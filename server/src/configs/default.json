@@ -1,0 +1,277 @@
+{
+  "interface": "0.0.0.0",
+  "port": 8080,
+  "title": "MapJS",
+  "headerTitle": "MapJS - NodeJS Map Replacement",
+  "locale": "en",
+  "style": "dark",
+  "dbType": "rdm",
+  "searchMaxResults": 20,
+  "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
+  "homepage": {
+        "enabled": false,
+        "title": "Welcome to MapJS",
+        "descriptionLine1": "The best place to find Pokemon, Raids, Quests, and more!",
+        "descriptionLine2": "Please login or join our Discord for more info...",
+        "discordInvite": "https://discord.gg/yourInvite"
+  },
+  "maxSessions": 5,
+  "favicon": "favicon.ico",
+  "ratelimit": {
+      "time": 60,
+      "requests": 100
+  },
+  "google": {
+      "analytics": "",
+      "adsense": ""
+  },
+  "scouting": {
+      "enabled": false,
+      "url": "",
+      "maxScouts": 15
+  },
+  "map": {
+      "startLat": 0,
+      "startLon": 0,
+      "startZoom": 12,
+      "minZoom": 10,
+      "maxZoom": 18,
+      "pvp": {
+          "useName": true,
+          "maxRank": 100,
+          "onlyShopTop5": false,
+          "minCpGreat": 1400,
+          "minCpUltra": 2400,
+          "megaStats": true,
+          "experimentalStats": false,
+          "l40stats": true,
+          "l41stats": false,
+          "l50stats": false,
+          "l51stats": false
+      },
+      "devicePathColor": "red",
+      "nestPolygons": true,
+      "clusters": {
+          "pokemon": true,
+          "gyms": true,
+          "pokestops": true,
+          "zoomLevel": 13
+      },
+      "filters": {
+          "gyms": true,
+          "raids": false,
+          "raidTimers": false,
+          "pokestops": false,
+          "quests": false,
+          "invasions": false,
+          "invasionTimers": false,
+          "spawnpoints": false,
+          "pokemon": false,
+          "pokemonTimers": false,
+          "nests": false,
+          "portals": false,
+          "scanCells": false,
+          "submissionCells": false,
+          "weather": false,
+          "scanAreas": false,
+          "devices": false
+      },
+      "glow": {
+          "iv": { "value": 100, "color": "red" },
+          "pvp": { "value": 1, "color": "blue" },
+          "both": { "color": "purple" }
+      },
+      "iconSizes": {
+          "gym": { "small": 20, "normal": 40, "large": 60, "huge": 80 },
+          "raid": { "small": 15, "normal": 30, "large": 50, "huge": 70 },
+          "pokestop": { "small": 15, "normal": 30, "large": 50, "huge": 70 },
+          "quest": { "small": 15, "normal": 30, "large": 50, "huge": 70 },
+          "invasion": { "small": 15, "normal": 30, "large": 50, "huge": 70 },
+          "spawnpoint": { "small": 0.5, "normal": 1, "large": 2, "huge": 3 },
+          "pokemon": { "small": 20, "normal": 40, "large": 60, "huge": 80 },
+          "nest": { "small": 20, "normal": 40, "large": 60, "huge": 80 },
+          "device": { "small": 15, "normal": 30, "large": 50, "huge": 70 }
+      },
+      "portalMods": { "oldColor": "blue", "newColor": "green" }
+  },
+  "header": {
+      "left": [],
+      "right": []
+  },
+  "db": {
+      "scanner": {
+          "host": "127.0.0.1",
+          "port": 3306,
+          "username": "user",
+          "password": "pass123!",
+          "database": "rdmdb",
+          "charset": "utf8mb4",
+          "sessionTable": "sessions",
+          "arScanColumn": false,
+          "useFor": []
+      },
+      "manualdb": {
+          "host": "127.0.0.1",
+          "port": 3306,
+          "username": "user",
+          "password": "pass123!",
+          "database": "manualdb",
+          "charset": "utf8mb4",
+          "sessionTable": "sessions",
+          "useFor": []
+      }
+  },
+  "discord": {
+      "enabled": false,
+      "logChannelId": "",
+      "status": "Map Status: Online",
+      "botToken": "",
+      "clientId": "",
+      "clientSecret": "",
+      "redirectUri": "http://localhost:8080/api/discord/callback",
+      "allowedGuilds": [],
+      "blockedGuilds": [],
+      "allowedUsers": [],
+      "perms": {
+          "map": {
+              "enabled": true,
+              "roles": []
+          },
+          "pokemon": {
+              "enabled": true,
+              "roles": []
+          },
+          "raids": {
+              "enabled": true,
+              "roles": []
+          },
+          "gyms": {
+              "enabled": true,
+              "roles": []
+          },
+          "pokestops": {
+              "enabled": true,
+              "roles": []
+          },
+          "quests": {
+              "enabled": true,
+              "roles": []
+          },
+          "lures": {
+              "enabled": true,
+              "roles": []
+          },
+          "invasions": {
+              "enabled": true,
+              "roles": []
+          },
+          "spawnpoints": {
+              "enabled": true,
+              "roles": []
+          },
+          "iv": {
+              "enabled": true,
+              "roles": []
+          },
+          "pvp": {
+              "enabled": true,
+              "roles": []
+          },
+          "s2cells": {
+              "enabled": true,
+              "roles": []
+          },
+          "submissionCells": {
+              "enabled": true,
+              "roles": []
+          },
+          "nests": {
+              "enabled": true,
+              "roles": []
+          },
+          "portals": {
+              "enabled": true,
+              "roles": []
+          },
+          "scanAreas": {
+              "enabled": true,
+              "roles": []
+          },
+          "weather": {
+              "enabled": true,
+              "roles": []
+          },
+          "devices": {
+              "enabled": true,
+              "roles": []
+          }
+      }
+  },
+  "tileservers": {
+      "Default": "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png;Map tiles by Carto, under CC BY 3.0. Data by  <a href='https://www.openstreetmap.org/'>OpenStreetMap</a>, under ODbL.",
+      "OSM": "https://tile.openstreetmap.org/{z}/{x}/{y}.png;Map data Â© <a href='https://www.openstreetmap.org'>OpenStreetMap</a> contributors",
+      "Dark Matter": "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png;Â© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors Â© <a href='https://carto.com/attributions'>CARTO</a>",
+      "Satellite": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x};Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+      },
+  "icons": {
+      "Default": {
+          "path": "https://mygod.github.io/pokicons/v2"
+      }
+  },
+  "popupDetails": {
+    "pokemon": {
+      "minimal": false,
+      "name": true,
+      "gender": true,
+      "weather": true,
+      "icon": true,
+      "types": true,
+      "iv": true,
+      "cp": true,
+      "lvl": true,
+      "moves": true,
+      "weight": true,
+      "captureRates": true,
+      "despawnTimer": true,
+      "otherTimers": true,
+      "pvp": true,
+      "pvpPercent": false,
+      "hideExcludeTimer": true,
+      "navigation": true
+    },
+    "pokestop": {},
+    "gyms": {},
+    "weather": {
+      "details": true
+    }
+  },
+  "rarity": {
+    "Default": {
+      "ivAnd": {
+        "value": "80-100",
+        "enabled": false
+      },
+      "ivOr": {
+        "value": "95-100",
+        "enabled": false
+      }
+    },
+    "quickStart": {
+      "ivAnd": {
+        "value": "90-100",
+        "enabled": false
+      },
+      "ivOr": {
+        "value": "95-100",
+        "enabled": true
+      },
+      "pokemon": []
+    },
+    "common": [],
+    "uncommon": [],
+    "rare": [],
+    "ultraRare": [],
+    "regional": [],
+    "event": []
+  }
+}

@@ -1,0 +1,157 @@
+{
+    "interface": "0.0.0.0",
+    "port": 8080,
+    "title": "MapJS",
+    "headerTitle": "MapJS - NodeJS Map Replacement",
+    "locale": "en",
+    "style": "dark",
+    "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
+    "homepage": {
+        "enabled": false,
+        "title": "Welcome to MapJS",
+        "descriptionLine1": "The best place to find Pokemon, Raids, Quests, and more!",
+        "descriptionLine2": "Please login or join our Discord for more info...",
+        "discordInvite": "https://discord.gg/yourInvite"
+    },
+    "map": {
+        "startLat": 0,
+        "startLon": 0,
+        "startZoom": 12,
+        "minZoom": 10,
+        "maxZoom": 18
+    },
+    "areas": {
+        "test": { "lat": 4.01, "lon": 117.01, "zoom": 15 }
+    },
+    "header": {
+        "left": [
+            { "name": "Stats", "url": "https://stats.example.com", "icon": "fas fa-chart-bar" }
+        ],
+        "right": [
+            { "name": "Discord", "url": "https://discord.com", "icon": "fab fa-discord" }
+        ]
+    },
+    "db": {
+        "scanner": {
+            "host": "127.0.0.1",
+            "port": 3306,
+            "username": "user",
+            "password": "pass123!",
+            "database": "rdmdb",
+            "charset": "utf8mb4",
+            "sessionTable": "sessions"
+        },
+        "manualdb": {
+            "host": "127.0.0.1",
+            "port": 3306,
+            "username": "user",
+            "password": "pass123!",
+            "database": "manualdb",
+            "charset": "utf8mb4"
+        }
+    },
+    "discord": {
+        "enabled": false,
+        "logChannelId": "",
+        "status": "Map Status: Online",
+        "botToken": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectUri": "http://localhost:8080/api/discord/callback",
+        "allowedGuilds": [],
+        "blockedGuilds": [],
+        "allowedUsers": [],
+        "perms": {
+            "map": {
+                "enabled": true,
+                "roles": []
+            },
+            "pokemon": {
+                "enabled": true,
+                "roles": []
+            },
+            "raids": {
+                "enabled": true,
+                "roles": []
+            },
+            "gyms": {
+                "enabled": true,
+                "roles": []
+            },
+            "pokestops": {
+                "enabled": true,
+                "roles": []
+            },
+            "quests": {
+                "enabled": true,
+                "roles": []
+            },
+            "lures": {
+                "enabled": true,
+                "roles": []
+            },
+            "invasions": {
+                "enabled": true,
+                "roles": []
+            },
+            "spawnpoints": {
+                "enabled": true,
+                "roles": []
+            },
+            "iv": {
+                "enabled": true,
+                "roles": []
+            },
+            "pvp": {
+                "enabled": true,
+                "roles": []
+            },
+            "s2cells": {
+                "enabled": true,
+                "roles": []
+            },
+            "submissionCells": {
+                "enabled": true,
+                "roles": []
+            },
+            "nests": {
+                "enabled": true,
+                "roles": []
+            },
+            "portals": {
+                "enabled": true,
+                "roles": []
+            },
+            "scanAreas": {
+                "enabled": true,
+                "roles": []
+            },
+            "weather": {
+                "enabled": true,
+                "roles": []
+            },
+            "devices": {
+                "enabled": true,
+                "roles": []
+            }
+        }
+    },
+    "tileservers": {
+        "Alidade Smooth Dark": "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png; &copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors",
+        "Thunder Forest": "https://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png;&copy; <a href='http://www.thunderforest.com/'>Thunderforest</a>, &copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
+        },
+    "icons": {
+        "Default": {
+            "path": "https://mygod.github.io/pokicons/v2"
+        },
+        "Local Example": {
+            "path": "/img/pokemon"
+        },
+        "Home": {
+            "path": "https://raw.githubusercontent.com/Mygod/PkmnHomeIcons/icons/icons"
+        },
+        "Shuffle": {
+            "path": "https://raw.githubusercontent.com/Mygod/pokedave_shuffle_icons_-ICONS-/master"
+        }
+    }
+}

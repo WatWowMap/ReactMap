@@ -1,0 +1,22 @@
+{
+  "name": "reactmap",
+  "version": "0.0.1",
+  "description": "React based frontend map.",
+  "main": "index.js",
+  "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "build:client": "yarn workspace react-map-client build",
+    "dev": "yarn workspace react-map-server dev",
+    "start": "yarn workspace react-map-server start"
+  },
+  "engines": {
+    "node": "^14.15"
+  }
+}
