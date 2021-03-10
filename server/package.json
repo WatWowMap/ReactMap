@@ -27,9 +27,13 @@
     "webpack-hot-middleware": "^2.25.0"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-graphql": "^0.12.0",
     "express-handlebars": "^5.2.1",
     "extend": "^3.0.2",
+    "graphql": "^15.5.0",
+    "graphql-type-json": "^0.3.2",
     "knex": "^0.95.1",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",

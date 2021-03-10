@@ -1,7 +1,6 @@
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import HtmlWebpackPlugin from "html-webpack-plugin"
-import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 
 import webpack from 'webpack'
 
@@ -60,6 +59,7 @@ export default {
     ]
   },
   resolve: {
+    mainFields: ['browser','main','module'],
     alias: {
       ...reactDomAlias,
       "@Components": path.resolve(__dirname, "src/components/"),

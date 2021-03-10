@@ -1,10 +1,15 @@
-import express from 'express' 
+import express from 'express'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import logger from "morgan"
 import '../knexfile.js'
-import rootRouter from './routes/rootRouter.js' 
-import addMiddlewares from './middlewares/addMiddlewares.js' 
+import rootRouter from './routes/rootRouter.js'
+import addMiddlewares from './middlewares/addMiddlewares.js'
+import hbsMiddleware from "express-handlebars"
+
+import { graphqlHTTP } from 'express-graphql'
+import schema from './schema/schema.js' 
+import cors from 'cors' 
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -12,8 +17,11 @@ const __dirname = dirname(__filename)
 const app = express()
 const port = 3000
 
-
-import hbsMiddleware from "express-handlebars"
+app.use(cors())
+app.use('/graphql', graphqlHTTP({
+  schema,
+  graphiql: true
+}))
 
 app.set("views", path.join(__dirname, "../views"))
 app.engine(
