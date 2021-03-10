@@ -6,7 +6,6 @@ import "../assets/scss/main.scss"
 import { MapContainer } from 'react-leaflet'
 import MapTiles from './MapTiles.jsx'
 import Fetch from '../services/Fetch.js'
-import Navbar from './layout/Navbar.jsx'
 
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 
@@ -31,7 +30,6 @@ const App = props => {
   return (
     <ApolloProvider client={client}>
       <Router>
-        <Navbar />
         <Switch>
           <Route exact path="/">
             {settings && <MapContainer center={[settings.startLat, settings.startLon]} zoom={settings.startZoom} whenCreated={setMap} >
