@@ -60,6 +60,7 @@ export default {
     ]
   },
   resolve: {
+    mainFields: ['browser','main','module'],
     alias: {
       ...reactDomAlias,
       "@Components": path.resolve(__dirname, "src/components/"),
