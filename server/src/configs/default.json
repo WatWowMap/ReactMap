@@ -273,5 +273,9 @@
     "ultraRare": [],
     "regional": [],
     "event": []
+  },
+  "devOptions": {
+    "enabled": true,
+    "graphiql": true
   }
 }

@@ -22,7 +22,7 @@ const App = props => {
   const getSettings = async () => {
     const body = (await Fetch.fetchSettings())
     setSettings(body)
-    setZoom(body.startZoom)
+    setZoom(body.map.startZoom)
   }
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const App = props => {
           <ApolloProvider client={client}>
             {settings &&
               <MapContainer
-                center={[settings.startLat, settings.startLon]}
+                center={[settings.map.startLat, settings.map.startLon]}
                 zoom={zoom}
                 whenCreated={setMap}
                 zoomControl={false} >
