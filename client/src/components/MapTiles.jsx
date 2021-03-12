@@ -5,6 +5,7 @@ import Gym from './gyms/Gym.jsx'
 import Pokestop from './pokestops/Pokestop.jsx'
 import Pokemon from './pokemon/Pokemon.jsx'
 import Nav from './layout/Nav.jsx'
+import Spawnpoint from './spawnpoints/Spawnpoint.jsx'
 
 const MapTiles = ({ map, settings }) => {
   const [bounds, setBounds] = useState({
@@ -50,10 +51,11 @@ const MapTiles = ({ map, settings }) => {
         url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
       />
       <ZoomControl position='topright' zoomInText='+' zoomOutText='-' />
+      {selected.Devices && <Device />}
       {selected.Gyms && <Gym bounds={bounds} />}
       {selected.Pokestops && <Pokestop bounds={bounds} />}
       {selected.Pokemon && <Pokemon bounds={bounds} />}
-      {selected.Devices && <Device />}
+      {selected.Spawnpoints && <Spawnpoint bounds={bounds} /> }
       <Nav
         selected={selected}
         setSelected={setSelected}
