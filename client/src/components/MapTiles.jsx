@@ -1,31 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { TileLayer } from 'react-leaflet'
+import { TileLayer, ZoomControl } from 'react-leaflet'
 import Gym from './gyms/Gym.jsx'
 import Pokestop from './pokestops/Pokestop.jsx'
 import Pokemon from './pokemon/Pokemon.jsx'
-import { useQuery } from '@apollo/client'
-import { getDataQuery } from '../services/queries.js'
+import Nav from './layout/Nav.jsx'
 
 const MapTiles = ({ map, settings }) => {
   const [bounds, setBounds] = useState({
-    _southWest: {
-      lat: 0,
-      lng: 0
-    },
-    _northEast: {
-      lat: 0,
-      lng: 0
-    }
+    _southWest: { lat: 0, lng: 0 },
+    _northEast: { lat: 0, lng: 0 }
   })
   const [position, setPosition] = useState({})
-  const { loading, error, data } = useQuery(getDataQuery, {
-    variables: {
-      minLat: bounds._southWest.lat,
-      minLon: bounds._southWest.lng,
-      maxLat: bounds._northEast.lat,
-      maxLon: bounds._northEast.lng
-    }
-  });
+  const [selected, setSelected] = useState({
+    Gyms: true,
+    Raids: false,
+    Pokestops: false,
+    Quests: false,
+    Invasions: false,
+    Spawnpoints: false,
+    Pokemon: true,
+    IngressPortals: false,
+    ScanCells: false,
+    S2Cells: false,
+    Weather: false,
+    ScanAreas: false,
+    Devices: false
+  })
 
   const onMove = useCallback(() => {
     setPosition(map.getCenter())
@@ -48,13 +48,14 @@ const MapTiles = ({ map, settings }) => {
         attribution={`&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors`}
         url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
       />
-      {data &&
-        <>
-          <Gym data={data.gyms} />
-          <Pokestop data={data.pokestops} />
-          <Pokemon data={data.pokemon} />
-        </>
-      }
+      <ZoomControl position='topright' zoomInText='+' zoomOutText='-' />
+      {selected.Gyms && <Gym bounds={bounds} />}
+      {selected.Pokestops && <Pokestop bounds={bounds} />}
+      {selected.Pokemon && <Pokemon bounds={bounds} />}
+      <Nav
+        selected={selected}
+        setSelected={setSelected}
+      />
     </>
   )
 }
