@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { TileLayer, ZoomControl } from 'react-leaflet'
+import Device from './devices/Device.jsx'
 import Gym from './gyms/Gym.jsx'
 import Pokestop from './pokestops/Pokestop.jsx'
 import Pokemon from './pokemon/Pokemon.jsx'
@@ -12,19 +13,19 @@ const MapTiles = ({ map, settings }) => {
   })
   const [position, setPosition] = useState({})
   const [selected, setSelected] = useState({
-    Gyms: true,
+    Gyms: false,
     Raids: false,
     Pokestops: false,
     Quests: false,
     Invasions: false,
     Spawnpoints: false,
-    Pokemon: true,
+    Pokemon: false,
     IngressPortals: false,
     ScanCells: false,
     S2Cells: false,
     Weather: false,
     ScanAreas: false,
-    Devices: false
+    Devices: true
   })
 
   const onMove = useCallback(() => {
@@ -52,6 +53,7 @@ const MapTiles = ({ map, settings }) => {
       {selected.Gyms && <Gym bounds={bounds} />}
       {selected.Pokestops && <Pokestop bounds={bounds} />}
       {selected.Pokemon && <Pokemon bounds={bounds} />}
+      {selected.Devices && <Device />}
       <Nav
         selected={selected}
         setSelected={setSelected}

@@ -17,24 +17,22 @@ const Pokemon = ({ bounds }) => {
   })
 
   return (
-    <>
-      {data && <MarkerClusterGroup
-        disableClusteringAtZoom={16}
-      >
-        {data.pokemon.map(pokemon => {
-          return (
-            <Marker
-              key={pokemon.id}
-              position={[pokemon.lat, pokemon.lon]}
-              icon={MarkerIcon(pokemon)}>
-              <Popup position={[pokemon.lat, pokemon.lon]}>
-                <PopupContent pokemon={pokemon} />
-              </Popup>
-            </Marker>
-          )
-        })}
-      </MarkerClusterGroup>}
-    </>
+    <MarkerClusterGroup
+      disableClusteringAtZoom={16}
+    >
+      {data && data.pokemon.map(pokemon => {
+        return (
+          <Marker
+            key={pokemon.id}
+            position={[pokemon.lat, pokemon.lon]}
+            icon={MarkerIcon(pokemon)}>
+            <Popup position={[pokemon.lat, pokemon.lon]}>
+              <PopupContent pokemon={pokemon} />
+            </Popup>
+          </Marker>
+        )
+      })}
+    </MarkerClusterGroup>
   )
 }
 

@@ -1,13 +1,20 @@
 import { GraphQLObjectType, GraphQLID, GraphQLFloat, GraphQLList, GraphQLSchema } from 'graphql'
 
+import DeviceType from './device.js'
 import GymType from './gym.js'
 import PokestopType from './pokestop.js'
 import PokemonType from './pokemon.js'
-import { Gym, Pokemon, Pokestop } from '../models/index.js'
+import { Device, Gym, Pokemon, Pokestop } from '../models/index.js'
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
+    devices: {
+      type: new GraphQLList(DeviceType),
+      async resolve(parent, args) {
+        return await Device.query()
+      }
+    },
     gyms: {
       type: new GraphQLList(GymType),
       args: {

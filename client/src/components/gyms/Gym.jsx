@@ -1,8 +1,8 @@
 import React from 'react'
 import { Marker, Popup } from 'react-leaflet'
 import MarkerIcon from './MarkerIcon.js'
-import PopupContent from './Popup.jsx'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
+import PopupContent from './Popup.jsx'
 import { useQuery } from '@apollo/client'
 import Query from '../../services/Query.js'
 
@@ -15,26 +15,24 @@ const Gym = ({ bounds }) => {
       maxLon: bounds._northEast.lng
     }
   })
-  
+
   return (
-    <>
-      {data && <MarkerClusterGroup
-        disableClusteringAtZoom={16}
-      >
-        {data.gyms.map(gym => {
-          return (
-            <Marker
-              key={gym.id}
-              position={[gym.lat, gym.lon]}
-              icon={MarkerIcon(gym)}>
-              <Popup position={[gym.lat, gym.lon]}>
-                <PopupContent gym={gym} />
-              </Popup>
-            </Marker>
-          )
-        })}
-      </MarkerClusterGroup>}
-    </>
+    <MarkerClusterGroup
+      disableClusteringAtZoom={16}
+    >
+      {data && data.gyms.map(gym => {
+        return (
+          <Marker
+            key={gym.id}
+            position={[gym.lat, gym.lon]}
+            icon={MarkerIcon(gym)}>
+            <Popup position={[gym.lat, gym.lon]}>
+              <PopupContent gym={gym} />
+            </Popup>
+          </Marker>
+        )
+      })}
+    </MarkerClusterGroup>
   )
 }
 

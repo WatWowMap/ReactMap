@@ -15,26 +15,24 @@ const Pokestop = ({ bounds }) => {
       maxLon: bounds._northEast.lng
     }
   })
-  
+
   return (
-    <>
-      {data && <MarkerClusterGroup
-        disableClusteringAtZoom={16}
-      >
-        {data.pokestops.map(pokestop => {
-          return (
-            <Marker
-              key={pokestop.id}
-              position={[pokestop.lat, pokestop.lon]}
-              icon={MarkerIcon(pokestop)}>
-              <Popup position={[pokestop.lat, pokestop.lon]}>
-                <PopupContent pokestop={pokestop} />
-              </Popup>
-            </Marker>
-          )
-        })}
-      </MarkerClusterGroup>}
-    </>
+    <MarkerClusterGroup
+      disableClusteringAtZoom={16}
+    >
+      {data && data.pokestops.map(pokestop => {
+        return (
+          <Marker
+            key={pokestop.id}
+            position={[pokestop.lat, pokestop.lon]}
+            icon={MarkerIcon(pokestop)}>
+            <Popup position={[pokestop.lat, pokestop.lon]}>
+              <PopupContent pokestop={pokestop} />
+            </Popup>
+          </Marker>
+        )
+      })}
+    </MarkerClusterGroup>
   )
 }
 
