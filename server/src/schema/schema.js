@@ -4,7 +4,15 @@ import DeviceType from './device.js'
 import GymType from './gym.js'
 import PokestopType from './pokestop.js'
 import PokemonType from './pokemon.js'
-import { Device, Gym, Pokemon, Pokestop } from '../models/index.js'
+import SpawnpointType from './spawnpoint.js'
+import { Device, Gym, Pokemon, Pokestop, Spawnpoint } from '../models/index.js'
+
+const minMaxArgs = {
+  minLat: { type: GraphQLFloat },
+  maxLat: { type: GraphQLFloat },
+  minLon: { type: GraphQLFloat },
+  maxLon: { type: GraphQLFloat }
+}
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
@@ -17,12 +25,7 @@ const RootQuery = new GraphQLObjectType({
     },
     gyms: {
       type: new GraphQLList(GymType),
-      args: {
-        minLat: { type: GraphQLFloat },
-        maxLat: { type: GraphQLFloat },
-        minLon: { type: GraphQLFloat },
-        maxLon: { type: GraphQLFloat }
-      },
+      args: minMaxArgs,
       async resolve(parent, args) {
         return await Gym.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
@@ -33,12 +36,7 @@ const RootQuery = new GraphQLObjectType({
     },
     pokestops: {
       type: new GraphQLList(PokestopType),
-      args: {
-        minLat: { type: GraphQLFloat },
-        maxLat: { type: GraphQLFloat },
-        minLon: { type: GraphQLFloat },
-        maxLon: { type: GraphQLFloat }
-      },
+      args: minMaxArgs,
       async resolve(parent, args) {
         return await Pokestop.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
@@ -49,12 +47,7 @@ const RootQuery = new GraphQLObjectType({
     },
     pokemon: {
       type: new GraphQLList(PokemonType),
-      args: {
-        minLat: { type: GraphQLFloat },
-        maxLat: { type: GraphQLFloat },
-        minLon: { type: GraphQLFloat },
-        maxLon: { type: GraphQLFloat }
-      },
+      args: minMaxArgs,
       async resolve(parent, args) {
         const ts = Math.floor((new Date).getTime() / 1000)
         return await Pokemon.query()
@@ -73,6 +66,15 @@ const RootQuery = new GraphQLObjectType({
         result.greatLeague = JSON.parse(result.pvp_rankings_great_league)
         result.ultraLeague = JSON.parse(result.pvp_rankings_ultra_league)
         return result
+      }
+    },
+    spawnpoints: {
+      type: new GraphQLList(SpawnpointType),
+      args: minMaxArgs,
+      async resolve(parent, args) {
+        return await Spawnpoint.query()
+          .whereBetween('lat', [args.minLat, args.maxLat])
+          .andWhereBetween('lon', [args.minLon, args.maxLon])
       }
     }
   }

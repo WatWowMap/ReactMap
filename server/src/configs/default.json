@@ -275,7 +275,7 @@
     "event": []
   },
   "devOptions": {
-    "enabled": true,
-    "graphiql": true
+    "enabled": false,
+    "graphiql": false
   }
 }

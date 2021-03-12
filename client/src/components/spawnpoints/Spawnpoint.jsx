@@ -1,5 +1,5 @@
 import React from 'react'
-import { Marker, Popup } from 'react-leaflet'
+import { Popup, CircleMarker } from 'react-leaflet'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
 
 import { useQuery } from '@apollo/client'
@@ -8,8 +8,8 @@ import Query from '../../services/Query.js'
 import marker from './marker.js'
 import PopupContent from './Popup.jsx'
 
-const Pokestop = ({ bounds }) => {
-  const { loading, error, data } = useQuery(Query.getAllPokestops(), {
+const Spawnpoint = ({ bounds }) => {
+  const { loading, error, data } = useQuery(Query.getAllSpawnpoints(), {
     variables: {
       minLat: bounds._southWest.lat,
       minLon: bounds._southWest.lng,
@@ -22,20 +22,21 @@ const Pokestop = ({ bounds }) => {
     <MarkerClusterGroup
       disableClusteringAtZoom={16}
     >
-      {data && data.pokestops.map(pokestop => {
+      {data && data.spawnpoints.map(spawnpoint => {
         return (
-          <Marker
-            key={pokestop.id}
-            position={[pokestop.lat, pokestop.lon]}
-            icon={marker(pokestop)}>
-            <Popup position={[pokestop.lat, pokestop.lon]}>
-              <PopupContent pokestop={pokestop} />
+          <CircleMarker
+            key={spawnpoint.id}
+            center={[spawnpoint.lat, spawnpoint.lon]}
+            radius={1}
+            pathOptions={marker(spawnpoint)}>
+            <Popup position={[spawnpoint.lat, spawnpoint.lon]}>
+              <PopupContent spawnpoint={spawnpoint} />
             </Popup>
-          </Marker>
+          </CircleMarker>
         )
       })}
     </MarkerClusterGroup>
   )
 }
 
-export default Pokestop
+export default Spawnpoint
