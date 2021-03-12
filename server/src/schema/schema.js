@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLBoolean, GraphQLFloat, GraphQLList, GraphQLSchema } from 'graphql'
+import { GraphQLObjectType, GraphQLID, GraphQLFloat, GraphQLList, GraphQLSchema } from 'graphql'
 
 import GymType from './gym.js'
 import PokestopType from './pokestop.js'

@@ -24,7 +24,7 @@ export default function (pokemon) {
 
   return new Icon({
     iconUrl: `https://mygod.github.io/pokicons/v2/${getPokemonIcon(pokemon.pokemon_id, 0, 0, 0, pokemon.costume)}.png`,
-    iconSize: [20, 20],
+    iconSize: [30, 30],
     iconAnchor: [20, 33.96],
     popupAnchor: [0, -41.96],
   })
