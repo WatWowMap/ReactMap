@@ -6,31 +6,31 @@ import Pokestop from './pokestops/Pokestop.jsx'
 import Pokemon from './pokemon/Pokemon.jsx'
 import Nav from './layout/Nav.jsx'
 import Spawnpoint from './spawnpoints/Spawnpoint.jsx'
+import Portal from './portals/Portal.jsx'
 
 const MapTiles = ({ map, settings }) => {
   const [bounds, setBounds] = useState({
     _southWest: { lat: 0, lng: 0 },
     _northEast: { lat: 0, lng: 0 }
   })
-  const [position, setPosition] = useState({})
   const [selected, setSelected] = useState({
-    Gyms: settings.map.filters.gyms,
-    Raids: settings.map.filters.raids,
-    Pokestops: settings.map.filters.pokestops,
-    Quests: settings.map.filters.quests,
-    Invasions: settings.map.filters.invasions,
-    Spawnpoints: settings.map.filters.spawnpoints,
-    Pokemon: settings.map.filters.pokemon,
-    IngressPortals: settings.map.filters.portals,
-    ScanCells: settings.map.filters.scanCells,
-    S2Cells: settings.map.filters.submissionCells,
-    Weather: settings.map.filters.weather,
-    ScanAreas: settings.map.filters.scanAreas,
-    Devices: settings.map.filters.devices
+    gyms: settings.map.filters.gyms,
+    raids: settings.map.filters.raids,
+    pokestops: settings.map.filters.pokestops,
+    quests: settings.map.filters.quests,
+    invasions: settings.map.filters.invasions,
+    spawnpoints: settings.map.filters.spawnpoints,
+    pokemon: settings.map.filters.pokemon,
+    portals: settings.map.filters.portals,
+    scanCells: settings.map.filters.scanCells,
+    s2Cells: settings.map.filters.submissionCells,
+    weather: settings.map.filters.weather,
+    scanAreas: settings.map.filters.scanAreas,
+    devices: settings.map.filters.devices
   })
 
   const onMove = useCallback(() => {
-    setPosition(map.getCenter())
+    setBounds(map.getBounds())
   }, [map])
 
   useEffect(() => {
@@ -40,10 +40,6 @@ const MapTiles = ({ map, settings }) => {
     }
   }, [map, onMove])
 
-  useEffect(() => {
-    setBounds(map.getBounds())
-  }, [position])
-
   return (
     <>
       <TileLayer
@@ -51,11 +47,12 @@ const MapTiles = ({ map, settings }) => {
         url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
       />
       <ZoomControl position='topright' zoomInText='+' zoomOutText='-' />
-      {selected.Devices && <Device />}
-      {selected.Gyms && <Gym bounds={bounds} />}
-      {selected.Pokestops && <Pokestop bounds={bounds} />}
-      {selected.Pokemon && <Pokemon bounds={bounds} />}
-      {selected.Spawnpoints && <Spawnpoint bounds={bounds} /> }
+      {selected.devices && <Device />}
+      {selected.gyms && <Gym bounds={bounds} />}
+      {selected.pokestops && <Pokestop bounds={bounds} />}
+      {selected.pokemon && <Pokemon bounds={bounds} />}
+      {selected.portals && <Portal bounds={bounds} />}
+      {selected.spawnpoints && <Spawnpoint bounds={bounds} />}
       <Nav
         selected={selected}
         setSelected={setSelected}
