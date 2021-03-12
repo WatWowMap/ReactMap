@@ -4,8 +4,9 @@ import DeviceType from './device.js'
 import GymType from './gym.js'
 import PokestopType from './pokestop.js'
 import PokemonType from './pokemon.js'
+import PortalType from './portals.js'
 import SpawnpointType from './spawnpoint.js'
-import { Device, Gym, Pokemon, Pokestop, Spawnpoint } from '../models/index.js'
+import { Device, Gym, Pokemon, Pokestop, Portal, Spawnpoint } from '../models/index.js'
 
 const minMaxArgs = {
   minLat: { type: GraphQLFloat },
@@ -66,6 +67,15 @@ const RootQuery = new GraphQLObjectType({
         result.greatLeague = JSON.parse(result.pvp_rankings_great_league)
         result.ultraLeague = JSON.parse(result.pvp_rankings_ultra_league)
         return result
+      }
+    },
+    portals: {
+      type: new GraphQLList(PortalType),
+      args: minMaxArgs,
+      async resolve(parent, args) {
+        return await Portal.query()
+          .whereBetween('lat', [args.minLat, args.maxLat])
+          .andWhereBetween('lon', [args.minLon, args.maxLon])
       }
     },
     spawnpoints: {

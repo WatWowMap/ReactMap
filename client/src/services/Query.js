@@ -3,6 +3,7 @@ import { getAllGyms } from './data/gym.js'
 import { getAllPokestops } from './data/pokestop.js'
 import { getAllPokemon } from './data/pokemon.js'
 import { getAllSpawnpoints } from './data/spawnpoint.js'
+import { getAllPortals } from './data/portal.js' 
 
 class Query {
 
@@ -20,6 +21,10 @@ class Query {
 
   static getAllPokemon() {
     return getAllPokemon
+  }
+
+  static getAllPortals() {
+    return getAllPortals
   }
 
   static getAllSpawnpoints() {

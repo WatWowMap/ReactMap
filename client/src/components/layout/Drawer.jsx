@@ -21,29 +21,29 @@ const DrawerMenu = ({ drawer, toggleDrawer, selected, setSelected }) => {
   const classes = useStyles()
 
   const filterItems = [
-    { name: 'Gyms', icon: <ArrowForwardIos /> },
-    { name: 'Raids', icon: <ArrowForwardIos /> },
-    { name: 'Pokestops', icon: <ArrowForwardIos /> },
-    { name: 'Quests', icon: <ArrowForwardIos /> },
-    { name: 'Invasions', icon: <ArrowForwardIos /> },
-    { name: 'Spawnpoints', icon: <ArrowForwardIos /> },
-    { name: 'Pokemon', icon: <ArrowForwardIos /> },
-    { name: 'Ingress Portals', icon: <ArrowForwardIos /> },
-    { name: 'Scan-Cells', icon: <ArrowForwardIos /> },
-    { name: 'S2-Cells', icon: <ArrowForwardIos /> },
-    { name: 'Weather', icon: <ArrowForwardIos /> },
-    { name: 'ScanAreas', icon: <ArrowForwardIos /> },
-    { name: 'Devices', icon: <ArrowForwardIos /> }
+    { name: 'Gyms', icon: <ArrowForwardIos />, meta: 'gyms' },
+    { name: 'Raids', icon: <ArrowForwardIos />, meta: 'raids' },
+    { name: 'Pokestops', icon: <ArrowForwardIos />, meta: 'pokestops' },
+    { name: 'Quests', icon: <ArrowForwardIos />, meta: 'quests' },
+    { name: 'Invasions', icon: <ArrowForwardIos />, meta: 'invasions' },
+    { name: 'Spawnpoints', icon: <ArrowForwardIos />, meta: 'spawnpoints' },
+    { name: 'Pokemon', icon: <ArrowForwardIos />, meta: 'pokemon' },
+    { name: 'Ingress Portals', icon: <ArrowForwardIos/>, meta: 'portals' },
+    { name: 'Scan-Cells', icon: <ArrowForwardIos />, meta: 'scanCells' },
+    { name: 'S2-Cells', icon: <ArrowForwardIos />, meta: 's2Cells' },
+    { name: 'Weather', icon: <ArrowForwardIos />, meta: 'weather' },
+    { name: 'ScanAreas', icon: <ArrowForwardIos />, meta: 'scanAreas' },
+    { name: 'Devices', icon: <ArrowForwardIos />, meta: 'devices' }
   ]
 
   const menuItems = [
-    { name: 'Areas', icon: <ArrowForwardIos /> },
-    { name: 'Stats', icon: <ArrowForwardIos /> },
-    { name: 'Search', icon: <ArrowForwardIos /> },
-    { name: 'Settings', icon: <ArrowForwardIos /> },
-    { name: 'ClearCache', icon: <ArrowForwardIos /> },
-    { name: 'Discord', icon: <ArrowForwardIos /> },
-    { name: 'Logout', icon: <ArrowForwardIos /> }
+    { name: 'Areas', icon: <ArrowForwardIos />, meta: 'areas' },
+    { name: 'Stats', icon: <ArrowForwardIos />, meta: 'stats' },
+    { name: 'Search', icon: <ArrowForwardIos />, meta: 'search' },
+    { name: 'Settings', icon: <ArrowForwardIos />, meta: 'settings' },
+    { name: 'ClearCache', icon: <ArrowForwardIos />, meta: 'clearCache' },
+    { name: 'Discord', icon: <ArrowForwardIos />, meta: 'discord' },
+    { name: 'Logout', icon: <ArrowForwardIos />, meta: 'logout' }
   ]
 
   return (
@@ -62,12 +62,12 @@ const DrawerMenu = ({ drawer, toggleDrawer, selected, setSelected }) => {
                 <ListItemText primary={item.name} />
                 <ToggleButton
                   value="x"
-                  selected={selected[item.name]}
+                  selected={selected[item.meta]}
                   onChange={() => {
-                    setSelected({ ...selected, [item.name]: !selected[item.name] });
+                    setSelected({ ...selected, [item.meta]: !selected[item.meta] });
                   }}
                 >
-                  {selected[item.name] ? <Check style={{ fontSize: 15, color: 'green' }} /> : <Clear style={{ fontSize: 15, color: 'red' }} />}
+                  {selected[item.meta] ? <Check style={{ fontSize: 15, color: 'green' }} /> : <Clear style={{ fontSize: 15, color: 'red' }} />}
 
                 </ToggleButton>
               </ListItem>
