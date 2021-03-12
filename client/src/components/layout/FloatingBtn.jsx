@@ -28,7 +28,7 @@ const ActionButtons = ({ zoom, setZoom, toggleDrawer }) => {
       <Grid container direction='column' spacing={1} className={classes.root}>
         <Grid item >
           <Fab color="primary" aria-label="add">
-            <Menu onClick={toggleDrawer('left', true)}/>
+            <Menu onClick={toggleDrawer(true)}/>
           </Fab>
         </Grid>
         <Grid item >

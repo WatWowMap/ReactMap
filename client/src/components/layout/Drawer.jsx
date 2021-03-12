@@ -46,70 +46,59 @@ const DrawerMenu = ({ drawer, toggleDrawer, selected, setSelected }) => {
     { name: 'Logout', icon: <ArrowForwardIos /> }
   ]
 
-  const list = (anchor) => (
-    <div
-      className={clsx(classes.list)}
-      role="presentation"
-      onKeyDown={toggleDrawer(anchor, false)}
-    >
-      <List>
-        <Typography>Map Filters</Typography>
-        {filterItems.map(item => {
-          return (
-            <ListItem button key={item.name}>
-              {item.icon}
-              <ListItemText primary={item.name} />
-              <ToggleButton
-                value="x"
-                selected={selected[item.name]}
-                onChange={() => {
-                  setSelected({ ...selected, [item.name]: !selected[item.name] });
-                }}
-              >
-                {selected[item.name] ? <Check style={{ fontSize: 15, color: 'green' }} /> : <Clear style={{ fontSize: 15, color: 'red' }} />}
+  return (
+    <Drawer anchor={'left'} open={drawer} onClose={toggleDrawer(false)}>
+      <div
+        className={clsx(classes.list)}
+        role="presentation"
+        onKeyDown={toggleDrawer(false)}
+      >
+        <List>
+          <Typography>Map Filters</Typography>
+          {filterItems.map(item => {
+            return (
+              <ListItem button key={item.name}>
+                {item.icon}
+                <ListItemText primary={item.name} />
+                <ToggleButton
+                  value="x"
+                  selected={selected[item.name]}
+                  onChange={() => {
+                    setSelected({ ...selected, [item.name]: !selected[item.name] });
+                  }}
+                >
+                  {selected[item.name] ? <Check style={{ fontSize: 15, color: 'green' }} /> : <Clear style={{ fontSize: 15, color: 'red' }} />}
 
-              </ToggleButton>
-            </ListItem>
-          )
-        })}
-      </List>
-      <Divider />
-      <List>
-        <ListItem>
-          <Button variant="contained" color="secondary">
-            Import
+                </ToggleButton>
+              </ListItem>
+            )
+          })}
+        </List>
+        <Divider />
+        <List>
+          <ListItem>
+            <Button variant="contained" color="secondary">
+              Import
           </Button>&nbsp;&nbsp;&nbsp;
           <Button variant="contained" color="primary">
-            Export
+              Export
           </Button>
-        </ListItem>
-      </List>
-      <Divider />
-      <List>
-        <Typography>Options</Typography>
-        {menuItems.map(item => {
-          return (
-            <ListItem button key={item.name}>
-              {item.icon}
-              <ListItemText primary={item.name} />
-            </ListItem>
-          )
-        })}
-      </List>
-    </div>
-  )
-
-  return (
-    <div>
-      {['left'].map((anchor) => (
-        <React.Fragment key={anchor}>
-          <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button>
-          <Drawer anchor={anchor} open={drawer[anchor]} onClose={toggleDrawer(anchor, false)}>
-            {list(anchor)}
-          </Drawer>
-        </React.Fragment>
-      ))}
-    </div>
+          </ListItem>
+        </List>
+        <Divider />
+        <List>
+          <Typography>Options</Typography>
+          {menuItems.map(item => {
+            return (
+              <ListItem button key={item.name}>
+                {item.icon}
+                <ListItemText primary={item.name} />
+              </ListItem>
+            )
+          })}
+        </List>
+      </div>
+    </Drawer>
   )
 }
 
