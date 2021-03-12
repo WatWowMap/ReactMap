@@ -13,19 +13,19 @@ const MapTiles = ({ map, settings }) => {
   })
   const [position, setPosition] = useState({})
   const [selected, setSelected] = useState({
-    Gyms: false,
-    Raids: false,
-    Pokestops: false,
-    Quests: false,
-    Invasions: false,
-    Spawnpoints: false,
-    Pokemon: false,
-    IngressPortals: false,
-    ScanCells: false,
-    S2Cells: false,
-    Weather: false,
-    ScanAreas: false,
-    Devices: true
+    Gyms: settings.map.filters.gyms,
+    Raids: settings.map.filters.raids,
+    Pokestops: settings.map.filters.pokestops,
+    Quests: settings.map.filters.quests,
+    Invasions: settings.map.filters.invasions,
+    Spawnpoints: settings.map.filters.spawnpoints,
+    Pokemon: settings.map.filters.pokemon,
+    IngressPortals: settings.map.filters.portals,
+    ScanCells: settings.map.filters.scanCells,
+    S2Cells: settings.map.filters.submissionCells,
+    Weather: settings.map.filters.weather,
+    ScanAreas: settings.map.filters.scanAreas,
+    Devices: settings.map.filters.devices
   })
 
   const onMove = useCallback(() => {

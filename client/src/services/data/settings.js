@@ -1,6 +1,6 @@
 export default async function () {
   try {
-    const response = await fetch(`/api/v1/data/settings`)
+    const response = await fetch(`/settings`)
     if (!response.ok) {
       throw new Error(`${response.status} (${response.statusText})`)
     }

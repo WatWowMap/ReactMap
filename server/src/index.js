@@ -6,22 +6,12 @@ import '../knexfile.js'
 import rootRouter from './routes/rootRouter.js'
 import addMiddlewares from './middlewares/addMiddlewares.js'
 import hbsMiddleware from "express-handlebars"
-
-import { graphqlHTTP } from 'express-graphql'
-import schema from './schema/schema.js' 
-import cors from 'cors' 
+import config from './services/config.js' 
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const app = express()
-const port = 3000
-
-app.use(cors())
-app.use('/graphql', graphqlHTTP({
-  schema,
-  graphiql: true
-}))
 
 app.set("views", path.join(__dirname, "../views"))
 app.engine(
@@ -43,8 +33,8 @@ addMiddlewares(app)
 
 app.use(rootRouter)
 
-app.listen(port, () => {
-  console.log(`Server is now listening at http://localhost:${port}`)
+app.listen(config.port, () => {
+  console.log(`Server is now listening at http://${config.interface}:${config.port}`)
 })
 
 export default app
