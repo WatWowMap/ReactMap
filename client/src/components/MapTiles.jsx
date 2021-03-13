@@ -7,11 +7,18 @@ import Pokemon from './pokemon/Pokemon.jsx'
 import Nav from './layout/Nav.jsx'
 import Spawnpoint from './spawnpoints/Spawnpoint.jsx'
 import Portal from './portals/Portal.jsx'
+import Weather from './weather/Weather.jsx'
 
 const MapTiles = ({ map, settings }) => {
   const [bounds, setBounds] = useState({
-    _southWest: { lat: 0, lng: 0 },
-    _northEast: { lat: 0, lng: 0 }
+    _southWest: { 
+      lat: settings.map.startLat-0.025, 
+      lng: settings.map.startLon-0.025 
+    },
+    _northEast: { 
+      lat: settings.map.startLat+0.025, 
+      lng: settings.map.startLon+0.025
+    }
   })
   const [selected, setSelected] = useState({
     gyms: settings.map.filters.gyms,
@@ -53,6 +60,7 @@ const MapTiles = ({ map, settings }) => {
       {selected.pokemon && <Pokemon bounds={bounds} />}
       {selected.portals && <Portal bounds={bounds} />}
       {selected.spawnpoints && <Spawnpoint bounds={bounds} />}
+      {selected.weather && <Weather />}
       <Nav
         selected={selected}
         setSelected={setSelected}

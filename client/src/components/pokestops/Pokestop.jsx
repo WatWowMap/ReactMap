@@ -17,7 +17,6 @@ const Pokestop = ({ bounds }) => {
       maxLon: bounds._northEast.lng
     }
   })
-  console.log(data)
 
   return (
     <MarkerClusterGroup

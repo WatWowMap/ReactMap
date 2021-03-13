@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SpawnpointPopup = ({ portal }) => {
+const PortalPopup = ({ portal }) => {
   return (
     <>
     {portal.name}
@@ -8,4 +8,4 @@ const SpawnpointPopup = ({ portal }) => {
   )
 }
 
-export default SpawnpointPopup
+export default PortalPopup

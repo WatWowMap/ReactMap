@@ -1,6 +1,7 @@
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import HtmlWebpackPlugin from "html-webpack-plugin"
+import config from '../server/src/services/config.js'
 
 import webpack from 'webpack'
 
@@ -55,24 +56,28 @@ export default {
       {
         test: /\.(png|jpe?g|gif)$/i,
         loader: 'file-loader',
+      },
+      {
+        test: /\.tsx?$/,
+        use: [{ loader: 'ts-loader', options: { transpileOnly: true } }]
       }
     ]
   },
   resolve: {
-    mainFields: ['browser','main','module'],
+    mainFields: ['browser', 'main', 'module'],
     alias: {
       ...reactDomAlias,
       "@Components": path.resolve(__dirname, "src/components/"),
       "@Providers": path.resolve(__dirname, "src/providers/"),
     },
-    extensions: ["*", ".js", ".jsx", ".scss"],
+    extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".scss"],
   },
   devServer: {
     contentBase: path.join(__dirname, "public/"),
     historyApiFallback: true,
-    port: 3000,
+    port: config.port,
     hotOnly: true,
-    publicPath: "http://localhost:3000/",
+    publicPath: `http://${config.interface}:${config.port}/`,
     proxy: [
       {
         context: ["/auth", "/api"],

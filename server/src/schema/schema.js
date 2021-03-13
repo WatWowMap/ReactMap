@@ -6,7 +6,8 @@ import PokestopType from './pokestop.js'
 import PokemonType from './pokemon.js'
 import PortalType from './portals.js'
 import SpawnpointType from './spawnpoint.js'
-import { Device, Gym, Pokemon, Pokestop, Portal, Spawnpoint } from '../models/index.js'
+import WeatherType from './weather.js'
+import { Device, Gym, Pokemon, Pokestop, Portal, Spawnpoint, Weather } from '../models/index.js'
 
 const minMaxArgs = {
   minLat: { type: GraphQLFloat },
@@ -85,6 +86,12 @@ const RootQuery = new GraphQLObjectType({
         return await Spawnpoint.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
           .andWhereBetween('lon', [args.minLon, args.maxLon])
+      }
+    },
+    weather: {
+      type: new GraphQLList(WeatherType),
+      async resolve(parent, args) {
+        return await Weather.query()
       }
     }
   }
