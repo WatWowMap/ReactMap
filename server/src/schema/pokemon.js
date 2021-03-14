@@ -12,7 +12,7 @@ const PvpType = new GraphQLObjectType({
 })
 
 export default new GraphQLObjectType({
-  name: 'PokemonDetails',
+  name: 'Pokemon',
   fields: () => ({
     id: { type: GraphQLID },
     lat: { type: GraphQLFloat },
