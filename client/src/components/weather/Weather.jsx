@@ -1,13 +1,12 @@
 import React from 'react'
-import { Popup, Polygon, Polyline, Marker } from 'react-leaflet'
+import { Popup, Polyline, Marker } from 'react-leaflet'
 
 import { useQuery } from '@apollo/client'
 import Query from '../../services/Query.js'
 
 import marker from './marker.js'
 import PopupContent from './Popup.jsx'
-import getPolygon from '../../services/getPolygon.js'
-import getPolyline from '../../services/getPolyline.js' 
+import getPolyVector from '../../services/getPolyVector.js' 
 
 const Weather = ({ bounds }) => {
   const { loading, error, data } = useQuery(Query.getAllWeather(), {
@@ -25,7 +24,7 @@ const Weather = ({ bounds }) => {
         return (
           <Polyline
             key={cell.id}
-            positions={getPolyline(cell.id)}
+            positions={getPolyVector(cell.id, 'polyline')}
             pathOptions={{ color: 'green', opacity: 0.5 }}>
             <Marker icon={marker(cell)} position={[cell.latitude, cell.longitude]}>
               <Popup position={[cell.latitude, cell.longitude]}>

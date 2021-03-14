@@ -1,6 +1,6 @@
 import { S2LatLng, S2Cell, S2CellId, S2Point } from 'nodes2ts';
 
-export default function (s2cellId) {
+export default function (s2cellId, type) {
   const s2cell = new S2Cell(new S2CellId(BigInt(s2cellId).toString()))
   const polygon = []
   for (let i = 0; i <= 3; i++) {
@@ -11,6 +11,9 @@ export default function (s2cellId) {
       latLng.latDegrees,
       latLng.lngDegrees
     ])
+  }
+  if (type === 'polyline') {
+    polygon.push(polygon[0])
   }
 
   return polygon

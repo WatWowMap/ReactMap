@@ -8,16 +8,17 @@ import Nav from './layout/Nav.jsx'
 import Spawnpoint from './spawnpoints/Spawnpoint.jsx'
 import Portal from './portals/Portal.jsx'
 import Weather from './weather/Weather.jsx'
+import S2Cell from './s2Cell/S2Cell.jsx'
 
 const MapTiles = ({ map, settings }) => {
   const [bounds, setBounds] = useState({
-    _southWest: { 
-      lat: settings.map.startLat-0.025, 
-      lng: settings.map.startLon-0.025 
+    _southWest: {
+      lat: settings.map.startLat - 0.025,
+      lng: settings.map.startLon - 0.025
     },
-    _northEast: { 
-      lat: settings.map.startLat+0.025, 
-      lng: settings.map.startLon+0.025
+    _northEast: {
+      lat: settings.map.startLat + 0.025,
+      lng: settings.map.startLon + 0.025
     }
   })
   const [selected, setSelected] = useState({
@@ -59,6 +60,7 @@ const MapTiles = ({ map, settings }) => {
       {selected.pokestops && <Pokestop bounds={bounds} />}
       {selected.pokemon && <Pokemon bounds={bounds} />}
       {selected.portals && <Portal bounds={bounds} />}
+      {selected.s2Cells && <S2Cell bounds={bounds} />}
       {selected.spawnpoints && <Spawnpoint bounds={bounds} />}
       {selected.weather && <Weather bounds={bounds} />}
       <Nav

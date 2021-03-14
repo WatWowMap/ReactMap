@@ -6,9 +6,10 @@ import GymType from './gym.js'
 import PokestopType from './pokestop.js'
 import PokemonType from './pokemon.js'
 import PortalType from './portals.js'
+import s2CellType from './s2Cell.js'
 import SpawnpointType from './spawnpoint.js'
 import WeatherType from './weather.js'
-import { Device, Gym, Pokemon, Pokestop, Portal, Spawnpoint, Weather } from '../models/index.js'
+import { Device, Gym, Pokemon, Pokestop, Portal, S2Cell, Spawnpoint, Weather } from '../models/index.js'
 
 const minMaxArgs = {
   minLat: { type: GraphQLFloat },
@@ -78,6 +79,18 @@ const RootQuery = new GraphQLObjectType({
         return await Portal.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
           .andWhereBetween('lon', [args.minLon, args.maxLon])
+      }
+    },
+    s2Cells: {
+      type: new GraphQLList(s2CellType),
+      args: minMaxArgs,
+      async resolve(parent, args) {
+        return await S2Cell.query()
+          .select(['*', ref('id')
+            .castTo('CHAR')
+            .as('id')])
+          .whereBetween('center_lat', [args.minLat, args.maxLat])
+          .andWhereBetween('center_lon', [args.minLon, args.maxLon])
       }
     },
     spawnpoints: {

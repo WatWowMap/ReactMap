@@ -5,7 +5,7 @@ import { getAllPokemon } from './data/pokemon.js'
 import { getAllSpawnpoints } from './data/spawnpoint.js'
 import { getAllPortals } from './data/portal.js' 
 import { getAllWeather } from './data/weather.js'
-
+import { getAllS2Cells } from './data/s2Cell.js'
 class Query {
 
   static getAllDevices() {
@@ -26,6 +26,10 @@ class Query {
 
   static getAllPortals() {
     return getAllPortals
+  }
+
+  static getAllS2Cells() {
+    return getAllS2Cells
   }
 
   static getAllSpawnpoints() {
