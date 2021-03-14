@@ -12,6 +12,7 @@ export default function (s2cellId) {
       latLng.lngDegrees
     ])
   }
+  polygon.push(polygon[0])
 
   return polygon
 }

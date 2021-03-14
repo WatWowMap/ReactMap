@@ -1,9 +1,9 @@
-import { GraphQLObjectType, GraphQLID, GraphQLInt, GraphQLFloat, GraphQLBoolean } from 'graphql'
+import { GraphQLObjectType, GraphQLInt, GraphQLFloat, GraphQLBoolean, GraphQLString } from 'graphql'
 
 export default new GraphQLObjectType({
   name: 'Weather',
   fields: () => ({
-    id: { type: GraphQLID },
+    id: { type: GraphQLString },
     level: { type: GraphQLInt },
     latitude: { type: GraphQLFloat },
     longitude: { type: GraphQLFloat },

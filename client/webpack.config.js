@@ -2,7 +2,6 @@ import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import config from '../server/src/services/config.js'
-
 import webpack from 'webpack'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -20,6 +19,7 @@ export default {
     publicPath: '/dist/'
   },
   mode: 'development',
+  devtool: "source-map",
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
@@ -49,17 +49,8 @@ export default {
         ]
       },
       {
-        test: /\.jsx?$/,
-        enforce: 'pre',
-        use: ['source-map-loader'],
-      },
-      {
         test: /\.(png|jpe?g|gif)$/i,
         loader: 'file-loader',
-      },
-      {
-        test: /\.tsx?$/,
-        use: [{ loader: 'ts-loader', options: { transpileOnly: true } }]
       }
     ]
   },

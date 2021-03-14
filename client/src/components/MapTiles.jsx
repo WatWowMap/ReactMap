@@ -60,7 +60,7 @@ const MapTiles = ({ map, settings }) => {
       {selected.pokemon && <Pokemon bounds={bounds} />}
       {selected.portals && <Portal bounds={bounds} />}
       {selected.spawnpoints && <Spawnpoint bounds={bounds} />}
-      {selected.weather && <Weather />}
+      {selected.weather && <Weather bounds={bounds} />}
       <Nav
         selected={selected}
         setSelected={setSelected}

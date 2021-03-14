@@ -1,4 +1,5 @@
 import { GraphQLObjectType, GraphQLID, GraphQLFloat, GraphQLList, GraphQLSchema } from 'graphql'
+import { ref } from 'objection'
 
 import DeviceType from './device.js'
 import GymType from './gym.js'
@@ -90,8 +91,14 @@ const RootQuery = new GraphQLObjectType({
     },
     weather: {
       type: new GraphQLList(WeatherType),
+      args: minMaxArgs,
       async resolve(parent, args) {
         return await Weather.query()
+          .select(['*', ref('id')
+            .castTo('CHAR')
+            .as('id')])
+          .whereBetween('latitude', [args.minLat, args.maxLat])
+          .andWhereBetween('longitude', [args.minLon, args.maxLon])
       }
     }
   }
