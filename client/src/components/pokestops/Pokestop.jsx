@@ -10,12 +10,7 @@ import PopupContent from './Popup.jsx'
 
 const Pokestop = ({ bounds }) => {
   const { loading, error, data } = useQuery(Query.getAllPokestops(), {
-    variables: {
-      minLat: bounds._southWest.lat,
-      minLon: bounds._southWest.lng,
-      maxLat: bounds._northEast.lat,
-      maxLon: bounds._northEast.lng
-    }
+    variables: bounds
   })
 
   return (
