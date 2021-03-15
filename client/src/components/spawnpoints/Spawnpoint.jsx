@@ -1,5 +1,5 @@
 import React from 'react'
-import { Popup, CircleMarker } from 'react-leaflet'
+import { Popup, Circle } from 'react-leaflet'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
 
 import { useQuery } from '@apollo/client'
@@ -10,12 +10,7 @@ import PopupContent from './Popup.jsx'
 
 const Spawnpoint = ({ bounds }) => {
   const { loading, error, data } = useQuery(Query.getAllSpawnpoints(), {
-    variables: {
-      minLat: bounds._southWest.lat,
-      minLon: bounds._southWest.lng,
-      maxLat: bounds._northEast.lat,
-      maxLon: bounds._northEast.lng
-    }
+    variables: bounds
   })
 
   return (
@@ -24,7 +19,7 @@ const Spawnpoint = ({ bounds }) => {
     >
       {data && data.spawnpoints.map(spawnpoint => {
         return (
-          <CircleMarker
+          <Circle
             key={spawnpoint.id}
             center={[spawnpoint.lat, spawnpoint.lon]}
             radius={1}
@@ -32,7 +27,7 @@ const Spawnpoint = ({ bounds }) => {
             <Popup position={[spawnpoint.lat, spawnpoint.lon]}>
               <PopupContent spawnpoint={spawnpoint} />
             </Popup>
-          </CircleMarker>
+          </Circle>
         )
       })}
     </MarkerClusterGroup>

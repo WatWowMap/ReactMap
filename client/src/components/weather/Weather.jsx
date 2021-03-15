@@ -10,12 +10,7 @@ import getPolyVector from '../../services/getPolyVector.js'
 
 const Weather = ({ bounds }) => {
   const { loading, error, data } = useQuery(Query.getAllWeather(), {
-    variables: {
-      minLat: bounds._southWest.lat,
-      minLon: bounds._southWest.lng,
-      maxLat: bounds._northEast.lat,
-      maxLon: bounds._northEast.lng
-    }
+    variables: bounds
   })
 
   return (

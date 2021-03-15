@@ -10,12 +10,7 @@ import getPolyVector from '../../services/getPolyVector'
 
 const S2Cell = ({ bounds }) => {
   const { loading, error, data } = useQuery(Query.getAllS2Cells(), {
-    variables: {
-      minLat: bounds._southWest.lat,
-      minLon: bounds._southWest.lng,
-      maxLat: bounds._northEast.lat,
-      maxLon: bounds._northEast.lng
-    }
+    variables: bounds
   })
 
   return (

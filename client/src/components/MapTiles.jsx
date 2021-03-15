@@ -9,17 +9,14 @@ import Spawnpoint from './spawnpoints/Spawnpoint.jsx'
 import Portal from './portals/Portal.jsx'
 import Weather from './weather/Weather.jsx'
 import S2Cell from './s2Cell/S2Cell.jsx'
+import SubmissionCell from './submissionCells/SubmissionCells.jsx'
 
 const MapTiles = ({ map, settings }) => {
   const [bounds, setBounds] = useState({
-    _southWest: {
-      lat: settings.map.startLat - 0.025,
-      lng: settings.map.startLon - 0.025
-    },
-    _northEast: {
-      lat: settings.map.startLat + 0.025,
-      lng: settings.map.startLon + 0.025
-    }
+    minLat: settings.map.startLat - 0.025,
+    maxLat: settings.map.startLat + 0.025,
+    minLon: settings.map.startLon - 0.025,
+    maxLon: settings.map.startLon + 0.025
   })
   const [selected, setSelected] = useState({
     gyms: settings.map.filters.gyms,
@@ -31,14 +28,20 @@ const MapTiles = ({ map, settings }) => {
     pokemon: settings.map.filters.pokemon,
     portals: settings.map.filters.portals,
     scanCells: settings.map.filters.scanCells,
-    s2Cells: settings.map.filters.submissionCells,
+    submissionCells: settings.map.filters.submissionCells,
     weather: settings.map.filters.weather,
     scanAreas: settings.map.filters.scanAreas,
     devices: settings.map.filters.devices
   })
 
   const onMove = useCallback(() => {
-    setBounds(map.getBounds())
+    const mapBounds = map.getBounds()
+    setBounds({
+      minLat: mapBounds._southWest.lat - 0.01,
+      maxLat: mapBounds._northEast.lat + 0.01,
+      minLon: mapBounds._southWest.lng - 0.01,
+      maxLon: mapBounds._northEast.lng + 0.01
+    })
   }, [map])
 
   useEffect(() => {
@@ -60,7 +63,8 @@ const MapTiles = ({ map, settings }) => {
       {selected.pokestops && <Pokestop bounds={bounds} />}
       {selected.pokemon && <Pokemon bounds={bounds} />}
       {selected.portals && <Portal bounds={bounds} />}
-      {selected.s2Cells && <S2Cell bounds={bounds} />}
+      {selected.scanCells && <S2Cell bounds={bounds} />}
+      {selected.submissionCells && <SubmissionCell bounds={bounds} />}
       {selected.spawnpoints && <Spawnpoint bounds={bounds} />}
       {selected.weather && <Weather bounds={bounds} />}
       <Nav

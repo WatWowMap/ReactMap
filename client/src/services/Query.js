@@ -6,6 +6,8 @@ import { getAllSpawnpoints } from './data/spawnpoint.js'
 import { getAllPortals } from './data/portal.js' 
 import { getAllWeather } from './data/weather.js'
 import { getAllS2Cells } from './data/s2Cell.js'
+import { getAllSubmissionCells } from './data/submissionCells.js'
+
 class Query {
 
   static getAllDevices() {
@@ -34,6 +36,10 @@ class Query {
 
   static getAllSpawnpoints() {
     return getAllSpawnpoints
+  }
+
+  static getAllSubmissionCells() {
+    return getAllSubmissionCells
   }
 
   static getAllWeather() {

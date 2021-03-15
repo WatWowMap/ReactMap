@@ -30,7 +30,7 @@ const DrawerMenu = ({ drawer, toggleDrawer, selected, setSelected }) => {
     { name: 'Pokemon', icon: <ArrowForwardIos />, meta: 'pokemon' },
     { name: 'Ingress Portals', icon: <ArrowForwardIos/>, meta: 'portals' },
     { name: 'Scan-Cells', icon: <ArrowForwardIos />, meta: 'scanCells' },
-    { name: 'S2-Cells', icon: <ArrowForwardIos />, meta: 's2Cells' },
+    { name: 'Wayfarer', icon: <ArrowForwardIos />, meta: 'submissionCells' },
     { name: 'Weather', icon: <ArrowForwardIos />, meta: 'weather' },
     { name: 'ScanAreas', icon: <ArrowForwardIos />, meta: 'scanAreas' },
     { name: 'Devices', icon: <ArrowForwardIos />, meta: 'devices' }
