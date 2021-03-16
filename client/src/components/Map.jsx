@@ -11,28 +11,34 @@ import Weather from './weather/Weather.jsx'
 import S2Cell from './s2Cell/S2Cell.jsx'
 import SubmissionCell from './submissionCells/SubmissionCells.jsx'
 
-const MapTiles = ({ map, settings }) => {
+const MapTiles = ({ map, config }) => {
   const [bounds, setBounds] = useState({
-    minLat: settings.map.startLat - 0.025,
-    maxLat: settings.map.startLat + 0.025,
-    minLon: settings.map.startLon - 0.025,
-    maxLon: settings.map.startLon + 0.025
+    minLat: config.map.startLat - 0.025,
+    maxLat: config.map.startLat + 0.025,
+    minLon: config.map.startLon - 0.025,
+    maxLon: config.map.startLon + 0.025
   })
   const [selected, setSelected] = useState({
-    gyms: settings.map.filters.gyms,
-    raids: settings.map.filters.raids,
-    pokestops: settings.map.filters.pokestops,
-    quests: settings.map.filters.quests,
-    invasions: settings.map.filters.invasions,
-    spawnpoints: settings.map.filters.spawnpoints,
-    pokemon: settings.map.filters.pokemon,
-    portals: settings.map.filters.portals,
-    scanCells: settings.map.filters.scanCells,
-    submissionCells: settings.map.filters.submissionCells,
-    weather: settings.map.filters.weather,
-    scanAreas: settings.map.filters.scanAreas,
-    devices: settings.map.filters.devices
+    gyms: config.map.filters.gyms,
+    raids: config.map.filters.raids,
+    pokestops: config.map.filters.pokestops,
+    quests: config.map.filters.quests,
+    invasions: config.map.filters.invasions,
+    spawnpoints: config.map.filters.spawnpoints,
+    pokemon: config.map.filters.pokemon,
+    portals: config.map.filters.portals,
+    scanCells: config.map.filters.scanCells,
+    submissionCells: config.map.filters.submissionCells,
+    weather: config.map.filters.weather,
+    scanAreas: config.map.filters.scanAreas,
+    devices: config.map.filters.devices
   })
+  const [settings, setSettings] = useState({
+    iconStyle: config.icons.Default,
+    tileServer: config.tileServers.Default
+  })
+
+  const availableForms = new Set(settings.iconStyle.pokemonList)
 
   const onMove = useCallback(() => {
     const mapBounds = map.getBounds()
@@ -54,14 +60,15 @@ const MapTiles = ({ map, settings }) => {
   return (
     <>
       <TileLayer
-        attribution={`&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors`}
-        url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
+        key={settings.tileServer.name}
+        attribution={settings.tileServer.attribution}
+        url={settings.tileServer.url}
       />
       <ZoomControl position='topright' zoomInText='+' zoomOutText='-' />
       {selected.devices && <Device />}
       {selected.gyms && <Gym bounds={bounds} />}
       {selected.pokestops && <Pokestop bounds={bounds} />}
-      {selected.pokemon && <Pokemon bounds={bounds} />}
+      {selected.pokemon && <Pokemon bounds={bounds} settings={settings} availableForms={availableForms}/>}
       {selected.portals && <Portal bounds={bounds} />}
       {selected.scanCells && <S2Cell bounds={bounds} />}
       {selected.submissionCells && <SubmissionCell bounds={bounds} />}
@@ -70,6 +77,9 @@ const MapTiles = ({ map, settings }) => {
       <Nav
         selected={selected}
         setSelected={setSelected}
+        config={config}
+        settings={settings}
+        setSettings={setSettings}
       />
     </>
   )

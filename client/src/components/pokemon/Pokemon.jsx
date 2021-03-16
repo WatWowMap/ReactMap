@@ -8,7 +8,7 @@ import Query from '../../services/Query.js'
 import marker from './marker.js'
 import PopupContent from './Popup.jsx'
 
-const Pokemon = ({ bounds }) => {
+const Pokemon = ({ bounds, availableForms, settings }) => {
   const { loading, error, data } = useQuery(Query.getAllPokemon(), {
     variables: bounds
   })
@@ -22,7 +22,7 @@ const Pokemon = ({ bounds }) => {
           <Marker
             key={pokemon.id}
             position={[pokemon.lat, pokemon.lon]}
-            icon={marker(pokemon)}>
+            icon={marker(settings, availableForms, pokemon)}>
             <Popup position={[pokemon.lat, pokemon.lon]}>
               <PopupContent pokemon={pokemon} />
             </Popup>

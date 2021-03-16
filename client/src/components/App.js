@@ -6,7 +6,7 @@ import { hot } from "react-hot-loader/root.js"
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import { MapContainer } from 'react-leaflet'
 
-import MapTiles from './MapTiles.jsx'
+import Map from './Map.jsx'
 import Fetch from '../services/Fetch.js'
 
 const client = new ApolloClient({
@@ -16,34 +16,33 @@ const client = new ApolloClient({
 
 const App = props => {
   const [map, setMap] = useState(null)
-  const [settings, setSettings] = useState(undefined)
+  const [config, setConfig] = useState(undefined)
   const [zoom, setZoom] = useState(15)
 
-  const getSettings = async () => {
-    const body = (await Fetch.fetchSettings())
-    setSettings(body)
-    setZoom(body.map.startZoom)
+  const getConfig = async () => {
+    setConfig(await Fetch.fetchConfig())
   }
 
   useEffect(() => {
-    getSettings()
+    getConfig()
   }, [])
 
+  console.log(config)
   return (
     <Router>
       <Switch>
         <Route exact path="/">
           <ApolloProvider client={client}>
-            {settings &&
+            {config &&
               <MapContainer
-                center={[settings.map.startLat, settings.map.startLon]}
-                zoom={zoom}
+                center={[config.map.startLat, config.map.startLon]}
+                zoom={config.map.startZoom}
                 whenCreated={setMap}
                 zoomControl={false} >
                 {map &&
-                  <MapTiles
+                  <Map
                     map={map}
-                    settings={settings}
+                    config={config}
                     zoom={zoom}
                     setZoom={setZoom} />}
               </MapContainer>}

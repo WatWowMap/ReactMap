@@ -1,9 +1,9 @@
-import fetchSettings from './data/settings.js' 
+import fetchConfig from './data/config.js' 
 
 class Fetch {
 
-  static async fetchSettings() {
-    return await fetchSettings()
+  static async fetchConfig() {
+    return await fetchConfig()
   }
   
 }
