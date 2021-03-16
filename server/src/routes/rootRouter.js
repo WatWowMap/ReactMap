@@ -5,6 +5,8 @@ import schema from '../schema/schema.js'
 import config from '../services/config.js' 
 import cors from 'cors' 
 
+import updateAvailableForms from '../services/updateAvailableForms.js' 
+
 const rootRouter = new express.Router()
 
 rootRouter.use("/", clientRouter)
@@ -14,19 +16,29 @@ rootRouter.use('/graphql', cors(), graphqlHTTP({
   graphiql: config.devOptions.graphiql
 }))
 
-rootRouter.get("/settings", async (req, res) => {
+rootRouter.get("/config", async (req, res) => {
   try {
-    const settings = {}
-    settings.env = config.devOptions.enabled
-    settings.map = config.map
-    settings.tileservers = config.tileservers
-    settings.icons = config.icons
-    settings.popUpDetails = config.popUpDetails
-    settings.rarity = config.rarity
-    res.status(200).json({ settings })
+    const frontEndConfig = {}
+    frontEndConfig.env = config.devOptions.enabled
+    frontEndConfig.map = config.map
+    frontEndConfig.tileServers = config.tileServers
+    await updateAvailableForms(config.icons)
+    frontEndConfig.icons = config.icons
+    frontEndConfig.popUpDetails = config.popUpDetails
+    frontEndConfig.rarity = config.rarity
+    res.status(200).json({ config: frontEndConfig })
   } catch (error) {
     res.status(500).json({ error })
   }
 })
+
+// rootRouter.get("/availableForms", async (req, res) => {
+//   try {
+//     const availableIcons = await updateAvailableForms(config.icons)
+//     res.status(200).json({ availableIcons })
+//   } catch (error) {
+//     res.status(500).json({ error })
+//   }
+// })
 
 export default rootRouter

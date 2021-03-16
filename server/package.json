@@ -27,6 +27,7 @@
     "webpack-hot-middleware": "^2.25.0"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-graphql": "^0.12.0",
