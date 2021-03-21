@@ -1,11 +1,11 @@
 import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLBoolean, GraphQLFloat } from 'graphql'
-import { GraphQLJSON } from 'graphql-type-json'
+import { JSONResolver } from 'graphql-scalars'
 
 const QuestType = new GraphQLObjectType({
   name: 'Conditions',
   fields: () => ({
     type: { type: GraphQLInt },
-    info: { type: GraphQLJSON }
+    info: { type: JSONResolver }
   })
 })
 
@@ -23,8 +23,8 @@ export default new GraphQLObjectType({
     quest_type: { type: GraphQLInt },
     quest_timestamp: { type: GraphQLInt },
     quest_target: { type: GraphQLInt },
-    quest_conditions: { type: GraphQLJSON },
-    quest_rewards: { type: GraphQLJSON },
+    quest_conditions: { type: JSONResolver },
+    quest_rewards: { type: JSONResolver },
     quest_template: { type: GraphQLString },
     quest_reward_type: { type: GraphQLInt },
     quest_item_id: { type: GraphQLInt },

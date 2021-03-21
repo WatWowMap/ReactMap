@@ -32,13 +32,4 @@ rootRouter.get("/config", async (req, res) => {
   }
 })
 
-// rootRouter.get("/availableForms", async (req, res) => {
-//   try {
-//     const availableIcons = await updateAvailableForms(config.icons)
-//     res.status(200).json({ availableIcons })
-//   } catch (error) {
-//     res.status(500).json({ error })
-//   }
-// })
-
 export default rootRouter

@@ -34,7 +34,7 @@
     "express-handlebars": "^5.2.1",
     "extend": "^3.0.2",
     "graphql": "^15.5.0",
-    "graphql-type-json": "^0.3.2",
+    "graphql-scalars": "^1.9.0",
     "knex": "^0.95.1",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",

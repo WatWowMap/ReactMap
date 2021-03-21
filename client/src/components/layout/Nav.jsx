@@ -4,7 +4,7 @@ import Drawer from './Drawer.jsx'
 import Dialog from '@material-ui/core/Dialog'
 import * as Dialogs from './dialogs/index.js'
 
-const Nav = ({ config, settings, setSettings, selected, setSelected }) => {
+const Nav = ({ config, settings, setSettings, globalFilters, setGlobalFilters, availableForms }) => {
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
@@ -18,11 +18,16 @@ const Nav = ({ config, settings, setSettings, selected, setSelected }) => {
     setDrawer(open)
   }
 
-  const toggleDialog = (open, type) => (event) => {
+  const toggleDialog = (open, type, filters) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    setDialog({ open: open, name: type })
+    if ( open ) {
+      setDialog({ open, name: type })
+    } else {
+      setDialog({ open })
+      setGlobalFilters({ ...globalFilters, [type]: { ...globalFilters[type], filter: filters} })
+    }
   }
 
   const DialogToRender = (name) => {
@@ -32,7 +37,10 @@ const Nav = ({ config, settings, setSettings, selected, setSelected }) => {
         config={config}
         settings={settings}
         setSettings={setSettings}
-        toggleDialog={toggleDialog} />
+        toggleDialog={toggleDialog}
+        availableForms={availableForms}
+        globalFilters={globalFilters}
+        setGlobalFilters={setGlobalFilters} />
     )
   }
 
@@ -44,16 +52,15 @@ const Nav = ({ config, settings, setSettings, selected, setSelected }) => {
         <Drawer
           drawer={drawer}
           toggleDrawer={toggleDrawer}
-          selected={selected}
-          setSelected={setSelected}
+          globalFilters={globalFilters}
+          setGlobalFilters={setGlobalFilters}
           toggleDialog={toggleDialog}
         />}
       <Dialog
         fullWidth={true}
-        maxWidth='sm'
+        maxWidth='md'
         open={dialog.open}
         onClose={toggleDialog(false, 'none')}
-        aria-labelledby="max-width-dialog-title"
       >
         {dialog.open && DialogToRender(dialog.name)}
       </Dialog>

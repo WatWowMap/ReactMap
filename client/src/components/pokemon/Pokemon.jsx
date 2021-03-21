@@ -7,28 +7,44 @@ import Query from '../../services/Query.js'
 
 import marker from './marker.js'
 import PopupContent from './Popup.jsx'
+import masterfile from '../../data/masterfile.json'
 
-const Pokemon = ({ bounds, availableForms, settings }) => {
+const Pokemon = ({ bounds, availableForms, settings, filters }) => {
+  const trimmedFilters = {}
+  Object.entries(filters).forEach(filter => {
+    if (filter[1].enabled) {
+      trimmedFilters[filter[0]] = filter[1]
+    }
+  })
   const { loading, error, data } = useQuery(Query.getAllPokemon(), {
-    variables: bounds
+    variables: {
+      ...bounds, filters: trimmedFilters
+    }
   })
 
   return (
     <MarkerClusterGroup
       disableClusteringAtZoom={16}
     >
-      {data && data.pokemon.map(pokemon => {
-        return (
-          <Marker
-            key={pokemon.id}
-            position={[pokemon.lat, pokemon.lon]}
-            icon={marker(settings, availableForms, pokemon)}>
-            <Popup position={[pokemon.lat, pokemon.lon]}>
-              <PopupContent pokemon={pokemon} />
-            </Popup>
-          </Marker>
-        )
-      })}
+      {data && data.pokemon.reduce((result, pokemon) => {
+        let realForm = pokemon.form
+        if (pokemon.form === 0 && masterfile.pokemon[pokemon.pokemon_id].default_form_id) {
+          realForm = masterfile.pokemon[pokemon.pokemon_id].default_form_id
+        }
+        if (filters[`${pokemon.pokemon_id}-${realForm}`].enabled) {
+          result.push(
+            <Marker
+              key={pokemon.id}
+              position={[pokemon.lat, pokemon.lon]}
+              icon={marker(settings, availableForms, pokemon, realForm)}>
+              <Popup position={[pokemon.lat, pokemon.lon]}>
+                <PopupContent pokemon={pokemon} />
+              </Popup>
+            </Marker>
+          )
+        }
+        return result
+      }, [])}
     </MarkerClusterGroup>
   )
 }

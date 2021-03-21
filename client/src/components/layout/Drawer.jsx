@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const DrawerMenu = ({ drawer, toggleDrawer, selected, setSelected, toggleDialog }) => {
+const DrawerMenu = ({ drawer, toggleDrawer, globalFilters, setGlobalFilters, toggleDialog }) => {
   const classes = useStyles(theme)
   const [expanded, setExpanded] = React.useState(false);
 
@@ -58,7 +58,7 @@ const DrawerMenu = ({ drawer, toggleDrawer, selected, setSelected, toggleDialog 
   ]
 
   return (
-    <Drawer anchor={'left'} open={drawer} onClose={toggleDrawer(false)} classes={{ paper: classes.drawer}}>
+    <Drawer anchor={'left'} open={drawer} onClose={toggleDrawer(false)} classes={{ paper: classes.drawer }}>
       <div
         className={clsx(classes.list)}
         role="presentation"
@@ -79,12 +79,12 @@ const DrawerMenu = ({ drawer, toggleDrawer, selected, setSelected, toggleDialog 
                     <ListItemText primary={item.name} onClick={toggleDialog(true, item.meta)} />&nbsp;&nbsp;&nbsp;
                     <ToggleButton
                       value="x"
-                      selected={selected[item.meta]}
+                      selected={globalFilters[item.meta].enabled}
                       onChange={() => {
-                        setSelected({ ...selected, [item.meta]: !selected[item.meta] })
+                        setGlobalFilters({ ...globalFilters, [item.meta]: { ...globalFilters[item.meta], enabled: !globalFilters[item.meta].enabled } })
                       }}
                     >
-                      {selected[item.meta] ? <Check style={{ fontSize: 10, color: 'green' }} /> : <Clear style={{ fontSize: 10, color: 'red' }} />}
+                      {globalFilters[item.meta].enabled ? <Check style={{ fontSize: 10, color: 'green' }} /> : <Clear style={{ fontSize: 10, color: 'red' }} />}
                     </ToggleButton>
                   </ListItem>
                 )
@@ -124,7 +124,7 @@ const DrawerMenu = ({ drawer, toggleDrawer, selected, setSelected, toggleDialog 
           </ListItem>
         </List>
       </div>
-    </Drawer>
+    </Drawer >
   )
 }
 
