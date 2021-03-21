@@ -4,10 +4,19 @@
  Pokemon GO Map frontend built with React. Work in progress. 
 
 ## Features 
-- View Pokemon, Gyms, and Pokestops
+- View and Filter Pokemon 
+- Gyms (Filtering coming soon!)
+- Pokestops (Filtering coming soon!)
+- Devices 
+- Weather 
+- Portals
+- Submissions Cells
+- Last scanned cells
+- Spawnpoints
 ## PreReqs
 - NodeJS (Recommend using V14.*)
 - MySQL (Recommend using 8.0+)
+- Yarn (npm install -g yarn)
 ## Installation Instructions
 1. Clone the repo
 2. Open up the directory (`cd ReactMap`)
@@ -20,6 +29,9 @@
 2. `yarn dev`
 
 ## Coming Soon
-- Filtering
+- Raids
+- Invasions
+- Quests
+- Searching
 - Discord Login
-- Everything else
+- User Profile/Control Panel
