@@ -1,4 +1,5 @@
 import { GraphQLObjectType, GraphQLID, GraphQLFloat, GraphQLList, GraphQLSchema } from 'graphql'
+import { JSONResolver } from 'graphql-scalars'
 import { ref } from 'objection'
 
 import DeviceType from './device.js'
@@ -9,6 +10,7 @@ import PortalType from './portals.js'
 import s2CellType from './s2Cell.js'
 import SpawnpointType from './spawnpoint.js'
 import WeatherType from './weather.js'
+
 import { Device, Gym, Pokemon, Pokestop, Portal, S2Cell, Spawnpoint, Weather } from '../models/index.js'
 
 const minMaxArgs = {
@@ -31,6 +33,7 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(GymType),
       args: minMaxArgs,
       async resolve(parent, args) {
+        console.log(args)
         return await Gym.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
           .andWhereBetween('lon', [args.minLon, args.maxLon])
@@ -51,13 +54,12 @@ const RootQuery = new GraphQLObjectType({
     },
     pokemon: {
       type: new GraphQLList(PokemonType),
-      args: minMaxArgs,
+      args: {
+        ...minMaxArgs,
+        filters: { type: JSONResolver }
+      },
       async resolve(parent, args) {
-        const ts = Math.floor((new Date).getTime() / 1000)
-        return await Pokemon.query()
-          .where('expire_timestamp', '>=', ts)
-          .andWhereBetween('lat', [args.minLat, args.maxLat])
-          .andWhereBetween('lon', [args.minLon, args.maxLon])
+        return await Pokemon.getPokemon(args)
       }
     },
     pokemonDetails: {
