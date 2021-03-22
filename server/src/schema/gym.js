@@ -28,6 +28,7 @@ export default new GraphQLObjectType({
     total_cp: { type: GraphQLInt },
     first_seen_timestamp: { type: GraphQLInt },
     sponsor_id: { type: GraphQLInt },
+    raid_pokemon_gender: { type: GraphQLInt },
     raid_pokemon_costume: { type: GraphQLInt },
     raid_pokemon_evolution: { type: GraphQLInt }
   })

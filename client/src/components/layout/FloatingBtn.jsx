@@ -15,12 +15,8 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const ActionButtons = ({ zoom, setZoom, toggleDrawer }) => {
+const FloatingButtons = ({ map, toggleDrawer }) => {
   const classes = useStyles()
-
-  const onClickZoom = value => {
-    setZoom(zoom + value)
-  }
 
   return (
     <Grid container direction='column' spacing={1} className={classes.root}>
@@ -31,21 +27,21 @@ const ActionButtons = ({ zoom, setZoom, toggleDrawer }) => {
       </Grid>
       <Grid item >
         <Fab color="secondary" aria-label="edit">
-          <LocationOn />
+          <LocationOn onClick={() => map.locate({ watch: true, setView: true, enableHighAccuracy: true })} />
         </Fab>
       </Grid>
       <Grid item >
         <Fab color="secondary" aria-label="edit">
-          <ZoomIn onClick={() => onClickZoom(1)} />
+          <ZoomIn onClick={() => map.zoomIn()} />
         </Fab>
       </Grid>
       <Grid item >
         <Fab color="secondary" aria-label="edit">
-          <ZoomOut onClick={() => onClickZoom(-1)} />
+          <ZoomOut onClick={() => map.zoomOut()} />
         </Fab>
       </Grid>
     </Grid>
   )
 }
 
-export default ActionButtons
+export default FloatingButtons

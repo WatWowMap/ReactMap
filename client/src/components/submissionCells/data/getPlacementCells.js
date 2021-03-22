@@ -1,5 +1,5 @@
 import { S2LatLng, S2RegionCoverer, S2CellId, S2LatLngRect } from 'nodes2ts'
-import getPolyVector from '../../../services/getPolyVector.js'
+import Utility from '../../../services/Utility.js'
 import Ring from './Ring.js'
 
 export default function (bounds, pokestops, gyms) {
@@ -20,7 +20,7 @@ export default function (bounds, pokestops, gyms) {
   const coveringCells = regionCoverer.getCoveringCells(region)
   for (let i = 0; i < coveringCells.length; i++) {
     const cell = coveringCells[i]
-    const polygon = getPolyVector(cell.id)
+    const polygon = Utility.getPolyVector(cell.id)
     const cellId = BigInt(cell.id).toString()
     indexedCells[cellId] = {
       'id': cellId,

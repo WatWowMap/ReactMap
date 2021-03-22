@@ -1,9 +1,8 @@
 import React from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
-import { Drawer, Button, List, ListItem, ListItemText, Typography, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core'
+import { Drawer, Button, List, ListItem, ListItemText, Typography, Accordion, AccordionSummary, AccordionDetails, IconButton } from '@material-ui/core'
 import { Check, Clear, ArrowForwardIos, ExpandMore } from '@material-ui/icons'
-import { ToggleButton } from '@material-ui/lab'
 import theme from './theme.js'
 
 const useStyles = makeStyles((theme) => ({
@@ -77,15 +76,12 @@ const DrawerMenu = ({ drawer, toggleDrawer, globalFilters, setGlobalFilters, tog
                   <ListItem button key={item.name}>
                     {item.icon}&nbsp;
                     <ListItemText primary={item.name} onClick={toggleDialog(true, item.meta)} />&nbsp;&nbsp;&nbsp;
-                    <ToggleButton
-                      value="x"
-                      selected={globalFilters[item.meta].enabled}
-                      onChange={() => {
-                        setGlobalFilters({ ...globalFilters, [item.meta]: { ...globalFilters[item.meta], enabled: !globalFilters[item.meta].enabled } })
-                      }}
-                    >
-                      {globalFilters[item.meta].enabled ? <Check style={{ fontSize: 10, color: 'green' }} /> : <Clear style={{ fontSize: 10, color: 'red' }} />}
-                    </ToggleButton>
+                    <IconButton onClick={() => {
+                      setGlobalFilters({ ...globalFilters, [item.meta]: { ...globalFilters[item.meta], enabled: !globalFilters[item.meta].enabled } })
+                    }}>
+                      {globalFilters[item.meta].enabled ? <Check style={{ fontSize: 15, color: 'green' }} />
+                        : <Clear style={{ fontSize: 15, color: 'red' }} />}
+                    </IconButton>
                   </ListItem>
                 )
               })}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { TileLayer, ZoomControl } from 'react-leaflet'
+import { TileLayer } from 'react-leaflet'
 import { ThemeProvider } from '@material-ui/styles'
 import theme from './layout/theme.js'
 
@@ -47,11 +47,10 @@ const Map = ({ map, config, defaultFilters, settings, setSettings, availableForm
         attribution={settings.tileServer.attribution}
         url={settings.tileServer.url}
       />
-      <ZoomControl position='topright' zoomInText='+' zoomOutText='-' />
       {globalFilters.devices.enabled &&
         <Device filter={globalFilters.devices.filters} />}
-      {globalFilters.gyms.enabled &&
-        <Gym bounds={bounds} />}
+      {(globalFilters.gyms.enabled || globalFilters.raids.enabled) &&
+        <Gym bounds={bounds} settings={settings} availableForms={availableForms} globalFilters={globalFilters}/>}
       {globalFilters.pokestops.enabled &&
         <Pokestop bounds={bounds} />}
       {globalFilters.pokemon.enabled &&
@@ -72,6 +71,7 @@ const Map = ({ map, config, defaultFilters, settings, setSettings, availableForm
         settings={settings}
         setSettings={setSettings}
         availableForms={availableForms}
+        map={map}
       />
     </ThemeProvider>
   )

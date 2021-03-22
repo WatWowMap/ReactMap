@@ -6,7 +6,7 @@ import Query from '../../services/Query.js'
 
 import marker from './marker.js'
 import PopupContent from './Popup.jsx'
-import getPolyVector from '../../services/getPolyVector.js' 
+import Utility from '../../services/Utility.js' 
 
 const Weather = ({ bounds }) => {
   const { loading, error, data } = useQuery(Query.getAllWeather(), {
@@ -19,7 +19,7 @@ const Weather = ({ bounds }) => {
         return (
           <Polyline
             key={cell.id}
-            positions={getPolyVector(cell.id, 'polyline')}
+            positions={Utility.getPolyVector(cell.id, 'polyline')}
             pathOptions={{ color: 'green', opacity: 0.5 }}>
             <Marker icon={marker(cell)} position={[cell.latitude, cell.longitude]}>
               <Popup position={[cell.latitude, cell.longitude]}>
