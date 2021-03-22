@@ -4,7 +4,6 @@ import React from 'react'
 import theme from '../layout/theme';
 
 const SubmissionCellPopup = ({ cell }) => {
-  console.log(cell)
   return (
     <ThemeProvider theme={theme}>
       <Typography>

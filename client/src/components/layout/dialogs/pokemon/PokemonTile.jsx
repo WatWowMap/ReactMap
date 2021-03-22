@@ -2,7 +2,7 @@ import React from 'react'
 import { Grid, IconButton } from '@material-ui/core'
 import { Check, Clear, Menu } from '@material-ui/icons'
 
-import getPokemonIcon from '../../../../services/getPokemonIcon.js'
+import Utility from '../../../../services/Utility.js'
 import useStyles from '../styling.js'
 import theme from '../../theme.js'
 
@@ -15,7 +15,7 @@ const PokemonTile = ({ settings, availableForms, tempFilters, setTempFilters, to
       alignItems="center"
     >
       <Grid item xs={8}>
-        <div className={classes.gridItem} style={{ backgroundImage: `url(${settings.iconStyle.path}/${getPokemonIcon(availableForms, pokemon.i, pokemon.formId)}.png)` }} />
+        <div className={classes.gridItem} style={{ backgroundImage: `url(${settings.iconStyle.path}/${Utility.getPokemonIcon(availableForms, pokemon.i, pokemon.formId)}.png)` }} />
       </Grid>
       <Grid container item xs={4}
         direction='column'

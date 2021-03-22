@@ -33,7 +33,6 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(GymType),
       args: minMaxArgs,
       async resolve(parent, args) {
-        console.log(args)
         return await Gym.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
           .andWhereBetween('lon', [args.minLon, args.maxLon])

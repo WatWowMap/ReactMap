@@ -1,5 +1,5 @@
 import { getAllDevices } from './data/device.js'
-import { getAllGyms } from './data/gym.js'
+import { getAllGyms, getAllRaids } from './data/gym.js'
 import { getAllPokestops } from './data/pokestop.js'
 import { getAllPokemon } from './data/pokemon.js'
 import { getAllSpawnpoints } from './data/spawnpoint.js'
@@ -28,6 +28,10 @@ class Query {
 
   static getAllPortals() {
     return getAllPortals
+  }
+
+  static getAllRaids() {
+    return getAllRaids
   }
 
   static getAllS2Cells() {

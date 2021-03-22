@@ -4,7 +4,7 @@ import Drawer from './Drawer.jsx'
 import Dialog from '@material-ui/core/Dialog'
 import * as Dialogs from './dialogs/index.js'
 
-const Nav = ({ config, settings, setSettings, globalFilters, setGlobalFilters, availableForms }) => {
+const Nav = ({ config, settings, setSettings, globalFilters, setGlobalFilters, availableForms, map }) => {
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
@@ -47,6 +47,7 @@ const Nav = ({ config, settings, setSettings, globalFilters, setGlobalFilters, a
   return (
     <>
       {!drawer ? <FloatingBtn
+        map={map}
         toggleDrawer={toggleDrawer}
       /> :
         <Drawer

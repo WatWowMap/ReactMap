@@ -4,7 +4,7 @@ import { Popup, Polygon, Circle, Tooltip } from 'react-leaflet'
 import { useQuery } from '@apollo/client'
 import Query from '../../services/Query.js'
 
-import getPolyVector from '../../services/getPolyVector'
+import Utility from '../../services/Utility'
 import getPlacementCells from './data/getPlacementCells.js'
 import getTypeCells from './data/getTypeCells.js'
 
@@ -48,7 +48,7 @@ const SubmissionCell = ({ bounds }) => {
         return (
           <Polygon
             key={cell.id}
-            positions={getPolyVector(cell.id, 'polygon')}
+            positions={Utility.getPolyVector(cell.id, 'polygon')}
             pathOptions={placementStyle(cell.blocked)}
             interactive={false}>
           </Polygon>
@@ -58,7 +58,7 @@ const SubmissionCell = ({ bounds }) => {
         return (
           <Polygon
             key={cell.id}
-            positions={getPolyVector(cell.id, 'polygon')}
+            positions={Utility.getPolyVector(cell.id, 'polygon')}
             pathOptions={typeStyle(cell)}>
             <Popup
               position={[cell.lat, cell.lon]}>

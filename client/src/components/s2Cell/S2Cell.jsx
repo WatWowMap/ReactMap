@@ -6,7 +6,7 @@ import Query from '../../services/Query.js'
 
 import marker from './marker.js'
 import PopupContent from './Popup.jsx'
-import getPolyVector from '../../services/getPolyVector'
+import Utility from '../../services/Utility'
 
 const S2Cell = ({ bounds }) => {
   const { loading, error, data } = useQuery(Query.getAllS2Cells(), {
@@ -19,7 +19,7 @@ const S2Cell = ({ bounds }) => {
         return (
           <Polygon
             key={cell.id}
-            positions={getPolyVector(cell.id, 'polygon')}
+            positions={Utility.getPolyVector(cell.id, 'polygon')}
             pathOptions={marker(cell.updated)}>
             <Popup position={[cell.latitude, cell.longitude]}>
               <PopupContent cell={cell} />
