@@ -52,7 +52,7 @@ const Map = ({ map, config, defaultFilters, settings, setSettings, availableForm
       {(globalFilters.gyms.enabled || globalFilters.raids.enabled) &&
         <Gym bounds={bounds} settings={settings} availableForms={availableForms} globalFilters={globalFilters}/>}
       {globalFilters.pokestops.enabled &&
-        <Pokestop bounds={bounds} />}
+        <Pokestop bounds={bounds} settings={settings} availableForms={availableForms} globalFilters={globalFilters}/>}
       {globalFilters.pokemon.enabled &&
         <Pokemon bounds={bounds} settings={settings} availableForms={availableForms} filters={globalFilters.pokemon.filter} />}
       {globalFilters.portals.enabled &&
@@ -66,6 +66,7 @@ const Map = ({ map, config, defaultFilters, settings, setSettings, availableForm
       {globalFilters.weather.enabled &&
         <Weather bounds={bounds} />}
       <Nav
+        defaultFilters={defaultFilters}
         globalFilters={globalFilters}
         setGlobalFilters={setGlobalFilters}
         settings={settings}

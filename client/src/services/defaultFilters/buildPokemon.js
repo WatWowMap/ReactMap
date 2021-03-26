@@ -16,7 +16,7 @@ export default function (type) {
         continue;
       } else if (type === 'pokemon') {
         pokemon[`${i}-${formId}`] = {
-          enabled: true,
+          enabled: false,
           size: 'md',
           iv: [80, 100],
           gl: [1, 10],

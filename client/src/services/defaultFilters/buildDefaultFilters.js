@@ -1,57 +1,59 @@
 import buildPokemon from './buildPokemon.js'
+import buildQuests from './buildQuests.js'
+import buildInvasions from './buildInvasions.js'
 
-export default function (config) {
+export default function (serverSettings) {
   const filters = {
     gyms: {
-      enabled: config.map.filters.gyms,
+      enabled: serverSettings.config.map.filters.gyms,
       filter: {}
     },
     raids: {
-      enabled: config.map.filters.raids,
+      enabled: serverSettings.config.map.filters.raids,
       filter: {}
     },
     pokestops: {
-      enabled: config.map.filters.pokestops,
-      filter: {}
-    },
-    quests: {
-      enabled: config.map.filters.quests,
-      filter: {}
-    },
-    invasions: {
-      enabled: config.map.filters.invasions,
-      filter: {}
+      enabled: serverSettings.config.map.filters.pokestops,
+      filter: {
+        p0: { enabled: true, size: 'md' },
+        p501: { enabled: true, size: 'md' },
+        p502: { enabled: true, size: 'md' },
+        p503: { enabled: true, size: 'md' },
+        p504: { enabled: true, size: 'md' },
+        ...buildInvasions(),
+        ...buildQuests(serverSettings.quests)
+      }
     },
     spawnpoints: {
-      enabled: config.map.filters.spawnpoints,
+      enabled: serverSettings.config.map.filters.spawnpoints,
       filter: {}
     },
     pokemon: {
-      enabled: config.map.filters.pokemon,
+      enabled: serverSettings.config.map.filters.pokemon,
       filter: buildPokemon('pokemon')
     },
     portals: {
-      enabled: config.map.filters.portals,
+      enabled: serverSettings.config.map.filters.portals,
       filter: {}
     },
     scanCells: {
-      enabled: config.map.filters.scanCells,
+      enabled: serverSettings.config.map.filters.scanCells,
       filter: {}
     },
     submissionCells: {
-      enabled: config.map.filters.submissionCells,
+      enabled: serverSettings.config.map.filters.submissionCells,
       filter: {}
     },
     weather: {
-      enabled: config.map.filters.weather,
+      enabled: serverSettings.config.map.filters.weather,
       filter: {}
     },
     scanAreas: {
-      enabled: config.map.filters.scanAreas,
+      enabled: serverSettings.config.map.filters.scanAreas,
       filter: {}
     },
     devices: {
-      enabled: config.map.filters.devices,
+      enabled: serverSettings.config.map.filters.devices,
       filter: {}
     }
   }

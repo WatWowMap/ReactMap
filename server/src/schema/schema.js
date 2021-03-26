@@ -2,6 +2,7 @@ import { GraphQLObjectType, GraphQLID, GraphQLFloat, GraphQLList, GraphQLSchema 
 import { JSONResolver } from 'graphql-scalars'
 import { ref } from 'objection'
 
+import config from '../services/config.js'
 import DeviceType from './device.js'
 import GymType from './gym.js'
 import PokestopType from './pokestop.js'
@@ -42,7 +43,10 @@ const RootQuery = new GraphQLObjectType({
     },
     pokestops: {
       type: new GraphQLList(PokestopType),
-      args: minMaxArgs,
+      args: {
+        ...minMaxArgs,
+        filters: { type: JSONResolver }
+      },
       async resolve(parent, args) {
         return await Pokestop.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
@@ -80,6 +84,12 @@ const RootQuery = new GraphQLObjectType({
         return await Portal.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
           .andWhereBetween('lon', [args.minLon, args.maxLon])
+      }
+    },
+    quests: {
+      type: JSONResolver,
+      async resolve(parent, args) {
+        return await Pokestop.getAvailableQuests()
       }
     },
     s2Cells: {

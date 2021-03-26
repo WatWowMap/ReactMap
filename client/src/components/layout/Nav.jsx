@@ -4,7 +4,7 @@ import Drawer from './Drawer.jsx'
 import Dialog from '@material-ui/core/Dialog'
 import * as Dialogs from './dialogs/index.js'
 
-const Nav = ({ config, settings, setSettings, globalFilters, setGlobalFilters, availableForms, map }) => {
+const Nav = ({ config, settings, setSettings, globalFilters, setGlobalFilters, availableForms, map, defaultFilters }) => {
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
@@ -22,11 +22,11 @@ const Nav = ({ config, settings, setSettings, globalFilters, setGlobalFilters, a
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    if ( open ) {
+    if (open) {
       setDialog({ open, name: type })
     } else {
       setDialog({ open })
-      setGlobalFilters({ ...globalFilters, [type]: { ...globalFilters[type], filter: filters} })
+      setGlobalFilters({ ...globalFilters, [type]: { ...globalFilters[type], filter: filters } })
     }
   }
 
@@ -40,7 +40,9 @@ const Nav = ({ config, settings, setSettings, globalFilters, setGlobalFilters, a
         toggleDialog={toggleDialog}
         availableForms={availableForms}
         globalFilters={globalFilters}
-        setGlobalFilters={setGlobalFilters} />
+        setGlobalFilters={setGlobalFilters}
+        defaultFilters={defaultFilters}
+      />
     )
   }
 
