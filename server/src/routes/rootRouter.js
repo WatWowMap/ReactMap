@@ -1,11 +1,12 @@
 import express from "express"
-import clientRouter from './clientRouter.js' 
+import clientRouter from './clientRouter.js'
 import { graphqlHTTP } from 'express-graphql'
-import schema from '../schema/schema.js' 
-import config from '../services/config.js' 
-import cors from 'cors' 
-
-import updateAvailableForms from '../services/updateAvailableForms.js' 
+import schema from '../schema/schema.js'
+import config from '../services/config.js'
+import cors from 'cors'
+import { Pokestop } from '../models/index.js'
+import { raw } from 'objection'
+import updateAvailableForms from '../services/updateAvailableForms.js'
 
 const rootRouter = new express.Router()
 
@@ -16,17 +17,24 @@ rootRouter.use('/graphql', cors(), graphqlHTTP({
   graphiql: config.devOptions.graphiql
 }))
 
-rootRouter.get("/config", async (req, res) => {
+rootRouter.get("/settings", async (req, res) => {
   try {
-    const frontEndConfig = {}
-    frontEndConfig.env = config.devOptions.enabled
-    frontEndConfig.map = config.map
-    frontEndConfig.tileServers = config.tileServers
-    await updateAvailableForms(config.icons)
-    frontEndConfig.icons = config.icons
-    frontEndConfig.popUpDetails = config.popUpDetails
-    frontEndConfig.rarity = config.rarity
-    res.status(200).json({ config: frontEndConfig })
+    const settings = {
+      config: {},
+      quests: {}
+    }
+    settings.config.env = config.devOptions.enabled
+    settings.config.map = config.map
+    settings.config.tileServers = config.tileServers
+    settings.config.icons = config.icons
+    settings.config.popUpDetails = config.popUpDetails
+    settings.config.rarity = config.rarity
+
+    await updateAvailableForms(settings.config.icons)
+
+    settings.quests = await Pokestop.getAvailableQuests()
+
+    res.status(200).json({ settings })
   } catch (error) {
     res.status(500).json({ error })
   }

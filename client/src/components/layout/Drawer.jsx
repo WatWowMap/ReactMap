@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 
 const DrawerMenu = ({ drawer, toggleDrawer, globalFilters, setGlobalFilters, toggleDialog }) => {
   const classes = useStyles(theme)
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState('filters');
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
@@ -34,8 +34,8 @@ const DrawerMenu = ({ drawer, toggleDrawer, globalFilters, setGlobalFilters, tog
     { name: 'Gyms', icon: <ArrowForwardIos />, meta: 'gyms' },
     { name: 'Raids', icon: <ArrowForwardIos />, meta: 'raids' },
     { name: 'Pokestops', icon: <ArrowForwardIos />, meta: 'pokestops' },
-    { name: 'Quests', icon: <ArrowForwardIos />, meta: 'quests' },
-    { name: 'Invasions', icon: <ArrowForwardIos />, meta: 'invasions' },
+    // { name: 'Quests', icon: <ArrowForwardIos />, meta: 'quests' },
+    // { name: 'Invasions', icon: <ArrowForwardIos />, meta: 'invasions' },
     { name: 'Spawnpoints', icon: <ArrowForwardIos />, meta: 'spawnpoints' },
     { name: 'Pokemon', icon: <ArrowForwardIos />, meta: 'pokemon' },
     { name: 'Ingress Portals', icon: <ArrowForwardIos />, meta: 'portals' },
@@ -63,7 +63,7 @@ const DrawerMenu = ({ drawer, toggleDrawer, globalFilters, setGlobalFilters, tog
         role="presentation"
         onKeyDown={toggleDrawer(false)}
       >
-        <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')} className={clsx(classes.list)}>
+        <Accordion expanded={expanded === 'filters'} onChange={handleChange('filters')} className={clsx(classes.list)}>
           <AccordionSummary
             expandIcon={<ExpandMore />}
           >
@@ -88,7 +88,7 @@ const DrawerMenu = ({ drawer, toggleDrawer, globalFilters, setGlobalFilters, tog
             </List>
           </AccordionDetails>
         </Accordion>
-        <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')} className={clsx(classes.list)}>
+        <Accordion expanded={expanded === 'options'} onChange={handleChange('options')} className={clsx(classes.list)}>
           <AccordionSummary
             expandIcon={<ExpandMore />}
             aria-controls="panel2bh-content"

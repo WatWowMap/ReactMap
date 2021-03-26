@@ -5,13 +5,25 @@ import MarkerClusterGroup from 'react-leaflet-markercluster'
 import { useQuery } from '@apollo/client'
 import Query from '../../services/Query.js'
 
-import marker from './marker.js'
+import stopMarker from './stopMarker.js'
+import questMarker from './questMarker.js'
 import PopupContent from './Popup.jsx'
 
-const Pokestop = ({ bounds }) => {
+const Pokestop = ({ bounds, globalFilters, settings, availableForms }) => {
+  const trimmedFilters = {
+    pokestops: {},
+  }
+  if (globalFilters.pokestops.enabled) {
+    Object.entries(globalFilters.pokestops.filter).forEach(filter => {
+      if (filter[1].enabled) {
+        trimmedFilters.pokestops[filter[0]] = filter[1]
+      }
+    })
+  }
   const { loading, error, data } = useQuery(Query.getAllPokestops(), {
-    variables: bounds
+    variables: { ...bounds, filters: trimmedFilters }
   })
+  const ts = (new Date).getTime() / 1000
 
   return (
     <MarkerClusterGroup
@@ -22,7 +34,15 @@ const Pokestop = ({ bounds }) => {
           <Marker
             key={pokestop.id}
             position={[pokestop.lat, pokestop.lon]}
-            icon={marker(pokestop)}>
+            icon={stopMarker(pokestop, ts, globalFilters.pokestops)}>
+            <Marker
+              key={pokestop.id}
+              position={[pokestop.lat, pokestop.lon]}
+              icon={questMarker(pokestop, settings, availableForms)}>
+              <Popup position={[pokestop.lat, pokestop.lon]}>
+                <PopupContent pokestop={pokestop} />
+              </Popup>
+            </Marker>
             <Popup position={[pokestop.lat, pokestop.lon]}>
               <PopupContent pokestop={pokestop} />
             </Popup>
