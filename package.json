@@ -10,7 +10,8 @@
     "start": "yarn build && node server/src/index.js",
     "dev": "nodemon server/src/index.js",
     "build": "webpack",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch",
+    "generate": "node server/src/services/generateMasterfile.js"
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",
@@ -59,12 +60,14 @@
     "express-graphql": "^0.12.0",
     "express-handlebars": "^5.2.1",
     "extend": "^3.0.2",
+    "fs-extra": "^9.1.0",
     "graphql": "^15.5.0",
     "graphql-scalars": "^1.9.0",
     "knex": "^0.95.1",
     "leaflet": "^1.7.1",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
+    "node-fetch": "^2.6.1",
     "nodes2ts": "^2.0.0",
     "objection": "^2.2.14",
     "react": "^17.0.2",

@@ -1,13 +1,12 @@
-/* eslint-disable consistent-return */
 /* eslint-disable no-console */
-export default async function getQuests() {
+export default async function getSettings() {
   try {
-    const response = await fetch('/quests')
+    const response = await fetch('/settings')
     if (!response.ok) {
       throw new Error(`${response.status} (${response.statusText})`)
     }
     const body = await response.json()
-    return body.quests
+    return body.settings
   } catch (error) {
     console.error(error.message)
   }

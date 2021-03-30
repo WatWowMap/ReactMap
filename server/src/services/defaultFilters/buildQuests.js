@@ -1,4 +1,4 @@
-export default function buildQuests(availableQuests) {
+module.exports = function buildQuests(availableQuests) {
   const quests = {}
   Object.entries(availableQuests).forEach(questType => {
     if (questType[0] === 'items') {

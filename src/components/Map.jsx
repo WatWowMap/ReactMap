@@ -16,7 +16,7 @@ import S2Cell from './s2Cell/S2Cell'
 import SubmissionCell from './submissionCells/SubmissionCells'
 
 export default function Map({
-  map, config, defaultFilters, settings, setSettings, availableForms,
+  map, config, defaultFilters, settings, setSettings, availableForms, masterfile,
 }) {
   const [bounds, setBounds] = useState({
     minLat: config.map.startLat - 0.025,
@@ -117,6 +117,7 @@ export default function Map({
         setSettings={setSettings}
         availableForms={availableForms}
         map={map}
+        masterfile={masterfile}
       />
     </ThemeProvider>
   )

@@ -3,6 +3,7 @@
 
 .env
 config.json
+masterfile.json
 
 # OS X
 .DS_Store*

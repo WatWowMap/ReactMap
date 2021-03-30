@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { MapContainer } from 'react-leaflet'
 
 import Map from './Map'
-import buildDefaultFilters from '../services/defaultFilters/buildDefaultFilters'
 
 export default function ConfigSettings({ serverSettings }) {
   const [map, setMap] = useState(null)
@@ -11,7 +10,6 @@ export default function ConfigSettings({ serverSettings }) {
     tileServer: serverSettings.config.tileServers.Default,
   })
 
-  const defaultFilters = buildDefaultFilters(serverSettings)
   const availableForms = new Set(settings.iconStyle.pokemonList)
 
   return (
@@ -31,8 +29,9 @@ export default function ConfigSettings({ serverSettings }) {
               config={serverSettings.config}
               settings={settings}
               setSettings={setSettings}
-              defaultFilters={defaultFilters}
+              defaultFilters={serverSettings.filters}
               availableForms={availableForms}
+              masterfile={serverSettings.masterfile}
             />
             )}
         </MapContainer>

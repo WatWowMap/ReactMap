@@ -6,7 +6,7 @@ import Drawer from './Drawer'
 import * as Dialogs from './dialogs/index'
 
 export default function Nav({
-  config, settings, setSettings, globalFilters, setGlobalFilters, availableForms, map, defaultFilters,
+  config, settings, setSettings, globalFilters, setGlobalFilters, availableForms, map, defaultFilters, masterfile,
 }) {
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
@@ -45,6 +45,7 @@ export default function Nav({
         globalFilters={globalFilters}
         setGlobalFilters={setGlobalFilters}
         defaultFilters={defaultFilters}
+        masterfile={masterfile}
       />
     )
   }

@@ -9,8 +9,6 @@ import {
   useMediaQuery,
 } from '@material-ui/core'
 import { useTheme } from '@material-ui/core/styles'
-import masterfile from '../../../../data/masterfile.json'
-import defaultRarity from '../../../../data/defaultRarity.json'
 
 import useStyles from '../../../../assets/mui/styling'
 import AdvancedMenu from './AdvancedFilter'
@@ -19,7 +17,7 @@ import FilterOptions from '../components/FilterOptions'
 import FilterFooter from '../components/FilterFooter'
 
 export default function PokemonMenu({
-  settings, globalFilters, toggleDialog, availableForms,
+  settings, globalFilters, toggleDialog, availableForms, masterfile,
 }) {
   const classes = useStyles()
   const theme = useTheme()
@@ -122,33 +120,22 @@ export default function PokemonMenu({
       const formId = forms[j]
       const id = `${i}-${formId}`
       let formName = pkmn.forms[formId].name || ''
+      formName = formName === 'Normal' ? '' : `(${formName})`
       pkmn.types = pkmn.types ? pkmn.types : []
-      const skipForms = ['shadow', 'purified']
 
-      if (!skipForms.includes(formName.toLowerCase())) {
-        formName = formName === 'Normal' ? '' : `(${formName})`
-
-        for (const [tier, pokemon] of Object.entries(defaultRarity)) {
-          if (pokemon.includes(parseInt(i))) {
-            pkmn.rarity = tier
-          }
-        }
-
-        if (filters.generations[pkmn.generation]
-          || filters.types[pkmn.types[0]]
-          || filters.types[pkmn.types[1]]
-          || filters.rarities[pkmn.rarity]
-          || (filters.rarities.Legendary && pkmn.legendary)
-          || (filters.rarities.Mythical && pkmn.mythic)) {
-          if (!filters.others.AllForms) {
-            if (formId == pkmn.default_form_id || formName === '()') {
-              filteredPokes.push({ id, i, formId })
-              filteredPokesObj[id] = { ...tempFilters[id] }
-            }
-          } else {
+      if (filters.generations[pkmn.generation]
+        || filters.types[pkmn.types[0]]
+        || filters.types[pkmn.types[1]]
+        || filters.rarities[pkmn.rarity]
+        || (filters.rarities.Legendary && pkmn.legendary)
+        if (!filters.others.AllForms) {
+          if (formId == pkmn.default_form_id || formName === '()') {
             filteredPokes.push({ id, i, formId })
             filteredPokesObj[id] = { ...tempFilters[id] }
           }
+        } else {
+          filteredPokes.push({ id, i, formId })
+          filteredPokesObj[id] = { ...tempFilters[id] }
         }
       }
     }

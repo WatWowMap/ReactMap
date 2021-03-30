@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 
 import ConfigSettings from './ConfigSettings'
-import Fetch from '../services/Fetch'
+import getSettings from '../services/getSettings'
 
 const client = new ApolloClient({
   uri: '/graphql',
@@ -14,7 +14,7 @@ const client = new ApolloClient({
 export default function App() {
   const [serverSettings, setServerSettings] = useState(undefined)
   const getServerSettings = async () => {
-    setServerSettings(await Fetch.fetchSettings())
+    setServerSettings(await getSettings())
   }
 
   useEffect(() => {

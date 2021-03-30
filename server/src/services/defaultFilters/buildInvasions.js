@@ -1,5 +1,5 @@
 /* eslint-disable no-plusplus */
-export default function buildInvasions() {
+module.exports = function buildInvasions() {
   const invasions = {}
 
   for (let i = 1; i <= 50; i++) {

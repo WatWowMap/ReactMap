@@ -1,12 +1,12 @@
-import getAllDevices from './data/device'
-import { getAllGyms, getAllRaids } from './data/gym'
-import getAllPokestops from './data/pokestop'
-import getAllPokemon from './data/pokemon'
-import getAllSpawnpoints from './data/spawnpoint'
-import getAllPortals from './data/portal'
-import getAllWeather from './data/weather'
-import getAllS2Cells from './data/s2Cell'
-import getAllSubmissionCells from './data/submissionCells'
+import getAllDevices from './queries/device'
+import { getAllGyms, getAllRaids } from './queries/gym'
+import getAllPokestops from './queries/pokestop'
+import getAllPokemon from './queries/pokemon'
+import getAllSpawnpoints from './queries/spawnpoint'
+import getAllPortals from './queries/portal'
+import getAllWeather from './queries/weather'
+import getAllS2Cells from './queries/s2Cell'
+import getAllSubmissionCells from './queries/submissionCells'
 
 class Query {
   static getAllDevices() {

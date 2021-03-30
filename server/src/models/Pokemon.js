@@ -1,6 +1,7 @@
 /* eslint-disable no-eval */
 /* eslint-disable no-restricted-syntax */
 const { Model } = require('objection')
+const { pokemon } = require('../data/masterfile.json')
 
 class Pokemon extends Model {
   static get tableName() {
@@ -32,9 +33,20 @@ class Pokemon extends Model {
       count = 0
     }
     query += '})'
+    const results = await eval(query)
 
-    // eslint-disable-next-line no-return-await
-    return count ? [] : await eval(query)
+    const filteredResults = results.reduce((result, pkmn) => {
+      let realForm = pkmn.form
+      if (pkmn.form === 0 && pokemon[pkmn.pokemon_id].default_form_id) {
+        realForm = pokemon[pkmn.pokemon_id].default_form_id
+      }
+      if (args.filters[`${pkmn.pokemon_id}-${realForm}`]) {
+        result.push(pkmn)
+      }
+      return result
+    }, [])
+
+    return count ? [] : filteredResults
   }
 }
 

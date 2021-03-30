@@ -21,6 +21,7 @@ module.exports = {
     allowForLoopAfterthoughts: 0,
     radix: 0,
     eqeqeq: 0,
+    'consistent-return': 0,
     'no-use-before-define': 0,
     'no-param-reassign': 0,
     'arrow-parens': 0,
