@@ -1,19 +1,13 @@
-import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLBoolean, GraphQLFloat } from 'graphql'
-import { JSONResolver } from 'graphql-scalars'
+const {
+  GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLFloat, GraphQLBoolean,
+} = require('graphql')
+const { JSONResolver } = require('graphql-scalars')
 
-const QuestType = new GraphQLObjectType({
-  name: 'Conditions',
-  fields: () => ({
-    type: { type: GraphQLInt },
-    info: { type: JSONResolver }
-  })
-})
-
-export default new GraphQLObjectType({
+module.exports = new GraphQLObjectType({
   name: 'Pokestop',
   fields: () => ({
     id: { type: GraphQLID },
-    lat: { type: GraphQLFloat  },
+    lat: { type: GraphQLFloat },
     lon: { type: GraphQLFloat },
     name: { type: GraphQLString },
     url: { type: GraphQLString },
@@ -34,6 +28,6 @@ export default new GraphQLObjectType({
     grunt_type: { type: GraphQLInt },
     first_seen_timestamp: { type: GraphQLInt },
     sponsor_id: { type: GraphQLInt },
-    quest_pokemon_id: { type: GraphQLInt }
-  })
+    quest_pokemon_id: { type: GraphQLInt },
+  }),
 })

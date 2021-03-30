@@ -1,21 +1,20 @@
-import express from "express"
-import { fileURLToPath } from "url"
-import path, { dirname } from "path"
+// const express = require('express')
+// const path = require('path')
 
-const clientRouter = new express.Router()
+// const clientRouter = new express.Router()
 
-const getClientIndexPath = () => {
-  const currentPath = dirname(fileURLToPath(import.meta.url))
-  const indexPath = path.join(currentPath, "../../../client/public/index.html")
-  return indexPath
-}
+// const getClientIndexPath = () => {
+//   const currentPath = dirname(fileURLToPath(import.meta.url))
+//   const indexPath = path.join(currentPath, '../../../client/public/index.html')
+//   return indexPath
+// }
 
-const clientRoutes = [
-  "/"
-]
+// const clientRoutes = [
+//   '/',
+// ]
 
-clientRouter.get(clientRoutes, (req, res) => {
-  res.sendFile(getClientIndexPath())
-})
+// clientRouter.get(clientRoutes, (req, res) => {
+//   res.sendFile(getClientIndexPath())
+// })
 
-export default clientRouter
+// export default clientRouter

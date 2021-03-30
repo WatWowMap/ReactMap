@@ -1,4 +1,4 @@
-import { Model, raw } from 'objection'
+const { Model, raw } = require('objection')
 
 class Pokestop extends Model {
   static get tableName() {
@@ -24,4 +24,4 @@ class Pokestop extends Model {
   }
 }
 
-export default Pokestop
+module.exports = Pokestop

@@ -1,6 +1,8 @@
-import { GraphQLObjectType, GraphQLInt, GraphQLFloat, GraphQLBoolean, GraphQLString } from 'graphql'
+const {
+  GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLInt, GraphQLFloat,
+} = require('graphql')
 
-export default new GraphQLObjectType({
+module.exports = new GraphQLObjectType({
   name: 'Weather',
   fields: () => ({
     id: { type: GraphQLString },
@@ -17,6 +19,6 @@ export default new GraphQLObjectType({
     special_effect_level: { type: GraphQLInt },
     severity: { type: GraphQLBoolean },
     warn_weather: { type: GraphQLBoolean },
-    updated: { type: GraphQLInt }
-  })
+    updated: { type: GraphQLInt },
+  }),
 })

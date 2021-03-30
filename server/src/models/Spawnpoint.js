@@ -1,4 +1,4 @@
-import { Model } from 'objection'
+const { Model } = require('objection')
 
 class Spawnpoint extends Model {
   static get tableName() {
@@ -6,4 +6,4 @@ class Spawnpoint extends Model {
   }
 }
 
-export default Spawnpoint
+module.exports = Spawnpoint

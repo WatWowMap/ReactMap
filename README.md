@@ -26,7 +26,9 @@
 
 ## Dev Instructions
 1. Follow steps 1-4 above
-2. `yarn dev`
+2. Open two consoles
+3. `yarn dev` in one, starts the server with nodemon
+4. `yarn watch` in the other, this automatically re-compiles your bundle for faster development.
 
 ## Coming Soon
 - Raids

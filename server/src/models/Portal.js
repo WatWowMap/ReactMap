@@ -1,4 +1,4 @@
-import { Model } from 'objection'
+const { Model } = require('objection')
 
 class Portal extends Model {
   static get tableName() {
@@ -6,4 +6,4 @@ class Portal extends Model {
   }
 }
 
-export default Portal
+module.exports = Portal

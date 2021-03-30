@@ -1,24 +1,28 @@
-import { GraphQLObjectType, GraphQLID, GraphQLFloat, GraphQLList, GraphQLSchema } from 'graphql'
-import { JSONResolver } from 'graphql-scalars'
-import { ref } from 'objection'
+/* eslint-disable no-return-await */
+const {
+  GraphQLObjectType, GraphQLID, GraphQLFloat, GraphQLList, GraphQLSchema,
+} = require('graphql')
+const { JSONResolver } = require('graphql-scalars')
+const { ref } = require('objection')
 
-import config from '../services/config.js'
-import DeviceType from './device.js'
-import GymType from './gym.js'
-import PokestopType from './pokestop.js'
-import PokemonType from './pokemon.js'
-import PortalType from './portals.js'
-import s2CellType from './s2Cell.js'
-import SpawnpointType from './spawnpoint.js'
-import WeatherType from './weather.js'
+const DeviceType = require('./device.js')
+const GymType = require('./gym.js')
+const PokestopType = require('./pokestop.js')
+const PokemonType = require('./pokemon.js')
+const PortalType = require('./portals.js')
+const s2CellType = require('./s2Cell.js')
+const SpawnpointType = require('./spawnpoint.js')
+const WeatherType = require('./weather.js')
 
-import { Device, Gym, Pokemon, Pokestop, Portal, S2Cell, Spawnpoint, Weather } from '../models/index.js'
+const {
+  Device, Gym, Pokemon, Pokestop, Portal, S2Cell, Spawnpoint, Weather,
+} = require('../models/index.js')
 
 const minMaxArgs = {
   minLat: { type: GraphQLFloat },
   maxLat: { type: GraphQLFloat },
   minLon: { type: GraphQLFloat },
-  maxLon: { type: GraphQLFloat }
+  maxLon: { type: GraphQLFloat },
 }
 
 const RootQuery = new GraphQLObjectType({
@@ -26,9 +30,9 @@ const RootQuery = new GraphQLObjectType({
   fields: {
     devices: {
       type: new GraphQLList(DeviceType),
-      async resolve(parent, args) {
+      async resolve() {
         return await Device.query()
-      }
+      },
     },
     gyms: {
       type: new GraphQLList(GymType),
@@ -39,13 +43,13 @@ const RootQuery = new GraphQLObjectType({
           .andWhereBetween('lon', [args.minLon, args.maxLon])
           .andWhere('deleted', false)
           .andWhere('updated', '>', 0)
-      }
+      },
     },
     pokestops: {
       type: new GraphQLList(PokestopType),
       args: {
         ...minMaxArgs,
-        filters: { type: JSONResolver }
+        filters: { type: JSONResolver },
       },
       async resolve(parent, args) {
         return await Pokestop.query()
@@ -53,29 +57,29 @@ const RootQuery = new GraphQLObjectType({
           .andWhereBetween('lon', [args.minLon, args.maxLon])
           .andWhere('deleted', false)
           .andWhere('updated', '>', 0)
-      }
+      },
     },
     pokemon: {
       type: new GraphQLList(PokemonType),
       args: {
         ...minMaxArgs,
-        filters: { type: JSONResolver }
+        filters: { type: JSONResolver },
       },
       async resolve(parent, args) {
         return await Pokemon.getPokemon(args)
-      }
+      },
     },
     pokemonDetails: {
       type: PokemonType,
       args: {
-        id: { type: GraphQLID }
+        id: { type: GraphQLID },
       },
       async resolve(parent, args) {
         const result = await Pokemon.query().findOne('id', args.id)
         result.greatLeague = JSON.parse(result.pvp_rankings_great_league)
         result.ultraLeague = JSON.parse(result.pvp_rankings_ultra_league)
         return result
-      }
+      },
     },
     portals: {
       type: new GraphQLList(PortalType),
@@ -84,13 +88,13 @@ const RootQuery = new GraphQLObjectType({
         return await Portal.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
           .andWhereBetween('lon', [args.minLon, args.maxLon])
-      }
+      },
     },
     quests: {
       type: JSONResolver,
-      async resolve(parent, args) {
+      async resolve() {
         return await Pokestop.getAvailableQuests()
-      }
+      },
     },
     s2Cells: {
       type: new GraphQLList(s2CellType),
@@ -102,7 +106,7 @@ const RootQuery = new GraphQLObjectType({
             .as('id')])
           .whereBetween('center_lat', [args.minLat, args.maxLat])
           .andWhereBetween('center_lon', [args.minLon, args.maxLon])
-      }
+      },
     },
     spawnpoints: {
       type: new GraphQLList(SpawnpointType),
@@ -111,7 +115,7 @@ const RootQuery = new GraphQLObjectType({
         return await Spawnpoint.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
           .andWhereBetween('lon', [args.minLon, args.maxLon])
-      }
+      },
     },
     weather: {
       type: new GraphQLList(WeatherType),
@@ -123,9 +127,9 @@ const RootQuery = new GraphQLObjectType({
             .as('id')])
           .whereBetween('latitude', [args.minLat, args.maxLat])
           .andWhereBetween('longitude', [args.minLon, args.maxLon])
-      }
-    }
-  }
+      },
+    },
+  },
 })
 
-export default new GraphQLSchema({ query: RootQuery })
+module.exports = new GraphQLSchema({ query: RootQuery })

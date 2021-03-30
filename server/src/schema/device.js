@@ -1,6 +1,8 @@
-import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLFloat } from 'graphql'
+const {
+  GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLFloat,
+} = require('graphql')
 
-export default new GraphQLObjectType({
+module.exports = new GraphQLObjectType({
   name: 'Device',
   fields: () => ({
     uuid: { type: GraphQLID },
@@ -8,5 +10,5 @@ export default new GraphQLObjectType({
     last_seen: { type: GraphQLInt },
     last_lat: { type: GraphQLFloat },
     last_lon: { type: GraphQLFloat },
-  })
+  }),
 })

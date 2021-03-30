@@ -1,12 +1,14 @@
-import { GraphQLObjectType, GraphQLID, GraphQLInt, GraphQLFloat } from 'graphql'
+const {
+  GraphQLObjectType, GraphQLID, GraphQLInt, GraphQLFloat,
+} = require('graphql')
 
-export default new GraphQLObjectType({
+module.exports = new GraphQLObjectType({
   name: 'Spawnpoint',
   fields: () => ({
     id: { type: GraphQLID },
     lat: { type: GraphQLFloat },
     lon: { type: GraphQLFloat },
     updated: { type: GraphQLInt },
-    despawn_sec: { type: GraphQLInt }
-  })
+    despawn_sec: { type: GraphQLInt },
+  }),
 })
