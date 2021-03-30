@@ -1,13 +1,12 @@
-import repl from "repl"
-import knexConnection from '../knexfile.js'
-
-import * as models from "./models/index.js"
+const repl = require('repl')
+const knexConnection = require('../knexfile')
+const models = require('./models/index.js')
 
 const replServer = repl.start({
-  prompt: "> ",
+  prompt: '> ',
 })
 
 replServer.context.models = models
-replServer.on("close", () => {
+replServer.on('close', () => {
   knexConnection.destroy()
 })

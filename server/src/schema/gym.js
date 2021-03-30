@@ -1,6 +1,8 @@
-import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLBoolean, GraphQLFloat } from 'graphql'
+const {
+  GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLFloat, GraphQLBoolean,
+} = require('graphql')
 
-export default new GraphQLObjectType({
+module.exports = new GraphQLObjectType({
   name: 'Gym',
   fields: () => ({
     id: { type: GraphQLID },
@@ -30,6 +32,6 @@ export default new GraphQLObjectType({
     sponsor_id: { type: GraphQLInt },
     raid_pokemon_gender: { type: GraphQLInt },
     raid_pokemon_costume: { type: GraphQLInt },
-    raid_pokemon_evolution: { type: GraphQLInt }
-  })
+    raid_pokemon_evolution: { type: GraphQLInt },
+  }),
 })

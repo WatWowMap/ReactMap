@@ -5,8 +5,8 @@
 
 ## Features 
 - View and Filter Pokemon 
-- Gyms (Filtering coming soon!)
-- Pokestops (Filtering coming soon!)
+- Gyms & Raids (Filtering coming soon!)
+- Pokestops, Quests, & Invasions (Filtering coming soon!)
 - Devices 
 - Weather 
 - Portals
@@ -17,21 +17,21 @@
 - NodeJS (Recommend using V14.*)
 - MySQL (Recommend using 8.0+)
 - Yarn (npm install -g yarn)
+
 ## Installation Instructions
 1. Clone the repo
 2. Open up the directory (`cd ReactMap`)
 3. `yarn install`
-4. Create your config (`cp server/configs/config.example.json server/configs/config.json`)
-5. `yarn start`
-
+4. Generate Masterfile `yarn generate`
+5. Create your config (`cp server/configs/config.example.json server/configs/config.json`)
+6. `yarn start`
 ## Dev Instructions
-1. Follow steps 1-4 above
-2. `yarn dev`
+1. Follow steps 1-5 above
+2. Open two consoles
+3. `yarn dev` in one, starts the server with nodemon
+4. `yarn watch` in the other, this automatically re-compiles your bundle for faster development.
 
 ## Coming Soon
-- Raids
-- Invasions
-- Quests
 - Searching
 - Discord Login
 - User Profile/Control Panel

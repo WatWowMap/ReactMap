@@ -1,4 +1,4 @@
-import { Model } from 'objection'
+const { Model } = require('objection')
 
 class Gym extends Model {
   static get tableName() {
@@ -6,4 +6,4 @@ class Gym extends Model {
   }
 }
 
-export default Gym
+module.exports = Gym

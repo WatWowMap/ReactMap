@@ -1,4 +1,4 @@
-import { Model } from 'objection'
+const { Model } = require('objection')
 
 class Device extends Model {
   static get tableName() {
@@ -6,4 +6,4 @@ class Device extends Model {
   }
 }
 
-export default Device
+module.exports = Device

@@ -1,4 +1,6 @@
-import { GraphQLObjectType, GraphQLID, GraphQLList, GraphQLInt, GraphQLFloat } from 'graphql'
+const {
+  GraphQLObjectType, GraphQLID, GraphQLInt, GraphQLFloat, GraphQLList,
+} = require('graphql')
 
 const PvpType = new GraphQLObjectType({
   name: 'Pvp',
@@ -7,11 +9,11 @@ const PvpType = new GraphQLObjectType({
     pokemon: { type: GraphQLInt },
     form: { type: GraphQLInt },
     cp: { type: GraphQLInt },
-    percentage: { type: GraphQLFloat }
-  })
+    percentage: { type: GraphQLFloat },
+  }),
 })
 
-export default new GraphQLObjectType({
+module.exports = new GraphQLObjectType({
   name: 'Pokemon',
   fields: () => ({
     id: { type: GraphQLID },
@@ -40,5 +42,5 @@ export default new GraphQLObjectType({
     capture_3: { type: GraphQLFloat },
     greatLeague: { type: new GraphQLList(PvpType) },
     ultraLeague: { type: new GraphQLList(PvpType) },
-  })
+  }),
 })

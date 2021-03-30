@@ -1,27 +1,25 @@
-import express from "express"
-import clientRouter from './clientRouter.js'
-import { graphqlHTTP } from 'express-graphql'
-import schema from '../schema/schema.js'
-import config from '../services/config.js'
-import cors from 'cors'
-import { Pokestop } from '../models/index.js'
-import { raw } from 'objection'
-import updateAvailableForms from '../services/updateAvailableForms.js'
+const express = require('express')
+const { graphqlHTTP } = require('express-graphql')
+const cors = require('cors')
+
+const schema = require('../schema/schema.js')
+const config = require('../services/config.js')
+const updateAvailableForms = require('../services/updateAvailableForms.js')
+const buildDefaultFilters = require('../services/defaultFilters/buildDefaultFilters.js')
+const masterfile = require('../data/masterfile.json')
 
 const rootRouter = new express.Router()
 
-rootRouter.use("/", clientRouter)
-
 rootRouter.use('/graphql', cors(), graphqlHTTP({
   schema,
-  graphiql: config.devOptions.graphiql
+  graphiql: config.devOptions.graphiql,
 }))
 
-rootRouter.get("/settings", async (req, res) => {
+rootRouter.get('/settings', async (req, res) => {
   try {
     const settings = {
       config: {},
-      quests: {}
+      quests: {},
     }
     settings.config.env = config.devOptions.enabled
     settings.config.map = config.map
@@ -31,8 +29,8 @@ rootRouter.get("/settings", async (req, res) => {
     settings.config.rarity = config.rarity
 
     await updateAvailableForms(settings.config.icons)
-
-    settings.quests = await Pokestop.getAvailableQuests()
+    settings.filters = await buildDefaultFilters()
+    settings.masterfile = masterfile
 
     res.status(200).json({ settings })
   } catch (error) {
@@ -40,4 +38,4 @@ rootRouter.get("/settings", async (req, res) => {
   }
 })
 
-export default rootRouter
+module.exports = rootRouter
