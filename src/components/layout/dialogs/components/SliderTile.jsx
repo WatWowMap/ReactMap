@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import React from 'react'
 import { Grid, Typography, Slider } from '@material-ui/core'
 

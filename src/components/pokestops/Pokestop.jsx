@@ -1,4 +1,3 @@
-/* eslint-disable prefer-destructuring */
 import React from 'react'
 import { Marker, Popup } from 'react-leaflet'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
@@ -17,8 +16,9 @@ export default function Pokestop({
   }
   if (globalFilters.pokestops.enabled) {
     Object.entries(globalFilters.pokestops.filter).forEach(filter => {
-      if (filter[1].enabled) {
-        trimmedFilters.pokestops[filter[0]] = filter[1]
+      const [id, specifics] = filter
+      if (specifics.enabled) {
+        trimmedFilters.pokestops[id] = specifics
       }
     })
   }

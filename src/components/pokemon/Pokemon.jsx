@@ -1,4 +1,3 @@
-/* eslint-disable prefer-destructuring */
 import React from 'react'
 import { Marker, Popup } from 'react-leaflet'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
@@ -13,8 +12,9 @@ export default function Pokemon({
 }) {
   const trimmedFilters = {}
   Object.entries(filters).forEach(filter => {
-    if (filter[1].enabled) {
-      trimmedFilters[filter[0]] = filter[1]
+    const [id, specifics] = filter
+    if (specifics.enabled) {
+      trimmedFilters[id] = specifics
     }
   })
   const { data } = useQuery(Query.getAllPokemon(), {

@@ -128,7 +128,7 @@ export default function PokemonMenu({
         || filters.types[pkmn.types[1]]
         || filters.rarities[pkmn.rarity]
         || (filters.rarities.Legendary && pkmn.legendary)
-        || (filters.rarities.Mythical && pkmn.mythic)) {
+        || (filters.rarities.Mythical && pkmn.mythical)) {
         if (!filters.others.AllForms) {
           if (formId == pkmn.default_form_id || formName === '()') {
             filteredPokes.push({ id, i, formId })
