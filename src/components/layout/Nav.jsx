@@ -3,7 +3,7 @@ import Dialog from '@material-ui/core/Dialog'
 
 import FloatingBtn from './FloatingBtn'
 import Drawer from './Drawer'
-import * as Dialogs from './dialogs/index'
+import * as Dialogs from './dialogs/dialogIndex'
 
 export default function Nav({
   config, settings, setSettings, globalFilters, setGlobalFilters, availableForms, map, defaultFilters, masterfile,
