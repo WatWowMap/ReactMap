@@ -8,18 +8,20 @@ import marker from './marker'
 import PopupContent from './Popup'
 
 export default function Portal({ bounds }) {
-  const { data } = useQuery(Query.getAllPortals(), {
+  const { data, previousData } = useQuery(Query.getAllPortals(), {
     variables: bounds,
   })
+
+  const renderedData = data || previousData
   return (
     <MarkerClusterGroup
-      disableClusteringAtZoom={16}
+      disableClusteringAtZoom={1}
     >
-      {data && data.portals.map(portal => (
+      {renderedData && renderedData.portals.map(portal => (
         <Circle
           key={portal.id}
           center={[portal.lat, portal.lon]}
-          radius={20}
+          radius={3}
           pathOptions={marker(portal)}
         >
           <Popup position={[portal.lat, portal.lon]}>

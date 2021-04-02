@@ -1,6 +1,7 @@
 const express = require('express')
 const path = require('path')
 const logger = require('morgan')
+const compression = require('compression')
 require('../knexfile.js')
 const rootRouter = require('./routes/rootRouter.js')
 const config = require('./services/config.js')
@@ -8,6 +9,8 @@ const config = require('./services/config.js')
 const app = express()
 
 app.use(logger('dev'))
+
+app.use(compression())
 
 app.use(express.json({ limit: '50mb' }))
 

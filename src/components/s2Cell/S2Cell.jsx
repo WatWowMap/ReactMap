@@ -8,13 +8,14 @@ import PopupContent from './Popup'
 import Utility from '../../services/Utility'
 
 export default function S2Cell({ bounds }) {
-  const { data } = useQuery(Query.getAllS2Cells(), {
+  const { data, previousData } = useQuery(Query.getAllS2Cells(), {
     variables: bounds,
   })
 
+  const renderedData = data || previousData
   return (
     <>
-      {data && data.s2Cells.map(cell => (
+      {renderedData && renderedData.s2Cells.map(cell => (
         <Polygon
           key={cell.id}
           positions={Utility.getPolyVector(cell.id, 'polygon')}

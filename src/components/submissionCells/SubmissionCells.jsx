@@ -13,7 +13,7 @@ import typeStyle from './typeStyle'
 import PopupContent from './Popup'
 
 export default function SubmissionCell({ bounds }) {
-  const { data } = useQuery(Query.getAllSubmissionCells(), {
+  const { data, previousData } = useQuery(Query.getAllSubmissionCells(), {
     variables: bounds,
   })
 
@@ -25,7 +25,8 @@ export default function SubmissionCell({ bounds }) {
     typeCells: [],
   }
 
-  if (data) {
+  const renderedData = data || previousData
+  if (renderedData) {
     cells = {
       placementCells: getPlacementCells(bounds, data.pokestops, data.gyms),
       typeCells: getTypeCells(bounds, data.pokestops, data.gyms),

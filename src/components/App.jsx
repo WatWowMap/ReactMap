@@ -8,7 +8,19 @@ import getSettings from '../services/getSettings'
 
 const client = new ApolloClient({
   uri: '/graphql',
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          pokemon: {
+            merge(existing, incoming) {
+              return incoming
+            },
+          },
+        },
+      },
+    },
+  }),
 })
 
 export default function App() {

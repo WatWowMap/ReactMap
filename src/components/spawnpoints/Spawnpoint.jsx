@@ -8,15 +8,16 @@ import marker from './marker'
 import PopupContent from './Popup'
 
 export default function Spawnpoint({ bounds }) {
-  const { data } = useQuery(Query.getAllSpawnpoints(), {
+  const { data, previousData } = useQuery(Query.getAllSpawnpoints(), {
     variables: bounds,
   })
 
+  const renderedData = data || previousData
   return (
     <MarkerClusterGroup
       disableClusteringAtZoom={16}
     >
-      {data && data.spawnpoints.map(spawnpoint => (
+      {renderedData && renderedData.spawnpoints.map(spawnpoint => (
         <Circle
           key={spawnpoint.id}
           center={[spawnpoint.lat, spawnpoint.lon]}

@@ -17,8 +17,8 @@ export default function ConfigSettings({ serverSettings }) {
       {serverSettings.config.map
         && (
         <MapContainer
-          center={[serverSettings.config.map.startLat, serverSettings.config.map.startLon]}
-          zoom={serverSettings.config.map.startZoom}
+          center={Object.values(JSON.parse(localStorage.getItem('location'))) || [serverSettings.config.map.startLat, serverSettings.config.map.startLon]}
+          zoom={localStorage.getItem('zoom') || serverSettings.config.map.startZoom}
           whenCreated={setMap}
           zoomControl={false}
         >
@@ -32,6 +32,7 @@ export default function ConfigSettings({ serverSettings }) {
               defaultFilters={serverSettings.filters}
               availableForms={availableForms}
               masterfile={serverSettings.masterfile}
+              preferCanvas
             />
             )}
         </MapContainer>
