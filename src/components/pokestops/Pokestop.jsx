@@ -22,16 +22,17 @@ export default function Pokestop({
       }
     })
   }
-  const { data } = useQuery(Query.getAllPokestops(), {
+  const { data, previousData } = useQuery(Query.getAllPokestops(), {
     variables: { ...bounds, filters: trimmedFilters },
   })
   const ts = (new Date()).getTime() / 1000
 
+  const renderedData = data || previousData
   return (
     <MarkerClusterGroup
       disableClusteringAtZoom={16}
     >
-      {data && data.pokestops.map(pokestop => (
+      {renderedData && renderedData.pokestops.map(pokestop => (
         <Marker
           key={pokestop.id}
           position={[pokestop.lat, pokestop.lon]}

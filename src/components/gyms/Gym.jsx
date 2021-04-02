@@ -11,16 +11,17 @@ import PopupContent from './Popup'
 export default function Gym({
   bounds, globalFilters, availableForms, settings,
 }) {
-  const { data } = !globalFilters.raids.enabled
+  const { data, previousData } = !globalFilters.raids.enabled
     ? useQuery(Query.getAllGyms(), { variables: bounds })
     : useQuery(Query.getAllRaids(), { variables: bounds })
   const ts = (new Date()).getTime() / 1000
 
+  const renderedData = data || previousData
   return (
     <MarkerClusterGroup
       disableClusteringAtZoom={13}
     >
-      {data && data.gyms.map(gym => (
+      {renderedData && renderedData.gyms.map(gym => (
         <Marker
           key={gym.id}
           position={[gym.lat, gym.lon]}

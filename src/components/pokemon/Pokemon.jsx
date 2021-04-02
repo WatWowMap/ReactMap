@@ -17,24 +17,25 @@ export default function Pokemon({
       trimmedFilters[id] = specifics
     }
   })
-  const { data } = useQuery(Query.getAllPokemon(), {
+  const { data, previousData } = useQuery(Query.getAllPokemon(), {
     variables: {
       ...bounds, filters: trimmedFilters,
     },
   })
 
+  const renderedData = data || previousData
   return (
     <MarkerClusterGroup
       disableClusteringAtZoom={16}
     >
-      {data && data.pokemon.map(pokemon => (
+      {renderedData && renderedData.pokemon.map(pokes => (
         <Marker
-          key={pokemon.id}
-          position={[pokemon.lat, pokemon.lon]}
-          icon={marker(settings, availableForms, pokemon, pokemon.form)}
+          key={pokes.id}
+          position={[pokes.lat, pokes.lon]}
+          icon={marker(settings, availableForms, pokes, pokes.form)}
         >
-          <Popup position={[pokemon.lat, pokemon.lon]}>
-            <PopupContent pokemon={pokemon} />
+          <Popup position={[pokes.lat, pokes.lon]}>
+            <PopupContent pokemon={pokes} />
           </Popup>
         </Marker>
       ))}
