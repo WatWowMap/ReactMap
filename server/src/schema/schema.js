@@ -40,11 +40,7 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(GymType),
       args: minMaxArgs,
       async resolve(parent, args) {
-        return await Gym.query()
-          .whereBetween('lat', [args.minLat, args.maxLat])
-          .andWhereBetween('lon', [args.minLon, args.maxLon])
-          .andWhere('deleted', false)
-          .andWhere('updated', '>', 0)
+        return await Gym.getAllGyms(args)
       },
     },
     pokestops: {
@@ -54,11 +50,7 @@ const RootQuery = new GraphQLObjectType({
         filters: { type: JSONResolver },
       },
       async resolve(parent, args) {
-        return await Pokestop.query()
-          .whereBetween('lat', [args.minLat, args.maxLat])
-          .andWhereBetween('lon', [args.minLon, args.maxLon])
-          .andWhere('deleted', false)
-          .andWhere('updated', '>', 0)
+        return await Pokestop.getAllPokestops(args)
       },
     },
     pokemon: {
@@ -97,12 +89,6 @@ const RootQuery = new GraphQLObjectType({
           .andWhereBetween('lon', [args.minLon, args.maxLon])
       },
     },
-    quests: {
-      type: JSONResolver,
-      async resolve() {
-        return await Pokestop.getAvailableQuests()
-      },
-    },
     s2Cells: {
       type: new GraphQLList(s2CellType),
       args: minMaxArgs,
@@ -128,14 +114,8 @@ const RootQuery = new GraphQLObjectType({
       type: JSONResolver,
       args: minMaxArgs,
       async resolve(parent, args) {
-        const pokestops = await Pokestop.query()
-          .whereBetween('lat', [args.minLat, args.maxLat])
-          .andWhereBetween('lon', [args.minLon, args.maxLon])
-          .andWhere('deleted', false)
-        const gyms = await Gym.query()
-          .whereBetween('lat', [args.minLat, args.maxLat])
-          .andWhereBetween('lon', [args.minLon, args.maxLon])
-          .andWhere('deleted', false)
+        const pokestops = await Pokestop.getAllPokestops(args)
+        const gyms = await Gym.getAllGyms(args)
         return {
           placementCells: Utility.getPlacementCells(args, pokestops, gyms),
           typeCells: Utility.getTypeCells(args, pokestops, gyms),

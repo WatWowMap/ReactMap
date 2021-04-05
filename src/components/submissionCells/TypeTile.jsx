@@ -1,12 +1,11 @@
 import React from 'react'
 import { Polygon, Popup, Tooltip } from 'react-leaflet'
-import Utility from '../../services/Utility'
 import PopupContent from './Popup'
 import typeStyle from './typeStyle'
 
 const TypeTile = ({ cell }) => (
   <Polygon
-    positions={Utility.getPolyVector(cell.id, 'polygon')}
+    positions={cell.polygon}
     pathOptions={typeStyle(cell)}
   >
     <Popup

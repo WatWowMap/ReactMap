@@ -1,11 +1,10 @@
 import React from 'react'
 import { Polygon } from 'react-leaflet'
-import Utility from '../../services/Utility'
 import placementStyle from './placementStyle'
 
 const PlacementTile = ({ cell }) => (
   <Polygon
-    positions={Utility.getPolyVector(cell.id, 'polygon')}
+    positions={cell.polygon}
     pathOptions={placementStyle(cell.blocked)}
     interactive={false}
   />
