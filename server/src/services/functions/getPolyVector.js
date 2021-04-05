@@ -1,9 +1,9 @@
 /* global BigInt */
-import {
+const {
   S2LatLng, S2Cell, S2CellId, S2Point,
-} from 'nodes2ts'
+} = require('nodes2ts')
 
-export default function getPolyVector(s2cellId, type) {
+module.exports = function getPolyVector(s2cellId, type) {
   const s2cell = new S2Cell(new S2CellId(BigInt(s2cellId).toString()))
   const polygon = []
   for (let i = 0; i <= 3; i += 1) {

@@ -1,12 +1,12 @@
 /* global BigInt */
 
-import {
+const {
   S2LatLng, S2RegionCoverer, S2CellId, S2LatLngRect,
-} from 'nodes2ts'
-import Utility from '../../../services/Utility'
-import Ring from './Ring'
+} = require('nodes2ts')
+const getPolyVector = require('./getPolyVector')
+const Ring = require('../Ring')
 
-export default function getPlacementCells(bounds, pokestops, gyms) {
+module.exports = function getPlacementCells(bounds, pokestops, gyms) {
   const allStops = pokestops.filter(x => x.sponsor_id === null || x.sponsor_id === 0)
   const allGyms = gyms.filter(x => x.sponsor_id === null || x.sponsor_id === 0)
   const stopCoords = allStops.map(x => ({ lat: x.lat, lon: x.lon }))
@@ -24,7 +24,7 @@ export default function getPlacementCells(bounds, pokestops, gyms) {
   const coveringCells = regionCoverer.getCoveringCells(region)
   for (let i = 0; i < coveringCells.length; i += 1) {
     const cell = coveringCells[i]
-    const polygon = Utility.getPolyVector(cell.id)
+    const polygon = getPolyVector(cell.id)
     const cellId = BigInt(cell.id).toString()
     indexedCells[cellId] = {
       id: cellId,

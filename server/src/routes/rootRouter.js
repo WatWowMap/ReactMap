@@ -2,10 +2,9 @@ const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const cors = require('cors')
 
-const schema = require('../schema/schema.js')
-const config = require('../services/config.js')
-const updateAvailableForms = require('../services/updateAvailableForms.js')
-const buildDefaultFilters = require('../services/defaultFilters/buildDefaultFilters.js')
+const schema = require('../schema/schema')
+const config = require('../services/config')
+const Utility = require('../services/Utility')
 const masterfile = require('../data/masterfile.json')
 
 const rootRouter = new express.Router()
@@ -28,8 +27,8 @@ rootRouter.get('/settings', async (req, res) => {
     settings.config.popUpDetails = config.popUpDetails
     settings.config.rarity = config.rarity
 
-    await updateAvailableForms(settings.config.icons)
-    settings.filters = await buildDefaultFilters()
+    await Utility.updateAvailableForms(settings.config.icons)
+    settings.filters = await Utility.buildDefaultFilters()
     settings.masterfile = masterfile
 
     res.status(200).json({ settings })
