@@ -7,4 +7,4 @@ class Ring {
   }
 }
 
-export default Ring
+module.exports = Ring

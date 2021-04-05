@@ -1,6 +1,7 @@
 const {
   GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLInt, GraphQLFloat,
 } = require('graphql')
+const { JSONResolver } = require('graphql-scalars')
 
 module.exports = new GraphQLObjectType({
   name: 'Weather',
@@ -20,5 +21,6 @@ module.exports = new GraphQLObjectType({
     severity: { type: GraphQLBoolean },
     warn_weather: { type: GraphQLBoolean },
     updated: { type: GraphQLInt },
+    polygon: { type: JSONResolver },
   }),
 })

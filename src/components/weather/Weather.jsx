@@ -5,19 +5,16 @@ import { useQuery } from '@apollo/client'
 import Query from '../../services/Query'
 import marker from './marker'
 import PopupContent from './Popup'
-import Utility from '../../services/Utility'
 
-export default function Weather({ bounds }) {
-  const { data } = useQuery(Query.getAllWeather(), {
-    variables: bounds,
-  })
+export default function Weather() {
+  const { data } = useQuery(Query.getAllWeather())
 
   return (
     <>
       {data && data.weather.map(cell => (
         <Polyline
           key={cell.id}
-          positions={Utility.getPolyVector(cell.id, 'polyline')}
+          positions={cell.polygon}
           pathOptions={{ color: 'green', opacity: 0.5 }}
         >
           <Marker icon={marker(cell)} position={[cell.latitude, cell.longitude]}>

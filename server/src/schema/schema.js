@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 /* eslint-disable no-return-await */
 const {
   GraphQLObjectType, GraphQLID, GraphQLFloat, GraphQLList, GraphQLSchema,
@@ -13,6 +14,7 @@ const PortalType = require('./portals.js')
 const s2CellType = require('./s2Cell.js')
 const SpawnpointType = require('./spawnpoint.js')
 const WeatherType = require('./weather.js')
+const Utility = require('../services/Utility')
 
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2Cell, Spawnpoint, Weather,
@@ -66,7 +68,12 @@ const RootQuery = new GraphQLObjectType({
         filters: { type: JSONResolver },
       },
       async resolve(parent, args) {
-        return await Pokemon.getPokemon(args)
+        const ts = Math.floor((new Date()).getTime() / 1000)
+        return await Pokemon.query()
+          .where('expire_timestamp', '>=', ts)
+          .andWhereBetween('lat', [args.minLat, args.maxLat])
+          .andWhereBetween('lon', [args.minLon, args.maxLon])
+          .andWhereBetween('iv', [0, 100])
       },
     },
     pokemonDetails: {
@@ -117,16 +124,33 @@ const RootQuery = new GraphQLObjectType({
           .andWhereBetween('lon', [args.minLon, args.maxLon])
       },
     },
-    weather: {
-      type: new GraphQLList(WeatherType),
+    submissionCells: {
+      type: JSONResolver,
       args: minMaxArgs,
       async resolve(parent, args) {
-        return await Weather.query()
+        const pokestops = await Pokestop.query()
+          .whereBetween('lat', [args.minLat, args.maxLat])
+          .andWhereBetween('lon', [args.minLon, args.maxLon])
+          .andWhere('deleted', false)
+        const gyms = await Gym.query()
+          .whereBetween('lat', [args.minLat, args.maxLat])
+          .andWhereBetween('lon', [args.minLon, args.maxLon])
+          .andWhere('deleted', false)
+        return {
+          placementCells: Utility.getPlacementCells(args, pokestops, gyms),
+          typeCells: Utility.getTypeCells(args, pokestops, gyms),
+        }
+      },
+    },
+    weather: {
+      type: new GraphQLList(WeatherType),
+      async resolve() {
+        const weather = await Weather.query()
           .select(['*', ref('id')
             .castTo('CHAR')
             .as('id')])
-          .whereBetween('latitude', [args.minLat, args.maxLat])
-          .andWhereBetween('longitude', [args.minLon, args.maxLon])
+        weather.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, 'polyline'))
+        return weather
       },
     },
   },

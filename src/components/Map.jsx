@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-underscore-dangle */
 import React, { useState, useEffect, useCallback } from 'react'
 import { TileLayer } from 'react-leaflet'
@@ -6,19 +7,19 @@ import { ThemeProvider } from '@material-ui/styles'
 import theme from '../assets/mui/theme'
 import Nav from './layout/Nav'
 import Device from './devices/Device'
-import Gym from './gyms/Gym'
-import Pokestop from './pokestops/Pokestop'
-import Pokemon from './pokemon/Pokemon'
-import Spawnpoint from './spawnpoints/Spawnpoint'
-import Portal from './portals/Portal'
+import Gym from './gyms/GymQuery'
+import Pokestop from './pokestops/PokestopQuery'
+import Pokemon from './pokemon/PokemonQuery'
+import Spawnpoint from './spawnpoints/SpawnpointQuery'
+import Portal from './portals/PortalQuery'
 import Weather from './weather/Weather'
-import S2Cell from './s2Cell/S2Cell'
-import SubmissionCell from './submissionCells/SubmissionCells'
+import S2Cell from './s2Cell/S2CellQuery'
+import SubmissionCell from './submissionCells/SubmissionCellQuery'
 
 export default function Map({
   map, config, defaultFilters, settings, setSettings, availableForms, masterfile,
 }) {
-  const [bounds, setBounds] = useState({
+  const [bounds] = useState({
     minLat: config.map.startLat - 0.025,
     maxLat: config.map.startLat + 0.025,
     minLon: config.map.startLon - 0.025,
@@ -26,23 +27,6 @@ export default function Map({
   })
 
   const [globalFilters, setGlobalFilters] = useState(JSON.parse(localStorage.getItem('filters')) || defaultFilters)
-
-  const onMove = useCallback(() => {
-    const mapBounds = map.getBounds()
-    setBounds({
-      minLat: mapBounds._southWest.lat,
-      maxLat: mapBounds._northEast.lat,
-      minLon: mapBounds._southWest.lng,
-      maxLon: mapBounds._northEast.lng,
-    })
-  }, [map])
-
-  useEffect(() => {
-    map.on('moveend', onMove)
-    return () => {
-      map.off('moveend', onMove)
-    }
-  }, [map])
 
   useEffect(() => {
     localStorage.setItem('filters', JSON.stringify(globalFilters))
