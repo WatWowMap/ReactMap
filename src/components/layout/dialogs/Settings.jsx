@@ -10,19 +10,21 @@ import {
   MenuItem,
   Select,
 } from '@material-ui/core'
-
+import useStore from '../../../hooks/useStore'
 import useStyles from '../../../assets/mui/styling'
 
 export default function Settings({
-  config, settings, setSettings, toggleDialog,
+  settings, setSettings, toggleDialog,
 }) {
   const classes = useStyles()
-
+  const config = useStore(state => state.config)
   const handleChange = event => {
+    const parsed = JSON.parse(event.target.value)
     setSettings({
       ...settings,
-      [event.target.name]: event.target.value,
+      [event.target.name]: parsed,
     })
+    localStorage.setItem(event.target.name, JSON.stringify(parsed))
   }
 
   return (
@@ -37,15 +39,15 @@ export default function Settings({
                 <Select
                   autoFocus
                   name="tileServer"
-                  value={settings.tileServer}
+                  value={JSON.stringify(settings.tileServer)}
                   onChange={handleChange}
                 >
                   {Object.keys(config.tileServers).map(tile => (
                     <MenuItem
                       key={tile}
-                      value={config.tileServers[tile]}
+                      value={JSON.stringify(config.tileServers[tile])}
                     >
-                      {config.tileServers[tile].name}
+                      {tile}
                     </MenuItem>
                   ))}
                 </Select>
@@ -57,13 +59,13 @@ export default function Settings({
                 <Select
                   autoFocus
                   name="iconStyle"
-                  value={settings.iconStyle}
+                  value={JSON.stringify(settings.iconStyle)}
                   onChange={handleChange}
                 >
                   {Object.keys(config.icons).map(icon => (
                     <MenuItem
                       key={icon}
-                      value={config.icons[icon]}
+                      value={JSON.stringify(config.icons[icon])}
                     >
                       {icon}
                     </MenuItem>

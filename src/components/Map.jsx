@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-underscore-dangle */
-import React, { useState, useEffect, useCallback } from 'react'
-import { TileLayer } from 'react-leaflet'
+import React, { useCallback } from 'react'
+import { TileLayer, useMap } from 'react-leaflet'
 import { ThemeProvider } from '@material-ui/styles'
+import useStore from '../hooks/useStore'
 
 import theme from '../assets/mui/theme'
 import Nav from './layout/Nav'
@@ -17,22 +16,22 @@ import S2Cell from './s2Cell/S2CellQuery'
 import SubmissionCell from './submissionCells/SubmissionCellQuery'
 
 export default function Map({
-  map, config, defaultFilters, settings, setSettings, availableForms, masterfile,
+  settings, setSettings,
 }) {
-  const [bounds] = useState({
-    minLat: config.map.startLat - 0.025,
-    maxLat: config.map.startLat + 0.025,
-    minLon: config.map.startLon - 0.025,
-    maxLon: config.map.startLon + 0.025,
-  })
+  const map = useMap()
+  const filters = useStore(state => state.filters)
+  const initialBounds = {
+    minLat: map.getBounds()._southWest.lat,
+    maxLat: map.getBounds()._northEast.lat,
+    minLon: map.getBounds()._southWest.lng,
+    maxLon: map.getBounds()._northEast.lng,
+  }
 
-  const [globalFilters, setGlobalFilters] = useState(JSON.parse(localStorage.getItem('filters')) || defaultFilters)
-
-  useEffect(() => {
-    localStorage.setItem('filters', JSON.stringify(globalFilters))
-    localStorage.setItem('zoom', JSON.stringify(map.getZoom()))
-    localStorage.setItem('location', JSON.stringify(map.getCenter()))
-  }, [map.getZoom(), map.getCenter(), globalFilters])
+  const onMove = useCallback(() => {
+    const newCenter = map.getCenter()
+    localStorage.setItem('location', JSON.stringify([newCenter.lat, newCenter.lng]))
+    localStorage.setItem('zoom', map.getZoom())
+  }, [map])
 
   return (
     <ThemeProvider theme={theme}>
@@ -41,74 +40,67 @@ export default function Map({
         attribution={settings.tileServer.attribution}
         url={settings.tileServer.url}
       />
-      {globalFilters.devices.enabled
-        && <Device filter={globalFilters.devices.filters} />}
-      {(globalFilters.gyms.enabled || globalFilters.raids.enabled)
+      {filters.devices.enabled
+        && <Device filter={filters.devices.filters} />}
+      {(filters.gyms.enabled || filters.raids.enabled)
         && (
           <Gym
-            bounds={bounds}
-            settings={settings}
-            availableForms={availableForms}
-            globalFilters={globalFilters}
+            bounds={initialBounds}
+            filters={filters}
+            onMove={onMove}
           />
         )}
-      {globalFilters.pokestops.enabled
+      {filters.pokestops.enabled
         && (
           <Pokestop
-            bounds={bounds}
-            settings={settings}
-            availableForms={availableForms}
-            globalFilters={globalFilters}
+            bounds={initialBounds}
+            filters={filters}
+            onMove={onMove}
           />
         )}
-      {globalFilters.pokemon.enabled
+      {filters.pokemon.enabled
         && (
           <Pokemon
-            bounds={bounds}
-            settings={settings}
-            availableForms={availableForms}
-            filters={globalFilters.pokemon.filter}
+            bounds={initialBounds}
+            filters={filters.pokemon.filter}
+            onMove={onMove}
           />
         )}
-      {globalFilters.portals.enabled
+      {filters.portals.enabled
         && (
           <Portal
-            bounds={bounds}
+            bounds={initialBounds}
+            onMove={onMove}
           />
         )}
-      {globalFilters.scanCells.enabled
+      {filters.scanCells.enabled
         && (
           <S2Cell
-            bounds={bounds}
+            bounds={initialBounds}
+            onMove={onMove}
           />
         )}
-      {globalFilters.submissionCells.enabled
+      {filters.submissionCells.enabled
         && (
           <SubmissionCell
-            bounds={bounds}
+            bounds={initialBounds}
+            onMove={onMove}
           />
         )}
-      {globalFilters.spawnpoints.enabled
+      {filters.spawnpoints.enabled
         && (
           <Spawnpoint
-            bounds={bounds}
+            bounds={initialBounds}
+            onMove={onMove}
           />
         )}
-      {globalFilters.weather.enabled
+      {filters.weather.enabled
         && (
-          <Weather
-            bounds={bounds}
-          />
+          <Weather />
         )}
       <Nav
-        defaultFilters={defaultFilters}
-        globalFilters={globalFilters}
-        setGlobalFilters={setGlobalFilters}
         settings={settings}
         setSettings={setSettings}
-        availableForms={availableForms}
-        map={map}
-        masterfile={masterfile}
       />
     </ThemeProvider>
   )

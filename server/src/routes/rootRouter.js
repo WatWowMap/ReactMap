@@ -1,3 +1,4 @@
+/* eslint-disable no-debugger */
 const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const cors = require('cors')
@@ -16,22 +17,23 @@ rootRouter.use('/graphql', cors(), graphqlHTTP({
 
 rootRouter.get('/settings', async (req, res) => {
   try {
-    const settings = {
-      config: {},
-      quests: {},
+    const serverSettings = {
+      config: {
+        map: config.map,
+        tileServers: config.tileServers,
+        icons: config.icons,
+      },
+      settings: {
+        iconStyle: config.icons.Default,
+        tileServer: config.tileServers.Default,
+      },
+      masterfile,
+      defaultFilters: await Utility.buildDefaultFilters(),
     }
-    settings.config.env = config.devOptions.enabled
-    settings.config.map = config.map
-    settings.config.tileServers = config.tileServers
-    settings.config.icons = config.icons
-    settings.config.popUpDetails = config.popUpDetails
-    settings.config.rarity = config.rarity
 
-    await Utility.updateAvailableForms(settings.config.icons)
-    settings.filters = await Utility.buildDefaultFilters()
-    settings.masterfile = masterfile
+    await Utility.updateAvailableForms(serverSettings.config.icons)
 
-    res.status(200).json({ settings })
+    res.status(200).json({ serverSettings })
   } catch (error) {
     res.status(500).json({ error })
   }

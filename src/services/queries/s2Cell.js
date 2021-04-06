@@ -7,6 +7,7 @@ const getAllS2Cells = gql`
       center_lat
       center_lon
       updated
+      polygon
     }
   }
 `

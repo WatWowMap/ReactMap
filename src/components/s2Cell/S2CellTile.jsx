@@ -2,11 +2,10 @@ import React from 'react'
 import { Polygon, Popup } from 'react-leaflet'
 import PopupContent from './Popup'
 import marker from './marker'
-import Utility from '../../services/Utility'
 
 const S2CellTile = ({ cell }) => (
   <Polygon
-    positions={Utility.getPolyVector(cell.id, 'polygon')}
+    positions={cell.polygon}
     pathOptions={marker(cell.updated)}
   >
     <Popup position={[cell.center_lat, cell.center_lon]}>

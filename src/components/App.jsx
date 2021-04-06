@@ -1,8 +1,7 @@
 import '../assets/scss/main.scss'
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
-
 import ConfigSettings from './ConfigSettings'
 import getSettings from '../services/getSettings'
 
@@ -35,12 +34,7 @@ export default function App() {
 
   return (
     <ApolloProvider client={client}>
-      {serverSettings
-        && (
-          <ConfigSettings
-            serverSettings={serverSettings}
-          />
-        )}
+      {serverSettings && <ConfigSettings serverSettings={serverSettings} />}
     </ApolloProvider>
   )
 }

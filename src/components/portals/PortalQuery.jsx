@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect } from 'react'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
@@ -6,14 +6,15 @@ import { useMap } from 'react-leaflet'
 import Query from '../../services/Query'
 import PortalTile from './PortalTile'
 
-export default function Portal({ bounds }) {
+export default function Portal({ bounds, onMove }) {
   const { data, previousData, refetch } = useQuery(Query.getAllPortals(), {
     variables: bounds,
   })
 
   const map = useMap()
 
-  const onMove = useCallback(() => {
+  const refetchPortals = () => {
+    onMove()
     const mapBounds = map.getBounds()
     refetch({
       minLat: mapBounds._southWest.lat,
@@ -21,12 +22,12 @@ export default function Portal({ bounds }) {
       minLon: mapBounds._southWest.lng,
       maxLon: mapBounds._northEast.lng,
     })
-  }, [map])
+  }
 
   useEffect(() => {
-    map.on('moveend', onMove)
+    map.on('moveend', refetchPortals)
     return () => {
-      map.off('moveend', onMove)
+      map.off('moveend', refetchPortals)
     }
   }, [map])
 
