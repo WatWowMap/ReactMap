@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect } from 'react'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
@@ -6,17 +6,15 @@ import { useMap } from 'react-leaflet'
 import Query from '../../services/Query'
 import PokestopTile from './PokestopTile'
 
-export default function PokestopQuery({
-  bounds, availableForms, settings, globalFilters,
-}) {
+export default function PokestopQuery({ bounds, filters, onMove }) {
   const map = useMap()
   const ts = (new Date()).getTime() / 1000
 
   const trimmedFilters = {
     pokestops: {},
   }
-  if (globalFilters.pokestops.enabled) {
-    Object.entries(globalFilters.pokestops.filter).forEach(filter => {
+  if (filters.pokestops.enabled) {
+    Object.entries(filters.pokestops.filter).forEach(filter => {
       const [id, specifics] = filter
       if (specifics.enabled) {
         trimmedFilters.pokestops[id] = specifics
@@ -27,7 +25,8 @@ export default function PokestopQuery({
     variables: { ...bounds, filters: trimmedFilters },
   })
 
-  const onMove = useCallback(() => {
+  const refetchStops = () => {
+    onMove()
     const mapBounds = map.getBounds()
     refetch({
       minLat: mapBounds._southWest.lat,
@@ -36,12 +35,12 @@ export default function PokestopQuery({
       maxLon: mapBounds._northEast.lng,
       filters: trimmedFilters,
     })
-  }, [map])
+  }
 
   useEffect(() => {
-    map.on('moveend', onMove)
+    map.on('moveend', refetchStops)
     return () => {
-      map.off('moveend', onMove)
+      map.off('moveend', refetchStops)
     }
   }, [map])
 
@@ -53,11 +52,9 @@ export default function PokestopQuery({
       {renderedData && renderedData.pokestops.map((pokestop) => (
         <PokestopTile
           key={`${pokestop.id}-${pokestop.lat}-${pokestop.lon}`}
-          settings={settings}
-          availableForms={availableForms}
           pokestop={pokestop}
           ts={ts}
-          globalFilters={globalFilters}
+          globalFilters={filters}
         />
       ))}
     </MarkerClusterGroup>

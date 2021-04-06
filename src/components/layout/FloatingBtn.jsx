@@ -3,11 +3,12 @@ import { Grid, Fab } from '@material-ui/core'
 import {
   Menu, LocationOn, ZoomIn, ZoomOut,
 } from '@material-ui/icons'
-
+import { useMap } from 'react-leaflet'
 import useStyles from '../../assets/mui/styling'
 
-export default function FloatingButtons({ map, toggleDrawer }) {
+export default function FloatingButtons({ toggleDrawer }) {
   const classes = useStyles()
+  const map = useMap()
 
   return (
     <Grid container direction="column" spacing={1} className={classes.floatingBtn}>

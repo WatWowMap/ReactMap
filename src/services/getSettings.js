@@ -6,7 +6,7 @@ export default async function getSettings() {
       throw new Error(`${response.status} (${response.statusText})`)
     }
     const body = await response.json()
-    return body.settings
+    return body.serverSettings
   } catch (error) {
     console.error(error.message)
   }

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect } from 'react'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
@@ -6,17 +6,16 @@ import { useMap } from 'react-leaflet'
 import Query from '../../services/Query'
 import GymTile from './GymTile'
 
-export default function GymQuery({
-  bounds, availableForms, settings, globalFilters,
-}) {
+export default function GymQuery({ bounds, filters, onMove }) {
   const map = useMap()
   const ts = (new Date()).getTime() / 1000
 
-  const { data, previousData, refetch } = !globalFilters.raids.enabled
+  const { data, previousData, refetch } = !filters.raids.enabled
     ? useQuery(Query.getAllGyms(), { variables: bounds })
     : useQuery(Query.getAllRaids(), { variables: bounds })
 
-  const onMove = useCallback(() => {
+  const refetchGyms = () => {
+    onMove()
     const mapBounds = map.getBounds()
     refetch({
       minLat: mapBounds._southWest.lat,
@@ -24,12 +23,12 @@ export default function GymQuery({
       minLon: mapBounds._southWest.lng,
       maxLon: mapBounds._northEast.lng,
     })
-  }, [map])
+  }
 
   useEffect(() => {
-    map.on('moveend', onMove)
+    map.on('moveend', refetchGyms)
     return () => {
-      map.off('moveend', onMove)
+      map.off('moveend', refetchGyms)
     }
   }, [map])
 
@@ -41,8 +40,6 @@ export default function GymQuery({
       {renderedData && renderedData.gyms.map((gym) => (
         <GymTile
           key={`${gym.id}-${gym.lat}-${gym.lon}`}
-          settings={settings}
-          availableForms={availableForms}
           gym={gym}
           ts={ts}
         />

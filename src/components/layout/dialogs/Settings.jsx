@@ -10,18 +10,22 @@ import {
   MenuItem,
   Select,
 } from '@material-ui/core'
-
+import { useStore } from '../../../hooks/useStore'
 import useStyles from '../../../assets/mui/styling'
 
 export default function Settings({
-  config, settings, setSettings, toggleDialog,
+  toggleDialog,
 }) {
   const classes = useStyles()
+  const config = useStore(state => state.config)
+  const settings = useStore(state => state.settings)
+  const setSettings = useStore(state => state.setSettings)
 
   const handleChange = event => {
+    const configName = event.target.name === 'iconStyle' ? 'icons' : 'tileServers'
     setSettings({
       ...settings,
-      [event.target.name]: event.target.value,
+      [event.target.name]: config[configName][event.target.value],
     })
   }
 
@@ -37,13 +41,13 @@ export default function Settings({
                 <Select
                   autoFocus
                   name="tileServer"
-                  value={settings.tileServer}
+                  value={settings.tileServer.name}
                   onChange={handleChange}
                 >
                   {Object.keys(config.tileServers).map(tile => (
                     <MenuItem
                       key={tile}
-                      value={config.tileServers[tile]}
+                      value={tile}
                     >
                       {config.tileServers[tile].name}
                     </MenuItem>
@@ -57,15 +61,15 @@ export default function Settings({
                 <Select
                   autoFocus
                   name="iconStyle"
-                  value={settings.iconStyle}
+                  value={settings.iconStyle.name}
                   onChange={handleChange}
                 >
                   {Object.keys(config.icons).map(icon => (
                     <MenuItem
                       key={icon}
-                      value={config.icons[icon]}
+                      value={icon}
                     >
-                      {icon}
+                      {config.icons[icon].name}
                     </MenuItem>
                   ))}
                 </Select>

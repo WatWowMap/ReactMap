@@ -10,17 +10,17 @@ import {
 } from '@material-ui/core'
 import { useTheme } from '@material-ui/core/styles'
 
+import { useMasterfile } from '../../../../hooks/useStore'
 import useStyles from '../../../../assets/mui/styling'
 import AdvancedMenu from './AdvancedFilter'
 import Tile from './PokemonTile'
 import FilterOptions from '../components/FilterOptions'
 import FilterFooter from '../components/FilterFooter'
 
-export default function PokemonMenu({
-  settings, globalFilters, toggleDialog, availableForms, masterfile,
-}) {
+export default function PokemonMenu({ globalFilters, toggleDialog }) {
   const classes = useStyles()
   const theme = useTheme()
+  const masterfile = useMasterfile(state => state.masterfile)
   const isMobile = useMediaQuery(theme.breakpoints.down('xs'))
 
   const [filterDrawer, setFilterDrawer] = useState(false)
@@ -73,7 +73,7 @@ export default function PokemonMenu({
       Mythical: false,
     },
     others: {
-      AllForms: false,
+      AllForms: true,
     },
   })
   const [expanded, setExpanded] = useState('generations')
@@ -146,8 +146,6 @@ export default function PokemonMenu({
     <Tile
       key={pokemon.id}
       pokemon={pokemon}
-      settings={settings}
-      availableForms={availableForms}
       tempFilters={tempFilters}
       setTempFilters={setTempFilters}
       toggleAdvMenu={toggleAdvMenu}

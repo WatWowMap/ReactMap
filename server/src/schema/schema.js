@@ -60,12 +60,7 @@ const RootQuery = new GraphQLObjectType({
         filters: { type: JSONResolver },
       },
       async resolve(parent, args) {
-        const ts = Math.floor((new Date()).getTime() / 1000)
-        return await Pokemon.query()
-          .where('expire_timestamp', '>=', ts)
-          .andWhereBetween('lat', [args.minLat, args.maxLat])
-          .andWhereBetween('lon', [args.minLon, args.maxLon])
-          .andWhereBetween('iv', [0, 100])
+        return await Pokemon.getPokemon(args)
       },
     },
     pokemonDetails: {
@@ -93,12 +88,14 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(s2CellType),
       args: minMaxArgs,
       async resolve(parent, args) {
-        return await S2Cell.query()
+        const s2cells = await S2Cell.query()
           .select(['*', ref('id')
             .castTo('CHAR')
             .as('id')])
           .whereBetween('center_lat', [args.minLat, args.maxLat])
           .andWhereBetween('center_lon', [args.minLon, args.maxLon])
+        s2cells.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, 'polygon'))
+        return s2cells
       },
     },
     spawnpoints: {

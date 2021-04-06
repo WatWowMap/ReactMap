@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect } from 'react'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
@@ -6,9 +6,7 @@ import { useMap } from 'react-leaflet'
 import Query from '../../services/Query'
 import PokemonTile from './PokemonTile'
 
-export default function PokemonQuery({
-  bounds, availableForms, settings, filters,
-}) {
+export default function PokemonQuery({ bounds, filters, onMove }) {
   const map = useMap()
 
   const trimmedFilters = {}
@@ -24,7 +22,8 @@ export default function PokemonQuery({
     },
   })
 
-  const onMove = useCallback(() => {
+  const refetchPokemon = () => {
+    onMove()
     const mapBounds = map.getBounds()
     refetch({
       minLat: mapBounds._southWest.lat,
@@ -33,12 +32,12 @@ export default function PokemonQuery({
       maxLon: mapBounds._northEast.lng,
       filters: trimmedFilters,
     })
-  }, [map])
+  }
 
   useEffect(() => {
-    map.on('moveend', onMove)
+    map.on('moveend', refetchPokemon)
     return () => {
-      map.off('moveend', onMove)
+      map.off('moveend', refetchPokemon)
     }
   }, [map])
 
@@ -50,8 +49,6 @@ export default function PokemonQuery({
       {renderedData && renderedData.pokemon.map((pokes) => (
         <PokemonTile
           key={`${pokes.id}-${pokes.lat}-${pokes.lon}`}
-          settings={settings}
-          availableForms={availableForms}
           pokemon={pokes}
         />
       ))}
