@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 import { ThemeProvider } from '@material-ui/styles'
-import useStore from '../hooks/useStore'
+import { useStore } from '../hooks/useStore'
 
 import theme from '../assets/mui/theme'
 import Nav from './layout/Nav'
@@ -15,11 +15,13 @@ import Weather from './weather/Weather'
 import S2Cell from './s2Cell/S2CellQuery'
 import SubmissionCell from './submissionCells/SubmissionCellQuery'
 
-export default function Map({
-  settings, setSettings,
-}) {
+export default function Map() {
   const map = useMap()
   const filters = useStore(state => state.filters)
+  const settings = useStore(state => state.settings)
+  const setLocation = useStore(state => state.setLocation)
+  const setZoom = useStore(state => state.setZoom)
+
   const initialBounds = {
     minLat: map.getBounds()._southWest.lat,
     maxLat: map.getBounds()._northEast.lat,
@@ -29,8 +31,8 @@ export default function Map({
 
   const onMove = useCallback(() => {
     const newCenter = map.getCenter()
-    localStorage.setItem('location', JSON.stringify([newCenter.lat, newCenter.lng]))
-    localStorage.setItem('zoom', map.getZoom())
+    setLocation([newCenter.lat, newCenter.lng])
+    setZoom(map.getZoom())
   }, [map])
 
   return (
@@ -98,10 +100,7 @@ export default function Map({
         && (
           <Weather />
         )}
-      <Nav
-        settings={settings}
-        setSettings={setSettings}
-      />
+      <Nav />
     </ThemeProvider>
   )
 }

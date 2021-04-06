@@ -10,21 +10,23 @@ import {
   MenuItem,
   Select,
 } from '@material-ui/core'
-import useStore from '../../../hooks/useStore'
+import { useStore } from '../../../hooks/useStore'
 import useStyles from '../../../assets/mui/styling'
 
 export default function Settings({
-  settings, setSettings, toggleDialog,
+  toggleDialog,
 }) {
   const classes = useStyles()
   const config = useStore(state => state.config)
+  const settings = useStore(state => state.settings)
+  const setSettings = useStore(state => state.setSettings)
+
   const handleChange = event => {
-    const parsed = JSON.parse(event.target.value)
+    const configName = event.target.name === 'iconStyle' ? 'icons' : 'tileServers'
     setSettings({
       ...settings,
-      [event.target.name]: parsed,
+      [event.target.name]: config[configName][event.target.value],
     })
-    localStorage.setItem(event.target.name, JSON.stringify(parsed))
   }
 
   return (
@@ -39,15 +41,15 @@ export default function Settings({
                 <Select
                   autoFocus
                   name="tileServer"
-                  value={JSON.stringify(settings.tileServer)}
+                  value={settings.tileServer.name}
                   onChange={handleChange}
                 >
                   {Object.keys(config.tileServers).map(tile => (
                     <MenuItem
                       key={tile}
-                      value={JSON.stringify(config.tileServers[tile])}
+                      value={tile}
                     >
-                      {tile}
+                      {config.tileServers[tile].name}
                     </MenuItem>
                   ))}
                 </Select>
@@ -59,15 +61,15 @@ export default function Settings({
                 <Select
                   autoFocus
                   name="iconStyle"
-                  value={JSON.stringify(settings.iconStyle)}
+                  value={settings.iconStyle.name}
                   onChange={handleChange}
                 >
                   {Object.keys(config.icons).map(icon => (
                     <MenuItem
                       key={icon}
-                      value={JSON.stringify(config.icons[icon])}
+                      value={icon}
                     >
-                      {icon}
+                      {config.icons[icon].name}
                     </MenuItem>
                   ))}
                 </Select>

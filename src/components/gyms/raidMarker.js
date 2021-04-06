@@ -1,5 +1,6 @@
 import { Icon } from 'leaflet'
 import Utility from '../../services/Utility'
+import { useStore } from '../../hooks/useStore'
 
 export default function raidMarker(gym, ts) {
   const iconSize = 30
@@ -10,7 +11,7 @@ export default function raidMarker(gym, ts) {
   let iconUrl
   if (gym.raid_battle_timestamp <= ts && gym.raid_end_timestamp >= ts && gym.raid_level > 0) {
     if (gym.raid_pokemon_id !== 0 && gym.raid_pokemon_id !== null) {
-      iconUrl = `${JSON.parse(localStorage.getItem('iconStyle')).path}/${Utility.getPokemonIcon(gym.raid_pokemon_id, gym.raid_pokemon_form, gym.raid_pokemon_evolution, gym.raid_pokemon_gender, gym.raid_pokemon_costume)}.png`
+      iconUrl = `${useStore(state => state.settings).iconStyle.path}/${Utility.getPokemonIcon(gym.raid_pokemon_id, gym.raid_pokemon_form, gym.raid_pokemon_evolution, gym.raid_pokemon_gender, gym.raid_pokemon_costume)}.png`
     } else {
       iconUrl = `/images/unknown_egg/${gym.raid_level}.png`
     }

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Grid, IconButton } from '@material-ui/core'
 import { Check, Clear, Menu } from '@material-ui/icons'
-
+import { useStore } from '../../../../hooks/useStore'
 import Utility from '../../../../services/Utility'
 import useStyles from '../../../../assets/mui/styling'
 
@@ -22,7 +22,7 @@ export default function PokemonTile({
       alignItems="center"
     >
       <Grid item xs={8}>
-        <div className={classes.gridItem} style={{ backgroundImage: `url(${JSON.parse(localStorage.getItem('iconStyle')).path}/${Utility.getPokemonIcon(pokemon.i, pokemon.formId)}.png)` }} />
+        <div className={classes.gridItem} style={{ backgroundImage: `url(${useStore(state => state.settings).iconStyle.path}/${Utility.getPokemonIcon(pokemon.i, pokemon.formId)}.png)` }} />
       </Grid>
       <Grid
         container

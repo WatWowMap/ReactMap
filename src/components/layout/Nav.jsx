@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
 import Dialog from '@material-ui/core/Dialog'
 
-import useStore from '../../hooks/useStore'
+import { useStore } from '../../hooks/useStore'
 import FloatingBtn from './FloatingBtn'
 import Drawer from './Drawer'
 import * as Dialogs from './dialogs/dialogIndex'
 
-export default function Nav({
-  settings, setSettings,
-}) {
+export default function Nav() {
   const globalFilters = useStore(state => state.filters)
   const setGlobalFilters = useStore(state => state.setFilters)
   const [drawer, setDrawer] = useState(false)
@@ -42,8 +40,6 @@ export default function Nav({
       <DialogMenu
         toggleDialog={toggleDialog}
         globalFilters={globalFilters}
-        settings={settings}
-        setSettings={setSettings}
       />
     )
   }

@@ -60,12 +60,7 @@ const RootQuery = new GraphQLObjectType({
         filters: { type: JSONResolver },
       },
       async resolve(parent, args) {
-        const ts = Math.floor((new Date()).getTime() / 1000)
-        return await Pokemon.query()
-          .where('expire_timestamp', '>=', ts)
-          .andWhereBetween('lat', [args.minLat, args.maxLat])
-          .andWhereBetween('lon', [args.minLon, args.maxLon])
-          .andWhereBetween('iv', [0, 100])
+        return await Pokemon.getPokemon(args)
       },
     },
     pokemonDetails: {

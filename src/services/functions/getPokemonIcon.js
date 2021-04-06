@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import useStore from '../../hooks/useStore'
+import { useStore } from '../../hooks/useStore'
 
 export default function getPokemonIcon(
   pokemonId, form = 0, evolution = 0, gender = 0, costume = 0, shiny = false,

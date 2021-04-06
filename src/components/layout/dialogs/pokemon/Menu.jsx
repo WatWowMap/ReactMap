@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core'
 import { useTheme } from '@material-ui/core/styles'
 
-import useStore from '../../../../hooks/useStore'
+import { useMasterfile } from '../../../../hooks/useStore'
 import useStyles from '../../../../assets/mui/styling'
 import AdvancedMenu from './AdvancedFilter'
 import Tile from './PokemonTile'
@@ -20,13 +20,11 @@ import FilterFooter from '../components/FilterFooter'
 export default function PokemonMenu({ globalFilters, toggleDialog }) {
   const classes = useStyles()
   const theme = useTheme()
-  const masterfile = useStore(state => state.masterfile)
+  const masterfile = useMasterfile(state => state.masterfile)
   const isMobile = useMediaQuery(theme.breakpoints.down('xs'))
 
   const [filterDrawer, setFilterDrawer] = useState(false)
-  console.log(globalFilters)
   const [tempFilters, setTempFilters] = useState(globalFilters.pokemon.filter)
-  console.log(tempFilters)
   const [advancedFilter, setAdvancedFilter] = useState({
     open: false,
     id: 0,

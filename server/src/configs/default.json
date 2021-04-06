@@ -219,7 +219,7 @@
       "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
     },
     "DarkMatter": {
-      "name": "Dark Matter",
+      "name": "DarkMatter",
       "attribution": "Â© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors Â© <a href='https://carto.com/attributions'>CARTO</a>",
       "url": "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
     },
@@ -229,10 +229,11 @@
       "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
     }
   },
-    "icons": {
-      "Default": {
-          "path": "https://mygod.github.io/pokicons/v2"
-      }
+  "icons": {
+    "Default": {
+      "name": "Default",
+      "path": "https://mygod.github.io/pokicons/v2"
+    }
   },
   "popupDetails": {
     "pokemon": {

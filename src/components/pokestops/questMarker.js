@@ -1,5 +1,6 @@
 import { Icon } from 'leaflet'
 import Utility from '../../services/Utility'
+import { useStore } from '../../hooks/useStore'
 
 export default function questMarker(pokestop) {
   const rewards = JSON.parse(pokestop.quest_rewards)
@@ -27,7 +28,7 @@ export default function questMarker(pokestop) {
     iconUrl = '/images/item/-5.png'
   } else if (type === 7 && info !== undefined) {
     // Pokemon
-    iconUrl = `${JSON.parse(localStorage.getItem('iconStyle')).path}/${Utility.getPokemonIcon(info.pokemon_id, info.form_id, 0, info.gender_id, info.costume_id, info.shiny)}.png`
+    iconUrl = `${useStore(state => state.settings).iconStyle.path}/${Utility.getPokemonIcon(info.pokemon_id, info.form_id, 0, info.gender_id, info.costume_id, info.shiny)}.png`
   } else if (type === 8) {
     // Pokecoin
     iconUrl = '/images/item/-6.png'
