@@ -3,8 +3,10 @@ const Gym = require('./Gym')
 const Pokestop = require('./Pokestop')
 const Pokemon = require('./Pokemon')
 const Portal = require('./Portal')
-const S2Cell = require('./S2Cell')
+const S2cell = require('./S2cell')
+const Session = require('./Session')
 const Spawnpoint = require('./Spawnpoint')
+const User = require('./User')
 const Weather = require('./Weather')
 
 module.exports = {
@@ -13,7 +15,9 @@ module.exports = {
   Pokestop,
   Pokemon,
   Portal,
-  S2Cell,
+  S2cell,
+  Session,
   Spawnpoint,
+  User,
   Weather,
 }

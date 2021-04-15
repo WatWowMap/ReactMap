@@ -2,7 +2,12 @@ const express = require('express')
 const path = require('path')
 const logger = require('morgan')
 const compression = require('compression')
-require('../knexfile.js')
+const session = require('express-session')
+const passport = require('passport')
+require('./strategies/discordStrategy')
+require('./db/initialization')
+
+const { sessionStore } = require('./services/session-store.js')
 const rootRouter = require('./routes/rootRouter.js')
 const config = require('./services/config.js')
 
@@ -14,7 +19,21 @@ app.use(compression())
 
 app.use(express.json({ limit: '50mb' }))
 
-app.use(express.static(path.join(__dirname, '../../dist')))
+app.use(express.static(path.join(__dirname, config.clientPath)))
+
+app.use(session({
+  name: 'discord',
+  key: 'session',
+  secret: config.sessionSecret,
+  store: sessionStore,
+  resave: true,
+  saveUninitialized: false,
+  cookie: { maxAge: 604800000 },
+}))
+
+app.use(passport.initialize())
+
+app.use(passport.session())
 
 app.use(rootRouter)
 

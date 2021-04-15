@@ -1,8 +1,8 @@
-/* eslint-disable no-debugger */
 const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const cors = require('cors')
-
+const authRouter = require('./auth')
+const clientRouter = require('./clientRouter')
 const schema = require('../schema/schema')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
@@ -10,10 +10,14 @@ const masterfile = require('../data/masterfile.json')
 
 const rootRouter = new express.Router()
 
-rootRouter.use('/graphql', cors(), graphqlHTTP({
-  schema,
-  graphiql: config.devOptions.graphiql,
-}))
+rootRouter.use('/', clientRouter)
+
+rootRouter.use('/auth', authRouter)
+
+rootRouter.get('/user', (req, res) => {
+  const { user } = req
+  res.status(200).json({ user })
+})
 
 rootRouter.get('/settings', async (req, res) => {
   try {
@@ -38,5 +42,10 @@ rootRouter.get('/settings', async (req, res) => {
     res.status(500).json({ error })
   }
 })
+
+rootRouter.use('/graphql', cors(), graphqlHTTP({
+  schema,
+  graphiql: config.devOptions.graphiql,
+}))
 
 module.exports = rootRouter

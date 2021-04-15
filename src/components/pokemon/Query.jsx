@@ -35,8 +35,6 @@ export default function PokemonQuery({
     }
   }, [map])
 
-  console.log('render')
-
   const trimmedFilters = {}
   Object.entries(filters).forEach(filter => {
     const [id, specifics] = filter

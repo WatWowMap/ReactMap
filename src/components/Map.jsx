@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 import { ThemeProvider } from '@material-ui/styles'
-import { useStore } from '../hooks/useStore'
 
+import { useStore } from '../hooks/useStore'
 import theme from '../assets/mui/theme'
 import Nav from './layout/Nav'
 import Device from './devices/Device'

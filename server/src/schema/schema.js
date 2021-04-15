@@ -11,13 +11,13 @@ const GymType = require('./gym.js')
 const PokestopType = require('./pokestop.js')
 const PokemonType = require('./pokemon.js')
 const PortalType = require('./portals.js')
-const s2CellType = require('./s2Cell.js')
+const s2CellType = require('./s2cell.js')
 const SpawnpointType = require('./spawnpoint.js')
 const WeatherType = require('./weather.js')
 const Utility = require('../services/Utility')
 
 const {
-  Device, Gym, Pokemon, Pokestop, Portal, S2Cell, Spawnpoint, Weather,
+  Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather,
 } = require('../models/index.js')
 
 const minMaxArgs = {
@@ -88,7 +88,7 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(s2CellType),
       args: minMaxArgs,
       async resolve(parent, args) {
-        const s2cells = await S2Cell.query()
+        const s2cells = await S2cell.query()
           .select(['*', ref('id')
             .castTo('CHAR')
             .as('id')])

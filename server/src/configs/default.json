@@ -9,11 +9,11 @@
   "searchMaxResults": 20,
   "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
   "homepage": {
-        "enabled": false,
-        "title": "Welcome to MapJS",
-        "descriptionLine1": "The best place to find Pokemon, Raids, Quests, and more!",
-        "descriptionLine2": "Please login or join our Discord for more info...",
-        "discordInvite": "https://discord.gg/yourInvite"
+    "enabled": false,
+    "title": "Welcome to MapJS",
+    "descriptionLine1": "The best place to find Pokemon, Raids, Quests, and more!",
+    "descriptionLine2": "Please login or join our Discord for more info...",
+    "discordInvite": "https://discord.gg/yourInvite"
   },
   "maxSessions": 5,
   "favicon": "favicon.ico",

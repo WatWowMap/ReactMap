@@ -11,7 +11,11 @@
     "dev": "nodemon server/src/index.js --watch server",
     "build": "webpack",
     "watch": "webpack --watch",
-    "generate": "node server/src/services/generateMasterfile.js"
+    "generate": "node server/src/services/generateMasterfile.js",
+    "console": "node --experimental-repl-await ./server/src/console.js",
+    "migrate:make": "knex --knexfile server/knexfile.cjs migrate:make",
+    "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
+    "migrate:rollback": "knex --knexfile server/knexfile.cjs migrate:rollback"
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",
@@ -56,10 +60,14 @@
     "clsx": "^1.1.1",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
+    "discord-oauth2": "^2.6.0",
+    "discord.js": "^12.5.3",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-graphql": "^0.12.0",
     "express-handlebars": "^5.2.1",
+    "express-mysql-session": "^2.1.5",
+    "express-session": "^1.17.1",
     "extend": "^3.0.2",
     "fs-extra": "^9.1.0",
     "graphql": "^15.5.0",
@@ -71,10 +79,13 @@
     "node-fetch": "^2.6.1",
     "nodes2ts": "^2.0.0",
     "objection": "^2.2.14",
+    "passport": "^0.4.1",
+    "passport-discord": "^0.1.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-leaflet": "^3.1.0",
     "react-leaflet-markercluster": "^3.0.0-rc1",
+    "react-router-dom": "^5.2.0",
     "zustand": "^3.3.3"
   }
 }

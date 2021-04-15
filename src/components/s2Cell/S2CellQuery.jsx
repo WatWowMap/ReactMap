@@ -31,7 +31,6 @@ export default function S2Cell({ bounds, onMove }) {
   }, [map])
 
   const renderedData = data || previousData
-  console.log(renderedData)
   return (
     <>
       {renderedData && renderedData.s2Cells.map(cell => (
