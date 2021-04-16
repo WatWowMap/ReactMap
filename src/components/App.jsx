@@ -5,7 +5,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 
 import ConfigSettings from './ConfigSettings'
-import getSettings from '../services/getSettings'
+import Fetch from '../services/Fetch'
 import Login from './Login'
 
 const client = new ApolloClient({
@@ -29,22 +29,8 @@ export default function App() {
   const [user, setUser] = useState(undefined)
   const [serverSettings, setServerSettings] = useState(undefined)
   const getServerSettings = async () => {
-    setServerSettings(await getSettings())
-    const body = await getUser()
-    setUser(body)
-  }
-
-  const getUser = async () => {
-    try {
-      const response = await fetch('/user')
-      if (!response.ok) {
-        throw new Error(`${response.status} (${response.statusText})`)
-      }
-      const body = await response.json()
-      return body.user
-    } catch (error) {
-      console.error(error.message)
-    }
+    setServerSettings(await Fetch.getSettings())
+    setUser(await Fetch.getUser())
   }
 
   useEffect(() => {
