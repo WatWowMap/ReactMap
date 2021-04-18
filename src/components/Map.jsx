@@ -1,19 +1,11 @@
 import React, { useCallback } from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 import { ThemeProvider } from '@material-ui/styles'
-import { useStore } from '../hooks/useStore'
 
+import { useMasterfile, useStore } from '../hooks/useStore'
 import theme from '../assets/mui/theme'
 import Nav from './layout/Nav'
-import Device from './devices/Device'
-import Gym from './gyms/GymQuery'
-import Pokestop from './pokestops/PokestopQuery'
-import Pokemon from './pokemon/PokemonQuery'
-import Spawnpoint from './spawnpoints/SpawnpointQuery'
-import Portal from './portals/PortalQuery'
-import Weather from './weather/Weather'
-import S2Cell from './s2Cell/S2CellQuery'
-import SubmissionCell from './submissionCells/SubmissionCellQuery'
+import * as index from './componentIndex'
 
 export default function Map() {
   const map = useMap()
@@ -21,6 +13,7 @@ export default function Map() {
   const settings = useStore(state => state.settings)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
+  const { filterItems } = useMasterfile(state => state.ui)
 
   const initialBounds = {
     minLat: map.getBounds()._southWest.lat,
@@ -42,64 +35,20 @@ export default function Map() {
         attribution={settings.tileServer.attribution}
         url={settings.tileServer.url}
       />
-      {filters.devices.enabled
-        && <Device filter={filters.devices.filters} />}
-      {(filters.gyms.enabled || filters.raids.enabled)
-        && (
-          <Gym
-            bounds={initialBounds}
-            filters={filters}
-            onMove={onMove}
-          />
-        )}
-      {filters.pokestops.enabled
-        && (
-          <Pokestop
-            bounds={initialBounds}
-            filters={filters}
-            onMove={onMove}
-          />
-        )}
-      {filters.pokemon.enabled
-        && (
-          <Pokemon
-            bounds={initialBounds}
-            filters={filters.pokemon.filter}
-            onMove={onMove}
-          />
-        )}
-      {filters.portals.enabled
-        && (
-          <Portal
-            bounds={initialBounds}
-            onMove={onMove}
-          />
-        )}
-      {filters.scanCells.enabled
-        && (
-          <S2Cell
-            bounds={initialBounds}
-            onMove={onMove}
-          />
-        )}
-      {filters.submissionCells.enabled
-        && (
-          <SubmissionCell
-            bounds={initialBounds}
-            onMove={onMove}
-          />
-        )}
-      {filters.spawnpoints.enabled
-        && (
-          <Spawnpoint
-            bounds={initialBounds}
-            onMove={onMove}
-          />
-        )}
-      {filters.weather.enabled
-        && (
-          <Weather />
-        )}
+      {Object.keys(filterItems).map(item => {
+        const Component = index[item]
+        if (filters[item].enabled) {
+          return (
+            <Component
+              key={item}
+              bounds={initialBounds}
+              filters={filters}
+              onMove={onMove}
+            />
+          )
+        }
+        return ''
+      })}
       <Nav />
     </ThemeProvider>
   )

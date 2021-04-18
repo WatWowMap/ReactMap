@@ -7,43 +7,21 @@ import {
   Check, Clear, ArrowForwardIos, ExpandMore,
 } from '@material-ui/icons'
 
+import Utility from '../../services/Utility'
 import useStyles from '../../assets/mui/styling'
+import { useMasterfile } from '../../hooks/useStore'
 
 export default function DrawerMenu({
   drawer, toggleDrawer, globalFilters, setGlobalFilters, toggleDialog,
 }) {
   const classes = useStyles()
+  const { filterItems, menuItems } = useMasterfile(state => state.ui)
+
   const [expanded, setExpanded] = React.useState('filters')
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
   }
-
-  const filterItems = [
-    { name: 'Gyms', icon: <ArrowForwardIos />, meta: 'gyms' },
-    { name: 'Raids', icon: <ArrowForwardIos />, meta: 'raids' },
-    { name: 'Pokestops', icon: <ArrowForwardIos />, meta: 'pokestops' },
-    // { name: 'Quests', icon: <ArrowForwardIos />, meta: 'quests' },
-    // { name: 'Invasions', icon: <ArrowForwardIos />, meta: 'invasions' },
-    { name: 'Spawnpoints', icon: <ArrowForwardIos />, meta: 'spawnpoints' },
-    { name: 'Pokemon', icon: <ArrowForwardIos />, meta: 'pokemon' },
-    { name: 'Ingress Portals', icon: <ArrowForwardIos />, meta: 'portals' },
-    { name: 'Scan-Cells', icon: <ArrowForwardIos />, meta: 'scanCells' },
-    { name: 'Wayfarer', icon: <ArrowForwardIos />, meta: 'submissionCells' },
-    { name: 'Weather', icon: <ArrowForwardIos />, meta: 'weather' },
-    { name: 'ScanAreas', icon: <ArrowForwardIos />, meta: 'scanAreas' },
-    { name: 'Devices', icon: <ArrowForwardIos />, meta: 'devices' },
-  ]
-
-  const menuItems = [
-    { name: 'Areas', icon: <ArrowForwardIos />, meta: 'areas' },
-    { name: 'Stats', icon: <ArrowForwardIos />, meta: 'stats' },
-    { name: 'Search', icon: <ArrowForwardIos />, meta: 'search' },
-    { name: 'Settings', icon: <ArrowForwardIos />, meta: 'settings' },
-    { name: 'ClearCache', icon: <ArrowForwardIos />, meta: 'clearCache' },
-    { name: 'Discord', icon: <ArrowForwardIos />, meta: 'discord' },
-    { name: 'Logout', icon: <ArrowForwardIos />, meta: 'logout' },
-  ]
 
   return (
     <Drawer anchor="left" open={drawer} onClose={toggleDrawer(false)} classes={{ paper: classes.drawer }}>
@@ -60,21 +38,24 @@ export default function DrawerMenu({
           </AccordionSummary>
           <AccordionDetails>
             <List>
-              {filterItems.map(item => (
-                <ListItem button key={item.name}>
-                  {item.icon}&nbsp;
-                  <ListItemText primary={item.name} onClick={toggleDialog(true, item.meta)} />&nbsp;&nbsp;&nbsp;
+              {Object.keys(filterItems).map(item => (
+                <ListItem button key={item}>
+                  <ArrowForwardIos />&nbsp;
+                  <ListItemText
+                    primary={Utility.getProperName(item)}
+                    onClick={toggleDialog(true, item)}
+                  />&nbsp;&nbsp;&nbsp;
                   <IconButton onClick={() => {
                     setGlobalFilters({
                       ...globalFilters,
-                      [item.meta]: {
-                        ...globalFilters[item.meta],
-                        enabled: !globalFilters[item.meta].enabled,
+                      [item]: {
+                        ...globalFilters[item],
+                        enabled: !globalFilters[item].enabled,
                       },
                     })
                   }}
                   >
-                    {globalFilters[item.meta].enabled ? <Check style={{ fontSize: 15, color: 'green' }} />
+                    {globalFilters[item].enabled ? <Check style={{ fontSize: 15, color: 'green' }} />
                       : <Clear style={{ fontSize: 15, color: 'red' }} />}
                   </IconButton>
                 </ListItem>
@@ -93,9 +74,12 @@ export default function DrawerMenu({
           <AccordionDetails>
             <List>
               {menuItems.map(item => (
-                <ListItem button key={item.name}>
-                  {item.icon}
-                  <ListItemText primary={item.name} onClick={toggleDialog(true, item.meta)} />
+                <ListItem button key={item}>
+                  <ArrowForwardIos />
+                  <ListItemText
+                    primary={Utility.getProperName(item)}
+                    onClick={toggleDialog(true, item)}
+                  />
                 </ListItem>
               ))}
             </List>

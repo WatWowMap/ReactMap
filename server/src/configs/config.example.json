@@ -43,24 +43,31 @@
       }
     ]
   },
-  "db": {
-    "scanner": {
-      "host": "127.0.0.1",
-      "port": 3306,
-      "username": "user",
-      "password": "pass123!",
-      "database": "rdmdb",
-      "charset": "utf8mb4",
-      "sessionTable": "sessions"
+  "database": {
+    "settings": {
+      "userTableName": "users",
+      "sessionTableName": "session"
     },
-    "manualdb": {
-      "host": "127.0.0.1",
-      "port": 3306,
-      "username": "user",
-      "password": "pass123!",
-      "database": "manualdb",
-      "charset": "utf8mb4"
-    }
+    "schemas": {
+      "scanner": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "user",
+        "password": "pass123!",
+        "database": "rdmdb",
+        "charset": "utf8mb4",
+        "useFor": ["device", "gym", "pokemon", "pokestop", "portal", "s2cell", "spawnpoint", "weather"]
+      },
+      "manualDb1": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "user",
+        "password": "pass123!",
+        "database": "manualdb",
+        "charset": "utf8mb4",
+        "useFor": ["session", "user"]
+      }
+    }  
   },
   "discord": {
     "enabled": false,
@@ -82,7 +89,15 @@
         "enabled": true,
         "roles": []
       },
-      "raids": {
+      "iv": {
+        "enabled": true,
+        "roles": []
+      },
+      "stats": {
+        "enabled": true,
+        "roles": []
+      },
+      "pvp": {
         "enabled": true,
         "roles": []
       },
@@ -90,15 +105,19 @@
         "enabled": true,
         "roles": []
       },
+      "raids": {
+        "enabled": true,
+        "roles": []
+      },
       "pokestops": {
         "enabled": true,
         "roles": []
       },
-      "quests": {
+      "lures": {
         "enabled": true,
         "roles": []
       },
-      "lures": {
+      "quests": {
         "enabled": true,
         "roles": []
       },
@@ -110,19 +129,15 @@
         "enabled": true,
         "roles": []
       },
-      "iv": {
-        "enabled": true,
-        "roles": []
-      },
-      "pvp": {
-        "enabled": true,
-        "roles": []
-      },
-      "s2cells": {
+      "s2Cells": {
         "enabled": true,
         "roles": []
       },
       "submissionCells": {
+        "enabled": true,
+        "roles": []
+      },
+      "scanAreas": {
         "enabled": true,
         "roles": []
       },
@@ -131,10 +146,6 @@
         "roles": []
       },
       "portals": {
-        "enabled": true,
-        "roles": []
-      },
-      "scanAreas": {
         "enabled": true,
         "roles": []
       },

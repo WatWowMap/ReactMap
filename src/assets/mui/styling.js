@@ -66,4 +66,9 @@ export default makeStyles({
       zIndex: 9998,
     },
   },
+  login: {
+    display: 'flex',
+    margin: '45% auto auto auto',
+    backgroundColor: 'rgb(52, 52, 52)',
+  },
 })

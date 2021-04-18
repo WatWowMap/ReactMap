@@ -2,8 +2,11 @@ import '../assets/scss/main.scss'
 
 import React, { useEffect, useState } from 'react'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+
 import ConfigSettings from './ConfigSettings'
-import getSettings from '../services/getSettings'
+import Fetch from '../services/Fetch'
+import Login from './Login'
 
 const client = new ApolloClient({
   uri: '/graphql',
@@ -25,7 +28,7 @@ const client = new ApolloClient({
 export default function App() {
   const [serverSettings, setServerSettings] = useState(undefined)
   const getServerSettings = async () => {
-    setServerSettings(await getSettings())
+    setServerSettings(await Fetch.getSettings())
   }
 
   useEffect(() => {
@@ -33,8 +36,14 @@ export default function App() {
   }, [])
 
   return (
-    <ApolloProvider client={client}>
-      {serverSettings && <ConfigSettings serverSettings={serverSettings} />}
-    </ApolloProvider>
+    <Router>
+      <Route exact path="/">
+        <ApolloProvider client={client}>
+          {serverSettings && serverSettings.user
+            ? serverSettings && <ConfigSettings serverSettings={serverSettings} />
+            : <Login />}
+        </ApolloProvider>
+      </Route>
+    </Router>
   )
 }

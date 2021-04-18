@@ -1,8 +1,8 @@
-/* eslint-disable no-debugger */
 const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const cors = require('cors')
-
+const authRouter = require('./auth')
+const clientRouter = require('./clientRouter')
 const schema = require('../schema/schema')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
@@ -10,12 +10,12 @@ const masterfile = require('../data/masterfile.json')
 
 const rootRouter = new express.Router()
 
-rootRouter.use('/graphql', cors(), graphqlHTTP({
-  schema,
-  graphiql: config.devOptions.graphiql,
-}))
+rootRouter.use('/', clientRouter)
+
+rootRouter.use('/auth', authRouter)
 
 rootRouter.get('/settings', async (req, res) => {
+  const perms = req.user ? req.user.perms : {}
   try {
     const serverSettings = {
       config: {
@@ -28,8 +28,10 @@ rootRouter.get('/settings', async (req, res) => {
         tileServer: config.tileServers.Default,
       },
       masterfile,
-      defaultFilters: await Utility.buildDefaultFilters(),
+      defaultFilters: await Utility.buildDefaultFilters(perms),
+      user: req.user,
     }
+    serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, perms)
 
     await Utility.updateAvailableForms(serverSettings.config.icons)
 
@@ -38,5 +40,10 @@ rootRouter.get('/settings', async (req, res) => {
     res.status(500).json({ error })
   }
 })
+
+rootRouter.use('/graphql', cors(), graphqlHTTP({
+  schema,
+  graphiql: config.devOptions.graphiql,
+}))
 
 module.exports = rootRouter

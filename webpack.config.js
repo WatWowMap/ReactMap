@@ -12,8 +12,8 @@ const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const DotenvPlugin = require('webpack-dotenv-plugin');
 const resolve = require('./webpack.config.resolve.js');
 
-module.exports = () => {
-  const isDevelopment = process.env.NODE_ENV !== 'production';
+module.exports = (env) => {
+  const isDevelopment = env.dev;
 
   return {
     mode: isDevelopment ? 'development' : 'production',

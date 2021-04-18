@@ -10,7 +10,7 @@ export default function PokemonQuery({ bounds, filters, onMove }) {
   const map = useMap()
 
   const trimmedFilters = {}
-  Object.entries(filters).forEach(filter => {
+  Object.entries(filters.pokemon.filter).forEach(filter => {
     const [id, specifics] = filter
     if (specifics.enabled) {
       trimmedFilters[id] = specifics

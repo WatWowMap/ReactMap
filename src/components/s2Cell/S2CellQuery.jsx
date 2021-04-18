@@ -31,10 +31,9 @@ export default function S2Cell({ bounds, onMove }) {
   }, [map])
 
   const renderedData = data || previousData
-  console.log(renderedData)
   return (
     <>
-      {renderedData && renderedData.s2Cells.map(cell => (
+      {renderedData && renderedData.s2cells.map(cell => (
         <S2CellTile
           key={`${cell.id}-${cell.center_lat}-${cell.center_lon}`}
           cell={cell}

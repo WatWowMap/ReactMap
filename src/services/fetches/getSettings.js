@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 export default async function getSettings() {
   try {
     const response = await fetch('/settings')
@@ -8,6 +7,7 @@ export default async function getSettings() {
     const body = await response.json()
     return body.serverSettings
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error.message)
   }
 }
