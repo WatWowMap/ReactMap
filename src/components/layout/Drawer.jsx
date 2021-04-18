@@ -76,7 +76,10 @@ export default function DrawerMenu({
               {menuItems.map(item => (
                 <ListItem button key={item}>
                   <ArrowForwardIos />
-                  <ListItemText primary={item} onClick={toggleDialog(true, item)} />
+                  <ListItemText
+                    primary={Utility.getProperName(item)}
+                    onClick={toggleDialog(true, item)}
+                  />
                 </ListItem>
               ))}
             </List>
