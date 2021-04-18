@@ -2,31 +2,40 @@ const { map: { filters } } = require('../config.js')
 const buildPokemon = require('./buildPokemon.js')
 const buildQuests = require('./buildQuests.js')
 const buildInvasions = require('./buildInvasions.js')
+const buildGyms = require('./buildGyms')
 const { Pokestop } = require('../../models/index')
 
 module.exports = async function buildDefault(perms) {
   const stopReducer = perms.pokestops || perms.lures || perms.quests || perms.invasions
+  const gymReducer = perms.gyms || perms.raids
+
   const globalFilters = {
-    gyms: perms.gyms ? {
+    gyms: gymReducer ? {
       enabled: filters.gyms,
-      filter: {},
-    } : undefined,
-    raids: perms.raids ? {
-      enabled: filters.raids,
-      filter: {},
-    } : undefined,
-    pokestops: stopReducer ? {
-      enabled: filters.pokestops,
+      allGyms: perms.gyms ? filters.gyms : undefined,
+      raids: perms.raids ? filters.raids : undefined,
       filter: {
-        p0: perms.pokestops ? { enabled: true, size: 'md' } : undefined,
-        p501: perms.lures ? { enabled: true, size: 'md' } : undefined,
-        p502: perms.lures ? { enabled: true, size: 'md' } : undefined,
-        p503: perms.lures ? { enabled: true, size: 'md' } : undefined,
-        p504: perms.lures ? { enabled: true, size: 'md' } : undefined,
-        ...buildInvasions(perms),
-        ...buildQuests(perms, await Pokestop.getAvailableQuests()),
+        ...buildGyms(perms.gyms),
+        ...buildPokemon(perms.raids),
       },
     } : undefined,
+
+    pokestops: stopReducer ? {
+      enabled: filters.pokestops,
+      allStops: perms.pokestops ? filters.pokestops : undefined,
+      lures: perms.lures ? filters.lures : undefined,
+      invasions: perms.invasions ? filters.invasions : undefined,
+      filter: {
+        s0: perms.pokestops ? { enabled: true, size: 'md' } : undefined,
+        s501: perms.lures ? { enabled: true, size: 'md' } : undefined,
+        s502: perms.lures ? { enabled: true, size: 'md' } : undefined,
+        s503: perms.lures ? { enabled: true, size: 'md' } : undefined,
+        s504: perms.lures ? { enabled: true, size: 'md' } : undefined,
+        ...buildInvasions(perms.invasions),
+        ...buildQuests(perms.quests, await Pokestop.getAvailableQuests()),
+      },
+    } : undefined,
+
     spawnpoints: perms.spawnpoints ? {
       enabled: filters.spawnpoints,
       filter: {},

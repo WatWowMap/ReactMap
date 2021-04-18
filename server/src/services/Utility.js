@@ -26,8 +26,8 @@ class Utility {
     return buildDefaultFilters(perms)
   }
 
-  static async generateUi(filters) {
-    return generateUi(filters)
+  static generateUi(filters, perms) {
+    return generateUi(filters, perms)
   }
 }
 

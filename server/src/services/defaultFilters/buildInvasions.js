@@ -1,7 +1,7 @@
 module.exports = function buildInvasions(perms) {
-  const invasions = {}
+  const invasions = perms ? {} : undefined
 
-  if (perms.invasions) {
+  if (invasions) {
     for (let i = 1; i <= 50; i += 1) {
       invasions[`i${i}`] = { enabled: true, size: 'md' }
     }

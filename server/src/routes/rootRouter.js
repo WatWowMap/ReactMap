@@ -31,7 +31,7 @@ rootRouter.get('/settings', async (req, res) => {
       defaultFilters: await Utility.buildDefaultFilters(perms),
       user: req.user,
     }
-    serverSettings.ui = await Utility.generateUi(serverSettings.defaultFilters)
+    serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, perms)
 
     await Utility.updateAvailableForms(serverSettings.config.icons)
 
