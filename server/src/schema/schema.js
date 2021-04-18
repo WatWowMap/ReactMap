@@ -10,8 +10,8 @@ const DeviceType = require('./device.js')
 const GymType = require('./gym.js')
 const PokestopType = require('./pokestop.js')
 const PokemonType = require('./pokemon.js')
-const PortalType = require('./portals.js')
-const s2CellType = require('./s2cell.js')
+const PortalType = require('./portal.js')
+const S2CellType = require('./s2cell.js')
 const SpawnpointType = require('./spawnpoint.js')
 const WeatherType = require('./weather.js')
 const Utility = require('../services/Utility')
@@ -84,8 +84,8 @@ const RootQuery = new GraphQLObjectType({
           .andWhereBetween('lon', [args.minLon, args.maxLon])
       },
     },
-    s2Cells: {
-      type: new GraphQLList(s2CellType),
+    s2cells: {
+      type: new GraphQLList(S2CellType),
       args: minMaxArgs,
       async resolve(parent, args) {
         const s2cells = await S2cell.query()

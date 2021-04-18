@@ -26,11 +26,9 @@ const client = new ApolloClient({
 })
 
 export default function App() {
-  const [user, setUser] = useState(undefined)
   const [serverSettings, setServerSettings] = useState(undefined)
   const getServerSettings = async () => {
     setServerSettings(await Fetch.getSettings())
-    setUser(await Fetch.getUser())
   }
 
   useEffect(() => {
@@ -41,7 +39,7 @@ export default function App() {
     <Router>
       <Route exact path="/">
         <ApolloProvider client={client}>
-          {user
+          {serverSettings && serverSettings.user
             ? serverSettings && <ConfigSettings serverSettings={serverSettings} />
             : <Login />}
         </ApolloProvider>

@@ -12,8 +12,6 @@ const useStore = create(persist(set => ({
   setFilters: (filters) => set({ filters }),
   settings: undefined,
   setSettings: (settings) => set({ settings }),
-  availableForms: undefined,
-  setAvailableForms: (availableForms) => set({ availableForms }),
 }),
 {
   name: 'local-state',
@@ -21,6 +19,12 @@ const useStore = create(persist(set => ({
 }))
 
 const useMasterfile = create(set => ({
+  availableForms: undefined,
+  setAvailableForms: (availableForms) => set({ availableForms }),
+  ui: {},
+  setUi: (ui) => set({ ui }),
+  perms: {},
+  setPerms: (perms) => set({ perms }),
   masterfile: {},
   setMasterfile: (masterfile) => set({ masterfile }),
 }))

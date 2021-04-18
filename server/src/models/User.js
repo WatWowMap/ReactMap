@@ -1,9 +1,9 @@
 const { Model } = require('objection')
-const { database } = require('../services/config')
+const { database: { settings } } = require('../services/config')
 
 class User extends Model {
   static get tableName() {
-    return database.settings.userTableName
+    return settings.userTableName
   }
 }
 

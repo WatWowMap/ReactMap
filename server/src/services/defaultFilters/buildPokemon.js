@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 const masterfile = require('../../data/masterfile.json')
 
-module.exports = function buildPokemon(type) {
+module.exports = function buildPokemon(perms, type) {
   const pokemon = {}
   for (const [i, pkmn] of Object.entries(masterfile.pokemon)) {
     const forms = Object.keys(pkmn.forms)
@@ -12,13 +12,13 @@ module.exports = function buildPokemon(type) {
           pokemon[`${i}-${formId}`] = {
             enabled: false,
             size: 'md',
-            iv: [80, 100],
-            gl: [1, 10],
-            ul: [1, 5],
-            atk: [0, 15],
-            def: [0, 15],
-            sta: [0, 15],
-            level: [0, 35],
+            iv: perms.iv ? [80, 100] : undefined,
+            gl: perms.pvp ? [1, 10] : undefined,
+            ul: perms.pvp ? [1, 5] : undefined,
+            atk: perms.stats ? [0, 15] : undefined,
+            def: perms.stats ? [0, 15] : undefined,
+            sta: perms.stats ? [0, 15] : undefined,
+            level: perms.stats ? [0, 35] : undefined,
           }
         } else {
           pokemon[`${i}-${formId}`] = {

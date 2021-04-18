@@ -14,12 +14,8 @@ rootRouter.use('/', clientRouter)
 
 rootRouter.use('/auth', authRouter)
 
-rootRouter.get('/user', (req, res) => {
-  const { user } = req
-  res.status(200).json({ user })
-})
-
 rootRouter.get('/settings', async (req, res) => {
+  const perms = req.user ? req.user.perms : {}
   try {
     const serverSettings = {
       config: {
@@ -32,8 +28,10 @@ rootRouter.get('/settings', async (req, res) => {
         tileServer: config.tileServers.Default,
       },
       masterfile,
-      defaultFilters: await Utility.buildDefaultFilters(),
+      defaultFilters: await Utility.buildDefaultFilters(perms),
+      user: req.user,
     }
+    serverSettings.ui = await Utility.generateUi(serverSettings.defaultFilters)
 
     await Utility.updateAvailableForms(serverSettings.config.icons)
 

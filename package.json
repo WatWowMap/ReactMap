@@ -9,8 +9,8 @@
   "scripts": {
     "start": "yarn build && node server/src/index.js",
     "dev": "nodemon server/src/index.js --watch server",
-    "build": "webpack",
-    "watch": "webpack --watch",
+    "build": "webpack --env prod",
+    "watch": "webpack --watch --env dev",
     "generate": "node server/src/services/generateMasterfile.js",
     "console": "node --experimental-repl-await ./server/src/console.js",
     "migrate:make": "knex --knexfile server/knexfile.cjs migrate:make",

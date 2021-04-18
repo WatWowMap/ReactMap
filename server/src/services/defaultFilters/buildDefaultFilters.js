@@ -1,63 +1,60 @@
-const config = require('../config.js')
+const { map: { filters } } = require('../config.js')
 const buildPokemon = require('./buildPokemon.js')
 const buildQuests = require('./buildQuests.js')
 const buildInvasions = require('./buildInvasions.js')
 const { Pokestop } = require('../../models/index')
 
-module.exports = async function buildDefault() {
-  const filters = {
-    gyms: {
-      enabled: config.map.filters.gyms,
+module.exports = async function buildDefault(perms) {
+  const stopReducer = perms.pokestops || perms.lures || perms.quests || perms.invasions
+  const globalFilters = {
+    gyms: perms.gyms ? {
+      enabled: filters.gyms,
       filter: {},
-    },
-    raids: {
-      enabled: config.map.filters.raids,
+    } : undefined,
+    raids: perms.raids ? {
+      enabled: filters.raids,
       filter: {},
-    },
-    pokestops: {
-      enabled: config.map.filters.pokestops,
+    } : undefined,
+    pokestops: stopReducer ? {
+      enabled: filters.pokestops,
       filter: {
-        p0: { enabled: true, size: 'md' },
-        p501: { enabled: true, size: 'md' },
-        p502: { enabled: true, size: 'md' },
-        p503: { enabled: true, size: 'md' },
-        p504: { enabled: true, size: 'md' },
-        ...buildInvasions(),
-        ...buildQuests(await Pokestop.getAvailableQuests()),
+        p0: perms.pokestops ? { enabled: true, size: 'md' } : undefined,
+        p501: perms.lures ? { enabled: true, size: 'md' } : undefined,
+        p502: perms.lures ? { enabled: true, size: 'md' } : undefined,
+        p503: perms.lures ? { enabled: true, size: 'md' } : undefined,
+        p504: perms.lures ? { enabled: true, size: 'md' } : undefined,
+        ...buildInvasions(perms),
+        ...buildQuests(perms, await Pokestop.getAvailableQuests()),
       },
-    },
-    spawnpoints: {
-      enabled: config.map.filters.spawnpoints,
+    } : undefined,
+    spawnpoints: perms.spawnpoints ? {
+      enabled: filters.spawnpoints,
       filter: {},
-    },
-    pokemon: {
-      enabled: config.map.filters.pokemon,
-      filter: buildPokemon('pokemon'),
-    },
-    portals: {
-      enabled: config.map.filters.portals,
+    } : undefined,
+    pokemon: perms.pokemon ? {
+      enabled: filters.pokemon,
+      filter: buildPokemon(perms, 'pokemon'),
+    } : undefined,
+    portals: perms.portals ? {
+      enabled: filters.portals,
       filter: {},
-    },
-    scanCells: {
-      enabled: config.map.filters.scanCells,
+    } : undefined,
+    s2Cells: perms.s2Cells ? {
+      enabled: filters.scanCells,
       filter: {},
-    },
-    submissionCells: {
-      enabled: config.map.filters.submissionCells,
+    } : undefined,
+    submissionCells: perms.submissionCells ? {
+      enabled: filters.submissionCells,
       filter: {},
-    },
-    weather: {
-      enabled: config.map.filters.weather,
+    } : undefined,
+    weather: perms.weather ? {
+      enabled: filters.weather,
       filter: {},
-    },
-    scanAreas: {
-      enabled: config.map.filters.scanAreas,
+    } : undefined,
+    devices: perms.devices ? {
+      enabled: filters.devices,
       filter: {},
-    },
-    devices: {
-      enabled: config.map.filters.devices,
-      filter: {},
-    },
+    } : undefined,
   }
-  return filters
+  return globalFilters
 }

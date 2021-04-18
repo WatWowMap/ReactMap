@@ -6,12 +6,14 @@ import Map from './Map'
 
 export default function ConfigSettings({ serverSettings }) {
   const setConfig = useStore(state => state.setConfig)
-  const setMasterfile = useMasterfile(state => state.setMasterfile)
   const setSettings = useStore(state => state.setSettings)
   const setFilters = useStore(state => state.setFilters)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
-  const setAvailableForms = useStore(state => state.setAvailableForms)
+  const setAvailableForms = useMasterfile(state => state.setAvailableForms)
+
+  const setMasterfile = useMasterfile(state => state.setMasterfile)
+  const setUi = useMasterfile(state => state.setUi)
 
   const updateObjState = (defaults, category) => {
     const localState = JSON.parse(localStorage.getItem('local-state'))
@@ -31,6 +33,7 @@ export default function ConfigSettings({ serverSettings }) {
     return defaults
   }
 
+  setUi(serverSettings.ui)
   setConfig(serverSettings.config)
   setMasterfile(serverSettings.masterfile)
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))

@@ -2,6 +2,7 @@ const getPolyVector = require('./functions/getPolyVector')
 const getPlacementCells = require('./functions/getPlacementCells')
 const getTypeCells = require('./functions/getTypeCells')
 const buildDefaultFilters = require('./defaultFilters/buildDefaultFilters')
+const generateUi = require('./ui')
 const updateAvailableForms = require('./functions/updateAvailableForms')
 
 class Utility {
@@ -21,8 +22,12 @@ class Utility {
     return updateAvailableForms(icons)
   }
 
-  static async buildDefaultFilters() {
-    return buildDefaultFilters()
+  static async buildDefaultFilters(perms) {
+    return buildDefaultFilters(perms)
+  }
+
+  static async generateUi(filters) {
+    return generateUi(filters)
   }
 }
 

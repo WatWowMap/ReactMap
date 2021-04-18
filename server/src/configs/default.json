@@ -98,28 +98,33 @@
       "left": [],
       "right": []
   },
-  "db": {
+  "database": {
+    "settings": {
+      "userTableName": "users",
+      "sessionTableName": "session"
+    },
+    "schemas": {
       "scanner": {
-          "host": "127.0.0.1",
-          "port": 3306,
-          "username": "user",
-          "password": "pass123!",
-          "database": "rdmdb",
-          "charset": "utf8mb4",
-          "sessionTable": "sessions",
-          "arScanColumn": false,
-          "useFor": []
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "user",
+        "password": "pass123!",
+        "database": "rdmdb",
+        "charset": "utf8mb4",
+        "arScanColumn": false,
+        "useFor": []
       },
       "manualdb": {
-          "host": "127.0.0.1",
-          "port": 3306,
-          "username": "user",
-          "password": "pass123!",
-          "database": "manualdb",
-          "charset": "utf8mb4",
-          "sessionTable": "sessions",
-          "useFor": []
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "user",
+        "password": "pass123!",
+        "database": "manualdb",
+        "charset": "utf8mb4",
+        "arScanColumn": false,
+        "useFor": []
       }
+    }  
   },
   "discord": {
       "enabled": false,
@@ -177,7 +182,7 @@
               "enabled": true,
               "roles": []
           },
-          "s2cells": {
+          "s2Cells": {
               "enabled": true,
               "roles": []
           },
