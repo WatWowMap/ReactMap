@@ -25,7 +25,7 @@
 2. Open up the directory (`cd ReactMap`)
 3. `yarn install`
 4. Generate Masterfile `yarn generate`
-5. Create your config (`cp server/configs/config.example.json server/configs/config.json`)
+5. Create your config (`cp server/src/configs/config.example.json server/src/configs/config.json`)
 6. Run your migrations (`yarn migrate:latest`)
 - This will create a `users` table, would highly recommend putting this in your manual db that has nests/portals/sessions/etc 
 - A sessions table will automatically be created in the specified db after the next step, be sure you've selected the correct db in the config!
