@@ -23,7 +23,7 @@
 2. Open up the directory (`cd ReactMap`)
 3. `yarn install`
 4. Generate Masterfile `yarn generate`
-5. Create your config (`cp server/configs/config.example.json server/configs/config.json`)
+5. Create your config (`cp server/src/configs/config.example.json server/src/configs/config.json`)
 6. `yarn start`
 ## Dev Instructions
 1. Follow steps 1-5 above
