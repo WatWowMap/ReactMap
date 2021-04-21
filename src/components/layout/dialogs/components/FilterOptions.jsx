@@ -5,6 +5,7 @@ import {
 import { ExpandMore } from '@material-ui/icons'
 
 import useStyles from '../../../../assets/mui/styling'
+import Utility from '../../../../services/Utility'
 
 export default function FilterOptions({
   name, options, handleChange, expanded, handleAccordion,
@@ -29,7 +30,7 @@ export default function FilterOptions({
                   key={option[0]}
                   control={<Checkbox checked={option[1]} onChange={(e) => handleChange(name, e)} name={option[0]} />}
                   value={option[0]}
-                  label={option[0]}
+                  label={Utility.getProperName(option[0])}
                 />
               ))}
             </FormGroup>

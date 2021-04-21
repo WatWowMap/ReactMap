@@ -69,26 +69,28 @@ function fetchJson(url) {
   }
 
   for (const [i, pkmn] of Object.entries(masterfile.pokemon)) {
-    newMasterfile.pokemon[i] = {
-      name: pkmn.name,
-      forms: filterForms(pkmn.forms),
-      default_form_id: pkmn.default_form_id,
-      pokedex_id: pkmn.pokedex_id,
-      genId: pkmn.genId,
-      generation: pkmn.generation,
-      types: pkmn.types,
-      attack: pkmn.attack,
-      defense: pkmn.defense,
-      stamina: pkmn.stamina,
-      height: pkmn.height,
-      weight: pkmn.weight,
-      quick_moves: getMovesTypes(pkmn.quick_moves),
-      charge_moves: getMovesTypes(pkmn.charge_moves),
-      legendary: pkmn.legendary,
-      mythical: pkmn.mythic,
-      rarity: getRarityLevel(i),
-      evolutions: pkmn.evolutions,
-      temp_evolutions: pkmn.temp_evolutions,
+    if (pkmn.pokedex_id) {
+      newMasterfile.pokemon[i] = {
+        name: pkmn.name,
+        forms: filterForms(pkmn.forms),
+        default_form_id: pkmn.default_form_id,
+        pokedex_id: pkmn.pokedex_id,
+        genId: pkmn.genId,
+        generation: pkmn.generation,
+        types: pkmn.types,
+        attack: pkmn.attack,
+        defense: pkmn.defense,
+        stamina: pkmn.stamina,
+        height: pkmn.height,
+        weight: pkmn.weight,
+        quick_moves: getMovesTypes(pkmn.quick_moves),
+        charge_moves: getMovesTypes(pkmn.charge_moves),
+        legendary: pkmn.legendary,
+        mythical: pkmn.mythic,
+        rarity: getRarityLevel(i),
+        evolutions: pkmn.evolutions,
+        temp_evolutions: pkmn.temp_evolutions,
+      }
     }
   }
   Fs.writeJSONSync('./server/src/data/masterfile.json', newMasterfile, {

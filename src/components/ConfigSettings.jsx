@@ -10,8 +10,8 @@ export default function ConfigSettings({ serverSettings }) {
   const setFilters = useStore(state => state.setFilters)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
-  const setAvailableForms = useMasterfile(state => state.setAvailableForms)
 
+  const setAvailableForms = useMasterfile(state => state.setAvailableForms)
   const setMasterfile = useMasterfile(state => state.setMasterfile)
   const setUi = useMasterfile(state => state.setUi)
 

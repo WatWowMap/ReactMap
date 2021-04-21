@@ -18,11 +18,11 @@ export default function FilterFooter({
     <DialogActions className={classes.filterFooter}>
       {isMobile
         && (
-        <IconButton
-          onClick={toggleDrawer(true)}
-        >
-          <Menu style={{ color: 'white' }} />
-        </IconButton>
+          <IconButton
+            onClick={toggleDrawer(true)}
+          >
+            <Menu style={{ color: 'white' }} />
+          </IconButton>
         )}
       <Button
         onClick={() => selectAllOrNone(false)}
@@ -42,9 +42,11 @@ export default function FilterFooter({
       </Button>
       <Button
         onClick={toggleDialog(false, 'pokemon', tempFilters)}
-        className={classes.successButton}
       >
-        <Typography variant="caption">
+        <Typography
+          variant="caption"
+          className={classes.successButton}
+        >
           Save
         </Typography>
       </Button>

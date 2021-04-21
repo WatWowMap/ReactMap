@@ -8,9 +8,11 @@ import {
   Grid,
   useMediaQuery,
 } from '@material-ui/core'
+import { FixedSizeGrid } from 'react-window'
+import AutoSizer from 'react-virtualized-auto-sizer'
 import { useTheme } from '@material-ui/core/styles'
 
-import { useMasterfile } from '../../../../hooks/useStore'
+import { useStore, useMasterfile } from '../../../../hooks/useStore'
 import useStyles from '../../../../assets/mui/styling'
 import AdvancedMenu from './AdvancedFilter'
 import Tile from './PokemonTile'
@@ -20,6 +22,8 @@ import FilterFooter from '../components/FilterFooter'
 export default function PokemonMenu({ globalFilters, toggleDialog }) {
   const classes = useStyles()
   const theme = useTheme()
+  const url = useStore(state => state.settings).iconStyle.path
+  const availableForms = useMasterfile(state => state.availableForms)
   const masterfile = useMasterfile(state => state.masterfile)
   const isMobile = useMediaQuery(theme.breakpoints.down('xs'))
 
@@ -34,13 +38,13 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
   const [filters, setFilters] = useState({
     generations: {
       Kanto: true,
-      Johto: false,
-      Hoenn: false,
-      Sinnoh: false,
-      Unova: false,
-      Kalos: false,
-      Alola: false,
-      Galar: false,
+      Johto: true,
+      Hoenn: true,
+      Sinnoh: true,
+      Unova: true,
+      Kalos: true,
+      Alola: true,
+      Galar: true,
     },
     types: {
       Normal: false,
@@ -73,7 +77,7 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
       Mythical: false,
     },
     others: {
-      AllForms: true,
+      allForms: true,
     },
   })
   const [expanded, setExpanded] = useState('generations')
@@ -122,35 +126,25 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
       let formName = pkmn.forms[formId].name || ''
       formName = formName === 'Normal' ? '' : `(${formName})`
       pkmn.types = pkmn.types ? pkmn.types : []
-
+      const name = formName === '' ? pkmn.name : formName
       if (filters.generations[pkmn.generation]
         || filters.types[pkmn.types[0]]
         || filters.types[pkmn.types[1]]
         || filters.rarities[pkmn.rarity]
         || (filters.rarities.Legendary && pkmn.legendary)
         || (filters.rarities.Mythical && pkmn.mythical)) {
-        if (!filters.others.AllForms) {
+        if (!filters.others.allForms) {
           if (formId == pkmn.default_form_id || formName === '()') {
-            filteredPokes.push({ id, i, formId })
+            filteredPokes.push({ id, name })
             filteredPokesObj[id] = { ...tempFilters[id] }
           }
         } else {
-          filteredPokes.push({ id, i, formId })
+          filteredPokes.push({ id, name })
           filteredPokesObj[id] = { ...tempFilters[id] }
         }
       }
     }
   }
-
-  const allPokemon = filteredPokes.map(pokemon => (
-    <Tile
-      key={pokemon.id}
-      pokemon={pokemon}
-      tempFilters={tempFilters}
-      setTempFilters={setTempFilters}
-      toggleAdvMenu={toggleAdvMenu}
-    />
-  ))
 
   const allFilterMenus = Object.entries(filters).map(filter => (
     <FilterOptions
@@ -162,6 +156,8 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
       handleAccordion={handleAccordion}
     />
   ))
+
+  const columnCount = isMobile ? 2 : 5
 
   return (
     <>
@@ -195,17 +191,36 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
                   </Grid>
                 )}
                 <Grid
-                  container
                   item
                   xs={12}
                   sm={8}
                   md={9}
-                  spacing={2}
-                  direction="row"
-                  justify="space-evenly"
-                  alignItems="flex-start"
+                  style={{ height: '75vh' }}
                 >
-                  {allPokemon}
+                  <AutoSizer defaultHeight={1080} defaultWidth={1920}>
+                    {({ width, height }) => (
+                      <FixedSizeGrid
+                        className="grid"
+                        width={width}
+                        height={height}
+                        columnCount={columnCount}
+                        columnWidth={130}
+                        rowCount={Math.ceil(filteredPokes.length / columnCount)}
+                        rowHeight={140}
+                        itemData={{
+                          pkmn: filteredPokes,
+                          columnCount,
+                          tempFilters,
+                          setTempFilters,
+                          toggleAdvMenu,
+                          url,
+                          availableForms,
+                        }}
+                      >
+                        {Tile}
+                      </FixedSizeGrid>
+                    )}
+                  </AutoSizer>
                 </Grid>
               </Grid>
             </DialogContent>

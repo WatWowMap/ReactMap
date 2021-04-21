@@ -6,7 +6,7 @@ import marker from './marker'
 const PokemonTile = ({ pokemon }) => (
   <Marker
     position={[pokemon.lat, pokemon.lon]}
-    icon={marker(pokemon, pokemon.form)}
+    icon={marker(pokemon)}
   >
     <Popup position={[pokemon.lat, pokemon.lon]}>
       <PopupContent pokemon={pokemon} />
