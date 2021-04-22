@@ -11,7 +11,6 @@ export default function FilterOptions({
   name, options, handleChange, expanded, handleAccordion,
 }) {
   const classes = useStyles()
-  const nameCap = name.charAt(0).toUpperCase() + name.slice(1)
 
   return (
     <Grid item>
@@ -20,7 +19,7 @@ export default function FilterOptions({
           expandIcon={<ExpandMore style={{ color: 'white' }} />}
           style={{ color: 'white' }}
         >
-          <Typography className={classes.heading}>{nameCap}</Typography>
+          <Typography className={classes.heading}>{Utility.getProperName(name)}</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <FormControl component="fieldset" className={classes.formControl}>

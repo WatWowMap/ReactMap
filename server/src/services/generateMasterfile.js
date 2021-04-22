@@ -43,12 +43,16 @@ function fetchJson(url) {
     return returnedForms
   }
 
-  const getRarityLevel = (pokemonId) => {
+  const getRarityLevel = (id, pkmn) => {
+    let rarity
     for (const [tier, pokemon] of Object.entries(defaultRarity)) {
-      if (pokemon.includes(parseInt(pokemonId))) {
-        return tier
+      if (pokemon.includes(parseInt(id))) {
+        rarity = tier
       }
     }
+    if (pkmn.legendary) rarity = 'Legendary'
+    if (pkmn.mythic) rarity = 'Mythical'
+    return rarity
   }
 
   const getMovesTypes = (moves) => {
@@ -84,10 +88,8 @@ function fetchJson(url) {
         height: pkmn.height,
         weight: pkmn.weight,
         quick_moves: getMovesTypes(pkmn.quick_moves),
-        charge_moves: getMovesTypes(pkmn.charge_moves),
-        legendary: pkmn.legendary,
-        mythical: pkmn.mythic,
-        rarity: getRarityLevel(i),
+        charge_moves: getMovesTypes(pkmn.charged_moves),
+        rarity: getRarityLevel(i, pkmn),
         evolutions: pkmn.evolutions,
         temp_evolutions: pkmn.temp_evolutions,
       }

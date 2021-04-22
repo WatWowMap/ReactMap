@@ -25,7 +25,10 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
   const theme = useTheme()
   const url = useStore(state => state.settings).iconStyle.path
   const availableForms = useMasterfile(state => state.availableForms)
+
+  let columnCount = useMediaQuery(theme.breakpoints.up('md')) ? 5 : 3
   const isMobile = useMediaQuery(theme.breakpoints.down('xs'))
+  if (isMobile) columnCount = 2
 
   const [filterDrawer, setFilterDrawer] = useState(false)
   const [tempFilters, setTempFilters] = useState(globalFilters.pokemon.filter)
@@ -78,6 +81,8 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
     },
     others: {
       allForms: false,
+      selected: false,
+      advanced: false,
     },
   })
   const [search, setSearch] = useState('')
@@ -134,17 +139,21 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
     />
   ))
   allFilterMenus.push(
-    <TextField
-      key="search"
-      id="search"
-      label="Search"
-      name="search"
-      value={search}
-      onChange={handleSearchChange}
-    />,
+    <Grid item key="search">
+      <TextField
+        className={classes.formControl}
+        id="search"
+        label="Search"
+        name="search"
+        value={search}
+        onChange={handleSearchChange}
+        variant="outlined"
+      />
+    </Grid>,
   )
+  // eslint-disable-next-line no-nested-ternary
+  const vHeight = expanded === 'types' ? '131vh' : expanded === 'generations' || expanded === 'rarities' ? '80vh' : '75vh'
 
-  const columnCount = isMobile ? 2 : 5
   return (
     <>
       {!advancedFilter.open
@@ -181,7 +190,7 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
                   xs={12}
                   sm={8}
                   md={9}
-                  style={{ height: '75vh' }}
+                  style={{ height: vHeight }}
                 >
                   <AutoSizer defaultHeight={1080} defaultWidth={1920}>
                     {({ width, height }) => (
@@ -190,7 +199,7 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
                         width={width}
                         height={height}
                         columnCount={columnCount}
-                        columnWidth={130}
+                        columnWidth={width / columnCount - 5}
                         rowCount={Math.ceil(filteredPokes.length / columnCount)}
                         rowHeight={140}
                         itemData={{
