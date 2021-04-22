@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 import React, { useState } from 'react'
 import {
   Dialog,
@@ -12,6 +11,7 @@ import {
 import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { useTheme } from '@material-ui/core/styles'
+import Utility from '../../../../services/Utility'
 
 import { useStore, useMasterfile } from '../../../../hooks/useStore'
 import useStyles from '../../../../assets/mui/styling'
@@ -25,7 +25,6 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
   const theme = useTheme()
   const url = useStore(state => state.settings).iconStyle.path
   const availableForms = useMasterfile(state => state.availableForms)
-  const masterfile = useMasterfile(state => state.masterfile)
   const isMobile = useMediaQuery(theme.breakpoints.down('xs'))
 
   const [filterDrawer, setFilterDrawer] = useState(false)
@@ -48,24 +47,24 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
       Galar: true,
     },
     types: {
-      Normal: false,
-      Fire: false,
-      Water: false,
-      Grass: false,
-      Electric: false,
-      Ice: false,
-      Fighting: false,
-      Poison: false,
-      Ground: false,
-      Flying: false,
-      Psychic: false,
       Bug: false,
-      Rock: false,
-      Ghost: false,
       Dark: false,
       Dragon: false,
-      Steel: false,
+      Electric: false,
       Fairy: false,
+      Fighting: false,
+      Fire: false,
+      Flying: false,
+      Ghost: false,
+      Grass: false,
+      Ground: false,
+      Ice: false,
+      Normal: false,
+      Poison: false,
+      Psychic: false,
+      Rock: false,
+      Steel: false,
+      Water: false,
     },
     rarities: {
       Common: false,
@@ -84,6 +83,8 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState('generations')
 
+  const { filteredPokesObj, filteredPokes } = Utility.filterPokemon(tempFilters, filters, search)
+
   const handleAccordion = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
   }
@@ -100,7 +101,7 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
   }
 
   const handleSearchChange = event => {
-    setSearch(event.target.value.toLowerCase())
+    setSearch(event.target.value.toString().toLowerCase())
   }
 
   const toggleDrawer = (open) => (event) => {
@@ -119,41 +120,6 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
     } else {
       setAdvancedFilter({ open })
       setTempFilters({ ...tempFilters, [id]: newFilters })
-    }
-  }
-
-  const filteredPokes = []
-  const filteredPokesObj = {}
-  for (const [i, pkmn] of Object.entries(masterfile.pokemon)) {
-    const forms = Object.keys(pkmn.forms)
-    for (let j = 0; j < forms.length; j += 1) {
-      const formId = forms[j]
-      const id = `${i}-${formId}`
-      let formName = pkmn.forms[formId].name || ''
-      formName = formName === 'Normal' ? '' : `(${formName})`
-      pkmn.types = pkmn.types ? pkmn.types : []
-      const name = formName === '' ? pkmn.name : formName
-      if (search !== '') {
-        if ((pkmn.name.toLowerCase()).includes(search)) {
-          filteredPokes.push({ id, name })
-          filteredPokesObj[id] = { ...tempFilters[id] }
-        }
-      } else if (filters.generations[pkmn.generation]
-        || filters.types[pkmn.types[0]]
-        || filters.types[pkmn.types[1]]
-        || filters.rarities[pkmn.rarity]
-        || (filters.rarities.Legendary && pkmn.legendary)
-        || (filters.rarities.Mythical && pkmn.mythical)) {
-        if (!filters.others.allForms) {
-          if (formId == pkmn.default_form_id || formName === '()') {
-            filteredPokes.push({ id, name })
-            filteredPokesObj[id] = { ...tempFilters[id] }
-          }
-        } else {
-          filteredPokes.push({ id, name })
-          filteredPokesObj[id] = { ...tempFilters[id] }
-        }
-      }
     }
   }
 
