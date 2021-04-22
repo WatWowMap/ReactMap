@@ -7,6 +7,7 @@ import {
   Drawer,
   Grid,
   useMediaQuery,
+  TextField,
 } from '@material-ui/core'
 import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -77,9 +78,10 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
       Mythical: false,
     },
     others: {
-      allForms: true,
+      allForms: false,
     },
   })
+  const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState('generations')
 
   const handleAccordion = (panel) => (event, isExpanded) => {
@@ -95,6 +97,10 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
 
   const handleChange = (name, event) => {
     setFilters({ ...filters, [name]: { ...filters[name], [event.target.name]: event.target.checked } })
+  }
+
+  const handleSearchChange = event => {
+    setSearch(event.target.value.toLowerCase())
   }
 
   const toggleDrawer = (open) => (event) => {
@@ -127,7 +133,12 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
       formName = formName === 'Normal' ? '' : `(${formName})`
       pkmn.types = pkmn.types ? pkmn.types : []
       const name = formName === '' ? pkmn.name : formName
-      if (filters.generations[pkmn.generation]
+      if (search !== '') {
+        if ((pkmn.name.toLowerCase()).includes(search)) {
+          filteredPokes.push({ id, name })
+          filteredPokesObj[id] = { ...tempFilters[id] }
+        }
+      } else if (filters.generations[pkmn.generation]
         || filters.types[pkmn.types[0]]
         || filters.types[pkmn.types[1]]
         || filters.rarities[pkmn.rarity]
@@ -156,9 +167,18 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
       handleAccordion={handleAccordion}
     />
   ))
+  allFilterMenus.push(
+    <TextField
+      key="search"
+      id="search"
+      label="Search"
+      name="search"
+      value={search}
+      onChange={handleSearchChange}
+    />,
+  )
 
   const columnCount = isMobile ? 2 : 5
-
   return (
     <>
       {!advancedFilter.open
