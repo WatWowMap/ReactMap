@@ -13,6 +13,9 @@ export default makeStyles({
     width: 125,
     color: 'white',
   },
+  search: {
+    width: 160,
+  },
   formLabel: {
     color: 'white',
   },

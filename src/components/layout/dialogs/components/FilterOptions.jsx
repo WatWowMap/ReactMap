@@ -1,6 +1,14 @@
 import React from 'react'
 import {
-  FormControl, FormGroup, FormControlLabel, Checkbox, Grid, Accordion, AccordionSummary, AccordionDetails, Typography,
+  FormControl,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Grid,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
 } from '@material-ui/core'
 import { ExpandMore } from '@material-ui/icons'
 
@@ -17,21 +25,25 @@ export default function FilterOptions({
       <Accordion expanded={expanded === name} onChange={handleAccordion(name)}>
         <AccordionSummary
           expandIcon={<ExpandMore style={{ color: 'white' }} />}
-          style={{ color: 'white' }}
         >
           <Typography className={classes.heading}>{Utility.getProperName(name)}</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <FormControl component="fieldset" className={classes.formControl}>
             <FormGroup>
-              {Object.entries(options).map(option => (
-                <FormControlLabel
-                  key={option[0]}
-                  control={<Checkbox checked={option[1]} onChange={(e) => handleChange(name, e)} name={option[0]} />}
-                  value={option[0]}
-                  label={Utility.getProperName(option[0])}
-                />
-              ))}
+              {Object.entries(options).map(option => {
+                const [key, value] = option
+                return (
+                  <FormControlLabel
+                    key={key}
+                    control={
+                      <Checkbox checked={value} onChange={(e) => handleChange(name, e)} name={key} />
+                    }
+                    value={key}
+                    label={Utility.getProperName(key)}
+                  />
+                )
+              })}
             </FormGroup>
           </FormControl>
         </AccordionDetails>

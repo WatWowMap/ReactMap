@@ -77,7 +77,7 @@ function fetchJson(url) {
       newMasterfile.pokemon[i] = {
         name: pkmn.name,
         forms: filterForms(pkmn.forms),
-        default_form_id: pkmn.default_form_id,
+        default_form_id: pkmn.default_form_id || 0,
         pokedex_id: pkmn.pokedex_id,
         genId: pkmn.genId,
         generation: pkmn.generation,

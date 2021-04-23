@@ -40,14 +40,14 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
   })
   const [filters, setFilters] = useState({
     generations: {
-      Kanto: true,
-      Johto: true,
-      Hoenn: true,
-      Sinnoh: true,
-      Unova: true,
-      Kalos: true,
-      Alola: true,
-      Galar: true,
+      Kanto: false,
+      Johto: false,
+      Hoenn: false,
+      Sinnoh: false,
+      Unova: false,
+      Kalos: false,
+      Alola: false,
+      Galar: false,
     },
     types: {
       Bug: false,
@@ -69,7 +69,12 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
       Steel: false,
       Water: false,
     },
-    rarities: {
+    forms: {
+      altForms: true,
+      Alola: false,
+      Galarian: false,
+    },
+    rarity: {
       Common: false,
       Uncommon: false,
       Rare: false,
@@ -80,13 +85,13 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
       Mythical: false,
     },
     others: {
-      allForms: false,
+      reverse: true,
       selected: false,
-      advanced: false,
+      unselected: false,
     },
   })
   const [search, setSearch] = useState('')
-  const [expanded, setExpanded] = useState('generations')
+  const [expanded, setExpanded] = useState('forms')
 
   const { filteredPokesObj, filteredPokes } = Utility.filterPokemon(tempFilters, filters, search)
 
@@ -128,20 +133,24 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
     }
   }
 
-  const allFilterMenus = Object.entries(filters).map(filter => (
-    <FilterOptions
-      key={filter[0]}
-      name={filter[0]}
-      options={filter[1]}
-      handleChange={handleChange}
-      expanded={expanded}
-      handleAccordion={handleAccordion}
-    />
-  ))
-  allFilterMenus.push(
+  const allFilterMenus = Object.entries(filters).map(filter => {
+    const [category, options] = filter
+    return (
+      <FilterOptions
+        key={category}
+        name={category}
+        options={options}
+        handleChange={handleChange}
+        expanded={expanded}
+        handleAccordion={handleAccordion}
+      />
+    )
+  })
+  allFilterMenus.unshift(
     <Grid item key="search">
       <TextField
-        className={classes.formControl}
+        className={classes.search}
+        color="secondary"
         id="search"
         label="Search"
         name="search"

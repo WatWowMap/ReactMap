@@ -4,7 +4,7 @@ import { useMasterfile } from '../../hooks/useStore'
 export default function filterPokemon(tempFilters, filters, search) {
   const masterfile = useMasterfile(state => state.masterfile).pokemon
   const {
-    generations, types, rarities, others,
+    generations, types, rarity, forms, others,
   } = filters
   const tempAdvFilter = {}
   const filteredPokes = []
@@ -17,9 +17,24 @@ export default function filterPokemon(tempFilters, filters, search) {
     filteredPokesObj[id] = { ...tempFilters[id] }
   }
 
+  const typeResolver = pkmnTypes => {
+    let typeCount = 0
+    Object.values(types).forEach(type => {
+      if (type) typeCount += 1
+    })
+    if (typeCount === 2) {
+      return types[pkmnTypes[0]] && types[pkmnTypes[1]]
+    }
+    if (typeCount === 1) {
+      return types[pkmnTypes[0]] || types[pkmnTypes[1]]
+    }
+  }
+
   if (others.selected) switchKey = 'selected'
-  if (others.advanced) {
-    switchKey = 'advanced'
+  if (others.unselected) switchKey = 'unselected'
+
+  if (others.reverse) {
+    switchKey = 'reverse'
     Object.keys(filters).forEach(category => {
       tempAdvFilter[category] = Object.values(filters[category]).every(val => val === false)
     })
@@ -48,14 +63,16 @@ export default function filterPokemon(tempFilters, filters, search) {
         default:
           if (generations[pkmn.generation]
             || types[formTypes[0]] || types[formTypes[1]]
-            || rarities[pkmn.rarity]) {
-            if (others.allForms) {
+            || rarity[pkmn.rarity]
+            || (forms[name] || (forms.altForms && j != pkmn.default_form_id))) {
+            if (forms.altForms) {
               addPokemon(id, name)
-            } else if (j == pkmn.default_form_id || formName === '') {
+            } else if (j == pkmn.default_form_id || forms[name]) {
               addPokemon(id, name)
             }
           } break
         case 'selected': if (tempFilters[id].enabled) addPokemon(id, name); break
+        case 'unselected': if (!tempFilters[id].enabled) addPokemon(id, name); break
         case 'search': {
           const meta = [...formTypes, name, formName, pkmn.rarity, pkmn.generation].join(' ').toLowerCase()
           searchTerms.forEach(term => {
@@ -70,11 +87,16 @@ export default function filterPokemon(tempFilters, filters, search) {
             }
           })
         } break
-        case 'advanced': {
+        case 'reverse': {
           if ((tempAdvFilter.generations ? true : generations[pkmn.generation])
-            && (tempAdvFilter.types ? true : (types[formTypes[0]] || types[formTypes[1]]))
-            && (tempAdvFilter.rarities ? true : rarities[pkmn.rarity])) {
-            addPokemon(id, name)
+            && (tempAdvFilter.types ? true : typeResolver(formTypes))
+            && (tempAdvFilter.forms ? true : forms[name] || (j != pkmn.default_form_id))
+            && (tempAdvFilter.rarity ? true : rarity[pkmn.rarity])) {
+            if (forms.altForms) {
+              addPokemon(id, name)
+            } else if (j == pkmn.default_form_id || forms[name]) {
+              addPokemon(id, name)
+            }
           } break
         }
       }
