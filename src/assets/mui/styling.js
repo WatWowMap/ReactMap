@@ -16,6 +16,10 @@ export default makeStyles({
   search: {
     width: 160,
   },
+  sliderInput: {
+    maxWidth: 65,
+    marginRight: 5,
+  },
   formLabel: {
     color: 'white',
   },

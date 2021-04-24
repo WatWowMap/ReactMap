@@ -10,7 +10,7 @@ export default function ConfigSettings({ serverSettings }) {
   const setFilters = useStore(state => state.setFilters)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
-
+  const setMenus = useStore(state => state.setMenus)
   const setAvailableForms = useMasterfile(state => state.setAvailableForms)
   const setMasterfile = useMasterfile(state => state.setMasterfile)
   const setUi = useMasterfile(state => state.setUi)
@@ -36,6 +36,7 @@ export default function ConfigSettings({ serverSettings }) {
   setUi(serverSettings.ui)
   setConfig(serverSettings.config)
   setMasterfile(serverSettings.masterfile)
+  setMenus(updateObjState(serverSettings.menus, 'menus'))
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
   setSettings(updateObjState(serverSettings.settings, 'settings'))
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))

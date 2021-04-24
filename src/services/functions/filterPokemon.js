@@ -1,16 +1,21 @@
 /* eslint-disable no-restricted-syntax */
 import { useMasterfile } from '../../hooks/useStore'
 
-export default function filterPokemon(tempFilters, filters, search) {
+export default function filterPokemon(tempFilters, menus, search) {
   const masterfile = useMasterfile(state => state.masterfile).pokemon
   const {
     generations, types, rarity, forms, others,
-  } = filters
+  } = menus
   const tempAdvFilter = {}
   const filteredPokes = []
   const filteredPokesObj = {}
   const searchTerms = []
   let switchKey
+
+  Object.keys(menus).forEach(category => {
+    tempAdvFilter[category] = Object.values(menus[category]).every(val => val === false)
+  })
+  tempAdvFilter.all = Object.values(tempAdvFilter).every(val => val === true)
 
   const addPokemon = (id, name) => {
     filteredPokes.push({ id, name })
@@ -30,14 +35,14 @@ export default function filterPokemon(tempFilters, filters, search) {
     }
   }
 
-  if (others.selected) switchKey = 'selected'
-  if (others.unselected) switchKey = 'unselected'
-
-  if (others.reverse) {
+  if ((others.selected && others.unselected) || tempAdvFilter.all) {
+    switchKey = 'all'
+  } else if (others.selected) {
+    switchKey = 'selected'
+  } else if (others.unselected) {
+    switchKey = 'unselected'
+  } else if (others.reverse) {
     switchKey = 'reverse'
-    Object.keys(filters).forEach(category => {
-      tempAdvFilter[category] = Object.values(filters[category]).every(val => val === false)
-    })
   }
 
   if (search !== '') {
@@ -71,6 +76,7 @@ export default function filterPokemon(tempFilters, filters, search) {
               addPokemon(id, name)
             }
           } break
+        case 'all': addPokemon(id, name); break
         case 'selected': if (tempFilters[id].enabled) addPokemon(id, name); break
         case 'unselected': if (!tempFilters[id].enabled) addPokemon(id, name); break
         case 'search': {
@@ -88,15 +94,11 @@ export default function filterPokemon(tempFilters, filters, search) {
           })
         } break
         case 'reverse': {
-          if ((tempAdvFilter.generations ? true : generations[pkmn.generation])
-            && (tempAdvFilter.types ? true : typeResolver(formTypes))
-            && (tempAdvFilter.forms ? true : forms[name] || (j != pkmn.default_form_id))
-            && (tempAdvFilter.rarity ? true : rarity[pkmn.rarity])) {
-            if (forms.altForms) {
-              addPokemon(id, name)
-            } else if (j == pkmn.default_form_id || forms[name]) {
-              addPokemon(id, name)
-            }
+          if ((tempAdvFilter.generations || generations[pkmn.generation])
+            && (tempAdvFilter.types || typeResolver(formTypes))
+            && (tempAdvFilter.rarity || rarity[pkmn.rarity])
+            && (tempAdvFilter.forms || (forms.altForms ? j != pkmn.default_form_id : forms[name]))) {
+            addPokemon(id, name)
           } break
         }
       }

@@ -7,6 +7,7 @@ import {
   Grid,
   useMediaQuery,
   TextField,
+  Button,
 } from '@material-ui/core'
 import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -16,18 +17,20 @@ import Utility from '../../../../services/Utility'
 import { useStore, useMasterfile } from '../../../../hooks/useStore'
 import useStyles from '../../../../assets/mui/styling'
 import AdvancedMenu from './AdvancedFilter'
-import Tile from './PokemonTile'
+import Tile from './MenuTile'
 import FilterOptions from '../components/FilterOptions'
 import FilterFooter from '../components/FilterFooter'
 
-export default function PokemonMenu({ globalFilters, toggleDialog }) {
+export default function Menu({ globalFilters, toggleDialog }) {
   const classes = useStyles()
   const theme = useTheme()
   const url = useStore(state => state.settings).iconStyle.path
   const availableForms = useMasterfile(state => state.availableForms)
+  const menus = useStore(state => state.menus)
+  const setMenus = useStore(state => state.setMenus)
 
   let columnCount = useMediaQuery(theme.breakpoints.up('md')) ? 5 : 3
-  const isMobile = useMediaQuery(theme.breakpoints.down('xs'))
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   if (isMobile) columnCount = 2
 
   const [filterDrawer, setFilterDrawer] = useState(false)
@@ -38,76 +41,33 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
     formId: 0,
     filters: {},
   })
-  const [filters, setFilters] = useState({
-    generations: {
-      Kanto: false,
-      Johto: false,
-      Hoenn: false,
-      Sinnoh: false,
-      Unova: false,
-      Kalos: false,
-      Alola: false,
-      Galar: false,
-    },
-    types: {
-      Bug: false,
-      Dark: false,
-      Dragon: false,
-      Electric: false,
-      Fairy: false,
-      Fighting: false,
-      Fire: false,
-      Flying: false,
-      Ghost: false,
-      Grass: false,
-      Ground: false,
-      Ice: false,
-      Normal: false,
-      Poison: false,
-      Psychic: false,
-      Rock: false,
-      Steel: false,
-      Water: false,
-    },
-    forms: {
-      altForms: true,
-      Alola: false,
-      Galarian: false,
-    },
-    rarity: {
-      Common: false,
-      Uncommon: false,
-      Rare: false,
-      UltraRare: false,
-      Regional: false,
-      Event: false,
-      Legendary: false,
-      Mythical: false,
-    },
-    others: {
-      reverse: true,
-      selected: false,
-      unselected: false,
-    },
-  })
   const [search, setSearch] = useState('')
-  const [expanded, setExpanded] = useState('forms')
+  const [expanded, setExpanded] = useState(false)
 
-  const { filteredPokesObj, filteredPokes } = Utility.filterPokemon(tempFilters, filters, search)
+  const { filteredPokesObj, filteredPokes } = Utility.filterPokemon(tempFilters, menus.pokemon, search)
 
   const handleAccordion = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
   }
 
   const selectAllOrNone = (show) => {
-    Object.values(filteredPokesObj).forEach(pokemon => {
-      pokemon.enabled = show
+    Object.values(filteredPokesObj).forEach(pkmn => {
+      pkmn.enabled = show
     })
     setTempFilters({ ...tempFilters, ...filteredPokesObj })
   }
 
   const handleChange = (name, event) => {
-    setFilters({ ...filters, [name]: { ...filters[name], [event.target.name]: event.target.checked } })
+    setMenus({
+      ...menus,
+      pokemon: {
+        ...menus.pokemon,
+        [name]: {
+          ...menus.pokemon[name],
+          [event.target.name]: event.target.checked,
+        },
+      },
+    })
   }
 
   const handleSearchChange = event => {
@@ -133,7 +93,18 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
     }
   }
 
-  const allFilterMenus = Object.entries(filters).map(filter => {
+  const handleReset = () => {
+    const resetPayload = {}
+    Object.keys(menus.pokemon).forEach(category => {
+      resetPayload[category] = {}
+      Object.keys(menus.pokemon[category]).forEach(filter => {
+        resetPayload[category][filter] = false
+      })
+    })
+    setMenus({ ...menus, pokemon: resetPayload })
+  }
+
+  const allFilterMenus = Object.entries(menus.pokemon).map(filter => {
     const [category, options] = filter
     return (
       <FilterOptions
@@ -159,9 +130,12 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
         variant="outlined"
       />
     </Grid>,
+    <Grid item key="reset">
+      <Button onClick={handleReset} color="primary">
+        Reset Filters
+      </Button>
+    </Grid>,
   )
-  // eslint-disable-next-line no-nested-ternary
-  const vHeight = expanded === 'types' ? '131vh' : expanded === 'generations' || expanded === 'rarities' ? '80vh' : '75vh'
 
   return (
     <>
@@ -199,7 +173,7 @@ export default function PokemonMenu({ globalFilters, toggleDialog }) {
                   xs={12}
                   sm={8}
                   md={9}
-                  style={{ height: vHeight }}
+                  style={{ height: '74vh' }}
                 >
                   <AutoSizer defaultHeight={1080} defaultWidth={1920}>
                     {({ width, height }) => (

@@ -12,6 +12,8 @@ const useStore = create(persist(set => ({
   setFilters: (filters) => set({ filters }),
   settings: undefined,
   setSettings: (settings) => set({ settings }),
+  menus: undefined,
+  setMenus: (menus) => set({ menus }),
 }),
 {
   name: 'local-state',

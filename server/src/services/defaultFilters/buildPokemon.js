@@ -11,13 +11,13 @@ module.exports = function buildPokemon(perms, type) {
         pokemon[`${i}-${formId}`] = {
           enabled: false,
           size: 'md',
-          iv: perms.iv ? [80, 100] : undefined,
-          gl: perms.pvp ? [1, 10] : undefined,
-          ul: perms.pvp ? [1, 5] : undefined,
-          atk: perms.stats ? [0, 15] : undefined,
-          def: perms.stats ? [0, 15] : undefined,
-          sta: perms.stats ? [0, 15] : undefined,
-          level: perms.stats ? [0, 35] : undefined,
+          iv: perms.iv ? [80, 100] : [0, 100],
+          gl: [1, 100],
+          ul: [1, 100],
+          atk: [0, 15],
+          def: [0, 15],
+          sta: [0, 15],
+          level: [0, 35],
         }
       } else if (perms) {
         pokemon[`${i}-${formId}`] = {

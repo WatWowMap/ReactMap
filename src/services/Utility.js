@@ -11,8 +11,8 @@ class Utility {
     return getProperName(word)
   }
 
-  static filterPokemon(tempFilters, filters, search) {
-    return filterPokemon(tempFilters, filters, search)
+  static filterPokemon(tempFilters, menus, search) {
+    return filterPokemon(tempFilters, menus, search)
   }
 }
 

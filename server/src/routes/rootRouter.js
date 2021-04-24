@@ -30,6 +30,7 @@ rootRouter.get('/settings', async (req, res) => {
       masterfile,
       defaultFilters: await Utility.buildDefaultFilters(perms),
       user: req.user,
+      menus: Utility.buildMenus(),
     }
     serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, perms)
 

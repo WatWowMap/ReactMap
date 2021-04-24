@@ -3,16 +3,28 @@ import MarkerClusterGroup from 'react-leaflet-markercluster'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
+import { useMasterfile } from '../../hooks/useStore'
 import Query from '../../services/Query'
 import PokemonTile from './PokemonTile'
 
 export default function PokemonQuery({ bounds, filters, onMove }) {
   const map = useMap()
-
+  const { filterItems: { pokemon: perms } } = useMasterfile(state => state.ui)
   const trimmedFilters = {}
   Object.entries(filters.pokemon.filter).forEach(filter => {
     const [id, specifics] = filter
     if (specifics.enabled) {
+      if (!perms.iv) delete specifics.iv
+      if (!perms.pvp) {
+        delete specifics.gl
+        delete specifics.ul
+      }
+      if (!perms.stats) {
+        delete specifics.atk
+        delete specifics.def
+        delete specifics.sta
+        delete specifics.level
+      }
       trimmedFilters[id] = specifics
     }
   })

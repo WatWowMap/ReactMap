@@ -9,20 +9,32 @@ import {
   ButtonGroup,
 } from '@material-ui/core'
 
+import { useMasterfile } from '../../../../hooks/useStore'
 import useStyles from '../../../../assets/mui/styling'
 import SliderTile from '../components/SliderTile'
 
 export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
   const classes = useStyles()
-
+  const { filterItems: { pokemon } } = useMasterfile(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
 
   const handleChange = (event) => {
+    const { id, name, value } = event.target
+    console.log(id, value)
+    let arrValues = value[1] ? value : []
+    if (id === `${name}-min`) {
+      console.log('hi')
+      arrValues = [parseInt(value), filterValues[name][1]]
+    } else if (id === `${name}-max`) {
+      console.log('hello')
+      arrValues = [filterValues[name][0], parseInt(value)]
+    }
     setFilterValues({
-      ...filterValues,
-      [event.target.name]: event.target.value,
+      ...filterValues, [name]: arrValues,
     })
   }
+
+  console.log(filterValues)
 
   const handleSize = (size) => {
     setFilterValues({
@@ -32,26 +44,15 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
 
   const mainSliders = [
     {
-      name: 'IV Range', shortName: 'iv', min: 0, max: 100,
+      name: 'IV Range', shortName: 'iv', min: 0, max: 100, disabled: pokemon.iv,
     },
     {
-      name: 'Great League', shortName: 'gl', min: 1, max: 100,
+      name: 'Great League', shortName: 'gl', min: 1, max: 100, disabled: pokemon.pvp,
     },
     {
-      name: 'Ultra League', shortName: 'ul', min: 1, max: 100,
+      name: 'Ultra League', shortName: 'ul', min: 1, max: 100, disabled: pokemon.pvp,
     },
-  ].map(each => (
-    <SliderTile
-      key={each.name}
-      name={each.name}
-      shortName={each.shortName}
-      min={each.min}
-      max={each.max}
-      handleChange={handleChange}
-      filterValues={filterValues}
-      color="secondary"
-    />
-  ))
+  ]
 
   const statSliders = [
     {
@@ -66,31 +67,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
     {
       name: 'Stamina', shortName: 'sta', min: 0, max: 15,
     },
-  ].map(each => (
-    <SliderTile
-      key={each.name}
-      name={each.name}
-      shortName={each.shortName}
-      min={each.min}
-      max={each.max}
-      handleChange={handleChange}
-      filterValues={filterValues}
-      color="primary"
-    />
-  ))
-
-  const allSizeButtons = ['sm', 'md', 'lg', 'xl'].map(size => {
-    const color = filterValues.size === size ? 'primary' : 'secondary'
-    return (
-      <Button
-        key={size}
-        onClick={() => handleSize(size)}
-        color={color}
-      >
-        {size}
-      </Button>
-    )
-  })
+  ]
 
   return (
     <>
@@ -103,26 +80,42 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
           alignItems="center"
         >
           <Grid
-            container
             item
             xs={12}
             sm={6}
-            direction="row"
-            justify="flex-start"
-            alignItems="center"
           >
-            {mainSliders}
+            {mainSliders.map(each => (
+              <SliderTile
+                key={each.name}
+                name={each.name}
+                shortName={each.shortName}
+                min={each.min}
+                max={each.max}
+                handleChange={handleChange}
+                filterValues={filterValues}
+                disabled={!each.disabled}
+                color="secondary"
+              />
+            ))}
           </Grid>
           <Grid
-            container
             item
             xs={12}
             sm={6}
-            direction="row"
-            justify="flex-start"
-            alignItems="center"
           >
-            {statSliders}
+            {statSliders.map(each => (
+              <SliderTile
+                key={each.name}
+                name={each.name}
+                shortName={each.shortName}
+                min={each.min}
+                max={each.max}
+                handleChange={handleChange}
+                filterValues={filterValues}
+                disabled={!pokemon.stats}
+                color="primary"
+              />
+            ))}
           </Grid>
         </Grid>
       </DialogContent>
@@ -135,7 +128,18 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
         >
           <Grid item xs={9} sm={10}>
             <ButtonGroup>
-              {allSizeButtons}
+              {['sm', 'md', 'lg', 'xl'].map(size => {
+                const color = filterValues.size === size ? 'primary' : 'secondary'
+                return (
+                  <Button
+                    key={size}
+                    onClick={() => handleSize(size)}
+                    color={color}
+                  >
+                    {size}
+                  </Button>
+                )
+              })}
             </ButtonGroup>
           </Grid>
           <Grid item xs={3} sm={2}>
