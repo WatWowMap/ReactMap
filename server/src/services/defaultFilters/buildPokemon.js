@@ -17,7 +17,7 @@ module.exports = function buildPokemon(perms, type) {
           atk: [0, 15],
           def: [0, 15],
           sta: [0, 15],
-          level: [0, 35],
+          level: [1, 35],
         }
       } else if (perms) {
         pokemon[`${i}-${formId}`] = {

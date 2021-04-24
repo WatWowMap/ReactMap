@@ -2,6 +2,7 @@
   "interface": "0.0.0.0",
   "port": 8080,
   "title": "MapJS",
+  "clientPath": "../../dist",
   "headerTitle": "MapJS - NodeJS Map Replacement",
   "locale": "en",
   "style": "dark",

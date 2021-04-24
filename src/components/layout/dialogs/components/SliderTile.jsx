@@ -1,14 +1,34 @@
-import React, { memo } from 'react'
+import React, { useState } from 'react'
 import {
   Grid, Typography, Slider, TextField,
 } from '@material-ui/core'
 
 import useStyles from '../../../../assets/mui/styling'
+import Utility from '../../../../services/Utility'
 
-const SliderTile = ({
+export default function SliderTile({
   name, shortName, filterValues, min, max, handleChange, color, disabled,
-}) => {
+}) {
   const classes = useStyles()
+  const [tempValues, setTempValues] = useState(filterValues[shortName])
+
+  const handleTempChange = (event) => {
+    const {
+      id, name: filter, value, min: slideMin, max: slideMax,
+    } = event.target
+    let arrValues = value[1] ? value : []
+    let safeVal
+    if (id === `${filter}-min`) {
+      safeVal = parseInt(value) ? parseInt(value) : parseInt(slideMin)
+      arrValues = [safeVal, filterValues[filter][1]]
+      handleChange(event)
+    } else if (id === `${filter}-max`) {
+      safeVal = parseInt(value) ? parseInt(value) : parseInt(slideMax)
+      arrValues = [filterValues[filter][0], safeVal]
+      handleChange(event)
+    }
+    setTempValues(arrValues)
+  }
 
   return (
     <Grid
@@ -20,32 +40,27 @@ const SliderTile = ({
       <Grid item xs={4}>
         <Typography>{name}</Typography>
       </Grid>
-      <Grid item xs={4}>
-        <TextField
-          className={classes.sliderInput}
-          color="primary"
-          id={`${shortName}-min`}
-          label="Min"
-          name={shortName}
-          value={filterValues[shortName][0]}
-          onChange={handleChange}
-          variant="outlined"
-          size="small"
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <TextField
-          className={classes.sliderInput}
-          color="secondary"
-          id={`${shortName}-max`}
-          label="Max"
-          name={shortName}
-          value={filterValues[shortName][1]}
-          onChange={handleChange}
-          variant="outlined"
-          size="small"
-        />
-      </Grid>
+      {['min', 'max'].map((each, index) => (
+        <Grid item xs={4} key={`${shortName}-${each}`}>
+          <TextField
+            className={classes.sliderInput}
+            color="primary"
+            id={`${shortName}-${each}`}
+            label={Utility.getProperName(each)}
+            name={shortName}
+            value={tempValues[index]}
+            onChange={handleTempChange}
+            variant="outlined"
+            size="small"
+            type="number"
+            disabled={disabled}
+            inputProps={{
+              min,
+              max,
+            }}
+          />
+        </Grid>
+      ))}
       <Grid item xs={10}>
         <Slider
           name={shortName}
@@ -53,8 +68,12 @@ const SliderTile = ({
           max={max}
           color={color}
           className={classes.slider}
-          value={filterValues[shortName]}
+          value={tempValues}
           onChange={(event, newValue) => {
+            event.target.value = newValue
+            handleTempChange(event)
+          }}
+          onChangeCommitted={(event, newValue) => {
             event.target.name = shortName
             event.target.value = newValue
             handleChange(event)
@@ -66,9 +85,3 @@ const SliderTile = ({
     </Grid>
   )
 }
-
-const areEqual = (prevSlider, nextSlider) => (
-  prevSlider.filterValues[prevSlider.shortName] === nextSlider.filterValues[nextSlider.shortName]
-)
-
-export default memo(SliderTile, areEqual)

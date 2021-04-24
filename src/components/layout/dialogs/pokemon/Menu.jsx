@@ -37,9 +37,6 @@ export default function Menu({ globalFilters, toggleDialog }) {
   const [tempFilters, setTempFilters] = useState(globalFilters.pokemon.filter)
   const [advancedFilter, setAdvancedFilter] = useState({
     open: false,
-    id: 0,
-    formId: 0,
-    filters: {},
   })
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState(false)

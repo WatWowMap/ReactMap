@@ -9,6 +9,7 @@ const connection = {
   client: 'mysql',
   connection: {
     host: schemas[selectedDb].host,
+    port: schemas[selectedDb].port,
     user: schemas[selectedDb].username,
     password: schemas[selectedDb].password,
     database: schemas[selectedDb].database,

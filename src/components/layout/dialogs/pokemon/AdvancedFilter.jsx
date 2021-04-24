@@ -19,22 +19,22 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
 
   const handleChange = (event) => {
-    const { id, name, value } = event.target
-    console.log(id, value)
+    const {
+      id, name, value, min: slideMin, max: slideMax,
+    } = event.target
     let arrValues = value[1] ? value : []
+    let safeVal
     if (id === `${name}-min`) {
-      console.log('hi')
-      arrValues = [parseInt(value), filterValues[name][1]]
+      safeVal = parseInt(value) ? parseInt(value) : parseInt(slideMin)
+      arrValues = [safeVal, filterValues[name][1]]
     } else if (id === `${name}-max`) {
-      console.log('hello')
-      arrValues = [filterValues[name][0], parseInt(value)]
+      safeVal = parseInt(value) ? parseInt(value) : parseInt(slideMax)
+      arrValues = [filterValues[name][0], safeVal]
     }
     setFilterValues({
       ...filterValues, [name]: arrValues,
     })
   }
-
-  console.log(filterValues)
 
   const handleSize = (size) => {
     setFilterValues({

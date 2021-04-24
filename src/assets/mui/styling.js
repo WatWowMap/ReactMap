@@ -17,8 +17,7 @@ export default makeStyles({
     width: 160,
   },
   sliderInput: {
-    maxWidth: 65,
-    marginRight: 5,
+    maxWidth: 75,
   },
   formLabel: {
     color: 'white',
