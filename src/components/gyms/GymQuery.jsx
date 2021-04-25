@@ -10,7 +10,7 @@ export default function GymQuery({ bounds, filters, onMove }) {
   const map = useMap()
   const ts = (new Date()).getTime() / 1000
 
-  const { data, previousData, refetch } = !filters.raids.enabled
+  const { data, previousData, refetch } = !filters.gyms.raids.enabled
     ? useQuery(Query.getAllGyms(), { variables: bounds })
     : useQuery(Query.getAllRaids(), { variables: bounds })
 

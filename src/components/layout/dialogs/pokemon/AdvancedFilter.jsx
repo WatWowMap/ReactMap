@@ -7,7 +7,13 @@ import {
   DialogActions,
   Button,
   ButtonGroup,
+  useMediaQuery,
+  Select,
+  FormControl,
+  MenuItem,
+  InputLabel,
 } from '@material-ui/core'
+import { useTheme } from '@material-ui/core/styles'
 
 import { useMasterfile } from '../../../../hooks/useStore'
 import useStyles from '../../../../assets/mui/styling'
@@ -15,6 +21,8 @@ import SliderTile from '../components/SliderTile'
 
 export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
   const classes = useStyles()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const { filterItems: { pokemon } } = useMasterfile(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
 
@@ -118,21 +126,47 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
           justify="center"
           alignItems="center"
         >
-          <Grid item xs={9} sm={10}>
-            <ButtonGroup>
-              {['sm', 'md', 'lg', 'xl'].map(size => {
-                const color = filterValues.size === size ? 'primary' : 'secondary'
-                return (
-                  <Button
-                    key={size}
-                    onClick={() => handleSize(size)}
-                    color={color}
-                  >
-                    {size}
-                  </Button>
-                )
-              })}
-            </ButtonGroup>
+          <Grid item xs={6} sm={8}>
+            {isMobile ? (
+              <FormControl className={classes.formControl}>
+                <InputLabel>Icon Size</InputLabel>
+                <Select
+                  name="size"
+                  value={filterValues.size}
+                  onChange={handleChange}
+                >
+                  {['sm', 'md', 'lg', 'xl'].map(size => (
+                    <MenuItem key={size} value={size}>{size}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )
+              : (
+                <ButtonGroup>
+                  {['sm', 'md', 'lg', 'xl'].map(size => {
+                    const color = filterValues.size === size ? 'primary' : 'secondary'
+                    return (
+                      <Button
+                        key={size}
+                        onClick={() => handleSize(size)}
+                        color={color}
+                      >
+                        {size}
+                      </Button>
+                    )
+                  })}
+                </ButtonGroup>
+              )}
+          </Grid>
+          <Grid item xs={3} sm={2}>
+            <Button onClick={toggleAdvMenu(false)} color="primary">
+              <Typography
+                variant="caption"
+                color="primary"
+              >
+                Cancel
+              </Typography>
+            </Button>
           </Grid>
           <Grid item xs={3} sm={2}>
             <Button onClick={toggleAdvMenu(false, advancedFilter.id, filterValues)} color="primary">

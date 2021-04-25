@@ -20,6 +20,12 @@ rootRouter.get('/settings', async (req, res) => {
     user = { perms: {} }
     Object.keys(config.discord.perms).forEach(perm => user.perms[perm] = true)
   }
+  ['tileServers', 'icons'].forEach(setting => {
+    Object.keys(config[setting]).forEach(option => {
+      config[setting][option].name = option
+    })
+  })
+
   if (user) {
     try {
       const serverSettings = {
@@ -38,7 +44,6 @@ rootRouter.get('/settings', async (req, res) => {
         menus: Utility.buildMenus(),
       }
       serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, user.perms)
-
       await Utility.updateAvailableForms(serverSettings.config.icons)
 
       res.status(200).json({ serverSettings })

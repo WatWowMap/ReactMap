@@ -4,7 +4,6 @@ const logger = require('morgan')
 const compression = require('compression')
 const session = require('express-session')
 const passport = require('passport')
-require('./strategies/discordStrategy')
 require('./db/initialization')
 
 const { sessionStore } = require('./services/session-store.js')
@@ -31,6 +30,9 @@ app.use(session({
   cookie: { maxAge: 604800000 },
 }))
 if (config.discord.enabled) {
+  // eslint-disable-next-line global-require
+  require('./strategies/discordStrategy')
+
   app.use(passport.initialize())
 
   app.use(passport.session())
