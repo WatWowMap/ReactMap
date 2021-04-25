@@ -84,6 +84,13 @@ export default function Menu({ globalFilters, toggleDialog }) {
     }
     if (open) {
       setAdvancedFilter({ open, id, tempFilters: tempFilters[id] })
+    } else if (id === 'ivAnd') {
+      setAdvancedFilter({ open })
+      Object.entries(filteredPokesObj).forEach(poke => {
+        const [key, { enabled }] = poke
+        filteredPokesObj[key] = { ...newFilters, enabled }
+      })
+      setTempFilters({ ...tempFilters, ...filteredPokesObj, [id]: newFilters })
     } else {
       setAdvancedFilter({ open })
       setTempFilters({ ...tempFilters, [id]: newFilters })
@@ -114,7 +121,7 @@ export default function Menu({ globalFilters, toggleDialog }) {
       />
     )
   })
-  allFilterMenus.unshift(
+  allFilterMenus.push(
     <Grid item key="search">
       <TextField
         className={classes.search}
@@ -128,6 +135,12 @@ export default function Menu({ globalFilters, toggleDialog }) {
       />
     </Grid>,
     <Grid item key="reset">
+      <Button onClick={toggleAdvMenu(true, 'ivAnd')} color="secondary">
+        Set Filter for <br />
+        All Selected
+      </Button>
+    </Grid>,
+    <Grid item key="global">
       <Button onClick={handleReset} color="primary">
         Reset Filters
       </Button>
@@ -136,8 +149,21 @@ export default function Menu({ globalFilters, toggleDialog }) {
 
   return (
     <>
-      {!advancedFilter.open
+      {advancedFilter.open
         ? (
+          <Dialog
+            fullWidth
+            maxWidth="sm"
+            open={advancedFilter.open}
+            onClose={toggleAdvMenu(false)}
+          >
+            <AdvancedMenu
+              advancedFilter={advancedFilter}
+              toggleAdvMenu={toggleAdvMenu}
+            />
+          </Dialog>
+        )
+        : (
           <>
             <DialogTitle
               className={classes.filterHeader}
@@ -213,21 +239,6 @@ export default function Menu({ globalFilters, toggleDialog }) {
               {allFilterMenus}
             </Drawer>
           </>
-        )
-        : (
-          <Dialog
-            fullWidth
-            maxWidth="sm"
-            open={advancedFilter.open}
-            aria-labelledby="max-width-dialog-title"
-          >
-            {advancedFilter.open && (
-              <AdvancedMenu
-                advancedFilter={advancedFilter}
-                toggleAdvMenu={toggleAdvMenu}
-              />
-            )}
-          </Dialog>
         )}
     </>
   )

@@ -55,7 +55,8 @@ export default function DrawerMenu({
                     })
                   }}
                   >
-                    {globalFilters[item].enabled ? <Check style={{ fontSize: 15, color: 'green' }} />
+                    {globalFilters[item].enabled
+                      ? <Check style={{ fontSize: 15, color: 'green' }} />
                       : <Clear style={{ fontSize: 15, color: 'red' }} />}
                   </IconButton>
                 </ListItem>

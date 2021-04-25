@@ -18,7 +18,7 @@ rootRouter.get('/settings', async (req, res) => {
   let { user } = req
   if (!config.discord.enabled) {
     user = { perms: {} }
-    Object.keys(config.discord.perms).forEach(perm => user.perms[perm] = true)
+    Object.keys(config.discord.perms).forEach(perm => user.perms[perm] = config.discord.perms[perm].enabled)
   }
   ['tileServers', 'icons'].forEach(setting => {
     Object.keys(config[setting]).forEach(option => {

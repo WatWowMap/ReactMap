@@ -42,7 +42,7 @@ module.exports = async function buildDefault(perms) {
     } : undefined,
     pokemon: perms.pokemon ? {
       enabled: filters.pokemon,
-      filter: buildPokemon(perms, 'pokemon'),
+      filter: buildPokemon(perms.pokemon, 'pokemon'),
     } : undefined,
     portals: perms.portals ? {
       enabled: filters.portals,

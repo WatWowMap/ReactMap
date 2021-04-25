@@ -46,11 +46,7 @@ export default function Nav() {
 
   return (
     <>
-      {!drawer ? (
-        <FloatingBtn
-          toggleDrawer={toggleDrawer}
-        />
-      ) : (
+      {drawer ? (
         <Drawer
           drawer={drawer}
           toggleDrawer={toggleDrawer}
@@ -58,12 +54,16 @@ export default function Nav() {
           setGlobalFilters={setGlobalFilters}
           toggleDialog={toggleDialog}
         />
+      ) : (
+        <FloatingBtn
+          toggleDrawer={toggleDrawer}
+        />
       )}
       <Dialog
         fullWidth
         maxWidth="md"
         open={dialog.open}
-        onClose={toggleDialog(false, 'none')}
+        onClose={toggleDialog(false)}
       >
         {dialog.open && DialogToRender(dialog.name)}
       </Dialog>
