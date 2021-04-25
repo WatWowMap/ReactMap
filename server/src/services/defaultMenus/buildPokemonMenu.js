@@ -1,5 +1,3 @@
-/* eslint-disable no-return-assign */
-
 module.exports = function buildPokemonMenu() {
   const categories = {
     generations: ['Kanto', 'Johto', 'Hoenn', 'Sinnoh', 'Unova', 'Kalos', 'Alola', 'Galar'],

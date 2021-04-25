@@ -18,22 +18,14 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
   const { filterItems: { pokemon } } = useMasterfile(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
 
-  const handleChange = (event) => {
-    const {
-      id, name, value, min: slideMin, max: slideMax,
-    } = event.target
-    let arrValues = value[1] ? value : []
-    let safeVal
-    if (id === `${name}-min`) {
-      safeVal = parseInt(value) ? parseInt(value) : parseInt(slideMin)
-      arrValues = [safeVal, filterValues[name][1]]
-    } else if (id === `${name}-max`) {
-      safeVal = parseInt(value) ? parseInt(value) : parseInt(slideMax)
-      arrValues = [filterValues[name][0], safeVal]
+  const handleChange = (event, values) => {
+    if (typeof event === 'object') {
+      setFilterValues({
+        ...filterValues, [event.target.name]: event.target.value,
+      })
+    } else {
+      setFilterValues({ ...filterValues, [event]: values })
     }
-    setFilterValues({
-      ...filterValues, [name]: arrValues,
-    })
   }
 
   const handleSize = (size) => {

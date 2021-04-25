@@ -14,18 +14,21 @@ export default function SliderTile({
 
   const handleTempChange = (event) => {
     const {
-      id, name: filter, value, min: slideMin, max: slideMax,
+      id, name: slideName, value, min: slideMin, max: slideMax,
     } = event.target
-    let arrValues = value[1] ? value : []
-    let safeVal
-    if (id === `${filter}-min`) {
-      safeVal = parseInt(value) ? parseInt(value) : parseInt(slideMin)
-      arrValues = [safeVal, filterValues[filter][1]]
-      handleChange(event)
-    } else if (id === `${filter}-max`) {
-      safeVal = parseInt(value) ? parseInt(value) : parseInt(slideMax)
-      arrValues = [filterValues[filter][0], safeVal]
-      handleChange(event)
+    const arrValues = typeof value === 'object' ? value : []
+
+    if (arrValues.length < 2) {
+      const minMaxObj = { min: slideMin, max: slideMax }
+      const minOrMax = id.split('-')[1]
+      const safeVal = parseInt(value) ? parseInt(value) : parseInt(minMaxObj[minOrMax])
+
+      if (minOrMax === 'min') {
+        arrValues.push(safeVal, filterValues[slideName][1])
+      } else {
+        arrValues.push(filterValues[slideName][0], safeVal)
+      }
+      handleChange(slideName, arrValues)
     }
     setTempValues(arrValues)
   }

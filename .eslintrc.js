@@ -27,6 +27,7 @@ module.exports = {
     'arrow-parens': 0,
     'react/jsx-one-expression-per-line': 0,
     'no-underscore-dangle': 0,
+    'no-return-assign': 0,
     'max-len': [
       'error',
       120,

@@ -30,10 +30,11 @@ app.use(session({
   saveUninitialized: false,
   cookie: { maxAge: 604800000 },
 }))
+if (config.discord.enabled) {
+  app.use(passport.initialize())
 
-app.use(passport.initialize())
-
-app.use(passport.session())
+  app.use(passport.session())
+}
 
 app.use(rootRouter)
 

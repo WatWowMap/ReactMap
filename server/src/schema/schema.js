@@ -1,4 +1,3 @@
-/* eslint-disable no-return-assign */
 /* eslint-disable no-return-await */
 const {
   GraphQLObjectType, GraphQLID, GraphQLFloat, GraphQLList, GraphQLSchema,
@@ -11,7 +10,7 @@ const GymType = require('./gym.js')
 const PokestopType = require('./pokestop.js')
 const PokemonType = require('./pokemon.js')
 const PortalType = require('./portal.js')
-const S2CellType = require('./s2cell.js')
+const S2CellType = require('./s2Cell.js')
 const SpawnpointType = require('./spawnpoint.js')
 const WeatherType = require('./weather.js')
 const Utility = require('../services/Utility')
