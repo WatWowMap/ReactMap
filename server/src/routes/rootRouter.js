@@ -15,29 +15,41 @@ rootRouter.use('/', clientRouter)
 rootRouter.use('/auth', authRouter)
 
 rootRouter.get('/settings', async (req, res) => {
-  const perms = req.user ? req.user.perms : {}
-  try {
-    const serverSettings = {
-      config: {
-        map: config.map,
-        tileServers: config.tileServers,
-        icons: config.icons,
-      },
-      settings: {
-        iconStyle: config.icons.Default,
-        tileServer: config.tileServers.Default,
-      },
-      masterfile,
-      defaultFilters: await Utility.buildDefaultFilters(perms),
-      user: req.user,
+  let { user } = req
+  if (!config.discord.enabled) {
+    user = { perms: {} }
+    Object.keys(config.discord.perms).forEach(perm => user.perms[perm] = config.discord.perms[perm].enabled)
+  }
+  ['tileServers', 'icons'].forEach(setting => {
+    Object.keys(config[setting]).forEach(option => {
+      config[setting][option].name = option
+    })
+  })
+
+  if (user) {
+    try {
+      const serverSettings = {
+        config: {
+          map: config.map,
+          tileServers: config.tileServers,
+          icons: config.icons,
+        },
+        settings: {
+          iconStyle: config.icons.Default,
+          tileServer: config.tileServers.Default,
+        },
+        masterfile,
+        defaultFilters: await Utility.buildDefaultFilters(user.perms),
+        user,
+        menus: Utility.buildMenus(),
+      }
+      serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, user.perms)
+      await Utility.updateAvailableForms(serverSettings.config.icons)
+
+      res.status(200).json({ serverSettings })
+    } catch (error) {
+      res.status(500).json({ error })
     }
-    serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, perms)
-
-    await Utility.updateAvailableForms(serverSettings.config.icons)
-
-    res.status(200).json({ serverSettings })
-  } catch (error) {
-    res.status(500).json({ error })
   }
 })
 

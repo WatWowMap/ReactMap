@@ -36,16 +36,14 @@ class Pokemon extends Model {
     const results = await eval(query)
 
     const filteredResults = results.reduce((result, pkmn) => {
-      let realForm = pkmn.form
       if (pkmn.form === 0 && pokemon[pkmn.pokemon_id].default_form_id) {
-        realForm = pokemon[pkmn.pokemon_id].default_form_id
+        pkmn.form = pokemon[pkmn.pokemon_id].default_form_id
       }
-      if (args.filters[`${pkmn.pokemon_id}-${realForm}`]) {
+      if (args.filters[`${pkmn.pokemon_id}-${pkmn.form}`]) {
         result.push(pkmn)
       }
       return result
     }, [])
-
     return count ? [] : filteredResults
   }
 }

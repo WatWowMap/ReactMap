@@ -4,7 +4,7 @@ const {
   S2LatLng, S2RegionCoverer, S2CellId, S2LatLngRect,
 } = require('nodes2ts')
 const getPolyVector = require('./getPolyVector')
-const Ring = require('../Ring')
+const { Ring } = require('../../models/index')
 
 module.exports = function getPlacementCells(bounds, pokestops, gyms) {
   const allStops = pokestops.filter(x => x.sponsor_id === null || x.sponsor_id === 0)

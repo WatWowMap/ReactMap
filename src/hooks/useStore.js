@@ -12,6 +12,8 @@ const useStore = create(persist(set => ({
   setFilters: (filters) => set({ filters }),
   settings: undefined,
   setSettings: (settings) => set({ settings }),
+  menus: undefined,
+  setMenus: (menus) => set({ menus }),
 }),
 {
   name: 'local-state',
@@ -27,6 +29,8 @@ const useMasterfile = create(set => ({
   setPerms: (perms) => set({ perms }),
   masterfile: {},
   setMasterfile: (masterfile) => set({ masterfile }),
+  breakpoint: false,
+  setBreakpoint: (breakpoint) => set({ breakpoint }),
 }))
 
 export { useStore, useMasterfile }

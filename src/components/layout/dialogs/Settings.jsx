@@ -12,6 +12,7 @@ import {
 } from '@material-ui/core'
 import { useStore } from '../../../hooks/useStore'
 import useStyles from '../../../assets/mui/styling'
+import Utility from '../../../services/Utility'
 
 export default function Settings({
   toggleDialog,
@@ -49,7 +50,7 @@ export default function Settings({
                       key={tile}
                       value={tile}
                     >
-                      {config.tileServers[tile].name}
+                      {Utility.getProperName(tile)}
                     </MenuItem>
                   ))}
                 </Select>
@@ -69,7 +70,7 @@ export default function Settings({
                       key={icon}
                       value={icon}
                     >
-                      {config.icons[icon].name}
+                      {Utility.getProperName(icon)}
                     </MenuItem>
                   ))}
                 </Select>

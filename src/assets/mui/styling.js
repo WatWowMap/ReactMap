@@ -24,9 +24,6 @@ export default makeStyles({
     backgroundColor: theme.palette.grey.dark,
     textAlign: 'center',
   },
-  slider: {
-    width: 200,
-  },
   successButton: {
     color: theme.palette.success.main,
   },
@@ -70,5 +67,18 @@ export default makeStyles({
     display: 'flex',
     margin: '45% auto auto auto',
     backgroundColor: 'rgb(52, 52, 52)',
+  },
+  search: {
+    padding: '2px 4px',
+    display: 'flex',
+    alignItems: 'center',
+    height: 50,
+  },
+  input: {
+    marginLeft: theme.spacing(1),
+    flex: 1,
+  },
+  iconButton: {
+    padding: 10,
   },
 })

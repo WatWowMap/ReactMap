@@ -4,6 +4,7 @@ const getTypeCells = require('./functions/getTypeCells')
 const buildDefaultFilters = require('./defaultFilters/buildDefaultFilters')
 const generateUi = require('./ui')
 const updateAvailableForms = require('./functions/updateAvailableForms')
+const buildMenus = require('./defaultMenus/buildMenus')
 
 class Utility {
   static getPolyVector(s2cellId, type) {
@@ -28,6 +29,10 @@ class Utility {
 
   static generateUi(filters, perms) {
     return generateUi(filters, perms)
+  }
+
+  static buildMenus() {
+    return buildMenus()
   }
 }
 

@@ -7,6 +7,8 @@
       "@assets/*": ["./src/assets/*"],
       "@components/*": ["./src/components/*"],
       "@services/*": ["./src/services/*"],
+      "@hooks/*": ["./src/hooks/*"],
     }
-  }
+  },
+  "exclude": ["node_modules", "dist"],
 }

@@ -7,6 +7,7 @@ const connections = Object.keys(schemas).map(name => Knex({
   client: 'mysql',
   connection: {
     host: schemas[name].host,
+    port: schemas[name].port,
     user: schemas[name].username,
     password: schemas[name].password,
     database: schemas[name].database,

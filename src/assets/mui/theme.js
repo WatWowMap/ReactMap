@@ -27,6 +27,16 @@ const theme = responsiveFontSizes(createMuiTheme({
     success: {
       main: '#00e676',
     },
+    text: {
+      primary: '#f5f5f5',
+      secondary: 'white',
+      hint: '#a0a0a0',
+    },
+  },
+  props: {
+    MuiButtonBase: {
+      disableRipple: true,
+    },
   },
 }))
 

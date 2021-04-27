@@ -1,31 +1,22 @@
 /* eslint-disable no-restricted-syntax */
 const masterfile = require('../../data/masterfile.json')
+const { PokemonFilter, GenericFilter } = require('../../models/index')
 
 module.exports = function buildPokemon(perms, type) {
   const pokemon = {}
   for (const [i, pkmn] of Object.entries(masterfile.pokemon)) {
-    const forms = Object.keys(pkmn.forms)
-    for (let j = 0; j < forms.length; j += 1) {
-      const formId = forms[j]
+    for (const j of Object.keys(pkmn.forms)) {
       if (type === 'pokemon') {
-        pokemon[`${i}-${formId}`] = {
-          enabled: false,
-          size: 'md',
-          iv: perms.iv ? [80, 100] : undefined,
-          gl: perms.pvp ? [1, 10] : undefined,
-          ul: perms.pvp ? [1, 5] : undefined,
-          atk: perms.stats ? [0, 15] : undefined,
-          def: perms.stats ? [0, 15] : undefined,
-          sta: perms.stats ? [0, 15] : undefined,
-          level: perms.stats ? [0, 35] : undefined,
-        }
+        pokemon[`${i}-${j}`] = new PokemonFilter()
       } else if (perms) {
-        pokemon[`${i}-${formId}`] = {
-          enabled: true,
-          size: 'md',
-        }
+        pokemon[`${i}-${j}`] = new GenericFilter()
       }
     }
+  }
+  if (type === 'pokemon') {
+    ['ivOr', 'ivAnd', 'default'].forEach(global => {
+      pokemon[global] = new PokemonFilter()
+    })
   }
   return pokemon
 }

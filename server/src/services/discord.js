@@ -1,7 +1,6 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
-/* eslint-disable no-return-assign */
 /* eslint-disable global-require */
 /* eslint-disable import/no-dynamic-require */
 /* global BigInt */

@@ -9,7 +9,7 @@ module.exports = async function buildDefault(perms) {
   const stopReducer = perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
 
-  const globalFilters = {
+  return {
     gyms: gymReducer ? {
       enabled: filters.gyms,
       allGyms: perms.gyms ? filters.gyms : undefined,
@@ -42,7 +42,7 @@ module.exports = async function buildDefault(perms) {
     } : undefined,
     pokemon: perms.pokemon ? {
       enabled: filters.pokemon,
-      filter: buildPokemon(perms, 'pokemon'),
+      filter: buildPokemon(perms.pokemon, 'pokemon'),
     } : undefined,
     portals: perms.portals ? {
       enabled: filters.portals,
@@ -65,5 +65,4 @@ module.exports = async function buildDefault(perms) {
       filter: {},
     } : undefined,
   }
-  return globalFilters
 }

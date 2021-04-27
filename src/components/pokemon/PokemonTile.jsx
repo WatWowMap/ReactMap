@@ -6,7 +6,7 @@ import marker from './marker'
 const PokemonTile = ({ pokemon }) => (
   <Marker
     position={[pokemon.lat, pokemon.lon]}
-    icon={marker(pokemon, pokemon.form)}
+    icon={marker(pokemon)}
   >
     <Popup position={[pokemon.lat, pokemon.lon]}>
       <PopupContent pokemon={pokemon} />
@@ -14,10 +14,9 @@ const PokemonTile = ({ pokemon }) => (
   </Marker>
 )
 
-const areEqual = (prevPoke, nextPoke) => (
-  prevPoke.id === nextPoke.id
-    && prevPoke.lat === nextPoke.lat
-    && prevPoke.lon === nextPoke.lon
+const areEqual = (prev, next) => (
+  prev.pokemon.id === next.pokemon.id
+    && prev.enabled === next.enabled
 )
 
 export default React.memo(PokemonTile, areEqual)
