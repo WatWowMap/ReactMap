@@ -1,8 +1,20 @@
 /* eslint-disable no-restricted-syntax */
 module.exports = function generateUi(filters, perms) {
   const filterItems = {}
-  const sizes = ['sm', 'md', 'lg', 'xl']
-
+  const text = {
+    save: 'Save',
+    reset: 'Reset',
+    filterSettings: 'Filter Settings',
+    resetFilters: 'Reset Filters',
+    advanced: 'Advanced',
+    help: 'Help',
+    applyToAll: 'Apply To All',
+    disableAll: 'Disable All',
+    enableAll: 'Enable All',
+    legacy: 'Legacy',
+    sizes: ['sm', 'md', 'lg', 'xl'],
+    sliderInputs: ['min', 'max'],
+  }
   for (const [key, value] of Object.entries(filters)) {
     if (value) {
       filterItems[key] = {}
@@ -50,9 +62,10 @@ module.exports = function generateUi(filters, perms) {
       })
       if (sliders) {
         filterItems[key].sliders = sliders
-        Object.values(sliders).forEach(category => {
-          category.forEach(slider => {
+        Object.keys(sliders).forEach(category => {
+          sliders[category].forEach(slider => {
             slider.disabled = !perms[slider.perm]
+            slider.color = category
           })
         })
       }
@@ -62,5 +75,5 @@ module.exports = function generateUi(filters, perms) {
 
   const menuItems = ['settings']
 
-  return { filterItems, menuItems, sizes }
+  return { filterItems, menuItems, text }
 }

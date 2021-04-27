@@ -5,11 +5,14 @@ import {
 import {
   Menu, Ballot, Check, Clear, Save, HelpOutline,
 } from '@material-ui/icons'
+
 import Help from '../help/Filters'
+import { useMasterfile } from '../../../../hooks/useStore'
 
 export default function FilterFooter({
   selectAllOrNone, toggleDialog, tempFilters, toggleDrawer, isMobile, toggleAdvMenu, type,
 }) {
+  const { text } = useMasterfile(state => state.ui)
   const [helpDialog, setHelpDialog] = useState(false)
 
   const toggleHelp = () => {
@@ -28,7 +31,7 @@ export default function FilterFooter({
     text: (
       <Button onClick={toggleHelp}>
         <Typography variant="caption">
-          Help
+          {text.help}
         </Typography>
       </Button>
     ),
@@ -38,11 +41,11 @@ export default function FilterFooter({
     key: 'openFilter',
     icon: (isMobile
       && (
-      <IconButton
-        onClick={toggleDrawer(true)}
-      >
-        <Ballot style={{ color: 'white' }} />
-      </IconButton>
+        <IconButton
+          onClick={toggleDrawer(true)}
+        >
+          <Ballot style={{ color: 'white' }} />
+        </IconButton>
       )
     ),
   }
@@ -59,7 +62,7 @@ export default function FilterFooter({
     text: (
       <Button onClick={toggleAdvMenu(true, 'ivAnd')}>
         <Typography variant="caption">
-          Apply to All
+          {text.applyToAll}
         </Typography>
       </Button>
     ),
@@ -80,7 +83,7 @@ export default function FilterFooter({
         color="primary"
       >
         <Typography variant="caption">
-          Disable All
+          {text.disableAll}
         </Typography>
       </Button>
     ),
@@ -101,7 +104,7 @@ export default function FilterFooter({
         style={{ color: '#00e676' }}
       >
         <Typography variant="caption">
-          Enable All
+          {text.enableAll}
         </Typography>
       </Button>
     ),
@@ -124,7 +127,7 @@ export default function FilterFooter({
         <Typography
           variant="caption"
         >
-          Save
+          {text.save}
         </Typography>
       </Button>
     ),
@@ -133,7 +136,6 @@ export default function FilterFooter({
   return (
     <>
       <Dialog
-        fullWidth
         maxWidth="sm"
         open={helpDialog}
         onClose={toggleHelp}

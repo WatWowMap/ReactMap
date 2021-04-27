@@ -22,24 +22,26 @@ import Tile from './MenuTile'
 import FilterOptions from './Options'
 import FilterFooter from './Footer'
 
-export default function Menu({ globalFilters, toggleDialog, type }) {
+export default function Menu({ filters, toggleDialog, type }) {
   const classes = useStyles()
   const url = useStore(state => state.settings).iconStyle.path
   const availableForms = useMasterfile(state => state.availableForms)
   const menus = useStore(state => state.menus)
   const setMenus = useStore(state => state.setMenus)
   const breakpoint = useMasterfile(state => state.breakpoint)
+  const { text } = useMasterfile(state => state.ui)
 
   let columnCount = breakpoint === 'sm' ? 3 : 5
   if (breakpoint === 'xs') columnCount = 1
   const isMobile = breakpoint === 'xs'
 
   const [filterDrawer, setFilterDrawer] = useState(false)
-  const [tempFilters, setTempFilters] = useState(globalFilters[type].filter)
+  const [tempFilters, setTempFilters] = useState(filters[type].filter)
   const [advancedFilter, setAdvancedFilter] = useState({
     open: false,
     id: '',
     tempFilters: {},
+    default: filters[type].filter.default,
   })
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState(false)
@@ -89,7 +91,12 @@ export default function Menu({ globalFilters, toggleDialog, type }) {
       return
     }
     if (open) {
-      setAdvancedFilter({ open, id, tempFilters: tempFilters[id] })
+      setAdvancedFilter({
+        open,
+        id,
+        tempFilters: tempFilters[id],
+        default: filters[type].filter.default,
+      })
     } else if (id === 'ivAnd') {
       setAdvancedFilter({ open })
       Object.entries(filteredObj).forEach(poke => {
@@ -130,7 +137,7 @@ export default function Menu({ globalFilters, toggleDialog, type }) {
   allFilterMenus.push(
     <Grid item key="reset">
       <Button onClick={handleReset} color="primary">
-        Reset Filters
+        {text.resetFilters}
       </Button>
     </Grid>,
   )
@@ -149,7 +156,7 @@ export default function Menu({ globalFilters, toggleDialog, type }) {
         />
       </Dialog>
       <DialogTitle className={classes.filterHeader}>
-        {Utility.getProperName(type)} Filter Settings
+        {Utility.getProperName(type)} {text.filterSettings}
       </DialogTitle>
       <DialogContent>
         <Grid

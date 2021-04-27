@@ -7,8 +7,8 @@ import Drawer from './Drawer'
 import * as Dialogs from './dialogs/dialogIndex'
 
 export default function Nav() {
-  const globalFilters = useStore(state => state.filters)
-  const setGlobalFilters = useStore(state => state.setFilters)
+  const filters = useStore(state => state.filters)
+  const setFilters = useStore(state => state.setFilters)
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
@@ -31,17 +31,16 @@ export default function Nav() {
       setDialog({ open, category, type })
     } else {
       setDialog({ open, category: '', type: '' })
-      setGlobalFilters({ ...globalFilters, [type]: { ...globalFilters[type], filter } })
+      setFilters({ ...filters, [type]: { ...filters[type], filter } })
     }
   }
 
   const DialogToRender = (category, type) => {
     const DialogMenu = Dialogs[category]
-    console.log(category, type)
     return (
       <DialogMenu
         toggleDialog={toggleDialog}
-        globalFilters={globalFilters}
+        filters={filters}
         type={type}
       />
     )
@@ -53,8 +52,8 @@ export default function Nav() {
         <Drawer
           drawer={drawer}
           toggleDrawer={toggleDrawer}
-          globalFilters={globalFilters}
-          setGlobalFilters={setGlobalFilters}
+          filters={filters}
+          setFilters={setFilters}
           toggleDialog={toggleDialog}
         />
       ) : (

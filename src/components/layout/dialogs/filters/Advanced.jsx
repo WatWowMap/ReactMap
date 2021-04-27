@@ -8,7 +8,9 @@ import {
   Button,
   Switch,
   FormControlLabel,
+  IconButton,
 } from '@material-ui/core'
+import { Save, Replay } from '@material-ui/icons'
 
 import StringFilter from './StringFilter'
 import { useMasterfile } from '../../../../hooks/useStore'
@@ -17,14 +19,15 @@ import Size from './Size'
 
 export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) {
   const isMobile = useMasterfile(state => state.breakpoint) === 'xs'
-  const { filterItems } = useMasterfile(state => state.ui)
-
+  const { filterItems, text } = useMasterfile(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
 
   const handleChange = (event, values) => {
     if (typeof event === 'object') {
       const { name, value } = event.target
       setFilterValues({ ...filterValues, [name]: value })
+    } else if (event === 'default') {
+      setFilterValues({ ...values, enabled: filterValues.enabled })
     } else {
       setFilterValues({ ...filterValues, [event]: values })
     }
@@ -32,6 +35,41 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
 
   const handleLegacySwitch = () => {
     setFilterValues({ ...filterValues, legacy: !filterValues.legacy })
+  }
+
+  const reset = {
+    key: 'reset',
+    icon: (
+      <IconButton
+        onClick={() => handleChange('default', advancedFilter.default)}
+      >
+        <Replay color="primary" />
+      </IconButton>
+    ),
+    text: (
+      <Button onClick={() => handleChange('default', advancedFilter.default)}>
+        <Typography variant="caption" color="primary">
+          {text.reset}
+        </Typography>
+      </Button>
+    ),
+  }
+  const save = {
+    key: 'save',
+    icon: (
+      <IconButton
+        onClick={toggleAdvMenu(false, advancedFilter.id, filterValues)}
+      >
+        <Save color="secondary" />
+      </IconButton>
+    ),
+    text: (
+      <Button onClick={toggleAdvMenu(false, advancedFilter.id, filterValues)}>
+        <Typography color="secondary" variant="caption">
+          {text.save}
+        </Typography>
+      </Button>
+    ),
   }
 
   return (
@@ -43,7 +81,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
           alignItems="center"
         >
           <Grid item xs={6}>
-            Advanced
+            {text.advanced}
           </Grid>
           <Grid item xs={6} style={{ textAlign: 'right' }}>
             <FormControlLabel
@@ -56,7 +94,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
                   disabled={filterItems[type].legacy}
                 />
               )}
-              label="Legacy"
+              label={text.legacy}
             />
           </Grid>
         </Grid>
@@ -79,40 +117,18 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
             )
             : (
               <>
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                >
-                  {filterItems[type].sliders.primary.map(each => (
-                    <SliderTile
-                      key={each.name}
-                      name={each.name}
-                      shortName={each.shortName}
-                      min={each.min}
-                      max={each.max}
-                      handleChange={handleChange}
-                      filterValues={filterValues}
-                      disabled={each.disabled}
-                      color="secondary"
-                    />
-                  ))}
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  {filterItems[type].sliders.secondary.map(each => (
-                    <SliderTile
-                      key={each.name}
-                      name={each.name}
-                      shortName={each.shortName}
-                      min={each.min}
-                      max={each.max}
-                      handleChange={handleChange}
-                      filterValues={filterValues}
-                      disabled={each.disabled}
-                      color="primary"
-                    />
-                  ))}
-                </Grid>
+                {Object.entries(filterItems[type].sliders).map(category => (
+                  <Grid item xs={12} sm={6} key={category[0]}>
+                    {category[1].map(each => (
+                      <SliderTile
+                        key={each.name}
+                        filterSlide={each}
+                        handleChange={handleChange}
+                        filterValues={filterValues}
+                      />
+                    ))}
+                  </Grid>
+                ))}
               </>
             )}
         </Grid>
@@ -123,38 +139,17 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
           justify="center"
           alignItems="center"
         >
-          {isMobile && (
-            <Grid item xs={2}>
-              <Typography>Size</Typography>
-            </Grid>
-          )}
-          <Grid item xs={4} sm={8}>
+          <Grid item xs={8}>
             <Size
-              isMobile={isMobile}
               filterValues={filterValues}
               handleChange={handleChange}
             />
           </Grid>
-          <Grid item xs={3} sm={2}>
-            <Button onClick={toggleAdvMenu(false)} color="primary">
-              <Typography
-                variant="caption"
-                color="primary"
-              >
-                Cancel
-              </Typography>
-            </Button>
-          </Grid>
-          <Grid item xs={3} sm={2}>
-            <Button onClick={toggleAdvMenu(false, advancedFilter.id, filterValues)} color="primary">
-              <Typography
-                variant="caption"
-                style={{ color: '#00e676' }}
-              >
-                Save
-              </Typography>
-            </Button>
-          </Grid>
+          {[reset, save].map(button => (
+            <Grid item xs={2} key={button.key}>
+              {isMobile ? button.icon : button.text}
+            </Grid>
+          ))}
         </Grid>
       </DialogActions>
     </>

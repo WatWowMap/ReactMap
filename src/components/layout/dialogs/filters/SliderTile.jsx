@@ -1,14 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Grid, Typography, Slider, TextField,
 } from '@material-ui/core'
 
 import Utility from '../../../../services/Utility'
+import { useMasterfile } from '../../../../hooks/useStore'
 
 export default function SliderTile({
-  name, shortName, filterValues, min, max, handleChange, color, disabled,
+  filterSlide: {
+    name, shortName, min, max, color, disabled,
+  }, handleChange, filterValues,
 }) {
   const [tempValues, setTempValues] = useState(filterValues[shortName])
+  const { text: { sliderInputs } } = useMasterfile(state => state.ui)
+
+  useEffect(() => {
+    setTempValues(filterValues[shortName])
+  }, [filterValues])
 
   const handleTempChange = (event) => {
     const {
@@ -41,7 +49,7 @@ export default function SliderTile({
       <Grid item xs={4}>
         <Typography>{name}</Typography>
       </Grid>
-      {['min', 'max'].map((each, index) => (
+      {sliderInputs.map((each, index) => (
         <Grid item xs={4} key={`${shortName}-${each}`}>
           <TextField
             style={{ width: 75 }}

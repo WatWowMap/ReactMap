@@ -14,7 +14,7 @@ module.exports = function buildPokemon(perms, type) {
     }
   }
   if (type === 'pokemon') {
-    ['ivOr', 'ivAnd'].forEach(global => {
+    ['ivOr', 'ivAnd', 'default'].forEach(global => {
       pokemon[global] = new PokemonFilter()
     })
   }

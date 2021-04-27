@@ -12,7 +12,7 @@ import useStyles from '../../assets/mui/styling'
 import { useMasterfile } from '../../hooks/useStore'
 
 export default function DrawerMenu({
-  drawer, toggleDrawer, globalFilters, setGlobalFilters, toggleDialog,
+  drawer, toggleDrawer, filters, setFilters, toggleDialog,
 }) {
   const classes = useStyles()
   const { filterItems, menuItems } = useMasterfile(state => state.ui)
@@ -41,16 +41,16 @@ export default function DrawerMenu({
                   onClick={toggleDialog(true, item, '', 'filters')}
                 />&nbsp;&nbsp;&nbsp;
                 <IconButton onClick={() => {
-                  setGlobalFilters({
-                    ...globalFilters,
+                  setFilters({
+                    ...filters,
                     [item]: {
-                      ...globalFilters[item],
-                      enabled: !globalFilters[item].enabled,
+                      ...filters[item],
+                      enabled: !filters[item].enabled,
                     },
                   })
                 }}
                 >
-                  {globalFilters[item].enabled
+                  {filters[item].enabled
                     ? <Check style={{ fontSize: 15, color: 'green' }} />
                     : <Clear style={{ fontSize: 15, color: 'red' }} />}
                 </IconButton>
