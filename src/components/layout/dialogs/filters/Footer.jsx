@@ -39,14 +39,12 @@ export default function FilterFooter({
 
   const openFilter = {
     key: 'openFilter',
-    icon: (isMobile
-      && (
-        <IconButton
-          onClick={toggleDrawer(true)}
-        >
-          <Ballot style={{ color: 'white' }} />
-        </IconButton>
-      )
+    icon: (
+      <IconButton
+        onClick={toggleDrawer(true)}
+      >
+        <Ballot style={{ color: 'white' }} />
+      </IconButton>
     ),
   }
 
