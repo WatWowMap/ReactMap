@@ -3,13 +3,11 @@ import {
   Grid, Typography, Slider, TextField,
 } from '@material-ui/core'
 
-import useStyles from '../../../../assets/mui/styling'
 import Utility from '../../../../services/Utility'
 
 export default function SliderTile({
   name, shortName, filterValues, min, max, handleChange, color, disabled,
 }) {
-  const classes = useStyles()
   const [tempValues, setTempValues] = useState(filterValues[shortName])
 
   const handleTempChange = (event) => {
@@ -46,7 +44,7 @@ export default function SliderTile({
       {['min', 'max'].map((each, index) => (
         <Grid item xs={4} key={`${shortName}-${each}`}>
           <TextField
-            className={classes.sliderInput}
+            style={{ width: 75 }}
             color="primary"
             id={`${shortName}-${each}`}
             label={Utility.getProperName(each)}
@@ -70,9 +68,10 @@ export default function SliderTile({
           min={min}
           max={max}
           color={color}
-          className={classes.slider}
+          style={{ width: 200 }}
           value={tempValues}
           onChange={(event, newValue) => {
+            event.target.name = shortName
             event.target.value = newValue
             handleTempChange(event)
           }}

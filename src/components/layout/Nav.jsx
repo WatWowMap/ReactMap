@@ -12,7 +12,8 @@ export default function Nav() {
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
-    name: 'none',
+    category: '',
+    type: '',
   })
 
   const toggleDrawer = (open) => (event) => {
@@ -22,24 +23,26 @@ export default function Nav() {
     setDrawer(open)
   }
 
-  const toggleDialog = (open, type, filters) => (event) => {
+  const toggleDialog = (open, type, filter, category) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
     if (open) {
-      setDialog({ open, name: type })
+      setDialog({ open, category, type })
     } else {
-      setDialog({ open })
-      setGlobalFilters({ ...globalFilters, [type]: { ...globalFilters[type], filter: filters } })
+      setDialog({ open, category: '', type: '' })
+      setGlobalFilters({ ...globalFilters, [type]: { ...globalFilters[type], filter } })
     }
   }
 
-  const DialogToRender = (name) => {
-    const DialogMenu = Dialogs[name]
+  const DialogToRender = (category, type) => {
+    const DialogMenu = Dialogs[category]
+    console.log(category, type)
     return (
       <DialogMenu
         toggleDialog={toggleDialog}
         globalFilters={globalFilters}
+        type={type}
       />
     )
   }
@@ -65,7 +68,7 @@ export default function Nav() {
         open={dialog.open}
         onClose={toggleDialog(false)}
       >
-        {dialog.open && DialogToRender(dialog.name)}
+        {dialog.open && DialogToRender(dialog.category, dialog.type)}
       </Dialog>
     </>
   )

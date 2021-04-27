@@ -1,7 +1,7 @@
 import settings from './Settings'
-import pokemon from './pokemon/Menu'
+import filters from './filters/Menu'
 
 export {
-  pokemon,
+  filters,
   settings,
 }

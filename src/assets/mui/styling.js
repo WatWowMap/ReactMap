@@ -13,9 +13,6 @@ export default makeStyles({
     width: 125,
     color: 'white',
   },
-  sliderInput: {
-    maxWidth: 75,
-  },
   formLabel: {
     color: 'white',
   },
@@ -26,9 +23,6 @@ export default makeStyles({
   filterFooter: {
     backgroundColor: theme.palette.grey.dark,
     textAlign: 'center',
-  },
-  slider: {
-    width: 200,
   },
   successButton: {
     color: theme.palette.success.main,

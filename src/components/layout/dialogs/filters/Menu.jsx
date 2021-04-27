@@ -17,12 +17,12 @@ import Utility from '../../../../services/Utility'
 
 import { useStore, useMasterfile } from '../../../../hooks/useStore'
 import useStyles from '../../../../assets/mui/styling'
-import AdvancedMenu from './AdvancedFilter'
+import Advanced from './Advanced'
 import Tile from './MenuTile'
-import FilterOptions from '../components/FilterOptions'
-import FilterFooter from '../components/FilterFooter'
+import FilterOptions from './Options'
+import FilterFooter from './Footer'
 
-export default function Menu({ globalFilters, toggleDialog }) {
+export default function Menu({ globalFilters, toggleDialog, type }) {
   const classes = useStyles()
   const url = useStore(state => state.settings).iconStyle.path
   const availableForms = useMasterfile(state => state.availableForms)
@@ -35,33 +35,35 @@ export default function Menu({ globalFilters, toggleDialog }) {
   const isMobile = breakpoint === 'xs'
 
   const [filterDrawer, setFilterDrawer] = useState(false)
-  const [tempFilters, setTempFilters] = useState(globalFilters.pokemon.filter)
+  const [tempFilters, setTempFilters] = useState(globalFilters[type].filter)
   const [advancedFilter, setAdvancedFilter] = useState({
     open: false,
+    id: '',
+    tempFilters: {},
   })
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState(false)
 
-  const { filteredPokesObj, filteredPokes } = Utility.filterPokemon(tempFilters, menus.pokemon, search)
+  const { filteredObj, filteredArr } = Utility[type](tempFilters, menus[type], search)
 
   const handleAccordion = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
   }
 
   const selectAllOrNone = (show) => {
-    Object.values(filteredPokesObj).forEach(pkmn => {
+    Object.values(filteredObj).forEach(pkmn => {
       pkmn.enabled = show
     })
-    setTempFilters({ ...tempFilters, ...filteredPokesObj })
+    setTempFilters({ ...tempFilters, ...filteredObj })
   }
 
   const handleChange = (name, event) => {
     setMenus({
       ...menus,
-      pokemon: {
-        ...menus.pokemon,
+      [type]: {
+        ...menus[type],
         [name]: {
-          ...menus.pokemon[name],
+          ...menus[type][name],
           [event.target.name]: event.target.checked,
         },
       },
@@ -90,11 +92,11 @@ export default function Menu({ globalFilters, toggleDialog }) {
       setAdvancedFilter({ open, id, tempFilters: tempFilters[id] })
     } else if (id === 'ivAnd') {
       setAdvancedFilter({ open })
-      Object.entries(filteredPokesObj).forEach(poke => {
+      Object.entries(filteredObj).forEach(poke => {
         const [key, { enabled }] = poke
-        filteredPokesObj[key] = { ...newFilters, enabled }
+        filteredObj[key] = { ...newFilters, enabled }
       })
-      setTempFilters({ ...tempFilters, ...filteredPokesObj, [id]: newFilters })
+      setTempFilters({ ...tempFilters, ...filteredObj, [id]: newFilters })
     } else {
       setAdvancedFilter({ open })
       setTempFilters({ ...tempFilters, [id]: newFilters })
@@ -103,16 +105,16 @@ export default function Menu({ globalFilters, toggleDialog }) {
 
   const handleReset = () => {
     const resetPayload = {}
-    Object.keys(menus.pokemon).forEach(category => {
+    Object.keys(menus[type]).forEach(category => {
       resetPayload[category] = {}
-      Object.keys(menus.pokemon[category]).forEach(filter => {
+      Object.keys(menus[type][category]).forEach(filter => {
         resetPayload[category][filter] = false
       })
     })
-    setMenus({ ...menus, pokemon: resetPayload })
+    setMenus({ ...menus, [type]: resetPayload })
   }
 
-  const allFilterMenus = Object.entries(menus.pokemon).map(filter => {
+  const allFilterMenus = Object.entries(menus[type]).map(filter => {
     const [category, options] = filter
     return (
       <FilterOptions
@@ -137,24 +139,21 @@ export default function Menu({ globalFilters, toggleDialog }) {
     <>
       <Dialog
         fullWidth
-        maxWidth="sm"
         open={advancedFilter.open}
         onClose={toggleAdvMenu(false)}
       >
-        <AdvancedMenu
+        <Advanced
           advancedFilter={advancedFilter}
           toggleAdvMenu={toggleAdvMenu}
+          type={type}
         />
       </Dialog>
-      <DialogTitle
-        className={classes.filterHeader}
-      >
-        Pokemon Filter Settings
+      <DialogTitle className={classes.filterHeader}>
+        {Utility.getProperName(type)} Filter Settings
       </DialogTitle>
       <DialogContent>
         <Grid
           container
-          direction="row"
           justify="space-evenly"
           alignItems="flex-start"
         >
@@ -172,15 +171,11 @@ export default function Menu({ globalFilters, toggleDialog }) {
               {allFilterMenus}
             </Grid>
           )}
-          <Grid
-            item
-            xs={12}
-            sm={9}
-          >
+          <Grid item xs={12} sm={8} md={9}>
             <Paper elevation={0} variant="outlined" className={classes.search}>
               <InputBase
                 className={classes.input}
-                placeholder="Filter Pokemon"
+                placeholder={`Filter ${Utility.getProperName(type)}`}
                 name="search"
                 value={search}
                 onChange={handleSearchChange}
@@ -204,10 +199,10 @@ export default function Menu({ globalFilters, toggleDialog }) {
                     height={height}
                     columnCount={columnCount}
                     columnWidth={width / columnCount - 5}
-                    rowCount={Math.ceil(filteredPokes.length / columnCount)}
+                    rowCount={Math.ceil(filteredArr.length / columnCount)}
                     rowHeight={columnCount > 1 ? 120 : 60}
                     itemData={{
-                      pkmn: filteredPokes,
+                      pkmn: filteredArr,
                       isMobile,
                       columnCount,
                       tempFilters,
@@ -233,6 +228,7 @@ export default function Menu({ globalFilters, toggleDialog }) {
         isMobile={isMobile}
         toggleAdvMenu={toggleAdvMenu}
         handleReset={handleReset}
+        type={type}
       />
       <Drawer
         anchor="left"

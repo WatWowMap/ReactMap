@@ -7,8 +7,8 @@ export default function filterPokemon(tempFilters, menus, search) {
     generations, types, rarity, forms, others,
   } = menus
   const tempAdvFilter = {}
-  const filteredPokes = []
-  const filteredPokesObj = {}
+  const filteredArr = []
+  const filteredObj = {}
   const searchTerms = []
   let switchKey
 
@@ -18,8 +18,8 @@ export default function filterPokemon(tempFilters, menus, search) {
   tempAdvFilter.all = Object.values(tempAdvFilter).every(val => val === true)
 
   const addPokemon = (id, name) => {
-    filteredPokes.push({ id, name })
-    filteredPokesObj[id] = { ...tempFilters[id] }
+    filteredArr.push({ id, name })
+    filteredObj[id] = { ...tempFilters[id] }
   }
 
   const typeResolver = pkmnTypes => {
@@ -104,5 +104,5 @@ export default function filterPokemon(tempFilters, menus, search) {
       }
     }
   }
-  return { filteredPokesObj, filteredPokes }
+  return { filteredObj, filteredArr }
 }

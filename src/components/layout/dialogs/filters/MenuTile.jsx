@@ -4,9 +4,9 @@ import { Grid, IconButton, Typography } from '@material-ui/core'
 import { Check, Clear, Menu } from '@material-ui/icons'
 import Utility from '../../../../services/Utility'
 
-const PokemonTile = ({
+export default function MenuTile({
   data, rowIndex, columnIndex, style,
-}) => {
+}) {
   const {
     pkmn, columnCount, tempFilters, setTempFilters, toggleAdvMenu, url, availableForms, isMobile,
   } = data
@@ -46,7 +46,7 @@ const PokemonTile = ({
     }}
     >
       {tempFilters[item.id].enabled
-        ? <Check style={{ color: 'green' }} />
+        ? <Check style={{ color: '#00e676' }} />
         : <Clear color="primary" />}
     </IconButton>
   )
@@ -93,5 +93,3 @@ const PokemonTile = ({
     </Grid>
   )
 }
-
-export default PokemonTile
