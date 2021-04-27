@@ -14,10 +14,9 @@ const PokemonTile = ({ pokemon }) => (
   </Marker>
 )
 
-const areEqual = (prevPoke, nextPoke) => (
-  prevPoke.id === nextPoke.id
-    && prevPoke.lat === nextPoke.lat
-    && prevPoke.lon === nextPoke.lon
+const areEqual = (prev, next) => (
+  prev.pokemon.id === next.pokemon.id
+    && prev.enabled === next.enabled
 )
 
 export default React.memo(PokemonTile, areEqual)

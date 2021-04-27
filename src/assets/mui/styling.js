@@ -13,9 +13,6 @@ export default makeStyles({
     width: 125,
     color: 'white',
   },
-  search: {
-    width: 160,
-  },
   sliderInput: {
     maxWidth: 75,
   },
@@ -76,5 +73,18 @@ export default makeStyles({
     display: 'flex',
     margin: '45% auto auto auto',
     backgroundColor: 'rgb(52, 52, 52)',
+  },
+  search: {
+    padding: '2px 4px',
+    display: 'flex',
+    alignItems: 'center',
+    height: 50,
+  },
+  input: {
+    marginLeft: theme.spacing(1),
+    flex: 1,
+  },
+  iconButton: {
+    padding: 10,
   },
 })

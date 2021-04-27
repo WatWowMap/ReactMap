@@ -33,6 +33,11 @@ const theme = responsiveFontSizes(createMuiTheme({
       hint: '#a0a0a0',
     },
   },
+  props: {
+    MuiButtonBase: {
+      disableRipple: true,
+    },
+  },
 }))
 
 export default theme

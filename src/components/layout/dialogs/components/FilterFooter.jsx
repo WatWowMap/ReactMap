@@ -1,55 +1,162 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
-  DialogActions, Button, Typography, IconButton, useMediaQuery,
+  Button, Typography, IconButton, Grid, Dialog,
 } from '@material-ui/core'
-import { Menu } from '@material-ui/icons'
-import { useTheme } from '@material-ui/core/styles'
-
-import useStyles from '../../../../assets/mui/styling'
+import {
+  Menu, Ballot, Check, Clear, Save, HelpOutline,
+} from '@material-ui/icons'
+import Help from './Help'
 
 export default function FilterFooter({
-  selectAllOrNone, toggleDialog, tempFilters, toggleDrawer,
+  selectAllOrNone, toggleDialog, tempFilters, toggleDrawer, isMobile, toggleAdvMenu,
 }) {
-  const classes = useStyles()
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('xs'))
+  const [helpDialog, setHelpDialog] = useState(false)
+
+  const toggleHelp = () => {
+    setHelpDialog(!helpDialog)
+  }
+
+  const help = {
+    key: 'help',
+    content: isMobile
+      ? (
+        <IconButton
+          onClick={toggleHelp}
+        >
+          <HelpOutline style={{ color: 'white' }} />
+        </IconButton>
+      )
+      : (
+        <Button onClick={toggleHelp}>
+          <Typography variant="caption">
+            Help
+          </Typography>
+        </Button>
+      ),
+  }
+
+  const openFilter = {
+    key: 'openFilter',
+    content: isMobile
+      ? (
+        <IconButton
+          onClick={toggleDrawer(true)}
+        >
+          <Ballot style={{ color: 'white' }} />
+        </IconButton>
+      )
+      : null,
+  }
+
+  const advMenu = {
+    key: 'advMenu',
+    content: isMobile
+      ? (
+        <IconButton
+          onClick={toggleAdvMenu(true, 'ivAnd')}
+        >
+          <Menu style={{ color: 'white' }} />
+        </IconButton>
+      )
+      : (
+        <Button onClick={toggleAdvMenu(true, 'ivAnd')}>
+          <Typography variant="caption">
+            Apply IV to All
+          </Typography>
+        </Button>
+      ),
+  }
+
+  const disableAll = {
+    key: 'disableAll',
+    content: isMobile
+      ? (
+        <IconButton
+          onClick={() => selectAllOrNone(false)}
+        >
+          <Clear color="primary" />
+        </IconButton>
+      )
+      : (
+        <Button
+          onClick={() => selectAllOrNone(false)}
+          color="primary"
+        >
+          <Typography variant="caption">
+            Disable All
+          </Typography>
+        </Button>
+      ),
+  }
+
+  const enableAll = {
+    key: 'enabledAll',
+    content: isMobile
+      ? (
+        <IconButton
+          onClick={() => selectAllOrNone(true)}
+        >
+          <Check style={{ color: 'green' }} />
+        </IconButton>
+      )
+      : (
+        <Button
+          onClick={() => selectAllOrNone(true)}
+          style={{ color: 'green' }}
+        >
+          <Typography variant="caption">
+            Enable All
+          </Typography>
+        </Button>
+      ),
+  }
+
+  const save = {
+    key: 'save',
+    content: isMobile
+      ? (
+        <IconButton
+          onClick={toggleDialog(false, 'pokemon', tempFilters)}
+        >
+          <Save color="secondary" />
+        </IconButton>
+      )
+      : (
+        <Button
+          onClick={toggleDialog(false, 'pokemon', tempFilters)}
+          color="secondary"
+        >
+          <Typography
+            variant="caption"
+          >
+            Save
+          </Typography>
+        </Button>
+      ),
+  }
 
   return (
-    <DialogActions className={classes.filterFooter}>
-      {isMobile
-        && (
-          <IconButton
-            onClick={toggleDrawer(true)}
-          >
-            <Menu style={{ color: 'white' }} />
-          </IconButton>
-        )}
-      <Button
-        onClick={() => selectAllOrNone(false)}
-        color="primary"
+    <>
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={helpDialog}
+        onClose={toggleHelp}
       >
-        <Typography variant="caption">
-          Deselect All
-        </Typography>
-      </Button>
-      <Button
-        onClick={() => selectAllOrNone(true)}
-        color="secondary"
+        <Help />
+      </Dialog>
+      <Grid
+        className="filter-footer"
+        container
+        justify={isMobile ? 'center' : 'flex-end'}
+        alignItems="center"
       >
-        <Typography variant="caption">
-          Select All
-        </Typography>
-      </Button>
-      <Button
-        onClick={toggleDialog(false, 'pokemon', tempFilters)}
-      >
-        <Typography
-          variant="caption"
-          className={classes.successButton}
-        >
-          Save
-        </Typography>
-      </Button>
-    </DialogActions>
+        {[help, openFilter, advMenu, disableAll, enableAll, save].map(button => (
+          <Grid item xs={2} key={button.key}>
+            {button.content}
+          </Grid>
+        ))}
+      </Grid>
+    </>
   )
 }

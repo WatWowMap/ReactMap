@@ -1,9 +1,7 @@
 import React, { useCallback } from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
-import { ThemeProvider } from '@material-ui/styles'
 
 import { useMasterfile, useStore } from '../hooks/useStore'
-import theme from '../assets/mui/theme'
 import Nav from './layout/Nav'
 import * as index from './componentIndex'
 
@@ -29,7 +27,7 @@ export default function Map() {
   }, [map])
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <TileLayer
         key={settings.tileServer.name}
         attribution={settings.tileServer.attribution}
@@ -50,6 +48,6 @@ export default function Map() {
         return ''
       })}
       <Nav />
-    </ThemeProvider>
+    </>
   )
 }

@@ -9,13 +9,13 @@ import {
   ButtonGroup,
   useMediaQuery,
   Select,
-  FormControl,
   MenuItem,
-  InputLabel,
+  TextField,
 } from '@material-ui/core'
 import { useTheme } from '@material-ui/core/styles'
 
 import { useMasterfile } from '../../../../hooks/useStore'
+import Utility from '../../../../services/Utility'
 import useStyles from '../../../../assets/mui/styling'
 import SliderTile from '../components/SliderTile'
 
@@ -24,9 +24,23 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const { filterItems: { pokemon } } = useMasterfile(state => state.ui)
+
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
+  const [error, setError] = useState({
+    status: false,
+    message: 'This filter Overrides All',
+  })
 
   const handleChange = (event, values) => {
+    if (event.target.name === 'adv') {
+      const result = event.target.value
+      if (Utility.checkAdvFilter(result) || result === '') {
+        setError({ status: false, message: 'This filter overrides all' })
+        setFilterValues({ ...filterValues, adv: result })
+      } else {
+        setError({ status: true, message: 'Invalid IV Filter' })
+      }
+    }
     if (typeof event === 'object') {
       setFilterValues({
         ...filterValues, [event.target.name]: event.target.value,
@@ -69,6 +83,23 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
     },
   ]
 
+  const advancedField = (
+    <TextField
+      error={error.status}
+      style={{ width: 225 }}
+      helperText={error.message}
+      color="secondary"
+      name="adv"
+      label="Custom"
+      value={filterValues.adv}
+      onChange={handleChange}
+      variant="outlined"
+      size="small"
+      disabled={!pokemon.iv || !pokemon.stats || pokemon.pvp}
+      fullWidth
+    />
+  )
+
   return (
     <>
       <DialogTitle style={{ color: 'white' }}>Advanced Filtering</DialogTitle>
@@ -93,10 +124,11 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
                 max={each.max}
                 handleChange={handleChange}
                 filterValues={filterValues}
-                disabled={!each.disabled}
+                disabled={!each.disabled || filterValues.adv !== ''}
                 color="secondary"
               />
             ))}
+            {!isMobile && advancedField}
           </Grid>
           <Grid
             item
@@ -112,11 +144,16 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
                 max={each.max}
                 handleChange={handleChange}
                 filterValues={filterValues}
-                disabled={!pokemon.stats}
+                disabled={!pokemon.stats || filterValues.adv !== ''}
                 color="primary"
               />
             ))}
           </Grid>
+          {isMobile && (
+            <Grid item xs={12}>
+              {advancedField}
+            </Grid>
+          )}
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -126,20 +163,25 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter }) {
           justify="center"
           alignItems="center"
         >
-          <Grid item xs={6} sm={8}>
+          {isMobile && (
+            <Grid item xs={2}>
+              <Typography>Size</Typography>
+            </Grid>
+          )}
+          <Grid item xs={4} sm={8}>
             {isMobile ? (
-              <FormControl className={classes.formControl}>
-                <InputLabel>Icon Size</InputLabel>
+              <>
                 <Select
                   name="size"
                   value={filterValues.size}
                   onChange={handleChange}
+                  style={{ width: 60 }}
                 >
                   {['sm', 'md', 'lg', 'xl'].map(size => (
                     <MenuItem key={size} value={size}>{size}</MenuItem>
                   ))}
                 </Select>
-              </FormControl>
+              </>
             )
               : (
                 <ButtonGroup>

@@ -5,13 +5,14 @@ import {
   DialogTitle,
   Drawer,
   Grid,
-  useMediaQuery,
-  TextField,
   Button,
+  Paper,
+  InputBase,
+  IconButton,
 } from '@material-ui/core'
+import { HighlightOff } from '@material-ui/icons'
 import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
-import { useTheme } from '@material-ui/core/styles'
 import Utility from '../../../../services/Utility'
 
 import { useStore, useMasterfile } from '../../../../hooks/useStore'
@@ -23,15 +24,15 @@ import FilterFooter from '../components/FilterFooter'
 
 export default function Menu({ globalFilters, toggleDialog }) {
   const classes = useStyles()
-  const theme = useTheme()
   const url = useStore(state => state.settings).iconStyle.path
   const availableForms = useMasterfile(state => state.availableForms)
   const menus = useStore(state => state.menus)
   const setMenus = useStore(state => state.setMenus)
+  const breakpoint = useMasterfile(state => state.breakpoint)
 
-  let columnCount = useMediaQuery(theme.breakpoints.up('md')) ? 5 : 3
-  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
-  if (isMobile) columnCount = 2
+  let columnCount = breakpoint === 'sm' ? 3 : 5
+  if (breakpoint === 'xs') columnCount = 1
+  const isMobile = breakpoint === 'xs'
 
   const [filterDrawer, setFilterDrawer] = useState(false)
   const [tempFilters, setTempFilters] = useState(globalFilters.pokemon.filter)
@@ -71,6 +72,9 @@ export default function Menu({ globalFilters, toggleDialog }) {
     setSearch(event.target.value.toString().toLowerCase())
   }
 
+  const resetSearch = () => {
+    setSearch('')
+  }
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
@@ -122,25 +126,7 @@ export default function Menu({ globalFilters, toggleDialog }) {
     )
   })
   allFilterMenus.push(
-    <Grid item key="search">
-      <TextField
-        className={classes.search}
-        color="secondary"
-        id="search"
-        label="Search"
-        name="search"
-        value={search}
-        onChange={handleSearchChange}
-        variant="outlined"
-      />
-    </Grid>,
     <Grid item key="reset">
-      <Button onClick={toggleAdvMenu(true, 'ivAnd')} color="secondary">
-        Set Filter for <br />
-        All Selected
-      </Button>
-    </Grid>,
-    <Grid item key="global">
       <Button onClick={handleReset} color="primary">
         Reset Filters
       </Button>
@@ -149,97 +135,112 @@ export default function Menu({ globalFilters, toggleDialog }) {
 
   return (
     <>
-      {advancedFilter.open
-        ? (
-          <Dialog
-            fullWidth
-            maxWidth="sm"
-            open={advancedFilter.open}
-            onClose={toggleAdvMenu(false)}
-          >
-            <AdvancedMenu
-              advancedFilter={advancedFilter}
-              toggleAdvMenu={toggleAdvMenu}
-            />
-          </Dialog>
-        )
-        : (
-          <>
-            <DialogTitle
-              className={classes.filterHeader}
-            >
-              Pokemon Filter Settings
-            </DialogTitle>
-            <DialogContent>
-              <Grid
-                container
-                direction="row"
-                justify="space-evenly"
-                alignItems="flex-start"
-              >
-                {!isMobile && (
-                  <Grid
-                    container
-                    item
-                    sm={4}
-                    md={3}
-                    spacing={2}
-                    direction="column"
-                    justify="flex-start"
-                    alignItems="flex-start"
-                  >
-                    {allFilterMenus}
-                  </Grid>
-                )}
-                <Grid
-                  item
-                  xs={12}
-                  sm={8}
-                  md={9}
-                  style={{ height: '74vh' }}
-                >
-                  <AutoSizer defaultHeight={1080} defaultWidth={1920}>
-                    {({ width, height }) => (
-                      <FixedSizeGrid
-                        className="grid"
-                        width={width}
-                        height={height}
-                        columnCount={columnCount}
-                        columnWidth={width / columnCount - 5}
-                        rowCount={Math.ceil(filteredPokes.length / columnCount)}
-                        rowHeight={140}
-                        itemData={{
-                          pkmn: filteredPokes,
-                          columnCount,
-                          tempFilters,
-                          setTempFilters,
-                          toggleAdvMenu,
-                          url,
-                          availableForms,
-                        }}
-                      >
-                        {Tile}
-                      </FixedSizeGrid>
-                    )}
-                  </AutoSizer>
-                </Grid>
-              </Grid>
-            </DialogContent>
-            <FilterFooter
-              selectAllOrNone={selectAllOrNone}
-              toggleDialog={toggleDialog}
-              tempFilters={tempFilters}
-              toggleDrawer={toggleDrawer}
-            />
-            <Drawer
-              anchor="left"
-              open={filterDrawer}
-              onClose={toggleDrawer(false)}
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={advancedFilter.open}
+        onClose={toggleAdvMenu(false)}
+      >
+        <AdvancedMenu
+          advancedFilter={advancedFilter}
+          toggleAdvMenu={toggleAdvMenu}
+        />
+      </Dialog>
+      <DialogTitle
+        className={classes.filterHeader}
+      >
+        Pokemon Filter Settings
+      </DialogTitle>
+      <DialogContent>
+        <Grid
+          container
+          direction="row"
+          justify="space-evenly"
+          alignItems="flex-start"
+        >
+          {!isMobile && (
+            <Grid
+              container
+              item
+              sm={4}
+              md={3}
+              spacing={2}
+              direction="column"
+              justify="flex-start"
+              alignItems="flex-start"
             >
               {allFilterMenus}
-            </Drawer>
-          </>
-        )}
+            </Grid>
+          )}
+          <Grid
+            item
+            xs={12}
+            sm={9}
+          >
+            <Paper elevation={0} variant="outlined" className={classes.search}>
+              <InputBase
+                className={classes.input}
+                placeholder="Filter Pokemon"
+                name="search"
+                value={search}
+                onChange={handleSearchChange}
+                fullWidth
+                autoComplete="off"
+                variant="outlined"
+              />
+              <IconButton
+                className={classes.iconButton}
+                onClick={resetSearch}
+              >
+                <HighlightOff style={{ color: '#848484' }} />
+              </IconButton>
+            </Paper>
+            <div style={{ height: '60vh' }}>
+              <AutoSizer defaultHeight={1080} defaultWidth={1920}>
+                {({ width, height }) => (
+                  <FixedSizeGrid
+                    className="grid"
+                    width={width}
+                    height={height}
+                    columnCount={columnCount}
+                    columnWidth={width / columnCount - 5}
+                    rowCount={Math.ceil(filteredPokes.length / columnCount)}
+                    rowHeight={columnCount > 1 ? 120 : 60}
+                    itemData={{
+                      pkmn: filteredPokes,
+                      isMobile,
+                      columnCount,
+                      tempFilters,
+                      setTempFilters,
+                      toggleAdvMenu,
+                      url,
+                      availableForms,
+                    }}
+                  >
+                    {Tile}
+                  </FixedSizeGrid>
+                )}
+              </AutoSizer>
+            </div>
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <FilterFooter
+        selectAllOrNone={selectAllOrNone}
+        toggleDialog={toggleDialog}
+        tempFilters={tempFilters}
+        toggleDrawer={toggleDrawer}
+        isMobile={isMobile}
+        toggleAdvMenu={toggleAdvMenu}
+        handleReset={handleReset}
+      />
+      <Drawer
+        anchor="left"
+        open={filterDrawer}
+        onClose={toggleDrawer(false)}
+      >
+        {allFilterMenus}
+      </Drawer>
     </>
   )
 }

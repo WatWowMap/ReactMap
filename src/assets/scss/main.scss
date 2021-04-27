@@ -27,3 +27,16 @@ body {
 .MuiToggleButton-root {
   background-color: white;
 }
+
+.grid-item {
+  width: auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.filter-footer {
+  background-color: #424242;
+  text-align: center; 
+  height: 50px;
+}

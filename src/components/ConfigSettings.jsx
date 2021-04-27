@@ -1,8 +1,11 @@
 import React from 'react'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
+import { ThemeProvider } from '@material-ui/styles'
+import { useMediaQuery } from '@material-ui/core'
 import { useStore, useMasterfile } from '../hooks/useStore'
 import Map from './Map'
+import theme from '../assets/mui/theme'
 
 export default function ConfigSettings({ serverSettings }) {
   const setConfig = useStore(state => state.setConfig)
@@ -14,6 +17,7 @@ export default function ConfigSettings({ serverSettings }) {
   const setAvailableForms = useMasterfile(state => state.setAvailableForms)
   const setMasterfile = useMasterfile(state => state.setMasterfile)
   const setUi = useMasterfile(state => state.setUi)
+  const setBreakpoint = useMasterfile(state => state.setBreakpoint)
 
   const updateObjState = (defaults, category) => {
     const localState = JSON.parse(localStorage.getItem('local-state'))
@@ -33,6 +37,11 @@ export default function ConfigSettings({ serverSettings }) {
     return defaults
   }
 
+  let screenSize = 'xs'
+  if (useMediaQuery(theme.breakpoints.only('sm'))) screenSize = 'sm'
+  if (useMediaQuery(theme.breakpoints.up('md'))) screenSize = 'md'
+
+  setBreakpoint(screenSize)
   setUi(serverSettings.ui)
   setConfig(serverSettings.config)
   setMasterfile(serverSettings.masterfile)
@@ -47,13 +56,15 @@ export default function ConfigSettings({ serverSettings }) {
   const zoom = updatePositionState(serverSettings.config.map.startZoom, 'zoom')
 
   return (
-    <MapContainer
-      center={startLocation}
-      zoom={zoom}
-      zoomControl={false}
-      preferCanvas
-    >
-      <Map />
-    </MapContainer>
+    <ThemeProvider theme={theme}>
+      <MapContainer
+        center={startLocation}
+        zoom={zoom}
+        zoomControl={false}
+        preferCanvas
+      >
+        <Map />
+      </MapContainer>
+    </ThemeProvider>
   )
 }

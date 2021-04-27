@@ -29,6 +29,8 @@ const useMasterfile = create(set => ({
   setPerms: (perms) => set({ perms }),
   masterfile: {},
   setMasterfile: (masterfile) => set({ masterfile }),
+  breakpoint: false,
+  setBreakpoint: (breakpoint) => set({ breakpoint }),
 }))
 
 export { useStore, useMasterfile }

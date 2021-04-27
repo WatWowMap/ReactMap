@@ -16,6 +16,7 @@ module.exports = function buildPokemon(perms, type) {
           def: [0, 15],
           sta: [0, 15],
           level: [1, 35],
+          adv: '',
         }
       } else if (perms) {
         pokemon[`${i}-${j}`] = {
@@ -37,6 +38,7 @@ module.exports = function buildPokemon(perms, type) {
         def: [0, 15],
         sta: [0, 15],
         level: [1, 35],
+        adv: '',
       }
     })
   }
