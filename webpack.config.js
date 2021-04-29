@@ -4,17 +4,14 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
-const appRoot = require('app-root-path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const emoji = require('node-emoji');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
-const DotenvPlugin = require('webpack-dotenv-plugin');
 const resolve = require('./webpack.config.resolve.js');
 
 module.exports = (env) => {
   const isDevelopment = env.dev;
-
   return {
     mode: isDevelopment ? 'development' : 'production',
     entry: './src/index.jsx',
@@ -106,10 +103,6 @@ module.exports = (env) => {
     resolve,
     plugins: (() => {
       const plugins = [
-        new DotenvPlugin({
-          sample: `${appRoot}/.env.example`,
-          path: `${appRoot}/.env.example`,
-        }),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
           template: './public/index.template.html',
