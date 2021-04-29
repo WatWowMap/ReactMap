@@ -3,18 +3,20 @@ import Dialog from '@material-ui/core/Dialog'
 
 import { useStore } from '../../hooks/useStore'
 import FloatingBtn from './FloatingBtn'
-import Drawer from './Drawer'
+import Drawer from './drawer/Main'
 import * as Dialogs from './dialogs/dialogIndex'
 
 export default function Nav() {
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
-  const [drawer, setDrawer] = useState(false)
+  const [drawer, setDrawer] = useState(true)
   const [dialog, setDialog] = useState({
     open: false,
     category: '',
     type: '',
   })
+
+  console.log('hi')
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {

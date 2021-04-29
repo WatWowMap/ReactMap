@@ -1,6 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 module.exports = function generateUi(filters, perms) {
   const filterItems = {}
+  const adminItems = {}
+  const wayfarerItems = {}
   const text = {
     save: 'Save',
     reset: 'Reset',
@@ -15,15 +17,16 @@ module.exports = function generateUi(filters, perms) {
     sizes: ['sm', 'md', 'lg', 'xl'],
     sliderInputs: ['min', 'max'],
   }
+
   for (const [key, value] of Object.entries(filters)) {
     if (value) {
-      filterItems[key] = {}
       let sliders
       let secondary = []
 
       switch (key) {
         default: filterItems[key] = true; break
         case 'pokemon':
+          filterItems[key] = {}
           secondary = ['iv', 'stats', 'pvp']
           sliders = {
             primary: [
@@ -53,9 +56,17 @@ module.exports = function generateUi(filters, perms) {
             ],
           }; break
         case 'pokestops':
+          filterItems[key] = {}
           secondary = ['pokestops', 'lures', 'quests', 'invasions']; break
         case 'gyms':
+          filterItems[key] = {}
           secondary = ['gyms', 'raids']; break
+        case 'weather': filterItems[key] = true; break
+        case 'submissionCells':
+        case 'portals': wayfarerItems[key] = true; break
+        case 'spawnpoints':
+        case 's2Cells':
+        case 'devices': adminItems[key] = true; break
       }
       secondary.forEach(perm => {
         if (perms[perm]) filterItems[key][perm] = true
@@ -72,8 +83,12 @@ module.exports = function generateUi(filters, perms) {
     }
   }
   filterItems.pokemon.legacy = !Object.values(filterItems.pokemon).length > 0
+  // adminItems.enabled = Object.values(adminItems).length > 0
+  // wayfarerItems.enabled = Object.values(wayfarerItems).length > 0
 
   const menuItems = ['settings']
 
-  return { filterItems, menuItems, text }
+  return {
+    filterItems, menuItems, text, adminItems, wayfarerItems,
+  }
 }

@@ -21,7 +21,6 @@ export default function PokemonQuery({ bounds, filters, onMove }) {
       ...bounds, filters: trimmedFilters,
     },
   })
-
   const refetchPokemon = () => {
     onMove()
     const mapBounds = map.getBounds()

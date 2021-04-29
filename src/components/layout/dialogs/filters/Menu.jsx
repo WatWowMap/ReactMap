@@ -197,7 +197,7 @@ export default function Menu({ filters, toggleDialog, type }) {
                 <HighlightOff style={{ color: '#848484' }} />
               </IconButton>
             </Paper>
-            <div style={{ height: '60vh' }}>
+            <div style={{ height: '73vh' }}>
               <AutoSizer defaultHeight={1080} defaultWidth={1920}>
                 {({ width, height }) => (
                   <FixedSizeGrid
