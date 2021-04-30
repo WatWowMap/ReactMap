@@ -11,7 +11,7 @@ export default function Map() {
   const settings = useStore(state => state.settings)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
-  const { menus: { filterItems } } = useMasterfile(state => state.ui)
+  const { menus } = useMasterfile(state => state.ui)
 
   const initialBounds = {
     minLat: map.getBounds()._southWest.lat - 0.01,
@@ -29,10 +29,11 @@ export default function Map() {
   return (
     <>
       <TileLayer
+        key={settings.tileServers.name}
         attribution={settings.tileServers.attribution}
         url={settings.tileServers.url}
       />
-      {Object.keys(filterItems).map(item => {
+      {Object.keys({ ...menus.filterItems, ...menus.wayfarer, ...menus.admin }).map(item => {
         const Component = index[item]
         let enabled = false
         if (item === 'gyms' && (filters[item].gyms || filters[item].raids)) {
