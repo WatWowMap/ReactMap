@@ -1,15 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
-  Drawer, Button, List, ListItem, ListItemText, Typography, Accordion, AccordionSummary, AccordionDetails, Grid,
+  Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid,
 } from '@material-ui/core'
-import {
-  ArrowForwardIos, ExpandMore,
-} from '@material-ui/icons'
+import { ExpandMore } from '@material-ui/icons'
 
-import Poi from './Poi'
-import Pokemon from './Pokemon'
-import Weather from './Weather'
-import Secondary from './Secondary'
+import Settings from './Settings'
+import WithSubItems from './WithSubItems'
+import WithSliders from './WithSliders'
+import SingularItem from './SingularItem'
 import Utility from '../../../services/Utility'
 import useStyles from '../../../assets/mui/styling'
 import { useMasterfile } from '../../../hooks/useStore'
@@ -18,23 +16,26 @@ export default function DrawerMenu({
   drawer, toggleDrawer, filters, setFilters, toggleDialog,
 }) {
   const classes = useStyles()
-  const {
-    filterItems, menuItems, adminItems, wayfarerItems,
-  } = useMasterfile(state => state.ui)
-
-  const [expanded, setExpanded] = React.useState('pokemon')
+  const { menus } = useMasterfile(state => state.ui)
+  const newObj = {
+    ...menus.filterItems,
+    wayfarer: menus.wayfarer,
+    admin: menus.admin,
+    settings: menus.settings,
+  }
+  const [expanded, setExpanded] = useState(false)
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
   }
 
-  const primaryContent = Object.keys(filterItems).map(category => {
+  const drawerItems = Object.keys(newObj).map(category => {
     let content
     switch (category) {
       default:
         content = (
-          Object.keys(filterItems[category]).map(subItem => (
-            <Poi
+          Object.keys(newObj[category]).map(subItem => (
+            <WithSubItems
               key={`${category}-${subItem}`}
               category={category}
               filters={filters}
@@ -45,8 +46,10 @@ export default function DrawerMenu({
         ); break
       case 'pokemon':
         content = (
-          <Pokemon
-            filterItems={filterItems}
+          <WithSliders
+            category={category}
+            context={newObj[category]}
+            specificFilter="ivOr"
             filters={filters}
             setFilters={setFilters}
             handleChange={handleChange}
@@ -55,11 +58,16 @@ export default function DrawerMenu({
         ); break
       case 'weather':
         content = (
-          <Weather
+          <SingularItem
+            category={category}
             filters={filters}
             setFilters={setFilters}
           />
         ); break
+      case 'settings':
+        content = (
+          <Settings />
+        )
     }
     return (
       <Accordion
@@ -84,14 +92,17 @@ export default function DrawerMenu({
             alignItems="center"
           >
             {content}
+            {(category !== 'settings' && category !== 'weather')
+            && (
             <Grid item xs={6}>
               <Button
-                onClick={toggleDialog(true, category, '', 'filters')}
+                onClick={toggleDialog(true, category)}
                 variant="contained"
               >
                 Advanced
               </Button>
             </Grid>
+            )}
           </Grid>
         </AccordionDetails>
       </Accordion>
@@ -100,34 +111,7 @@ export default function DrawerMenu({
 
   return (
     <Drawer anchor="left" open={drawer} onClose={toggleDrawer(false)} classes={{ paper: classes.drawer }}>
-      {primaryContent}
-
-      {[wayfarerItems, adminItems].map((each, index) => {
-        const title = index ? 'admin' : 'wayfarer'
-        return (
-          <Secondary
-            key={title}
-            expanded={expanded}
-            title={title}
-            handleChange={handleChange}
-            classes={classes}
-            filters={filters}
-            setFilters={setFilters}
-            each={each}
-          />
-        )
-      })}
-      <List>
-        {menuItems.map(item => (
-          <ListItem button key={item}>
-            <ArrowForwardIos />
-            <ListItemText
-              primary={Utility.getProperName(item)}
-              onClick={toggleDialog(true, item, '', 'settings')}
-            />
-          </ListItem>
-        ))}
-      </List>
+      {drawerItems}
     </Drawer>
   )
 }

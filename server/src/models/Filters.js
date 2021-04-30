@@ -18,7 +18,6 @@ class PokemonFilter extends GenericFilter {
     this.sta = [0, 15]
     this.level = [1, 35]
     this.adv = ''
-    this.legacy = false
   }
 }
 

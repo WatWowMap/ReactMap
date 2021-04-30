@@ -1,4 +1,4 @@
-import settings from './Settings'
+import settings from '../drawer/Settings'
 import filters from './filters/Menu'
 
 export {

@@ -9,7 +9,7 @@ import {
 import Help from '../help/Filters'
 import { useMasterfile } from '../../../../hooks/useStore'
 
-export default function FilterFooter({
+export default function Footer({
   selectAllOrNone, toggleDialog, tempFilters, toggleDrawer, isMobile, toggleAdvMenu, type,
 }) {
   const { text } = useMasterfile(state => state.ui)

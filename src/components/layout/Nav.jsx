@@ -3,20 +3,17 @@ import Dialog from '@material-ui/core/Dialog'
 
 import { useStore } from '../../hooks/useStore'
 import FloatingBtn from './FloatingBtn'
-import Drawer from './drawer/Main'
-import * as Dialogs from './dialogs/dialogIndex'
+import Drawer from './drawer/Drawer'
+import Menu from './dialogs/filters/Menu'
 
 export default function Nav() {
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
-  const [drawer, setDrawer] = useState(true)
+  const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
-    category: '',
     type: '',
   })
-
-  console.log('hi')
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -25,27 +22,16 @@ export default function Nav() {
     setDrawer(open)
   }
 
-  const toggleDialog = (open, type, filter, category) => (event) => {
+  const toggleDialog = (open, type, filter) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
     if (open) {
-      setDialog({ open, category, type })
+      setDialog({ open, type })
     } else {
-      setDialog({ open, category: '', type: '' })
-      setFilters({ ...filters, [type]: { ...filters[type], filter } })
+      setDialog({ open, type })
     }
-  }
-
-  const DialogToRender = (category, type) => {
-    const DialogMenu = Dialogs[category]
-    return (
-      <DialogMenu
-        toggleDialog={toggleDialog}
-        filters={filters}
-        type={type}
-      />
-    )
+    if (filter) setFilters({ ...filters, [type]: { ...filters[type], filter } })
   }
 
   return (
@@ -67,9 +53,13 @@ export default function Nav() {
         fullWidth
         maxWidth="md"
         open={dialog.open}
-        onClose={toggleDialog(false)}
+        onClose={toggleDialog(false, dialog.type)}
       >
-        {dialog.open && DialogToRender(dialog.category, dialog.type)}
+        <Menu
+          toggleDialog={toggleDialog}
+          filters={filters[dialog.type]}
+          type={dialog.type}
+        />
       </Dialog>
     </>
   )

@@ -13,14 +13,16 @@ import {
 import { Save, Replay } from '@material-ui/icons'
 
 import StringFilter from './StringFilter'
-import { useMasterfile } from '../../../../hooks/useStore'
+import { useStore, useMasterfile } from '../../../../hooks/useStore'
 import SliderTile from './SliderTile'
 import Size from './Size'
 
 export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) {
   const isMobile = useMasterfile(state => state.breakpoint) === 'xs'
-  const { filterItems, text } = useMasterfile(state => state.ui)
+  const { menus: { filterItems }, text } = useMasterfile(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
+  const filters = useStore(state => state.filters)
+  const setFilters = useStore(state => state.setFilters)
 
   const handleChange = (event, values) => {
     if (typeof event === 'object') {
@@ -34,7 +36,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
   }
 
   const handleLegacySwitch = () => {
-    setFilterValues({ ...filterValues, legacy: !filterValues.legacy })
+    setFilters({ ...filters, [type]: { ...filters[type], legacy: !filters[type].legacy } })
   }
 
   const reset = {
@@ -87,7 +89,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
             <FormControlLabel
               control={(
                 <Switch
-                  checked={filterValues.legacy}
+                  checked={filters[type].legacy}
                   onChange={handleLegacySwitch}
                   name="adv"
                   color="secondary"
@@ -106,7 +108,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
           justify="center"
           alignItems="center"
         >
-          {filterValues.legacy
+          {filters[type].legacy
             ? (
               <Grid item xs={12}>
                 <StringFilter

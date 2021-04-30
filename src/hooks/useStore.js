@@ -6,8 +6,6 @@ const useStore = create(persist(set => ({
   setLocation: (location) => set({ location }),
   zoom: undefined,
   setZoom: (zoom) => set({ zoom }),
-  config: undefined,
-  setConfig: (config) => set({ config }),
   filters: undefined,
   setFilters: (filters) => set({ filters }),
   settings: undefined,
@@ -21,6 +19,8 @@ const useStore = create(persist(set => ({
 }))
 
 const useMasterfile = create(set => ({
+  config: undefined,
+  setConfig: (config) => set({ config }),
   availableForms: undefined,
   setAvailableForms: (availableForms) => set({ availableForms }),
   ui: {},

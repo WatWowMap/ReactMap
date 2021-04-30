@@ -1,27 +1,23 @@
 import React from 'react'
-import {
-  Grid, Typography, Switch,
-} from '@material-ui/core'
+import { Grid, Typography, Switch } from '@material-ui/core'
 
-import Utility from '../../../services/Utility'
-
-export default function Pokemon({
-  category, filters, setFilters, subItem,
-}) {
+export default function SingularItem({ category, filters, setFilters }) {
   return (
     <>
       <Grid item xs={6}>
-        <Typography>{Utility.getProperName(subItem)}</Typography>
+        <Typography>
+          Enabled
+        </Typography>
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         <Switch
-          checked={filters[category][subItem]}
+          checked={filters[category].enabled}
           onChange={() => {
             setFilters({
               ...filters,
               [category]: {
                 ...filters[category],
-                [subItem]: !filters[category][subItem],
+                enabled: !filters[category].enabled,
               },
             })
           }}
