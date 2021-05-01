@@ -8,8 +8,9 @@ import PokemonTile from './PokemonTile'
 
 export default function PokemonQuery({ bounds, filters, onMove }) {
   const map = useMap()
-  const trimmedFilters = {}
-
+  const trimmedFilters = {
+    ivOr: filters.pokemon.filter.ivOr,
+  }
   Object.entries(filters.pokemon.filter).forEach(filter => {
     const [id, specifics] = filter
     if (specifics && specifics.enabled) {
