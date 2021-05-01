@@ -10,43 +10,38 @@ class Pokemon extends Model {
 
   static async getPokemon(args) {
     const ts = Math.floor((new Date()).getTime() / 1000)
+    const standard = args.filters.default
+    const keys = ['iv', 'level', 'atk', 'def', 'sta']
+
     let query = `this.query()
         .where("expire_timestamp", ">=", ${ts})
         .andWhereBetween("lat", [${args.minLat}, ${args.maxLat}])
         .andWhereBetween("lon", [${args.minLon}, ${args.maxLon}])`
 
-    for (const [pkmn, filter] of Object.entries(args.filters)) {
-      const {
-        iv, level, atk, def, sta,
-      } = filter
-      const base = `.andWhereBetween("level", [${level}])
-        .andWhereBetween("atk_iv", [${atk}])
-        .andWhereBetween("def_iv", [${def}])
-        .andWhereBetween("sta_iv", [${sta}])`
+    const arrayCheck = (filter) => filter.every((v, i) => v === standard[i])
 
-      if (pkmn === 'ivOr') {
-        query += `
-          .andWhere(builder => {
-            builder.whereBetween("iv", [${iv}])
-            ${base}`
-      } else {
-        const pokemonId = pkmn.split('-')[0]
-        query += `
-          .orWhere(builder => {
-            builder.where("pokemon_id", ${pokemonId})
-              .andWhereBetween("iv", [${filter.iv}])
-            ${base}})`
-      }
+    const generateSql = (filter, type) => {
+      let sql = ''
+      keys.forEach(key => {
+        switch (key) {
+          default:
+            if (!arrayCheck(filter[key])) sql += `.andWhereBetween("${key}_iv", [${filter[key]}])`; break
+          case 'iv':
+            if (!arrayCheck(filter[key]) && type) sql += `.andWhereBetween("${key}", [${filter[key]}])`; break
+          case 'level':
+            if (!arrayCheck(filter[key])) sql += `.andWhereBetween("${key}", [${filter[key]}])`; break
+        }
+      })
+      return sql
     }
-    query += '})'
-    const results = await eval(query)
-    const { length } = results
-    const {
-      iv, level, atk, def, sta,
-    } = args.filters.ivOr
 
     const secondaryFilter = queryResults => {
+      const { length } = results
+      const {
+        iv, level, atk, def, sta,
+      } = args.filters.ivOr
       const filteredResults = []
+
       for (let i = 0; i < length; i += 1) {
         const pkmn = queryResults[i]
         if (pkmn.form === 0) {
@@ -66,6 +61,23 @@ class Pokemon extends Model {
       }
       return filteredResults
     }
+
+    for (const [pkmn, filter] of Object.entries(args.filters)) {
+      if (pkmn === 'ivOr') {
+        query += `
+          .andWhere(builder => {
+            builder.whereBetween("iv", [${filter.iv}])
+              ${generateSql(filter)}`
+      } else if (pkmn !== 'default') {
+        query += `
+          .orWhere(builder => {
+            builder.where("pokemon_id", ${pkmn.split('-')[0]})
+              ${generateSql(filter, pkmn)}})`
+      }
+    }
+    query += '})'
+
+    const results = await eval(query)
     return secondaryFilter(results)
   }
 }
