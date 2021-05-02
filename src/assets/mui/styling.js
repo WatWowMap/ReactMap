@@ -33,10 +33,6 @@ export default makeStyles({
     margin: 'auto',
     width: 'fit-content',
   },
-  formControlSettings: {
-    marginTop: theme.spacing(2),
-    minWidth: 120,
-  },
   formControlLabel: {
     marginTop: theme.spacing(1),
   },

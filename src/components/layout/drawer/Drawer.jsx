@@ -1,0 +1,117 @@
+import React, { useState } from 'react'
+import {
+  Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid,
+} from '@material-ui/core'
+import { ExpandMore } from '@material-ui/icons'
+
+import Settings from './Settings'
+import WithSubItems from './WithSubItems'
+import WithSliders from './WithSliders'
+import SingularItem from './SingularItem'
+import Utility from '../../../services/Utility'
+import useStyles from '../../../assets/mui/styling'
+import { useMasterfile } from '../../../hooks/useStore'
+
+export default function DrawerMenu({
+  drawer, toggleDrawer, filters, setFilters, toggleDialog,
+}) {
+  const classes = useStyles()
+  const { menus } = useMasterfile(state => state.ui)
+  const newObj = {
+    ...menus.filterItems,
+    wayfarer: menus.wayfarer,
+    admin: menus.admin,
+    settings: menus.settings,
+  }
+  const [expanded, setExpanded] = useState(false)
+
+  const handleChange = (panel) => (event, isExpanded) => {
+    setExpanded(isExpanded ? panel : false)
+  }
+
+  const drawerItems = Object.keys(newObj).map(category => {
+    let content
+    switch (category) {
+      default:
+        content = (
+          Object.keys(newObj[category]).map(subItem => (
+            <WithSubItems
+              key={`${category}-${subItem}`}
+              category={category}
+              filters={filters}
+              setFilters={setFilters}
+              subItem={subItem}
+            />
+          ))
+        ); break
+      case 'pokemon':
+        content = (
+          <WithSliders
+            category={category}
+            context={newObj[category]}
+            specificFilter="ivOr"
+            filters={filters}
+            setFilters={setFilters}
+            handleChange={handleChange}
+            toggleDialog={toggleDialog}
+          />
+        ); break
+      case 'weather':
+        content = (
+          <SingularItem
+            category={category}
+            filters={filters}
+            setFilters={setFilters}
+          />
+        ); break
+      case 'settings':
+        content = (
+          <Settings />
+        )
+    }
+    return (
+      <Accordion
+        key={category}
+        expanded={expanded === category}
+        onChange={handleChange(category)}
+      >
+        <AccordionSummary
+          expandIcon={<ExpandMore style={{ color: 'white' }} />}
+        >
+          <Typography className={classes.heading}>
+            {Utility.getProperName(category)}
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Grid
+            container
+            style={{ width: 300 }}
+            spacing={3}
+            direction="row"
+            justify="center"
+            alignItems="center"
+          >
+            {content}
+            {(category !== 'settings' && category !== 'weather')
+            && (
+            <Grid item xs={6}>
+              <Button
+                onClick={toggleDialog(true, category)}
+                variant="contained"
+              >
+                Advanced
+              </Button>
+            </Grid>
+            )}
+          </Grid>
+        </AccordionDetails>
+      </Accordion>
+    )
+  })
+
+  return (
+    <Drawer anchor="left" open={drawer} onClose={toggleDrawer(false)} classes={{ paper: classes.drawer }}>
+      {drawerItems}
+    </Drawer>
+  )
+}

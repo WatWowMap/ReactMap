@@ -28,9 +28,9 @@ export default function questMarker(pokestop) {
     iconUrl = '/images/item/-5.png'
   } else if (type === 7 && info !== undefined) {
     // Pokemon
-    const url = useStore(state => state.settings).iconStyle.path
+    const { path } = useStore(state => state.settings).icons
     const availableForms = useMasterfile(state => state.availableForms)
-    iconUrl = `${url}/${Utility.getPokemonIcon(availableForms, info.pokemon_id, info.form_id, 0, info.gender_id, info.costume_id, info.shiny)}.png`
+    iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, info.pokemon_id, info.form_id, 0, info.gender_id, info.costume_id, info.shiny)}.png`
   } else if (type === 8) {
     // Pokecoin
     iconUrl = '/images/item/-6.png'

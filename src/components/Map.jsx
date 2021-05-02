@@ -11,13 +11,13 @@ export default function Map() {
   const settings = useStore(state => state.settings)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
-  const { filterItems } = useMasterfile(state => state.ui)
+  const { menus } = useMasterfile(state => state.ui)
 
   const initialBounds = {
-    minLat: map.getBounds()._southWest.lat,
-    maxLat: map.getBounds()._northEast.lat,
-    minLon: map.getBounds()._southWest.lng,
-    maxLon: map.getBounds()._northEast.lng,
+    minLat: map.getBounds()._southWest.lat - 0.01,
+    maxLat: map.getBounds()._northEast.lat + 0.01,
+    minLon: map.getBounds()._southWest.lng - 0.01,
+    maxLon: map.getBounds()._northEast.lng + 0.01,
   }
 
   const onMove = useCallback(() => {
@@ -29,13 +29,21 @@ export default function Map() {
   return (
     <>
       <TileLayer
-        key={settings.tileServer.name}
-        attribution={settings.tileServer.attribution}
-        url={settings.tileServer.url}
+        key={settings.tileServers.name}
+        attribution={settings.tileServers.attribution}
+        url={settings.tileServers.url}
       />
-      {Object.keys(filterItems).map(item => {
+      {Object.keys({ ...menus.filterItems, ...menus.wayfarer, ...menus.admin }).map(item => {
         const Component = index[item]
-        if (filters[item].enabled) {
+        let enabled = false
+        if (item === 'gyms' && (filters[item].gyms || filters[item].raids)) {
+          enabled = true
+        } else if (item === 'pokestops' && (filters[item].pokestops || filters[item].lures || filters[item].invasions || filters[item].quests)) {
+          enabled = true
+        } else if (filters[item].enabled) {
+          enabled = true
+        }
+        if (enabled) {
           return (
             <Component
               key={item}

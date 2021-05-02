@@ -8,7 +8,7 @@ export default function MenuTile({
   data, rowIndex, columnIndex, style,
 }) {
   const {
-    pkmn, columnCount, tempFilters, setTempFilters, toggleAdvMenu, url, availableForms, isMobile,
+    pkmn, columnCount, tempFilters, setTempFilters, toggleAdvMenu, path, availableForms, isMobile,
   } = data
 
   const item = pkmn[rowIndex * columnCount + columnIndex]
@@ -30,7 +30,7 @@ export default function MenuTile({
       className="grid-item"
       style={{
         height: isMobile ? 50 : 75,
-        backgroundImage: `url(${url}/${Utility.getPokemonIcon(availableForms, ...item.id.split('-'))}.png)`,
+        backgroundImage: `url(${path}/${Utility.getPokemonIcon(availableForms, ...item.id.split('-'))}.png)`,
       }}
     />
   )

@@ -35,8 +35,8 @@ rootRouter.get('/settings', async (req, res) => {
           icons: config.icons,
         },
         settings: {
-          iconStyle: config.icons.Default,
-          tileServer: config.tileServers.Default,
+          icons: config.icons.Default,
+          tileServers: config.tileServers.Default,
         },
         masterfile,
         defaultFilters: await Utility.buildDefaultFilters(user.perms),

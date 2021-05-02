@@ -58,8 +58,10 @@ const RootQuery = new GraphQLObjectType({
         ...minMaxArgs,
         filters: { type: JSONResolver },
       },
-      async resolve(parent, args) {
-        return await Pokemon.getPokemon(args)
+      async resolve(parent, args, req) {
+        if (req.user.perms.pokemon) {
+          return await Pokemon.getPokemon(args, req.user.perms)
+        }
       },
     },
     pokemonDetails: {

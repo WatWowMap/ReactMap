@@ -8,12 +8,13 @@ import Map from './Map'
 import theme from '../assets/mui/theme'
 
 export default function ConfigSettings({ serverSettings }) {
-  const setConfig = useStore(state => state.setConfig)
   const setSettings = useStore(state => state.setSettings)
   const setFilters = useStore(state => state.setFilters)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
   const setMenus = useStore(state => state.setMenus)
+
+  const setConfig = useMasterfile(state => state.setConfig)
   const setAvailableForms = useMasterfile(state => state.setAvailableForms)
   const setMasterfile = useMasterfile(state => state.setMasterfile)
   const setUi = useMasterfile(state => state.setUi)
@@ -50,7 +51,7 @@ export default function ConfigSettings({ serverSettings }) {
   setSettings(updateObjState(serverSettings.settings, 'settings'))
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
   setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
-  setAvailableForms((new Set(serverSettings.settings.iconStyle.pokemonList)), 'availableForms')
+  setAvailableForms((new Set(serverSettings.settings.icons.pokemonList)), 'availableForms')
 
   const startLocation = updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
   const zoom = updatePositionState(serverSettings.config.map.startZoom, 'zoom')

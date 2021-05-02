@@ -1,6 +1,11 @@
 /* eslint-disable no-restricted-syntax */
 module.exports = function generateUi(filters, perms) {
-  const filterItems = {}
+  const menus = {
+    filterItems: {},
+    wayfarer: {},
+    admin: {},
+    settings: {},
+  }
   const text = {
     save: 'Save',
     reset: 'Reset',
@@ -15,15 +20,16 @@ module.exports = function generateUi(filters, perms) {
     sizes: ['sm', 'md', 'lg', 'xl'],
     sliderInputs: ['min', 'max'],
   }
+
   for (const [key, value] of Object.entries(filters)) {
     if (value) {
-      filterItems[key] = {}
       let sliders
       let secondary = []
 
       switch (key) {
-        default: filterItems[key] = true; break
+        default: menus.filterItems[key] = true; break
         case 'pokemon':
+          menus.filterItems[key] = {}
           secondary = ['iv', 'stats', 'pvp']
           sliders = {
             primary: [
@@ -53,15 +59,22 @@ module.exports = function generateUi(filters, perms) {
             ],
           }; break
         case 'pokestops':
+          menus.filterItems[key] = {}
           secondary = ['pokestops', 'lures', 'quests', 'invasions']; break
         case 'gyms':
+          menus.filterItems[key] = {}
           secondary = ['gyms', 'raids']; break
+        case 'submissionCells':
+        case 'portals': menus.wayfarer[key] = true; break
+        case 'spawnpoints':
+        case 's2Cells':
+        case 'devices': menus.admin[key] = true; break
       }
       secondary.forEach(perm => {
-        if (perms[perm]) filterItems[key][perm] = true
+        if (perms[perm]) menus.filterItems[key][perm] = true
       })
       if (sliders) {
-        filterItems[key].sliders = sliders
+        menus.filterItems[key].sliders = sliders
         Object.keys(sliders).forEach(category => {
           sliders[category].forEach(slider => {
             slider.disabled = !perms[slider.perm]
@@ -71,9 +84,13 @@ module.exports = function generateUi(filters, perms) {
       }
     }
   }
-  filterItems.pokemon.legacy = !Object.values(filterItems.pokemon).length > 0
+  menus.filterItems.pokemon.legacy = !Object.values(menus.filterItems.pokemon).length > 0
+  // adminItems.enabled = Object.values(adminItems).length > 0
+  // wayfarerItems.enabled = Object.values(wayfarerItems).length > 0
 
-  const menuItems = ['settings']
+  menus.settings = true
 
-  return { filterItems, menuItems, text }
+  return {
+    menus, text,
+  }
 }

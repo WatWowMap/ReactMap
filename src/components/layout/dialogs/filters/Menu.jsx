@@ -20,11 +20,11 @@ import useStyles from '../../../../assets/mui/styling'
 import Advanced from './Advanced'
 import Tile from './MenuTile'
 import FilterOptions from './Options'
-import FilterFooter from './Footer'
+import Footer from './Footer'
 
 export default function Menu({ filters, toggleDialog, type }) {
   const classes = useStyles()
-  const url = useStore(state => state.settings).iconStyle.path
+  const { path } = useStore(state => state.settings).icons
   const availableForms = useMasterfile(state => state.availableForms)
   const menus = useStore(state => state.menus)
   const setMenus = useStore(state => state.setMenus)
@@ -36,12 +36,12 @@ export default function Menu({ filters, toggleDialog, type }) {
   const isMobile = breakpoint === 'xs'
 
   const [filterDrawer, setFilterDrawer] = useState(false)
-  const [tempFilters, setTempFilters] = useState(filters[type].filter)
+  const [tempFilters, setTempFilters] = useState(filters.filter)
   const [advancedFilter, setAdvancedFilter] = useState({
     open: false,
     id: '',
     tempFilters: {},
-    default: filters[type].filter.default,
+    default: filters.filter.default,
   })
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState(false)
@@ -95,7 +95,7 @@ export default function Menu({ filters, toggleDialog, type }) {
         open,
         id,
         tempFilters: tempFilters[id],
-        default: filters[type].filter.default,
+        default: filters.filter.default,
       })
     } else if (id === 'ivAnd') {
       setAdvancedFilter({ open })
@@ -153,6 +153,7 @@ export default function Menu({ filters, toggleDialog, type }) {
           advancedFilter={advancedFilter}
           toggleAdvMenu={toggleAdvMenu}
           type={type}
+          legacy={filters.legacy}
         />
       </Dialog>
       <DialogTitle className={classes.filterHeader}>
@@ -197,7 +198,7 @@ export default function Menu({ filters, toggleDialog, type }) {
                 <HighlightOff style={{ color: '#848484' }} />
               </IconButton>
             </Paper>
-            <div style={{ height: '60vh' }}>
+            <div style={{ height: '73vh' }}>
               <AutoSizer defaultHeight={1080} defaultWidth={1920}>
                 {({ width, height }) => (
                   <FixedSizeGrid
@@ -215,7 +216,7 @@ export default function Menu({ filters, toggleDialog, type }) {
                       tempFilters,
                       setTempFilters,
                       toggleAdvMenu,
-                      url,
+                      path,
                       availableForms,
                     }}
                   >
@@ -227,7 +228,7 @@ export default function Menu({ filters, toggleDialog, type }) {
           </Grid>
         </Grid>
       </DialogContent>
-      <FilterFooter
+      <Footer
         selectAllOrNone={selectAllOrNone}
         toggleDialog={toggleDialog}
         tempFilters={tempFilters}

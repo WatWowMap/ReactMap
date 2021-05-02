@@ -8,8 +8,10 @@ import PokemonTile from './PokemonTile'
 
 export default function PokemonQuery({ bounds, filters, onMove }) {
   const map = useMap()
-  const trimmedFilters = {}
-
+  const trimmedFilters = {
+    ivOr: filters.pokemon.filter.ivOr,
+    default: filters.pokemon.filter.default,
+  }
   Object.entries(filters.pokemon.filter).forEach(filter => {
     const [id, specifics] = filter
     if (specifics && specifics.enabled) {
@@ -21,7 +23,6 @@ export default function PokemonQuery({ bounds, filters, onMove }) {
       ...bounds, filters: trimmedFilters,
     },
   })
-
   const refetchPokemon = () => {
     onMove()
     const mapBounds = map.getBounds()

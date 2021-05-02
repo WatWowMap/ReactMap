@@ -2902,18 +2902,6 @@ dot-prop@^5.2.0:
   dependencies:
     is-obj "^2.0.0"
 
-dotenv-safe@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/dotenv-safe/-/dotenv-safe-5.0.1.tgz#8c4a79b8978fd4271b3d8ef17be2b2f04588af71"
-  integrity sha512-NiS92uLQHKThcQIB4pNEQHLaosz+O1VaJ1yuBaZNj0BASGpQliSzfPKgaoFs/WvE+p8pS9STXOMW30b5uxBZog==
-  dependencies:
-    dotenv "^5.0.0"
-
-dotenv@^5.0.0:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-5.0.1.tgz#a5317459bd3d79ab88cff6e44057a6a3fbb1fcef"
-  integrity sha512-4As8uPrjfwb7VXC+WnLCbXK7y+Ueb2B3zgNCePYfhxS1PYeaO1YTeplffTEcbfLhvFNGLAz90VvJs9yomG7bow==
-
 dotenv@^8.2.0:
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
@@ -7800,13 +7788,6 @@ webpack-dev-server@^3.11.2:
     webpack-log "^2.0.0"
     ws "^6.2.1"
     yargs "^13.3.2"
-
-webpack-dotenv-plugin@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/webpack-dotenv-plugin/-/webpack-dotenv-plugin-2.1.0.tgz#366bb18712f414e8b86aa66408a9039d03dd7165"
-  integrity sha1-NmuxhxL0FOi4aqZkCKkDnQPdcWU=
-  dependencies:
-    dotenv-safe "^5.0.1"
 
 webpack-log@^2.0.0:
   version "2.0.0"
