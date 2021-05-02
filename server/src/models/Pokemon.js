@@ -8,8 +8,9 @@ class Pokemon extends Model {
     return 'pokemon'
   }
 
-  static async getPokemon(args) {
+  static async getPokemon(args, perms) {
     const ts = Math.floor((new Date()).getTime() / 1000)
+    const { stats, iv: ivs } = perms
     const standard = args.filters.default
     const keys = ['iv', 'level', 'atk', 'def', 'sta']
 
@@ -18,18 +19,18 @@ class Pokemon extends Model {
         .andWhereBetween("lat", [${args.minLat}, ${args.maxLat}])
         .andWhereBetween("lon", [${args.minLon}, ${args.maxLon}])`
 
-    const arrayCheck = (filter) => filter.every((v, i) => v === standard[i])
+    const arrayCheck = (filter, key) => filter.every((v, i) => v === standard[key][i])
 
     const generateSql = (filter, type) => {
       let sql = ''
       keys.forEach(key => {
         switch (key) {
           default:
-            if (!arrayCheck(filter[key])) sql += `.andWhereBetween("${key}_iv", [${filter[key]}])`; break
+            if (!arrayCheck(filter[key], key) && stats) sql += `.andWhereBetween("${key}_iv", [${filter[key]}])`; break
           case 'iv':
-            if (!arrayCheck(filter[key]) && type) sql += `.andWhereBetween("${key}", [${filter[key]}])`; break
+            if (!arrayCheck(filter[key], key) && ivs && type) sql += `.andWhereBetween("${key}", [${filter[key]}])`; break
           case 'level':
-            if (!arrayCheck(filter[key])) sql += `.andWhereBetween("${key}", [${filter[key]}])`; break
+            if (!arrayCheck(filter[key], key) && stats) sql += `.andWhereBetween("${key}", [${filter[key]}])`; break
         }
       })
       return sql
@@ -66,9 +67,9 @@ class Pokemon extends Model {
       if (pkmn === 'ivOr') {
         query += `
           .andWhere(builder => {
-            builder.whereBetween("iv", [${filter.iv}])
+            builder${(ivs || stats) ? `.whereBetween("iv", [${ivs ? filter.iv : standard.iv}])` : ''}
               ${generateSql(filter)}`
-      } else if (pkmn !== 'default') {
+      } else if (pkmn.includes('-')) {
         query += `
           .orWhere(builder => {
             builder.where("pokemon_id", ${pkmn.split('-')[0]})
