@@ -58,7 +58,7 @@ export default function WithSliders({
           }}
         />
       </Grid>
-      {filters[category].legacy ? (
+      {(filters[category].legacy && context.legacy) ? (
         <>
           <Grid item xs={12}>
             <Typography>
@@ -91,6 +91,7 @@ export default function WithSliders({
               onChange={handleLegacySwitch}
               name="adv"
               color="secondary"
+              disabled={!context.legacy}
             />
           )}
           label="Legacy"

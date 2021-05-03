@@ -24,8 +24,6 @@ import Footer from './Footer'
 
 export default function Menu({ filters, toggleDialog, type }) {
   const classes = useStyles()
-  const { path } = useStore(state => state.settings).icons
-  const availableForms = useMasterfile(state => state.availableForms)
   const menus = useStore(state => state.menus)
   const setMenus = useStore(state => state.setMenus)
   const breakpoint = useMasterfile(state => state.breakpoint)
@@ -198,7 +196,7 @@ export default function Menu({ filters, toggleDialog, type }) {
                 <HighlightOff style={{ color: '#848484' }} />
               </IconButton>
             </Paper>
-            <div style={{ height: '73vh' }}>
+            <div style={{ height: isMobile ? '64vh' : '73vh' }}>
               <AutoSizer defaultHeight={1080} defaultWidth={1920}>
                 {({ width, height }) => (
                   <FixedSizeGrid
@@ -210,14 +208,12 @@ export default function Menu({ filters, toggleDialog, type }) {
                     rowCount={Math.ceil(filteredArr.length / columnCount)}
                     rowHeight={columnCount > 1 ? 120 : 60}
                     itemData={{
-                      pkmn: filteredArr,
+                      tileItem: filteredArr,
                       isMobile,
                       columnCount,
                       tempFilters,
                       setTempFilters,
                       toggleAdvMenu,
-                      path,
-                      availableForms,
                     }}
                   >
                     {Tile}

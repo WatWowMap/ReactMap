@@ -3,23 +3,25 @@ const buildPokemon = require('./buildPokemon.js')
 const buildQuests = require('./buildQuests.js')
 const buildInvasions = require('./buildInvasions.js')
 const buildGyms = require('./buildGyms')
-const { Pokestop, GenericFilter } = require('../../models/index')
+const { Pokestop, GenericFilter, Gym } = require('../../models/index')
 
 module.exports = async function buildDefault(perms) {
   const stopReducer = perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
+  const pokemonReducer = perms.iv || perms.stats || perms.pvp
 
   return {
     gyms: gymReducer ? {
       enabled: filters.gyms,
       gyms: perms.gyms ? filters.gyms : undefined,
       raids: perms.raids ? filters.raids : undefined,
+      exEligible: perms.gyms ? false : undefined,
+      inBattle: perms.gyms ? false : undefined,
       filter: {
-        ...buildGyms(perms.gyms),
-        ...buildPokemon(perms.raids),
+        ...buildGyms(perms),
+        ...await Gym.getAvailableRaidBosses(perms.raids),
       },
     } : undefined,
-
     pokestops: stopReducer ? {
       enabled: filters.pokestops,
       pokestops: perms.pokestops ? filters.pokestops : undefined,
@@ -36,22 +38,13 @@ module.exports = async function buildDefault(perms) {
         ...buildQuests(perms.quests, await Pokestop.getAvailableQuests()),
       },
     } : undefined,
-
-    spawnpoints: perms.spawnpoints ? {
-      enabled: filters.spawnpoints,
-      filter: {},
-    } : undefined,
     pokemon: perms.pokemon ? {
       enabled: filters.pokemon,
-      legacy: false,
+      legacy: pokemonReducer ? false : undefined,
       filter: buildPokemon(perms.pokemon, 'pokemon'),
     } : undefined,
     portals: perms.portals ? {
       enabled: filters.portals,
-      filter: {},
-    } : undefined,
-    s2Cells: perms.s2Cells ? {
-      enabled: filters.scanCells,
       filter: {},
     } : undefined,
     submissionCells: perms.submissionCells ? {
@@ -60,6 +53,14 @@ module.exports = async function buildDefault(perms) {
     } : undefined,
     weather: perms.weather ? {
       enabled: filters.weather,
+      filter: {},
+    } : undefined,
+    spawnpoints: perms.spawnpoints ? {
+      enabled: filters.spawnpoints,
+      filter: {},
+    } : undefined,
+    s2Cells: perms.s2Cells ? {
+      enabled: filters.scanCells,
       filter: {},
     } : undefined,
     devices: perms.devices ? {

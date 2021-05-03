@@ -10,9 +10,29 @@ export default function GymQuery({ bounds, filters, onMove }) {
   const map = useMap()
   const ts = (new Date()).getTime() / 1000
 
-  const { data, previousData, refetch } = !filters.gyms.raids.enabled
-    ? useQuery(Query.getAllGyms(), { variables: bounds })
-    : useQuery(Query.getAllRaids(), { variables: bounds })
+  const trimmedFilters = {
+    onlyRaids: filters.gyms.raids,
+    onlyGyms: filters.gyms.gyms,
+    onlyEx: filters.gyms.exEligible,
+    onlyBattle: filters.gyms.inBattle,
+  }
+  Object.entries(filters.gyms.filter).forEach(filter => {
+    const [id, specifics] = filter
+    if (specifics && specifics.enabled) {
+      trimmedFilters[id] = specifics
+    }
+  })
+  const { data, previousData, refetch } = filters.gyms.raids
+    ? useQuery(Query.getAllRaids(), {
+      variables: {
+        ...bounds, filters: trimmedFilters,
+      },
+    })
+    : useQuery(Query.getAllGyms(), {
+      variables: {
+        ...bounds, filters: trimmedFilters,
+      },
+    })
 
   const refetchGyms = () => {
     onMove()
@@ -22,6 +42,7 @@ export default function GymQuery({ bounds, filters, onMove }) {
       maxLat: mapBounds._northEast.lat,
       minLon: mapBounds._southWest.lng,
       maxLon: mapBounds._northEast.lng,
+      filters: trimmedFilters,
     })
   }
 
@@ -39,7 +60,7 @@ export default function GymQuery({ bounds, filters, onMove }) {
     >
       {renderedData && renderedData.gyms.map((gym) => (
         <GymTile
-          key={`${gym.id}-${gym.lat}-${gym.lon}`}
+          key={`${gym.id}-${gym.updated}-${gym.raid_end_timestamp}`}
           gym={gym}
           ts={ts}
         />

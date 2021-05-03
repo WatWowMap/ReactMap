@@ -37,7 +37,10 @@ const RootQuery = new GraphQLObjectType({
     },
     gyms: {
       type: new GraphQLList(GymType),
-      args: minMaxArgs,
+      args: {
+        ...minMaxArgs,
+        filters: { type: JSONResolver },
+      },
       async resolve(parent, args) {
         return await Gym.getAllGyms(args)
       },

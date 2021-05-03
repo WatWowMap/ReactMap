@@ -1,11 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 module.exports = function generateUi(filters, perms) {
-  const menus = {
-    filterItems: {},
-    wayfarer: {},
-    admin: {},
-    settings: {},
-  }
+  const menus = {}
   const text = {
     save: 'Save',
     reset: 'Reset',
@@ -20,17 +15,16 @@ module.exports = function generateUi(filters, perms) {
     sizes: ['sm', 'md', 'lg', 'xl'],
     sliderInputs: ['min', 'max'],
   }
+  const ignoredKeys = ['enabled', 'filter']
 
+  // builds the initial categories
   for (const [key, value] of Object.entries(filters)) {
+    let sliders
     if (value) {
-      let sliders
-      let secondary = []
-
       switch (key) {
-        default: menus.filterItems[key] = true; break
+        default: menus[key] = {}; break
         case 'pokemon':
-          menus.filterItems[key] = {}
-          secondary = ['iv', 'stats', 'pvp']
+          menus[key] = {}
           sliders = {
             primary: [
               {
@@ -58,23 +52,38 @@ module.exports = function generateUi(filters, perms) {
               },
             ],
           }; break
-        case 'pokestops':
-          menus.filterItems[key] = {}
-          secondary = ['pokestops', 'lures', 'quests', 'invasions']; break
-        case 'gyms':
-          menus.filterItems[key] = {}
-          secondary = ['gyms', 'raids']; break
         case 'submissionCells':
-        case 'portals': menus.wayfarer[key] = true; break
+        case 'portals':
+          menus.wayfarer = {}
+          menus.wayfarer[key] = {}; break
         case 'spawnpoints':
         case 's2Cells':
-        case 'devices': menus.admin[key] = true; break
+        case 'devices':
+          menus.admin = {}
+          menus.admin[key] = {}; break
       }
-      secondary.forEach(perm => {
-        if (perms[perm]) menus.filterItems[key][perm] = true
-      })
+      // builds each subcategory
+      for (const [subKey, subValue] of Object.entries(value)) {
+        if (!ignoredKeys.includes(subKey) && subValue !== undefined) {
+          switch (key) {
+            default: menus[key] = true; break
+            case 'pokemon':
+              menus[key][subKey] = true; break
+            case 'pokestops':
+              menus[key][subKey] = true; break
+            case 'gyms':
+              menus[key][subKey] = subValue; break
+            case 'submissionCells':
+            case 'portals': menus.wayfarer[key] = true; break
+            case 'spawnpoints':
+            case 's2Cells':
+            case 'devices': menus.admin[key] = true; break
+          }
+        }
+      }
+      // adds any sliders present
       if (sliders) {
-        menus.filterItems[key].sliders = sliders
+        menus[key].sliders = sliders
         Object.keys(sliders).forEach(category => {
           sliders[category].forEach(slider => {
             slider.disabled = !perms[slider.perm]
@@ -84,9 +93,15 @@ module.exports = function generateUi(filters, perms) {
       }
     }
   }
-  menus.filterItems.pokemon.legacy = !Object.values(menus.filterItems.pokemon).length > 0
-  // adminItems.enabled = Object.values(adminItems).length > 0
-  // wayfarerItems.enabled = Object.values(wayfarerItems).length > 0
+
+  // deletes any menus that do not have any items/perms
+  Object.keys(menus).forEach(category => {
+    if (category !== 'weather') {
+      if (Object.keys(menus[category]).length === 0) {
+        delete menus[category]
+      }
+    }
+  })
 
   menus.settings = true
 

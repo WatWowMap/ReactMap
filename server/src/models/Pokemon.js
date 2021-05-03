@@ -37,7 +37,7 @@ class Pokemon extends Model {
     }
 
     const secondaryFilter = queryResults => {
-      const { length } = results
+      const { length } = queryResults
       const {
         iv, level, atk, def, sta,
       } = args.filters.ivOr
@@ -66,14 +66,15 @@ class Pokemon extends Model {
     for (const [pkmn, filter] of Object.entries(args.filters)) {
       if (pkmn === 'ivOr') {
         query += `
-          .andWhere(builder => {
-            builder${(ivs || stats) ? `.whereBetween("iv", [${ivs ? filter.iv : standard.iv}])` : ''}
+          .andWhere(ivOr => {
+            ivOr${(ivs || stats) ? `.whereBetween("iv", [${ivs ? filter.iv : standard.iv}])` : ''}
               ${generateSql(filter)}`
       } else if (pkmn.includes('-')) {
         query += `
-          .orWhere(builder => {
-            builder.where("pokemon_id", ${pkmn.split('-')[0]})
-              ${generateSql(filter, pkmn)}})`
+          .orWhere(poke${pkmn.split('-')[0]} => {
+            poke${pkmn.split('-')[0]}.where("pokemon_id", ${pkmn.split('-')[0]})
+              ${generateSql(filter, pkmn)}
+          })`
       }
     }
     query += '})'

@@ -17,24 +17,19 @@ export default function DrawerMenu({
 }) {
   const classes = useStyles()
   const { menus } = useMasterfile(state => state.ui)
-  const newObj = {
-    ...menus.filterItems,
-    wayfarer: menus.wayfarer,
-    admin: menus.admin,
-    settings: menus.settings,
-  }
+
   const [expanded, setExpanded] = useState(false)
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
   }
 
-  const drawerItems = Object.keys(newObj).map(category => {
+  const drawerItems = Object.keys(menus).map(category => {
     let content
     switch (category) {
       default:
         content = (
-          Object.keys(newObj[category]).map(subItem => (
+          Object.keys(menus[category]).map(subItem => (
             <WithSubItems
               key={`${category}-${subItem}`}
               category={category}
@@ -48,7 +43,7 @@ export default function DrawerMenu({
         content = (
           <WithSliders
             category={category}
-            context={newObj[category]}
+            context={menus[category]}
             specificFilter="ivOr"
             filters={filters}
             setFilters={setFilters}
@@ -93,16 +88,16 @@ export default function DrawerMenu({
           >
             {content}
             {(category !== 'settings' && category !== 'weather')
-            && (
-            <Grid item xs={6}>
-              <Button
-                onClick={toggleDialog(true, category)}
-                variant="contained"
-              >
-                Advanced
-              </Button>
-            </Grid>
-            )}
+              && (
+                <Grid item xs={6}>
+                  <Button
+                    onClick={toggleDialog(true, category)}
+                    variant="contained"
+                  >
+                    Advanced
+                  </Button>
+                </Grid>
+              )}
           </Grid>
         </AccordionDetails>
       </Accordion>

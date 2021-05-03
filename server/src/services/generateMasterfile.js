@@ -3,6 +3,7 @@ const Fetch = require('node-fetch')
 const Fs = require('fs-extra')
 const defaultRarity = require('../data/defaultRarity.json')
 const weatherTypes = require('../data/weatherTypes.json')
+const gymMeta = require('../data/gymMeta.json')
 
 function fetchJson(url) {
   return new Promise(resolve => {
@@ -22,6 +23,7 @@ function fetchJson(url) {
     questRewardTypes: masterfile.quest_reward_types,
     items: masterfile.items,
     weatherTypes,
+    gyms: gymMeta,
   }
 
   for (const [id, move] of Object.entries(masterfile.moves)) {

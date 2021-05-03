@@ -2,16 +2,15 @@
 import React from 'react'
 import { Grid, IconButton, Typography } from '@material-ui/core'
 import { Check, Clear, Menu } from '@material-ui/icons'
-import Utility from '../../../../services/Utility'
 
 export default function MenuTile({
   data, rowIndex, columnIndex, style,
 }) {
   const {
-    pkmn, columnCount, tempFilters, setTempFilters, toggleAdvMenu, path, availableForms, isMobile,
+    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile,
   } = data
 
-  const item = pkmn[rowIndex * columnCount + columnIndex]
+  const item = tileItem[rowIndex * columnCount + columnIndex]
 
   if (!item) {
     return ''
@@ -30,7 +29,7 @@ export default function MenuTile({
       className="grid-item"
       style={{
         height: isMobile ? 50 : 75,
-        backgroundImage: `url(${path}/${Utility.getPokemonIcon(availableForms, ...item.id.split('-'))}.png)`,
+        backgroundImage: item.url,
       }}
     />
   )

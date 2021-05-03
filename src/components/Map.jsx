@@ -33,15 +33,29 @@ export default function Map() {
         attribution={settings.tileServers.attribution}
         url={settings.tileServers.url}
       />
-      {Object.keys({ ...menus.filterItems, ...menus.wayfarer, ...menus.admin }).map(item => {
+      {Object.keys({ ...menus, ...menus.wayfarer, ...menus.admin }).map(item => {
         const Component = index[item]
         let enabled = false
-        if (item === 'gyms' && (filters[item].gyms || filters[item].raids)) {
-          enabled = true
-        } else if (item === 'pokestops' && (filters[item].pokestops || filters[item].lures || filters[item].invasions || filters[item].quests)) {
-          enabled = true
-        } else if (filters[item].enabled) {
-          enabled = true
+        switch (item) {
+          default:
+            if (filters[item]
+              && filters[item].enabled) {
+              enabled = true
+            } break
+          case 'gyms':
+            if (filters[item].gyms
+              || filters[item].raids
+              || filters[item].exEligible
+              || filters[item].inBattle) {
+              enabled = true
+            } break
+          case 'pokestops':
+            if (filters[item].pokestops
+              || filters[item].lures
+              || filters[item].invasions
+              || filters[item].quests) {
+              enabled = true
+            } break
         }
         if (enabled) {
           return (

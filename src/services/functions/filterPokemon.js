@@ -1,8 +1,12 @@
 /* eslint-disable no-restricted-syntax */
-import { useMasterfile } from '../../hooks/useStore'
+import { useStore, useMasterfile } from '../../hooks/useStore'
+import getPokemonIcon from './getPokemonIcon'
 
 export default function filterPokemon(tempFilters, menus, search) {
   const masterfile = useMasterfile(state => state.masterfile).pokemon
+  const availableForms = useMasterfile(state => state.availableForms)
+  const { path } = useStore(state => state.settings).icons
+
   const {
     generations, types, rarity, forms, others,
   } = menus
@@ -18,7 +22,8 @@ export default function filterPokemon(tempFilters, menus, search) {
   tempAdvFilter.all = Object.values(tempAdvFilter).every(val => val === true)
 
   const addPokemon = (id, name) => {
-    filteredArr.push({ id, name })
+    const url = `url(${path}/${getPokemonIcon(availableForms, ...id.split('-'))}.png)`
+    filteredArr.push({ id, name, url })
     filteredObj[id] = { ...tempFilters[id] }
   }
 

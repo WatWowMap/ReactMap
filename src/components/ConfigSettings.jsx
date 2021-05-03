@@ -14,6 +14,7 @@ export default function ConfigSettings({ serverSettings }) {
   const setZoom = useStore(state => state.setZoom)
   const setMenus = useStore(state => state.setMenus)
 
+  const setAvailable = useMasterfile(state => state.setAvailable)
   const setConfig = useMasterfile(state => state.setConfig)
   const setAvailableForms = useMasterfile(state => state.setAvailableForms)
   const setMasterfile = useMasterfile(state => state.setMasterfile)
@@ -52,7 +53,7 @@ export default function ConfigSettings({ serverSettings }) {
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
   setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
   setAvailableForms((new Set(serverSettings.settings.icons.pokemonList)), 'availableForms')
-
+  setAvailable(serverSettings.available)
   const startLocation = updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
   const zoom = updatePositionState(serverSettings.config.map.startZoom, 'zoom')
 
