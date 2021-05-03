@@ -6,7 +6,9 @@ import { useMap } from 'react-leaflet'
 import Query from '../../services/Query'
 import GymTile from './GymTile'
 
-export default function GymQuery({ bounds, filters, onMove }) {
+export default function GymQuery({
+  bounds, filters, onMove, perms,
+}) {
   const map = useMap()
   const ts = (new Date()).getTime() / 1000
 
@@ -22,7 +24,7 @@ export default function GymQuery({ bounds, filters, onMove }) {
       trimmedFilters[id] = specifics
     }
   })
-  const { data, previousData, refetch } = filters.gyms.raids
+  const { data, previousData, refetch } = filters.gyms.raids && perms.raids
     ? useQuery(Query.getAllRaids(), {
       variables: {
         ...bounds, filters: trimmedFilters,

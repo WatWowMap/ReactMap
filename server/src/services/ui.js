@@ -72,7 +72,7 @@ module.exports = function generateUi(filters, perms) {
             case 'pokestops':
               menus[key][subKey] = true; break
             case 'gyms':
-              menus[key][subKey] = subValue; break
+              menus[key][subKey] = true; break
             case 'submissionCells':
             case 'portals': menus.wayfarer[key] = true; break
             case 'spawnpoints':

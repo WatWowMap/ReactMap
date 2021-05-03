@@ -6,6 +6,7 @@ export default function filterGyms(tempFilters, menus, search) {
   const availableForms = useMasterfile(state => state.availableForms)
   const masterfile = useMasterfile(state => state.masterfile)
   const { path } = useStore(state => state.settings).icons
+  const { menus: { gyms } } = useMasterfile(state => state.ui)
   const filteredArr = []
   const filteredObj = {}
 
@@ -23,18 +24,19 @@ export default function filterGyms(tempFilters, menus, search) {
   tempAdvFilter.all = Object.values(tempAdvFilter).every(val => val === true)
 
   const addGym = (id, name) => {
-    let urlBuilder
-    switch (id.charAt(0)) {
-      default: urlBuilder = `/images/gym/${id.slice(1).replace('-', '_')}`; break
-      case 'e': urlBuilder = `/images/egg/${id.slice(1)}`; break
-      case 'x': urlBuilder = '/images/item/1403'; break
-      case 'i': urlBuilder = '/images/battle/0_0'; break
-      case 'b': urlBuilder = `/images/battle/${id.slice(1).replace('-', '_')}`; break
-      case 'p': urlBuilder = `${path}/${getPokemonIcon(availableForms, ...id.slice(1).split('-'))}`; break
+    const raidCheck = (id.startsWith('p') && gyms.raids) || (id.startsWith('e') && gyms.raids)
+    const gymCheck = (id.startsWith('g') && gyms.gyms) || (id.startsWith('t') && gyms.gyms)
+    if (raidCheck || gymCheck) {
+      let urlBuilder
+      switch (id.charAt(0)) {
+        default: urlBuilder = `/images/gym/${id.slice(1).replace('-', '_')}`; break
+        case 'e': urlBuilder = `/images/egg/${id.slice(1)}`; break
+        case 'p': urlBuilder = `${path}/${getPokemonIcon(availableForms, ...id.slice(1).split('-'))}`; break
+      }
+      const url = `url(${urlBuilder}.png)`
+      filteredArr.push({ id, name, url })
+      filteredObj[id] = { ...tempFilters[id] }
     }
-    const url = `url(${urlBuilder}.png)`
-    filteredArr.push({ id, name, url })
-    filteredObj[id] = { ...tempFilters[id] }
   }
 
   if ((others.selected && others.unselected) || tempAdvFilter.all) {

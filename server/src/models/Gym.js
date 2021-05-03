@@ -9,8 +9,9 @@ class Gym extends Model {
     return 'gym'
   }
 
-  static async getAllGyms(args) {
+  static async getAllGyms(args, perms) {
     const ts = Math.floor((new Date()).getTime() / 1000)
+    const { gyms, raids } = perms
     const {
       onlyGyms, onlyRaids, onlyEx, onlyBattle,
     } = args.filters
@@ -37,19 +38,19 @@ class Gym extends Model {
       }
     })
     let count = false
-    if (onlyEx) {
+    if (onlyEx && gyms) {
       query += `
       .andWhere(ex => {
         ex.where('ex_raid_eligible', 1)`
       count = true
     }
-    if (onlyBattle) {
+    if (onlyBattle && gyms) {
       query += `
       .${count ? 'or' : 'and'}Where(ex => {
         ex.where('in_battle', 1)`
       count = true
     }
-    if (onlyGyms) {
+    if (onlyGyms && gyms) {
       query += `
       .${count ? 'or' : 'and'}Where(teams => {
         teams.whereIn('team_id', [${teams}])`
@@ -64,7 +65,7 @@ class Gym extends Model {
       })
       count = true
     }
-    if (onlyRaids) {
+    if (onlyRaids && raids) {
       query += `
       .${count ? 'or' : 'and'}Where(pokemon => {
         pokemon.whereIn('raid_pokemon_id', [${raidBosses}])
@@ -78,9 +79,9 @@ class Gym extends Model {
         })
       })`
     }
-    if (onlyBattle) query += '})'
-    if (onlyEx) query += '})'
-    if (onlyGyms) query += '})'
+    if (onlyEx && gyms) query += '})'
+    if (onlyBattle && gyms) query += '})'
+    if (onlyGyms && gyms) query += '})'
 
     const secondaryFilter = queryResults => {
       const { length } = queryResults
@@ -94,7 +95,6 @@ class Gym extends Model {
       return queryResults
     }
 
-    console.log(query)
     const results = await eval(query)
     return secondaryFilter(results)
   }

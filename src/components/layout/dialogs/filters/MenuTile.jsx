@@ -7,7 +7,7 @@ export default function MenuTile({
   data, rowIndex, columnIndex, style,
 }) {
   const {
-    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile,
+    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type,
   } = data
 
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -49,13 +49,13 @@ export default function MenuTile({
         : <Clear color="primary" />}
     </IconButton>
   )
-  const advMenu = (
+  const advMenu = type === 'pokemon' ? (
     <IconButton
       onClick={toggleAdvMenu(true, item.id)}
     >
       <Menu style={{ color: 'white' }} />
     </IconButton>
-  )
+  ) : ''
 
   const nameTitle = (
     <Typography

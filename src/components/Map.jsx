@@ -26,6 +26,8 @@ export default function Map() {
     setZoom(map.getZoom())
   }, [map])
 
+  console.log(filters, menus)
+
   return (
     <>
       <TileLayer
@@ -39,14 +41,14 @@ export default function Map() {
         switch (item) {
           default:
             if (filters[item]
-              && filters[item].enabled) {
+              && filters[item].enabled && menus[item]) {
               enabled = true
             } break
           case 'gyms':
-            if (filters[item].gyms
-              || filters[item].raids
-              || filters[item].exEligible
-              || filters[item].inBattle) {
+            if ((filters[item].gyms && menus[item].gyms)
+              || (filters[item].raids && menus[item].raids)
+              || (filters[item].exEligible && menus[item].exEligible)
+              || (filters[item].inBattle && menus[item].inBattle)) {
               enabled = true
             } break
           case 'pokestops':
@@ -64,6 +66,7 @@ export default function Map() {
               bounds={initialBounds}
               filters={filters}
               onMove={onMove}
+              perms={menus[item]}
             />
           )
         }

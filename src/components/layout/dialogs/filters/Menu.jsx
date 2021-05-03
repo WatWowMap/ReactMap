@@ -214,6 +214,7 @@ export default function Menu({ filters, toggleDialog, type }) {
                       tempFilters,
                       setTempFilters,
                       toggleAdvMenu,
+                      type,
                     }}
                   >
                     {Tile}
