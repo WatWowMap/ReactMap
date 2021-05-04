@@ -1,15 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
-  Grid, Typography, FormControlLabel, Switch,
+  Grid, Typography, FormControlLabel, Switch, AppBar, Tab, Tabs, Box,
 } from '@material-ui/core'
 
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 import Utility from '../../../services/Utility'
 
+function TabPanel(props) {
+  const { children, value, index } = props
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+    >
+      {value === index && (
+        <Box p={2}>
+          <Typography variant="caption">{children}</Typography>
+        </Box>
+      )}
+    </div>
+  )
+}
+
 export default function WithSliders({
   category, filters, setFilters, context, specificFilter,
 }) {
+  const [openTab, setOpenTab] = useState(0)
+
   const handleLegacySwitch = () => {
     setFilters({
       ...filters,
@@ -35,6 +53,10 @@ export default function WithSliders({
         },
       },
     })
+  }
+
+  const handleTabChange = (event, newValue) => {
+    setOpenTab(newValue)
   }
 
   return (
@@ -73,15 +95,34 @@ export default function WithSliders({
           </Grid>
         </>
       ) : (
-        Object.values(context.sliders.primary).map(subItem => (
-          <Grid item xs={12} key={subItem.shortName}>
-            <SliderTile
-              filterSlide={subItem}
-              handleChange={handleChange}
-              filterValues={filters[category].filter[specificFilter]}
-            />
-          </Grid>
-        ))
+        <>
+          <AppBar position="static">
+            <Tabs
+              value={openTab}
+              onChange={handleTabChange}
+              indicatorColor="secondary"
+              variant="fullWidth"
+              style={{ backgroundColor: '#424242' }}
+            >
+              {Object.keys(context.sliders).map(slider => (
+                <Tab label={slider} key={slider} style={{ width: 5, minWidth: 5 }} />
+              ))}
+            </Tabs>
+          </AppBar>
+          {Object.keys(context.sliders).map((slider, index) => (
+            <TabPanel value={openTab} index={index} key={slider}>
+              {Object.values(context.sliders[slider]).map(subItem => (
+                <Grid item xs={12} key={subItem.shortName}>
+                  <SliderTile
+                    filterSlide={subItem}
+                    handleChange={handleChange}
+                    filterValues={filters[category].filter[specificFilter]}
+                  />
+                </Grid>
+              ))}
+            </TabPanel>
+          ))}
+        </>
       )}
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         <FormControlLabel

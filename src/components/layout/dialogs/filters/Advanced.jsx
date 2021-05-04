@@ -43,13 +43,13 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
     key: 'reset',
     icon: (
       <IconButton
-        onClick={() => handleChange('default', advancedFilter.default)}
+        onClick={() => handleChange('default', advancedFilter.standard)}
       >
         <Replay color="primary" />
       </IconButton>
     ),
     text: (
-      <Button onClick={() => handleChange('default', advancedFilter.default)}>
+      <Button onClick={() => handleChange('default', advancedFilter.standard)}>
         <Typography variant="caption" color="primary">
           {text.reset}
         </Typography>

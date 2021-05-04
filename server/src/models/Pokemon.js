@@ -11,76 +11,90 @@ class Pokemon extends Model {
   static async getPokemon(args, perms) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const { stats, iv: ivs } = perms
-    const standard = args.filters.default
+    const pokemonList = []
+    const { standard, ivOr } = args.filters
     const keys = ['iv', 'level', 'atk', 'def', 'sta']
 
     let query = `this.query()
-        .where("expire_timestamp", ">=", ${ts})
-        .andWhereBetween("lat", [${args.minLat}, ${args.maxLat}])
-        .andWhereBetween("lon", [${args.minLon}, ${args.maxLon}])`
+        .where('expire_timestamp', '>=', ${ts})
+        .andWhereBetween('lat', [${args.minLat}, ${args.maxLat}])
+        .andWhereBetween('lon', [${args.minLon}, ${args.maxLon}])`
 
+    // checks if IVs/Stats are set to default and skips them if so
     const arrayCheck = (filter, key) => filter.every((v, i) => v === standard[key][i])
 
+    // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (filter, type) => {
       let sql = ''
       keys.forEach(key => {
         switch (key) {
           default:
-            if (!arrayCheck(filter[key], key) && stats) sql += `.andWhereBetween("${key}_iv", [${filter[key]}])`; break
+            if (!arrayCheck(filter[key], key) && stats) sql += `.andWhereBetween('${key}_iv', [${filter[key]}])`; break
           case 'iv':
-            if (!arrayCheck(filter[key], key) && ivs && type) sql += `.andWhereBetween("${key}", [${filter[key]}])`; break
+            if (!arrayCheck(filter[key], key) && ivs && type) sql += `.andWhereBetween('${key}', [${filter[key]}])`; break
           case 'level':
-            if (!arrayCheck(filter[key], key) && stats) sql += `.andWhereBetween("${key}", [${filter[key]}])`; break
+            if (!arrayCheck(filter[key], key) && stats) sql += `.andWhereBetween('${key}', [${filter[key]}])`; break
         }
       })
       return sql
     }
 
-    const secondaryFilter = queryResults => {
+    // adds correct form id if missing & checks if they were actually requested
+    const formFixer = queryResults => {
+      const fixedResults = []
+      const ivToCompare = ivs ? ivOr : standard
       const { length } = queryResults
-      const {
-        iv, level, atk, def, sta,
-      } = args.filters.ivOr
-      const filteredResults = []
 
       for (let i = 0; i < length; i += 1) {
         const pkmn = queryResults[i]
         if (pkmn.form === 0) {
           const formId = masterfile[pkmn.pokemon_id].default_form_id
           if (formId) pkmn.form = formId
-        }
-        const ivPass = pkmn.iv >= iv[0] && pkmn.iv <= iv[1]
-        const levelPass = pkmn.level >= level[0] && pkmn.level <= level[1]
-        const atkPass = pkmn.atk_iv >= atk[0] && pkmn.atk_iv <= atk[1]
-        const defPass = pkmn.def_iv >= def[0] && pkmn.def_iv <= def[1]
-        const staPass = pkmn.sta_iv >= sta[0] && pkmn.sta_iv <= sta[1]
-
-        if (args.filters[`${pkmn.pokemon_id}-${pkmn.form}`]
-          || (ivPass && levelPass && atkPass && defPass && staPass)) {
-          filteredResults.push(pkmn)
+          if (!ivs && !stats
+            && args.filters[`${pkmn.pokemon_id}-${pkmn.form}`]) {
+            fixedResults.push(pkmn)
+          } else {
+            const ivOrCheck = keys.map(key => (
+              pkmn[key] >= ivToCompare[key][0] && pkmn[key] <= ivToCompare[key][1]
+            ))
+            if (ivOrCheck.every(val => val)
+              || args.filters[`${pkmn.pokemon_id}-${pkmn.form}`]) {
+              fixedResults.push(pkmn)
+            }
+          }
+        } else {
+          fixedResults.push(pkmn)
         }
       }
-      return filteredResults
+      return queryResults
     }
 
+    // loops through the filters and generates the SQL
     for (const [pkmn, filter] of Object.entries(args.filters)) {
-      if (pkmn === 'ivOr') {
+      if (!ivs && !stats) {
+        if (pkmn.includes('-')) pokemonList.push(pkmn.split('-')[0])
+      } else if (pkmn === 'ivOr') {
         query += `
           .andWhere(ivOr => {
-            ivOr${(ivs || stats) ? `.whereBetween("iv", [${ivs ? filter.iv : standard.iv}])` : ''}
+            ivOr.whereBetween('iv', [${ivs ? filter.iv : standard.iv}])
               ${generateSql(filter)}`
       } else if (pkmn.includes('-')) {
         query += `
           .orWhere(poke${pkmn.split('-')[0]} => {
-            poke${pkmn.split('-')[0]}.where("pokemon_id", ${pkmn.split('-')[0]})
+            poke${pkmn.split('-')[0]}.where('pokemon_id', ${pkmn.split('-')[0]})
               ${generateSql(filter, pkmn)}
           })`
       }
     }
-    query += '})'
+
+    // runs a separate query if IV/Stats perms are false
+    query += (!ivs && !stats) ? `
+      .andWhere(pkmn => {
+        pkmn.whereIn('pokemon_id', [${[...new Set(pokemonList)]}])
+      })` : '})'
 
     const results = await eval(query)
-    return secondaryFilter(results)
+    return formFixer(results)
   }
 }
 
