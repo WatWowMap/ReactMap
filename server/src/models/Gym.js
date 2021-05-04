@@ -79,9 +79,7 @@ class Gym extends Model {
         })
       })`
     }
-    if (onlyEx && gyms) query += '})'
-    if (onlyBattle && gyms) query += '})'
-    if (onlyGyms && gyms) query += '})'
+    if ((onlyEx || onlyBattle || onlyGyms) && gyms) query += '})'
 
     const secondaryFilter = queryResults => {
       const { length } = queryResults
