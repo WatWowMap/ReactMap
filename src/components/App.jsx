@@ -19,6 +19,11 @@ const client = new ApolloClient({
               return incoming
             },
           },
+          gyms: {
+            merge(existing, incoming) {
+              return incoming
+            },
+          },
         },
       },
     },

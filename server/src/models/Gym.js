@@ -1,15 +1,116 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-eval */
 const { Model } = require('objection')
+const { GenericFilter } = require('./Filters')
+const { pokemon: masterfile } = require('../data/masterfile.json')
 
 class Gym extends Model {
   static get tableName() {
     return 'gym'
   }
 
-  static async getAllGyms(args) {
-    return this.query()
-      .whereBetween('lat', [args.minLat, args.maxLat])
-      .andWhereBetween('lon', [args.minLon, args.maxLon])
-      .andWhere('deleted', false)
+  static async getAllGyms(args, perms) {
+    const ts = Math.floor((new Date()).getTime() / 1000)
+    const { gyms, raids } = perms
+    const {
+      onlyGyms, onlyRaids, onlyEx, onlyBattle,
+    } = args.filters
+    let query = `this.query()
+      .whereBetween('lat', [${args.minLat}, ${args.maxLat}])
+      .andWhereBetween('lon', [${args.minLon}, ${args.maxLon}])
+      .andWhere('deleted', false)`
+
+    const raidBosses = []
+    const teams = []
+    const eggs = []
+    const slots = []
+
+    Object.keys(args.filters).forEach(raid => {
+      switch (raid.charAt(0)) {
+        default: break
+        case 'p': raidBosses.push(raid.slice(1).split('-')[0]); break
+        case 'e': eggs.push(raid.slice(1)); break
+        case 't': teams.push(raid.slice(1).split('-')[0]); break
+        case 'g': slots.push({
+          team: raid.slice(1).split('-')[0],
+          slots: 6 - raid.slice(1).split('-')[1],
+        }); break
+      }
+    })
+    let count = false
+    if (onlyEx && gyms) {
+      query += `
+      .andWhere(ex => {
+        ex.where('ex_raid_eligible', 1)`
+      count = true
+    }
+    if (onlyBattle && gyms) {
+      query += `
+      .${count ? 'or' : 'and'}Where(ex => {
+        ex.where('in_battle', 1)`
+      count = true
+    }
+    if (onlyGyms && gyms) {
+      query += `
+      .${count ? 'or' : 'and'}Where(teams => {
+        teams.whereIn('team_id', [${teams}])`
+      slots.forEach(slot => {
+        if (!teams.includes(slot.team)) {
+          query += `
+            .orWhere(slots => {
+              slots.where('team_id', ${slot.team})
+                .andWhere('availble_slots', ${slot.slots})
+            })`
+        }
+      })
+      count = true
+    }
+    if (onlyRaids && raids) {
+      query += `
+      .${count ? 'or' : 'and'}Where(pokemon => {
+        pokemon.whereIn('raid_pokemon_id', [${raidBosses}])
+          .andWhere('raid_battle_timestamp', '<=', ${ts})
+          .andWhere('raid_end_timestamp', '>=', ${ts})
+          .andWhere('raid_level', '>', 0)
+        .orWhere(eggs => {
+          eggs.whereIn('raid_level', [${eggs}])
+            .andWhere('raid_end_timestamp', '>=', ${ts})
+            .andWhere('raid_battle_timestamp', '>=', ${ts})
+        })
+      })`
+    }
+    if ((onlyEx || onlyBattle || onlyGyms) && gyms) query += '})'
+
+    const secondaryFilter = queryResults => {
+      const { length } = queryResults
+      for (let i = 0; i < length; i += 1) {
+        const gym = queryResults[i]
+        if (gym.raid_pokemon_form === 0 && gym.raid_pokemon_id > 0) {
+          const formId = masterfile[gym.raid_pokemon_id].default_form_id
+          if (formId) queryResults[i].raid_pokemon_form = formId
+        }
+      }
+      return queryResults
+    }
+
+    const results = await eval(query)
+    return secondaryFilter(results)
+  }
+
+  static async getAvailableRaidBosses() {
+    const ts = Math.floor((new Date()).getTime() / 1000)
+
+    const raids = {}
+    const results = await this.query()
+      .select('raid_pokemon_id', 'raid_pokemon_form')
+      .where('raid_end_timestamp', '>', ts)
+      .andWhere('raid_pokemon_id', '>', 0)
+      .groupBy('raid_pokemon_id', 'raid_pokemon_form')
+      .orderBy('raid_pokemon_id', 'asc')
+    results.forEach(pokemon => {
+      raids[`p${pokemon.raid_pokemon_id}-${pokemon.raid_pokemon_form}`] = new GenericFilter()
+    })
+    return raids
   }
 }
 

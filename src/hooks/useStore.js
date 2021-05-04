@@ -21,6 +21,8 @@ const useStore = create(persist(set => ({
 const useMasterfile = create(set => ({
   config: undefined,
   setConfig: (config) => set({ config }),
+  available: undefined,
+  setAvailable: (available) => set({ available }),
   availableForms: undefined,
   setAvailableForms: (availableForms) => set({ availableForms }),
   ui: {},

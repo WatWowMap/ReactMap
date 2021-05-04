@@ -1,22 +1,25 @@
 import { gql } from '@apollo/client'
 
 const getAllGyms = gql`
-  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!) {
-    gyms(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
+  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
+    gyms(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
       id
+      name
       lat
       lon
       availble_slots
       team_id
       in_battle
+      updated
     }
   }
 `
 
 const getAllRaids = gql`
-  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!) {
-    gyms(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
+  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
+    gyms(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
       id
+      name
       lat
       lon
       raid_level
@@ -30,6 +33,7 @@ const getAllRaids = gql`
       availble_slots
       team_id
       in_battle
+      updated
     }
   }
 `

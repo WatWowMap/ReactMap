@@ -19,7 +19,7 @@ import Size from './Size'
 
 export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) {
   const isMobile = useMasterfile(state => state.breakpoint) === 'xs'
-  const { menus: { filterItems }, text } = useMasterfile(state => state.ui)
+  const { menus, text } = useMasterfile(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
@@ -93,7 +93,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
                   onChange={handleLegacySwitch}
                   name="adv"
                   color="secondary"
-                  disabled={filterItems[type].legacy}
+                  disabled={!menus[type].legacy}
                 />
               )}
               label={text.legacy}
@@ -108,7 +108,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
           justify="center"
           alignItems="center"
         >
-          {filters[type].legacy
+          {(filters[type].legacy && menus[type].legacy)
             ? (
               <Grid item xs={12}>
                 <StringFilter
@@ -119,7 +119,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
             )
             : (
               <>
-                {Object.entries(filterItems[type].sliders).map(category => (
+                {Object.entries(menus[type].sliders).map(category => (
                   <Grid item xs={12} sm={6} key={category[0]}>
                     {category[1].map(each => (
                       <SliderTile

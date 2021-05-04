@@ -1,6 +1,6 @@
 import { Icon } from 'leaflet'
 
-export default function gymMarker(settings, availableForms, gym, ts) {
+export default function gymMarker(gym, ts) {
   const iconSize = 30
   const iconAnchorY = iconSize * 0.849
   const popupAnchorY = (gym.raid_end_timestamp >= ts && gym.raid_level > 0)
