@@ -26,8 +26,6 @@ export default function Map() {
     setZoom(map.getZoom())
   }, [map])
 
-  console.log(filters, menus)
-
   return (
     <>
       <TileLayer
