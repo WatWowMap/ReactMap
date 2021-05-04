@@ -68,7 +68,7 @@ class Gym extends Model {
     if (onlyRaids && raids) {
       query += `
       .${count ? 'or' : 'and'}Where(pokemon => {
-        pokemon.whereIn('raid_pokemon_id', [${raidBosses}])
+        pokemon.whereIn('raid_pokemon_id', [${[...new Set(raidBosses)]}])
           .andWhere('raid_battle_timestamp', '<=', ${ts})
           .andWhere('raid_end_timestamp', '>=', ${ts})
           .andWhere('raid_level', '>', 0)

@@ -10,7 +10,7 @@ export default function PokemonQuery({ bounds, filters, onMove }) {
   const map = useMap()
   const trimmedFilters = {
     ivOr: filters.pokemon.filter.ivOr,
-    default: filters.pokemon.filter.default,
+    standard: filters.pokemon.filter.standard,
   }
   Object.entries(filters.pokemon.filter).forEach(filter => {
     const [id, specifics] = filter
