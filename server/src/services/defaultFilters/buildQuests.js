@@ -6,7 +6,6 @@ module.exports = function buildQuests(perms, availableQuests) {
   if (quests) {
     Object.entries(availableQuests).forEach(questType => {
       const [type, rewards] = questType
-
       switch (type) {
         default:
           rewards.forEach(reward => {
@@ -20,9 +19,12 @@ module.exports = function buildQuests(perms, availableQuests) {
           rewards.forEach(reward => {
             quests[`m${reward.id}`] = new GenericFilter()
           }); break
+        case 'invasions':
+          rewards.forEach(reward => {
+            quests[`i${reward.grunt_type}`] = new GenericFilter()
+          })
       }
     })
   }
-
   return quests
 }

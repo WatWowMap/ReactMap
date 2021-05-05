@@ -3,6 +3,7 @@ import getProperName from './functions/getProperName'
 import filterPokemon from './functions/filterPokemon'
 import checkAdvFilter from './functions/checkAdvFilter'
 import filterGyms from './functions/filterGyms'
+import filterPokestops from './functions/filterPokestops'
 
 class Utility {
   static getPokemonIcon(availableForms, pokemonId, form, evolution, gender, costume, shiny) {
@@ -19,6 +20,10 @@ class Utility {
 
   static gyms(tempFilters, menus, search) {
     return filterGyms(tempFilters, menus, search)
+  }
+
+  static pokestops(tempFilters, menus, search) {
+    return filterPokestops(tempFilters, menus, search)
   }
 
   static checkAdvFilter(filter) {

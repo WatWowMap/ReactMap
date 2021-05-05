@@ -3,7 +3,7 @@ const { database: { schemas } } = require('./src/services/config')
 
 const migrationUrl = 'src/db/migrations'
 
-const selectedDb = Object.keys(schemas).find(dbName => schemas[dbName].useFor.includes('user')) || 'scanner'
+const selectedDb = Object.keys(schemas).find(dbName => schemas[dbName].useFor.includes('user')) || Object.keys(schemas)[0]
 
 const connection = {
   client: 'mysql',

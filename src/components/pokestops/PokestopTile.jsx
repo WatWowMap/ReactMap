@@ -11,14 +11,17 @@ const PokestopTile = ({
     position={[pokestop.lat, pokestop.lon]}
     icon={stopMarker(pokestop, ts, globalFilters.pokestops)}
   >
-    <Marker
-      position={[pokestop.lat, pokestop.lon]}
-      icon={questMarker(pokestop, settings, availableForms)}
-    >
-      <Popup position={[pokestop.lat, pokestop.lon]}>
-        <PopupContent pokestop={pokestop} />
-      </Popup>
-    </Marker>
+    {(pokestop.quest_rewards || pokestop.quest_pokemon_id)
+      && (
+        <Marker
+          position={[pokestop.lat, pokestop.lon]}
+          icon={questMarker(pokestop, settings, availableForms)}
+        >
+          <Popup position={[pokestop.lat, pokestop.lon]}>
+            <PopupContent pokestop={pokestop} />
+          </Popup>
+        </Marker>
+      )}
     <Popup position={[pokestop.lat, pokestop.lon]}>
       <PopupContent pokestop={pokestop} />
     </Popup>
@@ -26,10 +29,10 @@ const PokestopTile = ({
 
 )
 
-const areEqual = (prevStop, nextStop) => (
-  prevStop.id === nextStop.id
-  && prevStop.lat === nextStop.lat
-  && prevStop.lon === nextStop.lon
+const areEqual = (prev, next) => (
+  prev.pokestop.id === next.pokestop.id
+    && prev.pokestop.updated === next.pokestop.updated
+
 )
 
 export default React.memo(PokestopTile, areEqual)

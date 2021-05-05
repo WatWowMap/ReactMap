@@ -13,6 +13,10 @@ const categories = {
     rarity: ['Common', 'Uncommon', 'Rare', 'UltraRare', 'Regional', 'Event', 'Legendary', 'Mythical'],
     others: ['reverse', 'selected', 'unselected'],
   },
+  pokestops: {
+    categories: ['pokestops', 'items', 'energy', 'invasions', 'pokemon'],
+    others: ['reverse', 'selected', 'unselected'],
+  },
 }
 
 module.exports = function buildMenus() {

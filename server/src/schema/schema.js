@@ -1,23 +1,22 @@
-/* eslint-disable no-return-await */
 const {
   GraphQLObjectType, GraphQLID, GraphQLFloat, GraphQLList, GraphQLSchema,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
 const { ref } = require('objection')
 
-const DeviceType = require('./device.js')
-const GymType = require('./gym.js')
-const PokestopType = require('./pokestop.js')
-const PokemonType = require('./pokemon.js')
-const PortalType = require('./portal.js')
-const S2CellType = require('./s2Cell.js')
-const SpawnpointType = require('./spawnpoint.js')
-const WeatherType = require('./weather.js')
+const DeviceType = require('./device')
+const GymType = require('./gym')
+const PokestopType = require('./pokestop')
+const PokemonType = require('./pokemon')
+const PortalType = require('./portal')
+const S2cellType = require('./s2cell')
+const SpawnpointType = require('./spawnpoint')
+const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
 
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather,
-} = require('../models/index.js')
+} = require('../models/index')
 
 const minMaxArgs = {
   minLat: { type: GraphQLFloat },
@@ -32,7 +31,7 @@ const RootQuery = new GraphQLObjectType({
     devices: {
       type: new GraphQLList(DeviceType),
       async resolve() {
-        return await Device.query()
+        return Device.query()
       },
     },
     gyms: {
@@ -43,9 +42,9 @@ const RootQuery = new GraphQLObjectType({
       },
       async resolve(parent, args, req) {
         if (req.user.perms.gyms || req.user.perms.raids) {
-          return await Gym.getAllGyms(args, req.user.perms)
+          return Gym.getAllGyms(args, req.user.perms)
         }
-        return await Gym.getAllGyms(args)
+        return Gym.getAllGyms(args)
       },
     },
     pokestops: {
@@ -54,8 +53,13 @@ const RootQuery = new GraphQLObjectType({
         ...minMaxArgs,
         filters: { type: JSONResolver },
       },
-      async resolve(parent, args) {
-        return await Pokestop.getAllPokestops(args)
+      async resolve(parent, args, req) {
+        if (req.user.perms.pokestops
+          || req.user.perms.lures
+          || req.user.perms.quests
+          || req.user.perms.invasions) {
+          return Pokestop.getAllPokestops(args, req.user.perms)
+        }
       },
     },
     pokemon: {
@@ -66,7 +70,7 @@ const RootQuery = new GraphQLObjectType({
       },
       async resolve(parent, args, req) {
         if (req.user.perms.pokemon) {
-          return await Pokemon.getPokemon(args, req.user.perms)
+          return Pokemon.getPokemon(args, req.user.perms)
         }
       },
     },
@@ -86,13 +90,13 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(PortalType),
       args: minMaxArgs,
       async resolve(parent, args) {
-        return await Portal.query()
+        return Portal.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
           .andWhereBetween('lon', [args.minLon, args.maxLon])
       },
     },
     s2cells: {
-      type: new GraphQLList(S2CellType),
+      type: new GraphQLList(S2cellType),
       args: minMaxArgs,
       async resolve(parent, args) {
         const s2cells = await S2cell.query()
@@ -109,7 +113,7 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(SpawnpointType),
       args: minMaxArgs,
       async resolve(parent, args) {
-        return await Spawnpoint.query()
+        return Spawnpoint.query()
           .whereBetween('lat', [args.minLat, args.maxLat])
           .andWhereBetween('lon', [args.minLon, args.maxLon])
       },

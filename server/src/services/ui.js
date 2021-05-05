@@ -54,13 +54,13 @@ module.exports = function generateUi(filters, perms) {
           }; break
         case 'submissionCells':
         case 'portals':
-          menus.wayfarer = {}
-          menus.wayfarer[key] = {}; break
+          if (!menus.wayfarer) menus.wayfarer = {}
+          menus.wayfarer[key] = true; break
         case 'spawnpoints':
         case 's2Cells':
         case 'devices':
-          menus.admin = {}
-          menus.admin[key] = {}; break
+          if (!menus.admin) menus.admin = {}
+          menus.admin[key] = true; break
       }
       // builds each subcategory
       for (const [subKey, subValue] of Object.entries(value)) {

@@ -14,11 +14,6 @@ const connections = Object.keys(schemas).map(name => Knex({
   },
 }))
 
-// Sets default if for some reason it's not set in config
-if (schemas.scanner.useFor.length < 1) {
-  schemas.scanner.useFor.push('pokestop', 'gym', 'device', 's2cell', 'portal', 'weather', 'spawnpoint', 'pokemon', 'weather', 'user', 'session')
-}
-
 // Binds the models to the designated databases
 Object.keys(schemas).forEach((name, index) => {
   schemas[name].useFor.forEach(category => {
