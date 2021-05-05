@@ -97,20 +97,21 @@ class Gym extends Model {
     return secondaryFilter(results)
   }
 
-  static async getAvailableRaidBosses() {
-    const ts = Math.floor((new Date()).getTime() / 1000)
-
-    const raids = {}
-    const results = await this.query()
-      .select('raid_pokemon_id', 'raid_pokemon_form')
-      .where('raid_end_timestamp', '>', ts)
-      .andWhere('raid_pokemon_id', '>', 0)
-      .groupBy('raid_pokemon_id', 'raid_pokemon_form')
-      .orderBy('raid_pokemon_id', 'asc')
-    results.forEach(pokemon => {
-      raids[`p${pokemon.raid_pokemon_id}-${pokemon.raid_pokemon_form}`] = new GenericFilter()
-    })
-    return raids
+  static async getAvailableRaidBosses(perms, defaults) {
+    if (perms) {
+      const ts = Math.floor((new Date()).getTime() / 1000)
+      const raids = {}
+      const results = await this.query()
+        .select('raid_pokemon_id', 'raid_pokemon_form')
+        .where('raid_end_timestamp', '>', ts)
+        .andWhere('raid_pokemon_id', '>', 0)
+        .groupBy('raid_pokemon_id', 'raid_pokemon_form')
+        .orderBy('raid_pokemon_id', 'asc')
+      results.forEach(pokemon => {
+        raids[`p${pokemon.raid_pokemon_id}-${pokemon.raid_pokemon_form}`] = new GenericFilter(defaults)
+      })
+      return raids
+    }
   }
 }
 

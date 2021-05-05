@@ -40,7 +40,7 @@ const isValidSession = async (userId) => {
     .select('session_id')
     .where(raw(`json_extract(data, '$.passport.user.id') = '${userId}'`))
     .andWhere('expires', '>=', ts)
-  return results.length < config.maxSessions
+  return results.length < config.api.maxSessions
 }
 
 const clearOtherSessions = async (userId, currentSessionId) => {

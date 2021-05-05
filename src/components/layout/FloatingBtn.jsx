@@ -13,23 +13,23 @@ export default function FloatingButtons({ toggleDrawer }) {
   return (
     <Grid container direction="column" spacing={1} className={classes.floatingBtn}>
       <Grid item>
-        <Fab color="primary">
-          <Menu onClick={toggleDrawer(true)} />
+        <Fab color="primary" onClick={toggleDrawer(true)}>
+          <Menu />
         </Fab>
       </Grid>
       <Grid item>
-        <Fab color="secondary">
-          <LocationOn onClick={() => map.locate({ watch: true, setView: true, enableHighAccuracy: true })} />
+        <Fab color="secondary" onClick={() => map.locate({ watch: true, setView: true, enableHighAccuracy: true })}>
+          <LocationOn />
         </Fab>
       </Grid>
       <Grid item>
-        <Fab color="secondary">
-          <ZoomIn onClick={() => map.zoomIn()} />
+        <Fab color="secondary" onClick={() => map.zoomIn()}>
+          <ZoomIn />
         </Fab>
       </Grid>
       <Grid item>
-        <Fab color="secondary">
-          <ZoomOut onClick={() => map.zoomOut()} />
+        <Fab color="secondary" onClick={() => map.zoomOut()}>
+          <ZoomOut />
         </Fab>
       </Grid>
     </Grid>

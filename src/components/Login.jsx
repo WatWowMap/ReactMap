@@ -2,13 +2,15 @@ import React from 'react'
 import {
   Grid, Button, Icon, Typography,
 } from '@material-ui/core'
-import useStyles from '../assets/mui/styling'
 
 export default function Login() {
-  const classes = useStyles()
   return (
     <Grid
-      className={classes.login}
+      style={{
+        display: 'flex',
+        margin: '45% auto auto auto',
+        backgroundColor: 'rgb(52, 52, 52)',
+      }}
       container
       direction="row"
       justify="center"

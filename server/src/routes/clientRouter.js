@@ -8,7 +8,7 @@ const clientRoutes = [
 ]
 
 router.get(clientRoutes, (req, res) => {
-  res.sendFile(config.clientPath)
+  res.sendFile(config.api.clientPath)
 })
 
 module.exports = router
