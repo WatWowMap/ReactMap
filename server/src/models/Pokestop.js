@@ -77,8 +77,8 @@ class Pokestop extends Model {
       || (onlyInvasions && invasionPerms)) {
       query += '})'
     }
-    const results = await eval(query)
-    return results
+
+    return eval(query)
   }
 
   static async getAvailableQuests() {
