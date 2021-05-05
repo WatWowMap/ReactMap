@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
-const { database } = require('../../services/config')
+const { database: { settings: { userTableName } } } = require('../../services/config')
 
-const tableName = database.settings.userTableName
 /**
  * @typedef {import("knex")} Knex
  */
@@ -10,14 +9,14 @@ const tableName = database.settings.userTableName
  * @param {Knex} knex
  */
 exports.up = async (knex) => (
-  knex.schema.hasTable(tableName).then((exists) => {
+  knex.schema.hasTable(userTableName).then((exists) => {
     if (!exists) {
-      return knex.schema.createTable(tableName, table => {
+      return knex.schema.createTable(userTableName, table => {
         table.string('id')
       })
     }
     // eslint-disable-next-line no-console
-    console.warn(`${tableName} already exists in your db, you may need to choose a new name in the config file.`)
+    console.warn(`${userTableName} already exists in your db, you may need to choose a new name in the config file.`)
   })
 
 )
@@ -25,4 +24,4 @@ exports.up = async (knex) => (
 /**
   * @param {Knex} knex
   */
-exports.down = (knex) => (knex.schema.dropTableIfExists(tableName))
+exports.down = (knex) => (knex.schema.dropTableIfExists(userTableName))

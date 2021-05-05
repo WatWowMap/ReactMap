@@ -1,47 +1,16 @@
 {
   "interface": "0.0.0.0",
   "port": 8080,
-  "title": "MapJS",
-  "headerTitle": "MapJS - NodeJS Map Replacement",
-  "locale": "en",
-  "style": "dark",
-  "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
-  "homepage": {
-    "enabled": false,
-    "title": "Welcome to MapJS",
-    "descriptionLine1": "The best place to find Pokemon, Raids, Quests, and more!",
-    "descriptionLine2": "Please login or join our Discord for more info...",
-    "discordInvite": "https://discord.gg/yourInvite"
-  },
   "map": {
+    "title": "ReactMap",
+    "headerTitle": "React based Leaflet Map",  
+    "locale": "en",
+    "style": "dark",
     "startLat": 0,
     "startLon": 0,
     "startZoom": 12,
     "minZoom": 10,
     "maxZoom": 18
-  },
-  "areas": {
-    "test": {
-      "lat": 4.01,
-      "lon": 117.01,
-      "zoom": 15
-    }
-  },
-  "header": {
-    "left": [
-      {
-        "name": "Stats",
-        "url": "https://stats.example.com",
-        "icon": "fas fa-chart-bar"
-      }
-    ],
-    "right": [
-      {
-        "name": "Discord",
-        "url": "https://discord.com",
-        "icon": "fab fa-discord"
-      }
-    ]
   },
   "database": {
     "settings": {
@@ -50,21 +19,25 @@
     },
     "schemas": {
       "scanner": {
+        "type": "rdm",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",
         "password": "pass123!",
         "database": "rdmdb",
         "charset": "utf8mb4",
+        "arScanColumn": false,
         "useFor": ["device", "gym", "pokemon", "pokestop", "portal", "s2cell", "spawnpoint", "weather"]
       },
-      "manualDb1": {
+      "manual": {
+        "type": "manual",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",
         "password": "pass123!",
-        "database": "manualdb",
+        "database": "manual_1",
         "charset": "utf8mb4",
+        "arScanColumn": false,
         "useFor": ["session", "user"]
       }
     }  
@@ -72,7 +45,8 @@
   "discord": {
     "enabled": false,
     "logChannelId": "",
-    "status": "Map Status: Online",
+    "presence": "Map Status: Online",
+    "presenceType": 3,
     "botToken": "",
     "clientId": "",
     "clientSecret": "",
@@ -89,15 +63,7 @@
         "enabled": true,
         "roles": []
       },
-      "iv": {
-        "enabled": true,
-        "roles": []
-      },
-      "stats": {
-        "enabled": true,
-        "roles": []
-      },
-      "pvp": {
+      "raids": {
         "enabled": true,
         "roles": []
       },
@@ -105,19 +71,15 @@
         "enabled": true,
         "roles": []
       },
-      "raids": {
-        "enabled": true,
-        "roles": []
-      },
       "pokestops": {
         "enabled": true,
         "roles": []
       },
-      "lures": {
+      "quests": {
         "enabled": true,
         "roles": []
       },
-      "quests": {
+      "lures": {
         "enabled": true,
         "roles": []
       },
@@ -129,6 +91,14 @@
         "enabled": true,
         "roles": []
       },
+      "iv": {
+        "enabled": true,
+        "roles": []
+      },
+      "pvp": {
+        "enabled": true,
+        "roles": []
+      },
       "s2Cells": {
         "enabled": true,
         "roles": []
@@ -137,15 +107,15 @@
         "enabled": true,
         "roles": []
       },
-      "scanAreas": {
-        "enabled": true,
-        "roles": []
-      },
       "nests": {
         "enabled": true,
         "roles": []
       },
       "portals": {
+        "enabled": true,
+        "roles": []
+      },
+      "scanAreas": {
         "enabled": true,
         "roles": []
       },

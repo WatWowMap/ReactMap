@@ -5,9 +5,11 @@ import { ThemeProvider } from '@material-ui/styles'
 import { useMediaQuery } from '@material-ui/core'
 import { useStore, useMasterfile } from '../hooks/useStore'
 import Map from './Map'
-import theme from '../assets/mui/theme'
+import createTheme from '../assets/mui/theme'
 
 export default function ConfigSettings({ serverSettings }) {
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
   const setSettings = useStore(state => state.setSettings)
   const setFilters = useStore(state => state.setFilters)
   const setLocation = useStore(state => state.setLocation)

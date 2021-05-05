@@ -1,4 +1,4 @@
-const { map: { filters } } = require('../config.js')
+const { map: { defaultFilters } } = require('../config.js')
 const buildPokemon = require('./buildPokemon.js')
 const buildQuests = require('./buildQuests.js')
 // const buildInvasions = require('./buildInvasions.js')
@@ -12,59 +12,53 @@ module.exports = async function buildDefault(perms) {
 
   return {
     gyms: gymReducer ? {
-      enabled: filters.gyms,
-      gyms: perms.gyms ? filters.gyms : undefined,
-      raids: perms.raids ? filters.raids : undefined,
-      exEligible: perms.gyms ? false : undefined,
-      inBattle: perms.gyms ? false : undefined,
+      enabled: defaultFilters.gyms.enabled,
+      gyms: perms.gyms ? defaultFilters.gyms.enabled : undefined,
+      raids: perms.raids ? defaultFilters.gyms.raids : undefined,
+      exEligible: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
+      inBattle: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
       filter: {
-        ...buildGyms(perms),
-        ...await Gym.getAvailableRaidBosses(perms.raids),
+        ...buildGyms(perms, defaultFilters.gyms),
+        ...await Gym.getAvailableRaidBosses(perms.raids, defaultFilters.gyms.pokemon),
       },
     } : undefined,
     pokestops: stopReducer ? {
-      enabled: filters.pokestops,
-      pokestops: perms.pokestops ? filters.pokestops : undefined,
-      lures: perms.lures ? filters.lures : undefined,
-      invasions: perms.invasions ? filters.invasions : undefined,
-      quests: perms.quests ? filters.quests : undefined,
+      enabled: defaultFilters.pokestops.enabled,
+      pokestops: perms.pokestops ? defaultFilters.pokestops.enabled : undefined,
+      lures: perms.lures ? defaultFilters.pokestops.lures : undefined,
+      quests: perms.quests ? defaultFilters.pokestops.quests : undefined,
+      invasions: perms.invasions ? defaultFilters.pokestops.invasions : undefined,
       filter: {
-        l501: perms.lures ? new GenericFilter() : undefined,
-        l502: perms.lures ? new GenericFilter() : undefined,
-        l503: perms.lures ? new GenericFilter() : undefined,
-        l504: perms.lures ? new GenericFilter() : undefined,
-        ...buildQuests(perms.quests, await Pokestop.getAvailableQuests()),
+        l501: perms.lures ? new GenericFilter(defaultFilters.pokestops.lures) : undefined,
+        l502: perms.lures ? new GenericFilter(defaultFilters.pokestops.lures) : undefined,
+        l503: perms.lures ? new GenericFilter(defaultFilters.pokestops.lures) : undefined,
+        l504: perms.lures ? new GenericFilter(defaultFilters.pokestops.lures) : undefined,
+        ...buildQuests(perms.quests, await Pokestop.getAvailableQuests(), defaultFilters.pokestops),
         // ...buildInvasions(perms.invasions),
       },
     } : undefined,
     pokemon: perms.pokemon ? {
-      enabled: filters.pokemon,
-      legacy: pokemonReducer ? false : undefined,
-      filter: buildPokemon(perms.pokemon, 'pokemon'),
+      enabled: defaultFilters.pokemon.enabled,
+      legacy: pokemonReducer ? defaultFilters.pokemon.legacyFilter : undefined,
+      filter: buildPokemon(perms.pokemon, 'pokemon', defaultFilters.pokemon),
     } : undefined,
     portals: perms.portals ? {
-      enabled: filters.portals,
-      filter: {},
+      enabled: defaultFilters.portals.enabled,
     } : undefined,
     submissionCells: perms.submissionCells ? {
-      enabled: filters.submissionCells,
-      filter: {},
+      enabled: defaultFilters.submissionCells.enabled,
     } : undefined,
     weather: perms.weather ? {
-      enabled: filters.weather,
-      filter: {},
+      enabled: defaultFilters.weather.enabled,
     } : undefined,
     spawnpoints: perms.spawnpoints ? {
-      enabled: filters.spawnpoints,
-      filter: {},
+      enabled: defaultFilters.spawnpoints.enabled,
     } : undefined,
     s2Cells: perms.s2Cells ? {
-      enabled: filters.scanCells,
-      filter: {},
+      enabled: defaultFilters.scanCells.enabled,
     } : undefined,
     devices: perms.devices ? {
-      enabled: filters.devices,
-      filter: {},
+      enabled: defaultFilters.devices.enabled,
     } : undefined,
   }
 }

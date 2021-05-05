@@ -43,8 +43,8 @@ rootRouter.get('/settings', async (req, res) => {
         user,
         menus: Utility.buildMenus(),
       }
-      serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, user.perms)
       await Utility.updateAvailableForms(serverSettings.config.icons)
+      serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, user.perms)
 
       res.status(200).json({ serverSettings })
     } catch (error) {

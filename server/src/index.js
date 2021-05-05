@@ -18,12 +18,12 @@ app.use(compression())
 
 app.use(express.json({ limit: '50mb' }))
 
-app.use(express.static(path.join(__dirname, config.clientPath)))
+app.use(express.static(path.join(__dirname, config.devOptions.clientPath)))
 
 app.use(session({
   name: 'discord',
   key: 'session',
-  secret: config.sessionSecret,
+  secret: config.api.sessionSecret,
   store: sessionStore,
   resave: true,
   saveUninitialized: false,

@@ -8,17 +8,22 @@
 const DiscordOauth2 = require('discord-oauth2')
 const Discord = require('discord.js')
 const fs = require('fs')
-const config = require('./config')
+const { discord } = require('./config')
 
 const oauth = new DiscordOauth2()
 const client = new Discord.Client()
 
-if (config.discord.enabled) {
+if (discord.enabled) {
   client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`)
-    client.user.setPresence({ activity: { name: config.discord.status, type: 3 } })
+    client.user.setPresence({
+      activity: {
+        name: discord.presence,
+        type: discord.presenceType,
+      },
+    })
   })
-  client.login(config.discord.botToken)
+  client.login(discord.botToken)
 }
 
 class DiscordClient {
@@ -55,7 +60,7 @@ class DiscordClient {
   }
 
   async discordEvents() {
-    client.config = config.discord
+    client.config = discord
     try {
       fs.readdir(`${__dirname}/events/`, (err, files) => {
         if (err) return this.log.error(err)
@@ -72,31 +77,31 @@ class DiscordClient {
 
   async getPerms(user) {
     const perms = {}
-    Object.keys(config.discord.perms).map(perm => perms[perm] = false)
+    Object.keys(discord.perms).map(perm => perms[perm] = false)
     perms.areaRestrictions = []
 
     const [guilds, guildsFull] = await this.getGuilds()
-    if (config.discord.allowedUsers.includes(user.id)) {
+    if (discord.allowedUsers.includes(user.id)) {
       Object.keys(perms).forEach((key) => perms[key] = true)
       console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
       return perms
     }
-    for (let i = 0; i < config.discord.blockedGuilds.length; i += 1) {
-      const guildId = config.discord.blockedGuilds[i]
+    for (let i = 0; i < discord.blockedGuilds.length; i += 1) {
+      const guildId = discord.blockedGuilds[i]
       if (guilds.includes(guildId)) {
         perms.blocked = guildsFull.find(x => x.id === guildId).name
         return perms
       }
     }
-    for (let i = 0; i < config.discord.allowedGuilds.length; i += 1) {
-      const guildId = config.discord.allowedGuilds[i]
+    for (let i = 0; i < discord.allowedGuilds.length; i += 1) {
+      const guildId = discord.allowedGuilds[i]
       if (guilds.includes(guildId)) {
-        const keys = Object.keys(config.discord.perms)
+        const keys = Object.keys(discord.perms)
         const userRoles = await this.getUserRoles(guildId, user.id)
 
         for (let j = 0; j < keys.length; j += 1) {
           const key = keys[j]
-          const configItem = config.discord.perms[key]
+          const configItem = discord.perms[key]
           if (configItem.enabled && configItem.roles.length === 0) {
             perms[key] = true
           } else {

@@ -1,7 +1,6 @@
 import { makeStyles } from '@material-ui/styles'
-import theme from './theme'
 
-export default makeStyles({
+export default makeStyles(theme => ({
   gridItem: {
     height: 75,
     width: 'auto',
@@ -77,4 +76,4 @@ export default makeStyles({
   iconButton: {
     padding: 10,
   },
-})
+}))
