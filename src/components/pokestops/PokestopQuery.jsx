@@ -6,22 +6,25 @@ import { useMap } from 'react-leaflet'
 import Query from '../../services/Query'
 import PokestopTile from './PokestopTile'
 
-export default function PokestopQuery({ bounds, filters, onMove }) {
+export default function PokestopQuery({
+  bounds, filters, onMove, perms,
+}) {
   const map = useMap()
-  const ts = (new Date()).getTime() / 1000
+  const ts = Math.floor((new Date()).getTime() / 1000)
 
   const trimmedFilters = {
-    pokestops: {},
+    onlyStops: filters.pokestops.pokestops,
+    onlyLures: filters.pokestops.lures,
+    onlyQuests: filters.pokestops.quests,
+    onlyInvasions: filters.pokestops.invasions,
   }
-  if (filters.pokestops.enabled) {
-    Object.entries(filters.pokestops.filter).forEach(filter => {
-      const [id, specifics] = filter
-      if (specifics.enabled) {
-        trimmedFilters.pokestops[id] = specifics
-      }
-    })
-  }
-  const { data, previousData, refetch } = useQuery(Query.getAllPokestops(), {
+  Object.entries(filters.pokestops.filter).forEach(filter => {
+    const [id, specifics] = filter
+    if (specifics.enabled) {
+      trimmedFilters[id] = specifics
+    }
+  })
+  const { data, previousData, refetch } = useQuery(Query.getAllPokestops(filters.pokestops, perms), {
     variables: { ...bounds, filters: trimmedFilters },
   })
 

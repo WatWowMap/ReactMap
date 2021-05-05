@@ -33,20 +33,21 @@ export default function Map() {
         attribution={settings.tileServers.attribution}
         url={settings.tileServers.url}
       />
-      {Object.keys({ ...menus, ...menus.wayfarer, ...menus.admin }).map(item => {
+      {Object.entries({ ...menus, ...menus.wayfarer, ...menus.admin }).map(category => {
+        const [item, value] = category
         const Component = index[item]
         let enabled = false
         switch (item) {
           default:
             if (filters[item]
-              && filters[item].enabled && menus[item]) {
+              && filters[item].enabled && value) {
               enabled = true
             } break
           case 'gyms':
-            if ((filters[item].gyms && menus[item].gyms)
-              || (filters[item].raids && menus[item].raids)
-              || (filters[item].exEligible && menus[item].exEligible)
-              || (filters[item].inBattle && menus[item].inBattle)) {
+            if ((filters[item].gyms && value.gyms)
+              || (filters[item].raids && value.raids)
+              || (filters[item].exEligible && value.exEligible)
+              || (filters[item].inBattle && value.inBattle)) {
               enabled = true
             } break
           case 'pokestops':
@@ -64,7 +65,7 @@ export default function Map() {
               bounds={initialBounds}
               filters={filters}
               onMove={onMove}
-              perms={menus[item]}
+              perms={value}
             />
           )
         }

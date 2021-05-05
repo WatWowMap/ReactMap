@@ -15,6 +15,7 @@ function fetchJson(url) {
 
 ((async function generate() {
   const masterfile = await fetchJson('https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest.json')
+  const invasions = await fetchJson('https://raw.githubusercontent.com/WatWowMap/MapJS/master/static/data/grunttypes.json')
 
   const newMasterfile = {
     pokemon: {},
@@ -24,6 +25,7 @@ function fetchJson(url) {
     items: masterfile.items,
     weatherTypes,
     gyms: gymMeta,
+    invasions,
   }
 
   for (const [id, move] of Object.entries(masterfile.moves)) {

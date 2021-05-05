@@ -1,7 +1,7 @@
 const { map: { filters } } = require('../config.js')
 const buildPokemon = require('./buildPokemon.js')
 const buildQuests = require('./buildQuests.js')
-const buildInvasions = require('./buildInvasions.js')
+// const buildInvasions = require('./buildInvasions.js')
 const buildGyms = require('./buildGyms')
 const { Pokestop, GenericFilter, Gym } = require('../../models/index')
 
@@ -29,13 +29,12 @@ module.exports = async function buildDefault(perms) {
       invasions: perms.invasions ? filters.invasions : undefined,
       quests: perms.quests ? filters.quests : undefined,
       filter: {
-        s0: perms.pokestops ? new GenericFilter() : undefined,
-        s501: perms.lures ? new GenericFilter() : undefined,
-        s502: perms.lures ? new GenericFilter() : undefined,
-        s503: perms.lures ? new GenericFilter() : undefined,
-        s504: perms.lures ? new GenericFilter() : undefined,
-        ...buildInvasions(perms.invasions),
+        l501: perms.lures ? new GenericFilter() : undefined,
+        l502: perms.lures ? new GenericFilter() : undefined,
+        l503: perms.lures ? new GenericFilter() : undefined,
+        l504: perms.lures ? new GenericFilter() : undefined,
         ...buildQuests(perms.quests, await Pokestop.getAvailableQuests()),
+        // ...buildInvasions(perms.invasions),
       },
     } : undefined,
     pokemon: perms.pokemon ? {
