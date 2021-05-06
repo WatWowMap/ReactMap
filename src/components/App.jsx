@@ -35,7 +35,7 @@ const client = new ApolloClient({
 })
 
 export default function App() {
-  const [serverSettings, setServerSettings] = useState(false)
+  const [serverSettings, setServerSettings] = useState(undefined)
 
   const getServerSettings = async () => {
     setServerSettings(await Fetch.getSettings())
