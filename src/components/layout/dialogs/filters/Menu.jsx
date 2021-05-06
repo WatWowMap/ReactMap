@@ -16,7 +16,7 @@ import AutoSizer from 'react-virtualized-auto-sizer'
 import Utility from '../../../../services/Utility'
 
 import { useStore, useMasterfile } from '../../../../hooks/useStore'
-import useStyles from '../../../../assets/mui/styling'
+import useStyles from '../../../../hooks/useStyles'
 import Advanced from './Advanced'
 import Tile from './MenuTile'
 import FilterOptions from './Options'

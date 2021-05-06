@@ -4,7 +4,7 @@ import {
   Menu, LocationOn, ZoomIn, ZoomOut,
 } from '@material-ui/icons'
 import { useMap } from 'react-leaflet'
-import useStyles from '../../assets/mui/styling'
+import useStyles from '../../hooks/useStyles'
 
 export default function FloatingButtons({ toggleDrawer }) {
   const classes = useStyles()

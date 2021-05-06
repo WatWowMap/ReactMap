@@ -14,11 +14,9 @@ module.exports = function buildPokemon(perms, type, defaults) {
     }
   }
   if (type === 'pokemon') {
-    pokemon.standard = new PokemonFilter()
-    const globalFilters = ['ivOr', 'ivAnd']
-    globalFilters.forEach(global => {
-      pokemon[global] = new PokemonFilter(...Object.values(defaults.globalValues))
-    })
+    pokemon.standard = new PokemonFilter(true)
+    pokemon.ivOr = new PokemonFilter(true, 'md', ...Object.values(defaults.globalValues))
+    pokemon.ivAnd = new PokemonFilter(false, 'md', ...Object.values(defaults.globalValues))
   }
   return pokemon
 }

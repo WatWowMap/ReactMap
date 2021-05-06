@@ -3,7 +3,7 @@ import { TileLayer, useMap } from 'react-leaflet'
 
 import { useMasterfile, useStore } from '../hooks/useStore'
 import Nav from './layout/Nav'
-import * as index from './componentIndex'
+import QueryData from './QueryData'
 
 export default function Map() {
   const map = useMap()
@@ -35,12 +35,12 @@ export default function Map() {
       />
       {Object.entries({ ...menus, ...menus.wayfarer, ...menus.admin }).map(category => {
         const [item, value] = category
-        const Component = index[item]
         let enabled = false
         switch (item) {
           default:
             if (filters[item]
-              && filters[item].enabled && value) {
+              && filters[item].enabled
+              && value) {
               enabled = true
             } break
           case 'gyms':
@@ -51,21 +51,22 @@ export default function Map() {
               enabled = true
             } break
           case 'pokestops':
-            if (filters[item].pokestops
-              || filters[item].lures
-              || filters[item].invasions
-              || filters[item].quests) {
+            if ((filters[item].pokestops && value.pokestops)
+              || (filters[item].lures && value.lures)
+              || (filters[item].invasions && value.invasions)
+              || (filters[item].quests && value.quests)) {
               enabled = true
             } break
         }
         if (enabled) {
           return (
-            <Component
+            <QueryData
               key={item}
               bounds={initialBounds}
-              filters={filters}
+              filters={filters[item]}
               onMove={onMove}
               perms={value}
+              category={item}
             />
           )
         }

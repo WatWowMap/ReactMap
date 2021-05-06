@@ -57,7 +57,7 @@ module.exports = function generateUi(filters, perms) {
           if (!menus.wayfarer) menus.wayfarer = {}
           menus.wayfarer[key] = true; break
         case 'spawnpoints':
-        case 's2Cells':
+        case 's2cells':
         case 'devices':
           if (!menus.admin) menus.admin = {}
           menus.admin[key] = true; break
@@ -76,7 +76,7 @@ module.exports = function generateUi(filters, perms) {
             case 'submissionCells':
             case 'portals': menus.wayfarer[key] = true; break
             case 'spawnpoints':
-            case 's2Cells':
+            case 's2cells':
             case 'devices': menus.admin[key] = true; break
           }
         }

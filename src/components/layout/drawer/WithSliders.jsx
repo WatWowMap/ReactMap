@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Grid, Typography, FormControlLabel, Switch, AppBar, Tab, Tabs, Box,
 } from '@material-ui/core'
@@ -26,6 +26,7 @@ function TabPanel(props) {
 export default function WithSliders({
   category, filters, setFilters, context, specificFilter,
 }) {
+  const [tempLegacy, setTempLegacy] = useState(filters[category].filter.ivOr)
   const [openTab, setOpenTab] = useState(0)
 
   const handleLegacySwitch = () => {
@@ -37,6 +38,19 @@ export default function WithSliders({
       },
     })
   }
+
+  useEffect(() => {
+    setFilters({
+      ...filters,
+      [category]: {
+        ...filters[category],
+        filter: {
+          ...filters[category].filter,
+          [specificFilter]: tempLegacy,
+        },
+      },
+    })
+  }, [tempLegacy])
 
   const handleChange = event => {
     const { name, value } = event.target
@@ -89,8 +103,8 @@ export default function WithSliders({
           </Grid>
           <Grid item xs={12}>
             <StringFilter
-              filterValues={filters[category].filter[specificFilter]}
-              setFilterValues={setFilters}
+              filterValues={tempLegacy}
+              setFilterValues={setTempLegacy}
             />
           </Grid>
         </>

@@ -13,7 +13,7 @@ class Gym extends Model {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const { gyms, raids } = perms
     const {
-      onlyGyms, onlyRaids, onlyEx, onlyBattle,
+      onlyGyms, onlyRaids, onlyExEligible, onlyInBattle,
     } = args.filters
     let query = `this.query()
       .whereBetween('lat', [${args.minLat}, ${args.maxLat}])
@@ -38,13 +38,13 @@ class Gym extends Model {
       }
     })
     let count = false
-    if (onlyEx && gyms) {
+    if (onlyExEligible && gyms) {
       query += `
       .andWhere(ex => {
         ex.where('ex_raid_eligible', 1)`
       count = true
     }
-    if (onlyBattle && gyms) {
+    if (onlyInBattle && gyms) {
       query += `
       .${count ? 'or' : 'and'}Where(ex => {
         ex.where('in_battle', 1)`
@@ -79,7 +79,7 @@ class Gym extends Model {
         })
       })`
     }
-    if ((onlyEx || onlyBattle || onlyGyms) && gyms) query += '})'
+    if ((onlyExEligible || onlyInBattle || onlyGyms) && gyms) query += '})'
 
     const secondaryFilter = queryResults => {
       const { length } = queryResults

@@ -7,11 +7,7 @@ const getPolyVector = require('./getPolyVector')
 const { Ring } = require('../../models/index')
 
 module.exports = function getPlacementCells(bounds, pokestops, gyms) {
-  const allStops = pokestops.filter(x => x.sponsor_id === null || x.sponsor_id === 0)
-  const allGyms = gyms.filter(x => x.sponsor_id === null || x.sponsor_id === 0)
-  const stopCoords = allStops.map(x => ({ lat: x.lat, lon: x.lon }))
-  const gymCoords = allGyms.map(x => ({ lat: x.lat, lon: x.lon }))
-  const allCoords = gymCoords.concat(stopCoords)
+  const allCoords = [...pokestops, ...gyms]
 
   const regionCoverer = new S2RegionCoverer()
   regionCoverer.minLevel = 17
@@ -42,7 +38,7 @@ module.exports = function getPlacementCells(bounds, pokestops, gyms) {
       cell.blocked = true
     }
   }
-  const rings = allCoords.map(x => new Ring(x.lat, x.lon, 20))
+  const rings = allCoords.map(poi => new Ring(poi.id, poi.lat, poi.lon, 20))
 
   return {
     cells: Object.values(indexedCells),

@@ -5,19 +5,19 @@ export default function SubmissionCellPopup({ cell }) {
   return (
     <>
       <Typography>
-        {cell.level}
+        Level {cell.level}
       </Typography>
       <Typography>
-        {cell.id}
+        ID {cell.id}
       </Typography>
       <Typography>
-        {cell.count}
+        Total {cell.count}
       </Typography>
       <Typography>
-        {cell.count_pokestops}
+        Stops {cell.count_pokestops}
       </Typography>
       <Typography>
-        {cell.count_gyms}
+        Gyms {cell.count_gyms}
       </Typography>
     </>
   )

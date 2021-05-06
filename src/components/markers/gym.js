@@ -8,7 +8,7 @@ export default function gymMarker(gym, ts) {
 
   const inBattle = gym.in_battle ? 'battle' : 'gym'
   return new Icon({
-    iconUrl: `/images/${inBattle}/${gym.team_id}_${6 - gym.availble_slots}.png`,
+    iconUrl: `/images/${inBattle}/${gym.team_id || 0}_${(6 - gym.availble_slots) || 0}.png`,
     iconSize,
     iconAnchor: [iconSize / 2, iconAnchorY],
     popupAnchor: [0, popupAnchorY],

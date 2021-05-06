@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core'
 import { ExpandMore } from '@material-ui/icons'
 
-import useStyles from '../../../../assets/mui/styling'
+import useStyles from '../../../../hooks/useStyles'
 import Utility from '../../../../services/Utility'
 
 export default function FilterOptions({

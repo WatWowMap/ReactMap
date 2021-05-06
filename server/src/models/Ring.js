@@ -1,6 +1,6 @@
 class Ring {
-  constructor(lat, lon, radius) {
-    this.id = `${lat}-${lon}-${radius}`
+  constructor(id, lat, lon, radius) {
+    this.id = id
     this.lat = lat
     this.lon = lon
     this.radius = radius

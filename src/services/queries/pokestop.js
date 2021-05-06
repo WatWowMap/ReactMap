@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 
 const core = gql`
-  fragment Core on Pokestop {
+  fragment CorePokestop on Pokestop {
     id
     name
     lat
@@ -35,7 +35,7 @@ export const getPokestops = gql`
   ${core}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON! ) {
     pokestops(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      ...Core
+      ...CorePokestop
     }
   }
 `
@@ -45,7 +45,7 @@ export const getLures = gql`
   ${lure}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON! ) {
     pokestops(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      ...Core
+      ...CorePokestop
       ...Lure
     }
   }
@@ -56,7 +56,7 @@ export const getQuests = gql`
   ${quest}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON! ) {
     pokestops(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      ...Core
+      ...CorePokestop
       ...Quest
     }
   }
@@ -67,7 +67,7 @@ export const getInvasions = gql`
   ${invasion}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON! ) {
     pokestops(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      ...Core
+      ...CorePokestop
       ...Invasion
     }
   }
@@ -79,7 +79,7 @@ export const getLuresQuests = gql`
   ${quest}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON! ) {
     pokestops(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      ...Core
+      ...CorePokestop
       ...Lure
       ...Quest
     }
@@ -92,7 +92,7 @@ export const getLuresInvasions = gql`
   ${invasion}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON! ) {
     pokestops(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      ...Core
+      ...CorePokestop
       ...Lure
       ...Invasion
     }
@@ -105,7 +105,7 @@ export const getQuestsInvasions = gql`
   ${invasion}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON! ) {
     pokestops(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      ...Core
+      ...CorePokestop
       ...Quest
       ...Invasion
     }
@@ -119,7 +119,7 @@ export const getLuresQuestsInvasions = gql`
   ${invasion}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON! ) {
     pokestops(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      ...Core
+      ...CorePokestop
       ...Lure
       ...Quest
       ...Invasion

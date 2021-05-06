@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Polygon, Popup, Tooltip } from 'react-leaflet'
-import PopupContent from './Popup'
-import typeStyle from './typeStyle'
+import PopupContent from '../../popups/SubmissionCell'
+import typeStyle from '../../markers/typeCell'
 
 const TypeTile = ({ cell }) => (
   <Polygon
@@ -23,11 +23,9 @@ const TypeTile = ({ cell }) => (
   </Polygon>
 )
 
-const areEqual = (prevCell, nextCell) => (
-  prevCell.id === nextCell.id
-  && prevCell.count_pokestops === nextCell.count_pokestops
-  && prevCell.count_gyms === nextCell.count_gyms
-  && prevCell.count === nextCell.count
+const areEqual = (prev, next) => (
+  prev.cell.id === next.cell.id
+  && prev.cell.count === next.cell.count
 )
 
-export default React.memo(TypeTile, areEqual)
+export default memo(TypeTile, areEqual)

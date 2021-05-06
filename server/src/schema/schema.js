@@ -32,7 +32,7 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(DeviceType),
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.device) {
+        if (perms.devices) {
           return Device.query()
         }
       },
@@ -141,12 +141,28 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.submissionCells) {
-          const pokestops = await Pokestop.getAllPokestops(args)
-          const gyms = await Gym.getAllGyms(args)
-          return {
+          const pokestops = await Pokestop.query()
+            .select(['id', 'lat', 'lon'])
+            .whereBetween('lat', [args.minLat - 0.025, args.maxLat + 0.025])
+            .andWhereBetween('lon', [args.minLon - 0.025, args.maxLon + 0.025])
+            .andWhere('deleted', false)
+            .andWhere(poi => {
+              poi.whereNull('sponsor_id')
+                .orWhere('sponsor_id', 0)
+            })
+          const gyms = await Gym.query()
+            .select(['id', 'lat', 'lon'])
+            .whereBetween('lat', [args.minLat - 0.025, args.maxLat + 0.025])
+            .andWhereBetween('lon', [args.minLon - 0.025, args.maxLon + 0.025])
+            .andWhere('deleted', false)
+            .andWhere(poi => {
+              poi.whereNull('sponsor_id')
+                .orWhere('sponsor_id', 0)
+            })
+          return [{
             placementCells: Utility.getPlacementCells(args, pokestops, gyms),
             typeCells: Utility.getTypeCells(args, pokestops, gyms),
-          }
+          }]
         }
       },
     },

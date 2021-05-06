@@ -8,7 +8,7 @@ class GenericFilter {
 }
 
 class PokemonFilter extends GenericFilter {
-  constructor(iv, gl, ul, level, atk, def, sta, enabled, size) {
+  constructor(enabled, size, iv, gl, ul, level, atk, def, sta) {
     super(enabled, size)
     this.iv = iv || [0, 100]
     this.gl = gl || [1, 100]
