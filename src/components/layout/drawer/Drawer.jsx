@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import {
-  Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid,
+  Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid, Icon, Container,
 } from '@material-ui/core'
 import { ExpandMore } from '@material-ui/icons'
 
@@ -87,7 +87,9 @@ export default function DrawerMenu({
             alignItems="center"
           >
             {content}
-            {(category !== 'settings' && category !== 'weather')
+            {(category === 'pokemon'
+              || category === 'gyms'
+              || category === 'pokestops')
               && (
                 <Grid item xs={6}>
                   <Button
@@ -107,6 +109,22 @@ export default function DrawerMenu({
   return (
     <Drawer anchor="left" open={drawer} onClose={toggleDrawer(false)} classes={{ paper: classes.drawer }}>
       {drawerItems}
+      <Container style={{ position: 'absolute', bottom: 20, textAlign: 'center' }} maxWidth="sm">
+        <Button
+          variant="contained"
+          style={{
+            backgroundColor: 'rgb(114,136,218)',
+            color: 'white',
+          }}
+          size="medium"
+          href="/logout"
+        >
+          <Icon className="fab fa-discord" style={{ fontSize: 30 }} />&nbsp;
+          <Typography variant="h6">
+            Logout
+          </Typography>
+        </Button>
+      </Container>
     </Drawer>
   )
 }

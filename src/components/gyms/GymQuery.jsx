@@ -24,17 +24,10 @@ export default function GymQuery({
       trimmedFilters[id] = specifics
     }
   })
-  const { data, previousData, refetch } = filters.gyms.raids && perms.raids
-    ? useQuery(Query.getAllRaids(), {
-      variables: {
-        ...bounds, filters: trimmedFilters,
-      },
-    })
-    : useQuery(Query.getAllGyms(), {
-      variables: {
-        ...bounds, filters: trimmedFilters,
-      },
-    })
+
+  const { data, previousData, refetch } = useQuery(Query.getAllGyms(filters.gyms, perms), {
+    variables: { ...bounds, filters: trimmedFilters },
+  })
 
   const refetchGyms = () => {
     onMove()

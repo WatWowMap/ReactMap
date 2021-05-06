@@ -3,6 +3,7 @@ import { gql } from '@apollo/client'
 const core = gql`
   fragment Core on Pokestop {
     id
+    name
     lat
     lon
     updated
