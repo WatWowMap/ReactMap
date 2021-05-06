@@ -1,5 +1,5 @@
 import getAllDevices from './queries/device'
-import { getAllGyms, getAllRaids } from './queries/gym'
+import * as gymIndex from './queries/gym'
 import * as pokestopIndex from './queries/pokestop'
 import getAllPokemon from './queries/pokemon'
 import getAllSpawnpoints from './queries/spawnpoint'
@@ -13,8 +13,18 @@ class Query {
     return getAllDevices
   }
 
-  static getAllGyms() {
-    return getAllGyms
+  static getAllGyms(filters, perms) {
+    const permObj = {
+      Gyms: filters.gyms && perms.gyms,
+      Raids: filters.raids && perms.raids,
+    }
+    let query = 'get'
+
+    Object.keys(permObj).forEach(keyPerm => {
+      if (permObj[keyPerm]) query += keyPerm
+    })
+
+    return gymIndex[query]
   }
 
   static getAllPokestops(filters, perms) {
@@ -40,10 +50,6 @@ class Query {
 
   static getAllPortals() {
     return getAllPortals
-  }
-
-  static getAllRaids() {
-    return getAllRaids
   }
 
   static getAllS2Cells() {

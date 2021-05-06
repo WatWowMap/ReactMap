@@ -3,13 +3,14 @@ import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
 import { ThemeProvider } from '@material-ui/styles'
 import { useMediaQuery } from '@material-ui/core'
+
 import { useStore, useMasterfile } from '../hooks/useStore'
 import Map from './Map'
 import createTheme from '../assets/mui/theme'
 
 export default function ConfigSettings({ serverSettings }) {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
+
   const setSettings = useStore(state => state.setSettings)
   const setFilters = useStore(state => state.setFilters)
   const setLocation = useStore(state => state.setLocation)
@@ -41,6 +42,7 @@ export default function ConfigSettings({ serverSettings }) {
     return defaults
   }
 
+  const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
   let screenSize = 'xs'
   if (useMediaQuery(theme.breakpoints.only('sm'))) screenSize = 'sm'
   if (useMediaQuery(theme.breakpoints.up('md'))) screenSize = 'md'
@@ -67,7 +69,7 @@ export default function ConfigSettings({ serverSettings }) {
         zoomControl={false}
         preferCanvas
       >
-        <Map />
+        {serverSettings.user.perms.map && <Map />}
       </MapContainer>
     </ThemeProvider>
   )

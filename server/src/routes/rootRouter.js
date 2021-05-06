@@ -1,7 +1,7 @@
 const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const cors = require('cors')
-const authRouter = require('./auth')
+const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
 const schema = require('../schema/schema')
 const config = require('../services/config')
@@ -14,42 +14,49 @@ rootRouter.use('/', clientRouter)
 
 rootRouter.use('/auth', authRouter)
 
-rootRouter.get('/settings', async (req, res) => {
-  let { user } = req
-  if (!config.discord.enabled) {
-    user = { perms: {} }
-    Object.keys(config.discord.perms).forEach(perm => user.perms[perm] = config.discord.perms[perm].enabled)
-  }
-  ['tileServers', 'icons'].forEach(setting => {
-    Object.keys(config[setting]).forEach(option => {
-      config[setting][option].name = option
-    })
-  })
+rootRouter.get('/logout', (req, res) => {
+  req.session.destroy()
+  res.redirect('/')
+})
 
-  if (user) {
-    try {
-      const serverSettings = {
-        config: {
-          map: config.map,
-          tileServers: config.tileServers,
-          icons: config.icons,
-        },
-        settings: {
-          icons: config.icons.Default,
-          tileServers: config.tileServers.Default,
-        },
-        masterfile,
-        defaultFilters: await Utility.buildDefaultFilters(user.perms),
-        user,
-        menus: Utility.buildMenus(),
+rootRouter.get('/settings', async (req, res) => {
+  try {
+    if (!config.discord.enabled) {
+      req.session.perms = {}
+      Object.keys(config.discord.perms).forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
+      req.session.save()
+    }
+    const serverSettings = {
+      user: config.discord.enabled ? req.user : req.session,
+      discord: config.discord.enabled,
+    }
+
+    if (serverSettings.user) {
+      serverSettings.config = {
+        map: config.map,
+        tileServers: config.tileServers,
+        icons: config.icons,
       }
       await Utility.updateAvailableForms(serverSettings.config.icons)
-      serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, user.perms)
 
-      res.status(200).json({ serverSettings })
-    } catch (error) {
-      res.status(500).json({ error })
+      serverSettings.settings = {
+        icons: config.icons.Default,
+        tileServers: config.tileServers.Default,
+      }
+      Object.keys(serverSettings.settings).forEach(setting => {
+        Object.keys(serverSettings.config[setting]).forEach(option => {
+          serverSettings.config[setting][option].name = option
+        })
+      })
+
+      serverSettings.defaultFilters = await Utility.buildDefaultFilters(serverSettings.user.perms)
+      serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, serverSettings.user.perms)
+      serverSettings.menus = Utility.buildMenus()
+      serverSettings.masterfile = masterfile
     }
+    res.status(200).json({ serverSettings })
+  } catch (error) {
+    res.status(500).json({ error })
   }
 })
 
