@@ -1,5 +1,3 @@
-import '../assets/scss/main.scss'
-
 import React from 'react'
 import ConfigSettings from './ConfigSettings'
 import Login from './Login'

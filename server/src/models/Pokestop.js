@@ -12,7 +12,7 @@ class Pokestop extends Model {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms,
     } = perms
     const {
-      onlyStops, onlyLures, onlyQuests, onlyInvasions,
+      onlyPokestops, onlyLures, onlyQuests, onlyInvasions,
     } = args.filters
 
     let query = `this.query()
@@ -20,7 +20,7 @@ class Pokestop extends Model {
       .andWhereBetween('lon', [${args.minLon}, ${args.maxLon}])
       .andWhere('deleted', false)`
 
-    if (onlyStops) return eval(query)
+    if (onlyPokestops) return eval(query)
 
     const lures = []
     const items = []

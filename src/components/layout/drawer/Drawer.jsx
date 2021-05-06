@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import {
-  Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid, Icon, Container,
+  Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid,
 } from '@material-ui/core'
 import { ExpandMore } from '@material-ui/icons'
 
@@ -9,7 +9,7 @@ import WithSubItems from './WithSubItems'
 import WithSliders from './WithSliders'
 import SingularItem from './SingularItem'
 import Utility from '../../../services/Utility'
-import useStyles from '../../../assets/mui/styling'
+import useStyles from '../../../hooks/useStyles'
 import { useMasterfile } from '../../../hooks/useStore'
 
 export default function DrawerMenu({
@@ -107,24 +107,14 @@ export default function DrawerMenu({
   })
 
   return (
-    <Drawer anchor="left" open={drawer} onClose={toggleDrawer(false)} classes={{ paper: classes.drawer }}>
+    <Drawer
+      anchor="left"
+      open={drawer}
+      onClose={toggleDrawer(false)}
+      classes={{ paper: classes.drawer }}
+      style={{ overflow: 'hidden' }}
+    >
       {drawerItems}
-      <Container style={{ position: 'absolute', bottom: 20, textAlign: 'center' }} maxWidth="sm">
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: 'rgb(114,136,218)',
-            color: 'white',
-          }}
-          size="medium"
-          href="/logout"
-        >
-          <Icon className="fab fa-discord" style={{ fontSize: 30 }} />&nbsp;
-          <Typography variant="h6">
-            Logout
-          </Typography>
-        </Button>
-      </Container>
     </Drawer>
   )
 }

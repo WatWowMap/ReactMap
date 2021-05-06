@@ -5,11 +5,6 @@ const {
 const getPolyVector = require('./getPolyVector')
 
 module.exports = function getTypeCells(bounds, pokestops, gyms) {
-  const allStops = pokestops.filter(x => x.sponsor_id === null || x.sponsor_id === 0)
-  const allGyms = gyms.filter(x => x.sponsor_id === null || x.sponsor_id === 0)
-  const stopCoords = allStops.map(x => ({ lat: x.lat, lon: x.lon }))
-  const gymCoords = allGyms.map(x => ({ lat: x.lat, lon: x.lon }))
-
   const regionCoverer = new S2RegionCoverer()
   regionCoverer.minLevel = 14
   regionCoverer.maxLevel = 14
@@ -32,8 +27,8 @@ module.exports = function getTypeCells(bounds, pokestops, gyms) {
       polygon,
     }
   }
-  for (let i = 0; i < gymCoords.length; i += 1) {
-    const coords = gymCoords[i]
+  for (let i = 0; i < gyms.length; i += 1) {
+    const coords = gyms[i]
     const level14Cell = S2CellId.fromPoint(S2LatLng.fromDegrees(coords.lat, coords.lon).toPoint()).parentL(14)
     const cellId = BigInt(level14Cell.id).toString()
     const cell = indexedCells[cellId]
@@ -42,8 +37,8 @@ module.exports = function getTypeCells(bounds, pokestops, gyms) {
       cell.count += 1
     }
   }
-  for (let i = 0; i < stopCoords.length; i += 1) {
-    const coords = stopCoords[i]
+  for (let i = 0; i < pokestops.length; i += 1) {
+    const coords = pokestops[i]
     const level14Cell = S2CellId.fromPoint(S2LatLng.fromDegrees(coords.lat, coords.lon).toPoint()).parentL(14)
     const cellId = BigInt(level14Cell.id).toString()
     const cell = indexedCells[cellId]

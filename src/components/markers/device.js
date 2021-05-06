@@ -1,7 +1,6 @@
 import { Icon } from 'leaflet'
 
-export default function getDeviceMarkers(device) {
-  const ts = ((new Date()).getTime()) / 1000 - 900
+export default function getDeviceMarkers(device, ts) {
   const deviceStatus = ts - device.last_seen < 900 ? '0' : '1'
   return new Icon({
     iconUrl: `/images/device/${deviceStatus}.png`,

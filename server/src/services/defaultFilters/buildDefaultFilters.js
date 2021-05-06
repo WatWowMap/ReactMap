@@ -44,21 +44,27 @@ module.exports = async function buildDefault(perms) {
     } : undefined,
     portals: perms.portals ? {
       enabled: defaultFilters.portals.enabled,
+      filter: {},
     } : undefined,
     submissionCells: perms.submissionCells ? {
       enabled: defaultFilters.submissionCells.enabled,
+      filter: {},
     } : undefined,
     weather: perms.weather ? {
       enabled: defaultFilters.weather.enabled,
+      filter: {},
     } : undefined,
     spawnpoints: perms.spawnpoints ? {
       enabled: defaultFilters.spawnpoints.enabled,
+      filter: {},
     } : undefined,
-    s2Cells: perms.s2Cells ? {
+    s2cells: perms.s2cells ? {
       enabled: defaultFilters.scanCells.enabled,
+      filter: {},
     } : undefined,
     devices: perms.devices ? {
       enabled: defaultFilters.devices.enabled,
+      filter: {},
     } : undefined,
   }
 }

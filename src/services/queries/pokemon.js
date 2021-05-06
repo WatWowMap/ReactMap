@@ -8,6 +8,7 @@ const getAllPokemon = gql`
       lon
       pokemon_id
       form
+      updated
     }
   }
 `

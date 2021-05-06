@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 
 const core = gql`
-  fragment Core on Gym {
+  fragment CoreGym on Gym {
     id
     name
     lat
@@ -13,6 +13,7 @@ const core = gql`
 const gym = gql`
   fragment Gym on Gym {
     availble_slots
+    ex_raid_eligible
     team_id
     in_battle
   }
@@ -36,7 +37,7 @@ export const getGyms = gql`
   ${gym}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
     gyms(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      ...Core
+      ...CoreGym
       ...Gym
     }
   }
@@ -47,7 +48,7 @@ export const getRaids = gql`
   ${raid}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
     gyms(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      ...Core
+      ...CoreGym
       ...Raid
     }
   }
@@ -59,7 +60,7 @@ export const getGymsRaids = gql`
   ${raid}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
     gyms(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      ...Core
+      ...CoreGym
       ...Gym
       ...Raid
     }
