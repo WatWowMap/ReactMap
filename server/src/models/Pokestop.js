@@ -69,6 +69,7 @@ class Pokestop extends Model {
       query += `
         .${count ? 'or' : 'and'}Where(invasion => {
           invasion.whereIn('grunt_type', [${invasion}])
+          .andWhere('incident_expire_timestamp', '>=', ${ts})
           ${count ? '})' : ''} `
       count = true
     }
@@ -78,7 +79,63 @@ class Pokestop extends Model {
       query += '})'
     }
 
-    return eval(query)
+    const results = await eval(query)
+
+    const secondaryFilter = queryResults => {
+      const { length } = queryResults
+      const filteredResults = new Set()
+      for (let i = 0; i < length; i += 1) {
+        const pokestop = queryResults[i]
+
+        if (pokestop.quest_reward_type == 7) {
+          const rewards = JSON.parse(pokestop.quest_rewards)
+          const { info } = rewards ? rewards[0] : {}
+          Object.keys(info).forEach(x => (pokestop[`quest_${x}`] = info[x]))
+        } else if (pokestop.quest_reward_type == 12) {
+          const rewards = JSON.parse(pokestop.quest_rewards)
+          const { info } = rewards ? rewards[0] : {}
+          Object.keys(info).forEach(x => (pokestop[`mega_${x}`] = info[x]))
+        }
+
+        const library = [
+          {
+            filter: `p${pokestop.quest_pokemon_id}-${pokestop.quest_form_id}`,
+            field: 'quest_pokemon_id',
+          },
+          {
+            filter: `q${pokestop.quest_item_id}`,
+            field: 'quest_item_id',
+          },
+          {
+            filter: `m${pokestop.mega_pokemon_id}`,
+            field: 'mega_amount',
+          },
+          {
+            filter: `i${pokestop.grunt_type}`,
+            field: 'incident_expire_timestamp',
+          },
+          {
+            filter: `l${pokestop.lure_id}`,
+            field: 'lure_expire_timestamp',
+          },
+        ]
+
+        library.forEach(category => {
+          if (args.filters[category.filter]) {
+            library.forEach(otherCategory => {
+              if (category.filter !== otherCategory.filter) {
+                if (!args.filters[otherCategory.filter]) {
+                  delete pokestop[otherCategory.field]
+                }
+              }
+            })
+            filteredResults.add(pokestop)
+          }
+        })
+      }
+      return filteredResults
+    }
+    return secondaryFilter(results)
   }
 
   static async getAvailableQuests() {
@@ -104,27 +161,6 @@ class Pokestop extends Model {
       .whereNotNull('grunt_type')
       .orderBy('grunt_type', 'asc')
     return quests
-  }
-
-  static async test() {
-    return this.query()
-      .whereBetween('lat', [42.157983940242204, 42.41622065620649])
-      .andWhereBetween('lon', [-71.34457183837893, -70.99635528564454])
-      .andWhere('deleted', false)
-      .andWhere(items => {
-        items.whereIn('quest_item_id', [])
-          .orWhere(pokemon => {
-            pokemon.whereIn('quest_pokemon_id', [])
-          })
-          .orWhere(mega => {
-            mega.where(raw('json_extract(json_extract(quest_rewards, "$[*].info.pokemon_id"), "$[0]") = 3'))
-              .andWhere('quest_reward_type', 12)
-          })
-      })
-      .orWhere(mega => {
-        mega.where(raw('json_extract(json_extract(quest_rewards, "$[*].info.pokemon_id"), "$[0]") = 15'))
-          .andWhere('quest_reward_type', 12)
-      })
   }
 }
 
