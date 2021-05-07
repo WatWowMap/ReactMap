@@ -9,7 +9,7 @@ const PokestopTile = ({ item, ts }) => (
     position={[item.lat, item.lon]}
     icon={stopMarker(item, ts)}
   >
-    {(item.quest_rewards || item.quest_pokemon_id)
+    {(item.quest_item_id || item.quest_pokemon_id || item.mega_amount)
       && (
         <Marker
           position={[item.lat, item.lon]}

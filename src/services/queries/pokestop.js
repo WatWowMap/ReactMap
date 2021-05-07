@@ -19,8 +19,15 @@ const lure = gql`
 
 const quest = gql`
   fragment Quest on Pokestop {
-    quest_rewards
+    quest_reward_type
+    quest_item_id
     quest_pokemon_id
+    quest_form_id
+    quest_gender_id
+    quest_costume_id
+    quest_shiny
+    mega_pokemon_id
+    mega_amount
   }
 `
 

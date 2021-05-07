@@ -83,14 +83,28 @@ class Gym extends Model {
 
     const secondaryFilter = queryResults => {
       const { length } = queryResults
+      const filteredResults = []
+
       for (let i = 0; i < length; i += 1) {
         const gym = queryResults[i]
+
         if (gym.raid_pokemon_form === 0 && gym.raid_pokemon_id > 0) {
           const formId = masterfile[gym.raid_pokemon_id].default_form_id
-          if (formId) queryResults[i].raid_pokemon_form = formId
+          if (formId) gym.raid_pokemon_form = formId
+        }
+        if (args.filters[`p${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]
+          || args.filters[`e${gym.raid_level}`]) {
+          filteredResults.push(gym)
+        } else {
+          gym.raid_end_timestamp = null
+          gym.raid_spawn_timestamp = null
+          gym.raid_battle_timestamp = null
+          gym.raid_pokemon_id = null
+          gym.raid_level = null
+          filteredResults.push(gym)
         }
       }
-      return queryResults
+      return filteredResults
     }
 
     const results = await eval(query)

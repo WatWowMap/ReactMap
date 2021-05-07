@@ -29,5 +29,11 @@ module.exports = new GraphQLObjectType({
     first_seen_timestamp: { type: GraphQLInt },
     sponsor_id: { type: GraphQLInt },
     quest_pokemon_id: { type: GraphQLInt },
+    quest_form_id: { type: GraphQLInt },
+    quest_gender_id: { type: GraphQLInt },
+    quest_costume_id: { type: GraphQLInt },
+    quest_shiny: { type: GraphQLInt },
+    mega_pokemon_id: { type: GraphQLInt },
+    mega_amount: { type: GraphQLInt },
   }),
 })
