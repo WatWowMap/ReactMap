@@ -54,6 +54,16 @@ export default function QueryData({
     })
   }
 
+  const getPolling = cat => {
+    switch (cat) {
+      default: return 0
+      case 'device': return 5000
+      case 'gyms': return 10000
+      case 'pokestops': return 300000
+      case 'weather': return 900000
+    }
+  }
+
   useEffect(() => {
     map.on('moveend', refetchData)
     return () => {
@@ -61,11 +71,13 @@ export default function QueryData({
     }
   }, [map, filters])
 
-  const { data, previousData, refetch } = useQuery(Query[category](filters, perms), {
+  const { data, previousData, refetch } = useQuery(Query[category](filters, perms, map.getZoom(), zoomLevel), {
     variables: {
       ...bounds,
       filters: trimFilters(filters),
     },
+    fetchPolicy: 'cache-and-network',
+    pollInterval: getPolling(category),
   })
   const renderedData = data || previousData
 

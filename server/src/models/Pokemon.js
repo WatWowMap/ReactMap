@@ -12,7 +12,7 @@ class Pokemon extends Model {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const { stats, iv: ivs } = perms
     const pokemonList = []
-    const { standard, ivOr } = args.filters
+    const { onlyStandard, onlyIvOr } = args.filters
     const keys = ['iv', 'level', 'atk', 'def', 'sta']
 
     let query = `this.query()
@@ -21,7 +21,7 @@ class Pokemon extends Model {
         .andWhereBetween('lon', [${args.minLon}, ${args.maxLon}])`
 
     // checks if IVs/Stats are set to default and skips them if so
-    const arrayCheck = (filter, key) => filter.every((v, i) => v === standard[key][i])
+    const arrayCheck = (filter, key) => filter.every((v, i) => v === onlyStandard[key][i])
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (filter, type) => {
@@ -42,11 +42,17 @@ class Pokemon extends Model {
     // adds correct form id if missing & checks if they were actually requested
     const formFixer = queryResults => {
       const fixedResults = []
-      const ivToCompare = ivs ? ivOr : standard
+      const ivToCompare = ivs ? onlyIvOr : onlyStandard
       const { length } = queryResults
 
       for (let i = 0; i < length; i += 1) {
         const pkmn = queryResults[i]
+        if (pkmn.pvp_rankings_great_league !== null) {
+          pkmn.great = JSON.parse(pkmn.pvp_rankings_great_league)
+        }
+        if (pkmn.pvp_rankings_ultra_league !== null) {
+          pkmn.ultra = JSON.parse(pkmn.pvp_rankings_ultra_league)
+        }
         if (pkmn.form === 0) {
           const formId = masterfile[pkmn.pokemon_id].default_form_id
           if (formId) pkmn.form = formId
@@ -73,10 +79,10 @@ class Pokemon extends Model {
     for (const [pkmn, filter] of Object.entries(args.filters)) {
       if (!ivs && !stats) {
         if (pkmn.includes('-')) pokemonList.push(pkmn.split('-')[0])
-      } else if (pkmn === 'ivOr') {
+      } else if (pkmn === 'onlyIvOr') {
         query += `
           .andWhere(ivOr => {
-            ivOr.whereBetween('iv', [${ivs ? filter.iv : standard.iv}])
+            ivOr.whereBetween('iv', [${ivs ? filter.iv : onlyStandard.iv}])
               ${generateSql(filter)}`
       } else if (pkmn.includes('-')) {
         query += `

@@ -33,6 +33,10 @@ const useMasterfile = create(set => ({
   setMasterfile: (masterfile) => set({ masterfile }),
   breakpoint: false,
   setBreakpoint: (breakpoint) => set({ breakpoint }),
+  hideList: [],
+  setHideList: (hideList) => set({ hideList }),
+  excludeList: [],
+  setExcludeList: (excludeList) => set({ excludeList }),
 }))
 
 export { useStore, useMasterfile }

@@ -227,11 +227,23 @@
         "enabled": true,
         "roles": []
       },
-      "raids": {
+      "stats": {
+        "enabled": true,
+        "roles": []
+      },
+      "iv": {
+        "enabled": true,
+        "roles": []
+      },
+      "pvp": {
         "enabled": true,
         "roles": []
       },
       "gyms": {
+        "enabled": true,
+        "roles": []
+      },
+      "raids": {
         "enabled": true,
         "roles": []
       },
@@ -247,23 +259,7 @@
         "enabled": true,
         "roles": []
       },
-      "invasions": {
-        "enabled": true,
-        "roles": []
-      },
-      "spawnpoints": {
-        "enabled": true,
-        "roles": []
-      },
-      "iv": {
-        "enabled": true,
-        "roles": []
-      },
-      "pvp": {
-        "enabled": true,
-        "roles": []
-      },
-      "s2cells": {
+      "portals": {
         "enabled": true,
         "roles": []
       },
@@ -271,11 +267,11 @@
         "enabled": true,
         "roles": []
       },
-      "nests": {
+      "invasions": {
         "enabled": true,
         "roles": []
       },
-      "portals": {
+      "nests": {
         "enabled": true,
         "roles": []
       },
@@ -284,6 +280,14 @@
         "roles": []
       },
       "weather": {
+        "enabled": true,
+        "roles": []
+      },
+      "spawnpoints": {
+        "enabled": true,
+        "roles": []
+      },
+      "s2cells": {
         "enabled": true,
         "roles": []
       },
@@ -307,8 +311,18 @@
       "url": "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
     },
     "Satellite": {
-      "attribution": "&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
       "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+    }
+  },
+  "navigation": {
+    "GoogleMaps": {
+      "url": "https://www.google.com/maps/place/{x},{y}"
+    }, 
+    "AppleMaps": {
+      "url": "https://maps.apple.com/maps?daddr=${x},${y}"
+    },
+    "Waze": {
+      "url": "https://www.waze.com/ul?ll=${x},${y}"
     }
   },
   "icons": {

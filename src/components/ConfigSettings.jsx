@@ -43,6 +43,8 @@ export default function ConfigSettings({ serverSettings }) {
   }
 
   const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
+  document.body.classList.add('dark')
+
   let screenSize = 'xs'
   if (useMediaQuery(theme.breakpoints.only('sm'))) screenSize = 'sm'
   if (useMediaQuery(theme.breakpoints.up('md'))) screenSize = 'md'

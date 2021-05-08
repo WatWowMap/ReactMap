@@ -4,6 +4,7 @@ import filterPokemon from './functions/filterPokemon'
 import checkAdvFilter from './functions/checkAdvFilter'
 import filterGyms from './functions/filterGyms'
 import filterPokestops from './functions/filterPokestops'
+import getTimers from './functions/getTimeUntil'
 
 class Utility {
   static getPokemonIcon(availableForms, pokemonId, form, evolution, gender, costume, shiny) {
@@ -28,6 +29,10 @@ class Utility {
 
   static checkAdvFilter(filter) {
     return checkAdvFilter(filter)
+  }
+
+  static getTimeUntil(date, until) {
+    return getTimers(date, until)
   }
 }
 

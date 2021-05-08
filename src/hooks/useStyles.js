@@ -57,6 +57,7 @@ export default makeStyles(theme => ({
       top: 0,
       left: 5,
       zIndex: 9998,
+      width: 10,
     },
   },
   login: {
