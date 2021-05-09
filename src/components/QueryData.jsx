@@ -12,11 +12,17 @@ export default function QueryData({
 }) {
   const Component = index[category]
   const zoomLevel = useMasterfile(state => state.config).map.clusterZoomLevels[category] || 1
+  const hideList = useMasterfile(state => state.hideList)
+  const excludeList = useMasterfile(state => state.excludeList)
+  const timerList = useMasterfile(state => state.timerList)
   const map = useMap()
   const ts = Math.floor((new Date()).getTime() / 1000)
 
   const trimFilters = useCallback(requestedFilters => {
-    const trimmed = {}
+    const trimmed = {
+      hideList,
+      excludeList,
+    }
     Object.entries(requestedFilters).forEach(topLevelFilter => {
       const [id, specifics] = topLevelFilter
 
@@ -32,7 +38,7 @@ export default function QueryData({
       }
     })
     return trimmed
-  }, [])
+  }, [excludeList])
 
   const getId = useCallback((component, item) => {
     switch (component) {
@@ -54,7 +60,7 @@ export default function QueryData({
     })
   }
 
-  const getPolling = cat => {
+  const getPolling = useCallback(cat => {
     switch (cat) {
       default: return 0
       case 'device': return 5000
@@ -62,14 +68,14 @@ export default function QueryData({
       case 'pokestops': return 300000
       case 'weather': return 900000
     }
-  }
+  }, [])
 
   useEffect(() => {
     map.on('moveend', refetchData)
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [map, filters])
+  }, [filters, excludeList])
 
   const { data, previousData, refetch } = useQuery(Query[category](filters, perms, map.getZoom(), zoomLevel), {
     variables: {
@@ -83,15 +89,21 @@ export default function QueryData({
 
   return (
     <MarkerClusterGroup disableClusteringAtZoom={zoomLevel}>
-      {renderedData && renderedData[category].map(each => (
-        <Component
-          key={getId(category, each)}
-          item={each}
-          ts={ts}
-          filters={filters}
-          map={map}
-        />
-      ))}
+      {renderedData && renderedData[category].map(each => {
+        if (!hideList.includes(each.id)) {
+          return (
+            <Component
+              key={getId(category, each)}
+              item={each}
+              ts={ts}
+              filters={filters}
+              map={map}
+              showTimer={timerList.includes(each.id)}
+            />
+          )
+        }
+        return ''
+      })}
     </MarkerClusterGroup>
   )
 }

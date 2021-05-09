@@ -37,6 +37,8 @@ const useMasterfile = create(set => ({
   setHideList: (hideList) => set({ hideList }),
   excludeList: [],
   setExcludeList: (excludeList) => set({ excludeList }),
+  timerList: [],
+  setTimerList: (timerList) => set({ timerList }),
 }))
 
 export { useStore, useMasterfile }

@@ -10,7 +10,9 @@ class Pokemon extends Model {
   static async getPokemon(args, perms) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const { stats, iv: ivs, pvp } = perms
-    const { onlyStandard, onlyIvOr } = args.filters
+    const {
+      onlyStandard, onlyIvOr, excludeList,
+    } = args.filters
     const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv']
 
     const query = this.query()
@@ -54,21 +56,25 @@ class Pokemon extends Model {
           if (formId) pkmn.form = formId
           if (!ivs && !stats
             && args.filters[`${pkmn.pokemon_id}-${pkmn.form}`]) {
-            fixedResults.push(pkmn)
+            if (!excludeList.includes(`${pkmn.pokemon_id}-${pkmn.form}`)) {
+              fixedResults.push(pkmn)
+            }
           } else {
             const ivOrCheck = keys.map(key => (
               pkmn[key] >= ivToCompare[key][0] && pkmn[key] <= ivToCompare[key][1]
             ))
             if (ivOrCheck.every(val => val)
               || args.filters[`${pkmn.pokemon_id}-${pkmn.form}`]) {
-              fixedResults.push(pkmn)
+              if (!excludeList.includes(`${pkmn.pokemon_id}-${pkmn.form}`)) {
+                fixedResults.push(pkmn)
+              }
             }
           }
-        } else {
+        } else if (!excludeList.includes(`${pkmn.pokemon_id}-${pkmn.form}`)) {
           fixedResults.push(pkmn)
         }
       }
-      return queryResults
+      return fixedResults
     }
 
     // does a faster sql query if the user only has pokemon perms
@@ -85,10 +91,10 @@ class Pokemon extends Model {
     // generates sql based off of ivOr and individual filters
     query.andWhere(ivOr => {
       for (const [pkmn, filter] of Object.entries(args.filters)) {
-        if (pkmn.includes('-')) {
+        if (pkmn.includes('-') && !excludeList.includes(pkmn)) {
           ivOr.orWhere(poke => {
             poke.where('pokemon_id', pkmn.split('-')[0])
-            generateSql(poke, filter, true)
+            generateSql(poke, filter)
           })
         } else if (pkmn === 'onlyIvOr') {
           ivOr.whereBetween('iv', (ivs ? filter.iv : onlyStandard.iv))
