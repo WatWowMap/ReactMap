@@ -71,7 +71,7 @@ class Pokemon extends Model {
       return queryResults
     }
 
-    // does a faster sql query if the user is only filtering by pokemon
+    // does a faster sql query if the user only has pokemon perms
     if (!ivs && !stats) {
       const pokemonList = []
       Object.keys(args.filters).forEach(pkmn => {
