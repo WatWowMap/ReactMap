@@ -38,6 +38,10 @@ rootRouter.get('/settings', async (req, res) => {
         tileServers: config.tileServers,
         icons: config.icons,
         navigation: config.navigation,
+        drawer: {
+          temporary: {},
+          persistent: {},
+        },
       }
       await Utility.updateAvailableForms(serverSettings.config.icons)
 

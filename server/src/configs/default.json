@@ -32,6 +32,7 @@
       "style": "dark",
       "primary": "#ff5722",
       "secondary": "#00b0ff",
+      "drawer": "temporary",
       "glow": {
         "iv": { "value": 100, "color": "red" },
         "pvp": { "value": 1, "color": "blue" },

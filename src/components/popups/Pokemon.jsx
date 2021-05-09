@@ -191,21 +191,21 @@ const Stats = ({ pokemon, perms }) => {
       justify="space-around"
       alignItems="center"
     >
-      {(perms.iv && iv) && (
+      {(perms.iv && iv !== null) && (
         <Grid item>
           <Typography variant="h5" align="center" style={{ color: getColor(iv) }}>
             {iv}%
           </Typography>
         </Grid>
       )}
-      {(perms.stats && atk_iv) && (
+      {(perms.stats && iv !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {atk_iv} | {def_iv} | {sta_iv}
           </Typography>
         </Grid>
       )}
-      {((perms.iv || perms.stats) && (iv || atk_iv)) && (
+      {((perms.iv || perms.stats) && iv !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             CP {cp} | L{level}
