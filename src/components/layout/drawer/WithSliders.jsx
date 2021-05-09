@@ -55,67 +55,11 @@ export default function WithSliders({
       setTempLegacy({
         ...tempLegacy, [name]: value,
       })
-      // setFilters({
-      //   ...filters,
-      //   [category]: {
-      //     ...filters[category],
-      //     filter: {
-      //       ...filters[category].filter,
-      //       [specificFilter]: {
-      //         ...filters[category].filter[specificFilter],
-      //         [name]: value,
-      //       },
-      //     },
-      //   },
-      // })
     } else {
       setTempLegacy({
         ...tempLegacy, [event]: values,
       })
-      // setFilters({
-      //   ...filters,
-      //   [category]: {
-      //     ...filters[category],
-      //     filter: {
-      //       ...filters[category].filter,
-      //       [specificFilter]: {
-      //         ...filters[category].filter[specificFilter],
-      //         [event]: values,
-      //       },
-      //     },
-      //   },
-      // })
     }
-    // if (typeof event === 'object') {
-    //   const { name, value } = event.target
-    //   setFilters({
-    //     ...filters,
-    //     [category]: {
-    //       ...filters[category],
-    //       filter: {
-    //         ...filters[category].filter,
-    //         [specificFilter]: {
-    //           ...filters[category].filter[specificFilter],
-    //           [name]: value,
-    //         },
-    //       },
-    //     },
-    //   })
-    // } else {
-    //   setFilters({
-    //     ...filters,
-    //     [category]: {
-    //       ...filters[category],
-    //       filter: {
-    //         ...filters[category].filter,
-    //         [specificFilter]: {
-    //           ...filters[category].filter[specificFilter],
-    //           [event]: values,
-    //         },
-    //       },
-    //     },
-    //   })
-    // }
   }
 
   const handleTabChange = (event, newValue) => {
