@@ -1,8 +1,7 @@
 /* eslint-disable no-restricted-syntax */
-/* eslint-disable no-eval */
 const { Model } = require('objection')
 const { GenericFilter } = require('./Filters')
-const { pokemon: masterfile } = require('../data/masterfile.json')
+// const { pokemon: masterfile } = require('../data/masterfile.json')
 
 class Gym extends Model {
   static get tableName() {
@@ -15,10 +14,10 @@ class Gym extends Model {
     const {
       onlyGyms, onlyRaids, onlyExEligible, onlyInBattle,
     } = args.filters
-    let query = `this.query()
-      .whereBetween('lat', [${args.minLat}, ${args.maxLat}])
-      .andWhereBetween('lon', [${args.minLon}, ${args.maxLon}])
-      .andWhere('deleted', false)`
+    const query = this.query()
+      .whereBetween('lat', [args.minLat, args.maxLat])
+      .andWhereBetween('lon', [args.minLon, args.maxLon])
+      .andWhere('deleted', false)
 
     const raidBosses = []
     const teams = []
@@ -37,49 +36,45 @@ class Gym extends Model {
         }); break
       }
     })
-    let count = false
-    if (onlyExEligible && gyms) {
-      query += `
-      .andWhere(ex => {
-        ex.where('ex_raid_eligible', 1)`
-      count = true
-    }
-    if (onlyInBattle && gyms) {
-      query += `
-      .${count ? 'or' : 'and'}Where(ex => {
-        ex.where('in_battle', 1)`
-      count = true
-    }
-    if (onlyGyms && gyms) {
-      query += `
-      .${count ? 'or' : 'and'}Where(teams => {
-        teams.whereIn('team_id', [${teams}])`
-      slots.forEach(slot => {
-        if (!teams.includes(slot.team)) {
-          query += `
-            .orWhere(slots => {
-              slots.where('team_id', ${slot.team})
-                .andWhere('availble_slots', ${slot.slots})
-            })`
-        }
-      })
-      count = true
-    }
-    if (onlyRaids && raids) {
-      query += `
-      .${count ? 'or' : 'and'}Where(pokemon => {
-        pokemon.whereIn('raid_pokemon_id', [${[...new Set(raidBosses)]}])
-          .andWhere('raid_battle_timestamp', '<=', ${ts})
-          .andWhere('raid_end_timestamp', '>=', ${ts})
-          .andWhere('raid_level', '>', 0)
-        .orWhere(eggs => {
-          eggs.whereIn('raid_level', [${eggs}])
-            .andWhere('raid_end_timestamp', '>=', ${ts})
-            .andWhere('raid_battle_timestamp', '>=', ${ts})
+
+    query.andWhere(gym => {
+      if (onlyExEligible && gyms) {
+        gym.orWhere(ex => {
+          ex.where('ex_raid_eligible', 1)
         })
-      })`
-    }
-    if ((onlyExEligible || onlyInBattle || onlyGyms) && gyms) query += '})'
+      }
+      if (onlyInBattle && gyms) {
+        gym.orWhere(ex => {
+          ex.where('in_battle', 1)
+        })
+      }
+      if (onlyGyms && gyms) {
+        gym.orWhere(team => {
+          team.whereIn('team_id', teams)
+        })
+        slots.forEach(slot => {
+          if (!teams.includes(slot.team)) {
+            gym.orWhere(gymSlot => {
+              gymSlot.where('team_id', slot.team)
+                .andWhere('availble_slots', slot.slots)
+            })
+          }
+        })
+      }
+      if (onlyRaids && raids) {
+        gym.orWhere(pokemon => {
+          pokemon.whereIn('raid_pokemon_id', raidBosses)
+            .andWhere('raid_battle_timestamp', '<=', ts)
+            .andWhere('raid_end_timestamp', '>=', ts)
+            .andWhere('raid_level', '>', 0)
+        })
+        gym.orWhere(egg => {
+          egg.whereIn('raid_level', eggs)
+            .andWhere('raid_end_timestamp', '>=', ts)
+            .andWhere('raid_battle_timestamp', '>=', ts)
+        })
+      }
+    })
 
     const secondaryFilter = queryResults => {
       const { length } = queryResults
@@ -87,11 +82,11 @@ class Gym extends Model {
 
       for (let i = 0; i < length; i += 1) {
         const gym = queryResults[i]
-
-        if (gym.raid_pokemon_form === 0 && gym.raid_pokemon_id > 0) {
-          const formId = masterfile[gym.raid_pokemon_id].default_form_id
-          if (formId) gym.raid_pokemon_form = formId
-        }
+        // come back to this once I implement all raid filters
+        // if (gym.raid_pokemon_form === 0 && gym.raid_pokemon_id > 0) {
+        //   const formId = masterfile[gym.raid_pokemon_id].default_form_id
+        //   if (formId) gym.raid_pokemon_form = formId
+        // }
         if (args.filters[`p${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]
           || args.filters[`e${gym.raid_level}`]) {
           filteredResults.push(gym)
@@ -107,7 +102,7 @@ class Gym extends Model {
       return filteredResults
     }
 
-    const results = await eval(query)
+    const results = await query
     return secondaryFilter(results)
   }
 
