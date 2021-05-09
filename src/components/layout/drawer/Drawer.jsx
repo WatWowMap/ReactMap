@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import {
-  Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid,
+  Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid, IconButton,
 } from '@material-ui/core'
-import { ExpandMore } from '@material-ui/icons'
+import { ExpandMore, Clear } from '@material-ui/icons'
 
 import Settings from './Settings'
 import WithSubItems from './WithSubItems'
@@ -10,13 +10,14 @@ import WithSliders from './WithSliders'
 import SingularItem from './SingularItem'
 import Utility from '../../../services/Utility'
 import useStyles from '../../../hooks/useStyles'
-import { useMasterfile } from '../../../hooks/useStore'
+import { useStore, useMasterfile } from '../../../hooks/useStore'
 
 export default function DrawerMenu({
   drawer, toggleDrawer, filters, setFilters, toggleDialog,
 }) {
   const classes = useStyles()
   const { menus } = useMasterfile(state => state.ui)
+  const { drawer: { name } } = useStore(state => state.settings)
   const { map: { title } } = useMasterfile(state => state.config)
   const [expanded, setExpanded] = useState(false)
 
@@ -109,12 +110,26 @@ export default function DrawerMenu({
   return (
     <Drawer
       anchor="left"
+      variant={name}
       open={drawer}
       onClose={toggleDrawer(false)}
       classes={{ paper: classes.drawer }}
       style={{ overflow: 'hidden' }}
     >
-      <Typography variant="h3" color="secondary" style={{ fontWeight: 'bold', margin: 5 }}>{title}</Typography>
+      <Grid
+        container
+        alignItems="center"
+        justify="center"
+      >
+        <Grid item xs={10}>
+          <Typography variant="h3" color="secondary" style={{ fontWeight: 'bold', margin: 5 }}>{title}</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <IconButton onClick={toggleDrawer(false)}>
+            <Clear />
+          </IconButton>
+        </Grid>
+      </Grid>
       {drawerItems}
     </Drawer>
   )
