@@ -39,7 +39,7 @@ export default function Menu({ filters, toggleDialog, type }) {
     open: false,
     id: '',
     tempFilters: {},
-    default: filters.filter.standard,
+    default: filters.standard,
   })
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState(false)
@@ -93,7 +93,7 @@ export default function Menu({ filters, toggleDialog, type }) {
         open,
         id,
         tempFilters: tempFilters[id],
-        standard: filters.filter.standard,
+        standard: filters.standard,
       })
     } else if (id === 'ivAnd') {
       setAdvancedFilter({ open })

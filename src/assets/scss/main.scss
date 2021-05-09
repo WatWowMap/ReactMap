@@ -40,3 +40,23 @@ body {
   text-align: center; 
   height: 50px;
 }
+
+
+.leaflet-popup-tip-container .leaflet-popup-tip {
+  background-color: rgb(33, 37, 31);
+}
+
+.dark .leaflet-popup-content-wrapper {
+  background-color: rgb(33, 37, 31);
+  color: white;
+  border: rgb(26, 26, 26) solid 4px;
+}
+
+.table-pvp {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  border-collapse: separate;
+  border-spacing: 7px 1x;
+  padding-top: 5px;
+}

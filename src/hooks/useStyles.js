@@ -57,6 +57,7 @@ export default makeStyles(theme => ({
       top: 0,
       left: 5,
       zIndex: 9998,
+      width: 10,
     },
   },
   login: {
@@ -76,5 +77,15 @@ export default makeStyles(theme => ({
   },
   iconButton: {
     padding: 10,
+  },
+  expand: {
+    transform: 'rotate(0deg)',
+    marginLeft: 'auto',
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.shortest,
+    }),
+  },
+  expandOpen: {
+    transform: 'rotate(180deg)',
   },
 }))

@@ -8,14 +8,14 @@ class GenericFilter {
 }
 
 class PokemonFilter extends GenericFilter {
-  constructor(enabled, size, iv, gl, ul, level, atk, def, sta) {
+  constructor(iv, gl, ul, level, atk, def, sta, enabled, size) {
     super(enabled, size)
     this.iv = iv || [0, 100]
     this.gl = gl || [1, 100]
     this.ul = ul || [1, 100]
-    this.atk = atk || [0, 15]
-    this.def = def || [0, 15]
-    this.sta = sta || [0, 15]
+    this.atk_iv = atk || [0, 15]
+    this.def_iv = def || [0, 15]
+    this.sta_iv = sta || [0, 15]
     this.level = level || [1, 35]
     this.adv = ''
   }

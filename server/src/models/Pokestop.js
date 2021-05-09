@@ -1,4 +1,3 @@
-/* eslint-disable no-eval */
 const { Model, raw } = require('objection')
 
 class Pokestop extends Model {
@@ -15,72 +14,64 @@ class Pokestop extends Model {
       onlyPokestops, onlyLures, onlyQuests, onlyInvasions,
     } = args.filters
 
-    let query = `this.query()
-      .whereBetween('lat', [${args.minLat}, ${args.maxLat}])
-      .andWhereBetween('lon', [${args.minLon}, ${args.maxLon}])
-      .andWhere('deleted', false)`
+    const query = this.query()
+      .whereBetween('lat', [args.minLat, args.maxLat])
+      .andWhereBetween('lon', [args.minLon, args.maxLon])
+      .andWhere('deleted', false)
 
-    if (onlyPokestops) return eval(query)
+    // returns everything if all pokestops are on
+    if (onlyPokestops) return query
 
     const lures = []
     const items = []
     const energy = []
     const pokemon = []
-    const invasion = []
+    const invasions = []
 
+    // preps arrays for interested objects
     Object.keys(args.filters).forEach(pokestop => {
       switch (pokestop.charAt(0)) {
         default: break
         case 'p': pokemon.push(pokestop.slice(1).split('-')[0]); break
         case 'l': lures.push(pokestop.slice(1)); break
-        case 'i': invasion.push(pokestop.slice(1)); break
+        case 'i': invasions.push(pokestop.slice(1)); break
         case 'm': energy.push(pokestop.slice(1)); break
         case 'q': items.push(pokestop.slice(1)); break
       }
     })
 
-    let count = false
-    if (onlyLures && lurePerms) {
-      query += `
-        .${count ? 'or' : 'and'}Where(lures => {
-          lures.whereIn('lure_id', [${lures}])
-          .andWhere('lure_expire_timestamp', '>=', ${ts})`
-      count = true
-    }
-    if (onlyQuests && questPerms) {
-      query += `
-        .${count ? 'or' : 'and'}Where(items => {
-          items.whereIn('quest_item_id', [${items}])
-          ${count ? '})' : ''}`
-      count = true
-      query += `
-        .orWhere(pokemon => {
-          pokemon.whereIn('quest_pokemon_id', [${pokemon}])
-        })`
-      energy.forEach(poke => (
-        query += `
-          .orWhere(mega => {
-            mega.where(raw('json_extract(json_extract(quest_rewards, "$[*].info.pokemon_id"), "$[0]") = ${poke}'))
+    // builds the query
+    query.andWhere(stops => {
+      if (onlyLures && lurePerms) {
+        stops.orWhere(lure => {
+          lure.whereIn('lure_id', lures)
+            .andWhere('lure_expire_timestamp', '>=', ts)
+        })
+      }
+      if (onlyQuests && questPerms) {
+        stops.orWhere(quest => {
+          quest.whereIn('quest_item_id', items)
+        })
+        stops.orWhere(pokes => {
+          pokes.whereIn('quest_pokemon_id', pokemon)
+        })
+        energy.forEach(poke => {
+          stops.orWhere(mega => {
+            mega.where(raw(`json_extract(json_extract(quest_rewards, "$[*].info.pokemon_id"), "$[0]") = ${poke}`))
               .andWhere('quest_reward_type', 12)
-          })`
-      ))
-    }
-    if (onlyInvasions && invasionPerms) {
-      query += `
-        .${count ? 'or' : 'and'}Where(invasion => {
-          invasion.whereIn('grunt_type', [${invasion}])
-          .andWhere('incident_expire_timestamp', '>=', ${ts})
-          ${count ? '})' : ''} `
-      count = true
-    }
-    if ((onlyLures && lurePerms)
-      || (onlyQuests && questPerms)
-      || (onlyInvasions && invasionPerms)) {
-      query += '})'
-    }
+          })
+        })
+      }
+      if (onlyInvasions && invasionPerms) {
+        stops.orWhere(invasion => {
+          invasion.whereIn('grunt_type', invasions)
+            .andWhere('incident_expire_timestamp', '>=', ts)
+        })
+      }
+    })
+    const results = await query
 
-    const results = await eval(query)
-
+    // filters and removes unwanted data
     const secondaryFilter = queryResults => {
       const { length } = queryResults
       const filteredResults = new Set()
@@ -97,7 +88,7 @@ class Pokestop extends Model {
           Object.keys(info).forEach(x => (pokestop[`mega_${x}`] = info[x]))
         }
 
-        const library = [
+        const keyRef = [
           {
             filter: `p${pokestop.quest_pokemon_id}-${pokestop.quest_form_id}`,
             field: 'quest_pokemon_id',
@@ -120,9 +111,9 @@ class Pokestop extends Model {
           },
         ]
 
-        library.forEach(category => {
+        keyRef.forEach(category => {
           if (args.filters[category.filter]) {
-            library.forEach(otherCategory => {
+            keyRef.forEach(otherCategory => {
               if (category.filter !== otherCategory.filter) {
                 if (!args.filters[otherCategory.filter]) {
                   delete pokestop[otherCategory.field]

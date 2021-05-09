@@ -29,6 +29,7 @@ rootRouter.get('/settings', async (req, res) => {
     const serverSettings = {
       user: config.discord.enabled ? req.user : req.session,
       discord: config.discord.enabled,
+      settings: {},
     }
 
     if (serverSettings.user) {
@@ -36,19 +37,19 @@ rootRouter.get('/settings', async (req, res) => {
         map: config.map,
         tileServers: config.tileServers,
         icons: config.icons,
+        navigation: config.navigation,
       }
       await Utility.updateAvailableForms(serverSettings.config.icons)
 
-      serverSettings.settings = {
-        icons: config.icons.Default,
-        tileServers: config.tileServers.Default,
-      }
-      Object.keys(serverSettings.settings).forEach(setting => {
-        Object.keys(serverSettings.config[setting]).forEach(option => {
-          serverSettings.config[setting][option].name = option
-        })
+      Object.keys(serverSettings.config).forEach(setting => {
+        if (setting !== 'map') {
+          const category = serverSettings.config[setting]
+          Object.keys(category).forEach(option => {
+            category[option].name = option
+          })
+          serverSettings.settings[setting] = category[Object.keys(category)[0]]
+        }
       })
-
       serverSettings.defaultFilters = await Utility.buildDefaultFilters(serverSettings.user.perms)
       serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, serverSettings.user.perms)
       serverSettings.menus = Utility.buildMenus()

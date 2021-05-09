@@ -1,17 +1,7 @@
 const {
-  GraphQLObjectType, GraphQLID, GraphQLInt, GraphQLFloat, GraphQLList,
+  GraphQLObjectType, GraphQLID, GraphQLInt, GraphQLFloat,
 } = require('graphql')
-
-const PvpType = new GraphQLObjectType({
-  name: 'Pvp',
-  fields: () => ({
-    level: { type: GraphQLFloat },
-    pokemon: { type: GraphQLInt },
-    form: { type: GraphQLInt },
-    cp: { type: GraphQLInt },
-    percentage: { type: GraphQLFloat },
-  }),
-})
+const { JSONResolver } = require('graphql-scalars')
 
 module.exports = new GraphQLObjectType({
   name: 'Pokemon',
@@ -28,6 +18,8 @@ module.exports = new GraphQLObjectType({
     move_2: { type: GraphQLInt },
     gender: { type: GraphQLInt },
     cp: { type: GraphQLInt },
+    level: { type: GraphQLInt },
+    iv: { type: GraphQLFloat },
     atk_iv: { type: GraphQLInt },
     def_iv: { type: GraphQLInt },
     sta_iv: { type: GraphQLInt },
@@ -40,7 +32,7 @@ module.exports = new GraphQLObjectType({
     capture_1: { type: GraphQLFloat },
     capture_2: { type: GraphQLFloat },
     capture_3: { type: GraphQLFloat },
-    greatLeague: { type: new GraphQLList(PvpType) },
-    ultraLeague: { type: new GraphQLList(PvpType) },
+    great: { type: JSONResolver },
+    ultra: { type: JSONResolver },
   }),
 })

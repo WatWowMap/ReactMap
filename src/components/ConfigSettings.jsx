@@ -9,6 +9,7 @@ import Map from './Map'
 import createTheme from '../assets/mui/theme'
 
 export default function ConfigSettings({ serverSettings }) {
+  document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
   const setSettings = useStore(state => state.setSettings)
@@ -43,6 +44,8 @@ export default function ConfigSettings({ serverSettings }) {
   }
 
   const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
+  document.body.classList.add('dark')
+
   let screenSize = 'xs'
   if (useMediaQuery(theme.breakpoints.only('sm'))) screenSize = 'sm'
   if (useMediaQuery(theme.breakpoints.up('md'))) screenSize = 'md'
@@ -64,6 +67,7 @@ export default function ConfigSettings({ serverSettings }) {
   return (
     <ThemeProvider theme={theme}>
       <MapContainer
+        tap={false}
         center={startLocation}
         zoom={zoom}
         zoomControl={false}

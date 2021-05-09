@@ -17,7 +17,7 @@ export default function DrawerMenu({
 }) {
   const classes = useStyles()
   const { menus } = useMasterfile(state => state.ui)
-
+  const { map: { title } } = useMasterfile(state => state.config)
   const [expanded, setExpanded] = useState(false)
 
   const handleChange = (panel) => (event, isExpanded) => {
@@ -114,6 +114,7 @@ export default function DrawerMenu({
       classes={{ paper: classes.drawer }}
       style={{ overflow: 'hidden' }}
     >
+      <Typography variant="h3" color="secondary" style={{ fontWeight: 'bold', margin: 5 }}>{title}</Typography>
       {drawerItems}
     </Drawer>
   )
