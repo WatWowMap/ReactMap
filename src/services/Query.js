@@ -1,7 +1,7 @@
 import getAllDevices from './queries/device'
 import * as gymIndex from './queries/gym'
 import * as pokestopIndex from './queries/pokestop'
-import getAllPokemon from './queries/pokemon'
+import * as pokemonIndex from './queries/pokemon'
 import getAllSpawnpoints from './queries/spawnpoint'
 import getAllPortals from './queries/portal'
 import getAllWeather from './queries/weather'
@@ -36,19 +36,31 @@ class Query {
       Quests: filters.quests && perms.quests,
       Invasions: filters.invasions && perms.invasions,
     }
-    const allPerms = Object.values(permObj).every(val => val === false)
     let query = 'get'
 
     Object.keys(permObj).forEach(keyPerm => {
       if (permObj[keyPerm]) query += keyPerm
     })
-    if (allPerms) query += 'Pokestops'
+
+    if (query === 'get') query += 'Pokestops'
 
     return pokestopIndex[query]
   }
 
-  static pokemon() {
-    return getAllPokemon
+  static pokemon(filters, perms) {
+    const permObj = {
+      Ivs: perms.iv,
+      Stats: perms.stats,
+      Pvp: perms.pvp,
+    }
+    let query = 'get'
+
+    Object.keys(permObj).forEach(keyPerm => {
+      if (permObj[keyPerm]) query += keyPerm
+    })
+    if (query === 'get') query += 'Pokemon'
+
+    return pokemonIndex[query]
   }
 
   static portals() {

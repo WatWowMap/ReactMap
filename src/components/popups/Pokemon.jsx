@@ -37,6 +37,7 @@ export default function PokemonPopup({
   const setHideList = useMasterfile(state => state.setHideList)
   const excludeList = useMasterfile(state => state.excludeList)
   const setExcludeList = useMasterfile(state => state.setExcludeList)
+  const { menus: { pokemon: perms } } = useMasterfile(state => state.ui)
 
   const open = Boolean(anchorEl)
   const classes = useStyles()
@@ -115,15 +116,12 @@ export default function PokemonPopup({
       </Grid>
       <Grid item xs={3}>
         <IconButton
-          aria-label="more"
-          aria-controls="long-menu"
           aria-haspopup="true"
           onClick={handleClick}
         >
           <MoreVert />
         </IconButton>
         <Menu
-          id="long-menu"
           anchorEl={anchorEl}
           keepMounted
           open={open}
@@ -150,21 +148,27 @@ export default function PokemonPopup({
         justify="space-around"
         alignItems="center"
       >
-        <Grid item>
-          <Typography variant="h4" align="center" style={{ color: selectedColor }}>
-            {iv}%
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Typography variant="subtitle1" align="center">
-            {atk_iv} | {def_iv} | {sta_iv}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Typography variant="subtitle1" align="center">
-            CP {cp} (Lvl {level})
-          </Typography>
-        </Grid>
+        {(perms.iv && iv) && (
+          <Grid item>
+            <Typography variant="h4" align="center" style={{ color: selectedColor }}>
+              {iv}%
+            </Typography>
+          </Grid>
+        )}
+        {(perms.stats && atk_iv) && (
+          <Grid item>
+            <Typography variant="subtitle1" align="center">
+              {atk_iv} | {def_iv} | {sta_iv}
+            </Typography>
+          </Grid>
+        )}
+        {((perms.iv || perms.stats) && (iv || atk_iv)) && (
+          <Grid item>
+            <Typography variant="subtitle1" align="center">
+              CP {cp} (Lvl {level})
+            </Typography>
+          </Grid>
+        )}
       </Grid>
       <Divider orientation="vertical" flexItem />
       <Grid
@@ -175,7 +179,7 @@ export default function PokemonPopup({
         justify="space-around"
         alignItems="center"
       >
-        {weather != 0 && (
+        {(weather != 0 && perms.iv) && (
           <Grid
             item
             className="grid-item"
@@ -261,7 +265,7 @@ export default function PokemonPopup({
           alignItems="center"
           justify="center"
         >
-          {[move_1, move_2].map((move, i) => (
+          {(perms.iv && iv) && [move_1, move_2].map((move, i) => (
             <Fragment key={move}>
               <Grid
                 item

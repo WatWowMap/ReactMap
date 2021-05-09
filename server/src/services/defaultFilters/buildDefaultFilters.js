@@ -42,6 +42,9 @@ module.exports = async function buildDefault(perms) {
     pokemon: perms.pokemon ? {
       enabled: defaultFilters.pokemon.enabled,
       legacy: pokemonReducer ? defaultFilters.pokemon.legacyFilter : undefined,
+      iv: perms.iv ? true : undefined,
+      stats: perms.stats ? true : undefined,
+      pvp: perms.pvp ? true : undefined,
       standard: new PokemonFilter(),
       ivOr: new PokemonFilter(...Object.values(defaultFilters.pokemon.globalValues)),
       ivAnd: new PokemonFilter(...Object.values(defaultFilters.pokemon.globalValues)),

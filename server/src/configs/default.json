@@ -85,13 +85,13 @@
         "enabled": false,
         "legacyFilter": false,
         "globalValues": {
-          "iv": [0, 100],
+          "iv": [80, 100],
           "gl": [1, 100],
           "ul": [1, 100],
           "level": [1, 35],
-          "atk": [0, 15],
-          "def": [0, 15],
-          "sta": [0, 15]
+          "atk_iv": [0, 15],
+          "def_iv": [0, 15],
+          "sta_iv": [0, 15]
         }
       },
       "nests": {

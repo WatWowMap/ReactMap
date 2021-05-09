@@ -1,31 +1,142 @@
 import { gql } from '@apollo/client'
 
-export default gql`
+const core = gql`
+  fragment CorePokemon on Pokemon {
+    id
+    lat
+    lon
+    pokemon_id
+    form
+    gender
+    first_seen_timestamp
+    expire_timestamp
+    expire_timestamp_verified
+    updated
+  }
+`
+
+const ivs = gql`
+  fragment Iv on Pokemon {
+    iv
+    cp
+    level
+    weight
+    size
+    move_1
+    move_2
+    weather
+  }
+`
+
+const stats = gql`
+  fragment Stats on Pokemon {
+    cp
+    level
+    atk_iv
+    def_iv
+    sta_iv
+  }
+`
+
+const pvp = gql`
+  fragment Pvp on Pokemon {
+    great
+    ultra
+  }
+`
+
+export const getPokemon = gql`
+  ${core}
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
     pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
-      id
-      lat
-      lon
-      updated
-      pokemon_id
-      form
-      gender
-      iv
-      cp
-      move_1
-      move_2
-      level
-      weight
-      size
-      atk_iv
-      def_iv
-      sta_iv
-      weather
-      first_seen_timestamp
-      expire_timestamp
-      expire_timestamp_verified
-      great
-      ultra
+      ...CorePokemon
+    }
+  }
+`
+
+export const getIvs = gql`
+  ${core}
+  ${ivs}
+  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
+    pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
+      ...CorePokemon
+      ...Iv
+    }
+  }
+`
+
+export const getStats = gql`
+  ${core}
+  ${stats}
+  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
+    pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
+      ...CorePokemon
+      ...Stats
+    }
+  }
+`
+
+export const getPvp = gql`
+  ${core}
+  ${pvp}
+  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
+    pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
+      ...CorePokemon
+      ...Pvp
+    }
+  }
+`
+
+export const getIvsStats = gql`
+  ${core}
+  ${ivs}
+  ${stats}
+  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
+    pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
+      ...CorePokemon
+      ...Iv
+      ...Stats
+    }
+  }
+`
+
+export const getIvsPvp = gql`
+  ${core}
+  ${ivs}
+  ${pvp}
+  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
+    pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
+      ...CorePokemon
+      ...Iv
+      ...Pvp
+    }
+  }
+`
+
+export const getStatsPvp = gql`
+  ${core}
+  ${stats}
+  ${pvp}
+  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
+    pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
+      ...CorePokemon
+      ...Stats
+      ...Pvp
+    }
+  }
+`
+
+export const getIvsStatsPvp = gql`
+  ${core}
+  ${ivs}
+  ${stats}
+  ${pvp}
+  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
+    pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
+      ...CorePokemon
+      ...Iv
+      ...Stats
+      ...Pvp
     }
   }
 `
