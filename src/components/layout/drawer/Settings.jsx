@@ -1,14 +1,23 @@
-import React from 'react'
+/* eslint-disable react/jsx-props-no-spreading */
+import React, { useState } from 'react'
 import {
-  FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Typography,
+  FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Slide,
 } from '@material-ui/core'
+import { Alert } from '@material-ui/lab'
+
 import { useStore, useMasterfile } from '../../../hooks/useStore'
 import Utility from '../../../services/Utility'
+
+function SlideTransition(props) {
+  return <Slide {...props} direction="up" />
+}
 
 export default function Settings() {
   const config = useMasterfile(state => state.config)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
+
+  const [alert, setAlert] = useState(false)
 
   const handleChange = event => {
     setSettings({
@@ -17,17 +26,26 @@ export default function Settings() {
     })
   }
 
+  const clearStorage = () => {
+    localStorage.clear()
+    setAlert(true)
+  }
+
+  const handleClose = () => {
+    setAlert(false)
+  }
+
   return (
     <Grid
       container
-      direction="column"
+      direction="row"
       justify="space-evenly"
       alignItems="center"
       spacing={1}
     >
       {Object.keys(settings).map(setting => (
-        <Grid item key={setting}>
-          <FormControl style={{ width: 175 }}>
+        <Grid item key={setting} xs={10}>
+          <FormControl style={{ width: 200, margin: 5 }}>
             <InputLabel>{Utility.getProperName(setting)}</InputLabel>
             <Select
               autoFocus
@@ -48,7 +66,20 @@ export default function Settings() {
           </FormControl>
         </Grid>
       ))}
-      <Grid item>
+      <Grid item xs={6} style={{ textAlign: 'center', margin: '20px 0px' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          style={{
+            color: 'white',
+          }}
+          size="small"
+          onClick={clearStorage}
+        >
+          Clear Storage
+        </Button>
+      </Grid>
+      <Grid item xs={5} style={{ textAlign: 'center', margin: '20px 0px' }}>
         <Button
           variant="contained"
           style={{
@@ -59,11 +90,18 @@ export default function Settings() {
           href="/logout"
         >
           <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
-          <Typography variant="button">
-            Logout
-          </Typography>
+          Logout
         </Button>
       </Grid>
+      <Snackbar
+        open={alert}
+        onClose={handleClose}
+        TransitionComponent={SlideTransition}
+      >
+        <Alert onClose={handleClose} severity="success" variant="filled">
+          Local Storage has been cleared!
+        </Alert>
+      </Snackbar>
     </Grid>
   )
 }

@@ -23,6 +23,8 @@
     "title": "ReactMap",
     "headerTitle": "React based Leaflet Map",
     "locale": "en",
+    "enableFeedbackLink": false,
+    "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
     "startLat": 0,
     "startLon": 0,
     "startZoom": 12,

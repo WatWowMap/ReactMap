@@ -54,9 +54,13 @@ rootRouter.get('/settings', async (req, res) => {
           serverSettings.settings[setting] = category[Object.keys(category)[0]]
         }
       })
+
       serverSettings.defaultFilters = await Utility.buildDefaultFilters(serverSettings.user.perms)
+
       serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, serverSettings.user.perms)
+
       serverSettings.menus = Utility.buildMenus()
+
       serverSettings.masterfile = masterfile
     }
     res.status(200).json({ serverSettings })

@@ -121,8 +121,28 @@ export default function DrawerMenu({
         alignItems="center"
         justify="center"
       >
-        <Grid item xs={10}>
-          <Typography variant="h3" color="secondary" style={{ fontWeight: 'bold', margin: 5 }}>{title}</Typography>
+        <Grid
+          item
+          xs={2}
+          className="grid-item"
+          style={{
+            backgroundImage: 'url(/favicon.ico)',
+            width: 32,
+            height: 32,
+          }}
+        />
+        <Grid item xs={8}>
+          <Typography
+            variant="h5"
+            color="secondary"
+            style={{
+              fontWeight: 'bold',
+              margin: 10,
+              textShadow: '2px 2px #323232',
+            }}
+          >
+            {title}
+          </Typography>
         </Grid>
         <Grid item xs={2}>
           <IconButton onClick={toggleDrawer(false)}>
