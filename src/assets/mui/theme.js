@@ -26,9 +26,6 @@ export default function createTheme(theme, darkMode) {
         paper: '#333333',
         default: '#333333',
       },
-      success: {
-        main: '#00e676',
-      },
       text: {
         primary: '#f5f5f5',
         secondary: 'white',

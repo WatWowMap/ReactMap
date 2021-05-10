@@ -6,6 +6,8 @@
     "headerTitle": "React based Leaflet Map",  
     "locale": "en",
     "style": "dark",
+    "enableFeedback": true,
+    "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
     "startLat": 0,
     "startLon": 0,
     "startZoom": 12,
