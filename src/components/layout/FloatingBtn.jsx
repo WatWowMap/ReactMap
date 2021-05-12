@@ -3,7 +3,7 @@ import {
   Grid, Fab, Dialog, Button, Typography, Divider,
 } from '@material-ui/core'
 import {
-  Menu, LocationOn, ZoomIn, ZoomOut, BugReport, Create,
+  Menu, LocationOn, ZoomIn, ZoomOut, Forum, Create,
 } from '@material-ui/icons'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -53,7 +53,7 @@ export default function FloatingButtons({ toggleDrawer }) {
       {enableFeedback && (
         <Grid item>
           <Fab onClick={handleClickOpen}>
-            <BugReport />
+            <Forum />
           </Fab>
         </Grid>
       )}
@@ -71,7 +71,7 @@ export default function FloatingButtons({ toggleDrawer }) {
           <Divider />
           <br />
           <Typography variant="body2" align="center">
-            <em>This feedback is sent directly to the developers, which may not include this map&apos;s Admin.</em>
+            <em>This feedback is sent directly to the developers.</em>
           </Typography>
           <br />
           <Typography align="center">

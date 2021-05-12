@@ -4,6 +4,7 @@ const core = gql`
   fragment CorePokestop on Pokestop {
     id
     name
+    url
     lat
     lon
     updated

@@ -11,7 +11,7 @@ class Pokemon extends Model {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const { stats, iv: ivs, pvp } = perms
     const {
-      onlyStandard, onlyIvOr, excludeList,
+      onlyStandard, onlyIvOr, onlyExcludeList,
     } = args.filters
     const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv']
 
@@ -56,7 +56,7 @@ class Pokemon extends Model {
           if (formId) pkmn.form = formId
           if (!ivs && !stats
             && args.filters[`${pkmn.pokemon_id}-${pkmn.form}`]) {
-            if (!excludeList.includes(`${pkmn.pokemon_id}-${pkmn.form}`)) {
+            if (!onlyExcludeList.includes(`${pkmn.pokemon_id}-${pkmn.form}`)) {
               fixedResults.push(pkmn)
             }
           } else {
@@ -65,12 +65,12 @@ class Pokemon extends Model {
             ))
             if (ivOrCheck.every(val => val)
               || args.filters[`${pkmn.pokemon_id}-${pkmn.form}`]) {
-              if (!excludeList.includes(`${pkmn.pokemon_id}-${pkmn.form}`)) {
+              if (!onlyExcludeList.includes(`${pkmn.pokemon_id}-${pkmn.form}`)) {
                 fixedResults.push(pkmn)
               }
             }
           }
-        } else if (!excludeList.includes(`${pkmn.pokemon_id}-${pkmn.form}`)) {
+        } else if (!onlyExcludeList.includes(`${pkmn.pokemon_id}-${pkmn.form}`)) {
           fixedResults.push(pkmn)
         }
       }
@@ -91,7 +91,7 @@ class Pokemon extends Model {
     // generates sql based off of ivOr and individual filters
     query.andWhere(ivOr => {
       for (const [pkmn, filter] of Object.entries(args.filters)) {
-        if (pkmn.includes('-') && !excludeList.includes(pkmn)) {
+        if (pkmn.includes('-') && !onlyExcludeList.includes(pkmn)) {
           ivOr.orWhere(poke => {
             poke.where('pokemon_id', pkmn.split('-')[0])
             generateSql(poke, filter)

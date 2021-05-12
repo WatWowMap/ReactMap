@@ -8,7 +8,6 @@ import {
 import {
   Check, Clear, ExpandMore, Map, MoreVert,
 } from '@material-ui/icons'
-import clsx from 'clsx'
 import { useStore, useMasterfile } from '../../hooks/useStore'
 import useStyles from '../../hooks/useStyles'
 import Utility from '../../services/Utility'
@@ -313,16 +312,14 @@ const Footer = ({
       {(great || ultra) && (
         <Grid item xs={4}>
           <IconButton
-            className={clsx(classes.expand, {
-              [classes.expandOpen]: pvpExpand,
-            })}
+            className={pvpExpand ? classes.expandOpen : classes.expand}
             name="pvp"
             onClick={handlePvpClick}
             aria-expanded={pvpExpand}
             aria-label="show more"
           >
             <img
-              src="/images/misc/gbl.png"
+              src="/images/misc/pvp.png"
               height={20}
               width="auto"
             />
@@ -338,9 +335,7 @@ const Footer = ({
       </Grid>
       <Grid item xs={4}>
         <IconButton
-          className={clsx(classes.expand, {
-            [classes.expandOpen]: expanded,
-          })}
+          className={expanded ? classes.expandOpen : classes.expand}
           onClick={handleExpandClick}
           aria-expanded={expanded}
           aria-label="show more"

@@ -4,9 +4,11 @@ const core = gql`
   fragment CoreGym on Gym {
     id
     name
+    url
     lat
     lon
     updated
+    last_modified_timestamp
   }
 `
 
@@ -14,8 +16,11 @@ const gym = gql`
   fragment Gym on Gym {
     availble_slots
     ex_raid_eligible
+    ar_scan_eligible
     team_id
     in_battle
+    guarding_pokemon_id
+    total_cp
   }
 `
 
@@ -29,6 +34,8 @@ const raid = gql`
     raid_pokemon_gender
     raid_pokemon_costume
     raid_pokemon_evolution
+    raid_pokemon_move_1
+    raid_pokemon_move_2
   }
 `
 

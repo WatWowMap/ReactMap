@@ -3,22 +3,24 @@ import Utility from '../../services/Utility'
 import { useStore, useMasterfile } from '../../hooks/useStore'
 
 export default function raidMarker(gym, ts) {
+  const {
+    raid_battle_timestamp: startTS,
+    raid_pokemon_id: pokemonId,
+  } = gym
   const iconSize = 30
   const iconAnchorY = iconSize * 0.849
   const popupAnchorY = -8 - iconAnchorY
   const offsetY = iconSize + 25
 
-  let iconUrl
-  if (gym.raid_battle_timestamp <= ts && gym.raid_end_timestamp >= ts && gym.raid_level > 0) {
-    if (gym.raid_pokemon_id !== 0 && gym.raid_pokemon_id !== null) {
-      const { path } = useStore(state => state.settings).icons
-      const availableForms = useMasterfile(state => state.availableForms)
-      iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, gym.raid_pokemon_id, gym.raid_pokemon_form, gym.raid_pokemon_evolution, gym.raid_pokemon_gender, gym.raid_pokemon_costume)}.png`
-    } else {
-      iconUrl = `/images/unknown_egg/${gym.raid_level}.png`
-    }
-  } else if (gym.raid_end_timestamp >= ts && gym.raid_level > 0) {
-    iconUrl = `/images/egg/${gym.raid_level}.png`
+  let iconUrl = `/images/egg/${gym.raid_level}.png`
+
+  if (pokemonId > 0) {
+    const { path } = useStore(state => state.settings).icons
+    const availableForms = useMasterfile(state => state.availableForms)
+
+    iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, gym.raid_pokemon_id, gym.raid_pokemon_form, gym.raid_pokemon_evolution, gym.raid_pokemon_gender, gym.raid_pokemon_costume)}.png`
+  } else if (startTS < ts) {
+    iconUrl = `/images/unknown_egg/${gym.raid_level}.png`
   }
 
   return new Icon({
