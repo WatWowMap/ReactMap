@@ -3,7 +3,7 @@
   "port": 8080,
   "map": {
     "title": "ReactMap",
-    "headerTitle": "React based Leaflet Map",  
+    "headerTitle": "ReactMap",  
     "locale": "en",
     "style": "dark",
     "enableFeedback": true,

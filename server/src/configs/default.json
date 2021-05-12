@@ -21,7 +21,7 @@
   },
   "map": {
     "title": "ReactMap",
-    "headerTitle": "React based Leaflet Map",
+    "headerTitle": "ReactMap",
     "locale": "en",
     "enableFeedbackLink": false,
     "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
@@ -44,11 +44,11 @@
       "devicePathColor": "red"
     },
     "clusterZoomLevels": {
+      "spawnpoints": 12,
       "gyms": 13,
       "portals": 14,
       "pokestops": 14,
-      "pokemon": 15,
-      "spawnpoints": 16
+      "pokemon": 15
     },
     "userSettingsDefaults": {
       "useName": true,

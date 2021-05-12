@@ -33,5 +33,6 @@ module.exports = new GraphQLObjectType({
     raid_pokemon_gender: { type: GraphQLInt },
     raid_pokemon_costume: { type: GraphQLInt },
     raid_pokemon_evolution: { type: GraphQLInt },
+    ar_scan_eligible: { type: GraphQLInt },
   }),
 })

@@ -20,8 +20,7 @@ export default function QueryData({
 
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
-      hideList,
-      excludeList,
+      onlyExcludeList: excludeList,
     }
     Object.entries(requestedFilters).forEach(topLevelFilter => {
       const [id, specifics] = topLevelFilter

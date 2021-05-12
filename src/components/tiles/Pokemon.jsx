@@ -23,7 +23,7 @@ const PokemonTile = ({ item, showTimer }) => {
       >
         <PopupContent pokemon={item} iconUrl={iconUrl} />
       </Popup>
-      {showTimer && <Timer item={item} />}
+      {showTimer && <Timer item={item.expire_timestamp} />}
     </Marker>
   )
 }
