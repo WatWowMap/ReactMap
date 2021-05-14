@@ -26,11 +26,12 @@ class Pokemon extends Model {
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (queryBase, filter, bool) => {
       keys.forEach(key => {
-        switch (key) {
-          default:
-            if (!arrayCheck(filter[key], key) && stats) queryBase.andWhereBetween(key, filter[key]); break
-          case 'iv':
-            if (!arrayCheck(filter[key], key) && ivs && bool) queryBase.andWhereBetween(key, filter[key]); break
+        if (key === 'iv') {
+          if (!arrayCheck(filter[key], key) && ivs && bool) {
+            queryBase.andWhereBetween(key, filter[key])
+          }
+        } else if (!arrayCheck(filter[key], key) && stats) {
+          queryBase.andWhereBetween(key, filter[key])
         }
       })
     }

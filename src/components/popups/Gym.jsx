@@ -255,7 +255,13 @@ const RaidImage = ({ gym, ts }) => {
   }
 
   return (
-    <Grid container item xs={5} justify="center" alignItems="center">
+    <Grid
+      container
+      item
+      xs={5}
+      justify="center"
+      alignItems="center"
+    >
       <Grid
         item
         xs={12}

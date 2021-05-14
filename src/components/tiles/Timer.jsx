@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Tooltip } from 'react-leaflet'
 import Utility from '../../services/Utility'
 
-export default function Timer({ timestamp }) {
+export default function Timer({ timestamp, direction, label }) {
   const [timer, setTimer] = useState(Utility.getTimeUntil(new Date(timestamp * 1000), true))
 
   useEffect(() => {
@@ -13,7 +13,9 @@ export default function Timer({ timestamp }) {
   })
 
   return (
-    <Tooltip direction="center" permanent>
+    <Tooltip direction={direction} permanent>
+      {label}
+      {label && <br />}
       {timer.str}
     </Tooltip>
   )

@@ -27,16 +27,17 @@ export default function filterPokestops(tempFilters, menus, search) {
     let urlBuilder
     const stopCheck = id.startsWith('s') && perms.pokestops
     const lureCheck = id.startsWith('l') && perms.lures
-    const questCheck = (id.startsWith('p') || id.startsWith('m') || id.startsWith('q')) && perms.quests
+    const questCheck = (id.startsWith('p') || id.startsWith('m') || id.startsWith('q') || id.startsWith('d')) && perms.quests
     const invasionsCheck = id.startsWith('i') && perms.invasions
 
     if (stopCheck || lureCheck || questCheck || invasionsCheck) {
       switch (id.charAt(0)) {
         default: urlBuilder = '/images/pokestop/0'; break
         case 'i': urlBuilder = `/images/invasion/i0_${id.slice(1)}`; break
+        case 'd': urlBuilder = '/images/item/-1'; break
         case 'q': urlBuilder = `/images/item/${id.slice(1)}`; break
         case 'l': urlBuilder = `/images/pokestop/${id == 0 ? id : id.slice(-1)}`; break
-        case 'm': urlBuilder = `${path}/${getPokemonIcon(availableForms, id.slice(1), 0, 1)}`; break
+        case 'm': urlBuilder = `${path}/${getPokemonIcon(availableForms, id.slice(1).split('-')[0], 0, 1)}`; break
         case 'p': urlBuilder = `${path}/${getPokemonIcon(availableForms, ...id.slice(1).split('-'))}`
       }
       const url = `url(${urlBuilder}.png)`
@@ -67,9 +68,7 @@ export default function filterPokestops(tempFilters, menus, search) {
   }
 
   Object.keys(tempFilters).forEach(id => {
-    let pokestop = {
-      name: 'All Stops',
-    }
+    let pokestop = {}
     switch (id.charAt(0)) {
       default: pokestop.category = 'pokestops'; break
       case 'p':
@@ -79,9 +78,12 @@ export default function filterPokestops(tempFilters, menus, search) {
         pokestop = masterfile.invasions[id.slice(1)]
         pokestop.category = 'invasions'
         pokestop.name = pokestop.type; break
+      case 'd':
+        pokestop = { name: `Stardust x${id.slice(1)}` }
+        pokestop.category = 'items'; break
       case 'm':
-        pokestop = masterfile.pokemon[id.slice(1).split('-')[0]]
-        pokestop.catego000ry = 'energy'; break
+        pokestop = { name: `${masterfile.pokemon[id.slice(1).split('-')[0]].name} x${id.split('-')[1]}` }
+        pokestop.category = 'energy'; break
       case 'q':
         pokestop = masterfile.items[id.slice(1)]
         pokestop.category = 'items'; break

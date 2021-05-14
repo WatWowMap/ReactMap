@@ -73,6 +73,22 @@ body {
   -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 1);
 }
 
+.normal {
+  border: 4px solid rgb(204, 50, 165);
+}
+.glacial {
+  border: 4px solid rgb(116, 183, 250);
+}
+.mossy {
+  border: 4px solid lawngreen;
+}
+.magnetic {
+  border: 4px solid yellow;
+}
+.rainy {
+  border: 4px solid rgb(0, 82, 158)
+}
+
 .mystic {
   border: 4px solid blue;
 }
@@ -84,4 +100,57 @@ body {
 }
 .neutral {
   border: 4px solid gray;
+}
+
+.marker {
+  object-fit: contain;
+}
+
+.table-invasion {
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: bold;
+  text-align: center;
+}
+
+.table-invasion td:first-child {
+  padding-right: 10px;
+}
+.table-invasion td:nth-child(2) {
+  width: 100px
+}
+.table-invasion td:last-child {
+  padding-left: 7px;
+}
+
+.invasion-reward > img {
+  position: absolute;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  object-fit: contain;
+}
+
+.invasion-reward {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  position: relative;
+}
+
+img {
+  image-rendering: crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.invasion-reward > img.invasion-reward-shadow {
+  width: 15px;
+  height: 15px;
+  right: auto;
+  top: auto;
+  filter: drop-shadow(0 0 2px #000);
 }

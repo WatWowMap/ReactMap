@@ -1,9 +1,9 @@
-const { GenericFilter } = require('../../models/index')
+const { GenericFilter, Pokestop } = require('../../models/index')
 
-module.exports = function buildQuests(perms, availableQuests, defaults) {
+module.exports = async function buildQuests(perms, defaults) {
   const quests = perms ? {} : undefined
-
   if (quests) {
+    const availableQuests = await Pokestop.getAvailableQuests()
     Object.entries(availableQuests).forEach(questType => {
       const [type, rewards] = questType
       switch (type) {
@@ -17,12 +17,16 @@ module.exports = function buildQuests(perms, availableQuests, defaults) {
           }); break
         case 'mega':
           rewards.forEach(reward => {
-            quests[`m${reward.id}`] = new GenericFilter(defaults.megaEnergy)
+            quests[`m${reward.id}-${reward.amount}`] = new GenericFilter(defaults.megaEnergy)
           }); break
         case 'invasions':
           rewards.forEach(reward => {
             quests[`i${reward.grunt_type}`] = new GenericFilter(defaults.invasions)
-          })
+          }); break
+        case 'stardust':
+          rewards.forEach(reward => {
+            quests[`d${reward.amount}`] = new GenericFilter(defaults.invasions)
+          }); break
       }
     })
   }

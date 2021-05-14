@@ -17,5 +17,6 @@ export default function gymMarker(gym, ts) {
     iconSize,
     iconAnchor: [iconSize / 2, iconAnchorY],
     popupAnchor: [0, popupAnchorY],
+    className: 'marker',
   })
 }
