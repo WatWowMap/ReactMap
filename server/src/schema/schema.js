@@ -1,8 +1,8 @@
 const {
-  GraphQLObjectType, GraphQLID, GraphQLFloat, GraphQLList, GraphQLSchema,
+  GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
-const { ref } = require('objection')
+const { ref, raw } = require('objection')
 
 const DeviceType = require('./device')
 const GymType = require('./gym')
@@ -33,7 +33,17 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.devices) {
-          return Device.query()
+          const results = await Device.query()
+            .join('instance', 'device.instance_name', '=', 'instance.name')
+            .select('uuid', 'last_seen', 'last_lat', 'last_lon', 'type', 'instance_name',
+              raw('json_extract(data, "$.area")')
+                .as('rawArea'))
+          results.forEach(device => {
+            const parseRoute = JSON.parse(device.rawArea)
+            const finalRoute = parseRoute.length === 1 ? parseRoute[0] : parseRoute
+            device.area = finalRoute.map(route => [route.lat, route.lon])
+          })
+          return results
         }
       },
     },
@@ -76,21 +86,6 @@ const RootQuery = new GraphQLObjectType({
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.pokemon) {
           return Pokemon.getPokemon(args, perms)
-        }
-      },
-    },
-    pokemonDetails: {
-      type: PokemonType,
-      args: {
-        id: { type: GraphQLID },
-      },
-      async resolve(parent, args, req) {
-        const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.pokemon) {
-          const result = await Pokemon.query().findOne('id', args.id)
-          result.greatLeague = JSON.parse(result.pvp_rankings_great_league)
-          result.ultraLeague = JSON.parse(result.pvp_rankings_ultra_league)
-          return result
         }
       },
     },
@@ -175,7 +170,7 @@ const RootQuery = new GraphQLObjectType({
             .select(['*', ref('id')
               .castTo('CHAR')
               .as('id')])
-          results.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, 'polyline'))
+          results.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, 'polygon'))
           return results
         }
       },
