@@ -8,6 +8,8 @@ const core = gql`
     lat
     lon
     updated
+    last_modified_timestamp
+    ar_scan_eligible
   }
 `
 
@@ -20,8 +22,13 @@ const lure = gql`
 
 const quest = gql`
   fragment Quest on Pokestop {
+    quest_type
     quest_reward_type
+    quest_conditions
+    quest_target
     quest_item_id
+    item_amount
+    stardust_amount
     quest_pokemon_id
     quest_form_id
     quest_gender_id

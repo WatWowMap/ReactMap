@@ -3,9 +3,7 @@ const buildPokemon = require('./buildPokemon.js')
 const buildQuests = require('./buildQuests.js')
 // const buildInvasions = require('./buildInvasions.js')
 const buildGyms = require('./buildGyms')
-const {
-  Pokestop, GenericFilter, Gym, PokemonFilter,
-} = require('../../models/index')
+const { GenericFilter, Gym, PokemonFilter } = require('../../models/index')
 
 module.exports = async function buildDefault(perms) {
   const stopReducer = perms.pokestops || perms.lures || perms.quests || perms.invasions
@@ -35,7 +33,7 @@ module.exports = async function buildDefault(perms) {
         l502: perms.lures ? new GenericFilter(defaultFilters.pokestops.lures) : undefined,
         l503: perms.lures ? new GenericFilter(defaultFilters.pokestops.lures) : undefined,
         l504: perms.lures ? new GenericFilter(defaultFilters.pokestops.lures) : undefined,
-        ...buildQuests(perms.quests, await Pokestop.getAvailableQuests(), defaultFilters.pokestops),
+        ...await buildQuests(perms.quests, defaultFilters.pokestops),
         // ...buildInvasions(perms.invasions),
       },
     } : undefined,

@@ -28,5 +28,6 @@ export default function raidMarker(gym, ts) {
     iconSize,
     iconAnchor: [iconSize / 2, offsetY],
     popupAnchor: [0, popupAnchorY - 21.5],
+    className: 'marker',
   })
 }

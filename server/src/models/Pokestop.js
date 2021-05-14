@@ -11,7 +11,7 @@ class Pokestop extends Model {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms,
     } = perms
     const {
-      onlyPokestops, onlyLures, onlyQuests, onlyInvasions,
+      onlyPokestops, onlyLures, onlyQuests, onlyInvasions, onlyExcludeList,
     } = args.filters
 
     const query = this.query()
@@ -19,23 +19,41 @@ class Pokestop extends Model {
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .andWhere('deleted', false)
 
-    // returns everything if all pokestops are on
-    if (onlyPokestops) return query
+    const parseJson = pokestop => {
+      if (pokestop.quest_reward_type) {
+        const { info } = JSON.parse(pokestop.quest_rewards)[0]
+        switch (pokestop.quest_reward_type) {
+          default: return pokestop
+          case 2: Object.keys(info).forEach(x => (pokestop[`item_${x}`] = info[x])); break
+          case 3: Object.keys(info).forEach(x => (pokestop[`stardust_${x}`] = info[x])); break
+          case 7: Object.keys(info).forEach(x => (pokestop[`quest_${x}`] = info[x])); break
+          case 12: Object.keys(info).forEach(x => (pokestop[`mega_${x}`] = info[x])); break
+        }
+      }
+      return pokestop
+    }
 
+    // returns everything if all pokestops are on
+    if (onlyPokestops) {
+      const results = await query
+      return results.map(result => parseJson(result))
+    }
+
+    const stardust = []
+    const invasions = []
     const lures = []
-    const items = []
     const energy = []
     const pokemon = []
-    const invasions = []
-
+    const items = []
     // preps arrays for interested objects
     Object.keys(args.filters).forEach(pokestop => {
       switch (pokestop.charAt(0)) {
         default: break
-        case 'p': pokemon.push(pokestop.slice(1).split('-')[0]); break
-        case 'l': lures.push(pokestop.slice(1)); break
+        case 'd': stardust.push(pokestop.slice(1).split('-')[0]); break
         case 'i': invasions.push(pokestop.slice(1)); break
+        case 'l': lures.push(pokestop.slice(1)); break
         case 'm': energy.push(pokestop.slice(1)); break
+        case 'p': pokemon.push(pokestop.slice(1).split('-')[0]); break
         case 'q': items.push(pokestop.slice(1)); break
       }
     })
@@ -52,13 +70,21 @@ class Pokestop extends Model {
         stops.orWhere(quest => {
           quest.whereIn('quest_item_id', items)
         })
+        stardust.forEach(amount => {
+          stops.orWhere(dust => {
+            dust.where(raw(`json_extract(json_extract(quest_rewards, "$[*].info.amount"), "$[0]") = ${amount}`))
+              .andWhere('quest_reward_type', 3)
+          })
+        })
         stops.orWhere(pokes => {
           pokes.whereIn('quest_pokemon_id', pokemon)
         })
-        energy.forEach(poke => {
+        energy.forEach(megaEnergy => {
+          const [pokeId, amount] = megaEnergy.split('-')
           stops.orWhere(mega => {
-            mega.where(raw(`json_extract(json_extract(quest_rewards, "$[*].info.pokemon_id"), "$[0]") = ${poke}`))
+            mega.where(raw(`json_extract(json_extract(quest_rewards, "$[*].info.pokemon_id"), "$[0]") = ${pokeId}`))
               .andWhere('quest_reward_type', 12)
+              .andWhere(raw(`json_extract(json_extract(quest_rewards, "$[*].info.amount"), "$[0]") = ${amount}`))
           })
         })
       }
@@ -77,17 +103,7 @@ class Pokestop extends Model {
       const filteredResults = new Set()
       for (let i = 0; i < length; i += 1) {
         const pokestop = queryResults[i]
-
-        if (pokestop.quest_reward_type == 7) {
-          const rewards = JSON.parse(pokestop.quest_rewards)
-          const { info } = rewards ? rewards[0] : {}
-          Object.keys(info).forEach(x => (pokestop[`quest_${x}`] = info[x]))
-        } else if (pokestop.quest_reward_type == 12) {
-          const rewards = JSON.parse(pokestop.quest_rewards)
-          const { info } = rewards ? rewards[0] : {}
-          Object.keys(info).forEach(x => (pokestop[`mega_${x}`] = info[x]))
-        }
-
+        parseJson(pokestop)
         const keyRef = [
           {
             filter: `p${pokestop.quest_pokemon_id}-${pokestop.quest_form_id}`,
@@ -98,7 +114,7 @@ class Pokestop extends Model {
             field: 'quest_item_id',
           },
           {
-            filter: `m${pokestop.mega_pokemon_id}`,
+            filter: `m${pokestop.mega_pokemon_id}-${pokestop.mega_amount}`,
             field: 'mega_amount',
           },
           {
@@ -109,6 +125,10 @@ class Pokestop extends Model {
             filter: `l${pokestop.lure_id}`,
             field: 'lure_expire_timestamp',
           },
+          {
+            filter: `d${pokestop.stardust_amount}`,
+            field: 'stardust_amount',
+          },
         ]
 
         keyRef.forEach(category => {
@@ -118,6 +138,8 @@ class Pokestop extends Model {
                 if (!args.filters[otherCategory.filter]) {
                   delete pokestop[otherCategory.field]
                 }
+              } else if (onlyExcludeList.includes(category.filter)) {
+                delete pokestop[category.field]
               }
             })
             filteredResults.add(pokestop)
@@ -136,9 +158,17 @@ class Pokestop extends Model {
       .where('quest_reward_type', 2)
       .groupBy('quest_item_id')
       .orderBy('quest_item_id', 'asc')
+    quests.stardust = await this.query()
+      .distinct(raw('json_extract(json_extract(quest_rewards, "$[*].info.amount"), "$[0]")')
+        .as('amount'))
+      .where('quest_reward_type', 3)
+      .groupBy('amount')
+      .orderBy('amount', 'asc')
     quests.mega = await this.query()
       .distinct(raw('json_extract(json_extract(quest_rewards, "$[*].info.pokemon_id"), "$[0]")')
         .as('id'))
+      .distinct(raw('json_extract(json_extract(quest_rewards, "$[*].info.amount"), "$[0]")')
+        .as('amount'))
       .where('quest_reward_type', 12)
       .orderBy('id', 'asc')
     quests.pokemon = await this.query()

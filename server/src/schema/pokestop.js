@@ -19,7 +19,7 @@ module.exports = new GraphQLObjectType({
     quest_target: { type: GraphQLInt },
     quest_conditions: { type: JSONResolver },
     quest_rewards: { type: JSONResolver },
-    quest_template: { type: GraphQLString },
+    quest_template: { type: JSONResolver },
     quest_reward_type: { type: GraphQLInt },
     quest_item_id: { type: GraphQLInt },
     lure_id: { type: GraphQLInt },
@@ -35,5 +35,8 @@ module.exports = new GraphQLObjectType({
     quest_shiny: { type: GraphQLInt },
     mega_pokemon_id: { type: GraphQLInt },
     mega_amount: { type: GraphQLInt },
+    ar_scan_eligible: { type: GraphQLInt },
+    stardust_amount: { type: GraphQLInt },
+    item_amount: { type: GraphQLInt },
   }),
 })
