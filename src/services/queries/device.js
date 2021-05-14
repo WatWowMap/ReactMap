@@ -8,6 +8,8 @@ const getAllDevices = gql`
       last_seen
       last_lat
       last_lon
+      area
+      type
     }
   }
 `

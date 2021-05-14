@@ -1,6 +1,7 @@
 const {
   GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLFloat,
 } = require('graphql')
+const { JSONResolver } = require('graphql-scalars')
 
 module.exports = new GraphQLObjectType({
   name: 'Device',
@@ -10,5 +11,7 @@ module.exports = new GraphQLObjectType({
     last_seen: { type: GraphQLInt },
     last_lat: { type: GraphQLFloat },
     last_lon: { type: GraphQLFloat },
+    type: { type: GraphQLString },
+    area: { type: JSONResolver },
   }),
 })
