@@ -59,8 +59,8 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         pokemon={pokemon}
       />
       <Collapse in={!pvpExpand} timeout="auto" unmountOnExit>
-        {(getBestRank(great) < 6) && <PvpInfo league="great" data={great} onlyTop5 />}
-        {(getBestRank(ultra) < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 />}
+        {great && (getBestRank(great) < 6) && <PvpInfo league="great" data={great} onlyTop5 />}
+        {ultra && (getBestRank(ultra) < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 />}
       </Collapse>
       <Footer
         pokemon={pokemon}

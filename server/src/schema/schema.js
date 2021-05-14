@@ -37,12 +37,7 @@ const RootQuery = new GraphQLObjectType({
             .join('instance', 'device.instance_name', '=', 'instance.name')
             .select('uuid', 'last_seen', 'last_lat', 'last_lon', 'type', 'instance_name',
               raw('json_extract(data, "$.area")')
-                .as('rawArea'))
-          results.forEach(device => {
-            const parseRoute = JSON.parse(device.rawArea)
-            const finalRoute = parseRoute.length === 1 ? parseRoute[0] : parseRoute
-            device.area = finalRoute.map(route => [route.lat, route.lon])
-          })
+                .as('route'))
           return results
         }
       },

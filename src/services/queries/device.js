@@ -8,7 +8,7 @@ const getAllDevices = gql`
       last_seen
       last_lat
       last_lon
-      area
+      route
       type
     }
   }
