@@ -12,6 +12,6 @@ module.exports = new GraphQLObjectType({
     last_lat: { type: GraphQLFloat },
     last_lon: { type: GraphQLFloat },
     type: { type: GraphQLString },
-    area: { type: JSONResolver },
+    route: { type: JSONResolver },
   }),
 })
