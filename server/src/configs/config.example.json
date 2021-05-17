@@ -52,7 +52,7 @@
     "botToken": "",
     "clientId": "",
     "clientSecret": "",
-    "redirectUri": "http://localhost:8080/api/discord/callback",
+    "redirectUri": "http://localhost:8080/auth/discord/callback",
     "allowedGuilds": [],
     "blockedGuilds": [],
     "allowedUsers": [],

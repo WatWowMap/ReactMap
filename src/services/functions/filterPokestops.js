@@ -17,6 +17,8 @@ export default function filterPokestops(tempFilters, menus, search) {
   const tempAdvFilter = {}
   const searchTerms = []
   let switchKey
+  let total = 0
+  let show = 0
 
   Object.keys(menus).forEach(category => {
     tempAdvFilter[category] = Object.values(menus[category]).every(val => val === false)
@@ -24,6 +26,7 @@ export default function filterPokestops(tempFilters, menus, search) {
   tempAdvFilter.all = Object.values(tempAdvFilter).every(val => val === true)
 
   const addPokestop = (id, name) => {
+    show += 1
     let urlBuilder
     const stopCheck = id.startsWith('s') && perms.pokestops
     const lureCheck = id.startsWith('l') && perms.lures
@@ -68,6 +71,7 @@ export default function filterPokestops(tempFilters, menus, search) {
   }
 
   Object.keys(tempFilters).forEach(id => {
+    total += 1
     let pokestop = {}
     switch (id.charAt(0)) {
       default: pokestop.category = 'pokestops'; break
@@ -118,5 +122,5 @@ export default function filterPokestops(tempFilters, menus, search) {
       }
     }
   })
-  return { filteredObj, filteredArr }
+  return { filteredObj, filteredArr, count: { total, show } }
 }
