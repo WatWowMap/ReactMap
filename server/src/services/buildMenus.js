@@ -11,7 +11,7 @@ const categories = {
     types: ['Bug', 'Dark', 'Dragon', 'Electric', 'Fairy', 'Fighting', 'Fire', 'Flying', 'Ghost', 'Grass', 'Ground', 'Ice', 'Normal', 'Poison', 'Psychic', 'Rock', 'Steel', 'Water'],
     forms: ['altForms', 'Alola', 'Galarian'],
     rarity: ['Common', 'Uncommon', 'Rare', 'UltraRare', 'Regional', 'Event', 'Legendary', 'Mythical'],
-    others: ['reverse', 'selected', 'unselected'],
+    others: ['reverse', 'selected', 'unselected', 'available'],
   },
   pokestops: {
     categories: ['pokestops', 'items', 'energy', 'invasions', 'pokemon'],

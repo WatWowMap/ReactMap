@@ -13,7 +13,11 @@ import useStyles from '../../hooks/useStyles'
 import Utility from '../../services/Utility'
 
 export default function PokemonPopup({ pokemon, iconUrl }) {
-  const { pokemon_id, great, ultra } = pokemon
+  const {
+    pokemon_id,
+    pvp_rankings_great_league,
+    pvp_rankings_ultra_league,
+  } = pokemon
 
   const { menus: { pokemon: perms } } = useMasterfile(state => state.ui)
   const { pokemon: { [pokemon_id]: metaData } } = useMasterfile(state => state.masterfile)
@@ -21,14 +25,21 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
   const [expanded, setExpanded] = useState(false)
   const [pvpExpand, setPvpExpand] = useState(false)
 
-  const getBestRank = (league) => {
-    let bestRank = 4096
-    if (league !== null) {
+  const great = JSON.parse(pvp_rankings_great_league)
+  const ultra = JSON.parse(pvp_rankings_ultra_league)
+
+  const getBestOrWorst = (league, best) => {
+    let startRank = best ? 4096 : 1
+    if (league !== null && best) {
       league.forEach(pkmn => {
-        bestRank = pkmn.rank < bestRank ? pkmn.rank : bestRank
+        startRank = pkmn.rank < startRank ? pkmn.rank : startRank
+      })
+    } else if (league !== null) {
+      league.forEach(pkmn => {
+        startRank = pkmn.rank > startRank ? pkmn.rank : startRank
       })
     }
-    return bestRank
+    return startRank
   }
 
   return (
@@ -59,8 +70,8 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         pokemon={pokemon}
       />
       <Collapse in={!pvpExpand} timeout="auto" unmountOnExit>
-        {great && (getBestRank(great) < 6) && <PvpInfo league="great" data={great} onlyTop5 />}
-        {ultra && (getBestRank(ultra) < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 />}
+        {great && (getBestOrWorst(great, true) < 6) && <PvpInfo league="great" data={great} onlyTop5 />}
+        {ultra && (getBestOrWorst(ultra, true) < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 />}
       </Collapse>
       <Footer
         pokemon={pokemon}
@@ -68,6 +79,7 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         setExpanded={setExpanded}
         pvpExpand={pvpExpand}
         setPvpExpand={setPvpExpand}
+        hasPvp={getBestOrWorst(great) > 5 || getBestOrWorst(ultra) > 5}
       />
       <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
         {great && <PvpInfo league="great" data={great} />}
@@ -288,14 +300,12 @@ const Timer = ({ pokemon }) => {
 }
 
 const Footer = ({
-  pokemon, expanded, pvpExpand, setExpanded, setPvpExpand,
+  pokemon, expanded, pvpExpand, setExpanded, setPvpExpand, hasPvp,
 }) => {
   const classes = useStyles()
   const { navigation: { url } } = useStore(state => state.settings)
 
-  const {
-    great, ultra, lat, lon,
-  } = pokemon
+  const { lat, lon } = pokemon
 
   const handleExpandClick = () => {
     if (pvpExpand) setPvpExpand(false)
@@ -309,7 +319,7 @@ const Footer = ({
 
   return (
     <>
-      {(great || ultra) && (
+      {hasPvp && (
         <Grid item xs={4}>
           <IconButton
             className={pvpExpand ? classes.expandOpen : classes.expand}

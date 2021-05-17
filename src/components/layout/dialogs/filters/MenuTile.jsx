@@ -61,6 +61,7 @@ export default function MenuTile({
     <Typography
       variant={isMobile ? 'h6' : 'subtitle1'}
       align="center"
+      noWrap
     >
       {item.name}
     </Typography>

@@ -15,6 +15,8 @@ export default function filterPokemon(tempFilters, menus, search) {
   const filteredObj = {}
   const searchTerms = []
   let switchKey
+  let total = 0
+  let show = 0
 
   Object.keys(menus).forEach(category => {
     tempAdvFilter[category] = Object.values(menus[category]).every(val => val === false)
@@ -22,6 +24,7 @@ export default function filterPokemon(tempFilters, menus, search) {
   tempAdvFilter.all = Object.values(tempAdvFilter).every(val => val === true)
 
   const addPokemon = (id, name) => {
+    show += 1
     const url = `url(${path}/${getPokemonIcon(availableForms, ...id.split('-'))}.png)`
     filteredArr.push({ id, name, url })
     filteredObj[id] = { ...tempFilters[id] }
@@ -48,6 +51,8 @@ export default function filterPokemon(tempFilters, menus, search) {
     switchKey = 'unselected'
   } else if (others.reverse) {
     switchKey = 'reverse'
+  } else if (others.available) {
+    switchKey = 'available'
   }
 
   if (search !== '') {
@@ -68,7 +73,7 @@ export default function filterPokemon(tempFilters, menus, search) {
       formName = formName === 'Normal' ? '' : formName
       const name = formName === '' ? pkmn.name : formName
       const formTypes = form.types || pkmn.types
-
+      total += 1
       switch (switchKey) {
         default:
           if (generations[pkmn.generation]
@@ -84,6 +89,7 @@ export default function filterPokemon(tempFilters, menus, search) {
         case 'all': addPokemon(id, name); break
         case 'selected': if (tempFilters[id].enabled) addPokemon(id, name); break
         case 'unselected': if (!tempFilters[id].enabled) addPokemon(id, name); break
+        case 'available': if (form.available) addPokemon(id, name); break
         case 'search': {
           const meta = [...formTypes, name, formName, pkmn.rarity, pkmn.generation].join(' ').toLowerCase()
           searchTerms.forEach(term => {
@@ -109,5 +115,5 @@ export default function filterPokemon(tempFilters, menus, search) {
       }
     }
   }
-  return { filteredObj, filteredArr }
+  return { filteredObj, filteredArr, count: { total, show } }
 }
