@@ -59,11 +59,11 @@ class Pokemon extends Model {
           ivOr.orWhere(poke => {
             poke.where('pokemon_id', id)
             poke.whereIn('form', finalForm)
-            if (ivs || stats) {
+            if (ivs || stats || pvp) {
               generateSql(poke, filter, false, id, finalForm)
             }
           })
-        } else if (pkmn === 'onlyIvOr' && (ivs || stats)) {
+        } else if (pkmn === 'onlyIvOr' && (ivs || stats || pvp)) {
           ivOr.whereBetween('iv', (ivs ? filter.iv : onlyStandard.iv))
           generateSql(ivOr, filter, false)
         }
@@ -156,7 +156,7 @@ class Pokemon extends Model {
 
   static async getLegacy(args, perms) {
     const ts = Math.floor((new Date()).getTime() / 1000)
-    const results = this.query()
+    const results = await this.query()
       .where('expire_timestamp', '>=', ts)
       .andWhereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])

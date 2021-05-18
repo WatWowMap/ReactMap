@@ -102,11 +102,10 @@ module.exports = function getPokemon(results, args, perms) {
 
   let includeBigKarp = false
   let includeTinyRat = false
-  // let onlyVerifiedTimersSQL = ''
-  // let areaRestrictionsSQL = getAreaRestrictionSql(areaRestrictions)
   const interestedLevelCaps = [40, 50, 51]
   const interestedMegas = [1, 2, 3, 'experimental_stats']
   for (const key of args.filters.onlyLegacyExclude || []) {
+    if (key === 'ivAnd') continue
     const split = key.split('-', 2)
     if (split.length === 2) {
       const pokemonId = parseInt(split[0])
