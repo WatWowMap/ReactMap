@@ -3336,15 +3336,15 @@ express-graphql@^0.12.0:
     http-errors "1.8.0"
     raw-body "^2.4.1"
 
-express-mysql-session@^2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/express-mysql-session/-/express-mysql-session-2.1.5.tgz#0dc88aa8c1f1d4acfb0c0e8d0697bc964979b9c5"
-  integrity sha512-JbZnQfY6ykmvxQbrQe0HVZ6npB5KLmieT8hceHIeCImk/yqTni0dsNxpImB3dTwKaoBu56EK8jJt8+Jdg5E2qA==
+express-mysql-session@^2.1.6:
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/express-mysql-session/-/express-mysql-session-2.1.6.tgz#62a5ce8684937dd692d0bb16d70233ee85832a22"
+  integrity sha512-BrlTmp6YuPBLmOFKtKde4Op5QERo96ux7x6vLa9IDdW6kMqUsQtRiVX3g6zrugUBhRaGdo1bPBAIP8+TzhGlfw==
   dependencies:
     debug "4.3.1"
     express-session "1.17.1"
     mysql "2.18.1"
-    underscore "1.12.0"
+    underscore "1.13.1"
 
 express-session@1.17.1, express-session@^1.17.1:
   version "1.17.1"
@@ -7499,10 +7499,10 @@ undefsafe@^2.0.3:
   dependencies:
     debug "^2.2.0"
 
-underscore@1.12.0:
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.12.0.tgz#4814940551fc80587cef7840d1ebb0f16453be97"
-  integrity sha512-21rQzss/XPMjolTiIezSu3JAjgagXKROtNrYFEOWK109qY1Uv2tVjPTZ1ci2HgvQDA16gHYSthQIJfB+XId/rQ==
+underscore@1.13.1:
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.13.1.tgz#0c1c6bd2df54b6b69f2314066d65b6cde6fcf9d1"
+  integrity sha512-hzSoAVtJF+3ZtiFX0VgfFPHEDRm7Y/QPjGyNo4TVdnDTdft3tr8hEkD25a1jC+TjTuE7tkHGKkhwCgs9dgBB2g==
 
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"
