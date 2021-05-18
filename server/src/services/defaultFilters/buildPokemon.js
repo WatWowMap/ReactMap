@@ -4,6 +4,9 @@ const { PokemonFilter, GenericFilter, Pokemon } = require('../../models/index')
 
 module.exports = async function buildPokemon(perms, type) {
   const pokemon = {}
+  if (type === 'pokemon') {
+    pokemon.ivAnd = new PokemonFilter()
+  }
   const available = await Pokemon.getAvailablePokemon()
   for (const [i, pkmn] of Object.entries(masterfile.pokemon)) {
     for (const j of Object.keys(pkmn.forms)) {

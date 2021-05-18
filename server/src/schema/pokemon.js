@@ -32,7 +32,7 @@ module.exports = new GraphQLObjectType({
     capture_1: { type: GraphQLFloat },
     capture_2: { type: GraphQLFloat },
     capture_3: { type: GraphQLFloat },
-    pvp_rankings_great_league: { type: JSONResolver },
-    pvp_rankings_ultra_league: { type: JSONResolver },
+    great: { type: JSONResolver },
+    ultra: { type: JSONResolver },
   }),
 })

@@ -21,6 +21,7 @@ export default function QueryData({
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
       onlyExcludeList: excludeList,
+      onlyLegacyExclude: [],
     }
     Object.entries(requestedFilters).forEach(topLevelFilter => {
       const [id, specifics] = topLevelFilter
@@ -34,6 +35,8 @@ export default function QueryData({
 
       if (specifics.enabled) {
         trimmed[id] = specifics
+      } else if (category === 'pokemon' && filters.legacy) {
+        trimmed.onlyLegacyExclude.push(id)
       }
     })
     return trimmed

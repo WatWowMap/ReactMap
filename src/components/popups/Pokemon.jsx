@@ -15,8 +15,8 @@ import Utility from '../../services/Utility'
 export default function PokemonPopup({ pokemon, iconUrl }) {
   const {
     pokemon_id,
-    pvp_rankings_great_league,
-    pvp_rankings_ultra_league,
+    great,
+    ultra,
   } = pokemon
 
   const { menus: { pokemon: perms } } = useMasterfile(state => state.ui)
@@ -24,9 +24,6 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
 
   const [expanded, setExpanded] = useState(false)
   const [pvpExpand, setPvpExpand] = useState(false)
-
-  const great = JSON.parse(pvp_rankings_great_league)
-  const ultra = JSON.parse(pvp_rankings_ultra_league)
 
   const getBestOrWorst = (league, best) => {
     let startRank = best ? 4096 : 1
@@ -79,7 +76,7 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         setExpanded={setExpanded}
         pvpExpand={pvpExpand}
         setPvpExpand={setPvpExpand}
-        hasPvp={getBestOrWorst(great) > 5 || getBestOrWorst(ultra) > 5}
+        hasPvp={(great || ultra) && (getBestOrWorst(great) > 5 || getBestOrWorst(ultra) > 5)}
       />
       <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
         {great && <PvpInfo league="great" data={great} />}
@@ -205,7 +202,7 @@ const Stats = ({ pokemon, perms }) => {
       {(perms.iv && iv !== null) && (
         <Grid item>
           <Typography variant="h5" align="center" style={{ color: getColor(iv) }}>
-            {iv}%
+            {iv.toFixed(2)}%
           </Typography>
         </Grid>
       )}

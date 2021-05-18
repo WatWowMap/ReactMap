@@ -40,8 +40,8 @@ const stats = gql`
 
 const pvp = gql`
   fragment Pvp on Pokemon {
-    pvp_rankings_great_league
-    pvp_rankings_ultra_league
+    great
+    ultra
   }
 `
 
