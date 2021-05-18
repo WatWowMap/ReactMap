@@ -78,28 +78,29 @@ class Pokemon extends Model {
       if (pkmn.form === 0) {
         pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
       }
-      const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       if (pvp && (pkmn.pvp_rankings_great_league || pkmn.pvp_rankings_ultra_league)) {
         pkmn.great = JSON.parse(pkmn.pvp_rankings_great_league)
         pkmn.ultra = JSON.parse(pkmn.pvp_rankings_ultra_league)
       }
-      if (!onlyExcludeList.includes(filterId)) {
+      if (!onlyExcludeList.includes(`${pkmn.pokemon_id}-${pkmn.form}`)) {
         finalResults.push(pkmn)
-        listOfIds.push(pkmn.id)
+        if (pvp) {
+          listOfIds.push(pkmn.id)
+        }
       }
     })
 
-    const getMinMax = (filterId, stat) => {
-      const min = args.filters[filterId][stat][0] <= onlyIvOr[stat][0]
-        ? args.filters[filterId][stat][0] : onlyIvOr[stat][0]
-
-      const max = args.filters[filterId][stat][1] >= onlyIvOr[stat][1]
-        ? args.filters[filterId][stat][1] : onlyIvOr[stat][1]
-
-      return [min, max]
-    }
-
     if (pvp) {
+      const getMinMax = (filterId, stat) => {
+        const min = args.filters[filterId][stat][0] <= onlyIvOr[stat][0]
+          ? args.filters[filterId][stat][0] : onlyIvOr[stat][0]
+
+        const max = args.filters[filterId][stat][1] >= onlyIvOr[stat][1]
+          ? args.filters[filterId][stat][1] : onlyIvOr[stat][1]
+
+        return [min, max]
+      }
+
       const pvpQuery = this.query()
         .select(['*', raw(true).as('pvp')])
         .where('expire_timestamp', '>=', ts)
@@ -123,7 +124,8 @@ class Pokemon extends Model {
             }
           }
         })
-      const pvpResults = await pvpQuery.debug()
+      const pvpResults = await pvpQuery
+
       pvpResults.forEach(pkmn => {
         if (pkmn.form === 0) {
           pkmn.form = masterfile[pkmn.pokemon_id].default_form_id

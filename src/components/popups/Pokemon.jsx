@@ -193,7 +193,7 @@ const Stats = ({ pokemon, perms }) => {
   return (
     <Grid
       item
-      xs={9}
+      xs={(perms.iv || perms.stats) ? 9 : 1}
       container
       direction="column"
       justify="space-around"
@@ -230,9 +230,9 @@ const Info = ({ pokemon, metaData, perms }) => {
   return (
     <Grid
       item
-      xs={2}
+      xs={(perms.iv || perms.stats) ? 2 : 11}
       container
-      direction="column"
+      direction={(perms.iv || perms.stats) ? 'column' : 'row'}
       justify="space-around"
       alignItems="center"
     >
