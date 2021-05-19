@@ -32,13 +32,19 @@ class Pokemon extends Model {
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (queryBase, filter, notGlobal) => {
-      const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv']
+      const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', 'gl', 'ul']
       keys.forEach(key => {
         switch (key) {
           default:
             if (!arrayCheck(filter[key], key) && stats) queryBase.andWhereBetween(key, filter[key]); break
           case 'iv':
             if (!arrayCheck(filter[key], key) && ivs && notGlobal) queryBase.andWhereBetween(key, filter[key]); break
+          case 'gl':
+          case 'ul':
+            if (!arrayCheck(filter[key], key)) {
+              // makes sure the base query doesn't return everything if only GL and UL stats are selected for the Pokemon
+              queryBase.whereNull('pokemon_id')
+            } break
         }
       })
     }
