@@ -1,6 +1,8 @@
 const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const cors = require('cors')
+const { NoSchemaIntrospectionCustomRule } = require('graphql')
+
 const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
 const schema = require('../schema/schema')
@@ -72,6 +74,7 @@ rootRouter.get('/settings', async (req, res) => {
 rootRouter.use('/graphql', cors(), graphqlHTTP({
   schema,
   graphiql: config.devOptions.graphiql,
+  validationRules: config.devOptions.graphiql ? undefined : [NoSchemaIntrospectionCustomRule],
 }))
 
 module.exports = rootRouter
