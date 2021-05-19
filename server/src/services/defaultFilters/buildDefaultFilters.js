@@ -45,8 +45,7 @@ module.exports = async function buildDefault(perms) {
       pvp: perms.pvp ? true : undefined,
       standard: new PokemonFilter(),
       ivOr: new PokemonFilter(...Object.values(defaultFilters.pokemon.globalValues)),
-      ivAnd: new PokemonFilter(...Object.values(defaultFilters.pokemon.globalValues)),
-      filter: buildPokemon(perms.pokemon, 'pokemon'),
+      filter: await buildPokemon(perms.pokemon, 'pokemon'),
     } : undefined,
     portals: perms.portals ? {
       enabled: defaultFilters.portals.enabled,

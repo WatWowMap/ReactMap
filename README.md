@@ -4,9 +4,9 @@
  Pokemon GO Map frontend built with React. Work in progress. 
 
 ## Features 
-- View and Filter Pokemon 
-- Gyms & Raids (Filtering coming soon!)
-- Pokestops, Quests, & Invasions (Filtering coming soon!)
+- Pokemon IVs, PVP Stats, Moves, Levels, CP and more
+- Gym & Raid Filtering
+- Pokestops, Quests, Lures, & Invasions
 - Devices 
 - Weather 
 - Portals
@@ -17,7 +17,7 @@
 
 ## PreReqs
 - NodeJS (Recommend using V12.*)
-- MySQL (Recommend using 8.0+)
+- MySQL (Must use 8.0+)
 - Yarn (npm install -g yarn)
 
 ## Installation Instructions
@@ -38,6 +38,31 @@
 4. `yarn watch` in the other, this automatically re-compiles your bundle for faster development.
 
 ## Coming Soon
-- Searching
-- User Profile/Control Panel
-- Expanded filtering menus
+- Scan Areas
+- Nests
+- Translatable Text
+- More precise quest popups
+- Other various popups
+- Device paths/polygons
+- AR Quest Eligibility
+- Move gym slots into advanced gym menu for each team
+- Stardust and other item support
+- Filter all Quests/Raids/Invasions instead of only available
+- Fix stretched markers
+- Iconhtml to reduce double markers
+- Built in event viewer
+- Expand the help modals
+- Import/Export buttons
+- Custom Favicon Support
+- Adjustable icon sizes
+- Persist some menu selections
+- Category headers in filter menus
+- Add tutorial Popups
+- Glowing Pokemon
+
+## Credits
+- [MapJS](https://github.com/WatWowMap/MapJS)
+- [PMSF](https://github.com/pmsf/pmsf)
+- Especially [@Versx](https://github.com/versx)
+
+_This repository is purely for educational purposes._

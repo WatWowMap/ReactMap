@@ -9,6 +9,7 @@ import {
   Paper,
   InputBase,
   IconButton,
+  Typography,
 } from '@material-ui/core'
 import { HighlightOff } from '@material-ui/icons'
 import { FixedSizeGrid } from 'react-window'
@@ -44,7 +45,7 @@ export default function Menu({ filters, toggleDialog, type }) {
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState(false)
 
-  const { filteredObj, filteredArr } = Utility[type](tempFilters, menus[type], search)
+  const { filteredObj, filteredArr, count } = Utility[type](tempFilters, menus[type], search)
 
   const handleAccordion = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
@@ -137,6 +138,10 @@ export default function Menu({ filters, toggleDialog, type }) {
       <Button onClick={handleReset} color="primary">
         {text.resetFilters}
       </Button>
+    </Grid>,
+    <Grid item key="count" style={{ textAlign: 'center' }}>
+      <Typography variant="h6" align="center">Showing:</Typography>
+      <Typography variant="subtitle2" align="center">{count.show}/{count.total}</Typography>
     </Grid>,
   )
 

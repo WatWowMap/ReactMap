@@ -17,6 +17,8 @@ export default function filterGyms(tempFilters, menus, search) {
   const tempAdvFilter = {}
   const searchTerms = []
   let switchKey
+  let total = 0
+  let show = 0
 
   Object.keys(menus).forEach(category => {
     tempAdvFilter[category] = Object.values(menus[category]).every(val => val === false)
@@ -24,6 +26,7 @@ export default function filterGyms(tempFilters, menus, search) {
   tempAdvFilter.all = Object.values(tempAdvFilter).every(val => val === true)
 
   const addGym = (id, name) => {
+    show += 1
     const raidCheck = (id.startsWith('p') && gyms.raids) || (id.startsWith('e') && gyms.raids)
     const gymCheck = (id.startsWith('g') && gyms.gyms) || (id.startsWith('t') && gyms.gyms)
     if (raidCheck || gymCheck) {
@@ -61,6 +64,7 @@ export default function filterGyms(tempFilters, menus, search) {
   }
 
   Object.keys(tempFilters).forEach(id => {
+    total += 1
     const gym = id.startsWith('p') ? masterfile.pokemon[id.slice(1).split('-')[0]] : masterfile.gyms[id]
     if (id.startsWith('p')) {
       gym.category = 'bosses'
@@ -103,5 +107,5 @@ export default function filterGyms(tempFilters, menus, search) {
       }
     }
   })
-  return { filteredObj, filteredArr }
+  return { filteredObj, filteredArr, count: { total, show } }
 }

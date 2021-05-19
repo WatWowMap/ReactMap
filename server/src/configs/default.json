@@ -15,8 +15,8 @@
     },
     "maxSearchResults": 20,
     "pvpMinCp": {
-      "great": 1400,
-      "ultra": 2400
+      "gl": 1400,
+      "ul": 2400
     }
   },
   "map": {
@@ -217,7 +217,7 @@
     "botToken": "",
     "clientId": "",
     "clientSecret": "",
-    "redirectUri": "http://localhost:8080/api/discord/callback",
+    "redirectUri": "http://localhost:8080/auth/discord/callback",
     "allowedGuilds": [],
     "blockedGuilds": [],
     "allowedUsers": [],
