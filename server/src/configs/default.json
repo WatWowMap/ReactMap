@@ -15,8 +15,8 @@
     },
     "maxSearchResults": 20,
     "pvpMinCp": {
-      "great": 1400,
-      "ultra": 2400
+      "gl": 1400,
+      "ul": 2400
     }
   },
   "map": {

@@ -5,6 +5,7 @@
 /* eslint-disable default-case */
 const requireFromString = require('require-from-string')
 const masterfile = require('../data/masterfile.json')
+const { api: { pvpMinCp } } = require('./config')
 
 const jsifyIvFilter = (filter) => {
   const input = filter.toUpperCase()
@@ -199,8 +200,7 @@ module.exports = function getPokemon(results, args, perms) {
         filtered.level = result.level
       }
       if (perms.pvp && interestedLevelCaps.length > 0) {
-        const minCpGreat = 1400
-        const minCpUltra = 2400
+        const { gl, ul } = pvpMinCp
         const filterLeagueStats = (pvpResult, target, minCp) => {
           let last
           for (const entry of JSON.parse(pvpResult)) {
@@ -230,10 +230,10 @@ module.exports = function getPokemon(results, args, perms) {
           }
         }
         if (result.pvp_rankings_great_league) {
-          filterLeagueStats(result.pvp_rankings_great_league, filtered.great = [], minCpGreat)
+          filterLeagueStats(result.pvp_rankings_great_league, filtered.great = [], gl)
         }
         if (result.pvp_rankings_ultra_league) {
-          filterLeagueStats(result.pvp_rankings_ultra_league, filtered.ultra = [], minCpUltra)
+          filterLeagueStats(result.pvp_rankings_ultra_league, filtered.ultra = [], ul)
         }
       }
       let pokemonFilter = result.form === 0 ? pokemonLookup[result.pokemon_id] : formLookup[result.form]
