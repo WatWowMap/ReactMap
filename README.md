@@ -61,8 +61,8 @@
 - Glowing Pokemon
 
 ## Credits
-[MapJS](https://github.com/WatWowMap/MapJS)
-[PMSF](https://github.com/pmsf/pmsf)
-Especially [@Versx](https://github.com/versx)
+- [MapJS](https://github.com/WatWowMap/MapJS)
+- [PMSF](https://github.com/pmsf/pmsf)
+- Especially [@Versx](https://github.com/versx)
 
 _This repository is purely for educational purposes._
