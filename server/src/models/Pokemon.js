@@ -14,12 +14,19 @@ class Pokemon extends Model {
     const {
       onlyStandard, onlyExcludeList, onlyIvOr,
     } = args.filters
+
+    // small protection to make sure no pokemon enabled actually returns all when a user only has Pokemon perms
+    if (!ivs && !stats && !pvp) {
+      const noPokemonSelect = Object.keys(args.filters).find(x => x.charAt(0) !== 'o')
+      if (!noPokemonSelect) return []
+    }
+
     const query = this.query()
       .where('expire_timestamp', '>=', ts)
       .andWhereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
 
-    // checks if IVs/Stats are s  et to default and skips them if so
+    // checks if IVs/Stats are set to default and skips them if so
     const arrayCheck = (filter, key) => filter.every((v, i) => v === onlyStandard[key][i])
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
