@@ -12,16 +12,36 @@ const PokemonTile = ({ item, showTimer }) => {
   const availableForms = useMasterfile(useCallback(state => state.availableForms))
   const iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, item.pokemon_id, item.form, 0, 0, item.costume)}.png`
 
+  const getBestWorst = (league) => {
+    let best = 4096
+    let worst = 1
+    if (league !== null) {
+      league.forEach(pkmn => {
+        best = pkmn.rank < best ? pkmn.rank : best
+        worst = pkmn.rank > worst ? pkmn.rank : worst
+      })
+    } else {
+      best = undefined
+      worst = undefined
+    }
+    return { best, worst }
+  }
+
+  const pvpRankInfo = {
+    great: getBestWorst(item.great),
+    ultra: getBestWorst(item.ultra),
+  }
+
   return (
     <Marker
       position={[item.lat, item.lon]}
-      icon={marker(iconUrl)}
+      icon={marker(iconUrl, item, pvpRankInfo)}
     >
       <Popup
         position={[item.lat, item.lon]}
         style={{ backgroundColor: 'rgb(33, 37, 31)' }}
       >
-        <PopupContent pokemon={item} iconUrl={iconUrl} />
+        <PopupContent pokemon={item} iconUrl={iconUrl} pvpRankInfo={pvpRankInfo} />
       </Popup>
       {showTimer && <Timer timestamp={item.expire_timestamp} />}
     </Marker>

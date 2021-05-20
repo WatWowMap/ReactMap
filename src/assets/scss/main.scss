@@ -127,7 +127,17 @@ body {
   padding-left: 7px;
 }
 
-.invasion-reward > img {
+.marker-image-holder {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.pokemon-popup-image-holder > img,
+.filter-image-holder > img,
+.marker-image-holder > img,
+.invasion-reward > img 
+.leaflet-marker-pane .marker-image-holder > img {
   position: absolute;
   max-width: 100% !important;
   max-height: 100% !important;
@@ -137,6 +147,11 @@ body {
   left: 0;
   right: 0;
   object-fit: contain;
+}
+
+.marker-image-holder.top-overlay > img,
+.leaflet-container .leaflet-marker-pane .marker-image-holder.top-overlay > img {
+    top: auto;
 }
 
 .invasion-reward {
@@ -157,4 +172,10 @@ img {
   right: auto;
   top: auto;
   filter: drop-shadow(0 0 2px #000);
+}
+
+.marker-image-holder {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }

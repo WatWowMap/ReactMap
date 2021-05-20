@@ -123,37 +123,37 @@
       }
     },
     "iconSizes": {
-      "gym": {
+      "gyms": {
         "sm": 20,
         "md": 40,
         "lg": 60,
         "xl": 80
       },
-      "raid": {
+      "raids": {
         "sm": 15,
         "md": 30,
         "lg": 50,
         "xl": 70
       },
-      "pokestop": {
+      "pokestops": {
         "sm": 15,
         "md": 30,
         "lg": 50,
         "xl": 70
       },
-      "quest": {
+      "quests": {
         "sm": 15,
         "md": 30,
         "lg": 50,
         "xl": 70
       },
-      "invasion": {
+      "invasions": {
         "sm": 15,
         "md": 30,
         "lg": 50,
         "xl": 70
       },
-      "spawnpoint": {
+      "spawnpoints": {
         "sm": 0.5,
         "md": 1,
         "lg": 2,
@@ -165,13 +165,13 @@
         "lg": 60,
         "xl": 80
       },
-      "nest": {
+      "nests": {
         "sm": 20,
         "md": 40,
         "lg": 60,
         "xl": 80
       },
-      "device": {
+      "devices": {
         "sm": 15,
         "md": 30,
         "lg": 50,

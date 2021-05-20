@@ -12,7 +12,7 @@ import { useStore, useMasterfile } from '../../hooks/useStore'
 import useStyles from '../../hooks/useStyles'
 import Utility from '../../services/Utility'
 
-export default function PokemonPopup({ pokemon, iconUrl }) {
+export default function PokemonPopup({ pokemon, iconUrl, pvpRankInfo }) {
   const {
     pokemon_id,
     great,
@@ -24,20 +24,6 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
 
   const [expanded, setExpanded] = useState(false)
   const [pvpExpand, setPvpExpand] = useState(false)
-
-  const getBestOrWorst = (league, best) => {
-    let startRank = best ? 4096 : 1
-    if (league !== null && best) {
-      league.forEach(pkmn => {
-        startRank = pkmn.rank < startRank ? pkmn.rank : startRank
-      })
-    } else if (league !== null) {
-      league.forEach(pkmn => {
-        startRank = pkmn.rank > startRank ? pkmn.rank : startRank
-      })
-    }
-    return startRank
-  }
 
   return (
     <Grid
@@ -67,8 +53,8 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         pokemon={pokemon}
       />
       <Collapse in={!pvpExpand} timeout="auto" unmountOnExit>
-        {great && (getBestOrWorst(great, true) < 6) && <PvpInfo league="great" data={great} onlyTop5 />}
-        {ultra && (getBestOrWorst(ultra, true) < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 />}
+        {great && (pvpRankInfo.great.best < 6) && <PvpInfo league="great" data={great} onlyTop5 />}
+        {ultra && (pvpRankInfo.ultra.best < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 />}
       </Collapse>
       <Footer
         pokemon={pokemon}
@@ -76,7 +62,7 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         setExpanded={setExpanded}
         pvpExpand={pvpExpand}
         setPvpExpand={setPvpExpand}
-        hasPvp={(great || ultra) && (getBestOrWorst(great) > 5 || getBestOrWorst(ultra) > 5)}
+        hasPvp={(great || ultra) && (pvpRankInfo.great.worst > 5 || pvpRankInfo.ultra.worst > 5)}
       />
       <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
         {great && <PvpInfo league="great" data={great} />}
