@@ -168,7 +168,7 @@ const RootQuery = new GraphQLObjectType({
             .select(['*', ref('id')
               .castTo('CHAR')
               .as('id')])
-          results.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, 'polygon'))
+          results.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, true))
           return results
         }
       },

@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react'
 import { Grid, IconButton, Typography } from '@material-ui/core'
-import { Check, Clear, Menu } from '@material-ui/icons'
+import { Check, Clear, Tune } from '@material-ui/icons'
 
 export default function MenuTile({
   data, rowIndex, columnIndex, style,
@@ -53,7 +53,7 @@ export default function MenuTile({
     <IconButton
       onClick={toggleAdvMenu(true, item.id)}
     >
-      <Menu style={{ color: 'white' }} />
+      <Tune style={{ color: 'white' }} />
     </IconButton>
   ) : ''
 

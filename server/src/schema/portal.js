@@ -12,6 +12,6 @@ module.exports = new GraphQLObjectType({
     name: { type: GraphQLString },
     url: { type: GraphQLString },
     imported: { type: GraphQLInt },
-    checked: { type: GraphQLInt },
+    updated: { type: GraphQLInt },
   }),
 })

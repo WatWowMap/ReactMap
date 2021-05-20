@@ -208,22 +208,15 @@ const PoiImage = ({ gym }) => {
       item
       xs={6}
     >
-      <a
-        href={url}
+      <img
+        src={src}
         alt={name || teamName}
-        target="_blank"
-        rel="noreferrer"
-      >
-        <img
-          src={src}
-          alt={name || teamName}
-          className={`circle-image ${teamName}`}
-          style={{
-            maxHeight: 75,
-            maxWidth: 75,
-          }}
-        />
-      </a>
+        className={`circle-image ${teamName}`}
+        style={{
+          maxHeight: 75,
+          maxWidth: 75,
+        }}
+      />
     </Grid>
 
   )

@@ -64,7 +64,7 @@ export default function Footer({
         </Typography>
       </Button>
     ),
-  } : ''
+  } : { key: 'advMenu' }
 
   const disableAll = {
     key: 'disableAll',

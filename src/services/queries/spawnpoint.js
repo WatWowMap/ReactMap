@@ -7,6 +7,7 @@ query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!) {
     lat
     lon
     despawn_sec
+    updated
   }
 }
 `

@@ -2,22 +2,32 @@ import { Typography } from '@material-ui/core'
 import React from 'react'
 
 export default function SubmissionCellPopup({ cell }) {
+  const gymThreshold = [2, 6, 20]
+  let untilNextGym = 'Never'
+  if (cell.count_gyms < 3) {
+    untilNextGym = `${gymThreshold[cell.count_gyms] - cell.count} Submissions`
+  }
+  if ((cell.count === 1 && cell.count_gyms < 1)
+    || (cell.count === 5 && cell.count_gyms < 2)
+    || (cell.count === 19 && cell.count_gyms < 3)) {
+    untilNextGym = 'Next Submission!'
+  }
   return (
     <>
-      <Typography>
-        Level {cell.level}
+      <Typography variant="h6" align="center">
+        Level {cell.level} S2 Cell
       </Typography>
-      <Typography>
-        ID {cell.id}
+      <Typography variant="subtitle2" align="center">
+        Total Count: {cell.count}
       </Typography>
-      <Typography>
-        Total {cell.count}
+      <Typography variant="subtitle2" align="center">
+        Pokestops: {cell.count_pokestops}
       </Typography>
-      <Typography>
-        Stops {cell.count_pokestops}
+      <Typography variant="subtitle2" align="center">
+        Gyms: {cell.count_gyms}
       </Typography>
-      <Typography>
-        Gyms {cell.count_gyms}
+      <Typography variant="subtitle2" align="center">
+        Next Gym: {untilNextGym}
       </Typography>
     </>
   )
