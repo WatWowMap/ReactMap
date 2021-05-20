@@ -5,7 +5,6 @@ import { Map } from '@material-ui/icons'
 import { useStore } from '../../hooks/useStore'
 
 export default function PortalPopup({ portal }) {
-  console.log(portal)
   const { navigation: { url } } = useStore(state => state.settings)
   const [portalName, setPortalName] = useState(true)
   const {
