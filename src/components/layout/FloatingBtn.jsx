@@ -1,21 +1,20 @@
 import React from 'react'
 import {
-  Grid, Fab, Dialog, Button, Typography, Divider,
+  Grid, Fab, Dialog, Button, Typography, Divider, DialogActions, DialogContent, DialogTitle,
 } from '@material-ui/core'
 import {
   Menu, LocationOn, ZoomIn, ZoomOut, Forum, Create,
 } from '@material-ui/icons'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
-
 import { useMap } from 'react-leaflet'
+import Locate from 'leaflet.locatecontrol'
+
 import { useMasterfile } from '../../hooks/useStore'
 import useStyles from '../../hooks/useStyles'
 
 export default function FloatingButtons({ toggleDrawer }) {
   const classes = useStyles()
   const { map: { feedbackLink, enableFeedback } } = useMasterfile(state => state.config)
+  const breakpoint = useMasterfile(state => state.breakpoint)
   const [open, setOpen] = React.useState(false)
 
   const handleClickOpen = () => {
@@ -28,35 +27,49 @@ export default function FloatingButtons({ toggleDrawer }) {
 
   const map = useMap()
 
+  const locateOptions = {
+    maxZoom: 19,
+    strings: {
+      title: 'Use My Location',
+    },
+    onActivate: () => { },
+  }
+  const lc = new Locate(locateOptions)
+  lc.addTo(map)
+
+  const fabSize = breakpoint === 'xs' ? 'small' : 'large'
+  const iconSize = breakpoint === 'xs' ? 'small' : 'default'
+
   return (
-    <Grid container direction="column" spacing={1} className={classes.floatingBtn}>
+    <Grid container direction="column" className={classes.floatingBtn}>
       <Grid item>
-        <Fab color="primary" onClick={toggleDrawer(true)}>
-          <Menu />
+        <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)}>
+          <Menu fontSize={iconSize} />
         </Fab>
       </Grid>
       <Grid item>
-        <Fab color="secondary" onClick={() => map.locate({ watch: true, setView: true, enableHighAccuracy: true })}>
-          <LocationOn />
+        <Fab color="secondary" size={fabSize} onClick={() => lc.start()}>
+          <LocationOn fontSize={iconSize} />
         </Fab>
       </Grid>
       <Grid item>
-        <Fab color="secondary" onClick={() => map.zoomIn()}>
-          <ZoomIn />
+        <Fab color="secondary" size={fabSize} onClick={() => map.zoomIn()}>
+          <ZoomIn fontSize={iconSize} />
         </Fab>
       </Grid>
       <Grid item>
-        <Fab color="secondary" onClick={() => map.zoomOut()}>
-          <ZoomOut />
+        <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()}>
+          <ZoomOut fontSize={iconSize} />
         </Fab>
       </Grid>
       {enableFeedback && (
         <Grid item>
-          <Fab onClick={handleClickOpen}>
-            <Forum />
+          <Fab size={fabSize} onClick={handleClickOpen}>
+            <Forum fontSize={iconSize} />
           </Fab>
         </Grid>
       )}
+      {/* <LocateControl activate={activate} /> */}
       <Dialog
         open={open}
         onClose={handleClose}

@@ -4768,6 +4768,11 @@ latest-version@^5.0.0:
   dependencies:
     package-json "^6.3.0"
 
+leaflet.locatecontrol@^0.73.0:
+  version "0.73.0"
+  resolved "https://registry.yarnpkg.com/leaflet.locatecontrol/-/leaflet.locatecontrol-0.73.0.tgz#768d9edb0470f86c913ea6c2a70ec62380fd45c5"
+  integrity sha512-e6v6SyDU2nzG5AiH80eH7qhXw5J+EfgmEFHkuzTRC9jqCSbfAm/3HlZDuoa9WYsaZbn5ovvqNeaLW/JSMsgg5g==
+
 leaflet.markercluster@^1.4.1:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/leaflet.markercluster/-/leaflet.markercluster-1.5.0.tgz#54db42485da32fc3d92c7ae22d0d7982879e0b67"

@@ -91,7 +91,7 @@ export default function filterPokemon(tempFilters, menus, search) {
         case 'unselected': if (!tempFilters[id].enabled) addPokemon(id, name); break
         case 'available': if (form.available) addPokemon(id, name); break
         case 'search': {
-          const meta = [...formTypes, name, formName, pkmn.rarity, pkmn.generation].join(' ').toLowerCase()
+          const meta = [...formTypes, pkmn.name, formName, pkmn.rarity, pkmn.generation].join(' ').toLowerCase()
           searchTerms.forEach(term => {
             if (typeof term === 'string') {
               if ((meta.includes(term))
