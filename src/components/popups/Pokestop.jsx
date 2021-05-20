@@ -232,22 +232,15 @@ const PoiImage = ({
       alignItems="center"
     >
       <Grid item xs={12} style={{ textAlign: 'center' }}>
-        <a
-          href={url}
+        <img
+          src={src}
           alt={name || 'unknown'}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <img
-            src={src}
-            alt={name || 'unknown'}
-            className={`circle-image ${lureName}`}
-            style={{
-              maxHeight: 60,
-              maxWidth: 60,
-            }}
-          />
-        </a>
+          className={`circle-image ${lureName}`}
+          style={{
+            maxHeight: 60,
+            maxWidth: 60,
+          }}
+        />
       </Grid>
       {(hasLure >= ts && hasQuest)
         && (

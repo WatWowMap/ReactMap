@@ -70,7 +70,8 @@ export default function filterPokestops(tempFilters, menus, search) {
     }
   }
 
-  Object.keys(tempFilters).forEach(id => {
+  const sorted = Object.keys(tempFilters).sort()
+  sorted.forEach(id => {
     total += 1
     let pokestop = {}
     switch (id.charAt(0)) {

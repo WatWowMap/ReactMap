@@ -6,6 +6,9 @@ const getAllPortals = gql`
       id
       lat
       lon
+      name
+      url
+      updated
       imported
     }
   }

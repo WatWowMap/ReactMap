@@ -72,7 +72,7 @@ class Pokemon extends Model {
       }
     })
 
-    const results = await query.debug()
+    const results = await query
     const finalResults = []
     const listOfIds = []
 
