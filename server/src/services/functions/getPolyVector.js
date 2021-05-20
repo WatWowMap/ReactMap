@@ -3,7 +3,7 @@ const {
   S2LatLng, S2Cell, S2CellId, S2Point,
 } = require('nodes2ts')
 
-module.exports = function getPolyVector(s2cellId, fullPolygon) {
+module.exports = function getPolyVector(s2cellId, polyline) {
   const s2cell = new S2Cell(new S2CellId(BigInt(s2cellId).toString()))
   const polygon = []
   for (let i = 0; i <= 3; i += 1) {
@@ -15,7 +15,7 @@ module.exports = function getPolyVector(s2cellId, fullPolygon) {
       latLng.lngDegrees,
     ])
   }
-  if (fullPolygon) {
+  if (polyline) {
     polygon.push(polygon[0])
   }
 

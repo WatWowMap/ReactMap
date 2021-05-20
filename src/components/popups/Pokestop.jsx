@@ -242,14 +242,14 @@ const PoiImage = ({
           }}
         />
       </Grid>
-      {(hasLure >= ts && hasQuest)
+      {(hasLure && hasQuest)
         && (
           <Timer
             lureName={lureName}
             expireTime={lure_expire_timestamp}
           />
         )}
-      {(hasInvasion >= ts && hasQuest)
+      {(hasInvasion && hasQuest)
         && (
           <Timer expireTime={incident_expire_timestamp} />
         )}

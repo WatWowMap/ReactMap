@@ -53,22 +53,24 @@ export default function QueryData({
   const refetchData = () => {
     onMove()
     const mapBounds = map.getBounds()
-    refetch({
-      minLat: mapBounds._southWest.lat,
-      maxLat: mapBounds._northEast.lat,
-      minLon: mapBounds._southWest.lng,
-      maxLon: mapBounds._northEast.lng,
-      filters: trimFilters(filters),
-    })
+    if (category !== 'weather' && category !== 'device') {
+      refetch({
+        minLat: mapBounds._southWest.lat,
+        maxLat: mapBounds._northEast.lat,
+        minLon: mapBounds._southWest.lng,
+        maxLon: mapBounds._northEast.lng,
+        filters: trimFilters(filters),
+      })
+    }
   }
 
   const getPolling = useCallback(cat => {
     switch (cat) {
       default: return 0
-      case 'device': return 5000
+      case 'device': return 10000
       case 'gyms': return 10000
       case 'pokestops': return 300000
-      case 'weather': return 900000
+      case 'weather': return 30000
     }
   }, [])
 

@@ -8,7 +8,7 @@ export default function WeatherTile({ item }) {
     <Polyline
       key={item.id}
       positions={item.polygon}
-      pathOptions={{ color: 'green', opacity: 0.5 }}
+      pathOptions={{ color: '#246377', opacity: 0.25 }}
     >
       <Marker icon={weatherMarker(item)} position={[item.latitude, item.longitude]}>
         <Popup position={[item.latitude, item.longitude]}>

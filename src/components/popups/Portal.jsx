@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, { Fragment, useState } from 'react'
 import { Grid, Typography, IconButton } from '@material-ui/core'
 import { Map } from '@material-ui/icons'
@@ -10,11 +9,6 @@ export default function PortalPopup({ portal }) {
   const {
     url: imageUrl, name, lat, lon, updated, imported,
   } = portal
-
-  // let maxPortalName = name.substring(0, Math.min(name.length, 30))
-  // if (maxPortalName !== name) {
-  //   maxPortalName = `${maxPortalName.trim()}...`
-  // }
 
   const src = imageUrl
     ? imageUrl.replace('http://', 'https://')
