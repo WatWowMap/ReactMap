@@ -48,7 +48,7 @@ export default function Footer({
     ),
   }
 
-  const advMenu = {
+  const advMenu = type === 'pokemon' ? {
     key: 'advMenu',
     icon: (
       <IconButton
@@ -64,7 +64,7 @@ export default function Footer({
         </Typography>
       </Button>
     ),
-  }
+  } : ''
 
   const disableAll = {
     key: 'disableAll',

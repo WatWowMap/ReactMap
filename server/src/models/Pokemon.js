@@ -15,7 +15,7 @@ class Pokemon extends Model {
     const {
       onlyStandard, onlyExcludeList, onlyIvOr,
     } = args.filters
-
+    let queryPvp = false
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !stats && !pvp) {
       const noPokemonSelect = Object.keys(args.filters).find(x => x.charAt(0) !== 'o')
@@ -28,7 +28,7 @@ class Pokemon extends Model {
       .andWhereBetween('lon', [args.minLon, args.maxLon])
 
     // checks if IVs/Stats are set to default and skips them if so
-    const arrayCheck = (filter, key) => filter.every((v, i) => v === onlyStandard[key][i])
+    const arrayCheck = (filter, key) => filter[key].every((v, i) => v === onlyStandard[key][i])
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (queryBase, filter, notGlobal) => {
@@ -36,14 +36,17 @@ class Pokemon extends Model {
       keys.forEach(key => {
         switch (key) {
           default:
-            if (!arrayCheck(filter[key], key) && stats) queryBase.andWhereBetween(key, filter[key]); break
+            if (!arrayCheck(filter, key) && stats) queryBase.andWhereBetween(key, filter[key]); break
           case 'iv':
-            if (!arrayCheck(filter[key], key) && ivs && notGlobal) queryBase.andWhereBetween(key, filter[key]); break
+            if (!arrayCheck(filter, key) && ivs && notGlobal) queryBase.andWhereBetween(key, filter[key]); break
           case 'gl':
           case 'ul':
-            if (!arrayCheck(filter[key], key)) {
+            if (!arrayCheck(filter, key)) {
+              queryPvp = true
               // makes sure the base query doesn't return everything if only GL and UL stats are selected for the Pokemon
-              queryBase.whereNull('pokemon_id')
+              if (notGlobal) {
+                queryBase.whereNull('pokemon_id')
+              }
             } break
         }
       })
@@ -69,7 +72,7 @@ class Pokemon extends Model {
       }
     })
 
-    const results = await query
+    const results = await query.debug()
     const finalResults = []
     const listOfIds = []
 
@@ -91,14 +94,26 @@ class Pokemon extends Model {
     })
 
     // second query for pvp
-    if (pvp) {
-      const getMinMax = (filterId, stat) => {
-        const min = args.filters[filterId][stat][0] <= onlyIvOr[stat][0]
-          ? args.filters[filterId][stat][0] : onlyIvOr[stat][0]
-
-        const max = args.filters[filterId][stat][1] >= onlyIvOr[stat][1]
-          ? args.filters[filterId][stat][1] : onlyIvOr[stat][1]
-
+    if (pvp && queryPvp) {
+      const getMinMax = (filterId, league) => {
+        const globalOn = !arrayCheck(onlyIvOr, league)
+        const specificFilter = args.filters[filterId]
+        const [globalMin, globalMax] = onlyIvOr[league]
+        let min = 0
+        let max = 0
+        if (specificFilter) {
+          const [pkmnMin, pkmnMax] = specificFilter[league]
+          if (specificFilter && !globalOn) {
+            min = pkmnMin
+            max = pkmnMax
+          } else if (specificFilter && globalOn) {
+            min = pkmnMin <= globalMin ? pkmnMin : globalMin
+            max = pkmnMax >= globalMax ? pkmnMax : globalMax
+          }
+        } else if (globalOn) {
+          min = globalMin
+          max = globalMax
+        }
         return [min, max]
       }
 
@@ -109,7 +124,7 @@ class Pokemon extends Model {
 
       const getRanks = (league, data, filterId) => {
         const parsed = JSON.parse(data)
-        const [min, max] = args.filters[filterId] ? getMinMax(filterId, league) : onlyIvOr[league]
+        const [min, max] = getMinMax(filterId, league)
         return parsed.filter(pkmn => check(pkmn, league, min, max))
       }
 

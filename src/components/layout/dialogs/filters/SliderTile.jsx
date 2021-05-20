@@ -8,7 +8,7 @@ import { useMasterfile } from '../../../../hooks/useStore'
 
 export default function SliderTile({
   filterSlide: {
-    name, shortName, min, max, color, disabled,
+    name, shortName, min, max, color, disabled, label,
   }, handleChange, filterValues,
 }) {
   const [tempValues, setTempValues] = useState(filterValues[shortName])
@@ -55,7 +55,7 @@ export default function SliderTile({
             style={{ width: 75 }}
             color="primary"
             id={`${shortName}-${each}`}
-            label={Utility.getProperName(each)}
+            label={`${Utility.getProperName(each)} ${label}`}
             name={shortName}
             value={tempValues[index]}
             onChange={handleTempChange}
