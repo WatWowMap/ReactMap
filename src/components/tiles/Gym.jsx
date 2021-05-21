@@ -2,11 +2,12 @@
 import React, { memo } from 'react'
 import { Marker, Popup } from 'react-leaflet'
 import gymMarker from '../markers/gym'
-import raidMarker from '../markers/raid'
 import PopupContent from '../popups/Gym'
 import Timer from './Timer'
 
-const GymTile = ({ item, ts, showTimer }) => {
+const GymTile = ({
+  item, ts, showTimer, iconSizes, filters, path, availableForms,
+}) => {
   const { raid_battle_timestamp, raid_end_timestamp, raid_level } = item
   const hasRaid = (raid_end_timestamp >= ts && raid_level > 0)
   const timerToDisplay = raid_battle_timestamp >= ts
@@ -15,25 +16,12 @@ const GymTile = ({ item, ts, showTimer }) => {
   return (
     <Marker
       position={[item.lat, item.lon]}
-      icon={gymMarker(item, ts)}
+      icon={gymMarker(item, ts, hasRaid, iconSizes, filters, path, availableForms)}
     >
-      {hasRaid && (
-        <>
-          <Marker
-            position={[item.lat, item.lon]}
-            icon={raidMarker(item, ts)}
-            className="marker"
-          >
-            <Popup position={[item.lat, item.lon]}>
-              <PopupContent gym={item} hasRaid={hasRaid} ts={ts} />
-            </Popup>
-          </Marker>
-          {showTimer && <Timer timestamp={timerToDisplay} />}
-        </>
-      )}
       <Popup position={[item.lat, item.lon]}>
         <PopupContent gym={item} hasRaid={hasRaid} ts={ts} />
       </Popup>
+      {showTimer && <Timer timestamp={timerToDisplay} />}
     </Marker>
   )
 }

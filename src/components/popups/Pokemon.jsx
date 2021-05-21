@@ -17,6 +17,7 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
     pokemon_id,
     great,
     ultra,
+    rankSum,
   } = pokemon
 
   const { menus: { pokemon: perms } } = useMasterfile(state => state.ui)
@@ -25,27 +26,13 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
   const [expanded, setExpanded] = useState(false)
   const [pvpExpand, setPvpExpand] = useState(false)
 
-  const getBestOrWorst = (league, best) => {
-    let startRank = best ? 4096 : 1
-    if (league !== null && best) {
-      league.forEach(pkmn => {
-        startRank = pkmn.rank < startRank ? pkmn.rank : startRank
-      })
-    } else if (league !== null) {
-      league.forEach(pkmn => {
-        startRank = pkmn.rank > startRank ? pkmn.rank : startRank
-      })
-    }
-    return startRank
-  }
-
   return (
     <Grid
       container
       style={{ minWidth: 200 }}
       alignItems="center"
       justify="center"
-      spacing={2}
+      spacing={1}
     >
       <Header
         pokemon={pokemon}
@@ -67,8 +54,8 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         pokemon={pokemon}
       />
       <Collapse in={!pvpExpand} timeout="auto" unmountOnExit>
-        {great && (getBestOrWorst(great, true) < 6) && <PvpInfo league="great" data={great} onlyTop5 />}
-        {ultra && (getBestOrWorst(ultra, true) < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 />}
+        {great && (rankSum.gl.best < 6) && <PvpInfo league="great" data={great} onlyTop5 />}
+        {ultra && (rankSum.ul.best < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 />}
       </Collapse>
       <Footer
         pokemon={pokemon}
@@ -76,7 +63,7 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         setExpanded={setExpanded}
         pvpExpand={pvpExpand}
         setPvpExpand={setPvpExpand}
-        hasPvp={(great || ultra) && (getBestOrWorst(great) > 5 || getBestOrWorst(ultra) > 5)}
+        hasPvp={(great || ultra) && (rankSum.worst > 5)}
       />
       <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
         {great && <PvpInfo league="great" data={great} />}
@@ -193,7 +180,7 @@ const Stats = ({ pokemon, perms }) => {
   return (
     <Grid
       item
-      xs={(perms.iv || perms.stats) ? 9 : 1}
+      xs={(perms.iv || perms.stats) ? 8 : 1}
       container
       direction="column"
       justify="space-around"
@@ -230,7 +217,7 @@ const Info = ({ pokemon, metaData, perms }) => {
   return (
     <Grid
       item
-      xs={(perms.iv || perms.stats) ? 2 : 11}
+      xs={(perms.iv || perms.stats) ? 3 : 11}
       container
       direction={(perms.iv || perms.stats) ? 'column' : 'row'}
       justify="space-around"
@@ -270,12 +257,12 @@ const Info = ({ pokemon, metaData, perms }) => {
 
 const Timer = ({ pokemon }) => {
   const { expire_timestamp, expire_timestamp_verified } = pokemon
-
-  const [timer, setTimer] = useState(Utility.getTimeUntil(new Date(expire_timestamp * 1000), true))
+  const despawnTimer = new Date(expire_timestamp * 1000)
+  const [timer, setTimer] = useState(Utility.getTimeUntil(despawnTimer, true))
 
   useEffect(() => {
     const timer2 = setTimeout(() => {
-      setTimer(Utility.getTimeUntil(new Date(expire_timestamp * 1000), true))
+      setTimer(Utility.getTimeUntil(despawnTimer, true))
     }, 1000)
     return () => clearTimeout(timer2)
   })
@@ -283,8 +270,11 @@ const Timer = ({ pokemon }) => {
   return (
     <>
       <Grid item xs={9}>
-        <Typography variant="h5" align="center">
+        <Typography variant="h6" align="center">
           {timer.str}
+        </Typography>
+        <Typography variant="subtitle2" align="center">
+          {despawnTimer.toLocaleTimeString()}
         </Typography>
       </Grid>
       <Grid item xs={3}>

@@ -30,7 +30,14 @@ class Pokemon extends Model {
     const getRanks = (league, data, filterId) => {
       const parsed = JSON.parse(data)
       const [min, max] = getMinMax(filterId, league)
-      return parsed.filter(pkmn => check(pkmn, league, min, max))
+      let best = 4096
+      let worst = 1
+      const filtered = parsed.filter(pkmn => {
+        if (pkmn.rank < best) best = pkmn.rank
+        if (pkmn.rank > worst) worst = pkmn.rank
+        return check(pkmn, league, min, max)
+      })
+      return { filtered, best, worst }
     }
 
     const getMinMax = (filterId, league) => {
@@ -146,14 +153,37 @@ class Pokemon extends Model {
         pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
       }
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
-
+      pkmn.rankSum = {
+        gl: {},
+        ul: {},
+      }
       if (pkmn.pvp_rankings_great_league) {
         const rankCheck = getRanks('gl', pkmn.pvp_rankings_great_league, filterId)
-        pkmn.great = rankCheck.length > 0 ? rankCheck : undefined
+        if (rankCheck.filtered.length > 0) {
+          pkmn.great = rankCheck.filtered
+          pkmn.rankSum.best = rankCheck.best
+          pkmn.rankSum.worst = rankCheck.worst
+          pkmn.rankSum.gl.best = rankCheck.best
+          pkmn.rankSum.gl.worst = rankCheck.worst
+        }
       }
       if (pkmn.pvp_rankings_ultra_league) {
         const rankCheck = getRanks('ul', pkmn.pvp_rankings_ultra_league, filterId)
-        pkmn.ultra = rankCheck.length > 0 ? rankCheck : undefined
+        if (rankCheck.filtered.length > 0) {
+          pkmn.ultra = rankCheck.filtered
+          if (pkmn.rankSum.best) {
+            pkmn.rankSum.best = pkmn.rankSum.best > rankCheck.best ? pkmn.rankSum.best : rankCheck.best
+          } else {
+            pkmn.rankSum.best = rankCheck.best
+          }
+          if (pkmn.rankSum.worst) {
+            pkmn.rankSum.worst = pkmn.rankSum.worst < rankCheck.worst ? pkmn.rankSum.worst : rankCheck.worst
+          } else {
+            pkmn.rankSum.worst = rankCheck.worst
+          }
+          pkmn.rankSum.ul.best = rankCheck.best
+          pkmn.rankSum.ul.worst = rankCheck.worst
+        }
       }
       if (!onlyExcludeList.includes(filterId) && ((pkmn.great || pkmn.ultra) || !pkmn.pvp)) {
         finalResults.push(pkmn)

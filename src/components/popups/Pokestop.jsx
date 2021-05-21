@@ -35,7 +35,7 @@ export default function PokestopPopup({
   return (
     <Grid
       container
-      style={{ minWidth: 200 }}
+      style={{ minWidth: 200, maxWidth: 250 }}
       direction="row"
       justify="space-evenly"
       alignItems="center"
@@ -150,11 +150,6 @@ const Header = ({ pokestop, perms }) => {
     setTimerList([...timerList, id])
   }
 
-  let maxPokestopName = name.substring(0, Math.min(name.length, 30))
-  if (maxPokestopName !== name) {
-    maxPokestopName = `${maxPokestopName.trim()}...`
-  }
-
   const options = [
     { name: 'Hide', action: handleHide },
   ]
@@ -178,7 +173,7 @@ const Header = ({ pokestop, perms }) => {
           noWrap={pokestopName}
           onClick={() => setPokestopName(!pokestopName)}
         >
-          {maxPokestopName}
+          {name}
         </Typography>
       </Grid>
       <Grid item xs={3}>

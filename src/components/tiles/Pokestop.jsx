@@ -2,29 +2,20 @@ import React, { memo } from 'react'
 import { Marker, Popup } from 'react-leaflet'
 import PopupContent from '../popups/Pokestop'
 import stopMarker from '../markers/pokestop'
-import questMarker from '../markers/quest'
 import Timer from './Timer'
 
-const PokestopTile = ({ item, ts, showTimer }) => {
+const PokestopTile = ({
+  item, ts, showTimer, filters, iconSizes, path, availableForms,
+}) => {
   const hasInvasion = item.incident_expire_timestamp >= ts
   const hasLure = item.lure_expire_timestamp >= ts
+  const hasQuest = item.quest_item_id || item.quest_pokemon_id || item.mega_amount || item.quest_reward_type === 3
 
   return (
     <Marker
       position={[item.lat, item.lon]}
-      icon={stopMarker(item, ts)}
+      icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, availableForms)}
     >
-      {(item.quest_item_id || item.quest_pokemon_id || item.mega_amount || item.quest_reward_type === 3)
-        && (
-          <Marker
-            position={[item.lat, item.lon]}
-            icon={questMarker(item)}
-          >
-            <Popup position={[item.lat, item.lon]}>
-              <PopupContent pokestop={item} ts={ts} hasLure={hasLure} hasInvasion={hasInvasion} />
-            </Popup>
-          </Marker>
-        )}
       <Popup position={[item.lat, item.lon]}>
         <PopupContent pokestop={item} ts={ts} hasLure={hasLure} hasInvasion={hasInvasion} />
       </Popup>
@@ -38,11 +29,11 @@ const PokestopTile = ({ item, ts, showTimer }) => {
         )}
       {(showTimer && hasLure)
         && (
-        <Timer
-          timestamp={item.lure_expire_timestamp}
-          direction={hasInvasion ? 'left' : 'center'}
-          label={hasInvasion ? 'Lure' : false}
-        />
+          <Timer
+            timestamp={item.lure_expire_timestamp}
+            direction={hasInvasion ? 'left' : 'center'}
+            label={hasInvasion ? 'Lure' : false}
+          />
         )}
     </Marker>
   )
@@ -55,6 +46,7 @@ const areEqual = (prev, next) => (
   && prev.item.quest_pokemon_id === next.item.quest_pokemon_id
   && prev.item.mega_pokemon_id === next.item.mega_pokemon_id
   && prev.item.incident_expire_timestamp === next.item.incident_expire_timestamp
+  && prev.item.quest_reward_type === next.item.quest_reward_type
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
 )

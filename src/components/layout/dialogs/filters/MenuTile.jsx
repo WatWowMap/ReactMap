@@ -2,6 +2,7 @@
 import React from 'react'
 import { Grid, IconButton, Typography } from '@material-ui/core'
 import { Check, Clear, Tune } from '@material-ui/icons'
+import SizeDropdown from './SizeDropdown'
 
 export default function MenuTile({
   data, rowIndex, columnIndex, style,
@@ -49,13 +50,20 @@ export default function MenuTile({
         : <Clear color="primary" />}
     </IconButton>
   )
+
   const advMenu = type === 'pokemon' ? (
     <IconButton
       onClick={toggleAdvMenu(true, item.id)}
     >
       <Tune style={{ color: 'white' }} />
     </IconButton>
-  ) : ''
+  ) : (
+    <SizeDropdown
+      tempFilters={tempFilters}
+      setTempFilters={setTempFilters}
+      itemId={item.id}
+    />
+  )
 
   const nameTitle = (
     <Typography

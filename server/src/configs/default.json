@@ -63,10 +63,10 @@
     "defaultFilters": {
       "gyms": {
         "enabled": true,
-        "allGyms": false,
+        "allGyms": true,
         "exEligible": false,
         "inBattle": false,
-        "raids": false,
+        "raids": true,
         "eggs": true,
         "pokemon": true,
         "timers": false
@@ -79,6 +79,7 @@
         "megaEnergy": true,
         "pokemon": false,
         "invasions": false,
+        "allInvasions": false,
         "invasionTimers": false
       },
       "spawnpoints": {
@@ -123,37 +124,19 @@
       }
     },
     "iconSizes": {
-      "gym": {
+      "gyms": {
         "sm": 20,
-        "md": 40,
-        "lg": 60,
-        "xl": 80
-      },
-      "raid": {
-        "sm": 15,
-        "md": 30,
+        "md": 35,
         "lg": 50,
-        "xl": 70
+        "xl": 65
       },
-      "pokestop": {
+      "pokestops": {
         "sm": 15,
-        "md": 30,
-        "lg": 50,
-        "xl": 70
+        "md": 25,
+        "lg": 35,
+        "xl": 45
       },
-      "quest": {
-        "sm": 15,
-        "md": 30,
-        "lg": 50,
-        "xl": 70
-      },
-      "invasion": {
-        "sm": 15,
-        "md": 30,
-        "lg": 50,
-        "xl": 70
-      },
-      "spawnpoint": {
+      "spawnpoints": {
         "sm": 0.5,
         "md": 1,
         "lg": 2,
@@ -165,13 +148,13 @@
         "lg": 60,
         "xl": 80
       },
-      "nest": {
+      "nests": {
         "sm": 20,
         "md": 40,
         "lg": 60,
         "xl": 80
       },
-      "device": {
+      "devices": {
         "sm": 15,
         "md": 30,
         "lg": 50,
@@ -327,10 +310,13 @@
       "url": "https://www.google.com/maps/place/{x},{y}"
     }, 
     "AppleMaps": {
-      "url": "https://maps.apple.com/maps?daddr=${x},${y}"
+      "url": "https://maps.apple.com/maps?daddr={x},{y}"
     },
     "Waze": {
-      "url": "https://www.waze.com/ul?ll=${x},${y}"
+      "url": "https://www.waze.com/ul?ll={x},{y}"
+    },
+    "Intel": {
+      "url": "https://intel.ingress.com/intel?pll={x},{y}"
     }
   },
   "icons": {

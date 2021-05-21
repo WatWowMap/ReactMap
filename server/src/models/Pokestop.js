@@ -140,6 +140,10 @@ class Pokestop extends Model {
                 }
               } else if (onlyExcludeList.includes(category.filter)) {
                 delete pokestop[category.field]
+                delete pokestop.quest_reward_type
+                delete pokestop.quest_conditions
+                delete pokestop.quest_target
+                delete pokestop.quest_type
               }
             })
             filteredResults.add(pokestop)

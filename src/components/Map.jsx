@@ -12,6 +12,9 @@ export default function Map() {
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
   const { menus } = useMasterfile(state => state.ui)
+  const { map: { iconSizes } } = useCallback(useMasterfile(state => state.config))
+  const { path } = useStore(state => state.settings).icons
+  const availableForms = useMasterfile(state => state.availableForms)
 
   const initialBounds = {
     minLat: map.getBounds()._southWest.lat - 0.01,
@@ -67,6 +70,9 @@ export default function Map() {
               onMove={onMove}
               perms={value}
               category={item}
+              iconSizes={iconSizes[item]}
+              path={path}
+              availableForms={availableForms}
             />
           )
         }

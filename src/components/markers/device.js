@@ -1,9 +1,9 @@
 import { Icon } from 'leaflet'
 
-export default function getDeviceMarkers(status) {
+export default function getDeviceMarkers(status, iconSizes) {
   return new Icon({
     iconUrl: `/images/device/${status}.png`,
-    iconSize: [30, 30],
+    iconSize: [iconSizes.md, iconSizes.md],
     iconAnchor: [20, 33.96],
     popupAnchor: [0, -41.96],
     className: 'marker',
