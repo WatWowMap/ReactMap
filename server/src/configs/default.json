@@ -125,33 +125,15 @@
     "iconSizes": {
       "gyms": {
         "sm": 20,
-        "md": 40,
-        "lg": 60,
-        "xl": 80
-      },
-      "raids": {
-        "sm": 15,
-        "md": 30,
+        "md": 35,
         "lg": 50,
-        "xl": 70
+        "xl": 65
       },
       "pokestops": {
         "sm": 15,
         "md": 25,
-        "lg": 45,
-        "xl": 65
-      },
-      "quests": {
-        "sm": 15,
-        "md": 25,
-        "lg": 45,
-        "xl": 65
-      },
-      "invasions": {
-        "sm": 15,
-        "md": 30,
-        "lg": 50,
-        "xl": 70
+        "lg": 35,
+        "xl": 45
       },
       "spawnpoints": {
         "sm": 0.5,

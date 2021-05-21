@@ -1,12 +1,8 @@
 import L, { Icon } from 'leaflet'
-import { useMasterfile, useStore } from '../../hooks/useStore'
 
-export const basicMarker = (iconUrl, pkmn) => {
-  const { map: { iconSizes } } = useMasterfile(state => state.config)
-  const { pokemon: { filter } } = useStore(state => state.filters)
-
+export const basicMarker = (iconUrl, pkmn, filters, iconSizes) => {
   const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
-  const size = filter[filterId] ? iconSizes.pokemon[filter[filterId].size] : iconSizes.pokemon.md
+  const size = filters.filter[filterId] ? iconSizes[filters.filter[filterId].size] : iconSizes.md
 
   return new Icon({
     iconUrl,
@@ -17,10 +13,7 @@ export const basicMarker = (iconUrl, pkmn) => {
   })
 }
 
-export const fancyMarker = (iconUrl, pkmn, bestPvp) => {
-  const { map: { theme: { glow }, iconSizes } } = useMasterfile(state => state.config)
-  const { pokemon: { filter } } = useStore(state => state.filters)
-
+export const fancyMarker = (iconUrl, pkmn, bestPvp, filters, iconSizes, glow) => {
   const getGlowColor = () => {
     let color
     let badge
@@ -42,7 +35,7 @@ export const fancyMarker = (iconUrl, pkmn, bestPvp) => {
   }
   const { color, badge } = getGlowColor(pkmn.pokemon_id, pkmn.form)
   const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
-  const size = filter[filterId] ? iconSizes.pokemon[filter[filterId].size] : iconSizes.pokemon.md
+  const size = filters.filter[filterId] ? iconSizes[filters.filter[filterId].size] : iconSizes.md
 
   const pvpHtml = badge ? `
     <img src="/images/misc/${badge}.png" 

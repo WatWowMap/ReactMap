@@ -1,13 +1,8 @@
 /* eslint-disable camelcase */
 import L from 'leaflet'
-import { useMasterfile, useStore } from '../../hooks/useStore'
 import Utility from '../../services/Utility'
 
-export default function stopMarker(pokestop, ts, hasQuest, hasLure, hasInvasion) {
-  const { path } = useStore(state => state.settings).icons
-  const availableForms = useMasterfile(state => state.availableForms)
-  const { map: { iconSizes } } = useMasterfile(state => state.config)
-  const { pokestops: { filter } } = useStore(state => state.filters)
+export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, availableForms) {
   const { grunt_type, lure_id } = pokestop
 
   let iconType = 'pokestop/0'
@@ -24,8 +19,7 @@ export default function stopMarker(pokestop, ts, hasQuest, hasLure, hasInvasion)
     iconType = `invasion/i_${grunt_type}`
     filterId = `i${grunt_type}`
   }
-
-  const stopSize = filter[filterId] ? iconSizes.pokestops[filter[filterId].size] : iconSizes.pokestops.md
+  const stopSize = filters.filter[filterId] ? iconSizes[filters.filter[filterId].size] : iconSizes.md
   const iconAnchorY = stopSize * 0.896
   let popupAnchorY = -8 - iconAnchorY
 
@@ -83,14 +77,14 @@ export default function stopMarker(pokestop, ts, hasQuest, hasLure, hasInvasion)
           <img 
             src=${path}/${Utility.getPokemonIcon(availableForms, megaId, 0, 1)}.png 
             style="bottom: 15px; 
-              width:${iconSizes.quests[filter[filterId].size]}px; 
-              height:${iconSizes.quests[filter[filterId].size]}px;"
+              width:${iconSizes[filters.filter[filterId].size]}px; 
+              height:${iconSizes[filters.filter[filterId].size]}px;"
           />`
         if (megaAmount > 1) {
           iconHtml += `<div class="amount-holder"><div>${megaAmount}</div></div>`
         } break
     }
-    const questSize = filter[filterId] ? iconSizes.quests[filter[filterId].size] : iconSizes.quests.md
+    const questSize = filters.filter[filterId] ? iconSizes[filters.filter[filterId].size] : iconSizes.md
     const offsetY = 0 - questSize
     iconHtml = `
       <div 

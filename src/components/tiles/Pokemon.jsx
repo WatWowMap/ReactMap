@@ -1,15 +1,15 @@
 import React, { useCallback, memo } from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
-import { useStore, useMasterfile } from '../../hooks/useStore'
+import { useMasterfile } from '../../hooks/useStore'
 import Utility from '../../services/Utility'
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
 import Timer from './Timer'
 
-const PokemonTile = ({ item, showTimer }) => {
-  const { icons: { path } } = useStore(useCallback(state => state.settings))
-  const availableForms = useMasterfile(useCallback(state => state.availableForms))
+const PokemonTile = ({
+  item, showTimer, filters, iconSizes, path, availableForms,
+}) => {
   const { map: { theme: { glow } } } = useMasterfile(useCallback(state => state.config))
   const iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, item.pokemon_id, item.form, 0, 0, item.costume)}.png`
 
@@ -25,7 +25,9 @@ const PokemonTile = ({ item, showTimer }) => {
   return (
     <Marker
       position={[item.lat, item.lon]}
-      icon={(bestPvp || item.iv >= 100) ? fancyMarker(iconUrl, item, bestPvp) : basicMarker(iconUrl, item)}
+      icon={(bestPvp || item.iv >= 100)
+        ? fancyMarker(iconUrl, item, bestPvp, filters, iconSizes, glow)
+        : basicMarker(iconUrl, item, filters, iconSizes)}
     >
       <Popup position={[item.lat, item.lon]}>
         <PopupContent pokemon={item} iconUrl={iconUrl} />

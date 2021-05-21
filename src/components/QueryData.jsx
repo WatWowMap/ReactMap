@@ -8,13 +8,14 @@ import Query from '../services/Query'
 import * as index from './tiles/index'
 
 export default function QueryData({
-  bounds, filters, onMove, perms, category,
+  bounds, filters, onMove, perms, category, iconSizes, path, availableForms,
 }) {
   const Component = index[category]
   const zoomLevel = useMasterfile(state => state.config).map.clusterZoomLevels[category] || 1
   const hideList = useMasterfile(state => state.hideList)
   const excludeList = useMasterfile(state => state.excludeList)
   const timerList = useMasterfile(state => state.timerList)
+
   const map = useMap()
   const ts = Math.floor((new Date()).getTime() / 1000)
 
@@ -102,7 +103,10 @@ export default function QueryData({
               ts={ts}
               filters={filters}
               map={map}
+              iconSizes={iconSizes}
               showTimer={timerList.includes(each.id)}
+              path={path}
+              availableForms={availableForms}
             />
           )
         }

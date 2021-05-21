@@ -4,7 +4,9 @@ import PopupContent from '../popups/Pokestop'
 import stopMarker from '../markers/pokestop'
 import Timer from './Timer'
 
-const PokestopTile = ({ item, ts, showTimer }) => {
+const PokestopTile = ({
+  item, ts, showTimer, filters, iconSizes, path, availableForms,
+}) => {
   const hasInvasion = item.incident_expire_timestamp >= ts
   const hasLure = item.lure_expire_timestamp >= ts
   const hasQuest = item.quest_item_id || item.quest_pokemon_id || item.mega_amount || item.quest_reward_type === 3
@@ -12,7 +14,7 @@ const PokestopTile = ({ item, ts, showTimer }) => {
   return (
     <Marker
       position={[item.lat, item.lon]}
-      icon={stopMarker(item, ts, hasQuest, hasLure, hasInvasion)}
+      icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, availableForms)}
     >
       <Popup position={[item.lat, item.lon]}>
         <PopupContent pokestop={item} ts={ts} hasLure={hasLure} hasInvasion={hasInvasion} />
@@ -27,11 +29,11 @@ const PokestopTile = ({ item, ts, showTimer }) => {
         )}
       {(showTimer && hasLure)
         && (
-        <Timer
-          timestamp={item.lure_expire_timestamp}
-          direction={hasInvasion ? 'left' : 'center'}
-          label={hasInvasion ? 'Lure' : false}
-        />
+          <Timer
+            timestamp={item.lure_expire_timestamp}
+            direction={hasInvasion ? 'left' : 'center'}
+            label={hasInvasion ? 'Lure' : false}
+          />
         )}
     </Marker>
   )
