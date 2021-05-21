@@ -36,8 +36,8 @@ class Utility {
     return getTimers(date, until)
   }
 
-  static getIconSize(type, info) {
-    return getIconSize(type, info)
+  static getIconSize(type, subType, info) {
+    return getIconSize(type, subType, info)
   }
 }
 

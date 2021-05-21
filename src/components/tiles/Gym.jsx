@@ -2,7 +2,6 @@
 import React, { memo } from 'react'
 import { Marker, Popup } from 'react-leaflet'
 import gymMarker from '../markers/gym'
-import raidMarker from '../markers/raid'
 import PopupContent from '../popups/Gym'
 import Timer from './Timer'
 
@@ -15,25 +14,12 @@ const GymTile = ({ item, ts, showTimer }) => {
   return (
     <Marker
       position={[item.lat, item.lon]}
-      icon={gymMarker(item, ts)}
+      icon={gymMarker(item, ts, hasRaid)}
     >
-      {hasRaid && (
-        <>
-          <Marker
-            position={[item.lat, item.lon]}
-            icon={raidMarker(item, ts)}
-            className="marker"
-          >
-            <Popup position={[item.lat, item.lon]}>
-              <PopupContent gym={item} hasRaid={hasRaid} ts={ts} />
-            </Popup>
-          </Marker>
-          {showTimer && <Timer timestamp={timerToDisplay} />}
-        </>
-      )}
       <Popup position={[item.lat, item.lon]}>
         <PopupContent gym={item} hasRaid={hasRaid} ts={ts} />
       </Popup>
+      {showTimer && <Timer timestamp={timerToDisplay} />}
     </Marker>
   )
 }
