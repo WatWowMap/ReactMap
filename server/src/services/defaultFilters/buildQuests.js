@@ -21,11 +21,11 @@ module.exports = async function buildQuests(perms, defaults) {
           }); break
         case 'invasions':
           rewards.forEach(reward => {
-            quests[`i${reward.grunt_type}`] = new GenericFilter(defaults.invasions)
+            quests[`i${reward.grunt_type}`] = new GenericFilter(defaults.allInvasions)
           }); break
         case 'stardust':
           rewards.forEach(reward => {
-            quests[`d${reward.amount}`] = new GenericFilter(defaults.invasions)
+            quests[`d${reward.amount}`] = new GenericFilter(defaults.items)
           }); break
       }
     })

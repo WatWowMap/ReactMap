@@ -63,10 +63,10 @@
     "defaultFilters": {
       "gyms": {
         "enabled": true,
-        "allGyms": false,
+        "allGyms": true,
         "exEligible": false,
         "inBattle": false,
-        "raids": false,
+        "raids": true,
         "eggs": true,
         "pokemon": true,
         "timers": false
@@ -79,6 +79,7 @@
         "megaEnergy": true,
         "pokemon": false,
         "invasions": false,
+        "allInvasions": false,
         "invasionTimers": false
       },
       "spawnpoints": {
