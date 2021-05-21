@@ -27,7 +27,7 @@ export default function GymPopup({ gym, hasRaid, ts }) {
   return (
     <Grid
       container
-      style={{ minWidth: 200 }}
+      style={{ width: 200 }}
       direction="row"
       justify="space-evenly"
       alignItems="center"
@@ -135,11 +135,6 @@ const Header = ({ gym, perms }) => {
     setTimerList([...timerList, id])
   }
 
-  let maxGymName = name.substring(0, Math.min(name.length, 30))
-  if (maxGymName !== name) {
-    maxGymName = `${maxGymName.trim()}...`
-  }
-
   const options = [
     { name: 'Hide', action: handleHide },
   ]
@@ -163,7 +158,7 @@ const Header = ({ gym, perms }) => {
           noWrap={gymName}
           onClick={() => setGymName(!gymName)}
         >
-          {maxGymName}
+          {name}
         </Typography>
       </Grid>
       <Grid item xs={3}>

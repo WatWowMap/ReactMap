@@ -31,7 +31,7 @@ export default function PokemonPopup({ pokemon, iconUrl, pvpRankInfo }) {
       style={{ minWidth: 200 }}
       alignItems="center"
       justify="center"
-      spacing={2}
+      spacing={1}
     >
       <Header
         pokemon={pokemon}
@@ -179,7 +179,7 @@ const Stats = ({ pokemon, perms }) => {
   return (
     <Grid
       item
-      xs={(perms.iv || perms.stats) ? 9 : 1}
+      xs={(perms.iv || perms.stats) ? 8 : 1}
       container
       direction="column"
       justify="space-around"
@@ -216,7 +216,7 @@ const Info = ({ pokemon, metaData, perms }) => {
   return (
     <Grid
       item
-      xs={(perms.iv || perms.stats) ? 2 : 11}
+      xs={(perms.iv || perms.stats) ? 3 : 11}
       container
       direction={(perms.iv || perms.stats) ? 'column' : 'row'}
       justify="space-around"
@@ -256,12 +256,12 @@ const Info = ({ pokemon, metaData, perms }) => {
 
 const Timer = ({ pokemon }) => {
   const { expire_timestamp, expire_timestamp_verified } = pokemon
-
-  const [timer, setTimer] = useState(Utility.getTimeUntil(new Date(expire_timestamp * 1000), true))
+  const despawnTimer = new Date(expire_timestamp * 1000)
+  const [timer, setTimer] = useState(Utility.getTimeUntil(despawnTimer, true))
 
   useEffect(() => {
     const timer2 = setTimeout(() => {
-      setTimer(Utility.getTimeUntil(new Date(expire_timestamp * 1000), true))
+      setTimer(Utility.getTimeUntil(despawnTimer, true))
     }, 1000)
     return () => clearTimeout(timer2)
   })
@@ -269,8 +269,11 @@ const Timer = ({ pokemon }) => {
   return (
     <>
       <Grid item xs={9}>
-        <Typography variant="h5" align="center">
+        <Typography variant="h6" align="center">
           {timer.str}
+        </Typography>
+        <Typography variant="subtitle2" align="center">
+          {despawnTimer.toLocaleTimeString()}
         </Typography>
       </Grid>
       <Grid item xs={3}>

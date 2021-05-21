@@ -25,7 +25,7 @@ export default function stopMarker(pokestop, ts, hasQuest, hasLure, hasInvasion)
     filterId = `i${grunt_type}`
   }
 
-  const stopSize = iconSizes.pokestops[filter[filterId].size]
+  const stopSize = filter[filterId] ? iconSizes.pokestops[filter[filterId].size] : iconSizes.pokestops.md
   const iconAnchorY = stopSize * 0.896
   let popupAnchorY = -8 - iconAnchorY
 
@@ -90,7 +90,7 @@ export default function stopMarker(pokestop, ts, hasQuest, hasLure, hasInvasion)
           iconHtml += `<div class="amount-holder"><div>${megaAmount}</div></div>`
         } break
     }
-    const questSize = iconSizes.quests[filter[filterId].size]
+    const questSize = filter[filterId] ? iconSizes.quests[filter[filterId].size] : iconSizes.quests.md
     const offsetY = 0 - questSize
     iconHtml = `
       <div 

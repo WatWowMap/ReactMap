@@ -7,7 +7,7 @@ import Timer from './Timer'
 const PokestopTile = ({ item, ts, showTimer }) => {
   const hasInvasion = item.incident_expire_timestamp >= ts
   const hasLure = item.lure_expire_timestamp >= ts
-  const hasQuest = item.quest_reward_type
+  const hasQuest = item.quest_item_id || item.quest_pokemon_id || item.mega_amount || item.quest_reward_type === 3
 
   return (
     <Marker
@@ -44,6 +44,7 @@ const areEqual = (prev, next) => (
   && prev.item.quest_pokemon_id === next.item.quest_pokemon_id
   && prev.item.mega_pokemon_id === next.item.mega_pokemon_id
   && prev.item.incident_expire_timestamp === next.item.incident_expire_timestamp
+  && prev.item.quest_reward_type === next.item.quest_reward_type
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
 )

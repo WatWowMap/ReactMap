@@ -37,7 +37,8 @@ export default function pokemonMarker(iconUrl, pkmn, pvpRanks) {
     return { color, badge }
   }
   const { color, badge } = getGlowColor(pkmn.pokemon_id, pkmn.form)
-  const size = iconSizes.pokemon[filter[`${pkmn.pokemon_id}-${pkmn.form}`].size]
+  const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
+  const size = filter[filterId] ? iconSizes.pokemon[filter[filterId].size] : iconSizes.pokemon.md
 
   const pvpHtml = badge ? `
     <img src="/images/misc/${badge}.png" 

@@ -11,11 +11,11 @@ import {
   IconButton,
   Typography,
 } from '@material-ui/core'
-import { HighlightOff } from '@material-ui/icons'
+import { HighlightOff, Clear } from '@material-ui/icons'
 import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
-import Utility from '../../../../services/Utility'
 
+import Utility from '../../../../services/Utility'
 import { useStore, useMasterfile } from '../../../../hooks/useStore'
 import useStyles from '../../../../hooks/useStyles'
 import Advanced from './Advanced'
@@ -161,6 +161,12 @@ export default function Menu({ filters, toggleDialog, type }) {
       </Dialog>
       <DialogTitle className={classes.filterHeader}>
         {Utility.getProperName(type)} {text.filterSettings}
+        <IconButton
+          onClick={toggleDialog(false, type, filters.filter)}
+          style={{ position: 'absolute', right: 5, top: 5 }}
+        >
+          <Clear />
+        </IconButton>
       </DialogTitle>
       <DialogContent>
         <Grid

@@ -17,7 +17,8 @@ export default function gymMarker(gym, ts, hasRaid) {
   let filledSlots = 6 - availble_slots || 0
   if (!teamId) filledSlots = 0
 
-  const gymSize = iconSizes.gyms[filter[`t${team_id}-0`].size]
+  let filterId = `t${team_id}-0`
+  const gymSize = filter[filterId] ? iconSizes.gyms[filter[filterId].size] : iconSizes.gyms.md
   const iconAnchorY = gymSize * 0.849
   let popupAnchorY = -8 - iconAnchorY
 
@@ -41,10 +42,12 @@ export default function gymMarker(gym, ts, hasRaid) {
       raid_pokemon_gender,
       raid_pokemon_form,
     } = gym
-    raidSize = iconSizes.raids[filter[`e${raid_level}`].size]
+    filterId = `e${raid_level}`
+    raidSize = filter[filterId] ? iconSizes.raids[filter[filterId].size] : iconSizes.raids.md
     raidIcon = `/images/egg/${raid_level}.png`
     if (raid_pokemon_id > 0) {
-      raidSize = iconSizes.raids[filter[`p${raid_pokemon_id}-${raid_pokemon_form}`].size]
+      filterId = `p${raid_pokemon_id}-${raid_pokemon_form}`
+      raidSize = filter[filterId] ? iconSizes.raids[filter[filterId].size] : iconSizes.raids.md
       raidIcon = `${path}/${Utility.getPokemonIcon(availableForms, raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume)}.png`
     } else if (raid_battle_timestamp < ts) {
       raidIcon = `/images/unknown_egg/${raid_level}.png`
