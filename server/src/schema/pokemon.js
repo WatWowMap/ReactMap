@@ -34,5 +34,6 @@ module.exports = new GraphQLObjectType({
     capture_3: { type: GraphQLFloat },
     great: { type: JSONResolver },
     ultra: { type: JSONResolver },
+    rankSum: { type: JSONResolver },
   }),
 })

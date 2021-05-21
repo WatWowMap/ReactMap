@@ -42,6 +42,7 @@ const pvp = gql`
   fragment Pvp on Pokemon {
     great
     ultra
+    rankSum
   }
 `
 

@@ -19,7 +19,7 @@ const GymTile = ({ item, ts, showTimer }) => {
       <Popup position={[item.lat, item.lon]}>
         <PopupContent gym={item} hasRaid={hasRaid} ts={ts} />
       </Popup>
-      {showTimer && <Timer timestamp={timerToDisplay} />}
+      {showTimer && <Timer timestamp={timerToDisplay} direction="center" />}
     </Marker>
   )
 }

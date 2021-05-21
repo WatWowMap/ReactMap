@@ -4,46 +4,33 @@ import { Marker, Popup } from 'react-leaflet'
 import { useStore, useMasterfile } from '../../hooks/useStore'
 import Utility from '../../services/Utility'
 import PopupContent from '../popups/Pokemon'
-import marker from '../markers/pokemon'
+import { basicMarker, fancyMarker } from '../markers/pokemon'
 import Timer from './Timer'
 
 const PokemonTile = ({ item, showTimer }) => {
-  const { path } = useStore(useCallback(state => state.settings)).icons
+  const { icons: { path } } = useStore(useCallback(state => state.settings))
   const availableForms = useMasterfile(useCallback(state => state.availableForms))
+  const { map: { theme: { glow } } } = useMasterfile(useCallback(state => state.config))
   const iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, item.pokemon_id, item.form, 0, 0, item.costume)}.png`
 
-  const getBestWorst = (league) => {
-    let best = 4096
-    let worst = 1
-    if (league !== null) {
-      league.forEach(pkmn => {
-        best = pkmn.rank < best ? pkmn.rank : best
-        worst = pkmn.rank > worst ? pkmn.rank : worst
-      })
-    } else {
-      best = undefined
-      worst = undefined
+  const getPvpStatus = () => {
+    if (item.rankSum) {
+      if (item.rankSum.best <= glow.pvp.value || item.rankSum.best <= 3) {
+        return item.rankSum.best
+      }
     }
-    return { best, worst }
   }
-
-  const pvpRankInfo = {
-    great: getBestWorst(item.great),
-    ultra: getBestWorst(item.ultra),
-  }
+  const bestPvp = getPvpStatus()
 
   return (
     <Marker
       position={[item.lat, item.lon]}
-      icon={marker(iconUrl, item, pvpRankInfo)}
+      icon={(bestPvp || item.iv >= 100) ? fancyMarker(iconUrl, item, bestPvp) : basicMarker(iconUrl, item)}
     >
-      <Popup
-        position={[item.lat, item.lon]}
-        style={{ backgroundColor: 'rgb(33, 37, 31)' }}
-      >
-        <PopupContent pokemon={item} iconUrl={iconUrl} pvpRankInfo={pvpRankInfo} />
+      <Popup position={[item.lat, item.lon]}>
+        <PopupContent pokemon={item} iconUrl={iconUrl} />
       </Popup>
-      {showTimer && <Timer timestamp={item.expire_timestamp} />}
+      {showTimer && <Timer timestamp={item.expire_timestamp} direction="center" />}
     </Marker>
   )
 }

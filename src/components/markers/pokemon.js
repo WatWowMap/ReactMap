@@ -1,35 +1,39 @@
-import L from 'leaflet'
+import L, { Icon } from 'leaflet'
 import { useMasterfile, useStore } from '../../hooks/useStore'
 
-export default function pokemonMarker(iconUrl, pkmn, pvpRanks) {
+export const basicMarker = (iconUrl, pkmn) => {
+  const { map: { iconSizes } } = useMasterfile(state => state.config)
+  const { pokemon: { filter } } = useStore(state => state.filters)
+
+  const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
+  const size = filter[filterId] ? iconSizes.pokemon[filter[filterId].size] : iconSizes.pokemon.md
+
+  return new Icon({
+    iconUrl,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+    popupAnchor: [0, size * -0.6],
+    className: 'marker',
+  })
+}
+
+export const fancyMarker = (iconUrl, pkmn, bestPvp) => {
   const { map: { theme: { glow }, iconSizes } } = useMasterfile(state => state.config)
   const { pokemon: { filter } } = useStore(state => state.filters)
 
   const getGlowColor = () => {
-    let pvpBest = 4096
     let color
     let badge
-    if (pvpRanks.great.best && pvpRanks.ultra.best) {
-      if (pvpRanks.great.best < pvpRanks.ultra.best) {
-        pvpBest = pvpRanks.great.best
-      } else {
-        pvpBest = pvpRanks.ultra.best
+    if (bestPvp) {
+      switch (bestPvp) {
+        default: badge = 'first'; break
+        case 2: badge = 'second'; break
+        case 3: badge = 'third'; break
       }
-    } else if (pvpRanks.great.best) {
-      pvpBest = pvpRanks.great.best
-    } else if (pvpRanks.ultra.best) {
-      pvpBest = pvpRanks.ultra.best
     }
-    if (pvpBest === 3) {
-      badge = 'third'
-    } else if (pvpBest === 2) {
-      badge = 'second'
-    } else if (pvpBest === 1) {
-      badge = 'first'
-    }
-    if (pvpBest <= glow.pvp.value && pkmn.iv >= glow.iv.value) {
+    if (bestPvp <= glow.pvp.value && pkmn.iv >= glow.iv.value) {
       color = glow.both.color
-    } else if (pvpBest <= glow.pvp.value) {
+    } else if (bestPvp <= glow.pvp.value) {
       color = glow.pvp.color
     } else if (pkmn.iv >= glow.iv.value) {
       color = glow.iv.color

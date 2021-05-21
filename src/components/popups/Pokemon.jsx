@@ -12,11 +12,12 @@ import { useStore, useMasterfile } from '../../hooks/useStore'
 import useStyles from '../../hooks/useStyles'
 import Utility from '../../services/Utility'
 
-export default function PokemonPopup({ pokemon, iconUrl, pvpRankInfo }) {
+export default function PokemonPopup({ pokemon, iconUrl }) {
   const {
     pokemon_id,
     great,
     ultra,
+    rankSum,
   } = pokemon
 
   const { menus: { pokemon: perms } } = useMasterfile(state => state.ui)
@@ -53,8 +54,8 @@ export default function PokemonPopup({ pokemon, iconUrl, pvpRankInfo }) {
         pokemon={pokemon}
       />
       <Collapse in={!pvpExpand} timeout="auto" unmountOnExit>
-        {great && (pvpRankInfo.great.best < 6) && <PvpInfo league="great" data={great} onlyTop5 />}
-        {ultra && (pvpRankInfo.ultra.best < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 />}
+        {great && (rankSum.gl.best < 6) && <PvpInfo league="great" data={great} onlyTop5 />}
+        {ultra && (rankSum.ul.best < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 />}
       </Collapse>
       <Footer
         pokemon={pokemon}
@@ -62,7 +63,7 @@ export default function PokemonPopup({ pokemon, iconUrl, pvpRankInfo }) {
         setExpanded={setExpanded}
         pvpExpand={pvpExpand}
         setPvpExpand={setPvpExpand}
-        hasPvp={(great || ultra) && (pvpRankInfo.great.worst > 5 || pvpRankInfo.ultra.worst > 5)}
+        hasPvp={(great || ultra) && (rankSum.worst > 5)}
       />
       <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
         {great && <PvpInfo league="great" data={great} />}
