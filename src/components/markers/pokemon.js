@@ -1,9 +1,9 @@
 import L from 'leaflet'
-import { useMasterfile } from '../../hooks/useStore'
-import Utility from '../../services/Utility'
+import { useMasterfile, useStore } from '../../hooks/useStore'
 
 export default function pokemonMarker(iconUrl, pkmn, pvpRanks) {
-  const { map: { theme: { glow } } } = useMasterfile(state => state.config)
+  const { map: { theme: { glow }, iconSizes } } = useMasterfile(state => state.config)
+  const { pokemon: { filter } } = useStore(state => state.filters)
 
   const getGlowColor = () => {
     let pvpBest = 4096
@@ -37,7 +37,7 @@ export default function pokemonMarker(iconUrl, pkmn, pvpRanks) {
     return { color, badge }
   }
   const { color, badge } = getGlowColor(pkmn.pokemon_id, pkmn.form)
-  const size = Utility.getIconSize('pokemon', pkmn)
+  const size = iconSizes.pokemon[filter[`${pkmn.pokemon_id}-${pkmn.form}`].size]
 
   const pvpHtml = badge ? `
     <img src="/images/misc/${badge}.png" 

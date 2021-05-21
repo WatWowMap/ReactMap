@@ -2,29 +2,18 @@ import React, { memo } from 'react'
 import { Marker, Popup } from 'react-leaflet'
 import PopupContent from '../popups/Pokestop'
 import stopMarker from '../markers/pokestop'
-import questMarker from '../markers/quest'
 import Timer from './Timer'
 
 const PokestopTile = ({ item, ts, showTimer }) => {
   const hasInvasion = item.incident_expire_timestamp >= ts
   const hasLure = item.lure_expire_timestamp >= ts
+  const hasQuest = item.quest_reward_type
 
   return (
     <Marker
       position={[item.lat, item.lon]}
-      icon={stopMarker(item, ts)}
+      icon={stopMarker(item, ts, hasQuest, hasLure, hasInvasion)}
     >
-      {(item.quest_item_id || item.quest_pokemon_id || item.mega_amount || item.quest_reward_type === 3)
-        && (
-          <Marker
-            position={[item.lat, item.lon]}
-            icon={questMarker(item)}
-          >
-            <Popup position={[item.lat, item.lon]}>
-              <PopupContent pokestop={item} ts={ts} hasLure={hasLure} hasInvasion={hasInvasion} />
-            </Popup>
-          </Marker>
-        )}
       <Popup position={[item.lat, item.lon]}>
         <PopupContent pokestop={item} ts={ts} hasLure={hasLure} hasInvasion={hasInvasion} />
       </Popup>

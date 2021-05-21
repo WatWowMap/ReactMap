@@ -327,10 +327,13 @@
       "url": "https://www.google.com/maps/place/{x},{y}"
     }, 
     "AppleMaps": {
-      "url": "https://maps.apple.com/maps?daddr=${x},${y}"
+      "url": "https://maps.apple.com/maps?daddr={x},{y}"
     },
     "Waze": {
-      "url": "https://www.waze.com/ul?ll=${x},${y}"
+      "url": "https://www.waze.com/ul?ll={x},{y}"
+    },
+    "Intel": {
+      "url": "https://intel.ingress.com/intel?pll={x},{y}"
     }
   },
   "icons": {

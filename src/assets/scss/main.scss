@@ -179,3 +179,20 @@ img {
   width: 100%;
   height: 100%;
 }
+
+.amount-holder {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  min-width: 100%;
+  color: white;
+  text-shadow: #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px;
+  font-weight: 700;
+}
+.amount-holder > div {
+  text-align: right;
+}
+.amount-holder > div:before {
+  content: "×";
+}

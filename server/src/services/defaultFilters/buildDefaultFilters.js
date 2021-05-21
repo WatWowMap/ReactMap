@@ -29,6 +29,7 @@ module.exports = async function buildDefault(perms) {
       quests: perms.quests ? defaultFilters.pokestops.quests : undefined,
       invasions: perms.invasions ? defaultFilters.pokestops.invasions : undefined,
       filter: {
+        s0: new GenericFilter(),
         l501: perms.lures ? new GenericFilter(defaultFilters.pokestops.lures) : undefined,
         l502: perms.lures ? new GenericFilter(defaultFilters.pokestops.lures) : undefined,
         l503: perms.lures ? new GenericFilter(defaultFilters.pokestops.lures) : undefined,

@@ -4,6 +4,8 @@ import { useMasterfile, useStore } from '../../hooks/useStore'
 import Utility from '../../services/Utility'
 
 export default function gymMarker(gym, ts, hasRaid) {
+  const { map: { iconSizes } } = useMasterfile(state => state.config)
+  const { gyms: { filter } } = useStore(state => state.filters)
   const { path } = useStore(state => state.settings).icons
   const availableForms = useMasterfile(state => state.availableForms)
   const {
@@ -15,7 +17,7 @@ export default function gymMarker(gym, ts, hasRaid) {
   let filledSlots = 6 - availble_slots || 0
   if (!teamId) filledSlots = 0
 
-  const gymSize = Utility.getIconSize('gyms', gym)
+  const gymSize = iconSizes.gyms[filter[`t${team_id}-0`].size]
   const iconAnchorY = gymSize * 0.849
   let popupAnchorY = -8 - iconAnchorY
 
@@ -28,8 +30,8 @@ export default function gymMarker(gym, ts, hasRaid) {
       />
     </div>`
 
-  let raidSize = Utility.getIconSize('gyms', gym, 'eggs')
   let raidIcon
+  let raidSize = 0
   if (hasRaid) {
     const {
       raid_battle_timestamp,
@@ -39,9 +41,10 @@ export default function gymMarker(gym, ts, hasRaid) {
       raid_pokemon_gender,
       raid_pokemon_form,
     } = gym
+    raidSize = iconSizes.raids[filter[`e${raid_level}`].size]
     raidIcon = `/images/egg/${raid_level}.png`
     if (raid_pokemon_id > 0) {
-      raidSize = Utility.getIconSize('gyms', gym, 'raids')
+      raidSize = iconSizes.raids[filter[`p${raid_pokemon_id}-${raid_pokemon_form}`].size]
       raidIcon = `${path}/${Utility.getPokemonIcon(availableForms, raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume)}.png`
     } else if (raid_battle_timestamp < ts) {
       raidIcon = `/images/unknown_egg/${raid_level}.png`
