@@ -4,14 +4,14 @@ import DevicePoly from '../popups/DevicePoly'
 import deviceMarker from '../markers/device'
 import PopupContent from '../popups/Device'
 
-const DeviceTile = ({ item, ts }) => {
+const DeviceTile = ({ item, ts, iconSizes }) => {
   const [poly, setPoly] = useState(false)
   const status = ts - item.last_seen < 900 ? '0' : '1'
 
   return (
     <Marker
       position={[item.last_lat, item.last_lon]}
-      icon={deviceMarker(status)}
+      icon={deviceMarker(status, iconSizes)}
     >
       <Popup
         position={[item.last_lat, item.last_lon]}
