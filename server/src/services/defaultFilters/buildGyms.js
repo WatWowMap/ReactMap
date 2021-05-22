@@ -1,7 +1,7 @@
 const { GenericFilter } = require('../../models/index')
 
 module.exports = function buildGyms(perms, defaults) {
-  const gymFilters = {}
+  const gymFilters = { ivAnd: new GenericFilter() }
 
   if (perms.gyms) {
     for (let i = 0; i <= 3; i += 1) {
@@ -14,9 +14,9 @@ module.exports = function buildGyms(perms, defaults) {
     }
   }
   if (perms.raids) {
-    [1, 3, 5, 6].forEach(tier => {
-      gymFilters[`e${tier}`] = new GenericFilter(defaults.eggs)
-    })
+    for (let i = 1; i <= 6; i += 1) {
+      gymFilters[`e${i}`] = new GenericFilter(defaults.eggs)
+    }
   }
   return gymFilters
 }

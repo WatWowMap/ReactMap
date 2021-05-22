@@ -135,10 +135,20 @@
     "name": "1-Star Eggs",
     "level": "1Star",
     "category": "eggs"
+  },  
+  "e2": {
+    "name": "2-Star Eggs",
+    "level": "2Star",
+    "category": "eggs"
   },
   "e3": {
     "name": "3-Star Eggs",
     "level": "3Star",
+    "category": "eggs"
+  },
+  "e4": {
+    "name": "4-Star Eggs",
+    "level": "4Star",
     "category": "eggs"
   },
   "e5": {

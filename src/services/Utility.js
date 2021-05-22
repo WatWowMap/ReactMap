@@ -1,9 +1,7 @@
 import getPokemonIcon from './functions/getPokemonIcon'
 import getProperName from './functions/getProperName'
-import filterPokemon from './functions/filterPokemon'
+import menuFilter from './functions/menuFilter'
 import checkAdvFilter from './functions/checkAdvFilter'
-import filterGyms from './functions/filterGyms'
-import filterPokestops from './functions/filterPokestops'
 import getTimers from './functions/getTimeUntil'
 
 class Utility {
@@ -15,16 +13,8 @@ class Utility {
     return getProperName(word)
   }
 
-  static pokemon(tempFilters, menus, search) {
-    return filterPokemon(tempFilters, menus, search)
-  }
-
-  static gyms(tempFilters, menus, search) {
-    return filterGyms(tempFilters, menus, search)
-  }
-
-  static pokestops(tempFilters, menus, search) {
-    return filterPokestops(tempFilters, menus, search)
+  static menuFilter(tempFilters, menus, search, type) {
+    return menuFilter(tempFilters, menus, search, type)
   }
 
   static checkAdvFilter(filter) {

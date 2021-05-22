@@ -5,7 +5,7 @@ import {
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 
-import { useStore, useMasterfile } from '../../../hooks/useStore'
+import { useStore, useStatic } from '../../../hooks/useStore'
 import Utility from '../../../services/Utility'
 
 function SlideTransition(props) {
@@ -13,7 +13,7 @@ function SlideTransition(props) {
 }
 
 export default function Settings() {
-  const config = useMasterfile(state => state.config)
+  const config = useStatic(state => state.config)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
 

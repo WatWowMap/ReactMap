@@ -45,11 +45,6 @@ export default makeStyles(theme => ({
     background: 'rgb(51,51,51)',
     overflow: 'hidden',
   },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-    flexBasis: '33.33%',
-    flexShrink: 0,
-  },
   floatingBtn: {
     '& > *': {
       margin: theme.spacing(1),

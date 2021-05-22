@@ -6,7 +6,7 @@ import {
   Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem,
 } from '@material-ui/core'
 import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
-import { useStore, useMasterfile } from '../../hooks/useStore'
+import { useStore, useStatic } from '../../hooks/useStore'
 import useStyles from '../../hooks/useStyles'
 import Utility from '../../services/Utility'
 
@@ -20,7 +20,7 @@ const getTeam = teamId => {
 }
 
 export default function GymPopup({ gym, hasRaid, ts }) {
-  const { menus: { gyms: perms } } = useMasterfile(state => state.ui)
+  const { menus: { gyms: perms } } = useStatic(state => state.ui)
   const [raidExpand, setRaidExpand] = useState(hasRaid)
   const [extraExpand, setExtraExpand] = useState(false)
 
@@ -88,12 +88,12 @@ export default function GymPopup({ gym, hasRaid, ts }) {
 }
 
 const Header = ({ gym, perms }) => {
-  const hideList = useMasterfile(state => state.hideList)
-  const setHideList = useMasterfile(state => state.setHideList)
-  const excludeList = useMasterfile(state => state.excludeList)
-  const setExcludeList = useMasterfile(state => state.setExcludeList)
-  const timerList = useMasterfile(state => state.timerList)
-  const setTimerList = useMasterfile(state => state.setTimerList)
+  const hideList = useStatic(state => state.hideList)
+  const setHideList = useStatic(state => state.setHideList)
+  const excludeList = useStatic(state => state.excludeList)
+  const setExcludeList = useStatic(state => state.setExcludeList)
+  const timerList = useStatic(state => state.timerList)
+  const setTimerList = useStatic(state => state.setTimerList)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [gymName, setGymName] = useState(true)
@@ -223,8 +223,8 @@ const RaidImage = ({ gym, ts }) => {
     raid_battle_timestamp,
   } = gym
   const { icons: { path } } = useStore(state => state.settings)
-  const availableForms = useMasterfile(state => state.availableForms)
-  const { pokemon } = useMasterfile(state => state.masterfile)
+  const availableForms = useStatic(state => state.availableForms)
+  const { pokemon } = useStatic(state => state.masterfile)
 
   let src = `/images/egg/${raid_level}.png`
   if (raid_pokemon_id !== 0 && raid_pokemon_id !== null) {
@@ -343,7 +343,7 @@ const GymInfo = ({ gym }) => {
 }
 
 const RaidInfo = ({ gym }) => {
-  const { moves, pokemon } = useMasterfile(state => state.masterfile)
+  const { moves, pokemon } = useStatic(state => state.masterfile)
   const {
     raid_level, raid_pokemon_id, raid_pokemon_form, raid_pokemon_move_1, raid_pokemon_move_2,
     raid_pokemon_evolution,
@@ -529,7 +529,7 @@ const Footer = ({
 }
 
 const ExtraInfo = ({ gym }) => {
-  const { pokemon } = useMasterfile(state => state.masterfile)
+  const { pokemon } = useStatic(state => state.masterfile)
   const {
     last_modified_timestamp, updated, total_cp, guarding_pokemon_id,
   } = gym

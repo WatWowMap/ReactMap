@@ -1,7 +1,7 @@
 import React, { useCallback, memo } from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
-import { useMasterfile } from '../../hooks/useStore'
+import { useStatic } from '../../hooks/useStore'
 import Utility from '../../services/Utility'
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
@@ -10,7 +10,7 @@ import Timer from './Timer'
 const PokemonTile = ({
   item, showTimer, filters, iconSizes, path, availableForms,
 }) => {
-  const { map: { theme: { glow } } } = useMasterfile(useCallback(state => state.config))
+  const { map: { theme: { glow } } } = useStatic(useCallback(state => state.config))
   const iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, item.pokemon_id, item.form, 0, 0, item.costume)}.png`
 
   const getPvpStatus = () => {

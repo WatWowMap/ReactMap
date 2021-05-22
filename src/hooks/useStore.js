@@ -18,17 +18,19 @@ const useStore = create(persist(set => ({
   getStorage: () => localStorage,
 }))
 
-const useMasterfile = create(set => ({
+const useStatic = create(set => ({
   config: undefined,
   setConfig: (config) => set({ config }),
+  staticFilters: undefined,
+  setStaticFilters: (staticFilters) => set({ staticFilters }),
+  staticMenus: undefined,
+  setStaticMenus: (staticMenus) => set({ staticMenus }),
   available: undefined,
   setAvailable: (available) => set({ available }),
   availableForms: undefined,
   setAvailableForms: (availableForms) => set({ availableForms }),
   ui: {},
   setUi: (ui) => set({ ui }),
-  perms: {},
-  setPerms: (perms) => set({ perms }),
   masterfile: {},
   setMasterfile: (masterfile) => set({ masterfile }),
   breakpoint: false,
@@ -41,4 +43,4 @@ const useMasterfile = create(set => ({
   setTimerList: (timerList) => set({ timerList }),
 }))
 
-export { useStore, useMasterfile }
+export { useStore, useStatic }

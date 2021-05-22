@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 
-import { useMasterfile, useStore } from '../hooks/useStore'
+import { useStatic, useStore } from '../hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 
@@ -11,10 +11,10 @@ export default function Map() {
   const settings = useStore(state => state.settings)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
-  const { menus } = useMasterfile(state => state.ui)
-  const { map: { iconSizes } } = useCallback(useMasterfile(state => state.config))
+  const { menus } = useStatic(state => state.ui)
+  const { map: { iconSizes } } = useCallback(useStatic(state => state.config))
   const { path } = useStore(state => state.settings).icons
-  const availableForms = useMasterfile(state => state.availableForms)
+  const availableForms = useStatic(state => state.availableForms)
 
   const initialBounds = {
     minLat: map.getBounds()._southWest.lat - 0.01,

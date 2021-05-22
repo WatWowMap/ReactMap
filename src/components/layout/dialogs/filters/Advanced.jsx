@@ -10,16 +10,16 @@ import {
   FormControlLabel,
   IconButton,
 } from '@material-ui/core'
-import { Save, Replay } from '@material-ui/icons'
+import { Save, Replay, Clear } from '@material-ui/icons'
 
 import StringFilter from './StringFilter'
-import { useStore, useMasterfile } from '../../../../hooks/useStore'
+import { useStore, useStatic } from '../../../../hooks/useStore'
 import SliderTile from './SliderTile'
 import Size from './Size'
 
 export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) {
-  const isMobile = useMasterfile(state => state.breakpoint) === 'xs'
-  const { menus, text } = useMasterfile(state => state.ui)
+  const isMobile = useStatic(state => state.breakpoint) === 'xs'
+  const { menus, text } = useStatic(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
@@ -82,69 +82,79 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
           justify="space-between"
           alignItems="center"
         >
-          <Grid item xs={6}>
-            {text.advanced}
+          <Grid item xs={type === 'pokemon' ? 5 : 10}>
+            {type === 'pokemon' ? text.advanced : text.setSize}
           </Grid>
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
-            <FormControlLabel
-              control={(
-                <Switch
-                  checked={filters[type].legacy}
-                  onChange={handleLegacySwitch}
-                  name="adv"
-                  color="secondary"
-                  disabled={!menus[type].legacy}
-                />
-              )}
-              label={text.legacy}
-            />
+          {type === 'pokemon' && (
+            <Grid item xs={5}>
+              <FormControlLabel
+                control={(
+                  <Switch
+                    checked={filters[type].legacy}
+                    onChange={handleLegacySwitch}
+                    name="adv"
+                    color="secondary"
+                    disabled={!menus[type].legacy}
+                  />
+                )}
+                label={text.legacy}
+              />
+            </Grid>
+          )}
+          <Grid item xs={2} style={{ textAlign: 'right' }}>
+            <IconButton onClick={toggleAdvMenu(false, type, filters.filter)}>
+              <Clear />
+            </IconButton>
           </Grid>
         </Grid>
       </DialogTitle>
-      <DialogContent style={{ color: 'white' }}>
-        <Grid
-          container
-          direction="row"
-          justify="center"
-          alignItems="center"
-        >
-          {(filters[type].legacy && menus[type].legacy)
-            ? (
-              <Grid item xs={12}>
-                <StringFilter
-                  filterValues={filterValues}
-                  setFilterValues={setFilterValues}
-                />
-              </Grid>
-            )
-            : (
-              <>
-                {Object.entries(menus[type].sliders).map(category => (
-                  <Grid item xs={12} sm={6} key={category[0]}>
-                    {category[1].map(each => (
-                      <SliderTile
-                        key={each.name}
-                        filterSlide={each}
-                        handleChange={handleChange}
-                        filterValues={filterValues}
-                      />
-                    ))}
-                  </Grid>
-                ))}
-              </>
-            )}
-        </Grid>
-      </DialogContent>
+      {type === 'pokemon' && (
+        <DialogContent style={{ color: 'white' }}>
+          <Grid
+            container
+            direction="row"
+            justify="center"
+            alignItems="center"
+          >
+            {(filters[type].legacy && menus[type].legacy)
+              ? (
+                <Grid item xs={12}>
+                  <StringFilter
+                    filterValues={filterValues}
+                    setFilterValues={setFilterValues}
+                  />
+                </Grid>
+              )
+              : (
+                <>
+                  {Object.entries(menus[type].sliders).map(category => (
+                    <Grid item xs={12} sm={6} key={category[0]}>
+                      {category[1].map(each => (
+                        <SliderTile
+                          key={each.name}
+                          filterSlide={each}
+                          handleChange={handleChange}
+                          filterValues={filterValues}
+                        />
+                      ))}
+                    </Grid>
+                  ))}
+                </>
+              )}
+          </Grid>
+        </DialogContent>
+      )}
       <DialogActions>
         <Grid
           container
           justify="center"
           alignItems="center"
         >
-          <Grid item xs={8}>
+          <Grid item xs={type === 'pokemon' ? 8 : 7}>
             <Size
               filterValues={filterValues}
               handleChange={handleChange}
+              btnSize={type === 'pokemon' ? 'medium' : 'small'}
             />
           </Grid>
           {[reset, save].map(button => (

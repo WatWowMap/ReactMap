@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 const { Model } = require('objection')
-const { GenericFilter } = require('./Filters')
-// const { pokemon: masterfile } = require('../data/masterfile.json')
+const { pokemon: masterfile } = require('../data/masterfile.json')
 
 class Gym extends Model {
   static get tableName() {
@@ -19,7 +18,7 @@ class Gym extends Model {
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .andWhere('deleted', false)
 
-    const raidBosses = []
+    const raidBosses = new Set()
     const teams = []
     const eggs = []
     const slots = []
@@ -27,8 +26,7 @@ class Gym extends Model {
     Object.keys(args.filters).forEach(raid => {
       if (!onlyExcludeList.includes(raid)) {
         switch (raid.charAt(0)) {
-          default: break
-          case 'p': raidBosses.push(raid.slice(1).split('-')[0]); break
+          default: raidBosses.add(raid.split('-')[0]); break
           case 'e': eggs.push(raid.slice(1)); break
           case 't': teams.push(raid.slice(1).split('-')[0]); break
           case 'g': slots.push({
@@ -65,7 +63,7 @@ class Gym extends Model {
       }
       if (onlyRaids && raids) {
         gym.orWhere(pokemon => {
-          pokemon.whereIn('raid_pokemon_id', raidBosses)
+          pokemon.whereIn('raid_pokemon_id', [...raidBosses])
             .andWhere('raid_battle_timestamp', '<=', ts)
             .andWhere('raid_end_timestamp', '>=', ts)
             .andWhere('raid_level', '>', 0)
@@ -83,22 +81,21 @@ class Gym extends Model {
 
       for (let i = 0; i < length; i += 1) {
         const gym = queryResults[i]
-        // come back to this once I implement all raid filters
-        // if (gym.raid_pokemon_form === 0 && gym.raid_pokemon_id > 0) {
-        //   const formId = masterfile[gym.raid_pokemon_id].default_form_id
-        //   if (formId) gym.raid_pokemon_form = formId
-        // }
+        if (gym.raid_pokemon_form === 0 && gym.raid_pokemon_id > 0) {
+          const formId = masterfile[gym.raid_pokemon_id].default_form_id
+          if (formId) gym.raid_pokemon_form = formId
+        }
         if (!onlyExcludeList.includes(`t${gym.team_id}-0`)) {
           if (gym.raid_pokemon_id == 0
             && args.filters[`e${gym.raid_level}`]) {
             if (!onlyExcludeList.includes(`e${gym.raid_level}`)) {
               filteredResults.push(gym)
             }
-          } else if (args.filters[`p${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]) {
-            if (!onlyExcludeList.includes(`p${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`)) {
+          } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]) {
+            if (!onlyExcludeList.includes(`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`)) {
               filteredResults.push(gym)
             }
-          } else {
+          } else if (onlyGyms) {
             gym.raid_end_timestamp = null
             gym.raid_spawn_timestamp = null
             gym.raid_battle_timestamp = null
@@ -115,21 +112,24 @@ class Gym extends Model {
     return secondaryFilter(results)
   }
 
-  static async getAvailableRaidBosses(perms, defaults) {
-    if (perms) {
-      const ts = Math.floor((new Date()).getTime() / 1000)
-      const raids = {}
-      const results = await this.query()
-        .select('raid_pokemon_id', 'raid_pokemon_form')
-        .where('raid_end_timestamp', '>', ts)
-        .andWhere('raid_pokemon_id', '>', 0)
-        .groupBy('raid_pokemon_id', 'raid_pokemon_form')
-        .orderBy('raid_pokemon_id', 'asc')
-      results.forEach(pokemon => {
-        raids[`p${pokemon.raid_pokemon_id}-${pokemon.raid_pokemon_form}`] = new GenericFilter(defaults)
-      })
-      return raids
-    }
+  static async getAvailableRaidBosses() {
+    const ts = Math.floor((new Date()).getTime() / 1000)
+    const results = await this.query()
+      .select('raid_pokemon_id', 'raid_pokemon_form', 'raid_level')
+      .where('raid_end_timestamp', '>', ts)
+      .andWhere('raid_level', '>', 0)
+      .groupBy('raid_pokemon_id', 'raid_pokemon_form', 'raid_level')
+      .orderBy('raid_pokemon_id', 'asc')
+    return results.map(pokemon => {
+      if (pokemon.raid_pokemon_id === 0) {
+        return `e${pokemon.raid_level}`
+      }
+      if (pokemon.raid_pokemon_form === 0) {
+        const formId = masterfile[pokemon.raid_pokemon_id].default_form_id
+        if (formId) pokemon.raid_pokemon_form = formId
+      }
+      return `${pokemon.raid_pokemon_id}-${pokemon.raid_pokemon_form}`
+    })
   }
 }
 

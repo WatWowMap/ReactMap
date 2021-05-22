@@ -6,7 +6,7 @@ import {
   Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem, Avatar,
 } from '@material-ui/core'
 import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
-import { useStore, useMasterfile } from '../../hooks/useStore'
+import { useStore, useStatic } from '../../hooks/useStore'
 import useStyles from '../../hooks/useStyles'
 import Utility from '../../services/Utility'
 
@@ -24,7 +24,7 @@ const getLure = (lureId) => {
 export default function PokestopPopup({
   pokestop, ts, hasLure, hasInvasion,
 }) {
-  const { menus: { pokestops: perms } } = useMasterfile(state => state.ui)
+  const { menus: { pokestops: perms } } = useStatic(state => state.ui)
   const [invasionExpand, setInvasionExpand] = useState(false)
   const [extraExpand, setExtraExpand] = useState(false)
   const {
@@ -101,12 +101,12 @@ export default function PokestopPopup({
 }
 
 const Header = ({ pokestop, perms }) => {
-  const hideList = useMasterfile(state => state.hideList)
-  const setHideList = useMasterfile(state => state.setHideList)
-  const excludeList = useMasterfile(state => state.excludeList)
-  const setExcludeList = useMasterfile(state => state.setExcludeList)
-  const timerList = useMasterfile(state => state.timerList)
-  const setTimerList = useMasterfile(state => state.setTimerList)
+  const hideList = useStatic(state => state.hideList)
+  const setHideList = useStatic(state => state.setHideList)
+  const excludeList = useStatic(state => state.excludeList)
+  const setExcludeList = useStatic(state => state.setExcludeList)
+  const timerList = useStatic(state => state.timerList)
+  const setTimerList = useStatic(state => state.setTimerList)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [pokestopName, setPokestopName] = useState(true)
@@ -288,9 +288,9 @@ const Timer = ({ expireTime, lureName }) => {
 }
 
 const PokestopInfo = ({ pokestop }) => {
-  const { questTypes } = useMasterfile(state => state.masterfile)
+  const { questTypes } = useStatic(state => state.masterfile)
   const { icons: { path } } = useStore(state => state.settings)
-  const availableForms = useMasterfile(state => state.availableForms)
+  const availableForms = useStatic(state => state.availableForms)
   const {
     quest_reward_type, quest_target, quest_type,
     quest_item_id, item_amount, stardust_amount,
@@ -458,9 +458,9 @@ const ExtraInfo = ({ pokestop }) => {
 }
 
 const Invasion = ({ pokestop }) => {
-  const { invasions } = useMasterfile(state => state.masterfile)
+  const { invasions } = useStatic(state => state.masterfile)
   const { icons: { path } } = useStore(state => state.settings)
-  const availableForms = useMasterfile(state => state.availableForms)
+  const availableForms = useStatic(state => state.availableForms)
   const { grunt_type } = pokestop
   const invasion = invasions[grunt_type]
   const encounterNum = { first: '#1', second: '#2', third: '#3' }

@@ -9,6 +9,7 @@ const schema = require('../schema/schema')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
 const masterfile = require('../data/masterfile.json')
+const { Pokemon, Gym, Pokestop } = require('../models/index')
 
 const rootRouter = new express.Router()
 
@@ -59,6 +60,11 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.defaultFilters = await Utility.buildDefaultFilters(serverSettings.user.perms)
 
+      serverSettings.available = {
+        pokemon: await Pokemon.getAvailablePokemon(),
+        gyms: await Gym.getAvailableRaidBosses(),
+        pokestops: await Pokestop.getAvailableQuests(),
+      }
       serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, serverSettings.user.perms)
 
       serverSettings.menus = Utility.buildMenus()
