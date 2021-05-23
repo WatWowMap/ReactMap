@@ -24,8 +24,6 @@ export default function GymPopup({ gym, hasRaid, ts }) {
   const { menus: { gyms: perms } } = useStatic(state => state.ui)
   const [raidExpand, setRaidExpand] = useState(hasRaid)
   const [extraExpand, setExtraExpand] = useState(false)
-
-  console.log(gym)
   return (
     <Grid
       container

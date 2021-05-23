@@ -104,6 +104,9 @@ class Gym extends Model {
           const formId = masterfile[gym.raid_pokemon_id].default_form_id
           if (formId) gym.raid_pokemon_form = formId
         }
+        if (!gyms) {
+          gym.team_id = 0
+        }
         if (!onlyExcludeList.includes(`t${gym.team_id}-0`)) {
           if (gym.raid_pokemon_id === 0
             && args.filters[`e${gym.raid_level}`]) {
@@ -114,7 +117,7 @@ class Gym extends Model {
             if (!onlyExcludeList.includes(`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`)) {
               filteredResults.push(gym)
             }
-          } else if (onlyGyms) {
+          } else if (gyms && onlyGyms) {
             if (args.filters[`t${gym.team_id}-0`]) {
               gym.raid_end_timestamp = null
               gym.raid_spawn_timestamp = null
