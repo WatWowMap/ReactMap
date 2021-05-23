@@ -10,6 +10,7 @@ const core = gql`
     updated
     last_modified_timestamp
     ar_scan_eligible
+    key
   }
 `
 

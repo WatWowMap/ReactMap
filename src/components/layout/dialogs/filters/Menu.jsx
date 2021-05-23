@@ -58,8 +58,8 @@ export default function Menu({ filters, toggleDialog, type }) {
   }
 
   const selectAllOrNone = (show) => {
-    Object.values(filteredObj).forEach(pkmn => {
-      pkmn.enabled = show
+    Object.values(filteredObj).forEach(item => {
+      item.enabled = show
     })
     setTempFilters({ ...tempFilters, ...filteredObj })
   }
@@ -105,11 +105,19 @@ export default function Menu({ filters, toggleDialog, type }) {
         tempFilters: tempFilters[id],
         standard: filters.standard,
       })
-    } else if (id === 'ivAnd' || id === 'allSizes') {
+    } else if (id === 'ivAnd') {
       setAdvancedFilter({ open })
-      Object.entries(filteredObj).forEach(poke => {
-        const [key, { enabled }] = poke
+      Object.entries(filteredObj).forEach(item => {
+        const [key, { enabled }] = item
         filteredObj[key] = { ...newFilters, enabled }
+
+        // ugly patch for also changing gym slots with the apply to all
+        if (key.startsWith('t') && key.charAt(1) != 0) {
+          for (let i = 1; i <= 6; i += 1) {
+            const slotKey = `g${key.charAt(1)}-${i}`
+            filteredObj[slotKey] = { ...newFilters, enabled: tempFilters[slotKey].enabled }
+          }
+        }
       })
       setTempFilters({ ...tempFilters, ...filteredObj, [id]: newFilters })
     } else {

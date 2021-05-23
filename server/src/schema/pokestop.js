@@ -38,5 +38,6 @@ module.exports = new GraphQLObjectType({
     ar_scan_eligible: { type: GraphQLInt },
     stardust_amount: { type: GraphQLInt },
     item_amount: { type: GraphQLInt },
+    key: { type: GraphQLString },
   }),
 })

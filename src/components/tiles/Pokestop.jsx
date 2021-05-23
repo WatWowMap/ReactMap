@@ -15,30 +15,30 @@ const PokestopTile = ({
   return (
     <>
       {((hasQuest || hasLure || hasInvasion) || filters.allPokestops) && (
-      <Marker
-        position={[item.lat, item.lon]}
-        icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, availableForms)}
-      >
-        <Popup position={[item.lat, item.lon]}>
-          <PopupContent pokestop={item} ts={ts} hasLure={hasLure} hasInvasion={hasInvasion} hasQuest={hasQuest} />
-        </Popup>
-        {(showTimer && hasInvasion)
-          && (
-            <Timer
-              timestamp={item.incident_expire_timestamp}
-              direction={hasLure ? 'right' : 'center'}
-              label={hasLure ? 'Invasion' : false}
-            />
-          )}
-        {(showTimer && hasLure)
-          && (
-            <Timer
-              timestamp={item.lure_expire_timestamp}
-              direction={hasInvasion ? 'left' : 'center'}
-              label={hasInvasion ? 'Lure' : false}
-            />
-          )}
-      </Marker>
+        <Marker
+          position={[item.lat, item.lon]}
+          icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, availableForms)}
+        >
+          <Popup position={[item.lat, item.lon]}>
+            <PopupContent pokestop={item} ts={ts} hasLure={hasLure} hasInvasion={hasInvasion} hasQuest={hasQuest} />
+          </Popup>
+          {(showTimer && hasInvasion)
+            && (
+              <Timer
+                timestamp={item.incident_expire_timestamp}
+                direction={hasLure ? 'right' : 'center'}
+                label={hasLure ? 'Invasion' : false}
+              />
+            )}
+          {(showTimer && hasLure)
+            && (
+              <Timer
+                timestamp={item.lure_expire_timestamp}
+                direction={hasInvasion ? 'left' : 'center'}
+                label={hasInvasion ? 'Lure' : false}
+              />
+            )}
+        </Marker>
       )}
     </>
   )
@@ -54,6 +54,7 @@ const areEqual = (prev, next) => (
   && prev.item.stardust_amount === next.item.stardust_amount
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
+  && prev.filters.filter[prev.item.key].size === next.filters.filter[next.item.key].size
 )
 
 export default memo(PokestopTile, areEqual)

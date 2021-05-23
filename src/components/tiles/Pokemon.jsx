@@ -41,6 +41,7 @@ const areEqual = (prev, next) => (
   prev.item.id === next.item.id
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
+  && prev.filters.filter[`${prev.item.pokemon_id}-${prev.item.form}`].size === next.filters.filter[`${next.item.pokemon_id}-${next.item.form}`].size
 )
 
 export default memo(PokemonTile, areEqual)

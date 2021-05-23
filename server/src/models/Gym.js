@@ -42,6 +42,7 @@ class Gym extends Model {
       }
     })
     const finalTeams = []
+
     teams.forEach(team => {
       let slotCount = 0
       slots.initial.forEach(slot => {

@@ -136,6 +136,7 @@ class Pokestop extends Model {
         ]
         keyRef.forEach(category => {
           if (args.filters[category.filter]) {
+            pokestop.key = category.filter
             keyRef.forEach(otherCategory => {
               if (category.filter !== otherCategory.filter) {
                 if (!args.filters[otherCategory.filter]) {
@@ -143,7 +144,6 @@ class Pokestop extends Model {
                 }
               } else if (onlyExcludeList.includes(category.filter)) {
                 delete pokestop[category.field]
-                // delete pokestop.quest_reward_type
               }
             })
             filteredResults.add(pokestop)
@@ -193,6 +193,13 @@ class Pokestop extends Model {
       .groupBy('lure_id')
       .orderBy('lure_id')
     const finalList = []
+
+    quests.pokemon.forEach(pkmn => {
+      if (pkmn.form == 0) {
+        const formId = masterfile[pkmn.quest_pokemon_id].default_form_id
+        if (formId) pkmn.form = formId
+      }
+    })
     Object.entries(quests).forEach(questType => {
       const [type, rewards] = questType
       switch (type) {
