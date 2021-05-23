@@ -3,8 +3,8 @@ import {
   Grid, Typography, Slider, TextField,
 } from '@material-ui/core'
 
-import Utility from '../../../../services/Utility'
-import { useStatic } from '../../../../hooks/useStore'
+import Utility from '@services/Utility'
+import { useStatic } from '@hooks/useStore'
 
 export default function SliderTile({
   filterSlide: {

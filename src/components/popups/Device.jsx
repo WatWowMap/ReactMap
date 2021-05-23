@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Typography } from '@material-ui/core'
-import Utility from '../../services/Utility'
+
+import Utility from '@services/Utility'
 
 export default function DevicePopup({ device, status }) {
   return (

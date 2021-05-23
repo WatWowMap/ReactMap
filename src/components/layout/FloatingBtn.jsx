@@ -8,8 +8,8 @@ import {
 import { useMap } from 'react-leaflet'
 import Locate from 'leaflet.locatecontrol'
 
-import { useStatic } from '../../hooks/useStore'
-import useStyles from '../../hooks/useStyles'
+import { useStatic } from '@hooks/useStore'
+import useStyles from '@hooks/useStyles'
 
 export default function FloatingButtons({ toggleDrawer }) {
   const classes = useStyles()

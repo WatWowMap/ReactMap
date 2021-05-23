@@ -6,9 +6,10 @@ import {
   Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem, Avatar,
 } from '@material-ui/core'
 import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
-import { useStore, useStatic } from '../../hooks/useStore'
-import useStyles from '../../hooks/useStyles'
-import Utility from '../../services/Utility'
+
+import { useStore, useStatic } from '@hooks/useStore'
+import useStyles from '@hooks/useStyles'
+import Utility from '@services/Utility'
 
 const getLure = (lureId) => {
   switch (lureId) {

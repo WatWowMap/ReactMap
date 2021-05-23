@@ -15,9 +15,9 @@ import { HighlightOff, Clear } from '@material-ui/icons'
 import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 
-import Utility from '../../../../services/Utility'
-import { useStore, useStatic } from '../../../../hooks/useStore'
-import useStyles from '../../../../hooks/useStyles'
+import Utility from '@services/Utility'
+import { useStore, useStatic } from '@hooks/useStore'
+import useStyles from '@hooks/useStyles'
 import Advanced from './Advanced'
 import Tile from './MenuTile'
 import FilterOptions from './Options'
@@ -194,7 +194,7 @@ export default function Menu({ filters, toggleDialog, type }) {
               {allFilterMenus}
             </Grid>
           )}
-          <Grid item xs={12} sm={9} md={9}>
+          <Grid item xs={12} sm={9}>
             <Paper elevation={0} variant="outlined" className={classes.search}>
               <InputBase
                 className={classes.input}

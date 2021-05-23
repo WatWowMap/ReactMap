@@ -1,7 +1,7 @@
 import React from 'react'
 import { ButtonGroup, Button } from '@material-ui/core'
 
-import { useStatic } from '../../../../hooks/useStore'
+import { useStatic } from '@hooks/useStore'
 
 export default function Size({ filterValues, handleChange, btnSize }) {
   const { text: { sizes } } = useStatic(state => state.ui)

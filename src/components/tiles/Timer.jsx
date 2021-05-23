@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Tooltip } from 'react-leaflet'
+
 import Utility from '../../services/Utility'
 
 export default function Timer({ timestamp, direction, label }) {

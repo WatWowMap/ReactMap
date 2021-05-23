@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { Marker, Popup } from 'react-leaflet'
+
 import PopupContent from '../popups/Pokestop'
 import stopMarker from '../markers/pokestop'
 import Timer from './Timer'

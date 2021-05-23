@@ -52,5 +52,16 @@ module.exports = {
     node: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },
+    'import/resolver': {
+      alias: {
+        map: [
+          ['@components', './src/components/'],
+          ['@services', './src/services/'],
+          ['@hooks', './src/hooks/'],
+          ['@assets', './src/assets/'],
+        ],
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    },
   },
 }

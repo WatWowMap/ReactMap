@@ -1,8 +1,8 @@
 import React, { useCallback, memo } from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
-import { useStatic } from '../../hooks/useStore'
-import Utility from '../../services/Utility'
+import { useStatic } from '@hooks/useStore'
+import Utility from '@services/Utility'
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
 import Timer from './Timer'

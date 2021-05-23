@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { Polygon, Popup } from 'react-leaflet'
+
 import PopupContent from '../popups/S2cell'
 import marker from '../markers/s2cell'
 

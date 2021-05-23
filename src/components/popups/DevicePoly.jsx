@@ -1,6 +1,7 @@
 import React, { memo } from 'react'
 import { Polyline, Polygon } from 'react-leaflet'
-import { useStatic } from '../../hooks/useStore'
+
+import { useStatic } from '@hooks/useStore'
 
 const DevicePoly = ({ device }) => {
   const { map: { theme } } = useStatic(state => state.config)

@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { useStore, useStatic } from '../../hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
 import getPokemonIcon from './getPokemonIcon'
 
 export default function filterPokemon(tempFilters, menus, search, type) {

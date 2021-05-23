@@ -3,8 +3,8 @@ import MarkerClusterGroup from 'react-leaflet-markercluster'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { useStatic } from '../hooks/useStore'
-import Query from '../services/Query'
+import { useStatic } from '@hooks/useStore'
+import Query from '@services/Query'
 import * as index from './tiles/index'
 
 export default function QueryData({

@@ -8,9 +8,10 @@ import {
 import {
   Check, Clear, ExpandMore, Map, MoreVert,
 } from '@material-ui/icons'
-import { useStore, useStatic } from '../../hooks/useStore'
-import useStyles from '../../hooks/useStyles'
-import Utility from '../../services/Utility'
+
+import { useStore, useStatic } from '@hooks/useStore'
+import useStyles from '@hooks/useStyles'
+import Utility from '@services/Utility'
 
 export default function PokemonPopup({ pokemon, iconUrl }) {
   const {

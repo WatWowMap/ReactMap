@@ -12,8 +12,8 @@ import {
 } from '@material-ui/core'
 import { Save, Replay, Clear } from '@material-ui/icons'
 
+import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from './StringFilter'
-import { useStore, useStatic } from '../../../../hooks/useStore'
 import SliderTile from './SliderTile'
 import Size from './Size'
 

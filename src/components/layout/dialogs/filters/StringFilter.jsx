@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { TextField } from '@material-ui/core'
-import Utility from '../../../../services/Utility'
+import Utility from '@services/Utility'
 
 export default function StringFilter({ filterValues, setFilterValues }) {
   const [validation, setValidation] = useState({

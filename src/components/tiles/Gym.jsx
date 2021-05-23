@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import React, { memo } from 'react'
 import { Marker, Popup } from 'react-leaflet'
+
 import gymMarker from '../markers/gym'
 import PopupContent from '../popups/Gym'
 import Timer from './Timer'

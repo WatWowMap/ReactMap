@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { Circle, Popup } from 'react-leaflet'
+
 import PopupContent from '../popups/Spawnpoint'
 import marker from '../markers/spawnpoint'
 

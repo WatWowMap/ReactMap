@@ -4,9 +4,9 @@ import extend from 'extend'
 import { ThemeProvider } from '@material-ui/styles'
 import { useMediaQuery } from '@material-ui/core'
 
-import { useStore, useStatic } from '../hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
+import createTheme from '@assets/mui/theme'
 import Map from './Map'
-import createTheme from '../assets/mui/theme'
 
 export default function ConfigSettings({ serverSettings }) {
   document.title = serverSettings.config.map.headerTitle

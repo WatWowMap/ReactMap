@@ -1,7 +1,8 @@
 import React, { Fragment, useState } from 'react'
 import { Grid, Typography, IconButton } from '@material-ui/core'
 import { Map } from '@material-ui/icons'
-import { useStore } from '../../hooks/useStore'
+
+import { useStore } from '@hooks/useStore'
 
 export default function PortalPopup({ portal }) {
   const { navigation: { url } } = useStore(state => state.settings)

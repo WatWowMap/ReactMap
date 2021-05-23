@@ -6,8 +6,8 @@ import {
   Tune, Ballot, Check, Clear, Save, HelpOutline, FormatSize,
 } from '@material-ui/icons'
 
+import { useStatic } from '@hooks/useStore'
 import Help from '../help/Filters'
-import { useStatic } from '../../../../hooks/useStore'
 
 export default function Footer({
   selectAllOrNone, toggleDialog, tempFilters, toggleDrawer, isMobile, toggleAdvMenu, type,

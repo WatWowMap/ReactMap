@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { Polygon, Popup, Tooltip } from 'react-leaflet'
+
 import PopupContent from '../../popups/SubmissionCell'
 import typeStyle from '../../markers/typeCell'
 

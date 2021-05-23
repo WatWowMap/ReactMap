@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 
-import { useStatic, useStore } from '../hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 
