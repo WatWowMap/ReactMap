@@ -15,6 +15,7 @@ module.exports = function generateUi(filters, perms) {
     sizes: ['sm', 'md', 'lg', 'xl'],
     sliderInputs: ['min', 'max'],
     setSize: 'Set Icon Size',
+    slotSelection: 'Slot Selection',
   }
   const ignoredKeys = ['enabled', 'filter']
 

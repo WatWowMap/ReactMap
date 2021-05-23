@@ -176,7 +176,9 @@ export default function filterPokemon(tempFilters, menus, search, type) {
 
   if (type === 'gyms') {
     Object.keys(filter).forEach(id => {
-      if (id !== 'ivAnd' && Number.isNaN(parseInt(id.charAt(0)))) {
+      if (id !== 'ivAnd'
+        && Number.isNaN(parseInt(id.charAt(0)))
+        && !id.startsWith('g')) {
         total += 1
         const gym = masterfile.gyms[id]
         switch (switchKey) {

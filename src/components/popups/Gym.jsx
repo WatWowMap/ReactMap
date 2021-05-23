@@ -25,6 +25,7 @@ export default function GymPopup({ gym, hasRaid, ts }) {
   const [raidExpand, setRaidExpand] = useState(hasRaid)
   const [extraExpand, setExtraExpand] = useState(false)
 
+  console.log(gym)
   return (
     <Grid
       container

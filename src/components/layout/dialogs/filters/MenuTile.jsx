@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Grid, IconButton, Typography } from '@material-ui/core'
 import {
-  Check, Clear, Tune, FormatSize,
+  Check, Clear, Tune, FormatSize, Settings,
 } from '@material-ui/icons'
 
 export default function MenuTile({
@@ -10,7 +10,7 @@ export default function MenuTile({
 }) {
   const [name, setName] = useState(true)
   const {
-    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type,
+    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type, toggleSlotsMenu,
   } = data
 
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -55,11 +55,21 @@ export default function MenuTile({
     </IconButton>
   )
 
+  const getAdvMenuIcon = () => {
+    if (type === 'pokemon') {
+      return <Tune />
+    }
+    if (item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0) {
+      return <Settings />
+    }
+    return <FormatSize />
+  }
   const advMenu = (
     <IconButton
-      onClick={toggleAdvMenu(true, item.id)}
+      onClick={(item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0)
+        ? toggleSlotsMenu(true, item.id.charAt(1)) : toggleAdvMenu(true, item.id)}
     >
-      {type === 'pokemon' ? <Tune /> : <FormatSize />}
+      {getAdvMenuIcon()}
     </IconButton>
   )
 

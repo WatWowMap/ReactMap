@@ -22,6 +22,7 @@ import Advanced from './Advanced'
 import Tile from './MenuTile'
 import FilterOptions from './Options'
 import Footer from './Footer'
+import SlotSelection from './SlotSelection'
 
 export default function Menu({ filters, toggleDialog, type }) {
   const classes = useStyles()
@@ -42,6 +43,10 @@ export default function Menu({ filters, toggleDialog, type }) {
     id: '',
     tempFilters: {},
     default: filters.standard,
+  })
+  const [slotsMenu, setSlotsMenu] = useState({
+    open: false,
+    id: 0,
   })
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState(type === 'pokemon' ? 'others' : 'categories')
@@ -113,6 +118,23 @@ export default function Menu({ filters, toggleDialog, type }) {
     }
   }
 
+  const toggleSlotsMenu = (open, id, newFilters) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return
+    }
+    if (open) {
+      setSlotsMenu({
+        open,
+        id,
+      })
+    } else if (newFilters) {
+      setSlotsMenu({ open })
+      setTempFilters({ ...newFilters })
+    } else {
+      setSlotsMenu({ open })
+    }
+  }
+
   const handleReset = () => {
     const resetPayload = {}
     Object.keys(menus[type].filters).forEach(category => {
@@ -166,6 +188,16 @@ export default function Menu({ filters, toggleDialog, type }) {
           legacy={filters.legacy}
         />
       </Dialog>
+      <Dialog
+        open={slotsMenu.open}
+        onClose={toggleSlotsMenu(false)}
+      >
+        <SlotSelection
+          teamId={slotsMenu.id}
+          toggleSlotsMenu={toggleSlotsMenu}
+          tempFilters={tempFilters}
+        />
+      </Dialog>
       <DialogTitle className={classes.filterHeader}>
         {Utility.getProperName(type)} {text.filterSettings}
         <IconButton
@@ -213,7 +245,7 @@ export default function Menu({ filters, toggleDialog, type }) {
                 <HighlightOff style={{ color: '#848484' }} />
               </IconButton>
             </Paper>
-            <div style={{ height: isMobile ? '54vh' : '60vh' }}>
+            <div style={{ minHeight: isMobile ? '54vh' : '60vh' }}>
               <AutoSizer defaultHeight={1080} defaultWidth={1920}>
                 {({ width, height }) => (
                   <FixedSizeGrid
@@ -231,6 +263,7 @@ export default function Menu({ filters, toggleDialog, type }) {
                       tempFilters,
                       setTempFilters,
                       toggleAdvMenu,
+                      toggleSlotsMenu,
                       type,
                     }}
                   >

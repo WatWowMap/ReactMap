@@ -21,7 +21,12 @@ class Gym extends Model {
     const raidBosses = new Set()
     const teams = []
     const eggs = []
-    const slots = []
+    const slots = {
+      initial: [],
+      1: [],
+      2: [],
+      3: [],
+    }
 
     Object.keys(args.filters).forEach(raid => {
       if (!onlyExcludeList.includes(raid)) {
@@ -29,13 +34,27 @@ class Gym extends Model {
           default: raidBosses.add(raid.split('-')[0]); break
           case 'e': eggs.push(raid.slice(1)); break
           case 't': teams.push(raid.slice(1).split('-')[0]); break
-          case 'g': slots.push({
+          case 'g': slots.initial.push({
             team: raid.slice(1).split('-')[0],
             slots: 6 - raid.slice(1).split('-')[1],
           }); break
         }
       }
     })
+    const finalTeams = []
+    teams.forEach(team => {
+      let slotCount = 0
+      slots.initial.forEach(slot => {
+        if (slot.team === team) {
+          slotCount += 1
+          slots[team].push(slot.slots)
+        }
+      })
+      if (slotCount === 6 || team == 0) {
+        finalTeams.push(team)
+      }
+    })
+    delete slots.initial
 
     query.andWhere(gym => {
       if (onlyExEligible && gyms) {
@@ -50,13 +69,13 @@ class Gym extends Model {
       }
       if (onlyGyms && gyms) {
         gym.orWhere(team => {
-          team.whereIn('team_id', teams)
+          team.whereIn('team_id', finalTeams)
         })
-        slots.forEach(slot => {
-          if (!teams.includes(slot.team)) {
+        Object.keys(slots).forEach(team => {
+          if (slots[team].length > 0) {
             gym.orWhere(gymSlot => {
-              gymSlot.where('team_id', slot.team)
-                .andWhere('availble_slots', slot.slots)
+              gymSlot.where('team_id', team)
+                .whereIn('availble_slots', slots[team])
             })
           }
         })
@@ -86,7 +105,7 @@ class Gym extends Model {
           if (formId) gym.raid_pokemon_form = formId
         }
         if (!onlyExcludeList.includes(`t${gym.team_id}-0`)) {
-          if (gym.raid_pokemon_id == 0
+          if (gym.raid_pokemon_id === 0
             && args.filters[`e${gym.raid_level}`]) {
             if (!onlyExcludeList.includes(`e${gym.raid_level}`)) {
               filteredResults.push(gym)
@@ -96,12 +115,14 @@ class Gym extends Model {
               filteredResults.push(gym)
             }
           } else if (onlyGyms) {
-            gym.raid_end_timestamp = null
-            gym.raid_spawn_timestamp = null
-            gym.raid_battle_timestamp = null
-            gym.raid_pokemon_id = null
-            gym.raid_level = null
-            filteredResults.push(gym)
+            if (args.filters[`t${gym.team_id}-0`]) {
+              gym.raid_end_timestamp = null
+              gym.raid_spawn_timestamp = null
+              gym.raid_battle_timestamp = null
+              gym.raid_pokemon_id = null
+              gym.raid_level = null
+              filteredResults.push(gym)
+            }
           }
         }
       }
