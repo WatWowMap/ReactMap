@@ -5,7 +5,7 @@ import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 
-export default function Map() {
+export default function Map({ serverSettings: { config: { map: { minZoom, maxZoom } } } }) {
   const map = useMap()
   const filters = useStore(state => state.filters)
   const settings = useStore(state => state.settings)
@@ -35,6 +35,8 @@ export default function Map() {
         key={settings.tileServers.name}
         attribution={settings.tileServers.attribution}
         url={settings.tileServers.url}
+        minZoom={minZoom}
+        maxZoom={maxZoom}
       />
       {Object.entries({ ...menus, ...menus.wayfarer, ...menus.admin }).map(category => {
         const [item, value] = category

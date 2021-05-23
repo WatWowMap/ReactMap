@@ -9,7 +9,7 @@ class Pokestop extends Model {
   static async getAllPokestops(args, perms) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const {
-      lures: lurePerms, quests: questPerms, invasions: invasionPerms,
+      lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms,
     } = perms
     const {
       onlyAllPokestops, onlyLures, onlyQuests, onlyInvasions, onlyExcludeList,
@@ -35,7 +35,7 @@ class Pokestop extends Model {
     }
 
     // returns everything if all pokestops are on
-    if (onlyAllPokestops) {
+    if (onlyAllPokestops && pokestopPerms) {
       const results = await query
       return results.map(result => parseRewards(result))
     }
@@ -150,6 +150,7 @@ class Pokestop extends Model {
           }
         })
       }
+
       return filteredResults
     }
     return secondaryFilter(results)

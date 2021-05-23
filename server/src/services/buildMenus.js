@@ -8,7 +8,7 @@ const pokemonFilters = {
   generations: ['Kanto', 'Johto', 'Hoenn', 'Sinnoh', 'Unova', 'Kalos', 'Alola', 'Galar'],
   types: ['Bug', 'Dark', 'Dragon', 'Electric', 'Fairy', 'Fighting', 'Fire', 'Flying', 'Ghost', 'Grass', 'Ground', 'Ice', 'Normal', 'Poison', 'Psychic', 'Rock', 'Steel', 'Water'],
   forms: ['altForms', 'Alola', 'Galarian'],
-  rarity: ['Common', 'Uncommon', 'Rare', 'UltraRare', 'Regional', 'Event', 'Legendary', 'Mythical'],
+  rarity: ['common', 'uncommon', 'rare', 'ultraRare', 'regional', 'event', 'legendary', 'mythical'],
   others: ['reverse', 'selected', 'unselected', 'onlyAvailable'],
 }
 

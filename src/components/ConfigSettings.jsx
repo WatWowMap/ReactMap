@@ -77,7 +77,7 @@ export default function ConfigSettings({ serverSettings }) {
         zoomControl={false}
         preferCanvas
       >
-        {serverSettings.user.perms.map && <Map />}
+        {serverSettings.user.perms.map && <Map serverSettings={serverSettings} />}
       </MapContainer>
     </ThemeProvider>
   )

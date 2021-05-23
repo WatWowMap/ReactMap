@@ -17,17 +17,18 @@
 
 ## PreReqs
 - NodeJS (Recommend using V12.*)
-- MySQL (Must use 8.0+)
+- MySQL (Only 8.0+ has been tested)
 - Yarn (npm install -g yarn)
 
 ## Installation Instructions
 1. Clone the repo
 2. Open up the directory (`cd ReactMap`)
 3. `yarn install`
-4. Generate Masterfile `yarn generate`
+4. Generate Masterfile `yarn generate` (You will want to do this whenever new Pokemon/assets are released)
 5. Create your config (`cp server/src/configs/config.example.json server/src/configs/config.json`)
+- There are additional configs options available in `server/src/configs/default.json` that can be utilized by copying them over into your config file. Be sure to maintain the same object structure when copying options over
 6. Run your migrations (`yarn migrate:latest`)
-- This will create a `users` table, would highly recommend putting this in your manual db that has nests/portals/sessions/etc 
+- This will create a `users` table, would recommend putting this in your manual db that has nests/portals/sessions/etc 
 - A sessions table will automatically be created in the specified db after the next step, be sure you've selected the correct db in the config!
 - `yarn migrate:rollback` will rollback any migrations, be sure you know what you're doing to avoid data loss!
 7. `yarn start`
@@ -42,23 +43,14 @@
 - Nests
 - Translatable Text
 - More precise quest popups
-- Other various popups
-- Device paths/polygons
-- AR Quest Eligibility
-- Move gym slots into advanced gym menu for each team
-- Stardust and other item support
-- Filter all Quests/Raids/Invasions instead of only available
-- Fix stretched markers
-- Iconhtml to reduce double markers
+- AR Quest Eligibility for Stops
 - Built in event viewer
 - Expand the help modals
 - Import/Export buttons
 - Custom Favicon Support
-- Adjustable icon sizes
 - Persist some menu selections
 - Category headers in filter menus
 - Add tutorial Popups
-- Glowing Pokemon
 
 ## Credits
 - [MapJS](https://github.com/WatWowMap/MapJS)
