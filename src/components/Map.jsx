@@ -54,7 +54,7 @@ export default function Map() {
               enabled = true
             } break
           case 'pokestops':
-            if ((filters[item].pokestops && value.pokestops)
+            if ((filters[item].allPokestops && value.allPokestops)
               || (filters[item].lures && value.lures)
               || (filters[item].invasions && value.invasions)
               || (filters[item].quests && value.quests)) {

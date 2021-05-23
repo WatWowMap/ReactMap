@@ -12,7 +12,7 @@ class Pokestop extends Model {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms,
     } = perms
     const {
-      onlyPokestops, onlyLures, onlyQuests, onlyInvasions, onlyExcludeList,
+      onlyAllPokestops, onlyLures, onlyQuests, onlyInvasions, onlyExcludeList,
     } = args.filters
 
     const query = this.query()
@@ -35,7 +35,7 @@ class Pokestop extends Model {
     }
 
     // returns everything if all pokestops are on
-    if (onlyPokestops) {
+    if (onlyAllPokestops) {
       const results = await query
       return results.map(result => parseRewards(result))
     }
@@ -143,10 +143,7 @@ class Pokestop extends Model {
                 }
               } else if (onlyExcludeList.includes(category.filter)) {
                 delete pokestop[category.field]
-                delete pokestop.quest_reward_type
-                delete pokestop.quest_conditions
-                delete pokestop.quest_target
-                delete pokestop.quest_type
+                // delete pokestop.quest_reward_type
               }
             })
             filteredResults.add(pokestop)

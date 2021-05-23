@@ -22,15 +22,14 @@ const getLure = (lureId) => {
 }
 
 export default function PokestopPopup({
-  pokestop, ts, hasLure, hasInvasion,
+  pokestop, ts, hasLure, hasInvasion, hasQuest,
 }) {
   const { menus: { pokestops: perms } } = useStatic(state => state.ui)
   const [invasionExpand, setInvasionExpand] = useState(false)
   const [extraExpand, setExtraExpand] = useState(false)
   const {
-    incident_expire_timestamp, quest_type, lure_expire_timestamp, lure_id,
+    incident_expire_timestamp, lure_expire_timestamp, lure_id,
   } = pokestop
-  const hasQuest = quest_type && perms.quests
 
   return (
     <Grid
@@ -41,7 +40,12 @@ export default function PokestopPopup({
       alignItems="center"
       spacing={1}
     >
-      <Header pokestop={pokestop} perms={perms} />
+      <Header
+        pokestop={pokestop}
+        perms={perms}
+        hasInvasion={hasInvasion}
+        hasQuest={hasQuest}
+      />
       <Grid item xs={12}>
         <Collapse in={!invasionExpand} timeout="auto" unmountOnExit>
           <Grid
@@ -100,7 +104,9 @@ export default function PokestopPopup({
   )
 }
 
-const Header = ({ pokestop, perms }) => {
+const Header = ({
+  pokestop, perms, hasInvasion, hasQuest,
+}) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
   const excludeList = useStatic(state => state.excludeList)
@@ -133,7 +139,7 @@ const Header = ({ pokestop, perms }) => {
   const excludeQuest = () => {
     setAnchorEl(null)
     switch (quest_reward_type) {
-      default: setExcludeList([...excludeList, `p${quest_pokemon_id}-${quest_form_id}`]); break
+      default: setExcludeList([...excludeList, `${quest_pokemon_id}-${quest_form_id}`]); break
       case 2: setExcludeList([...excludeList, `q${quest_item_id}`]); break
       case 3: setExcludeList([...excludeList, `d${stardust_amount}`]); break
       case 12: setExcludeList([...excludeList, `m${mega_pokemon_id}-${mega_amount}`]); break
@@ -154,10 +160,10 @@ const Header = ({ pokestop, perms }) => {
     { name: 'Hide', action: handleHide },
   ]
 
-  if (perms.quests && quest_reward_type) {
+  if (perms.quests && hasQuest) {
     options.push({ name: 'Exclude Quest', action: excludeQuest })
   }
-  if (perms.invasions && grunt_type) {
+  if (perms.invasions && hasInvasion) {
     options.push(
       { name: 'Exclude Invasion', action: excludeInvasion },
       { name: 'Timer', action: handleTimer },

@@ -43,7 +43,6 @@ class Query {
     })
 
     if (query === 'get') query += 'Pokestops'
-
     return pokestopIndex[query]
   }
 

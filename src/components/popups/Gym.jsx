@@ -126,7 +126,7 @@ const Header = ({ gym, perms }) => {
     if (raid_pokemon_id == 0) {
       setExcludeList([...excludeList, `e${raid_level}`])
     } else {
-      setExcludeList([...excludeList, `p${raid_pokemon_id}-${raid_pokemon_form}`])
+      setExcludeList([...excludeList, `${raid_pokemon_id}-${raid_pokemon_form}`])
     }
   }
 
