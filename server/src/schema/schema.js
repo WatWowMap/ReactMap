@@ -109,8 +109,8 @@ const RootQuery = new GraphQLObjectType({
             .select(['*', ref('id')
               .castTo('CHAR')
               .as('id')])
-            .whereBetween('center_lat', [args.minLat, args.maxLat])
-            .andWhereBetween('center_lon', [args.minLon, args.maxLon])
+            .whereBetween('center_lat', [args.minLat - 0.01, args.maxLat + 0.01])
+            .andWhereBetween('center_lon', [args.minLon - 0.01, args.maxLon + 0.01])
           results.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, 'polygon'))
           return results
         }

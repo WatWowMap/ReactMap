@@ -4,6 +4,7 @@ const logger = require('morgan')
 const compression = require('compression')
 const session = require('express-session')
 const passport = require('passport')
+const rateLimit = require('express-rate-limit')
 require('./db/initialization')
 
 const { sessionStore } = require('./services/session-store.js')
@@ -15,6 +16,27 @@ const app = express()
 if (config.devOptions.enabled) {
   app.use(logger('dev'))
 }
+
+const RateLimitTime = config.api.rateLimit.time * 60 * 1000
+const MaxRequestsPerHour = config.api.rateLimit.requests * (RateLimitTime / 1000)
+
+const rateLimitOptions = {
+  windowMs: RateLimitTime, // Time window in milliseconds
+  max: MaxRequestsPerHour, // Start blocking after x requests
+  headers: true,
+  message: {
+    status: 429, // optional, of course
+    limiter: true,
+    type: 'error',
+    message: `Too many requests from this IP, please try again in ${config.api.rateLimit.time} minutes.`,
+  },
+  /* eslint-disable no-unused-vars */
+  onLimitReached: (req, res, options) => {
+    console.warn('user is being rate limited')
+    res.redirect('/429')
+  },
+}
+const requestRateLimiter = rateLimit(rateLimitOptions)
 
 app.use(compression())
 
@@ -40,7 +62,7 @@ if (config.discord.enabled) {
   app.use(passport.session())
 }
 
-app.use(rootRouter)
+app.use(rootRouter, requestRateLimiter)
 
 app.listen(config.port, config.interface, () => {
   // eslint-disable-next-line no-console

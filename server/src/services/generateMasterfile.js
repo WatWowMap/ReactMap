@@ -4,6 +4,7 @@ const Fs = require('fs-extra')
 const defaultRarity = require('../data/defaultRarity.json')
 const weatherTypes = require('../data/weatherTypes.json')
 const gymMeta = require('../data/gymMeta.json')
+const { rarity: adminRarity } = require('./config')
 
 function fetchJson(url) {
   return new Promise(resolve => {
@@ -50,12 +51,16 @@ function fetchJson(url) {
   const getRarityLevel = (id, pkmn) => {
     let rarity
     for (const [tier, pokemon] of Object.entries(defaultRarity)) {
-      if (pokemon.includes(parseInt(id))) {
+      if (adminRarity[tier].length > 0) {
+        if (adminRarity[tier].includes((parseInt(id)))) {
+          rarity = tier
+        }
+      } else if (pokemon.includes(parseInt(id))) {
         rarity = tier
       }
     }
-    if (pkmn.legendary) rarity = 'Legendary'
-    if (pkmn.mythic) rarity = 'Mythical'
+    if (pkmn.legendary) rarity = 'legendary'
+    if (pkmn.mythic) rarity = 'mythical'
     return rarity
   }
 

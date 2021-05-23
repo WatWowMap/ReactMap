@@ -6,7 +6,7 @@ import stopMarker from '../markers/pokestop'
 import Timer from './Timer'
 
 const PokestopTile = ({
-  item, ts, showTimer, filters, iconSizes, path, availableForms,
+  item, ts, showTimer, filters, iconSizes, path, availableForms, perms,
 }) => {
   const hasInvasion = item.incident_expire_timestamp >= ts
   const hasLure = item.lure_expire_timestamp >= ts
@@ -14,31 +14,34 @@ const PokestopTile = ({
 
   return (
     <>
-      {((hasQuest || hasLure || hasInvasion) || filters.allPokestops) && (
-        <Marker
-          position={[item.lat, item.lon]}
-          icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, availableForms)}
-        >
-          <Popup position={[item.lat, item.lon]}>
-            <PopupContent pokestop={item} ts={ts} hasLure={hasLure} hasInvasion={hasInvasion} hasQuest={hasQuest} />
-          </Popup>
-          {(showTimer && hasInvasion)
-            && (
-              <Timer
-                timestamp={item.incident_expire_timestamp}
-                direction={hasLure ? 'right' : 'center'}
-                label={hasLure ? 'Invasion' : false}
-              />
-            )}
-          {(showTimer && hasLure)
-            && (
-              <Timer
-                timestamp={item.lure_expire_timestamp}
-                direction={hasInvasion ? 'left' : 'center'}
-                label={hasInvasion ? 'Lure' : false}
-              />
-            )}
-        </Marker>
+      {(((hasQuest && perms.quests)
+        || (hasLure && perms.lures)
+        || (hasInvasion && perms.invasions))
+        || (filters.allPokestops && perms.allPokestops)) && (
+          <Marker
+            position={[item.lat, item.lon]}
+            icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, availableForms)}
+          >
+            <Popup position={[item.lat, item.lon]}>
+              <PopupContent pokestop={item} ts={ts} hasLure={hasLure} hasInvasion={hasInvasion} hasQuest={hasQuest} />
+            </Popup>
+            {(showTimer && hasInvasion)
+              && (
+                <Timer
+                  timestamp={item.incident_expire_timestamp}
+                  direction={hasLure ? 'right' : 'center'}
+                  label={hasLure ? 'Invasion' : false}
+                />
+              )}
+            {(showTimer && hasLure)
+              && (
+                <Timer
+                  timestamp={item.lure_expire_timestamp}
+                  direction={hasInvasion ? 'left' : 'center'}
+                  label={hasInvasion ? 'Lure' : false}
+                />
+              )}
+          </Marker>
       )}
     </>
   )

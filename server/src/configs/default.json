@@ -9,11 +9,10 @@
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
     "maxSessions": 5,
-    "ratelimit": {
+    "rateLimit": {
       "time": 60,
-      "requests": 100
+      "requests": 1000
     },
-    "maxSearchResults": 20,
     "pvpMinCp": {
       "gl": 1400,
       "ul": 2400
@@ -49,16 +48,6 @@
       "portals": 14,
       "pokestops": 14,
       "pokemon": 15
-    },
-    "userSettingsDefaults": {
-      "useName": true,
-      "onlyShopTop5": false,
-      "megaStats": true,
-      "experimentalStats": false,
-      "l40stats": true,
-      "l41stats": false,
-      "l50stats": false,
-      "l51stats": false
     },
     "defaultFilters": {
       "gyms": {
@@ -114,7 +103,7 @@
         "zoomLevel": 10
       },
       "weather": {
-        "enabled": false
+        "enabled": true
       },
       "scanAreas": {
         "enabled": false

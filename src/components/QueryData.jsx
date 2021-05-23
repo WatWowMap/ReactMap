@@ -107,6 +107,7 @@ export default function QueryData({
               showTimer={timerList.includes(each.id)}
               path={path}
               availableForms={availableForms}
+              perms={perms}
             />
           )
         }
