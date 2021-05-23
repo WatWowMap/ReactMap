@@ -12,7 +12,7 @@ export default function gymMarker(gym, ts, hasRaid, iconSizes, filters, path, av
   let filledSlots = 6 - availble_slots || 0
   if (!teamId) filledSlots = 0
 
-  let filterId = team_id === 0 ? `t${team_id}-0` : `g${team_id}-${filledSlots || 0}`
+  let filterId = teamId === 0 ? `t${teamId}-0` : `g${teamId}-${filledSlots || 0}`
   const gymSize = filters.filter[filterId] ? iconSizes[filters.filter[filterId].size] : iconSizes.md
   const iconAnchorY = gymSize * 0.849
   let popupAnchorY = -8 - iconAnchorY
@@ -20,7 +20,7 @@ export default function gymMarker(gym, ts, hasRaid, iconSizes, filters, path, av
   let iconHtml = `
     <div class="marker-image-holder">
       <img 
-        src="/images/${inBattle}/${team_id}_${filledSlots}.png"
+        src="/images/${inBattle}/${teamId}_${filledSlots}.png"
         style="width:${gymSize}px; 
         height:${gymSize}px;"
       />

@@ -45,12 +45,15 @@ const areEqual = (prev, next) => {
     if (prev.item.team_id == 0) {
       filterId = `t${prev.item.team_id}-0`
     }
-    const firstCheck = prev.filters.filter[filterId].size === next.filters.filter[filterId].size
+    let firstCheck = true
+    if (prev.team_id) {
+      firstCheck = prev.filters.filter[filterId].size === next.filters.filter[filterId].size
+    }
     if (prev.item.raid_end_timestamp >= prev.ts && next.item.raid_end_timestamp >= next.ts) {
-      if (prev.item.raid_battle_timestamp >= prev.ts && next.item.raid_battle_timestamp >= next.ts) {
-        return firstCheck && prev.filters.filter[`e${prev.item.raid_level}`].size === next.filters.filter[`e${next.item.raid_level}`].size
+      if (prev.item.raid_pokemon_id > 0 && next.item.raid_pokemon_id > 0) {
+        return firstCheck && prev.filters.filter[`${prev.item.raid_pokemon_id}-${prev.item.raid_pokemon_form}`].size === next.filters.filter[`${next.item.raid_pokemon_id}-${next.item.raid_pokemon_form}`].size
       }
-      return firstCheck && prev.filters.filter[`${prev.item.raid_pokemon_id}-${prev.item.raid_pokemon_form}`].size === next.filters.filter[`${next.item.raid_pokemon_id}-${next.item.raid_pokemon_form}`].size
+      return firstCheck && prev.filters.filter[`e${prev.item.raid_level}`].size === next.filters.filter[`e${next.item.raid_level}`].size
     }
     return firstCheck
   }

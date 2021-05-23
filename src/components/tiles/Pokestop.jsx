@@ -54,7 +54,7 @@ const areEqual = (prev, next) => (
   && prev.item.stardust_amount === next.item.stardust_amount
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
-  && prev.filters.filter[prev.item.key].size === next.filters.filter[next.item.key].size
+  && prev.filters.filter[prev.item.key || 's0'].size === next.filters.filter[next.item.key || 's0'].size
 )
 
 export default memo(PokestopTile, areEqual)
