@@ -8,13 +8,13 @@ import {
 import { useMap } from 'react-leaflet'
 import Locate from 'leaflet.locatecontrol'
 
-import { useMasterfile } from '../../hooks/useStore'
-import useStyles from '../../hooks/useStyles'
+import { useStatic } from '@hooks/useStore'
+import useStyles from '@hooks/useStyles'
 
 export default function FloatingButtons({ toggleDrawer }) {
   const classes = useStyles()
-  const { map: { feedbackLink, enableFeedback } } = useMasterfile(state => state.config)
-  const breakpoint = useMasterfile(state => state.breakpoint)
+  const { map: { feedbackLink, enableFeedback } } = useStatic(state => state.config)
+  const breakpoint = useStatic(state => state.breakpoint)
   const [open, setOpen] = React.useState(false)
 
   const handleClickOpen = () => {

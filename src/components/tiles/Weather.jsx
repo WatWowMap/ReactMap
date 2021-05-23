@@ -1,5 +1,6 @@
 import React from 'react'
 import { Popup, Polyline, Marker } from 'react-leaflet'
+
 import weatherMarker from '../markers/weather'
 import PopupContent from '../popups/Weather'
 

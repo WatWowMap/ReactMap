@@ -4,9 +4,9 @@ import extend from 'extend'
 import { ThemeProvider } from '@material-ui/styles'
 import { useMediaQuery } from '@material-ui/core'
 
-import { useStore, useMasterfile } from '../hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
+import createTheme from '@assets/mui/theme'
 import Map from './Map'
-import createTheme from '../assets/mui/theme'
 
 export default function ConfigSettings({ serverSettings }) {
   document.title = serverSettings.config.map.headerTitle
@@ -18,12 +18,14 @@ export default function ConfigSettings({ serverSettings }) {
   const setZoom = useStore(state => state.setZoom)
   const setMenus = useStore(state => state.setMenus)
 
-  const setAvailable = useMasterfile(state => state.setAvailable)
-  const setConfig = useMasterfile(state => state.setConfig)
-  const setAvailableForms = useMasterfile(state => state.setAvailableForms)
-  const setMasterfile = useMasterfile(state => state.setMasterfile)
-  const setUi = useMasterfile(state => state.setUi)
-  const setBreakpoint = useMasterfile(state => state.setBreakpoint)
+  const setStaticMenus = useStatic(state => state.setStaticMenus)
+  const setAvailable = useStatic(state => state.setAvailable)
+  const setConfig = useStatic(state => state.setConfig)
+  const setAvailableForms = useStatic(state => state.setAvailableForms)
+  const setMasterfile = useStatic(state => state.setMasterfile)
+  const setUi = useStatic(state => state.setUi)
+  const setBreakpoint = useStatic(state => state.setBreakpoint)
+  const setStaticFilters = useStatic(state => state.setStaticFilters)
 
   const updateObjState = (defaults, category) => {
     const localState = JSON.parse(localStorage.getItem('local-state'))
@@ -54,7 +56,9 @@ export default function ConfigSettings({ serverSettings }) {
   setUi(serverSettings.ui)
   setConfig(serverSettings.config)
   setMasterfile(serverSettings.masterfile)
+  setStaticMenus(serverSettings.menus)
   setMenus(updateObjState(serverSettings.menus, 'menus'))
+  setStaticFilters(serverSettings.defaultFilters)
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
   setSettings(updateObjState(serverSettings.settings, 'settings'))
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))

@@ -1,10 +1,10 @@
 import React from 'react'
 import { ButtonGroup, Button } from '@material-ui/core'
 
-import { useMasterfile } from '../../../../hooks/useStore'
+import { useStatic } from '@hooks/useStore'
 
-export default function Size({ filterValues, handleChange }) {
-  const { text: { sizes } } = useMasterfile(state => state.ui)
+export default function Size({ filterValues, handleChange, btnSize }) {
+  const { text: { sizes } } = useStatic(state => state.ui)
 
   return (
     <ButtonGroup>
@@ -15,6 +15,7 @@ export default function Size({ filterValues, handleChange }) {
             key={size}
             onClick={() => handleChange('size', size)}
             color={color}
+            size={btnSize}
           >
             {size}
           </Button>

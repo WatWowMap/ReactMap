@@ -1,14 +1,16 @@
 /* eslint-disable no-nested-ternary */
-import React from 'react'
+import React, { useState } from 'react'
 import { Grid, IconButton, Typography } from '@material-ui/core'
-import { Check, Clear, Tune } from '@material-ui/icons'
-import SizeDropdown from './SizeDropdown'
+import {
+  Check, Clear, Tune, FormatSize, Settings,
+} from '@material-ui/icons'
 
 export default function MenuTile({
   data, rowIndex, columnIndex, style,
 }) {
+  const [name, setName] = useState(true)
   const {
-    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type,
+    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type, toggleSlotsMenu,
   } = data
 
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -26,12 +28,14 @@ export default function MenuTile({
       : 'rgba(240, 240, 240, 0.01)'
 
   const image = (
-    <div
+    <img
       className="grid-item"
+      src={item.url}
       style={{
-        height: isMobile ? 50 : 75,
-        backgroundImage: item.url,
+        maxHeight: isMobile ? 50 : 75,
+        maxWidth: isMobile ? 50 : 75,
       }}
+      onError={(e) => { e.target.onerror = null; e.target.src = '/images/item/0.png' }}
     />
   )
   const selection = (
@@ -51,25 +55,30 @@ export default function MenuTile({
     </IconButton>
   )
 
-  const advMenu = type === 'pokemon' ? (
+  const getAdvMenuIcon = () => {
+    if (type === 'pokemon') {
+      return <Tune />
+    }
+    if (item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0) {
+      return <Settings />
+    }
+    return <FormatSize />
+  }
+  const advMenu = (
     <IconButton
-      onClick={toggleAdvMenu(true, item.id)}
+      onClick={(item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0)
+        ? toggleSlotsMenu(true, item.id.charAt(1)) : toggleAdvMenu(true, item.id)}
     >
-      <Tune style={{ color: 'white' }} />
+      {getAdvMenuIcon()}
     </IconButton>
-  ) : (
-    <SizeDropdown
-      tempFilters={tempFilters}
-      setTempFilters={setTempFilters}
-      itemId={item.id}
-    />
   )
 
   const nameTitle = (
     <Typography
-      variant={isMobile ? 'h6' : 'subtitle1'}
+      variant="subtitle2"
       align="center"
-      noWrap
+      noWrap={name}
+      onClick={() => setName(!name)}
     >
       {item.name}
     </Typography>

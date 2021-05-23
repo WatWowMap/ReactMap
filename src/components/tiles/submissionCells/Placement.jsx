@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { Polygon } from 'react-leaflet'
+
 import placementStyle from '../../markers/placementCell'
 
 const PlacementTile = ({ cell }) => (

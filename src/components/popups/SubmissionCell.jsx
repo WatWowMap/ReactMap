@@ -1,5 +1,5 @@
-import { Typography } from '@material-ui/core'
 import React from 'react'
+import { Typography } from '@material-ui/core'
 
 export default function SubmissionCellPopup({ cell }) {
   const gymThreshold = [2, 6, 20]

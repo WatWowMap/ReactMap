@@ -1,11 +1,12 @@
 /* eslint-disable camelcase */
 import React, { useState, useEffect } from 'react'
 import { Grid, Typography } from '@material-ui/core'
-import { useMasterfile } from '../../hooks/useStore'
-import Utility from '../../services/Utility'
+
+import { useStatic } from '@hooks/useStore'
+import Utility from '@services/Utility'
 
 export default function WeatherPopup({ weather }) {
-  const { weatherTypes } = useMasterfile(state => state.masterfile)
+  const { weatherTypes } = useStatic(state => state.masterfile)
   const { gameplay_condition, updated } = weather
 
   return (

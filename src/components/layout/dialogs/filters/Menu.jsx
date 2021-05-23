@@ -15,20 +15,22 @@ import { HighlightOff, Clear } from '@material-ui/icons'
 import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 
-import Utility from '../../../../services/Utility'
-import { useStore, useMasterfile } from '../../../../hooks/useStore'
-import useStyles from '../../../../hooks/useStyles'
+import Utility from '@services/Utility'
+import { useStore, useStatic } from '@hooks/useStore'
+import useStyles from '@hooks/useStyles'
 import Advanced from './Advanced'
 import Tile from './MenuTile'
 import FilterOptions from './Options'
 import Footer from './Footer'
+import SlotSelection from './SlotSelection'
 
 export default function Menu({ filters, toggleDialog, type }) {
   const classes = useStyles()
   const menus = useStore(state => state.menus)
   const setMenus = useStore(state => state.setMenus)
-  const breakpoint = useMasterfile(state => state.breakpoint)
-  const { text } = useMasterfile(state => state.ui)
+  const breakpoint = useStatic(state => state.breakpoint)
+  const { text } = useStatic(state => state.ui)
+  const { [type]: staticFilters } = useStatic(state => state.staticMenus)
 
   let columnCount = breakpoint === 'sm' ? 3 : 5
   if (breakpoint === 'xs') columnCount = 1
@@ -42,18 +44,22 @@ export default function Menu({ filters, toggleDialog, type }) {
     tempFilters: {},
     default: filters.standard,
   })
+  const [slotsMenu, setSlotsMenu] = useState({
+    open: false,
+    id: 0,
+  })
   const [search, setSearch] = useState('')
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(type === 'pokemon' ? 'others' : 'categories')
 
-  const { filteredObj, filteredArr, count } = Utility[type](tempFilters, menus[type], search)
+  const { filteredObj, filteredArr, count } = Utility.menuFilter(tempFilters, menus, search, type)
 
   const handleAccordion = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
   }
 
   const selectAllOrNone = (show) => {
-    Object.values(filteredObj).forEach(pkmn => {
-      pkmn.enabled = show
+    Object.values(filteredObj).forEach(item => {
+      item.enabled = show
     })
     setTempFilters({ ...tempFilters, ...filteredObj })
   }
@@ -63,9 +69,12 @@ export default function Menu({ filters, toggleDialog, type }) {
       ...menus,
       [type]: {
         ...menus[type],
-        [name]: {
-          ...menus[type][name],
-          [event.target.name]: event.target.checked,
+        filters: {
+          ...menus[type].filters,
+          [name]: {
+            ...menus[type].filters[name],
+            [event.target.name]: event.target.checked,
+          },
         },
       },
     })
@@ -98,9 +107,17 @@ export default function Menu({ filters, toggleDialog, type }) {
       })
     } else if (id === 'ivAnd') {
       setAdvancedFilter({ open })
-      Object.entries(filteredObj).forEach(poke => {
-        const [key, { enabled }] = poke
+      Object.entries(filteredObj).forEach(item => {
+        const [key, { enabled }] = item
         filteredObj[key] = { ...newFilters, enabled }
+
+        // ugly patch for also changing gym slots with the apply to all
+        if (key.startsWith('t') && key.charAt(1) != 0) {
+          for (let i = 1; i <= 6; i += 1) {
+            const slotKey = `g${key.charAt(1)}-${i}`
+            filteredObj[slotKey] = { ...newFilters, enabled: tempFilters[slotKey].enabled }
+          }
+        }
       })
       setTempFilters({ ...tempFilters, ...filteredObj, [id]: newFilters })
     } else {
@@ -109,29 +126,50 @@ export default function Menu({ filters, toggleDialog, type }) {
     }
   }
 
+  const toggleSlotsMenu = (open, id, newFilters) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return
+    }
+    if (open) {
+      setSlotsMenu({
+        open,
+        id,
+      })
+    } else if (newFilters) {
+      setSlotsMenu({ open })
+      setTempFilters({ ...newFilters })
+    } else {
+      setSlotsMenu({ open })
+    }
+  }
+
   const handleReset = () => {
     const resetPayload = {}
-    Object.keys(menus[type]).forEach(category => {
+    Object.keys(menus[type].filters).forEach(category => {
       resetPayload[category] = {}
-      Object.keys(menus[type][category]).forEach(filter => {
+      Object.keys(menus[type].filters[category]).forEach(filter => {
         resetPayload[category][filter] = false
       })
     })
-    setMenus({ ...menus, [type]: resetPayload })
+    setMenus({ ...menus, [type]: { ...menus[type], filters: resetPayload } })
   }
 
-  const allFilterMenus = Object.entries(menus[type]).map(filter => {
+  const allFilterMenus = Object.entries(staticFilters.filters).map(filter => {
     const [category, options] = filter
-    return (
-      <FilterOptions
-        key={category}
-        name={category}
-        options={options}
-        handleChange={handleChange}
-        expanded={expanded}
-        handleAccordion={handleAccordion}
-      />
-    )
+    if (Object.keys(options).length > 1) {
+      return (
+        <FilterOptions
+          key={category}
+          name={category}
+          options={options}
+          userSelection={menus[type].filters[category]}
+          handleChange={handleChange}
+          expanded={expanded}
+          handleAccordion={handleAccordion}
+        />
+      )
+    }
+    return null
   })
   allFilterMenus.push(
     <Grid item key="reset">
@@ -148,7 +186,6 @@ export default function Menu({ filters, toggleDialog, type }) {
   return (
     <>
       <Dialog
-        fullWidth
         open={advancedFilter.open}
         onClose={toggleAdvMenu(false)}
       >
@@ -157,6 +194,16 @@ export default function Menu({ filters, toggleDialog, type }) {
           toggleAdvMenu={toggleAdvMenu}
           type={type}
           legacy={filters.legacy}
+        />
+      </Dialog>
+      <Dialog
+        open={slotsMenu.open}
+        onClose={toggleSlotsMenu(false)}
+      >
+        <SlotSelection
+          teamId={slotsMenu.id}
+          toggleSlotsMenu={toggleSlotsMenu}
+          tempFilters={tempFilters}
         />
       </Dialog>
       <DialogTitle className={classes.filterHeader}>
@@ -178,9 +225,8 @@ export default function Menu({ filters, toggleDialog, type }) {
             <Grid
               container
               item
-              sm={4}
-              md={3}
-              spacing={2}
+              sm={3}
+              spacing={1}
               direction="column"
               justify="flex-start"
               alignItems="flex-start"
@@ -188,7 +234,7 @@ export default function Menu({ filters, toggleDialog, type }) {
               {allFilterMenus}
             </Grid>
           )}
-          <Grid item xs={12} sm={8} md={9}>
+          <Grid item xs={12} sm={9}>
             <Paper elevation={0} variant="outlined" className={classes.search}>
               <InputBase
                 className={classes.input}
@@ -207,7 +253,7 @@ export default function Menu({ filters, toggleDialog, type }) {
                 <HighlightOff style={{ color: '#848484' }} />
               </IconButton>
             </Paper>
-            <div style={{ height: isMobile ? '64vh' : '73vh' }}>
+            <div style={{ minHeight: isMobile ? '54vh' : '60vh' }}>
               <AutoSizer defaultHeight={1080} defaultWidth={1920}>
                 {({ width, height }) => (
                   <FixedSizeGrid
@@ -225,6 +271,7 @@ export default function Menu({ filters, toggleDialog, type }) {
                       tempFilters,
                       setTempFilters,
                       toggleAdvMenu,
+                      toggleSlotsMenu,
                       type,
                     }}
                   >
@@ -240,6 +287,7 @@ export default function Menu({ filters, toggleDialog, type }) {
         selectAllOrNone={selectAllOrNone}
         toggleDialog={toggleDialog}
         tempFilters={tempFilters}
+        setTempFilters={setTempFilters}
         toggleDrawer={toggleDrawer}
         isMobile={isMobile}
         toggleAdvMenu={toggleAdvMenu}

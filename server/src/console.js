@@ -1,5 +1,5 @@
 const repl = require('repl')
-const knexConnection = require('./db/initialization')
+require('./db/initialization')
 const models = require('./models/index.js')
 
 const replServer = repl.start({
@@ -7,6 +7,3 @@ const replServer = repl.start({
 })
 
 replServer.context.models = models
-replServer.on('close', () => {
-  knexConnection.destroy()
-})

@@ -3,8 +3,8 @@ import {
   Grid, Typography, Slider, TextField,
 } from '@material-ui/core'
 
-import Utility from '../../../../services/Utility'
-import { useMasterfile } from '../../../../hooks/useStore'
+import Utility from '@services/Utility'
+import { useStatic } from '@hooks/useStore'
 
 export default function SliderTile({
   filterSlide: {
@@ -12,7 +12,7 @@ export default function SliderTile({
   }, handleChange, filterValues,
 }) {
   const [tempValues, setTempValues] = useState(filterValues[shortName])
-  const { text: { sliderInputs } } = useMasterfile(state => state.ui)
+  const { text: { sliderInputs } } = useStatic(state => state.ui)
 
   useEffect(() => {
     setTempValues(filterValues[shortName])

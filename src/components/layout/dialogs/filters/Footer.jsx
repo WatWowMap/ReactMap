@@ -3,16 +3,16 @@ import {
   Button, Typography, IconButton, Grid, Dialog,
 } from '@material-ui/core'
 import {
-  Menu, Ballot, Check, Clear, Save, HelpOutline,
+  Tune, Ballot, Check, Clear, Save, HelpOutline, FormatSize,
 } from '@material-ui/icons'
 
+import { useStatic } from '@hooks/useStore'
 import Help from '../help/Filters'
-import { useMasterfile } from '../../../../hooks/useStore'
 
 export default function Footer({
   selectAllOrNone, toggleDialog, tempFilters, toggleDrawer, isMobile, toggleAdvMenu, type,
 }) {
-  const { text } = useMasterfile(state => state.ui)
+  const { text } = useStatic(state => state.ui)
   const [helpDialog, setHelpDialog] = useState(false)
 
   const toggleHelp = () => {
@@ -25,7 +25,7 @@ export default function Footer({
       <IconButton
         onClick={toggleHelp}
       >
-        <HelpOutline style={{ color: 'white' }} />
+        <HelpOutline />
       </IconButton>
     ),
     text: (
@@ -43,18 +43,18 @@ export default function Footer({
       <IconButton
         onClick={toggleDrawer(true)}
       >
-        <Ballot style={{ color: 'white' }} />
+        <Ballot />
       </IconButton>
     ),
   }
 
-  const advMenu = type === 'pokemon' ? {
+  const advMenu = {
     key: 'advMenu',
     icon: (
       <IconButton
         onClick={toggleAdvMenu(true, 'ivAnd')}
       >
-        <Menu style={{ color: 'white' }} />
+        {type === 'pokemon' ? <Tune /> : <FormatSize />}
       </IconButton>
     ),
     text: (
@@ -64,7 +64,7 @@ export default function Footer({
         </Typography>
       </Button>
     ),
-  } : { key: 'advMenu' }
+  }
 
   const disableAll = {
     key: 'disableAll',

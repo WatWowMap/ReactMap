@@ -8,9 +8,10 @@ import {
 import {
   Check, Clear, ExpandMore, Map, MoreVert,
 } from '@material-ui/icons'
-import { useStore, useMasterfile } from '../../hooks/useStore'
-import useStyles from '../../hooks/useStyles'
-import Utility from '../../services/Utility'
+
+import { useStore, useStatic } from '@hooks/useStore'
+import useStyles from '@hooks/useStyles'
+import Utility from '@services/Utility'
 
 export default function PokemonPopup({ pokemon, iconUrl }) {
   const {
@@ -20,8 +21,8 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
     rankSum,
   } = pokemon
 
-  const { menus: { pokemon: perms } } = useMasterfile(state => state.ui)
-  const { pokemon: { [pokemon_id]: metaData } } = useMasterfile(state => state.masterfile)
+  const { menus: { pokemon: perms } } = useStatic(state => state.ui)
+  const { pokemon: { [pokemon_id]: metaData } } = useStatic(state => state.masterfile)
 
   const [expanded, setExpanded] = useState(false)
   const [pvpExpand, setPvpExpand] = useState(false)
@@ -80,12 +81,12 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
 }
 
 const Header = ({ pokemon, iconUrl, metaData }) => {
-  const hideList = useMasterfile(state => state.hideList)
-  const setHideList = useMasterfile(state => state.setHideList)
-  const excludeList = useMasterfile(state => state.excludeList)
-  const setExcludeList = useMasterfile(state => state.setExcludeList)
-  const timerList = useMasterfile(state => state.timerList)
-  const setTimerList = useMasterfile(state => state.setTimerList)
+  const hideList = useStatic(state => state.hideList)
+  const setHideList = useStatic(state => state.setHideList)
+  const excludeList = useStatic(state => state.excludeList)
+  const setExcludeList = useStatic(state => state.setExcludeList)
+  const timerList = useStatic(state => state.timerList)
+  const setTimerList = useStatic(state => state.setTimerList)
 
   const [anchorEl, setAnchorEl] = useState(false)
 
@@ -345,7 +346,7 @@ const Footer = ({
 }
 
 const ExtraInfo = ({ pokemon, perms }) => {
-  const { moves } = useMasterfile(state => state.masterfile)
+  const { moves } = useStatic(state => state.masterfile)
 
   const {
     move_1, move_2, weight, size, first_seen_timestamp, updated, iv,
@@ -403,7 +404,7 @@ const PvpInfo = ({ league, data, onlyTop5 }) => {
   if (data === null) return ''
 
   const { path } = useStore(state => state.settings).icons
-  const availableForms = useMasterfile(state => state.availableForms)
+  const availableForms = useStatic(state => state.availableForms)
 
   const rows = []
   let capsExist = false

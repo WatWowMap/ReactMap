@@ -2,12 +2,12 @@
   "compilerOptions": {
     "target": "es2017",
     "allowSyntheticDefaultImports": false,
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "paths": {
-      "@assets/*": ["./src/assets/*"],
-      "@components/*": ["./src/components/*"],
-      "@services/*": ["./src/services/*"],
-      "@hooks/*": ["./src/hooks/*"],
+      "@assets/*": ["./assets/*"],
+      "@components/*": ["./components/*"],
+      "@services/*": ["./services/*"],
+      "@hooks/*": ["./hooks/*"],
     }
   },
   "exclude": ["node_modules", "dist"],

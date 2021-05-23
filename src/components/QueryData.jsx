@@ -3,18 +3,18 @@ import MarkerClusterGroup from 'react-leaflet-markercluster'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { useMasterfile } from '../hooks/useStore'
-import Query from '../services/Query'
+import { useStatic } from '@hooks/useStore'
+import Query from '@services/Query'
 import * as index from './tiles/index'
 
 export default function QueryData({
   bounds, filters, onMove, perms, category, iconSizes, path, availableForms,
 }) {
   const Component = index[category]
-  const zoomLevel = useMasterfile(state => state.config).map.clusterZoomLevels[category] || 1
-  const hideList = useMasterfile(state => state.hideList)
-  const excludeList = useMasterfile(state => state.excludeList)
-  const timerList = useMasterfile(state => state.timerList)
+  const zoomLevel = useStatic(state => state.config).map.clusterZoomLevels[category] || 1
+  const hideList = useStatic(state => state.hideList)
+  const excludeList = useStatic(state => state.excludeList)
+  const timerList = useStatic(state => state.timerList)
 
   const map = useMap()
   const ts = Math.floor((new Date()).getTime() / 1000)
@@ -34,7 +34,7 @@ export default function QueryData({
     Object.entries(requestedFilters.filter).forEach(filter => {
       const [id, specifics] = filter
 
-      if (specifics.enabled) {
+      if (specifics && specifics.enabled) {
         trimmed[id] = specifics
       } else if (category === 'pokemon' && filters.legacy) {
         trimmed.onlyLegacyExclude.push(id)

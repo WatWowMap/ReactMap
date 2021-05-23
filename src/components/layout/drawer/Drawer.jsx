@@ -10,15 +10,15 @@ import WithSliders from './WithSliders'
 import SingularItem from './SingularItem'
 import Utility from '../../../services/Utility'
 import useStyles from '../../../hooks/useStyles'
-import { useStore, useMasterfile } from '../../../hooks/useStore'
+import { useStore, useStatic } from '../../../hooks/useStore'
 
 export default function DrawerMenu({
   drawer, toggleDrawer, filters, setFilters, toggleDialog,
 }) {
   const classes = useStyles()
-  const { menus } = useMasterfile(state => state.ui)
+  const { menus } = useStatic(state => state.ui)
   const { drawer: { name } } = useStore(state => state.settings)
-  const { map: { title } } = useMasterfile(state => state.config)
+  const { map: { title } } = useStatic(state => state.config)
   const [expanded, setExpanded] = useState(false)
 
   const handleChange = (panel) => (event, isExpanded) => {

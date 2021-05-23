@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 
-import Fetch from '../services/Fetch'
+import Fetch from '@services/Fetch'
 import Auth from './Auth'
 
 const client = new ApolloClient({

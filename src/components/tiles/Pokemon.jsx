@@ -1,8 +1,8 @@
 import React, { useCallback, memo } from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
-import { useMasterfile } from '../../hooks/useStore'
-import Utility from '../../services/Utility'
+import { useStatic } from '@hooks/useStore'
+import Utility from '@services/Utility'
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
 import Timer from './Timer'
@@ -10,7 +10,7 @@ import Timer from './Timer'
 const PokemonTile = ({
   item, showTimer, filters, iconSizes, path, availableForms,
 }) => {
-  const { map: { theme: { glow } } } = useMasterfile(useCallback(state => state.config))
+  const { map: { theme: { glow } } } = useStatic(useCallback(state => state.config))
   const iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, item.pokemon_id, item.form, 0, 0, item.costume)}.png`
 
   const getPvpStatus = () => {
@@ -41,6 +41,7 @@ const areEqual = (prev, next) => (
   prev.item.id === next.item.id
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
+  && prev.filters.filter[`${prev.item.pokemon_id}-${prev.item.form}`].size === next.filters.filter[`${next.item.pokemon_id}-${next.item.form}`].size
 )
 
 export default memo(PokemonTile, areEqual)

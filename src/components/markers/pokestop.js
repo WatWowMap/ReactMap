@@ -66,7 +66,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
       case 5: iconUrl = '/images/item/-4.png'; break
       case 6: iconUrl = '/images/item/-5.png'; break
       case 7:
-        filterId = `p${pokemonId}-${formId}`
+        filterId = `${pokemonId}-${formId}`
         iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, pokemonId, formId, 0, genderId, costumeId, shiny)}.png`; break
       case 8: iconUrl = '/images/item/-6.png'; break
       case 11: iconUrl = '/images/item/-7.png'; break

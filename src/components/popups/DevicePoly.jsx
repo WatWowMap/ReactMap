@@ -1,9 +1,10 @@
 import React, { memo } from 'react'
 import { Polyline, Polygon } from 'react-leaflet'
-import { useMasterfile } from '../../hooks/useStore'
+
+import { useStatic } from '@hooks/useStore'
 
 const DevicePoly = ({ device }) => {
-  const { map: { theme } } = useMasterfile(state => state.config)
+  const { map: { theme } } = useStatic(state => state.config)
   const parsedRoute = JSON.parse(device.route)
   const routeCheck = parsedRoute.length === 1 ? parsedRoute[0] : parsedRoute
   const poly = routeCheck.map(route => [route.lat, route.lon])

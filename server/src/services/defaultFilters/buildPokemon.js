@@ -1,23 +1,22 @@
 /* eslint-disable no-restricted-syntax */
 const masterfile = require('../../data/masterfile.json')
-const { PokemonFilter, GenericFilter, Pokemon } = require('../../models/index')
+const { PokemonFilter, GenericFilter } = require('../../models/index')
 
-module.exports = async function buildPokemon(perms, type) {
-  const pokemon = {}
-  if (type === 'pokemon') {
-    pokemon.ivAnd = new PokemonFilter()
+module.exports = function buildPokemon(defaults) {
+  const pokemon = {
+    full: { ivAnd: new PokemonFilter() },
+    raids: { ivAnd: new GenericFilter() },
+    quests: { ivAnd: new GenericFilter() },
   }
-  const available = await Pokemon.getAvailablePokemon()
   for (const [i, pkmn] of Object.entries(masterfile.pokemon)) {
     for (const j of Object.keys(pkmn.forms)) {
-      if (type === 'pokemon') {
-        if (available.includes(`${i}-${j}`)) {
-          pkmn.forms[j].available = true
-        }
-        pokemon[`${i}-${j}`] = new PokemonFilter()
-      } else if (perms) {
-        pokemon[`p${i}-${j}`] = new GenericFilter()
-      }
+      pokemon.full[`${i}-${j}`] = new PokemonFilter()
+      pokemon.raids[`${i}-${j}`] = new GenericFilter(defaults.gyms.pokemon)
+      pokemon.quests[`${i}-${j}`] = new GenericFilter(defaults.pokestops.pokemon)
+    }
+    if (pkmn.temp_evolutions) {
+      pokemon.quests[`m${i}-10`] = new GenericFilter(defaults.pokestops.megaEnergy)
+      pokemon.quests[`m${i}-20`] = new GenericFilter(defaults.pokestops.megaEnergy)
     }
   }
   return pokemon

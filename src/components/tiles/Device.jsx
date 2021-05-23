@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react'
 import { Marker, Popup } from 'react-leaflet'
+
 import DevicePoly from '../popups/DevicePoly'
 import deviceMarker from '../markers/device'
 import PopupContent from '../popups/Device'

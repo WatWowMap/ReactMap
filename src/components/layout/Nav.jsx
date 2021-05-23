@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Dialog from '@material-ui/core/Dialog'
 
-import { useStore } from '../../hooks/useStore'
+import { useStore } from '@hooks/useStore'
 import FloatingBtn from './FloatingBtn'
 import Drawer from './drawer/Drawer'
 import Menu from './dialogs/filters/Menu'

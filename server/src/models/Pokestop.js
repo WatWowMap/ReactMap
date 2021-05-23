@@ -1,4 +1,5 @@
 const { Model, raw } = require('objection')
+const { pokemon: masterfile } = require('../data/masterfile.json')
 
 class Pokestop extends Model {
   static get tableName() {
@@ -11,7 +12,7 @@ class Pokestop extends Model {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms,
     } = perms
     const {
-      onlyPokestops, onlyLures, onlyQuests, onlyInvasions, onlyExcludeList,
+      onlyAllPokestops, onlyLures, onlyQuests, onlyInvasions, onlyExcludeList,
     } = args.filters
 
     const query = this.query()
@@ -19,7 +20,7 @@ class Pokestop extends Model {
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .andWhere('deleted', false)
 
-    const parseJson = pokestop => {
+    const parseRewards = pokestop => {
       if (pokestop.quest_reward_type) {
         const { info } = JSON.parse(pokestop.quest_rewards)[0]
         switch (pokestop.quest_reward_type) {
@@ -34,9 +35,9 @@ class Pokestop extends Model {
     }
 
     // returns everything if all pokestops are on
-    if (onlyPokestops) {
+    if (onlyAllPokestops) {
       const results = await query
-      return results.map(result => parseJson(result))
+      return results.map(result => parseRewards(result))
     }
 
     const stardust = []
@@ -48,12 +49,11 @@ class Pokestop extends Model {
     // preps arrays for interested objects
     Object.keys(args.filters).forEach(pokestop => {
       switch (pokestop.charAt(0)) {
-        default: break
+        default: pokemon.push(pokestop.split('-')[0]); break
         case 'd': stardust.push(pokestop.slice(1).split('-')[0]); break
         case 'i': invasions.push(pokestop.slice(1)); break
         case 'l': lures.push(pokestop.slice(1)); break
         case 'm': energy.push(pokestop.slice(1)); break
-        case 'p': pokemon.push(pokestop.slice(1).split('-')[0]); break
         case 'q': items.push(pokestop.slice(1)); break
       }
     })
@@ -103,10 +103,14 @@ class Pokestop extends Model {
       const filteredResults = new Set()
       for (let i = 0; i < length; i += 1) {
         const pokestop = queryResults[i]
-        parseJson(pokestop)
+        parseRewards(pokestop)
+        if (pokestop.quest_form_id === 0) {
+          const formId = masterfile[pokestop.quest_pokemon_id].default_form_id
+          if (formId) pokestop.quest_form_id = formId
+        }
         const keyRef = [
           {
-            filter: `p${pokestop.quest_pokemon_id}-${pokestop.quest_form_id}`,
+            filter: `${pokestop.quest_pokemon_id}-${pokestop.quest_form_id}`,
             field: 'quest_pokemon_id',
           },
           {
@@ -130,9 +134,9 @@ class Pokestop extends Model {
             field: 'stardust_amount',
           },
         ]
-
         keyRef.forEach(category => {
           if (args.filters[category.filter]) {
+            pokestop.key = category.filter
             keyRef.forEach(otherCategory => {
               if (category.filter !== otherCategory.filter) {
                 if (!args.filters[otherCategory.filter]) {
@@ -140,10 +144,6 @@ class Pokestop extends Model {
                 }
               } else if (onlyExcludeList.includes(category.filter)) {
                 delete pokestop[category.field]
-                delete pokestop.quest_reward_type
-                delete pokestop.quest_conditions
-                delete pokestop.quest_target
-                delete pokestop.quest_type
               }
             })
             filteredResults.add(pokestop)
@@ -156,6 +156,7 @@ class Pokestop extends Model {
   }
 
   static async getAvailableQuests() {
+    const ts = Math.floor((new Date()).getTime() / 1000)
     const quests = {}
     quests.items = await this.query()
       .select('quest_item_id')
@@ -185,7 +186,32 @@ class Pokestop extends Model {
       .distinct('grunt_type')
       .whereNotNull('grunt_type')
       .orderBy('grunt_type', 'asc')
-    return quests
+    quests.lures = await this.query()
+      .select('lure_id')
+      .whereNotNull('lure_id')
+      .andWhere('lure_expire_timestamp', '>=', ts)
+      .groupBy('lure_id')
+      .orderBy('lure_id')
+    const finalList = []
+
+    quests.pokemon.forEach(pkmn => {
+      if (pkmn.form == 0) {
+        const formId = masterfile[pkmn.quest_pokemon_id].default_form_id
+        if (formId) pkmn.form = formId
+      }
+    })
+    Object.entries(quests).forEach(questType => {
+      const [type, rewards] = questType
+      switch (type) {
+        default: rewards.forEach(reward => finalList.push(`${reward.quest_pokemon_id}-${reward.form}`)); break
+        case 'items': rewards.forEach(reward => finalList.push(`q${reward.quest_item_id}`)); break
+        case 'mega': rewards.forEach(reward => finalList.push(`m${reward.id}-${reward.amount}`)); break
+        case 'invasions': rewards.forEach(reward => finalList.push(`i${reward.grunt_type}`)); break
+        case 'stardust': rewards.forEach(reward => finalList.push(`d${reward.amount}`)); break
+        case 'lures': rewards.forEach(reward => finalList.push(`l${reward.lure_id}`)); break
+      }
+    })
+    return finalList
   }
 }
 
