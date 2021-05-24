@@ -2,7 +2,7 @@
 import { useStore, useStatic } from '@hooks/useStore'
 import getPokemonIcon from './getPokemonIcon'
 
-export default function filterPokemon(tempFilters, menus, search, type) {
+export default function menuFilter(tempFilters, menus, search, type) {
   const masterfile = useStatic(state => state.masterfile)
   const availableForms = useStatic(state => state.availableForms)
   const { path } = useStore(state => state.settings).icons
@@ -44,7 +44,7 @@ export default function filterPokemon(tempFilters, menus, search, type) {
     const questCheck = (!Number.isNaN(parseInt(id.charAt(0))) || id.startsWith('m') || id.startsWith('q') || id.startsWith('d')) && stopPerms.quests
     const invasionsCheck = id.startsWith('i') && stopPerms.invasions
 
-    if (stopCheck || lureCheck || questCheck || invasionsCheck) {
+    if ((stopCheck || lureCheck || questCheck || invasionsCheck) && stop) {
       show += 1
       let urlBuilder
       switch (id.charAt(0)) {
@@ -64,7 +64,7 @@ export default function filterPokemon(tempFilters, menus, search, type) {
   const addGym = (id, gym) => {
     const raidCheck = (!Number.isNaN(parseInt(id.charAt(0))) && gymPerms.raids) || (id.startsWith('e') && gymPerms.raids)
     const gymCheck = (id.startsWith('g') && gymPerms.gyms) || (id.startsWith('t') && gymPerms.gyms)
-    if (raidCheck || gymCheck) {
+    if ((raidCheck || gymCheck) && gym) {
       show += 1
       let urlBuilder
       switch (id.charAt(0)) {
