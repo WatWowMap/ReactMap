@@ -38,6 +38,30 @@
 3. `yarn dev` in one, starts the server with nodemon
 4. `yarn watch` in the other, this automatically re-compiles your bundle for faster development.
 
+## PM2 Ecosystem Sample
+```js
+  {
+      name: 'ReactMap',
+      script: 'index.js',
+      cwd: '/home/test/ReactMap/server/src',
+      instances: 1,
+      autorestart: true,
+      watch: ['configs/', 'dist/'],
+      max_memory_restart: '1G',
+      out_file: 'NULL'
+  }
+```
+
+## Updating
+1. `git pull`
+2. `yarn install`
+3. `yarn generate`
+Without PM2:
+- `yarn start`
+With PM2: 
+- `yarn build`
+- `pm2 restart ReactMap`
+
 ## Coming Soon
 - Scan Areas
 - Nests
