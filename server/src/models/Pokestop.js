@@ -1,5 +1,6 @@
 const { Model, raw } = require('objection')
 const { pokemon: masterfile } = require('../data/masterfile.json')
+const fetchQuests = require('../services/functions/fetchQuests')
 
 class Pokestop extends Model {
   static get tableName() {
@@ -158,7 +159,9 @@ class Pokestop extends Model {
 
   static async getAvailableQuests() {
     const ts = Math.floor((new Date()).getTime() / 1000)
+    const finalList = []
     const quests = {}
+    const stops = {}
     quests.items = await this.query()
       .select('quest_item_id')
       .where('quest_reward_type', 2)
@@ -183,17 +186,6 @@ class Pokestop extends Model {
         .as('form'))
       .where('quest_reward_type', 7)
       .orderBy('quest_pokemon_id', 'asc')
-    quests.invasions = await this.query()
-      .distinct('grunt_type')
-      .whereNotNull('grunt_type')
-      .orderBy('grunt_type', 'asc')
-    quests.lures = await this.query()
-      .select('lure_id')
-      .whereNotNull('lure_id')
-      .andWhere('lure_expire_timestamp', '>=', ts)
-      .groupBy('lure_id')
-      .orderBy('lure_id')
-    const finalList = []
 
     quests.pokemon.forEach(pkmn => {
       if (pkmn.form == 0) {
@@ -201,6 +193,7 @@ class Pokestop extends Model {
         if (formId) pkmn.form = formId
       }
     })
+
     Object.entries(quests).forEach(questType => {
       const [type, rewards] = questType
       switch (type) {
@@ -208,10 +201,32 @@ class Pokestop extends Model {
         case 'items': rewards.forEach(reward => finalList.push(`q${reward.quest_item_id}`)); break
         case 'mega': rewards.forEach(reward => finalList.push(`m${reward.id}-${reward.amount}`)); break
         case 'invasions': rewards.forEach(reward => finalList.push(`i${reward.grunt_type}`)); break
-        case 'stardust': rewards.forEach(reward => finalList.push(`d${reward.amount}`)); break
+      }
+    })
+
+    if (finalList.length === 0) {
+      return fetchQuests()
+    }
+
+    stops.invasions = await this.query()
+      .distinct('grunt_type')
+      .whereNotNull('grunt_type')
+      .orderBy('grunt_type', 'asc')
+    stops.lures = await this.query()
+      .select('lure_id')
+      .whereNotNull('lure_id')
+      .andWhere('lure_expire_timestamp', '>=', ts)
+      .groupBy('lure_id')
+      .orderBy('lure_id')
+
+    Object.entries(stops).forEach(stopType => {
+      const [type, rewards] = stopType
+      switch (type) {
+        default: rewards.forEach(reward => finalList.push(`i${reward.grunt_type}`)); break
         case 'lures': rewards.forEach(reward => finalList.push(`l${reward.lure_id}`)); break
       }
     })
+
     return finalList
   }
 }

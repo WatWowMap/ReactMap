@@ -17,6 +17,30 @@ function fetchJson(url) {
 ((async function generate() {
   const masterfile = await fetchJson('https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest.json')
   const invasions = await fetchJson('https://raw.githubusercontent.com/WatWowMap/MapJS/master/static/data/grunttypes.json')
+  const pogoInfo = await fetchJson('https://raw.githubusercontent.com/ccev/pogoinfo/8e395d7a5632e87dfbfa621b6573f8209c9943c6/active/grunts.json')
+
+  const newInvasions = {}
+  Object.entries(invasions).forEach(gruntType => {
+    const [type, info] = gruntType
+    const latest = pogoInfo ? pogoInfo[type] : {}
+
+    newInvasions[type] = {
+      type: invasions[type].type,
+      grunt: invasions[type].grunt,
+      second_reward: false,
+      encounters: {},
+    }
+    if (info.encounters) {
+      Object.keys(info.encounters).forEach((position, i) => {
+        if (latest && latest.active) {
+          newInvasions[type].encounters[position] = latest.lineup.team[i].map(pkmn => pkmn.id)
+          newInvasions[type].second_reward = latest.lineup.rewards.length > 1
+        } else {
+          newInvasions[type].encounters[position] = info.encounters[position]
+        }
+      })
+    }
+  })
 
   const newMasterfile = {
     pokemon: {},
@@ -26,7 +50,7 @@ function fetchJson(url) {
     items: masterfile.items,
     weatherTypes,
     gyms: gymMeta,
-    invasions,
+    invasions: newInvasions,
   }
 
   for (const [id, move] of Object.entries(masterfile.moves)) {

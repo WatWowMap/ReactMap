@@ -24,43 +24,52 @@
 1. Clone the repo
 2. Open up the directory (`cd ReactMap`)
 3. `yarn install`
-4. Generate Masterfile `yarn generate` (You will want to do this whenever new Pokemon/assets are released)
-5. Create your config (`cp server/src/configs/config.example.json server/src/configs/config.json`)
+4. Create your config (`cp server/src/configs/config.example.json server/src/configs/config.json`)
 - There are additional configs options available in `server/src/configs/default.json` that can be utilized by copying them over into your config file. Be sure to maintain the same object structure when copying options over
-6. Run your migrations (`yarn migrate:latest`)
+5. Run your migrations (`yarn migrate:latest`)
 - This will create a `users` table, would recommend putting this in your manual db that has nests/portals/sessions/etc 
 - A sessions table will automatically be created in the specified db after the next step, be sure you've selected the correct db in the config!
 - `yarn migrate:rollback` will rollback any migrations, be sure you know what you're doing to avoid data loss!
-7. `yarn start`
+6. `yarn start`
 ## Dev Instructions
 1. Follow steps 1-6 above
 2. Open two consoles
 3. `yarn dev` in one, starts the server with nodemon
 4. `yarn watch` in the other, this automatically re-compiles your bundle for faster development.
+- `yarn generate` if you want to experiment with the masterfile generator
+- `yarn build` to only build and not run the server
+- `yarn server` to only start the server without recompiling webpack
+- `yarn console` repl server for running code/playing with the ORM
+- `yarn migrate:make addNewFeature` to generate a new migration file called 'addNewFeature'
 
 ## PM2 Ecosystem Sample
 ```js
-  {
+module.exports = {
+  apps: [
+    {
       name: 'ReactMap',
-      script: 'index.js',
-      cwd: '/home/test/ReactMap/server/src',
+      script: 'yarn run server',
+      cwd: '/home/ReactMap/',
       instances: 1,
       autorestart: true,
       watch: ['configs/', 'dist/'],
       max_memory_restart: '1G',
-      out_file: 'NULL'
-  }
+      out_file: 'NULL',
+    }
+  ]
+}
 ```
 
 ## Updating
 1. `git pull`
 2. `yarn install`
-3. `yarn generate`
+
 Without PM2:
-- `yarn start`
+3. `yarn start`
+
 With PM2: 
-- `yarn build`
-- `pm2 restart ReactMap`
+3. `yarn build`
+4. `pm2 restart ReactMap`
 
 ## Coming Soon
 - Scan Areas

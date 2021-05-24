@@ -3,7 +3,12 @@
   "port": 8080,
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
-    "maxSessions": 5
+    "maxSessions": 5,
+    "queryAvailable": {
+      "pokemon": true,
+      "quests": false,
+      "raids": false
+    }
   },
   "map": {
     "title": "ReactMap",

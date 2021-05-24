@@ -4,7 +4,7 @@ const buildPokestops = require('./buildPokestops.js')
 const buildGyms = require('./buildGyms')
 const { GenericFilter, PokemonFilter } = require('../../models/index')
 
-module.exports = async function buildDefault(perms) {
+module.exports = function buildDefault(perms) {
   const stopReducer = perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
   const pokemonReducer = perms.iv || perms.stats || perms.pvp

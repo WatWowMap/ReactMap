@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 const { Model } = require('objection')
+const fetchRaids = require('../services/functions/fetchRaids')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 
 class Gym extends Model {
@@ -145,6 +146,9 @@ class Gym extends Model {
       .andWhere('raid_level', '>', 0)
       .groupBy('raid_pokemon_id', 'raid_pokemon_form', 'raid_level')
       .orderBy('raid_pokemon_id', 'asc')
+    if (results.length === 0) {
+      return fetchRaids()
+    }
     return results.map(pokemon => {
       if (pokemon.raid_pokemon_id === 0) {
         return `e${pokemon.raid_level}`
