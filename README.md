@@ -43,6 +43,7 @@
 - `yarn migrate:make addNewFeature` to generate a new migration file called 'addNewFeature'
 
 ## PM2 Ecosystem Sample
+You can copy and paste the following code into an existing PM2 ecosystem file or start a new one with `touch ecosystem.config.js`.
 ```js
 module.exports = {
   apps: [
@@ -59,7 +60,7 @@ module.exports = {
   ]
 }
 ```
-
+`pm2 start ecosystem.config.js`
 ## Updating
 1. `git pull`
 2. `yarn install`
@@ -69,7 +70,7 @@ Without PM2:
 
 With PM2: 
 3. `yarn build`
-4. `pm2 restart ReactMap`
+4. `pm2 restart ReactMap` (If you opted out of watching the `dist/` folder)
 
 ## Coming Soon
 - Scan Areas
