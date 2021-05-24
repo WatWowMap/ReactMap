@@ -44,7 +44,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
     const questCheck = (!Number.isNaN(parseInt(id.charAt(0))) || id.startsWith('m') || id.startsWith('q') || id.startsWith('d')) && stopPerms.quests
     const invasionsCheck = id.startsWith('i') && stopPerms.invasions
 
-    if ((stopCheck || lureCheck || questCheck || invasionsCheck) && stop) {
+    if ((stopCheck || lureCheck || questCheck || invasionsCheck) && stop.name) {
       show += 1
       let urlBuilder
       switch (id.charAt(0)) {
@@ -64,7 +64,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
   const addGym = (id, gym) => {
     const raidCheck = (!Number.isNaN(parseInt(id.charAt(0))) && gymPerms.raids) || (id.startsWith('e') && gymPerms.raids)
     const gymCheck = (id.startsWith('g') && gymPerms.gyms) || (id.startsWith('t') && gymPerms.gyms)
-    if ((raidCheck || gymCheck) && gym) {
+    if ((raidCheck || gymCheck) && gym.name) {
       show += 1
       let urlBuilder
       switch (id.charAt(0)) {
@@ -123,21 +123,20 @@ export default function menuFilter(tempFilters, menus, search, type) {
         switch (id.charAt(0)) {
           default: pokestop.category = 'pokestops'; break
           case 'i':
-            pokestop = masterfile.invasions[id.slice(1)]
+            pokestop = masterfile.invasions[id.slice(1)] || {}
             pokestop.category = 'invasions'
             pokestop.name = pokestop.type; break
           case 'd':
-            pokestop = { name: `x${id.slice(1)}` }
+            pokestop = { name: `x${id.slice(1)}` } || {}
             pokestop.category = 'items'; break
           case 'm':
-            pokestop = { name: `${masterfile.pokemon[id.slice(1).split('-')[0]].name} x${id.split('-')[1]}` }
+            pokestop = { name: `${masterfile.pokemon[id.slice(1).split('-')[0]].name} x${id.split('-')[1]}` } || {}
             pokestop.category = 'energy'; break
           case 'q':
-            pokestop = masterfile.items[id.slice(1)]
+            pokestop = masterfile.items[id.slice(1)] || {}
             pokestop.category = 'items'; break
           case 'l':
-            pokestop = masterfile.items[id.slice(1)]
-            pokestop.name = id === 'l501' ? 'Lure' : pokestop.name
+            pokestop = masterfile.items[id.slice(1)] || {}
             pokestop.category = 'lures'; break
         }
         switch (switchKey) {
@@ -180,7 +179,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
         && Number.isNaN(parseInt(id.charAt(0)))
         && !id.startsWith('g')) {
         total += 1
-        const gym = masterfile.gyms[id]
+        const gym = masterfile.gyms[id] || {}
         switch (switchKey) {
           default:
             if (categories[gym.category]) {

@@ -16,6 +16,11 @@
     "pvpMinCp": {
       "gl": 1400,
       "ul": 2400
+    },
+    "queryAvailable": {
+      "pokemon": true,
+      "quests": false,
+      "raids": false
     }
   },
   "map": {

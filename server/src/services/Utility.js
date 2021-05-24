@@ -5,6 +5,9 @@ const buildDefaultFilters = require('./defaultFilters/buildDefaultFilters')
 const generateUi = require('./ui')
 const updateAvailableForms = require('./functions/updateAvailableForms')
 const buildMenus = require('./buildMenus')
+const fetchJson = require('./functions/fetchJson')
+const fetchRaids = require('./functions/fetchRaids')
+const fetchQuests = require('./functions/fetchQuests')
 
 class Utility {
   static getPolyVector(s2cellId, type) {
@@ -23,7 +26,7 @@ class Utility {
     return updateAvailableForms(icons)
   }
 
-  static async buildDefaultFilters(perms) {
+  static buildDefaultFilters(perms) {
     return buildDefaultFilters(perms)
   }
 
@@ -33,6 +36,18 @@ class Utility {
 
   static buildMenus() {
     return buildMenus()
+  }
+
+  static async fetchJson(url) {
+    return fetchJson(url)
+  }
+
+  static async fetchRaids() {
+    return fetchRaids()
+  }
+
+  static async fetchQuests() {
+    return fetchQuests()
   }
 }
 

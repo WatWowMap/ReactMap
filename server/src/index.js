@@ -32,6 +32,7 @@ const rateLimitOptions = {
   },
   /* eslint-disable no-unused-vars */
   onLimitReached: (req, res, options) => {
+    // eslint-disable-next-line no-console
     console.warn('user is being rate limited')
     res.redirect('/429')
   },
