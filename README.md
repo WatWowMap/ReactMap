@@ -52,6 +52,16 @@
   }
 ```
 
+## Updating
+1. `git pull`
+2. `yarn install`
+3. `yarn generate`
+Without PM2:
+- `yarn start`
+With PM2: 
+- `yarn build`
+- `pm2 restart ReactMap`
+
 ## Coming Soon
 - Scan Areas
 - Nests
