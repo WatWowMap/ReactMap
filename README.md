@@ -51,7 +51,7 @@ module.exports = {
     {
       name: 'ReactMap',
       script: 'yarn run server',
-      cwd: '/home/ReactMap/',
+      cwd: '/home/user/ReactMap/',
       instances: 1,
       autorestart: true,
       watch: ['configs/', 'dist/'],
@@ -61,21 +61,22 @@ module.exports = {
   ]
 }
 ```
-`pm2 start ecosystem.config.js`
+Then while you're in the same directory as the ecosystem file, `pm2 start ecosystem.config.js`
 ## Updating
 1. `git pull`
 2. `yarn install`
 
 Without PM2:
+
 3. `yarn start`
 
-With PM2: 
+With PM2:
+
 3. `yarn build`
-4. `pm2 restart ReactMap` (If you opted out of watching the `dist/` folder)
+4. `pm2 restart ReactMap` (Optional if you opted out of watching the `dist/` folder)
 
 ## Coming Soon
 - Scan Areas
-- Nests
 - Translatable Text
 - More precise quest popups
 - AR Quest Eligibility for Stops
