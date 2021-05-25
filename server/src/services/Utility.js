@@ -8,6 +8,7 @@ const buildMenus = require('./buildMenus')
 const fetchJson = require('./functions/fetchJson')
 const fetchRaids = require('./functions/fetchRaids')
 const fetchQuests = require('./functions/fetchQuests')
+const fetchNests = require('./functions/fetchNests')
 
 class Utility {
   static getPolyVector(s2cellId, type) {
@@ -48,6 +49,10 @@ class Utility {
 
   static async fetchQuests() {
     return fetchQuests()
+  }
+
+  static async fetchNests() {
+    return fetchNests()
   }
 }
 

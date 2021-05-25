@@ -1,5 +1,6 @@
 const Device = require('./Device')
 const Gym = require('./Gym')
+const Nest = require('./Nest')
 const Pokestop = require('./Pokestop')
 const Pokemon = require('./Pokemon')
 const Portal = require('./Portal')
@@ -15,6 +16,7 @@ const { PokemonFilter, GenericFilter } = require('./Filters')
 module.exports = {
   Device,
   Gym,
+  Nest,
   Pokestop,
   Pokemon,
   Portal,

@@ -6,6 +6,7 @@ const { ref, raw } = require('objection')
 
 const DeviceType = require('./device')
 const GymType = require('./gym')
+const NestType = require('./nest')
 const PokestopType = require('./pokestop')
 const PokemonType = require('./pokemon')
 const PortalType = require('./portal')
@@ -15,7 +16,7 @@ const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
 
 const {
-  Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather,
+  Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
 } = require('../models/index')
 
 const minMaxArgs = {
@@ -33,12 +34,11 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.devices) {
-          const results = await Device.query()
+          return Device.query()
             .join('instance', 'device.instance_name', '=', 'instance.name')
             .select('uuid', 'last_seen', 'last_lat', 'last_lon', 'type', 'instance_name',
               raw('json_extract(data, "$.area")')
                 .as('route'))
-          return results
         }
       },
     },
@@ -52,6 +52,19 @@ const RootQuery = new GraphQLObjectType({
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.gyms || perms.raids) {
           return Gym.getAllGyms(args, perms)
+        }
+      },
+    },
+    nests: {
+      type: new GraphQLList(NestType),
+      args: {
+        ...minMaxArgs,
+        filters: { type: JSONResolver },
+      },
+      async resolve(parent, args, req) {
+        const perms = req.user ? req.user.perms : req.session.perms
+        if (perms.nests) {
+          return Nest.getNestingSpecies(args)
         }
       },
     },

@@ -10,8 +10,9 @@
 - Devices 
 - Weather 
 - Portals
+- Nests (Only compatible with latest [NestWatcher](https://github.com/M4d40/nestwatcher))
 - Submissions Cells
-- Last scanned cells
+- Last Scanned Cells
 - Spawnpoints
 - Discord Auth & Permission Based Viewing
 

@@ -1,7 +1,7 @@
 const { GenericFilter } = require('../../models/index')
 
 module.exports = function buildGyms(perms, defaults) {
-  const gymFilters = { ivAnd: new GenericFilter() }
+  const gymFilters = {}
 
   if (perms.gyms) {
     for (let i = 0; i <= 3; i += 1) {

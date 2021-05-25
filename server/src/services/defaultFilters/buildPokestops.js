@@ -2,10 +2,7 @@ const { GenericFilter } = require('../../models/index')
 const { items } = require('../../data/masterfile.json')
 
 module.exports = function buildQuests(perms, defaults) {
-  const quests = {
-    ivAnd: new GenericFilter(),
-    s0: new GenericFilter(),
-  }
+  const quests = { s0: new GenericFilter() }
   if (perms.lures) {
     for (let i = 1; i <= 5; i += 1) {
       quests[`l50${i}`] = new GenericFilter(defaults.lures)

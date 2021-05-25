@@ -6,13 +6,12 @@ module.exports = async function fetchQuests() {
   const questsInfo = []
   Object.values(quests).forEach(questType => {
     questType.forEach(task => {
-      const megaAmount = task.task.includes('5') ? 10 : 20
       task.rewards.forEach(reward => {
         switch (reward.type) {
           default: questsInfo.push(`${reward.reward.id}-${reward.reward.form || 0}`); break
           case 'stardust': questsInfo.push(`d${reward.amount}`); break
           case 'item': questsInfo.push(`q${reward.id}`); break
-          case 'energy': questsInfo.push(`m${reward.reward.id}-${megaAmount}`); break
+          case 'energy': questsInfo.push(`m${reward.reward.id}-${reward.amount}`); break
         }
       })
     })

@@ -55,6 +55,11 @@ export default function Map({ serverSettings: { config: { map: { minZoom, maxZoo
               || (filters[item].inBattle && value.inBattle)) {
               enabled = true
             } break
+          case 'nests':
+            if (((filters[item].pokemon && value.pokemon)
+              || (filters[item].polygons && value.polygons))) {
+              enabled = true
+            } break
           case 'pokestops':
             if ((filters[item].allPokestops && value.allPokestops)
               || (filters[item].lures && value.lures)

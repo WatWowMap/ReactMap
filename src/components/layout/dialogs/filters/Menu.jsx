@@ -105,7 +105,7 @@ export default function Menu({ filters, toggleDialog, type }) {
         tempFilters: tempFilters[id],
         standard: filters.standard,
       })
-    } else if (id === 'ivAnd') {
+    } else if (id === 'global') {
       setAdvancedFilter({ open })
       Object.entries(filteredObj).forEach(item => {
         const [key, { enabled }] = item
