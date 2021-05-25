@@ -3,7 +3,9 @@ import React, { useState } from 'react'
 import { Grid, Typography, Divider } from '@material-ui/core'
 import Utility from '@services/Utility'
 
-export default function NestPopup({ nest, iconUrl, pokemon }) {
+export default function NestPopup({
+  nest, iconUrl, pokemon, recent,
+}) {
   const [parkName, setParkName] = useState(true)
   const {
     name, updated, pokemon_avg,
@@ -57,7 +59,7 @@ export default function NestPopup({ nest, iconUrl, pokemon }) {
         <Typography variant="subtitle2">
           Last Updated:
         </Typography>
-        <Typography variant={lastUpdated.str.includes('d') ? 'h6' : 'subtitle2'} style={{ color: getColor(lastUpdated.diff) }}>
+        <Typography variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'} style={{ color: getColor(lastUpdated.diff) }}>
           {lastUpdated.str}
         </Typography>
         <Typography variant="subtitle2">
@@ -68,10 +70,17 @@ export default function NestPopup({ nest, iconUrl, pokemon }) {
         <Divider style={{ color: 'white', margin: 4 }} />
       </Grid>
       <Grid item xs={12} style={{ textAlign: 'center' }}>
-        <Typography variant="caption">
-          Nest Data is Estimated!<br />
-          Verify by Checking Current Spawns
-        </Typography>
+        {recent ? (
+          <Typography variant="caption">
+            Nest Data is Estimated!<br />
+            Verify by Checking Current Spawns
+          </Typography>
+        ) : (
+          <Typography variant="caption">
+            Nest is Potentially Out of Date!<br />
+            Check Current Spawns Instead
+          </Typography>
+        )}
       </Grid>
     </Grid>
   )

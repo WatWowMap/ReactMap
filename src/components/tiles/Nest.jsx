@@ -7,24 +7,26 @@ import nestMarker from '../markers/nest'
 import PopupContent from '../popups/Nest'
 
 const NestTile = ({
-  item, filters, iconSizes, path, availableForms,
+  item, filters, iconSizes, path, availableForms, ts,
 }) => {
   const { pokemon } = useStatic(state => state.masterfile)
   const iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, item.pokemon_id, item.pokemon_form)}.png`
   const parsedJson = JSON.parse(item.polygon_path)
+  const recent = ts - item.updated < 172800
 
   return (
     <>
       {filters.pokemon && (
         <Marker
           position={[item.lat, item.lon]}
-          icon={nestMarker(iconUrl, item, pokemon[item.pokemon_id], filters.filter, iconSizes)}
+          icon={nestMarker(iconUrl, item, pokemon[item.pokemon_id], filters.filter, iconSizes, recent)}
         >
           <Popup position={[item.lat, item.lon]}>
             <PopupContent
               nest={item}
               iconUrl={iconUrl}
               pokemon={pokemon[item.pokemon_id]}
+              recent={recent}
             />
           </Popup>
         </Marker>
