@@ -1,8 +1,10 @@
+/* eslint-disable import/no-unresolved */
 const {
   GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
 const { ref, raw } = require('objection')
+const fs = require('fs')
 
 const DeviceType = require('./device')
 const GymType = require('./gym')
@@ -11,6 +13,7 @@ const PokestopType = require('./pokestop')
 const PokemonType = require('./pokemon')
 const PortalType = require('./portal')
 const S2cellType = require('./s2cell')
+const ScanAreaType = require('./scanArea')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
@@ -126,6 +129,20 @@ const RootQuery = new GraphQLObjectType({
             .andWhereBetween('center_lon', [args.minLon - 0.01, args.maxLon + 0.01])
           results.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, 'polygon'))
           return results
+        }
+      },
+    },
+    scanAreas: {
+      type: new GraphQLList(ScanAreaType),
+      async resolve(parent, args, req) {
+        const perms = req.user ? req.user.perms : req.session.perms
+        if (perms.scanAreas) {
+          const scanAreas = fs.existsSync('server/src/configs/areas.json')
+            // eslint-disable-next-line global-require
+            ? require('../configs/areas.json') : { features: [] }
+          return scanAreas.features.sort(
+            (a, b) => (a.properties.name > b.properties.name) ? 1 : -1,
+          )
         }
       },
     },

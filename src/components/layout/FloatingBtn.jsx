@@ -28,7 +28,7 @@ export default function FloatingButtons({ toggleDrawer }) {
   const map = useMap()
 
   const locateOptions = {
-    maxZoom: 19,
+    keepCurrentZoomLevel: true,
     strings: {
       title: 'Use My Location',
     },

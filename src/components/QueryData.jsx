@@ -49,13 +49,16 @@ export default function QueryData({
       case 'devices': return `${item.uuid}-${item.last_seen}`
       case 'submissionCells': return component
       case 'nests': return `${item.nest_id}-${item.updated}`
+      case 'scanAreas': return item.properties.name
     }
   }, [])
 
   const refetchData = () => {
     onMove()
     const mapBounds = map.getBounds()
-    if (category !== 'weather' && category !== 'device') {
+    if (category !== 'weather'
+      && category !== 'device'
+      && category !== 'scanAreas') {
       refetch({
         minLat: mapBounds._southWest.lat,
         maxLat: mapBounds._northEast.lat,

@@ -73,9 +73,9 @@
         "quests": true,
         "items": true,
         "megaEnergy": true,
-        "pokemon": false,
+        "pokemon": true,
         "invasions": false,
-        "allInvasions": false,
+        "allInvasions": true,
         "invasionTimers": false
       },
       "spawnpoints": {
@@ -97,7 +97,8 @@
       "nests": {
         "enabled": false,
         "polygons": false,
-        "allPokemon": false
+        "pokemon": false,
+        "allPokemon": true
       },
       "portals": {
         "enabled": false
