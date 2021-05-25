@@ -18,7 +18,7 @@ const NestTile = ({
       {filters.pokemon && (
         <Marker
           position={[item.lat, item.lon]}
-          icon={nestMarker(iconUrl, pokemon[item.pokemon_id], filters.filter, iconSizes)}
+          icon={nestMarker(iconUrl, item, pokemon[item.pokemon_id], filters.filter, iconSizes)}
         >
           <Popup position={[item.lat, item.lon]}>
             <PopupContent
@@ -41,6 +41,8 @@ const areEqual = (prev, next) => (
   && prev.item.updated === next.item.updated
   && prev.filters.pokemon === next.filters.pokemon
   && prev.filters.polygons === next.filters.polygons
+  && prev.filters.filter[`${prev.item.pokemon_id}-${prev.item.pokemon_form}`].size
+  === next.filters.filter[`${next.item.pokemon_id}-${next.item.pokemon_form}`].size
 )
 
 export default memo(NestTile, areEqual)

@@ -1,7 +1,7 @@
 import L from 'leaflet'
 
-export default function nestMarker(iconUrl, pokemon, filters, iconSizes) {
-  const filterId = `${pokemon.pokemon_id}-${pokemon.form}`
+export default function nestMarker(iconUrl, nest, pokemon, filters, iconSizes) {
+  const filterId = `${nest.pokemon_id}-${nest.pokemon_form}`
   const size = filters[filterId] ? iconSizes[filters[filterId].size] : iconSizes.md
 
   const getTypesIcon = (pkmn) => {
