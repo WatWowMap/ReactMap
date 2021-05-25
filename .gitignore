@@ -3,6 +3,7 @@
 
 .env
 config.json
+areas.json
 masterfile.json
 
 # OS X

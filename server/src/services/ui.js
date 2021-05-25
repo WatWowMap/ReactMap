@@ -67,7 +67,7 @@ module.exports = function generateUi(filters, perms) {
       // builds each subcategory
       for (const [subKey, subValue] of Object.entries(value)) {
         if ((!ignoredKeys.includes(subKey) && subValue !== undefined)
-          || key === 'weather') {
+          || key === 'weather' || key === 'scanAreas') {
           switch (key) {
             default: menus[key][subKey] = true; break
             case 'pokemon':
@@ -81,6 +81,7 @@ module.exports = function generateUi(filters, perms) {
             case 'spawnpoints':
             case 's2cells':
             case 'devices': menus.admin[key] = true; break
+            case 'scanAreas':
             case 'weather': menus[key].enabled = true; break
           }
         }

@@ -27,11 +27,12 @@
 3. `yarn install`
 4. Create your config (`cp server/src/configs/config.example.json server/src/configs/config.json`)
 - There are additional configs options available in `server/src/configs/default.json` that can be utilized by copying them over into your config file. Be sure to maintain the same object structure when copying options over
-5. Run your migrations (`yarn migrate:latest`)
+5. (Optional) You can add an `areas.json` file in the configs folder that's in the GeoJSON format for your users to be able to visualize your currently scanned areas. If you're using Poracle, the `geofence.json` file can be used without having to make any changes to it other than renaming it to `areas.json`.
+6. Run your migrations (`yarn migrate:latest`)
 - This will create a `users` table, would recommend putting this in your manual db that has nests/portals/sessions/etc 
 - A sessions table will automatically be created in the specified db after the next step, be sure you've selected the correct db in the config!
 - `yarn migrate:rollback` will rollback any migrations, be sure you know what you're doing to avoid data loss!
-6. `yarn start`
+7. `yarn start`
 ## Dev Instructions
 1. Follow steps 1-6 above
 2. Open two consoles
@@ -54,7 +55,7 @@ module.exports = {
       cwd: '/home/user/ReactMap/',
       instances: 1,
       autorestart: true,
-      watch: ['configs/', 'dist/'],
+      watch: ['configs/'],
       max_memory_restart: '1G',
       out_file: 'NULL',
     }
@@ -73,7 +74,7 @@ Without PM2:
 With PM2:
 
 3. `yarn build`
-4. `pm2 restart ReactMap` (Optional if you opted out of watching the `dist/` folder)
+4. `pm2 restart ReactMap`
 
 ## Coming Soon
 - Scan Areas

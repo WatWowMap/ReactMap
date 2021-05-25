@@ -7,10 +7,10 @@ import { ExpandMore, Clear } from '@material-ui/icons'
 import Settings from './Settings'
 import WithSubItems from './WithSubItems'
 import WithSliders from './WithSliders'
-import SingularItem from './SingularItem'
 import Utility from '../../../services/Utility'
 import useStyles from '../../../hooks/useStyles'
 import { useStore, useStatic } from '../../../hooks/useStore'
+import Areas from './Areas'
 
 export default function DrawerMenu({
   drawer, toggleDrawer, filters, setFilters, toggleDialog,
@@ -50,14 +50,6 @@ export default function DrawerMenu({
             setFilters={setFilters}
             handleChange={handleChange}
             toggleDialog={toggleDialog}
-          />
-        ); break
-      case 'weather':
-        content = (
-          <SingularItem
-            category={category}
-            filters={filters}
-            setFilters={setFilters}
           />
         ); break
       case 'settings':
@@ -102,6 +94,7 @@ export default function DrawerMenu({
                   </Button>
                 </Grid>
               )}
+            {category === 'scanAreas' && <Areas />}
           </Grid>
         </AccordionDetails>
       </Accordion>

@@ -1,3 +1,4 @@
+const fs = require('fs')
 const { map: { defaultFilters } } = require('../config.js')
 const buildPokemon = require('./buildPokemon.js')
 const buildPokestops = require('./buildPokestops.js')
@@ -23,7 +24,7 @@ module.exports = function buildDefault(perms) {
     } : undefined,
     nests: perms.nests ? {
       enabled: defaultFilters.nests.enabled,
-      pokemon: defaultFilters.nests.allPokemon,
+      pokemon: defaultFilters.nests.pokemon,
       polygons: defaultFilters.nests.polygons,
       filter: pokemon.nests,
     } : undefined,
@@ -51,34 +52,41 @@ module.exports = function buildDefault(perms) {
     portals: perms.portals ? {
       enabled: defaultFilters.portals.enabled,
       filter: {
-        all: new GenericFilter(),
+        global: new GenericFilter(),
+        old: new GenericFilter(),
         new: new GenericFilter(),
       },
     } : undefined,
+    scanAreas: perms.scanAreas && fs.existsSync('server/src/configs/areas.json') ? {
+      enabled: defaultFilters.scanAreas.enabled,
+      filter: {},
+    } : undefined,
     submissionCells: perms.submissionCells ? {
       enabled: defaultFilters.submissionCells.enabled,
-      filter: {},
+      filter: { global: new GenericFilter() },
     } : undefined,
     weather: perms.weather ? {
       enabled: defaultFilters.weather.enabled,
-      filter: { all: new GenericFilter() },
+      filter: { global: new GenericFilter() },
     } : undefined,
     spawnpoints: perms.spawnpoints ? {
       enabled: defaultFilters.spawnpoints.enabled,
       filter: {
+        global: new GenericFilter(),
         confirmed: new GenericFilter(),
         unconfirmed: new GenericFilter(),
       },
     } : undefined,
     s2cells: perms.s2cells ? {
       enabled: defaultFilters.scanCells.enabled,
-      filter: { all: new GenericFilter() },
+      filter: { global: new GenericFilter() },
     } : undefined,
     devices: perms.devices ? {
       enabled: defaultFilters.devices.enabled,
       filter: {
         online: new GenericFilter(),
         offline: new GenericFilter(),
+        global: new GenericFilter(),
       },
     } : undefined,
   }

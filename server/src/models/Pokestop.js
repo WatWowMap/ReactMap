@@ -201,6 +201,7 @@ class Pokestop extends Model {
         case 'items': rewards.forEach(reward => finalList.push(`q${reward.quest_item_id}`)); break
         case 'mega': rewards.forEach(reward => finalList.push(`m${reward.id}-${reward.amount}`)); break
         case 'invasions': rewards.forEach(reward => finalList.push(`i${reward.grunt_type}`)); break
+        case 'stardust': rewards.forEach(reward => finalList.push(`d${reward.amount}`)); break
       }
     })
 

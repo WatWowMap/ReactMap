@@ -8,6 +8,7 @@ import getAllWeather from './queries/weather'
 import getAllS2cells from './queries/s2cell'
 import getAllSubmissionCells from './queries/submissionCells'
 import getAllNests from './queries/nest'
+import getAllScanAreas from './queries/scanAreas'
 
 class Query {
   static devices() {
@@ -85,6 +86,10 @@ class Query {
 
   static weather() {
     return getAllWeather
+  }
+
+  static scanAreas() {
+    return getAllScanAreas
   }
 }
 
