@@ -7,12 +7,14 @@
     "queryAvailable": {
       "pokemon": true,
       "quests": false,
-      "raids": false
+      "raids": false,
+      "nests": false
     }
   },
   "map": {
     "title": "ReactMap",
-    "headerTitle": "ReactMap",  
+    "headerTitle": "ReactMap",
+    "nestHemisphere": "north",
     "locale": "en",
     "style": "dark",
     "enableFeedback": true,
@@ -38,7 +40,7 @@
         "database": "rdmdb",
         "charset": "utf8mb4",
         "arScanColumn": false,
-        "useFor": ["device", "gym", "pokemon", "pokestop", "portal", "s2cell", "spawnpoint", "weather"]
+        "useFor": ["device", "gym", "pokemon", "pokestop", "s2cell", "spawnpoint", "weather"]
       },
       "manual": {
         "type": "manual",
@@ -49,7 +51,7 @@
         "database": "manual_1",
         "charset": "utf8mb4",
         "arScanColumn": false,
-        "useFor": ["session", "user"]
+        "useFor": ["session", "user", "nest", "portal"]
       }
     }  
   },

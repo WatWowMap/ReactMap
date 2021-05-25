@@ -48,6 +48,7 @@ export default function QueryData({
       default: return `${item.id}-${item.updated}`
       case 'devices': return `${item.uuid}-${item.last_seen}`
       case 'submissionCells': return component
+      case 'nests': return `${item.nest_id}-${item.updated}`
     }
   }, [])
 

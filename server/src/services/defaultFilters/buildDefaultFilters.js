@@ -21,6 +21,12 @@ module.exports = function buildDefault(perms) {
         ...pokemon.raids,
       },
     } : undefined,
+    nests: perms.nests ? {
+      enabled: defaultFilters.nests.enabled,
+      pokemon: defaultFilters.nests.allPokemon,
+      polygons: defaultFilters.nests.polygons,
+      filter: pokemon.nests,
+    } : undefined,
     pokestops: stopReducer ? {
       enabled: defaultFilters.pokestops.enabled,
       allPokestops: perms.pokestops ? defaultFilters.pokestops.enabled : undefined,

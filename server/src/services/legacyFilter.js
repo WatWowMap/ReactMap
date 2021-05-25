@@ -106,7 +106,7 @@ module.exports = function getPokemon(results, args, perms) {
   const interestedLevelCaps = [40, 50, 51]
   const interestedMegas = [1, 2, 3, 'experimental_stats']
   for (const key of args.filters.onlyLegacyExclude || []) {
-    if (key === 'ivAnd') continue
+    if (key === 'global') continue
     const split = key.split('-', 2)
     if (split.length === 2) {
       const pokemonId = parseInt(split[0])

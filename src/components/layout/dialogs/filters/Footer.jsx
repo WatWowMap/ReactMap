@@ -52,13 +52,13 @@ export default function Footer({
     key: 'advMenu',
     icon: (
       <IconButton
-        onClick={toggleAdvMenu(true, 'ivAnd')}
+        onClick={toggleAdvMenu(true, 'global')}
       >
         {type === 'pokemon' ? <Tune /> : <FormatSize />}
       </IconButton>
     ),
     text: (
-      <Button onClick={toggleAdvMenu(true, 'ivAnd')}>
+      <Button onClick={toggleAdvMenu(true, 'global')}>
         <Typography variant="caption">
           {text.applyToAll}
         </Typography>

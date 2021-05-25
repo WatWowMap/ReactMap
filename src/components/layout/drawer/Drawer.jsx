@@ -90,7 +90,8 @@ export default function DrawerMenu({
             {content}
             {(category === 'pokemon'
               || category === 'gyms'
-              || category === 'pokestops')
+              || category === 'pokestops'
+              || category === 'nests')
               && (
                 <Grid item xs={6}>
                   <Button

@@ -7,6 +7,7 @@ import getAllPortals from './queries/portal'
 import getAllWeather from './queries/weather'
 import getAllS2cells from './queries/s2cell'
 import getAllSubmissionCells from './queries/submissionCells'
+import getAllNests from './queries/nest'
 
 class Query {
   static devices() {
@@ -28,6 +29,10 @@ class Query {
     }
 
     return gymIndex[query]
+  }
+
+  static nests() {
+    return getAllNests
   }
 
   static pokestops(filters, perms) {

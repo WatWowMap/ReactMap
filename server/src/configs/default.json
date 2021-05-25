@@ -20,12 +20,14 @@
     "queryAvailable": {
       "pokemon": true,
       "quests": false,
-      "raids": false
+      "raids": false,
+      "nests": false
     }
   },
   "map": {
     "title": "ReactMap",
     "headerTitle": "ReactMap",
+    "nestHemisphere": "north",
     "locale": "en",
     "enableFeedbackLink": false,
     "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
@@ -94,7 +96,8 @@
       },
       "nests": {
         "enabled": false,
-        "polygons": false
+        "polygons": false,
+        "allPokemon": false
       },
       "portals": {
         "enabled": false

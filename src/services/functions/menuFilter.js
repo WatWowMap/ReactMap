@@ -30,8 +30,11 @@ export default function menuFilter(tempFilters, menus, search, type) {
   tempAdvFilter.all = Object.values(tempAdvFilter).every(val => val === true)
 
   const addPokemon = (id, name) => {
-    show += 1
-    if ((type === 'pokemon') || (type === 'pokestops' && stopPerms.quests) || (type === 'gyms' && gymPerms.raids)) {
+    if ((type === 'pokemon')
+      || (type === 'pokestops' && stopPerms.quests)
+      || (type === 'gyms' && gymPerms.raids)
+      || type === 'nests') {
+      show += 1
       const url = `${path}/${getPokemonIcon(availableForms, ...id.split('-'))}.png`
       filteredArr.push({ id, name, url })
       filteredObj[id] = { ...tempFilters[id] }
@@ -117,7 +120,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
 
   if (type === 'pokestops') {
     Object.keys(tempFilters).forEach(id => {
-      if (id !== 'ivAnd' && Number.isNaN(parseInt(id.charAt(0)))) {
+      if (id !== 'global' && Number.isNaN(parseInt(id.charAt(0)))) {
         total += 1
         let pokestop = {}
         switch (id.charAt(0)) {
@@ -175,7 +178,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
 
   if (type === 'gyms') {
     Object.keys(filter).forEach(id => {
-      if (id !== 'ivAnd'
+      if (id !== 'global'
         && Number.isNaN(parseInt(id.charAt(0)))
         && !id.startsWith('g')) {
         total += 1

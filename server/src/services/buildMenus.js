@@ -2,6 +2,7 @@ const categories = {
   gyms: ['teams', 'eggs', 'pokemon'],
   pokestops: ['lures', 'items', 'energy', 'invasions', 'pokemon'],
   pokemon: ['pokemon'],
+  nests: ['pokemon'],
 }
 
 const pokemonFilters = {

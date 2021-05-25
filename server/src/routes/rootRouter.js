@@ -9,7 +9,9 @@ const schema = require('../schema/schema')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
 const masterfile = require('../data/masterfile.json')
-const { Pokemon, Gym, Pokestop } = require('../models/index')
+const {
+  Pokemon, Gym, Pokestop, Nest,
+} = require('../models/index')
 
 const rootRouter = new express.Router()
 
@@ -60,12 +62,14 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
 
-      const { pokemon, quests, raids } = config.api.queryAvailable
-
+      const {
+        pokemon, quests, raids, nests,
+      } = config.api.queryAvailable
       serverSettings.available = {
         pokemon: pokemon ? await Pokemon.getAvailablePokemon() : [],
         gyms: raids ? await Gym.getAvailableRaidBosses() : await Utility.fetchRaids(),
         pokestops: quests ? await Pokestop.getAvailableQuests() : await Utility.fetchQuests(),
+        nests: nests ? await Nest.getAvailableNestingSpecies() : await Utility.fetchNests(),
       }
 
       serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, serverSettings.user.perms)
