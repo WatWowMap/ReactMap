@@ -6,8 +6,8 @@
     "maxSessions": 5,
     "queryAvailable": {
       "pokemon": true,
-      "quests": false,
-      "raids": false,
+      "quests": true,
+      "raids": true,
       "nests": false
     }
   },
