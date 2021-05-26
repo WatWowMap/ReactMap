@@ -168,5 +168,10 @@
     "Shuffle": {
       "path": "https://raw.githubusercontent.com/Mygod/pokedave_shuffle_icons_-ICONS-/master"
     }
+  },
+  "manualAreas": {
+    "New York": { "lat": 40.7481666, "lon": -74.0174788 },
+    "San Francisco": { "lat": 37.79539194255634, "lon": -122.39333173075096 },
+    "Remove these if you'd prefer the map to read directly from your Geojson": ""
   }
 }
