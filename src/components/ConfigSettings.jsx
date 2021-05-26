@@ -63,7 +63,7 @@ export default function ConfigSettings({ serverSettings }) {
   setSettings(updateObjState(serverSettings.settings, 'settings'))
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
   setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
-  setAvailableForms((new Set(serverSettings.settings.icons.pokemonList)), 'availableForms')
+  setAvailableForms((new Set(serverSettings.config.icons[serverSettings.settings.icons].pokemonList)), 'availableForms')
   setAvailable(serverSettings.available)
   const startLocation = updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
   const zoom = updatePositionState(serverSettings.config.map.startZoom, 'zoom')

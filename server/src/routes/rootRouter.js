@@ -47,19 +47,20 @@ rootRouter.get('/settings', async (req, res) => {
           temporary: {},
           persistent: {},
         },
+        manualAreas: config.manualAreas || {},
       }
       await Utility.updateAvailableForms(serverSettings.config.icons)
 
+      const ignoreList = ['map', 'manualAreas']
       Object.keys(serverSettings.config).forEach(setting => {
-        if (setting !== 'map') {
+        if (!ignoreList.includes(setting)) {
           const category = serverSettings.config[setting]
           Object.keys(category).forEach(option => {
             category[option].name = option
           })
-          serverSettings.settings[setting] = category[Object.keys(category)[0]]
+          serverSettings.settings[setting] = category[Object.keys(category)[0]].name
         }
       })
-      serverSettings.config.manualAreas = config.manualAreas || {}
 
       serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
 

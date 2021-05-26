@@ -22,7 +22,7 @@ export default function Settings() {
   const handleChange = event => {
     setSettings({
       ...settings,
-      [event.target.name]: config[event.target.name][event.target.value],
+      [event.target.name]: config[event.target.name][event.target.value].name,
     })
   }
 
@@ -35,6 +35,31 @@ export default function Settings() {
     setAlert(false)
   }
 
+  const exportSettings = () => {
+    const json = localStorage.getItem('local-state')
+    const el = document.createElement('a')
+    el.setAttribute('href', `data:application/json;chartset=utf-8,${encodeURIComponent(json)}`)
+    el.setAttribute('download', 'settings.json')
+    el.style.display = 'none'
+    document.body.appendChild(el)
+    el.click()
+    document.body.removeChild(el)
+  }
+
+  const importSettings = (e) => {
+    const file = e.target.files[0]
+    if (!file) {
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = function parse(newSettings) {
+      const contents = newSettings.target.result
+      localStorage.clear()
+      localStorage.setItem('local-state', contents)
+    }
+    reader.readAsText(file)
+  }
+
   return (
     <Grid
       container
@@ -43,29 +68,32 @@ export default function Settings() {
       alignItems="center"
       spacing={1}
     >
-      {Object.keys(settings).map(setting => (
-        <Grid item key={setting} xs={10}>
-          <FormControl style={{ width: 200, margin: 5 }}>
-            <InputLabel>{Utility.getProperName(setting)}</InputLabel>
-            <Select
-              autoFocus
-              name={setting}
-              value={settings[setting].name}
-              onChange={handleChange}
-              fullWidth
-            >
-              {Object.keys(config[setting]).map(option => (
-                <MenuItem
-                  key={option}
-                  value={option}
-                >
-                  {Utility.getProperName(option)}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-      ))}
+      {Object.entries(settings).map(setting => {
+        const [key, value] = setting
+        return (
+          <Grid item key={key} xs={10}>
+            <FormControl style={{ width: 200, margin: 5 }}>
+              <InputLabel>{Utility.getProperName(key)}</InputLabel>
+              <Select
+                autoFocus
+                name={key}
+                value={config[key][value].name}
+                onChange={handleChange}
+                fullWidth
+              >
+                {Object.keys(config[key]).map(option => (
+                  <MenuItem
+                    key={option}
+                    value={option}
+                  >
+                    {Utility.getProperName(option)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        )
+      })}
       <Grid item xs={6} style={{ textAlign: 'center', margin: '20px 0px' }}>
         <Button
           variant="contained"
@@ -79,7 +107,26 @@ export default function Settings() {
           Clear Storage
         </Button>
       </Grid>
-      <Grid item xs={5} style={{ textAlign: 'center', margin: '20px 0px' }}>
+      <Grid item xs={5} style={{ textAlign: 'center' }}>
+        <input
+          accept="application/json"
+          id="contained-button-file"
+          type="file"
+          style={{ display: 'none' }}
+          onChange={importSettings}
+        />
+        <label htmlFor="contained-button-file">
+          <Button
+            variant="contained"
+            color="primary"
+            component="span"
+            size="small"
+          >
+            Import
+          </Button>
+        </label>
+      </Grid>
+      <Grid item xs={6} style={{ textAlign: 'center', marginBottom: '20px' }}>
         <Button
           variant="contained"
           style={{
@@ -91,6 +138,16 @@ export default function Settings() {
         >
           <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
           Logout
+        </Button>
+      </Grid>
+      <Grid item xs={5} style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          size="small"
+          onClick={exportSettings}
+        >
+          Export
         </Button>
       </Grid>
       <Snackbar
