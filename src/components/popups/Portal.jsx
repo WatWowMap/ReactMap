@@ -2,10 +2,11 @@ import React, { Fragment, useState } from 'react'
 import { Grid, Typography, IconButton } from '@material-ui/core'
 import { Map } from '@material-ui/icons'
 
-import { useStore } from '@hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
 
 export default function PortalPopup({ portal }) {
-  const { navigation: { url } } = useStore(state => state.settings)
+  const { navigation } = useStore(state => state.settings)
+  const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
   const [portalName, setPortalName] = useState(true)
   const {
     url: imageUrl, name, lat, lon, updated, imported,

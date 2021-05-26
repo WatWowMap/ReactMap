@@ -12,7 +12,7 @@ class Gym extends Model {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const { gyms, raids } = perms
     const {
-      onlyGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyExcludeList,
+      onlyGyms, onlyRaids, onlyExEligible, onlyInBattle,
     } = args.filters
     const query = this.query()
       .whereBetween('lat', [args.minLat, args.maxLat])
@@ -30,16 +30,14 @@ class Gym extends Model {
     }
 
     Object.keys(args.filters).forEach(raid => {
-      if (!onlyExcludeList.includes(raid)) {
-        switch (raid.charAt(0)) {
-          default: raidBosses.add(raid.split('-')[0]); break
-          case 'e': eggs.push(raid.slice(1)); break
-          case 't': teams.push(raid.slice(1).split('-')[0]); break
-          case 'g': slots.initial.push({
-            team: raid.slice(1).split('-')[0],
-            slots: 6 - raid.slice(1).split('-')[1],
-          }); break
-        }
+      switch (raid.charAt(0)) {
+        default: raidBosses.add(raid.split('-')[0]); break
+        case 'e': eggs.push(raid.slice(1)); break
+        case 't': teams.push(raid.slice(1).split('-')[0]); break
+        case 'g': slots.initial.push({
+          team: raid.slice(1).split('-')[0],
+          slots: 6 - raid.slice(1).split('-')[1],
+        }); break
       }
     })
     const finalTeams = []
@@ -109,25 +107,19 @@ class Gym extends Model {
         if (!gyms) {
           gym.team_id = 0
         }
-        if (!onlyExcludeList.includes(`t${gym.team_id}-0`)) {
-          if (gym.raid_pokemon_id === 0
-            && args.filters[`e${gym.raid_level}`]) {
-            if (!onlyExcludeList.includes(`e${gym.raid_level}`)) {
-              filteredResults.push(gym)
-            }
-          } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]) {
-            if (!onlyExcludeList.includes(`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`)) {
-              filteredResults.push(gym)
-            }
-          } else if (gyms && onlyGyms) {
-            if (args.filters[`t${gym.team_id}-0`]) {
-              gym.raid_end_timestamp = null
-              gym.raid_spawn_timestamp = null
-              gym.raid_battle_timestamp = null
-              gym.raid_pokemon_id = null
-              gym.raid_level = null
-              filteredResults.push(gym)
-            }
+        if (gym.raid_pokemon_id === 0
+          && args.filters[`e${gym.raid_level}`]) {
+          filteredResults.push(gym)
+        } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]) {
+          filteredResults.push(gym)
+        } else if (gyms && onlyGyms) {
+          if (args.filters[`t${gym.team_id}-0`]) {
+            gym.raid_end_timestamp = null
+            gym.raid_spawn_timestamp = null
+            gym.raid_battle_timestamp = null
+            gym.raid_pokemon_id = null
+            gym.raid_level = null
+            filteredResults.push(gym)
           }
         }
       }

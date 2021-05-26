@@ -20,7 +20,9 @@ const getTeam = teamId => {
   }
 }
 
-export default function GymPopup({ gym, hasRaid, ts }) {
+export default function GymPopup({
+  gym, hasRaid, ts, path, availableForms,
+}) {
   const { menus: { gyms: perms } } = useStatic(state => state.ui)
   const [raidExpand, setRaidExpand] = useState(hasRaid)
   const [extraExpand, setExtraExpand] = useState(false)
@@ -33,7 +35,7 @@ export default function GymPopup({ gym, hasRaid, ts }) {
       alignItems="center"
       spacing={1}
     >
-      <Header gym={gym} perms={perms} />
+      <Header gym={gym} perms={perms} hasRaid={hasRaid} />
       {perms.gyms && (
         <Grid item xs={12}>
           <Collapse in={!raidExpand} timeout="auto" unmountOnExit>
@@ -61,7 +63,12 @@ export default function GymPopup({ gym, hasRaid, ts }) {
               justify="center"
               spacing={1}
             >
-              <RaidImage gym={gym} ts={ts} />
+              <RaidImage
+                gym={gym}
+                ts={ts}
+                path={path}
+                availableForms={availableForms}
+              />
               <Divider orientation="vertical" flexItem />
               <RaidInfo gym={gym} />
               <Timer gym={gym} ts={ts} />
@@ -87,13 +94,15 @@ export default function GymPopup({ gym, hasRaid, ts }) {
   )
 }
 
-const Header = ({ gym, perms }) => {
+const Header = ({ gym, perms, hasRaid }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
   const excludeList = useStatic(state => state.excludeList)
   const setExcludeList = useStatic(state => state.setExcludeList)
   const timerList = useStatic(state => state.timerList)
   const setTimerList = useStatic(state => state.setTimerList)
+  const filters = useStore(state => state.filters)
+  const setFilters = useStore(state => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [gymName, setGymName] = useState(true)
@@ -118,16 +127,43 @@ const Header = ({ gym, perms }) => {
 
   const excludeTeam = () => {
     setAnchorEl(null)
-    setExcludeList([...excludeList, `t${team_id}-0`])
+    const key = `t${team_id}-0`
+    setFilters({
+      ...filters,
+      gyms: {
+        ...filters.gyms,
+        filter: {
+          ...filters.gyms.filter,
+          [key]: {
+            ...filters.gyms.filter[key],
+            enabled: false,
+          },
+        },
+      },
+    })
+    setExcludeList([...excludeList, key])
   }
 
   const excludeBoss = () => {
     setAnchorEl(null)
-    if (raid_pokemon_id == 0) {
-      setExcludeList([...excludeList, `e${raid_level}`])
-    } else {
-      setExcludeList([...excludeList, `${raid_pokemon_id}-${raid_pokemon_form}`])
+    let key = `e${raid_level}`
+    if (raid_pokemon_id > 0) {
+      key = `${raid_pokemon_id}-${raid_pokemon_form}`
     }
+    setFilters({
+      ...filters,
+      gyms: {
+        ...filters.gyms,
+        filter: {
+          ...filters.gyms.filter,
+          [key]: {
+            ...filters.gyms.filter[key],
+            enabled: false,
+          },
+        },
+      },
+    })
+    setExcludeList([...excludeList, key])
   }
 
   const handleTimer = () => {
@@ -142,7 +178,7 @@ const Header = ({ gym, perms }) => {
   if (perms.gyms) {
     options.push({ name: 'Exclude Team', action: excludeTeam })
   }
-  if (perms.raids) {
+  if (perms.raids && hasRaid) {
     options.push(
       { name: 'Exclude Raid', action: excludeBoss },
       { name: 'Timer', action: handleTimer },
@@ -217,13 +253,13 @@ const PoiImage = ({ gym }) => {
   )
 }
 
-const RaidImage = ({ gym, ts }) => {
+const RaidImage = ({
+  gym, ts, path, availableForms,
+}) => {
   const {
     raid_level, raid_pokemon_id, raid_pokemon_form, raid_pokemon_gender, raid_pokemon_costume, raid_pokemon_evolution,
     raid_battle_timestamp,
   } = gym
-  const { icons: { path } } = useStore(state => state.settings)
-  const availableForms = useStatic(state => state.availableForms)
   const { pokemon } = useStatic(state => state.masterfile)
 
   let src = `/images/egg/${raid_level}.png`
@@ -474,8 +510,8 @@ const Footer = ({
   gym, expanded, setExpanded, hasRaid, raidExpand, setRaidExpand, perms,
 }) => {
   const classes = useStyles()
-  const { navigation: { url } } = useStore(state => state.settings)
-
+  const { navigation } = useStore(state => state.settings)
+  const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
   const { lat, lon } = gym
 
   const handleExpandClick = () => {

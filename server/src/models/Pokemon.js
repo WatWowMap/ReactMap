@@ -13,7 +13,7 @@ class Pokemon extends Model {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const { stats, iv: ivs, pvp } = perms
     const {
-      onlyStandard, onlyExcludeList, onlyIvOr,
+      onlyStandard, onlyIvOr,
     } = args.filters
     let queryPvp = false
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
@@ -94,7 +94,7 @@ class Pokemon extends Model {
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .andWhere(ivOr => {
         for (const [pkmn, filter] of Object.entries(args.filters)) {
-          if (pkmn.includes('-') && !onlyExcludeList.includes(pkmn)) {
+          if (pkmn.includes('-')) {
             const [id, form] = pkmn.split('-')
             const finalForm = masterfile[id].default_form_id == form ? [0, form] : [form]
             ivOr.orWhere(poke => {
@@ -129,7 +129,7 @@ class Pokemon extends Model {
         listOfIds.push(pkmn.id)
         pvpResults.push(pkmn)
       }
-      if (!onlyExcludeList.includes(`${pkmn.pokemon_id}-${pkmn.form}`) && noPvp) {
+      if (noPvp) {
         finalResults.push(pkmn)
       }
     })
@@ -185,11 +185,10 @@ class Pokemon extends Model {
           pkmn.rankSum.ul.worst = rankCheck.worst
         }
       }
-      if (!onlyExcludeList.includes(filterId) && ((pkmn.great || pkmn.ultra) || !pkmn.pvp)) {
+      if ((pkmn.great || pkmn.ultra) || !pkmn.pvp) {
         finalResults.push(pkmn)
       }
     })
-
     return finalResults
   }
 
