@@ -1,37 +1,63 @@
 import React from 'react'
 import { useQuery } from '@apollo/client'
-import { Paper, MenuItem, MenuList } from '@material-ui/core'
+import {
+  Paper, MenuItem, MenuList, Typography,
+} from '@material-ui/core'
 import center from '@turf/center'
 import { useMap } from 'react-leaflet'
+
+import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 
 export default function AreaDropDown() {
+  const { map: { defaultFilters: { scanAreas: { zoomLevel } } }, manualAreas } = useStatic(state => state.config)
   const { data } = useQuery(Query.scanAreas())
   const map = useMap()
 
   return (
     <Paper
       style={{
-        height: 250,
+        minHeight: 50,
+        maxHeight: 250,
         width: '100%',
         overflow: 'auto',
+        backgroundColor: '#212121',
       }}
-      elevation={2}
     >
-      <MenuList>
-        {data && data.scanAreas.map(area => (
-          <MenuItem
-            key={area.properties.name}
-            onClick={() => {
-              const [lon, lat] = center(area).geometry.coordinates
-              map.flyTo([lat, lon], 15)
-            }}
-          >
-            {Utility.getProperName(area.properties.name)}
-          </MenuItem>
-        ))}
-      </MenuList>
+      {Object.keys(manualAreas).length > 0 ? (
+        <MenuList>
+          {Object.keys(manualAreas).map(area => (
+            <MenuItem
+              key={area}
+              onClick={() => {
+                const { lat, lon } = manualAreas[area]
+                map.flyTo([lat, lon], zoomLevel)
+              }}
+            >
+              <Typography variant="subtitle2" align="center">
+                {area}
+              </Typography>
+            </MenuItem>
+          ))}
+        </MenuList>
+      ) : (
+        <MenuList>
+          {data && data.scanAreas.map(area => (
+            <MenuItem
+              key={area.properties.name}
+              onClick={() => {
+                const [lon, lat] = center(area).geometry.coordinates
+                map.flyTo([lat, lon], zoomLevel)
+              }}
+            >
+              <Typography variant="subtitle2" align="center">
+                {Utility.getProperName(area.properties.name)}
+              </Typography>
+            </MenuItem>
+          ))}
+        </MenuList>
+      )}
     </Paper>
   )
 }

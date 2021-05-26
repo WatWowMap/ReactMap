@@ -115,7 +115,8 @@
         "enabled": true
       },
       "scanAreas": {
-        "enabled": false
+        "enabled": false,
+        "zoomLevel": 12
       },
       "devices": {
         "enabled": false
@@ -329,5 +330,6 @@
     "ultraRare": [],
     "regional": [],
     "event": []
-  }
+  },
+  "manualAreas": null
 }

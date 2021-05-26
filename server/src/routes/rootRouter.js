@@ -59,6 +59,7 @@ rootRouter.get('/settings', async (req, res) => {
           serverSettings.settings[setting] = category[Object.keys(category)[0]]
         }
       })
+      serverSettings.config.manualAreas = config.manualAreas || {}
 
       serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
 
