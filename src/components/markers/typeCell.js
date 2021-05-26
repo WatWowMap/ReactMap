@@ -1,8 +1,5 @@
-import { useStore } from '../../hooks/useStore'
-
-export default function typeStyle(cell) {
-  const { tileServers: { style } } = useStore(state => state.settings)
-  const color = style === 'dark' ? 'red' : 'black'
+export default function typeStyle(cell, tileStyle) {
+  const color = tileStyle === 'dark' ? 'red' : 'black'
   if ((cell.count === 1 && cell.count_gyms < 1)
   || (cell.count === 5 && cell.count_gyms < 2)
   || (cell.count === 19 && cell.count_gyms < 3)) {

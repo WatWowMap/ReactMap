@@ -3,10 +3,10 @@ import { Polygon } from 'react-leaflet'
 
 import placementStyle from '../../markers/placementCell'
 
-const PlacementTile = ({ cell }) => (
+const PlacementTile = ({ cell, tileStyle }) => (
   <Polygon
     positions={cell.polygon}
-    pathOptions={placementStyle(cell.blocked)}
+    pathOptions={placementStyle(cell.blocked, tileStyle)}
     interactive={false}
   />
 )

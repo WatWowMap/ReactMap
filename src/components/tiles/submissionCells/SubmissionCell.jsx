@@ -3,7 +3,7 @@ import TypeTile from './Type'
 import PlacementTile from './Placement'
 import RingTile from './Ring'
 
-export default function SubmissionCellTile({ item, map }) {
+export default function SubmissionCellTile({ item, map, tileStyle }) {
   const zoom = map.getZoom()
   return (
     <>
@@ -17,12 +17,14 @@ export default function SubmissionCellTile({ item, map }) {
         <PlacementTile
           key={`pc${cell.id}-${cell.polygon[0]}-${cell.polygon[1]}-${cell.polygon[2]}-${cell.polygon[3]}`}
           cell={cell}
+          tileStyle={tileStyle}
         />
       ))}
       {item.typeCells.map(cell => (
         <TypeTile
           key={`tc${cell.id}-${cell.polygon[0]}-${cell.polygon[1]}-${cell.polygon[2]}-${cell.polygon[3]}`}
           cell={cell}
+          tileStyle={tileStyle}
         />
       ))}
     </>
