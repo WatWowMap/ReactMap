@@ -4,13 +4,10 @@
 /* eslint-disable global-require */
 /* eslint-disable import/no-dynamic-require */
 /* global BigInt */
-
-const DiscordOauth2 = require('discord-oauth2')
 const Discord = require('discord.js')
 const fs = require('fs')
 const { discord } = require('./config')
 
-const oauth = new DiscordOauth2()
 const client = new Discord.Client()
 
 if (discord.enabled) {
@@ -34,12 +31,6 @@ class DiscordClient {
 
   setAccessToken(token) {
     this.accessToken = token
-  }
-
-  async getGuilds() {
-    const guilds = await oauth.getUserGuilds(this.accessToken)
-    const guildIds = Array.from(guilds, x => BigInt(x.id).toString())
-    return [guildIds, guilds]
   }
 
   async getUserRoles(guildId, userId) {
@@ -80,7 +71,8 @@ class DiscordClient {
     Object.keys(discord.perms).map(perm => perms[perm] = false)
     perms.areaRestrictions = []
 
-    const [guilds, guildsFull] = await this.getGuilds()
+    const { guildsFull } = user
+    const guilds = user.guilds.map(guild => guild.id)
     if (discord.allowedUsers.includes(user.id)) {
       Object.keys(perms).forEach((key) => perms[key] = true)
       console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)

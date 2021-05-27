@@ -2771,11 +2771,6 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-discord-oauth2@^2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/discord-oauth2/-/discord-oauth2-2.6.0.tgz#d362b386e77a3eb3135772307a253514e0dc48be"
-  integrity sha512-9lEt1Rp9rruFPiVQOPbe2rKJXB40fO2u9Ozjz3n/TlVYnIxCTeohVkNI/c5AoLFDZcSxFc2MtDTf9iG0X7BkRg==
-
 discord.js@^12.5.3:
   version "12.5.3"
   resolved "https://registry.yarnpkg.com/discord.js/-/discord.js-12.5.3.tgz#56820d473c24320871df9ea0bbc6b462f21cf85c"

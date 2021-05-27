@@ -1,4 +1,5 @@
 import React from 'react'
+import { withRouter } from 'react-router-dom'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
 import { ThemeProvider } from '@material-ui/styles'
@@ -8,7 +9,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 import createTheme from '@assets/mui/theme'
 import Map from './Map'
 
-export default function ConfigSettings({ serverSettings }) {
+const ConfigSettings = ({ serverSettings, match }) => {
   document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
@@ -77,15 +78,27 @@ export default function ConfigSettings({ serverSettings }) {
   setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
   setAvailableForms((new Set(serverSettings.config.icons[serverSettings.settings.icons].pokemonList)), 'availableForms')
   setAvailable(serverSettings.available)
-  const startLocation = updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
-  const zoom = updatePositionState(serverSettings.config.map.startZoom, 'zoom')
+
+  const getStartLocation = () => {
+    if (match.path === '/') {
+      return updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
+    }
+    return [match.params.lat, match.params.lon]
+  }
+
+  const getStartZoom = () => {
+    if (match.path === '/') {
+      return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
+    }
+    return match.params.zoom
+  }
 
   return (
     <ThemeProvider theme={theme}>
       <MapContainer
         tap={false}
-        center={startLocation}
-        zoom={zoom}
+        center={getStartLocation()}
+        zoom={getStartZoom()}
         zoomControl={false}
         preferCanvas
       >
@@ -94,3 +107,5 @@ export default function ConfigSettings({ serverSettings }) {
     </ThemeProvider>
   )
 }
+
+export default withRouter(ConfigSettings)

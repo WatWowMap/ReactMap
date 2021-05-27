@@ -9,8 +9,8 @@ router.get('/discord/callback',
     failureRedirect: '/',
   }),
   async (req, res) => {
-    const { id } = req.session.passport.user
     try {
+      const { id } = req.session.passport.user
       if (!(await isValidSession(id))) {
         console.debug('[Session] Detected multiple sessions, clearing old ones...')
         await clearOtherSessions(id, req.sessionID)

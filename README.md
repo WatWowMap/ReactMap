@@ -77,14 +77,15 @@ With PM2:
 3. `yarn build`
 4. `pm2 restart ReactMap`
 
+## Additional Info
+- Webhook URL Format: `https://www.yourMapUrl.com/@/lat/lon/zom`
+
 ## Coming Soon
-- Scan Areas
 - Translatable Text
 - More precise quest popups
 - AR Quest Eligibility for Stops
 - Built in event viewer
 - Expand the help modals
-- Import/Export buttons
 - Custom Favicon Support
 - Persist some menu selections
 - Category headers in filter menus
