@@ -2,10 +2,11 @@ import '../assets/scss/main.scss'
 
 import React, { useEffect, useState } from 'react'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
 import Fetch from '@services/Fetch'
 import Auth from './Auth'
+import Login from './Login'
 
 const client = new ApolloClient({
   uri: '/graphql',
@@ -47,11 +48,21 @@ export default function App() {
 
   return (
     <Router>
-      <Route exact path="/">
-        <ApolloProvider client={client}>
-          {serverSettings && <Auth serverSettings={serverSettings} />}
-        </ApolloProvider>
-      </Route>
+      <Switch>
+        <Route exact path="/">
+          <ApolloProvider client={client}>
+            {serverSettings && <Auth serverSettings={serverSettings} />}
+          </ApolloProvider>
+        </Route>
+        <Route exact path="/login">
+          <Login failed />
+        </Route>
+        <Route exact path="/@/:lat/:lon/:zoom">
+          <ApolloProvider client={client}>
+            {serverSettings && <Auth serverSettings={serverSettings} />}
+          </ApolloProvider>
+        </Route>
+      </Switch>
     </Router>
   )
 }

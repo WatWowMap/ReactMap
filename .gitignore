@@ -6,6 +6,9 @@ config.json
 areas.json
 masterfile.json
 
+public/favicon/*
+!public/favicon/favicon.ico
+
 # OS X
 .DS_Store*
 Icon?

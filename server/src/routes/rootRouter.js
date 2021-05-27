@@ -28,9 +28,11 @@ if (config.discord.enabled) {
           status: 'ERROR',
           error: err.message,
         })
+      case 'Failed to fetch user\'s guilds':
+        return res.redirect('/login')
       default:
         return res.status(500).send({
-          status: 'ERROR - you clicked authorize twice, didn\'t you? You will need to go back and try again.',
+          status: 'ERROR',
           error: err.message,
         })
     }

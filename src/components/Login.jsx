@@ -3,14 +3,14 @@ import {
   Grid, Button, Icon, Typography,
 } from '@material-ui/core'
 
-export default function Login() {
+export default function Login({ failed }) {
   return (
     <Grid
       container
       direction="column"
       justify="center"
       alignItems="center"
-      style={{ minHeight: '100vh' }}
+      style={{ minHeight: '95vh' }}
     >
       <Grid item>
         <Button
@@ -23,16 +23,18 @@ export default function Login() {
           href="/auth/discord"
         >
           <Icon className="fab fa-discord" style={{ fontSize: 30 }} />&nbsp;
-          <Typography variant="h6">
+          <Typography variant="h6" align="center">
             Login
           </Typography>
         </Button>
       </Grid>
+      {failed && (
       <Grid item>
-        <Typography style={{ color: 'white', margin: 20 }}>
-          Only click the &apos;Authorize&apos; button on the next page once.
+        <Typography style={{ color: 'white', margin: 20 }} align="center">
+          Only click &apos;Authorize&apos; once
         </Typography>
       </Grid>
+      )}
     </Grid>
   )
 }

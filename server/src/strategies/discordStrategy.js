@@ -118,7 +118,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
         return done(null, user)
       })
   } catch (e) {
-    console.error('f')
+    console.error('User has failed auth.')
   }
 }
 

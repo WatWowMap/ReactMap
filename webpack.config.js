@@ -107,7 +107,7 @@ module.exports = (env) => {
         new HtmlWebpackPlugin({
           template: './public/index.template.html',
           filename: 'index.html',
-          favicon: './public/favicon.ico',
+          favicon: './public/favicon/favicon.ico',
         }),
         new CopyWebpackPlugin({
           patterns: [{ from: './public/images', to: 'images' }],
