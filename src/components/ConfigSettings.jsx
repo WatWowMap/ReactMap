@@ -60,10 +60,22 @@ export default function ConfigSettings({ serverSettings }) {
   setMenus(updateObjState(serverSettings.menus, 'menus'))
   setStaticFilters(serverSettings.defaultFilters)
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
-  setSettings(updateObjState(serverSettings.settings, 'settings'))
+
+  // temp settings migration
+  const parsed = JSON.parse(localStorage.getItem('local-state'))
+  if (parsed) {
+    if (parsed.state && parsed.state.settings.icons.name) {
+      setSettings(serverSettings.settings)
+    } else {
+      setSettings(updateObjState(serverSettings.settings, 'settings'))
+    }
+  } else {
+    setSettings(updateObjState(serverSettings.settings, 'settings'))
+  }
+
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
   setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
-  setAvailableForms((new Set(serverSettings.settings.icons.pokemonList)), 'availableForms')
+  setAvailableForms((new Set(serverSettings.config.icons[serverSettings.settings.icons].pokemonList)), 'availableForms')
   setAvailable(serverSettings.available)
   const startLocation = updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
   const zoom = updatePositionState(serverSettings.config.map.startZoom, 'zoom')

@@ -13,7 +13,7 @@ class Pokestop extends Model {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms,
     } = perms
     const {
-      onlyAllPokestops, onlyLures, onlyQuests, onlyInvasions, onlyExcludeList,
+      onlyAllPokestops, onlyLures, onlyQuests, onlyInvasions,
     } = args.filters
 
     const query = this.query()
@@ -140,11 +140,10 @@ class Pokestop extends Model {
             pokestop.key = category.filter
             keyRef.forEach(otherCategory => {
               if (category.filter !== otherCategory.filter) {
+                pokestop.key = category.filter
                 if (!args.filters[otherCategory.filter]) {
                   delete pokestop[otherCategory.field]
                 }
-              } else if (onlyExcludeList.includes(category.filter)) {
-                delete pokestop[category.field]
               }
             })
             filteredResults.add(pokestop)

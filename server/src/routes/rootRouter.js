@@ -17,7 +17,25 @@ const rootRouter = new express.Router()
 
 rootRouter.use('/', clientRouter)
 
-rootRouter.use('/auth', authRouter)
+if (config.discord.enabled) {
+  rootRouter.use('/auth', authRouter)
+
+  // eslint-disable-next-line no-unused-vars
+  rootRouter.use((err, req, res, next) => {
+    switch (err.message) {
+      case 'NoCodeProvided':
+        return res.status(400).send({
+          status: 'ERROR',
+          error: err.message,
+        })
+      default:
+        return res.status(500).send({
+          status: 'ERROR - you clicked authorize twice, didn\'t you? You will need to go back and try again.',
+          error: err.message,
+        })
+    }
+  })
+}
 
 rootRouter.get('/logout', (req, res) => {
   req.session.destroy()
@@ -47,19 +65,20 @@ rootRouter.get('/settings', async (req, res) => {
           temporary: {},
           persistent: {},
         },
+        manualAreas: config.manualAreas || {},
       }
       await Utility.updateAvailableForms(serverSettings.config.icons)
 
+      const ignoreList = ['map', 'manualAreas']
       Object.keys(serverSettings.config).forEach(setting => {
-        if (setting !== 'map') {
+        if (!ignoreList.includes(setting)) {
           const category = serverSettings.config[setting]
           Object.keys(category).forEach(option => {
             category[option].name = option
           })
-          serverSettings.settings[setting] = category[Object.keys(category)[0]]
+          serverSettings.settings[setting] = category[Object.keys(category)[0]].name
         }
       })
-      serverSettings.config.manualAreas = config.manualAreas || {}
 
       serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
 

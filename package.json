@@ -82,7 +82,7 @@
     "nodes2ts": "^2.0.0",
     "objection": "^2.2.14",
     "passport": "^0.4.1",
-    "passport-discord": "^0.1.4",
+    "passport-discord": "https://github.com/tonestrike/passport-discord.git",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-leaflet": "^3.1.0",

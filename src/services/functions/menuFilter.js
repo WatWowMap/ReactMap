@@ -5,7 +5,8 @@ import getPokemonIcon from './getPokemonIcon'
 export default function menuFilter(tempFilters, menus, search, type) {
   const masterfile = useStatic(state => state.masterfile)
   const availableForms = useStatic(state => state.availableForms)
-  const { path } = useStore(state => state.settings).icons
+  const { icons } = useStore(state => state.settings)
+  const { icons: { [icons]: { path } } } = useStatic(state => state.config)
   const { [type]: available } = useStatic(state => state.available)
   const { menus: { pokestops: stopPerms, gyms: gymPerms } } = useStatic(state => state.ui)
   const { [type]: { filter } } = useStatic(state => state.staticFilters)

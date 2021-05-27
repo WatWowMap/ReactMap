@@ -7,23 +7,39 @@ import PopupContent from '../popups/Gym'
 import Timer from './Timer'
 
 const GymTile = ({
-  item, ts, showTimer, iconSizes, filters, path, availableForms,
+  item, ts, showTimer, iconSizes, filters, path, availableForms, excludeList,
 }) => {
-  const { raid_battle_timestamp, raid_end_timestamp, raid_level } = item
-  const hasRaid = (raid_end_timestamp >= ts && raid_level > 0)
+  const {
+    raid_battle_timestamp, raid_end_timestamp, raid_level, raid_pokemon_id, raid_pokemon_form, team_id,
+  } = item
+  const hasRaid = (raid_end_timestamp >= ts
+    && raid_level > 0
+    && (raid_battle_timestamp >= ts
+      ? !excludeList.includes(`e${raid_level}`)
+      : !excludeList.includes(`${raid_pokemon_id}-${raid_pokemon_form}`)))
   const timerToDisplay = raid_battle_timestamp >= ts
     ? raid_battle_timestamp : raid_end_timestamp
 
   return (
-    <Marker
-      position={[item.lat, item.lon]}
-      icon={gymMarker(item, ts, hasRaid, iconSizes, filters, path, availableForms)}
-    >
-      <Popup position={[item.lat, item.lon]}>
-        <PopupContent gym={item} hasRaid={hasRaid} ts={ts} />
-      </Popup>
-      {showTimer && <Timer timestamp={timerToDisplay} />}
-    </Marker>
+    <>
+      {!excludeList.includes(`t${team_id}-0`) && (
+        <Marker
+          position={[item.lat, item.lon]}
+          icon={gymMarker(item, ts, hasRaid, iconSizes, filters, path, availableForms, excludeList)}
+        >
+          <Popup position={[item.lat, item.lon]}>
+            <PopupContent
+              gym={item}
+              hasRaid={hasRaid}
+              ts={ts}
+              path={path}
+              availableForms={availableForms}
+            />
+          </Popup>
+          {showTimer && <Timer timestamp={timerToDisplay} />}
+        </Marker>
+      )}
+    </>
   )
 }
 
@@ -65,6 +81,10 @@ const areEqual = (prev, next) => {
     && sizeLogic()
     && prev.showTimer === next.showTimer
     && prev.item.team_id === next.item.team_id
+    && !next.excludeList.includes(`${prev.item.raid_pokemon_id}-${prev.item.raid_pokemon_form}`)
+    && !next.excludeList.includes(`t${prev.item.team_id}-0`)
+    && !next.excludeList.includes(`e${prev.item.raid_level}`)
+    && prev.path === next.path
   )
 }
 

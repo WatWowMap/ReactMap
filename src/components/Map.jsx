@@ -8,12 +8,11 @@ import QueryData from './QueryData'
 export default function Map({ serverSettings: { config: { map: { minZoom, maxZoom } } } }) {
   const map = useMap()
   const filters = useStore(state => state.filters)
-  const settings = useStore(state => state.settings)
+  const { tileServers: userTiles, icons: userIcons } = useStore(state => state.settings)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
   const { menus } = useStatic(state => state.ui)
-  const { map: { iconSizes } } = useCallback(useStatic(state => state.config))
-  const { path } = useStore(state => state.settings).icons
+  const { map: { iconSizes }, tileServers, icons } = useCallback(useStatic(state => state.config))
   const availableForms = useStatic(state => state.availableForms)
 
   const initialBounds = {
@@ -32,9 +31,9 @@ export default function Map({ serverSettings: { config: { map: { minZoom, maxZoo
   return (
     <>
       <TileLayer
-        key={settings.tileServers.name}
-        attribution={settings.tileServers.attribution}
-        url={settings.tileServers.url}
+        key={tileServers[userTiles].name}
+        attribution={tileServers[userTiles].attribution}
+        url={tileServers[userTiles].url}
         minZoom={minZoom}
         maxZoom={maxZoom}
       />
@@ -78,8 +77,9 @@ export default function Map({ serverSettings: { config: { map: { minZoom, maxZoo
               perms={value}
               category={item}
               iconSizes={iconSizes[item]}
-              path={path}
+              path={icons[userIcons].path}
               availableForms={availableForms}
+              tileStyle={tileServers[userTiles].style}
             />
           )
         }

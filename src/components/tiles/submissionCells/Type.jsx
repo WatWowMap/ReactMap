@@ -4,10 +4,10 @@ import { Polygon, Popup, Tooltip } from 'react-leaflet'
 import PopupContent from '../../popups/SubmissionCell'
 import typeStyle from '../../markers/typeCell'
 
-const TypeTile = ({ cell }) => (
+const TypeTile = ({ cell, tileStyle }) => (
   <Polygon
     positions={cell.polygon}
-    pathOptions={typeStyle(cell)}
+    pathOptions={typeStyle(cell, tileStyle)}
   >
     <Popup
       position={[cell.lat, cell.lon]}

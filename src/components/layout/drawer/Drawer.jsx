@@ -17,9 +17,9 @@ export default function DrawerMenu({
 }) {
   const classes = useStyles()
   const { menus } = useStatic(state => state.ui)
-  const { drawer: { name } } = useStore(state => state.settings)
+  const { drawer: drawerStyle } = useStore(state => state.settings)
   const { map: { title } } = useStatic(state => state.config)
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState('')
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
@@ -104,7 +104,7 @@ export default function DrawerMenu({
   return (
     <Drawer
       anchor="left"
-      variant={name}
+      variant={drawerStyle}
       open={drawer}
       onClose={toggleDrawer(false)}
       classes={{ paper: classes.drawer }}

@@ -23,7 +23,7 @@ const getLure = (lureId) => {
 }
 
 export default function PokestopPopup({
-  pokestop, ts, hasLure, hasInvasion, hasQuest,
+  pokestop, ts, hasLure, hasInvasion, hasQuest, path, availableForms,
 }) {
   const { menus: { pokestops: perms } } = useStatic(state => state.ui)
   const [invasionExpand, setInvasionExpand] = useState(false)
@@ -65,7 +65,11 @@ export default function PokestopPopup({
             {hasQuest ? (
               <>
                 <Divider orientation="vertical" flexItem />
-                <PokestopInfo pokestop={pokestop} />
+                <PokestopInfo
+                  pokestop={pokestop}
+                  path={path}
+                  availableForms={availableForms}
+                />
               </>
             ) : (
               <>
@@ -114,6 +118,8 @@ const Header = ({
   const setExcludeList = useStatic(state => state.setExcludeList)
   const timerList = useStatic(state => state.timerList)
   const setTimerList = useStatic(state => state.setTimerList)
+  const filters = useStore(state => state.filters)
+  const setFilters = useStore(state => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [pokestopName, setPokestopName] = useState(true)
@@ -139,17 +145,46 @@ const Header = ({
 
   const excludeQuest = () => {
     setAnchorEl(null)
+    let key = ''
     switch (quest_reward_type) {
-      default: setExcludeList([...excludeList, `${quest_pokemon_id}-${quest_form_id}`]); break
-      case 2: setExcludeList([...excludeList, `q${quest_item_id}`]); break
-      case 3: setExcludeList([...excludeList, `d${stardust_amount}`]); break
-      case 12: setExcludeList([...excludeList, `m${mega_pokemon_id}-${mega_amount}`]); break
+      default: key = `${quest_pokemon_id}-${quest_form_id}`; break
+      case 2: key = `q${quest_item_id}`; break
+      case 3: key = `d${stardust_amount}`; break
+      case 12: key = `m${mega_pokemon_id}-${mega_amount}`; break
     }
+    setFilters({
+      ...filters,
+      pokestops: {
+        ...filters.pokestops,
+        filter: {
+          ...filters.pokestops.filter,
+          [key]: {
+            ...filters.pokestops.filter[key],
+            enabled: false,
+          },
+        },
+      },
+    })
+    setExcludeList([...excludeList, key])
   }
 
   const excludeInvasion = () => {
     setAnchorEl(null)
-    setExcludeList([...excludeList, `i${grunt_type}`])
+    const key = `i${grunt_type}`
+    setFilters({
+      ...filters,
+      pokestops: {
+        ...filters.pokestops,
+        filter: {
+          ...filters.pokestops.filter,
+          [key]: {
+            ...filters.pokestops.filter[key],
+            enabled: false,
+          },
+        },
+      },
+    })
+    setExcludeList([...excludeList, key])
   }
 
   const handleTimer = () => {
@@ -294,10 +329,8 @@ const Timer = ({ expireTime, lureName }) => {
   )
 }
 
-const PokestopInfo = ({ pokestop }) => {
+const PokestopInfo = ({ pokestop, path, availableForms }) => {
   const { questTypes } = useStatic(state => state.masterfile)
-  const { icons: { path } } = useStore(state => state.settings)
-  const availableForms = useStatic(state => state.availableForms)
   const {
     quest_reward_type, quest_target, quest_type,
     quest_item_id, item_amount, stardust_amount,
@@ -373,7 +406,8 @@ const Footer = ({
   pokestop, expanded, setExpanded, hasInvasion, invasionExpand, setInvasionExpand, perms,
 }) => {
   const classes = useStyles()
-  const { navigation: { url } } = useStore(state => state.settings)
+  const { navigation } = useStore(state => state.settings)
+  const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
   const { lat, lon } = pokestop
 
   const handleExpandClick = () => {

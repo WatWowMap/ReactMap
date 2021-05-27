@@ -87,6 +87,8 @@ const Header = ({ pokemon, iconUrl, metaData }) => {
   const setExcludeList = useStatic(state => state.setExcludeList)
   const timerList = useStatic(state => state.timerList)
   const setTimerList = useStatic(state => state.setTimerList)
+  const filters = useStore(state => state.filters)
+  const setFilters = useStore(state => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
 
@@ -108,7 +110,21 @@ const Header = ({ pokemon, iconUrl, metaData }) => {
 
   const handleExclude = () => {
     setAnchorEl(null)
-    setExcludeList([...excludeList, `${pokemon_id}-${form}`])
+    const key = `${pokemon_id}-${form}`
+    setFilters({
+      ...filters,
+      pokemon: {
+        ...filters.pokemon,
+        filter: {
+          ...filters.pokemon.filter,
+          [key]: {
+            ...filters.pokemon.filter[key],
+            enabled: false,
+          },
+        },
+      },
+    })
+    setExcludeList([...excludeList, key])
   }
 
   const handleTimer = () => {
@@ -291,7 +307,8 @@ const Footer = ({
   pokemon, expanded, pvpExpand, setExpanded, setPvpExpand, hasPvp,
 }) => {
   const classes = useStyles()
-  const { navigation: { url } } = useStore(state => state.settings)
+  const { navigation } = useStore(state => state.settings)
+  const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
 
   const { lat, lon } = pokemon
 
@@ -403,7 +420,8 @@ const ExtraInfo = ({ pokemon, perms }) => {
 const PvpInfo = ({ league, data, onlyTop5 }) => {
   if (data === null) return ''
 
-  const { path } = useStore(state => state.settings).icons
+  const { icons } = useStore(state => state.settings)
+  const { icons: { [icons]: { path } } } = useStatic(state => state.config)
   const availableForms = useStatic(state => state.availableForms)
 
   const rows = []

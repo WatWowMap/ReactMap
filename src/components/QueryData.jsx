@@ -7,21 +7,24 @@ import { useStatic } from '@hooks/useStore'
 import Query from '@services/Query'
 import * as index from './tiles/index'
 
+const withAvailableList = ['pokestops', 'gyms', 'nests']
+
 export default function QueryData({
-  bounds, filters, onMove, perms, category, iconSizes, path, availableForms,
+  bounds, filters, onMove, perms, category, iconSizes, path, availableForms, tileStyle,
 }) {
   const Component = index[category]
   const zoomLevel = useStatic(state => state.config).map.clusterZoomLevels[category] || 1
   const hideList = useStatic(state => state.hideList)
   const excludeList = useStatic(state => state.excludeList)
   const timerList = useStatic(state => state.timerList)
+  const available = useStatic(state => state.available)
+  const { [category]: { filter: staticFilters } } = useStatic(state => state.staticFilters)
 
   const map = useMap()
   const ts = Math.floor((new Date()).getTime() / 1000)
 
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
-      onlyExcludeList: excludeList,
       onlyLegacyExclude: [],
     }
     Object.entries(requestedFilters).forEach(topLevelFilter => {
@@ -34,14 +37,21 @@ export default function QueryData({
     Object.entries(requestedFilters.filter).forEach(filter => {
       const [id, specifics] = filter
 
-      if (specifics && specifics.enabled) {
-        trimmed[id] = specifics
+      if (specifics && specifics.enabled && staticFilters[id]) {
+        if (withAvailableList.includes(category)
+          && !Number.isNaN(parseInt(id.charAt(0)))) {
+          if (available[category].includes(id)) {
+            trimmed[id] = specifics
+          }
+        } else {
+          trimmed[id] = specifics
+        }
       } else if (category === 'pokemon' && filters.legacy) {
         trimmed.onlyLegacyExclude.push(id)
       }
     })
     return trimmed
-  }, [excludeList])
+  }, [])
 
   const getId = useCallback((component, item) => {
     switch (component) {
@@ -84,7 +94,7 @@ export default function QueryData({
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [filters, excludeList])
+  }, [filters])
 
   const { data, previousData, refetch } = useQuery(Query[category](filters, perms, map.getZoom(), zoomLevel), {
     variables: {
@@ -112,6 +122,8 @@ export default function QueryData({
               path={path}
               availableForms={availableForms}
               perms={perms}
+              tileStyle={tileStyle}
+              excludeList={excludeList}
             />
           )
         }

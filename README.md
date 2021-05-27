@@ -19,6 +19,7 @@
 ## PreReqs
 - NodeJS (Recommend using V12.*)
 - MySQL (Only 8.0+ has been tested)
+- Or MariaDB (10.4 has been tested)
 - Yarn (npm install -g yarn)
 
 ## Installation Instructions
@@ -27,7 +28,7 @@
 3. `yarn install`
 4. Create your config (`cp server/src/configs/config.example.json server/src/configs/config.json`)
 - There are additional configs options available in `server/src/configs/default.json` that can be utilized by copying them over into your config file. Be sure to maintain the same object structure when copying options over
-5. (Optional) You can add an `areas.json` file in the configs folder that's in the GeoJSON format for your users to be able to visualize your currently scanned areas. If you're using Poracle, the `geofence.json` file can be used without having to make any changes to it other than renaming it to `areas.json`.
+5. (Optional) You can add an `areas.json` file in the configs folder that's in the GeoJSON format (see `areas.example.json` for the format) for your users to be able to visualize your currently scanned areas.
 6. Run your migrations (`yarn migrate:latest`)
 - This will create a `users` table, would recommend putting this in your manual db that has nests/portals/sessions/etc 
 - A sessions table will automatically be created in the specified db after the next step, be sure you've selected the correct db in the config!

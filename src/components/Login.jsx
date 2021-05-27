@@ -6,15 +6,11 @@ import {
 export default function Login() {
   return (
     <Grid
-      style={{
-        display: 'flex',
-        margin: '45% auto auto auto',
-        backgroundColor: 'rgb(52, 52, 52)',
-      }}
       container
-      direction="row"
+      direction="column"
       justify="center"
       alignItems="center"
+      style={{ minHeight: '100vh' }}
     >
       <Grid item>
         <Button
@@ -31,6 +27,11 @@ export default function Login() {
             Login
           </Typography>
         </Button>
+      </Grid>
+      <Grid item>
+        <Typography style={{ color: 'white', margin: 20 }}>
+          Only click the &apos;Authorize&apos; button on the next page once.
+        </Typography>
       </Grid>
     </Grid>
   )
