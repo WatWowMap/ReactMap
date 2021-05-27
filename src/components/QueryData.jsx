@@ -18,7 +18,7 @@ export default function QueryData({
   const excludeList = useStatic(state => state.excludeList)
   const timerList = useStatic(state => state.timerList)
   const available = useStatic(state => state.available)
-  const staticFilters = useStatic(state => state.static)
+  const { [category]: { filter: staticFilters } } = useStatic(state => state.staticFilters)
 
   const map = useMap()
   const ts = Math.floor((new Date()).getTime() / 1000)
