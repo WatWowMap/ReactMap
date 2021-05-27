@@ -17,7 +17,25 @@ const rootRouter = new express.Router()
 
 rootRouter.use('/', clientRouter)
 
-rootRouter.use('/auth', authRouter)
+if (config.discord.enabled) {
+  rootRouter.use('/auth', authRouter)
+
+  // eslint-disable-next-line no-unused-vars
+  rootRouter.use((err, req, res, next) => {
+    switch (err.message) {
+      case 'NoCodeProvided':
+        return res.status(400).send({
+          status: 'ERROR',
+          error: err.message,
+        })
+      default:
+        return res.status(500).send({
+          status: 'ERROR - you clicked authorize twice, didn\'t you? You will need to go back and try again.',
+          error: err.message,
+        })
+    }
+  })
+}
 
 rootRouter.get('/logout', (req, res) => {
   req.session.destroy()

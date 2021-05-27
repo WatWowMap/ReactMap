@@ -28,6 +28,11 @@ export default function Login() {
           </Typography>
         </Button>
       </Grid>
+      <Grid item>
+        <Typography style={{ color: 'white', margin: 20 }}>
+          Only click the &apos;Authorize&apos; button on the next page once.
+        </Typography>
+      </Grid>
     </Grid>
   )
 }

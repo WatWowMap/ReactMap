@@ -5651,10 +5651,9 @@ pascalcase@^0.1.1:
   resolved "https://registry.yarnpkg.com/pascalcase/-/pascalcase-0.1.1.tgz#b363e55e8006ca6fe21784d2db22bd15d7917f14"
   integrity sha1-s2PlXoAGym/iF4TS2yK9FdeRfxQ=
 
-passport-discord@^0.1.4:
+"passport-discord@https://github.com/tonestrike/passport-discord.git":
   version "0.1.4"
-  resolved "https://registry.yarnpkg.com/passport-discord/-/passport-discord-0.1.4.tgz#9265be11952cdd54d77c47eaae352834444cf0f6"
-  integrity sha512-VJWPYqSOmh7SaCLw/C+k1ZqCzJnn2frrmQRx1YrcPJ3MQ+Oa31XclbbmqFICSvl8xv3Fqd6YWQ4H4p1MpIN9rA==
+  resolved "https://github.com/tonestrike/passport-discord.git#7d7a726f6dc1e3d7be51cf11c554f1fd8a74563a"
   dependencies:
     passport-oauth2 "^1.5.0"
 

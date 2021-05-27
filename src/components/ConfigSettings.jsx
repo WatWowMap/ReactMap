@@ -61,7 +61,7 @@ export default function ConfigSettings({ serverSettings }) {
   setStaticFilters(serverSettings.defaultFilters)
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
 
-  // console.log(JSON.parse(localStorage.getItem('local-state')).state.settings)
+  // temp settings migration
   const parsed = JSON.parse(localStorage.getItem('local-state'))
   if (parsed) {
     if (parsed.state && parsed.state.settings.icons.name) {
