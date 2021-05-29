@@ -5,27 +5,19 @@ import {
 import {
   Clear, Replay, Save, Check,
 } from '@material-ui/icons'
+import { useTranslation } from 'react-i18next'
 
-import Utility from '@services/Utility'
 import { useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Size from './Size'
 
-const getTeam = teamId => {
-  switch (parseInt(teamId)) {
-    default: return 'neutral'
-    case 1: return 'mystic'
-    case 2: return 'valor'
-    case 3: return 'instinct'
-  }
-}
-
 export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) {
   const classes = useStyles()
   const isMobile = useStatic(state => state.breakpoint) === 'xs'
-  const { text } = useStatic(state => state.ui)
+  const { t } = useTranslation()
   const [filterValues, setFilterValues] = useState(tempFilters)
   const [team] = useState(`t${teamId}-0`)
+
   const relevantSlots = Object.keys(filterValues).filter(each => each.charAt(0) === 'g' && each.charAt(1) === teamId)
 
   const handleSizeChange = (name, value) => {
@@ -57,7 +49,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
     text: (
       <Button onClick={() => handleSizeChange('default')}>
         <Typography variant="caption" color="primary">
-          {text.reset}
+          {t('reset')}
         </Typography>
       </Button>
     ),
@@ -74,7 +66,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
     text: (
       <Button onClick={toggleSlotsMenu(false, teamId, filterValues)}>
         <Typography color="secondary" variant="caption">
-          {text.save}
+          {t('save')}
         </Typography>
       </Button>
     ),
@@ -83,7 +75,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
   return (
     <>
       <DialogTitle className={classes.filterHeader}>
-        {Utility.getProperName(getTeam(teamId))} {text.slotSelection}
+        {t(`team${teamId}`)} {t('slotSelection')}
         <IconButton
           onClick={toggleSlotsMenu(false)}
           style={{ position: 'absolute', right: 5, top: 5 }}

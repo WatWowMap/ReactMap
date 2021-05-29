@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { useStore, useStatic } from '@hooks/useStore'
+import { useTranslation } from 'react-i18next'
 import getPokemonIcon from './getPokemonIcon'
 
 export default function menuFilter(tempFilters, menus, search, type) {
@@ -10,6 +11,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
   const { [type]: available } = useStatic(state => state.available)
   const { menus: { pokestops: stopPerms, gyms: gymPerms } } = useStatic(state => state.ui)
   const { [type]: { filter } } = useStatic(state => state.staticFilters)
+  const { t } = useTranslation()
 
   const {
     filters: {
@@ -127,20 +129,19 @@ export default function menuFilter(tempFilters, menus, search, type) {
         switch (id.charAt(0)) {
           default: pokestop.category = 'pokestops'; break
           case 'i':
-            pokestop = masterfile.invasions[id.slice(1)] || {}
             pokestop.category = 'invasions'
-            pokestop.name = pokestop.type; break
+            pokestop.name = t(`grunt_${id.slice(1)}`); break
           case 'd':
             pokestop = { name: `x${id.slice(1)}` } || {}
             pokestop.category = 'items'; break
           case 'm':
-            pokestop = { name: `${masterfile.pokemon[id.slice(1).split('-')[0]].name} x${id.split('-')[1]}` } || {}
+            pokestop = { name: `${t(`poke_${id.slice(1).split('-')[0]}`)} x${id.split('-')[1]}` } || {}
             pokestop.category = 'energy'; break
           case 'q':
-            pokestop = masterfile.items[id.slice(1)] || {}
+            pokestop.name = t(`item_${id.slice(1)}`)
             pokestop.category = 'items'; break
           case 'l':
-            pokestop = masterfile.items[id.slice(1)] || {}
+            pokestop.name = t(`lure_${id.slice(1)}`)
             pokestop.category = 'lures'; break
         }
         switch (switchKey) {
@@ -183,7 +184,18 @@ export default function menuFilter(tempFilters, menus, search, type) {
         && Number.isNaN(parseInt(id.charAt(0)))
         && !id.startsWith('g')) {
         total += 1
-        const gym = masterfile.gyms[id] || {}
+        const gym = {}
+        switch (id.charAt(0)) {
+          default:
+            gym.name = t(id)
+            gym.category = ''; break
+          case 'e':
+            gym.name = t(id)
+            gym.category = 'eggs'; break
+          case 't':
+            gym.name = t(`team_${id.slice(1).split('-')[0]}`)
+            gym.category = 'teams'; break
+        }
         switch (switchKey) {
           default:
             if (categories[gym.category]) {
@@ -224,6 +236,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
       let formName = form.name || 'Normal'
       formName = formName === 'Normal' ? '' : formName
       const name = formName === '' ? pkmn.name : formName
+      const displayName = j == pkmn.default_form_id ? t(`poke_${i}`) : t(`form_${j}`)
       const formTypes = form.types || pkmn.types
       total += 1
       pkmn.category = 'pokemon'
@@ -235,30 +248,30 @@ export default function menuFilter(tempFilters, menus, search, type) {
             || (forms[name] || (forms.altForms && j != pkmn.default_form_id))
             || categories[pkmn.category]) {
             if (forms.altForms) {
-              addPokemon(id, name)
+              addPokemon(id, displayName)
             } else if (j == pkmn.default_form_id || forms[name]) {
-              addPokemon(id, name)
+              addPokemon(id, displayName)
             }
           } break
-        case 'all': addPokemon(id, name); break
-        case 'selected': if (tempFilters[id].enabled) addPokemon(id, name); break
-        case 'unselected': if (!tempFilters[id].enabled) addPokemon(id, name); break
+        case 'all': addPokemon(id, displayName); break
+        case 'selected': if (tempFilters[id].enabled) addPokemon(id, displayName); break
+        case 'unselected': if (!tempFilters[id].enabled) addPokemon(id, displayName); break
         case 'available':
           if (available.includes(id)
             && (tempAdvFilter.categories || categories[pkmn.category])) {
-            addPokemon(id, name)
+            addPokemon(id, displayName)
           } break
         case 'search': {
-          const meta = [...formTypes, pkmn.name, formName, pkmn.rarity, pkmn.generation].join(' ').toLowerCase()
+          const meta = [...formTypes, pkmn.name, formName, pkmn.rarity, pkmn.generation, displayName].join(' ').toLowerCase()
           searchTerms.forEach(term => {
             if (typeof term === 'string') {
               if ((meta.includes(term))
                 || pkmn.pokedex_id == term) {
-                addPokemon(id, name)
+                addPokemon(id, displayName)
               }
             } else {
               const andCheck = term.every(subTerm => meta.includes(subTerm))
-              if (andCheck) addPokemon(id, name)
+              if (andCheck) addPokemon(id, displayName)
             }
           })
         } break
@@ -267,7 +280,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
             && (tempAdvFilter.types || typeResolver(formTypes))
             && (tempAdvFilter.rarity || rarity[pkmn.rarity])
             && (tempAdvFilter.forms || (forms.altForms ? j != pkmn.default_form_id : forms[name]))) {
-            addPokemon(id, name)
+            addPokemon(id, displayName)
           } break
         }
       }

@@ -6,6 +6,7 @@ import {
   Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem,
 } from '@material-ui/core'
 import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
+import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
@@ -23,9 +24,11 @@ const getTeam = teamId => {
 export default function GymPopup({
   gym, hasRaid, ts, path, availableForms,
 }) {
+  const { t } = useTranslation()
   const { menus: { gyms: perms } } = useStatic(state => state.ui)
   const [raidExpand, setRaidExpand] = useState(hasRaid)
   const [extraExpand, setExtraExpand] = useState(false)
+
   return (
     <Grid
       container
@@ -35,7 +38,7 @@ export default function GymPopup({
       alignItems="center"
       spacing={1}
     >
-      <Header gym={gym} perms={perms} hasRaid={hasRaid} />
+      <Header gym={gym} perms={perms} hasRaid={hasRaid} t={t} />
       {perms.gyms && (
         <Grid item xs={12}>
           <Collapse in={!raidExpand} timeout="auto" unmountOnExit>
@@ -49,6 +52,7 @@ export default function GymPopup({
               <Divider orientation="vertical" flexItem />
               <GymInfo
                 gym={gym}
+                t={t}
               />
             </Grid>
           </Collapse>
@@ -68,10 +72,11 @@ export default function GymPopup({
                 ts={ts}
                 path={path}
                 availableForms={availableForms}
+                t={t}
               />
               <Divider orientation="vertical" flexItem />
-              <RaidInfo gym={gym} />
-              <Timer gym={gym} ts={ts} />
+              <RaidInfo gym={gym} t={t} />
+              <Timer gym={gym} ts={ts} t={t} />
             </Grid>
           </Collapse>
         </Grid>
@@ -84,17 +89,20 @@ export default function GymPopup({
         setRaidExpand={setRaidExpand}
         hasRaid={hasRaid}
         perms={perms}
+        t={t}
       />
       {perms.gyms && (
         <Collapse in={extraExpand} timeout="auto" unmountOnExit>
-          <ExtraInfo gym={gym} />
+          <ExtraInfo gym={gym} t={t} />
         </Collapse>
       )}
     </Grid>
   )
 }
 
-const Header = ({ gym, perms, hasRaid }) => {
+const Header = ({
+  gym, perms, hasRaid, t,
+}) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
   const excludeList = useStatic(state => state.excludeList)
@@ -110,7 +118,7 @@ const Header = ({ gym, perms, hasRaid }) => {
   const {
     id, team_id, raid_pokemon_id, raid_pokemon_form, raid_level,
   } = gym
-  const name = gym.name || 'Unknown Gym Name'
+  const name = gym.name || t('unknownGym')
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -172,16 +180,16 @@ const Header = ({ gym, perms, hasRaid }) => {
   }
 
   const options = [
-    { name: 'Hide', action: handleHide },
+    { name: 'hide', action: handleHide },
   ]
 
   if (perms.gyms) {
-    options.push({ name: 'Exclude Team', action: excludeTeam })
+    options.push({ name: 'excludeTeam', action: excludeTeam })
   }
   if (perms.raids && hasRaid) {
     options.push(
-      { name: 'Exclude Raid', action: excludeBoss },
-      { name: 'Timer', action: handleTimer },
+      { name: 'excludeRaid', action: excludeBoss },
+      { name: 'timer', action: handleTimer },
     )
   }
 
@@ -219,7 +227,7 @@ const Header = ({ gym, perms, hasRaid }) => {
       >
         {options.map((option) => (
           <MenuItem key={option.name} onClick={option.action}>
-            {option.name}
+            {t(option.name)}
           </MenuItem>
         ))}
       </Menu>
@@ -254,7 +262,7 @@ const PoiImage = ({ gym }) => {
 }
 
 const RaidImage = ({
-  gym, ts, path, availableForms,
+  gym, ts, path, availableForms, t,
 }) => {
   const {
     raid_level, raid_pokemon_id, raid_pokemon_form, raid_pokemon_gender, raid_pokemon_costume, raid_pokemon_evolution,
@@ -303,7 +311,7 @@ const RaidImage = ({
       </Grid>
       <Grid item xs={12} style={{ textAlign: 'center' }}>
         <Typography variant="subtitle2">
-          {`Tier ${raid_level}`}
+          {`${t('tier')} ${raid_level}`}
         </Typography>
       </Grid>
       {(raid_pokemon_id > 0) && getRaidTypes(raid_pokemon_id, raid_pokemon_form).map(type => (
@@ -328,7 +336,7 @@ const RaidImage = ({
   )
 }
 
-const GymInfo = ({ gym }) => {
+const GymInfo = ({ gym, t }) => {
   const {
     team_id, availble_slots, ex_raid_eligible, ar_scan_eligible,
   } = gym
@@ -344,12 +352,12 @@ const GymInfo = ({ gym }) => {
     >
       <Grid item xs={12}>
         <Typography variant="h6" align="center">
-          {Utility.getProperName(getTeam(team_id))}
+          {t(`team_${team_id}`)}
         </Typography>
       </Grid>
       <Grid item xs={12}>
         <Typography variant="subtitle1" align="center">
-          Slots: {availble_slots}
+          {t('slots')} {availble_slots}
         </Typography>
       </Grid>
       {ex_raid_eligible && (
@@ -378,7 +386,7 @@ const GymInfo = ({ gym }) => {
   )
 }
 
-const RaidInfo = ({ gym }) => {
+const RaidInfo = ({ gym, t }) => {
   const { moves, pokemon } = useStatic(state => state.masterfile)
   const {
     raid_level, raid_pokemon_id, raid_pokemon_form, raid_pokemon_move_1, raid_pokemon_move_2,
@@ -389,19 +397,19 @@ const RaidInfo = ({ gym }) => {
     if (id) {
       return pokemon[raid_pokemon_id].name
     }
-    return `Tier ${raidLevel}`
+    return `${t('tier')} ${raidLevel}`
   }
 
   const getRaidForm = (id, form, evo) => {
     if (evo) {
-      return 'Mega'
+      return t('mega')
     }
     if (form) {
       const raidForm = pokemon[id].forms[form].name
       if (raidForm === 'Normal') {
         return ''
       }
-      return `${raidForm} Form`
+      return `${raidForm} ${t('form')}`
     }
   }
 
@@ -443,7 +451,7 @@ const RaidInfo = ({ gym }) => {
       />
       <Grid item xs={10} style={{ textAlign: 'center' }}>
         <Typography variant="caption" align="center">
-          {moves[raid_pokemon_move_1].name}
+          {t(`move_${raid_pokemon_move_1}`)}
         </Typography>
       </Grid>
       <Grid
@@ -459,14 +467,14 @@ const RaidInfo = ({ gym }) => {
       />
       <Grid item xs={10} style={{ textAlign: 'center' }}>
         <Typography variant="caption" align="center">
-          {moves[raid_pokemon_move_2].name}
+          {t(`move_${raid_pokemon_move_2}`)}
         </Typography>
       </Grid>
     </Grid>
   )
 }
 
-const Timer = ({ gym, start }) => {
+const Timer = ({ gym, start, t }) => {
   const { raid_battle_timestamp, raid_end_timestamp } = gym
   const startTime = new Date(raid_battle_timestamp * 1000)
   const endTime = new Date(raid_end_timestamp * 1000)
@@ -486,7 +494,7 @@ const Timer = ({ gym, start }) => {
     return (
       <Grid item xs={6} style={{ textAlign: 'center' }}>
         <Typography variant="subtitle1">
-          Starts: {startTime.toLocaleTimeString()}
+          {t('starts')}: {startTime.toLocaleTimeString()}
         </Typography>
         <Typography variant="h6">
           {raidStart.str}
@@ -497,7 +505,7 @@ const Timer = ({ gym, start }) => {
   return (
     <Grid item xs={12} style={{ textAlign: 'center' }}>
       <Typography variant="subtitle1">
-        End: {endTime.toLocaleTimeString()}
+        {t('ends')} {endTime.toLocaleTimeString()}
       </Typography>
       <Typography variant="h6">
         {raidEnd.str}
@@ -564,27 +572,26 @@ const Footer = ({
   )
 }
 
-const ExtraInfo = ({ gym }) => {
-  const { pokemon } = useStatic(state => state.masterfile)
+const ExtraInfo = ({ gym, t }) => {
   const {
     last_modified_timestamp, updated, total_cp, guarding_pokemon_id,
   } = gym
 
   const extraMetaData = [
     {
-      description: 'Defender',
-      data: pokemon[guarding_pokemon_id].name,
+      description: 'defender',
+      data: t(`poke_${guarding_pokemon_id}`),
     },
     {
-      description: 'Total CP:',
+      description: 'totalCP',
       data: total_cp,
     },
     {
-      description: 'Last Seen:',
+      description: 'lastSeen',
       data: (new Date(updated * 1000)).toLocaleTimeString(),
     },
     {
-      description: 'Last Modified:',
+      description: 'lastModified',
       data: (new Date(last_modified_timestamp * 1000)).toLocaleTimeString(),
     },
   ]
@@ -599,7 +606,7 @@ const ExtraInfo = ({ gym }) => {
         <Fragment key={meta.description}>
           <Grid item xs={5} style={{ textAlign: 'left' }}>
             <Typography variant="caption" align="center">
-              {meta.description}
+              {t(meta.description)}:
             </Typography>
           </Grid>
           <Grid item xs={6} style={{ textAlign: 'right' }}>

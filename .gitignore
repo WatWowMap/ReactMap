@@ -1,13 +1,18 @@
 /node_modules/
 /dist/
 
+# Config files
 .env
 config.json
 areas.json
 masterfile.json
 
+# Favicon
 public/favicon/*
 !public/favicon/favicon.ico
+
+# Ignore generated locales
+public/locales/*
 
 # OS X
 .DS_Store*

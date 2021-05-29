@@ -1,11 +1,13 @@
 /* eslint-disable camelcase */
 import React, { useState, useEffect } from 'react'
 import { Grid, Typography } from '@material-ui/core'
+import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
 export default function WeatherPopup({ weather }) {
+  const { t } = useTranslation()
   const { weatherTypes } = useStatic(state => state.masterfile)
   const { gameplay_condition, updated } = weather
 
@@ -19,24 +21,24 @@ export default function WeatherPopup({ weather }) {
     >
       <Grid item xs={12}>
         <Typography variant="h6" align="center">
-          {weatherTypes[gameplay_condition].name}
+          {t(`weather${gameplay_condition}`)}
         </Typography>
       </Grid>
       <Grid item xs={12}>
         <Typography variant="subtitle2" align="center">
-          Last Updated:
+          {t('lastUpdated')}:
         </Typography>
       </Grid>
       <Timer updated={updated} />
       <Grid item xs={12}>
         <Typography variant="subtitle2" align="center">
-          Boosted Types:
+          {t('boostedTypes')}:
         </Typography>
       </Grid>
       {weatherTypes[gameplay_condition].types.map(type => (
         <Grid item xs={4} key={type} style={{ textAlign: 'center' }}>
           <Typography variant="caption">
-            {type}
+            {t(type)}
           </Typography>
           <img
             src={`images/type/${type.toLowerCase()}.png`}

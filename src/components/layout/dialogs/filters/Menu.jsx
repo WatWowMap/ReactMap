@@ -14,6 +14,7 @@ import {
 import { HighlightOff, Clear } from '@material-ui/icons'
 import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
+import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
@@ -29,8 +30,8 @@ export default function Menu({ filters, toggleDialog, type }) {
   const menus = useStore(state => state.menus)
   const setMenus = useStore(state => state.setMenus)
   const breakpoint = useStatic(state => state.breakpoint)
-  const { text } = useStatic(state => state.ui)
   const { [type]: staticFilters } = useStatic(state => state.staticMenus)
+  const { t } = useTranslation()
 
   let columnCount = breakpoint === 'sm' ? 3 : 5
   if (breakpoint === 'xs') columnCount = 1
@@ -174,11 +175,11 @@ export default function Menu({ filters, toggleDialog, type }) {
   allFilterMenus.push(
     <Grid item key="reset">
       <Button onClick={handleReset} color="primary">
-        {text.resetFilters}
+        {t('resetFilters')}
       </Button>
     </Grid>,
     <Grid item key="count" style={{ textAlign: 'center' }}>
-      <Typography variant="h6" align="center">Showing:</Typography>
+      <Typography variant="h6" align="center">{t('showing')}:</Typography>
       <Typography variant="subtitle2" align="center">{count.show}/{count.total}</Typography>
     </Grid>,
   )
@@ -207,7 +208,7 @@ export default function Menu({ filters, toggleDialog, type }) {
         />
       </Dialog>
       <DialogTitle className={classes.filterHeader}>
-        {Utility.getProperName(type)} {text.filterSettings}
+        {t(`${type}Filters`)}
         <IconButton
           onClick={toggleDialog(false, type, filters.filter)}
           style={{ position: 'absolute', right: 5, top: 5 }}
@@ -238,7 +239,7 @@ export default function Menu({ filters, toggleDialog, type }) {
             <Paper elevation={0} variant="outlined" className={classes.search}>
               <InputBase
                 className={classes.input}
-                placeholder={`Filter ${Utility.getProperName(type)}`}
+                placeholder={t(`search${type}`)}
                 name="search"
                 value={search}
                 onChange={handleSearchChange}

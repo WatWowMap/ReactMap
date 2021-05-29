@@ -1,22 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 module.exports = function generateUi(filters, perms) {
   const menus = {}
-  const text = {
-    save: 'Save',
-    reset: 'Reset',
-    filterSettings: 'Filter Settings',
-    resetFilters: 'Reset Filters',
-    advanced: 'Advanced',
-    help: 'Help',
-    applyToAll: 'Apply To All',
-    disableAll: 'Disable All',
-    enableAll: 'Enable All',
-    legacy: 'Legacy',
-    sizes: ['sm', 'md', 'lg', 'xl'],
-    sliderInputs: ['min', 'max'],
-    setSize: 'Set Icon Size',
-    slotSelection: 'Slot Selection',
-  }
+  const sizes = ['sm', 'md', 'lg', 'xl']
   const ignoredKeys = ['enabled', 'filter']
 
   // builds the initial categories
@@ -30,27 +15,27 @@ module.exports = function generateUi(filters, perms) {
           sliders = {
             primary: [
               {
-                name: 'IV Range', shortName: 'iv', label: '%', min: 0, max: 100, perm: 'iv',
+                name: 'iv', label: '%', min: 0, max: 100, perm: 'iv',
               },
               {
-                name: 'Great League', shortName: 'gl', label: 'Rank', min: 1, max: 100, perm: 'pvp',
+                name: 'gl', label: 'rank', min: 1, max: 100, perm: 'pvp',
               },
               {
-                name: 'Ultra League', shortName: 'ul', label: 'Rank', min: 1, max: 100, perm: 'pvp',
+                name: 'ul', label: 'rank', min: 1, max: 100, perm: 'pvp',
               },
             ],
             secondary: [
               {
-                name: 'Level', shortName: 'level', label: '', min: 1, max: 35, perm: 'stats',
+                name: 'level', label: '', min: 1, max: 35, perm: 'stats',
               },
               {
-                name: 'Attack', shortName: 'atk_iv', label: '', min: 0, max: 15, perm: 'stats',
+                name: 'atk_iv', label: '', min: 0, max: 15, perm: 'stats',
               },
               {
-                name: 'Defense', shortName: 'def_iv', label: '', min: 0, max: 15, perm: 'stats',
+                name: 'def_iv', label: '', min: 0, max: 15, perm: 'stats',
               },
               {
-                name: 'Stamina', shortName: 'sta_iv', label: '', min: 0, max: 15, perm: 'stats',
+                name: 'sta_iv', label: '', min: 0, max: 15, perm: 'stats',
               },
             ],
           }; break
@@ -108,7 +93,5 @@ module.exports = function generateUi(filters, perms) {
 
   menus.settings = true
 
-  return {
-    menus, text,
-  }
+  return { menus, sizes }
 }

@@ -3,11 +3,11 @@ import {
   Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid, IconButton,
 } from '@material-ui/core'
 import { ExpandMore, Clear } from '@material-ui/icons'
+import { useTranslation } from 'react-i18next'
 
 import Settings from './Settings'
 import WithSubItems from './WithSubItems'
 import WithSliders from './WithSliders'
-import Utility from '../../../services/Utility'
 import useStyles from '../../../hooks/useStyles'
 import { useStore, useStatic } from '../../../hooks/useStore'
 import Areas from './Areas'
@@ -19,6 +19,7 @@ export default function DrawerMenu({
   const { menus } = useStatic(state => state.ui)
   const { drawer: drawerStyle } = useStore(state => state.settings)
   const { map: { title } } = useStatic(state => state.config)
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState('')
 
   const handleChange = (panel) => (event, isExpanded) => {
@@ -64,10 +65,10 @@ export default function DrawerMenu({
         onChange={handleChange(category)}
       >
         <AccordionSummary
-          expandIcon={<ExpandMore style={{ color: 'white' }} />}
+          expandIcon={<ExpandMore />}
         >
           <Typography className={classes.heading}>
-            {Utility.getProperName(category)}
+            {t(category)}
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
@@ -90,7 +91,7 @@ export default function DrawerMenu({
                     onClick={toggleDialog(true, category)}
                     variant="contained"
                   >
-                    Advanced
+                    {t('advanced')}
                   </Button>
                 </Grid>
               )}

@@ -1,10 +1,9 @@
 /* eslint-disable no-restricted-syntax */
 const Fetch = require('node-fetch')
 const Fs = require('fs-extra')
-const defaultRarity = require('../data/defaultRarity.json')
-const weatherTypes = require('../data/weatherTypes.json')
-const gymMeta = require('../data/gymMeta.json')
-const { rarity: adminRarity } = require('./config')
+const defaultRarity = require('./src/data/defaultRarity.json')
+const weatherTypes = require('./src/data/weatherTypes.json')
+const { rarity: adminRarity } = require('./src/services/config')
 
 function fetchJson(url) {
   return new Promise(resolve => {
@@ -49,7 +48,6 @@ function fetchJson(url) {
     questRewardTypes: masterfile.quest_reward_types,
     items: masterfile.items,
     weatherTypes,
-    gyms: gymMeta,
     invasions: newInvasions,
   }
 

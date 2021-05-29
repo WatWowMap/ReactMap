@@ -11,6 +11,7 @@ import {
   IconButton,
 } from '@material-ui/core'
 import { Save, Replay, Clear } from '@material-ui/icons'
+import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from './StringFilter'
@@ -19,10 +20,11 @@ import Size from './Size'
 
 export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) {
   const isMobile = useStatic(state => state.breakpoint) === 'xs'
-  const { menus, text } = useStatic(state => state.ui)
+  const { menus } = useStatic(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
+  const { t } = useTranslation()
 
   const handleChange = (event, values) => {
     if (typeof event === 'object') {
@@ -51,7 +53,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
     text: (
       <Button onClick={() => handleChange('default', advancedFilter.standard)}>
         <Typography variant="caption" color="primary">
-          {text.reset}
+          {t('reset')}
         </Typography>
       </Button>
     ),
@@ -68,7 +70,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
     text: (
       <Button onClick={toggleAdvMenu(false, advancedFilter.id, filterValues)}>
         <Typography color="secondary" variant="caption">
-          {text.save}
+          {t('save')}
         </Typography>
       </Button>
     ),
@@ -83,7 +85,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
           alignItems="center"
         >
           <Grid item xs={type === 'pokemon' ? 5 : 10}>
-            {type === 'pokemon' ? text.advanced : text.setSize}
+            {type === 'pokemon' ? t('advanced') : t('setSize')}
           </Grid>
           {type === 'pokemon' && (
             <Grid item xs={5}>
@@ -97,7 +99,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
                     disabled={!menus[type].legacy}
                   />
                 )}
-                label={text.legacy}
+                label={t('legacy')}
               />
             </Grid>
           )}

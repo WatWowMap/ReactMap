@@ -12,7 +12,7 @@ const NestTile = ({
   const { pokemon } = useStatic(state => state.masterfile)
   const iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, item.pokemon_id, item.pokemon_form)}.png`
   const parsedJson = JSON.parse(item.polygon_path)
-  const recent = ts - item.updated < 172800
+  const recent = ts - item.updated < 172800000
 
   return (
     <>
@@ -25,7 +25,7 @@ const NestTile = ({
             <PopupContent
               nest={item}
               iconUrl={iconUrl}
-              pokemon={pokemon[item.pokemon_id]}
+              pokemon={item.pokemon_id}
               recent={recent}
             />
           </Popup>

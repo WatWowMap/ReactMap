@@ -4,9 +4,9 @@ import {
   FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Slide,
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
+import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '../../../hooks/useStore'
-import Utility from '../../../services/Utility'
 
 function SlideTransition(props) {
   return <Slide {...props} direction="up" />
@@ -16,6 +16,7 @@ export default function Settings() {
   const config = useStatic(state => state.config)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
+  const { t, i18n } = useTranslation()
 
   const [alert, setAlert] = useState(false)
 
@@ -24,6 +25,9 @@ export default function Settings() {
       ...settings,
       [event.target.name]: config[event.target.name][event.target.value].name,
     })
+    if (event.target.name === 'localeSelection') {
+      i18n.changeLanguage(event.target.value)
+    }
   }
 
   const clearStorage = () => {
@@ -59,7 +63,6 @@ export default function Settings() {
     }
     reader.readAsText(file)
   }
-
   return (
     <Grid
       container
@@ -73,7 +76,7 @@ export default function Settings() {
         return (
           <Grid item key={key} xs={10}>
             <FormControl style={{ width: 200, margin: 5 }}>
-              <InputLabel>{Utility.getProperName(key)}</InputLabel>
+              <InputLabel>{t(key)}</InputLabel>
               <Select
                 autoFocus
                 name={key}
@@ -86,7 +89,7 @@ export default function Settings() {
                     key={option}
                     value={option}
                   >
-                    {Utility.getProperName(option)}
+                    {t(`${key}${option}`)}
                   </MenuItem>
                 ))}
               </Select>
@@ -104,7 +107,7 @@ export default function Settings() {
           size="small"
           onClick={clearStorage}
         >
-          Clear Storage
+          {t('clearStorage')}
         </Button>
       </Grid>
       <Grid item xs={5} style={{ textAlign: 'center' }}>
@@ -122,7 +125,7 @@ export default function Settings() {
             component="span"
             size="small"
           >
-            Import
+            {t('import')}
           </Button>
         </label>
       </Grid>
@@ -137,7 +140,7 @@ export default function Settings() {
           href="/logout"
         >
           <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
-          Logout
+          {t('logout')}
         </Button>
       </Grid>
       <Grid item xs={5} style={{ textAlign: 'center', marginBottom: '20px' }}>
@@ -147,7 +150,7 @@ export default function Settings() {
           size="small"
           onClick={exportSettings}
         >
-          Export
+          {t('export')}
         </Button>
       </Grid>
       <Snackbar
@@ -156,7 +159,7 @@ export default function Settings() {
         TransitionComponent={SlideTransition}
       >
         <Alert onClose={handleClose} severity="success" variant="filled">
-          Local Storage has been cleared!
+          {t('localStorageCleared')}
         </Alert>
       </Snackbar>
     </Grid>

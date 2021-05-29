@@ -2,20 +2,20 @@ import React, { useState, useEffect } from 'react'
 import {
   Grid, Typography, Slider, TextField,
 } from '@material-ui/core'
+import { useTranslation } from 'react-i18next'
 
-import Utility from '@services/Utility'
-import { useStatic } from '@hooks/useStore'
+const sliderInputs = ['min', 'max']
 
 export default function SliderTile({
   filterSlide: {
-    name, shortName, min, max, color, disabled, label,
+    name, min, max, color, disabled, label,
   }, handleChange, filterValues,
 }) {
-  const [tempValues, setTempValues] = useState(filterValues[shortName])
-  const { text: { sliderInputs } } = useStatic(state => state.ui)
+  const { t } = useTranslation()
+  const [tempValues, setTempValues] = useState(filterValues[name])
 
   useEffect(() => {
-    setTempValues(filterValues[shortName])
+    setTempValues(filterValues[name])
   }, [filterValues])
 
   const handleTempChange = (event) => {
@@ -47,16 +47,16 @@ export default function SliderTile({
       alignItems="center"
     >
       <Grid item xs={4}>
-        <Typography>{name}</Typography>
+        <Typography>{t(`${name}Slider`)}</Typography>
       </Grid>
       {sliderInputs.map((each, index) => (
-        <Grid item xs={4} key={`${shortName}-${each}`}>
+        <Grid item xs={4} key={`${name}-${each}`}>
           <TextField
             style={{ width: 75 }}
             color="primary"
-            id={`${shortName}-${each}`}
-            label={`${Utility.getProperName(each)} ${label}`}
-            name={shortName}
+            id={`${name}-${each}`}
+            label={`${t(each)} ${t(label)}`}
+            name={name}
             value={tempValues[index]}
             onChange={handleTempChange}
             variant="outlined"
@@ -72,19 +72,19 @@ export default function SliderTile({
       ))}
       <Grid item xs={10}>
         <Slider
-          name={shortName}
+          name={name}
           min={min}
           max={max}
           color={color}
           style={{ width: 200 }}
           value={tempValues}
           onChange={(event, newValue) => {
-            event.target.name = shortName
+            event.target.name = name
             event.target.value = newValue
             handleTempChange(event)
           }}
           onChangeCommitted={(event, newValue) => {
-            event.target.name = shortName
+            event.target.name = name
             event.target.value = newValue
             handleChange(event)
           }}

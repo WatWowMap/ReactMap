@@ -137,7 +137,7 @@ class Pokemon extends Model {
     // second query for pvp
     if (pvp && queryPvp) {
       pvpResults.push(...await this.query()
-        .select(['*', raw(true).as('pvp')])
+        .select(['*', raw(true).as('pvpCheck')])
         .where('expire_timestamp', '>=', ts)
         .andWhereBetween('lat', [args.minLat, args.maxLat])
         .andWhereBetween('lon', [args.minLon, args.maxLon])
@@ -149,7 +149,7 @@ class Pokemon extends Model {
     }
 
     pvpResults.forEach(pkmn => {
-      if (pkmn.form === 0 && pkmn.pvp) {
+      if (pkmn.form === 0 && pkmn.pvpCheck) {
         pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
       }
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
@@ -185,7 +185,7 @@ class Pokemon extends Model {
           pkmn.rankSum.ul.worst = rankCheck.worst
         }
       }
-      if ((pkmn.great || pkmn.ultra) || !pkmn.pvp) {
+      if ((pkmn.great || pkmn.ultra) || !pkmn.pvpCheck) {
         finalResults.push(pkmn)
       }
     })

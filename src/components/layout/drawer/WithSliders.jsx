@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react'
 import {
   Grid, Typography, FormControlLabel, Switch, AppBar, Tab, Tabs, Box,
 } from '@material-ui/core'
+import { useTranslation } from 'react-i18next'
 
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
-import Utility from '../../../services/Utility'
 
 function TabPanel(props) {
   const { children, value, index } = props
@@ -26,6 +26,7 @@ function TabPanel(props) {
 export default function WithSliders({
   category, filters, setFilters, context, specificFilter,
 }) {
+  const { t } = useTranslation()
   const [tempLegacy, setTempLegacy] = useState(filters[category][specificFilter])
   const [openTab, setOpenTab] = useState(0)
 
@@ -70,7 +71,7 @@ export default function WithSliders({
     <>
       <Grid item xs={6}>
         <Typography>
-          Enabled
+          {t('enabled')}
         </Typography>
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'right' }}>
@@ -91,7 +92,7 @@ export default function WithSliders({
         <>
           <Grid item xs={12}>
             <Typography>
-              {Utility.getProperName(specificFilter)} Filter
+              {t('ivOrFilter')}
             </Typography>
           </Grid>
           <Grid item xs={12}>
@@ -119,7 +120,7 @@ export default function WithSliders({
           {Object.keys(context.sliders).map((slider, index) => (
             <TabPanel value={openTab} index={index} key={slider}>
               {Object.values(context.sliders[slider]).map(subItem => (
-                <Grid item xs={12} key={subItem.shortName}>
+                <Grid item xs={12} key={subItem.name}>
                   <SliderTile
                     filterSlide={subItem}
                     handleChange={handleChange}

@@ -1,33 +1,37 @@
 import React from 'react'
 import { Typography } from '@material-ui/core'
+import { Trans, useTranslation } from 'react-i18next'
 
 export default function SubmissionCellPopup({ cell }) {
+  const { t } = useTranslation()
   const gymThreshold = [2, 6, 20]
-  let untilNextGym = 'Never'
+  let untilNextGym = t('never')
   if (cell.count_gyms < 3) {
-    untilNextGym = `${gymThreshold[cell.count_gyms] - cell.count} Submissions`
+    untilNextGym = `${gymThreshold[cell.count_gyms] - cell.count} ${t('submissions')}`
   }
   if ((cell.count === 1 && cell.count_gyms < 1)
     || (cell.count === 5 && cell.count_gyms < 2)
     || (cell.count === 19 && cell.count_gyms < 3)) {
-    untilNextGym = 'Next Submission!'
+    untilNextGym = t('nextSubmission')
   }
   return (
     <>
       <Typography variant="h6" align="center">
-        Level {cell.level} S2 Cell
+        <Trans i18nKey="s2CellLevel">
+          {{ level: cell.level }}
+        </Trans>
       </Typography>
       <Typography variant="subtitle2" align="center">
-        Total Count: {cell.count}
+        {t('totalCount')}: {cell.count}
       </Typography>
       <Typography variant="subtitle2" align="center">
-        Pokestops: {cell.count_pokestops}
+        {t('pokestops')}: {cell.count_pokestops}
       </Typography>
       <Typography variant="subtitle2" align="center">
-        Gyms: {cell.count_gyms}
+        {t('gyms')}: {cell.count_gyms}
       </Typography>
       <Typography variant="subtitle2" align="center">
-        Next Gym: {untilNextGym}
+        {t('nextGym')}: {untilNextGym}
       </Typography>
     </>
   )
