@@ -7,8 +7,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "yarn upgrade pogo-translations && node server/createLocales.js && webpack --env prod && node server/src/services/generateMasterfile.js && node server/src/index.js",
-    "server": "node server/src/services/generateMasterfile.js && node server/src/index.js",
+    "start": "yarn upgrade pogo-translations && node server/createLocales.js && webpack --env prod && node server/generateMasterfile.js && node server/src/index.js",
+    "server": "node server/generateMasterfile.js && node server/src/index.js",
     "dev": "nodemon server/src/index.js --watch server",
     "build": "yarn upgrade pogo-translations && node server/createLocales.js && webpack --env prod",
     "watch": "webpack --watch --env dev",
