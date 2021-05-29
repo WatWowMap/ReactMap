@@ -110,7 +110,10 @@ module.exports = (env) => {
           favicon: './public/favicon/favicon.ico',
         }),
         new CopyWebpackPlugin({
-          patterns: [{ from: './public/images', to: 'images' }],
+          patterns: [
+            { from: './public/images', to: 'images' },
+            { from: './public/locales', to: 'locales' },
+          ],
         }),
         new MiniCssExtractPlugin({
           filename: isDevelopment ? '[name].css' : '[name]-[contenthash:8].css',

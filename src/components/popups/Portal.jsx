@@ -1,12 +1,14 @@
 import React, { Fragment, useState } from 'react'
 import { Grid, Typography, IconButton } from '@material-ui/core'
 import { Map } from '@material-ui/icons'
+import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 
 export default function PortalPopup({ portal }) {
   const { navigation } = useStore(state => state.settings)
   const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
+  const { t } = useTranslation()
   const [portalName, setPortalName] = useState(true)
   const {
     url: imageUrl, name, lat, lon, updated, imported,
@@ -18,11 +20,11 @@ export default function PortalPopup({ portal }) {
 
   const extraMetaData = [
     {
-      description: 'Updated:',
+      description: t('lastUpdated'),
       data: (new Date(updated * 1000)).toLocaleTimeString(),
     },
     {
-      description: 'Imported:',
+      description: t('imported'),
       data: (new Date(imported * 1000)).toLocaleTimeString(),
     },
   ]

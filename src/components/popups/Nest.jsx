@@ -1,11 +1,13 @@
 /* eslint-disable camelcase */
 import React, { useState } from 'react'
 import { Grid, Typography, Divider } from '@material-ui/core'
+import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 
 export default function NestPopup({
   nest, iconUrl, pokemon, recent,
 }) {
+  const { t } = useTranslation()
   const [parkName, setParkName] = useState(true)
   const {
     name, updated, pokemon_avg,
@@ -52,18 +54,18 @@ export default function NestPopup({
         />
         <br />
         <Typography variant="caption">
-          {pokemon.name}
+          {t(`poke_${pokemon}`)}
         </Typography>
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'center' }}>
         <Typography variant="subtitle2">
-          Last Updated:
+          {t('lastUpdated')}
         </Typography>
         <Typography variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'} style={{ color: getColor(lastUpdated.diff) }}>
           {lastUpdated.str}
         </Typography>
         <Typography variant="subtitle2">
-          ~{pokemon_avg} spawns/hr
+          ~{pokemon_avg} {t('spawnsPerHour')}
         </Typography>
       </Grid>
       <Grid item xs={12}>
@@ -72,13 +74,13 @@ export default function NestPopup({
       <Grid item xs={12} style={{ textAlign: 'center' }}>
         {recent ? (
           <Typography variant="caption">
-            Nest Data is Estimated!<br />
-            Verify by Checking Current Spawns
+            {t('nestEstimated')}<br />
+            {t('verifyNests')}
           </Typography>
         ) : (
           <Typography variant="caption">
-            Nest is Potentially Out of Date!<br />
-            Check Current Spawns Instead
+            {t('nestOutOfDate')}<br />
+            {t('nestCheckCurrent')}
           </Typography>
         )}
       </Grid>

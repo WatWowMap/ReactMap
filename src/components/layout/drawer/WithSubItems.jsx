@@ -2,12 +2,12 @@ import React from 'react'
 import {
   Grid, Typography, Switch,
 } from '@material-ui/core'
-
-import Utility from '../../../services/Utility'
+import { useTranslation } from 'react-i18next'
 
 export default function WithSubItems({
   category, filters, setFilters, subItem,
 }) {
+  const { t } = useTranslation()
   let filterCategory
 
   if (category === 'wayfarer' || category === 'admin') {
@@ -45,7 +45,7 @@ export default function WithSubItems({
   return (
     <>
       <Grid item xs={6}>
-        <Typography>{Utility.getProperName(subItem)}</Typography>
+        <Typography>{t(subItem)}</Typography>
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         {filterCategory}

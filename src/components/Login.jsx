@@ -1,9 +1,12 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Grid, Button, Icon, Typography,
 } from '@material-ui/core'
 
 export default function Login({ failed }) {
+  const { t } = useTranslation()
+
   return (
     <Grid
       container
@@ -24,16 +27,16 @@ export default function Login({ failed }) {
         >
           <Icon className="fab fa-discord" style={{ fontSize: 30 }} />&nbsp;
           <Typography variant="h6" align="center">
-            Login
+            {t('login')}
           </Typography>
         </Button>
       </Grid>
       {failed && (
-      <Grid item>
-        <Typography style={{ color: 'white', margin: 20 }} align="center">
-          Only click &apos;Authorize&apos; once
-        </Typography>
-      </Grid>
+        <Grid item>
+          <Typography style={{ color: 'white', margin: 20 }} align="center">
+            {t('clickOnce')}
+          </Typography>
+        </Grid>
       )}
     </Grid>
   )

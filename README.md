@@ -79,7 +79,9 @@ With PM2:
 
 ## Additional Info
 - Webhook URL Format: `https://www.yourMapUrl.com/@/lat/lon/zom`
-
+- Adding new locales!
+  - Add/Edit your locales JSON in the `/public/base-locales` folder
+  - Then generate them with `yarn create-locales`
 ## Coming Soon
 - Translatable Text
 - More precise quest popups

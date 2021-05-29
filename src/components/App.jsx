@@ -1,6 +1,6 @@
 import '../assets/scss/main.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
@@ -47,22 +47,24 @@ export default function App() {
   }, [])
 
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <ApolloProvider client={client}>
-            {serverSettings && <Auth serverSettings={serverSettings} />}
-          </ApolloProvider>
-        </Route>
-        <Route exact path="/login">
-          <Login failed />
-        </Route>
-        <Route exact path="/@/:lat/:lon/:zoom">
-          <ApolloProvider client={client}>
-            {serverSettings && <Auth serverSettings={serverSettings} />}
-          </ApolloProvider>
-        </Route>
-      </Switch>
-    </Router>
+    <Suspense fallback="Loading translations...">
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <ApolloProvider client={client}>
+              {serverSettings && <Auth serverSettings={serverSettings} />}
+            </ApolloProvider>
+          </Route>
+          <Route exact path="/login">
+            <Login failed />
+          </Route>
+          <Route exact path="/@/:lat/:lon/:zoom">
+            <ApolloProvider client={client}>
+              {serverSettings && <Auth serverSettings={serverSettings} />}
+            </ApolloProvider>
+          </Route>
+        </Switch>
+      </Router>
+    </Suspense>
   )
 }

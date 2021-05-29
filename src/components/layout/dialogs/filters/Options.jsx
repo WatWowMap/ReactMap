@@ -11,13 +11,14 @@ import {
   Typography,
 } from '@material-ui/core'
 import { ExpandMore } from '@material-ui/icons'
+import { useTranslation } from 'react-i18next'
 
 import useStyles from '@hooks/useStyles'
-import Utility from '@services/Utility'
 
 export default function FilterOptions({
   name, options, handleChange, expanded, handleAccordion, userSelection,
 }) {
+  const { t } = useTranslation()
   const classes = useStyles()
   return (
     <Grid item>
@@ -26,7 +27,7 @@ export default function FilterOptions({
           expandIcon={<ExpandMore />}
         >
           <Typography className={classes.heading}>
-            {Utility.getProperName(name)}
+            {t(name)}
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
@@ -39,7 +40,7 @@ export default function FilterOptions({
                     <Checkbox checked={userSelection[key]} onChange={(e) => handleChange(name, e)} name={key} />
                     }
                   value={key}
-                  label={Utility.getProperName(key)}
+                  label={t(key)}
                 />
               ))}
             </FormGroup>

@@ -7,11 +7,13 @@ import {
 } from '@material-ui/icons'
 import { useMap } from 'react-leaflet'
 import Locate from 'leaflet.locatecontrol'
+import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 
 export default function FloatingButtons({ toggleDrawer }) {
+  const { t } = useTranslation()
   const classes = useStyles()
   const { map: { feedbackLink, enableFeedback } } = useStatic(state => state.config)
   const breakpoint = useStatic(state => state.breakpoint)
@@ -30,7 +32,7 @@ export default function FloatingButtons({ toggleDrawer }) {
   const locateOptions = {
     keepCurrentZoomLevel: true,
     strings: {
-      title: 'Use My Location',
+      title: t('useMyLocation'),
     },
     onActivate: () => { },
   }
@@ -69,22 +71,21 @@ export default function FloatingButtons({ toggleDrawer }) {
           </Fab>
         </Grid>
       )}
-      {/* <LocateControl activate={activate} /> */}
       <Dialog
         open={open}
         onClose={handleClose}
         maxWidth="xs"
       >
-        <DialogTitle>Submit Feedback/Bug Report</DialogTitle>
+        <DialogTitle>{t('submitFeedbackTitle')}</DialogTitle>
         <DialogContent>
           <Typography variant="subtitle1" align="center">
-            You can use the link below to submit feedback or any bugs that you have come across.
+            {t('useTheLinkBelow')}
           </Typography>
           <br />
           <Divider />
           <br />
           <Typography variant="body2" align="center">
-            <em>This feedback is sent directly to the developers.</em>
+            <em>{t('feedbackToDevs')}</em>
           </Typography>
           <br />
           <Typography align="center">
@@ -97,13 +98,13 @@ export default function FloatingButtons({ toggleDrawer }) {
               rel="noreferrer"
               style={{ justifyContent: 'center' }}
             >
-              Feedback Form
+              {t('feedbackForm')}
             </Button>
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary" autoFocus>
-            Close
+            {t('close')}
           </Button>
         </DialogActions>
       </Dialog>

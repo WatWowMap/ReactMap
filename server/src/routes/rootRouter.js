@@ -57,6 +57,7 @@ rootRouter.get('/settings', async (req, res) => {
       settings: {},
     }
 
+    // add user options here from the config that are structured as objects
     if (serverSettings.user) {
       serverSettings.config = {
         map: config.map,
@@ -70,6 +71,16 @@ rootRouter.get('/settings', async (req, res) => {
         manualAreas: config.manualAreas || {},
       }
       await Utility.updateAvailableForms(serverSettings.config.icons)
+
+      // add config options to this array that are structured as arrays
+      const arrayUserOptions = [
+        { name: 'localeSelection', values: config.localeSelection },
+      ]
+
+      arrayUserOptions.forEach(userMenu => {
+        serverSettings.config[userMenu.name] = {}
+        userMenu.values.forEach(value => serverSettings.config[userMenu.name][value] = {})
+      })
 
       const ignoreList = ['map', 'manualAreas']
       Object.keys(serverSettings.config).forEach(setting => {

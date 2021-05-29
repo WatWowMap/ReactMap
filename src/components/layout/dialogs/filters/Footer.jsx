@@ -5,15 +5,15 @@ import {
 import {
   Tune, Ballot, Check, Clear, Save, HelpOutline, FormatSize,
 } from '@material-ui/icons'
+import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
 import Help from '../help/Filters'
 
 export default function Footer({
   selectAllOrNone, toggleDialog, tempFilters, toggleDrawer, isMobile, toggleAdvMenu, type,
 }) {
-  const { text } = useStatic(state => state.ui)
   const [helpDialog, setHelpDialog] = useState(false)
+  const { t } = useTranslation()
 
   const toggleHelp = () => {
     setHelpDialog(!helpDialog)
@@ -31,7 +31,7 @@ export default function Footer({
     text: (
       <Button onClick={toggleHelp}>
         <Typography variant="caption">
-          {text.help}
+          {t('help')}
         </Typography>
       </Button>
     ),
@@ -60,7 +60,7 @@ export default function Footer({
     text: (
       <Button onClick={toggleAdvMenu(true, 'global')}>
         <Typography variant="caption">
-          {text.applyToAll}
+          {t('applyToAll')}
         </Typography>
       </Button>
     ),
@@ -81,7 +81,7 @@ export default function Footer({
         color="primary"
       >
         <Typography variant="caption">
-          {text.disableAll}
+          {t('disableAll')}
         </Typography>
       </Button>
     ),
@@ -102,7 +102,7 @@ export default function Footer({
         style={{ color: '#00e676' }}
       >
         <Typography variant="caption">
-          {text.enableAll}
+          {t('enableAll')}
         </Typography>
       </Button>
     ),
@@ -125,7 +125,7 @@ export default function Footer({
         <Typography
           variant="caption"
         >
-          {text.save}
+          {t('save')}
         </Typography>
       </Button>
     ),

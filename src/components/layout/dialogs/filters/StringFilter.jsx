@@ -1,37 +1,39 @@
 import React, { useState } from 'react'
 import { TextField } from '@material-ui/core'
+import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 
 export default function StringFilter({ filterValues, setFilterValues }) {
+  const { t } = useTranslation()
   const [validation, setValidation] = useState({
     value: filterValues.adv,
     status: false,
-    label: 'Custom',
-    message: 'Overwrites All Filters',
+    label: t('custom'),
+    message: t('overwrites'),
   })
 
   const validationCheck = event => {
     let { value } = event.target
     if (Utility.checkAdvFilter(value)) {
       setValidation({
-        label: 'Valid',
+        label: t('valid'),
         value,
         status: false,
-        message: 'Valid Stats Filter',
+        message: t('validFilter'),
       })
     } else if (value === '') {
       setValidation({
-        label: 'Custom',
+        label: t('custom'),
         value,
         status: false,
-        message: 'Overwrites All Filters',
+        message: t('overwrites'),
       })
     } else {
       setValidation({
-        label: 'Invalid!',
+        label: t('invalid'),
         value,
         status: true,
-        message: 'Enter a Valid Filter',
+        message: t('invalidFilter'),
       })
       value = ''
     }

@@ -8,12 +8,14 @@ import {
 import {
   Check, Clear, ExpandMore, Map, MoreVert,
 } from '@material-ui/icons'
+import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
 export default function PokemonPopup({ pokemon, iconUrl }) {
+  const { t } = useTranslation()
   const {
     pokemon_id,
     great,
@@ -39,11 +41,13 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         pokemon={pokemon}
         metaData={metaData}
         iconUrl={iconUrl}
+        t={t}
       />
       <Stats
         pokemon={pokemon}
         metaData={metaData}
         perms={perms}
+        t={t}
       />
       <Divider orientation="vertical" flexItem />
       <Info
@@ -55,8 +59,8 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         pokemon={pokemon}
       />
       <Collapse in={!pvpExpand} timeout="auto" unmountOnExit>
-        {great && (rankSum.gl.best < 6) && <PvpInfo league="great" data={great} onlyTop5 />}
-        {ultra && (rankSum.ul.best < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 />}
+        {great && (rankSum.gl.best < 6) && <PvpInfo league="great" data={great} onlyTop5 t={t} />}
+        {ultra && (rankSum.ul.best < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 t={t} />}
       </Collapse>
       <Footer
         pokemon={pokemon}
@@ -67,20 +71,23 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         hasPvp={(great || ultra) && (rankSum.worst > 5)}
       />
       <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
-        {great && <PvpInfo league="great" data={great} />}
-        {ultra && <PvpInfo league="ultra" data={ultra} />}
+        {great && <PvpInfo league="great" data={great} t={t} />}
+        {ultra && <PvpInfo league="ultra" data={ultra} t={t} />}
       </Collapse>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <ExtraInfo
           pokemon={pokemon}
           perms={perms}
+          t={t}
         />
       </Collapse>
     </Grid>
   )
 }
 
-const Header = ({ pokemon, iconUrl, metaData }) => {
+const Header = ({
+  pokemon, iconUrl, metaData, t,
+}) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
   const excludeList = useStatic(state => state.excludeList)
@@ -133,9 +140,9 @@ const Header = ({ pokemon, iconUrl, metaData }) => {
   }
 
   const options = [
-    { name: 'Hide', action: handleHide },
-    { name: 'Exclude', action: handleExclude },
-    { name: 'Timer', action: handleTimer },
+    { name: 'hide', action: handleHide },
+    { name: 'exclude', action: handleExclude },
+    { name: 'timer', action: handleTimer },
   ]
 
   return (
@@ -145,7 +152,7 @@ const Header = ({ pokemon, iconUrl, metaData }) => {
       </Grid>
       <Grid item xs={6}>
         <Typography variant="h5" align="center">
-          {metaData.name}
+          {t(`poke_${metaData.pokedex_id}`)}
         </Typography>
       </Grid>
       <Grid item xs={3}>
@@ -170,7 +177,7 @@ const Header = ({ pokemon, iconUrl, metaData }) => {
       >
         {options.map((option) => (
           <MenuItem key={option.name} onClick={option.action}>
-            {option.name}
+            {t(option.name)}
           </MenuItem>
         ))}
       </Menu>
@@ -178,7 +185,7 @@ const Header = ({ pokemon, iconUrl, metaData }) => {
   )
 }
 
-const Stats = ({ pokemon, perms }) => {
+const Stats = ({ pokemon, perms, t }) => {
   const {
     cp, iv, atk_iv, def_iv, sta_iv, level,
   } = pokemon
@@ -206,7 +213,7 @@ const Stats = ({ pokemon, perms }) => {
       {(perms.iv && iv !== null) && (
         <Grid item>
           <Typography variant="h5" align="center" style={{ color: getColor(iv) }}>
-            {iv.toFixed(2)}%
+            {iv.toFixed(2)}{t('%')}
           </Typography>
         </Grid>
       )}
@@ -220,7 +227,7 @@ const Stats = ({ pokemon, perms }) => {
       {((perms.iv || perms.stats) && iv !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
-            CP {cp} | L{level}
+            {t('cp')} {cp} | {t('levelAbbreviated')}{level}
           </Typography>
         </Grid>
       )}
@@ -362,7 +369,7 @@ const Footer = ({
   )
 }
 
-const ExtraInfo = ({ pokemon, perms }) => {
+const ExtraInfo = ({ pokemon, perms, t }) => {
   const { moves } = useStatic(state => state.masterfile)
 
   const {
@@ -389,12 +396,12 @@ const ExtraInfo = ({ pokemon, perms }) => {
           />
           <Grid item xs={6}>
             <Typography variant="caption" align="center">
-              {moves[move].name}
+              {t(`move_${move}`)}
             </Typography>
           </Grid>
           <Grid item xs={3} style={{ textAlign: 'right' }}>
             <Typography variant="caption" align="center">
-              {i ? `${weight.toFixed(2)}kg` : `${size.toFixed(2)}m`}
+              {i ? `${weight.toFixed(2)}${t('kilogram')}` : `${size.toFixed(2)}${t('meter')}`}
             </Typography>
           </Grid>
         </Fragment>
@@ -403,7 +410,7 @@ const ExtraInfo = ({ pokemon, perms }) => {
         <Fragment key={time}>
           <Grid item xs={5} style={{ textAlign: 'center' }}>
             <Typography variant="caption" align="center">
-              {i ? 'Last Seen:' : 'First Seen:'}
+              {i ? t('lastSeen') : t('firstSeen')}:
             </Typography>
           </Grid>
           <Grid item xs={6} style={{ textAlign: 'right' }}>
@@ -417,7 +424,9 @@ const ExtraInfo = ({ pokemon, perms }) => {
   )
 }
 
-const PvpInfo = ({ league, data, onlyTop5 }) => {
+const PvpInfo = ({
+  league, data, onlyTop5, t,
+}) => {
   if (data === null) return ''
 
   const { icons } = useStore(state => state.settings)
@@ -457,11 +466,11 @@ const PvpInfo = ({ league, data, onlyTop5 }) => {
       <thead>
         <tr>
           <td style={rowClass}><img src={`/images/misc/${league}.png`} height={20} /></td>
-          <td style={rowClass}>Rank</td>
-          <td style={rowClass}>CP</td>
-          <td style={rowClass}>Lvl</td>
-          {capsExist && <td style={rowClass}>Cap</td>}
-          <td style={rowClass}>%</td>
+          <td style={rowClass}>{t('rank')}</td>
+          <td style={rowClass}>{t('cp')}</td>
+          <td style={rowClass}>{t('lvl')}</td>
+          {capsExist && <td style={rowClass}>{t('cap')}</td>}
+          <td style={rowClass}>{t('%')}</td>
         </tr>
       </thead>
       <tbody>
