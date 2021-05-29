@@ -15,8 +15,8 @@
       "requests": 1000
     },
     "pvpMinCp": {
-      "gl": 1400,
-      "ul": 2400
+      "great": 1400,
+      "ultra": 2400
     },
     "queryAvailable": {
       "pokemon": true,
@@ -29,7 +29,6 @@
     "title": "ReactMap",
     "headerTitle": "ReactMap",
     "nestHemisphere": "north",
-    "locale": "en",
     "enableFeedbackLink": false,
     "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
     "startLat": 0,
@@ -87,8 +86,9 @@
         "legacyFilter": false,
         "globalValues": {
           "iv": [80, 100],
-          "gl": [1, 100],
-          "ul": [1, 100],
+          "great": [1, 100],
+          "ultra": [1, 100],
+          "little": [1, 100],
           "level": [1, 35],
           "atk_iv": [0, 15],
           "def_iv": [0, 15],
@@ -165,7 +165,9 @@
   "database": {
     "settings": {
       "userTableName": "users",
-      "sessionTableName": "session"
+      "sessionTableName": "session",
+      "type": "rdm",
+      "leagues": ["great", "ultra"]
     },
     "schemas": {
       "scanner": {

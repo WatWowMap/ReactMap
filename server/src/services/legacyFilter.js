@@ -200,7 +200,7 @@ module.exports = function getPokemon(results, args, perms) {
         filtered.level = result.level
       }
       if (perms.pvp && interestedLevelCaps.length > 0) {
-        const { gl, ul } = pvpMinCp
+        const { great, ultra } = pvpMinCp
         const filterLeagueStats = (pvpResult, target, minCp) => {
           let last
           for (const entry of JSON.parse(pvpResult)) {
@@ -230,10 +230,10 @@ module.exports = function getPokemon(results, args, perms) {
           }
         }
         if (result.pvp_rankings_great_league) {
-          filterLeagueStats(result.pvp_rankings_great_league, filtered.great = [], gl)
+          filterLeagueStats(result.pvp_rankings_great_league, filtered.great = [], great)
         }
         if (result.pvp_rankings_ultra_league) {
-          filterLeagueStats(result.pvp_rankings_ultra_league, filtered.ultra = [], ul)
+          filterLeagueStats(result.pvp_rankings_ultra_league, filtered.ultra = [], ultra)
         }
       }
       let pokemonFilter = result.form === 0 ? pokemonLookup[result.pokemon_id] : formLookup[result.form]
