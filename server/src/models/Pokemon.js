@@ -210,13 +210,17 @@ class Pokemon extends Model {
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (queryBase, filter, notGlobal) => {
-      const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv']
+      const keys = ['iv', 'atk_iv', 'def_iv', 'sta_iv']
       keys.forEach(key => {
         switch (key) {
           default:
-            if (!arrayCheck(filter, key) && stats) queryBase.andWhereBetween(key, filter[key]); break
-          case 'iv':
             if (!arrayCheck(filter, key) && ivs && notGlobal) queryBase.andWhereBetween(key, filter[key]); break
+          case 'atk_iv':
+            if (!arrayCheck(filter, key) && stats) queryBase.andWhereBetween('individual_attack', filter[key]); break
+          case 'def_iv':
+            if (!arrayCheck(filter, key) && stats) queryBase.andWhereBetween('individual_defense', filter[key]); break
+          case 'sta_iv':
+            if (!arrayCheck(filter, key) && stats) queryBase.andWhereBetween('individual_stamina', filter[key]); break
         }
       })
     }
@@ -242,9 +246,9 @@ class Pokemon extends Model {
         'weather_boosted_condition as weather',
         'last_modified as updated',
       )
-      .where('expire_timestamp', '>=', ts)
-      .andWhereBetween('lat', [args.minLat, args.maxLat])
-      .andWhereBetween('lon', [args.minLon, args.maxLon])
+      .where(raw('UNIX_TIMESTAMP(disappear_time)'), '>=', ts)
+      .andWhereBetween('latitude', [args.minLat, args.maxLat])
+      .andWhereBetween('longitude', [args.minLon, args.maxLon])
       .andWhere(ivOr => {
         for (const [pkmn, filter] of Object.entries(args.filters)) {
           if (pkmn.includes('-')) {
@@ -287,10 +291,10 @@ class Pokemon extends Model {
   static async getAvailablePokemon() {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const results = await this.query()
-      .select('pokemon_id', 'form')
+      .select('pokemon_id as id', 'form', 'expire_timestamp as time')
       .orderBy('pokemon_id', 'asc')
       .where('expire_timestamp', '>=', ts)
-      .groupBy('pokemon_id', 'form')
+    // .groupBy('pokemon_id', 'form')
     return results.map(pkmn => {
       if (pkmn.form === 0) {
         const formId = masterfile[pkmn.pokemon_id].default_form_id
