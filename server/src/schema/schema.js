@@ -17,6 +17,7 @@ const ScanAreaType = require('./scanArea')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
+const { database: { settings: { type } } } = require('../services/config')
 
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
@@ -96,10 +97,13 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.pokemon) {
-          if (args.filters.onlyLegacy) {
-            return Pokemon.getLegacy(args, perms)
+          if (type === 'rdm') {
+            if (args.filters.onlyLegacy) {
+              return Pokemon.getLegacy(args, perms)
+            }
+            return Pokemon.getPokemon(args, perms)
           }
-          return Pokemon.getPokemon(args, perms)
+          return Pokemon.getMadPokemon(args, perms)
         }
       },
     },

@@ -28,11 +28,11 @@
   "database": {
     "settings": {
       "userTableName": "users",
-      "sessionTableName": "session"
+      "sessionTableName": "session",
+      "type": "rdm/chuck/cdc/mad"
     },
     "schemas": {
       "scanner": {
-        "type": "rdm",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",
@@ -43,7 +43,6 @@
         "useFor": ["device", "gym", "pokemon", "pokestop", "s2cell", "spawnpoint", "weather"]
       },
       "manual": {
-        "type": "manual",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",
