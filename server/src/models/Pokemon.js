@@ -215,7 +215,7 @@ class Pokemon extends Model {
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (queryBase, filter, notGlobal) => {
-      const keys = ['iv', 'atk_iv', 'def_iv', 'sta_iv']
+      const keys = ['atk_iv', 'def_iv', 'sta_iv']
       keys.forEach(key => {
         switch (key) {
           default:
@@ -267,7 +267,6 @@ class Pokemon extends Model {
               }
             })
           } else if (pkmn === 'onlyIvOr' && (ivs || stats || pvp)) {
-            ivOr.whereBetween('iv', (ivs ? filter.iv : onlyStandard.iv))
             generateSql(ivOr, filter)
           }
         }
