@@ -415,7 +415,7 @@ const RaidInfo = ({ gym, t }) => {
 
   if (raid_pokemon_id === 0) {
     return (
-      <Timer gym={gym} start />
+      <Timer gym={gym} start t={t} />
     )
   }
 
