@@ -13,6 +13,7 @@ export default function SliderTile({
 }) {
   const { t } = useTranslation()
   const [tempValues, setTempValues] = useState(filterValues[name])
+  const [fullName, setFullName] = useState(true)
 
   useEffect(() => {
     setTempValues(filterValues[name])
@@ -47,7 +48,9 @@ export default function SliderTile({
       alignItems="center"
     >
       <Grid item xs={4}>
-        <Typography>{t(`${name}Slider`)}</Typography>
+        <Typography noWrap={fullName} onClick={() => setFullName(!fullName)}>
+          {t(`${name}Slider`)}
+        </Typography>
       </Grid>
       {sliderInputs.map((each, index) => (
         <Grid item xs={4} key={`${name}-${each}`}>

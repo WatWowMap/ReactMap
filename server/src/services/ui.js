@@ -1,4 +1,6 @@
 /* eslint-disable no-restricted-syntax */
+const { database: { settings: { leagues } } } = require('./config')
+
 module.exports = function generateUi(filters, perms) {
   const menus = {}
   const sizes = ['sm', 'md', 'lg', 'xl']
@@ -17,12 +19,6 @@ module.exports = function generateUi(filters, perms) {
               {
                 name: 'iv', label: '%', min: 0, max: 100, perm: 'iv',
               },
-              {
-                name: 'gl', label: 'rank', min: 1, max: 100, perm: 'pvp',
-              },
-              {
-                name: 'ul', label: 'rank', min: 1, max: 100, perm: 'pvp',
-              },
             ],
             secondary: [
               {
@@ -38,7 +34,10 @@ module.exports = function generateUi(filters, perms) {
                 name: 'sta_iv', label: '', min: 0, max: 15, perm: 'stats',
               },
             ],
-          }; break
+          }
+          leagues.forEach(league => sliders.primary.push({
+            name: league, label: 'rank', min: 1, max: 100, perm: 'pvp',
+          })); break
         case 'submissionCells':
         case 'portals':
           if (!menus.wayfarer) menus.wayfarer = {}

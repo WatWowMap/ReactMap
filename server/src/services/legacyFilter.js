@@ -200,7 +200,7 @@ module.exports = function getPokemon(results, args, perms) {
         filtered.level = result.level
       }
       if (perms.pvp && interestedLevelCaps.length > 0) {
-        const { gl, ul } = pvpMinCp
+        const { great, ultra } = pvpMinCp
         const filterLeagueStats = (pvpResult, target, minCp) => {
           let last
           for (const entry of JSON.parse(pvpResult)) {
@@ -224,16 +224,22 @@ module.exports = function getPokemon(results, args, perms) {
                 last.capped = true
               }
             } else {
+              if (entry.rank < filtered.bestPvp) {
+                filtered.bestPvp = entry.rank
+              }
               target.push(entry)
               last = entry
             }
           }
         }
+        filtered.bestPvp = 4096
         if (result.pvp_rankings_great_league) {
-          filterLeagueStats(result.pvp_rankings_great_league, filtered.great = [], gl)
+          filtered.cleanPvp = {}
+          filterLeagueStats(result.pvp_rankings_great_league, filtered.pvp_rankings_great_league = [], great)
         }
         if (result.pvp_rankings_ultra_league) {
-          filterLeagueStats(result.pvp_rankings_ultra_league, filtered.ultra = [], ul)
+          filtered.cleanPvp = {}
+          filterLeagueStats(result.pvp_rankings_ultra_league, filtered.pvp_rankings_ultra_league = [], ultra)
         }
       }
       let pokemonFilter = result.form === 0 ? pokemonLookup[result.pokemon_id] : formLookup[result.form]
@@ -244,10 +250,20 @@ module.exports = function getPokemon(results, args, perms) {
       } else {
         pokemonFilter = pokemonFilter(filtered)
       }
+      if (filtered.pvp_rankings_great_league) {
+        filtered.cleanPvp.great = filtered.pvp_rankings_great_league
+      }
+      if (filtered.pvp_rankings_ultra_league) {
+        filtered.cleanPvp.ultra = filtered.pvp_rankings_ultra_league
+      }
       if (!(pokemonFilter
         || (includeBigKarp && result.pokemon_id === 129 && result.weight !== null && result.weight >= 13.125)
         || (includeTinyRat && result.pokemon_id === 19 && result.weight !== null && result.weight <= 2.40625))) {
         continue
+      }
+      if (result.form === 0) {
+        const formId = masterfile.pokemon[result.pokemon_id].default_form_id
+        if (formId) result.form = formId
       }
       filtered.id = result.id
       filtered.pokemon_id = result.pokemon_id

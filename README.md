@@ -82,6 +82,13 @@ With PM2:
 - Adding new locales!
   - Add/Edit your locales JSON in the `/public/base-locales` folder
   - Then generate them with `yarn create-locales`
+- Setting the default locale:
+Look for this value in the `default.json` file (same folder as config):
+```js
+"localeSelection": ["en", "de", "pl", "es", "fr", "it", "jp"],
+```
+Whatever value you put in the first position is the language that it will default to if it can't detect the local browser language.
+
 ## Coming Soon
 - Translatable Text
 - More precise quest popups

@@ -17,17 +17,32 @@ import Utility from '@services/Utility'
 export default function PokemonPopup({ pokemon, iconUrl }) {
   const { t } = useTranslation()
   const {
-    pokemon_id,
-    great,
-    ultra,
-    rankSum,
+    pokemon_id, cleanPvp, iv, cp,
   } = pokemon
-
   const { menus: { pokemon: perms } } = useStatic(state => state.ui)
-  const { pokemon: { [pokemon_id]: metaData } } = useStatic(state => state.masterfile)
 
+  const { pokemon: { [pokemon_id]: metaData } } = useStatic(state => state.masterfile)
   const [expanded, setExpanded] = useState(false)
   const [pvpExpand, setPvpExpand] = useState(false)
+  const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
+
+  const leagueStats = (function pvpStats() {
+    const stats = {}
+    hasLeagues.forEach(league => {
+      stats[league] = { hasGood: false, hasBad: false }
+      cleanPvp[league].forEach(pkmn => {
+        if (pkmn.rank <= 5) {
+          stats[league].hasGood = true
+        }
+        if (pkmn.rank > 5) {
+          stats[league].hasBad = true
+        }
+      })
+    })
+    return stats
+  }())
+
+  const hasStats = iv || cp
 
   return (
     <Grid
@@ -43,24 +58,48 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         iconUrl={iconUrl}
         t={t}
       />
-      <Stats
-        pokemon={pokemon}
-        metaData={metaData}
-        perms={perms}
-        t={t}
-      />
-      <Divider orientation="vertical" flexItem />
+      {hasStats && (
+        <>
+          <Stats
+            pokemon={pokemon}
+            metaData={metaData}
+            perms={perms}
+            t={t}
+          />
+          <Divider orientation="vertical" flexItem />
+        </>
+      )}
+      {!hasStats && (
+        <Timer
+          pokemon={pokemon}
+        />
+      )}
       <Info
         pokemon={pokemon}
         metaData={metaData}
         perms={perms}
       />
-      <Timer
-        pokemon={pokemon}
-      />
+      {hasStats && (
+        <Timer
+          pokemon={pokemon}
+          hasStats={hasStats}
+        />
+      )}
       <Collapse in={!pvpExpand} timeout="auto" unmountOnExit>
-        {great && (rankSum.gl.best < 6) && <PvpInfo league="great" data={great} onlyTop5 t={t} />}
-        {ultra && (rankSum.ul.best < 6) && <PvpInfo league="ultra" data={ultra} onlyTop5 t={t} />}
+        {hasLeagues.map(league => {
+          if (leagueStats[league].hasGood) {
+            return (
+              <PvpInfo
+                key={league}
+                league={league}
+                data={cleanPvp[league]}
+                onlyTop5
+                t={t}
+              />
+            )
+          }
+          return null
+        })}
       </Collapse>
       <Footer
         pokemon={pokemon}
@@ -68,11 +107,17 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         setExpanded={setExpanded}
         pvpExpand={pvpExpand}
         setPvpExpand={setPvpExpand}
-        hasPvp={(great || ultra) && (rankSum.worst > 5)}
+        hasPvp={Object.values(leagueStats).some(val => val.hasBad)}
       />
       <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
-        {great && <PvpInfo league="great" data={great} t={t} />}
-        {ultra && <PvpInfo league="ultra" data={ultra} t={t} />}
+        {hasLeagues.map(league => (
+          <PvpInfo
+            key={league}
+            league={league}
+            data={cleanPvp[league]}
+            t={t}
+          />
+        ))}
       </Collapse>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <ExtraInfo
@@ -279,7 +324,7 @@ const Info = ({ pokemon, metaData, perms }) => {
   )
 }
 
-const Timer = ({ pokemon }) => {
+const Timer = ({ pokemon, hasStats }) => {
   const { expire_timestamp, expire_timestamp_verified } = pokemon
   const despawnTimer = new Date(expire_timestamp * 1000)
   const [timer, setTimer] = useState(Utility.getTimeUntil(despawnTimer, true))
@@ -293,7 +338,7 @@ const Timer = ({ pokemon }) => {
 
   return (
     <>
-      <Grid item xs={9}>
+      <Grid item xs={hasStats ? 9 : 6}>
         <Typography variant="h6" align="center">
           {timer.str}
         </Typography>
@@ -301,7 +346,7 @@ const Timer = ({ pokemon }) => {
           {despawnTimer.toLocaleTimeString()}
         </Typography>
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={hasStats ? 3 : 2}>
         {expire_timestamp_verified
           ? <Check fontSize="large" style={{ color: '#00e676' }} />
           : <Clear fontSize="large" color="primary" />}
@@ -460,12 +505,13 @@ const PvpInfo = ({
     }
   })
   const rowClass = { width: 30, fontWeight: 'bold' }
+  const src = league === 'great' || league === 'ultra' ? league : 'cup'
 
   return (
     <table className="table-pvp">
       <thead>
         <tr>
-          <td style={rowClass}><img src={`/images/misc/${league}.png`} height={20} /></td>
+          <td style={rowClass}><img src={`/images/misc/${src}.png`} height={20} /></td>
           <td style={rowClass}>{t('rank')}</td>
           <td style={rowClass}>{t('cp')}</td>
           <td style={rowClass}>{t('lvl')}</td>

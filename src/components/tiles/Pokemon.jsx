@@ -14,10 +14,8 @@ const PokemonTile = ({
   const iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, item.pokemon_id, item.form, 0, 0, item.costume)}.png`
 
   const getPvpStatus = () => {
-    if (item.rankSum) {
-      if (item.rankSum.best <= glow.pvp.value || item.rankSum.best <= 3) {
-        return item.rankSum.best
-      }
+    if (item.bestPvp <= glow.pvp.value || item.bestPvp <= 3) {
+      return item.bestPvp
     }
   }
   const bestPvp = getPvpStatus()
@@ -43,11 +41,11 @@ const PokemonTile = ({
 
 const areEqual = (prev, next) => (
   prev.item.id === next.item.id
-    && prev.item.updated === next.item.updated
-    && prev.showTimer === next.showTimer
-    && prev.filters.filter[`${prev.item.pokemon_id}-${prev.item.form}`].size === next.filters.filter[`${next.item.pokemon_id}-${next.item.form}`].size
-    && !next.excludeList.includes(`${prev.item.pokemon_id}-${prev.item.form}`)
-    && prev.path === next.path
+  && prev.item.updated === next.item.updated
+  && prev.showTimer === next.showTimer
+  && prev.filters.filter[`${prev.item.pokemon_id}-${prev.item.form}`].size === next.filters.filter[`${next.item.pokemon_id}-${next.item.form}`].size
+  && !next.excludeList.includes(`${prev.item.pokemon_id}-${prev.item.form}`)
+  && prev.path === next.path
 )
 
 export default memo(PokemonTile, areEqual)

@@ -15,7 +15,6 @@
     "title": "ReactMap",
     "headerTitle": "ReactMap",
     "nestHemisphere": "north",
-    "locale": "en",
     "style": "dark",
     "enableFeedback": true,
     "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
@@ -29,7 +28,8 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
-      "type": "rdm/chuck/cdc/mad"
+      "type": "rdm/chuck/cdc/mad",
+      "leagues": ["great", "ultra"]
     },
     "schemas": {
       "scanner": {
