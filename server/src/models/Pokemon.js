@@ -171,6 +171,7 @@ class Pokemon extends Model {
           parsed[league] = JSON.parse(pokemon[`pvp_rankings_${league}_league`])
         }
       })
+      return parsed
     }
 
     // filter pokes with pvp data
