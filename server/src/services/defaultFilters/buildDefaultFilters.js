@@ -5,11 +5,18 @@ const buildPokestops = require('./buildPokestops.js')
 const buildGyms = require('./buildGyms')
 const { GenericFilter, PokemonFilter } = require('../../models/index')
 
+const base = new PokemonFilter()
+base.pvp()
+const custom = new PokemonFilter(...Object.values(defaultFilters.pokemon.globalValues))
+custom.pvp(defaultFilters.pokemon.pvpValues)
+
 module.exports = function buildDefault(perms) {
   const stopReducer = perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
   const pokemonReducer = perms.iv || perms.stats || perms.pvp
-  const pokemon = buildPokemon(defaultFilters)
+
+  const pokemon = buildPokemon(defaultFilters, base, custom)
+
   return {
     gyms: gymReducer ? {
       enabled: defaultFilters.gyms.enabled,
@@ -45,8 +52,8 @@ module.exports = function buildDefault(perms) {
       iv: perms.iv ? true : undefined,
       stats: perms.stats ? true : undefined,
       pvp: perms.pvp ? true : undefined,
-      standard: new PokemonFilter(),
-      ivOr: new PokemonFilter(...Object.values(defaultFilters.pokemon.globalValues)),
+      standard: base,
+      ivOr: custom,
       filter: pokemon.full,
     } : undefined,
     portals: perms.portals ? {

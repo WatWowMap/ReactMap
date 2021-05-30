@@ -86,14 +86,12 @@
         "legacyFilter": false,
         "globalValues": {
           "iv": [80, 100],
-          "great": [1, 100],
-          "ultra": [1, 100],
-          "little": [1, 100],
           "level": [1, 35],
           "atk_iv": [0, 15],
           "def_iv": [0, 15],
           "sta_iv": [0, 15]
-        }
+        },
+        "pvpValues": [1, 10]
       },
       "nests": {
         "enabled": false,
