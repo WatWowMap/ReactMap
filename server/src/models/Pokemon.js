@@ -2,7 +2,13 @@
 const { Model, raw } = require('objection')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const legacyFilter = require('../services/legacyFilter')
-const { api: { pvpMinCp } } = require('../services/config')
+const {
+  api: { pvpMinCp },
+  database: {
+    settings:
+    { type, leagues },
+  },
+} = require('../services/config')
 
 class Pokemon extends Model {
   static get tableName() {
@@ -22,38 +28,37 @@ class Pokemon extends Model {
       if (!noPokemonSelect) return []
     }
 
-    const check = (pkmn, league, min, max) => (
-      pkmn.rank <= max && pkmn.rank >= min
-      && pkmn.cp >= pvpMinCp[league]
-    )
-
-    const getRanks = (league, data, filterId) => {
-      const parsed = JSON.parse(data)
-      const [min, max] = getMinMax(filterId, league)
-      let best = 4096
-      let worst = 1
-      const filtered = parsed.filter(pkmn => {
-        if (pkmn.rank < best) best = pkmn.rank
-        if (pkmn.rank > worst) worst = pkmn.rank
-        return check(pkmn, league, min, max)
-      })
-      return { filtered, best, worst }
+    const check = (pkmn, league, min, max) => {
+      const rankCheck = pkmn.rank <= max && pkmn.rank >= min
+      const cpCheck = type === 'chuck' ? true : pkmn.cp >= pvpMinCp[league]
+      return rankCheck && cpCheck
     }
 
+    const getRanks = (league, data, filterId) => {
+      const [min, max] = getMinMax(filterId, league)
+      let best = 4096
+      const filtered = data.filter(pkmn => {
+        if (pkmn.rank < best) best = pkmn.rank
+        return check(pkmn, league, min, max)
+      })
+      return { filtered, best }
+    }
+
+    // decide if Pokemon passes global or local filter
     const getMinMax = (filterId, league) => {
       const globalOn = !arrayCheck(onlyIvOr, league)
       const specificFilter = args.filters[filterId]
       const [globalMin, globalMax] = onlyIvOr[league]
       let min = 0
       let max = 0
-      if (specificFilter) {
+      if (specificFilter && !arrayCheck(specificFilter, league)) {
         const [pkmnMin, pkmnMax] = specificFilter[league]
-        if (specificFilter && !globalOn) {
-          min = pkmnMin
-          max = pkmnMax
-        } else if (specificFilter && globalOn) {
+        if (globalOn) {
           min = pkmnMin <= globalMin ? pkmnMin : globalMin
           max = pkmnMax >= globalMax ? pkmnMax : globalMax
+        } else {
+          min = pkmnMin
+          max = pkmnMax
         }
       } else if (globalOn) {
         min = globalMin
@@ -67,15 +72,10 @@ class Pokemon extends Model {
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (queryBase, filter, notGlobal) => {
-      const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', 'gl', 'ul']
+      const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', ...leagues]
       keys.forEach(key => {
         switch (key) {
           default:
-            if (!arrayCheck(filter, key) && stats) queryBase.andWhereBetween(key, filter[key]); break
-          case 'iv':
-            if (!arrayCheck(filter, key) && ivs && notGlobal) queryBase.andWhereBetween(key, filter[key]); break
-          case 'gl':
-          case 'ul':
             if (!arrayCheck(filter, key)) {
               queryPvp = true
               // makes sure the base query doesn't return everything if only GL and UL stats are selected for the Pokemon
@@ -83,6 +83,12 @@ class Pokemon extends Model {
                 queryBase.whereNull('pokemon_id')
               }
             } break
+          case 'iv':
+            if (!arrayCheck(filter, key) && ivs && notGlobal) queryBase.andWhereBetween(key, filter[key]); break
+          case 'atk_iv':
+          case 'def_iv':
+          case 'sta_iv':
+            if (!arrayCheck(filter, key) && stats) queryBase.andWhereBetween(key, filter[key]); break
         }
       })
     }
@@ -124,7 +130,8 @@ class Pokemon extends Model {
       }
       if (pvp
         && (pkmn.pvp_rankings_great_league
-          || pkmn.pvp_rankings_ultra_league)) {
+          || pkmn.pvp_rankings_ultra_league
+          || pkmn.pvp)) {
         noPvp = false
         listOfIds.push(pkmn.id)
         pvpResults.push(pkmn)
@@ -136,56 +143,53 @@ class Pokemon extends Model {
 
     // second query for pvp
     if (pvp && queryPvp) {
-      pvpResults.push(...await this.query()
+      const pvpQuery = this.query()
         .select(['*', raw(true).as('pvpCheck')])
         .where('expire_timestamp', '>=', ts)
         .andWhereBetween('lat', [args.minLat, args.maxLat])
         .andWhereBetween('lon', [args.minLon, args.maxLon])
         .whereNotIn('id', listOfIds)
-        .andWhere(pvpBuilder => {
+      if (type === 'chuck') {
+        pvpQuery.whereNotNull('pvp')
+      } else {
+        pvpQuery.andWhere(pvpBuilder => {
           pvpBuilder.whereNotNull('pvp_rankings_great_league')
             .orWhereNotNull('pvp_rankings_ultra_league')
-        }))
+        })
+      }
+      pvpResults.push(...await pvpQuery)
     }
 
+    const getParsedPvp = (pokemon) => {
+      if (type === 'chuck') {
+        return JSON.parse(pokemon.pvp)
+      }
+      const parsed = {}
+      const keys = ['great', 'ultra']
+      keys.forEach(league => {
+        if (pokemon[`pvp_rankings_${league}_league`]) {
+          parsed[league] = JSON.parse(pokemon[`pvp_rankings_${league}_league`])
+        }
+      })
+    }
+
+    // filter pokes with pvp data
     pvpResults.forEach(pkmn => {
-      if (pkmn.form === 0 && pkmn.pvpCheck) {
+      if (pkmn.form === 0) {
         pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
       }
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
-      pkmn.rankSum = {
-        gl: {},
-        ul: {},
-      }
-      if (pkmn.pvp_rankings_great_league) {
-        const rankCheck = getRanks('gl', pkmn.pvp_rankings_great_league, filterId)
-        if (rankCheck.filtered.length > 0) {
-          pkmn.great = rankCheck.filtered
-          pkmn.rankSum.best = rankCheck.best
-          pkmn.rankSum.worst = rankCheck.worst
-          pkmn.rankSum.gl.best = rankCheck.best
-          pkmn.rankSum.gl.worst = rankCheck.worst
+      const parsed = getParsedPvp(pkmn)
+      pkmn.cleanPvp = {}
+      pkmn.bestPvp = 4096
+      Object.keys(parsed).forEach(league => {
+        const { filtered, best } = getRanks(league, parsed[league], filterId)
+        if (filtered.length > 0) {
+          pkmn.cleanPvp[league] = filtered
+          if (best < pkmn.bestPvp) pkmn.bestPvp = best
         }
-      }
-      if (pkmn.pvp_rankings_ultra_league) {
-        const rankCheck = getRanks('ul', pkmn.pvp_rankings_ultra_league, filterId)
-        if (rankCheck.filtered.length > 0) {
-          pkmn.ultra = rankCheck.filtered
-          if (pkmn.rankSum.best) {
-            pkmn.rankSum.best = pkmn.rankSum.best > rankCheck.best ? pkmn.rankSum.best : rankCheck.best
-          } else {
-            pkmn.rankSum.best = rankCheck.best
-          }
-          if (pkmn.rankSum.worst) {
-            pkmn.rankSum.worst = pkmn.rankSum.worst < rankCheck.worst ? pkmn.rankSum.worst : rankCheck.worst
-          } else {
-            pkmn.rankSum.worst = rankCheck.worst
-          }
-          pkmn.rankSum.ul.best = rankCheck.best
-          pkmn.rankSum.ul.worst = rankCheck.worst
-        }
-      }
-      if ((pkmn.great || pkmn.ultra) || !pkmn.pvpCheck) {
+      })
+      if (Object.keys(pkmn.cleanPvp).length > 0 || !pkmn.pvpCheck) {
         finalResults.push(pkmn)
       }
     })
