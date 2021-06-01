@@ -5,7 +5,9 @@ import DevicePoly from '../popups/DevicePoly'
 import deviceMarker from '../markers/device'
 import PopupContent from '../popups/Device'
 
-const DeviceTile = ({ item, ts, iconSizes }) => {
+const DeviceTile = ({
+  item, ts, iconSizes, userSettings,
+}) => {
   const [poly, setPoly] = useState(false)
   const status = ts - item.last_seen < 900 ? '0' : '1'
 
@@ -21,7 +23,7 @@ const DeviceTile = ({ item, ts, iconSizes }) => {
       >
         <PopupContent device={item} status={parseInt(status)} />
       </Popup>
-      {poly && <DevicePoly device={item} />}
+      {poly && <DevicePoly device={item} color={userSettings.devicePathColor} />}
     </Marker>
   )
 }
@@ -31,6 +33,7 @@ const areEqual = (prev, next) => (
   && prev.item.last_lat === next.item.last_lat
   && prev.item.last_lon === next.item.last_lon
   && prev.item.last_seen === next.item.last_seen
+  && prev.userSettings.devicePathColor === next.userSettings.devicePathColor
 )
 
 export default memo(DeviceTile, areEqual)

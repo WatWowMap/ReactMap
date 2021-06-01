@@ -2,10 +2,8 @@ import React from 'react'
 import { ButtonGroup, Button } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
-
 export default function Size({ filterValues, handleChange, btnSize }) {
-  const { sizes } = useStatic(state => state.ui)
+  const sizes = ['sm', 'md', 'lg', 'xl']
   const { t } = useTranslation()
 
   return (

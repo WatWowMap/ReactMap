@@ -16,7 +16,7 @@ export default function PokestopPopup({
   pokestop, ts, hasLure, hasInvasion, hasQuest, path, availableForms,
 }) {
   const { t } = useTranslation()
-  const { menus: { pokestops: perms } } = useStatic(state => state.ui)
+  const { pokestops: perms } = useStatic(state => state.ui)
   const [invasionExpand, setInvasionExpand] = useState(false)
   const [extraExpand, setExtraExpand] = useState(false)
   const {

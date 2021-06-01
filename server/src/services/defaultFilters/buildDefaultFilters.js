@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { map: { defaultFilters } } = require('../config.js')
+const { defaultFilters } = require('../config.js')
 const buildPokemon = require('./buildPokemon.js')
 const buildPokestops = require('./buildPokestops.js')
 const buildGyms = require('./buildGyms')

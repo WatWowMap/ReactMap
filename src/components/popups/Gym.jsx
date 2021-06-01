@@ -12,20 +12,11 @@ import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
-const getTeam = teamId => {
-  switch (parseInt(teamId)) {
-    default: return 'neutral'
-    case 1: return 'mystic'
-    case 2: return 'valor'
-    case 3: return 'instinct'
-  }
-}
-
 export default function GymPopup({
   gym, hasRaid, ts, path, availableForms,
 }) {
   const { t } = useTranslation()
-  const { menus: { gyms: perms } } = useStatic(state => state.ui)
+  const { gyms: perms } = useStatic(state => state.ui)
   const [raidExpand, setRaidExpand] = useState(hasRaid)
   const [extraExpand, setExtraExpand] = useState(false)
 
@@ -237,7 +228,6 @@ const Header = ({
 
 const PoiImage = ({ gym }) => {
   const { url, team_id, name } = gym
-  const teamName = getTeam(team_id)
   const src = url
     ? url.replace('http://', 'https://')
     : `/images/team/${team_id}.png`
@@ -249,8 +239,8 @@ const PoiImage = ({ gym }) => {
     >
       <img
         src={src}
-        alt={name || teamName}
-        className={`circle-image ${teamName}`}
+        alt={name || 'unknown'}
+        className={`circle-image team-${team_id}`}
         style={{
           maxHeight: 75,
           maxWidth: 75,

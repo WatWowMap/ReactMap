@@ -7,7 +7,7 @@ import PopupContent from '../popups/Gym'
 import Timer from './Timer'
 
 const GymTile = ({
-  item, ts, showTimer, iconSizes, filters, path, availableForms, excludeList,
+  item, ts, showTimer, iconSizes, filters, path, availableForms, excludeList, userSettings,
 }) => {
   const {
     raid_battle_timestamp, raid_end_timestamp, raid_level, raid_pokemon_id, raid_pokemon_form, team_id,
@@ -36,7 +36,7 @@ const GymTile = ({
               availableForms={availableForms}
             />
           </Popup>
-          {showTimer && <Timer timestamp={timerToDisplay} />}
+          {(showTimer || userSettings.raidTimers) && <Timer timestamp={timerToDisplay} />}
         </Marker>
       )}
     </>
@@ -85,6 +85,7 @@ const areEqual = (prev, next) => {
     && !next.excludeList.includes(`t${prev.item.team_id}-0`)
     && !next.excludeList.includes(`e${prev.item.raid_level}`)
     && prev.path === next.path
+    && prev.userSettings.raidTimers === next.userSettings.raidTimers
   )
 }
 

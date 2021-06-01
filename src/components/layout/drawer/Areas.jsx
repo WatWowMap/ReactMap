@@ -11,7 +11,7 @@ import Utility from '@services/Utility'
 import Query from '@services/Query'
 
 export default function AreaDropDown() {
-  const { map: { defaultFilters: { scanAreas: { zoomLevel } } }, manualAreas } = useStatic(state => state.config)
+  const { map: { scanAreasZoom }, manualAreas } = useStatic(state => state.config)
   const { data } = useQuery(Query.scanAreas())
   const map = useMap()
 
@@ -32,7 +32,7 @@ export default function AreaDropDown() {
               key={area}
               onClick={() => {
                 const { lat, lon } = manualAreas[area]
-                map.flyTo([lat, lon], zoomLevel)
+                map.flyTo([lat, lon], scanAreasZoom)
               }}
             >
               <Typography variant="subtitle2" align="center">
@@ -48,7 +48,7 @@ export default function AreaDropDown() {
               key={area.properties.name}
               onClick={() => {
                 const [lon, lat] = center(area).geometry.coordinates
-                map.flyTo([lat, lon], zoomLevel)
+                map.flyTo([lat, lon], scanAreasZoom)
               }}
             >
               <Typography variant="subtitle2" align="center">

@@ -89,13 +89,31 @@ Look for this value in the `default.json` file (same folder as config):
 ```
 Whatever value you put in the first position is the language that it will default to if it can't detect the local browser language.
 
+- Glow:
+You can add any number of rules in the glow array in the config. **Be sure to add all of the keys or it will not work properly and may even cause issues.** Glow can have a drastic impact on performance, use sparingly. The name field is not translated client side, set it to whatever your locale is. 
+```json
+"glow": [
+  {"name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
+  {"name": "Nundo", "perm": "iv", "num": 0, "value": "#000000", "op": "=" },
+  {"name": "Top Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
+  {"name": "Multiple", "perm": "pvp", "value": "#800080" }    
+]
+```
+- PVP Leagues:
+If you're using Chuck to parse Pokemon you can add any number of leagues to the array to add compatibility with ReactMap.
+```json
+  "database": {
+    "settings": {
+      "type": "chuck",
+      "leagues": ["great", "ultra", "little"]
+    }
+  }
+```
+
 ## Coming Soon
-- Translatable Text
-- More precise quest popups
 - AR Quest Eligibility for Stops
 - Built in event viewer
 - Expand the help modals
-- Custom Favicon Support
 - Persist some menu selections
 - Category headers in filter menus
 - Add tutorial Popups

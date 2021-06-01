@@ -20,10 +20,11 @@ import Size from './Size'
 
 export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) {
   const isMobile = useStatic(state => state.breakpoint) === 'xs'
-  const { menus } = useStatic(state => state.ui)
+  const ui = useStatic(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore(state => state.filters)
-  const setFilters = useStore(state => state.setFilters)
+  const userSettings = useStore(state => state.userSettings)
+  const setUserSettings = useStore(state => state.setUserSettings)
   const { t } = useTranslation()
 
   const handleChange = (event, values) => {
@@ -38,7 +39,13 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
   }
 
   const handleLegacySwitch = () => {
-    setFilters({ ...filters, [type]: { ...filters[type], legacy: !filters[type].legacy } })
+    setUserSettings({
+      ...userSettings,
+      [type]: {
+        ...userSettings[type],
+        legacyFilter: !userSettings[type].legacyFilter,
+      },
+    })
   }
 
   const reset = {
@@ -96,7 +103,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
                     onChange={handleLegacySwitch}
                     name="adv"
                     color="secondary"
-                    disabled={!menus[type].legacy}
+                    disabled={!ui[type].legacy}
                   />
                 )}
                 label={t('legacy')}
@@ -118,7 +125,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
             justify="center"
             alignItems="center"
           >
-            {(filters[type].legacy && menus[type].legacy)
+            {(userSettings[type].legacyFilter && ui[type].legacy)
               ? (
                 <Grid item xs={12}>
                   <StringFilter
@@ -129,7 +136,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
               )
               : (
                 <>
-                  {Object.entries(menus[type].sliders).map(category => (
+                  {Object.entries(ui[type].sliders).map(category => (
                     <Grid item xs={12} sm={6} key={category[0]}>
                       {category[1].map(each => (
                         <SliderTile

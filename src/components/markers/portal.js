@@ -1,11 +1,7 @@
-import { useStatic } from '@hooks/useStore'
-
-export default function portalMarker(portal) {
-  const ts = ((new Date()).getTime()) / 1000
-  const { map: { theme: { portalMods } } } = useStatic(state => state.config)
+export default function portalMarker(portal, ts, settings) {
   return {
-    color: ts - portal.imported > 86400 ? portalMods.old : portalMods.new,
-    fillColor: ts - portal.imported > 86400 ? portalMods.old : portalMods.new,
+    color: ts - portal.imported > 86400 ? settings.oldPortals : settings.newPortals,
+    fillColor: ts - portal.imported > 86400 ? settings.oldPortals : settings.newPortals,
     fillOpacity: 0.25,
   }
 }

@@ -3,15 +3,19 @@ import Dialog from '@material-ui/core/Dialog'
 
 import { useStore } from '@hooks/useStore'
 import FloatingBtn from './FloatingBtn'
-import Drawer from './drawer/Drawer'
-import Menu from './dialogs/filters/Menu'
+import Sidebar from './drawer/Drawer'
+import FilterMenu from './dialogs/filters/Menu'
+import UserOptions from './dialogs/UserOptions'
 
 export default function Nav() {
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
+  const userSettings = useStore(state => state.userSettings)
+  const setUserSettings = useStore(state => state.setUserSettings)
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
+    category: '',
     type: '',
   })
 
@@ -22,22 +26,27 @@ export default function Nav() {
     setDrawer(open)
   }
 
-  const toggleDialog = (open, type, filter) => (event) => {
+  const toggleDialog = (open, category, type, filter) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
     if (open) {
-      setDialog({ open, type })
+      setDialog({ open, category, type })
     } else {
-      setDialog({ open, type })
+      setDialog({ open, category, type })
     }
-    if (filter) setFilters({ ...filters, [type]: { ...filters[type], filter } })
+    if (filter && type === 'filters') {
+      setFilters({ ...filters, [category]: { ...filters[category], filter } })
+    }
+    if (filter && type === 'options') {
+      setUserSettings({ ...userSettings, [category]: filter })
+    }
   }
 
   return (
     <>
       {drawer ? (
-        <Drawer
+        <Sidebar
           drawer={drawer}
           toggleDrawer={toggleDrawer}
           filters={filters}
@@ -52,13 +61,23 @@ export default function Nav() {
       <Dialog
         fullWidth
         maxWidth="md"
-        open={dialog.open}
-        onClose={toggleDialog(false, dialog.type)}
+        open={dialog.open && dialog.type === 'filters'}
+        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
-        <Menu
+        <FilterMenu
           toggleDialog={toggleDialog}
-          filters={filters[dialog.type]}
-          type={dialog.type}
+          filters={filters[dialog.category]}
+          category={dialog.category}
+        />
+      </Dialog>
+      <Dialog
+        maxWidth="sm"
+        open={dialog.open && dialog.type === 'options'}
+        onClose={toggleDialog(false, dialog.category, dialog.type)}
+      >
+        <UserOptions
+          toggleDialog={toggleDialog}
+          category={dialog.category}
         />
       </Dialog>
     </>
