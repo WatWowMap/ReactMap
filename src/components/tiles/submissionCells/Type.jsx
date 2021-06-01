@@ -27,6 +27,7 @@ const TypeTile = ({ cell, tileStyle }) => (
 const areEqual = (prev, next) => (
   prev.cell.id === next.cell.id
   && prev.cell.count === next.cell.count
+  && prev.zoom === next.zoom
 )
 
 export default memo(TypeTile, areEqual)

@@ -65,7 +65,13 @@ const PokemonTile = ({
               userSettings={userSettings}
             />
           </Popup>
-          {showTimer && <Timer timestamp={item.expire_timestamp} direction="center" />}
+          {showTimer && (
+          <Timer
+            timestamp={item.expire_timestamp}
+            direction="center"
+            offset={[0, 30]}
+          />
+          )}
         </Marker>
       )}
     </>
@@ -79,6 +85,7 @@ const areEqual = (prev, next) => (
   && prev.filters.filter[`${prev.item.pokemon_id}-${prev.item.form}`].size === next.filters.filter[`${next.item.pokemon_id}-${next.item.form}`].size
   && !next.excludeList.includes(`${prev.item.pokemon_id}-${prev.item.form}`)
   && prev.path === next.path
+  && prev.userSettings.legacyFilter === next.userSettings.legacyFilter
 )
 
 export default memo(PokemonTile, areEqual)

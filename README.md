@@ -90,7 +90,7 @@ Look for this value in the `default.json` file (same folder as config):
 Whatever value you put in the first position is the language that it will default to if it can't detect the local browser language.
 
 - Glow:
-You can add any number of rules in the glow array in the config. **Be sure to add all of the keys or it will not work properly and may even cause issues.** Glow can have a drastic impact on performance, use sparingly. The name field is not translated client side, set it to whatever your locale is. The `multiple` field is what will be displayed if a Pokemon satisfies more than one rule.
+You can add any number of rules in the glow array in the config. **Be sure to add all of the keys or it will not work properly and may even cause issues.** Glow can have a drastic impact on performance, use sparingly. The name field is not translated client side, set it to whatever your locale is. The `Multiple` field is what will be displayed if a Pokemon satisfies more than one rule, modifying or removing this rule could cause issues.
 ```json
 "glow": [
   {"name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },

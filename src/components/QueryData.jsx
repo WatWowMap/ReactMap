@@ -4,6 +4,7 @@ import Query from '@services/Query'
 import Clustering from './Clustering'
 
 const withAvailableList = ['pokestops', 'gyms', 'nests']
+const filterSkipList = ['filter', 'enabled', 'legacy']
 
 const getPolling = category => {
   switch (category) {
@@ -28,7 +29,7 @@ export default function QueryData({
     Object.entries(requestedFilters).forEach(topLevelFilter => {
       const [id, specifics] = topLevelFilter
 
-      if (id !== 'filter' && id !== 'enabled' && id !== 'legacy') {
+      if (!filterSkipList.includes(id)) {
         trimmed[`only${id.charAt(0).toUpperCase()}${id.slice(1)}`] = specifics
       }
     })
@@ -72,7 +73,7 @@ export default function QueryData({
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [filters])
+  }, [filters, userSettings])
 
   const { data, previousData, refetch } = useQuery(Query[category](filters, perms, map.getZoom(), zoomLevel), {
     variables: {

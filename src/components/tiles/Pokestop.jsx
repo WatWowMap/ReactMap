@@ -52,6 +52,7 @@ const PokestopTile = ({
                   timestamp={item.incident_expire_timestamp}
                   direction={hasLure ? 'right' : 'center'}
                   label={hasLure ? 'Invasion' : false}
+                  offset={hasLure ? [-5, 20] : [0, 20]}
                 />
               )}
             {((showTimer || userSettings.lureTimers) && hasLure)
@@ -60,6 +61,7 @@ const PokestopTile = ({
                   timestamp={item.lure_expire_timestamp}
                   direction={hasInvasion ? 'left' : 'center'}
                   label={hasInvasion ? 'Lure' : false}
+                  offset={hasInvasion ? [5, 20] : [0, 20]}
                 />
               )}
           </Marker>

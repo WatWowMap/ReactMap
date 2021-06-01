@@ -36,7 +36,13 @@ const GymTile = ({
               availableForms={availableForms}
             />
           </Popup>
-          {(showTimer || userSettings.raidTimers) && <Timer timestamp={timerToDisplay} />}
+          {(showTimer || userSettings.raidTimers) && (
+          <Timer
+            timestamp={timerToDisplay}
+            direction="center"
+            offset={[0, 10]}
+          />
+          )}
         </Marker>
       )}
     </>

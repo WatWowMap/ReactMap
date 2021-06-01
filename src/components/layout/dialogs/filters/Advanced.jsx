@@ -99,7 +99,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
               <FormControlLabel
                 control={(
                   <Switch
-                    checked={filters[type].legacy}
+                    checked={userSettings[type].legacy}
                     onChange={handleLegacySwitch}
                     name="adv"
                     color="secondary"

@@ -11,8 +11,9 @@ const RingTile = ({ ring }) => (
 
 const areEqual = (prev, next) => (
   prev.ring.id === next.ring.id
-    && prev.ring.lat === next.ring.lat
-    && prev.ring.lon === next.ring.lon
+  && prev.ring.lat === next.ring.lat
+  && prev.ring.lon === next.ring.lon
+  && prev.zoom === next.zoom
 )
 
 export default memo(RingTile, areEqual)
