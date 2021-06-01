@@ -120,12 +120,6 @@
       "newPortals": "#16b819"
     }
   },
-  "glow": {
-    "glowHundo": { "perm": "iv", "num": 100, "value": "#ff1744" },
-    "glowNundo": { "perm": "iv", "num": 0, "value": "#000000" },
-    "glowRank1": { "perm": "pvp", "num": 1, "value": "#0000ff" },
-    "glowMultiple": { "perm": "pvp", "value": "#800080" }
-  },
   "defaultFilters": {
     "devices": {
       "enabled": false
