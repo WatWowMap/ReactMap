@@ -36,14 +36,14 @@ const PokemonTile = ({
       const [ruleKey, ruleValue] = rule
       const statKey = ruleValue.perm === 'iv' ? 'iv' : 'bestPvp'
       if (ruleValue.op) {
-        if (operator[ruleValue.op](item[statKey], ruleValue.num)) {
+        if (operator[ruleValue.op](item[statKey], ruleValue.num) && item[statKey]) {
           glowCount += 1
           glowValue = userSettings[ruleKey]
         }
       }
     })
     if (glowCount > 1) {
-      return userSettings.multiple
+      return userSettings.Multiple
     }
     return glowValue
   }, [])

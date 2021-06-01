@@ -1,14 +1,12 @@
 import React, { useEffect, useCallback } from 'react'
 import { useQuery } from '@apollo/client'
-import { useMap } from 'react-leaflet'
-import { useStatic } from '@hooks/useStore'
 import Query from '@services/Query'
 import Clustering from './Clustering'
 
 const withAvailableList = ['pokestops', 'gyms', 'nests']
 
-const getPolling = cat => {
-  switch (cat) {
+const getPolling = category => {
+  switch (category) {
     default: return 0
     case 'device': return 10000
     case 'gyms': return 10000
@@ -18,14 +16,10 @@ const getPolling = cat => {
 }
 
 export default function QueryData({
-  bounds, filters, onMove, perms, category, userSettings, iconSizes, path, availableForms, tileStyle,
+  bounds, onMove, map, tileStyle, zoomLevel, config,
+  category, available, filters, staticFilters, staticUserSettings,
+  userSettings, perms, path, availableForms,
 }) {
-  const zoomLevel = useStatic(state => state.config).map.clusterZoomLevels[category] || 1
-  const available = useStatic(state => state.available)
-  const { [category]: { filter: staticFilters } } = useStatic(state => state.filters)
-
-  const map = useMap()
-
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
       onlyLegacyExclude: [],
@@ -44,13 +38,13 @@ export default function QueryData({
       if (specifics && specifics.enabled && staticFilters[id]) {
         if (withAvailableList.includes(category)
           && !Number.isNaN(parseInt(id.charAt(0)))) {
-          if (available[category].includes(id)) {
+          if (available.includes(id)) {
             trimmed[id] = specifics
           }
         } else {
           trimmed[id] = specifics
         }
-      } else if (category === 'pokemon' && userSettings.legacyFilter) {
+      } else if (userSettings.legacyFilter) {
         trimmed.onlyLegacyExclude.push(id)
       }
     })
@@ -97,14 +91,15 @@ export default function QueryData({
           renderedData={renderedData[category]}
           zoomLevel={zoomLevel}
           map={map}
+          config={config}
           filters={filters}
-          iconSizes={iconSizes}
           path={path}
           tileStyle={tileStyle}
-          availableForms={availableForms}
-          userSettings={userSettings}
           perms={perms}
+          availableForms={availableForms}
           category={category}
+          userSettings={userSettings}
+          staticUserSettings={staticUserSettings}
         />
       )}
     </>

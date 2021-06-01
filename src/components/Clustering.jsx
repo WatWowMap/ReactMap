@@ -15,15 +15,15 @@ const getId = (component, item) => {
 }
 
 export default function Clustering({
-  filters, perms, category, userSettings, renderedData,
-  iconSizes, path, availableForms, tileStyle, map, zoomLevel,
+  category, renderedData, userSettings, zoomLevel, staticUserSettings,
+  filters, map, path, availableForms, perms, tileStyle, config,
 }) {
   const Component = index[category]
   const hideList = useStatic(state => state.hideList)
   const excludeList = useStatic(state => state.excludeList)
   const timerList = useStatic(state => state.timerList)
-  const { [category]: staticUserSettings } = useStatic(state => state.userSettings)
   const ts = Math.floor((new Date()).getTime() / 1000)
+  const currentZoom = map.getZoom()
 
   return (
     <MarkerClusterGroup
@@ -39,11 +39,13 @@ export default function Clustering({
               ts={ts}
               filters={filters}
               map={map}
-              iconSizes={iconSizes}
+              config={config}
+              iconSizes={config.iconSizes[category]}
               showTimer={timerList.includes(each.id)}
               path={path}
               availableForms={availableForms}
               perms={perms}
+              zoom={currentZoom}
               tileStyle={tileStyle}
               excludeList={excludeList}
               userSettings={userSettings}

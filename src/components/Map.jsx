@@ -16,16 +16,18 @@ const userSettingsCategory = category => {
   }
 }
 
-export default function Map({ serverSettings: { config: { map: { minZoom, maxZoom } } } }) {
+export default function Map({ serverSettings: { config: { map: config, tileServers, icons } } }) {
   const map = useMap()
   const filters = useStore(state => state.filters)
   const { tileServers: userTiles, icons: userIcons } = useStore(state => state.settings)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
-  const ui = useStatic(state => state.ui)
-  const { map: { iconSizes }, tileServers, icons } = useCallback(useStatic(state => state.config))
-  const availableForms = useStatic(state => state.availableForms)
+  const ui = useCallback(useStatic(state => state.ui))
+  const available = useCallback(useStatic(state => state.available))
+  const staticFilters = useCallback(useStatic(state => state.filters))
   const userSettings = useStore(state => state.userSettings)
+  const staticUserSettings = useStatic(state => state.userSettings)
+  const availableForms = useStatic(state => state.availableForms)
 
   const initialBounds = {
     minLat: map.getBounds()._southWest.lat - 0.01,
@@ -38,7 +40,7 @@ export default function Map({ serverSettings: { config: { map: { minZoom, maxZoo
     const newCenter = map.getCenter()
     setLocation([newCenter.lat, newCenter.lng])
     setZoom(map.getZoom())
-  }, [map, userSettings])
+  }, [map])
 
   return (
     <>
@@ -46,8 +48,8 @@ export default function Map({ serverSettings: { config: { map: { minZoom, maxZoo
         key={tileServers[userTiles].name}
         attribution={tileServers[userTiles].attribution}
         url={tileServers[userTiles].url}
-        minZoom={minZoom}
-        maxZoom={maxZoom}
+        minZoom={config.minZoom}
+        maxZoom={config.maxZoom}
       />
       {Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
         const [category, value] = each
@@ -84,15 +86,20 @@ export default function Map({ serverSettings: { config: { map: { minZoom, maxZoo
             <QueryData
               key={category}
               bounds={initialBounds}
-              filters={filters[category]}
               onMove={onMove}
               perms={value}
+              map={map}
               category={category}
-              iconSizes={iconSizes[category]}
-              path={icons[userIcons].path}
+              config={config}
+              available={available[category]}
               availableForms={availableForms}
-              tileStyle={tileServers[userTiles].style}
+              path={icons[userIcons].path}
+              staticFilters={staticFilters[category].filter}
               userSettings={userSettings[userSettingsCategory(category)] || {}}
+              filters={filters[category]}
+              tileStyle={tileServers[userTiles].style}
+              zoomLevel={config.clusterZoomLevels[category] || 1}
+              staticUserSettings={staticUserSettings[category]}
             />
           )
         }
