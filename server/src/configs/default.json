@@ -38,7 +38,7 @@
     "maxZoom": 18,
     "scanAreasZoom": 12,
     "scanCellsZoom": 13,
-    "submissionZoomL": 15,
+    "submissionZoom": 15,
     "theme": {
       "style": "dark",
       "primary": "#ff5722",

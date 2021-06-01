@@ -8,13 +8,13 @@ export default function SubmissionCellTile({
 }) {
   return (
     <>
-      {zoom >= config.submissionZoomL && item.placementCells.rings.map(ring => (
+      {zoom >= config.submissionZoom && item.placementCells.rings.map(ring => (
         <RingTile
           key={`r${ring.id}-${ring.lat}-${ring.lon}`}
           ring={ring}
         />
       ))}
-      {zoom >= config.submissionZoomL && item.placementCells.cells.map(cell => (
+      {zoom >= config.submissionZoom && item.placementCells.cells.map(cell => (
         <PlacementTile
           key={`pc${cell.id}-${cell.polygon[0]}-${cell.polygon[1]}-${cell.polygon[2]}-${cell.polygon[3]}`}
           cell={cell}
