@@ -37,6 +37,7 @@ export default function PokestopPopup({
         perms={perms}
         hasInvasion={hasInvasion}
         hasQuest={hasQuest}
+        hasLure={hasLure}
         t={t}
       />
       <Grid item xs={12}>
@@ -117,7 +118,7 @@ export default function PokestopPopup({
 }
 
 const Header = ({
-  pokestop, perms, hasInvasion, hasQuest, t,
+  pokestop, perms, hasInvasion, hasQuest, t, hasLure,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -206,7 +207,8 @@ const Header = ({
   if (perms.quests && hasQuest) {
     options.push({ name: 'excludeQuest', action: excludeQuest })
   }
-  if (perms.invasions && hasInvasion) {
+  if ((perms.invasions && hasInvasion)
+  || (perms.lures && hasLure)) {
     options.push(
       { name: 'excludeInvasion', action: excludeInvasion },
       { name: 'timer', action: handleTimer },
@@ -279,7 +281,7 @@ const PoiImage = ({
         <img
           src={src}
           alt={name || 'unknown'}
-          className={`circle-image ${lureName}`}
+          className={`circle-image lure-${lure_id}`}
           style={{
             maxHeight: 60,
             maxWidth: 60,
