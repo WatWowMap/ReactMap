@@ -2,6 +2,6 @@ import React from 'react'
 
 export default function Help() {
   return (
-    <>Hi</>
+    <>There will be more stuff here eventually!</>
   )
 }

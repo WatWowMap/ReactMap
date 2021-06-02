@@ -7,7 +7,7 @@ import stopMarker from '../markers/pokestop'
 import Timer from './Timer'
 
 const PokestopTile = ({
-  item, ts, showTimer, filters, iconSizes, path, availableForms, perms, excludeList,
+  item, ts, showTimer, filters, iconSizes, path, availableForms, perms, excludeList, userSettings,
 }) => {
   const {
     grunt_type, incident_expire_timestamp, quest_item_id, lure_expire_timestamp,
@@ -46,20 +46,22 @@ const PokestopTile = ({
                 availableForms={availableForms}
               />
             </Popup>
-            {(showTimer && hasInvasion)
+            {((showTimer || userSettings.invasionTimers) && hasInvasion)
               && (
                 <Timer
                   timestamp={item.incident_expire_timestamp}
                   direction={hasLure ? 'right' : 'center'}
                   label={hasLure ? 'Invasion' : false}
+                  offset={hasLure ? [-5, 20] : [0, 20]}
                 />
               )}
-            {(showTimer && hasLure)
+            {((showTimer || userSettings.lureTimers) && hasLure)
               && (
                 <Timer
                   timestamp={item.lure_expire_timestamp}
                   direction={hasInvasion ? 'left' : 'center'}
                   label={hasInvasion ? 'Lure' : false}
+                  offset={hasInvasion ? [5, 20] : [0, 20]}
                 />
               )}
           </Marker>
@@ -84,6 +86,8 @@ const areEqual = (prev, next) => (
   && !next.excludeList.includes(`m${prev.item.mega_pokemon_id}-${prev.item.mega_amount}`)
   && !next.excludeList.includes(`d${prev.item.stardust_amount}`)
   && !next.excludeList.includes(`q${prev.item.quest_item_id}`)
+  && prev.userSettings.invasionTimers === next.userSettings.invasionTimers
+  && prev.userSettings.lureTimers === next.userSettings.lureTimers
 )
 
 export default memo(PokestopTile, areEqual)

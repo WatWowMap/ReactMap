@@ -13,27 +13,15 @@ export const basicMarker = (iconUrl, pkmn, filters, iconSizes) => {
   })
 }
 
-export const fancyMarker = (iconUrl, pkmn, bestPvp, filters, iconSizes, glow) => {
-  const getGlowColor = () => {
-    let color
-    let badge
-    if (bestPvp) {
-      switch (bestPvp) {
-        default: badge = 'first'; break
-        case 2: badge = 'second'; break
-        case 3: badge = 'third'; break
-      }
-    }
-    if (bestPvp <= glow.pvp.value && pkmn.iv >= glow.iv.value) {
-      color = glow.both.color
-    } else if (bestPvp <= glow.pvp.value) {
-      color = glow.pvp.color
-    } else if (pkmn.iv >= glow.iv.value) {
-      color = glow.iv.color
-    }
-    return { color, badge }
+export const fancyMarker = (iconUrl, pkmn, filters, iconSizes, glow) => {
+  let badge
+  switch (pkmn.bestPvp) {
+    default: break
+    case 1: badge = 'first'; break
+    case 2: badge = 'second'; break
+    case 3: badge = 'third'; break
   }
-  const { color, badge } = getGlowColor(pkmn.pokemon_id, pkmn.form)
+
   const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
   const size = filters.filter[filterId] ? iconSizes[filters.filter[filterId].size] : iconSizes.md
 
@@ -55,7 +43,7 @@ export const fancyMarker = (iconUrl, pkmn, bestPvp, filters, iconSizes, glow) =>
       <div class="marker-image-holder">
         <img 
           src="${iconUrl}" 
-          style=" ${color ? `filter:drop-shadow(0 0 10px ${color})drop-shadow(0 0 10px ${color});-webkit-filter:drop-shadow(0 0 10px ${color})drop-shadow(0 0 10px ${color});` : ''}
+          style=" ${glow ? `filter:drop-shadow(0 0 10px ${glow})drop-shadow(0 0 10px ${glow});-webkit-filter:drop-shadow(0 0 10px ${glow})drop-shadow(0 0 10px ${glow});` : ''}
           width:${size}px;
           height:${size}px;"
         />

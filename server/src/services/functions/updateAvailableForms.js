@@ -5,7 +5,7 @@ const fs = require('fs')
 const axios = require('axios')
 const path = require('path')
 
-const updateAvailableForms = async (icons) => {
+module.exports = async function updateAvailableForms(icons) {
   for (const icon of Object.values(icons)) {
     if (icon.path.startsWith('/')) {
       const pokemonIconsDir = path.resolve(__dirname, `../../static${icon.path}`)
@@ -35,5 +35,3 @@ const updateAvailableForms = async (icons) => {
     }
   }
 }
-
-module.exports = updateAvailableForms

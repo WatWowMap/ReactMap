@@ -14,34 +14,17 @@ import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
-export default function PokemonPopup({ pokemon, iconUrl }) {
+export default function PokemonPopup({ pokemon, iconUrl, userSettings }) {
   const { t } = useTranslation()
   const {
     pokemon_id, cleanPvp, iv, cp,
   } = pokemon
-  const { menus: { pokemon: perms } } = useStatic(state => state.ui)
+  const { pokemon: perms } = useStatic(state => state.ui)
 
   const { pokemon: { [pokemon_id]: metaData } } = useStatic(state => state.masterfile)
   const [expanded, setExpanded] = useState(false)
-  const [pvpExpand, setPvpExpand] = useState(false)
+  const [pvpExpand, setPvpExpand] = useState((userSettings.prioritizePvpInfo && perms.pvp))
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
-
-  const leagueStats = (function pvpStats() {
-    const stats = {}
-    hasLeagues.forEach(league => {
-      stats[league] = { hasGood: false, hasBad: false }
-      cleanPvp[league].forEach(pkmn => {
-        if (pkmn.rank <= 5) {
-          stats[league].hasGood = true
-        }
-        if (pkmn.rank > 5) {
-          stats[league].hasBad = true
-        }
-      })
-    })
-    return stats
-  }())
-
   const hasStats = iv || cp
 
   return (
@@ -58,6 +41,10 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
         iconUrl={iconUrl}
         t={t}
       />
+      <Timer
+        pokemon={pokemon}
+        hasStats={hasStats}
+      />
       {hasStats && (
         <>
           <Stats
@@ -69,45 +56,18 @@ export default function PokemonPopup({ pokemon, iconUrl }) {
           <Divider orientation="vertical" flexItem />
         </>
       )}
-      {!hasStats && (
-        <Timer
-          pokemon={pokemon}
-        />
-      )}
       <Info
         pokemon={pokemon}
         metaData={metaData}
         perms={perms}
       />
-      {hasStats && (
-        <Timer
-          pokemon={pokemon}
-          hasStats={hasStats}
-        />
-      )}
-      <Collapse in={!pvpExpand} timeout="auto" unmountOnExit>
-        {hasLeagues.map(league => {
-          if (leagueStats[league].hasGood) {
-            return (
-              <PvpInfo
-                key={league}
-                league={league}
-                data={cleanPvp[league]}
-                onlyTop5
-                t={t}
-              />
-            )
-          }
-          return null
-        })}
-      </Collapse>
       <Footer
         pokemon={pokemon}
         expanded={expanded}
         setExpanded={setExpanded}
         pvpExpand={pvpExpand}
         setPvpExpand={setPvpExpand}
-        hasPvp={Object.values(leagueStats).some(val => val.hasBad)}
+        hasPvp={hasLeagues.length > 0}
       />
       <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
         {hasLeagues.map(league => (
@@ -343,7 +303,7 @@ const Timer = ({ pokemon, hasStats }) => {
           {timer.str}
         </Typography>
         <Typography variant="subtitle2" align="center">
-          {despawnTimer.toLocaleTimeString()}
+          {despawnTimer.toLocaleTimeString(localStorage.getItem('i18nextLng'))}
         </Typography>
       </Grid>
       <Grid item xs={hasStats ? 3 : 2}>
@@ -460,7 +420,7 @@ const ExtraInfo = ({ pokemon, perms, t }) => {
           </Grid>
           <Grid item xs={6} style={{ textAlign: 'right' }}>
             <Typography variant="caption" align="center">
-              {(new Date(time * 1000)).toLocaleTimeString()}
+              {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
             </Typography>
           </Grid>
         </Fragment>

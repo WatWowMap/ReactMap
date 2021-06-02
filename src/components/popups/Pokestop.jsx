@@ -16,7 +16,7 @@ export default function PokestopPopup({
   pokestop, ts, hasLure, hasInvasion, hasQuest, path, availableForms,
 }) {
   const { t } = useTranslation()
-  const { menus: { pokestops: perms } } = useStatic(state => state.ui)
+  const { pokestops: perms } = useStatic(state => state.ui)
   const [invasionExpand, setInvasionExpand] = useState(false)
   const [extraExpand, setExtraExpand] = useState(false)
   const {
@@ -37,6 +37,7 @@ export default function PokestopPopup({
         perms={perms}
         hasInvasion={hasInvasion}
         hasQuest={hasQuest}
+        hasLure={hasLure}
         t={t}
       />
       <Grid item xs={12}>
@@ -107,9 +108,9 @@ export default function PokestopPopup({
         hasInvasion={hasInvasion}
         perms={perms}
       />
-      {perms.pokestops && (
+      {perms.allPokestops && (
         <Collapse in={extraExpand} timeout="auto" unmountOnExit>
-          <ExtraInfo pokestop={pokestop} t={t} />
+          <ExtraInfo pokestop={pokestop} t={t} ts={ts} />
         </Collapse>
       )}
     </Grid>
@@ -117,7 +118,7 @@ export default function PokestopPopup({
 }
 
 const Header = ({
-  pokestop, perms, hasInvasion, hasQuest, t,
+  pokestop, perms, hasInvasion, hasQuest, t, hasLure,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -206,7 +207,8 @@ const Header = ({
   if (perms.quests && hasQuest) {
     options.push({ name: 'excludeQuest', action: excludeQuest })
   }
-  if (perms.invasions && hasInvasion) {
+  if ((perms.invasions && hasInvasion)
+    || (perms.lures && hasLure)) {
     options.push(
       { name: 'excludeInvasion', action: excludeInvasion },
       { name: 'timer', action: handleTimer },
@@ -279,7 +281,7 @@ const PoiImage = ({
         <img
           src={src}
           alt={name || 'unknown'}
-          className={`circle-image ${lureName}`}
+          className={`circle-image lure-${lure_id}`}
           style={{
             maxHeight: 60,
             maxWidth: 60,
@@ -329,7 +331,7 @@ const Timer = ({ expireTime, lureName }) => {
       </Grid>
       <Grid item xs={12} style={{ textAlign: 'center' }}>
         <Typography variant="caption">
-          {new Date(endTime).toLocaleTimeString()}
+          {new Date(endTime).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
         </Typography>
       </Grid>
     </>
@@ -495,7 +497,7 @@ const Footer = ({
           <Map style={{ color: 'white' }} />
         </IconButton>
       </Grid>
-      {perms.pokestops && (
+      {perms.allPokestops && (
         <Grid item xs={4}>
           <IconButton
             className={expanded ? classes.expandOpen : classes.expand}
@@ -510,17 +512,17 @@ const Footer = ({
   )
 }
 
-const ExtraInfo = ({ pokestop, t }) => {
+const ExtraInfo = ({ pokestop, t, ts }) => {
   const { last_modified_timestamp, updated } = pokestop
 
   const extraMetaData = [
     {
-      description: 'lastSeen:',
-      data: (new Date(updated * 1000)).toLocaleTimeString(),
+      description: 'lastSeen',
+      data: Utility.dayCheck(ts, updated),
     },
     {
-      description: 'lastModified:',
-      data: (new Date(last_modified_timestamp * 1000)).toLocaleTimeString(),
+      description: 'lastModified',
+      data: Utility.dayCheck(ts, last_modified_timestamp),
     },
   ]
 
@@ -534,10 +536,10 @@ const ExtraInfo = ({ pokestop, t }) => {
         <Fragment key={meta.description}>
           <Grid item xs={5} style={{ textAlign: 'left' }}>
             <Typography variant="caption" align="center">
-              {t(meta.description)}
+              {t(meta.description)}:
             </Typography>
           </Grid>
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
+          <Grid item xs={7} style={{ textAlign: 'right' }}>
             <Typography variant="caption" align="center">
               {meta.data}
             </Typography>

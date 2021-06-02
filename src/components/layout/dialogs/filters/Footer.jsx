@@ -112,14 +112,14 @@ export default function Footer({
     key: 'save',
     icon: (
       <IconButton
-        onClick={toggleDialog(false, type, tempFilters)}
+        onClick={toggleDialog(false, type, 'filters', tempFilters)}
       >
         <Save color="secondary" />
       </IconButton>
     ),
     text: (
       <Button
-        onClick={toggleDialog(false, type, tempFilters)}
+        onClick={toggleDialog(false, type, 'filters', tempFilters)}
         color="secondary"
       >
         <Typography

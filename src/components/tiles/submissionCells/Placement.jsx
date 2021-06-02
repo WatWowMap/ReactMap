@@ -13,6 +13,7 @@ const PlacementTile = ({ cell, tileStyle }) => (
 
 const areEqual = (prev, next) => (
   prev.cell.id === next.cell.id
+  && prev.zoom === next.zoom
 )
 
 export default memo(PlacementTile, areEqual)

@@ -4,7 +4,7 @@ import { Popup, Polyline, Marker } from 'react-leaflet'
 import weatherMarker from '../markers/weather'
 import PopupContent from '../popups/Weather'
 
-export default function WeatherTile({ item }) {
+export default function WeatherTile({ item, ts }) {
   return (
     <Polyline
       key={item.id}
@@ -13,7 +13,7 @@ export default function WeatherTile({ item }) {
     >
       <Marker icon={weatherMarker(item)} position={[item.latitude, item.longitude]}>
         <Popup position={[item.latitude, item.longitude]}>
-          <PopupContent weather={item} />
+          <PopupContent weather={item} ts={ts} />
         </Popup>
       </Marker>
     </Polyline>

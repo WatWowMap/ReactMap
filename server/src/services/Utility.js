@@ -2,9 +2,10 @@ const getPolyVector = require('./functions/getPolyVector')
 const getPlacementCells = require('./functions/getPlacementCells')
 const getTypeCells = require('./functions/getTypeCells')
 const buildDefaultFilters = require('./defaultFilters/buildDefaultFilters')
-const generateUi = require('./ui')
 const updateAvailableForms = require('./functions/updateAvailableForms')
-const buildMenus = require('./buildMenus')
+const primaryUi = require('./ui/primary')
+const advMenus = require('./ui/advMenus')
+const clientOptions = require('./ui/clientOptions')
 const fetchJson = require('./functions/fetchJson')
 const fetchRaids = require('./functions/fetchRaids')
 const fetchQuests = require('./functions/fetchQuests')
@@ -31,12 +32,16 @@ class Utility {
     return buildDefaultFilters(perms)
   }
 
-  static generateUi(filters, perms) {
-    return generateUi(filters, perms)
+  static buildPrimaryUi(filters, perms) {
+    return primaryUi(filters, perms)
   }
 
-  static buildMenus() {
-    return buildMenus()
+  static buildAdvMenus() {
+    return advMenus()
+  }
+
+  static buildClientOptions(perms) {
+    return clientOptions(perms)
   }
 
   static async fetchJson(url) {

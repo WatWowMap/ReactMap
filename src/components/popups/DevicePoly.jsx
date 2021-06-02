@@ -1,10 +1,7 @@
 import React, { memo } from 'react'
 import { Polyline, Polygon } from 'react-leaflet'
 
-import { useStatic } from '@hooks/useStore'
-
-const DevicePoly = ({ device }) => {
-  const { map: { theme } } = useStatic(state => state.config)
+const DevicePoly = ({ device, color }) => {
   const parsedRoute = JSON.parse(device.route)
   const routeCheck = parsedRoute.length === 1 ? parsedRoute[0] : parsedRoute
   const poly = routeCheck.map(route => [route.lat, route.lon])
@@ -15,12 +12,12 @@ const DevicePoly = ({ device }) => {
         ? (
           <Polyline
             positions={poly}
-            pathOptions={{ color: theme.devicePathColor }}
+            pathOptions={{ color }}
           />
         ) : (
           <Polygon
             positions={poly}
-            pathOptions={{ color: theme.devicePathColor }}
+            pathOptions={{ color }}
           />
         )}
     </>

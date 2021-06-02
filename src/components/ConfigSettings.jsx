@@ -13,23 +13,27 @@ const ConfigSettings = ({ serverSettings, match }) => {
   document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
+  const setUserSettings = useStore(state => state.setUserSettings)
   const setSettings = useStore(state => state.setSettings)
   const setFilters = useStore(state => state.setFilters)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
   const setMenus = useStore(state => state.setMenus)
 
-  const setStaticMenus = useStatic(state => state.setStaticMenus)
+  const setStaticUserSettings = useStatic(state => state.setUserSettings)
+  const setStaticSettings = useStatic(state => state.setSettings)
+  const setStaticMenus = useStatic(state => state.setMenus)
   const setAvailable = useStatic(state => state.setAvailable)
   const setConfig = useStatic(state => state.setConfig)
   const setAvailableForms = useStatic(state => state.setAvailableForms)
   const setMasterfile = useStatic(state => state.setMasterfile)
   const setUi = useStatic(state => state.setUi)
   const setBreakpoint = useStatic(state => state.setBreakpoint)
-  const setStaticFilters = useStatic(state => state.setStaticFilters)
+  const setStaticFilters = useStatic(state => state.setFilters)
+
+  const localState = JSON.parse(localStorage.getItem('local-state'))
 
   const updateObjState = (defaults, category) => {
-    const localState = JSON.parse(localStorage.getItem('local-state'))
     if (localState && localState.state && localState.state[category]) {
       const newState = {}
       extend(true, newState, defaults, localState.state[category])
@@ -39,7 +43,6 @@ const ConfigSettings = ({ serverSettings, match }) => {
   }
 
   const updatePositionState = (defaults, category) => {
-    const localState = JSON.parse(localStorage.getItem('local-state'))
     if (localState && localState.state && localState.state[category]) {
       return localState.state[category]
     }
@@ -61,11 +64,14 @@ const ConfigSettings = ({ serverSettings, match }) => {
   setMenus(updateObjState(serverSettings.menus, 'menus'))
   setStaticFilters(serverSettings.defaultFilters)
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
+  setStaticSettings(serverSettings.settings)
+
+  setUserSettings(updateObjState(serverSettings.userSettings, 'userSettings'))
+  setStaticUserSettings(serverSettings.clientMenus)
 
   // temp settings migration
-  const parsed = JSON.parse(localStorage.getItem('local-state'))
-  if (parsed) {
-    if (parsed.state && parsed.state.settings.icons.name) {
+  if (localState) {
+    if (localState.state && localState.state.settings.icons.name) {
       setSettings(serverSettings.settings)
     } else {
       setSettings(updateObjState(serverSettings.settings, 'settings'))
