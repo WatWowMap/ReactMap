@@ -3,7 +3,7 @@ import {
   Grid, Fab, Dialog, Button, Typography, Divider, DialogActions, DialogContent, DialogTitle,
 } from '@material-ui/core'
 import {
-  Menu, LocationOn, ZoomIn, ZoomOut, Forum, Create,
+  Menu, LocationOn, ZoomIn, ZoomOut, Forum, Create, Equalizer,
 } from '@material-ui/icons'
 import { useMap } from 'react-leaflet'
 import Locate from 'leaflet.locatecontrol'
@@ -15,7 +15,11 @@ import useStyles from '@hooks/useStyles'
 export default function FloatingButtons({ toggleDrawer }) {
   const { t } = useTranslation()
   const classes = useStyles()
-  const { map: { feedbackLink, enableFeedback } } = useStatic(state => state.config)
+  const {
+    map: {
+      enableFeedback, feedbackLink, enableStats, statsLink,
+    },
+  } = useStatic(state => state.config)
   const breakpoint = useStatic(state => state.breakpoint)
   const [open, setOpen] = React.useState(false)
 
@@ -64,6 +68,13 @@ export default function FloatingButtons({ toggleDrawer }) {
           <ZoomOut fontSize={iconSize} />
         </Fab>
       </Grid>
+      {enableStats && (
+        <Grid item>
+          <Fab color="secondary" size={fabSize} href={statsLink} target="_blank" rel="noreferrer">
+            <Equalizer fontSize={iconSize} style={{ color: 'white' }} />
+          </Fab>
+        </Grid>
+      )}
       {enableFeedback && (
         <Grid item>
           <Fab size={fabSize} onClick={handleClickOpen}>

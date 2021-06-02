@@ -18,6 +18,8 @@
     "style": "dark",
     "enableFeedback": true,
     "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
+    "enableStats": true,
+    "statsLink": "https://rdmopole2link.net",
     "startLat": 0,
     "startLon": 0,
     "startZoom": 12,
