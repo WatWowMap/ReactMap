@@ -108,9 +108,9 @@ export default function PokestopPopup({
         hasInvasion={hasInvasion}
         perms={perms}
       />
-      {perms.pokestops && (
+      {perms.allPokestops && (
         <Collapse in={extraExpand} timeout="auto" unmountOnExit>
-          <ExtraInfo pokestop={pokestop} t={t} />
+          <ExtraInfo pokestop={pokestop} t={t} ts={ts} />
         </Collapse>
       )}
     </Grid>
@@ -208,7 +208,7 @@ const Header = ({
     options.push({ name: 'excludeQuest', action: excludeQuest })
   }
   if ((perms.invasions && hasInvasion)
-  || (perms.lures && hasLure)) {
+    || (perms.lures && hasLure)) {
     options.push(
       { name: 'excludeInvasion', action: excludeInvasion },
       { name: 'timer', action: handleTimer },
@@ -331,7 +331,7 @@ const Timer = ({ expireTime, lureName }) => {
       </Grid>
       <Grid item xs={12} style={{ textAlign: 'center' }}>
         <Typography variant="caption">
-          {new Date(endTime).toLocaleTimeString()}
+          {new Date(endTime).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
         </Typography>
       </Grid>
     </>
@@ -497,7 +497,7 @@ const Footer = ({
           <Map style={{ color: 'white' }} />
         </IconButton>
       </Grid>
-      {perms.pokestops && (
+      {perms.allPokestops && (
         <Grid item xs={4}>
           <IconButton
             className={expanded ? classes.expandOpen : classes.expand}
@@ -512,17 +512,17 @@ const Footer = ({
   )
 }
 
-const ExtraInfo = ({ pokestop, t }) => {
+const ExtraInfo = ({ pokestop, t, ts }) => {
   const { last_modified_timestamp, updated } = pokestop
 
   const extraMetaData = [
     {
-      description: 'lastSeen:',
-      data: (new Date(updated * 1000)).toLocaleTimeString(),
+      description: 'lastSeen',
+      data: Utility.dayCheck(ts, updated),
     },
     {
-      description: 'lastModified:',
-      data: (new Date(last_modified_timestamp * 1000)).toLocaleTimeString(),
+      description: 'lastModified',
+      data: Utility.dayCheck(ts, last_modified_timestamp),
     },
   ]
 
@@ -536,10 +536,10 @@ const ExtraInfo = ({ pokestop, t }) => {
         <Fragment key={meta.description}>
           <Grid item xs={5} style={{ textAlign: 'left' }}>
             <Typography variant="caption" align="center">
-              {t(meta.description)}
+              {t(meta.description)}:
             </Typography>
           </Grid>
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
+          <Grid item xs={7} style={{ textAlign: 'right' }}>
             <Typography variant="caption" align="center">
               {meta.data}
             </Typography>

@@ -84,7 +84,7 @@ export default function GymPopup({
       />
       {perms.gyms && (
         <Collapse in={extraExpand} timeout="auto" unmountOnExit>
-          <ExtraInfo gym={gym} t={t} />
+          <ExtraInfo gym={gym} t={t} ts={ts} />
         </Collapse>
       )}
     </Grid>
@@ -484,7 +484,7 @@ const Timer = ({ gym, start, t }) => {
     return (
       <Grid item xs={6} style={{ textAlign: 'center' }}>
         <Typography variant="subtitle1">
-          {t('starts')}: {startTime.toLocaleTimeString()}
+          {t('starts')}: {startTime.toLocaleTimeString(localStorage.getItem('i18nextLng'))}
         </Typography>
         <Typography variant="h6">
           {raidStart.str}
@@ -495,7 +495,7 @@ const Timer = ({ gym, start, t }) => {
   return (
     <Grid item xs={12} style={{ textAlign: 'center' }}>
       <Typography variant="subtitle1">
-        {t('ends')} {endTime.toLocaleTimeString()}
+        {t('ends')} {endTime.toLocaleTimeString(localStorage.getItem('i18nextLng'))}
       </Typography>
       <Typography variant="h6">
         {raidEnd.str}
@@ -562,7 +562,7 @@ const Footer = ({
   )
 }
 
-const ExtraInfo = ({ gym, t }) => {
+const ExtraInfo = ({ gym, t, ts }) => {
   const {
     last_modified_timestamp, updated, total_cp, guarding_pokemon_id,
   } = gym
@@ -578,11 +578,11 @@ const ExtraInfo = ({ gym, t }) => {
     },
     {
       description: 'lastSeen',
-      data: (new Date(updated * 1000)).toLocaleTimeString(),
+      data: Utility.dayCheck(ts, updated),
     },
     {
       description: 'lastModified',
-      data: (new Date(last_modified_timestamp * 1000)).toLocaleTimeString(),
+      data: Utility.dayCheck(ts, last_modified_timestamp),
     },
   ]
 

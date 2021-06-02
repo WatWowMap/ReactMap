@@ -21,7 +21,11 @@ const DeviceTile = ({
         onOpen={() => setPoly(true)}
         onClose={() => setPoly(false)}
       >
-        <PopupContent device={item} status={parseInt(status)} />
+        <PopupContent
+          device={item}
+          status={parseInt(status)}
+          ts={ts}
+        />
       </Popup>
       {poly && <DevicePoly device={item} color={userSettings.devicePathColor} />}
     </Marker>

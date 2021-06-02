@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
-export default function S2CellPopup({ cell }) {
+export default function S2CellPopup({ cell, ts }) {
   const { t } = useTranslation()
   const { id, updated } = cell
   const lastUpdated = new Date(updated * 1000)
@@ -16,6 +16,7 @@ export default function S2CellPopup({ cell }) {
     }, 1000)
     return () => clearTimeout(timer2)
   })
+
   return (
     <>
       <Typography variant="h6" align="center">{t('level15S2Cell')}</Typography>
@@ -23,7 +24,10 @@ export default function S2CellPopup({ cell }) {
         {timer.str}
       </Typography>
       <Typography variant="subtitle1" align="center">
-        {t('lastUpdated')}: {(new Date(updated * 1000)).toLocaleTimeString()}
+        {t('lastUpdated')}:
+      </Typography>
+      <Typography variant="subtitle1" align="center">
+        {Utility.dayCheck(ts, updated)}
       </Typography>
       <Typography variant="subtitle1" align="center">
         {t('id')}: {id}

@@ -117,8 +117,8 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
           </Grid>
         </Grid>
       </DialogTitle>
-      {type === 'pokemon' && (
-        <DialogContent style={{ color: 'white' }}>
+      <DialogContent style={{ color: 'white' }}>
+        {type === 'pokemon' ? (
           <Grid
             container
             direction="row"
@@ -151,23 +151,33 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
                 </>
               )}
           </Grid>
-        </DialogContent>
-      )}
+        ) : (
+          <Grid item xs={12} style={{ textAlign: 'center' }}>
+            <Size
+              filterValues={filterValues}
+              handleChange={handleChange}
+              btnSize="medium"
+            />
+          </Grid>
+        )}
+      </DialogContent>
       <DialogActions>
         <Grid
           container
           justify="center"
           alignItems="center"
         >
-          <Grid item xs={type === 'pokemon' ? 8 : 7}>
+          {type === 'pokemon' && (
+          <Grid item xs={8}>
             <Size
               filterValues={filterValues}
               handleChange={handleChange}
-              btnSize={type === 'pokemon' ? 'medium' : 'small'}
+              btnSize="medium"
             />
           </Grid>
+          )}
           {[reset, save].map(button => (
-            <Grid item xs={2} key={button.key}>
+            <Grid item xs={type === 'pokemon' ? 2 : 4} key={button.key} style={{ textAlign: 'right' }}>
               {isMobile ? button.icon : button.text}
             </Grid>
           ))}

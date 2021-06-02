@@ -4,17 +4,19 @@ import { Polygon, Popup } from 'react-leaflet'
 import PopupContent from '../popups/S2cell'
 import marker from '../markers/s2cell'
 
-const S2cellTile = ({ item, config, zoom }) => (
+const S2cellTile = ({
+  item, config, zoom, ts,
+}) => (
   <>
     {zoom >= config.scanCellsZoom && (
-    <Polygon
-      positions={item.polygon}
-      pathOptions={marker(item.updated)}
-    >
-      <Popup position={[item.center_lat, item.center_lon]}>
-        <PopupContent cell={item} />
-      </Popup>
-    </Polygon>
+      <Polygon
+        positions={item.polygon}
+        pathOptions={marker(item.updated)}
+      >
+        <Popup position={[item.center_lat, item.center_lon]}>
+          <PopupContent cell={item} ts={ts} />
+        </Popup>
+      </Polygon>
     )}
   </>
 )

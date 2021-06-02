@@ -303,7 +303,7 @@ const Timer = ({ pokemon, hasStats }) => {
           {timer.str}
         </Typography>
         <Typography variant="subtitle2" align="center">
-          {despawnTimer.toLocaleTimeString()}
+          {despawnTimer.toLocaleTimeString(localStorage.getItem('i18nextLng'))}
         </Typography>
       </Grid>
       <Grid item xs={hasStats ? 3 : 2}>
@@ -420,7 +420,7 @@ const ExtraInfo = ({ pokemon, perms, t }) => {
           </Grid>
           <Grid item xs={6} style={{ textAlign: 'right' }}>
             <Typography variant="caption" align="center">
-              {(new Date(time * 1000)).toLocaleTimeString()}
+              {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
             </Typography>
           </Grid>
         </Fragment>

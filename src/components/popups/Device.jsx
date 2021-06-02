@@ -1,10 +1,11 @@
+/* eslint-disable camelcase */
 import React, { useState, useEffect } from 'react'
 import { Typography } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
-export default function DevicePopup({ device, status }) {
+export default function DevicePopup({ device, status, ts }) {
   const { t } = useTranslation()
 
   return (
@@ -15,7 +16,7 @@ export default function DevicePopup({ device, status }) {
       <Typography variant="subtitle2">
         {t('instance')} {device.instance_name}
       </Typography>
-      <Timer device={device} t={t} />
+      <Timer device={device} t={t} ts={ts} />
       <Typography
         variant="subtitle1"
         style={{ color: `${status ? '#ff5722' : '#00e676'}` }}
@@ -27,20 +28,21 @@ export default function DevicePopup({ device, status }) {
   )
 }
 
-const Timer = ({ device, t }) => {
-  const lastSeen = new Date(device.last_seen * 1000)
-  const [raidStart, setRaidStart] = useState(Utility.getTimeUntil(lastSeen))
+const Timer = ({ device, t, ts }) => {
+  const { last_seen } = device
+  const lastSeen = new Date(last_seen * 1000)
+  const [since, setSince] = useState(Utility.getTimeUntil(lastSeen))
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setRaidStart(Utility.getTimeUntil(lastSeen))
+      setSince(Utility.getTimeUntil(lastSeen))
     }, 1000)
     return () => clearTimeout(timer)
   })
 
   return (
     <Typography variant="caption">
-      {t('lastSeen')}: {lastSeen.toLocaleTimeString()} ({raidStart.str})
+      {t('lastSeen')}: {Utility.dayCheck(ts, last_seen)} ({since.str})
     </Typography>
   )
 }
