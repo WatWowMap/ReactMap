@@ -13,7 +13,7 @@ class Pokestop extends Model {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms,
     } = perms
     const {
-      onlyAllPokestops, onlyLures, onlyQuests, onlyInvasions,
+      onlyAllPokestops, onlyLures, onlyQuests, onlyInvasions, onlyArEligible,
     } = args.filters
 
     const query = this.query()
@@ -34,7 +34,6 @@ class Pokestop extends Model {
       }
       return pokestop
     }
-
     // returns everything if all pokestops are on
     if (onlyAllPokestops && pokestopPerms) {
       const results = await query
@@ -95,6 +94,11 @@ class Pokestop extends Model {
             .andWhere('incident_expire_timestamp', '>=', ts)
         })
       }
+      if (onlyArEligible && pokestopPerms) {
+        stops.orWhere(ar => {
+          ar.where('ar_scan_eligible', 1)
+        })
+      }
     })
     const results = await query
 
@@ -111,36 +115,35 @@ class Pokestop extends Model {
         }
         const keyRef = [
           {
-            filter: `${pokestop.quest_pokemon_id}-${pokestop.quest_form_id}`,
+            filter: pokestop.quest_pokemon_id ? `${pokestop.quest_pokemon_id}-${pokestop.quest_form_id}` : undefined,
             field: 'quest_pokemon_id',
           },
           {
-            filter: `q${pokestop.quest_item_id}`,
+            filter: pokestop.quest_item_id ? `q${pokestop.quest_item_id}` : undefined,
             field: 'quest_item_id',
           },
           {
-            filter: `m${pokestop.mega_pokemon_id}-${pokestop.mega_amount}`,
+            filter: pokestop.mega_amount ? `m${pokestop.mega_pokemon_id}-${pokestop.mega_amount}` : undefined,
             field: 'mega_amount',
           },
           {
-            filter: `i${pokestop.grunt_type}`,
+            filter: pokestop.incident_expire_timestamp ? `i${pokestop.grunt_type}` : undefined,
             field: 'incident_expire_timestamp',
           },
           {
-            filter: `l${pokestop.lure_id}`,
+            filter: pokestop.lure_expire_timestamp ? `l${pokestop.lure_id}` : undefined,
             field: 'lure_expire_timestamp',
           },
           {
-            filter: `d${pokestop.stardust_amount}`,
+            filter: pokestop.stardust_amount ? `d${pokestop.stardust_amount}` : undefined,
             field: 'stardust_amount',
           },
         ]
         keyRef.forEach(category => {
-          if (args.filters[category.filter]) {
-            pokestop.key = category.filter
+          if (args.filters[category.filter]
+            || (onlyArEligible && pokestop.ar_scan_eligible === 1)) {
             keyRef.forEach(otherCategory => {
               if (category.filter !== otherCategory.filter) {
-                pokestop.key = category.filter
                 if (!args.filters[otherCategory.filter]) {
                   delete pokestop[otherCategory.field]
                 }
@@ -150,7 +153,6 @@ class Pokestop extends Model {
           }
         })
       }
-
       return filteredResults
     }
     return secondaryFilter(results)

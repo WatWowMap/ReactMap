@@ -9,8 +9,8 @@ const core = gql`
     lon
     updated
     last_modified_timestamp
-    ar_scan_eligible
     key
+    ar_scan_eligible
   }
 `
 

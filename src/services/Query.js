@@ -25,7 +25,7 @@ class Query {
       if (permObj[keyPerm]) query += keyPerm
     })
     if (query === 'get'
-      && (filters.exEligible || filters.inBattle)) {
+      && (filters.exEligible || filters.inBattle || filters.arEligible)) {
       query += 'Gyms'
     }
 

@@ -12,7 +12,7 @@ class Gym extends Model {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const { gyms, raids } = perms
     const {
-      onlyGyms, onlyRaids, onlyExEligible, onlyInBattle,
+      onlyGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible,
     } = args.filters
     const query = this.query()
       .whereBetween('lat', [args.minLat, args.maxLat])
@@ -63,8 +63,13 @@ class Gym extends Model {
         })
       }
       if (onlyInBattle && gyms) {
-        gym.orWhere(ex => {
-          ex.where('in_battle', 1)
+        gym.orWhere(battle => {
+          battle.where('in_battle', 1)
+        })
+      }
+      if (onlyArEligible && gyms) {
+        gym.orWhere(ar => {
+          ar.where('ar_scan_eligible', 1)
         })
       }
       if (onlyGyms && gyms) {
@@ -112,7 +117,7 @@ class Gym extends Model {
           filteredResults.push(gym)
         } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]) {
           filteredResults.push(gym)
-        } else if (gyms && onlyGyms) {
+        } else if (gyms && (onlyGyms || onlyArEligible)) {
           if (args.filters[`t${gym.team_id}-0`]) {
             gym.raid_end_timestamp = null
             gym.raid_spawn_timestamp = null

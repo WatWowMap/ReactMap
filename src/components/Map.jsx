@@ -65,7 +65,8 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
             if ((filters[category].gyms && value.gyms)
               || (filters[category].raids && value.raids)
               || (filters[category].exEligible && value.exEligible)
-              || (filters[category].inBattle && value.inBattle)) {
+              || (filters[category].inBattle && value.inBattle)
+              || (filters[category].arEligible && value.arEligible)) {
               enabled = true
             } break
           case 'nests':
@@ -77,7 +78,8 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
             if ((filters[category].allPokestops && value.allPokestops)
               || (filters[category].lures && value.lures)
               || (filters[category].invasions && value.invasions)
-              || (filters[category].quests && value.quests)) {
+              || (filters[category].quests && value.quests)
+              || (filters[category].arEligible && value.arEligible)) {
               enabled = true
             } break
         }

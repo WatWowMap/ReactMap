@@ -12,6 +12,7 @@ const PokestopTile = ({
   const {
     grunt_type, incident_expire_timestamp, quest_item_id, lure_expire_timestamp,
     quest_pokemon_id, quest_form_id, mega_amount, mega_pokemon_id, stardust_amount,
+    ar_scan_eligible,
   } = item
 
   const hasLure = lure_expire_timestamp >= ts
@@ -29,7 +30,7 @@ const PokestopTile = ({
       {(((hasQuest && perms.quests)
         || (hasLure && perms.lures)
         || (hasInvasion && perms.invasions))
-        || (filters.allPokestops && perms.allPokestops))
+        || ((filters.allPokestops || ar_scan_eligible) && perms.allPokestops))
         && (
           <Marker
             position={[item.lat, item.lon]}
@@ -80,7 +81,6 @@ const areEqual = (prev, next) => (
   && prev.item.stardust_amount === next.item.stardust_amount
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
-  && prev.filters.filter[prev.item.key || 's0'].size === next.filters.filter[next.item.key || 's0'].size
   && !next.excludeList.includes(`${prev.item.quest_pokemon_id}-${prev.item.quest_form_id}`)
   && !next.excludeList.includes(`i${prev.item.grunt_type}`)
   && !next.excludeList.includes(`m${prev.item.mega_pokemon_id}-${prev.item.mega_amount}`)
