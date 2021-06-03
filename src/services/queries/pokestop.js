@@ -142,3 +142,12 @@ export const getLuresQuestsInvasions = gql`
     }
   }
 `
+
+export const getOne = gql`
+  ${core}
+  query Data($id: ID!) {
+    pokestopsSingle(id: $id) {
+      ...CorePokestop
+    }
+  }
+`
