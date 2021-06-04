@@ -19,7 +19,7 @@ export default function DrawerMenu({
   const ui = useStatic(state => state.ui)
   const staticUserSettings = useStatic(state => state.userSettings)
   const { drawer: drawerStyle } = useStore(state => state.settings)
-  const { map: { title } } = useStatic(state => state.config)
+  const { map: { title, scanAreasZoom, noScanAreaOverlay }, manualAreas } = useStatic(state => state.config)
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState('')
 
@@ -39,6 +39,7 @@ export default function DrawerMenu({
               filters={filters}
               setFilters={setFilters}
               subItem={subItem}
+              noScanAreaOverlay={noScanAreaOverlay}
             />
           ))
         ); break
@@ -107,7 +108,12 @@ export default function DrawerMenu({
                   </Button>
                 </Grid>
               )}
-            {category === 'scanAreas' && <Areas />}
+            {category === 'scanAreas' && (
+            <Areas
+              scanAreasZoom={scanAreasZoom}
+              manualAreas={manualAreas}
+            />
+            )}
           </Grid>
         </AccordionDetails>
       </Accordion>

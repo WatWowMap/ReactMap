@@ -1,4 +1,3 @@
-const fs = require('fs')
 const { defaultFilters } = require('../config.js')
 const buildPokemon = require('./buildPokemon.js')
 const buildPokestops = require('./buildPokestops.js')
@@ -64,7 +63,7 @@ module.exports = function buildDefault(perms) {
         new: new GenericFilter(),
       },
     } : undefined,
-    scanAreas: perms.scanAreas && fs.existsSync('server/src/configs/areas.json') ? {
+    scanAreas: perms.scanAreas ? {
       enabled: defaultFilters.scanAreas.enabled,
       filter: {},
     } : undefined,
