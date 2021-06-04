@@ -76,8 +76,8 @@ export const getGymsRaids = gql`
 
 export const getOne = gql`
   ${core}
-  query Data($id: ID!) {
-    gymsSingle(id: $id) {
+  query Data($id: ID!, $perm: String!) {
+    gymsSingle(id: $id, perm: $perm) {
       ...CoreGym
     }
   }

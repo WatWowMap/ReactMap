@@ -10,7 +10,7 @@ import createTheme from '@assets/mui/theme'
 import Map from './Map'
 
 const ConfigSettings = ({
-  serverSettings, match, paramLocation, cachedParams,
+  serverSettings, match, paramLocation, paramZoom, cachedParams,
 }) => {
   document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
@@ -101,6 +101,9 @@ const ConfigSettings = ({
   }
 
   const getStartZoom = () => {
+    if (paramZoom) {
+      return paramZoom
+    }
     if (cachedParams) {
       return cachedParams.zoom
     }

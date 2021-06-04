@@ -145,8 +145,8 @@ export const getLuresQuestsInvasions = gql`
 
 export const getOne = gql`
   ${core}
-  query Data($id: ID!) {
-    pokestopsSingle(id: $id) {
+  query Data($id: ID!, $perm: String!) {
+    pokestopsSingle(id: $id, perm: $perm) {
       ...CorePokestop
     }
   }

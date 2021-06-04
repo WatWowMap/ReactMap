@@ -1,6 +1,6 @@
 /* eslint-disable import/no-unresolved */
 const {
-  GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID,
+  GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
 const { ref, raw } = require('objection')
@@ -60,10 +60,13 @@ const RootQuery = new GraphQLObjectType({
     },
     gymsSingle: {
       type: GymType,
-      args: { id: { type: GraphQLID } },
+      args: {
+        id: { type: GraphQLID },
+        perm: { type: GraphQLString },
+      },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.gyms || perms.raids) {
+        if (perms[args.perm]) {
           const result = await Gym.query().findById(args.id) || {}
           return result
         }
@@ -85,10 +88,13 @@ const RootQuery = new GraphQLObjectType({
     },
     nestsSingle: {
       type: NestType,
-      args: { id: { type: GraphQLID } },
+      args: {
+        id: { type: GraphQLID },
+        perm: { type: GraphQLString },
+      },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.nests) {
+        if (perms[args.perm]) {
           const result = await Nest.query().findById(args.id) || {}
           return result
         }
@@ -113,10 +119,13 @@ const RootQuery = new GraphQLObjectType({
     },
     pokestopsSingle: {
       type: PokestopType,
-      args: { id: { type: GraphQLID } },
+      args: {
+        id: { type: GraphQLID },
+        perm: { type: GraphQLString },
+      },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.pokestops || perms.quests || perms.invasions || perms.lures) {
+        if (perms[args.perm]) {
           const result = await Pokestop.query().findById(args.id) || {}
           return result
         }
@@ -141,10 +150,13 @@ const RootQuery = new GraphQLObjectType({
     },
     pokemonSingle: {
       type: PokemonType,
-      args: { id: { type: GraphQLID } },
+      args: {
+        id: { type: GraphQLID },
+        perm: { type: GraphQLString },
+      },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.pokemon) {
+        if (perms[args.perm]) {
           const result = await Pokemon.query().findById(args.id) || {}
           return result
         }
