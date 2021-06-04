@@ -9,17 +9,20 @@ import {
   IconButton,
   Switch,
   Input,
+  useMediaQuery,
 } from '@material-ui/core'
 import { Clear, Replay, Save } from '@material-ui/icons'
+import { useTheme } from '@material-ui/styles'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic, useStore } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 
 export default function UserOptions({ category, toggleDialog }) {
+  const theme = useTheme()
   const classes = useStyles()
   const { t } = useTranslation()
-  const isMobile = useStatic(state => state.breakpoint) === 'xs'
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const { [category]: staticUserSettings } = useStatic(state => state.userSettings)
   const userSettings = useStore(state => state.userSettings)
   const [localState, setLocalState] = useState(userSettings[category])

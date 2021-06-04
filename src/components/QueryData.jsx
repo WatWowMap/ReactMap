@@ -17,7 +17,7 @@ const getPolling = category => {
 }
 
 export default function QueryData({
-  bounds, onMove, map, tileStyle, zoomLevel, config,
+  bounds, onMove, map, tileStyle, zoomLevel, config, params,
   category, available, filters, staticFilters, staticUserSettings,
   userSettings, perms, path, availableForms,
 }) {
@@ -101,6 +101,7 @@ export default function QueryData({
           category={category}
           userSettings={userSettings}
           staticUserSettings={staticUserSettings}
+          params={params}
         />
       )}
     </>

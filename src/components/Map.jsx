@@ -16,7 +16,7 @@ const userSettingsCategory = category => {
   }
 }
 
-export default function Map({ serverSettings: { config: { map: config, tileServers, icons } } }) {
+export default function Map({ serverSettings: { config: { map: config, tileServers, icons } }, params }) {
   const map = useMap()
   const filters = useStore(state => state.filters)
   const { tileServers: userTiles, icons: userIcons } = useStore(state => state.settings)
@@ -102,6 +102,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               tileStyle={tileServers[userTiles].style}
               zoomLevel={config.clusterZoomLevels[category] || 1}
               staticUserSettings={staticUserSettings[category]}
+              params={params}
             />
           )
         }

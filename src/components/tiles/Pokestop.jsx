@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
-import React, { memo } from 'react'
+import React, {
+  memo, useState, useEffect, useRef,
+} from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
 import PopupContent from '../popups/Pokestop'
@@ -7,8 +9,10 @@ import stopMarker from '../markers/pokestop'
 import Timer from './Timer'
 
 const PokestopTile = ({
-  item, ts, showTimer, filters, iconSizes, path, availableForms, perms, excludeList, userSettings,
+  item, ts, showTimer, filters, iconSizes, path, availableForms, perms, excludeList, userSettings, params,
 }) => {
+  const [done, setDone] = useState(false)
+  const markerRefs = useRef({})
   const {
     grunt_type, incident_expire_timestamp, quest_item_id, lure_expire_timestamp,
     quest_pokemon_id, quest_form_id, mega_amount, mega_pokemon_id, stardust_amount,
@@ -25,6 +29,14 @@ const PokestopTile = ({
     || (item.mega_amount && !excludeList.includes(`${mega_pokemon_id}-${mega_amount}`))
     || (item.stardust_amount && !excludeList.includes(`d${stardust_amount}`)))
 
+  useEffect(() => {
+    const { id } = params
+    if (id === item.id) {
+      const markerToOpen = markerRefs.current[id]
+      markerToOpen.openPopup()
+    }
+  }, [done])
+
   return (
     <>
       {(((hasQuest && perms.quests)
@@ -33,10 +45,16 @@ const PokestopTile = ({
         || ((filters.allPokestops || ar_scan_eligible) && perms.allPokestops))
         && (
           <Marker
+            ref={(m) => {
+              markerRefs.current[item.id] = m
+              if (!done && item.id === params.id) {
+                setDone(true)
+              }
+            }}
             position={[item.lat, item.lon]}
             icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, availableForms)}
           >
-            <Popup position={[item.lat, item.lon]}>
+            <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
               <PopupContent
                 pokestop={item}
                 ts={ts}

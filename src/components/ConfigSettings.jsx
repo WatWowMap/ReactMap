@@ -30,7 +30,6 @@ const ConfigSettings = ({
   const setAvailableForms = useStatic(state => state.setAvailableForms)
   const setMasterfile = useStatic(state => state.setMasterfile)
   const setUi = useStatic(state => state.setUi)
-  const setBreakpoint = useStatic(state => state.setBreakpoint)
   const setStaticFilters = useStatic(state => state.setFilters)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
@@ -54,11 +53,6 @@ const ConfigSettings = ({
   const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
   document.body.classList.add('dark')
 
-  let screenSize = 'xs'
-  if (useMediaQuery(theme.breakpoints.only('sm'))) screenSize = 'sm'
-  if (useMediaQuery(theme.breakpoints.up('md'))) screenSize = 'md'
-
-  setBreakpoint(screenSize)
   setUi(serverSettings.ui)
   setConfig(serverSettings.config)
   setMasterfile(serverSettings.masterfile)
@@ -123,7 +117,12 @@ const ConfigSettings = ({
         zoomControl={false}
         preferCanvas
       >
-        {serverSettings.user.perms.map && <Map serverSettings={serverSettings} />}
+        {serverSettings.user.perms.map && (
+        <Map
+          serverSettings={serverSettings}
+          params={match.params}
+        />
+        )}
       </MapContainer>
     </ThemeProvider>
   )

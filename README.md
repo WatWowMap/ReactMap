@@ -80,8 +80,10 @@ With PM2:
 ## Additional Info
 - Webhook URL lat/lon Format: `https://www.yourMapUrl.com/@/:lat/:lon/:zoom`
 - Webhook URL ID Format: `https://www.yourMapUrl.com/id/:category/:id/:zoom`
-(ID format works for Pokemon, Gyms, Pokestops, and Nests)
-`:` indicates a variable and is not part of the final url.
+
+ID format works for Pokemon, Gyms, Raids, Pokestops, Quests, Invasions, Lures, and Nests. ID Format also opens the popup of the item with the matching ID, assuming that it matches the users' current filters.
+
+`:` indicates a variable and is not part of the final url. The category must be plural.
 
 - Adding new locales!
   - Add/Edit your locales JSON in the `/public/base-locales` folder

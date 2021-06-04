@@ -1,19 +1,20 @@
 import React, { useState } from 'react'
 import {
-  Grid, DialogTitle, DialogContent, DialogActions, IconButton, Button, Typography,
+  Grid, DialogTitle, DialogContent, DialogActions, IconButton, Button, Typography, useMediaQuery,
 } from '@material-ui/core'
 import {
   Clear, Replay, Save, Check,
 } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@material-ui/styles'
 
-import { useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Size from './Size'
 
 export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) {
+  const theme = useTheme()
   const classes = useStyles()
-  const isMobile = useStatic(state => state.breakpoint) === 'xs'
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const { t } = useTranslation()
   const [filterValues, setFilterValues] = useState(tempFilters)
   const [team] = useState(`t${teamId}-0`)
