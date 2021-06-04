@@ -34,5 +34,7 @@ module.exports = new GraphQLObjectType({
     capture_3: { type: GraphQLFloat },
     cleanPvp: { type: JSONResolver },
     bestPvp: { type: GraphQLInt },
+    ditto_form: { type: GraphQLInt },
+    display_pokemon_id: { type: GraphQLInt },
   }),
 })

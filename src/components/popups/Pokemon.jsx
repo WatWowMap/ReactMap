@@ -105,7 +105,9 @@ const Header = ({
   const [anchorEl, setAnchorEl] = useState(false)
 
   const open = Boolean(anchorEl)
-  const { id, pokemon_id, form } = pokemon
+  const {
+    id, pokemon_id, form, ditto_form, display_pokemon_id,
+  } = pokemon
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -155,10 +157,15 @@ const Header = ({
       <Grid item xs={3}>
         <Avatar src={iconUrl} />
       </Grid>
-      <Grid item xs={6}>
-        <Typography variant="h5" align="center">
+      <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Typography variant="h5">
           {t(`poke_${metaData.pokedex_id}`)}
         </Typography>
+        {ditto_form && (
+        <Typography variant="caption">
+          ({t(`poke_${display_pokemon_id}`)})
+        </Typography>
+        )}
       </Grid>
       <Grid item xs={3}>
         <IconButton
