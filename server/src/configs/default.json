@@ -38,6 +38,7 @@
     "startZoom": 12,
     "minZoom": 10,
     "maxZoom": 18,
+    "noScanAreaOverlay": false,
     "scanAreasZoom": 12,
     "scanCellsZoom": 13,
     "submissionZoom": 15,
@@ -354,5 +355,5 @@
     "regional": [],
     "event": []
   },
-  "manualAreas": null
+  "manualAreas": {}
 }

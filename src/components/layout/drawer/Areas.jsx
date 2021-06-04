@@ -6,12 +6,10 @@ import {
 import center from '@turf/center'
 import { useMap } from 'react-leaflet'
 
-import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 
-export default function AreaDropDown() {
-  const { map: { scanAreasZoom }, manualAreas } = useStatic(state => state.config)
+export default function AreaDropDown({ scanAreasZoom, manualAreas }) {
   const { data } = useQuery(Query.scanAreas())
   const map = useMap()
 
