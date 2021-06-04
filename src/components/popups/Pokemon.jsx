@@ -149,8 +149,6 @@ const Header = ({
     { name: 'exclude', action: handleExclude },
     { name: 'timer', action: handleTimer },
   ]
-
-  console.log(pokemon.id)
   return (
     <>
       <Grid item xs={3}>

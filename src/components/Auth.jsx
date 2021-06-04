@@ -1,5 +1,5 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
+import { Redirect, withRouter } from 'react-router-dom'
 
 import ConfigSettings from './ConfigSettings'
 import Login from './Login'
@@ -13,19 +13,26 @@ const Auth = ({ serverSettings, match }) => {
     return <Login />
   }
   const cachedParams = JSON.parse(localStorage.getItem('params'))
-  if (match.params.category || (cachedParams && cachedParams.category)) {
+  if (cachedParams) {
+    localStorage.removeItem('params')
+    const url = cachedParams.category
+      ? `/id/${cachedParams.category}/${cachedParams.id}/${cachedParams.zoom}`
+      : `/@/${cachedParams.lat}/${cachedParams.lon}/${cachedParams.zoom}`
+    return <Redirect push to={url} />
+  }
+  if (match.params.category) {
     return (
       <WebhookQuery
-        params={cachedParams || match.params}
+        match={match}
         serverSettings={serverSettings}
       />
     )
   }
   if (serverSettings.discord && serverSettings.user) {
-    return <ConfigSettings serverSettings={serverSettings} cachedParams={cachedParams} />
+    return <ConfigSettings serverSettings={serverSettings} match={match} />
   }
   if (!serverSettings.discord) {
-    return <ConfigSettings serverSettings={serverSettings} cachedParams={cachedParams} />
+    return <ConfigSettings serverSettings={serverSettings} match={match} />
   }
 }
 

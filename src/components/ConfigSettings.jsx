@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
 import { ThemeProvider } from '@material-ui/styles'
@@ -9,9 +8,9 @@ import { useStore, useStatic } from '@hooks/useStore'
 import createTheme from '@assets/mui/theme'
 import Map from './Map'
 
-const ConfigSettings = ({
-  serverSettings, match, paramLocation, paramZoom, cachedParams,
-}) => {
+export default function ConfigSettings({
+  serverSettings, match, paramLocation, paramZoom,
+}) {
   document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
@@ -85,9 +84,6 @@ const ConfigSettings = ({
     if (paramLocation && paramLocation[0] !== null) {
       return paramLocation
     }
-    if (cachedParams) {
-      return [cachedParams.lat, cachedParams.lon]
-    }
     if (match.params.lat) {
       return [match.params.lat, match.params.lon]
     }
@@ -98,15 +94,11 @@ const ConfigSettings = ({
     if (paramZoom) {
       return paramZoom
     }
-    if (cachedParams) {
-      return cachedParams.zoom
+    if (match.params.zoom) {
+      return match.params.zoom
     }
-    if (match.path === '/') {
-      return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
-    }
-    return match.params.zoom
+    return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
   }
-  localStorage.removeItem('params')
 
   return (
     <ThemeProvider theme={theme}>
@@ -118,14 +110,12 @@ const ConfigSettings = ({
         preferCanvas
       >
         {serverSettings.user.perms.map && (
-        <Map
-          serverSettings={serverSettings}
-          params={match.params}
-        />
+          <Map
+            serverSettings={serverSettings}
+            params={match.params}
+          />
         )}
       </MapContainer>
     </ThemeProvider>
   )
 }
-
-export default withRouter(ConfigSettings)
