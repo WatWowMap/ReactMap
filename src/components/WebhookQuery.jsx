@@ -6,15 +6,14 @@ import ConfigSettings from './ConfigSettings'
 
 export default function WebhookQuery({ params, serverSettings }) {
   const lowerCase = params.category.toLowerCase()
-  const sCheck = lowerCase.charAt(lowerCase.length) !== 's' ? `${lowerCase}s` : lowerCase
-  const { data } = useQuery(Query[sCheck]('id'), {
+  const { data } = useQuery(Query[lowerCase]('id'), {
     variables: { id: params.id },
   })
   return (
     <>
       {data && (
         <ConfigSettings
-          paramLocation={[data[`${sCheck}Single`].lat, data[`${sCheck}Single`].lon]}
+          paramLocation={[data[`${lowerCase}Single`].lat, data[`${lowerCase}Single`].lon]}
           serverSettings={serverSettings}
         />
       )}
