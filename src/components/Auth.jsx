@@ -7,21 +7,25 @@ import WebhookQuery from './WebhookQuery'
 
 const Auth = ({ serverSettings, match }) => {
   if (serverSettings.discord && !serverSettings.user) {
+    if (match.params.category || match.params.lat) {
+      localStorage.setItem('params', JSON.stringify(match.params))
+    }
     return <Login />
   }
-  if (match.params.category) {
+  const cachedParams = JSON.parse(localStorage.getItem('params'))
+  if (match.params.category || (cachedParams && cachedParams.category)) {
     return (
       <WebhookQuery
-        params={match.params}
+        params={cachedParams || match.params}
         serverSettings={serverSettings}
       />
     )
   }
   if (serverSettings.discord && serverSettings.user) {
-    return <ConfigSettings serverSettings={serverSettings} />
+    return <ConfigSettings serverSettings={serverSettings} cachedParams={cachedParams} />
   }
   if (!serverSettings.discord) {
-    return <ConfigSettings serverSettings={serverSettings} />
+    return <ConfigSettings serverSettings={serverSettings} cachedParams={cachedParams} />
   }
 }
 

@@ -9,7 +9,9 @@ import { useStore, useStatic } from '@hooks/useStore'
 import createTheme from '@assets/mui/theme'
 import Map from './Map'
 
-const ConfigSettings = ({ serverSettings, match, paramLocation }) => {
+const ConfigSettings = ({
+  serverSettings, match, paramLocation, cachedParams,
+}) => {
   document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
@@ -89,6 +91,9 @@ const ConfigSettings = ({ serverSettings, match, paramLocation }) => {
     if (paramLocation && paramLocation[0] !== null) {
       return paramLocation
     }
+    if (cachedParams) {
+      return [cachedParams.lat, cachedParams.lon]
+    }
     if (match.params.lat) {
       return [match.params.lat, match.params.lon]
     }
@@ -96,11 +101,15 @@ const ConfigSettings = ({ serverSettings, match, paramLocation }) => {
   }
 
   const getStartZoom = () => {
+    if (cachedParams) {
+      return cachedParams.zoom
+    }
     if (match.path === '/') {
       return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
     }
     return match.params.zoom
   }
+  localStorage.removeItem('params')
 
   return (
     <ThemeProvider theme={theme}>

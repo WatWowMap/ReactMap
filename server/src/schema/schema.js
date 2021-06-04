@@ -63,8 +63,9 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: GraphQLID } },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.gyms) {
-          return Gym.query().findById(args.id)
+        if (perms.gyms || perms.raids) {
+          const result = await Gym.query().findById(args.id) || {}
+          return result
         }
         return {}
       },
@@ -88,7 +89,8 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.nests) {
-          return Nest.query().findById(args.id)
+          const result = await Nest.query().findById(args.id) || {}
+          return result
         }
         return {}
       },
@@ -114,8 +116,9 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: GraphQLID } },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.pokestops) {
-          return Pokestop.query().findById(args.id)
+        if (perms.pokestops || perms.quests || perms.invasions || perms.lures) {
+          const result = await Pokestop.query().findById(args.id) || {}
+          return result
         }
         return {}
       },
@@ -142,7 +145,8 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.pokemon) {
-          return Pokemon.query().findById(args.id)
+          const result = await Pokemon.query().findById(args.id) || {}
+          return result
         }
         return {}
       },
