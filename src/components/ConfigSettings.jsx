@@ -9,7 +9,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 import createTheme from '@assets/mui/theme'
 import Map from './Map'
 
-const ConfigSettings = ({ serverSettings, match }) => {
+const ConfigSettings = ({ serverSettings, match, paramLocation }) => {
   document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
@@ -86,10 +86,13 @@ const ConfigSettings = ({ serverSettings, match }) => {
   setAvailable(serverSettings.available)
 
   const getStartLocation = () => {
-    if (match.path === '/') {
-      return updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
+    if (paramLocation && paramLocation[0] !== null) {
+      return paramLocation
     }
-    return [match.params.lat, match.params.lon]
+    if (match.params.lat) {
+      return [match.params.lat, match.params.lon]
+    }
+    return updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
   }
 
   const getStartZoom = () => {

@@ -6,6 +6,10 @@ class Nest extends Model {
     return 'nests'
   }
 
+  static get idColumn() {
+    return 'nest_id'
+  }
+
   static async getNestingSpecies(args) {
     const pokemon = []
 

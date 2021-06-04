@@ -78,7 +78,11 @@ With PM2:
 4. `pm2 restart ReactMap`
 
 ## Additional Info
-- Webhook URL Format: `https://www.yourMapUrl.com/@/lat/lon/zom`
+- Webhook URL lat/lon Format: `https://www.yourMapUrl.com/@/:lat/:lon/:zoom`
+- Webhook URL ID Format: `https://www.yourMapUrl.com/id/:category/:id/:zoom`
+(ID format works for Pokemon, Gyms, Pokestops, and Nests)
+`:` indicates a variable and is not part of the final url.
+
 - Adding new locales!
   - Add/Edit your locales JSON in the `/public/base-locales` folder
   - Then generate them with `yarn create-locales`
