@@ -63,6 +63,11 @@ export default function App() {
               {serverSettings && <Auth serverSettings={serverSettings} />}
             </ApolloProvider>
           </Route>
+          <Route exact path="/id/:category/:id/:zoom">
+            <ApolloProvider client={client}>
+              {serverSettings && <Auth serverSettings={serverSettings} />}
+            </ApolloProvider>
+          </Route>
         </Switch>
       </Router>
     </Suspense>

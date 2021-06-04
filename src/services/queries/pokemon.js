@@ -140,3 +140,12 @@ export const getIvsStatsPvp = gql`
     }
   }
 `
+
+export const getOne = gql`
+  ${core}
+  query Data($id: ID!) {
+    pokemonSingle(id: $id) {
+      ...CorePokemon
+    }
+  }
+`

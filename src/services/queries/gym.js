@@ -73,3 +73,12 @@ export const getGymsRaids = gql`
     }
   }
 `
+
+export const getOne = gql`
+  ${core}
+  query Data($id: ID!) {
+    gymsSingle(id: $id) {
+      ...CoreGym
+    }
+  }
+`

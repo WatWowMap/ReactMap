@@ -7,7 +7,7 @@ import getAllPortals from './queries/portal'
 import getAllWeather from './queries/weather'
 import getAllS2cells from './queries/s2cell'
 import getAllSubmissionCells from './queries/submissionCells'
-import getAllNests from './queries/nest'
+import { getOne, getAllNests } from './queries/nest'
 import getAllScanAreas from './queries/scanAreas'
 
 class Query {
@@ -16,6 +16,9 @@ class Query {
   }
 
   static gyms(filters, perms) {
+    if (filters === 'id') {
+      return gymIndex.getOne
+    }
     const permObj = {
       Gyms: filters.raids ? filters.gyms || perms.gyms : filters.gyms && perms.gyms,
       Raids: filters.raids && perms.raids,
@@ -32,11 +35,17 @@ class Query {
     return gymIndex[query]
   }
 
-  static nests() {
+  static nests(filters) {
+    if (filters === 'id') {
+      return getOne
+    }
     return getAllNests
   }
 
   static pokestops(filters, perms) {
+    if (filters === 'id') {
+      return pokestopIndex.getOne
+    }
     const permObj = {
       Lures: filters.lures && perms.lures,
       Quests: filters.quests && perms.quests,
@@ -53,6 +62,9 @@ class Query {
   }
 
   static pokemon(filters, perms) {
+    if (filters === 'id') {
+      return pokemonIndex.getOne
+    }
     const permObj = {
       Ivs: perms.iv,
       Stats: perms.stats,

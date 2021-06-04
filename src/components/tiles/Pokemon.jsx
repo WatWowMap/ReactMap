@@ -36,7 +36,7 @@ const PokemonTile = ({
       const [ruleKey, ruleValue] = rule
       const statKey = ruleValue.perm === 'iv' ? 'iv' : 'bestPvp'
       if (ruleValue.op) {
-        if (operator[ruleValue.op](item[statKey], ruleValue.num) && item[statKey]) {
+        if (operator[ruleValue.op](item[statKey], ruleValue.num) && item[statKey] !== null) {
           glowCount += 1
           glowValue = userSettings[ruleKey]
         }
@@ -66,11 +66,11 @@ const PokemonTile = ({
             />
           </Popup>
           {showTimer && (
-          <Timer
-            timestamp={item.expire_timestamp}
-            direction="center"
-            offset={[0, 30]}
-          />
+            <Timer
+              timestamp={item.expire_timestamp}
+              direction="center"
+              offset={[0, 30]}
+            />
           )}
         </Marker>
       )}
