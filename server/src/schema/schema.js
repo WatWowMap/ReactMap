@@ -17,7 +17,7 @@ const ScanAreaType = require('./scanArea')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
-const { database: { settings: { type } } } = require('../services/config')
+const { database: { schemas } } = require('../services/config')
 
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
@@ -29,6 +29,8 @@ const minMaxArgs = {
   minLon: { type: GraphQLFloat },
   maxLon: { type: GraphQLFloat },
 }
+
+const dbSelection = category => Object.values(schemas).find(({ useFor }) => useFor.includes(category))
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
@@ -142,13 +144,13 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.pokemon) {
-          if (type === 'rdm') {
-            if (args.filters.onlyLegacy) {
-              return Pokemon.getLegacy(args, perms)
-            }
-            return Pokemon.getPokemon(args, perms)
+          if (dbSelection('pokemon').type === 'mad') {
+            return Pokemon.getMadPokemon(args, perms)
           }
-          return Pokemon.getMadPokemon(args, perms)
+          if (args.filters.onlyLegacy) {
+            return Pokemon.getLegacy(args, perms)
+          }
+          return Pokemon.getPokemon(args, perms)
         }
       },
     },

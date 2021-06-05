@@ -219,7 +219,7 @@ class Pokemon extends Model {
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (queryBase, filter, notGlobal) => {
-      const keys = ['atk_iv', 'def_iv', 'sta_iv']
+      const keys = ['atk_iv', 'def_iv', 'sta_iv', 'level']
       keys.forEach(key => {
         switch (key) {
           default:
@@ -230,17 +230,22 @@ class Pokemon extends Model {
             if (!arrayCheck(filter, key) && stats) queryBase.andWhereBetween('individual_defense', filter[key]); break
           case 'sta_iv':
             if (!arrayCheck(filter, key) && stats) queryBase.andWhereBetween('individual_stamina', filter[key]); break
+          case 'level':
+            if (!arrayCheck(filter, key) && stats) queryBase.andWhereBetween(raw('IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'), filter[key]); break
         }
       })
     }
 
     // query builder
     const query = this.query()
-      .select(
+      .select([
         'encounter_id as id',
+        'pokemon_id',
         'latitude as lat',
         'longitude as lon',
-        'disappear_time as expire_timestamp',
+        raw('UNIX_TIMESTAMP(disappear_time) as expire_timestamp'),
+        raw('IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL) as iv'),
+        raw('IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL) as level'),
         'individual_attack as atk_iv',
         'individual_defense as def_iv',
         'individual_stamina as sta_iv',
@@ -253,8 +258,8 @@ class Pokemon extends Model {
         'form',
         'costume',
         'weather_boosted_condition as weather',
-        'last_modified as updated',
-      )
+        raw('UNIX_TIMESTAMP(last_modified) as updated'),
+      ])
       .where(raw('UNIX_TIMESTAMP(disappear_time)'), '>=', ts)
       .andWhereBetween('latitude', [args.minLat, args.maxLat])
       .andWhereBetween('longitude', [args.minLon, args.maxLon])
@@ -271,6 +276,7 @@ class Pokemon extends Model {
               }
             })
           } else if (pkmn === 'onlyIvOr' && (ivs || stats || pvp)) {
+            ivOr.whereBetween(raw('IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'), (ivs ? filter.iv : onlyStandard.iv))
             generateSql(ivOr, filter)
           }
         }
