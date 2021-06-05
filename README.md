@@ -78,7 +78,13 @@ With PM2:
 4. `pm2 restart ReactMap`
 
 ## Additional Info
-- Webhook URL Format: `https://www.yourMapUrl.com/@/lat/lon/zom`
+- Webhook URL lat/lon Format: `https://www.yourMapUrl.com/@/:lat/:lon/:zoom`
+- Webhook URL ID Format: `https://www.yourMapUrl.com/id/:category/:id/:zoom`
+
+ID format works for Pokemon, Gyms, Raids, Pokestops, Quests, Invasions, Lures, and Nests. ID Format also opens the popup of the item with the matching ID, assuming that it matches the users' current filters.
+
+`:` indicates a variable and is not part of the final url. The category must be plural.
+
 - Adding new locales!
   - Add/Edit your locales JSON in the `/public/base-locales` folder
   - Then generate them with `yarn create-locales`
@@ -89,13 +95,31 @@ Look for this value in the `default.json` file (same folder as config):
 ```
 Whatever value you put in the first position is the language that it will default to if it can't detect the local browser language.
 
+- Glow:
+You can add any number of rules in the glow array in the config. **Be sure to add all of the keys or it will not work properly and may even cause issues.** Glow can have a drastic impact on performance, use sparingly. The name field is not translated client side, set it to whatever your locale is. The `Multiple` field is what will be displayed if a Pokemon satisfies more than one rule, modifying or removing this rule could cause issues.
+```json
+"glow": [
+  {"name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
+  {"name": "Nundo", "perm": "iv", "num": 0, "value": "#000000", "op": "=" },
+  {"name": "Top Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
+  {"name": "Multiple", "perm": "pvp", "value": "#800080" }    
+]
+```
+- PVP Leagues:
+If you're using Chuck to parse Pokemon you can add any number of leagues to the array to add compatibility with ReactMap.
+```json
+  "database": {
+    "settings": {
+      "type": "chuck",
+      "leagues": ["great", "ultra", "little"]
+    }
+  }
+```
+
 ## Coming Soon
-- Translatable Text
-- More precise quest popups
 - AR Quest Eligibility for Stops
 - Built in event viewer
 - Expand the help modals
-- Custom Favicon Support
 - Persist some menu selections
 - Category headers in filter menus
 - Add tutorial Popups

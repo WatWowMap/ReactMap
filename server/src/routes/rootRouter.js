@@ -82,9 +82,9 @@ rootRouter.get('/settings', async (req, res) => {
         userMenu.values.forEach(value => serverSettings.config[userMenu.name][value] = {})
       })
 
-      const ignoreList = ['map', 'manualAreas']
+      const ignoreKeys = ['map', 'manualAreas', 'limit']
       Object.keys(serverSettings.config).forEach(setting => {
-        if (!ignoreList.includes(setting)) {
+        if (!ignoreKeys.includes(setting)) {
           const category = serverSettings.config[setting]
           Object.keys(category).forEach(option => {
             category[option].name = option
@@ -105,9 +105,14 @@ rootRouter.get('/settings', async (req, res) => {
         nests: nests ? await Nest.getAvailableNestingSpecies() : await Utility.fetchNests(),
       }
 
-      serverSettings.ui = Utility.generateUi(serverSettings.defaultFilters, serverSettings.user.perms)
+      serverSettings.ui = Utility.buildPrimaryUi(serverSettings.defaultFilters, serverSettings.user.perms)
 
-      serverSettings.menus = Utility.buildMenus()
+      serverSettings.menus = Utility.buildAdvMenus()
+
+      const { clientValues, clientMenus } = Utility.buildClientOptions(serverSettings.user.perms)
+
+      serverSettings.userSettings = clientValues
+      serverSettings.clientMenus = clientMenus
 
       serverSettings.masterfile = masterfile
     }

@@ -1,22 +1,28 @@
 import React from 'react'
 import {
-  Grid, Fab, Dialog, Button, Typography, Divider, DialogActions, DialogContent, DialogTitle,
+  Grid, Fab, Dialog, Button, Typography, Divider, DialogActions, DialogContent, DialogTitle, useMediaQuery,
 } from '@material-ui/core'
 import {
-  Menu, LocationOn, ZoomIn, ZoomOut, Forum, Create,
+  Menu, LocationOn, ZoomIn, ZoomOut, Forum, Create, Equalizer,
 } from '@material-ui/icons'
 import { useMap } from 'react-leaflet'
 import Locate from 'leaflet.locatecontrol'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@material-ui/styles'
 
 import { useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 
 export default function FloatingButtons({ toggleDrawer }) {
+  const theme = useTheme()
   const { t } = useTranslation()
   const classes = useStyles()
-  const { map: { feedbackLink, enableFeedback } } = useStatic(state => state.config)
-  const breakpoint = useStatic(state => state.breakpoint)
+  const {
+    map: {
+      enableFeedback, feedbackLink, enableStats, statsLink,
+    },
+  } = useStatic(state => state.config)
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const [open, setOpen] = React.useState(false)
 
   const handleClickOpen = () => {
@@ -39,8 +45,8 @@ export default function FloatingButtons({ toggleDrawer }) {
   const lc = new Locate(locateOptions)
   lc.addTo(map)
 
-  const fabSize = breakpoint === 'xs' ? 'small' : 'large'
-  const iconSize = breakpoint === 'xs' ? 'small' : 'default'
+  const fabSize = isMobile ? 'small' : 'large'
+  const iconSize = isMobile ? 'small' : 'default'
 
   return (
     <Grid container direction="column" className={classes.floatingBtn}>
@@ -64,6 +70,13 @@ export default function FloatingButtons({ toggleDrawer }) {
           <ZoomOut fontSize={iconSize} />
         </Fab>
       </Grid>
+      {enableStats && (
+        <Grid item>
+          <Fab color="secondary" size={fabSize} href={statsLink} target="_blank" rel="noreferrer">
+            <Equalizer fontSize={iconSize} style={{ color: 'white' }} />
+          </Fab>
+        </Grid>
+      )}
       {enableFeedback && (
         <Grid item>
           <Fab size={fabSize} onClick={handleClickOpen}>

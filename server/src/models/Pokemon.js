@@ -128,6 +128,10 @@ class Pokemon extends Model {
       if (pkmn.form === 0) {
         pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
       }
+      if (pkmn.pokemon_id === 132) {
+        pkmn.ditto_form = pkmn.form
+        pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
+      }
       if (pvp
         && (pkmn.pvp_rankings_great_league
           || pkmn.pvp_rankings_ultra_league

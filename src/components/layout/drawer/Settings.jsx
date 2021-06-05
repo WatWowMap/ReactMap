@@ -16,6 +16,7 @@ export default function Settings() {
   const config = useStatic(state => state.config)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
+  const staticSettings = useStatic(state => state.settings)
   const { t, i18n } = useTranslation()
 
   const [alert, setAlert] = useState(false)
@@ -63,6 +64,7 @@ export default function Settings() {
     }
     reader.readAsText(file)
   }
+
   return (
     <Grid
       container
@@ -71,32 +73,29 @@ export default function Settings() {
       alignItems="center"
       spacing={1}
     >
-      {Object.entries(settings).map(setting => {
-        const [key, value] = setting
-        return (
-          <Grid item key={key} xs={10}>
-            <FormControl style={{ width: 200, margin: 5 }}>
-              <InputLabel>{t(key)}</InputLabel>
-              <Select
-                autoFocus
-                name={key}
-                value={config[key][value].name}
-                onChange={handleChange}
-                fullWidth
-              >
-                {Object.keys(config[key]).map(option => (
-                  <MenuItem
-                    key={option}
-                    value={option}
-                  >
-                    {t(`${key}${option}`)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-        )
-      })}
+      {Object.keys(staticSettings).map(setting => (
+        <Grid item key={setting} xs={10}>
+          <FormControl style={{ width: 200, margin: 5 }}>
+            <InputLabel>{t(setting)}</InputLabel>
+            <Select
+              autoFocus
+              name={setting}
+              value={config[setting][settings[setting]].name}
+              onChange={handleChange}
+              fullWidth
+            >
+              {Object.keys(config[setting]).map(option => (
+                <MenuItem
+                  key={option}
+                  value={option}
+                >
+                  {t(`${setting}${option}`)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      ))}
       <Grid item xs={6} style={{ textAlign: 'center', margin: '20px 0px' }}>
         <Button
           variant="contained"

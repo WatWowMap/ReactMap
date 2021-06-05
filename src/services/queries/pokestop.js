@@ -9,8 +9,8 @@ const core = gql`
     lon
     updated
     last_modified_timestamp
-    ar_scan_eligible
     key
+    ar_scan_eligible
   }
 `
 
@@ -139,6 +139,15 @@ export const getLuresQuestsInvasions = gql`
       ...Lure
       ...Quest
       ...Invasion
+    }
+  }
+`
+
+export const getOne = gql`
+  ${core}
+  query Data($id: ID!, $perm: String!) {
+    pokestopsSingle(id: $id, perm: $perm) {
+      ...CorePokestop
     }
   }
 `

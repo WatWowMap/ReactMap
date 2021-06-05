@@ -12,6 +12,8 @@ const core = gql`
     expire_timestamp
     expire_timestamp_verified
     updated
+    display_pokemon_id
+    ditto_form
   }
 `
 
@@ -137,6 +139,15 @@ export const getIvsStatsPvp = gql`
       ...Iv
       ...Stats
       ...Pvp
+    }
+  }
+`
+
+export const getOne = gql`
+  ${core}
+  query Data($id: ID!, $perm: String!) {
+    pokemonSingle(id: $id, perm: $perm) {
+      ...CorePokemon
     }
   }
 `

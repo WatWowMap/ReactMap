@@ -4,8 +4,9 @@ import { Map } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
+import Utility from '@services/Utility'
 
-export default function PortalPopup({ portal }) {
+export default function PortalPopup({ portal, ts }) {
   const { navigation } = useStore(state => state.settings)
   const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
   const { t } = useTranslation()
@@ -21,11 +22,11 @@ export default function PortalPopup({ portal }) {
   const extraMetaData = [
     {
       description: t('lastUpdated'),
-      data: (new Date(updated * 1000)).toLocaleTimeString(),
+      data: Utility.dayCheck(ts, updated),
     },
     {
       description: t('imported'),
-      data: (new Date(imported * 1000)).toLocaleTimeString(),
+      data: Utility.dayCheck(ts, imported),
     },
   ]
 

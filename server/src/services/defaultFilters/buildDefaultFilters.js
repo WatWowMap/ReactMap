@@ -1,9 +1,9 @@
-const fs = require('fs')
-const { map: { defaultFilters } } = require('../config.js')
+const { defaultFilters } = require('../config.js')
 const buildPokemon = require('./buildPokemon.js')
 const buildPokestops = require('./buildPokestops.js')
 const buildGyms = require('./buildGyms')
 const { GenericFilter, PokemonFilter } = require('../../models/index')
+const { database: { schemas } } = require('../config')
 
 const base = new PokemonFilter()
 base.pvp()
@@ -14,7 +14,9 @@ module.exports = function buildDefault(perms) {
   const stopReducer = perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
   const pokemonReducer = perms.iv || perms.stats || perms.pvp
-
+  const hasAr = poi => Object.values(schemas).some(
+    schema => schema.useFor.includes(poi) && schema.arScanColumn === true,
+  )
   const pokemon = buildPokemon(defaultFilters, base, custom)
 
   return {
@@ -24,6 +26,7 @@ module.exports = function buildDefault(perms) {
       raids: perms.raids ? defaultFilters.gyms.raids : undefined,
       exEligible: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
       inBattle: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
+      arEligible: hasAr('gym') && perms.gyms ? false : undefined,
       filter: {
         ...buildGyms(perms, defaultFilters.gyms),
         ...pokemon.raids,
@@ -41,6 +44,7 @@ module.exports = function buildDefault(perms) {
       lures: perms.lures ? defaultFilters.pokestops.lures : undefined,
       quests: perms.quests ? defaultFilters.pokestops.quests : undefined,
       invasions: perms.invasions ? defaultFilters.pokestops.invasions : undefined,
+      arEligible: hasAr('pokestop') && perms.pokestops ? false : undefined,
       filter: {
         ...buildPokestops(perms, defaultFilters.pokestops),
         ...pokemon.quests,
@@ -64,7 +68,7 @@ module.exports = function buildDefault(perms) {
         new: new GenericFilter(),
       },
     } : undefined,
-    scanAreas: perms.scanAreas && fs.existsSync('server/src/configs/areas.json') ? {
+    scanAreas: perms.scanAreas ? {
       enabled: defaultFilters.scanAreas.enabled,
       filter: {},
     } : undefined,

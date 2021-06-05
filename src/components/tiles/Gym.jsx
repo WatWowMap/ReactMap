@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
-import React, { memo } from 'react'
+import React, {
+  memo, useState, useEffect, useRef,
+} from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
 import gymMarker from '../markers/gym'
@@ -7,8 +9,10 @@ import PopupContent from '../popups/Gym'
 import Timer from './Timer'
 
 const GymTile = ({
-  item, ts, showTimer, iconSizes, filters, path, availableForms, excludeList,
+  item, ts, showTimer, iconSizes, filters, path, availableForms, excludeList, userSettings, params,
 }) => {
+  const [done, setDone] = useState(false)
+  const markerRefs = useRef({})
   const {
     raid_battle_timestamp, raid_end_timestamp, raid_level, raid_pokemon_id, raid_pokemon_form, team_id,
   } = item
@@ -20,14 +24,28 @@ const GymTile = ({
   const timerToDisplay = raid_battle_timestamp >= ts
     ? raid_battle_timestamp : raid_end_timestamp
 
+  useEffect(() => {
+    const { id } = params
+    if (id === item.id) {
+      const markerToOpen = markerRefs.current[id]
+      markerToOpen.openPopup()
+    }
+  }, [done])
+
   return (
     <>
       {!excludeList.includes(`t${team_id}-0`) && (
         <Marker
+          ref={(m) => {
+            markerRefs.current[item.id] = m
+            if (!done && item.id === params.id) {
+              setDone(true)
+            }
+          }}
           position={[item.lat, item.lon]}
           icon={gymMarker(item, ts, hasRaid, iconSizes, filters, path, availableForms, excludeList)}
         >
-          <Popup position={[item.lat, item.lon]}>
+          <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
             <PopupContent
               gym={item}
               hasRaid={hasRaid}
@@ -36,7 +54,13 @@ const GymTile = ({
               availableForms={availableForms}
             />
           </Popup>
-          {showTimer && <Timer timestamp={timerToDisplay} />}
+          {(showTimer || userSettings.raidTimers) && (
+            <Timer
+              timestamp={timerToDisplay}
+              direction="center"
+              offset={[0, 10]}
+            />
+          )}
         </Marker>
       )}
     </>
@@ -85,6 +109,7 @@ const areEqual = (prev, next) => {
     && !next.excludeList.includes(`t${prev.item.team_id}-0`)
     && !next.excludeList.includes(`e${prev.item.raid_level}`)
     && prev.path === next.path
+    && prev.userSettings.raidTimers === next.userSettings.raidTimers
   )
 }
 

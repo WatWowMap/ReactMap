@@ -10,11 +10,13 @@ import {
   InputBase,
   IconButton,
   Typography,
+  useMediaQuery,
 } from '@material-ui/core'
 import { HighlightOff, Clear } from '@material-ui/icons'
 import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@material-ui/styles'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
@@ -25,17 +27,17 @@ import FilterOptions from './Options'
 import Footer from './Footer'
 import SlotSelection from './SlotSelection'
 
-export default function Menu({ filters, toggleDialog, type }) {
+export default function Menu({ filters, toggleDialog, category }) {
   const classes = useStyles()
+  const theme = useTheme()
   const menus = useStore(state => state.menus)
   const setMenus = useStore(state => state.setMenus)
-  const breakpoint = useStatic(state => state.breakpoint)
-  const { [type]: staticFilters } = useStatic(state => state.staticMenus)
+  const { [category]: staticMenus } = useStatic(state => state.menus)
   const { t } = useTranslation()
 
-  let columnCount = breakpoint === 'sm' ? 3 : 5
-  if (breakpoint === 'xs') columnCount = 1
-  const isMobile = breakpoint === 'xs'
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
+  let columnCount = window.matchMedia('(max-width: 960px)') ? 5 : 3
+  if (isMobile) columnCount = 1
 
   const [filterDrawer, setFilterDrawer] = useState(false)
   const [tempFilters, setTempFilters] = useState(filters.filter)
@@ -50,9 +52,9 @@ export default function Menu({ filters, toggleDialog, type }) {
     id: 0,
   })
   const [search, setSearch] = useState('')
-  const [expanded, setExpanded] = useState(type === 'pokemon' ? 'others' : 'categories')
+  const [expanded, setExpanded] = useState(category === 'pokemon' ? 'others' : 'categories')
 
-  const { filteredObj, filteredArr, count } = Utility.menuFilter(tempFilters, menus, search, type)
+  const { filteredObj, filteredArr, count } = Utility.menuFilter(tempFilters, menus, search, category)
 
   const handleAccordion = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
@@ -68,12 +70,12 @@ export default function Menu({ filters, toggleDialog, type }) {
   const handleChange = (name, event) => {
     setMenus({
       ...menus,
-      [type]: {
-        ...menus[type],
+      [category]: {
+        ...menus[category],
         filters: {
-          ...menus[type].filters,
+          ...menus[category].filters,
           [name]: {
-            ...menus[type].filters[name],
+            ...menus[category].filters[name],
             [event.target.name]: event.target.checked,
           },
         },
@@ -146,24 +148,24 @@ export default function Menu({ filters, toggleDialog, type }) {
 
   const handleReset = () => {
     const resetPayload = {}
-    Object.keys(menus[type].filters).forEach(category => {
-      resetPayload[category] = {}
-      Object.keys(menus[type].filters[category]).forEach(filter => {
-        resetPayload[category][filter] = false
+    Object.keys(menus[category].filters).forEach(cat => {
+      resetPayload[cat] = {}
+      Object.keys(menus[category].filters[cat]).forEach(filter => {
+        resetPayload[cat][filter] = false
       })
     })
-    setMenus({ ...menus, [type]: { ...menus[type], filters: resetPayload } })
+    setMenus({ ...menus, [category]: { ...menus[category], filters: resetPayload } })
   }
 
-  const allFilterMenus = Object.entries(staticFilters.filters).map(filter => {
-    const [category, options] = filter
+  const allFilterMenus = Object.entries(staticMenus.filters).map(filter => {
+    const [cat, options] = filter
     if (Object.keys(options).length > 1) {
       return (
         <FilterOptions
-          key={category}
-          name={category}
+          key={cat}
+          name={cat}
           options={options}
-          userSelection={menus[type].filters[category]}
+          userSelection={menus[category].filters[cat]}
           handleChange={handleChange}
           expanded={expanded}
           handleAccordion={handleAccordion}
@@ -193,7 +195,7 @@ export default function Menu({ filters, toggleDialog, type }) {
         <Advanced
           advancedFilter={advancedFilter}
           toggleAdvMenu={toggleAdvMenu}
-          type={type}
+          type={category}
           legacy={filters.legacy}
         />
       </Dialog>
@@ -208,15 +210,15 @@ export default function Menu({ filters, toggleDialog, type }) {
         />
       </Dialog>
       <DialogTitle className={classes.filterHeader}>
-        {t(`${type}Filters`)}
+        {t(`${category}Filters`)}
         <IconButton
-          onClick={toggleDialog(false, type, filters.filter)}
+          onClick={toggleDialog(false, category, 'filters', filters.filter)}
           style={{ position: 'absolute', right: 5, top: 5 }}
         >
           <Clear />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent className="no-scroll">
         <Grid
           container
           justify="space-evenly"
@@ -239,7 +241,7 @@ export default function Menu({ filters, toggleDialog, type }) {
             <Paper elevation={0} variant="outlined" className={classes.search}>
               <InputBase
                 className={classes.input}
-                placeholder={t(`search${type}`)}
+                placeholder={t(`search${category}`)}
                 name="search"
                 value={search}
                 onChange={handleSearchChange}
@@ -273,7 +275,7 @@ export default function Menu({ filters, toggleDialog, type }) {
                       setTempFilters,
                       toggleAdvMenu,
                       toggleSlotsMenu,
-                      type,
+                      type: category,
                     }}
                   >
                     {Tile}
@@ -293,7 +295,7 @@ export default function Menu({ filters, toggleDialog, type }) {
         isMobile={isMobile}
         toggleAdvMenu={toggleAdvMenu}
         handleReset={handleReset}
-        type={type}
+        type={category}
       />
       <Drawer
         anchor="left"

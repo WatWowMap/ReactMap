@@ -5,14 +5,28 @@ import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 
-export default function Map({ serverSettings: { config: { map: { minZoom, maxZoom } } } }) {
+const userSettingsCategory = category => {
+  switch (category) {
+    default: return category
+    case 'devices':
+    case 'spawnpoints':
+    case 's2cells': return 'admin'
+    case 'submissionCells':
+    case 'portals': return 'wayfarer'
+  }
+}
+
+export default function Map({ serverSettings: { config: { map: config, tileServers, icons } }, params }) {
   const map = useMap()
   const filters = useStore(state => state.filters)
   const { tileServers: userTiles, icons: userIcons } = useStore(state => state.settings)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
-  const { menus } = useStatic(state => state.ui)
-  const { map: { iconSizes }, tileServers, icons } = useCallback(useStatic(state => state.config))
+  const ui = useCallback(useStatic(state => state.ui))
+  const available = useCallback(useStatic(state => state.available))
+  const staticFilters = useCallback(useStatic(state => state.filters))
+  const userSettings = useStore(state => state.userSettings)
+  const staticUserSettings = useStatic(state => state.userSettings)
   const availableForms = useStatic(state => state.availableForms)
 
   const initialBounds = {
@@ -34,56 +48,65 @@ export default function Map({ serverSettings: { config: { map: { minZoom, maxZoo
         key={tileServers[userTiles].name}
         attribution={tileServers[userTiles].attribution}
         url={tileServers[userTiles].url}
-        minZoom={minZoom}
-        maxZoom={maxZoom}
+        minZoom={config.minZoom}
+        maxZoom={config.maxZoom}
       />
-      {Object.entries({ ...menus, ...menus.wayfarer, ...menus.admin }).map(category => {
-        const [item, value] = category
+      {Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
+        const [category, value] = each
         let enabled = false
-        switch (item) {
+        switch (category) {
           default:
-            if (filters[item]
-              && filters[item].enabled
+            if (filters[category]
+              && filters[category].enabled
               && value) {
               enabled = true
             } break
           case 'gyms':
-            if ((filters[item].gyms && value.gyms)
-              || (filters[item].raids && value.raids)
-              || (filters[item].exEligible && value.exEligible)
-              || (filters[item].inBattle && value.inBattle)) {
+            if ((filters[category].gyms && value.gyms)
+              || (filters[category].raids && value.raids)
+              || (filters[category].exEligible && value.exEligible)
+              || (filters[category].inBattle && value.inBattle)
+              || (filters[category].arEligible && value.arEligible)) {
               enabled = true
             } break
           case 'nests':
-            if (((filters[item].pokemon && value.pokemon)
-              || (filters[item].polygons && value.polygons))) {
+            if (((filters[category].pokemon && value.pokemon)
+              || (filters[category].polygons && value.polygons))) {
               enabled = true
             } break
           case 'pokestops':
-            if ((filters[item].allPokestops && value.allPokestops)
-              || (filters[item].lures && value.lures)
-              || (filters[item].invasions && value.invasions)
-              || (filters[item].quests && value.quests)) {
+            if ((filters[category].allPokestops && value.allPokestops)
+              || (filters[category].lures && value.lures)
+              || (filters[category].invasions && value.invasions)
+              || (filters[category].quests && value.quests)
+              || (filters[category].arEligible && value.arEligible)) {
               enabled = true
             } break
         }
         if (enabled) {
           return (
             <QueryData
-              key={item}
+              key={category}
               bounds={initialBounds}
-              filters={filters[item]}
               onMove={onMove}
               perms={value}
-              category={item}
-              iconSizes={iconSizes[item]}
-              path={icons[userIcons].path}
+              map={map}
+              category={category}
+              config={config}
+              available={available[category]}
               availableForms={availableForms}
+              path={icons[userIcons].path}
+              staticFilters={staticFilters[category].filter}
+              userSettings={userSettings[userSettingsCategory(category)] || {}}
+              filters={filters[category]}
               tileStyle={tileServers[userTiles].style}
+              zoomLevel={config.clusterZoomLevels[category] || 1}
+              staticUserSettings={staticUserSettings[category]}
+              params={params}
             />
           )
         }
-        return ''
+        return null
       })}
       <Nav />
     </>

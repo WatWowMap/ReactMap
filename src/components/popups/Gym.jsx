@@ -12,20 +12,11 @@ import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
-const getTeam = teamId => {
-  switch (parseInt(teamId)) {
-    default: return 'neutral'
-    case 1: return 'mystic'
-    case 2: return 'valor'
-    case 3: return 'instinct'
-  }
-}
-
 export default function GymPopup({
   gym, hasRaid, ts, path, availableForms,
 }) {
   const { t } = useTranslation()
-  const { menus: { gyms: perms } } = useStatic(state => state.ui)
+  const { gyms: perms } = useStatic(state => state.ui)
   const [raidExpand, setRaidExpand] = useState(hasRaid)
   const [extraExpand, setExtraExpand] = useState(false)
 
@@ -93,7 +84,7 @@ export default function GymPopup({
       />
       {perms.gyms && (
         <Collapse in={extraExpand} timeout="auto" unmountOnExit>
-          <ExtraInfo gym={gym} t={t} />
+          <ExtraInfo gym={gym} t={t} ts={ts} />
         </Collapse>
       )}
     </Grid>
@@ -237,7 +228,6 @@ const Header = ({
 
 const PoiImage = ({ gym }) => {
   const { url, team_id, name } = gym
-  const teamName = getTeam(team_id)
   const src = url
     ? url.replace('http://', 'https://')
     : `/images/team/${team_id}.png`
@@ -249,8 +239,8 @@ const PoiImage = ({ gym }) => {
     >
       <img
         src={src}
-        alt={name || teamName}
-        className={`circle-image ${teamName}`}
+        alt={name || 'unknown'}
+        className={`circle-image team-${team_id}`}
         style={{
           maxHeight: 75,
           maxWidth: 75,
@@ -437,7 +427,7 @@ const RaidInfo = ({ gym, t }) => {
           {getRaidForm(raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution)}
         </Typography>
       </Grid>
-
+      {raid_pokemon_move_1 && (
       <Grid
         item
         xs={2}
@@ -449,11 +439,13 @@ const RaidInfo = ({ gym, t }) => {
           backgroundImage: `url(/images/type/${moves[raid_pokemon_move_1].type.toLowerCase()}.png)`,
         }}
       />
+      )}
       <Grid item xs={10} style={{ textAlign: 'center' }}>
         <Typography variant="caption" align="center">
           {t(`move_${raid_pokemon_move_1}`)}
         </Typography>
       </Grid>
+      {raid_pokemon_move_2 && (
       <Grid
         item
         xs={2}
@@ -465,6 +457,7 @@ const RaidInfo = ({ gym, t }) => {
           backgroundImage: `url(/images/type/${moves[raid_pokemon_move_2].type.toLowerCase()}.png)`,
         }}
       />
+      )}
       <Grid item xs={10} style={{ textAlign: 'center' }}>
         <Typography variant="caption" align="center">
           {t(`move_${raid_pokemon_move_2}`)}
@@ -494,7 +487,7 @@ const Timer = ({ gym, start, t }) => {
     return (
       <Grid item xs={6} style={{ textAlign: 'center' }}>
         <Typography variant="subtitle1">
-          {t('starts')}: {startTime.toLocaleTimeString()}
+          {t('starts')}: {startTime.toLocaleTimeString(localStorage.getItem('i18nextLng'))}
         </Typography>
         <Typography variant="h6">
           {raidStart.str}
@@ -505,7 +498,7 @@ const Timer = ({ gym, start, t }) => {
   return (
     <Grid item xs={12} style={{ textAlign: 'center' }}>
       <Typography variant="subtitle1">
-        {t('ends')} {endTime.toLocaleTimeString()}
+        {t('ends')} {endTime.toLocaleTimeString(localStorage.getItem('i18nextLng'))}
       </Typography>
       <Typography variant="h6">
         {raidEnd.str}
@@ -572,7 +565,7 @@ const Footer = ({
   )
 }
 
-const ExtraInfo = ({ gym, t }) => {
+const ExtraInfo = ({ gym, t, ts }) => {
   const {
     last_modified_timestamp, updated, total_cp, guarding_pokemon_id,
   } = gym
@@ -588,11 +581,11 @@ const ExtraInfo = ({ gym, t }) => {
     },
     {
       description: 'lastSeen',
-      data: (new Date(updated * 1000)).toLocaleTimeString(),
+      data: Utility.dayCheck(ts, updated),
     },
     {
       description: 'lastModified',
-      data: (new Date(last_modified_timestamp * 1000)).toLocaleTimeString(),
+      data: Utility.dayCheck(ts, last_modified_timestamp),
     },
   ]
 

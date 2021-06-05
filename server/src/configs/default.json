@@ -31,97 +31,43 @@
     "nestHemisphere": "north",
     "enableFeedbackLink": false,
     "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
+    "enableStats": false,
+    "statsLink": "https://rdmopole2link.net",
     "startLat": 0,
     "startLon": 0,
     "startZoom": 12,
     "minZoom": 10,
     "maxZoom": 18,
+    "noScanAreaOverlay": false,
+    "scanAreasZoom": 12,
+    "scanCellsZoom": 13,
+    "submissionZoom": 15,
     "theme": {
       "style": "dark",
       "primary": "#ff5722",
       "secondary": "#00b0ff",
-      "drawer": "temporary",
-      "glow": {
-        "iv": { "value": 100, "color": "red" },
-        "pvp": { "value": 1, "color": "blue" },
-        "both": { "color": "purple" }
-      },
-      "portalMods": { "old": "blue", "new": "green" },
-      "devicePathColor": "red"
+      "drawer": "temporary"
     },
     "clusterZoomLevels": {
-      "spawnpoints": 12,
       "gyms": 13,
-      "portals": 14,
       "pokestops": 14,
-      "pokemon": 15
-    },
-    "defaultFilters": {
-      "gyms": {
-        "enabled": true,
-        "allGyms": true,
-        "exEligible": false,
-        "inBattle": false,
-        "raids": true,
-        "eggs": true,
-        "pokemon": true,
-        "timers": false
-      },
-      "pokestops": {
-        "enabled": false,
-        "lures": true,
-        "quests": true,
-        "items": true,
-        "megaEnergy": true,
-        "pokemon": true,
-        "invasions": false,
-        "allInvasions": true,
-        "invasionTimers": false
-      },
-      "spawnpoints": {
-        "enabled": false
-      },
-      "pokemon": {
-        "enabled": false,
-        "legacyFilter": false,
-        "globalValues": {
-          "iv": [80, 100],
-          "level": [1, 35],
-          "atk_iv": [0, 15],
-          "def_iv": [0, 15],
-          "sta_iv": [0, 15]
-        },
-        "pvpValues": [1, 10]
-      },
-      "nests": {
-        "enabled": false,
-        "polygons": false,
-        "pokemon": false,
-        "allPokemon": true
-      },
-      "portals": {
-        "enabled": false
-      },
-      "scanCells": {
-        "enabled": false,
-        "zoomLevel": 10
-      },
-      "submissionCells": {
-        "enabled": false,
-        "zoomLevel": 10
-      },
-      "weather": {
-        "enabled": true
-      },
-      "scanAreas": {
-        "enabled": false,
-        "zoomLevel": 12
-      },
-      "devices": {
-        "enabled": false
-      }
+      "pokemon": 15,
+      "portals": 14,
+      "spawnpoints": 12
     },
     "iconSizes": {
+      "devices": {
+        "sm": 15,
+        "md": 30,
+        "lg": 50,
+        "xl": 70
+      },
+      "nests": {
+        "sm": 20,
+        "md": 40,
+        "lg": 60,
+        "xl": 80
+      },
       "gyms": {
         "sm": 20,
         "md": 35,
@@ -134,30 +80,107 @@
         "lg": 35,
         "xl": 45
       },
-      "spawnpoints": {
-        "sm": 0.5,
-        "md": 1,
-        "lg": 2,
-        "xl": 3
-      },
       "pokemon": {
         "sm": 20,
         "md": 40,
         "lg": 60,
         "xl": 80
       },
-      "nests": {
-        "sm": 20,
-        "md": 40,
-        "lg": 60,
-        "xl": 80
-      },
-      "devices": {
-        "sm": 15,
-        "md": 30,
-        "lg": 50,
-        "xl": 70
+      "spawnpoints": {
+        "sm": 0.5,
+        "md": 1,
+        "lg": 2,
+        "xl": 3
       }
+    }
+  },
+  "clientSideOptions": {
+    "admin": {
+      "devicePathColor": "#ff1744"
+    },
+    "gyms": {
+      "clustering": true,
+      "raidTimers": false
+    },
+    "pokestops": {
+      "clustering": true,
+      "invasionTimers": false,
+      "lureTimers": false
+    },
+    "pokemon": {
+      "clustering": true,
+      "prioritizePvpInfo": false,
+      "legacyFilter": false,
+      "glow": [
+        {"name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
+        {"name": "Top 3 Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
+        {"name": "Multiple", "perm": "pvp", "value": "#800080" }    
+      ]
+    },
+    "wayfarer": {
+      "clustering": true,
+      "oldPortals": "#0000ff",
+      "newPortals": "#16b819"
+    }
+  },
+  "defaultFilters": {
+    "devices": {
+      "enabled": false
+    },
+    "gyms": {
+      "enabled": true,
+      "allGyms": true,
+      "exEligible": false,
+      "inBattle": false,
+      "raids": true,
+      "eggs": true,
+      "pokemon": true
+    },
+    "nests": {
+      "enabled": false,
+      "polygons": false,
+      "pokemon": false,
+      "allPokemon": true
+    },
+    "pokestops": {
+      "enabled": false,
+      "lures": true,
+      "quests": true,
+      "items": true,
+      "megaEnergy": true,
+      "pokemon": true,
+      "invasions": false,
+      "allInvasions": true
+    },
+    "pokemon": {
+      "enabled": false,
+      "legacyFilter": false,
+      "globalValues": {
+        "iv": [80, 100],
+        "level": [1, 35],
+        "atk_iv": [0, 15],
+        "def_iv": [0, 15],
+        "sta_iv": [0, 15]
+      },
+      "pvpValues": [1, 10]
+    },
+    "portals": {
+      "enabled": false
+    },
+    "scanAreas": {
+      "enabled": false
+    },
+    "scanCells": {
+      "enabled": false
+    },
+    "spawnpoints": {
+      "enabled": false
+    },
+    "submissionCells": {
+      "enabled": false
+    },
+    "weather": {
+      "enabled": true
     }
   },
   "database": {
@@ -330,5 +353,5 @@
     "regional": [],
     "event": []
   },
-  "manualAreas": null
+  "manualAreas": {}
 }

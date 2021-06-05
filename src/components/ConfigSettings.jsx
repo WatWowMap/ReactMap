@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
 import { ThemeProvider } from '@material-ui/styles'
@@ -9,27 +8,32 @@ import { useStore, useStatic } from '@hooks/useStore'
 import createTheme from '@assets/mui/theme'
 import Map from './Map'
 
-const ConfigSettings = ({ serverSettings, match }) => {
+export default function ConfigSettings({
+  serverSettings, match, paramLocation, paramZoom,
+}) {
   document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
+  const setUserSettings = useStore(state => state.setUserSettings)
   const setSettings = useStore(state => state.setSettings)
   const setFilters = useStore(state => state.setFilters)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
   const setMenus = useStore(state => state.setMenus)
 
-  const setStaticMenus = useStatic(state => state.setStaticMenus)
+  const setStaticUserSettings = useStatic(state => state.setUserSettings)
+  const setStaticSettings = useStatic(state => state.setSettings)
+  const setStaticMenus = useStatic(state => state.setMenus)
   const setAvailable = useStatic(state => state.setAvailable)
   const setConfig = useStatic(state => state.setConfig)
   const setAvailableForms = useStatic(state => state.setAvailableForms)
   const setMasterfile = useStatic(state => state.setMasterfile)
   const setUi = useStatic(state => state.setUi)
-  const setBreakpoint = useStatic(state => state.setBreakpoint)
-  const setStaticFilters = useStatic(state => state.setStaticFilters)
+  const setStaticFilters = useStatic(state => state.setFilters)
+
+  const localState = JSON.parse(localStorage.getItem('local-state'))
 
   const updateObjState = (defaults, category) => {
-    const localState = JSON.parse(localStorage.getItem('local-state'))
     if (localState && localState.state && localState.state[category]) {
       const newState = {}
       extend(true, newState, defaults, localState.state[category])
@@ -39,7 +43,6 @@ const ConfigSettings = ({ serverSettings, match }) => {
   }
 
   const updatePositionState = (defaults, category) => {
-    const localState = JSON.parse(localStorage.getItem('local-state'))
     if (localState && localState.state && localState.state[category]) {
       return localState.state[category]
     }
@@ -49,11 +52,6 @@ const ConfigSettings = ({ serverSettings, match }) => {
   const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
   document.body.classList.add('dark')
 
-  let screenSize = 'xs'
-  if (useMediaQuery(theme.breakpoints.only('sm'))) screenSize = 'sm'
-  if (useMediaQuery(theme.breakpoints.up('md'))) screenSize = 'md'
-
-  setBreakpoint(screenSize)
   setUi(serverSettings.ui)
   setConfig(serverSettings.config)
   setMasterfile(serverSettings.masterfile)
@@ -61,11 +59,14 @@ const ConfigSettings = ({ serverSettings, match }) => {
   setMenus(updateObjState(serverSettings.menus, 'menus'))
   setStaticFilters(serverSettings.defaultFilters)
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
+  setStaticSettings(serverSettings.settings)
+
+  setUserSettings(updateObjState(serverSettings.userSettings, 'userSettings'))
+  setStaticUserSettings(serverSettings.clientMenus)
 
   // temp settings migration
-  const parsed = JSON.parse(localStorage.getItem('local-state'))
-  if (parsed) {
-    if (parsed.state && parsed.state.settings.icons.name) {
+  if (localState) {
+    if (localState.state && localState.state.settings.icons.name) {
       setSettings(serverSettings.settings)
     } else {
       setSettings(updateObjState(serverSettings.settings, 'settings'))
@@ -80,17 +81,23 @@ const ConfigSettings = ({ serverSettings, match }) => {
   setAvailable(serverSettings.available)
 
   const getStartLocation = () => {
-    if (match.path === '/') {
-      return updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
+    if (paramLocation && paramLocation[0] !== null) {
+      return paramLocation
     }
-    return [match.params.lat, match.params.lon]
+    if (match.params.lat) {
+      return [match.params.lat, match.params.lon]
+    }
+    return updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
   }
 
   const getStartZoom = () => {
-    if (match.path === '/') {
-      return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
+    if (paramZoom) {
+      return paramZoom
     }
-    return match.params.zoom
+    if (match.params.zoom) {
+      return match.params.zoom
+    }
+    return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
   }
 
   return (
@@ -102,10 +109,13 @@ const ConfigSettings = ({ serverSettings, match }) => {
         zoomControl={false}
         preferCanvas
       >
-        {serverSettings.user.perms.map && <Map serverSettings={serverSettings} />}
+        {serverSettings.user.perms.map && (
+          <Map
+            serverSettings={serverSettings}
+            params={match.params}
+          />
+        )}
       </MapContainer>
     </ThemeProvider>
   )
 }
-
-export default withRouter(ConfigSettings)

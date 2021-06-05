@@ -9,9 +9,11 @@ import {
   Switch,
   FormControlLabel,
   IconButton,
+  useMediaQuery,
 } from '@material-ui/core'
 import { Save, Replay, Clear } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@material-ui/styles'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from './StringFilter'
@@ -19,11 +21,13 @@ import SliderTile from './SliderTile'
 import Size from './Size'
 
 export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) {
-  const isMobile = useStatic(state => state.breakpoint) === 'xs'
-  const { menus } = useStatic(state => state.ui)
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
+  const ui = useStatic(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore(state => state.filters)
-  const setFilters = useStore(state => state.setFilters)
+  const userSettings = useStore(state => state.userSettings)
+  const setUserSettings = useStore(state => state.setUserSettings)
   const { t } = useTranslation()
 
   const handleChange = (event, values) => {
@@ -38,7 +42,13 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
   }
 
   const handleLegacySwitch = () => {
-    setFilters({ ...filters, [type]: { ...filters[type], legacy: !filters[type].legacy } })
+    setUserSettings({
+      ...userSettings,
+      [type]: {
+        ...userSettings[type],
+        legacyFilter: !userSettings[type].legacyFilter,
+      },
+    })
   }
 
   const reset = {
@@ -92,11 +102,11 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
               <FormControlLabel
                 control={(
                   <Switch
-                    checked={filters[type].legacy}
+                    checked={userSettings[type].legacy}
                     onChange={handleLegacySwitch}
                     name="adv"
                     color="secondary"
-                    disabled={!menus[type].legacy}
+                    disabled={!ui[type].legacy}
                   />
                 )}
                 label={t('legacy')}
@@ -110,15 +120,15 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
           </Grid>
         </Grid>
       </DialogTitle>
-      {type === 'pokemon' && (
-        <DialogContent style={{ color: 'white' }}>
+      <DialogContent style={{ color: 'white' }}>
+        {type === 'pokemon' ? (
           <Grid
             container
             direction="row"
             justify="center"
             alignItems="center"
           >
-            {(filters[type].legacy && menus[type].legacy)
+            {(userSettings[type].legacyFilter && ui[type].legacy)
               ? (
                 <Grid item xs={12}>
                   <StringFilter
@@ -129,7 +139,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
               )
               : (
                 <>
-                  {Object.entries(menus[type].sliders).map(category => (
+                  {Object.entries(ui[type].sliders).map(category => (
                     <Grid item xs={12} sm={6} key={category[0]}>
                       {category[1].map(each => (
                         <SliderTile
@@ -144,23 +154,33 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
                 </>
               )}
           </Grid>
-        </DialogContent>
-      )}
+        ) : (
+          <Grid item xs={12} style={{ textAlign: 'center' }}>
+            <Size
+              filterValues={filterValues}
+              handleChange={handleChange}
+              btnSize="medium"
+            />
+          </Grid>
+        )}
+      </DialogContent>
       <DialogActions>
         <Grid
           container
           justify="center"
           alignItems="center"
         >
-          <Grid item xs={type === 'pokemon' ? 8 : 7}>
+          {type === 'pokemon' && (
+          <Grid item xs={8}>
             <Size
               filterValues={filterValues}
               handleChange={handleChange}
-              btnSize={type === 'pokemon' ? 'medium' : 'small'}
+              btnSize="medium"
             />
           </Grid>
+          )}
           {[reset, save].map(button => (
-            <Grid item xs={2} key={button.key}>
+            <Grid item xs={type === 'pokemon' ? 2 : 4} key={button.key} style={{ textAlign: 'right' }}>
               {isMobile ? button.icon : button.text}
             </Grid>
           ))}

@@ -3,7 +3,7 @@ import React, {
   Fragment, useState, useEffect,
 } from 'react'
 import {
-  Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem, Avatar,
+  Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem,
 } from '@material-ui/core'
 import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
 import { useTranslation, Trans } from 'react-i18next'
@@ -16,11 +16,11 @@ export default function PokestopPopup({
   pokestop, ts, hasLure, hasInvasion, hasQuest, path, availableForms,
 }) {
   const { t } = useTranslation()
-  const { menus: { pokestops: perms } } = useStatic(state => state.ui)
+  const { pokestops: perms } = useStatic(state => state.ui)
   const [invasionExpand, setInvasionExpand] = useState(false)
   const [extraExpand, setExtraExpand] = useState(false)
   const {
-    incident_expire_timestamp, lure_expire_timestamp, lure_id,
+    incident_expire_timestamp, lure_expire_timestamp, lure_id, grunt_type,
   } = pokestop
 
   return (
@@ -37,7 +37,9 @@ export default function PokestopPopup({
         perms={perms}
         hasInvasion={hasInvasion}
         hasQuest={hasQuest}
+        hasLure={hasLure}
         t={t}
+        ts={ts}
       />
       <Grid item xs={12}>
         <Collapse in={!invasionExpand} timeout="auto" unmountOnExit>
@@ -63,7 +65,7 @@ export default function PokestopPopup({
                   xs={6}
                   container
                   direction="row"
-                  justify="space-around"
+                  justify="center"
                   alignItems="center"
                 >
                   <QuestConditions
@@ -83,8 +85,21 @@ export default function PokestopPopup({
                 {(hasLure || hasInvasion)
                   && <Divider orientation="vertical" flexItem />}
                 <Grid container item xs={6}>
-                  {hasLure && <Timer expireTime={lure_expire_timestamp} lureName={t(`lure_${lure_id}`)} />}
-                  {hasInvasion && <Timer expireTime={incident_expire_timestamp} />}
+                  {hasLure && (
+                    <Timer
+                      expireTime={lure_expire_timestamp}
+                      name={`lure_${lure_id}`}
+                      t={t}
+                    />
+                  )}
+                  {hasInvasion && (
+                    <Timer
+                      expireTime={incident_expire_timestamp}
+                      name={grunt_type}
+                      grunt
+                      t={t}
+                    />
+                  )}
                 </Grid>
               </>
             )}
@@ -107,9 +122,9 @@ export default function PokestopPopup({
         hasInvasion={hasInvasion}
         perms={perms}
       />
-      {perms.pokestops && (
+      {perms.allPokestops && (
         <Collapse in={extraExpand} timeout="auto" unmountOnExit>
-          <ExtraInfo pokestop={pokestop} t={t} />
+          <ExtraInfo pokestop={pokestop} t={t} ts={ts} />
         </Collapse>
       )}
     </Grid>
@@ -117,7 +132,7 @@ export default function PokestopPopup({
 }
 
 const Header = ({
-  pokestop, perms, hasInvasion, hasQuest, t,
+  pokestop, perms, hasInvasion, hasQuest, t, hasLure,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -206,7 +221,8 @@ const Header = ({
   if (perms.quests && hasQuest) {
     options.push({ name: 'excludeQuest', action: excludeQuest })
   }
-  if (perms.invasions && hasInvasion) {
+  if ((perms.invasions && hasInvasion)
+    || (perms.lures && hasLure)) {
     options.push(
       { name: 'excludeInvasion', action: excludeInvasion },
       { name: 'timer', action: handleTimer },
@@ -225,7 +241,7 @@ const Header = ({
           {name}
         </Typography>
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={3} style={{ textAlign: 'right' }}>
         <IconButton
           aria-haspopup="true"
           onClick={handleClick}
@@ -259,51 +275,75 @@ const PoiImage = ({
   pokestop, ts, hasQuest, hasLure, hasInvasion, t,
 }) => {
   const {
-    url, name, lure_id, lure_expire_timestamp, incident_expire_timestamp,
+    name, url, lure_id, lure_expire_timestamp, incident_expire_timestamp, ar_scan_eligible,
   } = pokestop
 
-  const lureName = lure_expire_timestamp > ts ? t(`lure_${lure_id}`) : ''
+  const lureName = lure_expire_timestamp > ts ? `lure_${lure_id}` : ''
   const src = url
     ? url.replace('http://', 'https://')
     : '/images/misc/pokestop.png'
 
+  const invasionColor = hasInvasion ? 'invasion-exists' : ''
+
+  const getImageSize = () => {
+    if (hasQuest) {
+      if (hasInvasion || hasLure) {
+        return 60
+      }
+    }
+    return 90
+  }
   return (
     <Grid
       container
       item
-      xs={(hasQuest || hasInvasion || hasLure) ? 5 : 12}
+      xs={(hasQuest || hasInvasion || hasLure) ? 5 : 11}
       justify="center"
       alignItems="center"
     >
       <Grid item xs={12} style={{ textAlign: 'center' }}>
-        <img
-          src={src}
-          alt={name || 'unknown'}
-          className={`circle-image ${lureName}`}
-          style={{
-            maxHeight: 60,
-            maxWidth: 60,
-          }}
-        />
+        <div className="ar-eligible">
+          <img
+            src={src}
+            alt={name || 'unknown'}
+            className={`circle-image ${lureName} ${invasionColor}`}
+            style={{
+              maxHeight: getImageSize(),
+              maxWidth: getImageSize(),
+            }}
+          />
+          {ar_scan_eligible === 1 && (
+          <img
+            className="ar-logo"
+            src="/images/misc/ar.png"
+          />
+          )}
+        </div>
       </Grid>
       {(hasLure && hasQuest)
         && (
           <Timer
-            lureName={lureName}
+            name={lureName}
             expireTime={lure_expire_timestamp}
+            t={t}
           />
         )}
       {(hasInvasion && hasQuest)
         && (
-          <Timer expireTime={incident_expire_timestamp} />
+          <Timer
+            expireTime={incident_expire_timestamp}
+            t={t}
+          />
         )}
     </Grid>
   )
 }
 
-const Timer = ({ expireTime, lureName }) => {
+const Timer = ({
+  expireTime, name, t, grunt,
+}) => {
+  const { invasions: { [name]: invasion } } = useStatic(state => state.masterfile)
   const endTime = new Date(expireTime * 1000)
-
   const [timerEnd, setTimerEnd] = useState(Utility.getTimeUntil(endTime, true))
 
   useEffect(() => {
@@ -315,10 +355,10 @@ const Timer = ({ expireTime, lureName }) => {
 
   return (
     <>
-      {lureName && (
+      {name && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Typography variant="subtitle2">
-            {lureName}
+            {grunt ? t(invasion.type) : t(name)}
           </Typography>
         </Grid>
       )}
@@ -329,7 +369,7 @@ const Timer = ({ expireTime, lureName }) => {
       </Grid>
       <Grid item xs={12} style={{ textAlign: 'center' }}>
         <Typography variant="caption">
-          {new Date(endTime).toLocaleTimeString()}
+          {new Date(endTime).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
         </Typography>
       </Grid>
     </>
@@ -343,47 +383,41 @@ const RewardInfo = ({ pokestop, path, availableForms }) => {
     mega_pokemon_id, mega_amount,
   } = pokestop
 
+  const questRewards = []
   switch (quest_reward_type) {
     default: return ''
-    case 2: return (
-      <>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
-          <Avatar src={`/images/item/${quest_item_id}.png`} />
-        </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
-          <Avatar>x{item_amount}</Avatar>
-        </Grid>
-      </>
-    )
-    case 3: return (
-      <>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
-          <Avatar src="/images/item/-1.png" />
-        </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
-          <Avatar>x{stardust_amount}</Avatar>
-        </Grid>
-      </>
-    )
-    case 7: return (
-      <Grid item xs={6} style={{ textAlign: 'center' }}>
-        <Avatar src={`${path}/${Utility.getPokemonIcon(availableForms, quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny)}.png`} />
-      </Grid>
-    )
-    case 12: return (
-      <>
-        <Grid item xs={4} style={{ textAlign: 'center' }}>
-          <Avatar src={`${path}/${Utility.getPokemonIcon(availableForms, mega_pokemon_id, 0, 1)}.png`} />
-        </Grid>
-        <Grid item xs={4} style={{ textAlign: 'center' }}>
-          <Avatar src="/images/item/-8.png" />
-        </Grid>
-        <Grid item xs={4} style={{ textAlign: 'center' }}>
-          <Avatar>x{mega_amount}</Avatar>
-        </Grid>
-      </>
-    )
+    case 2:
+      questRewards.push(
+        <img src={`/images/item/${quest_item_id}.png`} className="quest-popup-img" />,
+        <div className="amount-popup">x{item_amount}</div>,
+      ); break
+    case 3:
+      questRewards.push(
+        <img src="/images/item/-1.png" className="quest-popup-img" />,
+        <div className="amount-popup">x{stardust_amount}</div>,
+      ); break
+    case 7:
+      questRewards.push(
+        <img src={`${path}/${Utility.getPokemonIcon(availableForms, quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny)}.png`} className="quest-popup-img" />,
+      ); break
+    case 12:
+      questRewards.push(
+        <img src={`${path}/${Utility.getPokemonIcon(availableForms, mega_pokemon_id, 0, 1)}.png`} className="quest-popup-img" />,
+        <img src="/images/item/-8.png" className="quest-popup-img" />,
+        <div className="amount-popup">x{mega_amount}</div>,
+      ); break
   }
+  return questRewards.map((reward, i) => (
+    <Grid
+      // eslint-disable-next-line react/no-array-index-key
+      key={i}
+      item
+      xs={12 / questRewards.length}
+      style={{ textAlign: 'center' }}
+    >
+      {reward}
+    </Grid>
+  ))
 }
 
 const QuestConditions = ({ pokestop, t }) => {
@@ -438,15 +472,18 @@ const QuestConditions = ({ pokestop, t }) => {
       )
     }
   }
-  const conditionsOne = type1 ? getQuestConditions(type1.type, type1.info) : null
-  const conditionsTwo = type2 ? getQuestConditions(type2.type, type2.info) : null
-
   return (
     <Grid item xs={12} style={{ textAlign: 'center' }}>
       {primaryCondition}
       {type1 && (
         <Typography variant="caption">
-          ({conditionsOne}{type2 ? `, ${conditionsTwo}` : ''})
+          {getQuestConditions(type1.type, type1.info)}
+        </Typography>
+      )}
+      <br />
+      {type2 && (
+        <Typography variant="caption">
+          {getQuestConditions(type2.type, type2.info)}
         </Typography>
       )}
     </Grid>
@@ -472,7 +509,7 @@ const Footer = ({
   return (
     <>
       {(hasInvasion && perms.invasions) && (
-        <Grid item xs={4}>
+        <Grid item xs={4} style={{ textAlign: 'center' }}>
           <IconButton
             className={classes.expand}
             onClick={handleInvasionClick}
@@ -480,8 +517,7 @@ const Footer = ({
           >
             <img
               src={`/images/misc/${invasionExpand ? 'quests' : 'invasions'}.png`}
-              height={20}
-              width="auto"
+              className="circle pulse"
             />
           </IconButton>
         </Grid>
@@ -495,8 +531,8 @@ const Footer = ({
           <Map style={{ color: 'white' }} />
         </IconButton>
       </Grid>
-      {perms.pokestops && (
-        <Grid item xs={4}>
+      {perms.allPokestops && (
+        <Grid item xs={4} style={{ textAlign: 'center' }}>
           <IconButton
             className={expanded ? classes.expandOpen : classes.expand}
             onClick={handleExpandClick}
@@ -510,17 +546,17 @@ const Footer = ({
   )
 }
 
-const ExtraInfo = ({ pokestop, t }) => {
+const ExtraInfo = ({ pokestop, t, ts }) => {
   const { last_modified_timestamp, updated } = pokestop
 
   const extraMetaData = [
     {
-      description: 'lastSeen:',
-      data: (new Date(updated * 1000)).toLocaleTimeString(),
+      description: 'lastSeen',
+      data: Utility.dayCheck(ts, updated),
     },
     {
-      description: 'lastModified:',
-      data: (new Date(last_modified_timestamp * 1000)).toLocaleTimeString(),
+      description: 'lastModified',
+      data: Utility.dayCheck(ts, last_modified_timestamp),
     },
   ]
 
@@ -534,10 +570,10 @@ const ExtraInfo = ({ pokestop, t }) => {
         <Fragment key={meta.description}>
           <Grid item xs={5} style={{ textAlign: 'left' }}>
             <Typography variant="caption" align="center">
-              {t(meta.description)}
+              {t(meta.description)}:
             </Typography>
           </Grid>
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
+          <Grid item xs={7} style={{ textAlign: 'right' }}>
             <Typography variant="caption" align="center">
               {meta.data}
             </Typography>
@@ -551,9 +587,8 @@ const ExtraInfo = ({ pokestop, t }) => {
 const Invasion = ({
   pokestop, path, availableForms, t,
 }) => {
-  const { invasions } = useStatic(state => state.masterfile)
   const { grunt_type } = pokestop
-  const invasion = invasions[grunt_type]
+  const { invasions: { [grunt_type]: invasion } } = useStatic(state => state.masterfile)
   const encounterNum = { first: '#1', second: '#2', third: '#3' }
 
   const makeShadowPokemon = pokemonId => (
@@ -579,19 +614,11 @@ const Invasion = ({
     return { first: '100%' }
   }
 
-  const getGruntGender = grunt => {
-    switch (grunt) {
-      default: return ''
-      case 'Male': return <Icon>male</Icon>
-      case 'Female': return <Icon>female</Icon>
-    }
-  }
-
   return (
     <Grid container>
       <Grid item xs={12}>
         <Typography variant="h6" align="center">
-          {t(invasion.type)} {getGruntGender(invasion.grunt)}
+          {t(invasion.type)} <Icon>{invasion.grunt.toLowerCase()}</Icon>
         </Typography>
       </Grid>
       <Grid item xs={12}>

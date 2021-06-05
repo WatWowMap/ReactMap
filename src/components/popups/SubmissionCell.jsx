@@ -7,7 +7,7 @@ export default function SubmissionCellPopup({ cell }) {
   const gymThreshold = [2, 6, 20]
   let untilNextGym = t('never')
   if (cell.count_gyms < 3) {
-    untilNextGym = `${gymThreshold[cell.count_gyms] - cell.count} ${t('submissions')}`
+    untilNextGym = gymThreshold[cell.count_gyms] - cell.count
   }
   if ((cell.count === 1 && cell.count_gyms < 1)
     || (cell.count === 5 && cell.count_gyms < 2)

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
-export default function WeatherPopup({ weather }) {
+export default function WeatherPopup({ weather, ts }) {
   const { t } = useTranslation()
   const { weatherTypes } = useStatic(state => state.masterfile)
   const { gameplay_condition, updated } = weather
@@ -29,7 +29,7 @@ export default function WeatherPopup({ weather }) {
           {t('lastUpdated')}:
         </Typography>
       </Grid>
-      <Timer updated={updated} />
+      <Timer updated={updated} ts={ts} />
       <Grid item xs={12}>
         <Typography variant="subtitle2" align="center">
           {t('boostedTypes')}:
@@ -53,7 +53,7 @@ export default function WeatherPopup({ weather }) {
   )
 }
 
-const Timer = ({ updated }) => {
+const Timer = ({ updated, ts }) => {
   const lastUpdated = new Date(updated * 1000)
   const [timer, setTimer] = useState(Utility.getTimeUntil(lastUpdated))
 
@@ -84,7 +84,7 @@ const Timer = ({ updated }) => {
           gutterBottom
           style={{ color }}
         >
-          {lastUpdated.toLocaleTimeString()}
+          {Utility.dayCheck(ts, updated)}
         </Typography>
       </Grid>
       <Grid item xs={timer.diff > 60 ? 12 : 4}>

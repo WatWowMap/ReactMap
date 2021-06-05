@@ -5,10 +5,14 @@ import {
 import { useTranslation } from 'react-i18next'
 
 export default function WithSubItems({
-  category, filters, setFilters, subItem,
+  category, filters, setFilters, subItem, noScanAreaOverlay,
 }) {
   const { t } = useTranslation()
   let filterCategory
+
+  if (category === 'scanAreas' && noScanAreaOverlay) {
+    return null
+  }
 
   if (category === 'wayfarer' || category === 'admin') {
     filterCategory = (

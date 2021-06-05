@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import {
-  Grid, Typography, FormControlLabel, Switch, AppBar, Tab, Tabs, Box,
+  Grid, Typography, Switch, AppBar, Tab, Tabs, Box,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
+import { useStore } from '@hooks/useStore'
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 
@@ -26,19 +27,10 @@ function TabPanel(props) {
 export default function WithSliders({
   category, filters, setFilters, context, specificFilter,
 }) {
+  const userSettings = useStore(state => state.userSettings)
   const { t } = useTranslation()
   const [tempLegacy, setTempLegacy] = useState(filters[category][specificFilter])
   const [openTab, setOpenTab] = useState(0)
-
-  const handleLegacySwitch = () => {
-    setFilters({
-      ...filters,
-      [category]: {
-        ...filters[category],
-        legacy: !filters[category].legacy,
-      },
-    })
-  }
 
   useEffect(() => {
     setFilters({
@@ -88,7 +80,7 @@ export default function WithSliders({
           }}
         />
       </Grid>
-      {(filters[category].legacy && context.legacy) ? (
+      {(userSettings[category].legacyFilter && context.legacy) ? (
         <>
           <Grid item xs={12}>
             <Typography>
@@ -132,20 +124,6 @@ export default function WithSliders({
           ))}
         </>
       )}
-      <Grid item xs={6} style={{ textAlign: 'right' }}>
-        <FormControlLabel
-          control={(
-            <Switch
-              checked={filters[category].legacy}
-              onChange={handleLegacySwitch}
-              name="adv"
-              color="secondary"
-              disabled={!context.legacy}
-            />
-          )}
-          label="Legacy"
-        />
-      </Grid>
     </>
   )
 }

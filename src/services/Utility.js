@@ -3,6 +3,7 @@ import getProperName from './functions/getProperName'
 import menuFilter from './functions/menuFilter'
 import checkAdvFilter from './functions/checkAdvFilter'
 import getTimers from './functions/getTimeUntil'
+import dayCheck from './functions/dayCheck'
 
 class Utility {
   static getPokemonIcon(availableForms, pokemonId, form, evolution, gender, costume, shiny) {
@@ -23,6 +24,10 @@ class Utility {
 
   static getTimeUntil(date, until) {
     return getTimers(date, until)
+  }
+
+  static dayCheck(ts, desiredStamp) {
+    return dayCheck(ts, desiredStamp)
   }
 }
 

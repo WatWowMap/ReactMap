@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import {
   Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid, IconButton,
 } from '@material-ui/core'
-import { ExpandMore, Clear } from '@material-ui/icons'
+import { ExpandMore, Clear, Settings } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
-import Settings from './Settings'
+import SettingsMenu from './Settings'
 import WithSubItems from './WithSubItems'
 import WithSliders from './WithSliders'
 import useStyles from '../../../hooks/useStyles'
@@ -16,9 +16,10 @@ export default function DrawerMenu({
   drawer, toggleDrawer, filters, setFilters, toggleDialog,
 }) {
   const classes = useStyles()
-  const { menus } = useStatic(state => state.ui)
+  const ui = useStatic(state => state.ui)
+  const staticUserSettings = useStatic(state => state.userSettings)
   const { drawer: drawerStyle } = useStore(state => state.settings)
-  const { map: { title } } = useStatic(state => state.config)
+  const { map: { title, scanAreasZoom, noScanAreaOverlay }, manualAreas } = useStatic(state => state.config)
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState('')
 
@@ -26,18 +27,19 @@ export default function DrawerMenu({
     setExpanded(isExpanded ? panel : false)
   }
 
-  const drawerItems = Object.keys(menus).map(category => {
+  const drawerItems = Object.keys(ui).map(category => {
     let content
     switch (category) {
       default:
         content = (
-          Object.keys(menus[category]).map(subItem => (
+          Object.keys(ui[category]).map(subItem => (
             <WithSubItems
               key={`${category}-${subItem}`}
               category={category}
               filters={filters}
               setFilters={setFilters}
               subItem={subItem}
+              noScanAreaOverlay={noScanAreaOverlay}
             />
           ))
         ); break
@@ -45,17 +47,15 @@ export default function DrawerMenu({
         content = (
           <WithSliders
             category={category}
-            context={menus[category]}
+            context={ui[category]}
             specificFilter="ivOr"
             filters={filters}
             setFilters={setFilters}
-            handleChange={handleChange}
-            toggleDialog={toggleDialog}
           />
         ); break
       case 'settings':
         content = (
-          <Settings />
+          <SettingsMenu />
         )
     }
     return (
@@ -81,6 +81,18 @@ export default function DrawerMenu({
             alignItems="center"
           >
             {content}
+            {staticUserSettings[category] && (
+              <Grid item xs={6}>
+                <Button
+                  onClick={toggleDialog(true, category, 'options')}
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<Settings />}
+                >
+                  {t('options')}
+                </Button>
+              </Grid>
+            )}
             {(category === 'pokemon'
               || category === 'gyms'
               || category === 'pokestops'
@@ -88,14 +100,20 @@ export default function DrawerMenu({
               && (
                 <Grid item xs={6}>
                   <Button
-                    onClick={toggleDialog(true, category)}
+                    onClick={toggleDialog(true, category, 'filters')}
                     variant="contained"
+                    color="primary"
                   >
                     {t('advanced')}
                   </Button>
                 </Grid>
               )}
-            {category === 'scanAreas' && <Areas />}
+            {category === 'scanAreas' && (
+            <Areas
+              scanAreasZoom={scanAreasZoom}
+              manualAreas={manualAreas}
+            />
+            )}
           </Grid>
         </AccordionDetails>
       </Accordion>
