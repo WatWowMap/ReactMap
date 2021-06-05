@@ -1,4 +1,6 @@
-import React, { useCallback, memo } from 'react'
+import React, {
+  useCallback, useEffect, memo, useRef, useState,
+} from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
 import Utility from '@services/Utility'
@@ -25,8 +27,11 @@ const operator = {
 }
 
 const PokemonTile = ({
-  item, showTimer, filters, iconSizes, path, availableForms, excludeList, userSettings, staticUserSettings,
+  item, showTimer, filters, iconSizes, path, availableForms, excludeList,
+  userSettings, staticUserSettings, params,
 }) => {
+  const [done, setDone] = useState(false)
+  const markerRefs = useRef({})
   const iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, item.pokemon_id, item.form, 0, 0, item.costume)}.png`
 
   const getGlowStatus = useCallback(() => {
@@ -49,16 +54,30 @@ const PokemonTile = ({
   }, [])
   const glowStatus = userSettings.glow ? getGlowStatus() : undefined
 
+  useEffect(() => {
+    const { id } = params
+    if (id === item.id) {
+      const markerToOpen = markerRefs.current[id]
+      markerToOpen.openPopup()
+    }
+  }, [done])
+
   return (
     <>
       {!excludeList.includes(`${item.pokemon_id}-${item.form}`) && (
         <Marker
+          ref={(m) => {
+            markerRefs.current[item.id] = m
+            if (!done && item.id === params.id) {
+              setDone(true)
+            }
+          }}
           position={[item.lat, item.lon]}
           icon={(item.bestPvp < 4 || glowStatus)
             ? fancyMarker(iconUrl, item, filters, iconSizes, glowStatus)
             : basicMarker(iconUrl, item, filters, iconSizes)}
         >
-          <Popup position={[item.lat, item.lon]}>
+          <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
             <PopupContent
               pokemon={item}
               iconUrl={iconUrl}

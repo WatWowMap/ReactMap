@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
 import { ThemeProvider } from '@material-ui/styles'
@@ -9,7 +8,9 @@ import { useStore, useStatic } from '@hooks/useStore'
 import createTheme from '@assets/mui/theme'
 import Map from './Map'
 
-const ConfigSettings = ({ serverSettings, match, paramLocation }) => {
+export default function ConfigSettings({
+  serverSettings, match, paramLocation, paramZoom,
+}) {
   document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
@@ -28,7 +29,6 @@ const ConfigSettings = ({ serverSettings, match, paramLocation }) => {
   const setAvailableForms = useStatic(state => state.setAvailableForms)
   const setMasterfile = useStatic(state => state.setMasterfile)
   const setUi = useStatic(state => state.setUi)
-  const setBreakpoint = useStatic(state => state.setBreakpoint)
   const setStaticFilters = useStatic(state => state.setFilters)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
@@ -52,11 +52,6 @@ const ConfigSettings = ({ serverSettings, match, paramLocation }) => {
   const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
   document.body.classList.add('dark')
 
-  let screenSize = 'xs'
-  if (useMediaQuery(theme.breakpoints.only('sm'))) screenSize = 'sm'
-  if (useMediaQuery(theme.breakpoints.up('md'))) screenSize = 'md'
-
-  setBreakpoint(screenSize)
   setUi(serverSettings.ui)
   setConfig(serverSettings.config)
   setMasterfile(serverSettings.masterfile)
@@ -96,10 +91,13 @@ const ConfigSettings = ({ serverSettings, match, paramLocation }) => {
   }
 
   const getStartZoom = () => {
-    if (match.path === '/') {
-      return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
+    if (paramZoom) {
+      return paramZoom
     }
-    return match.params.zoom
+    if (match.params.zoom) {
+      return match.params.zoom
+    }
+    return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
   }
 
   return (
@@ -111,10 +109,13 @@ const ConfigSettings = ({ serverSettings, match, paramLocation }) => {
         zoomControl={false}
         preferCanvas
       >
-        {serverSettings.user.perms.map && <Map serverSettings={serverSettings} />}
+        {serverSettings.user.perms.map && (
+          <Map
+            serverSettings={serverSettings}
+            params={match.params}
+          />
+        )}
       </MapContainer>
     </ThemeProvider>
   )
 }
-
-export default withRouter(ConfigSettings)

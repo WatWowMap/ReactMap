@@ -9,9 +9,11 @@ import {
   Switch,
   FormControlLabel,
   IconButton,
+  useMediaQuery,
 } from '@material-ui/core'
 import { Save, Replay, Clear } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@material-ui/styles'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from './StringFilter'
@@ -19,7 +21,8 @@ import SliderTile from './SliderTile'
 import Size from './Size'
 
 export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) {
-  const isMobile = useStatic(state => state.breakpoint) === 'xs'
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const ui = useStatic(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore(state => state.filters)

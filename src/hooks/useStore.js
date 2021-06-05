@@ -39,8 +39,6 @@ const useStatic = create(set => ({
   setUi: (ui) => set({ ui }),
   masterfile: {},
   setMasterfile: (masterfile) => set({ masterfile }),
-  breakpoint: false,
-  setBreakpoint: (breakpoint) => set({ breakpoint }),
   hideList: [],
   setHideList: (hideList) => set({ hideList }),
   excludeList: [],

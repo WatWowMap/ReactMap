@@ -15,7 +15,7 @@ const getId = (component, item) => {
 }
 
 export default function Clustering({
-  category, renderedData, userSettings, zoomLevel, staticUserSettings,
+  category, renderedData, userSettings, zoomLevel, staticUserSettings, params,
   filters, map, path, availableForms, perms, tileStyle, config,
 }) {
   const Component = index[category]
@@ -30,7 +30,7 @@ export default function Clustering({
       disableClusteringAtZoom={userSettings.clustering ? zoomLevel : 1}
       chunkedLoading
     >
-      {renderedData.map(each => {
+      {renderedData.map((each) => {
         if (!hideList.includes(each.id)) {
           return (
             <Component
@@ -50,6 +50,7 @@ export default function Clustering({
               excludeList={excludeList}
               userSettings={userSettings}
               staticUserSettings={staticUserSettings}
+              params={params}
             />
           )
         }

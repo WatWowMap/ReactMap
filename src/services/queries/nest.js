@@ -25,8 +25,8 @@ export const getAllNests = gql`
 
 export const getOne = gql`
   ${core}
-  query Data($id: ID!) {
-    nestsSingle(id: $id) {
+  query Data($id: ID!, $perm: String!) {
+    nestsSingle(id: $id, perm: $perm) {
       ...CoreNest
     }
   }

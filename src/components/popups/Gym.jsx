@@ -427,7 +427,7 @@ const RaidInfo = ({ gym, t }) => {
           {getRaidForm(raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution)}
         </Typography>
       </Grid>
-
+      {raid_pokemon_move_1 && (
       <Grid
         item
         xs={2}
@@ -439,11 +439,13 @@ const RaidInfo = ({ gym, t }) => {
           backgroundImage: `url(/images/type/${moves[raid_pokemon_move_1].type.toLowerCase()}.png)`,
         }}
       />
+      )}
       <Grid item xs={10} style={{ textAlign: 'center' }}>
         <Typography variant="caption" align="center">
           {t(`move_${raid_pokemon_move_1}`)}
         </Typography>
       </Grid>
+      {raid_pokemon_move_2 && (
       <Grid
         item
         xs={2}
@@ -455,6 +457,7 @@ const RaidInfo = ({ gym, t }) => {
           backgroundImage: `url(/images/type/${moves[raid_pokemon_move_2].type.toLowerCase()}.png)`,
         }}
       />
+      )}
       <Grid item xs={10} style={{ textAlign: 'center' }}>
         <Typography variant="caption" align="center">
           {t(`move_${raid_pokemon_move_2}`)}

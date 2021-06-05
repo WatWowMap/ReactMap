@@ -228,5 +228,8 @@
   "lureTimers": "All Lure Timers",
   "devicePathColor": "Device Path Color",
   "oldPortals": "Old Portals",
-  "newPortals": "New Portals"
+  "newPortals": "New Portals",
+  "items": "Items",
+  "energy": "Energy",
+  "arEligible": "AR Eligible"
 }

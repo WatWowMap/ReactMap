@@ -10,11 +10,13 @@ import {
   InputBase,
   IconButton,
   Typography,
+  useMediaQuery,
 } from '@material-ui/core'
 import { HighlightOff, Clear } from '@material-ui/icons'
 import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@material-ui/styles'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
@@ -27,15 +29,15 @@ import SlotSelection from './SlotSelection'
 
 export default function Menu({ filters, toggleDialog, category }) {
   const classes = useStyles()
+  const theme = useTheme()
   const menus = useStore(state => state.menus)
   const setMenus = useStore(state => state.setMenus)
-  const breakpoint = useStatic(state => state.breakpoint)
   const { [category]: staticMenus } = useStatic(state => state.menus)
   const { t } = useTranslation()
 
-  let columnCount = breakpoint === 'sm' ? 3 : 5
-  if (breakpoint === 'xs') columnCount = 1
-  const isMobile = breakpoint === 'xs'
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
+  let columnCount = window.matchMedia('(max-width: 960px)') ? 5 : 3
+  if (isMobile) columnCount = 1
 
   const [filterDrawer, setFilterDrawer] = useState(false)
   const [tempFilters, setTempFilters] = useState(filters.filter)

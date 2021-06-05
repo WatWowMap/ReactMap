@@ -151,7 +151,6 @@ const Header = ({
     { name: 'exclude', action: handleExclude },
     { name: 'timer', action: handleTimer },
   ]
-
   return (
     <>
       <Grid item xs={3}>
