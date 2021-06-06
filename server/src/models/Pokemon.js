@@ -9,10 +9,16 @@ const {
     { type, leagues },
   },
 } = require('../services/config')
+const dbSelection = require('../services/functions/dbSelection')
 
 class Pokemon extends Model {
   static get tableName() {
     return 'pokemon'
+  }
+
+  static get idColumn() {
+    return dbSelection('pokemon').type === 'mad'
+      ? 'encounter_id' : 'id'
   }
 
   static async getPokemon(args, perms) {
@@ -22,6 +28,7 @@ class Pokemon extends Model {
       onlyStandard, onlyIvOr,
     } = args.filters
     let queryPvp = false
+
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !stats && !pvp) {
       const noPokemonSelect = Object.keys(args.filters).find(x => x.charAt(0) !== 'o')
