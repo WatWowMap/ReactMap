@@ -235,17 +235,14 @@ class Pokemon extends Model {
         }
       })
     }
-
     // query builder
     const query = this.query()
+      .leftJoin('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
       .select([
         'encounter_id as id',
         'pokemon_id',
-        'latitude as lat',
-        'longitude as lon',
-        raw('UNIX_TIMESTAMP(disappear_time) as expire_timestamp'),
-        raw('IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL) as iv'),
-        raw('IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL) as level'),
+        'pokemon.latitude as lat',
+        'pokemon.longitude as lon',
         'individual_attack as atk_iv',
         'individual_defense as def_iv',
         'individual_stamina as sta_iv',
@@ -258,11 +255,15 @@ class Pokemon extends Model {
         'form',
         'costume',
         'weather_boosted_condition as weather',
-        raw('UNIX_TIMESTAMP(last_modified) as updated'),
+        'calc_endminsec',
+        raw('Unix_timestamp(Convert_tz(disappear_time, "+00:00", @@global.time_zone)) AS expire_timestamp'),
+        raw('IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL) as iv'),
+        raw('IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL) as level'),
+        raw('Unix_timestamp(Convert_tz(last_modified, "+00:00", @@global.time_zone)) AS updated'),
       ])
-      .where(raw('UNIX_TIMESTAMP(disappear_time)'), '>=', ts)
-      .andWhereBetween('latitude', [args.minLat, args.maxLat])
-      .andWhereBetween('longitude', [args.minLon, args.maxLon])
+      .where(raw('Unix_timestamp(Convert_tz(disappear_time, "+00:00", @@global.time_zone))'), '>=', ts)
+      .andWhereBetween('pokemon.latitude', [args.minLat, args.maxLat])
+      .andWhereBetween('pokemon.longitude', [args.minLon, args.maxLon])
       .andWhere(ivOr => {
         for (const [pkmn, filter] of Object.entries(args.filters)) {
           if (pkmn.includes('-')) {
@@ -288,6 +289,9 @@ class Pokemon extends Model {
     return results.map(pkmn => {
       if (pkmn.form === 0) {
         pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
+      }
+      if (pkmn.calc_endminsec) {
+        pkmn.expire_timestamp_verified = true
       }
       return pkmn
     })
