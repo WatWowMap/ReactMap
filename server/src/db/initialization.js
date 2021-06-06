@@ -12,6 +12,12 @@ const connections = Object.keys(schemas).map(name => Knex({
     password: schemas[name].password,
     database: schemas[name].database,
   },
+  pool: {
+    afterCreate(conn, done) {
+      conn.query('SET time_zone="+00:00";', (err) => done(err, conn))
+      console.log('Timezone Set')
+    },
+  },
 }))
 
 // Binds the models to the designated databases

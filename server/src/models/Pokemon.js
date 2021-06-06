@@ -209,7 +209,6 @@ class Pokemon extends Model {
   }
 
   static async getMadPokemon(args, perms) {
-    const ts = Math.floor((new Date()).getTime() / 1000)
     const { stats, iv: ivs, pvp } = perms
     const {
       onlyStandard,
@@ -263,12 +262,12 @@ class Pokemon extends Model {
         'costume',
         'weather_boosted_condition as weather',
         'calc_endminsec',
-        raw('Unix_timestamp(Convert_tz(disappear_time, "+00:00", @@global.time_zone)) AS expire_timestamp'),
+        raw('Unix_timestamp(disappear_time) AS expire_timestamp'),
+        raw('Unix_timestamp(last_modified) AS updated'),
         raw('IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL) as iv'),
         raw('IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL) as level'),
-        raw('Unix_timestamp(Convert_tz(last_modified, "+00:00", @@global.time_zone)) AS updated'),
       ])
-      .where(raw('Unix_timestamp(Convert_tz(disappear_time, "+00:00", @@global.time_zone))'), '>=', ts)
+      .where('disappear_time', '>=', this.knex().fn.now())
       .andWhereBetween('pokemon.latitude', [args.minLat, args.maxLat])
       .andWhereBetween('pokemon.longitude', [args.minLon, args.maxLon])
       .andWhere(ivOr => {
