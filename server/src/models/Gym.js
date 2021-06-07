@@ -53,39 +53,41 @@ class Gym extends Model {
     const raidBosses = new Set()
     const teams = []
     const eggs = []
-    const slots = {
-      initial: [],
+    const slots = []
+
+    Object.keys(args.filters).forEach(gym => {
+      if (gym.charAt(0) !== 'o') {
+        switch (gym.charAt(0)) {
+          default: raidBosses.add(gym.split('-')[0]); break
+          case 'e': eggs.push(gym.slice(1)); break
+          case 't': teams.push(gym.slice(1).split('-')[0]); break
+          case 'g': slots.push({
+            team: gym.slice(1).split('-')[0],
+            slots: 6 - gym.slice(1).split('-')[1],
+          }); break
+        }
+      }
+    })
+    const finalTeams = []
+    const finalSlots = {
       1: [],
       2: [],
       3: [],
     }
 
-    Object.keys(args.filters).forEach(raid => {
-      switch (raid.charAt(0)) {
-        default: raidBosses.add(raid.split('-')[0]); break
-        case 'e': eggs.push(raid.slice(1)); break
-        case 't': teams.push(raid.slice(1).split('-')[0]); break
-        case 'g': slots.initial.push({
-          team: raid.slice(1).split('-')[0],
-          slots: 6 - raid.slice(1).split('-')[1],
-        }); break
-      }
-    })
-    const finalTeams = []
-
     teams.forEach(team => {
       let slotCount = 0
-      slots.initial.forEach(slot => {
+      slots.forEach(slot => {
         if (slot.team === team) {
           slotCount += 1
-          slots[team].push(slot.slots)
+          finalSlots[team].push(slot.slots)
         }
       })
       if (slotCount === 6 || team == 0) {
+        delete finalSlots[team]
         finalTeams.push(team)
       }
     })
-    delete slots.initial
 
     query.andWhere(gym => {
       if (onlyExEligible && gyms) {
@@ -104,17 +106,25 @@ class Gym extends Model {
         })
       }
       if (onlyGyms && gyms) {
-        gym.orWhere(team => {
-          team.whereIn('team_id', finalTeams)
-        })
-        Object.keys(slots).forEach(team => {
-          if (slots[team].length > 0) {
-            gym.orWhere(gymSlot => {
-              gymSlot.where('team_id', team)
-                .whereIn(isMad ? 'slots_available' : 'availble_slots', slots[team])
+        if (finalTeams.length === 0 && slots.length === 0) {
+          gym.whereNull('team_id')
+        } else if (finalTeams.length === 4) {
+          gym.orWhereNotNull('team_id')
+        } else {
+          if (finalTeams.length > 0) {
+            gym.orWhere(team => {
+              team.whereIn('team_id', finalTeams)
             })
           }
-        })
+          Object.keys(finalSlots).forEach(team => {
+            if (finalSlots[team].length > 0) {
+              gym.orWhere(gymSlot => {
+                gymSlot.where('team_id', team)
+                  .whereIn(isMad ? 'slots_available' : 'availble_slots', finalSlots[team])
+              })
+            }
+          })
+        }
       }
       if (onlyRaids && raids) {
         gym.orWhere(pokemon => {
@@ -124,8 +134,12 @@ class Gym extends Model {
             .andWhere(isMad ? 'level' : 'raid_level', '>', 0)
         })
         gym.orWhere(egg => {
-          egg.whereIn(isMad ? 'level' : 'raid_level', eggs)
-            .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+          if (eggs.length === 6) {
+            egg.where(isMad ? 'level' : 'raid_level', '>', 0)
+          } else {
+            egg.whereIn(isMad ? 'level' : 'raid_level', eggs)
+          }
+          egg.andWhere(isMad ? 'start' : 'raid_battle_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
         })
       }
     })
@@ -160,7 +174,6 @@ class Gym extends Model {
       }
       return filteredResults
     }
-
     return secondaryFilter(await query)
   }
 
