@@ -54,7 +54,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.gyms || perms.raids) {
-          return Gym.getAllGyms(args, perms)
+          return Gym.getAllGyms(args, perms, Utility.dbSelection('gym') === 'mad')
         }
       },
     },

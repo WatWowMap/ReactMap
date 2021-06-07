@@ -3,14 +3,14 @@ const { database: { schemas } } = require('../services/config')
 const models = require('../models/index')
 
 // Establishes knex connections to each database listed in the config
-const connections = Object.keys(schemas).map(name => Knex({
+const connections = Object.values(schemas).map(schema => Knex({
   client: 'mysql',
   connection: {
-    host: schemas[name].host,
-    port: schemas[name].port,
-    user: schemas[name].username,
-    password: schemas[name].password,
-    database: schemas[name].database,
+    host: schema.host,
+    port: schema.port,
+    user: schema.username,
+    password: schema.password,
+    database: schema.database,
   },
   pool: {
     afterCreate(conn, done) {
@@ -21,8 +21,8 @@ const connections = Object.keys(schemas).map(name => Knex({
 }))
 
 // Binds the models to the designated databases
-Object.keys(schemas).forEach((name, index) => {
-  schemas[name].useFor.forEach(category => {
+Object.values(schemas).forEach((schema, index) => {
+  schema.useFor.forEach(category => {
     const capital = `${category.charAt(0).toUpperCase()}${category.slice(1)}`
     models[capital].knex(connections[index])
   })
