@@ -109,7 +109,7 @@ const RootQuery = new GraphQLObjectType({
           || perms.lures
           || perms.quests
           || perms.invasions) {
-          return Pokestop.getAllPokestops(args, perms)
+          return Pokestop.getAllPokestops(args, perms, Utility.dbSelection('pokestop') === 'mad')
         }
       },
     },

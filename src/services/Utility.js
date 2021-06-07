@@ -4,6 +4,7 @@ import menuFilter from './functions/menuFilter'
 import checkAdvFilter from './functions/checkAdvFilter'
 import getTimers from './functions/getTimeUntil'
 import dayCheck from './functions/dayCheck'
+import parseQuestConditions from './functions/parseConditions'
 
 class Utility {
   static getPokemonIcon(availableForms, pokemonId, form, evolution, gender, costume, shiny) {
@@ -28,6 +29,10 @@ class Utility {
 
   static dayCheck(ts, desiredStamp) {
     return dayCheck(ts, desiredStamp)
+  }
+
+  static parseConditions(conditions) {
+    return parseQuestConditions(conditions)
   }
 }
 

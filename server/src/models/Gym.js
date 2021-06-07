@@ -2,10 +2,16 @@
 const { Model, raw } = require('objection')
 const fetchRaids = require('../services/functions/fetchRaids')
 const { pokemon: masterfile } = require('../data/masterfile.json')
+const dbSelection = require('../services/functions/dbSelection')
 
 class Gym extends Model {
   static get tableName() {
     return 'gym'
+  }
+
+  static get idColumn() {
+    return dbSelection('gym').type === 'mad'
+      ? 'gym_id' : 'id'
   }
 
   static async getAllGyms(args, perms, isMad) {
@@ -44,6 +50,7 @@ class Gym extends Model {
           raw('Unix_timestamp(end) as raid_end_timestamp'),
           raw('Unix_timestamp(start) as raid_battle_timestamp'),
           raw('Unix_timestamp(gym.last_scanned) as updated'),
+          raw('isMad', true),
         ])
     }
     query.whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])

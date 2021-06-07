@@ -422,7 +422,7 @@ const RewardInfo = ({ pokestop, path, availableForms }) => {
 
 const QuestConditions = ({ pokestop, t }) => {
   const { quest_conditions, quest_type, quest_target } = pokestop
-  const [type1, type2] = JSON.parse(quest_conditions)
+  const [type1, type2] = Utility.parseConditions(quest_conditions)
   const primaryCondition = (
     <Typography variant="subtitle1">
       <Trans i18nKey={`quest_${quest_type}`}>
@@ -430,7 +430,6 @@ const QuestConditions = ({ pokestop, t }) => {
       </Trans>
     </Typography>
   )
-
   const getQuestConditions = (qType, qInfo) => {
     switch (qType) {
       default: return t(`quest_condition_${qType}`)
