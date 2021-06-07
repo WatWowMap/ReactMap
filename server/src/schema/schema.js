@@ -37,6 +37,26 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.devices) {
+          if (Utility.dbSelection('gym') === 'mad') {
+            const results = await Device.query()
+              .join('trs_status', 'settings_device.device_id', 'trs_status.device_id')
+              .join('settings_area', 'trs_status.area_id', 'settings_area.area_id')
+              .join('settings_routecalc', 'settings_area.area_id', 'settings_routecalc.routecalc_id')
+              .select([
+                'settings_device.name as uuid',
+                'settings_area.name as instance_name',
+                'mode as type',
+                'currentPos',
+                raw('Unix_timestamp(lastProtoDateTime) AS last_seen'),
+                'routefile as route',
+              ])
+            return results.map(device => ({
+              ...device,
+              isMad: true,
+              last_lat: device.currentPos.x,
+              last_lon: device.currentPos.y,
+            }))
+          }
           return Device.query()
             .join('instance', 'device.instance_name', '=', 'instance.name')
             .select('uuid', 'last_seen', 'last_lat', 'last_lon', 'type', 'instance_name',
