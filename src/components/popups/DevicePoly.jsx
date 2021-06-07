@@ -4,16 +4,11 @@ import { Polyline, Polygon } from 'react-leaflet'
 const DevicePoly = ({ device, color }) => {
   const parsedRoute = JSON.parse(device.route)
   const routeCheck = parsedRoute.length === 1 ? parsedRoute[0] : parsedRoute
-  const poly = (function generateRoute() {
-    if (device.isMad) {
-      return routeCheck.map(route => route.split(','))
-    }
-    return routeCheck.map(route => [route.lat, route.lon])
-  }())
+  const poly = routeCheck.map(route => [route.lat, route.lon])
 
   return (
     <>
-      {(device.type === 'circle_pokemon' || device.type === 'mon_mitm')
+      {(device.type === 'circle_pokemon')
         ? (
           <Polyline
             positions={poly}

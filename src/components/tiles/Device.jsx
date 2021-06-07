@@ -27,7 +27,7 @@ const DeviceTile = ({
           ts={ts}
         />
       </Popup>
-      {poly && <DevicePoly device={item} color={userSettings.devicePathColor} />}
+      {(poly && !item.isMad) && <DevicePoly device={item} color={userSettings.devicePathColor} />}
     </Marker>
   )
 }
