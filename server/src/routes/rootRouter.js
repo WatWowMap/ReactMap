@@ -99,10 +99,18 @@ rootRouter.get('/settings', async (req, res) => {
         pokemon, quests, raids, nests,
       } = config.api.queryAvailable
       serverSettings.available = {
-        pokemon: pokemon ? await Pokemon.getAvailablePokemon() : [],
-        gyms: raids ? await Gym.getAvailableRaidBosses() : await Utility.fetchRaids(),
-        pokestops: quests ? await Pokestop.getAvailableQuests() : await Utility.fetchQuests(),
-        nests: nests ? await Nest.getAvailableNestingSpecies() : await Utility.fetchNests(),
+        pokemon: pokemon
+          ? await Pokemon.getAvailablePokemon(Utility.dbSelection('pokemon'))
+          : [],
+        gyms: raids
+          ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym'))
+          : await Utility.fetchRaids(),
+        pokestops: quests
+          ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop'))
+          : await Utility.fetchQuests(),
+        nests: nests
+          ? await Nest.getAvailableNestingSpecies()
+          : await Utility.fetchNests(),
       }
 
       serverSettings.ui = Utility.buildPrimaryUi(serverSettings.defaultFilters, serverSettings.user.perms)

@@ -177,14 +177,23 @@ class Gym extends Model {
     return secondaryFilter(await query)
   }
 
-  static async getAvailableRaidBosses() {
+  static async getAvailableRaidBosses(isMad) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const results = await this.query()
-      .select('raid_pokemon_id', 'raid_pokemon_form', 'raid_level')
-      .where('raid_end_timestamp', '>', ts)
-      .andWhere('raid_level', '>', 0)
-      .groupBy('raid_pokemon_id', 'raid_pokemon_form', 'raid_level')
-      .orderBy('raid_pokemon_id', 'asc')
+      .select([
+        isMad ? 'pokemon_id as raid_pokemon_id' : 'raid_pokemon_id',
+        isMad ? 'form as raid_pokemon_form' : 'raid_pokemon_form',
+        isMad ? 'level as raid_level' : 'raid_level',
+      ])
+      .from(isMad ? 'raid' : 'gym')
+      .where(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+      .andWhere(isMad ? 'level' : 'raid_level', '>', 0)
+      .groupBy([
+        isMad ? 'pokemon_id' : 'raid_pokemon_id',
+        isMad ? 'form' : 'raid_pokemon_form',
+        isMad ? 'level' : 'raid_level',
+      ])
+      .orderBy(isMad ? 'pokemon_id' : 'raid_pokemon_id', 'asc')
     if (results.length === 0) {
       return fetchRaids()
     }

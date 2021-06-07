@@ -312,13 +312,13 @@ class Pokemon extends Model {
     return legacyFilter(results, args, perms)
   }
 
-  static async getAvailablePokemon() {
+  static async getAvailablePokemon(isMad) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const results = await this.query()
-      .select('pokemon_id as id', 'form', 'expire_timestamp as time')
+      .select('pokemon_id', 'form')
+      .where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+      .groupBy('pokemon_id', 'form')
       .orderBy('pokemon_id', 'asc')
-      .where('expire_timestamp', '>=', ts)
-    // .groupBy('pokemon_id', 'form')
     return results.map(pkmn => {
       if (pkmn.form === 0) {
         const formId = masterfile[pkmn.pokemon_id].default_form_id
