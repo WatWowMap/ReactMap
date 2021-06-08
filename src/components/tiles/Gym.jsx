@@ -71,11 +71,11 @@ const GymTile = ({
             />
           )}
           {userSettings.interactionRanges && (
-          <Circle
-            center={[item.lat, item.lon]}
-            radius={70}
-            pathOptions={{ color: getColor(item.team_id), weight: 1 }}
-          />
+            <Circle
+              center={[item.lat, item.lon]}
+              radius={70}
+              pathOptions={{ color: getColor(item.team_id), weight: 1 }}
+            />
           )}
         </Marker>
       )}
@@ -126,6 +126,7 @@ const areEqual = (prev, next) => {
     && !next.excludeList.includes(`e${prev.item.raid_level}`)
     && prev.path === next.path
     && prev.userSettings.raidTimers === next.userSettings.raidTimers
+    && prev.userSettings.interactionRanges === next.userSettings.interactionRanges
   )
 }
 

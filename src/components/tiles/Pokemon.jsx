@@ -112,6 +112,7 @@ const areEqual = (prev, next) => (
   && !next.excludeList.includes(`${prev.item.pokemon_id}-${prev.item.form}`)
   && prev.path === next.path
   && prev.userSettings.legacyFilter === next.userSettings.legacyFilter
+  && prev.userSettings.interactionRanges === next.userSettings.interactionRanges
 )
 
 export default memo(PokemonTile, areEqual)

@@ -113,6 +113,7 @@ const areEqual = (prev, next) => (
   && !next.excludeList.includes(`q${prev.item.quest_item_id}`)
   && prev.userSettings.invasionTimers === next.userSettings.invasionTimers
   && prev.userSettings.lureTimers === next.userSettings.lureTimers
+  && prev.userSettings.interactionRanges === next.userSettings.interactionRanges
 )
 
 export default memo(PokestopTile, areEqual)
