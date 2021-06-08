@@ -236,24 +236,47 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.submissionCells) {
-          const pokestops = await Pokestop.query()
-            .select(['id', 'lat', 'lon'])
-            .whereBetween('lat', [args.minLat - 0.025, args.maxLat + 0.025])
-            .andWhereBetween('lon', [args.minLon - 0.025, args.maxLon + 0.025])
-            .andWhere('deleted', false)
-            .andWhere(poi => {
-              poi.whereNull('sponsor_id')
-                .orWhere('sponsor_id', 0)
-            })
-          const gyms = await Gym.query()
-            .select(['id', 'lat', 'lon'])
-            .whereBetween('lat', [args.minLat - 0.025, args.maxLat + 0.025])
-            .andWhereBetween('lon', [args.minLon - 0.025, args.maxLon + 0.025])
-            .andWhere('deleted', false)
-            .andWhere(poi => {
-              poi.whereNull('sponsor_id')
-                .orWhere('sponsor_id', 0)
-            })
+          const isMadStops = Utility.dbSelection('pokestop') === 'mad'
+          const isMadGyms = Utility.dbSelection('gym') === 'mad'
+
+          const stopQuery = Pokestop.query()
+          if (isMadStops) {
+            stopQuery.select([
+              'pokestop_id AS id',
+              'latitude AS lat',
+              'longitude AS lon',
+            ])
+          } else {
+            stopQuery.select(['id', 'lat', 'lon'])
+              .andWhere(poi => {
+                poi.whereNull('sponsor_id')
+                  .orWhere('sponsor_id', 0)
+              })
+          }
+
+          const gymQuery = Gym.query()
+          if (isMadGyms) {
+            gymQuery.select([
+              'gym_id AS id',
+              'latitude AS lat',
+              'longitude AS lon',
+            ])
+          } else {
+            gymQuery.select(['id', 'lat', 'lon'])
+              .where(poi => {
+                poi.whereNull('sponsor_id')
+                  .orWhere('sponsor_id', 0)
+              })
+          }
+
+          [stopQuery, gymQuery].forEach((query, i) => {
+            const isMad = [isMadStops, isMadGyms]
+            query.whereBetween(`lat${isMad[i] ? 'itude' : ''}`, [args.minLat - 0.025, args.maxLat + 0.025])
+              .andWhereBetween(`lon${isMad[i] ? 'gitude' : ''}`, [args.minLon - 0.025, args.maxLon + 0.025])
+              .andWhere(isMad[i] ? 'enabled' : 'deleted', isMad[i])
+          })
+          const pokestops = await stopQuery
+          const gyms = await gymQuery
           return [{
             placementCells: Utility.getPlacementCells(args, pokestops, gyms),
             typeCells: Utility.getTypeCells(args, pokestops, gyms),
