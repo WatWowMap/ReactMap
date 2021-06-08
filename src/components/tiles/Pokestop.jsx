@@ -9,7 +9,7 @@ import stopMarker from '../markers/pokestop'
 import Timer from './Timer'
 
 const PokestopTile = ({
-  item, ts, showTimer, filters, iconSizes, path, availableForms, perms, excludeList, userSettings, params,
+  item, ts, showTimer, filters, iconSizes, path, availableForms, perms, excludeList, userSettings, params, showCircles,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
@@ -84,7 +84,7 @@ const PokestopTile = ({
                   offset={hasInvasion ? [5, 20] : [0, 20]}
                 />
               )}
-            {userSettings.interactionRanges && (
+            {showCircles && (
               <Circle
                 center={[item.lat, item.lon]}
                 radius={70}
@@ -114,7 +114,7 @@ const areEqual = (prev, next) => (
   && !next.excludeList.includes(`q${prev.item.quest_item_id}`)
   && prev.userSettings.invasionTimers === next.userSettings.invasionTimers
   && prev.userSettings.lureTimers === next.userSettings.lureTimers
-  && prev.userSettings.interactionRanges === next.userSettings.interactionRanges
+  && prev.showCircles === next.showCircles
   && prev.userSettings.madQuestText === next.userSettings.madQuestText
 )
 

@@ -18,7 +18,7 @@ const getColor = team => {
 }
 
 const GymTile = ({
-  item, ts, showTimer, iconSizes, filters, path, availableForms, excludeList, userSettings, params,
+  item, ts, showTimer, iconSizes, filters, path, availableForms, excludeList, userSettings, params, showCircles,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
@@ -70,7 +70,7 @@ const GymTile = ({
               offset={[0, 10]}
             />
           )}
-          {userSettings.interactionRanges && (
+          {showCircles && (
             <Circle
               center={[item.lat, item.lon]}
               radius={70}
@@ -126,7 +126,7 @@ const areEqual = (prev, next) => {
     && !next.excludeList.includes(`e${prev.item.raid_level}`)
     && prev.path === next.path
     && prev.userSettings.raidTimers === next.userSettings.raidTimers
-    && prev.userSettings.interactionRanges === next.userSettings.interactionRanges
+    && prev.showCircles === next.showCircles
   )
 }
 

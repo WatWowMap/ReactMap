@@ -28,7 +28,7 @@ const operator = {
 
 const PokemonTile = ({
   item, showTimer, filters, iconSizes, path, availableForms, excludeList,
-  userSettings, staticUserSettings, params,
+  userSettings, staticUserSettings, params, showCircles,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
@@ -91,7 +91,7 @@ const PokemonTile = ({
               offset={[0, 30]}
             />
           )}
-          {userSettings.interactionRanges && (
+          {showCircles && (
             <Circle
               center={[item.lat, item.lon]}
               radius={35}
@@ -112,7 +112,7 @@ const areEqual = (prev, next) => (
   && !next.excludeList.includes(`${prev.item.pokemon_id}-${prev.item.form}`)
   && prev.path === next.path
   && prev.userSettings.legacyFilter === next.userSettings.legacyFilter
-  && prev.userSettings.interactionRanges === next.userSettings.interactionRanges
+  && prev.showCircles === next.showCircles
 )
 
 export default memo(PokemonTile, areEqual)
