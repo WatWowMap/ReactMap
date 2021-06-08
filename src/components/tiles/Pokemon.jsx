@@ -1,7 +1,7 @@
 import React, {
   useCallback, useEffect, memo, useRef, useState,
 } from 'react'
-import { Marker, Popup } from 'react-leaflet'
+import { Marker, Popup, Circle } from 'react-leaflet'
 
 import Utility from '@services/Utility'
 import PopupContent from '../popups/Pokemon'
@@ -89,6 +89,13 @@ const PokemonTile = ({
               timestamp={item.expire_timestamp}
               direction="center"
               offset={[0, 30]}
+            />
+          )}
+          {userSettings.interactionRanges && (
+            <Circle
+              center={[item.lat, item.lon]}
+              radius={35}
+              pathOptions={{ color: '#BA42F6', weight: 1 }}
             />
           )}
         </Marker>

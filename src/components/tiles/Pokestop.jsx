@@ -2,7 +2,7 @@
 import React, {
   memo, useState, useEffect, useRef,
 } from 'react'
-import { Marker, Popup } from 'react-leaflet'
+import { Marker, Popup, Circle } from 'react-leaflet'
 
 import PopupContent from '../popups/Pokestop'
 import stopMarker from '../markers/pokestop'
@@ -83,6 +83,13 @@ const PokestopTile = ({
                   offset={hasInvasion ? [5, 20] : [0, 20]}
                 />
               )}
+            {userSettings.interactionRanges && (
+              <Circle
+                center={[item.lat, item.lon]}
+                radius={70}
+                pathOptions={{ color: '#0DA8E7', weight: 1 }}
+              />
+            )}
           </Marker>
         )}
     </>
