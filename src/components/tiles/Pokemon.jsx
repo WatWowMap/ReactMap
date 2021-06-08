@@ -53,7 +53,7 @@ const PokemonTile = ({
     return glowValue
   }, [])
   const glowStatus = userSettings.glow ? getGlowStatus() : undefined
-
+  const ivCircle = userSettings.ivCircles && item.iv >= userSettings.minIvCircle
   useEffect(() => {
     const { id } = params
     if (id === item.id) {
@@ -73,8 +73,8 @@ const PokemonTile = ({
             }
           }}
           position={[item.lat, item.lon]}
-          icon={(item.bestPvp < 4 || glowStatus)
-            ? fancyMarker(iconUrl, item, filters, iconSizes, glowStatus)
+          icon={(item.bestPvp < 4 || glowStatus || ivCircle)
+            ? fancyMarker(iconUrl, item, filters, iconSizes, glowStatus, userSettings.ivCircles)
             : basicMarker(iconUrl, item, filters, iconSizes)}
         >
           <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
@@ -105,6 +105,8 @@ const areEqual = (prev, next) => (
   && !next.excludeList.includes(`${prev.item.pokemon_id}-${prev.item.form}`)
   && prev.path === next.path
   && prev.userSettings.legacyFilter === next.userSettings.legacyFilter
+  && prev.userSettings.ivCircles === next.userSettings.ivCircles
+  && prev.userSettings.minIvCircle === next.userSettings.minIvCircle
 )
 
 export default memo(PokemonTile, areEqual)

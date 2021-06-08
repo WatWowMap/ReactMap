@@ -93,6 +93,7 @@ export default function UserOptions({ category, toggleDialog }) {
             size="small"
             type={fullOption.type}
             disabled={fullOption.disabled}
+            endAdornment={fullOption.label || ''}
             inputProps={{
               min: 0,
               max: 100,
@@ -107,6 +108,7 @@ export default function UserOptions({ category, toggleDialog }) {
             checked={localState[subOption || option]}
             name={subOption || option}
             onChange={handleChange}
+            disabled={fullOption.disabled}
           />
         </Grid>
       )

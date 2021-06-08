@@ -19,7 +19,9 @@ module.exports = function clientOptions(perms) {
       clustering: { type: 'bool', perm: ['pokemon'] },
       prioritizePvpInfo: { type: 'bool', perm: ['pvp'] },
       legacyFilter: { type: 'bool', perm: ['iv', 'stats', 'pvp'] },
-      glow: { type: 'bool', sub: {}, perm: ['pokemon'] },
+      ivCircles: { type: 'bool', perm: ['iv'] },
+      minIvCircle: { type: 'number', perm: ['iv'], label: '%' },
+      glow: { type: 'bool', sub: {}, perm: ['iv', 'stats', 'pvp'] },
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'] },
