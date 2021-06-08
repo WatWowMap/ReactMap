@@ -1,4 +1,5 @@
 const { clientSideOptions } = require('../config')
+const dbSelection = require('../functions/dbSelection')
 
 module.exports = function clientOptions(perms) {
   // the values here are the relevant perms to use them, they are looped through and the values are set based on your config, then the type is set based off of those values in the above function
@@ -9,11 +10,13 @@ module.exports = function clientOptions(perms) {
     gyms: {
       clustering: { type: 'bool', perm: ['gyms', 'raids'] },
       raidTimers: { type: 'bool', perm: ['raids'] },
+      interactionRanges: { type: 'bool', perm: ['gyms', 'raids'] },
     },
     pokestops: {
       clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },
       invasionTimers: { type: 'bool', perm: ['invasions'] },
       lureTimers: { type: 'bool', perm: ['lures'] },
+      interactionRanges: { type: 'bool', perm: ['pokestops'] },
     },
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'] },
@@ -21,7 +24,8 @@ module.exports = function clientOptions(perms) {
       legacyFilter: { type: 'bool', perm: ['iv', 'stats', 'pvp'] },
       ivCircles: { type: 'bool', perm: ['iv'] },
       minIvCircle: { type: 'number', perm: ['iv'], label: '%' },
-      glow: { type: 'bool', sub: {}, perm: ['iv', 'stats', 'pvp'] },
+      interactionRanges: { type: 'bool', perm: ['pokemon'] },
+      glow: { type: 'bool', sub: {}, perm: ['pokemon'] },
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'] },
@@ -30,6 +34,9 @@ module.exports = function clientOptions(perms) {
     },
   }
 
+  if (dbSelection('pokestop') === 'mad') {
+    clientMenus.pokestops.madQuestText = { type: 'bool', perm: ['quests'] }
+  }
   // only the keys & values are stored locally
   const clientValues = {}
 

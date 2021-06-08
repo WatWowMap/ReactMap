@@ -17,10 +17,15 @@
 - Discord Auth & Permission Based Viewing
 
 ## PreReqs
-- NodeJS (Recommend using V12.*)
+- NodeJS (Recommend using V12+)
 - MySQL (Only 8.0+ has been tested)
 - Or MariaDB (10.4 has been tested)
 - Yarn (npm install -g yarn)
+
+## Backends Supported:
+- [Chuck](https://github.com/WatWowMap/Chuck)
+- [RealDeviceMap (RDM)](https://github.com/realdevicemap/realdevicemap)
+- [Map-A-Droid (MAD)](https://github.com/Map-A-Droid/MAD)
 
 ## Installation Instructions
 1. Clone the repo
@@ -117,7 +122,6 @@ If you're using Chuck to parse Pokemon you can add any number of leagues to the 
 ```
 
 ## Coming Soon
-- AR Quest Eligibility for Stops
 - Built in event viewer
 - Expand the help modals
 - Persist some menu selections

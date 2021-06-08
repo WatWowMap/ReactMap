@@ -41,12 +41,11 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
-      "type": "rdm/chuck/cdc/mad",
       "leagues": ["great", "ultra"]
     },
     "schemas": {
       "scanner": {
-        "type": "rdm",
+        "type": "rdm/chuck/cdc/mad/manual",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",

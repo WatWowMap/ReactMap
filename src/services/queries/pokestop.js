@@ -37,6 +37,7 @@ const quest = gql`
     quest_shiny
     mega_pokemon_id
     mega_amount
+    quest_task
   }
 `
 

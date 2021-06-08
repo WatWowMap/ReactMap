@@ -1,5 +1,5 @@
 const {
-  GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLFloat,
+  GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLFloat, GraphQLBoolean,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
 
@@ -13,5 +13,6 @@ module.exports = new GraphQLObjectType({
     last_lon: { type: GraphQLFloat },
     type: { type: GraphQLString },
     route: { type: JSONResolver },
+    isMad: { type: GraphQLBoolean },
   }),
 })

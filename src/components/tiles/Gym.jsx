@@ -2,14 +2,23 @@
 import React, {
   memo, useState, useEffect, useRef,
 } from 'react'
-import { Marker, Popup } from 'react-leaflet'
+import { Marker, Popup, Circle } from 'react-leaflet'
 
 import gymMarker from '../markers/gym'
 import PopupContent from '../popups/Gym'
 import Timer from './Timer'
 
+const getColor = team => {
+  switch (team) {
+    default: return '#A9A9A9'
+    case 1: return '#0030C8'
+    case 2: return '#D83C22'
+    case 3: return '#F1F642'
+  }
+}
+
 const GymTile = ({
-  item, ts, showTimer, iconSizes, filters, path, availableForms, excludeList, userSettings, params,
+  item, ts, showTimer, iconSizes, filters, path, availableForms, excludeList, userSettings, params, showCircles,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
@@ -61,6 +70,13 @@ const GymTile = ({
               offset={[0, 10]}
             />
           )}
+          {showCircles && (
+            <Circle
+              center={[item.lat, item.lon]}
+              radius={70}
+              pathOptions={{ color: getColor(item.team_id), weight: 1 }}
+            />
+          )}
         </Marker>
       )}
     </>
@@ -110,6 +126,7 @@ const areEqual = (prev, next) => {
     && !next.excludeList.includes(`e${prev.item.raid_level}`)
     && prev.path === next.path
     && prev.userSettings.raidTimers === next.userSettings.raidTimers
+    && prev.showCircles === next.showCircles
   )
 }
 

@@ -1,7 +1,7 @@
 import React, {
   useCallback, useEffect, memo, useRef, useState,
 } from 'react'
-import { Marker, Popup } from 'react-leaflet'
+import { Marker, Popup, Circle } from 'react-leaflet'
 
 import Utility from '@services/Utility'
 import PopupContent from '../popups/Pokemon'
@@ -28,7 +28,7 @@ const operator = {
 
 const PokemonTile = ({
   item, showTimer, filters, iconSizes, path, availableForms, excludeList,
-  userSettings, staticUserSettings, params,
+  userSettings, staticUserSettings, params, showCircles,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
@@ -91,6 +91,13 @@ const PokemonTile = ({
               offset={[0, 30]}
             />
           )}
+          {showCircles && (
+            <Circle
+              center={[item.lat, item.lon]}
+              radius={35}
+              pathOptions={{ color: '#BA42F6', weight: 1 }}
+            />
+          )}
         </Marker>
       )}
     </>
@@ -107,6 +114,7 @@ const areEqual = (prev, next) => (
   && prev.userSettings.legacyFilter === next.userSettings.legacyFilter
   && prev.userSettings.ivCircles === next.userSettings.ivCircles
   && prev.userSettings.minIvCircle === next.userSettings.minIvCircle
+  && prev.showCircles === next.showCircles
 )
 
 export default memo(PokemonTile, areEqual)

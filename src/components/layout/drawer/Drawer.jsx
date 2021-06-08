@@ -65,7 +65,7 @@ export default function DrawerMenu({
         onChange={handleChange(category)}
       >
         <AccordionSummary
-          expandIcon={<ExpandMore />}
+          expandIcon={<ExpandMore style={{ color: 'white' }} />}
         >
           <Typography className={classes.heading}>
             {t(category)}
@@ -87,7 +87,7 @@ export default function DrawerMenu({
                   onClick={toggleDialog(true, category, 'options')}
                   variant="contained"
                   color="secondary"
-                  startIcon={<Settings />}
+                  startIcon={<Settings style={{ color: 'white' }} />}
                 >
                   {t('options')}
                 </Button>
@@ -159,7 +159,7 @@ export default function DrawerMenu({
         </Grid>
         <Grid item xs={2}>
           <IconButton onClick={toggleDrawer(false)}>
-            <Clear />
+            <Clear style={{ color: 'white' }} />
           </IconButton>
         </Grid>
       </Grid>
