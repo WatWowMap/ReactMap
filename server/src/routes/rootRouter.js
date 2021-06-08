@@ -98,19 +98,29 @@ rootRouter.get('/settings', async (req, res) => {
       const {
         pokemon, quests, raids, nests,
       } = config.api.queryAvailable
-      serverSettings.available = {
-        pokemon: pokemon
-          ? await Pokemon.getAvailablePokemon(Utility.dbSelection('pokemon') === 'mad')
-          : [],
-        gyms: raids
-          ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym') === 'mad')
-          : await Utility.fetchRaids(),
-        pokestops: quests
-          ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop') === 'mad')
-          : await Utility.fetchQuests(),
-        nests: nests
-          ? await Nest.getAvailableNestingSpecies()
-          : await Utility.fetchNests(),
+      try {
+        serverSettings.available = {
+          pokemon: pokemon
+            ? await Pokemon.getAvailablePokemon(Utility.dbSelection('pokemon') === 'mad')
+            : [],
+          gyms: raids
+            ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym') === 'mad')
+            : await Utility.fetchRaids(),
+          pokestops: quests
+            ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop') === 'mad')
+            : await Utility.fetchQuests(),
+          nests: nests
+            ? await Nest.getAvailableNestingSpecies()
+            : await Utility.fetchNests(),
+        }
+      } catch (e) {
+        serverSettings.available = {
+          pokemon: [],
+          gyms: await Utility.fetchRaids(),
+          pokestops: await Utility.fetchQuests(),
+          nests: await Utility.fetchNests(),
+        }
+        console.warn(e, '\nUnable to query available, attempting to fetch from GitHub instead')
       }
 
       serverSettings.ui = Utility.buildPrimaryUi(serverSettings.defaultFilters, serverSettings.user.perms)
