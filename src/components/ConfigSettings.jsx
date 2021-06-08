@@ -1,4 +1,5 @@
 import React from 'react'
+import { Redirect } from 'react-router-dom'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
 import { ThemeProvider } from '@material-ui/styles'
@@ -11,6 +12,17 @@ import Map from './Map'
 export default function ConfigSettings({
   serverSettings, match, paramLocation, paramZoom,
 }) {
+  if (serverSettings.error) {
+    return (
+      <Redirect
+        push
+        to={{
+          pathname: '/login',
+          state: { message: 'cannotConnect' },
+        }}
+      />
+    )
+  }
   document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 

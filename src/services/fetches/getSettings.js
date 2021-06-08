@@ -8,6 +8,7 @@ export default async function getSettings() {
     return body.serverSettings
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(error.message)
+    console.error(error.message, '\nUnable to fetch settings at this time, please try again later.')
+    return { error: true }
   }
 }
