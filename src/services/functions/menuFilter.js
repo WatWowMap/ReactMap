@@ -59,7 +59,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
         case 'd': urlBuilder = '/images/item/-1'; break
         case 'q': urlBuilder = `/images/item/${id.slice(1)}`; break
         case 'l': urlBuilder = `/images/pokestop/${id == 0 ? id : id.slice(-1)}`; break
-        case 'm': urlBuilder = `${path}/${getPokemonIcon(availableForms, id.slice(1).split('-')[0], 0, (id.slice(1).split('-')[0] == 6 || id.slice(1).split('-')[0] == 150) ? 2 : 1)}`; break
+        case 'm': urlBuilder = `${path}/${getPokemonIcon(availableForms, id.slice(1).split('-')[0])}`; break
       }
       const url = `${urlBuilder}.png`
       filteredArr.push({ id, name: stop.name, url })
