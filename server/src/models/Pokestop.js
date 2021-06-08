@@ -46,10 +46,14 @@ class Pokestop extends Model {
           'quest_reward AS quest_rewards',
           'quest_pokemon_form_id AS quest_form_id',
           'quest_pokemon_costume_id AS quest_costume_id',
-          raw('UNIX_TIMESTAMP(last_modified) AS last_modified_timestamp'),
-          raw('UNIX_TIMESTAMP(lure_expiration) AS lure_expire_timestamp'),
-          raw('UNIX_TIMESTAMP(last_updated) AS updated'),
-          raw('UNIX_TIMESTAMP(incident_expiration) AS incident_expire_timestamp'),
+          raw('UNIX_TIMESTAMP(last_modified)')
+            .as('last_modified_timestamp'),
+          raw('UNIX_TIMESTAMP(lure_expiration)')
+            .as('lure_expire_timestamp'),
+          raw('UNIX_TIMESTAMP(last_updated)')
+            .as('updated'),
+          raw('UNIX_TIMESTAMP(incident_expiration)')
+            .as('incident_expire_timestamp'),
         ])
     }
     query.whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])

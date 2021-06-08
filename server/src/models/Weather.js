@@ -24,7 +24,8 @@ class Weather extends Model {
     if (isMad) {
       query.select([
         'gameplay_weather AS gameplay_condition',
-        raw('UNIX_TIMESTAMP(last_updated) AS updated'),
+        raw('UNIX_TIMESTAMP(last_updated)')
+          .as('updated'),
       ])
     } else {
       const ts = Math.floor((new Date()).getTime() / 1000)

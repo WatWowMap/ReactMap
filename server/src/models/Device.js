@@ -19,7 +19,8 @@ class Device extends Model {
           'settings_device.name AS uuid',
           'settings_area.name AS instance_name',
           'mode AS type',
-          raw('UNIX_TIMESTAMP(lastProtoDateTime) AS last_seen'),
+          raw('UNIX_TIMESTAMP(lastProtoDateTime)')
+            .as('last_seen'),
           raw('X(currentPos)')
             .as('last_lat'),
           raw('Y(currentPos)')

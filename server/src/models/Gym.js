@@ -23,34 +23,37 @@ class Gym extends Model {
     const query = this.query()
 
     if (isMad) {
-      query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
-        .leftJoin('raid', 'gym.gym_id', 'raid.gym_id')
+      query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+        .join('raid', 'gym.gym_id', 'raid.gym_id')
         .select([
-          'gym.gym_id as id',
+          'gym.gym_id AS id',
           'name',
           'url',
-          'latitude as lat',
-          'longitude as lon',
+          'latitude AS lat',
+          'longitude AS lon',
           'team_id',
-          'slots_available as availble_slots',
-          'is_in_battle as in_battle',
-          'guard_pokemon_id as guarding_pokemon_id',
+          'slots_available AS availble_slots',
+          'is_in_battle AS in_battle',
+          'guard_pokemon_id AS guarding_pokemon_id',
           'total_cp',
-          'is_ex_raid_eligible as ex_raid_eligible',
-          'is_ar_scan_eligible as ar_scan_eligible',
-          'level as raid_level',
-          'pokemon_id as raid_pokemon_id',
-          'raid.form as raid_pokemon_form',
-          'raid.gender as raid_pokemon_gender',
-          'raid.costume as raid_pokemon_costume',
-          'evolution as raid_pokemon_evolution',
-          'move_1 as raid_pokemon_move_1',
-          'move_2 as raid_pokemon_move_2',
-          raw('Unix_timestamp(last_modified) AS last_modified_timestamp'),
-          raw('Unix_timestamp(end) as raid_end_timestamp'),
-          raw('Unix_timestamp(start) as raid_battle_timestamp'),
-          raw('Unix_timestamp(gym.last_scanned) as updated'),
-          raw('isMad', true),
+          'is_ex_raid_eligible AS ex_raid_eligible',
+          'is_ar_scan_eligible AS ar_scan_eligible',
+          'level AS raid_level',
+          'pokemon_id AS raid_pokemon_id',
+          'raid.form AS raid_pokemon_form',
+          'raid.gender AS raid_pokemon_gender',
+          'raid.costume AS raid_pokemon_costume',
+          'evolution AS raid_pokemon_evolution',
+          'move_1 AS raid_pokemon_move_1',
+          'move_2 AS raid_pokemon_move_2',
+          raw('UNIX_TIMESTAMP(last_modified)')
+            .as('last_modified_timestamp'),
+          raw('UNIX_TIMESTAMP(end)')
+            .as('raid_end_timestamp'),
+          raw('UNIX_TIMESTAMP(start)')
+            .as('raid_battle_timestamp'),
+          raw('UNIX_TIMESTAMP(gym.last_scanned)')
+            .as('updated'),
         ])
     }
     query.whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
@@ -188,9 +191,9 @@ class Gym extends Model {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const results = await this.query()
       .select([
-        isMad ? 'pokemon_id as raid_pokemon_id' : 'raid_pokemon_id',
-        isMad ? 'form as raid_pokemon_form' : 'raid_pokemon_form',
-        isMad ? 'level as raid_level' : 'raid_level',
+        isMad ? 'pokemon_id AS raid_pokemon_id' : 'raid_pokemon_id',
+        isMad ? 'form AS raid_pokemon_form' : 'raid_pokemon_form',
+        isMad ? 'level AS raid_level' : 'raid_level',
       ])
       .from(isMad ? 'raid' : 'gym')
       .where(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
