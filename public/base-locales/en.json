@@ -232,6 +232,7 @@
   "items": "Items",
   "energy": "Energy",
   "arEligible": "AR Eligible",
+  "interactionRanges": "Interaction Ranges",
   "cannotConnect": "\nUnable to connect to the server at this time.\nTrying again immediately will only cause more issues.\nPlease try again in a few minutes.\n\n- Map Admin Team",
   "madQuestText": "Native Quests"
 }

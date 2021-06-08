@@ -10,16 +10,19 @@ module.exports = function clientOptions(perms) {
     gyms: {
       clustering: { type: 'bool', perm: ['gyms', 'raids'] },
       raidTimers: { type: 'bool', perm: ['raids'] },
+      interactionRanges: { type: 'bool', perm: ['gyms', 'raids'] },
     },
     pokestops: {
       clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },
       invasionTimers: { type: 'bool', perm: ['invasions'] },
       lureTimers: { type: 'bool', perm: ['lures'] },
+      interactionRanges: { type: 'bool', perm: ['pokestops'] },
     },
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'] },
       prioritizePvpInfo: { type: 'bool', perm: ['pvp'] },
       legacyFilter: { type: 'bool', perm: ['iv', 'stats', 'pvp'] },
+      interactionRanges: { type: 'bool', perm: ['pokemon'] },
       glow: { type: 'bool', sub: {}, perm: ['pokemon'] },
     },
     wayfarer: {

@@ -25,6 +25,7 @@ export default function Clustering({
   const ts = Math.floor((new Date()).getTime() / 1000)
   const currentZoom = map.getZoom()
 
+  const showCircles = userSettings.interactionRanges && currentZoom >= config.interactionRangeZoom
   return (
     <MarkerClusterGroup
       disableClusteringAtZoom={userSettings.clustering ? zoomLevel : 1}
@@ -51,6 +52,7 @@ export default function Clustering({
               userSettings={userSettings}
               staticUserSettings={staticUserSettings}
               params={params}
+              showCircles={showCircles}
             />
           )
         }
