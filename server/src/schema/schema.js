@@ -3,7 +3,6 @@ const {
   GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
-const { ref } = require('objection')
 const fs = require('fs')
 
 const DeviceType = require('./device')
@@ -203,14 +202,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.s2cells) {
-          const results = await S2cell.query()
-            .select(['*', ref('id')
-              .castTo('CHAR')
-              .as('id')])
-            .whereBetween('center_lat', [args.minLat - 0.01, args.maxLat + 0.01])
-            .andWhereBetween('center_lon', [args.minLon - 0.01, args.maxLon + 0.01])
-          results.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, 'polygon'))
-          return results
+          return S2cell.getAllCells(args, Utility.dbSelection('pokestop') === 'mad')
         }
       },
     },
