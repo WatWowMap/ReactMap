@@ -115,7 +115,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
           )}
           <Grid item xs={2} style={{ textAlign: 'right' }}>
             <IconButton onClick={toggleAdvMenu(false, type, filters.filter)}>
-              <Clear />
+              <Clear style={{ color: 'white' }} />
             </IconButton>
           </Grid>
         </Grid>

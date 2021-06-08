@@ -215,7 +215,7 @@ export default function Menu({ filters, toggleDialog, category }) {
           onClick={toggleDialog(false, category, 'filters', filters.filter)}
           style={{ position: 'absolute', right: 5, top: 5 }}
         >
-          <Clear />
+          <Clear style={{ color: 'white' }} />
         </IconButton>
       </DialogTitle>
       <DialogContent className="no-scroll">

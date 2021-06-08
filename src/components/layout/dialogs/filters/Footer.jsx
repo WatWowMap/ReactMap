@@ -25,7 +25,7 @@ export default function Footer({
       <IconButton
         onClick={toggleHelp}
       >
-        <HelpOutline />
+        <HelpOutline style={{ color: 'white' }} />
       </IconButton>
     ),
     text: (
@@ -43,7 +43,7 @@ export default function Footer({
       <IconButton
         onClick={toggleDrawer(true)}
       >
-        <Ballot />
+        <Ballot style={{ color: 'white' }} />
       </IconButton>
     ),
   }
@@ -54,7 +54,9 @@ export default function Footer({
       <IconButton
         onClick={toggleAdvMenu(true, 'global')}
       >
-        {type === 'pokemon' ? <Tune /> : <FormatSize />}
+        {type === 'pokemon'
+          ? <Tune style={{ color: 'white' }} />
+          : <FormatSize style={{ color: 'white' }} />}
       </IconButton>
     ),
     text: (

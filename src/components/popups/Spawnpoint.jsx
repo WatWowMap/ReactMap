@@ -10,7 +10,7 @@ export default function SpawnpointPopup({ spawnpoint, ts }) {
     despawn_sec: despawn, lat, lon, updated,
   } = spawnpoint
 
-  const minute = Math.round(despawn / 60)
+  const minute = despawn > 60 ? Math.round(despawn / 60) : despawn
   const minuteFixed = minute < 10 ? `0${minute}` : minute
 
   return (

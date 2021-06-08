@@ -10,6 +10,7 @@ const getAllDevices = gql`
       last_lon
       route
       type
+      isMad
     }
   }
 `
