@@ -152,13 +152,11 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.pokemon) {
-          if (Utility.dbSelection('pokemon') === 'mad') {
-            return Pokemon.getMadPokemon(args, perms)
-          }
-          if (args.filters.onlyLegacy) {
+          const isMad = Utility.dbSelection('pokemon') === 'mad'
+          if (args.filters.onlyLegacy && !isMad) {
             return Pokemon.getLegacy(args, perms)
           }
-          return Pokemon.getPokemon(args, perms)
+          return Pokemon.getPokemon(args, perms, isMad)
         }
       },
     },
