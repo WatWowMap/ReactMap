@@ -6,7 +6,7 @@ const {
   api: { pvpMinCp },
   database: {
     settings:
-    { type, leagues },
+    { leagues },
   },
 } = require('../services/config')
 const dbSelection = require('../services/functions/dbSelection')
@@ -27,6 +27,7 @@ class Pokemon extends Model {
     const {
       onlyStandard, onlyIvOr,
     } = args.filters
+    const dbType = dbSelection('pokemon')
     let queryPvp = false
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
@@ -37,7 +38,7 @@ class Pokemon extends Model {
 
     const check = (pkmn, league, min, max) => {
       const rankCheck = pkmn.rank <= max && pkmn.rank >= min
-      const cpCheck = type === 'chuck' ? true : pkmn.cp >= pvpMinCp[league]
+      const cpCheck = dbType === 'chuck' ? true : pkmn.cp >= pvpMinCp[league]
       return rankCheck && cpCheck
     }
 
@@ -160,7 +161,7 @@ class Pokemon extends Model {
         .andWhereBetween('lat', [args.minLat, args.maxLat])
         .andWhereBetween('lon', [args.minLon, args.maxLon])
         .whereNotIn('id', listOfIds)
-      if (type === 'chuck') {
+      if (dbType === 'chuck') {
         pvpQuery.whereNotNull('pvp')
       } else {
         pvpQuery.andWhere(pvpBuilder => {
@@ -172,7 +173,7 @@ class Pokemon extends Model {
     }
 
     const getParsedPvp = (pokemon) => {
-      if (type === 'chuck') {
+      if (dbType === 'chuck') {
         return JSON.parse(pokemon.pvp)
       }
       const parsed = {}
