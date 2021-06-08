@@ -1,7 +1,7 @@
 const { Model, ref, raw } = require('objection')
 const getPolyVector = require('../services/functions/getPolyVector')
 const dbSelection = require('../services/functions/dbSelection')
-const { api: { weatherHistoryDays } } = require('../services/config')
+const { api: { weatherCellLimit } } = require('../services/config')
 
 class Weather extends Model {
   static get tableName() {
@@ -29,7 +29,7 @@ class Weather extends Model {
       ])
     } else {
       const ts = Math.floor((new Date()).getTime() / 1000)
-      const ms = ts - (weatherHistoryDays * 60 * 60 * 24)
+      const ms = ts - (weatherCellLimit * 60 * 60 * 24)
       query.where('updated', '>=', ms)
     }
     const results = await query

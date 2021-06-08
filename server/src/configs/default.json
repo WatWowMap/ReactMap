@@ -24,7 +24,7 @@
       "raids": false,
       "nests": false
     },
-    "weatherHistoryDays": 3
+    "weatherCellLimit": 3
   },
   "map": {
     "title": "ReactMap",
