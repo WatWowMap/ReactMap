@@ -10,7 +10,7 @@ class Gym extends Model {
   }
 
   static get idColumn() {
-    return dbSelection('gym').type === 'mad'
+    return dbSelection('gym') === 'mad'
       ? 'gym_id' : 'id'
   }
 

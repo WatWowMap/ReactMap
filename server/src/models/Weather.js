@@ -9,7 +9,7 @@ class Weather extends Model {
   }
 
   static get idColumn() {
-    return dbSelection('weather').type === 'mad'
+    return dbSelection('weather') === 'mad'
       ? 's2_cell_id' : 'id'
   }
 

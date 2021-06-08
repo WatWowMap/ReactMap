@@ -234,9 +234,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.spawnpoints) {
-          return Spawnpoint.query()
-            .whereBetween('lat', [args.minLat, args.maxLat])
-            .andWhereBetween('lon', [args.minLon, args.maxLon])
+          return Spawnpoint.getAllSpawnpoints(args, Utility.dbSelection('spawnpoint') === 'mad')
         }
       },
     },

@@ -17,7 +17,7 @@ class Pokemon extends Model {
   }
 
   static get idColumn() {
-    return dbSelection('pokemon').type === 'mad'
+    return dbSelection('pokemon') === 'mad'
       ? 'encounter_id' : 'id'
   }
 

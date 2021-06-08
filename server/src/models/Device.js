@@ -7,7 +7,7 @@ class Device extends Model {
   }
 
   static get idColumn() {
-    return dbSelection('device').type === 'mad' ? 'device_id' : 'uuid'
+    return dbSelection('device') === 'mad' ? 'device_id' : 'uuid'
   }
 
   static async getAllDevices(isMad) {

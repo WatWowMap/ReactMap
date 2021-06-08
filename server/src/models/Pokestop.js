@@ -10,7 +10,7 @@ class Pokestop extends Model {
   }
 
   static get idColumn() {
-    return dbSelection('pokestop').type === 'mad'
+    return dbSelection('pokestop') === 'mad'
       ? 'pokestop_id' : 'id'
   }
 
