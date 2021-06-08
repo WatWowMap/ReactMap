@@ -33,7 +33,7 @@ const Login = ({ clickedTwice, location }) => {
         </Button>
       </Grid>
       {clickedTwice && (
-        <Grid item>
+        <Grid item style={{ whiteSpace: 'pre-line' }}>
           <Typography style={{ color: 'white', margin: 20 }} align="center">
             {location.state ? t(location.state.message) : t('clickOnce')}
           </Typography>
