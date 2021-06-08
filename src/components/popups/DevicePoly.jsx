@@ -8,7 +8,7 @@ const DevicePoly = ({ device, color }) => {
 
   return (
     <>
-      {device.type === 'circle_pokemon'
+      {(device.type === 'circle_pokemon')
         ? (
           <Polyline
             positions={poly}

@@ -23,7 +23,8 @@
       "quests": false,
       "raids": false,
       "nests": false
-    }
+    },
+    "weatherCellLimit": 3
   },
   "map": {
     "title": "ReactMap",
@@ -105,7 +106,8 @@
     "pokestops": {
       "clustering": true,
       "invasionTimers": false,
-      "lureTimers": false
+      "lureTimers": false,
+      "madQuestText": false
     },
     "pokemon": {
       "clustering": true,
@@ -187,7 +189,6 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
-      "type": "rdm",
       "leagues": ["great", "ultra"]
     },
     "schemas": {

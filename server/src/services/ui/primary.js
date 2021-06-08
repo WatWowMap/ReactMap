@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 const { database: { settings: { leagues } } } = require('../config')
+const dbSelection = require('../functions/dbSelection')
 
 module.exports = function generateUi(filters, perms) {
   const ui = {}
@@ -34,9 +35,11 @@ module.exports = function generateUi(filters, perms) {
               },
             ],
           }
-          leagues.forEach(league => sliders.primary.push({
-            name: league, label: 'rank', min: 1, max: 100, perm: 'pvp',
-          })); break
+          if (dbSelection(key) !== 'mad') {
+            leagues.forEach(league => sliders.primary.push({
+              name: league, label: 'rank', min: 1, max: 100, perm: 'pvp',
+            }))
+          } break
         case 'submissionCells':
         case 'portals':
           if (!ui.wayfarer) ui.wayfarer = {}

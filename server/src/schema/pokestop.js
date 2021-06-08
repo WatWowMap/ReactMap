@@ -39,5 +39,6 @@ module.exports = new GraphQLObjectType({
     stardust_amount: { type: GraphQLInt },
     item_amount: { type: GraphQLInt },
     key: { type: GraphQLString },
+    quest_task: { type: GraphQLString },
   }),
 })

@@ -3,7 +3,6 @@ const {
   GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
-const { ref, raw } = require('objection')
 const fs = require('fs')
 
 const DeviceType = require('./device')
@@ -37,11 +36,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.devices) {
-          return Device.query()
-            .join('instance', 'device.instance_name', '=', 'instance.name')
-            .select('uuid', 'last_seen', 'last_lat', 'last_lon', 'type', 'instance_name',
-              raw('json_extract(data, "$.area")')
-                .as('route'))
+          return Device.getAllDevices(Utility.dbSelection('device') === 'mad')
         }
       },
     },
@@ -54,7 +49,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.gyms || perms.raids) {
-          return Gym.getAllGyms(args, perms)
+          return Gym.getAllGyms(args, perms, Utility.dbSelection('gym') === 'mad')
         }
       },
     },
@@ -67,7 +62,15 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms[args.perm]) {
-          const result = await Gym.query().findById(args.id) || {}
+          const query = Gym.query()
+            .findById(args.id)
+          if (Utility.dbSelection('gym') === 'mad') {
+            query.select([
+              'latitude AS lat',
+              'longitude AS lon',
+            ])
+          }
+          const result = await query || {}
           return result
         }
         return {}
@@ -113,7 +116,7 @@ const RootQuery = new GraphQLObjectType({
           || perms.lures
           || perms.quests
           || perms.invasions) {
-          return Pokestop.getAllPokestops(args, perms)
+          return Pokestop.getAllPokestops(args, perms, Utility.dbSelection('pokestop') === 'mad')
         }
       },
     },
@@ -126,8 +129,16 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms[args.perm]) {
-          const result = await Pokestop.query().findById(args.id) || {}
-          return result
+          const query = Pokestop.query()
+            .findById(args.id)
+          if (Utility.dbSelection('pokestop') === 'mad') {
+            query.select([
+              'latitude AS lat',
+              'longitude AS lon',
+            ])
+          }
+          const result = await query
+          return result || {}
         }
         return {}
       },
@@ -141,10 +152,11 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.pokemon) {
-          if (args.filters.onlyLegacy) {
+          const isMad = Utility.dbSelection('pokemon') === 'mad'
+          if (args.filters.onlyLegacy && !isMad) {
             return Pokemon.getLegacy(args, perms)
           }
-          return Pokemon.getPokemon(args, perms)
+          return Pokemon.getPokemon(args, perms, isMad)
         }
       },
     },
@@ -157,8 +169,15 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms[args.perm]) {
-          const result = await Pokemon.query().findById(args.id) || {}
-          return result
+          const query = Pokemon.query().findById(args.id) || {}
+          if (Utility.dbSelection('pokemon') === 'mad') {
+            query.select([
+              'latitude AS lat',
+              'longitude AS lon',
+            ])
+          }
+          const result = await query
+          return result || {}
         }
         return {}
       },
@@ -181,14 +200,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.s2cells) {
-          const results = await S2cell.query()
-            .select(['*', ref('id')
-              .castTo('CHAR')
-              .as('id')])
-            .whereBetween('center_lat', [args.minLat - 0.01, args.maxLat + 0.01])
-            .andWhereBetween('center_lon', [args.minLon - 0.01, args.maxLon + 0.01])
-          results.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, 'polygon'))
-          return results
+          return S2cell.getAllCells(args, Utility.dbSelection('pokestop') === 'mad')
         }
       },
     },
@@ -198,8 +210,8 @@ const RootQuery = new GraphQLObjectType({
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.scanAreas) {
           const scanAreas = fs.existsSync('server/src/configs/areas.json')
-            // eslint-disable-next-line global-require
-            ? require('../configs/areas.json') : { features: [] }
+            ? JSON.parse(fs.readFileSync('./server/src/configs/areas.json'))
+            : { features: [] }
           return scanAreas.features.sort(
             (a, b) => (a.properties.name > b.properties.name) ? 1 : -1,
           )
@@ -212,9 +224,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.spawnpoints) {
-          return Spawnpoint.query()
-            .whereBetween('lat', [args.minLat, args.maxLat])
-            .andWhereBetween('lon', [args.minLon, args.maxLon])
+          return Spawnpoint.getAllSpawnpoints(args, Utility.dbSelection('spawnpoint') === 'mad')
         }
       },
     },
@@ -224,24 +234,47 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.submissionCells) {
-          const pokestops = await Pokestop.query()
-            .select(['id', 'lat', 'lon'])
-            .whereBetween('lat', [args.minLat - 0.025, args.maxLat + 0.025])
-            .andWhereBetween('lon', [args.minLon - 0.025, args.maxLon + 0.025])
-            .andWhere('deleted', false)
-            .andWhere(poi => {
-              poi.whereNull('sponsor_id')
-                .orWhere('sponsor_id', 0)
-            })
-          const gyms = await Gym.query()
-            .select(['id', 'lat', 'lon'])
-            .whereBetween('lat', [args.minLat - 0.025, args.maxLat + 0.025])
-            .andWhereBetween('lon', [args.minLon - 0.025, args.maxLon + 0.025])
-            .andWhere('deleted', false)
-            .andWhere(poi => {
-              poi.whereNull('sponsor_id')
-                .orWhere('sponsor_id', 0)
-            })
+          const isMadStops = Utility.dbSelection('pokestop') === 'mad'
+          const isMadGyms = Utility.dbSelection('gym') === 'mad'
+
+          const stopQuery = Pokestop.query()
+          if (isMadStops) {
+            stopQuery.select([
+              'pokestop_id AS id',
+              'latitude AS lat',
+              'longitude AS lon',
+            ])
+          } else {
+            stopQuery.select(['id', 'lat', 'lon'])
+              .andWhere(poi => {
+                poi.whereNull('sponsor_id')
+                  .orWhere('sponsor_id', 0)
+              })
+          }
+
+          const gymQuery = Gym.query()
+          if (isMadGyms) {
+            gymQuery.select([
+              'gym_id AS id',
+              'latitude AS lat',
+              'longitude AS lon',
+            ])
+          } else {
+            gymQuery.select(['id', 'lat', 'lon'])
+              .where(poi => {
+                poi.whereNull('sponsor_id')
+                  .orWhere('sponsor_id', 0)
+              })
+          }
+
+          [stopQuery, gymQuery].forEach((query, i) => {
+            const isMad = [isMadStops, isMadGyms]
+            query.whereBetween(`lat${isMad[i] ? 'itude' : ''}`, [args.minLat - 0.025, args.maxLat + 0.025])
+              .andWhereBetween(`lon${isMad[i] ? 'gitude' : ''}`, [args.minLon - 0.025, args.maxLon + 0.025])
+              .andWhere(isMad[i] ? 'enabled' : 'deleted', isMad[i])
+          })
+          const pokestops = await stopQuery
+          const gyms = await gymQuery
           return [{
             placementCells: Utility.getPlacementCells(args, pokestops, gyms),
             typeCells: Utility.getTypeCells(args, pokestops, gyms),
@@ -254,12 +287,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.weather) {
-          const results = await Weather.query()
-            .select(['*', ref('id')
-              .castTo('CHAR')
-              .as('id')])
-          results.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, true))
-          return results
+          return Weather.getAllWeather(Utility.dbSelection('weather') === 'mad')
         }
       },
     },

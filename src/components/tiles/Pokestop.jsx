@@ -63,6 +63,7 @@ const PokestopTile = ({
                 hasQuest={hasQuest}
                 path={path}
                 availableForms={availableForms}
+                userSettings={userSettings}
               />
             </Popup>
             {((showTimer || userSettings.invasionTimers) && hasInvasion)
@@ -106,6 +107,7 @@ const areEqual = (prev, next) => (
   && !next.excludeList.includes(`q${prev.item.quest_item_id}`)
   && prev.userSettings.invasionTimers === next.userSettings.invasionTimers
   && prev.userSettings.lureTimers === next.userSettings.lureTimers
+  && prev.userSettings.madQuestText === next.userSettings.madQuestText
 )
 
 export default memo(PokestopTile, areEqual)

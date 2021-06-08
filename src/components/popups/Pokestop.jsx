@@ -13,7 +13,7 @@ import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
 export default function PokestopPopup({
-  pokestop, ts, hasLure, hasInvasion, hasQuest, path, availableForms,
+  pokestop, ts, hasLure, hasInvasion, hasQuest, path, availableForms, userSettings,
 }) {
   const { t } = useTranslation()
   const { pokestops: perms } = useStatic(state => state.ui)
@@ -71,6 +71,7 @@ export default function PokestopPopup({
                   <QuestConditions
                     pokestop={pokestop}
                     t={t}
+                    userSettings={userSettings}
                   />
                   <RewardInfo
                     pokestop={pokestop}
@@ -246,7 +247,7 @@ const Header = ({
           aria-haspopup="true"
           onClick={handleClick}
         >
-          <MoreVert />
+          <MoreVert style={{ color: 'white' }} />
         </IconButton>
       </Grid>
       <Menu
@@ -313,10 +314,10 @@ const PoiImage = ({
             }}
           />
           {ar_scan_eligible === 1 && (
-          <img
-            className="ar-logo"
-            src="/images/misc/ar.png"
-          />
+            <img
+              className="ar-logo"
+              src="/images/misc/ar.png"
+            />
           )}
         </div>
       </Grid>
@@ -420,9 +421,22 @@ const RewardInfo = ({ pokestop, path, availableForms }) => {
   ))
 }
 
-const QuestConditions = ({ pokestop, t }) => {
-  const { quest_conditions, quest_type, quest_target } = pokestop
-  const [type1, type2] = JSON.parse(quest_conditions)
+const QuestConditions = ({ pokestop, t, userSettings }) => {
+  const {
+    quest_conditions, quest_type, quest_target, quest_task,
+  } = pokestop
+
+  if (userSettings.madQuestText && quest_task) {
+    return (
+      <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <Typography variant="subtitle1">
+          {quest_task}
+        </Typography>
+      </Grid>
+    )
+  }
+
+  const [type1, type2] = Utility.parseConditions(quest_conditions)
   const primaryCondition = (
     <Typography variant="subtitle1">
       <Trans i18nKey={`quest_${quest_type}`}>
@@ -430,7 +444,6 @@ const QuestConditions = ({ pokestop, t }) => {
       </Trans>
     </Typography>
   )
-
   const getQuestConditions = (qType, qInfo) => {
     switch (qType) {
       default: return t(`quest_condition_${qType}`)
@@ -538,7 +551,7 @@ const Footer = ({
             onClick={handleExpandClick}
             aria-expanded={expanded}
           >
-            <ExpandMore />
+            <ExpandMore style={{ color: 'white' }} />
           </IconButton>
         </Grid>
       )}

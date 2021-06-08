@@ -121,7 +121,7 @@ export default function UserOptions({ category, toggleDialog }) {
           onClick={toggleDialog(false, category, 'options')}
           style={{ position: 'absolute', right: 5, top: 5 }}
         >
-          <Clear />
+          <Clear style={{ color: 'white' }} />
         </IconButton>
       </DialogTitle>
       <DialogContent>

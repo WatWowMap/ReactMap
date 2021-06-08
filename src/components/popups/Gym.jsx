@@ -201,7 +201,7 @@ const Header = ({
           aria-haspopup="true"
           onClick={handleClick}
         >
-          <MoreVert />
+          <MoreVert style={{ color: 'white' }} />
         </IconButton>
       </Grid>
       <Menu
@@ -403,7 +403,7 @@ const RaidInfo = ({ gym, t }) => {
     }
   }
 
-  if (raid_pokemon_id === 0) {
+  if (!raid_pokemon_id) {
     return (
       <Timer gym={gym} start t={t} />
     )
@@ -427,7 +427,7 @@ const RaidInfo = ({ gym, t }) => {
           {getRaidForm(raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution)}
         </Typography>
       </Grid>
-      {raid_pokemon_move_1 && (
+      {raid_pokemon_move_1 && raid_pokemon_move_1 !== 1 && (
       <Grid
         item
         xs={2}
@@ -445,7 +445,7 @@ const RaidInfo = ({ gym, t }) => {
           {t(`move_${raid_pokemon_move_1}`)}
         </Typography>
       </Grid>
-      {raid_pokemon_move_2 && (
+      {raid_pokemon_move_2 && raid_pokemon_move_2 !== 2 && (
       <Grid
         item
         xs={2}
@@ -557,7 +557,7 @@ const Footer = ({
             aria-expanded={expanded}
             aria-label="show more"
           >
-            <ExpandMore />
+            <ExpandMore style={{ color: 'white' }} />
           </IconButton>
         </Grid>
       )}
