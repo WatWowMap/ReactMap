@@ -23,7 +23,8 @@
       "quests": false,
       "raids": false,
       "nests": false
-    }
+    },
+    "weatherHistoryDays": 3
   },
   "map": {
     "title": "ReactMap",

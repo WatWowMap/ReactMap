@@ -63,7 +63,15 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms[args.perm]) {
-          const result = await Gym.query().findById(args.id) || {}
+          const query = Gym.query()
+            .findById(args.id)
+          if (Utility.dbSelection('gym') === 'mad') {
+            query.select([
+              'latitude AS lat',
+              'longitude AS lon',
+            ])
+          }
+          const result = await query || {}
           return result
         }
         return {}
@@ -122,8 +130,16 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms[args.perm]) {
-          const result = await Pokestop.query().findById(args.id) || {}
-          return result
+          const query = Pokestop.query()
+            .findById(args.id)
+          if (Utility.dbSelection('pokestop') === 'mad') {
+            query.select([
+              'latitude AS lat',
+              'longitude AS lon',
+            ])
+          }
+          const result = await query
+          return result || {}
         }
         return {}
       },
@@ -156,8 +172,15 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms[args.perm]) {
-          const result = await Pokemon.query().findById(args.id) || {}
-          return result
+          const query = Pokemon.query().findById(args.id) || {}
+          if (Utility.dbSelection('pokemon') === 'mad') {
+            query.select([
+              'latitude AS lat',
+              'longitude AS lon',
+            ])
+          }
+          const result = await query
+          return result || {}
         }
         return {}
       },
@@ -197,8 +220,8 @@ const RootQuery = new GraphQLObjectType({
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.scanAreas) {
           const scanAreas = fs.existsSync('server/src/configs/areas.json')
-            // eslint-disable-next-line global-require
-            ? require('../configs/areas.json') : { features: [] }
+            ? JSON.parse(fs.readFileSync('./server/src/configs/areas.json'))
+            : { features: [] }
           return scanAreas.features.sort(
             (a, b) => (a.properties.name > b.properties.name) ? 1 : -1,
           )
@@ -253,12 +276,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.weather) {
-          const results = await Weather.query()
-            .select(['*', ref('id')
-              .castTo('CHAR')
-              .as('id')])
-          results.forEach(cell => cell.polygon = Utility.getPolyVector(cell.id, true))
-          return results
+          return Weather.getAllWeather(Utility.dbSelection('weather') === 'mad')
         }
       },
     },
