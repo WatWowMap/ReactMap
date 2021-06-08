@@ -48,28 +48,24 @@ export default function App() {
 
   return (
     <Suspense fallback="Loading translations...">
-      <Router>
-        <Switch>
-          <Route exact path="/">
-            <ApolloProvider client={client}>
+      <ApolloProvider client={client}>
+        <Router>
+          <Switch>
+            <Route exact path="/">
               {serverSettings && <Auth serverSettings={serverSettings} />}
-            </ApolloProvider>
-          </Route>
-          <Route exact path="/login">
-            <Login failed />
-          </Route>
-          <Route exact path="/@/:lat/:lon/:zoom">
-            <ApolloProvider client={client}>
+            </Route>
+            <Route exact path="/@/:lat/:lon/:zoom">
               {serverSettings && <Auth serverSettings={serverSettings} />}
-            </ApolloProvider>
-          </Route>
-          <Route exact path="/id/:category/:id/:zoom">
-            <ApolloProvider client={client}>
+            </Route>
+            <Route exact path="/id/:category/:id/:zoom">
               {serverSettings && <Auth serverSettings={serverSettings} />}
-            </ApolloProvider>
-          </Route>
-        </Switch>
-      </Router>
+            </Route>
+            <Route exact path="/login">
+              <Login clickedTwice />
+            </Route>
+          </Switch>
+        </Router>
+      </ApolloProvider>
     </Suspense>
   )
 }

@@ -1,10 +1,11 @@
 import React from 'react'
+import { withRouter } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Grid, Button, Icon, Typography,
 } from '@material-ui/core'
 
-export default function Login({ failed }) {
+const Login = ({ clickedTwice, location }) => {
   const { t } = useTranslation()
 
   return (
@@ -31,13 +32,15 @@ export default function Login({ failed }) {
           </Typography>
         </Button>
       </Grid>
-      {failed && (
+      {clickedTwice && (
         <Grid item>
           <Typography style={{ color: 'white', margin: 20 }} align="center">
-            {t('clickOnce')}
+            {location.state ? t(location.state.message) : t('clickOnce')}
           </Typography>
         </Grid>
       )}
     </Grid>
   )
 }
+
+export default withRouter(Login)

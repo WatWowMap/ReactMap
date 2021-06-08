@@ -108,11 +108,11 @@ rootRouter.get('/settings', async (req, res) => {
       } catch (e) {
         serverSettings.available = {
           pokemon: [],
-          gyms: [],
-          pokestops: [],
-          nests: [],
+          gyms: await Utility.fetchRaids(),
+          pokestops: await Utility.fetchQuests(),
+          nests: await Utility.fetchNests(),
         }
-        console.warn(e, '\nUnable to query available')
+        console.warn(e, '\nUnable to query available, attempting to fetch from GitHub instead')
       }
 
       serverSettings.ui = Utility.buildPrimaryUi(serverSettings.defaultFilters, serverSettings.user.perms)
