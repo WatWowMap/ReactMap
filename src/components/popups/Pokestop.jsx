@@ -246,7 +246,7 @@ const Header = ({
           aria-haspopup="true"
           onClick={handleClick}
         >
-          <MoreVert />
+          <MoreVert style={{ color: 'white' }} />
         </IconButton>
       </Grid>
       <Menu
@@ -537,7 +537,7 @@ const Footer = ({
             onClick={handleExpandClick}
             aria-expanded={expanded}
           >
-            <ExpandMore />
+            <ExpandMore style={{ color: 'white' }} />
           </IconButton>
         </Grid>
       )}

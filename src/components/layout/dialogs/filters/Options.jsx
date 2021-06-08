@@ -24,7 +24,7 @@ export default function FilterOptions({
     <Grid item>
       <Accordion expanded={expanded === name} onChange={handleAccordion(name)}>
         <AccordionSummary
-          expandIcon={<ExpandMore />}
+          expandIcon={<ExpandMore style={{ color: 'white' }} />}
         >
           <Typography className={classes.heading}>
             {t(name)}

@@ -81,7 +81,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
           onClick={toggleSlotsMenu(false)}
           style={{ position: 'absolute', right: 5, top: 5 }}
         >
-          <Clear />
+          <Clear style={{ color: 'white' }} />
         </IconButton>
       </DialogTitle>
       <DialogContent style={{ color: 'white' }}>
