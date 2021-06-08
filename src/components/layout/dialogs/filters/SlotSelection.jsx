@@ -34,10 +34,6 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
     setFilterValues({ ...slotsObj })
   }
 
-  if (relevantSlots.every(val => filterValues[val].enabled === false) && filterValues[team].enabled) {
-    setFilterValues({ ...filterValues, [team]: { ...filterValues[team], enabled: false } })
-  }
-
   const reset = {
     key: 'reset',
     icon: (
