@@ -46,6 +46,7 @@ class Pokestop extends Model {
           'quest_reward AS quest_rewards',
           'quest_pokemon_form_id AS quest_form_id',
           'quest_pokemon_costume_id AS quest_costume_id',
+          'quest_task',
           raw('UNIX_TIMESTAMP(last_modified)')
             .as('last_modified_timestamp'),
           raw('UNIX_TIMESTAMP(lure_expiration)')

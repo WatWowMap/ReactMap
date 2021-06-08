@@ -106,7 +106,8 @@
     "pokestops": {
       "clustering": true,
       "invasionTimers": false,
-      "lureTimers": false
+      "lureTimers": false,
+      "madQuestText": false
     },
     "pokemon": {
       "clustering": true,
