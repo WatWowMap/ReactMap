@@ -167,7 +167,11 @@ const Header = ({
 
   const handleTimer = () => {
     setAnchorEl(null)
-    setTimerList([...timerList, id])
+    if (timerList.includes(id)) {
+      setTimerList(timerList.filter(x => x !== id))
+    } else {
+      setTimerList([...timerList, id])
+    }
   }
 
   const options = [

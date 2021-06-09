@@ -37,5 +37,26 @@ export default function createTheme(theme, darkMode) {
         disableRipple: true,
       },
     },
+    overrides: {
+      MuiAccordion: {
+        root: {
+          '&$expanded': {
+            margin: '1px 0',
+          },
+        },
+      },
+      MuiAccordionSummary: {
+        root: {
+          '&$expanded': {
+            minHeight: 10,
+          },
+        },
+        content: {
+          '&$expanded': {
+            margin: '10px 0',
+          },
+        },
+      },
+    },
   }))
 }
