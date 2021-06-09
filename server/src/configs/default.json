@@ -222,6 +222,7 @@
       }
     }
   },
+  "alwaysEnabledPerms": [],
   "discord": {
     "enabled": false,
     "logChannelId": "",

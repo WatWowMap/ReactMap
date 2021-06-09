@@ -33,6 +33,7 @@ export default function ConfigSettings({
   const setZoom = useStore(state => state.setZoom)
   const setMenus = useStore(state => state.setMenus)
 
+  const setAuth = useStatic(state => state.setAuth)
   const setStaticUserSettings = useStatic(state => state.setUserSettings)
   const setStaticSettings = useStatic(state => state.setSettings)
   const setStaticMenus = useStatic(state => state.setMenus)
@@ -64,14 +65,18 @@ export default function ConfigSettings({
   const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
   document.body.classList.add('dark')
 
+  setAuth({ discord: serverSettings.discord, loggedIn: serverSettings.loggedIn })
   setUi(serverSettings.ui)
   setConfig(serverSettings.config)
   setMasterfile(serverSettings.masterfile)
+  setAvailableForms((new Set(serverSettings.config.icons[serverSettings.settings.icons].pokemonList)), 'availableForms')
+  setAvailable(serverSettings.available)
+
   setStaticMenus(serverSettings.menus)
   setMenus(updateObjState(serverSettings.menus, 'menus'))
+
   setStaticFilters(serverSettings.defaultFilters)
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
-  setStaticSettings(serverSettings.settings)
 
   setUserSettings(updateObjState(serverSettings.userSettings, 'userSettings'))
   setStaticUserSettings(serverSettings.clientMenus)
@@ -86,12 +91,9 @@ export default function ConfigSettings({
   } else {
     setSettings(updateObjState(serverSettings.settings, 'settings'))
   }
+  setStaticSettings(serverSettings.settings)
 
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
-  setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
-  setAvailableForms((new Set(serverSettings.config.icons[serverSettings.settings.icons].pokemonList)), 'availableForms')
-  setAvailable(serverSettings.available)
-
   const getStartLocation = () => {
     if (paramLocation && paramLocation[0] !== null) {
       return paramLocation
@@ -102,6 +104,7 @@ export default function ConfigSettings({
     return updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
   }
 
+  setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
   const getStartZoom = () => {
     if (paramZoom) {
       return paramZoom

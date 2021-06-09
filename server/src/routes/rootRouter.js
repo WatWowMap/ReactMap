@@ -50,15 +50,28 @@ rootRouter.get('/settings', async (req, res) => {
       req.session.perms = {}
       Object.keys(config.discord.perms).forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
       req.session.save()
+    } else if (config.alwaysEnabledPerms.length > 0) {
+      req.session.perms = {}
+      config.alwaysEnabledPerms.forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
+      req.session.save()
+    }
+    const getUser = () => {
+      if (config.discord.enabled) {
+        if (req.user || config.alwaysEnabledPerms.length === 0) {
+          return req.user
+        }
+      }
+      return req.session
     }
     const serverSettings = {
-      user: config.discord.enabled ? req.user : req.session,
+      user: getUser(),
       discord: config.discord.enabled,
       settings: {},
     }
 
     // add user options here from the config that are structured as objects
     if (serverSettings.user) {
+      serverSettings.loggedIn = req.user
       serverSettings.config = {
         map: config.map,
         tileServers: config.tileServers,
