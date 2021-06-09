@@ -351,7 +351,7 @@ const GymInfo = ({ gym, t }) => {
       </Grid>
       <Grid item xs={12}>
         <Typography variant="subtitle1" align="center">
-          {t('slots')} {availble_slots}
+          {availble_slots} {t('slots')}
         </Typography>
       </Grid>
       {ex_raid_eligible && (
