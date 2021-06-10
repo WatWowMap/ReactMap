@@ -389,7 +389,7 @@ const RaidInfo = ({ gym, t }) => {
 
   const getRaidName = (raidLevel, id) => {
     if (id) {
-      return pokemon[raid_pokemon_id].name
+      return t(`poke_${raid_pokemon_id}`)
     }
     return `${t('tier')} ${raidLevel}`
   }
