@@ -4,6 +4,7 @@ import {
   FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Slide,
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '../../../hooks/useStore'
@@ -17,6 +18,7 @@ export default function Settings() {
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
   const staticSettings = useStatic(state => state.settings)
+  const auth = useStatic(state => state.auth)
   const { t, i18n } = useTranslation()
 
   const [alert, setAlert] = useState(false)
@@ -96,61 +98,88 @@ export default function Settings() {
           </FormControl>
         </Grid>
       ))}
-      <Grid item xs={6} style={{ textAlign: 'center', margin: '20px 0px' }}>
-        <Button
-          variant="contained"
-          color="primary"
-          style={{
-            color: 'white',
-          }}
-          size="small"
-          onClick={clearStorage}
-        >
-          {t('clearStorage')}
-        </Button>
-      </Grid>
-      <Grid item xs={5} style={{ textAlign: 'center' }}>
-        <input
-          accept="application/json"
-          id="contained-button-file"
-          type="file"
-          style={{ display: 'none' }}
-          onChange={importSettings}
-        />
-        <label htmlFor="contained-button-file">
+      <Grid
+        justify="space-evenly"
+        alignItems="center"
+        container
+        item
+        spacing={3}
+        style={{ margin: '10px 0px' }}
+      >
+        <Grid item xs={auth.discord ? 6 : 12} style={{ textAlign: 'center' }}>
           <Button
             variant="contained"
             color="primary"
-            component="span"
+            style={{
+              color: 'white',
+            }}
             size="small"
+            onClick={clearStorage}
           >
-            {t('import')}
+            {t('clearStorage')}
           </Button>
-        </label>
-      </Grid>
-      <Grid item xs={6} style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: 'rgb(114,136,218)',
-            color: 'white',
-          }}
-          size="small"
-          href="/logout"
-        >
-          <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
-          {t('logout')}
-        </Button>
-      </Grid>
-      <Grid item xs={5} style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <Button
-          variant="contained"
-          color="secondary"
-          size="small"
-          onClick={exportSettings}
-        >
-          {t('export')}
-        </Button>
+        </Grid>
+        <Grid item xs={5} style={{ textAlign: 'center' }}>
+          <input
+            accept="application/json"
+            id="contained-button-file"
+            type="file"
+            style={{ display: 'none' }}
+            onChange={importSettings}
+          />
+          <label htmlFor="contained-button-file">
+            <Button
+              variant="contained"
+              color="primary"
+              component="span"
+              size="small"
+            >
+              {t('import')}
+            </Button>
+          </label>
+        </Grid>
+        {auth.discord && (
+          <Grid item xs={6} style={{ textAlign: 'center' }}>
+            {auth.loggedIn ? (
+              <Button
+                variant="contained"
+                style={{
+                  backgroundColor: 'rgb(114,136,218)',
+                  color: 'white',
+                }}
+                size="small"
+                href="/logout"
+              >
+                <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
+                {t('logout')}
+              </Button>
+            ) : (
+              <Link to="/login" style={{ textDecoration: 'none' }}>
+                <Button
+                  variant="contained"
+                  style={{
+                    backgroundColor: 'rgb(114,136,218)',
+                    color: 'white',
+                  }}
+                  size="small"
+                >
+                  <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
+                  {t('login')}
+                </Button>
+              </Link>
+            )}
+          </Grid>
+        )}
+        <Grid item xs={5} style={{ textAlign: 'center' }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
+            onClick={exportSettings}
+          >
+            {t('export')}
+          </Button>
+        </Grid>
       </Grid>
       <Snackbar
         open={alert}

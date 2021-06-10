@@ -6,7 +6,7 @@
 /* global BigInt */
 const Discord = require('discord.js')
 const fs = require('fs')
-const { discord } = require('./config')
+const { alwaysEnabledPerms, discord } = require('./config')
 
 const client = new Discord.Client()
 
@@ -94,12 +94,15 @@ class DiscordClient {
         for (let j = 0; j < keys.length; j += 1) {
           const key = keys[j]
           const configItem = discord.perms[key]
-          if (configItem.enabled && configItem.roles.length === 0) {
-            perms[key] = true
-          } else {
-            for (let k = 0; k < userRoles.length; k += 1) {
-              if (configItem.roles.includes(userRoles[k])) {
-                perms[key] = true
+          if (configItem.enabled) {
+            if (configItem.roles.length === 0
+              || alwaysEnabledPerms.includes(key)) {
+              perms[key] = true
+            } else {
+              for (let k = 0; k < userRoles.length; k += 1) {
+                if (configItem.roles.includes(userRoles[k])) {
+                  perms[key] = true
+                }
               }
             }
           }
