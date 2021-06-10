@@ -39,12 +39,12 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
     const geo = geoResponse.data
     const embed = {
       color: 0xFF0000,
-      title: 'Failure',
+      title: 'Authentication',
       author: {
         name: `${user.username}`,
         icon_url: `https://cdn.discordapp.com/avatars/${user.id}/${profile.avatar}.png`,
       },
-      description: 'User Failed Authentication',
+      description: `${user.username} Failed Authentication`,
       thumbnail: {
         url: `https://cdn.discordapp.com/avatars/${user.id}/${profile.avatar}.png`,
       },
@@ -93,12 +93,10 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
     }
     if (user.valid) {
       console.log(user.username, `(${user.id})`, 'Authenticated successfully.')
-      embed.title = 'Success'
-      embed.description = 'User Successfully Authenticated'
+      embed.description = `${user.username} Successfully Authenticated`
       embed.color = 0x00FF00
     } else if (user.blocked) {
       console.warn(user.id, 'Blocked due to', user.blocked)
-      embed.title = 'Blocked'
       embed.description = `User Blocked Due to ${user.blocked}`
       embed.color = 0xFF0000
     } else {
