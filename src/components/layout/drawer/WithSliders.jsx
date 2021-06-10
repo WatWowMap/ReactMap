@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Fragment } from 'react'
 import {
   Grid, Typography, Switch, AppBar, Tab, Tabs, Box,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
-import { useStore } from '@hooks/useStore'
+import Utility from '@services/Utility'
+import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 
@@ -31,6 +32,10 @@ export default function WithSliders({
   const { t } = useTranslation()
   const [tempLegacy, setTempLegacy] = useState(filters[category][specificFilter])
   const [openTab, setOpenTab] = useState(0)
+
+  const availableForms = useStatic(state => state.availableForms)
+  const { icons } = useStatic(state => state.config)
+  const { icons: userIcons } = useStore(state => state.settings)
 
   useEffect(() => {
     setFilters({
@@ -61,12 +66,12 @@ export default function WithSliders({
 
   return (
     <>
-      <Grid item xs={6}>
+      <Grid item xs={9}>
         <Typography>
           {t('enabled')}
         </Typography>
       </Grid>
-      <Grid item xs={6} style={{ textAlign: 'right' }}>
+      <Grid item xs={3} style={{ textAlign: 'right' }}>
         <Switch
           checked={filters[category].enabled}
           onChange={() => {
@@ -80,6 +85,37 @@ export default function WithSliders({
           }}
         />
       </Grid>
+      {['xsRat', 'xlKarp'].map((each, index) => (
+        <Fragment key={each}>
+          <Grid item xs={2} style={{ textAlign: 'left' }}>
+            <img
+              style={{ maxHeight: 30, maxWidth: 30 }}
+              src={`${icons[userIcons].path}/${Utility.getPokemonIcon(availableForms, index ? 129 : 19)}.png`}
+            />
+          </Grid>
+          <Grid item xs={1} className="xs-xl">
+            <Typography
+              variant="subtitle2"
+            >
+              {index ? t('xl').toUpperCase() : t('xs').toUpperCase()}
+            </Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <Switch
+              checked={filters[category][each]}
+              onChange={() => {
+                setFilters({
+                  ...filters,
+                  [category]: {
+                    ...filters[category],
+                    [each]: !filters[category][each],
+                  },
+                })
+              }}
+            />
+          </Grid>
+        </Fragment>
+      ))}
       {(userSettings[category].legacyFilter && context.legacy) ? (
         <>
           <Grid item xs={12}>
