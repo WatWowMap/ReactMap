@@ -141,7 +141,7 @@ export default function WithSliders({
               style={{ backgroundColor: '#424242' }}
             >
               {Object.keys(context.sliders).map(slider => (
-                <Tab label={slider} key={slider} style={{ width: 5, minWidth: 5 }} />
+                <Tab label={t(slider)} key={slider} style={{ width: 5, minWidth: 5 }} />
               ))}
             </Tabs>
           </AppBar>

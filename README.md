@@ -121,6 +121,8 @@ If you're using Chuck to parse Pokemon you can add any number of leagues to the 
   }
 ```
 
+- A note on the `useFor` fields for each schema. These fields represent model names, not table names. They can be moved between schemas to accommodate any number of databases you wish to use, but they cannot be duplicated and must be spelled exactly the way they are in the config example.
+
 ## Coming Soon
 - Built in event viewer
 - Expand the help modals

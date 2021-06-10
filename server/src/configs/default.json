@@ -116,6 +116,8 @@
       "clustering": true,
       "prioritizePvpInfo": false,
       "legacyFilter": false,
+      "ivCircles": false,
+      "minIvCircle": 90,
       "interactionRanges": false,
       "glow": [
         {"name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },

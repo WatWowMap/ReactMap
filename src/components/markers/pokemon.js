@@ -13,7 +13,7 @@ export const basicMarker = (iconUrl, pkmn, filters, iconSizes) => {
   })
 }
 
-export const fancyMarker = (iconUrl, pkmn, filters, iconSizes, glow) => {
+export const fancyMarker = (iconUrl, pkmn, filters, iconSizes, glow, ivCircles) => {
   let badge
   switch (pkmn.bestPvp) {
     default: break
@@ -25,14 +25,25 @@ export const fancyMarker = (iconUrl, pkmn, filters, iconSizes, glow) => {
   const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
   const size = filters.filter[filterId] ? iconSizes[filters.filter[filterId].size] : iconSizes.md
 
-  const pvpHtml = badge ? `
-    <img src="/images/misc/${badge}.png" 
-      style="width:${size / 2}px;
-      height:auto;
-      position:absolute;
-      right:0;
-      bottom:0;"
-    />` : ''
+  const getExtraHtml = () => {
+    if (badge) {
+      return `
+        <img src="/images/misc/${badge}.png" 
+          style="width:${size / 2}px;
+          height:auto;
+          position:absolute;
+          right:0;
+          bottom:0;"
+        />`
+    }
+    if (ivCircles) {
+      return `
+        <div class="iv-badge">
+          ${Math.round(pkmn.iv)}
+        </div>`
+    }
+    return ''
+  }
 
   return L.divIcon({
     iconSize: [size, size],
@@ -48,6 +59,6 @@ export const fancyMarker = (iconUrl, pkmn, filters, iconSizes, glow) => {
           height:${size}px;"
         />
       </div>
-      ${pvpHtml}`,
+      ${getExtraHtml()}`,
   })
 }

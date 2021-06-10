@@ -72,7 +72,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
   return (
     <>
       <DialogTitle className={classes.filterHeader}>
-        {t(`team${teamId}`)} {t('slotSelection')}
+        {t(`team_${teamId}`)} {t('slotSelection')}
         <IconButton
           onClick={toggleSlotsMenu(false)}
           style={{ position: 'absolute', right: 5, top: 5 }}
