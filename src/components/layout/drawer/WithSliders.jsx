@@ -9,21 +9,18 @@ import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 
-function TabPanel(props) {
-  const { children, value, index } = props
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-    >
-      {value === index && (
-        <Box p={2}>
-          <Typography variant="caption">{children}</Typography>
-        </Box>
-      )}
-    </div>
-  )
-}
+const TabPanel = ({ children, value, index }) => (
+  <div
+    role="tabpanel"
+    hidden={value !== index}
+  >
+    {value === index && (
+      <Box p={2}>
+        <Typography variant="caption">{children}</Typography>
+      </Box>
+    )}
+  </div>
+)
 
 export default function WithSliders({
   category, filters, setFilters, context, specificFilter,
@@ -66,12 +63,12 @@ export default function WithSliders({
 
   return (
     <>
-      <Grid item xs={9}>
+      <Grid item xs={6}>
         <Typography>
           {t('enabled')}
         </Typography>
       </Grid>
-      <Grid item xs={3} style={{ textAlign: 'right' }}>
+      <Grid item xs={6} style={{ textAlign: 'right' }}>
         <Switch
           checked={filters[category].enabled}
           onChange={() => {
@@ -85,37 +82,6 @@ export default function WithSliders({
           }}
         />
       </Grid>
-      {['xsRat', 'xlKarp'].map((each, index) => (
-        <Fragment key={each}>
-          <Grid item xs={2} style={{ textAlign: 'left' }}>
-            <img
-              style={{ maxHeight: 30, maxWidth: 30 }}
-              src={`${icons[userIcons].path}/${Utility.getPokemonIcon(availableForms, index ? 129 : 19)}.png`}
-            />
-          </Grid>
-          <Grid item xs={1} className="xs-xl">
-            <Typography
-              variant="subtitle2"
-            >
-              {index ? t('xl').toUpperCase() : t('xs').toUpperCase()}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Switch
-              checked={filters[category][each]}
-              onChange={() => {
-                setFilters({
-                  ...filters,
-                  [category]: {
-                    ...filters[category],
-                    [each]: !filters[category][each],
-                  },
-                })
-              }}
-            />
-          </Grid>
-        </Fragment>
-      ))}
       {(userSettings[category].legacyFilter && context.legacy) ? (
         <>
           <Grid item xs={12}>
@@ -156,6 +122,48 @@ export default function WithSliders({
                   />
                 </Grid>
               ))}
+              {index ? (
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  direction="row"
+                  alignItems="center"
+                  justify="center"
+                >
+                  {['xsRat', 'xlKarp'].map((each, i) => (
+                    <Fragment key={each}>
+                      <Grid item xs={2} style={{ textAlign: 'left' }}>
+                        <img
+                          style={{ maxHeight: 30, maxWidth: 30 }}
+                          src={`${icons[userIcons].path}/${Utility.getPokemonIcon(availableForms, i ? 129 : 19)}.png`}
+                        />
+                      </Grid>
+                      <Grid item xs={1} className="xs-xl">
+                        <Typography
+                          variant="subtitle2"
+                        >
+                          {i ? t('xl').toUpperCase() : t('xs').toUpperCase()}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Switch
+                          checked={filters[category][each]}
+                          onChange={() => {
+                            setFilters({
+                              ...filters,
+                              [category]: {
+                                ...filters[category],
+                                [each]: !filters[category][each],
+                              },
+                            })
+                          }}
+                        />
+                      </Grid>
+                    </Fragment>
+                  ))}
+                </Grid>
+              ) : null}
             </TabPanel>
           ))}
         </>
