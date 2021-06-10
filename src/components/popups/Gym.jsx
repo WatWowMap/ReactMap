@@ -167,7 +167,11 @@ const Header = ({
 
   const handleTimer = () => {
     setAnchorEl(null)
-    setTimerList([...timerList, id])
+    if (timerList.includes(id)) {
+      setTimerList(timerList.filter(x => x !== id))
+    } else {
+      setTimerList([...timerList, id])
+    }
   }
 
   const options = [
@@ -347,7 +351,7 @@ const GymInfo = ({ gym, t }) => {
       </Grid>
       <Grid item xs={12}>
         <Typography variant="subtitle1" align="center">
-          {t('slots')} {availble_slots}
+          {availble_slots} {t('slots')}
         </Typography>
       </Grid>
       {ex_raid_eligible && (
@@ -385,7 +389,7 @@ const RaidInfo = ({ gym, t }) => {
 
   const getRaidName = (raidLevel, id) => {
     if (id) {
-      return pokemon[raid_pokemon_id].name
+      return t(`poke_${raid_pokemon_id}`)
     }
     return `${t('tier')} ${raidLevel}`
   }
