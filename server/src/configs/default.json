@@ -44,6 +44,7 @@
     "scanAreasZoom": 12,
     "scanCellsZoom": 13,
     "submissionZoom": 15,
+    "legacyPkmnFilter": true,
     "theme": {
       "style": "dark",
       "primary": "#ff5722",

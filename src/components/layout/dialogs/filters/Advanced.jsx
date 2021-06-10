@@ -26,6 +26,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
   const ui = useStatic(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore(state => state.filters)
+  const { map: { legacyPkmnFilter } } = useStatic(state => state.config)
   const userSettings = useStore(state => state.userSettings)
   const setUserSettings = useStore(state => state.setUserSettings)
   const { t } = useTranslation()
@@ -97,7 +98,7 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
           <Grid item xs={type === 'pokemon' ? 5 : 10}>
             {type === 'pokemon' ? t('advanced') : t('setSize')}
           </Grid>
-          {type === 'pokemon' && (
+          {(type === 'pokemon' && legacyPkmnFilter) && (
             <Grid item xs={5}>
               <FormControlLabel
                 control={(
@@ -171,13 +172,13 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
           alignItems="center"
         >
           {type === 'pokemon' && (
-          <Grid item xs={8}>
-            <Size
-              filterValues={filterValues}
-              handleChange={handleChange}
-              btnSize="medium"
-            />
-          </Grid>
+            <Grid item xs={8}>
+              <Size
+                filterValues={filterValues}
+                handleChange={handleChange}
+                btnSize="medium"
+              />
+            </Grid>
           )}
           {[reset, save].map(button => (
             <Grid item xs={type === 'pokemon' ? 2 : 4} key={button.key} style={{ textAlign: 'right' }}>
