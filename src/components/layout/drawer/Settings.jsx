@@ -154,7 +154,7 @@ export default function Settings() {
                 {t('logout')}
               </Button>
             ) : (
-              <Link to="/login">
+              <Link to="/login" style={{ textDecoration: 'none' }}>
                 <Button
                   variant="contained"
                   style={{
