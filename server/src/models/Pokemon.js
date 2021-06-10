@@ -25,7 +25,7 @@ class Pokemon extends Model {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const { stats, iv: ivs, pvp } = perms
     const {
-      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat,
+      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv,
     } = args.filters
     const dbType = dbSelection('pokemon')
     const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
@@ -186,6 +186,9 @@ class Pokemon extends Model {
         if (onlyXsRat) {
           ivOr.orWhere('pokemon_id', 19)
             .andWhere('weight', '<=', 2.40625)
+        }
+        if (onlyZeroIv && ivs) {
+          ivOr.orWhere('iv', 0)
         }
       })
 

@@ -239,5 +239,6 @@
   "madQuestText": "Native Quests",
   "xs": "xs",
   "primary": "Primary",
-  "secondary": "Secondary"
+  "secondary": "Secondary",
+  "zeroIv": "Add 0% IV"
 }

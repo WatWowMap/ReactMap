@@ -29,6 +29,7 @@ export default function WithSliders({
   const { t } = useTranslation()
   const [tempLegacy, setTempLegacy] = useState(filters[category][specificFilter])
   const [openTab, setOpenTab] = useState(0)
+  const { pokemon } = useStatic(state => state.ui)
 
   const availableForms = useStatic(state => state.availableForms)
   const { icons } = useStatic(state => state.config)
@@ -133,7 +134,7 @@ export default function WithSliders({
                 >
                   {['xsRat', 'xlKarp'].map((each, i) => (
                     <Fragment key={each}>
-                      <Grid item xs={2} style={{ textAlign: 'left' }}>
+                      <Grid item xs={2}>
                         <img
                           style={{ maxHeight: 30, maxWidth: 30 }}
                           src={`${icons[userIcons].path}/${Utility.getPokemonIcon(availableForms, i ? 129 : 19)}.png`}
@@ -148,6 +149,7 @@ export default function WithSliders({
                       </Grid>
                       <Grid item xs={3}>
                         <Switch
+                          disabled={!pokemon[each]}
                           checked={filters[category][each]}
                           onChange={() => {
                             setFilters({
@@ -163,7 +165,41 @@ export default function WithSliders({
                     </Fragment>
                   ))}
                 </Grid>
-              ) : null}
+              ) : (
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  direction="row"
+                  alignItems="center"
+                  justify="center"
+                >
+                  {['zeroIv'].map(each => (
+                    <Fragment key={each}>
+                      <Grid item xs={6}>
+                        <Typography>
+                          {t(each)}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6} style={{ textAlign: 'right' }}>
+                        <Switch
+                          disabled={!pokemon[each]}
+                          checked={filters[category][each]}
+                          onChange={() => {
+                            setFilters({
+                              ...filters,
+                              [category]: {
+                                ...filters[category],
+                                [each]: !filters[category][each],
+                              },
+                            })
+                          }}
+                        />
+                      </Grid>
+                    </Fragment>
+                  ))}
+                </Grid>
+              )}
             </TabPanel>
           ))}
         </>
