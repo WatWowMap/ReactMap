@@ -3,7 +3,7 @@ const buildPokemon = require('./buildPokemon.js')
 const buildPokestops = require('./buildPokestops.js')
 const buildGyms = require('./buildGyms')
 const { GenericFilter, PokemonFilter } = require('../../models/index')
-const { database: { schemas } } = require('../config')
+const { database: { schemas }, map: { legacyPkmnFilter } } = require('../config')
 
 const base = new PokemonFilter()
 base.pvp()
@@ -52,7 +52,7 @@ module.exports = function buildDefault(perms) {
     } : undefined,
     pokemon: perms.pokemon ? {
       enabled: defaultFilters.pokemon.enabled,
-      legacy: pokemonReducer ? defaultFilters.pokemon.legacyFilter : undefined,
+      legacy: (pokemonReducer && legacyPkmnFilter) ? defaultFilters.pokemon.legacyFilter : undefined,
       iv: perms.iv ? true : undefined,
       stats: perms.stats ? true : undefined,
       pvp: perms.pvp ? true : undefined,

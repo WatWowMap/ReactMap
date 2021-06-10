@@ -5842,7 +5842,7 @@ pkg-dir@^4.1.0, pkg-dir@^4.2.0:
 
 "pogo-translations@git+https://github.com/bschultz/pogo-translations.git":
   version "0.2.0"
-  resolved "git+https://github.com/bschultz/pogo-translations.git#83e5dda8148775d7eb03a94b9f8c7e9232b58add"
+  resolved "git+https://github.com/bschultz/pogo-translations.git#d6203691a707bdb6271d8e97358495a03644ab35"
 
 popper.js@1.16.1-lts:
   version "1.16.1-lts"
