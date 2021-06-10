@@ -1,28 +1,26 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Fragment } from 'react'
 import {
   Grid, Typography, Switch, AppBar, Tab, Tabs, Box,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
-import { useStore } from '@hooks/useStore'
+import Utility from '@services/Utility'
+import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 
-function TabPanel(props) {
-  const { children, value, index } = props
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-    >
-      {value === index && (
-        <Box p={2}>
-          <Typography variant="caption">{children}</Typography>
-        </Box>
-      )}
-    </div>
-  )
-}
+const TabPanel = ({ children, value, index }) => (
+  <div
+    role="tabpanel"
+    hidden={value !== index}
+  >
+    {value === index && (
+      <Box p={2}>
+        <Typography variant="caption">{children}</Typography>
+      </Box>
+    )}
+  </div>
+)
 
 export default function WithSliders({
   category, filters, setFilters, context, specificFilter,
@@ -31,6 +29,11 @@ export default function WithSliders({
   const { t } = useTranslation()
   const [tempLegacy, setTempLegacy] = useState(filters[category][specificFilter])
   const [openTab, setOpenTab] = useState(0)
+  const { pokemon } = useStatic(state => state.ui)
+
+  const availableForms = useStatic(state => state.availableForms)
+  const { icons } = useStatic(state => state.config)
+  const { icons: userIcons } = useStore(state => state.settings)
 
   useEffect(() => {
     setFilters({
@@ -120,6 +123,83 @@ export default function WithSliders({
                   />
                 </Grid>
               ))}
+              {index ? (
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  direction="row"
+                  alignItems="center"
+                  justify="center"
+                >
+                  {['xsRat', 'xlKarp'].map((each, i) => (
+                    <Fragment key={each}>
+                      <Grid item xs={2}>
+                        <img
+                          style={{ maxHeight: 30, maxWidth: 30 }}
+                          src={`${icons[userIcons].path}/${Utility.getPokemonIcon(availableForms, i ? 129 : 19)}.png`}
+                        />
+                      </Grid>
+                      <Grid item xs={1} className="xs-xl">
+                        <Typography
+                          variant="subtitle2"
+                        >
+                          {i ? t('xl').toUpperCase() : t('xs').toUpperCase()}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Switch
+                          disabled={!pokemon[each]}
+                          checked={filters[category][each]}
+                          onChange={() => {
+                            setFilters({
+                              ...filters,
+                              [category]: {
+                                ...filters[category],
+                                [each]: !filters[category][each],
+                              },
+                            })
+                          }}
+                        />
+                      </Grid>
+                    </Fragment>
+                  ))}
+                </Grid>
+              ) : (
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  direction="row"
+                  alignItems="center"
+                  justify="center"
+                >
+                  {['zeroIv'].map(each => (
+                    <Fragment key={each}>
+                      <Grid item xs={6}>
+                        <Typography>
+                          {t(each)}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6} style={{ textAlign: 'right' }}>
+                        <Switch
+                          disabled={!pokemon[each]}
+                          checked={filters[category][each]}
+                          onChange={() => {
+                            setFilters({
+                              ...filters,
+                              [category]: {
+                                ...filters[category],
+                                [each]: !filters[category][each],
+                              },
+                            })
+                          }}
+                        />
+                      </Grid>
+                    </Fragment>
+                  ))}
+                </Grid>
+              )}
             </TabPanel>
           ))}
         </>
