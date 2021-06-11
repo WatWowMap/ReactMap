@@ -7,6 +7,7 @@
 const Discord = require('discord.js')
 const fs = require('fs')
 const { alwaysEnabledPerms, discord } = require('./config')
+const areas = require('./areas.js')
 
 const client = new Discord.Client()
 
@@ -70,11 +71,12 @@ class DiscordClient {
     const perms = {}
     Object.keys(discord.perms).map(perm => perms[perm] = false)
     perms.areaRestrictions = []
-
+    let overwriteAreaRestrictions = false
     const { guildsFull } = user
     const guilds = user.guilds.map(guild => guild.id)
     if (discord.allowedUsers.includes(user.id)) {
       Object.keys(perms).forEach((key) => perms[key] = true)
+      perms.areaRestrictions = []
       console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
       return perms
     }
@@ -107,8 +109,32 @@ class DiscordClient {
             }
           }
         }
+        // Check once if user role is defined inside areaRestrictions
+        if (Object.keys(areas.names).length > 0) {
+          for (let k = 0; k < userRoles.length; k += 1) {
+            for (const role of Object.values(discord.areaRestrictions)) {
+              if (role.roles.includes(userRoles[k])) {
+                // Check if there's empty list for any of user roles, if so we disable restrictions
+                if (role.areas.length === 0) {
+                  overwriteAreaRestrictions = true
+                } else if (!overwriteAreaRestrictions) {
+                  for (const areaName of role.areas) {
+                    if (areas.names.includes(areaName)) {
+                      perms.areaRestrictions.push(areaName)
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
+    // If any of user roles have no restrictions we are allowing all
+    if (overwriteAreaRestrictions && perms.areaRestrictions) perms.areaRestrictions = []
+    // Remove duplicates from perms.areaRestrictions
+    if (perms.areaRestrictions.length !== 0) perms.areaRestrictions = [...new Set(perms.areaRestrictions)]
+
     return perms
   }
 

@@ -16,6 +16,7 @@ const ScanAreaType = require('./scanArea')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
+const getAreaSql = require('../services/functions/getAreaSql')
 
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
@@ -36,7 +37,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.devices) {
-          return Device.getAllDevices(Utility.dbSelection('device') === 'mad')
+          return Device.getAllDevices(perms, Utility.dbSelection('device') === 'mad')
         }
       },
     },
@@ -85,7 +86,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.nests) {
-          return Nest.getNestingSpecies(args)
+          return Nest.getNestingSpecies(args, perms)
         }
       },
     },
@@ -188,9 +189,13 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.portals) {
-          return Portal.query()
+          const query = Portal.query()
             .whereBetween('lat', [args.minLat, args.maxLat])
             .andWhereBetween('lon', [args.minLon, args.maxLon])
+          if (perms.areaRestrictions.length > 0) {
+            getAreaSql(query, perms.areaRestrictions)
+          }
+          return query
         }
       },
     },
@@ -200,7 +205,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.s2cells) {
-          return S2cell.getAllCells(args, Utility.dbSelection('pokestop') === 'mad')
+          return S2cell.getAllCells(args, perms, Utility.dbSelection('pokestop') === 'mad')
         }
       },
     },
@@ -224,7 +229,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.spawnpoints) {
-          return Spawnpoint.getAllSpawnpoints(args, Utility.dbSelection('spawnpoint') === 'mad')
+          return Spawnpoint.getAllSpawnpoints(args, perms, Utility.dbSelection('spawnpoint') === 'mad')
         }
       },
     },

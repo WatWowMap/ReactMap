@@ -10,6 +10,7 @@ const {
   },
 } = require('../services/config')
 const dbSelection = require('../services/functions/dbSelection')
+const getAreaSql = require('../services/functions/getAreaSql')
 
 class Pokemon extends Model {
   static get tableName() {
@@ -23,7 +24,9 @@ class Pokemon extends Model {
 
   static async getPokemon(args, perms, isMad) {
     const ts = Math.floor((new Date()).getTime() / 1000)
-    const { stats, iv: ivs, pvp } = perms
+    const {
+      stats, iv: ivs, pvp, areaRestrictions,
+    } = perms
     const {
       onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv,
     } = args.filters
@@ -162,6 +165,7 @@ class Pokemon extends Model {
     query.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
       .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
+      // .andWhereRaw(getAreaSql(areaRestrictions))
       .andWhere(ivOr => {
         for (const [pkmn, filter] of Object.entries(args.filters)) {
           if (pkmn.includes('-')) {
@@ -191,6 +195,9 @@ class Pokemon extends Model {
           ivOr.orWhere('iv', 0)
         }
       })
+    if (areaRestrictions.length > 0) {
+      getAreaSql(query, areaRestrictions, isMad, 'pokemon')
+    }
 
     const results = await query
     const finalResults = []
@@ -235,6 +242,9 @@ class Pokemon extends Model {
           pvpBuilder.whereNotNull('pvp_rankings_great_league')
             .orWhereNotNull('pvp_rankings_ultra_league')
         })
+      }
+      if (areaRestrictions.length > 0) {
+        getAreaSql(pvpQuery, areaRestrictions, isMad, 'pokemon')
       }
       pvpResults.push(...await pvpQuery)
     }
