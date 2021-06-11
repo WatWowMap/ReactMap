@@ -9,8 +9,8 @@ import stopMarker from '../markers/pokestop'
 import Timer from './Timer'
 
 const PokestopTile = ({
-  item, ts, showTimer, filters, iconSizes, path, iconModifiers, availableForms, perms, excludeList,
-  userSettings, params, showCircles,
+  item, ts, showTimer, filters, iconSizes, path, iconModifiers, availableForms, perms, excludeList, userSettings,
+  params, showCircles,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
