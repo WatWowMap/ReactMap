@@ -2,7 +2,8 @@
 import L from 'leaflet'
 import Utility from '../../services/Utility'
 
-export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, iconModifiers, availableForms) {
+export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, filters,
+                                   iconSizes, path, iconModifiers, availableForms) {
   const { grunt_type, lure_id } = pokestop
 
   let iconType = 'pokestop/0'

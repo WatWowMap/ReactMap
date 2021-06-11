@@ -9,7 +9,8 @@ import stopMarker from '../markers/pokestop'
 import Timer from './Timer'
 
 const PokestopTile = ({
-  item, ts, showTimer, filters, iconSizes, path, iconModifiers, availableForms, perms, excludeList, userSettings, params, showCircles,
+  item, ts, showTimer, filters, iconSizes, path, iconModifiers, availableForms,
+                        perms, excludeList, userSettings, params, showCircles,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
@@ -52,7 +53,8 @@ const PokestopTile = ({
               }
             }}
             position={[item.lat, item.lon]}
-            icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, iconModifiers, availableForms)}
+            icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, iconSizes, path,
+                iconModifiers, availableForms)}
           >
             <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
               <PopupContent
