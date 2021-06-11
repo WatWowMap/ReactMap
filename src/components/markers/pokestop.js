@@ -78,8 +78,8 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
           <img 
             src=${path}/${Utility.getPokemonIcon(availableForms, megaId, 0, 1)}.png 
             style="bottom: 15px; 
-              width:${iconOffsets.pokestops.sizeMultiplier ? iconSizes[filters.filter[filterId].size * iconOffsets.pokestops.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px; 
-              height:${iconOffsets.pokestops.sizeMultiplier ? iconSizes[filters.filter[filterId].size * iconOffsets.pokestops.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px;"
+              width:${iconOffsets.pokestops.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconOffsets.pokestops.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px; 
+              height:${iconOffsets.pokestops.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconOffsets.pokestops.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px;"
           />`
         if (megaAmount > 1) {
           iconHtml += `<div class="amount-holder"><div>${megaAmount}</div></div>`
