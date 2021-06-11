@@ -19,7 +19,7 @@ const getPolling = category => {
 export default function QueryData({
   bounds, onMove, map, tileStyle, zoomLevel, config, params,
   category, available, filters, staticFilters, staticUserSettings,
-  userSettings, perms, path, availableForms,
+  userSettings, perms, path, iconModifiers, availableForms,
 }) {
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
@@ -95,6 +95,7 @@ export default function QueryData({
           config={config}
           filters={filters}
           path={path}
+          iconModifiers={iconModifiers}
           tileStyle={tileStyle}
           perms={perms}
           availableForms={availableForms}

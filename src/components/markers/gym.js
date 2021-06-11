@@ -2,7 +2,7 @@
 import L from 'leaflet'
 import Utility from '../../services/Utility'
 
-export default function gymMarker(gym, ts, hasRaid, iconSizes, filters, path, availableForms) {
+export default function gymMarker(gym, ts, hasRaid, iconSizes, filters, path, iconModifiers, availableForms) {
   const {
     in_battle, team_id, availble_slots, raid_level,
   } = gym
@@ -47,13 +47,13 @@ export default function gymMarker(gym, ts, hasRaid, iconSizes, filters, path, av
     } else if (raid_battle_timestamp < ts) {
       raidIcon = `/images/unknown_egg/${raid_level}.png`
     }
-    const offsetY = iconSizes.offsetY ? -gymSize * iconSizes.offsetY
+    const offsetY = iconModifiers.offsetY ? -gymSize * iconModifiers.offsetY
       : gymSize * 0.269 - raidSize - filledSlots
     iconHtml += `
       <div class="marker-image-holder top-overlay" 
         style="width:${raidSize}px;
           height:${raidSize}px;
-          left:${iconSizes.offsetX ? iconSizes.offsetX * 100 : 50}%;
+          left:${iconModifiers.offsetX ? iconModifiers.offsetX * 100 : 50}%;
           transform:translateX(-50%);
           top:${offsetY}px;"
       >

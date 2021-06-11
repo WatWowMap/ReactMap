@@ -75,18 +75,13 @@
         "sm": 20,
         "md": 35,
         "lg": 50,
-        "xl": 65,
-        "offsetX": 0,
-        "offsetY": 0
+        "xl": 65
       },
       "pokestops": {
         "sm": 15,
         "md": 25,
         "lg": 35,
-        "xl": 45,
-        "offsetX": 0,
-        "offsetY": 0,
-        "sizeMultiplier": 0
+        "xl": 45
       },
       "pokemon": {
         "sm": 20,
@@ -358,7 +353,18 @@
   },
   "icons": {
     "Default": {
-      "path": "https://mygod.github.io/pokicons/v2"
+      "path": "https://mygod.github.io/pokicons/v2",
+      "iconModifiers": {
+        "gyms": {
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "pokestops": {
+          "offsetX": 0,
+          "offsetY": 0,
+          "sizeMultiplier": 0
+        }
+      }
     }
   },
   "rarity": {

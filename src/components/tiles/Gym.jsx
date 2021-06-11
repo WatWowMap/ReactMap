@@ -18,7 +18,7 @@ const getColor = team => {
 }
 
 const GymTile = ({
-  item, ts, showTimer, iconSizes, filters, path, availableForms, excludeList, userSettings, params, showCircles,
+  item, ts, showTimer, iconSizes, filters, path, iconModfiers, availableForms, excludeList, userSettings, params, showCircles,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
@@ -52,7 +52,7 @@ const GymTile = ({
             }
           }}
           position={[item.lat, item.lon]}
-          icon={gymMarker(item, ts, hasRaid, iconSizes, filters, path, availableForms, excludeList)}
+          icon={gymMarker(item, ts, hasRaid, iconSizes, filters, path, iconModfiers, availableForms, excludeList)}
         >
           <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
             <PopupContent
