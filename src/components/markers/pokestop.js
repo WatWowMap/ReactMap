@@ -92,7 +92,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
         class="marker-image-holder top-overlay" 
         style="width:${questSize}px;
         height:${questSize}px;
-        left:${iconSizes.offsetX ? iconSizes.offsetX * 10 : 50}%;
+        left:${iconSizes.offsetX ? iconSizes.offsetX * 100 : 50}%;
         transform:translateX(-50%);
         top:${offsetY}px;"
       >

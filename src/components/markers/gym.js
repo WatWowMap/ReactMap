@@ -53,7 +53,7 @@ export default function gymMarker(gym, ts, hasRaid, iconSizes, filters, path, av
       <div class="marker-image-holder top-overlay" 
         style="width:${raidSize}px;
           height:${raidSize}px;
-          left:${iconSizes.offsetX ? iconSizes.offsetX * 10 : 50}%;
+          left:${iconSizes.offsetX ? iconSizes.offsetX * 100 : 50}%;
           transform:translateX(-50%);
           top:${offsetY}px;"
       >
