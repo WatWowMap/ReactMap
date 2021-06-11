@@ -2,7 +2,7 @@
 import L from 'leaflet'
 import Utility from '../../services/Utility'
 
-const { map: { iconOffsets } } = require('../config')
+const { map: { iconOffsets } } = require('../../config')
 
 export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, availableForms) {
   const { grunt_type, lure_id } = pokestop
@@ -86,8 +86,8 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
           iconHtml += `<div class="amount-holder"><div>${megaAmount}</div></div>`
         } break
     }
-    const questSize = (filters.filter[filterId] ? iconSizes[filters.filter[filterId].size] :
-        iconSizes.md) * (iconOffsets.pokestops.sizeMultiplier ? iconOffsets.pokestops.sizeMultiplier : 1)
+    const questSize = (filters.filter[filterId] ? iconSizes[filters.filter[filterId].size]
+      : iconSizes.md) * (iconOffsets.pokestops.sizeMultiplier ? iconOffsets.pokestops.sizeMultiplier : 1)
     const offsetY = iconOffsets.pokestops.offsetY ? -stopSize * iconOffsets.pokestops.offsetY : 0 - questSize
     iconHtml = `
       <div 
