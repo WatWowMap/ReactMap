@@ -2,8 +2,6 @@
 import L from 'leaflet'
 import Utility from '../../services/Utility'
 
-const { map: { iconOffsets } } = require('../../config')
-
 export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, availableForms) {
   const { grunt_type, lure_id } = pokestop
 
@@ -79,22 +77,22 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
           <img 
             src=${path}/${Utility.getPokemonIcon(availableForms, megaId, 0, 1)}.png 
             style="bottom: 15px; 
-              width:${iconOffsets.pokestops.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconOffsets.pokestops.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px; 
-              height:${iconOffsets.pokestops.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconOffsets.pokestops.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px;"
+              width:${iconSizes.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconSizes.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px; 
+              height:${iconSizes.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconSizes.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px;"
           />`
         if (megaAmount > 1) {
           iconHtml += `<div class="amount-holder"><div>${megaAmount}</div></div>`
         } break
     }
     const questSize = (filters.filter[filterId] ? iconSizes[filters.filter[filterId].size]
-      : iconSizes.md) * (iconOffsets.pokestops.sizeMultiplier ? iconOffsets.pokestops.sizeMultiplier : 1)
-    const offsetY = iconOffsets.pokestops.offsetY ? -stopSize * iconOffsets.pokestops.offsetY : 0 - questSize
+      : iconSizes.md) * (iconSizes.sizeMultiplier ? iconSizes.sizeMultiplier : 1)
+    const offsetY = iconSizes.offsetY ? -stopSize * iconSizes.offsetY : 0 - questSize
     iconHtml = `
       <div 
         class="marker-image-holder top-overlay" 
         style="width:${questSize}px;
         height:${questSize}px;
-        left:${iconOffsets.pokestops.offsetX ? iconOffsets.pokestops.offsetX * 10 : 50}%;
+        left:${iconSizes.offsetX ? iconSizes.offsetX * 10 : 50}%;
         transform:translateX(-50%);
         top:${offsetY}px;"
       >

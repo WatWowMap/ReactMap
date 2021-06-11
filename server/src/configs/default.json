@@ -75,13 +75,18 @@
         "sm": 20,
         "md": 35,
         "lg": 50,
-        "xl": 65
+        "xl": 65,
+        "offsetX": 0,
+        "offsetY": 0
       },
       "pokestops": {
         "sm": 15,
         "md": 25,
         "lg": 35,
-        "xl": 45
+        "xl": 45,
+        "offsetX": 0,
+        "offsetY": 0,
+        "sizeMultiplier": 0
       },
       "pokemon": {
         "sm": 20,
@@ -94,17 +99,6 @@
         "md": 1,
         "lg": 2,
         "xl": 3
-      }
-    },
-    "iconOffsets": {
-      "gyms": {
-        "offsetX": 0,
-        "offsetY": 0
-      },
-      "pokestops": {
-        "offsetX": 0,
-        "offsetY": 0,
-        "sizeMultiplier": 0
       }
     }
   },
