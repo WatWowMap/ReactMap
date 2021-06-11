@@ -1,7 +1,8 @@
 /* eslint-disable camelcase */
 import L from 'leaflet'
 import Utility from '../../services/Utility'
-const { map: { iconOffsets } } = require('./config')
+
+const { map: { iconOffsets } } = require('../config')
 
 export default function gymMarker(gym, ts, hasRaid, iconSizes, filters, path, availableForms) {
   const {
@@ -48,12 +49,13 @@ export default function gymMarker(gym, ts, hasRaid, iconSizes, filters, path, av
     } else if (raid_battle_timestamp < ts) {
       raidIcon = `/images/unknown_egg/${raid_level}.png`
     }
-    const offsetY = iconOffsets.gyms.offsetY ? -gymSize * iconOffsets.gyms.offsetY : gymSize * 0.269 - raidSize - filledSlots
+    const offsetY = iconOffsets.gyms.offsetY ? -gymSize * iconOffsets.gyms.offsetY :
+        gymSize * 0.269 - raidSize - filledSlots
     iconHtml += `
       <div class="marker-image-holder top-overlay" 
         style="width:${raidSize}px;
           height:${raidSize}px;
-          left:${conOffsets.gyms.offsetX ? iconOffsets.gyms.offsetX * 10 : 50}%;
+          left:${iconOffsets.gyms.offsetX ? iconOffsets.gyms.offsetX * 10 : 50}%;
           transform:translateX(-50%);
           top:${offsetY}px;"
       >
