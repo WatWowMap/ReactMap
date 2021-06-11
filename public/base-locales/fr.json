@@ -1,6 +1,6 @@
 {
   "login": "Connexion",
-  "clickOnce": "Ne cliquer Connexion qu'une fois",
+  "clickOnce": "Ne cliquer 'Connexion' qu'une fois",
   "save": "Enregistrer",
   "reset": "Réinitialiser",
   "close": "Fermer",
@@ -74,7 +74,7 @@
   "tileServers": "Type de Carte",
   "icons": "Icônes",
   "navigation": "Navigation",
-  "drawer": "Drawer",
+  "drawer": "Menu",
   "tileServersDefault": "Défaut",
   "tileServersOSM": "OSM",
   "tileServersDarkMatter": "Dark Matter",
