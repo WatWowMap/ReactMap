@@ -192,7 +192,7 @@ class Pokemon extends Model {
             .andWhere('weight', '<=', 2.40625)
         }
         if (onlyZeroIv && ivs) {
-          ivOr.orWhere('iv', 0)
+          ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 0)
         }
       })
     if (areaRestrictions.length > 0) {

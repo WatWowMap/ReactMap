@@ -2,17 +2,20 @@ const areas = require('../areas.js')
 
 module.exports = function getAreaRestrictionSql(query, areaRestrictions, isMad, category) {
   let columns = ['lat', 'lon']
-  if (isMad && category !== 'device') {
-    columns = ['latitude', 'longitude']
-  }
-  if (isMad && category === 'pokemon') {
-    columns = columns.map(each => `pokemon.${each}`)
+  if (isMad) {
+    if (category === 'device') {
+      columns = ['X(currentPos)', 'Y(currentPos)']
+    } else {
+      columns = ['latitude', 'longitude']
+    }
+    if (category === 'pokemon') {
+      columns = columns.map(each => `pokemon.${each}`)
+    }
+  } else if (category === 'device') {
+    columns = columns.map(each => `last_${each}`)
   }
   if (category === 's2cell') {
     columns = columns.map(each => `center_${each}`)
-  }
-  if (category === 'device') {
-    columns = columns.map(each => `last_${each}`)
   }
 
   query.andWhere(restrictions => {
