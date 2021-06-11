@@ -71,7 +71,6 @@ class DiscordClient {
     const perms = {}
     Object.keys(discord.perms).map(perm => perms[perm] = false)
     perms.areaRestrictions = []
-    let overwriteAreaRestrictions = false
     const { guildsFull } = user
     const guilds = user.guilds.map(guild => guild.id)
     if (discord.allowedUsers.includes(user.id)) {
@@ -92,7 +91,7 @@ class DiscordClient {
       if (guilds.includes(guildId)) {
         const keys = Object.keys(discord.perms)
         const userRoles = await this.getUserRoles(guildId, user.id)
-
+        // Roles & Perms
         for (let j = 0; j < keys.length; j += 1) {
           const key = keys[j]
           const configItem = discord.perms[key]
@@ -109,32 +108,27 @@ class DiscordClient {
             }
           }
         }
-        // Check once if user role is defined inside areaRestrictions
+        // Area Restriction Rules
         if (Object.keys(areas.names).length > 0) {
-          for (let k = 0; k < userRoles.length; k += 1) {
-            for (const role of Object.values(discord.areaRestrictions)) {
-              if (role.roles.includes(userRoles[k])) {
-                // Check if there's empty list for any of user roles, if so we disable restrictions
-                if (role.areas.length === 0) {
-                  overwriteAreaRestrictions = true
-                } else if (!overwriteAreaRestrictions) {
-                  for (const areaName of role.areas) {
+          for (let j = 0; j < userRoles.length; j += 1) {
+            discord.areaRestrictions.forEach(rule => {
+              if (rule.roles.includes(userRoles[j])) {
+                if (rule.areas.length > 0) {
+                  rule.areas.forEach(areaName => {
                     if (areas.names.includes(areaName)) {
                       perms.areaRestrictions.push(areaName)
                     }
-                  }
+                  })
                 }
               }
-            }
+            })
           }
         }
       }
     }
-    // If any of user roles have no restrictions we are allowing all
-    if (overwriteAreaRestrictions && perms.areaRestrictions) perms.areaRestrictions = []
-    // Remove duplicates from perms.areaRestrictions
-    if (perms.areaRestrictions.length !== 0) perms.areaRestrictions = [...new Set(perms.areaRestrictions)]
-
+    if (perms.areaRestrictions.length > 0) {
+      perms.areaRestrictions = [...new Set(perms.areaRestrictions)]
+    }
     return perms
   }
 

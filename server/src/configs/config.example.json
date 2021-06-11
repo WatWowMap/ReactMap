@@ -81,16 +81,16 @@
     "allowedGuilds": [],
     "blockedGuilds": [],
     "allowedUsers": [],
-    "areaRestrictions": {
-      "rule1": {
-          "roles": [],
-          "areas": []
+    "areaRestrictions": [
+      {
+        "roles": [],
+        "areas": []
       },
-      "rule2": {
-          "roles": [],
-          "areas": []
+      {
+        "roles": [],
+        "areas": []
       }
-    },
+    ],
     "perms": {
       "map": {
         "enabled": true,

@@ -15,7 +15,6 @@ const connections = Object.values(schemas).map(schema => Knex({
   pool: {
     afterCreate(conn, done) {
       conn.query('SET time_zone="+00:00";', (err) => done(err, conn))
-      console.log('Timezone Set')
     },
   },
 }))
