@@ -16,7 +16,6 @@ const ScanAreaType = require('./scanArea')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
-const getAreaSql = require('../services/functions/getAreaSql')
 
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
@@ -189,13 +188,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.portals) {
-          const query = Portal.query()
-            .whereBetween('lat', [args.minLat, args.maxLat])
-            .andWhereBetween('lon', [args.minLon, args.maxLon])
-          if (perms.areaRestrictions.length > 0) {
-            getAreaSql(query, perms.areaRestrictions)
-          }
-          return query
+          return Portal.getAllPortals(args, perms)
         }
       },
     },
