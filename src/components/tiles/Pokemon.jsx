@@ -76,7 +76,7 @@ const PokemonTile = ({
           }}
           position={[item.lat, item.lon]}
           icon={(pvpCheck || glowStatus || ivCircle)
-            ? fancyMarker(iconUrl, item, filters, iconSizes, glowStatus, userSettings.ivCircles)
+            ? fancyMarker(iconUrl, item, filters, iconSizes, glowStatus, ivCircle)
             : basicMarker(iconUrl, item, filters, iconSizes)}
         >
           <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
