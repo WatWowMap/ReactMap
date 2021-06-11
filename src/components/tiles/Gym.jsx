@@ -18,8 +18,8 @@ const getColor = team => {
 }
 
 const GymTile = ({
-  item, ts, showTimer, iconSizes, filters, path, iconModifiers, availableForms,
-                   excludeList, userSettings, params, showCircles,
+  item, ts, showTimer, iconSizes, filters, path, iconModifiers, availableForms, excludeList,
+  userSettings, params, showCircles,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
