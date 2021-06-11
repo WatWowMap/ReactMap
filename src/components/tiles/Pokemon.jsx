@@ -53,7 +53,9 @@ const PokemonTile = ({
     return glowValue
   }, [])
   const glowStatus = userSettings.glow ? getGlowStatus() : undefined
-  const ivCircle = userSettings.ivCircles && item.iv >= userSettings.minIvCircle
+  const ivCircle = userSettings.ivCircles && item.iv !== null && item.iv >= userSettings.minIvCircle
+  const pvpCheck = item.bestPvp !== null && item.bestPvp < 4
+
   useEffect(() => {
     const { id } = params
     if (id === item.id) {
@@ -73,8 +75,8 @@ const PokemonTile = ({
             }
           }}
           position={[item.lat, item.lon]}
-          icon={(item.bestPvp < 4 || glowStatus || ivCircle)
-            ? fancyMarker(iconUrl, item, filters, iconSizes, glowStatus, userSettings.ivCircles)
+          icon={(pvpCheck || glowStatus || ivCircle)
+            ? fancyMarker(iconUrl, item, filters, iconSizes, glowStatus, ivCircle)
             : basicMarker(iconUrl, item, filters, iconSizes)}
         >
           <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
