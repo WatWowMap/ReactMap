@@ -235,7 +235,7 @@
   "arEligible": "RA Actif",
   "ivCircles": "Indicateurs d'IV",
   "minIvCircle": "Seuil étiquette IV",
-  "interactionRanges": "Portée de capture",
+  "interactionRanges": "Portée d'interaction",
   "cannotConnect": "\nImpossible de se connecter au serveur.\nRé-essayer immédiatement ne ferait que surcharger le serveur.\nEssayez à nouveau dans quelques minutes.\n\n- Merci",
   "madQuestText": "Quêtes Directes",
   "primary": "Primaire",
