@@ -397,7 +397,7 @@ const ExtraInfo = ({ pokemon, perms, t }) => {
       alignItems="center"
       justify="center"
     >
-      {(perms.iv && iv) && [move_1, move_2].map((move, i) => (
+      {(perms.iv && iv !== null) && [move_1, move_2].map((move, i) => (
         <Fragment key={move}>
           <Grid
             item
