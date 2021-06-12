@@ -50,8 +50,7 @@ export default function MenuTile({
     />
   )
   const selection = (
-    <IconButton onClick={handleFilterChange}
-    >
+    <IconButton onClick={handleFilterChange}>
       {tempFilters[item.id].enabled
         ? <Check style={{ color: '#00e676' }} />
         : <Clear color="primary" />}
