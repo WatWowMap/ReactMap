@@ -97,7 +97,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               availableForms={availableForms}
               path={icons[userIcons].path}
               iconModifiers={icons[userIcons].iconModifiers ? icons[userIcons].iconModifiers[category]
-                : { "offsetX": 0, "offsetY": 0, "sizeMultiplier": 0 }}
+                : { offsetX: 0, offsetY: 0, sizeMultiplier: 0 }}
               staticFilters={staticFilters[category].filter}
               userSettings={userSettings[userSettingsCategory(category)] || {}}
               filters={filters[category]}
