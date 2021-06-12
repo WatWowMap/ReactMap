@@ -19,6 +19,16 @@ export default function MenuTile({
     return ''
   }
 
+  const handleFilterChange = () => {
+    setTempFilters({
+      ...tempFilters,
+      [item.id]: {
+        ...tempFilters[item.id],
+        enabled: !tempFilters[item.id].enabled,
+      },
+    })
+  }
+
   const backgroundColor = columnIndex % 2
     ? rowIndex % 2 === 0
       ? 'rgba(1, 1, 1, 0.01)'
@@ -36,27 +46,11 @@ export default function MenuTile({
         maxWidth: isMobile ? 50 : 75,
       }}
       onError={(e) => { e.target.onerror = null; e.target.src = '/images/item/0.png' }}
-      onClick={() => {
-        setTempFilters({
-          ...tempFilters,
-          [item.id]: {
-            ...tempFilters[item.id],
-            enabled: !tempFilters[item.id].enabled,
-          },
-        })
-      }}
+      onClick={handleFilterChange}
     />
   )
   const selection = (
-    <IconButton onClick={() => {
-      setTempFilters({
-        ...tempFilters,
-        [item.id]: {
-          ...tempFilters[item.id],
-          enabled: !tempFilters[item.id].enabled,
-        },
-      })
-    }}
+    <IconButton onClick={handleFilterChange}
     >
       {tempFilters[item.id].enabled
         ? <Check style={{ color: '#00e676' }} />
