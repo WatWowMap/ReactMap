@@ -36,6 +36,15 @@ export default function MenuTile({
         maxWidth: isMobile ? 50 : 75,
       }}
       onError={(e) => { e.target.onerror = null; e.target.src = '/images/item/0.png' }}
+      onClick={() => {
+        setTempFilters({
+          ...tempFilters,
+          [item.id]: {
+            ...tempFilters[item.id],
+            enabled: !tempFilters[item.id].enabled,
+          },
+        })
+      }}
     />
   )
   const selection = (
