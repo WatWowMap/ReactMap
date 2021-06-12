@@ -2,7 +2,8 @@
 import L from 'leaflet'
 import Utility from '../../services/Utility'
 
-export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, availableForms) {
+export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, iconModifiers,
+  availableForms) {
   const { grunt_type, lure_id } = pokestop
 
   let iconType = 'pokestop/0'
@@ -77,21 +78,22 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
           <img 
             src=${path}/${Utility.getPokemonIcon(availableForms, megaId, 0, 1)}.png 
             style="bottom: 15px; 
-              width:${iconSizes[filters.filter[filterId].size]}px; 
-              height:${iconSizes[filters.filter[filterId].size]}px;"
+              width:${iconModifiers.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconModifiers.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px; 
+              height:${iconModifiers.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconModifiers.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px;"
           />`
         if (megaAmount > 1) {
           iconHtml += `<div class="amount-holder"><div>${megaAmount}</div></div>`
         } break
     }
-    const questSize = filters.filter[filterId] ? iconSizes[filters.filter[filterId].size] : iconSizes.md
-    const offsetY = 0 - questSize
+    const questSize = (filters.filter[filterId] ? iconSizes[filters.filter[filterId].size] : iconSizes.md)
+      * (iconModifiers.sizeMultiplier ? iconModifiers.sizeMultiplier : 1)
+    const offsetY = iconModifiers.offsetY ? -stopSize * iconModifiers.offsetY : 0 - questSize
     iconHtml = `
       <div 
         class="marker-image-holder top-overlay" 
         style="width:${questSize}px;
         height:${questSize}px;
-        left:50%;
+        left:${iconModifiers.offsetX ? iconModifiers.offsetX * 100 : 50}%;
         transform:translateX(-50%);
         top:${offsetY}px;"
       >
