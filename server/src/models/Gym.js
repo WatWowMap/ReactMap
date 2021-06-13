@@ -172,7 +172,7 @@ class Gym extends Model {
           filteredResults.push(gym)
         } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]) {
           filteredResults.push(gym)
-        } else if (gyms && (onlyGyms || onlyArEligible)) {
+        } else if (gyms && (onlyGyms || onlyArEligible || onlyExEligible)) {
           if (args.filters[`t${gym.team_id}-0`]) {
             gym.raid_end_timestamp = null
             gym.raid_battle_timestamp = null
