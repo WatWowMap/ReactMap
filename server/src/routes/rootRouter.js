@@ -17,7 +17,7 @@ const rootRouter = new express.Router()
 
 rootRouter.use('/', clientRouter)
 
-if (config.discord.enabled) {
+if (config.discord.enabled || config.localAuth.enabled) {
   rootRouter.use('/auth', authRouter)
 
   // eslint-disable-next-line no-unused-vars
@@ -46,7 +46,7 @@ rootRouter.get('/logout', (req, res) => {
 
 rootRouter.get('/settings', async (req, res) => {
   try {
-    if (!config.discord.enabled) {
+    if (!config.discord.enabled && !config.localAuth.enabled) {
       req.session.perms = {}
       Object.keys(config.discord.perms).forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
       req.session.save()
@@ -56,7 +56,7 @@ rootRouter.get('/settings', async (req, res) => {
       req.session.save()
     }
     const getUser = () => {
-      if (config.discord.enabled) {
+      if (config.discord.enabled || config.localAuth.enabled) {
         if (req.user || config.alwaysEnabledPerms.length === 0) {
           return req.user
         }
@@ -66,6 +66,7 @@ rootRouter.get('/settings', async (req, res) => {
     const serverSettings = {
       user: getUser(),
       discord: config.discord.enabled,
+      localAuth: config.localAuth.enabled,
       settings: {},
     }
 

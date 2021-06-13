@@ -240,5 +240,6 @@
   "madQuestText": "Quêtes Directes",
   "primary": "Primaire",
   "secondary": "Secondaire",
-  "zeroIv": "IV 0%"
+  "zeroIv": "IV 0%",
+  "orUseDiscord": "ou se connecter avec Discord"
 }

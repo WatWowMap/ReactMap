@@ -33,7 +33,7 @@
         {"name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
         {"name": "Nundo", "perm": "iv", "num": 0, "value": "#000000", "op": "=" },
         {"name": "Top Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
-        {"name": "Multiple", "perm": "pvp", "value": "#800080" }    
+        {"name": "Multiple", "perm": "pvp", "value": "#800080" }
       ]
     }
   },
@@ -41,6 +41,7 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
+      "localUserTableName": "members",
       "leagues": ["great", "ultra"]
     },
     "schemas": {
@@ -65,8 +66,19 @@
         "charset": "utf8mb4",
         "arScanColumn": false,
         "useFor": ["session", "user", "nest", "portal"]
+      },
+      "localAuth": {
+        "type": "localAuth",
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "user",
+        "password": "pass123!",
+        "database": "localauthdb",
+        "charset": "utf8mb4",
+        "arScanColumn": false,
+        "useFor": ["localUser"]
       }
-    }  
+    }
   },
   "alwaysEnabledPerms": [],
   "discord": {

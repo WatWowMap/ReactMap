@@ -196,6 +196,7 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
+      "localUserTableName": "members",
       "leagues": ["great", "ultra"]
     },
     "schemas": {
@@ -217,6 +218,17 @@
         "username": "user",
         "password": "pass123!",
         "database": "manualdb",
+        "charset": "utf8mb4",
+        "arScanColumn": false,
+        "useFor": []
+      },
+      "localAuth": {
+        "type": "localAuth",
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "user",
+        "password": "pass123!",
+        "database": "localauthdb",
         "charset": "utf8mb4",
         "arScanColumn": false,
         "useFor": []
@@ -312,6 +324,99 @@
       "devices": {
         "enabled": true,
         "roles": []
+      }
+    }
+  },
+  "localAuth": {
+    "enabled": false,
+    "settings": {
+      "usernameFormField": "username",
+      "passwordFormField": "password",
+      "usernameToLowerCase": true,
+      "passwordEncryption": "md5",
+      "usernameDbField": "username",
+      "passwordDbField": "password",
+      "discordIdDbField": "discordId",
+      "emailDbField": "email",
+      "statusDbField": "status"
+    },
+    "allowedUsers": [],
+    "perms": {
+      "map": {
+        "enabled": true,
+        "status": []
+      },
+      "pokemon": {
+        "enabled": true,
+        "status": []
+      },
+      "stats": {
+        "enabled": true,
+        "status": []
+      },
+      "iv": {
+        "enabled": true,
+        "status": []
+      },
+      "pvp": {
+        "enabled": true,
+        "status": []
+      },
+      "gyms": {
+        "enabled": true,
+        "status": []
+      },
+      "raids": {
+        "enabled": true,
+        "status": []
+      },
+      "pokestops": {
+        "enabled": true,
+        "status": []
+      },
+      "quests": {
+        "enabled": true,
+        "status": []
+      },
+      "lures": {
+        "enabled": true,
+        "status": []
+      },
+      "portals": {
+        "enabled": true,
+        "status": []
+      },
+      "submissionCells": {
+        "enabled": true,
+        "status": []
+      },
+      "invasions": {
+        "enabled": true,
+        "status": []
+      },
+      "nests": {
+        "enabled": true,
+        "status": []
+      },
+      "scanAreas": {
+        "enabled": true,
+        "status": []
+      },
+      "weather": {
+        "enabled": true,
+        "status": []
+      },
+      "spawnpoints": {
+        "enabled": true,
+        "status": []
+      },
+      "s2cells": {
+        "enabled": true,
+        "status": []
+      },
+      "devices": {
+        "enabled": true,
+        "status": []
       }
     }
   },

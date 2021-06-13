@@ -240,5 +240,6 @@
   "xs": "xs",
   "primary": "Primary",
   "secondary": "Secondary",
-  "zeroIv": "Add 0% IV"
+  "zeroIv": "Add 0% IV",
+  "orUseDiscord": "or log in with Discord"
 }
