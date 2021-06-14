@@ -240,5 +240,8 @@
   "xs": "xs",
   "primary": "Primary",
   "secondary": "Secondary",
-  "zeroIv": "Add 0% IV"
+  "zeroIv": "Add 0% IV",
+  "openMenu": "Open Menu",
+  "zoomIn": "Zoom In",
+  "zoomOut": "Zoom Out"
 }

@@ -240,5 +240,8 @@
   "madQuestText": "Quêtes Directes",
   "primary": "Primaire",
   "secondary": "Secondaire",
-  "zeroIv": "IV 0%"
+  "zeroIv": "IV 0%",
+  "openMenu": "Ouvrir le Menu",
+  "zoomIn": "Zoom avant",
+  "zoomOut": "Zoom arrière"
 }

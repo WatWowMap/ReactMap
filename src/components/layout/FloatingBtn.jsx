@@ -37,9 +37,6 @@ export default function FloatingButtons({ toggleDrawer }) {
 
   const locateOptions = {
     keepCurrentZoomLevel: true,
-    strings: {
-      title: t('useMyLocation'),
-    },
     onActivate: () => { },
   }
   const lc = new Locate(locateOptions)
@@ -51,22 +48,22 @@ export default function FloatingButtons({ toggleDrawer }) {
   return (
     <Grid container direction="column" className={classes.floatingBtn}>
       <Grid item>
-        <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)}>
+        <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)} title={t('openMenu')}>
           <Menu fontSize={iconSize} />
         </Fab>
       </Grid>
       <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => lc.start()}>
+        <Fab color="secondary" size={fabSize} onClick={() => lc.start()} title={t('useMyLocation')}>
           <LocationOn fontSize={iconSize} />
         </Fab>
       </Grid>
       <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => map.zoomIn()}>
+        <Fab color="secondary" size={fabSize} onClick={() => map.zoomIn()} title={t('zoomIn')}>
           <ZoomIn fontSize={iconSize} />
         </Fab>
       </Grid>
       <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()}>
+        <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()} title={t('zoomOut')}>
           <ZoomOut fontSize={iconSize} />
         </Fab>
       </Grid>

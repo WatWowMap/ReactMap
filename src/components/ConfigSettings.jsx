@@ -128,6 +128,8 @@ export default function ConfigSettings({
           <Map
             serverSettings={serverSettings}
             params={match.params}
+            zoomControl={false}
+            locateControl={false}
           />
         )}
       </MapContainer>
