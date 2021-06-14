@@ -3,6 +3,7 @@ const { Model, raw } = require('objection')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const fetchQuests = require('../services/functions/fetchQuests')
 const dbSelection = require('../services/functions/dbSelection')
+const getAreaSql = require('../services/functions/getAreaSql')
 
 class Pokestop extends Model {
   static get tableName() {
@@ -17,7 +18,7 @@ class Pokestop extends Model {
   static async getAllPokestops(args, perms, isMad) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const {
-      lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms,
+      lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms, areaRestrictions,
     } = perms
     const {
       onlyAllPokestops, onlyLures, onlyQuests, onlyInvasions, onlyArEligible,
@@ -60,6 +61,9 @@ class Pokestop extends Model {
     query.whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
+    if (areaRestrictions.length > 0) {
+      getAreaSql(query, areaRestrictions, isMad)
+    }
 
     const parseRewards = pokestop => {
       if (pokestop.quest_reward_type) {
