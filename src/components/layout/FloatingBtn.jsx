@@ -19,7 +19,7 @@ export default function FloatingButtons({ toggleDrawer }) {
   const classes = useStyles()
   const {
     map: {
-      enableFeedback, feedbackLink, enableStats, statsLink,
+      enableFeedback, feedbackLink, enableStats, statsLink, enableAccuracyCircle,
     },
   } = useStatic(state => state.config)
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
@@ -37,7 +37,8 @@ export default function FloatingButtons({ toggleDrawer }) {
 
   const locateOptions = {
     keepCurrentZoomLevel: true,
-    drawCircle: false,
+    circleStyle: { fillOpacity: 0.05 },
+    drawCircle: enableAccuracyCircle,
     strings: {
       title: t('useMyLocation'),
     },
