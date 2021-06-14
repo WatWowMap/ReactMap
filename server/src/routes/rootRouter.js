@@ -49,10 +49,12 @@ rootRouter.get('/settings', async (req, res) => {
     if (!config.discord.enabled) {
       req.session.perms = {}
       Object.keys(config.discord.perms).forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
+      req.session.perms.areaRestrictions = []
       req.session.save()
     } else if (config.alwaysEnabledPerms.length > 0) {
       req.session.perms = {}
       config.alwaysEnabledPerms.forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
+      req.session.perms.areaRestrictions = []
       req.session.save()
     }
     const getUser = () => {
