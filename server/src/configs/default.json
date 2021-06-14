@@ -333,7 +333,7 @@
       "usernameFormField": "username",
       "passwordFormField": "password",
       "usernameToLowerCase": true,
-      "passwordEncryption": "md5",
+      "passwordEncryption": "bcrypt",
       "usernameDbField": "username",
       "passwordDbField": "password",
       "discordIdDbField": "discordId",

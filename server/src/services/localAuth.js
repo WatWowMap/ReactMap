@@ -1,4 +1,5 @@
 const md5 = require('md5')
+const bcrypt = require('bcrypt')
 const { LocalUser } = require('../models/index')
 const { alwaysEnabledPerms, localAuth } = require('./config')
 
@@ -12,9 +13,15 @@ class LocalAuthClient {
           result.authentication = false
           result.message = 'User not found'
         } else {
-          if (localAuth.settings.passwordEncryption === "md5" && userExists[localAuth.settings.passwordDbField] !== md5(password)
-            || ((!localAuth.settings.passwordEncryption || localAuth.settings.passwordEncryption === "none")
-            && userExists[localAuth.settings.passwordDbField] !== password)) {
+          let passwordMatch
+          if (localAuth.settings.passwordEncryption === "bcrypt") {
+            passwordMatch = await bcrypt.compare(userExists[localAuth.settings.passwordDbField], password)
+          } else if (localAuth.settings.passwordEncryption === "md5") {
+            passwordMatch = userExists[localAuth.settings.passwordDbField] === md5(password)
+          } else {
+            passwordMatch = userExists[localAuth.settings.passwordDbField] === password
+          }
+          if (!passwordMatch) {
             result.authentication = false
             result.message = 'Incorrect password'
           } else {
