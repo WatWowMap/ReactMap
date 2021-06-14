@@ -165,7 +165,6 @@ class Pokemon extends Model {
     query.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
       .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
-      // .andWhereRaw(getAreaSql(areaRestrictions))
       .andWhere(ivOr => {
         for (const [pkmn, filter] of Object.entries(args.filters)) {
           if (pkmn.includes('-')) {
