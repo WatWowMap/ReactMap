@@ -37,6 +37,7 @@ export default function FloatingButtons({ toggleDrawer }) {
 
   const locateOptions = {
     keepCurrentZoomLevel: true,
+    drawCircle: false,
     strings: {
       title: t('useMyLocation'),
     },
