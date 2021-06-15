@@ -30,10 +30,10 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const availableForms = useStatic(state => state.availableForms)
 
   const initialBounds = {
-    minLat: map.getBounds()._southWest.lat - 0.01,
-    maxLat: map.getBounds()._northEast.lat + 0.01,
-    minLon: map.getBounds()._southWest.lng - 0.01,
-    maxLon: map.getBounds()._northEast.lng + 0.01,
+    minLat: map.getBounds()._southWest.lat,
+    maxLat: map.getBounds()._northEast.lat,
+    minLon: map.getBounds()._southWest.lng,
+    maxLon: map.getBounds()._northEast.lng,
   }
 
   const onMove = useCallback(() => {

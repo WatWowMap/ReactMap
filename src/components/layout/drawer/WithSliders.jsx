@@ -149,6 +149,7 @@ export default function WithSliders({
                       </Grid>
                       <Grid item xs={3}>
                         <Switch
+                          color="primary"
                           disabled={!pokemon[each]}
                           checked={filters[category][each]}
                           onChange={() => {
@@ -174,15 +175,19 @@ export default function WithSliders({
                   alignItems="center"
                   justify="center"
                 >
-                  {['zeroIv'].map(each => (
+                  <Grid item xs={12}>
+                    <Typography variant="h6">{t('shortcuts')}</Typography>
+                  </Grid>
+                  {['zeroIv', 'hundoIv'].map(each => (
                     <Fragment key={each}>
-                      <Grid item xs={6}>
+                      <Grid item xs={3}>
                         <Typography>
                           {t(each)}
                         </Typography>
                       </Grid>
-                      <Grid item xs={6} style={{ textAlign: 'right' }}>
+                      <Grid item xs={3}>
                         <Switch
+                          color="primary"
                           disabled={!pokemon[each]}
                           checked={filters[category][each]}
                           onChange={() => {

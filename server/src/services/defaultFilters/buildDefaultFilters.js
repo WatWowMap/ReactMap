@@ -61,6 +61,7 @@ module.exports = function buildDefault(perms) {
       xsRat: false,
       xlKarp: false,
       zeroIv: perms.iv ? false : undefined,
+      hundoIv: perms.iv ? true : undefined,
       filter: pokemon.full,
     } : undefined,
     portals: perms.portals ? {

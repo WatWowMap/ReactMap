@@ -7,7 +7,7 @@ import {
 } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
-import Help from '../help/Filters'
+import Help from '../tutorial/Advanced'
 
 export default function Footer({
   selectAllOrNone, toggleDialog, tempFilters, toggleDrawer, isMobile, toggleAdvMenu, type,
@@ -140,7 +140,11 @@ export default function Footer({
         open={helpDialog}
         onClose={toggleHelp}
       >
-        <Help />
+        <Help
+          toggleHelp={toggleHelp}
+          category={type}
+          isMobile={isMobile}
+        />
       </Dialog>
       <Grid
         className="filter-footer"
