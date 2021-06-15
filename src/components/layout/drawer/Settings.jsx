@@ -18,6 +18,7 @@ export default function Settings() {
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
   const staticSettings = useStatic(state => state.settings)
+  const setAvailableForms = useStatic(state => state.setAvailableForms)
   const auth = useStatic(state => state.auth)
   const { t, i18n } = useTranslation()
 
@@ -30,6 +31,9 @@ export default function Settings() {
     })
     if (event.target.name === 'localeSelection') {
       i18n.changeLanguage(event.target.value)
+    }
+    if (event.target.name === 'icons') {
+      setAvailableForms(new Set(config[event.target.name][event.target.value].pokemonList))
     }
   }
 
