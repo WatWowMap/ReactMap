@@ -7,6 +7,7 @@
 const Discord = require('discord.js')
 const fs = require('fs')
 const { alwaysEnabledPerms, discord } = require('./config')
+const areas = require('./areas.js')
 
 const client = new Discord.Client()
 
@@ -70,11 +71,11 @@ class DiscordClient {
     const perms = {}
     Object.keys(discord.perms).map(perm => perms[perm] = false)
     perms.areaRestrictions = []
-
     const { guildsFull } = user
     const guilds = user.guilds.map(guild => guild.id)
     if (discord.allowedUsers.includes(user.id)) {
       Object.keys(perms).forEach((key) => perms[key] = true)
+      perms.areaRestrictions = []
       console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
       return perms
     }
@@ -90,7 +91,7 @@ class DiscordClient {
       if (guilds.includes(guildId)) {
         const keys = Object.keys(discord.perms)
         const userRoles = await this.getUserRoles(guildId, user.id)
-
+        // Roles & Perms
         for (let j = 0; j < keys.length; j += 1) {
           const key = keys[j]
           const configItem = discord.perms[key]
@@ -107,7 +108,26 @@ class DiscordClient {
             }
           }
         }
+        // Area Restriction Rules
+        if (Object.keys(areas.names).length > 0) {
+          for (let j = 0; j < userRoles.length; j += 1) {
+            discord.areaRestrictions.forEach(rule => {
+              if (rule.roles.includes(userRoles[j])) {
+                if (rule.areas.length > 0) {
+                  rule.areas.forEach(areaName => {
+                    if (areas.names.includes(areaName)) {
+                      perms.areaRestrictions.push(areaName)
+                    }
+                  })
+                }
+              }
+            })
+          }
+        }
       }
+    }
+    if (perms.areaRestrictions.length > 0) {
+      perms.areaRestrictions = [...new Set(perms.areaRestrictions)]
     }
     return perms
   }

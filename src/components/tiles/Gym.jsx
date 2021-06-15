@@ -18,7 +18,8 @@ const getColor = team => {
 }
 
 const GymTile = ({
-  item, ts, showTimer, iconSizes, filters, path, availableForms, excludeList, userSettings, params, showCircles,
+  item, ts, showTimer, iconSizes, filters, path, iconModifiers, availableForms, excludeList, userSettings, params,
+  showCircles,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
@@ -30,7 +31,7 @@ const GymTile = ({
     && (raid_battle_timestamp >= ts
       ? !excludeList.includes(`e${raid_level}`)
       : !excludeList.includes(`${raid_pokemon_id}-${raid_pokemon_form}`)))
-  const timerToDisplay = raid_battle_timestamp >= ts
+  const timerToDisplay = (raid_battle_timestamp >= ts && raid_pokemon_id === 0)
     ? raid_battle_timestamp : raid_end_timestamp
 
   useEffect(() => {
@@ -52,7 +53,7 @@ const GymTile = ({
             }
           }}
           position={[item.lat, item.lon]}
-          icon={gymMarker(item, ts, hasRaid, iconSizes, filters, path, availableForms, excludeList)}
+          icon={gymMarker(item, ts, hasRaid, iconSizes, filters, path, iconModifiers, availableForms, excludeList)}
         >
           <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
             <PopupContent
@@ -63,7 +64,7 @@ const GymTile = ({
               availableForms={availableForms}
             />
           </Popup>
-          {(showTimer || userSettings.raidTimers) && (
+          {((showTimer || userSettings.raidTimers) && hasRaid) && (
             <Timer
               timestamp={timerToDisplay}
               direction="center"

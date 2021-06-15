@@ -13,7 +13,7 @@ export const basicMarker = (iconUrl, pkmn, filters, iconSizes) => {
   })
 }
 
-export const fancyMarker = (iconUrl, pkmn, filters, iconSizes, glow, ivCircles) => {
+export const fancyMarker = (iconUrl, pkmn, filters, iconSizes, glow, ivCircle) => {
   let badge
   switch (pkmn.bestPvp) {
     default: break
@@ -36,7 +36,7 @@ export const fancyMarker = (iconUrl, pkmn, filters, iconSizes, glow, ivCircles) 
           bottom:0;"
         />`
     }
-    if (ivCircles) {
+    if (ivCircle) {
       return `
         <div class="iv-badge">
           ${Math.round(pkmn.iv)}

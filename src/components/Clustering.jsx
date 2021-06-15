@@ -16,7 +16,7 @@ const getId = (component, item) => {
 
 export default function Clustering({
   category, renderedData, userSettings, zoomLevel, staticUserSettings, params,
-  filters, map, path, availableForms, perms, tileStyle, config,
+  filters, map, path, iconModifiers, availableForms, perms, tileStyle, config,
 }) {
   const Component = index[category]
   const hideList = useStatic(state => state.hideList)
@@ -44,6 +44,7 @@ export default function Clustering({
               iconSizes={config.iconSizes[category]}
               showTimer={timerList.includes(each.id)}
               path={path}
+              iconModifiers={iconModifiers}
               availableForms={availableForms}
               perms={perms}
               zoom={currentZoom}

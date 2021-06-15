@@ -1,5 +1,6 @@
 const { Model, raw } = require('objection')
 const dbSelection = require('../services/functions/dbSelection')
+const getAreaSql = require('../services/functions/getAreaSql')
 
 class Device extends Model {
   static get tableName() {
@@ -10,10 +11,11 @@ class Device extends Model {
     return dbSelection('device') === 'mad' ? 'device_id' : 'uuid'
   }
 
-  static async getAllDevices(isMad) {
+  static async getAllDevices(perms, isMad) {
+    const { areaRestrictions } = perms
+    const query = this.query()
     if (isMad) {
-      return Device.query()
-        .join('trs_status', 'settings_device.device_id', 'trs_status.device_id')
+      query.join('trs_status', 'settings_device.device_id', 'trs_status.device_id')
         .join('settings_area', 'trs_status.area_id', 'settings_area.area_id')
         .select([
           'settings_device.name AS uuid',
@@ -28,12 +30,16 @@ class Device extends Model {
           raw(true)
             .as('isMad'),
         ])
+    } else {
+      query.join('instance', 'device.instance_name', 'instance.name')
+        .select('uuid', 'last_seen', 'last_lat', 'last_lon', 'type', 'instance_name',
+          raw('json_extract(data, "$.area")')
+            .as('route'))
     }
-    return Device.query()
-      .join('instance', 'device.instance_name', 'instance.name')
-      .select('uuid', 'last_seen', 'last_lat', 'last_lon', 'type', 'instance_name',
-        raw('json_extract(data, "$.area")')
-          .as('route'))
+    if (areaRestrictions.length > 0) {
+      getAreaSql(query, areaRestrictions, isMad, 'device')
+    }
+    return query
   }
 }
 

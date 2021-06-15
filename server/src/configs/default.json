@@ -125,7 +125,7 @@
       "glow": [
         {"name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
         {"name": "Top 3 Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
-        {"name": "Multiple", "perm": "pvp", "value": "#800080" }    
+        {"name": "Multiple", "perm": "pvp", "value": "#800080" }
       ]
     },
     "wayfarer": {
@@ -239,6 +239,7 @@
     "allowedGuilds": [],
     "blockedGuilds": [],
     "allowedUsers": [],
+    "areaRestrictions": [],
     "perms": {
       "map": {
         "enabled": true,
@@ -343,7 +344,7 @@
   "navigation": {
     "GoogleMaps": {
       "url": "https://www.google.com/maps/place/{x},{y}"
-    }, 
+    },
     "AppleMaps": {
       "url": "https://maps.apple.com/maps?daddr={x},{y}"
     },
@@ -356,7 +357,18 @@
   },
   "icons": {
     "Default": {
-      "path": "https://mygod.github.io/pokicons/v2"
+      "path": "https://mygod.github.io/pokicons/v2",
+      "iconModifiers": {
+        "gyms": {
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "pokestops": {
+          "offsetX": 0,
+          "offsetY": 0,
+          "sizeMultiplier": 0
+        }
+      }
     }
   },
   "rarity": {

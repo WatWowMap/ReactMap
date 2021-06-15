@@ -73,7 +73,6 @@ export default function ConfigSettings({
   setUi(serverSettings.ui)
   setConfig(serverSettings.config)
   setMasterfile(serverSettings.masterfile)
-  setAvailableForms((new Set(serverSettings.config.icons[serverSettings.settings.icons].pokemonList)), 'availableForms')
   setAvailable(serverSettings.available)
 
   setStaticMenus(serverSettings.menus)
@@ -96,6 +95,8 @@ export default function ConfigSettings({
     setSettings(updateObjState(serverSettings.settings, 'settings'))
   }
   setStaticSettings(serverSettings.settings)
+  const localIcons = localState ? localState.state : serverSettings
+  setAvailableForms(new Set(serverSettings.config.icons[localIcons.settings.icons].pokemonList))
 
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
   const getStartLocation = () => {
