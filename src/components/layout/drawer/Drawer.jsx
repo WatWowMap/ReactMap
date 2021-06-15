@@ -178,7 +178,8 @@ export default function DrawerMenu({
               size="small"
               href="/logout"
             >
-              {auth.enabledAuthMethods.includes('discord')
+              {auth.enabledAuthMethods.length === 1
+              && auth.enabledAuthMethods.includes('discord')
               && (<Icon className="fab fa-discord" style={{ fontSize: 20 }} />)}
               &nbsp;{t('logout')}&nbsp;
             </Button>
@@ -192,7 +193,8 @@ export default function DrawerMenu({
                 }}
                 size="small"
               >
-                {auth.enabledAuthMethods.includes('discord')
+                {auth.enabledAuthMethods.length === 1
+                && auth.enabledAuthMethods.includes('discord')
                 && (<Icon className="fab fa-discord" style={{ fontSize: 20 }} />)}
                 &nbsp;{t('login')}&nbsp;
               </Button>
