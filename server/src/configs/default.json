@@ -225,6 +225,7 @@
       }
     }
   },
+  "excludeFromTutorial": [],
   "alwaysEnabledPerms": [],
   "discord": {
     "enabled": false,
