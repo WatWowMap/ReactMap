@@ -6,11 +6,11 @@
 /* global BigInt */
 const Discord = require('discord.js')
 const fs = require('fs')
-const { alwaysEnabledPerms, discord } = require('./config')
+const { alwaysEnabledPerms, enabledAuthMethods, discord } = require('./config')
 
 const client = new Discord.Client()
 
-if (discord.enabled) {
+if (enabledAuthMethods.includes('discord')) {
   client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`)
     client.user.setPresence({

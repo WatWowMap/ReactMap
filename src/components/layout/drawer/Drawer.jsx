@@ -166,7 +166,7 @@ export default function DrawerMenu({
         </Grid>
       </Grid>
       {drawerItems}
-      {(auth.discord || auth.localAuth) && (
+      {(auth.enabledAuthMethods.length > 0) && (
         <Grid item align="center" style={{ textAlign: 'center', margin: 40 }}>
           {auth.loggedIn ? (
             <Button
@@ -178,7 +178,8 @@ export default function DrawerMenu({
               size="small"
               href="/logout"
             >
-              {auth.discord && (<Icon className="fab fa-discord" style={{ fontSize: 20 }} />)}
+              {auth.enabledAuthMethods.includes('discord')
+              && (<Icon className="fab fa-discord" style={{ fontSize: 20 }} />)}
               &nbsp;{t('logout')}&nbsp;
             </Button>
           ) : (
@@ -191,7 +192,8 @@ export default function DrawerMenu({
                 }}
                 size="small"
               >
-                {auth.discord && (<Icon className="fab fa-discord" style={{ fontSize: 20 }} />)}
+                {auth.enabledAuthMethods.includes('discord')
+                && (<Icon className="fab fa-discord" style={{ fontSize: 20 }} />)}
                 &nbsp;{t('login')}&nbsp;
               </Button>
             </Link>

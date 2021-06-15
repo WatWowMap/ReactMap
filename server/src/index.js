@@ -54,12 +54,12 @@ app.use(session({
   saveUninitialized: false,
   cookie: { maxAge: 604800000 },
 }))
-if (config.discord.enabled || config.localAuth.enabled) {
-  if (config.discord.enabled) {
+if (config.enabledAuthMethods.length > 0) {
+  if (config.enabledAuthMethods.includes('discord')) {
     // eslint-disable-next-line global-require
     require('./strategies/discordStrategy')
   }
-  if (config.localAuth.enabled) {
+  if (config.enabledAuthMethods.includes('localAuth')) {
     // eslint-disable-next-line global-require
     require('./strategies/localStrategy')
   }

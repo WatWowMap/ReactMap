@@ -17,7 +17,7 @@ const rootRouter = new express.Router()
 
 rootRouter.use('/', clientRouter)
 
-if (config.discord.enabled || config.localAuth.enabled) {
+if (config.enabledAuthMethods.length > 0) {
   rootRouter.use('/auth', authRouter)
 
   // eslint-disable-next-line no-unused-vars
@@ -46,17 +46,13 @@ rootRouter.get('/logout', (req, res) => {
 
 rootRouter.get('/settings', async (req, res) => {
   try {
-    if (!config.discord.enabled && !config.localAuth.enabled) {
+    if (config.enabledAuthMethods.length === 0 || config.alwaysEnabledPerms.length > 0) {
       req.session.perms = {}
-      Object.keys(config.discord.perms).forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
-      req.session.save()
-    } else if (config.alwaysEnabledPerms.length > 0) {
-      req.session.perms = {}
-      config.alwaysEnabledPerms.forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
+      config.alwaysEnabledPerms.forEach(perm => req.session.perms[perm] = true)
       req.session.save()
     }
     const getUser = () => {
-      if (config.discord.enabled || config.localAuth.enabled) {
+      if (config.enabledAuthMethods.length > 0) {
         if (req.user || config.alwaysEnabledPerms.length === 0) {
           return req.user
         }
@@ -65,8 +61,7 @@ rootRouter.get('/settings', async (req, res) => {
     }
     const serverSettings = {
       user: getUser(),
-      discord: config.discord.enabled,
-      localAuth: config.localAuth.enabled,
+      enabledAuthMethods: config.enabledAuthMethods,
       settings: {},
     }
 

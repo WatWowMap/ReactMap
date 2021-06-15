@@ -30,7 +30,7 @@
     "title": "ReactMap",
     "headerTitle": "ReactMap",
     "nestHemisphere": "north",
-    "enableFeedbackLink": false,
+    "enableFeedback": false,
     "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
     "enableStats": false,
     "statsLink": "https://rdmopole2link.net",
@@ -201,6 +201,7 @@
     },
     "schemas": {
       "scanner": {
+        "enabled": true,
         "type": "rdm",
         "host": "127.0.0.1",
         "port": 3306,
@@ -212,6 +213,7 @@
         "useFor": []
       },
       "manual": {
+        "enabled": true,
         "type": "manual",
         "host": "127.0.0.1",
         "port": 3306,
@@ -223,6 +225,7 @@
         "useFor": []
       },
       "localAuth": {
+        "enabled": false,
         "type": "localAuth",
         "host": "127.0.0.1",
         "port": 3306,
@@ -236,8 +239,8 @@
     }
   },
   "alwaysEnabledPerms": [],
+  "enabledAuthMethods": [],
   "discord": {
-    "enabled": false,
     "logChannelId": "",
     "presence": "Map Status: Online",
     "presenceType": 3,
@@ -328,7 +331,6 @@
     }
   },
   "localAuth": {
-    "enabled": false,
     "settings": {
       "usernameFormField": "username",
       "passwordFormField": "password",

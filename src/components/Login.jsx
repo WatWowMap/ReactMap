@@ -32,7 +32,7 @@ const Login = ({ serverSettings, clickedTwice, location }) => {
       alignItems="center"
       style={{ minHeight: '95vh' }}
     >
-      {serverSettings.localAuth && (
+      {serverSettings.enabledAuthMethods.includes('localAuth') && (
         <Grid
           item
           justify="center"
@@ -80,14 +80,15 @@ const Login = ({ serverSettings, clickedTwice, location }) => {
           </Grid>
         </Grid>
       )}
-      {serverSettings.localAuth && serverSettings.discord && (
+      {serverSettings.enabledAuthMethods.includes('localAuth')
+      && serverSettings.enabledAuthMethods.includes('discord') && (
         <Grid item style={{ whiteSpace: 'pre-line' }}>
           <Typography style={{ color: 'white', margin: 20 }} align="center">
             {t('orUseDiscord')}
           </Typography>
         </Grid>
       )}
-      {serverSettings.discord && (
+      {serverSettings.enabledAuthMethods.includes('discord') && (
         <Grid item>
           <Button
             variant="contained"
@@ -105,7 +106,7 @@ const Login = ({ serverSettings, clickedTwice, location }) => {
           </Button>
         </Grid>
       )}
-      {serverSettings.discord && clickedTwice && (
+      {serverSettings.enabledAuthMethods.includes('discord') && clickedTwice && (
         <Grid item style={{ whiteSpace: 'pre-line' }}>
           <Typography style={{ color: 'white', margin: 20 }} align="center">
             {location.state ? t(location.state.message) : t('clickOnce')}
