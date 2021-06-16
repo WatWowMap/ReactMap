@@ -10,7 +10,7 @@ const Auth = ({ serverSettings, match }) => {
     if (match.params.category || match.params.lat) {
       localStorage.setItem('params', JSON.stringify(match.params))
     }
-    return <Login />
+    return <Login serverSettings={serverSettings} />
   }
   const cachedParams = JSON.parse(localStorage.getItem('params'))
   if (cachedParams) {

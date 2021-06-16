@@ -59,7 +59,7 @@ if (config.enabledAuthMethods.length > 0) {
     // eslint-disable-next-line global-require
     require('./strategies/discordStrategy')
   }
-  if (config.enabledAuthMethods.includes('localAuth')) {
+  if (config.enabledAuthMethods.includes('customAuth')) {
     // eslint-disable-next-line global-require
     require('./strategies/localStrategy')
   }

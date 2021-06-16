@@ -41,7 +41,7 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
-      "localUserTableName": "members",
+      "customAuthTableName": "members",
       "leagues": ["great", "ultra"]
     },
     "schemas": {

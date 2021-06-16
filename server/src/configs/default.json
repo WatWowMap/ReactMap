@@ -196,7 +196,7 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
-      "localUserTableName": "members",
+      "customAuthTableName": "members",
       "leagues": ["great", "ultra"]
     },
     "schemas": {
@@ -224,14 +224,14 @@
         "arScanColumn": false,
         "useFor": []
       },
-      "localAuth": {
+      "customAuth": {
         "enabled": false,
-        "type": "localAuth",
+        "type": "customAuth",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",
         "password": "pass123!",
-        "database": "localauthdb",
+        "database": "customauthdb",
         "charset": "utf8mb4",
         "arScanColumn": false,
         "useFor": []
@@ -330,7 +330,7 @@
       }
     }
   },
-  "localAuth": {
+  "customAuth": {
     "settings": {
       "usernameFormField": "username",
       "passwordFormField": "password",

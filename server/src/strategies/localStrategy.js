@@ -2,7 +2,7 @@ const LocalStrategy = require('passport-local').Strategy
 const passport = require('passport')
 const config = require('../services/config')
 const { User } = require('../models/index')
-const LocalAuthClient = require('../services/localAuth')
+const CustomAuthClient = require('../services/customAuth')
 
 passport.serializeUser(async (user, done) => {
   done(null, user)
@@ -18,13 +18,13 @@ passport.deserializeUser(async (user, done) => {
 
 const authHandler = async (username, password, done) => {
   try {
-    if (config.localAuth.settings.usernameToLowerCase) username = username.toLowerCase()
+    if (config.customAuth.settings.usernameToLowerCase) username = username.toLowerCase()
     const user = {}
-    const validUser = await LocalAuthClient.authenticate(username, password)
-    user.id = validUser.authentication ? validUser.userData[config.localAuth.settings.discordIdDbField] : username
-    user.email = validUser.authentication ? validUser.userData[config.localAuth.settings.emailDbField] : ''
+    const validUser = await CustomAuthClient.authenticate(username, password)
+    user.id = validUser.authentication ? validUser.userData[config.customAuth.settings.discordIdDbField] : username
+    user.email = validUser.authentication ? validUser.userData[config.customAuth.settings.emailDbField] : ''
     user.username = username
-    user.perms = validUser.authentication ? await LocalAuthClient.getPerms(validUser.userData) : {}
+    user.perms = validUser.authentication ? await CustomAuthClient.getPerms(validUser.userData) : {}
     user.valid = validUser.authentication && user.perms.map !== false
     user.blocked = user.perms.blocked
 
@@ -54,6 +54,6 @@ const authHandler = async (username, password, done) => {
 }
 
 passport.use(new LocalStrategy({
-  usernameField: config.localAuth.settings.usernameField,
-  passwordField: config.localAuth.settings.passwordField,
+  usernameField: config.customAuth.settings.usernameField,
+  passwordField: config.customAuth.settings.passwordField,
 }, authHandler))

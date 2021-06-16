@@ -32,7 +32,7 @@ const Login = ({ serverSettings, clickedTwice, location }) => {
       alignItems="center"
       style={{ minHeight: '95vh' }}
     >
-      {serverSettings.enabledAuthMethods.includes('localAuth') && (
+      {serverSettings.enabledAuthMethods.includes('customAuth') && (
         <Grid
           item
           justify="center"
@@ -80,7 +80,7 @@ const Login = ({ serverSettings, clickedTwice, location }) => {
           </Grid>
         </Grid>
       )}
-      {serverSettings.enabledAuthMethods.includes('localAuth')
+      {serverSettings.enabledAuthMethods.includes('customAuth')
       && serverSettings.enabledAuthMethods.includes('discord') && (
         <Grid item style={{ whiteSpace: 'pre-line' }}>
           <Typography style={{ color: 'white', margin: 20 }} align="center">
