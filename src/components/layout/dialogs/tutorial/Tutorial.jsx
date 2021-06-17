@@ -44,7 +44,7 @@ export default function Tutorial({ setTutorial, setUserProfile }) {
   }
 
   return (
-    <div style={{ width: 400 }}>
+    <div style={{ maxWidth: 400 }}>
       <DialogTitle className={classes.filterHeader}>
         {t('tutorial')} ({t(steps[activeStep] || 'Closing')})
       </DialogTitle>
@@ -54,7 +54,7 @@ export default function Tutorial({ setTutorial, setUserProfile }) {
         onChangeIndex={handleStepChange}
         enableMouseEvents
         animateHeight
-        containerStyle={{ minHeight: '65vh', alignItems: 'center' }}
+        containerStyle={{ minHeight: '75vh', alignItems: 'center' }}
       >
         <Welcome setUserProfile={setUserProfile} />
         <Sidebar isMobile={isMobile} />
