@@ -56,9 +56,15 @@ export default function UserProfile({ setUserProfile }) {
                       title={perm}
                     />
                   ) : (
-                    <List style={{ height: 250 }}>
+                    <List
+                      style={{
+                        height: 235,
+                        border: 'black 4px solid',
+                        borderRadius: 4,
+                      }}
+                    >
                       {perms[perm].map(area => (
-                        <ListItem>
+                        <ListItem key={area}>
                           <Typography>
                             {Utility.getProperName(area)}
                           </Typography>

@@ -12,7 +12,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
   const [isPokemon, setIsPokemon] = useState(category === 'pokemon')
 
   return (
-    <DialogContent style={{ marginTop: 5 }}>
+    <DialogContent>
       <Grid
         container
         direction="row"

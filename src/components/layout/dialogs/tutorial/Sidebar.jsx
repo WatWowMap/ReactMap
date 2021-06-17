@@ -9,7 +9,7 @@ export default function TutSidebar({ isMobile, pokemon }) {
   const { t } = useTranslation()
 
   return (
-    <DialogContent style={{ marginTop: 5 }}>
+    <DialogContent>
       <Grid
         container
         direction="row"

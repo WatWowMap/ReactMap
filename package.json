@@ -93,6 +93,7 @@
     "react-leaflet": "^3.1.0",
     "react-leaflet-markercluster": "^3.0.0-rc1",
     "react-router-dom": "^5.2.0",
+    "react-swipeable-views": "^0.14.0",
     "react-virtualized-auto-sizer": "^1.0.5",
     "react-window": "^1.8.6",
     "require-from-string": "^2.0.2",

@@ -5,11 +5,11 @@ import {
   Button,
   MobileStepper,
   useMediaQuery,
-  Typography,
 } from '@material-ui/core'
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons'
 import { useTheme } from '@material-ui/core/styles'
 import { useTranslation } from 'react-i18next'
+import SwipeableViews from 'react-swipeable-views'
 
 import useStyles from '@hooks/useStyles'
 import Welcome from './Welcome'
@@ -39,28 +39,30 @@ export default function Tutorial({ setTutorial, setUserProfile }) {
     setTutorial(false)
   }
 
-  const getStepContent = (stepIndex) => {
-    switch (stepIndex) {
-      default: return <Closing />
-      case 0: return <Welcome setUserProfile={setUserProfile} />
-      case 1: return <Sidebar isMobile={isMobile} />
-      case 2: return <Sidebar isMobile={isMobile} pokemon />
-      case 3: return <Advanced isMobile={isMobile} isTutorial />
-      case 4: return <Popups isMobile={isMobile} />
-    }
+  const handleStepChange = (step) => {
+    setActiveStep(step)
   }
 
   return (
-    <div style={{ maxWidth: 400 }}>
+    <div style={{ width: 400 }}>
       <DialogTitle className={classes.filterHeader}>
         {t('tutorial')} ({t(steps[activeStep] || 'Closing')})
       </DialogTitle>
-      {activeStep === 0 && (
-        <Typography variant="h5" align="center" style={{ margin: 20 }}>
-          {t('welcome')} {document.title}!
-        </Typography>
-      )}
-      {getStepContent(activeStep)}
+      <SwipeableViews
+        axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+        index={activeStep}
+        onChangeIndex={handleStepChange}
+        enableMouseEvents
+        animateHeight
+        containerStyle={{ minHeight: '65vh', alignItems: 'center' }}
+      >
+        <Welcome setUserProfile={setUserProfile} />
+        <Sidebar isMobile={isMobile} />
+        <Sidebar isMobile={isMobile} pokemon />
+        <Advanced isMobile={isMobile} isTutorial />
+        <Popups isMobile={isMobile} />
+        <Closing />
+      </SwipeableViews>
       <DialogActions>
         <MobileStepper
           variant="progress"

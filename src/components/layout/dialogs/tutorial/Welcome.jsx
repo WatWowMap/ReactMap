@@ -29,7 +29,10 @@ export default function TutWelcome({ setUserProfile }) {
   }
 
   return (
-    <DialogContent style={{ marginTop: 5 }}>
+    <DialogContent>
+      <Typography variant="h5" align="center" style={{ margin: 10 }}>
+        {t('welcome')} {document.title}!
+      </Typography>
       <Grid
         container
         direction="row"
