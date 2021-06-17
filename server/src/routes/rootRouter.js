@@ -52,7 +52,7 @@ rootRouter.get('/logout', (req, res) => {
 rootRouter.get('/settings', async (req, res) => {
   try {
     if (config.enabledAuthMethods.length === 0 || config.alwaysEnabledPerms.length > 0) {
-      req.session.perms = {}
+      req.session.perms = { areaRestrictions: [] }
       config.alwaysEnabledPerms.forEach(perm => req.session.perms[perm] = true)
       req.session.save()
     }

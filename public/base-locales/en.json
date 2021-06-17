@@ -241,5 +241,8 @@
   "primary": "Primary",
   "secondary": "Secondary",
   "zeroIv": "Add 0% IV",
-  "orUseDiscord": "or log in with Discord"
+  "orUseDiscord": "or log in with Discord",
+  "openMenu": "Open Menu",
+  "zoomIn": "Zoom In",
+  "zoomOut": "Zoom Out"
 }

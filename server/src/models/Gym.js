@@ -3,6 +3,7 @@ const { Model, raw } = require('objection')
 const fetchRaids = require('../services/functions/fetchRaids')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
+const getAreaSql = require('../services/functions/getAreaSql')
 
 class Gym extends Model {
   static get tableName() {
@@ -16,7 +17,7 @@ class Gym extends Model {
 
   static async getAllGyms(args, perms, isMad) {
     const ts = Math.floor((new Date()).getTime() / 1000)
-    const { gyms, raids } = perms
+    const { gyms, raids, areaRestrictions } = perms
     const {
       onlyGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible,
     } = args.filters
@@ -153,6 +154,9 @@ class Gym extends Model {
         })
       }
     })
+    if (areaRestrictions.length > 0) {
+      getAreaSql(query, areaRestrictions, isMad)
+    }
 
     const secondaryFilter = queryResults => {
       const { length } = queryResults
@@ -172,7 +176,7 @@ class Gym extends Model {
           filteredResults.push(gym)
         } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]) {
           filteredResults.push(gym)
-        } else if (gyms && (onlyGyms || onlyArEligible)) {
+        } else if (gyms && (onlyGyms || onlyArEligible || onlyExEligible)) {
           if (args.filters[`t${gym.team_id}-0`]) {
             gym.raid_end_timestamp = null
             gym.raid_battle_timestamp = null

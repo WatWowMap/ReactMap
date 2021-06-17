@@ -1,5 +1,6 @@
 const { Model } = require('objection')
 const { pokemon: masterfile } = require('../data/masterfile.json')
+const getAreaSql = require('../services/functions/getAreaSql')
 
 class Nest extends Model {
   static get tableName() {
@@ -10,18 +11,22 @@ class Nest extends Model {
     return 'nest_id'
   }
 
-  static async getNestingSpecies(args) {
+  static async getNestingSpecies(args, perms) {
+    const { areaRestrictions } = perms
     const pokemon = []
-
     Object.keys(args.filters).forEach(pkmn => {
       if (!pkmn.startsWith('g')) {
         pokemon.push(pkmn.split('-')[0])
       }
     })
-    const results = await this.query()
+    const query = this.query()
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .whereIn('pokemon_id', pokemon)
+    if (areaRestrictions.length > 0) {
+      getAreaSql(query, areaRestrictions)
+    }
+    const results = await query
 
     const fixedForms = queryResults => {
       const returnedResults = []

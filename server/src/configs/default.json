@@ -237,6 +237,7 @@
     "allowedGuilds": [],
     "blockedGuilds": [],
     "allowedUsers": [],
+    "areaRestrictions": [],
     "perms": {
       "map": {
         "enabled": true,
@@ -330,6 +331,7 @@
       "statusDbField": "status"
     },
     "allowedUsers": [],
+    "areaRestrictions": [],
     "perms": {
       "map": {
         "enabled": true,

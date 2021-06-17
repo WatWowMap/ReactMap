@@ -241,5 +241,8 @@
   "primary": "Primaire",
   "secondary": "Secondaire",
   "zeroIv": "IV 0%",
-  "orUseDiscord": "ou se connecter avec Discord"
+  "orUseDiscord": "ou se connecter avec Discord",
+  "openMenu": "Ouvrir le Menu",
+  "zoomIn": "Zoom avant",
+  "zoomOut": "Zoom arrière"
 }
