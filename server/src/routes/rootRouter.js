@@ -17,6 +17,11 @@ const rootRouter = new express.Router()
 
 rootRouter.use('/', clientRouter)
 
+config.enabledAuthMethods = [
+  ...(config.discord.enabled ? ['discord'] : []),
+  ...(config.customAuth.enabled ? ['customAuth'] : [])
+  ]
+
 if (config.enabledAuthMethods.length > 0) {
   rootRouter.use('/auth', authRouter)
 

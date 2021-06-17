@@ -201,7 +201,6 @@
     },
     "schemas": {
       "scanner": {
-        "enabled": true,
         "type": "rdm",
         "host": "127.0.0.1",
         "port": 3306,
@@ -213,7 +212,6 @@
         "useFor": []
       },
       "manual": {
-        "enabled": true,
         "type": "manual",
         "host": "127.0.0.1",
         "port": 3306,
@@ -223,24 +221,12 @@
         "charset": "utf8mb4",
         "arScanColumn": false,
         "useFor": []
-      },
-      "customAuth": {
-        "enabled": false,
-        "type": "customAuth",
-        "host": "127.0.0.1",
-        "port": 3306,
-        "username": "user",
-        "password": "pass123!",
-        "database": "customauthdb",
-        "charset": "utf8mb4",
-        "arScanColumn": false,
-        "useFor": []
       }
     }
   },
   "alwaysEnabledPerms": [],
-  "enabledAuthMethods": [],
   "discord": {
+    "enabled": false,
     "logChannelId": "",
     "presence": "Map Status: Online",
     "presenceType": 3,
@@ -331,6 +317,7 @@
     }
   },
   "customAuth": {
+    "enabled": false,
     "settings": {
       "usernameFormField": "username",
       "passwordFormField": "password",

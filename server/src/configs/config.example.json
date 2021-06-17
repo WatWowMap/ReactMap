@@ -46,7 +46,6 @@
     },
     "schemas": {
       "scanner": {
-        "enabled": true,
         "type": "rdm/chuck/cdc/mad/manual",
         "host": "127.0.0.1",
         "port": 3306,
@@ -58,7 +57,6 @@
         "useFor": ["device", "gym", "pokemon", "pokestop", "s2cell", "spawnpoint", "weather"]
       },
       "manual": {
-        "enabled": true,
         "type": "manual",
         "host": "127.0.0.1",
         "port": 3306,
@@ -72,8 +70,8 @@
     }
   },
   "alwaysEnabledPerms": ["map","gyms","pokestops"],
-  "enabledAuthMethods": [],
   "discord": {
+    "enabled": false,
     "logChannelId": "",
     "presence": "Map Status: Online",
     "presenceType": 3,
