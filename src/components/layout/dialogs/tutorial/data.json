@@ -1,0 +1,73 @@
+{
+  "pokemon": {
+    "id": "1479791170343952100",
+    "pokemon_id": 16,
+    "form": 962,
+    "gender": 1,
+    "expire_timestamp_verified": 1,
+    "display_pokemon_id": null,
+    "ditto_form": null,
+    "iv": 62.22,
+    "cp": 111,
+    "level": 7,
+    "weight": 1.75875461101532,
+    "size": 0.29718396067619,
+    "move_1": 219,
+    "move_2": 45,
+    "weather": 0,
+    "atk_iv": 0,
+    "def_iv": 14,
+    "sta_iv": 14,
+    "cleanPvp": {
+      "little": [
+        {
+          "pokemon": 16,
+          "cap": 50,
+          "value": 394462,
+          "level": 31,
+          "cp": 499,
+          "percentage": 0.98673,
+          "rank": 13,
+          "capped": true
+        }
+      ],
+      "great": [
+        {
+          "pokemon": 18,
+          "cap": 50,
+          "value": 1948426,
+          "level": 27,
+          "cp": 1498,
+          "percentage": 1,
+          "rank": 1,
+          "capped": true
+        },
+        {
+          "pokemon": 18,
+          "cap": 50,
+          "value": 1529981,
+          "level": 15,
+          "cp": 1489,
+          "percentage": 0.9912,
+          "rank": 14,
+          "evolution": 1,
+          "capped": true
+        }
+      ],
+      "ultra": [
+        {
+          "pokemon": 18,
+          "cap": 50,
+          "value": 3281721,
+          "level": 25,
+          "cp": 2482,
+          "percentage": 0.98763,
+          "rank": 34,
+          "evolution": 1,
+          "capped": true
+        }
+      ]
+    },
+    "bestPvp": 1
+  }
+}
