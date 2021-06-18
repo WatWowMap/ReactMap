@@ -47,7 +47,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
   const addPokestop = (id, stop) => {
     const stopCheck = id.startsWith('s') && stopPerms.pokestops
     const lureCheck = id.startsWith('l') && stopPerms.lures
-    const questCheck = (!Number.isNaN(parseInt(id.charAt(0))) || id.startsWith('m') || id.startsWith('q') || id.startsWith('d')) && stopPerms.quests
+    const questCheck = (!Number.isNaN(parseInt(id.charAt(0))) || id.startsWith('m') || id.startsWith('q') || id.startsWith('d') || id.startsWith('c')) && stopPerms.quests
     const invasionsCheck = id.startsWith('i') && stopPerms.invasions
 
     if ((stopCheck || lureCheck || questCheck || invasionsCheck) && stop.name) {
@@ -56,6 +56,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
       switch (id.charAt(0)) {
         default: urlBuilder = `${path}/${getPokemonIcon(availableForms, ...id.split('-'))}`; break
         case 'i': urlBuilder = `/images/invasion/i0_${id.slice(1)}`; break
+        case 'c': urlBuilder = `${path}/${getPokemonIcon(availableForms, id.slice(1))}`; break
         case 'd': urlBuilder = '/images/item/-1'; break
         case 'q': urlBuilder = `/images/item/${id.slice(1)}`; break
         case 'l': urlBuilder = `/images/pokestop/${id == 0 ? id : id.slice(-1)}`; break
@@ -122,7 +123,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
   }
 
   if (type === 'pokestops') {
-    Object.keys(tempFilters).forEach(id => {
+    Object.keys(filter).forEach(id => {
       if (id !== 'global' && Number.isNaN(parseInt(id.charAt(0)))) {
         total += 1
         let pokestop = {}
@@ -143,6 +144,9 @@ export default function menuFilter(tempFilters, menus, search, type) {
           case 'l':
             pokestop.name = t(`lure_${id.slice(1)}`)
             pokestop.category = 'lures'; break
+          case 'c':
+            pokestop.name = `${t(`poke_${id.slice(1)}`)} ${t('candy')}`
+            pokestop.category = 'candy'; break
         }
         switch (switchKey) {
           default:

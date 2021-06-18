@@ -37,6 +37,8 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
       quest_shiny: shiny,
       mega_pokemon_id: megaId,
       mega_amount: megaAmount,
+      candy_pokemon_id: candyPokemonId,
+      candy_amount: candyAmount,
     } = pokestop
     let iconUrl = '/images/pokestop/0.png'
 
@@ -60,9 +62,17 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
           iconHtml = `<div class="amount-holder"><div>${stardustAmount}</div></div>`
         } break
       case 4:
+        filterId = `c${candyPokemonId}`
         iconUrl = '/images/item/-3.png'
-        if (itemAmount > 1) {
-          iconHtml = `<div class="amount-holder"><div>${itemAmount}</div></div>`
+        iconHtml = `
+          <img 
+            src=${path}/${Utility.getPokemonIcon(availableForms, candyPokemonId)}.png 
+            style="bottom: 15px; 
+              width:${iconModifiers.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconModifiers.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px; 
+              height:${iconModifiers.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconModifiers.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px;"
+          />`
+        if (candyAmount > 1) {
+          iconHtml += `<div class="amount-holder"><div>${candyAmount}</div></div>`
         } break
       case 5: iconUrl = '/images/item/-4.png'; break
       case 6: iconUrl = '/images/item/-5.png'; break

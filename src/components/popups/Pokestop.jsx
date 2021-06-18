@@ -385,7 +385,7 @@ const RewardInfo = ({ pokestop, path, availableForms }) => {
   const {
     quest_reward_type, quest_item_id, item_amount, stardust_amount,
     quest_pokemon_id, quest_form_id, quest_gender_id, quest_costume_id, quest_shiny,
-    mega_pokemon_id, mega_amount,
+    mega_pokemon_id, mega_amount, candy_pokemon_id, candy_amount,
   } = pokestop
 
   const questRewards = []
@@ -400,6 +400,12 @@ const RewardInfo = ({ pokestop, path, availableForms }) => {
       questRewards.push(
         <img src="/images/item/-1.png" className="quest-popup-img" />,
         <div className="amount-popup">x{stardust_amount}</div>,
+      ); break
+    case 4:
+      questRewards.push(
+        <img src={`${path}/${Utility.getPokemonIcon(availableForms, candy_pokemon_id)}.png`} className="quest-popup-img" />,
+        <img src="/images/item/-3.png" className="quest-popup-img" />,
+        <div className="amount-popup">x{candy_amount}</div>,
       ); break
     case 7:
       questRewards.push(
@@ -468,7 +474,7 @@ const QuestConditions = ({ pokestop, t, userSettings }) => {
       )
       case 11: return (
         <Trans i18nKey={`quest_condition_${qType}_formatted`}>
-          {{ item: qInfo.item_ids.map(id => id) }}
+          {{ item: t(`item_${qInfo.item_id}`) }}
         </Trans>
       )
       case 8:

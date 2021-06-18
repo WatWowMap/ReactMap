@@ -157,6 +157,7 @@
       "quests": true,
       "items": true,
       "megaEnergy": true,
+      "candy": true,
       "pokemon": true,
       "invasions": false,
       "allInvasions": true

@@ -17,7 +17,7 @@ const PokestopTile = ({
   const {
     grunt_type, incident_expire_timestamp, quest_item_id, lure_expire_timestamp,
     quest_pokemon_id, quest_form_id, mega_amount, mega_pokemon_id, stardust_amount,
-    ar_scan_eligible,
+    ar_scan_eligible, candy_pokemon_id,
   } = item
 
   const hasLure = lure_expire_timestamp >= ts
@@ -28,7 +28,8 @@ const PokestopTile = ({
   const hasQuest = ((quest_item_id && !excludeList.includes(`q${quest_item_id}`))
     || (item.quest_pokemon_id && !excludeList.includes(`${quest_pokemon_id}-${quest_form_id}`))
     || (item.mega_amount && !excludeList.includes(`${mega_pokemon_id}-${mega_amount}`))
-    || (item.stardust_amount && !excludeList.includes(`d${stardust_amount}`)))
+    || (item.stardust_amount && !excludeList.includes(`d${stardust_amount}`))
+    || (item.candy_pokemon_id && !excludeList.includes(`c${candy_pokemon_id}`)))
 
   useEffect(() => {
     const { id } = params
