@@ -319,6 +319,8 @@
   },
   "customAuth": {
     "enabled": false,
+    "enableRegistration": false,
+    "registrationLink": "",
     "settings": {
       "usernameFormField": "username",
       "passwordFormField": "password",

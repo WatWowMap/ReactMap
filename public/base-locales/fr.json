@@ -243,6 +243,7 @@
   "zeroIv": "IV 0%",
   "username": "Nom d'utilisateur",
   "password": "Mot de passe",
+  "register": "S'inscrire",
   "orUseDiscord": "ou se connecter avec Discord",
   "openMenu": "Ouvrir le Menu",
   "zoomIn": "Zoom avant",

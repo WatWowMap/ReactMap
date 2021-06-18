@@ -49,6 +49,10 @@ rootRouter.get('/logout', (req, res) => {
   res.redirect('/')
 })
 
+rootRouter.get('/register', (req, res) => {
+  res.redirect(config.customAuth.registrationLink)
+})
+
 rootRouter.get('/settings', async (req, res) => {
   try {
     if (config.enabledAuthMethods.length === 0 || config.alwaysEnabledPerms.length > 0) {
@@ -67,6 +71,7 @@ rootRouter.get('/settings', async (req, res) => {
     const serverSettings = {
       user: getUser(),
       enabledAuthMethods: config.enabledAuthMethods,
+      enableRegistration: config.customAuth.enableRegistration,
       settings: {},
     }
 

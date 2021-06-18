@@ -113,6 +113,23 @@ const Login = ({ serverSettings, clickedTwice, location }) => {
           </Typography>
         </Grid>
       )}
+      {serverSettings.enableRegistration && (
+        <Grid item>
+          <Button
+            variant="contained"
+            style={{
+              backgroundColor: 'rgb(76,175,80)',
+              color: 'white',
+            }}
+            size="large"
+            href="/register"
+          >
+            <Typography variant="h6" align="center">
+              {t('register')}
+            </Typography>
+          </Button>
+        </Grid>
+      )}
     </Grid>
   )
 }
