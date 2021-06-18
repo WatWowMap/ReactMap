@@ -58,7 +58,7 @@ export default function Nav() {
         <Dialog
           open={tutorial}
         >
-          <Tutorial setUserProfile={setUserProfile} setTutorial={setTutorial} />
+          <Tutorial setUserProfile={setUserProfile} setTutorial={setTutorial} toggleDialog={toggleDialog} />
         </Dialog>
       )}
       {drawer ? (

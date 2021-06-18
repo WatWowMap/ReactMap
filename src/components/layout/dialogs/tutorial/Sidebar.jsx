@@ -1,12 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
-  Grid, DialogContent, Typography, Fab, Divider,
+  Grid, DialogContent, Typography, Fab, Divider, Button,
 } from '@material-ui/core'
-import { Menu } from '@material-ui/icons'
+import { Menu, Settings } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
-export default function TutSidebar({ isMobile, pokemon }) {
+import WithSubItems from '@components/layout/drawer/WithSubItems'
+import { filters } from './data.json'
+
+export default function TutSidebar({ toggleDialog, isMobile }) {
   const { t } = useTranslation()
+  const [tempFilters, setTempFilters] = useState(filters)
 
   return (
     <DialogContent>
@@ -17,34 +21,69 @@ export default function TutSidebar({ isMobile, pokemon }) {
         justify="center"
         spacing={2}
       >
-        {!pokemon && (
-          <>
-            <Grid item xs={8}>
-              <Typography variant={isMobile ? 'subtitle2' : 'h6'} align="center">
-                {t('tutorialSidebar')}
-              </Typography>
-            </Grid>
-            <Grid item xs={4}>
-              <Fab color="primary">
-                <Menu />
-              </Fab>
-            </Grid>
-            <Grid item xs={12}>
-              <Divider light />
-            </Grid>
-          </>
-        )}
-        <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
-          <Typography variant="subtitle1" align="center" gutterBottom>
-            {t(pokemon ? 'tutorialSidebarPokemon' : 'tutorialSidebarAll')}
+        <Grid item xs={8}>
+          <Typography variant={isMobile ? 'subtitle2' : 'h6'} align="center">
+            {t('tutorialSidebar0')}
           </Typography>
         </Grid>
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <img src={`/images/tutorial/sidebar_${pokemon ? 'pokemon' : 'all'}.png`} style={{ border: 'black 4px solid', borderRadius: 20 }} />
+        <Grid item xs={4}>
+          <Fab color="primary">
+            <Menu />
+          </Fab>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider light />
         </Grid>
         <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
           <Typography variant="subtitle1" align="center" gutterBottom>
-            {t(pokemon ? 'tutorialSidebarPokemon2' : 'tutorialSidebarAll2')}
+            {t('tutorialSidebar1')}
+          </Typography>
+        </Grid>
+        <Grid
+          container
+          spacing={2}
+          direction="row"
+          justify="center"
+          alignItems="center"
+          style={{
+            width: 300,
+            border: 'black 4px solid',
+            borderRadius: 20,
+            margin: 10,
+          }}
+        >
+          {Object.keys(tempFilters.pokestops).map(subItem => (
+            <WithSubItems
+              key={subItem}
+              category="pokestops"
+              filters={tempFilters}
+              setFilters={setTempFilters}
+              subItem={subItem}
+            />
+          ))}
+          <Grid item xs={6} style={{ textAlign: 'center' }}>
+            <Button
+              onClick={toggleDialog(true, 'pokestops', 'options')}
+              variant="contained"
+              color="secondary"
+              startIcon={<Settings style={{ color: 'white' }} />}
+            >
+              {t('options')}
+            </Button>
+          </Grid>
+          <Grid item xs={6} style={{ textAlign: 'center' }}>
+            <Button
+              onClick={toggleDialog(true, 'pokestops', 'filters')}
+              variant="contained"
+              color="primary"
+            >
+              {t('advanced')}
+            </Button>
+          </Grid>
+        </Grid>
+        <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
+          <Typography variant="subtitle1" align="center" gutterBottom>
+            {t('tutorialSidebar2')}
           </Typography>
         </Grid>
       </Grid>

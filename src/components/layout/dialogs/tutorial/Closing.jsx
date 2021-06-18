@@ -19,6 +19,9 @@ export default function TutClosing() {
           <Divider light style={{ margin: 10 }} />
         </Fragment>
       ))}
+      <Typography variant="subtitle1" align="center">
+        {t('tutorialClosing5')}
+      </Typography>
     </DialogContent>
   )
 }

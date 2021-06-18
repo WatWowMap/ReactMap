@@ -29,7 +29,6 @@ export default function WithSliders({
   const { t } = useTranslation()
   const [tempLegacy, setTempLegacy] = useState(filters[category][specificFilter])
   const [openTab, setOpenTab] = useState(0)
-  const { pokemon } = useStatic(state => state.ui)
 
   const availableForms = useStatic(state => state.availableForms)
   const { icons } = useStatic(state => state.config)
@@ -150,7 +149,7 @@ export default function WithSliders({
                       <Grid item xs={3}>
                         <Switch
                           color="primary"
-                          disabled={!pokemon[each]}
+                          disabled={!context[each]}
                           checked={filters[category][each]}
                           onChange={() => {
                             setFilters({
@@ -188,7 +187,7 @@ export default function WithSliders({
                       <Grid item xs={3}>
                         <Switch
                           color="primary"
-                          disabled={!pokemon[each]}
+                          disabled={!context[each]}
                           checked={filters[category][each]}
                           onChange={() => {
                             setFilters({

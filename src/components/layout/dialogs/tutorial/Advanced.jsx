@@ -1,116 +1,250 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
-  Grid, DialogContent, Typography, Divider, Button,
+  Grid, DialogContent, Typography, Divider, Button, Dialog,
 } from '@material-ui/core'
 import {
   Tune, Ballot, Check, Clear, Save, HelpOutline, FormatSize,
 } from '@material-ui/icons'
+import { FixedSizeGrid } from 'react-window'
+import AutoSizer from 'react-virtualized-auto-sizer'
 import { useTranslation } from 'react-i18next'
+
+import { useStatic } from '@hooks/useStore'
+import Advanced from '../filters/Advanced'
+import Tile from '../filters/MenuTile'
+import SlotSelection from '../filters/SlotSelection'
+import { tiles } from './data.json'
 
 export default function TutAdvanced({ isMobile, toggleHelp, category }) {
   const { t } = useTranslation()
   const [isPokemon, setIsPokemon] = useState(category === 'pokemon')
 
+  if (!category) {
+    category = isPokemon ? 'pokemon' : 'gyms'
+  }
+  const filters = useCallback(useStatic(state => state.filters))
+  const [tempFilters, setTempFilters] = useState(filters[category].filter)
+  const [advancedFilter, setAdvancedFilter] = useState({
+    open: false,
+    id: '',
+    tempFilters: {},
+    default: filters.standard,
+  })
+  const [slotsMenu, setSlotsMenu] = useState({
+    open: false,
+    id: 0,
+  })
+
+  const columnCount = isMobile ? 1 : 2
+
+  const toggleAdvMenu = (open, id, newFilters) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return
+    }
+    if (open) {
+      setAdvancedFilter({
+        open,
+        id,
+        tempFilters: tempFilters[id],
+        standard: filters.standard,
+      })
+    } else {
+      setAdvancedFilter({ open })
+      setTempFilters({ ...tempFilters, [id]: newFilters })
+    }
+  }
+
+  const toggleSlotsMenu = (open, id, newFilters) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return
+    }
+    if (open) {
+      setSlotsMenu({
+        open,
+        id,
+      })
+    } else if (newFilters) {
+      setSlotsMenu({ open })
+      setTempFilters({ ...newFilters })
+    } else {
+      setSlotsMenu({ open })
+    }
+  }
+
+  const handleSwitch = () => {
+    if (isPokemon) {
+      setTempFilters(filters.gyms.filter)
+    } else {
+      setTempFilters(filters.pokemon.filter)
+    }
+    setIsPokemon(!isPokemon)
+  }
+
   return (
-    <DialogContent>
-      <Grid
-        container
-        direction="row"
-        alignItems="center"
-        justify="center"
-        spacing={1}
+    <>
+      <Dialog
+        open={advancedFilter.open}
+        onClose={toggleAdvMenu(false)}
       >
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
-            {t('tutorialToggle')}
-          </Typography>
-          <br />
-          <img src={`/images/tutorial/filters_${isPokemon ? 'pokemon' : 'all'}.png`} style={{ border: 'black 4px solid', borderRadius: 20 }} />
-          <br />
-          <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
-            {isPokemon ? t('tutorialPokemonCaption') : t('tutorialAllCaption')}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Divider light />
-        </Grid>
-        <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-          {isMobile ? <HelpOutline style={{ color: 'white' }} /> : <Typography>{t('help')}</Typography>}
-        </Grid>
-        <Grid item xs={9} sm={8}>
-          <Typography variant="subtitle2" align="center">
-            {t('tutorialHelp')}
-          </Typography>
-        </Grid>
-        <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-          <Ballot style={{ color: 'white' }} />
-        </Grid>
-        <Grid item xs={9} sm={8}>
-          <Typography variant="subtitle2" align="center">
-            {t('tutorialAdvFilter')}
-          </Typography>
-        </Grid>
-        {isPokemon ? (
-          <>
-            <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-              {isMobile ? <Tune style={{ color: 'white' }} /> : <Typography>{t('applyToAll')}</Typography>}
-            </Grid>
-            <Grid item xs={9} sm={8}>
-              <Typography variant="subtitle2" align="center">
-                {t('tutorialTune')}
-              </Typography>
-            </Grid>
-          </>
-        ) : (
-          <>
-            <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-              {isMobile ? <FormatSize style={{ color: 'white' }} /> : <Typography>{t('applyToAll')}</Typography>}
-            </Grid>
-            <Grid item xs={9} sm={8}>
-              <Typography variant="subtitle2" align="center">
-                {t('tutorialFormatSize')}
-              </Typography>
-            </Grid>
-          </>
-        )}
-        <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-          {isMobile ? <Clear color="primary" /> : <Typography color="primary">{t('disableAll')}</Typography>}
-        </Grid>
-        <Grid item xs={9} sm={8}>
-          <Typography variant="subtitle2" align="center">
-            {t('tutorialClear')}
-          </Typography>
-        </Grid>
-        <Grid item xs={3} sm={4} style={{ color: '#00e676', textAlign: 'center' }}>
-          {isMobile ? <Check /> : <Typography>{t('enableAll')}</Typography>}
-        </Grid>
-        <Grid item xs={9} sm={8}>
-          <Typography variant="subtitle2" align="center">
-            {t('tutorialCheck')}
-          </Typography>
-        </Grid>
-        <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-          {isMobile ? <Save color="secondary" /> : <Typography color="secondary">{t('save')}</Typography>}
-        </Grid>
-        <Grid item xs={9} sm={8}>
-          <Typography variant="subtitle2" align="center">
-            {t('tutorialSave')}
-          </Typography>
-        </Grid>
-        {category ? (
-          <Grid item xs={12} style={{ textAlign: 'right' }}>
-            <Button onClick={toggleHelp} color="secondary" size="small">
-              {t('close')}
-            </Button>
-          </Grid>
-        ) : (
+        <Advanced
+          advancedFilter={advancedFilter}
+          toggleAdvMenu={toggleAdvMenu}
+          type={category}
+          legacy={filters.legacy}
+        />
+      </Dialog>
+      <Dialog
+        open={slotsMenu.open}
+        onClose={toggleSlotsMenu(false)}
+      >
+        <SlotSelection
+          teamId={slotsMenu.id}
+          toggleSlotsMenu={toggleSlotsMenu}
+          tempFilters={tempFilters}
+        />
+      </Dialog>
+      <DialogContent>
+        <Grid
+          container
+          direction="row"
+          alignItems="center"
+          justify="center"
+          spacing={1}
+        >
           <Grid item xs={12} style={{ textAlign: 'center' }}>
-            <Button onClick={() => setIsPokemon(!isPokemon)} variant="contained" color="primary" size="small">
-              {isPokemon ? t('tutorialShowAllView') : t('tutorialShowPokemonView')}
-            </Button>
+            <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
+              {t('tutorialToggle')}
+            </Typography>
           </Grid>
-        )}
-      </Grid>
-    </DialogContent>
+          <Grid item xs={12} sm={8} style={{ textAlign: 'center' }}>
+            <div style={{ minHeight: '130px', textAlign: 'center' }}>
+              <AutoSizer defaultHeight={100} defaultWidth={400}>
+                {({ width, height }) => (
+                  <FixedSizeGrid
+                    className="grid"
+                    width={width}
+                    height={height}
+                    columnCount={columnCount}
+                    columnWidth={width / columnCount}
+                    rowCount={Math.ceil(tiles[category].length / columnCount)}
+                    rowHeight={columnCount > 1 ? 120 : 60}
+                    itemData={{
+                      tileItem: tiles[category],
+                      isMobile,
+                      columnCount,
+                      tempFilters,
+                      setTempFilters,
+                      toggleAdvMenu,
+                      toggleSlotsMenu,
+                      type: category,
+                    }}
+                  >
+                    {Tile}
+                  </FixedSizeGrid>
+                )}
+              </AutoSizer>
+            </div>
+          </Grid>
+          <Grid item xs={12} style={{ textAlign: 'center' }}>
+            <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
+              {isPokemon
+                ? t('tutorialPokemonCaption')
+                : t('tutorialAllCaption')}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Divider light />
+          </Grid>
+          <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
+            {isMobile
+              ? <HelpOutline style={{ color: 'white' }} />
+              : <Typography>{t('help')}</Typography>}
+          </Grid>
+          <Grid item xs={9} sm={8}>
+            <Typography variant="subtitle2" align="center">
+              {t('tutorialHelp')}
+            </Typography>
+          </Grid>
+          <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
+            <Ballot style={{ color: 'white' }} />
+          </Grid>
+          <Grid item xs={9} sm={8}>
+            <Typography variant="subtitle2" align="center">
+              {t('tutorialAdvFilter')}
+            </Typography>
+          </Grid>
+          {isPokemon ? (
+            <>
+              <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
+                {isMobile
+                  ? <Tune style={{ color: 'white' }} />
+                  : <Typography>{t('applyToAll')}</Typography>}
+              </Grid>
+              <Grid item xs={9} sm={8}>
+                <Typography variant="subtitle2" align="center">
+                  {t('tutorialTune')}
+                </Typography>
+              </Grid>
+            </>
+          ) : (
+            <>
+              <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
+                {isMobile
+                  ? <FormatSize style={{ color: 'white' }} />
+                  : <Typography>{t('applyToAll')}</Typography>}
+              </Grid>
+              <Grid item xs={9} sm={8}>
+                <Typography variant="subtitle2" align="center">
+                  {t('tutorialFormatSize')}
+                </Typography>
+              </Grid>
+            </>
+          )}
+          <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
+            {isMobile
+              ? <Clear color="primary" />
+              : <Typography color="primary">{t('disableAll')}</Typography>}
+          </Grid>
+          <Grid item xs={9} sm={8}>
+            <Typography variant="subtitle2" align="center">
+              {t('tutorialClear')}
+            </Typography>
+          </Grid>
+          <Grid item xs={3} sm={4} style={{ color: '#00e676', textAlign: 'center' }}>
+            {isMobile
+              ? <Check />
+              : <Typography>{t('enableAll')}</Typography>}
+          </Grid>
+          <Grid item xs={9} sm={8}>
+            <Typography variant="subtitle2" align="center">
+              {t('tutorialCheck')}
+            </Typography>
+          </Grid>
+          <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
+            {isMobile
+              ? <Save color="secondary" />
+              : <Typography color="secondary">{t('save')}</Typography>}
+          </Grid>
+          <Grid item xs={9} sm={8}>
+            <Typography variant="subtitle2" align="center">
+              {t('tutorialSave')}
+            </Typography>
+          </Grid>
+          {toggleHelp ? (
+            <Grid item xs={12} style={{ textAlign: 'right' }}>
+              <Button onClick={toggleHelp} color="secondary" size="small">
+                {t('close')}
+              </Button>
+            </Grid>
+          ) : (
+            <Grid item xs={12} style={{ textAlign: 'center' }}>
+              <Button onClick={handleSwitch} variant="contained" color="primary" size="small">
+                {isPokemon ? t('tutorialShowAllView') : t('tutorialShowPokemonView')}
+              </Button>
+            </Grid>
+          )}
+        </Grid>
+      </DialogContent>
+    </>
   )
 }

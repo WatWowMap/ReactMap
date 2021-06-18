@@ -15,7 +15,7 @@ function SlideTransition(props) {
   return <Slide {...props} direction="up" />
 }
 
-export default function Settings() {
+export default function Settings({ toggleDialog }) {
   const config = useStatic(state => state.config)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
@@ -220,7 +220,7 @@ export default function Settings() {
         <UserProfile setUserProfile={setUserProfile} />
       </Dialog>
       <Dialog open={tutorial}>
-        <Tutorial setUserProfile={setUserProfile} setTutorial={setTutorial} />
+        <Tutorial setUserProfile={setUserProfile} setTutorial={setTutorial} toggleDialog={toggleDialog} />
       </Dialog>
     </Grid>
   )

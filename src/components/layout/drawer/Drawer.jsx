@@ -55,7 +55,7 @@ export default function DrawerMenu({
         ); break
       case 'settings':
         content = (
-          <SettingsMenu />
+          <SettingsMenu toggleDialog={toggleDialog} />
         )
     }
     return (
@@ -82,7 +82,7 @@ export default function DrawerMenu({
           >
             {content}
             {staticUserSettings[category] && (
-              <Grid item xs={6}>
+              <Grid item xs={6} style={{ textAlign: 'center' }}>
                 <Button
                   onClick={toggleDialog(true, category, 'options')}
                   variant="contained"
@@ -98,7 +98,7 @@ export default function DrawerMenu({
               || category === 'pokestops'
               || category === 'nests')
               && (
-                <Grid item xs={6}>
+                <Grid item xs={6} style={{ textAlign: 'center' }}>
                   <Button
                     onClick={toggleDialog(true, category, 'filters')}
                     variant="contained"

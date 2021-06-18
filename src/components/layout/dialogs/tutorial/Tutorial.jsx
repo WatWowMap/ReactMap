@@ -16,11 +16,12 @@ import Welcome from './Welcome'
 import Advanced from './Advanced'
 import Closing from './Closing'
 import Sidebar from './Sidebar'
+import Sliders from './Sliders'
 import Popups from './Popups'
 
-const steps = ['Intro', 'Sidebar', 'Pokemon', 'Advanced', 'Popups']
+const steps = ['Intro', 'Sidebar', 'Sliders', 'Advanced', 'Popups']
 
-export default function Tutorial({ setTutorial, setUserProfile }) {
+export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) {
   const theme = useTheme()
   const { t } = useTranslation()
   const classes = useStyles()
@@ -52,14 +53,12 @@ export default function Tutorial({ setTutorial, setUserProfile }) {
         axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
         index={activeStep}
         onChangeIndex={handleStepChange}
-        enableMouseEvents
         animateHeight
-        containerStyle={{ minHeight: '75vh', alignItems: 'center' }}
       >
         <Welcome setUserProfile={setUserProfile} />
-        <Sidebar isMobile={isMobile} />
-        <Sidebar isMobile={isMobile} pokemon />
-        <Advanced isMobile={isMobile} isTutorial />
+        <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />
+        <Sliders isMobile={isMobile} />
+        <Advanced isMobile={isMobile} />
         <Popups isMobile={isMobile} />
         <Closing />
       </SwipeableViews>

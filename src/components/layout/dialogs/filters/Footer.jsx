@@ -136,7 +136,6 @@ export default function Footer({
   return (
     <>
       <Dialog
-        maxWidth="sm"
         open={helpDialog}
         onClose={toggleHelp}
       >
