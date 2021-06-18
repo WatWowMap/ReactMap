@@ -27,7 +27,6 @@ export default function menuFilter(tempFilters, menus, search, type) {
   let total = 0
   let show = 0
 
-  console.log(filter)
   Object.keys(menus[type].filters).forEach(category => {
     tempAdvFilter[category] = Object.values(menus[type].filters[category]).every(val => val === false)
   })
