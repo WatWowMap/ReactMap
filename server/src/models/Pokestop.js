@@ -68,10 +68,11 @@ class Pokestop extends Model {
     const parseRewards = pokestop => {
       if (pokestop.quest_reward_type) {
         if (isMad) {
-          const { item, mega_resource } = JSON.parse(pokestop.quest_rewards)[0]
+          const { item, candy, mega_resource } = JSON.parse(pokestop.quest_rewards)[0]
           switch (pokestop.quest_reward_type) {
             default: return pokestop
             case 2: Object.keys(item).forEach(x => (pokestop[`item_${x}`] = item[x])); break
+            case 4: Object.keys(candy).forEach(x => (pokestop[`candy_${x}`] = candy[x])); break
             case 12: Object.keys(mega_resource).forEach(x => (pokestop[`mega_${x}`] = mega_resource[x])); break
           }
         } else {
