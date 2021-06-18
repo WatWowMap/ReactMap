@@ -40,5 +40,7 @@ module.exports = new GraphQLObjectType({
     item_amount: { type: GraphQLInt },
     key: { type: GraphQLString },
     quest_task: { type: GraphQLString },
+    candy_pokemon_id: { type: GraphQLInt },
+    candy_amount: { type: GraphQLInt },
   }),
 })
