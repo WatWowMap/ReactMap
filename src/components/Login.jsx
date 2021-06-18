@@ -42,7 +42,7 @@ const Login = ({ serverSettings, clickedTwice, location }) => {
           <Grid item>
             <TextField
               id="username"
-              label="Username"
+              label={t('username')}
               variant="outlined"
               style={{ margin: '20px 20px 10px' }}
               value={username}
@@ -53,7 +53,7 @@ const Login = ({ serverSettings, clickedTwice, location }) => {
           <Grid item>
             <TextField
               id="password"
-              label="Password"
+              label={t('password')}
               type="password"
               variant="outlined"
               style={{ margin: '10px 20px' }}
