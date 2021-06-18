@@ -19,7 +19,7 @@ export default function FloatingButtons({ toggleDrawer }) {
   const classes = useStyles()
   const {
     map: {
-      enableFeedback, feedbackLink, enableStats, statsLink,
+      enableFeedback, feedbackLink, enableStats, statsLink, locationBtnPosition,
     },
   } = useStatic(state => state.config)
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
@@ -46,41 +46,69 @@ export default function FloatingButtons({ toggleDrawer }) {
   const iconSize = isMobile ? 'small' : 'default'
 
   return (
-    <Grid container direction="column" className={classes.floatingBtn}>
-      <Grid item>
-        <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)} title={t('openMenu')}>
-          <Menu fontSize={iconSize} />
-        </Fab>
-      </Grid>
-      <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => lc.start()} title={t('useMyLocation')}>
-          <LocationOn fontSize={iconSize} />
-        </Fab>
-      </Grid>
-      <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => map.zoomIn()} title={t('zoomIn')}>
-          <ZoomIn fontSize={iconSize} />
-        </Fab>
-      </Grid>
-      <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()} title={t('zoomOut')}>
-          <ZoomOut fontSize={iconSize} />
-        </Fab>
-      </Grid>
-      {enableStats && (
+    <Grid
+      container
+      direction="column"
+      justify={locationBtnPosition === 'bottomRight' ? 'space-between' : 'flex-start'}
+      style={{ height: '100%' }}
+    >
+      <Grid
+        container
+        direction="column"
+        className={classes.floatingBtn}
+      >
         <Grid item>
-          <Fab color="secondary" size={fabSize} href={statsLink} target="_blank" rel="noreferrer">
-            <Equalizer fontSize={iconSize} style={{ color: 'white' }} />
+          <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)} title={t('openMenu')}>
+            <Menu fontSize={iconSize} />
           </Fab>
         </Grid>
-      )}
-      {enableFeedback && (
-        <Grid item>
-          <Fab size={fabSize} onClick={handleClickOpen}>
-            <Forum fontSize={iconSize} />
+        {enableStats && (
+          <Grid item>
+            <Fab color="secondary" size={fabSize} href={statsLink} target="_blank" rel="noreferrer">
+              <Equalizer fontSize={iconSize} style={{ color: 'white' }} />
+            </Fab>
+          </Grid>
+        )}
+        {enableFeedback && (
+          <Grid item>
+            <Fab size={fabSize} onClick={handleClickOpen}>
+              <Forum fontSize={iconSize} />
+            </Fab>
+          </Grid>
+        )}
+      </Grid>
+      <Grid
+        container
+        direction="column"
+        className={classes.floatingBtn}
+        alignItems={locationBtnPosition === 'bottomRight' ? 'flex-end' : 'flex-start'}
+        style={locationBtnPosition === 'bottomRight' ? { marginBottom: 15 } : {}}
+      >
+        <Grid
+          item
+          style={{ width: 'fit-content' }}
+        >
+          <Fab color="secondary" size={fabSize} onClick={() => lc.start()} title={t('useMyLocation')}>
+            <LocationOn fontSize={iconSize} />
           </Fab>
         </Grid>
-      )}
+        <Grid
+          item
+          style={{ width: 'fit-content' }}
+        >
+          <Fab color="secondary" size={fabSize} onClick={() => map.zoomIn()} title={t('zoomIn')}>
+            <ZoomIn fontSize={iconSize} />
+          </Fab>
+        </Grid>
+        <Grid
+          item
+          style={{ width: 'fit-content' }}
+        >
+          <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()} title={t('zoomOut')}>
+            <ZoomOut fontSize={iconSize} />
+          </Fab>
+        </Grid>
+      </Grid>
       <Dialog
         open={open}
         onClose={handleClose}

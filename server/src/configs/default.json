@@ -34,6 +34,7 @@
     "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
     "enableStats": false,
     "statsLink": "https://rdmopole2link.net",
+    "locationBtnPosition": "topLeft",
     "startLat": 0,
     "startLon": 0,
     "startZoom": 12,
