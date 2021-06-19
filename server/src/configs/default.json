@@ -307,7 +307,7 @@
         "enabled": true,
         "roles": []
       },
-      "s2cells": {
+      "scanCells": {
         "enabled": true,
         "roles": []
       },

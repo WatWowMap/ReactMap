@@ -10,7 +10,7 @@ const userSettingsCategory = category => {
     default: return category
     case 'devices':
     case 'spawnpoints':
-    case 's2cells': return 'admin'
+    case 'scanCells': return 'admin'
     case 'submissionCells':
     case 'portals': return 'wayfarer'
   }

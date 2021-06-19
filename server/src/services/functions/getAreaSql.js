@@ -14,7 +14,7 @@ module.exports = function getAreaRestrictionSql(query, areaRestrictions, isMad, 
   } else if (category === 'device') {
     columns = columns.map(each => `last_${each}`)
   }
-  if (category === 's2cell') {
+  if (category === 'scanCell') {
     columns = columns.map(each => `center_${each}`)
   }
 

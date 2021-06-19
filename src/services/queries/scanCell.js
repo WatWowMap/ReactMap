@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
-const getAllS2cells = gql`
+const getAllScanCells = gql`
   query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!) {
-    s2cells(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
+    scanCells(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
       id
       center_lat
       center_lon
@@ -12,4 +12,4 @@ const getAllS2cells = gql`
   }
 `
 
-export default getAllS2cells
+export default getAllScanCells

@@ -1,10 +1,10 @@
 import React, { memo } from 'react'
 import { Polygon, Popup } from 'react-leaflet'
 
-import PopupContent from '../popups/S2cell'
-import marker from '../markers/s2cell'
+import PopupContent from '../popups/ScanCell'
+import marker from '../markers/scanCell'
 
-const S2cellTile = ({
+const ScanCellTile = ({
   item, config, zoom, ts,
 }) => (
   <>
@@ -27,4 +27,4 @@ const areEqual = (prev, next) => (
   && prev.zoom === next.zoom
 )
 
-export default memo(S2cellTile, areEqual)
+export default memo(ScanCellTile, areEqual)
