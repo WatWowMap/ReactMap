@@ -53,7 +53,7 @@ const GymTile = ({
             }
           }}
           position={[item.lat, item.lon]}
-          icon={gymMarker(item, ts, hasRaid, iconSizes, filters, path, iconModifiers, availableForms, excludeList)}
+          icon={gymMarker(item, ts, hasRaid, iconSizes, filters, path, iconModifiers, availableForms, userSettings)}
         >
           <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
             <PopupContent
@@ -128,6 +128,7 @@ const areEqual = (prev, next) => {
     && prev.path === next.path
     && prev.userSettings.raidTimers === next.userSettings.raidTimers
     && prev.showCircles === next.showCircles
+    && prev.userSettings.showExBadge === next.userSettings.showExBadge
   )
 }
 

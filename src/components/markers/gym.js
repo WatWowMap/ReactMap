@@ -2,9 +2,11 @@
 import L from 'leaflet'
 import Utility from '../../services/Utility'
 
-export default function gymMarker(gym, ts, hasRaid, iconSizes, filters, path, iconModifiers, availableForms) {
+export default function gymMarker(
+  gym, ts, hasRaid, iconSizes, filters, path, iconModifiers, availableForms, userSettings,
+) {
   const {
-    in_battle, team_id, availble_slots, raid_level,
+    in_battle, team_id, availble_slots, raid_level, ex_raid_eligible,
   } = gym
 
   const inBattle = in_battle ? 'battle' : 'gym'
@@ -66,6 +68,16 @@ export default function gymMarker(gym, ts, hasRaid, iconSizes, filters, path, ic
     popupAnchorY += offsetY
   }
 
+  if (userSettings.showExBadge && ex_raid_eligible) {
+    iconHtml += `
+      <img src="/images/misc/ex.png" 
+        style="width:${gymSize / 1.5}px;
+        height: auto;
+        position: absolute;
+        left: -8px;
+        bottom: -7px;"
+      />`
+  }
   return L.divIcon({
     iconSize: [gymSize, gymSize],
     iconAnchor: [gymSize / 2, iconAnchorY],
