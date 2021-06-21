@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid, IconButton,
 } from '@material-ui/core'
@@ -12,19 +12,20 @@ import useStyles from '../../../hooks/useStyles'
 import { useStore, useStatic } from '../../../hooks/useStore'
 import Areas from './Areas'
 
-export default function DrawerMenu({
+export default function Sidebar({
   drawer, toggleDrawer, filters, setFilters, toggleDialog,
 }) {
+  const { drawer: drawerStyle } = useStore(state => state.settings)
+  const sidebar = useStore(state => state.sidebar)
+  const setSidebar = useStore(state => state.setSidebar)
   const classes = useStyles()
   const ui = useStatic(state => state.ui)
   const staticUserSettings = useStatic(state => state.userSettings)
-  const { drawer: drawerStyle } = useStore(state => state.settings)
   const { map: { title, scanAreasZoom, noScanAreaOverlay }, manualAreas } = useStatic(state => state.config)
   const { t } = useTranslation()
-  const [expanded, setExpanded] = useState('')
 
   const handleChange = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false)
+    setSidebar(isExpanded ? panel : false)
   }
 
   const drawerItems = Object.keys(ui).map(category => {
@@ -61,7 +62,7 @@ export default function DrawerMenu({
     return (
       <Accordion
         key={category}
-        expanded={expanded === category}
+        expanded={sidebar === category}
         onChange={handleChange(category)}
       >
         <AccordionSummary
