@@ -432,17 +432,17 @@ const RaidInfo = ({ gym, t }) => {
         </Typography>
       </Grid>
       {raid_pokemon_move_1 && raid_pokemon_move_1 !== 1 && (
-      <Grid
-        item
-        xs={2}
-        className="grid-item"
-        style={{
-          textAlign: 'center',
-          height: 15,
-          width: 15,
-          backgroundImage: `url(/images/type/${moves[raid_pokemon_move_1].type.toLowerCase()}.png)`,
-        }}
-      />
+        <Grid
+          item
+          xs={2}
+          className="grid-item"
+          style={{
+            textAlign: 'center',
+            height: 15,
+            width: 15,
+            backgroundImage: `url(/images/type/${moves[raid_pokemon_move_1].type.toLowerCase()}.png)`,
+          }}
+        />
       )}
       <Grid item xs={10} style={{ textAlign: 'center' }}>
         <Typography variant="caption" align="center">
@@ -450,17 +450,17 @@ const RaidInfo = ({ gym, t }) => {
         </Typography>
       </Grid>
       {raid_pokemon_move_2 && raid_pokemon_move_2 !== 2 && (
-      <Grid
-        item
-        xs={2}
-        className="grid-item"
-        style={{
-          textAlign: 'center',
-          height: 15,
-          width: 15,
-          backgroundImage: `url(/images/type/${moves[raid_pokemon_move_2].type.toLowerCase()}.png)`,
-        }}
-      />
+        <Grid
+          item
+          xs={2}
+          className="grid-item"
+          style={{
+            textAlign: 'center',
+            height: 15,
+            width: 15,
+            backgroundImage: `url(/images/type/${moves[raid_pokemon_move_2].type.toLowerCase()}.png)`,
+          }}
+        />
       )}
       <Grid item xs={10} style={{ textAlign: 'center' }}>
         <Typography variant="caption" align="center">
@@ -487,25 +487,13 @@ const Timer = ({ gym, start, t }) => {
     return () => clearTimeout(timer)
   })
 
-  if (start) {
-    return (
-      <Grid item xs={6} style={{ textAlign: 'center' }}>
-        <Typography variant="subtitle1">
-          {t('starts')}: {startTime.toLocaleTimeString(localStorage.getItem('i18nextLng'))}
-        </Typography>
-        <Typography variant="h6">
-          {raidStart.str}
-        </Typography>
-      </Grid>
-    )
-  }
   return (
-    <Grid item xs={12} style={{ textAlign: 'center' }}>
+    <Grid item xs={start ? 6 : 12} style={{ textAlign: 'center' }}>
       <Typography variant="subtitle1">
-        {t('ends')} {endTime.toLocaleTimeString(localStorage.getItem('i18nextLng'))}
+        {t(start ? 'starts' : 'ends')}: {(start ? startTime : endTime).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
       </Typography>
       <Typography variant="h6">
-        {raidEnd.str}
+        {(start ? raidStart : raidEnd).str}
       </Typography>
     </Grid>
   )
