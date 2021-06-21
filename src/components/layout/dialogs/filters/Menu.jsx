@@ -32,6 +32,8 @@ export default function Menu({ filters, toggleDialog, category }) {
   const theme = useTheme()
   const menus = useStore(state => state.menus)
   const setMenus = useStore(state => state.setMenus)
+  const advMenu = useStore(state => state.advMenu)
+  const setAdvMenu = useStore(state => state.setAdvMenu)
   const { [category]: staticMenus } = useStatic(state => state.menus)
   const { t } = useTranslation()
 
@@ -52,12 +54,14 @@ export default function Menu({ filters, toggleDialog, category }) {
     id: 0,
   })
   const [search, setSearch] = useState('')
-  const [expanded, setExpanded] = useState(category === 'pokemon' ? 'others' : 'categories')
 
   const { filteredObj, filteredArr, count } = Utility.menuFilter(tempFilters, menus, search, category)
 
   const handleAccordion = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false)
+    setAdvMenu({
+      ...advMenu,
+      [category]: isExpanded ? panel : false,
+    })
   }
 
   const selectAllOrNone = (show) => {
@@ -167,7 +171,7 @@ export default function Menu({ filters, toggleDialog, category }) {
           options={options}
           userSelection={menus[category].filters[cat]}
           handleChange={handleChange}
-          expanded={expanded}
+          expanded={advMenu[category]}
           handleAccordion={handleAccordion}
         />
       )
