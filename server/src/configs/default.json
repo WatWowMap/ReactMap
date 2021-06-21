@@ -104,7 +104,8 @@
     "gyms": {
       "clustering": true,
       "raidTimers": false,
-      "interactionRanges": false
+      "interactionRanges": false,
+      "showExBadge": false
     },
     "pokestops": {
       "clustering": true,
