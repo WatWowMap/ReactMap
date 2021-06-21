@@ -7,7 +7,7 @@ import { useTranslation, Trans } from 'react-i18next'
 import SliderTile from '../filters/SliderTile'
 import { filters, sliders } from './data.json'
 
-export default function TutSliders({ isMobile }) {
+export default function TutSliders() {
   const { ivOr } = filters.pokemon
   const { t } = useTranslation()
   const [temp, setTemp] = useState({ ...ivOr, iv: [80, 100], great: [1, 10] })
@@ -29,6 +29,7 @@ export default function TutSliders({ isMobile }) {
   const arrayCheck = (filter, key) => filter[key].every((v, i) => v === ivOr[key][i])
   Object.keys(temp).forEach(key => fullCheck[key] = !arrayCheck(temp, key))
 
+  const disabled = Object.keys(fullCheck).filter(key => fullCheck[key] === false)
   return (
     <DialogContent>
       <Grid
@@ -99,16 +100,21 @@ export default function TutSliders({ isMobile }) {
         <Grid item xs={12}>
           <Divider light style={{ margin: 10 }} />
         </Grid>
-        <Grid item xs={12}>
-          <Typography variant="subtitle1" align="center" color="secondary">
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Typography variant="subtitle2" color="secondary">
             {t('tutorialSliders6')}
           </Typography>
-          <Typography variant="subtitle1" align="center" color="primary">
+          <Typography variant="subtitle2" color="primary">
             {t('tutorialSliders7')}
           </Typography>
-          <Typography variant="subtitle1" align="center" style={{ marginBottom: isMobile ? 0 : 30 }}>
+          <Typography variant="subtitle2">
             {t('tutorialSliders8')}
           </Typography>
+          {disabled.length > 0 && (
+          <Typography variant="caption">
+            ({disabled.map(each => t(`${each}Slider`)).join(', ')})
+          </Typography>
+          )}
         </Grid>
       </Grid>
     </DialogContent>

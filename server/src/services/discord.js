@@ -96,8 +96,7 @@ class DiscordClient {
           const key = keys[j]
           const configItem = discord.perms[key]
           if (configItem.enabled) {
-            if (configItem.roles.length === 0
-              || alwaysEnabledPerms.includes(key)) {
+            if (alwaysEnabledPerms.includes(key)) {
               perms[key] = true
             } else {
               for (let k = 0; k < userRoles.length; k += 1) {

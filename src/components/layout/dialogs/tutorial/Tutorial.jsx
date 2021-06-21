@@ -1,15 +1,10 @@
 import React, { useState } from 'react'
 import {
-  DialogTitle,
-  DialogActions,
-  Button,
-  MobileStepper,
-  useMediaQuery,
+  DialogTitle, DialogActions, Button, MobileStepper, useMediaQuery,
 } from '@material-ui/core'
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons'
 import { useTheme } from '@material-ui/core/styles'
 import { useTranslation } from 'react-i18next'
-import SwipeableViews from 'react-swipeable-views'
 
 import useStyles from '@hooks/useStyles'
 import Welcome from './Welcome'
@@ -19,7 +14,7 @@ import Sidebar from './Sidebar'
 import Sliders from './Sliders'
 import Popups from './Popups'
 
-const steps = ['Intro', 'Sidebar', 'Sliders', 'Advanced', 'Popups']
+const steps = ['Intro', 'Sidebar', 'Sliders', 'Advanced', 'Popups', 'Closing']
 
 export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) {
   const theme = useTheme()
@@ -40,8 +35,15 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
     setTutorial(false)
   }
 
-  const handleStepChange = (step) => {
-    setActiveStep(step)
+  const getStepContent = (stepIndex) => {
+    switch (stepIndex) {
+      default: return <Closing />
+      case 0: return <Welcome setUserProfile={setUserProfile} />
+      case 1: return <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />
+      case 2: return <Sliders isMobile={isMobile} />
+      case 3: return <Advanced isMobile={isMobile} />
+      case 4: return <Popups isMobile={isMobile} />
+    }
   }
 
   return (
@@ -49,23 +51,11 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
       <DialogTitle className={classes.filterHeader}>
         {t('tutorial')} ({t(steps[activeStep] || 'Closing')})
       </DialogTitle>
-      <SwipeableViews
-        axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-        index={activeStep}
-        onChangeIndex={handleStepChange}
-        animateHeight
-      >
-        <Welcome setUserProfile={setUserProfile} />
-        <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />
-        <Sliders isMobile={isMobile} />
-        <Advanced isMobile={isMobile} />
-        <Popups isMobile={isMobile} />
-        <Closing />
-      </SwipeableViews>
+      {getStepContent(activeStep)}
       <DialogActions>
         <MobileStepper
           variant="progress"
-          steps={steps.length + 1}
+          steps={steps.length}
           position="static"
           activeStep={activeStep}
           style={{ maxWidth: 400, flexGrow: 1 }}

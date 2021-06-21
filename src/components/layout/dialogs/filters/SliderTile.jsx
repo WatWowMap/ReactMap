@@ -40,6 +40,8 @@ export default function SliderTile({
     setTempValues(arrValues)
   }
 
+  const textColor = tempValues[0] === min && tempValues[1] === max ? '#616161' : 'white'
+
   return (
     <Grid
       container
@@ -48,7 +50,7 @@ export default function SliderTile({
       alignItems="center"
     >
       <Grid item xs={4}>
-        <Typography noWrap={fullName} onClick={() => setFullName(!fullName)}>
+        <Typography noWrap={fullName} onClick={() => setFullName(!fullName)} style={{ color: textColor }}>
           {t(`${name}Slider`)}
         </Typography>
       </Grid>
@@ -56,7 +58,7 @@ export default function SliderTile({
         <Grid item xs={4} key={`${name}-${each}`}>
           <TextField
             style={{ width: 75 }}
-            color="primary"
+            color={color}
             id={`${name}-${each}`}
             label={`${t(each)} ${t(label)}`}
             name={name}
