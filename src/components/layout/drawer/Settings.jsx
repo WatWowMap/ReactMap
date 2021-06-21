@@ -44,6 +44,7 @@ export default function Settings({ toggleDialog }) {
 
   const clearStorage = () => {
     localStorage.clear()
+    window.location.reload()
     setAlert(true)
   }
 
@@ -74,6 +75,7 @@ export default function Settings({ toggleDialog }) {
       localStorage.setItem('local-state', contents)
     }
     reader.readAsText(file)
+    window.location.reload()
   }
 
   return (
@@ -115,8 +117,9 @@ export default function Settings({ toggleDialog }) {
         spacing={3}
         style={{ margin: '10px 0px' }}
       >
-        <Grid item xs={5} style={{ textAlign: 'center' }}>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
           <Button
+            style={{ minWidth: 100 }}
             variant="contained"
             color="secondary"
             size="small"
@@ -126,13 +129,15 @@ export default function Settings({ toggleDialog }) {
           </Button>
         </Grid>
         {discord && (
-          <Grid item xs={5} style={{ textAlign: 'center' }}>
+          <Grid item xs={6} style={{ textAlign: 'center' }}>
             {loggedIn ? (
               <Button
+                className="sidebar-button"
                 variant="contained"
                 style={{
                   backgroundColor: 'rgb(114,136,218)',
                   color: 'white',
+                  minWidth: 100,
                 }}
                 size="small"
                 href="/logout"
@@ -143,10 +148,12 @@ export default function Settings({ toggleDialog }) {
             ) : (
               <Link to="/login" style={{ textDecoration: 'none' }}>
                 <Button
+                  className="sidebar-button"
                   variant="contained"
                   style={{
                     backgroundColor: 'rgb(114,136,218)',
                     color: 'white',
+                    minWidth: 100,
                   }}
                   size="small"
                 >
@@ -157,8 +164,31 @@ export default function Settings({ toggleDialog }) {
             )}
           </Grid>
         )}
-        <Grid item xs={5} style={{ textAlign: 'center' }}>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
           <Button
+            style={{ minWidth: 100 }}
+            variant="contained"
+            color="secondary"
+            size="small"
+            onClick={() => setTutorial(true)}
+          >
+            {t('tutorial')}
+          </Button>
+        </Grid>
+        <Grid item xs={discord ? 6 : 12} style={{ textAlign: 'center' }}>
+          <Button
+            style={{ minWidth: 100 }}
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={clearStorage}
+          >
+            {t('resetFilters')}
+          </Button>
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <Button
+            style={{ minWidth: 100 }}
             variant="contained"
             color="secondary"
             size="small"
@@ -167,7 +197,7 @@ export default function Settings({ toggleDialog }) {
             {t('export')}
           </Button>
         </Grid>
-        <Grid item xs={5} style={{ textAlign: 'center' }}>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
           <input
             accept="application/json"
             id="contained-button-file"
@@ -177,6 +207,7 @@ export default function Settings({ toggleDialog }) {
           />
           <label htmlFor="contained-button-file">
             <Button
+              style={{ minWidth: 100 }}
               variant="contained"
               color="primary"
               component="span"
@@ -185,26 +216,6 @@ export default function Settings({ toggleDialog }) {
               {t('import')}
             </Button>
           </label>
-        </Grid>
-        <Grid item xs={5} style={{ textAlign: 'center' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={clearStorage}
-          >
-            {t('clearStorage')}
-          </Button>
-        </Grid>
-        <Grid item xs={discord ? 5 : 12} style={{ textAlign: 'center' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={() => setTutorial(true)}
-          >
-            {t('tutorial')}
-          </Button>
         </Grid>
       </Grid>
       <Snackbar
