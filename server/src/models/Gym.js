@@ -150,7 +150,7 @@ class Gym extends Model {
           } else {
             egg.whereIn(isMad ? 'level' : 'raid_level', eggs)
           }
-          egg.andWhere(isMad ? 'start' : 'raid_battle_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+          egg.andWhere(isMad ? 'start' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
         })
       }
     })
