@@ -14,14 +14,14 @@ export default function TutSliders() {
   const fullCheck = {}
 
   const handleChange = (event, values) => {
-    if (typeof event === 'object') {
+    if (values) {
+      setTemp({
+        ...temp, [event]: values,
+      })
+    } else {
       const { name, value } = event.target
       setTemp({
         ...temp, [name]: value,
-      })
-    } else {
-      setTemp({
-        ...temp, [event]: values,
       })
     }
   }
@@ -111,9 +111,9 @@ export default function TutSliders() {
             {t('tutorialSliders8')}
           </Typography>
           {disabled.length > 0 && (
-          <Typography variant="caption">
-            ({disabled.map(each => t(`${each}Slider`)).join(', ')})
-          </Typography>
+            <Typography variant="caption">
+              ({disabled.map(each => t(`${each}Slider`)).join(', ')})
+            </Typography>
           )}
         </Grid>
       </Grid>
