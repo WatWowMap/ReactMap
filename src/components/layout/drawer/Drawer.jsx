@@ -56,7 +56,7 @@ export default function Sidebar({
         ); break
       case 'settings':
         content = (
-          <SettingsMenu />
+          <SettingsMenu toggleDialog={toggleDialog} />
         )
     }
     return (
@@ -83,7 +83,7 @@ export default function Sidebar({
           >
             {content}
             {staticUserSettings[category] && (
-              <Grid item xs={6}>
+              <Grid item xs={6} style={{ textAlign: 'center' }}>
                 <Button
                   onClick={toggleDialog(true, category, 'options')}
                   variant="contained"
@@ -99,7 +99,7 @@ export default function Sidebar({
               || category === 'pokestops'
               || category === 'nests')
               && (
-                <Grid item xs={6}>
+                <Grid item xs={6} style={{ textAlign: 'center' }}>
                   <Button
                     onClick={toggleDialog(true, category, 'filters')}
                     variant="contained"

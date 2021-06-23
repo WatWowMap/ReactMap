@@ -14,6 +14,8 @@ const useStore = create(persist(set => ({
   setUserSettings: (userSettings) => set({ userSettings }),
   menus: undefined,
   setMenus: (menus) => set({ menus }),
+  tutorial: true,
+  setTutorial: (tutorial) => set({ tutorial }),
   sidebar: undefined,
   setSidebar: (sidebar) => set({ sidebar }),
   advMenu: {
@@ -30,7 +32,7 @@ const useStore = create(persist(set => ({
 }))
 
 const useStatic = create(set => ({
-  auth: { discord: true, loggedIn: false },
+  auth: { discord: true, loggedIn: false, perms: {} },
   setAuth: (auth) => set({ auth }),
   config: undefined,
   setConfig: (config) => set({ config }),

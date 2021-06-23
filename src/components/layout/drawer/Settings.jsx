@@ -1,28 +1,33 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React, { useState } from 'react'
 import {
-  FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Slide,
+  FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Slide, Dialog,
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '../../../hooks/useStore'
+import UserProfile from '../dialogs/UserProfile'
+import Tutorial from '../dialogs/tutorial/Tutorial'
 
 function SlideTransition(props) {
+  // eslint-disable-next-line react/jsx-props-no-spreading
   return <Slide {...props} direction="up" />
 }
 
-export default function Settings() {
+export default function Settings({ toggleDialog }) {
   const config = useStatic(state => state.config)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
   const staticSettings = useStatic(state => state.settings)
+  const { discord, loggedIn } = useStatic(state => state.auth)
   const setAvailableForms = useStatic(state => state.setAvailableForms)
-  const auth = useStatic(state => state.auth)
   const { t, i18n } = useTranslation()
 
   const [alert, setAlert] = useState(false)
+  const [userProfile, setUserProfile] = useState(false)
+  const tutorial = useStore(state => state.tutorial)
+  const setTutorial = useStore(state => state.setTutorial)
 
   const handleChange = event => {
     setSettings({
@@ -39,6 +44,7 @@ export default function Settings() {
 
   const clearStorage = () => {
     localStorage.clear()
+    window.location.reload()
     setAlert(true)
   }
 
@@ -69,6 +75,7 @@ export default function Settings() {
       localStorage.setItem('local-state', contents)
     }
     reader.readAsText(file)
+    window.location.reload()
   }
 
   return (
@@ -110,46 +117,27 @@ export default function Settings() {
         spacing={3}
         style={{ margin: '10px 0px' }}
       >
-        <Grid item xs={auth.discord ? 6 : 12} style={{ textAlign: 'center' }}>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
           <Button
+            style={{ minWidth: 100 }}
             variant="contained"
-            color="primary"
-            style={{
-              color: 'white',
-            }}
+            color="secondary"
             size="small"
-            onClick={clearStorage}
+            onClick={() => setUserProfile(true)}
           >
-            {t('clearStorage')}
+            {t('profile')}
           </Button>
         </Grid>
-        <Grid item xs={5} style={{ textAlign: 'center' }}>
-          <input
-            accept="application/json"
-            id="contained-button-file"
-            type="file"
-            style={{ display: 'none' }}
-            onChange={importSettings}
-          />
-          <label htmlFor="contained-button-file">
-            <Button
-              variant="contained"
-              color="primary"
-              component="span"
-              size="small"
-            >
-              {t('import')}
-            </Button>
-          </label>
-        </Grid>
-        {auth.discord && (
+        {discord && (
           <Grid item xs={6} style={{ textAlign: 'center' }}>
-            {auth.loggedIn ? (
+            {loggedIn ? (
               <Button
+                className="sidebar-button"
                 variant="contained"
                 style={{
                   backgroundColor: 'rgb(114,136,218)',
                   color: 'white',
+                  minWidth: 100,
                 }}
                 size="small"
                 href="/logout"
@@ -160,10 +148,12 @@ export default function Settings() {
             ) : (
               <Link to="/login" style={{ textDecoration: 'none' }}>
                 <Button
+                  className="sidebar-button"
                   variant="contained"
                   style={{
                     backgroundColor: 'rgb(114,136,218)',
                     color: 'white',
+                    minWidth: 100,
                   }}
                   size="small"
                 >
@@ -174,8 +164,31 @@ export default function Settings() {
             )}
           </Grid>
         )}
-        <Grid item xs={5} style={{ textAlign: 'center' }}>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
           <Button
+            style={{ minWidth: 100 }}
+            variant="contained"
+            color="secondary"
+            size="small"
+            onClick={() => setTutorial(true)}
+          >
+            {t('tutorial')}
+          </Button>
+        </Grid>
+        <Grid item xs={discord ? 6 : 12} style={{ textAlign: 'center' }}>
+          <Button
+            style={{ minWidth: 100 }}
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={clearStorage}
+          >
+            {t('resetFilters')}
+          </Button>
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <Button
+            style={{ minWidth: 100 }}
             variant="contained"
             color="secondary"
             size="small"
@@ -183,6 +196,26 @@ export default function Settings() {
           >
             {t('export')}
           </Button>
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <input
+            accept="application/json"
+            id="contained-button-file"
+            type="file"
+            style={{ display: 'none' }}
+            onChange={importSettings}
+          />
+          <label htmlFor="contained-button-file">
+            <Button
+              style={{ minWidth: 100 }}
+              variant="contained"
+              color="primary"
+              component="span"
+              size="small"
+            >
+              {t('import')}
+            </Button>
+          </label>
         </Grid>
       </Grid>
       <Snackbar
@@ -194,6 +227,12 @@ export default function Settings() {
           {t('localStorageCleared')}
         </Alert>
       </Snackbar>
+      <Dialog open={userProfile} fullWidth>
+        <UserProfile setUserProfile={setUserProfile} />
+      </Dialog>
+      <Dialog open={tutorial}>
+        <Tutorial setUserProfile={setUserProfile} setTutorial={setTutorial} toggleDialog={toggleDialog} />
+      </Dialog>
     </Grid>
   )
 }

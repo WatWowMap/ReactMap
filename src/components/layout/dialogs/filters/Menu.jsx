@@ -200,7 +200,6 @@ export default function Menu({ filters, toggleDialog, category }) {
           advancedFilter={advancedFilter}
           toggleAdvMenu={toggleAdvMenu}
           type={category}
-          legacy={filters.legacy}
         />
       </Dialog>
       <Dialog
