@@ -27,7 +27,10 @@ export default function SliderTile({
       setTempValues(newValues)
     } else {
       const { id, value } = event.target
-      let safeVal = parseInt(value) || ''
+      let safeVal = parseInt(value)
+      if (safeVal === undefined || Number.isNaN(safeVal)) {
+        safeVal = ''
+      }
       const arrValues = []
       if (id === 'min') {
         safeVal = safeVal < min ? min : safeVal
