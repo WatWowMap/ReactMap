@@ -218,7 +218,7 @@ class Pokemon extends Model {
           ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 0)
         }
         if (onlyHundoIv && ivs) {
-          ivOr.orWhere('iv', 100)
+          ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 100)
         }
       })
     if (areaRestrictions.length > 0) {
