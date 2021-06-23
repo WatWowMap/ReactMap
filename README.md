@@ -69,6 +69,11 @@ module.exports = {
 }
 ```
 Then while you're in the same directory as the ecosystem file, `pm2 start ecosystem.config.js`
+## Docker Usage Instructions
+1. Use docker-compose.yml (`cp docker-compose.example.yml docker-compose.yml`)
+2. Adjust it for your usage or copy the content to your existing setup (e.g. choose different image than from main branch).
+3. Run `docker-compose up -d reactmap`
+4. Important: for this setup you don't need to clone the repo, you only need to create config files (`areas.json` and `config.json`) like it's mentioned in Installation Instructions. Be aware of the path to the files written in `docker-compose.yml`
 ## Updating
 1. `git pull`
 2. `yarn install`
@@ -81,6 +86,10 @@ With PM2:
 
 3. `yarn build`
 4. `pm2 restart ReactMap`
+
+With Docker:
+1. `docker-compose pull reactmap`
+2. `docker-compose up -d reactmap`
 
 ## Additional Info
 - Webhook URL lat/lon Format: `https://www.yourMapUrl.com/@/:lat/:lon/:zoom`
