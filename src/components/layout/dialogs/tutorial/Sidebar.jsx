@@ -5,12 +5,16 @@ import {
 import { Menu, Settings } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
+import { useStatic } from '@hooks/useStore'
 import WithSubItems from '@components/layout/drawer/WithSubItems'
 import data from './data.json'
 
 export default function TutSidebar({ toggleDialog, isMobile }) {
   const { t } = useTranslation()
   const [tempFilters, setTempFilters] = useState(data.filters)
+  const { perms } = useStatic(state => state.auth)
+
+  const permCheck = perms.pokestops || perms.invasions || perms.quests || perms.lures
 
   return (
     <DialogContent>
@@ -52,15 +56,20 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
             margin: 10,
           }}
         >
-          {Object.keys(tempFilters.pokestops).map(subItem => (
-            <WithSubItems
-              key={subItem}
-              category="pokestops"
-              filters={tempFilters}
-              setFilters={setTempFilters}
-              subItem={subItem}
-            />
-          ))}
+          {Object.keys(tempFilters.pokestops).map(subItem => {
+            if (subItem === 'filter') {
+              return null
+            }
+            return (
+              <WithSubItems
+                key={subItem}
+                category="pokestops"
+                filters={tempFilters}
+                setFilters={setTempFilters}
+                subItem={subItem}
+              />
+            )
+          })}
           <Grid item xs={6} style={{ textAlign: 'center' }}>
             <Button
               onClick={toggleDialog(true, 'pokestops', 'options')}
@@ -76,6 +85,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
               onClick={toggleDialog(true, 'pokestops', 'filters')}
               variant="contained"
               color="primary"
+              disabled={!permCheck}
             >
               {t('advanced')}
             </Button>

@@ -75,7 +75,17 @@
       "allPokestops": false,
       "lures": true,
       "quests": true,
-      "invasions": true
+      "invasions": true,
+      "filter": {
+        "q1": {
+          "enabled": false,
+          "size": "md"
+        },
+        "m384-10": {
+          "enabled": false,
+          "size": "md"
+        }
+      }
     },
     "pokemon": {
       "hundoIv": true,
@@ -99,6 +109,130 @@
           1,
           35
         ]
+      },
+      "standard": {
+        "enabled": false,
+        "size": "md",
+        "iv": [
+          0,
+          100
+        ],
+        "atk_iv": [
+          0,
+          15
+        ],
+        "def_iv": [
+          0,
+          15
+        ],
+        "sta_iv": [
+          0,
+          15
+        ],
+        "level": [
+          1,
+          35
+        ],
+        "great": [
+          1,
+          100
+        ],
+        "ultra": [
+          1,
+          100
+        ]
+      },
+      "filter": {
+        "1-163": {
+          "enabled": false,
+          "size": "md",
+          "adv": "",
+          "iv": [
+            0,
+            100
+          ],
+          "atk_iv": [
+            0,
+            15
+          ],
+          "def_iv": [
+            0,
+            15
+          ],
+          "sta_iv": [
+            0,
+            15
+          ],
+          "level": [
+            1,
+            35
+          ],
+          "great": [
+            1,
+            100
+          ],
+          "ultra": [
+            1,
+            100
+          ]
+        },
+        "1-897": {
+          "enabled": false,
+          "size": "md",
+          "adv": "",
+          "iv": [
+            0,
+            100
+          ],
+          "atk_iv": [
+            0,
+            15
+          ],
+          "def_iv": [
+            0,
+            15
+          ],
+          "sta_iv": [
+            0,
+            15
+          ],
+          "level": [
+            1,
+            35
+          ],
+          "great": [
+            1,
+            100
+          ],
+          "ultra": [
+            1,
+            100
+          ]
+        }
+      }
+    },
+    "gyms": {
+      "filter": {
+        "t3-0": {
+          "enabled": true,
+          "size": "md"
+        },
+        "105-80": {
+          "enabled": false,
+          "size": "md"
+        }
+      }
+    },
+    "nests": {
+      "filter": {
+        "1-163": {
+          "enabled": true,
+          "size": "md"
+        },
+        "4-172": {
+          "enabled": false,
+          "size": "md"
+        }
       }
     }
   },
@@ -110,14 +244,6 @@
       "max": 100,
       "color": "secondary",
       "disabled": false
-    },
-    {
-      "name": "level",
-      "label": "",
-      "min": 1,
-      "max": 35,
-      "disabled": false,
-      "color": "secondary"
     },
     {
       "name": "great",
@@ -134,6 +260,41 @@
       "max": 100,
       "color": "primary",
       "disabled": false
+    },
+    {
+      "name": "atk_iv",
+      "label": "",
+      "min": 0,
+      "max": 15,
+      "perm": "stats",
+      "disabled": false,
+      "color": "secondary"
+    },
+    {
+      "name": "def_iv",
+      "label": "",
+      "min": 0,
+      "max": 15,
+      "perm": "stats",
+      "disabled": false,
+      "color": "secondary"
+    },
+    {
+      "name": "sta_iv",
+      "label": "",
+      "min": 0,
+      "max": 15,
+      "perm": "stats",
+      "disabled": false,
+      "color": "secondary"
+    },
+    {
+      "name": "level",
+      "label": "",
+      "min": 1,
+      "max": 35,
+      "disabled": false,
+      "color": "secondary"
     }
   ],
   "tiles": {

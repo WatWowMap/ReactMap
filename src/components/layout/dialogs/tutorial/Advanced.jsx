@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Grid, DialogContent, Typography, Divider, Button, Dialog,
 } from '@material-ui/core'
@@ -9,7 +9,6 @@ import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
 import Advanced from '../filters/Advanced'
 import Tile from '../filters/MenuTile'
 import SlotSelection from '../filters/SlotSelection'
@@ -22,19 +21,36 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
   if (!category) {
     category = isPokemon ? 'pokemon' : 'gyms'
   }
-  const filters = useCallback(useStatic(state => state.filters))
-  const [tempFilters, setTempFilters] = useState(filters[category].filter)
+  const [tempFilters, setTempFilters] = useState(data.filters[category].filter)
   const [advancedFilter, setAdvancedFilter] = useState({
     open: false,
     id: '',
     tempFilters: {},
-    default: filters.standard,
+    default: data.filters.standard,
   })
   const [slotsMenu, setSlotsMenu] = useState({
     open: false,
     id: 0,
   })
 
+  const advObject = {
+    iv: true,
+    stats: true,
+    pvp: true,
+    sliders: {
+      primary: [
+        data.sliders[0],
+        data.sliders[1],
+        data.sliders[2],
+      ],
+      secondary: [
+        data.sliders[3],
+        data.sliders[4],
+        data.sliders[5],
+        data.sliders[6],
+      ],
+    },
+  }
   const columnCount = isMobile ? 1 : 2
 
   const toggleAdvMenu = (open, id, newFilters) => (event) => {
@@ -46,7 +62,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
         open,
         id,
         tempFilters: tempFilters[id],
-        standard: filters.standard,
+        standard: data.filters.pokemon.standard,
       })
     } else {
       setAdvancedFilter({ open })
@@ -73,9 +89,9 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
 
   const handleSwitch = () => {
     if (isPokemon) {
-      setTempFilters(filters.gyms.filter)
+      setTempFilters(data.filters.gyms.filter)
     } else {
-      setTempFilters(filters.pokemon.filter)
+      setTempFilters(data.filters.pokemon.filter)
     }
     setIsPokemon(!isPokemon)
   }
@@ -90,7 +106,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
           advancedFilter={advancedFilter}
           toggleAdvMenu={toggleAdvMenu}
           type={category}
-          legacy={filters.legacy}
+          isTutorial={advObject}
         />
       </Dialog>
       <Dialog

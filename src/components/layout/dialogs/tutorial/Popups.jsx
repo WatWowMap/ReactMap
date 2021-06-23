@@ -46,6 +46,7 @@ export default function TutPopup({ isMobile }) {
                 }}
                 iconUrl="https://mygod.github.io/pokicons/v2/16.png"
                 userSettings={{ prioritizePvpInfo: false }}
+                isTutorial
               />
             </div>
           </div>

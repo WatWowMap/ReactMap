@@ -7,6 +7,7 @@ import { useTranslation, Trans } from 'react-i18next'
 import SliderTile from '../filters/SliderTile'
 import data from './data.json'
 
+const relevant = ['iv', 'level', 'great', 'ultra']
 export default function TutSliders() {
   const { ivOr } = data.filters.pokemon
   const { t } = useTranslation()
@@ -26,6 +27,7 @@ export default function TutSliders() {
     }
   }
 
+  const slidersToUse = data.sliders.filter(slider => relevant.includes(slider.name))
   const arrayCheck = (filter, key) => filter[key].every((v, i) => v === ivOr[key][i])
   Object.keys(temp).forEach(key => fullCheck[key] = !arrayCheck(temp, key))
 
@@ -50,7 +52,7 @@ export default function TutSliders() {
           alignItems="center"
           style={{ width: 300 }}
         >
-          {data.sliders.map(slider => (
+          {slidersToUse.map(slider => (
             <Grid item xs={12} key={slider.name}>
               <SliderTile
                 filterSlide={slider}
