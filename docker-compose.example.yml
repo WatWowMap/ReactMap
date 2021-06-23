@@ -1,0 +1,12 @@
+version: '3.1'
+services:
+  reactmap:
+    image: ghcr.io/WatWowMap/reactmap:main #pr-10
+    container_name: reactmap
+    command: "yarn start"
+    restart: unless-stopped
+    volumes:
+      - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
+      - ./server/src/configs/config.json:/home/node/server/src/configs/config.json
+    ports:
+      - "9090:8080"
