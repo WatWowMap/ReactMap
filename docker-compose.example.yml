@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   reactmap:
-    image: ghcr.io/WatWowMap/reactmap:main #pr-10
+    image: ghcr.io/watwowmap/reactmap:main #pr-10
     container_name: reactmap
     command: "yarn start"
     restart: unless-stopped
