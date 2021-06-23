@@ -13,31 +13,39 @@ export default function SliderTile({
 }) {
   const { t } = useTranslation()
   const [tempValues, setTempValues] = useState(filterValues[name])
+  const [tempTextValues, setTempTextValues] = useState(filterValues[name])
   const [fullName, setFullName] = useState(true)
 
   useEffect(() => {
     setTempValues(filterValues[name])
+    setTempTextValues(filterValues[name])
   }, [filterValues])
 
-  const handleTempChange = (event) => {
-    const {
-      id, name: slideName, value, min: slideMin, max: slideMax,
-    } = event.target
-    const arrValues = typeof value === 'object' ? value : []
-
-    if (arrValues.length < 2) {
-      const minMaxObj = { min: slideMin, max: slideMax }
-      const minOrMax = id.split('-')[1]
-      const safeVal = parseInt(value) ? parseInt(value) : parseInt(minMaxObj[minOrMax])
-
-      if (minOrMax === 'min') {
-        arrValues.push(safeVal, filterValues[slideName][1])
-      } else {
-        arrValues.push(filterValues[slideName][0], safeVal)
+  const handleTempChange = (event, newValues) => {
+    if (newValues) {
+      setTempTextValues(newValues)
+      setTempValues(newValues)
+    } else {
+      const { id, value } = event.target
+      let safeVal = parseInt(value)
+      if (safeVal === undefined || Number.isNaN(safeVal)) {
+        safeVal = ''
       }
-      handleChange(slideName, arrValues)
+      const arrValues = []
+      if (id === 'min') {
+        safeVal = safeVal < min ? min : safeVal
+        arrValues.push(safeVal, filterValues[name][1])
+      } else {
+        safeVal = safeVal > max ? max : safeVal
+        arrValues.push(filterValues[name][0], safeVal)
+      }
+      if (safeVal === '') {
+        setTempTextValues(arrValues)
+      } else {
+        setTempTextValues(arrValues)
+        handleChange(name, arrValues)
+      }
     }
-    setTempValues(arrValues)
   }
 
   return (
@@ -57,10 +65,10 @@ export default function SliderTile({
           <TextField
             style={{ width: 75 }}
             color="primary"
-            id={`${name}-${each}`}
+            id={each}
             label={`${t(each)} ${t(label)}`}
             name={name}
-            value={tempValues[index]}
+            value={tempTextValues[index]}
             onChange={handleTempChange}
             variant="outlined"
             size="small"
@@ -69,6 +77,7 @@ export default function SliderTile({
             inputProps={{
               min,
               max,
+              autoFocus: false,
             }}
           />
         </Grid>
@@ -81,15 +90,9 @@ export default function SliderTile({
           color={color}
           style={{ width: 200 }}
           value={tempValues}
-          onChange={(event, newValue) => {
-            event.target.name = name
-            event.target.value = newValue
-            handleTempChange(event)
-          }}
-          onChangeCommitted={(event, newValue) => {
-            event.target.name = name
-            event.target.value = newValue
-            handleChange(event)
+          onChange={handleTempChange}
+          onChangeCommitted={(event, newValues) => {
+            handleChange(name, newValues)
           }}
           disabled={disabled}
           valueLabelDisplay="auto"
