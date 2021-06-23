@@ -13,7 +13,7 @@ import { useStatic } from '@hooks/useStore'
 import Advanced from '../filters/Advanced'
 import Tile from '../filters/MenuTile'
 import SlotSelection from '../filters/SlotSelection'
-import { tiles } from './data.json'
+import data from './data.json'
 
 export default function TutAdvanced({ isMobile, toggleHelp, category }) {
   const { t } = useTranslation()
@@ -126,10 +126,10 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
                     height={height}
                     columnCount={columnCount}
                     columnWidth={width / columnCount}
-                    rowCount={Math.ceil(tiles[category].length / columnCount)}
+                    rowCount={Math.ceil(data.tiles[category].length / columnCount)}
                     rowHeight={columnCount > 1 ? 120 : 60}
                     itemData={{
-                      tileItem: tiles[category],
+                      tileItem: data.tiles[category],
                       isMobile,
                       columnCount,
                       tempFilters,

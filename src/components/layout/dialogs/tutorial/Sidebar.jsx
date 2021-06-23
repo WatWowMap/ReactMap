@@ -6,11 +6,11 @@ import { Menu, Settings } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import WithSubItems from '@components/layout/drawer/WithSubItems'
-import { filters } from './data.json'
+import data from './data.json'
 
 export default function TutSidebar({ toggleDialog, isMobile }) {
   const { t } = useTranslation()
-  const [tempFilters, setTempFilters] = useState(filters)
+  const [tempFilters, setTempFilters] = useState(data.filters)
 
   return (
     <DialogContent>

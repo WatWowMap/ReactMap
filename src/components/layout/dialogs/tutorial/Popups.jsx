@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
 import PokemonPopup from '@components/popups/Pokemon'
-import { pokemon } from './data.json'
+import data from './data.json'
 
 export default function TutPopup({ isMobile }) {
   const { t } = useTranslation()
@@ -37,7 +37,7 @@ export default function TutPopup({ isMobile }) {
             <div className="leaflet-popup-content">
               <PokemonPopup
                 pokemon={{
-                  ...pokemon,
+                  ...data.pokemon,
                   expire_timestamp: ts + 1800,
                   updated: ts + 100,
                   first_seen_timestamp: ts,

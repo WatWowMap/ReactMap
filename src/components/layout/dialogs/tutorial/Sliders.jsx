@@ -5,10 +5,10 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 
 import SliderTile from '../filters/SliderTile'
-import { filters, sliders } from './data.json'
+import data from './data.json'
 
 export default function TutSliders() {
-  const { ivOr } = filters.pokemon
+  const { ivOr } = data.filters.pokemon
   const { t } = useTranslation()
   const [temp, setTemp] = useState({ ...ivOr, iv: [80, 100], great: [1, 10] })
   const fullCheck = {}
@@ -50,7 +50,7 @@ export default function TutSliders() {
           alignItems="center"
           style={{ width: 300 }}
         >
-          {sliders.map(slider => (
+          {data.sliders.map(slider => (
             <Grid item xs={12} key={slider.name}>
               <SliderTile
                 filterSlide={slider}
