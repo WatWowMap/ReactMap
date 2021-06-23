@@ -321,5 +321,7 @@
   "statsSubtitle": "Shows Pokemon stats and levels",
   "submissionCellsSubtitle": "Shows information useful for submitting new POIs",
   "weatherSubtitle": "Shows in game weather info for each cell",
-  "userProfile": "User Profile"
+  "userProfile": "User Profile",
+  "candy": "Candy",
+  "showExBadge": "Show EX Badge"
 }

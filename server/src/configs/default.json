@@ -106,7 +106,8 @@
     "gyms": {
       "clustering": true,
       "raidTimers": false,
-      "interactionRanges": false
+      "interactionRanges": false,
+      "showExBadge": false
     },
     "pokestops": {
       "clustering": true,
@@ -159,6 +160,7 @@
       "quests": true,
       "items": true,
       "megaEnergy": true,
+      "candy": true,
       "pokemon": true,
       "invasions": false,
       "allInvasions": true

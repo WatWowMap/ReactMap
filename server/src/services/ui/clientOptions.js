@@ -11,6 +11,7 @@ module.exports = function clientOptions(perms) {
       clustering: { type: 'bool', perm: ['gyms', 'raids'] },
       raidTimers: { type: 'bool', perm: ['raids'] },
       interactionRanges: { type: 'bool', perm: ['gyms', 'raids'] },
+      showExBadge: { type: 'bool', perm: ['gyms'] },
     },
     pokestops: {
       clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },

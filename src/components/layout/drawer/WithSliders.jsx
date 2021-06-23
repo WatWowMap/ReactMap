@@ -45,14 +45,14 @@ export default function WithSliders({
   }, [tempLegacy])
 
   const handleChange = (event, values) => {
-    if (typeof event === 'object') {
+    if (values) {
+      setTempLegacy({
+        ...tempLegacy, [event]: values,
+      })
+    } else {
       const { name, value } = event.target
       setTempLegacy({
         ...tempLegacy, [name]: value,
-      })
-    } else {
-      setTempLegacy({
-        ...tempLegacy, [event]: values,
       })
     }
   }

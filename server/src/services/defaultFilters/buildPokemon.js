@@ -16,6 +16,9 @@ module.exports = function buildPokemon(defaults, base, custom) {
       pokemon.quests[`${i}-${j}`] = new GenericFilter(defaults.pokestops.pokemon)
       pokemon.nests[`${i}-${j}`] = new GenericFilter(defaults.nests.allPokemon)
     }
+    if (pkmn.family == i) {
+      pokemon.quests[`c${pkmn.family}`] = new GenericFilter(defaults.pokestops.candy)
+    }
     if (pkmn.temp_evolutions) {
       pokemon.quests[`m${i}-10`] = new GenericFilter(defaults.pokestops.megaEnergy)
       pokemon.quests[`m${i}-20`] = new GenericFilter(defaults.pokestops.megaEnergy)

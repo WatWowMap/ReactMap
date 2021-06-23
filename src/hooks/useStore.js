@@ -16,6 +16,15 @@ const useStore = create(persist(set => ({
   setMenus: (menus) => set({ menus }),
   tutorial: true,
   setTutorial: (tutorial) => set({ tutorial }),
+  sidebar: undefined,
+  setSidebar: (sidebar) => set({ sidebar }),
+  advMenu: {
+    pokemon: 'others',
+    gyms: 'categories',
+    pokestops: 'categories',
+    nests: 'others',
+  },
+  setAdvMenu: (advMenu) => set({ advMenu }),
 }),
 {
   name: 'local-state',

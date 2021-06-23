@@ -68,10 +68,11 @@ class Pokestop extends Model {
     const parseRewards = pokestop => {
       if (pokestop.quest_reward_type) {
         if (isMad) {
-          const { item, mega_resource } = JSON.parse(pokestop.quest_rewards)[0]
+          const { item, candy, mega_resource } = JSON.parse(pokestop.quest_rewards)[0]
           switch (pokestop.quest_reward_type) {
             default: return pokestop
             case 2: Object.keys(item).forEach(x => (pokestop[`item_${x}`] = item[x])); break
+            case 4: Object.keys(candy).forEach(x => (pokestop[`candy_${x}`] = candy[x])); break
             case 12: Object.keys(mega_resource).forEach(x => (pokestop[`mega_${x}`] = mega_resource[x])); break
           }
         } else {
@@ -80,6 +81,7 @@ class Pokestop extends Model {
             default: return pokestop
             case 2: Object.keys(info).forEach(x => (pokestop[`item_${x}`] = info[x])); break
             case 3: Object.keys(info).forEach(x => (pokestop[`stardust_${x}`] = info[x])); break
+            case 4: Object.keys(info).forEach(x => (pokestop[`candy_${x}`] = info[x])); break
             case 7: Object.keys(info).forEach(x => (pokestop[`quest_${x}`] = info[x])); break
             case 12: Object.keys(info).forEach(x => (pokestop[`mega_${x}`] = info[x])); break
           }
@@ -99,6 +101,7 @@ class Pokestop extends Model {
     const energy = []
     const pokemon = []
     const items = []
+    const candy = []
     // preps arrays for interested objects
     Object.keys(args.filters).forEach(pokestop => {
       switch (pokestop.charAt(0)) {
@@ -108,6 +111,7 @@ class Pokestop extends Model {
         case 'l': lures.push(pokestop.slice(1)); break
         case 'm': energy.push(pokestop.slice(1)); break
         case 'q': items.push(pokestop.slice(1)); break
+        case 'c': candy.push(pokestop.slice(1)); break
       }
     })
 
@@ -138,6 +142,12 @@ class Pokestop extends Model {
             mega.where(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.pokemon_id") = ${pokeId}`))
               .andWhere('quest_reward_type', 12)
               .andWhere(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.amount") = ${amount}`))
+          })
+        })
+        candy.forEach(poke => {
+          stops.orWhere(candies => {
+            candies.where(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'candy' : 'info'}.pokemon_id") = ${poke}`))
+              .andWhere('quest_reward_type', 4)
           })
         })
       }
@@ -190,6 +200,10 @@ class Pokestop extends Model {
           {
             filter: pokestop.stardust_amount ? `d${pokestop.stardust_amount}` : undefined,
             field: 'stardust_amount',
+          },
+          {
+            filter: pokestop.candy_pokemon_id ? `c${pokestop.candy_pokemon_id}` : undefined,
+            field: 'candy_pokemon_id',
           },
         ]
         keyRef.forEach(category => {
@@ -244,6 +258,12 @@ class Pokestop extends Model {
       .from(isMad ? 'trs_quest' : 'pokestop')
       .where('quest_reward_type', 12)
       .orderBy('id', 'asc')
+    quests.candy = await this.query()
+      .distinct(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'candy' : 'info'}.pokemon_id")`)
+        .as('id'))
+      .from(isMad ? 'trs_quest' : 'pokestop')
+      .where('quest_reward_type', 4)
+      .orderBy('id', 'asc')
     if (isMad) {
       quests.pokemon = await this.query()
         .select('quest_pokemon_id', 'quest_pokemon_form_id AS form')
@@ -274,6 +294,7 @@ class Pokestop extends Model {
         case 'mega': rewards.forEach(reward => finalList.push(`m${reward.id}-${reward.amount}`)); break
         case 'invasions': rewards.forEach(reward => finalList.push(`i${reward.grunt_type}`)); break
         case 'stardust': rewards.forEach(reward => finalList.push(`d${reward.amount}`)); break
+        case 'candy': rewards.forEach(reward => finalList.push(`c${reward.id}`)); break
       }
     })
 

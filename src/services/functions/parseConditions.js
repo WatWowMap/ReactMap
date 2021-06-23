@@ -1,18 +1,18 @@
 export default function parseQuestConditions(conditions) {
   const [type1, type2] = JSON.parse(conditions)
   const conditionsToReturn = []
-
   const parseMadRewards = specifics => {
     const normalized = {
       type: specifics.type,
       info: {},
     }
     switch (specifics.type) {
-      default: break;
+      default: break
       case 1: normalized.info.pokemon_type_ids = specifics.with_pokemon_type.pokemon_type; break
       case 2: normalized.info.pokemon_ids = specifics.with_pokemon_category.pokemon_ids; break
       case 7: normalized.info.raid_levels = specifics.with_raid_level.raid_level; break
       case 8:
+      case 11: normalized.info.item_id = specifics.with_item.item; break
       case 14:
       case 26: normalized.info.throw_type_id = specifics.with_throw_type.throw_type; break
       case 27: normalized.info.character_category_ids = specifics.with_invasion_character.category; break

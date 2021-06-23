@@ -32,13 +32,15 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
   const { t } = useTranslation()
 
   const handleChange = (event, values) => {
-    if (typeof event === 'object') {
+    if (values) {
+      if (event === 'default') {
+        setFilterValues({ ...values, enabled: filterValues.enabled })
+      } else {
+        setFilterValues({ ...filterValues, [event]: values })
+      }
+    } else {
       const { name, value } = event.target
       setFilterValues({ ...filterValues, [name]: value })
-    } else if (event === 'default') {
-      setFilterValues({ ...values, enabled: filterValues.enabled })
-    } else {
-      setFilterValues({ ...filterValues, [event]: values })
     }
   }
 
