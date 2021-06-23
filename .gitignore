@@ -7,6 +7,9 @@ config.json
 areas.json
 masterfile.json
 
+# Docker file
+/docker-compose.yml
+
 # Favicon
 public/favicon/*
 !public/favicon/favicon.ico
