@@ -29,7 +29,6 @@ export default function WithSliders({
   const { t } = useTranslation()
   const [tempLegacy, setTempLegacy] = useState(filters[category][specificFilter])
   const [openTab, setOpenTab] = useState(0)
-  const { pokemon } = useStatic(state => state.ui)
 
   const availableForms = useStatic(state => state.availableForms)
   const { icons } = useStatic(state => state.config)
@@ -46,14 +45,14 @@ export default function WithSliders({
   }, [tempLegacy])
 
   const handleChange = (event, values) => {
-    if (typeof event === 'object') {
+    if (values) {
+      setTempLegacy({
+        ...tempLegacy, [event]: values,
+      })
+    } else {
       const { name, value } = event.target
       setTempLegacy({
         ...tempLegacy, [name]: value,
-      })
-    } else {
-      setTempLegacy({
-        ...tempLegacy, [event]: values,
       })
     }
   }
@@ -149,7 +148,8 @@ export default function WithSliders({
                       </Grid>
                       <Grid item xs={3}>
                         <Switch
-                          disabled={!pokemon[each]}
+                          color="primary"
+                          disabled={!context[each]}
                           checked={filters[category][each]}
                           onChange={() => {
                             setFilters({
@@ -174,16 +174,20 @@ export default function WithSliders({
                   alignItems="center"
                   justify="center"
                 >
-                  {['zeroIv'].map(each => (
+                  <Grid item xs={12}>
+                    <Typography variant="h6">{t('shortcuts')}</Typography>
+                  </Grid>
+                  {['zeroIv', 'hundoIv'].map(each => (
                     <Fragment key={each}>
-                      <Grid item xs={6}>
+                      <Grid item xs={3}>
                         <Typography>
                           {t(each)}
                         </Typography>
                       </Grid>
-                      <Grid item xs={6} style={{ textAlign: 'right' }}>
+                      <Grid item xs={3}>
                         <Switch
-                          disabled={!pokemon[each]}
+                          color="primary"
+                          disabled={!context[each]}
                           checked={filters[category][each]}
                           onChange={() => {
                             setFilters({

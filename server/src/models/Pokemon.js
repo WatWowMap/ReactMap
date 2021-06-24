@@ -28,12 +28,19 @@ class Pokemon extends Model {
       stats, iv: ivs, pvp, areaRestrictions,
     } = perms
     const {
-      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv,
+      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv,
     } = args.filters
     const dbType = dbSelection('pokemon')
     const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
     const ivCalc = 'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
-
+    const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', ...leagues]
+    const madKeys = {
+      iv: raw(ivCalc),
+      level: raw(levelCalc),
+      atk_iv: 'individual_attack',
+      def_iv: 'individual_defense',
+      sta_iv: 'individual_stamina',
+    }
     let queryPvp = false
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
@@ -42,9 +49,9 @@ class Pokemon extends Model {
       if (!noPokemonSelect) return []
     }
 
-    const check = (pkmn, league, min, max) => {
+    const pvpCheck = (pkmn, league, min, max) => {
       const rankCheck = pkmn.rank <= max && pkmn.rank >= min
-      const cpCheck = dbType === 'chuck' ? true : pkmn.cp >= pvpMinCp[league]
+      const cpCheck = dbType === 'chuck' || pkmn.cp >= pvpMinCp[league]
       return rankCheck && cpCheck
     }
 
@@ -53,7 +60,7 @@ class Pokemon extends Model {
       let best = 4096
       const filtered = data.filter(pkmn => {
         if (pkmn.rank < best) best = pkmn.rank
-        return check(pkmn, league, min, max)
+        return pvpCheck(pkmn, league, min, max)
       })
       return { filtered, best }
     }
@@ -87,8 +94,8 @@ class Pokemon extends Model {
         return JSON.parse(pokemon.pvp)
       }
       const parsed = {}
-      const keys = ['great', 'ultra']
-      keys.forEach(league => {
+      const pvpKeys = ['great', 'ultra']
+      pvpKeys.forEach(league => {
         if (pokemon[`pvp_rankings_${league}_league`]) {
           parsed[league] = JSON.parse(pokemon[`pvp_rankings_${league}_league`])
         }
@@ -96,34 +103,46 @@ class Pokemon extends Model {
       return parsed
     }
 
-    // checks if IVs/Stats are set to default and skips them if so
+    // checks if filters are set to default and skips them if so
     const arrayCheck = (filter, key) => filter[key].every((v, i) => v === onlyStandard[key][i])
 
-    // generates specific SQL for each slider that isn't set to default, along with perm checks
-    const generateSql = (queryBase, filter, notGlobal) => {
-      const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', ...leagues]
-      const madKeys = [ivCalc, raw(levelCalc), 'individual_attack', 'individual_stamina', 'individual_defense']
+    // cycles through the above arrayCheck
+    const getRelevantKeys = filter => {
+      const relevantKeys = []
+      keys.forEach(key => {
+        if (!arrayCheck(filter, key)) {
+          relevantKeys.push(key)
+        }
+      })
+      return relevantKeys
+    }
 
-      keys.forEach((key, i) => {
+    // generates specific SQL for each slider that isn't set to default, along with perm checks
+    const generateSql = (queryBase, filter, relevant) => {
+      relevant.forEach(key => {
         switch (key) {
           default:
-            if (!arrayCheck(filter, key) && dbType !== 'mad') {
+            if (dbType !== 'mad' && pvp) {
               queryPvp = true
-              // makes sure the base query doesn't return everything if only PVP stats are selected for the Pokemon
-              if (notGlobal) {
+              if (!relevant.includes('iv')
+                && !relevant.includes('level')
+                && !relevant.includes('atk_iv')
+                && !relevant.includes('def_iv')
+                && !relevant.includes('sta_iv')) {
+                // doesn't return everything if only pvp stats for individual pokemon
                 queryBase.whereNull('pokemon_id')
               }
             } break
           case 'iv':
-            if (!arrayCheck(filter, key) && ivs && notGlobal) {
-              queryBase.andWhereBetween(isMad ? raw(ivCalc) : key, filter[key])
+            if (ivs) {
+              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
             } break
           case 'level':
           case 'atk_iv':
           case 'def_iv':
           case 'sta_iv':
-            if (!arrayCheck(filter, key) && stats) {
-              queryBase.andWhereBetween(isMad ? madKeys[i] : key, filter[key])
+            if (stats) {
+              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
             } break
         }
       })
@@ -168,18 +187,23 @@ class Pokemon extends Model {
       .andWhere(ivOr => {
         for (const [pkmn, filter] of Object.entries(args.filters)) {
           if (pkmn.includes('-')) {
+            const relevantFilters = getRelevantKeys(filter)
             const [id, form] = pkmn.split('-')
             const finalForm = masterfile[id].default_form_id == form ? [0, form] : [form]
             ivOr.orWhere(poke => {
               poke.where('pokemon_id', id)
               poke.whereIn('form', finalForm)
-              if (ivs || stats || pvp) {
-                generateSql(poke, filter, true)
+              if (relevantFilters.length > 0) {
+                generateSql(poke, filter, relevantFilters, true)
               }
             })
           } else if (pkmn === 'onlyIvOr' && (ivs || stats || pvp)) {
-            ivOr.whereBetween(isMad ? raw(ivCalc) : 'iv', (ivs ? filter.iv : onlyStandard.iv))
-            generateSql(ivOr, filter)
+            const relevantFilters = getRelevantKeys(filter)
+            if (relevantFilters.length > 0) {
+              generateSql(ivOr, filter, relevantFilters)
+            } else {
+              ivOr.whereNull('pokemon_id')
+            }
           }
         }
         if (onlyXlKarp) {
@@ -192,6 +216,9 @@ class Pokemon extends Model {
         }
         if (onlyZeroIv && ivs) {
           ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 0)
+        }
+        if (onlyHundoIv && ivs) {
+          ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 100)
         }
       })
     if (areaRestrictions.length > 0) {

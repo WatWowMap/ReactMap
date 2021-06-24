@@ -14,13 +14,17 @@ import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
-export default function PokemonPopup({ pokemon, iconUrl, userSettings }) {
+export default function PokemonPopup({
+  pokemon, iconUrl, userSettings, isTutorial,
+}) {
   const { t } = useTranslation()
   const {
     pokemon_id, cleanPvp, iv, cp,
   } = pokemon
-  const { pokemon: perms } = useStatic(state => state.ui)
-
+  const { pokemon: pokemonPerms } = useStatic(state => state.ui)
+  const perms = isTutorial ? {
+    pvp: true, stats: true, iv: true,
+  } : pokemonPerms
   const { pokemon: { [pokemon_id]: metaData } } = useStatic(state => state.masterfile)
   const [expanded, setExpanded] = useState(false)
   const [pvpExpand, setPvpExpand] = useState((userSettings.prioritizePvpInfo && perms.pvp))
@@ -165,9 +169,9 @@ const Header = ({
           {t(`poke_${metaData.pokedex_id}`)}
         </Typography>
         {ditto_form && (
-        <Typography variant="caption">
-          ({t(`poke_${display_pokemon_id}`)})
-        </Typography>
+          <Typography variant="caption">
+            ({t(`poke_${display_pokemon_id}`)})
+          </Typography>
         )}
       </Grid>
       <Grid item xs={3}>

@@ -17,7 +17,7 @@ module.exports = function generateUi(filters, perms) {
           sliders = {
             primary: [
               {
-                name: 'iv', label: '%', min: 0, max: 100, perm: 'iv',
+                name: 'iv', label: '%', min: 0, max: 100, perm: 'iv', color: 'secondary',
               },
             ],
             secondary: [
@@ -37,7 +37,7 @@ module.exports = function generateUi(filters, perms) {
           }
           if (dbSelection(key) !== 'mad') {
             leagues.forEach(league => sliders.primary.push({
-              name: league, label: 'rank', min: 1, max: 100, perm: 'pvp',
+              name: league, label: 'rank', min: 1, max: 100, perm: 'pvp', color: 'primary',
             }))
           } break
         case 'submissionCells':
@@ -78,7 +78,9 @@ module.exports = function generateUi(filters, perms) {
         Object.keys(sliders).forEach(category => {
           sliders[category].forEach(slider => {
             slider.disabled = !perms[slider.perm]
-            slider.color = category
+            if (!slider.color) {
+              slider.color = category
+            }
           })
         })
       }

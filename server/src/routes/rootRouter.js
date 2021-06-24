@@ -75,7 +75,7 @@ rootRouter.get('/settings', async (req, res) => {
     if (serverSettings.user) {
       serverSettings.loggedIn = req.user
       serverSettings.config = {
-        map: config.map,
+        map: { ...config.map, excludeList: config.excludeFromTutorial },
         tileServers: config.tileServers,
         icons: config.icons,
         navigation: config.navigation,
@@ -97,6 +97,7 @@ rootRouter.get('/settings', async (req, res) => {
         userMenu.values.forEach(value => serverSettings.config[userMenu.name][value] = {})
       })
 
+      // keys that are being sent to the frontend but are not options
       const ignoreKeys = ['map', 'manualAreas', 'limit']
       Object.keys(serverSettings.config).forEach(setting => {
         if (!ignoreKeys.includes(setting)) {

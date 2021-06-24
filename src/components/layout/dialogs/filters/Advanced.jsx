@@ -20,7 +20,9 @@ import StringFilter from './StringFilter'
 import SliderTile from './SliderTile'
 import Size from './Size'
 
-export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) {
+export default function AdvancedFilter({
+  toggleAdvMenu, advancedFilter, type, isTutorial,
+}) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const ui = useStatic(state => state.ui)
@@ -31,14 +33,20 @@ export default function AdvancedFilter({ toggleAdvMenu, advancedFilter, type }) 
   const setUserSettings = useStore(state => state.setUserSettings)
   const { t } = useTranslation()
 
+  if (isTutorial) {
+    ui.pokemon = isTutorial
+  }
+
   const handleChange = (event, values) => {
-    if (typeof event === 'object') {
+    if (values) {
+      if (event === 'default') {
+        setFilterValues({ ...values, enabled: filterValues.enabled })
+      } else {
+        setFilterValues({ ...filterValues, [event]: values })
+      }
+    } else {
       const { name, value } = event.target
       setFilterValues({ ...filterValues, [name]: value })
-    } else if (event === 'default') {
-      setFilterValues({ ...values, enabled: filterValues.enabled })
-    } else {
-      setFilterValues({ ...filterValues, [event]: values })
     }
   }
 
