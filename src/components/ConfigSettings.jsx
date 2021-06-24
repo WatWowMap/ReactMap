@@ -66,9 +66,11 @@ export default function ConfigSettings({
   document.body.classList.add('dark')
 
   setAuth({
-    discord: serverSettings.discord,
+    enabledAuthMethods: serverSettings.enabledAuthMethods,
     loggedIn: serverSettings.loggedIn,
     perms: serverSettings.user.perms,
+    profileData: serverSettings.user.profileData,
+    customAuthSettings: serverSettings.customAuthSettings,
   })
   setUi(serverSettings.ui)
   setConfig(serverSettings.config)

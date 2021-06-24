@@ -5,7 +5,7 @@ import * as pokemonIndex from './queries/pokemon'
 import getAllSpawnpoints from './queries/spawnpoint'
 import getAllPortals from './queries/portal'
 import getAllWeather from './queries/weather'
-import getAllS2cells from './queries/s2cell'
+import getAllScanCells from './queries/scanCell'
 import getAllSubmissionCells from './queries/submissionCells'
 import { getOne, getAllNests } from './queries/nest'
 import getAllScanAreas from './queries/scanAreas'
@@ -84,8 +84,8 @@ class Query {
     return getAllPortals
   }
 
-  static s2cells() {
-    return getAllS2cells
+  static scanCells() {
+    return getAllScanCells
   }
 
   static spawnpoints() {

@@ -13,7 +13,7 @@ const client = new Discord.Client()
 
 if (discord.enabled) {
   client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`)
+    console.log(`[Discord] Logged in as ${client.user.tag}!`)
     client.user.setPresence({
       activity: {
         name: discord.presence,
@@ -46,7 +46,7 @@ class DiscordClient {
         .keyArray()
       return roles
     } catch (e) {
-      console.error('Failed to get roles in guild', guildId, 'for user', userId)
+      console.error('[Discord] Failed to get roles in guild', guildId, 'for user', userId)
     }
     return []
   }
@@ -76,7 +76,7 @@ class DiscordClient {
     if (discord.allowedUsers.includes(user.id)) {
       Object.keys(perms).forEach((key) => perms[key] = true)
       perms.areaRestrictions = []
-      console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
+      console.log(`[Discord] User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
       return perms
     }
     for (let i = 0; i < discord.blockedGuilds.length; i += 1) {

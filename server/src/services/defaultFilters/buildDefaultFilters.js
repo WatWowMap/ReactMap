@@ -92,7 +92,7 @@ module.exports = function buildDefault(perms) {
         unconfirmed: new GenericFilter(),
       },
     } : undefined,
-    s2cells: perms.s2cells ? {
+    scanCells: perms.scanCells ? {
       enabled: defaultFilters.scanCells.enabled,
       filter: { global: new GenericFilter() },
     } : undefined,

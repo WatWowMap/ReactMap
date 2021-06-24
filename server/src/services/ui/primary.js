@@ -45,7 +45,7 @@ module.exports = function generateUi(filters, perms) {
           if (!ui.wayfarer) ui.wayfarer = {}
           ui.wayfarer[key] = true; break
         case 'spawnpoints':
-        case 's2cells':
+        case 'scanCells':
         case 'devices':
           if (!ui.admin) ui.admin = {}
           ui.admin[key] = true; break
@@ -65,7 +65,7 @@ module.exports = function generateUi(filters, perms) {
             case 'submissionCells':
             case 'portals': ui.wayfarer[key] = true; break
             case 'spawnpoints':
-            case 's2cells':
+            case 'scanCells':
             case 'devices': ui.admin[key] = true; break
             case 'scanAreas':
             case 'weather': ui[key].enabled = true; break

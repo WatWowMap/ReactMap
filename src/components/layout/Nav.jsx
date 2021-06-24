@@ -6,8 +6,9 @@ import FloatingBtn from './FloatingBtn'
 import Sidebar from './drawer/Drawer'
 import FilterMenu from './dialogs/filters/Menu'
 import UserOptions from './dialogs/UserOptions'
-import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
+import Tutorial from './dialogs/tutorial/Tutorial'
+import UserPerms from './dialogs/UserPerms'
 
 export default function Nav() {
   const filters = useStore(state => state.filters)
@@ -23,6 +24,7 @@ export default function Nav() {
     type: '',
   })
   const [userProfile, setUserProfile] = useState(false)
+  const [userPerms, setUserPerms] = useState(false)
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -50,15 +52,15 @@ export default function Nav() {
 
   return (
     <>
-      {userProfile ? (
-        <Dialog open={userProfile} fullWidth>
-          <UserProfile setUserProfile={setUserProfile} />
+      {userPerms ? (
+        <Dialog open={userPerms} fullWidth>
+          <UserProfile setUserPerms={setUserPerms} />
         </Dialog>
       ) : (
         <Dialog
           open={tutorial}
         >
-          <Tutorial setUserProfile={setUserProfile} setTutorial={setTutorial} toggleDialog={toggleDialog} />
+          <Tutorial setUserPerms={setUserPerms} setTutorial={setTutorial} toggleDialog={toggleDialog} />
         </Dialog>
       )}
       {drawer ? (
@@ -72,6 +74,7 @@ export default function Nav() {
       ) : (
         <FloatingBtn
           toggleDrawer={toggleDrawer}
+          setUserProfile={setUserProfile}
         />
       )}
       <Dialog
@@ -95,6 +98,12 @@ export default function Nav() {
           toggleDialog={toggleDialog}
           category={dialog.category}
         />
+      </Dialog>
+      <Dialog
+        open={userProfile}
+        onClose={() => setUserProfile(false)}
+      >
+        <UserProfile setUserProfile={setUserProfile} />
       </Dialog>
     </>
   )

@@ -1,4 +1,4 @@
-export default function s2cellMarker(cellUpdated) {
+export default function scanCellMarker(cellUpdated) {
   const ago = (new Date()).getTime() - (cellUpdated * 1000)
   const value = ago <= 150000 ? 0 : Math.min((ago - 150000) / 750000, 1)
   const hue = ((1 - value) * 120).toString(10)

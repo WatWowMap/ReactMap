@@ -2,8 +2,28 @@ const axios = require('axios')
 const DiscordStrategy = require('passport-discord').Strategy
 const passport = require('passport')
 const config = require('../services/config')
-const { User } = require('../models/index')
+const { User, CustomAuth } = require('../models/index')
 const DiscordClient = require('../services/discord')
+
+const getProfileData = async (discordId, discordNickname) => {
+  const result = {}
+  const userExists = await CustomAuth.query()
+    .findOne({ [config.customAuth.settings.discordNicknameDbField]: discordNickname })
+  if (userExists) {
+    result.username = userExists[config.customAuth.settings.usernameDbField]
+    result.area = userExists[config.customAuth.settings.areaDbField]
+    result.email = userExists[config.customAuth.settings.emailDbField]
+    result.status = userExists[config.customAuth.settings.statusDbField]
+    result.registrationDate = userExists[config.customAuth.settings.registrationDateDbField]
+    result.donorExpirationDate = userExists[config.customAuth.settings.donorExpirationDateDbField]
+    if (userExists[config.customAuth.settings.discordIdDbField] !== discordId) {
+      await CustomAuth.query()
+        .where({ [config.customAuth.settings.discordNicknameDbField]: discordNickname })
+        .update({ [config.customAuth.settings.discordIdDbField]: discordId })
+    }
+  }
+  return result
+}
 
 passport.serializeUser(async (user, done) => {
   done(null, user)
@@ -24,11 +44,20 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
   try {
     DiscordClient.setAccessToken(accessToken)
     const user = {}
+    const userProfileData = config.customAuth.enabled ?
+      await getProfileData(profile.id,`${profile.username.toLowerCase()}#${profile.discriminator}`)
+      : {}
     user.id = profile.id
     user.username = `${profile.username}#${profile.discriminator}`
     user.perms = await DiscordClient.getPerms(profile)
     user.valid = user.perms.map !== false
     user.blocked = user.perms.blocked
+    user.profileData = {
+      sessionUserId: profile.id,
+      discordId: profile.id,
+      discordNickname: `${profile.username.toLowerCase()}#${profile.discriminator}`,
+      ...userProfileData,
+    }
 
     const ip = req.headers['cf-connecting-ip']
       || ((req.headers['x-forwarded-for'] || '').split(', ')[0])
@@ -92,15 +121,15 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
       timestamp: new Date(),
     }
     if (user.valid) {
-      console.log(user.username, `(${user.id})`, 'Authenticated successfully.')
+      console.log('[Discord]', user.username, `(${user.id})`, 'Authenticated successfully.')
       embed.description = `${user.username} Successfully Authenticated`
       embed.color = 0x00FF00
     } else if (user.blocked) {
-      console.warn(user.id, 'Blocked due to', user.blocked)
+      console.warn('[Discord]', user.id, 'Blocked due to', user.blocked)
       embed.description = `User Blocked Due to ${user.blocked}`
       embed.color = 0xFF0000
     } else {
-      console.warn(user.id, 'Not authorized to access map')
+      console.warn('[Discord]', user.id, 'Not authorized to access map')
     }
 
     await DiscordClient.sendMessage(config.discord.logChannelId, { embed })
@@ -116,7 +145,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
         return done(null, user)
       })
   } catch (e) {
-    console.error('User has failed auth.')
+    console.error('[Discord] User has failed auth.')
   }
 }
 

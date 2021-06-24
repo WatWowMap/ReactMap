@@ -403,7 +403,7 @@ const RaidInfo = ({ gym, t }) => {
       if (raidForm === 'Normal') {
         return ''
       }
-      return `${raidForm} ${t('form')}`
+      return `${raidForm}`
     }
   }
 

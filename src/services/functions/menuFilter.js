@@ -240,7 +240,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
       let formName = form.name || 'Normal'
       formName = formName === 'Normal' ? '' : formName
       const name = formName === '' ? pkmn.name : formName
-      const displayName = j == pkmn.default_form_id ? t(`poke_${i}`) : t(`form_${j}`)
+      const displayName = formName === '' ? t(`poke_${i}`) : `${t(`poke_${i}`)} ${t(`form_${j}`)}`
       const formTypes = form.types || pkmn.types
       total += 1
       pkmn.category = 'pokemon'

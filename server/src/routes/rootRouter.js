@@ -17,7 +17,12 @@ const rootRouter = new express.Router()
 
 rootRouter.use('/', clientRouter)
 
-if (config.discord.enabled) {
+config.enabledAuthMethods = [
+  ...(config.discord.enabled ? ['discord'] : []),
+  ...(config.customAuth.enabled ? ['customAuth'] : [])
+  ]
+
+if (config.enabledAuthMethods.length > 0) {
   rootRouter.use('/auth', authRouter)
 
   // eslint-disable-next-line no-unused-vars
@@ -44,21 +49,19 @@ rootRouter.get('/logout', (req, res) => {
   res.redirect('/')
 })
 
+rootRouter.get('/register', (req, res) => {
+  res.redirect(config.customAuth.registrationExternalLink)
+})
+
 rootRouter.get('/settings', async (req, res) => {
   try {
-    if (!config.discord.enabled) {
-      req.session.perms = {}
-      Object.keys(config.discord.perms).forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
-      req.session.perms.areaRestrictions = []
-      req.session.save()
-    } else if (config.alwaysEnabledPerms.length > 0) {
-      req.session.perms = {}
-      config.alwaysEnabledPerms.forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
-      req.session.perms.areaRestrictions = []
+    if (config.enabledAuthMethods.length === 0 || config.alwaysEnabledPerms.length > 0) {
+      req.session.perms = { areaRestrictions: [] }
+      config.alwaysEnabledPerms.forEach(perm => req.session.perms[perm] = true)
       req.session.save()
     }
     const getUser = () => {
-      if (config.discord.enabled) {
+      if (config.enabledAuthMethods.length > 0) {
         if (req.user || config.alwaysEnabledPerms.length === 0) {
           return req.user
         }
@@ -67,13 +70,24 @@ rootRouter.get('/settings', async (req, res) => {
     }
     const serverSettings = {
       user: getUser(),
-      discord: config.discord.enabled,
+      enabledAuthMethods: config.enabledAuthMethods,
+      enableRegistration: config.customAuth.enableRegistration,
+      confirmationEmail: config.customAuth.confirmationEmail,
+      registrationExternalLink: config.customAuth.registrationExternalLink,
+      manualAreas: Object.keys(config.manualAreas),
+      disabledEmailDomains: config.customAuth.disabledEmailDomains,
+      customAuthSettings: {
+        visitorStatus: 'visitor',
+        emailConfirmedStatus: 'confirmed',
+        donorStatus: 'donator',
+        adminStatus: 'admin',
+      },
       settings: {},
     }
 
     // add user options here from the config that are structured as objects
     if (serverSettings.user) {
-      serverSettings.loggedIn = req.user
+      serverSettings.loggedIn = !!req.user
       serverSettings.config = {
         map: { ...config.map, excludeList: config.excludeFromTutorial },
         tileServers: config.tileServers,

@@ -1,8 +1,9 @@
 import React from 'react'
 import {
-  Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid, IconButton,
+  Drawer, Button, Typography, Accordion, AccordionSummary, AccordionDetails, Grid, IconButton, Icon,
 } from '@material-ui/core'
 import { ExpandMore, Clear, Settings } from '@material-ui/icons'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import SettingsMenu from './Settings'
@@ -22,6 +23,7 @@ export default function Sidebar({
   const ui = useStatic(state => state.ui)
   const staticUserSettings = useStatic(state => state.userSettings)
   const { map: { title, scanAreasZoom, noScanAreaOverlay }, manualAreas } = useStatic(state => state.config)
+  const auth = useStatic(state => state.auth)
   const { t } = useTranslation()
 
   const handleChange = (panel) => (event, isExpanded) => {
@@ -165,6 +167,42 @@ export default function Sidebar({
         </Grid>
       </Grid>
       {drawerItems}
+      {(auth.enabledAuthMethods.length > 0) && (
+        <Grid item align="center" style={{ textAlign: 'center', margin: 40 }}>
+          {auth.loggedIn ? (
+            <Button
+              variant="contained"
+              style={{
+                backgroundColor: 'rgb(114,136,218)',
+                color: 'white',
+              }}
+              size="small"
+              href="/logout"
+            >
+              {auth.enabledAuthMethods.length === 1
+              && auth.enabledAuthMethods.includes('discord')
+              && (<Icon className="fab fa-discord" style={{ fontSize: 20 }} />)}
+              &nbsp;{t('logout')}&nbsp;
+            </Button>
+          ) : (
+            <Link to="/login" style={{ textDecoration: 'none' }}>
+              <Button
+                variant="contained"
+                style={{
+                  backgroundColor: 'rgb(114,136,218)',
+                  color: 'white',
+                }}
+                size="small"
+              >
+                {auth.enabledAuthMethods.length === 1
+                && auth.enabledAuthMethods.includes('discord')
+                && (<Icon className="fab fa-discord" style={{ fontSize: 20 }} />)}
+                &nbsp;{t('login')}&nbsp;
+              </Button>
+            </Link>
+          )}
+        </Grid>
+      )}
     </Drawer>
   )
 }
