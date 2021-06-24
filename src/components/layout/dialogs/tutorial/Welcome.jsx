@@ -4,18 +4,17 @@ import {
   Grid,
   Typography,
   Fab,
-  Icon,
   Select,
   MenuItem,
 } from '@material-ui/core'
-import { Person } from '@material-ui/icons'
+import { Person, ExitToApp } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
 
-export default function TutWelcome({ setUserProfile }) {
+export default function TutWelcome({ setUserPerms }) {
   const { t, i18n } = useTranslation()
-  const { discord, loggedIn, perms } = useStatic(state => state.auth)
+  const { enabledAuthMethods, loggedIn, perms } = useStatic(state => state.auth)
   const { map: { excludeList }, localeSelection } = useStatic(state => state.config)
 
   const getPerms = () => {
@@ -44,7 +43,7 @@ export default function TutWelcome({ setUserProfile }) {
             {t('welcome')} {document.title}!
           </Typography>
         </Grid>
-        {discord
+        {enabledAuthMethods.length > 0
           && (
             <>
               <Grid item xs={6}>
@@ -54,7 +53,7 @@ export default function TutWelcome({ setUserProfile }) {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="h6" gutterBottom align="center">
-                  {loggedIn ? t('viewProfile') : t('loginOptional')}
+                  {loggedIn ? t('viewPerms') : t('loginOptional')}
                 </Typography>
               </Grid>
               <Grid item xs={6}>
@@ -64,15 +63,15 @@ export default function TutWelcome({ setUserProfile }) {
               </Grid>
               <Grid item xs={6} style={{ textAlign: 'center' }}>
                 {loggedIn ? (
-                  <Fab color="primary" onClick={() => setUserProfile(true)}>
+                  <Fab color="primary" onClick={() => setUserPerms(true)}>
                     <Person />
                   </Fab>
                 ) : (
                   <Fab
                     style={{ backgroundColor: 'rgb(114,136,218)', color: 'white' }}
-                    href="/auth/discord"
+                    href="/login"
                   >
-                    <Icon className="fab fa-discord" />
+                    <ExitToApp />
                   </Fab>
                 )}
               </Grid>

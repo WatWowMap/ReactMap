@@ -16,7 +16,7 @@ import Popups from './Popups'
 
 const steps = ['Intro', 'Sidebar', 'Sliders', 'Advanced', 'Popups', 'Closing']
 
-export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) {
+export default function Tutorial({ toggleDialog, setTutorial, setUserPerms }) {
   const theme = useTheme()
   const { t } = useTranslation()
   const classes = useStyles()
@@ -38,7 +38,7 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
   const getStepContent = (stepIndex) => {
     switch (stepIndex) {
       default: return <Closing />
-      case 0: return <Welcome setUserProfile={setUserProfile} />
+      case 0: return <Welcome setUserPerms={setUserPerms} />
       case 1: return <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />
       case 2: return <Sliders isMobile={isMobile} />
       case 3: return <Advanced isMobile={isMobile} />

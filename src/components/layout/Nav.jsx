@@ -54,7 +54,7 @@ export default function Nav() {
     <>
       {userPerms ? (
         <Dialog open={userPerms} fullWidth>
-          <UserProfile setUserPerms={setUserPerms} />
+          <UserPerms setUserPerms={setUserPerms} />
         </Dialog>
       ) : (
         <Dialog

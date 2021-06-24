@@ -138,28 +138,6 @@ export default function Settings({ toggleDialog }) {
           </Button>
         </Grid>
         <Grid item xs={6} style={{ textAlign: 'center' }}>
-          <Button
-            style={{ minWidth: 100 }}
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={clearStorage}
-          >
-            {t('resetFilters')}
-          </Button>
-        </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
-          <Button
-            style={{ minWidth: 100 }}
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={exportSettings}
-          >
-            {t('export')}
-          </Button>
-        </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
           <input
             accept="application/json"
             id="contained-button-file"
@@ -178,6 +156,28 @@ export default function Settings({ toggleDialog }) {
               {t('import')}
             </Button>
           </label>
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <Button
+            style={{ minWidth: 100 }}
+            variant="contained"
+            color="secondary"
+            size="small"
+            onClick={exportSettings}
+          >
+            {t('export')}
+          </Button>
+        </Grid>
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Button
+            style={{ minWidth: 100 }}
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={clearStorage}
+          >
+            {t('resetFilters')}
+          </Button>
         </Grid>
       </Grid>
       <Snackbar

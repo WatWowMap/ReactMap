@@ -289,7 +289,7 @@
   "next": "Next",
   "finish": "Finish",
   "startTutorial": "Start Tutorial",
-  "viewProfile": "View Profile",
+  "viewPerms": "View Permissions",
   "loginOptional": "Login (Optional)",
   "tutorial": "Tutorial",
   "tutorialLanguage": "Choose Your Language",
@@ -360,5 +360,8 @@
   "statsSubtitle": "Shows Pokemon stats and levels",
   "submissionCellsSubtitle": "Shows information useful for submitting new POIs",
   "weatherSubtitle": "Shows in game weather info for each cell",
+  "userPerms": "User Permissions",
+  "perms": "Permissions",
+  "candy": "Candy",
   "showExBadge": "Show EX Badge"
 }

@@ -18,7 +18,7 @@ import useStyles from '@hooks/useStyles'
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
-export default function UserProfile({ setUserProfile }) {
+export default function UserPerms({ setUserPerms }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const { perms } = useStatic(state => state.auth)
@@ -27,7 +27,7 @@ export default function UserProfile({ setUserProfile }) {
   return (
     <>
       <DialogTitle className={classes.filterHeader}>
-        {t('userProfile')}
+        {t('userPerms')}
       </DialogTitle>
       <DialogContent>
         <Grid
@@ -90,7 +90,7 @@ export default function UserProfile({ setUserProfile }) {
         <Button href={rolesLink} target="_blank" rel="noreferrer" color="primary">
           {rolesLinkName}
         </Button>
-        <Button onClick={() => setUserProfile(false)} color="secondary">
+        <Button onClick={() => setUserPerms(false)} color="secondary">
           {t('close')}
         </Button>
       </DialogActions>
