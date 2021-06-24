@@ -51,8 +51,24 @@ const clearOtherSessions = async (userId, currentSessionId) => {
   console.log('[Session] Clear Result:', results)
 }
 
+const updateSessionProfileDataByUserId = async (userId, dataType, value) => {
+  await Session.query()
+      .where(raw(`json_extract(data, '$.passport.user.id') = '${userId}'`))
+      .andWhere(raw(`json_extract(data, '$.passport.user.profileData.${dataType}') != '${value}'`))
+      .update({ data: raw(`json_set(data, '$.passport.user.profileData.${dataType}', '${value}')`) })
+}
+
+const updateSessionProfileDataByDiscordNickname = async (discordNickname, dataType, value) => {
+  await Session.query()
+      .where(raw(`json_extract(data, '$.passport.user.profileData.discordNickname') = '${discordNickname}'`))
+      .andWhere(raw(`json_extract(data, '$.passport.user.profileData.${dataType}') != '${value}'`))
+      .update({ data: raw(`json_set(data, '$.passport.user.profileData.${dataType}', '${value}')`) })
+}
+
 module.exports = {
   sessionStore,
   isValidSession,
   clearOtherSessions,
+  updateSessionProfileDataByUserId,
+  updateSessionProfileDataByDiscordNickname,
 }

@@ -6,11 +6,11 @@ import Login from './Login'
 import WebhookQuery from './WebhookQuery'
 
 const Auth = ({ serverSettings, match }) => {
-  if (serverSettings.discord && !serverSettings.user) {
+  if (serverSettings.enabledAuthMethods.length > 0 && !serverSettings.user) {
     if (match.params.category || match.params.lat) {
       localStorage.setItem('params', JSON.stringify(match.params))
     }
-    return <Login />
+    return <Login serverSettings={serverSettings} />
   }
   const cachedParams = JSON.parse(localStorage.getItem('params'))
   if (cachedParams) {
@@ -28,10 +28,10 @@ const Auth = ({ serverSettings, match }) => {
       />
     )
   }
-  if (serverSettings.discord && serverSettings.user) {
+  if (serverSettings.enabledAuthMethods.length > 0 && serverSettings.user) {
     return <ConfigSettings serverSettings={serverSettings} match={match} />
   }
-  if (!serverSettings.discord) {
+  if (serverSettings.enabledAuthMethods.length === 0) {
     return <ConfigSettings serverSettings={serverSettings} match={match} />
   }
 }

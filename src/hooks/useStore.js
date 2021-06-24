@@ -21,7 +21,7 @@ const useStore = create(persist(set => ({
 }))
 
 const useStatic = create(set => ({
-  auth: { discord: true, loggedIn: false },
+  auth: { enabledAuthMethods: [], loggedIn: false },
   setAuth: (auth) => set({ auth }),
   config: undefined,
   setConfig: (config) => set({ config }),

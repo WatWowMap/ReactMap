@@ -65,7 +65,12 @@ export default function ConfigSettings({
   const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
   document.body.classList.add('dark')
 
-  setAuth({ discord: serverSettings.discord, loggedIn: serverSettings.loggedIn })
+  setAuth({
+    enabledAuthMethods: serverSettings.enabledAuthMethods,
+    loggedIn: serverSettings.loggedIn,
+    profileData: serverSettings.user.profileData,
+    customAuthSettings: serverSettings.customAuthSettings,
+  })
   setUi(serverSettings.ui)
   setConfig(serverSettings.config)
   setMasterfile(serverSettings.masterfile)

@@ -30,10 +30,12 @@
     "title": "ReactMap",
     "headerTitle": "ReactMap",
     "nestHemisphere": "north",
-    "enableFeedbackLink": false,
+    "enableFeedback": false,
     "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
     "enableStats": false,
     "statsLink": "https://rdmopole2link.net",
+    "enableAccuracyCircle": true,
+    "locationBtnPosition": "topLeft",
     "startLat": 0,
     "startLon": 0,
     "startZoom": 12,
@@ -197,6 +199,7 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
+      "customAuthTableName": "members",
       "leagues": ["great", "ultra"]
     },
     "schemas": {
@@ -307,13 +310,131 @@
         "enabled": true,
         "roles": []
       },
-      "s2cells": {
+      "scanCells": {
         "enabled": true,
         "roles": []
       },
       "devices": {
         "enabled": true,
         "roles": []
+      }
+    }
+  },
+  "customAuth": {
+    "enabled": false,
+    "enableRegistration": false,
+    "registrationExternalLink": "",
+    "disabledEmailDomains": [],
+    "confirmationEmail": false,
+    "senderAddress": "Map Admin <admin@map.com>",
+    "siteDomain": "https://map.domain.com",
+    "nodemailerOptions": {
+      "host": "smtp.server.email",
+      "port": 587,
+      "secure": false,
+      "auth": {
+        "user": "username",
+        "pass": "password"
+      }
+    },
+    "settings": {
+      "usernameFormField": "username",
+      "passwordFormField": "password",
+      "usernameToLowerCase": true,
+      "passwordEncryption": "bcrypt",
+      "usernameDbField": "username",
+      "passwordDbField": "password",
+      "discordIdDbField": "discordId",
+      "discordNicknameDbField": "discordNickname",
+      "areaDbField": "area",
+      "emailDbField": "email",
+      "statusDbField": "status",
+      "visitorStatus": "confirmed",
+      "emailConfirmedStatus": "confirmed",
+      "donorStatus": "donor",
+      "adminStatus": "admin",
+      "registrationDateDbField": "registrationDate",
+      "donorExpirationDateDbField": "donor_expiration_date",
+      "lastConnectedDbField": "lastConnected"
+    },
+    "allowedUsers": [],
+    "areaRestrictions": [],
+    "perms": {
+      "map": {
+        "enabled": true,
+        "status": []
+      },
+      "pokemon": {
+        "enabled": true,
+        "status": []
+      },
+      "stats": {
+        "enabled": true,
+        "status": []
+      },
+      "iv": {
+        "enabled": true,
+        "status": []
+      },
+      "pvp": {
+        "enabled": true,
+        "status": []
+      },
+      "gyms": {
+        "enabled": true,
+        "status": []
+      },
+      "raids": {
+        "enabled": true,
+        "status": []
+      },
+      "pokestops": {
+        "enabled": true,
+        "status": []
+      },
+      "quests": {
+        "enabled": true,
+        "status": []
+      },
+      "lures": {
+        "enabled": true,
+        "status": []
+      },
+      "portals": {
+        "enabled": true,
+        "status": []
+      },
+      "submissionCells": {
+        "enabled": true,
+        "status": []
+      },
+      "invasions": {
+        "enabled": true,
+        "status": []
+      },
+      "nests": {
+        "enabled": true,
+        "status": []
+      },
+      "scanAreas": {
+        "enabled": true,
+        "status": []
+      },
+      "weather": {
+        "enabled": true,
+        "status": []
+      },
+      "spawnpoints": {
+        "enabled": true,
+        "status": []
+      },
+      "s2cells": {
+        "enabled": true,
+        "status": []
+      },
+      "devices": {
+        "enabled": true,
+        "status": []
       }
     }
   },

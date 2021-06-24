@@ -33,7 +33,7 @@
         {"name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
         {"name": "Nundo", "perm": "iv", "num": 0, "value": "#000000", "op": "=" },
         {"name": "Top Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
-        {"name": "Multiple", "perm": "pvp", "value": "#800080" }    
+        {"name": "Multiple", "perm": "pvp", "value": "#800080" }
       ]
     }
   },
@@ -41,6 +41,7 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
+      "customAuthTableName": "members",
       "leagues": ["great", "ultra"]
     },
     "schemas": {
@@ -53,7 +54,7 @@
         "database": "rdmdb",
         "charset": "utf8mb4",
         "arScanColumn": false,
-        "useFor": ["device", "gym", "pokemon", "pokestop", "s2cell", "spawnpoint", "weather"]
+        "useFor": ["device", "gym", "pokemon", "pokestop", "scanCell", "spawnpoint", "weather"]
       },
       "manual": {
         "type": "manual",
@@ -66,9 +67,9 @@
         "arScanColumn": false,
         "useFor": ["session", "user", "nest", "portal"]
       }
-    }  
+    }
   },
-  "alwaysEnabledPerms": [],
+  "alwaysEnabledPerms": ["map","gyms","pokestops"],
   "discord": {
     "enabled": false,
     "logChannelId": "",
@@ -160,7 +161,7 @@
         "enabled": true,
         "roles": []
       },
-      "s2cells": {
+      "scanCells": {
         "enabled": true,
         "roles": []
       },

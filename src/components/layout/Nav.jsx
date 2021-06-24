@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState } from 'react'
 import Dialog from '@material-ui/core/Dialog'
 
@@ -6,6 +7,7 @@ import FloatingBtn from './FloatingBtn'
 import Sidebar from './drawer/Drawer'
 import FilterMenu from './dialogs/filters/Menu'
 import UserOptions from './dialogs/UserOptions'
+import UserProfile from './dialogs/UserProfile'
 
 export default function Nav() {
   const filters = useStore(state => state.filters)
@@ -18,6 +20,7 @@ export default function Nav() {
     category: '',
     type: '',
   })
+  const [userProfile, setUserProfile] = useState(false)
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -56,6 +59,7 @@ export default function Nav() {
       ) : (
         <FloatingBtn
           toggleDrawer={toggleDrawer}
+          setUserProfile={setUserProfile}
         />
       )}
       <Dialog
@@ -79,6 +83,12 @@ export default function Nav() {
           toggleDialog={toggleDialog}
           category={dialog.category}
         />
+      </Dialog>
+      <Dialog
+        open={userProfile}
+        onClose={() => setUserProfile(false)}
+      >
+        <UserProfile setUserProfile={setUserProfile} />
       </Dialog>
     </>
   )

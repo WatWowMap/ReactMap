@@ -4,7 +4,7 @@ const {
 const { JSONResolver } = require('graphql-scalars')
 
 module.exports = new GraphQLObjectType({
-  name: 'S2cell',
+  name: 'ScanCell',
   fields: () => ({
     id: { type: GraphQLString },
     level: { type: GraphQLInt },

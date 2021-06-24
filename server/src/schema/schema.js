@@ -11,14 +11,14 @@ const NestType = require('./nest')
 const PokestopType = require('./pokestop')
 const PokemonType = require('./pokemon')
 const PortalType = require('./portal')
-const S2cellType = require('./s2cell')
+const ScanCellType = require('./scanCell')
 const ScanAreaType = require('./scanArea')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
 
 const {
-  Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
+  Device, Gym, Pokemon, Pokestop, Portal, ScanCell, Spawnpoint, Weather, Nest,
 } = require('../models/index')
 
 const minMaxArgs = {
@@ -192,13 +192,13 @@ const RootQuery = new GraphQLObjectType({
         }
       },
     },
-    s2cells: {
-      type: new GraphQLList(S2cellType),
+    scanCells: {
+      type: new GraphQLList(ScanCellType),
       args: minMaxArgs,
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.s2cells) {
-          return S2cell.getAllCells(args, perms, Utility.dbSelection('pokestop') === 'mad')
+        if (perms.scanCells) {
+          return ScanCell.getAllCells(args, perms, Utility.dbSelection('pokestop') === 'mad')
         }
       },
     },
