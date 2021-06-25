@@ -11,7 +11,7 @@ module.exports = new GraphQLObjectType({
     lon: { type: GraphQLFloat },
     distance: { type: GraphQLFloat },
     quest_pokemon_id: { type: GraphQLInt },
-    quest_pokemon_form: { type: GraphQLInt },
+    quest_form_id: { type: GraphQLInt },
     quest_gender_id: { type: GraphQLInt },
     quest_costume_id: { type: GraphQLInt },
     quest_item_id: { type: GraphQLInt },

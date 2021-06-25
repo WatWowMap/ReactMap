@@ -302,7 +302,7 @@
   "stats": "Statistik",
   "pvp": "PVP",
   "areaRestrictionsSubtitle": "Sie haben Zugriff auf diese Gebiete",
-  "deviceSubtitle": "Zeigt aktive Gerätestandorte und Routen an",
+  "devicesSubtitle": "Zeigt aktive Gerätestandorte und Routen an",
   "gymsSubtitle": "Zeigt alle aktiven Arenenstandorte, das aktive Team und wie viele Plätze jede Arena zur Verfügung hat",
   "invasionsSubtitle": "Zeigt Informationen zu Team Rocket-Invasionen, einschließlich Kampfaufstellung, Ablaufzeit und mögliche Belohnungen",
   "ivSubtitle": "Zeigt IV% und Leuchtoptionen",

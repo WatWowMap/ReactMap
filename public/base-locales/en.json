@@ -302,7 +302,7 @@
   "stats": "Stats",
   "pvp": "PVP",
   "areaRestrictionsSubtitle": "You have access to these areas",
-  "deviceSubtitle": "Shows active device locations and routes",
+  "devicesSubtitle": "Shows active device locations and routes",
   "gymsSubtitle": "Shows all active gym locations, active team, and how many slots each gym has available",
   "invasionsSubtitle": "Shows Team Rocket invasion info, including battle lineup, expire time, and possible rewards",
   "ivSubtitle": "Shows IV% and glow options",

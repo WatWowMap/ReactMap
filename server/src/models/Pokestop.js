@@ -384,7 +384,7 @@ class Pokestop extends Model {
       query.join('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
         .select([
           'quest_stardust AS stardust_amount',
-          'quest_pokemon_form_id AS pokemon_form',
+          'quest_pokemon_form_id AS quest_form_id',
         ])
     }
     if (perms.areaRestrictions.length > 0) {

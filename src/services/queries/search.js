@@ -9,7 +9,7 @@ query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $lo
     lon
     distance
     quest_pokemon_id
-    quest_pokemon_form
+    quest_form_id
     quest_gender_id
     quest_costume_id
     quest_shiny

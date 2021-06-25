@@ -42,7 +42,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
   )
 
   const getUrl = (option) => {
-    const { quest_reward_type, quest_pokemon_id, quest_pokemon_form } = option
+    const { quest_reward_type, quest_pokemon_id, quest_form_id } = option
 
     if (quest_reward_type) {
       const {
@@ -71,7 +71,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
         case 6: main = '/images/item/-5.png'; break
         case 7:
           main = getPokemonUrl(
-            quest_pokemon_id, quest_pokemon_form, 0, quest_gender_id, quest_costume_id, quest_shiny,
+            quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny,
           ); break
         case 8: main = '/images/item/-6.png'; break
         case 11: main = '/images/item/-7.png'; break
@@ -116,11 +116,12 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
       )
     }
     return (
-      <img src={getPokemonUrl(quest_pokemon_id, quest_pokemon_form)} style={{ maxWidth: 45, maxHeight: 45 }} />
+      <img src={getPokemonUrl(quest_pokemon_id, quest_form_id)} style={{ maxWidth: 45, maxHeight: 45 }} />
     )
   }
 
   const fetchedData = data || previousData
+  console.log(fetchedData)
   return (
     <div style={{ width: isMobile ? '80vw' : 500, minHeight: 190 }}>
       <DialogTitle className={classes.filterHeader}>
@@ -150,7 +151,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
         </Tabs>
       </AppBar>
       <TextField
-        style={{ margin: '15px 10px', width: '90%' }}
+        style={{ margin: '15px 10px', width: isMobile ? '93%' : '96%' }}
         autoComplete="off"
         label={t(`${safeSearch[openTab]}Search`)}
         value={search}
