@@ -330,6 +330,7 @@
   },
   "customAuth": {
     "enabled": false,
+    "enableDiscordLog": false,
     "enableRegistration": false,
     "registrationExternalLink": "",
     "disabledEmailDomains": [],

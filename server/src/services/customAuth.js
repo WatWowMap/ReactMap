@@ -2,8 +2,83 @@ const md5 = require('md5')
 const bcrypt = require('bcrypt')
 const nodemailer = require("nodemailer")
 const { CustomAuth } = require('../models/index')
-const { map: { title }, alwaysEnabledPerms, customAuth, manualAreas } = require('./config')
+const {
+  map: {
+    title
+  },
+  alwaysEnabledPerms,
+  customAuth,
+  manualAreas,
+  discord: {
+    enabled,
+    logChannelId,
+  },
+} = require('./config')
 const areas = require('./areas.js')
+const DiscordClient = require('./discord')
+
+const sendDiscordLogMsg = async (msgType, user) => {
+  if (!(enabled && customAuth.enableDiscordLog)) return
+  const embed = {}
+  switch (msgType) {
+    case 'userNotFound':
+      embed.color = 0xFF0000
+      embed.title = 'Authentication'
+      embed.description = `Authentication failed for user **${user}** : user not found`
+      break
+    case 'incorrectPassword':
+      embed.color = 0xFF0000
+      embed.title = 'Authentication'
+      embed.description = `Authentication failed for user **${user}** : wrong password`
+      break
+    case 'userNotConfirmed':
+      embed.color = 0xFF0000
+      embed.title = 'Authentication'
+      embed.description = `Authentication failed for user **${user}** : registration not confirmed`
+      break
+    case 'authenticationSuccessful':
+      embed.color = 0x00FF00
+      embed.title = 'Authentication'
+      embed.description = `Authentication successful for user **${user}**`
+      break
+    case 'registerSuccess':
+    case 'userRegistrationConfirmed':
+      embed.color = 0x00FF00
+      embed.title = 'Registration'
+      embed.description = `Registration successful for user **${user}**`
+      break
+    case 'registerSuccessEmail':
+      embed.color = 0xD0D0D0
+      embed.title = 'Registration'
+      embed.description = `Registration successful for user **${user}** - pending email confirmation`
+      break
+    case 'userProfileUpdated':
+      embed.color = 0x0000FF
+      embed.title = 'Profile Update'
+      embed.description = `Profile updated for user **${user.username}**`
+      embed.fields = [
+        {
+          name: 'Discord Nickname',
+          value: user.discordNickname,
+          inline: true,
+        },
+        {
+          name: 'Discord Id',
+          value: user.discordId,
+          inline: true,
+        },
+        {
+          name: 'Area',
+          value: user.area,
+          inline: true,
+        },
+      ]
+      break
+  }
+  embed.timestamp = new Date()
+
+  await DiscordClient.sendMessage(logChannelId, { embed })
+}
 
 class CustomAuthClient {
   async authenticate(username, password) {
@@ -15,6 +90,7 @@ class CustomAuthClient {
           result.authentication = false
           result.message = 'User not found'
           result.code = 'userNotFound'
+          await sendDiscordLogMsg('userNotFound', username)
         } else {
           let passwordMatch
           if (customAuth.settings.passwordEncryption === "bcrypt") {
@@ -28,11 +104,13 @@ class CustomAuthClient {
             result.authentication = false
             result.message = 'Incorrect password'
             result.code = 'incorrectPassword'
+            await sendDiscordLogMsg('incorrectPassword', username)
           } else {
             if (customAuth.confirmationEmail && userExists[customAuth.settings.statusDbField] === customAuth.settings.visitorStatus) {
               result.authentication = false
               result.message = 'User registration not confirmed'
               result.code = 'userNotConfirmed'
+              await sendDiscordLogMsg('userNotConfirmed', username)
             } else {
               const tzoffset = (new Date()).getTimezoneOffset() * 60000
               const localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 19).replace('T', ' ')
@@ -42,6 +120,7 @@ class CustomAuthClient {
               result.authentication = true
               result.message = 'Authentication successful'
               result.userData = userExists
+              await sendDiscordLogMsg('authenticationSuccessful', username)
             }
           }
         }
@@ -86,10 +165,11 @@ class CustomAuthClient {
                 if (Object.keys(manualAreas).length > 0) insertData[customAuth.settings.areaDbField] = data.registerArea
                 await CustomAuth.query()
                   .insert(insertData)
-                  .then((userRegistered) => {
+                  .then(async (userRegistered) => {
                     if (userRegistered) {
                       result.isSuccessful = true
                       result.message = 'registerSuccess'
+                      await sendDiscordLogMsg('registerSuccess', data.registerUsername)
                       if (customAuth.confirmationEmail && data.registerConfirmationEmail) {
                         const confirmationLink = `${customAuth.siteDomain}/auth/confirmation/${data.registerUsername}/${md5(data.registerEmail)}`
                         const textFormatted = data.registerConfirmationEmail.text.replace(/\{1}/g, data.registerUsername).replace(/\{2}/g, title).replace(/\{3}/g, confirmationLink)
@@ -103,6 +183,7 @@ class CustomAuthClient {
                           html: htmlFormatted
                         })
                         result.message = 'registerSuccessEmail'
+                        await sendDiscordLogMsg('registerSuccessEmail', data.registerUsername)
                       }
                     }
                   })
@@ -136,6 +217,7 @@ class CustomAuthClient {
                 result.isSuccessful = true
                 result.message = 'User registration confirmed'
                 result.code = 'userRegistrationConfirmed'
+                await sendDiscordLogMsg('userRegistrationConfirmed', data.confirmationUsername)
               } else {
                 result.isSuccessful = false
                 result.message = 'User registration code mismatch'
@@ -167,6 +249,7 @@ class CustomAuthClient {
             result.isSuccessful = true
             result.message = 'User profile updated'
             result.code = 'userProfileUpdated'
+            await sendDiscordLogMsg('userProfileUpdated', { username: data.username, ...data.updateProfileData })
           }
         })
     return result
