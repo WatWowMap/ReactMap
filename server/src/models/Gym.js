@@ -4,6 +4,7 @@ const fetchRaids = require('../services/functions/fetchRaids')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
+const { api: { searchResultsLimit } } = require('../services/config')
 
 class Gym extends Model {
   static get tableName() {
@@ -221,6 +222,27 @@ class Gym extends Model {
       }
       return `${pokemon.raid_pokemon_id}-${pokemon.raid_pokemon_form}`
     })
+  }
+
+  static async search(args, perms, isMad, distance) {
+    const query = this.query()
+      .select([
+        'name',
+        isMad ? 'latitude AS lat' : 'lat',
+        isMad ? 'longitude AS lon' : 'lon',
+        'url',
+        distance,
+      ])
+      .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .limit(searchResultsLimit)
+      .orderBy('distance')
+    if (isMad) {
+      query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+    }
+    if (perms.areaRestrictions.length > 0) {
+      getAreaSql(query, perms.areaRestrictions, isMad)
+    }
+    return query
   }
 }
 

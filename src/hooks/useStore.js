@@ -25,6 +25,8 @@ const useStore = create(persist(set => ({
     nests: 'others',
   },
   setAdvMenu: (advMenu) => set({ advMenu }),
+  search: '',
+  setSearch: (search) => set({ search }),
 }),
 {
   name: 'local-state',

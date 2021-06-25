@@ -413,7 +413,7 @@ const RewardInfo = ({ pokestop, path, availableForms }) => {
       ); break
     case 12:
       questRewards.push(
-        <img src={`${path}/${Utility.getPokemonIcon(availableForms, mega_pokemon_id, 0, 1)}.png`} className="quest-popup-img" />,
+        <img src={`${path}/${Utility.getPokemonIcon(availableForms, mega_pokemon_id, 0, mega_pokemon_id === 6 || mega_pokemon_id === 150 ? 2 : 1)}.png`} className="quest-popup-img" />,
         <img src="/images/item/-8.png" className="quest-popup-img" />,
         <div className="amount-popup">x{mega_amount}</div>,
       ); break

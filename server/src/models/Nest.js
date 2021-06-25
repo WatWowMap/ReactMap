@@ -1,6 +1,9 @@
 const { Model } = require('objection')
+const i18next = require('i18next')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const getAreaSql = require('../services/functions/getAreaSql')
+const { pokemon: masterPkmn } = require('../data/masterfile.json')
+const { api: { searchResultsLimit } } = require('../services/config')
 
 class Nest extends Model {
   static get tableName() {
@@ -56,6 +59,29 @@ class Nest extends Model {
       }
       return `${pokemon.pokemon_id}-${pokemon.pokemon_form || 0}`
     })
+  }
+
+  static async search(args, perms, isMad, distance) {
+    const { search, locale } = args
+    const pokemonIds = Object.keys(masterPkmn).filter(pkmn => (
+      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
+    ))
+    const query = this.query()
+      .select([
+        'name',
+        'lat',
+        'lon',
+        'pokemon_id AS quest_pokemon_id',
+        'pokemon_form AS quest_pokemon_form',
+        distance,
+      ])
+      .whereIn('pokemon_id', pokemonIds)
+      .limit(searchResultsLimit)
+      .orderBy('distance')
+    if (perms.areaRestrictions.length > 0) {
+      getAreaSql(query, perms.areaRestrictions, isMad)
+    }
+    return query
   }
 }
 

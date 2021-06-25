@@ -110,7 +110,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         }
         return null
       })}
-      <Nav />
+      <Nav map={map} />
     </>
   )
 }

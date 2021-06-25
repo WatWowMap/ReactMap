@@ -323,5 +323,11 @@
   "weatherSubtitle": "Shows in game weather info for each cell",
   "userProfile": "User Profile",
   "candy": "Candy",
-  "showExBadge": "Show EX Badge"
+  "showExBadge": "Show EX Badge",
+  "search": "Search",
+  "questsSearch": "Enter Reward Name...",
+  "pokestopsSearch": "Enter Pokestop Name...",
+  "gymsSearch": "Enter Gym Name...",
+  "portalsSearch": "Enter Portal Name...",
+  "nestsSearch": "Enter Nest Pokemon Name..."
 }

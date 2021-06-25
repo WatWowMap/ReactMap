@@ -24,13 +24,14 @@
       "raids": false,
       "nests": false
     },
-    "weatherCellLimit": 3
+    "weatherCellLimit": 3,
+    "searchResultsLimit": 15
   },
   "map": {
     "title": "ReactMap",
     "headerTitle": "ReactMap",
     "nestHemisphere": "north",
-    "enableFeedbackLink": false,
+    "enableFeedback": false,
     "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
     "enableStats": false,
     "statsLink": "https://rdmopole2link.net",

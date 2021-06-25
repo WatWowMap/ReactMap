@@ -9,6 +9,7 @@ import getAllS2cells from './queries/s2cell'
 import getAllSubmissionCells from './queries/submissionCells'
 import { getOne, getAllNests } from './queries/nest'
 import getAllScanAreas from './queries/scanAreas'
+import search from './queries/search'
 
 class Query {
   static devices() {
@@ -102,6 +103,10 @@ class Query {
 
   static scanAreas() {
     return getAllScanAreas
+  }
+
+  static search() {
+    return search
   }
 }
 
