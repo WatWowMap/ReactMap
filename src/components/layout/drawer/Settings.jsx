@@ -16,6 +16,7 @@ function SlideTransition(props) {
 
 export default function Settings({ toggleDialog }) {
   const config = useStatic(state => state.config)
+  const { map: { enableTutorial, enableUserPerms } } = useStatic(state => state.config)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
   const staticSettings = useStatic(state => state.settings)
@@ -108,76 +109,94 @@ export default function Settings({ toggleDialog }) {
         </Grid>
       ))}
       <Grid
-        justify="space-evenly"
-        alignItems="center"
         container
         item
         spacing={3}
         style={{ margin: '10px 0px' }}
       >
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
-          <Button
-            style={{ minWidth: 100 }}
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={() => setUserPerms(true)}
-          >
-            {t('perms')}
-          </Button>
+        <Grid
+          justify="space-evenly"
+          alignItems="center"
+          container
+          item
+          spacing={3}
+        >
+          {enableUserPerms && (
+            <Grid item xs={6} style={{ textAlign: 'center' }}>
+              <Button
+                style={{ minWidth: 100 }}
+                variant="contained"
+                color="secondary"
+                size="small"
+                onClick={() => setUserPerms(true)}
+              >
+                {t('perms')}
+              </Button>
+            </Grid>
+          )}
+          {enableTutorial && (
+            <Grid item xs={6} style={{ textAlign: 'center' }}>
+              <Button
+                style={{ minWidth: 100 }}
+                variant="contained"
+                color="secondary"
+                size="small"
+                onClick={() => setTutorial(true)}
+              >
+                {t('tutorial')}
+              </Button>
+            </Grid>
+          )}
         </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
-          <Button
-            style={{ minWidth: 100 }}
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={() => setTutorial(true)}
-          >
-            {t('tutorial')}
-          </Button>
-        </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
-          <input
-            accept="application/json"
-            id="contained-button-file"
-            type="file"
-            style={{ display: 'none' }}
-            onChange={importSettings}
-          />
-          <label htmlFor="contained-button-file">
+        <Grid
+          justify="space-evenly"
+          alignItems="center"
+          container
+          item
+          spacing={3}
+        >
+          <Grid item xs={6} style={{ textAlign: 'center' }}>
+            <input
+              accept="application/json"
+              id="contained-button-file"
+              type="file"
+              style={{ display: 'none' }}
+              onChange={importSettings}
+            />
+            <label htmlFor="contained-button-file">
+              <Button
+                style={{ minWidth: 100 }}
+                variant="contained"
+                color="primary"
+                component="span"
+                size="small"
+              >
+                {t('import')}
+              </Button>
+            </label>
+          </Grid>
+          <Grid item xs={6} style={{ textAlign: 'center' }}>
+            <Button
+              style={{ minWidth: 100 }}
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={exportSettings}
+            >
+              {t('export')}
+            </Button>
+          </Grid>
+          <Grid item xs={12} style={{ textAlign: 'center' }}>
             <Button
               style={{ minWidth: 100 }}
               variant="contained"
               color="primary"
-              component="span"
               size="small"
+              onClick={clearStorage}
             >
-              {t('import')}
+              {t('resetFilters')}
             </Button>
-          </label>
-        </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
-          <Button
-            style={{ minWidth: 100 }}
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={exportSettings}
-          >
-            {t('export')}
-          </Button>
-        </Grid>
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Button
-            style={{ minWidth: 100 }}
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={clearStorage}
-          >
-            {t('resetFilters')}
-          </Button>
+          </Grid>
         </Grid>
       </Grid>
       <Snackbar

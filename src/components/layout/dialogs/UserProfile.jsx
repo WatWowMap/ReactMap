@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import {
   Grid,
+  Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
@@ -17,12 +18,13 @@ import { useTranslation } from 'react-i18next'
 import useStyles from '@hooks/useStyles'
 import { useStatic } from '@hooks/useStore'
 import Axios from 'axios'
+import UserPerms from './UserPerms'
 
 export default function UserProfile({ setUserProfile }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const { enabledAuthMethods, customAuthSettings, profileData } = useStatic(state => state.auth)
-  const { manualAreas } = useStatic(state => state.config)
+  const { manualAreas, map: { enableUserPerms } } = useStatic(state => state.config)
 
   const discordRegex = /^((?!(discordtag|everyone|here)#)((?!@|#|:|```).{2,32})#\d{4}$)/i
   const [updateDiscordNickname, setUpdateDiscordNickname] = useState(profileData.discordNickname)
@@ -30,6 +32,7 @@ export default function UserProfile({ setUserProfile }) {
   const [updateDiscordNicknameTest, setUpdateDiscordNicknameTest] = useState(true)
   const [updateArea, setUpdateArea] = useState(profileData.area)
   const [updateProfile, setUpdateProfile] = useState(false)
+  const [userPerms, setUserPerms] = useState(false)
 
   const handleChange = (type, value) => {
     setUpdateProfile(false)
@@ -175,9 +178,23 @@ export default function UserProfile({ setUserProfile }) {
       <DialogActions>
         <Grid
           container
-          justify="flex-end"
+          justify={enableUserPerms ? 'space-between' : 'flex-end'}
           alignItems="center"
+          spacing={2}
         >
+          {enableUserPerms && (
+            <Grid item>
+              <Button
+                style={{ minWidth: 100 }}
+                variant="contained"
+                color="secondary"
+                size="small"
+                onClick={() => setUserPerms(true)}
+              >
+                {t('perms')}
+              </Button>
+            </Grid>
+          )}
           {updateProfile && (
             <Grid item>
               <Button onClick={() => handleProfileUpdate()} color="primary">
@@ -192,6 +209,11 @@ export default function UserProfile({ setUserProfile }) {
           </Grid>
         </Grid>
       </DialogActions>
+      {enableUserPerms && (
+        <Dialog open={userPerms} fullWidth>
+          <UserPerms setUserPerms={setUserPerms} />
+        </Dialog>
+      )}
     </>
   )
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Dialog from '@material-ui/core/Dialog'
 
-import { useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import FloatingBtn from './FloatingBtn'
 import Sidebar from './drawer/Drawer'
 import FilterMenu from './dialogs/filters/Menu'
@@ -17,6 +17,9 @@ export default function Nav() {
   const setUserSettings = useStore(state => state.setUserSettings)
   const tutorial = useStore(state => state.tutorial)
   const setTutorial = useStore(state => state.setTutorial)
+  const forcedTutorialDisplayed = useStore(state => state.forcedTutorialDisplayed)
+  const setForcedTutorialDisplayed = useStore(state => state.setForcedTutorialDisplayed)
+  const { map: { forceTutorial, enableTutorial, enableUserPerms } } = useStatic(state => state.config)
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
@@ -25,6 +28,11 @@ export default function Nav() {
   })
   const [userProfile, setUserProfile] = useState(false)
   const [userPerms, setUserPerms] = useState(false)
+
+  if (forceTutorial && !forcedTutorialDisplayed) {
+    setTutorial(true)
+    setForcedTutorialDisplayed(true)
+  }
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -52,17 +60,6 @@ export default function Nav() {
 
   return (
     <>
-      {userPerms ? (
-        <Dialog open={userPerms} fullWidth>
-          <UserPerms setUserPerms={setUserPerms} />
-        </Dialog>
-      ) : (
-        <Dialog
-          open={tutorial}
-        >
-          <Tutorial setUserPerms={setUserPerms} setTutorial={setTutorial} toggleDialog={toggleDialog} />
-        </Dialog>
-      )}
       {drawer ? (
         <Sidebar
           drawer={drawer}
@@ -99,6 +96,16 @@ export default function Nav() {
           category={dialog.category}
         />
       </Dialog>
+      {enableUserPerms && (
+        <Dialog open={userPerms} fullWidth>
+          <UserPerms setUserPerms={setUserPerms} />
+        </Dialog>
+      )}
+      {enableTutorial && (
+        <Dialog open={tutorial}>
+          <Tutorial setUserPerms={setUserPerms} setTutorial={setTutorial} toggleDialog={toggleDialog} />
+        </Dialog>
+      )}
       <Dialog
         open={userProfile}
         onClose={() => setUserProfile(false)}

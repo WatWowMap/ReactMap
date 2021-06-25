@@ -22,7 +22,11 @@ export default function UserPerms({ setUserPerms }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const { perms } = useStatic(state => state.auth)
-  const { map: { excludeList, rolesLinkName, rolesLink } } = useStatic(state => state.config)
+  const {
+    map: {
+      excludeList, enableRolesLink, rolesLinkName, rolesLink,
+    },
+  } = useStatic(state => state.config)
 
   return (
     <>
@@ -87,9 +91,11 @@ export default function UserPerms({ setUserPerms }) {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button href={rolesLink} target="_blank" rel="noreferrer" color="primary">
-          {rolesLinkName}
-        </Button>
+        {enableRolesLink && (
+          <Button href={rolesLink} target="_blank" rel="noreferrer" color="primary">
+            {rolesLinkName}
+          </Button>
+        )}
         <Button onClick={() => setUserPerms(false)} color="secondary">
           {t('close')}
         </Button>
