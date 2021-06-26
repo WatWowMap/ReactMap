@@ -1,25 +1,53 @@
 import { gql } from '@apollo/client'
 
-export default gql`
-query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!) {
-  search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale) {
+const core = gql`
+  fragment CoreSearch on Search {
     name
     url
     lat
     lon
     distance
-    quest_pokemon_id
-    quest_form_id
-    quest_gender_id
-    quest_costume_id
-    quest_shiny
-    quest_item_id
-    quest_reward_type
-    mega_pokemon_id
-    mega_amount
-    stardust_amount
-    item_amount
-    candy_pokemon_id
-    candy_amount
   }
-}`
+`
+
+export const poi = gql`
+  ${core}
+  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!) {
+    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale) {
+      ...CoreSearch
+    }
+  }
+`
+
+export const nests = gql`
+  ${core}
+  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!) {
+    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale) {
+      ...CoreSearch
+      nest_pokemon_id
+      nest_pokemon_form
+    }
+  }
+`
+
+export const quests = gql`
+  ${core}
+  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!) {
+    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale) {
+      ...CoreSearch
+      quest_pokemon_id
+      quest_form_id
+      quest_gender_id
+      quest_costume_id
+      quest_shiny
+      quest_item_id
+      quest_reward_type
+      mega_pokemon_id
+      mega_amount
+      stardust_amount
+      item_amount
+      candy_pokemon_id
+      candy_amount
+    }
+  }
+`

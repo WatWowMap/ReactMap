@@ -23,5 +23,7 @@ module.exports = new GraphQLObjectType({
     item_amount: { type: GraphQLInt },
     candy_pokemon_id: { type: GraphQLInt },
     candy_amount: { type: GraphQLInt },
+    nest_pokemon_id: { type: GraphQLInt },
+    nest_pokemon_form: { type: GraphQLInt },
   }),
 })

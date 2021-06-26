@@ -71,8 +71,8 @@ class Nest extends Model {
         'name',
         'lat',
         'lon',
-        'pokemon_id AS quest_pokemon_id',
-        'pokemon_form AS quest_form_id',
+        'pokemon_id AS nest_pokemon_id',
+        'pokemon_form AS nest_pokemon_form',
         distance,
       ])
       .whereIn('pokemon_id', pokemonIds)

@@ -386,6 +386,11 @@ class Pokestop extends Model {
           'quest_stardust AS stardust_amount',
           'quest_pokemon_form_id AS quest_form_id',
         ])
+    } else if (pokemonIds.length > 0) {
+      pokemonIds.forEach(pkmn => {
+        query.orWhere(raw(`json_extract(quest_rewards, "$[0].info.pokemon_id") = ${pkmn}`))
+          .whereIn('quest_reward_type', [4, 12])
+      })
     }
     if (perms.areaRestrictions.length > 0) {
       getAreaSql(query, perms.areaRestrictions, isMad)

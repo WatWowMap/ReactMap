@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useState } from 'react'
+import React from 'react'
 import {
   DialogTitle, IconButton, Tabs, AppBar, Tab, TextField, Typography, Grid,
 } from '@material-ui/core'
@@ -21,16 +21,17 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
   const location = useStore(state => state.location)
   const search = useStore(state => state.search)
   const setSearch = useStore(state => state.setSearch)
-  const [openTab, setOpenTab] = useState(0)
+  const searchTab = useStore(state => state.searchTab)
+  const setSearchTab = useStore(state => state.setSearchTab)
 
   const handleTabChange = (event, newValue) => {
-    setOpenTab(newValue)
+    setSearchTab(newValue)
   }
 
-  const { data, previousData } = useQuery(Query.search(), {
+  const { data, previousData } = useQuery(Query.search(safeSearch[searchTab]), {
     variables: {
       search,
-      category: safeSearch[openTab],
+      category: safeSearch[searchTab],
       lat: location[0],
       lon: location[1],
       locale: localStorage.getItem('i18nextLng'),
@@ -42,12 +43,13 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
   )
 
   const getUrl = (option) => {
-    const { quest_reward_type, quest_pokemon_id, quest_form_id } = option
+    const { quest_reward_type, nest_pokemon_id, nest_pokemon_form } = option
 
     if (quest_reward_type) {
       const {
-        quest_item_id, item_amount, quest_gender_id, quest_costume_id, quest_shiny,
-        stardust_amount, mega_pokemon_id, mega_amount, candy_pokemon_id, candy_amount,
+        quest_pokemon_id, quest_form_id, quest_gender_id, quest_costume_id, quest_shiny,
+        quest_item_id, item_amount, stardust_amount,
+        mega_pokemon_id, mega_amount, candy_pokemon_id, candy_amount,
       } = option
       let main
       let secondary
@@ -81,7 +83,10 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
           amount = mega_amount > 1 ? mega_amount : undefined; break
       }
       return (
-        <div style={{ maxHeight: 45, maxWidth: 45, position: 'relative' }}>
+        <div style={{
+          maxHeight: 45, maxWidth: 45, marginLeft: 17, position: 'relative',
+        }}
+        >
           <img src={main} style={{ maxWidth: 45, maxHeight: 45 }} />
           {secondary && (
             <img
@@ -116,12 +121,11 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
       )
     }
     return (
-      <img src={getPokemonUrl(quest_pokemon_id, quest_form_id)} style={{ maxWidth: 45, maxHeight: 45 }} />
+      <img src={getPokemonUrl(nest_pokemon_id, nest_pokemon_form)} style={{ maxWidth: 45, maxHeight: 45 }} />
     )
   }
 
   const fetchedData = data || previousData
-  console.log(fetchedData)
   return (
     <div style={{ width: isMobile ? '80vw' : 500, minHeight: 190 }}>
       <DialogTitle className={classes.filterHeader}>
@@ -135,7 +139,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
       </DialogTitle>
       <AppBar position="static">
         <Tabs
-          value={openTab}
+          value={searchTab}
           onChange={handleTabChange}
           indicatorColor="secondary"
           variant="fullWidth"
@@ -153,7 +157,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
       <TextField
         style={{ margin: '15px 10px', width: isMobile ? '93%' : '96%' }}
         autoComplete="off"
-        label={t(`${safeSearch[openTab]}Search`)}
+        label={t(`${safeSearch[searchTab]}Search`)}
         value={search}
         onChange={(event) => setSearch(event.target.value.toLowerCase())}
         variant="outlined"
@@ -171,7 +175,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
             style={{ backgroundColor: index % 2 ? 'rgba(1, 1, 1, 0.05)' : 'rgba(240, 240, 240, 0.05)', height: 50 }}
           >
             <Grid item xs={2} style={{ textAlign: 'center' }}>
-              {option.quest_reward_type || option.quest_pokemon_id !== null
+              {option.quest_reward_type || option.nest_pokemon_id
                 ? getUrl(option)
                 : <img src={option.url} style={{ height: 45, width: 45, objectFit: 'fill' }} />}
             </Grid>
