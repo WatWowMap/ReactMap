@@ -37,7 +37,7 @@ export default function FloatingButtons({ toggleDrawer }) {
 
   const locateOptions = {
     keepCurrentZoomLevel: true,
-    onActivate: () => { },
+    setView: 'untilPan',
   }
   const lc = new Locate(locateOptions)
   lc.addTo(map)
@@ -53,7 +53,7 @@ export default function FloatingButtons({ toggleDrawer }) {
         </Fab>
       </Grid>
       <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => lc.start()} title={t('useMyLocation')}>
+        <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')}>
           <LocationOn fontSize={iconSize} />
         </Fab>
       </Grid>
