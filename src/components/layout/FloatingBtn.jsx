@@ -39,7 +39,17 @@ export default function FloatingButtons({ toggleDrawer }) {
     keepCurrentZoomLevel: true,
     setView: 'untilPan',
   }
-  const lc = new Locate(locateOptions)
+  const LocateFab = Locate.extend({
+    _setClasses(state) {
+      if (state === 'requesting') this.color = '#2074b6'
+      else if (state === 'active') this.color = '#2074b6'
+      else if (state === 'following') this.color = '#fc8428'
+    },
+    _cleanClasses() {
+      this.color = '#444'
+    },
+  })
+  const lc = new LocateFab(locateOptions)
   lc.addTo(map)
 
   const fabSize = isMobile ? 'small' : 'large'
@@ -54,7 +64,7 @@ export default function FloatingButtons({ toggleDrawer }) {
       </Grid>
       <Grid item>
         <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')}>
-          <LocationOn fontSize={iconSize} />
+          <LocationOn color={lc.color} fontSize={iconSize} />
         </Fab>
       </Grid>
       <Grid item>
