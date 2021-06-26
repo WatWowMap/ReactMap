@@ -329,5 +329,6 @@
   "pokestopsSearch": "Enter Pokestop Name...",
   "gymsSearch": "Enter Gym Name...",
   "portalsSearch": "Enter Portal Name...",
-  "nestsSearch": "Enter Nest Pokemon Name..."
+  "nestsSearch": "Enter Nest Pokemon Name...",
+  "raidsSearch": "Enter Raid Boss Name..."
 }

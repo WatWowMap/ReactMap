@@ -52,3 +52,17 @@ export const quests = gql`
     }
   }
 `
+
+export const raids = gql`
+  ${core}
+  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!) {
+    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale) {
+      ...CoreSearch
+      raid_pokemon_id
+      raid_pokemon_form
+      raid_pokemon_gender
+      raid_pokemon_costume
+      raid_pokemon_evolution
+    }
+  }
+`

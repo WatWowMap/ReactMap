@@ -12,7 +12,7 @@ import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
 import Search from './dialogs/Search'
 
-const searchable = ['quests', 'pokestops', 'gyms', 'portals', 'nests']
+const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
 export default function Nav({ map, setManualParams }) {
   const classes = useStyles()

@@ -43,7 +43,9 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
   )
 
   const getUrl = (option) => {
-    const { quest_reward_type, nest_pokemon_id, nest_pokemon_form } = option
+    const {
+      quest_reward_type, nest_pokemon_id, nest_pokemon_form, raid_pokemon_id,
+    } = option
 
     if (quest_reward_type) {
       const {
@@ -120,6 +122,19 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
         </div>
       )
     }
+    if (raid_pokemon_id) {
+      const {
+        raid_pokemon_form, raid_pokemon_gender, raid_pokemon_costume, raid_pokemon_evolution,
+      } = option
+      return (
+        <img
+          src={getPokemonUrl(
+            raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume,
+          )}
+          style={{ maxWidth: 45, maxHeight: 45 }}
+        />
+      )
+    }
     return <img src={getPokemonUrl(nest_pokemon_id, nest_pokemon_form)} style={{ maxWidth: 45, maxHeight: 45 }} />
   }
 
@@ -147,7 +162,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
             <Tab
               key={each}
               icon={<img src={`/images/misc/${each}.png`} style={{ maxWidth: 20, height: 'auto' }} />}
-              style={{ width: 50, minWidth: 50 }}
+              style={{ width: 40, minWidth: 40 }}
             />
           ))}
         </Tabs>
@@ -173,9 +188,9 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
             style={{ backgroundColor: index % 2 ? 'rgba(1, 1, 1, 0.05)' : 'rgba(240, 240, 240, 0.05)', height: 50 }}
           >
             <Grid item xs={2} style={{ textAlign: 'center' }}>
-              {option.quest_reward_type || option.nest_pokemon_id
-                ? getUrl(option)
-                : <img src={option.url} style={{ height: 45, width: 45, objectFit: 'fill' }} />}
+              {option.url
+                ? <img src={option.url.includes('http') ? option.url : `images/misc/${safeSearch[searchTab]}.png`} style={{ height: 45, width: 45, objectFit: 'fill' }} />
+                : getUrl(option)}
             </Grid>
             <Grid item xs={8}>
               <Typography variant="caption">{option.name}</Typography>

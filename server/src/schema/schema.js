@@ -229,9 +229,9 @@ const RootQuery = new GraphQLObjectType({
       },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms[args.category]) {
-          const dbCategory = args.category === 'quests' ? 'pokestops' : args.category
-          const isMad = Utility.dbSelection(dbCategory.substring(0, dbCategory.length - 1)) === 'mad'
+        const { category } = args
+        if (perms[category]) {
+          const isMad = Utility.dbSelection(category.substring(0, category.length - 1)) === 'mad'
           const distance = raw(`ROUND(( 3959 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
 
           if (args.search === '') {
@@ -239,16 +239,18 @@ const RootQuery = new GraphQLObjectType({
           }
           switch (args.category) {
             default: return []
+            case 'quests':
+              return Pokestop.searchQuests(args, perms, isMad, distance)
             case 'pokestops':
               return Pokestop.search(args, perms, isMad, distance)
+            case 'raids':
+              return Gym.searchRaids(args, perms, isMad, distance)
             case 'gyms':
               return Gym.search(args, perms, isMad, distance)
             case 'portals':
               return Portal.search(args, perms, isMad, distance)
             case 'nests':
               return Nest.search(args, perms, isMad, distance)
-            case 'quests':
-              return Pokestop.searchQuests(args, perms, isMad, distance)
           }
         }
       },
