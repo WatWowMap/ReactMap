@@ -14,7 +14,7 @@ import Search from './dialogs/Search'
 
 const searchable = ['quests', 'pokestops', 'gyms', 'portals', 'nests']
 
-export default function Nav({ map }) {
+export default function Nav({ map, setManualParams }) {
   const classes = useStyles()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
@@ -52,6 +52,7 @@ export default function Nav({ map }) {
     }
     if (filter && type === 'search') {
       map.flyTo([filter.lat, filter.lon], 16)
+      setManualParams(filter)
     }
     if (filter && type === 'filters') {
       setFilters({ ...filters, [category]: { ...filters[category], filter } })

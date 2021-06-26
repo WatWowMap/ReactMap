@@ -68,6 +68,7 @@ class Nest extends Model {
     ))
     const query = this.query()
       .select([
+        'nest_id AS id',
         'name',
         'lat',
         'lon',

@@ -337,6 +337,7 @@ class Pokestop extends Model {
     const query = this.query()
       .select([
         'name',
+        isMad ? 'pokestop_id AS id' : 'id',
         isMad ? 'latitude AS lat' : 'lat',
         isMad ? 'longitude AS lon' : 'lon',
         isMad ? 'image AS url' : 'url',
@@ -366,6 +367,7 @@ class Pokestop extends Model {
     const query = this.query()
       .select([
         'name',
+        isMad ? 'pokestop_id AS id' : 'id',
         isMad ? 'latitude AS lat' : 'lat',
         isMad ? 'longitude AS lon' : 'lon',
         isMad ? 'quest_reward AS quest_rewards' : 'quest_rewards',

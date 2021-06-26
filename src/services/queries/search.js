@@ -2,6 +2,7 @@ import { gql } from '@apollo/client'
 
 const core = gql`
   fragment CoreSearch on Search {
+    id
     name
     url
     lat

@@ -1,10 +1,11 @@
 const {
-  GraphQLObjectType, GraphQLString, GraphQLFloat, GraphQLInt,
+  GraphQLObjectType, GraphQLString, GraphQLFloat, GraphQLInt, GraphQLID,
 } = require('graphql')
 
 module.exports = new GraphQLObjectType({
   name: 'Search',
   fields: () => ({
+    id: { type: GraphQLID },
     name: { type: GraphQLString },
     url: { type: GraphQLString },
     lat: { type: GraphQLFloat },

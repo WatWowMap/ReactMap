@@ -21,7 +21,14 @@ class Portal extends Model {
   static async search(args, perms, isMad, distance) {
     const { areaRestrictions } = perms
     const query = this.query()
-      .select(['name', 'lat', 'lon', 'url', distance])
+      .select([
+        'name',
+        'id',
+        'lat',
+        'lon',
+        'url',
+        distance,
+      ])
       .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')

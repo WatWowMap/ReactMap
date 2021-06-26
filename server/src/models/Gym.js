@@ -228,6 +228,7 @@ class Gym extends Model {
     const query = this.query()
       .select([
         'name',
+        isMad ? 'gym.gym_id AS id' : 'id',
         isMad ? 'latitude AS lat' : 'lat',
         isMad ? 'longitude AS lon' : 'lon',
         'url',

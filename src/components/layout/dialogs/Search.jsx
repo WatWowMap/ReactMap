@@ -120,9 +120,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
         </div>
       )
     }
-    return (
-      <img src={getPokemonUrl(nest_pokemon_id, nest_pokemon_form)} style={{ maxWidth: 45, maxHeight: 45 }} />
-    )
+    return <img src={getPokemonUrl(nest_pokemon_id, nest_pokemon_form)} style={{ maxWidth: 45, maxHeight: 45 }} />
   }
 
   const fetchedData = data || previousData
@@ -168,7 +166,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
             container
             item
             xs={12}
-            key={`${option.name}-${option.lat}-${option.lon}`}
+            key={`${option.id}-${safeSearch[searchTab]}`}
             onClick={toggleDialog(false, '', 'search', option)}
             justify="space-between"
             alignItems="center"
