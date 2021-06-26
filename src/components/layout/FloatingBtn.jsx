@@ -40,6 +40,7 @@ export default function FloatingButtons({ toggleDrawer }) {
     setView: 'untilPan',
   }
   const LocateFab = Locate.extend({
+    /* eslint-disable react/no-this-in-sfc */
     _setClasses(state) {
       if (state === 'requesting') this.color = '#2074b6'
       else if (state === 'active') this.color = '#2074b6'
@@ -48,6 +49,7 @@ export default function FloatingButtons({ toggleDrawer }) {
     _cleanClasses() {
       this.color = '#444'
     },
+    /* eslint-enable react/no-this-in-sfc */
   })
   const lc = new LocateFab(locateOptions)
   lc.addTo(map)
