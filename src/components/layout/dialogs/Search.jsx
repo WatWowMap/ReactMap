@@ -84,7 +84,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
       }
       return (
         <div style={{
-          maxHeight: 45, maxWidth: 45, marginLeft: 17, position: 'relative',
+          maxHeight: 45, maxWidth: 45, marginLeft: isMobile ? 0 : 17, position: 'relative',
         }}
         >
           <img src={main} style={{ maxWidth: 45, maxHeight: 45 }} />
