@@ -58,7 +58,7 @@ const Login = ({
     const authentication = await Axios({
       method: 'POST',
       data: {
-        username,
+        username: username.toLowerCase(),
         password,
       },
       withCredentials: true,

@@ -59,12 +59,12 @@ const sendDiscordLogMsg = async (msgType, user) => {
       embed.fields = [
         {
           name: 'Discord Nickname',
-          value: user.discordNickname,
+          value: user.discordNickname || '-',
           inline: true,
         },
         {
           name: 'Discord Id',
-          value: user.discordId,
+          value: user.discordId || '-',
           inline: true,
         },
         {
@@ -84,7 +84,9 @@ class CustomAuthClient {
   async authenticate(username, password) {
     const result = {}
     await CustomAuth.query()
-      .findOne({ [customAuth.settings.usernameDbField]: username })
+      .where({ [customAuth.settings.usernameDbField]: username })
+      .orWhere({ [customAuth.settings.emailDbField]: username })
+      .first()
       .then(async (userExists) => {
         if (!userExists) {
           result.authentication = false
@@ -104,23 +106,23 @@ class CustomAuthClient {
             result.authentication = false
             result.message = 'Incorrect password'
             result.code = 'incorrectPassword'
-            await sendDiscordLogMsg('incorrectPassword', username)
+            await sendDiscordLogMsg('incorrectPassword', userExists[customAuth.settings.usernameDbField])
           } else {
             if (customAuth.confirmationEmail && userExists[customAuth.settings.statusDbField] === customAuth.settings.visitorStatus) {
               result.authentication = false
               result.message = 'User registration not confirmed'
               result.code = 'userNotConfirmed'
-              await sendDiscordLogMsg('userNotConfirmed', username)
+              await sendDiscordLogMsg('userNotConfirmed', userExists[customAuth.settings.usernameDbField])
             } else {
               const tzoffset = (new Date()).getTimezoneOffset() * 60000
               const localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 19).replace('T', ' ')
               await CustomAuth.query()
-                  .where({ [customAuth.settings.usernameDbField]: username })
+                  .where({ [customAuth.settings.usernameDbField]: userExists[customAuth.settings.usernameDbField] })
                   .update({ [customAuth.settings.lastConnectedDbField]: localISOTime })
               result.authentication = true
               result.message = 'Authentication successful'
               result.userData = userExists
-              await sendDiscordLogMsg('authenticationSuccessful', username)
+              await sendDiscordLogMsg('authenticationSuccessful', userExists[customAuth.settings.usernameDbField])
             }
           }
         }
@@ -140,51 +142,60 @@ class CustomAuthClient {
           result.message = 'userAlreadyExists'
         } else {
           await CustomAuth.query()
-            .findOne({ [customAuth.settings.discordNicknameDbField]: data.registerDiscord })
-            .then(async (userDiscordAlreadyExists) => {
-              if (data.registerDiscord && userDiscordAlreadyExists) {
+            .findOne({ [customAuth.settings.emailDbField]: data.registerEmail })
+            .then(async (emailAlreadyExists) => {
+              if (emailAlreadyExists) {
                 result.isSuccessful = false
-                result.message = 'userDiscordAlreadyExists'
+                result.message = 'emailAlreadyExists'
               } else {
-                let passwordHashed
-                if (customAuth.settings.passwordEncryption === "bcrypt") {
-                  passwordHashed = await bcrypt.hash(data.registerPassword, 5)
-                } else if (customAuth.settings.passwordEncryption === "md5") {
-                  passwordHashed = md5(data.registerPassword)
-                } else {
-                  passwordHashed = data.registerPassword
-                }
-                const insertData = {
-                  [customAuth.settings.usernameDbField]: data.registerUsername,
-                  [customAuth.settings.passwordDbField]: passwordHashed,
-                  [customAuth.settings.emailDbField]: data.registerEmail,
-                  [customAuth.settings.discordNicknameDbField]: data.registerDiscord,
-                  [customAuth.settings.statusDbField]: customAuth.settings.visitorStatus,
-                  [customAuth.settings.registrationDateDbField]: localISOTime
-                }
-                if (Object.keys(manualAreas).length > 0) insertData[customAuth.settings.areaDbField] = data.registerArea
                 await CustomAuth.query()
-                  .insert(insertData)
-                  .then(async (userRegistered) => {
-                    if (userRegistered) {
-                      result.isSuccessful = true
-                      result.message = 'registerSuccess'
-                      await sendDiscordLogMsg('registerSuccess', data.registerUsername)
-                      if (customAuth.confirmationEmail && data.registerConfirmationEmail) {
-                        const confirmationLink = `${customAuth.siteDomain}/auth/confirmation/${data.registerUsername}/${md5(data.registerEmail)}`
-                        const textFormatted = data.registerConfirmationEmail.text.replace(/\{1}/g, data.registerUsername).replace(/\{2}/g, title).replace(/\{3}/g, confirmationLink)
-                        const htmlFormatted = data.registerConfirmationEmail.html.replace(/\{1}/g, data.registerUsername).replace(/\{2}/g, title).replace(/\{3}/g, confirmationLink)
-                        let transporter = nodemailer.createTransport(customAuth.nodemailerOptions)
-                        transporter.sendMail({
-                          from: customAuth.senderAddress,
-                          to: data.registerEmail,
-                          subject: data.registerConfirmationEmail.subject,
-                          text: textFormatted,
-                          html: htmlFormatted
-                        })
-                        result.message = 'registerSuccessEmail'
-                        await sendDiscordLogMsg('registerSuccessEmail', data.registerUsername)
+                  .findOne({ [customAuth.settings.discordNicknameDbField]: data.registerDiscord })
+                  .then(async (userDiscordAlreadyExists) => {
+                    if (data.registerDiscord && userDiscordAlreadyExists) {
+                      result.isSuccessful = false
+                      result.message = 'userDiscordAlreadyExists'
+                    } else {
+                      let passwordHashed
+                      if (customAuth.settings.passwordEncryption === "bcrypt") {
+                        passwordHashed = await bcrypt.hash(data.registerPassword, 5)
+                      } else if (customAuth.settings.passwordEncryption === "md5") {
+                        passwordHashed = md5(data.registerPassword)
+                      } else {
+                        passwordHashed = data.registerPassword
                       }
+                      const insertData = {
+                        [customAuth.settings.usernameDbField]: data.registerUsername,
+                        [customAuth.settings.passwordDbField]: passwordHashed,
+                        [customAuth.settings.emailDbField]: data.registerEmail,
+                        [customAuth.settings.discordNicknameDbField]: data.registerDiscord,
+                        [customAuth.settings.statusDbField]: customAuth.settings.visitorStatus,
+                        [customAuth.settings.registrationDateDbField]: localISOTime
+                      }
+                      if (Object.keys(manualAreas).length > 0) insertData[customAuth.settings.areaDbField] = data.registerArea
+                      await CustomAuth.query()
+                        .insert(insertData)
+                        .then(async (userRegistered) => {
+                          if (userRegistered) {
+                            result.isSuccessful = true
+                            result.message = 'registerSuccess'
+                            await sendDiscordLogMsg('registerSuccess', data.registerUsername)
+                            if (customAuth.confirmationEmail && data.registerConfirmationEmail) {
+                              const confirmationLink = `${customAuth.siteDomain}/auth/confirmation/${data.registerUsername}/${md5(data.registerEmail)}`
+                              const textFormatted = data.registerConfirmationEmail.text.replace(/\{1}/g, data.registerUsername).replace(/\{2}/g, title).replace(/\{3}/g, confirmationLink)
+                              const htmlFormatted = data.registerConfirmationEmail.html.replace(/\{1}/g, data.registerUsername).replace(/\{2}/g, title).replace(/\{3}/g, confirmationLink)
+                              let transporter = nodemailer.createTransport(customAuth.nodemailerOptions)
+                              transporter.sendMail({
+                                from: customAuth.senderAddress,
+                                to: data.registerEmail,
+                                subject: data.registerConfirmationEmail.subject,
+                                text: textFormatted,
+                                html: htmlFormatted
+                              })
+                              result.message = 'registerSuccessEmail'
+                              await sendDiscordLogMsg('registerSuccessEmail', data.registerUsername)
+                            }
+                          }
+                        })
                     }
                   })
               }

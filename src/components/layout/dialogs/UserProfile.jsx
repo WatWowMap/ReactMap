@@ -37,8 +37,9 @@ export default function UserProfile({ setUserProfile }) {
   const handleChange = (type, value) => {
     setUpdateProfile(false)
     if (type === 'discordNickname') {
-      if (value !== profileData.discordNickname
-        || updateArea !== profileData.area) {
+      if ((value !== profileData.discordNickname
+        || updateArea !== profileData.area)
+        && discordRegex.test(value)) {
         setUpdateProfile(true)
       }
     } else if (type === 'area') {
@@ -137,6 +138,7 @@ export default function UserProfile({ setUserProfile }) {
                 setUpdateDiscordNickname(e.target.value)
                 if (e.target.value && !discordRegex.test(e.target.value)) {
                   setUpdateDiscordNicknameTest(false)
+                  setUpdateProfile(false)
                 } else {
                   handleChange('discordNickname', e.target.value)
                   setUpdateDiscordNicknameTest(true)
@@ -145,32 +147,34 @@ export default function UserProfile({ setUserProfile }) {
             />
             <Typography variant="body2" align="center">{t('discordId')} : {profileData.discordId ? profileData.discordId : '-'}</Typography>
           </Grid>
-          {Object.keys(manualAreas).length > 0 && profileData.area && <Divider />}
           {Object.keys(manualAreas).length > 0 && profileData.area && (
-            <Grid item>
-              <FormControl
-                fullWidth="true"
-                margin="normal"
-                variant="outlined"
-                required
-              >
-                <InputLabel htmlFor="updateArea">{t('area')}</InputLabel>
-                <Select
-                  native
-                  value={updateArea}
-                  onChange={(e) => { setUpdateArea(e.target.value); handleChange('area', e.target.value) }}
-                  label={t('area')}
-                  inputProps={{
-                    name: 'updateArea',
-                    id: 'updateArea',
-                  }}
+            <>
+              <Divider />
+              <Grid item>
+                <FormControl
+                  fullWidth="true"
+                  margin="normal"
+                  variant="outlined"
+                  required
                 >
-                  {Object.keys(manualAreas).map(area => (
-                    <option value={area}>{area}</option>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                  <InputLabel htmlFor="updateArea">{t('area')}</InputLabel>
+                  <Select
+                    native
+                    value={updateArea}
+                    onChange={(e) => { setUpdateArea(e.target.value); handleChange('area', e.target.value) }}
+                    label={t('area')}
+                    inputProps={{
+                      name: 'updateArea',
+                      id: 'updateArea',
+                    }}
+                  >
+                    {Object.keys(manualAreas).map(area => (
+                      <option value={area}>{area}</option>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </>
           )}
         </Grid>
       </DialogContent>

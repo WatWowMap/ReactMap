@@ -264,6 +264,7 @@
   "registrationText": "Bonjour {1},\n\nConfirme ton adresse email afin de finaliser ton inscription sur {2}\n\nLien de confirmation : {3}\nA bientôt sur {2}",
   "registrationHtml": "<html><body>Bonjour {1},<br><br>Confirme ton adresse email afin de finaliser ton inscription sur {2}<br><br>Lien de confirmation : <a href=\"{3}\">Clique ici</a><br><br>A bientôt sur {2}</body></html>",
   "userAlreadyExists": "Ce nom d'utilisateur existe déjà, veuillez en choisir un autre",
+  "emailAlreadyExists": "Cette adresse email existe déjà, veuillez en choisir une autre",
   "userDiscordAlreadyExists": "Ce pseudo Discord existe déjà, veuillez en choisir un autre",
   "userAlreadyConfirmed": "L'inscription de cet utilisateur est déjà confirmée",
   "userNotConfirmed": "Veuillez svp confirmer votre inscription via l'email reçu",

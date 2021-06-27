@@ -350,7 +350,6 @@
     "settings": {
       "usernameFormField": "username",
       "passwordFormField": "password",
-      "usernameToLowerCase": true,
       "passwordEncryption": "bcrypt",
       "usernameDbField": "username",
       "passwordDbField": "password",

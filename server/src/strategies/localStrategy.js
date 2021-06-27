@@ -18,18 +18,21 @@ passport.deserializeUser(async (user, done) => {
 
 const authHandler = async (username, password, done) => {
   try {
-    if (config.customAuth.settings.usernameToLowerCase) username = username.toLowerCase()
     const user = {}
     const validUser = await CustomAuthClient.authenticate(username, password)
-    user.id = (validUser.authentication && validUser.userData[config.customAuth.settings.discordIdDbField]) ?
-      validUser.userData[config.customAuth.settings.discordIdDbField] : username
-    user.username = username
+    if (validUser.authentication) {
+      user.id = validUser.userData[config.customAuth.settings.discordIdDbField] ?
+        validUser.userData[config.customAuth.settings.discordIdDbField] : validUser.userData[config.customAuth.settings.usernameDbField]
+    } else {
+      user.id = username
+    }
+    user.username = validUser.authentication ? validUser.userData[config.customAuth.settings.usernameDbField] : username
     user.perms = validUser.authentication ? await CustomAuthClient.getPerms(validUser.userData) : {}
     user.valid = validUser.authentication && user.perms.map !== false
     user.blocked = user.perms.blocked
     user.profileData = validUser.authentication ? {
-      sessionUserId: (validUser.authentication && validUser.userData[config.customAuth.settings.discordIdDbField]) ?
-        validUser.userData[config.customAuth.settings.discordIdDbField] : username,
+      sessionUserId: validUser.userData[config.customAuth.settings.discordIdDbField] ?
+        validUser.userData[config.customAuth.settings.discordIdDbField] : validUser.userData[config.customAuth.settings.usernameDbField],
       username: validUser.userData[config.customAuth.settings.usernameDbField],
       discordId: validUser.userData[config.customAuth.settings.discordIdDbField],
       discordNickname: validUser.userData[config.customAuth.settings.discordNicknameDbField],
