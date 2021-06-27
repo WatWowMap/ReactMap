@@ -9,11 +9,13 @@ const filterSkipList = ['filter', 'enabled', 'legacy']
 
 const getPolling = category => {
   switch (category) {
-    default: return 0
-    case 'device': return 10000
-    case 'gyms': return 10000
-    case 'pokestops': return 300000
-    case 'weather': return 30000
+    case 'device':
+    case 'gyms':
+    case 'pokemon':
+      return 10 * 1000
+    case 'pokestops': return 5 * 60 * 1000
+    case 'weather': return 30 * 1000
+    default: return 10 * 60 * 1000
   }
 }
 
