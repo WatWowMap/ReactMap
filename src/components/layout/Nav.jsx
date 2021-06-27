@@ -109,6 +109,8 @@ export default function Nav() {
       <Dialog
         open={userProfile}
         onClose={() => setUserProfile(false)}
+        fullWidth
+        maxWidth="xs"
       >
         <UserProfile setUserProfile={setUserProfile} />
       </Dialog>

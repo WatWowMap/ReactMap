@@ -113,7 +113,7 @@ export default function UserProfile({ setUserProfile }) {
           justify="center"
           spacing={2}
         >
-          <Grid item>
+          <Grid item spacing={2}>
             {profileData.username && <Typography align="left">{t('username')} : {profileData.username}</Typography>}
             {profileData.email && <Typography align="left">{t('email')} : {profileData.email}</Typography>}
             <Typography align="left">
@@ -145,8 +145,8 @@ export default function UserProfile({ setUserProfile }) {
             />
             <Typography variant="body2" align="center">{t('discordId')} : {profileData.discordId ? profileData.discordId : '-'}</Typography>
           </Grid>
+          {Object.keys(manualAreas).length > 0 && profileData.area && <Divider />}
           {Object.keys(manualAreas).length > 0 && profileData.area && (
-            <Divider /> && (
             <Grid item>
               <FormControl
                 fullWidth="true"
@@ -171,7 +171,6 @@ export default function UserProfile({ setUserProfile }) {
                 </Select>
               </FormControl>
             </Grid>
-            )
           )}
         </Grid>
       </DialogContent>
@@ -210,7 +209,11 @@ export default function UserProfile({ setUserProfile }) {
         </Grid>
       </DialogActions>
       {enableUserPerms && (
-        <Dialog open={userPerms} fullWidth>
+        <Dialog
+          open={userPerms}
+          onClose={() => setUserPerms(false)}
+          fullWidth
+        >
           <UserPerms setUserPerms={setUserPerms} />
         </Dialog>
       )}
