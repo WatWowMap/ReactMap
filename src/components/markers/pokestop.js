@@ -86,7 +86,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
         iconUrl = '/images/item/-8.png'
         iconHtml = `
           <img 
-            src=${path}/${Utility.getPokemonIcon(availableForms, megaId, 0, 1)}.png 
+            src=${path}/${Utility.getPokemonIcon(availableForms, megaId, 0, megaId === 6 || megaId === 150 ? 2 : 1)}.png 
             style="bottom: 15px; 
               width:${iconModifiers.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconModifiers.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px; 
               height:${iconModifiers.sizeMultiplier ? iconSizes[filters.filter[filterId].size] * iconModifiers.sizeMultiplier : iconSizes[filters.filter[filterId].size]}px;"
