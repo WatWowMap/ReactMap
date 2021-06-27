@@ -9,6 +9,7 @@ import getAllS2cells from './queries/s2cell'
 import getAllSubmissionCells from './queries/submissionCells'
 import { getOne, getAllNests } from './queries/nest'
 import getAllScanAreas from './queries/scanAreas'
+import * as searchIndex from './queries/search'
 
 class Query {
   static devices() {
@@ -102,6 +103,15 @@ class Query {
 
   static scanAreas() {
     return getAllScanAreas
+  }
+
+  static search(category) {
+    switch (category) {
+      default: return searchIndex.poi
+      case 'raids':
+      case 'nests':
+      case 'quests': return searchIndex[category]
+    }
   }
 }
 
