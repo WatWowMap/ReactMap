@@ -1,3 +1,4 @@
+import formatInterval from './functions/formatInterval'
 import getPokemonIcon from './functions/getPokemonIcon'
 import getProperName from './functions/getProperName'
 import menuFilter from './functions/menuFilter'
@@ -21,6 +22,10 @@ class Utility {
 
   static checkAdvFilter(filter) {
     return checkAdvFilter(filter)
+  }
+
+  static formatInterval(intervalMs) {
+    return formatInterval(intervalMs)
   }
 
   static getTimeUntil(date, until) {

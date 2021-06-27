@@ -472,28 +472,23 @@ const RaidInfo = ({ gym, t }) => {
 }
 
 const Timer = ({ gym, start, t }) => {
-  const { raid_battle_timestamp, raid_end_timestamp } = gym
-  const startTime = new Date(raid_battle_timestamp * 1000)
-  const endTime = new Date(raid_end_timestamp * 1000)
-
-  const [raidStart, setRaidStart] = useState(Utility.getTimeUntil(startTime, true))
-  const [raidEnd, setRaidEnd] = useState(Utility.getTimeUntil(endTime, true))
+  const target = (start ? gym.raid_battle_timestamp : gym.raid_end_timestamp) * 1000
+  const update = () => start || gym.raid_pokemon_id ? Utility.getTimeUntil(target, true)
+    : Utility.formatInterval(target - gym.raid_battle_timestamp * 1000)
+  const [display, setDisplay] = useState(update)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setRaidStart(Utility.getTimeUntil(startTime, true))
-      setRaidEnd(Utility.getTimeUntil(endTime, true))
-    }, 1000)
+    const timer = setTimeout(() => setDisplay(update()), 1000)
     return () => clearTimeout(timer)
   })
 
   return (
     <Grid item xs={start ? 6 : 12} style={{ textAlign: 'center' }}>
       <Typography variant="subtitle1">
-        {t(start ? 'starts' : 'ends')}: {(start ? startTime : endTime).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
+        {t(start ? 'starts' : 'ends')}: {new Date(target).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
       </Typography>
       <Typography variant="h6">
-        {(start ? raidStart : raidEnd).str}
+        {display.str}
       </Typography>
     </Grid>
   )
