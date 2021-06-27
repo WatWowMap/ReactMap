@@ -138,6 +138,14 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
     return <img src={getPokemonUrl(nest_pokemon_id, nest_pokemon_form)} style={{ maxWidth: 45, maxHeight: 45 }} />
   }
 
+  const getBackupName = () => {
+    switch (safeSearch[searchTab]) {
+      default: return t('unknownGym')
+      case 'quests':
+      case 'pokestops': return t('unknownPokestop')
+    }
+  }
+
   const fetchedData = data || previousData
   return (
     <div style={{ width: isMobile ? '80vw' : 500, minHeight: 190 }}>
@@ -193,7 +201,9 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
                 : getUrl(option)}
             </Grid>
             <Grid item xs={8}>
-              <Typography variant="caption">{option.name}</Typography>
+              <Typography variant="caption">
+                {option.name || getBackupName()}
+              </Typography>
             </Grid>
             <Grid item xs={2}>
               <Typography variant="caption">{option.distance}km</Typography>
