@@ -1,21 +1,44 @@
-import React, { memo } from 'react'
+import React, {
+  useEffect, useState, useRef, memo,
+} from 'react'
 import { Circle, Popup } from 'react-leaflet'
 
 import PopupContent from '../popups/Portal'
 import marker from '../markers/portal'
 
-const PortalTile = ({ item, userSettings, ts }) => (
-  <Circle
-    key={item.id}
-    center={[item.lat, item.lon]}
-    radius={20}
-    pathOptions={marker(item, ts, userSettings)}
-  >
-    <Popup position={[item.lat, item.lon]}>
-      <PopupContent portal={item} ts={ts} />
-    </Popup>
-  </Circle>
-)
+const PortalTile = ({
+  item, userSettings, ts, params,
+}) => {
+  const [done, setDone] = useState(false)
+  const markerRefs = useRef({})
+
+  useEffect(() => {
+    const { id } = params
+    if (id === item.id) {
+      const markerToOpen = markerRefs.current[id]
+      markerToOpen.openPopup()
+    }
+  }, [done])
+
+  return (
+    <Circle
+      key={item.id}
+      ref={(m) => {
+        markerRefs.current[item.id] = m
+        if (!done && item.id === params.id) {
+          setDone(true)
+        }
+      }}
+      center={[item.lat, item.lon]}
+      radius={20}
+      pathOptions={marker(item, ts, userSettings)}
+    >
+      <Popup position={[item.lat, item.lon]}>
+        <PopupContent portal={item} ts={ts} />
+      </Popup>
+    </Circle>
+  )
+}
 
 const areEqual = (prev, next) => (
   prev.item.id === next.item.id

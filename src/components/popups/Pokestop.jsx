@@ -149,7 +149,7 @@ const Header = ({
   const open = Boolean(anchorEl)
   const {
     id, grunt_type, quest_pokemon_id, quest_form_id, mega_pokemon_id,
-    quest_reward_type, stardust_amount, quest_item_id, mega_amount,
+    quest_reward_type, stardust_amount, quest_item_id, mega_amount, candy_pokemon_id,
   } = pokestop
   const name = pokestop.name || t('unknownPokestop')
 
@@ -173,6 +173,7 @@ const Header = ({
       default: key = `${quest_pokemon_id}-${quest_form_id}`; break
       case 2: key = `q${quest_item_id}`; break
       case 3: key = `d${stardust_amount}`; break
+      case 4: key = `c${candy_pokemon_id}`; break
       case 12: key = `m${mega_pokemon_id}-${mega_amount}`; break
     }
     setFilters({
@@ -413,7 +414,7 @@ const RewardInfo = ({ pokestop, path, availableForms }) => {
       ); break
     case 12:
       questRewards.push(
-        <img src={`${path}/${Utility.getPokemonIcon(availableForms, mega_pokemon_id, 0, 1)}.png`} className="quest-popup-img" />,
+        <img src={`${path}/${Utility.getPokemonIcon(availableForms, mega_pokemon_id, 0, mega_pokemon_id === 6 || mega_pokemon_id === 150 ? 2 : 1)}.png`} className="quest-popup-img" />,
         <img src="/images/item/-8.png" className="quest-popup-img" />,
         <div className="amount-popup">x{mega_amount}</div>,
       ); break

@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
-import Dialog from '@material-ui/core/Dialog'
+import { Dialog, useMediaQuery } from '@material-ui/core'
+import { useTheme } from '@material-ui/styles'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import useStyles from '@hooks/useStyles'
+import { useStore, useStatic } from '@hooks/useStore'
 import FloatingBtn from './FloatingBtn'
 import Sidebar from './drawer/Drawer'
 import FilterMenu from './dialogs/filters/Menu'
@@ -9,8 +11,15 @@ import UserOptions from './dialogs/UserOptions'
 import UserProfile from './dialogs/UserProfile'
 import Tutorial from './dialogs/tutorial/Tutorial'
 import UserPerms from './dialogs/UserPerms'
+import Search from './dialogs/Search'
 
-export default function Nav() {
+const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
+
+export default function Nav({ map, setManualParams }) {
+  const classes = useStyles()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
+  const { perms } = useStatic(state => state.auth)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
   const userSettings = useStore(state => state.userSettings)
@@ -34,6 +43,8 @@ export default function Nav() {
     setForcedTutorialDisplayed(true)
   }
 
+  const safeSearch = searchable.filter(category => perms[category])
+
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
@@ -50,6 +61,10 @@ export default function Nav() {
     } else {
       setDialog({ open, category, type })
     }
+    if (filter && type === 'search') {
+      map.flyTo([filter.lat, filter.lon], 16)
+      setManualParams(filter)
+    }
     if (filter && type === 'filters') {
       setFilters({ ...filters, [category]: { ...filters[category], filter } })
     }
@@ -57,7 +72,6 @@ export default function Nav() {
       setUserSettings({ ...userSettings, [category]: filter })
     }
   }
-
   return (
     <>
       {drawer ? (
@@ -72,6 +86,9 @@ export default function Nav() {
         <FloatingBtn
           toggleDrawer={toggleDrawer}
           setUserProfile={setUserProfile}
+          toggleDialog={toggleDialog}
+          safeSearch={safeSearch}
+          isMobile={isMobile}
         />
       )}
       <Dialog
@@ -113,6 +130,20 @@ export default function Nav() {
         maxWidth="xs"
       >
         <UserProfile setUserProfile={setUserProfile} />
+      </Dialog>
+      <Dialog
+        classes={{
+          scrollPaper: classes.scrollPaper,
+          container: classes.container,
+        }}
+        open={dialog.open && dialog.type === 'search'}
+        onClose={toggleDialog(false, dialog.category, dialog.type)}
+      >
+        <Search
+          toggleDialog={toggleDialog}
+          safeSearch={safeSearch}
+          isMobile={isMobile}
+        />
       </Dialog>
     </>
   )

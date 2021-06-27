@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 
 import { useStatic, useStore } from '@hooks/useStore'
@@ -20,14 +20,15 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const map = useMap()
   const filters = useStore(state => state.filters)
   const { tileServers: userTiles, icons: userIcons } = useStore(state => state.settings)
-  const setLocation = useStore(state => state.setLocation)
-  const setZoom = useStore(state => state.setZoom)
+  const availableForms = useStatic(state => state.availableForms)
+  const staticUserSettings = useCallback(useStatic(state => state.userSettings))
   const ui = useCallback(useStatic(state => state.ui))
   const available = useCallback(useStatic(state => state.available))
   const staticFilters = useCallback(useStatic(state => state.filters))
+  const setLocation = useStore(state => state.setLocation)
+  const setZoom = useStore(state => state.setZoom)
   const userSettings = useStore(state => state.userSettings)
-  const staticUserSettings = useStatic(state => state.userSettings)
-  const availableForms = useStatic(state => state.availableForms)
+  const [manualParams, setManualParams] = useState(false)
 
   const initialBounds = {
     minLat: map.getBounds()._southWest.lat,
@@ -41,6 +42,10 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
     setLocation([newCenter.lat, newCenter.lng])
     setZoom(map.getZoom())
   }, [map])
+
+  if (manualParams) {
+    params.id = manualParams.id
+  }
 
   return (
     <>
@@ -110,7 +115,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         }
         return null
       })}
-      <Nav />
+      <Nav map={map} setManualParams={setManualParams} />
     </>
   )
 }

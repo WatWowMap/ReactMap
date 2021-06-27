@@ -24,7 +24,8 @@
       "raids": false,
       "nests": false
     },
-    "weatherCellLimit": 3
+    "weatherCellLimit": 3,
+    "searchResultsLimit": 15
   },
   "map": {
     "title": "ReactMap",

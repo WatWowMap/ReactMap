@@ -26,10 +26,10 @@ const PokestopTile = ({
     && !excludeList.includes(`i${grunt_type}`)
 
   const hasQuest = ((quest_item_id && !excludeList.includes(`q${quest_item_id}`))
-    || (item.quest_pokemon_id && !excludeList.includes(`${quest_pokemon_id}-${quest_form_id}`))
-    || (item.mega_amount && !excludeList.includes(`${mega_pokemon_id}-${mega_amount}`))
-    || (item.stardust_amount && !excludeList.includes(`d${stardust_amount}`))
-    || (item.candy_pokemon_id && !excludeList.includes(`c${candy_pokemon_id}`)))
+    || (quest_pokemon_id && !excludeList.includes(`${quest_pokemon_id}-${quest_form_id}`))
+    || (mega_amount && !excludeList.includes(`m${mega_pokemon_id}-${mega_amount}`))
+    || (stardust_amount && !excludeList.includes(`d${stardust_amount}`))
+    || (candy_pokemon_id && !excludeList.includes(`c${candy_pokemon_id}`)))
 
   useEffect(() => {
     const { id } = params

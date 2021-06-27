@@ -47,7 +47,7 @@ export default makeStyles(theme => ({
   },
   floatingBtn: {
     '& > *': {
-      margin: theme.spacing(1),
+      margin: `${theme.spacing(1)}px !important`,
       position: 'sticky',
       top: 0,
       left: 5,
@@ -82,5 +82,11 @@ export default makeStyles(theme => ({
   },
   expandOpen: {
     transform: 'rotate(180deg)',
+  },
+  scrollPaper: {
+    alignItems: 'baseline',
+  },
+  container: {
+    height: false,
   },
 }))

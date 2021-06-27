@@ -1,9 +1,11 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
+const i18next = require('i18next')
 const fetchRaids = require('../services/functions/fetchRaids')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
+const { api: { searchResultsLimit } } = require('../services/config')
 
 class Gym extends Model {
   static get tableName() {
@@ -221,6 +223,63 @@ class Gym extends Model {
       }
       return `${pokemon.raid_pokemon_id}-${pokemon.raid_pokemon_form}`
     })
+  }
+
+  static async search(args, perms, isMad, distance) {
+    const query = this.query()
+      .select([
+        'name',
+        isMad ? 'gym.gym_id AS id' : 'id',
+        isMad ? 'latitude AS lat' : 'lat',
+        isMad ? 'longitude AS lon' : 'lon',
+        'url',
+        distance,
+      ])
+      .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .limit(searchResultsLimit)
+      .orderBy('distance')
+    if (isMad) {
+      query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+    }
+    if (perms.areaRestrictions.length > 0) {
+      getAreaSql(query, perms.areaRestrictions, isMad)
+    }
+    return query
+  }
+
+  static async searchRaids(args, perms, isMad, distance) {
+    const { search, locale } = args
+    const ts = Math.floor((new Date()).getTime() / 1000)
+    const pokemonIds = Object.keys(masterfile).filter(pkmn => (
+      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
+    ))
+
+    const query = this.query()
+      .select([
+        'name',
+        isMad ? 'gym.gym_id AS id' : 'id',
+        isMad ? 'latitude AS lat' : 'lat',
+        isMad ? 'longitude AS lon' : 'lon',
+        isMad ? 'pokemon_id AS raid_pokemon_id' : 'raid_pokemon_id',
+        isMad ? 'raid.form AS raid_pokemon_form' : 'raid_pokemon_form',
+        isMad ? 'raid.gender AS raid_pokemon_gender' : 'raid_pokemon_gender',
+        isMad ? 'raid.costume AS raid_pokemon_costume' : 'raid_pokemon_costume',
+        isMad ? 'evolution AS raid_pokemon_evolution' : 'raid_pokemon_evolution',
+        distance,
+      ])
+      .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', pokemonIds)
+      .limit(searchResultsLimit)
+      .orderBy('distance')
+      .andWhere(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : ts)
+      .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+    if (isMad) {
+      query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+        .join('raid', 'gym.gym_id', 'raid.gym_id')
+    }
+    if (perms.areaRestrictions.length > 0) {
+      getAreaSql(query, perms.areaRestrictions, isMad)
+    }
+    return query
   }
 }
 

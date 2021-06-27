@@ -5,6 +5,8 @@ const compression = require('compression')
 const session = require('express-session')
 const passport = require('passport')
 const rateLimit = require('express-rate-limit')
+const i18next = require('i18next')
+const Backend = require('i18next-fs-backend')
 require('./db/initialization')
 
 const { sessionStore } = require('./services/session-store.js')
@@ -68,6 +70,18 @@ if (config.enabledAuthMethods.length > 0) {
 
   app.use(passport.session())
 }
+
+i18next.use(Backend).init({
+  lng: 'en',
+  fallbackLng: 'en',
+  preload: ['en', 'de', 'es', 'fr', 'pl'],
+  ns: ['translation'],
+  defaultNS: 'translation',
+  backend: { loadPath: 'public/locales/{{lng}}/{{ns}}.json' },
+}, (err, t) => {
+  // eslint-disable-next-line no-console
+  if (err) return console.error(err)
+})
 
 app.use(rootRouter, requestRateLimiter)
 

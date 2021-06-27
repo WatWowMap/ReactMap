@@ -16,3 +16,4 @@ RUN apk add git
 RUN npm install -g yarn
 COPY . .
 RUN yarn install
+RUN yarn build
