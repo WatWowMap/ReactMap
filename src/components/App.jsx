@@ -22,7 +22,7 @@ class AbortableLink extends ApolloLink {
   // eslint-disable-next-line class-methods-use-this
   request(operation, forward) {
     const context = operation.getContext();
-    if (context.abortableContext) context.abortableContext.handle(operation, forward);
+    return context.abortableContext ? context.abortableContext.handle(operation, forward) : forward(operation);
   }
 }
 
