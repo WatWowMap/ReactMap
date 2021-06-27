@@ -24,7 +24,7 @@ export default function FloatingButtons({ toggleDrawer }) {
   } = useStatic(state => state.config)
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const [open, setOpen] = React.useState(false)
-  const [color, setColor] = React.useState('#444')
+  const [color, setColor] = React.useState('action')
 
   const handleClickOpen = () => {
     setOpen(true)
@@ -39,12 +39,12 @@ export default function FloatingButtons({ toggleDrawer }) {
     const LocateFab = Locate.extend({
       /* eslint-disable react/no-this-in-sfc */
       _setClasses(state) {
-        if (state === 'requesting') setColor('#2074b6')
-        else if (state === 'active') setColor('#2074b6')
-        else if (state === 'following') setColor('#fc8428')
+        if (state === 'requesting') setColor('inherit')
+        else if (state === 'active') setColor('inherit')
+        else if (state === 'following') setColor('primary')
       },
       _cleanClasses() {
-        setColor('#444')
+        setColor('action')
       },
       /* eslint-enable react/no-this-in-sfc */
     })
@@ -68,7 +68,7 @@ export default function FloatingButtons({ toggleDrawer }) {
       </Grid>
       <Grid item>
         <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')}>
-          <LocationOn style={{ color }} fontSize={iconSize} />
+          <LocationOn color={color} fontSize={iconSize} />
         </Fab>
       </Grid>
       <Grid item>
