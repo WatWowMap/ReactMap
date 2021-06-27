@@ -1,16 +1,25 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
+const Ohbem = require('ohbem')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const legacyFilter = require('../services/legacyFilter')
 const {
   api: { pvpMinCp },
   database: {
-    settings:
-    { leagues },
+    settings: { leagues, reactMapHandlesPvp, pvpLevels },
   },
 } = require('../services/config')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
+
+const leagueObj = {}
+leagues.forEach(league => leagueObj[league.name] = league.cp)
+const ohbem = reactMapHandlesPvp ? new Ohbem({
+  leagues: leagueObj,
+  pokemonData: masterfile,
+  levelCaps: pvpLevels,
+  cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
+}) : undefined
 
 class Pokemon extends Model {
   static get tableName() {
@@ -33,7 +42,7 @@ class Pokemon extends Model {
     const dbType = dbSelection('pokemon')
     const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
     const ivCalc = 'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
-    const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', ...leagues]
+    const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', ...leagues.map(league => league.name)]
     const madKeys = {
       iv: raw(ivCalc),
       level: raw(levelCalc),
@@ -48,6 +57,38 @@ class Pokemon extends Model {
       const noPokemonSelect = Object.keys(args.filters).find(x => x.charAt(0) !== 'o')
       if (!noPokemonSelect) return []
     }
+
+    const getMadSql = q => (
+      q.join('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
+        .select([
+          'encounter_id AS id',
+          'pokemon_id',
+          'pokemon.latitude AS lat',
+          'pokemon.longitude AS lon',
+          'individual_attack AS atk_iv',
+          'individual_defense AS def_iv',
+          'individual_stamina AS sta_iv',
+          'move_1',
+          'move_2',
+          'cp',
+          'weight',
+          'height AS size',
+          'gender',
+          'form',
+          'costume',
+          'weather_boosted_condition AS weather',
+          raw('IF(calc_endminsec, 1, NULL)')
+            .as('expire_timestamp_verified'),
+          raw('Unix_timestamp(disappear_time)')
+            .as('expire_timestamp'),
+          raw('Unix_timestamp(last_modified)')
+            .as('updated'),
+          raw(ivCalc)
+            .as('iv'),
+          raw(levelCalc)
+            .as('level'),
+        ])
+    )
 
     const pvpCheck = (pkmn, league, min, max) => {
       const rankCheck = pkmn.rank <= max && pkmn.rank >= min
@@ -122,7 +163,7 @@ class Pokemon extends Model {
       relevant.forEach(key => {
         switch (key) {
           default:
-            if (dbType !== 'mad' && pvp) {
+            if (pvp) {
               queryPvp = true
               if (!relevant.includes('iv')
                 && !relevant.includes('level')
@@ -151,35 +192,7 @@ class Pokemon extends Model {
     // query builder
     const query = this.query()
     if (isMad) {
-      query.join('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
-        .select([
-          'encounter_id AS id',
-          'pokemon_id',
-          'pokemon.latitude AS lat',
-          'pokemon.longitude AS lon',
-          'individual_attack AS atk_iv',
-          'individual_defense AS def_iv',
-          'individual_stamina AS sta_iv',
-          'move_1',
-          'move_2',
-          'cp',
-          'weight',
-          'height AS size',
-          'gender',
-          'form',
-          'costume',
-          'weather_boosted_condition AS weather',
-          raw('IF(calc_endminsec, 1, NULL)')
-            .as('expire_timestamp_verified'),
-          raw('Unix_timestamp(disappear_time)')
-            .as('expire_timestamp'),
-          raw('Unix_timestamp(last_modified)')
-            .as('updated'),
-          raw(ivCalc)
-            .as('iv'),
-          raw(levelCalc)
-            .as('level'),
-        ])
+      getMadSql(query)
     }
     query.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
       .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
@@ -256,12 +269,19 @@ class Pokemon extends Model {
     // second query for pvp
     if (pvp && queryPvp) {
       const pvpQuery = this.query()
-        .select(['*', raw(true).as('pvpCheck')])
-        .where('expire_timestamp', '>=', ts)
-        .andWhereBetween('lat', [args.minLat, args.maxLat])
-        .andWhereBetween('lon', [args.minLon, args.maxLon])
-        .whereNotIn('id', listOfIds)
-      if (dbType === 'chuck') {
+      if (isMad) {
+        getMadSql(pvpQuery)
+        pvpQuery.select(raw(true).as('pvpCheck'))
+      } else {
+        pvpQuery.select(['*', raw(true).as('pvpCheck')])
+      }
+      pvpQuery.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+        .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
+        .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
+        .whereNotIn(isMad ? 'encounter_id' : 'id', listOfIds)
+      if (reactMapHandlesPvp) {
+        pvpQuery.whereNotNull('cp')
+      } else if (dbType === 'chuck') {
         pvpQuery.whereNotNull('pvp')
       } else {
         pvpQuery.andWhere(pvpBuilder => {
@@ -274,6 +294,9 @@ class Pokemon extends Model {
       }
       pvpResults.push(...await pvpQuery)
     }
+    if (reactMapHandlesPvp) {
+      this.getOhbemPvp(pvpResults)
+    }
 
     // filter pokes with pvp data
     pvpResults.forEach(pkmn => {
@@ -281,7 +304,7 @@ class Pokemon extends Model {
         pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
       }
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
-      const parsed = getParsedPvp(pkmn)
+      const parsed = reactMapHandlesPvp ? pkmn.pvp : getParsedPvp(pkmn)
       pkmn.cleanPvp = {}
       pkmn.bestPvp = 4096
       Object.keys(parsed).forEach(league => {
@@ -296,6 +319,24 @@ class Pokemon extends Model {
       }
     })
     return finalResults
+  }
+
+  static async getOhbemPvp(results) {
+    for (let i = 0; i < results.length; i += 1) {
+      if (results[i].level) {
+        results[i].pvp = ohbem.queryPvPRank(
+          results[i].pokemon_id,
+          results[i].form,
+          results[i].costume,
+          results[i].gender,
+          results[i].atk_iv,
+          results[i].def_iv,
+          results[i].sta_iv,
+          results[i].level,
+        )
+      }
+    }
+    return results
   }
 
   static async getLegacy(args, perms) {
