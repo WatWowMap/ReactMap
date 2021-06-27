@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/client'
 import { Observable } from '@apollo/client/utilities/observables/Observable'
 import Query from '@services/Query'
@@ -130,6 +130,7 @@ class RobustTimeout extends AbortableContext {
   }
 
   setupTimeout(refetch) {
+    if (this.refetch === refetch) return
     this.refetch = refetch
     if (this._ms) this.timeout = setTimeout(() => this.doRefetch(), this._ms)
   }
@@ -171,7 +172,7 @@ export default function QueryData({
     return trimmed
   }, [userSettings])
 
-  const timeout = new RobustTimeout(getPolling(category))
+  const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
   const refetchData = () => {
     onMove()
     const mapBounds = map.getBounds()
