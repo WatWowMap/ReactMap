@@ -119,7 +119,7 @@ class RobustTimeout extends AbortableContext {
 
   doRefetch(variables) {
     const now = Date.now()
-    if (this._lastUpdated - now < 500) return
+    if (now - this._lastUpdated < 500) return
     this._lastUpdated = now
     this.abortAll()
     if (this._ms) {

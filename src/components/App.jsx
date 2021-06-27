@@ -4,8 +4,9 @@ import React, { Suspense, useEffect, useState } from 'react'
 import {
   ApolloClient,
   ApolloLink,
-  ApolloProvider, createHttpLink,
+  ApolloProvider,
   InMemoryCache,
+  createHttpLink,
 } from '@apollo/client'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
