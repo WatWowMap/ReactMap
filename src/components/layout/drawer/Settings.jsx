@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useState } from 'react'
 import {
-  FormControl, Grid, InputLabel, MenuItem, Select, Button, Snackbar, Slide, Dialog,
+  FormControl, Grid, InputLabel, MenuItem, Select, Button, Snackbar, Slide, Dialog, Divider,
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 import { useTranslation } from 'react-i18next'
@@ -28,8 +28,6 @@ export default function Settings({ toggleDialog }) {
 
   const [alert, setAlert] = useState(false)
   const [userPerms, setUserPerms] = useState(false)
-  const tutorial = useStore(state => state.tutorial)
-  const setTutorial = useStore(state => state.setTutorial)
   const [feedback, setFeedback] = useState(false)
 
   const handleChange = event => {
@@ -151,7 +149,36 @@ export default function Settings({ toggleDialog }) {
               </Button>
             </Grid>
           )}
+          {config.map.enableStats && (
+            <Grid item xs={6} style={{ textAlign: 'center' }}>
+              <Button
+                variant="contained"
+                color="secondary"
+                style={{ minWidth: 100 }}
+                href={config.map.statsLink}
+                target="_blank"
+                rel="noreferrer"
+                size="small"
+              >
+                {t('stats')}
+              </Button>
+            </Grid>
+          )}
+          {config.map.enableFeedback && (
+            <Grid item xs={6} style={{ textAlign: 'center' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                style={{ minWidth: 100 }}
+                onClick={() => setFeedback(true)}
+                size="small"
+              >
+                {t('feedback')}
+              </Button>
+            </Grid>
+          )}
         </Grid>
+        <Grid item xs={12}><Divider /></Grid>
         <Grid
           justify="space-evenly"
           alignItems="center"
@@ -202,36 +229,6 @@ export default function Settings({ toggleDialog }) {
             </Button>
           </Grid>
         </Grid>
-        {config.map.enableStats
-          && (
-            <Grid item xs={6} style={{ textAlign: 'center' }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                style={{ minWidth: 100 }}
-                href={config.map.statsLink}
-                target="_blank"
-                rel="noreferrer"
-                size="small"
-              >
-                {t('stats')}
-              </Button>
-            </Grid>
-          )}
-        {config.map.enableFeedback
-          && (
-            <Grid item xs={6} style={{ textAlign: 'center' }}>
-              <Button
-                variant="contained"
-                color="primary"
-                style={{ minWidth: 100 }}
-                onClick={() => setFeedback(true)}
-                size="small"
-              >
-                {t('feedback')}
-              </Button>
-            </Grid>
-          )}
       </Grid>
       <Snackbar
         open={alert}

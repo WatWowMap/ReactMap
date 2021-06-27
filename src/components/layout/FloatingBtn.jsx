@@ -3,15 +3,13 @@
 import React from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import {
-  Grid, Fab, Dialog, Button, Typography, Divider, DialogActions, DialogContent, DialogTitle, useMediaQuery,
-} from '@material-ui/core'
-import {
-  Menu, LocationOn, ZoomIn, ZoomOut, Forum, Create, Equalizer, Person, Search,
+  Menu, LocationOn, ZoomIn, ZoomOut, Person, Search,
 } from '@material-ui/icons'
 import { useMap } from 'react-leaflet'
 import Locate from 'leaflet.locatecontrol'
 import { useTranslation } from 'react-i18next'
 
+import { useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 
 export default function FloatingButtons({
