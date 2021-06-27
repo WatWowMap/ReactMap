@@ -24,6 +24,7 @@ export default function FloatingButtons({ toggleDrawer }) {
   } = useStatic(state => state.config)
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const [open, setOpen] = React.useState(false)
+  const [color, setColor] = React.useState('#444')
 
   const handleClickOpen = () => {
     setOpen(true)
@@ -34,25 +35,26 @@ export default function FloatingButtons({ toggleDrawer }) {
   }
 
   const map = useMap()
-
-  const locateOptions = {
-    keepCurrentZoomLevel: true,
-    setView: 'untilPan',
-  }
-  const LocateFab = Locate.extend({
-    /* eslint-disable react/no-this-in-sfc */
-    _setClasses(state) {
-      if (state === 'requesting') this.color = '#2074b6'
-      else if (state === 'active') this.color = '#2074b6'
-      else if (state === 'following') this.color = '#fc8428'
-    },
-    _cleanClasses() {
-      this.color = '#444'
-    },
-    /* eslint-enable react/no-this-in-sfc */
+  const [lc] = React.useState(() => {
+    const LocateFab = Locate.extend({
+      /* eslint-disable react/no-this-in-sfc */
+      _setClasses(state) {
+        if (state === 'requesting') setColor('#2074b6')
+        else if (state === 'active') setColor('#2074b6')
+        else if (state === 'following') setColor('#fc8428')
+      },
+      _cleanClasses() {
+        setColor('#444')
+      },
+      /* eslint-enable react/no-this-in-sfc */
+    })
+    const result = new LocateFab({
+      keepCurrentZoomLevel: true,
+      setView: 'untilPan',
+    })
+    result.addTo(map)
+    return result
   })
-  const lc = new LocateFab(locateOptions)
-  lc.addTo(map)
 
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'default'
@@ -66,7 +68,7 @@ export default function FloatingButtons({ toggleDrawer }) {
       </Grid>
       <Grid item>
         <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')}>
-          <LocationOn color={lc.color} fontSize={iconSize} />
+          <LocationOn style={{ color }} fontSize={iconSize} />
         </Fab>
       </Grid>
       <Grid item>
