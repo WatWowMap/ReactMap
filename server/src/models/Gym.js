@@ -249,6 +249,7 @@ class Gym extends Model {
 
   static async searchRaids(args, perms, isMad, distance) {
     const { search, locale } = args
+    const ts = Math.floor((new Date()).getTime() / 1000)
     const pokemonIds = Object.keys(masterfile).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
     ))
@@ -269,6 +270,8 @@ class Gym extends Model {
       .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', pokemonIds)
       .limit(searchResultsLimit)
       .orderBy('distance')
+      .andWhere(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : ts)
+      .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
     if (isMad) {
       query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
         .join('raid', 'gym.gym_id', 'raid.gym_id')
