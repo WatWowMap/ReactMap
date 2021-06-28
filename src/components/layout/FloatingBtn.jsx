@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import {
   Menu, LocationOn, ZoomIn, ZoomOut, Search,
@@ -14,20 +14,18 @@ export default function FloatingButtons({
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
-  const [color, setColor] = React.useState('action')
+  const [color, setColor] = useState('inherit')
   const map = useMap()
-  const [lc] = React.useState(() => {
+  const [lc] = useState(() => {
     const LocateFab = Locate.extend({
-      /* eslint-disable react/no-this-in-sfc */
       _setClasses(state) {
-        if (state === 'requesting') setColor('inherit')
+        if (state === 'requesting') setColor('action')
         else if (state === 'active') setColor('inherit')
         else if (state === 'following') setColor('primary')
       },
       _cleanClasses() {
-        setColor('action')
+        setColor('inherit')
       },
-      /* eslint-enable react/no-this-in-sfc */
     })
     const result = new LocateFab({
       keepCurrentZoomLevel: true,
