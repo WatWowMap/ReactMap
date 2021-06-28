@@ -20,7 +20,7 @@ export default function FloatingButtons({
     const LocateFab = Locate.extend({
       _setClasses(state) {
         if (state === 'requesting') setColor('action')
-        else if (state === 'active') setColor('inherit')
+        else if (state === 'active') setColor('action')
         else if (state === 'following') setColor('primary')
       },
       _cleanClasses() {

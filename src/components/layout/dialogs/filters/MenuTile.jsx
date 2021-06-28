@@ -59,12 +59,12 @@ export default function MenuTile({
 
   const getAdvMenuIcon = () => {
     if (type === 'pokemon') {
-      return <Tune />
+      return <Tune style={{ color: 'white' }} />
     }
     if (item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0) {
-      return <Settings />
+      return <Settings style={{ color: 'white' }} />
     }
-    return <FormatSize />
+    return <FormatSize style={{ color: 'white' }} />
   }
   const advMenu = (
     <IconButton
