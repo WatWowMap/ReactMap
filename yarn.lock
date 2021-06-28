@@ -1311,9 +1311,9 @@
   integrity sha512-Lt+wj8NVPx0zUmUwumiVXapmaLUcAk3yPuHCFVXras9k5VT9TdhJqKqGVUQCD60OTMCl0qxJ57OiTL0Mic3Iag==
 
 "@types/node@>=13.7.0":
-  version "15.12.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-15.12.4.tgz#e1cf817d70a1e118e81922c4ff6683ce9d422e26"
-  integrity sha512-zrNj1+yqYF4WskCMOHwN+w9iuD12+dGm0rQ35HLl9/Ouuq52cEtd0CH9qMgrdNmi5ejC1/V7vKEXYubB+65DkA==
+  version "15.12.5"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-15.12.5.tgz#9a78318a45d75c9523d2396131bd3cca54b2d185"
+  integrity sha512-se3yX7UHv5Bscf8f1ERKvQOD6sTyycH3hdaoozvaLxgUiY5lIGEeH37AD0G0Qi9kPqihPn0HOfd2yaIEN9VwEg==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"
@@ -5926,7 +5926,10 @@ pkg-dir@^4.1.0, pkg-dir@^4.2.0:
 
 "pogo-translations@git+https://github.com/bschultz/pogo-translations.git":
   version "0.2.0"
-  resolved "git+https://github.com/bschultz/pogo-translations.git#d6203691a707bdb6271d8e97358495a03644ab35"
+  resolved "git+https://github.com/bschultz/pogo-translations.git#3fd72b8887ba7db4ba4bcc557b064f1158cdd043"
+  dependencies:
+    node-fetch "^2.6.1"
+    pogo-protos "github:Furtif/pogo-protos"
 
 popper.js@1.16.1-lts:
   version "1.16.1-lts"

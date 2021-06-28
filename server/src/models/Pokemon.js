@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-const { Model, raw } = require('objection')
+const { Model, raw, ref } = require('objection')
 const Ohbem = require('ohbem')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const legacyFilter = require('../services/legacyFilter')
@@ -61,7 +61,9 @@ class Pokemon extends Model {
     const getMadSql = q => (
       q.join('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
         .select([
-          'encounter_id AS id',
+          ref('encounter_id')
+            .castTo('CHAR')
+            .as('id'),
           'pokemon_id',
           'pokemon.latitude AS lat',
           'pokemon.longitude AS lon',
@@ -92,7 +94,7 @@ class Pokemon extends Model {
 
     const pvpCheck = (pkmn, league, min, max) => {
       const rankCheck = pkmn.rank <= max && pkmn.rank >= min
-      const cpCheck = dbType === 'chuck' || pkmn.cp >= pvpMinCp[league]
+      const cpCheck = dbType === 'chuck' || reactMapHandlesPvp || pkmn.cp >= pvpMinCp[league]
       return rankCheck && cpCheck
     }
 
@@ -253,10 +255,10 @@ class Pokemon extends Model {
         pkmn.ditto_form = pkmn.form
         pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
       }
-      if (pvp && dbType !== 'mad'
-        && (pkmn.pvp_rankings_great_league
-          || pkmn.pvp_rankings_ultra_league
-          || pkmn.pvp)) {
+      if (pvp && ((pkmn.pvp_rankings_great_league
+        || pkmn.pvp_rankings_ultra_league
+        || pkmn.pvp)
+        || (dbType === 'mad' && reactMapHandlesPvp && pkmn.cp))) {
         noPvp = false
         listOfIds.push(pkmn.id)
         pvpResults.push(pkmn)
@@ -267,7 +269,7 @@ class Pokemon extends Model {
     })
 
     // second query for pvp
-    if (pvp && queryPvp) {
+    if (queryPvp && (dbType !== 'mad' || reactMapHandlesPvp)) {
       const pvpQuery = this.query()
       if (isMad) {
         getMadSql(pvpQuery)
@@ -278,7 +280,11 @@ class Pokemon extends Model {
       pvpQuery.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
         .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
-        .whereNotIn(isMad ? 'encounter_id' : 'id', listOfIds)
+      if (isMad && listOfIds.length > 0) {
+        pvpQuery.whereRaw(`encounter_id NOT IN ( ${listOfIds.join(',')} )`)
+      } else {
+        pvpQuery.whereNotIn('id', listOfIds)
+      }
       if (reactMapHandlesPvp) {
         pvpQuery.whereNotNull('cp')
       } else if (dbType === 'chuck') {
@@ -294,17 +300,14 @@ class Pokemon extends Model {
       }
       pvpResults.push(...await pvpQuery)
     }
-    if (reactMapHandlesPvp) {
-      this.getOhbemPvp(pvpResults)
-    }
 
     // filter pokes with pvp data
     pvpResults.forEach(pkmn => {
+      const parsed = reactMapHandlesPvp ? this.getOhbemPvp(pkmn) : getParsedPvp(pkmn)
       if (pkmn.form === 0) {
         pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
       }
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
-      const parsed = reactMapHandlesPvp ? pkmn.pvp : getParsedPvp(pkmn)
       pkmn.cleanPvp = {}
       pkmn.bestPvp = 4096
       Object.keys(parsed).forEach(league => {
@@ -321,22 +324,17 @@ class Pokemon extends Model {
     return finalResults
   }
 
-  static async getOhbemPvp(results) {
-    for (let i = 0; i < results.length; i += 1) {
-      if (results[i].level) {
-        results[i].pvp = ohbem.queryPvPRank(
-          results[i].pokemon_id,
-          results[i].form,
-          results[i].costume,
-          results[i].gender,
-          results[i].atk_iv,
-          results[i].def_iv,
-          results[i].sta_iv,
-          results[i].level,
-        )
-      }
-    }
-    return results
+  static getOhbemPvp(pokemon) {
+    return ohbem.queryPvPRank(
+      pokemon.pokemon_id,
+      pokemon.form,
+      pokemon.costume,
+      pokemon.gender,
+      pokemon.atk_iv,
+      pokemon.def_iv,
+      pokemon.sta_iv,
+      pokemon.level,
+    )
   }
 
   static async getLegacy(args, perms) {

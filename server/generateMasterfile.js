@@ -125,6 +125,7 @@ function fetchJson(url) {
           evolutions: pkmn.evolutions,
           temp_evolutions: pkmn.temp_evolutions,
           family: pkmn.family,
+          little: pkmn.little,
         }
       }
     }
