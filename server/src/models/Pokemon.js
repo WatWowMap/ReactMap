@@ -19,7 +19,7 @@ const ohbem = reactMapHandlesPvp ? new Ohbem({
   pokemonData: masterfile,
   levelCaps: pvpLevels,
   cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
-}) : undefined
+}) : null
 
 class Pokemon extends Model {
   static get tableName() {
