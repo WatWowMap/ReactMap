@@ -89,4 +89,19 @@ export default makeStyles(theme => ({
   container: {
     height: false,
   },
+  '@global': {
+    '*::-webkit-scrollbar': {
+      width: '5px',
+    },
+    '*::-webkit-scrollbar-track': {
+      backgroundColor: theme.palette.background.default,
+    },
+    '*::-webkit-scrollbar-thumb': {
+      backgroundColor: theme.palette.action.hover,
+      borderRadius: '3px',
+    },
+    '*::-webkit-scrollbar-thumb:hover': {
+      backgroundColor: theme.palette.action.selected,
+    },
+  },
 }))
