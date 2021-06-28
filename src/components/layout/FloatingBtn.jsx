@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import {
   Menu, LocationOn, ZoomIn, ZoomOut, Search,
@@ -14,14 +14,26 @@ export default function FloatingButtons({
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
+  const [color, setColor] = useState('inherit')
   const map = useMap()
-
-  const locateOptions = {
-    keepCurrentZoomLevel: true,
-    setView: 'untilPan',
-  }
-  const lc = new Locate(locateOptions)
-  lc.addTo(map)
+  const [lc] = useState(() => {
+    const LocateFab = Locate.extend({
+      _setClasses(state) {
+        if (state === 'requesting') setColor('action')
+        else if (state === 'active') setColor('action')
+        else if (state === 'following') setColor('primary')
+      },
+      _cleanClasses() {
+        setColor('inherit')
+      },
+    })
+    const result = new LocateFab({
+      keepCurrentZoomLevel: true,
+      setView: 'untilPan',
+    })
+    result.addTo(map)
+    return result
+  })
 
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'default'
@@ -48,7 +60,7 @@ export default function FloatingButtons({
       )}
       <Grid item>
         <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')}>
-          <LocationOn fontSize={iconSize} />
+          <LocationOn color={color} fontSize={iconSize} />
         </Fab>
       </Grid>
       <Grid item>

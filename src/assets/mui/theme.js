@@ -16,6 +16,11 @@ export default function createTheme(theme, darkMode) {
         dark: '#007bb2',
         contrastText: '#fff',
       },
+      action: {
+        main: '#00e676',
+        contrastText: '#fff',
+        active: '#00e676',
+      },
       grey: {
         light: '#bdbdbd',
         main: '#333333',
