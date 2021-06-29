@@ -453,20 +453,15 @@ const PvpInfo = ({
   const availableForms = useStatic(state => state.availableForms)
 
   const rows = []
-  let capsExist = false
 
   data.forEach(eachRank => {
     if (eachRank.rank !== null && eachRank.cp !== null) {
-      if (eachRank.cap && !capsExist) {
-        capsExist = true
-      }
       const tempRow = {
         id: `${league}-${eachRank.pokemon}-${eachRank.form}-${eachRank.evolution}-${eachRank.gender}-${eachRank.rank}-${eachRank.cp}-${eachRank.lvl}-${eachRank.cap}`,
         img: <img src={`${path}/${Utility.getPokemonIcon(availableForms, eachRank.pokemon, eachRank.form, eachRank.evolution, eachRank.gender, eachRank.costume)}.png`} height={20} />,
         rank: eachRank.rank || 0,
         cp: eachRank.cp || 0,
-        lvl: eachRank.level || 0,
-        cap: (eachRank.capped !== true && eachRank.cap) || '',
+        lvl: (eachRank.level || '') + ((eachRank.capped !== true && `/${eachRank.cap}`) || ''),
         percent: (eachRank.percentage * 100).toFixed(1) || 0,
       }
       if (onlyTop5) {
@@ -489,7 +484,6 @@ const PvpInfo = ({
           <td style={rowClass}>{t('rank')}</td>
           <td style={rowClass}>{t('cp')}</td>
           <td style={rowClass}>{t('lvl')}</td>
-          {capsExist && <td style={rowClass}>{t('cap')}</td>}
           <td style={rowClass}>{t('%')}</td>
         </tr>
       </thead>
@@ -500,7 +494,6 @@ const PvpInfo = ({
             <td>{row.rank}</td>
             <td>{row.cp}</td>
             <td>{row.lvl}</td>
-            {capsExist && <td>{row.cap}</td>}
             <td>{row.percent}</td>
           </tr>
         ))}
