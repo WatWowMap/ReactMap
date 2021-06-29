@@ -31,8 +31,7 @@ const GymTile = ({
     && (raid_battle_timestamp >= ts
       ? !excludeList.includes(`e${raid_level}`)
       : !excludeList.includes(`${raid_pokemon_id}-${raid_pokemon_form}`)))
-  const timerToDisplay = (raid_battle_timestamp >= ts && raid_pokemon_id === 0)
-    ? raid_battle_timestamp : raid_end_timestamp
+  const timerToDisplay = raid_battle_timestamp >= ts && !raid_pokemon_id ? raid_battle_timestamp : raid_end_timestamp
 
   useEffect(() => {
     const { id } = params
