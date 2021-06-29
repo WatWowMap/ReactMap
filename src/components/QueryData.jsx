@@ -1,6 +1,7 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/client'
 import Query from '@services/Query'
+import RobustTimeout from '@classes/RobustTimeout'
 import Clustering from './Clustering'
 
 const withAvailableList = ['pokestops', 'gyms', 'nests']
@@ -8,11 +9,13 @@ const filterSkipList = ['filter', 'enabled', 'legacy']
 
 const getPolling = category => {
   switch (category) {
-    default: return 0
-    case 'device': return 10000
-    case 'gyms': return 10000
-    case 'pokestops': return 300000
-    case 'weather': return 30000
+    case 'device':
+    case 'gyms':
+    case 'pokemon':
+      return 10 * 1000
+    case 'pokestops': return 5 * 60 * 1000
+    case 'weather': return 30 * 1000
+    default: return 10 * 60 * 1000
   }
 }
 
@@ -21,6 +24,8 @@ export default function QueryData({
   category, available, filters, staticFilters, staticUserSettings,
   userSettings, perms, path, iconModifiers, availableForms,
 }) {
+  const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
+
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
       onlyLegacyExclude: [],
@@ -58,7 +63,7 @@ export default function QueryData({
     if (category !== 'weather'
       && category !== 'device'
       && category !== 'scanAreas') {
-      refetch({
+      timeout.doRefetch({
         minLat: mapBounds._southWest.lat,
         maxLat: mapBounds._northEast.lat,
         minLon: mapBounds._southWest.lng,
@@ -76,13 +81,16 @@ export default function QueryData({
   }, [filters, userSettings])
 
   const { data, previousData, refetch } = useQuery(Query[category](filters, perms, map.getZoom(), zoomLevel), {
+    context: {
+      abortableContext: timeout, // will be picked up by AbortableClient
+    },
     variables: {
       ...bounds,
       filters: trimFilters(filters),
     },
     fetchPolicy: 'cache-and-network',
-    pollInterval: getPolling(category),
   })
+  timeout.setupTimeout(refetch)
 
   const renderedData = data || previousData
   return (
