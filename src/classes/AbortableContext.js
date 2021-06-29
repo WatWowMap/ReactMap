@@ -37,7 +37,7 @@ export default class AbortableContext {
   }
 
   _removeOp(op) {
-    const i = this._pendingOp.indexOf((v) => v === op)
+    const i = this._pendingOp.indexOf(op)
     if (i === -1) return
     const last = this._pendingOp.length - 1
     if (last > 0) this._pendingOp[i] = this._pendingOp[last]
