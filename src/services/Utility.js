@@ -3,7 +3,6 @@ import getPokemonIcon from './functions/getPokemonIcon'
 import getProperName from './functions/getProperName'
 import menuFilter from './functions/menuFilter'
 import checkAdvFilter from './functions/checkAdvFilter'
-import getTimers from './functions/getTimeUntil'
 import dayCheck from './functions/dayCheck'
 import parseQuestConditions from './functions/parseConditions'
 
@@ -29,7 +28,7 @@ class Utility {
   }
 
   static getTimeUntil(date, until) {
-    return getTimers(date, until)
+    return formatInterval(until ? date - Date.now() : Date.now() - date)
   }
 
   static dayCheck(ts, desiredStamp) {
