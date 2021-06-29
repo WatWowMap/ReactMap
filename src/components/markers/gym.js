@@ -2,6 +2,17 @@
 import L from 'leaflet'
 import Utility from '../../services/Utility'
 
+const getBadgeColor = (raidLevel) => {
+  switch (raidLevel) {
+    default: return '#292929'
+    case 1:
+    case 2: return '#BF05C6'
+    case 3:
+    case 4: return '#9E8A09'
+    case 5: return '#088DB6'
+  }
+}
+
 export default function gymMarker(
   gym, ts, hasRaid, iconSizes, filters, path, iconModifiers, availableForms, userSettings,
 ) {
@@ -78,6 +89,21 @@ export default function gymMarker(
         bottom: -7px;"
       />`
   }
+
+  if (userSettings.raidLevelBadges && hasRaid) {
+    iconHtml += `
+    <div class="raid-badge" style="background-color: ${getBadgeColor(raid_level)};">
+    ${raid_level === 6
+    ? `<img src="/images/misc/mega.png" 
+        style="width:17.5px;
+          height: auto;
+          position: absolute;
+          left: 1.75px;
+          bottom: 1.65px;"
+        />` : raid_level}
+    </div>`
+  }
+
   return L.divIcon({
     iconSize: [gymSize, gymSize],
     iconAnchor: [gymSize / 2, iconAnchorY],

@@ -239,6 +239,22 @@ img {
   padding: 4px 3px 0 3px;
 }
 
+.raid-badge {
+  position: absolute;
+  right: -10px;
+  top: -15px;
+  text-align: center;
+  align-items: center; 
+  justify-content: center;
+  border: 2px solid white;
+  border-radius: 12px; 
+  color: white;
+  font: bold 15px/13px Helvetica, Verdana, Tahoma;
+  height: 16px; 
+  min-width: 14px;
+  padding: 4px 3px 0 3px;
+}
+
 .quest-popup-img {
   text-align: center;
   max-width: 40px;
