@@ -119,10 +119,6 @@ module.exports = (env) => {
           filename: isDevelopment ? '[name].css' : '[name]-[contenthash:8].css',
           chunkFilename: isDevelopment ? '[id].css' : '[id].[contenthash:8].css',
         }),
-        new ESLintPlugin({
-          context: 'src',
-          extensions: ['js', 'jsx'],
-        }),
         new ProgressBarPlugin({
           format: `Bundling application... ${emoji.get(
             'package',
@@ -132,6 +128,12 @@ module.exports = (env) => {
           clear: false,
         }),
       ];
+      if (isDevelopment) {
+        plugins.push(new ESLintPlugin({
+          context: 'src',
+          extensions: ['js', 'jsx'],
+        }))
+      }
       return plugins;
     })(),
     optimization: {
