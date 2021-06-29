@@ -466,7 +466,7 @@ const PvpInfo = ({
         rank: eachRank.rank || 0,
         cp: eachRank.cp || 0,
         lvl: eachRank.level || 0,
-        cap: eachRank.cap || '',
+        cap: (eachRank.capped !== true && eachRank.cap) || '',
         percent: (eachRank.percentage * 100).toFixed(1) || 0,
       }
       if (onlyTop5) {
