@@ -5,7 +5,6 @@ import { Observable } from '@apollo/client/utilities/observables/Observable'
  * @see AbortableLink
  * @author Mygod
  */
-
 export default class AbortableContext {
   constructor() {
     this._pendingOp = []

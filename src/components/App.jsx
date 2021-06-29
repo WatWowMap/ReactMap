@@ -3,28 +3,16 @@ import '../assets/scss/main.scss'
 import React, { Suspense, useEffect, useState } from 'react'
 import {
   ApolloClient,
-  ApolloLink,
   ApolloProvider,
   InMemoryCache,
   createHttpLink,
 } from '@apollo/client'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
+import AbortableLink from '@classes/AbortableLink';
 import Fetch from '@services/Fetch'
 import Auth from './Auth'
 import Login from './Login'
-
-/**
- * @author Mygod
- * @see AbortableContext
- */
-class AbortableLink extends ApolloLink {
-  // eslint-disable-next-line class-methods-use-this
-  request(operation, forward) {
-    const context = operation.getContext();
-    return context.abortableContext ? context.abortableContext.handle(operation, forward) : forward(operation);
-  }
-}
 
 const client = new ApolloClient({
   uri: '/graphql',
