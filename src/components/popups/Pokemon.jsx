@@ -461,7 +461,7 @@ const PvpInfo = ({
         img: <img src={`${path}/${Utility.getPokemonIcon(availableForms, each.pokemon, each.form, each.evolution, each.gender, each.costume)}.png`} height={20} />,
         rank: each.rank || 0,
         cp: each.cp || 0,
-        lvl: `${each.level || ''}${(each.capped !== true && `/${each.cap}`) || ''}`,
+        lvl: `${each.level || ''}${each.cap && !each.capped ? `/${each.cap}` : ''}`,
         percent: (each.percentage * 100).toFixed(1) || 0,
       }
       rows.push(tempRow)
