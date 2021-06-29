@@ -120,13 +120,22 @@ You can add any number of rules in the glow array in the config. **Be sure to ad
 ]
 ```
 - PVP Leagues:
-If you're using Chuck to parse Pokemon you can add any number of leagues to the array to add compatibility with ReactMap.
+If you're using Chuck as a parser you can add any number of leagues to the `leagues` array, just be sure to add the same keys to your Chuck config. 
+
+If you're using RDM and want more than just Great/Ultra League, you can set `reactMapHandlesPvp` to `true` and add any number of leagues/CP caps to the array, along with what levels you want to calculate in the `pvpLevels` array. 
+
+If you're using MAD and want PVP results you must set `reactMapHandlesPvp` to `true` and add what leagues and levels you'd like calculated. 
 ```json
   "database": {
     "settings": {
-      "type": "chuck",
-      "leagues": ["great", "ultra", "little"]
-    }
+      "reactMapHandlesPvp": false,
+      "leagues": [
+        { "name": "great", "cp": 1500 },
+        { "name": "ultra", "cp": 2500 },
+        { "name": "little", "cp": 500 }
+      ],
+      "pvpLevels": [50, 51]
+    },
   }
 ```
 

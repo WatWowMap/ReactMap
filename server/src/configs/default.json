@@ -201,7 +201,9 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
-      "leagues": ["great", "ultra"]
+      "leagues": [],
+      "reactMapHandlesPvp": false,
+      "pvpLevels": []
     },
     "schemas": {
       "scanner": {

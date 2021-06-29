@@ -20,7 +20,7 @@ class PokemonFilter extends GenericFilter {
   }
 
   pvp(values) {
-    leagues.forEach(league => this[league] = values || [1, 100])
+    leagues.forEach(league => this[league.name] = values || [1, 100])
   }
 }
 
