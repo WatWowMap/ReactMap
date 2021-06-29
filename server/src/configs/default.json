@@ -108,7 +108,8 @@
       "clustering": true,
       "raidTimers": false,
       "interactionRanges": false,
-      "showExBadge": false
+      "showExBadge": false,
+      "raidLevelBadges": false
     },
     "pokestops": {
       "clustering": true,

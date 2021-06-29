@@ -38,7 +38,7 @@ export const fancyMarker = (iconUrl, pkmn, filters, iconSizes, glow, ivCircle) =
     }
     if (ivCircle) {
       return `
-        <div class="iv-badge">
+        <div class="iv-badge" style="right: -10px; bottom: -5px;">
           ${Math.round(pkmn.iv)}
         </div>`
     }

@@ -330,5 +330,6 @@
   "gymsSearch": "Enter Gym Name...",
   "portalsSearch": "Enter Portal Name...",
   "nestsSearch": "Enter Nest Pokemon Name...",
-  "raidsSearch": "Enter Raid Boss Name..."
+  "raidsSearch": "Enter Raid Boss Name...",
+  "raidLevelBadges": "Raid Level Badges"
 }
