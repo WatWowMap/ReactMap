@@ -128,8 +128,6 @@ If you're using MAD and want PVP results you must set `reactMapHandlesPvp` to `t
 ```json
   "database": {
     "settings": {
-      "userTableName": "users_test",
-      "sessionTableName": "sessions",
       "reactMapHandlesPvp": false,
       "leagues": [
         { "name": "great", "cp": 1500 },
