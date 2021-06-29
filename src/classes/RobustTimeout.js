@@ -9,14 +9,18 @@ export default class RobustTimeout extends AbortableContext {
 
   doRefetch(variables) {
     const now = Date.now()
-    if (now - this._lastUpdated < (this._pendingOp.length ? 4000 : 500)) return
+    if (now - this._lastUpdated < (this._pendingOp.length ? 4000 : 500)) {
+      this._pendingVariables = variables
+      return
+    }
     this._lastUpdated = now
     this.abortAll()
     if (this._ms) {
       clearTimeout(this.timeout)
       this.timeout = setTimeout(() => this.doRefetch(), this._ms)
     }
-    this.refetch(variables)
+    this.refetch(variables === undefined ? this._pendingVariables : variables)
+    delete this._pendingVariables
   }
 
   setupTimeout(refetch) {
