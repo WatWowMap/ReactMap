@@ -129,6 +129,7 @@ const areEqual = (prev, next) => {
     && prev.userSettings.raidTimers === next.userSettings.raidTimers
     && prev.showCircles === next.showCircles
     && prev.userSettings.showExBadge === next.userSettings.showExBadge
+    && prev.userSettings.raidLevelBadges === next.userSettings.raidLevelBadges
   )
 }
 
