@@ -10,6 +10,7 @@ const getBadgeColor = (raidLevel) => {
     case 3:
     case 4: return '#9E8A09'
     case 5: return '#088DB6'
+    case 6: return '#21BD21'
   }
 }
 
@@ -74,8 +75,27 @@ export default function gymMarker(
           src="${raidIcon}" 
           style="width:${raidSize}px; 
           height:${raidSize}px;"
+        />`
+    if (userSettings.raidLevelBadges) {
+      iconHtml += `
+      <div 
+        class="iv-badge" 
+        style="background-color: ${getBadgeColor(raid_level)}; 
+          top: 20px; 
+          right: -5px;"
+      >
+      ${raid_level === 6
+    ? `<img src="/images/misc/mega.png" 
+          style="width:17.5px;
+            height: auto;
+            position: absolute;
+            left: 1.75px;
+            bottom: 1.60px;"
         />
       </div>`
+    : raid_level}`
+    }
+    iconHtml += '</div>'
     popupAnchorY += offsetY
   }
 
@@ -88,20 +108,6 @@ export default function gymMarker(
         left: -8px;
         bottom: -7px;"
       />`
-  }
-
-  if (userSettings.raidLevelBadges && hasRaid) {
-    iconHtml += `
-    <div class="raid-badge" style="background-color: ${getBadgeColor(raid_level)};">
-    ${raid_level === 6
-    ? `<img src="/images/misc/mega.png" 
-        style="width:17.5px;
-          height: auto;
-          position: absolute;
-          left: 1.75px;
-          bottom: 1.65px;"
-        />` : raid_level}
-    </div>`
   }
 
   return L.divIcon({
