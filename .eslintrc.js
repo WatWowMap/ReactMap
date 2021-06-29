@@ -59,6 +59,7 @@ module.exports = {
           ['@services', './src/services/'],
           ['@hooks', './src/hooks/'],
           ['@assets', './src/assets/'],
+          ['@classes', './src/classes/'],
         ],
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
