@@ -47,16 +47,15 @@ rootRouter.get('/logout', (req, res) => {
 rootRouter.get('/settings', async (req, res) => {
   try {
     if (!config.discord.enabled) {
-      req.session.perms = {}
+      req.session.perms = { areaRestrictions: [] }
       Object.keys(config.discord.perms).forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
-      req.session.perms.areaRestrictions = []
       req.session.save()
     } else if (config.alwaysEnabledPerms.length > 0) {
-      req.session.perms = {}
+      req.session.perms = { areaRestrictions: [] }
       config.alwaysEnabledPerms.forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
-      req.session.perms.areaRestrictions = []
       req.session.save()
     }
+
     const getUser = () => {
       if (config.discord.enabled) {
         if (req.user || config.alwaysEnabledPerms.length === 0) {
