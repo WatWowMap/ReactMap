@@ -156,9 +156,7 @@ class Gym extends Model {
         })
       }
     })
-    if (areaRestrictions.length > 0) {
-      getAreaSql(query, areaRestrictions, isMad)
-    }
+    getAreaSql(query, areaRestrictions, isMad, 'gyms')
 
     const secondaryFilter = queryResults => {
       const { length } = queryResults
@@ -241,9 +239,7 @@ class Gym extends Model {
     if (isMad) {
       query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
-    if (perms.areaRestrictions.length > 0) {
-      getAreaSql(query, perms.areaRestrictions, isMad)
-    }
+    getAreaSql(query, perms.areaRestrictions, isMad, 'gyms')
     return query
   }
 
@@ -276,9 +272,7 @@ class Gym extends Model {
       query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
         .join('raid', 'gym.gym_id', 'raid.gym_id')
     }
-    if (perms.areaRestrictions.length > 0) {
-      getAreaSql(query, perms.areaRestrictions, isMad)
-    }
+    getAreaSql(query, perms.areaRestrictions, isMad, 'gyms')
     return query
   }
 }

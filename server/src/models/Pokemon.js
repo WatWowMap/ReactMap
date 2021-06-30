@@ -236,9 +236,7 @@ class Pokemon extends Model {
           ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 100)
         }
       })
-    if (areaRestrictions.length > 0) {
-      getAreaSql(query, areaRestrictions, isMad, 'pokemon')
-    }
+    getAreaSql(query, areaRestrictions, isMad, 'pokemon')
 
     const results = await query
     const finalResults = []
@@ -295,9 +293,7 @@ class Pokemon extends Model {
             .orWhereNotNull('pvp_rankings_ultra_league')
         })
       }
-      if (areaRestrictions.length > 0) {
-        getAreaSql(pvpQuery, areaRestrictions, isMad, 'pokemon')
-      }
+      getAreaSql(pvpQuery, areaRestrictions, isMad, 'pokemon')
       pvpResults.push(...await pvpQuery)
     }
 

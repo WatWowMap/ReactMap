@@ -246,6 +246,7 @@
     "blockedGuilds": [],
     "allowedUsers": [],
     "areaRestrictions": [],
+    "skipAreaRestrictionPerms": [],
     "perms": {
       "map": {
         "enabled": true,

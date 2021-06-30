@@ -63,9 +63,7 @@ class Pokestop extends Model {
     query.whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
-    if (areaRestrictions.length > 0) {
-      getAreaSql(query, areaRestrictions, isMad)
-    }
+    getAreaSql(query, areaRestrictions, isMad, 'pokestops')
 
     // returns everything if all pokestops are on
     if (onlyAllPokestops && pokestopPerms) {
@@ -346,9 +344,7 @@ class Pokestop extends Model {
       .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (perms.areaRestrictions.length > 0) {
-      getAreaSql(query, perms.areaRestrictions, isMad)
-    }
+    getAreaSql(query, perms.areaRestrictions, isMad, 'pokestops')
     return query
   }
 
@@ -394,9 +390,7 @@ class Pokestop extends Model {
           .whereIn('quest_reward_type', [4, 12])
       })
     }
-    if (perms.areaRestrictions.length > 0) {
-      getAreaSql(query, perms.areaRestrictions, isMad)
-    }
+    getAreaSql(query, perms.areaRestrictions, isMad, 'pokestops')
     const results = await query
     return results.map(result => isMad ? this.parseMadRewards(result) : this.parseRewards(result))
   }
