@@ -156,7 +156,7 @@ class Gym extends Model {
         })
       }
     })
-    getAreaSql(query, areaRestrictions, isMad, 'gyms')
+    getAreaSql(query, areaRestrictions, isMad, 'gyms')  // TODO: support `gyms, raids`
 
     const secondaryFilter = queryResults => {
       const { length } = queryResults
@@ -272,7 +272,7 @@ class Gym extends Model {
       query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
         .join('raid', 'gym.gym_id', 'raid.gym_id')
     }
-    getAreaSql(query, perms.areaRestrictions, isMad, 'gyms')
+    getAreaSql(query, perms.areaRestrictions, isMad, 'raids')
     return query
   }
 }
