@@ -1,4 +1,4 @@
-const { skipAreaRestrictionPerms } = require('../config')
+const { discord: { skipAreaRestrictionPerms } } = require('../config')
 const areas = require('../areas.js')
 
 module.exports = function getAreaRestrictionSql(query, areaRestrictions, isMad, category) {
