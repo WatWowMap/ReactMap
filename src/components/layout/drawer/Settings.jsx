@@ -209,6 +209,7 @@ export default function Settings({ toggleDialog }) {
           />
           <label htmlFor="contained-button-file">
             <Button
+              component="span"
               style={{ minWidth: 100 }}
               variant="contained"
               color="primary"
