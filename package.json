@@ -52,8 +52,7 @@
     "sass": "^1.32.8",
     "sass-loader": "^11.0.1",
     "webpack": "^5.27.2",
-    "webpack-cli": "^4.5.0",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-cli": "^4.5.0"
   },
   "dependencies": {
     "@apollo/client": "^3.3.11",
@@ -88,7 +87,7 @@
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.1",
     "nodes2ts": "^2.0.0",
-    "objection": "^2.2.14",
+    "objection": "Vincit/objection.js#chore/knex-0-95-0",
     "ohbem": "^1.1.0",
     "passport": "^0.4.1",
     "passport-discord": "https://github.com/tonestrike/passport-discord.git",
@@ -96,8 +95,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-i18next": "^11.9.0",
-    "react-leaflet": "^3.1.0",
-    "react-leaflet-markercluster": "^3.0.0-rc1",
+    "react-leaflet": "3.1.0",
+    "react-leaflet-markercluster": "3.0.0-rc1",
     "react-router-dom": "^5.2.0",
     "react-virtualized-auto-sizer": "^1.0.5",
     "react-window": "^1.8.6",
