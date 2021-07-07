@@ -84,7 +84,7 @@ export default function Settings({ toggleDialog }) {
     <Grid
       container
       direction="row"
-      justify="space-evenly"
+      justifyContent="space-evenly"
       alignItems="center"
       spacing={1}
     >
@@ -112,7 +112,7 @@ export default function Settings({ toggleDialog }) {
         </Grid>
       ))}
       <Grid
-        justify="space-evenly"
+        justifyContent="space-evenly"
         alignItems="center"
         container
         item

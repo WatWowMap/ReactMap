@@ -148,7 +148,7 @@ export default function Footer({
       <Grid
         className="filter-footer"
         container
-        justify={isMobile ? 'center' : 'flex-end'}
+        justifyContent={isMobile ? 'center' : 'flex-end'}
         alignItems="center"
       >
         {[help, openFilter, advMenu, disableAll, enableAll, save].map(button => (

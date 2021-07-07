@@ -134,7 +134,7 @@ export default function UserOptions({ category, toggleDialog }) {
               container
               key={key}
               direction="row"
-              justify="center"
+              justifyContent="center"
               alignItems="center"
               style={{ width: 250 }}
               spacing={2}

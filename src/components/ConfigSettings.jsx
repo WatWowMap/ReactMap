@@ -6,7 +6,7 @@ import { ThemeProvider } from '@material-ui/styles'
 import { useMediaQuery } from '@material-ui/core'
 
 import { useStore, useStatic } from '@hooks/useStore'
-import createTheme from '@assets/mui/theme'
+import setTheme from '@assets/mui/theme'
 import Map from './Map'
 
 export default function ConfigSettings({
@@ -62,7 +62,7 @@ export default function ConfigSettings({
     return defaults
   }
 
-  const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
+  const theme = setTheme(serverSettings.config.map.theme, prefersDarkMode)
   document.body.classList.add('dark')
 
   setAuth({

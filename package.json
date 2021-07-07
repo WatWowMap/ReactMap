@@ -57,10 +57,10 @@
   },
   "dependencies": {
     "@apollo/client": "^3.3.11",
-    "@material-ui/core": "^4.11.3",
+    "@material-ui/core": "^4.12.1",
     "@material-ui/icons": "^4.11.2",
-    "@material-ui/lab": "^4.0.0-alpha.58",
-    "@material-ui/styles": "^4.11.3",
+    "@material-ui/lab": "^4.0.0-alpha.60",
+    "@material-ui/styles": "^4.11.4",
     "@turf/center": "^6.3.0",
     "axios": "^0.21.1",
     "compression": "^1.7.4",
