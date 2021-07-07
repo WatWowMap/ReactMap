@@ -22,7 +22,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
         container
         direction="row"
         alignItems="center"
-        justify="center"
+        justifyContent="center"
         spacing={2}
       >
         <Grid item xs={8}>
@@ -47,7 +47,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
           container
           spacing={2}
           direction="row"
-          justify="center"
+          justifyContent="center"
           alignItems="center"
           style={{
             width: 300,

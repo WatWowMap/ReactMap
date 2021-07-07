@@ -12,7 +12,7 @@ const Login = ({ clickedTwice, location }) => {
     <Grid
       container
       direction="column"
-      justify="center"
+      justifyContent="center"
       alignItems="center"
       style={{ minHeight: '95vh' }}
     >

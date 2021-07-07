@@ -19,7 +19,7 @@ export default function TutPopup({ isMobile }) {
       <Grid
         container
         direction="column"
-        justify="space-evenly"
+        justifyContent="space-evenly"
         alignItems="center"
         spacing={2}
       >

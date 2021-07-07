@@ -36,7 +36,7 @@ export default function TutWelcome({ setUserProfile }) {
         container
         direction="row"
         alignItems="center"
-        justify="center"
+        justifyContent="center"
         spacing={2}
       >
         <Grid item xs={12}>

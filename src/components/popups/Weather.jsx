@@ -15,7 +15,7 @@ export default function WeatherPopup({ weather, ts }) {
     <Grid
       container
       direction="row"
-      justify="center"
+      justifyContent="center"
       alignItems="center"
       style={{ width: 150 }}
     >

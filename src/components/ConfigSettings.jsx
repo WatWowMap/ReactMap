@@ -6,7 +6,7 @@ import { ThemeProvider } from '@material-ui/styles'
 import { useMediaQuery } from '@material-ui/core'
 
 import { useStore, useStatic } from '@hooks/useStore'
-import createTheme from '@assets/mui/theme'
+import setTheme from '@assets/mui/theme'
 import Map from './Map'
 
 export default function ConfigSettings({
@@ -25,6 +25,8 @@ export default function ConfigSettings({
   }
   document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
+
+  console.log(serverSettings)
 
   const setUserSettings = useStore(state => state.setUserSettings)
   const setSettings = useStore(state => state.setSettings)
@@ -62,7 +64,7 @@ export default function ConfigSettings({
     return defaults
   }
 
-  const theme = createTheme(serverSettings.config.map.theme, prefersDarkMode)
+  const theme = setTheme(serverSettings.config.map.theme, prefersDarkMode)
   document.body.classList.add('dark')
 
   setAuth({
@@ -75,25 +77,16 @@ export default function ConfigSettings({
   setMasterfile(serverSettings.masterfile)
   setAvailable(serverSettings.available)
 
-  setStaticMenus(serverSettings.menus)
   setMenus(updateObjState(serverSettings.menus, 'menus'))
+  setStaticMenus(serverSettings.menus)
 
-  setStaticFilters(serverSettings.defaultFilters)
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
+  setStaticFilters(serverSettings.defaultFilters)
 
   setUserSettings(updateObjState(serverSettings.userSettings, 'userSettings'))
   setStaticUserSettings(serverSettings.clientMenus)
 
-  // temp settings migration
-  if (localState) {
-    if (localState.state && localState.state.settings.icons.name) {
-      setSettings(serverSettings.settings)
-    } else {
-      setSettings(updateObjState(serverSettings.settings, 'settings'))
-    }
-  } else {
-    setSettings(updateObjState(serverSettings.settings, 'settings'))
-  }
+  setSettings(updateObjState(serverSettings.settings, 'settings'))
   setStaticSettings(serverSettings.settings)
   const localIcons = localState ? localState.state : serverSettings
   setAvailableForms(new Set(serverSettings.config.icons[localIcons.settings.icons].pokemonList))

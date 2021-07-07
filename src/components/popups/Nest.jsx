@@ -29,7 +29,7 @@ export default function NestPopup({
   return (
     <Grid
       container
-      justify="center"
+      justifyContent="center"
       alignItems="center"
       style={{ width: 200 }}
       spacing={1}

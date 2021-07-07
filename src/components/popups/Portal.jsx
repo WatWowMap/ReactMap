@@ -35,7 +35,7 @@ export default function PortalPopup({ portal, ts }) {
       container
       style={{ width: 200 }}
       direction="row"
-      justify="space-evenly"
+      justifyContent="space-evenly"
       alignItems="center"
       spacing={1}
     >

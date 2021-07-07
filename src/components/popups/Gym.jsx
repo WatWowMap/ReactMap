@@ -25,7 +25,7 @@ export default function GymPopup({
       container
       style={{ width: 200 }}
       direction="row"
-      justify="space-evenly"
+      justifyContent="space-evenly"
       alignItems="center"
       spacing={1}
     >
@@ -36,7 +36,7 @@ export default function GymPopup({
             <Grid
               container
               alignItems="center"
-              justify="space-evenly"
+              justifyContent="space-evenly"
               spacing={1}
             >
               <PoiImage gym={gym} />
@@ -55,7 +55,7 @@ export default function GymPopup({
             <Grid
               container
               alignItems="center"
-              justify="center"
+              justifyContent="center"
               spacing={1}
             >
               <RaidImage
@@ -285,7 +285,7 @@ const RaidImage = ({
       container
       item
       xs={5}
-      justify="center"
+      justifyContent="center"
       alignItems="center"
     >
       <Grid
@@ -341,7 +341,7 @@ const GymInfo = ({ gym, t }) => {
       xs={5}
       container
       direction="row"
-      justify="space-around"
+      justifyContent="space-around"
       alignItems="center"
     >
       <Grid item xs={12}>
@@ -418,7 +418,7 @@ const RaidInfo = ({ gym, t }) => {
       item
       xs={6}
       container
-      justify="space-around"
+      justifyContent="space-around"
       alignItems="center"
     >
       <Grid item xs={12}>
@@ -580,7 +580,7 @@ const ExtraInfo = ({ gym, t, ts }) => {
     <Grid
       container
       alignItems="center"
-      justify="center"
+      justifyContent="center"
     >
       {extraMetaData.map(meta => (
         <Fragment key={meta.description}>

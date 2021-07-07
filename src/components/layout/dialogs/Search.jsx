@@ -191,7 +191,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
             xs={12}
             key={`${option.id}-${safeSearch[searchTab]}`}
             onClick={toggleDialog(false, '', 'search', option)}
-            justify="space-between"
+            justifyContent="space-between"
             alignItems="center"
             style={{ backgroundColor: index % 2 ? 'rgba(1, 1, 1, 0.05)' : 'rgba(240, 240, 240, 0.05)', height: 50 }}
           >

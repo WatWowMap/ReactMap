@@ -84,7 +84,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
         <Grid
           container
           direction="row"
-          justify="center"
+          justifyContent="center"
           alignItems="center"
         >
           {relevantSlots.map(each => (
@@ -96,7 +96,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
               sm={6}
               direction="row"
               alignItems="center"
-              justify="center"
+              justifyContent="center"
             >
               <Grid item xs={2} style={{ textAlign: 'center' }}>
                 <img src={`/images/gym/${each.slice(1).replace('-', '_')}.png`} style={{ maxWidth: 50, maxHeight: 50 }} />
@@ -139,7 +139,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
       <DialogActions>
         <Grid
           container
-          justify="center"
+          justifyContent="center"
           alignItems="center"
         >
           <Grid item xs={8}>

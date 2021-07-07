@@ -224,7 +224,7 @@ export default function Menu({ filters, toggleDialog, category }) {
       <DialogContent className="no-scroll">
         <Grid
           container
-          justify="space-evenly"
+          justifyContent="space-evenly"
           alignItems="flex-start"
         >
           {!isMobile && (
@@ -234,7 +234,7 @@ export default function Menu({ filters, toggleDialog, category }) {
               sm={3}
               spacing={1}
               direction="column"
-              justify="flex-start"
+              justifyContent="flex-start"
               alignItems="flex-start"
             >
               {allFilterMenus}

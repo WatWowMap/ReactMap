@@ -90,7 +90,7 @@ export default function MenuTile({
     <Grid
       style={{ ...style, backgroundColor, textAlign: 'center' }}
       container
-      justify="center"
+      justifyContent="center"
       alignItems="center"
       spacing={isMobile ? 2 : 0}
     >
