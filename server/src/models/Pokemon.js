@@ -21,6 +21,52 @@ const ohbem = reactMapHandlesPvp ? new Ohbem({
   cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
 }) : null
 
+const dbType = dbSelection('pokemon')
+const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
+const ivCalc = 'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
+const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', ...leagues.map(league => league.name)]
+const madKeys = {
+  iv: raw(ivCalc),
+  level: raw(levelCalc),
+  atk_iv: 'individual_attack',
+  def_iv: 'individual_defense',
+  sta_iv: 'individual_stamina',
+}
+
+const getMadSql = q => (
+  q.join('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
+    .select([
+      ref('encounter_id')
+        .castTo('CHAR')
+        .as('id'),
+      'pokemon_id',
+      'pokemon.latitude AS lat',
+      'pokemon.longitude AS lon',
+      'individual_attack AS atk_iv',
+      'individual_defense AS def_iv',
+      'individual_stamina AS sta_iv',
+      'move_1',
+      'move_2',
+      'cp',
+      'weight',
+      'height AS size',
+      'gender',
+      'form',
+      'costume',
+      'weather_boosted_condition AS weather',
+      raw('IF(calc_endminsec, 1, NULL)')
+        .as('expire_timestamp_verified'),
+      raw('Unix_timestamp(disappear_time)')
+        .as('expire_timestamp'),
+      raw('Unix_timestamp(last_modified)')
+        .as('updated'),
+      raw(ivCalc)
+        .as('iv'),
+      raw(levelCalc)
+        .as('level'),
+    ])
+)
+
 class Pokemon extends Model {
   static get tableName() {
     return 'pokemon'
@@ -39,17 +85,6 @@ class Pokemon extends Model {
     const {
       onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv,
     } = args.filters
-    const dbType = dbSelection('pokemon')
-    const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
-    const ivCalc = 'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
-    const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', ...leagues.map(league => league.name)]
-    const madKeys = {
-      iv: raw(ivCalc),
-      level: raw(levelCalc),
-      atk_iv: 'individual_attack',
-      def_iv: 'individual_defense',
-      sta_iv: 'individual_stamina',
-    }
     let queryPvp = false
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
@@ -57,40 +92,6 @@ class Pokemon extends Model {
       const noPokemonSelect = Object.keys(args.filters).find(x => x.charAt(0) !== 'o')
       if (!noPokemonSelect) return []
     }
-
-    const getMadSql = q => (
-      q.join('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
-        .select([
-          ref('encounter_id')
-            .castTo('CHAR')
-            .as('id'),
-          'pokemon_id',
-          'pokemon.latitude AS lat',
-          'pokemon.longitude AS lon',
-          'individual_attack AS atk_iv',
-          'individual_defense AS def_iv',
-          'individual_stamina AS sta_iv',
-          'move_1',
-          'move_2',
-          'cp',
-          'weight',
-          'height AS size',
-          'gender',
-          'form',
-          'costume',
-          'weather_boosted_condition AS weather',
-          raw('IF(calc_endminsec, 1, NULL)')
-            .as('expire_timestamp_verified'),
-          raw('Unix_timestamp(disappear_time)')
-            .as('expire_timestamp'),
-          raw('Unix_timestamp(last_modified)')
-            .as('updated'),
-          raw(ivCalc)
-            .as('iv'),
-          raw(levelCalc)
-            .as('level'),
-        ])
-    )
 
     const pvpCheck = (pkmn, league, min, max) => {
       const rankCheck = pkmn.rank <= max && pkmn.rank >= min
@@ -337,13 +338,17 @@ class Pokemon extends Model {
     )
   }
 
-  static async getLegacy(args, perms) {
+  static async getLegacy(args, perms, isMad) {
     const ts = Math.floor((new Date()).getTime() / 1000)
-    const results = await this.query()
-      .where('expire_timestamp', '>=', ts)
-      .andWhereBetween('lat', [args.minLat, args.maxLat])
-      .andWhereBetween('lon', [args.minLon, args.maxLon])
-    return legacyFilter(results, args, perms)
+    const query = this.query()
+      .where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+      .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
+      .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
+    if (isMad) {
+      getMadSql(query)
+    }
+    const results = await query
+    return legacyFilter(results, args, perms, ohbem)
   }
 
   static async getAvailablePokemon(isMad) {

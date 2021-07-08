@@ -1311,9 +1311,9 @@
   integrity sha512-Lt+wj8NVPx0zUmUwumiVXapmaLUcAk3yPuHCFVXras9k5VT9TdhJqKqGVUQCD60OTMCl0qxJ57OiTL0Mic3Iag==
 
 "@types/node@>=13.7.0":
-  version "15.12.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-15.12.5.tgz#9a78318a45d75c9523d2396131bd3cca54b2d185"
-  integrity sha512-se3yX7UHv5Bscf8f1ERKvQOD6sTyycH3hdaoozvaLxgUiY5lIGEeH37AD0G0Qi9kPqihPn0HOfd2yaIEN9VwEg==
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.0.0.tgz#067a6c49dc7a5c2412a505628e26902ae967bf6f"
+  integrity sha512-TmCW5HoZ2o2/z2EYi109jLqIaPIi9y/lc2LmDCWzuCi35bcaQ+OtUh6nwBiFK7SOu25FAU5+YKdqFZUwtqGSdg==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"
@@ -5563,9 +5563,9 @@ obuf@^1.0.0, obuf@^1.1.2:
   integrity sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==
 
 ohbem@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/ohbem/-/ohbem-1.1.0.tgz#b5d44d75fffa8f14e9f131167931a46c1e7c2e8d"
-  integrity sha512-DOPmUgGcglgcPOlLcedjSnwvFi+jabnqPLjw7rMa1q21GNPWFO4E7Q4hFI6sZIZ8XKjRWNXo4n9e8sc4zVoFJQ==
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/ohbem/-/ohbem-1.2.1.tgz#258735445161b0aeceb7a31ac3ace05c8450a4d7"
+  integrity sha512-24Q7wEVa8+wKoc1humnPCkTekENM8/y1NbBbWiDHHwUptkJ4iAjvMUODkRyR2aLT141uv8hEXwlYM2/H36N21A==
   dependencies:
     pogo-protos "github:Furtif/pogo-protos"
   optionalDependencies:
@@ -5919,8 +5919,8 @@ pkg-dir@^4.1.0, pkg-dir@^4.2.0:
     find-up "^4.0.0"
 
 "pogo-protos@github:Furtif/pogo-protos":
-  version "2.54.3"
-  resolved "https://codeload.github.com/Furtif/pogo-protos/tar.gz/37081f6af2ce10094e3424e08a600b43ae516fe7"
+  version "2.54.5"
+  resolved "https://codeload.github.com/Furtif/pogo-protos/tar.gz/171e589604bf2891269d1ea79f79738b99b2355b"
   dependencies:
     protobufjs "^6.10.2"
 
