@@ -75,25 +75,16 @@ export default function ConfigSettings({
   setMasterfile(serverSettings.masterfile)
   setAvailable(serverSettings.available)
 
-  setStaticMenus(serverSettings.menus)
   setMenus(updateObjState(serverSettings.menus, 'menus'))
+  setStaticMenus(serverSettings.menus)
 
-  setStaticFilters(serverSettings.defaultFilters)
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
+  setStaticFilters(serverSettings.defaultFilters)
 
   setUserSettings(updateObjState(serverSettings.userSettings, 'userSettings'))
   setStaticUserSettings(serverSettings.clientMenus)
 
-  // temp settings migration
-  if (localState) {
-    if (localState.state && localState.state.settings.icons.name) {
-      setSettings(serverSettings.settings)
-    } else {
-      setSettings(updateObjState(serverSettings.settings, 'settings'))
-    }
-  } else {
-    setSettings(updateObjState(serverSettings.settings, 'settings'))
-  }
+  setSettings(updateObjState(serverSettings.settings, 'settings'))
   setStaticSettings(serverSettings.settings)
   const localIcons = localState ? localState.state : serverSettings
   setAvailableForms(new Set(serverSettings.config.icons[localIcons.settings.icons].pokemonList))
