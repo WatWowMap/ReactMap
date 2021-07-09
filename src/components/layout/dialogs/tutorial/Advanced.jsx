@@ -124,7 +124,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
           container
           direction="row"
           alignItems="center"
-          justify="center"
+          justifyContent="center"
           spacing={1}
         >
           <Grid item xs={12} style={{ textAlign: 'center' }}>

@@ -100,7 +100,7 @@ export default function AdvancedFilter({
       <DialogTitle style={{ color: 'white' }}>
         <Grid
           container
-          justify="space-between"
+          justifyContent="space-between"
           alignItems="center"
         >
           <Grid item xs={type === 'pokemon' ? 5 : 10}>
@@ -134,7 +134,7 @@ export default function AdvancedFilter({
           <Grid
             container
             direction="row"
-            justify="center"
+            justifyContent="center"
             alignItems="center"
           >
             {(userSettings[type].legacyFilter && ui[type].legacy)
@@ -176,7 +176,7 @@ export default function AdvancedFilter({
       <DialogActions>
         <Grid
           container
-          justify="center"
+          justifyContent="center"
           alignItems="center"
         >
           {type === 'pokemon' && (

@@ -37,7 +37,7 @@ export default function FloatingButtons({
   })
 
   const fabSize = isMobile ? 'small' : 'large'
-  const iconSize = isMobile ? 'small' : 'default'
+  const iconSize = isMobile ? 'small' : 'medium'
 
   const ref = useRef(null)
   useEffect(() => Leaflet.DomEvent.disableClickPropagation(ref.current))
@@ -46,7 +46,7 @@ export default function FloatingButtons({
     <Grid
       container
       direction="column"
-      justify="flex-start"
+      justifyContent="flex-start"
       alignItems="flex-start"
       className={classes.floatingBtn}
       ref={ref}

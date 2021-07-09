@@ -36,7 +36,7 @@ export default function PokemonPopup({
       container
       style={{ minWidth: 200 }}
       alignItems="center"
-      justify="center"
+      justifyContent="center"
       spacing={1}
     >
       <Header
@@ -226,7 +226,7 @@ const Stats = ({ pokemon, perms, t }) => {
       xs={(perms.iv || perms.stats) ? 8 : 1}
       container
       direction="column"
-      justify="space-around"
+      justifyContent="space-around"
       alignItems="center"
     >
       {(perms.iv && iv !== null) && (
@@ -263,7 +263,7 @@ const Info = ({ pokemon, metaData, perms }) => {
       xs={(perms.iv || perms.stats) ? 3 : 11}
       container
       direction={(perms.iv || perms.stats) ? 'column' : 'row'}
-      justify="space-around"
+      justifyContent="space-around"
       alignItems="center"
     >
       {(weather != 0 && perms.iv) && (
@@ -399,7 +399,7 @@ const ExtraInfo = ({ pokemon, perms, t }) => {
     <Grid
       container
       alignItems="center"
-      justify="center"
+      justifyContent="center"
     >
       {(perms.iv && iv !== null) && [move_1, move_2].map((move, i) => (
         <Fragment key={move}>

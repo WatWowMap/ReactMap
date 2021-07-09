@@ -1,17 +1,17 @@
-const path = require('path');
-const chalk = require('chalk');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const ESLintPlugin = require('eslint-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const emoji = require('node-emoji');
-const ProgressBarPlugin = require('progress-bar-webpack-plugin');
-const resolve = require('./webpack.config.resolve.js');
+const path = require('path')
+const chalk = require('chalk')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const ESLintPlugin = require('eslint-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const emoji = require('node-emoji')
+const ProgressBarPlugin = require('progress-bar-webpack-plugin')
+const resolve = require('./webpack.config.resolve')
 
 module.exports = (env) => {
-  const isDevelopment = env.dev;
+  const isDevelopment = env.dev
   return {
     mode: isDevelopment ? 'development' : 'production',
     entry: './src/index.jsx',
@@ -21,30 +21,6 @@ module.exports = (env) => {
       publicPath: '/',
     },
     devtool: false,
-    devServer: {
-      contentBase: path.join(__dirname, 'dist'),
-      compress: true,
-      port: 3000,
-      historyApiFallback: true,
-      open: true,
-      stats: {
-        colors: true,
-        hash: false,
-        version: false,
-        timings: false,
-        assets: false,
-        chunks: false,
-        modules: false,
-        reasons: true,
-        children: false,
-        source: false,
-        errors: true,
-        errorDetails: true,
-        warnings: true,
-        publicPath: false,
-        verbose: true,
-      },
-    },
     performance: {
       hints: false,
       maxEntrypointSize: 512000,
@@ -127,14 +103,14 @@ module.exports = (env) => {
           )} (${chalk.blue.bold(':elapsed seconds')})`,
           clear: false,
         }),
-      ];
+      ]
       if (isDevelopment) {
         plugins.push(new ESLintPlugin({
           context: 'src',
           extensions: ['js', 'jsx'],
         }))
       }
-      return plugins;
+      return plugins
     })(),
     optimization: {
       runtimeChunk: 'single',
@@ -161,5 +137,5 @@ module.exports = (env) => {
         }),
       ],
     },
-  };
-};
+  }
+}

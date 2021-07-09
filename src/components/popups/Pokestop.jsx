@@ -28,7 +28,7 @@ export default function PokestopPopup({
       container
       style={{ minWidth: 250, maxWidth: 300 }}
       direction="row"
-      justify="space-evenly"
+      justifyContent="space-evenly"
       alignItems="center"
       spacing={1}
     >
@@ -46,7 +46,7 @@ export default function PokestopPopup({
           <Grid
             container
             alignItems="center"
-            justify="space-evenly"
+            justifyContent="space-evenly"
             spacing={1}
           >
             <PoiImage
@@ -65,7 +65,7 @@ export default function PokestopPopup({
                   xs={6}
                   container
                   direction="row"
-                  justify="center"
+                  justifyContent="center"
                   alignItems="center"
                 >
                   <QuestConditions
@@ -304,7 +304,7 @@ const PoiImage = ({
       container
       item
       xs={(hasQuest || hasInvasion || hasLure) ? 5 : 11}
-      justify="center"
+      justifyContent="center"
       alignItems="center"
     >
       <Grid item xs={12} style={{ textAlign: 'center' }}>
@@ -588,7 +588,7 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
     <Grid
       container
       alignItems="center"
-      justify="center"
+      justifyContent="center"
     >
       {extraMetaData.map(meta => (
         <Fragment key={meta.description}>

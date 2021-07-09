@@ -129,7 +129,7 @@ export default function WithSliders({
                   xs={12}
                   direction="row"
                   alignItems="center"
-                  justify="center"
+                  justifyContent="center"
                 >
                   {['xsRat', 'xlKarp'].map((each, i) => (
                     <Fragment key={each}>
@@ -172,7 +172,7 @@ export default function WithSliders({
                   xs={12}
                   direction="row"
                   alignItems="center"
-                  justify="center"
+                  justifyContent="center"
                 >
                   <Grid item xs={12}>
                     <Typography variant="h6">{t('shortcuts')}</Typography>

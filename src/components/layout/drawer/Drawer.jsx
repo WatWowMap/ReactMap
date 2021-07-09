@@ -78,7 +78,7 @@ export default function Sidebar({
             style={{ width: 300 }}
             spacing={3}
             direction="row"
-            justify="center"
+            justifyContent="center"
             alignItems="center"
           >
             {content}
@@ -133,7 +133,7 @@ export default function Sidebar({
       <Grid
         container
         alignItems="center"
-        justify="center"
+        justifyContent="center"
       >
         <Grid
           item

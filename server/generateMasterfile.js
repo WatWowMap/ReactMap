@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 const Fetch = require('node-fetch')
-const Fs = require('fs-extra')
+const fs = require('fs')
 const defaultRarity = require('./src/data/defaultRarity.json')
 const weatherTypes = require('./src/data/weatherTypes.json')
 const { rarity: adminRarity } = require('./src/services/config')
@@ -129,10 +129,12 @@ function fetchJson(url) {
         }
       }
     }
-    Fs.writeJSONSync('./server/src/data/masterfile.json', newMasterfile, {
-      spaces: '\t',
-      EOL: '\n',
-    })
+    fs.writeFile(
+      './server/src/data/masterfile.json',
+      JSON.stringify(newMasterfile, null, 2),
+      'utf8',
+      () => { },
+    )
   } catch (e) {
     console.warn(e, '\nUnable to generate new masterfile, using existing.')
   }

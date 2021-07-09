@@ -34,7 +34,7 @@ export default function UserProfile({ setUserProfile }) {
           container
           direction="row"
           alignItems="center"
-          justify="center"
+          justifyContent="center"
           spacing={2}
         >
           {Object.keys(perms).map(perm => {
