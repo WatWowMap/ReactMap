@@ -331,5 +331,6 @@
   "portalsSearch": "Enter Portal Name...",
   "nestsSearch": "Enter Nest Pokemon Name...",
   "raidsSearch": "Enter Raid Boss Name...",
-  "raidLevelBadges": "Raid Level Badges"
+  "raidLevelBadges": "Raid Level Badges",
+  "pokemonTimers": "All Pokemon Timers"
 }
