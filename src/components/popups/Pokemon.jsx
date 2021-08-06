@@ -427,12 +427,12 @@ const ExtraInfo = ({ pokemon, perms, t }) => {
       ))}
       {[first_seen_timestamp, updated].map((time, i) => (
         <Fragment key={time}>
-          <Grid item xs={7} style={{ textAlign: 'center' }}>
+          <Grid item xs={5} style={{ textAlign: 'center' }}>
             <Typography variant="caption" align="center">
               {i ? t('lastSeen') : t('firstSeen')}:
             </Typography>
           </Grid>
-          <Grid item xs={4} style={{ textAlign: 'right' }}>
+          <Grid item xs={6} style={{ textAlign: 'right' }}>
             <Typography variant="caption" align="center">
               {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
             </Typography>
