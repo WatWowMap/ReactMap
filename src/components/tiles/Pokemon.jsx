@@ -86,7 +86,7 @@ const PokemonTile = ({
               userSettings={userSettings}
             />
           </Popup>
-          {showTimer && (
+          {(showTimer || userSettings.pokemonTimers) && (
             <Timer
               timestamp={item.expire_timestamp}
               direction="center"
@@ -113,6 +113,7 @@ const areEqual = (prev, next) => (
   && prev.filters.filter[`${prev.item.pokemon_id}-${prev.item.form}`].size === next.filters.filter[`${next.item.pokemon_id}-${next.item.form}`].size
   && !next.excludeList.includes(`${prev.item.pokemon_id}-${prev.item.form}`)
   && prev.path === next.path
+  && prev.userSettings.pokemonTimers === next.userSettings.pokemonTimers
   && prev.userSettings.legacyFilter === next.userSettings.legacyFilter
   && prev.userSettings.ivCircles === next.userSettings.ivCircles
   && prev.userSettings.minIvCircle === next.userSettings.minIvCircle
