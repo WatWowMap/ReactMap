@@ -345,5 +345,7 @@
   "filterFooterOpenFilterWidth": 1,
   "filterFooterAdvMenuWidth": 3,
   "drawerSettingsTutorialWidth": 5,
-  "drawerSettingsResetFiltersDiscordWidth": 7
+  "drawerSettingsResetFiltersDiscordWidth": 7,
+  "popupPortalDescriptionWidth": 8,
+  "popupPortalDataWidth": 4
 }
