@@ -19,16 +19,17 @@ export default function SpawnpointPopup({ spawnpoint, ts }) {
       <Typography variant="h6" align="center">
         {despawn ? `00:${minuteFixed}` : '?'}
       </Typography>
-      <Typography variant="subtitle1">
-        {t('lastUpdated')}:
+      <Typography variant="subtitle1" align="center">
+        {t('lastUpdated')}
       </Typography>
-      <Typography variant="subtitle1">
+      <Typography variant="subtitle2" align="center">
         {Utility.dayCheck(ts, updated)}
       </Typography>
-      <Typography variant="caption">
-        {t('location')}:<br />
-        {lat},<br />
-        {lon}
+      <Typography variant="subtitle1" align="center">
+        {t('location')}
+      </Typography>
+      <Typography variant="subtitle2" align="center">
+        {lat},<br />{lon}
       </Typography>
     </>
   )
