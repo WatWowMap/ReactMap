@@ -25,6 +25,7 @@ export default function SpawnpointPopup({ spawnpoint, ts }) {
       <Typography variant="subtitle2" align="center">
         {Utility.dayCheck(ts, updated)}
       </Typography>
+      <br />
       <Typography variant="subtitle1" align="center">
         {t('location')}
       </Typography>
