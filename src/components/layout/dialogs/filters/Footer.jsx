@@ -19,6 +19,8 @@ export default function Footer({
     setHelpDialog(!helpDialog)
   }
 
+  const capitalizeFirstChar = str => str.charAt(0).toUpperCase() + str.substring(1);
+
   const help = {
     key: 'help',
     icon: (
@@ -152,7 +154,7 @@ export default function Footer({
         alignItems="center"
       >
         {[help, openFilter, advMenu, disableAll, enableAll, save].map(button => (
-          <Grid item xs={isMobile ? '2' : t(`dialogFilterFooter${button.key}Width`, '2')} key={button.key}>
+          <Grid item xs={isMobile ? '2' : t(`dialogFilterFooter${capitalizeFirstChar(button.key)}Width`, '2')} key={button.key}>
             {isMobile ? button.icon : button.text}
           </Grid>
         ))}
