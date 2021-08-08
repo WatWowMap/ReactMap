@@ -70,7 +70,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
               />
             )
           })}
-          <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <Grid item xs={t('drawerGridOptionsWidth', '6')} style={{ textAlign: 'center' }}>
             <Button
               onClick={toggleDialog(true, 'pokestops', 'options')}
               variant="contained"
@@ -80,7 +80,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
               {t('options')}
             </Button>
           </Grid>
-          <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <Grid item xs={t('drawerGridAdvancedWidth', '6')} style={{ textAlign: 'center' }}>
             <Button
               onClick={toggleDialog(true, 'pokestops', 'filters')}
               variant="contained"
