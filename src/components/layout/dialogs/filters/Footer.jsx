@@ -92,7 +92,7 @@ export default function Footer({
   }
 
   const enableAll = {
-    key: 'enabledAll',
+    key: 'enableAll',
     icon: (
       <IconButton
         onClick={() => selectAllOrNone(true)}
