@@ -154,7 +154,7 @@ export default function Footer({
         alignItems="center"
       >
         {[help, openFilter, advMenu, disableAll, enableAll, save].map(button => (
-          <Grid item xs={isMobile ? '2' : t(`dialogFilterFooter${capitalizeFirstChar(button.key)}Width`, '2')} key={button.key}>
+          <Grid item xs={isMobile ? '2' : t(`dialogFilterFooter${capitalizeFirstChar(button.key)}Width`)} key={button.key}>
             {isMobile ? button.icon : button.text}
           </Grid>
         ))}

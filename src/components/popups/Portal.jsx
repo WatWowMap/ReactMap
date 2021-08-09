@@ -69,12 +69,12 @@ export default function PortalPopup({ portal, ts }) {
       </Grid>
       {extraMetaData.map(meta => (
         <Fragment key={meta.description}>
-          <Grid item xs={t('popupPortalDescriptionWidth', '6')} style={{ textAlign: 'left' }}>
+          <Grid item xs={t('popupPortalDescriptionWidth')} style={{ textAlign: 'left' }}>
             <Typography variant="caption" align="center">
               {meta.description}
             </Typography>
           </Grid>
-          <Grid item xs={t('popupPortalDataWidth', '6')} style={{ textAlign: 'right' }}>
+          <Grid item xs={t('popupPortalDataWidth')} style={{ textAlign: 'right' }}>
             <Typography variant="caption" align="center">
               {meta.data}
             </Typography>
