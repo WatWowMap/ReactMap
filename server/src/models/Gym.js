@@ -26,8 +26,8 @@ class Gym extends Model {
     const query = this.query()
 
     if (isMad) {
-      query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
-        .join('raid', 'gym.gym_id', 'raid.gym_id')
+      query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+        .leftJoin('raid', 'gym.gym_id', 'raid.gym_id')
         .select([
           'gym.gym_id AS id',
           'name',
@@ -239,7 +239,7 @@ class Gym extends Model {
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (isMad) {
-      query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+      query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
     if (perms.areaRestrictions.length > 0) {
       getAreaSql(query, perms.areaRestrictions, isMad)
@@ -273,8 +273,8 @@ class Gym extends Model {
       .andWhere(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : ts)
       .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
     if (isMad) {
-      query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
-        .join('raid', 'gym.gym_id', 'raid.gym_id')
+      query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+        .leftJoin('raid', 'gym.gym_id', 'raid.gym_id')
     }
     if (perms.areaRestrictions.length > 0) {
       getAreaSql(query, perms.areaRestrictions, isMad)

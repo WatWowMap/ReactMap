@@ -34,7 +34,7 @@ const madKeys = {
 }
 
 const getMadSql = q => (
-  q.join('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
+  q.leftJoin('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
     .select([
       ref('encounter_id')
         .castTo('CHAR')
