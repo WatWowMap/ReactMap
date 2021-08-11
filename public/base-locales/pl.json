@@ -345,7 +345,6 @@
   "popupGymDescriptionWidth": 6,
   "popupPokemonSeenDataWidth": 4,
   "popupPokemonSeenDescriptionWidth": 7,
-  "popupPokestopSeenDescriptionWidth": 7,
-  "popupPortalDataWidth": 4,
-  "popupPortalDescriptionWidth": 8
+  "popupPokestopSeenDataWidth": 5,
+  "popupPokestopSeenDescriptionWidth": 7
 }

@@ -67,20 +67,14 @@ export default function PortalPopup({ portal, ts }) {
           />
         </a>
       </Grid>
-      {extraMetaData.map(meta => (
-        <Fragment key={meta.description}>
-          <Grid item xs={t('popupPortalDescriptionWidth')} style={{ textAlign: 'left' }}>
-            <Typography variant="caption" align="center">
-              {meta.description}
-            </Typography>
-          </Grid>
-          <Grid item xs={t('popupPortalDataWidth')} style={{ textAlign: 'right' }}>
-            <Typography variant="caption" align="center">
-              {meta.data}
-            </Typography>
-          </Grid>
-        </Fragment>
-      ))}
+      <Grid item xs={12} style={{ textAlign: 'center' }}>
+        {extraMetaData.map(meta => (
+          <Fragment key={meta.description}>
+            <Typography variant="subtitle1" style={{ textAlign: 'center' }}>{meta.description}</Typography>
+            <Typography variant="caption" style={{ textAlign: 'center' }}>{meta.data}</Typography>
+          </Fragment>
+        ))}
+      </Grid>
       <Grid item xs={4} style={{ textAlign: 'center' }}>
         <IconButton
           href={url.replace('{x}', lat).replace('{y}', lon)}
