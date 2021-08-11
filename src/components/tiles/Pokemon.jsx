@@ -87,7 +87,7 @@ const PokemonTile = ({
               userSettings={userSettings}
             />
           </Popup>
-          {showTimer && (
+          {(showTimer || userSettings.pokemonTimers) && (
             <Timer
               timestamp={item.expire_timestamp}
               direction="center"
