@@ -74,7 +74,7 @@ const PokemonTile = ({
               setDone(true)
             }
           }}
-          zIndexOffset={item.iv * 100}  ** Fix so that hundos will be always on top **
+          zIndexOffset={item.iv * 100}
           position={[item.lat, item.lon]}
           icon={(pvpCheck || glowStatus || ivCircle)
             ? fancyMarker(iconUrl, item, filters, iconSizes, glowStatus, ivCircle)
