@@ -37,8 +37,8 @@ export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons) => {
             style={{
               width: size / 2,
               height: 'auto',
-              bottom: (-size / 4) * pokemonMod.offsetY,
-              left: `${pokemonMod.offsetX * size * 5}%`,
+              bottom: (-size / 5) * pokemonMod.offsetY,
+              left: `${pokemonMod.offsetX * size * 4}%`,
             }}
           />
         )}
