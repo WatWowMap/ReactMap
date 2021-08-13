@@ -78,15 +78,23 @@ export default class UIcons {
     }
   }
 
+  checkValid(localIconObj) {
+    return Object.values(localIconObj).every(icon => this[icon])
+  }
+
   setSelection(categories, value) {
     if (typeof categories === 'object') {
       Object.keys(categories).forEach(category => {
         this.selected[category] = categories[category]
-        this.modifiers[category] = this[categories[category]].modifiers[category]
+        this.modifiers[category] = this[categories[category]]
+          ? this[categories[category]].modifiers[category]
+          : this.modifiers.base
       })
     } else {
       this.selected[categories] = value
-      this.modifiers[categories] = this[value].modifiers[categories]
+      this.modifiers[categories] = this[value]
+        ? this[value].modifiers[categories]
+        : this.modifiers.base
     }
   }
 

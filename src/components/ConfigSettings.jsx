@@ -87,10 +87,13 @@ export default function ConfigSettings({
   setSettings(updateObjState(serverSettings.settings, 'settings'))
   setStaticSettings(serverSettings.settings)
 
-  setIcons(updateObjState(serverSettings.Icons.selected, 'icons'))
-  if (localState && localState.state && localState.state.icons) {
+  const newIcons = updateObjState(serverSettings.Icons.selected, 'icons')
+  const isValidIcon = serverSettings.Icons.checkValid(newIcons)
+
+  if (localState && localState.state && localState.state.icons && isValidIcon) {
     serverSettings.Icons.setSelection(localState.state.icons)
   }
+  setIcons(isValidIcon ? newIcons : serverSettings.Icons.selected)
   setStaticIcons(serverSettings.Icons)
 
   setConfig(serverSettings.config)
