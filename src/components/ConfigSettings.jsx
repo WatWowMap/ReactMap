@@ -91,7 +91,6 @@ export default function ConfigSettings({
   if (localState && localState.state && localState.state.icons) {
     serverSettings.Icons.setSelection(localState.state.icons)
   }
-  console.log(serverSettings.Icons)
   setStaticIcons(serverSettings.Icons)
 
   setConfig(serverSettings.config)

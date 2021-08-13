@@ -2,7 +2,6 @@ const getPolyVector = require('./functions/getPolyVector')
 const getPlacementCells = require('./functions/getPlacementCells')
 const getTypeCells = require('./functions/getTypeCells')
 const buildDefaultFilters = require('./defaultFilters/buildDefaultFilters')
-const updateAvailableForms = require('./functions/updateAvailableForms')
 const primaryUi = require('./ui/primary')
 const advMenus = require('./ui/advMenus')
 const clientOptions = require('./ui/clientOptions')
@@ -23,10 +22,6 @@ class Utility {
 
   static getTypeCells(bounds, pokestops, gyms) {
     return getTypeCells(bounds, pokestops, gyms)
-  }
-
-  static async updateAvailableForms(icons) {
-    return updateAvailableForms(icons)
   }
 
   static buildDefaultFilters(perms) {
