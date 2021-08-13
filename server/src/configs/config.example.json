@@ -30,32 +30,9 @@
     "pokemon": {
       "clustering": true,
       "glow": [
-        {
-          "name": "Hundo",
-          "perm": "iv",
-          "num": 100,
-          "value": "#ff1744",
-          "op": "="
-        },
-        {
-          "name": "Nundo",
-          "perm": "iv",
-          "num": 0,
-          "value": "#000000",
-          "op": "="
-        },
-        {
-          "name": "Top Ranks",
-          "perm": "pvp",
-          "num": 3,
-          "value": "#0000ff",
-          "op": "<="
-        },
-        {
-          "name": "Multiple",
-          "perm": "pvp",
-          "value": "#800080"
-        }
+        { "name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
+        { "name": "Top 3 Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
+        { "name": "Multiple", "perm": "pvp", "value": "#800080" }
       ]
     }
   },
@@ -64,20 +41,11 @@
       "userTableName": "users",
       "sessionTableName": "session",
       "leagues": [
-        {
-          "name": "great",
-          "cp": 1500
-        },
-        {
-          "name": "ultra",
-          "cp": 2500
-        }
+        { "name": "great", "cp": 1500 },
+        { "name": "ultra", "cp": 2500 }
       ],
       "reactMapHandlesPvp": false,
-      "pvpLevels": [
-        50,
-        51
-      ]
+      "pvpLevels": [50, 51]
     },
     "schemas": {
       "scanner": {
@@ -89,15 +57,7 @@
         "database": "rdmdb",
         "charset": "utf8mb4",
         "arScanColumn": false,
-        "useFor": [
-          "device",
-          "gym",
-          "pokemon",
-          "pokestop",
-          "s2cell",
-          "spawnpoint",
-          "weather"
-        ]
+        "useFor": ["device", "gym", "pokemon", "pokestop", "s2cell", "spawnpoint", "weather"]
       },
       "manual": {
         "type": "manual",
@@ -108,12 +68,7 @@
         "database": "manual_1",
         "charset": "utf8mb4",
         "arScanColumn": false,
-        "useFor": [
-          "session",
-          "user",
-          "nest",
-          "portal"
-        ]
+        "useFor": ["session", "user", "nest", "portal"]
       }
     }
   },

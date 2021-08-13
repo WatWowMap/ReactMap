@@ -86,9 +86,6 @@ rootRouter.get('/settings', async (req, res) => {
       }
 
       // add config options to this array that are structured as arrays
-      // config.icons.styles.forEach(icon => {
-      //   serverSettings.config.icons[icon.name] = icon
-      // })
       const arrayUserOptions = [
         { name: 'localeSelection', values: config.localeSelection },
       ]
@@ -97,20 +94,6 @@ rootRouter.get('/settings', async (req, res) => {
         serverSettings.config[userMenu.name] = {}
         userMenu.values.forEach(value => serverSettings.config[userMenu.name][value] = {})
       })
-
-      // Fetch & Configure UICONS Settings
-      // await Utility.updateAvailableForms(serverSettings.config.icons)
-      // config.icons.customizable.forEach(option => {
-      //   Object.values(serverSettings.config.icons).forEach(icon => {
-      //     serverSettings.settings.icon[]
-      //     if (icon[option]) {
-      //       if (!serverSettings.config[option]) {
-      //         serverSettings.config[option] = {}
-      //       }
-      //       serverSettings.config[option][icon.name] = { name: icon.name }
-      //     }
-      //   })
-      // })
 
       // keys that are being sent to the frontend but are not options
       const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons']
