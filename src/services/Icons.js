@@ -20,7 +20,21 @@ export default class UIcons {
 
   async fetchIcons(icons) {
     if (!icons.some(icon => icon.path === this.baseUrl)) {
-      icons.push({ name: 'Base', path: this.baseUrl })
+      icons.push({
+        name: 'Base',
+        path: this.baseUrl,
+        modifiers: {
+          gym: {
+            0: 1,
+            1: 1,
+            2: 1,
+            3: 3,
+            4: 4,
+            5: 4,
+            6: 18,
+          },
+        },
+      })
     }
     for (const icon of icons) {
       const data = await Fetch.getIcons(icon.path)

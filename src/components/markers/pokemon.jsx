@@ -21,40 +21,38 @@ export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons) => {
   }
 
   const ReactIcon = (
-    <>
-      <div className="marker-image-holder top-overlay">
+    <div className="marker-image-holder top-overlay">
+      <img
+        src={iconUrl}
+        style={{
+          WebkitFilter: glow ? `drop-shadow(0 0 10px ${glow})drop-shadow(0 0 10px ${glow})` : undefined,
+          height: size,
+          width: size,
+        }}
+      />
+      {badge && (
         <img
-          src={iconUrl}
+          src={Icons.getMisc(badge)}
           style={{
-            WebkitFilter: glow ? `drop-shadow(0 0 10px ${glow})drop-shadow(0 0 10px ${glow})` : undefined,
-            height: size,
-            width: size,
+            width: size / 2,
+            height: 'auto',
+            bottom: (-size / 5) * pokemonMod.offsetY,
+            left: `${pokemonMod.offsetX * size * 4}%`,
           }}
         />
-        {badge && (
-          <img
-            src={Icons.getMisc(badge)}
-            style={{
-              width: size / 2,
-              height: 'auto',
-              bottom: (-size / 5) * pokemonMod.offsetY,
-              left: `${pokemonMod.offsetX * size * 4}%`,
-            }}
-          />
-        )}
-        {(ivCircle && !badge) && (
-          <div
-            className="iv-badge"
-            style={{
-              bottom: (-size / 5) * pokemonMod.offsetY,
-              left: `${pokemonMod.offsetX * size * 5}%`,
-            }}
-          >
-            {Math.round(pkmn.iv)}
-          </div>
-        )}
-      </div>
-    </>
+      )}
+      {(ivCircle && !badge) && (
+        <div
+          className="iv-badge"
+          style={{
+            bottom: (-size / 5) * pokemonMod.offsetY,
+            left: `${pokemonMod.offsetX * size * 5}%`,
+          }}
+        >
+          {Math.round(pkmn.iv)}
+        </div>
+      )}
+    </div>
   )
 
   return L.divIcon({
