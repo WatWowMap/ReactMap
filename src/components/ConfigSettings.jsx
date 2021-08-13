@@ -23,6 +23,7 @@ export default function ConfigSettings({
       />
     )
   }
+
   document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
@@ -32,14 +33,14 @@ export default function ConfigSettings({
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
   const setMenus = useStore(state => state.setMenus)
-
+  const setIcons = useStore(state => state.setIcons)
   const setAuth = useStatic(state => state.setAuth)
   const setStaticUserSettings = useStatic(state => state.setUserSettings)
   const setStaticSettings = useStatic(state => state.setSettings)
   const setStaticMenus = useStatic(state => state.setMenus)
   const setAvailable = useStatic(state => state.setAvailable)
   const setConfig = useStatic(state => state.setConfig)
-  const setAvailableForms = useStatic(state => state.setAvailableForms)
+  const setStaticIcons = useStatic(state => state.setIcons)
   const setMasterfile = useStatic(state => state.setMasterfile)
   const setUi = useStatic(state => state.setUi)
   const setStaticFilters = useStatic(state => state.setFilters)
@@ -71,7 +72,6 @@ export default function ConfigSettings({
     perms: serverSettings.user.perms,
   })
   setUi(serverSettings.ui)
-  setConfig(serverSettings.config)
   setMasterfile(serverSettings.masterfile)
   setAvailable(serverSettings.available)
 
@@ -86,8 +86,15 @@ export default function ConfigSettings({
 
   setSettings(updateObjState(serverSettings.settings, 'settings'))
   setStaticSettings(serverSettings.settings)
-  const localIcons = localState ? localState.state : serverSettings
-  setAvailableForms(new Set(serverSettings.config.icons[localIcons.settings.icons].pokemonList))
+
+  setIcons(updateObjState(serverSettings.Icons.selected, 'icons'))
+  if (localState && localState.state && localState.state.icons) {
+    serverSettings.Icons.setSelection(localState.state.icons)
+  }
+  console.log(serverSettings.Icons)
+  setStaticIcons(serverSettings.Icons)
+
+  setConfig(serverSettings.config)
 
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
   const getStartLocation = () => {
@@ -120,7 +127,7 @@ export default function ConfigSettings({
         zoomControl={false}
         preferCanvas
       >
-        {serverSettings.user.perms.map && (
+        {(serverSettings.user.perms.map) && (
           <Map
             serverSettings={serverSettings}
             params={match.params}

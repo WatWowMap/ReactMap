@@ -1,13 +1,10 @@
 /* eslint-disable no-restricted-syntax */
-import { useStore, useStatic } from '@hooks/useStore'
+import { useStatic } from '@hooks/useStore'
 import { useTranslation } from 'react-i18next'
-import getPokemonIcon from './getPokemonIcon'
 
 export default function menuFilter(tempFilters, menus, search, type) {
   const masterfile = useStatic(state => state.masterfile)
-  const availableForms = useStatic(state => state.availableForms)
-  const { icons } = useStore(state => state.settings)
-  const { icons: { [icons]: { path } } } = useStatic(state => state.config)
+  const Icons = useStatic(state => state.Icons)
   const { [type]: available } = useStatic(state => state.available)
   const { pokestops: stopPerms, gyms: gymPerms } = useStatic(state => state.ui)
   const { [type]: { filter } } = useStatic(state => state.filters)
@@ -38,7 +35,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
       || (type === 'gyms' && gymPerms.raids)
       || type === 'nests') {
       show += 1
-      const url = `${path}/${getPokemonIcon(availableForms, ...id.split('-'))}.png`
+      const url = Icons.getPokemon(...id.split('-'))
       filteredArr.push({ id, name, url })
       filteredObj[id] = { ...tempFilters[id] }
     }
@@ -54,15 +51,15 @@ export default function menuFilter(tempFilters, menus, search, type) {
       show += 1
       let urlBuilder
       switch (id.charAt(0)) {
-        default: urlBuilder = `${path}/${getPokemonIcon(availableForms, ...id.split('-'))}`; break
-        case 'i': urlBuilder = `/images/invasion/i0_${id.slice(1)}`; break
-        case 'c': urlBuilder = `${path}/${getPokemonIcon(availableForms, id.slice(1))}`; break
-        case 'd': urlBuilder = '/images/item/-1'; break
-        case 'q': urlBuilder = `/images/item/${id.slice(1)}`; break
-        case 'l': urlBuilder = `/images/pokestop/${id == 0 ? id : id.slice(-1)}`; break
-        case 'm': urlBuilder = `${path}/${getPokemonIcon(availableForms, id.slice(1).split('-')[0], 0, (id.slice(1).split('-')[0] == 6 || id.slice(1).split('-')[0] == 150) ? 2 : 1)}`; break
+        case 'i': urlBuilder = Icons.getInvasions(id.slice(1)); break
+        case 'c': urlBuilder = Icons.getRewards(4, ...id.slice(1).split('-')); break
+        case 'd': urlBuilder = Icons.getRewards(3, id.slice(1)); break
+        case 'q': urlBuilder = Icons.getRewards(2, ...id.slice(1).split('-')); break
+        case 'l': urlBuilder = Icons.getPokestops(id.slice(1)); break
+        case 'm': urlBuilder = Icons.getPokemon(...id.slice(1).split('-'), 1); break
+        default: urlBuilder = Icons.getPokemon(...id.split('-')); break
       }
-      const url = `${urlBuilder}.png`
+      const url = urlBuilder
       filteredArr.push({ id, name: stop.name, url })
       filteredObj[id] = { ...tempFilters[id] }
     }
@@ -73,14 +70,13 @@ export default function menuFilter(tempFilters, menus, search, type) {
     const gymCheck = (id.startsWith('g') && gymPerms.gyms) || (id.startsWith('t') && gymPerms.gyms)
     if ((raidCheck || gymCheck) && gym.name) {
       show += 1
-      let urlBuilder
+      let url
       switch (id.charAt(0)) {
-        default: urlBuilder = `${path}/${getPokemonIcon(availableForms, ...id.split('-'))}`; break
-        case 'e': urlBuilder = `/images/egg/${id.slice(1)}`; break
+        default: url = Icons.getPokemon(...id.split('-')); break
+        case 'e': url = Icons.getEggs(id.slice(1)); break
         case 't':
-        case 'g': urlBuilder = `/images/gym/${id.slice(1).replace('-', '_')}`; break
+        case 'g': url = Icons.getGyms(...id.slice(1).split('-')); break
       }
-      const url = `${urlBuilder}.png`
       filteredArr.push({ id, name: gym.name, url })
       filteredObj[id] = { ...tempFilters[id] }
     }

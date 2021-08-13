@@ -13,7 +13,7 @@ import { useStore, useStatic } from '../../../hooks/useStore'
 import Areas from './Areas'
 
 export default function Sidebar({
-  drawer, toggleDrawer, filters, setFilters, toggleDialog,
+  drawer, toggleDrawer, filters, setFilters, toggleDialog, Icons,
 }) {
   const { drawer: drawerStyle } = useStore(state => state.settings)
   const sidebar = useStore(state => state.sidebar)
@@ -56,7 +56,7 @@ export default function Sidebar({
         ); break
       case 'settings':
         content = (
-          <SettingsMenu toggleDialog={toggleDialog} />
+          <SettingsMenu toggleDialog={toggleDialog} Icons={Icons} />
         )
     }
     return (

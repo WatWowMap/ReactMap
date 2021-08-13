@@ -9,7 +9,7 @@ import stopMarker from '../markers/pokestop'
 import Timer from './Timer'
 
 const PokestopTile = ({
-  item, ts, showTimer, filters, iconSizes, path, iconModifiers, availableForms, perms, excludeList, userSettings,
+  item, ts, showTimer, filters, Icons, perms, excludeList, userSettings,
   params, showCircles,
 }) => {
   const [done, setDone] = useState(false)
@@ -54,8 +54,7 @@ const PokestopTile = ({
               }
             }}
             position={[item.lat, item.lon]}
-            icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, iconSizes, path, iconModifiers,
-              availableForms)}
+            icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, Icons)}
           >
             <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
               <PopupContent
@@ -64,8 +63,7 @@ const PokestopTile = ({
                 hasLure={hasLure}
                 hasInvasion={hasInvasion}
                 hasQuest={hasQuest}
-                path={path}
-                availableForms={availableForms}
+                Icons={Icons}
                 userSettings={userSettings}
               />
             </Popup>
@@ -110,15 +108,14 @@ const areEqual = (prev, next) => (
   && prev.item.stardust_amount === next.item.stardust_amount
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
+  && Object.keys(prev.userIcons).every(key => prev.userIcons[key] === next.userIcons[key])
+  && Object.keys(prev.userSettings).every(key => prev.userSettings[key] === next.userSettings[key])
   && !next.excludeList.includes(`${prev.item.quest_pokemon_id}-${prev.item.quest_form_id}`)
   && !next.excludeList.includes(`i${prev.item.grunt_type}`)
   && !next.excludeList.includes(`m${prev.item.mega_pokemon_id}-${prev.item.mega_amount}`)
   && !next.excludeList.includes(`d${prev.item.stardust_amount}`)
   && !next.excludeList.includes(`q${prev.item.quest_item_id}`)
-  && prev.userSettings.invasionTimers === next.userSettings.invasionTimers
-  && prev.userSettings.lureTimers === next.userSettings.lureTimers
   && prev.showCircles === next.showCircles
-  && prev.userSettings.madQuestText === next.userSettings.madQuestText
 )
 
 export default memo(PokestopTile, areEqual)

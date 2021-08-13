@@ -4,7 +4,6 @@ import {
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
-import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
@@ -29,10 +28,7 @@ export default function WithSliders({
   const { t } = useTranslation()
   const [tempLegacy, setTempLegacy] = useState(filters[category][specificFilter])
   const [openTab, setOpenTab] = useState(0)
-
-  const availableForms = useStatic(state => state.availableForms)
-  const { icons } = useStatic(state => state.config)
-  const { icons: userIcons } = useStore(state => state.settings)
+  const Icons = useStatic(state => state.Icons)
 
   useEffect(() => {
     setFilters({
@@ -136,7 +132,7 @@ export default function WithSliders({
                       <Grid item xs={2}>
                         <img
                           style={{ maxHeight: 30, maxWidth: 30 }}
-                          src={`${icons[userIcons].path}/${Utility.getPokemonIcon(availableForms, i ? 129 : 19)}.png`}
+                          src={`${Icons.getPokemon(i ? 129 : 19).url}`}
                         />
                       </Grid>
                       <Grid item xs={1} className="xs-xl">

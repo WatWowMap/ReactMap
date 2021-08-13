@@ -15,7 +15,7 @@ import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
 export default function PokemonPopup({
-  pokemon, iconUrl, userSettings, isTutorial,
+  pokemon, iconUrl, userSettings, isTutorial, Icons,
 }) {
   const { t } = useTranslation()
   const {
@@ -64,6 +64,7 @@ export default function PokemonPopup({
         pokemon={pokemon}
         metaData={metaData}
         perms={perms}
+        Icons={Icons}
       />
       <Footer
         pokemon={pokemon}
@@ -80,6 +81,7 @@ export default function PokemonPopup({
             league={league}
             data={cleanPvp[league]}
             t={t}
+            Icons={Icons}
           />
         ))}
       </Collapse>
@@ -254,7 +256,9 @@ const Stats = ({ pokemon, perms, t }) => {
   )
 }
 
-const Info = ({ pokemon, metaData, perms }) => {
+const Info = ({
+  pokemon, metaData, perms, Icons,
+}) => {
   const { gender, weather } = pokemon
 
   return (
@@ -271,9 +275,9 @@ const Info = ({ pokemon, metaData, perms }) => {
           item
           className="grid-item"
           style={{
-            height: 32,
-            width: 32,
-            backgroundImage: `url(/images/weather/${weather}.png)`,
+            height: 24,
+            width: 24,
+            backgroundImage: `url(${Icons.getWeather(weather)})`,
           }}
         />
       )}
@@ -444,13 +448,9 @@ const ExtraInfo = ({ pokemon, perms, t }) => {
 }
 
 const PvpInfo = ({
-  league, data, t,
+  league, data, t, Icons,
 }) => {
   if (data === null) return ''
-
-  const { icons } = useStore(state => state.settings)
-  const { icons: { [icons]: { path } } } = useStatic(state => state.config)
-  const availableForms = useStatic(state => state.availableForms)
 
   const rows = []
 
@@ -458,7 +458,7 @@ const PvpInfo = ({
     if (each.rank !== null && each.cp !== null) {
       const tempRow = {
         id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.gender}-${each.rank}-${each.cp}-${each.lvl}-${each.cap}`,
-        img: <img src={`${path}/${Utility.getPokemonIcon(availableForms, each.pokemon, each.form, each.evolution, each.gender, each.costume)}.png`} height={20} />,
+        img: <img src={`${Icons.getPokemon(each.pokemon, each.form, each.evolution, each.gender, each.costume)}`} height={20} />,
         rank: each.rank || 0,
         cp: each.cp || 0,
         lvl: `${each.level || ''}${each.cap && !each.capped ? `/${each.cap}` : ''}`,

@@ -163,6 +163,7 @@ body {
 .marker-image-holder.top-overlay > img,
 .leaflet-container .leaflet-marker-pane .marker-image-holder.top-overlay > img {
     top: auto;
+    position: absolute;
 }
 
 .invasion-reward {
@@ -235,6 +236,12 @@ img {
   height: 16px; 
   min-width: 14px;
   padding: 4px 3px 0 3px;
+}
+
+.weather-icon {
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgb(41,102,122);
+  border-radius: 48px; 
 }
 
 .quest-popup-img {

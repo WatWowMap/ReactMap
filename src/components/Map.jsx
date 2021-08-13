@@ -16,12 +16,12 @@ const userSettingsCategory = category => {
   }
 }
 
-export default function Map({ serverSettings: { config: { map: config, tileServers, icons } }, params }) {
+export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons }, params }) {
   const map = useMap()
   const filters = useStore(state => state.filters)
-  const { tileServers: userTiles, icons: userIcons } = useStore(state => state.settings)
-  const availableForms = useStatic(state => state.availableForms)
+  const settings = useStore(state => state.settings)
   const staticUserSettings = useCallback(useStatic(state => state.userSettings))
+  const icons = useStore(state => state.icons)
   const ui = useCallback(useStatic(state => state.ui))
   const available = useCallback(useStatic(state => state.available))
   const staticFilters = useCallback(useStatic(state => state.filters))
@@ -50,15 +50,16 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   return (
     <>
       <TileLayer
-        key={tileServers[userTiles].name}
-        attribution={tileServers[userTiles].attribution}
-        url={tileServers[userTiles].url}
+        key={tileServers[settings.tileServers].name}
+        attribution={tileServers[settings.tileServers].attribution}
+        url={tileServers[settings.tileServers].url}
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
       />
       {Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
         const [category, value] = each
         let enabled = false
+
         switch (category) {
           default:
             if (filters[category]
@@ -99,14 +100,12 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               category={category}
               config={config}
               available={available[category]}
-              availableForms={availableForms}
-              path={icons[userIcons].path}
-              iconModifiers={icons[userIcons].iconModifiers ? icons[userIcons].iconModifiers[category]
-                : { offsetX: 0, offsetY: 0, sizeMultiplier: 0 }}
+              Icons={Icons}
               staticFilters={staticFilters[category].filter}
+              userIcons={icons}
               userSettings={userSettings[userSettingsCategory(category)] || {}}
               filters={filters[category]}
-              tileStyle={tileServers[userTiles].style}
+              tileStyle={tileServers[settings.tileServers].style}
               zoomLevel={config.clusterZoomLevels[category] || 1}
               staticUserSettings={staticUserSettings[category]}
               params={params}
@@ -115,7 +114,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         }
         return null
       })}
-      <Nav map={map} setManualParams={setManualParams} />
+      <Nav map={map} setManualParams={setManualParams} Icons={Icons} />
     </>
   )
 }

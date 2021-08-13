@@ -11,7 +11,11 @@ export default function WeatherTile({ item, ts }) {
       positions={item.polygon}
       pathOptions={{ color: '#246377', opacity: 0.25 }}
     >
-      <Marker icon={weatherMarker(item)} position={[item.latitude, item.longitude]}>
+      <Marker
+        icon={weatherMarker(item)}
+        position={[item.latitude, item.longitude]}
+        zIndexOffset={10000}
+      >
         <Popup position={[item.latitude, item.longitude]}>
           <PopupContent weather={item} ts={ts} />
         </Popup>

@@ -7,17 +7,15 @@ import { Clear } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
 
-import { useStore, useStatic } from '@hooks/useStore'
+import { useStore } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Query from '@services/Query'
-import Utility from '@services/Utility'
 
-export default function Search({ safeSearch, toggleDialog, isMobile }) {
+export default function Search({
+  safeSearch, toggleDialog, isMobile, Icons,
+}) {
   const { t } = useTranslation()
   const classes = useStyles()
-  const availableForms = useStatic(state => state.availableForms)
-  const { icons } = useStatic(state => state.config)
-  const { icons: userIcons } = useStore(state => state.settings)
   const location = useStore(state => state.location)
   const search = useStore(state => state.search)
   const setSearch = useStore(state => state.setSearch)
@@ -38,10 +36,6 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
     },
   })
 
-  const getPokemonUrl = (id, form, mega, gender, costume, shiny) => (
-    `${icons[userIcons].path}/${Utility.getPokemonIcon(availableForms, id, form, mega, gender, costume, shiny)}.png`
-  )
-
   const getUrl = (option) => {
     const {
       quest_reward_type, nest_pokemon_id, nest_pokemon_form, raid_pokemon_id,
@@ -51,38 +45,24 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
       const {
         quest_pokemon_id, quest_form_id, quest_gender_id, quest_costume_id, quest_shiny,
         quest_item_id, item_amount, stardust_amount,
-        mega_pokemon_id, mega_amount, candy_pokemon_id, candy_amount,
+        mega_pokemon_id, mega_amount, candy_pokemon_id,
       } = option
       let main
-      let secondary
-      let amount
       switch (quest_reward_type) {
-        default: main = '/images/item/-0.png'; break
-        case 1:
-          main = '/images/item/-2.png'
-          amount = item_amount > 1 ? item_amount : undefined; break
         case 2:
-          main = `/images/item/${quest_item_id}.png`
-          amount = item_amount > 1 ? item_amount : undefined; break
+          main = Icons.getRewards(quest_reward_type, quest_item_id, item_amount); break
         case 3:
-          main = '/images/item/-1.png'
-          amount = stardust_amount > 1 ? stardust_amount : undefined; break
+          main = Icons.getRewards(quest_reward_type, stardust_amount); break
         case 4:
-          main = getPokemonUrl(candy_pokemon_id)
-          secondary = '/images/item/-3.png'
-          amount = candy_amount > 1 ? candy_amount : undefined; break
-        case 5: main = '/images/item/-4.png'; break
-        case 6: main = '/images/item/-5.png'; break
+          main = Icons.getRewards(quest_reward_type, candy_pokemon_id); break
         case 7:
-          main = getPokemonUrl(
+          main = Icons.getPokemon(
             quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny,
           ); break
-        case 8: main = '/images/item/-6.png'; break
-        case 11: main = '/images/item/-7.png'; break
         case 12:
-          main = getPokemonUrl(mega_pokemon_id, 0, mega_pokemon_id === 6 || mega_pokemon_id === 150 ? 2 : 1)
-          secondary = '/images/item/-8.png'
-          amount = mega_amount > 1 ? mega_amount : undefined; break
+          main = Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount); break
+        default:
+          main = Icons.getRewards(quest_reward_type)
       }
       return (
         <div style={{
@@ -90,35 +70,6 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
         }}
         >
           <img src={main} style={{ maxWidth: 45, maxHeight: 45 }} />
-          {secondary && (
-            <img
-              src={secondary}
-              style={{
-                position: 'absolute',
-                maxWidth: '40%',
-                maxHeight: '40%',
-                bottom: 0,
-                left: 5,
-              }}
-            />
-          )}
-          {amount && (
-            <div
-              style={{
-                position: 'absolute',
-                maxWidth: '50%',
-                maxHeight: '50%',
-                bottom: 0,
-                right: secondary || amount < 100 ? 0 : '25%',
-                color: 'white',
-                textShadow: '#000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px',
-                fontWeight: 700,
-                font: 'bold 15px/13px Helvetica, Verdana, Tahoma',
-              }}
-            >
-              x{amount}
-            </div>
-          )}
         </div>
       )
     }
@@ -128,14 +79,14 @@ export default function Search({ safeSearch, toggleDialog, isMobile }) {
       } = option
       return (
         <img
-          src={getPokemonUrl(
+          src={Icons.getPokemon(
             raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume,
           )}
           style={{ maxWidth: 45, maxHeight: 45 }}
         />
       )
     }
-    return <img src={getPokemonUrl(nest_pokemon_id, nest_pokemon_form)} style={{ maxWidth: 45, maxHeight: 45 }} />
+    return <img src={Icons.getPokemon(nest_pokemon_id, nest_pokemon_form)} style={{ maxWidth: 45, maxHeight: 45 }} />
   }
 
   const getBackupName = () => {

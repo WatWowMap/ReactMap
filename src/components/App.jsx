@@ -9,7 +9,8 @@ import {
 } from '@apollo/client'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
-import AbortableLink from '@classes/AbortableLink';
+import AbortableLink from '@classes/AbortableLink'
+import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
 import Auth from './Auth'
 import Login from './Login'
@@ -43,10 +44,18 @@ const client = new ApolloClient({
 })
 
 export default function App() {
-  const [serverSettings, setServerSettings] = useState(undefined)
+  const [serverSettings, setServerSettings] = useState(null)
 
   const getServerSettings = async () => {
-    setServerSettings(await Fetch.getSettings())
+    const data = await Fetch.getSettings()
+    const Icons = data.config ? new UIcons(
+      data.config.icons.customizable, data.config.icons.sizes, data.masterfile.questRewardTypes,
+    ) : null
+    if (Icons) {
+      await Icons.fetchIcons(data.config.icons.styles)
+      data.userSettings.icons = Icons.selected
+    }
+    setServerSettings({ ...data, Icons })
   }
 
   useEffect(() => {

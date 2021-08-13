@@ -76,17 +76,19 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.config = {
         map: { ...config.map, excludeList: config.excludeFromTutorial },
         tileServers: config.tileServers,
-        icons: config.icons,
         navigation: config.navigation,
         drawer: {
           temporary: {},
           persistent: {},
         },
         manualAreas: config.manualAreas || {},
+        icons: config.icons,
       }
-      await Utility.updateAvailableForms(serverSettings.config.icons)
 
       // add config options to this array that are structured as arrays
+      // config.icons.styles.forEach(icon => {
+      //   serverSettings.config.icons[icon.name] = icon
+      // })
       const arrayUserOptions = [
         { name: 'localeSelection', values: config.localeSelection },
       ]
@@ -96,8 +98,22 @@ rootRouter.get('/settings', async (req, res) => {
         userMenu.values.forEach(value => serverSettings.config[userMenu.name][value] = {})
       })
 
+      // Fetch & Configure UICONS Settings
+      // await Utility.updateAvailableForms(serverSettings.config.icons)
+      // config.icons.customizable.forEach(option => {
+      //   Object.values(serverSettings.config.icons).forEach(icon => {
+      //     serverSettings.settings.icon[]
+      //     if (icon[option]) {
+      //       if (!serverSettings.config[option]) {
+      //         serverSettings.config[option] = {}
+      //       }
+      //       serverSettings.config[option][icon.name] = { name: icon.name }
+      //     }
+      //   })
+      // })
+
       // keys that are being sent to the frontend but are not options
-      const ignoreKeys = ['map', 'manualAreas', 'limit']
+      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons']
       Object.keys(serverSettings.config).forEach(setting => {
         if (!ignoreKeys.includes(setting)) {
           const category = serverSettings.config[setting]

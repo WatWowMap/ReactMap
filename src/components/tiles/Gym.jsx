@@ -18,7 +18,7 @@ const getColor = team => {
 }
 
 const GymTile = ({
-  item, ts, showTimer, iconSizes, filters, path, iconModifiers, availableForms, excludeList, userSettings, params,
+  item, ts, showTimer, filters, Icons, excludeList, userSettings, params,
   showCircles,
 }) => {
   const [done, setDone] = useState(false)
@@ -31,6 +31,7 @@ const GymTile = ({
     && (raid_battle_timestamp >= ts
       ? !excludeList.includes(`e${raid_level}`)
       : !excludeList.includes(`${raid_pokemon_id}-${raid_pokemon_form}`)))
+  const hasEgg = (raid_end_timestamp >= ts && raid_battle_timestamp <= ts)
   const timerToDisplay = raid_battle_timestamp >= ts && !raid_pokemon_id ? raid_battle_timestamp : raid_end_timestamp
 
   useEffect(() => {
@@ -52,15 +53,14 @@ const GymTile = ({
             }
           }}
           position={[item.lat, item.lon]}
-          icon={gymMarker(item, ts, hasRaid, iconSizes, filters, path, iconModifiers, availableForms, userSettings)}
+          icon={gymMarker(item, hasEgg, hasRaid, filters, Icons, userSettings)}
         >
           <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
             <PopupContent
               gym={item}
               hasRaid={hasRaid}
               ts={ts}
-              path={path}
-              availableForms={availableForms}
+              Icons={Icons}
             />
           </Popup>
           {((showTimer || userSettings.raidTimers) && hasRaid) && (
@@ -124,11 +124,9 @@ const areEqual = (prev, next) => {
     && !next.excludeList.includes(`${prev.item.raid_pokemon_id}-${prev.item.raid_pokemon_form}`)
     && !next.excludeList.includes(`t${prev.item.team_id}-0`)
     && !next.excludeList.includes(`e${prev.item.raid_level}`)
-    && prev.path === next.path
-    && prev.userSettings.raidTimers === next.userSettings.raidTimers
+    && Object.keys(prev.userIcons).every(key => prev.userIcons[key] === next.userIcons[key])
+    && Object.keys(prev.userSettings).every(key => prev.userSettings[key] === next.userSettings[key])
     && prev.showCircles === next.showCircles
-    && prev.userSettings.showExBadge === next.userSettings.showExBadge
-    && prev.userSettings.raidLevelBadges === next.userSettings.raidLevelBadges
   )
 }
 

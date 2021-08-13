@@ -11,7 +11,7 @@ import { getOne, getAllNests } from './queries/nest'
 import getAllScanAreas from './queries/scanAreas'
 import * as searchIndex from './queries/search'
 
-class Query {
+export default class Query {
   static devices() {
     return getAllDevices
   }
@@ -114,5 +114,3 @@ class Query {
     }
   }
 }
-
-export default Query
