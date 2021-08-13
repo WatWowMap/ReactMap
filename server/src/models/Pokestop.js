@@ -28,7 +28,7 @@ class Pokestop extends Model {
 
     const query = this.query()
     if (isMad) {
-      query.join('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
+      query.leftJoin('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
         .select([
           'pokestop_id AS id',
           'latitude AS lat',
@@ -383,7 +383,7 @@ class Pokestop extends Model {
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (isMad) {
-      query.join('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
+      query.leftJoin('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
         .select([
           'quest_stardust AS stardust_amount',
           'quest_pokemon_form_id AS quest_form_id',
