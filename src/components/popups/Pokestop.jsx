@@ -595,12 +595,12 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
     >
       {extraMetaData.map(meta => (
         <Fragment key={meta.description}>
-          <Grid item xs={5} style={{ textAlign: 'left' }}>
+          <Grid item xs={t('popupPokestopSeenDescriptionWidth')} style={{ textAlign: 'left' }}>
             <Typography variant="caption" align="center">
               {t(meta.description)}:
             </Typography>
           </Grid>
-          <Grid item xs={7} style={{ textAlign: 'right' }}>
+          <Grid item xs={t('popupPokestopSeenDataWidth')} style={{ textAlign: 'right' }}>
             <Typography variant="caption" align="center">
               {meta.data}
             </Typography>

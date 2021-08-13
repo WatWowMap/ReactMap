@@ -74,6 +74,7 @@ const PokemonTile = ({
               setDone(true)
             }
           }}
+          zIndexOffset={item.iv * 100}
           position={[item.lat, item.lon]}
           icon={(pvpCheck || glowStatus || ivCircle)
             ? fancyMarker(url, size, item, glowStatus, ivCircle, Icons)
@@ -87,7 +88,7 @@ const PokemonTile = ({
               Icons={Icons}
             />
           </Popup>
-          {showTimer && (
+          {(showTimer || userSettings.pokemonTimers) && (
             <Timer
               timestamp={item.expire_timestamp}
               direction="center"

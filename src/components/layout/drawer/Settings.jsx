@@ -147,7 +147,7 @@ export default function Settings({ toggleDialog, Icons }) {
         spacing={3}
         style={{ margin: '10px 0px' }}
       >
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawerSettingsProfileWidth')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -159,7 +159,7 @@ export default function Settings({ toggleDialog, Icons }) {
           </Button>
         </Grid>
         {discord && (
-          <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <Grid item xs={t('drawerSettingsLogoutWidth')} style={{ textAlign: 'center' }}>
             {loggedIn ? (
               <Button
                 className="sidebar-button"
@@ -194,7 +194,7 @@ export default function Settings({ toggleDialog, Icons }) {
             )}
           </Grid>
         )}
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawerSettingsTutorialWidth')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -205,7 +205,7 @@ export default function Settings({ toggleDialog, Icons }) {
             {t('tutorial')}
           </Button>
         </Grid>
-        <Grid item xs={discord ? 6 : 12} style={{ textAlign: 'center' }}>
+        <Grid item xs={discord ? t('drawerSettingsResetFiltersDiscordWidth') : t('drawerSettingsResetFiltersWidth')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -216,7 +216,7 @@ export default function Settings({ toggleDialog, Icons }) {
             {t('resetFilters')}
           </Button>
         </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawerSettingsExportSettingsWidth')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -227,7 +227,7 @@ export default function Settings({ toggleDialog, Icons }) {
             {t('export')}
           </Button>
         </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawerSettingsImportSettingsWidth')} style={{ textAlign: 'center' }}>
           <input
             accept="application/json"
             id="contained-button-file"
@@ -249,7 +249,7 @@ export default function Settings({ toggleDialog, Icons }) {
         </Grid>
         {config.map.enableStats
           && (
-            <Grid item xs={6} style={{ textAlign: 'center' }}>
+            <Grid item xs={t('drawerSettingsStatsWidth')} style={{ textAlign: 'center' }}>
               <Button
                 variant="contained"
                 color="secondary"
@@ -265,7 +265,7 @@ export default function Settings({ toggleDialog, Icons }) {
           )}
         {config.map.enableFeedback
           && (
-            <Grid item xs={6} style={{ textAlign: 'center' }}>
+            <Grid item xs={t('drawerSettingsFeedbackWidth')} style={{ textAlign: 'center' }}>
               <Button
                 variant="contained"
                 color="primary"

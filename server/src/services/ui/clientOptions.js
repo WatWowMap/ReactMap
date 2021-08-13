@@ -22,6 +22,7 @@ module.exports = function clientOptions(perms) {
     },
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'] },
+      pokemonTimers: { type: 'bool', perm: ['pokemon'] },
       prioritizePvpInfo: { type: 'bool', perm: ['pvp'] },
       ivCircles: { type: 'bool', perm: ['iv'] },
       minIvCircle: { type: 'number', perm: ['iv'], label: '%' },

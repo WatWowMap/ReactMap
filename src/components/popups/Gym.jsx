@@ -583,12 +583,12 @@ const ExtraInfo = ({ gym, t, ts }) => {
     >
       {extraMetaData.map(meta => (
         <Fragment key={meta.description}>
-          <Grid item xs={5} style={{ textAlign: 'left' }}>
+          <Grid item xs={t('popupGymDescriptionWidth')} style={{ textAlign: 'left' }}>
             <Typography variant="caption" align="center">
               {t(meta.description)}:
             </Typography>
           </Grid>
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
+          <Grid item xs={t('popupGymDataWidth')} style={{ textAlign: 'right' }}>
             <Typography variant="caption" align="center">
               {meta.data}
             </Typography>

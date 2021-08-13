@@ -1,25 +1,28 @@
+/* eslint-disable react/no-array-index-key */
 import React, { memo } from 'react'
 import { Polyline, Polygon } from 'react-leaflet'
 
 const DevicePoly = ({ device, color }) => {
   const parsedRoute = JSON.parse(device.route)
-  const routeCheck = parsedRoute.length === 1 ? parsedRoute[0] : parsedRoute
-  const poly = routeCheck.map(route => [route.lat, route.lon])
+  const arrayRoute = parsedRoute[0].lat ? [parsedRoute] : parsedRoute
 
   return (
     <>
       {(device.type === 'circle_pokemon')
-        ? (
+        ? arrayRoute.map((polygon, i) => (
           <Polyline
-            positions={poly}
+            key={i}
+            positions={polygon.map(route => [route.lat, route.lon])}
             pathOptions={{ color }}
           />
-        ) : (
+        ))
+        : arrayRoute.map((polygon, i) => (
           <Polygon
-            positions={poly}
+            key={i}
+            positions={polygon.map(route => [route.lat, route.lon])}
             pathOptions={{ color }}
           />
-        )}
+        ))}
     </>
   )
 }
