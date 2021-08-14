@@ -36,9 +36,7 @@ class Device extends Model {
           raw('json_extract(data, "$.area")')
             .as('route'))
     }
-    if (areaRestrictions.length > 0) {
-      getAreaSql(query, areaRestrictions, isMad, 'device')
-    }
+    getAreaSql(query, areaRestrictions, isMad, 'devices')
     return query
   }
 }

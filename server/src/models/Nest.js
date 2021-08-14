@@ -26,9 +26,7 @@ class Nest extends Model {
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .whereIn('pokemon_id', pokemon)
-    if (areaRestrictions.length > 0) {
-      getAreaSql(query, areaRestrictions)
-    }
+    getAreaSql(query, areaRestrictions, false, 'nests')
     const results = await query
 
     const fixedForms = queryResults => {
@@ -79,9 +77,7 @@ class Nest extends Model {
       .whereIn('pokemon_id', pokemonIds)
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (perms.areaRestrictions.length > 0) {
-      getAreaSql(query, perms.areaRestrictions, isMad)
-    }
+    getAreaSql(query, perms.areaRestrictions, isMad, 'nests')
     return query
   }
 }

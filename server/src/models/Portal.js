@@ -12,9 +12,7 @@ class Portal extends Model {
     const query = this.query()
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
-    if (areaRestrictions.length > 0) {
-      getAreaSql(query, areaRestrictions)
-    }
+    getAreaSql(query, areaRestrictions, false, 'portals')
     return query
   }
 
@@ -32,9 +30,7 @@ class Portal extends Model {
       .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (areaRestrictions.length > 0) {
-      getAreaSql(query, areaRestrictions, isMad)
-    }
+    getAreaSql(query, areaRestrictions, isMad, 'portals')
     return query
   }
 }
