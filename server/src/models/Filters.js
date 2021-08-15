@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-const { database: { settings: { leagues } } } = require('../services/config.js')
+const { database: { settings: { leagues } } } = require('../services/config')
 
 class GenericFilter {
   constructor(enabled, size) {

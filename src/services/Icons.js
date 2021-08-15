@@ -15,14 +15,14 @@ export default class UIcons {
         sizeMultiplier: 1,
       },
     }
-    this.baseUrl = 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
   }
 
   async fetchIcons(icons) {
-    if (!icons.some(icon => icon.path === this.baseUrl)) {
+    const baseUrl = 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
+    if (!icons.some(icon => icon.path === baseUrl)) {
       icons.push({
         name: 'Base',
-        path: this.baseUrl,
+        path: baseUrl,
         modifiers: {
           gym: {
             0: 1,
