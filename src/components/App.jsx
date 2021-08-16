@@ -48,6 +48,8 @@ export default function App() {
 
   const getServerSettings = async () => {
     const data = await Fetch.getSettings()
+    document.title = data.config.map.headerTitle
+
     const Icons = data.config ? new UIcons(
       data.config.icons.customizable, data.config.icons.sizes, data.masterfile.questRewardTypes,
     ) : null

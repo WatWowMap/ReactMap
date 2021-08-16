@@ -62,9 +62,6 @@ export default class UIcons {
           if (isValid) {
             this[category].push(icon.name)
           }
-          if (!this.selected[category]) {
-            this.selected[category] = icon.name
-          }
           if (!this[icon.name].modifiers[category]) {
             this[icon.name].modifiers[category] = this.modifiers.base
           } else {
@@ -72,6 +69,10 @@ export default class UIcons {
               ...this.modifiers.base,
               ...this[icon.name].modifiers[category],
             }
+          }
+          if (!this.selected[category]) {
+            this.selected[category] = icon.name
+            this.modifiers[category] = this[icon.name].modifiers[category]
           }
         }
       })

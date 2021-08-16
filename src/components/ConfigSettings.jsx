@@ -24,8 +24,9 @@ export default function ConfigSettings({
     )
   }
 
-  document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
+  const theme = setTheme(serverSettings.config.map.theme, prefersDarkMode)
+  document.body.classList.add('dark')
 
   const setUserSettings = useStore(state => state.setUserSettings)
   const setSettings = useStore(state => state.setSettings)
@@ -62,9 +63,6 @@ export default function ConfigSettings({
     }
     return defaults
   }
-
-  const theme = setTheme(serverSettings.config.map.theme, prefersDarkMode)
-  document.body.classList.add('dark')
 
   setAuth({
     discord: serverSettings.discord,
