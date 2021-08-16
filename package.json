@@ -92,6 +92,7 @@
     "pogo-translations": "git+https://github.com/bschultz/pogo-translations.git",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-ga": "^3.3.0",
     "react-i18next": "^11.9.0",
     "react-leaflet": "3.1.0",
     "react-leaflet-markercluster": "3.0.0-rc1",

@@ -7,6 +7,10 @@
     "graphiql": false,
     "clientPath": "../../dist"
   },
+  "googleAnalytics": {
+    "enabled": false,
+    "trackingId": ""
+  },
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
     "maxSessions": 5,

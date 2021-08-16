@@ -8,12 +8,14 @@ import {
   createHttpLink,
 } from '@apollo/client'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import ReactGA from 'react-ga'
 
 import AbortableLink from '@classes/AbortableLink'
 import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
 import Auth from './Auth'
 import Login from './Login'
+import RouteChangeTracker from './RouteChangeTracker'
 
 const client = new ApolloClient({
   uri: '/graphql',
@@ -58,6 +60,9 @@ export default function App() {
       data.userSettings.icons = Icons.selected
     }
     setServerSettings({ ...data, Icons })
+    if (data.config.googleAnalytics.enabled) {
+      ReactGA.initialize(data.config.googleAnalytics)
+    }
   }
 
   useEffect(() => {
@@ -68,6 +73,7 @@ export default function App() {
     <Suspense fallback="Loading translations...">
       <ApolloProvider client={client}>
         <Router>
+          {(serverSettings && serverSettings.config.googleAnalytics.enabled) && <RouteChangeTracker />}
           <Switch>
             <Route exact path="/">
               {serverSettings && <Auth serverSettings={serverSettings} />}
