@@ -59,7 +59,7 @@ export default function App() {
     }
     setServerSettings({ ...data, Icons })
     if (data.config.googleAnalytics.enabled) {
-      ReactGA.initialize(data.config.googleAnalytics)
+      ReactGA.initialize(data.config.googleAnalytics.trackingId)
     }
   }
 
