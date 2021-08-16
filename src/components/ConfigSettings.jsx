@@ -24,6 +24,7 @@ export default function ConfigSettings({
     )
   }
 
+  document.title = serverSettings.config.map.headerTitle
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
   const theme = setTheme(serverSettings.config.map.theme, prefersDarkMode)
   document.body.classList.add('dark')
