@@ -1,7 +1,7 @@
 {
   "interface": "0.0.0.0",
   "port": 8080,
-  "localeSelection": ["en", "de", "pl", "es", "fr", "it", "jp"],
+  "localeSelection": ["en", "de", "pl" ,"es" ,"fr", "it"],
   "devOptions": {
     "enabled": false,
     "graphiql": false,
@@ -60,44 +60,6 @@
       "pokemon": 15,
       "portals": 14,
       "spawnpoints": 12
-    },
-    "iconSizes": {
-      "devices": {
-        "sm": 15,
-        "md": 30,
-        "lg": 50,
-        "xl": 70
-      },
-      "nests": {
-        "sm": 20,
-        "md": 40,
-        "lg": 60,
-        "xl": 80
-      },
-      "gyms": {
-        "sm": 20,
-        "md": 35,
-        "lg": 50,
-        "xl": 65
-      },
-      "pokestops": {
-        "sm": 15,
-        "md": 25,
-        "lg": 35,
-        "xl": 45
-      },
-      "pokemon": {
-        "sm": 20,
-        "md": 40,
-        "lg": 60,
-        "xl": 80
-      },
-      "spawnpoints": {
-        "sm": 0.5,
-        "md": 1,
-        "lg": 2,
-        "xl": 3
-      }
     }
   },
   "clientSideOptions": {
@@ -127,9 +89,9 @@
       "minIvCircle": 90,
       "interactionRanges": false,
       "glow": [
-        {"name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
-        {"name": "Top 3 Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
-        {"name": "Multiple", "perm": "pvp", "value": "#800080" }
+        { "name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
+        { "name": "Top 3 Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
+        { "name": "Multiple", "perm": "pvp", "value": "#800080" }
       ]
     },
     "wayfarer": {
@@ -363,18 +325,63 @@
     }
   },
   "icons": {
-    "Default": {
-      "path": "https://mygod.github.io/pokicons/v2",
-      "iconModifiers": {
-        "gyms": {
-          "offsetX": 0,
-          "offsetY": 0
-        },
-        "pokestops": {
-          "offsetX": 0,
-          "offsetY": 0,
-          "sizeMultiplier": 0
-        }
+    "Read_More_Here": "https://github.com/WatWowMap/ReactMap/wiki/Icons-Configuration",
+    "customizable": [],
+    "styles": [],
+    "sizes": {
+      "device": {
+        "sm": 15,
+        "md": 30,
+        "lg": 50,
+        "xl": 70
+      },
+      "nest": {
+        "sm": 20,
+        "md": 40,
+        "lg": 60,
+        "xl": 80
+      },
+      "gym": {
+        "sm": 20,
+        "md": 35,
+        "lg": 50,
+        "xl": 65
+      },
+      "raid": {
+        "sm": 20,
+        "md": 35,
+        "lg": 50,
+        "xl": 65
+      },
+      "pokestop": {
+        "sm": 15,
+        "md": 25,
+        "lg": 35,
+        "xl": 45
+      },
+      "invasion": {
+        "sm": 10,
+        "md": 20,
+        "lg": 30,
+        "xl": 40
+      },
+      "reward": {
+        "sm": 20,
+        "md": 30,
+        "lg": 40,
+        "xl": 50
+      },
+      "pokemon": {
+        "sm": 20,
+        "md": 40,
+        "lg": 60,
+        "xl": 80
+      },
+      "spawnpoint": {
+        "sm": 0.5,
+        "md": 1,
+        "lg": 2,
+        "xl": 3
       }
     }
   },

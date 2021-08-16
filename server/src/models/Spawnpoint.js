@@ -32,7 +32,7 @@ class Spawnpoint extends Model {
     if (areaRestrictions.length > 0) {
       getAreaSql(query, areaRestrictions, isMad)
     }
-    return query.debug()
+    return query
   }
 }
 

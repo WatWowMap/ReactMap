@@ -1,5 +1,5 @@
 const { GenericFilter } = require('../../models/index')
-const { items } = require('../../data/masterfile.json')
+const { items, questRewardTypes } = require('../../data/masterfile.json')
 
 module.exports = function buildQuests(perms, defaults) {
   const quests = { s0: new GenericFilter() }
@@ -15,6 +15,9 @@ module.exports = function buildQuests(perms, defaults) {
     for (let i = 200; i <= 2000; i += 100) {
       quests[`d${i}`] = new GenericFilter(defaults.items)
     }
+    Object.keys(questRewardTypes).forEach(type => {
+      quests[`u${type}`] = new GenericFilter()
+    })
   }
   if (perms.invasions) {
     for (let i = 1; i <= 50; i += 1) {

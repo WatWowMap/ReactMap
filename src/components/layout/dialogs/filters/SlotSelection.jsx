@@ -8,6 +8,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@material-ui/styles'
 
+import { useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Size from './Size'
 
@@ -16,6 +17,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
   const classes = useStyles()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const { t } = useTranslation()
+  const Icons = useStatic(state => state.Icons)
   const [filterValues, setFilterValues] = useState(tempFilters)
   const [team] = useState(`t${teamId}-0`)
 
@@ -99,7 +101,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
               justifyContent="center"
             >
               <Grid item xs={2} style={{ textAlign: 'center' }}>
-                <img src={`/images/gym/${each.slice(1).replace('-', '_')}.png`} style={{ maxWidth: 50, maxHeight: 50 }} />
+                <img src={Icons.getGyms(...each.slice(1).split('-'))} style={{ maxWidth: 50, maxHeight: 50 }} />
               </Grid>
               <Grid item xs={8} style={{ textAlign: 'center' }}>
                 <Size

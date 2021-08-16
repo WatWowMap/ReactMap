@@ -16,17 +16,18 @@ function SlideTransition(props) {
   return <Slide {...props} direction="up" />
 }
 
-export default function Settings({ toggleDialog }) {
+export default function Settings({ toggleDialog, Icons }) {
   const { t, i18n } = useTranslation()
   const config = useStatic(state => state.config)
   const staticSettings = useStatic(state => state.settings)
   const { discord, loggedIn } = useStatic(state => state.auth)
-  const setAvailableForms = useStatic(state => state.setAvailableForms)
   const tutorial = useStore(state => state.tutorial)
   const setTutorial = useStore(state => state.setTutorial)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
-
+  const icons = useStore(state => state.icons)
+  const setIcons = useStore(state => state.setIcons)
+  const setStaticIcons = useStatic(state => state.setIcons)
   const [alert, setAlert] = useState(false)
   const [userProfile, setUserProfile] = useState(false)
   const [feedback, setFeedback] = useState(false)
@@ -39,9 +40,13 @@ export default function Settings({ toggleDialog }) {
     if (event.target.name === 'localeSelection') {
       i18n.changeLanguage(event.target.value)
     }
-    if (event.target.name === 'icons') {
-      setAvailableForms(new Set(config[event.target.name][event.target.value].pokemonList))
-    }
+  }
+
+  const handleIconChange = event => {
+    const { name, value } = event.target
+    Icons.setSelection(name, value)
+    setStaticIcons(Icons)
+    setIcons({ ...icons, [name]: value })
   }
 
   const clearStorage = () => {
@@ -105,6 +110,29 @@ export default function Settings({ toggleDialog }) {
                   value={option}
                 >
                   {t(`${setting}${option}`)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      ))}
+      {Icons.customizable.map(category => (
+        <Grid item key={category} xs={10}>
+          <FormControl style={{ width: 200, margin: 5 }}>
+            <InputLabel>{t(`${category}Icons`, `${category} Icons`)}</InputLabel>
+            <Select
+              autoFocus
+              name={category}
+              value={icons[category]}
+              onChange={handleIconChange}
+              fullWidth
+            >
+              {Icons[category].map(option => (
+                <MenuItem
+                  key={option}
+                  value={option}
+                >
+                  {t(`${category}${option}`, option)}
                 </MenuItem>
               ))}
             </Select>

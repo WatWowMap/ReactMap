@@ -76,15 +76,14 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.config = {
         map: { ...config.map, excludeList: config.excludeFromTutorial },
         tileServers: config.tileServers,
-        icons: config.icons,
         navigation: config.navigation,
         drawer: {
           temporary: {},
           persistent: {},
         },
         manualAreas: config.manualAreas || {},
+        icons: config.icons,
       }
-      await Utility.updateAvailableForms(serverSettings.config.icons)
 
       // add config options to this array that are structured as arrays
       const arrayUserOptions = [
@@ -97,7 +96,7 @@ rootRouter.get('/settings', async (req, res) => {
       })
 
       // keys that are being sent to the frontend but are not options
-      const ignoreKeys = ['map', 'manualAreas', 'limit']
+      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons']
       Object.keys(serverSettings.config).forEach(setting => {
         if (!ignoreKeys.includes(setting)) {
           const category = serverSettings.config[setting]

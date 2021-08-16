@@ -13,7 +13,7 @@ import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
 export default function PokestopPopup({
-  pokestop, ts, hasLure, hasInvasion, hasQuest, path, availableForms, userSettings,
+  pokestop, ts, hasLure, hasInvasion, hasQuest, Icons, userSettings,
 }) {
   const { t } = useTranslation()
   const { pokestops: perms } = useStatic(state => state.ui)
@@ -56,6 +56,7 @@ export default function PokestopPopup({
               hasLure={hasLure}
               hasInvasion={hasInvasion}
               t={t}
+              Icons={Icons}
             />
             {hasQuest ? (
               <>
@@ -75,8 +76,7 @@ export default function PokestopPopup({
                   />
                   <RewardInfo
                     pokestop={pokestop}
-                    path={path}
-                    availableForms={availableForms}
+                    Icons={Icons}
                     t={t}
                   />
                 </Grid>
@@ -110,7 +110,7 @@ export default function PokestopPopup({
       {perms.invasions && (
         <Grid item xs={12}>
           <Collapse in={invasionExpand} timeout="auto" unmountOnExit>
-            <Invasion pokestop={pokestop} path={path} availableForms={availableForms} t={t} />
+            <Invasion pokestop={pokestop} Icons={Icons} t={t} />
           </Collapse>
         </Grid>
       )}
@@ -278,7 +278,7 @@ const Header = ({
 }
 
 const PoiImage = ({
-  pokestop, ts, hasQuest, hasLure, hasInvasion, t,
+  pokestop, ts, hasQuest, hasLure, hasInvasion, t, Icons,
 }) => {
   const {
     name, url, lure_id, lure_expire_timestamp, incident_expire_timestamp, ar_scan_eligible,
@@ -287,7 +287,7 @@ const PoiImage = ({
   const lureName = lure_expire_timestamp > ts ? `lure_${lure_id}` : ''
   const src = url
     ? url.replace('http://', 'https://')
-    : '/images/misc/pokestop.png'
+    : Icons.getPokestops(0)
 
   const invasionColor = hasInvasion ? 'invasion-exists' : ''
 
@@ -382,7 +382,7 @@ const Timer = ({
   )
 }
 
-const RewardInfo = ({ pokestop, path, availableForms }) => {
+const RewardInfo = ({ pokestop, Icons }) => {
   const {
     quest_reward_type, quest_item_id, item_amount, stardust_amount,
     quest_pokemon_id, quest_form_id, quest_gender_id, quest_costume_id, quest_shiny,
@@ -391,31 +391,34 @@ const RewardInfo = ({ pokestop, path, availableForms }) => {
 
   const questRewards = []
   switch (quest_reward_type) {
-    default: return ''
+    default:
+      questRewards.push(
+        <img src={Icons.getRewards(quest_reward_type)} className="quest-popup-img" />,
+      ); break
     case 2:
       questRewards.push(
-        <img src={`/images/item/${quest_item_id}.png`} className="quest-popup-img" />,
+        <img src={Icons.getRewards(quest_reward_type, quest_item_id)} className="quest-popup-img" />,
         <div className="amount-popup">x{item_amount}</div>,
       ); break
     case 3:
       questRewards.push(
-        <img src="/images/item/-1.png" className="quest-popup-img" />,
+        <img src={Icons.getRewards(quest_reward_type, 0)} className="quest-popup-img" />,
         <div className="amount-popup">x{stardust_amount}</div>,
       ); break
     case 4:
       questRewards.push(
-        <img src={`${path}/${Utility.getPokemonIcon(availableForms, candy_pokemon_id)}.png`} className="quest-popup-img" />,
-        <img src="/images/item/-3.png" className="quest-popup-img" />,
+        <img src={Icons.getPokemon(candy_pokemon_id)} className="quest-popup-img" />,
+        <img src={Icons.item(candy_pokemon_id)} className="quest-popup-img" />,
         <div className="amount-popup">x{candy_amount}</div>,
       ); break
     case 7:
       questRewards.push(
-        <img src={`${path}/${Utility.getPokemonIcon(availableForms, quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny)}.png`} className="quest-popup-img" />,
+        <img src={Icons.getPokemon(quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny)} className="quest-popup-img" />,
       ); break
     case 12:
       questRewards.push(
-        <img src={`${path}/${Utility.getPokemonIcon(availableForms, mega_pokemon_id, 0, mega_pokemon_id === 6 || mega_pokemon_id === 150 ? 2 : 1)}.png`} className="quest-popup-img" />,
-        <img src="/images/item/-8.png" className="quest-popup-img" />,
+        <img src={Icons.getPokemon(mega_pokemon_id, quest_form_id, 1)} className="quest-popup-img" />,
+        <img src={Icons.getRewards(quest_reward_type, 0)} className="quest-popup-img" />,
         <div className="amount-popup">x{mega_amount}</div>,
       ); break
   }
@@ -608,9 +611,7 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
   )
 }
 
-const Invasion = ({
-  pokestop, path, availableForms, t,
-}) => {
+const Invasion = ({ pokestop, Icons, t }) => {
   const { grunt_type } = pokestop
   const { invasions: { [grunt_type]: invasion } } = useStatic(state => state.masterfile)
   const encounterNum = { first: '#1', second: '#2', third: '#3' }
@@ -619,7 +620,7 @@ const Invasion = ({
     <div key={pokemonId} className="invasion-reward">
       <img
         className="invasion-reward"
-        src={`${path}/${Utility.getPokemonIcon(availableForms, pokemonId)}.png`}
+        src={Icons.getPokemon(pokemonId)}
       />
       <img
         className="invasion-reward-shadow"

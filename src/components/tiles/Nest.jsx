@@ -4,17 +4,16 @@ import React, {
 import { Polygon, Marker, Popup } from 'react-leaflet'
 
 import { useStatic } from '@hooks/useStore'
-import Utility from '@services/Utility'
 import nestMarker from '../markers/nest'
 import PopupContent from '../popups/Nest'
 
 const NestTile = ({
-  item, filters, iconSizes, path, availableForms, ts, params,
+  item, filters, Icons, ts, params,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
   const { pokemon } = useStatic(state => state.masterfile)
-  const iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, item.pokemon_id, item.pokemon_form)}.png`
+  const iconUrl = Icons.getPokemon(item.pokemon_id, item.pokemon_form)
   const parsedJson = JSON.parse(item.polygon_path)
   const recent = ts - item.updated < 172800000
 
@@ -37,7 +36,7 @@ const NestTile = ({
             }
           }}
           position={[item.lat, item.lon]}
-          icon={nestMarker(iconUrl, item, pokemon[item.pokemon_id], filters.filter, iconSizes, recent)}
+          icon={nestMarker(iconUrl, item, pokemon[item.pokemon_id], filters, Icons, recent)}
         >
           <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
             <PopupContent

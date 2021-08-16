@@ -19,10 +19,10 @@ export default function DevicePopup({ device, status, ts }) {
       <Timer device={device} t={t} ts={ts} />
       <Typography
         variant="subtitle1"
-        style={{ color: `${status ? '#ff5722' : '#00e676'}` }}
+        style={{ color: `${status === 'offline' ? '#ff5722' : '#00e676'}` }}
         align="center"
       >
-        {status ? t('offline') : t('online')}
+        {t(status)}
       </Typography>
     </>
   )

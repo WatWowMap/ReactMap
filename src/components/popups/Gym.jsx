@@ -13,7 +13,7 @@ import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
 export default function GymPopup({
-  gym, hasRaid, ts, path, availableForms,
+  gym, hasRaid, ts, Icons,
 }) {
   const { t } = useTranslation()
   const { gyms: perms } = useStatic(state => state.ui)
@@ -39,7 +39,10 @@ export default function GymPopup({
               justifyContent="space-evenly"
               spacing={1}
             >
-              <PoiImage gym={gym} />
+              <PoiImage
+                Icons={Icons}
+                gym={gym}
+              />
               <Divider orientation="vertical" flexItem />
               <GymInfo
                 gym={gym}
@@ -61,8 +64,7 @@ export default function GymPopup({
               <RaidImage
                 gym={gym}
                 ts={ts}
-                path={path}
-                availableForms={availableForms}
+                Icons={Icons}
                 t={t}
               />
               <Divider orientation="vertical" flexItem />
@@ -230,11 +232,11 @@ const Header = ({
   )
 }
 
-const PoiImage = ({ gym }) => {
+const PoiImage = ({ gym, Icons }) => {
   const { url, team_id, name } = gym
   const src = url
     ? url.replace('http://', 'https://')
-    : `/images/team/${team_id}.png`
+    : `${Icons.getTeams(team_id)}`
 
   return (
     <Grid
@@ -256,20 +258,17 @@ const PoiImage = ({ gym }) => {
 }
 
 const RaidImage = ({
-  gym, ts, path, availableForms, t,
+  gym, ts, Icons, t,
 }) => {
   const {
     raid_level, raid_pokemon_id, raid_pokemon_form, raid_pokemon_gender, raid_pokemon_costume, raid_pokemon_evolution,
-    raid_battle_timestamp,
+    raid_battle_timestamp, raid_is_exclusive,
   } = gym
   const { pokemon } = useStatic(state => state.masterfile)
 
-  let src = `/images/egg/${raid_level}.png`
-  if (raid_pokemon_id !== 0 && raid_pokemon_id !== null) {
-    src = `${path}/${Utility.getPokemonIcon(availableForms, raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume)}.png`
-  } else if (ts >= raid_battle_timestamp) {
-    src = `/images/unknown_egg/${raid_level}.png`
-  }
+  const src = raid_pokemon_id
+    ? `${Icons.getPokemon(raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume)}`
+    : `${Icons.getEggs(raid_level, raid_battle_timestamp < ts, raid_is_exclusive)}`
 
   const getRaidTypes = (id, form) => {
     if (pokemon[id].forms[form]) {

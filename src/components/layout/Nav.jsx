@@ -14,7 +14,7 @@ import Search from './dialogs/Search'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
-export default function Nav({ map, setManualParams }) {
+export default function Nav({ map, setManualParams, Icons }) {
   const classes = useStyles()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
@@ -71,7 +71,11 @@ export default function Nav({ map, setManualParams }) {
         <Dialog
           open={tutorial}
         >
-          <Tutorial setUserProfile={setUserProfile} setTutorial={setTutorial} toggleDialog={toggleDialog} />
+          <Tutorial
+            setUserProfile={setUserProfile}
+            setTutorial={setTutorial}
+            toggleDialog={toggleDialog}
+          />
         </Dialog>
       )}
       {drawer ? (
@@ -81,6 +85,7 @@ export default function Nav({ map, setManualParams }) {
           filters={filters}
           setFilters={setFilters}
           toggleDialog={toggleDialog}
+          Icons={Icons}
         />
       ) : (
         <FloatingBtn
@@ -124,6 +129,7 @@ export default function Nav({ map, setManualParams }) {
           toggleDialog={toggleDialog}
           safeSearch={safeSearch}
           isMobile={isMobile}
+          Icons={Icons}
         />
       </Dialog>
     </>

@@ -3,7 +3,6 @@ import React, {
 } from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 
-import Utility from '@services/Utility'
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
 import Timer from './Timer'
@@ -27,12 +26,13 @@ const operator = {
 }
 
 const PokemonTile = ({
-  item, showTimer, filters, iconSizes, path, availableForms, excludeList,
+  item, showTimer, filters, Icons, excludeList,
   userSettings, staticUserSettings, params, showCircles,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
-  const iconUrl = `${path}/${Utility.getPokemonIcon(availableForms, item.pokemon_id, item.form, 0, 0, item.costume)}.png`
+  const url = Icons.getPokemon(item.pokemon_id, item.form, 0, item.gender, item.costume)
+  const size = Icons.getSize('pokemon', filters.filter[`${item.pokemon_id}-${item.form}`])
 
   const getGlowStatus = useCallback(() => {
     let glowCount = 0
@@ -77,14 +77,15 @@ const PokemonTile = ({
           zIndexOffset={item.iv * 100}
           position={[item.lat, item.lon]}
           icon={(pvpCheck || glowStatus || ivCircle)
-            ? fancyMarker(iconUrl, item, filters, iconSizes, glowStatus, ivCircle)
-            : basicMarker(iconUrl, item, filters, iconSizes)}
+            ? fancyMarker(url, size, item, glowStatus, ivCircle, Icons)
+            : basicMarker(url, size)}
         >
           <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
             <PopupContent
               pokemon={item}
-              iconUrl={iconUrl}
+              iconUrl={url}
               userSettings={userSettings}
+              Icons={Icons}
             />
           </Popup>
           {(showTimer || userSettings.pokemonTimers) && (
@@ -113,11 +114,8 @@ const areEqual = (prev, next) => (
   && prev.showTimer === next.showTimer
   && prev.filters.filter[`${prev.item.pokemon_id}-${prev.item.form}`].size === next.filters.filter[`${next.item.pokemon_id}-${next.item.form}`].size
   && !next.excludeList.includes(`${prev.item.pokemon_id}-${prev.item.form}`)
-  && prev.path === next.path
-  && prev.userSettings.pokemonTimers === next.userSettings.pokemonTimers
-  && prev.userSettings.legacyFilter === next.userSettings.legacyFilter
-  && prev.userSettings.ivCircles === next.userSettings.ivCircles
-  && prev.userSettings.minIvCircle === next.userSettings.minIvCircle
+  && prev.userIcons.pokemon === next.userIcons.pokemon
+  && Object.keys(prev.userSettings).every(key => prev.userSettings[key] === next.userSettings[key])
   && prev.showCircles === next.showCircles
 )
 

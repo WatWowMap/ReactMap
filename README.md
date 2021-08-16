@@ -115,6 +115,10 @@ With Docker:
 1. `docker-compose pull reactmap`
 2. `docker-compose up -d reactmap`
 
+If you get an error related to `yarn.lock` when pulling:
+- `git checkout yarn.lock`
+- `git pull`
+
 ## Additional Info
 
 - Webhook URL lat/lon Format: `https://www.yourMapUrl.com/@/:lat/:lon/:zoom`

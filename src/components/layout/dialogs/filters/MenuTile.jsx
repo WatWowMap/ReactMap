@@ -45,7 +45,6 @@ export default function MenuTile({
         maxHeight: isMobile ? 50 : 75,
         maxWidth: isMobile ? 50 : 75,
       }}
-      onError={(e) => { e.target.onerror = null; e.target.src = '/images/item/0.png' }}
       onClick={handleFilterChange}
     />
   )
