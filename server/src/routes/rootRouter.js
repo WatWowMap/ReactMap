@@ -68,6 +68,7 @@ rootRouter.get('/settings', async (req, res) => {
       user: getUser(),
       discord: config.discord.enabled,
       settings: {},
+      googleAnalytics: config.googleAnalytics.enabled ? config.googleAnalytics.trackingId : null,
     }
 
     // add user options here from the config that are structured as objects
@@ -81,7 +82,6 @@ rootRouter.get('/settings', async (req, res) => {
           temporary: {},
           persistent: {},
         },
-        googleAnalytics: config.googleAnalytics,
         manualAreas: config.manualAreas || {},
         icons: config.icons,
       }
@@ -97,7 +97,7 @@ rootRouter.get('/settings', async (req, res) => {
       })
 
       // keys that are being sent to the frontend but are not options
-      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons', 'googleAnalytics']
+      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons']
       Object.keys(serverSettings.config).forEach(setting => {
         if (!ignoreKeys.includes(setting)) {
           const category = serverSettings.config[setting]

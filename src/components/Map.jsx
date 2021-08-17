@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
+import ReactGA from 'react-ga'
 
 import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
@@ -46,6 +47,10 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   if (manualParams) {
     params.id = manualParams.id
   }
+
+  useEffect(() => {
+    ReactGA.pageview(window.location.pathname)
+  }, [])
 
   return (
     <>

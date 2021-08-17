@@ -58,8 +58,8 @@ export default function App() {
       data.userSettings.icons = Icons.selected
     }
     setServerSettings({ ...data, Icons })
-    if (data.config && data.config.googleAnalytics.enabled) {
-      ReactGA.initialize(data.config.googleAnalytics.trackingId)
+    if (data.googleAnalytics) {
+      ReactGA.initialize(data.googleAnalytics)
     }
   }
 
@@ -71,10 +71,7 @@ export default function App() {
     <Suspense fallback="Loading translations...">
       <ApolloProvider client={client}>
         <Router>
-          {(serverSettings
-            && serverSettings.config
-            && serverSettings.config.googleAnalytics.enabled)
-            && <RouteChangeTracker />}
+          {(serverSettings && serverSettings.googleAnalytics) && <RouteChangeTracker />}
           <Switch>
             <Route exact path="/">
               {serverSettings && <Auth serverSettings={serverSettings} />}
