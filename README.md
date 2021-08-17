@@ -116,6 +116,7 @@ With Docker:
 2. `docker-compose up -d reactmap`
 
 If you get an error related to `yarn.lock` when pulling:
+
 - `git checkout yarn.lock`
 - `git pull`
 
@@ -172,6 +173,43 @@ You can add any number of rules in the glow array in the config. **Be sure to ad
 - If you're using Chuck as a parser you can add any number of leagues, CP caps, and PVP level caps to the respective arrays, just be sure to add the same keys to your Chuck config.
 - If you're using RDM and want more than just Great/Ultra League, you can set `reactMapHandlesPvp` to `true` and add and number of leagues, CP caps, and PVP level caps to the respective arrays.
 - If you're using MAD and want PVP results you must set `reactMapHandlesPvp` to `true` and add any number of leagues, CP caps, and PVP level caps to the respective arrays
+
+### Multi Domain Support
+
+ReactMap supports multiple domain config options. Under the "multiDomain" object in the config, set each child object key to the domains you want to customize. (See example below for the format) Any of the properties of the "map" object in the config can be set in these custom domain objects. The rest of the values you set in the "map" object will be used as the default values.
+
+```js
+{
+  "map": {
+    headerTitle: "ReactMap",
+    title: "ReactMap",
+    startLat: 32.05,
+    startLon: -20.00,
+    startZoom: 5,
+    enableFeedback: false
+  },
+  "multiDomains": {
+    // Requests from Domain 1 will start at 0, 0, zoom of 20, and the custom titles
+    "www.domain1.net": {
+      headerTitle: "My Cool Map",
+      title: "Cool Map",
+      startLat: 0,
+      startLon: 0,
+      startZoom: 20
+    },
+    // Requests from Domain 2 will start at 11, 11, zoom of 10, and the default titles, "ReactMap"
+    "www.domain2.net": {
+      startLat: 11,
+      startLon: 11,
+      startZoom: 10
+    },
+    // Requests from Domain 3 will start at the default 32.05, -20.00 and have the custom title "The Coolest Map"
+    "www.domain3.net": {
+      title: "The Coolest Map"
+    }
+  }
+}
+```
 
 ## Credits
 

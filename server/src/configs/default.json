@@ -27,6 +27,7 @@
     "weatherCellLimit": 3,
     "searchResultsLimit": 15
   },
+  "multiDomains": {},
   "map": {
     "title": "ReactMap",
     "headerTitle": "ReactMap",
