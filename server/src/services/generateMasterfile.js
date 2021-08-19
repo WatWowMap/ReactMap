@@ -1,15 +1,21 @@
+/* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const fs = require('fs')
 
-const { rarity: adminRarity } = require('./config')
 const fetchJson = require('./functions/fetchJson')
 const defaultRarity = require('../data/defaultRarity.json')
 
 const getRarityLevel = (id, pkmn) => {
+  let adminRarity
   let rarity
+  if (fs.existsSync('../configs/config.json')) {
+    adminRarity = JSON.parse(fs.readFileSync('server/src/configs/config.json', 'utf8'))
+  } else {
+    adminRarity = JSON.parse(fs.readFileSync('server/src/configs/default.json', 'utf8'))
+  }
   for (const [tier, pokemon] of Object.entries(defaultRarity)) {
-    if (adminRarity[tier].length > 0) {
-      if (adminRarity[tier].includes((parseInt(id)))) {
+    if (adminRarity.rarity[tier].length > 0) {
+      if (adminRarity.rarity[tier].includes((parseInt(id)))) {
         rarity = tier
       }
     } else if (pokemon.includes(parseInt(id))) {
@@ -28,7 +34,7 @@ module.exports.generate = async function generate() {
     Object.values(masterfile.pokemon).forEach(pokemon => pokemon.rarity = getRarityLevel(pokemon.id, pokemon))
 
     fs.writeFile(
-      './server/src/data/masterfile.json',
+      'server/src/data/masterfile.json',
       JSON.stringify(masterfile, null, 2),
       'utf8',
       () => { },

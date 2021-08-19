@@ -1,12 +1,13 @@
 /* eslint-disable no-console */
 const fs = require('fs')
 const path = require('path')
-const Utility = require('./Utility')
+
+const fetchJson = require('./functions/fetchJson')
 
 const appLocalesFolder = path.resolve(__dirname, '../../../public/base-locales')
 const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales');
 
-(async function locales() {
+module.exports.locales = async function locales() {
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
   const englishRef = fs.readFileSync(path.resolve(appLocalesFolder, 'en.json'), { encoding: 'utf8', flag: 'r' })
 
@@ -20,7 +21,7 @@ const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales');
     fs.mkdir(`${finalLocalesFolder}/${baseName}`, (error) => error ? console.log(`${locale} already exists, skipping`) : console.log(`${locale} folder created`))
 
     try {
-      const remoteFiles = await Utility.fetchJson(`https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/static/locales/${baseName}.json`)
+      const remoteFiles = await fetchJson(`https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/static/locales/${baseName}.json`)
 
       Object.keys(remoteFiles).forEach(key => {
         if (!key.startsWith('desc_') && !key.startsWith('pokemon_category_')) {
@@ -44,4 +45,4 @@ const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales');
     )
     console.log('localeFile', 'file saved.')
   }))
-}())
+}

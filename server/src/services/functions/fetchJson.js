@@ -1,9 +1,9 @@
-const Fetch = require('node-fetch')
+const fetch = require('node-fetch')
 
 module.exports = function fetchJson(url) {
   try {
     return new Promise(resolve => {
-      Fetch(url)
+      fetch(url)
         .then(res => res.json())
         .then(json => resolve(json))
     })
