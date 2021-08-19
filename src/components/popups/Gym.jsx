@@ -68,7 +68,7 @@ export default function GymPopup({
                 t={t}
               />
               <Divider orientation="vertical" flexItem />
-              <RaidInfo gym={gym} t={t} />
+              <RaidInfo gym={gym} t={t} Icons={Icons} />
               <Timer gym={gym} ts={ts} t={t} />
             </Grid>
           </Collapse>
@@ -236,7 +236,7 @@ const PoiImage = ({ gym, Icons }) => {
   const { url, team_id, name } = gym
   const src = url
     ? url.replace('http://', 'https://')
-    : `${Icons.getTeams(team_id)}`
+    : Icons.getTeams(team_id)
 
   return (
     <Grid
@@ -267,8 +267,10 @@ const RaidImage = ({
   const { pokemon } = useStatic(state => state.masterfile)
 
   const src = raid_pokemon_id
-    ? `${Icons.getPokemon(raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume)}`
-    : `${Icons.getEggs(raid_level, raid_battle_timestamp < ts, raid_is_exclusive)}`
+    ? Icons.getPokemon(
+      raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume,
+    )
+    : Icons.getEggs(raid_level, raid_battle_timestamp < ts, raid_is_exclusive)
 
   const getRaidTypes = (id, form) => {
     if (pokemon[id].forms[form]) {
@@ -316,7 +318,7 @@ const RaidImage = ({
           style={{
             height: 15,
             width: 15,
-            backgroundImage: `url(/images/type/${type.toLowerCase()}.png)`,
+            backgroundImage: `url(${Icons.getTypes(type)})`,
           }}
         />
       ))}
@@ -379,7 +381,7 @@ const GymInfo = ({ gym, t }) => {
   )
 }
 
-const RaidInfo = ({ gym, t }) => {
+const RaidInfo = ({ gym, t, Icons }) => {
   const { moves, pokemon } = useStatic(state => state.masterfile)
   const {
     raid_level, raid_pokemon_id, raid_pokemon_form, raid_pokemon_move_1, raid_pokemon_move_2,
@@ -439,7 +441,7 @@ const RaidInfo = ({ gym, t }) => {
             textAlign: 'center',
             height: 15,
             width: 15,
-            backgroundImage: `url(/images/type/${moves[raid_pokemon_move_1].type.toLowerCase()}.png)`,
+            backgroundImage: `url(${Icons.getTypes(moves[raid_pokemon_move_1].type)})`,
           }}
         />
       )}
@@ -457,7 +459,7 @@ const RaidInfo = ({ gym, t }) => {
             textAlign: 'center',
             height: 15,
             width: 15,
-            backgroundImage: `url(/images/type/${moves[raid_pokemon_move_2].type.toLowerCase()}.png)`,
+            backgroundImage: `url(${Icons.getTypes(moves[raid_pokemon_move_2].type)})`,
           }}
         />
       )}

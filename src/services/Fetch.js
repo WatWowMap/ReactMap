@@ -24,7 +24,33 @@ export default class Fetch {
       return response.json()
     } catch (error) {
       console.error(error.message, `Unable to fetch ${iconPath} at this time, please try again later.`)
-      return { error: true }
+    }
+  }
+
+  static async getInvasions(invasions) {
+    try {
+      const newInvasions = {}
+      const response = await fetch('https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/grunts.json')
+      const pogoInfo = await response.json()
+
+      Object.entries(invasions).forEach(gruntType => {
+        const [type, info] = gruntType
+        const latest = pogoInfo ? pogoInfo[type] : {}
+
+        newInvasions[type] = invasions[type]
+        if (info.encounters) {
+          Object.keys(info.encounters).forEach((position, i) => {
+            if (latest && latest.active) {
+              newInvasions[type].encounters[position] = latest.lineup.team[i].map(pkmn => pkmn.id)
+              newInvasions[type].second_reward = latest.lineup.rewards.length > 1
+            }
+          })
+        }
+      })
+      return newInvasions
+    } catch (e) {
+      console.log('Unable to fetch most recent Invasions')
+      return invasions
     }
   }
 }

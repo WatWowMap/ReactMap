@@ -59,6 +59,7 @@ Pokemon GO Map frontend built with React. Currently in beta testing!
 **The dev yarn scripts do not generate the masterfile and locales like the production scripts do, you must generate them manually using these:**
 
 - `yarn generate` if you want to experiment with the masterfile generator
+- `yarn create-locales` if you want to generate locales manually
 - `yarn build` to only build and not run the server
 - `yarn server` to only start the server without recompiling webpack
 - `yarn console` repl server for running code/playing with the ORM

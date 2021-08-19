@@ -154,10 +154,6 @@ class Pokestop extends Model {
         } else {
           this.parseRewards(pokestop)
         }
-        if (pokestop.quest_form_id === 0 && pokestop.quest_pokemon_id !== 0) {
-          const formId = masterPkmn[pokestop.quest_pokemon_id].default_form_id
-          if (formId) pokestop.quest_form_id = formId
-        }
         const keyRef = [
           {
             filter: pokestop.quest_pokemon_id ? `${pokestop.quest_pokemon_id}-${pokestop.quest_form_id}` : undefined,
@@ -261,12 +257,6 @@ class Pokestop extends Model {
         .where('quest_reward_type', 7)
         .orderBy('quest_pokemon_id')
     }
-    quests.pokemon.forEach(pkmn => {
-      if (pkmn.form == 0 && pkmn.quest_pokemon_id != 0) {
-        const formId = masterPkmn[pkmn.quest_pokemon_id].default_form_id
-        if (formId) pkmn.form = formId
-      }
-    })
 
     Object.entries(quests).forEach(questType => {
       const [type, rewards] = questType

@@ -205,10 +205,9 @@ class Pokemon extends Model {
           if (pkmn.includes('-')) {
             const relevantFilters = getRelevantKeys(filter)
             const [id, form] = pkmn.split('-')
-            const finalForm = masterfile[id].default_form_id == form ? [0, form] : [form]
             ivOr.orWhere(poke => {
               poke.where('pokemon_id', id)
-              poke.whereIn('form', finalForm)
+              poke.andWhere('form', form)
               if (relevantFilters.length > 0) {
                 generateSql(poke, filter, relevantFilters, true)
               }
@@ -249,12 +248,9 @@ class Pokemon extends Model {
     // form checker
     results.forEach(pkmn => {
       let noPvp = true
-      if (pkmn.form === 0) {
-        pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
-      }
       if (pkmn.pokemon_id === 132) {
         pkmn.ditto_form = pkmn.form
-        pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
+        pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
       }
       if (pvp && ((pkmn.pvp_rankings_great_league
         || pkmn.pvp_rankings_ultra_league
@@ -305,9 +301,6 @@ class Pokemon extends Model {
     // filter pokes with pvp data
     pvpResults.forEach(pkmn => {
       const parsed = reactMapHandlesPvp ? this.getOhbemPvp(pkmn) : getParsedPvp(pkmn)
-      if (pkmn.form === 0) {
-        pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
-      }
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       pkmn.cleanPvp = {}
       pkmn.bestPvp = 4096
@@ -358,13 +351,7 @@ class Pokemon extends Model {
       .where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
       .groupBy('pokemon_id', 'form')
       .orderBy('pokemon_id', 'form')
-    return results.map(pkmn => {
-      if (pkmn.form === 0) {
-        const formId = masterfile[pkmn.pokemon_id].default_form_id
-        if (formId) pkmn.form = formId
-      }
-      return `${pkmn.pokemon_id}-${pkmn.form}`
-    })
+    return results.map(pkmn => `${pkmn.pokemon_id}-${pkmn.form}`)
   }
 }
 

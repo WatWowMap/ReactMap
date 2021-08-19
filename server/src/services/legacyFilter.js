@@ -120,7 +120,7 @@ const getLegacy = (results, args, perms, ohbem) => {
     if (split.length === 2) {
       const pokemonId = parseInt(split[0])
       const formId = parseInt(split[1])
-      if ((masterfile.pokemon[pokemonId] || {}).default_form_id === formId) {
+      if ((masterfile.pokemon[pokemonId] || {}).defaultFormId === formId) {
         pokemonLookup[pokemonId] = false
       }
       formLookup[formId] = false
@@ -145,7 +145,7 @@ const getLegacy = (results, args, perms, ohbem) => {
         console.warn('Unrecognized key', key)
       } else {
         pokemonLookup[pokemonId] = false
-        const defaultForm = (masterfile.pokemon[pokemonId] || {}).default_form_id
+        const defaultForm = (masterfile.pokemon[pokemonId] || {}).defaultFormId
         if (defaultForm) {
           formLookup[defaultForm] = false
         }
@@ -167,7 +167,7 @@ const getLegacy = (results, args, perms, ohbem) => {
       if (split.length === 2) {
         const pokemonId = parseInt(split[0])
         const formId = parseInt(split[1])
-        if ((masterfile.pokemon[pokemonId] || {}).default_form_id === formId) {
+        if ((masterfile.pokemon[pokemonId] || {}).defaultFormId === formId) {
           pokemonLookup[pokemonId] = jsFilter
         }
         formLookup[formId] = jsFilter
@@ -182,7 +182,7 @@ const getLegacy = (results, args, perms, ohbem) => {
           console.warn('Unrecognized key', key)
         } else {
           pokemonLookup[pokemonId] = jsFilter
-          const defaultForm = (masterfile.pokemon[pokemonId] || {}).default_form_id
+          const defaultForm = (masterfile.pokemon[pokemonId] || {}).defaultFormId
           if (defaultForm) {
             formLookup[defaultForm] = jsFilter
           }
@@ -277,7 +277,7 @@ const getLegacy = (results, args, perms, ohbem) => {
         continue
       }
       if (result.form === 0) {
-        const formId = masterfile.pokemon[result.pokemon_id].default_form_id
+        const formId = masterfile.pokemon[result.pokemon_id].defaultFormId
         if (formId) result.form = formId
       }
       filtered.id = result.id

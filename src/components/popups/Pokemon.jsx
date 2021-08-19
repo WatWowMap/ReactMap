@@ -18,6 +18,7 @@ export default function PokemonPopup({
   pokemon, iconUrl, userSettings, isTutorial, Icons,
 }) {
   const { t } = useTranslation()
+  const classes = useStyles()
   const {
     pokemon_id, cleanPvp, iv, cp,
   } = pokemon
@@ -44,6 +45,7 @@ export default function PokemonPopup({
         metaData={metaData}
         iconUrl={iconUrl}
         t={t}
+        classes={classes}
       />
       <Timer
         pokemon={pokemon}
@@ -73,6 +75,7 @@ export default function PokemonPopup({
         pvpExpand={pvpExpand}
         setPvpExpand={setPvpExpand}
         hasPvp={hasLeagues.length > 0}
+        classes={classes}
       />
       <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
         {hasLeagues.map(league => (
@@ -90,6 +93,7 @@ export default function PokemonPopup({
           pokemon={pokemon}
           perms={perms}
           t={t}
+          Icons={Icons}
         />
       </Collapse>
     </Grid>
@@ -97,7 +101,7 @@ export default function PokemonPopup({
 }
 
 const Header = ({
-  pokemon, iconUrl, metaData, t,
+  pokemon, metaData, t, classes,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -161,14 +165,16 @@ const Header = ({
     { name: 'exclude', action: handleExclude },
     { name: 'timer', action: handleTimer },
   ]
+
+  console.log(classes.avatarPokemon)
   return (
     <>
       <Grid item xs={3}>
-        <Avatar src={iconUrl} />
+        <Avatar>{metaData.pokedexId}</Avatar>
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'center' }}>
         <Typography variant="h5">
-          {t(`poke_${metaData.pokedex_id}`)}
+          {t(`poke_${metaData.pokedexId}`)}
         </Typography>
         {ditto_form && (
           <Typography variant="caption">
@@ -259,7 +265,8 @@ const Stats = ({ pokemon, perms, t }) => {
 const Info = ({
   pokemon, metaData, perms, Icons,
 }) => {
-  const { gender, weather } = pokemon
+  const { gender, weather, form } = pokemon
+  const formTypes = metaData.forms[form].types || metaData.types
 
   return (
     <Grid
@@ -286,7 +293,7 @@ const Info = ({
           <Icon>{gender === 1 ? 'male' : 'female'}</Icon>
         </Grid>
       )}
-      {metaData.types.map(type => (
+      {formTypes.map(type => (
         <Grid
           item
           key={type}
@@ -294,7 +301,8 @@ const Info = ({
           style={{
             height: 20,
             width: 20,
-            backgroundImage: `url(/images/type/${type.toLowerCase()}.png)`,
+            marginBottom: 5,
+            backgroundImage: `url(${Icons.getTypes(type)})`,
           }}
         />
       ))}
@@ -334,9 +342,8 @@ const Timer = ({ pokemon, hasStats }) => {
 }
 
 const Footer = ({
-  pokemon, expanded, pvpExpand, setExpanded, setPvpExpand, hasPvp,
+  pokemon, expanded, pvpExpand, setExpanded, setPvpExpand, hasPvp, classes,
 }) => {
-  const classes = useStyles()
   const { navigation } = useStore(state => state.settings)
   const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
 
@@ -392,7 +399,9 @@ const Footer = ({
   )
 }
 
-const ExtraInfo = ({ pokemon, perms, t }) => {
+const ExtraInfo = ({
+  pokemon, perms, t, Icons,
+}) => {
   const { moves } = useStatic(state => state.masterfile)
 
   const {
@@ -414,7 +423,7 @@ const ExtraInfo = ({ pokemon, perms, t }) => {
             style={{
               height: 15,
               width: 15,
-              backgroundImage: `url(/images/type/${moves[move].type.toLowerCase()}.png)`,
+              backgroundImage: `url(${Icons.getTypes(moves[move].type)})`,
             }}
           />
           <Grid item xs={6}>
@@ -458,7 +467,10 @@ const PvpInfo = ({
     if (each.rank !== null && each.cp !== null) {
       const tempRow = {
         id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.gender}-${each.rank}-${each.cp}-${each.lvl}-${each.cap}`,
-        img: <img src={`${Icons.getPokemon(each.pokemon, each.form, each.evolution, each.gender, each.costume)}`} height={20} />,
+        img: <img
+          src={Icons.getPokemon(each.pokemon, each.form, each.evolution, each.gender, each.costume)}
+          height={20}
+        />,
         rank: each.rank || 0,
         cp: each.cp || 0,
         lvl: `${each.level || ''}${each.cap && !each.capped ? `/${each.cap}` : ''}`,

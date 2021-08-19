@@ -9,9 +9,9 @@ const i18next = require('i18next')
 const Backend = require('i18next-fs-backend')
 require('./db/initialization')
 
-const { sessionStore } = require('./services/session-store.js')
-const rootRouter = require('./routes/rootRouter.js')
-const config = require('./services/config.js')
+const { sessionStore } = require('./services/session-store')
+const rootRouter = require('./routes/rootRouter')
+const config = require('./services/config')
 
 const app = express()
 
@@ -68,7 +68,7 @@ if (config.discord.enabled) {
 i18next.use(Backend).init({
   lng: 'en',
   fallbackLng: 'en',
-  preload: ['en', 'de', 'es', 'fr', 'pl'],
+  preload: config.localeSelection,
   ns: ['translation'],
   defaultNS: 'translation',
   backend: { loadPath: 'public/locales/{{lng}}/{{ns}}.json' },
