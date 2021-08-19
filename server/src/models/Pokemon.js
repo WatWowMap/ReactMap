@@ -12,15 +12,6 @@ const {
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 
-const leagueObj = {}
-leagues.forEach(league => leagueObj[league.name] = league.cp)
-const ohbem = reactMapHandlesPvp ? new Ohbem({
-  leagues: leagueObj,
-  pokemonData: masterfile,
-  levelCaps: pvpLevels,
-  cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
-}) : null
-
 const dbType = dbSelection('pokemon')
 const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
 const ivCalc = 'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
@@ -32,6 +23,7 @@ const madKeys = {
   def_iv: 'individual_defense',
   sta_iv: 'individual_stamina',
 }
+let ohbem = null
 
 const getMadSql = q => (
   q.join('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
@@ -75,6 +67,17 @@ class Pokemon extends Model {
   static get idColumn() {
     return dbSelection('pokemon') === 'mad'
       ? 'encounter_id' : 'id'
+  }
+
+  static async initOhbem() {
+    const leagueObj = {}
+    leagues.forEach(league => leagueObj[league.name] = league.cp)
+    ohbem = new Ohbem({
+      leagues: leagueObj,
+      pokemonData: await Ohbem.fetchPokemonData(),
+      levelCaps: pvpLevels,
+      cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
+    })
   }
 
   static async getPokemon(args, perms, isMad) {

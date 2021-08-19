@@ -9,6 +9,7 @@ const i18next = require('i18next')
 const Backend = require('i18next-fs-backend')
 require('./db/initialization')
 
+const { Pokemon } = require('./models/index')
 const { sessionStore } = require('./services/session-store')
 const rootRouter = require('./routes/rootRouter')
 const config = require('./services/config')
@@ -78,6 +79,10 @@ i18next.use(Backend).init({
 })
 
 app.use(rootRouter, requestRateLimiter)
+
+if (config.database.settings.reactMapHandlesPvp) {
+  Pokemon.initOhbem()
+}
 
 app.listen(config.port, config.interface, () => {
   // eslint-disable-next-line no-console

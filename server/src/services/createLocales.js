@@ -4,9 +4,9 @@ const path = require('path')
 const Utility = require('./Utility')
 
 const appLocalesFolder = path.resolve(__dirname, '../../../public/base-locales')
-const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales')
+const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales');
 
-module.exports.locales = async function locales() {
+(async function locales() {
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
   const englishRef = fs.readFileSync(path.resolve(appLocalesFolder, 'en.json'), { encoding: 'utf8', flag: 'r' })
 
@@ -44,4 +44,4 @@ module.exports.locales = async function locales() {
     )
     console.log('localeFile', 'file saved.')
   }))
-}
+}())
