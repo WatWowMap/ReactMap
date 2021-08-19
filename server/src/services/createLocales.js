@@ -5,7 +5,7 @@ const path = require('path')
 const fetchJson = require('./functions/fetchJson')
 
 const appLocalesFolder = path.resolve(__dirname, '../../../public/base-locales')
-const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales');
+const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales')
 
 module.exports.locales = async function locales() {
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
@@ -25,7 +25,12 @@ module.exports.locales = async function locales() {
 
       Object.keys(remoteFiles).forEach(key => {
         if (!key.startsWith('desc_') && !key.startsWith('pokemon_category_')) {
-          trimmedRemoteFiles[key] = remoteFiles[key]
+          if (key.startsWith('quest_')) {
+            remoteFiles[key] = remoteFiles[key].replace('}', '%%').replace('}', '%%')
+            trimmedRemoteFiles[key] = remoteFiles[key].replace('%{', '{{').replace('%%', '}}').replace('%{', '{{').replace('%%', '}}')
+          } else {
+            trimmedRemoteFiles[key] = remoteFiles[key]
+          }
         }
       })
     } catch (e) {
