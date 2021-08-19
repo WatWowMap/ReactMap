@@ -156,7 +156,7 @@ export default class UIcons {
   }
 
   getRewards(rewardType, id, amount) {
-    const category = this.questRewardTypes[rewardType].text.toLowerCase().replace(' ', '_')
+    const category = this.questRewardTypes[rewardType].formatted.toLowerCase().replace(' ', '_')
     const baseUrl = `${this[this.selected.reward].path}/reward/${category}`
     const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
     for (const aSuffix of amountSuffixes) {
