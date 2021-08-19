@@ -45,7 +45,6 @@ export default function PokemonPopup({
         metaData={metaData}
         iconUrl={iconUrl}
         t={t}
-        classes={classes}
       />
       <Timer
         pokemon={pokemon}
@@ -100,9 +99,7 @@ export default function PokemonPopup({
   )
 }
 
-const Header = ({
-  pokemon, metaData, t, classes,
-}) => {
+const Header = ({ pokemon, metaData, t }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
   const excludeList = useStatic(state => state.excludeList)
@@ -166,7 +163,6 @@ const Header = ({
     { name: 'timer', action: handleTimer },
   ]
 
-  console.log(classes.avatarPokemon)
   return (
     <>
       <Grid item xs={3}>
