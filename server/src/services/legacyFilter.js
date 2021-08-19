@@ -201,7 +201,7 @@ const getLegacy = (results, args, perms, ohbem) => {
         continue
       }
       if (entry.evolution) {
-        if (masterfile.pokemon[entry.pokemon].temp_evolutions[entry.evolution].unreleased
+        if (masterfile.pokemon[entry.pokemon].tempEvolutions[entry.evolution].unreleased
           ? !interestedMegas.includes('experimental')
           : !interestedMegas.includes(entry.evolution)) {
           continue
@@ -275,10 +275,6 @@ const getLegacy = (results, args, perms, ohbem) => {
       }
       if (!pokemonFilter) {
         continue
-      }
-      if (result.form === 0) {
-        const formId = masterfile.pokemon[result.pokemon_id].defaultFormId
-        if (formId) result.form = formId
       }
       filtered.id = result.id
       filtered.pokemon_id = result.pokemon_id
