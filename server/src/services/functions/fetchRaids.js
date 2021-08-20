@@ -8,7 +8,7 @@ module.exports = async function fetchRaids() {
     Object.entries(pogoInfoResults).forEach(raidTier => {
       const [egg, bosses] = raidTier
       raidsInfo.push(`e${egg}`)
-      bosses.forEach(boss => raidsInfo.push(`${boss.id}-${boss.form || masterfile[boss.id].default_form_id}`))
+      bosses.forEach(boss => raidsInfo.push(`${boss.id}-${boss.form || masterfile[boss.id].defaultFormId}`))
     })
     return raidsInfo
   } catch (e) {

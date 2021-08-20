@@ -132,7 +132,7 @@ export default function WithSliders({
                       <Grid item xs={2}>
                         <img
                           style={{ maxHeight: 30, maxWidth: 30 }}
-                          src={`${Icons.getPokemon(i ? 129 : 19)}`}
+                          src={Icons.getPokemon(i ? 129 : 19)}
                         />
                       </Grid>
                       <Grid item xs={1} className="xs-xl">

@@ -131,11 +131,11 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
-  getTypes(typeId = 1) {
+  getTypes(typeId) {
     const baseUrl = `${this[this.selected.type].path}/type`
     const result = `${typeId}.png`
     if (this[this.selected.type].type.has(result)) {
-      return { url: `${baseUrl}/${result}` }
+      return `${baseUrl}/${result}`
     }
     return `${baseUrl}/0.png`
   }
@@ -156,7 +156,7 @@ export default class UIcons {
   }
 
   getRewards(rewardType, id, amount) {
-    const category = this.questRewardTypes[rewardType].text.toLowerCase().replace(' ', '_')
+    const category = this.questRewardTypes[rewardType].toLowerCase().replace(' ', '_')
     const baseUrl = `${this[this.selected.reward].path}/reward/${category}`
     const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
     for (const aSuffix of amountSuffixes) {
@@ -223,6 +223,15 @@ export default class UIcons {
     const baseUrl = `${this[this.selected.weather].path}/weather`
     const result = `${weatherId}.png`
     if (this[this.selected.weather].weather.has(result)) {
+      return `${baseUrl}/${result}`
+    }
+    return `${baseUrl}/0.png`
+  }
+
+  getNests(typeId) {
+    const baseUrl = `${this[this.selected.nest].path}/nest`
+    const result = `${typeId}.png`
+    if (this[this.selected.nest].nest.has(result)) {
       return `${baseUrl}/${result}`
     }
     return `${baseUrl}/0.png`

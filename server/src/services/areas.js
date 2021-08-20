@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 const fs = require('fs')
 const path = require('path')
-const { discord: { areaRestrictions } } = require('./config.js')
+const { discord: { areaRestrictions } } = require('./config')
 
 const loadAreas = () => {
   let areas = {}

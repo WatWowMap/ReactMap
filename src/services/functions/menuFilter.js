@@ -127,7 +127,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
           default: pokestop.category = 'pokestops'; break
           case 'i':
             pokestop.category = 'invasions'
-            pokestop.name = t(`grunt_${id.slice(1)}`); break
+            pokestop.name = t(`grunt_a_${id.slice(1)}`, `grunt_${id.slice(1)}`); break
           case 'd':
             pokestop = { name: `x${id.slice(1)}` } || {}
             pokestop.category = 'items'; break
@@ -236,20 +236,20 @@ export default function menuFilter(tempFilters, menus, search, type) {
       let formName = form.name || 'Normal'
       formName = formName === 'Normal' ? '' : formName
       const name = formName === '' ? pkmn.name : formName
-      const displayName = j == pkmn.default_form_id ? t(`poke_${i}`) : t(`form_${j}`)
-      const formTypes = form.types || pkmn.types
+      const displayName = j == pkmn.defaultFormId ? t(`poke_${i}`) : t(`form_${j}`)
+      const formTypes = form.types || pkmn.types || []
       total += 1
       pkmn.category = 'pokemon'
       switch (switchKey) {
         default:
           if (generations[pkmn.generation]
-            || types[formTypes[0]] || types[formTypes[1]]
+            || types[masterfile.types[formTypes[0]]] || types[masterfile.types[formTypes[1]]]
             || rarity[pkmn.rarity]
-            || (forms[name] || (forms.altForms && j != pkmn.default_form_id))
+            || (forms[name] || (forms.altForms && j != pkmn.defaultFormId))
             || categories[pkmn.category]) {
             if (forms.altForms) {
               addPokemon(id, displayName)
-            } else if (j == pkmn.default_form_id || forms[name]) {
+            } else if (j == pkmn.defaultFormId || forms[name]) {
               addPokemon(id, displayName)
             }
           } break
@@ -266,7 +266,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
           searchTerms.forEach(term => {
             if (typeof term === 'string') {
               if ((meta.includes(term))
-                || pkmn.pokedex_id == term) {
+                || pkmn.pokedexId == term) {
                 addPokemon(id, displayName)
               }
             } else {
@@ -279,7 +279,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
           if ((tempAdvFilter.generations || generations[pkmn.generation])
             && (tempAdvFilter.types || typeResolver(formTypes))
             && (tempAdvFilter.rarity || rarity[pkmn.rarity])
-            && (tempAdvFilter.forms || (forms.altForms ? j != pkmn.default_form_id : forms[name]))) {
+            && (tempAdvFilter.forms || (forms.altForms ? j != pkmn.defaultFormId : forms[name]))) {
             addPokemon(id, displayName)
           } break
         }

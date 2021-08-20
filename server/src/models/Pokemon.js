@@ -12,15 +12,6 @@ const {
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 
-const leagueObj = {}
-leagues.forEach(league => leagueObj[league.name] = league.cp)
-const ohbem = reactMapHandlesPvp ? new Ohbem({
-  leagues: leagueObj,
-  pokemonData: masterfile,
-  levelCaps: pvpLevels,
-  cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
-}) : null
-
 const dbType = dbSelection('pokemon')
 const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
 const ivCalc = 'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
@@ -32,6 +23,7 @@ const madKeys = {
   def_iv: 'individual_defense',
   sta_iv: 'individual_stamina',
 }
+let ohbem = null
 
 const getMadSql = q => (
   q.join('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
@@ -75,6 +67,17 @@ class Pokemon extends Model {
   static get idColumn() {
     return dbSelection('pokemon') === 'mad'
       ? 'encounter_id' : 'id'
+  }
+
+  static async initOhbem() {
+    const leagueObj = {}
+    leagues.forEach(league => leagueObj[league.name] = league.cp)
+    ohbem = new Ohbem({
+      leagues: leagueObj,
+      pokemonData: await Ohbem.fetchPokemonData(),
+      levelCaps: pvpLevels,
+      cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
+    })
   }
 
   static async getPokemon(args, perms, isMad) {
@@ -205,10 +208,9 @@ class Pokemon extends Model {
           if (pkmn.includes('-')) {
             const relevantFilters = getRelevantKeys(filter)
             const [id, form] = pkmn.split('-')
-            const finalForm = masterfile[id].default_form_id == form ? [0, form] : [form]
             ivOr.orWhere(poke => {
               poke.where('pokemon_id', id)
-              poke.whereIn('form', finalForm)
+              poke.andWhere('form', form)
               if (relevantFilters.length > 0) {
                 generateSql(poke, filter, relevantFilters, true)
               }
@@ -249,12 +251,9 @@ class Pokemon extends Model {
     // form checker
     results.forEach(pkmn => {
       let noPvp = true
-      if (pkmn.form === 0) {
-        pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
-      }
       if (pkmn.pokemon_id === 132) {
         pkmn.ditto_form = pkmn.form
-        pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
+        pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
       }
       if (pvp && ((pkmn.pvp_rankings_great_league
         || pkmn.pvp_rankings_ultra_league
@@ -305,9 +304,6 @@ class Pokemon extends Model {
     // filter pokes with pvp data
     pvpResults.forEach(pkmn => {
       const parsed = reactMapHandlesPvp ? this.getOhbemPvp(pkmn) : getParsedPvp(pkmn)
-      if (pkmn.form === 0) {
-        pkmn.form = masterfile[pkmn.pokemon_id].default_form_id
-      }
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       pkmn.cleanPvp = {}
       pkmn.bestPvp = 4096
@@ -358,13 +354,7 @@ class Pokemon extends Model {
       .where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
       .groupBy('pokemon_id', 'form')
       .orderBy('pokemon_id', 'form')
-    return results.map(pkmn => {
-      if (pkmn.form === 0) {
-        const formId = masterfile[pkmn.pokemon_id].default_form_id
-        if (formId) pkmn.form = formId
-      }
-      return `${pkmn.pokemon_id}-${pkmn.form}`
-    })
+    return results.map(pkmn => `${pkmn.pokemon_id}-${pkmn.form}`)
   }
 }
 

@@ -5020,13 +5020,6 @@ pkg-up@^2.0.0:
   dependencies:
     protobufjs "^6.10.2"
 
-"pogo-translations@git+https://github.com/bschultz/pogo-translations.git":
-  version "0.2.0"
-  resolved "git+https://github.com/bschultz/pogo-translations.git#d5d95328b9a9727f1f046adb7b57c4e5852b9386"
-  dependencies:
-    node-fetch "^2.6.1"
-    pogo-protos "github:Furtif/pogo-protos"
-
 popper.js@1.16.1-lts:
   version "1.16.1-lts"
   resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1-lts.tgz#cf6847b807da3799d80ee3d6d2f90df8a3f50b05"

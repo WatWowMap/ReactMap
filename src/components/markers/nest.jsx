@@ -12,7 +12,7 @@ export default function nestMarker(iconUrl, nest, pokemon, filters, Icons, recen
     <div className="marker-image-holder">
       <span className="text-nowrap">
         <img
-          src={`/images/nest/nest-${types[0].toLowerCase()}.png`}
+          src={Icons.getNests(types[0])}
           className={types.length === 2 ? 'type-img-1' : 'type-img-single'}
           style={{
             width: size,
@@ -22,7 +22,7 @@ export default function nestMarker(iconUrl, nest, pokemon, filters, Icons, recen
         />
         {types.length === 2 && (
           <img
-            src={`/images/nest/nest-${types[1].toLowerCase()}.png`}
+            src={Icons.getNests(types[1])}
             className="type-img-2"
             style={{
               width: size,
@@ -36,7 +36,7 @@ export default function nestMarker(iconUrl, nest, pokemon, filters, Icons, recen
         src={iconUrl}
         style={{
           width: size,
-          height: 'auto',
+          height: size,
           opacity,
         }}
       />
