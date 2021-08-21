@@ -10,7 +10,7 @@ const config = require('../services/config')
 const Utility = require('../services/Utility')
 const masterfile = require('../data/masterfile.json')
 const {
-  Pokemon, Gym, Pokestop, Nest,
+  Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter,
 } = require('../models/index')
 
 const rootRouter = new express.Router()
@@ -136,6 +136,23 @@ rootRouter.get('/settings', async (req, res) => {
         }
         console.warn(e, '\nUnable to query available, attempting to fetch from GitHub instead')
       }
+
+      // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile
+      // Primary for quest rewards that are form unset, despite normally have a set form
+      Object.keys(serverSettings.available).forEach(category => {
+        serverSettings.available[category].forEach(item => {
+          if (!serverSettings.defaultFilters[category].filter[item] && !item.startsWith('132')) {
+            serverSettings.defaultFilters[category].filter[item] = category === 'pokemon'
+              ? new PokemonFilter()
+              : new GenericFilter()
+            if (typeof parseInt(item.charAt(0)) === 'number') {
+              const masterfileRef = masterfile.pokemon[item.split('-')[0]]
+              if (!masterfileRef.forms) masterfileRef.forms = {}
+              masterfileRef.forms[item.split('-')[1]] = { name: '*' }
+            }
+          }
+        })
+      })
 
       serverSettings.ui = Utility.buildPrimaryUi(serverSettings.defaultFilters, serverSettings.user.perms)
 

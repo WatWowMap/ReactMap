@@ -31,7 +31,10 @@ module.exports.generate = async function generate() {
   try {
     const masterfile = await fetchJson('https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-react-map.json')
 
-    Object.values(masterfile.pokemon).forEach(pokemon => pokemon.rarity = getRarityLevel(pokemon.id, pokemon))
+    Object.values(masterfile.pokemon).forEach(pokemon => {
+      pokemon.rarity = getRarityLevel(pokemon.id, pokemon)
+      pokemon.types = pokemon.types || []
+    })
 
     fs.writeFile(
       'server/src/data/masterfile.json',
