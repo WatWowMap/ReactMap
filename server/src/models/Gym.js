@@ -69,16 +69,15 @@ class Gym extends Model {
     const slots = []
 
     Object.keys(args.filters).forEach(gym => {
-      if (gym.charAt(0) !== 'o') {
-        switch (gym.charAt(0)) {
-          default: raidBosses.add(gym.split('-')[0]); break
-          case 'e': eggs.push(gym.slice(1)); break
-          case 't': teams.push(gym.slice(1).split('-')[0]); break
-          case 'g': slots.push({
-            team: gym.slice(1).split('-')[0],
-            slots: 6 - gym.slice(1).split('-')[1],
-          }); break
-        }
+      switch (gym.charAt(0)) {
+        case 'o': break
+        case 'e': eggs.push(gym.slice(1)); break
+        case 't': teams.push(gym.slice(1).split('-')[0]); break
+        case 'g': slots.push({
+          team: gym.slice(1).split('-')[0],
+          slots: 6 - gym.slice(1).split('-')[1],
+        }); break
+        default: raidBosses.add(gym.split('-')[0]); break
       }
     })
     const finalTeams = []

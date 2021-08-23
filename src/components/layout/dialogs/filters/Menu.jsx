@@ -190,6 +190,14 @@ export default function Menu({ filters, toggleDialog, category }) {
     </Grid>,
   )
 
+  if (menus[category].filters.others.onlyAvailable) {
+    allFilterMenus.push(
+      <Grid item key="onlyAvailable">
+        <Typography variant="caption" align="center">{t('onlyShowingAvailable')}</Typography>
+      </Grid>,
+    )
+  }
+
   return (
     <>
       <Dialog
