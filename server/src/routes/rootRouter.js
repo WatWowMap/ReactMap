@@ -149,7 +149,7 @@ rootRouter.get('/settings', async (req, res) => {
           })
         })
       } catch (e) {
-        console.warn('Unable to add missing items to the filters')
+        console.warn(e, '\nUnable to add missing items to the filters')
       }
 
       serverSettings.ui = Utility.buildPrimaryUi(serverSettings.defaultFilters, serverSettings.user.perms)
