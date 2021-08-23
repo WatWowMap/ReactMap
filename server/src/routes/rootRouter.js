@@ -142,8 +142,14 @@ rootRouter.get('/settings', async (req, res) => {
                 : new GenericFilter()
               if (typeof parseInt(item.charAt(0)) === 'number') {
                 const masterfileRef = masterfile.pokemon[item.split('-')[0]]
-                if (!masterfileRef.forms) masterfileRef.forms = {}
-                masterfileRef.forms[item.split('-')[1]] = { name: '*' }
+                if (masterfileRef) {
+                  if (!masterfileRef.forms) {
+                    masterfileRef.forms = {}
+                  }
+                  masterfileRef.forms[item.split('-')[1]] = { name: '*' }
+                } else {
+                  console.warn('Missing and unable to add', category, item)
+                }
               }
             }
           })
