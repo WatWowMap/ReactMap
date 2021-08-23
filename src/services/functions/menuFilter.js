@@ -245,7 +245,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
           // todo: remove continue
         }
       }
-      const formTypes = form.types || pkmn.types || []
+      const formTypes = (form.types || pkmn.types || []).map(typeId => masterfile.types[typeId])
       total += 1
       pkmn.category = 'pokemon'
       switch (switchKey) {
@@ -254,7 +254,10 @@ export default function menuFilter(tempFilters, menus, search, type) {
         case 'unselected': if (!tempFilters[id].enabled) addPokemon(id, displayName); break
         case 'available':
           if (available.includes(id)
-            && (tempAdvFilter.categories || categories[pkmn.category])) {
+            && (tempAdvFilter.generations || generations[pkmn.generation])
+            && (tempAdvFilter.types || typeResolver(formTypes))
+            && (tempAdvFilter.rarity || rarity[pkmn.rarity])
+            && (tempAdvFilter.forms || (forms.altForms ? j != pkmn.defaultFormId : forms[displayName]))) {
             addPokemon(id, displayName)
           } break
         case 'search': {
@@ -285,7 +288,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
             || rarity[pkmn.rarity]
             || (forms[displayName] || (forms.altForms && j != pkmn.defaultFormId))
             || categories[pkmn.category]) {
-            if (forms.altForms) {
+            if (forms.altForms || categories[pkmn.category]) {
               addPokemon(id, displayName)
             } else if (j == pkmn.defaultFormId || forms[displayName]) {
               addPokemon(id, displayName)
