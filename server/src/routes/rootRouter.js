@@ -71,7 +71,7 @@ rootRouter.get('/settings', async (req, res) => {
     }
 
     // add user options here from the config that are structured as objects
-    if (serverSettings.user) {
+    if (serverSettings.user && serverSettings.user.perms) {
       serverSettings.loggedIn = req.user
       serverSettings.config = {
         map: { ...config.map, excludeList: config.excludeFromTutorial },
@@ -128,31 +128,29 @@ rootRouter.get('/settings', async (req, res) => {
             : await Utility.fetchNests(),
         }
       } catch (e) {
-        serverSettings.available = {
-          pokemon: [],
-          gyms: await Utility.fetchRaids(),
-          pokestops: await Utility.fetchQuests(),
-          nests: await Utility.fetchNests(),
-        }
-        console.warn(e, '\nUnable to query available, attempting to fetch from GitHub instead')
+        console.warn(e, '\nUnable to query available.')
       }
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile
       // Primary for quest rewards that are form unset, despite normally have a set form
-      Object.keys(serverSettings.available).forEach(category => {
-        serverSettings.available[category].forEach(item => {
-          if (!serverSettings.defaultFilters[category].filter[item] && !item.startsWith('132')) {
-            serverSettings.defaultFilters[category].filter[item] = category === 'pokemon'
-              ? new PokemonFilter()
-              : new GenericFilter()
-            if (typeof parseInt(item.charAt(0)) === 'number') {
-              const masterfileRef = masterfile.pokemon[item.split('-')[0]]
-              if (!masterfileRef.forms) masterfileRef.forms = {}
-              masterfileRef.forms[item.split('-')[1]] = { name: '*' }
+      try {
+        Object.keys(serverSettings.available).forEach(category => {
+          serverSettings.available[category].forEach(item => {
+            if (!serverSettings.defaultFilters[category].filter[item] && !item.startsWith('132')) {
+              serverSettings.defaultFilters[category].filter[item] = category === 'pokemon'
+                ? new PokemonFilter()
+                : new GenericFilter()
+              if (typeof parseInt(item.charAt(0)) === 'number') {
+                const masterfileRef = masterfile.pokemon[item.split('-')[0]]
+                if (!masterfileRef.forms) masterfileRef.forms = {}
+                masterfileRef.forms[item.split('-')[1]] = { name: '*' }
+              }
             }
-          }
+          })
         })
-      })
+      } catch (e) {
+        console.warn('Unable to add missing items to the filters')
+      }
 
       serverSettings.ui = Utility.buildPrimaryUi(serverSettings.defaultFilters, serverSettings.user.perms)
 
