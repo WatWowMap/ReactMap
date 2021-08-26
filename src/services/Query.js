@@ -10,6 +10,7 @@ import getAllSubmissionCells from './queries/submissionCells'
 import { getOne, getAllNests } from './queries/nest'
 import getAllScanAreas from './queries/scanAreas'
 import * as searchIndex from './queries/search'
+import setWebhook from './queries/webhook'
 
 export default class Query {
   static devices() {
@@ -112,5 +113,9 @@ export default class Query {
       case 'nests':
       case 'quests': return searchIndex[category]
     }
+  }
+
+  static webhook() {
+    return setWebhook
   }
 }

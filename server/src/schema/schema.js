@@ -5,12 +5,13 @@ const {
 const { JSONResolver } = require('graphql-scalars')
 const fs = require('fs')
 const { raw } = require('objection')
-
+const fetch = require('node-fetch')
 const DeviceType = require('./device')
 const GymType = require('./gym')
 const NestType = require('./nest')
 const PokestopType = require('./pokestop')
 const PokemonType = require('./pokemon')
+const WebhookType = require('./webhook')
 const PortalType = require('./portal')
 const S2cellType = require('./s2cell')
 const ScanAreaType = require('./scanArea')
@@ -18,7 +19,7 @@ const SearchType = require('./search')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
-
+const { webhooks } = require('../services/config')
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
 } = require('../models/index')
@@ -331,4 +332,36 @@ const RootQuery = new GraphQLObjectType({
   },
 })
 
-module.exports = new GraphQLSchema({ query: RootQuery })
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    webhook: {
+      type: WebhookType,
+      args: {
+        category: { type: GraphQLString },
+        dataObj: { type: JSONResolver },
+      },
+      async resolve(parent, args, req) {
+        const perms = req.user ? req.user.perms : req.session.perms
+        const { category } = args
+        if (perms.webhooks && perms[category]) {
+          switch (webhooks.provider) {
+            case 'poracle':
+              return fetch(`${webhooks.host}:${webhooks.port}/api/reactmap`, {
+                method: 'GET',
+                headers: {
+                  'X-Poracle-Secret': webhooks.poracleSecret,
+                  userId: req.user ? req.user.id : null,
+                  category,
+                  ...args.dataObj,
+                },
+              })
+            default: return { status: false }
+          }
+        }
+      },
+    },
+  },
+})
+
+module.exports = new GraphQLSchema({ query: RootQuery, mutation: Mutation })

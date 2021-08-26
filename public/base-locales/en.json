@@ -134,6 +134,7 @@
   "excludeInvasion": "Exclude Invasion",
   "excludeTeam": "Exclude Team",
   "excludeRaid": "Exclude Raid",
+  "excludeLure": "Exclude Lure",
   "timer": "Timer",
   "hide": "Hide",
   "tier": "Tier",
@@ -370,5 +371,16 @@
   "popupPokemonSeenDescriptionWidth": 5,
   "popupPokestopSeenDataWidth": 7,
   "popupPokestopSeenDescriptionWidth": 5,
-  "onlyShowingAvailable": "Only Showing Available"
+  "onlyShowingAvailable": "Only Showing Available",
+  "webhookEntry": "Add {{category}} to {{name}}",
+  "webhookSuccess": "Added",
+  "webhookFailed": "Failed",
+  "gym": "Gym",
+  "egg": "Egg",
+  "raid": "Raid",
+  "lure": "Lure",
+  "quest": "Quest",
+  "invasion": "Invasion",
+  "nest": "Nest",
+  "pokestop": "Pokestop"
 }

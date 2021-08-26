@@ -74,7 +74,11 @@ rootRouter.get('/settings', async (req, res) => {
     if (serverSettings.user && serverSettings.user.perms) {
       serverSettings.loggedIn = req.user
       serverSettings.config = {
-        map: { ...config.map, excludeList: config.excludeFromTutorial },
+        map: {
+          ...config.map,
+          excludeList: config.excludeFromTutorial,
+          webhook: config.webhooks.name,
+        },
         tileServers: config.tileServers,
         navigation: config.navigation,
         drawer: {

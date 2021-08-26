@@ -11,6 +11,7 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
+import useWebhook from '@hooks/useWebhook'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
@@ -22,13 +23,13 @@ export default function PokemonPopup({
   const {
     pokemon_id, cleanPvp, iv, cp,
   } = pokemon
-  const { pokemon: pokemonPerms } = useStatic(state => state.ui)
-  const perms = isTutorial ? {
+  const { perms } = useStatic(state => state.auth)
+  const pokePerms = isTutorial ? {
     pvp: true, stats: true, iv: true,
-  } : pokemonPerms
+  } : perms
   const { pokemon: { [pokemon_id]: metaData } } = useStatic(state => state.masterfile)
   const [expanded, setExpanded] = useState(false)
-  const [pvpExpand, setPvpExpand] = useState((userSettings.prioritizePvpInfo && perms.pvp))
+  const [pvpExpand, setPvpExpand] = useState((userSettings.prioritizePvpInfo && pokePerms.pvp))
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
 
@@ -45,6 +46,7 @@ export default function PokemonPopup({
         metaData={metaData}
         iconUrl={iconUrl}
         t={t}
+        perms={perms}
       />
       <Timer
         pokemon={pokemon}
@@ -55,7 +57,7 @@ export default function PokemonPopup({
           <Stats
             pokemon={pokemon}
             metaData={metaData}
-            perms={perms}
+            perms={pokePerms}
             t={t}
           />
           <Divider orientation="vertical" flexItem />
@@ -64,7 +66,7 @@ export default function PokemonPopup({
       <Info
         pokemon={pokemon}
         metaData={metaData}
-        perms={perms}
+        perms={pokePerms}
         Icons={Icons}
       />
       <Footer
@@ -90,7 +92,7 @@ export default function PokemonPopup({
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <ExtraInfo
           pokemon={pokemon}
-          perms={perms}
+          perms={pokePerms}
           t={t}
           Icons={Icons}
         />
@@ -99,7 +101,9 @@ export default function PokemonPopup({
   )
 }
 
-const Header = ({ pokemon, metaData, t }) => {
+const Header = ({
+  pokemon, metaData, t, perms,
+}) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
   const excludeList = useStatic(state => state.excludeList)
@@ -108,10 +112,9 @@ const Header = ({ pokemon, metaData, t }) => {
   const setTimerList = useStatic(state => state.setTimerList)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
+  const { setWebhook, StatusAlert, handleAlertClose } = useWebhook()
 
   const [anchorEl, setAnchorEl] = useState(false)
-
-  const open = Boolean(anchorEl)
   const {
     id, pokemon_id, form, ditto_form, display_pokemon_id,
   } = pokemon
@@ -122,6 +125,7 @@ const Header = ({ pokemon, metaData, t }) => {
 
   const handleClose = () => {
     setAnchorEl(null)
+    handleAlertClose(false)
   }
 
   const handleHide = () => {
@@ -163,6 +167,10 @@ const Header = ({ pokemon, metaData, t }) => {
     { name: 'timer', action: handleTimer },
   ]
 
+  if (perms.webhooks) {
+    options.push(setWebhook('pokemon', { pokemon }))
+  }
+
   return (
     <>
       <Grid item xs={3}>
@@ -189,21 +197,22 @@ const Header = ({ pokemon, metaData, t }) => {
       <Menu
         anchorEl={anchorEl}
         keepMounted
-        open={open}
+        open={Boolean(anchorEl)}
         onClose={handleClose}
         PaperProps={{
           style: {
             maxHeight: 216,
-            width: '20ch',
+            minWidth: '20ch',
           },
         }}
       >
         {options.map((option) => (
-          <MenuItem key={option.name} onClick={option.action}>
-            {t(option.name)}
+          <MenuItem key={option.key || option.name} onClick={option.action}>
+            {typeof option.name === 'string' ? t(option.name) : option.name}
           </MenuItem>
         ))}
       </Menu>
+      <StatusAlert />
     </>
   )
 }

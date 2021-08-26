@@ -9,6 +9,7 @@ import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
+import useWebhook from '@hooks/useWebhook'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
@@ -16,7 +17,7 @@ export default function GymPopup({
   gym, hasRaid, ts, Icons,
 }) {
   const { t } = useTranslation()
-  const { gyms: perms } = useStatic(state => state.ui)
+  const { perms } = useStatic(state => state.auth)
   const [raidExpand, setRaidExpand] = useState(hasRaid)
   const [extraExpand, setExtraExpand] = useState(false)
 
@@ -104,10 +105,10 @@ const Header = ({
   const setTimerList = useStatic(state => state.setTimerList)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
+  const { setWebhook, StatusAlert, handleAlertClose } = useWebhook()
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [gymName, setGymName] = useState(true)
-  const open = Boolean(anchorEl)
   const {
     id, team_id, raid_pokemon_id, raid_pokemon_form, raid_level,
   } = gym
@@ -119,6 +120,7 @@ const Header = ({
 
   const handleClose = () => {
     setAnchorEl(null)
+    handleAlertClose(false)
   }
 
   const handleHide = () => {
@@ -182,12 +184,22 @@ const Header = ({
 
   if (perms.gyms) {
     options.push({ name: 'excludeTeam', action: excludeTeam })
+    if (perms.webhooks) {
+      options.push(setWebhook('gym', { id }))
+    }
   }
   if (perms.raids && hasRaid) {
     options.push(
       { name: 'excludeRaid', action: excludeBoss },
       { name: 'timer', action: handleTimer },
     )
+    if (perms.webhooks) {
+      if (raid_pokemon_id) {
+        options.push(setWebhook('raid', { raid_pokemon_id, raid_pokemon_form }))
+      } else {
+        options.push(setWebhook('egg', { raid_level }))
+      }
+    }
   }
 
   return (
@@ -213,21 +225,22 @@ const Header = ({
       <Menu
         anchorEl={anchorEl}
         keepMounted
-        open={open}
+        open={Boolean(anchorEl)}
         onClose={handleClose}
         PaperProps={{
           style: {
             maxHeight: 216,
-            width: '20ch',
+            minWidth: '20ch',
           },
         }}
       >
         {options.map((option) => (
-          <MenuItem key={option.name} onClick={option.action}>
-            {t(option.name)}
+          <MenuItem key={option.key || option.name} onClick={option.action}>
+            {typeof option.name === 'string' ? t(option.name) : option.name}
           </MenuItem>
         ))}
       </Menu>
+      <StatusAlert />
     </>
   )
 }
@@ -253,7 +266,6 @@ const PoiImage = ({ gym, Icons }) => {
         }}
       />
     </Grid>
-
   )
 }
 

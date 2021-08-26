@@ -42,7 +42,7 @@ const NestTile = ({
             <PopupContent
               nest={item}
               iconUrl={iconUrl}
-              pokemon={item.pokemon_id}
+              pokemon={item}
               recent={recent}
             />
           </Popup>

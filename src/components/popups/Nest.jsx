@@ -1,16 +1,31 @@
 /* eslint-disable camelcase */
 import React, { useState } from 'react'
-import { Grid, Typography, Divider } from '@material-ui/core'
+import {
+  Grid, Typography, IconButton, Divider, Menu, MenuItem,
+} from '@material-ui/core'
+import { MoreVert } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
+
+import { useStore, useStatic } from '@hooks/useStore'
+import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 
 export default function NestPopup({
   nest, iconUrl, pokemon, recent,
 }) {
   const { t } = useTranslation()
+  const { setWebhook, StatusAlert, handleAlertClose } = useWebhook()
+  const hideList = useStatic(state => state.hideList)
+  const setHideList = useStatic(state => state.setHideList)
+  const excludeList = useStatic(state => state.excludeList)
+  const setExcludeList = useStatic(state => state.setExcludeList)
+  const { perms } = useStatic(state => state.auth)
+  const filters = useStore(state => state.filters)
+  const setFilters = useStore(state => state.setFilters)
   const [parkName, setParkName] = useState(true)
+  const [anchorEl, setAnchorEl] = useState(false)
   const {
-    name, updated, pokemon_avg,
+    id, name, updated, pokemon_avg,
   } = nest
 
   const lastUpdated = Utility.getTimeUntil((new Date(updated * 1000)))
@@ -26,6 +41,48 @@ export default function NestPopup({
     return color
   }
 
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null)
+    handleAlertClose(false)
+  }
+
+  const handleHide = () => {
+    setAnchorEl(null)
+    setHideList([...hideList, id])
+  }
+
+  const handleExclude = () => {
+    setAnchorEl(null)
+    const key = `${pokemon.pokemon_id}-${pokemon.pokemon_form}`
+    setFilters({
+      ...filters,
+      nests: {
+        ...filters.nests,
+        filter: {
+          ...filters.nests.filter,
+          [key]: {
+            ...filters.nests.filter[key],
+            enabled: false,
+          },
+        },
+      },
+    })
+    setExcludeList([...excludeList, key])
+  }
+
+  const options = [
+    { name: 'hide', action: handleHide },
+    { name: 'exclude', action: handleExclude },
+  ]
+
+  if (perms.webhooks) {
+    options.push(setWebhook('nest', { pokemon }))
+  }
+
   return (
     <Grid
       container
@@ -34,7 +91,7 @@ export default function NestPopup({
       style={{ width: 200 }}
       spacing={1}
     >
-      <Grid item xs={12}>
+      <Grid item xs={9}>
         <Typography
           variant={name.length > 20 ? 'subtitle2' : 'h6'}
           align="center"
@@ -44,6 +101,33 @@ export default function NestPopup({
           {name}
         </Typography>
       </Grid>
+      <Grid item xs={3}>
+        <IconButton
+          aria-haspopup="true"
+          onClick={handleClick}
+        >
+          <MoreVert style={{ color: 'white' }} />
+        </IconButton>
+      </Grid>
+      <Menu
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        PaperProps={{
+          style: {
+            maxHeight: 216,
+            minWidth: '20ch',
+          },
+        }}
+      >
+        {options.map((option) => (
+          <MenuItem key={option.key || option.name} onClick={option.action}>
+            {typeof option.name === 'string' ? t(option.name) : option.name}
+          </MenuItem>
+        ))}
+      </Menu>
+      <StatusAlert />
       <Grid item xs={6} style={{ textAlign: 'center' }}>
         <img
           src={iconUrl}
@@ -54,7 +138,7 @@ export default function NestPopup({
         />
         <br />
         <Typography variant="caption">
-          {t(`poke_${pokemon}`)}
+          {t(`poke_${pokemon.pokemon_id}`)}
         </Typography>
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'center' }}>
