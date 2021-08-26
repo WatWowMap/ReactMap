@@ -186,6 +186,7 @@ const Header = ({
     options.push({ name: 'excludeTeam', action: excludeTeam })
     if (perms.webhooks) {
       options.push(setWebhook('gym', { id }))
+      options.push(setWebhook('team', { team_id }))
     }
   }
   if (perms.raids && hasRaid) {
