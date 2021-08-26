@@ -348,7 +348,7 @@ const Mutation = new GraphQLObjectType({
           switch (webhooks.provider) {
             case 'poracle':
               return fetch(`${webhooks.host}:${webhooks.port}/api/reactmap`, {
-                method: 'GET',
+                method: 'POST',
                 headers: {
                   'X-Poracle-Secret': webhooks.poracleSecret,
                   userId: req.user ? req.user.id : null,
