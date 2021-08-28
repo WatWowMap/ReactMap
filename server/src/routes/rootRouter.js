@@ -10,7 +10,7 @@ const config = require('../services/config')
 const Utility = require('../services/Utility')
 const masterfile = require('../data/masterfile.json')
 const {
-  Pokemon, Gym, Pokestop, Nest,
+  Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter,
 } = require('../models/index')
 
 const rootRouter = new express.Router()
@@ -67,11 +67,11 @@ rootRouter.get('/settings', async (req, res) => {
     const serverSettings = {
       user: getUser(),
       discord: config.discord.enabled,
-      settings: {},
+      settings: { },
     }
 
     // add user options here from the config that are structured as objects
-    if (serverSettings.user) {
+    if (serverSettings.user && serverSettings.user.perms) {
       const getSelectedDomain = () => {
         let base = config.map
         if (config.multiDomains[req.headers.host]) {
@@ -86,10 +86,10 @@ rootRouter.get('/settings', async (req, res) => {
         tileServers: config.tileServers,
         navigation: config.navigation,
         drawer: {
-          temporary: {},
-          persistent: {},
+          temporary: { },
+          persistent: { },
         },
-        manualAreas: config.manualAreas || {},
+        manualAreas: config.manualAreas || { },
         icons: config.icons,
       }
 
@@ -99,8 +99,8 @@ rootRouter.get('/settings', async (req, res) => {
       ]
 
       arrayUserOptions.forEach(userMenu => {
-        serverSettings.config[userMenu.name] = {}
-        userMenu.values.forEach(value => serverSettings.config[userMenu.name][value] = {})
+        serverSettings.config[userMenu.name] = { }
+        userMenu.values.forEach(value => serverSettings.config[userMenu.name][value] = { })
       })
 
       // keys that are being sent to the frontend but are not options
@@ -136,13 +136,34 @@ rootRouter.get('/settings', async (req, res) => {
             : await Utility.fetchNests(),
         }
       } catch (e) {
-        serverSettings.available = {
-          pokemon: [],
-          gyms: await Utility.fetchRaids(),
-          pokestops: await Utility.fetchQuests(),
-          nests: await Utility.fetchNests(),
-        }
-        console.warn(e, '\nUnable to query available, attempting to fetch from GitHub instead')
+        console.warn(e, '\nUnable to query available.')
+      }
+
+      // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile
+      // Primary for quest rewards that are form unset, despite normally have a set form
+      try {
+        Object.keys(serverSettings.available).forEach(category => {
+          serverSettings.available[category].forEach(item => {
+            if (!serverSettings.defaultFilters[category].filter[item] && !item.startsWith('132')) {
+              serverSettings.defaultFilters[category].filter[item] = category === 'pokemon'
+                ? new PokemonFilter()
+                : new GenericFilter()
+              if (typeof parseInt(item.charAt(0)) === 'number') {
+                const masterfileRef = masterfile.pokemon[item.split('-')[0]]
+                if (masterfileRef) {
+                  if (!masterfileRef.forms) {
+                    masterfileRef.forms = { }
+                  }
+                  masterfileRef.forms[item.split('-')[1]] = { name: '*' }
+                } else {
+                  console.warn('Missing and unable to add', category, item)
+                }
+              }
+            }
+          })
+        })
+      } catch (e) {
+        console.warn(e, '\nUnable to add missing items to the filters')
       }
 
       serverSettings.ui = Utility.buildPrimaryUi(serverSettings.defaultFilters, serverSettings.user.perms)

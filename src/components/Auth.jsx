@@ -6,7 +6,7 @@ import Login from './Login'
 import WebhookQuery from './WebhookQuery'
 
 const Auth = ({ serverSettings, match }) => {
-  if ((serverSettings.discord && !serverSettings.user) || !serverSettings.user.perms.map) {
+  if ((serverSettings.discord && !serverSettings.user) || (serverSettings.user && !serverSettings.user.perms.map)) {
     if (match.params.category || match.params.lat) {
       localStorage.setItem('params', JSON.stringify(match.params))
     }

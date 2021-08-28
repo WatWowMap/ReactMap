@@ -83,13 +83,14 @@ class Pokestop extends Model {
     // preps arrays for interested objects
     Object.keys(args.filters).forEach(pokestop => {
       switch (pokestop.charAt(0)) {
-        default: pokemon.push(pokestop.split('-')[0]); break
+        case 'o': break
         case 'd': stardust.push(pokestop.slice(1).split('-')[0]); break
         case 'i': invasions.push(pokestop.slice(1)); break
         case 'l': lures.push(pokestop.slice(1)); break
         case 'm': energy.push(pokestop.slice(1)); break
         case 'q': items.push(pokestop.slice(1)); break
         case 'c': candy.push(pokestop.slice(1)); break
+        default: pokemon.push(pokestop.split('-')[0]); break
       }
     })
 
@@ -153,10 +154,6 @@ class Pokestop extends Model {
           this.parseMadRewards(pokestop)
         } else {
           this.parseRewards(pokestop)
-        }
-        if (pokestop.quest_form_id === 0 && pokestop.quest_pokemon_id !== 0) {
-          const formId = masterPkmn[pokestop.quest_pokemon_id].default_form_id
-          if (formId) pokestop.quest_form_id = formId
         }
         const keyRef = [
           {
@@ -261,12 +258,6 @@ class Pokestop extends Model {
         .where('quest_reward_type', 7)
         .orderBy('quest_pokemon_id')
     }
-    quests.pokemon.forEach(pkmn => {
-      if (pkmn.form == 0 && pkmn.quest_pokemon_id != 0) {
-        const formId = masterPkmn[pkmn.quest_pokemon_id].default_form_id
-        if (formId) pkmn.form = formId
-      }
-    })
 
     Object.entries(quests).forEach(questType => {
       const [type, rewards] = questType

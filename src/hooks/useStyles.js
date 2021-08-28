@@ -89,6 +89,10 @@ export default makeStyles(theme => ({
   container: {
     height: false,
   },
+  avatarPokemon: {
+    backgroundColor: theme.palette.secondary.main,
+    color: 'white',
+  },
   '@global': {
     '*::-webkit-scrollbar': {
       width: '5px',

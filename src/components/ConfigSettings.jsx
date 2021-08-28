@@ -68,7 +68,7 @@ export default function ConfigSettings({
   setAuth({
     discord: serverSettings.discord,
     loggedIn: serverSettings.loggedIn,
-    perms: serverSettings.user.perms,
+    perms: serverSettings.user ? serverSettings.user.perms : {},
   })
   setUi(serverSettings.ui)
   setMasterfile(serverSettings.masterfile)
@@ -128,7 +128,7 @@ export default function ConfigSettings({
         zoomControl={false}
         preferCanvas
       >
-        {(serverSettings.user.perms.map) && (
+        {(serverSettings.user && serverSettings.user.perms.map) && (
           <Map
             serverSettings={serverSettings}
             params={match.params}
