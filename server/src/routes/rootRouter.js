@@ -67,7 +67,7 @@ rootRouter.get('/settings', async (req, res) => {
     const serverSettings = {
       user: getUser(),
       discord: config.discord.enabled,
-      settings: { },
+      settings: {},
     }
 
     // add user options here from the config that are structured as objects
@@ -82,10 +82,10 @@ rootRouter.get('/settings', async (req, res) => {
         tileServers: config.tileServers,
         navigation: config.navigation,
         drawer: {
-          temporary: { },
-          persistent: { },
+          temporary: {},
+          persistent: {},
         },
-        manualAreas: config.manualAreas || { },
+        manualAreas: config.manualAreas || {},
         icons: config.icons,
       }
 
@@ -95,8 +95,8 @@ rootRouter.get('/settings', async (req, res) => {
       ]
 
       arrayUserOptions.forEach(userMenu => {
-        serverSettings.config[userMenu.name] = { }
-        userMenu.values.forEach(value => serverSettings.config[userMenu.name][value] = { })
+        serverSettings.config[userMenu.name] = {}
+        userMenu.values.forEach(value => serverSettings.config[userMenu.name][value] = {})
       })
 
       // keys that are being sent to the frontend but are not options
@@ -148,7 +148,7 @@ rootRouter.get('/settings', async (req, res) => {
                 const masterfileRef = masterfile.pokemon[item.split('-')[0]]
                 if (masterfileRef) {
                   if (!masterfileRef.forms) {
-                    masterfileRef.forms = { }
+                    masterfileRef.forms = {}
                   }
                   masterfileRef.forms[item.split('-')[1]] = { name: '*' }
                 } else {
