@@ -72,17 +72,13 @@ rootRouter.get('/settings', async (req, res) => {
 
     // add user options here from the config that are structured as objects
     if (serverSettings.user && serverSettings.user.perms) {
-      const getSelectedDomain = () => {
-        let base = config.map
-        if (config.multiDomains[req.headers.host]) {
-          base = { ...base, ...config.multiDomains[req.headers.host] }
-        }
-        return base
-      }
-
       serverSettings.loggedIn = req.user
       serverSettings.config = {
-        map: { ...getSelectedDomain(), excludeList: config.excludeFromTutorial },
+        map: {
+          ...config.map,
+          ...config.multiDomains[req.headers.host],
+          excludeList: config.excludeFromTutorial,
+        },
         tileServers: config.tileServers,
         navigation: config.navigation,
         drawer: {
