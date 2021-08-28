@@ -369,5 +369,6 @@
   "popupPokemonSeenDataWidth": 6,
   "popupPokemonSeenDescriptionWidth": 5,
   "popupPokestopSeenDataWidth": 7,
-  "popupPokestopSeenDescriptionWidth": 5
+  "popupPokestopSeenDescriptionWidth": 5,
+  "onlyShowingAvailable": "Only Showing Available"
 }

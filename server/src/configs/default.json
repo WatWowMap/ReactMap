@@ -332,6 +332,7 @@
     "Read_More_Here": "https://github.com/WatWowMap/ReactMap/wiki/Icons-Configuration",
     "customizable": [],
     "styles": [],
+    "defaultIcons": {},
     "sizes": {
       "device": {
         "sm": 15,

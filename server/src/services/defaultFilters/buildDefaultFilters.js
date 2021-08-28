@@ -1,9 +1,8 @@
-const { defaultFilters } = require('../config.js')
-const buildPokemon = require('./buildPokemon.js')
-const buildPokestops = require('./buildPokestops.js')
+const { defaultFilters, database: { schemas }, map: { legacyPkmnFilter } } = require('../config')
+const buildPokemon = require('./buildPokemon')
+const buildPokestops = require('./buildPokestops')
 const buildGyms = require('./buildGyms')
 const { GenericFilter, PokemonFilter } = require('../../models/index')
-const { database: { schemas }, map: { legacyPkmnFilter } } = require('../config')
 
 const base = new PokemonFilter()
 base.pvp()

@@ -55,7 +55,13 @@ export default function App() {
     ) : null
     if (Icons) {
       await Icons.fetchIcons(data.config.icons.styles)
+      if (data.config.icons.defaultIcons) {
+        Icons.setSelection(data.config.icons.defaultIcons)
+      }
       data.userSettings.icons = Icons.selected
+    }
+    if (data.ui && data.ui.pokestops && data.ui.pokestops.invasions) {
+      data.masterfile.invasions = await Fetch.getInvasions(data.masterfile.invasions)
     }
     setServerSettings({ ...data, Icons })
     if (data.googleAnalytics) {

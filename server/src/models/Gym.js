@@ -69,16 +69,15 @@ class Gym extends Model {
     const slots = []
 
     Object.keys(args.filters).forEach(gym => {
-      if (gym.charAt(0) !== 'o') {
-        switch (gym.charAt(0)) {
-          default: raidBosses.add(gym.split('-')[0]); break
-          case 'e': eggs.push(gym.slice(1)); break
-          case 't': teams.push(gym.slice(1).split('-')[0]); break
-          case 'g': slots.push({
-            team: gym.slice(1).split('-')[0],
-            slots: 6 - gym.slice(1).split('-')[1],
-          }); break
-        }
+      switch (gym.charAt(0)) {
+        case 'o': break
+        case 'e': eggs.push(gym.slice(1)); break
+        case 't': teams.push(gym.slice(1).split('-')[0]); break
+        case 'g': slots.push({
+          team: gym.slice(1).split('-')[0],
+          slots: 6 - gym.slice(1).split('-')[1],
+        }); break
+        default: raidBosses.add(gym.split('-')[0]); break
       }
     })
     const finalTeams = []
@@ -166,15 +165,10 @@ class Gym extends Model {
 
       for (let i = 0; i < length; i += 1) {
         const gym = queryResults[i]
-        if (gym.raid_pokemon_form === 0 && gym.raid_pokemon_id > 0) {
-          const formId = masterfile[gym.raid_pokemon_id].default_form_id
-          if (formId) gym.raid_pokemon_form = formId
-        }
         if (!gyms) {
           gym.team_id = 0
         }
-        if (!gym.raid_pokemon_id
-          && args.filters[`e${gym.raid_level}`]) {
+        if (!gym.raid_pokemon_id && args.filters[`e${gym.raid_level}`]) {
           filteredResults.push(gym)
         } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]) {
           filteredResults.push(gym)
@@ -216,10 +210,6 @@ class Gym extends Model {
     return results.map(pokemon => {
       if (pokemon.raid_pokemon_id === 0) {
         return `e${pokemon.raid_level}`
-      }
-      if (pokemon.raid_pokemon_form === 0) {
-        const formId = masterfile[pokemon.raid_pokemon_id].default_form_id
-        if (formId) pokemon.raid_pokemon_form = formId
       }
       return `${pokemon.raid_pokemon_id}-${pokemon.raid_pokemon_form}`
     })

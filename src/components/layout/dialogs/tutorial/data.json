@@ -2,7 +2,7 @@
   "pokemon": {
     "id": "1479791170343952100",
     "pokemon_id": 16,
-    "form": 962,
+    "form": 0,
     "gender": 1,
     "expire_timestamp_verified": 1,
     "display_pokemon_id": null,
