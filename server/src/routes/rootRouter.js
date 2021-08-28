@@ -74,7 +74,11 @@ rootRouter.get('/settings', async (req, res) => {
     if (serverSettings.user && serverSettings.user.perms) {
       serverSettings.loggedIn = req.user
       serverSettings.config = {
-        map: { ...config.map, excludeList: config.excludeFromTutorial },
+        map: {
+          ...config.map,
+          ...config.multiDomains[req.headers.host],
+          excludeList: config.excludeFromTutorial,
+        },
         tileServers: config.tileServers,
         navigation: config.navigation,
         drawer: {
