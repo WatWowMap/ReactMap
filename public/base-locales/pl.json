@@ -273,6 +273,7 @@
   "tutorialSliders6": "Łączy się z innymi tego samego koloru",
   "tutorialSliders7": "Filtruje oddzielnie od pozostałych suwaków",
   "tutorialSliders8": "'Pełen' suwak oznacza, że jest nieaktywny:",
+  "tutorialSliders9": "Wszystkie spawny, niezależnie od tego, czy posiadają IV czy nie",
   "tutorialHelp": "Skrót do tego menu",
   "tutorialAdvFilter": "Tylko dla urządzeń mobilnych, otwiera opcje filtrowania w menu zaawansowanym",
   "tutorialTune": "Ustawia filtr zaawansowany dla wszystkich Pokemonów obecnie filtrowanych w menu",
@@ -359,5 +360,6 @@
   "popupPokemonSeenDescriptionWidth": 7,
   "popupPokestopSeenDataWidth": 5,
   "popupPokestopSeenDescriptionWidth": 7,
-  "onlyShowingAvailable": "Pokazuje tylko dostępne"
+  "onlyShowingAvailable": "Pokazuje tylko dostępne",
+  "showDexNumInPopup": "Pokaż Pokedex # w Popupie"
 }
