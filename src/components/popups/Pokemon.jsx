@@ -172,7 +172,7 @@ const Header = ({ pokemon, metaData, t }) => {
         <Typography variant="h5">
           {t(`poke_${metaData.pokedexId}`)}
         </Typography>
-        {ditto_form && (
+        {ditto_form !== null && (
           <Typography variant="caption">
             ({t(`poke_${display_pokemon_id}`)})
           </Typography>
