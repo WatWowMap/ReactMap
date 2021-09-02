@@ -89,19 +89,19 @@ export default makeStyles(theme => ({
   container: {
     height: false,
   },
-  avatarPokemon: {
-    backgroundColor: theme.palette.secondary.main,
-    color: 'white',
+  avatar: {
+    backgroundColor: `${theme.palette.secondary.main} !important`,
+    color: 'white !important',
   },
   '@global': {
     '*::-webkit-scrollbar': {
       width: '5px',
     },
     '*::-webkit-scrollbar-track': {
-      backgroundColor: theme.palette.background.default,
+      backgroundColor: theme.palette.grey[900],
     },
     '*::-webkit-scrollbar-thumb': {
-      backgroundColor: theme.palette.action.hover,
+      backgroundColor: theme.palette.action.selected,
       borderRadius: '3px',
     },
     '*::-webkit-scrollbar-thumb:hover': {

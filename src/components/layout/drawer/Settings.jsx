@@ -78,7 +78,7 @@ export default function Settings({ toggleDialog, Icons }) {
       localStorage.setItem('local-state', contents)
     }
     reader.readAsText(file)
-    window.location.reload()
+    setTimeout(() => window.location.reload(), 1500)
   }
 
   return (

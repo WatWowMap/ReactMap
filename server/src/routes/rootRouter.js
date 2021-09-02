@@ -76,6 +76,7 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.config = {
         map: {
           ...config.map,
+          ...config.multiDomains[req.headers.host],
           excludeList: config.excludeFromTutorial,
           webhook: config.webhooks.name,
         },

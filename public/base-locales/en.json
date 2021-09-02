@@ -274,6 +274,7 @@
   "tutorialSliders6": "Chains with other of the same color",
   "tutorialSliders7": "Filters separately from other sliders",
   "tutorialSliders8": "A 'full' slider means that it is disabled:",
+  "tutorialSliders9": "All spawns, regardless of being IV checked or not",
   "tutorialHelp": "Shortcut to this menu",
   "tutorialAdvFilter": "Mobile only, opens the filtering options for the advanced menu",
   "tutorialTune": "Sets the advanced filter for all Pokemon currently being filtered in the menu",
@@ -383,5 +384,6 @@
   "invasion": "Invasion",
   "nest": "Nest",
   "pokestop": "Pokestop",
-  "team": "Team"
+  "team": "Team",
+  "showDexNumInPopup": "Show Pokedex # in Popup"
 }

@@ -47,6 +47,8 @@ export default function PokemonPopup({
         iconUrl={iconUrl}
         t={t}
         perms={perms}
+        userSettings={userSettings}
+        classes={classes}
       />
       <Timer
         pokemon={pokemon}
@@ -102,7 +104,7 @@ export default function PokemonPopup({
 }
 
 const Header = ({
-  pokemon, metaData, t, perms,
+  pokemon, metaData, t, iconUrl, userSettings, classes, perms,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -171,16 +173,25 @@ const Header = ({
     options.push(setWebhook('pokemon', { pokemon }))
   }
 
+  const pokemonName = t(`poke_${metaData.pokedexId}`)
   return (
     <>
       <Grid item xs={3}>
-        <Avatar>{metaData.pokedexId}</Avatar>
+        {userSettings.showDexNumInPopup
+          ? (
+            <Avatar classes={{
+              colorDefault: classes.avatar,
+            }}
+            >{metaData.pokedexId}
+            </Avatar>
+          )
+          : <img src={iconUrl} style={{ maxWidth: 40, maxHeight: 40 }} />}
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'center' }}>
-        <Typography variant="h5">
-          {t(`poke_${metaData.pokedexId}`)}
+        <Typography variant={pokemonName.length > 8 ? 'h6' : 'h5'}>
+          {pokemonName}
         </Typography>
-        {ditto_form && (
+        {(ditto_form !== null && display_pokemon_id) && (
           <Typography variant="caption">
             ({t(`poke_${display_pokemon_id}`)})
           </Typography>
