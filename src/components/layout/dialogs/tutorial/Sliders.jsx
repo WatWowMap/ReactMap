@@ -12,7 +12,6 @@ export default function TutSliders() {
   const { ivOr } = data.filters.pokemon
   const { t } = useTranslation()
   const [temp, setTemp] = useState({ ...ivOr, iv: [80, 100], great: [1, 10] })
-  const fullCheck = {}
 
   const handleChange = (event, values) => {
     if (values) {
@@ -26,12 +25,12 @@ export default function TutSliders() {
       })
     }
   }
-
+  const fullCheck = { }
   const slidersToUse = data.sliders.filter(slider => relevant.includes(slider.name))
   const arrayCheck = (filter, key) => filter[key].every((v, i) => v === ivOr[key][i])
   Object.keys(temp).forEach(key => fullCheck[key] = !arrayCheck(temp, key))
-
   const disabled = Object.keys(fullCheck).filter(key => fullCheck[key] === false)
+
   return (
     <DialogContent>
       <Grid
@@ -98,6 +97,11 @@ export default function TutSliders() {
               </Trans>
             </Typography>
           )}
+          {disabled.length === 4 && (
+            <Typography variant="caption">
+              {t('tutorialSliders9')}
+            </Typography>
+          )}
         </Grid>
         <Grid item xs={12}>
           <Divider light style={{ margin: 10 }} />
@@ -112,7 +116,7 @@ export default function TutSliders() {
           <Typography variant="subtitle2">
             {t('tutorialSliders8')}
           </Typography>
-          {disabled.length > 0 && (
+          {disabled.length && (
             <Typography variant="caption">
               ({disabled.map(each => t(`${each}Slider`)).join(', ')})
             </Typography>

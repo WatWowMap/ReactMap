@@ -27,6 +27,7 @@ module.exports = function clientOptions(perms) {
       ivCircles: { type: 'bool', perm: ['iv'] },
       minIvCircle: { type: 'number', perm: ['iv'], label: '%' },
       interactionRanges: { type: 'bool', perm: ['pokemon'] },
+      showDexNumInPopup: { type: 'bool', perm: ['pokemon'] },
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'] },

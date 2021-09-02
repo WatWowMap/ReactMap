@@ -63,12 +63,6 @@ export default function setTheme(theme, darkMode) {
           },
         },
       },
-      MuiAvatar: {
-        circular: {
-          color: 'white',
-          backgroundColor: theme.secondary,
-        },
-      },
     },
   }))
 }
