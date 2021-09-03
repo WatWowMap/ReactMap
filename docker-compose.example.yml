@@ -3,7 +3,7 @@ services:
   reactmap:
     image: ghcr.io/watwowmap/reactmap:main #pr-10
     container_name: reactmap
-    command: "yarn start"
+    command: sh -c "yarn migrate:latest && start"
     restart: unless-stopped
     volumes:
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
