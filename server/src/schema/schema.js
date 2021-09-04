@@ -1,11 +1,11 @@
 /* eslint-disable import/no-unresolved */
 const {
-  GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString,
+  GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString, GraphQLBoolean,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
 const fs = require('fs')
 const { raw } = require('objection')
-const fetch = require('node-fetch')
+
 const DeviceType = require('./device')
 const GymType = require('./gym')
 const NestType = require('./nest')
@@ -19,7 +19,7 @@ const SearchType = require('./search')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
-const { webhooks } = require('../services/config')
+
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
 } = require('../models/index')
@@ -339,25 +339,22 @@ const Mutation = new GraphQLObjectType({
       type: WebhookType,
       args: {
         category: { type: GraphQLString },
-        dataObj: { type: JSONResolver },
+        data: { type: JSONResolver },
+        exists: { type: GraphQLBoolean },
       },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        const { category } = args
-        if (perms.webhooks && perms[category]) {
-          switch (webhooks.provider) {
-            case 'poracle':
-              return fetch(`${webhooks.host}:${webhooks.port}/api/reactmap`, {
-                method: 'POST',
-                headers: {
-                  'X-Poracle-Secret': webhooks.poracleSecret,
-                  userId: req.user ? req.user.id : null,
-                  category,
-                  ...args.dataObj,
-                },
-              })
-            default: return { status: false }
+        const { category, data, exists } = args
+        if (perms.webhooks && req.user && (perms[category] || perms[`${category}s`])) {
+          const response = await Utility.webhookApi(category, req.user.id, (exists ? 'DELETE' : 'POST'), data)
+          if (response.status === 'ok') {
+            return {
+              ...await Utility.webhookApi(category, req.user.id, 'GET'),
+              method: exists ? 'Removed' : 'Added',
+              category,
+            }
           }
+          return response
         }
       },
     },

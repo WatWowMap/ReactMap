@@ -46,6 +46,7 @@ export default function ConfigSettings({
   const setMasterfile = useStatic(state => state.setMasterfile)
   const setUi = useStatic(state => state.setUi)
   const setStaticFilters = useStatic(state => state.setFilters)
+  const setWebhookData = useStatic(state => state.setWebhookData)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
 
@@ -96,6 +97,7 @@ export default function ConfigSettings({
   setStaticIcons(serverSettings.Icons)
 
   setConfig(serverSettings.config)
+  setWebhookData(serverSettings.webhookData)
 
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
   const getStartLocation = () => {

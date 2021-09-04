@@ -49,6 +49,7 @@ export default function PokemonPopup({
         perms={perms}
         userSettings={userSettings}
         classes={classes}
+        isTutorial={isTutorial}
       />
       <Timer
         pokemon={pokemon}
@@ -104,7 +105,7 @@ export default function PokemonPopup({
 }
 
 const Header = ({
-  pokemon, metaData, t, iconUrl, userSettings, classes, perms,
+  pokemon, metaData, t, iconUrl, userSettings, classes, perms, isTutorial,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -114,7 +115,8 @@ const Header = ({
   const setTimerList = useStatic(state => state.setTimerList)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
-  const { setWebhook, StatusAlert, handleAlertClose } = useWebhook()
+  const setWebhookPopup = useStatic(state => state.setWebhookPopup)
+  // const { setWebhook, StatusAlert, handleAlertClose } = useWebhook()
 
   const [anchorEl, setAnchorEl] = useState(false)
   const {
@@ -127,7 +129,7 @@ const Header = ({
 
   const handleClose = () => {
     setAnchorEl(null)
-    handleAlertClose(false)
+    // handleAlertClose(false)
   }
 
   const handleHide = () => {
@@ -169,8 +171,9 @@ const Header = ({
     { name: 'timer', action: handleTimer },
   ]
 
-  if (perms.webhooks) {
-    options.push(setWebhook('pokemon', { pokemon }))
+  if (perms.webhooks && !isTutorial) {
+    options.push({ name: 'webhook', action: () => setWebhookPopup({ open: true, category: 'pokemon' }) })
+    // options.push(setWebhook('pokemon', { pokemon }))
   }
 
   const pokemonName = t(`poke_${metaData.pokedexId}`)
@@ -223,7 +226,7 @@ const Header = ({
           </MenuItem>
         ))}
       </Menu>
-      <StatusAlert />
+      {/* <StatusAlert /> */}
     </>
   )
 }

@@ -11,6 +11,7 @@ import UserOptions from './dialogs/UserOptions'
 import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
 import Search from './dialogs/Search'
+import QuickAdd from './dialogs/webhooks/QuickAdd'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
@@ -19,12 +20,14 @@ export default function Nav({ map, setManualParams, Icons }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const { perms } = useStatic(state => state.auth)
+  const webhookPopup = useStatic(state => state.webhookPopup)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
   const userSettings = useStore(state => state.userSettings)
   const setUserSettings = useStore(state => state.setUserSettings)
   const tutorial = useStore(state => state.tutorial)
   const setTutorial = useStore(state => state.setTutorial)
+
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
@@ -131,6 +134,16 @@ export default function Nav({ map, setManualParams, Icons }) {
           isMobile={isMobile}
           Icons={Icons}
         />
+      </Dialog>
+      <Dialog
+        classes={{
+          scrollPaper: classes.scrollPaper,
+          container: classes.container,
+        }}
+        maxWidth="xs"
+        open={webhookPopup.open}
+      >
+        <QuickAdd />
       </Dialog>
     </>
   )

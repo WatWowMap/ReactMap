@@ -3,15 +3,15 @@ import React, {
   Fragment, useState, useEffect,
 } from 'react'
 import {
-  Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem,
+  Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem, Dialog,
 } from '@material-ui/core'
 import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
-import useWebhook from '@hooks/useWebhook'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
+import WebhookPopup from '@components/layout/dialogs/webhooks/QuickAdd'
 
 export default function GymPopup({
   gym, hasRaid, ts, Icons,
@@ -103,12 +103,15 @@ const Header = ({
   const setExcludeList = useStatic(state => state.setExcludeList)
   const timerList = useStatic(state => state.timerList)
   const setTimerList = useStatic(state => state.setTimerList)
+  const setWebhookPopup = useStatic(state => state.setWebhookPopup)
+  const webhookData = useStatic(state => state.webhookData)
+
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
-  const { setWebhook, StatusAlert, handleAlertClose } = useWebhook()
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [gymName, setGymName] = useState(true)
+  const [popup, setPopup] = useState(false)
   const {
     id, team_id, raid_pokemon_id, raid_pokemon_form, raid_level,
   } = gym
@@ -120,7 +123,6 @@ const Header = ({
 
   const handleClose = () => {
     setAnchorEl(null)
-    handleAlertClose(false)
   }
 
   const handleHide = () => {
@@ -184,23 +186,33 @@ const Header = ({
 
   if (perms.gyms) {
     options.push({ name: 'excludeTeam', action: excludeTeam })
-    if (perms.webhooks) {
-      options.push(setWebhook('gym', { id }))
-      options.push(setWebhook('team', { team_id }))
-    }
   }
   if (perms.raids && hasRaid) {
     options.push(
       { name: 'excludeRaid', action: excludeBoss },
       { name: 'timer', action: handleTimer },
     )
-    if (perms.webhooks) {
-      if (raid_pokemon_id) {
-        options.push(setWebhook('raid', { raid_pokemon_id, raid_pokemon_form }))
-      } else {
-        options.push(setWebhook('egg', { raid_level }))
-      }
-    }
+  }
+  if (perms.webhooks && webhookData) {
+    options.push({
+      name: (
+        <Trans i18nKey="manageWebhook">
+          {{ name: 'Rotom' }}
+        </Trans>
+      ),
+      action: () => setWebhookPopup({
+        open: true,
+        category: 'gym',
+        categories: {
+          gym: perms.gyms,
+          team: perms.gyms,
+          raid: raid_pokemon_id && perms.raids,
+          egg: !raid_pokemon_id && hasRaid && perms.raids,
+        },
+        data: gym,
+      }),
+      key: 'webhook',
+    })
   }
 
   return (
@@ -236,12 +248,26 @@ const Header = ({
         }}
       >
         {options.map((option) => (
-          <MenuItem key={option.key || option.name} onClick={option.action}>
+          <MenuItem key={option.key || option.name} onClick={option.action} dense>
             {typeof option.name === 'string' ? t(option.name) : option.name}
           </MenuItem>
         ))}
       </Menu>
-      <StatusAlert />
+      <Dialog
+        open={popup}
+        onClose={() => setPopup(false)}
+      >
+        <WebhookPopup
+          categories={{
+            gyms: true,
+            team: team_id,
+            raids: raid_pokemon_id,
+            eggs: !raid_pokemon_id,
+          }}
+          data={gym}
+          setPopup={setPopup}
+        />
+      </Dialog>
     </>
   )
 }
@@ -286,10 +312,8 @@ const RaidImage = ({
     : Icons.getEggs(raid_level, raid_battle_timestamp < ts, raid_is_exclusive)
 
   const getRaidTypes = (id, form) => {
-    if (pokemon[id].forms[form]) {
-      if (pokemon[id].forms[form].types) {
-        return pokemon[id].forms[form].types
-      }
+    if (pokemon[id].forms[form] && pokemon[id].forms[form].types) {
+      return pokemon[id].forms[form].types
     }
     return pokemon[id].types
   }

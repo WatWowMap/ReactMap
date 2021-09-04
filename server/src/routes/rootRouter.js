@@ -173,6 +173,13 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.clientMenus = clientMenus
 
       serverSettings.masterfile = masterfile
+
+      try {
+        serverSettings.webhookData = await Utility.webhookApi('all', serverSettings.user.id, 'GET')
+      } catch (e) {
+        console.warn('Unable to fetch webhook data')
+      }
+      console.log(serverSettings.webhookData)
     }
     res.status(200).json({ serverSettings })
   } catch (error) {

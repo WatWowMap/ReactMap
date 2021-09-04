@@ -295,6 +295,11 @@
       "devices": {
         "enabled": true,
         "roles": []
+      },
+      "webhooks": {
+        "enabled": false,
+        "roles": [
+        ]
       }
     }
   },

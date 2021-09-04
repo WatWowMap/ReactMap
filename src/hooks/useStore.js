@@ -38,7 +38,7 @@ const useStore = create(persist(set => ({
 }))
 
 const useStatic = create(set => ({
-  auth: { discord: true, loggedIn: false, perms: {} },
+  auth: { discord: true, loggedIn: false, perms: { } },
   setAuth: (auth) => set({ auth }),
   config: undefined,
   setConfig: (config) => set({ config }),
@@ -54,9 +54,9 @@ const useStatic = create(set => ({
   setAvailable: (available) => set({ available }),
   Icons: undefined,
   setIcons: (Icons) => set({ Icons }),
-  ui: {},
+  ui: { },
   setUi: (ui) => set({ ui }),
-  masterfile: {},
+  masterfile: { },
   setMasterfile: (masterfile) => set({ masterfile }),
   hideList: [],
   setHideList: (hideList) => set({ hideList }),
@@ -64,6 +64,12 @@ const useStatic = create(set => ({
   setExcludeList: (excludeList) => set({ excludeList }),
   timerList: [],
   setTimerList: (timerList) => set({ timerList }),
+  webhookPopup: {
+    open: false, category: '', categories: { }, data: { },
+  },
+  setWebhookPopup: (webhookPopup) => set({ webhookPopup }),
+  webhookData: undefined,
+  setWebhookData: (webhookData) => set({ webhookData }),
 }))
 
 export { useStore, useStatic }
