@@ -1,9 +1,9 @@
-const axios = require('axios')
 const DiscordStrategy = require('passport-discord').Strategy
 const passport = require('passport')
 const config = require('../services/config')
 const { User } = require('../models/index')
 const DiscordClient = require('../services/discord')
+const Utility = require('../services/Utility')
 
 passport.serializeUser(async (user, done) => {
   done(null, user)
@@ -35,8 +35,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
       || (req.connection.remoteAddress || req.connection.localAddress).match('[0-9]+.[0-9].+[0-9]+.[0-9]+$')[0]
 
     const url = `http://ip-api.com/json/${ip}?fields=66846719&lang=${config.map.locale || 'en'}`
-    const geoResponse = await axios.get(url)
-    const geo = geoResponse.data
+    const geo = await Utility.fetchJson(url)
     const embed = {
       color: 0xFF0000,
       title: 'Authentication',
