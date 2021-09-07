@@ -60,7 +60,6 @@
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/styles": "^4.11.4",
     "@turf/center": "^6.3.0",
-    "axios": "^0.21.1",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "discord.js": "^12.5.3",
