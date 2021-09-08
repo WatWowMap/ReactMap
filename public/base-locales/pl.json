@@ -361,5 +361,8 @@
   "popupPokestopSeenDataWidth": 5,
   "popupPokestopSeenDescriptionWidth": 7,
   "onlyShowingAvailable": "Pokazuje tylko dostępne",
-  "showDexNumInPopup": "Pokaż Pokedex # w Popupie"
+  "showDexNumInPopup": "Pokaż Pokedex # w Popupie",
+  "popup": "Popup",
+  "pvpLevel": "Statystyki PvP poziomu {{level}}",
+  "pvpMega": "Statystyki PvP Mega"
 }
