@@ -86,7 +86,7 @@ class Pokemon extends Model {
       stats, iv: ivs, pvp, areaRestrictions,
     } = perms
     const {
-      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv,
+      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega,
     } = args.filters
     let queryPvp = false
 
@@ -99,7 +99,9 @@ class Pokemon extends Model {
     const pvpCheck = (pkmn, league, min, max) => {
       const rankCheck = pkmn.rank <= max && pkmn.rank >= min
       const cpCheck = dbType === 'chuck' || reactMapHandlesPvp || pkmn.cp >= pvpMinCp[league]
-      return rankCheck && cpCheck
+      const megaCheck = !pkmn.evolution || (pkmn.evolution && onlyPvpMega)
+      const capCheck = pkmn.capped || args.filters[`onlyPvp${pkmn.cap}`]
+      return rankCheck && cpCheck && megaCheck && capCheck
     }
 
     const getRanks = (league, data, filterId) => {
