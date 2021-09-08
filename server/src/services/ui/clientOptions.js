@@ -38,7 +38,9 @@ module.exports = function clientOptions(perms) {
   }
 
   pvpLevels.forEach(level => {
-    clientMenus.pokemon[`pvp${level}`] = { type: 'bool', perm: ['pvp'], popup: true }
+    clientMenus.pokemon[`pvp${level}`] = {
+      type: 'bool', perm: ['pvp'], popup: true, value: true,
+    }
   })
 
   // special case options that require additional checks
@@ -60,7 +62,7 @@ module.exports = function clientOptions(perms) {
     clientValues[key] = {}
     Object.entries(options).forEach(option => {
       const [name, meta] = option
-      clientMenus[key][name].value = clientSideOptions[key][name] || true
+      clientMenus[key][name].value = clientSideOptions[key][name] || meta.value
       clientMenus[key][name].disabled = !meta.perm.some(x => perms[x])
       clientValues[key][name] = meta.value
       if (meta.sub) clientMenus[key][name].sub = {}
