@@ -14,7 +14,7 @@ import Utility from '@services/Utility'
 import WebhookPopup from '@components/layout/dialogs/webhooks/QuickAdd'
 
 export default function GymPopup({
-  gym, hasRaid, ts, Icons,
+  gym, hasRaid, ts, Icons, config,
 }) {
   const { t } = useTranslation()
   const { perms } = useStatic(state => state.auth)
@@ -30,7 +30,7 @@ export default function GymPopup({
       alignItems="center"
       spacing={1}
     >
-      <Header gym={gym} perms={perms} hasRaid={hasRaid} t={t} />
+      <Header gym={gym} perms={perms} hasRaid={hasRaid} t={t} config={config} />
       {perms.gyms && (
         <Grid item xs={12}>
           <Collapse in={!raidExpand} timeout="auto" unmountOnExit>
@@ -95,7 +95,7 @@ export default function GymPopup({
 }
 
 const Header = ({
-  gym, perms, hasRaid, t,
+  gym, perms, hasRaid, t, config,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -197,14 +197,18 @@ const Header = ({
     options.push({
       name: (
         <Trans i18nKey="manageWebhook">
-          {{ name: 'Rotom' }}
+          {{ name: config.webhook }}
         </Trans>
       ),
       action: () => setWebhookPopup({
         open: true,
         category: 'gym',
         categories: {
-          gym: perms.gyms,
+          gym: {
+            teamChanges: perms.gyms,
+            inBattle: perms.gyms,
+            allRaids: perms.raids,
+          },
           team: perms.gyms,
           raid: raid_pokemon_id && perms.raids,
           egg: !raid_pokemon_id && hasRaid && perms.raids,

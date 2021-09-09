@@ -15,7 +15,9 @@ import QuickAdd from './dialogs/webhooks/QuickAdd'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
-export default function Nav({ map, setManualParams, Icons }) {
+export default function Nav({
+  map, setManualParams, Icons, config,
+}) {
   const classes = useStyles()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
@@ -143,7 +145,7 @@ export default function Nav({ map, setManualParams, Icons }) {
         maxWidth="xs"
         open={webhookPopup.open}
       >
-        <QuickAdd />
+        <QuickAdd config={config} />
       </Dialog>
     </>
   )

@@ -1,4 +1,5 @@
 import { makeStyles } from '@material-ui/styles'
+import { purple } from '@material-ui/core/colors'
 
 export default makeStyles(theme => ({
   gridItem: {
@@ -92,6 +93,16 @@ export default makeStyles(theme => ({
   avatar: {
     backgroundColor: `${theme.palette.secondary.main} !important`,
     color: 'white !important',
+  },
+  quickAddCheckbox: {
+    fontSize: '12px !important',
+  },
+  modifyWebhook: {
+    color: theme.palette.getContrastText(purple[500]),
+    backgroundColor: `${purple[500]} !important`,
+    '&:hover': {
+      backgroundColor: `${purple[700]} !important`,
+    },
   },
   '@global': {
     '*::-webkit-scrollbar': {

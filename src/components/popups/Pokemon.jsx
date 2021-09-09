@@ -11,7 +11,6 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
-import useWebhook from '@hooks/useWebhook'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
@@ -105,7 +104,7 @@ export default function PokemonPopup({
 }
 
 const Header = ({
-  pokemon, metaData, t, iconUrl, userSettings, classes, perms, isTutorial,
+  pokemon, metaData, t, iconUrl, userSettings, classes,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -115,7 +114,7 @@ const Header = ({
   const setTimerList = useStatic(state => state.setTimerList)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
-  const setWebhookPopup = useStatic(state => state.setWebhookPopup)
+  // const setWebhookPopup = useStatic(state => state.setWebhookPopup)
   // const { setWebhook, StatusAlert, handleAlertClose } = useWebhook()
 
   const [anchorEl, setAnchorEl] = useState(false)
@@ -171,10 +170,10 @@ const Header = ({
     { name: 'timer', action: handleTimer },
   ]
 
-  if (perms.webhooks && !isTutorial) {
-    options.push({ name: 'webhook', action: () => setWebhookPopup({ open: true, category: 'pokemon' }) })
-    // options.push(setWebhook('pokemon', { pokemon }))
-  }
+  // if (perms.webhooks && !isTutorial) {
+  //   options.push({ name: 'webhook', action: () => setWebhookPopup({ open: true, category: 'pokemon' }) })
+  //   // options.push(setWebhook('pokemon', { pokemon }))
+  // }
 
   const pokemonName = t(`poke_${metaData.pokedexId}`)
   return (

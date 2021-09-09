@@ -19,7 +19,7 @@ const getColor = team => {
 
 const GymTile = ({
   item, ts, showTimer, filters, Icons, excludeList, userSettings, params,
-  showCircles,
+  showCircles, config,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
@@ -61,6 +61,7 @@ const GymTile = ({
               hasRaid={hasRaid}
               ts={ts}
               Icons={Icons}
+              config={config}
             />
           </Popup>
           {((showTimer || userSettings.raidTimers) && hasRaid) && (

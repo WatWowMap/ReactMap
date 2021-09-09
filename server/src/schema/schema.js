@@ -1,6 +1,6 @@
 /* eslint-disable import/no-unresolved */
 const {
-  GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString, GraphQLBoolean,
+  GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
 const fs = require('fs')
@@ -340,18 +340,21 @@ const Mutation = new GraphQLObjectType({
       args: {
         category: { type: GraphQLString },
         data: { type: JSONResolver },
-        exists: { type: GraphQLBoolean },
+        status: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        const { category, data, exists } = args
+        const { category, data, status } = args
         if (perms.webhooks && req.user && (perms[category] || perms[`${category}s`])) {
-          const response = await Utility.webhookApi(category, req.user.id, (exists ? 'DELETE' : 'POST'), data)
+          const response = await Utility.webhookApi(category, req.user.id, status, data)
+
           if (response.status === 'ok') {
             return {
               ...await Utility.webhookApi(category, req.user.id, 'GET'),
-              method: exists ? 'Removed' : 'Added',
+              method: status,
               category,
+              distance: data.distance,
+              clean: Boolean(data.clean),
             }
           }
           return response

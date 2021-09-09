@@ -114,7 +114,12 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         }
         return null
       })}
-      <Nav map={map} setManualParams={setManualParams} Icons={Icons} />
+      <Nav
+        map={map}
+        setManualParams={setManualParams}
+        Icons={Icons}
+        config={config}
+      />
     </>
   )
 }

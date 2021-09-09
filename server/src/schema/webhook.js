@@ -25,5 +25,7 @@ module.exports = new GraphQLObjectType({
     category: { type: GraphQLString },
     method: { type: GraphQLString },
     gym: { type: new GraphQLList(GymType) },
+    distance: { type: GraphQLInt },
+    clean: { type: GraphQLBoolean },
   }),
 })

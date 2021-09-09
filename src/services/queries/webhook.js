@@ -1,11 +1,13 @@
 import { gql } from '@apollo/client'
 
 export default gql`
-  mutation Webhook($data: JSON!, $category: String!, $exists: Boolean!) {
-    webhook(data: $data, category: $category, exists: $exists) {
+  mutation Webhook($data: JSON!, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       status
       category
       method
+      distance
+      clean
       gym {
         uid
         clean

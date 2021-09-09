@@ -7,19 +7,16 @@ import { MoreVert } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
-import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 
 export default function NestPopup({
   nest, iconUrl, pokemon, recent,
 }) {
   const { t } = useTranslation()
-  const { setWebhook, StatusAlert, handleAlertClose } = useWebhook()
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
   const excludeList = useStatic(state => state.excludeList)
   const setExcludeList = useStatic(state => state.setExcludeList)
-  const { perms } = useStatic(state => state.auth)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
   const [parkName, setParkName] = useState(true)
@@ -47,7 +44,6 @@ export default function NestPopup({
 
   const handleClose = () => {
     setAnchorEl(null)
-    handleAlertClose(false)
   }
 
   const handleHide = () => {
@@ -78,10 +74,6 @@ export default function NestPopup({
     { name: 'hide', action: handleHide },
     { name: 'exclude', action: handleExclude },
   ]
-
-  if (perms.webhooks) {
-    options.push(setWebhook('nest', { pokemon }))
-  }
 
   return (
     <Grid
@@ -127,7 +119,6 @@ export default function NestPopup({
           </MenuItem>
         ))}
       </Menu>
-      <StatusAlert />
       <Grid item xs={6} style={{ textAlign: 'center' }}>
         <img
           src={iconUrl}

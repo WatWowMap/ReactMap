@@ -9,7 +9,6 @@ import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
 import { useTranslation, Trans } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
-import useWebhook from '@hooks/useWebhook'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
@@ -144,7 +143,6 @@ const Header = ({
   const setTimerList = useStatic(state => state.setTimerList)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
-  const { setWebhook, StatusAlert, handleAlertClose } = useWebhook()
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [pokestopName, setPokestopName] = useState(true)
@@ -160,7 +158,6 @@ const Header = ({
 
   const handleClose = () => {
     setAnchorEl(null)
-    handleAlertClose(false)
   }
 
   const handleHide = () => {
@@ -226,15 +223,8 @@ const Header = ({
     { name: 'hide', action: handleHide },
   ]
 
-  if (perms.webhooks) {
-    options.push(setWebhook('pokestop', { pokestop }))
-  }
-
   if (perms.quests && hasQuest) {
     options.push({ name: 'excludeQuest', action: excludeQuest })
-    if (perms.webhooks) {
-      options.push(setWebhook('quest', { pokestop }))
-    }
   }
 
   if ((perms.invasions && hasInvasion)
@@ -243,17 +233,11 @@ const Header = ({
       options.push(
         { name: 'excludeInvasion', action: () => exclInvLure(false) },
       )
-      if (perms.webhooks) {
-        options.push(setWebhook('invasion', { grunt_type }))
-      }
     }
     if (hasLure) {
       options.push(
         { name: 'excludeLure', action: () => exclInvLure(true) },
       )
-      if (perms.webhooks) {
-        options.push(setWebhook('lure', { lure_id }))
-      }
     }
     options.push({ name: 'timer', action: handleTimer })
   }
@@ -296,7 +280,6 @@ const Header = ({
           </MenuItem>
         ))}
       </Menu>
-      <StatusAlert />
     </>
   )
 }
