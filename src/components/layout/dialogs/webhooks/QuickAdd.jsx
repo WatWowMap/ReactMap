@@ -152,16 +152,11 @@ export default function QuickAdd({ config }) {
   useEffect(() => {
     if (data && data.webhook) {
       setWebhookData({ ...webhookData, ...data.webhook })
-      const {
-        category, status, method, message, distance, clean,
-      } = data.webhook
-      const isOkay = status === 'ok'
+      const { status, message } = data.webhook
       setAlert({
         open: true,
-        message: isOkay
-          ? <Trans i18nKey="webhookSuccess">{{ category: t(category) }}{{ method: t(method) }}{{ distance }}{{ clean }}</Trans>
-          : <Trans i18nKey="webhookFailed">{{ error: message }}</Trans>,
-        severity: isOkay ? 'success' : 'error',
+        message: message ? message.replace(/\*/g, '') : '',
+        severity: status === 'ok' ? 'success' : 'error',
       })
     }
   }, [data])

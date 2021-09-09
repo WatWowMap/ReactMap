@@ -4,13 +4,9 @@ const { webhooks } = require('../config')
 const webhookConverter = require('./webhookConverter')
 
 module.exports = async function webhookApi(category, discordId, method, data = null) {
-  let headers
+  const headers = { Accept: 'application/json', 'Content-Type': 'application/json' }
   switch (webhooks.provider) {
-    case 'poracle': headers = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'X-Poracle-Secret': webhooks.poracleSecret,
-    }; break
+    case 'poracle': Object.assign(headers, { 'X-Poracle-Secret': webhooks.poracleSecret }); break
     default: break
   }
   try {

@@ -351,10 +351,7 @@ const Mutation = new GraphQLObjectType({
           if (response.status === 'ok') {
             return {
               ...await Utility.webhookApi(category, req.user.id, 'GET'),
-              method: status,
-              category,
-              distance: data.distance,
-              clean: Boolean(data.clean),
+              message: response.message,
             }
           }
           return response

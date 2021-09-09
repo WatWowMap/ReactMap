@@ -22,10 +22,7 @@ module.exports = new GraphQLObjectType({
   name: 'Webhook',
   fields: () => ({
     status: { type: GraphQLString },
-    category: { type: GraphQLString },
-    method: { type: GraphQLString },
+    message: { type: GraphQLString },
     gym: { type: new GraphQLList(GymType) },
-    distance: { type: GraphQLInt },
-    clean: { type: GraphQLBoolean },
   }),
 })

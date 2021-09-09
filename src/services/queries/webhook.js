@@ -4,10 +4,7 @@ export default gql`
   mutation Webhook($data: JSON!, $category: String!, $status: String!) {
     webhook(data: $data, category: $category, status: $status) {
       status
-      category
-      method
-      distance
-      clean
+      message
       gym {
         uid
         clean
