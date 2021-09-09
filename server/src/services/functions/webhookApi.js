@@ -9,6 +9,7 @@ module.exports = async function webhookApi(category, discordId, method, data = n
     case 'poracle': Object.assign(headers, { 'X-Poracle-Secret': webhooks.poracleSecret }); break
     default: break
   }
+  console.log(webhookConverter(category, data))
   try {
     return fetch(`${webhooks.host}:${webhooks.port}/api/tracking/${category}/${discordId}${method === 'DELETE' ? `/byUid/${data.uid}` : ''}`, {
       method,

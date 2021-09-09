@@ -151,6 +151,7 @@ export default function QuickAdd({ config }) {
 
   useEffect(() => {
     if (data && data.webhook) {
+      console.log(data)
       setWebhookData({ ...webhookData, ...data.webhook })
       const { status, message } = data.webhook
       setAlert({

@@ -3,6 +3,7 @@ module.exports = function webhookConverter(category, data) {
     case 'gym':
       return {
         ...data,
+        team: data.team_id,
         gym_id: data.id,
         gym_name: data.name || 'Unknown',
         latitude: data.lat,
