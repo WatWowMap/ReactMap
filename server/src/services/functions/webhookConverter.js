@@ -1,8 +1,11 @@
 module.exports = function webhookConverter(category, data) {
   switch (category) {
     case 'gym':
+    case 'egg':
+    case 'raid':
       return {
         ...data,
+        level: data.raid_level,
         team: data.team_id,
         gym_id: data.id,
         gym_name: data.name || 'Unknown',

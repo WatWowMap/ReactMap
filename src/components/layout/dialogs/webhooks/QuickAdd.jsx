@@ -151,9 +151,9 @@ export default function QuickAdd({ config }) {
 
   useEffect(() => {
     if (data && data.webhook) {
-      console.log(data)
-      setWebhookData({ ...webhookData, ...data.webhook })
-      const { status, message } = data.webhook
+      console.log('incoming data', data)
+      const { status, message, category } = data.webhook
+      setWebhookData({ ...webhookData, [category]: data.webhook[category] })
       setAlert({
         open: true,
         message: message ? message.replace(/\*/g, '') : '',
@@ -162,7 +162,8 @@ export default function QuickAdd({ config }) {
     }
   }, [data])
 
-  console.log(payloads, webhookData)
+  console.log('payloads', payloads, webhookData)
+  console.log('new webhook data', webhookData)
   return (
     <>
       <DialogTitle className={classes.filterHeader}>
@@ -206,6 +207,7 @@ export default function QuickAdd({ config }) {
             const isGlobal = category === 'gym' || category === 'pokestop'
 
             const status = getStatus(exists, payloads[category])
+            console.log(exists)
             const clean = (
               <Grid item xs={6} sm={3}>
                 <FormControlLabel

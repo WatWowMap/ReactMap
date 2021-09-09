@@ -11,6 +11,7 @@ const fetchQuests = require('./functions/fetchQuests')
 const fetchNests = require('./functions/fetchNests')
 const dbSelection = require('./functions/dbSelection')
 const webhookApi = require('./functions/webhookApi')
+const permissions = require('./functions/permissions')
 
 class Utility {
   static getPolyVector(s2cellId, type) {
@@ -63,6 +64,10 @@ class Utility {
 
   static async webhookApi(category, discordId, method, data) {
     return webhookApi(category, discordId, method, data)
+  }
+
+  static permissions(permToCheck, perms) {
+    return permissions(permToCheck, perms)
   }
 }
 

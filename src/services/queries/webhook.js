@@ -5,13 +5,31 @@ export default gql`
     webhook(data: $data, category: $category, status: $status) {
       status
       message
+      category
       gym {
         uid
         clean
         distance
-        template
         team
         slot_changes
+        gym_id
+      }
+      egg {
+        uid
+        clean
+        distance
+        level
+        team
+        gym_id
+      }
+      raid {
+        uid
+        clean
+        distance
+        level
+        pokemon_id
+        form
+        team
         gym_id
       }
     }
