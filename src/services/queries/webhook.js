@@ -13,6 +13,7 @@ export default gql`
         team
         slot_changes
         gym_id
+        allRaids
       }
       egg {
         uid

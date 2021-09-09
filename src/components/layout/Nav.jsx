@@ -98,6 +98,7 @@ export default function Nav({
           toggleDialog={toggleDialog}
           safeSearch={safeSearch}
           isMobile={isMobile}
+          perms={perms}
         />
       )}
       <Dialog

@@ -18,18 +18,18 @@ import { useStatic } from '@hooks/useStore'
 import Query from '@services/Query'
 import SlideTransition from '@assets/mui/SlideTransition'
 
-const setStates = (categories, data, webhookData) => {
+const setStates = (categories, itemData, webhookData) => {
   try {
     const returnObj = {}
     Object.keys(categories).forEach(category => {
       if (categories[category]) {
-        if (data && webhookData && webhookData[category]) {
-          const { id, webhookId } = dataLookup(category, data)
+        if (itemData && webhookData && webhookData[category]) {
+          const { id, webhookId } = dataLookup(category, itemData)
           const exists = category === 'team'
-            ? webhookData.gym.find(entry => entry.gym_id === null && entry.team === data.gym.team_id) || {}
-            : webhookData[category].find(entry => entry[webhookId] === data[id]) || {}
+            ? webhookData.gym.find(entry => entry.gym_id === null && entry.team === itemData.gym.team_id) || {}
+            : webhookData[category].find(entry => entry[webhookId] === itemData[id]) || {}
 
-          returnObj[category] = { ...data, clean: Boolean(exists.clean) || false, distance: exists.distance || 0 }
+          returnObj[category] = { ...itemData, clean: Boolean(exists.clean) || false, distance: exists.distance || 0 }
           if (typeof categories[category] === 'object') {
             returnObj[category].subCategories = setStates(categories[category])
           }
@@ -40,7 +40,7 @@ const setStates = (categories, data, webhookData) => {
     })
     return returnObj
   } catch (e) {
-    console.error(e, data, webhookData)
+    console.error(e, itemData, webhookData)
   }
 }
 
@@ -92,11 +92,13 @@ const dataLookup = (category, entry, Icons, t) => {
 }
 
 const getStatus = (exists, local) => {
+  // console.log('exists', exists)
+  // console.log('local', local)
   try {
-    if (exists && Boolean(exists.clean) === local.clean && exists.distance === local.distance) {
+    if (exists && Boolean(exists.clean) === local.clean && exists.distance == local.distance) {
       return 'DELETE'
     }
-    if (exists && (Boolean(exists.clean) !== local.clean || exists.distance !== local.distance)) {
+    if (exists && (Boolean(exists.clean) !== local.clean || exists.distance != local.distance)) {
       return 'PATCH'
     }
     return 'POST'
@@ -139,31 +141,38 @@ export default function QuickAdd({ config }) {
   }
 
   const handleDistance = (category) => {
+    // console.log(payloads[category].distance, Number.isNaN(parseInt(payloads[category].distance)))
     setDistances({ ...distances, [category]: !distances[category] })
     setPayloads({
       ...payloads,
       [category]: {
         ...payloads[category],
-        distance: payloads[category].distance === 0 ? 1 : 0,
+        distance: Number.isNaN(parseInt(payloads[category].distance)) || !payloads[category].distance
+          ? 1 : 0,
       },
     })
   }
 
   useEffect(() => {
+    // console.log('incoming data', data)
     if (data && data.webhook) {
-      console.log('incoming data', data)
       const { status, message, category } = data.webhook
-      setWebhookData({ ...webhookData, [category]: data.webhook[category] })
+      if (category === 'all') {
+        setWebhookData(data.webhook)
+      } else {
+        setWebhookData({ ...webhookData, [category]: data.webhook[category] })
+      }
+
       setAlert({
         open: true,
-        message: message ? message.replace(/\*/g, '') : '',
-        severity: status === 'ok' ? 'success' : 'error',
+        message: message[0] ? message.join('\n').replace(/\*/g, '') : `${t(category)} ${t('removed')}`,
+        severity: status[0] === 'ok' ? 'success' : 'error',
       })
     }
   }, [data])
 
-  console.log('payloads', payloads, webhookData)
-  console.log('new webhook data', webhookData)
+  // console.log(webhookData)
+  // console.log(payloads)
   return (
     <>
       <DialogTitle className={classes.filterHeader}>
@@ -203,11 +212,11 @@ export default function QuickAdd({ config }) {
             } = dataLookup(category, webhookPopup.data, Icons, t)
             const exists = category === 'team'
               ? webhookData.gym.find(entry => entry.gym_id === null && entry.team === payloads.gym.team_id)
-              : webhookData[category].find(entry => entry[webhookId] === payloads[category][id])
+              : webhookData[category].find(entry => entry[webhookId] == payloads[category][id])
             const isGlobal = category === 'gym' || category === 'pokestop'
 
             const status = getStatus(exists, payloads[category])
-            console.log(exists)
+            // console.log(exists)
             const clean = (
               <Grid item xs={6} sm={3}>
                 <FormControlLabel

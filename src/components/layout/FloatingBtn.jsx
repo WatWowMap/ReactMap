@@ -11,7 +11,7 @@ import Leaflet from 'leaflet'
 import useStyles from '@hooks/useStyles'
 
 export default function FloatingButtons({
-  toggleDrawer, toggleDialog, safeSearch, isMobile,
+  toggleDrawer, toggleDialog, safeSearch, isMobile, perms,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
@@ -62,6 +62,13 @@ export default function FloatingButtons({
             <Search fontSize={iconSize} />
           </Fab>
         </Grid>
+      )}
+      {perms.webhooks && (
+      <Grid item>
+        <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()} title={t('zoomOut')}>
+          <ZoomOut fontSize={iconSize} />
+        </Fab>
+      </Grid>
       )}
       <Grid item>
         <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')}>

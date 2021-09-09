@@ -15,6 +15,7 @@ const GymType = new GraphQLObjectType({
     team: { type: GraphQLInt },
     slot_changes: { type: GraphQLInt },
     gym_id: { type: GraphQLString },
+    allRaids: { type: GraphQLBoolean },
   }),
 })
 
@@ -58,8 +59,8 @@ const RaidType = new GraphQLObjectType({
 module.exports = new GraphQLObjectType({
   name: 'Webhook',
   fields: () => ({
-    status: { type: GraphQLString },
-    message: { type: GraphQLString },
+    status: { type: new GraphQLList(GraphQLString) },
+    message: { type: new GraphQLList(GraphQLString) },
     category: { type: GraphQLString },
     gym: { type: new GraphQLList(GymType) },
     egg: { type: new GraphQLList(EggType) },

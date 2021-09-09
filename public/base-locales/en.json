@@ -379,6 +379,7 @@
   "webhookFailed": "Failed - {{error}}",
   "setDistance": "Set Distance",
   "distance": "Distance",
+  "removed": "Removed",
   "gym": "Gym",
   "egg": "Egg",
   "raid": "Raid",
