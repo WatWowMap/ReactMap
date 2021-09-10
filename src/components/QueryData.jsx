@@ -38,6 +38,11 @@ export default function QueryData({
         trimmed[`only${id.charAt(0).toUpperCase()}${id.slice(1)}`] = specifics
       }
     })
+    Object.entries(userSettings).forEach(([entryK, entryV]) => {
+      if (entryK.startsWith('pvp')) {
+        trimmed[`only${entryK.charAt(0).toUpperCase()}${entryK.slice(1)}`] = entryV
+      }
+    })
     Object.entries(requestedFilters.filter).forEach(filter => {
       const [id, specifics] = filter
 

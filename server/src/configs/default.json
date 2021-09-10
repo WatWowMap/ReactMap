@@ -90,6 +90,7 @@
       "minIvCircle": 90,
       "interactionRanges": false,
       "showDexNumInPopup": false,
+      "pvpMega": false,
       "glow": [
         { "name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
         { "name": "Top 3 Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
