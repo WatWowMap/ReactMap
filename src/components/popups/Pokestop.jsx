@@ -13,7 +13,7 @@ import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
 export default function PokestopPopup({
-  pokestop, ts, hasLure, hasInvasion, hasQuest, Icons, userSettings,
+  pokestop, ts, hasLure, hasInvasion, hasQuest, Icons, userSettings, config,
 }) {
   const { t } = useTranslation()
   const { pokestops: perms } = useStatic(state => state.ui)
@@ -23,6 +23,7 @@ export default function PokestopPopup({
     incident_expire_timestamp, lure_expire_timestamp, lure_id, grunt_type,
   } = pokestop
 
+  console.log(Boolean(config.questMessage))
   return (
     <Grid
       container
@@ -77,8 +78,14 @@ export default function PokestopPopup({
                   <RewardInfo
                     pokestop={pokestop}
                     Icons={Icons}
-                    t={t}
                   />
+                  {(hasQuest && config.questMessage) && (
+                    <Grid item xs={12} style={{ textAlign: 'center' }}>
+                      <Typography variant="caption">
+                        {config.questMessage}
+                      </Typography>
+                    </Grid>
+                  )}
                 </Grid>
               </>
             ) : (

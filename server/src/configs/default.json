@@ -49,6 +49,7 @@
     "scanCellsZoom": 13,
     "submissionZoom": 15,
     "legacyPkmnFilter": true,
+    "questMessage": "",
     "theme": {
       "style": "dark",
       "primary": "#ff5722",
