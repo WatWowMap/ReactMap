@@ -1,13 +1,10 @@
 import React, { useState } from 'react'
 import {
   DialogContent,
-  DialogTitle,
   Dialog,
   AppBar,
   Tabs,
   Tab,
-  IconButton,
-  Grid,
   TableContainer,
   Table,
   TableHead,
@@ -16,17 +13,18 @@ import {
   TableBody,
   Paper,
 } from '@material-ui/core'
-import { Clear, Person } from '@material-ui/icons'
-import { useTranslation, Trans } from 'react-i18next'
+import { Person } from '@material-ui/icons'
+import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
-import Action from '@components/layout/general/Action'
+import Footer from '@components/layout/general/Footer'
 import TabPanel from '@components/layout/general/TabPanel'
+import Header from '@components/layout/general/Header'
 
 const ignoredKeys = ['message', 'error', 'statusCode', 'status', 'profile', 'name']
 
-export default function Manage({ toggleDialog, Icons, isMobile }) {
+export default function Manage({ toggleDialog, Icons }) {
   const { t } = useTranslation()
   const classes = useStyles()
   const webhookData = useStatic(s => s.webhookData)
@@ -48,17 +46,7 @@ export default function Manage({ toggleDialog, Icons, isMobile }) {
   const filteredData = Object.keys(webhookData).filter(key => !ignoredKeys.includes(key))
   return (
     <>
-      <DialogTitle className={classes.filterHeader}>
-        <Trans i18nKey="manageWebhook">
-          {{ name: webhookName }}
-        </Trans>
-        <IconButton
-          onClick={toggleDialog(false, '', 'webhook')}
-          style={{ position: 'absolute', right: 5, top: 5 }}
-        >
-          <Clear style={{ color: 'white' }} />
-        </IconButton>
-      </DialogTitle>
+      <Header name={webhookName} action={toggleDialog(false, '', 'webhook')} />
       <AppBar position="static">
         <Tabs
           value={tabValue}
@@ -106,18 +94,7 @@ export default function Manage({ toggleDialog, Icons, isMobile }) {
           </TabPanel>
         ))}
       </DialogContent>
-      <Grid
-        className="filter-footer"
-        container
-        justifyContent={isMobile ? 'center' : 'flex-end'}
-        alignItems="center"
-      >
-        {footerButtons.map(button => (
-          <Grid item xs={4} key={button.name}>
-            <Action name={button.name} action={button.action} icon={button.icon} color="white" />
-          </Grid>
-        ))}
-      </Grid>
+      <Footer options={footerButtons} />
       <Dialog
         classes={{
           scrollPaper: classes.scrollPaper,
