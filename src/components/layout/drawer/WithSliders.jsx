@@ -1,25 +1,13 @@
 import React, { useEffect, useState, Fragment } from 'react'
 import {
-  Grid, Typography, Switch, AppBar, Tab, Tabs, Box,
+  Grid, Typography, Switch, AppBar, Tab, Tabs,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
-
-const TabPanel = ({ children, value, index }) => (
-  <div
-    role="tabpanel"
-    hidden={value !== index}
-  >
-    {value === index && (
-      <Box p={2}>
-        <Typography variant="caption">{children}</Typography>
-      </Box>
-    )}
-  </div>
-)
+import TabPanel from '../general/TabPanel'
 
 export default function WithSliders({
   category, filters, setFilters, context, specificFilter,
