@@ -12,6 +12,7 @@ import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
 import Search from './dialogs/Search'
 import QuickAdd from './dialogs/webhooks/QuickAdd'
+import Manage from './dialogs/webhooks/Manage'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
@@ -32,9 +33,9 @@ export default function Nav({
 
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
-    open: false,
+    open: true,
     category: '',
-    type: '',
+    type: 'webhook',
   })
   const [userProfile, setUserProfile] = useState(false)
   const safeSearch = searchable.filter(category => perms[category])
@@ -147,6 +148,22 @@ export default function Nav({
         open={webhookPopup.open}
       >
         <QuickAdd config={config} />
+      </Dialog>
+      <Dialog
+        classes={{
+          scrollPaper: classes.scrollPaper,
+          container: classes.container,
+        }}
+        fullWidth
+        maxWidth="xl"
+        open={dialog.open && dialog.type === 'webhook'}
+        onClose={toggleDialog(false, dialog.category, dialog.type)}
+      >
+        <Manage
+          toggleDialog={toggleDialog}
+          isMobile={isMobile}
+          Icons={Icons}
+        />
       </Dialog>
     </>
   )

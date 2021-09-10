@@ -239,9 +239,14 @@ export default class UIcons {
 
   getMisc(fileName) {
     const baseUrl = `${this[this.selected.misc].path}/misc`
-    if (this[this.selected.misc].misc.has(`${fileName}.png`)) {
-      return `${baseUrl}/${fileName}.png`
+    switch (true) {
+      case this[this.selected.misc].misc.has(`${fileName}.png`):
+        return `${baseUrl}/${fileName}.png`
+      case fileName.endsWith('s') && this[this.selected.misc].misc.has(`${fileName.slice(0, -1)}.png`):
+        return `${baseUrl}/${fileName.slice(0, -1)}.png`
+      case !fileName.endsWith('s') && this[this.selected.misc].misc.has(`${fileName}s.png`):
+        return `${baseUrl}/${fileName}s.png`
+      default: return `${baseUrl}/0.png`
     }
-    return `${baseUrl}/0.png`
   }
 }

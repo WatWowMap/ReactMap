@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import {
-  Menu, LocationOn, ZoomIn, ZoomOut, Search,
+  Menu, LocationOn, ZoomIn, ZoomOut, Search, NotificationsActive,
 } from '@material-ui/icons'
 import { useMap } from 'react-leaflet'
 import Locate from 'leaflet.locatecontrol'
 import { useTranslation } from 'react-i18next'
 import Leaflet from 'leaflet'
-
 import useStyles from '@hooks/useStyles'
 
 export default function FloatingButtons({
@@ -65,8 +64,8 @@ export default function FloatingButtons({
       )}
       {perms.webhooks && (
       <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()} title={t('zoomOut')}>
-          <ZoomOut fontSize={iconSize} />
+        <Fab color="secondary" size={fabSize} onClick={toggleDialog(true, '', 'webhook')} title={t('webhook')}>
+          <NotificationsActive fontSize={iconSize} />
         </Fab>
       </Grid>
       )}

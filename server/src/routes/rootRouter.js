@@ -78,7 +78,6 @@ rootRouter.get('/settings', async (req, res) => {
           ...config.map,
           ...config.multiDomains[req.headers.host],
           excludeList: config.excludeFromTutorial,
-          webhook: config.webhooks.name,
         },
         tileServers: config.tileServers,
         navigation: config.navigation,
@@ -185,6 +184,12 @@ rootRouter.get('/settings', async (req, res) => {
         serverSettings.webhookData = await Utility.webhookApi('all', serverSettings.user.id, 'GET')
       } catch (e) {
         console.warn('Unable to fetch webhook data')
+      }
+      if (serverSettings.webhookData) {
+        serverSettings.webhookData.name = config.webhooks.name
+        Object.entries(serverSettings.webhookData).forEach(([key, value]) => {
+          serverSettings.webhookData[key] = Array.isArray(value) ? value : [value]
+        })
       }
       console.log(serverSettings.webhookData)
     }
