@@ -23,7 +23,6 @@ export default function PokestopPopup({
     incident_expire_timestamp, lure_expire_timestamp, lure_id, grunt_type,
   } = pokestop
 
-  console.log(Boolean(config.questMessage))
   return (
     <Grid
       container
