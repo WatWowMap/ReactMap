@@ -10,7 +10,7 @@ import Timer from './Timer'
 
 const PokestopTile = ({
   item, ts, showTimer, filters, Icons, perms, excludeList, userSettings,
-  params, showCircles,
+  params, showCircles, config,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
@@ -65,6 +65,7 @@ const PokestopTile = ({
                 hasQuest={hasQuest}
                 Icons={Icons}
                 userSettings={userSettings}
+                config={config}
               />
             </Popup>
             {((showTimer || userSettings.invasionTimers) && hasInvasion)
