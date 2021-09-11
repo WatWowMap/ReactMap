@@ -75,7 +75,11 @@ rootRouter.get('/settings', async (req, res) => {
     if (serverSettings.user && serverSettings.user.perms) {
       serverSettings.loggedIn = req.user
       serverSettings.config = {
-        map: { ...config.map, excludeList: config.excludeFromTutorial },
+        map: {
+          ...config.map,
+          ...config.multiDomains[req.headers.host],
+          excludeList: config.excludeFromTutorial,
+        },
         tileServers: config.tileServers,
         navigation: config.navigation,
         drawer: {
@@ -110,23 +114,30 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
 
-      const {
-        pokemon, quests, raids, nests,
-      } = config.api.queryAvailable
       try {
-        serverSettings.available = {
-          pokemon: pokemon
+        serverSettings.available = {}
+        if (serverSettings.user.perms.pokemon) {
+          serverSettings.available.pokemon = config.api.queryAvailable.pokemon
             ? await Pokemon.getAvailablePokemon(Utility.dbSelection('pokemon') === 'mad')
-            : [],
-          gyms: raids
+            : []
+        }
+        if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
+          serverSettings.available.gyms = config.api.queryAvailable.raids
             ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym') === 'mad')
-            : await Utility.fetchRaids(),
-          pokestops: quests
+            : await Utility.fetchRaids()
+        }
+        if (serverSettings.user.perms.quests
+          || serverSettings.user.perms.pokestops
+          || serverSettings.user.perms.invasions
+          || serverSettings.user.perms.lures) {
+          serverSettings.available.pokestops = config.api.queryAvailable.quests
             ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop') === 'mad')
-            : await Utility.fetchQuests(),
-          nests: nests
+            : await Utility.fetchQuests()
+        }
+        if (serverSettings.user.perms.nests) {
+          serverSettings.available.nests = config.api.queryAvailable.nests
             ? await Nest.getAvailableNestingSpecies()
-            : await Utility.fetchNests(),
+            : await Utility.fetchNests()
         }
       } catch (e) {
         console.warn(e, '\nUnable to query available.')
@@ -141,7 +152,7 @@ rootRouter.get('/settings', async (req, res) => {
               serverSettings.defaultFilters[category].filter[item] = category === 'pokemon'
                 ? new PokemonFilter()
                 : new GenericFilter()
-              if (typeof parseInt(item.charAt(0)) === 'number') {
+              if (!Number.isNaN(parseInt(item.charAt(0)))) {
                 const masterfileRef = masterfile.pokemon[item.split('-')[0]]
                 if (masterfileRef) {
                   if (!masterfileRef.forms) {

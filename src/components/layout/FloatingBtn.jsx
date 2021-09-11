@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import {
   Menu, LocationOn, ZoomIn, ZoomOut, Search,
@@ -6,6 +6,7 @@ import {
 import { useMap } from 'react-leaflet'
 import Locate from 'leaflet.locatecontrol'
 import { useTranslation } from 'react-i18next'
+import Leaflet from 'leaflet'
 
 import useStyles from '@hooks/useStyles'
 
@@ -37,6 +38,8 @@ export default function FloatingButtons({
 
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'medium'
+  const ref = useRef(null)
+  useEffect(() => Leaflet.DomEvent.disableClickPropagation(ref.current))
 
   return (
     <Grid
@@ -45,6 +48,8 @@ export default function FloatingButtons({
       justifyContent="flex-start"
       alignItems="flex-start"
       className={classes.floatingBtn}
+      ref={ref}
+      style={{ width: isMobile ? 50 : 65 }}
     >
       <Grid item>
         <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)} title={t('openMenu')}>

@@ -112,8 +112,11 @@ const getLegacy = (results, args, perms, ohbem) => {
     }
   })
 
-  const interestedLevelCaps = [40, 50, 51]
-  const interestedMegas = [1, 2, 3, 'experimental_stats']
+  const interestedLevelCaps = Object.keys(args.filters)
+    .filter(x => x.startsWith('onlyPvp') && args.filters[x])
+    .map(y => parseInt(y.substring(7)))
+  const interestedMegas = args.filters.pvpMega ? [1, 2, 3, 'experimental_stats'] : []
+
   for (const key of args.filters.onlyLegacyExclude || []) {
     if (key === 'global') continue
     const split = key.split('-', 2)

@@ -1,4 +1,4 @@
-const { clientSideOptions, map: { legacyPkmnFilter } } = require('../config')
+const { clientSideOptions, map: { legacyPkmnFilter }, database: { settings: { pvpLevels } } } = require('../config')
 const dbSelection = require('../functions/dbSelection')
 
 module.exports = function clientOptions(perms) {
@@ -23,10 +23,12 @@ module.exports = function clientOptions(perms) {
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'] },
       pokemonTimers: { type: 'bool', perm: ['pokemon'] },
-      prioritizePvpInfo: { type: 'bool', perm: ['pvp'] },
+      prioritizePvpInfo: { type: 'bool', perm: ['pvp'], popup: true },
       ivCircles: { type: 'bool', perm: ['iv'] },
       minIvCircle: { type: 'number', perm: ['iv'], label: '%' },
       interactionRanges: { type: 'bool', perm: ['pokemon'] },
+      showDexNumInPopup: { type: 'bool', perm: ['pokemon'], popup: true },
+      pvpMega: { type: 'bool', perm: ['pokemon'], popup: true },
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'] },
@@ -34,6 +36,12 @@ module.exports = function clientOptions(perms) {
       newPortals: { type: 'color', perm: ['portals'] },
     },
   }
+
+  pvpLevels.forEach(level => {
+    clientMenus.pokemon[`pvp${level}`] = {
+      type: 'bool', perm: ['pvp'], popup: true, value: true,
+    }
+  })
 
   // special case options that require additional checks
   if (legacyPkmnFilter) {
@@ -54,7 +62,7 @@ module.exports = function clientOptions(perms) {
     clientValues[key] = {}
     Object.entries(options).forEach(option => {
       const [name, meta] = option
-      clientMenus[key][name].value = clientSideOptions[key][name] || false
+      clientMenus[key][name].value = clientSideOptions[key][name] || meta.value
       clientMenus[key][name].disabled = !meta.perm.some(x => perms[x])
       clientValues[key][name] = meta.value
       if (meta.sub) clientMenus[key][name].sub = {}

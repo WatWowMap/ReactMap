@@ -274,6 +274,7 @@
   "tutorialSliders7": "Filtre indépendants des autres curseurs",
   "tutorialSliders8": "Un Curseur 'Complet' signifie que celui-ci est désactivé:",
   "tutorialHelp": "Raccourci vers ce menu",
+  "tutorialSliders9": "Tous les spawns que les IV soient vérifiés ou pas",
   "tutorialAdvFilter": "Mobile uniquement, ouvre les options de filtres du menu avancé",
   "tutorialTune": "Configure le filtre avancé pour tous les Pokémon actuellement filtrés dans le menu",
   "tutorialFormatSize": "Configure la taille des icones pour tous les éléments actuellement filtrés dans le menu",
@@ -369,5 +370,9 @@
   "popupPokemonSeenDataWidth": 6,
   "popupPokemonSeenDescriptionWidth": 5,
   "popupPokestopSeenDataWidth": 7,
-  "popupPokestopSeenDescriptionWidth": 5
+  "popupPokestopSeenDescriptionWidth": 5,
+  "showDexNumInPopup": "Visualiser le # de Pokedex en Popup",
+  "popup": "Popup",
+  "pvpLevel": "Stats PvP Niveau {{level}}",
+  "pvpMega": "Stats PvP Mega"
 }
