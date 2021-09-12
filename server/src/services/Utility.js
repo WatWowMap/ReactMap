@@ -5,15 +5,10 @@ const buildDefaultFilters = require('./defaultFilters/buildDefaultFilters')
 const primaryUi = require('./ui/primary')
 const advMenus = require('./ui/advMenus')
 const clientOptions = require('./ui/clientOptions')
-const fetchJson = require('./functions/fetchJson')
-const fetchRaids = require('./functions/fetchRaids')
-const fetchQuests = require('./functions/fetchQuests')
-const fetchNests = require('./functions/fetchNests')
 const dbSelection = require('./functions/dbSelection')
-const webhookApi = require('./functions/webhookApi')
 const permissions = require('./functions/permissions')
 
-class Utility {
+module.exports = class Utility {
   static getPolyVector(s2cellId, type) {
     return getPolyVector(s2cellId, type)
   }
@@ -42,33 +37,11 @@ class Utility {
     return clientOptions(perms)
   }
 
-  static async fetchJson(url) {
-    return fetchJson(url)
-  }
-
-  static async fetchRaids() {
-    return fetchRaids()
-  }
-
-  static async fetchQuests() {
-    return fetchQuests()
-  }
-
-  static async fetchNests() {
-    return fetchNests()
-  }
-
   static dbSelection(category) {
     return dbSelection(category)
-  }
-
-  static async webhookApi(category, discordId, method, data) {
-    return webhookApi(category, discordId, method, data)
   }
 
   static permissions(permToCheck, perms) {
     return permissions(permToCheck, perms)
   }
 }
-
-module.exports = Utility

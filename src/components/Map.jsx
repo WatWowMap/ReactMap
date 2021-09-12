@@ -4,6 +4,7 @@ import { TileLayer, useMap } from 'react-leaflet'
 import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
+import DraggableMarker from './layout/dialogs/webhooks/Draggable'
 
 const userSettingsCategory = category => {
   switch (category) {
@@ -18,27 +19,31 @@ const userSettingsCategory = category => {
 
 export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons }, params }) {
   const map = useMap()
-  const filters = useStore(state => state.filters)
-  const settings = useStore(state => state.settings)
+
   const staticUserSettings = useCallback(useStatic(state => state.userSettings))
-  const icons = useStore(state => state.icons)
   const ui = useCallback(useStatic(state => state.ui))
   const available = useCallback(useStatic(state => state.available))
   const staticFilters = useCallback(useStatic(state => state.filters))
+
+  const filters = useStore(state => state.filters)
+  const settings = useStore(state => state.settings)
+  const icons = useStore(state => state.icons)
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
   const userSettings = useStore(state => state.userSettings)
-  const [manualParams, setManualParams] = useState(false)
 
-  const initialBounds = {
+  const [webhookMode, setWebhookMode] = useState(false)
+  const [selectedAreas, setSelectedAreas] = useState([])
+  const [manualParams, setManualParams] = useState(false)
+  const [initialBounds] = useState({
     minLat: map.getBounds()._southWest.lat,
     maxLat: map.getBounds()._northEast.lat,
     minLon: map.getBounds()._southWest.lng,
     maxLon: map.getBounds()._northEast.lng,
-  }
+  })
 
-  const onMove = useCallback(() => {
-    const newCenter = map.getCenter()
+  const onMove = useCallback((latLon) => {
+    const newCenter = latLon || map.getCenter()
     setLocation([newCenter.lat, newCenter.lng])
     setZoom(map.getZoom())
   }, [map])
@@ -56,69 +61,87 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
       />
-      {Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
-        const [category, value] = each
-        let enabled = false
+      {webhookMode === 'location' ? (
+        <DraggableMarker map={map} setWebhookMode={setWebhookMode} onMove={onMove} />
+      ) : (
+        Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
+          const [category, value] = each
+          let enabled = false
 
-        switch (category) {
-          default:
-            if (filters[category]
-              && filters[category].enabled
-              && value) {
-              enabled = true
-            } break
-          case 'gyms':
-            if ((filters[category].gyms && value.gyms)
-              || (filters[category].raids && value.raids)
-              || (filters[category].exEligible && value.exEligible)
-              || (filters[category].inBattle && value.inBattle)
-              || (filters[category].arEligible && value.arEligible)) {
-              enabled = true
-            } break
-          case 'nests':
-            if (((filters[category].pokemon && value.pokemon)
-              || (filters[category].polygons && value.polygons))) {
-              enabled = true
-            } break
-          case 'pokestops':
-            if ((filters[category].allPokestops && value.allPokestops)
-              || (filters[category].lures && value.lures)
-              || (filters[category].invasions && value.invasions)
-              || (filters[category].quests && value.quests)
-              || (filters[category].arEligible && value.arEligible)) {
-              enabled = true
-            } break
-        }
-        if (enabled) {
-          return (
-            <QueryData
-              key={category}
-              bounds={initialBounds}
-              onMove={onMove}
-              perms={value}
-              map={map}
-              category={category}
-              config={config}
-              available={available[category]}
-              Icons={Icons}
-              staticFilters={staticFilters[category].filter}
-              userIcons={icons}
-              userSettings={userSettings[userSettingsCategory(category)] || {}}
-              filters={filters[category]}
-              tileStyle={tileServers[settings.tileServers].style}
-              zoomLevel={config.clusterZoomLevels[category] || 1}
-              staticUserSettings={staticUserSettings[category]}
-              params={params}
-            />
-          )
-        }
-        return null
-      })}
+          switch (category) {
+            case 'scanAreas':
+              if ((filters[category] && filters[category].enabled)
+                || webhookMode === 'areas') {
+                enabled = true
+              } break
+            case 'gyms':
+              if (((filters[category].gyms && value.gyms)
+                || (filters[category].raids && value.raids)
+                || (filters[category].exEligible && value.exEligible)
+                || (filters[category].inBattle && value.inBattle)
+                || (filters[category].arEligible && value.arEligible))
+                && !webhookMode) {
+                enabled = true
+              } break
+            case 'nests':
+              if (((filters[category].pokemon && value.pokemon)
+                || (filters[category].polygons && value.polygons))
+                && !webhookMode) {
+                enabled = true
+              } break
+            case 'pokestops':
+              if (((filters[category].allPokestops && value.allPokestops)
+                || (filters[category].lures && value.lures)
+                || (filters[category].invasions && value.invasions)
+                || (filters[category].quests && value.quests)
+                || (filters[category].arEligible && value.arEligible))
+                && !webhookMode) {
+                enabled = true
+              } break
+            default:
+              if (filters[category]
+                && filters[category].enabled
+                && value && !webhookMode) {
+                enabled = true
+              } break
+          }
+          if (enabled) {
+            return (
+              <QueryData
+                key={category}
+                bounds={initialBounds}
+                onMove={onMove}
+                perms={value}
+                map={map}
+                category={category}
+                config={config}
+                available={available[category]}
+                Icons={Icons}
+                staticFilters={staticFilters[category].filter}
+                userIcons={icons}
+                userSettings={userSettings[userSettingsCategory(category)] || {}}
+                filters={filters[category]}
+                tileStyle={tileServers[settings.tileServers].style}
+                zoomLevel={config.clusterZoomLevels[category] || 1}
+                staticUserSettings={staticUserSettings[category]}
+                params={params}
+                webhookMode={webhookMode}
+                selectedAreas={selectedAreas}
+                setSelectedAreas={setSelectedAreas}
+              />
+            )
+          }
+          return null
+        }))}
       <Nav
         map={map}
         setManualParams={setManualParams}
         Icons={Icons}
         config={config}
+        webhookMode={webhookMode}
+        setWebhookMode={setWebhookMode}
+        selectedAreas={selectedAreas}
+        setSelectedAreas={setSelectedAreas}
       />
     </>
   )

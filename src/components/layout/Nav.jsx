@@ -17,7 +17,7 @@ import Manage from './dialogs/webhooks/Manage'
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
 export default function Nav({
-  map, setManualParams, Icons, config,
+  map, setManualParams, Icons, config, setWebhookMode, webhookMode, selectedAreas, setSelectedAreas,
 }) {
   const classes = useStyles()
   const theme = useTheme()
@@ -34,7 +34,7 @@ export default function Nav({
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: true,
-    category: '',
+    category: ' ',
     type: 'webhook',
   })
   const [userProfile, setUserProfile] = useState(false)
@@ -55,6 +55,9 @@ export default function Nav({
       setDialog({ open, category, type })
     } else {
       setDialog({ open, category, type })
+    }
+    if (type === 'webhook') {
+      setFilters({ ...filters, scanAreas: { ...filters.scanAreas, enabled: open ? false : Boolean(filter) } })
     }
     if (filter && type === 'search') {
       map.flyTo([filter.lat, filter.lon], 16)
@@ -100,13 +103,15 @@ export default function Nav({
           safeSearch={safeSearch}
           isMobile={isMobile}
           perms={perms}
+          webhookMode={webhookMode}
+          setWebhookMode={setWebhookMode}
+          scanAreasOn={filters.scanAreas.enabled}
         />
       )}
       <Dialog
         fullWidth
         maxWidth="md"
         open={dialog.open && dialog.type === 'filters'}
-        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <FilterMenu
           toggleDialog={toggleDialog}
@@ -117,7 +122,6 @@ export default function Nav({
       <Dialog
         maxWidth="sm"
         open={dialog.open && dialog.type === 'options'}
-        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <UserOptions
           toggleDialog={toggleDialog}
@@ -130,7 +134,6 @@ export default function Nav({
           container: classes.container,
         }}
         open={dialog.open && dialog.type === 'search'}
-        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <Search
           toggleDialog={toggleDialog}
@@ -154,15 +157,22 @@ export default function Nav({
           scrollPaper: classes.scrollPaper,
           container: classes.container,
         }}
-        fullWidth
+        fullWidth={!isMobile}
+        fullScreen={isMobile}
+        style={{ display: webhookMode ? 'none' : 'block' }}
         maxWidth="xl"
         open={dialog.open && dialog.type === 'webhook'}
-        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <Manage
           toggleDialog={toggleDialog}
           isMobile={isMobile}
           Icons={Icons}
+          webhookMode={webhookMode}
+          setWebhookMode={setWebhookMode}
+          map={map}
+          scanAreasOn={dialog.category} // inconsistency here
+          selectedAreas={selectedAreas}
+          setSelectedAreas={setSelectedAreas}
         />
       </Dialog>
     </>

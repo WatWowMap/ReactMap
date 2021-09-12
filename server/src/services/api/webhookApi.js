@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const fetch = require('node-fetch')
 const { webhooks } = require('../config')
-const webhookConverter = require('./webhookConverter')
+const webhookConverter = require('../functions/webhookConverter')
 
 const looper = (num, toLoop, staticData, skipZero) => {
   const arr = []
@@ -19,6 +19,16 @@ module.exports = async function webhookApi(category, discordId, method, data = n
     case 'poracle': Object.assign(headers, { 'X-Poracle-Secret': webhooks.poracleSecret }); break
     default: break
   }
+
+  if (category === 'areas') {
+    const { areas } = await fetch(`${webhooks.host}:${webhooks.port}/api/geofence/all/hash`, {
+      method,
+      headers,
+    })
+      .then(res => res.json())
+    return Object.keys(areas).map(a => a).sort()
+  }
+
   let sending
   if (method === 'POST') {
     sending = webhookConverter(category, data)
@@ -45,18 +55,6 @@ module.exports = async function webhookApi(category, discordId, method, data = n
   const response = Array.isArray(category)
     ? await Promise.all(category.map(cat => fetcher(cat)))
     : await fetcher(category)
-
-  // if (category === 'all') {
-  //   response.gym.forEach(gym => {
-  //     let count = 0
-  //     response.raid.forEach(raid => {
-  //       if (raid.gym_id === gym.id) count += 1
-  //     })
-  //     if (count === 6) {
-  //       gym.allRaids = true
-  //     }
-  //   })
-  // }
 
   try {
     return response

@@ -5,8 +5,9 @@ const {
 const { JSONResolver } = require('graphql-scalars')
 const fs = require('fs')
 const { raw } = require('objection')
-
+const NodeGeocoder = require('node-geocoder')
 const DeviceType = require('./device')
+const GeocoderType = require('./geocoder')
 const GymType = require('./gym')
 const NestType = require('./nest')
 const PokestopType = require('./pokestop')
@@ -19,6 +20,8 @@ const SearchType = require('./search')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
+
+const { webhooks } = require('../services/config')
 
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
@@ -40,6 +43,27 @@ const RootQuery = new GraphQLObjectType({
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.devices) {
           return Device.getAllDevices(perms, Utility.dbSelection('device') === 'mad')
+        }
+      },
+    },
+    geocoder: {
+      type: new GraphQLList(GeocoderType),
+      args: {
+        search: { type: GraphQLString },
+      },
+      async resolve(parent, args, req) {
+        const perms = req.user ? req.user.perms : req.session.perms
+        if (perms.webhooks) {
+          const geocoder = NodeGeocoder({
+            provider: 'openstreetmap',
+            osmServer: webhooks.nominatimUrl,
+            timeout: 5000,
+          })
+          geocoder._geocoder._formatResult = ((original) => (result) => ({
+            ...original(result),
+            suburb: result.address.suburb || '',
+          }))(geocoder._geocoder._formatResult)
+          return geocoder.geocode(args.search)
         }
       },
     },
@@ -206,16 +230,14 @@ const RootQuery = new GraphQLObjectType({
       },
     },
     scanAreas: {
-      type: new GraphQLList(ScanAreaType),
+      type: ScanAreaType,
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.scanAreas) {
           const scanAreas = fs.existsSync('server/src/configs/areas.json')
             ? JSON.parse(fs.readFileSync('./server/src/configs/areas.json'))
             : { features: [] }
-          return scanAreas.features.sort(
-            (a, b) => (a.properties.name > b.properties.name) ? 1 : -1,
-          )
+          return scanAreas
         }
       },
     },
@@ -349,9 +371,6 @@ const Mutation = new GraphQLObjectType({
           const response = await Utility.webhookApi(category, req.user.id, status, data)
           const categories = Array.isArray(response) ? 'all' : category
           const get = await Utility.webhookApi(categories, req.user.id, 'GET')
-
-          console.log('response', response)
-          console.log('get', get)
 
           return {
             ...get,

@@ -4,6 +4,7 @@ import menuFilter from './functions/menuFilter'
 import checkAdvFilter from './functions/checkAdvFilter'
 import dayCheck from './functions/dayCheck'
 import parseQuestConditions from './functions/parseConditions'
+import formatter from './functions/formatter'
 
 export default class Utility {
   static getProperName(word) {
@@ -32,5 +33,9 @@ export default class Utility {
 
   static parseConditions(conditions) {
     return parseQuestConditions(conditions)
+  }
+
+  static formatter(addressFormat, data) {
+    return formatter(addressFormat, data)
   }
 }

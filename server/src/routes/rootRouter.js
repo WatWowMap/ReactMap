@@ -8,6 +8,7 @@ const clientRouter = require('./clientRouter')
 const schema = require('../schema/schema')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
+const Fetch = require('../services/Fetch')
 const masterfile = require('../data/masterfile.json')
 const {
   Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter,
@@ -88,7 +89,6 @@ rootRouter.get('/settings', async (req, res) => {
         manualAreas: config.manualAreas || {},
         icons: config.icons,
       }
-
       // add config options to this array that are structured as arrays
       const arrayUserOptions = [
         { name: 'localeSelection', values: config.localeSelection },
@@ -123,7 +123,7 @@ rootRouter.get('/settings', async (req, res) => {
         if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
           serverSettings.available.gyms = config.api.queryAvailable.raids
             ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym') === 'mad')
-            : await Utility.fetchRaids()
+            : await Fetch.fetchRaids()
         }
         if (serverSettings.user.perms.quests
           || serverSettings.user.perms.pokestops
@@ -131,12 +131,12 @@ rootRouter.get('/settings', async (req, res) => {
           || serverSettings.user.perms.lures) {
           serverSettings.available.pokestops = config.api.queryAvailable.quests
             ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop') === 'mad')
-            : await Utility.fetchQuests()
+            : await Fetch.fetchQuests()
         }
         if (serverSettings.user.perms.nests) {
           serverSettings.available.nests = config.api.queryAvailable.nests
             ? await Nest.getAvailableNestingSpecies()
-            : await Utility.fetchNests()
+            : await Fetch.fetchNests()
         }
       } catch (e) {
         console.warn(e, '\nUnable to query available.')
@@ -181,15 +181,18 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.masterfile = masterfile
 
       try {
-        serverSettings.webhookData = await Utility.webhookApi('all', serverSettings.user.id, 'GET')
+        serverSettings.webhookData = await Fetch.webhookApi('all', serverSettings.user.id, 'GET')
       } catch (e) {
         console.warn('Unable to fetch webhook data')
       }
       if (serverSettings.webhookData) {
         serverSettings.webhookData.name = config.webhooks.name
-        Object.entries(serverSettings.webhookData).forEach(([key, value]) => {
-          serverSettings.webhookData[key] = Array.isArray(value) ? value : [value]
-        })
+        serverSettings.webhookData.addressFormat = config.webhooks.addressFormat
+        try {
+          serverSettings.webhookData.areas = await Fetch.webhookApi('areas', '', 'GET')
+        } catch (e) {
+          console.warn('Unable to fetch webhook areas')
+        }
       }
       console.log(serverSettings.webhookData)
     }

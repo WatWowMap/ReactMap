@@ -1,24 +1,44 @@
-import React, { memo } from 'react'
+import React from 'react'
 import { GeoJSON } from 'react-leaflet'
 import Utility from '@services/Utility'
 
-const NestTile = ({ item }) => {
+export default function ScanAreaTile({
+  item, webhookMode, selectedAreas, setSelectedAreas,
+}) {
+  const handleClick = (name) => {
+    if (selectedAreas.includes(name)) {
+      setSelectedAreas(selectedAreas.filter(h => h !== name))
+    } else {
+      setSelectedAreas([...selectedAreas, name])
+    }
+  }
   const onEachFeature = (feature, layer) => {
     if (feature.properties && feature.properties.name) {
+      const name = feature.properties.name.toLowerCase()
       layer.setStyle({
         color: feature.properties.stroke || '#3388ff',
         weight: feature.properties['stroke-width'] || 3,
         opacity: feature.properties['stroke-opacity'] || 1,
         fillColor: feature.properties.fill || '#3388ff',
+        fillOpacity: selectedAreas.includes(name) ? 0.8 : 0.2,
       })
-      layer.bindPopup(Utility.getProperName(feature.properties.name))
+      const popupContent = Utility.getProperName(name)
+      if (webhookMode) {
+        layer.on('click', () => handleClick(name))
+        layer.bindTooltip(popupContent, {
+          permanent: true, direction: 'top',
+        }).openTooltip()
+      } else {
+        layer.bindPopup(popupContent)
+      }
     }
   }
-  return <GeoJSON data={item} onEachFeature={onEachFeature} />
+
+  return (
+    <GeoJSON
+      key={selectedAreas}
+      data={item.scanAreas}
+      onEachFeature={onEachFeature}
+    />
+  )
 }
-
-const areEqual = (prev, next) => (
-  prev.item.properties.name === next.item.properties.name
-)
-
-export default memo(NestTile, areEqual)

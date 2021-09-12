@@ -83,6 +83,7 @@
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.1",
+    "node-geocoder": "^3.27.0",
     "nodes2ts": "^2.0.0",
     "objection": "Vincit/objection.js#chore/knex-0-95-0",
     "ohbem": "^1.1.0",
