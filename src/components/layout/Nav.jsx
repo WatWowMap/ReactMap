@@ -12,12 +12,12 @@ import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
 import Search from './dialogs/Search'
 import QuickAdd from './dialogs/webhooks/QuickAdd'
-import Manage from './dialogs/webhooks/Manage'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
 export default function Nav({
-  map, setManualParams, Icons, config, setWebhookMode, webhookMode, selectedAreas, setSelectedAreas,
+  map, setManualParams, Icons, config,
+  setWebhookMode, webhookMode,
 }) {
   const classes = useStyles()
   const theme = useTheme()
@@ -30,12 +30,11 @@ export default function Nav({
   const setUserSettings = useStore(state => state.setUserSettings)
   const tutorial = useStore(state => state.tutorial)
   const setTutorial = useStore(state => state.setTutorial)
-
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
-    open: true,
-    category: ' ',
-    type: 'webhook',
+    open: false,
+    category: '',
+    type: '',
   })
   const [userProfile, setUserProfile] = useState(false)
   const safeSearch = searchable.filter(category => perms[category])
@@ -55,9 +54,6 @@ export default function Nav({
       setDialog({ open, category, type })
     } else {
       setDialog({ open, category, type })
-    }
-    if (type === 'webhook') {
-      setFilters({ ...filters, scanAreas: { ...filters.scanAreas, enabled: open ? false : Boolean(filter) } })
     }
     if (filter && type === 'search') {
       map.flyTo([filter.lat, filter.lon], 16)
@@ -151,29 +147,6 @@ export default function Nav({
         open={webhookPopup.open}
       >
         <QuickAdd config={config} />
-      </Dialog>
-      <Dialog
-        classes={{
-          scrollPaper: classes.scrollPaper,
-          container: classes.container,
-        }}
-        fullWidth={!isMobile}
-        fullScreen={isMobile}
-        style={{ display: webhookMode ? 'none' : 'block' }}
-        maxWidth="xl"
-        open={dialog.open && dialog.type === 'webhook'}
-      >
-        <Manage
-          toggleDialog={toggleDialog}
-          isMobile={isMobile}
-          Icons={Icons}
-          webhookMode={webhookMode}
-          setWebhookMode={setWebhookMode}
-          map={map}
-          scanAreasOn={dialog.category} // inconsistency here
-          selectedAreas={selectedAreas}
-          setSelectedAreas={setSelectedAreas}
-        />
       </Dialog>
     </>
   )

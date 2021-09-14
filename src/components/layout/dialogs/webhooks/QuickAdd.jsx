@@ -92,8 +92,6 @@ const dataLookup = (category, entry, Icons, t) => {
 }
 
 const getStatus = (exists, local) => {
-  // console.log('exists', exists)
-  // console.log('local', local)
   try {
     if (exists && Boolean(exists.clean) === local.clean && exists.distance == local.distance) {
       return 'DELETE'

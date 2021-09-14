@@ -20,7 +20,7 @@ export default function ScanAreaTile({
         weight: feature.properties['stroke-width'] || 3,
         opacity: feature.properties['stroke-opacity'] || 1,
         fillColor: feature.properties.fill || '#3388ff',
-        fillOpacity: selectedAreas.includes(name) ? 0.8 : 0.2,
+        fillOpacity: selectedAreas && selectedAreas.includes(name) && webhookMode === 'areas' ? 0.8 : 0.2,
       })
       const popupContent = Utility.getProperName(name)
       if (webhookMode) {
@@ -37,7 +37,7 @@ export default function ScanAreaTile({
   return (
     <GeoJSON
       key={selectedAreas}
-      data={item.scanAreas}
+      data={item}
       onEachFeature={onEachFeature}
     />
   )

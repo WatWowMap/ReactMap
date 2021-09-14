@@ -34,6 +34,9 @@ module.exports = function permissionManager(permToCheck, perms) {
     case 'spawnpoint':
     case 'spawnpoints': return perms.spawnpoints
     case 'webhook':
+    case 'setLocation':
+    case 'setAreas':
+    case 'switchProfile':
     case 'webhooks': return perms.webhooks
     default: return false
   }

@@ -181,7 +181,7 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.masterfile = masterfile
 
       try {
-        serverSettings.webhookData = await Fetch.webhookApi('all', serverSettings.user.id, 'GET')
+        serverSettings.webhookData = await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET')
       } catch (e) {
         console.warn('Unable to fetch webhook data')
       }
@@ -194,7 +194,7 @@ rootRouter.get('/settings', async (req, res) => {
           console.warn('Unable to fetch webhook areas')
         }
       }
-      console.log(serverSettings.webhookData)
+      // console.log(serverSettings.webhookData)
     }
     res.status(200).json({ serverSettings })
   } catch (error) {

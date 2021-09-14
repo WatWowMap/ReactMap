@@ -4,7 +4,7 @@ import { TileLayer, useMap } from 'react-leaflet'
 import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
-import DraggableMarker from './layout/dialogs/webhooks/Draggable'
+import Webhook from './layout/dialogs/webhooks/Webhook'
 
 const userSettingsCategory = category => {
   switch (category) {
@@ -28,12 +28,11 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const filters = useStore(state => state.filters)
   const settings = useStore(state => state.settings)
   const icons = useStore(state => state.icons)
-  const setLocation = useStore(state => state.setLocation)
+  const setLocation = useStore(s => s.setLocation)
   const setZoom = useStore(state => state.setZoom)
   const userSettings = useStore(state => state.userSettings)
 
   const [webhookMode, setWebhookMode] = useState(false)
-  const [selectedAreas, setSelectedAreas] = useState([])
   const [manualParams, setManualParams] = useState(false)
   const [initialBounds] = useState({
     minLat: map.getBounds()._southWest.lat,
@@ -61,8 +60,13 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
       />
-      {webhookMode === 'location' ? (
-        <DraggableMarker map={map} setWebhookMode={setWebhookMode} onMove={onMove} />
+      {webhookMode ? (
+        <Webhook
+          map={map}
+          webhookMode={webhookMode}
+          setWebhookMode={setWebhookMode}
+          Icons={Icons}
+        />
       ) : (
         Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
           const [category, value] = each
@@ -125,14 +129,12 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
                 zoomLevel={config.clusterZoomLevels[category] || 1}
                 staticUserSettings={staticUserSettings[category]}
                 params={params}
-                webhookMode={webhookMode}
-                selectedAreas={selectedAreas}
-                setSelectedAreas={setSelectedAreas}
               />
             )
           }
           return null
-        }))}
+        })
+      )}
       <Nav
         map={map}
         setManualParams={setManualParams}
@@ -140,8 +142,6 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         config={config}
         webhookMode={webhookMode}
         setWebhookMode={setWebhookMode}
-        selectedAreas={selectedAreas}
-        setSelectedAreas={setSelectedAreas}
       />
     </>
   )

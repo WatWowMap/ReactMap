@@ -12,21 +12,52 @@ const looper = (num, toLoop, staticData, skipZero) => {
 }
 
 module.exports = async function webhookApi(category, discordId, method, data = null) {
-  const headers = { Accept: 'application/json', 'Content-Type': 'application/json' }
+  const headers = {}
 
   if (method === 'PATCH') method = 'POST'
+
   switch (webhooks.provider) {
     case 'poracle': Object.assign(headers, { 'X-Poracle-Secret': webhooks.poracleSecret }); break
     default: break
   }
 
-  if (category === 'areas') {
-    const { areas } = await fetch(`${webhooks.host}:${webhooks.port}/api/geofence/all/hash`, {
-      method,
-      headers,
-    })
-      .then(res => res.json())
-    return Object.keys(areas).map(a => a).sort()
+  console.log(category)
+  switch (category) {
+    case 'switchProfile': {
+      const post = await fetch(`${webhooks.host}:${webhooks.port}/api/humans/${discordId}/${category}/${data}`, { method, headers })
+        .then(res => res.json())
+      const get = await fetch(`${webhooks.host}:${webhooks.port}/api/humans/one/${discordId}`, { method: 'GET', headers })
+        .then(res => res.json())
+      return { ...post, ...get }
+    }
+    case 'setLocation': {
+      const post = await fetch(`${webhooks.host}:${webhooks.port}/api/humans/${discordId}/${category}/${data[0]}/${data[1]}`, { method, headers })
+        .then(res => res.json())
+      const get = await fetch(`${webhooks.host}:${webhooks.port}/api/humans/one/${discordId}`, { method: 'GET', headers })
+        .then(res => res.json())
+      return { ...post, ...get }
+    }
+    case 'setAreas': {
+      Object.assign(headers, { Accept: 'application/json', 'Content-Type': 'application/json' })
+      const post = await fetch(`${webhooks.host}:${webhooks.port}/api/humans/${discordId}/${category}`, {
+        method,
+        headers,
+        body: JSON.stringify(data),
+      })
+        .then(res => res.json())
+      const get = await fetch(`${webhooks.host}:${webhooks.port}/api/humans/one/${discordId}`, { method: 'GET', headers })
+        .then(res => res.json())
+      return { ...post, ...get }
+    }
+    case 'areas': {
+      const { areas } = await fetch(`${webhooks.host}:${webhooks.port}/api/geofence/all/hash`, {
+        method,
+        headers,
+      })
+        .then(res => res.json())
+      return Object.keys(areas).map(a => a).sort()
+    }
+    default: break
   }
 
   let sending

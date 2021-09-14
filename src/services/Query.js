@@ -10,7 +10,7 @@ import getAllSubmissionCells from './queries/submissionCells'
 import { getOne, getAllNests } from './queries/nest'
 import getAllScanAreas from './queries/scanAreas'
 import * as searchIndex from './queries/search'
-import setWebhook from './queries/webhook'
+import * as webhookIndex from './queries/webhook'
 import getGeocoder from './queries/geocoder'
 
 export default class Query {
@@ -116,8 +116,11 @@ export default class Query {
     }
   }
 
-  static webhook() {
-    return setWebhook
+  static webhook(type) {
+    switch (type) {
+      case 'setHuman': return webhookIndex.setHuman
+      default: return webhookIndex.allProfiles
+    }
   }
 
   static geocoder() {

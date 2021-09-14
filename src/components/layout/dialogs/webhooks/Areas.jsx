@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { memo } from 'react'
 import { Done, Clear } from '@material-ui/icons'
 import {
   Grid, Typography, Chip, Button,
@@ -6,26 +6,25 @@ import {
 
 import useStyles from '@hooks/useStyles'
 
-export default function Areas({
-  areas, profileData, humanData, setWebhookMode, t, selectedAreas, setSelectedAreas,
-}) {
+const Areas = ({
+  setWebhookMode, t, selectedAreas, webhookData, syncWebhook,
+}) => {
   const classes = useStyles()
 
-  const handleClick = (event, del) => {
-    const name = del
-      ? event.toLowerCase()
-      : event.target.innerText.toLowerCase()
-    if (selectedAreas.includes(name)) {
-      setSelectedAreas(selectedAreas.filter((a) => a !== name))
-    } else {
-      setSelectedAreas([...selectedAreas, name])
-    }
+  const handleClick = areaName => {
+    areaName = areaName.toLowerCase()
+    const newAreas = selectedAreas.includes(areaName)
+      ? selectedAreas.filter(a => a !== areaName)
+      : [...selectedAreas, areaName]
+
+    syncWebhook({
+      variables: {
+        category: 'setAreas',
+        data: newAreas,
+        status: 'POST',
+      },
+    })
   }
-
-  useEffect(() => {
-    setSelectedAreas(JSON.parse(profileData.find((p) => p.profile_no === humanData.current_profile_no).area))
-  }, [])
-
   return (
     <Grid
       container
@@ -51,7 +50,7 @@ export default function Areas({
         xs={12}
         className={classes.areaChips}
       >
-        {areas.map(area => {
+        {webhookData.areas.map(area => {
           const included = selectedAreas.includes(area.toLowerCase())
           return (
             <Chip
@@ -62,8 +61,8 @@ export default function Areas({
               deleteIcon={included ? <Done /> : <Clear />}
               size="small"
               color={included ? 'secondary' : 'primary'}
-              onClick={handleClick}
-              onDelete={() => handleClick(area, true)}
+              onClick={() => handleClick(area)}
+              onDelete={() => handleClick(area)}
               style={{ margin: 3 }}
             />
           )
@@ -72,3 +71,10 @@ export default function Areas({
     </Grid>
   )
 }
+
+const areEqual = (prev, next) => (
+  prev.selectedAreas.length === next.selectedAreas.length
+  && prev.currentHuman.area === next.currentHuman.area
+)
+
+export default memo(Areas, areEqual)

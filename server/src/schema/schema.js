@@ -12,7 +12,7 @@ const GymType = require('./gym')
 const NestType = require('./nest')
 const PokestopType = require('./pokestop')
 const PokemonType = require('./pokemon')
-const WebhookType = require('./webhook')
+const PoracleType = require('./poracle')
 const PortalType = require('./portal')
 const S2cellType = require('./s2cell')
 const ScanAreaType = require('./scanArea')
@@ -20,6 +20,7 @@ const SearchType = require('./search')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
+const Fetch = require('../services/Fetch')
 
 const { webhooks } = require('../services/config')
 
@@ -351,6 +352,19 @@ const RootQuery = new GraphQLObjectType({
         }
       },
     },
+    webhook: {
+      type: PoracleType,
+      args: {
+        category: { type: GraphQLString },
+        status: { type: GraphQLString },
+      },
+      async resolve(parent, args, req) {
+        const perms = req.user ? req.user.perms : req.session.perms
+        if (perms.webhooks) {
+          return Fetch.webhookApi(args.category, req.user.id, args.status)
+        }
+      },
+    },
   },
 })
 
@@ -358,22 +372,23 @@ const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
     webhook: {
-      type: WebhookType,
+      type: PoracleType,
       args: {
         category: { type: GraphQLString },
         data: { type: JSONResolver },
         status: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
-        const perms = req.user ? req.user.perms : req.session.perms
+        const perms = req.user ? req.user.perms : false
         const { category, data, status } = args
-        if (perms.webhooks && req.user && Utility.permissions(category, perms)) {
-          const response = await Utility.webhookApi(category, req.user.id, status, data)
-          const categories = Array.isArray(response) ? 'all' : category
-          const get = await Utility.webhookApi(categories, req.user.id, 'GET')
+        if (perms && Utility.permissions(category, perms)) {
+          const response = await Fetch.webhookApi(category, req.user.id, status, data)
+          const categories = Array.isArray(response) ? 'allProfiles' : category
+          // const get = await Fetch.webhookApi(categories, req.user.id, 'GET')
 
+          // console.log(category, response)
           return {
-            ...get,
+            ...response,
             status: categories === 'all' ? response.map(x => x.status) : [response.status],
             message: categories === 'all' ? response.map(x => x.message) : [response.message],
             category: categories,

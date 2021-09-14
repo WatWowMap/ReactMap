@@ -7,8 +7,10 @@ import {
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
-export default function DraggableMarker({ map, setWebhookMode, onMove }) {
-  const [position, setPosition] = useState(map.getCenter())
+export default function DraggableMarker({
+  map, setWebhookMode, webhookLocation, setWebhookLocation,
+}) {
+  const [position, setPosition] = useState(webhookLocation)
   const [radius, setRadius] = useState(0)
   const { t } = useTranslation()
   const markerRef = useRef(null)
@@ -18,9 +20,9 @@ export default function DraggableMarker({ map, setWebhookMode, onMove }) {
       dragend() {
         const marker = markerRef.current
         if (marker) {
-          map.flyTo(marker.getLatLng())
-          setPosition(marker.getLatLng())
-          onMove(marker.getLatLng())
+          const { lat, lng } = marker.getLatLng()
+          map.flyTo([lat, lng])
+          setPosition([lat, lng])
           const popup = popupRef.current
           if (popup) {
             popup.openOn(map)
@@ -76,7 +78,10 @@ export default function DraggableMarker({ map, setWebhookMode, onMove }) {
               <Button
                 color="secondary"
                 variant="contained"
-                onClick={() => setWebhookMode(false)}
+                onClick={() => {
+                  setWebhookMode('open')
+                  setWebhookLocation(position)
+                }}
               >
                 {t('clickToSelect')}
               </Button>

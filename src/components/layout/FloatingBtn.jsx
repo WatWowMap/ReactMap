@@ -11,7 +11,7 @@ import useStyles from '@hooks/useStyles'
 import useLocation from '@hooks/useLocation'
 
 export default function FloatingButtons({
-  toggleDrawer, toggleDialog, safeSearch, isMobile, perms, webhookMode, setWebhookMode, scanAreasOn,
+  toggleDrawer, toggleDialog, safeSearch, isMobile, perms, webhookMode, setWebhookMode,
 }) {
   const { t } = useTranslation()
   const map = useMap()
@@ -20,9 +20,9 @@ export default function FloatingButtons({
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'medium'
   const ref = useRef(null)
+
   useEffect(() => Leaflet.DomEvent.disableClickPropagation(ref.current))
 
-  console.log(webhookMode)
   return (
     <Grid
       container
@@ -46,11 +46,11 @@ export default function FloatingButtons({
         </Grid>
       )}
       {perms.webhooks && (
-      <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={toggleDialog(true, scanAreasOn, 'webhook')} title={t('webhook')} disabled={Boolean(webhookMode)}>
-          <NotificationsActive fontSize={iconSize} />
-        </Fab>
-      </Grid>
+        <Grid item>
+          <Fab color="secondary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('webhook')} disabled={Boolean(webhookMode)}>
+            <NotificationsActive fontSize={iconSize} />
+          </Fab>
+        </Grid>
       )}
       <Grid item>
         <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')} disabled={Boolean(webhookMode)}>
@@ -68,7 +68,7 @@ export default function FloatingButtons({
         </Fab>
       </Grid>
       <Grid item>
-        <Fab color="primary" size={fabSize} onClick={() => setWebhookMode(false)} title={t('save')} disabled={Boolean(!webhookMode === 'areas')}>
+        <Fab color="primary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('save')} disabled={webhookMode !== 'areas'}>
           <Save fontSize={iconSize} />
         </Fab>
       </Grid>

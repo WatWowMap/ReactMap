@@ -21,9 +21,9 @@ const getPolling = category => {
 }
 
 export default function QueryData({
-  bounds, onMove, map, tileStyle, zoomLevel, config, params, selectedAreas,
+  bounds, onMove, map, tileStyle, zoomLevel, config, params,
   category, available, filters, staticFilters, staticUserSettings,
-  userSettings, perms, Icons, userIcons, webhookMode, setSelectedAreas,
+  userSettings, perms, Icons, userIcons,
 }) {
   const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
 
@@ -102,10 +102,7 @@ export default function QueryData({
   if (renderedData) {
     return category === 'scanAreas' ? (
       <ScanArea
-        item={renderedData}
-        webhookMode={webhookMode}
-        selectedAreas={selectedAreas}
-        setSelectedAreas={setSelectedAreas}
+        item={renderedData[category]}
       />
     ) : (
       <Clustering
@@ -122,9 +119,6 @@ export default function QueryData({
         userSettings={userSettings}
         staticUserSettings={staticUserSettings}
         params={params}
-        webhookMode={webhookMode}
-        selectedAreas={selectedAreas}
-        setSelectedAreas={setSelectedAreas}
       />
     )
   }

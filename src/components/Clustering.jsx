@@ -15,8 +15,8 @@ const getId = (component, item) => {
 }
 
 export default function Clustering({
-  category, renderedData, userSettings, zoomLevel, staticUserSettings, params, selectedAreas,
-  filters, map, Icons, perms, tileStyle, config, userIcons, webhookMode, setSelectedAreas,
+  category, renderedData, userSettings, zoomLevel, staticUserSettings, params,
+  filters, map, Icons, perms, tileStyle, config, userIcons,
 }) {
   const Component = index[category]
   const hideList = useStatic(state => state.hideList)
@@ -52,9 +52,6 @@ export default function Clustering({
               staticUserSettings={staticUserSettings}
               params={params}
               showCircles={showCircles}
-              webhookMode={webhookMode}
-              selectedAreas={selectedAreas}
-              setSelectedAreas={setSelectedAreas}
             />
           )
         }
