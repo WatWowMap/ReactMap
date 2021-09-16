@@ -365,6 +365,18 @@ const RootQuery = new GraphQLObjectType({
         }
       },
     },
+    webhookGeojson: {
+      type: ScanAreaType,
+      async resolve(parent, args, req) {
+        const perms = req.user ? req.user.perms : req.session.perms
+        if (perms.webhooks) {
+          const { geoJSON } = await Fetch.webhookApi('geojson', req.user.id, 'GET')
+          const skip = webhooks.areasToSkip.map(a => a.toLowerCase())
+          geoJSON.features = geoJSON.features.filter(f => !skip.includes(f.properties.name.toLowerCase()))
+          return geoJSON
+        }
+      },
+    },
   },
 })
 

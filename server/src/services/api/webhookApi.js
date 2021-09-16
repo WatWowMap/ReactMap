@@ -49,6 +49,9 @@ module.exports = async function webhookApi(category, discordId, method, data = n
         .then(res => res.json())
       return { ...post, ...get }
     }
+    case 'geojson':
+      return fetch(`${webhooks.host}:${webhooks.port}/api/geofence/all/geojson`, { method, headers })
+        .then(res => res.json())
     case 'areas': {
       const { areas } = await fetch(`${webhooks.host}:${webhooks.port}/api/geofence/all/hash`, {
         method,

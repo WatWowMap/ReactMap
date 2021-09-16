@@ -255,3 +255,21 @@ export const setHuman = gql`
     }
   }
 `
+
+export const geojson = gql`
+  query WebhookGeojson {
+    webhookGeojson {
+      type
+      features {
+        type
+        properties {
+          name
+        }
+        geometry {
+          type
+          coordinates
+        }
+      }
+    }
+  }
+`
