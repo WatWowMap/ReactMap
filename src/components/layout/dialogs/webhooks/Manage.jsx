@@ -20,6 +20,7 @@ const ignoredKeys = ['message', 'error', 'statusCode', 'status', 'profile', 'nam
 
 export default function Manage({
   Icons, isMobile,
+  selectedWebhook, setSelectedWebhook,
   setWebhookMode, webhookMode,
   selectedAreas, setSelectedAreas,
   webhookLocation, setWebhookLocation,
@@ -36,11 +37,11 @@ export default function Manage({
     { name: 'addNew', action: () => setAddNew(true), icon: 'Add' },
     { name: 'close', action: () => setWebhookMode(false), icon: 'Close' },
   ]
-  const filteredData = Object.keys(webhookData).filter(key => !ignoredKeys.includes(key))
+  const filteredData = Object.keys(webhookData[selectedWebhook]).filter(key => !ignoredKeys.includes(key))
 
   return (
     <>
-      <Header name={webhookData.name} action={() => setWebhookMode(false)} />
+      <Header name={selectedWebhook} action={() => setWebhookMode(false)} />
       <AppBar position="static">
         <Tabs
           value={tabValue}
@@ -66,16 +67,17 @@ export default function Manage({
             {{
               human: (
                 <Human
-                  setWebhookMode={setWebhookMode}
-                  webhookData={webhookData}
-                  addressFormat={webhookData.addressFormat}
                   t={t}
+                  isMobile={isMobile}
+                  webhookData={webhookData}
                   webhookMode={webhookMode}
+                  setWebhookMode={setWebhookMode}
                   webhookLocation={webhookLocation}
                   setWebhookLocation={setWebhookLocation}
                   selectedAreas={selectedAreas}
                   setSelectedAreas={setSelectedAreas}
-                  isMobile={isMobile}
+                  selectedWebhook={selectedWebhook}
+                  setSelectedWebhook={setSelectedWebhook}
                 />
               ),
             }[key]}

@@ -6,8 +6,8 @@
 /* global BigInt */
 const Discord = require('discord.js')
 const fs = require('fs')
-const { alwaysEnabledPerms, discord } = require('./config')
-const areas = require('./areas.js')
+const { alwaysEnabledPerms, discord, webhooks } = require('./config')
+const areas = require('./areas')
 
 const client = new Discord.Client()
 
@@ -71,6 +71,7 @@ class DiscordClient {
     const perms = {}
     Object.keys(discord.perms).map(perm => perms[perm] = false)
     perms.areaRestrictions = []
+    perms.webhooks = []
     const { guildsFull } = user
     const guilds = user.guilds.map(guild => guild.id)
     if (discord.allowedUsers.includes(user.id)) {
@@ -122,6 +123,15 @@ class DiscordClient {
               }
             })
           }
+        }
+        if (webhooks.length) {
+          userRoles.forEach(role => {
+            webhooks.forEach(webhook => {
+              if (webhook.discordRoles.includes(role)) {
+                perms.webhooks.push(webhook.name)
+              }
+            })
+          })
         }
       }
     }

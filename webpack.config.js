@@ -20,7 +20,7 @@ module.exports = (env) => {
       filename: '[name].[contenthash].js',
       publicPath: '/',
     },
-    devtool: false,
+    devtool: isDevelopment ? 'eval-source-map' : false,
     performance: {
       hints: false,
       maxEntrypointSize: 512000,

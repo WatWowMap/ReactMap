@@ -5,6 +5,8 @@ import {
 import { useTheme } from '@material-ui/core/styles'
 
 import useStyles from '@hooks/useStyles'
+import { useStore } from '@hooks/useStore'
+
 import DraggableMarker from './Draggable'
 import Manage from './Manage'
 import AreaSelection from './AreaSelection'
@@ -18,6 +20,9 @@ export default function Main({
 
   const [selectedAreas, setSelectedAreas] = useState([])
   const [webhookLocation, setWebhookLocation] = useState([])
+
+  const selectedWebhook = useStore(s => s.selectedWebhook)
+  const setSelectedWebhook = useStore(s => s.selectedWebhook)
 
   return (
     <>
@@ -42,6 +47,8 @@ export default function Main({
           setSelectedAreas={setSelectedAreas}
           webhookLocation={webhookLocation}
           setWebhookLocation={setWebhookLocation}
+          selectedWebhook={selectedWebhook}
+          setSelectedWebhook={setSelectedWebhook}
         />
       </Dialog>
       {webhookMode === 'location' && (
@@ -58,6 +65,7 @@ export default function Main({
           setWebhookMode={setWebhookMode}
           selectedAreas={selectedAreas}
           setSelectedAreas={setSelectedAreas}
+          selectedWebhook={selectedWebhook}
         />
       )}
     </>

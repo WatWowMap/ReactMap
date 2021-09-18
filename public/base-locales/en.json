@@ -409,5 +409,6 @@
   "chooseOnMap": "Choose on Map",
   "selectProfile": "Select Profile",
   "distanceRadius": "Preview Radius Distances",
-  "areas": "Areas"
+  "areas": "Areas",
+  "selectWebhook": "Select Bot"
 }

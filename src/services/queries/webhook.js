@@ -227,8 +227,8 @@ export const allProfiles = gql`
   ${quest}
   ${raid}
   ${weather}
-  query Webhook($category: String!, $status: String!) {
-    webhook(category: $category, status: $status) {
+  query Webhook($category: String!, $status: String!, $name: String!) {
+    webhook(category: $category, status: $status, name: $name) {
       ...PoracleHuman
       ...PoracleEgg
       ...PoracleGym
@@ -246,8 +246,8 @@ export const allProfiles = gql`
 
 export const setHuman = gql`
   ${human}
-  mutation Webhook($data: JSON!, $category: String!, $status: String!) {
-    webhook(data: $data, category: $category, status: $status) {
+  mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
+    webhook(data: $data, category: $category, status: $status, name: $name) {
       category
       message
       status
@@ -257,8 +257,8 @@ export const setHuman = gql`
 `
 
 export const geojson = gql`
-  query WebhookGeojson {
-    webhookGeojson {
+  query WebhookGeojson($name: String!) {
+    webhookGeojson(name: $name) {
       type
       features {
         type

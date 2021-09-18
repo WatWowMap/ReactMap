@@ -21,7 +21,7 @@ module.exports = class Fetch {
     return fetchNests()
   }
 
-  static async webhookApi(category, discordId, method, data) {
-    return webhookApi(category, discordId, method, data)
+  static async webhookApi(category, discordId, method, name, data) {
+    return webhookApi(category, discordId, method, name, data)
   }
 }

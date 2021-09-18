@@ -6,6 +6,7 @@ const { JSONResolver } = require('graphql-scalars')
 const fs = require('fs')
 const { raw } = require('objection')
 const NodeGeocoder = require('node-geocoder')
+
 const DeviceType = require('./device')
 const GeocoderType = require('./geocoder')
 const GymType = require('./gym')
@@ -51,13 +52,15 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(GeocoderType),
       args: {
         search: { type: GraphQLString },
+        name: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.webhooks) {
+          const webhook = webhooks.find(hook => hook.name === args.name)
           const geocoder = NodeGeocoder({
             provider: 'openstreetmap',
-            osmServer: webhooks.nominatimUrl,
+            osmServer: webhook.nominatimUrl,
             timeout: 5000,
           })
           geocoder._geocoder._formatResult = ((original) => (result) => ({
@@ -357,6 +360,7 @@ const RootQuery = new GraphQLObjectType({
       args: {
         category: { type: GraphQLString },
         status: { type: GraphQLString },
+        name: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
@@ -367,11 +371,16 @@ const RootQuery = new GraphQLObjectType({
     },
     webhookGeojson: {
       type: ScanAreaType,
+      args: {
+        name: { type: GraphQLString },
+      },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.webhooks) {
-          const { geoJSON } = await Fetch.webhookApi('geojson', req.user.id, 'GET')
-          const skip = webhooks.areasToSkip.map(a => a.toLowerCase())
+          const { name } = args
+          const { geoJSON } = await Fetch.webhookApi('geojson', req.user.id, 'GET', name)
+          const webhook = webhooks.find(hook => hook.name === name)
+          const skip = webhook.areasToSkip.map(a => a.toLowerCase())
           geoJSON.features = geoJSON.features.filter(f => !skip.includes(f.properties.name.toLowerCase()))
           return geoJSON
         }
@@ -389,12 +398,13 @@ const Mutation = new GraphQLObjectType({
         category: { type: GraphQLString },
         data: { type: JSONResolver },
         status: { type: GraphQLString },
+        name: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : false
-        const { category, data, status } = args
+        const { category, data, status, name } = args
         if (perms && Utility.permissions(category, perms)) {
-          const response = await Fetch.webhookApi(category, req.user.id, status, data)
+          const response = await Fetch.webhookApi(category, req.user.id, status, name, data)
           const categories = Array.isArray(response) ? 'allProfiles' : category
           // const get = await Fetch.webhookApi(categories, req.user.id, 'GET')
 

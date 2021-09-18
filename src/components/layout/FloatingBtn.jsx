@@ -45,7 +45,7 @@ export default function FloatingButtons({
           </Fab>
         </Grid>
       )}
-      {perms.webhooks && (
+      {perms.webhooks.length && (
         <Grid item>
           <Fab color="secondary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('webhook')} disabled={Boolean(webhookMode)}>
             <NotificationsActive fontSize={iconSize} />

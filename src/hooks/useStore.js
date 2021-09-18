@@ -31,6 +31,8 @@ const useStore = create(persist(set => ({
   setSearch: (search) => set({ search }),
   searchTab: 0,
   setSearchTab: (searchTab) => set({ searchTab }),
+  selectedWebhook: undefined,
+  setSelectedWebhook: (selectedWebhook) => set({ selectedWebhook }),
 }),
 {
   name: 'local-state',

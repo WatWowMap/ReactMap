@@ -5,9 +5,13 @@ import Query from '@services/Query'
 import ScanAreaTile from '@components/tiles/ScanArea'
 
 export default function AreaSelection({
-  map, webhookMode, setWebhookMode, selectedAreas, setSelectedAreas,
+  map, selectedWebhook,
+  webhookMode, setWebhookMode,
+  selectedAreas, setSelectedAreas,
 }) {
-  const { data } = useQuery(Query.webhook('geojson'))
+  const { data } = useQuery(Query.webhook('geojson'), {
+    variables: { name: selectedWebhook },
+  })
 
   if (data && data.webhookGeojson) {
     return (

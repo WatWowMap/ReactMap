@@ -7,7 +7,7 @@ import {
 import useStyles from '@hooks/useStyles'
 
 const Areas = ({
-  setWebhookMode, t, selectedAreas, webhookData, syncWebhook,
+  setWebhookMode, t, selectedAreas, webhookData, syncWebhook, selectedWebhook,
 }) => {
   const classes = useStyles()
 
@@ -21,10 +21,12 @@ const Areas = ({
       variables: {
         category: 'setAreas',
         data: newAreas,
+        name: selectedWebhook,
         status: 'POST',
       },
     })
   }
+
   return (
     <Grid
       container

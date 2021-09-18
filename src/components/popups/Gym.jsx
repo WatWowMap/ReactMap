@@ -193,7 +193,7 @@ const Header = ({
       { name: 'timer', action: handleTimer },
     )
   }
-  if (perms.webhooks && webhookData) {
+  if (perms.webhooks.length && webhookData) {
     options.push({
       name: (
         <Trans i18nKey="manageWebhook">

@@ -1,13 +1,11 @@
 const fetch = require('node-fetch')
 
-module.exports = function fetchJson(url) {
+module.exports = async function fetchJson(url, options = undefined) {
   try {
-    return new Promise(resolve => {
-      fetch(url)
-        .then(res => res.json())
-        .then(json => resolve(json))
-    })
+    return fetch(url, options)
+      .then(res => res.json())
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.warn(e, `\nUnable to fetch ${url}`)
   }
 }

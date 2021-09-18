@@ -14,7 +14,7 @@ import { useMutation } from '@apollo/client'
 import { useTranslation, Trans } from 'react-i18next'
 
 import useStyles from '@hooks/useStyles'
-import { useStatic } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import Query from '@services/Query'
 import SlideTransition from '@assets/mui/SlideTransition'
 
@@ -113,6 +113,7 @@ export default function QuickAdd({ config }) {
 
   const webhookPopup = useStatic(state => state.webhookPopup)
   const setWebhookPopup = useStatic(state => state.setWebhookPopup)
+  const selectedWebhook = useStore(state => state.selectedWebhook)
   const webhookData = useStatic(state => state.webhookData)
   const setWebhookData = useStatic(state => state.setWebhookData)
   const Icons = useStatic(state => state.Icons)
@@ -139,7 +140,6 @@ export default function QuickAdd({ config }) {
   }
 
   const handleDistance = (category) => {
-    // console.log(payloads[category].distance, Number.isNaN(parseInt(payloads[category].distance)))
     setDistances({ ...distances, [category]: !distances[category] })
     setPayloads({
       ...payloads,
@@ -152,7 +152,6 @@ export default function QuickAdd({ config }) {
   }
 
   useEffect(() => {
-    // console.log('incoming data', data)
     if (data && data.webhook) {
       const { status, message, category } = data.webhook
       if (category === 'all') {
@@ -160,7 +159,6 @@ export default function QuickAdd({ config }) {
       } else {
         setWebhookData({ ...webhookData, [category]: data.webhook[category] })
       }
-
       setAlert({
         open: true,
         message: message[0] ? message.join('\n').replace(/\*/g, '') : `${t(category)} ${t('removed')}`,
@@ -169,8 +167,6 @@ export default function QuickAdd({ config }) {
     }
   }, [data])
 
-  // console.log(webhookData)
-  // console.log(payloads)
   return (
     <>
       <DialogTitle className={classes.filterHeader}>
@@ -214,7 +210,6 @@ export default function QuickAdd({ config }) {
             const isGlobal = category === 'gym' || category === 'pokestop'
 
             const status = getStatus(exists, payloads[category])
-            // console.log(exists)
             const clean = (
               <Grid item xs={6} sm={3}>
                 <FormControlLabel
@@ -254,6 +249,7 @@ export default function QuickAdd({ config }) {
                           uid: exists ? exists.uid : null,
                         },
                         status,
+                        name: selectedWebhook,
                       },
                     })}
                   >

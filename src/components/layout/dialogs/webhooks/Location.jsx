@@ -16,7 +16,7 @@ import useLocation from '@hooks/useLocation'
 const Location = ({
   setWebhookMode, t, syncWebhook,
   addressFormat, currentHuman,
-  webhookLocation,
+  webhookLocation, selectedWebhook,
 }) => {
   const map = useMapEvents({
     locationfound: (location) => {
@@ -29,7 +29,7 @@ const Location = ({
 
   const { lc, color } = useLocation(map)
   const [search, { data, previousData, loading }] = useLazyQuery(Query.geocoder(), {
-    variables: { search },
+    variables: { search, name: selectedWebhook },
   })
 
   const handleLocationChange = useCallback((location) => {
@@ -38,6 +38,7 @@ const Location = ({
         variables: {
           category: 'setLocation',
           data: location,
+          name: selectedWebhook,
           status: 'POST',
         },
       })
@@ -65,22 +66,22 @@ const Location = ({
       alignItems="center"
       spacing={2}
     >
-      <Grid item xs={6} sm={4}>
+      <Grid item xs={6}>
         <Typography variant="h6">
-          {t('location')}:
+          {t('location')}
         </Typography>
       </Grid>
-      <Grid item xs={6} sm={8}>
-        <Typography variant="subtitle2">
+      <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Typography variant="body2">
           {webhookLocation.map(x => x.toFixed(8)).join(', ')}
         </Typography>
       </Grid>
-      <Grid item xs={6} sm={6} style={{ textAlign: 'right' }}>
+      <Grid item xs={6} style={{ textAlign: 'center' }}>
         <Button size="small" variant="contained" color="secondary" onClick={() => lc._onClick()} startIcon={<LocationOn color={color} />}>
           {t('myLocation')}
         </Button>
       </Grid>
-      <Grid item xs={6} sm={6} style={{ textAlign: 'right' }}>
+      <Grid item xs={6} style={{ textAlign: 'center' }}>
         <Button size="small" variant="contained" color="primary" onClick={() => setWebhookMode('location')}>
           {t('chooseOnMap')}
         </Button>

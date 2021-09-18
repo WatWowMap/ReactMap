@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const cors = require('cors')
@@ -180,21 +181,23 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.masterfile = masterfile
 
-      try {
-        serverSettings.webhookData = await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET')
-      } catch (e) {
-        console.warn('Unable to fetch webhook data')
-      }
-      if (serverSettings.webhookData) {
-        serverSettings.webhookData.name = config.webhooks.name
-        serverSettings.webhookData.addressFormat = config.webhooks.addressFormat
+      if (serverSettings.user.perms.webhooks.length) {
+        serverSettings.webhooks = {}
+        const filtered = config.webhooks.filter(webhook => serverSettings.user.perms.webhooks.includes(webhook.name))
         try {
-          serverSettings.webhookData.areas = await Fetch.webhookApi('areas', '', 'GET')
+          await Promise.all(filtered.map(async webhook => {
+            serverSettings.webhooks[webhook.name] = {
+              name: webhook.name,
+              addressFormat: webhook.addressFormat,
+              areas: await Fetch.webhookApi('areas', serverSettings.user.id, 'GET', webhook.name),
+              ...await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name),
+            }
+          }))
         } catch (e) {
-          console.warn('Unable to fetch webhook areas')
+          console.warn(e, 'Unable to fetch webhook data')
         }
       }
-      // console.log(serverSettings.webhookData)
+      console.log(serverSettings.webhooks)
     }
     res.status(200).json({ serverSettings })
   } catch (error) {
