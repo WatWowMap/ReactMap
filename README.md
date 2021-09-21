@@ -35,7 +35,7 @@ Pokemon GO Map frontend built with React. Currently in beta testing!
 
 1. Clone the repo
 2. Open up the directory (`cd ReactMap`)
-3. `yarn install`
+3. `yarn install --ignore-optional`
 4. Create your config (`cp server/src/configs/config.example.json server/src/configs/config.json`)
 
 - There are additional configs options available in `server/src/configs/default.json` that can be utilized by copying them over into your config file. Be sure to maintain the same object structure when copying options over.
@@ -100,7 +100,7 @@ Then while you're in the same directory as the ecosystem file, `pm2 start ecosys
 ## Updating
 
 1. `git pull`
-2. `yarn install`
+2. `yarn install --ignore-optional`
 
 Without PM2:
 
