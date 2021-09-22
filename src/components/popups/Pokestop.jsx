@@ -356,7 +356,7 @@ const QuestConditions = ({ quest, t, userSettings }) => {
       ) : t('quest_condition_14')
       case 26: return (
         <Trans i18nKey={`quest_condition_${qType}_formatted`}>
-          {{ alignments: t(`throw_type_${qInfo.throw_type_id}`) }}
+          {{ alignments: qInfo.alignment_ids.map(id => t(`alignment_${id}`)) }}
         </Trans>
       )
       case 27: return (
