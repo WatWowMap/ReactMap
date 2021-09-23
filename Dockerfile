@@ -15,5 +15,5 @@ COPY package.json .
 RUN apk add git
 RUN npm install -g yarn
 COPY . .
-RUN yarn install
+RUN yarn install --ignore-optional
 RUN yarn build

@@ -13,8 +13,8 @@ export default function parseQuestConditions(conditions) {
       case 7: normalized.info.raid_levels = specifics.with_raid_level.raid_level; break
       case 11: normalized.info.item_id = specifics.with_item.item; break
       case 8:
-      case 14:
-      case 26: normalized.info.throw_type_id = specifics.with_throw_type.throw_type; break
+      case 14: normalized.info.throw_type_id = specifics.with_throw_type.throw_type; break
+      case 26: normalized.info.alignment_ids = specifics.with_pokemon_alignment.alignment; break
       case 27: normalized.info.character_category_ids = specifics.with_invasion_character.category; break
     }
     return normalized

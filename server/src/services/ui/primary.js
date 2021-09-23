@@ -35,7 +35,7 @@ module.exports = function generateUi(filters, perms) {
             ],
           }
           leagues.forEach(league => sliders.primary.push({
-            name: league.name, label: 'rank', min: 1, max: 100, perm: 'pvp', color: 'primary',
+            name: league.name, label: 'rank', min: (league.minRank || 1), max: (league.maxRank || 100), perm: 'pvp', color: 'primary',
           })); break
         case 'submissionCells':
         case 'portals':
