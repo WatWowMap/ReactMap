@@ -49,7 +49,7 @@ export default function WithSubItems({
   return (
     <>
       <Grid item xs={6}>
-        <Typography>{t(subItem)}</Typography>
+        <Typography>{category === 'scanAreas' ? t('showPolygons') : t(subItem)}</Typography>
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         {filterCategory}
