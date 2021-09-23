@@ -26,37 +26,40 @@ export default function Clustering({
   const currentZoom = map.getZoom()
 
   const showCircles = userSettings.interactionRanges && currentZoom >= config.interactionRangeZoom
-  return (
+
+  const finalData = renderedData.map((each) => {
+    if (!hideList.includes(each.id)) {
+      return (
+        <Component
+          key={`${getId(category, each)}-${userSettings.clustering}`}
+          item={each}
+          ts={ts}
+          filters={filters}
+          map={map}
+          config={config}
+          showTimer={timerList.includes(each.id)}
+          Icons={Icons}
+          userIcons={userIcons}
+          perms={perms}
+          zoom={currentZoom}
+          tileStyle={tileStyle}
+          excludeList={excludeList}
+          userSettings={userSettings}
+          staticUserSettings={staticUserSettings}
+          params={params}
+          showCircles={showCircles}
+        />
+      )
+    }
+    return null
+  })
+
+  return userSettings.clustering ? (
     <MarkerClusterGroup
-      disableClusteringAtZoom={userSettings.clustering ? zoomLevel : 1}
+      disableClusteringAtZoom={zoomLevel}
       chunkedLoading
     >
-      {renderedData.map((each) => {
-        if (!hideList.includes(each.id)) {
-          return (
-            <Component
-              key={getId(category, each)}
-              item={each}
-              ts={ts}
-              filters={filters}
-              map={map}
-              config={config}
-              showTimer={timerList.includes(each.id)}
-              Icons={Icons}
-              userIcons={userIcons}
-              perms={perms}
-              zoom={currentZoom}
-              tileStyle={tileStyle}
-              excludeList={excludeList}
-              userSettings={userSettings}
-              staticUserSettings={staticUserSettings}
-              params={params}
-              showCircles={showCircles}
-            />
-          )
-        }
-        return null
-      })}
+      {finalData}
     </MarkerClusterGroup>
-  )
+  ) : finalData
 }
