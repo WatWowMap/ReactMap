@@ -207,11 +207,11 @@ class Gym extends Model {
     if (results.length === 0) {
       return fetchRaids()
     }
-    return results.map(pokemon => {
-      if (pokemon.raid_pokemon_id === 0) {
-        return `e${pokemon.raid_level}`
+    return results.map(result => {
+      if (result.raid_pokemon_id) {
+        return `${result.raid_pokemon_id}-${result.raid_pokemon_form}`
       }
-      return `${pokemon.raid_pokemon_id}-${pokemon.raid_pokemon_form}`
+      return `e${result.raid_level}`
     })
   }
 
