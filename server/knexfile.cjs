@@ -1,5 +1,5 @@
 const path = require('path')
-const { database: { schemas } } = require('./src/services/config')
+const { database: { schemas, settings: { migrationTableName } } } = require('./src/services/config')
 
 const migrationUrl = 'src/db/migrations'
 
@@ -15,6 +15,7 @@ const connection = {
     database: schemas[selectedDb].database,
   },
   migrations: {
+    tableName: migrationTableName,
     directory: migrationUrl,
     extensions: 'cjs',
     stub: path.join(migrationUrl, 'migration.stub.cjs'),

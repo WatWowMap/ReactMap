@@ -169,6 +169,7 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
+      "migrationTableName": "knex_migrations",
       "leagues": [],
       "reactMapHandlesPvp": false,
       "pvpLevels": []
