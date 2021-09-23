@@ -1,20 +1,16 @@
 import React, { useState } from 'react'
 import {
-  FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Slide, Dialog,
+  FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Dialog,
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic } from '../../../hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
+import SlideTransition from '@assets/mui/SlideTransition'
 import UserProfile from '../dialogs/UserProfile'
 import Tutorial from '../dialogs/tutorial/Tutorial'
 import Feedback from '../dialogs/Feedback'
-
-function SlideTransition(props) {
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  return <Slide {...props} direction="up" />
-}
 
 export default function Settings({ toggleDialog, Icons }) {
   const { t, i18n } = useTranslation()

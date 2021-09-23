@@ -1,4 +1,4 @@
-const areas = require('../areas.js')
+const areas = require('../areas')
 
 module.exports = function getAreaRestrictionSql(query, areaRestrictions, isMad, category) {
   let columns = ['lat', 'lon']

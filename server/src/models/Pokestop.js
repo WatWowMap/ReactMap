@@ -2,7 +2,7 @@
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const { pokemon: masterPkmn, items: masterItems, questRewardTypes } = require('../data/masterfile.json')
-const fetchQuests = require('../services/functions/fetchQuests')
+const fetchQuests = require('../services/api/fetchQuests')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { api: { searchResultsLimit } } = require('../services/config')

@@ -47,6 +47,9 @@ module.exports = {
         varsIgnorePattern: '^TypesDefs(.*)',
       },
     ],
+    'object-curly-newline': ['error', {
+      ExportDeclaration: { minProperties: 4 },
+    }],
   },
   settings: {
     node: {

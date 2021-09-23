@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/client'
 import Query from '@services/Query'
 import RobustTimeout from '@classes/RobustTimeout'
 import Clustering from './Clustering'
+import ScanArea from './tiles/ScanArea'
 
 const withAvailableList = ['pokestops', 'gyms', 'nests']
 const filterSkipList = ['filter', 'enabled', 'legacy']
@@ -98,25 +99,28 @@ export default function QueryData({
   timeout.setupTimeout(refetch)
 
   const renderedData = data || previousData
-  return (
-    <>
-      {renderedData && (
-        <Clustering
-          renderedData={renderedData[category]}
-          zoomLevel={zoomLevel}
-          map={map}
-          config={config}
-          filters={filters}
-          Icons={Icons}
-          userIcons={userIcons}
-          tileStyle={tileStyle}
-          perms={perms}
-          category={category}
-          userSettings={userSettings}
-          staticUserSettings={staticUserSettings}
-          params={params}
-        />
-      )}
-    </>
-  )
+  if (renderedData) {
+    return category === 'scanAreas' ? (
+      <ScanArea
+        item={renderedData[category]}
+      />
+    ) : (
+      <Clustering
+        renderedData={renderedData[category]}
+        zoomLevel={zoomLevel}
+        map={map}
+        config={config}
+        filters={filters}
+        Icons={Icons}
+        userIcons={userIcons}
+        tileStyle={tileStyle}
+        perms={perms}
+        category={category}
+        userSettings={userSettings}
+        staticUserSettings={staticUserSettings}
+        params={params}
+      />
+    )
+  }
+  return null
 }

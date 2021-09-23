@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 const fs = require('fs')
 
-const fetchJson = require('./functions/fetchJson')
+const fetchJson = require('./api/fetchJson')
 const defaultRarity = require('../data/defaultRarity.json')
 
 const getRarityLevel = (id, pkmn) => {

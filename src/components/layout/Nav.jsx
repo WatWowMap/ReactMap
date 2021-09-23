@@ -11,14 +11,19 @@ import UserOptions from './dialogs/UserOptions'
 import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
 import Search from './dialogs/Search'
+import QuickAdd from './dialogs/webhooks/QuickAdd'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
-export default function Nav({ map, setManualParams, Icons }) {
+export default function Nav({
+  map, setManualParams, Icons, config,
+  setWebhookMode, webhookMode,
+}) {
   const classes = useStyles()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const { perms } = useStatic(state => state.auth)
+  const webhookPopup = useStatic(state => state.webhookPopup)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
   const userSettings = useStore(state => state.userSettings)
@@ -93,13 +98,16 @@ export default function Nav({ map, setManualParams, Icons }) {
           toggleDialog={toggleDialog}
           safeSearch={safeSearch}
           isMobile={isMobile}
+          perms={perms}
+          webhookMode={webhookMode}
+          setWebhookMode={setWebhookMode}
+          scanAreasOn={filters.scanAreas.enabled}
         />
       )}
       <Dialog
         fullWidth
         maxWidth="md"
         open={dialog.open && dialog.type === 'filters'}
-        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <FilterMenu
           toggleDialog={toggleDialog}
@@ -110,7 +118,6 @@ export default function Nav({ map, setManualParams, Icons }) {
       <Dialog
         maxWidth="sm"
         open={dialog.open && dialog.type === 'options'}
-        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <UserOptions
           toggleDialog={toggleDialog}
@@ -123,7 +130,6 @@ export default function Nav({ map, setManualParams, Icons }) {
           container: classes.container,
         }}
         open={dialog.open && dialog.type === 'search'}
-        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <Search
           toggleDialog={toggleDialog}
@@ -131,6 +137,16 @@ export default function Nav({ map, setManualParams, Icons }) {
           isMobile={isMobile}
           Icons={Icons}
         />
+      </Dialog>
+      <Dialog
+        classes={{
+          scrollPaper: classes.scrollPaper,
+          container: classes.container,
+        }}
+        maxWidth="xs"
+        open={webhookPopup.open}
+      >
+        <QuickAdd config={config} />
       </Dialog>
     </>
   )

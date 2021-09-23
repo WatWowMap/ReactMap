@@ -16,7 +16,7 @@ export default function PokestopPopup({
   pokestop, ts, hasLure, hasInvasion, hasQuest, Icons, userSettings, config,
 }) {
   const { t } = useTranslation()
-  const { pokestops: perms } = useStatic(state => state.ui)
+  const { perms } = useStatic(state => state.auth)
   const [invasionExpand, setInvasionExpand] = useState(false)
   const [extraExpand, setExtraExpand] = useState(false)
   const {
@@ -152,9 +152,8 @@ const Header = ({
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [pokestopName, setPokestopName] = useState(true)
-  const open = Boolean(anchorEl)
   const {
-    id, grunt_type, quest_pokemon_id, quest_form_id, mega_pokemon_id,
+    id, grunt_type, quest_pokemon_id, quest_form_id, mega_pokemon_id, lure_id,
     quest_reward_type, stardust_amount, quest_item_id, mega_amount, candy_pokemon_id,
   } = pokestop
   const name = pokestop.name || t('unknownPokestop')
@@ -198,9 +197,9 @@ const Header = ({
     setExcludeList([...excludeList, key])
   }
 
-  const excludeInvasion = () => {
+  const exclInvLure = (isLure) => {
     setAnchorEl(null)
-    const key = `i${grunt_type}`
+    const key = isLure ? `l${lure_id}` : `i${grunt_type}`
     setFilters({
       ...filters,
       pokestops: {
@@ -233,12 +232,20 @@ const Header = ({
   if (perms.quests && hasQuest) {
     options.push({ name: 'excludeQuest', action: excludeQuest })
   }
+
   if ((perms.invasions && hasInvasion)
     || (perms.lures && hasLure)) {
-    options.push(
-      { name: 'excludeInvasion', action: excludeInvasion },
-      { name: 'timer', action: handleTimer },
-    )
+    if (hasInvasion) {
+      options.push(
+        { name: 'excludeInvasion', action: () => exclInvLure(false) },
+      )
+    }
+    if (hasLure) {
+      options.push(
+        { name: 'excludeLure', action: () => exclInvLure(true) },
+      )
+    }
+    options.push({ name: 'timer', action: handleTimer })
   }
 
   return (
@@ -264,18 +271,18 @@ const Header = ({
       <Menu
         anchorEl={anchorEl}
         keepMounted
-        open={open}
+        open={Boolean(anchorEl)}
         onClose={handleClose}
         PaperProps={{
           style: {
             maxHeight: 216,
-            width: '20ch',
+            minWidth: '20ch',
           },
         }}
       >
         {options.map((option) => (
-          <MenuItem key={option.name} onClick={option.action}>
-            {t(option.name)}
+          <MenuItem key={option.key || option.name} onClick={option.action}>
+            {typeof option.name === 'string' ? t(option.name) : option.name}
           </MenuItem>
         ))}
       </Menu>

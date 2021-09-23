@@ -5,12 +5,15 @@ const {
 const { JSONResolver } = require('graphql-scalars')
 const fs = require('fs')
 const { raw } = require('objection')
+const NodeGeocoder = require('node-geocoder')
 
 const DeviceType = require('./device')
+const GeocoderType = require('./geocoder')
 const GymType = require('./gym')
 const NestType = require('./nest')
 const PokestopType = require('./pokestop')
 const PokemonType = require('./pokemon')
+const PoracleType = require('./poracle')
 const PortalType = require('./portal')
 const S2cellType = require('./s2cell')
 const ScanAreaType = require('./scanArea')
@@ -18,6 +21,9 @@ const SearchType = require('./search')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
+const Fetch = require('../services/Fetch')
+
+const { webhooks } = require('../services/config')
 
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
@@ -39,6 +45,29 @@ const RootQuery = new GraphQLObjectType({
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.devices) {
           return Device.getAllDevices(perms, Utility.dbSelection('device') === 'mad')
+        }
+      },
+    },
+    geocoder: {
+      type: new GraphQLList(GeocoderType),
+      args: {
+        search: { type: GraphQLString },
+        name: { type: GraphQLString },
+      },
+      async resolve(parent, args, req) {
+        const perms = req.user ? req.user.perms : req.session.perms
+        if (perms.webhooks) {
+          const webhook = webhooks.find(hook => hook.name === args.name)
+          const geocoder = NodeGeocoder({
+            provider: 'openstreetmap',
+            osmServer: webhook.nominatimUrl,
+            timeout: 5000,
+          })
+          geocoder._geocoder._formatResult = ((original) => (result) => ({
+            ...original(result),
+            suburb: result.address.suburb || '',
+          }))(geocoder._geocoder._formatResult)
+          return geocoder.geocode(args.search)
         }
       },
     },
@@ -205,16 +234,14 @@ const RootQuery = new GraphQLObjectType({
       },
     },
     scanAreas: {
-      type: new GraphQLList(ScanAreaType),
+      type: ScanAreaType,
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.scanAreas) {
           const scanAreas = fs.existsSync('server/src/configs/areas.json')
             ? JSON.parse(fs.readFileSync('./server/src/configs/areas.json'))
             : { features: [] }
-          return scanAreas.features.sort(
-            (a, b) => (a.properties.name > b.properties.name) ? 1 : -1,
-          )
+          return scanAreas
         }
       },
     },
@@ -328,7 +355,70 @@ const RootQuery = new GraphQLObjectType({
         }
       },
     },
+    webhook: {
+      type: PoracleType,
+      args: {
+        category: { type: GraphQLString },
+        status: { type: GraphQLString },
+        name: { type: GraphQLString },
+      },
+      async resolve(parent, args, req) {
+        const perms = req.user ? req.user.perms : req.session.perms
+        if (perms.webhooks) {
+          return Fetch.webhookApi(args.category, req.user.id, args.status)
+        }
+      },
+    },
+    webhookGeojson: {
+      type: ScanAreaType,
+      args: {
+        name: { type: GraphQLString },
+      },
+      async resolve(parent, args, req) {
+        const perms = req.user ? req.user.perms : req.session.perms
+        if (perms.webhooks) {
+          const { name } = args
+          const { geoJSON } = await Fetch.webhookApi('geojson', req.user.id, 'GET', name)
+          const webhook = webhooks.find(hook => hook.name === name)
+          const skip = webhook.areasToSkip.map(a => a.toLowerCase())
+          geoJSON.features = geoJSON.features.filter(f => !skip.includes(f.properties.name.toLowerCase()))
+          return geoJSON
+        }
+      },
+    },
   },
 })
 
-module.exports = new GraphQLSchema({ query: RootQuery })
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    webhook: {
+      type: PoracleType,
+      args: {
+        category: { type: GraphQLString },
+        data: { type: JSONResolver },
+        status: { type: GraphQLString },
+        name: { type: GraphQLString },
+      },
+      async resolve(parent, args, req) {
+        const perms = req.user ? req.user.perms : false
+        const { category, data, status, name } = args
+        if (perms && Utility.permissions(category, perms)) {
+          const response = await Fetch.webhookApi(category, req.user.id, status, name, data)
+          const categories = Array.isArray(response) ? 'allProfiles' : category
+          // const get = await Fetch.webhookApi(categories, req.user.id, 'GET')
+
+          // console.log(category, response)
+          return {
+            ...response,
+            status: categories === 'all' ? response.map(x => x.status) : [response.status],
+            message: categories === 'all' ? response.map(x => x.message) : [response.message],
+            category: categories,
+          }
+        }
+      },
+    },
+  },
+})
+
+module.exports = new GraphQLSchema({ query: RootQuery, mutation: Mutation })

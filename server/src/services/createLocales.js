@@ -2,7 +2,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const fetchJson = require('./functions/fetchJson')
+const fetchJson = require('./api/fetchJson')
 
 const appLocalesFolder = path.resolve(__dirname, '../../../public/base-locales')
 const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales')

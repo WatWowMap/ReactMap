@@ -3,20 +3,21 @@ import React, {
   Fragment, useState, useEffect,
 } from 'react'
 import {
-  Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem,
+  Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem, Dialog,
 } from '@material-ui/core'
 import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
+import WebhookPopup from '@components/layout/dialogs/webhooks/QuickAdd'
 
 export default function GymPopup({
-  gym, hasRaid, ts, Icons,
+  gym, hasRaid, ts, Icons, config,
 }) {
   const { t } = useTranslation()
-  const { gyms: perms } = useStatic(state => state.ui)
+  const { perms } = useStatic(state => state.auth)
   const [raidExpand, setRaidExpand] = useState(hasRaid)
   const [extraExpand, setExtraExpand] = useState(false)
 
@@ -29,7 +30,7 @@ export default function GymPopup({
       alignItems="center"
       spacing={1}
     >
-      <Header gym={gym} perms={perms} hasRaid={hasRaid} t={t} />
+      <Header gym={gym} perms={perms} hasRaid={hasRaid} t={t} config={config} />
       {perms.gyms && (
         <Grid item xs={12}>
           <Collapse in={!raidExpand} timeout="auto" unmountOnExit>
@@ -94,7 +95,7 @@ export default function GymPopup({
 }
 
 const Header = ({
-  gym, perms, hasRaid, t,
+  gym, perms, hasRaid, t, config,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -102,12 +103,15 @@ const Header = ({
   const setExcludeList = useStatic(state => state.setExcludeList)
   const timerList = useStatic(state => state.timerList)
   const setTimerList = useStatic(state => state.setTimerList)
+  const setWebhookPopup = useStatic(state => state.setWebhookPopup)
+  const webhookData = useStatic(state => state.webhookData)
+
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [gymName, setGymName] = useState(true)
-  const open = Boolean(anchorEl)
+  const [popup, setPopup] = useState(false)
   const {
     id, team_id, raid_pokemon_id, raid_pokemon_form, raid_level,
   } = gym
@@ -189,6 +193,31 @@ const Header = ({
       { name: 'timer', action: handleTimer },
     )
   }
+  if (perms.webhooks.length && webhookData) {
+    options.push({
+      name: (
+        <Trans i18nKey="manageWebhook">
+          {{ name: config.webhook }}
+        </Trans>
+      ),
+      action: () => setWebhookPopup({
+        open: true,
+        category: 'gym',
+        categories: {
+          gym: {
+            teamChanges: perms.gyms,
+            inBattle: perms.gyms,
+            allRaids: perms.raids,
+          },
+          team: perms.gyms,
+          raid: raid_pokemon_id && perms.raids,
+          egg: !raid_pokemon_id && hasRaid && perms.raids,
+        },
+        data: gym,
+      }),
+      key: 'webhook',
+    })
+  }
 
   return (
     <>
@@ -213,21 +242,36 @@ const Header = ({
       <Menu
         anchorEl={anchorEl}
         keepMounted
-        open={open}
+        open={Boolean(anchorEl)}
         onClose={handleClose}
         PaperProps={{
           style: {
             maxHeight: 216,
-            width: '20ch',
+            minWidth: '20ch',
           },
         }}
       >
         {options.map((option) => (
-          <MenuItem key={option.name} onClick={option.action}>
-            {t(option.name)}
+          <MenuItem key={option.key || option.name} onClick={option.action} dense>
+            {typeof option.name === 'string' ? t(option.name) : option.name}
           </MenuItem>
         ))}
       </Menu>
+      <Dialog
+        open={popup}
+        onClose={() => setPopup(false)}
+      >
+        <WebhookPopup
+          categories={{
+            gyms: true,
+            team: team_id,
+            raids: raid_pokemon_id,
+            eggs: !raid_pokemon_id,
+          }}
+          data={gym}
+          setPopup={setPopup}
+        />
+      </Dialog>
     </>
   )
 }
@@ -253,7 +297,6 @@ const PoiImage = ({ gym, Icons }) => {
         }}
       />
     </Grid>
-
   )
 }
 
@@ -273,10 +316,8 @@ const RaidImage = ({
     : Icons.getEggs(raid_level, raid_battle_timestamp < ts, raid_is_exclusive)
 
   const getRaidTypes = (id, form) => {
-    if (pokemon[id].forms[form]) {
-      if (pokemon[id].forms[form].types) {
-        return pokemon[id].forms[form].types
-      }
+    if (pokemon[id].forms[form] && pokemon[id].forms[form].types) {
+      return pokemon[id].forms[form].types
     }
     return pokemon[id].types
   }

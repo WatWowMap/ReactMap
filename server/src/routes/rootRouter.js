@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const cors = require('cors')
@@ -8,6 +9,7 @@ const clientRouter = require('./clientRouter')
 const schema = require('../schema/schema')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
+const Fetch = require('../services/Fetch')
 const masterfile = require('../data/masterfile.json')
 const {
   Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter,
@@ -88,7 +90,6 @@ rootRouter.get('/settings', async (req, res) => {
         manualAreas: config.manualAreas || {},
         icons: config.icons,
       }
-
       // add config options to this array that are structured as arrays
       const arrayUserOptions = [
         { name: 'localeSelection', values: config.localeSelection },
@@ -123,7 +124,7 @@ rootRouter.get('/settings', async (req, res) => {
         if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
           serverSettings.available.gyms = config.api.queryAvailable.raids
             ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym') === 'mad')
-            : await Utility.fetchRaids()
+            : await Fetch.fetchRaids()
         }
         if (serverSettings.user.perms.quests
           || serverSettings.user.perms.pokestops
@@ -131,12 +132,12 @@ rootRouter.get('/settings', async (req, res) => {
           || serverSettings.user.perms.lures) {
           serverSettings.available.pokestops = config.api.queryAvailable.quests
             ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop') === 'mad')
-            : await Utility.fetchQuests()
+            : await Fetch.fetchQuests()
         }
         if (serverSettings.user.perms.nests) {
           serverSettings.available.nests = config.api.queryAvailable.nests
             ? await Nest.getAvailableNestingSpecies()
-            : await Utility.fetchNests()
+            : await Fetch.fetchNests()
         }
       } catch (e) {
         console.warn(e, '\nUnable to query available.')
@@ -179,6 +180,24 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.clientMenus = clientMenus
 
       serverSettings.masterfile = masterfile
+
+      if (serverSettings.user.perms.webhooks.length) {
+        serverSettings.webhooks = {}
+        const filtered = config.webhooks.filter(webhook => serverSettings.user.perms.webhooks.includes(webhook.name))
+        try {
+          await Promise.all(filtered.map(async webhook => {
+            serverSettings.webhooks[webhook.name] = {
+              name: webhook.name,
+              addressFormat: webhook.addressFormat,
+              areas: await Fetch.webhookApi('areas', serverSettings.user.id, 'GET', webhook.name),
+              ...await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name),
+            }
+          }))
+        } catch (e) {
+          console.warn(e, 'Unable to fetch webhook data')
+        }
+      }
+      console.log(serverSettings.webhooks)
     }
     res.status(200).json({ serverSettings })
   } catch (error) {

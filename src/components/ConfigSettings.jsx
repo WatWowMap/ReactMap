@@ -36,6 +36,8 @@ export default function ConfigSettings({
   const setZoom = useStore(state => state.setZoom)
   const setMenus = useStore(state => state.setMenus)
   const setIcons = useStore(state => state.setIcons)
+  const setSelectedWebhook = useStore(state => state.setSelectedWebhook)
+
   const setAuth = useStatic(state => state.setAuth)
   const setStaticUserSettings = useStatic(state => state.setUserSettings)
   const setStaticSettings = useStatic(state => state.setSettings)
@@ -46,6 +48,7 @@ export default function ConfigSettings({
   const setMasterfile = useStatic(state => state.setMasterfile)
   const setUi = useStatic(state => state.setUi)
   const setStaticFilters = useStatic(state => state.setFilters)
+  const setWebhookData = useStatic(state => state.setWebhookData)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
 
@@ -96,6 +99,15 @@ export default function ConfigSettings({
   setStaticIcons(serverSettings.Icons)
 
   setConfig(serverSettings.config)
+  setWebhookData(serverSettings.webhooks)
+
+  if (localState && localState.state
+    && serverSettings.webhooks
+    && serverSettings.webhooks[localState.state.selectedWebhook]) {
+    setSelectedWebhook(localState.state.selectedWebhook)
+  } else {
+    setSelectedWebhook(serverSettings.webhooks[Object.keys(serverSettings.webhooks)[0]].name)
+  }
 
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
   const getStartLocation = () => {
