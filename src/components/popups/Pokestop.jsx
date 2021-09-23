@@ -1,24 +1,30 @@
 /* eslint-disable camelcase */
 import React, {
-  Fragment, useState, useEffect,
+  Fragment, useState,
 } from 'react'
 import {
-  Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem,
+  Grid, Typography, Collapse, IconButton, Divider,
 } from '@material-ui/core'
-import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
+import { ExpandMore, MoreVert } from '@material-ui/icons'
 import { useTranslation, Trans } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
+import Dropdown from './common/Dropdown'
+import TimeTile from './common/TimeTile'
+import Navigation from './common/Navigation'
+import Title from './common/Title'
+import HeaderImage from './common/HeaderImage'
+import Timer from './common/Timer'
 
 export default function PokestopPopup({
   pokestop, ts, hasLure, hasInvasion, hasQuest, Icons, userSettings, config,
 }) {
   const { t } = useTranslation()
   const { pokestops: perms } = useStatic(state => state.ui)
-  const [invasionExpand, setInvasionExpand] = useState(false)
-  const [extraExpand, setExtraExpand] = useState(false)
+  const popups = useStore(state => state.popups)
+  const setPopups = useStore(state => state.setPopups)
   const {
     incident_expire_timestamp, lure_expire_timestamp, lure_id, grunt_type,
   } = pokestop
@@ -26,111 +32,98 @@ export default function PokestopPopup({
   return (
     <Grid
       container
-      style={{ minWidth: 250, maxWidth: 300 }}
+      style={{ width: 200 }}
       direction="row"
       justifyContent="space-evenly"
       alignItems="center"
       spacing={1}
     >
-      <Header
-        pokestop={pokestop}
-        perms={perms}
-        hasInvasion={hasInvasion}
-        hasQuest={hasQuest}
-        hasLure={hasLure}
-        t={t}
-        ts={ts}
-      />
+      <Grid item xs={3} style={{ textAlign: 'center' }}>
+        <HeaderImage
+          alt={pokestop.name}
+          url={pokestop.url}
+          backup={Icons.getPokestops(0)}
+          arScanEligible={pokestop.ar_scan_eligible}
+        />
+      </Grid>
+      <Grid item xs={7}>
+        <Title
+          mainName={pokestop.name}
+          backup={t('unknownPokestop')}
+        />
+      </Grid>
+      <Grid item xs={2}>
+        <MenuActions
+          pokestop={pokestop}
+          perms={perms}
+          hasInvasion={hasInvasion}
+          hasQuest={hasQuest}
+          hasLure={hasLure}
+          t={t}
+          ts={ts}
+        />
+      </Grid>
       <Grid item xs={12}>
-        <Collapse in={!invasionExpand} timeout="auto" unmountOnExit>
+        <Collapse in={!popups.invasions || !hasInvasion} timeout="auto" unmountOnExit>
           <Grid
             container
+            justifyContent="center"
             alignItems="center"
-            justifyContent="space-evenly"
             spacing={1}
           >
-            <PoiImage
-              pokestop={pokestop}
-              ts={ts}
-              hasQuest={hasQuest}
-              hasLure={hasLure}
-              hasInvasion={hasInvasion}
-              t={t}
-              Icons={Icons}
-            />
-            {hasQuest ? (
+            {hasQuest && pokestop.quests.map((quest, index) => (
+              <Fragment key={quest.with_ar}>
+                {index ? <Divider light flexItem className="popup-divider" /> : null}
+                <RewardInfo
+                  quest={quest}
+                  Icons={Icons}
+                  config={config}
+                  t={t}
+                />
+                <QuestConditions
+                  quest={quest}
+                  t={t}
+                  userSettings={userSettings}
+                />
+              </Fragment>
+            ))}
+            {hasLure && (
               <>
-                <Divider orientation="vertical" flexItem />
-                <Grid
-                  item
-                  xs={6}
-                  container
-                  direction="row"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <QuestConditions
-                    pokestop={pokestop}
-                    t={t}
-                    userSettings={userSettings}
-                  />
-                  <RewardInfo
-                    pokestop={pokestop}
-                    Icons={Icons}
-                  />
-                  {(hasQuest && config.questMessage) && (
-                    <Grid item xs={12} style={{ textAlign: 'center' }}>
-                      <Typography variant="caption">
-                        {config.questMessage}
-                      </Typography>
-                    </Grid>
-                  )}
-                </Grid>
+                {(hasQuest) && <Divider light flexItem className="popup-divider" />}
+                <TimeTile
+                  expireTime={lure_expire_timestamp}
+                  icon={Icons.getPokestops(lure_id)}
+                  until
+                />
               </>
-            ) : (
+            )}
+            {hasInvasion && (
               <>
-                {(hasLure || hasInvasion)
-                  && <Divider orientation="vertical" flexItem />}
-                <Grid container item xs={6}>
-                  {hasLure && (
-                    <Timer
-                      expireTime={lure_expire_timestamp}
-                      name={`lure_${lure_id}`}
-                      t={t}
-                    />
-                  )}
-                  {hasInvasion && (
-                    <Timer
-                      expireTime={incident_expire_timestamp}
-                      name={grunt_type}
-                      grunt
-                      t={t}
-                    />
-                  )}
-                </Grid>
+                {(hasQuest || hasLure) && <Divider light flexItem className="popup-divider" />}
+                <TimeTile
+                  expireTime={incident_expire_timestamp}
+                  icon={Icons.getInvasions(grunt_type)}
+                  until
+                />
               </>
             )}
           </Grid>
         </Collapse>
       </Grid>
-      {perms.invasions && (
-        <Grid item xs={12}>
-          <Collapse in={invasionExpand} timeout="auto" unmountOnExit>
-            <Invasion pokestop={pokestop} Icons={Icons} t={t} />
-          </Collapse>
-        </Grid>
+      {(perms.invasions && hasInvasion) && (
+        <Collapse in={popups.invasions} timeout="auto" unmountOnExit>
+          <Invasion pokestop={pokestop} Icons={Icons} t={t} />
+        </Collapse>
       )}
       <Footer
         pokestop={pokestop}
-        expanded={extraExpand}
-        setExpanded={setExtraExpand}
-        invasionExpand={invasionExpand}
-        setInvasionExpand={setInvasionExpand}
+        popups={popups}
+        setPopups={setPopups}
         hasInvasion={hasInvasion}
         perms={perms}
       />
       {perms.allPokestops && (
-        <Collapse in={extraExpand} timeout="auto" unmountOnExit>
+        <Collapse in={popups.extras} timeout="auto" unmountOnExit>
           <ExtraInfo pokestop={pokestop} t={t} ts={ts} />
         </Collapse>
       )}
@@ -138,8 +131,8 @@ export default function PokestopPopup({
   )
 }
 
-const Header = ({
-  pokestop, perms, hasInvasion, hasQuest, t, hasLure,
+const MenuActions = ({
+  pokestop, perms, hasInvasion, hasQuest, hasLure, t,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -151,13 +144,10 @@ const Header = ({
   const setFilters = useStore(state => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
-  const [pokestopName, setPokestopName] = useState(true)
-  const open = Boolean(anchorEl)
+
   const {
-    id, grunt_type, quest_pokemon_id, quest_form_id, mega_pokemon_id,
-    quest_reward_type, stardust_amount, quest_item_id, mega_amount, candy_pokemon_id,
+    id, grunt_type, lure_id, quests,
   } = pokestop
-  const name = pokestop.name || t('unknownPokestop')
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -172,16 +162,7 @@ const Header = ({
     setHideList([...hideList, id])
   }
 
-  const excludeQuest = () => {
-    setAnchorEl(null)
-    let key = ''
-    switch (quest_reward_type) {
-      default: key = `${quest_pokemon_id}-${quest_form_id}`; break
-      case 2: key = `q${quest_item_id}`; break
-      case 3: key = `d${stardust_amount}`; break
-      case 4: key = `c${candy_pokemon_id}`; break
-      case 12: key = `m${mega_pokemon_id}-${mega_amount}`; break
-    }
+  const setState = (key) => {
     setFilters({
       ...filters,
       pokestops: {
@@ -198,23 +179,21 @@ const Header = ({
     setExcludeList([...excludeList, key])
   }
 
+  const excludeLure = () => {
+    setAnchorEl(null)
+    const key = `l${lure_id}`
+    setState(key)
+  }
+
+  const excludeQuest = (i) => {
+    setAnchorEl(null)
+    setState(quests[i].key)
+  }
+
   const excludeInvasion = () => {
     setAnchorEl(null)
     const key = `i${grunt_type}`
-    setFilters({
-      ...filters,
-      pokestops: {
-        ...filters.pokestops,
-        filter: {
-          ...filters.pokestops.filter,
-          [key]: {
-            ...filters.pokestops.filter[key],
-            enabled: false,
-          },
-        },
-      },
-    })
-    setExcludeList([...excludeList, key])
+    setState(key)
   }
 
   const handleTimer = () => {
@@ -230,8 +209,23 @@ const Header = ({
     { name: 'hide', action: handleHide },
   ]
 
+  if (perms.lures && hasLure) {
+    options.push({ name: 'excludeLure', action: excludeLure })
+  }
+
   if (perms.quests && hasQuest) {
-    options.push({ name: 'excludeQuest', action: excludeQuest })
+    quests.forEach((quest, i) => {
+      let reward = ''
+      switch (quest.quest_reward_type) {
+        case 2: reward = t(`item_${quest.quest_item_id}`); break
+        case 3: reward = `${t('stardust')} x${quest.stardust_amount}`; break
+        case 4: reward = `${t(`poke_${quest.candy_pokemon_id} ${t('candy')}`)}`; break
+        case 7: reward = t(`poke_${quest.quest_pokemon_id}`); break
+        case 12: reward = `${t(`poke_${quest.mega_pokemon_id}`)} x${quest.mega_amount}`; break
+        default: reward = t(`quest_reward_${quest.quest_reward_type}`); break
+      }
+      options.push({ key: `${reward}-${quest.with_ar}`, name: <Trans i18nKey="excludeQuestMulti">{{ reward }}</Trans>, action: () => excludeQuest(i) })
+    })
   }
   if ((perms.invasions && hasInvasion)
     || (perms.lures && hasLure)) {
@@ -240,225 +234,93 @@ const Header = ({
       { name: 'timer', action: handleTimer },
     )
   }
-
   return (
-    <>
-      <Grid item xs={9}>
-        <Typography
-          variant={name.length > 20 ? 'subtitle2' : 'h6'}
-          align="center"
-          noWrap={pokestopName}
-          onClick={() => setPokestopName(!pokestopName)}
-        >
-          {name}
-        </Typography>
-      </Grid>
-      <Grid item xs={3} style={{ textAlign: 'right' }}>
-        <IconButton
-          aria-haspopup="true"
-          onClick={handleClick}
-        >
-          <MoreVert style={{ color: 'white' }} />
-        </IconButton>
-      </Grid>
-      <Menu
-        anchorEl={anchorEl}
-        keepMounted
-        open={open}
-        onClose={handleClose}
-        PaperProps={{
-          style: {
-            maxHeight: 216,
-            width: '20ch',
-          },
-        }}
+    <Grid item xs={3} style={{ textAlign: 'right' }}>
+      <IconButton
+        aria-haspopup="true"
+        onClick={handleClick}
       >
-        {options.map((option) => (
-          <MenuItem key={option.name} onClick={option.action}>
-            {t(option.name)}
-          </MenuItem>
-        ))}
-      </Menu>
-    </>
-  )
-}
-
-const PoiImage = ({
-  pokestop, ts, hasQuest, hasLure, hasInvasion, t, Icons,
-}) => {
-  const {
-    name, url, lure_id, lure_expire_timestamp, incident_expire_timestamp, ar_scan_eligible,
-  } = pokestop
-
-  const lureName = lure_expire_timestamp > ts ? `lure_${lure_id}` : ''
-  const src = url
-    ? url.replace('http://', 'https://')
-    : Icons.getPokestops(0)
-
-  const invasionColor = hasInvasion ? 'invasion-exists' : ''
-
-  const getImageSize = () => {
-    if (hasQuest) {
-      if (hasInvasion || hasLure) {
-        return 60
-      }
-    }
-    return 90
-  }
-  return (
-    <Grid
-      container
-      item
-      xs={(hasQuest || hasInvasion || hasLure) ? 5 : 11}
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Grid item xs={12} style={{ textAlign: 'center' }}>
-        <div className="ar-eligible">
-          <img
-            src={src}
-            alt={name || 'unknown'}
-            className={`circle-image ${lureName} ${invasionColor}`}
-            style={{
-              maxHeight: getImageSize(),
-              maxWidth: getImageSize(),
-            }}
-          />
-          {ar_scan_eligible === 1 && (
-            <img
-              className="ar-logo"
-              src="/images/misc/ar.png"
-            />
-          )}
-        </div>
-      </Grid>
-      {(hasLure && hasQuest)
-        && (
-          <Timer
-            name={lureName}
-            expireTime={lure_expire_timestamp}
-            t={t}
-          />
-        )}
-      {(hasInvasion && hasQuest)
-        && (
-          <Timer
-            expireTime={incident_expire_timestamp}
-            t={t}
-          />
-        )}
+        <MoreVert style={{ color: 'white' }} />
+      </IconButton>
+      <Dropdown
+        anchorEl={anchorEl}
+        handleClose={handleClose}
+        options={options}
+      />
     </Grid>
   )
 }
 
-const Timer = ({
-  expireTime, name, t, grunt,
+const RewardInfo = ({
+  quest, Icons, config, t,
 }) => {
-  const { invasions: { [name]: invasion } } = useStatic(state => state.masterfile)
-  const endTime = new Date(expireTime * 1000)
-  const [timerEnd, setTimerEnd] = useState(Utility.getTimeUntil(endTime, true))
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setTimerEnd(Utility.getTimeUntil(endTime, true))
-    }, 1000)
-    return () => clearTimeout(timer)
-  })
-
+  const {
+    quest_item_id,
+    item_amount,
+    stardust_amount,
+    candy_pokemon_id,
+    candy_amount,
+    mega_pokemon_id,
+    mega_amount,
+    quest_reward_type,
+    quest_pokemon_id,
+    quest_form_id,
+    quest_gender_id,
+    quest_costume_id,
+    quest_shiny,
+    with_ar,
+  } = quest
   return (
-    <>
-      {name && (
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="subtitle2">
-            {grunt ? t(invasion.type) : t(name)}
-          </Typography>
-        </Grid>
-      )}
-      <Grid item xs={12} style={{ textAlign: 'center' }}>
-        <Typography variant="subtitle2">
-          {timerEnd.str}
-        </Typography>
-      </Grid>
-      <Grid item xs={12} style={{ textAlign: 'center' }}>
-        <Typography variant="caption">
-          {new Date(endTime).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
-        </Typography>
-      </Grid>
-    </>
+    <Grid item xs={3} style={{ textAlign: 'center' }}>
+      {{
+        2: <img
+          src={Icons.getRewards(quest_reward_type, quest_item_id, item_amount)}
+          className="quest-popup-img"
+        />,
+        3: <img
+          src={Icons.getRewards(quest_reward_type, stardust_amount)}
+          className="quest-popup-img"
+        />,
+        4: <img
+          src={Icons.getRewards(quest_reward_type, candy_pokemon_id, candy_amount)}
+          className="quest-popup-img"
+        />,
+        7: <img
+          src={Icons.getPokemon(quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny)}
+          className="quest-popup-img"
+        />,
+        12: <img
+          src={Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount)}
+          className="quest-popup-img"
+        />,
+      }[quest_reward_type] || <img src={Icons.getRewards(quest_reward_type)} className="quest-popup-img" />}
+      <Typography variant="caption" className="ar-task" noWrap>
+        {config.questMessage ? config.questMessage : t(`arQuest_${Boolean(with_ar)}`)}
+      </Typography>
+    </Grid>
   )
 }
 
-const RewardInfo = ({ pokestop, Icons }) => {
+const QuestConditions = ({ quest, t, userSettings }) => {
   const {
-    quest_reward_type, quest_item_id, item_amount, stardust_amount,
-    quest_pokemon_id, quest_form_id, quest_gender_id, quest_costume_id, quest_shiny,
-    mega_pokemon_id, mega_amount, candy_pokemon_id, candy_amount,
-  } = pokestop
-
-  const questRewards = []
-  switch (quest_reward_type) {
-    default:
-      questRewards.push(
-        <img src={Icons.getRewards(quest_reward_type)} className="quest-popup-img" />,
-      ); break
-    case 2:
-      questRewards.push(
-        <img src={Icons.getRewards(quest_reward_type, quest_item_id)} className="quest-popup-img" />,
-        <div className="amount-popup">x{item_amount}</div>,
-      ); break
-    case 3:
-      questRewards.push(
-        <img src={Icons.getRewards(quest_reward_type, 0)} className="quest-popup-img" />,
-        <div className="amount-popup">x{stardust_amount}</div>,
-      ); break
-    case 4:
-      questRewards.push(
-        <img src={Icons.getPokemon(candy_pokemon_id)} className="quest-popup-img" />,
-        <img src={Icons.item(candy_pokemon_id)} className="quest-popup-img" />,
-        <div className="amount-popup">x{candy_amount}</div>,
-      ); break
-    case 7:
-      questRewards.push(
-        <img src={Icons.getPokemon(quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny)} className="quest-popup-img" />,
-      ); break
-    case 12:
-      questRewards.push(
-        <img src={Icons.getPokemon(mega_pokemon_id, quest_form_id, 1)} className="quest-popup-img" />,
-        <img src={Icons.getRewards(quest_reward_type, 0)} className="quest-popup-img" />,
-        <div className="amount-popup">x{mega_amount}</div>,
-      ); break
-  }
-  return questRewards.map((reward, i) => (
-    <Grid
-      // eslint-disable-next-line react/no-array-index-key
-      key={i}
-      item
-      xs={12 / questRewards.length}
-      style={{ textAlign: 'center' }}
-    >
-      {reward}
-    </Grid>
-  ))
-}
-
-const QuestConditions = ({ pokestop, t, userSettings }) => {
-  const {
-    quest_conditions, quest_type, quest_target, quest_task,
-  } = pokestop
+    quest_task,
+    quest_type,
+    quest_target,
+    quest_conditions,
+  } = quest
 
   if (userSettings.madQuestText && quest_task) {
     return (
-      <Grid item xs={12} style={{ textAlign: 'center' }}>
-        <Typography variant="subtitle1">
+      <Grid item xs={9} style={{ textAlign: 'center' }}>
+        <Typography variant="caption">
           {quest_task}
         </Typography>
       </Grid>
     )
   }
-
   const [type1, type2] = Utility.parseConditions(quest_conditions)
   const primaryCondition = (
-    <Typography variant="subtitle1">
+    <Typography variant="caption">
       <Trans i18nKey={`quest_${quest_type}`}>
         {{ amount: quest_target }}
       </Trans>
@@ -466,7 +328,6 @@ const QuestConditions = ({ pokestop, t, userSettings }) => {
   )
   const getQuestConditions = (qType, qInfo) => {
     switch (qType) {
-      default: return t(`quest_condition_${qType}`)
       case 1: return (
         <Trans i18nKey={`quest_condition_${qType}_formatted`}>
           {{ types: qInfo.pokemon_type_ids.map(id => t(`poke_type_${id}`)) }}
@@ -503,79 +364,75 @@ const QuestConditions = ({ pokestop, t, userSettings }) => {
           {{ categories: qInfo.character_category_ids.map(id => t(`character_category_${id}`)) }}
         </Trans>
       )
+      default: return t(`quest_condition_${qType}`)
     }
   }
   return (
-    <Grid item xs={12} style={{ textAlign: 'center' }}>
+    <Grid item xs={9} style={{ textAlign: 'center' }}>
       {primaryCondition}
       {type1 && (
-        <Typography variant="caption">
-          {getQuestConditions(type1.type, type1.info)}
-        </Typography>
+        <>
+          <br />
+          <Typography variant="caption">
+            {getQuestConditions(type1.type, type1.info)}
+          </Typography>
+        </>
       )}
-      <br />
       {type2 && (
-        <Typography variant="caption">
-          {getQuestConditions(type2.type, type2.info)}
-        </Typography>
+        <>
+          <br />
+          <Typography variant="caption">
+            {getQuestConditions(type2.type, type2.info)}
+          </Typography>
+        </>
       )}
     </Grid>
   )
 }
 
 const Footer = ({
-  pokestop, expanded, setExpanded, hasInvasion, invasionExpand, setInvasionExpand, perms,
+  pokestop, popups, setPopups,
+  hasInvasion, perms,
 }) => {
   const classes = useStyles()
-  const { navigation } = useStore(state => state.settings)
-  const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
-  const { lat, lon } = pokestop
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded)
-  }
-
-  const handleInvasionClick = () => {
-    setInvasionExpand(!invasionExpand)
+  const handleExpandClick = (category) => {
+    setPopups({
+      ...popups, [category]: !popups[category],
+    })
   }
 
   return (
-    <>
+    <Grid container item xs={12} justifyContent="space-evenly" alignItems="center">
       {(hasInvasion && perms.invasions) && (
-        <Grid item xs={4} style={{ textAlign: 'center' }}>
+        <Grid item xs={3} style={{ textAlign: 'center' }}>
           <IconButton
             className={classes.expand}
-            onClick={handleInvasionClick}
-            aria-expanded={invasionExpand}
+            onClick={() => handleExpandClick('invasions')}
+            aria-expanded={popups.invasions}
           >
             <img
-              src={`/images/misc/${invasionExpand ? 'quests' : 'invasions'}.png`}
+              src={`/images/misc/${popups.invasions ? 'quests' : 'invasions'}.png`}
               className="circle pulse"
             />
           </IconButton>
         </Grid>
       )}
-      <Grid item xs={4} style={{ textAlign: 'center' }}>
-        <IconButton
-          href={url.replace('{x}', lat).replace('{y}', lon)}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <Map style={{ color: 'white' }} />
-        </IconButton>
+      <Grid item xs={3}>
+        <Navigation lat={pokestop.lat} lon={pokestop.lon} />
       </Grid>
       {perms.allPokestops && (
-        <Grid item xs={4} style={{ textAlign: 'center' }}>
+        <Grid item xs={3} style={{ textAlign: 'center' }}>
           <IconButton
-            className={expanded ? classes.expandOpen : classes.expand}
-            onClick={handleExpandClick}
-            aria-expanded={expanded}
+            className={popups.extras ? classes.expandOpen : classes.expand}
+            onClick={() => handleExpandClick('extras')}
+            aria-expanded={popups.extras}
           >
             <ExpandMore style={{ color: 'white' }} />
           </IconButton>
         </Grid>
       )}
-    </>
+    </Grid>
   )
 }
 
@@ -585,10 +442,12 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
   const extraMetaData = [
     {
       description: 'lastSeen',
+      timer: <Timer expireTime={updated} />,
       data: Utility.dayCheck(ts, updated),
     },
     {
       description: 'lastModified',
+      timer: <Timer expireTime={last_modified_timestamp} />,
       data: Utility.dayCheck(ts, last_modified_timestamp),
     },
   ]
@@ -602,12 +461,15 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
       {extraMetaData.map(meta => (
         <Fragment key={meta.description}>
           <Grid item xs={t('popupPokestopSeenDescriptionWidth')} style={{ textAlign: 'left' }}>
-            <Typography variant="caption" align="center">
+            <Typography variant="caption">
               {t(meta.description)}:
             </Typography>
           </Grid>
+          <Grid item xs={t('popupPokestopSeenTimerWidth')} style={{ textAlign: 'right' }}>
+            {meta.timer}
+          </Grid>
           <Grid item xs={t('popupPokestopSeenDataWidth')} style={{ textAlign: 'right' }}>
-            <Typography variant="caption" align="center">
+            <Typography variant="caption">
               {meta.data}
             </Typography>
           </Grid>
@@ -649,7 +511,7 @@ const Invasion = ({ pokestop, Icons, t }) => {
     <Grid container>
       <Grid item xs={12}>
         <Typography variant="h6" align="center">
-          {t(invasion.type)} <Icon>{invasion.grunt.toLowerCase()}</Icon>
+          {t(`grunt_a_${grunt_type}`)}
         </Typography>
       </Grid>
       <Grid item xs={12}>
