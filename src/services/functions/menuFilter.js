@@ -257,7 +257,8 @@ export default function menuFilter(tempFilters, menus, search, type) {
             && (tempAdvFilter.generations || generations[pkmn.generation])
             && (tempAdvFilter.types || typeResolver(formTypes))
             && (tempAdvFilter.rarity || rarity[pkmn.rarity])
-            && (tempAdvFilter.forms || (forms.altForms ? j != pkmn.defaultFormId : forms[displayName]))) {
+            && (tempAdvFilter.forms || (forms.altForms ? j != pkmn.defaultFormId : forms[displayName]))
+            && (tempAdvFilter.categories || categories[pkmn.category])) {
             addPokemon(id, displayName)
           } break
         case 'search': {
