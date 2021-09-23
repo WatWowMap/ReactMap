@@ -9,6 +9,7 @@
   },
   "googleAnalytics": {
     "enabled": false,
+    "debugMode": false,
     "trackingId": ""
   },
   "api": {

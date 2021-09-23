@@ -4,6 +4,7 @@ import { Grid, IconButton, Typography } from '@material-ui/core'
 import {
   Check, Clear, Tune, FormatSize, Settings,
 } from '@material-ui/icons'
+import ReactGA from 'react-ga'
 
 export default function MenuTile({
   data, rowIndex, columnIndex, style,
@@ -26,6 +27,11 @@ export default function MenuTile({
         ...tempFilters[item.id],
         enabled: !tempFilters[item.id].enabled,
       },
+    })
+    ReactGA.event({
+      category: 'Filtering',
+      action: `${item.name} Status: ${!tempFilters[item.id].enabled}`,
+      label: type,
     })
   }
 

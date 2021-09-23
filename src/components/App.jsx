@@ -63,10 +63,11 @@ export default function App() {
     if (data.ui && data.ui.pokestops && data.ui.pokestops.invasions) {
       data.masterfile.invasions = await Fetch.getInvasions(data.masterfile.invasions)
     }
-    setServerSettings({ ...data, Icons })
     if (data.googleAnalytics) {
-      ReactGA.initialize(data.googleAnalytics)
+      ReactGA.initialize(data.googleAnalytics.trackingId, { debug: data.googleAnalytics.debugMode })
+      delete data.googleAnalytics
     }
+    setServerSettings({ ...data, Icons })
   }
 
   useEffect(() => {

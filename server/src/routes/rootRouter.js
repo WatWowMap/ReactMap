@@ -68,7 +68,7 @@ rootRouter.get('/settings', async (req, res) => {
       user: getUser(),
       discord: config.discord.enabled,
       settings: {},
-      googleAnalytics: config.googleAnalytics.enabled ? config.googleAnalytics.trackingId : null,
+      googleAnalytics: config.googleAnalytics.enabled ? config.googleAnalytics : null,
     }
 
     // add user options here from the config that are structured as objects

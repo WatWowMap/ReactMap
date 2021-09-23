@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 import ReactGA from 'react-ga'
 
@@ -18,6 +18,8 @@ const userSettingsCategory = category => {
 }
 
 export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons }, params }) {
+  ReactGA.pageview(window.location.pathname)
+
   const map = useMap()
   const filters = useStore(state => state.filters)
   const settings = useStore(state => state.settings)
@@ -47,10 +49,6 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   if (manualParams) {
     params.id = manualParams.id
   }
-
-  useEffect(() => {
-    ReactGA.pageview(window.location.pathname)
-  }, [])
 
   return (
     <>

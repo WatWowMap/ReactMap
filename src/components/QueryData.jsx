@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/client'
+import ReactGA from 'react-ga'
+
 import Query from '@services/Query'
 import RobustTimeout from '@classes/RobustTimeout'
 import Clustering from './Clustering'
@@ -24,6 +26,13 @@ export default function QueryData({
   category, available, filters, staticFilters, staticUserSettings,
   userSettings, perms, Icons, userIcons,
 }) {
+  ReactGA.event({
+    category: 'Data',
+    action: `${category} being fetched`,
+    label: category,
+    nonInteraction: true,
+  })
+
   const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
 
   const trimFilters = useCallback(requestedFilters => {
