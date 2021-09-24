@@ -57,6 +57,7 @@
       "drawer": "temporary"
     },
     "clusterZoomLevels": {
+      "forcedClusterLimit": 2500,
       "gyms": 13,
       "pokestops": 14,
       "pokemon": 15,
