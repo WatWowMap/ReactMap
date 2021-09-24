@@ -8,7 +8,6 @@ import {
   createHttpLink,
 } from '@apollo/client'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import ReactGA from 'react-ga'
 
 import AbortableLink from '@classes/AbortableLink'
 import UIcons from '@services/Icons'
@@ -63,13 +62,8 @@ export default function App() {
     if (data.ui && data.ui.pokestops && data.ui.pokestops.invasions) {
       data.masterfile.invasions = await Fetch.getInvasions(data.masterfile.invasions)
     }
-    if (data.googleAnalytics) {
-      ReactGA.initialize(data.googleAnalytics.trackingId, { debug: data.googleAnalytics.debugMode })
-      delete data.googleAnalytics
-    }
     setServerSettings({ ...data, Icons })
   }
-
   useEffect(() => {
     getServerSettings()
   }, [])

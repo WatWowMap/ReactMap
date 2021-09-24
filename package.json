@@ -32,6 +32,7 @@
     "copy-webpack-plugin": "^8.1.0",
     "css-loader": "^5.1.4",
     "css-minimizer-webpack-plugin": "^2.0.0",
+    "dotenv": "^10.0.0",
     "eslint": "^7.22.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-import-resolver-alias": "^1.1.2",
