@@ -25,6 +25,13 @@ const operator = {
   },
 }
 
+const getOffset = (coords, type) => coords.map(coord => {
+  let offset = Math.random() * 0.0002 - 0.0001
+  const offOffset = type === 'nearby_cell' ? 0.0002 : 0.00015
+  offset += offset >= 0 ? -offOffset : offOffset
+  return (coord + offset)
+})
+
 const PokemonTile = ({
   item, showTimer, filters, Icons, excludeList,
   userSettings, staticUserSettings, params, showCircles,
@@ -64,6 +71,10 @@ const PokemonTile = ({
     }
   }, [done])
 
+  const finalLocation = item.seen_type.startsWith('nearby')
+    ? getOffset([item.lat, item.lon], item.seen_type)
+    : [item.lat, item.lon]
+
   return (
     <>
       {!excludeList.includes(`${item.pokemon_id}-${item.form}`) && (
@@ -75,12 +86,12 @@ const PokemonTile = ({
             }
           }}
           zIndexOffset={item.iv * 100}
-          position={[item.lat, item.lon]}
+          position={finalLocation}
           icon={(pvpCheck || glowStatus || ivCircle)
             ? fancyMarker(url, size, item, glowStatus, ivCircle, Icons)
             : basicMarker(url, size)}
         >
-          <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
+          <Popup position={finalLocation} onClose={() => delete params.id}>
             <PopupContent
               pokemon={item}
               iconUrl={url}
@@ -97,7 +108,7 @@ const PokemonTile = ({
           )}
           {showCircles && (
             <Circle
-              center={[item.lat, item.lon]}
+              center={finalLocation}
               radius={35}
               pathOptions={{ color: '#BA42F6', weight: 1 }}
             />

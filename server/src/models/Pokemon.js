@@ -257,6 +257,14 @@ class Pokemon extends Model {
         pkmn.ditto_form = pkmn.form
         pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
       }
+      if (!pkmn.seen_type) {
+        if (pkmn.spawn_id === null) {
+          pkmn.seen_type = pkmn.pokestop_id ? 'nearby_stop' : 'nearby_cell'
+        } else {
+          pkmn.seen_type = 'encounter'
+        }
+      }
+
       if (pvp && ((pkmn.pvp_rankings_great_league
         || pkmn.pvp_rankings_ultra_league
         || pkmn.pvp)

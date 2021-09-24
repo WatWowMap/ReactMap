@@ -15,6 +15,7 @@ const core = gql`
     updated
     display_pokemon_id
     ditto_form
+    seen_type
   }
 `
 
