@@ -16,8 +16,8 @@ import {
 import { Clear, Replay, Save } from '@material-ui/icons'
 import { useTheme } from '@material-ui/styles'
 import { useTranslation, Trans } from 'react-i18next'
-import ReactGA from 'react-ga'
 
+import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import TabPanel from '../general/TabPanel'
@@ -78,11 +78,7 @@ export default function UserOptions({ category, toggleDialog }) {
     } else {
       setLocalState({ ...localState, [name]: !localState[name] })
     }
-    ReactGA.event({
-      category: 'User Options',
-      action: `Name: ${name} New Value: ${value || !localState[name]}`,
-      label: category,
-    })
+    Utility.analytics('User Options', `Name: ${name} New Value: ${value || !localState[name]}`, category)
   }
 
   const handleTabChange = (event, newValue) => {

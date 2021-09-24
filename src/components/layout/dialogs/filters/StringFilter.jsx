@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { TextField } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
+
 import Utility from '@services/Utility'
 
 export default function StringFilter({ filterValues, setFilterValues }) {
@@ -14,6 +15,7 @@ export default function StringFilter({ filterValues, setFilterValues }) {
 
   const validationCheck = event => {
     let { value } = event.target
+    Utility.analytics('Filtering', value, 'Legacy')
     if (Utility.checkAdvFilter(value)) {
       setValidation({
         label: t('valid'),

@@ -17,7 +17,6 @@ import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@material-ui/styles'
-import ReactGA from 'react-ga'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
@@ -29,6 +28,8 @@ import Footer from './Footer'
 import SlotSelection from './SlotSelection'
 
 export default function Menu({ filters, toggleDialog, category }) {
+  Utility.analytics(`/advanced/${category}`)
+
   const classes = useStyles()
   const theme = useTheme()
   const menus = useStore(state => state.menus)
@@ -73,11 +74,7 @@ export default function Menu({ filters, toggleDialog, category }) {
   }
 
   const handleChange = (name, event) => {
-    ReactGA.event({
-      category: 'Filtering Options',
-      action: `New Value: ${event.target.checked}`,
-      label: `Category: ${category} Name: ${name}.${event.target.name}`,
-    })
+    Utility.analytics('Filtering Options', `New Value: ${event.target.checked}`, `Category: ${category} Name: ${name}.${event.target.name}`)
     setMenus({
       ...menus,
       [category]: {
@@ -293,6 +290,7 @@ export default function Menu({ filters, toggleDialog, category }) {
                       toggleAdvMenu,
                       toggleSlotsMenu,
                       type: category,
+                      Utility,
                     }}
                   >
                     {Tile}

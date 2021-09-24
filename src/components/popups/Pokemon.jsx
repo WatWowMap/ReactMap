@@ -9,7 +9,6 @@ import {
   Check, Clear, ExpandMore, Map, MoreVert,
 } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
-import ReactGA from 'react-ga'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
@@ -34,11 +33,7 @@ export default function PokemonPopup({
   const hasStats = iv || cp
 
   useEffect(() => {
-    ReactGA.event({
-      category: 'Pokemon Popup',
-      action: `IV: ${pokemon.iv}% Best PVP: #${pokemon.bestPvp}`,
-      label: pokemon.pokemon_id,
-    })
+    Utility.analytics('Popup', `ID: ${pokemon.pokemon_id} IV: ${pokemon.iv}% PVP: #${pokemon.bestPvp}`, 'Pokemon')
   }, [])
 
   return (

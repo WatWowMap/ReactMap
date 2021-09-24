@@ -4,14 +4,13 @@ import { Grid, IconButton, Typography } from '@material-ui/core'
 import {
   Check, Clear, Tune, FormatSize, Settings,
 } from '@material-ui/icons'
-import ReactGA from 'react-ga'
 
 export default function MenuTile({
   data, rowIndex, columnIndex, style,
 }) {
   const [name, setName] = useState(true)
   const {
-    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type, toggleSlotsMenu,
+    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type, toggleSlotsMenu, Utility,
   } = data
 
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -28,11 +27,7 @@ export default function MenuTile({
         enabled: !tempFilters[item.id].enabled,
       },
     })
-    ReactGA.event({
-      category: 'Filtering',
-      action: `${item.name} Status: ${!tempFilters[item.id].enabled}`,
-      label: type,
-    })
+    Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id].enabled}`, type)
   }
 
   const backgroundColor = columnIndex % 2

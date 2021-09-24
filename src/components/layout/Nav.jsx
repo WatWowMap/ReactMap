@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Dialog, useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@material-ui/styles'
-import ReactGA from 'react-ga'
 
+import Utility from '@services/Utility'
 import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
 import FloatingBtn from './FloatingBtn'
@@ -43,11 +43,7 @@ export default function Nav({ map, setManualParams, Icons }) {
   }
 
   const toggleDialog = (open, category, type, filter) => (event) => {
-    ReactGA.event({
-      category: 'Menu Toggle',
-      action: `Open: ${open}`,
-      label: `Category: ${category} Menu: ${type}`,
-    })
+    Utility.analytics('Menu Toggle', `Open: ${open}`, `Category: ${category} Menu: ${type}`)
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
