@@ -54,7 +54,7 @@ export default function Clustering({
     return null
   })
 
-  return userSettings.clustering ? (
+  return userSettings.clustering || renderedData.length > config.clusterZoomLevels.forcedClusterLimit ? (
     <MarkerClusterGroup
       disableClusteringAtZoom={zoomLevel}
       chunkedLoading
