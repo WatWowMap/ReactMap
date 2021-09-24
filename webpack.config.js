@@ -8,6 +8,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const emoji = require('node-emoji')
 const ProgressBarPlugin = require('progress-bar-webpack-plugin')
+const webpack = require('webpack')
+const dotenv = require('dotenv').config({
+  path: path.join(__dirname, '.env'),
+})
+
 const resolve = require('./webpack.config.resolve')
 
 module.exports = (env) => {
@@ -102,6 +107,9 @@ module.exports = (env) => {
             ':percent',
           )} (${chalk.blue.bold(':elapsed seconds')})`,
           clear: false,
+        }),
+        new webpack.DefinePlugin({
+          'process.env': JSON.stringify(dotenv.parsed),
         }),
       ]
       if (isDevelopment) {

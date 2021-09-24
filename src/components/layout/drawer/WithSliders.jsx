@@ -3,6 +3,7 @@ import {
   Grid, Typography, Switch, AppBar, Tab, Tabs,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
+import ReactGA from 'react-ga'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from '../dialogs/filters/StringFilter'
@@ -33,10 +34,20 @@ export default function WithSliders({
       setTempLegacy({
         ...tempLegacy, [event]: values,
       })
+      ReactGA.event({
+        category: 'Global Pokemon',
+        action: `${event}: ${values}`,
+        label: `${category} Text`,
+      })
     } else {
       const { name, value } = event.target
       setTempLegacy({
         ...tempLegacy, [name]: value,
+      })
+      ReactGA.event({
+        category: 'Global Pokemon',
+        action: `${name}: ${value}`,
+        label: `${category} Sliders`,
       })
     }
   }

@@ -14,6 +14,7 @@ import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
 import Auth from './Auth'
 import Login from './Login'
+import RouteChangeTracker from './RouteChangeTracker'
 
 const client = new ApolloClient({
   uri: '/graphql',
@@ -63,7 +64,6 @@ export default function App() {
     }
     setServerSettings({ ...data, Icons })
   }
-
   useEffect(() => {
     getServerSettings()
   }, [])
@@ -72,6 +72,7 @@ export default function App() {
     <Suspense fallback="Loading translations...">
       <ApolloProvider client={client}>
         <Router>
+          {(serverSettings && serverSettings.googleAnalytics) && <RouteChangeTracker />}
           <Switch>
             <Route exact path="/">
               {serverSettings && <Auth serverSettings={serverSettings} />}

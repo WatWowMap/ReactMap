@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
+import ReactGA from 'react-ga'
 
 import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
@@ -17,6 +18,8 @@ const userSettingsCategory = category => {
 }
 
 export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons }, params }) {
+  ReactGA.pageview(window.location.pathname)
+
   const map = useMap()
   const filters = useStore(state => state.filters)
   const settings = useStore(state => state.settings)

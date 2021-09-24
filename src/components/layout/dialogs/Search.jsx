@@ -6,6 +6,7 @@ import {
 import { Clear } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
+import ReactGA from 'react-ga'
 
 import { useStore } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
@@ -25,6 +26,12 @@ export default function Search({
   const handleTabChange = (event, newValue) => {
     setSearchTab(newValue)
   }
+
+  ReactGA.event({
+    category: 'Global Search',
+    action: `Search Value: ${search}`,
+    label: safeSearch[searchTab],
+  })
 
   const { data, previousData } = useQuery(Query.search(safeSearch[searchTab]), {
     variables: {

@@ -13,12 +13,15 @@ import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
 import { useTranslation } from 'react-i18next'
+import ReactGA from 'react-ga'
 
 import useStyles from '@hooks/useStyles'
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
 export default function UserProfile({ setUserProfile }) {
+  ReactGA.pageview('/user-profile')
+
   const classes = useStyles()
   const { t } = useTranslation()
   const { perms } = useStatic(state => state.auth)

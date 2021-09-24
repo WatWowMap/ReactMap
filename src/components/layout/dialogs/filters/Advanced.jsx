@@ -14,6 +14,7 @@ import {
 import { Save, Replay, Clear } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@material-ui/styles'
+import ReactGA from 'react-ga'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from './StringFilter'
@@ -32,6 +33,14 @@ export default function AdvancedFilter({
   const userSettings = useStore(state => state.userSettings)
   const setUserSettings = useStore(state => state.setUserSettings)
   const { t } = useTranslation()
+
+  if (type) {
+    ReactGA.event({
+      category: 'Advanced Filtering',
+      action: `ID: ${advancedFilter.id} Size: ${filterValues.size}`,
+      label: type,
+    })
+  }
 
   if (isTutorial) {
     ui.pokemon = isTutorial

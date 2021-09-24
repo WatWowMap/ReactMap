@@ -62,7 +62,7 @@ module.exports = function clientOptions(perms) {
     clientValues[key] = {}
     Object.entries(options).forEach(option => {
       const [name, meta] = option
-      clientMenus[key][name].value = clientSideOptions[key][name] || meta.value
+      clientMenus[key][name].value = clientSideOptions[key][name] || meta.value || false
       clientMenus[key][name].disabled = !meta.perm.some(x => perms[x])
       clientValues[key][name] = meta.value
       if (meta.sub) clientMenus[key][name].sub = {}
