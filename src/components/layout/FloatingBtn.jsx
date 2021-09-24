@@ -56,13 +56,6 @@ export default function FloatingButtons({
           <Menu fontSize={iconSize} />
         </Fab>
       </Grid>
-      {safeSearch.length > 0 && (
-        <Grid item>
-          <Fab color="primary" size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('openMenu')}>
-            <Search fontSize={iconSize} />
-          </Fab>
-        </Grid>
-      )}
       <Grid item>
         <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')}>
           <LocationOn color={color} fontSize={iconSize} />
@@ -78,6 +71,13 @@ export default function FloatingButtons({
           <ZoomOut fontSize={iconSize} />
         </Fab>
       </Grid>
+      {safeSearch.length > 0 && (
+        <Grid item>
+          <Fab color="primary" size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('openMenu')}>
+            <Search fontSize={iconSize} />
+          </Fab>
+        </Grid>
+      )}
     </Grid>
   )
 }
