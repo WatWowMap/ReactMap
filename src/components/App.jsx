@@ -76,10 +76,10 @@ export default function App() {
             <Route exact path="/">
               {serverSettings && <Auth serverSettings={serverSettings} />}
             </Route>
-            <Route exact path="/@/:lat/:lon/:zoom">
+            <Route exact path="/@/:lat/:lon/:zoom?">
               {serverSettings && <Auth serverSettings={serverSettings} />}
             </Route>
-            <Route exact path="/id/:category/:id/:zoom">
+            <Route exact path="/id/:category/:id/:zoom?">
               {serverSettings && <Auth serverSettings={serverSettings} />}
             </Route>
             <Route exact path="/login">

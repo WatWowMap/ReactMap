@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const passport = require('passport')
-const { isValidSession, clearOtherSessions } = require('../services/session-store.js')
+const { isValidSession, clearOtherSessions } = require('../services/session-store')
 
 router.get('/discord', passport.authenticate('discord'))
 
