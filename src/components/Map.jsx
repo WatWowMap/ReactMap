@@ -106,7 +106,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               userSettings={userSettings[userSettingsCategory(category)] || {}}
               filters={filters[category]}
               tileStyle={tileServers[settings.tileServers].style}
-              zoomLevel={config.clusterZoomLevels[category] || 1}
+              zoomLevel={config.clusterZoomLevels[category]}
               staticUserSettings={staticUserSettings[category]}
               params={params}
             />

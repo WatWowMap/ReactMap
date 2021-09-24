@@ -1,8 +1,8 @@
 import React from 'react'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
-
 import { useStatic } from '@hooks/useStore'
 import * as index from './tiles/index'
+import Notification from './layout/general/Notification'
 
 const getId = (component, item) => {
   switch (component) {
@@ -22,10 +22,12 @@ export default function Clustering({
   const hideList = useStatic(state => state.hideList)
   const excludeList = useStatic(state => state.excludeList)
   const timerList = useStatic(state => state.timerList)
+
   const ts = Math.floor((new Date()).getTime() / 1000)
   const currentZoom = map.getZoom()
 
   const showCircles = userSettings.interactionRanges && currentZoom >= config.interactionRangeZoom
+  const limitHit = renderedData.length > config.clusterZoomLevels.forcedClusterLimit
 
   const finalData = renderedData.map((each) => {
     if (!hideList.includes(each.id)) {
@@ -54,12 +56,30 @@ export default function Clustering({
     return null
   })
 
-  return userSettings.clustering || renderedData.length > config.clusterZoomLevels.forcedClusterLimit ? (
-    <MarkerClusterGroup
-      disableClusteringAtZoom={zoomLevel}
-      chunkedLoading
-    >
-      {finalData}
-    </MarkerClusterGroup>
+  return zoomLevel && (userSettings.clustering || limitHit) ? (
+    <>
+      <MarkerClusterGroup
+        disableClusteringAtZoom={zoomLevel}
+        chunkedLoading
+      >
+        {finalData}
+      </MarkerClusterGroup>
+      {limitHit && (
+        <Notification
+          severity="warning"
+          i18nKey="clusterLimit"
+          messages={[
+            {
+              key: 'limitHit',
+              variables: [category, config.clusterZoomLevels.forcedClusterLimit],
+            },
+            {
+              key: 'zoomIn',
+              variables: [],
+            },
+          ]}
+        />
+      )}
+    </>
   ) : finalData
 }
