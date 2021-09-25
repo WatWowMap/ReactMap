@@ -77,6 +77,9 @@ export default function ConfigSettings({
   setMenus(updateObjState(serverSettings.menus, 'menus'))
   setStaticMenus(serverSettings.menus)
 
+  if (localState?.state?.filters?.pokemon?.standard) {
+    delete localState.state.filters.pokemon.standard
+  }
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
   setStaticFilters(serverSettings.defaultFilters)
 
