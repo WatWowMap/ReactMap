@@ -264,7 +264,6 @@ class Pokemon extends Model {
           pkmn.seen_type = 'encounter'
         }
       }
-
       if (pvp && ((pkmn.pvp_rankings_great_league
         || pkmn.pvp_rankings_ultra_league
         || pkmn.pvp)
@@ -317,6 +316,7 @@ class Pokemon extends Model {
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       pkmn.cleanPvp = {}
       pkmn.bestPvp = 4096
+      if (!pkmn.seen_type) pkmn.seen_type = 'encounter'
       Object.keys(parsed).forEach(league => {
         const { filtered, best } = getRanks(league, parsed[league], filterId)
         if (filtered.length > 0) {

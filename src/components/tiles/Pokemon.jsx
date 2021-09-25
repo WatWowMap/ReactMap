@@ -71,7 +71,7 @@ const PokemonTile = ({
     }
   }, [done])
 
-  const finalLocation = item.seen_type.startsWith('nearby')
+  const finalLocation = item.seen_type?.startsWith('nearby')
     ? getOffset([item.lat, item.lon], item.seen_type)
     : [item.lat, item.lon]
 
