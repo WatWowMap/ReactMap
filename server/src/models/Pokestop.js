@@ -287,8 +287,8 @@ class Pokestop extends Model {
     for (let i = 0; i < queryResults.length; i += 1) {
       const result = queryResults[i]
       const newResult = {}
-      const quest = { with_ar: false }
-      const altQuest = { with_ar: true }
+      const quest = { with_ar: true }
+      const altQuest = { with_ar: false }
 
       Object.keys(result).forEach(field => {
         if (questProps[field]) {
