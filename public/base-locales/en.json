@@ -369,12 +369,17 @@
   "popupGymDescriptionWidth": 5,
   "popupPokemonSeenDataWidth": 6,
   "popupPokemonSeenDescriptionWidth": 5,
-  "popupPokestopSeenDataWidth": 7,
+  "popupPokestopSeenDataWidth": 12,
   "popupPokestopSeenDescriptionWidth": 5,
   "onlyShowingAvailable": "Only Showing Available",
   "showDexNumInPopup": "Show Pokedex # in Popup",
   "popup": "Popup",
   "pvpLevel": "Level {{level}} PVP Stats",
   "pvpMega": "Mega PVP Stats",
+  "arQuest_true": "AR Task",
+  "arQuest_false": "No AR",
+  "excludeQuestMulti": "Exclude {{reward}}",
+  "excludeLure": "Exclude Lure",
+  "popupPokestopSeenTimerWidth": 7,
   "showPolygons": "Show Polygons"
 }
