@@ -26,7 +26,7 @@ export default function PokestopPopup({
   const popups = useStore(state => state.popups)
   const setPopups = useStore(state => state.setPopups)
   const {
-    incident_expire_timestamp, lure_expire_timestamp, lure_id, grunt_type,
+    lure_expire_timestamp, lure_id, invasions,
   } = pokestop
 
   useEffect(() => {
@@ -105,11 +105,14 @@ export default function PokestopPopup({
             {hasInvasion && (
               <>
                 {(hasQuest || hasLure) && <Divider light flexItem className="popup-divider" />}
-                <TimeTile
-                  expireTime={incident_expire_timestamp}
-                  icon={Icons.getInvasions(grunt_type)}
-                  until
-                />
+                {invasions.map(invasion => (
+                  <TimeTile
+                    key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
+                    expireTime={invasion.incident_expire_timestamp}
+                    icon={Icons.getInvasions(invasion.grunt_type)}
+                    until
+                  />
+                ))}
               </>
             )}
           </Grid>
@@ -485,8 +488,8 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
 }
 
 const Invasion = ({ pokestop, Icons, t }) => {
-  const { grunt_type } = pokestop
-  const { invasions: { [grunt_type]: invasion } } = useStatic(state => state.masterfile)
+  const { invasions } = pokestop
+  const { invasions: invasionInfo } = useStatic(state => state.masterfile)
   const encounterNum = { first: '#1', second: '#2', third: '#3' }
 
   const makeShadowPokemon = pkmn => (
@@ -515,28 +518,28 @@ const Invasion = ({ pokestop, Icons, t }) => {
     return { first: '100%' }
   }
 
-  return (
-    <Grid container>
+  return invasions.map(invasion => (
+    <Grid container key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}>
       <Grid item xs={12}>
         <Typography variant="h6" align="center">
-          {t(`grunt_a_${grunt_type}`)}
+          {t(`grunt_a_${invasion.grunt_type}`)}
         </Typography>
       </Grid>
       <Grid item xs={12}>
         <table className="table-invasion">
           <tbody>
-            {Object.keys(invasion.encounters).map(position => (
+            {Object.keys(invasionInfo[invasion.grunt_type].encounters).map(position => (
               <tr key={position}>
                 <td>{encounterNum[position]}</td>
                 <td>
-                  {invasion.encounters[position].map(data => makeShadowPokemon(data))}
+                  {invasionInfo[invasion.grunt_type].encounters[position].map(data => makeShadowPokemon(data))}
                 </td>
-                <td>{getRewardPercent(invasion)[position] || ''}</td>
+                <td>{getRewardPercent(invasionInfo[invasion.grunt_type])[position] || ''}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </Grid>
     </Grid>
-  )
+  ))
 }

@@ -31,7 +31,13 @@ Object.keys(questProps).forEach(key => {
   questPropsAlt[`alternative_${key}`] = true
   madQuestProps[key] = true
 })
-
+const invasionProps = {
+  expiration_ms: 'incident_expire_timestamp',
+  character: 'grunt_type',
+  incident_expire_timestamp: true,
+  grunt_type: true,
+}
+const dbType = dbSelection('pokestop')
 const { hasAltQuests } = Object.values(schemas).find(schema => schema.useFor.includes('pokestop'))
 
 class Pokestop extends Model {
@@ -46,7 +52,8 @@ class Pokestop extends Model {
 
   static async getAllPokestops(args, perms, isMad) {
     const date = new Date()
-    const ts = Math.floor(date.getTime() / 1000)
+    const tsMs = date.getTime()
+    const ts = Math.floor(tsMs / 1000)
     const midnight = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
 
     const {
@@ -83,6 +90,14 @@ class Pokestop extends Model {
             .as('incident_expire_timestamp'),
         ])
     }
+    if (dbType === 'chuck') {
+      query.join('incident', 'pokestop.id', 'incident.pokestop_id')
+        .select([
+          '*',
+          'pokestop.id AS id',
+          'incident.id AS incidentId',
+        ])
+    }
     query.whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
@@ -93,7 +108,7 @@ class Pokestop extends Model {
     // returns everything if all pokestops are on
     if (onlyAllPokestops && pokestopPerms) {
       const results = await query
-      const normalized = isMad ? this.mapMadQuests(results) : this.mapRdmQuests(results)
+      const normalized = isMad ? this.mapMAD(results) : this.mapRDM(results)
       return this.secondaryFilter(normalized, args.filters, isMad)
     }
 
@@ -179,10 +194,17 @@ class Pokestop extends Model {
         })
       }
       if (onlyInvasions && invasionPerms) {
-        stops.orWhere(invasion => {
-          invasion.whereIn(isMad ? 'incident_grunt_type' : 'grunt_type', invasions)
-            .andWhere(isMad ? 'incident_expiration' : 'incident_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
-        })
+        if (dbType === 'chuck') {
+          stops.orWhere(invasion => {
+            invasion.whereIn('character', invasions)
+              .andWhere('expiration_ms', '>=', ts)
+          })
+        } else {
+          stops.orWhere(invasion => {
+            invasion.whereIn(isMad ? 'incident_grunt_type' : 'grunt_type', invasions)
+              .andWhere(isMad ? 'incident_expiration' : 'incident_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+          })
+        }
       }
       if (onlyArEligible && pokestopPerms) {
         stops.orWhere(ar => {
@@ -190,8 +212,8 @@ class Pokestop extends Model {
         })
       }
     })
-    const results = await query
-    const normalized = isMad ? this.mapMadQuests(results) : this.mapRdmQuests(results)
+    const results = await query.orderBy('pokestop.id')
+    const normalized = isMad ? this.mapMAD(results) : this.mapRDM(results, ts)
     return this.secondaryFilter(normalized, args.filters, isMad, midnight)
   }
 
@@ -209,9 +231,9 @@ class Pokestop extends Model {
 
       this.fieldAssigner(filtered, pokestop, ['id', 'lat', 'lon', 'enabled', 'ar_scan_eligible', 'url', 'name', 'last_modified_timestamp', 'updated'])
 
-      if (global || (filters.onlyInvasions && filters[`i${pokestop.grunt_type}`])) {
-        this.fieldAssigner(filtered, pokestop, ['grunt_type', 'incident_expire_timestamp'])
-      }
+      // if (global || (filters.onlyInvasions && filters[`i${pokestop.grunt_type}`])) {
+      this.fieldAssigner(filtered, pokestop, ['invasions'])
+      // }
       if (global || (filters.onlyLures && filters[`l${pokestop.lure_id}`])) {
         this.fieldAssigner(filtered, pokestop, ['lure_id', 'lure_expire_timestamp'])
       }
@@ -258,7 +280,7 @@ class Pokestop extends Model {
     return filteredResults
   }
 
-  static mapMadQuests(queryResults) {
+  static mapMAD(queryResults) {
     const filtered = {}
     for (let i = 0; i < queryResults.length; i += 1) {
       const result = queryResults[i]
@@ -282,27 +304,38 @@ class Pokestop extends Model {
     return Object.values(filtered)
   }
 
-  static mapRdmQuests(queryResults) {
-    const filtered = []
+  static mapRDM(queryResults, ts) {
+    const filtered = {}
     for (let i = 0; i < queryResults.length; i += 1) {
       const result = queryResults[i]
-      const newResult = {}
       const quest = { with_ar: true }
       const altQuest = { with_ar: false }
+      const invasion = {}
 
-      Object.keys(result).forEach(field => {
-        if (questProps[field]) {
-          quest[field] = result[field]
-        } else if (questPropsAlt[`alternative_${field}`]) {
-          altQuest[field] = result[field]
-        } else {
-          newResult[field] = result[field]
-        }
-      })
-      newResult.quests = [quest, altQuest].filter(q => Object.keys(q).length > 1)
-      filtered.push(newResult)
+      if (filtered[result.id]) {
+        Object.keys(invasionProps).forEach(field => (
+          invasion[typeof invasionProps[field] === 'string' ? invasionProps[field] : field] = result[field]
+        ))
+      } else {
+        filtered[result.id] = { invasions: [] }
+        Object.keys(result).forEach(field => {
+          if (questProps[field]) {
+            quest[field] = result[field]
+          } else if (questPropsAlt[`alternative_${field}`]) {
+            altQuest[field] = result[field]
+          } else if (invasionProps[field]) {
+            invasion[typeof invasionProps[field] === 'string' ? invasionProps[field] : field] = result[field]
+          } else {
+            filtered[result.id][field] = result[field]
+          }
+        })
+      }
+      if (invasion.grunt_type && invasion.incident_expire_timestamp >= ts) {
+        filtered[result.id].invasions.push(invasion)
+      }
+      filtered[result.id].quests = [quest, altQuest].filter(q => Object.keys(q).length > 1)
     }
-    return filtered
+    return Object.values(filtered)
   }
 
   static async getAvailableQuests(isMad) {
