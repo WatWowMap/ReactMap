@@ -622,11 +622,11 @@ const Invasion = ({ pokestop, Icons, t }) => {
   const { invasions: { [grunt_type]: invasion } } = useStatic(state => state.masterfile)
   const encounterNum = { first: '#1', second: '#2', third: '#3' }
 
-  const makeShadowPokemon = pokemonId => (
-    <div key={pokemonId} className="invasion-reward">
+  const makeShadowPokemon = pkmn => (
+    <div key={pkmn.id} className="invasion-reward">
       <img
         className="invasion-reward"
-        src={Icons.getPokemon(pokemonId)}
+        src={Icons.getPokemon(pkmn.id, pkmn.form, 0, pkmn.gender, pkmn.costumeId, pkmn.shiny)}
       />
       <img
         className="invasion-reward-shadow"
@@ -638,6 +638,9 @@ const Invasion = ({ pokestop, Icons, t }) => {
   const getRewardPercent = grunt => {
     if (grunt.type === 'Giovanni') {
       return { third: '100%' }
+    }
+    if (grunt.type.startsWith('NPC')) {
+      return {}
     }
     if (grunt.second_reward) {
       return { first: '85%', second: '15%' }
