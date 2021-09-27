@@ -364,5 +364,6 @@
   "showDexNumInPopup": "Pokaż Pokedex # w Popupie",
   "popup": "Popup",
   "pvpLevel": "Statystyki PvP poziomu {{level}}",
-  "pvpMega": "Statystyki PvP Mega"
+  "pvpMega": "Statystyki PvP Mega",
+  "showPolygons": "Pokaż Obszary"
 }
