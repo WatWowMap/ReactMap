@@ -32,8 +32,6 @@ Object.keys(questProps).forEach(key => {
   madQuestProps[key] = true
 })
 const invasionProps = {
-  expiration_ms: 'incident_expire_timestamp',
-  character: 'grunt_type',
   incident_expire_timestamp: true,
   grunt_type: true,
 }
@@ -96,6 +94,8 @@ class Pokestop extends Model {
           '*',
           'pokestop.id AS id',
           'incident.id AS incidentId',
+          'incident.expiration_ms AS incident_expire_timestamp',
+          'incident.character AS grunt_type',
         ])
     }
     query.whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
@@ -314,7 +314,7 @@ class Pokestop extends Model {
 
       if (filtered[result.id]) {
         Object.keys(invasionProps).forEach(field => (
-          invasion[typeof invasionProps[field] === 'string' ? invasionProps[field] : field] = result[field]
+          invasion[field] = result[field]
         ))
       } else {
         filtered[result.id] = { invasions: [] }
@@ -324,7 +324,7 @@ class Pokestop extends Model {
           } else if (questPropsAlt[`alternative_${field}`]) {
             altQuest[field] = result[field]
           } else if (invasionProps[field]) {
-            invasion[typeof invasionProps[field] === 'string' ? invasionProps[field] : field] = result[field]
+            invasion[field] = result[field]
           } else {
             filtered[result.id][field] = result[field]
           }

@@ -154,7 +154,7 @@ const MenuActions = ({
   const [anchorEl, setAnchorEl] = useState(false)
 
   const {
-    id, grunt_type, lure_id, quests,
+    id, lure_id, quests, invasions,
   } = pokestop
 
   const handleClick = (event) => {
@@ -189,8 +189,7 @@ const MenuActions = ({
 
   const excludeLure = () => {
     setAnchorEl(null)
-    const key = `l${lure_id}`
-    setState(key)
+    setState(`l${lure_id}`)
   }
 
   const excludeQuest = (i) => {
@@ -198,10 +197,9 @@ const MenuActions = ({
     setState(quests[i].key)
   }
 
-  const excludeInvasion = () => {
+  const excludeInvasion = (i) => {
     setAnchorEl(null)
-    const key = `i${grunt_type}`
-    setState(key)
+    setState(`i${invasions[i].grunt_type}`)
   }
 
   const handleTimer = () => {
@@ -232,13 +230,23 @@ const MenuActions = ({
         case 12: reward = `${t(`poke_${quest.mega_pokemon_id}`)} x${quest.mega_amount}`; break
         default: reward = t(`quest_reward_${quest.quest_reward_type}`); break
       }
-      options.push({ key: `${reward}-${quest.with_ar}`, name: <Trans i18nKey="excludeQuestMulti">{{ reward }}</Trans>, action: () => excludeQuest(i) })
+      options.push({
+        key: `${reward}-${quest.with_ar}`,
+        name: <Trans i18nKey="excludeQuestMulti">{{ reward }}</Trans>,
+        action: () => excludeQuest(i),
+      })
     })
   }
   if ((perms.invasions && hasInvasion)
     || (perms.lures && hasLure)) {
+    invasions.forEach((invasion, i) => {
+      options.push({
+        key: `${invasion.grunt_type}-${invasion.incident_expire_timestamp}`,
+        name: <Trans i18nKey="excludeInvasionMulti">{{ invasion: t(`grunt_a_${invasion.grunt_type}`) }}</Trans>,
+        action: () => excludeInvasion(i),
+      })
+    })
     options.push(
-      { name: 'excludeInvasion', action: excludeInvasion },
       { name: 'timer', action: handleTimer },
     )
   }
