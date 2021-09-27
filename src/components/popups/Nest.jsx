@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Grid, Typography, Divider } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
@@ -25,6 +25,10 @@ export default function NestPopup({
     }
     return color
   }
+
+  useEffect(() => {
+    Utility.analytics('Popup', `Name: ${name} Pokemon: ${pokemon}`, 'Nest')
+  }, [])
 
   return (
     <Grid

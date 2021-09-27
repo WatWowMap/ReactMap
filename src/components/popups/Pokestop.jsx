@@ -23,6 +23,11 @@ export default function PokestopPopup({
     incident_expire_timestamp, lure_expire_timestamp, lure_id, grunt_type,
   } = pokestop
 
+  useEffect(() => {
+    const has = { hasLure, hasQuest, hasInvasion }
+    Utility.analytics('Popup', Object.keys(has).filter(a => Boolean(has[a])), 'Pokestop')
+  }, [])
+
   return (
     <Grid
       container

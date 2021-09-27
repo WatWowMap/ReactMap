@@ -28,6 +28,8 @@ import Footer from './Footer'
 import SlotSelection from './SlotSelection'
 
 export default function Menu({ filters, toggleDialog, category }) {
+  Utility.analytics(`/advanced/${category}`)
+
   const classes = useStyles()
   const theme = useTheme()
   const menus = useStore(state => state.menus)
@@ -84,6 +86,7 @@ export default function Menu({ filters, toggleDialog, category }) {
   }
 
   const handleChange = (name, event) => {
+    Utility.analytics('Filtering Options', `New Value: ${event.target.checked}`, `Category: ${category} Name: ${name}.${event.target.name}`)
     setMenus({
       ...menus,
       [category]: {
@@ -296,6 +299,7 @@ export default function Menu({ filters, toggleDialog, category }) {
                       toggleAdvMenu,
                       toggleSlotsMenu,
                       type: category,
+                      Utility,
                     }}
                   >
                     {Tile}

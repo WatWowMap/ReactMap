@@ -5,6 +5,7 @@ import extend from 'extend'
 import { ThemeProvider } from '@material-ui/styles'
 import { useMediaQuery } from '@material-ui/core'
 
+import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
 import setTheme from '@assets/mui/theme'
 import Map from './Map'
@@ -12,6 +13,7 @@ import Map from './Map'
 export default function ConfigSettings({
   serverSettings, match, paramLocation, paramZoom,
 }) {
+  Utility.analytics('Discord', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
   if (serverSettings.error) {
     return (
       <Redirect

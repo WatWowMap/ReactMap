@@ -11,6 +11,10 @@ export default function WeatherPopup({ weather, ts, Icons }) {
   const { weather: weatherTypes } = useStatic(state => state.masterfile)
   const { gameplay_condition, updated } = weather
 
+  useEffect(() => {
+    Utility.analytics('Popup', `Type: ${t(`weather${gameplay_condition}`)}`, 'Weather')
+  }, [])
+
   return (
     <Grid
       container

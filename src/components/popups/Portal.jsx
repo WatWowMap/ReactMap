@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useState, useEffect } from 'react'
 import { Grid, Typography, IconButton } from '@material-ui/core'
 import { Map } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
@@ -29,6 +29,10 @@ export default function PortalPopup({ portal, ts }) {
       data: Utility.dayCheck(ts, imported),
     },
   ]
+
+  useEffect(() => {
+    Utility.analytics('Popup', `Name: ${name}`, 'Portal')
+  }, [])
 
   return (
     <Grid

@@ -5,6 +5,7 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
+import Utility from '@services/Utility'
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 import TabPanel from '../general/TabPanel'
@@ -33,11 +34,13 @@ export default function WithSliders({
       setTempLegacy({
         ...tempLegacy, [event]: values,
       })
+      Utility.analytics('Global Pokemon', `${event}: ${values}`, `${category} Text`)
     } else {
       const { name, value } = event.target
       setTempLegacy({
         ...tempLegacy, [name]: value,
       })
+      Utility.analytics('Global Pokemon', `${name}: ${value}`, `${category} Sliders`)
     }
   }
 
