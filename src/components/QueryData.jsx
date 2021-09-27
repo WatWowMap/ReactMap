@@ -52,7 +52,7 @@ export default function QueryData({
       if (specifics && specifics.enabled && staticFilters[id]) {
         if (withAvailableList.includes(category)
           && !Number.isNaN(parseInt(id.charAt(0)))) {
-          if (available.includes(id)) {
+          if (available?.includes(id)) {
             trimmed[id] = specifics
           }
         } else {
