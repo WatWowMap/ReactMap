@@ -15,6 +15,7 @@ import { Save, Replay, Clear } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@material-ui/styles'
 
+import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
 import StringFilter from './StringFilter'
 import SliderTile from './SliderTile'
@@ -23,6 +24,8 @@ import Size from './Size'
 export default function AdvancedFilter({
   toggleAdvMenu, advancedFilter, type, isTutorial,
 }) {
+  Utility.analytics(`/${type}/${advancedFilter.id}`)
+
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const ui = useStatic(state => state.ui)
@@ -33,6 +36,7 @@ export default function AdvancedFilter({
   const setUserSettings = useStore(state => state.setUserSettings)
   const { t } = useTranslation()
 
+  Utility.analytics('Advanced Filtering', `ID: ${advancedFilter.id} Size: ${filterValues.size}`, type)
   if (isTutorial) {
     ui.pokemon = isTutorial
   }

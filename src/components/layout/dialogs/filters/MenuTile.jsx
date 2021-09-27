@@ -10,7 +10,7 @@ export default function MenuTile({
 }) {
   const [name, setName] = useState(true)
   const {
-    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type, toggleSlotsMenu,
+    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type, toggleSlotsMenu, Utility,
   } = data
 
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -27,6 +27,7 @@ export default function MenuTile({
         enabled: !tempFilters[item.id].enabled,
       },
     })
+    Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id].enabled}`, type)
   }
 
   const backgroundColor = columnIndex % 2

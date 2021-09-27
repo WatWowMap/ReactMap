@@ -380,5 +380,6 @@
   "arQuest_false": "No AR",
   "excludeQuestMulti": "Exclude {{reward}}",
   "excludeLure": "Exclude Lure",
-  "popupPokestopSeenTimerWidth": 7
+  "popupPokestopSeenTimerWidth": 7,
+  "showPolygons": "Show Polygons"
 }

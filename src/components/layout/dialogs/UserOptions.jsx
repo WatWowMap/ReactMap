@@ -17,6 +17,7 @@ import { Clear, Replay, Save } from '@material-ui/icons'
 import { useTheme } from '@material-ui/styles'
 import { useTranslation, Trans } from 'react-i18next'
 
+import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import TabPanel from '../general/TabPanel'
@@ -77,6 +78,7 @@ export default function UserOptions({ category, toggleDialog }) {
     } else {
       setLocalState({ ...localState, [name]: !localState[name] })
     }
+    Utility.analytics('User Options', `Name: ${name} New Value: ${value || !localState[name]}`, category)
   }
 
   const handleTabChange = (event, newValue) => {
@@ -147,23 +149,23 @@ export default function UserOptions({ category, toggleDialog }) {
         </IconButton>
       </DialogTitle>
       {category === 'pokemon' && (
-      <AppBar position="static">
-        <Tabs
-          value={tab}
-          onChange={handleTabChange}
-          indicatorColor="secondary"
-          variant="fullWidth"
-          style={{ backgroundColor: '#424242', width: '100%' }}
-        >
-          {['primary', 'popup'].map(each => (
-            <Tab
-              key={each}
-              label={t(each)}
-              style={{ width: 40, minWidth: 40 }}
-            />
-          ))}
-        </Tabs>
-      </AppBar>
+        <AppBar position="static">
+          <Tabs
+            value={tab}
+            onChange={handleTabChange}
+            indicatorColor="secondary"
+            variant="fullWidth"
+            style={{ backgroundColor: '#424242', width: '100%' }}
+          >
+            {['primary', 'popup'].map(each => (
+              <Tab
+                key={each}
+                label={t(each)}
+                style={{ width: 40, minWidth: 40 }}
+              />
+            ))}
+          </Tabs>
+        </AppBar>
       )}
       {['main', 'popup'].map((each, index) => (
         <TabPanel value={tab} index={index} key={each}>

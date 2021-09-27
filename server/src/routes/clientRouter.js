@@ -7,8 +7,8 @@ const router = new express.Router()
 const clientRoutes = [
   '/',
   '/login',
-  '/@/:lat/:lon/:zoom',
-  '/id/:category/:id/:zoom',
+  '/@/:lat/:lon/:zoom?',
+  '/id/:category/:id/:zoom?',
 ]
 
 router.get(clientRoutes, (req, res) => {

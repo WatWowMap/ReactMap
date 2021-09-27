@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Typography } from '@material-ui/core'
 import { Trans, useTranslation } from 'react-i18next'
+
+import Utility from '@services/Utility'
 
 export default function SubmissionCellPopup({ cell }) {
   const { t } = useTranslation()
@@ -14,6 +16,11 @@ export default function SubmissionCellPopup({ cell }) {
     || (cell.count === 19 && cell.count_gyms < 3)) {
     untilNextGym = t('nextSubmission')
   }
+
+  useEffect(() => {
+    Utility.analytics('Popup', `Total Count: ${cell.count}`, 'Submission Cell')
+  }, [])
+
   return (
     <>
       <Typography variant="h6" align="center">
