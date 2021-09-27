@@ -626,7 +626,7 @@ const Invasion = ({ pokestop, Icons, t }) => {
     <div key={pkmn.id} className="invasion-reward">
       <img
         className="invasion-reward"
-        src={Icons.getPokemon(pkmn.id, pkmn.formId, 0, pkmn.gender, pkmn.costumeId, pkmn.shiny)}
+        src={Icons.getPokemon(pkmn.id, pkmn.form, 0, pkmn.gender, pkmn.costumeId, pkmn.shiny)}
       />
       <img
         className="invasion-reward-shadow"
