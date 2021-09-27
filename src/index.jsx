@@ -5,13 +5,14 @@ import ReactGA from 'react-ga'
 import App from './components/App'
 import './services/i18n'
 
-const { GOOGLE_ANALYTICS_ID, ANALYTICS_DEBUG_MODE, TITLE } = process.env
-
-if (GOOGLE_ANALYTICS_ID) {
-  ReactGA.initialize(GOOGLE_ANALYTICS_ID, { debug: ANALYTICS_DEBUG_MODE })
-}
-if (TITLE) {
-  document.title = TITLE
+if (process.env) {
+  const { GOOGLE_ANALYTICS_ID, ANALYTICS_DEBUG_MODE, TITLE } = process.env
+  if (process.env.GOOGLE_ANALYTICS_ID) {
+    ReactGA.initialize(GOOGLE_ANALYTICS_ID, { debug: ANALYTICS_DEBUG_MODE })
+  }
+  if (TITLE) {
+    document.title = TITLE
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
