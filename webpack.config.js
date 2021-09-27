@@ -12,7 +12,6 @@ const webpack = require('webpack')
 const dotenv = require('dotenv').config({
   path: path.join(__dirname, '.env'),
 })
-
 const resolve = require('./webpack.config.resolve')
 
 module.exports = (env) => {
@@ -109,7 +108,7 @@ module.exports = (env) => {
           clear: false,
         }),
         new webpack.DefinePlugin({
-          'process.env': JSON.stringify(dotenv.parsed),
+          'process.env': dotenv ? JSON.stringify(dotenv.parsed) : JSON.stringify({}),
         }),
       ]
       if (isDevelopment) {
