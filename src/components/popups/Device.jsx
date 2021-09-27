@@ -8,6 +8,10 @@ import Utility from '@services/Utility'
 export default function DevicePopup({ device, status, ts }) {
   const { t } = useTranslation()
 
+  useEffect(() => {
+    Utility.analytics('Popup', 'Popup Clicked', 'Device')
+  }, [])
+
   return (
     <>
       <Typography variant="h6" align="center">

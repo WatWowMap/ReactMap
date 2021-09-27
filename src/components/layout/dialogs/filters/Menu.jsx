@@ -28,6 +28,8 @@ import Footer from './Footer'
 import SlotSelection from './SlotSelection'
 
 export default function Menu({ filters, toggleDialog, category }) {
+  Utility.analytics(`/advanced/${category}`)
+
   const classes = useStyles()
   const theme = useTheme()
   const menus = useStore(state => state.menus)
@@ -64,14 +66,27 @@ export default function Menu({ filters, toggleDialog, category }) {
     })
   }
 
+  const generateSlots = (teamId, show) => {
+    for (let i = 1; i <= 6; i += 1) {
+      const slotKey = `g${teamId.charAt(1)}-${i}`
+      filteredObj[slotKey] = typeof show === 'boolean'
+        ? { ...tempFilters[slotKey], enabled: show }
+        : show
+    }
+  }
+
   const selectAllOrNone = (show) => {
-    Object.values(filteredObj).forEach(item => {
+    Object.entries(filteredObj).forEach(([key, item]) => {
       item.enabled = show
+      if (key.startsWith('t') && key.charAt(1) != 0) {
+        generateSlots(key, show)
+      }
     })
     setTempFilters({ ...tempFilters, ...filteredObj })
   }
 
   const handleChange = (name, event) => {
+    Utility.analytics('Filtering Options', `New Value: ${event.target.checked}`, `Category: ${category} Name: ${name}.${event.target.name}`)
     setMenus({
       ...menus,
       [category]: {
@@ -120,10 +135,7 @@ export default function Menu({ filters, toggleDialog, category }) {
 
         // ugly patch for also changing gym slots with the apply to all
         if (key.startsWith('t') && key.charAt(1) != 0) {
-          for (let i = 1; i <= 6; i += 1) {
-            const slotKey = `g${key.charAt(1)}-${i}`
-            filteredObj[slotKey] = { ...newFilters, enabled: tempFilters[slotKey].enabled }
-          }
+          generateSlots(key, newFilters)
         }
       })
       setTempFilters({ ...tempFilters, ...filteredObj, [id]: newFilters })
@@ -287,6 +299,7 @@ export default function Menu({ filters, toggleDialog, category }) {
                       toggleAdvMenu,
                       toggleSlotsMenu,
                       type: category,
+                      Utility,
                     }}
                   >
                     {Tile}

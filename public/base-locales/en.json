@@ -377,5 +377,6 @@
   "pvpLevel": "Level {{level}} PVP Stats",
   "pvpMega": "Mega PVP Stats",
   "clusterLimit_0": "{{variable_0}} limit ({{variable_1}}) has been hit",
-  "clusterLimit_1": "Please zoom in or narrow your filters"
+  "clusterLimit_1": "Please zoom in or narrow your filters",
+  "showPolygons": "Show Polygons"
 }
