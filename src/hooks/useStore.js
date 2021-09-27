@@ -31,13 +31,6 @@ const useStore = create(persist(set => ({
   setSearch: (search) => set({ search }),
   searchTab: 0,
   setSearchTab: (searchTab) => set({ searchTab }),
-  popups: {
-    invasions: false,
-    extras: false,
-    pvp: false,
-    names: true,
-  },
-  setPopups: (popups) => set({ popups }),
 }),
 {
   name: 'local-state',

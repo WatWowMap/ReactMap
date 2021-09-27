@@ -9,6 +9,7 @@ const core = gql`
     lon
     updated
     last_modified_timestamp
+    key
     ar_scan_eligible
   }
 `
@@ -22,27 +23,23 @@ const lure = gql`
 
 const quest = gql`
   fragment Quest on Pokestop {
-    quests {
-      quest_type
-      quest_target
-      quest_conditions
-      quest_reward_type
-      quest_item_id
-      quest_task
-      item_amount
-      stardust_amount
-      quest_pokemon_id
-      quest_form_id
-      quest_gender_id
-      quest_costume_id
-      quest_shiny
-      mega_pokemon_id
-      mega_amount
-      candy_pokemon_id
-      candy_amount
-      with_ar
-      key
-    }
+    quest_type
+    quest_reward_type
+    quest_conditions
+    quest_target
+    quest_item_id
+    item_amount
+    stardust_amount
+    quest_pokemon_id
+    quest_form_id
+    quest_gender_id
+    quest_costume_id
+    quest_shiny
+    mega_pokemon_id
+    mega_amount
+    quest_task
+    candy_pokemon_id
+    candy_amount
   }
 `
 

@@ -14,9 +14,10 @@ const PokestopTile = ({
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
-
   const {
-    grunt_type, incident_expire_timestamp, lure_expire_timestamp, ar_scan_eligible, quests,
+    grunt_type, incident_expire_timestamp, quest_item_id, lure_expire_timestamp,
+    quest_pokemon_id, quest_form_id, mega_amount, mega_pokemon_id, stardust_amount,
+    ar_scan_eligible, candy_pokemon_id,
   } = item
 
   const hasLure = lure_expire_timestamp >= ts
@@ -24,7 +25,11 @@ const PokestopTile = ({
   const hasInvasion = incident_expire_timestamp >= ts
     && !excludeList.includes(`i${grunt_type}`)
 
-  const hasQuest = quests && quests.some(quest => !excludeList.includes(quest.key))
+  const hasQuest = ((quest_item_id && !excludeList.includes(`q${quest_item_id}`))
+    || (quest_pokemon_id && !excludeList.includes(`${quest_pokemon_id}-${quest_form_id}`))
+    || (mega_amount && !excludeList.includes(`m${mega_pokemon_id}-${mega_amount}`))
+    || (stardust_amount && !excludeList.includes(`d${stardust_amount}`))
+    || (candy_pokemon_id && !excludeList.includes(`c${candy_pokemon_id}`)))
 
   useEffect(() => {
     const { id } = params
@@ -97,13 +102,20 @@ const PokestopTile = ({
 const areEqual = (prev, next) => (
   prev.item.id === next.item.id
   && prev.item.lure_expire_timestamp === next.item.lure_expire_timestamp
+  && prev.item.quest_item_id === next.item.quest_item_id
+  && prev.item.quest_pokemon_id === next.item.quest_pokemon_id
+  && prev.item.mega_pokemon_id === next.item.mega_pokemon_id
   && prev.item.incident_expire_timestamp === next.item.incident_expire_timestamp
-  && Boolean(prev.item.quests) === Boolean(next.item.quests)
+  && prev.item.stardust_amount === next.item.stardust_amount
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
   && Object.keys(prev.userIcons).every(key => prev.userIcons[key] === next.userIcons[key])
   && Object.keys(prev.userSettings).every(key => prev.userSettings[key] === next.userSettings[key])
-  && (prev.item.quests ? !prev.item.quests.some(quest => next.excludeList.includes(quest.key)) : true)
+  && !next.excludeList.includes(`${prev.item.quest_pokemon_id}-${prev.item.quest_form_id}`)
+  && !next.excludeList.includes(`i${prev.item.grunt_type}`)
+  && !next.excludeList.includes(`m${prev.item.mega_pokemon_id}-${prev.item.mega_amount}`)
+  && !next.excludeList.includes(`d${prev.item.stardust_amount}`)
+  && !next.excludeList.includes(`q${prev.item.quest_item_id}`)
   && prev.showCircles === next.showCircles
 )
 

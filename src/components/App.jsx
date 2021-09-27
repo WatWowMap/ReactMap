@@ -40,15 +40,6 @@ const client = new ApolloClient({
           },
         },
       },
-      Pokestop: {
-        fields: {
-          quests: {
-            merge(existing, incoming) {
-              return incoming
-            },
-          },
-        },
-      },
     },
   }),
 })
