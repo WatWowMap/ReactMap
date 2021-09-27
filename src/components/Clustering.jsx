@@ -27,7 +27,6 @@ export default function Clustering({
   const currentZoom = map.getZoom()
 
   const showCircles = userSettings.interactionRanges && currentZoom >= config.interactionRangeZoom
-  const limitHit = renderedData.length > config.clusterZoomLevels.forcedClusterLimit
 
   const finalData = renderedData.map((each) => {
     if (!hideList.includes(each.id)) {
@@ -56,10 +55,13 @@ export default function Clustering({
     return null
   })
 
-  return zoomLevel && (userSettings.clustering || limitHit) ? (
+  const limitHit = finalData.length > config.clusterZoomLevels.forcedClusterLimit
+
+  return limitHit || (zoomLevel && userSettings.clustering) ? (
     <>
       <MarkerClusterGroup
-        disableClusteringAtZoom={zoomLevel}
+        key={map.getZoom()}
+        disableClusteringAtZoom={limitHit ? 20 : zoomLevel}
         chunkedLoading
       >
         {finalData}
