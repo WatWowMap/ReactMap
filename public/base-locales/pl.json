@@ -364,5 +364,13 @@
   "showDexNumInPopup": "Pokaż Pokedex # w Popupie",
   "popup": "Popup",
   "pvpLevel": "Statystyki PvP poziomu {{level}}",
-  "pvpMega": "Statystyki PvP Mega"
+  "pvpMega": "Statystyki PvP Mega",
+  "arQuest_true": "Zadanie AR",
+  "arQuest_false": "Bez AR",
+  "excludeQuestMulti": "Wyklucz {{reward}}",
+  "excludeLure": "Wyklucz lura",
+  "popupPokestopSeenTimerWidth": 7,
+  "clusterLimit_0": "{{variable_0}} limit ({{variable_1}}) został osiągnięty",
+  "clusterLimit_1": "Proszę przybliż lub zawęź swoje filtry",
+  "showPolygons": "Pokaż Obszary"
 }
