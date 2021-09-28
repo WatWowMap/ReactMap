@@ -275,30 +275,23 @@ const RewardInfo = ({
     quest_shiny,
     with_ar,
   } = quest
+
+  const getImage = () => {
+    switch (quest_reward_type) {
+      case 2: return Icons.getRewards(quest_reward_type, quest_item_id, item_amount)
+      case 3: return Icons.getRewards(quest_reward_type, stardust_amount)
+      case 4: return Icons.getRewards(quest_reward_type, candy_pokemon_id, candy_amount)
+      case 7: return Icons.getPokemon(
+        quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny,
+      )
+      case 12: return Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount)
+      default: return Icons.getRewards(quest_reward_type)
+    }
+  }
+
   return (
     <Grid item xs={3} style={{ textAlign: 'center' }}>
-      {{
-        2: <img
-          src={Icons.getRewards(quest_reward_type, quest_item_id, item_amount)}
-          className="quest-popup-img"
-        />,
-        3: <img
-          src={Icons.getRewards(quest_reward_type, stardust_amount)}
-          className="quest-popup-img"
-        />,
-        4: <img
-          src={Icons.getRewards(quest_reward_type, candy_pokemon_id, candy_amount)}
-          className="quest-popup-img"
-        />,
-        7: <img
-          src={Icons.getPokemon(quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny)}
-          className="quest-popup-img"
-        />,
-        12: <img
-          src={Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount)}
-          className="quest-popup-img"
-        />,
-      }[quest_reward_type] || <img src={Icons.getRewards(quest_reward_type)} className="quest-popup-img" />}
+      <img src={getImage()} className="quest-popup-img" />,
       <Typography variant="caption" className="ar-task" noWrap>
         {config.questMessage ? config.questMessage : t(`arQuest_${Boolean(with_ar)}`)}
       </Typography>
