@@ -97,7 +97,7 @@ class Pokestop extends Model {
           '*',
           'pokestop.id AS id',
           'incident.id AS incidentId',
-          raw('FLOOR(incident.expiration_ms / 1000, 0) AS incident_expire_timestamp'),
+          raw('FLOOR(incident.expiration_ms / 1000) AS incident_expire_timestamp'),
           'incident.character AS grunt_type',
         ])
     }
