@@ -50,7 +50,8 @@ class Pokestop extends Model {
 
   static async getAllPokestops(args, perms, isMad) {
     const date = new Date()
-    const ts = Math.floor(date.getTime() / 1000)
+    const tsMs = date.getTime()
+    const ts = Math.floor(tsMs / 1000)
     const midnight = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
 
     const {
@@ -93,7 +94,7 @@ class Pokestop extends Model {
           '*',
           'pokestop.id AS id',
           'incident.id AS incidentId',
-          raw('ROUND(incident.expiration_ms / 1000, 0) AS incident_expire_timestamp'),
+          raw('FLOOR(incident.expiration_ms / 1000, 0) AS incident_expire_timestamp'),
           'incident.character AS grunt_type',
         ])
     }
@@ -196,7 +197,7 @@ class Pokestop extends Model {
         if (dbType === 'chuck') {
           stops.orWhere(invasion => {
             invasion.whereIn('character', invasions)
-              .andWhere('expiration_ms', '>=', ts)
+              .andWhere('expiration_ms', '>=', tsMs)
           })
         } else {
           stops.orWhere(invasion => {
@@ -325,8 +326,8 @@ class Pokestop extends Model {
         Object.keys(result).forEach(field => {
           if (questProps[field]) {
             quest[field] = result[field]
-          } else if (questPropsAlt[`alternative_${field}`]) {
-            altQuest[field] = result[field]
+          } else if (questPropsAlt[field]) {
+            altQuest[field.substring(12)] = result[field]
           } else if (invasionProps[field]) {
             invasion[field] = result[field]
           } else {
