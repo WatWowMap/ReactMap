@@ -159,13 +159,15 @@ export default class UIcons {
   }
 
   getRewards(rewardType, id, amount) {
-    const category = this.questRewardTypes[rewardType]
+    const category = this.questRewardTypes[rewardType] || 'unset'
     const baseUrl = `${this[this.selected.reward].path}/reward/${category}`
-    const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
-    for (const aSuffix of amountSuffixes) {
-      const result = `${id}${aSuffix}.png`
-      if (this[this.selected.reward][category].has(result)) {
-        return `${baseUrl}/${result}`
+    if (this[this.selected.reward][category]) {
+      const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
+      for (const aSuffix of amountSuffixes) {
+        const result = `${id}${aSuffix}.png`
+        if (this[this.selected.reward][category].has(result)) {
+          return `${baseUrl}/${result}`
+        }
       }
     }
     return `${baseUrl}/0.png`

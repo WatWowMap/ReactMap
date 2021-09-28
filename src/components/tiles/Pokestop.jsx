@@ -94,8 +94,8 @@ const PokestopTile = ({
 const areEqual = (prev, next) => (
   prev.item.id === next.item.id
   && prev.item.lure_expire_timestamp === next.item.lure_expire_timestamp
-  && prev.item.incident_expire_timestamp === next.item.incident_expire_timestamp
-  && Boolean(prev.item.quests) === Boolean(next.item.quests)
+  && prev.item.quests?.length === next.item.quests?.length
+  && prev.item.invasions?.length === next.item.invasions?.length
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
   && Object.keys(prev.userIcons).every(key => prev.userIcons[key] === next.userIcons[key])

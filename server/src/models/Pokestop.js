@@ -50,8 +50,7 @@ class Pokestop extends Model {
 
   static async getAllPokestops(args, perms, isMad) {
     const date = new Date()
-    const tsMs = date.getTime()
-    const ts = Math.floor(tsMs / 1000)
+    const ts = Math.floor(date.getTime() / 1000)
     const midnight = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
 
     const {
@@ -94,7 +93,7 @@ class Pokestop extends Model {
           '*',
           'pokestop.id AS id',
           'incident.id AS incidentId',
-          'incident.expiration_ms AS incident_expire_timestamp',
+          raw('ROUND(incident.expiration_ms / 1000, 0) AS incident_expire_timestamp'),
           'incident.character AS grunt_type',
         ])
     }
@@ -212,8 +211,8 @@ class Pokestop extends Model {
         })
       }
     })
-    const results = await query.orderBy('pokestop.id')
-    const normalized = isMad ? this.mapMAD(results) : this.mapRDM(results, ts)
+    const results = await query
+    const normalized = isMad ? this.mapMAD(results, ts) : this.mapRDM(results, ts)
     return this.secondaryFilter(normalized, args.filters, isMad, midnight)
   }
 
@@ -231,9 +230,9 @@ class Pokestop extends Model {
 
       this.fieldAssigner(filtered, pokestop, ['id', 'lat', 'lon', 'enabled', 'ar_scan_eligible', 'url', 'name', 'last_modified_timestamp', 'updated'])
 
-      // if (global || (filters.onlyInvasions && filters[`i${pokestop.grunt_type}`])) {
-      this.fieldAssigner(filtered, pokestop, ['invasions'])
-      // }
+      if (global || filters.onlyInvasions) {
+        filtered.invasions = pokestop.invasions.filter(invasion => filters[`i${invasion.grunt_type}`])
+      }
       if (global || (filters.onlyLures && filters[`l${pokestop.lure_id}`])) {
         this.fieldAssigner(filtered, pokestop, ['lure_id', 'lure_expire_timestamp'])
       }
@@ -280,26 +279,31 @@ class Pokestop extends Model {
     return filteredResults
   }
 
-  static mapMAD(queryResults) {
+  static mapMAD(queryResults, ts) {
     const filtered = {}
     for (let i = 0; i < queryResults.length; i += 1) {
       const result = queryResults[i]
       const quest = {}
+      const invasion = {}
 
       if (filtered[result.id]) {
         Object.keys(madQuestProps).forEach(field => (quest[field] = result[field]))
-        filtered[result.id].quests.push(quest)
       } else {
-        filtered[result.id] = { quests: [] }
+        filtered[result.id] = { quests: [], invasions: [] }
         Object.keys(result).forEach(field => {
           if (madQuestProps[field]) {
             quest[field] = result[field]
+          } else if (invasionProps[field]) {
+            invasion[field] = result[field]
           } else {
             filtered[result.id][field] = result[field]
           }
         })
-        filtered[result.id].quests.push(quest)
       }
+      if (invasion.grunt_type && invasion.incident_expire_timestamp >= ts) {
+        filtered[result.id].invasions.push(invasion)
+      }
+      filtered[result.id].quests.push(quest)
     }
     return Object.values(filtered)
   }
