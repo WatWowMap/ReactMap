@@ -21,6 +21,10 @@ export default function GymPopup({
   const [raidExpand, setRaidExpand] = useState(hasRaid)
   const [extraExpand, setExtraExpand] = useState(false)
 
+  useEffect(() => {
+    Utility.analytics('Popup', `Team ID: ${gym.team_id} Has Raid: ${hasRaid}`, 'Gym')
+  }, [])
+
   return (
     <Grid
       container

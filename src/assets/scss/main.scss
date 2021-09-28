@@ -1,5 +1,5 @@
-@import '~leaflet/dist/leaflet.css';
-@import '~react-leaflet-markercluster/dist/styles.min.css';
+@import "~leaflet/dist/leaflet.css";
+@import "~react-leaflet-markercluster/dist/styles.min.css";
 
 .leaflet-container {
   position: absolute;
@@ -20,12 +20,12 @@ body {
   background-color: rgb(53, 53, 53);
 }
 
-.markercluster-map { 
-  height: 90vh; 
+.markercluster-map {
+  height: 90vh;
 }
 
 .MuiDrawer-paper {
-  background-color: rgb(51,51,51);
+  background-color: rgb(51, 51, 51);
 }
 
 .MuiToggleButton-root {
@@ -39,12 +39,18 @@ body {
   background-size: contain;
 }
 
+.filter-footer {
+  background-color: #424242;
+  text-align: center;
+  height: 50px;
+}
+
 .leaflet-tooltip {
   font-weight: bold;
   border: none;
   max-height: 15px;
   padding: 0px 2px !important;
-  border-radius: .5rem !important;
+  border-radius: 0.5rem !important;
 }
 
 .leaflet-popup-tip-container .leaflet-popup-tip {
@@ -95,7 +101,7 @@ body {
   border: 4px solid yellow;
 }
 .lure_505 {
-  border: 4px solid rgb(0, 82, 158)
+  border: 4px solid rgb(0, 82, 158);
 }
 
 .team-1 {
@@ -126,7 +132,7 @@ body {
   padding-right: 10px;
 }
 .table-invasion td:nth-child(2) {
-  width: 100px
+  width: 100px;
 }
 .table-invasion td:last-child {
   padding-left: 7px;
@@ -136,6 +142,12 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
+}
+
+.popup-divider {
+  width: 100% !important;
+  height: 2px !important;
+  margin: 6px 0px !important;
 }
 
 .pokemon-popup-image-holder > img,
@@ -156,8 +168,8 @@ body {
 
 .marker-image-holder.top-overlay > img,
 .leaflet-container .leaflet-marker-pane .marker-image-holder.top-overlay > img {
-    top: auto;
-    position: absolute;
+  top: auto;
+  position: absolute;
 }
 
 .invasion-reward {
@@ -182,11 +194,18 @@ body {
 
 .ar-eligible > img.ar-logo {
   position: absolute;
-  width: 25px;
-  height: 25px;
-  right: 5px;
-  bottom: 5px;
-  filter: drop-shadow(0 0 2px #000);
+  width: 16px;
+  height: 16px;
+  left: 0px;
+  bottom: -5px;
+}
+
+.ar-eligible > img.ex-logo {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  right: 0px;
+  bottom: -5px;
 }
 
 img {
@@ -207,7 +226,8 @@ img {
   transform: translateX(-50%);
   min-width: 100%;
   color: white;
-  text-shadow: #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px;
+  text-shadow: #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px,
+    #000 0 0 1px, #000 0 0 1px;
   font-weight: 700;
 }
 .amount-holder > div {
@@ -220,28 +240,35 @@ img {
 .iv-badge {
   position: absolute;
   text-align: center;
-  align-items: center; 
+  align-items: center;
   justify-content: center;
   background-color: rgb(110, 110, 110);
   border: 2px solid white;
-  border-radius: 12px; 
+  border-radius: 12px;
   color: white;
   font: bold 15px/13px Helvetica, Verdana, Tahoma;
-  height: 16px; 
+  height: 16px;
   min-width: 14px;
   padding: 4px 3px 0 3px;
 }
 
 .weather-icon {
   background-color: rgba(255, 255, 255, 0.5);
-  border: 2px solid rgb(41,102,122);
-  border-radius: 48px; 
+  border: 2px solid rgb(41, 102, 122);
+  border-radius: 48px;
 }
 
 .quest-popup-img {
-  text-align: center;
-  max-width: 40px;
-  max-height: 40px;
+  max-width: 30px;
+  max-height: 30px;
+}
+
+.ar-task {
+  background-color: rgb(63, 63, 63);
+  border: 1px solid white;
+  border-radius: 12px;
+  padding: 3px;
+  font-size: 0.5rem !important;
 }
 
 .amount-popup {
@@ -268,13 +295,21 @@ img {
 .type-img-1 {
   left: 0;
   background: top left no-repeat;
-  -webkit-mask-image: -webkit-linear-gradient(right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+  -webkit-mask-image: -webkit-linear-gradient(
+    right,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 1)
+  );
 }
 
 .type-img-2 {
   right: 0;
   background: top right no-repeat;
-  -webkit-mask-image: -webkit-linear-gradient(right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+  -webkit-mask-image: -webkit-linear-gradient(
+    right,
+    rgba(0, 0, 0, 1),
+    rgba(0, 0, 0, 0)
+  );
 }
 
 .no-scroll::-webkit-scrollbar {

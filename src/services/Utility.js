@@ -1,3 +1,5 @@
+import ReactGA from 'react-ga'
+
 import formatInterval from './functions/formatInterval'
 import getProperName from './functions/getProperName'
 import menuFilter from './functions/menuFilter'
@@ -37,5 +39,17 @@ export default class Utility {
 
   static formatter(addressFormat, data) {
     return formatter(addressFormat, data)
+  }
+
+  static analytics(category, action = false, label = false, nonInteraction = false) {
+    if (process.env?.GOOGLE_ANALYTICS_ID) {
+      if (action) {
+        ReactGA.event({
+          category, action, label, nonInteraction,
+        })
+      } else {
+        ReactGA.pageview(category)
+      }
+    }
   }
 }

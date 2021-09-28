@@ -14,6 +14,7 @@ import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
 import Auth from './Auth'
 import Login from './Login'
+import RouteChangeTracker from './RouteChangeTracker'
 
 const client = new ApolloClient({
   uri: '/graphql',
@@ -33,6 +34,20 @@ const client = new ApolloClient({
             },
           },
           pokestops: {
+            merge(existing, incoming) {
+              return incoming
+            },
+          },
+        },
+      },
+      Pokestop: {
+        fields: {
+          quests: {
+            merge(existing, incoming) {
+              return incoming
+            },
+          },
+          invasions: {
             merge(existing, incoming) {
               return incoming
             },
@@ -63,7 +78,6 @@ export default function App() {
     }
     setServerSettings({ ...data, Icons })
   }
-
   useEffect(() => {
     getServerSettings()
   }, [])
@@ -72,14 +86,15 @@ export default function App() {
     <Suspense fallback="Loading translations...">
       <ApolloProvider client={client}>
         <Router>
+          {(serverSettings && serverSettings.googleAnalytics) && <RouteChangeTracker />}
           <Switch>
             <Route exact path="/">
               {serverSettings && <Auth serverSettings={serverSettings} />}
             </Route>
-            <Route exact path="/@/:lat/:lon/:zoom">
+            <Route exact path="/@/:lat/:lon/:zoom?">
               {serverSettings && <Auth serverSettings={serverSettings} />}
             </Route>
-            <Route exact path="/id/:category/:id/:zoom">
+            <Route exact path="/id/:category/:id/:zoom?">
               {serverSettings && <Auth serverSettings={serverSettings} />}
             </Route>
             <Route exact path="/login">

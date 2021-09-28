@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Grid, Typography, IconButton, Divider, Menu, MenuItem,
 } from '@material-ui/core'
@@ -74,6 +74,9 @@ export default function NestPopup({
     { name: 'hide', action: handleHide },
     { name: 'exclude', action: handleExclude },
   ]
+  useEffect(() => {
+    Utility.analytics('Popup', `Name: ${name} Pokemon: ${pokemon}`, 'Nest')
+  }, [])
 
   return (
     <Grid

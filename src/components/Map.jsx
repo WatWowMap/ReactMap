@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 
+import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
@@ -18,6 +19,8 @@ const userSettingsCategory = category => {
 }
 
 export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons }, params }) {
+  Utility.analytics(window.location.pathname)
+
   const map = useMap()
 
   const staticUserSettings = useCallback(useStatic(state => state.userSettings))

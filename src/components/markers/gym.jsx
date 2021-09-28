@@ -44,7 +44,7 @@ export default function GymMarker(gym, hasEgg, hasRaid, filters, Icons, userSett
       raidIcon = Icons.getPokemon(
         raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume,
       )
-      raidSize = Icons.getSize('pokemon', filters.filter[filterId])
+      raidSize = Icons.getSize('raid', filters.filter[filterId])
     } else {
       filterId = `e${raid_level}`
       raidIcon = Icons.getEggs(raid_level, hasEgg, raid_is_exclusive)

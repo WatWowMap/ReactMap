@@ -5,6 +5,7 @@
   "devOptions": {
     "enabled": false,
     "graphiql": false,
+    "queryDebug": false,
     "clientPath": "../../dist"
   },
   "api": {
@@ -57,6 +58,7 @@
       "drawer": "temporary"
     },
     "clusterZoomLevels": {
+      "forcedClusterLimit": 2500,
       "gyms": 13,
       "pokestops": 14,
       "pokemon": 15,
@@ -169,9 +171,11 @@
     "settings": {
       "userTableName": "users",
       "sessionTableName": "session",
+      "migrationTableName": "knex_migrations",
       "leagues": [],
       "reactMapHandlesPvp": false,
-      "pvpLevels": []
+      "pvpLevels": [],
+      "hideOldQuests": true
     },
     "schemas": {
       "scanner": {
@@ -183,6 +187,7 @@
         "database": "rdmdb",
         "charset": "utf8mb4",
         "arScanColumn": false,
+        "hasAltQuests": false,
         "useFor": []
       },
       "manual": {

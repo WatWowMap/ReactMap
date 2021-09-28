@@ -32,6 +32,10 @@ export default function PokemonPopup({
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
 
+  useEffect(() => {
+    Utility.analytics('Popup', `ID: ${pokemon.pokemon_id} IV: ${pokemon.iv}% PVP: #${pokemon.bestPvp}`, 'Pokemon')
+  }, [])
+
   return (
     <Grid
       container

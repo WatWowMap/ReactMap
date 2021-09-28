@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Dialog, useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@material-ui/styles'
 
+import Utility from '@services/Utility'
 import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
 import FloatingBtn from './FloatingBtn'
@@ -47,6 +48,7 @@ export default function Nav({
   }
 
   const toggleDialog = (open, category, type, filter) => (event) => {
+    Utility.analytics('Menu Toggle', `Open: ${open}`, `Category: ${category} Menu: ${type}`)
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }

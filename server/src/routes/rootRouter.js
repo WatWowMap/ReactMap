@@ -3,6 +3,8 @@ const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const cors = require('cors')
 const { NoSchemaIntrospectionCustomRule } = require('graphql')
+const fs = require('fs')
+const { default: center } = require('@turf/center')
 
 const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
@@ -44,6 +46,25 @@ if (config.discord.enabled) {
 rootRouter.get('/logout', (req, res) => {
   req.session.destroy()
   res.redirect('/')
+})
+
+rootRouter.get('/area/:area/:zoom?', (req, res) => {
+  const { area, zoom } = req.params
+  try {
+    const scanAreas = fs.existsSync('server/src/configs/areas.json')
+      ? JSON.parse(fs.readFileSync('server/src/configs/areas.json'))
+      : { features: [] }
+    if (scanAreas.features.length) {
+      const foundArea = scanAreas.features.find(a => a.properties.name.toLowerCase() === area.toLowerCase())
+      if (foundArea) {
+        const [lon, lat] = center(foundArea).geometry.coordinates
+        res.redirect(`/@/${lat}/${lon}/${zoom || 15}`)
+      }
+    }
+    res.redirect('/')
+  } catch (e) {
+    res.send(`Error navigating to ${area}`, e)
+  }
 })
 
 rootRouter.get('/settings', async (req, res) => {

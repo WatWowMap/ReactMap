@@ -5,7 +5,39 @@ const { pokemon: masterPkmn, items: masterItems, questRewardTypes } = require('.
 const fetchQuests = require('../services/api/fetchQuests')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { api: { searchResultsLimit } } = require('../services/config')
+const { api: { searchResultsLimit }, database: { schemas, settings } } = require('../services/config')
+
+const questProps = {
+  quest_type: true,
+  quest_timestamp: true,
+  quest_target: true,
+  quest_conditions: true,
+  quest_rewards: true,
+  quest_template: true,
+  quest_reward_type: true,
+  quest_item_id: true,
+  quest_pokemon_id: true,
+}
+const questPropsAlt = {}
+const madQuestProps = {
+  quest_form_id: true,
+  quest_costume_id: true,
+  quest_item_amount: true,
+  quest_task: true,
+  with_ar: true,
+  stardust_amount: true,
+}
+Object.keys(questProps).forEach(key => {
+  questPropsAlt[`alternative_${key}`] = true
+  madQuestProps[key] = true
+})
+const invasionProps = {
+  incident_expire_timestamp: true,
+  grunt_type: true,
+}
+const dbType = dbSelection('pokestop')
+const { hasAltQuests } = Object.values(schemas).find(schema => schema.useFor.includes('pokestop'))
+const altQuestCheck = hasAltQuests && dbType !== 'mad'
 
 class Pokestop extends Model {
   static get tableName() {
@@ -18,38 +50,37 @@ class Pokestop extends Model {
   }
 
   static async getAllPokestops(args, perms, isMad) {
-    const ts = Math.floor((new Date()).getTime() / 1000)
+    const date = new Date()
+    const tsMs = date.getTime()
+    const ts = Math.floor(tsMs / 1000)
+    const midnight = settings.hideOldQuests
+      ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
+      : 0
+
     const {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms, areaRestrictions,
     } = perms
     const {
-      onlyAllPokestops, onlyLures, onlyQuests, onlyInvasions, onlyArEligible,
+      onlyLures, onlyQuests, onlyInvasions, onlyArEligible, onlyAllPokestops,
     } = args.filters
 
     const query = this.query()
     if (isMad) {
       query.leftJoin('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
         .select([
+          '*',
           'pokestop_id AS id',
           'latitude AS lat',
           'longitude AS lon',
           'active_fort_modifier AS lure_id',
-          'name',
           'image AS url',
           'incident_grunt_type AS grunt_type',
           'is_ar_scan_eligible AS ar_scan_eligible',
-          'quest_type',
           'quest_stardust AS stardust_amount',
-          'quest_pokemon_id',
-          'quest_reward_type',
-          'quest_item_id',
-          'quest_item_amount',
-          'quest_target',
           'quest_condition AS quest_conditions',
           'quest_reward AS quest_rewards',
           'quest_pokemon_form_id AS quest_form_id',
           'quest_pokemon_costume_id AS quest_costume_id',
-          'quest_task',
           raw('UNIX_TIMESTAMP(last_modified)')
             .as('last_modified_timestamp'),
           raw('UNIX_TIMESTAMP(lure_expiration)')
@@ -58,6 +89,16 @@ class Pokestop extends Model {
             .as('updated'),
           raw('UNIX_TIMESTAMP(incident_expiration)')
             .as('incident_expire_timestamp'),
+        ])
+    }
+    if (dbType === 'chuck') {
+      query.join('incident', 'pokestop.id', 'incident.pokestop_id')
+        .select([
+          '*',
+          'pokestop.id AS id',
+          'incident.id AS incidentId',
+          raw('FLOOR(incident.expiration_ms / 1000) AS incident_expire_timestamp'),
+          'incident.character AS grunt_type',
         ])
     }
     query.whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
@@ -70,7 +111,8 @@ class Pokestop extends Model {
     // returns everything if all pokestops are on
     if (onlyAllPokestops && pokestopPerms) {
       const results = await query
-      return results.map(result => isMad ? this.parseMadRewards(result) : this.parseRewards(result))
+      const normalized = isMad ? this.mapMAD(results, ts) : this.mapRDM(results, ts)
+      return this.secondaryFilter(normalized, args.filters, isMad, midnight)
     }
 
     const stardust = []
@@ -103,38 +145,73 @@ class Pokestop extends Model {
         })
       }
       if (onlyQuests && questPerms) {
-        stops.orWhereIn('quest_item_id', items)
-          .orWhereIn('quest_pokemon_id', pokemon)
-        if (isMad) {
-          stops.orWhereIn('quest_stardust', stardust)
-        } else {
-          stardust.forEach(amount => {
-            stops.orWhere(dust => {
-              dust.where(raw(`json_extract(json_extract(quest_rewards, "$[*].info.amount"), "$[0]") = ${amount}`))
-                .andWhere('quest_reward_type', 3)
+        stops.orWhere(quest => {
+          quest.where('quest_timestamp', '>=', midnight)
+            .andWhere(questTypes => {
+              questTypes.orWhereIn('quest_item_id', items)
+                .orWhereIn('quest_pokemon_id', pokemon)
+              if (altQuestCheck) {
+                questTypes.orWhereIn('alternative_quest_item_id', items)
+                  .orWhereIn('alternative_quest_pokemon_id', pokemon)
+              }
+              if (isMad) {
+                questTypes.orWhereIn('quest_stardust', stardust)
+              } else {
+                stardust.forEach(amount => {
+                  questTypes.orWhere(dust => {
+                    dust.where('quest_reward_type', 3)
+                      .andWhere(raw(`json_extract(quest_rewards, "$[0].info.amount") = ${amount}`))
+                  })
+                  if (altQuestCheck) {
+                    questTypes.orWhere(altDust => {
+                      altDust.where('alternative_quest_reward_type', 3)
+                        .andWhere(raw(`json_extract(alternative_quest_rewards, "$[0].info.amount") = ${amount}`))
+                    })
+                  }
+                })
+              }
+              energy.forEach(megaEnergy => {
+                const [pokeId, amount] = megaEnergy.split('-')
+                questTypes.orWhere(mega => {
+                  mega.where('quest_reward_type', 12)
+                    .andWhere(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.pokemon_id") = ${pokeId}`))
+                    .andWhere(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.amount") = ${amount}`))
+                })
+                if (altQuestCheck) {
+                  questTypes.orWhere(altMega => {
+                    altMega.where('alternative_quest_reward_type', 12)
+                      .andWhere(raw(`json_extract(alternative_quest_rewards, "$[0].info.pokemon_id") = ${pokeId}`))
+                      .andWhere(raw(`json_extract(alternative_quest_rewards, "$[0].info.amount") = ${amount}`))
+                  })
+                }
+              })
+              candy.forEach(poke => {
+                questTypes.orWhere(candies => {
+                  candies.where('quest_reward_type', 4)
+                    .where(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'candy' : 'info'}.pokemon_id") = ${poke}`))
+                })
+                if (altQuestCheck) {
+                  questTypes.orWhere(altCandies => {
+                    altCandies.where('alternative_quest_reward_type', 4)
+                      .where(raw(`json_extract(alternative_quest_rewards, "$[0].info.pokemon_id") = ${poke}`))
+                  })
+                }
+              })
             })
-          })
-        }
-        energy.forEach(megaEnergy => {
-          const [pokeId, amount] = megaEnergy.split('-')
-          stops.orWhere(mega => {
-            mega.where(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.pokemon_id") = ${pokeId}`))
-              .andWhere('quest_reward_type', 12)
-              .andWhere(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.amount") = ${amount}`))
-          })
-        })
-        candy.forEach(poke => {
-          stops.orWhere(candies => {
-            candies.where(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'candy' : 'info'}.pokemon_id") = ${poke}`))
-              .andWhere('quest_reward_type', 4)
-          })
         })
       }
       if (onlyInvasions && invasionPerms) {
-        stops.orWhere(invasion => {
-          invasion.whereIn(isMad ? 'incident_grunt_type' : 'grunt_type', invasions)
-            .andWhere(isMad ? 'incident_expiration' : 'incident_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
-        })
+        if (dbType === 'chuck') {
+          stops.orWhere(invasion => {
+            invasion.whereIn('character', invasions)
+              .andWhere('expiration_ms', '>=', tsMs)
+          })
+        } else {
+          stops.orWhere(invasion => {
+            invasion.whereIn(isMad ? 'incident_grunt_type' : 'grunt_type', invasions)
+              .andWhere(isMad ? 'incident_expiration' : 'incident_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+          })
+        }
       }
       if (onlyArEligible && pokestopPerms) {
         stops.orWhere(ar => {
@@ -143,70 +220,144 @@ class Pokestop extends Model {
       }
     })
     const results = await query
+    const normalized = isMad ? this.mapMAD(results, ts) : this.mapRDM(results, ts)
+    return this.secondaryFilter(normalized, args.filters, isMad, midnight)
+  }
 
-    // filters and removes unwanted data
-    const secondaryFilter = queryResults => {
-      const { length } = queryResults
-      const filteredResults = new Set()
-      for (let i = 0; i < length; i += 1) {
-        const pokestop = queryResults[i]
-        if (isMad) {
-          this.parseMadRewards(pokestop)
-        } else {
-          this.parseRewards(pokestop)
-        }
-        const keyRef = [
-          {
-            filter: pokestop.quest_pokemon_id ? `${pokestop.quest_pokemon_id}-${pokestop.quest_form_id}` : undefined,
-            field: 'quest_pokemon_id',
-          },
-          {
-            filter: pokestop.quest_item_id ? `q${pokestop.quest_item_id}` : undefined,
-            field: 'quest_item_id',
-          },
-          {
-            filter: pokestop.mega_amount ? `m${pokestop.mega_pokemon_id}-${pokestop.mega_amount}` : undefined,
-            field: 'mega_amount',
-          },
-          {
-            filter: pokestop.incident_expire_timestamp ? `i${pokestop.grunt_type}` : undefined,
-            field: 'incident_expire_timestamp',
-          },
-          {
-            filter: pokestop.lure_expire_timestamp ? `l${pokestop.lure_id}` : undefined,
-            field: 'lure_expire_timestamp',
-          },
-          {
-            filter: pokestop.stardust_amount ? `d${pokestop.stardust_amount}` : undefined,
-            field: 'stardust_amount',
-          },
-          {
-            filter: pokestop.candy_pokemon_id ? `c${pokestop.candy_pokemon_id}` : undefined,
-            field: 'candy_pokemon_id',
-          },
-        ]
-        keyRef.forEach(category => {
-          if (args.filters[category.filter]
-            || (onlyArEligible && pokestop.ar_scan_eligible === 1)) {
-            keyRef.forEach(otherCategory => {
-              if (category.filter !== otherCategory.filter) {
-                if (!args.filters[otherCategory.filter]) {
-                  delete pokestop[otherCategory.field]
-                }
-              }
-            })
-            filteredResults.add(pokestop)
+  static fieldAssigner(target, source, fields) {
+    fields.forEach(field => (target[field] = source[field]))
+  }
+
+  // filters and removes unwanted data
+  static secondaryFilter(queryResults, filters, isMad, midnight) {
+    const filteredResults = []
+    for (let i = 0; i < queryResults.length; i += 1) {
+      const pokestop = queryResults[i]
+      const filtered = {}
+      const global = filters.onlyAllPokestops || (pokestop.ar_scan_eligible && filters.onlyArEligible)
+
+      this.fieldAssigner(filtered, pokestop, ['id', 'lat', 'lon', 'enabled', 'ar_scan_eligible', 'url', 'name', 'last_modified_timestamp', 'updated'])
+
+      if (global || filters.onlyInvasions) {
+        filtered.invasions = pokestop.invasions.filter(invasion => filters[`i${invasion.grunt_type}`])
+      }
+      if (global || (filters.onlyLures && filters[`l${pokestop.lure_id}`])) {
+        this.fieldAssigner(filtered, pokestop, ['lure_id', 'lure_expire_timestamp'])
+      }
+
+      if (global || filters.onlyQuests) {
+        filtered.quests = []
+        pokestop.quests.forEach(quest => {
+          if (quest.quest_reward_type) {
+            const newQuest = {}
+            if (isMad) {
+              this.parseMadRewards(quest)
+            } else {
+              this.parseRdmRewards(quest)
+            }
+            const fields = ['quest_type', 'quest_timestamp', 'quest_target', 'quest_conditions', 'quest_task', 'quest_reward_type', 'quest_rewards', 'with_ar']
+            switch (quest.quest_reward_type) {
+              case 2:
+                newQuest.key = `q${quest.quest_item_id}`
+                fields.push('quest_item_id', 'item_amount'); break
+              case 3:
+                newQuest.key = `d${quest.stardust_amount}`
+                fields.push('stardust_amount'); break
+              case 4:
+                newQuest.key = `c${quest.candy_pokemon_id}`
+                fields.push('candy_pokemon_id', 'candy_amount'); break
+              case 7:
+                newQuest.key = `${quest.quest_pokemon_id}-${quest.quest_form_id}`
+                fields.push('quest_pokemon_id', 'quest_form_id', 'quest_costume_id', 'quest_gender_id', 'quest_shiny'); break
+              case 12:
+                newQuest.key = `m${quest.mega_pokemon_id}-${quest.mega_amount}`
+                fields.push('mega_pokemon_id', 'mega_amount'); break
+              default:
+                newQuest.key = `u${quest.quest_reward_type}`
+            }
+            if (quest.quest_timestamp >= midnight && (global || filters[newQuest.key])) {
+              this.fieldAssigner(newQuest, quest, fields)
+              filtered.quests.push(newQuest)
+            }
           }
         })
       }
-      return filteredResults
+      filteredResults.push(filtered)
     }
-    return secondaryFilter(results)
+    return filteredResults
+  }
+
+  static mapMAD(queryResults, ts) {
+    const filtered = {}
+    for (let i = 0; i < queryResults.length; i += 1) {
+      const result = queryResults[i]
+      const quest = {}
+      const invasion = {}
+
+      if (filtered[result.id]) {
+        Object.keys(madQuestProps).forEach(field => (quest[field] = result[field]))
+      } else {
+        filtered[result.id] = { quests: [], invasions: [] }
+        Object.keys(result).forEach(field => {
+          if (madQuestProps[field]) {
+            quest[field] = result[field]
+          } else if (invasionProps[field]) {
+            invasion[field] = result[field]
+          } else {
+            filtered[result.id][field] = result[field]
+          }
+        })
+      }
+      if (invasion.grunt_type && invasion.incident_expire_timestamp >= ts) {
+        filtered[result.id].invasions.push(invasion)
+      }
+      filtered[result.id].quests.push(quest)
+    }
+    return Object.values(filtered)
+  }
+
+  static mapRDM(queryResults, ts) {
+    const filtered = {}
+    for (let i = 0; i < queryResults.length; i += 1) {
+      const result = queryResults[i]
+      const quest = { with_ar: true }
+      const altQuest = { with_ar: false }
+      const invasion = {}
+
+      if (filtered[result.id]) {
+        Object.keys(invasionProps).forEach(field => (
+          invasion[field] = result[field]
+        ))
+      } else {
+        filtered[result.id] = { invasions: [], quests: [] }
+        Object.keys(result).forEach(field => {
+          if (questProps[field]) {
+            quest[field] = result[field]
+          } else if (questPropsAlt[field]) {
+            altQuest[field.substring(12)] = result[field]
+          } else if (invasionProps[field]) {
+            invasion[field] = result[field]
+          } else {
+            filtered[result.id][field] = result[field]
+          }
+        })
+      }
+      if (quest.quest_reward_type) {
+        filtered[result.id].quests.push(quest)
+      }
+      if (altQuest.quest_reward_type) {
+        filtered[result.id].quests.push(altQuest)
+      }
+      if (invasion.grunt_type && invasion.incident_expire_timestamp >= ts) {
+        filtered[result.id].invasions.push(invasion)
+      }
+    }
+    return Object.values(filtered)
   }
 
   static async getAvailableQuests(isMad) {
     const ts = Math.floor((new Date()).getTime() / 1000)
-    const finalList = []
+    const finalList = new Set()
     const quests = {}
     const stops = {}
     quests.items = await this.query()
@@ -214,20 +365,36 @@ class Pokestop extends Model {
       .from(isMad ? 'trs_quest' : 'pokestop')
       .where('quest_reward_type', 2)
       .groupBy('quest_item_id')
-      .orderBy('quest_item_id')
+    if (altQuestCheck) {
+      quests.items = [
+        ...quests.items,
+        ...await this.query()
+          .select('alternative_quest_item_id AS quest_item_id')
+          .from('pokestop')
+          .where('alternative_quest_reward_type', 2)
+          .groupBy('alternative_quest_item_id'),
+      ]
+    }
     if (isMad) {
       quests.stardust = await this.query()
         .select('quest_stardust AS amount')
         .from('trs_quest')
         .where('quest_stardust', '>', 0)
         .groupBy('amount')
-        .orderBy('amount')
     } else {
       quests.stardust = await this.query()
         .distinct(raw('json_extract(quest_rewards, "$[0].info.amount")')
           .as('amount'))
         .where('quest_reward_type', 3)
-        .orderBy('amount')
+      if (altQuestCheck) {
+        quests.stardust = [
+          ...quests.stardust,
+          ...await this.query()
+            .distinct(raw('json_extract(alternative_quest_rewards, "$[0].info.amount")')
+              .as('amount'))
+            .where('alternative_quest_reward_type', 3),
+        ]
+      }
     }
     quests.mega = await this.query()
       .distinct(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.pokemon_id")`)
@@ -236,38 +403,65 @@ class Pokestop extends Model {
         .as('amount'))
       .from(isMad ? 'trs_quest' : 'pokestop')
       .where('quest_reward_type', 12)
-      .orderBy('id', 'asc')
+    if (altQuestCheck) {
+      quests.mega = [
+        ...quests.mega,
+        ...await this.query()
+          .distinct(raw('json_extract(alternative_quest_rewards, "$[0].info.pokemon_id")')
+            .as('id'))
+          .distinct(raw('json_extract(alternative_quest_rewards, "$[0].info.amount")')
+            .as('amount'))
+          .from('pokestop')
+          .where('alternative_quest_reward_type', 12),
+      ]
+    }
     quests.candy = await this.query()
       .distinct(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'candy' : 'info'}.pokemon_id")`)
         .as('id'))
       .from(isMad ? 'trs_quest' : 'pokestop')
       .where('quest_reward_type', 4)
-      .orderBy('id', 'asc')
+    if (altQuestCheck) {
+      quests.candy = [
+        ...quests.candy,
+        ...await this.query()
+          .distinct(raw('json_extract(alternative_quest_rewards, "$[0].info.pokemon_id")')
+            .as('id'))
+          .from('pokestop')
+          .where('alternative_quest_reward_type', 4),
+      ]
+    }
     if (isMad) {
       quests.pokemon = await this.query()
         .select('quest_pokemon_id', 'quest_pokemon_form_id AS form')
         .from('trs_quest')
         .where('quest_reward_type', 7)
         .groupBy('quest_pokemon_id', 'quest_pokemon_form_id')
-        .orderBy('quest_pokemon_id')
     } else {
       quests.pokemon = await this.query()
         .distinct('quest_pokemon_id')
         .select(raw('json_extract(quest_rewards, "$[0].info.form_id")')
           .as('form'))
         .where('quest_reward_type', 7)
-        .orderBy('quest_pokemon_id')
+      if (altQuestCheck) {
+        quests.pokemon = [
+          ...quests.pokemon,
+          ...await this.query()
+            .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
+            .select(raw('json_extract(alternative_quest_rewards, "$[0].info.form_id")')
+              .as('form'))
+            .where('alternative_quest_reward_type', 7),
+        ]
+      }
     }
 
-    Object.entries(quests).forEach(questType => {
-      const [type, rewards] = questType
+    Object.entries(quests).forEach(([type, rewards]) => {
       switch (type) {
-        default: rewards.forEach(reward => finalList.push(`${reward.quest_pokemon_id}-${reward.form}`)); break
-        case 'items': rewards.forEach(reward => finalList.push(`q${reward.quest_item_id}`)); break
-        case 'mega': rewards.forEach(reward => finalList.push(`m${reward.id}-${reward.amount}`)); break
-        case 'invasions': rewards.forEach(reward => finalList.push(`i${reward.grunt_type}`)); break
-        case 'stardust': rewards.forEach(reward => finalList.push(`d${reward.amount}`)); break
-        case 'candy': rewards.forEach(reward => finalList.push(`c${reward.id}`)); break
+        default: rewards.forEach(reward => finalList.add(`${reward.quest_pokemon_id}-${reward.form}`)); break
+        case 'items': rewards.forEach(reward => finalList.add(`q${reward.quest_item_id}`)); break
+        case 'mega': rewards.forEach(reward => finalList.add(`m${reward.id}-${reward.amount}`)); break
+        case 'invasions': rewards.forEach(reward => finalList.add(`i${reward.grunt_type}`)); break
+        case 'stardust': rewards.forEach(reward => finalList.add(`d${reward.amount}`)); break
+        case 'candy': rewards.forEach(reward => finalList.add(`c${reward.id}`)); break
       }
     })
 
@@ -289,39 +483,39 @@ class Pokestop extends Model {
     Object.entries(stops).forEach(stopType => {
       const [type, rewards] = stopType
       switch (type) {
-        default: rewards.forEach(reward => finalList.push(`i${reward.grunt_type}`)); break
-        case 'lures': rewards.forEach(reward => finalList.push(`l${reward.lure_id}`)); break
+        default: rewards.forEach(reward => finalList.add(`i${reward.grunt_type}`)); break
+        case 'lures': rewards.forEach(reward => finalList.add(`l${reward.lure_id}`)); break
       }
     })
-    return finalList
+    return [...finalList]
   }
 
-  static parseRewards = pokestop => {
-    if (pokestop.quest_reward_type) {
-      const { info } = JSON.parse(pokestop.quest_rewards)[0]
-      switch (pokestop.quest_reward_type) {
-        default: return pokestop
-        case 2: Object.keys(info).forEach(x => (pokestop[`item_${x}`] = info[x])); break
-        case 3: Object.keys(info).forEach(x => (pokestop[`stardust_${x}`] = info[x])); break
-        case 4: Object.keys(info).forEach(x => (pokestop[`candy_${x}`] = info[x])); break
-        case 7: Object.keys(info).forEach(x => (pokestop[`quest_${x}`] = info[x])); break
-        case 12: Object.keys(info).forEach(x => (pokestop[`mega_${x}`] = info[x])); break
+  static parseRdmRewards = (quest) => {
+    if (quest.quest_reward_type) {
+      const { info } = JSON.parse(quest.quest_rewards)[0]
+      switch (quest.quest_reward_type) {
+        case 2: Object.keys(info).forEach(x => (quest[`item_${x}`] = info[x])); break
+        case 3: Object.keys(info).forEach(x => (quest[`stardust_${x}`] = info[x])); break
+        case 4: Object.keys(info).forEach(x => (quest[`candy_${x}`] = info[x])); break
+        case 7: Object.keys(info).forEach(x => (quest[`quest_${x}`] = info[x])); break
+        case 12: Object.keys(info).forEach(x => (quest[`mega_${x}`] = info[x])); break
+        default: break
       }
     }
-    return pokestop
+    return quest
   }
 
-  static parseMadRewards = (pokestop) => {
-    if (pokestop.quest_reward_type) {
-      const { item, candy, mega_resource } = JSON.parse(pokestop.quest_rewards)[0]
-      switch (pokestop.quest_reward_type) {
-        default: return pokestop
-        case 2: Object.keys(item).forEach(x => (pokestop[`item_${x}`] = item[x])); break
-        case 4: Object.keys(candy).forEach(x => (pokestop[`candy_${x}`] = candy[x])); break
-        case 12: Object.keys(mega_resource).forEach(x => (pokestop[`mega_${x}`] = mega_resource[x])); break
+  static parseMadRewards = (quest) => {
+    if (quest.quest_reward_type) {
+      const { item, candy, mega_resource } = JSON.parse(quest.quest_rewards)[0]
+      switch (quest.quest_reward_type) {
+        case 2: Object.keys(item).forEach(x => (quest[`item_${x}`] = item[x])); break
+        case 4: Object.keys(candy).forEach(x => (quest[`candy_${x}`] = candy[x])); break
+        case 12: Object.keys(mega_resource).forEach(x => (quest[`mega_${x}`] = mega_resource[x])); break
+        default: break
       }
     }
-    return pokestop
+    return quest
   }
 
   static async search(args, perms, isMad, distance) {
@@ -365,7 +559,6 @@ class Pokestop extends Model {
         'quest_pokemon_id',
         'quest_item_id',
         'quest_reward_type',
-        'quest_reward_type',
         distance,
       ])
       .whereIn('quest_pokemon_id', pokemonIds)
@@ -373,23 +566,30 @@ class Pokestop extends Model {
       .orWhereIn('quest_reward_type', rewardTypes)
       .limit(searchResultsLimit)
       .orderBy('distance')
+    if (altQuestCheck) {
+      query.select('alternative_quest_rewards')
+    }
     if (isMad) {
       query.leftJoin('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
         .select([
           'quest_stardust AS stardust_amount',
           'quest_pokemon_form_id AS quest_form_id',
         ])
-    } else if (pokemonIds.length > 0) {
+    } else if (pokemonIds.length) {
       pokemonIds.forEach(pkmn => {
         query.orWhere(raw(`json_extract(quest_rewards, "$[0].info.pokemon_id") = ${pkmn}`))
           .whereIn('quest_reward_type', [4, 12])
+        if (altQuestCheck) {
+          query.orWhere(raw(`json_extract(alternative_quest_rewards, "$[0].info.pokemon_id") = ${pkmn}`))
+            .whereIn('alternative_quest_reward_type', [4, 12])
+        }
       })
     }
     if (perms.areaRestrictions.length > 0) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     const results = await query
-    return results.map(result => isMad ? this.parseMadRewards(result) : this.parseRewards(result))
+    return results.map(result => isMad ? this.parseMadRewards(result) : this.parseRdmRewards(result))
   }
 }
 

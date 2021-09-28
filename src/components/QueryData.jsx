@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/client'
+
+import Utility from '@services/Utility'
 import Query from '@services/Query'
 import RobustTimeout from '@classes/RobustTimeout'
 import Clustering from './Clustering'
@@ -25,6 +27,7 @@ export default function QueryData({
   category, available, filters, staticFilters, staticUserSettings,
   userSettings, perms, Icons, userIcons,
 }) {
+  Utility.analytics('Data', `${category} being fetched`, category, true)
   const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
 
   const trimFilters = useCallback(requestedFilters => {
@@ -50,7 +53,7 @@ export default function QueryData({
       if (specifics && specifics.enabled && staticFilters[id]) {
         if (withAvailableList.includes(category)
           && !Number.isNaN(parseInt(id.charAt(0)))) {
-          if (available.includes(id)) {
+          if (available?.includes(id)) {
             trimmed[id] = specifics
           }
         } else {

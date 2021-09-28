@@ -7,7 +7,7 @@ export default class UIcons {
     this.customizable = customizable
     this.sizes = iconSizes
     this.selected = {}
-    this.questRewardTypes = questRewardTypes
+    this.questRewardTypes = {}
     this.modifiers = {
       base: {
         offsetX: 1,
@@ -15,6 +15,9 @@ export default class UIcons {
         sizeMultiplier: 1,
       },
     }
+    Object.entries(questRewardTypes).forEach(([id, category]) => (
+      this.questRewardTypes[id] = category.toLowerCase().replace(' ', '_')
+    ))
   }
 
   async fetchIcons(icons) {
@@ -156,13 +159,15 @@ export default class UIcons {
   }
 
   getRewards(rewardType, id, amount) {
-    const category = this.questRewardTypes[rewardType].toLowerCase().replace(' ', '_')
+    const category = this.questRewardTypes[rewardType] || 'unset'
     const baseUrl = `${this[this.selected.reward].path}/reward/${category}`
-    const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
-    for (const aSuffix of amountSuffixes) {
-      const result = `${id}${aSuffix}.png`
-      if (this[this.selected.reward][category].has(result)) {
-        return `${baseUrl}/${result}`
+    if (this[this.selected.reward][category]) {
+      const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
+      for (const aSuffix of amountSuffixes) {
+        const result = `${id}${aSuffix}.png`
+        if (this[this.selected.reward][category].has(result)) {
+          return `${baseUrl}/${result}`
+        }
       }
     }
     return `${baseUrl}/0.png`

@@ -370,7 +370,7 @@
   "popupGymDescriptionWidth": 5,
   "popupPokemonSeenDataWidth": 6,
   "popupPokemonSeenDescriptionWidth": 5,
-  "popupPokestopSeenDataWidth": 7,
+  "popupPokestopSeenDataWidth": 12,
   "popupPokestopSeenDescriptionWidth": 5,
   "onlyShowingAvailable": "Only Showing Available",
   "showDexNumInPopup": "Show Pokedex # in Popup",
@@ -410,5 +410,13 @@
   "selectProfile": "Select Profile",
   "distanceRadius": "Preview Radius Distances",
   "areas": "Areas",
-  "selectWebhook": "Select Bot"
+  "selectWebhook": "Select Bot",
+  "arQuest_true": "AR Task",
+  "arQuest_false": "No AR",
+  "excludeQuestMulti": "Exclude {{reward}}",
+  "popupPokestopSeenTimerWidth": 7,
+  "clusterLimit_0": "{{variable_0}} limit ({{variable_1}}) has been hit",
+  "clusterLimit_1": "Please zoom in or narrow your filters",
+  "showPolygons": "Show Polygons",
+  "excludeInvasionMulti": "Exclude {{invasion}}"
 }

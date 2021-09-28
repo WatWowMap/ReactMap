@@ -19,6 +19,7 @@ import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
 export default function UserProfile({ setUserProfile }) {
+  Utility.analytics('/user-profile')
   const classes = useStyles()
   const { t } = useTranslation()
   const { perms } = useStatic(state => state.auth)
