@@ -187,6 +187,7 @@
         "database": "rdmdb",
         "charset": "utf8mb4",
         "arScanColumn": false,
+        "hasAltQuests": false,
         "useFor": []
       },
       "manual": {
