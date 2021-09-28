@@ -322,7 +322,7 @@ class Pokestop extends Model {
           invasion[field] = result[field]
         ))
       } else {
-        filtered[result.id] = { invasions: [] }
+        filtered[result.id] = { invasions: [], quests: [] }
         Object.keys(result).forEach(field => {
           if (questProps[field]) {
             quest[field] = result[field]
@@ -335,10 +335,15 @@ class Pokestop extends Model {
           }
         })
       }
+      if (quest.quest_reward_type) {
+        filtered[result.id].quests.push(quest)
+      }
+      if (altQuest.quest_reward_type) {
+        filtered[result.id].quests.push(altQuest)
+      }
       if (invasion.grunt_type && invasion.incident_expire_timestamp >= ts) {
         filtered[result.id].invasions.push(invasion)
       }
-      filtered[result.id].quests = [quest, altQuest].filter(q => Object.keys(q).length > 1)
     }
     return Object.values(filtered)
   }
