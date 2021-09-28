@@ -103,7 +103,7 @@ export default function QueryData({
   const renderedData = data || previousData
   return (
     <>
-      {renderedData && (
+      {Boolean(renderedData) && (
         <Clustering
           renderedData={renderedData[category]}
           zoomLevel={zoomLevel}

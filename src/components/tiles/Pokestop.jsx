@@ -16,14 +16,11 @@ const PokestopTile = ({
   const markerRefs = useRef({})
 
   const {
-    grunt_type, incident_expire_timestamp, lure_expire_timestamp, ar_scan_eligible, quests,
+    lure_expire_timestamp, ar_scan_eligible, quests, invasions,
   } = item
 
   const hasLure = lure_expire_timestamp >= ts
-
-  const hasInvasion = incident_expire_timestamp >= ts
-    && !excludeList.includes(`i${grunt_type}`)
-
+  const hasInvasion = invasions && invasions.some(invasion => !excludeList.includes(`i${invasion.grunt_type}`))
   const hasQuest = quests && quests.some(quest => !excludeList.includes(quest.key))
 
   useEffect(() => {
@@ -36,7 +33,7 @@ const PokestopTile = ({
 
   return (
     <>
-      {(((hasQuest && perms.quests)
+      {Boolean(((hasQuest && perms.quests)
         || (hasLure && perms.lures)
         || (hasInvasion && perms.invasions))
         || ((filters.allPokestops || ar_scan_eligible) && perms.allPokestops))
@@ -97,13 +94,18 @@ const PokestopTile = ({
 const areEqual = (prev, next) => (
   prev.item.id === next.item.id
   && prev.item.lure_expire_timestamp === next.item.lure_expire_timestamp
-  && prev.item.incident_expire_timestamp === next.item.incident_expire_timestamp
-  && Boolean(prev.item.quests) === Boolean(next.item.quests)
+  && prev.item.quests?.length === next.item.quests?.length
+  && prev.item.invasions?.length === next.item.invasions?.length
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
   && Object.keys(prev.userIcons).every(key => prev.userIcons[key] === next.userIcons[key])
   && Object.keys(prev.userSettings).every(key => prev.userSettings[key] === next.userSettings[key])
-  && (prev.item.quests ? !prev.item.quests.some(quest => next.excludeList.includes(quest.key)) : true)
+  && (prev.item.quests
+    ? !prev.item.quests.some(quest => next.excludeList.includes(quest.key))
+    : true)
+  && (prev.item.invasions
+    ? !prev.item.invasions.some(invasion => next.excludeList.includes(invasion.grunt_type))
+    : true)
   && prev.showCircles === next.showCircles
 )
 

@@ -60,7 +60,7 @@ export default function Clustering({
   return limitHit || (zoomLevel && userSettings.clustering) ? (
     <>
       <MarkerClusterGroup
-        key={map.getZoom()}
+        key={`${limitHit}-${userSettings.clustering}-${category}`}
         disableClusteringAtZoom={limitHit ? 20 : zoomLevel}
         chunkedLoading
       >

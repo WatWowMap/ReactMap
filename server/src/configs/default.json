@@ -5,6 +5,7 @@
   "devOptions": {
     "enabled": false,
     "graphiql": false,
+    "queryDebug": false,
     "clientPath": "../../dist"
   },
   "api": {
@@ -173,7 +174,8 @@
       "migrationTableName": "knex_migrations",
       "leagues": [],
       "reactMapHandlesPvp": false,
-      "pvpLevels": []
+      "pvpLevels": [],
+      "hideOldQuests": true
     },
     "schemas": {
       "scanner": {
@@ -185,6 +187,7 @@
         "database": "rdmdb",
         "charset": "utf8mb4",
         "arScanColumn": false,
+        "hasAltQuests": false,
         "useFor": []
       },
       "manual": {

@@ -48,8 +48,10 @@ const quest = gql`
 
 const invasion = gql`
   fragment Invasion on Pokestop {
-    incident_expire_timestamp
-    grunt_type
+    invasions {
+      incident_expire_timestamp
+      grunt_type
+    }
   }
 `
 
