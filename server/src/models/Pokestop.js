@@ -5,7 +5,7 @@ const { pokemon: masterPkmn, items: masterItems, questRewardTypes } = require('.
 const fetchQuests = require('../services/functions/fetchQuests')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { api: { searchResultsLimit }, database: { schemas } } = require('../services/config')
+const { api: { searchResultsLimit }, database: { schemas, settings } } = require('../services/config')
 
 const questProps = {
   quest_type: true,
@@ -52,7 +52,9 @@ class Pokestop extends Model {
     const date = new Date()
     const tsMs = date.getTime()
     const ts = Math.floor(tsMs / 1000)
-    const midnight = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
+    const midnight = settings.hideOldQuests
+      ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
+      : 0
 
     const {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms, areaRestrictions,
@@ -108,8 +110,8 @@ class Pokestop extends Model {
     // returns everything if all pokestops are on
     if (onlyAllPokestops && pokestopPerms) {
       const results = await query
-      const normalized = isMad ? this.mapMAD(results) : this.mapRDM(results)
-      return this.secondaryFilter(normalized, args.filters, isMad)
+      const normalized = isMad ? this.mapMAD(results, ts) : this.mapRDM(results, ts)
+      return this.secondaryFilter(normalized, args.filters, isMad, midnight)
     }
 
     const stardust = []

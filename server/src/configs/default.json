@@ -174,7 +174,8 @@
       "migrationTableName": "knex_migrations",
       "leagues": [],
       "reactMapHandlesPvp": false,
-      "pvpLevels": []
+      "pvpLevels": [],
+      "hideOldQuests": true
     },
     "schemas": {
       "scanner": {
