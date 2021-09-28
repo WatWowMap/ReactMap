@@ -291,7 +291,7 @@ const RewardInfo = ({
 
   return (
     <Grid item xs={3} style={{ textAlign: 'center' }}>
-      <img src={getImage()} className="quest-popup-img" />,
+      <img src={getImage()} className="quest-popup-img" />
       <Typography variant="caption" className="ar-task" noWrap>
         {config.questMessage ? config.questMessage : t(`arQuest_${Boolean(with_ar)}`)}
       </Typography>
