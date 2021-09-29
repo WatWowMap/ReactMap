@@ -372,5 +372,6 @@
   "popupPokestopSeenTimerWidth": 7,
   "clusterLimit_0": "{{variable_0}} limit ({{variable_1}}) został osiągnięty",
   "clusterLimit_1": "Proszę przybliż lub zawęź swoje filtry",
-  "showPolygons": "Pokaż Obszary"
+  "showPolygons": "Pokaż Obszary",
+  "excludeInvasionMulti": "Wyklucz {{invasion}}"
 }
