@@ -100,7 +100,7 @@ class Pokemon extends Model {
       const rankCheck = pkmn.rank <= max && pkmn.rank >= min
       const cpCheck = dbType === 'chuck' || reactMapHandlesPvp || pkmn.cp >= pvpMinCp[league]
       const megaCheck = !pkmn.evolution || onlyPvpMega
-      const capCheck = pkmn.capped || args.filters[`onlyPvp${pkmn.cap}`]
+      const capCheck = dbType === 'chuck' || reactMapHandlesPvp ? pkmn.capped || args.filters[`onlyPvp${pkmn.cap}`] : true
       return rankCheck && cpCheck && megaCheck && capCheck
     }
 
