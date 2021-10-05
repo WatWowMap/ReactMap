@@ -46,7 +46,7 @@ const PokestopTile = ({
               }
             }}
             position={[item.lat, item.lon]}
-            icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, Icons)}
+            icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, Icons, userSettings)}
           >
             <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
               <PopupContent

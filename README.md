@@ -215,7 +215,8 @@ ReactMap supports multiple domain config options. Under the "multiDomain" object
 ## Using the .env File
 - From the root of the directory `cp example.env .env`
 - `nano .env`
-- If you want to use Google Analytics, you can add your ID here. Only use debug mode during development.
+- If you want to use Google Analytics, you can add your ID here. 
+- If you want to use debug mode, add "ANALYTICS_DEBUG_MODE=true" to your `.env`. Only use debug mode during development.
 - You can also set a title for the map if you want it to load it up a bit faster compared to the default Map title.
 
 ## Credits

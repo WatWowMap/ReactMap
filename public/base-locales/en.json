@@ -384,5 +384,6 @@
   "clusterLimit_0": "{{variable_0}} limit ({{variable_1}}) has been hit",
   "clusterLimit_1": "Please zoom in or narrow your filters",
   "showPolygons": "Show Polygons",
-  "excludeInvasionMulti": "Exclude {{invasion}}"
+  "excludeInvasionMulti": "Exclude {{invasion}}",
+  "hasQuestIndicator": "Alternative Color for Stops with Quests"
 }
