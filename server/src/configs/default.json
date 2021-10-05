@@ -82,7 +82,8 @@
       "invasionTimers": false,
       "lureTimers": false,
       "interactionRanges": false,
-      "madQuestText": false
+      "madQuestText": false,
+      "hasQuestIndicator": true
     },
     "pokemon": {
       "clustering": true,
