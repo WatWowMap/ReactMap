@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import Help from '../tutorial/Advanced'
 
 export default function Footer({
-  selectAllOrNone, toggleDialog, tempFilters, toggleDrawer, isMobile, toggleAdvMenu, type,
+  selectAllOrNone, toggleDialog, tempFilters, toggleDrawer, isMobile, toggleAdvMenu, type, webhook,
 }) {
   const [helpDialog, setHelpDialog] = useState(false)
   const { t } = useTranslation()
@@ -116,14 +116,14 @@ export default function Footer({
     key: 'save',
     icon: (
       <IconButton
-        onClick={toggleDialog(false, type, 'filters', tempFilters)}
+        onClick={webhook ? toggleDialog : toggleDialog(false, type, 'filters', tempFilters)}
       >
         <Save color="secondary" />
       </IconButton>
     ),
     text: (
       <Button
-        onClick={toggleDialog(false, type, 'filters', tempFilters)}
+        onClick={webhook ? toggleDialog : toggleDialog(false, type, 'filters', tempFilters)}
         color="secondary"
       >
         <Typography

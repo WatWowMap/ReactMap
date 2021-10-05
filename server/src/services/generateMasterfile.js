@@ -23,7 +23,7 @@ const getRarityLevel = (id, pkmn) => {
     }
   }
   if (pkmn.legendary) rarity = 'legendary'
-  if (pkmn.mythic) rarity = 'mythical'
+  if (pkmn.mythical) rarity = 'mythical'
   return rarity
 }
 
@@ -34,6 +34,8 @@ module.exports.generate = async function generate() {
     Object.values(masterfile.pokemon).forEach(pokemon => {
       pokemon.rarity = getRarityLevel(pokemon.pokedexId, pokemon)
       pokemon.types = pokemon.types || []
+      delete pokemon.mythical
+      delete pokemon.legendary
     })
 
     fs.writeFile(

@@ -4,7 +4,6 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
-  Grid,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -21,32 +20,30 @@ export default function FilterOptions({
   const { t } = useTranslation()
   const classes = useStyles()
   return (
-    <Grid item>
-      <Accordion expanded={expanded === name} onChange={handleAccordion(name)}>
-        <AccordionSummary
-          expandIcon={<ExpandMore style={{ color: 'white' }} />}
-        >
-          <Typography className={classes.heading}>
-            {t(name)}
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <FormControl component="fieldset" className={classes.formControl}>
-            <FormGroup>
-              {Object.keys(options).map(key => (
-                <FormControlLabel
-                  key={key}
-                  control={
-                    <Checkbox checked={userSelection[key]} onChange={(e) => handleChange(name, e)} name={key} />
-                    }
-                  value={key}
-                  label={t(key)}
-                />
-              ))}
-            </FormGroup>
-          </FormControl>
-        </AccordionDetails>
-      </Accordion>
-    </Grid>
+    <Accordion expanded={expanded === name} onChange={handleAccordion(name)}>
+      <AccordionSummary
+        expandIcon={<ExpandMore style={{ color: 'white' }} />}
+      >
+        <Typography className={classes.heading}>
+          {t(name)}
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <FormControl component="fieldset" className={classes.formControl}>
+          <FormGroup>
+            {Object.keys(options).map(key => (
+              <FormControlLabel
+                key={key}
+                control={
+                  <Checkbox checked={userSelection[key]} onChange={(e) => handleChange(name, e)} name={key} />
+                }
+                value={key}
+                label={t(key)}
+              />
+            ))}
+          </FormGroup>
+        </FormControl>
+      </AccordionDetails>
+    </Accordion>
   )
 }

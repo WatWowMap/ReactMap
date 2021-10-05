@@ -17,6 +17,7 @@ export default function Main({
   const theme = useTheme()
   const classes = useStyles()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
+  const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
 
   const [selectedAreas, setSelectedAreas] = useState([])
   const [webhookLocation, setWebhookLocation] = useState([])
@@ -40,6 +41,7 @@ export default function Main({
         <Manage
           map={map}
           isMobile={isMobile}
+          isTablet={isTablet}
           Icons={Icons}
           webhookMode={webhookMode}
           setWebhookMode={setWebhookMode}

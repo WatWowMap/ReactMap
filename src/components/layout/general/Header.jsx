@@ -1,17 +1,20 @@
 import React from 'react'
 import { IconButton, DialogTitle } from '@material-ui/core'
 import { Clear } from '@material-ui/icons'
-import { Trans } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import useStyles from '@hooks/useStyles'
 
-export default function Header({ name, action }) {
+export default function Header({ name, title, action }) {
   const classes = useStyles()
+  const { t } = useTranslation()
 
   return (
     <DialogTitle className={classes.filterHeader}>
-      <Trans i18nKey="manageWebhook">
-        {{ name }}
-      </Trans>
+      {name ? (
+        <Trans i18nKey={title}>
+          {{ name }}
+        </Trans>
+      ) : t(title)}
       <IconButton
         onClick={action}
         style={{ position: 'absolute', right: 5, top: 5 }}

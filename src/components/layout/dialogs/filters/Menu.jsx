@@ -2,45 +2,36 @@ import React, { useState } from 'react'
 import {
   Dialog,
   DialogContent,
-  DialogTitle,
   Drawer,
   Grid,
-  Button,
-  Paper,
-  InputBase,
-  IconButton,
-  Typography,
-  useMediaQuery,
 } from '@material-ui/core'
-import { HighlightOff, Clear } from '@material-ui/icons'
-import { FixedSizeGrid } from 'react-window'
-import AutoSizer from 'react-virtualized-auto-sizer'
 import { useTranslation } from 'react-i18next'
-import { useTheme } from '@material-ui/styles'
 
 import Utility from '@services/Utility'
-import { useStore, useStatic } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
+import { useStore } from '@hooks/useStore'
+
+import ReactWindow from '@components/layout/general/ReactWindow'
+import Header from '@components/layout/general/Header'
+import Footer from '@components/layout/general/Footer'
 import Advanced from './Advanced'
 import Tile from './MenuTile'
-import FilterOptions from './Options'
-import Footer from './Footer'
 import SlotSelection from './SlotSelection'
+import OptionsContainer from './OptionsContainer'
+import Help from '../tutorial/Advanced'
 
-export default function Menu({ filters, toggleDialog, category }) {
+export default function Menu({
+  filters, toggleDialog, category, isTablet, isMobile, webhook = false, WebhookTile,
+}) {
   Utility.analytics(`/advanced/${category}`)
 
-  const classes = useStyles()
-  const theme = useTheme()
   const menus = useStore(state => state.menus)
   const setMenus = useStore(state => state.setMenus)
   const advMenu = useStore(state => state.advMenu)
   const setAdvMenu = useStore(state => state.setAdvMenu)
-  const { [category]: staticMenus } = useStatic(state => state.menus)
+
   const { t } = useTranslation()
 
-  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
-  let columnCount = window.matchMedia('(max-width: 960px)') ? 5 : 3
+  let columnCount = isTablet ? 3 : 5
   if (isMobile) columnCount = 1
 
   const [filterDrawer, setFilterDrawer] = useState(false)
@@ -56,15 +47,9 @@ export default function Menu({ filters, toggleDialog, category }) {
     id: 0,
   })
   const [search, setSearch] = useState('')
+  const [helpDialog, setHelpDialog] = useState(false)
 
   const { filteredObj, filteredArr, count } = Utility.menuFilter(tempFilters, menus, search, category)
-
-  const handleAccordion = (panel) => (event, isExpanded) => {
-    setAdvMenu({
-      ...advMenu,
-      [category]: isExpanded ? panel : false,
-    })
-  }
 
   const generateSlots = (teamId, show) => {
     for (let i = 1; i <= 6; i += 1) {
@@ -85,30 +70,6 @@ export default function Menu({ filters, toggleDialog, category }) {
     setTempFilters({ ...tempFilters, ...filteredObj })
   }
 
-  const handleChange = (name, event) => {
-    Utility.analytics('Filtering Options', `New Value: ${event.target.checked}`, `Category: ${category} Name: ${name}.${event.target.name}`)
-    setMenus({
-      ...menus,
-      [category]: {
-        ...menus[category],
-        filters: {
-          ...menus[category].filters,
-          [name]: {
-            ...menus[category].filters[name],
-            [event.target.name]: event.target.checked,
-          },
-        },
-      },
-    })
-  }
-
-  const handleSearchChange = event => {
-    setSearch(event.target.value.toString().toLowerCase())
-  }
-
-  const resetSearch = () => {
-    setSearch('')
-  }
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
@@ -173,45 +134,71 @@ export default function Menu({ filters, toggleDialog, category }) {
     setMenus({ ...menus, [category]: { ...menus[category], filters: resetPayload } })
   }
 
-  const allFilterMenus = Object.entries(staticMenus.filters).map(filter => {
-    const [cat, options] = filter
-    if (Object.keys(options).length > 1) {
-      return (
-        <FilterOptions
-          key={cat}
-          name={cat}
-          options={options}
-          userSelection={menus[category].filters[cat]}
-          handleChange={handleChange}
-          expanded={advMenu[category]}
-          handleAccordion={handleAccordion}
-        />
-      )
-    }
-    return null
-  })
-  allFilterMenus.push(
-    <Grid item key="reset">
-      <Button onClick={handleReset} color="primary">
-        {t('resetFilters')}
-      </Button>
-    </Grid>,
-    <Grid item key="count" style={{ textAlign: 'center' }}>
-      <Typography variant="h6" align="center">{t('showing')}:</Typography>
-      <Typography variant="subtitle2" align="center">{count.show}/{count.total}</Typography>
-    </Grid>,
+  const Options = (
+    <OptionsContainer
+      count={count}
+      category={category}
+      Utility={Utility}
+      handleReset={handleReset}
+      advMenu={advMenu}
+      setAdvMenu={setAdvMenu}
+      search={search}
+      setSearch={setSearch}
+      menus={menus}
+      setMenus={setMenus}
+    />
   )
 
-  if (menus[category].filters.others.onlyAvailable) {
-    allFilterMenus.push(
-      <Grid item key="onlyAvailable">
-        <Typography variant="caption" align="center">{t('onlyShowingAvailable')}</Typography>
-      </Grid>,
-    )
-  }
-
+  const footerButtons = [
+    { name: 'help', action: () => setHelpDialog(!helpDialog), icon: 'HelpOutline', color: 'white' },
+    { name: 'openFilter', action: toggleDrawer(true), icon: 'Ballot', color: 'white', mobileOnly: true },
+    { name: 'applyToAll', action: toggleAdvMenu(true, 'global'), icon: category === 'pokemon' ? 'Tune' : 'FormatSize', color: 'white' },
+    { name: 'disableAll', action: () => selectAllOrNone(false), icon: 'Clear', color: 'primary' },
+    { name: 'enableAll', action: () => selectAllOrNone(true), icon: 'Check', color: '#00e676' },
+    { name: 'save', action: webhook ? toggleDialog : toggleDialog(false, category, 'filters', tempFilters), icon: 'Save', color: 'secondary' },
+  ]
   return (
     <>
+      <Header
+        title={t(`${category}Filters`)}
+        action={webhook ? toggleDialog : toggleDialog(false, category, 'filters', filters.filter)}
+      />
+      <DialogContent style={{ padding: '8px 5px', height: '100%' }}>
+        <Grid container spacing={1}>
+          {isMobile ? (
+            <Grid item style={{ height: '85vh', overflow: 'auto' }} />
+          ) : (
+            <Grid item sm={3} style={{ height: '75vh', overflow: 'auto' }}>
+              {Options}
+            </Grid>
+          )}
+          <ReactWindow
+            columnCount={columnCount}
+            length={filteredArr.length}
+            flex
+            offset={0}
+            data={{
+              isMobile,
+              tileItem: filteredArr,
+              tempFilters,
+              setTempFilters,
+              toggleAdvMenu,
+              toggleSlotsMenu,
+              type: category,
+              Utility,
+            }}
+            Tile={WebhookTile || Tile}
+          />
+        </Grid>
+      </DialogContent>
+      <Footer options={footerButtons} role="dialogFilterFooter" />
+      <Drawer
+        anchor="bottom"
+        open={filterDrawer}
+        onClose={toggleDrawer(false)}
+      >
+        {Options}
+      </Drawer>
       <Dialog
         open={advancedFilter.open}
         onClose={toggleAdvMenu(false)}
@@ -232,102 +219,15 @@ export default function Menu({ filters, toggleDialog, category }) {
           tempFilters={tempFilters}
         />
       </Dialog>
-      <DialogTitle className={classes.filterHeader}>
-        {t(`${category}Filters`)}
-        <IconButton
-          onClick={toggleDialog(false, category, 'filters', filters.filter)}
-          style={{ position: 'absolute', right: 5, top: 5 }}
-        >
-          <Clear style={{ color: 'white' }} />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent className="no-scroll">
-        <Grid
-          container
-          justifyContent="space-evenly"
-          alignItems="flex-start"
-        >
-          {!isMobile && (
-            <Grid
-              container
-              item
-              sm={3}
-              spacing={1}
-              direction="column"
-              justifyContent="flex-start"
-              alignItems="flex-start"
-            >
-              {allFilterMenus}
-            </Grid>
-          )}
-          <Grid item xs={12} sm={9}>
-            <Paper elevation={0} variant="outlined" className={classes.search}>
-              <InputBase
-                className={classes.input}
-                placeholder={t(`search${category}`)}
-                name="search"
-                value={search}
-                onChange={handleSearchChange}
-                fullWidth
-                autoComplete="off"
-                variant="outlined"
-              />
-              <IconButton
-                className={classes.iconButton}
-                onClick={resetSearch}
-              >
-                <HighlightOff style={{ color: '#848484' }} />
-              </IconButton>
-            </Paper>
-            <div style={{ minHeight: isMobile ? '54vh' : '60vh' }}>
-              <AutoSizer defaultHeight={1080} defaultWidth={1920}>
-                {({ width, height }) => (
-                  <FixedSizeGrid
-                    className="grid"
-                    width={width}
-                    height={height}
-                    columnCount={columnCount}
-                    columnWidth={width / columnCount - 5}
-                    rowCount={Math.ceil(filteredArr.length / columnCount)}
-                    rowHeight={columnCount > 1 ? 120 : 60}
-                    itemData={{
-                      tileItem: filteredArr,
-                      isMobile,
-                      columnCount,
-                      tempFilters,
-                      setTempFilters,
-                      toggleAdvMenu,
-                      toggleSlotsMenu,
-                      type: category,
-                      Utility,
-                    }}
-                  >
-                    {Tile}
-                  </FixedSizeGrid>
-                )}
-              </AutoSizer>
-            </div>
-          </Grid>
-        </Grid>
-      </DialogContent>
-      <Footer
-        selectAllOrNone={selectAllOrNone}
-        toggleDialog={toggleDialog}
-        tempFilters={tempFilters}
-        setTempFilters={setTempFilters}
-        toggleDrawer={toggleDrawer}
-        isMobile={isMobile}
-        toggleAdvMenu={toggleAdvMenu}
-        handleReset={handleReset}
-        type={category}
-      />
-      <Drawer
-        anchor="left"
-        open={filterDrawer}
-        onClose={toggleDrawer(false)}
+      <Dialog
+        open={helpDialog}
       >
-        {allFilterMenus}
-      </Drawer>
+        <Help
+          toggleHelp={() => setHelpDialog(!helpDialog)}
+          category={category}
+          isMobile={isMobile}
+        />
+      </Dialog>
     </>
   )
 }

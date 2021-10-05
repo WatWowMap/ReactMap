@@ -1,5 +1,13 @@
 import { gql } from '@apollo/client'
 
+const base = gql`
+  fragment Base on Poracle {
+    category
+    message
+    status
+  }
+`
+
 const egg = gql`
   fragment PoracleEgg on Poracle {
     egg {
@@ -246,12 +254,22 @@ export const allProfiles = gql`
 
 export const setHuman = gql`
   ${human}
+  ${base}
   mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
     webhook(data: $data, category: $category, status: $status, name: $name) {
-      category
-      message
-      status
+      ...Base
       ...PoracleHuman
+    }
+  }
+`
+
+export const setPokemon = gql`
+  ${human}
+  ${base}
+  mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
+    webhook(data: $data, category: $category, status: $status, name: $name) {
+      ...Base
+      ...PoraclePokemon
     }
   }
 `

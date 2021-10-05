@@ -23,6 +23,7 @@ export default function Nav({
   const classes = useStyles()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
+  const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
   const { perms } = useStatic(state => state.auth)
   const webhookPopup = useStatic(state => state.webhookPopup)
   const filters = useStore(state => state.filters)
@@ -77,6 +78,8 @@ export default function Nav({
       ) : (
         <Dialog
           open={tutorial}
+          fullWidth={!isMobile}
+          fullScreen={isMobile}
         >
           <Tutorial
             setUserProfile={setUserProfile}
@@ -107,7 +110,8 @@ export default function Nav({
         />
       )}
       <Dialog
-        fullWidth
+        fullWidth={!isMobile}
+        fullScreen={isMobile}
         maxWidth="md"
         open={dialog.open && dialog.type === 'filters'}
       >
@@ -115,9 +119,12 @@ export default function Nav({
           toggleDialog={toggleDialog}
           filters={filters[dialog.category]}
           category={dialog.category}
+          isMobile={isMobile}
+          isTablet={isTablet}
         />
       </Dialog>
       <Dialog
+        fullScreen={isMobile}
         maxWidth="sm"
         open={dialog.open && dialog.type === 'options'}
       >

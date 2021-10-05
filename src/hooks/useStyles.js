@@ -67,6 +67,7 @@ export default makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     height: 50,
+    margin: '10px 2px',
   },
   input: {
     marginLeft: theme.spacing(1),

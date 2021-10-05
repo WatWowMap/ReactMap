@@ -37,7 +37,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
       show += 1
       const url = Icons.getPokemon(...id.split('-'))
       filteredArr.push({ id, name, url })
-      filteredObj[id] = { ...tempFilters[id] }
+      filteredObj[id] = tempFilters[id]
     }
   }
 
@@ -61,7 +61,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
       }
       const url = urlBuilder
       filteredArr.push({ id, name: stop.name, url })
-      filteredObj[id] = { ...tempFilters[id] }
+      filteredObj[id] = tempFilters[id]
     }
   }
 
@@ -78,7 +78,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
         default: url = Icons.getPokemon(...id.split('-')); break
       }
       filteredArr.push({ id, name: gym.name, url })
-      filteredObj[id] = { ...tempFilters[id] }
+      filteredObj[id] = tempFilters[id]
     }
   }
 
@@ -107,14 +107,34 @@ export default function menuFilter(tempFilters, menus, search, type) {
     switchKey = 'available'
   }
 
-  if (search !== '') {
+  const evalSearchTerms = term => {
+    if (term.includes('&')) {
+      searchTerms.push(term.split('&'))
+    }
+    if (term.includes('+')) {
+      const cleaned = term.slice(1)
+      const families = Object.keys(masterfile.pokemon).filter(id => {
+        const name = t(`poke_${id}`)
+        return (name.toLowerCase().includes(cleaned))
+      })
+      if (families) {
+        const familyIds = families.map(pkmn => +masterfile.pokemon[pkmn].family)
+        searchTerms.push(...new Set(familyIds))
+      }
+    }
+    searchTerms.push(term)
+  }
+
+  if (search) {
     switchKey = 'search'
+    search = search.replace(/,/g, '|')
     if (search.includes('|')) {
-      searchTerms.push(...search.split('|'))
-    } else if (search.includes('&')) {
-      searchTerms.push(search.split('&'))
+      const orSplit = search.split('|').map(term => term.trim())
+      orSplit.forEach(term => {
+        evalSearchTerms(term)
+      })
     } else {
-      searchTerms.push(search)
+      evalSearchTerms(search)
     }
   }
 
@@ -129,7 +149,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
             pokestop.name = t(`grunt_a_${id.slice(1)}`, `grunt_${id.slice(1)}`); break
           case 'd':
             pokestop = { name: `x${id.slice(1)}` } || {}
-            pokestop.category = 'items'; break
+            pokestop.category = 'stardust'; break
           case 'm':
             pokestop = { name: `${t(`poke_${id.slice(1).split('-')[0]}`)} x${id.split('-')[1]}` } || {}
             pokestop.category = 'energy'; break
@@ -265,10 +285,13 @@ export default function menuFilter(tempFilters, menus, search, type) {
           const meta = [...formTypes, pkmn.name, displayName, pkmn.rarity, pkmn.generation].join(' ').toLowerCase()
           searchTerms.forEach(term => {
             if (typeof term === 'string') {
+              term = term.trim()
               if ((meta.includes(term))
                 || pkmn.pokedexId == term) {
                 addPokemon(id, displayName)
               }
+            } else if (typeof term === 'number') {
+              if (pkmn.family === term) addPokemon(id, displayName)
             } else {
               const andCheck = term.every(subTerm => meta.includes(subTerm))
               if (andCheck) addPokemon(id, displayName)
@@ -285,7 +308,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
         }
         default:
           if (generations[pkmn.generation]
-            || types[masterfile.types[formTypes[0]]] || types[masterfile.types[formTypes[1]]]
+            || types[formTypes[0]] || types[formTypes[1]]
             || rarity[pkmn.rarity]
             || (forms[displayName] || (forms.altForms && j != pkmn.defaultFormId))
             || categories[pkmn.category]) {

@@ -348,7 +348,7 @@
   "miscIcons": "Pozostałe ikony",
   "invasionIcons": "Ikony inwazji",
   "pokemonTimers": "Licznik czasu wszystkich Pokemonów",
-  "dialogFilterFooterAdvMenuWidth": 3,
+  "dialogFilterFooterApplyToAllWidth": 3,
   "dialogFilterFooterOpenFilterWidth": 1,
   "drawerGridAdvancedWidth": 7,
   "drawerGridOptionsWidth": 5,

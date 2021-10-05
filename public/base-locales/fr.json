@@ -348,7 +348,7 @@
   "miscIcons": "Icones Divers",
   "invasionIcons": "Icones d'Invasions",
   "pokemonTimers": "Tous les timers Pokemon",
-  "dialogFilterFooterAdvMenuWidth": 2,
+  "dialogFilterFooterApplyToAllWidth": 2,
   "dialogFilterFooterDisableAllWidth": 2,
   "dialogFilterFooterEnableAllWidth": 2,
   "dialogFilterFooterHelpWidth": 2,
