@@ -63,9 +63,7 @@ export default function App() {
 
   const getServerSettings = async () => {
     const data = await Fetch.getSettings()
-    const Icons = data.config ? new UIcons(
-      data.config.icons.customizable, data.config.icons.sizes, data.masterfile.questRewardTypes,
-    ) : null
+    const Icons = data.config ? new UIcons(data.config.icons, data.masterfile.questRewardTypes) : null
     if (Icons) {
       await Icons.fetchIcons(data.config.icons.styles)
       if (data.config.icons.defaultIcons) {
@@ -73,8 +71,14 @@ export default function App() {
       }
       data.userSettings.icons = Icons.selected
     }
-    if (data.ui && data.ui.pokestops && data.ui.pokestops.invasions) {
-      data.masterfile.invasions = await Fetch.getInvasions(data.masterfile.invasions)
+    if (data.ui?.pokestops?.invasions) {
+      const invasionCache = JSON.parse(localStorage.getItem('invasions_cache'))
+      const cacheTime = data.config.map.invasionCacheHrs * 60 * 60 * 1000
+      if (invasionCache && invasionCache.lastFetched + cacheTime > Date.now()) {
+        data.masterfile.invasions = invasionCache
+      } else {
+        data.masterfile.invasions = await Fetch.getInvasions(data.masterfile.invasions)
+      }
     }
     setServerSettings({ ...data, Icons })
   }
