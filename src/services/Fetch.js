@@ -59,6 +59,10 @@ export default class Fetch {
       return newInvasions
     } catch (e) {
       console.log('Unable to fetch most recent Invasions')
+      const cached = localStorage.getItem('invasions_cache')
+      if (cached) {
+        return JSON.parse(cached)
+      }
       return invasions
     }
   }
