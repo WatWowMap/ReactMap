@@ -439,5 +439,6 @@
   "byDistance": "By Distance",
   "min_time": "Min Time",
   "addNewProfile": "Add New Profile",
-  "noneSlider": "None"
+  "noneSlider": "None",
+  "hasQuestIndicator": "Alternative Color for Stops with Quests"
 }

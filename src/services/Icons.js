@@ -3,9 +3,9 @@
 import Fetch from '@services/Fetch'
 
 export default class UIcons {
-  constructor(customizable, iconSizes, questRewardTypes) {
+  constructor({ customizable, sizes, cacheHrs }, questRewardTypes) {
     this.customizable = customizable
-    this.sizes = iconSizes
+    this.sizes = sizes
     this.selected = {}
     this.questRewardTypes = {}
     this.modifiers = {
@@ -15,6 +15,7 @@ export default class UIcons {
         sizeMultiplier: 1,
       },
     }
+    this.cacheMs = cacheHrs * 60 * 60 * 1000
     Object.entries(questRewardTypes).forEach(([id, category]) => (
       this.questRewardTypes[id] = category.toLowerCase().replace(' ', '_')
     ))
@@ -35,50 +36,56 @@ export default class UIcons {
             4: 4,
             5: 4,
             6: 18,
+            sizeMultiplier: 1.2,
           },
         },
       })
     }
     for (const icon of icons) {
-      const data = await Fetch.getIcons(icon.path)
-      this[icon.name] = { indexes: Object.keys(data), ...icon }
-      if (!this[icon.name].modifiers) {
-        this[icon.name].modifiers = {}
-      }
-      this[icon.name].indexes.forEach(category => {
-        let isValid
-        if (!parseInt(category) && category !== '0') {
-          if (Array.isArray(data[category])) {
-            this[icon.name][category] = new Set(data[category])
-            isValid = true
-          } else {
-            Object.keys(data[category]).forEach(subCategory => {
-              if (Array.isArray(data[category][subCategory])) {
-                this[icon.name][subCategory] = new Set(data[category][subCategory])
-                isValid = true
+      const cachedIndex = JSON.parse(localStorage.getItem(`${icon.name}_icons`))
+      const data = cachedIndex && cachedIndex.lastFetched + this.cacheMs > Date.now()
+        ? cachedIndex
+        : await Fetch.getIcons(icon.path, icon.name)
+      if (data) {
+        this[icon.name] = { indexes: Object.keys(data), ...icon }
+        if (!this[icon.name].modifiers) {
+          this[icon.name].modifiers = {}
+        }
+        this[icon.name].indexes.forEach(category => {
+          let isValid = false
+          if (!parseInt(category) && category !== '0' && category !== 'lastFetched') {
+            if (Array.isArray(data[category])) {
+              this[icon.name][category] = new Set(data[category])
+              isValid = true
+            } else {
+              Object.keys(data[category]).forEach(subCategory => {
+                if (Array.isArray(data[category][subCategory])) {
+                  this[icon.name][subCategory] = new Set(data[category][subCategory])
+                  isValid = true
+                }
+              })
+            }
+            if (!this[category]) {
+              this[category] = []
+            }
+            if (isValid) {
+              this[category].push(icon.name)
+            }
+            if (!this[icon.name].modifiers[category]) {
+              this[icon.name].modifiers[category] = this.modifiers.base
+            } else {
+              this[icon.name].modifiers[category] = {
+                ...this.modifiers.base,
+                ...this[icon.name].modifiers[category],
               }
-            })
-          }
-          if (!this[category]) {
-            this[category] = []
-          }
-          if (isValid) {
-            this[category].push(icon.name)
-          }
-          if (!this[icon.name].modifiers[category]) {
-            this[icon.name].modifiers[category] = this.modifiers.base
-          } else {
-            this[icon.name].modifiers[category] = {
-              ...this.modifiers.base,
-              ...this[icon.name].modifiers[category],
+            }
+            if (!this.selected[category]) {
+              this.selected[category] = icon.name
+              this.modifiers[category] = this[icon.name].modifiers[category]
             }
           }
-          if (!this.selected[category]) {
-            this.selected[category] = icon.name
-            this.modifiers[category] = this[icon.name].modifiers[category]
-          }
-        }
-      })
+        })
+      }
     }
   }
 

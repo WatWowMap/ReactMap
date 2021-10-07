@@ -281,7 +281,7 @@
   "tutorialCheck": "Włącza wszystkie pozycje obecnie filtrowane w menu",
   "tutorialClear": "Wyłącza wszystkie pozycje obecnie filtrowane w menu",
   "tutorialSave": "Zapisuje wybrane Pokemony i zamyka okno",
-  "tutorialShowAllView": "Przełącza pokestopy i gymy",
+  "tutorialShowAllView": "Przełącza Pokestopy i gymy",
   "tutorialShowPokemonView": "Przełącza Pokemony",
   "tutorialToggle": "Kliknięcię w krzyżyk / X przełącza element",
   "tutorialPokemonCaption": "Ta ikona pozwala na ustawienie filtrów dla konkretnego Pokemona",
@@ -311,7 +311,7 @@
   "mapSubtitle": "Pokazuje mapę",
   "nestsSubtitle": "Pokazuje obecnie nestujące Pokemony oraz powierzchnie nestów",
   "pokemonSubtitle": "Pokazuje lokalizacje Pokemonów oraz czas ich zniknięcia",
-  "pokestopsSubtitle": "Pokazuje lokalizacje wszystkich pokestopów",
+  "pokestopsSubtitle": "Pokazuje lokalizacje wszystkich Pokestopów",
   "portalsSubtitle": "Pokazuje portale z Ingress",
   "pvpSubtitle": "Pokazuje rangę PVP/CP/informację o poziomie każdego Pokemona",
   "questsSubtitle": "Pokazuje nagrodę oraz informację o zadaniu",
@@ -372,5 +372,7 @@
   "popupPokestopSeenTimerWidth": 7,
   "clusterLimit_0": "{{variable_0}} limit ({{variable_1}}) został osiągnięty",
   "clusterLimit_1": "Proszę przybliż lub zawęź swoje filtry",
-  "showPolygons": "Pokaż Obszary"
+  "showPolygons": "Pokaż Obszary",
+  "excludeInvasionMulti": "Wyklucz {{invasion}}",
+  "hasQuestIndicator": "Alternatywny kolor dla Pokestopów z zadaniami"
 }

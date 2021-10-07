@@ -3,13 +3,13 @@ import React from 'react'
 import { renderToString } from 'react-dom/server'
 import L from 'leaflet'
 
-export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, filters, Icons) {
+export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, filters, Icons, userSettings) {
   const { lure_id } = pokestop
   const { invasion: invasionMod, pokestop: pokestopMod, reward: rewardMod } = Icons.modifiers
 
   let filterId = 's0'
   let popupYOffset = 1.3
-  const baseIcon = Icons.getPokestops(hasLure ? lure_id : 0, hasInvasion, hasQuest)
+  const baseIcon = Icons.getPokestops(hasLure ? lure_id : 0, hasInvasion, (hasQuest && userSettings.hasQuestIndicator))
   let baseSize = Icons.getSize('pokestop', filters.filter[filterId])
   const invasionIcons = []
   const invasionSizes = []
