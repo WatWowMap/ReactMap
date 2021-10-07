@@ -265,6 +265,9 @@ export default function menuFilter(tempFilters, menus, search, type) {
           // todo: remove continue
         }
       }
+      if (!tempFilters[id]) {
+        tempFilters[id] = { enabled: false, pokemon_id: i, form: j }
+      }
       const formTypes = (form.types || pkmn.types || []).map(typeId => masterfile.types[typeId])
       total += 1
       pkmn.category = 'pokemon'

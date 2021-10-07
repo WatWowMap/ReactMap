@@ -15,6 +15,7 @@ export default function ScanAreaTile({
   const onEachFeature = (feature, layer) => {
     if (feature.properties && feature.properties.name) {
       const name = feature.properties.name.toLowerCase()
+      const popupContent = Utility.getProperName(name)
       layer.setStyle({
         color: feature.properties.stroke || '#3388ff',
         weight: feature.properties['stroke-width'] || 3,
@@ -22,7 +23,6 @@ export default function ScanAreaTile({
         fillColor: feature.properties.fill || '#3388ff',
         fillOpacity: selectedAreas && selectedAreas.includes(name) && webhookMode === 'areas' ? 0.8 : 0.2,
       })
-      const popupContent = Utility.getProperName(name)
       if (webhookMode) {
         layer.on('click', () => handleClick(name))
         layer.bindTooltip(popupContent, {

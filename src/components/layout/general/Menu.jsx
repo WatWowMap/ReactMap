@@ -5,7 +5,6 @@ import {
   Drawer,
   Grid,
 } from '@material-ui/core'
-import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import { useStore } from '@hooks/useStore'
@@ -13,14 +12,16 @@ import { useStore } from '@hooks/useStore'
 import ReactWindow from '@components/layout/general/ReactWindow'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
-import Advanced from './Advanced'
-import Tile from './MenuTile'
-import SlotSelection from './SlotSelection'
-import OptionsContainer from './OptionsContainer'
-import Help from '../tutorial/Advanced'
+import Advanced from '../dialogs/filters/Advanced'
+import SlotSelection from '../dialogs/filters/SlotSelection'
+import OptionsContainer from '../dialogs/filters/OptionsContainer'
+import Help from '../dialogs/tutorial/Advanced'
+import WebhookAdvanced from '../dialogs/webhooks/WebhookAdv'
 
 export default function Menu({
-  filters, toggleDialog, category, isTablet, isMobile, webhook = false, WebhookTile,
+  isTablet, isMobile, category, Tile,
+  filters, tempFilters, setTempFilters,
+  title, titleAction, extraButtons = [],
 }) {
   Utility.analytics(`/advanced/${category}`)
 
@@ -29,13 +30,10 @@ export default function Menu({
   const advMenu = useStore(state => state.advMenu)
   const setAdvMenu = useStore(state => state.setAdvMenu)
 
-  const { t } = useTranslation()
-
   let columnCount = isTablet ? 3 : 5
   if (isMobile) columnCount = 1
 
   const [filterDrawer, setFilterDrawer] = useState(false)
-  const [tempFilters, setTempFilters] = useState(filters.filter)
   const [advancedFilter, setAdvancedFilter] = useState({
     open: false,
     id: '',
@@ -48,6 +46,10 @@ export default function Menu({
   })
   const [search, setSearch] = useState('')
   const [helpDialog, setHelpDialog] = useState(false)
+  const [webhook, setWebhook] = useState({
+    open: false,
+    id: '',
+  })
 
   const { filteredObj, filteredArr, count } = Utility.menuFilter(tempFilters, menus, search, category)
 
@@ -106,6 +108,18 @@ export default function Menu({
     }
   }
 
+  const toggleWebhook = (open, id, newFilters) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return
+    }
+    setWebhook({ open, id })
+    if (id && newFilters) {
+      // eslint-disable-next-line camelcase
+      const [pokemon_id, form] = id.split('-')
+      setTempFilters({ ...tempFilters, [id]: { ...tempFilters[id], ...newFilters, pokemon_id, form, enabled: true } })
+    }
+  }
+
   const toggleSlotsMenu = (open, id, newFilters) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
@@ -155,13 +169,14 @@ export default function Menu({
     { name: 'applyToAll', action: toggleAdvMenu(true, 'global'), icon: category === 'pokemon' ? 'Tune' : 'FormatSize', color: 'white' },
     { name: 'disableAll', action: () => selectAllOrNone(false), icon: 'Clear', color: 'primary' },
     { name: 'enableAll', action: () => selectAllOrNone(true), icon: 'Check', color: '#00e676' },
-    { name: 'save', action: webhook ? toggleDialog : toggleDialog(false, category, 'filters', tempFilters), icon: 'Save', color: 'secondary' },
+    ...extraButtons,
   ]
+
   return (
     <>
       <Header
-        title={t(`${category}Filters`)}
-        action={webhook ? toggleDialog : toggleDialog(false, category, 'filters', filters.filter)}
+        titles={[title]}
+        action={titleAction}
       />
       <DialogContent style={{ padding: '8px 5px', height: '100%' }}>
         <Grid container spacing={1}>
@@ -186,8 +201,9 @@ export default function Menu({
               toggleSlotsMenu,
               type: category,
               Utility,
+              toggleWebhook,
             }}
-            Tile={WebhookTile || Tile}
+            Tile={Tile}
           />
         </Grid>
       </DialogContent>
@@ -202,6 +218,8 @@ export default function Menu({
       <Dialog
         open={advancedFilter.open}
         onClose={toggleAdvMenu(false)}
+        fullWidth={!isMobile}
+        fullScreen={isMobile}
       >
         <Advanced
           advancedFilter={advancedFilter}
@@ -226,6 +244,19 @@ export default function Menu({
           toggleHelp={() => setHelpDialog(!helpDialog)}
           category={category}
           isMobile={isMobile}
+        />
+      </Dialog>
+      <Dialog
+        open={webhook.open}
+        fullWidth={!isMobile}
+        fullScreen={isMobile}
+      >
+        <WebhookAdvanced
+          id={webhook.id}
+          category={category}
+          isMobile={isMobile}
+          toggleWebhook={toggleWebhook}
+          tempFilters={tempFilters[webhook.id]}
         />
       </Dialog>
     </>

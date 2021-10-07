@@ -1,26 +1,65 @@
-import React, {
-  useState, useEffect, memo,
-} from 'react'
+import React, { useEffect, useState, memo } from 'react'
 import { useMutation } from '@apollo/client'
 
 import Query from '@services/Query'
 import ReactWindow from '@components/layout/general/ReactWindow'
-import PokemonTile from './tiles/PokemonTile'
+import PokemonTile from './tiles/PoraclePokemon'
+
+const pvpFields = ['pvp_ranking_league', 'pvp_ranking_best', 'pvp_ranking_worst', 'pvp_ranking_min_cp']
+const ignoredFields = ['noIv', 'byDistance', 'xs', 'xl', 'allForms', 'pvpEntry']
+
+const processPokemon = (pokemon, defaults) => pokemon.map(pkmn => {
+  const fields = ['pokemon_id', 'form', 'clean', 'distance', 'min_time', 'template', 'profile_no', 'gender', 'rarity', 'max_rarity']
+  const newPokemon = {}
+  if (pkmn.allForms) {
+    pkmn.form = 0
+  }
+  if (pkmn.pvpEntry) {
+    fields.push(...pvpFields)
+  } else {
+    fields.push(...Object.keys(pkmn).filter(key => !pvpFields.includes(key) && !ignoredFields.includes(key)))
+  }
+  fields.forEach(field => newPokemon[field] = pkmn[field] || defaults[field])
+  return newPokemon
+})
 
 const WebhookPokemon = ({
-  isMobile, t, webhookData, selectedWebhook, Icons,
+  isMobile, webhookData, selectedWebhook, Icons, send, setSend, tempFilters, setTempFilters, setWebhookData,
 }) => {
-  const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook('setPokemon'))
-
+  const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook('pokemon'))
   const [currentPokemon, setCurrentPokemon] = useState(webhookData[selectedWebhook].pokemon)
 
   useEffect(() => {
-    if (newWebhookData && newWebhookData.webhook) {
+    if (newWebhookData?.webhook?.pokemon) {
       setCurrentPokemon(newWebhookData.webhook.pokemon)
     }
   }, [newWebhookData])
 
-  console.log(currentPokemon)
+  useEffect(() => {
+    if (send) {
+      setSend(false)
+      setTempFilters({})
+      syncWebhook({
+        variables: {
+          category: 'pokemon',
+          data: processPokemon(
+            Object.values(tempFilters).filter(x => x.enabled), webhookData[selectedWebhook].info.pokemon.defaults,
+          ),
+          name: selectedWebhook,
+          status: 'POST',
+        },
+      })
+    }
+  }, [send])
+
+  useEffect(() => () => setWebhookData({
+    ...webhookData,
+    [selectedWebhook]: {
+      ...webhookData[selectedWebhook],
+      pokemon: currentPokemon,
+    },
+  }))
+
   return (
     <ReactWindow
       columnCount={1}
@@ -31,17 +70,23 @@ const WebhookPokemon = ({
         Icons,
         tileItem: currentPokemon.sort((a, b) => a.pokemon_id - b.pokemon_id),
         syncWebhook,
+        selectedWebhook,
+        currentPokemon,
+        setCurrentPokemon,
+        setSend,
+        setTempFilters,
       }}
       Tile={PokemonTile}
     />
   )
 }
 
-// const areEqual = (prev, next) => {
-//   const prevSelected = prev.webhookData[prev.selectedWebhook]
-//   const nextSelected = next.webhookData[next.selectedWebhook]
-//   return true
-// }
+const areEqual = (prev, next) => {
+  const prevSelected = prev.webhookData[prev.selectedWebhook]
+  const nextSelected = next.webhookData[next.selectedWebhook]
+  return prevSelected.pokemon.length === nextSelected.pokemon.length
+    && prevSelected.fetched === nextSelected.fetched
+    && prev.send === next.send
+}
 
-// export default memo(WebhookPokemon, areEqual)
-export default WebhookPokemon
+export default memo(WebhookPokemon, areEqual)

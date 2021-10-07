@@ -35,7 +35,7 @@ export default function Main({
         fullWidth={!isMobile}
         fullScreen={isMobile}
         style={{ display: webhookMode === 'open' ? 'block' : 'none' }}
-        maxWidth="xl"
+        maxWidth="md"
         open={Boolean(webhookMode)}
       >
         <Manage

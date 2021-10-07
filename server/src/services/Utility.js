@@ -7,6 +7,7 @@ const advMenus = require('./ui/advMenus')
 const clientOptions = require('./ui/clientOptions')
 const dbSelection = require('./functions/dbSelection')
 const permissions = require('./functions/permissions')
+const webhook = require('./ui/webhook')
 
 module.exports = class Utility {
   static getPolyVector(s2cellId, type) {
@@ -43,5 +44,9 @@ module.exports = class Utility {
 
   static permissions(permToCheck, perms) {
     return permissions(permToCheck, perms)
+  }
+
+  static webhookUi(provider, hookConfig, pvp) {
+    return webhook(provider, hookConfig, pvp)
   }
 }

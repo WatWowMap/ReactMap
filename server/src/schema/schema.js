@@ -365,7 +365,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.webhooks) {
-          return Fetch.webhookApi(args.category, req.user.id, args.status)
+          return Fetch.webhookApi(args.category, req.user.id, args.status, args.name)
         }
       },
     },

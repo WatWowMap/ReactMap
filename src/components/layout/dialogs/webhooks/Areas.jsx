@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useEffect } from 'react'
 import { Done, Clear } from '@material-ui/icons'
 import {
   Grid, Typography, Chip, Button,
@@ -7,7 +7,7 @@ import {
 import useStyles from '@hooks/useStyles'
 
 const Areas = ({
-  setWebhookMode, t, selectedAreas, webhookData, syncWebhook, selectedWebhook,
+  webhookMode, setWebhookMode, t, selectedAreas, webhookData, syncWebhook, selectedWebhook,
 }) => {
   const classes = useStyles()
 
@@ -16,7 +16,6 @@ const Areas = ({
     const newAreas = selectedAreas.includes(areaName)
       ? selectedAreas.filter(a => a !== areaName)
       : [...selectedAreas, areaName]
-
     syncWebhook({
       variables: {
         category: 'setAreas',
@@ -26,6 +25,19 @@ const Areas = ({
       },
     })
   }
+
+  useEffect(() => {
+    if (webhookMode === 'areas') {
+      syncWebhook({
+        variables: {
+          category: 'setAreas',
+          data: selectedAreas,
+          name: selectedWebhook,
+          status: 'POST',
+        },
+      })
+    }
+  }, [selectedAreas])
 
   return (
     <Grid

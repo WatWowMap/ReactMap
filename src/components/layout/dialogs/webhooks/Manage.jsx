@@ -8,17 +8,17 @@ import {
 } from '@material-ui/core'
 import { Person } from '@material-ui/icons'
 import { useTranslation, Trans } from 'react-i18next'
+
 import { useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 
 import Footer from '@components/layout/general/Footer'
 import TabPanel from '@components/layout/general/TabPanel'
 import Header from '@components/layout/general/Header'
+import NewPokemon from './tiles/PokemonMenu'
 import Human from './Human'
 import Pokemon from './Pokemon'
-import Menu from '../filters/Menu'
-
-const ignoredKeys = ['message', 'error', 'statusCode', 'status', 'profile', 'name', 'areas', 'addressFormat', 'message', 'category', 'weather', '__typename']
+import Menu from '../../general/Menu'
 
 export default function Manage({
   Icons, isMobile, isTablet,
@@ -30,22 +30,31 @@ export default function Manage({
   const { t } = useTranslation()
   const classes = useStyles()
   const webhookData = useStatic(s => s.webhookData)
-  const [tabValue, setTabValue] = useState(4)
-  const [help, setHelp] = useState(false)
-  const [addNew, setAddNew] = useState(false)
+  const setWebhookData = useStatic(s => s.setWebhookData)
   const staticFilters = useStatic(s => s.filters)
 
-  const filteredData = Object.keys(webhookData[selectedWebhook]).filter(key => !ignoredKeys.includes(key))
+  const [tabValue, setTabValue] = useState(0)
+  const [help, setHelp] = useState(false)
+  const [addNew, setAddNew] = useState(false)
+  const filteredData = Object.keys(webhookData[selectedWebhook].info).map(key => key)
+
+  const [tempFilters, setTempFilters] = useState({})
+  const [send, setSend] = useState(false)
+
   const footerButtons = [
     { name: 'help', action: () => setHelp(true), icon: 'HelpOutline' },
-    { name: <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans>, action: () => setAddNew(true), icon: 'Add', key: 'addNew' },
+    { name: tabValue ? <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans> : t('addNewProfile'), action: () => setAddNew(true), icon: 'Add', key: 'addNew' },
     { name: 'close', action: () => setWebhookMode(false), icon: 'Close' },
   ]
 
-  console.log(filteredData[tabValue])
+  const handleClose = () => {
+    setAddNew(false)
+    setSend(true)
+  }
+
   return (
     <>
-      <Header name={selectedWebhook} action={() => setWebhookMode(false)} title="manageWebhook" />
+      <Header names={[selectedWebhook]} action={() => setWebhookMode(false)} titles={['manageWebhook']} />
       <AppBar position="static">
         <Tabs
           value={tabValue}
@@ -74,6 +83,7 @@ export default function Manage({
                   t={t}
                   isMobile={isMobile}
                   webhookData={webhookData}
+                  setWebhookData={setWebhookData}
                   webhookMode={webhookMode}
                   setWebhookMode={setWebhookMode}
                   webhookLocation={webhookLocation}
@@ -86,11 +96,15 @@ export default function Manage({
               ),
               pokemon: (
                 <Pokemon
-                  t={t}
                   Icons={Icons}
                   isMobile={isMobile}
                   webhookData={webhookData}
+                  setWebhookData={setWebhookData}
                   selectedWebhook={selectedWebhook}
+                  tempFilters={tempFilters}
+                  setTempFilters={setTempFilters}
+                  send={send}
+                  setSend={setSend}
                 />
               ),
             }[key]}
@@ -107,16 +121,22 @@ export default function Manage({
         fullScreen={isMobile}
         maxWidth="md"
         open={addNew}
-        onClose={() => setAddNew(false)}
+        onClose={handleClose}
       >
         <Menu
           category={filteredData[tabValue]}
           filters={staticFilters[filteredData[tabValue]]
             || staticFilters[`${filteredData[tabValue]}s`]}
+          tempFilters={tempFilters}
+          setTempFilters={setTempFilters}
+          title="Step 1"
+          titleAction={handleClose}
           isMobile={isMobile}
           isTablet={isTablet}
-          toggleDialog={() => setAddNew(false)}
-          webhook
+          Tile={NewPokemon}
+          extraButtons={[
+            { name: 'next', action: handleClose, icon: 'Save', color: 'secondary' },
+          ]}
         />
       </Dialog>
       <Dialog

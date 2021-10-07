@@ -422,5 +422,22 @@
   "stardust": "Stardust", 
   "webhookFooterHelpWidth": 4,
   "webhookFooterCloseWidth": 4,
-  "webhookFooterAddNewWidth": 4
+  "webhookFooterAddNewWidth": 4,
+  "dialogFilterFooterNextWidth": 2,
+  "webhookAdvancedSaveWidth": 2,
+  "cpSlider": "CP",
+  "pvp_ranking_league": "League",
+  "pvp_ranking_min_cp": "Min CP",
+  "pvpSlider": "Ranks",
+  "profile_no": "Profile",
+  "template": "Template",
+  "gender": "Gender",
+  "clean": "Clean",
+  "allForms": "All Forms",
+  "pvpEntry": "PVP Entry",
+  "noIv": "Incl. No IV",
+  "byDistance": "By Distance",
+  "min_time": "Min Time",
+  "addNewProfile": "Add New Profile",
+  "noneSlider": "None"
 }

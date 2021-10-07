@@ -114,7 +114,7 @@ const nest = gql`
   }
 `
 
-const pokemon = gql`
+const Pokemon = gql`
   fragment PoraclePokemon on Poracle {
     pokemon {
       atk
@@ -230,7 +230,7 @@ export const allProfiles = gql`
   ${invasion}
   ${lure}
   ${nest}
-  ${pokemon}
+  ${Pokemon}
   ${profile}
   ${quest}
   ${raid}
@@ -253,8 +253,8 @@ export const allProfiles = gql`
 `
 
 export const setHuman = gql`
-  ${human}
   ${base}
+  ${human}
   mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
     webhook(data: $data, category: $category, status: $status, name: $name) {
       ...Base
@@ -263,9 +263,9 @@ export const setHuman = gql`
   }
 `
 
-export const setPokemon = gql`
-  ${human}
+export const pokemon = gql`
   ${base}
+  ${Pokemon}
   mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
     webhook(data: $data, category: $category, status: $status, name: $name) {
       ...Base

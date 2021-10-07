@@ -11,7 +11,7 @@ import Utility from '@services/Utility'
 
 import FilterOptions from './Options'
 
-export default function MenuFilters({
+export default function OptionsContainer({
   advMenu, setAdvMenu, search, setSearch, menus, setMenus,
   category, handleReset, count,
 }) {

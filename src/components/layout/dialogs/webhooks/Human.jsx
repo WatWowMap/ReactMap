@@ -16,7 +16,7 @@ const Human = ({
   selectedAreas, setSelectedAreas,
   selectedWebhook, setSelectedWebhook,
   webhookLocation, setWebhookLocation,
-  isMobile, t, webhookData,
+  isMobile, t, webhookData, setWebhookData,
 }) => {
   const location = useStore(state => state.location)
   const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook('setHuman'))
@@ -39,7 +39,13 @@ const Human = ({
     setSelectedAreas(JSON.parse(area))
   }, [currentHuman])
 
-  console.log('human')
+  useEffect(() => () => setWebhookData({
+    ...webhookData,
+    [selectedWebhook]: {
+      ...webhookData[selectedWebhook],
+      human: currentHuman,
+    },
+  }))
 
   return (
     <Grid
@@ -134,6 +140,7 @@ const Human = ({
         setWebhookMode={setWebhookMode}
         selectedAreas={selectedAreas}
         syncWebhook={syncWebhook}
+        webhookMode={webhookMode}
         selectedWebhook={selectedWebhook}
         currentHuman={currentHuman}
       />

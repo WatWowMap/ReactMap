@@ -21,6 +21,10 @@ const GETcategory = (webhook, headers, discordId, category) => ({
     url: `${webhook.host}:${webhook.port}/api/humans/one/${discordId}`,
     options: { method: 'GET', headers },
   },
+  pokemon: {
+    url: `${webhook.host}:${webhook.port}/api/tracking/pokemon/${discordId}`,
+    options: { method: 'GET', headers },
+  },
 }[category])
 
 module.exports = async function webhookApi(category, discordId, method, webhookName, data = null) {
@@ -36,6 +40,12 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
 
   const payloadObj = {}
   switch (category) {
+    case 'poracleWeb':
+    case 'templates':
+      Object.assign(payloadObj, {
+        url: `${webhook.host}:${webhook.port}/api/config/${category}`,
+        options: { method, headers },
+      }); break
     case 'switchProfile':
       Object.assign(payloadObj, {
         url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}/${data}`,
@@ -49,7 +59,6 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
         get: 'human',
       }); break
     case 'setAreas':
-      console.log('setAreas', data)
       Object.assign(payloadObj, {
         url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}`,
         options: {
@@ -67,12 +76,26 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
         url: `${webhook.host}:${webhook.port}/api/geofence/all/hash`,
         options: { method, headers },
       }); break
+    case 'humans':
+      Object.assign(payloadObj, {
+        url: `${webhook.host}:${webhook.port}/api/humans/${discordId}`,
+        options: { method, headers },
+      }); break
+    case 'pokemon':
+      Object.assign(payloadObj, {
+        url: `${webhook.host}:${webhook.port}/api/tracking/${category}/${discordId}${method === 'DELETE' ? `/byUid/${data.uid}` : ''}`,
+        options: {
+          method, headers, body: method === 'POST' ? JSON.stringify(data) : undefined,
+        },
+        get: method === 'DELETE' ? undefined : category,
+      }); break
     default:
       Object.assign(payloadObj, {
         url: `${webhook.host}:${webhook.port}/api/tracking/${category}/${discordId}${method === 'DELETE' ? `/byUid/${data.uid}` : ''}`,
         options: {
           method, headers, body: data ? JSON.stringify(data) : null,
         },
+        // get: category,
       }); break
   }
 
@@ -86,6 +109,12 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
   try {
     const post = await fetchJson(payloadObj.url, payloadObj.options)
 
+    if (category === 'templates') {
+      post[webhook.platform].pokemon = post[webhook.platform].monster
+      delete post[webhook.platform].monster
+      post[webhook.platform].pokemonNoIv = post[webhook.platform].monsterNoIv
+      delete post[webhook.platform].monsterNoIv
+    }
     if (category === 'areas') {
       return Object.keys(post.areas).map(a => a).sort()
     }
