@@ -42,6 +42,8 @@ const useStore = create(persist(set => ({
     names: true,
   },
   setPopups: (popups) => set({ popups }),
+  motdIndex: 0,
+  setMotdIndex: (motdIndex) => set({ motdIndex }),
 }),
 {
   name: 'local-state',

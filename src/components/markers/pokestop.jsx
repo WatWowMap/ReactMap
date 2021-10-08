@@ -4,12 +4,16 @@ import { renderToString } from 'react-dom/server'
 import L from 'leaflet'
 
 export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, filters, Icons, userSettings) {
-  const { lure_id } = pokestop
+  const { lure_id, ar_scan_eligible } = pokestop
   const { invasion: invasionMod, pokestop: pokestopMod, reward: rewardMod } = Icons.modifiers
 
   let filterId = 's0'
   let popupYOffset = 1.3
-  const baseIcon = Icons.getPokestops(hasLure ? lure_id : 0, hasInvasion, (hasQuest && userSettings.hasQuestIndicator))
+  const baseIcon = Icons.getPokestops(
+    hasLure ? lure_id : 0, hasInvasion,
+    (hasQuest && userSettings.hasQuestIndicator),
+    (userSettings.showArBadge && ar_scan_eligible),
+  )
   let baseSize = Icons.getSize('pokestop', filters.filter[filterId])
   const invasionIcons = []
   const invasionSizes = []
@@ -85,6 +89,18 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
           transform: 'translateX(-50%)',
         }}
       />
+      {Boolean(userSettings.showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')) && (
+        <img
+          src={Icons.getMisc('ar')}
+          style={{
+            width: baseSize / 2,
+            height: 'auto',
+            bottom: 20 + pokestopMod.offsetY,
+            left: `${pokestopMod.offsetX * 10}%`,
+            transform: 'translateX(-50%)',
+          }}
+        />
+      )}
       {questIcons.map((icon, i) => (
         <img
           key={icon}

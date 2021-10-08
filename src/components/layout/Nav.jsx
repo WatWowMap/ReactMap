@@ -13,6 +13,7 @@ import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
 import Search from './dialogs/Search'
 import QuickAdd from './dialogs/webhooks/QuickAdd'
+import Motd from './dialogs/Motd'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
@@ -26,18 +27,22 @@ export default function Nav({
   const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
   const { perms } = useStatic(state => state.auth)
   const webhookPopup = useStatic(state => state.webhookPopup)
+  const { map: { messageOfTheDay } } = useStatic(state => state.config)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
   const userSettings = useStore(state => state.userSettings)
   const setUserSettings = useStore(state => state.setUserSettings)
   const tutorial = useStore(state => state.tutorial)
   const setTutorial = useStore(state => state.setTutorial)
+  const motdIndex = useStore(state => state.motdIndex)
+  const setMotdIndex = useStore(s => s.setMotdIndex)
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
     category: '',
     type: '',
   })
+
   const [userProfile, setUserProfile] = useState(false)
   const safeSearch = searchable.filter(category => perms[category])
 
@@ -145,6 +150,22 @@ export default function Nav({
           safeSearch={safeSearch}
           isMobile={isMobile}
           Icons={Icons}
+        />
+      </Dialog>
+      <Dialog
+        classes={{
+          scrollPaper: classes.scrollPaper,
+          container: classes.container,
+        }}
+        maxWidth="sm"
+        open={Boolean(motdIndex !== messageOfTheDay.index && messageOfTheDay?.messages.length)}
+        onClose={() => setMotdIndex(messageOfTheDay.index)}
+      >
+        <QuickAdd config={config} />
+        <Motd
+          newMotdIndex={messageOfTheDay.index}
+          setMotdIndex={setMotdIndex}
+          messages={messageOfTheDay.messages}
         />
       </Dialog>
       <Dialog

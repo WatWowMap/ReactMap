@@ -7,7 +7,7 @@ import PopupContent from '../popups/Portal'
 import marker from '../markers/portal'
 
 const PortalTile = ({
-  item, userSettings, ts, params,
+  item, userSettings, ts, params, Icons,
 }) => {
   const [done, setDone] = useState(false)
   const markerRefs = useRef({})
@@ -34,7 +34,7 @@ const PortalTile = ({
       pathOptions={marker(item, ts, userSettings)}
     >
       <Popup position={[item.lat, item.lon]}>
-        <PopupContent portal={item} ts={ts} />
+        <PopupContent portal={item} ts={ts} Icons={Icons} />
       </Popup>
     </Circle>
   )

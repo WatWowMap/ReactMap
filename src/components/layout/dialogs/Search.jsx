@@ -124,7 +124,7 @@ export default function Search({
           {safeSearch.map(each => (
             <Tab
               key={each}
-              icon={<img src={`/images/misc/${each}.png`} style={{ maxWidth: 20, height: 'auto' }} />}
+              icon={<img src={Icons.getMisc(each)} style={{ maxWidth: 20, height: 'auto' }} />}
               style={{ width: 40, minWidth: 40 }}
             />
           ))}
@@ -152,7 +152,7 @@ export default function Search({
           >
             <Grid item xs={2} style={{ textAlign: 'center' }}>
               {option.url
-                ? <img src={option.url.includes('http') ? option.url : `images/misc/${safeSearch[searchTab]}.png`} style={{ height: 45, width: 45, objectFit: 'fill' }} />
+                ? <img src={option.url.includes('http') ? option.url : Icons.getMisc(safeSearch[searchTab])} style={{ height: 40, width: 45, objectFit: 'fill' }} />
                 : getUrl(option)}
             </Grid>
             <Grid item xs={8}>

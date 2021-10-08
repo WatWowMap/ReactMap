@@ -440,11 +440,13 @@
   "min_time": "Min Time",
   "addNewProfile": "Add New Profile",
   "noneSlider": "None",
-  "hasQuestIndicator": "Alternative Color for Stops with Quests",
   "nonRegisteredHumanTitle": "Oops, something is not right!",
   "nonRegisteredHumanDesc": "You may not be registered with {{webhook}}\nOr the server is currently unreachable",
   "tryAgainLater": "Please try again later",
   "selectedAreas": "{{amount}} Area Selected",
   "selectedAreas_plural": "{{amount}} Areas Selected",
-  "webhookPokemonSelection": "Pokemon Selection"
+  "webhookPokemonSelection": "Pokemon Selection",
+  "messageOfTheDay": "Message of the Day",
+  "hasQuestIndicator": "Alternative Color for Stops with Quests",
+  "showArBadge": "Show AR Badge"
 }

@@ -64,6 +64,10 @@
       "pokemon": 15,
       "portals": 14,
       "spawnpoints": 12
+    },
+    "messageOfTheDay": {
+      "index": 0,
+      "messages": []
     }
   },
   "clientSideOptions": {
@@ -75,6 +79,7 @@
       "raidTimers": false,
       "interactionRanges": false,
       "showExBadge": false,
+      "showArBadge": false,
       "raidLevelBadges": false
     },
     "pokestops": {
@@ -83,7 +88,8 @@
       "lureTimers": false,
       "interactionRanges": false,
       "madQuestText": false,
-      "hasQuestIndicator": true
+      "hasQuestIndicator": true,
+      "showArBadge": false
     },
     "pokemon": {
       "clustering": true,

@@ -219,6 +219,29 @@ ReactMap supports multiple domain config options. Under the "multiDomain" object
 - If you want to use debug mode, add "ANALYTICS_DEBUG_MODE=true" to your `.env`. Only use debug mode during development.
 - You can also set a title for the map if you want it to load it up a bit faster compared to the default Map title.
 
+## Message of the Day
+You can add one time MotD's for your community to see upon opening the map from your config. Simply increment the index to make sure your users see the latest message, then add an many messages as you want in the message array. It accepts an array of strings or objects that have `title`, `body`, and `footer` properties, all are optional. The map will display all messages in the messages array, so you'll need to clear old ones out if you don't wish for them to display.
+
+```json
+  "messageOfTheDay": {
+    "index": 1,
+    "messages": [
+      {
+        "title": "Title 1",
+        "body": "Body 1",
+        "footer": "Footer 1"
+      },
+      {
+        "title": "Title 2",
+        "body": "Body 2"
+      },
+      {
+        "footer": "Footer 3"
+      },
+      "I am a boring message"
+    ]
+  }
+```
 ## Credits
 
 - [MapJS](https://github.com/WatWowMap/MapJS)
