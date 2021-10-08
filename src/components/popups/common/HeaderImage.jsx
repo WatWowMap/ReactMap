@@ -2,7 +2,7 @@ import React from 'react'
 import { Avatar } from '@material-ui/core'
 
 export default function HeaderImage({
-  url, backupImage, exEligible, arScanEligible, alt,
+  url, backupImage, exEligible, arScanEligible, alt, Icons,
 }) {
   const src = url
     ? url.replace('http://', 'https://')
@@ -18,13 +18,13 @@ export default function HeaderImage({
       {Boolean(arScanEligible) && (
         <img
           className="ar-logo"
-          src="/images/misc/ar.png"
+          src={Icons.getMisc('ar')}
         />
       )}
       {Boolean(exEligible) && (
         <img
           className="ex-logo"
-          src="/images/misc/ex.png"
+          src={Icons.getMisc('ex')}
         />
       )}
     </div>
