@@ -385,5 +385,6 @@
   "clusterLimit_1": "Bitte reinzoomen oder die Filter einschränken",
   "showPolygons": "Polygone anzeigen",
   "excludeInvasionMulti": "{{invasion}} ausschließen",
+  "messageOfTheDay": "Nachricht des Tages",
   "hasQuestIndicator": "Alternative Farbe für Stops mit Quests"
 }
