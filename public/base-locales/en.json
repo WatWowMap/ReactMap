@@ -445,5 +445,6 @@
   "nonRegisteredHumanDesc": "You may not be registered with {{webhook}}\nOr the server is currently unreachable",
   "tryAgainLater": "Please try again later",
   "selectedAreas": "{{amount}} Area Selected",
-  "selectedAreas_plural": "{{amount}} Areas Selected"
+  "selectedAreas_plural": "{{amount}} Areas Selected",
+  "webhookPokemonSelection": "Pokemon Selection"
 }

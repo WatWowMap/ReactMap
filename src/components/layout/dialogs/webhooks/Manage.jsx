@@ -130,13 +130,13 @@ export default function Manage({
             || staticFilters[`${filteredData[tabValue]}s`]}
           tempFilters={tempFilters}
           setTempFilters={setTempFilters}
-          title="Step 1"
+          title={t('webhookPokemonSelection')}
           titleAction={handleClose}
           isMobile={isMobile}
           isTablet={isTablet}
           Tile={NewPokemon}
           extraButtons={[
-            { name: 'next', action: handleClose, icon: 'Save', color: 'secondary' },
+            { name: 'save', action: handleClose, icon: 'Save', color: 'secondary' },
           ]}
         />
       </Dialog>

@@ -89,7 +89,7 @@ const Human = ({
             ))}
           </Select>
         </Grid>
-        {Object.keys(webhookData).length > 0 && (
+        {Object.keys(webhookData).length > 1 && (
           <>
             <Grid item xs={6} sm={3}>
               <Typography variant="h6">
