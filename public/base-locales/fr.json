@@ -374,5 +374,6 @@
   "showDexNumInPopup": "Visualiser le # de Pokedex en Popup",
   "popup": "Popup",
   "pvpLevel": "Stats PvP Niveau {{level}}",
+  "showArBadge": "Afficher les Badges AR",
   "pvpMega": "Stats PvP Mega"
 }
