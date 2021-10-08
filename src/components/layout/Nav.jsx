@@ -153,15 +153,10 @@ export default function Nav({
         />
       </Dialog>
       <Dialog
-        classes={{
-          scrollPaper: classes.scrollPaper,
-          container: classes.container,
-        }}
         maxWidth="sm"
         open={Boolean(motdIndex !== messageOfTheDay.index && messageOfTheDay?.messages.length)}
         onClose={() => setMotdIndex(messageOfTheDay.index)}
       >
-        <QuickAdd config={config} />
         <Motd
           newMotdIndex={messageOfTheDay.index}
           setMotdIndex={setMotdIndex}
