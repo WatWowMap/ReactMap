@@ -208,19 +208,22 @@ rootRouter.get('/settings', async (req, res) => {
         try {
           await Promise.all(filtered.map(async webhook => {
             const hookConfig = await Fetch.webhookApi('poracleWeb', serverSettings.user.id, 'GET', webhook.name)
-            serverSettings.webhooks[webhook.name] = {
+            const baseSettings = {
               name: webhook.name,
               addressFormat: webhook.addressFormat,
               platform: webhook.platform,
               pvp: webhook.pvp,
-              areas: await Fetch.webhookApi('areas', serverSettings.user.id, 'GET', webhook.name),
-              info: Utility.webhookUi(webhook.provider, hookConfig, webhook.pvp),
-              template: await Fetch.webhookApi('templates', serverSettings.user.id, 'GET', webhook.name),
               config: hookConfig,
               leagues: config.database.settings.leagues,
               fetched: Date.now(),
-              ...await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name),
             }
+            serverSettings.webhooks[webhook.name] = hookConfig ? {
+              ...baseSettings,
+              info: Utility.webhookUi(webhook.provider, hookConfig, webhook.pvp),
+              areas: await Fetch.webhookApi('areas', serverSettings.user.id, 'GET', webhook.name),
+              template: await Fetch.webhookApi('templates', serverSettings.user.id, 'GET', webhook.name),
+              ...await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name),
+            } : baseSettings
           }))
         } catch (e) {
           console.warn(e, 'Unable to fetch webhook data')

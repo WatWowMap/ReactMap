@@ -33,6 +33,7 @@ export default function Footer({ options, role }) {
             {isMobile ? (
               <IconButton
                 onClick={button.action}
+                disabled={button.disabled}
               >
                 <MuiIcon
                   color={muiColor ? button.color : 'inherit'}
@@ -44,6 +45,7 @@ export default function Footer({ options, role }) {
                 onClick={button.action}
                 color={muiColor ? button.color : 'inherit'}
                 style={{ color: muiColor ? null : button.color }}
+                disabled={button.disabled}
               >
                 {!button.mobileOnly && (
                   <Typography

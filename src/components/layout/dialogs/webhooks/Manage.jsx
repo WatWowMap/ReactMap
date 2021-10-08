@@ -19,6 +19,7 @@ import NewPokemon from './tiles/PokemonMenu'
 import Human from './Human'
 import Pokemon from './Pokemon'
 import Menu from '../../general/Menu'
+import WebhookError from './Error'
 
 export default function Manage({
   Icons, isMobile, isTablet,
@@ -36,14 +37,14 @@ export default function Manage({
   const [tabValue, setTabValue] = useState(0)
   const [help, setHelp] = useState(false)
   const [addNew, setAddNew] = useState(false)
-  const filteredData = Object.keys(webhookData[selectedWebhook].info).map(key => key)
+  const filteredData = Object.keys(webhookData[selectedWebhook].info || {}).map(key => key)
 
   const [tempFilters, setTempFilters] = useState({})
   const [send, setSend] = useState(false)
 
   const footerButtons = [
-    { name: 'help', action: () => setHelp(true), icon: 'HelpOutline' },
-    { name: tabValue ? <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans> : t('addNewProfile'), action: () => setAddNew(true), icon: 'Add', key: 'addNew' },
+    { name: 'help', action: () => setHelp(true), icon: 'HelpOutline', disabled: !webhookData[selectedWebhook].human },
+    { name: tabValue ? <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans> : t('addNewProfile'), action: () => setAddNew(true), icon: 'Add', key: 'addNew', disabled: !webhookData[selectedWebhook].human },
     { name: 'close', action: () => setWebhookMode(false), icon: 'Close' },
   ]
 
@@ -75,7 +76,7 @@ export default function Manage({
         </Tabs>
       </AppBar>
       <DialogContent style={{ padding: '0', height: isMobile ? '100%' : '70vh' }}>
-        {filteredData.map((key, i) => (
+        {webhookData[selectedWebhook].human ? filteredData.map((key, i) => (
           <TabPanel value={tabValue} index={i} key={key} virtual>
             {{
               human: (
@@ -109,7 +110,7 @@ export default function Manage({
               ),
             }[key]}
           </TabPanel>
-        ))}
+        )) : <WebhookError selectedWebhook={selectedWebhook} />}
       </DialogContent>
       <Footer options={footerButtons} role="webhookFooter" />
       <Dialog

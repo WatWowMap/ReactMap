@@ -129,11 +129,16 @@ export default function WebhookAdvanced({
     const menuItems = []
     switch (option.name) {
       case 'template': template[platform][poracleValues.noIv ? `${category}NoIv` : category].en.forEach(item => (
-        menuItems.push(<MenuItem key={item} value={item}>{item}</MenuItem>)
+        menuItems.push(<MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>)
       )); break
-      case 'profile_no': profile.forEach(pro => (
-        menuItems.push(<MenuItem key={pro.name} value={pro.profile_no}>{pro.name}</MenuItem>)
-      )); break
+      case 'profile_no':
+        if (profile.length) {
+          profile.forEach(pro => (
+            menuItems.push(<MenuItem key={pro.name} value={pro.profile_no}>{pro.name}</MenuItem>)
+          ))
+        } else {
+          menuItems.push(<MenuItem key={1} value={1}>1</MenuItem>)
+        } break
       case 'pvp_ranking_league': option.options.forEach(league => (
         menuItems.push(<MenuItem key={league.name} value={league.cp}>{t(`${league.name}Slider`)}</MenuItem>)
       )); break

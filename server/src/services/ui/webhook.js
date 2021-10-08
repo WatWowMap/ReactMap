@@ -60,8 +60,8 @@ module.exports = function selectProvider(provider, hookConfig, pvp) {
               ],
               texts: [{ name: 'min_time', type: 'number', max: 60, xs: 4, sm: 4 }],
               booleans: [
-                { name: 'xs', xs: 4, sm: 4 },
-                { name: 'xl', xs: 4, sm: 4 },
+                { name: 'xs', xs: 4, sm: 4, override: true },
+                { name: 'xl', xs: 4, sm: 4, override: true },
               ],
             },
             pvp: {

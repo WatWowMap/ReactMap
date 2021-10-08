@@ -43,7 +43,7 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
     case 'poracleWeb':
     case 'templates':
       Object.assign(payloadObj, {
-        url: `${webhook.host}:${webhook.port}/api/config/${category}`,
+        url: `${webhook.host}:${webhook.port}/api/config/${category}?names=true`,
         options: { method, headers },
       }); break
     case 'switchProfile':
