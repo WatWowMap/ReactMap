@@ -58,7 +58,7 @@ export default function Menu({
       const slotKey = `g${teamId.charAt(1)}-${i}`
       filteredObj[slotKey] = typeof show === 'boolean'
         ? { ...tempFilters[slotKey], enabled: show }
-        : show
+        : { ...tempFilters[slotKey], size: show.size }
     }
   }
 
