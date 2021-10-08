@@ -61,32 +61,31 @@ const Location = ({
       container
       item
       xs={12}
-      sm={6}
       justifyContent="center"
       alignItems="center"
       spacing={2}
     >
-      <Grid item xs={6}>
+      <Grid item xs={6} sm={3}>
         <Typography variant="h6">
           {t('location')}
         </Typography>
       </Grid>
-      <Grid item xs={6} style={{ textAlign: 'center' }}>
+      <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Typography variant="body2">
           {webhookLocation.map(x => x.toFixed(8)).join(', ')}
         </Typography>
       </Grid>
-      <Grid item xs={6} style={{ textAlign: 'center' }}>
+      <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Button size="small" variant="contained" color="secondary" onClick={() => lc._onClick()} startIcon={<LocationOn color={color} />}>
           {t('myLocation')}
         </Button>
       </Grid>
-      <Grid item xs={6} style={{ textAlign: 'center' }}>
+      <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Button size="small" variant="contained" color="primary" onClick={() => setWebhookMode('location')}>
           {t('chooseOnMap')}
         </Button>
       </Grid>
-      <Grid item xs={12} sm={12}>
+      <Grid item xs={12}>
         <Autocomplete
           style={{ width: '100%' }}
           getOptionLabel={(option) => Utility.formatter(addressFormat, option)}

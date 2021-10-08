@@ -63,7 +63,7 @@ const Human = ({
         spacing={2}
       >
         <Grid item xs={6} sm={3}>
-          <Typography>
+          <Typography variant="h6">
             {t('selectProfile')}
           </Typography>
         </Grid>
@@ -89,10 +89,10 @@ const Human = ({
             ))}
           </Select>
         </Grid>
-        {Object.keys(webhookData).length > 1 && (
+        {Object.keys(webhookData).length > 0 && (
           <>
             <Grid item xs={6} sm={3}>
-              <Typography>
+              <Typography variant="h6">
                 {t('selectWebhook')}
               </Typography>
             </Grid>
@@ -112,9 +112,7 @@ const Human = ({
         <Divider
           light
           flexItem
-          style={isMobile
-            ? { height: 5, width: '100%', margin: '15px 0px' }
-            : { display: 'none' }}
+          style={{ height: 5, width: '100%', margin: '15px 0px' }}
         />
       </Grid>
       <Location
@@ -130,11 +128,8 @@ const Human = ({
       />
       <Divider
         light
-        orientation={isMobile ? 'horizontal' : 'vertical'}
         flexItem
-        style={isMobile
-          ? { height: 5, width: '100%', margin: '15px 0px' }
-          : null}
+        style={{ height: 5, width: '100%', margin: '15px 0px' }}
       />
       <Areas
         t={t}
@@ -145,6 +140,7 @@ const Human = ({
         webhookMode={webhookMode}
         selectedWebhook={selectedWebhook}
         currentHuman={currentHuman}
+        isMobile={isMobile}
       />
     </Grid>
   )

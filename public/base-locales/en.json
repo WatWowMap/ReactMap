@@ -443,5 +443,7 @@
   "hasQuestIndicator": "Alternative Color for Stops with Quests",
   "nonRegisteredHumanTitle": "Oops, something is not right!",
   "nonRegisteredHumanDesc": "You may not be registered with {{webhook}}\nOr the server is currently unreachable",
-  "tryAgainLater": "Please try again later"
+  "tryAgainLater": "Please try again later",
+  "selectedAreas": "{{amount}} Area Selected",
+  "selectedAreas_plural": "{{amount}} Areas Selected"
 }
