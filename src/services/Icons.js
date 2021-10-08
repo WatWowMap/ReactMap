@@ -150,15 +150,18 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
-  getPokestops(lureId, invasionActive = false, questActive = false) {
+  getPokestops(lureId, invasionActive = false, questActive = false, ar = false) {
     const baseUrl = `${this[this.selected.pokestop].path}/pokestop`
     const invasionSuffixes = invasionActive ? ['_i', ''] : ['']
     const questSuffixes = questActive ? ['_q', ''] : ['']
+    const arSuffixes = ar ? ['_ar', ''] : ['']
     for (const invasionSuffix of invasionSuffixes) {
       for (const questSuffix of questSuffixes) {
-        const result = `${lureId}${questSuffix}${invasionSuffix}.png`
-        if (this[this.selected.pokestop].pokestop.has(result)) {
-          return `${baseUrl}/${result}`
+        for (const arSuffix of arSuffixes) {
+          const result = `${lureId}${questSuffix}${invasionSuffix}${arSuffix}.png`
+          if (this[this.selected.pokestop].pokestop.has(result)) {
+            return `${baseUrl}/${result}`
+          }
         }
       }
     }
@@ -189,17 +192,20 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
-  getGyms(teamId = 0, trainerCount = 0, inBattle = false, ex = false) {
+  getGyms(teamId = 0, trainerCount = 0, inBattle = false, ex = false, ar = false) {
     const baseUrl = `${this[this.selected.gym].path}/gym`
     const trainerSuffixes = trainerCount ? [`_t${trainerCount}`, ''] : ['']
     const inBattleSuffixes = inBattle ? ['_b', ''] : ['']
     const exSuffixes = ex ? ['_ex', ''] : ['']
+    const arSuffixes = ar ? ['_ar', ''] : ['']
     for (const trainerSuffix of trainerSuffixes) {
       for (const inBattleSuffix of inBattleSuffixes) {
         for (const exSuffix of exSuffixes) {
-          const result = `${teamId}${trainerSuffix}${inBattleSuffix}${exSuffix}.png`
-          if (this[this.selected.gym].gym.has(result)) {
-            return `${baseUrl}/${result}`
+          for (const arSuffix of arSuffixes) {
+            const result = `${teamId}${trainerSuffix}${inBattleSuffix}${exSuffix}${arSuffix}.png`
+            if (this[this.selected.gym].gym.has(result)) {
+              return `${baseUrl}/${result}`
+            }
           }
         }
       }
@@ -251,9 +257,14 @@ export default class UIcons {
 
   getMisc(fileName) {
     const baseUrl = `${this[this.selected.misc].path}/misc`
-    if (this[this.selected.misc].misc.has(`${fileName}.png`)) {
-      return `${baseUrl}/${fileName}.png`
+    switch (true) {
+      case this[this.selected.misc].misc.has(`${fileName}.png`):
+        return `${baseUrl}/${fileName}.png`
+      case fileName.endsWith('s') && this[this.selected.misc].misc.has(`${fileName.slice(0, -1)}.png`):
+        return `${baseUrl}/${fileName.slice(0, -1)}.png`
+      case !fileName.endsWith('s') && this[this.selected.misc].misc.has(`${fileName}s.png`):
+        return `${baseUrl}/${fileName}s.png`
+      default: return `${baseUrl}/0.png`
     }
-    return `${baseUrl}/0.png`
   }
 }

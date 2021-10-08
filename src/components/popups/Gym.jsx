@@ -51,6 +51,7 @@ export default function GymPopup({
               <GymInfo
                 gym={gym}
                 t={t}
+                Icons={Icons}
               />
             </Grid>
           </Collapse>
@@ -87,6 +88,7 @@ export default function GymPopup({
         hasRaid={hasRaid}
         perms={perms}
         t={t}
+        Icons={Icons}
       />
       {perms.gyms && (
         <Collapse in={extraExpand} timeout="auto" unmountOnExit>
@@ -335,7 +337,7 @@ const RaidImage = ({
   )
 }
 
-const GymInfo = ({ gym, t }) => {
+const GymInfo = ({ gym, t, Icons }) => {
   const {
     team_id, availble_slots, ex_raid_eligible, ar_scan_eligible,
   } = gym
@@ -366,7 +368,7 @@ const GymInfo = ({ gym, t }) => {
           className="grid-item"
           style={{
             height: 24,
-            backgroundImage: 'url(/images/misc/ex.png)',
+            backgroundImage: `url(${Icons.getMisc('ex')})`,
           }}
         />
       )}
@@ -377,7 +379,7 @@ const GymInfo = ({ gym, t }) => {
           className="grid-item"
           style={{
             height: 24,
-            backgroundImage: 'url(/images/misc/ar.png)',
+            backgroundImage: `url(${Icons.getMisc('ar')})`,
           }}
         />
       )}
@@ -500,7 +502,7 @@ const Timer = ({ gym, start, t }) => {
 }
 
 const Footer = ({
-  gym, expanded, setExpanded, hasRaid, raidExpand, setRaidExpand, perms,
+  gym, expanded, setExpanded, hasRaid, raidExpand, setRaidExpand, perms, Icons,
 }) => {
   const classes = useStyles()
   const { navigation } = useStore(state => state.settings)
@@ -525,7 +527,7 @@ const Footer = ({
             aria-expanded={raidExpand}
           >
             <img
-              src={`/images/misc/${raidExpand ? 'gyms' : 'raids'}.png`}
+              src={Icons.getMisc(raidExpand ? 'gyms' : 'raids')}
               height={20}
               width="auto"
             />

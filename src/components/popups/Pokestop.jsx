@@ -45,6 +45,7 @@ export default function PokestopPopup({
     >
       <Grid item xs={3} style={{ textAlign: 'center' }}>
         <HeaderImage
+          Icons={Icons}
           alt={pokestop.name}
           url={pokestop.url}
           backup={Icons.getPokestops(0)}
@@ -129,6 +130,7 @@ export default function PokestopPopup({
         setPopups={setPopups}
         hasInvasion={hasInvasion}
         perms={perms}
+        Icons={Icons}
       />
       {perms.allPokestops && (
         <Collapse in={popups.extras} timeout="auto" unmountOnExit>
@@ -401,7 +403,7 @@ const QuestConditions = ({ quest, t, userSettings }) => {
 
 const Footer = ({
   pokestop, popups, setPopups,
-  hasInvasion, perms,
+  hasInvasion, perms, Icons,
 }) => {
   const classes = useStyles()
 
@@ -421,7 +423,7 @@ const Footer = ({
             aria-expanded={popups.invasions}
           >
             <img
-              src={`/images/misc/${popups.invasions ? 'quests' : 'invasions'}.png`}
+              src={Icons.getMisc(popups.invasions ? 'quest' : 'invasion')}
               className="circle pulse"
             />
           </IconButton>
@@ -501,7 +503,7 @@ const Invasion = ({ pokestop, Icons, t }) => {
       />
       <img
         className="invasion-reward-shadow"
-        src="/images/misc/shadow.png"
+        src={Icons.getMisc('shadow')}
       />
     </div>
   )

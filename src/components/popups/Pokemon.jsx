@@ -81,6 +81,7 @@ export default function PokemonPopup({
         setPvpExpand={setPvpExpand}
         hasPvp={hasLeagues.length > 0}
         classes={classes}
+        Icons={Icons}
       />
       <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
         {hasLeagues.map(league => (
@@ -355,7 +356,7 @@ const Timer = ({ pokemon, hasStats }) => {
 }
 
 const Footer = ({
-  pokemon, expanded, pvpExpand, setExpanded, setPvpExpand, hasPvp, classes,
+  pokemon, expanded, pvpExpand, setExpanded, setPvpExpand, hasPvp, classes, Icons,
 }) => {
   const { navigation } = useStore(state => state.settings)
   const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
@@ -384,7 +385,7 @@ const Footer = ({
             aria-label="show more"
           >
             <img
-              src="/images/misc/pvp.png"
+              src={Icons.getMisc('pvp')}
               height={20}
               width="auto"
             />
@@ -493,13 +494,12 @@ const PvpInfo = ({
     }
   })
   const rowClass = { width: 30, fontWeight: 'bold' }
-  const src = league === 'great' || league === 'ultra' ? league : 'cup'
 
   return (
     <table className="table-pvp">
       <thead>
         <tr>
-          <td style={rowClass}><img src={`/images/misc/${src}.png`} height={20} /></td>
+          <td style={rowClass}><img src={Icons.getMisc(league === 'great' || league === 'ultra' ? league : 'cup')} height={20} /></td>
           <td style={rowClass}>{t('rank')}</td>
           <td style={rowClass}>{t('cp')}</td>
           <td style={rowClass}>{t('lvl')}</td>

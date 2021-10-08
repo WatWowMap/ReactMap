@@ -384,5 +384,6 @@
   "showPolygons": "Afficher les Polygones",
   "excludeInvasionMulti": "Exclure {{invasion}}",
   "hasQuestIndicator": "Couleur alternative pour afficher les Quêtes",
+  "showArBadge": "Afficher les Badges AR",
   "pvpMega": "Stats PvP Mega"
 }

@@ -386,5 +386,6 @@
   "showPolygons": "Show Polygons",
   "excludeInvasionMulti": "Exclude {{invasion}}",
   "messageOfTheDay": "Message of the Day",
-  "hasQuestIndicator": "Alternative Color for Stops with Quests"
+  "hasQuestIndicator": "Alternative Color for Stops with Quests",
+  "showArBadge": "Show AR Badge"
 }

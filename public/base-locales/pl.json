@@ -375,5 +375,6 @@
   "showPolygons": "Pokaż Obszary",
   "excludeInvasionMulti": "Wyklucz {{invasion}}",
   "messageOfTheDay": "Wiadomość Dnia",
-  "hasQuestIndicator": "Alternatywny kolor dla Pokestopów z zadaniami"
+  "hasQuestIndicator": "Alternatywny kolor dla Pokestopów z zadaniami",
+  "showArBadge": "Pokaż odznakę AR"
 }

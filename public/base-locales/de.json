@@ -386,5 +386,6 @@
   "showPolygons": "Polygone anzeigen",
   "excludeInvasionMulti": "{{invasion}} ausschließen",
   "messageOfTheDay": "Nachricht des Tages",
-  "hasQuestIndicator": "Alternative Farbe für Stops mit Quests"
+  "hasQuestIndicator": "Alternative Farbe für Stops mit Quests",
+  "showArBadge": "Zeige AR Abzeichen"
 }
