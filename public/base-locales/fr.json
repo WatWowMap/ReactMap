@@ -374,6 +374,16 @@
   "showDexNumInPopup": "Visualiser le # de Pokedex en Popup",
   "popup": "Popup",
   "pvpLevel": "Stats PvP Niveau {{level}}",
+  "messageOftheDay": "Message du jour",
+  "arQuest_false": "Sans Quête AR",
+  "excludeQuestMulti": "Exclure {{reward}}",
+  "excludeLure": "Exclure Leurre",
+  "popupPokestopSeenTimerWidth": 7,
+  "clusterLimit_0": "La limite de {{variable_0}} ({{variable_1}}) a été atteinte",
+  "clusterLimit_1": "Veuillez zoomer ou réduire vos filtres",
+  "showPolygons": "Afficher les Polygones",
+  "excludeInvasionMulti": "Exclure {{invasion}}",
+  "hasQuestIndicator": "Couleur alternative pour afficher les Quêtes",
   "showArBadge": "Afficher les Badges AR",
   "pvpMega": "Stats PvP Mega"
 }

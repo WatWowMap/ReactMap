@@ -385,6 +385,7 @@
   "clusterLimit_1": "Please zoom in or narrow your filters",
   "showPolygons": "Show Polygons",
   "excludeInvasionMulti": "Exclude {{invasion}}",
+  "messageOfTheDay": "Message of the Day",
   "hasQuestIndicator": "Alternative Color for Stops with Quests",
   "showArBadge": "Show AR Badge"
 }

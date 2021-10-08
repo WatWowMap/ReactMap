@@ -64,6 +64,10 @@
       "pokemon": 15,
       "portals": 14,
       "spawnpoints": 12
+    },
+    "messageOfTheDay": {
+      "index": 0,
+      "messages": []
     }
   },
   "clientSideOptions": {

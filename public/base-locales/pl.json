@@ -374,6 +374,7 @@
   "clusterLimit_1": "Proszę przybliż lub zawęź swoje filtry",
   "showPolygons": "Pokaż Obszary",
   "excludeInvasionMulti": "Wyklucz {{invasion}}",
+  "messageOfTheDay": "Wiadomość Dnia",
   "hasQuestIndicator": "Alternatywny kolor dla Pokestopów z zadaniami",
   "showArBadge": "Pokaż odznakę AR"
 }
