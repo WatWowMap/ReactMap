@@ -63,7 +63,7 @@ export default function SliderTile({
       {['min', 'max'].map((each, index) => (
         <Grid item xs={4} key={`${name}-${each}`} style={{ textAlign: index ? 'center' : 'right' }}>
           <TextField
-            style={{ width: 75 }}
+            style={{ width: 80 }}
             color={color}
             id={each}
             label={`${t(each)} ${t(label)}`}

@@ -226,7 +226,7 @@ rootRouter.get('/settings', async (req, res) => {
           console.warn(e, 'Unable to fetch webhook data')
         }
       }
-      // console.log(serverSettings.webhooks)
+      console.log(serverSettings.webhooks)
     }
     res.status(200).json({ serverSettings })
   } catch (error) {

@@ -137,6 +137,9 @@ export default function WebhookAdvanced({
       case 'pvp_ranking_league': option.options.forEach(league => (
         menuItems.push(<MenuItem key={league.name} value={league.cp}>{t(`${league.name}Slider`)}</MenuItem>)
       )); break
+      case 'gender': option.options.forEach(gender => (
+        menuItems.push(<MenuItem key={gender} value={gender}>{t(`gender_${gender}`)}</MenuItem>)
+      )); break
       default: option.options.forEach(subOption => (
         menuItems.push(<MenuItem key={subOption} value={subOption}>{t(subOption, subOption)}</MenuItem>)
       ))

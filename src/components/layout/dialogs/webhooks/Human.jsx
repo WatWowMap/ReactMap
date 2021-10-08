@@ -69,7 +69,9 @@ const Human = ({
         </Grid>
         <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
           <Select
-            value={currentHuman.current_profile_no}
+            value={webhookData[selectedWebhook].profile.length
+              ? currentHuman.current_profile_no
+              : ''}
             onChange={(e) => {
               syncWebhook({
                 variables: {

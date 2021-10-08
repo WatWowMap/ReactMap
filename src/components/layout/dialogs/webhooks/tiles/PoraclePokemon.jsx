@@ -27,7 +27,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
       return
     }
     setEditDialog(open)
-    if (id && !Object.keys(newFilters).every(key => newFilters[key] === item[key])) {
+    if (id && newFilters && !Object.keys(newFilters).every(key => newFilters[key] === item[key])) {
       // eslint-disable-next-line camelcase
       const [pokemon_id, form] = id.split('-')
       syncWebhook({
