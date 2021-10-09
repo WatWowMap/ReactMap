@@ -210,7 +210,8 @@ const RootQuery = new GraphQLObjectType({
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.scanAreas) {
           const scanAreas = fs.existsSync('server/src/configs/areas.json')
-            ? JSON.parse(fs.readFileSync('./server/src/configs/areas.json'))
+            // eslint-disable-next-line global-require
+            ? require('../configs/areas.json')
             : { features: [] }
           return scanAreas.features.sort(
             (a, b) => (a.properties.name > b.properties.name) ? 1 : -1,
