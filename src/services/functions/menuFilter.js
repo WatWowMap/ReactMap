@@ -42,7 +42,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
   }
 
   const addPokestop = (id, stop) => {
-    const stopCheck = id.startsWith('s') && stopPerms.pokestops
+    const stopCheck = id.startsWith('s') && stopPerms.allPokestops
     const lureCheck = id.startsWith('l') && stopPerms.lures
     const questCheck = (!Number.isNaN(parseInt(id.charAt(0))) || id.startsWith('m') || id.startsWith('q') || id.startsWith('d') || id.startsWith('c')) && stopPerms.quests
     const invasionsCheck = id.startsWith('i') && stopPerms.invasions
@@ -67,7 +67,7 @@ export default function menuFilter(tempFilters, menus, search, type) {
 
   const addGym = (id, gym) => {
     const raidCheck = (!Number.isNaN(parseInt(id.charAt(0))) && gymPerms.raids) || (id.startsWith('e') && gymPerms.raids)
-    const gymCheck = (id.startsWith('g') && gymPerms.gyms) || (id.startsWith('t') && gymPerms.gyms)
+    const gymCheck = (id.startsWith('g') && gymPerms.allGyms) || (id.startsWith('t') && gymPerms.allGyms)
     if ((raidCheck || gymCheck) && gym.name) {
       show += 1
       let url
