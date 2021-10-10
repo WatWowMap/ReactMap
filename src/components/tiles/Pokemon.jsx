@@ -5,7 +5,7 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
-import Timer from './Timer'
+import ToolTipWrapper from './Timer'
 
 const operator = {
   '=': function equal(a, b) {
@@ -100,10 +100,9 @@ const PokemonTile = ({
             />
           </Popup>
           {(showTimer || userSettings.pokemonTimers) && (
-            <Timer
-              timestamp={item.expire_timestamp}
-              direction="center"
-              offset={[0, 30]}
+            <ToolTipWrapper
+              timers={[item.expire_timestamp]}
+              offset={[0, 18]}
             />
           )}
           {showCircles && (
