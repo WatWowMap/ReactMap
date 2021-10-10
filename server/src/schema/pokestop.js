@@ -47,7 +47,7 @@ module.exports = new GraphQLObjectType({
     lon: { type: GraphQLFloat },
     name: { type: GraphQLString },
     url: { type: GraphQLString },
-    lure_expire_timestamp: { type: GraphQLString },
+    lure_expire_timestamp: { type: GraphQLInt },
     last_modified_timestamp: { type: GraphQLInt },
     updated: { type: GraphQLInt },
     lure_id: { type: GraphQLInt },
