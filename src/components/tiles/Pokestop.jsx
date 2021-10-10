@@ -6,7 +6,7 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 
 import PopupContent from '../popups/Pokestop'
 import stopMarker from '../markers/pokestop'
-import Timer from './Timer'
+import ToolTipWrapper from './Timer'
 
 const PokestopTile = ({
   item, ts, showTimer, filters, Icons, perms, excludeList, userSettings,
@@ -30,6 +30,16 @@ const PokestopTile = ({
       markerToOpen.openPopup()
     }
   }, [done])
+
+  const timers = []
+  if ((showTimer || userSettings.invasionTimers) && hasInvasion) {
+    invasions.forEach(invasion => (
+      timers.push(invasion.incident_expire_timestamp)
+    ))
+  }
+  if ((showTimer || userSettings.lureTimers) && hasLure) {
+    timers.push(lure_expire_timestamp)
+  }
 
   return (
     <>
@@ -60,24 +70,9 @@ const PokestopTile = ({
                 config={config}
               />
             </Popup>
-            {((showTimer || userSettings.invasionTimers) && hasInvasion)
-              && (
-                <Timer
-                  timestamp={item.incident_expire_timestamp}
-                  direction={hasLure ? 'right' : 'center'}
-                  label={hasLure ? 'Invasion' : false}
-                  offset={hasLure ? [-5, 20] : [0, 20]}
-                />
-              )}
-            {((showTimer || userSettings.lureTimers) && hasLure)
-              && (
-                <Timer
-                  timestamp={item.lure_expire_timestamp}
-                  direction={hasInvasion ? 'left' : 'center'}
-                  label={hasInvasion ? 'Lure' : false}
-                  offset={hasInvasion ? [5, 20] : [0, 20]}
-                />
-              )}
+            {Boolean(timers.length) && (
+              <ToolTipWrapper timers={timers} offset={[6, 4]} />
+            )}
             {showCircles && (
               <Circle
                 center={[item.lat, item.lon]}

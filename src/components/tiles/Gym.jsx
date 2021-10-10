@@ -6,7 +6,7 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 
 import gymMarker from '../markers/gym'
 import PopupContent from '../popups/Gym'
-import Timer from './Timer'
+import ToolTipWrapper from './Timer'
 
 const getColor = team => {
   switch (team) {
@@ -64,10 +64,9 @@ const GymTile = ({
             />
           </Popup>
           {((showTimer || userSettings.raidTimers) && hasRaid) && (
-            <Timer
-              timestamp={timerToDisplay}
-              direction="center"
-              offset={[0, 10]}
+            <ToolTipWrapper
+              timers={[timerToDisplay]}
+              offset={[6, 5]}
             />
           )}
           {showCircles && (
