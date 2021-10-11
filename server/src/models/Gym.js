@@ -21,7 +21,7 @@ class Gym extends Model {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const { gyms, raids, areaRestrictions } = perms
     const {
-      onlyGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible,
+      onlyAllGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible,
     } = args.filters
     const query = this.query()
 
@@ -117,7 +117,7 @@ class Gym extends Model {
           ar.where(isMad ? 'is_ar_scan_eligible' : 'ar_scan_eligible', 1)
         })
       }
-      if (onlyGyms && gyms) {
+      if (onlyAllGyms && gyms) {
         if (finalTeams.length === 0 && slots.length === 0) {
           gym.whereNull('team_id')
         } else if (finalTeams.length === 4) {
@@ -172,7 +172,7 @@ class Gym extends Model {
           filteredResults.push(gym)
         } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]) {
           filteredResults.push(gym)
-        } else if (gyms && (onlyGyms || onlyArEligible || onlyExEligible)) {
+        } else if (gyms && (onlyAllGyms || onlyArEligible || onlyExEligible)) {
           if (args.filters[`t${gym.team_id}-0`]) {
             gym.raid_end_timestamp = null
             gym.raid_battle_timestamp = null

@@ -1,7 +1,7 @@
 {
   "interface": "0.0.0.0",
   "port": 8080,
-  "localeSelection": ["en", "de", "pl" ,"es" ,"fr", "it"],
+  "localeSelection": ["en", "de", "pl" ,"es" ,"fr"],
   "devOptions": {
     "enabled": false,
     "graphiql": false,
