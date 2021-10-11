@@ -217,10 +217,6 @@ const MenuActions = ({
     { name: 'hide', action: handleHide },
   ]
 
-  if (perms.lures && hasLure) {
-    options.push({ name: 'excludeLure', action: excludeLure })
-  }
-
   if (perms.quests && hasQuest) {
     quests.forEach((quest, i) => {
       let reward = ''
@@ -241,13 +237,18 @@ const MenuActions = ({
   }
   if ((perms.invasions && hasInvasion)
     || (perms.lures && hasLure)) {
-    invasions.forEach((invasion, i) => {
-      options.push({
-        key: `${invasion.grunt_type}-${invasion.incident_expire_timestamp}`,
-        name: <Trans i18nKey="excludeInvasionMulti">{{ invasion: t(`grunt_a_${invasion.grunt_type}`) }}</Trans>,
-        action: () => excludeInvasion(i),
+    if (hasInvasion) {
+      invasions.forEach((invasion, i) => {
+        options.push({
+          key: `${invasion.grunt_type}-${invasion.incident_expire_timestamp}`,
+          name: <Trans i18nKey="excludeInvasionMulti">{{ invasion: t(`grunt_a_${invasion.grunt_type}`) }}</Trans>,
+          action: () => excludeInvasion(i),
+        })
       })
-    })
+    }
+    if (hasLure) {
+      options.push({ name: 'excludeLure', action: excludeLure })
+    }
     options.push(
       { name: 'timer', action: handleTimer },
     )
