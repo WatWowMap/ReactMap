@@ -1,6 +1,6 @@
 /* eslint-disable import/no-unresolved */
 const {
-  GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString,
+  GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString, GraphQLInt,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
 const fs = require('fs')
@@ -18,7 +18,7 @@ const SearchType = require('./search')
 const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
-
+const { map } = require('../services/config')
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
 } = require('../models/index')
@@ -40,6 +40,7 @@ const RootQuery = new GraphQLObjectType({
         if (perms.devices) {
           return Device.getAllDevices(perms, Utility.dbSelection('device') === 'mad')
         }
+        return []
       },
     },
     gyms: {
@@ -53,6 +54,7 @@ const RootQuery = new GraphQLObjectType({
         if (perms.gyms || perms.raids) {
           return Gym.getAllGyms(args, perms, Utility.dbSelection('gym') === 'mad')
         }
+        return []
       },
     },
     gymsSingle: {
@@ -89,6 +91,7 @@ const RootQuery = new GraphQLObjectType({
         if (perms.nests) {
           return Nest.getNestingSpecies(args, perms)
         }
+        return []
       },
     },
     nestsSingle: {
@@ -120,6 +123,7 @@ const RootQuery = new GraphQLObjectType({
           || perms.invasions) {
           return Pokestop.getAllPokestops(args, perms, Utility.dbSelection('pokestop') === 'mad')
         }
+        return []
       },
     },
     pokestopsSingle: {
@@ -160,6 +164,7 @@ const RootQuery = new GraphQLObjectType({
           }
           return Pokemon.getPokemon(args, perms, isMad)
         }
+        return []
       },
     },
     pokemonSingle: {
@@ -192,16 +197,35 @@ const RootQuery = new GraphQLObjectType({
         if (perms.portals) {
           return Portal.getAllPortals(args, perms)
         }
+        return []
+      },
+    },
+    portalsSingle: {
+      type: PortalType,
+      args: {
+        id: { type: GraphQLID },
+        perm: { type: GraphQLString },
+      },
+      async resolve(parent, args, req) {
+        const perms = req.user ? req.user.perms : req.session.perms
+        if (perms[args.perm]) {
+          return Portal.query().findById(args.id) || {}
+        }
+        return {}
       },
     },
     s2cells: {
       type: new GraphQLList(S2cellType),
-      args: minMaxArgs,
+      args: {
+        ...minMaxArgs,
+        zoom: { type: GraphQLInt },
+      },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.s2cells) {
+        if (perms.s2cells && args.zoom >= map.scanCellsZoom) {
           return S2cell.getAllCells(args, perms, Utility.dbSelection('pokestop') === 'mad')
         }
+        return []
       },
     },
     scanAreas: {
@@ -254,6 +278,7 @@ const RootQuery = new GraphQLObjectType({
               return Nest.search(args, perms, isMad, distance)
           }
         }
+        return []
       },
     },
     spawnpoints: {
@@ -264,14 +289,18 @@ const RootQuery = new GraphQLObjectType({
         if (perms.spawnpoints) {
           return Spawnpoint.getAllSpawnpoints(args, perms, Utility.dbSelection('spawnpoint') === 'mad')
         }
+        return []
       },
     },
     submissionCells: {
       type: JSONResolver,
-      args: minMaxArgs,
+      args: {
+        ...minMaxArgs,
+        zoom: { type: GraphQLInt },
+      },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.submissionCells) {
+        if (perms.submissionCells && args.zoom >= map.submissionZoom - 1) {
           const isMadStops = Utility.dbSelection('pokestop') === 'mad'
           const isMadGyms = Utility.dbSelection('gym') === 'mad'
 
@@ -314,10 +343,13 @@ const RootQuery = new GraphQLObjectType({
           const pokestops = await stopQuery
           const gyms = await gymQuery
           return [{
-            placementCells: Utility.getPlacementCells(args, pokestops, gyms),
+            placementCells: args.zoom >= map.submissionZoom
+              ? Utility.getPlacementCells(args, pokestops, gyms)
+              : [],
             typeCells: Utility.getTypeCells(args, pokestops, gyms),
           }]
         }
+        return [{ placementCells: [], typeCells: [] }]
       },
     },
     weather: {
@@ -327,6 +359,7 @@ const RootQuery = new GraphQLObjectType({
         if (perms.weather) {
           return Weather.getAllWeather(Utility.dbSelection('weather') === 'mad')
         }
+        return []
       },
     },
   },

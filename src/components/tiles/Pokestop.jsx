@@ -1,8 +1,9 @@
 /* eslint-disable camelcase */
-import React, {
-  memo, useState, useEffect, useRef,
-} from 'react'
+import React, { useState, memo, useRef } from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
+
+import useMarkerTimer from '@hooks/useMarkerTimer'
+import useForcePopup from '@hooks/useForcePopup'
 
 import PopupContent from '../popups/Pokestop'
 import stopMarker from '../markers/pokestop'
@@ -10,80 +11,71 @@ import ToolTipWrapper from './Timer'
 
 const PokestopTile = ({
   item, ts, showTimer, filters, Icons, perms, excludeList, userSettings,
-  params, showCircles, config,
+  params, showCircles, config, setParams,
 }) => {
+  const markerRef = useRef({})
   const [done, setDone] = useState(false)
-  const markerRefs = useRef({})
+  const [stateChange, setStateChange] = useState(false)
+  const newTs = Date.now() / 1000
 
-  const {
-    lure_expire_timestamp, ar_scan_eligible, quests, invasions,
-  } = item
+  const hasLure = item.lure_expire_timestamp > newTs
 
-  const hasLure = lure_expire_timestamp >= ts
-  const hasInvasion = invasions && invasions.some(invasion => !excludeList.includes(`i${invasion.grunt_type}`))
-  const hasQuest = quests && quests.some(quest => !excludeList.includes(quest.key))
+  const hasInvasion = item.invasions && item.invasions.some(invasion => !excludeList.includes(`i${invasion.grunt_type}`) && invasion.incident_expire_timestamp > newTs)
 
-  useEffect(() => {
-    const { id } = params
-    if (id === item.id) {
-      const markerToOpen = markerRefs.current[id]
-      markerToOpen.openPopup()
-    }
-  }, [done])
+  const hasQuest = item.quests && item.quests.some(quest => !excludeList.includes(quest.key))
 
   const timers = []
   if ((showTimer || userSettings.invasionTimers) && hasInvasion) {
-    invasions.forEach(invasion => (
+    item.invasions.forEach(invasion => (
       timers.push(invasion.incident_expire_timestamp)
     ))
   }
   if ((showTimer || userSettings.lureTimers) && hasLure) {
-    timers.push(lure_expire_timestamp)
+    timers.push(item.lure_expire_timestamp)
   }
 
-  return (
-    <>
-      {Boolean(((hasQuest && perms.quests)
-        || (hasLure && perms.lures)
-        || (hasInvasion && perms.invasions))
-        || ((filters.allPokestops || ar_scan_eligible) && perms.allPokestops))
-        && (
-          <Marker
-            ref={(m) => {
-              markerRefs.current[item.id] = m
-              if (!done && item.id === params.id) {
-                setDone(true)
-              }
-            }}
-            position={[item.lat, item.lon]}
-            icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, Icons, userSettings)}
-          >
-            <Popup position={[item.lat, item.lon]} onClose={() => delete params.id}>
-              <PopupContent
-                pokestop={item}
-                ts={ts}
-                hasLure={hasLure}
-                hasInvasion={hasInvasion}
-                hasQuest={hasQuest}
-                Icons={Icons}
-                userSettings={userSettings}
-                config={config}
-              />
-            </Popup>
-            {Boolean(timers.length) && (
-              <ToolTipWrapper timers={timers} offset={[6, 4]} />
-            )}
-            {showCircles && (
-              <Circle
-                center={[item.lat, item.lon]}
-                radius={70}
-                pathOptions={{ color: '#0DA8E7', weight: 1 }}
-              />
-            )}
-          </Marker>
+  useMarkerTimer(timers.length ? Math.min(...timers) : null, item.id, markerRef, '', ts, () => setStateChange(!stateChange))
+  useForcePopup(item.id, markerRef, params, setParams, done)
+
+  return Boolean(((hasQuest && perms.quests)
+    || (hasLure && perms.lures)
+    || (hasInvasion && perms.invasions))
+    || ((filters.allPokestops || item.ar_scan_eligible) && perms.allPokestops))
+    && (
+      <Marker
+        ref={(m) => {
+          markerRef.current[item.id] = m
+          if (!done && item.id === params.id) {
+            setDone(true)
+          }
+        }}
+        position={[item.lat, item.lon]}
+        icon={stopMarker(item, hasQuest, hasLure, hasInvasion, filters, Icons, userSettings)}
+      >
+        <Popup position={[item.lat, item.lon]}>
+          <PopupContent
+            pokestop={item}
+            ts={ts}
+            hasLure={hasLure}
+            hasInvasion={hasInvasion}
+            hasQuest={hasQuest}
+            Icons={Icons}
+            userSettings={userSettings}
+            config={config}
+          />
+        </Popup>
+        {Boolean(timers.length) && (
+          <ToolTipWrapper timers={timers} offset={[6, 4]} />
         )}
-    </>
-  )
+        {showCircles && (
+          <Circle
+            center={[item.lat, item.lon]}
+            radius={70}
+            pathOptions={{ color: '#0DA8E7', weight: 1 }}
+          />
+        )}
+      </Marker>
+    )
 }
 
 const areEqual = (prev, next) => (
