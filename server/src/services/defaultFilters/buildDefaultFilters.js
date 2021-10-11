@@ -21,7 +21,7 @@ module.exports = function buildDefault(perms) {
   return {
     gyms: gymReducer ? {
       enabled: defaultFilters.gyms.enabled,
-      gyms: perms.gyms ? defaultFilters.gyms.enabled : undefined,
+      allGyms: perms.gyms ? defaultFilters.gyms.enabled : undefined,
       raids: perms.raids ? defaultFilters.gyms.raids : undefined,
       exEligible: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
       inBattle: perms.gyms ? defaultFilters.gyms.exEligible : undefined,

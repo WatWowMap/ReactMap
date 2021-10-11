@@ -34,7 +34,7 @@ export default function GymPopup({
       spacing={1}
     >
       <Header gym={gym} perms={perms} hasRaid={hasRaid} t={t} />
-      {perms.gyms && (
+      {perms.allGyms && (
         <Grid item xs={12}>
           <Collapse in={!raidExpand} timeout="auto" unmountOnExit>
             <Grid
@@ -90,7 +90,7 @@ export default function GymPopup({
         t={t}
         Icons={Icons}
       />
-      {perms.gyms && (
+      {perms.allGyms && (
         <Collapse in={extraExpand} timeout="auto" unmountOnExit>
           <ExtraInfo gym={gym} t={t} ts={ts} />
         </Collapse>
@@ -186,7 +186,7 @@ const Header = ({
     { name: 'hide', action: handleHide },
   ]
 
-  if (perms.gyms) {
+  if (perms.allGyms) {
     options.push({ name: 'excludeTeam', action: excludeTeam })
   }
   if (perms.raids && hasRaid) {
@@ -523,7 +523,7 @@ const Footer = ({
 
   return (
     <>
-      {(hasRaid && perms.raids && perms.gyms) && (
+      {(hasRaid && perms.raids && perms.allGyms) && (
         <Grid item xs={4}>
           <IconButton
             className={classes.expand}
@@ -547,7 +547,7 @@ const Footer = ({
           <Map style={{ color: 'white' }} />
         </IconButton>
       </Grid>
-      {perms.gyms && (
+      {perms.allGyms && (
         <Grid item xs={4}>
           <IconButton
             className={expanded ? classes.expandOpen : classes.expand}

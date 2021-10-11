@@ -21,7 +21,7 @@ export default class Query {
       return gymIndex.getOne
     }
     const permObj = {
-      Gyms: filters.raids ? filters.gyms || perms.gyms : filters.gyms && perms.gyms,
+      Gyms: filters.raids ? filters.allGyms || perms.allGyms : filters.allGyms && perms.allGyms,
       Raids: filters.raids && perms.raids,
     }
     let query = 'get'

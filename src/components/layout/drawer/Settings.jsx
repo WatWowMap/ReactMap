@@ -100,7 +100,7 @@ export default function Settings({ toggleDialog, Icons }) {
             <Select
               autoFocus
               name={setting}
-              value={config[setting][settings[setting]].name}
+              value={config[setting][settings[setting]]?.name}
               onChange={handleChange}
               fullWidth
             >

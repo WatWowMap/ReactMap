@@ -68,7 +68,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               enabled = true
             } break
           case 'gyms':
-            if ((filters[category].gyms && value.gyms)
+            if ((filters[category].allGyms && value.allGyms)
               || (filters[category].raids && value.raids)
               || (filters[category].exEligible && value.exEligible)
               || (filters[category].inBattle && value.inBattle)
