@@ -4,6 +4,7 @@ import { useMutation } from '@apollo/client'
 import Query from '@services/Query'
 import ReactWindow from '@components/layout/general/ReactWindow'
 import PokemonTile from './tiles/PoraclePokemon'
+import Selecting from './Selecting'
 
 const pvpFields = ['pvp_ranking_league', 'pvp_ranking_best', 'pvp_ranking_worst', 'pvp_ranking_min_cp']
 const ignoredFields = ['noIv', 'byDistance', 'xs', 'xl', 'allForms', 'pvpEntry']
@@ -28,6 +29,7 @@ const WebhookPokemon = ({
 }) => {
   const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook('pokemon'))
   const [currentPokemon, setCurrentPokemon] = useState(webhookData[selectedWebhook].pokemon)
+  const [selected, setSelected] = useState({})
 
   useEffect(() => {
     if (newWebhookData?.webhook?.pokemon) {
@@ -60,24 +62,39 @@ const WebhookPokemon = ({
     },
   }))
 
+  const handleAll = () => {
+    const newPokemon = {}
+    currentPokemon.forEach(entry => {
+      newPokemon[entry.uid] = true
+    })
+    setSelected(newPokemon)
+  }
   return (
-    <ReactWindow
-      columnCount={1}
-      length={currentPokemon.length}
-      offset={15}
-      data={{
-        isMobile,
-        Icons,
-        tileItem: currentPokemon.sort((a, b) => a.pokemon_id - b.pokemon_id),
-        syncWebhook,
-        selectedWebhook,
-        currentPokemon,
-        setCurrentPokemon,
-        setSend,
-        setTempFilters,
-      }}
-      Tile={PokemonTile}
-    />
+    <>
+      <ReactWindow
+        columnCount={1}
+        length={currentPokemon.length}
+        offset={15}
+        data={{
+          isMobile,
+          Icons,
+          tileItem: currentPokemon.sort((a, b) => a.pokemon_id - b.pokemon_id),
+          syncWebhook,
+          selectedWebhook,
+          currentPokemon,
+          setCurrentPokemon,
+          selected,
+          setSelected,
+          setSend,
+          setTempFilters,
+          leagues: webhookData[selectedWebhook].info.pokemon.leagues,
+        }}
+        Tile={PokemonTile}
+      />
+      {Object.values(selected).some(x => x) && (
+        <Selecting setSelected={setSelected} handleAll={handleAll} />
+      )}
+    </>
   )
 }
 
@@ -87,6 +104,7 @@ const areEqual = (prev, next) => {
   return prevSelected.pokemon.length === nextSelected.pokemon.length
     && prevSelected.fetched === nextSelected.fetched
     && prev.send === next.send
+    && prev.isMobile === next.isMobile
 }
 
 export default memo(WebhookPokemon, areEqual)

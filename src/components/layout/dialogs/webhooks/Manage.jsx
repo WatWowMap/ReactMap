@@ -34,7 +34,7 @@ export default function Manage({
   const setWebhookData = useStatic(s => s.setWebhookData)
   const staticFilters = useStatic(s => s.filters)
 
-  const [tabValue, setTabValue] = useState(0)
+  const [tabValue, setTabValue] = useState(1)
   const [help, setHelp] = useState(false)
   const [addNew, setAddNew] = useState(false)
   const filteredData = Object.keys(webhookData[selectedWebhook].info || {}).map(key => key)

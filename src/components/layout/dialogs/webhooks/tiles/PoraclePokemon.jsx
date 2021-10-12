@@ -1,14 +1,26 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState } from 'react'
-import { Grid, Typography, IconButton, Dialog } from '@material-ui/core'
+import {
+  Grid, Typography, IconButton, Dialog, Checkbox,
+} from '@material-ui/core'
 import { DeleteForever, Edit } from '@material-ui/icons'
 
 import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 
+const generateDescription = (pkmn, leagues, isMobile) => {
+  if (isMobile) {
+    return pkmn.pvp_ranking_league
+      ? `${leagues.find(league => league.cp === pkmn.pvp_ranking_league).name} ${pkmn.pvp_ranking_best}-${pkmn.pvp_ranking_worst}`
+      : `${pkmn.min_iv}-${pkmn.max_iv}% | L${pkmn.min_level}-${pkmn.max_level}
+      A${pkmn.atk}-${pkmn.max_atk} | D${pkmn.def}-${pkmn.max_def} | S${pkmn.sta}-${pkmn.max_sta}${pkmn.distance ? ` | d${pkmn.distance}` : ''}`
+  }
+  return pkmn.description?.replace(/\**/g, '')
+}
+
 export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   const {
-    tileItem, columnCount, Icons, syncWebhook, selectedWebhook,
-    currentPokemon, setCurrentPokemon, isMobile, setSend, setTempFilters,
+    tileItem, columnCount, Icons, syncWebhook, selectedWebhook, selected, setSelected,
+    currentPokemon, setCurrentPokemon, isMobile, setSend, setTempFilters, leagues,
   } = data
   const [editDialog, setEditDialog] = useState(false)
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -43,6 +55,10 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
     }
   }
 
+  const handleChange = (event) => {
+    setSelected({ ...selected, [item.uid]: event.target.checked })
+  }
+
   return (
     <Grid
       container
@@ -58,17 +74,15 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
           style={{ maxWidth: 40, maxHeight: 40 }}
         />
       </Grid>
-      <Grid item xs={8} sm={9}>
+      <Grid item xs={6} sm={9}>
         <Typography variant="caption">
-          {item.description?.replace(/\**/g, '')}
+          {generateDescription(item, leagues, isMobile)}
         </Typography>
       </Grid>
-      <Grid item xs={1}>
+      <Grid item xs={4} sm={2}>
         <IconButton size="small" onClick={() => setEditDialog(true)}>
           <Edit style={{ color: 'white' }} />
         </IconButton>
-      </Grid>
-      <Grid item xs={1}>
         <IconButton
           size="small"
           onClick={() => {
@@ -85,6 +99,11 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
         >
           <DeleteForever style={{ color: 'white' }} />
         </IconButton>
+        <Checkbox
+          size="small"
+          checked={Boolean(selected[item.uid])}
+          onChange={handleChange}
+        />
       </Grid>
       <Dialog
         open={editDialog}
