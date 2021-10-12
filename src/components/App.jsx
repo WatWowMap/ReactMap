@@ -81,19 +81,13 @@ export default function App() {
     <Suspense fallback="Loading translations...">
       <ApolloProvider client={client}>
         <Router>
-          {(serverSettings && serverSettings.googleAnalytics) && <RouteChangeTracker />}
+          {(process.env && process.env.GOOGLE_ANALYTICS_ID) && <RouteChangeTracker />}
           <Switch>
             <Route exact path="/">
               {serverSettings && <Auth serverSettings={serverSettings} />}
             </Route>
-            <Route exact path="/@/:lat/:lon/:zoom?">
-              {serverSettings && <Auth serverSettings={serverSettings} />}
-            </Route>
-            <Route exact path="/id/:category/:id/:zoom?">
-              {serverSettings && <Auth serverSettings={serverSettings} />}
-            </Route>
             <Route exact path="/login">
-              <Login clickedTwice />
+              <Login clickedTwice serverSettings={serverSettings} />
             </Route>
           </Switch>
         </Router>

@@ -294,6 +294,13 @@
       }
     }
   },
+  "telegram": {
+    "enabled": true,
+    "botName": "",
+    "botToken": "",
+    "enabledPerms": []
+  },
+
   "tileServers": {
     "Default": {
       "attribution": "Map tiles by Carto, under CC BY 3.0. Data by  <a href='https://www.openstreetmap.org/'>OpenStreetMap</a>, under ODbL.",

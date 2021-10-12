@@ -4906,10 +4906,17 @@ passport-oauth2@^1.5.0:
     uid2 "0.0.x"
     utils-merge "1.x.x"
 
-passport-strategy@1.x.x:
+passport-strategy@1.x.x, passport-strategy@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/passport-strategy/-/passport-strategy-1.0.0.tgz#b5539aa8fc225a3d1ad179476ddf236b440f52e4"
   integrity sha1-tVOaqPwiWj0a0XlHbd8ja0QPUuQ=
+
+passport-telegram-official@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/passport-telegram-official/-/passport-telegram-official-2.0.1.tgz#c54bd5c82aab904c2e4466a280806c19da94366e"
+  integrity sha512-h7ugNskZjkouF4HuOeYs25bmAg/Ct7jcOTaB1lZgWPXAX8SL9NRp11+h1b0udpKodYRgnFfR5tS6IummI0qVLQ==
+  dependencies:
+    passport-strategy "^1.0.0"
 
 passport@^0.4.1:
   version "0.4.1"
@@ -5565,6 +5572,13 @@ react-router@5.2.0:
     tiny-invariant "^1.0.2"
     tiny-warning "^1.0.0"
 
+react-telegram-login@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/react-telegram-login/-/react-telegram-login-1.1.2.tgz#28b9bdd68bb2710afca19354ac1f9428092836f0"
+  integrity sha512-pDP+bvfaklWgnK5O6yvZnIwgky0nnYUU6Zhk0EjdMSkPsLQoOzZRsXIoZnbxyBXhi7346bsxMH+EwwJPTxClDw==
+  dependencies:
+    react "^16.13.1"
+
 react-transition-group@^4.4.0:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.4.2.tgz#8b59a56f09ced7b55cbd53c36768b922890d5470"
@@ -5587,6 +5601,15 @@ react-window@^1.8.6:
   dependencies:
     "@babel/runtime" "^7.0.0"
     memoize-one ">=3.1.1 <6"
+
+react@^16.13.1:
+  version "16.14.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.14.0.tgz#94d776ddd0aaa37da3eda8fc5b6b18a4c9a3114d"
+  integrity sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
 
 react@^17.0.2:
   version "17.0.2"

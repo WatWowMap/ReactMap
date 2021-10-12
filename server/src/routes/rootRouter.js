@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const cors = require('cors')
@@ -12,34 +13,32 @@ const config = require('../services/config')
 const Utility = require('../services/Utility')
 const masterfile = require('../data/masterfile.json')
 const {
-  Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter,
+  Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter, User,
 } = require('../models/index')
 
 const rootRouter = new express.Router()
 
 rootRouter.use('/', clientRouter)
 
-if (config.discord.enabled) {
-  rootRouter.use('/auth', authRouter)
+rootRouter.use('/auth', authRouter)
 
-  // eslint-disable-next-line no-unused-vars
-  rootRouter.use((err, req, res, next) => {
-    switch (err.message) {
-      case 'NoCodeProvided':
-        return res.status(400).send({
-          status: 'ERROR',
-          error: err.message,
-        })
-      case 'Failed to fetch user\'s guilds':
-        return res.redirect('/login')
-      default:
-        return res.status(500).send({
-          status: 'ERROR',
-          error: err.message,
-        })
-    }
-  })
-}
+// eslint-disable-next-line no-unused-vars
+rootRouter.use((err, req, res, next) => {
+  switch (err.message) {
+    case 'NoCodeProvided':
+      return res.status(400).send({
+        status: 'ERROR',
+        error: err.message,
+      })
+    case 'Failed to fetch user\'s guilds':
+      return res.redirect('/login')
+    default:
+      return res.status(500).send({
+        status: 'ERROR',
+        error: err.message,
+      })
+  }
+})
 
 rootRouter.get('/logout', (req, res) => {
   req.session.destroy()
@@ -67,9 +66,11 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 
 rootRouter.get('/settings', async (req, res) => {
   try {
-    if (!config.discord.enabled) {
+    if (!config.authMethods.length) {
       req.session.perms = { areaRestrictions: [] }
-      Object.keys(config.discord.perms).forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
+      Object.keys(config.discord.perms).forEach(perm => (
+        req.session.perms[perm] = config.discord.perms[perm].enabled
+      ))
       req.session.save()
     } else if (config.alwaysEnabledPerms.length > 0) {
       req.session.perms = { areaRestrictions: [] }
@@ -77,22 +78,24 @@ rootRouter.get('/settings', async (req, res) => {
       req.session.save()
     }
 
-    const getUser = () => {
-      if (config.discord.enabled) {
-        if (req.user || config.alwaysEnabledPerms.length === 0) {
-          return req.user
-        }
+    const getUser = async () => {
+      if (config.authMethods.length && req.user) {
+        return User.query()
+          .where('discordId', req.user.id)
+          .orWhere('telegramId', req.user.id)
+          .first()
       }
       return req.session
     }
     const serverSettings = {
-      user: getUser(),
+      user: { ...req.user, ...await getUser() },
       discord: config.discord.enabled,
       settings: {},
+      authMethods: config.authMethods,
     }
 
     // add user options here from the config that are structured as objects
-    if (serverSettings.user && serverSettings.user.perms) {
+    if (serverSettings.user?.perms) {
       serverSettings.loggedIn = req.user
       serverSettings.config = {
         map: {

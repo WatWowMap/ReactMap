@@ -15,7 +15,7 @@ import { useStatic } from '@hooks/useStore'
 
 export default function TutWelcome({ setUserProfile }) {
   const { t, i18n } = useTranslation()
-  const { discord, loggedIn, perms } = useStatic(state => state.auth)
+  const { strategy, loggedIn, perms } = useStatic(state => state.auth)
   const { map: { excludeList }, localeSelection } = useStatic(state => state.config)
 
   const getPerms = () => {
@@ -28,6 +28,12 @@ export default function TutWelcome({ setUserProfile }) {
       }
     })
     return `${have} / ${total}`
+  }
+
+  const getStrategy = () => {
+    if (strategy === 'discord') {
+      
+    }
   }
 
   return (
@@ -44,7 +50,7 @@ export default function TutWelcome({ setUserProfile }) {
             {t('welcome')} {document.title}!
           </Typography>
         </Grid>
-        {discord
+        {strategy
           && (
             <>
               <Grid item xs={6}>

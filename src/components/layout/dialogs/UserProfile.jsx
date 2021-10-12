@@ -1,13 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Grid,
   Typography,
   DialogTitle,
-  DialogContent,
   DialogActions,
   Button,
   List,
   ListItem,
+  AppBar,
+  Tabs,
+  Tab,
 } from '@material-ui/core'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
@@ -18,19 +20,63 @@ import useStyles from '@hooks/useStyles'
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
+import TabPanel from '../general/TabPanel'
+
 export default function UserProfile({ setUserProfile }) {
   Utility.analytics('/user-profile')
   const classes = useStyles()
   const { t } = useTranslation()
-  const { perms } = useStatic(state => state.auth)
+  const { perms, methods } = useStatic(state => state.auth)
   const { map: { excludeList, rolesLinkName, rolesLink } } = useStatic(state => state.config)
+  const [tab, setTab] = useState(0)
+
+  const handleTabChange = (event, newValue) => {
+    setTab(newValue)
+  }
 
   return (
     <>
       <DialogTitle className={classes.filterHeader}>
         {t('userProfile')}
       </DialogTitle>
-      <DialogContent>
+      <AppBar position="static">
+        <Tabs
+          value={tab}
+          onChange={handleTabChange}
+          indicatorColor="secondary"
+          variant="fullWidth"
+          style={{ backgroundColor: '#424242', width: '100%' }}
+        >
+          {['primary', 'popup'].map(each => (
+            <Tab
+              key={each}
+              label={t(each)}
+              style={{ width: 40, minWidth: 40 }}
+            />
+          ))}
+        </Tabs>
+      </AppBar>
+      <TabPanel value={tab} index={0}>
+        <Grid
+          container
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          spacing={2}
+        >
+          {methods.includes('discord') && (
+          <Grid item>
+            Link Discord
+          </Grid>
+          )}
+          {methods.includes('telegram') && (
+          <Grid item>
+            Link Telegram
+          </Grid>
+          )}
+        </Grid>
+      </TabPanel>
+      <TabPanel value={tab} index={1}>
         <Grid
           container
           direction="row"
@@ -86,7 +132,7 @@ export default function UserProfile({ setUserProfile }) {
             )
           })}
         </Grid>
-      </DialogContent>
+      </TabPanel>
       <DialogActions>
         <Button href={rolesLink} target="_blank" rel="noreferrer" color="primary">
           {rolesLinkName}

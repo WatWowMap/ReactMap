@@ -1,11 +1,12 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import {
-  Grid, Button, Icon, Typography,
-} from '@material-ui/core'
+import { Grid, Typography } from '@material-ui/core'
+import TelegramLoginButton from 'react-telegram-login'
 
-const Login = ({ clickedTwice, location }) => {
+import DiscordLogin from './layout/general/DiscordLogin'
+
+const Login = ({ clickedTwice, location, serverSettings }) => {
   const { t } = useTranslation()
 
   return (
@@ -15,23 +16,23 @@ const Login = ({ clickedTwice, location }) => {
       justifyContent="center"
       alignItems="center"
       style={{ minHeight: '95vh' }}
+      spacing={4}
     >
+      {serverSettings?.authMethods?.includes('discord') && (
       <Grid item>
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: 'rgb(114,136,218)',
-            color: 'white',
-          }}
-          size="large"
-          href="/auth/discord"
-        >
-          <Icon className="fab fa-discord" style={{ fontSize: 30 }} />&nbsp;
-          <Typography variant="h6" align="center">
-            {t('login')}
-          </Typography>
-        </Button>
+        <DiscordLogin />
       </Grid>
+      )}
+      {serverSettings?.authMethods?.includes('telegram') && (
+      <Grid item>
+        <TelegramLoginButton
+          botName="reactmap_bot"
+          dataAuthUrl="/auth/telegram/callback"
+          usePic={false}
+          lang={localStorage.getItem('i18nextLng')}
+        />
+      </Grid>
+      )}
       {clickedTwice && (
         <Grid item style={{ whiteSpace: 'pre-line' }}>
           <Typography style={{ color: 'white', margin: 20 }} align="center">

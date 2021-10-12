@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
@@ -7,7 +8,7 @@
 const Discord = require('discord.js')
 const fs = require('fs')
 const { alwaysEnabledPerms, discord } = require('./config')
-const areas = require('./areas.js')
+const areas = require('./areas')
 
 const client = new Discord.Client()
 
