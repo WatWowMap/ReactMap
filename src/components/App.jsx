@@ -71,7 +71,7 @@ export default function App() {
       }
       data.userSettings.icons = Icons.selected
     }
-    if (data.ui?.pokestops?.invasions) {
+    if (data.ui?.pokestops?.invasions && data.config?.map.fetchLatestInvasions) {
       const invasionCache = JSON.parse(localStorage.getItem('invasions_cache'))
       const cacheTime = data.config.map.invasionCacheHrs * 60 * 60 * 1000
       if (invasionCache && invasionCache.lastFetched + cacheTime > Date.now()) {
