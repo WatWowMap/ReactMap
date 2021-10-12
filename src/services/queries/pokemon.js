@@ -146,10 +146,10 @@ export const getIvsStatsPvp = gql`
 `
 
 export const getOne = gql`
-  ${core}
   query Data($id: ID!, $perm: String!) {
     pokemonSingle(id: $id, perm: $perm) {
-      ...CorePokemon
+      lat
+      lon
     }
   }
 `

@@ -16,8 +16,8 @@ const Auth = ({ serverSettings, match }) => {
   if (cachedParams) {
     localStorage.removeItem('params')
     const url = cachedParams.category
-      ? `/id/${cachedParams.category}/${cachedParams.id}/${cachedParams.zoom}`
-      : `/@/${cachedParams.lat}/${cachedParams.lon}/${cachedParams.zoom}`
+      ? `/id/${cachedParams.category}/${cachedParams.id}/${cachedParams.zoom || 18}`
+      : `/@/${cachedParams.lat}/${cachedParams.lon}/${cachedParams.zoom || 18}`
     return <Redirect push to={url} />
   }
   if (match.params.category) {

@@ -58,8 +58,8 @@ export default function Nav({ map, setManualParams, Icons }) {
       setDialog({ open, category, type })
     }
     if (filter && type === 'search') {
+      setManualParams({ id: filter.id })
       map.flyTo([filter.lat, filter.lon], 16)
-      setManualParams(filter)
     }
     if (filter && type === 'filters') {
       setFilters({ ...filters, [category]: { ...filters[category], filter } })

@@ -6,17 +6,18 @@ import Notification from './layout/general/Notification'
 
 const getId = (component, item) => {
   switch (component) {
-    default: return `${item.id}-${item.updated}`
-    case 'devices': return `${item.uuid}-${item.last_seen}`
+    default: return item.id
+    case 'devices': return item.uuid
     case 'submissionCells': return component
-    case 'nests': return `${item.nest_id}-${item.updated}`
+    case 'nests': return item.nest_id
     case 'scanAreas': return item.properties.name
   }
 }
+const ignoredClustering = ['devices', 'submissionCells', 's2cells', 'weather']
 
 export default function Clustering({
-  category, renderedData, userSettings, zoomLevel, staticUserSettings, params,
-  filters, map, Icons, perms, tileStyle, config, userIcons,
+  category, renderedData, userSettings, clusterZoomLvl, staticUserSettings, params,
+  filters, map, Icons, perms, tileStyle, config, userIcons, setParams,
 }) {
   const Component = index[category]
   const hideList = useStatic(state => state.hideList)
@@ -29,10 +30,11 @@ export default function Clustering({
   const showCircles = userSettings.interactionRanges && currentZoom >= config.interactionRangeZoom
 
   const finalData = renderedData.map((each) => {
-    if (!hideList.includes(each.id)) {
+    const id = getId(category, each)
+    if (!hideList.includes(id)) {
       return (
         <Component
-          key={`${getId(category, each)}-${userSettings.clustering}`}
+          key={`${id}-${userSettings.clustering}`}
           item={each}
           ts={ts}
           filters={filters}
@@ -48,6 +50,7 @@ export default function Clustering({
           userSettings={userSettings}
           staticUserSettings={staticUserSettings}
           params={params}
+          setParams={setParams}
           showCircles={showCircles}
         />
       )
@@ -56,12 +59,13 @@ export default function Clustering({
   })
 
   const limitHit = finalData.length > config.clusterZoomLevels.forcedClusterLimit
+    && !ignoredClustering.includes(category)
 
-  return limitHit || (zoomLevel && userSettings.clustering) ? (
+  return limitHit || (clusterZoomLvl && userSettings.clustering) ? (
     <>
       <MarkerClusterGroup
         key={`${limitHit}-${userSettings.clustering}-${category}`}
-        disableClusteringAtZoom={limitHit ? 20 : zoomLevel}
+        disableClusteringAtZoom={limitHit ? 20 : clusterZoomLvl}
         chunkedLoading
       >
         {finalData}
