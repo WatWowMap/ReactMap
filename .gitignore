@@ -2,10 +2,14 @@
 /dist/
 
 # Config files
+server/src/configs/*
+!server/src/configs/default.json
+!server/src/configs/config.example.json
+!server/src/configs/areas.example.json
 .env
-config.json
-areas.json
-masterfile.json
+
+# Masterfile
+server/src/data/masterfile.json
 
 # Docker file
 /docker-compose.yml

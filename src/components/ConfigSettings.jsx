@@ -108,7 +108,7 @@ export default function ConfigSettings({
       return paramZoom
     }
     if (match.params.zoom) {
-      return match.params.zoom
+      return match.params.zoom || 15
     }
     return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
   }

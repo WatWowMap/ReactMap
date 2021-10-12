@@ -12,6 +12,7 @@ import UserOptions from './dialogs/UserOptions'
 import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
 import Search from './dialogs/Search'
+import Motd from './dialogs/Motd'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
@@ -20,18 +21,22 @@ export default function Nav({ map, setManualParams, Icons }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const { perms } = useStatic(state => state.auth)
+  const { map: { messageOfTheDay } } = useStatic(state => state.config)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
   const userSettings = useStore(state => state.userSettings)
   const setUserSettings = useStore(state => state.setUserSettings)
   const tutorial = useStore(state => state.tutorial)
   const setTutorial = useStore(state => state.setTutorial)
+  const motdIndex = useStore(state => state.motdIndex)
+  const setMotdIndex = useStore(s => s.setMotdIndex)
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
     category: '',
     type: '',
   })
+
   const [userProfile, setUserProfile] = useState(false)
   const safeSearch = searchable.filter(category => perms[category])
 
@@ -53,8 +58,8 @@ export default function Nav({ map, setManualParams, Icons }) {
       setDialog({ open, category, type })
     }
     if (filter && type === 'search') {
+      setManualParams({ id: filter.id })
       map.flyTo([filter.lat, filter.lon], 16)
-      setManualParams(filter)
     }
     if (filter && type === 'filters') {
       setFilters({ ...filters, [category]: { ...filters[category], filter } })
@@ -132,6 +137,17 @@ export default function Nav({ map, setManualParams, Icons }) {
           safeSearch={safeSearch}
           isMobile={isMobile}
           Icons={Icons}
+        />
+      </Dialog>
+      <Dialog
+        maxWidth="sm"
+        open={Boolean(motdIndex !== messageOfTheDay.index && messageOfTheDay?.messages.length)}
+        onClose={() => setMotdIndex(messageOfTheDay.index)}
+      >
+        <Motd
+          newMotdIndex={messageOfTheDay.index}
+          setMotdIndex={setMotdIndex}
+          messages={messageOfTheDay.messages}
         />
       </Dialog>
     </>

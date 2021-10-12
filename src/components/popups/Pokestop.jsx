@@ -26,7 +26,7 @@ export default function PokestopPopup({
   const popups = useStore(state => state.popups)
   const setPopups = useStore(state => state.setPopups)
   const {
-    incident_expire_timestamp, lure_expire_timestamp, lure_id, grunt_type,
+    lure_expire_timestamp, lure_id, invasions,
   } = pokestop
 
   useEffect(() => {
@@ -45,6 +45,7 @@ export default function PokestopPopup({
     >
       <Grid item xs={3} style={{ textAlign: 'center' }}>
         <HeaderImage
+          Icons={Icons}
           alt={pokestop.name}
           url={pokestop.url}
           backup={Icons.getPokestops(0)}
@@ -105,11 +106,14 @@ export default function PokestopPopup({
             {hasInvasion && (
               <>
                 {(hasQuest || hasLure) && <Divider light flexItem className="popup-divider" />}
-                <TimeTile
-                  expireTime={incident_expire_timestamp}
-                  icon={Icons.getInvasions(grunt_type)}
-                  until
-                />
+                {invasions.map(invasion => (
+                  <TimeTile
+                    key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
+                    expireTime={invasion.incident_expire_timestamp}
+                    icon={Icons.getInvasions(invasion.grunt_type)}
+                    until
+                  />
+                ))}
               </>
             )}
           </Grid>
@@ -126,6 +130,7 @@ export default function PokestopPopup({
         setPopups={setPopups}
         hasInvasion={hasInvasion}
         perms={perms}
+        Icons={Icons}
       />
       {perms.allPokestops && (
         <Collapse in={popups.extras} timeout="auto" unmountOnExit>
@@ -151,7 +156,7 @@ const MenuActions = ({
   const [anchorEl, setAnchorEl] = useState(false)
 
   const {
-    id, grunt_type, lure_id, quests,
+    id, lure_id, quests, invasions,
   } = pokestop
 
   const handleClick = (event) => {
@@ -186,8 +191,7 @@ const MenuActions = ({
 
   const excludeLure = () => {
     setAnchorEl(null)
-    const key = `l${lure_id}`
-    setState(key)
+    setState(`l${lure_id}`)
   }
 
   const excludeQuest = (i) => {
@@ -195,10 +199,9 @@ const MenuActions = ({
     setState(quests[i].key)
   }
 
-  const excludeInvasion = () => {
+  const excludeInvasion = (i) => {
     setAnchorEl(null)
-    const key = `i${grunt_type}`
-    setState(key)
+    setState(`i${invasions[i].grunt_type}`)
   }
 
   const handleTimer = () => {
@@ -214,10 +217,6 @@ const MenuActions = ({
     { name: 'hide', action: handleHide },
   ]
 
-  if (perms.lures && hasLure) {
-    options.push({ name: 'excludeLure', action: excludeLure })
-  }
-
   if (perms.quests && hasQuest) {
     quests.forEach((quest, i) => {
       let reward = ''
@@ -229,13 +228,28 @@ const MenuActions = ({
         case 12: reward = `${t(`poke_${quest.mega_pokemon_id}`)} x${quest.mega_amount}`; break
         default: reward = t(`quest_reward_${quest.quest_reward_type}`); break
       }
-      options.push({ key: `${reward}-${quest.with_ar}`, name: <Trans i18nKey="excludeQuestMulti">{{ reward }}</Trans>, action: () => excludeQuest(i) })
+      options.push({
+        key: `${reward}-${quest.with_ar}`,
+        name: <Trans i18nKey="excludeQuestMulti">{{ reward }}</Trans>,
+        action: () => excludeQuest(i),
+      })
     })
   }
   if ((perms.invasions && hasInvasion)
     || (perms.lures && hasLure)) {
+    if (hasInvasion) {
+      invasions.forEach((invasion, i) => {
+        options.push({
+          key: `${invasion.grunt_type}-${invasion.incident_expire_timestamp}`,
+          name: <Trans i18nKey="excludeInvasionMulti">{{ invasion: t(`grunt_a_${invasion.grunt_type}`) }}</Trans>,
+          action: () => excludeInvasion(i),
+        })
+      })
+    }
+    if (hasLure) {
+      options.push({ name: 'excludeLure', action: excludeLure })
+    }
     options.push(
-      { name: 'excludeInvasion', action: excludeInvasion },
       { name: 'timer', action: handleTimer },
     )
   }
@@ -275,30 +289,23 @@ const RewardInfo = ({
     quest_shiny,
     with_ar,
   } = quest
+
+  const getImage = () => {
+    switch (quest_reward_type) {
+      case 2: return Icons.getRewards(quest_reward_type, quest_item_id, item_amount)
+      case 3: return Icons.getRewards(quest_reward_type, stardust_amount)
+      case 4: return Icons.getRewards(quest_reward_type, candy_pokemon_id, candy_amount)
+      case 7: return Icons.getPokemon(
+        quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny,
+      )
+      case 12: return Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount)
+      default: return Icons.getRewards(quest_reward_type)
+    }
+  }
+
   return (
     <Grid item xs={3} style={{ textAlign: 'center' }}>
-      {{
-        2: <img
-          src={Icons.getRewards(quest_reward_type, quest_item_id, item_amount)}
-          className="quest-popup-img"
-        />,
-        3: <img
-          src={Icons.getRewards(quest_reward_type, stardust_amount)}
-          className="quest-popup-img"
-        />,
-        4: <img
-          src={Icons.getRewards(quest_reward_type, candy_pokemon_id, candy_amount)}
-          className="quest-popup-img"
-        />,
-        7: <img
-          src={Icons.getPokemon(quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny)}
-          className="quest-popup-img"
-        />,
-        12: <img
-          src={Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount)}
-          className="quest-popup-img"
-        />,
-      }[quest_reward_type] || <img src={Icons.getRewards(quest_reward_type)} className="quest-popup-img" />}
+      <img src={getImage()} className="quest-popup-img" />
       <Typography variant="caption" className="ar-task" noWrap>
         {config.questMessage ? config.questMessage : t(`arQuest_${Boolean(with_ar)}`)}
       </Typography>
@@ -397,7 +404,7 @@ const QuestConditions = ({ quest, t, userSettings }) => {
 
 const Footer = ({
   pokestop, popups, setPopups,
-  hasInvasion, perms,
+  hasInvasion, perms, Icons,
 }) => {
   const classes = useStyles()
 
@@ -417,7 +424,7 @@ const Footer = ({
             aria-expanded={popups.invasions}
           >
             <img
-              src={`/images/misc/${popups.invasions ? 'quests' : 'invasions'}.png`}
+              src={Icons.getMisc(popups.invasions ? 'quest' : 'invasion')}
               className="circle pulse"
             />
           </IconButton>
@@ -485,8 +492,8 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
 }
 
 const Invasion = ({ pokestop, Icons, t }) => {
-  const { grunt_type } = pokestop
-  const { invasions: { [grunt_type]: invasion } } = useStatic(state => state.masterfile)
+  const { invasions } = pokestop
+  const { invasions: invasionInfo } = useStatic(state => state.masterfile)
   const encounterNum = { first: '#1', second: '#2', third: '#3' }
 
   const makeShadowPokemon = pkmn => (
@@ -497,7 +504,7 @@ const Invasion = ({ pokestop, Icons, t }) => {
       />
       <img
         className="invasion-reward-shadow"
-        src="/images/misc/shadow.png"
+        src={Icons.getMisc('shadow')}
       />
     </div>
   )
@@ -515,28 +522,28 @@ const Invasion = ({ pokestop, Icons, t }) => {
     return { first: '100%' }
   }
 
-  return (
-    <Grid container>
+  return invasions.map(invasion => (
+    <Grid container key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}>
       <Grid item xs={12}>
         <Typography variant="h6" align="center">
-          {t(`grunt_a_${grunt_type}`)}
+          {t(`grunt_a_${invasion.grunt_type}`)}
         </Typography>
       </Grid>
       <Grid item xs={12}>
         <table className="table-invasion">
           <tbody>
-            {Object.keys(invasion.encounters).map(position => (
+            {Object.keys(invasionInfo[invasion.grunt_type].encounters).map(position => (
               <tr key={position}>
                 <td>{encounterNum[position]}</td>
                 <td>
-                  {invasion.encounters[position].map(data => makeShadowPokemon(data))}
+                  {invasionInfo[invasion.grunt_type].encounters[position].map(data => makeShadowPokemon(data))}
                 </td>
-                <td>{getRewardPercent(invasion)[position] || ''}</td>
+                <td>{getRewardPercent(invasionInfo[invasion.grunt_type])[position] || ''}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </Grid>
     </Grid>
-  )
+  ))
 }

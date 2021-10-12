@@ -3,9 +3,9 @@
 import Fetch from '@services/Fetch'
 
 export default class UIcons {
-  constructor(customizable, iconSizes, questRewardTypes) {
+  constructor({ customizable, sizes, cacheHrs }, questRewardTypes) {
     this.customizable = customizable
-    this.sizes = iconSizes
+    this.sizes = sizes
     this.selected = {}
     this.questRewardTypes = {}
     this.modifiers = {
@@ -15,6 +15,7 @@ export default class UIcons {
         sizeMultiplier: 1,
       },
     }
+    this.cacheMs = cacheHrs * 60 * 60 * 1000
     Object.entries(questRewardTypes).forEach(([id, category]) => (
       this.questRewardTypes[id] = category.toLowerCase().replace(' ', '_')
     ))
@@ -35,50 +36,56 @@ export default class UIcons {
             4: 4,
             5: 4,
             6: 18,
+            sizeMultiplier: 1.2,
           },
         },
       })
     }
     for (const icon of icons) {
-      const data = await Fetch.getIcons(icon.path)
-      this[icon.name] = { indexes: Object.keys(data), ...icon }
-      if (!this[icon.name].modifiers) {
-        this[icon.name].modifiers = {}
-      }
-      this[icon.name].indexes.forEach(category => {
-        let isValid
-        if (!parseInt(category) && category !== '0') {
-          if (Array.isArray(data[category])) {
-            this[icon.name][category] = new Set(data[category])
-            isValid = true
-          } else {
-            Object.keys(data[category]).forEach(subCategory => {
-              if (Array.isArray(data[category][subCategory])) {
-                this[icon.name][subCategory] = new Set(data[category][subCategory])
-                isValid = true
+      const cachedIndex = JSON.parse(localStorage.getItem(`${icon.name}_icons`))
+      const data = cachedIndex && cachedIndex.lastFetched + this.cacheMs > Date.now()
+        ? cachedIndex
+        : await Fetch.getIcons(icon.path, icon.name)
+      if (data) {
+        this[icon.name] = { indexes: Object.keys(data), ...icon }
+        if (!this[icon.name].modifiers) {
+          this[icon.name].modifiers = {}
+        }
+        this[icon.name].indexes.forEach(category => {
+          let isValid = false
+          if (!parseInt(category) && category !== '0' && category !== 'lastFetched') {
+            if (Array.isArray(data[category])) {
+              this[icon.name][category] = new Set(data[category])
+              isValid = true
+            } else {
+              Object.keys(data[category]).forEach(subCategory => {
+                if (Array.isArray(data[category][subCategory])) {
+                  this[icon.name][subCategory] = new Set(data[category][subCategory])
+                  isValid = true
+                }
+              })
+            }
+            if (!this[category]) {
+              this[category] = []
+            }
+            if (isValid) {
+              this[category].push(icon.name)
+            }
+            if (!this[icon.name].modifiers[category]) {
+              this[icon.name].modifiers[category] = this.modifiers.base
+            } else {
+              this[icon.name].modifiers[category] = {
+                ...this.modifiers.base,
+                ...this[icon.name].modifiers[category],
               }
-            })
-          }
-          if (!this[category]) {
-            this[category] = []
-          }
-          if (isValid) {
-            this[category].push(icon.name)
-          }
-          if (!this[icon.name].modifiers[category]) {
-            this[icon.name].modifiers[category] = this.modifiers.base
-          } else {
-            this[icon.name].modifiers[category] = {
-              ...this.modifiers.base,
-              ...this[icon.name].modifiers[category],
+            }
+            if (!this.selected[category]) {
+              this.selected[category] = icon.name
+              this.modifiers[category] = this[icon.name].modifiers[category]
             }
           }
-          if (!this.selected[category]) {
-            this.selected[category] = icon.name
-            this.modifiers[category] = this[icon.name].modifiers[category]
-          }
-        }
-      })
+        })
+      }
     }
   }
 
@@ -143,15 +150,18 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
-  getPokestops(lureId, invasionActive = false, questActive = false) {
+  getPokestops(lureId, invasionActive = false, questActive = false, ar = false) {
     const baseUrl = `${this[this.selected.pokestop].path}/pokestop`
     const invasionSuffixes = invasionActive ? ['_i', ''] : ['']
     const questSuffixes = questActive ? ['_q', ''] : ['']
+    const arSuffixes = ar ? ['_ar', ''] : ['']
     for (const invasionSuffix of invasionSuffixes) {
       for (const questSuffix of questSuffixes) {
-        const result = `${lureId}${questSuffix}${invasionSuffix}.png`
-        if (this[this.selected.pokestop].pokestop.has(result)) {
-          return `${baseUrl}/${result}`
+        for (const arSuffix of arSuffixes) {
+          const result = `${lureId}${questSuffix}${invasionSuffix}${arSuffix}.png`
+          if (this[this.selected.pokestop].pokestop.has(result)) {
+            return `${baseUrl}/${result}`
+          }
         }
       }
     }
@@ -159,13 +169,15 @@ export default class UIcons {
   }
 
   getRewards(rewardType, id, amount) {
-    const category = this.questRewardTypes[rewardType]
+    const category = this.questRewardTypes[rewardType] || 'unset'
     const baseUrl = `${this[this.selected.reward].path}/reward/${category}`
-    const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
-    for (const aSuffix of amountSuffixes) {
-      const result = `${id}${aSuffix}.png`
-      if (this[this.selected.reward][category].has(result)) {
-        return `${baseUrl}/${result}`
+    if (this[this.selected.reward][category]) {
+      const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
+      for (const aSuffix of amountSuffixes) {
+        const result = `${id}${aSuffix}.png`
+        if (this[this.selected.reward][category].has(result)) {
+          return `${baseUrl}/${result}`
+        }
       }
     }
     return `${baseUrl}/0.png`
@@ -180,17 +192,20 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
-  getGyms(teamId = 0, trainerCount = 0, inBattle = false, ex = false) {
+  getGyms(teamId = 0, trainerCount = 0, inBattle = false, ex = false, ar = false) {
     const baseUrl = `${this[this.selected.gym].path}/gym`
     const trainerSuffixes = trainerCount ? [`_t${trainerCount}`, ''] : ['']
     const inBattleSuffixes = inBattle ? ['_b', ''] : ['']
     const exSuffixes = ex ? ['_ex', ''] : ['']
+    const arSuffixes = ar ? ['_ar', ''] : ['']
     for (const trainerSuffix of trainerSuffixes) {
       for (const inBattleSuffix of inBattleSuffixes) {
         for (const exSuffix of exSuffixes) {
-          const result = `${teamId}${trainerSuffix}${inBattleSuffix}${exSuffix}.png`
-          if (this[this.selected.gym].gym.has(result)) {
-            return `${baseUrl}/${result}`
+          for (const arSuffix of arSuffixes) {
+            const result = `${teamId}${trainerSuffix}${inBattleSuffix}${exSuffix}${arSuffix}.png`
+            if (this[this.selected.gym].gym.has(result)) {
+              return `${baseUrl}/${result}`
+            }
           }
         }
       }
@@ -242,9 +257,14 @@ export default class UIcons {
 
   getMisc(fileName) {
     const baseUrl = `${this[this.selected.misc].path}/misc`
-    if (this[this.selected.misc].misc.has(`${fileName}.png`)) {
-      return `${baseUrl}/${fileName}.png`
+    switch (true) {
+      case this[this.selected.misc].misc.has(`${fileName}.png`):
+        return `${baseUrl}/${fileName}.png`
+      case fileName.endsWith('s') && this[this.selected.misc].misc.has(`${fileName.slice(0, -1)}.png`):
+        return `${baseUrl}/${fileName.slice(0, -1)}.png`
+      case !fileName.endsWith('s') && this[this.selected.misc].misc.has(`${fileName}s.png`):
+        return `${baseUrl}/${fileName}s.png`
+      default: return `${baseUrl}/0.png`
     }
-    return `${baseUrl}/0.png`
   }
 }

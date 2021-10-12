@@ -1,10 +1,11 @@
 {
   "interface": "0.0.0.0",
   "port": 8080,
-  "localeSelection": ["en", "de", "pl" ,"es" ,"fr", "it"],
+  "localeSelection": ["en", "de", "pl" ,"es" ,"fr"],
   "devOptions": {
     "enabled": false,
     "graphiql": false,
+    "queryDebug": false,
     "clientPath": "../../dist"
   },
   "api": {
@@ -49,6 +50,8 @@
     "scanCellsZoom": 13,
     "submissionZoom": 15,
     "legacyPkmnFilter": true,
+    "fetchLatestInvasions": true,
+    "invasionCacheHrs": 1,
     "questMessage": "",
     "theme": {
       "style": "dark",
@@ -63,6 +66,10 @@
       "pokemon": 15,
       "portals": 14,
       "spawnpoints": 12
+    },
+    "messageOfTheDay": {
+      "index": 0,
+      "messages": []
     }
   },
   "clientSideOptions": {
@@ -74,6 +81,7 @@
       "raidTimers": false,
       "interactionRanges": false,
       "showExBadge": false,
+      "showArBadge": false,
       "raidLevelBadges": false
     },
     "pokestops": {
@@ -81,7 +89,9 @@
       "invasionTimers": false,
       "lureTimers": false,
       "interactionRanges": false,
-      "madQuestText": false
+      "madQuestText": false,
+      "hasQuestIndicator": true,
+      "showArBadge": false
     },
     "pokemon": {
       "clustering": true,
@@ -173,7 +183,8 @@
       "migrationTableName": "knex_migrations",
       "leagues": [],
       "reactMapHandlesPvp": false,
-      "pvpLevels": []
+      "pvpLevels": [],
+      "hideOldQuests": true
     },
     "schemas": {
       "scanner": {
@@ -185,6 +196,7 @@
         "database": "rdmdb",
         "charset": "utf8mb4",
         "arScanColumn": false,
+        "hasAltQuests": false,
         "useFor": []
       },
       "manual": {
@@ -342,6 +354,7 @@
     "customizable": [],
     "styles": [],
     "defaultIcons": {},
+    "cacheHrs": 1,
     "sizes": {
       "device": {
         "sm": 15,

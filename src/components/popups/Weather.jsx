@@ -12,7 +12,7 @@ export default function WeatherPopup({ weather, ts, Icons }) {
   const { gameplay_condition, updated } = weather
 
   useEffect(() => {
-    Utility.analytics('Popup', `Type: ${t(`weather${gameplay_condition}`)}`, 'Weather')
+    Utility.analytics('Popup', `Type: ${t(`weather_${gameplay_condition}`)}`, 'Weather')
   }, [])
 
   return (
@@ -25,7 +25,7 @@ export default function WeatherPopup({ weather, ts, Icons }) {
     >
       <Grid item xs={12}>
         <Typography variant="h6" align="center">
-          {t(`weather${gameplay_condition}`)}
+          {t(`weather_${gameplay_condition}`)}
         </Typography>
       </Grid>
       <Grid item xs={12}>

@@ -31,6 +31,14 @@ const quest = new GraphQLObjectType({
   }),
 })
 
+const invasion = new GraphQLObjectType({
+  name: 'Invasion',
+  fields: () => ({
+    grunt_type: { type: GraphQLInt },
+    incident_expire_timestamp: { type: GraphQLInt },
+  }),
+})
+
 module.exports = new GraphQLObjectType({
   name: 'Pokestop',
   fields: () => ({
@@ -39,16 +47,15 @@ module.exports = new GraphQLObjectType({
     lon: { type: GraphQLFloat },
     name: { type: GraphQLString },
     url: { type: GraphQLString },
-    lure_expire_timestamp: { type: GraphQLString },
+    lure_expire_timestamp: { type: GraphQLInt },
     last_modified_timestamp: { type: GraphQLInt },
     updated: { type: GraphQLInt },
     lure_id: { type: GraphQLInt },
     pokestop_display: { type: GraphQLBoolean },
-    incident_expire_timestamp: { type: GraphQLInt },
-    grunt_type: { type: GraphQLInt },
     first_seen_timestamp: { type: GraphQLInt },
     sponsor_id: { type: GraphQLInt },
     ar_scan_eligible: { type: GraphQLInt },
     quests: { type: new GraphQLList(quest) },
+    invasions: { type: new GraphQLList(invasion) },
   }),
 })

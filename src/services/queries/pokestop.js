@@ -48,8 +48,10 @@ const quest = gql`
 
 const invasion = gql`
   fragment Invasion on Pokestop {
-    incident_expire_timestamp
-    grunt_type
+    invasions {
+      incident_expire_timestamp
+      grunt_type
+    }
   }
 `
 
@@ -150,10 +152,10 @@ export const getLuresQuestsInvasions = gql`
 `
 
 export const getOne = gql`
-  ${core}
   query Data($id: ID!, $perm: String!) {
     pokestopsSingle(id: $id, perm: $perm) {
-      ...CorePokestop
+      lat
+      lon
     }
   }
 `

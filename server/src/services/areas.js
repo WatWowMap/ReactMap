@@ -7,7 +7,8 @@ const loadAreas = () => {
   let areas = {}
   const areasFilePath = path.resolve(__dirname, '../configs/areas.json')
   try {
-    const data = fs.readFileSync(areasFilePath, 'utf8')
+    // eslint-disable-next-line global-require
+    const data = fs.existsSync(areasFilePath, 'utf8') ? require('../configs/areas.json') : Error('Areas file not found')
     areas = JSON.parse(data)
   } catch (err) {
     const showWarning = areaRestrictions.some(rule => rule.roles.length > 0)

@@ -207,41 +207,14 @@
             "3": 3,
             "4": 4,
             "5": 4,
-            "6": 18
+            "6": 18,
+            "sizeMultiplier": 1.2
           }
         }
       },
       {
         "name": "PMSF",
         "path": "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons-outline/",
-        "modifiers": {
-          "reward": {
-            "offsetX": 0.2,
-            "offsetY": 0.5,
-            "sizeMultiplier": 1.15
-          },
-          "invasion": {
-            "offsetX": -0.45,
-            "offsetY": 1.7,
-            "sizeMultiplier": 2
-          },
-          "pokestop": {
-            "sizeMultiplier": 2,
-            "manualPopup": -40
-          }
-        }
-      },
-      {
-        "name": "Home",
-        "path": "https://raw.githubusercontent.com/nileplumb/PkmnHomeIcons/master/UICONS/"
-      },
-      {
-        "name": "Shuffle",
-        "path": "https://raw.githubusercontent.com/nileplumb/PkmnShuffleMap/master/UICONS/"
-      },
-      {
-        "name": "PokeDave",
-        "path": "https://raw.githubusercontent.com/jepke/pokedave_shuffle_icons_-PMSF-/master/UICONS/",
         "modifiers": {
           "reward": {
             "offsetX": 0.2,
@@ -259,6 +232,14 @@
             "manualPopup": -100
           }
         }
+      },
+      {
+        "name": "Home",
+        "path": "https://raw.githubusercontent.com/nileplumb/PkmnHomeIcons/master/UICONS/"
+      },
+      {
+        "name": "Shuffle",
+        "path": "https://raw.githubusercontent.com/nileplumb/PkmnShuffleMap/master/UICONS/"
       }
     ]
   },

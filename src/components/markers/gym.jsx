@@ -15,15 +15,19 @@ const getBadgeColor = (raidLevel) => {
   }
 }
 
-export default function GymMarker(gym, hasEgg, hasRaid, filters, Icons, userSettings) {
+export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, userSettings) {
   const {
-    in_battle, team_id, availble_slots, raid_level, ex_raid_eligible,
+    in_battle, team_id, availble_slots, raid_level, ex_raid_eligible, ar_scan_eligible,
   } = gym
   const { gym: gymMod, raid: raidMod } = Icons.modifiers
 
   const filledSlots = availble_slots !== null ? 6 - availble_slots : 0
   let filterId = team_id === 0 ? `t${team_id}-0` : `g${team_id}-${filledSlots || 0}`
-  const gymIcon = Icons.getGyms(team_id, filledSlots, in_battle, userSettings.showExBadge && ex_raid_eligible)
+  const gymIcon = Icons.getGyms(
+    team_id, filledSlots, in_battle,
+    userSettings.showExBadge && ex_raid_eligible,
+    userSettings.showArBadge && ar_scan_eligible,
+  )
   const gymSize = Icons.getSize('gym', filters.filter[filterId])
   let raidIcon
   let raidSize = 0
@@ -47,7 +51,7 @@ export default function GymMarker(gym, hasEgg, hasRaid, filters, Icons, userSett
       raidSize = Icons.getSize('raid', filters.filter[filterId])
     } else {
       filterId = `e${raid_level}`
-      raidIcon = Icons.getEggs(raid_level, hasEgg, raid_is_exclusive)
+      raidIcon = Icons.getEggs(raid_level, hasHatched, raid_is_exclusive)
       raidSize = Icons.getSize('raid', filters.filter[filterId])
     }
   }
@@ -64,14 +68,38 @@ export default function GymMarker(gym, hasEgg, hasRaid, filters, Icons, userSett
           transform: 'translateX(-50%)',
         }}
       />
-      {(userSettings.showExBadge && ex_raid_eligible && !gymIcon.includes('ex')) && (
+      {Boolean(userSettings.showExBadge && ex_raid_eligible && !gymIcon.includes('_ex')) && (
         <img
-          src="/images/misc/ex.png"
+          src={Icons.getMisc('ex')}
           style={{
             width: gymSize / 1.5,
             height: 'auto',
             bottom: -1 + gymMod.offsetY,
-            left: `${gymMod.offsetX * 25}%`,
+            left: `${gymMod.offsetX * 15}%`,
+            transform: 'translateX(-50%)',
+          }}
+        />
+      )}
+      {Boolean(userSettings.showArBadge && ar_scan_eligible && !gymIcon.includes('_ar')) && (
+        <img
+          src={Icons.getMisc('ar')}
+          style={{
+            width: gymSize / 2,
+            height: 'auto',
+            bottom: 20 + gymMod.offsetY,
+            left: `${gymMod.offsetX * 10}%`,
+            transform: 'translateX(-50%)',
+          }}
+        />
+      )}
+      {Boolean(in_battle && !gymIcon.includes('_b')) && (
+        <img
+          src={Icons.getMisc('battle')}
+          style={{
+            width: gymSize,
+            height: 'auto',
+            bottom: 10 + gymMod.offsetY,
+            left: `${gymMod.offsetX * 100}%`,
             transform: 'translateX(-50%)',
           }}
         />
@@ -101,7 +129,7 @@ export default function GymMarker(gym, hasEgg, hasRaid, filters, Icons, userSett
           {raid_level === 6
             ? (
               <img
-                src="/images/misc/mega.png"
+                src={Icons.getMisc('mega')}
                 style={{
                   width: 17.5,
                   height: 'auto',
