@@ -66,13 +66,14 @@ export default function menuFilter(tempFilters, menus, search, type) {
   }
 
   const addGym = (id, gym) => {
-    const raidCheck = (!Number.isNaN(parseInt(id.charAt(0))) && gymPerms.raids) || (id.startsWith('e') && gymPerms.raids)
+    const raidCheck = (!Number.isNaN(parseInt(id.charAt(0))) && gymPerms.raids) || (id.startsWith('e') && gymPerms.raids) || (id.startsWith('r') && gymPerms.raids)
     const gymCheck = (id.startsWith('g') && gymPerms.allGyms) || (id.startsWith('t') && gymPerms.allGyms)
     if ((raidCheck || gymCheck) && gym.name) {
       show += 1
       let url
       switch (id.charAt(0)) {
-        case 'e': url = Icons.getEggs(id.slice(1)); break
+        case 'e':
+        case 'r': url = Icons.getEggs(id.slice(1), id.charAt(0) === 'r'); break
         case 't':
         case 'g': url = Icons.getGyms(...id.slice(1).split('-')); break
         default: url = Icons.getPokemon(...id.split('-')); break
@@ -187,11 +188,14 @@ export default function menuFilter(tempFilters, menus, search, type) {
         const gym = {}
         switch (id.charAt(0)) {
           case 'e':
-            gym.name = t(id)
+            gym.name = t(`egg_${id.slice(1)}_plural`)
             gym.category = 'eggs'; break
           case 't':
             gym.name = t(`team_${id.slice(1).split('-')[0]}`)
             gym.category = 'teams'; break
+          case 'r':
+            gym.name = t(`raid_${id.slice(1).split('-')[0]}_plural`)
+            gym.category = 'raids'; break
           default:
             gym.name = t(id)
             gym.category = ''; break

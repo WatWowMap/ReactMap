@@ -80,7 +80,8 @@
       "interactionRanges": false,
       "showExBadge": false,
       "showArBadge": false,
-      "raidLevelBadges": false
+      "raidLevelBadges": false,
+      "raidsOr": true
     },
     "pokestops": {
       "clustering": true,

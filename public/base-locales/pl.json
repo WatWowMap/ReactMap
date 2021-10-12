@@ -374,5 +374,6 @@
   "excludeInvasionMulti": "Wyklucz {{invasion}}",
   "messageOfTheDay": "Wiadomość Dnia",
   "hasQuestIndicator": "Alternatywny kolor dla Pokestopów z zadaniami",
-  "showArBadge": "Pokaż odznakę AR"
+  "showArBadge": "Pokaż odznakę AR",
+  "raidsOr": "Filtruj raid bossy oddzielnie od raidów"
 }

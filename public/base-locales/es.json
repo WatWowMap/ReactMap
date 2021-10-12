@@ -377,5 +377,6 @@
   "navigationWaze": "Waze",
   "navigationIntel": "Intel",
   "localeSelection": "Selección de Idioma",
-  "ivOrFilter": "IV O filtro"
+  "ivOrFilter": "IV O filtro",
+  "raidsOr": "Filtrar Bosses separadas de Incursiones"
 }

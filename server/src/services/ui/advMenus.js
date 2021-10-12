@@ -1,5 +1,5 @@
 const categories = {
-  gyms: ['teams', 'eggs', 'pokemon'],
+  gyms: ['teams', 'eggs', 'raids', 'pokemon'],
   pokestops: ['lures', 'items', 'energy', 'invasions', 'pokemon', 'candy'],
   pokemon: ['pokemon'],
   nests: ['pokemon'],
