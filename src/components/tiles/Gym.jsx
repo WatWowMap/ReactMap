@@ -116,6 +116,7 @@ const areEqual = (prev, next) => {
     && sizeLogic()
     && prev.showTimer === next.showTimer
     && prev.item.team_id === next.item.team_id
+    && prev.item.availble_slots === next.item.availble_slots
     && !next.excludeList.includes(`${prev.item.raid_pokemon_id}-${prev.item.raid_pokemon_form}`)
     && !next.excludeList.includes(`t${prev.item.team_id}-0`)
     && !next.excludeList.includes(`e${prev.item.raid_level}`)
