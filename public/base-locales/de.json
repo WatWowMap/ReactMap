@@ -385,5 +385,6 @@
   "excludeInvasionMulti": "{{invasion}} ausschließen",
   "messageOfTheDay": "Nachricht des Tages",
   "hasQuestIndicator": "Alternative Farbe für Stops mit Quests",
-  "showArBadge": "Zeige AR Abzeichen"
+  "showArBadge": "Zeige AR Symbol",
+  "raidsOr": "Raidbosse separat filtern"
 }

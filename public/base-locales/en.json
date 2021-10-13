@@ -376,5 +376,6 @@
   "messageOfTheDay": "Message of the Day",
   "hasQuestIndicator": "Alternative Color for Stops with Quests",
   "showArBadge": "Show AR Badge",
-  "allGyms": "All Gyms"
+  "allGyms": "All Gyms",
+  "raidsOr": "Filter Raid Bosses Separately from Raids"
 }
