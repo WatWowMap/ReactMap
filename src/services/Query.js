@@ -3,7 +3,7 @@ import * as gymIndex from './queries/gym'
 import * as pokestopIndex from './queries/pokestop'
 import * as pokemonIndex from './queries/pokemon'
 import getAllSpawnpoints from './queries/spawnpoint'
-import getAllPortals from './queries/portal'
+import * as portalIndex from './queries/portal'
 import getAllWeather from './queries/weather'
 import getAllS2cells from './queries/s2cell'
 import getAllSubmissionCells from './queries/submissionCells'
@@ -81,8 +81,12 @@ export default class Query {
     return pokemonIndex[query]
   }
 
-  static portals() {
-    return getAllPortals
+  static portals(filters) {
+    if (filters === 'id') {
+      return portalIndex.getOne
+    }
+
+    return portalIndex.getAllPortals
   }
 
   static s2cells() {

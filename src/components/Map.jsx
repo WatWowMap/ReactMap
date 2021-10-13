@@ -31,13 +31,14 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
   const userSettings = useStore(state => state.userSettings)
-  const [manualParams, setManualParams] = useState(false)
+  const [manualParams, setManualParams] = useState(params)
 
   const initialBounds = {
     minLat: map.getBounds()._southWest.lat,
     maxLat: map.getBounds()._northEast.lat,
     minLon: map.getBounds()._southWest.lng,
     maxLon: map.getBounds()._northEast.lng,
+    zoom: map.getZoom(),
   }
 
   const onMove = useCallback(() => {
@@ -45,10 +46,6 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
     setLocation([newCenter.lat, newCenter.lng])
     setZoom(map.getZoom())
   }, [map])
-
-  if (manualParams) {
-    params.id = manualParams.id
-  }
 
   return (
     <>
@@ -109,9 +106,10 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               userSettings={userSettings[userSettingsCategory(category)] || {}}
               filters={filters[category]}
               tileStyle={tileServers[settings.tileServers].style}
-              zoomLevel={config.clusterZoomLevels[category]}
+              clusterZoomLvl={config.clusterZoomLevels[category]}
               staticUserSettings={staticUserSettings[category]}
-              params={params}
+              params={manualParams}
+              setParams={setManualParams}
             />
           )
         }

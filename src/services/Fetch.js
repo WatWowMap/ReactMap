@@ -47,9 +47,10 @@ export default class Fetch {
         if (info.encounters) {
           Object.keys(info.encounters).forEach((position, i) => {
             if (latest && latest.active) {
-              newInvasions[type].encounters[position] = latest.lineup.team[i].map(pkmn => (
-                { id: pkmn.id, form: pkmn.form }
-              ))
+              newInvasions[type].encounters[position] = latest.lineup.team[i].map((pkmn, j) => (
+                pkmn.template === 'UNSET' && info.encounters[position][j]
+                  ? info.encounters[position][j]
+                  : { id: pkmn.id, form: pkmn.form }))
               newInvasions[type].second_reward = latest.lineup.rewards.length > 1
             }
           })

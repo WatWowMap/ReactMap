@@ -50,6 +50,8 @@
     "scanCellsZoom": 13,
     "submissionZoom": 15,
     "legacyPkmnFilter": true,
+    "fetchLatestInvasions": true,
+    "invasionCacheHrs": 1,
     "questMessage": "",
     "theme": {
       "style": "dark",
@@ -346,6 +348,7 @@
     "customizable": [],
     "styles": [],
     "defaultIcons": {},
+    "cacheHrs": 1,
     "sizes": {
       "device": {
         "sm": 15,

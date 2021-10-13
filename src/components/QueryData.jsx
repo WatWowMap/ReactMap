@@ -11,8 +11,9 @@ const filterSkipList = ['filter', 'enabled', 'legacy']
 
 const getPolling = category => {
   switch (category) {
-    case 'device':
+    case 'devices':
     case 'gyms':
+    case 's2cells':
     case 'pokemon':
       return 10 * 1000
     case 'pokestops': return 5 * 60 * 1000
@@ -22,9 +23,9 @@ const getPolling = category => {
 }
 
 export default function QueryData({
-  bounds, onMove, map, tileStyle, zoomLevel, config, params,
+  bounds, onMove, map, tileStyle, clusterZoomLvl, config, params,
   category, available, filters, staticFilters, staticUserSettings,
-  userSettings, perms, Icons, userIcons,
+  userSettings, perms, Icons, userIcons, setParams,
 }) {
   Utility.analytics('Data', `${category} being fetched`, category, true)
   const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
@@ -78,6 +79,7 @@ export default function QueryData({
         minLon: mapBounds._southWest.lng,
         maxLon: mapBounds._northEast.lng,
         filters: trimFilters(filters),
+        zoom: map.getZoom(),
       })
     }
   }
@@ -87,9 +89,11 @@ export default function QueryData({
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [filters, userSettings])
+  }, [filters, userSettings, map.getZoom()])
 
-  const { data, previousData, refetch } = useQuery(Query[category](filters, perms, map.getZoom(), zoomLevel), {
+  const { data, previousData, refetch } = useQuery(Query[category](
+    filters, perms, map.getZoom(), clusterZoomLvl,
+  ), {
     context: {
       abortableContext: timeout, // will be picked up by AbortableClient
     },
@@ -107,7 +111,7 @@ export default function QueryData({
       {Boolean(renderedData) && (
         <Clustering
           renderedData={renderedData[category]}
-          zoomLevel={zoomLevel}
+          clusterZoomLvl={clusterZoomLvl}
           map={map}
           config={config}
           filters={filters}
@@ -119,6 +123,7 @@ export default function QueryData({
           userSettings={userSettings}
           staticUserSettings={staticUserSettings}
           params={params}
+          setParams={setParams}
         />
       )}
     </>
