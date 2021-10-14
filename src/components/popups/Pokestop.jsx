@@ -34,6 +34,8 @@ export default function PokestopPopup({
     Utility.analytics('Popup', Object.keys(has).filter(a => Boolean(has[a])), 'Pokestop')
   }, [])
 
+  const plainPokestop = !hasLure && !hasQuest && !hasInvasion
+
   return (
     <Grid
       container
@@ -43,16 +45,17 @@ export default function PokestopPopup({
       alignItems="center"
       spacing={1}
     >
-      <Grid item xs={3} style={{ textAlign: 'center' }}>
-        <HeaderImage
-          Icons={Icons}
-          alt={pokestop.name}
-          url={pokestop.url}
-          backup={Icons.getPokestops(0)}
-          arScanEligible={pokestop.ar_scan_eligible}
-        />
-      </Grid>
-      <Grid item xs={7}>
+      {!plainPokestop && (
+        <Grid item xs={3} style={{ textAlign: 'center' }}>
+          <HeaderImage
+            Icons={Icons}
+            alt={pokestop.name}
+            url={pokestop.url}
+            arScanEligible={pokestop.ar_scan_eligible}
+          />
+        </Grid>
+      )}
+      <Grid item xs={plainPokestop ? 10 : 7}>
         <Title
           mainName={pokestop.name}
           backup={t('unknownPokestop')}
@@ -69,31 +72,40 @@ export default function PokestopPopup({
           ts={ts}
         />
       </Grid>
-      <Grid item xs={12}>
-        <Collapse in={!popups.invasions || !hasInvasion} timeout="auto" unmountOnExit>
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            spacing={1}
-          >
-            {hasQuest && pokestop.quests.map((quest, index) => (
-              <Fragment key={quest.with_ar}>
-                {index ? <Divider light flexItem className="popup-divider" /> : null}
-                <RewardInfo
-                  quest={quest}
-                  Icons={Icons}
-                  config={config}
-                  t={t}
-                />
-                <QuestConditions
-                  quest={quest}
-                  t={t}
-                  userSettings={userSettings}
-                />
-              </Fragment>
-            ))}
-            {hasLure && (
+      <Grid item xs={12} style={{ textAlign: 'center' }}>
+        {plainPokestop ? (
+          <HeaderImage
+            Icons={Icons}
+            alt={pokestop.name}
+            url={pokestop.url}
+            arScanEligible={pokestop.ar_scan_eligible}
+            large
+          />
+        ) : (
+          <Collapse in={!popups.invasions || !hasInvasion} timeout="auto" unmountOnExit>
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              spacing={1}
+            >
+              {hasQuest && pokestop.quests.map((quest, index) => (
+                <Fragment key={quest.with_ar}>
+                  {index ? <Divider light flexItem className="popup-divider" /> : null}
+                  <RewardInfo
+                    quest={quest}
+                    Icons={Icons}
+                    config={config}
+                    t={t}
+                  />
+                  <QuestConditions
+                    quest={quest}
+                    t={t}
+                    userSettings={userSettings}
+                  />
+                </Fragment>
+              ))}
+              {hasLure && (
               <>
                 {(hasQuest) && <Divider light flexItem className="popup-divider" />}
                 <TimeTile
@@ -102,8 +114,8 @@ export default function PokestopPopup({
                   until
                 />
               </>
-            )}
-            {hasInvasion && (
+              )}
+              {hasInvasion && (
               <>
                 {(hasQuest || hasLure) && <Divider light flexItem className="popup-divider" />}
                 {invasions.map(invasion => (
@@ -115,9 +127,10 @@ export default function PokestopPopup({
                   />
                 ))}
               </>
-            )}
-          </Grid>
-        </Collapse>
+              )}
+            </Grid>
+          </Collapse>
+        )}
       </Grid>
       {(perms.invasions && hasInvasion) && (
         <Collapse in={popups.invasions} timeout="auto" unmountOnExit>
