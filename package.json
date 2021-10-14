@@ -19,6 +19,10 @@
     "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
     "migrate:rollback": "knex --knexfile server/knexfile.cjs migrate:rollback"
   },
+  "engines": {
+    "node": ">=14",
+    "yarn": "1.22.x"
+  },
   "devDependencies": {
     "@babel/core": "^7.13.10",
     "@babel/eslint-parser": "^7.13.10",
