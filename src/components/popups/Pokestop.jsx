@@ -106,27 +106,27 @@ export default function PokestopPopup({
                 </Fragment>
               ))}
               {hasLure && (
-              <>
-                {(hasQuest) && <Divider light flexItem className="popup-divider" />}
-                <TimeTile
-                  expireTime={lure_expire_timestamp}
-                  icon={Icons.getPokestops(lure_id)}
-                  until
-                />
-              </>
-              )}
-              {hasInvasion && (
-              <>
-                {(hasQuest || hasLure) && <Divider light flexItem className="popup-divider" />}
-                {invasions.map(invasion => (
+                <>
+                  {(hasQuest) && <Divider light flexItem className="popup-divider" />}
                   <TimeTile
-                    key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
-                    expireTime={invasion.incident_expire_timestamp}
-                    icon={Icons.getInvasions(invasion.grunt_type)}
+                    expireTime={lure_expire_timestamp}
+                    icon={Icons.getPokestops(lure_id)}
                     until
                   />
-                ))}
-              </>
+                </>
+              )}
+              {hasInvasion && (
+                <>
+                  {(hasQuest || hasLure) && <Divider light flexItem className="popup-divider" />}
+                  {invasions.map(invasion => (
+                    <TimeTile
+                      key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
+                      expireTime={invasion.incident_expire_timestamp}
+                      icon={Icons.getInvasions(invasion.grunt_type)}
+                      until
+                    />
+                  ))}
+                </>
               )}
             </Grid>
           </Collapse>
