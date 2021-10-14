@@ -360,7 +360,7 @@
   "excludeInvasionMulti": "{{invasion}} ausschließen",
   "messageOfTheDay": "Nachricht des Tages",
   "hasQuestIndicator": "Alternative Farbe für Stops mit Quests",
-  "showArBadge": "Zeige AR Abzeichen",
-  "raidsOr": "Raid Bossen separat filtern",
+  "showArBadge": "Zeige AR Symbol",
+  "raidsOr": "Raidbosse separat filtern",
   "stardust": "Sternenstaub"
 }

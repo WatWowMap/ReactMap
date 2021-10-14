@@ -82,6 +82,7 @@ class Gym extends Model {
         default: raidBosses.add(gym.split('-')[0]); break
       }
     })
+    if (!onlyOrRaids) raidBosses.add(0)
     const finalTeams = []
     const finalSlots = {
       1: [],
@@ -144,18 +145,10 @@ class Gym extends Model {
         gym.orWhere(raid => {
           raid.where(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : ts)
             .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
-          if (onlyOrRaids) {
-            raid.andWhere(bosses => {
+            .andWhere(bosses => {
               bosses.whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [...raidBosses])
-                .orWhereIn(isMad ? 'level' : 'raid_level', raids)
+                ?.[onlyOrRaids ? 'orWhereIn' : 'whereIn'](isMad ? 'level' : 'raid_level', raids)
             })
-          } else {
-            raidBosses.add(0)
-            raid.andWhere(bosses => {
-              bosses.whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [...raidBosses])
-                .whereIn(isMad ? 'level' : 'raid_level', raids)
-            })
-          }
         })
         if (eggs.length) {
           gym.orWhere(egg => {

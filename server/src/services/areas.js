@@ -9,7 +9,7 @@ const loadAreas = () => {
   try {
     // eslint-disable-next-line global-require
     const data = fs.existsSync(areasFilePath, 'utf8') ? require('../configs/areas.json') : Error('Areas file not found')
-    areas = JSON.parse(data)
+    areas = data
   } catch (err) {
     const showWarning = areaRestrictions.some(rule => rule.roles.length > 0)
     if (showWarning) {

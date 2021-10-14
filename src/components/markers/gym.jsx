@@ -15,7 +15,7 @@ const getBadgeColor = (raidLevel) => {
   }
 }
 
-export default function GymMarker(gym, hasEgg, hasRaid, filters, Icons, userSettings) {
+export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, userSettings) {
   const {
     in_battle, team_id, availble_slots, raid_level, ex_raid_eligible, ar_scan_eligible,
   } = gym
@@ -51,7 +51,7 @@ export default function GymMarker(gym, hasEgg, hasRaid, filters, Icons, userSett
       raidSize = Icons.getSize('raid', filters.filter[filterId])
     } else {
       filterId = `e${raid_level}`
-      raidIcon = Icons.getEggs(raid_level, hasEgg, raid_is_exclusive)
+      raidIcon = Icons.getEggs(raid_level, hasHatched, raid_is_exclusive)
       raidSize = Icons.getSize('raid', filters.filter[filterId])
     }
   }
