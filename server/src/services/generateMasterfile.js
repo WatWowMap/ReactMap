@@ -20,7 +20,7 @@ const getRarityLevel = (id, pkmn) => {
     }
   }
   if (pkmn.legendary) rarity = 'legendary'
-  if (pkmn.mythic) rarity = 'mythical'
+  if (pkmn.mythical) rarity = 'mythical'
   return rarity
 }
 

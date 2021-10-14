@@ -7,7 +7,12 @@ import { useMediaQuery } from '@material-ui/core'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
+import genPokemon from '@services/filtering/genPokemon'
+import genPokestops from '@services/filtering/genPokestops'
+import genGyms from '@services/filtering/genGyms'
+
 import setTheme from '@assets/mui/theme'
+
 import Map from './Map'
 
 export default function ConfigSettings({
@@ -48,6 +53,7 @@ export default function ConfigSettings({
   const setMasterfile = useStatic(state => state.setMasterfile)
   const setUi = useStatic(state => state.setUi)
   const setStaticFilters = useStatic(state => state.setFilters)
+  const setMenuFilters = useStatic(state => state.setMenuFilters)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
 
@@ -123,6 +129,12 @@ export default function ConfigSettings({
     }
     return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
   }
+
+  setMenuFilters({
+    ...genPokemon(serverSettings.Icons, serverSettings.masterfile),
+    ...genPokestops(serverSettings.Icons, serverSettings.defaultFilters.pokestops, serverSettings.masterfile),
+    ...genGyms(serverSettings.Icons, serverSettings.defaultFilters.gyms),
+  })
 
   return (
     <ThemeProvider theme={theme}>

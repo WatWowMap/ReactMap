@@ -20,6 +20,7 @@ import { useTheme } from '@material-ui/styles'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
+import useFilter from '@hooks/useFilter'
 import useStyles from '@hooks/useStyles'
 import Advanced from './Advanced'
 import Tile from './MenuTile'
@@ -57,7 +58,7 @@ export default function Menu({ filters, toggleDialog, category }) {
   })
   const [search, setSearch] = useState('')
 
-  const { filteredObj, filteredArr, count } = Utility.menuFilter(tempFilters, menus, search, category)
+  const { filteredObj, filteredArr, count } = useFilter(tempFilters, menus, search, category)
 
   const handleAccordion = (panel) => (event, isExpanded) => {
     setAdvMenu({
