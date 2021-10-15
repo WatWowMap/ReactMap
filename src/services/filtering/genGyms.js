@@ -1,13 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
-export default function genGyms(Icons, gyms) {
+export default function genGyms(Icons, gyms, menus) {
   const { t } = useTranslation()
 
-  const tempObj = {
-    eggs: {},
-    raids: {},
-    teams: {},
-  }
+  const tempObj = Object.fromEntries(menus.categories.map(x => [x, {}]))
 
   Object.keys(gyms.filter).forEach(id => {
     if (id !== 'global'

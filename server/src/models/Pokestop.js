@@ -5,7 +5,7 @@ const { pokemon: masterPkmn, items: masterItems, questRewardTypes } = require('.
 const fetchQuests = require('../services/functions/fetchQuests')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { api: { searchResultsLimit }, database: { schemas, settings } } = require('../services/config')
+const { api: { searchResultsLimit }, database: { schemas, settings }, map } = require('../services/config')
 
 const questProps = {
   quest_type: true,
@@ -122,6 +122,8 @@ class Pokestop extends Model {
     const pokemon = []
     const items = []
     const candy = []
+    const xlCandy = []
+    const general = []
     // preps arrays for interested objects
     Object.keys(args.filters).forEach(pokestop => {
       switch (pokestop.charAt(0)) {
@@ -132,6 +134,8 @@ class Pokestop extends Model {
         case 'm': energy.push(pokestop.slice(1)); break
         case 'q': items.push(pokestop.slice(1)); break
         case 'c': candy.push(pokestop.slice(1)); break
+        case 'x': xlCandy.push(pokestop.slice(1)); break
+        case 'u': general.push(pokestop.slice(1)); break
         default: pokemon.push(pokestop.split('-')[0]); break
       }
     })
@@ -197,6 +201,28 @@ class Pokestop extends Model {
                   })
                 }
               })
+              xlCandy.forEach(poke => {
+                questTypes.orWhere(xlCandies => {
+                  xlCandies.where('quest_reward_type', 9)
+                    .where(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'xl_candy' : 'info'}.pokemon_id") = ${poke}`))
+                })
+                if (altQuestCheck) {
+                  questTypes.orWhere(altXlCandies => {
+                    altXlCandies.where('alternative_quest_reward_type', 9)
+                      .where(raw(`json_extract(alternative_quest_rewards, "$[0].info.pokemon_id") = ${poke}`))
+                  })
+                }
+              })
+              if (general.length && map.enableQuestRewardTypeFilters) {
+                questTypes.orWhere(rewardType => {
+                  rewardType.whereIn('quest_reward_type', general)
+                })
+                if (altQuestCheck) {
+                  questTypes.orWhere(altRewardType => {
+                    altRewardType.whereIn('alternative_quest_reward_type', general)
+                  })
+                }
+              }
             })
         })
       }
@@ -269,13 +295,17 @@ class Pokestop extends Model {
               case 7:
                 newQuest.key = `${quest.quest_pokemon_id}-${quest.quest_form_id}`
                 fields.push('quest_pokemon_id', 'quest_form_id', 'quest_costume_id', 'quest_gender_id', 'quest_shiny'); break
+              case 9:
+                newQuest.key = `x${quest.xl_candy_pokemon_id}`
+                fields.push('xl_candy_pokemon_id', 'xl_candy_amount'); break
               case 12:
                 newQuest.key = `m${quest.mega_pokemon_id}-${quest.mega_amount}`
                 fields.push('mega_pokemon_id', 'mega_amount'); break
               default:
                 newQuest.key = `u${quest.quest_reward_type}`
             }
-            if (quest.quest_timestamp >= midnight && (global || filters[newQuest.key])) {
+            if (quest.quest_timestamp >= midnight && (global || filters[newQuest.key]
+              || (filters[`u${quest.quest_reward_type}`] && map.enableQuestRewardTypeFilters))) {
               this.fieldAssigner(newQuest, quest, fields)
               filtered.quests.push(newQuest)
             }
@@ -430,6 +460,21 @@ class Pokestop extends Model {
           .where('alternative_quest_reward_type', 4),
       ]
     }
+    quests.xlCandy = await this.query()
+      .distinct(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'xl_candy' : 'info'}.pokemon_id")`)
+        .as('id'))
+      .from(isMad ? 'trs_quest' : 'pokestop')
+      .where('quest_reward_type', 9)
+    if (altQuestCheck) {
+      quests.xlCandy = [
+        ...quests.xlCandy,
+        ...await this.query()
+          .distinct(raw('json_extract(alternative_quest_rewards, "$[0].info.pokemon_id")')
+            .as('id'))
+          .from('pokestop')
+          .where('alternative_quest_reward_type', 9),
+      ]
+    }
     if (isMad) {
       quests.pokemon = await this.query()
         .select('quest_pokemon_id', 'quest_pokemon_form_id AS form')
@@ -456,12 +501,13 @@ class Pokestop extends Model {
 
     Object.entries(quests).forEach(([type, rewards]) => {
       switch (type) {
-        default: rewards.forEach(reward => finalList.add(`${reward.quest_pokemon_id}-${reward.form}`)); break
         case 'items': rewards.forEach(reward => finalList.add(`q${reward.quest_item_id}`)); break
         case 'mega': rewards.forEach(reward => finalList.add(`m${reward.id}-${reward.amount}`)); break
         case 'invasions': rewards.forEach(reward => finalList.add(`i${reward.grunt_type}`)); break
         case 'stardust': rewards.forEach(reward => finalList.add(`d${reward.amount}`)); break
         case 'candy': rewards.forEach(reward => finalList.add(`c${reward.id}`)); break
+        case 'xlCandy': rewards.forEach(reward => finalList.add(`x${reward.id}`)); break
+        default: rewards.forEach(reward => finalList.add(`${reward.quest_pokemon_id}-${reward.form}`)); break
       }
     })
 
@@ -498,6 +544,7 @@ class Pokestop extends Model {
         case 3: Object.keys(info).forEach(x => (quest[`stardust_${x}`] = info[x])); break
         case 4: Object.keys(info).forEach(x => (quest[`candy_${x}`] = info[x])); break
         case 7: Object.keys(info).forEach(x => (quest[`quest_${x}`] = info[x])); break
+        case 9: Object.keys(info).forEach(x => (quest[`xl_candy_${x}`] = info[x])); break
         case 12: Object.keys(info).forEach(x => (quest[`mega_${x}`] = info[x])); break
         default: break
       }
@@ -507,10 +554,13 @@ class Pokestop extends Model {
 
   static parseMadRewards = (quest) => {
     if (quest.quest_reward_type) {
-      const { item, candy, mega_resource } = JSON.parse(quest.quest_rewards)[0]
+      const {
+        item, candy, xl_candy, mega_resource,
+      } = JSON.parse(quest.quest_rewards)[0]
       switch (quest.quest_reward_type) {
         case 2: Object.keys(item).forEach(x => (quest[`item_${x}`] = item[x])); break
         case 4: Object.keys(candy).forEach(x => (quest[`candy_${x}`] = candy[x])); break
+        case 9: Object.keys(xl_candy).forEach(x => (quest[`xl_candy_${x}`] = candy[x])); break
         case 12: Object.keys(mega_resource).forEach(x => (quest[`mega_${x}`] = mega_resource[x])); break
         default: break
       }
@@ -578,10 +628,10 @@ class Pokestop extends Model {
     } else if (pokemonIds.length) {
       pokemonIds.forEach(pkmn => {
         query.orWhere(raw(`json_extract(quest_rewards, "$[0].info.pokemon_id") = ${pkmn}`))
-          .whereIn('quest_reward_type', [4, 12])
+          .whereIn('quest_reward_type', [4, 9, 12])
         if (altQuestCheck) {
           query.orWhere(raw(`json_extract(alternative_quest_rewards, "$[0].info.pokemon_id") = ${pkmn}`))
-            .whereIn('alternative_quest_reward_type', [4, 12])
+            .whereIn('alternative_quest_reward_type', [4, 9, 12])
         }
       })
     }

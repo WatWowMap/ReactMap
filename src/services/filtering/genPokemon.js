@@ -1,12 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
-export default function genPokemon(Icons, masterfile) {
+export default function genPokemon(Icons, masterfile, menus) {
   const { t } = useTranslation()
 
-  const tempObj = {
-    pokemon: {},
-    unsetQuests: {},
-  }
+  const tempObj = Object.fromEntries(menus.categories.map(x => [x, {}]))
 
   Object.entries(masterfile.pokemon).forEach(([i, pkmn]) => {
     const pokeName = t(`poke_${i}`)
@@ -17,10 +14,10 @@ export default function genPokemon(Icons, masterfile) {
       const name = form.name && form.name !== 'Normal' && j != 0 && j != pkmn.defaultFormId
         ? formName
         : pokeName
-      const pkmnObj = {
-        name,
-        pokedexId: i,
-        formId: j,
+      tempObj.pokemon[id] = {
+        name: form.name === '*' ? `${name}*` : name,
+        pokedexId: +i,
+        formId: +j,
         defaultFormId: pkmn.defaultFormId,
         pokeName,
         formName,
@@ -31,13 +28,7 @@ export default function genPokemon(Icons, masterfile) {
         perm: 'pokemon',
         family: pkmn.family,
       }
-      if (form.name === '*') {
-        tempObj.unsetQuests[id] = { ...pkmnObj, name: `${name}*` }
-      } else {
-        tempObj.pokemon[id] = pkmnObj
-      }
     })
   })
-
   return tempObj
 }

@@ -3,7 +3,6 @@ import { Redirect } from 'react-router-dom'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
 import { ThemeProvider } from '@material-ui/styles'
-import { useMediaQuery } from '@material-ui/core'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
@@ -32,8 +31,7 @@ export default function ConfigSettings({
   }
 
   document.title = serverSettings.config.map.headerTitle
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
-  const theme = setTheme(serverSettings.config.map.theme, prefersDarkMode)
+  const theme = setTheme(serverSettings.config.map.theme)
   document.body.classList.add('dark')
 
   const setUserSettings = useStore(state => state.setUserSettings)
@@ -131,9 +129,12 @@ export default function ConfigSettings({
   }
 
   setMenuFilters({
-    ...genPokemon(serverSettings.Icons, serverSettings.masterfile),
-    ...genPokestops(serverSettings.Icons, serverSettings.defaultFilters.pokestops, serverSettings.masterfile),
-    ...genGyms(serverSettings.Icons, serverSettings.defaultFilters.gyms),
+    ...genPokestops(
+      serverSettings.Icons, serverSettings.defaultFilters.pokestops,
+      serverSettings.masterfile, serverSettings.menus?.pokestops,
+    ),
+    ...genGyms(serverSettings.Icons, serverSettings.defaultFilters?.gyms, serverSettings.menus?.gyms),
+    ...genPokemon(serverSettings.Icons, serverSettings.masterfile, serverSettings.menus?.pokemon),
   })
 
   return (

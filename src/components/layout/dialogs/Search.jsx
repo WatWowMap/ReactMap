@@ -49,7 +49,7 @@ export default function Search({
       const {
         quest_pokemon_id, quest_form_id, quest_gender_id, quest_costume_id, quest_shiny,
         quest_item_id, item_amount, stardust_amount,
-        mega_pokemon_id, mega_amount, candy_pokemon_id,
+        mega_pokemon_id, mega_amount, candy_pokemon_id, xl_candy_pokemon_id,
       } = option
       let main
       switch (quest_reward_type) {
@@ -63,6 +63,8 @@ export default function Search({
           main = Icons.getPokemon(
             quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny,
           ); break
+        case 9:
+          main = Icons.getRewards(quest_reward_type, xl_candy_pokemon_id); break
         case 12:
           main = Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount); break
         default:

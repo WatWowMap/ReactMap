@@ -1,10 +1,15 @@
 const masterfile = require('../../data/masterfile.json')
+const { map } = require('../config')
 
 const categories = {
   gyms: ['teams', 'eggs', 'raids', 'pokemon'],
-  pokestops: ['lures', 'items', 'energy', 'invasions', 'pokemon', 'candy', 'stardust'],
+  pokestops: ['lures', 'items', 'quest_reward_12', 'invasions', 'pokemon', 'quest_reward_4', 'quest_reward_9', 'quest_reward_3'],
   pokemon: ['pokemon'],
   nests: ['pokemon'],
+}
+
+if (map.enableQuestRewardTypeFilters) {
+  categories.pokestops.push('general')
 }
 
 const pokemonFilters = {

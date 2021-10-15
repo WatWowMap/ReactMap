@@ -50,6 +50,7 @@
     "scanCellsZoom": 13,
     "submissionZoom": 15,
     "legacyPkmnFilter": true,
+    "enableQuestRewardTypeFilters": false,
     "fetchLatestInvasions": true,
     "invasionCacheHrs": 1,
     "questMessage": "",

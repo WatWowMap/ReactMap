@@ -1,10 +1,10 @@
 import { responsiveFontSizes } from '@material-ui/core'
 import { createTheme } from '@material-ui/core/styles'
 
-export default function setTheme(theme, darkMode) {
+export default function setTheme(theme) {
   return responsiveFontSizes(createTheme({
     palette: {
-      type: darkMode ? 'dark' : 'light',
+      type: 'dark',
       primary: {
         light: '#ff784e',
         main: theme.primary,
