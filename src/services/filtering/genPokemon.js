@@ -1,11 +1,16 @@
 import { useTranslation } from 'react-i18next'
 
-export default function genPokemon(Icons, masterfile, menus) {
+import { useStatic } from '@hooks/useStore'
+
+export default function genPokemon() {
   const { t } = useTranslation()
+  const Icons = useStatic(s => s.Icons)
+  const { pokemon } = useStatic(s => s.masterfile)
+  const { pokemon: { categories } } = useStatic(s => s.menus)
 
-  const tempObj = Object.fromEntries(menus.categories.map(x => [x, {}]))
+  const tempObj = Object.fromEntries(categories.map(x => [x, {}]))
 
-  Object.entries(masterfile.pokemon).forEach(([i, pkmn]) => {
+  Object.entries(pokemon).forEach(([i, pkmn]) => {
     const pokeName = t(`poke_${i}`)
     Object.entries(pkmn.forms).forEach(([j, form]) => {
       const formName = t(`form_${j}`)
@@ -25,7 +30,7 @@ export default function genPokemon(Icons, masterfile, menus) {
         rarity: pkmn.rarity,
         genId: `generation_${pkmn.genId}`,
         url: Icons.getPokemon(i, j),
-        perm: 'pokemon',
+        perms: ['pokemon', 'raids', 'quests', 'nests'],
         family: pkmn.family,
       }
     })

@@ -4,7 +4,9 @@ import { useQuery } from '@apollo/client'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 import RobustTimeout from '@classes/RobustTimeout'
+
 import Clustering from './Clustering'
+import Notification from './layout/general/Notification'
 
 const withAvailableList = ['pokestops', 'gyms', 'nests']
 const filterSkipList = ['filter', 'enabled', 'legacy']
@@ -14,8 +16,9 @@ const getPolling = category => {
     case 'devices':
     case 'gyms':
     case 's2cells':
-    case 'pokemon':
       return 10 * 1000
+    case 'pokemon':
+      return 20 * 1000
     case 'pokestops': return 5 * 60 * 1000
     case 'weather': return 30 * 1000
     default: return 10 * 60 * 1000
@@ -33,6 +36,7 @@ export default function QueryData({
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
       onlyLegacyExclude: [],
+      onlyGlobal: requestedFilters.filter?.global,
       onlyLegacy: userSettings.legacyFilter,
       onlyOrRaids: userSettings.raidsOr,
     }
@@ -91,7 +95,9 @@ export default function QueryData({
     }
   }, [filters, userSettings, map.getZoom()])
 
-  const { data, previousData, refetch } = useQuery(Query[category](
+  const {
+    data, previousData, refetch, error,
+  } = useQuery(Query[category](
     filters, perms, map.getZoom(), clusterZoomLvl,
   ), {
     context: {
@@ -106,7 +112,18 @@ export default function QueryData({
   timeout.setupTimeout(refetch)
 
   const renderedData = data || previousData
-  return (
+  return error ? (
+    <Notification
+      severity={process.env.NODE_ENV === 'development' ? 'error' : 'info'}
+      i18nKey={process.env.NODE_ENV === 'development' ? 'server_dev_error_0' : 'server_error_0'}
+      messages={[
+        {
+          key: 'error',
+          variables: process.env.NODE_ENV === 'development' ? [error] : [category],
+        },
+      ]}
+    />
+  ) : (
     <>
       {Boolean(renderedData) && (
         <Clustering
@@ -124,6 +141,7 @@ export default function QueryData({
           staticUserSettings={staticUserSettings}
           params={params}
           setParams={setParams}
+          error={error}
         />
       )}
     </>

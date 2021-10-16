@@ -1,16 +1,24 @@
+import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import { useStatic } from '@hooks/useStore'
-import { useCallback } from 'react'
+import genPokemon from '@services/filtering/genPokemon'
+import genGyms from '@services/filtering/genGyms'
+import genPokestops from '@services/filtering/genPokestops'
 
 const filteringPokemon = ['pokemon', 'quest_reward_4', 'quest_reward_9', 'quest_reward_12']
 
 export default function useFilter(tempFilters, menus, search, category, reqCategories) {
   const { t } = useTranslation()
-  const menuFilters = useStatic(useCallback(s => s.menuFilters, []))
   const available = useStatic(useCallback(s => s.available, []))
   const { perms } = useStatic(useCallback(s => s.auth, []))
   const { pokemon } = useStatic(useCallback(s => s.masterfile, []))
 
+  const [menuFilters] = useState({
+    ...genGyms(),
+    ...genPokestops(),
+    ...genPokemon(),
+  })
   const {
     filters: {
       generations, types, rarity, forms, others, categories,
@@ -96,7 +104,7 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
 
   reqCategories.forEach(subCategory => {
     Object.entries(menuFilters[subCategory] || {}).forEach(([id, item]) => {
-      if (perms[item.perm]) {
+      if (item.perms.some(perm => perms[perm])) {
         if (!item.name.endsWith('*') || (item.name.endsWith('*') && category === 'pokestops')) {
           count.total += 1
           item.id = id

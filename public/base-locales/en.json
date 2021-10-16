@@ -353,5 +353,7 @@
   "showArBadge": "Show AR Badge",
   "allGyms": "All Gyms",
   "raidsOr": "Filter Raid Bosses Separately from Raids",
-  "general": "General"
+  "general": "General",
+  "server_error_0": "Error fetching {{variable_0}} from the server",
+  "server_Dev_error_0": "{{variable_0}}"
 }

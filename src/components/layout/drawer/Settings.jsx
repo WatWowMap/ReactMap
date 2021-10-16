@@ -6,7 +6,8 @@ import { Alert } from '@material-ui/lab'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic } from '../../../hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
+
 import UserProfile from '../dialogs/UserProfile'
 import Tutorial from '../dialogs/tutorial/Tutorial'
 import Feedback from '../dialogs/Feedback'
@@ -21,13 +22,15 @@ export default function Settings({ toggleDialog, Icons }) {
   const config = useStatic(state => state.config)
   const staticSettings = useStatic(state => state.settings)
   const { discord, loggedIn } = useStatic(state => state.auth)
+  const setStaticIcons = useStatic(state => state.setIcons)
+
   const tutorial = useStore(state => state.tutorial)
   const setTutorial = useStore(state => state.setTutorial)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
   const icons = useStore(state => state.icons)
   const setIcons = useStore(state => state.setIcons)
-  const setStaticIcons = useStatic(state => state.setIcons)
+
   const [alert, setAlert] = useState(false)
   const [userProfile, setUserProfile] = useState(false)
   const [feedback, setFeedback] = useState(false)

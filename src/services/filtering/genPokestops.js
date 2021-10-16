@@ -1,8 +1,16 @@
 import { useTranslation } from 'react-i18next'
 
-export default function genPokestops(Icons, pokestops, masterfile, menus) {
+import { useStatic } from '@hooks/useStore'
+
+export default function genPokestops() {
   const { t } = useTranslation()
-  const tempObj = Object.fromEntries(menus.categories.map(x => [x, {}]))
+  const Icons = useStatic(s => s.Icons)
+  const { pokemon } = useStatic(s => s.masterfile)
+  const { pokestops } = useStatic(s => s.filters)
+  const { pokestops: { categories } } = useStatic(s => s.menus)
+
+  const tempObj = Object.fromEntries(categories.map(x => [x, {}]))
+  if (!pokestops?.filter) return {}
 
   Object.keys(pokestops.filter).forEach(id => {
     if (id !== 'global' && !/\d/.test(id.charAt(0))) {
@@ -12,7 +20,7 @@ export default function genPokestops(Icons, pokestops, masterfile, menus) {
             tempObj.invasions[id] = {
               name: t(`grunt_a_${id.slice(1)}`, `grunt_${id.slice(1)}`),
               url: Icons.getInvasions(id.slice(1)),
-              perm: 'invasions',
+              perms: ['invasions'],
             }
           } break
         case 'd':
@@ -20,7 +28,7 @@ export default function genPokestops(Icons, pokestops, masterfile, menus) {
             tempObj.quest_reward_3[id] = {
               name: `x${id.slice(1)}`,
               url: Icons.getRewards(3, id.slice(1)),
-              perm: 'quests',
+              perms: ['quests'],
             }
           } break
         case 'm':
@@ -28,11 +36,11 @@ export default function genPokestops(Icons, pokestops, masterfile, menus) {
             tempObj.quest_reward_12[id] = {
               name: `${t(`poke_${id.slice(1).split('-')[0]}`)} x${id.split('-')[1]}`,
               url: Icons.getPokemon(...id.slice(1).split('-'), 1),
-              perm: 'quests',
-              genId: `generation_${masterfile.pokemon[id.slice(1).split('-')[0]].genId}`,
-              formTypes: masterfile.pokemon[id.slice(1).split('-')[0]].types.map(x => `poke_type_${x}`),
-              rarity: masterfile.pokemon[id.slice(1).split('-')[0]].rarity,
-              family: masterfile.pokemon[id.slice(1).split('-')[0]].family,
+              perms: ['quests'],
+              genId: `generation_${pokemon[id.slice(1).split('-')[0]].genId}`,
+              formTypes: pokemon[id.slice(1).split('-')[0]].types.map(x => `poke_type_${x}`),
+              rarity: pokemon[id.slice(1).split('-')[0]].rarity,
+              family: pokemon[id.slice(1).split('-')[0]].family,
             }
           } break
         case 'q':
@@ -40,7 +48,7 @@ export default function genPokestops(Icons, pokestops, masterfile, menus) {
             tempObj.items[id] = {
               name: t(`item_${id.slice(1)}`),
               url: Icons.getRewards(2, ...id.slice(1).split('-')),
-              perm: 'quests',
+              perms: ['quests'],
             }
           } break
         case 'l':
@@ -48,7 +56,7 @@ export default function genPokestops(Icons, pokestops, masterfile, menus) {
             tempObj.lures[id] = {
               name: t(`lure_${id.slice(1)}`),
               url: Icons.getPokestops(id.slice(1)),
-              perm: 'lures',
+              perms: ['lures'],
             }
           } break
         case 'x':
@@ -57,11 +65,11 @@ export default function genPokestops(Icons, pokestops, masterfile, menus) {
             tempObj[id.charAt(0) === 'c' ? 'quest_reward_4' : 'quest_reward_9'][id] = {
               name: `${t(`poke_${id.slice(1)}`)} ${id.charAt(0) === 'c' ? t('candy') : t('xl')}`,
               url: Icons.getRewards(id.charAt(0) === 'c' ? 4 : 9, ...id.slice(1).split('-')),
-              perm: 'quests',
-              genId: `generation_${masterfile.pokemon[id.slice(1).split('-')[0]].genId}`,
-              formTypes: masterfile.pokemon[id.slice(1).split('-')[0]].types.map(x => `poke_type_${x}`),
-              rarity: masterfile.pokemon[id.slice(1).split('-')[0]].rarity,
-              family: masterfile.pokemon[id.slice(1).split('-')[0]].family,
+              perms: ['quests'],
+              genId: `generation_${pokemon[id.slice(1).split('-')[0]].genId}`,
+              formTypes: pokemon[id.slice(1).split('-')[0]].types.map(x => `poke_type_${x}`),
+              rarity: pokemon[id.slice(1).split('-')[0]].rarity,
+              family: pokemon[id.slice(1).split('-')[0]].family,
             }
           } break
         case 'u':
@@ -69,7 +77,7 @@ export default function genPokestops(Icons, pokestops, masterfile, menus) {
             tempObj.general[id] = {
               name: t(`quest_reward_${id.slice(1)}`),
               url: Icons.getRewards(id.slice(1)),
-              perm: 'quests',
+              perms: ['quests'],
             }
           } break
         default:
@@ -77,7 +85,7 @@ export default function genPokestops(Icons, pokestops, masterfile, menus) {
             tempObj.pokestops[id] = {
               name: t('pokestop'),
               url: Icons.getPokestops(0),
-              perm: 'pokestops',
+              perms: ['pokestops'],
             }
           }
       }

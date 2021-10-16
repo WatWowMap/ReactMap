@@ -1,9 +1,15 @@
 import { useTranslation } from 'react-i18next'
 
-export default function genGyms(Icons, gyms, menus) {
-  const { t } = useTranslation()
+import { useStatic } from '@hooks/useStore'
 
-  const tempObj = Object.fromEntries(menus.categories.map(x => [x, {}]))
+export default function genGyms() {
+  const { t } = useTranslation()
+  const Icons = useStatic(s => s.Icons)
+  const { gyms } = useStatic(s => s.filters)
+  const { gyms: { categories } } = useStatic(s => s.menus)
+
+  const tempObj = Object.fromEntries(categories.map(x => [x, {}]))
+  if (!gyms?.filter) return {}
 
   Object.keys(gyms.filter).forEach(id => {
     if (id !== 'global'
@@ -14,19 +20,19 @@ export default function genGyms(Icons, gyms, menus) {
           tempObj.eggs[id] = {
             name: t(`egg_${id.slice(1)}_plural`),
             url: Icons.getEggs(id.slice(1), false),
-            perm: 'raids',
+            perms: ['raids'],
           }; break
         case 'r':
           tempObj.raids[id] = {
             name: t(`raid_${id.slice(1).split('-')[0]}_plural`),
             url: Icons.getEggs(id.slice(1), true),
-            perm: 'raids',
+            perms: ['raids'],
           }; break
         default:
           tempObj.teams[id] = {
             name: t(`team_${id.slice(1).split('-')[0]}`),
             url: Icons.getGyms(...id.slice(1).split('-')),
-            perm: 'gyms',
+            perms: ['gyms'],
           }; break
       }
     }
