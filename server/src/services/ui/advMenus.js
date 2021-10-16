@@ -24,7 +24,7 @@ const pokemonFilters = {
     Object.values(masterfile.pokemon)
       .map(val => val.rarity),
   )].filter(val => val !== undefined),
-  forms: ['altForms', 'Alola', 'Galarian'],
+  forms: ['normalForms', 'altForms', 'Alola', 'Galarian'],
   others: ['reverse', 'selected', 'unselected', 'onlyAvailable'],
 }
 

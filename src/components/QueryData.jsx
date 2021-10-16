@@ -36,7 +36,6 @@ export default function QueryData({
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
       onlyLegacyExclude: [],
-      onlyGlobal: requestedFilters.filter?.global,
       onlyLegacy: userSettings.legacyFilter,
       onlyOrRaids: userSettings.raidsOr,
       onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,

@@ -77,7 +77,7 @@ class Pokemon extends Model {
       stats, iv: ivs, pvp, areaRestrictions,
     } = perms
     const {
-      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyGlobal, onlyLinkGlobal,
+      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyLinkGlobal,
     } = args.filters
     let queryPvp = false
 
@@ -189,23 +189,19 @@ class Pokemon extends Model {
     }
 
     const basicPokemon = []
-    const matchesGlobalAnd = []
     const fancyPokemon = {}
     const orRelevant = getRelevantKeys(onlyIvOr)
-    const andRelevant = getRelevantKeys(onlyGlobal)
 
     Object.entries(args.filters).forEach(([pkmn, filter]) => {
       if (!pkmn.startsWith('o')) {
         const relevantFilters = getRelevantKeys(filter)
         const [id] = pkmn.split('-')
         if (relevantFilters.length && (ivs || stats || pvp)) {
-          if (keys.every(key => arrayCheck(filter, key, onlyGlobal))) {
-            matchesGlobalAnd.push(id)
-          } else {
-            const stringify = JSON.stringify(filter)
-            if (!fancyPokemon[stringify]) fancyPokemon[stringify] = { ...filter, relevantFilters, pokemon: [] }
-            fancyPokemon[stringify].pokemon.push(id)
+          const stringify = JSON.stringify(filter)
+          if (!fancyPokemon[stringify]) {
+            fancyPokemon[stringify] = { ...filter, relevantFilters, pokemon: [] }
           }
+          fancyPokemon[stringify].pokemon.push(id)
         } else {
           basicPokemon.push(id)
         }
@@ -219,7 +215,7 @@ class Pokemon extends Model {
     if (isMad) {
       getMadSql(query)
     }
-    if (orRelevant.length || fancyPokemon.length || matchesGlobalAnd.length || basicPokemon.length
+    if (orRelevant.length || fancyPokemon.length || basicPokemon.length
       || onlyXlKarp || onlyXsRat || onlyZeroIv || onlyHundoIv) {
       query.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
@@ -236,12 +232,6 @@ class Pokemon extends Model {
               generateSql(fancyPkmn, pkmnGroup, pkmnGroup.relevantFilters)
             })
           })
-          if (matchesGlobalAnd.length) {
-            ivOr.orWhere(ivAnd => {
-              generateSql(ivAnd, onlyGlobal, andRelevant)
-              ivAnd.whereIn('pokemon_id', matchesGlobalAnd)
-            })
-          }
           if (basicPokemon.length) {
             ivOr.orWhereIn('pokemon_id', basicPokemon)
           }

@@ -117,7 +117,11 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                 if ((tempAdvFilter.generations || generations[item.genId])
                   && (tempAdvFilter.types || typeResolver(item.formTypes))
                   && (tempAdvFilter.rarity || rarity[item.rarity])
-                  && (tempAdvFilter.forms || (forms.altForms ? item.formId != item.defaultFormId : forms[item.name]))) {
+                  && (tempAdvFilter.forms
+                    || forms[item.formName]
+                    || (forms.altForms && item.formId != item.defaultFormId)
+                    || (forms.normalForms && item.formId === item.defaultFormId)
+                  )) {
                   addItem(id, item)
                 }
               } else if ((tempAdvFilter.categories || categories[subCategory])) {
@@ -150,13 +154,11 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                 if (generations[item.genId]
                   || item.formTypes.some(x => types[x])
                   || rarity[item.rarity]
-                  || (forms[item.name] || (forms.altForms && item.formId != item.defaultFormId))
+                  || (forms[item.name]
+                    || (forms.altForms && item.formId != item.defaultFormId)
+                    || (forms.normalForms && item.formId === item.defaultFormId))
                   || categories[subCategory]) {
-                  if (forms.altForms || categories[subCategory]) {
-                    addItem(id, item)
-                  } else if (item.formId == item.defaultFormId || forms[item.name]) {
-                    addItem(id, item)
-                  }
+                  addItem(id, item)
                 }
               } else if (categories[subCategory]) {
                 addItem(id, item)
