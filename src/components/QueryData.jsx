@@ -39,6 +39,7 @@ export default function QueryData({
       onlyGlobal: requestedFilters.filter?.global,
       onlyLegacy: userSettings.legacyFilter,
       onlyOrRaids: userSettings.raidsOr,
+      onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
     }
     Object.entries(requestedFilters).forEach(topLevelFilter => {
       const [id, specifics] = topLevelFilter

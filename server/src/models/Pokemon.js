@@ -77,7 +77,7 @@ class Pokemon extends Model {
       stats, iv: ivs, pvp, areaRestrictions,
     } = perms
     const {
-      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyGlobal,
+      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyGlobal, onlyLinkGlobal,
     } = args.filters
     let queryPvp = false
 
@@ -273,7 +273,9 @@ class Pokemon extends Model {
     // form checker
     results.forEach(pkmn => {
       let noPvp = true
-      const satisfyFilters = args.filters[pkmn.filterId]
+      const satisfyFilters = onlyLinkGlobal
+        ? args.filters[pkmn.filterId]
+        : args.filters[pkmn.filterId]
         || this.satisfiesGlobal(orRelevant, onlyIvOr, pkmn, onlyHundoIv, onlyZeroIv, onlyXsRat, onlyXlKarp)
       if (pkmn.pokemon_id === 132) {
         pkmn.ditto_form = pkmn.form

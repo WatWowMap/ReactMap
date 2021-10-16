@@ -26,6 +26,7 @@ module.exports = function clientOptions(perms) {
     },
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'] },
+      linkGlobalAndAdvanced: { type: 'bool', perm: ['pokemon'] },
       pokemonTimers: { type: 'bool', perm: ['pokemon'] },
       prioritizePvpInfo: { type: 'bool', perm: ['pvp'], popup: true },
       ivCircles: { type: 'bool', perm: ['iv'] },
