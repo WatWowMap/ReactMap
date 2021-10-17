@@ -1,8 +1,9 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
 const Ohbem = require('ohbem')
+const requireFromString = require('require-from-string')
+
 const { pokemon: masterfile } = require('../data/masterfile.json')
-const legacyFilter = require('../services/legacyFilter')
 const {
   api: { pvpMinCp },
   database: {
@@ -96,6 +97,101 @@ class Pokemon extends Model {
     return relevantKeys
   }
 
+  static expertFilter = (filter) => {
+    const input = filter.toUpperCase()
+    const tokenizer = /\s*([()|&!,]|([ADSL]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
+    let result = ''
+    let expectClause = true // expect a clause or '('
+    let stack = 0
+    let lastIndex = 0
+    let match
+    // eslint-disable-next-line no-cond-assign
+    while ((match = tokenizer.exec(input)) !== null) {
+      if (match.index > lastIndex) {
+        return null
+      }
+      if (expectClause) {
+        if (match[3] !== undefined) {
+          const lower = parseFloat(match[3])
+          let column = 'iv'
+          let subColumn
+          switch (match[2]) {
+            case 'A': column = 'atk_iv'; break
+            case 'D': column = 'def_iv'; break
+            case 'S': column = 'sta_iv'; break
+            case 'L': column = 'level'; break
+            case 'CP': column = 'cp'; break
+            case 'GL':
+              column = 'cleanPvp'
+              subColumn = 'great'; break
+            case 'UL':
+              column = 'cleanPvp'
+              subColumn = 'ultra'; break
+            case 'LC':
+              column = 'cleanPvp'
+              subColumn = 'little'; break
+            default: break
+          }
+          let upper = lower
+          if (match[4] !== undefined) {
+            upper = parseFloat(match[4])
+          }
+          if (subColumn) {
+            result += `((pokemon['${column}']['${subColumn}'] || []).some(x => x.rank >= ${lower} && x.rank <= ${upper}))`
+          } else {
+            result += `(pokemon['${column}'] !== null && pokemon['${column}'] >= ${lower} && pokemon['${column}'] <= ${upper})`
+          }
+          expectClause = false
+        } else {
+          switch (match[1]) {
+            case '(':
+              // eslint-disable-next-line no-plusplus
+              if (++stack > 1000000000) {
+                return null
+              }
+              result += '('
+              break
+            case '!':
+              result += '!'
+              break
+            default:
+              return null
+          }
+        }
+      } else if (match[3] !== undefined) {
+        return null
+      } else {
+        switch (match[1]) {
+          case '(':
+          case '!':
+            return null
+          case ')':
+            result += ')'
+            // eslint-disable-next-line no-plusplus
+            if (--stack < 0) {
+              return null
+            }
+            break
+          case '&':
+            result += '&&'
+            expectClause = true
+            break
+          case '|':
+          case ',':
+            result += '||'
+            expectClause = true
+            break
+          default: break
+        }
+      }
+      lastIndex = tokenizer.lastIndex
+    }
+    if (expectClause || stack !== 0 || lastIndex < filter.length) {
+      return null
+    }
+    return requireFromString(`module.exports = (pokemon) => ${result};`)
+  }
+
   static satisfiesGlobal = (fields, global, pkmn, onlyHundoIv, onlyZeroIv, onlyXsRat, onlyXlKarp) => (
     (fields && global && fields.some(
       field => pkmn[field] >= global[field][0] && pkmn[field] <= global[field][1],
@@ -132,7 +228,9 @@ class Pokemon extends Model {
   }
 
   static getRanks = (league, data, filterId, args) => {
-    const [min, max] = this.getMinMax(filterId, league, args)
+    const [min, max] = args.onlyLegacy
+      ? [0, 4096]
+      : this.getMinMax(filterId, league, args)
     let best = 4096
     const filtered = data.filter(pkmn => {
       const result = this.pvpCheck(pkmn, league, min, max, args)
@@ -150,14 +248,14 @@ class Pokemon extends Model {
     return rankCheck && cpCheck && megaCheck && capCheck
   }
 
-  static getMinMax = (filterId, key, args) => {
-    const globalOn = !this.arrayCheck(args.onlyIvOr, key, args.onlyStandard)
+  static getMinMax = (filterId, league, args) => {
+    const globalOn = !this.arrayCheck(args.onlyIvOr, league, args.onlyStandard)
     const specificFilter = args[filterId]
-    const [globalMin, globalMax] = args.onlyIvOr[key]
+    const [globalMin, globalMax] = args.onlyIvOr[league]
     let min = 0
     let max = 0
-    if (specificFilter && !this.arrayCheck(specificFilter, key, args.onlyStandard)) {
-      const [pkmnMin, pkmnMax] = specificFilter[key]
+    if (specificFilter && !this.arrayCheck(specificFilter, league, args.onlyStandard)) {
+      const [pkmnMin, pkmnMax] = specificFilter[league]
       if (globalOn) {
         min = pkmnMin <= globalMin ? pkmnMin : globalMin
         max = pkmnMax >= globalMax ? pkmnMax : globalMax
@@ -182,25 +280,31 @@ class Pokemon extends Model {
       stats, iv: ivs, pvp, areaRestrictions,
     } = perms
     const {
-      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyLinkGlobal,
+      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyLinkGlobal, onlyLegacy,
     } = args.filters
 
     const basicPokemon = []
     const fancyPokemon = {}
-    const orRelevant = this.getRelevantKeys(onlyIvOr, onlyStandard, perms)
+    const orRelevant = onlyLegacy
+      ? this.expertFilter(onlyIvOr.adv)
+      : this.getRelevantKeys(onlyIvOr, onlyStandard, perms)
 
     Object.entries(args.filters).forEach(([pkmn, filter]) => {
       if (!pkmn.startsWith('o')) {
-        const relevantFilters = this.getRelevantKeys(filter, onlyStandard, perms)
+        const relevantFilters = filter.adv
+          ? this.expertFilter(filter.adv)
+          : this.getRelevantKeys(filter, onlyStandard, perms)
         const [id] = pkmn.split('-')
-        if (relevantFilters.length && (ivs || stats || pvp)) {
+        if ((relevantFilters.length || filter.adv) && (ivs || stats || pvp)) {
           fancyPokemon[pkmn] = relevantFilters
         } else {
           basicPokemon.push(id)
         }
       }
     })
-    const needsJs = Object.keys(fancyPokemon).length || orRelevant.some(field => leagueObj[field])
+    const needsJs = Object.keys(fancyPokemon).length
+      || (onlyIvOr.adv && onlyLegacy)
+      || orRelevant.some(field => leagueObj[field])
 
     const query = this.query()
     if (isMad) {
@@ -242,69 +346,69 @@ class Pokemon extends Model {
     }
     const results = await query
 
-    const filteredResults = results.map(pkmn => {
-      const newPkmn = pkmn
-
+    return results.filter(pkmn => {
       if (pkmn.pokemon_id === 132) {
-        newPkmn.ditto_form = pkmn.form
-        newPkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
+        pkmn.ditto_form = pkmn.form
+        pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
       }
-      newPkmn.filterId = `${newPkmn.pokemon_id}-${newPkmn.form}`
+      pkmn.filterId = `${pkmn.pokemon_id}-${pkmn.form}`
 
-      if (onlyLinkGlobal && !args.filters[newPkmn.filterId]) {
+      if (onlyLinkGlobal && !args.filters[pkmn.filterId]) {
         return null
+      }
+      if (!ivs) {
+        delete pkmn.iv
+      }
+      if (!stats) {
+        delete pkmn.cp
+        delete pkmn.atk_iv
+        delete pkmn.def_iv
+        delete pkmn.sta_iv
+        delete pkmn.level
       }
       if (!pkmn.seen_type) {
         if (pkmn.spawn_id === null) {
-          newPkmn.seen_type = pkmn.pokestop_id ? 'nearby_stop' : 'nearby_cell'
+          pkmn.seen_type = pkmn.pokestop_id ? 'nearby_stop' : 'nearby_cell'
         } else {
-          newPkmn.seen_type = 'encounter'
+          pkmn.seen_type = 'encounter'
         }
-      } else {
-        newPkmn.seen_type = pkmn.seen_type
       }
-      if (pkmn.cp) {
+      if (pkmn.cp || pkmn.iv) {
         if (pvp) {
-          const parsed = reactMapHandlesPvp ? this.getOhbemPvp(newPkmn) : this.getParsedPvp(newPkmn)
-          newPkmn.cleanPvp = {}
-          newPkmn.bestPvp = 4096
+          const parsed = reactMapHandlesPvp ? this.getOhbemPvp(pkmn) : this.getParsedPvp(pkmn)
+          pkmn.cleanPvp = {}
+          pkmn.bestPvp = 4096
           Object.keys(parsed).forEach(league => {
-            const { filtered, best } = this.getRanks(league, parsed[league], newPkmn.filterId, args.filters)
+            const { filtered, best } = this.getRanks(league, parsed[league], pkmn.filterId, args.filters)
             if (filtered.length) {
-              newPkmn.cleanPvp[league] = filtered
-              if (best < newPkmn.bestPvp) {
-                newPkmn.bestPvp = best
+              pkmn.cleanPvp[league] = filtered
+              if (best < pkmn.bestPvp) {
+                pkmn.bestPvp = best
               }
-              newPkmn[league] = best
+              pkmn[league] = best
             }
           })
         }
-        if (this.formChecker(pkmn, fancyPokemon[newPkmn.filterId], args.filters[newPkmn.filterId])) {
-          return newPkmn
+        if (onlyLegacy) {
+          if (args.filters[pkmn.filterId]?.adv && fancyPokemon[pkmn.filterId](pkmn)) {
+            return pkmn
+          }
+          if (onlyIvOr.adv && orRelevant(pkmn)) {
+            return pkmn
+          }
+        } else {
+          if (this.formChecker(pkmn, fancyPokemon[pkmn.filterId], args.filters[pkmn.filterId])) {
+            return pkmn
+          }
+          if (this.satisfiesGlobal(orRelevant, onlyIvOr, pkmn, onlyHundoIv, onlyZeroIv, onlyXsRat, onlyXlKarp)) {
+            return pkmn
+          }
         }
-        if (this.satisfiesGlobal(orRelevant, onlyIvOr, pkmn, onlyHundoIv, onlyZeroIv, onlyXsRat, onlyXlKarp)) {
-          return newPkmn
-        }
-      } else if (args.filters[newPkmn.filterId]) {
-        return newPkmn
+      } else if (args.filters[pkmn.filterId]) {
+        return pkmn
       }
       return null
     })
-
-    return filteredResults.filter(pkmn => pkmn)
-  }
-
-  static async getLegacy(args, perms, isMad) {
-    const ts = Math.floor((new Date()).getTime() / 1000)
-    const query = this.query()
-      .where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
-      .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
-      .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
-    if (isMad) {
-      getMadSql(query)
-    }
-    const results = await query
-    return legacyFilter(results, args, perms, ohbem)
   }
 
   static async getAvailablePokemon(isMad) {

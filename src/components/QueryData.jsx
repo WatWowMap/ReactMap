@@ -112,14 +112,14 @@ export default function QueryData({
   timeout.setupTimeout(refetch)
 
   const renderedData = data || previousData
-  return error ? (
+  return error && process.env.NODE_ENV === 'development' ? (
     <Notification
-      severity={process.env.NODE_ENV === 'development' ? 'error' : 'info'}
-      i18nKey={process.env.NODE_ENV === 'development' ? 'server_dev_error_0' : 'server_error_0'}
+      severity="error"
+      i18nKey="server_dev_error_0"
       messages={[
         {
           key: 'error',
-          variables: process.env.NODE_ENV === 'development' ? [error] : [category],
+          variables: [error],
         },
       ]}
     />
