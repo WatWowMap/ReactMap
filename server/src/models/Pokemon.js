@@ -31,6 +31,7 @@ let ohbem = null
 const getMadSql = q => (
   q.leftJoin('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
     .select([
+      '*',
       ref('encounter_id')
         .castTo('CHAR')
         .as('id'),
