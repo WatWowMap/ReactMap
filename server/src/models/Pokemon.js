@@ -73,7 +73,7 @@ class Pokemon extends Model {
     })
   }
 
-  static getPerms = field => {
+  static getPerms(field) {
     switch (field) {
       case 'iv': return 'iv'
       case 'level':
@@ -86,7 +86,7 @@ class Pokemon extends Model {
 
   static arrayCheck = (filter, key, reference) => filter[key].every((v, i) => v === reference[key][i])
 
-  static getRelevantKeys = (filter, reference, perms) => {
+  static getRelevantKeys(filter, reference, perms) {
     const relevantKeys = []
     if (filter) {
       keys.forEach(key => {
@@ -98,7 +98,7 @@ class Pokemon extends Model {
     return relevantKeys
   }
 
-  static expertFilter = (filter) => {
+  static expertFilter(filter) {
     const input = filter.toUpperCase()
     const tokenizer = /\s*([()|&!,]|([ADSL]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
     let result = ''
@@ -193,15 +193,35 @@ class Pokemon extends Model {
     return requireFromString(`module.exports = (pokemon) => ${result};`)
   }
 
-  static satisfiesGlobal = (fields, global, pkmn, onlyHundoIv, onlyZeroIv, onlyXsRat, onlyXlKarp) => (
-    (fields && global && fields.some(
-      field => pkmn[field] >= global[field][0] && pkmn[field] <= global[field][1],
-    )) || (onlyHundoIv && pkmn.iv === 100) || (onlyZeroIv && pkmn.iv === 0)
+  static checker = (pkmn, relevant, filter) => {
+    if (!relevant && filter) {
+      return true
+    }
+    if (filter) {
+      const orFields = []
+      const andFields = []
+      relevant.forEach(field => (leagueObj[field]
+        ? orFields.push(field)
+        : andFields.push(field)))
+      return ((orFields.length && orFields.some(field => pkmn[field]
+        && pkmn[field] >= filter[field][0]
+        && pkmn[field] <= filter[field][1]))
+        || (andFields.length && andFields.every(field => pkmn[field]
+          && pkmn[field] >= filter[field][0]
+          && pkmn[field] <= filter[field][1])))
+    }
+    return false
+  }
+
+  static globalChecker = (pkmn, globalRelevant, global, onlyHundoIv, onlyZeroIv, onlyXsRat, onlyXlKarp) => (
+    (globalRelevant.length && this.checker(pkmn, globalRelevant, global))
+    || (onlyHundoIv && pkmn.iv === 100)
+    || (onlyZeroIv && pkmn.iv === 0)
     || (onlyXsRat && pkmn.weight <= 2.40625 && pkmn.pokemon_id === 19)
     || (onlyXlKarp && pkmn.weight >= 13.125 && pkmn.pokemon_id === 129)
   )
 
-  static getParsedPvp = (pokemon) => {
+  static getParsedPvp(pokemon) {
     if (dbType === 'chuck') {
       return JSON.parse(pokemon.pvp)
     }
@@ -228,7 +248,7 @@ class Pokemon extends Model {
     )
   }
 
-  static getRanks = (league, data, filterId, args) => {
+  static getRanks(league, data, filterId, args) {
     const [min, max] = args.onlyLegacy
       ? [0, 4096]
       : this.getMinMax(filterId, league, args)
@@ -241,7 +261,7 @@ class Pokemon extends Model {
     return { filtered, best }
   }
 
-  static pvpCheck = (pkmn, league, min, max, args) => {
+  static pvpCheck(pkmn, league, min, max, args) {
     const rankCheck = pkmn.rank <= max && pkmn.rank >= min
     const cpCheck = dbType === 'chuck' || reactMapHandlesPvp || pkmn.cp >= pvpMinCp[league]
     const megaCheck = !pkmn.evolution || args.onlyPvpMega
@@ -249,14 +269,14 @@ class Pokemon extends Model {
     return rankCheck && cpCheck && megaCheck && capCheck
   }
 
-  static getMinMax = (filterId, league, args) => {
-    const globalOn = !this.arrayCheck(args.onlyIvOr, league, args.onlyStandard)
+  static getMinMax = (filterId, key, args) => {
+    const globalOn = !this.arrayCheck(args.onlyIvOr, key, args.onlyStandard)
     const specificFilter = args[filterId]
-    const [globalMin, globalMax] = args.onlyIvOr[league]
+    const [globalMin, globalMax] = args.onlyIvOr[key]
     let min = 0
     let max = 0
-    if (specificFilter && !this.arrayCheck(specificFilter, league, args.onlyStandard)) {
-      const [pkmnMin, pkmnMax] = specificFilter[league]
+    if (specificFilter && !this.arrayCheck(specificFilter, key, args.onlyStandard)) {
+      const [pkmnMin, pkmnMax] = specificFilter[key]
       if (globalOn) {
         min = pkmnMin <= globalMin ? pkmnMin : globalMin
         max = pkmnMax >= globalMax ? pkmnMax : globalMax
@@ -270,10 +290,6 @@ class Pokemon extends Model {
     }
     return [min, max]
   }
-
-  static formChecker = (pokemon, relevant = [], filter) => filter && relevant.every(
-    key => (pokemon[key] >= filter[key][0] && pokemon[key] <= filter[key][1]),
-  )
 
   static async getPokemon(args, perms, isMad) {
     const ts = Date.now() / 1000
@@ -292,11 +308,11 @@ class Pokemon extends Model {
 
     Object.entries(args.filters).forEach(([pkmn, filter]) => {
       if (!pkmn.startsWith('o')) {
-        const relevantFilters = filter.adv
+        const relevantFilters = onlyLegacy
           ? this.expertFilter(filter.adv)
           : this.getRelevantKeys(filter, onlyStandard, perms)
         const [id] = pkmn.split('-')
-        if ((relevantFilters.length || filter.adv) && (ivs || stats || pvp)) {
+        if ((relevantFilters.length || onlyLegacy) && (ivs || stats || pvp)) {
           fancyPokemon[pkmn] = relevantFilters
         } else {
           basicPokemon.push(id)
@@ -357,16 +373,6 @@ class Pokemon extends Model {
       if (onlyLinkGlobal && !args.filters[pkmn.filterId]) {
         return null
       }
-      if (!ivs) {
-        delete pkmn.iv
-      }
-      if (!stats) {
-        delete pkmn.cp
-        delete pkmn.atk_iv
-        delete pkmn.def_iv
-        delete pkmn.sta_iv
-        delete pkmn.level
-      }
       if (!pkmn.seen_type) {
         if (pkmn.spawn_id === null) {
           pkmn.seen_type = pkmn.pokestop_id ? 'nearby_stop' : 'nearby_cell'
@@ -390,6 +396,16 @@ class Pokemon extends Model {
             }
           })
         }
+        if (!ivs) {
+          delete pkmn.iv
+        }
+        if (!stats) {
+          delete pkmn.cp
+          delete pkmn.atk_iv
+          delete pkmn.def_iv
+          delete pkmn.sta_iv
+          delete pkmn.level
+        }
         if (onlyLegacy) {
           if (args.filters[pkmn.filterId]?.adv && fancyPokemon[pkmn.filterId](pkmn)) {
             return pkmn
@@ -398,14 +414,15 @@ class Pokemon extends Model {
             return pkmn
           }
         } else {
-          if (this.formChecker(pkmn, fancyPokemon[pkmn.filterId], args.filters[pkmn.filterId])) {
+          if (this.checker(pkmn, fancyPokemon[pkmn.filterId], args.filters[pkmn.filterId])) {
             return pkmn
           }
-          if (this.satisfiesGlobal(orRelevant, onlyIvOr, pkmn, onlyHundoIv, onlyZeroIv, onlyXsRat, onlyXlKarp)) {
+          if (this.globalChecker(pkmn, orRelevant, onlyIvOr, onlyHundoIv, onlyZeroIv, onlyXsRat, onlyXlKarp)) {
             return pkmn
           }
+          return null
         }
-      } else if (args.filters[pkmn.filterId]) {
+      } else if (args.filters[pkmn.filterId] && !fancyPokemon[pkmn.filterId]) {
         return pkmn
       }
       return null
