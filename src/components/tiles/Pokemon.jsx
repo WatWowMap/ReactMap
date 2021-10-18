@@ -55,6 +55,7 @@ const PokemonTile = ({
   const glowStatus = userSettings.glow ? getGlowStatus(item, userSettings, staticUserSettings) : undefined
   const ivCircle = userSettings.ivCircles && item.iv !== null && item.iv >= userSettings.minIvCircle
   const pvpCheck = item.bestPvp !== null && item.bestPvp < 4
+  const weatherCheck = item.weather && userSettings.weatherIndicator
 
   const finalLocation = item.seen_type?.startsWith('nearby')
     ? getOffset([item.lat, item.lon], item.seen_type)
@@ -72,8 +73,8 @@ const PokemonTile = ({
       }}
       zIndexOffset={item.iv * 100}
       position={finalLocation}
-      icon={(pvpCheck || glowStatus || ivCircle)
-        ? fancyMarker(url, size, item, glowStatus, ivCircle, Icons)
+      icon={(pvpCheck || glowStatus || ivCircle || weatherCheck)
+        ? fancyMarker(url, size, item, glowStatus, ivCircle, Icons, weatherCheck)
         : basicMarker(url, size)}
     >
       <Popup position={finalLocation}>

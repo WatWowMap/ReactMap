@@ -377,5 +377,6 @@
   "hasQuestIndicator": "Alternative Color for Stops with Quests",
   "showArBadge": "Show AR Badge",
   "allGyms": "All Gyms",
-  "raidsOr": "Filter Raid Bosses Separately from Raids"
+  "raidsOr": "Filter Raid Bosses Separately from Raids",
+  "weatherIndicator": "Weather Boost Indicator"
 }

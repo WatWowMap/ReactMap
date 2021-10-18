@@ -101,6 +101,7 @@
       "legacyFilter": false,
       "ivCircles": false,
       "minIvCircle": 90,
+      "weatherIndicator": false,
       "interactionRanges": false,
       "showDexNumInPopup": false,
       "pvpMega": false,
