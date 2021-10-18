@@ -351,5 +351,7 @@
   "hasQuestIndicator": "Alternatywny kolor dla Pokestopów z zadaniami",
   "showArBadge": "Pokaż odznakę AR",
   "raidsOr": "Filtruj raid bossy oddzielnie od raidów",
-  "general": "Ogólny"
+  "general": "Ogólny",
+  "linkGlobalAndAdvanced": "Linki globalne i zaawansowane",
+  "normalForms": "Formy normalne"
 }

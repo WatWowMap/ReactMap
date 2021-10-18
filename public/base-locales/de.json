@@ -362,5 +362,7 @@
   "hasQuestIndicator": "Alternative Farbe für Stops mit Quests",
   "showArBadge": "Zeige AR Symbol",
   "raidsOr": "Raidbosse separat filtern",
-  "general": "Allgemeines"
+  "general": "Allgemeines",
+  "linkGlobalAndAdvanced": "Verknüpfe Global und Erweitert",
+  "normalForms": "Standard Forms"
 }

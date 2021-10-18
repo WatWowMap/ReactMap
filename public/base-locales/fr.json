@@ -360,5 +360,7 @@
   "showArBadge": "Afficher les Badges AR",
   "pvpMega": "Stats PvP Mega",
   "raidsOr": "Filtrer les Raid Bosses séparément des Raids",
-  "general": "Générale"
+  "general": "Générale",
+  "linkGlobalAndAdvanced": "Lien global et avancé",
+  "normalForms": "Formes normales"
 }
