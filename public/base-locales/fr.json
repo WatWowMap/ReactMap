@@ -384,5 +384,6 @@
   "hasQuestIndicator": "Couleur alternative pour afficher les Quêtes",
   "showArBadge": "Afficher les Badges AR",
   "pvpMega": "Stats PvP Mega",
-  "raidsOr": "Filtrer les Raid Bosses séparément des Raids"
+  "raidsOr": "Filtrer les Raid Bosses séparément des Raids",
+  "weatherIndicator": "Indicateur météo"
 }

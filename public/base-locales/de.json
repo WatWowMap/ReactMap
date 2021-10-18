@@ -386,5 +386,6 @@
   "messageOfTheDay": "Nachricht des Tages",
   "hasQuestIndicator": "Alternative Farbe für Stops mit Quests",
   "showArBadge": "Zeige AR Symbol",
-  "raidsOr": "Raidbosse separat filtern"
+  "raidsOr": "Raidbosse separat filtern",
+  "weatherIndicator": "Wetter Symbol"
 }

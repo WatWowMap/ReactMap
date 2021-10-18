@@ -378,5 +378,6 @@
   "navigationIntel": "Intel",
   "localeSelection": "Selección de Idioma",
   "ivOrFilter": "IV O filtro",
-  "raidsOr": "Filtrar Bosses separadas de Incursiones"
+  "raidsOr": "Filtrar Bosses separadas de Incursiones",
+  "weatherIndicator": "Indicador meteorológico"
 }
