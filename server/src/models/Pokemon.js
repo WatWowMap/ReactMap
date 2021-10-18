@@ -223,7 +223,7 @@ class Pokemon extends Model {
 
   static getParsedPvp(pokemon) {
     if (dbType === 'chuck') {
-      return JSON.parse(pokemon.pvp)
+      return pokemon.pvp ? JSON.parse(pokemon.pvp) : {}
     }
     const parsed = {}
     const pvpKeys = ['great', 'ultra']
@@ -381,7 +381,7 @@ class Pokemon extends Model {
         }
       }
       if (pkmn.cp || pkmn.iv) {
-        if (pvp) {
+        if (pvp && pkmn.pokemon_id !== 132) {
           const parsed = reactMapHandlesPvp ? this.getOhbemPvp(pkmn) : this.getParsedPvp(pkmn)
           pkmn.cleanPvp = {}
           pkmn.bestPvp = 4096
