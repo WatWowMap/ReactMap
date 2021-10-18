@@ -133,7 +133,9 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                 addItem(id, item)
               } break
             case 'search': {
-              const meta = Object.values(item).map(x => x).join(' ').toLowerCase()
+              const meta = Object.values(item).flatMap(x => t(x))
+                .join(' ')
+                .toLowerCase()
               searchTerms.forEach(term => {
                 switch (typeof term) {
                   case 'string':
