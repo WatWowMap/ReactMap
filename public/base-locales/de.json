@@ -365,5 +365,6 @@
   "general": "Allgemeines",
   "linkGlobalAndAdvanced": "Verknüpfe Global und Erweitert",
   "normalForms": "Normalformen",
-  "weatherIndicator": "Wetter Symbol"
+  "weatherIndicator": "Wetter Symbol",
+  "page": "Seite {{page}}"
 }

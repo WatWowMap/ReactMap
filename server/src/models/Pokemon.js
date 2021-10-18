@@ -318,6 +318,10 @@ class Pokemon extends Model {
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       pkmn.cleanPvp = {}
       pkmn.bestPvp = 4096
+      if (pkmn.pokemon_id === 132) {
+        pkmn.ditto_form = pkmn.form
+        pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
+      }
       if (!pkmn.seen_type) pkmn.seen_type = 'encounter'
       Object.keys(parsed).forEach(league => {
         const { filtered, best } = getRanks(league, parsed[league], filterId)

@@ -357,5 +357,6 @@
   "server_Dev_error_0": "{{variable_0}}",
   "linkGlobalAndAdvanced": "Link Global & Advanced",
   "normalForms": "Normal Forms",
-  "weatherIndicator": "Weather Boost Indicator"
+  "weatherIndicator": "Weather Boost Indicator",
+  "page": "Page {{page}}"
 }
