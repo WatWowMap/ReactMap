@@ -13,12 +13,16 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
   const available = useStatic(useCallback(s => s.available, []))
   const { perms } = useStatic(useCallback(s => s.auth, []))
   const { pokemon } = useStatic(useCallback(s => s.masterfile, []))
+  const setExcludeList = useStatic(useCallback(s => s.setExcludeList, []))
 
   const [menuFilters] = useState({
     ...genGyms(),
     ...genPokestops(),
     ...genPokemon(),
   })
+
+  setExcludeList([])
+
   const {
     filters: {
       generations, types, rarity, forms, others, categories,
