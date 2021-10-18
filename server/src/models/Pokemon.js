@@ -206,7 +206,7 @@ class Pokemon extends Model {
       return ((orFields.length && orFields.some(field => pkmn[field]
         && pkmn[field] >= filter[field][0]
         && pkmn[field] <= filter[field][1]))
-        || (andFields.length && andFields.every(field => pkmn[field]
+        || (andFields.length && andFields.every(field => pkmn[field] !== undefined
           && pkmn[field] >= filter[field][0]
           && pkmn[field] <= filter[field][1])))
     }
