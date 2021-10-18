@@ -33,6 +33,7 @@ module.exports = function clientOptions(perms) {
       minIvCircle: { type: 'number', perm: ['iv'], label: '%' },
       interactionRanges: { type: 'bool', perm: ['pokemon'] },
       showDexNumInPopup: { type: 'bool', perm: ['pokemon'], popup: true },
+      weatherIndicator: { type: 'bool', perm: ['weather'] },
       pvpMega: { type: 'bool', perm: ['pokemon'], popup: true },
     },
     wayfarer: {
