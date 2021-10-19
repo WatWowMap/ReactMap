@@ -8,6 +8,7 @@ import {
 
 import Utility from '@services/Utility'
 import { useStore } from '@hooks/useStore'
+import useFilter from '@hooks/useFilter'
 
 import ReactWindow from '@components/layout/general/ReactWindow'
 import Header from '@components/layout/general/Header'
@@ -51,7 +52,7 @@ export default function Menu({
     id: '',
   })
 
-  const { filteredObj, filteredArr, count } = Utility.menuFilter(tempFilters, menus, search, category)
+  const { filteredObj, filteredArr, count } = useFilter(tempFilters, menus, search, category)
 
   const generateSlots = (teamId, show) => {
     for (let i = 1; i <= 6; i += 1) {

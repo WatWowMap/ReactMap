@@ -208,7 +208,7 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.masterfile = masterfile
 
-      if (serverSettings.user.perms.webhooks.length) {
+      if (serverSettings.user?.perms?.webhooks?.length) {
         serverSettings.webhooks = {}
         const filtered = config.webhooks.filter(webhook => serverSettings.user.perms.webhooks.includes(webhook.name))
         try {
