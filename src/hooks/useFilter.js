@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
@@ -20,8 +20,6 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
     ...genPokestops(),
     ...genPokemon(),
   })
-
-  setExcludeList([])
 
   const {
     filters: {
@@ -174,6 +172,8 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
       }
     })
   })
+
+  useEffect(() => () => setExcludeList([]))
 
   return { filteredObj, filteredArr, count }
 }
