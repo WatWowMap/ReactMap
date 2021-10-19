@@ -54,6 +54,7 @@
     "fetchLatestInvasions": true,
     "invasionCacheHrs": 1,
     "questMessage": "",
+    "navigationControls": "react", 
     "theme": {
       "style": "dark",
       "primary": "#ff5722",

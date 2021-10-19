@@ -358,5 +358,8 @@
   "linkGlobalAndAdvanced": "Link Global & Advanced",
   "normalForms": "Normal Forms",
   "weatherIndicator": "Weather Boost Indicator",
-  "page": "Page {{page}}"
+  "page": "Page {{page}}",
+  "navigationControls": "Navigation Controls",
+  "navigationControlsreact": "React",
+  "navigationControlsleaflet": "Leaflet"
 }
