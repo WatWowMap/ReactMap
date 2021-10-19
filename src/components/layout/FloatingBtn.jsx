@@ -1,3 +1,4 @@
+/* eslint-disable react/no-this-in-sfc */
 import React, { useEffect, useRef, useState } from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import {
@@ -6,12 +7,12 @@ import {
 import { useMap } from 'react-leaflet'
 import Locate from 'leaflet.locatecontrol'
 import { useTranslation } from 'react-i18next'
-import Leaflet from 'leaflet'
+import L from 'leaflet'
 
 import useStyles from '@hooks/useStyles'
 
 export default function FloatingButtons({
-  toggleDrawer, toggleDialog, safeSearch, isMobile,
+  toggleDrawer, toggleDialog, safeSearch, isMobile, settings,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
@@ -27,6 +28,37 @@ export default function FloatingButtons({
       _cleanClasses() {
         setColor('inherit')
       },
+      onAdd() {
+        const container = L.DomUtil.create('div', 'react-locate-control leaflet-bar leaflet-control')
+        this._container = container
+        this._map = map
+        this._layer = this.options.layer || new L.LayerGroup()
+        this._layer.addTo(map)
+        this._event = undefined
+        this._compassHeading = null
+        this._prevBounds = null
+
+        const linkAndIcon = this.options.createButtonCallback(container, this.options)
+        this._link = linkAndIcon.link
+        this._icon = linkAndIcon.icon
+
+        L.DomEvent.on(
+          this._link,
+          'click',
+          function stuff(ev) {
+            L.DomEvent.stopPropagation(ev)
+            L.DomEvent.preventDefault(ev)
+            this._onClick()
+          },
+          this,
+        ).on(this._link, 'dblclick', L.DomEvent.stopPropagation)
+
+        this._resetVariables()
+
+        this._map.on('unload', this._unload, this)
+
+        return container
+      },
     })
     const result = new LocateFab({
       keepCurrentZoomLevel: true,
@@ -39,7 +71,7 @@ export default function FloatingButtons({
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'medium'
   const ref = useRef(null)
-  useEffect(() => Leaflet.DomEvent.disableClickPropagation(ref.current))
+  useEffect(() => L.DomEvent.disableClickPropagation(ref.current))
 
   return (
     <Grid
@@ -58,26 +90,30 @@ export default function FloatingButtons({
       </Grid>
       {safeSearch.length > 0 && (
         <Grid item>
-          <Fab color="primary" size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('openMenu')}>
+          <Fab color={settings.navigationControls === 'react' ? 'primary' : 'secondary'} size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('openMenu')}>
             <Search fontSize={iconSize} />
           </Fab>
         </Grid>
       )}
-      <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')}>
-          <LocationOn color={color} fontSize={iconSize} />
-        </Fab>
-      </Grid>
-      <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => map.zoomIn()} title={t('zoomIn')}>
-          <ZoomIn fontSize={iconSize} />
-        </Fab>
-      </Grid>
-      <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()} title={t('zoomOut')}>
-          <ZoomOut fontSize={iconSize} />
-        </Fab>
-      </Grid>
+      {settings.navigationControls === 'react' && (
+        <>
+          <Grid item>
+            <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')}>
+              <LocationOn color={color} fontSize={iconSize} />
+            </Fab>
+          </Grid>
+          <Grid item>
+            <Fab color="secondary" size={fabSize} onClick={() => map.zoomIn()} title={t('zoomIn')}>
+              <ZoomIn fontSize={iconSize} />
+            </Fab>
+          </Grid>
+          <Grid item>
+            <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()} title={t('zoomOut')}>
+              <ZoomOut fontSize={iconSize} />
+            </Fab>
+          </Grid>
+        </>
+      )}
     </Grid>
   )
 }

@@ -16,7 +16,9 @@ import Motd from './dialogs/Motd'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
-export default function Nav({ map, setManualParams, Icons }) {
+export default function Nav({
+  map, setManualParams, Icons, settings,
+}) {
   const classes = useStyles()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
@@ -100,6 +102,7 @@ export default function Nav({ map, setManualParams, Icons }) {
           toggleDialog={toggleDialog}
           safeSearch={safeSearch}
           isMobile={isMobile}
+          settings={settings}
         />
       )}
       <Dialog

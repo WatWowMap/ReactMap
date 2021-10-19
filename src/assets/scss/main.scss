@@ -1,4 +1,5 @@
 @import "~react-leaflet-markercluster/dist/styles.min.css";
+@import "~leaflet.locatecontrol/dist/L.Control.Locate.min.css";
 
 .leaflet-container {
   position: absolute;
@@ -11,8 +12,8 @@
   right: 0;
 }
 
-.leaflet-control-locate {
-  opacity: 0;
+.react-locate-control {
+  display: none;
 }
 
 body {

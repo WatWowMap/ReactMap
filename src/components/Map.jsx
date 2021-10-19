@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react'
-import { TileLayer, useMap } from 'react-leaflet'
+import React, { useState, useEffect, useCallback } from 'react'
+import { TileLayer, useMap, ZoomControl } from 'react-leaflet'
+import L from 'leaflet'
 
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
@@ -31,8 +32,14 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
   const userSettings = useStore(state => state.userSettings)
-  const [manualParams, setManualParams] = useState(params)
 
+  const [manualParams, setManualParams] = useState(params)
+  const [lc] = useState(L.control.locate({
+    position: 'bottomright',
+    icon: 'fas fa-location-arrow',
+    keepCurrentZoomLevel: true,
+    setView: 'untilPan',
+  }))
   const initialBounds = {
     minLat: map.getBounds()._southWest.lat,
     maxLat: map.getBounds()._northEast.lat,
@@ -47,6 +54,14 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
     setZoom(map.getZoom())
   }, [map])
 
+  useEffect(() => {
+    if (settings.navigationControls === 'leaflet') {
+      lc.addTo(map)
+    } else {
+      lc.remove()
+    }
+  }, [settings.navigationControls])
+
   return (
     <>
       <TileLayer
@@ -56,6 +71,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
       />
+      {settings.navigationControls === 'leaflet' && <ZoomControl position="bottomright" />}
       {Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
         const [category, value] = each
         let enabled = false
@@ -115,7 +131,12 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         }
         return null
       })}
-      <Nav map={map} setManualParams={setManualParams} Icons={Icons} />
+      <Nav
+        map={map}
+        setManualParams={setManualParams}
+        Icons={Icons}
+        settings={settings}
+      />
     </>
   )
 }

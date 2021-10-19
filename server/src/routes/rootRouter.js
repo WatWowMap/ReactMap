@@ -108,6 +108,10 @@ rootRouter.get('/settings', async (req, res) => {
           temporary: {},
           persistent: {},
         },
+        navigationControls: {
+          react: {},
+          leaflet: {},
+        },
         manualAreas: config.manualAreas || {},
         icons: config.icons,
       }
