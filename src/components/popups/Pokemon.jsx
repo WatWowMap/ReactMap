@@ -172,7 +172,9 @@ const Header = ({
     { name: 'timer', action: handleTimer },
   ]
 
-  const pokemonName = t(`poke_${metaData.pokedexId}`)
+  const pokeName = t(`poke_${metaData.pokedexId}`)
+  const formName = metaData.forms?.[form]?.name === 'Normal' || form === 0 ? '' : t(`form_${pokemon.form}`)
+
   return (
     <>
       <Grid item xs={3}>
@@ -187,12 +189,16 @@ const Header = ({
           : <img src={iconUrl} style={{ maxWidth: 40, maxHeight: 40 }} />}
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'center' }}>
-        <Typography variant={pokemonName.length > 8 ? 'h6' : 'h5'}>
-          {pokemonName}
+        <Typography variant={pokeName.length > 8 ? 'h6' : 'h5'}>
+          {pokeName}
         </Typography>
-        {(ditto_form !== null && display_pokemon_id) && (
+        {(ditto_form !== null && display_pokemon_id) ? (
           <Typography variant="caption">
             ({t(`poke_${display_pokemon_id}`)})
+          </Typography>
+        ) : (
+          <Typography variant="caption">
+            {formName}
           </Typography>
         )}
       </Grid>
