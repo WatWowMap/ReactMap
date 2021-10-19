@@ -25,9 +25,10 @@ module.exports.locales = async function locales() {
 
       Object.keys(remoteFiles).forEach(key => {
         if (!key.startsWith('desc_') && !key.startsWith('pokemon_category_')) {
-          if (key.startsWith('quest_')) {
-            remoteFiles[key] = remoteFiles[key].replace('}', '%%').replace('}', '%%')
-            trimmedRemoteFiles[key] = remoteFiles[key].replace('%{', '{{').replace('%%', '}}').replace('%{', '{{').replace('%%', '}}')
+          if (key.startsWith('quest_') || key.startsWith('challenge_')) {
+            trimmedRemoteFiles[key] = remoteFiles[key]
+              .replace(/%\{/g, '{{')
+              .replace(/\}/g, '}}')
           } else {
             trimmedRemoteFiles[key] = remoteFiles[key]
           }

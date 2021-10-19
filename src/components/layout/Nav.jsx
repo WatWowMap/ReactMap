@@ -19,7 +19,7 @@ const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
 export default function Nav({
   map, setManualParams, Icons, config,
-  setWebhookMode, webhookMode,
+  setWebhookMode, webhookMode, settings,
 }) {
   const classes = useStyles()
   const theme = useTheme()
@@ -64,8 +64,8 @@ export default function Nav({
       setDialog({ open, category, type })
     }
     if (filter && type === 'search') {
+      setManualParams({ id: filter.id })
       map.flyTo([filter.lat, filter.lon], 16)
-      setManualParams(filter)
     }
     if (filter && type === 'filters') {
       setFilters({ ...filters, [category]: { ...filters[category], filter } })
@@ -112,6 +112,7 @@ export default function Nav({
           webhookMode={webhookMode}
           setWebhookMode={setWebhookMode}
           scanAreasOn={filters.scanAreas.enabled}
+          settings={settings}
         />
       )}
       <Dialog

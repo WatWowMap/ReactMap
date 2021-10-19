@@ -6,20 +6,16 @@ import marker from '../markers/s2cell'
 
 const S2cellTile = ({
   item, config, zoom, ts,
-}) => (
-  <>
-    {zoom >= config.scanCellsZoom && (
-      <Polygon
-        positions={item.polygon}
-        pathOptions={marker(item.updated)}
-      >
-        <Popup position={[item.center_lat, item.center_lon]}>
-          <PopupContent cell={item} ts={ts} />
-        </Popup>
-      </Polygon>
-    )}
-  </>
-)
+}) => (zoom >= config.scanCellsZoom && (
+  <Polygon
+    positions={item.polygon}
+    pathOptions={marker(item.updated)}
+  >
+    <Popup position={[item.center_lat, item.center_lon]}>
+      <PopupContent cell={item} ts={ts} />
+    </Popup>
+  </Polygon>
+))
 
 const areEqual = (prev, next) => (
   prev.item.id === next.item.id

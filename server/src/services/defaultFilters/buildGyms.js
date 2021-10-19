@@ -16,6 +16,7 @@ module.exports = function buildGyms(perms, defaults) {
   if (perms.raids) {
     for (let i = 1; i <= 6; i += 1) {
       gymFilters[`e${i}`] = new GenericFilter(defaults.eggs)
+      gymFilters[`r${i}`] = new GenericFilter(defaults.raids)
     }
   }
   return gymFilters

@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react'
-import { TileLayer, useMap } from 'react-leaflet'
+import React, { useState, useEffect, useCallback } from 'react'
+import { TileLayer, useMap, ZoomControl } from 'react-leaflet'
+import L from 'leaflet'
 
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
@@ -18,7 +19,7 @@ const userSettingsCategory = category => {
   }
 }
 
-export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons }, params }) {
+export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons, webhooks }, params }) {
   Utility.analytics(window.location.pathname)
 
   const map = useMap()
@@ -35,14 +36,21 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const setZoom = useStore(state => state.setZoom)
   const userSettings = useStore(state => state.userSettings)
 
-  const [webhookMode, setWebhookMode] = useState('open')
-  const [manualParams, setManualParams] = useState(false)
+  const [webhookMode, setWebhookMode] = useState(false)
   const [initialBounds] = useState({
     minLat: map.getBounds()._southWest.lat,
     maxLat: map.getBounds()._northEast.lat,
     minLon: map.getBounds()._southWest.lng,
     maxLon: map.getBounds()._northEast.lng,
+    zoom: map.getZoom(),
   })
+  const [manualParams, setManualParams] = useState(params)
+  const [lc] = useState(L.control.locate({
+    position: 'bottomright',
+    icon: 'fas fa-location-arrow',
+    keepCurrentZoomLevel: true,
+    setView: 'untilPan',
+  }))
 
   const onMove = useCallback((latLon) => {
     const newCenter = latLon || map.getCenter()
@@ -50,9 +58,13 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
     setZoom(map.getZoom())
   }, [map])
 
-  if (manualParams) {
-    params.id = manualParams.id
-  }
+  useEffect(() => {
+    if (settings.navigationControls === 'leaflet') {
+      lc.addTo(map)
+    } else {
+      lc.remove()
+    }
+  }, [settings.navigationControls])
 
   return (
     <>
@@ -63,81 +75,85 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
       />
-      {webhookMode ? (
-        <Webhook
-          map={map}
-          webhookMode={webhookMode}
-          setWebhookMode={setWebhookMode}
-          Icons={Icons}
-        />
-      ) : (
-        Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
-          const [category, value] = each
-          let enabled = false
+      {settings.navigationControls === 'leaflet' && <ZoomControl position="bottomright" />}
+      {
+        (webhooks && webhookMode) ? (
+          <Webhook
+            map={map}
+            webhookMode={webhookMode}
+            setWebhookMode={setWebhookMode}
+            Icons={Icons}
+          />
+        ) : (
+          Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
+            const [category, value] = each
+            let enabled = false
 
-          switch (category) {
-            case 'scanAreas':
-              if ((filters[category] && filters[category].enabled)
-                || webhookMode === 'areas') {
-                enabled = true
-              } break
-            case 'gyms':
-              if (((filters[category].gyms && value.gyms)
-                || (filters[category].raids && value.raids)
-                || (filters[category].exEligible && value.exEligible)
-                || (filters[category].inBattle && value.inBattle)
-                || (filters[category].arEligible && value.arEligible))
-                && !webhookMode) {
-                enabled = true
-              } break
-            case 'nests':
-              if (((filters[category].pokemon && value.pokemon)
-                || (filters[category].polygons && value.polygons))
-                && !webhookMode) {
-                enabled = true
-              } break
-            case 'pokestops':
-              if (((filters[category].allPokestops && value.allPokestops)
-                || (filters[category].lures && value.lures)
-                || (filters[category].invasions && value.invasions)
-                || (filters[category].quests && value.quests)
-                || (filters[category].arEligible && value.arEligible))
-                && !webhookMode) {
-                enabled = true
-              } break
-            default:
-              if (filters[category]
-                && filters[category].enabled
-                && value && !webhookMode) {
-                enabled = true
-              } break
-          }
-          if (enabled) {
-            return (
-              <QueryData
-                key={category}
-                bounds={initialBounds}
-                onMove={onMove}
-                perms={value}
-                map={map}
-                category={category}
-                config={config}
-                available={available[category]}
-                Icons={Icons}
-                staticFilters={staticFilters[category].filter}
-                userIcons={icons}
-                userSettings={userSettings[userSettingsCategory(category)] || {}}
-                filters={filters[category]}
-                tileStyle={tileServers[settings.tileServers].style}
-                zoomLevel={config.clusterZoomLevels[category] || 1}
-                staticUserSettings={staticUserSettings[category]}
-                params={params}
-              />
-            )
-          }
-          return null
-        })
-      )}
+            switch (category) {
+              case 'scanAreas':
+                if ((filters[category] && filters[category].enabled)
+                  || webhookMode === 'areas') {
+                  enabled = true
+                } break
+              case 'gyms':
+                if (((filters[category].allGyms && value.allGyms)
+                  || (filters[category].raids && value.raids)
+                  || (filters[category].exEligible && value.exEligible)
+                  || (filters[category].inBattle && value.inBattle)
+                  || (filters[category].arEligible && value.arEligible))
+                  && !webhookMode) {
+                  enabled = true
+                } break
+              case 'nests':
+                if (((filters[category].pokemon && value.pokemon)
+                  || (filters[category].polygons && value.polygons))
+                  && !webhookMode) {
+                  enabled = true
+                } break
+              case 'pokestops':
+                if (((filters[category].allPokestops && value.allPokestops)
+                  || (filters[category].lures && value.lures)
+                  || (filters[category].invasions && value.invasions)
+                  || (filters[category].quests && value.quests)
+                  || (filters[category].arEligible && value.arEligible))
+                  && !webhookMode) {
+                  enabled = true
+                } break
+              default:
+                if (filters[category]
+                  && filters[category].enabled
+                  && value && !webhookMode) {
+                  enabled = true
+                } break
+            }
+            if (enabled) {
+              return (
+                <QueryData
+                  key={category}
+                  bounds={initialBounds}
+                  onMove={onMove}
+                  perms={value}
+                  map={map}
+                  category={category}
+                  config={config}
+                  available={available[category]}
+                  Icons={Icons}
+                  staticFilters={staticFilters[category].filter}
+                  userIcons={icons}
+                  userSettings={userSettings[userSettingsCategory(category)] || {}}
+                  filters={filters[category]}
+                  tileStyle={tileServers[settings.tileServers].style}
+                  clusterZoomLvl={config.clusterZoomLevels[category]}
+                  staticUserSettings={staticUserSettings[category]}
+                  params={manualParams}
+                  setParams={setManualParams}
+                />
+              )
+            }
+            return null
+          })
+        )
+      }
       <Nav
         map={map}
         setManualParams={setManualParams}
@@ -145,6 +161,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         config={config}
         webhookMode={webhookMode}
         setWebhookMode={setWebhookMode}
+        settings={settings}
       />
     </>
   )

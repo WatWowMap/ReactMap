@@ -19,6 +19,10 @@
     "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
     "migrate:rollback": "knex --knexfile server/knexfile.cjs migrate:rollback"
   },
+  "engines": {
+    "node": ">=14",
+    "yarn": "1.22.x"
+  },
   "devDependencies": {
     "@babel/core": "^7.13.10",
     "@babel/eslint-parser": "^7.13.10",
@@ -95,7 +99,7 @@
     "react-dom": "^17.0.2",
     "react-ga": "^3.3.0",
     "react-i18next": "^11.9.0",
-    "react-leaflet": "3.1.0",
+    "react-leaflet": "3.2.2",
     "react-leaflet-markercluster": "3.0.0-rc1",
     "react-router-dom": "^5.2.0",
     "react-virtualized-auto-sizer": "^1.0.5",

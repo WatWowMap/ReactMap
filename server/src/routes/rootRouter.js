@@ -52,16 +52,18 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
   const { area, zoom } = req.params
   try {
     const scanAreas = fs.existsSync('server/src/configs/areas.json')
-      ? JSON.parse(fs.readFileSync('server/src/configs/areas.json'))
+      // eslint-disable-next-line global-require
+      ? require('../configs/areas.json')
       : { features: [] }
     if (scanAreas.features.length) {
       const foundArea = scanAreas.features.find(a => a.properties.name.toLowerCase() === area.toLowerCase())
       if (foundArea) {
         const [lon, lat] = center(foundArea).geometry.coordinates
         res.redirect(`/@/${lat}/${lon}/${zoom || 15}`)
+      } else {
+        res.send(`${area} is not an available area`)
       }
     }
-    res.redirect('/')
   } catch (e) {
     res.send(`Error navigating to ${area}`, e)
   }
@@ -107,6 +109,10 @@ rootRouter.get('/settings', async (req, res) => {
         drawer: {
           temporary: {},
           persistent: {},
+        },
+        navigationControls: {
+          react: {},
+          leaflet: {},
         },
         manualAreas: config.manualAreas || {},
         icons: config.icons,

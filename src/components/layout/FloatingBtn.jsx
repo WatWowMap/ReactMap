@@ -4,14 +4,14 @@ import {
   Menu, LocationOn, ZoomIn, ZoomOut, Search, NotificationsActive, Save,
 } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
-import Leaflet from 'leaflet'
 import { useMap } from 'react-leaflet'
+import L from 'leaflet'
 
 import useStyles from '@hooks/useStyles'
 import useLocation from '@hooks/useLocation'
 
 export default function FloatingButtons({
-  toggleDrawer, toggleDialog, safeSearch, isMobile, perms, webhookMode, setWebhookMode,
+  toggleDrawer, toggleDialog, safeSearch, isMobile, perms, webhookMode, setWebhookMode, settings,
 }) {
   const { t } = useTranslation()
   const map = useMap()
@@ -21,7 +21,7 @@ export default function FloatingButtons({
   const iconSize = isMobile ? 'small' : 'medium'
   const ref = useRef(null)
 
-  useEffect(() => Leaflet.DomEvent.disableClickPropagation(ref.current))
+  useEffect(() => L.DomEvent.disableClickPropagation(ref.current))
 
   return (
     <Grid
@@ -40,33 +40,37 @@ export default function FloatingButtons({
       </Grid>
       {safeSearch.length > 0 && (
         <Grid item>
-          <Fab color="primary" size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('openMenu')} disabled={Boolean(webhookMode)}>
+          <Fab color={settings.navigationControls === 'react' ? 'primary' : 'secondary'} size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('openMenu')} disabled={Boolean(webhookMode)}>
             <Search fontSize={iconSize} />
           </Fab>
         </Grid>
       )}
-      {perms.webhooks.length && (
+      {perms?.webhooks?.length && (
         <Grid item>
           <Fab color="secondary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('webhook')} disabled={Boolean(webhookMode)}>
             <NotificationsActive fontSize={iconSize} />
           </Fab>
         </Grid>
       )}
-      <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')} disabled={Boolean(webhookMode)}>
-          <LocationOn color={color} fontSize={iconSize} />
-        </Fab>
-      </Grid>
-      <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => map.zoomIn()} title={t('zoomIn')} disabled={Boolean(webhookMode)}>
-          <ZoomIn fontSize={iconSize} />
-        </Fab>
-      </Grid>
-      <Grid item>
-        <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()} title={t('zoomOut')} disabled={Boolean(webhookMode)}>
-          <ZoomOut fontSize={iconSize} />
-        </Fab>
-      </Grid>
+      {settings.navigationControls === 'react' && (
+        <>
+          <Grid item>
+            <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')}>
+              <LocationOn color={color} fontSize={iconSize} />
+            </Fab>
+          </Grid>
+          <Grid item>
+            <Fab color="secondary" size={fabSize} onClick={() => map.zoomIn()} title={t('zoomIn')}>
+              <ZoomIn fontSize={iconSize} />
+            </Fab>
+          </Grid>
+          <Grid item>
+            <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()} title={t('zoomOut')}>
+              <ZoomOut fontSize={iconSize} />
+            </Fab>
+          </Grid>
+        </>
+      )}
       <Grid item>
         <Fab color="primary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('save')} disabled={webhookMode !== 'areas'}>
           <Save fontSize={iconSize} />

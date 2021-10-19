@@ -14,7 +14,7 @@ import Sidebar from './Sidebar'
 import Sliders from './Sliders'
 import Popups from './Popups'
 
-const steps = ['Intro', 'Sidebar', 'Sliders', 'Advanced', 'Popups', 'Closing']
+const steps = ['intro', 'sidebar', 'sliders', 'advanced', 'popups', 'closing']
 
 export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) {
   const theme = useTheme()
@@ -49,7 +49,7 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
   return (
     <div style={{ maxWidth: 400 }}>
       <DialogTitle className={classes.filterHeader}>
-        {t('tutorial')} ({t(steps[activeStep] || 'Closing')})
+        {t('tutorial')} ({t(steps[activeStep] || t('closing'))})
       </DialogTitle>
       {getStepContent(activeStep)}
       <DialogActions>

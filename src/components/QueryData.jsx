@@ -4,18 +4,22 @@ import { useQuery } from '@apollo/client'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 import RobustTimeout from '@classes/RobustTimeout'
+
 import Clustering from './Clustering'
 import ScanArea from './tiles/ScanArea'
+import Notification from './layout/general/Notification'
 
 const withAvailableList = ['pokestops', 'gyms', 'nests']
 const filterSkipList = ['filter', 'enabled', 'legacy']
 
 const getPolling = category => {
   switch (category) {
-    case 'device':
+    case 'devices':
     case 'gyms':
-    case 'pokemon':
+    case 's2cells':
       return 10 * 1000
+    case 'pokemon':
+      return 20 * 1000
     case 'pokestops': return 5 * 60 * 1000
     case 'weather': return 30 * 1000
     default: return 10 * 60 * 1000
@@ -23,9 +27,9 @@ const getPolling = category => {
 }
 
 export default function QueryData({
-  bounds, onMove, map, tileStyle, zoomLevel, config, params,
+  bounds, onMove, map, tileStyle, clusterZoomLvl, config, params,
   category, available, filters, staticFilters, staticUserSettings,
-  userSettings, perms, Icons, userIcons,
+  userSettings, perms, Icons, userIcons, setParams,
 }) {
   Utility.analytics('Data', `${category} being fetched`, category, true)
   const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
@@ -34,6 +38,8 @@ export default function QueryData({
     const trimmed = {
       onlyLegacyExclude: [],
       onlyLegacy: userSettings.legacyFilter,
+      onlyOrRaids: userSettings.raidsOr,
+      onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
     }
     Object.entries(requestedFilters).forEach(topLevelFilter => {
       const [id, specifics] = topLevelFilter
@@ -78,6 +84,7 @@ export default function QueryData({
         minLon: mapBounds._southWest.lng,
         maxLon: mapBounds._northEast.lng,
         filters: trimFilters(filters),
+        zoom: map.getZoom(),
       })
     }
   }
@@ -87,9 +94,13 @@ export default function QueryData({
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [filters, userSettings])
+  }, [filters, userSettings, map.getZoom()])
 
-  const { data, previousData, refetch } = useQuery(Query[category](filters, perms, map.getZoom(), zoomLevel), {
+  const {
+    data, previousData, refetch, error,
+  } = useQuery(Query[category](
+    filters, perms, map.getZoom(), clusterZoomLvl,
+  ), {
     context: {
       abortableContext: timeout, // will be picked up by AbortableClient
     },
@@ -102,6 +113,20 @@ export default function QueryData({
   timeout.setupTimeout(refetch)
 
   const renderedData = data || previousData
+  if (error && process.env.NODE_ENV === 'development') {
+    return (
+      <Notification
+        severity="error"
+        i18nKey="server_dev_error_0"
+        messages={[
+          {
+            key: 'error',
+            variables: [error],
+          },
+        ]}
+      />
+    )
+  }
   if (renderedData) {
     return category === 'scanAreas' ? (
       <ScanArea
@@ -110,7 +135,7 @@ export default function QueryData({
     ) : (
       <Clustering
         renderedData={renderedData[category]}
-        zoomLevel={zoomLevel}
+        clusterZoomLvl={clusterZoomLvl}
         map={map}
         config={config}
         filters={filters}
@@ -122,6 +147,7 @@ export default function QueryData({
         userSettings={userSettings}
         staticUserSettings={staticUserSettings}
         params={params}
+        setParams={setParams}
       />
     )
   }

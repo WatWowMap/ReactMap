@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Tooltip } from 'react-leaflet'
+import Utility from '@services/Utility'
 
-import Utility from '../../services/Utility'
-
-export default function Timer({
-  timestamp, direction, label, offset,
-}) {
+const Timer = ({ timestamp }) => {
   const [timer, setTimer] = useState(Utility.getTimeUntil(new Date(timestamp * 1000), true))
 
   useEffect(() => {
@@ -16,10 +13,19 @@ export default function Timer({
   })
 
   return (
-    <Tooltip direction={direction} permanent offset={offset || [0, 0]}>
-      {label && label}
-      {label && <br />}
+    <div>
       {timer.str}
+    </div>
+  )
+}
+
+export default function TooltipWrapper({ timers, offset }) {
+  return (
+    <Tooltip direction="bottom" permanent offset={offset}>
+      {timers.map((timer, i) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <Timer key={timer + i * 123} timestamp={timer} multi={timers.length > 1} />
+      ))}
     </Tooltip>
   )
 }
