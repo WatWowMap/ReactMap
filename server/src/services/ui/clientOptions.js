@@ -26,14 +26,15 @@ module.exports = function clientOptions(perms) {
     },
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'] },
+      linkGlobalAndAdvanced: { type: 'bool', perm: ['pokemon'] },
       pokemonTimers: { type: 'bool', perm: ['pokemon'] },
-      prioritizePvpInfo: { type: 'bool', perm: ['pvp'], popup: true },
+      prioritizePvpInfo: { type: 'bool', perm: ['pvp'] },
       ivCircles: { type: 'bool', perm: ['iv'] },
       minIvCircle: { type: 'number', perm: ['iv'], label: '%' },
       interactionRanges: { type: 'bool', perm: ['pokemon'] },
-      showDexNumInPopup: { type: 'bool', perm: ['pokemon'], popup: true },
-      weatherIndicator: { type: 'bool', perm: ['weather'] },
-      pvpMega: { type: 'bool', perm: ['pokemon'], popup: true },
+      showDexNumInPopup: { type: 'bool', perm: ['pokemon'] },
+      weatherIndicator: { type: 'bool', perm: ['pokemon'] },
+      pvpMega: { type: 'bool', perm: ['pokemon'] },
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'] },
@@ -44,7 +45,7 @@ module.exports = function clientOptions(perms) {
 
   pvpLevels.forEach(level => {
     clientMenus.pokemon[`pvp${level}`] = {
-      type: 'bool', perm: ['pvp'], popup: true, value: true,
+      type: 'bool', perm: ['pvp'], value: true,
     }
   })
 

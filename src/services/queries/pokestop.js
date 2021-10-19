@@ -40,6 +40,8 @@ const quest = gql`
       mega_amount
       candy_pokemon_id
       candy_amount
+      xl_candy_pokemon_id
+      xl_candy_amount
       with_ar
       key
     }

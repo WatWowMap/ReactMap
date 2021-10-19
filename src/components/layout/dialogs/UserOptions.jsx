@@ -32,6 +32,9 @@ export default function UserOptions({ category, toggleDialog }) {
 
   const [localState, setLocalState] = useState(userSettings[category])
   const [tab, setTab] = useState(0)
+  const [tabPages] = useState(Array.from({
+    length: Math.ceil(Object.keys(staticUserSettings).length / 10),
+  }, (v, i) => i))
 
   const reset = {
     key: 'reset',
@@ -157,21 +160,23 @@ export default function UserOptions({ category, toggleDialog }) {
             variant="fullWidth"
             style={{ backgroundColor: '#424242', width: '100%' }}
           >
-            {['primary', 'popup'].map(each => (
+            {tabPages.map(each => (
               <Tab
                 key={each}
-                label={t(each)}
+                label={<Trans i18nKey="page">{{ page: each + 1 }}</Trans>}
                 style={{ width: 40, minWidth: 40 }}
               />
             ))}
           </Tabs>
         </AppBar>
       )}
-      {['main', 'popup'].map((each, index) => (
-        <TabPanel value={tab} index={index} key={each}>
-          {Object.entries(staticUserSettings).map(([key, values]) => {
-            if (values.popup && !index) return null
-            if (!values.popup && index) return null
+      {tabPages.map(each => (
+        <TabPanel value={tab} index={each} key={each}>
+          {Object.entries(staticUserSettings).map(([key, values], j) => {
+            const start = each * 10
+            const end = each * 10 + 10
+            if (j < start) return null
+            if (j >= end) return null
             return (
               <Grid
                 container

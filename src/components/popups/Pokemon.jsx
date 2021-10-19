@@ -258,14 +258,14 @@ const Stats = ({ pokemon, perms, t }) => {
           </Typography>
         </Grid>
       )}
-      {(perms.stats && iv !== null) && (
+      {(perms.stats && atk_iv !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {atk_iv} | {def_iv} | {sta_iv}
           </Typography>
         </Grid>
       )}
-      {((perms.iv || perms.stats) && iv !== null) && (
+      {(perms.stats && level !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {t('cp')} {cp} | {t('levelAbbreviated')}{level}
