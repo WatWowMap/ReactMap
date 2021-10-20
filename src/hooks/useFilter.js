@@ -113,6 +113,7 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                 if ((tempAdvFilter.generations || generations[item.genId])
                   && (tempAdvFilter.types || typeResolver(item.formTypes))
                   && (tempAdvFilter.rarity || rarity[item.rarity])
+                  && (tempAdvFilter.categories || categories[subCategory])
                   && (tempAdvFilter.forms
                     || forms[item.formName]
                     || (forms.altForms && item.formId != item.defaultFormId)
@@ -125,10 +126,11 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
               } break
             case 'available':
               if ((available?.[category].includes(id) || id.startsWith('t'))) {
-                if (subCategory === 'pokemon') {
+                if (filteringPokemon.includes(subCategory)) {
                   if ((tempAdvFilter.generations || generations[item.genId])
                     && (tempAdvFilter.types || typeResolver(item.formTypes))
                     && (tempAdvFilter.rarity || rarity[item.rarity])
+                    && (tempAdvFilter.categories || categories[subCategory])
                     && (tempAdvFilter.forms
                       || forms[item.formName]
                       || (forms.altForms && item.formId != item.defaultFormId)
