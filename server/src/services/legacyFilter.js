@@ -234,7 +234,7 @@ const getLegacy = (results, args, perms, ohbem) => {
       const result = results[i]
       const filtered = {}
       if (result.pokemon_id === 132) {
-        result.ditto_form = result.form
+        filtered.ditto_form = result.form
         result.form = masterfile.pokemon[result.pokemon_id]?.defaultFormId || 0
       }
       if (!result.seen_type) {
@@ -307,12 +307,12 @@ const getLegacy = (results, args, perms, ohbem) => {
       filtered.changed = result.changed
       filtered.cellId = result.cell_id
       filtered.expire_timestamp_verified = result.expire_timestamp_verified
+      filtered.display_pokemon_id = result.display_pokemon_id
       if (perms.iv || perms.stats) {
         filtered.move_1 = result.move_1
         filtered.move_2 = result.move_2
         filtered.weight = result.weight
         filtered.size = result.size
-        filtered.display_pokemon_id = result.display_pokemon_id
       }
       pokemon.push(filtered)
     }
