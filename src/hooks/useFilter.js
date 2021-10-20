@@ -124,9 +124,21 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                 addItem(id, item)
               } break
             case 'available':
-              if ((available?.[category].includes(id) || id.startsWith('t'))
-                && (tempAdvFilter.categories || categories[subCategory])) {
-                addItem(id, item)
+              if ((available?.[category].includes(id) || id.startsWith('t'))) {
+                if (subCategory === 'pokemon') {
+                  if ((tempAdvFilter.generations || generations[item.genId])
+                    && (tempAdvFilter.types || typeResolver(item.formTypes))
+                    && (tempAdvFilter.rarity || rarity[item.rarity])
+                    && (tempAdvFilter.forms
+                      || forms[item.formName]
+                      || (forms.altForms && item.formId != item.defaultFormId)
+                      || (forms.normalForms && item.formId === item.defaultFormId)
+                    )) {
+                    addItem(id, item)
+                  }
+                } else if (tempAdvFilter.categories || categories[subCategory]) {
+                  addItem(id, item)
+                }
               } break
             case 'search':
               searchTerms.forEach(term => {
