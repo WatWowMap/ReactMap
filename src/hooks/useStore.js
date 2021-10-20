@@ -55,8 +55,6 @@ const useStatic = create(set => ({
   setFilters: (filters) => set({ filters }),
   menus: undefined,
   setMenus: (menus) => set({ menus }),
-  menuFilters: null,
-  setMenuFilters: (menuFilters) => set({ menuFilters }),
   userSettings: undefined,
   setUserSettings: (userSettings) => set({ userSettings }),
   settings: undefined,

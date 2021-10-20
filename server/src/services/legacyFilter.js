@@ -233,6 +233,17 @@ const getLegacy = (results, args, perms, ohbem) => {
       bestPvp = 4096
       const result = results[i]
       const filtered = {}
+      if (result.pokemon_id === 132) {
+        result.ditto_form = result.form
+        result.form = masterfile.pokemon[result.pokemon_id]?.defaultFormId || 0
+      }
+      if (!result.seen_type) {
+        if (result.spawn_id === null) {
+          result.seen_type = result.pokestop_id ? 'nearby_stop' : 'nearby_cell'
+        } else {
+          result.seen_type = 'encounter'
+        }
+      }
       if (perms.iv || perms.stats) {
         filtered.atk_iv = result.atk_iv
         filtered.def_iv = result.def_iv

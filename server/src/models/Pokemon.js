@@ -213,8 +213,12 @@ class Pokemon extends Model {
             const relevantFilters = getRelevantKeys(filter)
             const [id, form] = pkmn.split('-')
             ivOr.orWhere(poke => {
-              poke.where('pokemon_id', id)
-              poke.andWhere('form', form)
+              if (id === '132') {
+                poke.where('pokemon_id', id)
+              } else {
+                poke.where('pokemon_id', id)
+                  .andWhere('form', form)
+              }
               if (relevantFilters.length > 0) {
                 generateSql(poke, filter, relevantFilters, true)
               }
