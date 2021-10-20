@@ -308,9 +308,15 @@ const Info = ({
           }}
         />
       )}
-      {gender != 3 && (
+      {gender && (
         <Grid item style={{ textAlign: 'center' }}>
-          <Icon>{gender === 1 ? 'male' : 'female'}</Icon>
+          <Icon>
+            {{
+              1: 'male',
+              2: 'female',
+              3: 'transgender',
+            }[gender] || ''}
+          </Icon>
         </Grid>
       )}
       {formTypes.map(type => (
@@ -459,18 +465,20 @@ const ExtraInfo = ({
         </Fragment>
       ))}
       {[first_seen_timestamp, updated].map((time, i) => (
-        <Fragment key={time}>
-          <Grid item xs={t('popupPokemonSeenDescriptionWidth')} style={{ textAlign: 'center' }}>
-            <Typography variant="caption" align="center">
-              {i ? t('lastSeen') : t('firstSeen')}:
-            </Typography>
-          </Grid>
-          <Grid item xs={t('popupPokemonSeenDataWidth')} style={{ textAlign: 'right' }}>
-            <Typography variant="caption" align="center">
-              {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
-            </Typography>
-          </Grid>
-        </Fragment>
+        time ? (
+          <Fragment key={time}>
+            <Grid item xs={t('popupPokemonSeenDescriptionWidth')} style={{ textAlign: 'center' }}>
+              <Typography variant="caption" align="center">
+                {i ? t('lastSeen') : t('firstSeen')}:
+              </Typography>
+            </Grid>
+            <Grid item xs={t('popupPokemonSeenDataWidth')} style={{ textAlign: 'right' }}>
+              <Typography variant="caption" align="center">
+                {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
+              </Typography>
+            </Grid>
+          </Fragment>
+        ) : null
       ))}
     </Grid>
   )
