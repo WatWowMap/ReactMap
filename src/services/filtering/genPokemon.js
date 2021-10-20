@@ -1,4 +1,4 @@
-export default function genPokemon(t, Icons, pokemon, categories) {
+export default function genPokemon(t, pokemon, categories) {
   const tempObj = Object.fromEntries(categories.map(x => [x, {}]))
 
   Object.entries(pokemon).forEach(([i, pkmn]) => {
@@ -20,7 +20,6 @@ export default function genPokemon(t, Icons, pokemon, categories) {
         formTypes,
         rarity: pkmn.rarity,
         genId: `generation_${pkmn.genId}`,
-        url: Icons.getPokemon(i, j),
         perms: ['pokemon', 'raids', 'quests', 'nests'],
         family: pkmn.family,
       }

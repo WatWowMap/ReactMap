@@ -2,17 +2,17 @@ import { useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
-import useGenerate from './useGenerate'
 
 const filteringPokemon = ['pokemon', 'quest_reward_4', 'quest_reward_9', 'quest_reward_12']
 
 export default function useFilter(tempFilters, menus, search, category, reqCategories) {
   const { t } = useTranslation()
   const available = useStatic(useCallback(s => s.available, []))
+  const Icons = useStatic(useCallback(s => s.Icons, []))
   const { perms } = useStatic(useCallback(s => s.auth, []))
   const { pokemon } = useStatic(useCallback(s => s.masterfile, []))
   const setExcludeList = useStatic(useCallback(s => s.setExcludeList, []))
-  const menuFilters = useGenerate()
+  const menuFilters = useStatic(useCallback(s => s.menuFilters, []))
 
   const {
     filters: {
@@ -46,6 +46,7 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
   const addItem = (id, item) => {
     count.show += 1
     filteredObj[id] = tempFilters[id]
+    item.url = Icons.getIconById(id)
     filteredArr.push(item)
   }
 
