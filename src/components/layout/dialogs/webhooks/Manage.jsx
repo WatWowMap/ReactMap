@@ -38,7 +38,7 @@ export default function Manage({
   const poracleFilters = useMemo(() => Poracle.filterGenerator(
     webhookData[selectedWebhook], staticFilters, invasions,
   ), [])
-  const [tabValue, setTabValue] = useState(2)
+  const [tabValue, setTabValue] = useState(0)
   const [help, setHelp] = useState(false)
   const [addNew, setAddNew] = useState(false)
   const filteredData = Object.keys(webhookData[selectedWebhook].info || {}).map(key => key)

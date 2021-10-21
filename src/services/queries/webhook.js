@@ -168,7 +168,7 @@ const profile = gql`
   }
 `
 
-const quest = gql`
+const Quest = gql`
   fragment PoracleQuest on Poracle {
     quest {
       amount
@@ -232,7 +232,7 @@ export const allProfiles = gql`
   ${Nest}
   ${Pokemon}
   ${profile}
-  ${quest}
+  ${Quest}
   ${Raid}
   ${weather}
   query Webhook($category: String!, $status: String!, $name: String!) {
@@ -325,6 +325,17 @@ export const nest = gql`
     webhook(data: $data, category: $category, status: $status, name: $name) {
       ...Base
       ...PoracleNest
+    }
+  }
+`
+
+export const quest = gql`
+  ${base}
+  ${Quest}
+  mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
+    webhook(data: $data, category: $category, status: $status, name: $name) {
+      ...Base
+      ...PoracleQuest
     }
   }
 `

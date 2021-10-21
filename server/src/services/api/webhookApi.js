@@ -86,6 +86,7 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
     case 'lure':
     case 'nest':
     case 'pokemon':
+    case 'quest':
     case 'raid':
       Object.assign(payloadObj, {
         url: `${webhook.host}:${webhook.port}/api/tracking/${category}/${discordId}${method === 'DELETE' ? `/byUid/${data.uid}` : ''}`,

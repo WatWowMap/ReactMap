@@ -3,7 +3,7 @@ export default class Poracle {
     if (!poracleInfo) {
       return {}
     }
-    const { info: { pokemon, raid, egg, invasion, lure, nest }, human } = poracleInfo
+    const { info: { pokemon, raid, egg, invasion, lure, nest, quest }, human } = poracleInfo
     const filters = {
       pokemon: {
         global: pokemon.defaults,
@@ -22,6 +22,9 @@ export default class Poracle {
       },
       nest: {
         global: nest.defaults,
+      },
+      quest: {
+        global: quest.defaults,
       },
     }
     Object.keys(reactMapFilters.pokemon.filter).forEach(key => {
@@ -46,6 +49,14 @@ export default class Poracle {
         profile_no: human.current_profile_no,
         enabled: false,
       }
+      filters.quest[key] = {
+        ...quest.defaults,
+        reward: +key.split('-')[0],
+        form: +key.split('-')[1],
+        profile_no: human.current_profile_no,
+        reward_type: 7,
+        enabled: false,
+      }
     })
     Object.keys(reactMapFilters.pokestops.filter).forEach(key => {
       if (key.startsWith('i')) {
@@ -61,6 +72,52 @@ export default class Poracle {
           ...lure.defaults,
           lure_id: key.slice(1),
           profile_no: human.current_profile_no,
+          enabled: false,
+        }
+      }
+      if (key.startsWith('q')) {
+        filters.quest[key] = {
+          ...quest.defaults,
+          reward: +key.slice(1),
+          profile_no: human.current_profile_no,
+          reward_type: 2,
+          enabled: false,
+        }
+      }
+      if (key.startsWith('c')) {
+        filters.quest[key] = {
+          ...quest.defaults,
+          reward: +key.slice(1),
+          profile_no: human.current_profile_no,
+          reward_type: 4,
+          enabled: false,
+        }
+      }
+      if (key.startsWith('d')) {
+        filters.quest[key] = {
+          ...quest.defaults,
+          profile_no: human.current_profile_no,
+          reward_type: 3,
+          amount: +key.slice(1),
+          enabled: false,
+        }
+      }
+      if (key.startsWith('m')) {
+        filters.quest[key] = {
+          ...quest.defaults,
+          profile_no: human.current_profile_no,
+          reward_type: 12,
+          reward: +key.split('-')[0].slice(1),
+          amount: +key.split('-')[1],
+          enabled: false,
+        }
+      }
+      if (key.startsWith('x')) {
+        filters.quest[key] = {
+          ...quest.defaults,
+          reward: +key.slice(1),
+          profile_no: human.current_profile_no,
+          reward_type: 9,
           enabled: false,
         }
       }
@@ -88,11 +145,12 @@ export default class Poracle {
 
   static getMapCategory(poracleCategory) {
     switch (poracleCategory) {
-      case 'egg': return 'gyms'
-      case 'invasion': return 'pokestops'
-      case 'lure': return 'pokestops'
-      case 'nest': return 'nests'
+      case 'egg':
       case 'raid': return 'gyms'
+      case 'invasion':
+      case 'lure':
+      case 'quest': return 'pokestops'
+      case 'nest': return 'nests'
       default: return poracleCategory
     }
   }
@@ -104,6 +162,7 @@ export default class Poracle {
       case 'lure': return ['lures']
       case 'nest': return ['pokemon']
       case 'raid': return ['raids', 'pokemon']
+      case 'quest': return ['items', 'quest_reward_12', 'pokemon', 'quest_reward_4', 'quest_reward_9', 'quest_reward_3']
       default: return [poracleCategory]
     }
   }
@@ -116,6 +175,16 @@ export default class Poracle {
       case 'raid': return item.pokemon_id === 9000
         ? `r${item.level}`
         : `${item.pokemon_id}-${item.form}`
+      case 'quest': return (function quests() {
+        switch (item.reward_type) {
+          case 2: return `q${item.reward}`
+          case 3: return `d${item.amount}`
+          case 4: return `c${item.reward}`
+          case 9: return `x${item.reward}`
+          case 12: return `m${item.reward}-${item.amount}`
+          default: return `${item.reward}-${item.form}`
+        }
+      }())
       default: return `${item.pokemon_id}-${item.form}`
     }
   }
@@ -126,17 +195,23 @@ export default class Poracle {
       case 'i': return { id: id.replace('i', ''), type: 'invasion' }
       case 'l': return { id: id.replace('l', ''), type: 'lure' }
       case 'r': return { id: id.replace('r', ''), type: 'raid' }
+      case 'q': return { id: id.replace('q', ''), type: 'item' }
+      case 'm': return { pokemonId: id.split('-')[0].replace('m', ''), type: 'pokemon' }
+      case 'c': return { pokemonId: id.replace('c', ''), type: 'pokemon' }
+      case 'x': return { pokemonId: id.replace('x', ''), type: 'pokemon' }
+      case 'd': return { id: 3, type: 'quest_reward' }
       default: return { pokemonId: id.split('-')[0], form: id.split('-')[1], type: 'pokemon' }
     }
   }
 
-  static getTitles(idObj, type) {
-    switch (type) {
+  static getTitles(idObj) {
+    switch (idObj.type) {
       case 'egg': return [`egg_${idObj.id}_plural`]
       case 'invasion': return [`grunt_a_${idObj.id}`]
       case 'lure': return [`lure_${idObj.id}`]
       case 'raid': return [`raid_${idObj.id}_plural`]
-      default: return [`poke_${idObj.pokemonId}`, +idObj.form ? `form_${idObj.form}` : '']
+      case 'pokemon': return [`poke_${idObj.pokemonId}`, +idObj.form ? `form_${idObj.form}` : '']
+      default: return [`${idObj.type}_${idObj.id}`]
     }
   }
 
@@ -179,6 +254,7 @@ export default class Poracle {
         }
         return { ...defaults, ...boss }
       })
+      case 'quest': return entries.map(quest => ({ ...defaults, ...quest, byDistance: undefined }))
       default: return entries.map(pkmn => {
         const fields = ['pokemon_id', 'form', 'clean', 'distance', 'min_time', 'template', 'profile_no', 'gender', 'rarity', 'max_rarity']
         const newPokemon = {}

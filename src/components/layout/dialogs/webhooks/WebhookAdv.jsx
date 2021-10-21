@@ -27,7 +27,7 @@ import SliderTile from '@components/layout/dialogs/filters/SliderTile'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 
-const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive', 'lure_id']
+const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive', 'lure_id', 'reward', 'reward_type']
 
 export default function WebhookAdvanced({
   category, id, toggleWebhook, tempFilters, isMobile,
@@ -55,8 +55,6 @@ export default function WebhookAdvanced({
     setPoracleValues({ ...poracleValues, [low]: values[0], [high]: values[1] })
   }
 
-  console.log('poracle', poracleValues)
-  console.log('filter', filterValues)
   const handleSwitch = (event) => {
     const { name, checked } = event.target
     switch (name) {
@@ -195,6 +193,16 @@ export default function WebhookAdvanced({
         return `${config.prefix}${t('invasion')} ${invasion ? t(`poke_type_${invasion}`) : t(poracleValues.grunt_type.replace(' ', ''))}
         ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       }
+      case 'q': return `${config.prefix}${t('quest')} ${t(`item_${idObj.id}`)}
+      ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
+      case 'm': return `${config.prefix}${t('quest')} ${t('energy')}${t(`poke_${idObj.pokemonId}`)}
+      ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
+      case 'c': return `${config.prefix}${t('quest')} ${t('candy')}${t(`poke_${idObj.pokemonId}`)}
+      ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
+      case 'x': return `${config.prefix}${t('quest')} ${t('xl')}${t(`poke_${idObj.pokemonId}`)}
+      ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
+      case 'd': return `${config.prefix}${t('quest')} ${t('stardust')}
+      ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'l': return `${config.prefix}${t('lure')} ${t(`lure_${idObj.id}`).toLowerCase()}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       default: return `${config.prefix}${category === 'pokemon' ? t('track') : t(category)} 
@@ -202,6 +210,14 @@ export default function WebhookAdvanced({
       ${!poracleValues.allForms && +idObj.form ? `form:${t(`form_${idObj.form}`).replace(/ /g, '_')}` : ''} 
       ${poracleValues.noIv ? '' : Object.keys(poracleValues).map(checkDefaults).join(' ')}
       ${poracleValues.gender ? ` ${t(`gender_${poracleValues.gender}`)}` : ''}`
+    }
+  }
+
+  const getDisabled = (option) => {
+    switch (option.name) {
+      case 'distance': return !poracleValues.byDistance
+      case 'amount': return option?.disabled?.some(x => id.startsWith(x)) || /\d/.test(id.charAt(0))
+      default: return option?.disabled?.some(x => id.startsWith(x))
     }
   }
 
@@ -256,7 +272,7 @@ export default function WebhookAdvanced({
               color="primary"
               onChange={handleSwitch}
               checked={Boolean(poracleValues[option.name])}
-              disabled={id.startsWith(option.disabled)}
+              disabled={getDisabled(option)}
             />
           </Grid>
         </Grid>
@@ -270,7 +286,7 @@ export default function WebhookAdvanced({
             value={poracleValues[option.name]}
             onChange={handleSelect}
             variant="outlined"
-            disabled={option.name === 'distance' ? !poracleValues.byDistance : option.disabled}
+            disabled={getDisabled(option)}
             type={option.type || 'text'}
             size="small"
             style={{ width: 90 }}
@@ -308,7 +324,7 @@ export default function WebhookAdvanced({
   return (
     <>
       <Header
-        titles={Poracle.getTitles(idObj, idObj.type)}
+        titles={Poracle.getTitles(idObj)}
         action={toggleWebhook(false, id)}
       />
       <DialogContent style={{ color: 'white', padding: '8px 5px' }}>

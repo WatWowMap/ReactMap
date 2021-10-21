@@ -54,7 +54,6 @@ export default function Menu({
 
   const { filteredObj, filteredArr, count } = useFilter(tempFilters, menus, search, category, categories)
 
-  // console.log('menu', filteredArr)
   const generateSlots = (teamId, show) => {
     for (let i = 1; i <= 6; i += 1) {
       const slotKey = `g${teamId.charAt(1)}-${i}`
