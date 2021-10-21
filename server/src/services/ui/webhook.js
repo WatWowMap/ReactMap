@@ -182,6 +182,30 @@ module.exports = function selectProvider(provider, hookConfig, pvp) {
             },
           },
         },
+        lure: {
+          defaults: {
+            clean: false,
+            distance: 0,
+            template: hookConfig.defaultTemplateName.toString(),
+            lure_id: 0,
+            byDistance: false,
+          },
+          ui: {
+            general: {
+              selects: [
+                { name: 'profile_no', options: [], xs: 4, sm: 4 },
+                { name: 'template', options: [], xs: 4, sm: 4 },
+              ],
+              booleans: [
+                { name: 'clean', xs: 4, sm: 4 },
+              ],
+              distanceOrArea: {
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+              },
+            },
+          },
+        },
       }
     }
     default: return {}

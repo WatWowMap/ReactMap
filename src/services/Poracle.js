@@ -3,7 +3,7 @@ export default class Poracle {
     if (!poracleInfo) {
       return {}
     }
-    const { info: { pokemon, raid, egg, invasion }, human } = poracleInfo
+    const { info: { pokemon, raid, egg, invasion, lure }, human } = poracleInfo
     const filters = {
       pokemon: {
         global: pokemon.defaults,
@@ -16,6 +16,9 @@ export default class Poracle {
       },
       invasion: {
         global: invasion.defaults,
+      },
+      lure: {
+        global: lure.defaults,
       },
     }
     Object.keys(reactMapFilters.pokemon.filter).forEach(key => {
@@ -39,6 +42,14 @@ export default class Poracle {
         filters.invasion[key] = {
           ...invasion.defaults,
           grunt_type: invasions[key.slice(1)].type.toLowerCase(),
+          profile_no: human.current_profile_no,
+          enabled: false,
+        }
+      }
+      if (key.startsWith('l')) {
+        filters.lure[key] = {
+          ...lure.defaults,
+          lure_id: key.slice(1),
           profile_no: human.current_profile_no,
           enabled: false,
         }
@@ -69,6 +80,7 @@ export default class Poracle {
     switch (poracleCategory) {
       case 'egg': return 'gyms'
       case 'invasion': return 'pokestops'
+      case 'lure': return 'pokestops'
       case 'raid': return 'gyms'
       default: return poracleCategory
     }
@@ -78,6 +90,7 @@ export default class Poracle {
     switch (poracleCategory) {
       case 'egg': return ['eggs']
       case 'invasion': return ['invasions']
+      case 'lure': return ['lures']
       case 'raid': return ['raids', 'pokemon']
       default: return [poracleCategory]
     }
@@ -87,6 +100,7 @@ export default class Poracle {
     switch (category) {
       case 'egg': return `e${item.level}`
       case 'invasion': return `i${Object.keys(invasions).find(x => invasions[x].type?.toLowerCase() === item.grunt_type)}`
+      case 'lure': return `l${item.lure_id}`
       case 'raid': return item.pokemon_id === 9000
         ? `r${item.level}`
         : `${item.pokemon_id}-${item.form}`
@@ -98,6 +112,7 @@ export default class Poracle {
     switch (id.charAt(0)) {
       case 'e': return { id: id.replace('e', ''), type: 'egg' }
       case 'i': return { id: id.replace('i', ''), type: 'invasion' }
+      case 'l': return { id: id.replace('l', ''), type: 'lure' }
       case 'r': return { id: id.replace('r', ''), type: 'raid' }
       default: return { pokemonId: id.split('-')[0], form: id.split('-')[1], type: 'pokemon' }
     }
@@ -107,6 +122,7 @@ export default class Poracle {
     switch (type) {
       case 'egg': return [`egg_${idObj.id}_plural`]
       case 'invasion': return [`grunt_a_${idObj.id}`]
+      case 'lure': return [`lure_${idObj.id}`]
       case 'raid': return [`raid_${idObj.id}_plural`]
       default: return [`poke_${idObj.pokemonId}`, +idObj.form ? `form_${idObj.form}` : '']
     }
@@ -141,6 +157,7 @@ export default class Poracle {
     switch (type) {
       case 'egg': return entries.map(egg => ({ ...defaults, ...egg, byDistance: undefined }))
       case 'invasion': return entries.map(invasion => ({ ...defaults, ...invasion, byDistance: undefined }))
+      case 'lure': return entries.map(lure => ({ ...defaults, ...lure, lure_id: +lure.lure_id, byDistance: undefined }))
       case 'raid': return entries.map(boss => {
         if (boss.allForms) {
           boss.form = defaults.form

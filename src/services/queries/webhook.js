@@ -83,7 +83,7 @@ const Invasion = gql`
   }
 `
 
-const lure = gql`
+const Lure = gql`
   fragment PoracleLure on Poracle {
     lure {
       distance
@@ -228,7 +228,7 @@ export const allProfiles = gql`
   ${Egg}
   ${gym}
   ${Invasion}
-  ${lure}
+  ${Lure}
   ${nest}
   ${Pokemon}
   ${profile}
@@ -303,6 +303,17 @@ export const invasion = gql`
     webhook(data: $data, category: $category, status: $status, name: $name) {
       ...Base
       ...PoracleInvasion
+    }
+  }
+`
+
+export const lure = gql`
+  ${base}
+  ${Lure}
+  mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
+    webhook(data: $data, category: $category, status: $status, name: $name) {
+      ...Base
+      ...PoracleLure
     }
   }
 `

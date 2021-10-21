@@ -27,7 +27,7 @@ import SliderTile from '@components/layout/dialogs/filters/SliderTile'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 
-const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive']
+const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive', 'lure_id']
 
 export default function WebhookAdvanced({
   category, id, toggleWebhook, tempFilters, isMobile,
@@ -106,6 +106,9 @@ export default function WebhookAdvanced({
     }
     if (name === 'move' && value !== 9000) {
       newObj.allMoves = false
+    }
+    if (name === 'template') {
+      newObj[name] = value.toString()
     }
     setPoracleValues({ ...poracleValues, ...newObj })
   }
@@ -188,8 +191,11 @@ export default function WebhookAdvanced({
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'i': {
         const invasion = Object.keys(types).find(x => types[x].toLowerCase() === poracleValues.grunt_type)
-        return `${config.prefix}${t('invasion')} ${invasion ? t(`poke_type_${invasion}`) : t(poracleValues.grunt_type.replace(' ', ''))}`
+        return `${config.prefix}${t('invasion')} ${invasion ? t(`poke_type_${invasion}`) : t(poracleValues.grunt_type.replace(' ', ''))}
+        ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       }
+      case 'l': return `${config.prefix}${t('lure')} ${t(`lure_${idObj.id}`).toLowerCase()}
+      ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       default: return `${config.prefix}${category === 'pokemon' ? t('track') : t('raid')} 
       ${t(`poke_${idObj.pokemonId}`)} 
       ${!poracleValues.allForms && +idObj.form ? `form:${t(`form_${idObj.form}`).replace(/ /g, '_')}` : ''} 
