@@ -180,7 +180,9 @@ const Header = ({
   //   // options.push(setWebhook('pokemon', { pokemon }))
   // }
 
-  const pokemonName = t(`poke_${metaData.pokedexId}`)
+  const pokeName = t(`poke_${metaData.pokedexId}`)
+  const formName = metaData.forms?.[form]?.name === 'Normal' || form === 0 ? '' : t(`form_${pokemon.form}`)
+
   return (
     <>
       <Grid item xs={3}>
@@ -195,12 +197,16 @@ const Header = ({
           : <img src={iconUrl} style={{ maxWidth: 40, maxHeight: 40 }} />}
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'center' }}>
-        <Typography variant={pokemonName.length > 8 ? 'h6' : 'h5'}>
-          {pokemonName}
+        <Typography variant={pokeName.length > 8 ? 'h6' : 'h5'}>
+          {pokeName}
         </Typography>
-        {(ditto_form !== null && display_pokemon_id) && (
+        {(ditto_form !== null && display_pokemon_id) ? (
           <Typography variant="caption">
             ({t(`poke_${display_pokemon_id}`)})
+          </Typography>
+        ) : (
+          <Typography variant="caption">
+            {formName}
           </Typography>
         )}
       </Grid>
@@ -311,9 +317,15 @@ const Info = ({
           }}
         />
       )}
-      {gender != 3 && (
+      {gender && (
         <Grid item style={{ textAlign: 'center' }}>
-          <Icon>{gender === 1 ? 'male' : 'female'}</Icon>
+          <Icon>
+            {{
+              1: 'male',
+              2: 'female',
+              3: 'transgender',
+            }[gender] || ''}
+          </Icon>
         </Grid>
       )}
       {formTypes.map(type => (
@@ -462,18 +474,20 @@ const ExtraInfo = ({
         </Fragment>
       ))}
       {[first_seen_timestamp, updated].map((time, i) => (
-        <Fragment key={time}>
-          <Grid item xs={t('popupPokemonSeenDescriptionWidth')} style={{ textAlign: 'center' }}>
-            <Typography variant="caption" align="center">
-              {i ? t('lastSeen') : t('firstSeen')}:
-            </Typography>
-          </Grid>
-          <Grid item xs={t('popupPokemonSeenDataWidth')} style={{ textAlign: 'right' }}>
-            <Typography variant="caption" align="center">
-              {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
-            </Typography>
-          </Grid>
-        </Fragment>
+        time ? (
+          <Fragment key={time}>
+            <Grid item xs={t('popupPokemonSeenDescriptionWidth')} style={{ textAlign: 'center' }}>
+              <Typography variant="caption" align="center">
+                {i ? t('lastSeen') : t('firstSeen')}:
+              </Typography>
+            </Grid>
+            <Grid item xs={t('popupPokemonSeenDataWidth')} style={{ textAlign: 'right' }}>
+              <Typography variant="caption" align="center">
+                {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
+              </Typography>
+            </Grid>
+          </Fragment>
+        ) : null
       ))}
     </Grid>
   )

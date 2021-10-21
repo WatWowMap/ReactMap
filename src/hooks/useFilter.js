@@ -1,27 +1,18 @@
-import { useState, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
-import genPokemon from '@services/filtering/genPokemon'
-import genGyms from '@services/filtering/genGyms'
-import genPokestops from '@services/filtering/genPokestops'
 
 const filteringPokemon = ['pokemon', 'quest_reward_4', 'quest_reward_9', 'quest_reward_12']
 
 export default function useFilter(tempFilters, menus, search, category, reqCategories) {
   const { t } = useTranslation()
   const available = useStatic(useCallback(s => s.available, []))
+  const Icons = useStatic(useCallback(s => s.Icons, []))
   const { perms } = useStatic(useCallback(s => s.auth, []))
   const { pokemon } = useStatic(useCallback(s => s.masterfile, []))
   const setExcludeList = useStatic(useCallback(s => s.setExcludeList, []))
-
-  const [menuFilters] = useState({
-    ...genGyms(),
-    ...genPokestops(),
-    ...genPokemon(),
-  })
-
-  setExcludeList([])
+  const menuFilters = useStatic(useCallback(s => s.menuFilters, []))
 
   const {
     filters: {
@@ -55,6 +46,7 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
   const addItem = (id, item) => {
     count.show += 1
     filteredObj[id] = tempFilters[id]
+    item.url = Icons.getIconById(id)
     filteredArr.push(item)
   }
 
@@ -68,7 +60,7 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
         const name = t(`poke_${id}`)
         return (name.toLowerCase().includes(cleaned))
       })
-      if (families) {
+      if (families && term.slice(1)) {
         const familyIds = families.map(item => +pokemon[item].family)
         searchTerms.push(...new Set(familyIds))
       }
@@ -121,6 +113,7 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                 if ((tempAdvFilter.generations || generations[item.genId])
                   && (tempAdvFilter.types || typeResolver(item.formTypes))
                   && (tempAdvFilter.rarity || rarity[item.rarity])
+                  && (tempAdvFilter.categories || categories[subCategory])
                   && (tempAdvFilter.forms
                     || forms[item.formName]
                     || (forms.altForms && item.formId != item.defaultFormId)
@@ -132,20 +125,30 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                 addItem(id, item)
               } break
             case 'available':
-              if ((available?.[category].includes(id) || id.startsWith('t'))
-                && (tempAdvFilter.categories || categories[subCategory])) {
-                addItem(id, item)
+              if ((available?.[category].includes(id) || id.startsWith('t'))) {
+                if (filteringPokemon.includes(subCategory)) {
+                  if ((tempAdvFilter.generations || generations[item.genId])
+                    && (tempAdvFilter.types || typeResolver(item.formTypes))
+                    && (tempAdvFilter.rarity || rarity[item.rarity])
+                    && (tempAdvFilter.categories || categories[subCategory])
+                    && (tempAdvFilter.forms
+                      || forms[item.formName]
+                      || (forms.altForms && item.formId != item.defaultFormId)
+                      || (forms.normalForms && item.formId === item.defaultFormId)
+                    )) {
+                    addItem(id, item)
+                  }
+                } else if (tempAdvFilter.categories || categories[subCategory]) {
+                  addItem(id, item)
+                }
               } break
-            case 'search': {
-              const meta = Object.values(item).flatMap(x => t(x))
-                .join(' ')
-                .toLowerCase()
+            case 'search':
               searchTerms.forEach(term => {
+                const meta = item.searchMeta || item.name
                 switch (typeof term) {
                   case 'string':
                     term = term.trim()
-                    if ((meta.includes(term))
-                      || item.pokedexId == term) {
+                    if ((meta.includes(term)) || item.pokedexId == term) {
                       addItem(id, item)
                     } break
                   case 'number':
@@ -153,8 +156,7 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                   default:
                     if (term.every(subTerm => meta.includes(subTerm))) addItem(id, item)
                 }
-              })
-            } break
+              }); break
             default:
               if (filteringPokemon.includes(subCategory)) {
                 if (generations[item.genId]
@@ -174,6 +176,8 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
       }
     })
   })
+
+  useEffect(() => () => setExcludeList([]))
 
   return { filteredObj, filteredArr, count }
 }

@@ -1,13 +1,4 @@
-import { useTranslation } from 'react-i18next'
-
-import { useStatic } from '@hooks/useStore'
-
-export default function genGyms() {
-  const { t } = useTranslation()
-  const Icons = useStatic(s => s.Icons)
-  const { gyms } = useStatic(s => s.filters)
-  const { gyms: { categories } } = useStatic(s => s.menus)
-
+export default function genGyms(t, gyms, categories) {
   const tempObj = Object.fromEntries(categories.map(x => [x, {}]))
   if (!gyms?.filter) return {}
 
@@ -19,20 +10,20 @@ export default function genGyms() {
         case 'e':
           tempObj.eggs[id] = {
             name: t(`egg_${id.slice(1)}_plural`),
-            url: Icons.getEggs(id.slice(1), false),
             perms: ['raids'],
+            searchMeta: `${t(`egg_${id.slice(1)}_plural`)} ${t('eggs').toLowerCase()}`,
           }; break
         case 'r':
           tempObj.raids[id] = {
             name: t(`raid_${id.slice(1).split('-')[0]}_plural`),
-            url: Icons.getEggs(id.slice(1), true),
             perms: ['raids'],
+            searchMeta: `${t(`raid_${id.slice(1)}_plural`)} ${t('raids').toLowerCase()}`,
           }; break
         default:
           tempObj.teams[id] = {
             name: t(`team_${id.slice(1).split('-')[0]}`),
-            url: Icons.getGyms(...id.slice(1).split('-')),
             perms: ['gyms'],
+            searchMeta: `${t(`team_${id.slice(1)}`)} ${t('teams').toLowerCase()}`,
           }; break
       }
     }

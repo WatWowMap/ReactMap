@@ -8,6 +8,7 @@ import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
 
 import setTheme from '@assets/mui/theme'
+import useGenerate from '@hooks/useGenerate'
 
 import Map from './Map'
 
@@ -51,6 +52,7 @@ export default function ConfigSettings({
   const setUi = useStatic(state => state.setUi)
   const setStaticFilters = useStatic(state => state.setFilters)
   const setWebhookData = useStatic(state => state.setWebhookData)
+  const setMenuFilters = useStatic(state => state.setMenuFilters)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
 
@@ -102,7 +104,7 @@ export default function ConfigSettings({
   }
   setIcons(isValidIcon ? newIcons : serverSettings.Icons.selected)
   setStaticIcons(serverSettings.Icons)
-
+  setMenuFilters(useGenerate())
   setConfig(serverSettings.config)
   setWebhookData(serverSettings.webhooks)
 
