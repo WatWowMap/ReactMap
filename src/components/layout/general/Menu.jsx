@@ -182,6 +182,7 @@ export default function Menu({
       <Header
         titles={[title]}
         action={titleAction}
+        names={[webhookCategory || category]}
       />
       <DialogContent style={{ padding: '8px 5px', height: '100%' }}>
         <Grid container spacing={1}>

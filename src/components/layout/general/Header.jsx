@@ -13,7 +13,7 @@ export default function Header({ names = [], titles, action }) {
       {titles.map((title, index) => (
         names[index] ? (
           <Trans i18nKey={title} key={title}>
-            {{ name: names[index] }}
+            {{ name: t(names[index]) }}
           </Trans>
         ) : `${t(title)} `
       ))}

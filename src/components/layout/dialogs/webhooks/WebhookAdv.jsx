@@ -163,6 +163,7 @@ export default function WebhookAdvanced({
     if (field === 'min_time' && parseInt(poracleValues.min_time)) return `t${poracleValues.min_time}`
     if (field === 'exclusive' && poracleValues.exclusive) return ` ${t('exclusive')} `
     if (field === 'clean' && poracleValues.clean) return ` ${t('clean')} `
+    if (field === 'min_spawn_avg' && poracleValues.min_spawn_avg > 0) return ` ${t('minspawn')}${poracleValues.min_spawn_avg} `
     if (skipFields.includes(field)) return ''
     if (field.startsWith('pvp')) {
       if (poracleValues.pvpEntry) {
@@ -196,7 +197,7 @@ export default function WebhookAdvanced({
       }
       case 'l': return `${config.prefix}${t('lure')} ${t(`lure_${idObj.id}`).toLowerCase()}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
-      default: return `${config.prefix}${category === 'pokemon' ? t('track') : t('raid')} 
+      default: return `${config.prefix}${category === 'pokemon' ? t('track') : t(category)} 
       ${t(`poke_${idObj.pokemonId}`)} 
       ${!poracleValues.allForms && +idObj.form ? `form:${t(`form_${idObj.form}`).replace(/ /g, '_')}` : ''} 
       ${poracleValues.noIv ? '' : Object.keys(poracleValues).map(checkDefaults).join(' ')}

@@ -81,11 +81,12 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
         url: `${webhook.host}:${webhook.port}/api/humans/${discordId}`,
         options: { method, headers },
       }); break
-    case 'raid':
     case 'egg':
     case 'invasion':
     case 'lure':
+    case 'nest':
     case 'pokemon':
+    case 'raid':
       Object.assign(payloadObj, {
         url: `${webhook.host}:${webhook.port}/api/tracking/${category}/${discordId}${method === 'DELETE' ? `/byUid/${data.uid}` : ''}`,
         options: {

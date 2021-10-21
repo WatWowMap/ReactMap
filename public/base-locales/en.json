@@ -409,9 +409,7 @@
   "tryAgainLater": "Please try again later",
   "selectedAreas": "{{amount}} Area Selected",
   "selectedAreas_plural": "{{amount}} Areas Selected",
-  "webhook_pokemon_selection": "Pokemon Selection",
-  "webhook_raid_selection": "Raid Boss Selection",
-  "webhook_egg_selection": "Raid Eggs Selection",
+  "webhook_selection": "{{name}} Selection",
   "messageOfTheDay": "Message of the Day",
   "hasQuestIndicator": "Alternative Color for Stops with Quests",
   "showArBadge": "Show AR Badge",
@@ -429,5 +427,6 @@
   "exclusive": "Exclusive",
   "allMoves": "All Moves",
   "move": "Move",
-  "any": "Any"
+  "any": "Any",
+  "min_spawn_average": "Min Spawn Rate"
 }

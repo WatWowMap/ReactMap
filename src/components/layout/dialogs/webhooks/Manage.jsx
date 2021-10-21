@@ -145,7 +145,7 @@ export default function Manage({
           filters={poracleFilters[webhookCategory]}
           tempFilters={tempFilters}
           setTempFilters={setTempFilters}
-          title={t(`webhook_${webhookCategory}_selection`)}
+          title="webhook_selection"
           titleAction={() => handleClose(false)}
           isMobile={isMobile}
           isTablet={isTablet}

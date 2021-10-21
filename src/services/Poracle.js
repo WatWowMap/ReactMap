@@ -3,7 +3,7 @@ export default class Poracle {
     if (!poracleInfo) {
       return {}
     }
-    const { info: { pokemon, raid, egg, invasion, lure }, human } = poracleInfo
+    const { info: { pokemon, raid, egg, invasion, lure, nest }, human } = poracleInfo
     const filters = {
       pokemon: {
         global: pokemon.defaults,
@@ -20,6 +20,9 @@ export default class Poracle {
       lure: {
         global: lure.defaults,
       },
+      nest: {
+        global: nest.defaults,
+      },
     }
     Object.keys(reactMapFilters.pokemon.filter).forEach(key => {
       filters.pokemon[key] = {
@@ -31,6 +34,13 @@ export default class Poracle {
       }
       filters.raid[key] = {
         ...raid.defaults,
+        pokemon_id: +key.split('-')[0],
+        form: +key.split('-')[1],
+        profile_no: human.current_profile_no,
+        enabled: false,
+      }
+      filters.nest[key] = {
+        ...nest.defaults,
         pokemon_id: +key.split('-')[0],
         form: +key.split('-')[1],
         profile_no: human.current_profile_no,
@@ -81,6 +91,7 @@ export default class Poracle {
       case 'egg': return 'gyms'
       case 'invasion': return 'pokestops'
       case 'lure': return 'pokestops'
+      case 'nest': return 'nests'
       case 'raid': return 'gyms'
       default: return poracleCategory
     }
@@ -91,6 +102,7 @@ export default class Poracle {
       case 'egg': return ['eggs']
       case 'invasion': return ['invasions']
       case 'lure': return ['lures']
+      case 'nest': return ['pokemon']
       case 'raid': return ['raids', 'pokemon']
       default: return [poracleCategory]
     }
