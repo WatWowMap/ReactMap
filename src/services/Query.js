@@ -121,12 +121,7 @@ export default class Query {
   }
 
   static webhook(type) {
-    switch (type) {
-      case 'setHuman': return webhookIndex.setHuman
-      case 'pokemon': return webhookIndex.pokemon
-      case 'geojson': return webhookIndex.geojson
-      default: return webhookIndex.allProfiles
-    }
+    return webhookIndex[type]
   }
 
   static geocoder() {

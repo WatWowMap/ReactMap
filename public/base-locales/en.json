@@ -409,7 +409,9 @@
   "tryAgainLater": "Please try again later",
   "selectedAreas": "{{amount}} Area Selected",
   "selectedAreas_plural": "{{amount}} Areas Selected",
-  "webhookPokemonSelection": "Pokemon Selection",
+  "webhook_pokemon_selection": "Pokemon Selection",
+  "webhook_raid_selection": "Raid Boss Selection",
+  "webhook_egg_selection": "Raid Eggs Selection",
   "messageOfTheDay": "Message of the Day",
   "hasQuestIndicator": "Alternative Color for Stops with Quests",
   "showArBadge": "Show AR Badge",
@@ -423,5 +425,9 @@
   "page": "Page {{page}}",
   "navigationControls": "Navigation Controls",
   "navigationControlsreact": "React",
-  "navigationControlsleaflet": "Leaflet"
+  "navigationControlsleaflet": "Leaflet",
+  "exclusive": "Exclusive",
+  "allMoves": "All Moves",
+  "move": "Move",
+  "any": "Any"
 }

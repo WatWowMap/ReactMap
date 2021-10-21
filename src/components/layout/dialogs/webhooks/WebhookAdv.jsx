@@ -1,4 +1,5 @@
-import React, { Fragment, useState } from 'react'
+/* eslint-disable react/jsx-no-duplicate-props */
+import React, { useState } from 'react'
 import {
   Grid,
   DialogContent,
@@ -9,6 +10,7 @@ import {
   TextField,
   FormControl,
   InputLabel,
+  InputAdornment,
   Paper,
   Accordion,
   AccordionSummary,
@@ -20,37 +22,17 @@ import { useTranslation } from 'react-i18next'
 
 import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
+import Poracle from '@services/Poracle'
 import SliderTile from '@components/layout/dialogs/filters/SliderTile'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 
-const convertToReactMap = (values) => {
-  const reactMapFriendly = {}
-  Object.keys(values).forEach(key => {
-    if (key.startsWith('min')) {
-      const trim = key.replace('min_', '')
-      reactMapFriendly[trim] = [values[`min_${trim}`], values[`max_${trim}`]]
-    } else if (key.startsWith('max')) {
-      // do nothing, handled above
-    } else if (key.startsWith('pvp')) {
-      reactMapFriendly.pvp = [values.pvp_ranking_best, values.pvp_ranking_worst]
-    } else if (key === 'atk' || key === 'def' || key === 'sta') {
-      reactMapFriendly[`${key}_iv`] = [values[key], values[`max_${key}`]]
-    } else if (key.startsWith('rarity')) {
-      reactMapFriendly.rarity = [values[key], values[`max_${key}`]]
-    } else {
-      reactMapFriendly[key] = values[key]
-    }
-  })
-  return reactMapFriendly
-}
-
-const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'great_league_ranking', 'great_league_ranking_min_cp', 'ultra_league_ranking', 'ultra_league_ranking_min_cp', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename']
+const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive']
 
 export default function WebhookAdvanced({
   category, id, toggleWebhook, tempFilters, isMobile,
 }) {
-  const [pokemonId, form] = id.split('-')
+  const idObj = Poracle.getId(id)
   const { t } = useTranslation()
   const classes = useStyles()
   const selectedWebhook = useStore(s => s.selectedWebhook)
@@ -59,11 +41,11 @@ export default function WebhookAdvanced({
   const { [selectedWebhook]: {
     info: { [category]: info }, profile, human, template, platform, config, leagues, pvp,
   } } = useStatic(s => s.webhookData)
-  const { pokemon: { [pokemonId]: { weight } } } = useStatic(s => s.masterfile)
+  const { pokemon, moves } = useStatic(s => s.masterfile)
 
   const [filterValues, setFilterValues] = useState(tempFilters?.template
-    ? convertToReactMap(tempFilters)
-    : { ...convertToReactMap(info.defaults), profile_no: human.current_profile_no })
+    ? Poracle.reactMapFriendly(tempFilters)
+    : { ...Poracle.reactMapFriendly(info.defaults), profile_no: human.current_profile_no })
   const [poracleValues, setPoracleValues] = useState(tempFilters?.template
     ? tempFilters
     : { ...info.defaults, profile_no: human.current_profile_no })
@@ -73,13 +55,15 @@ export default function WebhookAdvanced({
     setPoracleValues({ ...poracleValues, [low]: values[0], [high]: values[1] })
   }
 
+  console.log('poracle', poracleValues)
+  console.log('filter', filterValues)
   const handleSwitch = (event) => {
     const { name, checked } = event.target
     switch (name) {
       case 'xl':
         setPoracleValues({
           ...poracleValues,
-          min_weight: checked ? Math.ceil(weight * 1.313) : info.defaults.min_weight,
+          min_weight: checked ? Math.ceil(pokemon[idObj.pokemonId].weight * 1.313) : info.defaults.min_weight,
           max_weight: info.defaults.max_weight,
           [name]: checked,
           xs: false,
@@ -88,7 +72,7 @@ export default function WebhookAdvanced({
         setPoracleValues({
           ...poracleValues,
           min_weight: info.defaults.min_weight,
-          max_weight: checked ? Math.floor(weight / 1.6431924) : info.defaults.max_weight,
+          max_weight: checked ? Math.floor(pokemon[idObj.pokemonId].weight / 1.6431924) : info.defaults.max_weight,
           [name]: checked,
           xl: false,
         }); break
@@ -104,6 +88,12 @@ export default function WebhookAdvanced({
           [name]: checked,
           noIv: false,
         }); break
+      case 'allMoves':
+        setPoracleValues({
+          ...poracleValues,
+          [name]: checked,
+          move: 9000,
+        }); break
       default: setPoracleValues({ ...poracleValues, [name]: checked })
     }
   }
@@ -113,6 +103,9 @@ export default function WebhookAdvanced({
     const newObj = { [name]: value }
     if (name === 'pvp_ranking_league') {
       newObj.pvp_ranking_min_cp = pvp === 'ohbem' ? 0 : value - 50
+    }
+    if (name === 'move' && value !== 9000) {
+      newObj.allMoves = false
     }
     setPoracleValues({ ...poracleValues, ...newObj })
   }
@@ -129,7 +122,7 @@ export default function WebhookAdvanced({
     const menuItems = []
     switch (option.name) {
       case 'template': template[platform][poracleValues.noIv ? `${category}NoIv` : category].en.forEach(item => (
-        menuItems.push(<MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>)
+        menuItems.push(<MenuItem key={item} value={item}>{item}</MenuItem>)
       )); break
       case 'profile_no':
         if (profile.length) {
@@ -145,6 +138,16 @@ export default function WebhookAdvanced({
       case 'gender': option.options.forEach(gender => (
         menuItems.push(<MenuItem key={gender} value={gender}>{t(`gender_${gender}`)}</MenuItem>)
       )); break
+      case 'team': option.options.forEach(team => (
+        menuItems.push(<MenuItem key={team} value={team}>{t(`team_${team}`, t('any'))}</MenuItem>)
+      )); break
+      case 'move':
+        menuItems.push(<MenuItem key={9000} value={9000}>{t('any')}</MenuItem>)
+        Object.keys(moves).forEach(move => {
+          if (moves[move].type) {
+            menuItems.push(<MenuItem key={move} value={move}>{t(`move_${move}`)}</MenuItem>)
+          }
+        }); break
       default: option.options.forEach(subOption => (
         menuItems.push(<MenuItem key={subOption} value={subOption}>{t(subOption, subOption)}</MenuItem>)
       ))
@@ -153,12 +156,14 @@ export default function WebhookAdvanced({
   }
 
   const checkDefaults = (field) => {
-    if (field === 'distance' && parseInt(poracleValues.distance)) return `d${poracleValues.distance}`
+    if (field === 'distance' && poracleValues.byDistance && parseInt(poracleValues.distance)) return `d${poracleValues.distance}`
     if (field === 'min_time' && parseInt(poracleValues.min_time)) return `t${poracleValues.min_time}`
+    if (field === 'exclusive' && poracleValues.exclusive) return ` ${t('exclusive')} `
+    if (field === 'clean' && poracleValues.clean) return ` ${t('clean')} `
     if (skipFields.includes(field)) return ''
     if (field.startsWith('pvp')) {
       if (poracleValues.pvpEntry) {
-        const league = leagues.find(x => x.cp === poracleValues.pvp_ranking_league)
+        const league = leagues.find(x => x.cp === poracleValues.pvp_ranking_league) || {}
         switch (field) {
           case 'pvp_ranking_min_cp':
             return pvp === 'ohbem' ? '' : `${league.name}cp${poracleValues.pvp_ranking_min_cp}`
@@ -177,13 +182,15 @@ export default function WebhookAdvanced({
   }
 
   const getPoracleString = () => {
-    switch (category) {
-      default: return `${config.prefix}track 
-      ${t(`poke_${pokemonId}`).toLowerCase()} 
-      ${!poracleValues.allForms && +form ? `form:${t(`form_${form}`).toLowerCase().replace(/ /g, '_')}` : ''} 
+    switch (id.charAt(0)) {
+      case 'r':
+      case 'e': return `${config.prefix}${id.charAt(0) === 'e' ? t('egg') : t('raid')} ${t('level')}${idObj.id}
+      ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
+      default: return `${config.prefix}${category === 'pokemon' ? t('track') : t('raid')} 
+      ${t(`poke_${idObj.pokemonId}`)} 
+      ${!poracleValues.allForms && +idObj.form ? `form:${t(`form_${idObj.form}`).replace(/ /g, '_')}` : ''} 
       ${poracleValues.noIv ? '' : Object.keys(poracleValues).map(checkDefaults).join(' ')}
-      ${poracleValues.gender ? ` ${t(`gender_${poracleValues.gender}`).toLowerCase()}` : ''}
-      ${poracleValues.clean ? ' clean' : ''}`
+      ${poracleValues.gender ? ` ${t(`gender_${poracleValues.gender}`)}` : ''}`
     }
   }
 
@@ -238,6 +245,7 @@ export default function WebhookAdvanced({
               color="primary"
               onChange={handleSwitch}
               checked={Boolean(poracleValues[option.name])}
+              disabled={id.startsWith(option.disabled)}
             />
           </Grid>
         </Grid>
@@ -258,6 +266,11 @@ export default function WebhookAdvanced({
             inputProps={{
               min: 0,
               max: option.max,
+            }}
+            InputProps={{
+              endAdornment: option.adornment
+                ? <InputAdornment position="end">{option.adornment}</InputAdornment>
+                : null,
             }}
           />
         </Grid>
@@ -280,10 +293,11 @@ export default function WebhookAdvanced({
       )
     }
   }
+
   return (
     <>
       <Header
-        titles={[`poke_${pokemonId}`, +form ? `form_${form}` : '']}
+        titles={Poracle.getTitles(idObj, idObj.type)}
         action={toggleWebhook(false, id)}
       />
       <DialogContent style={{ color: 'white', padding: '8px 5px' }}>
@@ -321,7 +335,7 @@ export default function WebhookAdvanced({
         })}
         <Paper style={{ margin: 10, width: '95%', textAlign: 'center' }} elevation={1}>
           <Typography variant="subtitle1" color="secondary">
-            {getPoracleString()}
+            {getPoracleString().toLowerCase()}
           </Typography>
         </Paper>
       </DialogContent>

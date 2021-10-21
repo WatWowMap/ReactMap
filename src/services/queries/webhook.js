@@ -8,7 +8,7 @@ const base = gql`
   }
 `
 
-const egg = gql`
+const Egg = gql`
   fragment PoracleEgg on Poracle {
     egg {
       distance
@@ -187,7 +187,7 @@ const quest = gql`
   }
 `
 
-const raid = gql`
+const Raid = gql`
   fragment PoracleRaid on Poracle {
     raid {
       exclusive
@@ -225,7 +225,7 @@ const weather = gql`
 
 export const allProfiles = gql`
   ${human}
-  ${egg}
+  ${Egg}
   ${gym}
   ${invasion}
   ${lure}
@@ -233,7 +233,7 @@ export const allProfiles = gql`
   ${Pokemon}
   ${profile}
   ${quest}
-  ${raid}
+  ${Raid}
   ${weather}
   query Webhook($category: String!, $status: String!, $name: String!) {
     webhook(category: $category, status: $status, name: $name) {
@@ -270,6 +270,28 @@ export const pokemon = gql`
     webhook(data: $data, category: $category, status: $status, name: $name) {
       ...Base
       ...PoraclePokemon
+    }
+  }
+`
+
+export const raid = gql`
+  ${base}
+  ${Raid}
+  mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
+    webhook(data: $data, category: $category, status: $status, name: $name) {
+      ...Base
+      ...PoracleRaid
+    }
+  }
+`
+
+export const egg = gql`
+  ${base}
+  ${Egg}
+  mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
+    webhook(data: $data, category: $category, status: $status, name: $name) {
+      ...Base
+      ...PoracleEgg
     }
   }
 `

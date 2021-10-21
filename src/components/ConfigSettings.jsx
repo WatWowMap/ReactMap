@@ -110,7 +110,7 @@ export default function ConfigSettings({
     && serverSettings.webhooks
     && serverSettings.webhooks[localState.state.selectedWebhook]) {
     setSelectedWebhook(localState.state.selectedWebhook)
-  } else if (serverSettings?.webhooks?.length) {
+  } else if (serverSettings?.webhooks) {
     setSelectedWebhook(serverSettings.webhooks[Object.keys(serverSettings.webhooks)[0]].name)
   }
 

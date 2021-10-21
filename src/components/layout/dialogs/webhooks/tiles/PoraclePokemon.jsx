@@ -17,10 +17,26 @@ const generateDescription = (pkmn, leagues, isMobile) => {
   return pkmn.description?.replace(/\**/g, '')
 }
 
+const getIcons = (Icons, category, item) => ({
+  pokemon: Icons.getPokemon(item.pokemon_id, item.form, 0, item.gender),
+  raid: item.pokemon_id === 9000
+    ? Icons.getEggs(item.level, true)
+    : Icons.getPokemon(item.pokemon_id, item.form),
+  egg: Icons.getEggs(item.level),
+}[category])
+
+const getId = (category, item) => ({
+  pokemon: `${item.pokemon_id}-${item.form}`,
+  raid: item.pokemon_id === 9000
+    ? `r${item.level}`
+    : `${item.pokemon_id}-${item.form}`,
+  egg: `e${item.level}`,
+}[category])
+
 export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   const {
     tileItem, columnCount, Icons, syncWebhook, selectedWebhook, selected, setSelected,
-    currentPokemon, setCurrentPokemon, isMobile, setSend, setTempFilters, leagues,
+    tracked, setTracked, isMobile, setSend, setTempFilters, leagues, category,
   } = data
   const [editDialog, setEditDialog] = useState(false)
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -70,7 +86,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
     >
       <Grid item xs={2} sm={1}>
         <img
-          src={Icons.getPokemon(item.pokemon_id, item.form, 0, item.gender)}
+          src={getIcons(Icons, category, item)}
           style={{ maxWidth: 40, maxHeight: 40 }}
         />
       </Grid>
@@ -86,10 +102,10 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
         <IconButton
           size="small"
           onClick={() => {
-            setCurrentPokemon(currentPokemon.filter(p => p.uid !== item.uid))
+            setTracked(tracked.filter(p => p.uid !== item.uid))
             syncWebhook({
               variables: {
-                category: 'pokemon',
+                category,
                 data: { uid: item.uid },
                 name: selectedWebhook,
                 status: 'DELETE',
@@ -111,8 +127,8 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
         fullScreen={isMobile}
       >
         <WebhookAdvanced
-          id={`${item.pokemon_id}-${item.form}`}
-          category="pokemon"
+          id={getId(category, item)}
+          category={category}
           isMobile={isMobile}
           toggleWebhook={toggleWebhook}
           tempFilters={item}

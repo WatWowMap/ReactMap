@@ -16,16 +16,16 @@ webhooks.forEach(hook => {
 //   return arr
 // }
 
-const GETcategory = (webhook, headers, discordId, category) => ({
-  human: {
-    url: `${webhook.host}:${webhook.port}/api/humans/one/${discordId}`,
-    options: { method: 'GET', headers },
-  },
-  pokemon: {
-    url: `${webhook.host}:${webhook.port}/api/tracking/pokemon/${discordId}`,
-    options: { method: 'GET', headers },
-  },
-}[category])
+// const GETcategory = (webhook, headers, discordId, category) => ({
+//   human: {
+//     url: `${webhook.host}:${webhook.port}/api/humans/one/${discordId}`,
+//     options: { method: 'GET', headers },
+//   },
+//   pokemon: {
+//     url: `${webhook.host}:${webhook.port}/api/tracking/pokemon/${discordId}`,
+//     options: { method: 'GET', headers },
+//   },
+// }[category])
 
 module.exports = async function webhookApi(category, discordId, method, webhookName, data = null) {
   const webhook = webhookObj[webhookName]
@@ -81,6 +81,8 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
         url: `${webhook.host}:${webhook.port}/api/humans/${discordId}`,
         options: { method, headers },
       }); break
+    case 'raid':
+    case 'egg':
     case 'pokemon':
       Object.assign(payloadObj, {
         url: `${webhook.host}:${webhook.port}/api/tracking/${category}/${discordId}${method === 'DELETE' ? `/byUid/${data.uid}` : ''}`,
@@ -119,11 +121,13 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
       return Object.keys(post.areas).map(a => a).sort()
     }
     if (payloadObj.get) {
-      const getObj = GETcategory(webhook, headers, discordId, payloadObj.get)
-      const get = await fetchJson(getObj.url, getObj.options)
+      const getUrl = payloadObj.get === 'human'
+        ? `${webhook.host}:${webhook.port}/api/humans/one/${discordId}`
+        : `${webhook.host}:${webhook.port}/api/tracking/${payloadObj.get}/${discordId}`
+      // GETcategory(webhook, headers, discordId, payloadObj.get)
+      const get = await fetchJson(getUrl, { method: 'GET', headers })
       return { ...post, ...get }
     }
-
     return post
   } catch (e) {
     console.error(e, 'Issue with fetching or getting data', payloadObj)

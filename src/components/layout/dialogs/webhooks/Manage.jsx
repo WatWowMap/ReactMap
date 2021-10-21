@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   DialogContent,
   Dialog,
@@ -11,13 +11,14 @@ import { useTranslation, Trans } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
+import Poracle from '@services/Poracle'
 
 import Footer from '@components/layout/general/Footer'
 import TabPanel from '@components/layout/general/TabPanel'
 import Header from '@components/layout/general/Header'
 import NewPokemon from './tiles/PokemonMenu'
 import Human from './Human'
-import Pokemon from './Pokemon'
+import Tracked from './Tracked'
 import Menu from '../../general/Menu'
 import WebhookError from './Error'
 
@@ -34,12 +35,14 @@ export default function Manage({
   const setWebhookData = useStatic(s => s.setWebhookData)
   const staticFilters = useStatic(s => s.filters)
 
-  const [tabValue, setTabValue] = useState(1)
+  const poracleFilters = useMemo(() => Poracle.filterGenerator(webhookData[selectedWebhook], staticFilters), [])
+  const [tabValue, setTabValue] = useState(2)
   const [help, setHelp] = useState(false)
   const [addNew, setAddNew] = useState(false)
   const filteredData = Object.keys(webhookData[selectedWebhook].info || {}).map(key => key)
+  const webhookCategory = filteredData[tabValue]
 
-  const [tempFilters, setTempFilters] = useState({})
+  const [tempFilters, setTempFilters] = useState(poracleFilters[webhookCategory])
   const [send, setSend] = useState(false)
 
   const footerButtons = [
@@ -48,10 +51,20 @@ export default function Manage({
     { name: 'close', action: () => setWebhookMode(false), icon: 'Close' },
   ]
 
-  const handleClose = () => {
+  const handleClose = (save) => {
     setAddNew(false)
-    setSend(true)
+    if (save) {
+      setSend(true)
+    } else {
+      setTempFilters(poracleFilters[webhookCategory])
+    }
   }
+
+  useEffect(() => {
+    if (tabValue) {
+      setTempFilters(poracleFilters[webhookCategory])
+    }
+  }, [tabValue])
 
   return (
     <>
@@ -78,37 +91,36 @@ export default function Manage({
       <DialogContent style={{ padding: '0', height: isMobile ? '100%' : '70vh' }}>
         {webhookData[selectedWebhook].human ? filteredData.map((key, i) => (
           <TabPanel value={tabValue} index={i} key={key} virtual>
-            {{
-              human: (
-                <Human
-                  t={t}
-                  isMobile={isMobile}
-                  webhookData={webhookData}
-                  setWebhookData={setWebhookData}
-                  webhookMode={webhookMode}
-                  setWebhookMode={setWebhookMode}
-                  webhookLocation={webhookLocation}
-                  setWebhookLocation={setWebhookLocation}
-                  selectedAreas={selectedAreas}
-                  setSelectedAreas={setSelectedAreas}
-                  selectedWebhook={selectedWebhook}
-                  setSelectedWebhook={setSelectedWebhook}
-                />
-              ),
-              pokemon: (
-                <Pokemon
-                  Icons={Icons}
-                  isMobile={isMobile}
-                  webhookData={webhookData}
-                  setWebhookData={setWebhookData}
-                  selectedWebhook={selectedWebhook}
-                  tempFilters={tempFilters}
-                  setTempFilters={setTempFilters}
-                  send={send}
-                  setSend={setSend}
-                />
-              ),
-            }[key]}
+            {key === 'human' ? (
+              <Human
+                t={t}
+                isMobile={isMobile}
+                webhookData={webhookData}
+                setWebhookData={setWebhookData}
+                webhookMode={webhookMode}
+                setWebhookMode={setWebhookMode}
+                webhookLocation={webhookLocation}
+                setWebhookLocation={setWebhookLocation}
+                selectedAreas={selectedAreas}
+                setSelectedAreas={setSelectedAreas}
+                selectedWebhook={selectedWebhook}
+                setSelectedWebhook={setSelectedWebhook}
+              />
+            ) : (
+              <Tracked
+                Icons={Icons}
+                category={key}
+                isMobile={isMobile}
+                webhookData={webhookData}
+                setWebhookData={setWebhookData}
+                selectedWebhook={selectedWebhook}
+                tempFilters={tempFilters}
+                setTempFilters={setTempFilters}
+                send={send}
+                setSend={setSend}
+                Poracle={Poracle}
+              />
+            )}
           </TabPanel>
         )) : <WebhookError selectedWebhook={selectedWebhook} />}
       </DialogContent>
@@ -125,18 +137,19 @@ export default function Manage({
         onClose={handleClose}
       >
         <Menu
-          category={filteredData[tabValue]}
-          filters={staticFilters[filteredData[tabValue]]
-            || staticFilters[`${filteredData[tabValue]}s`]}
+          category={Poracle.getMapCategory(webhookCategory)}
+          categories={Poracle.getFilterCategories(webhookCategory)}
+          webhookCategory={webhookCategory}
+          filters={poracleFilters[webhookCategory]}
           tempFilters={tempFilters}
           setTempFilters={setTempFilters}
-          title={t('webhookPokemonSelection')}
-          titleAction={handleClose}
+          title={t(`webhook_${webhookCategory}_selection`)}
+          titleAction={() => handleClose(false)}
           isMobile={isMobile}
           isTablet={isTablet}
           Tile={NewPokemon}
           extraButtons={[
-            { name: 'save', action: handleClose, icon: 'Save', color: 'secondary' },
+            { name: 'save', action: () => handleClose(true), icon: 'Save', color: 'secondary' },
           ]}
         />
       </Dialog>

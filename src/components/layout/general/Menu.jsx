@@ -20,8 +20,8 @@ import Help from '../dialogs/tutorial/Advanced'
 import WebhookAdvanced from '../dialogs/webhooks/WebhookAdv'
 
 export default function Menu({
-  isTablet, isMobile, category, Tile,
-  filters, tempFilters, setTempFilters,
+  isTablet, isMobile, category, Tile, webhookCategory,
+  filters, tempFilters, setTempFilters, categories,
   title, titleAction, extraButtons = [],
 }) {
   Utility.analytics(`/advanced/${category}`)
@@ -52,8 +52,9 @@ export default function Menu({
     id: '',
   })
 
-  const { filteredObj, filteredArr, count } = useFilter(tempFilters, menus, search, category)
+  const { filteredObj, filteredArr, count } = useFilter(tempFilters, menus, search, category, categories)
 
+  // console.log('menu', filteredArr)
   const generateSlots = (teamId, show) => {
     for (let i = 1; i <= 6; i += 1) {
       const slotKey = `g${teamId.charAt(1)}-${i}`
@@ -113,12 +114,15 @@ export default function Menu({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    setWebhook({ open, id })
-    if (id && newFilters) {
-      // eslint-disable-next-line camelcase
-      const [pokemon_id, form] = id.split('-')
-      setTempFilters({ ...tempFilters, [id]: { ...tempFilters[id], ...newFilters, pokemon_id, form, enabled: true } })
+    if (id === 'global' && !open) {
+      Object.keys(filteredObj).forEach(item => {
+        filteredObj[item] = { ...newFilters, enabled: true }
+      })
+      setTempFilters({ ...tempFilters, ...filteredObj, [id]: newFilters })
+    } else if (id && newFilters && !open) {
+      setTempFilters({ ...tempFilters, [id]: { ...tempFilters[id], ...newFilters, enabled: true } })
     }
+    setWebhook({ open, id })
   }
 
   const toggleSlotsMenu = (open, id, newFilters) => (event) => {
@@ -167,7 +171,7 @@ export default function Menu({
   const footerButtons = [
     { name: 'help', action: () => setHelpDialog(!helpDialog), icon: 'HelpOutline', color: 'white' },
     { name: 'openFilter', action: toggleDrawer(true), icon: 'Ballot', color: 'white', mobileOnly: true },
-    { name: 'applyToAll', action: toggleAdvMenu(true, 'global'), icon: category === 'pokemon' ? 'Tune' : 'FormatSize', color: 'white' },
+    { name: 'applyToAll', action: webhookCategory ? toggleWebhook(true, 'global') : toggleAdvMenu(true, 'global'), icon: category === 'pokemon' ? 'Tune' : 'FormatSize', color: 'white' },
     { name: 'disableAll', action: () => selectAllOrNone(false), icon: 'Clear', color: 'primary' },
     { name: 'enableAll', action: () => selectAllOrNone(true), icon: 'Check', color: '#00e676' },
     ...extraButtons,
@@ -203,6 +207,7 @@ export default function Menu({
               type: category,
               Utility,
               toggleWebhook,
+              webhookCategory,
             }}
             Tile={Tile}
           />
@@ -254,7 +259,7 @@ export default function Menu({
       >
         <WebhookAdvanced
           id={webhook.id}
-          category={category}
+          category={webhookCategory}
           isMobile={isMobile}
           toggleWebhook={toggleWebhook}
           tempFilters={tempFilters[webhook.id]}

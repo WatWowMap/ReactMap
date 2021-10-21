@@ -5,6 +5,13 @@ import {
   Check, Clear, Tune,
 } from '@material-ui/icons'
 
+const getOtherData = (id) => {
+  switch (id.charAt(0)) {
+    case 'e':
+    case 'r': return { level: id.slice(1) }
+    default: return { pokemon_id: id.split('-')[0], form: id.split('-')[1] }
+  }
+}
 export default function NewPokemon({
   data, rowIndex, columnIndex, style,
 }) {
@@ -25,7 +32,7 @@ export default function NewPokemon({
       [item.id]: tempFilters[item.id] ? {
         ...tempFilters[item.id],
         enabled: !tempFilters[item.id].enabled,
-      } : tempFilters[item.id] = { enabled: true },
+      } : tempFilters[item.id] = { enabled: true, ...getOtherData(item.id) },
     })
     Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id].enabled}`, type)
   }

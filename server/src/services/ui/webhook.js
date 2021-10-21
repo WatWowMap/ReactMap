@@ -8,10 +8,11 @@ module.exports = function selectProvider(provider, hookConfig, pvp) {
       return {
         human: true,
         pokemon: {
+          sortProp: 'pokemon_id',
           defaults: {
             clean: false,
             distance: 0,
-            template: hookConfig.defaultTemplateName,
+            template: hookConfig.defaultTemplateName.toString(),
             pokemon_id: 0,
             form: 0,
             gender: 0,
@@ -44,7 +45,6 @@ module.exports = function selectProvider(provider, hookConfig, pvp) {
             xl: false,
           },
           ui: {
-            // Categories such as 'primary' are rendered recursively
             primary: {
               sliders: [
                 { name: 'iv', label: '', min: -1, max: 100, perm: 'iv', low: 'min_iv', high: 'max_iv' },
@@ -58,7 +58,7 @@ module.exports = function selectProvider(provider, hookConfig, pvp) {
                 { name: 'def_iv', label: '', min: 0, max: 15, perm: 'stats', low: 'def', high: 'max_def' },
                 { name: 'sta_iv', label: '', min: 0, max: 15, perm: 'stats', low: 'sta', high: 'max_sta' },
               ],
-              texts: [{ name: 'min_time', type: 'number', max: 60, xs: 4, sm: 4 }],
+              texts: [{ name: 'min_time', type: 'number', max: 60, adornment: 's', xs: 4, sm: 4 }],
               booleans: [
                 { name: 'xs', xs: 4, sm: 4, override: true },
                 { name: 'xl', xs: 4, sm: 4, override: true },
@@ -66,7 +66,9 @@ module.exports = function selectProvider(provider, hookConfig, pvp) {
             },
             pvp: {
               selects: [{ name: 'pvp_ranking_league', options: [{ name: 'none', cp: 0 }, ...leagues], xs: 6, sm: isOhbem ? 6 : 3 }],
-              texts: isOhbem ? [] : [{ name: 'pvp_ranking_min_cp', max: pvpMax, type: 'number', xs: 6, sm: 3 }],
+              texts: isOhbem
+                ? []
+                : [{ name: 'pvp_ranking_min_cp', max: pvpMax, type: 'number', adornment: 'cp', xs: 6, sm: 3 }],
               sliders: [{ name: 'pvp', label: 'rank', min: 1, max: hookConfig.pvpFilterMaxRank, perm: 'pvp', low: 'pvp_ranking_best', high: 'pvp_ranking_worst' }],
             },
             general: {
@@ -83,7 +85,73 @@ module.exports = function selectProvider(provider, hookConfig, pvp) {
               ],
               distanceOrArea: {
                 booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
-                texts: [{ name: 'distance', type: 'number', xs: 4, sm: 4 }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+              },
+            },
+          },
+        },
+        raid: {
+          defaults: {
+            clean: false,
+            distance: 0,
+            template: hookConfig.defaultTemplateName.toString(),
+            pokemon_id: 9000,
+            evolution: 9000,
+            form: 0,
+            move: 9000,
+            exclusive: false,
+            level: 9000,
+            team: 4,
+            gym_id: null,
+            byDistance: false,
+          },
+          ui: {
+            general: {
+              selects: [
+                { name: 'profile_no', options: [], xs: 6, sm: 3 },
+                { name: 'template', options: [], xs: 6, sm: 3 },
+                { name: 'team', options: [0, 1, 2, 3, 4], xs: 6, sm: 3 },
+                { name: 'move', options: [], xs: 6, sm: 3 },
+                // { name: 'level', options: [0, 1, 2, 3, 4, 5, 6], xs: 6, sm: 3 },
+              ],
+              booleans: [
+                { name: 'clean', xs: 6, sm: 3 },
+                { name: 'exclusive', xs: 6, sm: 3 },
+                { name: 'allForms', disabled: 'r', xs: 6, sm: 3 },
+                { name: 'allMoves', disabled: 'r', xs: 6, sm: 3 },
+              ],
+              distanceOrArea: {
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+              },
+            },
+          },
+        },
+        egg: {
+          defaults: {
+            clean: false,
+            distance: 0,
+            template: hookConfig.defaultTemplateName.toString(),
+            exclusive: false,
+            level: 9000,
+            team: 4,
+            gym_id: null,
+            byDistance: false,
+          },
+          ui: {
+            general: {
+              selects: [
+                { name: 'profile_no', options: [], xs: 6, sm: 4 },
+                { name: 'template', options: [], xs: 6, sm: 4 },
+                { name: 'team', options: [1, 2, 3, 4], xs: 6, sm: 4 },
+              ],
+              booleans: [
+                { name: 'clean', xs: 6, sm: 6 },
+                { name: 'exclusive', xs: 6, sm: 6 },
+              ],
+              distanceOrArea: {
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
               },
             },
           },
