@@ -134,7 +134,11 @@ rootRouter.get('/settings', async (req, res) => {
           Object.keys(category).forEach(option => {
             category[option].name = option
           })
-          serverSettings.settings[setting] = category[Object.keys(category)[0]].name
+          if (config.map[setting] && typeof config.map[setting] !== 'object') {
+            serverSettings.settings[setting] = config.map[setting]
+          } else {
+            serverSettings.settings[setting] = category[Object.keys(category)[0]].name
+          }
         }
       })
 
