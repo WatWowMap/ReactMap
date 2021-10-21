@@ -34,8 +34,10 @@ export default function Manage({
   const webhookData = useStatic(s => s.webhookData)
   const setWebhookData = useStatic(s => s.setWebhookData)
   const staticFilters = useStatic(s => s.filters)
-
-  const poracleFilters = useMemo(() => Poracle.filterGenerator(webhookData[selectedWebhook], staticFilters), [])
+  const { invasions } = useStatic(s => s.masterfile)
+  const poracleFilters = useMemo(() => Poracle.filterGenerator(
+    webhookData[selectedWebhook], staticFilters, invasions,
+  ), [])
   const [tabValue, setTabValue] = useState(2)
   const [help, setHelp] = useState(false)
   const [addNew, setAddNew] = useState(false)

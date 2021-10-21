@@ -156,6 +156,32 @@ module.exports = function selectProvider(provider, hookConfig, pvp) {
             },
           },
         },
+        invasion: {
+          defaults: {
+            clean: false,
+            distance: 0,
+            template: hookConfig.defaultTemplateName.toString(),
+            grunt_type: null,
+            gender: 0,
+            byDistance: false,
+          },
+          ui: {
+            general: {
+              selects: [
+                { name: 'profile_no', options: [], xs: 6, sm: 6 },
+                { name: 'template', options: [], xs: 6, sm: 6 },
+                { name: 'gender', options: [0, 1, 2], xs: 6, sm: 6 },
+              ],
+              booleans: [
+                { name: 'clean', xs: 6, sm: 6 },
+              ],
+              distanceOrArea: {
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+              },
+            },
+          },
+        },
       }
     }
     default: return {}

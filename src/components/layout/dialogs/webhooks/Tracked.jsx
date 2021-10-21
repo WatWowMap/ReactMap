@@ -2,7 +2,9 @@ import React, { useEffect, useState, memo } from 'react'
 import { useMutation } from '@apollo/client'
 
 import Query from '@services/Query'
+import { useStatic } from '@hooks/useStore'
 import ReactWindow from '@components/layout/general/ReactWindow'
+
 import PokemonTile from './tiles/PoraclePokemon'
 import Selecting from './Selecting'
 
@@ -14,6 +16,7 @@ const Tracked = ({
   const [tracked, setTracked] = useState(webhookData[selectedWebhook][category])
   const [selected, setSelected] = useState({})
   const [staticInfo] = useState(webhookData[selectedWebhook].info)
+  const { invasions } = useStatic(s => s.masterfile)
 
   useEffect(() => {
     if (newWebhookData?.webhook?.[category]) {
@@ -77,6 +80,8 @@ const Tracked = ({
           setTempFilters,
           leagues: staticInfo.pokemon.leagues,
           category,
+          Poracle,
+          invasions,
         }}
         Tile={PokemonTile}
       />

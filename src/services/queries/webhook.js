@@ -67,7 +67,7 @@ const gym = gql`
   }
 `
 
-const invasion = gql`
+const Invasion = gql`
   fragment PoracleInvasion on Poracle {
     invasion {
       clean
@@ -227,7 +227,7 @@ export const allProfiles = gql`
   ${human}
   ${Egg}
   ${gym}
-  ${invasion}
+  ${Invasion}
   ${lure}
   ${nest}
   ${Pokemon}
@@ -292,6 +292,17 @@ export const egg = gql`
     webhook(data: $data, category: $category, status: $status, name: $name) {
       ...Base
       ...PoracleEgg
+    }
+  }
+`
+
+export const invasion = gql`
+  ${base}
+  ${Invasion}
+  mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
+    webhook(data: $data, category: $category, status: $status, name: $name) {
+      ...Base
+      ...PoracleInvasion
     }
   }
 `

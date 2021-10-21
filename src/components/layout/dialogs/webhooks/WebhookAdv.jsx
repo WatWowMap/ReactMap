@@ -32,7 +32,7 @@ const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 
 export default function WebhookAdvanced({
   category, id, toggleWebhook, tempFilters, isMobile,
 }) {
-  const idObj = Poracle.getId(id)
+  const idObj = Poracle.getIdObj(id)
   const { t } = useTranslation()
   const classes = useStyles()
   const selectedWebhook = useStore(s => s.selectedWebhook)
@@ -41,7 +41,7 @@ export default function WebhookAdvanced({
   const { [selectedWebhook]: {
     info: { [category]: info }, profile, human, template, platform, config, leagues, pvp,
   } } = useStatic(s => s.webhookData)
-  const { pokemon, moves } = useStatic(s => s.masterfile)
+  const { pokemon, moves, types } = useStatic(s => s.masterfile)
 
   const [filterValues, setFilterValues] = useState(tempFilters?.template
     ? Poracle.reactMapFriendly(tempFilters)
@@ -186,6 +186,10 @@ export default function WebhookAdvanced({
       case 'r':
       case 'e': return `${config.prefix}${id.charAt(0) === 'e' ? t('egg') : t('raid')} ${t('level')}${idObj.id}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
+      case 'i': {
+        const invasion = Object.keys(types).find(x => types[x].toLowerCase() === poracleValues.grunt_type)
+        return `${config.prefix}${t('invasion')} ${invasion ? t(`poke_type_${invasion}`) : t(poracleValues.grunt_type.replace(' ', ''))}`
+      }
       default: return `${config.prefix}${category === 'pokemon' ? t('track') : t('raid')} 
       ${t(`poke_${idObj.pokemonId}`)} 
       ${!poracleValues.allForms && +idObj.form ? `form:${t(`form_${idObj.form}`).replace(/ /g, '_')}` : ''} 

@@ -7,36 +7,10 @@ import { DeleteForever, Edit } from '@material-ui/icons'
 
 import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 
-const generateDescription = (pkmn, leagues, isMobile) => {
-  if (isMobile) {
-    return pkmn.pvp_ranking_league
-      ? `${leagues.find(league => league.cp === pkmn.pvp_ranking_league).name} ${pkmn.pvp_ranking_best}-${pkmn.pvp_ranking_worst}`
-      : `${pkmn.min_iv}-${pkmn.max_iv}% | L${pkmn.min_level}-${pkmn.max_level}
-      A${pkmn.atk}-${pkmn.max_atk} | D${pkmn.def}-${pkmn.max_def} | S${pkmn.sta}-${pkmn.max_sta}${pkmn.distance ? ` | d${pkmn.distance}` : ''}`
-  }
-  return pkmn.description?.replace(/\**/g, '')
-}
-
-const getIcons = (Icons, category, item) => ({
-  pokemon: Icons.getPokemon(item.pokemon_id, item.form, 0, item.gender),
-  raid: item.pokemon_id === 9000
-    ? Icons.getEggs(item.level, true)
-    : Icons.getPokemon(item.pokemon_id, item.form),
-  egg: Icons.getEggs(item.level),
-}[category])
-
-const getId = (category, item) => ({
-  pokemon: `${item.pokemon_id}-${item.form}`,
-  raid: item.pokemon_id === 9000
-    ? `r${item.level}`
-    : `${item.pokemon_id}-${item.form}`,
-  egg: `e${item.level}`,
-}[category])
-
 export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   const {
     tileItem, columnCount, Icons, syncWebhook, selectedWebhook, selected, setSelected,
-    tracked, setTracked, isMobile, setSend, setTempFilters, leagues, category,
+    tracked, setTracked, isMobile, setSend, setTempFilters, leagues, category, Poracle, invasions,
   } = data
   const [editDialog, setEditDialog] = useState(false)
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -75,6 +49,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
     setSelected({ ...selected, [item.uid]: event.target.checked })
   }
 
+  const id = Poracle.getId(item, category, invasions)
   return (
     <Grid
       container
@@ -86,13 +61,13 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
     >
       <Grid item xs={2} sm={1}>
         <img
-          src={getIcons(Icons, category, item)}
+          src={Icons.getIconById(id)}
           style={{ maxWidth: 40, maxHeight: 40 }}
         />
       </Grid>
       <Grid item xs={6} sm={9}>
         <Typography variant="caption">
-          {generateDescription(item, leagues, isMobile)}
+          {Poracle.generateDescription(item, leagues, isMobile)}
         </Typography>
       </Grid>
       <Grid item xs={4} sm={2}>
@@ -127,7 +102,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
         fullScreen={isMobile}
       >
         <WebhookAdvanced
-          id={getId(category, item)}
+          id={id}
           category={category}
           isMobile={isMobile}
           toggleWebhook={toggleWebhook}

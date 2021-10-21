@@ -126,7 +126,7 @@ const InvasionType = new GraphQLObjectType({
     ping: { type: GraphQLString },
     clean: { type: GraphQLBoolean },
     gender: { type: GraphQLInt },
-    grunt_type: { type: GraphQLInt },
+    grunt_type: { type: GraphQLString },
     template: { type: GraphQLString },
     distance: { type: GraphQLInt },
   }),

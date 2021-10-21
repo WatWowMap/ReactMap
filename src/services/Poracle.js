@@ -1,18 +1,21 @@
 export default class Poracle {
-  static filterGenerator = (poracleInfo, reactMapFilters) => {
+  static filterGenerator = (poracleInfo, reactMapFilters, invasions) => {
     if (!poracleInfo) {
       return {}
     }
-    const { info: { pokemon, raid, egg }, human } = poracleInfo
+    const { info: { pokemon, raid, egg, invasion }, human } = poracleInfo
     const filters = {
       pokemon: {
         global: pokemon.defaults,
       },
       raid: {
-        global: pokemon.defaults,
+        global: raid.defaults,
       },
       egg: {
-        global: pokemon.defaults,
+        global: egg.defaults,
+      },
+      invasion: {
+        global: invasion.defaults,
       },
     }
     Object.keys(reactMapFilters.pokemon.filter).forEach(key => {
@@ -31,15 +34,16 @@ export default class Poracle {
         enabled: false,
       }
     })
-    // Object.keys(reactMapFilters.pokestops.filter).forEach(key => {
-    //   if (key.startsWith('i')) {
-    //     filters.invasion[key] = {
-    //       ...invasion.defaults,
-    //       grunt_type: +key.slice[1],
-    //       enabled: false,
-    //     }
-    //   }
-    // })
+    Object.keys(reactMapFilters.pokestops.filter).forEach(key => {
+      if (key.startsWith('i')) {
+        filters.invasion[key] = {
+          ...invasion.defaults,
+          grunt_type: invasions[key.slice(1)].type.toLowerCase(),
+          profile_no: human.current_profile_no,
+          enabled: false,
+        }
+      }
+    })
     Object.keys(reactMapFilters.gyms.filter).forEach(key => {
       if (key.startsWith('r')) {
         filters.raid[key] = {
@@ -64,6 +68,7 @@ export default class Poracle {
   static getMapCategory(poracleCategory) {
     switch (poracleCategory) {
       case 'egg': return 'gyms'
+      case 'invasion': return 'pokestops'
       case 'raid': return 'gyms'
       default: return poracleCategory
     }
@@ -72,14 +77,27 @@ export default class Poracle {
   static getFilterCategories(poracleCategory) {
     switch (poracleCategory) {
       case 'egg': return ['eggs']
+      case 'invasion': return ['invasions']
       case 'raid': return ['raids', 'pokemon']
       default: return [poracleCategory]
     }
   }
 
-  static getId(id) {
+  static getId(item, category, invasions) {
+    switch (category) {
+      case 'egg': return `e${item.level}`
+      case 'invasion': return `i${Object.keys(invasions).find(x => invasions[x].type?.toLowerCase() === item.grunt_type)}`
+      case 'raid': return item.pokemon_id === 9000
+        ? `r${item.level}`
+        : `${item.pokemon_id}-${item.form}`
+      default: return `${item.pokemon_id}-${item.form}`
+    }
+  }
+
+  static getIdObj(id) {
     switch (id.charAt(0)) {
       case 'e': return { id: id.replace('e', ''), type: 'egg' }
+      case 'i': return { id: id.replace('i', ''), type: 'invasion' }
       case 'r': return { id: id.replace('r', ''), type: 'raid' }
       default: return { pokemonId: id.split('-')[0], form: id.split('-')[1], type: 'pokemon' }
     }
@@ -88,6 +106,7 @@ export default class Poracle {
   static getTitles(idObj, type) {
     switch (type) {
       case 'egg': return [`egg_${idObj.id}_plural`]
+      case 'invasion': return [`grunt_a_${idObj.id}`]
       case 'raid': return [`raid_${idObj.id}_plural`]
       default: return [`poke_${idObj.pokemonId}`, +idObj.form ? `form_${idObj.form}` : '']
     }
@@ -121,6 +140,7 @@ export default class Poracle {
     const ignoredFields = ['noIv', 'byDistance', 'xs', 'xl', 'allForms', 'pvpEntry']
     switch (type) {
       case 'egg': return entries.map(egg => ({ ...defaults, ...egg, byDistance: undefined }))
+      case 'invasion': return entries.map(invasion => ({ ...defaults, ...invasion, byDistance: undefined }))
       case 'raid': return entries.map(boss => {
         if (boss.allForms) {
           boss.form = defaults.form
@@ -145,5 +165,15 @@ export default class Poracle {
         return newPokemon
       })
     }
+  }
+
+  static generateDescription(pkmn, leagues, isMobile) {
+    if (isMobile) {
+      return pkmn.pvp_ranking_league
+        ? `${leagues.find(league => league.cp === pkmn.pvp_ranking_league).name} ${pkmn.pvp_ranking_best}-${pkmn.pvp_ranking_worst}`
+        : `${pkmn.min_iv}-${pkmn.max_iv}% | L${pkmn.min_level}-${pkmn.max_level}
+        A${pkmn.atk}-${pkmn.max_atk} | D${pkmn.def}-${pkmn.max_def} | S${pkmn.sta}-${pkmn.max_sta}${pkmn.distance ? ` | d${pkmn.distance}` : ''}`
+    }
+    return pkmn.description?.replace(/\**/g, '')
   }
 }
