@@ -101,7 +101,7 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
   reqCategories.forEach(subCategory => {
     Object.entries(menuFilters[subCategory] || {}).forEach(([id, item]) => {
       if (item.perms.some(perm => perms[perm])) {
-        if (!item.name.endsWith('*') || (item.name.endsWith('*') && category === 'pokestops')) {
+        if (!item.name.endsWith('*') || (item.name.endsWith('*') && category === item.category)) {
           count.total += 1
           item.id = id
           switch (switchKey) {
