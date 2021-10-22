@@ -216,7 +216,7 @@ class Pokemon extends Model {
                 poke.where('pokemon_id', id)
               } else {
                 poke.where('pokemon_id', id)
-                  .andWhere('form', form)
+                  .andWhere('pokemon.form', form)
               }
               if (relevantFilters.length > 0) {
                 generateSql(poke, filter, relevantFilters, true)
