@@ -48,7 +48,7 @@ export default function SliderTile({
     }
   }
 
-  const textColor = tempValues[0] === min && tempValues[1] === max ? '#616161' : 'white'
+  const textColor = (tempValues[0] === min && tempValues[1] === max) || disabled ? '#616161' : 'white'
 
   return (
     <Grid

@@ -13,7 +13,7 @@ import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
 export default function GymPopup({
-  gym, hasRaid, ts, Icons,
+  gym, hasRaid, ts, Icons, hasHatched,
 }) {
   const { t } = useTranslation()
   const { gyms: perms } = useStatic(state => state.ui)
@@ -34,7 +34,7 @@ export default function GymPopup({
       spacing={1}
     >
       <Header gym={gym} perms={perms} hasRaid={hasRaid} t={t} />
-      {perms.gyms && (
+      {perms.allGyms && (
         <Grid item xs={12}>
           <Collapse in={!raidExpand} timeout="auto" unmountOnExit>
             <Grid
@@ -51,6 +51,7 @@ export default function GymPopup({
               <GymInfo
                 gym={gym}
                 t={t}
+                Icons={Icons}
               />
             </Grid>
           </Collapse>
@@ -72,8 +73,8 @@ export default function GymPopup({
                 t={t}
               />
               <Divider orientation="vertical" flexItem />
-              <RaidInfo gym={gym} t={t} Icons={Icons} />
-              <Timer gym={gym} ts={ts} t={t} />
+              <RaidInfo gym={gym} t={t} Icons={Icons} ts={ts} />
+              <Timer gym={gym} ts={ts} t={t} hasHatched={hasHatched} />
             </Grid>
           </Collapse>
         </Grid>
@@ -87,8 +88,9 @@ export default function GymPopup({
         hasRaid={hasRaid}
         perms={perms}
         t={t}
+        Icons={Icons}
       />
-      {perms.gyms && (
+      {perms.allGyms && (
         <Collapse in={extraExpand} timeout="auto" unmountOnExit>
           <ExtraInfo gym={gym} t={t} ts={ts} />
         </Collapse>
@@ -184,7 +186,7 @@ const Header = ({
     { name: 'hide', action: handleHide },
   ]
 
-  if (perms.gyms) {
+  if (perms.allGyms) {
     options.push({ name: 'excludeTeam', action: excludeTeam })
   }
   if (perms.raids && hasRaid) {
@@ -335,7 +337,7 @@ const RaidImage = ({
   )
 }
 
-const GymInfo = ({ gym, t }) => {
+const GymInfo = ({ gym, t, Icons }) => {
   const {
     team_id, availble_slots, ex_raid_eligible, ar_scan_eligible,
   } = gym
@@ -366,7 +368,7 @@ const GymInfo = ({ gym, t }) => {
           className="grid-item"
           style={{
             height: 24,
-            backgroundImage: 'url(/images/misc/ex.png)',
+            backgroundImage: `url(${Icons.getMisc('ex')})`,
           }}
         />
       )}
@@ -377,7 +379,7 @@ const GymInfo = ({ gym, t }) => {
           className="grid-item"
           style={{
             height: 24,
-            backgroundImage: 'url(/images/misc/ar.png)',
+            backgroundImage: `url(${Icons.getMisc('ar')})`,
           }}
         />
       )}
@@ -385,7 +387,9 @@ const GymInfo = ({ gym, t }) => {
   )
 }
 
-const RaidInfo = ({ gym, t, Icons }) => {
+const RaidInfo = ({
+  gym, t, Icons, ts,
+}) => {
   const { moves, pokemon } = useStatic(state => state.masterfile)
   const {
     raid_level, raid_pokemon_id, raid_pokemon_form, raid_pokemon_move_1, raid_pokemon_move_2,
@@ -412,7 +416,7 @@ const RaidInfo = ({ gym, t, Icons }) => {
     }
   }
 
-  if (!raid_pokemon_id) {
+  if (!raid_pokemon_id || (raid_pokemon_id && gym.raid_battle_timestamp >= ts)) {
     return (
       <Timer gym={gym} start t={t} />
     )
@@ -476,9 +480,11 @@ const RaidInfo = ({ gym, t, Icons }) => {
   )
 }
 
-const Timer = ({ gym, start, t }) => {
+const Timer = ({
+  gym, start, t, hasHatched,
+}) => {
   const target = (start ? gym.raid_battle_timestamp : gym.raid_end_timestamp) * 1000
-  const update = () => start || gym.raid_pokemon_id ? Utility.getTimeUntil(target, true)
+  const update = () => start || hasHatched || gym.raid_pokemon_id ? Utility.getTimeUntil(target, true)
     : Utility.formatInterval(target - gym.raid_battle_timestamp * 1000)
   const [display, setDisplay] = useState(update)
 
@@ -500,7 +506,7 @@ const Timer = ({ gym, start, t }) => {
 }
 
 const Footer = ({
-  gym, expanded, setExpanded, hasRaid, raidExpand, setRaidExpand, perms,
+  gym, expanded, setExpanded, hasRaid, raidExpand, setRaidExpand, perms, Icons,
 }) => {
   const classes = useStyles()
   const { navigation } = useStore(state => state.settings)
@@ -517,7 +523,7 @@ const Footer = ({
 
   return (
     <>
-      {(hasRaid && perms.raids && perms.gyms) && (
+      {(hasRaid && perms.raids && perms.allGyms) && (
         <Grid item xs={4}>
           <IconButton
             className={classes.expand}
@@ -525,7 +531,7 @@ const Footer = ({
             aria-expanded={raidExpand}
           >
             <img
-              src={`/images/misc/${raidExpand ? 'gyms' : 'raids'}.png`}
+              src={Icons.getMisc(raidExpand ? 'gyms' : 'raids')}
               height={20}
               width="auto"
             />
@@ -541,7 +547,7 @@ const Footer = ({
           <Map style={{ color: 'white' }} />
         </IconButton>
       </Grid>
-      {perms.gyms && (
+      {perms.allGyms && (
         <Grid item xs={4}>
           <IconButton
             className={expanded ? classes.expandOpen : classes.expand}

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
-export default function PortalPopup({ portal, ts }) {
+export default function PortalPopup({ portal, ts, Icons }) {
   const { navigation } = useStore(state => state.settings)
   const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
   const { t } = useTranslation()
@@ -17,7 +17,7 @@ export default function PortalPopup({ portal, ts }) {
 
   const src = imageUrl
     ? imageUrl.replace('http://', 'https://')
-    : '/images/misc/pokestop.png'
+    : Icons.getMisc('portal')
 
   const extraMetaData = [
     {

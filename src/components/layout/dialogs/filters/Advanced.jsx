@@ -68,13 +68,13 @@ export default function AdvancedFilter({
     key: 'reset',
     icon: (
       <IconButton
-        onClick={() => handleChange('default', advancedFilter.standard)}
+        onClick={() => handleChange('default', advancedFilter.standard || { enabled: false, size: 'md' })}
       >
         <Replay color="primary" />
       </IconButton>
     ),
     text: (
-      <Button onClick={() => handleChange('default', advancedFilter.standard)}>
+      <Button onClick={() => handleChange('default', advancedFilter.standard || { enabled: false, size: 'md' })}>
         <Typography variant="caption" color="primary">
           {t('reset')}
         </Typography>

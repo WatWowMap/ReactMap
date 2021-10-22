@@ -3,11 +3,13 @@ import { Redirect } from 'react-router-dom'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
 import { ThemeProvider } from '@material-ui/styles'
-import { useMediaQuery } from '@material-ui/core'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
+
 import setTheme from '@assets/mui/theme'
+import useGenerate from '@hooks/useGenerate'
+
 import Map from './Map'
 
 export default function ConfigSettings({
@@ -27,8 +29,7 @@ export default function ConfigSettings({
   }
 
   document.title = serverSettings.config.map.headerTitle
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
-  const theme = setTheme(serverSettings.config.map.theme, prefersDarkMode)
+  const theme = setTheme(serverSettings.config.map.theme)
   document.body.classList.add('dark')
 
   const setUserSettings = useStore(state => state.setUserSettings)
@@ -48,6 +49,7 @@ export default function ConfigSettings({
   const setMasterfile = useStatic(state => state.setMasterfile)
   const setUi = useStatic(state => state.setUi)
   const setStaticFilters = useStatic(state => state.setFilters)
+  const setMenuFilters = useStatic(state => state.setMenuFilters)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
 
@@ -94,12 +96,12 @@ export default function ConfigSettings({
   const newIcons = updateObjState(serverSettings.Icons.selected, 'icons')
   const isValidIcon = serverSettings.Icons.checkValid(newIcons)
 
-  if (localState && localState.state && localState.state.icons && isValidIcon) {
-    serverSettings.Icons.setSelection(localState.state.icons)
+  if (localState?.state?.icons && isValidIcon) {
+    serverSettings.Icons.setSelection(newIcons)
   }
-  setIcons(isValidIcon ? newIcons : serverSettings.Icons.selected)
+  setIcons(serverSettings.Icons.selection)
   setStaticIcons(serverSettings.Icons)
-
+  setMenuFilters(useGenerate())
   setConfig(serverSettings.config)
 
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
@@ -119,7 +121,7 @@ export default function ConfigSettings({
       return paramZoom
     }
     if (match.params.zoom) {
-      return match.params.zoom
+      return match.params.zoom || 15
     }
     return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
   }

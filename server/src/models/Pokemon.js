@@ -27,24 +27,23 @@ let ohbem = null
 
 const getMadSql = q => (
   q.leftJoin('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
+    .leftJoin('pokemon_display', 'pokemon.encounter_id', 'pokemon_display.encounter_id')
     .select([
-      ref('encounter_id')
+      '*',
+      ref('pokemon.encounter_id')
         .castTo('CHAR')
         .as('id'),
-      'pokemon_id',
       'pokemon.latitude AS lat',
       'pokemon.longitude AS lon',
       'individual_attack AS atk_iv',
       'individual_defense AS def_iv',
       'individual_stamina AS sta_iv',
-      'move_1',
-      'move_2',
-      'cp',
-      'weight',
       'height AS size',
-      'gender',
-      'form',
-      'costume',
+      'pokemon.form',
+      'pokemon.gender',
+      'pokemon.costume',
+      'pokemon_display.pokemon AS display_pokemon_id',
+      'pokemon_display.form AS ditto_form',
       'weather_boosted_condition AS weather',
       raw('IF(calc_endminsec, 1, NULL)')
         .as('expire_timestamp_verified'),
@@ -86,7 +85,7 @@ class Pokemon extends Model {
       stats, iv: ivs, pvp, areaRestrictions,
     } = perms
     const {
-      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega,
+      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyLinkGlobal,
     } = args.filters
     let queryPvp = false
 
@@ -100,7 +99,7 @@ class Pokemon extends Model {
       const rankCheck = pkmn.rank <= max && pkmn.rank >= min
       const cpCheck = dbType === 'chuck' || reactMapHandlesPvp || pkmn.cp >= pvpMinCp[league]
       const megaCheck = !pkmn.evolution || onlyPvpMega
-      const capCheck = pkmn.capped || args.filters[`onlyPvp${pkmn.cap}`]
+      const capCheck = dbType === 'chuck' || reactMapHandlesPvp ? pkmn.capped || args.filters[`onlyPvp${pkmn.cap}`] : true
       return rankCheck && cpCheck && megaCheck && capCheck
     }
 
@@ -197,6 +196,8 @@ class Pokemon extends Model {
       })
     }
 
+    const globalCheck = (pkmn) => onlyLinkGlobal ? args.filters[`${pkmn.pokemon_id}-${pkmn.form}`] : true
+
     // query builder
     const query = this.query()
     if (isMad) {
@@ -211,8 +212,12 @@ class Pokemon extends Model {
             const relevantFilters = getRelevantKeys(filter)
             const [id, form] = pkmn.split('-')
             ivOr.orWhere(poke => {
-              poke.where('pokemon_id', id)
-              poke.andWhere('form', form)
+              if (id === '132') {
+                poke.where('pokemon_id', id)
+              } else {
+                poke.where('pokemon_id', id)
+                  .andWhere('form', form)
+              }
               if (relevantFilters.length > 0) {
                 generateSql(poke, filter, relevantFilters, true)
               }
@@ -253,7 +258,7 @@ class Pokemon extends Model {
     // form checker
     results.forEach(pkmn => {
       let noPvp = true
-      if (pkmn.pokemon_id === 132) {
+      if (pkmn.pokemon_id === 132 && !pkmn.ditto_form) {
         pkmn.ditto_form = pkmn.form
         pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
       }
@@ -272,7 +277,7 @@ class Pokemon extends Model {
         listOfIds.push(pkmn.id)
         pvpResults.push(pkmn)
       }
-      if (noPvp) {
+      if (noPvp && globalCheck(pkmn)) {
         finalResults.push(pkmn)
       }
     })
@@ -290,7 +295,7 @@ class Pokemon extends Model {
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
         .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
       if (isMad && listOfIds.length > 0) {
-        pvpQuery.whereRaw(`encounter_id NOT IN ( ${listOfIds.join(',')} )`)
+        pvpQuery.whereRaw(`pokemon.encounter_id NOT IN ( ${listOfIds.join(',')} )`)
       } else {
         pvpQuery.whereNotIn('id', listOfIds)
       }
@@ -316,6 +321,10 @@ class Pokemon extends Model {
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       pkmn.cleanPvp = {}
       pkmn.bestPvp = 4096
+      if (pkmn.pokemon_id === 132) {
+        pkmn.ditto_form = pkmn.form
+        pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
+      }
       if (!pkmn.seen_type) pkmn.seen_type = 'encounter'
       Object.keys(parsed).forEach(league => {
         const { filtered, best } = getRanks(league, parsed[league], filterId)
@@ -324,7 +333,7 @@ class Pokemon extends Model {
           if (best < pkmn.bestPvp) pkmn.bestPvp = best
         }
       })
-      if (Object.keys(pkmn.cleanPvp).length > 0 || !pkmn.pvpCheck) {
+      if ((Object.keys(pkmn.cleanPvp).length > 0 || !pkmn.pvpCheck) && globalCheck(pkmn)) {
         finalResults.push(pkmn)
       }
     })

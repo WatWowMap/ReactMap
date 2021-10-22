@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react'
-import { TileLayer, useMap } from 'react-leaflet'
+import React, { useState, useEffect, useCallback } from 'react'
+import { TileLayer, useMap, ZoomControl } from 'react-leaflet'
+import L from 'leaflet'
 
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
@@ -31,13 +32,20 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const setLocation = useStore(state => state.setLocation)
   const setZoom = useStore(state => state.setZoom)
   const userSettings = useStore(state => state.userSettings)
-  const [manualParams, setManualParams] = useState(false)
 
+  const [manualParams, setManualParams] = useState(params)
+  const [lc] = useState(L.control.locate({
+    position: 'bottomright',
+    icon: 'fas fa-location-arrow',
+    keepCurrentZoomLevel: true,
+    setView: 'untilPan',
+  }))
   const initialBounds = {
     minLat: map.getBounds()._southWest.lat,
     maxLat: map.getBounds()._northEast.lat,
     minLon: map.getBounds()._southWest.lng,
     maxLon: map.getBounds()._northEast.lng,
+    zoom: map.getZoom(),
   }
 
   const onMove = useCallback(() => {
@@ -46,9 +54,13 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
     setZoom(map.getZoom())
   }, [map])
 
-  if (manualParams) {
-    params.id = manualParams.id
-  }
+  useEffect(() => {
+    if (settings.navigationControls === 'leaflet') {
+      lc.addTo(map)
+    } else {
+      lc.remove()
+    }
+  }, [settings.navigationControls])
 
   return (
     <>
@@ -59,6 +71,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
       />
+      {settings.navigationControls === 'leaflet' && <ZoomControl position="bottomright" />}
       {Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
         const [category, value] = each
         let enabled = false
@@ -71,7 +84,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               enabled = true
             } break
           case 'gyms':
-            if ((filters[category].gyms && value.gyms)
+            if ((filters[category].allGyms && value.allGyms)
               || (filters[category].raids && value.raids)
               || (filters[category].exEligible && value.exEligible)
               || (filters[category].inBattle && value.inBattle)
@@ -109,15 +122,21 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               userSettings={userSettings[userSettingsCategory(category)] || {}}
               filters={filters[category]}
               tileStyle={tileServers[settings.tileServers].style}
-              zoomLevel={config.clusterZoomLevels[category] || 1}
+              clusterZoomLvl={config.clusterZoomLevels[category]}
               staticUserSettings={staticUserSettings[category]}
-              params={params}
+              params={manualParams}
+              setParams={setManualParams}
             />
           )
         }
         return null
       })}
-      <Nav map={map} setManualParams={setManualParams} Icons={Icons} />
+      <Nav
+        map={map}
+        setManualParams={setManualParams}
+        Icons={Icons}
+        settings={settings}
+      />
     </>
   )
 }

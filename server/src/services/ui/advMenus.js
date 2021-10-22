@@ -1,15 +1,30 @@
+const masterfile = require('../../data/masterfile.json')
+const { map } = require('../config')
+
 const categories = {
-  gyms: ['teams', 'eggs', 'pokemon'],
-  pokestops: ['lures', 'items', 'energy', 'invasions', 'pokemon', 'candy'],
+  gyms: ['teams', 'eggs', 'raids', 'pokemon'],
+  pokestops: ['lures', 'items', 'quest_reward_12', 'invasions', 'pokemon', 'quest_reward_4', 'quest_reward_9', 'quest_reward_3'],
   pokemon: ['pokemon'],
   nests: ['pokemon'],
 }
 
+if (map.enableQuestRewardTypeFilters) {
+  categories.pokestops.push('general')
+}
+
 const pokemonFilters = {
-  generations: ['Kanto', 'Johto', 'Hoenn', 'Sinnoh', 'Unova', 'Kalos', 'Alola', 'Galar'],
-  types: ['Bug', 'Dark', 'Dragon', 'Electric', 'Fairy', 'Fighting', 'Fire', 'Flying', 'Ghost', 'Grass', 'Ground', 'Ice', 'Normal', 'Poison', 'Psychic', 'Rock', 'Steel', 'Water'],
-  forms: ['altForms', 'Alola', 'Galarian'],
-  rarity: ['common', 'uncommon', 'rare', 'ultraRare', 'regional', 'event', 'legendary', 'mythical'],
+  generations: [...new Set(
+    Object.values(masterfile.pokemon)
+      .map(val => `generation_${val.genId}`),
+  )].filter(val => val !== undefined),
+  types: Object.keys(masterfile.types)
+    .map(key => `poke_type_${key}`)
+    .filter(val => val !== 'poke_type_0'),
+  rarity: [...new Set(
+    Object.values(masterfile.pokemon)
+      .map(val => val.rarity),
+  )].filter(val => val !== undefined),
+  forms: ['normalForms', 'altForms', 'Alola', 'Galarian'],
   others: ['reverse', 'selected', 'unselected', 'onlyAvailable'],
 }
 

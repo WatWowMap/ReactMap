@@ -50,16 +50,18 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
   const { area, zoom } = req.params
   try {
     const scanAreas = fs.existsSync('server/src/configs/areas.json')
-      ? JSON.parse(fs.readFileSync('server/src/configs/areas.json'))
+      // eslint-disable-next-line global-require
+      ? require('../configs/areas.json')
       : { features: [] }
     if (scanAreas.features.length) {
       const foundArea = scanAreas.features.find(a => a.properties.name.toLowerCase() === area.toLowerCase())
       if (foundArea) {
         const [lon, lat] = center(foundArea).geometry.coordinates
         res.redirect(`/@/${lat}/${lon}/${zoom || 15}`)
+      } else {
+        res.send(`${area} is not an available area`)
       }
     }
-    res.redirect('/')
   } catch (e) {
     res.send(`Error navigating to ${area}`, e)
   }
@@ -106,6 +108,10 @@ rootRouter.get('/settings', async (req, res) => {
           temporary: {},
           persistent: {},
         },
+        navigationControls: {
+          react: {},
+          leaflet: {},
+        },
         manualAreas: config.manualAreas || {},
         icons: config.icons,
       }
@@ -128,7 +134,11 @@ rootRouter.get('/settings', async (req, res) => {
           Object.keys(category).forEach(option => {
             category[option].name = option
           })
-          serverSettings.settings[setting] = category[Object.keys(category)[0]].name
+          if (config.map[setting] && typeof config.map[setting] !== 'object') {
+            serverSettings.settings[setting] = config.map[setting]
+          } else {
+            serverSettings.settings[setting] = category[Object.keys(category)[0]].name
+          }
         }
       })
 

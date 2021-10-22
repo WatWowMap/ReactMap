@@ -6,13 +6,10 @@ const fetchJson = require('./functions/fetchJson')
 const defaultRarity = require('../data/defaultRarity.json')
 
 const getRarityLevel = (id, pkmn) => {
-  let adminRarity
+  const adminRarity = fs.existsSync('../configs/config.json')
+    ? JSON.parse(fs.readFileSync('server/src/configs/config.json', 'utf8'))
+    : JSON.parse(fs.readFileSync('server/src/configs/default.json', 'utf8'))
   let rarity
-  if (fs.existsSync('../configs/config.json')) {
-    adminRarity = JSON.parse(fs.readFileSync('server/src/configs/config.json', 'utf8'))
-  } else {
-    adminRarity = JSON.parse(fs.readFileSync('server/src/configs/default.json', 'utf8'))
-  }
   for (const [tier, pokemon] of Object.entries(defaultRarity)) {
     if (adminRarity.rarity[tier].length > 0) {
       if (adminRarity.rarity[tier].includes((parseInt(id)))) {
@@ -23,7 +20,7 @@ const getRarityLevel = (id, pkmn) => {
     }
   }
   if (pkmn.legendary) rarity = 'legendary'
-  if (pkmn.mythic) rarity = 'mythical'
+  if (pkmn.mythical) rarity = 'mythical'
   return rarity
 }
 
