@@ -20,7 +20,7 @@ Pokemon GO Map frontend built with React. Currently in beta testing!
 
 ## PreReqs
 
-- NodeJS (Recommend using V12+)
+- NodeJS (V14+)
 - MySQL (Only 8.0+ has been tested)
 - Or MariaDB (10.4 has been tested)
 - Yarn (npm install -g yarn)

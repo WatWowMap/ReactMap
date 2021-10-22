@@ -79,6 +79,9 @@ export default class UIcons {
                 ...this[icon.name].modifiers[category],
               }
             }
+            if (icon.path === baseUrl) {
+              this.selected.misc = icon.name
+            }
             if (!this.selected[category]) {
               this.selected[category] = icon.name
               this.modifiers[category] = this[icon.name].modifiers[category]
@@ -89,6 +92,10 @@ export default class UIcons {
     }
   }
 
+  get selection() {
+    return { ...this.selected }
+  }
+
   checkValid(localIconObj) {
     return Object.values(localIconObj).every(icon => this[icon])
   }
@@ -96,12 +103,14 @@ export default class UIcons {
   setSelection(categories, value) {
     if (typeof categories === 'object') {
       Object.keys(categories).forEach(category => {
-        this.selected[category] = categories[category]
-        this.modifiers[category] = this[categories[category]]
-          ? this[categories[category]].modifiers[category]
-          : this.modifiers.base
+        if (category !== 'misc') {
+          this.selected[category] = categories[category]
+          this.modifiers[category] = this[categories[category]]
+            ? this[categories[category]].modifiers[category]
+            : this.modifiers.base
+        }
       })
-    } else {
+    } else if (categories !== 'misc') {
       this.selected[categories] = value
       this.modifiers[categories] = this[value]
         ? this[value].modifiers[categories]

@@ -69,7 +69,6 @@ export default function App() {
       if (data.config.icons.defaultIcons) {
         Icons.setSelection(data.config.icons.defaultIcons)
       }
-      data.userSettings.icons = Icons.selected
     }
     if (data.ui?.pokestops?.invasions && data.config?.map.fetchLatestInvasions) {
       const invasionCache = JSON.parse(localStorage.getItem('invasions_cache'))

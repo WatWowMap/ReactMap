@@ -365,5 +365,6 @@
   "linkGlobalAndAdvanced": "Enlaces globales y avanzadas",
   "normalForms": "Formas normales",
   "weatherIndicator": "Indicador meteorológico",
-  "page": "Página {{page}}"
+  "page": "Página {{page}}",
+  "navigationControls": "Controles de navegación"
 }
