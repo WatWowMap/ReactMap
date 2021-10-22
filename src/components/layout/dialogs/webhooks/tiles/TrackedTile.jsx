@@ -10,7 +10,7 @@ import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   const {
     tileItem, columnCount, Icons, syncWebhook, selectedWebhook, selected, setSelected,
-    tracked, setTracked, isMobile, setSend, setTempFilters, leagues, category, Poracle, invasions,
+    tracked, setTracked, isMobile, setSend, setTempFilters, leagues, category, t, Poracle, invasions,
   } = data
   const [editDialog, setEditDialog] = useState(false)
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -50,6 +50,9 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   }
 
   const id = Poracle.getId(item, category, invasions)
+  if (category === 'invasion') {
+    item.grunt_id = Object.keys(invasions).find(key => invasions[key]?.type?.toLowerCase() === item.grunt_type)
+  }
   return (
     <Grid
       container
@@ -65,12 +68,12 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
           style={{ maxWidth: 40, maxHeight: 40 }}
         />
       </Grid>
-      <Grid item xs={6} sm={9}>
+      <Grid item xs={6} sm={8} md={9}>
         <Typography variant="caption">
-          {Poracle.generateDescription(item, leagues, isMobile)}
+          {Poracle.generateDescription(item, category, leagues, t)}
         </Typography>
       </Grid>
-      <Grid item xs={4} sm={2}>
+      <Grid item xs={4} sm={3} md={2} style={{ textAlign: 'right' }}>
         <IconButton size="small" onClick={() => setEditDialog(true)}>
           <Edit style={{ color: 'white' }} />
         </IconButton>

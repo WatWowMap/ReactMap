@@ -1,17 +1,18 @@
 import React, { useEffect, useState, memo } from 'react'
 import { useMutation } from '@apollo/client'
+import { useTranslation } from 'react-i18next'
 
 import Query from '@services/Query'
 import { useStatic } from '@hooks/useStore'
 import ReactWindow from '@components/layout/general/ReactWindow'
-
-import PokemonTile from './tiles/PoraclePokemon'
+import PokemonTile from './tiles/TrackedTile'
 import Selecting from './Selecting'
 
 const Tracked = ({
   isMobile, webhookData, selectedWebhook, Icons, send, setSend,
   tempFilters, setTempFilters, setWebhookData, category, Poracle,
 }) => {
+  const { t } = useTranslation()
   const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook(category))
   const [tracked, setTracked] = useState(webhookData[selectedWebhook][category])
   const [selected, setSelected] = useState({})
@@ -61,7 +62,7 @@ const Tracked = ({
     setSelected(newObj)
   }
   return (
-    <>
+    <div style={{ height: '100%' }}>
       <ReactWindow
         columnCount={1}
         length={tracked.length}
@@ -78,17 +79,18 @@ const Tracked = ({
           setSelected,
           setSend,
           setTempFilters,
-          leagues: staticInfo.pokemon.leagues,
+          leagues: webhookData[selectedWebhook].leagues,
           category,
           Poracle,
           invasions,
+          t,
         }}
         Tile={PokemonTile}
       />
       {Object.values(selected).some(x => x) && (
         <Selecting setSelected={setSelected} handleAll={handleAll} />
       )}
-    </>
+    </div>
   )
 }
 

@@ -1,8 +1,7 @@
 import React from 'react'
 import {
-  Paper, InputBase, IconButton, Grid, Typography, Button, Chip,
+  Grid, Typography, Button, Chip,
 } from '@material-ui/core'
-import { HighlightOff } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import useStyles from '@hooks/useStyles'
@@ -12,11 +11,11 @@ import Utility from '@services/Utility'
 import FilterOptions from './Options'
 
 export default function OptionsContainer({
-  advMenu, setAdvMenu, search, setSearch, menus, setMenus,
+  advMenu, setAdvMenu, menus, setMenus,
   category, handleReset, count,
 }) {
-  const classes = useStyles()
   const { t } = useTranslation()
+  const classes = useStyles()
   const { [category]: staticMenus } = useStatic(state => state.menus)
 
   const handleChange = (name, event) => {
@@ -34,14 +33,6 @@ export default function OptionsContainer({
         },
       },
     })
-  }
-
-  const handleSearchChange = event => {
-    setSearch(event.target.value.toString().toLowerCase())
-  }
-
-  const resetSearch = () => {
-    setSearch('')
   }
 
   const handleAccordion = (panel) => (event, isExpanded) => {
@@ -77,31 +68,13 @@ export default function OptionsContainer({
   })
 
   allFilterMenus.push(
-    <Paper elevation={0} variant="outlined" className={classes.search} key="search">
-      <InputBase
-        className={classes.input}
-        placeholder={t(`search${category}`)}
-        name="search"
-        value={search}
-        onChange={handleSearchChange}
-        fullWidth
-        autoComplete="off"
-        variant="outlined"
-      />
-      <IconButton
-        className={classes.iconButton}
-        onClick={resetSearch}
-      >
-        <HighlightOff style={{ color: '#848484' }} />
-      </IconButton>
-    </Paper>,
-    <Grid container key="resetShowing" justifyContent="center" alignItems="center" style={{ marginBottom: 10 }}>
-      <Grid item xs={6} style={{ textAlign: 'center' }}>
+    <Grid container key="resetShowing" justifyContent="center" alignItems="center" style={{ margin: '10px 0' }}>
+      <Grid item xs={5} sm={6} style={{ textAlign: 'center' }}>
         <Button onClick={handleReset} color="primary" size="small">
           {t('resetFilters')}
         </Button>
       </Grid>
-      <Grid item xs={6} style={{ textAlign: 'center' }}>
+      <Grid item xs={7} sm={6} style={{ textAlign: 'center' }}>
         <Typography variant="subtitle2" align="center">
           {t('showing')}: {count.show}/{count.total}
         </Typography>

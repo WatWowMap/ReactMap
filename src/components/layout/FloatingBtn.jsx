@@ -11,7 +11,7 @@ import useStyles from '@hooks/useStyles'
 import useLocation from '@hooks/useLocation'
 
 export default function FloatingButtons({
-  toggleDrawer, toggleDialog, safeSearch, isMobile, perms, webhookMode, setWebhookMode, settings,
+  toggleDrawer, toggleDialog, safeSearch, isMobile, perms, webhookMode, setWebhookMode, settings, webhooks,
 }) {
   const { t } = useTranslation()
   const map = useMap()
@@ -45,7 +45,7 @@ export default function FloatingButtons({
           </Fab>
         </Grid>
       )}
-      {perms?.webhooks?.length && (
+      {(perms?.webhooks?.length && webhooks) && (
         <Grid item>
           <Fab color="secondary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('webhook')} disabled={Boolean(webhookMode)}>
             <NotificationsActive fontSize={iconSize} />

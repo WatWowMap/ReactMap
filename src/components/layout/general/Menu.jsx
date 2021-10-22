@@ -18,6 +18,7 @@ import SlotSelection from '../dialogs/filters/SlotSelection'
 import OptionsContainer from '../dialogs/filters/OptionsContainer'
 import Help from '../dialogs/tutorial/Advanced'
 import WebhookAdvanced from '../dialogs/webhooks/WebhookAdv'
+import AdvSearch from '../dialogs/filters/AdvSearch'
 
 export default function Menu({
   isTablet, isMobile, category, Tile, webhookCategory,
@@ -185,32 +186,39 @@ export default function Menu({
       />
       <DialogContent style={{ padding: '8px 5px', height: '100%' }}>
         <Grid container spacing={1}>
-          {isMobile ? (
-            <Grid item style={{ height: '85vh', overflow: 'auto' }} />
-          ) : (
+          {!isMobile && (
             <Grid item sm={3} style={{ height: '75vh', overflow: 'auto' }}>
               {Options}
             </Grid>
           )}
-          <ReactWindow
-            columnCount={columnCount}
-            length={filteredArr.length}
-            flex
-            offset={0}
-            data={{
-              isMobile,
-              tileItem: filteredArr,
-              tempFilters,
-              setTempFilters,
-              toggleAdvMenu,
-              toggleSlotsMenu,
-              type: category,
-              Utility,
-              toggleWebhook,
-              webhookCategory,
-            }}
-            Tile={Tile}
-          />
+          <Grid container item xs={12} sm={9} direction="column" style={isMobile ? { height: '85vh' } : {}}>
+            <AdvSearch
+              search={search}
+              setSearch={setSearch}
+              category={category}
+            />
+            <div style={{ flex: '1 1 auto' }}>
+              <ReactWindow
+                columnCount={columnCount}
+                length={filteredArr.length}
+                flex
+                offset={0}
+                data={{
+                  isMobile,
+                  tileItem: filteredArr,
+                  tempFilters,
+                  setTempFilters,
+                  toggleAdvMenu,
+                  toggleSlotsMenu,
+                  type: category,
+                  Utility,
+                  toggleWebhook,
+                  webhookCategory,
+                }}
+                Tile={Tile}
+              />
+            </div>
+          </Grid>
         </Grid>
       </DialogContent>
       <Footer options={footerButtons} role="dialogFilterFooter" />

@@ -19,7 +19,7 @@ const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
 export default function Nav({
   map, setManualParams, Icons, config,
-  setWebhookMode, webhookMode, settings,
+  setWebhookMode, webhookMode, settings, webhooks,
 }) {
   const classes = useStyles()
   const theme = useTheme()
@@ -109,6 +109,7 @@ export default function Nav({
           safeSearch={safeSearch}
           isMobile={isMobile}
           perms={perms}
+          webhooks={webhooks}
           webhookMode={webhookMode}
           setWebhookMode={setWebhookMode}
           scanAreasOn={filters.scanAreas.enabled}

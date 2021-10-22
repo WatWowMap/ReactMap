@@ -428,5 +428,8 @@
   "allMoves": "All Moves",
   "move": "Move",
   "any": "Any",
-  "min_spawn_average": "Min Spawn Rate"
+  "min_spawn_average": "Min Spawn Rate",
+  "selectAll": "Select All",
+  "deleteAll": "Delete All",
+  "cancel": "Cancel"
 }

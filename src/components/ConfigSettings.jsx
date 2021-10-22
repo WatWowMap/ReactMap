@@ -108,9 +108,7 @@ export default function ConfigSettings({
   setConfig(serverSettings.config)
   setWebhookData(serverSettings.webhooks)
 
-  if (localState && localState.state
-    && serverSettings.webhooks
-    && serverSettings.webhooks[localState.state.selectedWebhook]) {
+  if (localState?.state && serverSettings?.webhooks?.[localState.state?.selectedWebhook]) {
     setSelectedWebhook(localState.state.selectedWebhook)
   } else if (serverSettings?.webhooks) {
     setSelectedWebhook(serverSettings.webhooks[Object.keys(serverSettings.webhooks)[0]].name)

@@ -161,6 +161,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         config={config}
         webhookMode={webhookMode}
         setWebhookMode={setWebhookMode}
+        webhooks={webhooks}
         settings={settings}
       />
     </>

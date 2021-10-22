@@ -1,6 +1,6 @@
 export default class Poracle {
   static filterGenerator = (poracleInfo, reactMapFilters, invasions) => {
-    if (!poracleInfo) {
+    if (!poracleInfo?.config) {
       return {}
     }
     const { info: { pokemon, raid, egg, invasion, lure, nest, quest }, human } = poracleInfo
@@ -272,13 +272,19 @@ export default class Poracle {
     }
   }
 
-  static generateDescription(pkmn, leagues, isMobile) {
-    if (isMobile) {
-      return pkmn.pvp_ranking_league
-        ? `${leagues.find(league => league.cp === pkmn.pvp_ranking_league).name} ${pkmn.pvp_ranking_best}-${pkmn.pvp_ranking_worst}`
-        : `${pkmn.min_iv}-${pkmn.max_iv}% | L${pkmn.min_level}-${pkmn.max_level}
-        A${pkmn.atk}-${pkmn.max_atk} | D${pkmn.def}-${pkmn.max_def} | S${pkmn.sta}-${pkmn.max_sta}${pkmn.distance ? ` | d${pkmn.distance}` : ''}`
+  static generateDescription(item, category, leagues, t) {
+    switch (category) {
+      case 'invasion': return `${t(`grunt_${item.grunt_id}`)} ${item.distance ? ` | d${item.distance}` : ''}`
+      case 'lure': return `${t(`lure_${item.lure_id}`)} ${item.distance ? ` | d${item.distance}` : ''}`
+      case 'quest': return `${t(`quest_reward_${item.reward_type}`)} | ${item.reward} ${item.amount}`
+      case 'raid':
+      case 'egg': return `Level ${item.level} ${item.exclusive ? 'Exclusive Only' : ''} ${item.clean ? 'clean' : ''} Template: ${item.template} ${item.team === 4 ? '' : item.team} ${item.gym_id ? 'Gym:' : ''}${item.distance ? ` | d${item.distance}` : ''}`
+      case 'nest': return `${t(`poke_${item.pokemon_id}`)} | Min Spawn: ${item.min_spawn_avg}`
+      case 'pokemon':
+      default: return item.pvp_ranking_league
+        ? `${leagues.find(league => league.cp === item.pvp_ranking_league).name} ${item.pvp_ranking_best}-${item.pvp_ranking_worst}`
+        : `${item.min_iv}-${item.max_iv}% | L${item.min_level}-${item.max_level}
+        A${item.atk}-${item.max_atk} | D${item.def}-${item.max_def} | S${item.sta}-${item.max_sta}${item.distance ? ` | d${item.distance}` : ''}`
     }
-    return pkmn.description?.replace(/\**/g, '')
   }
 }
