@@ -12,6 +12,7 @@ export default function genPokemon(t, pokemon, categories) {
         : pokeName
       tempObj.pokemon[id] = {
         name: form.name === '*' ? `${name}*` : name,
+        category: form.name === '*' ? form.category : undefined,
         pokedexId: +i,
         formId: +j,
         defaultFormId: pkmn.defaultFormId,
