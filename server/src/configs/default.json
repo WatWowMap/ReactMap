@@ -217,14 +217,7 @@
       }
     }
   },
-  "webhooks": {
-    "enabled": false,
-    "provider": "poracle",
-    "name": "Poracle",
-    "host": "http://127.0.0.1",
-    "port": 4040,
-    "poracleSecret": ""
-  },
+  "webhooks": [],
   "excludeFromTutorial": [],
   "alwaysEnabledPerms": [],
   "discord": {
