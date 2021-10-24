@@ -83,7 +83,6 @@ export default function Nav({
       ) : (
         <Dialog
           open={tutorial}
-          fullWidth={!isMobile}
           fullScreen={isMobile}
         >
           <Tutorial

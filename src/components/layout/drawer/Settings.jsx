@@ -10,17 +10,15 @@ import { useStore, useStatic } from '@hooks/useStore'
 import SlideTransition from '@assets/mui/SlideTransition'
 
 import UserProfile from '../dialogs/UserProfile'
-import Tutorial from '../dialogs/tutorial/Tutorial'
 import Feedback from '../dialogs/Feedback'
 
-export default function Settings({ toggleDialog, Icons }) {
+export default function Settings({ Icons }) {
   const { t, i18n } = useTranslation()
   const config = useStatic(state => state.config)
   const staticSettings = useStatic(state => state.settings)
   const { discord, loggedIn } = useStatic(state => state.auth)
   const setStaticIcons = useStatic(state => state.setIcons)
 
-  const tutorial = useStore(state => state.tutorial)
   const setTutorial = useStore(state => state.setTutorial)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
@@ -288,9 +286,6 @@ export default function Settings({ toggleDialog, Icons }) {
       </Snackbar>
       <Dialog open={userProfile}>
         <UserProfile setUserProfile={setUserProfile} />
-      </Dialog>
-      <Dialog open={tutorial}>
-        <Tutorial setUserProfile={setUserProfile} setTutorial={setTutorial} toggleDialog={toggleDialog} />
       </Dialog>
       <Dialog
         open={feedback}

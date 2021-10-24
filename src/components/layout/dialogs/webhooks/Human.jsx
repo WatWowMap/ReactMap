@@ -131,17 +131,19 @@ const Human = ({
         flexItem
         style={{ height: 5, width: '100%', margin: '15px 0px' }}
       />
-      <Areas
-        t={t}
-        webhookData={webhookData[selectedWebhook]}
-        setWebhookMode={setWebhookMode}
-        selectedAreas={selectedAreas}
-        syncWebhook={syncWebhook}
-        webhookMode={webhookMode}
-        selectedWebhook={selectedWebhook}
-        currentHuman={currentHuman}
-        isMobile={isMobile}
-      />
+      {webhookData[selectedWebhook].areas.status !== false ? (
+        <Areas
+          t={t}
+          webhookData={webhookData[selectedWebhook]}
+          setWebhookMode={setWebhookMode}
+          selectedAreas={selectedAreas}
+          syncWebhook={syncWebhook}
+          webhookMode={webhookMode}
+          selectedWebhook={selectedWebhook}
+          currentHuman={currentHuman}
+          isMobile={isMobile}
+        />
+      ) : <Typography>{`Invalid Area File Received from ${selectedWebhook}`}</Typography>}
     </Grid>
   )
 }
