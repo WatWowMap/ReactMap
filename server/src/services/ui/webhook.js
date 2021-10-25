@@ -1,6 +1,4 @@
-const { database: { settings: { leagues } } } = require('../config')
-
-module.exports = function selectProvider(provider, hookConfig, pvp) {
+module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
   switch (provider) {
     case 'poracle': {
       const pvpMax = hookConfig[`pvpFilter${leagues[0].name.charAt(0).toUpperCase()}${leagues[0].name.substring(1)}MinCP`] || 4096

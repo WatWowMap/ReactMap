@@ -1,6 +1,6 @@
 export default class Poracle {
   static filterGenerator = (poracleInfo, reactMapFilters, invasions) => {
-    if (!poracleInfo?.config) {
+    if (!poracleInfo?.valid) {
       return {}
     }
     const { info: { pokemon, raid, egg, invasion, lure, nest, quest }, human } = poracleInfo

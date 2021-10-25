@@ -1,12 +1,6 @@
 /* eslint-disable no-console */
-const { webhooks } = require('../config')
-// const webhookConverter = require('../functions/webhookConverter')
+const config = require('../config')
 const fetchJson = require('./fetchJson')
-
-const webhookObj = {}
-webhooks.forEach(hook => {
-  webhookObj[hook.name] = hook
-})
 
 // const looper = (num, toLoop, staticData, skipZero) => {
 //   const arr = []
@@ -26,115 +20,94 @@ webhooks.forEach(hook => {
 //     options: { method: 'GET', headers },
 //   },
 // }[category])
-
 module.exports = async function webhookApi(category, discordId, method, webhookName, data = null) {
-  const webhook = webhookObj[webhookName]
-
-  const headers = {}
-  switch (webhook.provider) {
-    case 'poracle': Object.assign(headers, { 'X-Poracle-Secret': webhook.poracleSecret }); break
-    default: break
-  }
-
-  console.log(category)
-
-  const payloadObj = {}
-  switch (category) {
-    case 'poracleWeb':
-    case 'templates':
-      Object.assign(payloadObj, {
-        url: `${webhook.host}:${webhook.port}/api/config/${category}?names=true`,
-        options: { method, headers },
-      }); break
-    case 'switchProfile':
-      Object.assign(payloadObj, {
-        url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}/${data}`,
-        options: { method, headers },
-        get: 'human',
-      }); break
-    case 'setLocation':
-      Object.assign(payloadObj, {
-        url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}/${data[0]}/${data[1]}`,
-        options: { method, headers },
-        get: 'human',
-      }); break
-    case 'setAreas':
-      Object.assign(payloadObj, {
-        url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}`,
-        options: {
-          method, headers, body: JSON.stringify(data),
-        },
-        get: 'human',
-      }); break
-    case 'geojson':
-      Object.assign(payloadObj, {
-        url: `${webhook.host}:${webhook.port}/api/geofence/all/${category}`,
-        options: { method, headers },
-      }); break
-    case 'areas':
-      Object.assign(payloadObj, {
-        url: `${webhook.host}:${webhook.port}/api/geofence/all/hash`,
-        options: { method, headers },
-      }); break
-    case 'humans':
-      Object.assign(payloadObj, {
-        url: `${webhook.host}:${webhook.port}/api/humans/${discordId}`,
-        options: { method, headers },
-      }); break
-    case 'egg':
-    case 'invasion':
-    case 'lure':
-    case 'nest':
-    case 'pokemon':
-    case 'quest':
-    case 'raid':
-      Object.assign(payloadObj, {
-        url: `${webhook.host}:${webhook.port}/api/tracking/${category}/${discordId}${method === 'DELETE' ? `/byUid/${data.uid}` : ''}`,
-        options: {
-          method, headers, body: method === 'POST' ? JSON.stringify(data) : undefined,
-        },
-        get: method === 'DELETE' ? undefined : category,
-      }); break
-    default:
-      Object.assign(payloadObj, {
-        url: `${webhook.host}:${webhook.port}/api/tracking/${category}/${discordId}${method === 'DELETE' ? `/byUid/${data.uid}` : ''}`,
-        options: {
-          method, headers, body: data ? JSON.stringify(data) : null,
-        },
-        // get: category,
-      }); break
-  }
-
-  if (payloadObj.options.body) {
-    Object.assign(payloadObj.options.headers, { Accept: 'application/json', 'Content-Type': 'application/json' })
-  }
-  if (method === 'PATCH') {
-    method = 'POST'
-  }
-
   try {
-    const post = await fetchJson(payloadObj.url, payloadObj.options)
+    const webhook = config.webhookObj[webhookName]?.server
+    if (!webhook) {
+      throw new Error('Invalid Webhook selected: ', webhookName)
+    }
+    const headers = {}
+    switch (webhook.provider) {
+      case 'poracle': Object.assign(headers, { 'X-Poracle-Secret': webhook.poracleSecret }); break
+      default: break
+    }
 
-    if (category === 'templates') {
-      post[webhook.platform].pokemon = post[webhook.platform].monster
-      delete post[webhook.platform].monster
-      post[webhook.platform].pokemonNoIv = post[webhook.platform].monsterNoIv
-      delete post[webhook.platform].monsterNoIv
+    console.log(category)
+
+    const payloadObj = {}
+    switch (category) {
+      case 'switchProfile':
+        Object.assign(payloadObj, {
+          url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}/${data}`,
+          options: { method, headers },
+          get: 'human',
+        }); break
+      case 'setLocation':
+        Object.assign(payloadObj, {
+          url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}/${data[0]}/${data[1]}`,
+          options: { method, headers },
+          get: 'human',
+        }); break
+      case 'setAreas':
+        Object.assign(payloadObj, {
+          url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}`,
+          options: {
+            method, headers, body: JSON.stringify(data),
+          },
+          get: 'human',
+        }); break
+      case 'geojson':
+        Object.assign(payloadObj, {
+          url: `${webhook.host}:${webhook.port}/api/geofence/all/${category}`,
+          options: { method, headers },
+        }); break
+      case 'humans':
+        Object.assign(payloadObj, {
+          url: `${webhook.host}:${webhook.port}/api/humans/${discordId}`,
+          options: { method, headers },
+        }); break
+      case 'egg':
+      case 'invasion':
+      case 'lure':
+      case 'nest':
+      case 'pokemon':
+      case 'quest':
+      case 'raid':
+        Object.assign(payloadObj, {
+          url: `${webhook.host}:${webhook.port}/api/tracking/${category}/${discordId}${method === 'DELETE' ? `/byUid/${data.uid}` : ''}`,
+          options: {
+            method, headers, body: method === 'POST' ? JSON.stringify(data) : undefined,
+          },
+          get: method === 'DELETE' ? undefined : category,
+        }); break
+      default:
+        Object.assign(payloadObj, {
+          url: `${webhook.host}:${webhook.port}/api/tracking/${category}/${discordId}${method === 'DELETE' ? `/byUid/${data.uid}` : ''}`,
+          options: {
+            method, headers, body: data ? JSON.stringify(data) : null,
+          },
+        }); break
     }
-    if (category === 'areas') {
-      return Object.keys(post.areas).map(a => a).sort()
+
+    if (payloadObj.options.body) {
+      Object.assign(payloadObj.options.headers, { Accept: 'application/json', 'Content-Type': 'application/json' })
     }
+    if (method === 'PATCH') {
+      method = 'POST'
+    }
+
+    const post = await fetchJson(payloadObj.url, payloadObj.options, config.devOptions.enabled)
+
     if (payloadObj.get) {
       const getUrl = payloadObj.get === 'human'
         ? `${webhook.host}:${webhook.port}/api/humans/one/${discordId}`
         : `${webhook.host}:${webhook.port}/api/tracking/${payloadObj.get}/${discordId}`
-      // GETcategory(webhook, headers, discordId, payloadObj.get)
-      const get = await fetchJson(getUrl, { method: 'GET', headers })
+      const get = await fetchJson(getUrl, { method: 'GET', headers }, config.devOptions.enabled)
       return { ...post, ...get }
     }
     return post
   } catch (e) {
-    console.error(e, 'Issue with fetching or getting data', payloadObj)
+    console.log(e, 'There was a problem processing that webhook request')
     return { status: false }
   }
 }

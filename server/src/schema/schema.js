@@ -22,7 +22,7 @@ const SpawnpointType = require('./spawnpoint')
 const WeatherType = require('./weather')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
-const { map, webhooks } = require('../services/config')
+const config = require('../services/config')
 const {
   Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
 } = require('../models/index')
@@ -56,17 +56,19 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.webhooks) {
-          const webhook = webhooks.find(hook => hook.name === args.name)
-          const geocoder = NodeGeocoder({
-            provider: 'openstreetmap',
-            osmServer: webhook.nominatimUrl,
-            timeout: 5000,
-          })
-          geocoder._geocoder._formatResult = ((original) => (result) => ({
-            ...original(result),
-            suburb: result.address.suburb || '',
-          }))(geocoder._geocoder._formatResult)
-          return geocoder.geocode(args.search)
+          const webhook = config.webhookObj[args.name]
+          if (webhook) {
+            const geocoder = NodeGeocoder({
+              provider: 'openstreetmap',
+              osmServer: webhook.server.nominatimUrl,
+              timeout: 5000,
+            })
+            geocoder._geocoder._formatResult = ((original) => (result) => ({
+              ...original(result),
+              suburb: result.address.suburb || '',
+            }))(geocoder._geocoder._formatResult)
+            return geocoder.geocode(args.search)
+          }
         }
       },
     },
@@ -249,7 +251,7 @@ const RootQuery = new GraphQLObjectType({
       },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.s2cells && args.zoom >= map.scanCellsZoom) {
+        if (perms.s2cells && args.zoom >= config.map.scanCellsZoom) {
           return S2cell.getAllCells(args, perms, Utility.dbSelection('pokestop') === 'mad')
         }
         return []
@@ -325,7 +327,7 @@ const RootQuery = new GraphQLObjectType({
       },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms.submissionCells && args.zoom >= map.submissionZoom - 1) {
+        if (perms.submissionCells && args.zoom >= config.map.submissionZoom - 1) {
           const isMadStops = Utility.dbSelection('pokestop') === 'mad'
           const isMadGyms = Utility.dbSelection('gym') === 'mad'
 
@@ -368,7 +370,7 @@ const RootQuery = new GraphQLObjectType({
           const pokestops = await stopQuery
           const gyms = await gymQuery
           return [{
-            placementCells: args.zoom >= map.submissionZoom
+            placementCells: args.zoom >= config.submissionZoom
               ? Utility.getPlacementCells(args, pokestops, gyms)
               : [],
             typeCells: Utility.getTypeCells(args, pokestops, gyms),
@@ -409,12 +411,13 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms.webhooks) {
-          const { name } = args
-          const { geoJSON } = await Fetch.webhookApi('geojson', req.user.id, 'GET', name)
-          const webhook = webhooks.find(hook => hook.name === name)
-          const skip = webhook.areasToSkip.map(a => a.toLowerCase())
-          geoJSON.features = geoJSON.features.filter(f => !skip.includes(f.properties.name.toLowerCase()))
-          return geoJSON
+          const { geoJSON } = await Fetch.webhookApi('geojson', req.user.id, 'GET', args.name)
+          const webhook = config.webhookObj[args.name]
+          if (webhook) {
+            const skip = webhook.server.areasToSkip.map(a => a.toLowerCase())
+            geoJSON.features = geoJSON.features.filter(f => !skip.includes(f.properties.name.toLowerCase()))
+            return geoJSON
+          }
         }
       },
     },

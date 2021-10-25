@@ -1,8 +1,8 @@
 const fetch = require('node-fetch')
 
-module.exports = async function fetchJson(url, options = undefined) {
+module.exports = async function fetchJson(url, options = undefined, log = false) {
   try {
-    console.log(url, options)
+    if (log) console.log(url, options)
     const response = await fetch(url, options)
     if (!response.ok) {
       throw new Error(`${response.status} (${response.statusText})`)
