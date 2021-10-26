@@ -1,5 +1,5 @@
 # ReactMap
-[![GitHub Release](https://img.shields.io/github/release/WatWowMap/ReactMap.svg)](https://github.com/WatWowMap/ReactMNap/releases/)
+[![GitHub Release](https://img.shields.io/github/release/WatWowMap/ReactMap.svg)](https://github.com/WatWowMap/ReactMap/releases/)
 [![GitHub Contributors](https://img.shields.io/github/contributors/WatWowMap/ReactMap.svg)](https://github.com/WatWowMap/ReactMap/graphs/contributors/)
 [![Discord](https://img.shields.io/discord/552003258000998401.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/zZ9h9Xa)  
 ## Description
