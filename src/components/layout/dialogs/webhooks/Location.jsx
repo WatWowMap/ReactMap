@@ -105,7 +105,7 @@ const Location = ({
             <TextField
               // eslint-disable-next-line react/jsx-props-no-spreading
               {...params}
-              label="Search"
+              label={t('search_location')}
               variant="outlined"
               onChange={(e) => search({ variables: { search: e.target.value } })}
               InputProps={{

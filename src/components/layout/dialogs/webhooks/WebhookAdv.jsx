@@ -16,18 +16,25 @@ import {
   AccordionSummary,
   AccordionDetails,
   Divider,
+  CircularProgress,
 } from '@material-ui/core'
 import { ExpandMore } from '@material-ui/icons'
-import { useTranslation } from 'react-i18next'
+import { Autocomplete } from '@material-ui/lab'
+import { Trans, useTranslation } from 'react-i18next'
+import { useLazyQuery } from '@apollo/client'
 
 import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
+
+import Query from '@services/Query'
+import Utility from '@services/Utility'
 import Poracle from '@services/Poracle'
+
 import SliderTile from '@components/layout/dialogs/filters/SliderTile'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 
-const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive', 'lure_id', 'reward', 'reward_type', 'grunt_type', 'grunt_id']
+const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive', 'lure_id', 'reward', 'reward_type', 'grunt_type', 'grunt_id', 'gym_id']
 
 export default function WebhookAdvanced({
   category, id, toggleWebhook, tempFilters, isMobile,
@@ -35,14 +42,26 @@ export default function WebhookAdvanced({
   const idObj = Poracle.getIdObj(id)
   const { t } = useTranslation()
   const classes = useStyles()
+  const location = useStore(state => state.location)
   const selectedWebhook = useStore(s => s.selectedWebhook)
   const webhookAdv = useStore(s => s.webhookAdv)
   const setWebhookAdv = useStore(s => s.setWebhookAdv)
   const { [selectedWebhook]: {
-    info: { [category]: info }, profile, human, template, prefix, leagues, pvp,
+    info: { [category]: info }, profile, human, template, prefix, leagues, pvp, addressFormat,
   } } = useStatic(s => s.webhookData)
   const { pokemon, moves, types } = useStatic(s => s.masterfile)
 
+  const [search, { data, previousData, loading }] = useLazyQuery(Query.search('webhook'), {
+    variables: {
+      search: '',
+      category: '',
+      lat: location[0],
+      lon: location[1],
+      locale: localStorage.getItem('i18nextLng'),
+      webhookName: selectedWebhook,
+    },
+  })
+  const fetchedData = data || previousData
   const [filterValues, setFilterValues] = useState(tempFilters?.template
     ? Poracle.reactMapFriendly(tempFilters)
     : { ...Poracle.reactMapFriendly(info.defaults), profile_no: human.current_profile_no })
@@ -300,6 +319,67 @@ export default function WebhookAdvanced({
                 : null,
             }}
           />
+        </Grid>
+      ))
+      case 'autoComplete': return options.map(option => (
+        <Grid
+          key={option.name}
+          item
+          container
+          xs={option.xs}
+          sm={option.sm}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Grid item xs={11}>
+            <Autocomplete
+              style={{ width: '100%' }}
+              getOptionLabel={(x) => `${x.name} - ${Utility.formatter(addressFormat, x.formatted)}`}
+              filterOptions={(x) => x}
+              options={fetchedData ? fetchedData.search : []}
+              autoComplete
+              includeInputInList
+              freeSolo
+              onChange={(event, newValue) => {
+                if (newValue) {
+                  setPoracleValues({ ...poracleValues, gym_id: newValue.id })
+                }
+              }}
+              renderInput={(params) => (
+                <TextField
+                  // eslint-disable-next-line react/jsx-props-no-spreading
+                  {...params}
+                  label={<Trans i18nKey="search_specific">{{ category: t(option.label) }}</Trans>}
+                  variant="outlined"
+                  onChange={(e) => search({ variables: { search: e.target.value, category: option.searchCategory } })}
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
+              renderOption={(x) => (
+                <Grid container alignItems="center" spacing={1}>
+                  <Grid item xs={12}>
+                    <Typography variant="subtitle2">
+                      {x.name}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="caption">
+                      {Utility.formatter(addressFormat, x.formatted)}
+                    </Typography>
+                  </Grid>
+                  <Divider light flexItem style={{ height: 2, width: '90%', margin: '5px 0' }} />
+                </Grid>
+              )}
+            />
+          </Grid>
         </Grid>
       ))
       // Recursive for nested props

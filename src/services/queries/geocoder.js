@@ -1,9 +1,8 @@
 import { gql } from '@apollo/client'
 
-export default gql`
-  query Geocoder($search: String!, $name: String!) {
-    geocoder(search: $search, name: $name) {
-      latitude
+export const Nominatim = gql`
+  fragment Nominatim on Geocoder {
+    latitude
       longitude
       streetNumber
       streetName
@@ -14,6 +13,14 @@ export default gql`
       zipcode
       country
       countryCode
+  }
+`
+
+export default gql`
+  ${Nominatim}
+  query Geocoder($search: String!, $name: String!) {
+    geocoder(search: $search, name: $name) {
+      ...Nominatim
     }
   }
 `

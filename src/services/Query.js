@@ -113,10 +113,11 @@ export default class Query {
 
   static search(category) {
     switch (category) {
-      default: return searchIndex.poi
       case 'raids':
       case 'nests':
       case 'quests': return searchIndex[category]
+      case 'webhook': return searchIndex.poiWebhook
+      default: return searchIndex.poi
     }
   }
 

@@ -5,7 +5,6 @@ const {
 const { JSONResolver } = require('graphql-scalars')
 const fs = require('fs')
 const { raw } = require('objection')
-const NodeGeocoder = require('node-geocoder')
 
 const DeviceType = require('./device')
 const GeocoderType = require('./geocoder')
@@ -58,18 +57,7 @@ const RootQuery = new GraphQLObjectType({
         if (perms.webhooks) {
           const webhook = config.webhookObj[args.name]
           if (webhook) {
-            const geocoder = NodeGeocoder({
-              provider: 'openstreetmap',
-              osmServer: webhook.server.nominatimUrl,
-              timeout: 5000,
-            })
-            geocoder._geocoder._formatResult = ((original) => (result) => ({
-              ...original(result),
-              suburb: result.address.suburb || '',
-              town: result.address.town || '',
-              village: result.address.village || '',
-            }))(geocoder._geocoder._formatResult)
-            return geocoder.geocode(args.search)
+            return Utility.geocoder(webhook.server.nominatimUrl, args.search)
           }
         }
       },
@@ -280,10 +268,11 @@ const RootQuery = new GraphQLObjectType({
         lat: { type: GraphQLFloat },
         lon: { type: GraphQLFloat },
         locale: { type: GraphQLString },
+        webhookName: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        const { category } = args
+        const { category, webhookName } = args
         if (perms[category]) {
           const isMad = Utility.dbSelection(category.substring(0, category.length - 1)) === 'mad'
           const distance = raw(`ROUND(( 3959 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
@@ -292,7 +281,6 @@ const RootQuery = new GraphQLObjectType({
             return []
           }
           switch (args.category) {
-            default: return []
             case 'quests':
               return Pokestop.searchQuests(args, perms, isMad, distance)
             case 'pokestops':
@@ -300,11 +288,27 @@ const RootQuery = new GraphQLObjectType({
             case 'raids':
               return Gym.searchRaids(args, perms, isMad, distance)
             case 'gyms':
-              return Gym.search(args, perms, isMad, distance)
+              return webhookName
+                ? (async function getResultsWithAddress() {
+                  const results = await Gym.search(args, perms, isMad, distance)
+                  const webhook = config.webhookObj[webhookName]
+                  if (webhook && results.length) {
+                    const withFormatted = await Promise.all(results.map(async result => ({
+                      ...result,
+                      formatted: await Utility.geocoder(
+                        webhook.server.nominatimUrl, { lat: result.lat, lon: result.lon }, true,
+                      ),
+                    })))
+                    return withFormatted
+                  }
+                  return []
+                }())
+                : Gym.search(args, perms, isMad, distance)
             case 'portals':
               return Portal.search(args, perms, isMad, distance)
             case 'nests':
               return Nest.search(args, perms, isMad, distance)
+            default: return []
           }
         }
         return []

@@ -443,5 +443,8 @@
   "manage_profiles": "Manage Profiles",
   "min_spawn_avg": "Avg Min Spawn",
   "poke_global": "Everything",
-  "amount": "Amount"
+  "amount": "Amount",
+  "specific_gym": "Specific Gym",
+  "search_location": "Search Locations",
+  "search_specific": "Search for a Specific {{category}}"
 }

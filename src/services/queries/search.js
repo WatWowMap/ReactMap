@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client'
+import { Nominatim } from './geocoder'
 
 const core = gql`
   fragment CoreSearch on Search {
@@ -16,6 +17,19 @@ export const poi = gql`
   query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!) {
     search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale) {
       ...CoreSearch
+    }
+  }
+`
+
+export const poiWebhook = gql`
+  ${Nominatim}
+  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $webhookName: String) {
+    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, webhookName: $webhookName) {
+      id
+      name
+      formatted {
+        ...Nominatim
+      }
     }
   }
 `

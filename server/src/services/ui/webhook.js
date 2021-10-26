@@ -102,6 +102,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             team: 4,
             gym_id: null,
             byDistance: false,
+            allMoves: true,
           },
           ui: {
             general: {
@@ -110,7 +111,6 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 { name: 'template', options: [], xs: 6, sm: 3 },
                 { name: 'team', options: [0, 1, 2, 3, 4], xs: 6, sm: 3 },
                 { name: 'move', options: [], xs: 6, sm: 3 },
-                // { name: 'level', options: [0, 1, 2, 3, 4, 5, 6], xs: 6, sm: 3 },
               ],
               booleans: [
                 { name: 'clean', xs: 6, sm: 3 },
@@ -118,6 +118,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 { name: 'allForms', disabled: ['r'], xs: 6, sm: 3 },
                 { name: 'allMoves', disabled: ['r'], xs: 6, sm: 3 },
               ],
+              autoComplete: [{ name: 'gymName', label: 'gym', searchCategory: 'gyms', xs: 12, sm: 12 }],
               distanceOrArea: {
                 booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
@@ -147,6 +148,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 { name: 'clean', xs: 6, sm: 6 },
                 { name: 'exclusive', xs: 6, sm: 6 },
               ],
+              autoComplete: [{ name: 'gymName', label: 'gym', searchCategory: 'gyms', xs: 12, sm: 12 }],
               distanceOrArea: {
                 booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],

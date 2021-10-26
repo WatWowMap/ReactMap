@@ -8,6 +8,7 @@ const clientOptions = require('./ui/clientOptions')
 const dbSelection = require('./functions/dbSelection')
 const permissions = require('./functions/permissions')
 const webhook = require('./ui/webhook')
+const geocoder = require('./geocoder')
 
 module.exports = class Utility {
   static getPolyVector(s2cellId, type) {
@@ -48,5 +49,9 @@ module.exports = class Utility {
 
   static webhookUi(provider, hookConfig, pvp) {
     return webhook(provider, hookConfig, pvp)
+  }
+
+  static async geocoder(nominatimUrl, search, reverse) {
+    return geocoder(nominatimUrl, search, reverse)
   }
 }
