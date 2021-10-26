@@ -212,14 +212,16 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.masterfile = masterfile
 
-      if (serverSettings.user?.perms?.webhooks?.length && config.webhooks.length) {
+      if (config.webhooks.length && serverSettings.user?.perms?.webhooks?.length) {
         serverSettings.webhooks = {}
         const filtered = config.webhooks.filter(webhook => serverSettings.user.perms.webhooks.includes(webhook.name))
         try {
           await Promise.all(filtered.map(async webhook => {
-            serverSettings.webhooks[webhook.name] = {
-              ...config.webhookObj[webhook.name].client,
-              ...await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name),
+            if (config.webhookObj[webhook.name].client.valid) {
+              serverSettings.webhooks[webhook.name] = {
+                ...config.webhookObj[webhook.name].client,
+                ...await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name),
+              }
             }
           }))
         } catch (e) {

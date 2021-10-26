@@ -38,6 +38,7 @@ export default function TutWelcome({ setUserProfile }) {
         alignItems="center"
         justifyContent="center"
         spacing={2}
+        style={{ height: '100%' }}
       >
         <Grid item xs={12}>
           <Typography variant="h4" align="center" style={{ margin: 10 }}>

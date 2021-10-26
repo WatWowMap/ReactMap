@@ -24,13 +24,14 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
         alignItems="center"
         justifyContent="center"
         spacing={2}
+        style={{ height: '100%' }}
       >
-        <Grid item xs={8}>
+        <Grid item xs={8} style={{ textAlign: 'center' }}>
           <Typography variant={isMobile ? 'subtitle2' : 'h6'} align="center">
             {t('tutorialSidebar0')}
           </Typography>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={4} style={{ textAlign: 'center' }}>
           <Fab color="primary">
             <Menu />
           </Fab>

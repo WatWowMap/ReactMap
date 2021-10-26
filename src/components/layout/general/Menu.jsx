@@ -232,7 +232,6 @@ export default function Menu({
       <Dialog
         open={advancedFilter.open}
         onClose={toggleAdvMenu(false)}
-        fullWidth={!isMobile}
         fullScreen={isMobile}
       >
         <Advanced

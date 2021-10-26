@@ -87,6 +87,7 @@ export default function Nav({
         <Dialog
           open={tutorial}
           fullScreen={isMobile}
+          maxWidth="xs"
         >
           <Tutorial
             setUserProfile={setUserProfile}

@@ -19,10 +19,10 @@ export default function TutPopup({ isMobile }) {
     <DialogContent>
       <Grid
         container
-        direction="column"
-        justifyContent="space-evenly"
+        justifyContent="center"
         alignItems="center"
         spacing={2}
+        style={{ height: '100%' }}
       >
         <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
           <Typography variant="h6" align="center" gutterBottom>

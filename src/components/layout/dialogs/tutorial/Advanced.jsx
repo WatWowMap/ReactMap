@@ -5,10 +5,9 @@ import {
 import {
   Tune, Ballot, Check, Clear, Save, HelpOutline, FormatSize,
 } from '@material-ui/icons'
-import { FixedSizeGrid } from 'react-window'
-import AutoSizer from 'react-virtualized-auto-sizer'
 import { useTranslation } from 'react-i18next'
 
+import ReactWindow from '@components/layout/general/ReactWindow'
 import Advanced from '../filters/Advanced'
 import Tile from '../filters/MenuTile'
 import SlotSelection from '../filters/SlotSelection'
@@ -126,6 +125,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
           alignItems="center"
           justifyContent="center"
           spacing={1}
+          style={{ height: '100%' }}
         >
           <Grid item xs={12} style={{ textAlign: 'center' }}>
             <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
@@ -134,31 +134,21 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
           </Grid>
           <Grid item xs={12} sm={8} style={{ textAlign: 'center' }}>
             <div style={{ minHeight: '130px', textAlign: 'center' }}>
-              <AutoSizer defaultHeight={100} defaultWidth={400}>
-                {({ width, height }) => (
-                  <FixedSizeGrid
-                    className="grid"
-                    width={width}
-                    height={height}
-                    columnCount={columnCount}
-                    columnWidth={width / columnCount}
-                    rowCount={Math.ceil(data.tiles[category].length / columnCount)}
-                    rowHeight={columnCount > 1 ? 120 : 60}
-                    itemData={{
-                      tileItem: data.tiles[category],
-                      isMobile,
-                      columnCount,
-                      tempFilters,
-                      setTempFilters,
-                      toggleAdvMenu,
-                      toggleSlotsMenu,
-                      type: category,
-                    }}
-                  >
-                    {Tile}
-                  </FixedSizeGrid>
-                )}
-              </AutoSizer>
+              <ReactWindow
+                columnCount={columnCount}
+                length={data.tiles[category].length}
+                Tile={Tile}
+                data={{
+                  tileItem: data.tiles[category],
+                  isMobile,
+                  tempFilters,
+                  setTempFilters,
+                  toggleAdvMenu,
+                  toggleSlotsMenu,
+                  type: category,
+                }}
+                offset={0}
+              />
             </div>
           </Grid>
           <Grid item xs={12} style={{ textAlign: 'center' }}>

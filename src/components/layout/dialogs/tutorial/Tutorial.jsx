@@ -47,7 +47,7 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
   }
 
   return (
-    <div style={{ maxWidth: 400 }}>
+    <>
       <DialogTitle className={classes.filterHeader}>
         {t('tutorial')} ({t(steps[activeStep] || t('closing'))})
       </DialogTitle>
@@ -73,6 +73,6 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
           )}
         />
       </DialogActions>
-    </div>
+    </>
   )
 }

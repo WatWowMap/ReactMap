@@ -38,6 +38,7 @@ export default function TutSliders() {
         direction="row"
         alignItems="center"
         justifyContent="center"
+        style={{ height: '100%' }}
       >
         <Grid item xs={12} style={{ margin: 5 }}>
           <Typography variant="h6" align="center" gutterBottom>
