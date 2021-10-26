@@ -1,7 +1,8 @@
 import React from 'react'
 import {
-  Grid, Typography, Button, Chip,
+  Grid, Typography, Button, Chip, IconButton,
 } from '@material-ui/core'
+import { Clear } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import useStyles from '@hooks/useStyles'
@@ -12,7 +13,7 @@ import FilterOptions from './Options'
 
 export default function OptionsContainer({
   advMenu, setAdvMenu, menus, setMenus,
-  category, handleReset, count,
+  category, handleReset, count, isMobile, toggleDrawer,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
@@ -93,5 +94,16 @@ export default function OptionsContainer({
       </Grid>
     </Grid>,
   )
+  if (isMobile) {
+    allFilterMenus.unshift(
+      <Grid container key="resetShowing" justifyContent="center" alignItems="center">
+        <Grid item xs={12} style={{ textAlign: 'right' }}>
+          <IconButton onClick={toggleDrawer(false)}>
+            <Clear style={{ color: 'white' }} />
+          </IconButton>
+        </Grid>
+      </Grid>,
+    )
+  }
   return allFilterMenus
 }

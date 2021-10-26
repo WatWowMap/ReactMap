@@ -165,6 +165,8 @@ export default function Menu({
       setSearch={setSearch}
       menus={menus}
       setMenus={setMenus}
+      toggleDrawer={toggleDrawer}
+      isMobile={isMobile}
     />
   )
 

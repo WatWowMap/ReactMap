@@ -144,6 +144,7 @@ export default function Nav({
         />
       </Dialog>
       <Dialog
+        fullScreen={isMobile}
         classes={{
           scrollPaper: classes.scrollPaper,
           container: classes.container,
