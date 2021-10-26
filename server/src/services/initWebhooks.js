@@ -19,18 +19,20 @@ module.exports = async function initWebhooks(config) {
           fetched: Date.now(),
           leagues: [{ name: 'great', cp: 1500 }, { name: 'ultra', cp: 2500 }],
           valid: Boolean(hookConfig),
+          pvp: 'rdm',
         }
         if (hookConfig?.pvpLittleLeagueAllowed) {
           baseSettings.leagues.push({ name: 'little', cp: 500 })
+          baseSettings.pvp = 'ohbem'
         }
 
         const templates = await fetchJson(`${webhook.host}:${webhook.port}/api/config/templates?names=true`, options, config.devOptions.enabled)
         const areas = await fetchJson(`${webhook.host}:${webhook.port}/api/geofence/all/hash`, options, config.devOptions.enabled)
 
         if (templates) {
-          templates[webhook.platform].pokemon = templates.monster
+          templates[webhook.platform].pokemon = templates[webhook.platform].monster
           delete templates[webhook.platform].monster
-          templates[webhook.platform].pokemonNoIv = templates.monsterNoIv
+          templates[webhook.platform].pokemonNoIv = templates[webhook.platform].monsterNoIv
           delete templates[webhook.platform].monsterNoIv
         }
 
@@ -47,8 +49,8 @@ module.exports = async function initWebhooks(config) {
           },
           client: hookConfig ? {
             ...baseSettings,
+            prefix: hookConfig.prefix,
             locale: hookConfig.locale,
-            pvp: hookConfig.pvpLittleLeagueAllowed ? 'ohbem' : 'rdm',
             info: webhookUi(webhook.provider, hookConfig, baseSettings.pvp, baseSettings.leagues),
             areas: areas ? Object.keys(areas.areas).map(a => a).sort() : [],
             template: templates[webhook.platform],

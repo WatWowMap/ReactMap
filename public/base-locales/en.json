@@ -440,5 +440,8 @@
   "day_6": "Saturday",
   "day_7": "Sunday",
   "profile_name": "Profile Name",
-  "manage_profiles": "Manage Profiles"
+  "manage_profiles": "Manage Profiles",
+  "min_spawn_avg": "Avg Min Spawn",
+  "poke_global": "Everything",
+  "amount": "Amount"
 }

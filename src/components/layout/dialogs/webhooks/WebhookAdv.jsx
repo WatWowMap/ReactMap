@@ -27,7 +27,7 @@ import SliderTile from '@components/layout/dialogs/filters/SliderTile'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 
-const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive', 'lure_id', 'reward', 'reward_type', 'grunt_type']
+const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive', 'lure_id', 'reward', 'reward_type', 'grunt_type', 'grunt_id']
 
 export default function WebhookAdvanced({
   category, id, toggleWebhook, tempFilters, isMobile,
@@ -39,7 +39,7 @@ export default function WebhookAdvanced({
   const webhookAdv = useStore(s => s.webhookAdv)
   const setWebhookAdv = useStore(s => s.setWebhookAdv)
   const { [selectedWebhook]: {
-    info: { [category]: info }, profile, human, template, platform, config, leagues, pvp,
+    info: { [category]: info }, profile, human, template, prefix, leagues, pvp,
   } } = useStatic(s => s.webhookData)
   const { pokemon, moves, types } = useStatic(s => s.masterfile)
 
@@ -122,7 +122,7 @@ export default function WebhookAdvanced({
   const getOptions = (option) => {
     const menuItems = []
     switch (option.name) {
-      case 'template': template[platform][poracleValues.noIv ? `${category}NoIv` : category].en.forEach(item => (
+      case 'template': template[poracleValues.noIv ? `${category}NoIv` : category].en.forEach(item => (
         menuItems.push(<MenuItem key={item} value={item}>{item}</MenuItem>)
       )); break
       case 'profile_no':
@@ -186,26 +186,26 @@ export default function WebhookAdvanced({
   const getPoracleString = () => {
     switch (id.charAt(0)) {
       case 'r':
-      case 'e': return `${config.prefix}${id.charAt(0) === 'e' ? t('egg') : t('raid')} ${t('level')}${idObj.id}
+      case 'e': return `${prefix}${id.charAt(0) === 'e' ? t('egg') : t('raid')} ${t('level')}${idObj.id}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'i': {
         const invasion = Object.keys(types).find(x => types[x].toLowerCase() === poracleValues.grunt_type)
-        return `${config.prefix}${t('invasion')} ${invasion ? t(`poke_type_${invasion}`) : t(poracleValues.grunt_type.replace(' ', ''))}
+        return `${prefix}${t('invasion')} ${invasion ? t(`poke_type_${invasion}`) : t(poracleValues.grunt_type.replace(' ', ''))}
         ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       }
-      case 'q': return `${config.prefix}${t('quest')} ${t(`item_${idObj.id}`)}
+      case 'q': return `${prefix}${t('quest')} ${t(`item_${idObj.id}`)}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
-      case 'm': return `${config.prefix}${t('quest')} ${t('energy')}${t(`poke_${idObj.pokemonId}`)}
+      case 'm': return `${prefix}${t('quest')} ${t('energy')}${t(`poke_${idObj.pokemonId}`)}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
-      case 'c': return `${config.prefix}${t('quest')} ${t('candy')}${t(`poke_${idObj.pokemonId}`)}
+      case 'c': return `${prefix}${t('quest')} ${t('candy')}${t(`poke_${idObj.pokemonId}`)}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
-      case 'x': return `${config.prefix}${t('quest')} ${t('xl')}${t(`poke_${idObj.pokemonId}`)}
+      case 'x': return `${prefix}${t('quest')} ${t('xl')}${t(`poke_${idObj.pokemonId}`)}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
-      case 'd': return `${config.prefix}${t('quest')} ${t('stardust')}
+      case 'd': return `${prefix}${t('quest')} ${t('stardust')}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
-      case 'l': return `${config.prefix}${t('lure')} ${t(`lure_${idObj.id}`).toLowerCase()}
+      case 'l': return `${prefix}${t('lure')} ${t(`lure_${idObj.id}`).toLowerCase()}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
-      default: return `${config.prefix}${category === 'pokemon' ? t('track') : t(category)} 
+      default: return `${prefix}${category === 'pokemon' ? t('track') : t(category)} 
       ${t(`poke_${idObj.pokemonId}`)} 
       ${!poracleValues.allForms && +idObj.form ? `form:${t(`form_${idObj.form}`).replace(/ /g, '_')}` : ''} 
       ${poracleValues.noIv ? '' : Object.keys(poracleValues).map(checkDefaults).join(' ')}
@@ -289,7 +289,7 @@ export default function WebhookAdvanced({
             disabled={getDisabled(option)}
             type={option.type || 'text'}
             size="small"
-            style={{ width: 90 }}
+            style={{ width: 120 }}
             inputProps={{
               min: 0,
               max: option.max,

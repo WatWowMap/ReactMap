@@ -36,7 +36,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const setZoom = useStore(state => state.setZoom)
   const userSettings = useStore(state => state.userSettings)
 
-  const [webhookMode, setWebhookMode] = useState('open')
+  const [webhookMode, setWebhookMode] = useState(false)
   const [initialBounds] = useState({
     minLat: map.getBounds()._southWest.lat,
     maxLat: map.getBounds()._northEast.lat,

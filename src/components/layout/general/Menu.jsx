@@ -116,7 +116,7 @@ export default function Menu({
     }
     if (id === 'global' && !open) {
       Object.keys(filteredObj).forEach(item => {
-        filteredObj[item] = { ...newFilters, enabled: true }
+        filteredObj[item] = { ...tempFilters[item], ...newFilters, enabled: true }
       })
       setTempFilters({ ...tempFilters, ...filteredObj, [id]: newFilters })
     } else if (id && newFilters && !open) {

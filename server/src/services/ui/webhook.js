@@ -166,12 +166,11 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
           ui: {
             general: {
               selects: [
-                { name: 'profile_no', options: [], xs: 6, sm: 6 },
-                { name: 'template', options: [], xs: 6, sm: 6 },
-                { name: 'gender', options: [0, 1, 2], xs: 6, sm: 6 },
+                { name: 'profile_no', options: [], xs: 4, sm: 4 },
+                { name: 'template', options: [], xs: 4, sm: 4 },
               ],
               booleans: [
-                { name: 'clean', xs: 6, sm: 6 },
+                { name: 'clean', xs: 4, sm: 4 },
               ],
               distanceOrArea: {
                 booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],

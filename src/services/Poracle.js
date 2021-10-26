@@ -5,27 +5,13 @@ export default class Poracle {
     }
     const { info: { pokemon, raid, egg, invasion, lure, nest, quest }, human } = poracleInfo
     const filters = {
-      pokemon: {
-        global: pokemon.defaults,
-      },
-      raid: {
-        global: raid.defaults,
-      },
-      egg: {
-        global: egg.defaults,
-      },
-      invasion: {
-        global: invasion.defaults,
-      },
-      lure: {
-        global: lure.defaults,
-      },
-      nest: {
-        global: nest.defaults,
-      },
-      quest: {
-        global: quest.defaults,
-      },
+      pokemon: { global: { ...pokemon.defaults, profile_no: human.current_profile_no } },
+      raid: { global: { ...raid.defaults, profile_no: human.current_profile_no } },
+      egg: { global: { ...egg.defaults, profile_no: human.current_profile_no } },
+      invasion: { global: { ...invasion.defaults, profile_no: human.current_profile_no } },
+      lure: { global: { ...lure.defaults, profile_no: human.current_profile_no } },
+      nest: { global: { ...nest.defaults, profile_no: human.current_profile_no } },
+      quest: { global: { ...quest.defaults, profile_no: human.current_profile_no } },
     }
     Object.keys(reactMapFilters.pokemon.filter).forEach(key => {
       filters.pokemon[key] = {
@@ -57,12 +43,23 @@ export default class Poracle {
         reward_type: 7,
         enabled: false,
       }
+      if (key === 'global') {
+        delete filters.pokemon[key].pokemon_id
+        delete filters.pokemon[key].form
+        delete filters.raid[key].pokemon_id
+        delete filters.raid[key].form
+        delete filters.nest[key].pokemon_id
+        delete filters.nest[key].form
+        delete filters.quest[key].reward
+        delete filters.quest[key].form
+      }
     })
     Object.keys(reactMapFilters.pokestops.filter).forEach(key => {
       if (key.startsWith('i')) {
         filters.invasion[key] = {
           ...invasion.defaults,
           grunt_type: invasions[key.slice(1)].type.toLowerCase(),
+          gender: invasions[key.slice(1)].gender,
           profile_no: human.current_profile_no,
           enabled: false,
         }
@@ -121,6 +118,14 @@ export default class Poracle {
           enabled: false,
         }
       }
+      if (key === 'global') {
+        delete filters.invasion[key].grunt_type
+        delete filters.invasion[key].gender
+        delete filters.lure[key].lure_id
+        delete filters.quest[key].reward
+        delete filters.quest[key].reward_type
+        delete filters.quest[key].amount
+      }
     })
     Object.keys(reactMapFilters.gyms.filter).forEach(key => {
       if (key.startsWith('r')) {
@@ -138,6 +143,10 @@ export default class Poracle {
           profile_no: human.current_profile_no,
           enabled: false,
         }
+      }
+      if (key === 'global') {
+        delete filters.raid[key].level
+        delete filters.egg[key].level
       }
     })
     return filters
