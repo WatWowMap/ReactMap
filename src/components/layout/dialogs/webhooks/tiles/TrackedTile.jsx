@@ -70,7 +70,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
       </Grid>
       <Grid item xs={6} sm={8} md={9}>
         <Typography variant="caption">
-          {Poracle.generateDescription(item, category, leagues, t)}
+          {Poracle.generateDescription(item, category, leagues, t)?.replace(/\*/g, '')}
         </Typography>
       </Grid>
       <Grid item xs={4} sm={3} md={2} style={{ textAlign: 'right' }}>

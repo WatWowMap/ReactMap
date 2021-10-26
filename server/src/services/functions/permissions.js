@@ -1,4 +1,7 @@
 module.exports = function permissionManager(permToCheck, perms) {
+  if (permToCheck.startsWith('quick')) {
+    permToCheck = permToCheck.replace('quick', '').toLowerCase()
+  }
   switch (permToCheck) {
     case 'map': return perms.map
     case 'team':

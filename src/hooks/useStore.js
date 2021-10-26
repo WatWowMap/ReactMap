@@ -79,10 +79,10 @@ const useStatic = create(set => ({
   setExcludeList: (excludeList) => set({ excludeList }),
   timerList: [],
   setTimerList: (timerList) => set({ timerList }),
-  webhookPopup: {
-    open: false, category: '', categories: { }, data: { },
+  webhookAlert: {
+    open: false, severity: 'info', message: '',
   },
-  setWebhookPopup: (webhookPopup) => set({ webhookPopup }),
+  setWebhookAlert: (webhookAlert) => set({ webhookAlert }),
   webhookData: undefined,
   setWebhookData: (webhookData) => set({ webhookData }),
 }))

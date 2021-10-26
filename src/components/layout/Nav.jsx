@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
-import { Dialog, useMediaQuery } from '@material-ui/core'
+import { Dialog, useMediaQuery, Snackbar } from '@material-ui/core'
+import { Alert } from '@material-ui/lab'
 import { useTheme } from '@material-ui/styles'
 
 import Utility from '@services/Utility'
 import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
+import SlideTransition from '@assets/mui/SlideTransition'
+
 import FloatingBtn from './FloatingBtn'
 import Sidebar from './drawer/Drawer'
 import FilterMenu from './dialogs/filters/FilterMenu'
@@ -12,13 +15,12 @@ import UserOptions from './dialogs/UserOptions'
 import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
 import Search from './dialogs/Search'
-import QuickAdd from './dialogs/webhooks/QuickAdd'
 import Motd from './dialogs/Motd'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
 export default function Nav({
-  map, setManualParams, Icons, config,
+  map, setManualParams, Icons,
   setWebhookMode, webhookMode, settings, webhooks,
 }) {
   const classes = useStyles()
@@ -26,7 +28,8 @@ export default function Nav({
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
   const { perms } = useStatic(state => state.auth)
-  const webhookPopup = useStatic(state => state.webhookPopup)
+  const webhookAlert = useStatic(state => state.webhookAlert)
+  const setWebhookAlert = useStatic(state => state.setWebhookAlert)
   const { map: { messageOfTheDay } } = useStatic(state => state.config)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
@@ -164,16 +167,19 @@ export default function Nav({
           messages={messageOfTheDay.messages}
         />
       </Dialog>
-      <Dialog
-        classes={{
-          scrollPaper: classes.scrollPaper,
-          container: classes.container,
-        }}
-        maxWidth="xs"
-        open={webhookPopup.open}
+      <Snackbar
+        open={Boolean(webhookAlert.open)}
+        onClose={() => setWebhookAlert({ open: false, severity: 'info', message: '' })}
+        TransitionComponent={SlideTransition}
       >
-        <QuickAdd config={config} />
-      </Dialog>
+        <Alert
+          onClose={() => setWebhookAlert({ open: false, severity: 'info', message: '' })}
+          severity={webhookAlert.severity}
+          variant="filled"
+        >
+          {webhookAlert.message}
+        </Alert>
+      </Snackbar>
     </>
   )
 }

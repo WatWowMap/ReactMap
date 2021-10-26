@@ -446,5 +446,7 @@
   "amount": "Amount",
   "specific_gym": "Specific Gym",
   "search_location": "Search Locations",
-  "search_specific": "Search for a Specific {{category}}"
+  "search_specific": "Search for a Specific {{category}}",
+  "webhook_success_gym": "Raids, Eggs, and Team Change Alerts Have Been Added!",
+  "slot_changes": "Slot Changes"
 }

@@ -3,11 +3,12 @@ export default class Poracle {
     if (!poracleInfo?.valid) {
       return {}
     }
-    const { info: { pokemon, raid, egg, invasion, lure, nest, quest }, human } = poracleInfo
+    const { info: { pokemon, raid, egg, invasion, lure, nest, quest, gym }, human } = poracleInfo
     const filters = {
       pokemon: { global: { ...pokemon.defaults, profile_no: human.current_profile_no } },
       raid: { global: { ...raid.defaults, profile_no: human.current_profile_no } },
       egg: { global: { ...egg.defaults, profile_no: human.current_profile_no } },
+      gym: { global: { ...gym.defaults, profile_no: human.current_profile_no } },
       invasion: { global: { ...invasion.defaults, profile_no: human.current_profile_no } },
       lure: { global: { ...lure.defaults, profile_no: human.current_profile_no } },
       nest: { global: { ...nest.defaults, profile_no: human.current_profile_no } },
@@ -144,9 +145,18 @@ export default class Poracle {
           enabled: false,
         }
       }
+      if (key.startsWith('t')) {
+        filters.gym[key] = {
+          ...gym.defaults,
+          team: +key.slice(1).split('-')[0],
+          profile_no: human.current_profile_no,
+          enabled: false,
+        }
+      }
       if (key === 'global') {
         delete filters.raid[key].level
         delete filters.egg[key].level
+        delete filters.gym[key].team
       }
     })
     return filters
@@ -154,6 +164,7 @@ export default class Poracle {
 
   static getMapCategory(poracleCategory) {
     switch (poracleCategory) {
+      case 'gym':
       case 'egg':
       case 'raid': return 'gyms'
       case 'invasion':
@@ -168,6 +179,7 @@ export default class Poracle {
     switch (poracleCategory) {
       case 'egg': return ['eggs']
       case 'invasion': return ['invasions']
+      case 'gym': return ['teams']
       case 'lure': return ['lures']
       case 'nest': return ['pokemon']
       case 'raid': return ['raids', 'pokemon']
@@ -181,6 +193,7 @@ export default class Poracle {
       case 'egg': return `e${item.level}`
       case 'invasion': return `i${Object.keys(invasions).find(x => invasions[x].type?.toLowerCase() === item.grunt_type)}`
       case 'lure': return `l${item.lure_id}`
+      case 'gym': return `t${item.team}-0`
       case 'raid': return item.pokemon_id === 9000
         ? `r${item.level}`
         : `${item.pokemon_id}-${item.form}`
@@ -209,6 +222,7 @@ export default class Poracle {
       case 'c': return { pokemonId: id.replace('c', ''), type: 'pokemon' }
       case 'x': return { pokemonId: id.replace('x', ''), type: 'pokemon' }
       case 'd': return { id: 3, type: 'quest_reward' }
+      case 't': return { id: id.split('-')[0].replace('t', ''), type: 'gym' }
       default: return { pokemonId: id.split('-')[0], form: id.split('-')[1], type: 'pokemon' }
     }
   }
@@ -220,6 +234,7 @@ export default class Poracle {
       case 'lure': return [`lure_${idObj.id}`]
       case 'raid': return [`raid_${idObj.id}_plural`]
       case 'pokemon': return [`poke_${idObj.pokemonId}`, +idObj.form ? `form_${idObj.form}` : '']
+      case 'gym': return [`team_${idObj.id}`]
       default: return [`${idObj.type}_${idObj.id}`]
     }
   }
@@ -254,6 +269,7 @@ export default class Poracle {
       case 'egg': return entries.map(egg => ({ ...defaults, ...egg, byDistance: undefined }))
       case 'invasion': return entries.map(invasion => ({ ...defaults, ...invasion, byDistance: undefined }))
       case 'lure': return entries.map(lure => ({ ...defaults, ...lure, lure_id: +lure.lure_id, byDistance: undefined }))
+      case 'gym': return entries.map(gym => ({ ...defaults, ...gym, byDistance: undefined }))
       case 'raid': return entries.map(boss => {
         if (boss.allForms) {
           boss.form = defaults.form
@@ -285,15 +301,24 @@ export default class Poracle {
     switch (category) {
       case 'invasion': return `${t(`grunt_${item.grunt_id}`)} ${item.distance ? ` | d${item.distance}` : ''}`
       case 'lure': return `${t(`lure_${item.lure_id}`)} ${item.distance ? ` | d${item.distance}` : ''}`
-      case 'quest': return `${t(`quest_reward_${item.reward_type}`)} | ${item.reward} ${item.amount}`
-      case 'raid':
-      case 'egg': return `Level ${item.level} ${item.exclusive ? 'Exclusive Only' : ''} ${item.clean ? 'clean' : ''} Template: ${item.template} ${item.team === 4 ? '' : item.team} ${item.gym_id ? 'Gym:' : ''}${item.distance ? ` | d${item.distance}` : ''}`
+      case 'quest': return `${t(`quest_reward_${item.reward_type}`)} | ${(function getReward() {
+        switch (item.reward_type) {
+          case 2: return `${t(`item_${item.reward}`)} x${item.amount}`
+          case 3: return `x${item.amount}`
+          case 7: return `${t(`poke_${item.reward}`)} ${t('form')}: ${t(`form_${item.form}`)}`
+          case 12: return `${t(`poke_${item.reward}`)} ${t('form')}: x${item.amount}`
+          default: return ''
+        }
+      }())} ${item.distance ? ` | d${item.distance}` : ''}`
+      // case 'gym': return `${t(`team_${item.team}`)} ${item.gym_id ? item.name : ''}`
+      // case 'raid':
+      // case 'egg': return `Level ${item.level} ${item.exclusive ? 'Exclusive Only' : ''} ${item.clean ? 'clean' : ''} Template: ${item.template} ${item.team === 4 ? '' : item.team} ${item.gym_id ? 'Gym:' : ''}${item.distance ? ` | d${item.distance}` : ''}`
       case 'nest': return `${t(`poke_${item.pokemon_id}`)} | Min Spawn: ${item.min_spawn_avg}`
-      case 'pokemon':
-      default: return item.pvp_ranking_league
+      case 'pokemon': return item.pvp_ranking_league
         ? `${leagues.find(league => league.cp === item.pvp_ranking_league).name} ${item.pvp_ranking_best}-${item.pvp_ranking_worst}`
         : `${item.min_iv}-${item.max_iv}% | L${item.min_level}-${item.max_level}
-        A${item.atk}-${item.max_atk} | D${item.def}-${item.max_def} | S${item.sta}-${item.max_sta}${item.distance ? ` | d${item.distance}` : ''}`
+      A${item.atk}-${item.max_atk} | D${item.def}-${item.max_def} | S${item.sta}-${item.max_sta}${item.distance ? ` | d${item.distance}` : ''}`
+      default: return item.description
     }
   }
 }

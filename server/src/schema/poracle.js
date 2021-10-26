@@ -38,7 +38,7 @@ const GymType = new GraphQLObjectType({
     team: { type: GraphQLInt },
     slot_changes: { type: GraphQLInt },
     gym_id: { type: GraphQLString },
-    allRaids: { type: GraphQLBoolean },
+    description: { type: GraphQLString },
   }),
 })
 
@@ -59,6 +59,7 @@ const RaidType = new GraphQLObjectType({
     form: { type: GraphQLInt },
     move: { type: GraphQLInt },
     pokemon_id: { type: GraphQLInt },
+    description: { type: GraphQLString },
   }),
 })
 
@@ -76,6 +77,7 @@ const EggType = new GraphQLObjectType({
     template: { type: GraphQLString },
     team: { type: GraphQLInt },
     gym_id: { type: GraphQLString },
+    description: { type: GraphQLString },
   }),
 })
 
@@ -129,6 +131,7 @@ const InvasionType = new GraphQLObjectType({
     grunt_type: { type: GraphQLString },
     template: { type: GraphQLString },
     distance: { type: GraphQLInt },
+    description: { type: GraphQLString },
   }),
 })
 
@@ -143,6 +146,7 @@ const LureType = new GraphQLObjectType({
     lure_id: { type: GraphQLInt },
     template: { type: GraphQLString },
     distance: { type: GraphQLInt },
+    description: { type: GraphQLString },
   }),
 })
 
@@ -161,6 +165,7 @@ const QuestType = new GraphQLObjectType({
     reward: { type: GraphQLInt },
     reward_type: { type: GraphQLInt },
     shiny: { type: GraphQLBoolean },
+    description: { type: GraphQLString },
   }),
 })
 
@@ -190,6 +195,7 @@ const NestType = new GraphQLObjectType({
     distance: { type: GraphQLInt },
     min_spawn_avg: { type: GraphQLInt },
     pokemon_id: { type: GraphQLInt },
+    description: { type: GraphQLString },
   }),
 })
 
@@ -204,14 +210,15 @@ const WeatherType = new GraphQLObjectType({
     template: { type: GraphQLString },
     cell: { type: GraphQLInt },
     condition: { type: GraphQLInt },
+    description: { type: GraphQLString },
   }),
 })
 
 module.exports = new GraphQLObjectType({
   name: 'Poracle',
   fields: () => ({
-    status: { type: new GraphQLList(GraphQLString) },
-    message: { type: new GraphQLList(GraphQLString) },
+    status: { type: GraphQLString },
+    message: { type: GraphQLString },
     category: { type: GraphQLString },
     human: { type: HumanType },
     gym: { type: new GraphQLList(GymType) },

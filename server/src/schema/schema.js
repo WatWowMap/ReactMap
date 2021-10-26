@@ -446,13 +446,7 @@ const Mutation = new GraphQLObjectType({
         const { category, data, status, name } = args
         if (perms && Utility.permissions(category, perms)) {
           const response = await Fetch.webhookApi(category, req.user.id, status, name, data)
-          const categories = Array.isArray(response) ? 'allProfiles' : category
-          return {
-            ...response,
-            status: categories === 'all' ? response.map(x => x.status) : [response.status],
-            message: categories === 'all' ? response.map(x => x.message) : [response.message],
-            category: categories,
-          }
+          return response
         }
       },
     },

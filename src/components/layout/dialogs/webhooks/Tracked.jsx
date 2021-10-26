@@ -61,16 +61,19 @@ const Tracked = ({
     })
     setSelected(newObj)
   }
+
+  const profileFiltered = tracked.filter(x => x.profile_no === webhookData[selectedWebhook].human.current_profile_no)
+
   return (
     <div style={{ height: '100%' }}>
       <ReactWindow
         columnCount={1}
-        length={tracked.length}
+        length={profileFiltered.length}
         offset={15}
         data={{
           isMobile,
           Icons,
-          tileItem: tracked.sort((a, b) => a[staticInfo[category].sortProp] - b[staticInfo[category].sortProp]),
+          tileItem: profileFiltered.sort((a, b) => a[staticInfo[category].sortProp] - b[staticInfo[category].sortProp]),
           syncWebhook,
           selectedWebhook,
           tracked,
@@ -99,6 +102,7 @@ const areEqual = (prev, next) => {
   const nextSelected = next.webhookData[next.selectedWebhook]
   return prevSelected[prev.category].length === nextSelected[next.category].length
     && prevSelected.fetched === nextSelected.fetched
+    && prevSelected.human.current_profile_no === nextSelected.human.current_profile_no
     && prev.send === next.send
     && prev.isMobile === next.isMobile
 }

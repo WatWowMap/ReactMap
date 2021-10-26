@@ -34,7 +34,7 @@ import SliderTile from '@components/layout/dialogs/filters/SliderTile'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 
-const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive', 'lure_id', 'reward', 'reward_type', 'grunt_type', 'grunt_id', 'gym_id']
+const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive', 'lure_id', 'reward', 'reward_type', 'grunt_type', 'grunt_id', 'gym_id', 'slot_changes']
 
 export default function WebhookAdvanced({
   category, id, toggleWebhook, tempFilters, isMobile,
@@ -181,6 +181,7 @@ export default function WebhookAdvanced({
     if (field === 'exclusive' && poracleValues.exclusive) return ` ${t('exclusive')} `
     if (field === 'clean' && poracleValues.clean) return ` ${t('clean')} `
     if (field === 'min_spawn_avg' && poracleValues.min_spawn_avg > 0) return ` ${t('minspawn')}${poracleValues.min_spawn_avg} `
+    if (field === 'slot_changes' && poracleValues.slot_changes) return ` ${t('slot_changes')} `
     if (skipFields.includes(field)) return ''
     if (field.startsWith('pvp')) {
       if (poracleValues.pvpEntry) {
@@ -205,6 +206,8 @@ export default function WebhookAdvanced({
   const getPoracleString = () => {
     switch (id.charAt(0)) {
       case 'r':
+      case 't': return `${prefix}${t('gym')} ${t(`team_${poracleValues.team}`)}
+      ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'e': return `${prefix}${id.charAt(0) === 'e' ? t('egg') : t('raid')} ${t('level')}${idObj.id}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'i': {

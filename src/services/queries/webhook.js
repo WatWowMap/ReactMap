@@ -22,6 +22,7 @@ const Egg = gql`
       team
       template
       uid
+      description
     }
   }
 `
@@ -63,6 +64,7 @@ const Gym = gql`
       team
       template
       uid
+      description
     }
   }
 `
@@ -79,6 +81,7 @@ const Invasion = gql`
       profile_no
       template
       uid
+      description
     }
   }
 `
@@ -94,6 +97,7 @@ const Lure = gql`
       template
       uid
       profile_no
+      description
     }
   }
 `
@@ -110,6 +114,7 @@ const Nest = gql`
       profile_no
       template
       uid
+      description
     }
   }
 `
@@ -149,6 +154,7 @@ const Pokemon = gql`
       sta
       template
       uid
+      description
     }
   }
 `
@@ -183,6 +189,7 @@ const Quest = gql`
       shiny
       template
       uid
+      description
     }
   }
 `
@@ -204,6 +211,7 @@ const Raid = gql`
       team
       template
       uid
+      description
     }
   }
 `
@@ -219,6 +227,7 @@ const Weather = gql`
       profile_no
       template
       uid
+      description
     }
   }
 `
@@ -248,6 +257,37 @@ export const allProfiles = gql`
       ...PoracleQuest
       ...PoracleRaid
       ...PoracleWeather
+    }
+  }
+`
+
+export const quickAdd = gql`
+  ${Human}
+  ${Egg}
+  ${Gym}
+  ${Invasion}
+  ${Lure}
+  ${Nest}
+  ${Pokemon}
+  ${Profile}
+  ${Quest}
+  ${Raid}
+  ${Weather}
+  mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
+    webhook(data: $data, category: $category, status: $status, name: $name) {
+      ...PoracleHuman
+      ...PoracleEgg
+      ...PoracleGym
+      ...PoracleInvasion
+      ...PoracleLure
+      ...PoracleNest
+      ...PoraclePokemon
+      ...PoracleProfile
+      ...PoracleQuest
+      ...PoracleRaid
+      ...PoracleWeather
+      status
+      message
     }
   }
 `
@@ -303,6 +343,17 @@ export const egg = gql`
     webhook(data: $data, category: $category, status: $status, name: $name) {
       ...Base
       ...PoracleEgg
+    }
+  }
+`
+
+export const gym = gql`
+  ${base}
+  ${Gym}
+  mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
+    webhook(data: $data, category: $category, status: $status, name: $name) {
+      ...Base
+      ...PoracleGym
     }
   }
 `

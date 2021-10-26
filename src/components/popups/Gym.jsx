@@ -3,18 +3,18 @@ import React, {
   Fragment, useState, useEffect,
 } from 'react'
 import {
-  Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem, Dialog,
+  Grid, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem,
 } from '@material-ui/core'
 import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
 import { useTranslation, Trans } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
+import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
-import WebhookPopup from '@components/layout/dialogs/webhooks/QuickAdd'
 
 export default function GymPopup({
-  gym, hasRaid, ts, Icons, config, hasHatched,
+  gym, hasRaid, ts, Icons, hasHatched,
 }) {
   const { t } = useTranslation()
   const { perms } = useStatic(state => state.auth)
@@ -34,8 +34,8 @@ export default function GymPopup({
       alignItems="center"
       spacing={1}
     >
-      <Header gym={gym} perms={perms} hasRaid={hasRaid} t={t} config={config} />
-      {perms.allGyms && (
+      <Header gym={gym} perms={perms} hasRaid={hasRaid} t={t} />
+      {perms.gyms && (
         <Grid item xs={12}>
           <Collapse in={!raidExpand} timeout="auto" unmountOnExit>
             <Grid
@@ -91,7 +91,7 @@ export default function GymPopup({
         t={t}
         Icons={Icons}
       />
-      {perms.allGyms && (
+      {perms.gyms && (
         <Collapse in={extraExpand} timeout="auto" unmountOnExit>
           <ExtraInfo gym={gym} t={t} ts={ts} />
         </Collapse>
@@ -101,7 +101,7 @@ export default function GymPopup({
 }
 
 const Header = ({
-  gym, perms, hasRaid, t, config,
+  gym, perms, hasRaid, t,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -109,15 +109,16 @@ const Header = ({
   const setExcludeList = useStatic(state => state.setExcludeList)
   const timerList = useStatic(state => state.timerList)
   const setTimerList = useStatic(state => state.setTimerList)
-  const setWebhookPopup = useStatic(state => state.setWebhookPopup)
-  const webhookData = useStatic(state => state.webhookData)
+
+  const selectedWebhook = useStore(state => state.selectedWebhook)
 
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [gymName, setGymName] = useState(true)
-  const [popup, setPopup] = useState(false)
+
+  const addWebhook = useWebhook({ category: 'quickGym', selectedWebhook })
   const {
     id, team_id, raid_pokemon_id, raid_pokemon_form, raid_level,
   } = gym
@@ -190,7 +191,7 @@ const Header = ({
     { name: 'hide', action: handleHide },
   ]
 
-  if (perms.allGyms) {
+  if (perms.gyms) {
     options.push({ name: 'excludeTeam', action: excludeTeam })
   }
   if (perms.raids && hasRaid) {
@@ -199,28 +200,14 @@ const Header = ({
       { name: 'timer', action: handleTimer },
     )
   }
-  if (perms.webhooks.length && webhookData) {
+  if (perms.webhooks?.includes(selectedWebhook)) {
     options.push({
       name: (
-        <Trans i18nKey="manageWebhook">
-          {{ name: config.webhook }}
+        <Trans i18nKey="webhookEntry">
+          {{ category: t('gym') }}{{ name: selectedWebhook }}
         </Trans>
       ),
-      action: () => setWebhookPopup({
-        open: true,
-        category: 'gym',
-        categories: {
-          gym: {
-            teamChanges: perms.gyms,
-            inBattle: perms.gyms,
-            allRaids: perms.raids,
-          },
-          team: perms.gyms,
-          raid: raid_pokemon_id && perms.raids,
-          egg: !raid_pokemon_id && hasRaid && perms.raids,
-        },
-        data: gym,
-      }),
+      action: () => addWebhook(gym),
       key: 'webhook',
     })
   }
@@ -263,21 +250,7 @@ const Header = ({
           </MenuItem>
         ))}
       </Menu>
-      <Dialog
-        open={popup}
-        onClose={() => setPopup(false)}
-      >
-        <WebhookPopup
-          categories={{
-            gyms: true,
-            team: team_id,
-            raids: raid_pokemon_id,
-            eggs: !raid_pokemon_id,
-          }}
-          data={gym}
-          setPopup={setPopup}
-        />
-      </Dialog>
+
     </>
   )
 }

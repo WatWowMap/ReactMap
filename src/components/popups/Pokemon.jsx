@@ -119,8 +119,6 @@ const Header = ({
   const setTimerList = useStatic(state => state.setTimerList)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
-  // const setWebhookPopup = useStatic(state => state.setWebhookPopup)
-  // const { setWebhook, StatusAlert, handleAlertClose } = useWebhook()
 
   const [anchorEl, setAnchorEl] = useState(false)
   const {
@@ -133,7 +131,6 @@ const Header = ({
 
   const handleClose = () => {
     setAnchorEl(null)
-    // handleAlertClose(false)
   }
 
   const handleHide = () => {
@@ -174,11 +171,6 @@ const Header = ({
     { name: 'exclude', action: handleExclude },
     { name: 'timer', action: handleTimer },
   ]
-
-  // if (perms.webhooks && !isTutorial) {
-  //   options.push({ name: 'webhook', action: () => setWebhookPopup({ open: true, category: 'pokemon' }) })
-  //   // options.push(setWebhook('pokemon', { pokemon }))
-  // }
 
   const pokeName = t(`poke_${metaData.pokedexId}`)
   const formName = metaData.forms?.[form]?.name === 'Normal' || form === 0 ? '' : t(`form_${pokemon.form}`)
@@ -236,7 +228,6 @@ const Header = ({
           </MenuItem>
         ))}
       </Menu>
-      {/* <StatusAlert /> */}
     </>
   )
 }

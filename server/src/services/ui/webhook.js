@@ -142,11 +142,39 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
               selects: [
                 { name: 'profile_no', options: [], xs: 6, sm: 4 },
                 { name: 'template', options: [], xs: 6, sm: 4 },
-                { name: 'team', options: [1, 2, 3, 4], xs: 6, sm: 4 },
+                { name: 'team', options: [0, 1, 2, 3, 4], xs: 6, sm: 4 },
               ],
               booleans: [
                 { name: 'clean', xs: 6, sm: 6 },
                 { name: 'exclusive', xs: 6, sm: 6 },
+              ],
+              autoComplete: [{ name: 'gymName', label: 'gym', searchCategory: 'gyms', xs: 12, sm: 12 }],
+              distanceOrArea: {
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+              },
+            },
+          },
+        },
+        gym: {
+          defaults: {
+            clean: false,
+            distance: 0,
+            template: hookConfig.defaultTemplateName.toString(),
+            team: 4,
+            slot_changes: false,
+            gym_id: null,
+            byDistance: false,
+          },
+          ui: {
+            general: {
+              selects: [
+                { name: 'profile_no', options: [], xs: 6, sm: 3 },
+                { name: 'template', options: [], xs: 6, sm: 3 },
+              ],
+              booleans: [
+                { name: 'clean', xs: 6, sm: 3 },
+                { name: 'slot_changes', xs: 6, sm: 3 },
               ],
               autoComplete: [{ name: 'gymName', label: 'gym', searchCategory: 'gyms', xs: 12, sm: 12 }],
               distanceOrArea: {
@@ -227,7 +255,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 { name: 'clean', xs: 4, sm: 4 },
                 { name: 'allForms', xs: 6, sm: 6, disabled: ['m', 'x', 'd', 'c', 'q'] },
               ],
-              texts: [{ name: 'amount', type: 'number', disabled: ['m', 'd'], xs: 6, sm: 6 }],
+              texts: [{ name: 'amount', type: 'number', disabled: ['m', 'd', 'g'], xs: 6, sm: 6 }],
               distanceOrArea: {
                 booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
