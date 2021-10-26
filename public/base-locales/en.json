@@ -431,5 +431,14 @@
   "min_spawn_average": "Min Spawn Rate",
   "selectAll": "Select All",
   "deleteAll": "Delete All",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "day_1": "Monday",
+  "day_2": "Tuesday",
+  "day_3": "Wednesday",
+  "day_4": "Thursday",
+  "day_5": "Friday",
+  "day_6": "Saturday",
+  "day_7": "Sunday",
+  "profile_name": "Profile Name",
+  "manage_profiles": "Manage Profiles"
 }

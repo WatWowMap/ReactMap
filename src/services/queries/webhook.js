@@ -26,7 +26,7 @@ const Egg = gql`
   }
 `
 
-const human = gql`
+const Human = gql`
   fragment PoracleHuman on Poracle {
     human {
       admin_disable
@@ -50,7 +50,7 @@ const human = gql`
   }
 `
 
-const gym = gql`
+const Gym = gql`
   fragment PoracleGym on Poracle {
     gym {
       clean
@@ -153,7 +153,7 @@ const Pokemon = gql`
   }
 `
 
-const profile = gql`
+const Profile = gql`
   fragment PoracleProfile on Poracle {
     profile {
       active_hours
@@ -208,7 +208,7 @@ const Raid = gql`
   }
 `
 
-const weather = gql`
+const Weather = gql`
   fragment PoracleWeather on Poracle {
     weather {
       cell
@@ -224,17 +224,17 @@ const weather = gql`
 `
 
 export const allProfiles = gql`
-  ${human}
+  ${Human}
   ${Egg}
-  ${gym}
+  ${Gym}
   ${Invasion}
   ${Lure}
   ${Nest}
   ${Pokemon}
-  ${profile}
+  ${Profile}
   ${Quest}
   ${Raid}
-  ${weather}
+  ${Weather}
   query Webhook($category: String!, $status: String!, $name: String!) {
     webhook(category: $category, status: $status, name: $name) {
       ...PoracleHuman
@@ -254,11 +254,22 @@ export const allProfiles = gql`
 
 export const setHuman = gql`
   ${base}
-  ${human}
+  ${Human}
   mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
     webhook(data: $data, category: $category, status: $status, name: $name) {
       ...Base
       ...PoracleHuman
+    }
+  }
+`
+
+export const setProfile = gql`
+  ${base}
+  ${Profile}
+  mutation Webhook($data: JSON!, $category: String!, $status: String!, $name: String!) {
+    webhook(data: $data, category: $category, status: $status, name: $name) {
+      ...Base
+      ...PoracleProfile
     }
   }
 `

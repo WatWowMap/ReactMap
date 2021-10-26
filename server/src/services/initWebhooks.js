@@ -47,6 +47,7 @@ module.exports = async function initWebhooks(config) {
           },
           client: hookConfig ? {
             ...baseSettings,
+            locale: hookConfig.locale,
             pvp: hookConfig.pvpLittleLeagueAllowed ? 'ohbem' : 'rdm',
             info: webhookUi(webhook.provider, hookConfig, baseSettings.pvp, baseSettings.leagues),
             areas: areas ? Object.keys(areas.areas).map(a => a).sort() : [],

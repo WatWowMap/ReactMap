@@ -21,6 +21,7 @@ import Human from './Human'
 import Tracked from './Tracked'
 import Menu from '../../general/Menu'
 import WebhookError from './Error'
+import ProfileEditing from './ProfileEditing'
 
 export default function Manage({
   Icons, isMobile, isTablet,
@@ -49,7 +50,7 @@ export default function Manage({
 
   const footerButtons = [
     { name: 'help', action: () => setHelp(true), icon: 'HelpOutline', disabled: !webhookData[selectedWebhook].human },
-    { name: tabValue ? <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans> : t('addNewProfile'), action: () => setAddNew(true), icon: 'Add', key: 'addNew', disabled: !webhookData[selectedWebhook].human },
+    { name: tabValue ? <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans> : t('manage_profiles'), action: () => setAddNew(true), icon: 'Add', key: 'addNew', disabled: !webhookData[selectedWebhook].human },
     { name: 'close', action: () => setWebhookMode(false), icon: 'Close' },
   ]
 
@@ -138,22 +139,32 @@ export default function Manage({
         open={addNew}
         onClose={handleClose}
       >
-        <Menu
-          category={Poracle.getMapCategory(webhookCategory)}
-          categories={Poracle.getFilterCategories(webhookCategory)}
-          webhookCategory={webhookCategory}
-          filters={poracleFilters[webhookCategory]}
-          tempFilters={tempFilters}
-          setTempFilters={setTempFilters}
-          title="webhook_selection"
-          titleAction={() => handleClose(false)}
-          isMobile={isMobile}
-          isTablet={isTablet}
-          Tile={NewPokemon}
-          extraButtons={[
-            { name: 'save', action: () => handleClose(true), icon: 'Save', color: 'secondary' },
-          ]}
-        />
+        {webhookCategory === 'human' ? (
+          <ProfileEditing
+            webhookData={webhookData}
+            setWebhookData={setWebhookData}
+            selectedWebhook={selectedWebhook}
+            handleClose={handleClose}
+            isMobile={isMobile}
+          />
+        ) : (
+          <Menu
+            category={Poracle.getMapCategory(webhookCategory)}
+            categories={Poracle.getFilterCategories(webhookCategory)}
+            webhookCategory={webhookCategory}
+            filters={poracleFilters[webhookCategory]}
+            tempFilters={tempFilters}
+            setTempFilters={setTempFilters}
+            title="webhook_selection"
+            titleAction={() => handleClose(false)}
+            isMobile={isMobile}
+            isTablet={isTablet}
+            Tile={NewPokemon}
+            extraButtons={[
+              { name: 'save', action: () => handleClose(true), icon: 'Save', color: 'secondary' },
+            ]}
+          />
+        )}
       </Dialog>
       <Dialog
         classes={{
