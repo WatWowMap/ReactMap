@@ -11,4 +11,6 @@ export default function formatter(addressFormat, result) {
     .replace('{{countryCode}}', result.countryCode || '')
     .replace('{{neighborhoods}}', result.neighborhoods || '')
     .replace('{{suburb}}', result.suburb || '')
+    .replace('{{town}}', result.town || '')
+    .replace('{{village}}', result.village || '')
 }

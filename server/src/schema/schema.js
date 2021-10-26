@@ -66,6 +66,8 @@ const RootQuery = new GraphQLObjectType({
             geocoder._geocoder._formatResult = ((original) => (result) => ({
               ...original(result),
               suburb: result.address.suburb || '',
+              town: result.address.town || '',
+              village: result.address.village || '',
             }))(geocoder._geocoder._formatResult)
             return geocoder.geocode(args.search)
           }
