@@ -9,17 +9,20 @@ import L from 'leaflet'
 
 import useStyles from '@hooks/useStyles'
 import useLocation from '@hooks/useLocation'
+import { useStore } from '@hooks/useStore'
 
 export default function FloatingButtons({
   toggleDrawer, toggleDialog, safeSearch, isMobile, perms, webhookMode, setWebhookMode, settings, webhooks,
 }) {
   const { t } = useTranslation()
   const map = useMap()
+  const ref = useRef(null)
   const classes = useStyles()
   const { lc, color } = useLocation(map)
+  const selectedWebhook = useStore(s => s.selectedWebhook)
+
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'medium'
-  const ref = useRef(null)
 
   useEffect(() => L.DomEvent.disableClickPropagation(ref.current))
 
@@ -45,7 +48,7 @@ export default function FloatingButtons({
           </Fab>
         </Grid>
       ) : null}
-      {(perms?.webhooks?.length && webhooks) ? (
+      {(perms?.webhooks?.length && webhooks && selectedWebhook) ? (
         <Grid item>
           <Fab color="secondary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('webhook')} disabled={Boolean(webhookMode)}>
             <NotificationsActive fontSize={iconSize} />

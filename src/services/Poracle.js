@@ -1,165 +1,166 @@
 export default class Poracle {
   static filterGenerator = (poracleInfo, reactMapFilters, invasions) => {
-    if (!poracleInfo?.valid) {
-      return {}
-    }
-    const { info: { pokemon, raid, egg, invasion, lure, nest, quest, gym }, human } = poracleInfo
-    const filters = {
-      pokemon: { global: { ...pokemon.defaults, profile_no: human.current_profile_no } },
-      raid: { global: { ...raid.defaults, profile_no: human.current_profile_no } },
-      egg: { global: { ...egg.defaults, profile_no: human.current_profile_no } },
-      gym: { global: { ...gym.defaults, profile_no: human.current_profile_no } },
-      invasion: { global: { ...invasion.defaults, profile_no: human.current_profile_no } },
-      lure: { global: { ...lure.defaults, profile_no: human.current_profile_no } },
-      nest: { global: { ...nest.defaults, profile_no: human.current_profile_no } },
-      quest: { global: { ...quest.defaults, profile_no: human.current_profile_no } },
-    }
-    Object.keys(reactMapFilters.pokemon.filter).forEach(key => {
-      filters.pokemon[key] = {
-        ...pokemon.defaults,
-        pokemon_id: +key.split('-')[0],
-        form: +key.split('-')[1],
-        profile_no: human.current_profile_no,
-        enabled: false,
+    try {
+      const { info: { pokemon, raid, egg, invasion, lure, nest, quest, gym }, human } = poracleInfo
+      const filters = {
+        pokemon: { global: { ...pokemon.defaults, profile_no: human.current_profile_no } },
+        raid: { global: { ...raid.defaults, profile_no: human.current_profile_no } },
+        egg: { global: { ...egg.defaults, profile_no: human.current_profile_no } },
+        gym: { global: { ...gym.defaults, profile_no: human.current_profile_no } },
+        invasion: { global: { ...invasion.defaults, profile_no: human.current_profile_no } },
+        lure: { global: { ...lure.defaults, profile_no: human.current_profile_no } },
+        nest: { global: { ...nest.defaults, profile_no: human.current_profile_no } },
+        quest: { global: { ...quest.defaults, profile_no: human.current_profile_no } },
       }
-      filters.raid[key] = {
-        ...raid.defaults,
-        pokemon_id: +key.split('-')[0],
-        form: +key.split('-')[1],
-        profile_no: human.current_profile_no,
-        enabled: false,
-      }
-      filters.nest[key] = {
-        ...nest.defaults,
-        pokemon_id: +key.split('-')[0],
-        form: +key.split('-')[1],
-        profile_no: human.current_profile_no,
-        enabled: false,
-      }
-      filters.quest[key] = {
-        ...quest.defaults,
-        reward: +key.split('-')[0],
-        form: +key.split('-')[1],
-        profile_no: human.current_profile_no,
-        reward_type: 7,
-        enabled: false,
-      }
-      if (key === 'global') {
-        delete filters.pokemon[key].pokemon_id
-        delete filters.pokemon[key].form
-        delete filters.raid[key].pokemon_id
-        delete filters.raid[key].form
-        delete filters.nest[key].pokemon_id
-        delete filters.nest[key].form
-        delete filters.quest[key].reward
-        delete filters.quest[key].form
-      }
-    })
-    Object.keys(reactMapFilters.pokestops.filter).forEach(key => {
-      if (key.startsWith('i')) {
-        filters.invasion[key] = {
-          ...invasion.defaults,
-          grunt_type: invasions[key.slice(1)].type.toLowerCase(),
-          gender: invasions[key.slice(1)].gender,
+      Object.keys(reactMapFilters.pokemon.filter).forEach(key => {
+        filters.pokemon[key] = {
+          ...pokemon.defaults,
+          pokemon_id: +key.split('-')[0],
+          form: +key.split('-')[1],
           profile_no: human.current_profile_no,
           enabled: false,
         }
-      }
-      if (key.startsWith('l')) {
-        filters.lure[key] = {
-          ...lure.defaults,
-          lure_id: key.slice(1),
-          profile_no: human.current_profile_no,
-          enabled: false,
-        }
-      }
-      if (key.startsWith('q')) {
-        filters.quest[key] = {
-          ...quest.defaults,
-          reward: +key.slice(1),
-          profile_no: human.current_profile_no,
-          reward_type: 2,
-          enabled: false,
-        }
-      }
-      if (key.startsWith('c')) {
-        filters.quest[key] = {
-          ...quest.defaults,
-          reward: +key.slice(1),
-          profile_no: human.current_profile_no,
-          reward_type: 4,
-          enabled: false,
-        }
-      }
-      if (key.startsWith('d')) {
-        filters.quest[key] = {
-          ...quest.defaults,
-          profile_no: human.current_profile_no,
-          reward_type: 3,
-          amount: +key.slice(1),
-          enabled: false,
-        }
-      }
-      if (key.startsWith('m')) {
-        filters.quest[key] = {
-          ...quest.defaults,
-          profile_no: human.current_profile_no,
-          reward_type: 12,
-          reward: +key.split('-')[0].slice(1),
-          amount: +key.split('-')[1],
-          enabled: false,
-        }
-      }
-      if (key.startsWith('x')) {
-        filters.quest[key] = {
-          ...quest.defaults,
-          reward: +key.slice(1),
-          profile_no: human.current_profile_no,
-          reward_type: 9,
-          enabled: false,
-        }
-      }
-      if (key === 'global') {
-        delete filters.invasion[key].grunt_type
-        delete filters.invasion[key].gender
-        delete filters.lure[key].lure_id
-        delete filters.quest[key].reward
-        delete filters.quest[key].reward_type
-        delete filters.quest[key].amount
-      }
-    })
-    Object.keys(reactMapFilters.gyms.filter).forEach(key => {
-      if (key.startsWith('r')) {
         filters.raid[key] = {
           ...raid.defaults,
-          level: +key.slice(1),
+          pokemon_id: +key.split('-')[0],
+          form: +key.split('-')[1],
           profile_no: human.current_profile_no,
           enabled: false,
         }
-      }
-      if (key.startsWith('e')) {
-        filters.egg[key] = {
-          ...egg.defaults,
-          level: +key.slice(1),
+        filters.nest[key] = {
+          ...nest.defaults,
+          pokemon_id: +key.split('-')[0],
+          form: +key.split('-')[1],
           profile_no: human.current_profile_no,
           enabled: false,
         }
-      }
-      if (key.startsWith('t')) {
-        filters.gym[key] = {
-          ...gym.defaults,
-          team: +key.slice(1).split('-')[0],
+        filters.quest[key] = {
+          ...quest.defaults,
+          reward: +key.split('-')[0],
+          form: +key.split('-')[1],
           profile_no: human.current_profile_no,
+          reward_type: 7,
           enabled: false,
         }
-      }
-      if (key === 'global') {
-        delete filters.raid[key].level
-        delete filters.egg[key].level
-        delete filters.gym[key].team
-      }
-    })
-    return filters
+        if (key === 'global') {
+          delete filters.pokemon[key].pokemon_id
+          delete filters.pokemon[key].form
+          delete filters.raid[key].pokemon_id
+          delete filters.raid[key].form
+          delete filters.nest[key].pokemon_id
+          delete filters.nest[key].form
+          delete filters.quest[key].reward
+          delete filters.quest[key].form
+        }
+      })
+      Object.keys(reactMapFilters.pokestops.filter).forEach(key => {
+        if (key.startsWith('i')) {
+          filters.invasion[key] = {
+            ...invasion.defaults,
+            grunt_type: invasions[key.slice(1)].type.toLowerCase(),
+            gender: invasions[key.slice(1)].gender,
+            profile_no: human.current_profile_no,
+            enabled: false,
+          }
+        }
+        if (key.startsWith('l')) {
+          filters.lure[key] = {
+            ...lure.defaults,
+            lure_id: key.slice(1),
+            profile_no: human.current_profile_no,
+            enabled: false,
+          }
+        }
+        if (key.startsWith('q')) {
+          filters.quest[key] = {
+            ...quest.defaults,
+            reward: +key.slice(1),
+            profile_no: human.current_profile_no,
+            reward_type: 2,
+            enabled: false,
+          }
+        }
+        if (key.startsWith('c')) {
+          filters.quest[key] = {
+            ...quest.defaults,
+            reward: +key.slice(1),
+            profile_no: human.current_profile_no,
+            reward_type: 4,
+            enabled: false,
+          }
+        }
+        if (key.startsWith('d')) {
+          filters.quest[key] = {
+            ...quest.defaults,
+            profile_no: human.current_profile_no,
+            reward_type: 3,
+            amount: +key.slice(1),
+            enabled: false,
+          }
+        }
+        if (key.startsWith('m')) {
+          filters.quest[key] = {
+            ...quest.defaults,
+            profile_no: human.current_profile_no,
+            reward_type: 12,
+            reward: +key.split('-')[0].slice(1),
+            amount: +key.split('-')[1],
+            enabled: false,
+          }
+        }
+        if (key.startsWith('x')) {
+          filters.quest[key] = {
+            ...quest.defaults,
+            reward: +key.slice(1),
+            profile_no: human.current_profile_no,
+            reward_type: 9,
+            enabled: false,
+          }
+        }
+        if (key === 'global') {
+          delete filters.invasion[key].grunt_type
+          delete filters.invasion[key].gender
+          delete filters.lure[key].lure_id
+          delete filters.quest[key].reward
+          delete filters.quest[key].reward_type
+          delete filters.quest[key].amount
+        }
+      })
+      Object.keys(reactMapFilters.gyms.filter).forEach(key => {
+        if (key.startsWith('r')) {
+          filters.raid[key] = {
+            ...raid.defaults,
+            level: +key.slice(1),
+            profile_no: human.current_profile_no,
+            enabled: false,
+          }
+        }
+        if (key.startsWith('e')) {
+          filters.egg[key] = {
+            ...egg.defaults,
+            level: +key.slice(1),
+            profile_no: human.current_profile_no,
+            enabled: false,
+          }
+        }
+        if (key.startsWith('t')) {
+          filters.gym[key] = {
+            ...gym.defaults,
+            team: +key.slice(1).split('-')[0],
+            profile_no: human.current_profile_no,
+            enabled: false,
+          }
+        }
+        if (key === 'global') {
+          delete filters.raid[key].level
+          delete filters.egg[key].level
+          delete filters.gym[key].team
+        }
+      })
+      return filters
+    } catch (e) {
+      return { error: e.message }
+    }
   }
 
   static getMapCategory(poracleCategory) {
@@ -315,7 +316,7 @@ export default class Poracle {
       // case 'egg': return `Level ${item.level} ${item.exclusive ? 'Exclusive Only' : ''} ${item.clean ? 'clean' : ''} Template: ${item.template} ${item.team === 4 ? '' : item.team} ${item.gym_id ? 'Gym:' : ''}${item.distance ? ` | d${item.distance}` : ''}`
       case 'nest': return `${t(`poke_${item.pokemon_id}`)} | Min Spawn: ${item.min_spawn_avg}`
       case 'pokemon': return item.pvp_ranking_league
-        ? `${leagues.find(league => league.cp === item.pvp_ranking_league).name} ${item.pvp_ranking_best}-${item.pvp_ranking_worst}`
+        ? `${t('pvp')} ${t(leagues.find(league => league.cp === item.pvp_ranking_league).name)} ${item.pvp_ranking_best}-${item.pvp_ranking_worst} ${item.pvp_ranking_min_cp ? `${item.pvp_ranking_min_cp}${t('cp')}` : ''}`
         : `${item.min_iv}-${item.max_iv}% | L${item.min_level}-${item.max_level}
       A${item.atk}-${item.max_atk} | D${item.def}-${item.max_def} | S${item.sta}-${item.max_sta}${item.distance ? ` | d${item.distance}` : ''}`
       default: return item.description

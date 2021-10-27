@@ -42,7 +42,7 @@ export default function Manage({
   const [tabValue, setTabValue] = useState(0)
   const [help, setHelp] = useState(false)
   const [addNew, setAddNew] = useState(false)
-  const filteredData = Object.keys(webhookData[selectedWebhook].info || {}).map(key => key)
+  const filteredData = Object.keys(webhookData[selectedWebhook]?.info || {}).map(key => key)
   const webhookCategory = filteredData[tabValue]
 
   const [tempFilters, setTempFilters] = useState(poracleFilters[webhookCategory])
@@ -92,7 +92,7 @@ export default function Manage({
         </Tabs>
       </AppBar>
       <DialogContent style={{ padding: '0', height: isMobile ? '100%' : '70vh' }}>
-        {webhookData[selectedWebhook].human ? filteredData.map((key, i) => (
+        {webhookData[selectedWebhook].human && !poracleFilters.error ? filteredData.map((key, i) => (
           <TabPanel value={tabValue} index={i} key={key} virtual>
             {key === 'human' ? (
               <Human

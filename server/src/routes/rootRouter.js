@@ -219,14 +219,17 @@ rootRouter.get('/settings', async (req, res) => {
         try {
           await Promise.all(filtered.map(async webhook => {
             if (config.webhookObj[webhook.name].client.valid) {
-              serverSettings.webhooks[webhook.name] = {
-                ...config.webhookObj[webhook.name].client,
-                ...await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name),
-              }
+              const remoteData = await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name)
+              serverSettings.webhooks[webhook.name] = remoteData.human.admin_disable
+                ? config.webhookObj[webhook.name].client
+                : {
+                  ...config.webhookObj[webhook.name].client,
+                  ...await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name),
+                }
             }
           }))
         } catch (e) {
-          serverSettings.webhooks.error = true
+          serverSettings.webhooks = null
           console.warn(e, 'Unable to fetch webhook data')
         }
       }

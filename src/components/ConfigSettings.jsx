@@ -111,7 +111,7 @@ export default function ConfigSettings({
   if (localState?.state && serverSettings?.webhooks?.[localState.state?.selectedWebhook]) {
     setSelectedWebhook(localState.state.selectedWebhook)
   } else if (serverSettings?.webhooks) {
-    setSelectedWebhook(serverSettings.webhooks[Object.keys(serverSettings.webhooks)[0]].name)
+    setSelectedWebhook(Object.keys(serverSettings.webhooks)[0])
   }
 
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
