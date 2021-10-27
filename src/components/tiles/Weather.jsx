@@ -12,7 +12,7 @@ export default function WeatherTile({ item, ts, Icons }) {
       pathOptions={{ color: '#246377', opacity: 0.25 }}
     >
       <Marker
-        icon={weatherMarker(item)}
+        icon={weatherMarker(item, Icons)}
         position={[item.latitude, item.longitude]}
         zIndexOffset={10000}
       >

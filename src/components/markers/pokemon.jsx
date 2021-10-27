@@ -54,18 +54,20 @@ export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons, weatherC
       )}
       {Boolean(weatherCheck) && (
         <div
+          className="weather-fancy"
           style={{
-            position: 'absolute',
+            width: size / 1.5,
+            height: size / 1.5,
             top: -size * pokemonMod.offsetY,
             left: `${pokemonMod.offsetX * size * 5}%`,
           }}
         >
           <img
-            src={`/images/weather/${pkmn.weather}.png`}
-            className="weather-icon"
+            src={Icons.getWeather(pkmn.weather)}
             style={{
               width: size / 2,
               height: 'auto',
+              padding: size / 12,
             }}
           />
         </div>
