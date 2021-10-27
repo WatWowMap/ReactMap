@@ -370,7 +370,7 @@
   "addNewProfile": "Neues Profil hinzufügen",
   "noneSlider": "Keine",
   "nonRegisteredHumanTitle": "Ups, da stimmt etwas nicht!",
-  "nonRegisteredHumanDesc": "Du bist möglicherweise nicht bei {{webhook}} registriert}nOder der Server ist derzeit nicht erreichbar",
+  "nonRegisteredHumanDesc": "Du bist möglicherweise nicht bei {{webhook}} registriert\nOder der Server ist derzeit nicht erreichbar",
   "tryAgainLater": "Bitte versuche es später nochmal",
   "selectedAreas": "{{amount}} Gebiet ausgewählt",
   "selectedAreas_plural": "{{amount}} Gebiete ausgewählt",
