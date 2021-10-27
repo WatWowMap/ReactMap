@@ -407,9 +407,9 @@
   "min_spawn_avg": "Durchschn. Min Spawn",
   "poke_global": "Alle",
   "amount": "Anzahl",
-  "specific_gym": "Specific Gym",
-  "search_location": "Search Locations",
-  "search_specific": "Suche nach spezieller {{category}}",
+  "specific_gym": "Spezifische Arena",
+  "search_location": "Suche Standorte",
+  "search_specific": "Suche nach spezifischer {{category}}",
   "webhook_success_gym": "Raids, Eier, und Team Wechsel Alarme wurden hinzugefügt!",
   "slot_changes": "Platzänderungen"
 }
