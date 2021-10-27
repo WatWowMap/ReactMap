@@ -99,7 +99,6 @@
     "pokemon": {
       "clustering": true,
       "pokemonTimers": false,
-      "prioritizePvpInfo": false,
       "legacyFilter": false,
       "ivCircles": false,
       "minIvCircle": 90,
