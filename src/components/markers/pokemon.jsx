@@ -63,7 +63,7 @@ export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons, weatherC
           }}
         >
           <img
-            src={Icons.getWeather(pkmn.weather)}
+            src={Icons.getWeather(pkmn.weather, pkmn.lat, pkmn.lon)}
             style={{
               width: size / 2,
               height: 'auto',

@@ -10,7 +10,7 @@ export default function weatherMarker(weather, Icons) {
     html: renderToString(
       <div className="weather-fancy">
         <img
-          src={Icons.getWeather(weather.gameplay_condition)}
+          src={Icons.getWeather(weather.gameplay_condition, weather.latitude, weather.longitude)}
           style={{
             width: 25,
             height: 25,
