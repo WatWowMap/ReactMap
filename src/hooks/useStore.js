@@ -38,6 +38,7 @@ const useStore = create(persist(set => ({
   popups: {
     invasions: false,
     extras: false,
+    raids: true,
     pvp: false,
     names: true,
   },

@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import SlideTransition from '@assets/mui/SlideTransition'
+import Utility from '@services/Utility'
 
 import UserProfile from '../dialogs/UserProfile'
 import Feedback from '../dialogs/Feedback'
@@ -106,7 +107,7 @@ export default function Settings({ Icons }) {
                   key={option}
                   value={option}
                 >
-                  {t(`${setting}${option}`)}
+                  {t(`${setting}${option}`, Utility.getProperName(option))}
                 </MenuItem>
               ))}
             </Select>
@@ -129,7 +130,7 @@ export default function Settings({ Icons }) {
                   key={option}
                   value={option}
                 >
-                  {t(`${category}${option}`, option)}
+                  {t(`${category}${option}`, Utility.getProperName(option))}
                 </MenuItem>
               ))}
             </Select>
