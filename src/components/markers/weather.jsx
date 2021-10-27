@@ -12,9 +12,9 @@ export default function weatherMarker(weather, Icons) {
         <img
           src={Icons.getWeather(weather.gameplay_condition, weather.latitude, weather.longitude)}
           style={{
-            width: 25,
-            height: 25,
-            padding: 2.3,
+            width: 24,
+            height: 24,
+            padding: 2.5,
           }}
         />
       </div>,
