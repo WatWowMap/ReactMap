@@ -190,7 +190,7 @@ rootRouter.get('/settings', async (req, res) => {
                     masterfileRef.forms = {}
                   }
                   masterfileRef.forms[item.split('-')[1]] = { name: '*', category }
-                  console.log(`Added ${masterfileRef.name} Key: ${item} to masterfile.`)
+                  console.log(`Added ${masterfileRef.name} Key: ${item} to masterfile. (${category})`)
                 } else {
                   console.warn('Missing and unable to add', category, item)
                 }

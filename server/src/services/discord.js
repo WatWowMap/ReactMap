@@ -77,6 +77,7 @@ class DiscordClient {
     if (discord.allowedUsers.includes(user.id)) {
       Object.keys(perms).forEach((key) => perms[key] = true)
       perms.areaRestrictions = []
+      perms.webhooks = webhooks.map(x => x.name)
       console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
       return perms
     }
