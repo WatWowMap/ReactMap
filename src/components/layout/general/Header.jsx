@@ -17,12 +17,14 @@ export default function Header({ names = [], titles, action }) {
           </Trans>
         ) : `${t(title)} `
       ))}
+      {Boolean(action) && (
       <IconButton
         onClick={action}
         style={{ position: 'absolute', right: 5, top: 5 }}
       >
-        <Clear style={{ color: 'white' }} />
+        <Clear />
       </IconButton>
+      )}
     </DialogTitle>
   )
 }

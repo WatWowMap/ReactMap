@@ -22,6 +22,7 @@ import Tracked from './Tracked'
 import Menu from '../../general/Menu'
 import WebhookError from './Error'
 import ProfileEditing from './ProfileEditing'
+import Feedback from '../Feedback'
 
 export default function Manage({
   Icons, isMobile, isTablet,
@@ -36,11 +37,13 @@ export default function Manage({
   const setWebhookData = useStatic(s => s.setWebhookData)
   const staticFilters = useStatic(s => s.filters)
   const { invasions } = useStatic(s => s.masterfile)
+  const { map } = useStatic(s => s.config)
+
   const poracleFilters = useMemo(() => Poracle.filterGenerator(
     webhookData[selectedWebhook], staticFilters, invasions,
   ), [])
   const [tabValue, setTabValue] = useState(0)
-  const [help, setHelp] = useState(false)
+  const [feedback, setFeedback] = useState(false)
   const [addNew, setAddNew] = useState(false)
   const filteredData = Object.keys(webhookData[selectedWebhook]?.info || {}).map(key => key)
   const webhookCategory = filteredData[tabValue]
@@ -49,10 +52,23 @@ export default function Manage({
   const [send, setSend] = useState(false)
 
   const footerButtons = [
-    { name: 'help', action: () => setHelp(true), icon: 'HelpOutline', disabled: !webhookData[selectedWebhook].human },
-    { name: tabValue ? <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans> : t('manage_profiles'), action: () => setAddNew(true), icon: 'Add', key: 'addNew', disabled: !webhookData[selectedWebhook].human },
+    {
+      name: tabValue
+        ? <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans>
+        : t('manage_profiles'),
+      action: () => setAddNew(true),
+      icon: 'Add',
+      key: 'addNew',
+      disabled: !webhookData[selectedWebhook].human || !tabValue,
+    },
     { name: 'close', action: () => setWebhookMode(false), icon: 'Close' },
   ]
+
+  if (map.enableFeedback) {
+    footerButtons.unshift(
+      { name: 'feedback', action: () => setFeedback(true), icon: 'BugReport', disabled: !webhookData[selectedWebhook].human },
+    )
+  }
 
   const handleClose = (save) => {
     setAddNew(false)
@@ -172,10 +188,10 @@ export default function Manage({
           container: classes.container,
         }}
         maxWidth="xs"
-        open={help}
-        onClose={() => setHelp(false)}
+        open={feedback}
+        onClose={() => setFeedback(false)}
       >
-        {t('help')}
+        <Feedback link={map.feedbackLink} setFeedback={setFeedback} />
       </Dialog>
     </>
   )

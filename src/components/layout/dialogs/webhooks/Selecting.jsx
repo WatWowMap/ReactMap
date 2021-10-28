@@ -27,6 +27,7 @@ export default function Selecting({ setSelected, handleAll }) {
           color="secondary"
           variant="extended"
           onClick={handleAll}
+          disabled
         >
           {t('selectAll')}
         </Fab>
@@ -37,6 +38,7 @@ export default function Selecting({ setSelected, handleAll }) {
           color="primary"
           variant="extended"
           onClick={handleAll}
+          disabled
         >
           {t('deleteAll')}
         </Fab>

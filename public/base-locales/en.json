@@ -369,6 +369,7 @@
   "excludeInvasionMulti": "Exclude {{invasion}}",
   "stardust": "Stardust", 
   "webhookFooterHelpWidth": 4,
+  "webhookFooterFeedbackWidth": 4,
   "webhookFooterCloseWidth": 4,
   "webhookFooterAddNewWidth": 4,
   "dialogFilterFooterNextWidth": 2,
@@ -432,5 +433,7 @@
   "search_location": "Search Locations",
   "search_specific": "Search for a Specific {{category}}",
   "webhook_success_gym": "Raids, Eggs, and Team Change Alerts Have Been Added!",
-  "slot_changes": "Slot Changes"
+  "slot_changes": "Slot Changes",
+  "confirm_delete": "This will remove all tracking for this profile, are you sure?",
+  "confirm_copy": "Choose which profile you would like to copy \"{{profile}}\" to, this will overwrite that profile entirely."
 }

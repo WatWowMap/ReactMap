@@ -21,16 +21,16 @@ export default function Footer({ options, role }) {
     <Grid
       className={classes.filterFooter}
       container
-      justifyContent={isMobile ? 'center' : 'flex-end'}
+      justifyContent="flex-end"
       alignItems="center"
     >
       {options.map(button => {
-        const MuiIcon = MuiIcons[button.icon]
+        const MuiIcon = button.icon ? MuiIcons[button.icon] : null
         const muiColor = button.color === 'primary' || button.color === 'secondary'
         const key = button.key || button.name
         return (
-          <Grid item xs={isMobile ? gridNum : t(`${role}${capitalizeFirstChar(key)}Width`, gridNum)} key={key}>
-            {isMobile ? (
+          <Grid item xs={isMobile ? gridNum : t(`${role}${capitalizeFirstChar(key)}Width`, gridNum)} key={key} style={{ textAlign: button.align || 'center' }}>
+            {isMobile && MuiIcon ? (
               <IconButton
                 onClick={button.action}
                 disabled={button.disabled}
