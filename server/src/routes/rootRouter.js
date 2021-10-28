@@ -248,7 +248,7 @@ rootRouter.use('/graphql', cors(), graphqlHTTP({
   graphiql: config.devOptions.graphiql,
   validationRules: config.devOptions.graphiql ? undefined : [NoSchemaIntrospectionCustomRule],
   customFormatErrorFn: (error) => {
-    console.error('GraphQL Error:', error.message)
+    console.error('GraphQL Error:', error.message, error.path)
   },
 }))
 

@@ -21,7 +21,7 @@ const HumanType = new GraphQLObjectType({
     community_membership: { type: GraphQLString },
     area_restrictions: { type: GraphQLString },
     notes: { type: GraphQLString },
-    blocked_alerts: { type: GraphQLInt },
+    blocked_alerts: { type: GraphQLString },
   }),
 })
 
