@@ -412,6 +412,7 @@ export default function WebhookAdvanced({
       />
       <DialogContent style={{ color: 'white', padding: '8px 5px' }}>
         {Object.keys(info.ui).map(type => {
+          if (JSON.parse(human.blocked_alerts).includes(type)) return null
           const Items = (
             <Grid
               container

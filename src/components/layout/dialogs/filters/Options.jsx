@@ -34,9 +34,13 @@ export default function FilterOptions({
             {Object.keys(options).map(key => (
               <FormControlLabel
                 key={key}
-                control={
-                  <Checkbox checked={userSelection[key]} onChange={(e) => handleChange(name, e)} name={key} />
-                }
+                control={(
+                  <Checkbox
+                    checked={userSelection[key]}
+                    onChange={(e) => handleChange(name, e)}
+                    name={key}
+                  />
+                )}
                 value={key}
                 label={t(key)}
               />

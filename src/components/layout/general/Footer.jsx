@@ -26,7 +26,8 @@ export default function Footer({ options, role }) {
     >
       {options.map(button => {
         const MuiIcon = button.icon ? MuiIcons[button.icon] : null
-        const muiColor = button.color === 'primary' || button.color === 'secondary'
+        const color = button.disabled ? 'default' : button.color || 'white'
+        const muiColor = color === 'primary' || color === 'secondary'
         const key = button.key || button.name
         return (
           <Grid item xs={isMobile ? gridNum : t(`${role}${capitalizeFirstChar(key)}Width`, gridNum)} key={key} style={{ textAlign: button.align || 'center' }}>
@@ -36,15 +37,15 @@ export default function Footer({ options, role }) {
                 disabled={button.disabled}
               >
                 <MuiIcon
-                  color={muiColor ? button.color : 'inherit'}
-                  style={{ color: muiColor ? null : button.color }}
+                  color={muiColor ? color : 'inherit'}
+                  style={{ color: muiColor ? null : color }}
                 />
               </IconButton>
             ) : (
               <Button
                 onClick={button.action}
-                color={muiColor ? button.color : 'inherit'}
-                style={{ color: muiColor ? null : button.color }}
+                color={muiColor ? color : 'inherit'}
+                style={{ color: muiColor ? null : color }}
                 disabled={button.disabled}
               >
                 {!button.mobileOnly && (

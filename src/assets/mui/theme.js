@@ -63,11 +63,6 @@ export default function setTheme(theme) {
           },
         },
       },
-      MuiSvgIcon: {
-        root: {
-          color: 'white',
-        },
-      },
       MuiSelect: {
         icon: {
           color: 'white',

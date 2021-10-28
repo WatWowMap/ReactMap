@@ -45,7 +45,10 @@ export default function Manage({
   const [tabValue, setTabValue] = useState(0)
   const [feedback, setFeedback] = useState(false)
   const [addNew, setAddNew] = useState(false)
-  const filteredData = Object.keys(webhookData[selectedWebhook]?.info || {}).map(key => key)
+  const filteredData = Object.keys(webhookData[selectedWebhook]?.info || {}).filter(key => key
+    && (!webhookData[selectedWebhook]?.human?.blocked_alerts || (key === 'pokemon'
+      ? !webhookData[selectedWebhook].human.blocked_alerts.includes('monster')
+      : !webhookData[selectedWebhook].human.blocked_alerts.includes(key))))
   const webhookCategory = filteredData[tabValue]
 
   const [tempFilters, setTempFilters] = useState(poracleFilters[webhookCategory])
@@ -61,12 +64,12 @@ export default function Manage({
       key: 'addNew',
       disabled: !webhookData[selectedWebhook].human || !tabValue,
     },
-    { name: 'close', action: () => setWebhookMode(false), icon: 'Close' },
+    { name: 'close', action: () => setWebhookMode(false), icon: 'Close', color: 'primary' },
   ]
 
   if (map.enableFeedback) {
     footerButtons.unshift(
-      { name: 'feedback', action: () => setFeedback(true), icon: 'BugReport', disabled: !webhookData[selectedWebhook].human },
+      { name: 'feedback', action: () => setFeedback(true), icon: 'BugReport', disabled: !webhookData[selectedWebhook].human, color: '#00e676' },
     )
   }
 

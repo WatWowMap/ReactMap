@@ -97,6 +97,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
           size="small"
           checked={Boolean(selected[item.uid])}
           onChange={handleChange}
+          color="secondary"
         />
       </Grid>
       <Dialog
