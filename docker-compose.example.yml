@@ -8,6 +8,6 @@ services:
     volumes:
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
       - ./server/src/configs/config.json:/home/node/server/src/configs/config.json
-      - ./env.example:/home/node/.env
+      - ./example.env:/home/node/.env
     ports:
       - "9090:8080"
