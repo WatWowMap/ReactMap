@@ -69,6 +69,18 @@ const Tracked = ({
     setSelected(newObj)
   }
 
+  const deleteAll = () => {
+    syncWebhook({
+      variables: {
+        category: `${category}Delete`,
+        data: Object.keys(selected),
+        name: selectedWebhook,
+        status: 'POST',
+      },
+    })
+    setSelected({})
+  }
+
   const profileFiltered = tracked.filter(x => x.profile_no === webhookData[selectedWebhook].human.current_profile_no)
 
   return (
@@ -98,7 +110,7 @@ const Tracked = ({
         Tile={PokemonTile}
       />
       {Object.values(selected).some(x => x) && (
-        <Selecting setSelected={setSelected} handleAll={handleAll} />
+        <Selecting setSelected={setSelected} handleAll={handleAll} deleteAll={deleteAll} />
       )}
     </div>
   )

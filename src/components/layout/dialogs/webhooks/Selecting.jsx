@@ -2,7 +2,7 @@ import React from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
-export default function Selecting({ setSelected, handleAll }) {
+export default function Selecting({ setSelected, handleAll, deleteAll }) {
   const { t } = useTranslation()
   return (
     <Grid
@@ -27,18 +27,16 @@ export default function Selecting({ setSelected, handleAll }) {
           color="secondary"
           variant="extended"
           onClick={handleAll}
-          disabled
         >
           {t('selectAll')}
         </Fab>
       </Grid>
-      <Grid item xs={4} sm={3} md={2} style={{ textAlign: 'center' }}>
+      <Grid item xs={5} sm={4} md={3} style={{ textAlign: 'center' }}>
         <Fab
           size="small"
           color="primary"
           variant="extended"
-          onClick={handleAll}
-          disabled
+          onClick={deleteAll}
         >
           {t('deleteAll')}
         </Fab>

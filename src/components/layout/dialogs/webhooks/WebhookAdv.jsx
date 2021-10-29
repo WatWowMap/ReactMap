@@ -239,6 +239,7 @@ export default function WebhookAdvanced({
     switch (option.name) {
       case 'distance': return !poracleValues.byDistance
       case 'amount': return option?.disabled?.some(x => id.startsWith(x)) || /\d/.test(id.charAt(0))
+      case 'pvpEntry': return human.blocked_alerts?.includes('pvp')
       default: return option?.disabled?.some(x => id.startsWith(x))
     }
   }
@@ -412,7 +413,7 @@ export default function WebhookAdvanced({
       />
       <DialogContent style={{ color: 'white', padding: '8px 5px' }}>
         {Object.keys(info.ui).map(type => {
-          if (JSON.parse(human.blocked_alerts).includes(type)) return null
+          if (human.blocked_alerts && JSON.parse(human.blocked_alerts).includes(type)) return null
           const Items = (
             <Grid
               container

@@ -426,7 +426,7 @@ const Mutation = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : false
         const { category, data, status, name } = args
-        if (perms && Utility.permissions(category, perms)) {
+        if (perms.webhooks.includes(name)) {
           const response = await Fetch.webhookApi(category, req.user.id, status, name, data)
           return response
         }

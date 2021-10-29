@@ -51,6 +51,23 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
           url: `${webhook.host}:${webhook.port}/api/humans/${discordId}`,
           options: { method, headers },
         }); break
+      case 'eggDelete':
+      case 'invasionDelete':
+      case 'lureDelete':
+      case 'nestDelete':
+      case 'pokemonDelete':
+      case 'questDelete':
+      case 'raidDelete':
+      case 'gymDelete': {
+        const cleanCategory = category.replace('Delete', '')
+        Object.assign(payloadObj, {
+          url: `${webhook.host}:${webhook.port}/api/tracking/${cleanCategory}/${discordId}/delete`,
+          options: {
+            method, headers, body: method === 'POST' ? JSON.stringify(data) : undefined,
+          },
+          get: cleanCategory,
+        })
+      } break
       case 'egg':
       case 'invasion':
       case 'lure':
