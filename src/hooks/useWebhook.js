@@ -16,8 +16,7 @@ export default function useWebhook({ category, selectedWebhook }) {
       if (data.webhook.status === 'success') {
         data.webhook.message = t(`webhook_success_${category.replace('quick', '').toLowerCase()}`)
       }
-      setWebhookAlert({ open: true, severity: data.webhook.status, message: data.webhook.message })
-      if (webhookData[selectedWebhook]) {
+      if (webhookData?.[selectedWebhook]) {
         return setWebhookData({
           ...webhookData,
           [selectedWebhook]: {
@@ -26,6 +25,7 @@ export default function useWebhook({ category, selectedWebhook }) {
           },
         })
       }
+      setWebhookAlert({ open: true, severity: data.webhook.status, message: data.webhook.message })
     }
   }, [data])
 

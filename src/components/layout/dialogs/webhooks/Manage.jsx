@@ -30,15 +30,14 @@ export default function Manage({
   setWebhookMode, webhookMode,
   selectedAreas, setSelectedAreas,
   webhookLocation, setWebhookLocation,
+  webhookData, setWebhookData,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
-  const webhookData = useStatic(s => s.webhookData)
-  const setWebhookData = useStatic(s => s.setWebhookData)
   const staticFilters = useStatic(s => s.filters)
   const { invasions } = useStatic(s => s.masterfile)
   const { map } = useStatic(s => s.config)
-
+  const setWebhookAlert = useStatic(state => state.setWebhookAlert)
   const poracleFilters = useMemo(() => Poracle.filterGenerator(
     webhookData[selectedWebhook], staticFilters, invasions,
   ), [])
@@ -127,9 +126,11 @@ export default function Manage({
                 setSelectedAreas={setSelectedAreas}
                 selectedWebhook={selectedWebhook}
                 setSelectedWebhook={setSelectedWebhook}
+                setWebhookAlert={setWebhookAlert}
               />
             ) : (
               <Tracked
+                t={t}
                 Icons={Icons}
                 category={key}
                 isMobile={isMobile}
@@ -141,6 +142,7 @@ export default function Manage({
                 send={send}
                 setSend={setSend}
                 Poracle={Poracle}
+                setWebhookAlert={setWebhookAlert}
               />
             )}
           </TabPanel>

@@ -5,9 +5,11 @@ import {
   Grid, Divider, Typography, Select, MenuItem,
 } from '@material-ui/core'
 import { useMutation } from '@apollo/client'
+import { Trans } from 'react-i18next'
 
-import { useStore } from '@hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
 import Query from '@services/Query'
+
 import Location from './Location'
 import Areas from './Areas'
 
@@ -17,15 +19,25 @@ const Human = ({
   selectedWebhook, setSelectedWebhook,
   webhookLocation, setWebhookLocation,
   isMobile, t, webhookData, setWebhookData,
+  setWebhookAlert,
 }) => {
-  const location = useStore(state => state.location)
+  const { perms } = useStatic(s => s.auth)
+  const location = useStore(s => s.location)
   const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook('setHuman'))
 
   const [currentHuman, setCurrentHuman] = useState(webhookData[selectedWebhook].human)
 
   useEffect(() => {
-    if (newWebhookData && newWebhookData.webhook) {
-      setCurrentHuman(newWebhookData.webhook.human)
+    if (newWebhookData?.webhook) {
+      if (newWebhookData.webhook.status === 'error') {
+        setWebhookAlert({
+          open: true,
+          severity: newWebhookData.webhook.status,
+          message: <Trans i18nKey={newWebhookData.webhook.message}>{{ name: selectedWebhook }}</Trans>,
+        })
+      } else if (newWebhookData.webhook.human) {
+        setCurrentHuman(newWebhookData.webhook.human)
+      }
     }
   }, [newWebhookData])
 
@@ -89,7 +101,7 @@ const Human = ({
             ))}
           </Select>
         </Grid>
-        {Object.keys(webhookData).length > 1 && (
+        {perms.webhooks.length > 1 && (
           <>
             <Grid item xs={6} sm={3}>
               <Typography variant="h6">
@@ -102,7 +114,7 @@ const Human = ({
                 onChange={(e) => setSelectedWebhook(e.target.value)}
                 style={{ minWidth: 100 }}
               >
-                {Object.keys(webhookData).map((webhook) => (
+                {perms.webhooks.map((webhook) => (
                   <MenuItem key={webhook} value={webhook}>{webhook}</MenuItem>
                 ))}
               </Select>

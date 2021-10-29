@@ -220,17 +220,22 @@ rootRouter.get('/settings', async (req, res) => {
           await Promise.all(filtered.map(async webhook => {
             if (config.webhookObj[webhook.name].client.valid) {
               const remoteData = await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name)
-              serverSettings.webhooks[webhook.name] = remoteData.human.admin_disable
-                ? config.webhookObj[webhook.name].client
-                : {
-                  ...config.webhookObj[webhook.name].client,
-                  ...await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name),
-                }
+              const { areas } = await Fetch.webhookApi('humans', serverSettings.user.id, 'GET', webhook.name)
+
+              if (remoteData && areas) {
+                serverSettings.webhooks[webhook.name] = remoteData.human.admin_disable
+                  ? config.webhookObj[webhook.name].client
+                  : {
+                    ...config.webhookObj[webhook.name].client,
+                    ...remoteData,
+                    available: areas.map(area => area.name),
+                  }
+              }
             }
           }))
         } catch (e) {
           serverSettings.webhooks = null
-          console.warn(e, 'Unable to fetch webhook data')
+          console.warn(e.message, 'Unable to fetch webhook data')
         }
       }
       if (config.devOptions.enabled) {
@@ -247,8 +252,12 @@ rootRouter.use('/graphql', cors(), graphqlHTTP({
   schema,
   graphiql: config.devOptions.graphiql,
   validationRules: config.devOptions.graphiql ? undefined : [NoSchemaIntrospectionCustomRule],
-  customFormatErrorFn: (error) => {
-    console.error('GraphQL Error:', error.message, error.path)
+  customFormatErrorFn: (e) => {
+    if (config.devOptions) {
+      console.error('GraphQL Error:', e)
+    } else {
+      console.error('GraphQL Error:', e.message, e.path, e.location)
+    }
   },
 }))
 

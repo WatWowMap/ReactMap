@@ -41,6 +41,11 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
           url: `${webhook.host}:${webhook.port}/api/geofence/all/${category}`,
           options: { method, headers },
         }); break
+      case 'areaSecurity':
+        Object.assign(payloadObj, {
+          url: `${webhook.host}:${webhook.port}/api/geofence/${discordId}`,
+          options: { method, headers },
+        }); break
       case 'humans':
         Object.assign(payloadObj, {
           url: `${webhook.host}:${webhook.port}/api/humans/${discordId}`,
@@ -89,6 +94,6 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
     return post
   } catch (e) {
     console.log(e.message, 'There was a problem processing that webhook request')
-    return { status: 'error', message: e.message }
+    return { status: 'error', message: 'webhook_error' }
   }
 }

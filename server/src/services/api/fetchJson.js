@@ -9,7 +9,11 @@ module.exports = async function fetchJson(url, options = undefined, log = false)
     }
     return response.json()
   } catch (e) {
-    console.warn(e, `\nUnable to fetch ${url}`)
+    if (log) {
+      console.warn(e)
+    } else {
+      console.warn(e.message, '\n', e.code, `\nUnable to fetch ${url}`)
+    }
     return null
   }
 }

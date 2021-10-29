@@ -10,6 +10,8 @@ module.exports = async function initWebhooks(config) {
       }
       if (webhook.enabled) {
         const options = { method: 'GET', headers: { 'X-Poracle-Secret': webhook.poracleSecret } }
+        webhook.areasToSkip = webhook.areasToSkip.map(x => x.toLowerCase()) || []
+
         const hookConfig = await fetchJson(`${webhook.host}:${webhook.port}/api/config/poracleWeb`, options, config.devOptions.enabled)
 
         const baseSettings = {
@@ -27,7 +29,15 @@ module.exports = async function initWebhooks(config) {
         }
 
         const templates = await fetchJson(`${webhook.host}:${webhook.port}/api/config/templates?names=true`, options, config.devOptions.enabled)
-        const areas = await fetchJson(`${webhook.host}:${webhook.port}/api/geofence/all/hash`, options, config.devOptions.enabled)
+        const areas = await fetchJson(`${webhook.host}:${webhook.port}/api/geofence/all/geojson`, options, config.devOptions.enabled) || {}
+
+        if (areas.geoJSON?.features) {
+          areas.geoJSON.features = areas.geoJSON.features
+            .sort((a, b) => a.properties.name.localeCompare(b.properties.name))
+            .filter(x => !webhook.areasToSkip.includes(x.properties.name.toLowerCase()))
+        } else {
+          console.warn('No geofences found')
+        }
 
         if (templates) {
           templates[webhook.platform].pokemon = templates[webhook.platform].monster
@@ -52,7 +62,7 @@ module.exports = async function initWebhooks(config) {
             prefix: hookConfig.prefix,
             locale: hookConfig.locale,
             info: webhookUi(webhook.provider, hookConfig, baseSettings.pvp, baseSettings.leagues),
-            areas: areas ? Object.keys(areas.areas).map(a => a).sort() : [],
+            areas: areas.geoJSON || [],
             template: templates[webhook.platform],
           } : baseSettings,
         }

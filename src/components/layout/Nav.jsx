@@ -178,6 +178,7 @@ export default function Nav({
           onClose={() => setWebhookAlert({ open: false, severity: 'info', message: '' })}
           severity={webhookAlert.severity}
           variant="filled"
+          style={{ whiteSpace: 'pre-line', textAlign: 'center' }}
         >
           {webhookAlert.message}
         </Alert>

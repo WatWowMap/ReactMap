@@ -12,6 +12,7 @@ i18n
     supportedLngs: ['de', 'en', 'es', 'fr', 'it', 'ja', 'ko', 'pl', 'pt-br', 'ru', 'th', 'zh-tw'],
     fallbackLng: 'en',
     debug: false,
+    joinArrays: '\n',
   })
 
 export default i18n

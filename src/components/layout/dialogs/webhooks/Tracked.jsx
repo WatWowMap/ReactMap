@@ -1,6 +1,6 @@
 import React, { useEffect, useState, memo } from 'react'
 import { useMutation } from '@apollo/client'
-import { useTranslation } from 'react-i18next'
+import { Trans } from 'react-i18next'
 
 import Query from '@services/Query'
 import { useStatic } from '@hooks/useStore'
@@ -11,8 +11,8 @@ import Selecting from './Selecting'
 const Tracked = ({
   isMobile, webhookData, selectedWebhook, Icons, send, setSend,
   tempFilters, setTempFilters, setWebhookData, category, Poracle,
+  setWebhookAlert, t,
 }) => {
-  const { t } = useTranslation()
   const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook(category))
   const [tracked, setTracked] = useState(webhookData[selectedWebhook][category])
   const [selected, setSelected] = useState({})
@@ -22,6 +22,13 @@ const Tracked = ({
   useEffect(() => {
     if (newWebhookData?.webhook?.[category]) {
       setTracked(newWebhookData.webhook[category])
+    }
+    if (newWebhookData?.webhook?.status === 'error') {
+      setWebhookAlert({
+        open: true,
+        severity: newWebhookData.webhook.status,
+        message: <Trans i18nKey={newWebhookData.webhook.message}>{{ name: selectedWebhook }}</Trans>,
+      })
     }
   }, [newWebhookData])
 

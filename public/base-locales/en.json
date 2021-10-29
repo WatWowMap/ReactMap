@@ -367,7 +367,7 @@
   "clusterLimit_1": "Please zoom in or narrow your filters",
   "showPolygons": "Show Polygons",
   "excludeInvasionMulti": "Exclude {{invasion}}",
-  "stardust": "Stardust", 
+  "stardust": "Stardust",
   "webhookFooterHelpWidth": 4,
   "webhookFooterFeedbackWidth": 4,
   "webhookFooterCloseWidth": 4,
@@ -435,5 +435,9 @@
   "webhook_success_gym": "Raids, Eggs, and Team Change Alerts Have Been Added!",
   "slot_changes": "Slot Changes",
   "confirm_delete": "This will remove all tracking for this profile, are you sure?",
-  "confirm_copy": "Choose which profile you would like to copy \"{{profile}}\" to, this will overwrite that profile entirely."
+  "confirm_copy": "Choose which profile you would like to copy \"{{profile}}\" to, this will overwrite that profile entirely.",
+  "webhook_error": [
+    "{{name}} was unable to process that.",
+    "Please try again later."
+  ]
 }

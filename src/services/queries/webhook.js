@@ -401,21 +401,3 @@ export const quest = gql`
     }
   }
 `
-
-export const geojson = gql`
-  query WebhookGeojson($name: String!) {
-    webhookGeojson(name: $name) {
-      type
-      features {
-        type
-        properties {
-          name
-        }
-        geometry {
-          type
-          coordinates
-        }
-      }
-    }
-  }
-`

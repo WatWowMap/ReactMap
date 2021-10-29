@@ -1,23 +1,25 @@
 import React from 'react'
-import { useQuery } from '@apollo/client'
 
-import Query from '@services/Query'
 import ScanAreaTile from '@components/tiles/ScanArea'
 
 export default function AreaSelection({
   map, selectedWebhook,
   webhookMode, setWebhookMode,
   selectedAreas, setSelectedAreas,
+  webhookData,
 }) {
-  const { data } = useQuery(Query.webhook('geojson'), {
-    variables: { name: selectedWebhook },
-  })
-
-  if (data && data.webhookGeojson) {
+  if (webhookData[selectedWebhook]) {
+    const lower = webhookData[selectedWebhook].available.map(a => a.toLowerCase())
+    const filtered = {
+      ...webhookData[selectedWebhook].areas,
+      features: webhookData[selectedWebhook].areas.features.filter(feature => (
+        lower.includes(feature.properties.name.toLowerCase())
+      )),
+    }
     return (
       <ScanAreaTile
         map={map}
-        item={data.webhookGeojson}
+        item={filtered}
         webhookMode={webhookMode}
         setWebhookMode={setWebhookMode}
         selectedAreas={selectedAreas}

@@ -16,7 +16,7 @@ const Areas = ({
     areaName = areaName.toLowerCase()
     let newAreas = []
     if (areaName === 'all') {
-      newAreas = webhookData.areas
+      newAreas = webhookData.available
     } else if (areaName === 'none') {
       newAreas = []
     } else {
@@ -54,6 +54,7 @@ const Areas = ({
       </Button>
     </Grid>
   )
+
   return (
     <Grid
       container
@@ -86,7 +87,7 @@ const Areas = ({
         xs={12}
         className={classes.areaChips}
       >
-        {webhookData.areas.map(area => {
+        {webhookData.available.map(area => {
           const included = selectedAreas.includes(area.toLowerCase())
           return (
             <Chip
