@@ -112,6 +112,7 @@ const areEqual = (prev, next) => {
   }
   return prev.item.id === next.item.id
     && prev.item.raid_pokemon_id === next.item.raid_pokemon_id
+    && prev.item.raid_level === next.item.raid_level
     && raidLogic()
     && sizeLogic()
     && prev.showTimer === next.showTimer
