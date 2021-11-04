@@ -184,7 +184,7 @@ export default class Poracle {
       case 'lure': return ['lures']
       case 'nest': return ['pokemon']
       case 'raid': return ['raids', 'pokemon']
-      case 'quest': return ['items', 'quest_reward_12', 'pokemon', 'quest_reward_4', 'quest_reward_9', 'quest_reward_3']
+      case 'quest': return ['items', 'quest_reward_12', 'pokemon', 'quest_reward_4', 'quest_reward_3']
       default: return [poracleCategory]
     }
   }
