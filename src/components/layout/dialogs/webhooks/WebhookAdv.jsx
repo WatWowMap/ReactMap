@@ -47,7 +47,7 @@ export default function WebhookAdvanced({
   const webhookAdv = useStore(s => s.webhookAdv)
   const setWebhookAdv = useStore(s => s.setWebhookAdv)
   const { [selectedWebhook]: {
-    info: { [category]: info }, profile, human, template, prefix, leagues, pvp, addressFormat,
+    info: { [category]: info }, profile, human, template, prefix, leagues, pvp, addressFormat, hasNominatim,
   } } = useStatic(s => s.webhookData)
   const { pokemon, moves, types } = useStatic(s => s.masterfile)
 
@@ -342,6 +342,7 @@ export default function WebhookAdvanced({
               filterOptions={(x) => x}
               options={fetchedData ? fetchedData.search : []}
               autoComplete
+              disabled={!hasNominatim}
               includeInputInList
               freeSolo
               onChange={(event, newValue) => {

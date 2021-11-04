@@ -2,6 +2,9 @@ const NodeGeocoder = require('node-geocoder')
 
 module.exports = async function geocoder(nominatimUrl, search, reverse) {
   try {
+    if (!nominatimUrl) {
+      throw new Error('Nominatim url not provided')
+    }
     const stockGeocoder = NodeGeocoder({
       provider: 'openstreetmap',
       osmServer: nominatimUrl,

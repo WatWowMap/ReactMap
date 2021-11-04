@@ -142,6 +142,7 @@ const Human = ({
         setWebhookMode={setWebhookMode}
         currentHuman={currentHuman}
         addressFormat={webhookData[selectedWebhook].addressFormat}
+        hasNominatim={webhookData[selectedWebhook].hasNominatim}
         t={t}
         syncWebhook={syncWebhook}
         webhookMode={webhookMode}

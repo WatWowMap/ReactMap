@@ -17,6 +17,7 @@ const Location = ({
   setWebhookMode, t, syncWebhook,
   addressFormat, currentHuman,
   webhookLocation, selectedWebhook,
+  hasNominatim,
 }) => {
   const map = useMapEvents({
     locationfound: (location) => {
@@ -94,6 +95,7 @@ const Location = ({
           autoComplete
           includeInputInList
           freeSolo
+          disabled={!hasNominatim}
           onChange={(event, newValue) => {
             if (newValue) {
               const { latitude, longitude } = newValue
