@@ -39,3 +39,6 @@ Desktop.ini
 # Linux
 .directory
 *~
+
+# VS Code
+/.vscode/

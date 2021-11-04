@@ -26,6 +26,8 @@ const quest = new GraphQLObjectType({
     mega_amount: { type: GraphQLInt },
     candy_pokemon_id: { type: GraphQLInt },
     candy_amount: { type: GraphQLInt },
+    xl_candy_pokemon_id: { type: GraphQLInt },
+    xl_candy_amount: { type: GraphQLInt },
     with_ar: { type: GraphQLBoolean },
     key: { type: GraphQLString },
   }),

@@ -34,6 +34,8 @@ export default function PokestopPopup({
     Utility.analytics('Popup', Object.keys(has).filter(a => Boolean(has[a])), 'Pokestop')
   }, [])
 
+  const plainPokestop = !hasLure && !hasQuest && !hasInvasion
+
   return (
     <Grid
       container
@@ -43,81 +45,90 @@ export default function PokestopPopup({
       alignItems="center"
       spacing={1}
     >
-      <Grid item xs={3} style={{ textAlign: 'center' }}>
-        <HeaderImage
-          Icons={Icons}
-          alt={pokestop.name}
-          url={pokestop.url}
-          backup={Icons.getPokestops(0)}
-          arScanEligible={pokestop.ar_scan_eligible}
-        />
-      </Grid>
-      <Grid item xs={7}>
+      {!plainPokestop && (
+        <Grid item xs={3} style={{ textAlign: 'center' }}>
+          <HeaderImage
+            Icons={Icons}
+            alt={pokestop.name}
+            url={pokestop.url}
+            arScanEligible={pokestop.ar_scan_eligible}
+          />
+        </Grid>
+      )}
+      <Grid item xs={plainPokestop ? 10 : 7}>
         <Title
           mainName={pokestop.name}
           backup={t('unknownPokestop')}
         />
       </Grid>
-      <Grid item xs={2}>
-        <MenuActions
-          pokestop={pokestop}
-          perms={perms}
-          hasInvasion={hasInvasion}
-          hasQuest={hasQuest}
-          hasLure={hasLure}
-          t={t}
-          ts={ts}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <Collapse in={!popups.invasions || !hasInvasion} timeout="auto" unmountOnExit>
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            spacing={1}
-          >
-            {hasQuest && pokestop.quests.map((quest, index) => (
-              <Fragment key={quest.with_ar}>
-                {index ? <Divider light flexItem className="popup-divider" /> : null}
-                <RewardInfo
-                  quest={quest}
-                  Icons={Icons}
-                  config={config}
-                  t={t}
-                />
-                <QuestConditions
-                  quest={quest}
-                  t={t}
-                  userSettings={userSettings}
-                />
-              </Fragment>
-            ))}
-            {hasLure && (
-              <>
-                {(hasQuest) && <Divider light flexItem className="popup-divider" />}
-                <TimeTile
-                  expireTime={lure_expire_timestamp}
-                  icon={Icons.getPokestops(lure_id)}
-                  until
-                />
-              </>
-            )}
-            {hasInvasion && (
-              <>
-                {(hasQuest || hasLure) && <Divider light flexItem className="popup-divider" />}
-                {invasions.map(invasion => (
+      <MenuActions
+        pokestop={pokestop}
+        perms={perms}
+        hasInvasion={hasInvasion}
+        hasQuest={hasQuest}
+        hasLure={hasLure}
+        t={t}
+        ts={ts}
+      />
+      <Grid item xs={12} style={{ textAlign: 'center' }}>
+        {plainPokestop ? (
+          <HeaderImage
+            Icons={Icons}
+            alt={pokestop.name}
+            url={pokestop.url}
+            arScanEligible={pokestop.ar_scan_eligible}
+            large
+          />
+        ) : (
+          <Collapse in={!popups.invasions || !hasInvasion} timeout="auto" unmountOnExit>
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              spacing={1}
+            >
+              {hasQuest && pokestop.quests.map((quest, index) => (
+                <Fragment key={quest.with_ar}>
+                  {index ? <Divider light flexItem className="popup-divider" /> : null}
+                  <RewardInfo
+                    quest={quest}
+                    Icons={Icons}
+                    config={config}
+                    t={t}
+                  />
+                  <QuestConditions
+                    quest={quest}
+                    t={t}
+                    userSettings={userSettings}
+                  />
+                </Fragment>
+              ))}
+              {hasLure && (
+                <>
+                  {(hasQuest) && <Divider light flexItem className="popup-divider" />}
                   <TimeTile
-                    key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
-                    expireTime={invasion.incident_expire_timestamp}
-                    icon={Icons.getInvasions(invasion.grunt_type)}
+                    expireTime={lure_expire_timestamp}
+                    icon={Icons.getPokestops(lure_id)}
                     until
                   />
-                ))}
-              </>
-            )}
-          </Grid>
-        </Collapse>
+                </>
+              )}
+              {hasInvasion && (
+                <>
+                  {(hasQuest || hasLure) && <Divider light flexItem className="popup-divider" />}
+                  {invasions.map(invasion => (
+                    <TimeTile
+                      key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
+                      expireTime={invasion.incident_expire_timestamp}
+                      icon={Icons.getInvasions(invasion.grunt_type)}
+                      until
+                    />
+                  ))}
+                </>
+              )}
+            </Grid>
+          </Collapse>
+        )}
       </Grid>
       {(perms.invasions && hasInvasion) && (
         <Collapse in={popups.invasions} timeout="auto" unmountOnExit>
@@ -225,6 +236,7 @@ const MenuActions = ({
         case 3: reward = `${t('stardust')} x${quest.stardust_amount}`; break
         case 4: reward = `${t(`poke_${quest.candy_pokemon_id} ${t('candy')}`)}`; break
         case 7: reward = t(`poke_${quest.quest_pokemon_id}`); break
+        case 9: reward = t(`poke_${quest.quest_pokemon_id} ${t('xl')}`); break
         case 12: reward = `${t(`poke_${quest.mega_pokemon_id}`)} x${quest.mega_amount}`; break
         default: reward = t(`quest_reward_${quest.quest_reward_type}`); break
       }
@@ -235,6 +247,7 @@ const MenuActions = ({
       })
     })
   }
+
   if ((perms.invasions && hasInvasion)
     || (perms.lures && hasLure)) {
     if (hasInvasion) {
@@ -254,7 +267,7 @@ const MenuActions = ({
     )
   }
   return (
-    <Grid item xs={3} style={{ textAlign: 'right' }}>
+    <Grid item xs={2} style={{ textAlign: 'right' }}>
       <IconButton
         aria-haspopup="true"
         onClick={handleClick}

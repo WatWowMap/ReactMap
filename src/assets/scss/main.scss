@@ -1,4 +1,5 @@
 @import "~react-leaflet-markercluster/dist/styles.min.css";
+@import "~leaflet.locatecontrol/dist/L.Control.Locate.min.css";
 
 .leaflet-container {
   position: absolute;
@@ -11,8 +12,8 @@
   right: 0;
 }
 
-.leaflet-control-locate {
-  opacity: 0;
+.react-locate-control {
+  display: none;
 }
 
 body {
@@ -194,16 +195,12 @@ body {
 
 .ar-eligible > img.ar-logo {
   position: absolute;
-  width: 16px;
-  height: 16px;
   left: 0px;
   bottom: -5px;
 }
 
 .ar-eligible > img.ex-logo {
   position: absolute;
-  width: 16px;
-  height: 16px;
   right: 0px;
   bottom: -5px;
 }
@@ -352,4 +349,8 @@ img {
 
 .perm-wrapper img {
   width: 100%;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(100%);
 }

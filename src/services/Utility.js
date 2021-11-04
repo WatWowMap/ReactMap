@@ -2,18 +2,14 @@ import ReactGA from 'react-ga'
 
 import formatInterval from './functions/formatInterval'
 import getProperName from './functions/getProperName'
-import menuFilter from './functions/menuFilter'
 import checkAdvFilter from './functions/checkAdvFilter'
 import dayCheck from './functions/dayCheck'
 import parseQuestConditions from './functions/parseConditions'
+import formatter from './functions/formatter'
 
 export default class Utility {
   static getProperName(word) {
     return getProperName(word)
-  }
-
-  static menuFilter(tempFilters, menus, search, type) {
-    return menuFilter(tempFilters, menus, search, type)
   }
 
   static checkAdvFilter(filter) {
@@ -34,6 +30,10 @@ export default class Utility {
 
   static parseConditions(conditions) {
     return parseQuestConditions(conditions)
+  }
+
+  static formatter(addressFormat, data) {
+    return formatter(addressFormat, data)
   }
 
   static analytics(category, action = false, label = false, nonInteraction = false) {

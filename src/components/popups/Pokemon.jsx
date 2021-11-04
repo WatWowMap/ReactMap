@@ -14,6 +14,8 @@ import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
+import GenericTimer from './common/Timer'
+
 export default function PokemonPopup({
   pokemon, iconUrl, userSettings, isTutorial, Icons,
 }) {
@@ -22,13 +24,13 @@ export default function PokemonPopup({
   const {
     pokemon_id, cleanPvp, iv, cp,
   } = pokemon
-  const { pokemon: pokemonPerms } = useStatic(state => state.ui)
-  const perms = isTutorial ? {
+  const { perms } = useStatic(state => state.auth)
+  const pokePerms = isTutorial ? {
     pvp: true, stats: true, iv: true,
-  } : pokemonPerms
+  } : perms
   const { pokemon: { [pokemon_id]: metaData } } = useStatic(state => state.masterfile)
-  const [expanded, setExpanded] = useState(false)
-  const [pvpExpand, setPvpExpand] = useState((userSettings.prioritizePvpInfo && perms.pvp))
+  const popups = useStore(state => state.popups)
+  const setPopups = useStore(state => state.setPopups)
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
 
@@ -49,8 +51,10 @@ export default function PokemonPopup({
         metaData={metaData}
         iconUrl={iconUrl}
         t={t}
+        perms={perms}
         userSettings={userSettings}
         classes={classes}
+        isTutorial={isTutorial}
       />
       <Timer
         pokemon={pokemon}
@@ -61,7 +65,7 @@ export default function PokemonPopup({
           <Stats
             pokemon={pokemon}
             metaData={metaData}
-            perms={perms}
+            perms={pokePerms}
             t={t}
           />
           <Divider orientation="vertical" flexItem />
@@ -70,20 +74,18 @@ export default function PokemonPopup({
       <Info
         pokemon={pokemon}
         metaData={metaData}
-        perms={perms}
+        perms={pokePerms}
         Icons={Icons}
       />
       <Footer
         pokemon={pokemon}
-        expanded={expanded}
-        setExpanded={setExpanded}
-        pvpExpand={pvpExpand}
-        setPvpExpand={setPvpExpand}
+        popups={popups}
+        setPopups={setPopups}
         hasPvp={hasLeagues.length > 0}
         classes={classes}
         Icons={Icons}
       />
-      <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
+      <Collapse in={popups.pvp && perms.pvp} timeout="auto" unmountOnExit>
         {hasLeagues.map(league => (
           <PvpInfo
             key={league}
@@ -94,10 +96,10 @@ export default function PokemonPopup({
           />
         ))}
       </Collapse>
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
+      <Collapse in={popups.extras} timeout="auto" unmountOnExit>
         <ExtraInfo
           pokemon={pokemon}
-          perms={perms}
+          perms={pokePerms}
           t={t}
           Icons={Icons}
         />
@@ -119,8 +121,6 @@ const Header = ({
   const setFilters = useStore(state => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
-
-  const open = Boolean(anchorEl)
   const {
     id, pokemon_id, form, ditto_form, display_pokemon_id,
   } = pokemon
@@ -172,7 +172,9 @@ const Header = ({
     { name: 'timer', action: handleTimer },
   ]
 
-  const pokemonName = t(`poke_${metaData.pokedexId}`)
+  const pokeName = t(`poke_${metaData.pokedexId}`)
+  const formName = metaData.forms?.[form]?.name === 'Normal' || form === 0 ? '' : t(`form_${pokemon.form}`)
+
   return (
     <>
       <Grid item xs={3}>
@@ -187,12 +189,16 @@ const Header = ({
           : <img src={iconUrl} style={{ maxWidth: 40, maxHeight: 40 }} />}
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'center' }}>
-        <Typography variant={pokemonName.length > 8 ? 'h6' : 'h5'}>
-          {pokemonName}
+        <Typography variant={pokeName.length > 8 ? 'h6' : 'h5'}>
+          {pokeName}
         </Typography>
-        {(ditto_form !== null && display_pokemon_id) && (
+        {(ditto_form !== null && display_pokemon_id) ? (
           <Typography variant="caption">
             ({t(`poke_${display_pokemon_id}`)})
+          </Typography>
+        ) : (
+          <Typography variant="caption">
+            {formName}
           </Typography>
         )}
       </Grid>
@@ -207,18 +213,18 @@ const Header = ({
       <Menu
         anchorEl={anchorEl}
         keepMounted
-        open={open}
+        open={Boolean(anchorEl)}
         onClose={handleClose}
         PaperProps={{
           style: {
             maxHeight: 216,
-            width: '20ch',
+            minWidth: '20ch',
           },
         }}
       >
         {options.map((option) => (
-          <MenuItem key={option.name} onClick={option.action}>
-            {t(option.name)}
+          <MenuItem key={option.key || option.name} onClick={option.action}>
+            {typeof option.name === 'string' ? t(option.name) : option.name}
           </MenuItem>
         ))}
       </Menu>
@@ -258,14 +264,14 @@ const Stats = ({ pokemon, perms, t }) => {
           </Typography>
         </Grid>
       )}
-      {(perms.stats && iv !== null) && (
+      {(perms.stats && atk_iv !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {atk_iv} | {def_iv} | {sta_iv}
           </Typography>
         </Grid>
       )}
-      {((perms.iv || perms.stats) && iv !== null) && (
+      {(perms.stats && level !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {t('cp')} {cp} | {t('levelAbbreviated')}{level}
@@ -302,9 +308,15 @@ const Info = ({
           }}
         />
       )}
-      {gender != 3 && (
+      {gender && (
         <Grid item style={{ textAlign: 'center' }}>
-          <Icon>{gender === 1 ? 'male' : 'female'}</Icon>
+          <Icon>
+            {{
+              1: 'male',
+              2: 'female',
+              3: 'transgender',
+            }[gender] || ''}
+          </Icon>
         </Grid>
       )}
       {formTypes.map(type => (
@@ -356,21 +368,20 @@ const Timer = ({ pokemon, hasStats }) => {
 }
 
 const Footer = ({
-  pokemon, expanded, pvpExpand, setExpanded, setPvpExpand, hasPvp, classes, Icons,
+  pokemon, popups, setPopups, hasPvp, classes, Icons,
 }) => {
   const { navigation } = useStore(state => state.settings)
   const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
 
   const { lat, lon } = pokemon
 
-  const handleExpandClick = () => {
-    if (pvpExpand) setPvpExpand(false)
-    setExpanded(!expanded)
-  }
-
-  const handlePvpClick = () => {
-    if (expanded) setExpanded(false)
-    setPvpExpand(!pvpExpand)
+  const handleExpandClick = (category) => {
+    const opposite = category === 'extras' ? 'pvp' : 'extras'
+    setPopups({
+      ...popups,
+      [category]: !popups[category],
+      [opposite]: false,
+    })
   }
 
   return (
@@ -378,11 +389,10 @@ const Footer = ({
       {hasPvp && (
         <Grid item xs={4}>
           <IconButton
-            className={pvpExpand ? classes.expandOpen : classes.expand}
+            className={popups.pvp ? classes.expandOpen : classes.expand}
             name="pvp"
-            onClick={handlePvpClick}
-            aria-expanded={pvpExpand}
-            aria-label="show more"
+            onClick={() => handleExpandClick('pvp')}
+            aria-expanded={popups.pvp}
           >
             <img
               src={Icons.getMisc('pvp')}
@@ -401,10 +411,9 @@ const Footer = ({
       </Grid>
       <Grid item xs={4}>
         <IconButton
-          className={expanded ? classes.expandOpen : classes.expand}
-          onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more"
+          className={popups.extras ? classes.expandOpen : classes.expand}
+          onClick={() => handleExpandClick('extras')}
+          aria-expanded={popups.extras}
         >
           <ExpandMore style={{ color: 'white' }} />
         </IconButton>
@@ -441,30 +450,35 @@ const ExtraInfo = ({
             }}
           />
           <Grid item xs={6}>
-            <Typography variant="caption" align="center">
+            <Typography variant="caption">
               {t(`move_${move}`)}
             </Typography>
           </Grid>
           <Grid item xs={3} style={{ textAlign: 'right' }}>
-            <Typography variant="caption" align="center">
+            <Typography variant="caption">
               {i ? `${weight.toFixed(2)}${t('kilogram')}` : `${size.toFixed(2)}${t('meter')}`}
             </Typography>
           </Grid>
         </Fragment>
       ))}
       {[first_seen_timestamp, updated].map((time, i) => (
-        <Fragment key={time}>
-          <Grid item xs={t('popupPokemonSeenDescriptionWidth')} style={{ textAlign: 'center' }}>
-            <Typography variant="caption" align="center">
-              {i ? t('lastSeen') : t('firstSeen')}:
-            </Typography>
-          </Grid>
-          <Grid item xs={t('popupPokemonSeenDataWidth')} style={{ textAlign: 'right' }}>
-            <Typography variant="caption" align="center">
-              {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
-            </Typography>
-          </Grid>
-        </Fragment>
+        time ? (
+          <Fragment key={time}>
+            <Grid item xs={t('popupPokemonSeenDescriptionWidth')} style={{ textAlign: 'center' }}>
+              <Typography variant="caption">
+                {i ? t('lastSeen') : t('firstSeen')}:
+              </Typography>
+            </Grid>
+            <Grid item xs={t('popupPokemonSeenTimerWidth')} style={{ textAlign: 'right' }}>
+              <GenericTimer expireTime={time} />
+            </Grid>
+            <Grid item xs={t('popupPokemonSeenDataWidth')} style={{ textAlign: 'right' }}>
+              <Typography variant="caption">
+                {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
+              </Typography>
+            </Grid>
+          </Fragment>
+        ) : null
       ))}
     </Grid>
   )

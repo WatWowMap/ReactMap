@@ -79,6 +79,9 @@ export default class UIcons {
                 ...this[icon.name].modifiers[category],
               }
             }
+            if (icon.path === baseUrl) {
+              this.selected.misc = icon.name
+            }
             if (!this.selected[category]) {
               this.selected[category] = icon.name
               this.modifiers[category] = this[icon.name].modifiers[category]
@@ -89,6 +92,10 @@ export default class UIcons {
     }
   }
 
+  get selection() {
+    return { ...this.selected }
+  }
+
   checkValid(localIconObj) {
     return Object.values(localIconObj).every(icon => this[icon])
   }
@@ -96,12 +103,14 @@ export default class UIcons {
   setSelection(categories, value) {
     if (typeof categories === 'object') {
       Object.keys(categories).forEach(category => {
-        this.selected[category] = categories[category]
-        this.modifiers[category] = this[categories[category]]
-          ? this[categories[category]].modifiers[category]
-          : this.modifiers.base
+        if (category !== 'misc') {
+          this.selected[category] = categories[category]
+          this.modifiers[category] = this[categories[category]]
+            ? this[categories[category]].modifiers[category]
+            : this.modifiers.base
+        }
       })
-    } else {
+    } else if (categories !== 'misc') {
       this.selected[categories] = value
       this.modifiers[categories] = this[value]
         ? this[value].modifiers[categories]
@@ -115,6 +124,25 @@ export default class UIcons {
     return this.modifiers[category]
       ? baseSize * this.modifiers[category].sizeMultiplier
       : baseSize
+  }
+
+  getIconById(id) {
+    switch (id.charAt(0)) {
+      case 'c': return this.getRewards(4, ...id.slice(1).split('-'))
+      case 'd': return this.getRewards(3, id.slice(1))
+      case 'e': return this.getEggs(id.slice(1), false)
+      case 'g': return this.getGyms(...id.slice(1).split('-'))
+      case 'i': return this.getInvasions(id.slice(1))
+      case 'l': return this.getPokestops(id.slice(1))
+      case 'm': return this.getPokemon(id.slice(1).split('-')[0], 0, 1)
+      case 'q': return this.getRewards(2, ...id.slice(1).split('-'))
+      case 'r': return this.getEggs(id.slice(1), true)
+      case 's': return this.getPokestops(0)
+      case 't': return this.getGyms(...id.slice(1).split('-'))
+      case 'u': return this.getRewards(id.slice(1))
+      case 'x': return this.getRewards(9, ...id.slice(1).split('-'))
+      default: return this.getPokemon(...id.split('-'))
+    }
   }
 
   getPokemon(pokemonId, form = 0, evolution = 0, gender = 0, costume = 0, shiny = false) {

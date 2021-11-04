@@ -6,8 +6,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Switch,
-  FormControlLabel,
   IconButton,
   useMediaQuery,
 } from '@material-ui/core'
@@ -31,9 +29,7 @@ export default function AdvancedFilter({
   const ui = useStatic(state => state.ui)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore(state => state.filters)
-  const { map: { legacyPkmnFilter } } = useStatic(state => state.config)
   const userSettings = useStore(state => state.userSettings)
-  const setUserSettings = useStore(state => state.setUserSettings)
   const { t } = useTranslation()
 
   Utility.analytics('Advanced Filtering', `ID: ${advancedFilter.id} Size: ${filterValues.size}`, type)
@@ -54,27 +50,17 @@ export default function AdvancedFilter({
     }
   }
 
-  const handleLegacySwitch = () => {
-    setUserSettings({
-      ...userSettings,
-      [type]: {
-        ...userSettings[type],
-        legacyFilter: !userSettings[type].legacyFilter,
-      },
-    })
-  }
-
   const reset = {
     key: 'reset',
     icon: (
       <IconButton
-        onClick={() => handleChange('default', advancedFilter.standard)}
+        onClick={() => handleChange('default', advancedFilter.standard || { enabled: false, size: 'md' })}
       >
         <Replay color="primary" />
       </IconButton>
     ),
     text: (
-      <Button onClick={() => handleChange('default', advancedFilter.standard)}>
+      <Button onClick={() => handleChange('default', advancedFilter.standard || { enabled: false, size: 'md' })}>
         <Typography variant="caption" color="primary">
           {t('reset')}
         </Typography>
@@ -107,25 +93,9 @@ export default function AdvancedFilter({
           justifyContent="space-between"
           alignItems="center"
         >
-          <Grid item xs={type === 'pokemon' ? 5 : 10}>
+          <Grid item xs={10}>
             {type === 'pokemon' ? t('advanced') : t('setSize')}
           </Grid>
-          {(type === 'pokemon' && legacyPkmnFilter) && (
-            <Grid item xs={5}>
-              <FormControlLabel
-                control={(
-                  <Switch
-                    checked={userSettings[type].legacy}
-                    onChange={handleLegacySwitch}
-                    name="adv"
-                    color="secondary"
-                    disabled={!ui[type].legacy}
-                  />
-                )}
-                label={t('legacy')}
-              />
-            </Grid>
-          )}
           <Grid item xs={2} style={{ textAlign: 'right' }}>
             <IconButton onClick={toggleAdvMenu(false, type, filters.filter)}>
               <Clear style={{ color: 'white' }} />

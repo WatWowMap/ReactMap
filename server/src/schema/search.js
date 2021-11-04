@@ -1,6 +1,7 @@
 const {
   GraphQLObjectType, GraphQLString, GraphQLFloat, GraphQLInt, GraphQLID,
 } = require('graphql')
+const GeocoderType = require('./geocoder')
 
 module.exports = new GraphQLObjectType({
   name: 'Search',
@@ -11,6 +12,7 @@ module.exports = new GraphQLObjectType({
     lat: { type: GraphQLFloat },
     lon: { type: GraphQLFloat },
     distance: { type: GraphQLFloat },
+    formatted: { type: GeocoderType },
     quest_pokemon_id: { type: GraphQLInt },
     quest_form_id: { type: GraphQLInt },
     quest_gender_id: { type: GraphQLInt },

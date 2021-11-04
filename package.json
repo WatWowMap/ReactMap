@@ -19,6 +19,10 @@
     "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
     "migrate:rollback": "knex --knexfile server/knexfile.cjs migrate:rollback"
   },
+  "engines": {
+    "node": ">=14",
+    "yarn": "1.22.x"
+  },
   "devDependencies": {
     "@babel/core": "^7.13.10",
     "@babel/eslint-parser": "^7.13.10",
@@ -84,6 +88,7 @@
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.1",
+    "node-geocoder": "^3.27.0",
     "nodes2ts": "^2.0.0",
     "objection": "^3.0.0-alpha.4",
     "ohbem": "^1.3.0",

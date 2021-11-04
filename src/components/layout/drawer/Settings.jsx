@@ -1,33 +1,31 @@
 import React, { useState } from 'react'
 import {
-  FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Slide, Dialog,
+  FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Dialog,
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic } from '../../../hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
+import SlideTransition from '@assets/mui/SlideTransition'
+import Utility from '@services/Utility'
+
 import UserProfile from '../dialogs/UserProfile'
-import Tutorial from '../dialogs/tutorial/Tutorial'
 import Feedback from '../dialogs/Feedback'
 
-function SlideTransition(props) {
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  return <Slide {...props} direction="up" />
-}
-
-export default function Settings({ toggleDialog, Icons }) {
+export default function Settings({ Icons }) {
   const { t, i18n } = useTranslation()
   const config = useStatic(state => state.config)
   const staticSettings = useStatic(state => state.settings)
   const { discord, loggedIn } = useStatic(state => state.auth)
-  const tutorial = useStore(state => state.tutorial)
+  const setStaticIcons = useStatic(state => state.setIcons)
+
   const setTutorial = useStore(state => state.setTutorial)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
   const icons = useStore(state => state.icons)
   const setIcons = useStore(state => state.setIcons)
-  const setStaticIcons = useStatic(state => state.setIcons)
+
   const [alert, setAlert] = useState(false)
   const [userProfile, setUserProfile] = useState(false)
   const [feedback, setFeedback] = useState(false)
@@ -109,7 +107,7 @@ export default function Settings({ toggleDialog, Icons }) {
                   key={option}
                   value={option}
                 >
-                  {t(`${setting}${option}`)}
+                  {t(`${setting}${option}`, Utility.getProperName(option))}
                 </MenuItem>
               ))}
             </Select>
@@ -132,7 +130,7 @@ export default function Settings({ toggleDialog, Icons }) {
                   key={option}
                   value={option}
                 >
-                  {t(`${category}${option}`, option)}
+                  {t(`${category}${option}`, Utility.getProperName(option))}
                 </MenuItem>
               ))}
             </Select>
@@ -289,9 +287,6 @@ export default function Settings({ toggleDialog, Icons }) {
       </Snackbar>
       <Dialog open={userProfile}>
         <UserProfile setUserProfile={setUserProfile} />
-      </Dialog>
-      <Dialog open={tutorial}>
-        <Tutorial setUserProfile={setUserProfile} setTutorial={setTutorial} toggleDialog={toggleDialog} />
       </Dialog>
       <Dialog
         open={feedback}

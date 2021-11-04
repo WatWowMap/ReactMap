@@ -3,6 +3,7 @@ const extend = require('extend')
 const fs = require('fs')
 const uConfig = require('../configs/config.json')
 const eConfig = require('../configs/default.json')
+const initWebhooks = require('./initWebhooks')
 
 const target = {}
 
@@ -24,6 +25,12 @@ try {
 }
 
 if (target.icons.defaultIcons.misc) {
-  console.warn('Warning: If you set the misc category to anything but the base set there may be missing icons on your map!')
+  console.warn('Warning: Setting the misc category to anything does not have an impact on the icons.')
 }
+if (target.webhooks.length) {
+  (async () => {
+    target.webhookObj = await initWebhooks(target)
+  })()
+}
+
 module.exports = target

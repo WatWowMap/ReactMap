@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
-import { Dialog, useMediaQuery } from '@material-ui/core'
+import { Dialog, useMediaQuery, Snackbar } from '@material-ui/core'
+import { Alert } from '@material-ui/lab'
 import { useTheme } from '@material-ui/styles'
 
 import Utility from '@services/Utility'
 import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
+import SlideTransition from '@assets/mui/SlideTransition'
+
 import FloatingBtn from './FloatingBtn'
 import Sidebar from './drawer/Drawer'
-import FilterMenu from './dialogs/filters/Menu'
+import FilterMenu from './dialogs/filters/FilterMenu'
 import UserOptions from './dialogs/UserOptions'
 import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
@@ -16,11 +19,17 @@ import Motd from './dialogs/Motd'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
-export default function Nav({ map, setManualParams, Icons }) {
+export default function Nav({
+  map, setManualParams, Icons,
+  setWebhookMode, webhookMode, settings, webhooks,
+}) {
   const classes = useStyles()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
+  const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
   const { perms } = useStatic(state => state.auth)
+  const webhookAlert = useStatic(state => state.webhookAlert)
+  const setWebhookAlert = useStatic(state => state.setWebhookAlert)
   const { map: { messageOfTheDay } } = useStatic(state => state.config)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
@@ -77,6 +86,8 @@ export default function Nav({ map, setManualParams, Icons }) {
       ) : (
         <Dialog
           open={tutorial}
+          fullScreen={isMobile}
+          maxWidth="xs"
         >
           <Tutorial
             setUserProfile={setUserProfile}
@@ -100,24 +111,32 @@ export default function Nav({ map, setManualParams, Icons }) {
           toggleDialog={toggleDialog}
           safeSearch={safeSearch}
           isMobile={isMobile}
+          perms={perms}
+          webhooks={webhooks}
+          webhookMode={webhookMode}
+          setWebhookMode={setWebhookMode}
+          scanAreasOn={filters.scanAreas.enabled}
+          settings={settings}
         />
       )}
       <Dialog
-        fullWidth
+        fullWidth={!isMobile}
+        fullScreen={isMobile}
         maxWidth="md"
         open={dialog.open && dialog.type === 'filters'}
-        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <FilterMenu
           toggleDialog={toggleDialog}
           filters={filters[dialog.category]}
           category={dialog.category}
+          isMobile={isMobile}
+          isTablet={isTablet}
         />
       </Dialog>
       <Dialog
+        fullScreen={isMobile}
         maxWidth="sm"
         open={dialog.open && dialog.type === 'options'}
-        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <UserOptions
           toggleDialog={toggleDialog}
@@ -125,12 +144,12 @@ export default function Nav({ map, setManualParams, Icons }) {
         />
       </Dialog>
       <Dialog
+        fullScreen={isMobile}
         classes={{
           scrollPaper: classes.scrollPaper,
           container: classes.container,
         }}
         open={dialog.open && dialog.type === 'search'}
-        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <Search
           toggleDialog={toggleDialog}
@@ -150,6 +169,20 @@ export default function Nav({ map, setManualParams, Icons }) {
           messages={messageOfTheDay.messages}
         />
       </Dialog>
+      <Snackbar
+        open={Boolean(webhookAlert.open)}
+        onClose={() => setWebhookAlert({ open: false, severity: 'info', message: '' })}
+        TransitionComponent={SlideTransition}
+      >
+        <Alert
+          onClose={() => setWebhookAlert({ open: false, severity: 'info', message: '' })}
+          severity={webhookAlert.severity}
+          variant="filled"
+          style={{ whiteSpace: 'pre-line', textAlign: 'center' }}
+        >
+          {webhookAlert.message}
+        </Alert>
+      </Snackbar>
     </>
   )
 }

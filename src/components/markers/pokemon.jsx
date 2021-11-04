@@ -10,7 +10,7 @@ export const basicMarker = (iconUrl, size) => new Icon({
   className: 'marker',
 })
 
-export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons) => {
+export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons, weatherCheck) => {
   const { pokemon: pokemonMod } = Icons.modifiers
   let badge
   switch (pkmn.bestPvp) {
@@ -52,11 +52,30 @@ export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons) => {
           {Math.round(pkmn.iv)}
         </div>
       )}
+      {Boolean(weatherCheck) && (
+        <div
+          style={{
+            position: 'absolute',
+            top: -size * pokemonMod.offsetY,
+            left: `${pokemonMod.offsetX * size * 5}%`,
+          }}
+        >
+          <img
+            src={`/images/weather/${pkmn.weather}.png`}
+            className="weather-icon"
+            style={{
+              width: size / 2,
+              height: 'auto',
+            }}
+          />
+        </div>
+      )}
     </div>
   )
 
   return L.divIcon({
-    popupAnchor: [(badge || ivCircle || glow ? size / 2.5 : 0), size * -0.8],
+    popupAnchor: [0, size * -0.7 * pokemonMod.offsetY],
+    iconAnchor: [size / 2, 0],
     className: 'pokemon-marker',
     html: renderToString(ReactIcon),
   })
