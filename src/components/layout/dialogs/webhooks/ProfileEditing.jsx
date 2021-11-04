@@ -13,22 +13,28 @@ import Query from '@services/Query'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 
+const profilesObject = (data) => Object.fromEntries(data.map(profile => {
+  const newProfile = { ...profile, active_hours: [] }
+  const parsed = Array.isArray(profile.active_hours)
+    ? profile.active_hours
+    : JSON.parse(profile.active_hours)
+  if (Array.isArray(parsed)) {
+    const sorted = parsed.sort((a, b) => a.day === a.bday ? a.hours - b.hours : a.day - b.day)
+    sorted.forEach((schedule, i) => {
+      newProfile.active_hours.push({ ...schedule, id: i })
+    })
+  }
+  return [profile.name, newProfile]
+}))
+
 export default function ProfileEditing({
   webhookData, setWebhookData, selectedWebhook, handleClose, isMobile,
 }) {
   const { t } = useTranslation()
-  const [syncWebhook, { data }] = useMutation(Query.webhook('setProfile'))
-  const [profiles, setProfiles] = useState(Object.fromEntries(webhookData[selectedWebhook].profile.map(profile => {
-    const newProfile = { ...profile, active_hours: [] }
-    const parsed = JSON.parse(profile.active_hours)
-    if (Array.isArray(parsed)) {
-      const sorted = parsed.sort((a, b) => a.day === a.bday ? a.hours - b.hours : a.day - b.day)
-      sorted.forEach((schedule, i) => {
-        newProfile.active_hours.push({ ...schedule, id: i })
-      })
-    }
-    return [profile.name, newProfile]
-  })))
+  const [syncWebhook, { data }] = useMutation(Query.webhook('setProfile'), {
+    fetchPolicy: 'no-cache',
+  })
+  const [profiles, setProfiles] = useState(profilesObject(webhookData[selectedWebhook].profile))
   const [copyTo, setCopyTo] = useState(
     Object.fromEntries(webhookData[selectedWebhook].profile.map((x) => [x.name, x.name])),
   )
@@ -42,26 +48,42 @@ export default function ProfileEditing({
     setProfiles({ ...profiles, [newProfile]: { name: newProfile, active_hours: [] } })
     setViews({ ...views, [newProfile]: 'profile' })
     setNewProfile('')
+    syncWebhook({
+      variables: {
+        category: 'profiles-add',
+        data: { name: newProfile },
+        status: 'POST',
+        name: selectedWebhook,
+      },
+    })
   }
 
-  const handleRemove = (profile, id) => {
-    profiles[profile].active_hours = profiles[profile].active_hours.filter(schedule => schedule.id !== id)
-    setProfiles({ ...profiles })
-  }
-
-  const handleScheduleChange = (event) => {
-    const { name, value } = event.target
-    if (name === 'day') {
-      setNewSchedule({ ...newSchedule, day: +value })
-    } else {
-      const [hours, mins] = value.split(':')
-      setNewSchedule({ ...newSchedule, hours, mins })
-    }
-  }
-
-  const handleDelete = (profile) => {
+  const handleRemoveProfile = (profile) => {
+    syncWebhook({
+      variables: {
+        category: 'profiles-byProfileNo',
+        data: profiles[profile].profile_no,
+        status: 'DELETE',
+        name: selectedWebhook,
+      },
+    })
     delete profiles[profile]
     setProfiles({ ...profiles })
+  }
+
+  const handleCopyProfile = (profile) => {
+    syncWebhook({
+      variables: {
+        category: 'profiles-copy',
+        data: {
+          from: profiles[profile].profile_no,
+          to: profiles[copyTo[profile]].profile_no,
+        },
+        status: 'POST',
+        name: selectedWebhook,
+      },
+    })
+    setViews({ ...views, [profile]: 'profile' })
   }
 
   const handleAddSchedule = (profile) => {
@@ -71,21 +93,75 @@ export default function ProfileEditing({
     }
     setProfiles({ ...profiles, [profile]: editedProfile })
     setViews({ ...views, [profile]: 'profile' })
+    syncWebhook({
+      variables: {
+        category: 'profiles-update',
+        data: editedProfile,
+        status: 'POST',
+        name: selectedWebhook,
+      },
+    })
   }
 
-  const getInputs = (profile) => (
-    <Grid item sm={isMobile ? 6 : 3} style={{ textAlign: 'right' }}>
-      <IconButton onClick={() => setViews({ ...views, [profile]: 'edit' })}>
-        <Edit />
-      </IconButton>
-      <IconButton onClick={() => setViews({ ...views, [profile]: 'delete' })}>
-        <DeleteForever />
-      </IconButton>
-      <IconButton onClick={() => setViews({ ...views, [profile]: 'copy' })}>
-        <FileCopy />
-      </IconButton>
-    </Grid>
-  )
+  const handleRemoveSchedule = (profile, id) => {
+    const newProfileObj = {
+      ...profiles,
+      [profile]: {
+        ...profiles[profile],
+        active_hours: profiles[profile].active_hours.filter(schedule => schedule.id !== id),
+      },
+    }
+    setProfiles(newProfileObj)
+    syncWebhook({
+      variables: {
+        category: 'profiles-update',
+        data: newProfileObj[profile],
+        status: 'POST',
+        name: selectedWebhook,
+      },
+    })
+  }
+
+  const handleScheduleAdjustments = (event) => {
+    const { name, value } = event.target
+    if (name === 'day') {
+      setNewSchedule({ ...newSchedule, day: +value })
+    } else {
+      const [hours, mins] = value.split(':')
+      setNewSchedule({ ...newSchedule, hours, mins })
+    }
+  }
+
+  const handleCloseMenu = () => {
+    setWebhookData({
+      ...webhookData,
+      [selectedWebhook]: {
+        ...webhookData[selectedWebhook],
+        profile: Object.values(profiles),
+      },
+    })
+    handleClose('profiles')
+  }
+
+  const getInputs = (profile) => {
+    const disabled = webhookData[selectedWebhook].human.current_profile_no === profiles[profile].profile_no
+    return (
+      <Grid item sm={isMobile ? 6 : 3} style={{ textAlign: 'right' }}>
+        <IconButton onClick={() => setViews({ ...views, [profile]: 'edit' })}>
+          <Edit style={{ color: 'white' }} />
+        </IconButton>
+        <IconButton
+          onClick={() => setViews({ ...views, [profile]: 'delete' })}
+          disabled={disabled}
+        >
+          <DeleteForever style={{ color: disabled ? 'inherit' : 'white' }} />
+        </IconButton>
+        <IconButton onClick={() => setViews({ ...views, [profile]: 'copy' })}>
+          <FileCopy style={{ color: 'white' }} />
+        </IconButton>
+      </Grid>
+    )
+  }
 
   useEffect(() => {
     if (data?.webhook?.profile) {
@@ -93,10 +169,10 @@ export default function ProfileEditing({
         ...webhookData,
         [selectedWebhook]: {
           ...webhookData[selectedWebhook],
-          profile: data.webhooks.profile,
+          profile: data.webhook.profile,
         },
       })
-      handleClose(false)
+      setProfiles(profilesObject(data.webhook.profile))
     }
   }, [data])
 
@@ -116,14 +192,24 @@ export default function ProfileEditing({
           <Grid item xs={7} sm={5}>
             <TextField
               autoComplete="off"
-              label={t('profile_name')}
+              label={profiles[newProfile] || newProfile === 'all'
+                ? t('profile_error')
+                : t('profile_name')}
               value={newProfile}
               onChange={(event) => setNewProfile(event.target.value)}
               variant="outlined"
+              error={Boolean(profiles[newProfile]) || newProfile === 'all'}
             />
           </Grid>
           <Grid item xs={3}>
-            <Button variant="contained" color="primary" onClick={handleAddProfile}>{t('save')}</Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddProfile}
+              disabled={Boolean(profiles[newProfile]) || !newProfile || newProfile === 'all'}
+            >
+              {t('save')}
+            </Button>
           </Grid>
           <Divider flexItem light style={{ margin: '10px 0', width: '90%', height: 3 }} />
           <Grid item xs={12}>
@@ -149,7 +235,7 @@ export default function ProfileEditing({
                             deleteIcon={<Clear />}
                             size={isMobile ? 'small' : 'medium'}
                             color="secondary"
-                            onDelete={() => handleRemove(profile, schedule.id)}
+                            onDelete={() => handleRemoveSchedule(profile, schedule.id)}
                             style={{ margin: 3 }}
                           />
                         ))}
@@ -163,7 +249,7 @@ export default function ProfileEditing({
                         <Select
                           name="day"
                           value={newSchedule.day}
-                          onChange={handleScheduleChange}
+                          onChange={handleScheduleAdjustments}
                           fullWidth
                         >
                           {[1, 2, 3, 4, 5, 6, 7].map(day => (
@@ -183,7 +269,7 @@ export default function ProfileEditing({
                           color="secondary"
                           label="new time"
                           value={`${newSchedule.hours}:${newSchedule.mins}`}
-                          onChange={handleScheduleChange}
+                          onChange={handleScheduleAdjustments}
                           variant="outlined"
                           size="small"
                           type="time"
@@ -191,10 +277,10 @@ export default function ProfileEditing({
                       </Grid>
                       <Grid item xs={4} sm={2} style={{ textAlign: 'right' }}>
                         <IconButton onClick={() => setViews({ ...views, [profile]: 'profile' })}>
-                          <Clear />
+                          <Clear style={{ color: 'white' }} />
                         </IconButton>
                         <IconButton onClick={() => handleAddSchedule(profile)}>
-                          <Save />
+                          <Save style={{ color: 'white' }} />
                         </IconButton>
                       </Grid>
                     </>
@@ -208,10 +294,10 @@ export default function ProfileEditing({
                       </Grid>
                       <Grid item xs={4} sm={2}>
                         <IconButton onClick={() => setViews({ ...views, [profile]: 'profile' })}>
-                          <Clear />
+                          <Clear style={{ color: 'white' }} />
                         </IconButton>
-                        <IconButton onClick={() => handleDelete(profile)}>
-                          <Save />
+                        <IconButton onClick={() => handleRemoveProfile(profile)}>
+                          <Save style={{ color: 'white' }} />
                         </IconButton>
                       </Grid>
                     </>
@@ -239,10 +325,10 @@ export default function ProfileEditing({
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <IconButton onClick={() => setViews({ ...views, [profile]: 'profile' })}>
-                            <Clear />
+                            <Clear style={{ color: 'white' }} />
                           </IconButton>
-                          <IconButton onClick={() => setViews({ ...views, [profile]: 'profile' })}>
-                            <Save />
+                          <IconButton onClick={() => handleCopyProfile(profile)} disabled={profile === copyTo[profile]}>
+                            <Save style={{ color: profile === copyTo[profile] ? 'inherit' : 'white' }} />
                           </IconButton>
                         </Grid>
                       </Grid>
@@ -257,14 +343,7 @@ export default function ProfileEditing({
       <Footer
         options={[{
           name: 'save',
-          action: () => syncWebhook({
-            variables: {
-              category: 'newProfile',
-              data: profiles,
-              status: 'POST',
-              name: selectedWebhook,
-            },
-          }),
+          action: handleCloseMenu,
           icon: 'Save',
         }]}
         role="webhookAdvanced"

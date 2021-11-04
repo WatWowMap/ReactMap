@@ -439,5 +439,6 @@
   "webhook_error": [
     "{{name}} was unable to process that.",
     "Please try again later."
-  ]
+  ],
+  "profile_error": "Must be unique and valid"
 }

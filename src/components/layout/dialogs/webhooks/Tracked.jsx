@@ -13,7 +13,9 @@ const Tracked = ({
   tempFilters, setTempFilters, setWebhookData, category, Poracle,
   setWebhookAlert, t,
 }) => {
-  const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook(category))
+  const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook(category), {
+    fetchPolicy: 'no-cache',
+  })
   const [tracked, setTracked] = useState(webhookData[selectedWebhook][category])
   const [selected, setSelected] = useState({})
   const [staticInfo] = useState(webhookData[selectedWebhook].info)
@@ -72,7 +74,7 @@ const Tracked = ({
   const deleteAll = () => {
     syncWebhook({
       variables: {
-        category: `${category}Delete`,
+        category: `${category}-delete`,
         data: Object.keys(selected),
         name: selectedWebhook,
         status: 'POST',
@@ -120,8 +122,9 @@ const areEqual = (prev, next) => {
   const prevSelected = prev.webhookData[prev.selectedWebhook]
   const nextSelected = next.webhookData[next.selectedWebhook]
   return prevSelected[prev.category].length === nextSelected[next.category].length
-    && prevSelected.fetched === nextSelected.fetched
+    && prev.addNew == next.addNew
     && prevSelected.human.current_profile_no === nextSelected.human.current_profile_no
+    && prevSelected.fetched === nextSelected.fetched
     && prev.send === next.send
     && prev.isMobile === next.isMobile
 }

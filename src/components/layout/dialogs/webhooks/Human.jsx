@@ -23,7 +23,9 @@ const Human = ({
 }) => {
   const { perms } = useStatic(s => s.auth)
   const location = useStore(s => s.location)
-  const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook('setHuman'))
+  const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook('setHuman'), {
+    fetchPolicy: 'no-cache',
+  })
 
   const [currentHuman, setCurrentHuman] = useState(webhookData[selectedWebhook].human)
 
@@ -36,6 +38,13 @@ const Human = ({
           message: <Trans i18nKey={newWebhookData.webhook.message}>{{ name: selectedWebhook }}</Trans>,
         })
       } else if (newWebhookData.webhook.human) {
+        setWebhookData({
+          ...webhookData,
+          [selectedWebhook]: {
+            ...webhookData[selectedWebhook],
+            human: newWebhookData.webhook.human,
+          },
+        })
         setCurrentHuman(newWebhookData.webhook.human)
       }
     }
@@ -169,6 +178,7 @@ const areEqual = (prev, next) => {
     && prevSelected.human.latitude === nextSelected.human.latitude
     && prevSelected.human.longitude === nextSelected.human.longitude
     && prevSelected.human.area === nextSelected.human.area
+    && prev.addNew === next.addNew
     && prev.selectedAreas.length === next.selectedAreas.length
     && prev.isMobile === next.isMobile
     && prev.webhookLocation.join('') === next.webhookLocation.join('')

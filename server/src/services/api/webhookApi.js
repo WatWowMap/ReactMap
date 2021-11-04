@@ -51,21 +51,35 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
           url: `${webhook.host}:${webhook.port}/api/humans/${discordId}`,
           options: { method, headers },
         }); break
-      case 'eggDelete':
-      case 'invasionDelete':
-      case 'lureDelete':
-      case 'nestDelete':
-      case 'pokemonDelete':
-      case 'questDelete':
-      case 'raidDelete':
-      case 'gymDelete': {
-        const cleanCategory = category.replace('Delete', '')
+      case 'profiles-add':
+      case 'profiles-byProfileNo':
+      case 'profiles-update':
+      case 'profiles-copy':
+      case 'profiles': {
+        const [main, sub] = category.split('-')
         Object.assign(payloadObj, {
-          url: `${webhook.host}:${webhook.port}/api/tracking/${cleanCategory}/${discordId}/delete`,
+          url: `${webhook.host}:${webhook.port}/api/${main}/${discordId}/${sub}${sub === 'copy' ? `/${data.from}/${data.to}` : ''}${method === 'DELETE' ? `/${data}` : ''}`,
+          options: {
+            method, headers, body: method === 'POST' && category !== 'profiles-copy' ? JSON.stringify(data) : undefined,
+          },
+          get: main,
+        })
+      } break
+      case 'egg-delete':
+      case 'invasion-delete':
+      case 'lure-delete':
+      case 'nest-delete':
+      case 'pokemon-delete':
+      case 'quest-delete':
+      case 'raid-delete':
+      case 'gym-delete': {
+        const [main, sub] = category.split('-')
+        Object.assign(payloadObj, {
+          url: `${webhook.host}:${webhook.port}/api/tracking/${main}/${discordId}/${sub}`,
           options: {
             method, headers, body: method === 'POST' ? JSON.stringify(data) : undefined,
           },
-          get: cleanCategory,
+          get: main,
         })
       } break
       case 'egg':
@@ -102,9 +116,16 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
       throw new Error('No data returned from server')
     }
     if (payloadObj.get) {
-      const getUrl = payloadObj.get === 'human'
-        ? `${webhook.host}:${webhook.port}/api/humans/one/${discordId}`
-        : `${webhook.host}:${webhook.port}/api/tracking/${payloadObj.get}/${discordId}`
+      const getUrl = (function getUrl() {
+        switch (payloadObj.get) {
+          case 'profiles':
+            return `${webhook.host}:${webhook.port}/api/profiles/${discordId}`
+          case 'human':
+            return `${webhook.host}:${webhook.port}/api/humans/one/${discordId}`
+          default:
+            return `${webhook.host}:${webhook.port}/api/tracking/${payloadObj.get}/${discordId}`
+        }
+      }())
       const get = await fetchJson(getUrl, { method: 'GET', headers }, config.devOptions.enabled)
       return { ...post, ...get }
     }

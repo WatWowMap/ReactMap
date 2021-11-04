@@ -8,7 +8,9 @@ import {
 } from '@material-ui/core'
 import { Person } from '@material-ui/icons'
 import { useTranslation, Trans } from 'react-i18next'
+import { useLazyQuery } from '@apollo/client'
 
+import Query from '@services/Query'
 import { useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Poracle from '@services/Poracle'
@@ -34,6 +36,10 @@ export default function Manage({
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
+  const [syncWebhook, { data }] = useLazyQuery(Query.webhook('allProfiles'), {
+    fetchPolicy: 'no-cache',
+  })
+
   const staticFilters = useStatic(s => s.filters)
   const { invasions } = useStatic(s => s.masterfile)
   const { map } = useStatic(s => s.config)
@@ -61,7 +67,7 @@ export default function Manage({
       action: () => setAddNew(true),
       icon: 'Add',
       key: 'addNew',
-      disabled: !webhookData[selectedWebhook].human || !tabValue,
+      disabled: !webhookData[selectedWebhook].human,
     },
     { name: 'close', action: () => setWebhookMode(false), icon: 'Close', color: 'primary' },
   ]
@@ -74,7 +80,16 @@ export default function Manage({
 
   const handleClose = (save) => {
     setAddNew(false)
-    if (save) {
+    if (save === 'profiles') {
+      syncWebhook({
+        variables: {
+          category: 'allProfiles',
+          data: null,
+          status: 'GET',
+          name: selectedWebhook,
+        },
+      })
+    } else if (save) {
       setSend(true)
     } else {
       setTempFilters(poracleFilters[webhookCategory])
@@ -84,8 +99,29 @@ export default function Manage({
   useEffect(() => {
     if (tabValue) {
       setTempFilters(poracleFilters[webhookCategory])
+    } else {
+      syncWebhook({
+        variables: {
+          category: 'allProfiles',
+          data: null,
+          status: 'GET',
+          name: selectedWebhook,
+        },
+      })
     }
   }, [tabValue])
+
+  useEffect(() => {
+    if (data?.webhook) {
+      setWebhookData({
+        ...webhookData,
+        [selectedWebhook]: {
+          ...webhookData[selectedWebhook],
+          ...data.webhook,
+        },
+      })
+    }
+  }, [data])
 
   return (
     <>
@@ -127,6 +163,7 @@ export default function Manage({
                 selectedWebhook={selectedWebhook}
                 setSelectedWebhook={setSelectedWebhook}
                 setWebhookAlert={setWebhookAlert}
+                addNew={addNew}
               />
             ) : (
               <Tracked
@@ -143,6 +180,7 @@ export default function Manage({
                 setSend={setSend}
                 Poracle={Poracle}
                 setWebhookAlert={setWebhookAlert}
+                addNew={addNew}
               />
             )}
           </TabPanel>
