@@ -229,6 +229,7 @@ rootRouter.get('/settings', async (req, res) => {
                     ...config.webhookObj[webhook.name].client,
                     ...remoteData,
                     hasNominatim: Boolean(config.webhookObj[webhook.name].server.nominatimUrl),
+                    locale: remoteData.human.language || config.webhookObj[webhook.name].client.locale,
                     available: areas
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .filter(area => area.userSelectable !== false)
