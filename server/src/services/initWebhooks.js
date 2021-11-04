@@ -10,7 +10,7 @@ module.exports = async function initWebhooks(config) {
       }
       if (webhook.enabled) {
         const options = { method: 'GET', headers: { 'X-Poracle-Secret': webhook.poracleSecret } }
-        webhook.areasToSkip = webhook.areasToSkip.map(x => x.toLowerCase()) || []
+        webhook.areasToSkip = webhook.areasToSkip?.map(x => x.toLowerCase()) || []
 
         const hookConfig = await fetchJson(`${webhook.host}:${webhook.port}/api/config/poracleWeb`, options, config.devOptions.enabled)
 
