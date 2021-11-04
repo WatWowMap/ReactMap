@@ -114,7 +114,7 @@ export default function Menu({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    if (id === 'global' && !open) {
+    if (id === 'global' && !open && newFilters) {
       Object.keys(filteredObj).forEach(item => {
         filteredObj[item] = { ...tempFilters[item], ...newFilters, enabled: true }
       })
@@ -173,7 +173,7 @@ export default function Menu({
   const footerButtons = [
     { name: 'help', action: () => setHelpDialog(!helpDialog), icon: 'HelpOutline', color: 'white' },
     { name: 'openFilter', action: toggleDrawer(true), icon: 'Ballot', color: 'white', mobileOnly: true },
-    { name: 'applyToAll', action: webhookCategory ? toggleWebhook(true, 'global') : toggleAdvMenu(true, 'global'), icon: category === 'pokemon' ? 'Tune' : 'FormatSize', color: 'white' },
+    { name: 'applyToAll', action: webhookCategory ? toggleWebhook(true, 'global') : toggleAdvMenu(true, 'global'), icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize', color: 'white' },
     { name: 'disableAll', action: () => selectAllOrNone(false), icon: 'Clear', color: 'primary' },
     { name: 'enableAll', action: () => selectAllOrNone(true), icon: 'Check', color: '#00e676' },
     ...extraButtons,

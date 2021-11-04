@@ -46,7 +46,7 @@ const Tracked = ({
         variables: {
           category,
           data: Poracle.processor(
-            category, Object.values(tempFilters).filter(x => x.enabled), staticInfo[category].defaults,
+            category, Object.values(tempFilters).filter(x => x && x.enabled), staticInfo[category].defaults,
           ),
           name: selectedWebhook,
           status: 'POST',
