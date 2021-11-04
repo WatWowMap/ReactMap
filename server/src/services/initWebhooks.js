@@ -35,6 +35,7 @@ module.exports = async function initWebhooks(config) {
           areas.geoJSON.features = areas.geoJSON.features
             .sort((a, b) => a.properties.name.localeCompare(b.properties.name))
             .filter(x => !webhook.areasToSkip.includes(x.properties.name.toLowerCase()))
+            .filter(y => y.properties.userSelectable !== false)
         } else {
           console.warn('No geofences found')
         }

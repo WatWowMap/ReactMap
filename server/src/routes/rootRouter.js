@@ -228,7 +228,9 @@ rootRouter.get('/settings', async (req, res) => {
                   : {
                     ...config.webhookObj[webhook.name].client,
                     ...remoteData,
-                    available: areas.map(area => area.name),
+                    available: areas
+                      .filter(area => area.userSelectable !== false)
+                      .map(area => area.name),
                   }
               }
             }
