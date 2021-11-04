@@ -9,9 +9,10 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    supportedLngs: ['en', 'de', 'es', 'fr', 'it', 'jp', 'pl'],
+    supportedLngs: ['de', 'en', 'es', 'fr', 'it', 'ja', 'ko', 'pl', 'pt-br', 'ru', 'th', 'zh-tw'],
     fallbackLng: 'en',
     debug: false,
+    joinArrays: '\n',
   })
 
 export default i18n

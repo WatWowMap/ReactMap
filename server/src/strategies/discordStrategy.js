@@ -3,7 +3,7 @@ const passport = require('passport')
 const config = require('../services/config')
 const { User } = require('../models/index')
 const DiscordClient = require('../services/discord')
-const Utility = require('../services/Utility')
+const Fetch = require('../services/Fetch')
 
 passport.serializeUser(async (user, done) => {
   done(null, user)
@@ -35,7 +35,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
       || (req.connection.remoteAddress || req.connection.localAddress).match('[0-9]+.[0-9].+[0-9]+.[0-9]+$')[0]
 
     const url = `http://ip-api.com/json/${ip}?fields=66846719&lang=${config.map.locale || 'en'}`
-    const geo = await Utility.fetchJson(url)
+    const geo = await Fetch.fetchJson(url)
     const embed = {
       color: 0xFF0000,
       title: 'Authentication',
@@ -115,7 +115,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
         return done(null, user)
       })
   } catch (e) {
-    console.error('User has failed auth.')
+    console.error('User has failed auth.', e)
   }
 }
 

@@ -61,17 +61,15 @@ export default function PokestopPopup({
           backup={t('unknownPokestop')}
         />
       </Grid>
-      <Grid item xs={2}>
-        <MenuActions
-          pokestop={pokestop}
-          perms={perms}
-          hasInvasion={hasInvasion}
-          hasQuest={hasQuest}
-          hasLure={hasLure}
-          t={t}
-          ts={ts}
-        />
-      </Grid>
+      <MenuActions
+        pokestop={pokestop}
+        perms={perms}
+        hasInvasion={hasInvasion}
+        hasQuest={hasQuest}
+        hasLure={hasLure}
+        t={t}
+        ts={ts}
+      />
       <Grid item xs={12} style={{ textAlign: 'center' }}>
         {plainPokestop ? (
           <HeaderImage
@@ -249,6 +247,7 @@ const MenuActions = ({
       })
     })
   }
+
   if ((perms.invasions && hasInvasion)
     || (perms.lures && hasLure)) {
     if (hasInvasion) {
@@ -268,7 +267,7 @@ const MenuActions = ({
     )
   }
   return (
-    <Grid item xs={3} style={{ textAlign: 'right' }}>
+    <Grid item xs={2} style={{ textAlign: 'right' }}>
       <IconButton
         aria-haspopup="true"
         onClick={handleClick}

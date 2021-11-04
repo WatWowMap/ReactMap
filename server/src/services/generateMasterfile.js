@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 const fs = require('fs')
 
-const fetchJson = require('./functions/fetchJson')
+const fetchJson = require('./api/fetchJson')
 const defaultRarity = require('../data/defaultRarity.json')
 
 const getRarityLevel = (id, pkmn) => {
@@ -31,6 +31,8 @@ module.exports.generate = async function generate() {
     Object.values(masterfile.pokemon).forEach(pokemon => {
       pokemon.rarity = getRarityLevel(pokemon.pokedexId, pokemon)
       pokemon.types = pokemon.types || []
+      delete pokemon.mythical
+      delete pokemon.legendary
     })
 
     fs.writeFile(

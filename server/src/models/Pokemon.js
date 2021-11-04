@@ -341,16 +341,25 @@ class Pokemon extends Model {
   }
 
   static getOhbemPvp(pokemon) {
-    return ohbem.queryPvPRank(
-      pokemon.pokemon_id,
-      pokemon.form,
-      pokemon.costume,
-      pokemon.gender,
-      pokemon.atk_iv,
-      pokemon.def_iv,
-      pokemon.sta_iv,
-      pokemon.level,
-    )
+    try {
+      if (pokemon.pokemon_id && pokemon.level
+        && pokemon.atk_iv && pokemon.def_iv && pokemon.sta_iv) {
+        return ohbem.queryPvPRank(
+          pokemon.pokemon_id,
+          pokemon.form,
+          pokemon.costume,
+          pokemon.gender,
+          pokemon.atk_iv,
+          pokemon.def_iv,
+          pokemon.sta_iv,
+          pokemon.level,
+        )
+      }
+      return {}
+    } catch (e) {
+      console.error(`Unable to process ${JSON.stringify(pokemon)}`, e)
+      return {}
+    }
   }
 
   static async getLegacy(args, perms, isMad) {

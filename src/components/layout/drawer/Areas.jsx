@@ -41,7 +41,7 @@ export default function AreaDropDown({ scanAreasZoom, manualAreas }) {
         </MenuList>
       ) : (
         <MenuList>
-          {data && data.scanAreas.map(area => (
+          {data && data.scanAreas.features.map(area => (
             <MenuItem
               key={area.properties.name}
               onClick={() => {

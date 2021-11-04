@@ -105,7 +105,7 @@ export default function Search({
 
   const fetchedData = data || previousData
   return (
-    <div style={{ width: isMobile ? '80vw' : 500, minHeight: 190 }}>
+    <div style={{ width: isMobile ? 'inherit' : 500, minHeight: 190 }}>
       <DialogTitle className={classes.filterHeader}>
         {t('search')}
         <IconButton

@@ -37,17 +37,17 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
 
   const getStepContent = (stepIndex) => {
     switch (stepIndex) {
-      default: return <Closing />
       case 0: return <Welcome setUserProfile={setUserProfile} />
       case 1: return <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />
       case 2: return <Sliders isMobile={isMobile} />
       case 3: return <Advanced isMobile={isMobile} />
       case 4: return <Popups isMobile={isMobile} />
+      default: return <Closing />
     }
   }
 
   return (
-    <div style={{ maxWidth: 400 }}>
+    <>
       <DialogTitle className={classes.filterHeader}>
         {t('tutorial')} ({t(steps[activeStep] || t('closing'))})
       </DialogTitle>
@@ -73,6 +73,6 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
           )}
         />
       </DialogActions>
-    </div>
+    </>
   )
 }
