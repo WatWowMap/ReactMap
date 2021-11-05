@@ -84,7 +84,7 @@ export default function QueryData({
         minLon: mapBounds._southWest.lng,
         maxLon: mapBounds._northEast.lng,
         filters: trimFilters(filters),
-        zoom: map.getZoom(),
+        zoom: Math.floor(map.getZoom()),
       })
     }
   }

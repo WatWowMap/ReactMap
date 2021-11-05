@@ -55,7 +55,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const onMove = useCallback((latLon) => {
     const newCenter = latLon || map.getCenter()
     setLocation([newCenter.lat, newCenter.lng])
-    setZoom(map.getZoom())
+    setZoom(Math.floor(map.getZoom()))
   }, [map])
 
   useEffect(() => {

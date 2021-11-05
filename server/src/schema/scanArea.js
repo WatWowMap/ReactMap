@@ -4,28 +4,28 @@ const {
 
 const feature = new GraphQLObjectType({
   name: 'Feature',
-  fields: () => ({
+  fields: {
     type: { type: GraphQLString },
     properties: {
       type: new GraphQLObjectType({
         name: 'ScanAreasName',
-        fields: () => ({
+        fields: {
           name: { type: GraphQLString },
-        }),
+        },
       }),
     },
     geometry: {
       type: new GraphQLObjectType({
         name: 'ScanAreaGeometry',
-        fields: () => ({
+        fields: {
           type: { type: GraphQLString },
           coordinates: {
             type: new GraphQLList(new GraphQLList(new GraphQLList(GraphQLFloat))),
           },
-        }),
+        },
       }),
     },
-  }),
+  },
 })
 
 module.exports = new GraphQLObjectType({
