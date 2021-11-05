@@ -40,8 +40,8 @@ module.exports.locales = async function locales() {
 
     const finalTranslations = {
       ...JSON.parse(englishRef),
-      ...JSON.parse(reactMapTranslations),
       ...trimmedRemoteFiles,
+      ...JSON.parse(reactMapTranslations),
     }
     fs.writeFile(
       path.resolve(finalLocalesFolder, baseName, 'translation.json'),
