@@ -110,7 +110,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
           category={category}
           isMobile={isMobile}
           toggleWebhook={toggleWebhook}
-          tempFilters={item}
+          tempFilters={{ ...item, byDistance: Boolean(item.distance) }}
         />
       </Dialog>
     </Grid>
