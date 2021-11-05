@@ -376,7 +376,7 @@ const RootQuery = new GraphQLObjectType({
           const pokestops = await stopQuery
           const gyms = await gymQuery
           return [{
-            placementCells: args.zoom >= config.submissionZoom
+            placementCells: args.zoom >= config.map.submissionZoom
               ? Utility.getPlacementCells(args, pokestops, gyms)
               : [],
             typeCells: Utility.getTypeCells(args, pokestops, gyms),
