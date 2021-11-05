@@ -2,29 +2,27 @@ const {
   GraphQLObjectType, GraphQLString, GraphQLList, GraphQLFloat,
 } = require('graphql')
 
+const properties = new GraphQLObjectType({
+  name: 'Properties',
+  fields: {
+    name: { type: GraphQLString },
+  },
+})
+
+const geometry = new GraphQLObjectType({
+  name: 'ScanAreaGeometry',
+  fields: {
+    type: { type: GraphQLString },
+    coordinates: { type: new GraphQLList(new GraphQLList(new GraphQLList(GraphQLFloat))) },
+  },
+})
+
 const feature = new GraphQLObjectType({
   name: 'Feature',
   fields: {
     type: { type: GraphQLString },
-    properties: {
-      type: new GraphQLObjectType({
-        name: 'ScanAreasName',
-        fields: {
-          name: { type: GraphQLString },
-        },
-      }),
-    },
-    geometry: {
-      type: new GraphQLObjectType({
-        name: 'ScanAreaGeometry',
-        fields: {
-          type: { type: GraphQLString },
-          coordinates: {
-            type: new GraphQLList(new GraphQLList(new GraphQLList(GraphQLFloat))),
-          },
-        },
-      }),
-    },
+    properties: { type: properties },
+    geometry: { type: geometry },
   },
 })
 
