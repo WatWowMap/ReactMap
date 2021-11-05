@@ -127,6 +127,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
                 } break
             }
             if (enabled) {
+              Utility.analytics('Data', `${category} being fetched`, category, true)
               return (
                 <QueryData
                   key={category}
