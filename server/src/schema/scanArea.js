@@ -1,13 +1,7 @@
 const {
   GraphQLObjectType, GraphQLString, GraphQLList, GraphQLFloat,
 } = require('graphql')
-
-const properties = new GraphQLObjectType({
-  name: 'Properties',
-  fields: {
-    name: { type: GraphQLString },
-  },
-})
+const { JSONResolver } = require('graphql-scalars')
 
 const geometry = new GraphQLObjectType({
   name: 'ScanAreaGeometry',
@@ -21,7 +15,7 @@ const feature = new GraphQLObjectType({
   name: 'Feature',
   fields: {
     type: { type: GraphQLString },
-    properties: { type: properties },
+    properties: { type: JSONResolver },
     geometry: { type: geometry },
   },
 })
