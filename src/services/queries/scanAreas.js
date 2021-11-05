@@ -6,9 +6,7 @@ query Data {
       type
       features {
         type
-        properties {
-          name
-        }
+        properties
         geometry {
           type
           coordinates
