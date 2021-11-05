@@ -440,5 +440,6 @@
     "{{name}} was unable to process that.",
     "Please try again later."
   ],
-  "profile_error": "Must be unique and valid"
+  "profile_error": "Must be unique and valid",
+  "team_0": "Harmony"
 }

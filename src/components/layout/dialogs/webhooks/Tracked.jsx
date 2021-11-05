@@ -75,7 +75,7 @@ const Tracked = ({
     syncWebhook({
       variables: {
         category: `${category}-delete`,
-        data: Object.keys(selected),
+        data: Object.keys(selected).filter(x => selected[x]),
         name: selectedWebhook,
         status: 'POST',
       },
