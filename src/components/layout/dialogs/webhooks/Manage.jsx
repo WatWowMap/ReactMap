@@ -65,7 +65,7 @@ export default function Manage({
         ? <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans>
         : t('manage_profiles'),
       action: () => setAddNew(true),
-      icon: 'Add',
+      icon: tabValue ? 'Add' : 'People',
       key: 'addNew',
       disabled: !webhookData[selectedWebhook].human,
     },
@@ -122,6 +122,18 @@ export default function Manage({
       })
     }
   }, [data])
+
+  useEffect(() => {
+    const changeTab = (e) => {
+      if (+e.key && filteredData[+e.key - 1]) {
+        setTabValue(+e.key - 1)
+      }
+    }
+    window.addEventListener('keydown', changeTab)
+    return () => {
+      window.removeEventListener('keydown', changeTab)
+    }
+  }, [])
 
   return (
     <>

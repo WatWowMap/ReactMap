@@ -111,6 +111,12 @@ export default function WebhookAdvanced({
           [name]: checked,
           move: 9000,
         }); break
+      case 'byDistance':
+        setPoracleValues({
+          ...poracleValues,
+          [name]: checked,
+          distance: 0,
+        }); break
       default: setPoracleValues({ ...poracleValues, [name]: checked })
     }
   }

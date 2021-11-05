@@ -67,7 +67,7 @@ export default function Menu({
   const selectAllOrNone = (show) => {
     Object.entries(filteredObj).forEach(([key, item]) => {
       item.enabled = show
-      if (key.startsWith('t') && key.charAt(1) != 0) {
+      if (key.startsWith('t') && key.charAt(1) != 0 && !webhookCategory) {
         generateSlots(key, show)
       }
     })

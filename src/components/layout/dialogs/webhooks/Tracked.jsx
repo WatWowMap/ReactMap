@@ -46,7 +46,7 @@ const Tracked = ({
         variables: {
           category,
           data: Poracle.processor(
-            category, Object.values(tempFilters).filter(x => x && x.enabled), staticInfo[category].defaults,
+            category, Object.values(tempFilters || {}).filter(x => x && x.enabled), staticInfo[category].defaults,
           ),
           name: selectedWebhook,
           status: 'POST',
@@ -122,7 +122,7 @@ const areEqual = (prev, next) => {
   const prevSelected = prev.webhookData[prev.selectedWebhook]
   const nextSelected = next.webhookData[next.selectedWebhook]
   return prevSelected[prev.category].length === nextSelected[next.category].length
-    && prev.addNew == next.addNew
+    && prev.addNew === next.addNew
     && prevSelected.human.current_profile_no === nextSelected.human.current_profile_no
     && prevSelected.fetched === nextSelected.fetched
     && prev.send === next.send
