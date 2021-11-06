@@ -2,7 +2,9 @@ import React from 'react'
 import { Redirect } from 'react-router-dom'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
+import { Typography, Grid } from '@material-ui/core'
 import { ThemeProvider } from '@material-ui/styles'
+import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
@@ -16,22 +18,13 @@ export default function ConfigSettings({
   serverSettings, match, paramLocation, paramZoom,
 }) {
   Utility.analytics('Discord', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
-  if (serverSettings.error) {
-    return (
-      <Redirect
-        push
-        to={{
-          pathname: '/login',
-          state: { message: 'cannotConnect' },
-        }}
-      />
-    )
-  }
 
+  const localState = JSON.parse(localStorage.getItem('local-state'))
   document.title = serverSettings.config.map.headerTitle
-  const theme = setTheme(serverSettings.config.map.theme)
   document.body.classList.add('dark')
+  const theme = setTheme(serverSettings.config.map.theme)
 
+  const { t } = useTranslation()
   const setUserSettings = useStore(state => state.setUserSettings)
   const setSettings = useStore(state => state.setSettings)
   const setFilters = useStore(state => state.setFilters)
@@ -54,8 +47,6 @@ export default function ConfigSettings({
   const setWebhookData = useStatic(state => state.setWebhookData)
   const setMenuFilters = useStatic(state => state.setMenuFilters)
 
-  const localState = JSON.parse(localStorage.getItem('local-state'))
-
   const updateObjState = (defaults, category) => {
     if (localState && localState.state && localState.state[category]) {
       const newState = {}
@@ -72,49 +63,6 @@ export default function ConfigSettings({
     return defaults
   }
 
-  setAuth({
-    discord: serverSettings.discord,
-    loggedIn: serverSettings.loggedIn,
-    perms: serverSettings.user ? serverSettings.user.perms : {},
-  })
-  setUi(serverSettings.ui)
-  setMasterfile(serverSettings.masterfile)
-  setAvailable(serverSettings.available)
-
-  setMenus(updateObjState(serverSettings.menus, 'menus'))
-  setStaticMenus(serverSettings.menus)
-
-  if (localState?.state?.filters?.pokemon?.standard) {
-    delete localState.state.filters.pokemon.standard
-  }
-  setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
-  setStaticFilters(serverSettings.defaultFilters)
-
-  setUserSettings(updateObjState(serverSettings.userSettings, 'userSettings'))
-  setStaticUserSettings(serverSettings.clientMenus)
-
-  setSettings(updateObjState(serverSettings.settings, 'settings'))
-  setStaticSettings(serverSettings.settings)
-
-  const newIcons = updateObjState(serverSettings.Icons.selected, 'icons')
-  const isValidIcon = serverSettings.Icons.checkValid(newIcons)
-
-  if (localState?.state?.icons && isValidIcon) {
-    serverSettings.Icons.setSelection(newIcons)
-  }
-  setIcons(serverSettings.Icons.selection)
-  setStaticIcons(serverSettings.Icons)
-  setMenuFilters(useGenerate())
-  setConfig(serverSettings.config)
-  setWebhookData(serverSettings.webhooks)
-
-  if (localState?.state && serverSettings?.webhooks?.[localState.state?.selectedWebhook]) {
-    setSelectedWebhook(localState.state.selectedWebhook)
-  } else if (serverSettings?.webhooks) {
-    setSelectedWebhook(Object.keys(serverSettings.webhooks)[0])
-  }
-
-  setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
   const getStartLocation = () => {
     if (paramLocation && paramLocation[0] !== null) {
       return paramLocation
@@ -125,7 +73,6 @@ export default function ConfigSettings({
     return updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
   }
 
-  setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
   const getStartZoom = () => {
     if (paramZoom) {
       return paramZoom
@@ -134,6 +81,88 @@ export default function ConfigSettings({
       return match.params.zoom || 15
     }
     return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
+  }
+
+  try {
+    if (serverSettings.error) {
+      return (
+        <Redirect
+          push
+          to={{
+            pathname: '/login',
+            state: { message: 'cannotConnect' },
+          }}
+        />
+      )
+    }
+
+    setAuth({
+      discord: serverSettings.discord,
+      loggedIn: serverSettings.loggedIn,
+      perms: serverSettings.user ? serverSettings.user.perms : {},
+    })
+    setUi(serverSettings.ui)
+    setMasterfile(serverSettings.masterfile)
+    setAvailable(serverSettings.available)
+
+    setMenus(updateObjState(serverSettings.menus, 'menus'))
+    setStaticMenus(serverSettings.menus)
+
+    if (localState?.state?.filters?.pokemon?.standard) {
+      delete localState.state.filters.pokemon.standard
+    }
+    setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
+    setStaticFilters(serverSettings.defaultFilters)
+
+    setUserSettings(updateObjState(serverSettings.userSettings, 'userSettings'))
+    setStaticUserSettings(serverSettings.clientMenus)
+
+    setSettings(updateObjState(serverSettings.settings, 'settings'))
+    setStaticSettings(serverSettings.settings)
+
+    const newIcons = updateObjState(serverSettings.Icons.selected, 'icons')
+    const isValidIcon = serverSettings.Icons.checkValid(newIcons)
+
+    if (localState?.state?.icons && isValidIcon) {
+      serverSettings.Icons.setSelection(newIcons)
+    }
+    setIcons(serverSettings.Icons.selection)
+    setStaticIcons(serverSettings.Icons)
+    setMenuFilters(useGenerate())
+    setConfig(serverSettings.config)
+    setWebhookData(serverSettings.webhooks)
+
+    if (localState?.state && serverSettings?.webhooks?.[localState.state?.selectedWebhook]) {
+      setSelectedWebhook(localState.state.selectedWebhook)
+    } else if (serverSettings?.webhooks) {
+      setSelectedWebhook(Object.keys(serverSettings.webhooks)[0])
+    }
+
+    setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
+    setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e)
+    return (
+      <Grid
+        container
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        style={{ height: '95vh' }}
+      >
+        <Grid item>
+          <Typography variant="h6" style={{ color: serverSettings.config.map.theme.primary }}>
+            {t('config_error')}
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Typography variant="subtitle2" style={{ color: serverSettings.config.map.theme.secondary }}>
+            {e.message}
+          </Typography>
+        </Grid>
+      </Grid>
+    )
   }
 
   return (
