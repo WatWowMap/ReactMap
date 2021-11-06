@@ -115,7 +115,6 @@ export default function Nav({
           webhooks={webhooks}
           webhookMode={webhookMode}
           setWebhookMode={setWebhookMode}
-          scanAreasOn={filters.scanAreas.enabled}
           settings={settings}
         />
       )}
