@@ -169,11 +169,25 @@ export default function WebhookAdvanced({
       )); break
       case 'move':
         menuItems.push(<MenuItem key={9000} value={9000}>{t('any')}</MenuItem>)
-        Object.keys(moves).forEach(move => {
-          if (moves[move].type) {
-            menuItems.push(<MenuItem key={move} value={move}>{t(`move_${move}`)}</MenuItem>)
-          }
-        }); break
+        if (id === 'global') {
+          Object.keys(moves).forEach(move => {
+            if (moves[move].type) {
+              menuItems.push(<MenuItem key={move} value={move}>{t(`move_${move}`)}</MenuItem>)
+            }
+          })
+        } else if (pokemon[idObj.pokemonId]) {
+          ['quickMoves', 'chargedMoves'].forEach(moveType => {
+            if (pokemon[idObj.pokemonId]?.forms?.[idObj.form]?.[moveType]) {
+              pokemon[idObj.pokemonId]?.forms?.[idObj.form]?.[moveType].forEach(move => {
+                menuItems.push(<MenuItem key={move} value={move}>{t(`move_${move}`)}</MenuItem>)
+              })
+            } else if (pokemon[idObj.pokemonId][moveType]) {
+              pokemon[idObj.pokemonId][moveType].forEach(move => {
+                menuItems.push(<MenuItem key={move} value={move}>{t(`move_${move}`)}</MenuItem>)
+              })
+            }
+          })
+        } break
       default: option.options.forEach(subOption => (
         menuItems.push(<MenuItem key={subOption} value={subOption}>{t(subOption, subOption)}</MenuItem>)
       ))
@@ -187,7 +201,7 @@ export default function WebhookAdvanced({
     if (field === 'exclusive' && poracleValues.exclusive) return ` ${t('exclusive')} `
     if (field === 'clean' && poracleValues.clean) return ` ${t('clean')} `
     if (field === 'min_spawn_avg' && poracleValues.min_spawn_avg > 0) return ` ${t('minspawn')}${poracleValues.min_spawn_avg} `
-    if (field === 'slot_changes' && poracleValues.slot_changes) return ` ${t('slot_changes')} `
+    if (field === 'slot_changes' && poracleValues.slot_changes) return ` ${t('slot_changes_poracle')} `
     if (field === 'team' && poracleValues.team !== 4) return t(`team_${poracleValues.team}`)
     if (skipFields.includes(field)) return ''
     if (field.startsWith('pvp')) {
@@ -222,7 +236,7 @@ export default function WebhookAdvanced({
         return `${prefix}${t('invasion')} ${invasion ? t(`poke_type_${invasion}`) : t(poracleValues.grunt_type.replace(' ', ''))}
         ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       }
-      case 'q': return `${prefix}${t('quest')} ${t(`item_${idObj.id}`)}
+      case 'q': return `${prefix}${t('quest')} ${t(`item_${idObj.id}`).replace(' ', '_')}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'm': return `${prefix}${t('quest')} ${t('energy')}${t(`poke_${idObj.pokemonId}`)}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
