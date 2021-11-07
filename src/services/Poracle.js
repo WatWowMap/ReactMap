@@ -300,25 +300,26 @@ export default class Poracle {
 
   static generateDescription(item, category, leagues, t) {
     switch (category) {
-      case 'invasion': return `${t(`grunt_${item.grunt_id}`)} ${item.distance ? ` | d${item.distance}` : ''}`
-      case 'lure': return `${t(`lure_${item.lure_id}`)} ${item.distance ? ` | d${item.distance}` : ''}`
+      case 'invasion': return `${t(`grunt_${item.grunt_id}`)}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
+      case 'lure': return `${t(`lure_${item.lure_id}`)}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
       case 'quest': return `${t(`quest_reward_${item.reward_type}`)} | ${(function getReward() {
         switch (item.reward_type) {
-          case 2: return `${t(`item_${item.reward}`)} x${item.amount}`
+          case 2: return `${t(`item_${item.reward}`)}${item.amount ? ` | x${item.amount}` : ''}`
           case 3: return `x${item.amount}`
+          case 4: return `${t(`poke_${item.reward}`)}${item.amount ? ` | x${item.amount}` : ''}`
           case 7: return `${t(`poke_${item.reward}`)} ${t('form')}: ${t(`form_${item.form}`)}`
-          case 12: return `${t(`poke_${item.reward}`)} ${t('form')}: x${item.amount}`
+          case 12: return `${t(`poke_${item.reward}`)}${item.amount ? ` | x${item.amount}` : ''}`
           default: return ''
         }
-      }())} ${item.distance ? ` | d${item.distance}` : ''}`
+      }())}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
       // case 'gym': return `${t(`team_${item.team}`)} ${item.gym_id ? item.name : ''}`
       // case 'raid':
       // case 'egg': return `Level ${item.level} ${item.exclusive ? 'Exclusive Only' : ''} ${item.clean ? 'clean' : ''} Template: ${item.template} ${item.team === 4 ? '' : item.team} ${item.gym_id ? 'Gym:' : ''}${item.distance ? ` | d${item.distance}` : ''}`
-      case 'nest': return `${t(`poke_${item.pokemon_id}`)} | Min Spawn: ${item.min_spawn_avg}`
+      case 'nest': return `${t(`poke_${item.pokemon_id}`)} | Min Spawn: ${item.min_spawn_avg}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
       case 'pokemon': return item.pvp_ranking_league
-        ? `${t('pvp')} ${t(leagues.find(league => league.cp === item.pvp_ranking_league).name)} ${item.pvp_ranking_best}-${item.pvp_ranking_worst} ${item.pvp_ranking_min_cp ? `${item.pvp_ranking_min_cp}${t('cp')}` : ''}`
+        ? `${t('pvp')} ${t(leagues.find(league => league.cp === item.pvp_ranking_league).name)} ${item.pvp_ranking_best}-${item.pvp_ranking_worst} ${item.pvp_ranking_min_cp ? `${item.pvp_ranking_min_cp}${t('cp')}` : ''}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
         : `${item.min_iv}-${item.max_iv}% | L${item.min_level}-${item.max_level}
-      A${item.atk}-${item.max_atk} | D${item.def}-${item.max_def} | S${item.sta}-${item.max_sta}${item.distance ? ` | d${item.distance}` : ''}`
+      A${item.atk}-${item.max_atk} | D${item.def}-${item.max_def} | S${item.sta}-${item.max_sta}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
       default: return item.description
     }
   }

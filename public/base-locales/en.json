@@ -434,6 +434,7 @@
   "search_specific": "Search for a Specific {{category}}",
   "webhook_success_gym": "Raids, Eggs, and Team Change Alerts Have Been Added!",
   "slot_changes": "Slot Changes",
+  "slot_changes_poracle": "slot_changes",
   "confirm_delete": "This will remove all tracking for this profile, are you sure?",
   "confirm_copy": "Choose which profile you would like to copy \"{{profile}}\" to, this will overwrite that profile entirely.",
   "webhook_error": [
