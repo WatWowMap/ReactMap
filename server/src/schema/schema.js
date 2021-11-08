@@ -137,9 +137,9 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms?.pokestops
-          || perms.lures
-          || perms.quests
-          || perms.invasions) {
+          || perms?.lures
+          || perms?.quests
+          || perms?.invasions) {
           return Pokestop.getAllPokestops(args, perms, Utility.dbSelection('pokestop') === 'mad')
         }
         return []
@@ -376,7 +376,7 @@ const RootQuery = new GraphQLObjectType({
           const pokestops = await stopQuery
           const gyms = await gymQuery
           return [{
-            placementCells: args.zoom >= config.submissionZoom
+            placementCells: args.zoom >= config.map.submissionZoom
               ? Utility.getPlacementCells(args, pokestops, gyms)
               : [],
             typeCells: Utility.getTypeCells(args, pokestops, gyms),

@@ -82,8 +82,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 { name: 'noIv', xs: 6, sm: 3 },
               ],
               distanceOrArea: {
-                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
-                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 6, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
           },
@@ -103,6 +103,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             gym_id: null,
             byDistance: false,
             allMoves: true,
+            allForms: true,
           },
           ui: {
             general: {
@@ -120,8 +121,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
               ],
               autoComplete: [{ name: 'gymName', label: 'gym', searchCategory: 'gyms', xs: 12, sm: 12 }],
               distanceOrArea: {
-                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
-                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 6, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
           },
@@ -150,8 +151,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
               ],
               autoComplete: [{ name: 'gymName', label: 'gym', searchCategory: 'gyms', xs: 12, sm: 12 }],
               distanceOrArea: {
-                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
-                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 6, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
           },
@@ -178,8 +179,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
               ],
               autoComplete: [{ name: 'gymName', label: 'gym', searchCategory: 'gyms', xs: 12, sm: 12 }],
               distanceOrArea: {
-                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
-                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 6, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
           },
@@ -203,8 +204,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 { name: 'clean', xs: 4, sm: 4 },
               ],
               distanceOrArea: {
-                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
-                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 6, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
           },
@@ -227,8 +228,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 { name: 'clean', xs: 4, sm: 4 },
               ],
               distanceOrArea: {
-                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
-                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 6, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
           },
@@ -244,6 +245,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             amount: 0,
             form: 0,
             byDistance: false,
+            allForms: true,
           },
           ui: {
             general: {
@@ -257,8 +259,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
               ],
               texts: [{ name: 'amount', type: 'number', disabled: ['m', 'd', 'g'], xs: 6, sm: 6 }],
               distanceOrArea: {
-                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
-                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 6, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
           },
@@ -272,6 +274,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             min_spawn_avg: 0,
             form: 0,
             byDistance: false,
+            allForms: true,
           },
           ui: {
             general: {
@@ -285,8 +288,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
               ],
               texts: [{ name: 'min_spawn_avg', type: 'number', xs: 6, sm: 6 }],
               distanceOrArea: {
-                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 8, sm: 8, override: true }],
-                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 4, sm: 4 }],
+                booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 6, sm: 8, override: true }],
+                texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
           },

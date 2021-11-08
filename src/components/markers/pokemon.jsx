@@ -10,7 +10,7 @@ export const basicMarker = (iconUrl, size) => new Icon({
   className: 'marker',
 })
 
-export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons, weatherCheck) => {
+export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons, weatherCheck, isNight) => {
   const { pokemon: pokemonMod } = Icons.modifiers
   let badge
   switch (pkmn.bestPvp) {
@@ -54,18 +54,20 @@ export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons, weatherC
       )}
       {Boolean(weatherCheck) && (
         <div
+          className="weather-fancy"
           style={{
-            position: 'absolute',
+            width: size / 2,
+            height: size / 2,
             top: -size * pokemonMod.offsetY,
             left: `${pokemonMod.offsetX * size * 5}%`,
           }}
         >
           <img
-            src={`/images/weather/${pkmn.weather}.png`}
-            className="weather-icon"
+            src={Icons.getWeather(pkmn.weather, isNight)}
             style={{
-              width: size / 2,
+              width: size / 3,
               height: 'auto',
+              padding: size / 12,
             }}
           />
         </div>

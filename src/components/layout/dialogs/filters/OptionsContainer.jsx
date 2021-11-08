@@ -12,7 +12,7 @@ import Utility from '@services/Utility'
 import FilterOptions from './Options'
 
 export default function OptionsContainer({
-  advMenu, setAdvMenu, menus, setMenus,
+  advMenu, setAdvMenu, menus, setMenus, categories,
   category, handleReset, count, isMobile, toggleDrawer,
 }) {
   const { t } = useTranslation()
@@ -45,7 +45,9 @@ export default function OptionsContainer({
 
   const applied = []
   const allFilterMenus = Object.entries(staticMenus.filters).map(([cat, options]) => {
-    if (Object.keys(options).length > 1) {
+    if (categories
+      ? categories.length > 1 || cat === 'others' || (categories.includes('pokemon') && cat !== 'categories')
+      : Object.keys(options).length > 1) {
       if (menus[category].filters[cat]) {
         Object.entries(menus[category].filters[cat]).forEach(([filter, bool]) => {
           if (bool) {

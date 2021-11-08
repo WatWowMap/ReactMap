@@ -43,14 +43,14 @@ export default function FloatingButtons({
       </Grid>
       {safeSearch.length > 0 ? (
         <Grid item>
-          <Fab color={settings.navigationControls === 'react' ? 'primary' : 'secondary'} size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('openMenu')} disabled={Boolean(webhookMode)}>
+          <Fab color={settings.navigationControls === 'react' ? 'primary' : 'secondary'} size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('search')} disabled={Boolean(webhookMode)}>
             <Search fontSize={iconSize} />
           </Fab>
         </Grid>
       ) : null}
       {(perms?.webhooks?.length && webhooks && selectedWebhook) ? (
         <Grid item>
-          <Fab color="secondary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('webhook')} disabled={Boolean(webhookMode)}>
+          <Fab color="secondary" size={fabSize} onClick={() => setWebhookMode('open')} title={selectedWebhook} disabled={Boolean(webhookMode)}>
             <NotificationsActive fontSize={iconSize} />
           </Fab>
         </Grid>
@@ -74,11 +74,13 @@ export default function FloatingButtons({
           </Grid>
         </>
       ) : null}
+      {(webhookMode === 'areas' || webhookMode === 'location') && (
       <Grid item>
-        <Fab color="primary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('save')} disabled={webhookMode !== 'areas'}>
+        <Fab color="primary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('save')}>
           <Save fontSize={iconSize} />
         </Fab>
       </Grid>
+      )}
     </Grid>
   )
 }

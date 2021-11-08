@@ -65,7 +65,7 @@ export default function Manage({
         ? <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans>
         : t('manage_profiles'),
       action: () => setAddNew(true),
-      icon: 'Add',
+      icon: tabValue ? 'Add' : 'People',
       key: 'addNew',
       disabled: !webhookData[selectedWebhook].human,
     },

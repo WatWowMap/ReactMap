@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/client'
 
-import Utility from '@services/Utility'
 import Query from '@services/Query'
 import RobustTimeout from '@classes/RobustTimeout'
 
@@ -29,9 +28,8 @@ const getPolling = category => {
 export default function QueryData({
   bounds, onMove, map, tileStyle, clusterZoomLvl, config, params,
   category, available, filters, staticFilters, staticUserSettings,
-  userSettings, perms, Icons, userIcons, setParams,
+  userSettings, perms, Icons, userIcons, setParams, isNight,
 }) {
-  Utility.analytics('Data', `${category} being fetched`, category, true)
   const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
 
   const trimFilters = useCallback(requestedFilters => {
@@ -84,7 +82,7 @@ export default function QueryData({
         minLon: mapBounds._southWest.lng,
         maxLon: mapBounds._northEast.lng,
         filters: trimFilters(filters),
-        zoom: map.getZoom(),
+        zoom: Math.floor(map.getZoom()),
       })
     }
   }
@@ -148,6 +146,7 @@ export default function QueryData({
         staticUserSettings={staticUserSettings}
         params={params}
         setParams={setParams}
+        isNight={isNight}
       />
     )
   }

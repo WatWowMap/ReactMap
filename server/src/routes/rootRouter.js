@@ -106,7 +106,7 @@ rootRouter.get('/settings', async (req, res) => {
           ...config.multiDomains[req.headers.host],
           excludeList: config.excludeFromTutorial,
         },
-        tileServers: config.tileServers,
+        tileServers: { auto: {}, ...config.tileServers },
         navigation: config.navigation,
         drawer: {
           temporary: {},
@@ -231,6 +231,7 @@ rootRouter.get('/settings', async (req, res) => {
                     ...config.webhookObj[webhook.name].client,
                     ...remoteData,
                     hasNominatim: Boolean(config.webhookObj[webhook.name].server.nominatimUrl),
+                    locale: remoteData.human.language || config.webhookObj[webhook.name].client.locale,
                     available: areas
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .filter(area => area.userSelectable !== false)
@@ -259,7 +260,7 @@ rootRouter.use('/graphql', cors(), graphqlHTTP({
   graphiql: config.devOptions.graphiql,
   validationRules: config.devOptions.graphiql ? undefined : [NoSchemaIntrospectionCustomRule],
   customFormatErrorFn: (e) => {
-    if (config.devOptions) {
+    if (config.devOptions.enabled) {
       console.error('GraphQL Error:', e)
     } else {
       console.error('GraphQL Error:', e.message, e.path, e.location)
