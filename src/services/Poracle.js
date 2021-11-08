@@ -3,12 +3,21 @@ export default class Poracle {
     try {
       const { info: { pokemon, raid, egg, invasion, lure, nest, quest, gym }, human } = poracleInfo
       const filters = {
-        pokemon: { global: { ...pokemon.defaults, profile_no: human.current_profile_no } },
+        pokemon: {
+          global: { ...pokemon.defaults, profile_no: human.current_profile_no },
+          '0-0': { ...pokemon.defaults, profile_no: human.current_profile_no },
+        },
         raid: { global: { ...raid.defaults, profile_no: human.current_profile_no } },
         egg: { global: { ...egg.defaults, profile_no: human.current_profile_no } },
         gym: { global: { ...gym.defaults, profile_no: human.current_profile_no } },
-        invasion: { global: { ...invasion.defaults, profile_no: human.current_profile_no } },
-        lure: { global: { ...lure.defaults, profile_no: human.current_profile_no } },
+        invasion: {
+          global: { ...invasion.defaults, profile_no: human.current_profile_no },
+          'i0-0': { ...invasion.defaults, profile_no: human.current_profile_no },
+        },
+        lure: {
+          global: { ...lure.defaults, profile_no: human.current_profile_no },
+          l0: { ...lure.defaults, profile_no: human.current_profile_no },
+        },
         nest: { global: { ...nest.defaults, profile_no: human.current_profile_no } },
         quest: { global: { ...quest.defaults, profile_no: human.current_profile_no } },
       }
@@ -266,6 +275,7 @@ export default class Poracle {
   static processor(type, entries, defaults) {
     const pvpFields = ['pvp_ranking_league', 'pvp_ranking_best', 'pvp_ranking_worst', 'pvp_ranking_min_cp']
     const ignoredFields = ['noIv', 'byDistance', 'xs', 'xl', 'allForms', 'pvpEntry']
+    const dupes = {}
     switch (type) {
       case 'egg': return entries.map(egg => ({ ...defaults, ...egg, byDistance: undefined }))
       case 'invasion': return entries.map(invasion => ({ ...defaults, ...invasion, byDistance: undefined }))
@@ -274,18 +284,35 @@ export default class Poracle {
       case 'raid': return entries.map(boss => {
         if (boss.allForms) {
           boss.form = defaults.form
+          if (dupes[boss.pokemon_id]) {
+            return null
+          }
+          dupes[boss.pokemon_id] = true
         }
         if (boss.byDistance === false) {
           boss.distance = 0
         }
         return { ...defaults, ...boss }
-      })
-      case 'quest': return entries.map(quest => ({ ...defaults, ...quest, byDistance: undefined }))
+      }).filter(boss => boss)
+      case 'quest': return entries.map(quest => {
+        if (quest.allForms) {
+          quest.form = defaults.form
+          if (dupes[quest.reward]) {
+            return null
+          }
+          dupes[quest.reward] = true
+        }
+        return { ...defaults, ...quest, byDistance: undefined, allForms: undefined }
+      }).filter(quest => quest)
       default: return entries.map(pkmn => {
         const fields = ['pokemon_id', 'form', 'clean', 'distance', 'min_time', 'template', 'profile_no', 'gender', 'rarity', 'max_rarity']
         const newPokemon = {}
         if (pkmn.allForms) {
           pkmn.form = 0
+          if (dupes[pkmn.pokemon_id]) {
+            return null
+          }
+          dupes[pkmn.pokemon_id] = true
         }
         if (pkmn.pvpEntry) {
           fields.push(...pvpFields)
@@ -294,7 +321,7 @@ export default class Poracle {
         }
         fields.forEach(field => newPokemon[field] = pkmn[field] || defaults[field])
         return newPokemon
-      })
+      }).filter(pokemon => pokemon)
     }
   }
 

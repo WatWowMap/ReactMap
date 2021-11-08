@@ -167,6 +167,7 @@ export default function Menu({
       setMenus={setMenus}
       toggleDrawer={toggleDrawer}
       isMobile={isMobile}
+      categories={categories}
     />
   )
 

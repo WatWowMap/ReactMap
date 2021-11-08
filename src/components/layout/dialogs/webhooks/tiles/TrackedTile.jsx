@@ -53,6 +53,15 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   if (category === 'invasion') {
     item.grunt_id = Object.keys(invasions).find(key => invasions[key]?.type?.toLowerCase() === item.grunt_type)
   }
+  if (category === 'pokemon') {
+    item.pvpEntry = Boolean(item.pvp_ranking_league)
+    item.allForms = !item.form
+    item.xs = item.max_weight !== 9000000
+    item.xl = item.min_weight !== 0
+  }
+  if (category === 'raid') {
+    item.allMoves = item.move === 9000
+  }
   return (
     <Grid
       container
