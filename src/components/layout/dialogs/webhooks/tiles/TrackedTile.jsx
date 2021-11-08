@@ -50,12 +50,14 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   }
 
   const id = Poracle.getId(item, category, invasions)
+  if (item.form !== undefined) {
+    item.allForms = !item.form
+  }
   if (category === 'invasion') {
     item.grunt_id = Object.keys(invasions).find(key => invasions[key]?.type?.toLowerCase() === item.grunt_type)
   }
   if (category === 'pokemon') {
     item.pvpEntry = Boolean(item.pvp_ranking_league)
-    item.allForms = !item.form
     item.xs = item.max_weight !== 9000000
     item.xl = item.min_weight !== 0
   }
