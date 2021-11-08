@@ -103,6 +103,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             gym_id: null,
             byDistance: false,
             allMoves: true,
+            allForms: true,
           },
           ui: {
             general: {
@@ -244,6 +245,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             amount: 0,
             form: 0,
             byDistance: false,
+            allForms: true,
           },
           ui: {
             general: {
@@ -272,6 +274,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             min_spawn_avg: 0,
             form: 0,
             byDistance: false,
+            allForms: true,
           },
           ui: {
             general: {

@@ -74,11 +74,13 @@ export default function FloatingButtons({
           </Grid>
         </>
       ) : null}
+      {(webhookMode === 'areas' || webhookMode === 'location') && (
       <Grid item>
-        <Fab color="primary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('save')} disabled={webhookMode !== 'areas'}>
+        <Fab color="primary" size={fabSize} onClick={() => setWebhookMode('open')} title={t('save')}>
           <Save fontSize={iconSize} />
         </Fab>
       </Grid>
+      )}
     </Grid>
   )
 }

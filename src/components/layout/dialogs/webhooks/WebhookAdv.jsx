@@ -205,7 +205,7 @@ export default function WebhookAdvanced({
     if (field === 'team' && poracleValues.team !== 4) return t(`team_${poracleValues.team}`)
     if (skipFields.includes(field)) return ''
     if (field.startsWith('pvp')) {
-      if (poracleValues.pvpEntry) {
+      if (poracleValues.pvpEntry && poracleValues.pvp_ranking_league) {
         const league = leagues.find(x => x.cp === poracleValues.pvp_ranking_league) || {}
         switch (field) {
           case 'pvp_ranking_min_cp':
