@@ -1,7 +1,6 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 import Fetch from '@services/Fetch'
-import SunCalc from 'suncalc'
 
 export default class UIcons {
   constructor({ customizable, sizes, cacheHrs }, questRewardTypes) {
@@ -266,13 +265,9 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
-  getWeather(weatherId, lat, lon) {
+  getWeather(weatherId, isNight = false) {
     const baseUrl = `${this[this.selected.weather].path}/weather`
-    const date = new Date()
-    const times = SunCalc.getTimes(date, lat, lon)
-    const timeSuffixes = date <= times.sunrise || date >= times.sunset
-      ? ['_n', '']
-      : ['_d', '']
+    const timeSuffixes = isNight ? ['_n', ''] : ['_d', '']
     for (const timeSuffix of timeSuffixes) {
       const result = `${weatherId}${timeSuffix}.png`
       if (this[this.selected.weather].weather.has(result)) {

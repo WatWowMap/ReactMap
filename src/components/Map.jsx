@@ -33,6 +33,8 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const settings = useStore(state => state.settings)
   const icons = useStore(state => state.icons)
   const setLocation = useStore(s => s.setLocation)
+  const isNight = useStatic(state => state.isNight)
+  const setIsNight = useStatic(state => state.setIsNight)
   const setZoom = useStore(state => state.setZoom)
   const userSettings = useStore(state => state.userSettings)
 
@@ -56,6 +58,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
     const newCenter = latLon || map.getCenter()
     setLocation([newCenter.lat, newCenter.lng])
     setZoom(Math.floor(map.getZoom()))
+    setIsNight(Utility.nightCheck(newCenter.lat, newCenter.lng))
   }, [map])
 
   useEffect(() => {
@@ -148,6 +151,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
                   staticUserSettings={staticUserSettings[category]}
                   params={manualParams}
                   setParams={setManualParams}
+                  isNight={isNight}
                 />
               )
             }

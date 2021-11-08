@@ -28,7 +28,7 @@ const getPolling = category => {
 export default function QueryData({
   bounds, onMove, map, tileStyle, clusterZoomLvl, config, params,
   category, available, filters, staticFilters, staticUserSettings,
-  userSettings, perms, Icons, userIcons, setParams,
+  userSettings, perms, Icons, userIcons, setParams, isNight,
 }) {
   const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
 
@@ -146,6 +146,7 @@ export default function QueryData({
         staticUserSettings={staticUserSettings}
         params={params}
         setParams={setParams}
+        isNight={isNight}
       />
     )
   }
