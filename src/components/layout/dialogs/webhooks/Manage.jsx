@@ -14,6 +14,7 @@ import Query from '@services/Query'
 import { useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Poracle from '@services/Poracle'
+import Utility from '@services/Utility'
 
 import Footer from '@components/layout/general/Footer'
 import TabPanel from '@components/layout/general/TabPanel'
@@ -55,6 +56,8 @@ export default function Manage({
       ? !webhookData[selectedWebhook].human.blocked_alerts.includes('monster')
       : !webhookData[selectedWebhook].human.blocked_alerts.includes(key))))
   const webhookCategory = filteredData[tabValue]
+
+  Utility.analytics('Webhook', `${webhookCategory} Webhook Page`, webhookCategory, true)
 
   const [tempFilters, setTempFilters] = useState(poracleFilters[webhookCategory])
   const [send, setSend] = useState(false)

@@ -3,7 +3,7 @@ import { Snackbar } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 import { useTranslation, Trans } from 'react-i18next'
 
-import SlideTransition from './SlideTransition'
+import SlideTransition from '@assets/mui/SlideTransition'
 
 export default function Notification({ severity, i18nKey, messages }) {
   const { t } = useTranslation()
