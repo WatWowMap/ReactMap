@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { TileLayer, useMap, ZoomControl } from 'react-leaflet'
 import L from 'leaflet'
 
@@ -17,6 +17,15 @@ const userSettingsCategory = category => {
     case 'submissionCells':
     case 'portals': return 'wayfarer'
   }
+}
+
+const getTileServer = (tileServers, settings, isNight) => {
+  if (tileServers[settings.tileServers].name === 'auto') {
+    return isNight
+      ? Object.values(tileServers).find(server => server.style === 'dark')
+      : Object.values(tileServers).find(server => server.style === 'light')
+  }
+  return tileServers[settings.tileServers]
 }
 
 export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons, webhooks }, params }) {
@@ -61,6 +70,8 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
     setIsNight(Utility.nightCheck(newCenter.lat, newCenter.lng))
   }, [map])
 
+  const tileServer = useMemo(() => getTileServer(tileServers, settings, isNight), [settings.tileServers])
+
   useEffect(() => {
     if (settings.navigationControls === 'leaflet') {
       lc.addTo(map)
@@ -72,9 +83,9 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   return (
     <>
       <TileLayer
-        key={tileServers[settings.tileServers].name}
-        attribution={tileServers[settings.tileServers].attribution}
-        url={tileServers[settings.tileServers].url}
+        key={tileServer.name}
+        attribution={tileServer.attribution}
+        url={tileServer.url}
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
       />
