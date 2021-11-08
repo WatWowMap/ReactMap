@@ -357,3 +357,7 @@ img {
 .perm-wrapper img {
   width: 100%;
 }
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(100%);
+}

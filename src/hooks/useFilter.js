@@ -125,7 +125,7 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                 addItem(id, item)
               } break
             case 'available':
-              if ((available?.[category].includes(id) || id.startsWith('t'))) {
+              if ((available?.[category]?.includes(id) || id.startsWith('t'))) {
                 if (filteringPokemon.includes(subCategory)) {
                   if ((tempAdvFilter.generations || generations[item.genId])
                     && (tempAdvFilter.types || typeResolver(item.formTypes))

@@ -1,4 +1,5 @@
 import { makeStyles } from '@material-ui/styles'
+import { purple } from '@material-ui/core/colors'
 
 export default makeStyles(theme => ({
   gridItem: {
@@ -20,8 +21,9 @@ export default makeStyles(theme => ({
     backgroundColor: theme.palette.secondary.main,
   },
   filterFooter: {
-    backgroundColor: theme.palette.grey.dark,
+    backgroundColor: '#424242',
     textAlign: 'center',
+    height: 50,
   },
   successButton: {
     color: theme.palette.success.main,
@@ -64,7 +66,7 @@ export default makeStyles(theme => ({
     padding: '2px 4px',
     display: 'flex',
     alignItems: 'center',
-    height: 50,
+    margin: 3,
   },
   input: {
     marginLeft: theme.spacing(1),
@@ -89,6 +91,16 @@ export default makeStyles(theme => ({
     backgroundColor: `${theme.palette.secondary.main} !important`,
     color: 'white !important',
   },
+  quickAddCheckbox: {
+    fontSize: '12px !important',
+  },
+  modifyWebhook: {
+    color: theme.palette.getContrastText(purple[500]),
+    backgroundColor: `${purple[500]} !important`,
+    '&:hover': {
+      backgroundColor: `${purple[700]} !important`,
+    },
+  },
   '@global': {
     '*::-webkit-scrollbar': {
       width: '5px',
@@ -102,6 +114,14 @@ export default makeStyles(theme => ({
     },
     '*::-webkit-scrollbar-thumb:hover': {
       backgroundColor: theme.palette.action.selected,
+    },
+  },
+  areaChips: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: theme.spacing(1),
     },
   },
 }))

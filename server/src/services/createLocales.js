@@ -2,7 +2,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const fetchJson = require('./functions/fetchJson')
+const fetchJson = require('./api/fetchJson')
 
 const appLocalesFolder = path.resolve(__dirname, '../../../public/base-locales')
 const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales')
@@ -40,8 +40,8 @@ module.exports.locales = async function locales() {
 
     const finalTranslations = {
       ...JSON.parse(englishRef),
-      ...JSON.parse(reactMapTranslations),
       ...trimmedRemoteFiles,
+      ...JSON.parse(reactMapTranslations),
     }
     fs.writeFile(
       path.resolve(finalLocalesFolder, baseName, 'translation.json'),

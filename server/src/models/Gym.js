@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const fetchRaids = require('../services/functions/fetchRaids')
+const fetchRaids = require('../services/api/fetchRaids')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
@@ -179,7 +179,7 @@ class Gym extends Model {
           filteredResults.push(gym)
         } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`] || args.filters[`r${gym.raid_level}`]) {
           filteredResults.push(gym)
-        } else if (gymPerms && (onlyAllGyms || onlyArEligible || onlyExEligible)) {
+        } else if (gymPerms && (onlyAllGyms || onlyArEligible || onlyExEligible || onlyInBattle)) {
           if (args.filters[`t${gym.team_id}-0`]) {
             gym.raid_end_timestamp = null
             gym.raid_battle_timestamp = null

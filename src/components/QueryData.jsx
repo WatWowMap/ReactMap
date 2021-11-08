@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/client'
 
-import Utility from '@services/Utility'
 import Query from '@services/Query'
 import RobustTimeout from '@classes/RobustTimeout'
 
 import Clustering from './Clustering'
+import ScanArea from './tiles/ScanArea'
 import Notification from './layout/general/Notification'
 
 const withAvailableList = ['pokestops', 'gyms', 'nests']
@@ -30,7 +30,6 @@ export default function QueryData({
   category, available, filters, staticFilters, staticUserSettings,
   userSettings, perms, Icons, userIcons, setParams,
 }) {
-  Utility.analytics('Data', `${category} being fetched`, category, true)
   const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
 
   const trimFilters = useCallback(requestedFilters => {
@@ -83,7 +82,7 @@ export default function QueryData({
         minLon: mapBounds._southWest.lng,
         maxLon: mapBounds._northEast.lng,
         filters: trimFilters(filters),
-        zoom: map.getZoom(),
+        zoom: Math.floor(map.getZoom()),
       })
     }
   }
@@ -112,38 +111,43 @@ export default function QueryData({
   timeout.setupTimeout(refetch)
 
   const renderedData = data || previousData
-  return error && process.env.NODE_ENV === 'development' ? (
-    <Notification
-      severity="error"
-      i18nKey="server_dev_error_0"
-      messages={[
-        {
-          key: 'error',
-          variables: [error],
-        },
-      ]}
-    />
-  ) : (
-    <>
-      {Boolean(renderedData) && (
-        <Clustering
-          renderedData={renderedData[category]}
-          clusterZoomLvl={clusterZoomLvl}
-          map={map}
-          config={config}
-          filters={filters}
-          Icons={Icons}
-          userIcons={userIcons}
-          tileStyle={tileStyle}
-          perms={perms}
-          category={category}
-          userSettings={userSettings}
-          staticUserSettings={staticUserSettings}
-          params={params}
-          setParams={setParams}
-          error={error}
-        />
-      )}
-    </>
-  )
+  if (error && process.env.NODE_ENV === 'development') {
+    return (
+      <Notification
+        severity="error"
+        i18nKey="server_dev_error_0"
+        messages={[
+          {
+            key: 'error',
+            variables: [error],
+          },
+        ]}
+      />
+    )
+  }
+  if (renderedData) {
+    return category === 'scanAreas' ? (
+      <ScanArea
+        item={renderedData[category]}
+      />
+    ) : (
+      <Clustering
+        renderedData={renderedData[category]}
+        clusterZoomLvl={clusterZoomLvl}
+        map={map}
+        config={config}
+        filters={filters}
+        Icons={Icons}
+        userIcons={userIcons}
+        tileStyle={tileStyle}
+        perms={perms}
+        category={category}
+        userSettings={userSettings}
+        staticUserSettings={staticUserSettings}
+        params={params}
+        setParams={setParams}
+      />
+    )
+  }
+  return null
 }

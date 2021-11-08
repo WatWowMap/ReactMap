@@ -63,6 +63,14 @@ export default function setTheme(theme) {
           },
         },
       },
+      MuiSelect: {
+        icon: {
+          color: 'white',
+        },
+        iconOpen: {
+          color: 'white',
+        },
+      },
     },
   }))
 }

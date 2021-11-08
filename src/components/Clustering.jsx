@@ -10,7 +10,6 @@ const getId = (component, item) => {
     case 'devices': return item.uuid
     case 'submissionCells': return component
     case 'nests': return item.nest_id
-    case 'scanAreas': return item.properties.name
   }
 }
 const ignoredClustering = ['devices', 'submissionCells', 's2cells', 'weather']
