@@ -195,7 +195,7 @@ const NestType = new GraphQLObjectType({
     distance: { type: GraphQLInt },
     min_spawn_avg: { type: GraphQLInt },
     pokemon_id: { type: GraphQLInt },
-    description: { type: GraphQLString },
+    form: { type: GraphQLInt },
   }),
 })
 

@@ -31,16 +31,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
     setEditDialog(open)
     if (id && newFilters && !Object.keys(newFilters).every(key => newFilters[key] === item[key])) {
       // eslint-disable-next-line camelcase
-      const [pokemon_id, form] = id.split('-')
-      syncWebhook({
-        variables: {
-          category: 'pokemon',
-          data: { uid: item.uid },
-          name: selectedWebhook,
-          status: 'POST',
-        },
-      })
-      setTempFilters({ [id]: { ...newFilters, pokemon_id, form, enabled: true } })
+      setTempFilters({ [id]: { ...newFilters, enabled: true } })
       setSend(true)
     }
   }

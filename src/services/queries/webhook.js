@@ -111,10 +111,10 @@ const Nest = gql`
       min_spawn_avg
       ping
       pokemon_id
+      form
       profile_no
       template
       uid
-      description
     }
   }
 `
