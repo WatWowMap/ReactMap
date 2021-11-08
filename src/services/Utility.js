@@ -1,4 +1,5 @@
 import ReactGA from 'react-ga'
+import SunCalc from 'suncalc'
 
 import formatInterval from './functions/formatInterval'
 import getProperName from './functions/getProperName'
@@ -34,6 +35,12 @@ export default class Utility {
 
   static formatter(addressFormat, data) {
     return formatter(addressFormat, data)
+  }
+
+  static nightCheck(lat, lon) {
+    const date = new Date()
+    const times = SunCalc.getTimes(date, lat, lon)
+    return date <= times.sunrise || date >= times.sunset
   }
 
   static analytics(category, action = false, label = false, nonInteraction = false) {

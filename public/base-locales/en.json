@@ -442,5 +442,6 @@
     "Please try again later."
   ],
   "profile_error": "Must be unique and valid",
-  "team_0": "Harmony"
+  "team_0": "Harmony",
+  "auto": "Auto"
 }

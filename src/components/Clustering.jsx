@@ -16,7 +16,7 @@ const ignoredClustering = ['devices', 'submissionCells', 's2cells', 'weather']
 
 export default function Clustering({
   category, renderedData, userSettings, clusterZoomLvl, staticUserSettings, params,
-  filters, map, Icons, perms, tileStyle, config, userIcons, setParams,
+  filters, map, Icons, perms, tileStyle, config, userIcons, setParams, isNight,
 }) {
   const Component = index[category]
   const hideList = useStatic(state => state.hideList)
@@ -51,6 +51,7 @@ export default function Clustering({
           params={params}
           setParams={setParams}
           showCircles={showCircles}
+          isNight={isNight}
         />
       )
     }

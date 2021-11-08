@@ -53,6 +53,7 @@ export default function ConfigSettings({
   const setStaticFilters = useStatic(state => state.setFilters)
   const setWebhookData = useStatic(state => state.setWebhookData)
   const setMenuFilters = useStatic(state => state.setMenuFilters)
+  const setIsNight = useStatic(state => state.setIsNight)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
 
@@ -115,6 +116,7 @@ export default function ConfigSettings({
   }
 
   setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
+
   const getStartLocation = () => {
     if (paramLocation && paramLocation[0] !== null) {
       return paramLocation
@@ -135,6 +137,8 @@ export default function ConfigSettings({
     }
     return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
   }
+
+  setIsNight(Utility.nightCheck(...getStartLocation()))
 
   return (
     <ThemeProvider theme={theme}>

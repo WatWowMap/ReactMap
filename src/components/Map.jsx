@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { TileLayer, useMap, ZoomControl } from 'react-leaflet'
 import L from 'leaflet'
 
@@ -19,6 +19,15 @@ const userSettingsCategory = category => {
   }
 }
 
+const getTileServer = (tileServers, settings, isNight) => {
+  if (tileServers[settings.tileServers].name === 'auto') {
+    return isNight
+      ? Object.values(tileServers).find(server => server.style === 'dark')
+      : Object.values(tileServers).find(server => server.style === 'light')
+  }
+  return tileServers[settings.tileServers]
+}
+
 export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons, webhooks }, params }) {
   Utility.analytics(window.location.pathname)
 
@@ -33,6 +42,8 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const settings = useStore(state => state.settings)
   const icons = useStore(state => state.icons)
   const setLocation = useStore(s => s.setLocation)
+  const isNight = useStatic(state => state.isNight)
+  const setIsNight = useStatic(state => state.setIsNight)
   const setZoom = useStore(state => state.setZoom)
   const userSettings = useStore(state => state.userSettings)
 
@@ -56,7 +67,10 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
     const newCenter = latLon || map.getCenter()
     setLocation([newCenter.lat, newCenter.lng])
     setZoom(Math.floor(map.getZoom()))
+    setIsNight(Utility.nightCheck(newCenter.lat, newCenter.lng))
   }, [map])
+
+  const tileServer = useMemo(() => getTileServer(tileServers, settings, isNight), [settings.tileServers])
 
   useEffect(() => {
     if (settings.navigationControls === 'leaflet') {
@@ -69,9 +83,9 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   return (
     <>
       <TileLayer
-        key={tileServers[settings.tileServers].name}
-        attribution={tileServers[settings.tileServers].attribution}
-        url={tileServers[settings.tileServers].url}
+        key={tileServer.name}
+        attribution={tileServer.attribution}
+        url={tileServer.url}
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
       />
@@ -148,6 +162,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
                   staticUserSettings={staticUserSettings[category]}
                   params={manualParams}
                   setParams={setManualParams}
+                  isNight={isNight}
                 />
               )
             }

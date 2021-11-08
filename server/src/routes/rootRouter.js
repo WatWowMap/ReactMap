@@ -104,7 +104,7 @@ rootRouter.get('/settings', async (req, res) => {
           ...config.multiDomains[req.headers.host],
           excludeList: config.excludeFromTutorial,
         },
-        tileServers: config.tileServers,
+        tileServers: { auto: {}, ...config.tileServers },
         navigation: config.navigation,
         drawer: {
           temporary: {},
