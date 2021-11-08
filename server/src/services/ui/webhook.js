@@ -164,18 +164,20 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             template: hookConfig.defaultTemplateName.toString(),
             team: 4,
             slot_changes: false,
+            battle_changes: false,
             gym_id: null,
             byDistance: false,
           },
           ui: {
             general: {
               selects: [
-                { name: 'profile_no', options: [], xs: 6, sm: 3 },
-                { name: 'template', options: [], xs: 6, sm: 3 },
+                { name: 'profile_no', options: [], xs: 4, sm: 6 },
+                { name: 'template', options: [], xs: 4, sm: 6 },
               ],
               booleans: [
-                { name: 'clean', xs: 6, sm: 3 },
-                { name: 'slot_changes', xs: 6, sm: 3 },
+                { name: 'clean', xs: 4, sm: 4 },
+                { name: 'battle_changes', xs: 6, sm: 4 },
+                { name: 'slot_changes', xs: 6, sm: 4 },
               ],
               autoComplete: [{ name: 'gymName', label: 'gym', searchCategory: 'gyms', xs: 12, sm: 12 }],
               distanceOrArea: {

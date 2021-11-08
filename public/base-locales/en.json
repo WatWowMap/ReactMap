@@ -442,5 +442,7 @@
     "Please try again later."
   ],
   "profile_error": "Must be unique and valid",
-  "team_0": "Harmony"
+  "team_0": "Harmony",
+  "battle_changes": "In Battle",
+  "battle_changes_poracle": "battle_changes"
 }
