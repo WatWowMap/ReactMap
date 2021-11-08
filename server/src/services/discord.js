@@ -136,8 +136,11 @@ class DiscordClient {
         }
       }
     }
-    if (perms.areaRestrictions.length > 0) {
+    if (perms.areaRestrictions.length) {
       perms.areaRestrictions = [...new Set(perms.areaRestrictions)]
+    }
+    if (perms.webhooks.length) {
+      perms.webhooks = [...new Set(perms.webhooks)]
     }
     return perms
   }
