@@ -1,22 +1,18 @@
 import React, { useState } from 'react'
 import {
-  Grid, DialogTitle, DialogContent, DialogActions, IconButton, Button, Typography, useMediaQuery,
+  Grid, DialogContent, IconButton,
 } from '@material-ui/core'
 import {
-  Clear, Replay, Save, Check,
+  Clear, Check,
 } from '@material-ui/icons'
-import { useTranslation } from 'react-i18next'
-import { useTheme } from '@material-ui/styles'
 
 import { useStatic } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
+
+import Header from '@components/layout/general/Header'
+import Footer from '@components/layout/general/Footer'
 import Size from './Size'
 
-export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) {
-  const theme = useTheme()
-  const classes = useStyles()
-  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
-  const { t } = useTranslation()
+export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters, isMobile }) {
   const Icons = useStatic(state => state.Icons)
   const [filterValues, setFilterValues] = useState(tempFilters)
   const [team] = useState(`t${teamId}-0`)
@@ -36,52 +32,9 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
     setFilterValues({ ...slotsObj })
   }
 
-  const reset = {
-    key: 'reset',
-    icon: (
-      <IconButton
-        onClick={() => handleSizeChange('default')}
-      >
-        <Replay color="primary" />
-      </IconButton>
-    ),
-    text: (
-      <Button onClick={() => handleSizeChange('default')}>
-        <Typography variant="caption" color="primary">
-          {t('reset')}
-        </Typography>
-      </Button>
-    ),
-  }
-  const save = {
-    key: 'save',
-    icon: (
-      <IconButton
-        onClick={toggleSlotsMenu(false, teamId, filterValues)}
-      >
-        <Save color="secondary" />
-      </IconButton>
-    ),
-    text: (
-      <Button onClick={toggleSlotsMenu(false, teamId, filterValues)}>
-        <Typography color="secondary" variant="caption">
-          {t('save')}
-        </Typography>
-      </Button>
-    ),
-  }
-
   return (
     <>
-      <DialogTitle className={classes.filterHeader}>
-        {t(`team_${teamId}`)} {t('slotSelection')}
-        <IconButton
-          onClick={toggleSlotsMenu(false)}
-          style={{ position: 'absolute', right: 5, top: 5 }}
-        >
-          <Clear style={{ color: 'white' }} />
-        </IconButton>
-      </DialogTitle>
+      <Header titles={[`team_${teamId}`, 'slotSelection']} action={toggleSlotsMenu(false)} />
       <DialogContent style={{ color: 'white' }}>
         <Grid
           container
@@ -138,26 +91,20 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters }) 
           ))}
         </Grid>
       </DialogContent>
-      <DialogActions>
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Grid item xs={8}>
-            <Size
-              filterValues={filterValues[team]}
-              handleChange={handleSizeChange}
-              btnSize="medium"
-            />
-          </Grid>
-          {[reset, save].map(button => (
-            <Grid item xs={2} key={button.key}>
-              {isMobile ? button.icon : button.text}
-            </Grid>
-          ))}
-        </Grid>
-      </DialogActions>
+      <Footer options={[
+        {
+          key: 'size',
+          component: <Size
+            filterValues={filterValues[team]}
+            handleChange={handleSizeChange}
+            btnSize="medium"
+          />,
+          size: isMobile ? 8 : 7,
+        },
+        { name: 'reset', action: () => handleSizeChange('default'), color: 'primary', icon: 'Replay', size: 2 },
+        { name: 'save', action: toggleSlotsMenu(false, teamId, filterValues), color: 'secondary', icon: 'Save', size: isMobile ? 2 : 3 },
+      ]}
+      />
     </>
   )
 }

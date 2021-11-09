@@ -133,13 +133,13 @@ export default function Nav({
         />
       </Dialog>
       <Dialog
-        fullScreen={isMobile}
         maxWidth="sm"
         open={dialog.open && dialog.type === 'options'}
       >
         <UserOptions
           toggleDialog={toggleDialog}
           category={dialog.category}
+          isMobile={isMobile}
         />
       </Dialog>
       <Dialog

@@ -2,10 +2,7 @@ import React from 'react'
 import {
   Grid,
   Typography,
-  DialogTitle,
   DialogContent,
-  DialogActions,
-  Button,
   List,
   ListItem,
 } from '@material-ui/core'
@@ -14,22 +11,20 @@ import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
 import { useTranslation } from 'react-i18next'
 
-import useStyles from '@hooks/useStyles'
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
+import Header from '../general/Header'
+import Footer from '../general/Footer'
 
 export default function UserProfile({ setUserProfile }) {
   Utility.analytics('/user-profile')
-  const classes = useStyles()
   const { t } = useTranslation()
   const { perms } = useStatic(state => state.auth)
   const { map: { excludeList, rolesLinkName, rolesLink } } = useStatic(state => state.config)
 
   return (
     <>
-      <DialogTitle className={classes.filterHeader}>
-        {t('userProfile')}
-      </DialogTitle>
+      <Header titles={['userProfile']} action={() => setUserProfile(false)} />
       <DialogContent>
         <Grid
           container
@@ -46,7 +41,7 @@ export default function UserProfile({ setUserProfile }) {
               <Grid item xs={12} sm={6} key={perm}>
                 <Card className="perm-wrapper">
                   {!perms[perm] && <div className="disabled-overlay" />}
-                  {perm !== 'areaRestrictions' ? (
+                  {perm !== 'areaRestrictions' && perm !== 'webhooks' ? (
                     <CardMedia
                       style={{
                         height: 250,
@@ -87,14 +82,11 @@ export default function UserProfile({ setUserProfile }) {
           })}
         </Grid>
       </DialogContent>
-      <DialogActions>
-        <Button href={rolesLink} target="_blank" rel="noreferrer" color="primary">
-          {rolesLinkName}
-        </Button>
-        <Button onClick={() => setUserProfile(false)} color="secondary">
-          {t('close')}
-        </Button>
-      </DialogActions>
+      <Footer options={[
+        { name: rolesLinkName, link: rolesLink, color: 'primary' },
+        { name: 'close', color: 'secondary', action: () => setUserProfile(false) },
+      ]}
+      />
     </>
   )
 }

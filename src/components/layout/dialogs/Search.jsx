@@ -1,16 +1,15 @@
 /* eslint-disable camelcase */
 import React from 'react'
 import {
-  DialogTitle, IconButton, Tabs, AppBar, Tab, TextField, Typography, Grid,
+  Tabs, AppBar, Tab, TextField, Typography, Grid,
 } from '@material-ui/core'
-import { Clear } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
 
 import Utility from '@services/Utility'
 import { useStore } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
 import Query from '@services/Query'
+import Header from '../general/Header'
 
 export default function Search({
   safeSearch, toggleDialog, isMobile, Icons,
@@ -18,7 +17,6 @@ export default function Search({
   Utility.analytics('/search')
 
   const { t } = useTranslation()
-  const classes = useStyles()
   const location = useStore(state => state.location)
   const search = useStore(state => state.search)
   const setSearch = useStore(state => state.setSearch)
@@ -97,24 +95,16 @@ export default function Search({
 
   const getBackupName = () => {
     switch (safeSearch[searchTab]) {
-      default: return t('unknownGym')
       case 'quests':
       case 'pokestops': return t('unknownPokestop')
+      default: return t('unknownGym')
     }
   }
 
   const fetchedData = data || previousData
   return (
     <div style={{ width: isMobile ? 'inherit' : 500, minHeight: 190 }}>
-      <DialogTitle className={classes.filterHeader}>
-        {t('search')}
-        <IconButton
-          onClick={toggleDialog(false, '', 'search')}
-          style={{ position: 'absolute', right: 5, top: 5 }}
-        >
-          <Clear style={{ color: 'white' }} />
-        </IconButton>
-      </DialogTitle>
+      <Header titles={['search']} action={toggleDialog(false, '', 'search')} />
       <AppBar position="static">
         <Tabs
           value={searchTab}
