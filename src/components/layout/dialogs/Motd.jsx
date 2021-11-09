@@ -1,17 +1,14 @@
 import React from 'react'
 import {
-  DialogTitle, DialogContent, DialogActions, Button, Typography,
+  DialogContent, Typography,
 } from '@material-ui/core'
-import { useTranslation } from 'react-i18next'
-
-import useStyles from '@hooks/useStyles'
+import Header from '../general/Header'
+import Footer from '../general/Footer'
 
 export default function Motd({ messages, newMotdIndex, setMotdIndex }) {
-  const { t } = useTranslation()
-  const classes = useStyles()
   return (
     <>
-      <DialogTitle className={classes.filterHeader}>{t('messageOfTheDay')}</DialogTitle>
+      <Header titles={['messageOfTheDay']} />
       <DialogContent>
         {messages.map(message => (
           typeof message === 'string' ? (
@@ -39,11 +36,7 @@ export default function Motd({ messages, newMotdIndex, setMotdIndex }) {
           )
         ))}
       </DialogContent>
-      <DialogActions className={classes.filterFooter}>
-        <Button onClick={() => setMotdIndex(newMotdIndex)} color="primary" autoFocus>
-          {t('close')}
-        </Button>
-      </DialogActions>
+      <Footer options={[{ name: 'close', action: () => setMotdIndex(newMotdIndex), color: 'primary' }]} />
     </>
   )
 }

@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import {
-  DialogTitle, DialogActions, Button, MobileStepper, useMediaQuery,
+  DialogActions, Button, MobileStepper, useMediaQuery,
 } from '@material-ui/core'
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons'
 import { useTheme } from '@material-ui/core/styles'
 import { useTranslation } from 'react-i18next'
 
-import useStyles from '@hooks/useStyles'
+import Header from '@components/layout/general/Header'
 import Welcome from './Welcome'
 import Advanced from './Advanced'
 import Closing from './Closing'
@@ -19,7 +19,6 @@ const steps = ['intro', 'sidebar', 'sliders', 'advanced', 'popups', 'closing']
 export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) {
   const theme = useTheme()
   const { t } = useTranslation()
-  const classes = useStyles()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const [activeStep, setActiveStep] = useState(0)
 
@@ -48,9 +47,7 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
 
   return (
     <>
-      <DialogTitle className={classes.filterHeader}>
-        {t('tutorial')} ({t(steps[activeStep] || t('closing'))})
-      </DialogTitle>
+      <Header titles={['tutorial', steps[activeStep] || 'closing']} />
       {getStepContent(activeStep)}
       <DialogActions>
         <MobileStepper

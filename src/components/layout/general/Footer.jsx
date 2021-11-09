@@ -15,7 +15,6 @@ export default function Footer({ options, role }) {
   const classes = useStyles()
 
   const capitalizeFirstChar = str => `${str.charAt(0).toUpperCase()}${str.substring(1)}`
-  const gridNum = Math.floor(12 / options.length)
 
   return (
     <Grid
@@ -23,17 +22,39 @@ export default function Footer({ options, role }) {
       container
       justifyContent="flex-end"
       alignItems="center"
+      style={{ minHeight: 50 }}
     >
       {options.map(button => {
+        const key = button.key || button.name
+        const actualSize = button.size || Math.floor(12 / options.length)
+        if (button.component) {
+          return (
+            <Grid
+              item
+              key={button.key}
+              xs={actualSize}
+              style={{ textAlign: button.align || 'center' }}
+            >
+              {button.component}
+            </Grid>
+          )
+        }
         const MuiIcon = button.icon ? MuiIcons[button.icon] : null
         const color = button.disabled ? 'default' : button.color || 'white'
         const muiColor = color === 'primary' || color === 'secondary'
-        const key = button.key || button.name
         return (
-          <Grid item xs={isMobile ? gridNum : t(`${role}${capitalizeFirstChar(key)}Width`, gridNum)} key={key} style={{ textAlign: button.align || 'center' }}>
+          <Grid
+            item
+            xs={isMobile ? actualSize : +t(`${role}${capitalizeFirstChar(key)}Width`) || actualSize}
+            key={key}
+            style={{ textAlign: button.align || 'center' }}
+          >
             {isMobile && MuiIcon ? (
               <IconButton
-                onClick={button.action}
+                href={button.link || undefined}
+                rel={button.link ? 'noreferrer' : undefined}
+                target={button.link ? '_blank' : undefined}
+                onClick={button.action || undefined}
                 disabled={button.disabled}
               >
                 <MuiIcon
@@ -43,6 +64,9 @@ export default function Footer({ options, role }) {
               </IconButton>
             ) : (
               <Button
+                href={button.link}
+                rel={button.link ? 'noreferrer' : undefined}
+                target={button.link ? '_blank' : undefined}
                 onClick={button.action}
                 color={muiColor ? color : 'inherit'}
                 style={{ color: muiColor ? null : color }}
