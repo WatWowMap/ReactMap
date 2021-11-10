@@ -45,7 +45,10 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
     item.allForms = !item.form
   }
   if (category === 'invasion') {
-    item.grunt_id = Object.keys(invasions).find(key => invasions[key]?.type?.toLowerCase() === item.grunt_type)
+    item.grunt_id = Object.keys(invasions).find(
+      key => invasions[key]?.type?.toLowerCase() === item.grunt_type
+        && invasions[key].gender === item.gender,
+    )
   }
   if (category === 'pokemon') {
     item.pvpEntry = Boolean(item.pvp_ranking_league)

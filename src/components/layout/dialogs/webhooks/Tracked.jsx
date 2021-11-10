@@ -39,7 +39,7 @@ const Tracked = ({
       setSend(false)
       setTempFilters(
         Object.fromEntries(
-          Object.entries(tempFilters).map(([key, value]) => [key, { ...value, enabled: false }]),
+          Object.entries(tempFilters || {}).map(([key, value]) => [key, { ...value, enabled: false }]),
         ),
       )
       syncWebhook({

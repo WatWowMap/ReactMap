@@ -53,7 +53,9 @@ export default function Menu({
     id: '',
   })
 
-  const { filteredObj, filteredArr, count } = useFilter(tempFilters, menus, search, category, categories)
+  const { filteredObj, filteredArr, count } = useFilter(
+    tempFilters, menus, search, category, Boolean(webhookCategory), categories,
+  )
 
   const generateSlots = (teamId, show) => {
     for (let i = 1; i <= 6; i += 1) {
@@ -115,9 +117,26 @@ export default function Menu({
       return
     }
     if (id === 'global' && !open && newFilters) {
-      Object.keys(filteredObj).forEach(item => {
-        filteredObj[item] = { ...tempFilters[item], ...newFilters, enabled: true }
-      })
+      const wildCards = (() => {
+        switch (webhookCategory) {
+          case 'raid': return ['r90', '0-0']
+          case 'egg': return ['e90']
+          case 'gym': return ['t4']
+          case 'invasion': return ['i0']
+          default: return ['0-0']
+        }
+      })()
+      if (newFilters.everything_individually !== false) {
+        Object.keys(filteredObj).forEach(item => {
+          if (!wildCards.includes(item)) {
+            filteredObj[item] = { ...tempFilters[item], ...newFilters, enabled: true }
+          }
+        })
+      } else {
+        wildCards.forEach(item => {
+          filteredObj[item] = { ...tempFilters[item], ...newFilters, enabled: true }
+        })
+      }
       setTempFilters({ ...tempFilters, ...filteredObj, [id]: newFilters })
     } else if (id && newFilters && !open) {
       setTempFilters({ ...tempFilters, [id]: { ...tempFilters[id], ...newFilters, enabled: true } })

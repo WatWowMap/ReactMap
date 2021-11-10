@@ -98,7 +98,7 @@ export default function OptionsContainer({
   )
   if (isMobile) {
     allFilterMenus.unshift(
-      <Grid container key="resetShowing" justifyContent="center" alignItems="center">
+      <Grid container key="close" justifyContent="center" alignItems="center">
         <Grid item xs={12} style={{ textAlign: 'right' }}>
           <IconButton onClick={toggleDrawer(false)}>
             <Clear style={{ color: 'white' }} />

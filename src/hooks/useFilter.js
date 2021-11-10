@@ -5,7 +5,7 @@ import { useStatic } from '@hooks/useStore'
 
 const filteringPokemon = ['pokemon', 'quest_reward_4', 'quest_reward_9', 'quest_reward_12']
 
-export default function useFilter(tempFilters, menus, search, category, reqCategories) {
+export default function useFilter(tempFilters, menus, search, category, webhookMode, reqCategories) {
   const { t } = useTranslation()
   const available = useStatic(useCallback(s => s.available, []))
   const Icons = useStatic(useCallback(s => s.Icons, []))
@@ -100,7 +100,7 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
 
   reqCategories.forEach(subCategory => {
     Object.entries(menuFilters[subCategory] || {}).forEach(([id, item]) => {
-      if (item.perms.some(perm => perms[perm])) {
+      if (item.perms.some(perm => perms[perm]) && (item.webhookOnly ? webhookMode : true)) {
         if (!item.name.endsWith('*') || (item.name.endsWith('*') && category === item.category)) {
           count.total += 1
           item.id = id
@@ -109,8 +109,8 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
             case 'selected': if (tempFilters[id].enabled) addItem(id, item); break
             case 'unselected': if (!tempFilters[id].enabled) addItem(id, item); break
             case 'reverse':
-              if (filteringPokemon.includes(subCategory)) {
-                if ((tempAdvFilter.generations || generations[item.genId])
+              if (filteringPokemon.includes(subCategory) || item.webhookOnly) {
+                if (((tempAdvFilter.generations || generations[item.genId])
                   && (tempAdvFilter.types || typeResolver(item.formTypes))
                   && (tempAdvFilter.rarity || rarity[item.rarity])
                   && (tempAdvFilter.categories || categories[subCategory])
@@ -118,16 +118,16 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                     || forms[item.formName]
                     || (forms.altForms && item.formId != item.defaultFormId)
                     || (forms.normalForms && item.formId === item.defaultFormId)
-                  )) {
+                  )) || item.webhookOnly) {
                   addItem(id, item)
                 }
-              } else if ((tempAdvFilter.categories || categories[subCategory])) {
+              } else if ((tempAdvFilter.categories || categories[subCategory]) || item.webhookOnly) {
                 addItem(id, item)
               } break
             case 'available':
-              if ((available?.[category]?.includes(id) || id.startsWith('t'))) {
+              if ((available?.[category]?.includes(id) || id.startsWith('t')) || item.webhookOnly) {
                 if (filteringPokemon.includes(subCategory)) {
-                  if ((tempAdvFilter.generations || generations[item.genId])
+                  if (((tempAdvFilter.generations || generations[item.genId])
                     && (tempAdvFilter.types || typeResolver(item.formTypes))
                     && (tempAdvFilter.rarity || rarity[item.rarity])
                     && (tempAdvFilter.categories || categories[subCategory])
@@ -135,10 +135,10 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                       || forms[item.formName]
                       || (forms.altForms && item.formId != item.defaultFormId)
                       || (forms.normalForms && item.formId === item.defaultFormId)
-                    )) {
+                    )) || item.webhookOnly) {
                     addItem(id, item)
                   }
-                } else if (tempAdvFilter.categories || categories[subCategory]) {
+                } else if (tempAdvFilter.categories || categories[subCategory] || item.webhookOnly) {
                   addItem(id, item)
                 }
               } break
@@ -165,10 +165,11 @@ export default function useFilter(tempFilters, menus, search, category, reqCateg
                   || (forms[item.name]
                     || (forms.altForms && item.formId != item.defaultFormId)
                     || (forms.normalForms && item.formId === item.defaultFormId))
-                  || categories[subCategory]) {
+                  || categories[subCategory]
+                  || item.webhookOnly) {
                   addItem(id, item)
                 }
-              } else if (categories[subCategory]) {
+              } else if (categories[subCategory] || item.webhookOnly) {
                 addItem(id, item)
               } break
           }

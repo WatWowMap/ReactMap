@@ -33,7 +33,7 @@ const useStore = create(persist(set => ({
   setSearchTab: (searchTab) => set({ searchTab }),
   selectedWebhook: undefined,
   setSelectedWebhook: (selectedWebhook) => set({ selectedWebhook }),
-  webhookAdv: { primary: true, advanced: false, pvp: false, distance: true },
+  webhookAdv: { primary: true, advanced: false, pvp: false, distance: true, global: true },
   setWebhookAdv: (webhookAdv) => set({ webhookAdv }),
   popups: {
     invasions: false,
