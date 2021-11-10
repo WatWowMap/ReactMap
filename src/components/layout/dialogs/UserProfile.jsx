@@ -2,9 +2,7 @@ import React, { useState } from 'react'
 import {
   Grid,
   Typography,
-  DialogTitle,
-  DialogActions,
-  Button,
+  DialogContent,
   List,
   ListItem,
   AppBar,
@@ -16,15 +14,15 @@ import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
 import { useTranslation } from 'react-i18next'
 
-import useStyles from '@hooks/useStyles'
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
+import Header from '../general/Header'
+import Footer from '../general/Footer'
 
 import TabPanel from '../general/TabPanel'
 
 export default function UserProfile({ setUserProfile }) {
   Utility.analytics('/user-profile')
-  const classes = useStyles()
   const { t } = useTranslation()
   const { perms, methods } = useStatic(state => state.auth)
   const { map: { excludeList, rolesLinkName, rolesLink } } = useStatic(state => state.config)
@@ -36,9 +34,10 @@ export default function UserProfile({ setUserProfile }) {
 
   return (
     <>
-      <DialogTitle className={classes.filterHeader}>
+      {/* <DialogTitle className={classes.filterHeader}>
         {t('userProfile')}
-      </DialogTitle>
+      </DialogTitle> */}
+      <Header titles={['userProfile']} action={() => setUserProfile(false)} />
       <AppBar position="static">
         <Tabs
           value={tab}
@@ -65,82 +64,81 @@ export default function UserProfile({ setUserProfile }) {
           spacing={2}
         >
           {methods.includes('discord') && (
-          <Grid item>
-            Link Discord
-          </Grid>
+            <Grid item>
+              Link Discord
+            </Grid>
           )}
           {methods.includes('telegram') && (
-          <Grid item>
-            Link Telegram
-          </Grid>
+            <Grid item>
+              Link Telegram
+            </Grid>
           )}
         </Grid>
       </TabPanel>
       <TabPanel value={tab} index={1}>
-        <Grid
-          container
-          direction="row"
-          alignItems="center"
-          justifyContent="center"
-          spacing={2}
-        >
-          {Object.keys(perms).map(perm => {
-            if (excludeList.includes(perm)) {
-              return null
-            }
-            return (
-              <Grid item xs={12} sm={6} key={perm}>
-                <Card className="perm-wrapper">
-                  {!perms[perm] && <div className="disabled-overlay" />}
-                  {perm !== 'areaRestrictions' ? (
-                    <CardMedia
-                      style={{
-                        height: 250,
-                        border: 'black 4px solid',
-                        borderRadius: 4,
-                      }}
-                      image={`/images/perms/${perm}.png`}
-                      title={perm}
-                    />
-                  ) : (
-                    <List
-                      style={{
-                        height: 235,
-                        border: 'black 4px solid',
-                        borderRadius: 4,
-                      }}
-                    >
-                      {perms[perm].map(area => (
-                        <ListItem key={area}>
-                          <Typography>
-                            {Utility.getProperName(area)}
-                          </Typography>
-                        </ListItem>
-                      ))}
-                    </List>
-                  )}
-                  <CardContent style={{ height: 100 }}>
-                    <Typography gutterBottom variant="h6" noWrap>
-                      {t(perm)}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                      {t(`${perm}Subtitle`)}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            )
-          })}
-        </Grid>
+        <DialogContent>
+          <Grid
+            container
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            spacing={2}
+          >
+            {Object.keys(perms).map(perm => {
+              if (excludeList.includes(perm)) {
+                return null
+              }
+              return (
+                <Grid item xs={12} sm={6} key={perm}>
+                  <Card className="perm-wrapper">
+                    {!perms[perm] && <div className="disabled-overlay" />}
+                    {perm !== 'areaRestrictions' && perm !== 'webhooks' ? (
+                      <CardMedia
+                        style={{
+                          height: 250,
+                          border: 'black 4px solid',
+                          borderRadius: 4,
+                        }}
+                        image={`/images/perms/${perm}.png`}
+                        title={perm}
+                      />
+                    ) : (
+                      <List
+                        style={{
+                          height: 235,
+                          border: 'black 4px solid',
+                          borderRadius: 4,
+                        }}
+                      >
+                        {perms[perm].map(area => (
+                          <ListItem key={area}>
+                            <Typography>
+                              {Utility.getProperName(area)}
+                            </Typography>
+                          </ListItem>
+                        ))}
+                      </List>
+                    )}
+                    <CardContent style={{ height: 100 }}>
+                      <Typography gutterBottom variant="h6" noWrap>
+                        {t(perm)}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary" component="p">
+                        {t(`${perm}Subtitle`)}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              )
+            })}
+          </Grid>
+        </DialogContent>
       </TabPanel>
-      <DialogActions>
-        <Button href={rolesLink} target="_blank" rel="noreferrer" color="primary">
-          {rolesLinkName}
-        </Button>
-        <Button onClick={() => setUserProfile(false)} color="secondary">
-          {t('close')}
-        </Button>
-      </DialogActions>
+      <Footer options={[
+        { name: rolesLinkName, link: rolesLink, color: 'primary' },
+        { name: 'close', color: 'secondary', action: () => setUserProfile(false) },
+      ]}
+      />
     </>
   )
 }

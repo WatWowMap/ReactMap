@@ -242,7 +242,7 @@ rootRouter.get('/settings', async (req, res) => {
           }))
         } catch (e) {
           serverSettings.webhooks = null
-          console.warn(e.message, 'Unable to fetch webhook data')
+          console.warn(e.message, 'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database', serverSettings.user.id)
         }
       }
       if (config.devOptions.enabled) {

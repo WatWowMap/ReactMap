@@ -44,6 +44,11 @@ export default function setTheme(theme) {
       },
     },
     overrides: {
+      MuiDialogTitle: {
+        root: {
+          padding: '12px 24px',
+        },
+      },
       MuiAccordion: {
         root: {
           '&$expanded': {
