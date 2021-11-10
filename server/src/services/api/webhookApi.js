@@ -16,9 +16,11 @@ module.exports = async function webhookApi(category, discordId, method, webhookN
     }
     const payloadObj = {}
     switch (category) {
+      case 'start':
+      case 'stop':
       case 'switchProfile':
         Object.assign(payloadObj, {
-          url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}/${data}`,
+          url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}${data ? `/${data}` : ''}`,
           options: { method, headers },
           get: 'human',
         }); break
