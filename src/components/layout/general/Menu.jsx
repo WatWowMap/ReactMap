@@ -54,7 +54,7 @@ export default function Menu({
   })
 
   const { filteredObj, filteredArr, count } = useFilter(
-    tempFilters, menus, search, category, Boolean(webhookCategory), categories,
+    tempFilters, menus, search, category, webhookCategory, categories,
   )
 
   const generateSlots = (teamId, show) => {

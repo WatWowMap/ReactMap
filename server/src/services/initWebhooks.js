@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const fetchJson = require('./api/fetchJson')
 const webhookUi = require('./ui/webhook')
 
@@ -22,6 +23,7 @@ module.exports = async function initWebhooks(config) {
           leagues: [{ name: 'great', cp: 1500 }, { name: 'ultra', cp: 2500 }],
           valid: Boolean(hookConfig),
           pvp: 'rdm',
+          everything: hookConfig.everythingFlagPermissions === 'allow-any',
         }
         if (hookConfig?.pvpLittleLeagueAllowed) {
           baseSettings.leagues.push({ name: 'little', cp: 500 })

@@ -5,7 +5,7 @@ import { useStatic } from '@hooks/useStore'
 
 const filteringPokemon = ['pokemon', 'quest_reward_4', 'quest_reward_9', 'quest_reward_12']
 
-export default function useFilter(tempFilters, menus, search, category, webhookMode, reqCategories) {
+export default function useFilter(tempFilters, menus, search, category, webhookCategory, reqCategories) {
   const { t } = useTranslation()
   const available = useStatic(useCallback(s => s.available, []))
   const Icons = useStatic(useCallback(s => s.Icons, []))
@@ -100,7 +100,10 @@ export default function useFilter(tempFilters, menus, search, category, webhookM
 
   reqCategories.forEach(subCategory => {
     Object.entries(menuFilters[subCategory] || {}).forEach(([id, item]) => {
-      if (item.perms.some(perm => perms[perm]) && (item.webhookOnly ? webhookMode : true)) {
+      if (item.perms.some(perm => perms[perm])
+        && (item.webhookOnly
+          ? webhookCategory && tempFilters[id]
+          : true)) {
         if (!item.name.endsWith('*') || (item.name.endsWith('*') && category === item.category)) {
           count.total += 1
           item.id = id

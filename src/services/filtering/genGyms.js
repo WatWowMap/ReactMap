@@ -3,13 +3,13 @@ export default function genGyms(t, gyms, categories) {
   if (!gyms?.filter) return {}
 
   if (tempObj.eggs) {
-    tempObj.eggs.e90 = { name: t('egg_global'), perms: ['raids'], webhookOnly: true }
+    tempObj.eggs.e90 = { name: t('poke_global'), perms: ['raids'], webhookOnly: true }
   }
   if (tempObj.raids) {
-    tempObj.raids.r90 = { name: t('raid_global'), perms: ['raids'], webhookOnly: true }
+    tempObj.raids.r90 = { name: t('poke_global'), perms: ['raids'], webhookOnly: true }
   }
   if (tempObj.teams) {
-    tempObj.teams.t4 = { name: t('team_global'), perms: ['gyms'], webhookOnly: true }
+    tempObj.teams.t4 = { name: t('poke_global'), perms: ['gyms'], webhookOnly: true }
   }
 
   Object.keys(gyms.filter).forEach(id => {

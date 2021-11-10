@@ -447,8 +447,5 @@
   "webhooksSubtitle": "Manage your alerts directly from the map for these bots",
   "webhooks": "Alerts",
   "everything_individually": "Add Individual Alerts",
-  "individually": "individually",
-  "raid_global": "Everything (Raids)",
-  "egg_global": "Everything (Eggs)",
-  "team_global": "All Teams"
+  "individually": "individually"
 }

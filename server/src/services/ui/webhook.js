@@ -41,7 +41,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             byDistance: false,
             xs: false,
             xl: false,
-            everything_individually: hookConfig.everythingFlagPermissions === 'allow_and_always_individually'
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
               || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
@@ -109,7 +109,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             byDistance: false,
             allMoves: true,
             allForms: true,
-            everything_individually: hookConfig.everythingFlagPermissions === 'allow_and_always_individually'
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
               || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
@@ -147,7 +147,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             team: 4,
             gym_id: null,
             byDistance: false,
-            everything_individually: hookConfig.everythingFlagPermissions === 'allow_and_always_individually'
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
               || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
@@ -181,7 +181,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             slot_changes: false,
             gym_id: null,
             byDistance: false,
-            everything_individually: hookConfig.everythingFlagPermissions === 'allow_and_always_individually'
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
               || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
@@ -213,7 +213,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             grunt_type: null,
             gender: 0,
             byDistance: false,
-            everything_individually: hookConfig.everythingFlagPermissions === 'allow_and_always_individually'
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
               || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {

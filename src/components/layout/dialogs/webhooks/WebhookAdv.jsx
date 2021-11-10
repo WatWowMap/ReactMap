@@ -47,7 +47,8 @@ export default function WebhookAdvanced({
   const webhookAdv = useStore(s => s.webhookAdv)
   const setWebhookAdv = useStore(s => s.setWebhookAdv)
   const { [selectedWebhook]: {
-    info: { [category]: info }, profile, human, template, prefix, leagues, pvp, addressFormat, hasNominatim, locale,
+    info: { [category]: info },
+    profile, human, template, prefix, leagues, pvp, addressFormat, hasNominatim, locale, everything,
   } } = useStatic(s => s.webhookData)
   const { pokemon, moves, types } = useStatic(s => s.masterfile)
 
@@ -446,7 +447,7 @@ export default function WebhookAdvanced({
       <DialogContent style={{ color: 'white', padding: '8px 5px' }}>
         {Object.keys(info.ui).map(type => {
           if (human.blocked_alerts && JSON.parse(human.blocked_alerts).includes(type)) return null
-          if (type === 'global' && idObj.id !== 'global') return null
+          if (type === 'global' && (idObj.id !== 'global' || !everything)) return null
           const Items = (
             <Grid
               container
@@ -458,7 +459,7 @@ export default function WebhookAdvanced({
           )
           return (
             <Paper style={{ margin: 10, width: '95%' }} elevation={3} key={type}>
-              {(type === 'general' || type === 'distanceOrArea') ? Items : (
+              {(type === 'general' || type === 'distanceOrArea' || type === 'global') ? Items : (
                 <Accordion
                   expanded={webhookAdv[type]}
                   onChange={handleChange(type)}
