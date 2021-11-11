@@ -444,5 +444,6 @@
   "team_0": "Harmony",
   "auto": "Auto",
   "webhooksSubtitle": "Manage your alerts directly from the map for these bots",
-  "webhooks": "Alerts"
+  "webhooks": "Alerts",
+  "join": "Join"
 }

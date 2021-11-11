@@ -63,7 +63,7 @@ export default function App() {
 
   const getServerSettings = async () => {
     const data = await Fetch.getSettings()
-    const Icons = data.config ? new UIcons(data.config.icons, data.masterfile.questRewardTypes) : null
+    const Icons = data.masterfile ? new UIcons(data.config.icons, data.masterfile.questRewardTypes) : null
     if (Icons) {
       await Icons.fetchIcons(data.config.icons.styles)
       if (data.config.icons.defaultIcons) {

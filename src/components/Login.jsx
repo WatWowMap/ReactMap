@@ -18,20 +18,36 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
       style={{ minHeight: '95vh' }}
       spacing={4}
     >
-      {serverSettings?.authMethods?.includes('discord') && (
       <Grid item>
-        <DiscordLogin />
+        <Typography variant="h3" style={{ color: 'white' }}>
+          {t('welcome')} {serverSettings.config.map.headerTitle}
+        </Typography>
       </Grid>
+      {serverSettings?.authMethods?.includes('discord') && (
+        <Grid container item justifyContent="center" alignItems="center" spacing={2}>
+          <Grid
+            item
+            xs={serverSettings.config.map.discordInvite ? 3 : 6}
+            style={{ textAlign: serverSettings.config.map.discordInvite ? 'right' : 'center' }}
+          >
+            <DiscordLogin />
+          </Grid>
+          {serverSettings.config.map.discordInvite && (
+            <Grid item xs={3} style={{ textAlign: 'left' }}>
+              <DiscordLogin href={serverSettings.config.map.discordInvite} text="join" />
+            </Grid>
+          )}
+        </Grid>
       )}
       {serverSettings?.authMethods?.includes('telegram') && (
-      <Grid item>
-        <TelegramLoginButton
-          botName={process.env?.TELEGRAM_BOT_NAME}
-          dataAuthUrl="/auth/telegram/callback"
-          usePic={false}
-          lang={localStorage.getItem('i18nextLng')}
-        />
-      </Grid>
+        <Grid item>
+          <TelegramLoginButton
+            botName={process.env?.TELEGRAM_BOT_NAME}
+            dataAuthUrl="/auth/telegram/callback"
+            usePic={false}
+            lang={localStorage.getItem('i18nextLng')}
+          />
+        </Grid>
       )}
       {clickedTwice && (
         <Grid item style={{ whiteSpace: 'pre-line' }}>

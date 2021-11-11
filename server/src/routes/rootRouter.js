@@ -96,13 +96,9 @@ rootRouter.get('/settings', async (req, res) => {
       discord: config.discord.enabled,
       settings: {},
       authMethods: config.authMethods,
-    }
-
-    // add user options here from the config that are structured as objects
-    if (serverSettings.user?.perms) {
-      serverSettings.loggedIn = req.user
-      serverSettings.config = {
+      config: {
         map: {
+          discordInvite: config.discord.inviteLink,
           ...config.map,
           ...config.multiDomains[req.headers.host],
           excludeList: config.excludeFromTutorial,
@@ -119,7 +115,12 @@ rootRouter.get('/settings', async (req, res) => {
         },
         manualAreas: config.manualAreas || {},
         icons: config.icons,
-      }
+      },
+    }
+
+    // add user options here from the config that are structured as objects
+    if (serverSettings.user?.perms) {
+      serverSettings.loggedIn = req.user
       // add config options to this array that are structured as arrays
       const arrayUserOptions = [
         { name: 'localeSelection', values: config.localeSelection },
