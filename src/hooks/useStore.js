@@ -86,6 +86,8 @@ const useStatic = create(set => ({
   setWebhookAlert: (webhookAlert) => set({ webhookAlert }),
   webhookData: undefined,
   setWebhookData: (webhookData) => set({ webhookData }),
+  isNight: false,
+  setIsNight: (isNight) => set({ isNight }),
 }))
 
 export { useStore, useStatic }

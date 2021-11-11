@@ -17,7 +17,7 @@ import Utility from '@services/Utility'
 import GenericTimer from './common/Timer'
 
 export default function PokemonPopup({
-  pokemon, iconUrl, userSettings, isTutorial, Icons,
+  pokemon, iconUrl, userSettings, isTutorial, Icons, isNight,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
@@ -76,6 +76,7 @@ export default function PokemonPopup({
         metaData={metaData}
         perms={pokePerms}
         Icons={Icons}
+        isNight={isNight}
       />
       <Footer
         pokemon={pokemon}
@@ -283,7 +284,7 @@ const Stats = ({ pokemon, perms, t }) => {
 }
 
 const Info = ({
-  pokemon, metaData, perms, Icons,
+  pokemon, metaData, perms, Icons, isNight,
 }) => {
   const { gender, weather, form } = pokemon
   const formTypes = metaData.forms[form].types || metaData.types
@@ -304,7 +305,7 @@ const Info = ({
           style={{
             height: 24,
             width: 24,
-            backgroundImage: `url(${Icons.getWeather(weather)})`,
+            backgroundImage: `url(${Icons.getWeather(weather, isNight)})`,
           }}
         />
       )}

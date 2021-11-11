@@ -2,7 +2,7 @@ import React, {
   useState, useEffect, memo,
 } from 'react'
 import {
-  Grid, Divider, Typography, Select, MenuItem,
+  Grid, Divider, Typography, Select, MenuItem, Switch,
 } from '@material-ui/core'
 import { useMutation } from '@apollo/client'
 import { Trans } from 'react-i18next'
@@ -68,6 +68,9 @@ const Human = ({
     },
   }))
 
+  const multipleHooks = perms.webhooks.length > 1
+  const gridSize = multipleHooks ? 2 : 3
+
   return (
     <Grid
       container
@@ -83,12 +86,12 @@ const Human = ({
         alignItems="center"
         spacing={2}
       >
-        <Grid item xs={6} sm={3}>
+        <Grid item xs={6} sm={gridSize}>
           <Typography variant="h6">
             {t('selectProfile')}
           </Typography>
         </Grid>
-        <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
+        <Grid item xs={6} sm={gridSize} style={{ textAlign: 'center' }}>
           <Select
             value={webhookData[selectedWebhook].profile.length
               ? currentHuman.current_profile_no
@@ -110,14 +113,14 @@ const Human = ({
             ))}
           </Select>
         </Grid>
-        {perms.webhooks.length > 1 && (
+        {multipleHooks && (
           <>
-            <Grid item xs={6} sm={3}>
+            <Grid item xs={6} sm={gridSize}>
               <Typography variant="h6">
                 {t('selectWebhook')}
               </Typography>
             </Grid>
-            <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
+            <Grid item xs={6} sm={gridSize} style={{ textAlign: 'center' }}>
               <Select
                 value={selectedWebhook}
                 onChange={(e) => setSelectedWebhook(e.target.value)}
@@ -130,6 +133,27 @@ const Human = ({
             </Grid>
           </>
         )}
+        <Grid item xs={6} sm={gridSize}>
+          <Typography variant="h6">
+            {t('enabled')}
+          </Typography>
+        </Grid>
+        <Grid item xs={6} sm={gridSize} style={{ textAlign: 'center' }}>
+          <Switch
+            color="secondary"
+            checked={Boolean(currentHuman.enabled)}
+            onChange={() => {
+              syncWebhook({
+                variables: {
+                  category: currentHuman.enabled ? 'stop' : 'start',
+                  data: false,
+                  status: 'POST',
+                  name: selectedWebhook,
+                },
+              })
+            }}
+          />
+        </Grid>
         <Divider
           light
           flexItem

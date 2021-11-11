@@ -265,11 +265,14 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
-  getWeather(weatherId) {
+  getWeather(weatherId, isNight = false) {
     const baseUrl = `${this[this.selected.weather].path}/weather`
-    const result = `${weatherId}.png`
-    if (this[this.selected.weather].weather.has(result)) {
-      return `${baseUrl}/${result}`
+    const timeSuffixes = isNight ? ['_n', ''] : ['_d', '']
+    for (const timeSuffix of timeSuffixes) {
+      const result = `${weatherId}${timeSuffix}.png`
+      if (this[this.selected.weather].weather.has(result)) {
+        return `${baseUrl}/${result}`
+      }
     }
     return `${baseUrl}/0.png`
   }

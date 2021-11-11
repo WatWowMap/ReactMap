@@ -235,7 +235,7 @@ export default function Menu({
       <Dialog
         open={advancedFilter.open}
         onClose={toggleAdvMenu(false)}
-        fullScreen={isMobile}
+        fullScreen={isMobile && category === 'pokemon'}
       >
         <Advanced
           advancedFilter={advancedFilter}
@@ -251,6 +251,7 @@ export default function Menu({
           teamId={slotsMenu.id}
           toggleSlotsMenu={toggleSlotsMenu}
           tempFilters={tempFilters}
+          isMobile={isMobile}
         />
       </Dialog>
       <Dialog
