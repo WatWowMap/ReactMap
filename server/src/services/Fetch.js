@@ -5,8 +5,8 @@ const fetchNests = require('./api/fetchNests')
 const webhookApi = require('./api/webhookApi')
 
 module.exports = class Fetch {
-  static async fetchJson(url) {
-    return fetchJson(url)
+  static async fetchJson(url, options) {
+    return fetchJson(url, options)
   }
 
   static async fetchRaids() {

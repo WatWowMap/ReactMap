@@ -34,49 +34,46 @@ export default function UserProfile({ setUserProfile }) {
 
   return (
     <>
-      {/* <DialogTitle className={classes.filterHeader}>
-        {t('userProfile')}
-      </DialogTitle> */}
       <Header titles={['userProfile']} action={() => setUserProfile(false)} />
-      <AppBar position="static">
-        <Tabs
-          value={tab}
-          onChange={handleTabChange}
-          indicatorColor="secondary"
-          variant="fullWidth"
-          style={{ backgroundColor: '#424242', width: '100%' }}
-        >
-          {['primary', 'popup'].map(each => (
-            <Tab
-              key={each}
-              label={t(each)}
-              style={{ width: 40, minWidth: 40 }}
-            />
-          ))}
-        </Tabs>
-      </AppBar>
-      <TabPanel value={tab} index={0}>
-        <Grid
-          container
-          direction="column"
-          alignItems="center"
-          justifyContent="center"
-          spacing={2}
-        >
-          {methods.includes('discord') && (
-            <Grid item>
-              Link Discord
-            </Grid>
-          )}
-          {methods.includes('telegram') && (
-            <Grid item>
-              Link Telegram
-            </Grid>
-          )}
-        </Grid>
-      </TabPanel>
-      <TabPanel value={tab} index={1}>
-        <DialogContent>
+      <DialogContent style={{ padding: 0 }}>
+        <AppBar position="static">
+          <Tabs
+            value={tab}
+            onChange={handleTabChange}
+            indicatorColor="secondary"
+            variant="fullWidth"
+            style={{ backgroundColor: '#424242', width: '100%' }}
+          >
+            {['primary', 'popup'].map(each => (
+              <Tab
+                key={each}
+                label={t(each)}
+                style={{ width: 40, minWidth: 40 }}
+              />
+            ))}
+          </Tabs>
+        </AppBar>
+        <TabPanel value={tab} index={0}>
+          <Grid
+            container
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+            spacing={2}
+          >
+            {methods.includes('discord') && (
+              <Grid item>
+                Link Discord
+              </Grid>
+            )}
+            {methods.includes('telegram') && (
+              <Grid item>
+                Link Telegram
+              </Grid>
+            )}
+          </Grid>
+        </TabPanel>
+        <TabPanel value={tab} index={1}>
           <Grid
             container
             direction="row"
@@ -132,8 +129,8 @@ export default function UserProfile({ setUserProfile }) {
               )
             })}
           </Grid>
-        </DialogContent>
-      </TabPanel>
+        </TabPanel>
+      </DialogContent>
       <Footer options={[
         { name: rolesLinkName, link: rolesLink, color: 'primary' },
         { name: 'close', color: 'secondary', action: () => setUserProfile(false) },

@@ -21,6 +21,9 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
     const embed = await logUserAuth(req, user, 'Discord')
     await DiscordClient.sendMessage(config.discord.logChannelId, { embed })
 
+    if (user) {
+      delete user.guilds
+    }
     await User.query()
       .findOne({ discordId: user.id })
       .then(async (userExists) => {
@@ -40,6 +43,6 @@ passport.use(new DiscordStrategy({
   clientID: config.discord.clientId,
   clientSecret: config.discord.clientSecret,
   callbackURL: config.discord.redirectUri,
-  scope: ['identify', 'guilds', 'email'],
+  scope: ['identify', 'guilds'],
   passReqToCallback: true,
 }, authHandler))

@@ -4,18 +4,17 @@ import {
   Grid,
   Typography,
   Fab,
-  Icon,
   Select,
   MenuItem,
 } from '@material-ui/core'
-import { Person } from '@material-ui/icons'
+import { Person, LockOpen } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
 
 export default function TutWelcome({ setUserProfile }) {
   const { t, i18n } = useTranslation()
-  const { strategy, loggedIn, perms } = useStatic(state => state.auth)
+  const { methods, loggedIn, perms } = useStatic(state => state.auth)
   const { map: { excludeList }, localeSelection } = useStatic(state => state.config)
 
   const getPerms = () => {
@@ -28,12 +27,6 @@ export default function TutWelcome({ setUserProfile }) {
       }
     })
     return `${have} / ${total}`
-  }
-
-  const getStrategy = () => {
-    if (strategy === 'discord') {
-      
-    }
   }
 
   return (
@@ -51,45 +44,38 @@ export default function TutWelcome({ setUserProfile }) {
             {t('welcome')} {document.title}!
           </Typography>
         </Grid>
-        {strategy
-          && (
-            <>
-              <Grid item xs={6}>
-                <Typography variant="subtitle2" align="center">
-                  {t('tutorialCategories')}:
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h6" gutterBottom align="center">
-                  {loggedIn ? t('viewProfile') : t('loginOptional')}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3" align="center">
-                  {getPerms()}
-                </Typography>
-              </Grid>
-              <Grid item xs={6} style={{ textAlign: 'center' }}>
-                {loggedIn ? (
-                  <Fab color="primary" onClick={() => setUserProfile(true)}>
-                    <Person />
-                  </Fab>
-                ) : (
-                  <Fab
-                    style={{ backgroundColor: 'rgb(114,136,218)', color: 'white' }}
-                    href="/auth/discord"
-                  >
-                    <Icon className="fab fa-discord" />
-                  </Fab>
-                )}
-              </Grid>
-              <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
-                <Typography variant="subtitle1" align="center">
-                  {loggedIn ? t('tutorialLoggedIn') : t('tutorialLoggedOut')}
-                </Typography>
-              </Grid>
-            </>
+
+        <Grid item xs={6}>
+          <Typography variant="subtitle2" align="center">
+            {t('tutorialCategories')}:
+          </Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <Typography variant="h6" gutterBottom align="center">
+            {!loggedIn && methods.length ? t('loginOptional') : t('viewProfile')}
+          </Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <Typography variant="h3" align="center">
+            {getPerms()}
+          </Typography>
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
+          {!loggedIn && methods.length ? (
+            <Fab color="primary" href="/login">
+              <LockOpen />
+            </Fab>
+          ) : (
+            <Fab color="primary" onClick={() => setUserProfile(true)}>
+              <Person />
+            </Fab>
           )}
+        </Grid>
+        <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
+          <Typography variant="subtitle1" align="center">
+            {!loggedIn && methods.length ? t('tutorialLoggedOut') : t('tutorialLoggedIn')}
+          </Typography>
+        </Grid>
         <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
           <Typography variant="subtitle1" align="center">
             {t('tutorialLanguage')}

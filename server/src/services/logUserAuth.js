@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const Utility = require('./Utility')
+const Fetch = require('./Fetch')
 const config = require('./config')
 
 module.exports = async function getAuthInfo(req, user, strategy) {
@@ -8,7 +8,7 @@ module.exports = async function getAuthInfo(req, user, strategy) {
     || (req.connection.remoteAddress || req.connection.localAddress).match('[0-9]+.[0-9].+[0-9]+.[0-9]+$')[0]
 
   const url = `http://ip-api.com/json/${ip}?fields=66846719&lang=${config.map.locale || 'en'}`
-  const geo = await Utility.fetchJson(url)
+  const geo = await Fetch.fetchJson(url)
   const embed = {
     color: 0xFF0000,
     title: 'Authentication',

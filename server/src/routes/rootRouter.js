@@ -70,13 +70,14 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 rootRouter.get('/settings', async (req, res) => {
   try {
     if (!config.authMethods.length) {
-      req.session.perms = { areaRestrictions: [] }
-      Object.keys(config.discord.perms).forEach(perm => (
+      req.session.perms = { areaRestrictions: [], webhooks: [] }
+      Object.keys(config.discord.perms).forEach(perm => {
         req.session.perms[perm] = config.discord.perms[perm].enabled
-      ))
+        req.session.perms[perm] = config.telegram.perms[perm].enabled
+      })
       req.session.save()
     } else if (config.alwaysEnabledPerms.length > 0) {
-      req.session.perms = { areaRestrictions: [] }
+      req.session.perms = { areaRestrictions: [], webhooks: [] }
       config.alwaysEnabledPerms.forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
       req.session.save()
     }
@@ -221,8 +222,9 @@ rootRouter.get('/settings', async (req, res) => {
         try {
           await Promise.all(filtered.map(async webhook => {
             if (config.webhookObj[webhook.name].client.valid) {
-              const remoteData = await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name)
-              const { areas } = await Fetch.webhookApi('humans', serverSettings.user.id, 'GET', webhook.name)
+              const { strategy, discordId, telegramId } = serverSettings.user
+              const remoteData = await Fetch.webhookApi('allProfiles', strategy === 'discord' ? discordId : telegramId, 'GET', webhook.name)
+              const { areas } = await Fetch.webhookApi('humans', strategy === 'discord' ? discordId : telegramId, 'GET', webhook.name)
 
               if (remoteData && areas) {
                 serverSettings.webhooks[webhook.name] = remoteData.human.admin_disable
@@ -236,13 +238,14 @@ rootRouter.get('/settings', async (req, res) => {
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .filter(area => area.userSelectable !== false)
                       .map(area => area.name),
+                    templates: config.webhookObj[webhook.name].client.templates[strategy],
                   }
               }
             }
           }))
         } catch (e) {
           serverSettings.webhooks = null
-          console.warn(e.message, 'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database', serverSettings.user.id)
+          console.warn(e.message, 'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database. User ID:', serverSettings.user.id)
         }
       }
       if (config.devOptions.enabled) {

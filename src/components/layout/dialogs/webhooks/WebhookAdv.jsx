@@ -47,7 +47,7 @@ export default function WebhookAdvanced({
   const webhookAdv = useStore(s => s.webhookAdv)
   const setWebhookAdv = useStore(s => s.setWebhookAdv)
   const { [selectedWebhook]: {
-    info: { [category]: info }, profile, human, template, prefix, leagues, pvp, addressFormat, hasNominatim, locale,
+    info: { [category]: info }, profile, human, templates, prefix, leagues, pvp, addressFormat, hasNominatim, locale,
   } } = useStatic(s => s.webhookData)
   const { pokemon, moves, types } = useStatic(s => s.masterfile)
 
@@ -149,7 +149,7 @@ export default function WebhookAdvanced({
   const getOptions = (option) => {
     const menuItems = []
     switch (option.name) {
-      case 'template': template[poracleValues.noIv ? `${category}NoIv` : category]?.[locale]?.forEach(item => (
+      case 'template': templates[poracleValues.noIv ? `${category}NoIv` : category]?.[locale]?.forEach(item => (
         menuItems.push(<MenuItem key={item} value={item}>{item}</MenuItem>)
       )); break
       case 'profile_no':

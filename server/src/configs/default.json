@@ -1,7 +1,13 @@
 {
   "interface": "0.0.0.0",
   "port": 8080,
-  "localeSelection": ["en", "de", "pl" ,"es" ,"fr"],
+  "localeSelection": [
+    "en",
+    "de",
+    "pl",
+    "es",
+    "fr"
+  ],
   "devOptions": {
     "enabled": false,
     "graphiql": false,
@@ -54,7 +60,7 @@
     "fetchLatestInvasions": true,
     "invasionCacheHrs": 1,
     "questMessage": "",
-    "navigationControls": "react", 
+    "navigationControls": "react",
     "theme": {
       "style": "dark",
       "primary": "#ff5722",
@@ -108,9 +114,25 @@
       "pvpMega": false,
       "linkGlobalAndAdvanced": false,
       "glow": [
-        { "name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
-        { "name": "Top 3 Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
-        { "name": "Multiple", "perm": "pvp", "value": "#800080" }
+        {
+          "name": "Hundo",
+          "perm": "iv",
+          "num": 100,
+          "value": "#ff1744",
+          "op": "="
+        },
+        {
+          "name": "Top 3 Ranks",
+          "perm": "pvp",
+          "num": 3,
+          "value": "#0000ff",
+          "op": "<="
+        },
+        {
+          "name": "Multiple",
+          "perm": "pvp",
+          "value": "#800080"
+        }
       ]
     },
     "wayfarer": {
@@ -153,13 +175,31 @@
       "enabled": false,
       "legacyFilter": false,
       "globalValues": {
-        "iv": [80, 100],
-        "level": [1, 35],
-        "atk_iv": [0, 15],
-        "def_iv": [0, 15],
-        "sta_iv": [0, 15]
+        "iv": [
+          80,
+          100
+        ],
+        "level": [
+          1,
+          35
+        ],
+        "atk_iv": [
+          0,
+          15
+        ],
+        "def_iv": [
+          0,
+          15
+        ],
+        "sta_iv": [
+          0,
+          15
+        ]
       },
-      "pvpValues": [1, 10]
+      "pvpValues": [
+        1,
+        10
+      ]
     },
     "portals": {
       "enabled": false
@@ -312,12 +352,89 @@
     }
   },
   "telegram": {
-    "enabled": true,
-    "botName": "",
+    "enabled": false,
     "botToken": "",
-    "enabledPerms": []
+    "groups": [""],
+    "areaRestrictions": [],
+    "perms": {
+      "map": {
+        "enabled": true,
+        "roles": []
+      },
+      "gyms": {
+        "enabled": true,
+        "roles": []
+      },
+      "raids": {
+        "enabled": true,
+        "roles": []
+      },
+      "nests": {
+        "enabled": true,
+        "roles": []
+      },
+      "pokestops": {
+        "enabled": true,
+        "roles": []
+      },
+      "quests": {
+        "enabled": true,
+        "roles": []
+      },
+      "lures": {
+        "enabled": true,
+        "roles": []
+      },
+      "invasions": {
+        "enabled": true,
+        "roles": []
+      },
+      "pokemon": {
+        "enabled": true,
+        "roles": []
+      },
+      "stats": {
+        "enabled": true,
+        "roles": []
+      },
+      "iv": {
+        "enabled": true,
+        "roles": []
+      },
+      "pvp": {
+        "enabled": true,
+        "roles": []
+      },
+      "portals": {
+        "enabled": true,
+        "roles": []
+      },
+      "submissionCells": {
+        "enabled": true,
+        "roles": []
+      },
+      "scanAreas": {
+        "enabled": true,
+        "roles": []
+      },
+      "weather": {
+        "enabled": true,
+        "roles": []
+      },
+      "s2cells": {
+        "enabled": true,
+        "roles": []
+      },
+      "spawnpoints": {
+        "enabled": true,
+        "roles": []
+      },
+      "devices": {
+        "enabled": true,
+        "roles": []
+      }
+    }
   },
-
   "tileServers": {
     "Default": {
       "attribution": "Map tiles by Carto, under CC BY 3.0. Data by  <a href='https://www.openstreetmap.org/'>OpenStreetMap</a>, under ODbL.",

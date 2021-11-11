@@ -26,7 +26,7 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
       {serverSettings?.authMethods?.includes('telegram') && (
       <Grid item>
         <TelegramLoginButton
-          botName="reactmap_bot"
+          botName={process.env?.TELEGRAM_BOT_NAME}
           dataAuthUrl="/auth/telegram/callback"
           usePic={false}
           lang={localStorage.getItem('i18nextLng')}

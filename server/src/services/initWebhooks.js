@@ -40,10 +40,16 @@ module.exports = async function initWebhooks(config) {
         }
 
         if (templates) {
-          templates[webhook.platform].pokemon = templates[webhook.platform].monster
-          delete templates[webhook.platform].monster
-          templates[webhook.platform].pokemonNoIv = templates[webhook.platform].monsterNoIv
-          delete templates[webhook.platform].monsterNoIv
+          ['discord', 'telegram'].forEach(platform => {
+            if (templates[platform].monster) {
+              templates[platform].pokemon = templates[platform].monster
+              delete templates[platform].monster
+            }
+            if (templates[platform].monsterNoIv) {
+              templates[platform].pokemonNoIv = templates[platform].monsterNoIv
+              delete templates[platform].monsterNoIv
+            }
+          })
         }
 
         webhookObj[webhook.name] = {
@@ -63,7 +69,7 @@ module.exports = async function initWebhooks(config) {
             locale: hookConfig.locale,
             info: webhookUi(webhook.provider, hookConfig, baseSettings.pvp, baseSettings.leagues),
             areas: areas.geoJSON || [],
-            template: templates[webhook.platform],
+            templates,
           } : baseSettings,
         }
       }
