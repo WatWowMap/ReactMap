@@ -18,7 +18,7 @@ module.exports = async function resolveQuickHook(category, discordId, webhookNam
         await Promise.all(subCategories.map(async subCategory => {
           const hookArray = subCategory === 'gym'
             ? looper(3, 'team', webhook.client.info[subCategory].defaults, false)
-              .map(x => ({ ...x, slot_changes: true }))
+              .map(x => ({ ...x, slot_changes: true, battle_changes: true }))
             : looper(6, 'level', webhook.client.info[subCategory].defaults, true)
           const withId = hookArray.map(x => ({ ...x, gym_id: data.id }))
           const post = await fetchJson(`${webhook.server.host}:${webhook.server.port}/api/tracking/${subCategory}/${discordId}`, {

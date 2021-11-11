@@ -443,6 +443,8 @@
   ],
   "profile_error": "Must be unique and valid",
   "team_0": "Harmony",
+  "battle_changes": "In Battle",
+  "battle_changes_poracle": "battle_changes",
   "auto": "Auto",
   "webhooksSubtitle": "Manage your alerts directly from the map for these bots",
   "webhooks": "Alerts"
