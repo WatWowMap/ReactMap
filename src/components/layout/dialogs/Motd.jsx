@@ -4,6 +4,7 @@ import React from 'react'
 import {
   DialogContent, Typography, Grid, Button, Link, Divider,
 } from '@material-ui/core'
+import { Link as RouterLink } from 'react-router-dom'
 import Header from '../general/Header'
 import Footer from '../general/Footer'
 
@@ -17,9 +18,24 @@ export default function Motd({ motd, handleMotdClose }) {
   })
 
   const getLinkWrapper = (block, element) => (
-    <Link href={block.link} rel="noreferrer" target="_blank" color={block.linkColor} underline={block.underline}>
-      {element}
-    </Link>
+    block.link.startsWith('http') ? (
+      <Link
+        href={block.link}
+        rel="noreferrer"
+        target="blank"
+        color={block.linkColor}
+        underline={block.underline}
+      >
+        {element}
+      </Link>
+    ) : (
+      <RouterLink
+        to={block.link}
+        style={block.style}
+      >
+        {element}
+      </RouterLink>
+    )
   )
 
   const getContent = (block) => {
@@ -34,6 +50,7 @@ export default function Motd({ motd, handleMotdClose }) {
           <Button
             size={block.size}
             color={isMuiColor ? block.color : 'inherit'}
+            variant={block.variant}
             style={block.style || { color: isMuiColor ? 'inherit' : block.color }}
           >
             {block.content}

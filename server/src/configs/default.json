@@ -73,7 +73,7 @@
       "index": 0,
       "settings": {
         "parentSpacing": 0,
-        "parentAlignContent": "center",
+        "parentAlignItems": "center",
         "parentJustifyContent": "center",
         "parentStyle": {},
         "permanent": false
