@@ -232,6 +232,7 @@ class Gym extends Model {
         'url',
         distance,
       ])
+      .where(isMad ? 'enabled' : 'deleted', isMad)
       .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
@@ -269,6 +270,7 @@ class Gym extends Model {
       .orderBy('distance')
       .andWhere(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : ts)
       .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+      .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
         .leftJoin('raid', 'gym.gym_id', 'raid.gym_id')
