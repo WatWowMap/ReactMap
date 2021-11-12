@@ -78,7 +78,8 @@
         "parentStyle": {},
         "permanent": false
       },
-      "messages": []
+      "messages": [],
+      "footerButtons": []
     }
   },
   "clientSideOptions": {
