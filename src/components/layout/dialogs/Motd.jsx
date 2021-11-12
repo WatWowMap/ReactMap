@@ -5,10 +5,15 @@ import {
   DialogContent, Typography, Grid, Button, Link, Divider,
 } from '@material-ui/core'
 import { Link as RouterLink } from 'react-router-dom'
+
+import { useStatic } from '@hooks/useStore'
+
 import Header from '../general/Header'
 import Footer from '../general/Footer'
 
 export default function Motd({ motd, handleMotdClose }) {
+  const { perms } = useStatic(s => s.auth)
+
   const getSizes = (sizeObj) => ({
     xs: sizeObj?.xs || 12,
     sm: sizeObj?.sm || sizeObj?.xs || 12,
@@ -138,16 +143,20 @@ export default function Motd({ motd, handleMotdClose }) {
           justifyContent={motd.settings.parentJustifyContent}
           style={motd.settings.parentStyle}
         >
-          {motd.messages.map((block, i) => (
-            <Grid
-              key={i}
-              item
-              {...getSizes(block.gridSizes)}
-              style={block.gridStyle || { textAlign: 'center' }}
-            >
-              {getContent(block)}
-            </Grid>
-          ))}
+          {motd.messages.map((block, i) => {
+            if (block.donorOnly && !perms.donor) return null
+            if (block.freeloaderOnly && perms.donor) return null
+            return (
+              <Grid
+                key={i}
+                item
+                {...getSizes(block.gridSizes)}
+                style={block.gridStyle || { textAlign: 'center' }}
+              >
+                {getContent(block)}
+              </Grid>
+            )
+          })}
         </Grid>
       </DialogContent>
       <Footer options={footerOptions} />

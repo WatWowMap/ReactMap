@@ -316,6 +316,10 @@
       "devices": {
         "enabled": true,
         "roles": []
+      },
+      "donor": {
+        "enabled": true,
+        "roles": []
       }
     }
   },
