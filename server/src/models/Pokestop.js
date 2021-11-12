@@ -578,6 +578,7 @@ class Pokestop extends Model {
         isMad ? 'image AS url' : 'url',
         distance,
       ])
+      .where(isMad ? 'enabled' : 'deleted', isMad)
       .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
@@ -611,6 +612,7 @@ class Pokestop extends Model {
         'quest_reward_type',
         distance,
       ])
+      .where(isMad ? 'enabled' : 'deleted', isMad)
       .whereIn('quest_pokemon_id', pokemonIds)
       .orWhereIn('quest_item_id', itemIds)
       .orWhereIn('quest_reward_type', rewardTypes)

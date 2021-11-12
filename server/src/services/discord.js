@@ -145,7 +145,6 @@ class DiscordClient {
     } catch (e) {
       console.warn('Failed to get perms for user', user.id, e.message)
     }
-    console.log(perms)
     return perms
   }
 

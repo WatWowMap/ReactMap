@@ -56,22 +56,25 @@ export default function Menu({
   const { filteredObj, filteredArr, count } = useFilter(tempFilters, menus, search, category, categories)
 
   const generateSlots = (teamId, show) => {
+    const slotObj = {}
     for (let i = 1; i <= 6; i += 1) {
       const slotKey = `g${teamId.charAt(1)}-${i}`
-      filteredObj[slotKey] = typeof show === 'boolean'
+      slotObj[slotKey] = typeof show === 'boolean'
         ? { ...tempFilters[slotKey], enabled: show }
         : { ...tempFilters[slotKey], size: show.size }
     }
+    return slotObj
   }
 
   const selectAllOrNone = (show) => {
+    const newObj = {}
     Object.entries(filteredObj).forEach(([key, item]) => {
-      item.enabled = show
+      newObj[key] = { ...item, enabled: show }
       if (key.startsWith('t') && key.charAt(1) != 0 && !webhookCategory) {
-        generateSlots(key, show)
+        Object.assign(newObj, generateSlots(key, show))
       }
     })
-    setTempFilters({ ...tempFilters, ...filteredObj })
+    setTempFilters({ ...tempFilters, ...newObj })
   }
 
   const toggleDrawer = (open) => (event) => {
