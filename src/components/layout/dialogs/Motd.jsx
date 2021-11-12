@@ -129,7 +129,10 @@ export default function Motd({ motd, handleMotdClose }) {
   const footerOptions = [{ name: 'close', action: handleMotdClose, color: 'primary' }]
 
   if (motd.footerButtons.length) {
-    footerOptions.unshift(...motd.footerButtons)
+    footerOptions.unshift(...motd.footerButtons.filter(button => (
+      !button.donorOnly && !button.freeloaderOnly)
+      || (button.donorOnly && perms.donor)
+      || (button.freeloaderOnly && !perms.donor)))
   }
 
   return (
