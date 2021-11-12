@@ -39,12 +39,14 @@ export default function Nav({
   const setTutorial = useStore(state => state.setTutorial)
   const motdIndex = useStore(state => state.motdIndex)
   const setMotdIndex = useStore(s => s.setMotdIndex)
+
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
     open: false,
     category: '',
     type: '',
   })
+  const [motd, setMotd] = useState(messageOfTheDay.index > motdIndex && messageOfTheDay.messages.length)
 
   const [userProfile, setUserProfile] = useState(false)
   const safeSearch = searchable.filter(category => perms[category])
@@ -54,6 +56,13 @@ export default function Nav({
       return
     }
     setDrawer(open)
+  }
+
+  const handleMotdClose = () => {
+    if (!messageOfTheDay.settings.permanent) {
+      setMotdIndex(messageOfTheDay.index)
+    }
+    setMotd(false)
   }
 
   const toggleDialog = (open, category, type, filter) => (event) => {
@@ -159,13 +168,11 @@ export default function Nav({
       </Dialog>
       <Dialog
         maxWidth="sm"
-        open={Boolean(motdIndex !== messageOfTheDay.index && messageOfTheDay?.messages.length)}
-        onClose={() => setMotdIndex(messageOfTheDay.index)}
+        open={Boolean(motd)}
       >
         <Motd
-          newMotdIndex={messageOfTheDay.index}
-          setMotdIndex={setMotdIndex}
-          messages={messageOfTheDay.messages}
+          motd={messageOfTheDay}
+          handleMotdClose={handleMotdClose}
         />
       </Dialog>
       <Snackbar

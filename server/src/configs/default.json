@@ -71,7 +71,15 @@
     },
     "messageOfTheDay": {
       "index": 0,
-      "messages": []
+      "settings": {
+        "parentSpacing": 0,
+        "parentAlignItems": "center",
+        "parentJustifyContent": "center",
+        "parentStyle": {},
+        "permanent": false
+      },
+      "messages": [],
+      "footerButtons": []
     }
   },
   "clientSideOptions": {
@@ -306,6 +314,10 @@
         "roles": []
       },
       "devices": {
+        "enabled": true,
+        "roles": []
+      },
+      "donor": {
         "enabled": true,
         "roles": []
       }

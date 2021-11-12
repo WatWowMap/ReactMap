@@ -10,7 +10,7 @@ export default function FilterMenu({
     <Menu
       category={category}
       title={`${category}Filters`}
-      titleAction={toggleDialog(false, category, 'filters', filters.filter)}
+      titleAction={toggleDialog(false, category, 'filters')}
       isMobile={isMobile}
       isTablet={isTablet}
       filters={filters}

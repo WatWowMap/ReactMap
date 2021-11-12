@@ -12,7 +12,7 @@ const config = require('../config')
 
 const getWildCards = (category) => {
   switch (category) {
-    case 'gym': return { team: 4, slot_changes: true }
+    case 'gym': return { team: 4, slot_changes: true, battle_changes: true }
     case 'egg':
     case 'raid': return { level: 90 }
     default: return {}
