@@ -14,6 +14,9 @@ module.exports = async function initWebhooks(config) {
 
         const hookConfig = await fetchJson(`${webhook.host}:${webhook.port}/api/config/poracleWeb`, options, config.devOptions.enabled)
 
+        if (!hookConfig) {
+          throw new Error(`Webhook ${webhook.name} is not configured correctly`)
+        }
         const [major, minor, patch] = hookConfig.version.split('.').map(x => parseInt(x))
 
         if (major < 4 || (major === 4 && minor < 3) || (major === 4 && minor === 3 && patch < 2)) {
