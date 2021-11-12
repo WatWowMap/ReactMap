@@ -17,7 +17,7 @@ export default function Motd({ motd, handleMotdClose }) {
   })
 
   const getLinkWrapper = (block, element) => (
-    <Link href={block.link} rel="noreferrer" target="_blank">
+    <Link href={block.link} rel="noreferrer" target="_blank" color={block.linkColor} underline={block.underline}>
       {element}
     </Link>
   )
@@ -39,7 +39,7 @@ export default function Motd({ motd, handleMotdClose }) {
             {block.content}
           </Button>
         )
-        return button.link ? getLinkWrapper(block, button) : button
+        return block.link ? getLinkWrapper(block, button) : button
       }
       case 'text': {
         const text = (
@@ -51,7 +51,7 @@ export default function Motd({ motd, handleMotdClose }) {
             {block.content}
           </Typography>
         )
-        return text.link ? getLinkWrapper(block, text) : text
+        return block.link ? getLinkWrapper(block, text) : text
       }
       case 'divider': return (
         <Divider {...block} />
