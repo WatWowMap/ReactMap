@@ -579,7 +579,7 @@ class Pokestop extends Model {
         distance,
       ])
       .where(isMad ? 'enabled' : 'deleted', isMad)
-      .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .whereRaw(`LOWER(name) LIKE '%${args.search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (perms.areaRestrictions.length > 0) {
