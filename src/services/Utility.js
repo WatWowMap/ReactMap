@@ -1,22 +1,16 @@
+import ReactGA from 'react-ga'
+import SunCalc from 'suncalc'
+
 import formatInterval from './functions/formatInterval'
-import getPokemonIcon from './functions/getPokemonIcon'
 import getProperName from './functions/getProperName'
-import menuFilter from './functions/menuFilter'
 import checkAdvFilter from './functions/checkAdvFilter'
 import dayCheck from './functions/dayCheck'
 import parseQuestConditions from './functions/parseConditions'
+import formatter from './functions/formatter'
 
-class Utility {
-  static getPokemonIcon(availableForms, pokemonId, form, evolution, gender, costume, shiny) {
-    return getPokemonIcon(availableForms, pokemonId, form, evolution, gender, costume, shiny)
-  }
-
+export default class Utility {
   static getProperName(word) {
     return getProperName(word)
-  }
-
-  static menuFilter(tempFilters, menus, search, type) {
-    return menuFilter(tempFilters, menus, search, type)
   }
 
   static checkAdvFilter(filter) {
@@ -38,6 +32,26 @@ class Utility {
   static parseConditions(conditions) {
     return parseQuestConditions(conditions)
   }
-}
 
-export default Utility
+  static formatter(addressFormat, data) {
+    return formatter(addressFormat, data)
+  }
+
+  static nightCheck(lat, lon) {
+    const date = new Date()
+    const times = SunCalc.getTimes(date, lat, lon)
+    return date <= times.sunrise || date >= times.sunset
+  }
+
+  static analytics(category, action = false, label = false, nonInteraction = false) {
+    if (process.env?.GOOGLE_ANALYTICS_ID) {
+      if (action) {
+        ReactGA.event({
+          category, action, label, nonInteraction,
+        })
+      } else {
+        ReactGA.pageview(category)
+      }
+    }
+  }
+}

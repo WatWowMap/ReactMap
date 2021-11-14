@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const fetchRaids = require('../services/functions/fetchRaids')
+const fetchRaids = require('../services/api/fetchRaids')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
@@ -19,15 +19,15 @@ class Gym extends Model {
 
   static async getAllGyms(args, perms, isMad) {
     const ts = Math.floor((new Date()).getTime() / 1000)
-    const { gyms, raids, areaRestrictions } = perms
+    const { gyms: gymPerms, raids: raidPerms, areaRestrictions } = perms
     const {
-      onlyGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible,
+      onlyAllGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible, onlyOrRaids,
     } = args.filters
     const query = this.query()
 
     if (isMad) {
-      query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
-        .join('raid', 'gym.gym_id', 'raid.gym_id')
+      query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+        .leftJoin('raid', 'gym.gym_id', 'raid.gym_id')
         .select([
           'gym.gym_id AS id',
           'name',
@@ -64,23 +64,25 @@ class Gym extends Model {
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
 
     const raidBosses = new Set()
+    const raids = []
     const teams = []
     const eggs = []
     const slots = []
 
     Object.keys(args.filters).forEach(gym => {
-      if (gym.charAt(0) !== 'o') {
-        switch (gym.charAt(0)) {
-          default: raidBosses.add(gym.split('-')[0]); break
-          case 'e': eggs.push(gym.slice(1)); break
-          case 't': teams.push(gym.slice(1).split('-')[0]); break
-          case 'g': slots.push({
-            team: gym.slice(1).split('-')[0],
-            slots: 6 - gym.slice(1).split('-')[1],
-          }); break
-        }
+      switch (gym.charAt(0)) {
+        case 'o': break
+        case 'r': raids.push(gym.slice(1)); break
+        case 'e': eggs.push(gym.slice(1)); break
+        case 't': teams.push(gym.slice(1).split('-')[0]); break
+        case 'g': slots.push({
+          team: gym.slice(1).split('-')[0],
+          slots: 6 - gym.slice(1).split('-')[1],
+        }); break
+        default: raidBosses.add(gym.split('-')[0]); break
       }
     })
+    if (!onlyOrRaids) raidBosses.add(0)
     const finalTeams = []
     const finalSlots = {
       1: [],
@@ -103,22 +105,22 @@ class Gym extends Model {
     })
 
     query.andWhere(gym => {
-      if (onlyExEligible && gyms) {
+      if (onlyExEligible && gymPerms) {
         gym.orWhere(ex => {
           ex.where(isMad ? 'is_ex_raid_eligible' : 'ex_raid_eligible', 1)
         })
       }
-      if (onlyInBattle && gyms) {
+      if (onlyInBattle && gymPerms) {
         gym.orWhere(battle => {
           battle.where(isMad ? 'is_in_battle' : 'in_battle', 1)
         })
       }
-      if (onlyArEligible && gyms) {
+      if (onlyArEligible && gymPerms) {
         gym.orWhere(ar => {
           ar.where(isMad ? 'is_ar_scan_eligible' : 'ar_scan_eligible', 1)
         })
       }
-      if (onlyGyms && gyms) {
+      if (onlyAllGyms && gymPerms) {
         if (finalTeams.length === 0 && slots.length === 0) {
           gym.whereNull('team_id')
         } else if (finalTeams.length === 4) {
@@ -139,21 +141,25 @@ class Gym extends Model {
           })
         }
       }
-      if (onlyRaids && raids) {
-        gym.orWhere(pokemon => {
-          pokemon.whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [...raidBosses])
-            .andWhere(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : ts)
+      if (onlyRaids && raidPerms) {
+        gym.orWhere(raid => {
+          raid.where(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : ts)
             .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
-            .andWhere(isMad ? 'level' : 'raid_level', '>', 0)
+            .andWhere(bosses => {
+              bosses.whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [...raidBosses])
+                ?.[onlyOrRaids ? 'orWhereIn' : 'whereIn'](isMad ? 'level' : 'raid_level', raids)
+            })
         })
-        gym.orWhere(egg => {
-          if (eggs.length === 6) {
-            egg.where(isMad ? 'level' : 'raid_level', '>', 0)
-          } else {
-            egg.whereIn(isMad ? 'level' : 'raid_level', eggs)
-          }
-          egg.andWhere(isMad ? 'start' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
-        })
+        if (eggs.length) {
+          gym.orWhere(egg => {
+            if (eggs.length === 6) {
+              egg.where(isMad ? 'level' : 'raid_level', '>', 0)
+            } else {
+              egg.whereIn(isMad ? 'level' : 'raid_level', eggs)
+            }
+            egg.andWhere(isMad ? 'start' : 'raid_battle_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+          })
+        }
       }
     })
     getAreaSql(query, areaRestrictions, isMad, 'gyms')  // TODO: support `gyms, raids`
@@ -164,19 +170,14 @@ class Gym extends Model {
 
       for (let i = 0; i < length; i += 1) {
         const gym = queryResults[i]
-        if (gym.raid_pokemon_form === 0 && gym.raid_pokemon_id > 0) {
-          const formId = masterfile[gym.raid_pokemon_id].default_form_id
-          if (formId) gym.raid_pokemon_form = formId
-        }
-        if (!gyms) {
+        if (!gymPerms) {
           gym.team_id = 0
         }
-        if (!gym.raid_pokemon_id
-          && args.filters[`e${gym.raid_level}`]) {
+        if (!gym.raid_pokemon_id && (args.filters[`e${gym.raid_level}`] || args.filters[`r${gym.raid_level}`])) {
           filteredResults.push(gym)
-        } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]) {
+        } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`] || args.filters[`r${gym.raid_level}`]) {
           filteredResults.push(gym)
-        } else if (gyms && (onlyGyms || onlyArEligible || onlyExEligible)) {
+        } else if (gymPerms && (onlyAllGyms || onlyArEligible || onlyExEligible || onlyInBattle)) {
           if (args.filters[`t${gym.team_id}-0`]) {
             gym.raid_end_timestamp = null
             gym.raid_battle_timestamp = null
@@ -211,15 +212,11 @@ class Gym extends Model {
     if (results.length === 0) {
       return fetchRaids()
     }
-    return results.map(pokemon => {
-      if (pokemon.raid_pokemon_id === 0) {
-        return `e${pokemon.raid_level}`
+    return results.flatMap(result => {
+      if (result.raid_pokemon_id) {
+        return `${result.raid_pokemon_id}-${result.raid_pokemon_form}`
       }
-      if (pokemon.raid_pokemon_form === 0) {
-        const formId = masterfile[pokemon.raid_pokemon_id].default_form_id
-        if (formId) pokemon.raid_pokemon_form = formId
-      }
-      return `${pokemon.raid_pokemon_id}-${pokemon.raid_pokemon_form}`
+      return [`e${result.raid_level}`, `r${result.raid_level}`]
     })
   }
 
@@ -233,11 +230,12 @@ class Gym extends Model {
         'url',
         distance,
       ])
-      .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .where(isMad ? 'enabled' : 'deleted', isMad)
+      .whereRaw(`LOWER(name) LIKE '%${args.search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (isMad) {
-      query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+      query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
     getAreaSql(query, perms.areaRestrictions, isMad, 'gyms')
     return query
@@ -268,9 +266,10 @@ class Gym extends Model {
       .orderBy('distance')
       .andWhere(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : ts)
       .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+      .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {
-      query.join('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
-        .join('raid', 'gym.gym_id', 'raid.gym_id')
+      query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+        .leftJoin('raid', 'gym.gym_id', 'raid.gym_id')
     }
     getAreaSql(query, perms.areaRestrictions, isMad, 'raids')
     return query

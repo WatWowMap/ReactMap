@@ -10,7 +10,6 @@ const Session = require('./Session')
 const Spawnpoint = require('./Spawnpoint')
 const User = require('./User')
 const Weather = require('./Weather')
-
 const { PokemonFilter, GenericFilter } = require('./Filters')
 
 module.exports = {

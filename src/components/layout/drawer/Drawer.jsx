@@ -13,7 +13,7 @@ import { useStore, useStatic } from '../../../hooks/useStore'
 import Areas from './Areas'
 
 export default function Sidebar({
-  drawer, toggleDrawer, filters, setFilters, toggleDialog,
+  drawer, toggleDrawer, filters, setFilters, toggleDialog, Icons,
 }) {
   const { drawer: drawerStyle } = useStore(state => state.settings)
   const sidebar = useStore(state => state.sidebar)
@@ -56,7 +56,7 @@ export default function Sidebar({
         ); break
       case 'settings':
         content = (
-          <SettingsMenu toggleDialog={toggleDialog} />
+          <SettingsMenu toggleDialog={toggleDialog} Icons={Icons} />
         )
     }
     return (
@@ -78,12 +78,12 @@ export default function Sidebar({
             style={{ width: 300 }}
             spacing={3}
             direction="row"
-            justify="center"
+            justifyContent="center"
             alignItems="center"
           >
             {content}
             {staticUserSettings[category] && (
-              <Grid item xs={6} style={{ textAlign: 'center' }}>
+              <Grid item xs={t('drawerGridOptionsWidth')} style={{ textAlign: 'center' }}>
                 <Button
                   onClick={toggleDialog(true, category, 'options')}
                   variant="contained"
@@ -99,7 +99,7 @@ export default function Sidebar({
               || category === 'pokestops'
               || category === 'nests')
               && (
-                <Grid item xs={6} style={{ textAlign: 'center' }}>
+                <Grid item xs={t('drawerGridAdvancedWidth')} style={{ textAlign: 'center' }}>
                   <Button
                     onClick={toggleDialog(true, category, 'filters')}
                     variant="contained"
@@ -133,7 +133,7 @@ export default function Sidebar({
       <Grid
         container
         alignItems="center"
-        justify="center"
+        justifyContent="center"
       >
         <Grid
           item

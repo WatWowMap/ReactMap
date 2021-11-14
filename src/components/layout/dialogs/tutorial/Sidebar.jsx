@@ -22,15 +22,16 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
         container
         direction="row"
         alignItems="center"
-        justify="center"
+        justifyContent="center"
         spacing={2}
+        style={{ height: '100%' }}
       >
-        <Grid item xs={8}>
+        <Grid item xs={8} style={{ textAlign: 'center' }}>
           <Typography variant={isMobile ? 'subtitle2' : 'h6'} align="center">
             {t('tutorialSidebar0')}
           </Typography>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={4} style={{ textAlign: 'center' }}>
           <Fab color="primary">
             <Menu />
           </Fab>
@@ -47,7 +48,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
           container
           spacing={2}
           direction="row"
-          justify="center"
+          justifyContent="center"
           alignItems="center"
           style={{
             width: 300,
@@ -70,7 +71,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
               />
             )
           })}
-          <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <Grid item xs={t('drawerGridOptionsWidth')} style={{ textAlign: 'center' }}>
             <Button
               onClick={toggleDialog(true, 'pokestops', 'options')}
               variant="contained"
@@ -80,7 +81,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
               {t('options')}
             </Button>
           </Grid>
-          <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <Grid item xs={t('drawerGridAdvancedWidth')} style={{ textAlign: 'center' }}>
             <Button
               onClick={toggleDialog(true, 'pokestops', 'filters')}
               variant="contained"

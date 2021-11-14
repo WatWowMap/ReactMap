@@ -1,4 +1,4 @@
-const { clearOtherSessions } = require('../session-store')
+const { clearOtherSessions } = require('../sessionStore')
 
 module.exports = async (client, member) => {
   try {

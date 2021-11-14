@@ -3,15 +3,17 @@ import * as gymIndex from './queries/gym'
 import * as pokestopIndex from './queries/pokestop'
 import * as pokemonIndex from './queries/pokemon'
 import getAllSpawnpoints from './queries/spawnpoint'
-import getAllPortals from './queries/portal'
+import * as portalIndex from './queries/portal'
 import getAllWeather from './queries/weather'
 import getAllS2cells from './queries/s2cell'
 import getAllSubmissionCells from './queries/submissionCells'
 import { getOne, getAllNests } from './queries/nest'
 import getAllScanAreas from './queries/scanAreas'
 import * as searchIndex from './queries/search'
+import * as webhookIndex from './queries/webhook'
+import getGeocoder from './queries/geocoder'
 
-class Query {
+export default class Query {
   static devices() {
     return getAllDevices
   }
@@ -21,7 +23,7 @@ class Query {
       return gymIndex.getOne
     }
     const permObj = {
-      Gyms: filters.raids ? filters.gyms || perms.gyms : filters.gyms && perms.gyms,
+      Gyms: filters.raids ? filters.allGyms || perms.allGyms : filters.allGyms && perms.allGyms,
       Raids: filters.raids && perms.raids,
     }
     let query = 'get'
@@ -81,8 +83,12 @@ class Query {
     return pokemonIndex[query]
   }
 
-  static portals() {
-    return getAllPortals
+  static portals(filters) {
+    if (filters === 'id') {
+      return portalIndex.getOne
+    }
+
+    return portalIndex.getAllPortals
   }
 
   static s2cells() {
@@ -107,12 +113,19 @@ class Query {
 
   static search(category) {
     switch (category) {
-      default: return searchIndex.poi
       case 'raids':
       case 'nests':
       case 'quests': return searchIndex[category]
+      case 'webhook': return searchIndex.poiWebhook
+      default: return searchIndex.poi
     }
   }
-}
 
-export default Query
+  static webhook(type) {
+    return webhookIndex[type]
+  }
+
+  static geocoder() {
+    return getGeocoder
+  }
+}

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
@@ -6,8 +7,8 @@
 /* global BigInt */
 const Discord = require('discord.js')
 const fs = require('fs')
-const { alwaysEnabledPerms, discord } = require('./config')
-const areas = require('./areas.js')
+const { alwaysEnabledPerms, discord, webhooks } = require('./config')
+const Utility = require('./Utility')
 
 const client = new Discord.Client()
 
@@ -62,71 +63,59 @@ class DiscordClient {
           client.on(eventName, event.bind(null, client))
         })
       })
-    } catch (err) {
-      console.error('Failed to activate an event')
+    } catch (e) {
+      console.error('Failed to activate an event', e.message)
     }
   }
 
   async getPerms(user) {
-    const perms = {}
-    Object.keys(discord.perms).map(perm => perms[perm] = false)
+    const perms = Object.fromEntries(Object.keys(discord.perms).map(x => [x, false]))
     perms.areaRestrictions = []
-    const { guildsFull } = user
-    const guilds = user.guilds.map(guild => guild.id)
-    if (discord.allowedUsers.includes(user.id)) {
-      Object.keys(perms).forEach((key) => perms[key] = true)
-      perms.areaRestrictions = []
-      console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
-      return perms
-    }
-    for (let i = 0; i < discord.blockedGuilds.length; i += 1) {
-      const guildId = discord.blockedGuilds[i]
-      if (guilds.includes(guildId)) {
-        perms.blocked = guildsFull.find(x => x.id === guildId).name
+    perms.webhooks = []
+    try {
+      const { guildsFull } = user
+      const guilds = user.guilds.map(guild => guild.id)
+      if (discord.allowedUsers.includes(user.id)) {
+        Object.keys(perms).forEach((key) => perms[key] = true)
+        perms.areaRestrictions = []
+        perms.webhooks = webhooks.map(x => x.name)
+        console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
         return perms
       }
-    }
-    for (let i = 0; i < discord.allowedGuilds.length; i += 1) {
-      const guildId = discord.allowedGuilds[i]
-      if (guilds.includes(guildId)) {
-        const keys = Object.keys(discord.perms)
-        const userRoles = await this.getUserRoles(guildId, user.id)
-        // Roles & Perms
-        for (let j = 0; j < keys.length; j += 1) {
-          const key = keys[j]
-          const configItem = discord.perms[key]
-          if (configItem.enabled) {
-            if (alwaysEnabledPerms.includes(key)) {
-              perms[key] = true
-            } else {
-              for (let k = 0; k < userRoles.length; k += 1) {
-                if (configItem.roles.includes(userRoles[k])) {
-                  perms[key] = true
+      for (let i = 0; i < discord.blockedGuilds.length; i += 1) {
+        const guildId = discord.blockedGuilds[i]
+        if (guilds.includes(guildId)) {
+          perms.blocked = guildsFull.find(x => x.id === guildId).name
+          return perms
+        }
+      }
+      for (let i = 0; i < discord.allowedGuilds.length; i += 1) {
+        const guildId = discord.allowedGuilds[i]
+        if (guilds.includes(guildId)) {
+          const keys = Object.keys(discord.perms)
+          const userRoles = await this.getUserRoles(guildId, user.id)
+          // Roles & Perms
+          for (let j = 0; j < keys.length; j += 1) {
+            const key = keys[j]
+            const configItem = discord.perms[key]
+            if (configItem.enabled) {
+              if (alwaysEnabledPerms.includes(key)) {
+                perms[key] = true
+              } else {
+                for (let k = 0; k < userRoles.length; k += 1) {
+                  if (configItem.roles.includes(userRoles[k])) {
+                    perms[key] = true
+                  }
                 }
               }
             }
           }
-        }
-        // Area Restriction Rules
-        if (Object.keys(areas.names).length > 0) {
-          for (let j = 0; j < userRoles.length; j += 1) {
-            discord.areaRestrictions.forEach(rule => {
-              if (rule.roles.includes(userRoles[j])) {
-                if (rule.areas.length > 0) {
-                  rule.areas.forEach(areaName => {
-                    if (areas.names.includes(areaName)) {
-                      perms.areaRestrictions.push(areaName)
-                    }
-                  })
-                }
-              }
-            })
-          }
+          perms.areaRestrictions = Utility.areaPerms(userRoles, 'discord')
+          perms.webhooks = Utility.webhookPerms(userRoles, 'discordRoles')
         }
       }
-    }
-    if (perms.areaRestrictions.length > 0) {
-      perms.areaRestrictions = [...new Set(perms.areaRestrictions)]
+    } catch (e) {
+      console.warn('Failed to get perms for user', user.id, e.message)
     }
     return perms
   }
@@ -135,11 +124,15 @@ class DiscordClient {
     if (!channelId) {
       return
     }
-    const channel = await client.channels.cache
-      .get(channelId)
-      .fetch()
-    if (channel && message) {
-      channel.send(message)
+    try {
+      const channel = await client.channels.cache
+        .get(channelId)
+        .fetch()
+      if (channel && message) {
+        channel.send(message)
+      }
+    } catch (e) {
+      console.error('Failed to send message to discord', e.message)
     }
   }
 }

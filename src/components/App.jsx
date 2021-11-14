@@ -9,10 +9,12 @@ import {
 } from '@apollo/client'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
-import AbortableLink from '@classes/AbortableLink';
+import AbortableLink from '@classes/AbortableLink'
+import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
 import Auth from './Auth'
 import Login from './Login'
+import RouteChangeTracker from './RouteChangeTracker'
 
 const client = new ApolloClient({
   uri: '/graphql',
@@ -38,17 +40,47 @@ const client = new ApolloClient({
           },
         },
       },
+      Pokestop: {
+        fields: {
+          quests: {
+            merge(existing, incoming) {
+              return incoming
+            },
+          },
+          invasions: {
+            merge(existing, incoming) {
+              return incoming
+            },
+          },
+        },
+      },
     },
   }),
 })
 
 export default function App() {
-  const [serverSettings, setServerSettings] = useState(undefined)
+  const [serverSettings, setServerSettings] = useState(null)
 
   const getServerSettings = async () => {
-    setServerSettings(await Fetch.getSettings())
+    const data = await Fetch.getSettings()
+    const Icons = data.masterfile ? new UIcons(data.config.icons, data.masterfile.questRewardTypes) : null
+    if (Icons) {
+      await Icons.fetchIcons(data.config.icons.styles)
+      if (data.config.icons.defaultIcons) {
+        Icons.setSelection(data.config.icons.defaultIcons)
+      }
+    }
+    if (data.ui?.pokestops?.invasions && data.config?.map.fetchLatestInvasions) {
+      const invasionCache = JSON.parse(localStorage.getItem('invasions_cache'))
+      const cacheTime = data.config.map.invasionCacheHrs * 60 * 60 * 1000
+      if (invasionCache && invasionCache.lastFetched + cacheTime > Date.now()) {
+        data.masterfile.invasions = invasionCache
+      } else {
+        data.masterfile.invasions = await Fetch.getInvasions(data.masterfile.invasions)
+      }
+    }
+    setServerSettings({ ...data, Icons })
   }
-
   useEffect(() => {
     getServerSettings()
   }, [])
@@ -57,18 +89,13 @@ export default function App() {
     <Suspense fallback="Loading translations...">
       <ApolloProvider client={client}>
         <Router>
+          {(process.env && process.env.GOOGLE_ANALYTICS_ID) && <RouteChangeTracker />}
           <Switch>
             <Route exact path="/">
               {serverSettings && <Auth serverSettings={serverSettings} />}
             </Route>
-            <Route exact path="/@/:lat/:lon/:zoom">
-              {serverSettings && <Auth serverSettings={serverSettings} />}
-            </Route>
-            <Route exact path="/id/:category/:id/:zoom">
-              {serverSettings && <Auth serverSettings={serverSettings} />}
-            </Route>
             <Route exact path="/login">
-              <Login clickedTwice />
+              <Login clickedTwice serverSettings={serverSettings} />
             </Route>
           </Switch>
         </Router>

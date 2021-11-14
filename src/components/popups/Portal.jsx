@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useState, useEffect } from 'react'
 import { Grid, Typography, IconButton } from '@material-ui/core'
 import { Map } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
-export default function PortalPopup({ portal, ts }) {
+export default function PortalPopup({ portal, ts, Icons }) {
   const { navigation } = useStore(state => state.settings)
   const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
   const { t } = useTranslation()
@@ -17,7 +17,7 @@ export default function PortalPopup({ portal, ts }) {
 
   const src = imageUrl
     ? imageUrl.replace('http://', 'https://')
-    : '/images/misc/pokestop.png'
+    : Icons.getMisc('portal')
 
   const extraMetaData = [
     {
@@ -30,12 +30,16 @@ export default function PortalPopup({ portal, ts }) {
     },
   ]
 
+  useEffect(() => {
+    Utility.analytics('Popup', `Name: ${name}`, 'Portal')
+  }, [])
+
   return (
     <Grid
       container
       style={{ width: 200 }}
       direction="row"
-      justify="space-evenly"
+      justifyContent="space-evenly"
       alignItems="center"
       spacing={1}
     >
@@ -67,20 +71,14 @@ export default function PortalPopup({ portal, ts }) {
           />
         </a>
       </Grid>
-      {extraMetaData.map(meta => (
-        <Fragment key={meta.description}>
-          <Grid item xs={5} style={{ textAlign: 'left' }}>
-            <Typography variant="caption" align="center">
-              {meta.description}
-            </Typography>
-          </Grid>
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
-            <Typography variant="caption" align="center">
-              {meta.data}
-            </Typography>
-          </Grid>
-        </Fragment>
-      ))}
+      <Grid item xs={12} style={{ textAlign: 'center' }}>
+        {extraMetaData.map(meta => (
+          <Fragment key={meta.description}>
+            <Typography variant="subtitle1" style={{ textAlign: 'center' }}>{meta.description}</Typography>
+            <Typography variant="caption" style={{ textAlign: 'center' }}>{meta.data}</Typography>
+          </Fragment>
+        ))}
+      </Grid>
       <Grid item xs={4} style={{ textAlign: 'center' }}>
         <IconButton
           href={url.replace('{x}', lat).replace('{y}', lon)}

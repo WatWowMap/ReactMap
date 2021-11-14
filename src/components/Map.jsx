@@ -1,9 +1,12 @@
-import React, { useState, useCallback } from 'react'
-import { TileLayer, useMap } from 'react-leaflet'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { TileLayer, useMap, ZoomControl } from 'react-leaflet'
+import L from 'leaflet'
 
+import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
+import Webhook from './layout/dialogs/webhooks/Webhook'
 
 const userSettingsCategory = category => {
   switch (category) {
@@ -16,106 +19,167 @@ const userSettingsCategory = category => {
   }
 }
 
-export default function Map({ serverSettings: { config: { map: config, tileServers, icons } }, params }) {
+const getTileServer = (tileServers, settings, isNight) => {
+  if (tileServers[settings.tileServers].name === 'auto') {
+    return isNight
+      ? Object.values(tileServers).find(server => server.style === 'dark')
+      : Object.values(tileServers).find(server => server.style === 'light')
+  }
+  return tileServers[settings.tileServers]
+}
+
+export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons, webhooks }, params }) {
+  Utility.analytics(window.location.pathname)
+
   const map = useMap()
-  const filters = useStore(state => state.filters)
-  const { tileServers: userTiles, icons: userIcons } = useStore(state => state.settings)
-  const availableForms = useStatic(state => state.availableForms)
+
   const staticUserSettings = useCallback(useStatic(state => state.userSettings))
   const ui = useCallback(useStatic(state => state.ui))
   const available = useCallback(useStatic(state => state.available))
   const staticFilters = useCallback(useStatic(state => state.filters))
-  const setLocation = useStore(state => state.setLocation)
+
+  const filters = useStore(state => state.filters)
+  const settings = useStore(state => state.settings)
+  const icons = useStore(state => state.icons)
+  const setLocation = useStore(s => s.setLocation)
+  const isNight = useStatic(state => state.isNight)
+  const setIsNight = useStatic(state => state.setIsNight)
   const setZoom = useStore(state => state.setZoom)
   const userSettings = useStore(state => state.userSettings)
-  const [manualParams, setManualParams] = useState(false)
 
-  const initialBounds = {
+  const [webhookMode, setWebhookMode] = useState(false)
+  const [initialBounds] = useState({
     minLat: map.getBounds()._southWest.lat,
     maxLat: map.getBounds()._northEast.lat,
     minLon: map.getBounds()._southWest.lng,
     maxLon: map.getBounds()._northEast.lng,
-  }
+    zoom: map.getZoom(),
+  })
+  const [manualParams, setManualParams] = useState(params)
+  const [lc] = useState(L.control.locate({
+    position: 'bottomright',
+    icon: 'fas fa-location-arrow',
+    keepCurrentZoomLevel: true,
+    setView: 'untilPan',
+  }))
 
-  const onMove = useCallback(() => {
-    const newCenter = map.getCenter()
+  const onMove = useCallback((latLon) => {
+    const newCenter = latLon || map.getCenter()
     setLocation([newCenter.lat, newCenter.lng])
-    setZoom(map.getZoom())
+    setZoom(Math.floor(map.getZoom()))
+    setIsNight(Utility.nightCheck(newCenter.lat, newCenter.lng))
   }, [map])
 
-  if (manualParams) {
-    params.id = manualParams.id
-  }
+  const tileServer = useMemo(() => getTileServer(tileServers, settings, isNight), [settings.tileServers])
+
+  useEffect(() => {
+    if (settings.navigationControls === 'leaflet') {
+      lc.addTo(map)
+    } else {
+      lc.remove()
+    }
+  }, [settings.navigationControls])
 
   return (
     <>
       <TileLayer
-        key={tileServers[userTiles].name}
-        attribution={tileServers[userTiles].attribution}
-        url={tileServers[userTiles].url}
+        key={tileServer.name}
+        attribution={tileServer.attribution}
+        url={tileServer.url}
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
       />
-      {Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
-        const [category, value] = each
-        let enabled = false
-        switch (category) {
-          default:
-            if (filters[category]
-              && filters[category].enabled
-              && value) {
-              enabled = true
-            } break
-          case 'gyms':
-            if ((filters[category].gyms && value.gyms)
-              || (filters[category].raids && value.raids)
-              || (filters[category].exEligible && value.exEligible)
-              || (filters[category].inBattle && value.inBattle)
-              || (filters[category].arEligible && value.arEligible)) {
-              enabled = true
-            } break
-          case 'nests':
-            if (((filters[category].pokemon && value.pokemon)
-              || (filters[category].polygons && value.polygons))) {
-              enabled = true
-            } break
-          case 'pokestops':
-            if ((filters[category].allPokestops && value.allPokestops)
-              || (filters[category].lures && value.lures)
-              || (filters[category].invasions && value.invasions)
-              || (filters[category].quests && value.quests)
-              || (filters[category].arEligible && value.arEligible)) {
-              enabled = true
-            } break
-        }
-        if (enabled) {
-          return (
-            <QueryData
-              key={category}
-              bounds={initialBounds}
-              onMove={onMove}
-              perms={value}
-              map={map}
-              category={category}
-              config={config}
-              available={available[category]}
-              availableForms={availableForms}
-              path={icons[userIcons].path}
-              iconModifiers={icons[userIcons].iconModifiers ? icons[userIcons].iconModifiers[category]
-                : { offsetX: 0, offsetY: 0, sizeMultiplier: 0 }}
-              staticFilters={staticFilters[category].filter}
-              userSettings={userSettings[userSettingsCategory(category)] || {}}
-              filters={filters[category]}
-              tileStyle={tileServers[userTiles].style}
-              zoomLevel={config.clusterZoomLevels[category] || 1}
-              staticUserSettings={staticUserSettings[category]}
-              params={params}
-            />
-          )
-        }
-        return null
-      })}
-      <Nav map={map} setManualParams={setManualParams} />
+      {settings.navigationControls === 'leaflet' && <ZoomControl position="bottomright" />}
+      {
+        (webhooks && webhookMode) ? (
+          <Webhook
+            map={map}
+            webhookMode={webhookMode}
+            setWebhookMode={setWebhookMode}
+            Icons={Icons}
+          />
+        ) : (
+          Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
+            const [category, value] = each
+            let enabled = false
+
+            switch (category) {
+              case 'scanAreas':
+                if ((filters[category] && filters[category].enabled)
+                  || webhookMode === 'areas') {
+                  enabled = true
+                } break
+              case 'gyms':
+                if (((filters[category].allGyms && value.allGyms)
+                  || (filters[category].raids && value.raids)
+                  || (filters[category].exEligible && value.exEligible)
+                  || (filters[category].inBattle && value.inBattle)
+                  || (filters[category].arEligible && value.arEligible))
+                  && !webhookMode) {
+                  enabled = true
+                } break
+              case 'nests':
+                if (((filters[category].pokemon && value.pokemon)
+                  || (filters[category].polygons && value.polygons))
+                  && !webhookMode) {
+                  enabled = true
+                } break
+              case 'pokestops':
+                if (((filters[category].allPokestops && value.allPokestops)
+                  || (filters[category].lures && value.lures)
+                  || (filters[category].invasions && value.invasions)
+                  || (filters[category].quests && value.quests)
+                  || (filters[category].arEligible && value.arEligible))
+                  && !webhookMode) {
+                  enabled = true
+                } break
+              default:
+                if (filters[category]
+                  && filters[category].enabled
+                  && value && !webhookMode) {
+                  enabled = true
+                } break
+            }
+            if (enabled) {
+              Utility.analytics('Data', `${category} being fetched`, category, true)
+              return (
+                <QueryData
+                  key={category}
+                  bounds={initialBounds}
+                  onMove={onMove}
+                  perms={value}
+                  map={map}
+                  category={category}
+                  config={config}
+                  available={available[category]}
+                  Icons={Icons}
+                  staticFilters={staticFilters[category].filter}
+                  userIcons={icons}
+                  userSettings={userSettings[userSettingsCategory(category)] || {}}
+                  filters={filters[category]}
+                  tileStyle={tileServer.style}
+                  clusterZoomLvl={config.clusterZoomLevels[category]}
+                  staticUserSettings={staticUserSettings[category]}
+                  params={manualParams}
+                  setParams={setManualParams}
+                  isNight={isNight}
+                />
+              )
+            }
+            return null
+          })
+        )
+      }
+      <Nav
+        map={map}
+        setManualParams={setManualParams}
+        Icons={Icons}
+        config={config}
+        webhookMode={webhookMode}
+        setWebhookMode={setWebhookMode}
+        webhooks={webhooks}
+        settings={settings}
+      />
     </>
   )
 }

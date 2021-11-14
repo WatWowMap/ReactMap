@@ -1,5 +1,5 @@
 const {
-  GraphQLObjectType, GraphQLID, GraphQLInt, GraphQLFloat,
+  GraphQLObjectType, GraphQLID, GraphQLInt, GraphQLFloat, GraphQLString,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
 
@@ -36,5 +36,6 @@ module.exports = new GraphQLObjectType({
     bestPvp: { type: GraphQLInt },
     ditto_form: { type: GraphQLInt },
     display_pokemon_id: { type: GraphQLInt },
+    seen_type: { type: GraphQLString },
   }),
 })

@@ -1,16 +1,20 @@
 /* eslint-disable no-restricted-syntax */
 const fs = require('fs')
 const path = require('path')
-const { discord: { areaRestrictions } } = require('./config.js')
+const {
+  discord: { areaRestrictions: discord },
+  telegram: { areaRestrictions: telegram },
+} = require('./config')
 
 const loadAreas = () => {
   let areas = {}
   const areasFilePath = path.resolve(__dirname, '../configs/areas.json')
   try {
-    const data = fs.readFileSync(areasFilePath, 'utf8')
-    areas = JSON.parse(data)
+    // eslint-disable-next-line global-require
+    const data = fs.existsSync(areasFilePath, 'utf8') ? require('../configs/areas.json') : Error('Areas file not found')
+    areas = data
   } catch (err) {
-    const showWarning = areaRestrictions.some(rule => rule.roles.length > 0)
+    const showWarning = discord.some(rule => rule.roles.length) || telegram.some(rule => rule.roles.length)
     if (showWarning) {
       console.warn('[Area Restrictions] Disabled - `areas.json` file is missing or broken.')
     }

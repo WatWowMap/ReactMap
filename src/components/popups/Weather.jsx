@@ -6,22 +6,26 @@ import { useTranslation } from 'react-i18next'
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
-export default function WeatherPopup({ weather, ts }) {
+export default function WeatherPopup({ weather, ts, Icons }) {
   const { t } = useTranslation()
-  const { weatherTypes } = useStatic(state => state.masterfile)
+  const { weather: weatherTypes } = useStatic(state => state.masterfile)
   const { gameplay_condition, updated } = weather
+
+  useEffect(() => {
+    Utility.analytics('Popup', `Type: ${t(`weather_${gameplay_condition}`)}`, 'Weather')
+  }, [])
 
   return (
     <Grid
       container
       direction="row"
-      justify="center"
+      justifyContent="center"
       alignItems="center"
       style={{ width: 150 }}
     >
       <Grid item xs={12}>
         <Typography variant="h6" align="center">
-          {t(`weather${gameplay_condition}`)}
+          {t(`weather_${gameplay_condition}`)}
         </Typography>
       </Grid>
       <Grid item xs={12}>
@@ -38,10 +42,10 @@ export default function WeatherPopup({ weather, ts }) {
       {weatherTypes[gameplay_condition].types.map(type => (
         <Grid item xs={4} key={type} style={{ textAlign: 'center' }}>
           <Typography variant="caption">
-            {t(type)}
+            {t(`poke_type_${type}`)}
           </Typography>
           <img
-            src={`images/type/${type.toLowerCase()}.png`}
+            src={Icons.getTypes(type)}
             style={{
               maxWidth: 30,
               maxHeight: 30,

@@ -1,20 +1,30 @@
-import React, { memo, useState } from 'react'
+import React, {
+  memo, useRef, useEffect, useState,
+} from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
-import DevicePoly from '../popups/DevicePoly'
 import deviceMarker from '../markers/device'
 import PopupContent from '../popups/Device'
+import DevicePoly from '../popups/DevicePoly'
 
 const DeviceTile = ({
-  item, ts, iconSizes, userSettings,
+  item, ts, Icons, userSettings,
 }) => {
   const [poly, setPoly] = useState(false)
-  const status = ts - item.last_seen < 900 ? '0' : '1'
+  const markerRef = useRef(null)
+  const status = ts - item.last_seen < 900 ? 'online' : 'offline'
+
+  useEffect(() => {
+    if (poly && markerRef) {
+      markerRef.current.openPopup()
+    }
+  })
 
   return (
     <Marker
       position={[item.last_lat, item.last_lon]}
-      icon={deviceMarker(status, iconSizes)}
+      icon={deviceMarker(status, Icons)}
+      ref={markerRef}
     >
       <Popup
         position={[item.last_lat, item.last_lon]}
@@ -23,7 +33,7 @@ const DeviceTile = ({
       >
         <PopupContent
           device={item}
-          status={parseInt(status)}
+          status={status}
           ts={ts}
         />
       </Popup>
@@ -37,7 +47,6 @@ const areEqual = (prev, next) => (
   && prev.item.last_lat === next.item.last_lat
   && prev.item.last_lon === next.item.last_lon
   && prev.item.last_seen === next.item.last_seen
-  && prev.userSettings.devicePathColor === next.userSettings.devicePathColor
 )
 
 export default memo(DeviceTile, areEqual)

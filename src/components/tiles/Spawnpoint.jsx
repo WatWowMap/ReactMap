@@ -2,13 +2,12 @@ import React, { memo } from 'react'
 import { Circle, Popup } from 'react-leaflet'
 
 import PopupContent from '../popups/Spawnpoint'
-import marker from '../markers/spawnpoint'
 
-const SpawnpointTile = ({ item, iconSizes, ts }) => (
+const SpawnpointTile = ({ item, Icons, ts }) => (
   <Circle
     center={[item.lat, item.lon]}
-    radius={iconSizes.md}
-    pathOptions={marker(item)}
+    radius={Icons.getSize('spawnpoint')}
+    pathOptions={{ color: item.despawn_sec ? 'green' : 'red' }}
   >
     <Popup position={[item.lat, item.lon]}>
       <PopupContent spawnpoint={item} ts={ts} />

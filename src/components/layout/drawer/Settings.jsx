@@ -1,31 +1,30 @@
 import React, { useState } from 'react'
 import {
-  FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Slide, Dialog,
+  FormControl, Grid, InputLabel, MenuItem, Select, Button, Snackbar, Dialog,
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic } from '../../../hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
+import SlideTransition from '@assets/mui/SlideTransition'
+import Utility from '@services/Utility'
+
 import UserProfile from '../dialogs/UserProfile'
-import Tutorial from '../dialogs/tutorial/Tutorial'
 import Feedback from '../dialogs/Feedback'
 
-function SlideTransition(props) {
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  return <Slide {...props} direction="up" />
-}
-
-export default function Settings({ toggleDialog }) {
+export default function Settings({ Icons }) {
   const { t, i18n } = useTranslation()
   const config = useStatic(state => state.config)
   const staticSettings = useStatic(state => state.settings)
-  const { discord, loggedIn } = useStatic(state => state.auth)
-  const setAvailableForms = useStatic(state => state.setAvailableForms)
-  const tutorial = useStore(state => state.tutorial)
+  const { loggedIn } = useStatic(state => state.auth)
+  const setStaticIcons = useStatic(state => state.setIcons)
+
   const setTutorial = useStore(state => state.setTutorial)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
+  const icons = useStore(state => state.icons)
+  const setIcons = useStore(state => state.setIcons)
 
   const [alert, setAlert] = useState(false)
   const [userProfile, setUserProfile] = useState(false)
@@ -39,9 +38,13 @@ export default function Settings({ toggleDialog }) {
     if (event.target.name === 'localeSelection') {
       i18n.changeLanguage(event.target.value)
     }
-    if (event.target.name === 'icons') {
-      setAvailableForms(new Set(config[event.target.name][event.target.value].pokemonList))
-    }
+  }
+
+  const handleIconChange = event => {
+    const { name, value } = event.target
+    Icons.setSelection(name, value)
+    setStaticIcons(Icons)
+    setIcons({ ...icons, [name]: value })
   }
 
   const clearStorage = () => {
@@ -77,14 +80,14 @@ export default function Settings({ toggleDialog }) {
       localStorage.setItem('local-state', contents)
     }
     reader.readAsText(file)
-    window.location.reload()
+    setTimeout(() => window.location.reload(), 1500)
   }
 
   return (
     <Grid
       container
       direction="row"
-      justify="space-evenly"
+      justifyContent="space-evenly"
       alignItems="center"
       spacing={1}
     >
@@ -95,7 +98,7 @@ export default function Settings({ toggleDialog }) {
             <Select
               autoFocus
               name={setting}
-              value={config[setting][settings[setting]].name}
+              value={config[setting][settings[setting]]?.name}
               onChange={handleChange}
               fullWidth
             >
@@ -104,7 +107,30 @@ export default function Settings({ toggleDialog }) {
                   key={option}
                   value={option}
                 >
-                  {t(`${setting}${option}`)}
+                  {t(`${setting}${option}`, Utility.getProperName(option))}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      ))}
+      {Icons.customizable.map(category => (
+        <Grid item key={category} xs={10}>
+          <FormControl style={{ width: 200, margin: 5 }}>
+            <InputLabel>{t(`${category}Icons`, `${category} Icons`)}</InputLabel>
+            <Select
+              autoFocus
+              name={category}
+              value={icons[category]}
+              onChange={handleIconChange}
+              fullWidth
+            >
+              {Icons[category].map(option => (
+                <MenuItem
+                  key={option}
+                  value={option}
+                >
+                  {t(`${category}${option}`, Utility.getProperName(option))}
                 </MenuItem>
               ))}
             </Select>
@@ -112,14 +138,14 @@ export default function Settings({ toggleDialog }) {
         </Grid>
       ))}
       <Grid
-        justify="space-evenly"
+        justifyContent="space-evenly"
         alignItems="center"
         container
         item
         spacing={3}
         style={{ margin: '10px 0px' }}
       >
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawerSettingsProfileWidth')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -130,43 +156,33 @@ export default function Settings({ toggleDialog }) {
             {t('profile')}
           </Button>
         </Grid>
-        {discord && (
-          <Grid item xs={6} style={{ textAlign: 'center' }}>
-            {loggedIn ? (
+        <Grid item xs={t('drawerSettingsLogoutWidth')} style={{ textAlign: 'center' }}>
+          {loggedIn ? (
+            <Button
+              className="sidebar-button"
+              variant="contained"
+              style={{ minWidth: 100 }}
+              color="primary"
+              size="small"
+              href="/logout"
+            >
+              {t('logout')}
+            </Button>
+          ) : (
+            <Link to="/login" style={{ textDecoration: 'none' }}>
               <Button
                 className="sidebar-button"
                 variant="contained"
-                style={{
-                  backgroundColor: 'rgb(114,136,218)',
-                  color: 'white',
-                  minWidth: 100,
-                }}
+                style={{ minWidth: 100 }}
+                color="primary"
                 size="small"
-                href="/logout"
               >
-                <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
-                {t('logout')}
+                {t('login')}
               </Button>
-            ) : (
-              <Link to="/login" style={{ textDecoration: 'none' }}>
-                <Button
-                  className="sidebar-button"
-                  variant="contained"
-                  style={{
-                    backgroundColor: 'rgb(114,136,218)',
-                    color: 'white',
-                    minWidth: 100,
-                  }}
-                  size="small"
-                >
-                  <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
-                  {t('login')}
-                </Button>
-              </Link>
-            )}
-          </Grid>
-        )}
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+            </Link>
+          )}
+        </Grid>
+        <Grid item xs={t('drawerSettingsTutorialWidth')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -177,7 +193,7 @@ export default function Settings({ toggleDialog }) {
             {t('tutorial')}
           </Button>
         </Grid>
-        <Grid item xs={discord ? 6 : 12} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawerSettingsResetFiltersWidth')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -188,7 +204,7 @@ export default function Settings({ toggleDialog }) {
             {t('resetFilters')}
           </Button>
         </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawerSettingsExportSettingsWidth')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -199,7 +215,7 @@ export default function Settings({ toggleDialog }) {
             {t('export')}
           </Button>
         </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawerSettingsImportSettingsWidth')} style={{ textAlign: 'center' }}>
           <input
             accept="application/json"
             id="contained-button-file"
@@ -209,6 +225,7 @@ export default function Settings({ toggleDialog }) {
           />
           <label htmlFor="contained-button-file">
             <Button
+              component="span"
               style={{ minWidth: 100 }}
               variant="contained"
               color="primary"
@@ -220,7 +237,7 @@ export default function Settings({ toggleDialog }) {
         </Grid>
         {config.map.enableStats
           && (
-            <Grid item xs={6} style={{ textAlign: 'center' }}>
+            <Grid item xs={t('drawerSettingsStatsWidth')} style={{ textAlign: 'center' }}>
               <Button
                 variant="contained"
                 color="secondary"
@@ -236,7 +253,7 @@ export default function Settings({ toggleDialog }) {
           )}
         {config.map.enableFeedback
           && (
-            <Grid item xs={6} style={{ textAlign: 'center' }}>
+            <Grid item xs={t('drawerSettingsFeedbackWidth')} style={{ textAlign: 'center' }}>
               <Button
                 variant="contained"
                 color="primary"
@@ -260,9 +277,6 @@ export default function Settings({ toggleDialog }) {
       </Snackbar>
       <Dialog open={userProfile}>
         <UserProfile setUserProfile={setUserProfile} />
-      </Dialog>
-      <Dialog open={tutorial}>
-        <Tutorial setUserProfile={setUserProfile} setTutorial={setTutorial} toggleDialog={toggleDialog} />
       </Dialog>
       <Dialog
         open={feedback}

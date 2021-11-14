@@ -8,12 +8,14 @@ const core = gql`
     pokemon_id
     form
     gender
+    costume
     first_seen_timestamp
     expire_timestamp
     expire_timestamp_verified
     updated
     display_pokemon_id
     ditto_form
+    seen_type
   }
 `
 
@@ -144,10 +146,10 @@ export const getIvsStatsPvp = gql`
 `
 
 export const getOne = gql`
-  ${core}
   query Data($id: ID!, $perm: String!) {
     pokemonSingle(id: $id, perm: $perm) {
-      ...CorePokemon
+      lat
+      lon
     }
   }
 `

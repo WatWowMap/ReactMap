@@ -2,13 +2,18 @@ import { gql } from '@apollo/client'
 
 const getAllScanAreas = gql`
 query Data {
-  scanAreas {
-    type
-    properties
-    geometry
-    features
+    scanAreas {
+      type
+      features {
+        type
+        properties
+        geometry {
+          type
+          coordinates
+        }
+      }
+    }
   }
-}
 `
 
 export default getAllScanAreas

@@ -1,24 +1,36 @@
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
+/* eslint-disable no-console */
+const fs = require('fs')
 const router = require('express').Router()
 const passport = require('passport')
-const { isValidSession, clearOtherSessions } = require('../services/session-store.js')
+const { isValidSession, clearOtherSessions } = require('../services/sessionStore')
 
-router.get('/discord', passport.authenticate('discord'))
+// Loads up the base auth routes and any custom ones
+fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
+  if (e) return console.error(e)
+  files.forEach((file) => {
+    const trimmed = file.replace('.js', '')
 
-router.get('/discord/callback',
-  passport.authenticate('discord', {
-    failureRedirect: '/',
-  }),
-  async (req, res) => {
-    try {
-      const { id } = req.session.passport.user
-      if (!(await isValidSession(id))) {
-        console.debug('[Session] Detected multiple sessions, clearing old ones...')
-        await clearOtherSessions(id, req.sessionID)
-      }
-      res.redirect('/')
-    } catch (error) {
-      res.status(500).json({ error })
-    }
+    router.get(`/${trimmed}`, passport.authenticate(trimmed))
+    router.get(`/${trimmed}/callback`,
+      passport.authenticate(trimmed, {
+        failureRedirect: '/',
+      }),
+      async (req, res) => {
+        try {
+          const { id } = req.session.passport.user
+          if (!(await isValidSession(id))) {
+            console.debug('[Session] Detected multiple sessions, clearing old ones...')
+            await clearOtherSessions(id, req.sessionID)
+          }
+          res.redirect('/')
+        } catch (err) {
+          res.status(500).json({ err })
+        }
+      })
+    console.log(`${trimmed} route initialized`)
   })
+})
 
 module.exports = router

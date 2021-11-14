@@ -14,29 +14,36 @@ import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
+import GenericTimer from './common/Timer'
+
 export default function PokemonPopup({
-  pokemon, iconUrl, userSettings, isTutorial,
+  pokemon, iconUrl, userSettings, isTutorial, Icons, isNight,
 }) {
   const { t } = useTranslation()
+  const classes = useStyles()
   const {
     pokemon_id, cleanPvp, iv, cp,
   } = pokemon
-  const { pokemon: pokemonPerms } = useStatic(state => state.ui)
-  const perms = isTutorial ? {
+  const { perms } = useStatic(state => state.auth)
+  const pokePerms = isTutorial ? {
     pvp: true, stats: true, iv: true,
-  } : pokemonPerms
+  } : perms
   const { pokemon: { [pokemon_id]: metaData } } = useStatic(state => state.masterfile)
-  const [expanded, setExpanded] = useState(false)
-  const [pvpExpand, setPvpExpand] = useState((userSettings.prioritizePvpInfo && perms.pvp))
+  const popups = useStore(state => state.popups)
+  const setPopups = useStore(state => state.setPopups)
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
+
+  useEffect(() => {
+    Utility.analytics('Popup', `ID: ${pokemon.pokemon_id} IV: ${pokemon.iv}% PVP: #${pokemon.bestPvp}`, 'Pokemon')
+  }, [])
 
   return (
     <Grid
       container
       style={{ minWidth: 200 }}
       alignItems="center"
-      justify="center"
+      justifyContent="center"
       spacing={1}
     >
       <Header
@@ -44,6 +51,10 @@ export default function PokemonPopup({
         metaData={metaData}
         iconUrl={iconUrl}
         t={t}
+        perms={perms}
+        userSettings={userSettings}
+        classes={classes}
+        isTutorial={isTutorial}
       />
       <Timer
         pokemon={pokemon}
@@ -54,7 +65,7 @@ export default function PokemonPopup({
           <Stats
             pokemon={pokemon}
             metaData={metaData}
-            perms={perms}
+            perms={pokePerms}
             t={t}
           />
           <Divider orientation="vertical" flexItem />
@@ -63,31 +74,35 @@ export default function PokemonPopup({
       <Info
         pokemon={pokemon}
         metaData={metaData}
-        perms={perms}
+        perms={pokePerms}
+        Icons={Icons}
+        isNight={isNight}
       />
       <Footer
         pokemon={pokemon}
-        expanded={expanded}
-        setExpanded={setExpanded}
-        pvpExpand={pvpExpand}
-        setPvpExpand={setPvpExpand}
+        popups={popups}
+        setPopups={setPopups}
         hasPvp={hasLeagues.length > 0}
+        classes={classes}
+        Icons={Icons}
       />
-      <Collapse in={pvpExpand} timeout="auto" unmountOnExit>
+      <Collapse in={popups.pvp && perms.pvp} timeout="auto" unmountOnExit>
         {hasLeagues.map(league => (
           <PvpInfo
             key={league}
             league={league}
             data={cleanPvp[league]}
             t={t}
+            Icons={Icons}
           />
         ))}
       </Collapse>
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
+      <Collapse in={popups.extras} timeout="auto" unmountOnExit>
         <ExtraInfo
           pokemon={pokemon}
-          perms={perms}
+          perms={pokePerms}
           t={t}
+          Icons={Icons}
         />
       </Collapse>
     </Grid>
@@ -95,7 +110,7 @@ export default function PokemonPopup({
 }
 
 const Header = ({
-  pokemon, iconUrl, metaData, t,
+  pokemon, metaData, t, iconUrl, userSettings, classes,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -107,8 +122,6 @@ const Header = ({
   const setFilters = useStore(state => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
-
-  const open = Boolean(anchorEl)
   const {
     id, pokemon_id, form, ditto_form, display_pokemon_id,
   } = pokemon
@@ -159,18 +172,34 @@ const Header = ({
     { name: 'exclude', action: handleExclude },
     { name: 'timer', action: handleTimer },
   ]
+
+  const pokeName = t(`poke_${metaData.pokedexId}`)
+  const formName = metaData.forms?.[form]?.name === 'Normal' || form === 0 ? '' : t(`form_${pokemon.form}`)
+
   return (
     <>
       <Grid item xs={3}>
-        <Avatar src={iconUrl} />
+        {userSettings.showDexNumInPopup
+          ? (
+            <Avatar classes={{
+              colorDefault: classes.avatar,
+            }}
+            >{metaData.pokedexId}
+            </Avatar>
+          )
+          : <img src={iconUrl} style={{ maxWidth: 40, maxHeight: 40 }} />}
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'center' }}>
-        <Typography variant="h5">
-          {t(`poke_${metaData.pokedex_id}`)}
+        <Typography variant={pokeName.length > 8 ? 'h6' : 'h5'}>
+          {pokeName}
         </Typography>
-        {ditto_form && (
+        {(ditto_form !== null && display_pokemon_id) ? (
           <Typography variant="caption">
             ({t(`poke_${display_pokemon_id}`)})
+          </Typography>
+        ) : (
+          <Typography variant="caption">
+            {formName}
           </Typography>
         )}
       </Grid>
@@ -185,18 +214,18 @@ const Header = ({
       <Menu
         anchorEl={anchorEl}
         keepMounted
-        open={open}
+        open={Boolean(anchorEl)}
         onClose={handleClose}
         PaperProps={{
           style: {
             maxHeight: 216,
-            width: '20ch',
+            minWidth: '20ch',
           },
         }}
       >
         {options.map((option) => (
-          <MenuItem key={option.name} onClick={option.action}>
-            {t(option.name)}
+          <MenuItem key={option.key || option.name} onClick={option.action}>
+            {typeof option.name === 'string' ? t(option.name) : option.name}
           </MenuItem>
         ))}
       </Menu>
@@ -226,7 +255,7 @@ const Stats = ({ pokemon, perms, t }) => {
       xs={(perms.iv || perms.stats) ? 8 : 1}
       container
       direction="column"
-      justify="space-around"
+      justifyContent="space-around"
       alignItems="center"
     >
       {(perms.iv && iv !== null) && (
@@ -236,14 +265,14 @@ const Stats = ({ pokemon, perms, t }) => {
           </Typography>
         </Grid>
       )}
-      {(perms.stats && iv !== null) && (
+      {(perms.stats && atk_iv !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {atk_iv} | {def_iv} | {sta_iv}
           </Typography>
         </Grid>
       )}
-      {((perms.iv || perms.stats) && iv !== null) && (
+      {(perms.stats && level !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {t('cp')} {cp} | {t('levelAbbreviated')}{level}
@@ -254,8 +283,11 @@ const Stats = ({ pokemon, perms, t }) => {
   )
 }
 
-const Info = ({ pokemon, metaData, perms }) => {
-  const { gender, weather } = pokemon
+const Info = ({
+  pokemon, metaData, perms, Icons, isNight,
+}) => {
+  const { gender, weather, form } = pokemon
+  const formTypes = metaData.forms[form].types || metaData.types
 
   return (
     <Grid
@@ -263,7 +295,7 @@ const Info = ({ pokemon, metaData, perms }) => {
       xs={(perms.iv || perms.stats) ? 3 : 11}
       container
       direction={(perms.iv || perms.stats) ? 'column' : 'row'}
-      justify="space-around"
+      justifyContent="space-around"
       alignItems="center"
     >
       {(weather != 0 && perms.iv) && (
@@ -271,18 +303,24 @@ const Info = ({ pokemon, metaData, perms }) => {
           item
           className="grid-item"
           style={{
-            height: 32,
-            width: 32,
-            backgroundImage: `url(/images/weather/${weather}.png)`,
+            height: 24,
+            width: 24,
+            backgroundImage: `url(${Icons.getWeather(weather, isNight)})`,
           }}
         />
       )}
-      {gender != 3 && (
+      {gender && (
         <Grid item style={{ textAlign: 'center' }}>
-          <Icon>{gender === 1 ? 'male' : 'female'}</Icon>
+          <Icon>
+            {{
+              1: 'male',
+              2: 'female',
+              3: 'transgender',
+            }[gender] || ''}
+          </Icon>
         </Grid>
       )}
-      {metaData.types.map(type => (
+      {formTypes.map(type => (
         <Grid
           item
           key={type}
@@ -290,7 +328,8 @@ const Info = ({ pokemon, metaData, perms }) => {
           style={{
             height: 20,
             width: 20,
-            backgroundImage: `url(/images/type/${type.toLowerCase()}.png)`,
+            marginBottom: 5,
+            backgroundImage: `url(${Icons.getTypes(type)})`,
           }}
         />
       ))}
@@ -330,22 +369,20 @@ const Timer = ({ pokemon, hasStats }) => {
 }
 
 const Footer = ({
-  pokemon, expanded, pvpExpand, setExpanded, setPvpExpand, hasPvp,
+  pokemon, popups, setPopups, hasPvp, classes, Icons,
 }) => {
-  const classes = useStyles()
   const { navigation } = useStore(state => state.settings)
   const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
 
   const { lat, lon } = pokemon
 
-  const handleExpandClick = () => {
-    if (pvpExpand) setPvpExpand(false)
-    setExpanded(!expanded)
-  }
-
-  const handlePvpClick = () => {
-    if (expanded) setExpanded(false)
-    setPvpExpand(!pvpExpand)
+  const handleExpandClick = (category) => {
+    const opposite = category === 'extras' ? 'pvp' : 'extras'
+    setPopups({
+      ...popups,
+      [category]: !popups[category],
+      [opposite]: false,
+    })
   }
 
   return (
@@ -353,14 +390,13 @@ const Footer = ({
       {hasPvp && (
         <Grid item xs={4}>
           <IconButton
-            className={pvpExpand ? classes.expandOpen : classes.expand}
+            className={popups.pvp ? classes.expandOpen : classes.expand}
             name="pvp"
-            onClick={handlePvpClick}
-            aria-expanded={pvpExpand}
-            aria-label="show more"
+            onClick={() => handleExpandClick('pvp')}
+            aria-expanded={popups.pvp}
           >
             <img
-              src="/images/misc/pvp.png"
+              src={Icons.getMisc('pvp')}
               height={20}
               width="auto"
             />
@@ -376,10 +412,9 @@ const Footer = ({
       </Grid>
       <Grid item xs={4}>
         <IconButton
-          className={expanded ? classes.expandOpen : classes.expand}
-          onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more"
+          className={popups.extras ? classes.expandOpen : classes.expand}
+          onClick={() => handleExpandClick('extras')}
+          aria-expanded={popups.extras}
         >
           <ExpandMore style={{ color: 'white' }} />
         </IconButton>
@@ -388,7 +423,9 @@ const Footer = ({
   )
 }
 
-const ExtraInfo = ({ pokemon, perms, t }) => {
+const ExtraInfo = ({
+  pokemon, perms, t, Icons,
+}) => {
   const { moves } = useStatic(state => state.masterfile)
 
   const {
@@ -399,7 +436,7 @@ const ExtraInfo = ({ pokemon, perms, t }) => {
     <Grid
       container
       alignItems="center"
-      justify="center"
+      justifyContent="center"
     >
       {(perms.iv && iv !== null) && [move_1, move_2].map((move, i) => (
         <Fragment key={move}>
@@ -410,47 +447,48 @@ const ExtraInfo = ({ pokemon, perms, t }) => {
             style={{
               height: 15,
               width: 15,
-              backgroundImage: `url(/images/type/${moves[move].type.toLowerCase()}.png)`,
+              backgroundImage: `url(${Icons.getTypes(moves[move].type)})`,
             }}
           />
           <Grid item xs={6}>
-            <Typography variant="caption" align="center">
+            <Typography variant="caption">
               {t(`move_${move}`)}
             </Typography>
           </Grid>
           <Grid item xs={3} style={{ textAlign: 'right' }}>
-            <Typography variant="caption" align="center">
+            <Typography variant="caption">
               {i ? `${weight.toFixed(2)}${t('kilogram')}` : `${size.toFixed(2)}${t('meter')}`}
             </Typography>
           </Grid>
         </Fragment>
       ))}
       {[first_seen_timestamp, updated].map((time, i) => (
-        <Fragment key={time}>
-          <Grid item xs={5} style={{ textAlign: 'center' }}>
-            <Typography variant="caption" align="center">
-              {i ? t('lastSeen') : t('firstSeen')}:
-            </Typography>
-          </Grid>
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
-            <Typography variant="caption" align="center">
-              {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
-            </Typography>
-          </Grid>
-        </Fragment>
+        time ? (
+          <Fragment key={time}>
+            <Grid item xs={t('popupPokemonSeenDescriptionWidth')} style={{ textAlign: 'center' }}>
+              <Typography variant="caption">
+                {i ? t('lastSeen') : t('firstSeen')}:
+              </Typography>
+            </Grid>
+            <Grid item xs={t('popupPokemonSeenTimerWidth')} style={{ textAlign: 'right' }}>
+              <GenericTimer expireTime={time} />
+            </Grid>
+            <Grid item xs={t('popupPokemonSeenDataWidth')} style={{ textAlign: 'right' }}>
+              <Typography variant="caption">
+                {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
+              </Typography>
+            </Grid>
+          </Fragment>
+        ) : null
       ))}
     </Grid>
   )
 }
 
 const PvpInfo = ({
-  league, data, t,
+  league, data, t, Icons,
 }) => {
   if (data === null) return ''
-
-  const { icons } = useStore(state => state.settings)
-  const { icons: { [icons]: { path } } } = useStatic(state => state.config)
-  const availableForms = useStatic(state => state.availableForms)
 
   const rows = []
 
@@ -458,7 +496,10 @@ const PvpInfo = ({
     if (each.rank !== null && each.cp !== null) {
       const tempRow = {
         id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.gender}-${each.rank}-${each.cp}-${each.lvl}-${each.cap}`,
-        img: <img src={`${path}/${Utility.getPokemonIcon(availableForms, each.pokemon, each.form, each.evolution, each.gender, each.costume)}.png`} height={20} />,
+        img: <img
+          src={Icons.getPokemon(each.pokemon, each.form, each.evolution, each.gender, each.costume)}
+          height={20}
+        />,
         rank: each.rank || 0,
         cp: each.cp || 0,
         lvl: `${each.level || ''}${each.cap && !each.capped ? `/${each.cap}` : ''}`,
@@ -468,13 +509,12 @@ const PvpInfo = ({
     }
   })
   const rowClass = { width: 30, fontWeight: 'bold' }
-  const src = league === 'great' || league === 'ultra' ? league : 'cup'
 
   return (
     <table className="table-pvp">
       <thead>
         <tr>
-          <td style={rowClass}><img src={`/images/misc/${src}.png`} height={20} /></td>
+          <td style={rowClass}><img src={Icons.getMisc(league === 'great' || league === 'ultra' ? league : 'cup')} height={20} /></td>
           <td style={rowClass}>{t('rank')}</td>
           <td style={rowClass}>{t('cp')}</td>
           <td style={rowClass}>{t('lvl')}</td>

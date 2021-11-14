@@ -2,10 +2,14 @@
 /dist/
 
 # Config files
+server/src/configs/*
+!server/src/configs/default.json
+!server/src/configs/config.example.json
+!server/src/configs/areas.example.json
 .env
-config.json
-areas.json
-masterfile.json
+
+# Masterfile
+server/src/data/masterfile.json
 
 # Docker file
 /docker-compose.yml
@@ -13,6 +17,11 @@ masterfile.json
 # Favicon
 public/favicon/*
 !public/favicon/favicon.ico
+
+# Strategies
+server/src/strategies/*
+!server/src/strategies/discord.js
+!server/src/strategies/telegram.js
 
 # Ignore generated locales
 public/locales/*
@@ -30,3 +39,6 @@ Desktop.ini
 # Linux
 .directory
 *~
+
+# VS Code
+/.vscode/

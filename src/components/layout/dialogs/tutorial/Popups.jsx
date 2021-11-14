@@ -10,18 +10,19 @@ import data from './data.json'
 
 export default function TutPopup({ isMobile }) {
   const { t } = useTranslation()
-  const ts = Math.floor((new Date()).getTime() / 1000)
+  const Icons = useStatic(state => state.Icons)
   const { map: { startLat, startLon } } = useStatic(state => state.config)
+  const ts = Math.floor((new Date()).getTime() / 1000)
   const size = isMobile ? 'subtitle2' : 'subtitle1'
 
   return (
     <DialogContent>
       <Grid
         container
-        direction="column"
-        justify="space-evenly"
+        justifyContent="center"
         alignItems="center"
         spacing={2}
+        style={{ height: '100%' }}
       >
         <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
           <Typography variant="h6" align="center" gutterBottom>
@@ -47,6 +48,7 @@ export default function TutPopup({ isMobile }) {
                 iconUrl="https://mygod.github.io/pokicons/v2/16.png"
                 userSettings={{ prioritizePvpInfo: false }}
                 isTutorial
+                Icons={Icons}
               />
             </div>
           </div>

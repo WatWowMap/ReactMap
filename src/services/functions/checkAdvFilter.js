@@ -3,7 +3,7 @@
 /* eslint-disable default-case */
 export default function checkIVFilterValid(filter) {
   const input = filter.toUpperCase()
-  const tokenizer = /\s*([()|&!,]|([ADSL]?|CP|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
+  const tokenizer = /\s*([()|&!,]|([ADSL]?|CP|[GU]L|LC)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
   let expectClause = true
   let stack = 0
   let lastIndex = 0

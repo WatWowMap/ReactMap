@@ -10,7 +10,7 @@ export default function MenuTile({
 }) {
   const [name, setName] = useState(true)
   const {
-    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type, toggleSlotsMenu,
+    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type, toggleSlotsMenu, Utility,
   } = data
 
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -27,6 +27,7 @@ export default function MenuTile({
         enabled: !tempFilters[item.id].enabled,
       },
     })
+    Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id].enabled}`, type)
   }
 
   const backgroundColor = columnIndex % 2
@@ -45,7 +46,6 @@ export default function MenuTile({
         maxHeight: isMobile ? 50 : 75,
         maxWidth: isMobile ? 50 : 75,
       }}
-      onError={(e) => { e.target.onerror = null; e.target.src = '/images/item/0.png' }}
       onClick={handleFilterChange}
     />
   )
@@ -90,7 +90,7 @@ export default function MenuTile({
     <Grid
       style={{ ...style, backgroundColor, textAlign: 'center' }}
       container
-      justify="center"
+      justifyContent="center"
       alignItems="center"
       spacing={isMobile ? 2 : 0}
     >

@@ -33,7 +33,7 @@ class Nest extends Model {
       const returnedResults = []
       queryResults.forEach(pkmn => {
         if (pkmn.pokemon_form == 0 || pkmn.pokemon_form === null) {
-          const formId = masterfile[pkmn.pokemon_id].default_form_id
+          const formId = masterfile[pkmn.pokemon_id].defaultFormId
           if (formId) pkmn.pokemon_form = formId
         }
         if (args.filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
@@ -53,7 +53,7 @@ class Nest extends Model {
 
     return results.map(pokemon => {
       if (pokemon.pokemon_form == 0 || pokemon.pokemon_form === null) {
-        return `${pokemon.pokemon_id}-${masterfile[pokemon.pokemon_id].default_form_id || 0}`
+        return `${pokemon.pokemon_id}-${masterfile[pokemon.pokemon_id].defaultFormId || 0}`
       }
       return `${pokemon.pokemon_id}-${pokemon.pokemon_form || 0}`
     })

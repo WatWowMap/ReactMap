@@ -5,11 +5,16 @@
 /* eslint-disable default-case */
 const requireFromString = require('require-from-string')
 const masterfile = require('../data/masterfile.json')
-const { api: { pvpMinCp } } = require('./config')
+const {
+  api: { pvpMinCp },
+  database: {
+    settings: { reactMapHandlesPvp },
+  },
+} = require('./config')
 
 const jsifyIvFilter = (filter) => {
   const input = filter.toUpperCase()
-  const tokenizer = /\s*([()|&!,]|([ADSL]?|CP|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
+  const tokenizer = /\s*([()|&!,]|([ADSL]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
   let result = ''
   let expectClause = true // expect a clause or '('
   let stack = 0
@@ -23,21 +28,29 @@ const jsifyIvFilter = (filter) => {
       if (match[3] !== undefined) {
         const lower = parseFloat(match[3])
         let column = 'iv'
+        let subColumn
         switch (match[2]) {
           case 'A': column = 'atk_iv'; break
           case 'D': column = 'def_iv'; break
           case 'S': column = 'sta_iv'; break
           case 'L': column = 'level'; break
           case 'CP': column = 'cp'; break
-          case 'GL': column = 'pvp_rankings_great_league'; break
-          case 'UL': column = 'pvp_rankings_ultra_league'; break
+          case 'GL':
+            column = 'cleanPvp'
+            subColumn = 'great'; break
+          case 'UL':
+            column = 'cleanPvp'
+            subColumn = 'ultra'; break
+          case 'LC':
+            column = 'cleanPvp'
+            subColumn = 'little'; break
         }
         let upper = lower
         if (match[4] !== undefined) {
           upper = parseFloat(match[4])
         }
-        if (column.endsWith('_league')) {
-          result += `((pokemon['${column}'] || []).some(x => x.rank >= ${lower} && x.rank <= ${upper}))`
+        if (subColumn) {
+          result += `((pokemon['${column}']['${subColumn}'] || []).some(x => x.rank >= ${lower} && x.rank <= ${upper}))`
         } else {
           result += `(pokemon['${column}'] !== null && pokemon['${column}'] >= ${lower} && pokemon['${column}'] <= ${upper})`
         }
@@ -89,36 +102,31 @@ const jsifyIvFilter = (filter) => {
   return requireFromString(`module.exports = (pokemon) => ${result};`)
 }
 
-module.exports = function getPokemon(results, args, perms) {
+const getLegacy = (results, args, perms, ohbem) => {
   const pokemonLookup = {}
   const formLookup = {}
-  const pokemonFilterIV = {
-    or: args.filters.onlyIvOr.adv,
-  }
+  const pokemonFilterIV = { or: args.filters.onlyIvOr.adv }
   Object.keys(args.filters).forEach(pkmn => {
     if (pkmn.charAt(0) !== 'o') {
       pokemonFilterIV[pkmn] = args.filters[pkmn].adv
     }
   })
 
-  let includeBigKarp = false
-  let includeTinyRat = false
-  const interestedLevelCaps = [40, 50, 51]
-  const interestedMegas = [1, 2, 3, 'experimental_stats']
+  const interestedLevelCaps = Object.keys(args.filters)
+    .filter(x => x.startsWith('onlyPvp') && args.filters[x])
+    .map(y => parseInt(y.substring(7)))
+  const interestedMegas = args.filters.pvpMega ? [1, 2, 3, 'experimental_stats'] : []
+
   for (const key of args.filters.onlyLegacyExclude || []) {
     if (key === 'global') continue
     const split = key.split('-', 2)
     if (split.length === 2) {
       const pokemonId = parseInt(split[0])
       const formId = parseInt(split[1])
-      if ((masterfile.pokemon[pokemonId] || {}).default_form_id === formId) {
+      if ((masterfile.pokemon[pokemonId] || {}).defaultFormId === formId) {
         pokemonLookup[pokemonId] = false
       }
       formLookup[formId] = false
-    } else if (key === 'big_karp') {
-      includeBigKarp = true
-    } else if (key === 'tiny_rat') {
-      includeTinyRat = true
     } else if (key === 'mega_stats') {
       interestedMegas.push(1)
       interestedMegas.push(2)
@@ -140,7 +148,7 @@ module.exports = function getPokemon(results, args, perms) {
         console.warn('Unrecognized key', key)
       } else {
         pokemonLookup[pokemonId] = false
-        const defaultForm = (masterfile.pokemon[pokemonId] || {}).default_form_id
+        const defaultForm = (masterfile.pokemon[pokemonId] || {}).defaultFormId
         if (defaultForm) {
           formLookup[defaultForm] = false
         }
@@ -162,7 +170,7 @@ module.exports = function getPokemon(results, args, perms) {
       if (split.length === 2) {
         const pokemonId = parseInt(split[0])
         const formId = parseInt(split[1])
-        if ((masterfile.pokemon[pokemonId] || {}).default_form_id === formId) {
+        if ((masterfile.pokemon[pokemonId] || {}).defaultFormId === formId) {
           pokemonLookup[pokemonId] = jsFilter
         }
         formLookup[formId] = jsFilter
@@ -177,7 +185,7 @@ module.exports = function getPokemon(results, args, perms) {
           console.warn('Unrecognized key', key)
         } else {
           pokemonLookup[pokemonId] = jsFilter
-          const defaultForm = (masterfile.pokemon[pokemonId] || {}).default_form_id
+          const defaultForm = (masterfile.pokemon[pokemonId] || {}).defaultFormId
           if (defaultForm) {
             formLookup[defaultForm] = jsFilter
           }
@@ -186,11 +194,56 @@ module.exports = function getPokemon(results, args, perms) {
     }
   }
 
+  let bestPvp = 4096
+  const filterLeagueStats = (pvpResult, target, minCp) => {
+    let last
+    for (const entry of typeof pvpResult === 'string' ? JSON.parse(pvpResult) : pvpResult) {
+      if ((minCp && entry.cp < minCp) || (entry.cap !== undefined && (entry.capped
+        ? interestedLevelCaps[interestedLevelCaps.length - 1] < entry.cap
+        : !interestedLevelCaps.includes(entry.cap)))) {
+        continue
+      }
+      if (entry.evolution) {
+        if (masterfile.pokemon[entry.pokemon].tempEvolutions[entry.evolution].unreleased
+          ? !interestedMegas.includes('experimental')
+          : !interestedMegas.includes(entry.evolution)) {
+          continue
+        }
+      }
+      if (last !== undefined && last.pokemon === entry.pokemon
+        && last.form === entry.form && last.evolution === entry.evolution
+        && last.level === entry.level && last.rank === entry.rank) {
+        last.cap = entry.cap
+        if (entry.capped) {
+          last.capped = true
+        }
+      } else {
+        if (entry.rank < bestPvp) {
+          bestPvp = entry.rank
+        }
+        target.push(entry)
+        last = entry
+      }
+    }
+  }
+
   const pokemon = []
   if (results && results.length > 0) {
     for (let i = 0; i < results.length; i++) {
+      bestPvp = 4096
       const result = results[i]
       const filtered = {}
+      if (result.pokemon_id === 132) {
+        filtered.ditto_form = result.form
+        result.form = masterfile.pokemon[result.pokemon_id]?.defaultFormId || 0
+      }
+      if (!result.seen_type) {
+        if (result.spawn_id === null) {
+          result.seen_type = result.pokestop_id ? 'nearby_stop' : 'nearby_cell'
+        } else {
+          result.seen_type = 'encounter'
+        }
+      }
       if (perms.iv || perms.stats) {
         filtered.atk_iv = result.atk_iv
         filtered.def_iv = result.def_iv
@@ -201,46 +254,30 @@ module.exports = function getPokemon(results, args, perms) {
       }
       if (perms.pvp && interestedLevelCaps.length > 0) {
         const { great, ultra } = pvpMinCp
-        const filterLeagueStats = (pvpResult, target, minCp) => {
-          let last
-          for (const entry of JSON.parse(pvpResult)) {
-            if ((minCp && entry.cp < minCp) || (entry.cap !== undefined && (entry.capped
-              ? interestedLevelCaps[interestedLevelCaps.length - 1] < entry.cap
-              : !interestedLevelCaps.includes(entry.cap)))) {
-              continue
-            }
-            if (entry.evolution) {
-              if (masterfile.pokemon[entry.pokemon].temp_evolutions[entry.evolution].unreleased
-                ? !interestedMegas.includes('experimental')
-                : !interestedMegas.includes(entry.evolution)) {
-                continue
-              }
-            }
-            if (last !== undefined && last.pokemon === entry.pokemon
-              && last.form === entry.form && last.evolution === entry.evolution
-              && last.level === entry.level && last.rank === entry.rank) {
-              last.cap = entry.cap
-              if (entry.capped) {
-                last.capped = true
-              }
-            } else {
-              if (entry.rank < filtered.bestPvp) {
-                filtered.bestPvp = entry.rank
-              }
-              target.push(entry)
-              last = entry
-            }
+        filtered.cleanPvp = {}
+        if (result.pvp || (reactMapHandlesPvp && result.cp)) {
+          const pvpResults = reactMapHandlesPvp ? ohbem.queryPvPRank(
+            result.pokemon_id,
+            result.form,
+            result.costume,
+            result.gender,
+            result.atk_iv,
+            result.def_iv,
+            result.sta_iv,
+            result.level,
+          ) : JSON.parse(result.pvp)
+          Object.keys(pvpResults).forEach(league => {
+            filterLeagueStats(pvpResults[league], filtered.cleanPvp[league] = [])
+          })
+        } else {
+          if (result.pvp_rankings_great_league) {
+            filterLeagueStats(result.pvp_rankings_great_league, filtered.cleanPvp.great = [], great)
+          }
+          if (result.pvp_rankings_ultra_league) {
+            filterLeagueStats(result.pvp_rankings_ultra_league, filtered.cleanPvp.ultra = [], ultra)
           }
         }
-        filtered.bestPvp = 4096
-        if (result.pvp_rankings_great_league) {
-          filtered.cleanPvp = {}
-          filterLeagueStats(result.pvp_rankings_great_league, filtered.pvp_rankings_great_league = [], great)
-        }
-        if (result.pvp_rankings_ultra_league) {
-          filtered.cleanPvp = {}
-          filterLeagueStats(result.pvp_rankings_ultra_league, filtered.pvp_rankings_ultra_league = [], ultra)
-        }
+        filtered.bestPvp = bestPvp
       }
       let pokemonFilter = result.form === 0 ? pokemonLookup[result.pokemon_id] : formLookup[result.form]
       if (pokemonFilter === undefined) {
@@ -250,20 +287,8 @@ module.exports = function getPokemon(results, args, perms) {
       } else {
         pokemonFilter = pokemonFilter(filtered)
       }
-      if (filtered.pvp_rankings_great_league) {
-        filtered.cleanPvp.great = filtered.pvp_rankings_great_league
-      }
-      if (filtered.pvp_rankings_ultra_league) {
-        filtered.cleanPvp.ultra = filtered.pvp_rankings_ultra_league
-      }
-      if (!(pokemonFilter
-        || (includeBigKarp && result.pokemon_id === 129 && result.weight !== null && result.weight >= 13.125)
-        || (includeTinyRat && result.pokemon_id === 19 && result.weight !== null && result.weight <= 2.40625))) {
+      if (!pokemonFilter) {
         continue
-      }
-      if (result.form === 0) {
-        const formId = masterfile.pokemon[result.pokemon_id].default_form_id
-        if (formId) result.form = formId
       }
       filtered.id = result.id
       filtered.pokemon_id = result.pokemon_id
@@ -282,15 +307,17 @@ module.exports = function getPokemon(results, args, perms) {
       filtered.changed = result.changed
       filtered.cellId = result.cell_id
       filtered.expire_timestamp_verified = result.expire_timestamp_verified
+      filtered.display_pokemon_id = result.display_pokemon_id
       if (perms.iv || perms.stats) {
         filtered.move_1 = result.move_1
         filtered.move_2 = result.move_2
         filtered.weight = result.weight
         filtered.size = result.size
-        filtered.display_pokemon_id = result.display_pokemon_id
       }
       pokemon.push(filtered)
     }
   }
   return pokemon
 }
+
+module.exports = getLegacy

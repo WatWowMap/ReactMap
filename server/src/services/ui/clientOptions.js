@@ -1,4 +1,4 @@
-const { clientSideOptions, map: { legacyPkmnFilter } } = require('../config')
+const { clientSideOptions, map: { legacyPkmnFilter }, database: { settings: { pvpLevels } } } = require('../config')
 const dbSelection = require('../functions/dbSelection')
 
 module.exports = function clientOptions(perms) {
@@ -12,20 +12,28 @@ module.exports = function clientOptions(perms) {
       raidTimers: { type: 'bool', perm: ['raids'] },
       interactionRanges: { type: 'bool', perm: ['gyms', 'raids'] },
       showExBadge: { type: 'bool', perm: ['gyms'] },
+      showArBadge: { type: 'bool', perm: ['gyms'] },
       raidLevelBadges: { type: 'bool', perm: ['raids'] },
+      raidsOr: { type: 'bool', perm: ['raids'] },
     },
     pokestops: {
       clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },
       invasionTimers: { type: 'bool', perm: ['invasions'] },
       lureTimers: { type: 'bool', perm: ['lures'] },
       interactionRanges: { type: 'bool', perm: ['pokestops'] },
+      hasQuestIndicator: { type: 'bool', perm: ['quests'] },
+      showArBadge: { type: 'bool', perm: ['pokestops'] },
     },
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'] },
-      prioritizePvpInfo: { type: 'bool', perm: ['pvp'] },
+      linkGlobalAndAdvanced: { type: 'bool', perm: ['pokemon'] },
+      pokemonTimers: { type: 'bool', perm: ['pokemon'] },
       ivCircles: { type: 'bool', perm: ['iv'] },
       minIvCircle: { type: 'number', perm: ['iv'], label: '%' },
       interactionRanges: { type: 'bool', perm: ['pokemon'] },
+      showDexNumInPopup: { type: 'bool', perm: ['pokemon'] },
+      weatherIndicator: { type: 'bool', perm: ['pokemon'] },
+      pvpMega: { type: 'bool', perm: ['pokemon'] },
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'] },
@@ -33,6 +41,12 @@ module.exports = function clientOptions(perms) {
       newPortals: { type: 'color', perm: ['portals'] },
     },
   }
+
+  pvpLevels.forEach(level => {
+    clientMenus.pokemon[`pvp${level}`] = {
+      type: 'bool', perm: ['pvp'], value: true,
+    }
+  })
 
   // special case options that require additional checks
   if (legacyPkmnFilter) {
@@ -53,7 +67,7 @@ module.exports = function clientOptions(perms) {
     clientValues[key] = {}
     Object.entries(options).forEach(option => {
       const [name, meta] = option
-      clientMenus[key][name].value = clientSideOptions[key][name] || false
+      clientMenus[key][name].value = clientSideOptions[key][name] || meta.value || false
       clientMenus[key][name].disabled = !meta.perm.some(x => perms[x])
       clientValues[key][name] = meta.value
       if (meta.sub) clientMenus[key][name].sub = {}
