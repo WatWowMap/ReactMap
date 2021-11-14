@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
@@ -7,7 +8,7 @@
 const Discord = require('discord.js')
 const fs = require('fs')
 const { alwaysEnabledPerms, discord, webhooks } = require('./config')
-const areas = require('./areas')
+const Utility = require('./Utility')
 
 const client = new Discord.Client()
 
@@ -109,38 +110,9 @@ class DiscordClient {
               }
             }
           }
-          // Area Restriction Rules
-          if (Object.keys(areas.names).length > 0) {
-            for (let j = 0; j < userRoles.length; j += 1) {
-              discord.areaRestrictions.forEach(rule => {
-                if (rule.roles.includes(userRoles[j])) {
-                  if (rule.areas.length > 0) {
-                    rule.areas.forEach(areaName => {
-                      if (areas.names.includes(areaName)) {
-                        perms.areaRestrictions.push(areaName)
-                      }
-                    })
-                  }
-                }
-              })
-            }
-          }
-          if (webhooks.length) {
-            userRoles.forEach(role => {
-              webhooks.forEach(webhook => {
-                if (webhook.discordRoles.includes(role)) {
-                  perms.webhooks.push(webhook.name)
-                }
-              })
-            })
-          }
+          perms.areaRestrictions = Utility.areaPerms(userRoles, 'discord')
+          perms.webhooks = Utility.webhookPerms(userRoles, 'discordRoles')
         }
-      }
-      if (perms.areaRestrictions.length) {
-        perms.areaRestrictions = [...new Set(perms.areaRestrictions)]
-      }
-      if (perms.webhooks.length) {
-        perms.webhooks = [...new Set(perms.webhooks)]
       }
     } catch (e) {
       console.warn('Failed to get perms for user', user.id, e.message)

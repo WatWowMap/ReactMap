@@ -321,8 +321,7 @@
   "drawerSettingsImportSettingsWidth": 6,
   "drawerSettingsLogoutWidth": 6,
   "drawerSettingsProfileWidth": 6,
-  "drawerSettingsResetFiltersDiscordWidth": 6,
-  "drawerSettingsResetFiltersWidth": 12,
+  "drawerSettingsResetFiltersWidth": 6,
   "drawerSettingsStatsWidth": 6,
   "drawerSettingsTutorialWidth": 6,
   "popupGymDescriptionWidth": 5,
@@ -450,5 +449,6 @@
   "webhooksSubtitle": "Manage your alerts directly from the map for these bots",
   "webhooks": "Alerts",
   "everything_individually": "Add Individual Alerts",
-  "individually": "individually"
+  "individually": "individually",
+  "join": "Join"
 }

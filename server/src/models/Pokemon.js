@@ -246,7 +246,7 @@ class Pokemon extends Model {
           ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 100)
         }
       })
-    if (areaRestrictions.length > 0) {
+    if (areaRestrictions?.length > 0) {
       getAreaSql(query, areaRestrictions, isMad, 'pokemon')
     }
 
@@ -309,7 +309,7 @@ class Pokemon extends Model {
             .orWhereNotNull('pvp_rankings_ultra_league')
         })
       }
-      if (areaRestrictions.length > 0) {
+      if (areaRestrictions?.length > 0) {
         getAreaSql(pvpQuery, areaRestrictions, isMad, 'pokemon')
       }
       pvpResults.push(...await pvpQuery)
@@ -370,6 +370,9 @@ class Pokemon extends Model {
       .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
     if (isMad) {
       getMadSql(query)
+    }
+    if (perms.areaRestrictions?.length > 0) {
+      getAreaSql(query, perms.areaRestrictions, isMad, 'pokemon')
     }
     const results = await query
     return legacyFilter(results, args, perms, ohbem)

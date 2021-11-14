@@ -1,4 +1,6 @@
+/* eslint-disable no-console */
 const Knex = require('knex')
+const { database: { schemas: { scanner, manual } } } = require('../configs/config.example.json')
 const { database: { schemas }, devOptions: { queryDebug } } = require('../services/config')
 const models = require('../models/index')
 
@@ -22,8 +24,14 @@ const connections = Object.values(schemas).map(schema => Knex({
 
 // Binds the models to the designated databases
 Object.values(schemas).forEach((schema, index) => {
-  schema.useFor.forEach(category => {
-    const capital = `${category.charAt(0).toUpperCase()}${category.slice(1)}`
-    models[capital].knex(connections[index])
-  })
+  try {
+    schema.useFor.forEach(category => {
+      const capital = `${category.charAt(0).toUpperCase()}${category.slice(1)}`
+      models[capital].knex(connections[index])
+    })
+  } catch (e) {
+    console.error(`
+    Only ${[...scanner.useFor, ...manual.useFor].join(', ')} are valid options in the useFor fields`, '\n\n', e)
+    process.exit(9)
+  }
 })

@@ -256,6 +256,13 @@ const RootQuery = new GraphQLObjectType({
             // eslint-disable-next-line global-require
             ? require('../configs/areas.json')
             : { features: [] }
+          if (scanAreas.features.length) {
+            try {
+              scanAreas.features = scanAreas.features.sort((a, b) => (a.properties.name > b.properties.name) ? 1 : -1)
+            } catch (e) {
+              console.warn('Failed to sort scan areas', e.message)
+            }
+          }
           return scanAreas
         }
       },

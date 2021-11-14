@@ -29,7 +29,7 @@ class Spawnpoint extends Model {
     }
     query.whereBetween(`lat${isMad ? 'itude' : ''}`, [args.minLat, args.maxLat])
       .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [args.minLon, args.maxLon])
-    if (areaRestrictions.length > 0) {
+    if (areaRestrictions?.length > 0) {
       getAreaSql(query, areaRestrictions, isMad)
     }
     return query

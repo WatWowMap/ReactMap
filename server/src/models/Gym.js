@@ -162,7 +162,7 @@ class Gym extends Model {
         }
       }
     })
-    if (areaRestrictions.length > 0) {
+    if (areaRestrictions?.length > 0) {
       getAreaSql(query, areaRestrictions, isMad)
     }
 
@@ -233,13 +233,13 @@ class Gym extends Model {
         distance,
       ])
       .where(isMad ? 'enabled' : 'deleted', isMad)
-      .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .whereRaw(`LOWER(name) LIKE '%${args.search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
-    if (perms.areaRestrictions.length > 0) {
+    if (perms.areaRestrictions?.length > 0) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     return query
@@ -275,7 +275,7 @@ class Gym extends Model {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
         .leftJoin('raid', 'gym.gym_id', 'raid.gym_id')
     }
-    if (perms.areaRestrictions.length > 0) {
+    if (perms.areaRestrictions?.length > 0) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     return query

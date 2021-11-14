@@ -1,5 +1,5 @@
 /* global BigInt */
-const { clearOtherSessions } = require('../session-store')
+const { clearOtherSessions } = require('../sessionStore')
 
 module.exports = async (client, oldPresence, newPresence) => {
   const rolesBefore = oldPresence.roles.cache

@@ -18,6 +18,11 @@ server/src/data/masterfile.json
 public/favicon/*
 !public/favicon/favicon.ico
 
+# Strategies
+server/src/strategies/*
+!server/src/strategies/discord.js
+!server/src/strategies/telegram.js
+
 # Ignore generated locales
 public/locales/*
 
