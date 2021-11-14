@@ -17,7 +17,7 @@ class S2cell extends Model {
         .as('id')])
       .whereBetween(`center_lat${isMad ? 'itude' : ''}`, [args.minLat - 0.01, args.maxLat + 0.01])
       .andWhereBetween(`center_lon${isMad ? 'gitude' : ''}`, [args.minLon - 0.01, args.maxLon + 0.01])
-    if (areaRestrictions.length > 0) {
+    if (areaRestrictions?.length > 0) {
       getAreaSql(query, areaRestrictions, isMad, 's2cell')
     }
     const results = await query

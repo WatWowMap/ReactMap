@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import {
-  FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Dialog,
+  FormControl, Grid, InputLabel, MenuItem, Select, Button, Snackbar, Dialog,
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 import { Link } from 'react-router-dom'
@@ -17,7 +17,7 @@ export default function Settings({ Icons }) {
   const { t, i18n } = useTranslation()
   const config = useStatic(state => state.config)
   const staticSettings = useStatic(state => state.settings)
-  const { discord, loggedIn } = useStatic(state => state.auth)
+  const { loggedIn } = useStatic(state => state.auth)
   const setStaticIcons = useStatic(state => state.setIcons)
 
   const setTutorial = useStore(state => state.setTutorial)
@@ -156,42 +156,32 @@ export default function Settings({ Icons }) {
             {t('profile')}
           </Button>
         </Grid>
-        {discord && (
-          <Grid item xs={t('drawerSettingsLogoutWidth')} style={{ textAlign: 'center' }}>
-            {loggedIn ? (
+        <Grid item xs={t('drawerSettingsLogoutWidth')} style={{ textAlign: 'center' }}>
+          {loggedIn ? (
+            <Button
+              className="sidebar-button"
+              variant="contained"
+              style={{ minWidth: 100 }}
+              color="primary"
+              size="small"
+              href="/logout"
+            >
+              {t('logout')}
+            </Button>
+          ) : (
+            <Link to="/login" style={{ textDecoration: 'none' }}>
               <Button
                 className="sidebar-button"
                 variant="contained"
-                style={{
-                  backgroundColor: 'rgb(114,136,218)',
-                  color: 'white',
-                  minWidth: 100,
-                }}
+                style={{ minWidth: 100 }}
+                color="primary"
                 size="small"
-                href="/logout"
               >
-                <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
-                {t('logout')}
+                {t('login')}
               </Button>
-            ) : (
-              <Link to="/login" style={{ textDecoration: 'none' }}>
-                <Button
-                  className="sidebar-button"
-                  variant="contained"
-                  style={{
-                    backgroundColor: 'rgb(114,136,218)',
-                    color: 'white',
-                    minWidth: 100,
-                  }}
-                  size="small"
-                >
-                  <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
-                  {t('login')}
-                </Button>
-              </Link>
-            )}
-          </Grid>
-        )}
+            </Link>
+          )}
+        </Grid>
         <Grid item xs={t('drawerSettingsTutorialWidth')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
@@ -203,7 +193,7 @@ export default function Settings({ Icons }) {
             {t('tutorial')}
           </Button>
         </Grid>
-        <Grid item xs={discord ? t('drawerSettingsResetFiltersDiscordWidth') : t('drawerSettingsResetFiltersWidth')} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawerSettingsResetFiltersWidth')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"

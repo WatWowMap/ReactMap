@@ -1,5 +1,9 @@
+/* eslint-disable no-console */
+/* eslint-disable import/no-dynamic-require */
+/* eslint-disable global-require */
 const express = require('express')
 const path = require('path')
+const fs = require('fs')
 const logger = require('morgan')
 const compression = require('compression')
 const session = require('express-session')
@@ -10,7 +14,7 @@ const Backend = require('i18next-fs-backend')
 require('./db/initialization')
 
 const { Pokemon } = require('./models/index')
-const { sessionStore } = require('./services/session-store')
+const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const config = require('./services/config')
 
@@ -57,14 +61,35 @@ app.use(session({
   saveUninitialized: false,
   cookie: { maxAge: 604800000 },
 }))
-if (config.discord.enabled) {
-  // eslint-disable-next-line global-require
-  require('./strategies/discordStrategy')
 
-  app.use(passport.initialize())
+fs.readdir(`${__dirname}/strategies/`, (e, files) => {
+  if (e) return console.error(e)
+  files.forEach(file => {
+    const trimmed = file.replace('.js', '')
+    if (config[trimmed]?.enabled) {
+      require(`./strategies/${trimmed}`)
+      console.log(file, 'strategy initialized')
+    } else {
+      console.log(file, 'strategy not enabled, if this was a mistake, make sure to add it to the config and enable it')
+    }
+  })
+})
 
-  app.use(passport.session())
-}
+app.use(passport.initialize())
+
+app.use(passport.session())
+
+passport.serializeUser(async (user, done) => {
+  done(null, user)
+})
+
+passport.deserializeUser(async (user, done) => {
+  if (user.perms.map) {
+    done(null, user)
+  } else {
+    done(null, false)
+  }
+})
 
 i18next.use(Backend).init({
   lng: 'en',
@@ -74,7 +99,6 @@ i18next.use(Backend).init({
   defaultNS: 'translation',
   backend: { loadPath: 'public/locales/{{lng}}/{{ns}}.json' },
 }, (err, t) => {
-  // eslint-disable-next-line no-console
   if (err) return console.error(err)
 })
 
@@ -85,7 +109,6 @@ if (config.database.settings.reactMapHandlesPvp) {
 }
 
 app.listen(config.port, config.interface, () => {
-  // eslint-disable-next-line no-console
   console.log(`Server is now listening at http://${config.interface}:${config.port}`)
 })
 

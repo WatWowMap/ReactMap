@@ -104,7 +104,7 @@ class Pokestop extends Model {
     query.whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
-    if (areaRestrictions.length > 0) {
+    if (areaRestrictions?.length > 0) {
       getAreaSql(query, areaRestrictions, isMad)
     }
 
@@ -582,7 +582,7 @@ class Pokestop extends Model {
       .whereRaw(`LOWER(name) LIKE '%${args.search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (perms.areaRestrictions.length > 0) {
+    if (perms.areaRestrictions?.length > 0) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     return query
@@ -637,7 +637,7 @@ class Pokestop extends Model {
         }
       })
     }
-    if (perms.areaRestrictions.length > 0) {
+    if (perms.areaRestrictions?.length > 0) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     const results = await query

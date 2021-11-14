@@ -321,8 +321,7 @@
   "drawerSettingsImportSettingsWidth": 6,
   "drawerSettingsLogoutWidth": 6,
   "drawerSettingsProfileWidth": 6,
-  "drawerSettingsResetFiltersDiscordWidth": 6,
-  "drawerSettingsResetFiltersWidth": 12,
+  "drawerSettingsResetFiltersWidth": 6,
   "drawerSettingsStatsWidth": 6,
   "drawerSettingsTutorialWidth": 6,
   "popupGymDescriptionWidth": 5,
@@ -448,5 +447,6 @@
   "battle_changes_poracle": "battle_changes",
   "auto": "Auto",
   "webhooksSubtitle": "Manage your alerts directly from the map for these bots",
-  "webhooks": "Alerts"
+  "webhooks": "Alerts",
+  "join": "Join"
 }

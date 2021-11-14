@@ -14,34 +14,32 @@ const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 const masterfile = require('../data/masterfile.json')
 const {
-  Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter,
+  Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter, User,
 } = require('../models/index')
 
 const rootRouter = new express.Router()
 
 rootRouter.use('/', clientRouter)
 
-if (config.discord.enabled) {
-  rootRouter.use('/auth', authRouter)
+rootRouter.use('/auth', authRouter)
 
-  // eslint-disable-next-line no-unused-vars
-  rootRouter.use((err, req, res, next) => {
-    switch (err.message) {
-      case 'NoCodeProvided':
-        return res.status(400).send({
-          status: 'ERROR',
-          error: err.message,
-        })
-      case 'Failed to fetch user\'s guilds':
-        return res.redirect('/login')
-      default:
-        return res.status(500).send({
-          status: 'ERROR',
-          error: err.message,
-        })
-    }
-  })
-}
+// eslint-disable-next-line no-unused-vars
+rootRouter.use((err, req, res, next) => {
+  switch (err.message) {
+    case 'NoCodeProvided':
+      return res.status(400).send({
+        status: 'ERROR',
+        error: err.message,
+      })
+    case 'Failed to fetch user\'s guilds':
+      return res.redirect('/login')
+    default:
+      return res.status(500).send({
+        status: 'ERROR',
+        error: err.message,
+      })
+  }
+})
 
 rootRouter.get('/logout', (req, res) => {
   req.session.destroy()
@@ -71,35 +69,36 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 
 rootRouter.get('/settings', async (req, res) => {
   try {
-    if (!config.discord.enabled) {
-      req.session.perms = { areaRestrictions: [] }
-      Object.keys(config.discord.perms).forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
+    if (!config.authMethods.length) {
+      req.session.perms = { areaRestrictions: [], webhooks: [] }
+      Object.keys(config.discord.perms).forEach(perm => {
+        req.session.perms[perm] = config.discord.perms[perm].enabled
+        req.session.perms[perm] = config.telegram.perms[perm].enabled
+      })
       req.session.save()
     } else if (config.alwaysEnabledPerms.length > 0) {
-      req.session.perms = { areaRestrictions: [] }
+      req.session.perms = { areaRestrictions: [], webhooks: [] }
       config.alwaysEnabledPerms.forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
       req.session.save()
     }
 
-    const getUser = () => {
-      if (config.discord.enabled) {
-        if (req.user || config.alwaysEnabledPerms.length === 0) {
-          return req.user
-        }
+    const getUser = async () => {
+      if (config.authMethods.length && req.user) {
+        return User.query()
+          .where('discordId', req.user.id)
+          .orWhere('telegramId', req.user.id)
+          .first()
       }
       return req.session
     }
     const serverSettings = {
-      user: getUser(),
+      user: { ...req.user, ...await getUser() },
       discord: config.discord.enabled,
       settings: {},
-    }
-
-    // add user options here from the config that are structured as objects
-    if (serverSettings.user && serverSettings.user.perms) {
-      serverSettings.loggedIn = req.user
-      serverSettings.config = {
+      authMethods: config.authMethods,
+      config: {
         map: {
+          discordInvite: config.discord.inviteLink,
           ...config.map,
           ...config.multiDomains[req.headers.host],
           excludeList: config.excludeFromTutorial,
@@ -116,7 +115,12 @@ rootRouter.get('/settings', async (req, res) => {
         },
         manualAreas: config.manualAreas || {},
         icons: config.icons,
-      }
+      },
+    }
+
+    // add user options here from the config that are structured as objects
+    if (serverSettings.user?.perms) {
+      serverSettings.loggedIn = req.user
       // add config options to this array that are structured as arrays
       const arrayUserOptions = [
         { name: 'localeSelection', values: config.localeSelection },
@@ -219,8 +223,9 @@ rootRouter.get('/settings', async (req, res) => {
         try {
           await Promise.all(filtered.map(async webhook => {
             if (config.webhookObj[webhook.name].client.valid) {
-              const remoteData = await Fetch.webhookApi('allProfiles', serverSettings.user.id, 'GET', webhook.name)
-              const { areas } = await Fetch.webhookApi('humans', serverSettings.user.id, 'GET', webhook.name)
+              const { strategy, discordId, telegramId } = serverSettings.user
+              const remoteData = await Fetch.webhookApi('allProfiles', strategy === 'discord' ? discordId : telegramId, 'GET', webhook.name)
+              const { areas } = await Fetch.webhookApi('humans', strategy === 'discord' ? discordId : telegramId, 'GET', webhook.name)
 
               if (remoteData && areas) {
                 serverSettings.webhooks[webhook.name] = remoteData.human.admin_disable
@@ -234,13 +239,14 @@ rootRouter.get('/settings', async (req, res) => {
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .filter(area => area.userSelectable !== false)
                       .map(area => area.name),
+                    templates: config.webhookObj[webhook.name].client.templates[strategy],
                   }
               }
             }
           }))
         } catch (e) {
           serverSettings.webhooks = null
-          console.warn(e.message, 'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database', serverSettings.user.id)
+          console.warn(e.message, 'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database. User ID:', serverSettings.user.id)
         }
       }
       if (config.devOptions.enabled) {
