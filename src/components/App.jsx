@@ -95,7 +95,7 @@ export default function App() {
               {serverSettings && <Auth serverSettings={serverSettings} />}
             </Route>
             <Route exact path="/login">
-              <Login clickedTwice serverSettings={serverSettings} />
+              {serverSettings && <Login clickedTwice serverSettings={serverSettings} />}
             </Route>
           </Switch>
         </Router>
