@@ -54,6 +54,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
     minLon: map.getBounds()._southWest.lng,
     maxLon: map.getBounds()._northEast.lng,
     zoom: map.getZoom(),
+    ts: Math.floor(Date.now() / 1000),
   })
   const [manualParams, setManualParams] = useState(params)
   const [lc] = useState(L.control.locate({

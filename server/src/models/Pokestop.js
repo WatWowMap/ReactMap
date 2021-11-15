@@ -50,9 +50,9 @@ class Pokestop extends Model {
   }
 
   static async getAllPokestops(args, perms, isMad) {
-    const date = new Date()
+    const date = new Date(args.ts * 1000)
     const tsMs = date.getTime()
-    const ts = Math.floor(tsMs / 1000)
+    const { ts } = args
     const midnight = settings.hideOldQuests
       ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
       : 0
@@ -590,6 +590,11 @@ class Pokestop extends Model {
 
   static async searchQuests(args, perms, isMad, distance) {
     const { search, locale } = args
+    const date = new Date(args.ts * 1000)
+    const midnight = settings.hideOldQuests
+      ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
+      : 0
+
     const pokemonIds = Object.keys(masterPkmn).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
     ))
@@ -613,9 +618,12 @@ class Pokestop extends Model {
         distance,
       ])
       .where(isMad ? 'enabled' : 'deleted', isMad)
-      .whereIn('quest_pokemon_id', pokemonIds)
-      .orWhereIn('quest_item_id', itemIds)
-      .orWhereIn('quest_reward_type', rewardTypes)
+      .andWhere('quest_timestamp', '>=', midnight)
+      .andWhere(quests => {
+        quests.whereIn('quest_pokemon_id', pokemonIds)
+          .orWhereIn('quest_item_id', itemIds)
+          .orWhereIn('quest_reward_type', rewardTypes)
+      })
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (altQuestCheck) {

@@ -15,7 +15,7 @@ module.exports = async function initWebhooks(config) {
         const hookConfig = await fetchJson(`${webhook.host}:${webhook.port}/api/config/poracleWeb`, options, config.devOptions.enabled)
 
         if (!hookConfig) {
-          throw new Error(`Webhook ${webhook.name} is not configured correctly`)
+          throw new Error(`Webhook [${webhook.name}] is not configured correctly`)
         }
         const [major, minor, patch] = hookConfig.version.split('.').map(x => parseInt(x))
 
@@ -84,7 +84,7 @@ module.exports = async function initWebhooks(config) {
       }
     }))
   } catch (e) {
-    console.log(e, 'There has bene an error during webhook initialization')
+    console.log(config.devOptions.enabled ? e : e.message, 'There has bene an error during webhook initialization')
   }
   return webhookObj
 }

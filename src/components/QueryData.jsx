@@ -83,6 +83,7 @@ export default function QueryData({
         maxLon: mapBounds._northEast.lng,
         filters: trimFilters(filters),
         zoom: Math.floor(map.getZoom()),
+        ts: Math.floor(Date.now() / 1000),
       })
     }
   }
