@@ -1,5 +1,5 @@
 const masterfile = require('../../data/masterfile.json')
-const { map } = require('../config')
+const { map, api: { queryAvailable } } = require('../config')
 
 const categories = {
   gyms: ['teams', 'eggs', 'raids', 'pokemon'],
@@ -28,23 +28,36 @@ const pokemonFilters = {
   others: ['reverse', 'selected', 'unselected', 'onlyAvailable'],
 }
 
+const getQueryCategory = (subCategory) => {
+  switch (subCategory) {
+    case 'pokestops': return 'quests'
+    case 'gyms': return 'raids'
+    default: return subCategory
+  }
+}
+
 module.exports = function buildMenus() {
   const menuFilters = {}
   const returnedItems = {}
 
   Object.entries(pokemonFilters).forEach(filter => {
     const [key, items] = filter
-    menuFilters[key] = {}
-    items.forEach(item => menuFilters[key][item] = item === 'onlyAvailable')
+    menuFilters[key] = Object.fromEntries(items.map(item => [item, false]))
   })
 
   Object.entries(categories).forEach(category => {
     const [key, items] = category
     returnedItems[key] = {
       categories: items,
-      filters: { ...menuFilters, categories: {} },
+      filters: {
+        ...menuFilters,
+        others: {
+          ...menuFilters.others,
+          onlyAvailable: queryAvailable[getQueryCategory(key)],
+        },
+        categories: Object.fromEntries(items.map(item => [item, false])),
+      },
     }
-    items.forEach(item => returnedItems[key].filters.categories[item] = false)
   })
   return returnedItems
 }
