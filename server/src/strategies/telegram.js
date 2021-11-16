@@ -31,10 +31,9 @@ const authHandler = async (req, profile, done) => {
   }))
 
   Object.entries(telegram.perms).forEach(([perm, info]) => {
-    if ((info.enabled && info.roles.length)) {
-      if (info.roles.some(role => groupInfo.includes(role)) || alwaysEnabledPerms.includes(perm)) {
-        user.perms[perm] = true
-      }
+    if (info.enabled && (alwaysEnabledPerms.includes(perm)
+    || info.roles.some(role => groupInfo.includes(role)))) {
+      user.perms[perm] = true
     }
   })
 

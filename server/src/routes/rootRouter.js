@@ -72,13 +72,14 @@ rootRouter.get('/settings', async (req, res) => {
     if (!config.authMethods.length) {
       req.session.perms = { areaRestrictions: [], webhooks: [] }
       Object.keys(config.discord.perms).forEach(perm => {
-        req.session.perms[perm] = config.discord.perms[perm].enabled
-        req.session.perms[perm] = config.telegram.perms[perm].enabled
+        req.session.perms[perm] = config.discord.perms[perm].enabled || config.telegram.perms[perm].enabled
       })
       req.session.save()
-    } else if (config.alwaysEnabledPerms.length > 0) {
+    } else if (config.alwaysEnabledPerms.length) {
       req.session.perms = { areaRestrictions: [], webhooks: [] }
-      config.alwaysEnabledPerms.forEach(perm => req.session.perms[perm] = config.discord.perms[perm].enabled)
+      config.alwaysEnabledPerms.forEach(perm => {
+        req.session.perms[perm] = (config.authMethods.includes('discord') && config.discord.perms[perm].enabled) || (config.authMethods.includes('telegram') && config.telegram.perms[perm].enabled)
+      })
       req.session.save()
     }
 
@@ -93,7 +94,6 @@ rootRouter.get('/settings', async (req, res) => {
     }
     const serverSettings = {
       user: { ...req.user, ...await getUser() },
-      discord: config.discord.enabled,
       settings: {},
       authMethods: config.authMethods,
       config: {
