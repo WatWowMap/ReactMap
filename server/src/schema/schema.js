@@ -1,10 +1,15 @@
-/* eslint-disable import/no-unresolved */
+/* eslint-disable no-console */
 const {
   GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString, GraphQLInt,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
 const fs = require('fs')
 const { raw } = require('objection')
+
+const scanAreas = fs.existsSync('server/src/configs/areas.json')
+  // eslint-disable-next-line global-require
+  ? require('../configs/areas.json')
+  : { features: [] }
 
 const DeviceType = require('./device')
 const GeocoderType = require('./geocoder')
@@ -60,6 +65,7 @@ const RootQuery = new GraphQLObjectType({
             return Utility.geocoder(webhook.server.nominatimUrl, args.search)
           }
         }
+        return []
       },
     },
     gyms: {
@@ -93,8 +99,8 @@ const RootQuery = new GraphQLObjectType({
               'longitude AS lon',
             ])
           }
-          const result = await query || {}
-          return result
+          const result = await query
+          return result || {}
         }
         return {}
       },
@@ -122,8 +128,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms?.[args.perm]) {
-          const result = await Nest.query().findById(args.id) || {}
-          return result
+          return Nest.query().findById(args.id) || {}
         }
         return {}
       },
@@ -195,7 +200,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms?.[args.perm]) {
-          const query = Pokemon.query().findById(args.id) || {}
+          const query = Pokemon.query().findById(args.id)
           if (Utility.dbSelection('pokemon') === 'mad') {
             query.select([
               'latitude AS lat',
@@ -252,10 +257,6 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
         if (perms?.scanAreas) {
-          const scanAreas = fs.existsSync('server/src/configs/areas.json')
-            // eslint-disable-next-line global-require
-            ? require('../configs/areas.json')
-            : { features: [] }
           if (scanAreas.features.length) {
             try {
               scanAreas.features = scanAreas.features.sort((a, b) => (a.properties.name > b.properties.name) ? 1 : -1)
@@ -294,23 +295,20 @@ const RootQuery = new GraphQLObjectType({
               return Pokestop.search(args, perms, isMad, distance)
             case 'raids':
               return Gym.searchRaids(args, perms, isMad, distance)
-            case 'gyms':
-              return webhookName
-                ? (async function getResultsWithAddress() {
-                  const results = await Gym.search(args, perms, isMad, distance)
-                  const webhook = config.webhookObj[webhookName]
-                  if (webhook && results.length) {
-                    const withFormatted = await Promise.all(results.map(async result => ({
-                      ...result,
-                      formatted: await Utility.geocoder(
-                        webhook.server.nominatimUrl, { lat: result.lat, lon: result.lon }, true,
-                      ),
-                    })))
-                    return withFormatted
-                  }
-                  return []
-                }())
-                : Gym.search(args, perms, isMad, distance)
+            case 'gyms': {
+              const results = await Gym.search(args, perms, isMad, distance)
+              const webhook = webhookName ? config.webhookObj[webhookName] : null
+              if (webhook && results.length) {
+                const withFormatted = await Promise.all(results.map(async result => ({
+                  ...result,
+                  formatted: await Utility.geocoder(
+                    webhook.server.nominatimUrl, { lat: result.lat, lon: result.lon }, true,
+                  ),
+                })))
+                return withFormatted
+              }
+              return results
+            }
             case 'portals':
               return Portal.search(args, perms, isMad, distance)
             case 'nests':
@@ -414,6 +412,7 @@ const RootQuery = new GraphQLObjectType({
         if (perms?.webhooks) {
           return Fetch.webhookApi(args.category, req.user.id, args.status, args.name)
         }
+        return {}
       },
     },
   },
@@ -437,6 +436,7 @@ const Mutation = new GraphQLObjectType({
           const response = await Fetch.webhookApi(category, req.user.id, status, name, data)
           return response
         }
+        return {}
       },
     },
   },
