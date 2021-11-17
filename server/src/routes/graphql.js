@@ -256,16 +256,14 @@ const RootQuery = new GraphQLObjectType({
       type: ScanAreaType,
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
-        if (perms?.scanAreas) {
-          if (scanAreas.features.length) {
-            try {
-              scanAreas.features = scanAreas.features.sort((a, b) => (a.properties.name > b.properties.name) ? 1 : -1)
-            } catch (e) {
-              console.warn('Failed to sort scan areas', e.message)
-            }
+        if (perms?.scanAreas && scanAreas.features.length) {
+          try {
+            scanAreas.features = scanAreas.features.sort((a, b) => (a.properties.name > b.properties.name) ? 1 : -1)
+          } catch (e) {
+            console.warn('Failed to sort scan areas', e.message)
           }
-          return scanAreas
         }
+        return scanAreas
       },
     },
     search: {
