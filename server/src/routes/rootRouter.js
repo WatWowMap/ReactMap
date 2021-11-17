@@ -8,7 +8,7 @@ const { default: center } = require('@turf/center')
 
 const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
-const schema = require('../schema/schema')
+const schema = require('./graphql')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
