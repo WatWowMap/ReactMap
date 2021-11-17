@@ -19,11 +19,13 @@ const authHandler = async (req, profile, done) => {
   const groupInfo = await Promise.all(telegram.groups.filter(async group => {
     try {
       const response = await Fetch.fetchJson(`https://api.telegram.org/bot${telegram.botToken}/getChatMember?chat_id=${group}&user_id=${user.id}`)
+      if (!response) {
+        throw new Error('Unable to query TG API or User is not in the group')
+      }
       if (!response.ok) {
         throw new Error(`Telegram API error: ${response.status} ${response.statusText}`)
       }
-      const { result } = await response.json()
-      return result.status !== 'left' && result.status !== 'kicked'
+      return response.result.status !== 'left' && response.result.status !== 'kicked'
     } catch (e) {
       console.error(e.message, `Telegram Group: ${group}`, `User: ${user.id} (${user.username})`)
       return null
@@ -32,7 +34,7 @@ const authHandler = async (req, profile, done) => {
 
   Object.entries(telegram.perms).forEach(([perm, info]) => {
     if (info.enabled && (alwaysEnabledPerms.includes(perm)
-    || info.roles.some(role => groupInfo.includes(role)))) {
+      || info.roles.some(role => groupInfo.includes(role)))) {
       user.perms[perm] = true
     }
   })
