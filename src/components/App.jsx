@@ -97,6 +97,12 @@ export default function App() {
             <Route exact path="/login">
               {serverSettings && <Login clickedTwice serverSettings={serverSettings} />}
             </Route>
+            <Route exact path="/@/:lat/:lon/:zoom?">
+              {serverSettings && <Auth serverSettings={serverSettings} />}
+            </Route>
+            <Route exact path="/id/:category/:id/:zoom?">
+              {serverSettings && <Auth serverSettings={serverSettings} />}
+            </Route>
           </Switch>
         </Router>
       </ApolloProvider>
