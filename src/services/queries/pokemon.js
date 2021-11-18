@@ -16,6 +16,7 @@ const core = gql`
     display_pokemon_id
     ditto_form
     seen_type
+    inactive_stats
   }
 `
 

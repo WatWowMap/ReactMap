@@ -235,7 +235,7 @@ const Header = ({
 
 const Stats = ({ pokemon, perms, t }) => {
   const {
-    cp, iv, atk_iv, def_iv, sta_iv, level,
+    cp, iv, atk_iv, def_iv, sta_iv, level, inactive_stats,
   } = pokemon
 
   const getColor = useCallback(ivPercent => {
@@ -268,7 +268,7 @@ const Stats = ({ pokemon, perms, t }) => {
       {(perms.stats && atk_iv !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
-            {atk_iv} | {def_iv} | {sta_iv}
+            {atk_iv} | {def_iv} | {sta_iv} {inactive_stats ? '*' : ''}
           </Typography>
         </Grid>
       )}

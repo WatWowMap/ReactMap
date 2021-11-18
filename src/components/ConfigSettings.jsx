@@ -14,7 +14,7 @@ import Map from './Map'
 export default function ConfigSettings({
   serverSettings, match, paramLocation, paramZoom,
 }) {
-  Utility.analytics('Discord', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
+  Utility.analytics('User', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
 
   document.title = serverSettings.config.map.headerTitle
   const theme = setTheme(serverSettings.config.map.theme)

@@ -197,6 +197,17 @@ class Pokemon extends Model {
 
     const globalCheck = (pkmn) => onlyLinkGlobal ? args.filters[`${pkmn.pokemon_id}-${pkmn.form}`] : true
 
+    const handleDitto = (pkmn) => {
+      pkmn.ditto_form = pkmn.form
+      pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
+      const statsToCheck = ['atk', 'def', 'sta']
+      statsToCheck.forEach(stat => {
+        if (!pkmn[`${stat}_iv`] && pkmn[`${stat}_inactive`]) {
+          pkmn[`${stat}_iv`] = pkmn[`${stat}_inactive`]
+          pkmn.inactive_stats = true
+        }
+      })
+    }
     // query builder
     const query = this.query()
     if (isMad) {
@@ -258,8 +269,7 @@ class Pokemon extends Model {
     results.forEach(pkmn => {
       let noPvp = true
       if (pkmn.pokemon_id === 132 && !pkmn.ditto_form) {
-        pkmn.ditto_form = pkmn.form
-        pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
+        handleDitto(pkmn)
       }
       if (!pkmn.seen_type) {
         if (pkmn.spawn_id === null) {
@@ -320,9 +330,8 @@ class Pokemon extends Model {
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       pkmn.cleanPvp = {}
       pkmn.bestPvp = 4096
-      if (pkmn.pokemon_id === 132) {
-        pkmn.ditto_form = pkmn.form
-        pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
+      if (pkmn.pokemon_id === 132 && !pkmn.ditto_form && pkmn.pvpCheck) {
+        handleDitto(pkmn)
       }
       if (!pkmn.seen_type) pkmn.seen_type = 'encounter'
       Object.keys(parsed).forEach(league => {
