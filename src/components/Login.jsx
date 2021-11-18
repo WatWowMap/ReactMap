@@ -19,7 +19,7 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
       spacing={4}
     >
       <Grid item>
-        <Typography variant="h3" style={{ color: 'white' }}>
+        <Typography variant="h3" style={{ color: 'white' }} align="center">
           {t('welcome')} {serverSettings.config.map.headerTitle}
         </Typography>
       </Grid>
@@ -27,13 +27,14 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
         <Grid container item justifyContent="center" alignItems="center" spacing={2}>
           <Grid
             item
-            xs={serverSettings.config.map.discordInvite ? 3 : 6}
+            xs={serverSettings.config.map.discordInvite ? 5 : 10}
+            sm={serverSettings.config.map.discordInvite ? 3 : 5}
             style={{ textAlign: serverSettings.config.map.discordInvite ? 'right' : 'center' }}
           >
             <DiscordLogin />
           </Grid>
           {serverSettings.config.map.discordInvite && (
-            <Grid item xs={3} style={{ textAlign: 'left' }}>
+            <Grid item xs={5} sm={3} style={{ textAlign: 'left' }}>
               <DiscordLogin href={serverSettings.config.map.discordInvite} text="join" />
             </Grid>
           )}
