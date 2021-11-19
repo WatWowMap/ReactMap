@@ -1,5 +1,7 @@
 export default function genPokemon(t, pokemon, categories) {
-  const tempObj = Object.fromEntries(categories.map(x => [x, {}]))
+  const tempObj = Object.fromEntries(categories.map(x => (
+    [x, { '0-0': { webhookOnly: true, name: t('poke_global'), perms: ['pokemon', 'raids', 'quests', 'nests'], formTypes: [] } }]
+  )))
 
   Object.entries(pokemon).forEach(([i, pkmn]) => {
     const pokeName = t(`poke_${i}`)
