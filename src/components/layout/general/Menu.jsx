@@ -122,7 +122,7 @@ export default function Menu({
     if (id === 'global' && !open && newFilters) {
       const wildCards = (() => {
         switch (webhookCategory) {
-          case 'raid': return ['r90', '0-0']
+          case 'raid': return ['r90']
           case 'egg': return ['e90']
           case 'gym': return ['t4']
           case 'invasion': return ['i0']

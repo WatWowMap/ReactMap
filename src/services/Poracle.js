@@ -251,10 +251,16 @@ export default class Poracle {
 
   static getTitles(idObj) {
     switch (idObj.type) {
-      case 'egg': return [`egg_${idObj.id}_plural`]
-      case 'invasion': return [`grunt_a_${idObj.id}`]
+      case 'egg': return idObj.id === '90'
+        ? ['poke_global']
+        : [`egg_${idObj.id}_plural`]
+      case 'invasion': return idObj.id === '0'
+        ? ['poke_global']
+        : [`grunt_a_${idObj.id}`]
       case 'lure': return [`lure_${idObj.id}`]
-      case 'raid': return [`raid_${idObj.id}_plural`]
+      case 'raid': return idObj.id === '90'
+        ? ['poke_global']
+        : [`raid_${idObj.id}_plural`]
       case 'pokemon': return idObj.id === '0'
         ? ['poke_global']
         : [`poke_${idObj.id}`, +idObj.form ? `form_${idObj.form}` : '']
