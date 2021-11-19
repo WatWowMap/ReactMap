@@ -47,8 +47,8 @@ export const nests = gql`
 
 export const quests = gql`
   ${core}
-  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int!) {
-    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, ts: $ts) {
+  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int!, $midnight: Int!) {
+    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, ts: $ts, midnight: $midnight) {
       ...CoreSearch
       quest_pokemon_id
       quest_form_id

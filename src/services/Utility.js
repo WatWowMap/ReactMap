@@ -43,6 +43,15 @@ export default class Utility {
     return date <= times.sunrise || date >= times.sunset
   }
 
+  static getMidnight() {
+    const date = new Date()
+    return Math.floor(
+      new Date(
+        date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0,
+      ).getTime() / 1000,
+    )
+  }
+
   static analytics(category, action = false, label = false, nonInteraction = false) {
     if (process.env?.GOOGLE_ANALYTICS_ID) {
       if (action) {

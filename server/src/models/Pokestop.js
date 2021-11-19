@@ -51,21 +51,18 @@ class Pokestop extends Model {
   }
 
   static async getAllPokestops(args, perms, isMad) {
-    const date = new Date(args.ts * 1000)
-    const tsMs = date.getTime()
-    const { ts } = args
-    const midnight = settings.hideOldQuests
-      ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
-      : 0
+    const { filters: {
+      onlyLures, onlyQuests, onlyInvasions, onlyArEligible, onlyAllPokestops,
+    }, ts, midnight } = args
+    // const midnight = settings.hideOldQuests
+    //   ? args.midnight
+    //   : 0
 
-    console.log('Main Pokestops\n', 'Clear Old Quests: ', settings.hideOldQuests, '\nTimestamp: ', ts, '\nMidnight: ', midnight, '\nDate: ', date)
+    console.log('Main Pokestops', '\nClear Old Quests: ', settings.hideOldQuests, '\nTimestamp: ', ts, '\nMidnight: ', midnight)
 
     const {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms, areaRestrictions,
     } = perms
-    const {
-      onlyLures, onlyQuests, onlyInvasions, onlyArEligible, onlyAllPokestops,
-    } = args.filters
 
     const query = this.query()
     if (isMad) {
@@ -233,7 +230,7 @@ class Pokestop extends Model {
         if (dbType === 'chuck') {
           stops.orWhere(invasion => {
             invasion.whereIn('character', invasions)
-              .andWhere('expiration_ms', '>=', tsMs)
+              .andWhere('expiration_ms', '>=', ts * 1000)
           })
         } else {
           stops.orWhere(invasion => {
@@ -595,13 +592,12 @@ class Pokestop extends Model {
   }
 
   static async searchQuests(args, perms, isMad, distance) {
-    const { search, locale } = args
-    const date = new Date(args.ts * 1000)
-    const midnight = settings.hideOldQuests
-      ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
-      : 0
+    const { search, locale, ts, midnight } = args
+    // const midnight = settings.hideOldQuests
+    //   ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
+    //   : 0
 
-    console.log('Search Quests\n', 'Clear Old Quests: ', settings.hideOldQuests, '\nTimestamp: ', args.ts, '\nMidnight: ', midnight, '\nDate: ', date)
+    console.log('Search Quests\n', 'Clear Old Quests: ', settings.hideOldQuests, '\nTimestamp: ', ts, '\nMidnight: ', midnight)
 
     const pokemonIds = Object.keys(masterPkmn).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)

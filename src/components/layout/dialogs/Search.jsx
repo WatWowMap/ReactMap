@@ -36,6 +36,7 @@ export default function Search({
       lon: location[1],
       locale: localStorage.getItem('i18nextLng'),
       ts: Math.floor(Date.now() / 1000),
+      midnight: Utility.getMidnight(),
     },
   })
 
