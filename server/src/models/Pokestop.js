@@ -51,19 +51,16 @@ class Pokestop extends Model {
   }
 
   static async getAllPokestops(args, perms, isMad) {
-    const date = new Date()
-    const tsMs = date.getTime()
-    const ts = Math.floor(tsMs / 1000)
+    const { filters: {
+      onlyLures, onlyQuests, onlyInvasions, onlyArEligible, onlyAllPokestops,
+    }, ts, midnight: clientMidnight } = args
     const midnight = settings.hideOldQuests
-      ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
+      ? clientMidnight
       : 0
 
     const {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms, areaRestrictions,
     } = perms
-    const {
-      onlyLures, onlyQuests, onlyInvasions, onlyArEligible, onlyAllPokestops,
-    } = args.filters
 
     const query = this.query()
     if (isMad) {
@@ -231,7 +228,7 @@ class Pokestop extends Model {
         if (dbType === 'chuck') {
           stops.orWhere(invasion => {
             invasion.whereIn('character', invasions)
-              .andWhere('expiration_ms', '>=', tsMs)
+              .andWhere('expiration_ms', '>=', ts * 1000)
           })
         } else {
           stops.orWhere(invasion => {
@@ -593,7 +590,9 @@ class Pokestop extends Model {
   }
 
   static async searchQuests(args, perms, isMad, distance) {
-    const { search, locale } = args
+    const { search, locale, midnight: clientMidnight } = args
+    const midnight = settings.hideOldQuests ? clientMidnight : 0
+
     const pokemonIds = Object.keys(masterPkmn).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
     ))
@@ -617,9 +616,12 @@ class Pokestop extends Model {
         distance,
       ])
       .where(isMad ? 'enabled' : 'deleted', isMad)
-      .whereIn('quest_pokemon_id', pokemonIds)
-      .orWhereIn('quest_item_id', itemIds)
-      .orWhereIn('quest_reward_type', rewardTypes)
+      .andWhere('quest_timestamp', '>=', midnight)
+      .andWhere(quests => {
+        quests.whereIn('quest_pokemon_id', pokemonIds)
+          .orWhereIn('quest_item_id', itemIds)
+          .orWhereIn('quest_reward_type', rewardTypes)
+      })
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (altQuestCheck) {
@@ -644,7 +646,7 @@ class Pokestop extends Model {
     if (perms.areaRestrictions?.length > 0) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
-    const results = await query
+    const results = await query.skipUndefined()
     return results.map(result => isMad ? this.parseMadRewards(result) : this.parseRdmRewards(result))
   }
 }

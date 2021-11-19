@@ -80,7 +80,6 @@ class Pokemon extends Model {
   }
 
   static async getPokemon(args, perms, isMad) {
-    const ts = Math.floor((new Date()).getTime() / 1000)
     const {
       stats, iv: ivs, pvp, areaRestrictions,
     } = perms
@@ -214,7 +213,7 @@ class Pokemon extends Model {
     if (isMad) {
       getMadSql(query)
     }
-    query.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+    query.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : args.ts)
       .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
       .andWhere(ivOr => {
@@ -301,7 +300,7 @@ class Pokemon extends Model {
       } else {
         pvpQuery.select(['*', raw(true).as('pvpCheck')])
       }
-      pvpQuery.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+      pvpQuery.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : args.ts)
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
         .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
       if (isMad && listOfIds.length > 0) {

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/client'
 
 import Query from '@services/Query'
+import Utility from '@services/Utility'
 import RobustTimeout from '@classes/RobustTimeout'
 
 import Clustering from './Clustering'
@@ -83,6 +84,8 @@ export default function QueryData({
         maxLon: mapBounds._northEast.lng,
         filters: trimFilters(filters),
         zoom: Math.floor(map.getZoom()),
+        ts: Math.floor(Date.now() / 1000),
+        midnight: Utility.getMidnight(),
       })
     }
   }

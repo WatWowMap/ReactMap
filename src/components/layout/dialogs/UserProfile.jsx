@@ -34,7 +34,7 @@ export default function UserProfile({ setUserProfile }) {
           spacing={2}
         >
           {Object.keys(perms).map(perm => {
-            if (excludeList.includes(perm)) {
+            if (excludeList.includes(perm) || perm === 'donor') {
               return null
             }
             return (

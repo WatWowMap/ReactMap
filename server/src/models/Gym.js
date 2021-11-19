@@ -18,7 +18,6 @@ class Gym extends Model {
   }
 
   static async getAllGyms(args, perms, isMad) {
-    const ts = Math.floor((new Date()).getTime() / 1000)
     const { gyms: gymPerms, raids: raidPerms, areaRestrictions } = perms
     const {
       onlyAllGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible, onlyOrRaids,
@@ -143,8 +142,8 @@ class Gym extends Model {
       }
       if (onlyRaids && raidPerms) {
         gym.orWhere(raid => {
-          raid.where(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : ts)
-            .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+          raid.where(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : args.ts)
+            .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : args.ts)
             .andWhere(bosses => {
               bosses.whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [...raidBosses])
                 ?.[onlyOrRaids ? 'orWhereIn' : 'whereIn'](isMad ? 'level' : 'raid_level', raids)
@@ -157,7 +156,7 @@ class Gym extends Model {
             } else {
               egg.whereIn(isMad ? 'level' : 'raid_level', eggs)
             }
-            egg.andWhere(isMad ? 'start' : 'raid_battle_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+            egg.andWhere(isMad ? 'start' : 'raid_battle_timestamp', '>=', isMad ? this.knex().fn.now() : args.ts)
           })
         }
       }
@@ -247,7 +246,6 @@ class Gym extends Model {
 
   static async searchRaids(args, perms, isMad, distance) {
     const { search, locale } = args
-    const ts = Math.floor((new Date()).getTime() / 1000)
     const pokemonIds = Object.keys(masterfile).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
     ))
@@ -268,8 +266,8 @@ class Gym extends Model {
       .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', pokemonIds)
       .limit(searchResultsLimit)
       .orderBy('distance')
-      .andWhere(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : ts)
-      .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+      .andWhere(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : args.ts)
+      .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : args.ts)
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')

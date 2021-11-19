@@ -36,6 +36,8 @@ const minMaxArgs = {
   maxLat: { type: GraphQLFloat },
   minLon: { type: GraphQLFloat },
   maxLon: { type: GraphQLFloat },
+  ts: { type: GraphQLInt },
+  midnight: { type: GraphQLInt },
 }
 
 const RootQuery = new GraphQLObjectType({
@@ -275,6 +277,8 @@ const RootQuery = new GraphQLObjectType({
         lon: { type: GraphQLFloat },
         locale: { type: GraphQLString },
         webhookName: { type: GraphQLString },
+        ts: { type: GraphQLInt },
+        midnight: { type: GraphQLInt },
       },
       async resolve(parent, args, req) {
         const perms = req.user ? req.user.perms : req.session.perms
