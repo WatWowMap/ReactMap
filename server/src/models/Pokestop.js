@@ -53,12 +53,10 @@ class Pokestop extends Model {
   static async getAllPokestops(args, perms, isMad) {
     const { filters: {
       onlyLures, onlyQuests, onlyInvasions, onlyArEligible, onlyAllPokestops,
-    }, ts, midnight } = args
-    // const midnight = settings.hideOldQuests
-    //   ? args.midnight
-    //   : 0
-
-    console.log('Main Pokestops', '\nClear Old Quests: ', settings.hideOldQuests, '\nTimestamp: ', ts, '\nMidnight: ', midnight)
+    }, ts, midnight: clientMidnight } = args
+    const midnight = settings.hideOldQuests
+      ? clientMidnight
+      : 0
 
     const {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms, areaRestrictions,
@@ -592,12 +590,8 @@ class Pokestop extends Model {
   }
 
   static async searchQuests(args, perms, isMad, distance) {
-    const { search, locale, ts, midnight } = args
-    // const midnight = settings.hideOldQuests
-    //   ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
-    //   : 0
-
-    console.log('Search Quests\n', 'Clear Old Quests: ', settings.hideOldQuests, '\nTimestamp: ', ts, '\nMidnight: ', midnight)
+    const { search, locale, midnight: clientMidnight } = args
+    const midnight = settings.hideOldQuests ? clientMidnight : 0
 
     const pokemonIds = Object.keys(masterPkmn).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
@@ -652,7 +646,7 @@ class Pokestop extends Model {
     if (perms.areaRestrictions?.length > 0) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
-    const results = await query
+    const results = await query.skipUndefined()
     return results.map(result => isMad ? this.parseMadRewards(result) : this.parseRdmRewards(result))
   }
 }
