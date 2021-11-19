@@ -58,6 +58,8 @@ class Pokestop extends Model {
       ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
       : 0
 
+    console.log('Main Pokestops\n', 'Clear Old Quests: ', settings.hideOldQuests, '\nTimestamp: ', ts, '\nMidnight: ', midnight, '\nDate: ', date)
+
     const {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms, areaRestrictions,
     } = perms
@@ -598,6 +600,8 @@ class Pokestop extends Model {
     const midnight = settings.hideOldQuests
       ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000
       : 0
+
+    console.log('Search Quests\n', 'Clear Old Quests: ', settings.hideOldQuests, '\nTimestamp: ', args.ts, '\nMidnight: ', midnight, '\nDate: ', date)
 
     const pokemonIds = Object.keys(masterPkmn).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
