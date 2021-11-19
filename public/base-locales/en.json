@@ -448,5 +448,7 @@
   "auto": "Auto",
   "webhooksSubtitle": "Manage your alerts directly from the map for these bots",
   "webhooks": "Alerts",
+  "everything_individually": "Add Individual Alerts",
+  "individually": "individually",
   "join": "Join"
 }

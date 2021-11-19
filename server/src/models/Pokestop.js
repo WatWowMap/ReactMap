@@ -337,6 +337,9 @@ class Pokestop extends Model {
           } else {
             filtered[result.id][field] = result[field]
           }
+          if (result.with_ar === undefined) {
+            quest.with_ar = true
+          }
         })
       }
       if (invasion.grunt_type && invasion.incident_expire_timestamp >= ts) {

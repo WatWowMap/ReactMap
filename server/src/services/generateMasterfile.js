@@ -24,7 +24,7 @@ const getRarityLevel = (id, pkmn) => {
   return rarity
 }
 
-module.exports.generate = async function generate() {
+const generate = async () => {
   try {
     const masterfile = await fetchJson('https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-react-map.json')
 
@@ -41,8 +41,13 @@ module.exports.generate = async function generate() {
       'utf8',
       () => { },
     )
-    console.log('New masterfile generated')
   } catch (e) {
     console.warn('Unable to generate new masterfile, using existing.')
   }
+}
+
+module.exports.generate = generate
+
+if (require.main === module) {
+  generate().then(() => console.log('Masterfile generated'))
 }

@@ -53,7 +53,7 @@ const Location = ({
     }
   }, [webhookLocation])
 
-  useEffect(() => () => lc._deactivate(), [])
+  useEffect(() => () => lc.stop(), [])
 
   const fetchedData = data || previousData
 

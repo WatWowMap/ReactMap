@@ -3,7 +3,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
     case 'poracle': {
       const pvpMax = hookConfig[`pvpFilter${leagues[0].name.charAt(0).toUpperCase()}${leagues[0].name.substring(1)}MinCP`] || 4096
       const isOhbem = pvp === 'ohbem'
-      return {
+      const poracleUiObj = {
         human: true,
         pokemon: {
           sortProp: 'pokemon_id',
@@ -41,6 +41,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             byDistance: false,
             xs: false,
             xl: false,
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
+              || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
             primary: {
@@ -86,6 +88,9 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
+            global: {
+              booleans: [],
+            },
           },
         },
         raid: {
@@ -104,6 +109,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             byDistance: false,
             allMoves: true,
             allForms: true,
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
+              || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
             general: {
@@ -125,6 +132,9 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
+            global: {
+              booleans: [],
+            },
           },
         },
         egg: {
@@ -137,6 +147,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             team: 4,
             gym_id: null,
             byDistance: false,
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
+              || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
             general: {
@@ -155,6 +167,9 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
+            global: {
+              booleans: [],
+            },
           },
         },
         gym: {
@@ -167,6 +182,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             battle_changes: false,
             gym_id: null,
             byDistance: false,
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
+              || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
             general: {
@@ -185,6 +202,9 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
+            global: {
+              booleans: [],
+            },
           },
         },
         invasion: {
@@ -195,6 +215,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             grunt_type: null,
             gender: 0,
             byDistance: false,
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
+              || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
             general: {
@@ -209,6 +231,9 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 6, sm: 8, override: true }],
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
+            },
+            global: {
+              booleans: [],
             },
           },
         },
@@ -297,6 +322,13 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
           },
         },
       }
+      Object.values(poracleUiObj).forEach(category => {
+        if (typeof category === 'object' && category?.ui?.global
+          && hookConfig.everythingFlagPermissions === 'allow-any') {
+          category.ui.global.booleans.push({ name: 'everything_individually', xs: 12, sm: 12, override: true })
+        }
+      })
+      return poracleUiObj
     }
     default: return {}
   }

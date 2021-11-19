@@ -2,6 +2,10 @@ export default function genPokestops(t, pokemon, pokestops, categories) {
   const tempObj = Object.fromEntries(categories.map(x => [x, {}]))
   if (!pokestops?.filter) return {}
 
+  if (tempObj.invasions) {
+    tempObj.invasions.i0 = { name: t('poke_global'), perms: ['invasions'], webhookOnly: true }
+  }
+
   Object.keys(pokestops.filter).forEach(id => {
     if (id !== 'global' && !/\d/.test(id.charAt(0))) {
       switch (id.charAt(0)) {

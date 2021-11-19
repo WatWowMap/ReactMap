@@ -7,7 +7,7 @@ const fetchJson = require('./api/fetchJson')
 const appLocalesFolder = path.resolve(__dirname, '../../../public/base-locales')
 const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales')
 
-module.exports.locales = async function locales() {
+const locales = async () => {
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
   const englishRef = fs.readFileSync(path.resolve(appLocalesFolder, 'en.json'), { encoding: 'utf8', flag: 'r' })
 
@@ -51,4 +51,10 @@ module.exports.locales = async function locales() {
     )
     console.log(`${locale}`, 'file saved.')
   }))
+}
+
+module.exports.locales = locales
+
+if (require.main === module) {
+  locales().then(() => console.log('Translations generated'))
 }
