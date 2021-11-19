@@ -332,7 +332,25 @@ const QuestConditions = ({ quest, t, userSettings }) => {
     quest_type,
     quest_target,
     quest_conditions,
+    quest_title,
   } = quest
+
+  if (quest_title) {
+    return (
+      <Grid item xs={9} style={{ textAlign: 'center' }}>
+        <Typography variant="caption">
+          <Trans
+            defaults={quest_task}
+            i18nKey={quest_title.startsWith('quest_')
+              ? quest_title.replace('quest_', 'quest_title_').toLowerCase()
+              : `quest_title_${quest_title.toLowerCase()}`}
+          >
+            {{ amount_0: quest_target }}
+          </Trans>
+        </Typography>
+      </Grid>
+    )
+  }
 
   if (userSettings.madQuestText && quest_task) {
     return (

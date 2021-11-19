@@ -15,6 +15,7 @@ const quest = new GraphQLObjectType({
     quest_reward_type: { type: GraphQLInt },
     quest_task: { type: GraphQLString },
     quest_item_id: { type: GraphQLInt },
+    quest_title: { type: GraphQLString },
     item_amount: { type: GraphQLInt },
     stardust_amount: { type: GraphQLInt },
     quest_pokemon_id: { type: GraphQLInt },
