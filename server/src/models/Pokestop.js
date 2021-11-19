@@ -17,6 +17,7 @@ const questProps = {
   quest_reward_type: true,
   quest_item_id: true,
   quest_pokemon_id: true,
+  quest_title: true,
 }
 const questPropsAlt = {}
 const madQuestProps = {
@@ -281,7 +282,7 @@ class Pokestop extends Model {
             } else {
               this.parseRdmRewards(quest)
             }
-            const fields = ['quest_type', 'quest_timestamp', 'quest_target', 'quest_conditions', 'quest_task', 'quest_reward_type', 'quest_rewards', 'with_ar']
+            const fields = ['quest_type', 'quest_timestamp', 'quest_target', 'quest_conditions', 'quest_task', 'quest_reward_type', 'quest_rewards', 'with_ar', 'quest_title']
             switch (quest.quest_reward_type) {
               case 2:
                 newQuest.key = `q${quest.quest_item_id}`
