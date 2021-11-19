@@ -86,7 +86,7 @@ module.exports = async function initWebhooks(config) {
       }
     }))
   } catch (e) {
-    console.log(config.devOptions.enabled ? e : e.message, 'There has bene an error during webhook initialization')
+    console.log(config.devOptions.enabled ? e : e.message, 'An error has occurred during webhook initialization')
   }
   return webhookObj
 }
