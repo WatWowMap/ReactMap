@@ -16,6 +16,7 @@ export default function parseQuestConditions(conditions) {
       case 14: normalized.info.throw_type_id = specifics.with_throw_type.throw_type; break
       case 26: normalized.info.alignment_ids = specifics.with_pokemon_alignment.alignment; break
       case 27: normalized.info.character_category_ids = specifics.with_invasion_character.category; break
+      case 44: normalized.info.time = specifics.with_elapsed_time.elapsed_time / 1000; break
     }
     return normalized
   }

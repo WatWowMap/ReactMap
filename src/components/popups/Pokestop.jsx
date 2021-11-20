@@ -407,6 +407,11 @@ const QuestConditions = ({ quest, t, userSettings }) => {
           {{ categories: qInfo.character_category_ids.map(id => t(`character_category_${id}`)) }}
         </Trans>
       )
+      case 44: return (
+        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+          {{ time: qInfo.time }}
+        </Trans>
+      )
       default: return t(`quest_condition_${qType}`)
     }
   }
