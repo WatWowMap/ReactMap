@@ -21,7 +21,16 @@ const config = require('./services/config')
 const app = express()
 
 if (config.devOptions.enabled) {
-  app.use(logger('dev'))
+  app.use(logger((tokens, req, res) => [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens['response-time'](req, res),
+    'ms',
+    req.user ? `- ${req.user.username}` : 'Not Logged In',
+    '-',
+    req.headers['x-forwarded-for'],
+  ].join(' ')))
 }
 
 const RateLimitTime = config.api.rateLimit.time * 60 * 1000

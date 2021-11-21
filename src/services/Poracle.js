@@ -264,7 +264,9 @@ export default class Poracle {
       case 'pokemon': return idObj.id === '0'
         ? ['poke_global']
         : [`poke_${idObj.id}`, +idObj.form ? `form_${idObj.form}` : '']
-      case 'gym': return [`team_${idObj.id}`]
+      case 'gym': return idObj.id === '4'
+        ? ['poke_global']
+        : [`team_${idObj.id}`]
       default: return [`${idObj.type}_${idObj.id}`]
     }
   }

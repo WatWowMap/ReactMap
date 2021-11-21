@@ -84,9 +84,10 @@ class Pokemon extends Model {
       stats, iv: ivs, pvp, areaRestrictions,
     } = perms
     const {
-      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyLinkGlobal,
+      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyLinkGlobal, ts,
     } = args.filters
     let queryPvp = false
+    const safeTs = ts || Math.floor((new Date()).getTime() / 1000)
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !stats && !pvp) {
@@ -213,7 +214,7 @@ class Pokemon extends Model {
     if (isMad) {
       getMadSql(query)
     }
-    query.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : args.ts)
+    query.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
       .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
       .andWhere(ivOr => {
@@ -300,7 +301,7 @@ class Pokemon extends Model {
       } else {
         pvpQuery.select(['*', raw(true).as('pvpCheck')])
       }
-      pvpQuery.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : args.ts)
+      pvpQuery.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
         .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
       if (isMad && listOfIds.length > 0) {
