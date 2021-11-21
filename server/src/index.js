@@ -29,7 +29,7 @@ if (config.devOptions.enabled) {
     'ms',
     req.user ? `- ${req.user.username}` : 'Not Logged In',
     '-',
-    req.connection.remoteAddress || req.connection.localAddress,
+    req.headers['x-forwarded-for'],
   ].join(' ')))
 }
 
