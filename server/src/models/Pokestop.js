@@ -57,6 +57,7 @@ class Pokestop extends Model {
     const midnight = settings.hideOldQuests
       ? clientMidnight
       : 0
+    const safeTs = ts || Math.floor((new Date()).getTime() / 1000)
 
     const {
       lures: lurePerms, quests: questPerms, invasions: invasionPerms, pokestops: pokestopPerms, areaRestrictions,
@@ -109,7 +110,7 @@ class Pokestop extends Model {
     // returns everything if all pokestops are on
     if (onlyAllPokestops && pokestopPerms) {
       const results = await query
-      const normalized = isMad ? this.mapMAD(results, ts) : this.mapRDM(results, ts)
+      const normalized = isMad ? this.mapMAD(results, safeTs) : this.mapRDM(results, safeTs)
       return this.secondaryFilter(normalized, args.filters, isMad, midnight)
     }
 
@@ -143,7 +144,7 @@ class Pokestop extends Model {
       if (onlyLures && lurePerms) {
         stops.orWhere(lure => {
           lure.whereIn(isMad ? 'active_fort_modifier' : 'lure_id', lures)
-            .andWhere(isMad ? 'lure_expiration' : 'lure_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+            .andWhere(isMad ? 'lure_expiration' : 'lure_expire_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
         })
       }
       if (onlyQuests && questPerms) {
@@ -228,7 +229,7 @@ class Pokestop extends Model {
         if (dbType === 'chuck') {
           stops.orWhere(invasion => {
             invasion.whereIn('character', invasions)
-              .andWhere('expiration_ms', '>=', ts * 1000)
+              .andWhere('expiration_ms', '>=', safeTs * 1000)
           })
         } else {
           stops.orWhere(invasion => {
@@ -244,7 +245,7 @@ class Pokestop extends Model {
       }
     })
     const results = await query
-    const normalized = isMad ? this.mapMAD(results, ts) : this.mapRDM(results, ts)
+    const normalized = isMad ? this.mapMAD(results, safeTs) : this.mapRDM(results, safeTs)
     return this.secondaryFilter(normalized, args.filters, isMad, midnight)
   }
 
@@ -616,7 +617,7 @@ class Pokestop extends Model {
         distance,
       ])
       .where(isMad ? 'enabled' : 'deleted', isMad)
-      .andWhere('quest_timestamp', '>=', midnight)
+      .andWhere('quest_timestamp', '>=', midnight || 0)
       .andWhere(quests => {
         quests.whereIn('quest_pokemon_id', pokemonIds)
           .orWhereIn('quest_item_id', itemIds)

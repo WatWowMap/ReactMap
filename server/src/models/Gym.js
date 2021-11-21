@@ -20,8 +20,9 @@ class Gym extends Model {
   static async getAllGyms(args, perms, isMad) {
     const { gyms: gymPerms, raids: raidPerms, areaRestrictions } = perms
     const {
-      onlyAllGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible, onlyOrRaids,
+      onlyAllGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible, onlyOrRaids, ts,
     } = args.filters
+    const safeTs = ts || Math.floor((new Date()).getTime() / 1000)
     const query = this.query()
 
     if (isMad) {
@@ -142,8 +143,8 @@ class Gym extends Model {
       }
       if (onlyRaids && raidPerms) {
         gym.orWhere(raid => {
-          raid.where(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : args.ts)
-            .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : args.ts)
+          raid.where(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : safeTs)
+            .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
             .andWhere(bosses => {
               bosses.whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [...raidBosses])
                 ?.[onlyOrRaids ? 'orWhereIn' : 'whereIn'](isMad ? 'level' : 'raid_level', raids)
@@ -156,7 +157,7 @@ class Gym extends Model {
             } else {
               egg.whereIn(isMad ? 'level' : 'raid_level', eggs)
             }
-            egg.andWhere(isMad ? 'start' : 'raid_battle_timestamp', '>=', isMad ? this.knex().fn.now() : args.ts)
+            egg.andWhere(isMad ? 'start' : 'raid_battle_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
           })
         }
       }
@@ -249,7 +250,7 @@ class Gym extends Model {
     const pokemonIds = Object.keys(masterfile).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
     ))
-
+    const safeTs = args.ts || Math.floor((new Date()).getTime() / 1000)
     const query = this.query()
       .select([
         'name',
@@ -266,8 +267,8 @@ class Gym extends Model {
       .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', pokemonIds)
       .limit(searchResultsLimit)
       .orderBy('distance')
-      .andWhere(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : args.ts)
-      .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : args.ts)
+      .andWhere(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : safeTs)
+      .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')

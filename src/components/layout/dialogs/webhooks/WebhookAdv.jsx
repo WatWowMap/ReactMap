@@ -389,7 +389,13 @@ export default function WebhookAdvanced({
                   {...params}
                   label={<Trans i18nKey="search_specific">{{ category: t(option.label) }}</Trans>}
                   variant="outlined"
-                  onChange={(e) => search({ variables: { search: e.target.value, category: option.searchCategory } })}
+                  onChange={(e) => search({
+                    variables: {
+                      search: e.target.value,
+                      category: option.searchCategory,
+                      ts: Math.floor(Date.now() / 1000),
+                    },
+                  })}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
