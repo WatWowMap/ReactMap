@@ -27,8 +27,9 @@ if (config.devOptions.enabled) {
     tokens.status(req, res),
     tokens['response-time'](req, res),
     'ms',
-    req.user ? `user: ${req.user.username}` : 'Not Logged In',
-    tokens['remote-addr'](req, res),
+    req.user ? `- ${req.user.username}` : 'Not Logged In',
+    '-',
+    req.connection.remoteAddress || req.connection.localAddress,
   ].join(' ')))
 }
 
