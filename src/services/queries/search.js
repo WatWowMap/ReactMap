@@ -23,8 +23,8 @@ export const poi = gql`
 
 export const poiWebhook = gql`
   ${Nominatim}
-  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $webhookName: String, $ts: Int) {
-    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, webhookName: $webhookName, ts: $ts) {
+  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $webhookName: String) {
+    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, webhookName: $webhookName) {
       id
       name
       formatted {
