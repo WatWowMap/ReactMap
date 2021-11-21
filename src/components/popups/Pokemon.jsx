@@ -438,30 +438,33 @@ const ExtraInfo = ({
       alignItems="center"
       justifyContent="center"
     >
-      {(perms.iv && iv !== null) && [move_1, move_2].map((move, i) => (
-        <Fragment key={move}>
-          <Grid
-            item
-            xs={2}
-            className="grid-item"
-            style={{
-              height: 15,
-              width: 15,
-              backgroundImage: `url(${Icons.getTypes(moves[move].type)})`,
-            }}
-          />
-          <Grid item xs={6}>
-            <Typography variant="caption">
-              {t(`move_${move}`)}
-            </Typography>
-          </Grid>
-          <Grid item xs={3} style={{ textAlign: 'right' }}>
-            <Typography variant="caption">
-              {i ? `${weight.toFixed(2)}${t('kilogram')}` : `${size.toFixed(2)}${t('meter')}`}
-            </Typography>
-          </Grid>
-        </Fragment>
-      ))}
+      {(perms.iv && iv !== null) && [move_1, move_2].map((move, i) => {
+        if (!move) return null
+        return (
+          <Fragment key={move}>
+            <Grid
+              item
+              xs={2}
+              className="grid-item"
+              style={{
+                height: 15,
+                width: 15,
+                backgroundImage: `url(${Icons.getTypes(moves[move].type)})`,
+              }}
+            />
+            <Grid item xs={6}>
+              <Typography variant="caption">
+                {t(`move_${move}`)}
+              </Typography>
+            </Grid>
+            <Grid item xs={3} style={{ textAlign: 'right' }}>
+              <Typography variant="caption">
+                {i ? `${weight.toFixed(2)}${t('kilogram')}` : `${size.toFixed(2)}${t('meter')}`}
+              </Typography>
+            </Grid>
+          </Fragment>
+        )
+      })}
       {[first_seen_timestamp, updated].map((time, i) => (
         time ? (
           <Fragment key={time}>
