@@ -78,12 +78,12 @@ const Location = ({
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Button size="small" variant="contained" color="secondary" onClick={() => lc._onClick()} startIcon={<LocationOn color={color} />}>
-          {t('myLocation')}
+          {t('my_location')}
         </Button>
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Button size="small" variant="contained" color="primary" onClick={() => setWebhookMode('location')}>
-          {t('chooseOnMap')}
+          {t('choose_on_map')}
         </Button>
       </Grid>
       <Grid item xs={12}>

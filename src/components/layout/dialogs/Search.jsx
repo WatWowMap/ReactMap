@@ -98,8 +98,8 @@ export default function Search({
   const getBackupName = () => {
     switch (safeSearch[searchTab]) {
       case 'quests':
-      case 'pokestops': return t('unknownPokestop')
-      default: return t('unknownGym')
+      case 'pokestops': return t('unknown_pokestop')
+      default: return t('unknown_gym')
     }
   }
 
@@ -127,7 +127,7 @@ export default function Search({
       <TextField
         style={{ margin: '15px 10px', width: isMobile ? '93%' : '96%' }}
         autoComplete="off"
-        label={t(`${safeSearch[searchTab]}Search`)}
+        label={t(`global_search_${safeSearch[searchTab]}`)}
         value={search}
         onChange={(event) => setSearch(event.target.value.toLowerCase())}
         variant="outlined"

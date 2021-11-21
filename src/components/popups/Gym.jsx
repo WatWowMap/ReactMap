@@ -41,7 +41,7 @@ export default function GymPopup({
       <Grid item xs={10}>
         <Title
           mainName={gym.name}
-          backup={t('unknownGym')}
+          backup={t('unknown_gym')}
         />
       </Grid>
       <MenuActions
@@ -203,18 +203,18 @@ const MenuActions = ({
   ]
 
   if (perms.gyms) {
-    options.push({ name: 'excludeTeam', action: excludeTeam })
+    options.push({ name: 'exclude_team', action: excludeTeam })
   }
   if (perms.raids && hasRaid) {
     options.push(
-      { name: 'excludeRaid', action: excludeBoss },
+      { name: 'exclude_raid', action: excludeBoss },
       { name: 'timer', action: handleTimer },
     )
   }
   if (perms.webhooks?.includes(selectedWebhook)) {
     options.push({
       name: (
-        <Trans i18nKey="webhookEntry">
+        <Trans i18nKey="webhook_entry">
           {{ category: t('gym') }}{{ name: selectedWebhook }}
         </Trans>
       ),
@@ -571,16 +571,16 @@ const ExtraInfo = ({ gym, t, ts }) => {
       data: t(`poke_${guarding_pokemon_id}`),
     },
     {
-      description: 'totalCP',
+      description: 'total_cp',
       data: total_cp,
     },
     {
-      description: 'lastSeen',
+      description: 'last_seen',
       timer: <GenericTimer expireTime={updated} />,
       data: Utility.dayCheck(ts, updated),
     },
     {
-      description: 'lastModified',
+      description: 'last_modified',
       timer: <GenericTimer expireTime={last_modified_timestamp} />,
       data: Utility.dayCheck(ts, last_modified_timestamp),
     },
@@ -591,17 +591,17 @@ const ExtraInfo = ({ gym, t, ts }) => {
       {extraMetaData.map(meta => (
         meta.data ? (
           <Fragment key={meta.description}>
-            <Grid item xs={t('popupGymDescriptionWidth')} style={{ textAlign: 'left' }}>
+            <Grid item xs={t('popup_gym_description_width')} style={{ textAlign: 'left' }}>
               <Typography variant="caption">
                 {t(meta.description)}:
               </Typography>
             </Grid>
             {meta.timer ? (
-              <Grid item xs={t('popupGymSeenTimerWidth')} style={{ textAlign: 'right' }}>
+              <Grid item xs={t('popup_gym_seen_timer_width')} style={{ textAlign: 'right' }}>
                 {meta.timer}
               </Grid>
             ) : null}
-            <Grid item xs={meta.timer ? t('popupGymDataWidth') : t('popupGymSeenTimerWidth')} style={{ textAlign: 'right' }}>
+            <Grid item xs={meta.timer ? t('popup_gym_data_width') : t('popup_gym_seen_timer_width')} style={{ textAlign: 'right' }}>
               <Typography variant="caption">
                 {meta.data}
               </Typography>

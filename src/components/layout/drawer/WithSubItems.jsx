@@ -4,6 +4,8 @@ import {
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
+import Utility from '@services/Utility'
+
 export default function WithSubItems({
   category, filters, setFilters, subItem, noScanAreaOverlay,
 }) {
@@ -49,7 +51,7 @@ export default function WithSubItems({
   return (
     <>
       <Grid item xs={6}>
-        <Typography>{category === 'scanAreas' ? t('showPolygons') : t(subItem)}</Typography>
+        <Typography>{category === 'scanAreas' ? t('show_polygons') : t(Utility.camelToSnake(subItem))}</Typography>
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         {filterCategory}

@@ -73,7 +73,7 @@ export default function Clustering({
       {limitHit && (
         <Notification
           severity="warning"
-          i18nKey="clusterLimit"
+          i18nKey="cluster_limit"
           messages={[
             {
               key: 'limitHit',

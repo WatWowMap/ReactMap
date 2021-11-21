@@ -46,7 +46,7 @@ const Timer = ({ device, t, ts }) => {
 
   return (
     <Typography variant="caption">
-      {t('lastSeen')}: {Utility.dayCheck(ts, last_seen)} ({since.str})
+      {t('last_seen')}: {Utility.dayCheck(ts, last_seen)} ({since.str})
     </Typography>
   )
 }

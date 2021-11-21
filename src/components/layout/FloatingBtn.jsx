@@ -37,7 +37,7 @@ export default function FloatingButtons({
       style={{ width: isMobile ? 50 : 65 }}
     >
       <Grid item>
-        <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)} title={t('openMenu')} disabled={Boolean(webhookMode)}>
+        <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)} title={t('open_menu')} disabled={Boolean(webhookMode)}>
           <Menu fontSize={iconSize} />
         </Fab>
       </Grid>
@@ -58,17 +58,17 @@ export default function FloatingButtons({
       {settings.navigationControls === 'react' ? (
         <>
           <Grid item>
-            <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('useMyLocation')}>
+            <Fab color="secondary" size={fabSize} onClick={() => lc._onClick()} title={t('use_my_location')}>
               <LocationOn color={color} fontSize={iconSize} />
             </Fab>
           </Grid>
           <Grid item>
-            <Fab color="secondary" size={fabSize} onClick={() => map.zoomIn()} title={t('zoomIn')}>
+            <Fab color="secondary" size={fabSize} onClick={() => map.zoomIn()} title={t('zoom_in')}>
               <ZoomIn fontSize={iconSize} />
             </Fab>
           </Grid>
           <Grid item>
-            <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()} title={t('zoomOut')}>
+            <Fab color="secondary" size={fabSize} onClick={() => map.zoomOut()} title={t('zoom_out')}>
               <ZoomOut fontSize={iconSize} />
             </Fab>
           </Grid>

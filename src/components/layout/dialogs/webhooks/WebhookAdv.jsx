@@ -165,7 +165,7 @@ export default function WebhookAdvanced({
           menuItems.push(<MenuItem key={1} value={1}>1</MenuItem>)
         } break
       case 'pvp_ranking_league': option.options.forEach(league => (
-        menuItems.push(<MenuItem key={league.name} value={league.cp}>{t(`${league.name}Slider`)}</MenuItem>)
+        menuItems.push(<MenuItem key={league.name} value={league.cp}>{t(`slider_${league.name}`)}</MenuItem>)
       )); break
       case 'gender': option.options.forEach(gender => (
         menuItems.push(<MenuItem key={gender} value={gender}>{t(`gender_${gender}`)}</MenuItem>)
@@ -319,7 +319,7 @@ export default function WebhookAdvanced({
         >
           <Grid item xs={6} style={{ textAlign: 'center' }}>
             <Typography variant="subtitle2">
-              {t(option.name)}
+              {t(Utility.camelToSnake(option.name))}
             </Typography>
           </Grid>
           <Grid item xs={6} style={{ textAlign: 'center' }}>
@@ -486,7 +486,7 @@ export default function WebhookAdvanced({
           </Typography>
         </Paper>
       </DialogContent>
-      <Footer options={footerOptions} role="webhookAdvanced" />
+      <Footer options={footerOptions} role="webhook_advanced" />
     </>
   )
 }

@@ -28,7 +28,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
       >
         <Grid item xs={8} style={{ textAlign: 'center' }}>
           <Typography variant={isMobile ? 'subtitle2' : 'h6'} align="center">
-            {t('tutorialSidebar0')}
+            {t('tutorial_sidebar_0')}
           </Typography>
         </Grid>
         <Grid item xs={4} style={{ textAlign: 'center' }}>
@@ -41,7 +41,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
         </Grid>
         <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
           <Typography variant="subtitle1" align="center" gutterBottom>
-            {t('tutorialSidebar1')}
+            {t('tutorial_sidebar_1')}
           </Typography>
         </Grid>
         <Grid
@@ -71,7 +71,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
               />
             )
           })}
-          <Grid item xs={t('drawerGridOptionsWidth')} style={{ textAlign: 'center' }}>
+          <Grid item xs={t('drawer_grid_options_width')} style={{ textAlign: 'center' }}>
             <Button
               onClick={toggleDialog(true, 'pokestops', 'options')}
               variant="contained"
@@ -81,7 +81,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
               {t('options')}
             </Button>
           </Grid>
-          <Grid item xs={t('drawerGridAdvancedWidth')} style={{ textAlign: 'center' }}>
+          <Grid item xs={t('drawer_grid_advanced_width')} style={{ textAlign: 'center' }}>
             <Button
               onClick={toggleDialog(true, 'pokestops', 'filters')}
               variant="contained"
@@ -94,7 +94,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
         </Grid>
         <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
           <Typography variant="subtitle1" align="center" gutterBottom>
-            {t('tutorialSidebar2')}
+            {t('tutorial_sidebar_2')}
           </Typography>
         </Grid>
       </Grid>

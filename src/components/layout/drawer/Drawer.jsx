@@ -5,6 +5,8 @@ import {
 import { ExpandMore, Clear, Settings } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
+import Utility from '@services/Utility'
+
 import SettingsMenu from './Settings'
 import WithSubItems from './WithSubItems'
 import WithSliders from './WithSliders'
@@ -69,7 +71,7 @@ export default function Sidebar({
           expandIcon={<ExpandMore style={{ color: 'white' }} />}
         >
           <Typography className={classes.heading}>
-            {t(category)}
+            {t(Utility.camelToSnake(category))}
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
@@ -83,7 +85,7 @@ export default function Sidebar({
           >
             {content}
             {staticUserSettings[category] && (
-              <Grid item xs={t('drawerGridOptionsWidth')} style={{ textAlign: 'center' }}>
+              <Grid item xs={t('drawer_grid_options_width')} style={{ textAlign: 'center' }}>
                 <Button
                   onClick={toggleDialog(true, category, 'options')}
                   variant="contained"
@@ -99,7 +101,7 @@ export default function Sidebar({
               || category === 'pokestops'
               || category === 'nests')
               && (
-                <Grid item xs={t('drawerGridAdvancedWidth')} style={{ textAlign: 'center' }}>
+                <Grid item xs={t('drawer_grid_advanced_width')} style={{ textAlign: 'center' }}>
                   <Button
                     onClick={toggleDialog(true, category, 'filters')}
                     variant="contained"

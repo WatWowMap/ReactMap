@@ -74,7 +74,7 @@ export default function OptionsContainer({
     <Grid container key="resetShowing" justifyContent="center" alignItems="center" style={{ margin: '10px 0' }}>
       <Grid item xs={5} sm={6} style={{ textAlign: 'center' }}>
         <Button onClick={handleReset} color="primary" size="small">
-          {t('resetFilters')}
+          {t('reset_filters')}
         </Button>
       </Grid>
       <Grid item xs={7} sm={6} style={{ textAlign: 'center' }}>
@@ -86,7 +86,7 @@ export default function OptionsContainer({
         {applied.map(x => (
           <Chip
             key={x}
-            label={t(x)}
+            label={t(Utility.camelToSnake(x))}
             variant="outlined"
             size="small"
             color={menus[category].filters.others.reverse ? 'secondary' : 'primary'}

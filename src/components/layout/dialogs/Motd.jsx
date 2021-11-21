@@ -137,7 +137,7 @@ export default function Motd({ motd, handleMotdClose }) {
 
   return (
     <>
-      <Header titles={motd.titles || ['messageOfTheDay']} />
+      <Header titles={motd.titles || ['message_of_the_day']} />
       <DialogContent>
         <Grid
           container

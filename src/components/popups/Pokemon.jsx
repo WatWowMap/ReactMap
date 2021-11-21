@@ -275,7 +275,7 @@ const Stats = ({ pokemon, perms, t }) => {
       {(perms.stats && level !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
-            {t('cp')} {cp} | {t('levelAbbreviated')}{level}
+            {t('cp')} {cp} | {t('abbreviation_level')}{level}
           </Typography>
         </Grid>
       )}
@@ -465,15 +465,15 @@ const ExtraInfo = ({
       {[first_seen_timestamp, updated].map((time, i) => (
         time ? (
           <Fragment key={time}>
-            <Grid item xs={t('popupPokemonSeenDescriptionWidth')} style={{ textAlign: 'center' }}>
+            <Grid item xs={t('popup_pokemon_description_width')} style={{ textAlign: 'center' }}>
               <Typography variant="caption">
-                {i ? t('lastSeen') : t('firstSeen')}:
+                {i ? t('last_seen') : t('first_seen')}:
               </Typography>
             </Grid>
-            <Grid item xs={t('popupPokemonSeenTimerWidth')} style={{ textAlign: 'right' }}>
+            <Grid item xs={t('popup_pokemon_seen_timer_width')} style={{ textAlign: 'right' }}>
               <GenericTimer expireTime={time} />
             </Grid>
-            <Grid item xs={t('popupPokemonSeenDataWidth')} style={{ textAlign: 'right' }}>
+            <Grid item xs={t('popup_pokemon_data_width')} style={{ textAlign: 'right' }}>
               <Typography variant="caption">
                 {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
               </Typography>

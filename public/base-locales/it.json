@@ -1,9 +1,9 @@
 {
-  "localeSelectionen": "English",
-  "localeSelectionde": "Deutsch",
-  "localeSelectiones": "Español",
-  "localeSelectionpl": "Polski",
-  "localeSelectionfr": "Français",
-  "localeSelectionit": "Italiano",
-  "localeSelectionjp": "日本語"
+  "locale_selection_en": "English",
+  "locale_selection_de": "Deutsch",
+  "locale_selection_es": "Español",
+  "locale_selection_pl": "Polski",
+  "locale_selection_fr": "Français",
+  "locale_selection_it": "Italiano",
+  "locale_selection_ja": "日本語"
 }

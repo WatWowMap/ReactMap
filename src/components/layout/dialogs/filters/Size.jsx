@@ -9,7 +9,7 @@ export default function Size({ filterValues, handleChange, btnSize }) {
   return (
     <ButtonGroup>
       {sizes.map(size => {
-        const color = filterValues.size === size ? 'primary' : 'secondary'
+        const color = (filterValues.size || 'md') === size ? 'primary' : 'secondary'
         return (
           <Button
             key={size}

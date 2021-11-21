@@ -8,7 +8,7 @@ import WebhookQuery from './WebhookQuery'
 const Auth = ({ serverSettings, match }) => {
   if (serverSettings.error) {
     return (
-      <Redirect push to={{ pathname: '/login', state: { message: 'cannotConnect' } }} />
+      <Redirect push to={{ pathname: '/login', state: { message: 'cannot_connect' } }} />
     )
   }
 

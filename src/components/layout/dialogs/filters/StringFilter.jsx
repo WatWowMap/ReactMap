@@ -21,7 +21,7 @@ export default function StringFilter({ filterValues, setFilterValues }) {
         label: t('valid'),
         value,
         status: false,
-        message: t('validFilter'),
+        message: t('valid_filter'),
       })
     } else if (value === '') {
       setValidation({
@@ -35,7 +35,7 @@ export default function StringFilter({ filterValues, setFilterValues }) {
         label: t('invalid'),
         value,
         status: true,
-        message: t('invalidFilter'),
+        message: t('invalid_filter'),
       })
       value = ''
     }

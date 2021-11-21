@@ -73,7 +73,7 @@ export default function WithSliders({
         <>
           <Grid item xs={12}>
             <Typography>
-              {t('ivOrFilter')}
+              {t('iv_or_filter')}
             </Typography>
           </Grid>
           <Grid item xs={12}>
@@ -109,16 +109,17 @@ export default function WithSliders({
                   />
                 </Grid>
               ))}
-              {index ? (
-                <Grid
-                  container
-                  item
-                  xs={12}
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  {['xsRat', 'xlKarp'].map((each, i) => (
+              <Grid
+                container
+                item
+                xs={12}
+                direction="row"
+                alignItems="center"
+                justifyContent="center"
+                style={{ width: 250 }}
+              >
+                {index ? (
+                  ['xsRat', 'xlKarp'].map((each, i) => (
                     <Fragment key={each}>
                       <Grid item xs={2}>
                         <img
@@ -126,7 +127,7 @@ export default function WithSliders({
                           src={Icons.getPokemon(i ? 129 : 19)}
                         />
                       </Grid>
-                      <Grid item xs={1} className="xs-xl">
+                      <Grid item xs={1}>
                         <Typography
                           variant="subtitle2"
                         >
@@ -150,25 +151,13 @@ export default function WithSliders({
                         />
                       </Grid>
                     </Fragment>
-                  ))}
-                </Grid>
-              ) : (
-                <Grid
-                  container
-                  item
-                  xs={12}
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Grid item xs={12}>
-                    <Typography variant="h6">{t('shortcuts')}</Typography>
-                  </Grid>
-                  {['zeroIv', 'hundoIv'].map(each => (
+                  ))
+                ) : (
+                  ['zeroIv', 'hundoIv'].map(each => (
                     <Fragment key={each}>
                       <Grid item xs={3}>
                         <Typography>
-                          {t(each)}
+                          {t(Utility.camelToSnake(each))}
                         </Typography>
                       </Grid>
                       <Grid item xs={3}>
@@ -188,9 +177,9 @@ export default function WithSliders({
                         />
                       </Grid>
                     </Fragment>
-                  ))}
-                </Grid>
-              )}
+                  ))
+                )}
+              </Grid>
             </TabPanel>
           ))}
         </>

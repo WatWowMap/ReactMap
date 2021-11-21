@@ -2,6 +2,7 @@ import React, { useEffect, useState, memo } from 'react'
 import { useMutation } from '@apollo/client'
 import { Trans } from 'react-i18next'
 
+import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { useStatic } from '@hooks/useStore'
 import ReactWindow from '@components/layout/general/ReactWindow'
@@ -108,6 +109,7 @@ const Tracked = ({
           Poracle,
           invasions,
           t,
+          Utility,
         }}
         Tile={PokemonTile}
       />

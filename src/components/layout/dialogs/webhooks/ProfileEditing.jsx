@@ -186,7 +186,7 @@ export default function ProfileEditing({
         <Grid container spacing={2} alignItems="center" justifyContent="center">
           <Grid item xs={12} sm={4}>
             <Typography variant="h6" align="center">
-              {t('addNewProfile')}
+              {t('add_new_profile')}
             </Typography>
           </Grid>
           <Grid item xs={7} sm={5}>
@@ -346,7 +346,7 @@ export default function ProfileEditing({
           action: handleCloseMenu,
           icon: 'Save',
         }]}
-        role="webhookAdvanced"
+        role="webhook_advanced"
       />
     </>
   )

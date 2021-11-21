@@ -62,7 +62,7 @@ export default function AdvancedFilter({
   return (
     <>
       <Header
-        titles={[type === 'pokemon' ? t('advanced') : t('setSize')]}
+        titles={[type === 'pokemon' ? t('advanced') : t('set_size')]}
         action={toggleAdvMenu(false, type, filters.filter)}
       />
       <DialogContent style={{ color: 'white' }}>

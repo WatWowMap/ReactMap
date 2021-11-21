@@ -24,7 +24,7 @@ export default function UserProfile({ setUserProfile }) {
 
   return (
     <>
-      <Header titles={['userProfile']} action={() => setUserProfile(false)} />
+      <Header titles={['user_profile']} action={() => setUserProfile(false)} />
       <DialogContent>
         <Grid
           container
@@ -70,10 +70,10 @@ export default function UserProfile({ setUserProfile }) {
                   )}
                   <CardContent style={{ height: 100 }}>
                     <Typography gutterBottom variant="h6" noWrap>
-                      {t(perm)}
+                      {t(Utility.camelToSnake(perm))}
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
-                      {t(`${perm}Subtitle`)}
+                      {t(`${Utility.camelToSnake(perm)}_subtitle`)}
                     </Typography>
                   </CardContent>
                 </Card>

@@ -47,12 +47,12 @@ export default function TutWelcome({ setUserProfile }) {
 
         <Grid item xs={6}>
           <Typography variant="subtitle2" align="center">
-            {t('tutorialCategories')}:
+            {t('tutorial_categories')}:
           </Typography>
         </Grid>
         <Grid item xs={6}>
           <Typography variant="h6" gutterBottom align="center">
-            {!loggedIn && methods.length ? t('loginOptional') : t('viewProfile')}
+            {!loggedIn && methods.length ? t('login_optional') : t('view_profile')}
           </Typography>
         </Grid>
         <Grid item xs={6}>
@@ -73,12 +73,12 @@ export default function TutWelcome({ setUserProfile }) {
         </Grid>
         <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
           <Typography variant="subtitle1" align="center">
-            {!loggedIn && methods.length ? t('tutorialLoggedOut') : t('tutorialLoggedIn')}
+            {!loggedIn && methods.length ? t('tutorial_logged_out') : t('tutorial_logged_in')}
           </Typography>
         </Grid>
         <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
           <Typography variant="subtitle1" align="center">
-            {t('tutorialLanguage')}
+            {t('tutorial_language')}
           </Typography>
         </Grid>
         <Grid item xs={12} sm={10} style={{ textAlign: 'center' }}>
@@ -94,14 +94,14 @@ export default function TutWelcome({ setUserProfile }) {
                 key={option}
                 value={option}
               >
-                {t(`localeSelection${option}`)}
+                {t(`locale_selection_${option}`)}
               </MenuItem>
             ))}
           </Select>
         </Grid>
         <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
           <Typography variant="subtitle1" align="center">
-            {t('tutorialWelcome')}
+            {t('tutorial_welcome')}
           </Typography>
         </Grid>
       </Grid>
