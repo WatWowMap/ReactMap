@@ -234,7 +234,7 @@ class Pokestop extends Model {
         } else {
           stops.orWhere(invasion => {
             invasion.whereIn(isMad ? 'incident_grunt_type' : 'grunt_type', invasions)
-              .andWhere(isMad ? 'incident_expiration' : 'incident_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+              .andWhere(isMad ? 'incident_expiration' : 'incident_expire_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
           })
         }
       }
