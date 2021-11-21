@@ -69,8 +69,11 @@ class Pokemon extends Model {
   }
 
   static async initOhbem() {
-    const leagueObj = {}
-    leagues.forEach(league => leagueObj[league.name] = league.cp)
+    const leagueObj = Object.fromEntries(leagues.map(league => [league.name, league.cp]))
+    const hasLittle = leagues.find(league => league.name === 'little')
+    if (hasLittle) {
+      leagueObj.little = hasLittle.littleCupRules ? 500 : { little: false, cap: 500 }
+    }
     ohbem = new Ohbem({
       leagues: leagueObj,
       pokemonData: await Ohbem.fetchPokemonData(),
@@ -351,22 +354,18 @@ class Pokemon extends Model {
 
   static getOhbemPvp(pokemon) {
     try {
-      if (pokemon.pokemon_id && pokemon.level
-        && pokemon.atk_iv && pokemon.def_iv && pokemon.sta_iv) {
-        return ohbem.queryPvPRank(
-          pokemon.pokemon_id,
-          pokemon.form,
-          pokemon.costume,
-          pokemon.gender,
-          pokemon.atk_iv,
-          pokemon.def_iv,
-          pokemon.sta_iv,
-          pokemon.level,
-        )
-      }
-      return {}
+      return ohbem.queryPvPRank(
+        pokemon.pokemon_id,
+        pokemon.form,
+        pokemon.costume,
+        pokemon.gender,
+        pokemon.atk_iv,
+        pokemon.def_iv,
+        pokemon.sta_iv,
+        pokemon.level,
+      )
     } catch (e) {
-      console.error(`Unable to process ${JSON.stringify(pokemon)}`, e)
+      console.error('Unable to process PVP Stats for Pokemon with ID#: ', pokemon.id, '\n', e.message)
       return {}
     }
   }
