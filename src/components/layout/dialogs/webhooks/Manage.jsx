@@ -65,7 +65,7 @@ export default function Manage({
   const footerButtons = [
     {
       name: tabValue
-        ? <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans>
+        ? <Trans i18nKey="add_new">{{ category: t(filteredData[tabValue]) }}</Trans>
         : t('manage_profiles'),
       action: () => setAddNew(true),
       icon: tabValue ? 'Add' : 'People',
@@ -128,7 +128,7 @@ export default function Manage({
 
   return (
     <>
-      <Header names={[selectedWebhook]} action={() => setWebhookMode(false)} titles={['manageWebhook']} />
+      <Header names={[selectedWebhook]} action={() => setWebhookMode(false)} titles={['manage_webhook']} />
       <AppBar position="static">
         <Tabs
           value={tabValue}
@@ -189,7 +189,7 @@ export default function Manage({
           </TabPanel>
         )) : <WebhookError selectedWebhook={selectedWebhook} />}
       </DialogContent>
-      <Footer options={footerButtons} role="webhookFooter" />
+      <Footer options={footerButtons} role="webhook_footer" />
       <Dialog
         classes={{
           scrollPaper: classes.scrollPaper,

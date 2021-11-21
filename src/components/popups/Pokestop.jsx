@@ -58,7 +58,7 @@ export default function PokestopPopup({
       <Grid item xs={plainPokestop ? 10 : 7}>
         <Title
           mainName={pokestop.name}
-          backup={t('unknownPokestop')}
+          backup={t('unknown_pokestop')}
         />
       </Grid>
       <MenuActions
@@ -242,7 +242,7 @@ const MenuActions = ({
       }
       options.push({
         key: `${reward}-${quest.with_ar}`,
-        name: <Trans i18nKey="excludeQuestMulti">{{ reward }}</Trans>,
+        name: <Trans i18nKey="exclude_quest_multi">{{ reward }}</Trans>,
         action: () => excludeQuest(i),
       })
     })
@@ -254,13 +254,13 @@ const MenuActions = ({
       invasions.forEach((invasion, i) => {
         options.push({
           key: `${invasion.grunt_type}-${invasion.incident_expire_timestamp}`,
-          name: <Trans i18nKey="excludeInvasionMulti">{{ invasion: t(`grunt_a_${invasion.grunt_type}`) }}</Trans>,
+          name: <Trans i18nKey="exclude_invasion_multi">{{ invasion: t(`grunt_a_${invasion.grunt_type}`) }}</Trans>,
           action: () => excludeInvasion(i),
         })
       })
     }
     if (hasLure) {
-      options.push({ name: 'excludeLure', action: excludeLure })
+      options.push({ name: 'exclude_lure', action: excludeLure })
     }
     options.push(
       { name: 'timer', action: handleTimer },
@@ -320,7 +320,7 @@ const RewardInfo = ({
     <Grid item xs={3} style={{ textAlign: 'center' }}>
       <img src={getImage()} className="quest-popup-img" />
       <Typography variant="caption" className="ar-task" noWrap>
-        {config.questMessage ? config.questMessage : t(`arQuest_${Boolean(with_ar)}`)}
+        {config.questMessage ? config.questMessage : t(`ar_quest_${Boolean(with_ar)}`)}
       </Typography>
     </Grid>
   )
@@ -489,12 +489,12 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
 
   const extraMetaData = [
     {
-      description: 'lastSeen',
+      description: 'last_seen',
       timer: <Timer expireTime={updated} />,
       data: Utility.dayCheck(ts, updated),
     },
     {
-      description: 'lastModified',
+      description: 'last_modified',
       timer: <Timer expireTime={last_modified_timestamp} />,
       data: Utility.dayCheck(ts, last_modified_timestamp),
     },
@@ -508,15 +508,15 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
     >
       {extraMetaData.map(meta => (
         <Fragment key={meta.description}>
-          <Grid item xs={t('popupPokestopSeenDescriptionWidth')} style={{ textAlign: 'left' }}>
+          <Grid item xs={t('popup_pokestop_description_width')} style={{ textAlign: 'left' }}>
             <Typography variant="caption">
               {t(meta.description)}:
             </Typography>
           </Grid>
-          <Grid item xs={t('popupPokestopSeenTimerWidth')} style={{ textAlign: 'right' }}>
+          <Grid item xs={t('popup_pokestop_seen_timer_width')} style={{ textAlign: 'right' }}>
             {meta.timer}
           </Grid>
-          <Grid item xs={t('popupPokestopSeenDataWidth')} style={{ textAlign: 'right' }}>
+          <Grid item xs={t('popup_pokestop_data_width')} style={{ textAlign: 'right' }}>
             <Typography variant="caption">
               {meta.data}
             </Typography>

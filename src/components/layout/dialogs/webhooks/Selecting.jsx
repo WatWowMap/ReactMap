@@ -31,7 +31,7 @@ export default function Selecting({ setSelected, handleAll, deleteAll }) {
           onClick={handleAll}
         >
           <Typography variant="caption">
-            {t('selectAll')}
+            {t('select_all')}
           </Typography>
         </Fab>
       </Grid>
@@ -43,7 +43,7 @@ export default function Selecting({ setSelected, handleAll, deleteAll }) {
           onClick={deleteAll}
         >
           <Typography variant="caption">
-            {t('deleteAll')}
+            {t('delete_all')}
           </Typography>
         </Fab>
       </Grid>

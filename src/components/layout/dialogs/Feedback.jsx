@@ -12,16 +12,16 @@ export default function Feedback({ link, setFeedback }) {
 
   return (
     <>
-      <Header titles={[t('submitFeedbackTitle')]} />
+      <Header titles={[t('submit_feedback_title')]} />
       <DialogContent>
         <Typography variant="subtitle1" align="center">
-          {t('useTheLinkBelow')}
+          {t('use_the_link_below')}
         </Typography>
         <br />
         <Divider />
         <br />
         <Typography variant="body2" align="center">
-          <em>{t('feedbackToDevs')}</em>
+          <em>{t('feedback_to_devs')}</em>
         </Typography>
         <br />
         <Typography align="center">
@@ -34,11 +34,11 @@ export default function Feedback({ link, setFeedback }) {
             rel="noreferrer"
             style={{ justifyContent: 'center' }}
           >
-            {t('feedbackForm')}
+            {t('feedback_form')}
           </Button>
         </Typography>
       </DialogContent>
-      <Footer options={[{ name: 'close', action: () => setFeedback(false), color: 'primary', align: 'right' }]} role="webhookFooter" />
+      <Footer options={[{ name: 'close', action: () => setFeedback(false), color: 'primary', align: 'right' }]} role="webhook_footer" />
     </>
   )
 }

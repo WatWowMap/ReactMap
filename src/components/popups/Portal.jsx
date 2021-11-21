@@ -21,7 +21,7 @@ export default function PortalPopup({ portal, ts, Icons }) {
 
   const extraMetaData = [
     {
-      description: t('lastUpdated'),
+      description: t('last_updated'),
       data: Utility.dayCheck(ts, updated),
     },
     {

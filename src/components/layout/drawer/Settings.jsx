@@ -94,7 +94,7 @@ export default function Settings({ Icons }) {
       {Object.keys(staticSettings).map(setting => (
         <Grid item key={setting} xs={10}>
           <FormControl style={{ width: 200, margin: 5 }}>
-            <InputLabel>{t(setting)}</InputLabel>
+            <InputLabel>{t(Utility.camelToSnake(setting))}</InputLabel>
             <Select
               autoFocus
               name={setting}
@@ -107,7 +107,7 @@ export default function Settings({ Icons }) {
                   key={option}
                   value={option}
                 >
-                  {t(`${setting}${option}`, Utility.getProperName(option))}
+                  {t(`${Utility.camelToSnake(setting)}_${option.toLowerCase()}`, Utility.getProperName(option))}
                 </MenuItem>
               ))}
             </Select>
@@ -117,7 +117,7 @@ export default function Settings({ Icons }) {
       {Icons.customizable.map(category => (
         <Grid item key={category} xs={10}>
           <FormControl style={{ width: 200, margin: 5 }}>
-            <InputLabel>{t(`${category}Icons`, `${category} Icons`)}</InputLabel>
+            <InputLabel>{t(`${category}_icons`, `${category} Icons`)}</InputLabel>
             <Select
               autoFocus
               name={category}
@@ -130,7 +130,7 @@ export default function Settings({ Icons }) {
                   key={option}
                   value={option}
                 >
-                  {t(`${category}${option}`, Utility.getProperName(option))}
+                  {t(`${category.toLowerCase()}_${option.toLowerCase()}`, Utility.getProperName(option))}
                 </MenuItem>
               ))}
             </Select>
@@ -145,7 +145,7 @@ export default function Settings({ Icons }) {
         spacing={3}
         style={{ margin: '10px 0px' }}
       >
-        <Grid item xs={t('drawerSettingsProfileWidth')} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawer_settings_profile_width')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -156,7 +156,7 @@ export default function Settings({ Icons }) {
             {t('profile')}
           </Button>
         </Grid>
-        <Grid item xs={t('drawerSettingsLogoutWidth')} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawer_settings_logout_width')} style={{ textAlign: 'center' }}>
           {loggedIn ? (
             <Button
               className="sidebar-button"
@@ -182,7 +182,7 @@ export default function Settings({ Icons }) {
             </Link>
           )}
         </Grid>
-        <Grid item xs={t('drawerSettingsTutorialWidth')} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawer_settings_tutorial_width')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -193,7 +193,7 @@ export default function Settings({ Icons }) {
             {t('tutorial')}
           </Button>
         </Grid>
-        <Grid item xs={t('drawerSettingsResetFiltersWidth')} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawer_settings_reset_filters_width')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -201,10 +201,10 @@ export default function Settings({ Icons }) {
             size="small"
             onClick={clearStorage}
           >
-            {t('resetFilters')}
+            {t('reset_filters')}
           </Button>
         </Grid>
-        <Grid item xs={t('drawerSettingsExportSettingsWidth')} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawer_settings_export_settings_width')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -215,7 +215,7 @@ export default function Settings({ Icons }) {
             {t('export')}
           </Button>
         </Grid>
-        <Grid item xs={t('drawerSettingsImportSettingsWidth')} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawer_settings_import_settings_width')} style={{ textAlign: 'center' }}>
           <input
             accept="application/json"
             id="contained-button-file"
@@ -237,7 +237,7 @@ export default function Settings({ Icons }) {
         </Grid>
         {config.map.enableStats
           && (
-            <Grid item xs={t('drawerSettingsStatsWidth')} style={{ textAlign: 'center' }}>
+            <Grid item xs={t('drawer_settings_stats_width')} style={{ textAlign: 'center' }}>
               <Button
                 variant="contained"
                 color="secondary"
@@ -253,7 +253,7 @@ export default function Settings({ Icons }) {
           )}
         {config.map.enableFeedback
           && (
-            <Grid item xs={t('drawerSettingsFeedbackWidth')} style={{ textAlign: 'center' }}>
+            <Grid item xs={t('drawer_settings_feedback_width')} style={{ textAlign: 'center' }}>
               <Button
                 variant="contained"
                 color="primary"
@@ -272,7 +272,7 @@ export default function Settings({ Icons }) {
         TransitionComponent={SlideTransition}
       >
         <Alert onClose={handleClose} severity="success" variant="filled">
-          {t('localStorageCleared')}
+          {t('local_storage_cleared')}
         </Alert>
       </Snackbar>
       <Dialog open={userProfile}>

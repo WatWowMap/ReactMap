@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import ReactGA from 'react-ga'
 import SunCalc from 'suncalc'
 
@@ -35,6 +36,31 @@ export default class Utility {
 
   static formatter(addressFormat, data) {
     return formatter(addressFormat, data)
+  }
+
+  static camelToSnake(str) {
+    return str.replace(/([a-z](?=[A-Z]))/g, '$1_').toLowerCase()
+  }
+
+  static getTileBackground(columnIndex, rowIndex) {
+    return columnIndex % 2
+      ? rowIndex % 2 === 0
+        ? 'rgba(1, 1, 1, 0.01)'
+        : 'rgba(240, 240, 240, 0.01)'
+      : rowIndex % 2
+        ? 'rgba(1, 1, 1, 0.01)'
+        : 'rgba(240, 240, 240, 0.01)'
+  }
+
+  static generateSlots = (teamId, show, tempFilters) => {
+    const slotObj = {}
+    for (let i = 1; i <= 6; i += 1) {
+      const slotKey = `g${teamId.charAt(1)}-${i}`
+      slotObj[slotKey] = typeof show === 'boolean'
+        ? { ...tempFilters[slotKey], enabled: show }
+        : { ...tempFilters[slotKey], size: show.size }
+    }
+    return slotObj
   }
 
   static nightCheck(lat, lon) {

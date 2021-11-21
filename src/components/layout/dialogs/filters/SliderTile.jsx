@@ -57,7 +57,7 @@ export default function SliderTile({
     >
       <Grid item xs={4}>
         <Typography noWrap={fullName} onClick={() => setFullName(!fullName)} style={{ color: textColor }}>
-          {t(`${name}Slider`)}
+          {t(`slider_${name}`)}
         </Typography>
       </Grid>
       {['min', 'max'].map((each, index) => (

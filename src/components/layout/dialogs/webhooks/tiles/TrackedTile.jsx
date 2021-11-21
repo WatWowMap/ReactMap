@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useState } from 'react'
 import {
   Grid, Typography, IconButton, Dialog, Checkbox,
@@ -9,20 +8,12 @@ import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 
 export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   const {
-    tileItem, columnCount, Icons, syncWebhook, selectedWebhook, selected, setSelected,
+    tileItem, columnCount, Icons, syncWebhook, selectedWebhook, selected, setSelected, Utility,
     tracked, setTracked, isMobile, setSend, setTempFilters, leagues, category, t, Poracle, invasions,
   } = data
   const [editDialog, setEditDialog] = useState(false)
   const item = tileItem[rowIndex * columnCount + columnIndex]
   if (!item) return null
-
-  const backgroundColor = columnIndex % 2
-    ? rowIndex % 2 === 0
-      ? 'rgba(1, 1, 1, 0.01)'
-      : 'rgba(240, 240, 240, 0.01)'
-    : rowIndex % 2
-      ? 'rgba(1, 1, 1, 0.01)'
-      : 'rgba(240, 240, 240, 0.01)'
 
   const toggleWebhook = (open, id, newFilters) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -63,7 +54,10 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
       container
       item
       xs={12}
-      style={{ ...style, backgroundColor }}
+      style={{
+        ...style,
+        backgroundColor: Utility.getTileBackground(columnIndex, rowIndex),
+      }}
       justifyContent="center"
       alignItems="center"
     >

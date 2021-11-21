@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useState } from 'react'
 import { Grid, IconButton, Typography } from '@material-ui/core'
 import {
@@ -36,14 +35,6 @@ export default function NewPokemon({
     })
     Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id].enabled}`, type)
   }
-
-  const backgroundColor = columnIndex % 2
-    ? rowIndex % 2 === 0
-      ? 'rgba(1, 1, 1, 0.01)'
-      : 'rgba(240, 240, 240, 0.01)'
-    : rowIndex % 2
-      ? 'rgba(1, 1, 1, 0.01)'
-      : 'rgba(240, 240, 240, 0.01)'
 
   const image = (
     <img
@@ -85,7 +76,11 @@ export default function NewPokemon({
 
   return (
     <Grid
-      style={{ ...style, backgroundColor, textAlign: 'center' }}
+      style={{
+        ...style,
+        backgroundColor: Utility.getTileBackground(columnIndex, rowIndex),
+        textAlign: 'center',
+      }}
       container
       justifyContent="center"
       alignItems="center"

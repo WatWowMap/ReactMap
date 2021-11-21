@@ -9,7 +9,7 @@ export default function FilterMenu({
   return (
     <Menu
       category={category}
-      title={`${category}Filters`}
+      title={`${category}_filters`}
       titleAction={toggleDialog(false, category, 'filters')}
       isMobile={isMobile}
       isTablet={isTablet}

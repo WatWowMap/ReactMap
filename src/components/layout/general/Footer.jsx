@@ -14,8 +14,6 @@ export default function Footer({ options, role }) {
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const classes = useStyles()
 
-  const capitalizeFirstChar = str => `${str.charAt(0).toUpperCase()}${str.substring(1)}`
-
   return (
     <Grid
       className={classes.filterFooter}
@@ -45,7 +43,7 @@ export default function Footer({ options, role }) {
         return (
           <Grid
             item
-            xs={isMobile ? actualSize : +t(`${role}${capitalizeFirstChar(key)}Width`) || actualSize}
+            xs={isMobile ? actualSize : +t(`${role}_key_width`) || actualSize}
             key={key}
             style={{ textAlign: button.align || 'center' }}
           >

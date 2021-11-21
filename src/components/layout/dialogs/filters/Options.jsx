@@ -12,6 +12,7 @@ import {
 import { ExpandMore } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
+import Utility from '@services/Utility'
 import useStyles from '@hooks/useStyles'
 
 export default function FilterOptions({
@@ -25,7 +26,7 @@ export default function FilterOptions({
         expandIcon={<ExpandMore style={{ color: 'white' }} />}
       >
         <Typography className={classes.heading}>
-          {t(name)}
+          {t(Utility.camelToSnake(name))}
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
@@ -42,7 +43,7 @@ export default function FilterOptions({
                   />
                 )}
                 value={key}
-                label={t(key)}
+                label={t(Utility.camelToSnake(key))}
               />
             ))}
           </FormGroup>

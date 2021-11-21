@@ -7,6 +7,8 @@ import {
 } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
+import Utility from '@services/Utility'
+
 import ReactWindow from '@components/layout/general/ReactWindow'
 import Advanced from '../filters/Advanced'
 import Tile from '../filters/MenuTile'
@@ -20,7 +22,10 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
   if (!category) {
     category = isPokemon ? 'pokemon' : 'gyms'
   }
-  const [tempFilters, setTempFilters] = useState(data.filters[category].filter)
+  const [tempFilters, setTempFilters] = useState({
+    ...data.filters[category].filter,
+    ...Utility.generateSlots('t3-0', true, {}),
+  })
   const [advancedFilter, setAdvancedFilter] = useState({
     open: false,
     id: '',
@@ -88,7 +93,10 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
 
   const handleSwitch = () => {
     if (isPokemon) {
-      setTempFilters(data.filters.gyms.filter)
+      setTempFilters({
+        ...data.filters.gyms.filter,
+        ...Utility.generateSlots('t3-0', true, tempFilters),
+      })
     } else {
       setTempFilters(data.filters.pokemon.filter)
     }
@@ -129,7 +137,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
         >
           <Grid item xs={12} style={{ textAlign: 'center' }}>
             <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
-              {t('tutorialToggle')}
+              {t('tutorial_toggle')}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={8} style={{ textAlign: 'center' }}>
@@ -146,6 +154,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
                   toggleAdvMenu,
                   toggleSlotsMenu,
                   type: category,
+                  Utility,
                 }}
                 offset={0}
               />
@@ -154,8 +163,8 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
           <Grid item xs={12} style={{ textAlign: 'center' }}>
             <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
               {isPokemon
-                ? t('tutorialPokemonCaption')
-                : t('tutorialAllCaption')}
+                ? t('tutorial_pokemon_caption')
+                : t('tutorial_all_caption')}
             </Typography>
           </Grid>
           <Grid item xs={12}>
@@ -168,7 +177,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
           </Grid>
           <Grid item xs={9} sm={8}>
             <Typography variant="subtitle2" align="center">
-              {t('tutorialHelp')}
+              {t('tutorial_help')}
             </Typography>
           </Grid>
           <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
@@ -176,7 +185,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
           </Grid>
           <Grid item xs={9} sm={8}>
             <Typography variant="subtitle2" align="center">
-              {t('tutorialAdvFilter')}
+              {t('tutorial_adv_filter')}
             </Typography>
           </Grid>
           {isPokemon ? (
@@ -184,11 +193,11 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
               <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
                 {isMobile
                   ? <Tune style={{ color: 'white' }} />
-                  : <Typography>{t('applyToAll')}</Typography>}
+                  : <Typography>{t('apply_to_all')}</Typography>}
               </Grid>
               <Grid item xs={9} sm={8}>
                 <Typography variant="subtitle2" align="center">
-                  {t('tutorialTune')}
+                  {t('tutorial_tune')}
                 </Typography>
               </Grid>
             </>
@@ -197,11 +206,11 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
               <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
                 {isMobile
                   ? <FormatSize style={{ color: 'white' }} />
-                  : <Typography>{t('applyToAll')}</Typography>}
+                  : <Typography>{t('apply_to_all')}</Typography>}
               </Grid>
               <Grid item xs={9} sm={8}>
                 <Typography variant="subtitle2" align="center">
-                  {t('tutorialFormatSize')}
+                  {t('tutorial_format_size')}
                 </Typography>
               </Grid>
             </>
@@ -209,21 +218,21 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
           <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
             {isMobile
               ? <Clear color="primary" />
-              : <Typography color="primary">{t('disableAll')}</Typography>}
+              : <Typography color="primary">{t('disable_all')}</Typography>}
           </Grid>
           <Grid item xs={9} sm={8}>
             <Typography variant="subtitle2" align="center">
-              {t('tutorialClear')}
+              {t('tutorial_clear')}
             </Typography>
           </Grid>
           <Grid item xs={3} sm={4} style={{ color: '#00e676', textAlign: 'center' }}>
             {isMobile
               ? <Check />
-              : <Typography>{t('enableAll')}</Typography>}
+              : <Typography>{t('enable_all')}</Typography>}
           </Grid>
           <Grid item xs={9} sm={8}>
             <Typography variant="subtitle2" align="center">
-              {t('tutorialCheck')}
+              {t('tutorial_check')}
             </Typography>
           </Grid>
           <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
@@ -233,7 +242,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
           </Grid>
           <Grid item xs={9} sm={8}>
             <Typography variant="subtitle2" align="center">
-              {t('tutorialSave')}
+              {t('tutorial_save')}
             </Typography>
           </Grid>
           {toggleHelp ? (
@@ -245,7 +254,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
           ) : (
             <Grid item xs={12} style={{ textAlign: 'center' }}>
               <Button onClick={handleSwitch} variant="contained" color="primary" size="small">
-                {isPokemon ? t('tutorialShowAllView') : t('tutorialShowPokemonView')}
+                {isPokemon ? t('tutorial_show_all_view') : t('tutorial_show_pokemon_view')}
               </Button>
             </Grid>
           )}

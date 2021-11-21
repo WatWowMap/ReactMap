@@ -53,7 +53,7 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
       {clickedTwice && (
         <Grid item style={{ whiteSpace: 'pre-line' }}>
           <Typography style={{ color: 'white', margin: 20 }} align="center">
-            {location.state ? t(location.state.message) : t('clickOnce')}
+            {location.state ? t(location.state.message) : t('click_once')}
           </Typography>
         </Grid>
       )}

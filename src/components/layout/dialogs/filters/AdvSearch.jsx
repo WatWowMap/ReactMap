@@ -21,7 +21,7 @@ export default function AdvSearch({ search, setSearch, category }) {
     <Paper elevation={0} variant="outlined" className={classes.search} key="search">
       <InputBase
         className={classes.input}
-        placeholder={t(`search${category}`)}
+        placeholder={t(`search_${category}`)}
         name="search"
         value={search}
         onChange={handleSearchChange}

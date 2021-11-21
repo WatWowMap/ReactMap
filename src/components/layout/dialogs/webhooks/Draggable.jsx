@@ -58,7 +58,7 @@ export default function DraggableMarker({
           >
             <Grid item>
               <Typography variant="subtitle2" align="center">
-                {t('dragAndDrop')}
+                {t('drag_and_drop')}
               </Typography>
             </Grid>
             <Grid item style={{ textAlign: 'center' }}>
@@ -71,7 +71,7 @@ export default function DraggableMarker({
                 />
               </FormControl>
               <Typography variant="caption">
-                {t('distanceRadius')}
+                {t('distance_radius')}
               </Typography>
             </Grid>
             <Grid item>
@@ -83,7 +83,7 @@ export default function DraggableMarker({
                   setWebhookLocation(position)
                 }}
               >
-                {t('clickToSelect')}
+                {t('click_to_select')}
               </Button>
             </Grid>
           </Grid>

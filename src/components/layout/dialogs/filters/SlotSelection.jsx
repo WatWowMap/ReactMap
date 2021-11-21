@@ -34,7 +34,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters, is
 
   return (
     <>
-      <Header titles={[`team_${teamId}`, 'slotSelection']} action={toggleSlotsMenu(false)} />
+      <Header titles={[`team_${teamId}`, 'slot_selection']} action={toggleSlotsMenu(false)} />
       <DialogContent style={{ color: 'white' }}>
         <Grid
           container

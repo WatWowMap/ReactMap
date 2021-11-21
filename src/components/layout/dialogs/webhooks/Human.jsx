@@ -88,7 +88,7 @@ const Human = ({
       >
         <Grid item xs={6} sm={gridSize}>
           <Typography variant="h6">
-            {t('selectProfile')}
+            {t('select_profile')}
           </Typography>
         </Grid>
         <Grid item xs={6} sm={gridSize} style={{ textAlign: 'center' }}>
@@ -117,7 +117,7 @@ const Human = ({
           <>
             <Grid item xs={6} sm={gridSize}>
               <Typography variant="h6">
-                {t('selectWebhook')}
+                {t('select_webhook')}
               </Typography>
             </Grid>
             <Grid item xs={6} sm={gridSize} style={{ textAlign: 'center' }}>
