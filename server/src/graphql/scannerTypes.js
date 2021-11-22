@@ -111,7 +111,7 @@ module.exports = gql`
     invasions: [Invasion]
   }
 
-  interface Pokemon {
+  type Pokemon {
     id: ID
     encounter_id: Int
     spawnpoint_id: String
@@ -123,8 +123,8 @@ module.exports = gql`
     gender: Int
     display_pokemon_id: Int
     ditto_form: Int
-    weight: Int
-    size: Int
+    weight: Float
+    size: Float
     move_1: Int
     move_2: Int
     cp: Int
@@ -143,6 +143,7 @@ module.exports = gql`
     inactive_stats: Boolean
     changed: Boolean
     expire_timestamp: Int
+    first_seen_timestamp: Int
     expire_timestamp_verified: Boolean
     updated: Int
   }
