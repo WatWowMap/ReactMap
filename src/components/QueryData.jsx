@@ -4,9 +4,9 @@ import { useQuery } from '@apollo/client'
 import Query from '@services/Query'
 import Utility from '@services/Utility'
 import RobustTimeout from '@classes/RobustTimeout'
+import { useStatic } from '@hooks/useStore'
 
 import Clustering from './Clustering'
-import ScanArea from './tiles/ScanArea'
 import Notification from './layout/general/Notification'
 
 const withAvailableList = ['pokestops', 'gyms', 'nests']
@@ -31,6 +31,8 @@ export default function QueryData({
   category, available, filters, staticFilters, staticUserSettings,
   userSettings, perms, Icons, userIcons, setParams, isNight,
 }) {
+  const setExcludeList = useStatic(state => state.setExcludeList)
+
   const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
 
   const trimFilters = useCallback(requestedFilters => {
@@ -113,6 +115,8 @@ export default function QueryData({
   })
   timeout.setupTimeout(refetch)
 
+  useEffect(() => () => setExcludeList([]))
+
   const renderedData = data || previousData
   if (error && process.env.NODE_ENV === 'development') {
     return (
@@ -128,30 +132,23 @@ export default function QueryData({
       />
     )
   }
-  if (renderedData) {
-    return category === 'scanAreas' ? (
-      <ScanArea
-        item={renderedData[category]}
-      />
-    ) : (
-      <Clustering
-        renderedData={renderedData[category]}
-        clusterZoomLvl={clusterZoomLvl}
-        map={map}
-        config={config}
-        filters={filters}
-        Icons={Icons}
-        userIcons={userIcons}
-        tileStyle={tileStyle}
-        perms={perms}
-        category={category}
-        userSettings={userSettings}
-        staticUserSettings={staticUserSettings}
-        params={params}
-        setParams={setParams}
-        isNight={isNight}
-      />
-    )
-  }
-  return null
+  return renderedData ? (
+    <Clustering
+      renderedData={renderedData[category]}
+      clusterZoomLvl={clusterZoomLvl}
+      map={map}
+      config={config}
+      filters={filters}
+      Icons={Icons}
+      userIcons={userIcons}
+      tileStyle={tileStyle}
+      perms={perms}
+      category={category}
+      userSettings={userSettings}
+      staticUserSettings={staticUserSettings}
+      params={params}
+      setParams={setParams}
+      isNight={isNight}
+    />
+  ) : null
 }

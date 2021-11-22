@@ -1,14 +1,10 @@
 /* eslint-disable no-console */
 const express = require('express')
-const { graphqlHTTP } = require('express-graphql')
-const cors = require('cors')
-const { NoSchemaIntrospectionCustomRule } = require('graphql')
 const fs = require('fs')
 const { default: center } = require('@turf/center')
 
 const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
-const schema = require('./graphql')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
@@ -258,18 +254,5 @@ rootRouter.get('/settings', async (req, res) => {
     res.status(500).json({ error })
   }
 })
-
-rootRouter.use('/graphql', cors(), graphqlHTTP({
-  schema,
-  graphiql: config.devOptions.graphiql,
-  validationRules: config.devOptions.graphiql ? undefined : [NoSchemaIntrospectionCustomRule],
-  customFormatErrorFn: (e) => {
-    if (config.devOptions.enabled) {
-      console.error('GraphQL Error:', e)
-    } else {
-      console.error('GraphQL Error:', e.message, e.path, e.location)
-    }
-  },
-}))
 
 module.exports = rootRouter

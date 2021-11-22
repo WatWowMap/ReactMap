@@ -11,14 +11,31 @@ const passport = require('passport')
 const rateLimit = require('express-rate-limit')
 const i18next = require('i18next')
 const Backend = require('i18next-fs-backend')
+const { ApolloServer } = require('apollo-server-express')
 require('./db/initialization')
 
 const { Pokemon } = require('./models/index')
 const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const config = require('./services/config')
+const typeDefs = require('./graphql/typeDefs')
+const resolvers = require('./graphql/resolvers')
 
 const app = express()
+
+const server = new ApolloServer({
+  cors: true,
+  typeDefs,
+  resolvers,
+  introspection: config.devOptions.enabled,
+  debug: config.devOptions.queryDebug,
+  context: ({ req }) => ({ req }),
+  formatError: (e) => config.devOptions.enabled
+    ? console.error(e)
+    : console.error('GraphQL Error: ', e.message, e.path, e.location),
+})
+
+server.start().then(() => server.applyMiddleware({ app, path: '/graphql' }))
 
 if (config.devOptions.enabled) {
   app.use(logger((tokens, req, res) => [
