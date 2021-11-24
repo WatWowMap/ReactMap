@@ -55,7 +55,7 @@ class Pokestop extends Model {
       onlyLures, onlyQuests, onlyInvasions, onlyArEligible, onlyAllPokestops,
     }, ts, midnight: clientMidnight } = args
     const midnight = settings.hideOldQuests
-      ? clientMidnight
+      ? clientMidnight || 0
       : 0
     const safeTs = ts || Math.floor((new Date()).getTime() / 1000)
 
