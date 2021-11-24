@@ -110,9 +110,15 @@ class DiscordClient {
               }
             }
           }
-          perms.areaRestrictions = Utility.areaPerms(userRoles, 'discord')
-          perms.webhooks = Utility.webhookPerms(userRoles, 'discordRoles')
+          perms.areaRestrictions.push(...Utility.areaPerms(userRoles, 'discord'))
+          perms.webhooks.push(...Utility.webhookPerms(userRoles, 'discordRoles'))
         }
+      }
+      if (perms.areaRestrictions.length) {
+        perms.areaRestrictions = [...new Set(perms.areaRestrictions)]
+      }
+      if (perms.webhooks.length) {
+        perms.webhooks = [...new Set(perms.webhooks)]
       }
     } catch (e) {
       console.warn('Failed to get perms for user', user.id, e.message)
