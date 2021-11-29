@@ -1,7 +1,6 @@
 module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
   switch (provider) {
     case 'poracle': {
-      const pvpMax = hookConfig[`pvpFilter${leagues[0].name.charAt(0).toUpperCase()}${leagues[0].name.substring(1)}MinCP`] || 4096
       const isOhbem = pvp === 'ohbem'
       const poracleUiObj = {
         human: true,
@@ -34,7 +33,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             pvp_ranking_league: 0,
             pvp_ranking_best: 1,
             pvp_ranking_worst: hookConfig.pvpFilterMaxRank,
-            pvp_ranking_min_cp: isOhbem ? 0 : leagues[0].cp - 50,
+            pvp_ranking_min_cp: 0,
             allForms: true,
             pvpEntry: false,
             noIv: false,
@@ -58,17 +57,17 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 { name: 'def_iv', label: '', min: 0, max: 15, perm: 'stats', low: 'def', high: 'max_def' },
                 { name: 'sta_iv', label: '', min: 0, max: 15, perm: 'stats', low: 'sta', high: 'max_sta' },
               ],
-              texts: [{ name: 'min_time', type: 'number', max: 60, adornment: 's', xs: 4, sm: 4 }],
+              texts: [{ name: 'min_time', type: 'number', max: 60, adornment: 's', xs: 4, sm: 4, width: 100 }],
               booleans: [
                 { name: 'xs', xs: 4, sm: 4, override: true },
                 { name: 'xl', xs: 4, sm: 4, override: true },
               ],
             },
             pvp: {
-              selects: [{ name: 'pvp_ranking_league', options: [{ name: 'none', cp: 0 }, ...leagues], xs: 6, sm: isOhbem ? 6 : 3 }],
+              selects: [{ name: 'pvp_ranking_league', options: [{ name: 'none', cp: 0 }, ...leagues], xs: isOhbem ? 12 : 6, sm: isOhbem ? 6 : 3 }],
               texts: isOhbem
                 ? []
-                : [{ name: 'pvp_ranking_min_cp', max: pvpMax, type: 'number', adornment: 'cp', xs: 6, sm: 3 }],
+                : [{ name: 'pvp_ranking_min_cp', type: 'number', adornment: 'cp', width: 110, xs: 6, sm: 3 }],
               sliders: [{ name: 'pvp', label: 'rank', min: 1, max: hookConfig.pvpFilterMaxRank, perm: 'pvp', low: 'pvp_ranking_best', high: 'pvp_ranking_worst' }],
             },
             general: {

@@ -46,7 +46,10 @@ export default function Nav({
     category: '',
     type: '',
   })
-  const [motd, setMotd] = useState(messageOfTheDay.index > motdIndex && messageOfTheDay.messages.length)
+  const [motd, setMotd] = useState(
+    (messageOfTheDay.index > motdIndex && messageOfTheDay.messages.length)
+    || messageOfTheDay.settings.permanent,
+  )
 
   const [userProfile, setUserProfile] = useState(false)
   const safeSearch = searchable.filter(category => perms[category])

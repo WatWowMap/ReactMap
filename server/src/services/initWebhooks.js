@@ -29,13 +29,13 @@ module.exports = async function initWebhooks(config) {
           platform: webhook.platform,
           addressFormat: webhook.addressFormat || hookConfig.addressFormat,
           fetched: Date.now(),
-          leagues: [{ name: 'great', cp: 1500 }, { name: 'ultra', cp: 2500 }],
+          leagues: [{ name: 'great', cp: 1500, min: hookConfig.pvpFilterGreatMinCP }, { name: 'ultra', cp: 2500, min: hookConfig.pvpFilterUltraMinCP }],
           valid: Boolean(hookConfig),
           pvp: 'rdm',
           everything: hookConfig.everythingFlagPermissions === 'allow-any',
         }
         if (hookConfig?.pvpLittleLeagueAllowed) {
-          baseSettings.leagues.push({ name: 'little', cp: 500 })
+          baseSettings.leagues.push({ name: 'little', cp: 500, min: hookConfig.pvpFilterLittleMinCP })
           baseSettings.pvp = 'ohbem'
         }
 
