@@ -52,7 +52,7 @@ export default function WebhookAdvanced({
   } } = useStatic(s => s.webhookData)
   const { pokemon, moves, types } = useStatic(s => s.masterfile)
 
-  Utility.analytics('/poracle')
+  Utility.analytics(`/poracle/${category}`)
 
   const [search, { data, previousData, loading }] = useLazyQuery(Query.search('webhook'), {
     variables: {
@@ -154,48 +154,48 @@ export default function WebhookAdvanced({
     const menuItems = []
     switch (option.name) {
       case 'template': templates[poracleValues.noIv ? `${category}NoIv` : category]?.[locale]?.forEach(item => (
-        menuItems.push(<MenuItem key={item} value={item}>{item}</MenuItem>)
+        menuItems.push(<MenuItem key={item} value={item} dense>{item}</MenuItem>)
       )); break
       case 'profile_no':
         if (profile.length) {
           profile.forEach(pro => (
-            menuItems.push(<MenuItem key={pro.name} value={pro.profile_no}>{pro.name}</MenuItem>)
+            menuItems.push(<MenuItem key={pro.name} value={pro.profile_no} dense>{pro.name}</MenuItem>)
           ))
         } else {
-          menuItems.push(<MenuItem key={1} value={1}>1</MenuItem>)
+          menuItems.push(<MenuItem key={1} value={1} dense>1</MenuItem>)
         } break
       case 'pvp_ranking_league': option.options.forEach(league => (
-        menuItems.push(<MenuItem key={league.name} value={league.cp}>{t(`slider_${league.name}`)}</MenuItem>)
+        menuItems.push(<MenuItem key={league.name} value={league.cp} dense>{t(`slider_${league.name}`)}</MenuItem>)
       )); break
       case 'gender': option.options.forEach(gender => (
-        menuItems.push(<MenuItem key={gender} value={gender}>{t(`gender_${gender}`)}</MenuItem>)
+        menuItems.push(<MenuItem key={gender} value={gender} dense>{t(`gender_${gender}`)}</MenuItem>)
       )); break
       case 'team': option.options.forEach(team => (
-        menuItems.push(<MenuItem key={team} value={team}>{t(`team_${team}`, t('any'))}</MenuItem>)
+        menuItems.push(<MenuItem key={team} value={team} dense>{t(`team_${team}`, t('any'))}</MenuItem>)
       )); break
       case 'move':
-        menuItems.push(<MenuItem key={9000} value={9000}>{t('any')}</MenuItem>)
+        menuItems.push(<MenuItem key={9000} value={9000} dense>{t('any')}</MenuItem>)
         if (id === 'global') {
           Object.keys(moves).forEach(move => {
             if (moves[move].type) {
-              menuItems.push(<MenuItem key={move} value={move}>{t(`move_${move}`)}</MenuItem>)
+              menuItems.push(<MenuItem key={move} value={move} dense>{t(`move_${move}`)}</MenuItem>)
             }
           })
         } else if (pokemon[idObj.id]) {
           ['quickMoves', 'chargedMoves'].forEach(moveType => {
             if (pokemon[idObj.id]?.forms?.[idObj.form]?.[moveType]) {
               pokemon[idObj.id]?.forms?.[idObj.form]?.[moveType].forEach(move => {
-                menuItems.push(<MenuItem key={move} value={move}>{t(`move_${move}`)}</MenuItem>)
+                menuItems.push(<MenuItem key={move} value={move} dense>{t(`move_${move}`)}</MenuItem>)
               })
             } else if (pokemon[idObj.id][moveType]) {
               pokemon[idObj.id][moveType].forEach(move => {
-                menuItems.push(<MenuItem key={move} value={move}>{t(`move_${move}`)}</MenuItem>)
+                menuItems.push(<MenuItem key={move} value={move} dense>{t(`move_${move}`)}</MenuItem>)
               })
             }
           })
         } break
       default: option.options.forEach(subOption => (
-        menuItems.push(<MenuItem key={subOption} value={subOption}>{t(subOption, subOption)}</MenuItem>)
+        menuItems.push(<MenuItem key={subOption} value={subOption} dense>{t(subOption, subOption)}</MenuItem>)
       ))
     }
     return menuItems
@@ -213,15 +213,15 @@ export default function WebhookAdvanced({
     if (field === 'everything_individually' && poracleValues.everything_individually) return ` ${t('individually')} `
     if (skipFields.includes(field)) return ''
     if (field.startsWith('pvp')) {
-      if (poracleValues.pvpEntry && poracleValues.pvp_ranking_league) {
+      if (poracleValues.pvpEntry && poracleValues.pvp_ranking_league && poracleValues[field] !== info.defaults[field]) {
         const league = leagues.find(x => x.cp === poracleValues.pvp_ranking_league) || {}
         switch (field) {
           case 'pvp_ranking_min_cp':
-            return pvp === 'ohbem' ? '' : `${league.name}cp${poracleValues.pvp_ranking_min_cp}`
+            return pvp === 'ohbem' ? '' : `${league.name}${t('cp')}${poracleValues.pvp_ranking_min_cp}`
           case 'pvp_ranking_worst':
-            return `${league.name}high${poracleValues.pvp_ranking_worst}`
+            return `${league.name}${poracleValues.pvp_ranking_worst}`
           case 'pvp_ranking_best':
-            return `${league.name}${poracleValues.pvp_ranking_best}`
+            return `${league.name}high${poracleValues.pvp_ranking_best}`
           default: return ''
         }
       }
@@ -345,14 +345,18 @@ export default function WebhookAdvanced({
             disabled={getDisabled(option)}
             type={option.type || 'text'}
             size="small"
-            style={{ width: 120 }}
+            style={{ width: option.width || 120 }}
             inputProps={{
-              min: 0,
-              max: option.max,
+              min: option.name === 'pvp_ranking_min_cp' && poracleValues.pvp_ranking_league
+                ? leagues.find(x => x.cp === poracleValues.pvp_ranking_league)?.min || 0
+                : option.min || 0,
+              max: option.name === 'pvp_ranking_min_cp' && poracleValues.pvp_ranking_league
+                ? poracleValues.pvp_ranking_league || 0
+                : option.max || 0,
             }}
             InputProps={{
               endAdornment: option.adornment
-                ? <InputAdornment position="end">{option.adornment}</InputAdornment>
+                ? <InputAdornment position="end">{t(option.adornment)}</InputAdornment>
                 : null,
             }}
           />
@@ -473,6 +477,7 @@ export default function WebhookAdvanced({
                 >
                   <AccordionSummary
                     expandIcon={<ExpandMore style={{ color: 'white' }} />}
+                    className={classes.accordionSummary}
                   >
                     <Typography className={classes.heading}>
                       {t(type)}

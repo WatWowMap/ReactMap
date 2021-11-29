@@ -37,6 +37,9 @@ export default makeStyles(theme => ({
   formControlLabel: {
     marginTop: theme.spacing(1),
   },
+  accordionSummary: {
+    backgroundColor: '#2e2e2e',
+  },
   list: {
     width: 'auto',
     zIndex: 9998,
