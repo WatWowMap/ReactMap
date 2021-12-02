@@ -16,6 +16,7 @@ const masterfile = require('../data/masterfile.json')
 const {
   Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter, User,
 } = require('../models/index')
+const { version } = require('../../../package.json')
 
 const rootRouter = new express.Router()
 
@@ -42,7 +43,7 @@ rootRouter.use((err, req, res, next) => {
 })
 
 rootRouter.get('/logout', (req, res) => {
-  req.session.destroy()
+  req.logout()
   res.redirect('/')
 })
 
@@ -59,11 +60,12 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
         const [lon, lat] = center(foundArea).geometry.coordinates
         res.redirect(`/@/${lat}/${lon}/${zoom || 15}`)
       } else {
-        res.send(`${area} is not an available area`)
+        res.redirect('/404')
       }
     }
   } catch (e) {
-    res.send(`Error navigating to ${area}`, e)
+    console.error(`Error navigating to ${area}`, e.message)
+    res.redirect('/404')
   }
 })
 
@@ -116,6 +118,7 @@ rootRouter.get('/settings', async (req, res) => {
         manualAreas: config.manualAreas || {},
         icons: config.icons,
       },
+      version,
     }
 
     // add user options here from the config that are structured as objects
@@ -255,7 +258,7 @@ rootRouter.get('/settings', async (req, res) => {
     }
     res.status(200).json({ serverSettings })
   } catch (error) {
-    res.status(500).json({ error })
+    res.status(500).json({ error: error.message, status: 500 })
   }
 })
 

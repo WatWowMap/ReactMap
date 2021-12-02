@@ -15,6 +15,7 @@ import Fetch from '@services/Fetch'
 import Auth from './Auth'
 import Login from './Login'
 import RouteChangeTracker from './RouteChangeTracker'
+import Errors from './Errors'
 
 const client = new ApolloClient({
   uri: '/graphql',
@@ -91,6 +92,8 @@ export default function App() {
         <Router>
           {(process.env && process.env.GOOGLE_ANALYTICS_ID) && <RouteChangeTracker />}
           <Switch>
+            <Route exact path="/404" component={Errors} />
+            <Route exact path="/500" component={Errors} />
             <Route exact path="/">
               {serverSettings && <Auth serverSettings={serverSettings} />}
             </Route>

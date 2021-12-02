@@ -113,6 +113,10 @@ i18next.use(Backend).init({
 
 app.use(rootRouter, requestRateLimiter)
 
+app.all('*', (req, res) => {
+  res.redirect('/')
+})
+
 if (config.database.settings.reactMapHandlesPvp) {
   Pokemon.initOhbem()
 }
