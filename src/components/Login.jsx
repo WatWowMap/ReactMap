@@ -31,7 +31,7 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
             sm={serverSettings.config.map.discordInvite ? 3 : 5}
             style={{ textAlign: serverSettings.config.map.discordInvite ? 'right' : 'center' }}
           >
-            <DiscordLogin />
+            <DiscordLogin href={serverSettings.config.map.discordAuthUrl} />
           </Grid>
           {serverSettings.config.map.discordInvite && (
             <Grid item xs={5} sm={3} style={{ textAlign: 'left' }}>
@@ -43,8 +43,8 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
       {serverSettings?.authMethods?.includes('telegram') && (
         <Grid item>
           <TelegramLoginButton
-            botName={process.env?.TELEGRAM_BOT_NAME}
-            dataAuthUrl="/auth/telegram/callback"
+            botName={process.env?.[serverSettings.config.map.telegramBotEnvRef]}
+            dataAuthUrl={serverSettings.config.map.telegramAuthUrl}
             usePic={false}
             lang={localStorage.getItem('i18nextLng')}
           />
