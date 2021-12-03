@@ -117,6 +117,19 @@ app.all('*', (req, res) => {
   res.redirect('/')
 })
 
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error('Express Error:', err.message)
+  switch (err.message) {
+    case 'NoCodeProvided':
+      return res.redirect('/404')
+    case 'Failed to fetch user\'s guilds':
+      return res.redirect('/login')
+    default:
+      return res.redirect('/')
+  }
+})
+
 if (config.database.settings.reactMapHandlesPvp) {
   Pokemon.initOhbem()
 }

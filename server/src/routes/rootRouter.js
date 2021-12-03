@@ -24,24 +24,6 @@ rootRouter.use('/', clientRouter)
 
 rootRouter.use('/auth', authRouter)
 
-// eslint-disable-next-line no-unused-vars
-rootRouter.use((err, req, res, next) => {
-  switch (err.message) {
-    case 'NoCodeProvided':
-      return res.status(400).send({
-        status: 'ERROR',
-        error: err.message,
-      })
-    case 'Failed to fetch user\'s guilds':
-      return res.redirect('/login')
-    default:
-      return res.status(500).send({
-        status: 'ERROR',
-        error: err.message,
-      })
-  }
-})
-
 rootRouter.get('/logout', (req, res) => {
   req.logout()
   res.redirect('/')
