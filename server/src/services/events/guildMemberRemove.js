@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const { clearOtherSessions } = require('../sessionStore')
 
 module.exports = async (client, member) => {

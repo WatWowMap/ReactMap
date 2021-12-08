@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* global BigInt */
 const { clearOtherSessions } = require('../sessionStore')
 
