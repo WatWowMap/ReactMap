@@ -131,7 +131,7 @@ app.use((err, req, res, next) => {
 })
 
 if (config.database.settings.reactMapHandlesPvp) {
-  Pokemon.initOhbem()
+  (async () => Pokemon.initOhbem())()
 }
 
 app.listen(config.port, config.interface, () => {

@@ -64,6 +64,7 @@
     "discordAuthUrl": "/auth/discord",
     "telegramAuthUrl": "/auth/telegram",
     "telegramBotEnvRef": "TELEGRAM_BOT_NAME",
+    "localAuthUrl": "/auth/local",
     "theme": {
       "style": "dark",
       "primary": "#ff5722",

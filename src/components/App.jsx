@@ -8,7 +8,9 @@ import {
   createHttpLink,
 } from '@apollo/client'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { ThemeProvider } from '@material-ui/styles'
 
+import setTheme from '@assets/mui/theme'
 import AbortableLink from '@classes/AbortableLink'
 import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
@@ -86,28 +88,34 @@ export default function App() {
     getServerSettings()
   }, [])
 
+  const theme = serverSettings
+    ? setTheme(serverSettings.config.map.theme)
+    : {}
+
   return (
     <Suspense fallback="Loading translations...">
       <ApolloProvider client={client}>
-        <Router>
-          {(process.env && process.env.GOOGLE_ANALYTICS_ID) && <RouteChangeTracker />}
-          <Switch>
-            <Route exact path="/404" component={Errors} />
-            <Route exact path="/500" component={Errors} />
-            <Route exact path="/">
-              {serverSettings && <Auth serverSettings={serverSettings} />}
-            </Route>
-            <Route exact path="/login">
-              {serverSettings && <Login clickedTwice serverSettings={serverSettings} />}
-            </Route>
-            <Route exact path="/@/:lat/:lon/:zoom?">
-              {serverSettings && <Auth serverSettings={serverSettings} />}
-            </Route>
-            <Route exact path="/id/:category/:id/:zoom?">
-              {serverSettings && <Auth serverSettings={serverSettings} />}
-            </Route>
-          </Switch>
-        </Router>
+        <ThemeProvider theme={theme}>
+          <Router>
+            {(process.env && process.env.GOOGLE_ANALYTICS_ID) && <RouteChangeTracker />}
+            <Switch>
+              <Route exact path="/404" component={Errors} />
+              <Route exact path="/500" component={Errors} />
+              <Route exact path="/">
+                {serverSettings && <Auth serverSettings={serverSettings} />}
+              </Route>
+              <Route exact path="/login">
+                {serverSettings && <Login clickedTwice serverSettings={serverSettings} />}
+              </Route>
+              <Route exact path="/@/:lat/:lon/:zoom?">
+                {serverSettings && <Auth serverSettings={serverSettings} />}
+              </Route>
+              <Route exact path="/id/:category/:id/:zoom?">
+                {serverSettings && <Auth serverSettings={serverSettings} />}
+              </Route>
+            </Switch>
+          </Router>
+        </ThemeProvider>
       </ApolloProvider>
     </Suspense>
   )

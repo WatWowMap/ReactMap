@@ -22,6 +22,7 @@ public/favicon/*
 server/src/strategies/*
 !server/src/strategies/discord.js
 !server/src/strategies/telegram.js
+!server/src/strategies/local.js
 
 # Ignore generated locales
 public/locales/*

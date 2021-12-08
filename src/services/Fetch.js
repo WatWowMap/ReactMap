@@ -68,4 +68,19 @@ export default class Fetch {
       return invasions
     }
   }
+
+  static async login(user, endpoint = '/auth/local') {
+    try {
+      return fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      })
+    } catch (error) {
+      console.error(error.message, '\nUnable to login at this time, please try again later.')
+      return { error: true, status: 500 }
+    }
+  }
 }

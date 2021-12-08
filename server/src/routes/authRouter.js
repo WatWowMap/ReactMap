@@ -12,8 +12,8 @@ fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
   files.forEach((file) => {
     const trimmed = file.replace('.js', '')
 
-    router.get(`/${trimmed}`, passport.authenticate(trimmed))
-    router.get(`/${trimmed}/callback`,
+    router[trimmed.includes('local') ? 'post' : 'get'](`/${trimmed}`, passport.authenticate(trimmed))
+    router[trimmed.includes('local') ? 'post' : 'get'](`/${trimmed}/callback`,
       passport.authenticate(trimmed, {
         failureRedirect: '/',
       }),

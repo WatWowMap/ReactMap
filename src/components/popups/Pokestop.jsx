@@ -340,7 +340,7 @@ const QuestConditions = ({ quest, t, userSettings }) => {
       <Grid item xs={9} style={{ textAlign: 'center' }}>
         <Typography variant="caption">
           <Trans
-            defaults={quest_task}
+            defaults={quest_task || quest_title}
             i18nKey={quest_title.startsWith('quest_')
               ? quest_title.replace('quest_', 'quest_title_').toLowerCase()
               : `quest_title_${quest_title.toLowerCase()}`}

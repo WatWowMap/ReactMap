@@ -5,6 +5,7 @@ import { Grid, Typography } from '@material-ui/core'
 import TelegramLoginButton from 'react-telegram-login'
 
 import DiscordLogin from './layout/general/DiscordLogin'
+import LocalLogin from './layout/general/LocalLogin'
 
 const Login = ({ clickedTwice, location, serverSettings }) => {
   const { t } = useTranslation()
@@ -48,6 +49,11 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
             usePic={false}
             lang={localStorage.getItem('i18nextLng')}
           />
+        </Grid>
+      )}
+      {serverSettings?.authMethods?.includes('local') && (
+        <Grid item>
+          <LocalLogin href={serverSettings.config.map.localAuthUrl} />
         </Grid>
       )}
       {clickedTwice && (
