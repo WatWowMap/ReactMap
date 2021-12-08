@@ -371,7 +371,9 @@
   "telegram": {
     "enabled": false,
     "botToken": "",
-    "groups": [""],
+    "groups": [
+      ""
+    ],
     "areaRestrictions": [],
     "perms": {
       "map": {
@@ -455,6 +457,11 @@
         "roles": []
       }
     }
+  },
+  "local": {
+    "enabled": false,
+    "perms": [],
+    "areaRestrictions": []
   },
   "tileServers": {
     "Default": {
