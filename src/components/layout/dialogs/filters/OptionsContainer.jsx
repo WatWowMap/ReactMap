@@ -9,7 +9,7 @@ import useStyles from '@hooks/useStyles'
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
-import FilterOptions from './Options'
+import Options from './Options'
 
 export default function OptionsContainer({
   advMenu, setAdvMenu, menus, setMenus, categories,
@@ -56,7 +56,7 @@ export default function OptionsContainer({
         })
       }
       return (
-        <FilterOptions
+        <Options
           key={cat}
           name={cat}
           options={options}

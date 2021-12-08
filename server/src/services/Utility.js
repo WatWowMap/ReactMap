@@ -33,8 +33,8 @@ module.exports = class Utility {
     return primaryUi(filters, perms)
   }
 
-  static buildAdvMenus() {
-    return advMenus()
+  static buildAdvMenus(available) {
+    return advMenus(available)
   }
 
   static buildClientOptions(perms) {
