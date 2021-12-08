@@ -50,7 +50,7 @@ export default function OptionsContainer({
       : Object.keys(options).length > 1) {
       if (menus[category].filters[cat]) {
         Object.entries(menus[category].filters[cat]).forEach(([filter, bool]) => {
-          if (bool) {
+          if (bool && options[filter] !== undefined) {
             applied.push(filter)
           }
         })

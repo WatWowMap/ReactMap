@@ -49,21 +49,6 @@ export default function ConfigSettings({
 
   const updateObjState = (defaults, category) => {
     if (localState?.state?.[category]) {
-      if (category === 'menus') {
-        try {
-          Object.entries(localState.state.menus).forEach(([categoryKey, categoryValues]) => {
-            Object.entries(categoryValues.filters).forEach(([subKey, subValues]) => {
-              Object.keys(subValues).forEach(filter => {
-                if (defaults[categoryKey]?.filters?.[subKey]?.[filter] === undefined) {
-                  delete localState.state.menus[categoryKey].filters[subKey][filter]
-                }
-              })
-            })
-          })
-        } catch (e) {
-          console.warn('Unable to remove outdated filters')
-        }
-      }
       const newState = {}
       extend(true, newState, defaults, localState.state[category])
       return newState
