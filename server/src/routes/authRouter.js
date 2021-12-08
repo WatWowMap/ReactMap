@@ -30,7 +30,7 @@ fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
           res.redirect('/')
         }
       })
-    console.log(`${trimmed} route initialized`)
+    console.log(`/auth/${trimmed} route initialized`)
   })
 })
 
