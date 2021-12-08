@@ -4,7 +4,7 @@ const DiscordStrategy = require('passport-discord').Strategy
 const passport = require('passport')
 const path = require('path')
 
-const config = require('../services/config')
+const { discord: strategyConfig } = require('../services/config')
 const { User } = require('../models/index')
 const DiscordMapClient = require('../services/DiscordClient')
 const logUserAuth = require('../services/logUserAuth')
@@ -15,15 +15,15 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`)
   client.user.setPresence({
     activity: {
-      name: config.discord.presence,
-      type: config.discord.presenceType,
+      name: strategyConfig.presence,
+      type: strategyConfig.presenceType,
     },
   })
 })
 
-client.login(config.discord.botToken)
+client.login(strategyConfig.botToken)
 
-const MapClient = new DiscordMapClient(client, config.discord)
+const MapClient = new DiscordMapClient(client, strategyConfig)
 
 const authHandler = async (req, accessToken, refreshToken, profile, done) => {
   if (!req.query.code) {
@@ -38,7 +38,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
     user.blocked = user.perms.blocked
 
     const embed = await logUserAuth(req, user, 'Discord')
-    await MapClient.sendMessage(config.discord.logChannelId, { embed })
+    await MapClient.sendMessage(strategyConfig.logChannelId, { embed })
 
     if (user) {
       delete user.guilds
@@ -59,9 +59,9 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
 }
 
 passport.use(path.parse(__filename).name, new DiscordStrategy({
-  clientID: config.discord.clientId,
-  clientSecret: config.discord.clientSecret,
-  callbackURL: config.discord.redirectUri,
+  clientID: strategyConfig.clientId,
+  clientSecret: strategyConfig.clientSecret,
+  callbackURL: strategyConfig.redirectUri,
   scope: ['identify', 'guilds'],
   passReqToCallback: true,
 }, authHandler))
