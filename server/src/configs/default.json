@@ -31,6 +31,7 @@
       "raids": false,
       "nests": false
     },
+    "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
     "searchResultsLimit": 15
   },
