@@ -146,7 +146,10 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
   )
 
   return L.divIcon({
-    popupAnchor: [7, -((gymSize + raidSize * 2) + slotModifier) / 2],
+    popupAnchor: [
+      7 + gymMod.popupX + raidMod.popupX,
+      (-((gymSize + raidSize * 2) + slotModifier) / 2) + gymMod.popupY + raidMod.popupY,
+    ],
     className: 'gym-marker',
     html: renderToString(ReactIcon),
   })

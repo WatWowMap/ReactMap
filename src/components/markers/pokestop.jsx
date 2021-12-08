@@ -15,6 +15,9 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
     (userSettings.showArBadge && ar_scan_eligible),
   )
   let baseSize = Icons.getSize('pokestop', filters.filter[filterId])
+  let popupX = 7 + pokestopMod.popupX
+  let { popupY } = pokestopMod
+
   const invasionIcons = []
   const invasionSizes = []
   const questIcons = []
@@ -31,6 +34,8 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
       invasionIcons.unshift(Icons.getInvasions(invasion.grunt_type))
       invasionSizes.unshift(Icons.getSize('invasion', filters.filter[filterId]))
       popupYOffset += rewardMod.offsetY - 1
+      popupX += invasionMod.popupX
+      popupY += invasionMod.popupY
     })
   }
   if (hasQuest && !(hasInvasion && invasionMod.removeQuest)) {
@@ -75,6 +80,8 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
       }
       questSizes.unshift(Icons.getSize('reward', filters.filter[key]))
       popupYOffset += rewardMod.offsetY - 1
+      popupX += rewardMod.popupX
+      popupY += rewardMod.popupY
     })
   }
 
@@ -137,15 +144,10 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
     </div>
   )
 
-  const getPopupAnchorY = () => {
-    if (pokestopMod.manualPopup) {
-      return pokestopMod.manualPopup - totalInvasionSize * 0.25 - totalQuestSize * 0.1
-    }
-    return -(baseSize + totalInvasionSize + totalQuestSize) / popupYOffset
-  }
-
   return L.divIcon({
-    popupAnchor: [7, getPopupAnchorY()],
+    popupAnchor: [popupX, (pokestopMod.manualPopup
+      ? pokestopMod.manualPopup - totalInvasionSize * 0.25 - totalQuestSize * 0.1
+      : -(baseSize + totalInvasionSize + totalQuestSize) / popupYOffset) + popupY],
     className: 'pokestop-marker',
     html: renderToString(ReactIcon),
   })

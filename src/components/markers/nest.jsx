@@ -6,6 +6,7 @@ export default function nestMarker(iconUrl, nest, pokemon, filters, Icons, recen
   const { types } = pokemon
   const filterId = `${nest.pokemon_id}-${nest.pokemon_form}`
   const size = Icons.getSize('nest', filters.filter[filterId])
+  const { x, y } = Icons.getPopupOffset('nest')
   const opacity = recent ? 1 : 0.5
 
   const ReactIcon = (
@@ -46,7 +47,7 @@ export default function nestMarker(iconUrl, nest, pokemon, filters, Icons, recen
   return L.divIcon({
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 0.75],
-    popupAnchor: [0, -8 - size],
+    popupAnchor: [0 + x, -8 - size + y],
     className: 'nest-marker',
     html: renderToString(ReactIcon),
   })

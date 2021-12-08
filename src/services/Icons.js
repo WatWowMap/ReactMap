@@ -13,6 +13,8 @@ export default class UIcons {
         offsetX: 1,
         offsetY: 1,
         sizeMultiplier: 1,
+        popupX: 0,
+        popupY: 0,
       },
     }
     this.cacheMs = cacheHrs * 60 * 60 * 1000
@@ -124,6 +126,12 @@ export default class UIcons {
     return this.modifiers[category]
       ? baseSize * this.modifiers[category].sizeMultiplier
       : baseSize
+  }
+
+  getPopupOffset(category) {
+    return this.modifiers[category]
+      ? { x: this.modifiers[category].popupX || 0, y: this.modifiers[category].popupY || 0 }
+      : { x: 0, y: 0 }
   }
 
   getIconById(id) {
