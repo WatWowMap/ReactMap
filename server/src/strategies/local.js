@@ -2,7 +2,9 @@
 const passport = require('passport')
 const Strategy = require('passport-local')
 const bcrypt = require('bcrypt')
-const { discord, local, alwaysEnabledPerms } = require('../services/config')
+const path = require('path')
+
+const { local: strategyConfig, discord, alwaysEnabledPerms } = require('../services/config')
 const { User } = require('../models/index')
 const Utility = require('../services/Utility')
 
@@ -11,9 +13,9 @@ const authHandler = (req, username, password, done) => {
     perms: {
       ...Object.fromEntries(
         Object.keys(discord.perms)
-          .map(x => [x, local.perms.includes(x) || alwaysEnabledPerms.includes(x)]),
+          .map(x => [x, strategyConfig.perms.includes(x) || alwaysEnabledPerms.includes(x)]),
       ),
-      areaRestrictions: Utility.areaPerms(local.perms, 'local'),
+      areaRestrictions: Utility.areaPerms(strategyConfig.perms, 'local'),
       webhooks: [],
     },
   }
@@ -43,7 +45,7 @@ const authHandler = (req, username, password, done) => {
   }
 }
 
-passport.use(new Strategy({
+passport.use(path.parse(__filename).name, new Strategy({
   usernameField: 'username',
   passwordField: 'password',
   passReqToCallback: true,
