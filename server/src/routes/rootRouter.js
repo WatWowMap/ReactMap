@@ -134,18 +134,32 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
 
+      serverSettings.available = {
+        pokemon: [],
+        pokestops: [],
+        gyms: [],
+        nests: [],
+      }
+
       try {
-        serverSettings.available = {}
         if (serverSettings.user.perms.pokemon) {
           serverSettings.available.pokemon = config.api.queryAvailable.pokemon
             ? await Pokemon.getAvailablePokemon(Utility.dbSelection('pokemon') === 'mad')
             : []
         }
+      } catch (e) {
+        console.error('Unable to query Pokemon', e.message)
+      }
+      try {
         if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
           serverSettings.available.gyms = config.api.queryAvailable.raids
             ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym') === 'mad')
             : await Fetch.fetchRaids()
         }
+      } catch (e) {
+        console.error('Unable to query Raids', e.message)
+      }
+      try {
         if (serverSettings.user.perms.quests
           || serverSettings.user.perms.pokestops
           || serverSettings.user.perms.invasions
@@ -154,13 +168,17 @@ rootRouter.get('/settings', async (req, res) => {
             ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop') === 'mad')
             : await Fetch.fetchQuests()
         }
+      } catch (e) {
+        console.error('Unable to query Pokestops', e.message)
+      }
+      try {
         if (serverSettings.user.perms.nests) {
           serverSettings.available.nests = config.api.queryAvailable.nests
             ? await Nest.getAvailableNestingSpecies()
             : await Fetch.fetchNests()
         }
       } catch (e) {
-        console.warn(e, '\nUnable to query available.')
+        console.error('Unable to query Nests', e.message)
       }
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile
@@ -193,7 +211,7 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.ui = Utility.buildPrimaryUi(serverSettings.defaultFilters, serverSettings.user.perms)
 
-      serverSettings.menus = Utility.buildAdvMenus()
+      serverSettings.menus = Utility.buildAdvMenus(serverSettings.available)
 
       const { clientValues, clientMenus } = Utility.buildClientOptions(serverSettings.user.perms)
 

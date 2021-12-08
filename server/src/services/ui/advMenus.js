@@ -36,24 +36,22 @@ const getQueryCategory = (subCategory) => {
   }
 }
 
-module.exports = function buildMenus() {
+module.exports = function buildMenus(available) {
   const menuFilters = {}
   const returnedItems = {}
 
-  Object.entries(pokemonFilters).forEach(filter => {
-    const [key, items] = filter
+  Object.entries(pokemonFilters).forEach(([key, items]) => {
     menuFilters[key] = Object.fromEntries(items.map(item => [item, false]))
   })
 
-  Object.entries(categories).forEach(category => {
-    const [key, items] = category
+  Object.entries(categories).forEach(([key, items]) => {
     returnedItems[key] = {
       categories: items,
       filters: {
         ...menuFilters,
         others: {
           ...menuFilters.others,
-          onlyAvailable: queryAvailable[getQueryCategory(key)],
+          onlyAvailable: available[key]?.length ? queryAvailable[getQueryCategory(key)] : undefined,
         },
         categories: Object.fromEntries(items.map(item => [item, false])),
       },
