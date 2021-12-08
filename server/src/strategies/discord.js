@@ -2,6 +2,8 @@
 const Discord = require('discord.js')
 const DiscordStrategy = require('passport-discord').Strategy
 const passport = require('passport')
+const path = require('path')
+
 const config = require('../services/config')
 const { User } = require('../models/index')
 const DiscordMapClient = require('../services/DiscordClient')
@@ -56,7 +58,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
   }
 }
 
-passport.use(new DiscordStrategy({
+passport.use(path.parse(__filename).name, new DiscordStrategy({
   clientID: config.discord.clientId,
   clientSecret: config.discord.clientSecret,
   callbackURL: config.discord.redirectUri,

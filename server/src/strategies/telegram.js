@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 const { TelegramStrategy } = require('passport-telegram-official')
 const passport = require('passport')
+const path = require('path')
+
 const { telegram, alwaysEnabledPerms } = require('../services/config')
 const { User } = require('../models/index')
 const Fetch = require('../services/Fetch')
@@ -58,7 +60,7 @@ const authHandler = async (req, profile, done) => {
   }
 }
 
-passport.use(new TelegramStrategy({
+passport.use(path.parse(__filename).name, new TelegramStrategy({
   botToken: telegram.botToken,
   passReqToCallback: true,
 }, authHandler))
