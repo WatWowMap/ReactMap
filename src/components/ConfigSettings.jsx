@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import React from 'react'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
@@ -43,7 +45,7 @@ export default function ConfigSettings({
   const localState = JSON.parse(localStorage.getItem('local-state'))
 
   const updateObjState = (defaults, category) => {
-    if (localState && localState.state && localState.state[category]) {
+    if (localState?.state?.[category]) {
       const newState = {}
       extend(true, newState, defaults, localState.state[category])
       return newState
@@ -52,7 +54,7 @@ export default function ConfigSettings({
   }
 
   const updatePositionState = (defaults, category) => {
-    if (localState && localState.state && localState.state[category]) {
+    if (localState?.state?.[category]) {
       return localState.state[category]
     }
     return defaults
@@ -74,6 +76,7 @@ export default function ConfigSettings({
   if (localState?.state?.filters?.pokemon?.standard) {
     delete localState.state.filters.pokemon.standard
   }
+
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
   setStaticFilters(serverSettings.defaultFilters)
 
