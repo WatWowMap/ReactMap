@@ -70,8 +70,9 @@ rootRouter.get('/settings', async (req, res) => {
     const getUser = async () => {
       if (config.authMethods.length && req.user) {
         return User.query()
-          .where('discordId', req.user.id)
-          .orWhere('telegramId', req.user.id)
+          .where('id', req.user.id)
+          .orWhere('telegramId', req.user.telegramId)
+          .orWhere('discordId', req.user.discordId)
           .first()
       }
       return req.session

@@ -28,6 +28,7 @@ export default function ConfigSettings({
   const setMenus = useStore(state => state.setMenus)
   const setIcons = useStore(state => state.setIcons)
   const setSelectedWebhook = useStore(state => state.setSelectedWebhook)
+  const setTutorial = useStore(state => state.setTutorial)
 
   const setAuth = useStatic(state => state.setAuth)
   const setStaticUserSettings = useStatic(state => state.setUserSettings)
@@ -67,10 +68,11 @@ export default function ConfigSettings({
     perms: serverSettings.user ? serverSettings.user.perms : {},
     methods: serverSettings.authMethods,
   })
+  setTutorial(!serverSettings.user.tutorial)
   setUi(serverSettings.ui)
+
   setMasterfile(serverSettings.masterfile)
   setAvailable(serverSettings.available)
-
   setMenus(updateObjState(serverSettings.menus, 'menus'))
   setStaticMenus(serverSettings.menus)
 

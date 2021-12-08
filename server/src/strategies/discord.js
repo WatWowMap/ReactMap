@@ -28,11 +28,11 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
       .findOne({ discordId: user.id })
       .then(async (userExists) => {
         if (!userExists) {
-          await User.query()
-            .insert({ discordId: user.id, strategy: 'discord' })
-          return done(null, user)
+          const newUser = await User.query()
+            .insertAndFetch({ discordId: user.id, strategy: 'discord' })
+          return done(null, { ...user, ...newUser })
         }
-        return done(null, user)
+        return done(null, { ...user, ...userExists })
       })
   } catch (e) {
     console.error('User has failed Discord auth.', e)

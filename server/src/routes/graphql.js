@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 const {
-  GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString, GraphQLInt,
+  GraphQLObjectType, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLID, GraphQLString, GraphQLInt, GraphQLBoolean,
 } = require('graphql')
 const { JSONResolver } = require('graphql-scalars')
 const fs = require('fs')
@@ -28,7 +28,7 @@ const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 const config = require('../services/config')
 const {
-  Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
+  Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest, User,
 } = require('../models/index')
 
 const minMaxArgs = {
@@ -435,10 +435,26 @@ const Mutation = new GraphQLObjectType({
         const perms = req.user ? req.user.perms : false
         const { category, data, status, name } = args
         if (perms?.webhooks.includes(name)) {
-          const response = await Fetch.webhookApi(category, req.user.id, status, name, data)
+          const id = req.user.strategy === 'discord' ? req.user.discordId : req.user.telegramId
+          const response = await Fetch.webhookApi(category, id, status, name, data)
           return response
         }
         return {}
+      },
+    },
+    user: {
+      type: GraphQLBoolean,
+      args: {
+        tutorial: { type: GraphQLBoolean },
+      },
+      async resolve(parent, args, req) {
+        if (req.user) {
+          await User.query()
+            .update({ tutorial: args.tutorial })
+            .where('id', req.user.id)
+          return true
+        }
+        return false
       },
     },
   },
