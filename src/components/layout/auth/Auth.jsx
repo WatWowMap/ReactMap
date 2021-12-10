@@ -1,9 +1,9 @@
 import React from 'react'
 import { Redirect, withRouter } from 'react-router-dom'
 
-import ConfigSettings from './ConfigSettings'
+import ConfigSettings from '../../ConfigSettings'
 import Login from './Login'
-import WebhookQuery from './WebhookQuery'
+import WebhookQuery from '../../WebhookQuery'
 
 const Auth = ({ serverSettings, match }) => {
   if (serverSettings.error) {
