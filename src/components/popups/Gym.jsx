@@ -340,7 +340,7 @@ const RaidImage = ({
 
 const GymInfo = ({ gym, t, Icons }) => {
   const {
-    team_id, availble_slots, ex_raid_eligible, ar_scan_eligible,
+    team_id, available_slots, ex_raid_eligible, ar_scan_eligible,
   } = gym
 
   return (
@@ -359,7 +359,7 @@ const GymInfo = ({ gym, t, Icons }) => {
       </Grid>
       <Grid item xs={12}>
         <Typography variant="subtitle1" align="center">
-          {availble_slots} {t('slots')}
+          {available_slots} {t('slots')}
         </Typography>
       </Grid>
       {ex_raid_eligible && (
