@@ -82,7 +82,6 @@ rootRouter.get('/settings', async (req, res) => {
       authMethods: config.authMethods,
       config: {
         map: {
-          discordInvite: config.discord.inviteLink,
           ...config.map,
           ...config.multiDomains[req.headers.host],
           excludeList: config.excludeFromTutorial,
