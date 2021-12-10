@@ -333,6 +333,8 @@
   "popup_pokemon_description_width": 6,
   "popup_pokemon_seen_timer_width": 5,
   "popup_pokemon_data_width": 11,
+  "login_button": 10,
+  "join_button": 10,
   "show_dex_num_in_popup": "Zeige Pokedex # in Popup",
   "popup": "Popup",
   "pvp_level": "Level {{level}} PVP Stats",

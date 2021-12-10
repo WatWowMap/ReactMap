@@ -16,32 +16,31 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
       justifyContent="center"
       alignItems="center"
       style={{ minHeight: '95vh' }}
-      spacing={4}
     >
-      <Grid item>
+      <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
         <Typography variant="h3" style={{ color: 'white' }} align="center">
           {t('welcome')} {serverSettings.config.map.headerTitle}
         </Typography>
       </Grid>
       {serverSettings?.authMethods?.includes('discord') && (
-        <Grid container item justifyContent="center" alignItems="center" spacing={2}>
+        <Grid container item justifyContent="center" alignItems="center" spacing={2} style={{ marginTop: 20, marginBottom: 20 }}>
           <Grid
             item
-            xs={serverSettings.config.map.discordInvite ? 5 : 10}
-            sm={serverSettings.config.map.discordInvite ? 3 : 5}
-            style={{ textAlign: serverSettings.config.map.discordInvite ? 'right' : 'center' }}
+            xs={serverSettings.config.map.discordInvite ? t('login_button') : 10}
+            sm={serverSettings.config.map.discordInvite ? 3 : 10}
+            style={{ textAlign: 'center' }}
           >
             <DiscordLogin href={serverSettings.config.map.discordAuthUrl} />
           </Grid>
           {serverSettings.config.map.discordInvite && (
-            <Grid item xs={5} sm={3} style={{ textAlign: 'left' }}>
+            <Grid item xs={t('join_button')} sm={3} style={{ textAlign: 'center' }}>
               <DiscordLogin href={serverSettings.config.map.discordInvite} text="join" />
             </Grid>
           )}
         </Grid>
       )}
       {serverSettings?.authMethods?.includes('telegram') && (
-        <Grid item>
+        <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
           <TelegramLoginButton
             botName={process.env?.[serverSettings.config.map.telegramBotEnvRef]}
             dataAuthUrl={serverSettings.config.map.telegramAuthUrl}
