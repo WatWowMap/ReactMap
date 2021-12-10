@@ -1,14 +1,18 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Grid, Typography } from '@material-ui/core'
+import { Grid, Typography, useMediaQuery } from '@material-ui/core'
+import { useTheme } from '@material-ui/styles'
 import TelegramLoginButton from 'react-telegram-login'
 
 import DiscordLogin from './layout/general/DiscordLogin'
 import LocalLogin from './layout/general/LocalLogin'
+import LocaleSelection from './layout/general/LocaleSelection'
 
 const Login = ({ clickedTwice, location, serverSettings }) => {
   const { t } = useTranslation()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
 
   return (
     <Grid
@@ -51,7 +55,7 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
         </Grid>
       )}
       {serverSettings?.authMethods?.includes('local') && (
-        <Grid item>
+        <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
           <LocalLogin href={serverSettings.config.map.localAuthUrl} />
         </Grid>
       )}
@@ -62,6 +66,9 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
           </Typography>
         </Grid>
       )}
+      <Grid item style={{ marginTop: 20, marginBottom: 20, bottom: 0, position: 'absolute', width: isMobile ? '50%' : '20%' }}>
+        <LocaleSelection localeSelection={serverSettings.config.localeSelection} />
+      </Grid>
     </Grid>
   )
 }

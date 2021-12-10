@@ -110,15 +110,6 @@ rootRouter.get('/settings', async (req, res) => {
     // add user options here from the config that are structured as objects
     if (serverSettings.user?.perms) {
       serverSettings.loggedIn = req.user
-      // add config options to this array that are structured as arrays
-      const arrayUserOptions = [
-        { name: 'localeSelection', values: config.localeSelection },
-      ]
-
-      arrayUserOptions.forEach(userMenu => {
-        serverSettings.config[userMenu.name] = {}
-        userMenu.values.forEach(value => serverSettings.config[userMenu.name][value] = {})
-      })
 
       // keys that are being sent to the frontend but are not options
       const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons']
