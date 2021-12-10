@@ -171,7 +171,7 @@ export default function Nav({
       </Dialog>
       <Dialog
         maxWidth="sm"
-        open={Boolean(motd)}
+        open={Boolean(motd && !tutorial)}
       >
         <Motd
           motd={messageOfTheDay}

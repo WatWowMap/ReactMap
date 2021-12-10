@@ -456,5 +456,7 @@
   "webhook_footer_feedback_width": 4,
   "webhook_footer_close_width": 4,
   "webhook_footer_add_new_width": 4,
-  "webhook_advanced_save_width": 2
+  "webhook_advanced_save_width": 2,
+  "login_button": 5,
+  "join_button": 5
 }

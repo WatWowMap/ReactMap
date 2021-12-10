@@ -38,7 +38,7 @@ const GymTile = ({
 
   const hasHatched = raid_end_timestamp >= newTs && raid_battle_timestamp <= newTs
 
-  const timerToDisplay = hasHatched ? raid_end_timestamp : raid_battle_timestamp
+  const timerToDisplay = item.raid_pokemon_id || hasHatched ? raid_end_timestamp : raid_battle_timestamp
 
   useMarkerTimer(timerToDisplay, item.id, markerRef, '', ts, () => setStateChange(!stateChange))
   useForcePopup(item.id, markerRef, params, setParams, done)

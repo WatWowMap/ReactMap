@@ -83,6 +83,7 @@
     "clientId": "",
     "clientSecret": "",
     "redirectUri": "http://localhost:8080/auth/discord/callback",
+    "inviteLink": "",
     "allowedGuilds": [],
     "blockedGuilds": [],
     "allowedUsers": [],

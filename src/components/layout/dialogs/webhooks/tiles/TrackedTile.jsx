@@ -37,7 +37,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   }
   if (category === 'invasion') {
     item.grunt_id = Object.keys(invasions).find(
-      key => invasions[key]?.type?.toLowerCase() === item.grunt_type
+      key => invasions[key]?.type?.toLowerCase() === item.grunt_type.toLowerCase()
         && invasions[key].gender === item.gender,
     )
   }

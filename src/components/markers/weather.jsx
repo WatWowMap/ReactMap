@@ -3,9 +3,10 @@ import { renderToString } from 'react-dom/server'
 import L from 'leaflet'
 
 export default function weatherMarker(weather, Icons, isNight) {
+  const { x, y } = Icons.getPopupOffset('weather')
   return L.divIcon({
     iconAnchor: [20, 20],
-    popupAnchor: [-2.5, -20],
+    popupAnchor: [-2.5 + x, -20 + y],
     className: 'weather-icon',
     html: renderToString(
       <div className="weather-fancy">
