@@ -213,7 +213,7 @@ export default class Poracle {
   static getId(item, category, invasions) {
     switch (category) {
       case 'egg': return `e${item.level}`
-      case 'invasion': return `i${Object.keys(invasions).find(x => invasions[x].type?.toLowerCase() === item.grunt_type && invasions[x].gender === item.gender)}`
+      case 'invasion': return `i${Object.keys(invasions).find(x => invasions[x].type?.toLowerCase() === item.grunt_type.toLowerCase() && invasions[x].gender === item.gender)}`
       case 'lure': return `l${item.lure_id}`
       case 'gym': return `t${item.team}-0`
       case 'raid': return item.pokemon_id === 9000
