@@ -25,7 +25,6 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
           key={i}
           block={block}
           defaultReturn={null}
-          childrenKey="messages"
         />
       ))}
     </Grid>

@@ -22,7 +22,6 @@ export default function DonorPage({ donorPage, handleDonorClose }) {
             <CustomTile
               key={i}
               block={block}
-              childrenKey="components"
             />
           )
         })
