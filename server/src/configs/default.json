@@ -97,12 +97,14 @@
     "donationPage": {
       "showOnMap": false,
       "showToDonors": false,
+      "fabIcon": "card",
       "settings": {
         "parentSpacing": 0,
         "parentAlignItems": "center",
         "parentJustifyContent": "center",
         "parentStyle": {}
       },
+      "titles": [],
       "components": [],
       "footerButtons": []
     },
