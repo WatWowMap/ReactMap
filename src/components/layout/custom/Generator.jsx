@@ -11,7 +11,7 @@ import CustomButton from './CustomButton'
 import CustomImg from './CustomImg'
 import Telegram from '../auth/Telegram'
 
-export default function Generator({ block = {}, defaultReturn = null, childrenKey = 'components' }) {
+export default function Generator({ block = {}, defaultReturn = null }) {
   const isMuiColor = block.color === 'primary' || block.color === 'secondary'
   switch (block.type) {
     case 'img': return <CustomImg block={block} />
@@ -30,7 +30,7 @@ export default function Generator({ block = {}, defaultReturn = null, childrenKe
         alignItems={block.alignItems}
         justifyContent={block.justifyContent}
       >
-        {block[childrenKey].map((subBlock, i) => (
+        {block.components.map((subBlock, i) => (
           <Grid
             key={i}
             item

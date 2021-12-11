@@ -48,7 +48,7 @@ export default function Nav({
     type: '',
   })
   const [motd, setMotd] = useState(
-    (messageOfTheDay.index > motdIndex && messageOfTheDay.messages.length)
+    (messageOfTheDay.index > motdIndex && messageOfTheDay.components.length)
     || messageOfTheDay.settings.permanent,
   )
   const [donorPage, setDonorPage] = useState(false)
