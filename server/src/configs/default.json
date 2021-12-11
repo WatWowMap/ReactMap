@@ -91,6 +91,27 @@
       },
       "messages": [],
       "footerButtons": []
+    },
+    "donationPage": {
+      "showOnMap": false,
+      "showToDonors": false,
+      "settings": {
+        "parentSpacing": 0,
+        "parentAlignItems": "center",
+        "parentJustifyContent": "center",
+        "parentStyle": {}
+      },
+      "components": [],
+      "footerButtons": []
+    },
+    "loginPage": {
+      "settings": {
+        "parentSpacing": 0,
+        "parentAlignItems": "center",
+        "parentJustifyContent": "center",
+        "parentStyle": {}
+      },
+      "components": []
     }
   },
   "clientSideOptions": {
@@ -371,7 +392,9 @@
   "telegram": {
     "enabled": false,
     "botToken": "",
-    "groups": [""],
+    "groups": [
+      ""
+    ],
     "areaRestrictions": [],
     "perms": {
       "map": {
