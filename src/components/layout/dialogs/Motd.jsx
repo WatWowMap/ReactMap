@@ -4,14 +4,14 @@ import { Typography } from '@material-ui/core'
 
 import { useStatic } from '@hooks/useStore'
 
-import CustomWrapper from '../custom/DialogWrapper'
+import DialogWrapper from '../custom/DialogWrapper'
 import CustomTile from '../custom/CustomTile'
 
 export default function Motd({ motd, handleMotdClose }) {
   const { perms } = useStatic(s => s.auth)
 
   return (
-    <CustomWrapper
+    <DialogWrapper
       configObj={motd}
       defaultTitle="message_of_the_day"
       handleClose={handleMotdClose}

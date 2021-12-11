@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button } from '@material-ui/core'
+import { Button, Icon, Typography } from '@material-ui/core'
 import LinkWrapper from './LinkWrapper'
 
 export default function CustomButton({ block, isMuiColor = false }) {
@@ -10,7 +10,10 @@ export default function CustomButton({ block, isMuiColor = false }) {
       variant={block.variant}
       style={block.style || { color: isMuiColor ? 'inherit' : block.color }}
     >
-      {block.content}
+      {Boolean(block.icon) && <Icon className={block.icon} style={{ fontSize: 30 }} />}&nbsp;
+      <Typography variant="button" align="right">
+        {block.content}
+      </Typography>
     </Button>
   )
   return block.link ? <LinkWrapper block={block} element={button} /> : button

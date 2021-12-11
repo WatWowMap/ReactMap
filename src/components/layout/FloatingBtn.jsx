@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import {
-  Menu, LocationOn, ZoomIn, ZoomOut, Search, NotificationsActive, Save, CardMembership,
+  Menu, LocationOn, ZoomIn, ZoomOut, Search, NotificationsActive, Save, CardMembership, AttachMoney, EuroSymbol,
 } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
@@ -10,6 +10,12 @@ import L from 'leaflet'
 import useStyles from '@hooks/useStyles'
 import useLocation from '@hooks/useLocation'
 import { useStore } from '@hooks/useStore'
+
+const DonationIcons = {
+  dollar: AttachMoney,
+  euro: EuroSymbol,
+  card: CardMembership,
+}
 
 export default function FloatingButtons({
   toggleDrawer, toggleDialog, safeSearch,
@@ -30,6 +36,8 @@ export default function FloatingButtons({
 
   const showDonorPage = (perms.donor ? donationPage.showToDonors : true)
     && donationPage.showOnMap && donationPage.components.length
+
+  const DonorIcon = showDonorPage ? DonationIcons[donationPage.fabIcon || 'card'] : null
 
   return (
     <Grid
@@ -63,7 +71,7 @@ export default function FloatingButtons({
       {showDonorPage ? (
         <Grid item>
           <Fab color="secondary" size={fabSize} onClick={() => setDonorPage(true)} title={t('donor_menu')} disabled={Boolean(webhookMode)}>
-            <CardMembership fontSize={iconSize} />
+            <DonorIcon fontSize={iconSize} />
           </Fab>
         </Grid>
       ) : null}

@@ -3,14 +3,14 @@ import React from 'react'
 
 import { useStatic } from '@hooks/useStore'
 
-import CustomWrapper from '../custom/DialogWrapper'
+import DialogWrapper from '../custom/DialogWrapper'
 import CustomTile from '../custom/CustomTile'
 
 export default function DonorPage({ donorPage, handleDonorClose }) {
   const { perms } = useStatic(s => s.auth)
 
   return (
-    <CustomWrapper
+    <DialogWrapper
       configObj={donorPage}
       defaultTitle="donor_page"
       handleClose={handleDonorClose}

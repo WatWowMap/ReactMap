@@ -34,7 +34,7 @@ export default function Generator({ block = {}, defaultReturn = null, childrenKe
           <Grid
             key={i}
             item
-            {...Utility.getSizes(subBlock.sizes)}
+            {...Utility.getSizes(subBlock.gridSizes)}
             style={subBlock.gridStyle || { textAlign: 'center' }}
           >
             <Generator block={subBlock} defaultReturn={defaultReturn} />
