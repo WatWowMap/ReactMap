@@ -93,7 +93,7 @@
       "footerButtons": []
     },
     "donationPage": {
-      "showOnMap": true,
+      "showOnMap": false,
       "showToDonors": false,
       "settings": {
         "parentSpacing": 0,
