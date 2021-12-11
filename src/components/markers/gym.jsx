@@ -17,11 +17,11 @@ const getBadgeColor = (raidLevel) => {
 
 export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, userSettings) {
   const {
-    in_battle, team_id, availble_slots, raid_level, ex_raid_eligible, ar_scan_eligible,
+    in_battle, team_id, available_slots, raid_level, ex_raid_eligible, ar_scan_eligible,
   } = gym
   const { gym: gymMod, raid: raidMod } = Icons.modifiers
 
-  const filledSlots = availble_slots !== null ? 6 - availble_slots : 0
+  const filledSlots = available_slots !== null ? 6 - available_slots : 0
   let filterId = team_id === 0 ? `t${team_id}-0` : `g${team_id}-${filledSlots || 0}`
   const gymIcon = Icons.getGyms(
     team_id, filledSlots, in_battle,

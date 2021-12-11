@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -5,16 +6,35 @@ import { Grid, Typography, useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@material-ui/styles'
 import TelegramLoginButton from 'react-telegram-login'
 
-import DiscordLogin from './layout/general/DiscordLogin'
-import LocalLogin from './layout/general/LocalLogin'
-import LocaleSelection from './layout/general/LocaleSelection'
+import LocalLogin from './LocalLogin'
+import LocaleSelection from '../general/LocaleSelection'
+import DiscordLogin from './Discord'
+import CustomTile from '../custom/CustomTile'
 
 const Login = ({ clickedTwice, location, serverSettings }) => {
   const { t } = useTranslation()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
 
-  return (
+  const { settings, components } = serverSettings.config.map.loginPage
+  return components.length ? (
+    <Grid
+      container
+      spacing={settings.parentSpacing || 0}
+      alignItems={settings.parentAlignItems || 'center'}
+      justifyContent={settings.parentJustifyContent || 'center'}
+      style={settings.parentStyle || {}}
+    >
+      {components.map((block, i) => (
+        <CustomTile
+          key={i}
+          block={block}
+          defaultReturn={null}
+          childrenKey="messages"
+        />
+      ))}
+    </Grid>
+  ) : (
     <Grid
       container
       direction="column"

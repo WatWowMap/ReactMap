@@ -17,7 +17,7 @@ module.exports = new GraphQLObjectType({
     updated: { type: GraphQLInt },
     raid_pokemon_id: { type: GraphQLInt },
     guarding_pokemon_id: { type: GraphQLInt },
-    availble_slots: { type: GraphQLInt },
+    available_slots: { type: GraphQLInt },
     team_id: { type: GraphQLInt },
     raid_level: { type: GraphQLInt },
     ex_raid_eligible: { type: GraphQLBoolean },

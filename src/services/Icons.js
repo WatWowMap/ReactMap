@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 import Fetch from '@services/Fetch'
 
@@ -43,7 +42,7 @@ export default class UIcons {
         },
       })
     }
-    for (const icon of icons) {
+    await Promise.all(icons.map(async icon => {
       const cachedIndex = JSON.parse(localStorage.getItem(`${icon.name}_icons`))
       const data = cachedIndex && cachedIndex.lastFetched + this.cacheMs > Date.now()
         ? cachedIndex
@@ -91,7 +90,7 @@ export default class UIcons {
           }
         })
       }
-    }
+    }))
   }
 
   get selection() {

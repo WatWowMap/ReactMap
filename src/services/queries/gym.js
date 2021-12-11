@@ -14,7 +14,7 @@ const core = gql`
 
 const gym = gql`
   fragment Gym on Gym {
-    availble_slots
+    available_slots
     ex_raid_eligible
     ar_scan_eligible
     team_id

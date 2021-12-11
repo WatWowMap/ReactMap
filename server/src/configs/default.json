@@ -93,6 +93,27 @@
       },
       "messages": [],
       "footerButtons": []
+    },
+    "donationPage": {
+      "showOnMap": false,
+      "showToDonors": false,
+      "settings": {
+        "parentSpacing": 0,
+        "parentAlignItems": "center",
+        "parentJustifyContent": "center",
+        "parentStyle": {}
+      },
+      "components": [],
+      "footerButtons": []
+    },
+    "loginPage": {
+      "settings": {
+        "parentSpacing": 0,
+        "parentAlignItems": "center",
+        "parentJustifyContent": "center",
+        "parentStyle": {}
+      },
+      "components": []
     }
   },
   "clientSideOptions": {
@@ -283,7 +304,6 @@
     "clientId": "",
     "clientSecret": "",
     "redirectUri": "http://localhost:8080/auth/discord/callback",
-    "inviteLink": "",
     "allowedGuilds": [],
     "blockedGuilds": [],
     "allowedUsers": [],
