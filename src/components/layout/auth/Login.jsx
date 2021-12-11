@@ -6,7 +6,7 @@ import { Grid, Typography, useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@material-ui/styles'
 import TelegramLoginButton from 'react-telegram-login'
 
-import LocalLogin from './LocalLogin'
+import LocalLogin from './Local'
 import LocaleSelection from '../general/LocaleSelection'
 import DiscordLogin from './Discord'
 import CustomTile from '../custom/CustomTile'
