@@ -16,7 +16,7 @@ export default function Motd({ motd, handleMotdClose }) {
       defaultTitle="message_of_the_day"
       handleClose={handleMotdClose}
       contentBody={
-        motd.messages.map((block, i) => {
+        motd.components.map((block, i) => {
           if (block.donorOnly && !perms.donor) return null
           if (block.freeloaderOnly && perms.donor) return null
           return (
@@ -24,7 +24,6 @@ export default function Motd({ motd, handleMotdClose }) {
               key={i}
               block={block}
               defaultReturn={block.type ? null : <DefaultMotD block={block} />}
-              childrenKey="messages"
             />
           )
         })
