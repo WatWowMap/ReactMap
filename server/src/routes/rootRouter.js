@@ -8,7 +8,7 @@ const { default: center } = require('@turf/center')
 
 const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
-const apiRouter = require('./api/v1/apiIndex')
+const apiRouter = require('./api/apiIndex')
 const schema = require('./graphql')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
@@ -25,7 +25,7 @@ rootRouter.use('/', clientRouter)
 
 rootRouter.use('/auth', authRouter)
 
-rootRouter.use('/api/v1', apiRouter)
+rootRouter.use('/api', apiRouter)
 
 rootRouter.get('/logout', (req, res) => {
   req.logout()

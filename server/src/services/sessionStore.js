@@ -46,7 +46,7 @@ const isValidSession = async (userId) => {
 const clearOtherSessions = async (userId, currentSessionId) => {
   const results = await Session.query()
     .where(raw(`json_extract(data, '$.passport.user.id') = '${userId}'`))
-    .andWhere('session_id', '!=', currentSessionId)
+    .andWhere('session_id', '!=', currentSessionId || '')
     .delete()
   console.log('[Session] Clear Result:', results)
 }

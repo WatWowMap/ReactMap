@@ -24,6 +24,11 @@ server/src/strategies/*
 !server/src/strategies/telegram.js
 !server/src/strategies/local.js
 
+# API Endpoints
+server/src/routes/api/v1/*
+!server/src/routes/api/v1/users.js
+!server/src/routes/api/v1/sessions.js
+
 # Ignore generated locales
 public/locales/*
 

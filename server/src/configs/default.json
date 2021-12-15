@@ -16,7 +16,7 @@
   },
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
-    "reactMapSecret": "You Should Change Me",
+    "reactMapSecret": "",
     "maxSessions": 5,
     "rateLimit": {
       "time": 60,
