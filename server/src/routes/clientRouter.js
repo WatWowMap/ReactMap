@@ -9,6 +9,8 @@ const clientRoutes = [
   '/login',
   '/@/:lat/:lon/:zoom?',
   '/id/:category/:id/:zoom?',
+  '/404',
+  '/500',
 ]
 
 router.get(clientRoutes, (req, res) => {

@@ -12,6 +12,7 @@ export default function DiscordLogin({ href, text }) {
         backgroundColor: 'rgb(114,136,218)',
         color: 'white',
         textAlign: 'center',
+        minWidth: 140,
       }}
       size="large"
       href={href || '/auth/discord'}

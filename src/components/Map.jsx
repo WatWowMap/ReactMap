@@ -21,9 +21,10 @@ const userSettingsCategory = category => {
 
 const getTileServer = (tileServers, settings, isNight) => {
   if (tileServers[settings.tileServers].name === 'auto') {
-    return isNight
+    const autoTile = isNight
       ? Object.values(tileServers).find(server => server.style === 'dark')
       : Object.values(tileServers).find(server => server.style === 'light')
+    return autoTile || Object.values(tileServers).find(server => server.name !== 'auto')
   }
   return tileServers[settings.tileServers]
 }

@@ -17,7 +17,7 @@ export default function Settings({ Icons }) {
   const { t, i18n } = useTranslation()
   const config = useStatic(state => state.config)
   const staticSettings = useStatic(state => state.settings)
-  const { loggedIn } = useStatic(state => state.auth)
+  const { loggedIn, methods } = useStatic(state => state.auth)
   const setStaticIcons = useStatic(state => state.setIcons)
 
   const setTutorial = useStore(state => state.setTutorial)
@@ -156,6 +156,7 @@ export default function Settings({ Icons }) {
             {t('profile')}
           </Button>
         </Grid>
+        {Boolean(methods.length) && (
         <Grid item xs={t('drawer_settings_logout_width')} style={{ textAlign: 'center' }}>
           {loggedIn ? (
             <Button
@@ -182,6 +183,7 @@ export default function Settings({ Icons }) {
             </Link>
           )}
         </Grid>
+        )}
         <Grid item xs={t('drawer_settings_tutorial_width')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}

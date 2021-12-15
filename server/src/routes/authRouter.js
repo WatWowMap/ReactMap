@@ -26,7 +26,8 @@ fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
           }
           res.redirect('/')
         } catch (err) {
-          res.status(500).json({ err })
+          console.error(err)
+          res.redirect('/')
         }
       })
     console.log(`${trimmed} route initialized`)

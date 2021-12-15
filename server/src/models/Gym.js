@@ -35,7 +35,7 @@ class Gym extends Model {
           'latitude AS lat',
           'longitude AS lon',
           'team_id',
-          'slots_available AS availble_slots',
+          'slots_available AS available_slots',
           'is_in_battle AS in_battle',
           'guard_pokemon_id AS guarding_pokemon_id',
           'total_cp',
@@ -142,14 +142,16 @@ class Gym extends Model {
         }
       }
       if (onlyRaids && raidPerms) {
-        gym.orWhere(raid => {
-          raid.where(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : safeTs)
-            .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
-            .andWhere(bosses => {
-              bosses.whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [...raidBosses])
-                ?.[onlyOrRaids ? 'orWhereIn' : 'whereIn'](isMad ? 'level' : 'raid_level', raids)
-            })
-        })
+        if (raidBosses.size) {
+          gym.orWhere(raid => {
+            raid.where(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : safeTs)
+              .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
+              .andWhere(bosses => {
+                bosses.whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [...raidBosses])
+                  ?.[onlyOrRaids ? 'orWhereIn' : 'whereIn'](isMad ? 'level' : 'raid_level', raids)
+              })
+          })
+        }
         if (eggs.length) {
           gym.orWhere(egg => {
             if (eggs.length === 6) {
@@ -167,13 +169,17 @@ class Gym extends Model {
     }
 
     const secondaryFilter = queryResults => {
-      const { length } = queryResults
       const filteredResults = []
 
-      for (let i = 0; i < length; i += 1) {
+      for (let i = 0; i < queryResults.length; i += 1) {
         const gym = queryResults[i]
+
+        if (gym.availble_slots !== undefined) {
+          gym.available_slots = gym.availble_slots
+        }
         if (!gymPerms) {
           gym.team_id = 0
+          gym.available_slots = 6
         }
         if (!gym.raid_pokemon_id && (args.filters[`e${gym.raid_level}`] || args.filters[`r${gym.raid_level}`])) {
           filteredResults.push(gym)

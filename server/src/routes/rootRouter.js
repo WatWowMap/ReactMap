@@ -12,6 +12,7 @@ const masterfile = require('../data/masterfile.json')
 const {
   Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter, User,
 } = require('../models/index')
+const { version } = require('../../../package.json')
 
 const rootRouter = new express.Router()
 
@@ -19,26 +20,8 @@ rootRouter.use('/', clientRouter)
 
 rootRouter.use('/auth', authRouter)
 
-// eslint-disable-next-line no-unused-vars
-rootRouter.use((err, req, res, next) => {
-  switch (err.message) {
-    case 'NoCodeProvided':
-      return res.status(400).send({
-        status: 'ERROR',
-        error: err.message,
-      })
-    case 'Failed to fetch user\'s guilds':
-      return res.redirect('/login')
-    default:
-      return res.status(500).send({
-        status: 'ERROR',
-        error: err.message,
-      })
-  }
-})
-
 rootRouter.get('/logout', (req, res) => {
-  req.session.destroy()
+  req.logout()
   res.redirect('/')
 })
 
@@ -55,11 +38,12 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
         const [lon, lat] = center(foundArea).geometry.coordinates
         res.redirect(`/@/${lat}/${lon}/${zoom || 15}`)
       } else {
-        res.send(`${area} is not an available area`)
+        res.redirect('/404')
       }
     }
   } catch (e) {
-    res.send(`Error navigating to ${area}`, e)
+    console.error(`Error navigating to ${area}`, e.message)
+    res.redirect('/404')
   }
 })
 
@@ -94,11 +78,11 @@ rootRouter.get('/settings', async (req, res) => {
       authMethods: config.authMethods,
       config: {
         map: {
-          discordInvite: config.discord.inviteLink,
           ...config.map,
           ...config.multiDomains[req.headers.host],
           excludeList: config.excludeFromTutorial,
         },
+        localeSelection: Object.fromEntries(config.localeSelection.map(locale => [locale, { name: locale }])),
         tileServers: { auto: {}, ...config.tileServers },
         navigation: config.navigation,
         drawer: {
@@ -112,6 +96,7 @@ rootRouter.get('/settings', async (req, res) => {
         manualAreas: config.manualAreas || {},
         icons: config.icons,
       },
+      version,
     }
 
     // add user options here from the config that are structured as objects
@@ -129,6 +114,7 @@ rootRouter.get('/settings', async (req, res) => {
 
       // keys that are being sent to the frontend but are not options
       const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons']
+
       Object.keys(serverSettings.config).forEach(setting => {
         if (!ignoreKeys.includes(setting)) {
           const category = serverSettings.config[setting]
@@ -145,18 +131,32 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
 
+      serverSettings.available = {
+        pokemon: [],
+        pokestops: [],
+        gyms: [],
+        nests: [],
+      }
+
       try {
-        serverSettings.available = {}
         if (serverSettings.user.perms.pokemon) {
           serverSettings.available.pokemon = config.api.queryAvailable.pokemon
             ? await Pokemon.getAvailablePokemon(Utility.dbSelection('pokemon') === 'mad')
             : []
         }
+      } catch (e) {
+        console.error('Unable to query Pokemon', e.message)
+      }
+      try {
         if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
           serverSettings.available.gyms = config.api.queryAvailable.raids
             ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym') === 'mad')
             : await Fetch.fetchRaids()
         }
+      } catch (e) {
+        console.error('Unable to query Raids', e.message)
+      }
+      try {
         if (serverSettings.user.perms.quests
           || serverSettings.user.perms.pokestops
           || serverSettings.user.perms.invasions
@@ -165,13 +165,17 @@ rootRouter.get('/settings', async (req, res) => {
             ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop') === 'mad')
             : await Fetch.fetchQuests()
         }
+      } catch (e) {
+        console.error('Unable to query Pokestops', e.message)
+      }
+      try {
         if (serverSettings.user.perms.nests) {
           serverSettings.available.nests = config.api.queryAvailable.nests
             ? await Nest.getAvailableNestingSpecies()
             : await Fetch.fetchNests()
         }
       } catch (e) {
-        console.warn(e, '\nUnable to query available.')
+        console.error('Unable to query Nests', e.message)
       }
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile
@@ -204,7 +208,7 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.ui = Utility.buildPrimaryUi(serverSettings.defaultFilters, serverSettings.user.perms)
 
-      serverSettings.menus = Utility.buildAdvMenus()
+      serverSettings.menus = Utility.buildAdvMenus(serverSettings.available)
 
       const { clientValues, clientMenus } = Utility.buildClientOptions(serverSettings.user.perms)
 
@@ -251,7 +255,7 @@ rootRouter.get('/settings', async (req, res) => {
     }
     res.status(200).json({ serverSettings })
   } catch (error) {
-    res.status(500).json({ error })
+    res.status(500).json({ error: error.message, status: 500 })
   }
 })
 

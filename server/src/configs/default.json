@@ -31,6 +31,7 @@
       "raids": false,
       "nests": false
     },
+    "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
     "searchResultsLimit": 15
   },
@@ -61,6 +62,10 @@
     "invasionCacheHrs": 1,
     "questMessage": "",
     "navigationControls": "react",
+    "discordInvite": "",
+    "discordAuthUrl": "/auth/discord",
+    "telegramAuthUrl": "/auth/telegram",
+    "telegramBotEnvRef": "TELEGRAM_BOT_NAME",
     "theme": {
       "style": "dark",
       "primary": "#ff5722",
@@ -84,8 +89,31 @@
         "parentStyle": {},
         "permanent": false
       },
-      "messages": [],
+      "components": [],
       "footerButtons": []
+    },
+    "donationPage": {
+      "showOnMap": false,
+      "showToDonors": false,
+      "fabIcon": "card",
+      "settings": {
+        "parentSpacing": 0,
+        "parentAlignItems": "center",
+        "parentJustifyContent": "center",
+        "parentStyle": {}
+      },
+      "titles": [],
+      "components": [],
+      "footerButtons": []
+    },
+    "loginPage": {
+      "settings": {
+        "parentSpacing": 0,
+        "parentAlignItems": "center",
+        "parentJustifyContent": "center",
+        "parentStyle": {}
+      },
+      "components": []
     }
   },
   "clientSideOptions": {
@@ -366,7 +394,9 @@
   "telegram": {
     "enabled": false,
     "botToken": "",
-    "groups": [""],
+    "groups": [
+      ""
+    ],
     "areaRestrictions": [],
     "perms": {
       "map": {

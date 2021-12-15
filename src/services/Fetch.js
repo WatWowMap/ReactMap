@@ -8,10 +8,11 @@ export default class Fetch {
         throw new Error(`${response.status} (${response.statusText})`)
       }
       const body = await response.json()
+      console.log('ReactMap version:', body.serverSettings.version)
       return body.serverSettings
     } catch (error) {
       console.error(error.message, '\nUnable to fetch settings at this time, please try again later.')
-      return { error: true }
+      return { error: true, status: 500 }
     }
   }
 

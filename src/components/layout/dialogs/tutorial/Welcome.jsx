@@ -4,16 +4,15 @@ import {
   Grid,
   Typography,
   Fab,
-  Select,
-  MenuItem,
 } from '@material-ui/core'
 import { Person, LockOpen } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
+import LocaleSelection from '@components/layout/general/LocaleSelection'
 
 export default function TutWelcome({ setUserProfile }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { methods, loggedIn, perms } = useStatic(state => state.auth)
   const { map: { excludeList }, localeSelection } = useStatic(state => state.config)
 
@@ -82,22 +81,7 @@ export default function TutWelcome({ setUserProfile }) {
           </Typography>
         </Grid>
         <Grid item xs={12} sm={10} style={{ textAlign: 'center' }}>
-          <Select
-            autoFocus
-            name="localeSelection"
-            value={localStorage.getItem('i18nextLng')}
-            onChange={(event) => i18n.changeLanguage(event.target.value)}
-            fullWidth
-          >
-            {Object.keys(localeSelection).map(option => (
-              <MenuItem
-                key={option}
-                value={option}
-              >
-                {t(`locale_selection_${option}`)}
-              </MenuItem>
-            ))}
-          </Select>
+          <LocaleSelection localeSelection={localeSelection} />
         </Grid>
         <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
           <Typography variant="subtitle1" align="center">

@@ -196,7 +196,7 @@ export default function ProfileEditing({
                 ? t('profile_error')
                 : t('profile_name')}
               value={newProfile}
-              onChange={(event) => setNewProfile(event.target.value)}
+              onChange={(event) => setNewProfile(event.target.value?.toLowerCase())}
               variant="outlined"
               error={Boolean(profiles[newProfile]) || newProfile === 'all'}
             />

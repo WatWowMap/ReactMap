@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 import Fetch from '@services/Fetch'
 
@@ -13,6 +12,8 @@ export default class UIcons {
         offsetX: 1,
         offsetY: 1,
         sizeMultiplier: 1,
+        popupX: 0,
+        popupY: 0,
       },
     }
     this.cacheMs = cacheHrs * 60 * 60 * 1000
@@ -41,55 +42,59 @@ export default class UIcons {
         },
       })
     }
-    for (const icon of icons) {
-      const cachedIndex = JSON.parse(localStorage.getItem(`${icon.name}_icons`))
-      const data = cachedIndex && cachedIndex.lastFetched + this.cacheMs > Date.now()
-        ? cachedIndex
-        : await Fetch.getIcons(icon.path, icon.name)
-      if (data) {
-        this[icon.name] = { indexes: Object.keys(data), ...icon }
-        if (!this[icon.name].modifiers) {
-          this[icon.name].modifiers = {}
-        }
-        this[icon.name].indexes.forEach(category => {
-          let isValid = false
-          if (!parseInt(category) && category !== '0' && category !== 'lastFetched') {
-            if (Array.isArray(data[category])) {
-              this[icon.name][category] = new Set(data[category])
-              isValid = true
-            } else {
-              Object.keys(data[category]).forEach(subCategory => {
-                if (Array.isArray(data[category][subCategory])) {
-                  this[icon.name][subCategory] = new Set(data[category][subCategory])
-                  isValid = true
+    await Promise.all(icons.map(async icon => {
+      try {
+        const cachedIndex = JSON.parse(localStorage.getItem(`${icon.name}_icons`))
+        const data = cachedIndex && cachedIndex.lastFetched + this.cacheMs > Date.now()
+          ? cachedIndex
+          : await Fetch.getIcons(icon.path, icon.name)
+        if (data) {
+          this[icon.name] = { indexes: Object.keys(data), ...icon }
+          if (!this[icon.name].modifiers) {
+            this[icon.name].modifiers = {}
+          }
+          this[icon.name].indexes.forEach(category => {
+            let isValid = false
+            if (!parseInt(category) && category !== '0' && category !== 'lastFetched') {
+              if (Array.isArray(data[category])) {
+                this[icon.name][category] = new Set(data[category])
+                isValid = true
+              } else {
+                Object.keys(data[category]).forEach(subCategory => {
+                  if (Array.isArray(data[category][subCategory])) {
+                    this[icon.name][subCategory] = new Set(data[category][subCategory])
+                    isValid = true
+                  }
+                })
+              }
+              if (!this[category]) {
+                this[category] = []
+              }
+              if (isValid) {
+                this[category].push(icon.name)
+              }
+              if (!this[icon.name].modifiers[category]) {
+                this[icon.name].modifiers[category] = this.modifiers.base
+              } else {
+                this[icon.name].modifiers[category] = {
+                  ...this.modifiers.base,
+                  ...this[icon.name].modifiers[category],
                 }
-              })
-            }
-            if (!this[category]) {
-              this[category] = []
-            }
-            if (isValid) {
-              this[category].push(icon.name)
-            }
-            if (!this[icon.name].modifiers[category]) {
-              this[icon.name].modifiers[category] = this.modifiers.base
-            } else {
-              this[icon.name].modifiers[category] = {
-                ...this.modifiers.base,
-                ...this[icon.name].modifiers[category],
+              }
+              if (icon.path === baseUrl) {
+                this.selected.misc = icon.name
+              }
+              if (!this.selected[category]) {
+                this.selected[category] = icon.name
+                this.modifiers[category] = this[icon.name].modifiers[category]
               }
             }
-            if (icon.path === baseUrl) {
-              this.selected.misc = icon.name
-            }
-            if (!this.selected[category]) {
-              this.selected[category] = icon.name
-              this.modifiers[category] = this[icon.name].modifiers[category]
-            }
-          }
-        })
+          })
+        }
+      } catch (e) {
+        console.error('Issue loading', icon, '\n', e)
       }
-    }
+    }))
   }
 
   get selection() {
@@ -124,6 +129,12 @@ export default class UIcons {
     return this.modifiers[category]
       ? baseSize * this.modifiers[category].sizeMultiplier
       : baseSize
+  }
+
+  getPopupOffset(category) {
+    return this.modifiers[category]
+      ? { x: this.modifiers[category].popupX || 0, y: this.modifiers[category].popupY || 0 }
+      : { x: 0, y: 0 }
   }
 
   getIconById(id) {

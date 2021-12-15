@@ -16,6 +16,7 @@ import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
 import Search from './dialogs/Search'
 import Motd from './dialogs/Motd'
+import DonorPage from './dialogs/DonorPage'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
@@ -30,7 +31,7 @@ export default function Nav({
   const { perms } = useStatic(state => state.auth)
   const webhookAlert = useStatic(state => state.webhookAlert)
   const setWebhookAlert = useStatic(state => state.setWebhookAlert)
-  const { map: { messageOfTheDay } } = useStatic(state => state.config)
+  const { map: { messageOfTheDay, donationPage } } = useStatic(state => state.config)
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
   const userSettings = useStore(state => state.userSettings)
@@ -46,7 +47,11 @@ export default function Nav({
     category: '',
     type: '',
   })
-  const [motd, setMotd] = useState(messageOfTheDay.index > motdIndex && messageOfTheDay.messages.length)
+  const [motd, setMotd] = useState(
+    (messageOfTheDay.index > motdIndex && messageOfTheDay.components.length)
+    || messageOfTheDay.settings.permanent,
+  )
+  const [donorPage, setDonorPage] = useState(false)
 
   const [userProfile, setUserProfile] = useState(false)
   const safeSearch = searchable.filter(category => perms[category])
@@ -125,6 +130,8 @@ export default function Nav({
           webhookMode={webhookMode}
           setWebhookMode={setWebhookMode}
           settings={settings}
+          donationPage={donationPage}
+          setDonorPage={setDonorPage}
         />
       )}
       <Dialog
@@ -168,11 +175,19 @@ export default function Nav({
       </Dialog>
       <Dialog
         maxWidth="sm"
-        open={Boolean(motd)}
+        open={Boolean(motd && !tutorial)}
       >
         <Motd
           motd={messageOfTheDay}
           handleMotdClose={handleMotdClose}
+        />
+      </Dialog>
+      <Dialog
+        open={donorPage}
+      >
+        <DonorPage
+          donorPage={donationPage}
+          handleDonorClose={() => setDonorPage(false)}
         />
       </Dialog>
       <Snackbar
