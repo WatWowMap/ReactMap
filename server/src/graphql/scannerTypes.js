@@ -25,7 +25,7 @@ module.exports = gql`
     raid_pokemon_id: Int
     updated: Int
     guarding_pokemon_id: Int
-    availble_slots: Int
+    available_slots: Int
     team_id: Int
     raid_level: Int
     ex_raid_eligible: Boolean
