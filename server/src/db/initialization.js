@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const Knex = require('knex')
 const { database: { schemas: { scanner, manual } } } = require('../configs/config.example.json')
-const { database: { schemas }, devOptions: { queryDebug } } = require('../services/config')
+const { database: { schemas, settings }, devOptions: { queryDebug } } = require('../services/config')
 const models = require('../models/index')
 
 // Establishes knex connections to each database listed in the config
@@ -16,6 +16,7 @@ const connections = Object.values(schemas).map(schema => Knex({
   },
   debug: queryDebug,
   pool: {
+    max: settings.maxConnections,
     afterCreate(conn, done) {
       conn.query('SET time_zone="+00:00";', (err) => done(err, conn))
     },
