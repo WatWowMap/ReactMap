@@ -264,7 +264,8 @@
       "leagues": [],
       "reactMapHandlesPvp": false,
       "pvpLevels": [],
-      "hideOldQuests": true
+      "hideOldQuests": true,
+      "maxConnections": 10
     },
     "schemas": {
       "scanner": {
