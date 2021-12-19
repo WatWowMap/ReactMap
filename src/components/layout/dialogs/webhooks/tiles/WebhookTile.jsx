@@ -30,10 +30,10 @@ export default function NewPokemon({
       ...tempFilters,
       [item.id]: tempFilters[item.id] ? {
         ...tempFilters[item.id],
-        enabled: !tempFilters[item.id].enabled,
+        enabled: !tempFilters[item.id]?.enabled,
       } : tempFilters[item.id] = { enabled: true, ...getOtherData(item.id) },
     })
-    Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id].enabled}`, type)
+    Utility.analytics('Webhook Filtering', `${item.name} Status: ${!tempFilters[item.id]?.enabled}`, type)
   }
 
   const image = (
@@ -49,7 +49,7 @@ export default function NewPokemon({
   )
   const selection = (
     <IconButton onClick={handleFilterChange}>
-      {tempFilters[item.id] && tempFilters[item.id].enabled
+      {tempFilters[item.id] && tempFilters[item.id]?.enabled
         ? <Check style={{ color: '#00e676' }} />
         : <Clear color="primary" />}
     </IconButton>
