@@ -9,7 +9,7 @@ const scanAreas = fs.existsSync('server/src/configs/areas.json')
   ? require('../configs/areas.json')
   : { features: [] }
 const {
-  Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest,
+  Device, Gym, Pokemon, Pokestop, Portal, S2cell, Spawnpoint, Weather, Nest, User,
 } = require('../models/index')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
@@ -271,10 +271,20 @@ module.exports = {
     webhook: (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : false
       const { category, data, status, name } = args
-      if (perms?.webhooks.includes(name)) {
-        return Fetch.webhookApi(category, req.user.id, status, name, data)
+      if (perms?.webhooks?.includes(name)) {
+        const id = req.user.strategy === 'discord' ? req.user.discordId : req.user.telegramId
+        return Fetch.webhookApi(category, id, status, name, data)
       }
       return {}
+    },
+    user: async (parent, args, { req }) => {
+      if (req.user) {
+        await User.query()
+          .update({ tutorial: args.tutorial })
+          .where('id', req.user.id)
+        return true
+      }
+      return false
     },
   },
 }

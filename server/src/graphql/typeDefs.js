@@ -34,5 +34,6 @@ module.exports = gql`
 
   type Mutation {
     webhook(category: String, data: JSON, status: String, name: String): Poracle
+    user(tutorial: Boolean): Boolean
   }
 `
