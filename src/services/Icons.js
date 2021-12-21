@@ -92,6 +92,7 @@ export default class UIcons {
           })
         }
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('Issue loading', icon, '\n', e)
       }
     }))

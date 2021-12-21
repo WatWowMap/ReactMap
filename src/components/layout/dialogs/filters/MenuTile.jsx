@@ -26,7 +26,7 @@ export default function MenuTile({
         enabled: !tempFilters[item.id].enabled,
       },
     })
-    Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id].enabled}`, type)
+    Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id]?.enabled}`, type)
   }
 
   const image = (
@@ -42,7 +42,7 @@ export default function MenuTile({
   )
   const selection = (
     <IconButton onClick={handleFilterChange}>
-      {tempFilters[item.id].enabled
+      {tempFilters[item.id]?.enabled
         ? <Check style={{ color: '#00e676' }} />
         : <Clear color="primary" />}
     </IconButton>

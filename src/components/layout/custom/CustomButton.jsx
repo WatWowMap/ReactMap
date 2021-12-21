@@ -8,6 +8,7 @@ export default function CustomButton({ block, isMuiColor = false }) {
       size={block.size}
       color={isMuiColor ? block.color : 'inherit'}
       variant={block.variant}
+      href={block.href}
       style={block.style || { color: isMuiColor ? 'inherit' : block.color }}
     >
       {Boolean(block.icon) && <Icon className={block.icon} style={{ fontSize: 30 }} />}&nbsp;
