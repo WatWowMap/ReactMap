@@ -1,9 +1,8 @@
 class Ring {
-  constructor(id, lat, lon, radius) {
+  constructor(id, lat, lon) {
     this.id = id
     this.lat = lat
     this.lon = lon
-    this.radius = radius
   }
 }
 

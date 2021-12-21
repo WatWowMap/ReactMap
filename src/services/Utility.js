@@ -97,4 +97,17 @@ export default class Utility {
     lg: sizeObj?.lg || sizeObj?.md || sizeObj?.sm || sizeObj?.xs || 12,
     xl: sizeObj?.xl || sizeObj?.lg || sizeObj?.md || sizeObj?.sm || sizeObj?.xs || 12,
   })
+
+  static getQueryArgs(map) {
+    const mapBounds = map.getBounds()
+    return {
+      minLat: mapBounds._southWest.lat,
+      maxLat: mapBounds._northEast.lat,
+      minLon: mapBounds._southWest.lng,
+      maxLon: mapBounds._northEast.lng,
+      zoom: map.getZoom(),
+      ts: Math.floor(Date.now() / 1000),
+      midnight: this.getMidnight(),
+    }
+  }
 }
