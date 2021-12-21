@@ -65,6 +65,7 @@
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/styles": "^4.11.4",
     "@turf/center": "^6.3.0",
+    "apollo-link-timeout": "^4.0.0",
     "apollo-server-core": "^3.5.0",
     "apollo-server-express": "^3.5.0",
     "compression": "^1.7.4",

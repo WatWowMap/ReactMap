@@ -1,10 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 
 import Query from '@services/Query'
 import Utility from '@services/Utility'
-import RobustTimeout from '@classes/RobustTimeout'
-import { useStatic } from '@hooks/useStore'
 
 import Clustering from './Clustering'
 import Notification from './layout/general/Notification'
@@ -29,12 +27,8 @@ const getPolling = category => {
 export default function QueryData({
   bounds, onMove, map, tileStyle, clusterZoomLvl, config, params,
   category, available, filters, staticFilters, staticUserSettings,
-  userSettings, perms, Icons, userIcons, setParams, isNight,
+  userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
 }) {
-  const setExcludeList = useStatic(state => state.setExcludeList)
-
-  const [timeout] = useState(() => new RobustTimeout(getPolling(category)))
-
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
       onlyLegacyExclude: [],
@@ -71,23 +65,16 @@ export default function QueryData({
       }
     })
     return trimmed
-  }, [userSettings])
+  }, [userSettings, filters])
 
   const refetchData = () => {
     onMove()
-    const mapBounds = map.getBounds()
     if (category !== 'weather'
       && category !== 'device'
       && category !== 'scanAreas') {
-      timeout.doRefetch({
-        minLat: mapBounds._southWest.lat,
-        maxLat: mapBounds._northEast.lat,
-        minLon: mapBounds._southWest.lng,
-        maxLon: mapBounds._northEast.lng,
+      refetch({
+        ...Utility.getQueryArgs(map),
         filters: trimFilters(filters),
-        zoom: Math.floor(map.getZoom()),
-        ts: Math.floor(Date.now() / 1000),
-        midnight: Utility.getMidnight(),
       })
     }
   }
@@ -97,27 +84,23 @@ export default function QueryData({
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [filters, userSettings, map.getZoom()])
+  }, [filters, userSettings])
 
-  const {
-    data, previousData, refetch, error,
-  } = useQuery(Query[category](
+  const { data, previousData, refetch, error } = useQuery(Query[category](
     filters, perms, map.getZoom(), clusterZoomLvl,
   ), {
-    context: {
-      abortableContext: timeout, // will be picked up by AbortableClient
-    },
+    context: { timeout: getPolling(category) },
     variables: {
       ...bounds,
       filters: trimFilters(filters),
     },
     fetchPolicy: 'cache-and-network',
+    pollInterval: getPolling(category),
   })
-  timeout.setupTimeout(refetch)
 
   useEffect(() => () => setExcludeList([]))
 
-  const renderedData = data || previousData
+  const renderedData = data || previousData || {}
   if (error && process.env.NODE_ENV === 'development') {
     return (
       <Notification
@@ -132,7 +115,7 @@ export default function QueryData({
       />
     )
   }
-  return renderedData ? (
+  return renderedData[category] ? (
     <Clustering
       renderedData={renderedData[category]}
       clusterZoomLvl={clusterZoomLvl}

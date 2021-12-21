@@ -1900,6 +1900,11 @@ apollo-graphql@^0.9.0:
     lodash.sortby "^4.7.0"
     sha.js "^2.4.11"
 
+apollo-link-timeout@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/apollo-link-timeout/-/apollo-link-timeout-4.0.0.tgz#3e255bcced6a6babdcc080b1919dd958c036e235"
+  integrity sha512-2tZsNvmbsAHunWSsGi+URLMQSDoSU0NRDJeYicX/eB7J94QXydgvZOG4FCsgU5hY0dhUrPrLCotcpJjvOOfSlA==
+
 apollo-reporting-protobuf@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/apollo-reporting-protobuf/-/apollo-reporting-protobuf-3.2.0.tgz#6735231e0d77a242708ec3712eaa1ee211d2f974"
