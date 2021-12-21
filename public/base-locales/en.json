@@ -418,6 +418,11 @@
   "join": "Join",
   "errors_404": "Oops, this page can't be found!",
   "errors_500": "There has a been a server error, try again later!",
+  "no_filter_results": [
+    "No Results Found",
+    "Try Broadening Your Filters"
+  ],
+  "donor_page": "Donor Page",
   "dialog_filter_footer_apply_to_all_width": 2,
   "dialog_filter_footer_adv_menu_width": 2,
   "dialog_filter_footer_disable_all_width": 2,
@@ -449,5 +454,7 @@
   "webhook_footer_feedback_width": 4,
   "webhook_footer_close_width": 4,
   "webhook_footer_add_new_width": 4,
-  "webhook_advanced_save_width": 2
+  "webhook_advanced_save_width": 2,
+  "login_button": 5,
+  "join_button": 5
 }

@@ -8,18 +8,20 @@ import {
   createHttpLink,
 } from '@apollo/client'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import ApolloLinkTimeout from 'apollo-link-timeout'
 
-import AbortableLink from '@classes/AbortableLink'
 import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
-import Auth from './Auth'
-import Login from './Login'
+import Auth from './layout/auth/Auth'
+import Login from './layout/auth/Login'
 import RouteChangeTracker from './RouteChangeTracker'
 import Errors from './Errors'
 
+const timeoutLink = new ApolloLinkTimeout(10000) // 10 second timeout
+
 const client = new ApolloClient({
   uri: '/graphql',
-  link: new AbortableLink().concat(createHttpLink()),
+  link: timeoutLink.concat(createHttpLink({ uri: '/graphql' })),
   cache: new InMemoryCache({
     typePolicies: {
       Query: {

@@ -9,7 +9,7 @@ import useStyles from '@hooks/useStyles'
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
-import FilterOptions from './Options'
+import Options from './Options'
 
 export default function OptionsContainer({
   advMenu, setAdvMenu, menus, setMenus, categories,
@@ -50,13 +50,13 @@ export default function OptionsContainer({
       : Object.keys(options).length > 1) {
       if (menus[category].filters[cat]) {
         Object.entries(menus[category].filters[cat]).forEach(([filter, bool]) => {
-          if (bool) {
+          if (bool && options[filter] !== undefined) {
             applied.push(filter)
           }
         })
       }
       return (
-        <FilterOptions
+        <Options
           key={cat}
           name={cat}
           options={options}

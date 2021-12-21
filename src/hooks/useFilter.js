@@ -109,8 +109,8 @@ export default function useFilter(tempFilters, menus, search, category, webhookC
           item.id = id
           switch (switchKey) {
             case 'all': addItem(id, item); break
-            case 'selected': if (tempFilters[id].enabled) addItem(id, item); break
-            case 'unselected': if (!tempFilters[id].enabled) addItem(id, item); break
+            case 'selected': if (tempFilters[id]?.enabled) addItem(id, item); break
+            case 'unselected': if (!tempFilters[id]?.enabled) addItem(id, item); break
             case 'reverse':
               if (filteringPokemon.includes(subCategory) || item.webhookOnly) {
                 if (((tempAdvFilter.generations || generations[item.genId])

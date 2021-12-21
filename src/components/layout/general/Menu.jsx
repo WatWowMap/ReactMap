@@ -4,7 +4,9 @@ import {
   DialogContent,
   Drawer,
   Grid,
+  Typography,
 } from '@material-ui/core'
+import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import { useStore } from '@hooks/useStore'
@@ -31,6 +33,7 @@ export default function Menu({
   const setMenus = useStore(state => state.setMenus)
   const advMenu = useStore(state => state.advMenu)
   const setAdvMenu = useStore(state => state.setAdvMenu)
+  const { t } = useTranslation()
 
   let columnCount = isTablet ? 3 : 5
   if (isMobile) columnCount = 1
@@ -212,27 +215,39 @@ export default function Menu({
               setSearch={setSearch}
               category={category}
             />
-            <div style={{ flex: '1 1 auto' }}>
-              <ReactWindow
-                columnCount={columnCount}
-                length={filteredArr.length}
-                flex
-                offset={0}
-                data={{
-                  isMobile,
-                  tileItem: filteredArr,
-                  tempFilters,
-                  setTempFilters,
-                  toggleAdvMenu,
-                  toggleSlotsMenu,
-                  type: category,
-                  Utility,
-                  toggleWebhook,
-                  webhookCategory,
-                }}
-                Tile={Tile}
-              />
-            </div>
+            {filteredArr.length ? (
+              <div style={{ flex: '1 1 auto' }}>
+                <ReactWindow
+                  columnCount={columnCount}
+                  length={filteredArr.length}
+                  flex
+                  offset={0}
+                  data={{
+                    isMobile,
+                    tileItem: filteredArr,
+                    tempFilters,
+                    setTempFilters,
+                    toggleAdvMenu,
+                    toggleSlotsMenu,
+                    type: category,
+                    Utility,
+                    toggleWebhook,
+                    webhookCategory,
+                  }}
+                  Tile={Tile}
+                />
+              </div>
+            ) : (
+              <div style={{ flex: '1 1 auto' }}>
+                <Grid container alignItems="center" justifyContent="center" direction="column" style={{ height: '100%' }}>
+                  <Grid item style={{ whiteSpace: 'pre-line' }}>
+                    <Typography variant="h6" align="center">
+                      {t('no_filter_results')}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </div>
+            )}
           </Grid>
         </Grid>
       </DialogContent>

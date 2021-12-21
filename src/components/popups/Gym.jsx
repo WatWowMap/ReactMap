@@ -90,6 +90,8 @@ export default function GymPopup({
               />
               <Divider orientation="vertical" flexItem />
               <RaidInfo gym={gym} t={t} Icons={Icons} ts={ts} />
+              {Boolean(gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts)
+                && <Timer gym={gym} start t={t} />}
               <Timer gym={gym} ts={ts} t={t} hasHatched={hasHatched} />
             </Grid>
           </Collapse>
@@ -338,7 +340,7 @@ const RaidImage = ({
 
 const GymInfo = ({ gym, t, Icons }) => {
   const {
-    team_id, availble_slots, ex_raid_eligible, ar_scan_eligible,
+    team_id, available_slots, ex_raid_eligible, ar_scan_eligible,
   } = gym
 
   return (
@@ -357,7 +359,7 @@ const GymInfo = ({ gym, t, Icons }) => {
       </Grid>
       <Grid item xs={12}>
         <Typography variant="subtitle1" align="center">
-          {availble_slots} {t('slots')}
+          {available_slots} {t('slots')}
         </Typography>
       </Grid>
       {ex_raid_eligible && (
@@ -387,13 +389,19 @@ const GymInfo = ({ gym, t, Icons }) => {
 }
 
 const RaidInfo = ({
-  gym, t, Icons, ts,
+  gym, t, Icons,
 }) => {
   const { moves, pokemon } = useStatic(state => state.masterfile)
   const {
     raid_level, raid_pokemon_id, raid_pokemon_form, raid_pokemon_move_1, raid_pokemon_move_2,
     raid_pokemon_evolution,
   } = gym
+
+  if (!raid_pokemon_id) {
+    return (
+      <Timer gym={gym} start t={t} />
+    )
+  }
 
   const getRaidName = (raidLevel, id) => {
     if (id) {
@@ -413,12 +421,6 @@ const RaidInfo = ({
       }
       return `${raidForm} ${t('form')}`
     }
-  }
-
-  if (!raid_pokemon_id || (raid_pokemon_id && gym.raid_battle_timestamp >= ts)) {
-    return (
-      <Timer gym={gym} start t={t} />
-    )
   }
 
   return (
@@ -494,7 +496,7 @@ const Timer = ({
   })
 
   return (
-    <Grid item xs={start ? 6 : 12} style={{ textAlign: 'center' }}>
+    <Grid item xs={start && !gym.raid_pokemon_id ? 6 : 12} style={{ textAlign: 'center' }}>
       <Typography variant="subtitle1">
         {t(start ? 'starts' : 'ends')}: {new Date(target).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
       </Typography>

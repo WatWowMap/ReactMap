@@ -1,25 +1,44 @@
 /* eslint-disable no-console */
+const Discord = require('discord.js')
 const DiscordStrategy = require('passport-discord').Strategy
 const passport = require('passport')
-const config = require('../services/config')
+const path = require('path')
+
+const { discord: strategyConfig } = require('../services/config')
 const { User } = require('../models/index')
-const DiscordClient = require('../services/discord')
+const DiscordMapClient = require('../services/DiscordClient')
 const logUserAuth = require('../services/logUserAuth')
+
+const client = new Discord.Client()
+
+client.on('ready', () => {
+  console.log(`Logged in as ${client.user.tag}!`)
+  client.user.setPresence({
+    activity: {
+      name: strategyConfig.presence,
+      type: strategyConfig.presenceType,
+    },
+  })
+})
+
+client.login(strategyConfig.botToken)
+
+const MapClient = new DiscordMapClient(client, strategyConfig)
 
 const authHandler = async (req, accessToken, refreshToken, profile, done) => {
   if (!req.query.code) {
     throw new Error('NoCodeProvided')
   }
   try {
-    DiscordClient.setAccessToken(accessToken)
+    MapClient.setAccessToken(accessToken)
     const user = profile
     user.username = `${profile.username}#${profile.discriminator}`
-    user.perms = await DiscordClient.getPerms(profile)
+    user.perms = await MapClient.getPerms(profile)
     user.valid = user.perms.map !== false
     user.blocked = user.perms.blocked
 
     const embed = await logUserAuth(req, user, 'Discord')
-    await DiscordClient.sendMessage(config.discord.logChannelId, { embed })
+    await MapClient.sendMessage(strategyConfig.logChannelId, { embed })
 
     if (user) {
       delete user.guilds
@@ -39,10 +58,10 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
   }
 }
 
-passport.use(new DiscordStrategy({
-  clientID: config.discord.clientId,
-  clientSecret: config.discord.clientSecret,
-  callbackURL: config.discord.redirectUri,
+passport.use(path.parse(__filename).name, new DiscordStrategy({
+  clientID: strategyConfig.clientId,
+  clientSecret: strategyConfig.clientSecret,
+  callbackURL: strategyConfig.redirectUri,
   scope: ['identify', 'guilds'],
   passReqToCallback: true,
 }, authHandler))

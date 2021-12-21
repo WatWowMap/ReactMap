@@ -76,7 +76,7 @@ export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons, weatherC
   )
 
   return L.divIcon({
-    popupAnchor: [0, size * -0.7 * pokemonMod.offsetY],
+    popupAnchor: [0 + pokemonMod.popupX, size * -0.7 * pokemonMod.offsetY + pokemonMod.popupY],
     iconAnchor: [size / 2, 0],
     className: 'pokemon-marker',
     html: renderToString(ReactIcon),

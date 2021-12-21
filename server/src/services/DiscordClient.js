@@ -5,28 +5,14 @@
 /* eslint-disable global-require */
 /* eslint-disable import/no-dynamic-require */
 /* global BigInt */
-const Discord = require('discord.js')
 const fs = require('fs')
-const { alwaysEnabledPerms, discord, webhooks } = require('./config')
+const { alwaysEnabledPerms, webhooks } = require('./config')
 const Utility = require('./Utility')
 
-const client = new Discord.Client()
-
-if (discord.enabled) {
-  client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`)
-    client.user.setPresence({
-      activity: {
-        name: discord.presence,
-        type: discord.presenceType,
-      },
-    })
-  })
-  client.login(discord.botToken)
-}
-
-class DiscordClient {
-  constructor(accessToken) {
+module.exports = class DiscordMapClient {
+  constructor(client, config, accessToken) {
+    this.client = client
+    this.config = config
     this.accessToken = accessToken
     this.discordEvents()
   }
@@ -37,7 +23,7 @@ class DiscordClient {
 
   async getUserRoles(guildId, userId) {
     try {
-      const members = await client.guilds.cache
+      const members = await this.client.guilds.cache
         .get(guildId)
         .members
         .fetch()
@@ -53,14 +39,14 @@ class DiscordClient {
   }
 
   async discordEvents() {
-    client.config = discord
+    this.client.config = this.config
     try {
       fs.readdir(`${__dirname}/events/`, (err, files) => {
         if (err) return this.log.error(err)
         files.forEach((file) => {
           const event = require(`${__dirname}/events/${file}`)
           const eventName = file.split('.')[0]
-          client.on(eventName, event.bind(null, client))
+          this.client.on(eventName, event.bind(null, this.client))
         })
       })
     } catch (e) {
@@ -69,35 +55,35 @@ class DiscordClient {
   }
 
   async getPerms(user) {
-    const perms = Object.fromEntries(Object.keys(discord.perms).map(x => [x, false]))
+    const perms = Object.fromEntries(Object.keys(this.config.perms).map(x => [x, false]))
     perms.areaRestrictions = []
     perms.webhooks = []
     try {
       const { guildsFull } = user
       const guilds = user.guilds.map(guild => guild.id)
-      if (discord.allowedUsers.includes(user.id)) {
+      if (this.config.allowedUsers.includes(user.id)) {
         Object.keys(perms).forEach((key) => perms[key] = true)
         perms.areaRestrictions = []
         perms.webhooks = webhooks.map(x => x.name)
         console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
         return perms
       }
-      for (let i = 0; i < discord.blockedGuilds.length; i += 1) {
-        const guildId = discord.blockedGuilds[i]
+      for (let i = 0; i < this.config.blockedGuilds.length; i += 1) {
+        const guildId = this.config.blockedGuilds[i]
         if (guilds.includes(guildId)) {
           perms.blocked = guildsFull.find(x => x.id === guildId).name
           return perms
         }
       }
-      for (let i = 0; i < discord.allowedGuilds.length; i += 1) {
-        const guildId = discord.allowedGuilds[i]
+      for (let i = 0; i < this.config.allowedGuilds.length; i += 1) {
+        const guildId = this.config.allowedGuilds[i]
         if (guilds.includes(guildId)) {
-          const keys = Object.keys(discord.perms)
+          const keys = Object.keys(this.config.perms)
           const userRoles = await this.getUserRoles(guildId, user.id)
           // Roles & Perms
           for (let j = 0; j < keys.length; j += 1) {
             const key = keys[j]
-            const configItem = discord.perms[key]
+            const configItem = this.config.perms[key]
             if (configItem.enabled) {
               if (alwaysEnabledPerms.includes(key)) {
                 perms[key] = true
@@ -131,7 +117,7 @@ class DiscordClient {
       return
     }
     try {
-      const channel = await client.channels.cache
+      const channel = await this.client.channels.cache
         .get(channelId)
         .fetch()
       if (channel && message) {
@@ -142,5 +128,3 @@ class DiscordClient {
     }
   }
 }
-
-module.exports = new DiscordClient()
