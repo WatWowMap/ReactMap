@@ -83,8 +83,10 @@ rootRouter.get('/settings', async (req, res) => {
           req.logout()
           return { valid: false }
         }
+      } else if (req.session.perms) {
+        return { valid: true, ...req.session }
       }
-      return { valid: true, ...req.session }
+      return { valid: false }
     }
     const serverSettings = {
       user: await getUser(),
