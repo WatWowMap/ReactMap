@@ -219,19 +219,27 @@ img {
 .amount-holder {
   position: absolute;
   left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
+  bottom: 12px;
+  transform: translateX(-25%);
   min-width: 100%;
   color: white;
   text-shadow: #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px,
     #000 0 0 1px, #000 0 0 1px;
   font-weight: 700;
 }
-.amount-holder > div {
-  text-align: right;
-}
-.amount-holder > div:before {
-  content: "×";
+
+.search-amount-holder {
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  transform: translateX(-50%);
+  min-width: 100%;
+  font-size: x-large;
+  font-family: Roboto;
+  color: white;
+  text-shadow: #000 0 0 2px, #000 0 0 2px, #000 0 0 2px, #000 0 0 2px,
+    #000 0 0 2px, #000 0 0 2px;
+  font-weight: 700;
 }
 
 .iv-badge {

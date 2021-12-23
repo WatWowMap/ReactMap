@@ -48,25 +48,31 @@ export default function Search({
     if (quest_reward_type) {
       const {
         quest_pokemon_id, quest_form_id, quest_gender_id, quest_costume_id, quest_shiny,
-        quest_item_id, item_amount, stardust_amount,
+        quest_item_id, item_amount, stardust_amount, candy_amount, xl_candy_amount,
         mega_pokemon_id, mega_amount, candy_pokemon_id, xl_candy_pokemon_id,
       } = option
       let main
+      let amount = 0
       switch (quest_reward_type) {
         case 2:
-          main = Icons.getRewards(quest_reward_type, quest_item_id, item_amount); break
+          main = Icons.getRewards(quest_reward_type, quest_item_id, item_amount)
+          amount = main.includes('_a') && item_amount > 1 ? 0 : item_amount; break
         case 3:
-          main = Icons.getRewards(quest_reward_type, stardust_amount); break
+          main = Icons.getRewards(quest_reward_type, stardust_amount)
+          amount = main.includes('_a') ? 0 : stardust_amount; break
         case 4:
-          main = Icons.getRewards(quest_reward_type, candy_pokemon_id); break
+          main = Icons.getRewards(quest_reward_type, candy_pokemon_id)
+          amount = main.includes('_a') ? 0 : candy_amount; break
         case 7:
           main = Icons.getPokemon(
             quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny,
           ); break
         case 9:
-          main = Icons.getRewards(quest_reward_type, xl_candy_pokemon_id); break
+          main = Icons.getRewards(quest_reward_type, xl_candy_pokemon_id)
+          amount = main.includes('_a') ? 0 : xl_candy_amount; break
         case 12:
-          main = Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount); break
+          main = Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount)
+          amount = main.includes('_a') ? 0 : mega_amount; break
         default:
           main = Icons.getRewards(quest_reward_type)
       }
@@ -76,6 +82,8 @@ export default function Search({
         }}
         >
           <img src={main} style={{ maxWidth: 45, maxHeight: 45 }} />
+          {Boolean(main.includes('stardust') ? !main.endsWith('0.png') : !main.includes('_a') && amount)
+            && <div className="search-amount-holder">x{amount}</div>}
         </div>
       )
     }
