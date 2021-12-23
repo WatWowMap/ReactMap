@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import React from 'react'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'

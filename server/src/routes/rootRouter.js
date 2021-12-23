@@ -58,23 +58,36 @@ rootRouter.get('/settings', async (req, res) => {
     } else if (config.alwaysEnabledPerms.length) {
       req.session.perms = { areaRestrictions: [], webhooks: [] }
       config.alwaysEnabledPerms.forEach(perm => {
-        req.session.perms[perm] = (config.authMethods.includes('discord') && config.discord.perms[perm].enabled) || (config.authMethods.includes('telegram') && config.telegram.perms[perm].enabled)
+        try {
+          req.session.perms[perm] = (config.authMethods.includes('discord') && config.discord.perms[perm].enabled) || (config.authMethods.includes('telegram') && config.telegram.perms[perm].enabled)
+        } catch (e) {
+          console.error('Invalid Perm in "alwaysEnabled" array:', perm)
+        }
       })
       req.session.save()
     }
 
     const getUser = async () => {
       if (config.authMethods.length && req.user) {
-        return User.query()
-          .where('id', req.user.id)
-          .orWhere('telegramId', req.user.telegramId)
-          .orWhere('discordId', req.user.discordId)
-          .first()
+        try {
+          const user = await User.query().findById(req.user.id)
+          if (user) {
+            delete user.password
+            return { valid: true, ...req.user, ...user }
+          }
+          console.log('[Session Init] Legacy user detected, forcing logout, User ID:', req?.user?.id)
+          req.logout()
+          return { valid: false }
+        } catch (e) {
+          console.log('[Session Init] Issue finding user, forcing logout, User ID:', req?.user?.id)
+          req.logout()
+          return { valid: false }
+        }
       }
-      return req.session
+      return { valid: true, ...req.session }
     }
     const serverSettings = {
-      user: { ...req.user, ...await getUser() },
+      user: await getUser(),
       settings: {},
       authMethods: config.authMethods,
       config: {
@@ -101,7 +114,7 @@ rootRouter.get('/settings', async (req, res) => {
     }
 
     // add user options here from the config that are structured as objects
-    if (serverSettings.user?.perms) {
+    if (serverSettings.user.valid) {
       serverSettings.loggedIn = req.user
       // add config options to this array that are structured as arrays
       const arrayUserOptions = [
@@ -249,9 +262,6 @@ rootRouter.get('/settings', async (req, res) => {
           serverSettings.webhooks = null
           console.warn(e.message, 'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database. User ID:', serverSettings.user.id)
         }
-      }
-      if (config.devOptions.enabled) {
-        console.log(serverSettings.webhooks)
       }
     }
     res.status(200).json({ serverSettings })
