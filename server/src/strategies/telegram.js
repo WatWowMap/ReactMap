@@ -49,11 +49,11 @@ const authHandler = async (req, profile, done) => {
       .findOne({ telegramId: user.id })
       .then(async (userExists) => {
         if (!userExists) {
-          await User.query()
-            .insert({ telegramId: user.id, strategy: user.provider })
-          return done(null, user)
+          const newUser = await User.query()
+            .insertAndFetch({ telegramId: user.id, strategy: user.provider })
+          return done(null, { ...user, ...newUser })
         }
-        return done(null, user)
+        return done(null, { ...user, ...userExists })
       })
   } catch (e) {
     console.error('User has failed Telegram auth.', e)
