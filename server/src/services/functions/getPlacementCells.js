@@ -38,7 +38,7 @@ module.exports = function getPlacementCells(bounds, pokestops, gyms) {
       cell.blocked = true
     }
   }
-  const rings = allCoords.map(poi => new Ring(poi.id, poi.lat, poi.lon, 20))
+  const rings = allCoords.map(poi => new Ring(poi.id, poi.lat, poi.lon))
 
   return {
     cells: Object.values(indexedCells),

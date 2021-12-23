@@ -242,6 +242,10 @@
       {
         "name": "Shuffle",
         "path": "https://raw.githubusercontent.com/nileplumb/PkmnShuffleMap/master/UICONS/"
+      },
+      {
+        "name": "Half Shiny",
+        "path": "https://raw.githubusercontent.com/jms412/PkmnShuffleMap/master/UICONS_Half_Shiny_Sparkles_256/"
       }
     ]
   },

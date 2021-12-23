@@ -38,6 +38,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const ui = useCallback(useStatic(state => state.ui))
   const available = useCallback(useStatic(state => state.available))
   const staticFilters = useCallback(useStatic(state => state.filters))
+  const setExcludeList = useCallback(useStatic(state => state.setExcludeList))
 
   const filters = useStore(state => state.filters)
   const settings = useStore(state => state.settings)
@@ -49,15 +50,6 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const userSettings = useStore(state => state.userSettings)
 
   const [webhookMode, setWebhookMode] = useState(false)
-  const [initialBounds] = useState({
-    minLat: map.getBounds()._southWest.lat,
-    maxLat: map.getBounds()._northEast.lat,
-    minLon: map.getBounds()._southWest.lng,
-    maxLon: map.getBounds()._northEast.lng,
-    zoom: map.getZoom(),
-    ts: Math.floor(Date.now() / 1000),
-    midnight: Utility.getMidnight(),
-  })
   const [manualParams, setManualParams] = useState(params)
   const [lc] = useState(L.control.locate({
     position: 'bottomright',
@@ -148,7 +140,9 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               return (
                 <QueryData
                   key={category}
-                  bounds={initialBounds}
+                  sizeKey={filters[category].filter ? Object.values(filters[category].filter).map(x => x.size).join(',') : 'md'}
+                  bounds={Utility.getQueryArgs(map)}
+                  setExcludeList={setExcludeList}
                   onMove={onMove}
                   perms={value}
                   map={map}

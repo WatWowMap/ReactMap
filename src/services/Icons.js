@@ -43,52 +43,57 @@ export default class UIcons {
       })
     }
     await Promise.all(icons.map(async icon => {
-      const cachedIndex = JSON.parse(localStorage.getItem(`${icon.name}_icons`))
-      const data = cachedIndex && cachedIndex.lastFetched + this.cacheMs > Date.now()
-        ? cachedIndex
-        : await Fetch.getIcons(icon.path, icon.name)
-      if (data) {
-        this[icon.name] = { indexes: Object.keys(data), ...icon }
-        if (!this[icon.name].modifiers) {
-          this[icon.name].modifiers = {}
-        }
-        this[icon.name].indexes.forEach(category => {
-          let isValid = false
-          if (!parseInt(category) && category !== '0' && category !== 'lastFetched') {
-            if (Array.isArray(data[category])) {
-              this[icon.name][category] = new Set(data[category])
-              isValid = true
-            } else {
-              Object.keys(data[category]).forEach(subCategory => {
-                if (Array.isArray(data[category][subCategory])) {
-                  this[icon.name][subCategory] = new Set(data[category][subCategory])
-                  isValid = true
+      try {
+        const cachedIndex = JSON.parse(localStorage.getItem(`${icon.name}_icons`))
+        const data = cachedIndex && cachedIndex.lastFetched + this.cacheMs > Date.now()
+          ? cachedIndex
+          : await Fetch.getIcons(icon.path, icon.name)
+        if (data) {
+          this[icon.name] = { indexes: Object.keys(data), ...icon }
+          if (!this[icon.name].modifiers) {
+            this[icon.name].modifiers = {}
+          }
+          this[icon.name].indexes.forEach(category => {
+            let isValid = false
+            if (!parseInt(category) && category !== '0' && category !== 'lastFetched') {
+              if (Array.isArray(data[category])) {
+                this[icon.name][category] = new Set(data[category])
+                isValid = true
+              } else {
+                Object.keys(data[category]).forEach(subCategory => {
+                  if (Array.isArray(data[category][subCategory])) {
+                    this[icon.name][subCategory] = new Set(data[category][subCategory])
+                    isValid = true
+                  }
+                })
+              }
+              if (!this[category]) {
+                this[category] = []
+              }
+              if (isValid) {
+                this[category].push(icon.name)
+              }
+              if (!this[icon.name].modifiers[category]) {
+                this[icon.name].modifiers[category] = this.modifiers.base
+              } else {
+                this[icon.name].modifiers[category] = {
+                  ...this.modifiers.base,
+                  ...this[icon.name].modifiers[category],
                 }
-              })
-            }
-            if (!this[category]) {
-              this[category] = []
-            }
-            if (isValid) {
-              this[category].push(icon.name)
-            }
-            if (!this[icon.name].modifiers[category]) {
-              this[icon.name].modifiers[category] = this.modifiers.base
-            } else {
-              this[icon.name].modifiers[category] = {
-                ...this.modifiers.base,
-                ...this[icon.name].modifiers[category],
+              }
+              if (icon.path === baseUrl) {
+                this.selected.misc = icon.name
+              }
+              if (!this.selected[category]) {
+                this.selected[category] = icon.name
+                this.modifiers[category] = this[icon.name].modifiers[category]
               }
             }
-            if (icon.path === baseUrl) {
-              this.selected.misc = icon.name
-            }
-            if (!this.selected[category]) {
-              this.selected[category] = icon.name
-              this.modifiers[category] = this[icon.name].modifiers[category]
-            }
-          }
-        })
+          })
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('Issue loading', icon, '\n', e)
       }
     }))
   }

@@ -5,7 +5,9 @@ import {
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons'
 import { useTheme } from '@material-ui/core/styles'
 import { useTranslation } from 'react-i18next'
+import { useMutation } from '@apollo/client'
 
+import Query from '@services/Query'
 import Header from '@components/layout/general/Header'
 import Welcome from './Welcome'
 import Advanced from './Advanced'
@@ -21,6 +23,7 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
   const { t } = useTranslation()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const [activeStep, setActiveStep] = useState(0)
+  const [setTutorialInDb] = useMutation(Query.user('setTutorial'))
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1)
@@ -32,6 +35,7 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
 
   const handleTutClose = () => {
     setTutorial(false)
+    setTutorialInDb({ variables: { tutorial: true } })
   }
 
   const getStepContent = (stepIndex) => {

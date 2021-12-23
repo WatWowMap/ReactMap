@@ -93,29 +93,11 @@ const areEqual = (prev, next) => {
     return true
   }
 
-  const sizeLogic = () => {
-    let filterId = `g${prev.item.team_id}-${6 - prev.item.available_slots}`
-    if (prev.item.team_id == 0) {
-      filterId = `t${prev.item.team_id}-0`
-    }
-    let firstCheck = true
-    if (prev.team_id) {
-      firstCheck = prev.filters.filter[filterId].size === next.filters.filter[filterId].size
-    }
-    if (prev.item.raid_end_timestamp >= prev.ts && next.item.raid_end_timestamp >= next.ts) {
-      if (prev.item.raid_pokemon_id > 0 && next.item.raid_pokemon_id > 0) {
-        return firstCheck && prev.filters.filter[`${prev.item.raid_pokemon_id}-${prev.item.raid_pokemon_form}`].size === next.filters.filter[`${next.item.raid_pokemon_id}-${next.item.raid_pokemon_form}`].size
-      }
-      return firstCheck && prev.filters.filter[`e${prev.item.raid_level}`].size === next.filters.filter[`e${next.item.raid_level}`].size
-    }
-    return firstCheck
-  }
   return prev.item.id === next.item.id
     && prev.item.raid_pokemon_id === next.item.raid_pokemon_id
     && prev.item.raid_level === next.item.raid_level
     && prev.item.in_battle === next.item.in_battle
     && raidLogic()
-    && sizeLogic()
     && prev.showTimer === next.showTimer
     && prev.item.team_id === next.item.team_id
     && prev.item.available_slots === next.item.available_slots

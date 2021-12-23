@@ -1,15 +1,11 @@
 /* eslint-disable no-console */
 const express = require('express')
-const { graphqlHTTP } = require('express-graphql')
-const cors = require('cors')
-const { NoSchemaIntrospectionCustomRule } = require('graphql')
 const fs = require('fs')
 const { default: center } = require('@turf/center')
 
 const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
 const apiRouter = require('./api/apiIndex')
-const schema = require('./graphql')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
@@ -65,22 +61,36 @@ rootRouter.get('/settings', async (req, res) => {
     } else if (config.alwaysEnabledPerms.length) {
       req.session.perms = { areaRestrictions: [], webhooks: [] }
       config.alwaysEnabledPerms.forEach(perm => {
-        req.session.perms[perm] = (config.authMethods.includes('discord') && config.discord.perms[perm].enabled) || (config.authMethods.includes('telegram') && config.telegram.perms[perm].enabled)
+        try {
+          req.session.perms[perm] = (config.authMethods.includes('discord') && config.discord.perms[perm].enabled) || (config.authMethods.includes('telegram') && config.telegram.perms[perm].enabled)
+        } catch (e) {
+          console.error('Invalid Perm in "alwaysEnabled" array:', perm)
+        }
       })
       req.session.save()
     }
 
     const getUser = async () => {
       if (config.authMethods.length && req.user) {
-        return User.query()
-          .where('discordId', req.user.id)
-          .orWhere('telegramId', req.user.id)
-          .first()
+        try {
+          const user = await User.query().findById(req.user.id)
+          if (user) {
+            delete user.password
+            return { valid: true, ...req.user, ...user }
+          }
+          console.log('[Session Init] Legacy user detected, forcing logout, User ID:', req?.user?.id)
+          req.logout()
+          return { valid: false }
+        } catch (e) {
+          console.log('[Session Init] Issue finding user, forcing logout, User ID:', req?.user?.id)
+          req.logout()
+          return { valid: false }
+        }
       }
-      return req.session
+      return { valid: true, ...req.session }
     }
     const serverSettings = {
-      user: { ...req.user, ...await getUser() },
+      user: await getUser(),
       settings: {},
       authMethods: config.authMethods,
       config: {
@@ -107,7 +117,7 @@ rootRouter.get('/settings', async (req, res) => {
     }
 
     // add user options here from the config that are structured as objects
-    if (serverSettings.user?.perms) {
+    if (serverSettings.user.valid) {
       serverSettings.loggedIn = req.user
 
       // keys that are being sent to the frontend but are not options
@@ -247,27 +257,11 @@ rootRouter.get('/settings', async (req, res) => {
           console.warn(e.message, 'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database. User ID:', serverSettings.user.id)
         }
       }
-      if (config.devOptions.enabled) {
-        console.log(serverSettings.webhooks)
-      }
     }
     res.status(200).json({ serverSettings })
   } catch (error) {
     res.status(500).json({ error: error.message, status: 500 })
   }
 })
-
-rootRouter.use('/graphql', cors(), graphqlHTTP({
-  schema,
-  graphiql: config.devOptions.graphiql,
-  validationRules: config.devOptions.graphiql ? undefined : [NoSchemaIntrospectionCustomRule],
-  customFormatErrorFn: (e) => {
-    if (config.devOptions.enabled) {
-      console.error('GraphQL Error:', e)
-    } else {
-      console.error('GraphQL Error:', e.message, e.path, e.location)
-    }
-  },
-}))
 
 module.exports = rootRouter
