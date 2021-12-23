@@ -55,8 +55,6 @@ const areEqual = (prev, next) => (
   && prev.item.updated === next.item.updated
   && prev.filters.pokemon === next.filters.pokemon
   && prev.filters.polygons === next.filters.polygons
-  && prev.filters.filter[`${prev.item.pokemon_id}-${prev.item.pokemon_form}`].size
-  === next.filters.filter[`${next.item.pokemon_id}-${next.item.pokemon_form}`].size
 )
 
 export default memo(NestTile, areEqual)

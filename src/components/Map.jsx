@@ -140,6 +140,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               return (
                 <QueryData
                   key={category}
+                  sizeKey={filters[category].filter ? Object.values(filters[category].filter).map(x => x.size).join(',') : 'md'}
                   bounds={Utility.getQueryArgs(map)}
                   setExcludeList={setExcludeList}
                   onMove={onMove}
