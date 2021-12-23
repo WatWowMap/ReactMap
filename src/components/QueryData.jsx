@@ -26,7 +26,7 @@ const getPolling = category => {
 
 export default function QueryData({
   bounds, onMove, map, tileStyle, clusterZoomLvl, config, params,
-  category, available, filters, staticFilters, staticUserSettings,
+  category, available, filters, staticFilters, staticUserSettings, sizeKey,
   userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
 }) {
   const trimFilters = useCallback(requestedFilters => {
@@ -117,6 +117,7 @@ export default function QueryData({
   }
   return renderedData[category] ? (
     <Clustering
+      key={sizeKey}
       renderedData={renderedData[category]}
       clusterZoomLvl={clusterZoomLvl}
       map={map}
