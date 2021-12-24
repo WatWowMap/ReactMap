@@ -70,7 +70,7 @@ export default function ConfigSettings({
     methods: serverSettings.authMethods,
   })
 
-  setTutorial(serverSettings.user.tutorial === undefined ? localState?.state?.tutorial : serverSettings.user.tutorial)
+  setTutorial(serverSettings.user.tutorial === undefined ? localState?.state?.tutorial : !serverSettings.user.tutorial)
   setUi(serverSettings.ui)
 
   setMasterfile(serverSettings.masterfile)
