@@ -1,13 +1,11 @@
 import React, { useState } from 'react'
 import {
-  FormControl, Grid, InputLabel, MenuItem, Select, Button, Snackbar, Dialog,
+  FormControl, Grid, InputLabel, MenuItem, Select, Button, Dialog,
 } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
-import SlideTransition from '@assets/mui/SlideTransition'
 import Utility from '@services/Utility'
 
 import UserProfile from '../dialogs/UserProfile'
@@ -26,7 +24,7 @@ export default function Settings({ Icons }) {
   const icons = useStore(state => state.icons)
   const setIcons = useStore(state => state.setIcons)
 
-  const [alert, setAlert] = useState(false)
+  const [redirect, setRedirect] = useState(false)
   const [userProfile, setUserProfile] = useState(false)
   const [feedback, setFeedback] = useState(false)
 
@@ -45,16 +43,6 @@ export default function Settings({ Icons }) {
     Icons.setSelection(name, value)
     setStaticIcons(Icons)
     setIcons({ ...icons, [name]: value })
-  }
-
-  const clearStorage = () => {
-    localStorage.clear()
-    window.location.reload()
-    setAlert(true)
-  }
-
-  const handleClose = () => {
-    setAlert(false)
   }
 
   const exportSettings = () => {
@@ -83,6 +71,9 @@ export default function Settings({ Icons }) {
     setTimeout(() => window.location.reload(), 1500)
   }
 
+  if (redirect) {
+    return <Redirect push to="/reset" />
+  }
   return (
     <Grid
       container
@@ -157,32 +148,32 @@ export default function Settings({ Icons }) {
           </Button>
         </Grid>
         {Boolean(methods.length) && (
-        <Grid item xs={t('drawer_settings_logout_width')} style={{ textAlign: 'center' }}>
-          {loggedIn ? (
-            <Button
-              className="sidebar-button"
-              variant="contained"
-              style={{ minWidth: 100 }}
-              color="primary"
-              size="small"
-              href="/logout"
-            >
-              {t('logout')}
-            </Button>
-          ) : (
-            <Link to="/login" style={{ textDecoration: 'none' }}>
+          <Grid item xs={t('drawer_settings_logout_width')} style={{ textAlign: 'center' }}>
+            {loggedIn ? (
               <Button
                 className="sidebar-button"
                 variant="contained"
                 style={{ minWidth: 100 }}
                 color="primary"
                 size="small"
+                href="/logout"
               >
-                {t('login')}
+                {t('logout')}
               </Button>
-            </Link>
-          )}
-        </Grid>
+            ) : (
+              <Link to="/login" style={{ textDecoration: 'none' }}>
+                <Button
+                  className="sidebar-button"
+                  variant="contained"
+                  style={{ minWidth: 100 }}
+                  color="primary"
+                  size="small"
+                >
+                  {t('login')}
+                </Button>
+              </Link>
+            )}
+          </Grid>
         )}
         <Grid item xs={t('drawer_settings_tutorial_width')} style={{ textAlign: 'center' }}>
           <Button
@@ -201,7 +192,7 @@ export default function Settings({ Icons }) {
             variant="contained"
             color="primary"
             size="small"
-            onClick={clearStorage}
+            onClick={() => setRedirect(true)}
           >
             {t('reset_filters')}
           </Button>
@@ -268,15 +259,6 @@ export default function Settings({ Icons }) {
             </Grid>
           )}
       </Grid>
-      <Snackbar
-        open={alert}
-        onClose={handleClose}
-        TransitionComponent={SlideTransition}
-      >
-        <Alert onClose={handleClose} severity="success" variant="filled">
-          {t('local_storage_cleared')}
-        </Alert>
-      </Snackbar>
       <Dialog open={userProfile}>
         <UserProfile setUserProfile={setUserProfile} />
       </Dialog>
