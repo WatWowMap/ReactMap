@@ -69,7 +69,7 @@ export default class Fetch {
     }
   }
 
-  static async login(user, endpoint = '/auth/local') {
+  static async login(user, endpoint = '/auth/local/callback') {
     try {
       return fetch(endpoint, {
         method: 'POST',

@@ -4,10 +4,13 @@ const DiscordStrategy = require('passport-discord').Strategy
 const passport = require('passport')
 const path = require('path')
 
+// if writing a custom strategy, rename 'discord' below to your strategy name
+// this will automatically grab all of its unique values in the config
 const { discord: strategyConfig } = require('../services/config')
 const { User } = require('../models/index')
 const DiscordMapClient = require('../services/DiscordClient')
 const logUserAuth = require('../services/logUserAuth')
+const Utility = require('../services/Utility')
 
 const client = new Discord.Client()
 
@@ -43,9 +46,21 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
     if (user) {
       delete user.guilds
     }
+
     await User.query()
-      .findOne({ discordId: user.id })
+      .findOne(req.user ? { id: req.user.id } : { discordId: user.id })
       .then(async (userExists) => {
+        if (req.user) {
+          await User.query()
+            .update({ discordId: user.id })
+            .where('id', req.user.id)
+          return done(null, {
+            ...user,
+            ...req.user,
+            discordId: user.id,
+            perms: Utility.mergePerms(req.user.perms, user.perms),
+          })
+        }
         if (!userExists) {
           const newUser = await User.query()
             .insertAndFetch({ discordId: user.id, strategy: 'discord' })

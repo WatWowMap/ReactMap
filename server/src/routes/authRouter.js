@@ -11,11 +11,15 @@ fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
   if (e) return console.error(e)
   files.forEach((file) => {
     const trimmed = file.replace('.js', '')
+    const method = trimmed.includes('local') ? 'post' : 'get'
 
-    router[trimmed.includes('local') ? 'post' : 'get'](`/${trimmed}`, passport.authenticate(trimmed))
-    router[trimmed.includes('local') ? 'post' : 'get'](`/${trimmed}/callback`,
+    router[method](`/${trimmed}`, passport.authenticate(trimmed, {
+      successRedirect: '/',
+      failureMessage: true,
+    }))
+    router[method](`/${trimmed}/callback`,
       passport.authenticate(trimmed, {
-        failureRedirect: '/',
+        failureMessage: true,
       }),
       async (req, res) => {
         try {
@@ -30,7 +34,7 @@ fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
           res.redirect('/')
         }
       })
-    console.log(`/auth/${trimmed} route initialized`)
+    console.log(`${method.toUpperCase()} /auth/${trimmed} route initialized`)
   })
 })
 

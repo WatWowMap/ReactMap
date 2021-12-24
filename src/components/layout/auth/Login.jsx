@@ -4,11 +4,11 @@ import { withRouter } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Grid, Typography, useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@material-ui/styles'
-import TelegramLoginButton from 'react-telegram-login'
 
 import LocalLogin from './Local'
 import LocaleSelection from '../general/LocaleSelection'
 import DiscordLogin from './Discord'
+import TelegramLogin from './Telegram'
 import CustomTile from '../custom/CustomTile'
 
 const Login = ({ clickedTwice, location, serverSettings }) => {
@@ -65,11 +65,9 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
       )}
       {serverSettings?.authMethods?.includes('telegram') && (
         <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
-          <TelegramLoginButton
-            botName={process.env?.[serverSettings.config.map.telegramBotEnvRef]}
-            dataAuthUrl={serverSettings.config.map.telegramAuthUrl}
-            usePic={false}
-            lang={localStorage.getItem('i18nextLng')}
+          <TelegramLogin
+            botName={serverSettings.config.map.telegramBotEnvRef}
+            authUrl={serverSettings.config.map.telegramAuthUrl}
           />
         </Grid>
       )}

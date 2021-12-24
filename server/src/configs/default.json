@@ -64,10 +64,10 @@
     "questMessage": "",
     "navigationControls": "react",
     "discordInvite": "",
-    "discordAuthUrl": "/auth/discord",
-    "telegramAuthUrl": "/auth/telegram",
+    "discordAuthUrl": "/auth/discord/callback",
+    "telegramAuthUrl": "/auth/telegram/callback",
     "telegramBotEnvRef": "TELEGRAM_BOT_NAME",
-    "localAuthUrl": "/auth/local",
+    "localAuthUrl": "/auth/local/callback",
     "theme": {
       "style": "dark",
       "primary": "#ff5722",

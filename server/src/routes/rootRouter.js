@@ -76,7 +76,7 @@ rootRouter.get('/settings', async (req, res) => {
           const user = await User.query().findById(req.user.id)
           if (user) {
             delete user.password
-            return { valid: true, ...req.user, ...user }
+            return { ...req.user, ...user, valid: true }
           }
           console.log('[Session Init] Legacy user detected, forcing logout, User ID:', req?.user?.id)
           req.logout()
@@ -87,7 +87,7 @@ rootRouter.get('/settings', async (req, res) => {
           return { valid: false }
         }
       } else if (req.session.perms) {
-        return { valid: true, ...req.session }
+        return { ...req.session, valid: true }
       }
       return { valid: false }
     }

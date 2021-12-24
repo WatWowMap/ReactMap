@@ -4,11 +4,13 @@ const Strategy = require('passport-local')
 const bcrypt = require('bcrypt')
 const path = require('path')
 
+// if writing a custom strategy, rename 'local' below to your strategy name
+// this will automatically grab all of its unique values in the config
 const { local: strategyConfig, discord, alwaysEnabledPerms } = require('../services/config')
 const { User } = require('../models/index')
 const Utility = require('../services/Utility')
 
-const authHandler = (req, username, password, done) => {
+const authHandler = async (req, username, password, done) => {
   const user = {
     perms: {
       ...Object.fromEntries(
@@ -21,7 +23,7 @@ const authHandler = (req, username, password, done) => {
   }
 
   try {
-    User.query()
+    await User.query()
       .findOne({ username })
       .then(async (userExists) => {
         if (!userExists) {
