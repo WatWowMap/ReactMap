@@ -11,6 +11,7 @@ const clientRoutes = [
   '/id/:category/:id/:zoom?',
   '/404',
   '/500',
+  '/reset',
 ]
 
 router.get(clientRoutes, (req, res) => {
