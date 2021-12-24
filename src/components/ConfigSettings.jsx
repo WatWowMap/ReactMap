@@ -10,6 +10,7 @@ import setTheme from '@assets/mui/theme'
 import useGenerate from '@hooks/useGenerate'
 
 import Map from './Map'
+import HolidayEffects from './HolidayEffects'
 
 export default function ConfigSettings({
   serverSettings, match, paramLocation, paramZoom,
@@ -134,6 +135,7 @@ export default function ConfigSettings({
 
   return (
     <ThemeProvider theme={theme}>
+      <canvas id="holiday-canvas" />
       <MapContainer
         tap={false}
         center={getStartLocation()}
@@ -147,6 +149,7 @@ export default function ConfigSettings({
             params={match.params}
           />
         )}
+        <HolidayEffects mapSettings={serverSettings.config.map} />
       </MapContainer>
     </ThemeProvider>
   )
