@@ -74,6 +74,7 @@
     },
     "christmasSnow": true,
     "newYearsFireworks": true,
+    "valentinesDay": true,
     "clusterZoomLevels": {
       "forcedClusterLimit": 2500,
       "gyms": 13,

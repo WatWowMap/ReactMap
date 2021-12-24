@@ -135,6 +135,7 @@ export default function ConfigSettings({
 
   return (
     <ThemeProvider theme={theme}>
+      <canvas id="holiday-canvas" />
       <MapContainer
         tap={false}
         center={getStartLocation()}

@@ -1,7 +1,15 @@
 import React from 'react'
+import HolidayAnimations from '@services/HolidayAnimations'
 
 export default function HolidayEffects({ mapSettings }) {
   const date = new Date()
+
+  if (mapSettings.valentinesDay && date.getMonth() === 1 && date.getDate() === 14) {
+    const heart = new HolidayAnimations('https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/A_perfect_SVG_heart.svg/20px-A_perfect_SVG_heart.svg.png')
+    heart.initialize()
+
+    return null
+  }
   if (mapSettings.christmasSnow
     && date.getMonth() === 11 && date.getDate() >= 24 && date.getDate() <= 30) {
     return (
