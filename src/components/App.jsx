@@ -18,6 +18,8 @@ import Auth from './layout/auth/Auth'
 import Login from './layout/auth/Login'
 import RouteChangeTracker from './RouteChangeTracker'
 import Errors from './Errors'
+import ClearStorage from './ClearStorage'
+import HolidayEffects from './HolidayEffects'
 
 const timeoutLink = new ApolloLinkTimeout(10000) // 10 second timeout
 
@@ -103,6 +105,7 @@ export default function App() {
             <Switch>
               <Route exact path="/404" component={Errors} />
               <Route exact path="/500" component={Errors} />
+              <Route exact path="/reset" component={ClearStorage} />
               <Route exact path="/">
                 {serverSettings && <Auth serverSettings={serverSettings} />}
               </Route>
@@ -117,6 +120,8 @@ export default function App() {
               </Route>
             </Switch>
           </Router>
+          <canvas id="holiday-canvas" />
+          <HolidayEffects mapSettings={serverSettings ? serverSettings.config.map : {}} />
         </ThemeProvider>
       </ApolloProvider>
     </Suspense>

@@ -284,6 +284,10 @@ module.exports = {
           .where('id', req.user.id)
         return true
       }
+      if (req.session) {
+        req.session.tutorial = true
+        req.session.save()
+      }
       return false
     },
   },
