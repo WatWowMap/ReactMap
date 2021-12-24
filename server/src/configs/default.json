@@ -72,6 +72,8 @@
       "secondary": "#00b0ff",
       "drawer": "temporary"
     },
+    "christmasSnow": true,
+    "newYearsFireworks": true,
     "clusterZoomLevels": {
       "forcedClusterLimit": 2500,
       "gyms": 13,
