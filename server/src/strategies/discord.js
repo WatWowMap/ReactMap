@@ -52,8 +52,12 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
       .then(async (userExists) => {
         if (req.user) {
           await User.query()
-            .update({ discordId: user.id })
+            .update({ discordId: user.id, discordPerms: JSON.stringify(user.perms), webhookStrategy: 'discord' })
             .where('id', req.user.id)
+          await User.query()
+            .where('discordId', user.id)
+            .whereNot('id', req.user.id)
+            .delete()
           return done(null, {
             ...user,
             ...req.user,

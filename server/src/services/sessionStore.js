@@ -43,12 +43,12 @@ const isValidSession = async (userId) => {
   return results.length < config.api.maxSessions
 }
 
-const clearOtherSessions = async (userId, currentSessionId) => {
+const clearOtherSessions = async (userId, currentSessionId, botName) => {
   const results = await Session.query()
     .where(raw(`json_extract(data, '$.passport.user.id') = '${userId}'`))
     .andWhere('session_id', '!=', currentSessionId || '')
     .delete()
-  console.log('[Session] Clear Result:', results)
+  console.log(`[Session${botName && ` - ${botName}`}] Clear Result:`, results)
 }
 
 module.exports = {

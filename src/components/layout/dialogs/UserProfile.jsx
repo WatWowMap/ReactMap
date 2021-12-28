@@ -8,28 +8,37 @@ import {
   AppBar,
   Tabs,
   Tab,
+  Select,
+  MenuItem,
 } from '@material-ui/core'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
 import { useTranslation } from 'react-i18next'
+import { useMutation } from '@apollo/client'
 
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
+import Query from '@services/Query'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'
 import TabPanel from '../general/TabPanel'
 import DiscordLogin from '../auth/Discord'
 import Telegram from '../auth/Telegram'
+import Notification from '../general/Notification'
 
 export default function UserProfile({ setUserProfile }) {
   Utility.analytics('/user-profile')
   const { t } = useTranslation()
-  const { methods, perms, strategy } = useStatic(state => state.auth)
+  const auth = useStatic(state => state.auth)
+  const setAuth = useStatic(state => state.setAuth)
   const { map: { discordAuthUrl, telegramAuthUrl, telegramBotEnvRef } } = useStatic(state => state.config)
   const { map: { excludeList, rolesLinkName, rolesLink } } = useStatic(state => state.config)
   const [tab, setTab] = useState(0)
+  const [refreshing, setRefreshing] = useState(false)
+
+  const [setWebhookStrategy] = useMutation(Query.user('setWebhookStrategy'))
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue)
@@ -37,16 +46,21 @@ export default function UserProfile({ setUserProfile }) {
 
   const PermPage = (
     <ProfilePermissions
-      perms={perms}
+      perms={auth.perms}
       excludeList={excludeList}
       t={t}
     />
   )
+
+  if (refreshing) {
+    setTimeout(() => window.location.reload(), 2000)
+  }
+
   return (
     <>
       <Header titles={['user_profile']} action={() => setUserProfile(false)} />
       <DialogContent style={{ padding: 0, minWidth: '40vw', minHeight: '40vh' }}>
-        {strategy === 'local' ? (
+        {auth.strategy === 'local' ? (
           <>
             <AppBar position="static">
               <Tabs
@@ -74,16 +88,46 @@ export default function UserProfile({ setUserProfile }) {
                 style={{ minHeight: '40vh' }}
                 spacing={2}
               >
-                {methods.includes('discord') && (
+                {auth.methods.includes('discord') && (
                   <Grid item style={{ padding: '20px 0' }}>
                     <DiscordLogin href={discordAuthUrl} text="link_discord" size="medium" />
                   </Grid>
                 )}
-                {methods.includes('telegram') && (
+                {auth.methods.includes('telegram') && (
                   <Grid item style={{ padding: '20px 0' }}>
                     <Telegram authUrl={telegramAuthUrl} botName={telegramBotEnvRef} />
                   </Grid>
                 )}
+                <Grid container item alignItems="center" justifyContent="center">
+                  <Grid item xs={12} sm={6} md={5} style={{ textAlign: 'center' }}>
+                    <Typography>
+                      {t('select_webhook_strategy')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} style={{ textAlign: 'center' }}>
+                    <Select
+                      value={auth.webhookStrategy}
+                      onChange={(e) => {
+                        setWebhookStrategy({
+                          variables: {
+                            strategy: e.target.value,
+                          },
+                        })
+                        setAuth({ ...auth, webhookStrategy: e.target.value })
+                        setRefreshing(true)
+                      }}
+                      style={{ minWidth: 100 }}
+                    >
+                      {['discord', 'telegram'].map((x) => (
+                        auth[`${x}Id`] ? (
+                          <MenuItem key={x} value={x}>
+                            {Utility.getProperName(x)}
+                          </MenuItem>
+                        ) : null
+                      ))}
+                    </Select>
+                  </Grid>
+                </Grid>
               </Grid>
             </TabPanel>
             <TabPanel value={tab} index={1}>
@@ -97,6 +141,7 @@ export default function UserProfile({ setUserProfile }) {
         { name: 'close', color: 'secondary', action: () => setUserProfile(false) },
       ]}
       />
+      {refreshing && <Notification severity="success" i18nKey="webhook_strategy_success" messages={[{ key: 'redirecting', variables: [] }]} />}
     </>
   )
 }

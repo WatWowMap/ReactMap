@@ -11,7 +11,7 @@ import DiscordLogin from './Discord'
 import TelegramLogin from './Telegram'
 import CustomTile from '../custom/CustomTile'
 
-const Login = ({ clickedTwice, location, serverSettings }) => {
+const Login = ({ clickedTwice, location, serverSettings, getServerSettings }) => {
   const { t } = useTranslation()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
@@ -30,6 +30,8 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
           key={i}
           block={block}
           defaultReturn={null}
+          serverSettings={serverSettings}
+          getServerSettings={getServerSettings}
         />
       ))}
     </Grid>
@@ -73,7 +75,11 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
       )}
       {serverSettings?.authMethods?.includes('local') && (
         <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
-          <LocalLogin href={serverSettings.config.map.localAuthUrl} />
+          <LocalLogin
+            href={serverSettings.config.map.localAuthUrl}
+            serverSettings={serverSettings}
+            getServerSettings={getServerSettings}
+          />
         </Grid>
       )}
       {clickedTwice && (

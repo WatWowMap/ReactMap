@@ -1,9 +1,13 @@
 import { gql } from '@apollo/client'
 
-const user = gql`
+export const setTutorial = gql`
 mutation Data($tutorial: Boolean!) {
-    user(tutorial: $tutorial)
+    tutorial(tutorial: $tutorial)
   }
 `
 
-export default user
+export const setWebhookStrategy = gql`
+mutation Data($strategy: String!) {
+    strategy(strategy: $strategy)
+  }
+`

@@ -37,6 +37,11 @@ const authHandler = async (req, username, password, done) => {
           return done(null, user, { message: 'User created' })
         }
         if (bcrypt.compareSync(password, userExists.password)) {
+          ['discordPerms', 'telegramPerms'].forEach((perms) => {
+            if (userExists[perms]) {
+              user.perms = Utility.mergePerms(user.perms, JSON.parse(userExists[perms]))
+            }
+          })
           user.id = userExists.id
           return done(null, user, { message: 'Logged in successfully' })
         }

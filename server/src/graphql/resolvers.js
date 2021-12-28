@@ -277,7 +277,7 @@ module.exports = {
       }
       return {}
     },
-    user: async (parent, args, { req }) => {
+    tutorial: async (parent, args, { req }) => {
       if (req.user) {
         await User.query()
           .update({ tutorial: args.tutorial })
@@ -287,6 +287,15 @@ module.exports = {
       if (req.session) {
         req.session.tutorial = true
         req.session.save()
+      }
+      return false
+    },
+    strategy: async (parent, args, { req }) => {
+      if (req.user) {
+        await User.query()
+          .update({ webhookStrategy: args.strategy })
+          .where('id', req.user.id)
+        return true
       }
       return false
     },

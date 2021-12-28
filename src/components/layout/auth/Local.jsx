@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
+import { Redirect } from 'react-router-dom'
 import {
   Grid, Typography, Button, OutlinedInput, InputLabel, FormControl, InputAdornment, IconButton,
 } from '@material-ui/core'
 import { Visibility, VisibilityOff } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
+
 import Fetch from '@services/Fetch'
 
-export default function LocalLogin({ href }) {
+export default function LocalLogin({ href, serverSettings, getServerSettings }) {
   const { t } = useTranslation()
   const [user, setUser] = useState({
     username: '',
@@ -14,7 +16,7 @@ export default function LocalLogin({ href }) {
     showPassword: false,
   })
   const [error, setError] = useState('')
-
+  const [redirect, setRedirect] = useState(false)
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value })
   }
@@ -22,15 +24,22 @@ export default function LocalLogin({ href }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     await Fetch.login(user, href)
-      .then(resp => {
-        if (resp.ok) {
-          window.location.reload()
-        } else {
+      .then(async resp => {
+        if (!resp.ok) {
           setError(t('local_error'))
+        }
+        if (resp.redirected) {
+          await getServerSettings()
+          if (serverSettings.user.valid) {
+            setRedirect(true)
+          }
         }
       })
   }
 
+  if (redirect) {
+    return <Redirect push to="/" />
+  }
   return (
     <>
       <form onSubmit={handleSubmit}>

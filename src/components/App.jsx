@@ -1,6 +1,6 @@
 import '../assets/scss/main.scss'
 
-import React, { Suspense, useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState, useCallback } from 'react'
 import {
   ApolloClient,
   ApolloProvider,
@@ -68,7 +68,7 @@ const client = new ApolloClient({
 export default function App() {
   const [serverSettings, setServerSettings] = useState(null)
 
-  const getServerSettings = async () => {
+  const getServerSettings = useCallback(async () => {
     const data = await Fetch.getSettings()
     const Icons = data.masterfile ? new UIcons(data.config.icons, data.masterfile.questRewardTypes) : null
     if (Icons) {
@@ -87,7 +87,8 @@ export default function App() {
       }
     }
     setServerSettings({ ...data, Icons })
-  }
+  }, [])
+
   useEffect(() => {
     getServerSettings()
   }, [])
@@ -107,16 +108,22 @@ export default function App() {
               <Route exact path="/500" component={Errors} />
               <Route exact path="/reset" component={ClearStorage} />
               <Route exact path="/">
-                {serverSettings && <Auth serverSettings={serverSettings} />}
+                {serverSettings && <Auth serverSettings={serverSettings} getServerSettings={getServerSettings} />}
               </Route>
               <Route exact path="/login">
-                {serverSettings && <Login clickedTwice serverSettings={serverSettings} />}
+                {serverSettings && (
+                <Login
+                  clickedTwice
+                  serverSettings={serverSettings}
+                  getServerSettings={getServerSettings}
+                />
+                )}
               </Route>
               <Route exact path="/@/:lat/:lon/:zoom?">
-                {serverSettings && <Auth serverSettings={serverSettings} />}
+                {serverSettings && <Auth serverSettings={serverSettings} getServerSettings={getServerSettings} />}
               </Route>
               <Route exact path="/id/:category/:id/:zoom?">
-                {serverSettings && <Auth serverSettings={serverSettings} />}
+                {serverSettings && <Auth serverSettings={serverSettings} getServerSettings={getServerSettings} />}
               </Route>
             </Switch>
           </Router>

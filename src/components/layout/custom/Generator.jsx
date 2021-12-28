@@ -12,7 +12,9 @@ import CustomText from './CustomText'
 import CustomButton from './CustomButton'
 import CustomImg from './CustomImg'
 
-export default function Generator({ block = {}, defaultReturn = null }) {
+export default function Generator({
+  block = {}, defaultReturn = null, serverSettings, getServerSettings,
+}) {
   const isMuiColor = block.color === 'primary' || block.color === 'secondary'
   switch (block.type) {
     case 'img': return <CustomImg block={block} />
@@ -21,7 +23,13 @@ export default function Generator({ block = {}, defaultReturn = null }) {
     case 'divider': return <Divider {...block} />
     case 'telegram': return <Telegram botName={process.env?.[block.telegramBotEnvRef]} authUrl={block.telegramAuthUrl} />
     case 'discord': return <DiscordLogin href={block.link} text={block.text} />
-    case 'localLogin': return <LocalLogin href={block.localAuthUrl} />
+    case 'localLogin': return (
+      <LocalLogin
+        href={block.localAuthUrl}
+        serverSettings={serverSettings}
+        getServerSettings={getServerSettings}
+      />
+    )
     case 'parent': return (
       <Grid
         container

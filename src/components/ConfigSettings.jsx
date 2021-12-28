@@ -61,6 +61,9 @@ export default function ConfigSettings({
 
   setAuth({
     strategy: serverSettings.user.strategy,
+    discordId: serverSettings.user.discordId,
+    telegramId: serverSettings.user.telegramId,
+    webhookStrategy: serverSettings.user.webhookStrategy,
     loggedIn: serverSettings.loggedIn,
     perms: serverSettings.user ? serverSettings.user.perms : {},
     methods: serverSettings.authMethods,

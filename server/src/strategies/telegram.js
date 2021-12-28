@@ -50,10 +50,15 @@ const authHandler = async (req, profile, done) => {
     await User.query()
       .findOne({ telegramId: user.id })
       .then(async (userExists) => {
+        console.log(userExists)
         if (req.user) {
           await User.query()
-            .update({ telegramId: user.id })
+            .update({ telegramId: user.id, telegramPerms: JSON.stringify(user.perms), webhookStrategy: 'telegram' })
             .where('id', req.user.id)
+          await User.query()
+            .where('telegramId', user.id)
+            .whereNot('id', req.user.id)
+            .delete()
           return done(null, {
             ...user,
             ...req.user,

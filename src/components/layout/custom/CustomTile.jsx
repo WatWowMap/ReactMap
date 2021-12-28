@@ -6,7 +6,7 @@ import Utility from '@services/Utility'
 
 import Generator from './Generator'
 
-export default function CustomTile({ block, defaultReturn }) {
+export default function CustomTile({ block, defaultReturn, serverSettings = {}, getServerSettings = () => {} }) {
   return (
     <Grid
       item
@@ -16,6 +16,8 @@ export default function CustomTile({ block, defaultReturn }) {
       <Generator
         block={block}
         defaultReturn={defaultReturn}
+        serverSettings={serverSettings}
+        getServerSettings={getServerSettings}
       />
     </Grid>
   )
