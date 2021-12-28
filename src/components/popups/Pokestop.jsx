@@ -347,21 +347,22 @@ const QuestConditions = ({ pokestop, quest, t, userSettings }) => {
     )
   }
 
-  if (quest_title && i18n.hasResourceBundle(localStorage.getItem('i18nextLng'), quest_title) && !quest_title.includes('geotarget')) {
-    return (
-      <Grid item xs={9} style={{ textAlign: 'center' }}>
-        <Typography variant="caption">
-          <Trans
-            defaults={quest_task || quest_title}
-            i18nKey={quest_title.startsWith('quest_')
-              ? quest_title.replace('quest_', 'quest_title_').toLowerCase()
-              : `quest_title_${quest_title.toLowerCase()}`}
-          >
-            {{ amount_0: quest_target }}
-          </Trans>
-        </Typography>
-      </Grid>
-    )
+  if (quest_title && !quest_title.includes('geotarget')) {
+    const normalized = quest_title.startsWith('quest_')
+      ? quest_title.replace('quest_', 'quest_title_').toLowerCase()
+      : `quest_title_${quest_title.toLowerCase()}`
+
+    if (i18n.exists(normalized)) {
+      return (
+        <Grid item xs={9} style={{ textAlign: 'center' }}>
+          <Typography variant="caption">
+            <Trans i18nKey={normalized}>
+              {{ amount_0: quest_target }}
+            </Trans>
+          </Typography>
+        </Grid>
+      )
+    }
   }
 
   const [type1, type2] = Utility.parseConditions(quest_conditions)
