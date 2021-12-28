@@ -13,6 +13,8 @@ const locales = async () => {
 
   fs.mkdir(finalLocalesFolder, (error) => error ? console.log('Locales folder already exists, skipping') : console.log('locales folder created'))
 
+  const availableRemote = await fetchJson('https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/index.json')
+
   await Promise.all(localTranslations.map(async locale => {
     const reactMapTranslations = fs.readFileSync(path.resolve(appLocalesFolder, locale), { encoding: 'utf8', flag: 'r' })
     const baseName = locale.replace('.json', '')
@@ -21,7 +23,12 @@ const locales = async () => {
     fs.mkdir(`${finalLocalesFolder}/${baseName}`, (error) => error ? console.log(`${locale} already exists, skipping`) : console.log(`${locale} folder created`))
 
     try {
-      const remoteFiles = await fetchJson(`https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/static/locales/${baseName}.json`)
+      const hasRemote = availableRemote.includes(locale)
+      const remoteFiles = await fetchJson(`https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/static/locales/${hasRemote ? baseName : 'en'}.json`)
+
+      if (!hasRemote) {
+        console.warn('No remote translation found for', locale, 'using english')
+      }
 
       Object.keys(remoteFiles).forEach(key => {
         if (!key.startsWith('desc_') && !key.startsWith('pokemon_category_')) {
