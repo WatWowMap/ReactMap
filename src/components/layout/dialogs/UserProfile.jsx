@@ -59,7 +59,7 @@ export default function UserProfile({ setUserProfile }) {
   return (
     <>
       <Header titles={['user_profile']} action={() => setUserProfile(false)} />
-      <DialogContent style={{ padding: 0, minWidth: '40vw', minHeight: '40vh' }}>
+      <DialogContent style={{ padding: 0, minHeight: '40vh' }}>
         {auth.strategy === 'local' ? (
           <>
             <AppBar position="static">
@@ -86,7 +86,6 @@ export default function UserProfile({ setUserProfile }) {
                 alignItems="center"
                 justifyContent="center"
                 style={{ minHeight: '40vh' }}
-                spacing={2}
               >
                 {auth.methods.includes('discord') && (
                   <Grid item style={{ padding: '20px 0' }}>
@@ -99,7 +98,7 @@ export default function UserProfile({ setUserProfile }) {
                   </Grid>
                 )}
                 <Grid container item alignItems="center" justifyContent="center">
-                  <Grid item xs={12} sm={6} md={5} style={{ textAlign: 'center' }}>
+                  <Grid item xs={12} sm={6} md={5} style={{ textAlign: 'center', padding: '20px 0' }}>
                     <Typography>
                       {t('select_webhook_strategy')}
                     </Typography>
