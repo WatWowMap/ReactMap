@@ -97,6 +97,7 @@ export default function PokestopPopup({
                     t={t}
                   />
                   <QuestConditions
+                    pokestop={pokestop}
                     quest={quest}
                     t={t}
                     userSettings={userSettings}
@@ -326,7 +327,7 @@ const RewardInfo = ({
   )
 }
 
-const QuestConditions = ({ quest, t, userSettings }) => {
+const QuestConditions = ({ pokestop, quest, t, userSettings }) => {
   const {
     quest_task,
     quest_type,
@@ -334,23 +335,7 @@ const QuestConditions = ({ quest, t, userSettings }) => {
     quest_conditions,
     quest_title,
   } = quest
-
-  if (quest_title) {
-    return (
-      <Grid item xs={9} style={{ textAlign: 'center' }}>
-        <Typography variant="caption">
-          <Trans
-            defaults={quest_task || quest_title}
-            i18nKey={quest_title.startsWith('quest_')
-              ? quest_title.replace('quest_', 'quest_title_').toLowerCase()
-              : `quest_title_${quest_title.toLowerCase()}`}
-          >
-            {{ amount_0: quest_target }}
-          </Trans>
-        </Typography>
-      </Grid>
-    )
-  }
+  const { i18n } = useTranslation()
 
   if (userSettings.madQuestText && quest_task) {
     return (
@@ -361,6 +346,25 @@ const QuestConditions = ({ quest, t, userSettings }) => {
       </Grid>
     )
   }
+
+  if (quest_title && !quest_title.includes('geotarget')) {
+    const normalized = quest_title.startsWith('quest_')
+      ? quest_title.replace('quest_', 'quest_title_').toLowerCase()
+      : `quest_title_${quest_title.toLowerCase()}`
+
+    if (i18n.exists(normalized)) {
+      return (
+        <Grid item xs={9} style={{ textAlign: 'center' }}>
+          <Typography variant="caption">
+            <Trans i18nKey={normalized}>
+              {{ amount_0: quest_target }}
+            </Trans>
+          </Typography>
+        </Grid>
+      )
+    }
+  }
+
   const [type1, type2] = Utility.parseConditions(quest_conditions)
   const primaryCondition = (
     <Typography variant="caption">
@@ -370,45 +374,51 @@ const QuestConditions = ({ quest, t, userSettings }) => {
     </Typography>
   )
   const getQuestConditions = (qType, qInfo) => {
+    const key = `quest_condition_${qType}_formatted`
     switch (qType) {
       case 1: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ types: qInfo.pokemon_type_ids.map(id => t(`poke_type_${id}`)) }}
         </Trans>
       )
       case 2: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ pokemon: qInfo.pokemon_ids.map(id => t(`poke_${id}`)) }}
         </Trans>
       )
       case 7: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ levels: qInfo.raid_levels.map(id => id) }}
         </Trans>
       )
       case 11: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ item: t(`item_${qInfo.item_id}`) }}
         </Trans>
       )
       case 8:
       case 14: return qInfo.throw_type_id ? (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ throw_type: t(`throw_type_${qInfo.throw_type_id}`) }}
         </Trans>
       ) : t('quest_condition_14')
       case 26: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ alignments: qInfo.alignment_ids.map(id => t(`alignment_${id}`)) }}
         </Trans>
       )
       case 27: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ categories: qInfo.character_category_ids.map(id => t(`character_category_${id}`)) }}
         </Trans>
       )
+      case 42: return (
+        <Trans i18nKey={key}>
+          {{ poi: pokestop.name }}
+        </Trans>
+      )
       case 44: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ time: qInfo.time }}
         </Trans>
       )

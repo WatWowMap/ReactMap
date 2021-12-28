@@ -7,7 +7,6 @@ export default function parseQuestConditions(conditions) {
       info: {},
     }
     switch (specifics.type) {
-      default: break
       case 1: normalized.info.pokemon_type_ids = specifics.with_pokemon_type.pokemon_type; break
       case 2: normalized.info.pokemon_ids = specifics.with_pokemon_category.pokemon_ids; break
       case 7: normalized.info.raid_levels = specifics.with_raid_level.raid_level; break
@@ -17,6 +16,7 @@ export default function parseQuestConditions(conditions) {
       case 26: normalized.info.alignment_ids = specifics.with_pokemon_alignment.alignment; break
       case 27: normalized.info.character_category_ids = specifics.with_invasion_character.category; break
       case 44: normalized.info.time = specifics.with_elapsed_time.elapsed_time / 1000; break
+      default: break
     }
     return normalized
   }
