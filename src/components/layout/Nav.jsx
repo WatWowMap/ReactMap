@@ -48,8 +48,10 @@ export default function Nav({
     type: '',
   })
   const [motd, setMotd] = useState(
-    (messageOfTheDay.index > motdIndex && messageOfTheDay.components.length)
-    || messageOfTheDay.settings.permanent,
+    messageOfTheDay.components.length
+    && (messageOfTheDay.index > motdIndex || messageOfTheDay.settings.permanent)
+    && ((perms.donor ? messageOfTheDay.settings.donorOnly : messageOfTheDay.settings.freeloaderOnly)
+      || (!messageOfTheDay.settings.donorOnly && !messageOfTheDay.settings.freeloaderOnly)),
   )
   const [donorPage, setDonorPage] = useState(false)
 
@@ -179,6 +181,7 @@ export default function Nav({
       >
         <Motd
           motd={messageOfTheDay}
+          perms={perms}
           handleMotdClose={handleMotdClose}
         />
       </Dialog>
