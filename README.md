@@ -20,6 +20,10 @@ Pokemon GO Map frontend built with React. Currently in beta testing!
 - Spawnpoints
 - Discord Auth & Permission Based Viewing
 
+## Live Demo
+- You can find a live demo version of this app [here](https://www.reactmap.dev/).
+- To get the full experience you will need to have a Discord account
+
 ## PreReqs
 
 - NodeJS (V14+)
