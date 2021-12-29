@@ -90,7 +90,9 @@
         "parentAlignItems": "center",
         "parentJustifyContent": "center",
         "parentStyle": {},
-        "permanent": false
+        "permanent": false,
+        "freeloaderOnly": false,
+        "donorOnly": false
       },
       "components": [],
       "footerButtons": []
