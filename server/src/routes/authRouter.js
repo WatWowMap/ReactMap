@@ -37,8 +37,8 @@ fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
             res.redirect('/')
           }
         }
-      })(req, res))
-    console.log(`${method.toUpperCase()} /auth/${trimmed} route initialized`)
+      })(req, res, next))
+    console.log(`${method.toUpperCase()} /auth/${trimmed}/callback route initialized`)
   })
 })
 

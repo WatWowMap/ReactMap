@@ -22,7 +22,7 @@ router.get('/hasValid/:id', async (req, res) => {
   try {
     if (api.reactMapSecret && req.headers['react-map-secret'] === api.reactMapSecret) {
       const results = await Session.query()
-        .whereRaw(`json_extract(data, '$.passport.user.id') = '${req.params.id}'`)
+        .whereRaw(`json_extract(data, '$.passport.user.id') = ${req.params.id}`)
       res.status(200).json({
         valid: Boolean(results.length),
         length: results.length,
@@ -40,7 +40,7 @@ router.get('/clearSessions/:id', async (req, res) => {
   try {
     if (api.reactMapSecret && req.headers['react-map-secret'] === api.reactMapSecret) {
       const results = await Session.query()
-        .whereRaw(`json_extract(data, '$.passport.user.id') = '${req.params.id}'`)
+        .whereRaw(`json_extract(data, '$.passport.user.id') = ${req.params.id}`)
         .delete()
       res.status(200).json(results, 'Sessions Cleared')
     } else {
