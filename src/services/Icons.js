@@ -42,11 +42,12 @@ export default class UIcons {
         },
       })
     }
-    await Promise.all(icons.map(async icon => {
+    for (const icon of icons) {
       try {
         const cachedIndex = JSON.parse(localStorage.getItem(`${icon.name}_icons`))
         const data = cachedIndex && cachedIndex.lastFetched + this.cacheMs > Date.now()
           ? cachedIndex
+          // eslint-disable-next-line no-await-in-loop
           : await Fetch.getIcons(icon.path, icon.name)
         if (data) {
           this[icon.name] = { indexes: Object.keys(data), ...icon }
@@ -95,7 +96,7 @@ export default class UIcons {
         // eslint-disable-next-line no-console
         console.error('Issue loading', icon, '\n', e)
       }
-    }))
+    }
   }
 
   get selection() {
