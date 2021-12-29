@@ -46,10 +46,13 @@ export const nests = gql`
 `
 
 export const quests = gql`
-  ${core}
   query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int!, $midnight: Int) {
-    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, ts: $ts, midnight: $midnight) {
-      ...CoreSearch
+    searchQuest(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, ts: $ts, midnight: $midnight) {
+      id
+      name
+      lat
+      lon
+      distance
       quest_pokemon_id
       quest_form_id
       quest_gender_id
@@ -63,6 +66,7 @@ export const quests = gql`
       item_amount
       candy_pokemon_id
       candy_amount
+      with_ar
     }
   }
 `

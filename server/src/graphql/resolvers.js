@@ -163,8 +163,6 @@ module.exports = {
           return []
         }
         switch (args.category) {
-          case 'quests':
-            return Pokestop.searchQuests(args, perms, isMad, distance)
           case 'pokestops':
             return Pokestop.search(args, perms, isMad, distance)
           case 'raids':
@@ -191,6 +189,19 @@ module.exports = {
         }
       }
       return []
+    },
+    searchQuest: async (parent, args, { req }) => {
+      const perms = req.user ? req.user.perms : req.session.perms
+      const { category } = args
+      if (perms?.[category]) {
+        const isMad = Utility.dbSelection(category.substring(0, category.length - 1)) === 'mad'
+        const distance = raw(`ROUND(( 3959 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
+
+        if (args.search === '') {
+          return []
+        }
+        return Pokestop.searchQuests(args, perms, isMad, distance) || []
+      }
     },
     spawnpoints: (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms

@@ -40,6 +40,22 @@ module.exports = gql`
     lon: Float
     distance: Float
     formatted: Geocoder
+    nest_pokemon_id: Int
+    nest_pokemon_form: Int
+    raid_pokemon_id: Int
+    raid_pokemon_form: Int
+    raid_pokemon_gender: Int
+    raid_pokemon_costume: Int
+    raid_pokemon_evolution: Int
+  }
+
+  type SearchQuest {
+    id: ID
+    name: String
+    lat: Float
+    lon: Float
+    distance: Float
+    formatted: Geocoder
     quest_pokemon_id: Int
     quest_form_id: Int
     quest_gender_id: Int
@@ -53,13 +69,7 @@ module.exports = gql`
     item_amount: Int
     candy_pokemon_id: Int
     candy_amount: Int
-    nest_pokemon_id: Int
-    nest_pokemon_form: Int
-    raid_pokemon_id: Int
-    raid_pokemon_form: Int
-    raid_pokemon_gender: Int
-    raid_pokemon_costume: Int
-    raid_pokemon_evolution: Int
+    with_ar: Boolean
   }
 
   type WayfarerCell {

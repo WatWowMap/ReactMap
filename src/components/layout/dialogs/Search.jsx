@@ -56,7 +56,7 @@ export default function Search({
       switch (quest_reward_type) {
         case 2:
           main = Icons.getRewards(quest_reward_type, quest_item_id, item_amount)
-          amount = main.includes('_a') && item_amount > 1 ? 0 : item_amount; break
+          amount = main.includes('_a') || item_amount <= 1 ? 0 : item_amount; break
         case 3:
           main = Icons.getRewards(quest_reward_type, stardust_amount)
           amount = main.includes('_a') ? 0 : stardust_amount; break
@@ -141,12 +141,12 @@ export default function Search({
         variant="outlined"
       />
       <Grid container>
-        {fetchedData && fetchedData.search.map((option, index) => (
+        {fetchedData?.[safeSearch[searchTab] === 'quests' ? 'searchQuest' : 'search']?.map((option, index) => (
           <Grid
             container
             item
             xs={12}
-            key={`${option.id}-${safeSearch[searchTab]}`}
+            key={`${option.id}-${safeSearch[searchTab]}-${option.with_ar}`}
             onClick={toggleDialog(false, '', 'search', option)}
             justifyContent="space-between"
             alignItems="center"
