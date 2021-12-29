@@ -11,3 +11,9 @@ mutation Data($strategy: String!) {
     strategy(strategy: $strategy)
   }
 `
+
+export const checkUsername = gql`
+mutation Data($username: String!) {
+    checkUsername(username: $username)
+  }
+`

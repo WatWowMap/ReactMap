@@ -299,5 +299,10 @@ module.exports = {
       }
       return false
     },
+    checkUsername: async (parent, args) => {
+      const results = await User.query()
+        .where('username', args.username)
+      return Boolean(results.length)
+    },
   },
 }

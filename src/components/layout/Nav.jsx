@@ -94,7 +94,11 @@ export default function Nav({
   return (
     <>
       {userProfile ? (
-        <Dialog open={userProfile} fullWidth>
+        <Dialog
+          open={userProfile}
+          fullWidth
+          fullScreen={isMobile}
+        >
           <UserProfile setUserProfile={setUserProfile} />
         </Dialog>
       ) : (

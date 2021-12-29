@@ -36,5 +36,6 @@ module.exports = gql`
     webhook(category: String, data: JSON, status: String, name: String): Poracle
     tutorial(tutorial: Boolean): Boolean
     strategy(strategy: String): Boolean
+    checkUsername(username: String): Boolean
   }
 `

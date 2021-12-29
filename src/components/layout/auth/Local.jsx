@@ -5,8 +5,10 @@ import {
 } from '@material-ui/core'
 import { Visibility, VisibilityOff } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
+import { useMutation } from '@apollo/client'
 
 import Fetch from '@services/Fetch'
+import Query from '@services/Query'
 
 export default function LocalLogin({ href, serverSettings, getServerSettings }) {
   const { t } = useTranslation()
@@ -17,7 +19,12 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
   })
   const [error, setError] = useState('')
   const [redirect, setRedirect] = useState(false)
+  const [checkUsername, { data }] = useMutation(Query.user('checkUsername'))
+
   const handleChange = (e) => {
+    if (e.target.name === 'username') {
+      checkUsername({ variables: { username: e.target.value } })
+    }
     setUser({ ...user, [e.target.name]: e.target.value })
   }
 
@@ -40,6 +47,7 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
   if (redirect) {
     return <Redirect push to="/" />
   }
+
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -108,7 +116,15 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
               disabled={!user.username || !user.password}
             >
               <Typography variant="subtitle2" align="center">
-                {t('login')}
+                {(() => {
+                  if (!user.username && !user.password) {
+                    return `${t('login')}/${t('register')}`
+                  }
+                  if (data?.checkUsername) {
+                    return t('login')
+                  }
+                  return t('register')
+                })()}
               </Typography>
             </Button>
           </Grid>
