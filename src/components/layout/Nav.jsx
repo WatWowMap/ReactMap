@@ -75,11 +75,8 @@ export default function Nav({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    if (open) {
-      setDialog({ open, category, type })
-    } else {
-      setDialog({ open, category, type })
-    }
+    setDialog({ open, category, type })
+
     if (filter && type === 'search') {
       setManualParams({ id: filter.id })
       map.flyTo([filter.lat, filter.lon], 16)
@@ -96,8 +93,8 @@ export default function Nav({
       {userProfile ? (
         <Dialog
           open={userProfile}
-          fullWidth
           fullScreen={isMobile}
+          maxWidth="xs"
         >
           <UserProfile setUserProfile={setUserProfile} />
         </Dialog>

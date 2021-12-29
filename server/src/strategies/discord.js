@@ -66,9 +66,14 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
           })
         }
         if (!userExists) {
-          const newUser = await User.query()
+          userExists = await User.query()
             .insertAndFetch({ discordId: user.id, strategy: 'discord' })
-          return done(null, { ...user, ...newUser })
+        }
+        if (userExists.strategy !== 'discord') {
+          await User.query()
+            .update({ strategy: 'discord' })
+            .where('id', userExists.id)
+          userExists.strategy = 'discord'
         }
         return done(null, { ...user, ...userExists })
       })

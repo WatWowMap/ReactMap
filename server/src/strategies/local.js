@@ -46,6 +46,12 @@ const authHandler = async (req, username, password, done) => {
               user.perms = Utility.mergePerms(user.perms, JSON.parse(userExists[perms]))
             }
           })
+          if (userExists.strategy !== 'local') {
+            await User.query()
+              .update({ strategy: 'local' })
+              .where('id', userExists.id)
+            userExists.strategy = 'local'
+          }
           user.id = userExists.id
           return done(null, user)
         }

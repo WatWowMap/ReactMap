@@ -67,9 +67,14 @@ const authHandler = async (req, profile, done) => {
           })
         }
         if (!userExists) {
-          const newUser = await User.query()
+          userExists = await User.query()
             .insertAndFetch({ telegramId: user.id, strategy: user.provider })
-          return done(null, { ...user, ...newUser })
+        }
+        if (userExists.strategy !== 'telegram') {
+          await User.query()
+            .update({ strategy: 'telegram' })
+            .where('id', userExists.id)
+          userExists.strategy = 'telegram'
         }
         return done(null, { ...user, ...userExists })
       })
