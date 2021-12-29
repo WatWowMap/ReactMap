@@ -51,6 +51,10 @@ export default class UIcons {
           : await Fetch.getIcons(icon.path, icon.name)
         if (data) {
           this[icon.name] = { indexes: Object.keys(data), ...icon }
+
+          if (icon.local) {
+            this[icon.name].path = `/images/uicons/${icon.local}`
+          }
           if (!this[icon.name].modifiers) {
             this[icon.name].modifiers = {}
           }

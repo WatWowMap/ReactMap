@@ -23,6 +23,10 @@ server/src/strategies/*
 !server/src/strategies/discord.js
 !server/src/strategies/telegram.js
 
+# Local UICONS Repos
+public/images/uicons/*
+!public/images/uicons/.gitkeep
+
 # Ignore generated locales
 public/locales/*
 
