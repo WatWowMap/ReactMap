@@ -33,7 +33,7 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
     await Fetch.login(user, href)
       .then(async resp => {
         if (!resp.ok) {
-          setError(t('local_error'))
+          setError(t(await resp.json()))
         }
         if (resp.redirected) {
           await getServerSettings()

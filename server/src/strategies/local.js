@@ -27,14 +27,18 @@ const authHandler = async (req, username, password, done) => {
       .findOne({ username })
       .then(async (userExists) => {
         if (!userExists) {
-          const newUser = await User.query()
-            .insertAndFetch({
-              username,
-              password: await bcrypt.hash(password, 10),
-              strategy: 'local',
-            })
-          user.id = newUser.id
-          return done(null, user, { message: 'User created' })
+          try {
+            const newUser = await User.query()
+              .insertAndFetch({
+                username,
+                password: await bcrypt.hash(password, 10),
+                strategy: 'local',
+              })
+            user.id = newUser.id
+            return done(null, user)
+          } catch (e) {
+            return done(null, user, { message: 'error_creating_user' })
+          }
         }
         if (bcrypt.compareSync(password, userExists.password)) {
           ['discordPerms', 'telegramPerms'].forEach((perms) => {
@@ -43,9 +47,9 @@ const authHandler = async (req, username, password, done) => {
             }
           })
           user.id = userExists.id
-          return done(null, user, { message: 'Logged in successfully' })
+          return done(null, user)
         }
-        return done(null, false, { message: 'Invalid credentials' })
+        return done(null, false, { message: 'invalid_credentials' })
       })
   } catch (e) {
     console.error('User has failed Local authentication.', e.message)

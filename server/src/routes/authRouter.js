@@ -18,22 +18,26 @@ fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
       failureMessage: true,
     }))
     router[method](`/${trimmed}/callback`,
-      passport.authenticate(trimmed, {
-        failureMessage: true,
-      }),
-      async (req, res) => {
-        try {
-          const { id } = req.session.passport.user
-          if (!(await isValidSession(id))) {
-            console.debug('[Session] Detected multiple sessions, clearing old ones...')
-            await clearOtherSessions(id, req.sessionID)
+      async (req, res, next) => passport.authenticate(trimmed, async (err, user, info) => {
+        if (err) { return next(err) }
+        if (!user) {
+          res.status(401).json(info.message)
+        } else {
+          try {
+            return req.login(user, async () => {
+              const { id } = user
+              if (!(await isValidSession(id))) {
+                console.debug('[Session] Detected multiple sessions, clearing old ones...')
+                await clearOtherSessions(id, req.sessionID)
+              }
+              return res.redirect('/')
+            })
+          } catch (error) {
+            console.error(error)
+            res.redirect('/')
           }
-          res.redirect('/')
-        } catch (err) {
-          console.error(err)
-          res.redirect('/')
         }
-      })
+      })(req, res))
     console.log(`${method.toUpperCase()} /auth/${trimmed} route initialized`)
   })
 })
