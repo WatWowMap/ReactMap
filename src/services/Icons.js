@@ -52,8 +52,8 @@ export default class UIcons {
         if (data) {
           this[icon.name] = { indexes: Object.keys(data), ...icon }
 
-          if (icon.local) {
-            this[icon.name].path = `/images/uicons/${icon.local}`
+          if (!icon.path.startsWith('http')) {
+            this[icon.name].path = `/images/uicons/${icon.path}`
           }
           if (!this[icon.name].modifiers) {
             this[icon.name].modifiers = {}

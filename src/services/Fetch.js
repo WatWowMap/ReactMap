@@ -18,9 +18,9 @@ export default class Fetch {
 
   static async getIcons(icon) {
     try {
-      const response = icon.local
-        ? await fetch(`/images/uicons/${icon.local}/index.json`)
-        : await fetch(`${icon.path}/index.json`)
+      const response = icon.path.startsWith('http')
+        ? await fetch(`${icon.path}/index.json`)
+        : await fetch(`/images/uicons/${icon.path}/index.json`)
       if (!response.ok) {
         throw new Error(`${response.status} (${response.statusText})`)
       }
