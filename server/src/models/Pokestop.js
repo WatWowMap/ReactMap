@@ -642,7 +642,7 @@ class Pokestop extends Model {
     if (altQuestCheck) {
       const altQuestQuery = this.query()
         .select(['*', distance])
-        .where('delete', false)
+        .where('deleted', false)
         .andWhere('quest_timestamp', '>=', midnight || 0)
         .andWhere(quests => {
           quests.whereIn('alternative_quest_pokemon_id', pokemonIds)
