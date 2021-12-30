@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* global BigInt */
-const { clearOtherSessions } = require('../sessionStore')
+const { clearDiscordSessions } = require('../sessionStore')
+const { User } = require('../../models/index')
 
 module.exports = async (client, oldPresence, newPresence) => {
   const rolesBefore = oldPresence.roles.cache
@@ -20,7 +21,8 @@ module.exports = async (client, oldPresence, newPresence) => {
       .filter(x => !rolesBefore.includes(x)))
   try {
     if (perms.includes(roleDiff[0])) {
-      await clearOtherSessions(oldPresence.user.id, '')
+      await clearDiscordSessions(oldPresence.user.id, client.user.username)
+      await User.clearPerms(oldPresence.user.id, 'discord', client.user.username)
     }
   } catch (e) {
     console.error(`Could not clear sessions for ${oldPresence.user.username}#${oldPresence.user.discriminator}`)

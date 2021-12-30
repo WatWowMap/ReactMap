@@ -22,6 +22,15 @@ public/favicon/*
 server/src/strategies/*
 !server/src/strategies/discord.js
 !server/src/strategies/telegram.js
+!server/src/strategies/local.js
+
+# API Endpoints
+server/src/routes/api/v1/*
+!server/src/routes/api/v1/users.js
+!server/src/routes/api/v1/sessions.js
+
+# custom model
+server/src/models/Custom.js
 
 # Local UICONS Repos
 public/images/uicons/*
