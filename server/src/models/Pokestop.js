@@ -633,6 +633,7 @@ class Pokestop extends Model {
         .select([
           'quest_stardust AS stardust_amount',
           'quest_pokemon_form_id AS quest_form_id',
+          'quest_pokemon_costume_id AS quest_costume_id',
         ])
     }
     if (perms.areaRestrictions?.length) {
