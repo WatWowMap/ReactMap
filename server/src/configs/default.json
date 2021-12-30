@@ -96,6 +96,7 @@
         "freeloaderOnly": false,
         "donorOnly": false
       },
+      "titles": [],
       "components": [],
       "footerButtons": []
     },
