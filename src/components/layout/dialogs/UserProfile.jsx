@@ -45,7 +45,7 @@ export default function UserProfile({ setUserProfile }) {
   return (
     <>
       <Header titles={['user_profile']} action={() => setUserProfile(false)} />
-      <DialogContent style={{ padding: 0, minHeight: '60vh' }}>
+      <DialogContent style={{ padding: 0 }}>
         {auth.strategy === 'local' ? (
           <LinkProfiles auth={auth} PermPage={PermPage} t={t} />
         ) : PermPage}
@@ -103,14 +103,18 @@ const LinkProfiles = ({ auth, t, PermPage }) => {
           justifyContent="center"
           style={{ minHeight: '40vh' }}
         >
-          {auth.methods.includes('discord') && (
+          {auth.methods.some(method => method.includes('discord')) && (
             <Grid item style={{ padding: '20px 0' }}>
-              <DiscordLogin href={discordAuthUrl} text="link_discord" size="medium" />
+              {auth.discordId
+                ? <Typography color="secondary">{t('discord_linked')}</Typography>
+                : <DiscordLogin href={discordAuthUrl} text="link_discord" size="medium" />}
             </Grid>
           )}
-          {auth.methods.includes('telegram') && (
+          {auth.methods.some(method => method.includes('telegram')) && (
             <Grid item style={{ padding: '20px 0' }}>
-              <Telegram authUrl={telegramAuthUrl} botName={telegramBotEnvRef} />
+              {auth.telegramId
+                ? <Typography color="secondary">{t('telegram_linked')}</Typography>
+                : <Telegram authUrl={telegramAuthUrl} botName={telegramBotEnvRef} />}
             </Grid>
           )}
           <Grid container item alignItems="center" justifyContent="center">

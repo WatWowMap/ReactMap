@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import {
-  FormControl, Grid, InputLabel, MenuItem, Select, Button, Dialog,
+  FormControl, Grid, InputLabel, MenuItem, Select, Button,
 } from '@material-ui/core'
 import { Link, Redirect } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -8,15 +8,14 @@ import { useTranslation } from 'react-i18next'
 import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
-import UserProfile from '../dialogs/UserProfile'
-import Feedback from '../dialogs/Feedback'
-
 export default function Settings({ Icons }) {
   const { t, i18n } = useTranslation()
   const config = useStatic(state => state.config)
   const staticSettings = useStatic(state => state.settings)
   const { loggedIn, methods } = useStatic(state => state.auth)
   const setStaticIcons = useStatic(state => state.setIcons)
+  const setUserProfile = useStatic(state => state.setUserProfile)
+  const setFeedback = useStatic(state => state.setFeedback)
 
   const setTutorial = useStore(state => state.setTutorial)
   const settings = useStore(state => state.settings)
@@ -25,8 +24,6 @@ export default function Settings({ Icons }) {
   const setIcons = useStore(state => state.setIcons)
 
   const [redirect, setRedirect] = useState(false)
-  const [userProfile, setUserProfile] = useState(false)
-  const [feedback, setFeedback] = useState(false)
 
   const handleChange = event => {
     setSettings({
@@ -259,15 +256,6 @@ export default function Settings({ Icons }) {
             </Grid>
           )}
       </Grid>
-      <Dialog open={userProfile}>
-        <UserProfile setUserProfile={setUserProfile} />
-      </Dialog>
-      <Dialog
-        open={feedback}
-        maxWidth="xs"
-      >
-        <Feedback link={config.map.feedbackLink} setFeedback={setFeedback} />
-      </Dialog>
     </Grid>
   )
 }
