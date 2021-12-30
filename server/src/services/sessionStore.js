@@ -50,8 +50,17 @@ const clearOtherSessions = async (userId, currentSessionId, botName) => {
   console.log(`[Session${botName && ` - ${botName}`}] Clear Result:`, results)
 }
 
+const clearDiscordSessions = async (discordId, botName) => {
+  const results = await Session.query()
+    .whereRaw(`json_extract(data, '$.passport.user.discordId') = '${discordId}'`)
+    .orWhereRaw(`json_extract(data, '$.passport.user.id') = '${discordId}'`)
+    .delete()
+  console.log(`[Session${botName && ` - ${botName}`}] Clear Result:`, results)
+}
+
 module.exports = {
   sessionStore,
   isValidSession,
   clearOtherSessions,
+  clearDiscordSessions,
 }
