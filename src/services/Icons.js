@@ -48,9 +48,13 @@ export default class UIcons {
         const data = cachedIndex && cachedIndex.lastFetched + this.cacheMs > Date.now()
           ? cachedIndex
           // eslint-disable-next-line no-await-in-loop
-          : await Fetch.getIcons(icon.path, icon.name)
+          : await Fetch.getIcons(icon)
         if (data) {
           this[icon.name] = { indexes: Object.keys(data), ...icon }
+
+          if (!icon.path.startsWith('http')) {
+            this[icon.name].path = `/images/uicons/${icon.path}`
+          }
           if (!this[icon.name].modifiers) {
             this[icon.name].modifiers = {}
           }
