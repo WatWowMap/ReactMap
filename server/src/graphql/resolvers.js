@@ -288,7 +288,7 @@ module.exports = {
       }
       return {}
     },
-    user: async (parent, args, { req }) => {
+    tutorial: async (parent, args, { req }) => {
       if (req.user) {
         await User.query()
           .update({ tutorial: args.tutorial })
@@ -300,6 +300,20 @@ module.exports = {
         req.session.save()
       }
       return false
+    },
+    strategy: async (parent, args, { req }) => {
+      if (req.user) {
+        await User.query()
+          .update({ webhookStrategy: args.strategy })
+          .where('id', req.user.id)
+        return true
+      }
+      return false
+    },
+    checkUsername: async (parent, args) => {
+      const results = await User.query()
+        .where('username', args.username)
+      return Boolean(results.length)
     },
   },
 }

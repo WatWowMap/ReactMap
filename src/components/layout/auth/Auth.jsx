@@ -5,7 +5,7 @@ import ConfigSettings from '../../ConfigSettings'
 import Login from './Login'
 import WebhookQuery from '../../WebhookQuery'
 
-const Auth = ({ serverSettings, match }) => {
+const Auth = ({ serverSettings, getServerSettings, match }) => {
   if (serverSettings.error) {
     return (
       <Redirect push to={{ pathname: `${serverSettings.status}` }} />
@@ -17,7 +17,7 @@ const Auth = ({ serverSettings, match }) => {
     if (match.params.category || match.params.lat) {
       localStorage.setItem('params', JSON.stringify(match.params))
     }
-    return <Login serverSettings={serverSettings} />
+    return <Login serverSettings={serverSettings} getServerSettings={getServerSettings} />
   }
   const cachedParams = JSON.parse(localStorage.getItem('params'))
   if (cachedParams) {

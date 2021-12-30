@@ -11,26 +11,34 @@ fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
   if (e) return console.error(e)
   files.forEach((file) => {
     const trimmed = file.replace('.js', '')
+    const method = trimmed.includes('local') ? 'post' : 'get'
 
-    router.get(`/${trimmed}`, passport.authenticate(trimmed))
-    router.get(`/${trimmed}/callback`,
-      passport.authenticate(trimmed, {
-        failureRedirect: '/',
-      }),
-      async (req, res) => {
-        try {
-          const { id } = req.session.passport.user
-          if (!(await isValidSession(id))) {
-            console.debug('[Session] Detected multiple sessions, clearing old ones...')
-            await clearOtherSessions(id, req.sessionID)
+    router[method](`/${trimmed}`, passport.authenticate(trimmed, {
+      successRedirect: '/',
+      failureMessage: true,
+    }))
+    router[method](`/${trimmed}/callback`,
+      async (req, res, next) => passport.authenticate(trimmed, async (err, user, info) => {
+        if (err) { return next(err) }
+        if (!user) {
+          res.status(401).json(info.message)
+        } else {
+          try {
+            return req.login(user, async () => {
+              const { id } = user
+              if (!(await isValidSession(id))) {
+                console.debug('[Session] Detected multiple sessions, clearing old ones...')
+                await clearOtherSessions(id, req.sessionID)
+              }
+              return res.redirect('/')
+            })
+          } catch (error) {
+            console.error(error)
+            res.redirect('/')
           }
-          res.redirect('/')
-        } catch (err) {
-          console.error(err)
-          res.redirect('/')
         }
-      })
-    console.log(`${trimmed} route initialized`)
+      })(req, res, next))
+    console.log(`${method.toUpperCase()} /auth/${trimmed}/callback route initialized`)
   })
 })
 

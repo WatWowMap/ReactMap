@@ -88,6 +88,10 @@ const useStatic = create(set => ({
   setWebhookData: (webhookData) => set({ webhookData }),
   isNight: false,
   setIsNight: (isNight) => set({ isNight }),
+  userProfile: false,
+  setUserProfile: (userProfile) => set({ userProfile }),
+  feedback: false,
+  setFeedback: (feedback) => set({ feedback }),
 }))
 
 export { useStore, useStatic }

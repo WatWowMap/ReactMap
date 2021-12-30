@@ -2,14 +2,10 @@
 import React from 'react'
 import { Typography } from '@material-ui/core'
 
-import { useStatic } from '@hooks/useStore'
-
 import DialogWrapper from '../custom/DialogWrapper'
 import CustomTile from '../custom/CustomTile'
 
-export default function Motd({ motd, handleMotdClose }) {
-  const { perms } = useStatic(s => s.auth)
-
+export default function Motd({ motd, perms, handleMotdClose }) {
   return (
     <DialogWrapper
       configObj={motd}

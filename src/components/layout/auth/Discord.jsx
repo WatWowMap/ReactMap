@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, Icon, Typography } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
-export default function DiscordLogin({ href, text }) {
+export default function DiscordLogin({ href, text, size }) {
   const { t } = useTranslation()
 
   return (
@@ -14,8 +14,8 @@ export default function DiscordLogin({ href, text }) {
         textAlign: 'center',
         minWidth: 140,
       }}
-      size="large"
-      href={href || '/auth/discord'}
+      size={size || 'large'}
+      href={href || '/auth/discord/callback'}
     >
       <Icon className="fab fa-discord" style={{ fontSize: 30 }} />&nbsp;
       <Typography variant="h6" align="center">

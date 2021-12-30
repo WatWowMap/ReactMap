@@ -17,21 +17,28 @@ import UserProfile from './dialogs/UserProfile'
 import Search from './dialogs/Search'
 import Motd from './dialogs/Motd'
 import DonorPage from './dialogs/DonorPage'
+import Feedback from './dialogs/Feedback'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
 export default function Nav({
-  map, setManualParams, Icons,
+  map, setManualParams, Icons, config,
   setWebhookMode, webhookMode, settings, webhooks,
 }) {
   const classes = useStyles()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
+
   const { perms } = useStatic(state => state.auth)
   const webhookAlert = useStatic(state => state.webhookAlert)
   const setWebhookAlert = useStatic(state => state.setWebhookAlert)
   const { map: { messageOfTheDay, donationPage } } = useStatic(state => state.config)
+  const userProfile = useStatic(state => state.userProfile)
+  const setUserProfile = useStatic(state => state.setUserProfile)
+  const feedback = useStatic(state => state.feedback)
+  const setFeedback = useStatic(state => state.setFeedback)
+
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
   const userSettings = useStore(state => state.userSettings)
@@ -48,12 +55,13 @@ export default function Nav({
     type: '',
   })
   const [motd, setMotd] = useState(
-    (messageOfTheDay.index > motdIndex && messageOfTheDay.components.length)
-    || messageOfTheDay.settings.permanent,
+    messageOfTheDay.components.length
+    && (messageOfTheDay.index > motdIndex || messageOfTheDay.settings.permanent)
+    && ((perms.donor ? messageOfTheDay.settings.donorOnly : messageOfTheDay.settings.freeloaderOnly)
+      || (!messageOfTheDay.settings.donorOnly && !messageOfTheDay.settings.freeloaderOnly)),
   )
   const [donorPage, setDonorPage] = useState(false)
 
-  const [userProfile, setUserProfile] = useState(false)
   const safeSearch = searchable.filter(category => perms[category])
 
   const toggleDrawer = (open) => (event) => {
@@ -75,11 +83,8 @@ export default function Nav({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    if (open) {
-      setDialog({ open, category, type })
-    } else {
-      setDialog({ open, category, type })
-    }
+    setDialog({ open, category, type })
+
     if (filter && type === 'search') {
       setManualParams({ id: filter.id })
       map.flyTo([filter.lat, filter.lon], 16)
@@ -91,25 +96,9 @@ export default function Nav({
       setUserSettings({ ...userSettings, [category]: filter })
     }
   }
+
   return (
     <>
-      {userProfile ? (
-        <Dialog open={userProfile} fullWidth>
-          <UserProfile setUserProfile={setUserProfile} />
-        </Dialog>
-      ) : (
-        <Dialog
-          open={tutorial}
-          fullScreen={isMobile}
-          maxWidth="xs"
-        >
-          <Tutorial
-            setUserProfile={setUserProfile}
-            setTutorial={setTutorial}
-            toggleDialog={toggleDialog}
-          />
-        </Dialog>
-      )}
       {drawer ? (
         <Sidebar
           drawer={drawer}
@@ -133,6 +122,27 @@ export default function Nav({
           donationPage={donationPage}
           setDonorPage={setDonorPage}
         />
+      )}
+      {userProfile ? (
+        <Dialog
+          open={userProfile}
+          fullScreen={isMobile}
+          fullWidth={!isMobile}
+        >
+          <UserProfile setUserProfile={setUserProfile} />
+        </Dialog>
+      ) : (
+        <Dialog
+          open={tutorial}
+          fullScreen={isMobile}
+          maxWidth="xs"
+        >
+          <Tutorial
+            setUserProfile={setUserProfile}
+            setTutorial={setTutorial}
+            toggleDialog={toggleDialog}
+          />
+        </Dialog>
       )}
       <Dialog
         fullWidth={!isMobile}
@@ -179,6 +189,7 @@ export default function Nav({
       >
         <Motd
           motd={messageOfTheDay}
+          perms={perms}
           handleMotdClose={handleMotdClose}
         />
       </Dialog>
@@ -189,6 +200,12 @@ export default function Nav({
           donorPage={donationPage}
           handleDonorClose={() => setDonorPage(false)}
         />
+      </Dialog>
+      <Dialog
+        open={feedback}
+        maxWidth={isMobile ? 'sm' : 'xs'}
+      >
+        <Feedback link={config.feedbackLink} setFeedback={setFeedback} />
       </Dialog>
       <Snackbar
         open={Boolean(webhookAlert.open)}

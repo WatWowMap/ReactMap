@@ -148,7 +148,7 @@ export default function Manage({
           ))}
         </Tabs>
       </AppBar>
-      <DialogContent style={{ padding: '0', height: isMobile ? '100%' : '70vh' }}>
+      <DialogContent style={{ padding: 0, height: isMobile ? '100%' : '70vh' }}>
         {webhookData[selectedWebhook].human && !poracleFilters.error ? filteredData.map((key, i) => (
           <TabPanel value={tabValue} index={i} key={key} virtual>
             {key === 'human' ? (

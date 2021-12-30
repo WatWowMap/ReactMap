@@ -1,16 +1,13 @@
 import React from 'react'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
-import { ThemeProvider } from '@material-ui/styles'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
 
-import setTheme from '@assets/mui/theme'
 import useGenerate from '@hooks/useGenerate'
 
 import Map from './Map'
-import HolidayEffects from './HolidayEffects'
 
 export default function ConfigSettings({
   serverSettings, match, paramLocation, paramZoom,
@@ -18,7 +15,6 @@ export default function ConfigSettings({
   Utility.analytics('User', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
 
   document.title = serverSettings.config.map.headerTitle
-  const theme = setTheme(serverSettings.config.map.theme)
   document.body.classList.add('dark')
 
   const setUserSettings = useStore(state => state.setUserSettings)
@@ -65,6 +61,9 @@ export default function ConfigSettings({
 
   setAuth({
     strategy: serverSettings.user.strategy,
+    discordId: serverSettings.user.discordId,
+    telegramId: serverSettings.user.telegramId,
+    webhookStrategy: serverSettings.user.webhookStrategy,
     loggedIn: serverSettings.loggedIn,
     perms: serverSettings.user ? serverSettings.user.perms : {},
     methods: serverSettings.authMethods,
@@ -135,23 +134,19 @@ export default function ConfigSettings({
   setIsNight(Utility.nightCheck(...getStartLocation()))
 
   return (
-    <ThemeProvider theme={theme}>
-      <canvas id="holiday-canvas" />
-      <MapContainer
-        tap={false}
-        center={getStartLocation()}
-        zoom={getStartZoom()}
-        zoomControl={false}
-        preferCanvas
-      >
-        {(serverSettings.user && serverSettings.user.perms.map) && (
-          <Map
-            serverSettings={serverSettings}
-            params={match.params}
-          />
-        )}
-        <HolidayEffects mapSettings={serverSettings.config.map} />
-      </MapContainer>
-    </ThemeProvider>
+    <MapContainer
+      tap={false}
+      center={getStartLocation()}
+      zoom={getStartZoom()}
+      zoomControl={false}
+      preferCanvas
+    >
+      {(serverSettings.user && serverSettings.user.perms.map) && (
+        <Map
+          serverSettings={serverSettings}
+          params={match.params}
+        />
+      )}
+    </MapContainer>
   )
 }

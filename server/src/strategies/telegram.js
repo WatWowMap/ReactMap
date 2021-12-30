@@ -3,6 +3,8 @@ const { TelegramStrategy } = require('passport-telegram-official')
 const passport = require('passport')
 const path = require('path')
 
+// if writing a custom strategy, rename 'telegram' below to your strategy name
+// this will automatically grab all of its unique values in the config
 const { telegram: strategyConfig, alwaysEnabledPerms } = require('../services/config')
 const { User } = require('../models/index')
 const Fetch = require('../services/Fetch')
@@ -48,10 +50,31 @@ const authHandler = async (req, profile, done) => {
     await User.query()
       .findOne({ telegramId: user.id })
       .then(async (userExists) => {
+        console.log(userExists)
+        if (req.user) {
+          await User.query()
+            .update({ telegramId: user.id, telegramPerms: JSON.stringify(user.perms), webhookStrategy: 'telegram' })
+            .where('id', req.user.id)
+          await User.query()
+            .where('telegramId', user.id)
+            .whereNot('id', req.user.id)
+            .delete()
+          return done(null, {
+            ...user,
+            ...req.user,
+            telegramId: user.id,
+            perms: Utility.mergePerms(req.user.perms, user.perms),
+          })
+        }
         if (!userExists) {
-          const newUser = await User.query()
+          userExists = await User.query()
             .insertAndFetch({ telegramId: user.id, strategy: user.provider })
-          return done(null, { ...user, ...newUser })
+        }
+        if (userExists.strategy !== 'telegram') {
+          await User.query()
+            .update({ strategy: 'telegram' })
+            .where('id', userExists.id)
+          userExists.strategy = 'telegram'
         }
         return done(null, { ...user, ...userExists })
       })
