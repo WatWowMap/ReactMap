@@ -42,14 +42,19 @@ export default class UIcons {
         },
       })
     }
-    await Promise.all(icons.map(async icon => {
+    for (const icon of icons) {
       try {
         const cachedIndex = JSON.parse(localStorage.getItem(`${icon.name}_icons`))
         const data = cachedIndex && cachedIndex.lastFetched + this.cacheMs > Date.now()
           ? cachedIndex
-          : await Fetch.getIcons(icon.path, icon.name)
+          // eslint-disable-next-line no-await-in-loop
+          : await Fetch.getIcons(icon)
         if (data) {
           this[icon.name] = { indexes: Object.keys(data), ...icon }
+
+          if (!icon.path.startsWith('http')) {
+            this[icon.name].path = `/images/uicons/${icon.path}`
+          }
           if (!this[icon.name].modifiers) {
             this[icon.name].modifiers = {}
           }
@@ -95,7 +100,7 @@ export default class UIcons {
         // eslint-disable-next-line no-console
         console.error('Issue loading', icon, '\n', e)
       }
-    }))
+    }
   }
 
   get selection() {

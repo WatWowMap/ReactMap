@@ -32,6 +32,10 @@ server/src/routes/api/v1/*
 # custom model
 server/src/models/Custom.js
 
+# Local UICONS Repos
+public/images/uicons/*
+!public/images/uicons/.gitkeep
+
 # Ignore generated locales
 public/locales/*
 
