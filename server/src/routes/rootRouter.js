@@ -5,6 +5,7 @@ const { default: center } = require('@turf/center')
 
 const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
+const apiRouter = require('./api/apiIndex')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
@@ -19,6 +20,8 @@ const rootRouter = new express.Router()
 rootRouter.use('/', clientRouter)
 
 rootRouter.use('/auth', authRouter)
+
+rootRouter.use('/api', apiRouter)
 
 rootRouter.get('/logout', (req, res) => {
   req.logout()
@@ -73,7 +76,7 @@ rootRouter.get('/settings', async (req, res) => {
           const user = await User.query().findById(req.user.id)
           if (user) {
             delete user.password
-            return { valid: true, ...req.user, ...user }
+            return { ...req.user, ...user, valid: true }
           }
           console.log('[Session Init] Legacy user detected, forcing logout, User ID:', req?.user?.id)
           req.logout()
@@ -84,7 +87,7 @@ rootRouter.get('/settings', async (req, res) => {
           return { valid: false }
         }
       } else if (req.session.perms) {
-        return { valid: true, ...req.session }
+        return { ...req.session, valid: true }
       }
       return { valid: false }
     }
@@ -118,15 +121,6 @@ rootRouter.get('/settings', async (req, res) => {
     // add user options here from the config that are structured as objects
     if (serverSettings.user.valid) {
       serverSettings.loggedIn = req.user
-      // add config options to this array that are structured as arrays
-      const arrayUserOptions = [
-        { name: 'localeSelection', values: config.localeSelection },
-      ]
-
-      arrayUserOptions.forEach(userMenu => {
-        serverSettings.config[userMenu.name] = {}
-        userMenu.values.forEach(value => serverSettings.config[userMenu.name][value] = {})
-      })
 
       // keys that are being sent to the frontend but are not options
       const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons']
@@ -239,9 +233,17 @@ rootRouter.get('/settings', async (req, res) => {
         try {
           await Promise.all(filtered.map(async webhook => {
             if (config.webhookObj[webhook.name].client.valid) {
-              const { strategy, discordId, telegramId } = serverSettings.user
-              const remoteData = await Fetch.webhookApi('allProfiles', strategy === 'discord' ? discordId : telegramId, 'GET', webhook.name)
-              const { areas } = await Fetch.webhookApi('humans', strategy === 'discord' ? discordId : telegramId, 'GET', webhook.name)
+              const { strategy, webhookStrategy, discordId, telegramId } = serverSettings.user
+              const webhookId = (() => {
+                switch (strategy) {
+                  case 'discord': return discordId
+                  case 'telegram': return telegramId
+                  default: return webhookStrategy === 'discord' ? discordId : telegramId
+                }
+              })()
+
+              const remoteData = await Fetch.webhookApi('allProfiles', webhookId, 'GET', webhook.name)
+              const { areas } = await Fetch.webhookApi('humans', webhookId, 'GET', webhook.name)
 
               if (remoteData && areas) {
                 serverSettings.webhooks[webhook.name] = remoteData.human.admin_disable

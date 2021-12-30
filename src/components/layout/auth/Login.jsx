@@ -2,14 +2,19 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Grid, Typography } from '@material-ui/core'
-import TelegramLoginButton from 'react-telegram-login'
+import { Grid, Typography, useMediaQuery } from '@material-ui/core'
+import { useTheme } from '@material-ui/styles'
 
+import LocalLogin from './Local'
+import LocaleSelection from '../general/LocaleSelection'
 import DiscordLogin from './Discord'
+import TelegramLogin from './Telegram'
 import CustomTile from '../custom/CustomTile'
 
-const Login = ({ clickedTwice, location, serverSettings }) => {
+const Login = ({ clickedTwice, location, serverSettings, getServerSettings }) => {
   const { t } = useTranslation()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
 
   const { settings, components } = serverSettings.config.map.loginPage
   return components.length ? (
@@ -25,6 +30,8 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
           key={i}
           block={block}
           defaultReturn={null}
+          serverSettings={serverSettings}
+          getServerSettings={getServerSettings}
         />
       ))}
     </Grid>
@@ -60,11 +67,18 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
       )}
       {serverSettings?.authMethods?.includes('telegram') && (
         <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
-          <TelegramLoginButton
-            botName={process.env?.[serverSettings.config.map.telegramBotEnvRef]}
-            dataAuthUrl={serverSettings.config.map.telegramAuthUrl}
-            usePic={false}
-            lang={localStorage.getItem('i18nextLng')}
+          <TelegramLogin
+            botName={serverSettings.config.map.telegramBotEnvRef}
+            authUrl={serverSettings.config.map.telegramAuthUrl}
+          />
+        </Grid>
+      )}
+      {serverSettings?.authMethods?.includes('local') && (
+        <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
+          <LocalLogin
+            href={serverSettings.config.map.localAuthUrl}
+            serverSettings={serverSettings}
+            getServerSettings={getServerSettings}
           />
         </Grid>
       )}
@@ -75,6 +89,9 @@ const Login = ({ clickedTwice, location, serverSettings }) => {
           </Typography>
         </Grid>
       )}
+      <Grid item style={{ marginTop: 20, marginBottom: 20, bottom: 0, position: 'absolute', width: isMobile ? '50%' : '20%' }}>
+        <LocaleSelection localeSelection={serverSettings.config.localeSelection} />
+      </Grid>
     </Grid>
   )
 }

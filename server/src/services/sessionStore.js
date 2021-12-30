@@ -2,7 +2,6 @@
 
 const session = require('express-session')
 const MySQLStore = require('express-mysql-session')(session)
-const { raw } = require('objection')
 const config = require('./config')
 
 const { database: { schemas } } = config
@@ -38,21 +37,30 @@ const isValidSession = async (userId) => {
   const ts = Math.floor((new Date()).getTime() / 1000)
   const results = await Session.query()
     .select('session_id')
-    .where(raw(`json_extract(data, '$.passport.user.id') = '${userId}'`))
+    .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
     .andWhere('expires', '>=', ts)
   return results.length < config.api.maxSessions
 }
 
-const clearOtherSessions = async (userId, currentSessionId) => {
+const clearOtherSessions = async (userId, currentSessionId, botName) => {
   const results = await Session.query()
-    .where(raw(`json_extract(data, '$.passport.user.id') = '${userId}'`))
-    .andWhere('session_id', '!=', currentSessionId)
+    .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
+    .andWhere('session_id', '!=', currentSessionId || '')
     .delete()
-  console.log('[Session] Clear Result:', results)
+  console.log(`[Session${botName && ` - ${botName}`}] Clear Result:`, results)
+}
+
+const clearDiscordSessions = async (discordId, botName) => {
+  const results = await Session.query()
+    .whereRaw(`json_extract(data, '$.passport.user.discordId') = '${discordId}'`)
+    .orWhereRaw(`json_extract(data, '$.passport.user.id') = '${discordId}'`)
+    .delete()
+  console.log(`[Session${botName && ` - ${botName}`}] Clear Result:`, results)
 }
 
 module.exports = {
   sessionStore,
   isValidSession,
   clearOtherSessions,
+  clearDiscordSessions,
 }

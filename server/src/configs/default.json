@@ -16,6 +16,7 @@
   },
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
+    "reactMapSecret": "",
     "maxSessions": 5,
     "rateLimit": {
       "time": 60,
@@ -63,9 +64,10 @@
     "questMessage": "",
     "navigationControls": "react",
     "discordInvite": "",
-    "discordAuthUrl": "/auth/discord",
-    "telegramAuthUrl": "/auth/telegram",
+    "discordAuthUrl": "/auth/discord/callback",
+    "telegramAuthUrl": "/auth/telegram/callback",
     "telegramBotEnvRef": "TELEGRAM_BOT_NAME",
+    "localAuthUrl": "/auth/local/callback",
     "theme": {
       "style": "dark",
       "primary": "#ff5722",
@@ -486,6 +488,11 @@
         "roles": []
       }
     }
+  },
+  "local": {
+    "enabled": false,
+    "perms": [],
+    "areaRestrictions": []
   },
   "tileServers": {
     "Default": {

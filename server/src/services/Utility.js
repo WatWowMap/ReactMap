@@ -11,6 +11,7 @@ const webhook = require('./ui/webhook')
 const geocoder = require('./geocoder')
 const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')
+const mergePerms = require('./functions/mergePerms')
 
 module.exports = class Utility {
   static getPolyVector(s2cellId, type) {
@@ -63,5 +64,9 @@ module.exports = class Utility {
 
   static webhookPerms(roles, provider) {
     return webhookPerms(roles, provider)
+  }
+
+  static mergePerms(existingPerms, incomingPerms = {}) {
+    return mergePerms(existingPerms, incomingPerms)
   }
 }
