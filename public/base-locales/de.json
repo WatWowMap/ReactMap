@@ -438,5 +438,34 @@
     "{{name}} konnte das nicht verarbeiten.",
     "Bitte versuche es später nochmals."
   ],
-  "profile_error": "Muss eindeutig und gültig sein"
+  "profile_error": "Muss eindeutig und gültig sein",
+  "team_0": "Neutral",
+  "battle_changes": "im Kampf",
+  "battle_changes_poracle": "battle_changes",
+  "auto": "Auto",
+  "webhooks_subtitle": "Verwalten Deine Benachrichtigungen für diese Bots direkt von der Karte aus",
+  "webhooks": "Benachrichtigungen",
+  "everything_individually": "Individuelle Benachrichtigungen hinzufügen",
+  "individually": "individuell",
+  "join": "Beitreten",
+  "errors_404": "Hoppla, diese Seite kann nicht gefunden werden!",
+  "errors_500": "Es ist ein Serverfehler aufgetreten, versuchen Sie es später erneut!",
+  "local_username": "Nutzername",
+  "local_password": "Passwort",
+  "local_error": "Es ist ein Fehler aufgetreten, bitte versuchen es später noch einmal!",
+  "no_filter_results": [
+    "Keine Ergebnisse gefunden",
+    "Versuche, Deine Filter zu erweitern"
+  ],
+  "donor_page": "Spenderseite",
+  "go_back": "zurück",
+  "access": "Zugriff",
+  "link_discord": "Discord verknüpfen",
+  "select_webhook_strategy": "Alarm Manager",
+  "webhook_strategy_success_0": "Erfolg! Aktualisieren, um Benachrichtigungseinstellungen abzurufen...",
+  "register": "Registrieren",
+  "invalid_credentials": "Ungültige Anmeldeinformationen",
+  "error_creating_user": "Neuer Benutzer kann derzeit nicht registriert werden",
+  "discord_linked": "Discord Verknüpft",
+  "telegram_linked": "Telegram Verknüpft"
 }
