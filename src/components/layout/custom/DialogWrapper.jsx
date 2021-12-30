@@ -19,7 +19,7 @@ export default function CustomWrapper({ configObj, defaultTitle, contentBody, ha
 
   return (
     <>
-      <Header titles={configObj.titles || [defaultTitle]} />
+      <Header titles={configObj.titles?.length ? configObj.titles : [defaultTitle]} />
       <DialogContent>
         <Grid
           container
