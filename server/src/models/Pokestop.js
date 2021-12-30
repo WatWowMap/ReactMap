@@ -643,7 +643,7 @@ class Pokestop extends Model {
       const altQuestQuery = this.query()
         .select(['*', distance])
         .where('deleted', false)
-        .andWhere('quest_timestamp', '>=', midnight || 0)
+        .andWhere('alternative_quest_timestamp', '>=', midnight || 0)
         .andWhere(quests => {
           quests.whereIn('alternative_quest_pokemon_id', pokemonIds)
             .orWhereIn('alternative_quest_item_id', itemIds)
@@ -668,7 +668,7 @@ class Pokestop extends Model {
       results.sort((a, b) => a.distance - b.distance)
       results.length = searchResultsLimit
     }
-    return results.map(result => isMad ? this.parseMadRewards(result) : this.parseRdmRewards(result))
+    return results.map(result => isMad ? this.parseMadRewards(result) : this.parseRdmRewards(result)).filter(x => x)
   }
 }
 
