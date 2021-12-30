@@ -67,6 +67,8 @@ export const quests = gql`
       candy_pokemon_id
       candy_amount
       with_ar
+      quest_title
+      quest_target
     }
   }
 `

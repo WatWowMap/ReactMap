@@ -603,6 +603,7 @@ class Pokestop extends Model {
     const rewardTypes = Object.keys(questRewardTypes).filter(type => (
       i18next.t(`quest_reward_${type}`, { lng: locale }).toLowerCase().includes(search)
     ))
+
     const query = this.query()
       .select([
         '*',
@@ -662,6 +663,7 @@ class Pokestop extends Model {
         quest_reward_type: result.alternative_quest_reward_type,
         quest_pokemon_id: result.alternative_quest_pokemon_id,
         quest_item_id: result.alternative_quest_item_id,
+        quest_title: result.alternative_quest_title,
         with_ar: true,
       }))
       results.push(...remapped)

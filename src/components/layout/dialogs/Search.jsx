@@ -10,6 +10,7 @@ import Utility from '@services/Utility'
 import { useStore } from '@hooks/useStore'
 import Query from '@services/Query'
 import Header from '../general/Header'
+import QuestTitle from '../general/QuestTitle'
 
 export default function Search({
   safeSearch, toggleDialog, isMobile, Icons,
@@ -158,9 +159,16 @@ export default function Search({
                 : getUrl(option)}
             </Grid>
             <Grid item xs={8}>
-              <Typography variant="caption">
+              <Typography variant="caption" style={{ fontWeight: 'bold' }}>
                 {option.name || getBackupName()}
               </Typography>
+              <br />
+              {(option.quest_title && option.quest_target) && (
+                <QuestTitle
+                  questTitle={option.quest_title}
+                  questTarget={option.quest_target}
+                />
+              )}
             </Grid>
             <Grid item xs={2}>
               <Typography variant="caption">{option.distance}km</Typography>

@@ -70,6 +70,8 @@ module.exports = gql`
     candy_pokemon_id: Int
     candy_amount: Int
     with_ar: Boolean
+    quest_title: String
+    quest_target: Int
   }
 
   type WayfarerCell {
