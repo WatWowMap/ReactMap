@@ -101,7 +101,7 @@ const LinkProfiles = ({ auth, t, PermPage }) => {
           direction="column"
           alignItems="center"
           justifyContent="center"
-          style={{ minHeight: '40vh' }}
+          style={{ minHeight: '65vh' }}
         >
           {auth.methods.some(method => method.includes('discord')) && (
             <Grid item style={{ padding: '20px 0' }}>
@@ -164,6 +164,7 @@ const ProfilePermissions = ({ perms, excludeList, t }) => (
     alignItems="center"
     justifyContent="center"
     spacing={2}
+    style={{ padding: 5 }}
   >
     {Object.keys(perms).map(perm => {
       if (excludeList.includes(perm) || perm === 'donor') {
