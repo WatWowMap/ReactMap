@@ -26,6 +26,7 @@ module.exports = gql`
     s2cells(minLat: Float, maxLat: Float, minLon: Float, maxLon: Float, ts: Int, filters: JSON, zoom: Int): [S2cell]
     scanAreas: [ScanArea]
     search(search: String, category: String, lat: Float, lon: Float, locale: String, webhookName: String, ts: Int, midnight: Int): [Search]
+    searchQuest(search: String, category: String, lat: Float, lon: Float, locale: String, webhookName: String, ts: Int, midnight: Int): [SearchQuest]
     spawnpoints(minLat: Float, maxLat: Float, minLon: Float, maxLon: Float, ts: Int, filters: JSON): [Spawnpoint]
     submissionCells(minLat: Float, maxLat: Float, minLon: Float, maxLon: Float, ts: Int, zoom: Int): [SubmissionCell]
     weather: [Weather]

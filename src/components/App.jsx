@@ -47,6 +47,9 @@ const client = new ApolloClient({
           },
         },
       },
+      SearchQuest: {
+        keyFields: ['id', 'with_ar'],
+      },
       Pokestop: {
         fields: {
           quests: {

@@ -10,6 +10,7 @@ import { useTranslation, Trans } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
+
 import Utility from '@services/Utility'
 import Dropdown from './common/Dropdown'
 import TimeTile from './common/TimeTile'
@@ -328,6 +329,7 @@ const RewardInfo = ({
 }
 
 const QuestConditions = ({ pokestop, quest, t, userSettings }) => {
+  const { i18n } = useTranslation()
   const {
     quest_task,
     quest_type,
@@ -335,7 +337,6 @@ const QuestConditions = ({ pokestop, quest, t, userSettings }) => {
     quest_conditions,
     quest_title,
   } = quest
-  const { i18n } = useTranslation()
 
   if (userSettings.madQuestText && quest_task) {
     return (

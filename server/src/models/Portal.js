@@ -21,7 +21,6 @@ class Portal extends Model {
 
   static async search(args, perms, isMad, distance) {
     const { areaRestrictions } = perms
-    console.log(Date.now() - portalUpdateLimit * 1000 * 60 * 60 * 24)
     const query = this.query()
       .select([
         'name',
