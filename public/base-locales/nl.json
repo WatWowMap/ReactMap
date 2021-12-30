@@ -419,6 +419,9 @@
     "join": "Join",
     "errors_404": "Oeps, deze pagina kan niet gevonden worden!",
     "errors_500": "Er is een serverfout opgetreden, probeer het later opnieuw!",
+    "local_username": "Gebruikersnaam",
+    "local_password": "Wachtwoord",
+    "local_error": "Er is een fout opgetreden, probeer het later opnieuw!",
     "no_filter_results": [
       "Geen resultaten gevonden",
       "Probeer je filters uit te breiden"
@@ -428,7 +431,7 @@
     "access": "Toegang",
     "link_discord": "Discord Verbonden",
     "select_webhook_strategy": "Alarm Manager",
-    "webhook_strategy_success_0": "Succes! Vernieuwen om meldingsinstellingen te krijgen...",
+    "webhook_strategy_success_0": "Succesvol! Vernieuwen om meldingsinstellingen te krijgen...",
     "register": "Registratie",
     "invalid_credentials": "Ongeldige inloggegevens",
     "error_creating_user": "Kan op dit moment geen nieuwe gebruiker registreren",
