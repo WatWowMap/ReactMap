@@ -6,7 +6,7 @@ const models = require('../models/index')
 
 // Establishes knex connections to each database listed in the config
 const connections = Object.values(schemas).map(schema => Knex({
-  client: 'mysql',
+  client: 'mysql2',
   connection: {
     host: schema.host,
     port: schema.port,
