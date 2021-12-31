@@ -89,6 +89,14 @@ export default function ConfigSettings({
   setUserSettings(updateObjState(serverSettings.userSettings, 'userSettings'))
   setStaticUserSettings(serverSettings.clientMenus)
 
+  if (localState?.state?.settings) {
+    const cached = localState.state.settings.localeSelection
+    const i18cached = localStorage.getItem('i18nextLng')
+    localState.state.settings.localeSelection = cached !== i18cached ? i18cached : cached
+  } else {
+    serverSettings.settings.localeSelection = localStorage.getItem('i18nextLng') || serverSettings.settings.localeSelection
+  }
+
   setSettings(updateObjState(serverSettings.settings, 'settings'))
   setStaticSettings(serverSettings.settings)
 
