@@ -73,7 +73,7 @@ const missing = async () => {
 
     Object.keys(englishRef).forEach(key => {
       if (!reactMapTranslations[key]) {
-        missingKeys[key] = `t('${key}')`
+        missingKeys[key] = englishRef[key]
       }
     })
     fs.writeFile(
@@ -89,5 +89,9 @@ const missing = async () => {
 module.exports.locales = locales
 
 if (require.main === module) {
-  missing().then(() => console.log('Translations generated'))
+  locales().then(() => console.log('Translations generated'))
+
+  if (process.argv[2] === '--missing') {
+    missing().then(() => console.log('Missing translations generated'))
+  }
 }

@@ -14,6 +14,7 @@
     "watch": "webpack --watch --env dev",
     "generate": "node server/src/services/generateMasterfile.js",
     "create-locales": "node server/src/services/createLocales.js",
+    "missing-locales": "node server/src/services/createLocales.js --missing",
     "console": "node --experimental-repl-await ./server/src/console.js",
     "migrate:make": "knex --knexfile server/knexfile.cjs migrate:make",
     "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
