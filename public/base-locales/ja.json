@@ -424,5 +424,8 @@
   "confirm_delete": "これにより、このプロファイルのすべての追跡が削除されます。よろしいですか？",
   "profile_error": "一意で有効である必要があります",
   "team_0": "調和",
-  "battle_changes": "バトル中"
+  "battle_changes": "バトル中",
+  "profile_name": "プロファイル名",
+  "confirm_copy": "「{{profile}}」をコピーするプロファイルを選択します。これにより、そのプロファイルが完全に上書きされます。",
+  "webhook_error": "{{name}}はそれを処理できませんでした。\n\n後でもう一度やり直してください。"
 }
