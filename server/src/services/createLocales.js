@@ -87,6 +87,7 @@ const missing = async () => {
 }
 
 module.exports.locales = locales
+module.exports.missing = missing
 
 if (require.main === module) {
   locales().then(() => console.log('Translations generated'))
