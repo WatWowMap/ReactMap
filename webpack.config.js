@@ -126,9 +126,9 @@ module.exports = (env) => {
         plugins.push(
           new SentryWebpackPlugin({
             authToken: dotenv.parsed.SENTRY_AUTH_TOKEN,
-            org: 'reactmap',
-            project: 'reactmap',
-            release: dotenv.parsed.SENTRY_RELEASE,
+            org: dotenv.parsed.SENTRY_ORG,
+            project: dotenv.parsed.SENTRY_PROJECT,
+            release: version,
             include: '.',
             ignore: ['node_modules', 'server', 'public', 'webpack.config.js'],
           }),
