@@ -56,10 +56,12 @@ export default function PokemonPopup({
         classes={classes}
         isTutorial={isTutorial}
       />
-      <Timer
-        pokemon={pokemon}
-        hasStats={hasStats}
-      />
+      {pokemon.expire_timestamp && (
+        <Timer
+          pokemon={pokemon}
+          hasStats={hasStats}
+        />
+      )}
       {hasStats && (
         <>
           <Stats

@@ -96,7 +96,7 @@ export default function App() {
     getServerSettings()
   }, [])
 
-  const theme = serverSettings
+  const theme = serverSettings?.config?.map?.theme
     ? setTheme(serverSettings.config.map.theme)
     : {}
 
