@@ -38,6 +38,7 @@ public/images/uicons/*
 
 # Ignore generated locales
 public/locales/*
+public/missing-locales/*
 
 # OS X
 .DS_Store*

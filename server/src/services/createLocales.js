@@ -6,6 +6,7 @@ const fetchJson = require('./api/fetchJson')
 
 const appLocalesFolder = path.resolve(__dirname, '../../../public/base-locales')
 const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales')
+const missingFolder = path.resolve(__dirname, '../../../public/missing-locales')
 
 const locales = async () => {
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
@@ -60,8 +61,33 @@ const locales = async () => {
   }))
 }
 
+const missing = async () => {
+  const localTranslations = await fs.promises.readdir(appLocalesFolder)
+  const englishRef = JSON.parse(fs.readFileSync(path.resolve(appLocalesFolder, 'en.json'), { encoding: 'utf8', flag: 'r' }))
+
+  fs.mkdir(missingFolder, (error) => error ? console.log('Locales folder already exists, skipping') : console.log('locales folder created'))
+
+  localTranslations.forEach(locale => {
+    const reactMapTranslations = JSON.parse(fs.readFileSync(path.resolve(appLocalesFolder, locale), { encoding: 'utf8', flag: 'r' }))
+    const missingKeys = {}
+
+    Object.keys(englishRef).forEach(key => {
+      if (!reactMapTranslations[key]) {
+        missingKeys[key] = `t('${key}')`
+      }
+    })
+    fs.writeFile(
+      path.resolve(missingFolder, locale),
+      JSON.stringify(missingKeys, null, 2),
+      'utf8',
+      () => { },
+    )
+    console.log(`${locale}`, 'file saved.')
+  })
+}
+
 module.exports.locales = locales
 
 if (require.main === module) {
-  locales().then(() => console.log('Translations generated'))
+  missing().then(() => console.log('Translations generated'))
 }

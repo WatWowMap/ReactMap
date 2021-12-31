@@ -29,12 +29,6 @@
   "max": "Max",
   "set_size": "Set Icon Size",
   "slot_selection": "Slot Selection",
-  "e1": "1-Star Eggs",
-  "e2": "2-Star Eggs",
-  "e3": "3-Star Eggs",
-  "e4": "4-Star Eggs",
-  "e5": "Legendary Eggs",
-  "e6": "Mega Eggs",
   "generations": "Generations",
   "types": "Types",
   "forms": "Forms",
@@ -402,10 +396,7 @@
   "slot_changes_poracle": "slot_changes",
   "confirm_delete": "This will remove all tracking for this profile, are you sure?",
   "confirm_copy": "Choose which profile you would like to copy \"{{profile}}\" to, this will overwrite that profile entirely.",
-  "webhook_error": [
-    "{{name}} was unable to process that.",
-    "Please try again later."
-  ],
+  "webhook_error": "{{name}} was unable to process that.\nPlease try again later.",
   "profile_error": "Must be unique and valid",
   "team_0": "Harmony",
   "battle_changes": "In Battle",
@@ -421,10 +412,7 @@
   "local_username": "Username",
   "local_password": "Password",
   "local_error": "There has been an error, please try again later!",
-  "no_filter_results": [
-    "No Results Found",
-    "Try Broadening Your Filters"
-  ],
+  "no_filter_results": "No Results Found\nTry Broadening Your Filters",
   "donor_page": "Donor Page",
   "go_back": "Go Back",
   "access": "Access",
@@ -469,5 +457,9 @@
   "webhook_footer_add_new_width": 4,
   "webhook_advanced_save_width": 2,
   "login_button": 5,
-  "join_button": 5
+  "join_button": 5,
+  "level": "level",
+  "km": "km",
+  "feedback": "Feedback",
+  "donor_menu": "Donor Menu"
 }
