@@ -425,5 +425,7 @@
   "exclude_quest_multi": "{{reward}} 제외",
   "cluster_limit_0": "{{variable_0}} 제한({{variable_1}})에 도달했습니다.",
   "cluster_limit_1": "필터를 확대하거나 좁히십시오.",
-  "show_polygons": "다각형 표시"
+  "show_polygons": "다각형 표시",
+  "pokestops": "포켓스톱",
+  "spawnpoints": "생성 지점"
 }
