@@ -13,7 +13,6 @@ const masterfile = require('../data/masterfile.json')
 const {
   Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter, User,
 } = require('../models/index')
-const { version } = require('../../../package.json')
 
 const rootRouter = new express.Router()
 
@@ -76,7 +75,7 @@ rootRouter.get('/settings', async (req, res) => {
           const user = await User.query().findById(req.user.id)
           if (user) {
             delete user.password
-            return { ...req.user, ...user, valid: true }
+            return { ...req.user, ...user, valid: true, username: user.username || req.user.username }
           }
           console.log('[Session Init] Legacy user detected, forcing logout, User ID:', req?.user?.id)
           req.logout()
@@ -115,7 +114,6 @@ rootRouter.get('/settings', async (req, res) => {
         manualAreas: config.manualAreas || {},
         icons: config.icons,
       },
-      version,
     }
 
     // add user options here from the config that are structured as objects
