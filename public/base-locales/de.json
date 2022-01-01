@@ -432,7 +432,7 @@
   "profile_error": "Muss eindeutig und gültig sein",
   "team_0": "Neutral",
   "battle_changes": "im Kampf",
-  "battle_changes_poracle": "wird angegriffen",
+  "battle_changes_poracle": "wird_angegriffen",
   "auto": "Auto",
   "webhooks_subtitle": "Verwalte deine Benachrichtigungen für diese Bots, direkt von der Karte aus.",
   "webhooks": "Benachrichtigungen",
