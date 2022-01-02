@@ -33,7 +33,7 @@ export default function Nav({
   const { perms } = useStatic(state => state.auth)
   const webhookAlert = useStatic(state => state.webhookAlert)
   const setWebhookAlert = useStatic(state => state.setWebhookAlert)
-  const { map: { messageOfTheDay, donationPage } } = useStatic(state => state.config)
+  const { map: { messageOfTheDay, donationPage, defaultQuestSet } } = useStatic(state => state.config)
   const userProfile = useStatic(state => state.userProfile)
   const setUserProfile = useStatic(state => state.setUserProfile)
   const feedback = useStatic(state => state.feedback)
@@ -95,6 +95,10 @@ export default function Nav({
     if (filter && type === 'options') {
       setUserSettings({ ...userSettings, [category]: filter })
     }
+  }
+
+  if (!filters['pokestops'].showQuestSet) {
+    setFilters({ ...filters, pokestops: { ...filters['pokestops'], showQuestSet: defaultQuestSet } })
   }
 
   return (

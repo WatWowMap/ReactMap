@@ -59,6 +59,7 @@
     "submissionZoom": 15,
     "legacyPkmnFilter": true,
     "enableQuestRewardTypeFilters": false,
+    "defaultQuestSet": "both",
     "fetchLatestInvasions": true,
     "invasionCacheHrs": 1,
     "questMessage": "",

@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  Grid, Typography, Switch,
+  Grid, Typography, Switch, ButtonGroup, Button,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
@@ -56,6 +56,56 @@ export default function WithSubItems({
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         {filterCategory}
       </Grid>
+      {category === 'pokestops' && subItem === 'quests' && filters['pokestops']['quests'] === true && (
+        <Grid item xs={12} style={{ textAlign: 'right' }}>
+          <ButtonGroup
+            size="small"
+          >
+            <Button
+              onClick={() => {
+                setFilters({
+                  ...filters,
+                  [category]: {
+                    ...filters[category],
+                    showQuestSet: 'normal',
+                  }
+                })
+              }}
+              variant={filters[category].showQuestSet === 'normal' ? 'contained' : 'outlined'}
+            >
+              {t('withAr')}
+            </Button>
+            <Button
+              onClick={() => {
+                setFilters({
+                  ...filters,
+                  [category]: {
+                    ...filters[category],
+                    showQuestSet: 'both',
+                  }
+                })
+              }}
+              variant={filters[category].showQuestSet === 'both' ? 'contained' : 'outlined'}
+            >
+              {t('both')}
+            </Button>
+            <Button
+              onClick={() => {
+                setFilters({
+                  ...filters,
+                  [category]: {
+                    ...filters[category],
+                    showQuestSet: 'alternative',
+                  }
+                })
+              }}
+              variant={filters[category].showQuestSet === 'alternative' ? 'contained' : 'outlined'}
+            >
+              {t('withoutAr')}
+            </Button>
+          </ButtonGroup>
+        </Grid>
+      )}
     </>
   )
 }
