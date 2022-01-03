@@ -402,7 +402,7 @@
   "normal_forms": "Formes normales",
   "weather_indicator": "Indicateur météo",
   "page": "Page {{page}}",
-  "navigation_controls": "Navigation",
+  "navigation_controls": "Boutons Navigation",
   "navigation_controls_react": "React",
   "navigation_controls_leaflet": "Leaflet",
   "exclusive": "Exclusif",
