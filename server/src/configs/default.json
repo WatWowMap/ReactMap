@@ -47,6 +47,8 @@
     "statsLink": "https://rdmopole2link.net",
     "rolesLinkName": "Role Upgrading Info",
     "rolesLink": "https://discordsomething.net",
+    "forceTutorial": true,
+    "enableTutorial": true,
     "startLat": 0,
     "startLon": 0,
     "startZoom": 12,
