@@ -23,7 +23,7 @@ export default function Sidebar({
   const classes = useStyles()
   const ui = useStatic(state => state.ui)
   const staticUserSettings = useStatic(state => state.userSettings)
-  const { map: { title, scanAreasZoom, noScanAreaOverlay }, manualAreas } = useStatic(state => state.config)
+  const { map: { title, scanAreasZoom, noScanAreaOverlay, enableQuestSetSelector }, manualAreas } = useStatic(state => state.config)
   const { t } = useTranslation()
 
   const handleChange = (panel) => (event, isExpanded) => {
@@ -43,6 +43,7 @@ export default function Sidebar({
               setFilters={setFilters}
               subItem={subItem}
               noScanAreaOverlay={noScanAreaOverlay}
+              enableQuestSetSelector={enableQuestSetSelector}
             />
           ))
         ); break

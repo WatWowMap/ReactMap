@@ -25,7 +25,8 @@
     "startLon": 0,
     "startZoom": 12,
     "minZoom": 10,
-    "maxZoom": 18
+    "maxZoom": 18,
+    "enableQuestSetSelector": true
   },
   "clientSideOptions": {
     "pokemon": {

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 
 export default function WithSubItems({
-  category, filters, setFilters, subItem, noScanAreaOverlay,
+  category, filters, setFilters, subItem, noScanAreaOverlay, enableQuestSetSelector,
 }) {
   const { t } = useTranslation()
   let filterCategory
@@ -56,7 +56,7 @@ export default function WithSubItems({
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         {filterCategory}
       </Grid>
-      {category === 'pokestops' && subItem === 'quests' && filters['pokestops']['quests'] === true && (
+      {enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters['pokestops']['quests'] === true && (
         <Grid item xs={12} style={{ textAlign: 'right' }}>
           <ButtonGroup
             size="small"
