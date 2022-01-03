@@ -101,7 +101,9 @@ rootRouter.get('/settings', async (req, res) => {
           excludeList: config.excludeFromTutorial,
         },
         localeSelection: Object.fromEntries(config.localeSelection.map(locale => [locale, { name: locale }])),
-        tileServers: { auto: {}, ...config.tileServers },
+        tileServers: (config.map.forceAutoAsDefaultTileServer || config.map.allowAutoTileServer)
+          ? (config.map.forceAutoAsDefaultTileServer ? { auto: {}, ...config.tileServers } : { ...config.tileServers, auto: {} })
+          : { ...config.tileServers },
         navigation: config.navigation,
         drawer: {
           temporary: {},
