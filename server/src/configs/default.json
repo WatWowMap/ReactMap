@@ -6,7 +6,8 @@
     "de",
     "pl",
     "es",
-    "fr"
+    "fr",
+    "nl" 
   ],
   "devOptions": {
     "enabled": false,
