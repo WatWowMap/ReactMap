@@ -61,6 +61,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
           return done(null, {
             ...user,
             ...req.user,
+            username: userExists.username || user.username,
             discordId: user.id,
             perms: Utility.mergePerms(req.user.perms, user.perms),
           })
@@ -75,7 +76,10 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
             .where('id', userExists.id)
           userExists.strategy = 'discord'
         }
-        return done(null, { ...user, ...userExists })
+        if (userExists.id >= 25000) {
+          console.warn('[USER] User ID is higher than 25,000! This may indicate that a Discord ID was saved as the User ID\nYou should rerun the migrations with "yarn migrate:rollback && yarn migrate:latest"')
+        }
+        return done(null, { ...user, ...userExists, username: userExists.username || user.username })
       })
   } catch (e) {
     console.error('User has failed Discord auth.', e)

@@ -427,5 +427,6 @@
   "battle_changes": "バトル中",
   "profile_name": "プロファイル名",
   "confirm_copy": "「{{profile}}」をコピーするプロファイルを選択します。これにより、そのプロファイルが完全に上書きされます。",
-  "webhook_error": "{{name}}はそれを処理できませんでした。\n\n後でもう一度やり直してください。"
+  "webhook_error": "{{name}}はそれを処理できませんでした。\n\n後でもう一度やり直してください。",
+  "locale_selection_nl": "Nederlands"
 }

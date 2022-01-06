@@ -46,7 +46,7 @@ export default function UserProfile({ setUserProfile }) {
     <>
       <Header titles={['user_profile']} action={() => setUserProfile(false)} />
       <DialogContent style={{ padding: 0 }}>
-        {auth.strategy === 'local' ? (
+        {auth.strategy.includes('local') ? (
           <LinkProfiles auth={auth} PermPage={PermPage} t={t} />
         ) : PermPage}
       </DialogContent>
@@ -125,7 +125,7 @@ const LinkProfiles = ({ auth, t, PermPage }) => {
             </Grid>
             <Grid item xs={12} sm={6} md={4} style={{ textAlign: 'center' }}>
               <Select
-                value={auth.webhookStrategy}
+                value={auth.webhookStrategy || ''}
                 onChange={(e) => {
                   setWebhookStrategy({
                     variables: {

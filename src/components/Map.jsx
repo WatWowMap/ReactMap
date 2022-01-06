@@ -20,13 +20,14 @@ const userSettingsCategory = category => {
 }
 
 const getTileServer = (tileServers, settings, isNight) => {
-  if (tileServers[settings.tileServers].name === 'auto') {
+  const fallbackTs = Object.values(tileServers).find(server => server.name !== 'auto')
+  if (tileServers?.[settings.tileServers]?.name === 'auto') {
     const autoTile = isNight
       ? Object.values(tileServers).find(server => server.style === 'dark')
       : Object.values(tileServers).find(server => server.style === 'light')
-    return autoTile || Object.values(tileServers).find(server => server.name !== 'auto')
+    return autoTile || fallbackTs
   }
-  return tileServers[settings.tileServers]
+  return tileServers[settings.tileServers] || fallbackTs
 }
 
 export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons, webhooks }, params }) {
@@ -140,7 +141,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               return (
                 <QueryData
                   key={category}
-                  sizeKey={filters[category].filter ? Object.values(filters[category].filter).map(x => x.size).join(',') : 'md'}
+                  sizeKey={filters[category].filter ? Object.values(filters[category].filter).map(x => x ? x.size : 'md').join(',') : 'md'}
                   bounds={Utility.getQueryArgs(map)}
                   setExcludeList={setExcludeList}
                   onMove={onMove}

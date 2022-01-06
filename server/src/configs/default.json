@@ -6,7 +6,8 @@
     "de",
     "pl",
     "es",
-    "fr"
+    "fr",
+    "nl" 
   ],
   "devOptions": {
     "enabled": false,
@@ -403,9 +404,7 @@
   "telegram": {
     "enabled": false,
     "botToken": "",
-    "groups": [
-      ""
-    ],
+    "groups": [],
     "areaRestrictions": [],
     "perms": {
       "map": {

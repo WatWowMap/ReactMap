@@ -1,6 +1,7 @@
 import React from 'react'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
+import * as Sentry from '@sentry/react'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
@@ -68,6 +69,7 @@ export default function ConfigSettings({
     perms: serverSettings.user ? serverSettings.user.perms : {},
     methods: serverSettings.authMethods,
   })
+  Sentry.setUser({ username: serverSettings.user.username, id: serverSettings.user.id })
 
   setTutorial(serverSettings.user.tutorial === undefined ? localState?.state?.tutorial : !serverSettings.user.tutorial)
   setUi(serverSettings.ui)
@@ -86,6 +88,14 @@ export default function ConfigSettings({
 
   setUserSettings(updateObjState(serverSettings.userSettings, 'userSettings'))
   setStaticUserSettings(serverSettings.clientMenus)
+
+  if (localState?.state?.settings) {
+    const cached = localState.state.settings.localeSelection
+    const i18cached = localStorage.getItem('i18nextLng')
+    localState.state.settings.localeSelection = cached !== i18cached ? i18cached : cached
+  } else {
+    serverSettings.settings.localeSelection = localStorage.getItem('i18nextLng') || serverSettings.settings.localeSelection
+  }
 
   setSettings(updateObjState(serverSettings.settings, 'settings'))
   setStaticSettings(serverSettings.settings)

@@ -6,7 +6,7 @@ const migrationUrl = 'src/db/migrations'
 const selectedDb = Object.keys(schemas).find(dbName => schemas[dbName].useFor.includes('user')) || Object.keys(schemas)[0]
 
 const connection = {
-  client: 'mysql',
+  client: 'mysql2',
   connection: {
     host: schemas[selectedDb].host,
     port: schemas[selectedDb].port,
