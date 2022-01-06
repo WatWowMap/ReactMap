@@ -131,7 +131,7 @@ export default function App() {
             </Switch>
           </Router>
           <canvas id="holiday-canvas" />
-          <HolidayEffects mapSettings={serverSettings ? serverSettings.config.map : {}} />
+          <HolidayEffects mapSettings={serverSettings?.config?.map ? serverSettings.config.map : {}} />
         </ThemeProvider>
       </ApolloProvider>
     </Suspense>
