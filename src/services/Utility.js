@@ -105,7 +105,7 @@ export default class Utility {
       maxLat: mapBounds._northEast.lat,
       minLon: mapBounds._southWest.lng,
       maxLon: mapBounds._northEast.lng,
-      zoom: map.getZoom(),
+      zoom: Math.floor(map.getZoom()),
       ts: Math.floor(Date.now() / 1000),
       midnight: this.getMidnight(),
     }
