@@ -9,7 +9,7 @@ module.exports = gql`
     last_lon: Float
     type: String
     isMad: Boolean
-    route: String
+    route: JSON
   }
 
   type Gym {
