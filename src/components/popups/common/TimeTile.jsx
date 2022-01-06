@@ -13,12 +13,14 @@ export default function TimeUntil({ expireTime, icon, until }) {
           <img src={icon} className="quest-popup-img" />
         </Grid>
       )}
-      <Grid item xs={icon ? 9 : 12} style={{ textAlign: 'center' }}>
-        <Timer expireTime={expireTime} until={until} />
-        <Typography variant="caption">
-          {new Date(endTime).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
-        </Typography>
-      </Grid>
+      {endTime && (
+        <Grid item xs={icon ? 9 : 12} style={{ textAlign: 'center' }}>
+          <Timer expireTime={expireTime} until={until} />
+          <Typography variant="caption">
+            {new Date(endTime).toLocaleTimeString(localStorage.getItem('i18nextLng') || 'en')}
+          </Typography>
+        </Grid>
+      )}
     </>
   )
 }
