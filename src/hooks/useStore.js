@@ -16,7 +16,7 @@ const useStore = create(persist(set => ({
   setIcons: (icons) => set({ icons }),
   menus: undefined,
   setMenus: (menus) => set({ menus }),
-  tutorial: true,
+  tutorial: undefined,
   setTutorial: (tutorial) => set({ tutorial }),
   sidebar: undefined,
   setSidebar: (sidebar) => set({ sidebar }),
