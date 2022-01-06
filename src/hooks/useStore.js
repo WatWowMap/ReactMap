@@ -16,8 +16,6 @@ const useStore = create(persist(set => ({
   setIcons: (icons) => set({ icons }),
   menus: undefined,
   setMenus: (menus) => set({ menus }),
-  forcedTutorialDisplayed: false,
-  setForcedTutorialDisplayed: (forcedTutorialDisplayed) => set({ forcedTutorialDisplayed }),
   tutorial: undefined,
   setTutorial: (tutorial) => set({ tutorial }),
   sidebar: undefined,

@@ -33,7 +33,7 @@ export default function Nav({
   const { perms } = useStatic(state => state.auth)
   const webhookAlert = useStatic(state => state.webhookAlert)
   const setWebhookAlert = useStatic(state => state.setWebhookAlert)
-  const { map: { forceTutorial, enableTutorial, messageOfTheDay, donationPage } } = useStatic(state => state.config)
+  const { map: { enableTutorial, messageOfTheDay, donationPage } } = useStatic(state => state.config)
   const userProfile = useStatic(state => state.userProfile)
   const setUserProfile = useStatic(state => state.setUserProfile)
   const feedback = useStatic(state => state.feedback)
@@ -45,8 +45,6 @@ export default function Nav({
   const setUserSettings = useStore(state => state.setUserSettings)
   const tutorial = useStore(state => state.tutorial)
   const setTutorial = useStore(state => state.setTutorial)
-  const forcedTutorialDisplayed = useStore(state => state.forcedTutorialDisplayed)
-  const setForcedTutorialDisplayed = useStore(state => state.setForcedTutorialDisplayed)
   const motdIndex = useStore(state => state.motdIndex)
   const setMotdIndex = useStore(s => s.setMotdIndex)
 
@@ -63,11 +61,6 @@ export default function Nav({
       || (!messageOfTheDay.settings.donorOnly && !messageOfTheDay.settings.freeloaderOnly)),
   )
   const [donorPage, setDonorPage] = useState(false)
-
-  if (forceTutorial && !forcedTutorialDisplayed) {
-    setTutorial(true)
-    setForcedTutorialDisplayed(true)
-  }
 
   const safeSearch = searchable.filter(category => perms[category])
 
