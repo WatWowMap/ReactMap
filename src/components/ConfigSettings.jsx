@@ -71,7 +71,7 @@ export default function ConfigSettings({
   })
   Sentry.setUser({ username: serverSettings.user.username, id: serverSettings.user.id })
 
-  setTutorial(serverSettings.user.tutorial === undefined ? localState?.state?.tutorial : !serverSettings.user.tutorial)
+  setTutorial(serverSettings.user.tutorial === undefined ? serverSettings.config.map.forceTutorial : !serverSettings.user.tutorial)
   setUi(serverSettings.ui)
 
   setMasterfile(serverSettings.masterfile)
