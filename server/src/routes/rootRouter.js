@@ -51,20 +51,12 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 
 rootRouter.get('/settings', async (req, res) => {
   try {
-    if (!config.authMethods.length) {
-      req.session.perms = { areaRestrictions: [], webhooks: [] }
-      Object.keys(config.discord.perms).forEach(perm => {
-        req.session.perms[perm] = config.discord.perms[perm].enabled || config.telegram.perms[perm].enabled
-      })
-      req.session.save()
-    } else if (config.alwaysEnabledPerms.length) {
-      req.session.perms = { areaRestrictions: [], webhooks: [] }
+    if (!config.authMethods.length || config.alwaysEnabledPerms.length) req.session.perms = { areaRestrictions: [], webhooks: [] }
+    if (config.alwaysEnabledPerms.length) {
       config.alwaysEnabledPerms.forEach(perm => {
-        try {
-          req.session.perms[perm] = (config.authMethods.includes('discord') && config.discord.perms[perm].enabled) || (config.authMethods.includes('telegram') && config.telegram.perms[perm].enabled)
-        } catch (e) {
-          console.error('Invalid Perm in "alwaysEnabled" array:', perm)
-        }
+        Object.keys(config.discord.perms).includes(perm)
+          ? req.session.perms[perm] = true
+          : console.warn('Possible invalid Perm in "alwaysEnabledPerms" array:', perm)
       })
       req.session.save()
     }
