@@ -78,8 +78,8 @@
   "admin": "Administrador",
   "settings": "Ajustes",
   "advanced": "Avanzado",
-  "tileservers": "Imágenes de Mapa",
-  "tileservers_default": "Configuración Predeterminada",
+  "tile_servers": "Imágenes de Mapa",
+  "tile_servers_default": "Configuración Predeterminada",
   "drawer": "Menú",
   "navigation": "Navegación",
   "icons": "Iconos",
@@ -352,5 +352,5 @@
   "normal_forms": "Formas normales",
   "weather_indicator": "Indicador meteorológico",
   "page": "Página {{page}}",
-  "navigation_controls_": "Controles de navegación"
+  "navigation_controls": "Controles de navegación"
 }

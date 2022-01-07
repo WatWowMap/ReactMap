@@ -70,11 +70,11 @@
   "admin": "Administrator",
   "settings": "Ustawienia",
   "advanced": "Zaawansowane",
-  "tileservers": "Serwer kafelków",
+  "tile_servers": "Serwer kafelków",
   "icons": "Ikony",
   "navigation": "Nawigacja",
   "drawer": "Menu nawigacyjne",
-  "tileservers_default": "Domyślny",
+  "tile_servers_default": "Domyślny",
   "iconsDefault": "Domyślne",
   "drawer_temporary": "Tymaczsowe",
   "drawer_persistent": "Stałe",
@@ -343,5 +343,5 @@
   "normal_forms": "Formy normalne",
   "weather_indicator": "Wskaźnik pogody",
   "page": "Strona {{page}}",
-  "navigation_controls_": "Nawigacja"
+  "navigation_controls": "Nawigacja"
 }
