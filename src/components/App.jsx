@@ -96,14 +96,10 @@ export default function App() {
     getServerSettings()
   }, [])
 
-  const theme = serverSettings?.config?.map?.theme
-    ? setTheme(serverSettings.config.map.theme)
-    : {}
-
   return (
     <Suspense fallback="Loading translations...">
       <ApolloProvider client={client}>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={setTheme(serverSettings?.config?.map?.theme)}>
           <Router>
             {(process.env && process.env.GOOGLE_ANALYTICS_ID) && <RouteChangeTracker />}
             <Switch>
