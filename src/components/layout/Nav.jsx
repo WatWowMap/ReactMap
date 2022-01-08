@@ -132,19 +132,17 @@ export default function Nav({
           <UserProfile setUserProfile={setUserProfile} />
         </Dialog>
       ) : (
-        enableTutorial ? (
-          <Dialog
-            open={tutorial}
-            fullScreen={isMobile}
-            maxWidth="xs"
-          >
-            <Tutorial
-              setUserProfile={setUserProfile}
-              setTutorial={setTutorial}
-              toggleDialog={toggleDialog}
-            />
-          </Dialog>
-        ) : null
+        <Dialog
+          open={tutorial && enableTutorial}
+          fullScreen={isMobile}
+          maxWidth="xs"
+        >
+          <Tutorial
+            setUserProfile={setUserProfile}
+            setTutorial={setTutorial}
+            toggleDialog={toggleDialog}
+          />
+        </Dialog>
       )}
       <Dialog
         fullWidth={!isMobile}
