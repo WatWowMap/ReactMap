@@ -51,12 +51,17 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 
 rootRouter.get('/settings', async (req, res) => {
   try {
-    if (!config.authMethods.length || config.alwaysEnabledPerms.length) req.session.perms = { areaRestrictions: [], webhooks: [] }
+    if (!config.authMethods.length || config.alwaysEnabledPerms.length) {
+      req.session.perms = { areaRestrictions: [], webhooks: [] }
+      req.session.save()
+    }
     if (config.alwaysEnabledPerms.length) {
       config.alwaysEnabledPerms.forEach(perm => {
-        Object.keys(config.discord.perms).includes(perm)
-          ? req.session.perms[perm] = true
-          : console.warn('Possible invalid Perm in "alwaysEnabledPerms" array:', perm)
+        if (config.discord.perms[perm]) {
+          req.session.perms[perm] = true
+        } else {
+          console.warn('Invalid Perm in "alwaysEnabledPerms" array:', perm)
+        }
       })
       req.session.save()
     }
