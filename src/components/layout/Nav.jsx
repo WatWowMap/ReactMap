@@ -33,7 +33,7 @@ export default function Nav({
   const { perms } = useStatic(state => state.auth)
   const webhookAlert = useStatic(state => state.webhookAlert)
   const setWebhookAlert = useStatic(state => state.setWebhookAlert)
-  const { map: { messageOfTheDay, donationPage, defaultQuestSet } } = useStatic(state => state.config)
+  const { map: { enableTutorial, messageOfTheDay, donationPage, defaultQuestSet } } = useStatic(state => state.config)
   const userProfile = useStatic(state => state.userProfile)
   const setUserProfile = useStatic(state => state.setUserProfile)
   const feedback = useStatic(state => state.feedback)
@@ -97,8 +97,8 @@ export default function Nav({
     }
   }
 
-  if (!filters['pokestops'].showQuestSet) {
-    setFilters({ ...filters, pokestops: { ...filters['pokestops'], showQuestSet: defaultQuestSet } })
+  if (!filters.pokestops.showQuestSet) {
+    setFilters({ ...filters, pokestops: { ...filters.pokestops, showQuestSet: defaultQuestSet } })
   }
 
   return (
@@ -137,7 +137,7 @@ export default function Nav({
         </Dialog>
       ) : (
         <Dialog
-          open={tutorial}
+          open={tutorial && enableTutorial}
           fullScreen={isMobile}
           maxWidth="xs"
         >

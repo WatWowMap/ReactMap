@@ -6,7 +6,8 @@
     "de",
     "pl",
     "es",
-    "fr"
+    "fr",
+    "nl" 
   ],
   "devOptions": {
     "enabled": false,
@@ -47,6 +48,9 @@
     "statsLink": "https://rdmopole2link.net",
     "rolesLinkName": "Role Upgrading Info",
     "rolesLink": "https://discordsomething.net",
+    "forceTutorial": true,
+    "enableTutorial": true,
+    "enableUserProfile": true,
     "startLat": 0,
     "startLon": 0,
     "startZoom": 12,

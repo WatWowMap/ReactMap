@@ -14,7 +14,7 @@ import LocaleSelection from '@components/layout/general/LocaleSelection'
 export default function TutWelcome({ setUserProfile }) {
   const { t } = useTranslation()
   const { methods, loggedIn, perms } = useStatic(state => state.auth)
-  const { map: { excludeList }, localeSelection } = useStatic(state => state.config)
+  const { map: { enableUserProfile, excludeList }, localeSelection } = useStatic(state => state.config)
 
   const getPerms = () => {
     let have = 0
@@ -49,11 +49,13 @@ export default function TutWelcome({ setUserProfile }) {
             {t('tutorial_categories')}:
           </Typography>
         </Grid>
-        <Grid item xs={6}>
-          <Typography variant="h6" gutterBottom align="center">
-            {!loggedIn && methods.length ? t('login_optional') : t('view_profile')}
-          </Typography>
-        </Grid>
+        {enableUserProfile && (
+          <Grid item xs={6}>
+            <Typography variant="h6" gutterBottom align="center">
+              {!loggedIn && methods.length ? t('login_optional') : t('view_profile')}
+            </Typography>
+          </Grid>
+        )}
         <Grid item xs={6}>
           <Typography variant="h3" align="center">
             {getPerms()}
@@ -64,17 +66,20 @@ export default function TutWelcome({ setUserProfile }) {
             <Fab color="primary" href="/login">
               <LockOpen />
             </Fab>
-          ) : (
-            <Fab color="primary" onClick={() => setUserProfile(true)}>
-              <Person />
-            </Fab>
+          ) : (enableUserProfile && (
+              <Fab color="primary" onClick={() => setUserProfile(true)}>
+                <Person />
+              </Fab>
+            ) || null
           )}
         </Grid>
-        <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
-          <Typography variant="subtitle1" align="center">
-            {!loggedIn && methods.length ? t('tutorial_logged_out') : t('tutorial_logged_in')}
-          </Typography>
-        </Grid>
+        {enableUserProfile && (
+          <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
+            <Typography variant="subtitle1" align="center">
+              {!loggedIn && methods.length ? t('tutorial_logged_out') : t('tutorial_logged_in')}
+            </Typography>
+          </Grid>
+        )}
         <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
           <Typography variant="subtitle1" align="center">
             {t('tutorial_language')}

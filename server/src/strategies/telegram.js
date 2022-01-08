@@ -5,7 +5,7 @@ const path = require('path')
 
 // if writing a custom strategy, rename 'telegram' below to your strategy name
 // this will automatically grab all of its unique values in the config
-const { telegram: strategyConfig, alwaysEnabledPerms } = require('../services/config')
+const { map: { forceTutorial }, telegram: strategyConfig, alwaysEnabledPerms } = require('../services/config')
 const { User } = require('../models/index')
 const Fetch = require('../services/Fetch')
 const Utility = require('../services/Utility')
@@ -69,7 +69,7 @@ const authHandler = async (req, profile, done) => {
         }
         if (!userExists) {
           userExists = await User.query()
-            .insertAndFetch({ telegramId: user.id, strategy: user.provider })
+            .insertAndFetch({ telegramId: user.id, strategy: user.provider, tutorial: !forceTutorial })
         }
         if (userExists.strategy !== 'telegram') {
           await User.query()
