@@ -6,7 +6,7 @@ const path = require('path')
 
 // if writing a custom strategy, rename 'discord' below to your strategy name
 // this will automatically grab all of its unique values in the config
-const { discord: strategyConfig } = require('../services/config')
+const { map: { forceTutorial }, discord: strategyConfig } = require('../services/config')
 const { User } = require('../models/index')
 const DiscordMapClient = require('../services/DiscordClient')
 const logUserAuth = require('../services/logUserAuth')
@@ -68,7 +68,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
         }
         if (!userExists) {
           userExists = await User.query()
-            .insertAndFetch({ discordId: user.id, strategy: 'discord' })
+            .insertAndFetch({ discordId: user.id, strategy: 'discord', tutorial: !forceTutorial })
         }
         if (userExists.strategy !== 'discord') {
           await User.query()

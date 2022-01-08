@@ -174,17 +174,19 @@ export default function Settings({ Icons }) {
             )}
           </Grid>
         )}
-        <Grid item xs={t('drawer_settings_tutorial_width')} style={{ textAlign: 'center' }}>
-          <Button
-            style={{ minWidth: 100 }}
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={() => setTutorial(true)}
-          >
-            {t('tutorial')}
-          </Button>
-        </Grid>
+        {config.map.enableTutorial && (
+          <Grid item xs={t('drawer_settings_tutorial_width')} style={{ textAlign: 'center' }}>
+            <Button
+              style={{ minWidth: 100 }}
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={() => setTutorial(true)}
+            >
+              {t('tutorial')}
+            </Button>
+          </Grid>
+        )}
         <Grid item xs={t('drawer_settings_reset_filters_width')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
