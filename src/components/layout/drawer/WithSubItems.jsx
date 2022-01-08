@@ -56,7 +56,7 @@ export default function WithSubItems({
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         {filterCategory}
       </Grid>
-      {enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters['pokestops']['quests'] === true && (
+      {enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters.pokestops.quests === true && (
         <Grid item xs={12} style={{ textAlign: 'right' }}>
           <ButtonGroup
             size="small"
@@ -68,7 +68,7 @@ export default function WithSubItems({
                   [category]: {
                     ...filters[category],
                     showQuestSet: 'normal',
-                  }
+                  },
                 })
               }}
               variant={filters[category].showQuestSet === 'normal' ? 'contained' : 'outlined'}
@@ -82,7 +82,7 @@ export default function WithSubItems({
                   [category]: {
                     ...filters[category],
                     showQuestSet: 'both',
-                  }
+                  },
                 })
               }}
               variant={filters[category].showQuestSet === 'both' ? 'contained' : 'outlined'}
@@ -96,7 +96,7 @@ export default function WithSubItems({
                   [category]: {
                     ...filters[category],
                     showQuestSet: 'alternative',
-                  }
+                  },
                 })
               }}
               variant={filters[category].showQuestSet === 'alternative' ? 'contained' : 'outlined'}
