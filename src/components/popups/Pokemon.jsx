@@ -358,7 +358,7 @@ const Timer = ({ pokemon, hasStats }) => {
           {timer.str}
         </Typography>
         <Typography variant="subtitle2" align="center">
-          {despawnTimer.toLocaleTimeString(localStorage.getItem('i18nextLng'))}
+          {despawnTimer.toLocaleTimeString(localStorage.getItem('i18nextLng') || 'en')}
         </Typography>
       </Grid>
       <Grid item xs={hasStats ? 3 : 2}>
@@ -480,7 +480,7 @@ const ExtraInfo = ({
             </Grid>
             <Grid item xs={t('popup_pokemon_data_width')} style={{ textAlign: 'right' }}>
               <Typography variant="caption">
-                {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
+                {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng') || 'en')}
               </Typography>
             </Grid>
           </Fragment>

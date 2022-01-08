@@ -113,7 +113,7 @@ module.exports = (env) => {
           clear: false,
         }),
         new webpack.DefinePlugin({
-          'process.env': JSON.stringify({ ...dotenv.parsed, VERSION: version }),
+          'process.env': JSON.stringify({ ...dotenv.parsed, VERSION: version, isDevelopment }),
         }),
       ]
       if (isDevelopment) {
