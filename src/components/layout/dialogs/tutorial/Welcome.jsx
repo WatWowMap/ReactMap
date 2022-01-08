@@ -62,16 +62,20 @@ export default function TutWelcome({ setUserProfile }) {
           </Typography>
         </Grid>
         <Grid item xs={6} style={{ textAlign: 'center' }}>
-          {!loggedIn && methods.length ? (
-            <Fab color="primary" href="/login">
-              <LockOpen />
-            </Fab>
-          ) : (enableUserProfile && (
+          {(() => {
+            if (!loggedIn && methods.length) {
+              return (
+                <Fab color="primary" href="/login">
+                  <LockOpen />
+                </Fab>
+              )
+            }
+            return enableUserProfile ? (
               <Fab color="primary" onClick={() => setUserProfile(true)}>
                 <Person />
               </Fab>
-            ) || null
-          )}
+            ) : null
+          })()}
         </Grid>
         {enableUserProfile && (
           <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
