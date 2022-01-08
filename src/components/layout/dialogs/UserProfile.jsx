@@ -46,7 +46,7 @@ export default function UserProfile({ setUserProfile }) {
     <>
       <Header titles={['user_profile']} action={() => setUserProfile(false)} />
       <DialogContent style={{ padding: 0 }}>
-        {auth.strategy.includes('local') ? (
+        {auth?.strategy?.includes('local') ? (
           <LinkProfiles auth={auth} PermPage={PermPage} t={t} />
         ) : PermPage}
       </DialogContent>

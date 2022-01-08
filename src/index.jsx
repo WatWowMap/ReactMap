@@ -10,7 +10,7 @@ import './services/i18n'
 if (process.env) {
   const {
     GOOGLE_ANALYTICS_ID, ANALYTICS_DEBUG_MODE, TITLE, VERSION,
-    SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE,
+    SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE, isDevelopment,
   } = process.env
   if (GOOGLE_ANALYTICS_ID) {
     ReactGA.initialize(GOOGLE_ANALYTICS_ID, { debug: ANALYTICS_DEBUG_MODE })
@@ -23,6 +23,7 @@ if (process.env) {
     integrations: [new Integrations.BrowserTracing()],
     tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE || 0.1,
     release: VERSION,
+    environment: isDevelopment ? 'development' : 'production',
   })
   // eslint-disable-next-line no-console
   console.log('ReactMap Version:', VERSION)

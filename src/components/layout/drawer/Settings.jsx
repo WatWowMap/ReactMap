@@ -133,17 +133,19 @@ export default function Settings({ Icons }) {
         spacing={3}
         style={{ margin: '10px 0px' }}
       >
-        <Grid item xs={t('drawer_settings_profile_width')} style={{ textAlign: 'center' }}>
-          <Button
-            style={{ minWidth: 100 }}
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={() => setUserProfile(true)}
-          >
-            {t('profile')}
-          </Button>
-        </Grid>
+        {config.map.enableUserProfile && (
+          <Grid item xs={t('drawer_settings_profile_width')} style={{ textAlign: 'center' }}>
+            <Button
+              style={{ minWidth: 100 }}
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={() => setUserProfile(true)}
+            >
+              {t('profile')}
+            </Button>
+          </Grid>
+        )}
         {Boolean(methods.length) && (
           <Grid item xs={t('drawer_settings_logout_width')} style={{ textAlign: 'center' }}>
             {loggedIn ? (
