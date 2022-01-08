@@ -6,7 +6,7 @@ const path = require('path')
 
 // if writing a custom strategy, rename 'local' below to your strategy name
 // this will automatically grab all of its unique values in the config
-const { local: strategyConfig, discord, alwaysEnabledPerms } = require('../services/config')
+const { map: { forceTutorial }, local: strategyConfig, discord, alwaysEnabledPerms } = require('../services/config')
 const { User } = require('../models/index')
 const Utility = require('../services/Utility')
 
@@ -33,6 +33,7 @@ const authHandler = async (req, username, password, done) => {
                 username,
                 password: await bcrypt.hash(password, 10),
                 strategy: 'local',
+                tutorial: !forceTutorial,
               })
             user.id = newUser.id
             return done(null, user)
