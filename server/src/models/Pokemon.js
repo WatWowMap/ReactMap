@@ -365,6 +365,7 @@ class Pokemon extends Model {
         pokemon.level,
       )
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('Unable to process PVP Stats for Pokemon with ID#: ', pokemon.id, '\n', e.message)
       return {}
     }

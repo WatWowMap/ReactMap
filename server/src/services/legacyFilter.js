@@ -297,6 +297,15 @@ const getLegacy = (results, args, perms, ohbem) => {
       if (!pokemonFilter) {
         continue
       }
+      if (!result.seen_type) {
+        if (result.spawn_id === null) {
+          filtered.seen_type = result.pokestop_id ? 'nearby_stop' : 'nearby_cell'
+        } else {
+          filtered.seen_type = 'encounter'
+        }
+      } else {
+        filtered.seen_type = result.seen_type
+      }
       filtered.id = result.id
       filtered.pokemon_id = result.pokemon_id
       filtered.lat = result.lat

@@ -3,7 +3,7 @@ import React, {
   Fragment, useCallback, useState, useEffect,
 } from 'react'
 import {
-  Grid, Avatar, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem,
+  Grid, Avatar, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem, Tooltip,
 } from '@material-ui/core'
 import {
   Check, Clear, ExpandMore, Map, MoreVert,
@@ -60,7 +60,11 @@ export default function PokemonPopup({
         <Timer
           pokemon={pokemon}
           hasStats={hasStats}
+          t={t}
         />
+      )}
+      {pokemon.seen_type === 'nearby_cell' && (
+        <Typography>{t('pokemon_cell')}</Typography>
       )}
       {hasStats && (
         <>
@@ -339,7 +343,7 @@ const Info = ({
   )
 }
 
-const Timer = ({ pokemon, hasStats }) => {
+const Timer = ({ pokemon, hasStats, t }) => {
   const { expire_timestamp, expire_timestamp_verified } = pokemon
   const despawnTimer = new Date(expire_timestamp * 1000)
   const [timer, setTimer] = useState(Utility.getTimeUntil(despawnTimer, true))
@@ -362,9 +366,15 @@ const Timer = ({ pokemon, hasStats }) => {
         </Typography>
       </Grid>
       <Grid item xs={hasStats ? 3 : 2}>
-        {expire_timestamp_verified
-          ? <Check fontSize="large" style={{ color: '#00e676' }} />
-          : <Clear fontSize="large" color="primary" />}
+        <Tooltip
+          title={expire_timestamp_verified ? t('timer_verified') : t('timer_unverified')}
+          arrow
+          enterTouchDelay={0}
+        >
+          {expire_timestamp_verified
+            ? <Check fontSize="large" style={{ color: '#00e676' }} />
+            : <Clear fontSize="large" color="primary" />}
+        </Tooltip>
       </Grid>
     </>
   )
