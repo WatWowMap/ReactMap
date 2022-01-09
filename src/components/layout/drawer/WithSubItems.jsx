@@ -57,52 +57,26 @@ export default function WithSubItems({
         {filterCategory}
       </Grid>
       {enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters.pokestops.quests === true && (
-        <Grid item xs={12} style={{ textAlign: 'right' }}>
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
           <ButtonGroup
             size="small"
           >
-            <Button
-              onClick={() => {
-                setFilters({
+            {['with_ar', 'both', 'without_ar'].map(questSet => (
+              <Button
+                key={questSet}
+                onClick={() => setFilters({
                   ...filters,
                   [category]: {
                     ...filters[category],
-                    showQuestSet: 'normal',
+                    showQuestSet: questSet,
                   },
-                })
-              }}
-              variant={filters[category].showQuestSet === 'normal' ? 'contained' : 'outlined'}
-            >
-              {t('withAr')}
-            </Button>
-            <Button
-              onClick={() => {
-                setFilters({
-                  ...filters,
-                  [category]: {
-                    ...filters[category],
-                    showQuestSet: 'both',
-                  },
-                })
-              }}
-              variant={filters[category].showQuestSet === 'both' ? 'contained' : 'outlined'}
-            >
-              {t('both')}
-            </Button>
-            <Button
-              onClick={() => {
-                setFilters({
-                  ...filters,
-                  [category]: {
-                    ...filters[category],
-                    showQuestSet: 'alternative',
-                  },
-                })
-              }}
-              variant={filters[category].showQuestSet === 'alternative' ? 'contained' : 'outlined'}
-            >
-              {t('withoutAr')}
-            </Button>
+                })}
+                color={questSet === filters[category].showQuestSet ? 'primary' : 'secondary'}
+                variant={questSet === filters[category].showQuestSet ? 'contained' : 'outlined'}
+              >
+                {t(questSet)}
+              </Button>
+            ))}
           </ButtonGroup>
         </Grid>
       )}
