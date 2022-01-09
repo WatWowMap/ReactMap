@@ -473,5 +473,8 @@
   "webhook_footer_add_new_width": 4,
   "webhook_advanced_save_width": 2,
   "login_button": 5,
-  "join_button": 5
+  "join_button": 5,
+  "pokemon_cell": "Pokemon's Location Could Vary",
+  "timer_verified": "This Timer is Verified",
+  "timer_unverified": "This Timer is Unverified"
 }
