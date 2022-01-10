@@ -35,7 +35,7 @@
     "searchResultsLimit": 15,
     "nestHemisphere": "north"
   },
-  "multiDomains": {},
+  "multiDomains": [],
   "map": {
     "general": {
       "title": "ReactMap",
