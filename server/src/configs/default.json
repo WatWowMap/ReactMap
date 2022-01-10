@@ -326,27 +326,35 @@
   },
   "webhooks": [],
   "authentication": {
-    "discord": {
-      "enabled": false,
-      "logChannelId": "",
-      "presence": "Map Status: Online",
-      "presenceType": 3,
-      "botToken": "",
-      "clientId": "",
-      "clientSecret": "",
-      "redirectUri": "http://localhost:8080/auth/discord/callback",
-      "allowedGuilds": [],
-      "blockedGuilds": [],
-      "allowedUsers": []
-    },
-    "telegram": {
-      "enabled": false,
-      "botToken": "",
-      "groups": []
-    },
-    "local": {
-      "enabled": false
-    },
+    "strategies": [
+      {
+        "name": "discord",
+        "type": "discord",
+        "enabled": false,
+        "logChannelId": "",
+        "presence": "Map Status: Online",
+        "presenceType": 3,
+        "botToken": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectUri": "http://localhost:8080/auth/discord/callback",
+        "allowedGuilds": [],
+        "blockedGuilds": [],
+        "allowedUsers": []
+      },
+      {
+        "name": "telegram",
+        "type": "telegram",
+        "enabled": false,
+        "botToken": "",
+        "groups": []
+      },
+      {
+        "name": "local",
+        "type": "local",
+        "enabled": false
+      }
+    ],
     "areaRestrictions": [],
     "excludeFromTutorial": [],
     "alwaysEnabledPerms": [],
