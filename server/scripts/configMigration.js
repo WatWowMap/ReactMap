@@ -115,8 +115,10 @@ const mergeAuth = async () => {
     ...authMethods.flatMap(m => oldConfig?.[m]?.perms[perm]?.roles || []),
   ])
 
-  const discordObj = (obj) => ({
+  const discordObj = (obj, name) => ({
+    name,
     enabled: obj?.enabled,
+    type: 'discord',
     logChannelId: obj?.logChannelId,
     presence: obj?.presence,
     presenceType: obj?.presenceType,
@@ -129,29 +131,25 @@ const mergeAuth = async () => {
     allowedUsers: obj?.allowedUsers,
   })
 
-  const telegramObj = (obj) => ({
+  const telegramObj = (obj, name) => ({
+    name,
     enabled: obj?.enabled,
+    type: 'telegram',
     botToken: obj?.botToken,
     groups: obj?.groups,
   })
 
-  const localObj = (obj) => ({
+  const localObj = (obj, name) => ({
+    name,
     enabled: obj?.enabled,
+    type: 'local',
   })
 
   const checkEnabled = (perm) => oldConfig?.discord?.perms?.[perm]?.enabled
     || oldConfig?.telegram?.perms?.[perm]?.enabled
 
   const baseAuth = {
-    discord: oldConfig.discord
-      ? discordObj(oldConfig.discord)
-      : undefined,
-    telegram: oldConfig.telegram
-      ? telegramObj(oldConfig.telegram)
-      : undefined,
-    local: oldConfig.local
-      ? localObj(oldConfig.local)
-      : undefined,
+    strategies: [],
     areaRestrictions: [
       ...oldConfig?.discord?.areaRestrictions || [],
       ...oldConfig?.telegram?.areaRestrictions || [],
@@ -205,7 +203,7 @@ const mergeAuth = async () => {
         enabled: checkEnabled('submissionCells'),
         roles: flattenArray('submissionCells'),
       },
-      invasions: {
+      invasion: {
         enabled: checkEnabled('invasions'),
         roles: flattenArray('invasions'),
       },
@@ -213,7 +211,7 @@ const mergeAuth = async () => {
         enabled: checkEnabled('nests'),
         roles: flattenArray('nests'),
       },
-      scanAreas: {
+      scanArea: {
         enabled: checkEnabled('scanAreas'),
         roles: flattenArray('scanAreas'),
       },
@@ -239,24 +237,37 @@ const mergeAuth = async () => {
       },
     },
   }
-  if (oldConfig?.local?.perms) {
-    oldConfig.local.perms.forEach(perm => {
-      Object.keys(baseAuth.perms).forEach(key => {
-        if (perm.includes(key)) {
-          baseAuth.perms[key].roles.push('local')
+  if (oldConfig?.discord) {
+    baseAuth.strategies.push(discordObj(oldConfig?.discord, 'discord'))
+  }
+  if (oldConfig?.telegram) {
+    baseAuth.strategies.push(telegramObj(oldConfig?.telegram, 'telegram'))
+  }
+  if (oldConfig?.local) {
+    baseAuth.strategies.push(localObj(oldConfig?.local, 'local'))
+    if (oldConfig?.local?.perms) {
+      oldConfig.local.perms.forEach(perm => {
+        if (perm === 's2cells') {
+          baseAuth.perms.scanCell.roles.push('local')
+        } else {
+          Object.keys(baseAuth.perms).forEach(key => {
+            if (perm.includes(key)) {
+              baseAuth.perms[key].roles.push('local')
+            }
+          })
         }
       })
-    })
+    }
   }
   authMethods.forEach(m => {
     if (m.toLowerCase().includes('discord')) {
-      baseAuth[m] = discordObj(oldConfig[m])
+      baseAuth.strategies.push(discordObj(oldConfig[m], m))
     } else if (m.toLowerCase().includes('telegram')) {
-      baseAuth[m] = telegramObj(oldConfig[m])
+      baseAuth.strategies.push(telegramObj(oldConfig[m], m))
     } else if (m.toLowerCase().includes('local')) {
-      baseAuth[m] = localObj(oldConfig[m])
+      baseAuth.strategies.push(localObj(oldConfig[m], m))
     } else {
-      console.warn('Unable to process Auth Method:', m)
+      console.warn('Unable to process Auth Method:', m, 'you will need to manually migrate this!')
     }
   })
   return baseAuth
@@ -327,7 +338,13 @@ const rebuildConfig = async () => ({
       reactMapHandlesPvp: undefined,
       pvpLevels: undefined,
     },
-    schemas: Object.values(oldConfig?.database?.schemas),
+    schemas: Object.values(oldConfig?.database?.schemas).map(s => {
+      if (s.useFor.includes('s2cell')) {
+        const s2cellIndex = s.useFor.indexOf('s2cell')
+        s.useFor[s2cellIndex] = 'scanCell'
+      }
+      return s
+    }),
   },
   webhooks: oldConfig?.webhooks,
   authentication: await mergeAuth(),

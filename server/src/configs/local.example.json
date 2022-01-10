@@ -94,7 +94,7 @@
           "gym",
           "pokemon",
           "pokestop",
-          "s2cell",
+          "scanCell",
           "spawnpoint",
           "weather"
         ]
@@ -118,19 +118,23 @@
     ]
   },
   "authentication": {
-    "discord": {
-      "enabled": false,
-      "logChannelId": "",
-      "presence": "Map Status: Online",
-      "presenceType": 3,
-      "botToken": "",
-      "clientId": "",
-      "clientSecret": "",
-      "redirectUri": "http://localhost:8080/auth/discord/callback",
-      "allowedGuilds": [],
-      "blockedGuilds": [],
-      "allowedUsers": []
-    },
+    "strategies": [
+      {
+        "enabled": false,
+        "type": "discord",
+        "name": "discord",
+        "logChannelId": "",
+        "presence": "Map Status: Online",
+        "presenceType": 3,
+        "botToken": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectUri": "http://localhost:8080/auth/discord/callback",
+        "allowedGuilds": [],
+        "blockedGuilds": [],
+        "allowedUsers": []
+      }
+    ],
     "areaRestrictions": [
       {
         "roles": [],
@@ -187,7 +191,7 @@
         "enabled": true,
         "roles": []
       },
-      "invasions": {
+      "invasion": {
         "enabled": true,
         "roles": []
       },
@@ -195,7 +199,7 @@
         "enabled": true,
         "roles": []
       },
-      "scanAreas": {
+      "scanArea": {
         "enabled": true,
         "roles": []
       },
@@ -221,15 +225,30 @@
   },
   "tileServers": [
     {
-      "name": "AlidadeSmoothDark",
-      "attribution": "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors",
-      "url": "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
+      "name": "auto"
+    },
+    {
+      "name": "Carto",
+      "attribution": "Map tiles by Carto, under CC BY 3.0. Data by  <a href='https://www.openstreetmap.org/'>OpenStreetMap</a>, under ODbL.",
+      "url": "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png",
+      "style": "light"
+    },
+    {
+      "name": "OSM",
+      "attribution": "Map data Â© <a href='https://www.openstreetmap.org'>OpenStreetMap</a> contributors",
+      "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "style": "light"
+    },
+    {
+      "name": "Dark Matter",
+      "attribution": "Â© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors Â© <a href='https://carto.com/attributions'>CARTO</a>",
+      "url": "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       "style": "dark"
     },
     {
-      "name": "ThunderForest",
-      "attribution": "&copy; <a href='http://www.thunderforest.com/'>Thunderforest</a>, &copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
-      "url": "https://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png",
+      "name": "Satellite",
+      "attribution": "&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+      "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       "style": "dark"
     }
   ],
