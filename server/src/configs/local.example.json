@@ -2,55 +2,85 @@
   "interface": "0.0.0.0",
   "port": 8080,
   "api": {
-    "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
+    "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Zx",
     "reactMapSecret": "You Should Change Me",
     "maxSessions": 5,
     "queryAvailable": {
       "pokemon": true,
-      "quests": true,
-      "raids": true,
-      "nests": false
+      "quest": true,
+      "raid": true,
+      "nest": false
+    },
+    "pvp": {
+      "leagues": [
+        {
+          "name": "great",
+          "cp": 1500
+        },
+        {
+          "name": "ultra",
+          "cp": 2500
+        }
+      ],
+      "levels": [
+        50,
+        51
+      ],
+      "reactMapHandlesPvp": false
     }
   },
   "map": {
-    "title": "ReactMap",
-    "headerTitle": "ReactMap",
-    "nestHemisphere": "north",
-    "style": "dark",
-    "enableFeedback": true,
-    "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
-    "enableStats": true,
-    "statsLink": "https://rdmopole2link.net",
-    "startLat": 0,
-    "startLon": 0,
-    "startZoom": 12,
-    "minZoom": 10,
-    "maxZoom": 18,
-    "enableQuestSetSelector": true
+    "general": {
+      "title": "ReactMap",
+      "headerTitle": "ReactMap",
+      "startLat": 0,
+      "startLon": 0,
+      "startZoom": 12,
+      "minZoom": 10,
+      "maxZoom": 18
+    },
+    "links": {
+      "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
+      "statsLink": "https://rdmopole2link.net"
+    },
+    "misc": {
+      "enableQuestSetSelector": true
+    },
+    "clustering": {}
   },
   "clientSideOptions": {
     "pokemon": {
       "clustering": true,
       "glow": [
-        { "name": "Hundo", "perm": "iv", "num": 100, "value": "#ff1744", "op": "=" },
-        { "name": "Top 3 Ranks", "perm": "pvp", "num": 3, "value": "#0000ff", "op": "<=" },
-        { "name": "Multiple", "perm": "pvp", "value": "#800080" }
+        {
+          "name": "Hundo",
+          "perm": "iv",
+          "num": 100,
+          "value": "#ff1744",
+          "op": "="
+        },
+        {
+          "name": "Top 3 Ranks",
+          "perm": "pvp",
+          "num": 3,
+          "value": "#0000ff",
+          "op": "<="
+        },
+        {
+          "name": "Multiple",
+          "perm": "pvp",
+          "value": "#800080"
+        }
       ]
     }
   },
   "database": {
     "settings": {
       "userTableName": "users",
-      "sessionTableName": "session",
-      "leagues": [
-        { "name": "great", "cp": 1500 },
-        { "name": "ultra", "cp": 2500 }
-      ],
-      "reactMapHandlesPvp": false,
-      "pvpLevels": [50, 51]
+      "sessionTableName": "session"
     },
-    "schemas": {
-      "scanner": {
+    "schemas": [
+      {
         "type": "rdm/chuck/cdc/mad/manual",
         "host": "127.0.0.1",
         "port": 3306,
@@ -59,9 +89,17 @@
         "database": "rdmdb",
         "charset": "utf8mb4",
         "arScanColumn": false,
-        "useFor": ["device", "gym", "pokemon", "pokestop", "s2cell", "spawnpoint", "weather"]
+        "useFor": [
+          "device",
+          "gym",
+          "pokemon",
+          "pokestop",
+          "s2cell",
+          "spawnpoint",
+          "weather"
+        ]
       },
-      "manual": {
+      {
         "type": "manual",
         "host": "127.0.0.1",
         "port": 3306,
@@ -70,24 +108,29 @@
         "database": "manual_1",
         "charset": "utf8mb4",
         "arScanColumn": false,
-        "useFor": ["session", "user", "nest", "portal"]
+        "useFor": [
+          "session",
+          "user",
+          "nest",
+          "portal"
+        ]
       }
-    }
+    ]
   },
-  "alwaysEnabledPerms": [],
-  "discord": {
-    "enabled": false,
-    "logChannelId": "",
-    "presence": "Map Status: Online",
-    "presenceType": 3,
-    "botToken": "",
-    "clientId": "",
-    "clientSecret": "",
-    "redirectUri": "http://localhost:8080/auth/discord/callback",
-    "inviteLink": "",
-    "allowedGuilds": [],
-    "blockedGuilds": [],
-    "allowedUsers": [],
+  "authentication": {
+    "discord": {
+      "enabled": false,
+      "logChannelId": "",
+      "presence": "Map Status: Online",
+      "presenceType": 3,
+      "botToken": "",
+      "clientId": "",
+      "clientSecret": "",
+      "redirectUri": "http://localhost:8080/auth/discord/callback",
+      "allowedGuilds": [],
+      "blockedGuilds": [],
+      "allowedUsers": []
+    },
     "areaRestrictions": [
       {
         "roles": [],
@@ -98,16 +141,13 @@
         "areas": []
       }
     ],
+    "alwaysEnabledPerms": [],
     "perms": {
       "map": {
         "enabled": true,
         "roles": []
       },
       "pokemon": {
-        "enabled": true,
-        "roles": []
-      },
-      "stats": {
         "enabled": true,
         "roles": []
       },
@@ -119,31 +159,31 @@
         "enabled": true,
         "roles": []
       },
-      "gyms": {
+      "gym": {
         "enabled": true,
         "roles": []
       },
-      "raids": {
+      "raid": {
         "enabled": true,
         "roles": []
       },
-      "pokestops": {
+      "pokestop": {
         "enabled": true,
         "roles": []
       },
-      "quests": {
+      "quest": {
         "enabled": true,
         "roles": []
       },
-      "lures": {
+      "lure": {
         "enabled": true,
         "roles": []
       },
-      "portals": {
+      "portal": {
         "enabled": true,
         "roles": []
       },
-      "submissionCells": {
+      "submissionCell": {
         "enabled": true,
         "roles": []
       },
@@ -151,7 +191,7 @@
         "enabled": true,
         "roles": []
       },
-      "nests": {
+      "nest": {
         "enabled": true,
         "roles": []
       },
@@ -163,32 +203,36 @@
         "enabled": true,
         "roles": []
       },
-      "spawnpoints": {
+      "spawnpoint": {
         "enabled": true,
         "roles": []
       },
-      "s2cells": {
+      "scanCell": {
+        "roles": []
+      },
+      "device": {
         "enabled": true,
         "roles": []
       },
-      "devices": {
-        "enabled": true,
+      "donor": {
         "roles": []
       }
     }
   },
-  "tileServers": {
-    "AlidadeSmoothDark": {
+  "tileServers": [
+    {
+      "name": "AlidadeSmoothDark",
       "attribution": "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors",
       "url": "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
       "style": "dark"
     },
-    "ThunderForest": {
+    {
+      "name": "ThunderForest",
       "attribution": "&copy; <a href='http://www.thunderforest.com/'>Thunderforest</a>, &copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
       "url": "https://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png",
       "style": "dark"
     }
-  },
+  ],
   "icons": {
     "Read_More_Here": "https://github.com/WatWowMap/ReactMap/wiki/Icons-Configuration",
     "customizable": [
@@ -250,15 +294,19 @@
       }
     ]
   },
-  "manualAreas": {
-    "New York": {
+  "manualAreas": [
+    {
+      "name": "New York",
       "lat": 40.7481666,
       "lon": -74.0174788
     },
-    "San Francisco": {
+    {
+      "name": "San Francisco",
       "lat": 37.79539194255634,
       "lon": -122.39333173075096
     },
-    "Remove these if you'd prefer the map to read directly from your Geojson": ""
-  }
+    {
+      "name": "Remove all of these if you'd prefer the map to read directly from your Geojson"
+    }
+  ]
 }

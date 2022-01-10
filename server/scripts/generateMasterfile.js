@@ -2,11 +2,11 @@
 /* eslint-disable no-restricted-syntax */
 const fs = require('fs')
 
-const fetchJson = require('./api/fetchJson')
-const defaultRarity = require('../data/defaultRarity.json')
+const fetchJson = require('../src/services/api/fetchJson')
+const defaultRarity = require('../src/data/defaultRarity.json')
 
 const getRarityLevel = (id, pkmn) => {
-  const adminRarity = fs.existsSync('../configs/config.json')
+  const adminRarity = fs.existsSync('server/src/configs/config.json')
     ? JSON.parse(fs.readFileSync('server/src/configs/config.json', 'utf8'))
     : JSON.parse(fs.readFileSync('server/src/configs/default.json', 'utf8'))
   let rarity

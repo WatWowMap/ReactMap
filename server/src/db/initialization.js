@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 const Knex = require('knex')
-const { database: { schemas: { scanner, manual } } } = require('../configs/config.example.json')
+const { database: { schemas: { scanner, manual } } } = require('../configs/local.example.json')
 const { database: { schemas, settings }, devOptions: { queryDebug } } = require('../services/config')
 const models = require('../models/index')
 
