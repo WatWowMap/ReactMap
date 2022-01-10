@@ -264,12 +264,12 @@
         "sta_iv": [
           0,
           15
+        ],
+        "pvp": [
+          1,
+          10  
         ]
-      },
-      "pvpValues": [
-        1,
-        10
-      ]
+      }
     },
     "portal": {
       "enabled": false

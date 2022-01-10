@@ -323,7 +323,14 @@ const rebuildConfig = async () => ({
     gym: oldConfig?.defaultFilters?.gyms,
     nest: oldConfig?.defaultFilters?.nests,
     pokestop: oldConfig?.defaultFilters?.pokestops,
-    pokemon: oldConfig?.defaultFilters?.pokemon,
+    pokemon: {
+      ...oldConfig?.defaultFilters?.pokemon,
+      globalValues: {
+        ...oldConfig?.defaultFilters?.pokemon?.globalValues,
+        pvp: oldConfig?.defaultFilters?.pokemon?.pvpValues,
+      },
+      pvpValues: undefined,
+    },
     portal: oldConfig?.defaultFilters?.portals,
     scanArea: oldConfig?.defaultFilters?.scanAreas,
     scanCell: oldConfig?.defaultFilters?.scanCells,
