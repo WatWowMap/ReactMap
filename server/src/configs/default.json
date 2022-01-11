@@ -22,8 +22,20 @@
       "nest": false
     },
     "pvp": {
-      "leagues": [],
-      "levels": [],
+      "leagues": [
+        {
+          "name": "great",
+          "cp": 1500
+        },
+        {
+          "name": "ultra",
+          "cp": 2500
+        }
+      ],
+      "levels": [
+        50,
+        51
+      ],
       "reactMapHandlesPvp": false,
       "minCp": {
         "great": 1400,
