@@ -254,7 +254,7 @@ rootRouter.get('/settings', async (req, res) => {
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .filter(area => area.userSelectable !== false)
                       .map(area => area.name),
-                    templates: config.webhookObj[webhook.name].client.templates[strategy],
+                    templates: config.webhookObj[webhook.name].client.templates[webhookStrategy || strategy],
                   }
               }
             }

@@ -52,7 +52,7 @@ const authHandler = async (req, username, password, done) => {
         if (bcrypt.compareSync(password, userExists.password)) {
           ['discordPerms', 'telegramPerms'].forEach((permSet) => {
             if (userExists[permSet]) {
-              user.perms = Utility.mergePerms(user.perms, JSON.parse(userExists[permSet]))
+              user.perms = Utility.mergePerms(user.perms, userExists[permSet])
             }
           })
           if (userExists.strategy !== 'local') {
