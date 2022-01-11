@@ -6,10 +6,7 @@
 const requireFromString = require('require-from-string')
 const masterfile = require('../data/masterfile.json')
 const {
-  api: { pvpMinCp },
-  database: {
-    settings: { reactMapHandlesPvp },
-  },
+  api: { pvp: { minCp: pvpMinCp, reactMapHandlesPvp } },
 } = require('./config')
 
 const jsifyIvFilter = (filter) => {
@@ -251,7 +248,7 @@ const getLegacy = (results, args, perms, ohbem) => {
           result.seen_type = 'encounter'
         }
       }
-      if (perms.iv || perms.stats) {
+      if (perms.iv) {
         filtered.atk_iv = result.atk_iv
         filtered.def_iv = result.def_iv
         filtered.sta_iv = result.sta_iv
@@ -324,7 +321,7 @@ const getLegacy = (results, args, perms, ohbem) => {
       filtered.cellId = result.cell_id
       filtered.expire_timestamp_verified = result.expire_timestamp_verified
       filtered.display_pokemon_id = result.display_pokemon_id
-      if (perms.iv || perms.stats) {
+      if (perms.iv) {
         filtered.move_1 = result.move_1
         filtered.move_2 = result.move_2
         filtered.weight = result.weight

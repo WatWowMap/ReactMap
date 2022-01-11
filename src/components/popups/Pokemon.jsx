@@ -26,7 +26,7 @@ export default function PokemonPopup({
   } = pokemon
   const { perms } = useStatic(state => state.auth)
   const pokePerms = isTutorial ? {
-    pvp: true, stats: true, iv: true,
+    pvp: true, iv: true,
   } : perms
   const { pokemon: { [pokemon_id]: metaData } } = useStatic(state => state.masterfile)
   const popups = useStore(state => state.popups)
@@ -258,7 +258,7 @@ const Stats = ({ pokemon, perms, t }) => {
   return (
     <Grid
       item
-      xs={(perms.iv || perms.stats) ? 8 : 1}
+      xs={perms.iv ? 8 : 1}
       container
       direction="column"
       justifyContent="space-around"
@@ -271,14 +271,14 @@ const Stats = ({ pokemon, perms, t }) => {
           </Typography>
         </Grid>
       )}
-      {(perms.stats && atk_iv !== null) && (
+      {(perms.iv && atk_iv !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {atk_iv} | {def_iv} | {sta_iv} {inactive_stats ? '*' : ''}
           </Typography>
         </Grid>
       )}
-      {(perms.stats && level !== null) && (
+      {(perms.iv && level !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {t('cp')} {cp} | {t('abbreviation_level')}{level}
@@ -298,9 +298,9 @@ const Info = ({
   return (
     <Grid
       item
-      xs={(perms.iv || perms.stats) ? 3 : 11}
+      xs={(perms.iv) ? 3 : 11}
       container
-      direction={(perms.iv || perms.stats) ? 'column' : 'row'}
+      direction={(perms.iv) ? 'column' : 'row'}
       justifyContent="space-around"
       alignItems="center"
     >

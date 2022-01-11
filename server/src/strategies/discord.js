@@ -6,7 +6,10 @@ const path = require('path')
 
 // if writing a custom strategy, rename 'discord' below to your strategy name
 // this will automatically grab all of its unique values in the config
-const { map: { forceTutorial }, discord: strategyConfig } = require('../services/config')
+const {
+  map: { forceTutorial },
+  authentication: { discord: strategyConfig, perms },
+} = require('../services/config')
 const { User } = require('../models/index')
 const DiscordMapClient = require('../services/DiscordClient')
 const logUserAuth = require('../services/logUserAuth')
@@ -26,7 +29,7 @@ client.on('ready', () => {
 
 client.login(strategyConfig.botToken)
 
-const MapClient = new DiscordMapClient(client, strategyConfig)
+const MapClient = new DiscordMapClient(client, { ...strategyConfig, perms })
 
 const authHandler = async (req, accessToken, refreshToken, profile, done) => {
   if (!req.query.code) {

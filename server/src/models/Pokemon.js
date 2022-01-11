@@ -4,15 +4,12 @@ const Ohbem = require('ohbem')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const legacyFilter = require('../services/legacyFilter')
 const {
-  api: { pvpMinCp },
-  database: {
-    settings: { leagues, reactMapHandlesPvp, pvpLevels },
-  },
+  api: { pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, levels } },
 } = require('../services/config')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 
-const dbType = dbSelection('pokemon')
+const { type: dbType } = dbSelection('pokemon')
 const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
 const ivCalc = 'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
 const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', ...leagues.map(league => league.name)]
@@ -58,13 +55,13 @@ const getMadSql = q => (
     ])
 )
 
-class Pokemon extends Model {
+module.exports = class Pokemon extends Model {
   static get tableName() {
     return 'pokemon'
   }
 
   static get idColumn() {
-    return dbSelection('pokemon') === 'mad'
+    return dbSelection('pokemon').type === 'mad'
       ? 'encounter_id' : 'id'
   }
 
@@ -77,14 +74,14 @@ class Pokemon extends Model {
     ohbem = new Ohbem({
       leagues: leagueObj,
       pokemonData: await Ohbem.fetchPokemonData(),
-      levelCaps: pvpLevels,
+      levelCaps: levels,
       cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
     })
   }
 
   static async getPokemon(args, perms, isMad) {
     const {
-      stats, iv: ivs, pvp, areaRestrictions,
+      iv: ivs, pvp, areaRestrictions,
     } = perms
     const {
       onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyLinkGlobal, ts,
@@ -93,7 +90,7 @@ class Pokemon extends Model {
     const safeTs = ts || Math.floor((new Date()).getTime() / 1000)
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
-    if (!ivs && !stats && !pvp) {
+    if (!ivs && !pvp) {
       const noPokemonSelect = Object.keys(args.filters).find(x => x.charAt(0) !== 'o')
       if (!noPokemonSelect) return []
     }
@@ -184,15 +181,12 @@ class Pokemon extends Model {
                 queryBase.whereNull('pokemon_id')
               }
             } break
-          case 'iv':
-            if (ivs) {
-              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
-            } break
           case 'level':
           case 'atk_iv':
           case 'def_iv':
           case 'sta_iv':
-            if (stats) {
+          case 'iv':
+            if (ivs) {
               queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
             } break
         }
@@ -236,7 +230,7 @@ class Pokemon extends Model {
                 generateSql(poke, filter, relevantFilters, true)
               }
             })
-          } else if (pkmn === 'onlyIvOr' && (ivs || stats || pvp)) {
+          } else if (pkmn === 'onlyIvOr' && (ivs || pvp)) {
             const relevantFilters = getRelevantKeys(filter)
             if (relevantFilters.length > 0) {
               generateSql(ivOr, filter, relevantFilters)
@@ -397,5 +391,3 @@ class Pokemon extends Model {
     return results.map(pkmn => `${pkmn.pokemon_id}-${pkmn.form}`)
   }
 }
-
-module.exports = Pokemon

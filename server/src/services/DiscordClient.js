@@ -6,7 +6,7 @@
 /* eslint-disable import/no-dynamic-require */
 /* global BigInt */
 const fs = require('fs')
-const { alwaysEnabledPerms, webhooks } = require('./config')
+const { authentication: { alwaysEnabledPerms }, webhooks } = require('./config')
 const Utility = require('./Utility')
 
 module.exports = class DiscordMapClient {

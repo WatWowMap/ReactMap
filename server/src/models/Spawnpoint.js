@@ -2,14 +2,14 @@ const { Model, raw } = require('objection')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 
-class Spawnpoint extends Model {
+module.exports = class Spawnpoint extends Model {
   static get tableName() {
-    return dbSelection('spawnpoint') === 'mad'
+    return dbSelection('spawnpoint').type === 'mad'
       ? 'trs_spawn' : 'spawnpoint'
   }
 
   static get idColumn() {
-    return dbSelection('spawnpoint') === 'mad'
+    return dbSelection('spawnpoint').type === 'mad'
       ? 'spawnpoint' : 'id'
   }
 
@@ -35,5 +35,3 @@ class Spawnpoint extends Model {
     return query
   }
 }
-
-module.exports = Spawnpoint

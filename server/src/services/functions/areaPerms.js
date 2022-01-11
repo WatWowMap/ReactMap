@@ -1,11 +1,11 @@
 const areas = require('../areas')
 const config = require('../config')
 
-module.exports = function areaPerms(roles, provider) {
+module.exports = function areaPerms(roles) {
   let perms = []
   if (Object.keys(areas.names).length) {
     roles.forEach(group => {
-      config[provider].areaRestrictions.forEach(rule => {
+      config.authentication.areaRestrictions.forEach(rule => {
         if (rule.roles.includes(group)) {
           if (rule.areas.length) {
             rule.areas.forEach(areaName => {

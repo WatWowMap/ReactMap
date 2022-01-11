@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 const express = require('express')
-const fs = require('fs')
 const { default: center } = require('@turf/center')
 
 const authRouter = require('./authRouter')
@@ -30,18 +29,18 @@ rootRouter.get('/logout', (req, res) => {
 rootRouter.get('/area/:area/:zoom?', (req, res) => {
   const { area, zoom } = req.params
   try {
-    const scanAreas = fs.existsSync('server/src/configs/areas.json')
-      // eslint-disable-next-line global-require
-      ? require('../configs/areas.json')
-      : { features: [] }
+    const { scanAreas, manualAreas } = config
     if (scanAreas.features.length) {
       const foundArea = scanAreas.features.find(a => a.properties.name.toLowerCase() === area.toLowerCase())
       if (foundArea) {
         const [lon, lat] = center(foundArea).geometry.coordinates
-        res.redirect(`/@/${lat}/${lon}/${zoom || 15}`)
-      } else {
-        res.redirect('/404')
+        return res.redirect(`/@/${lat}/${lon}/${zoom || 18}`)
       }
+      if (manualAreas.length) {
+        const { lat, lon } = manualAreas.find(a => a.name.toLowerCase() === area.toLowerCase())
+        return res.redirect(`/@/${lat}/${lon}/${zoom || 18}`)
+      }
+      return res.redirect('/404')
     }
   } catch (e) {
     console.error(`Error navigating to ${area}`, e.message)
@@ -51,13 +50,13 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 
 rootRouter.get('/settings', async (req, res) => {
   try {
-    if (!config.authMethods.length || config.alwaysEnabledPerms.length) {
+    if (!config.authMethods.length || config.authentication.alwaysEnabledPerms.length) {
       req.session.perms = { areaRestrictions: [], webhooks: [] }
       req.session.save()
     }
-    if (config.alwaysEnabledPerms.length) {
-      config.alwaysEnabledPerms.forEach(perm => {
-        if (config.discord.perms[perm]) {
+    if (config.authentication.alwaysEnabledPerms.length) {
+      config.authentication.alwaysEnabledPerms.forEach(perm => {
+        if (config.authentication.perms[perm]) {
           req.session.perms[perm] = true
         } else {
           console.warn('Invalid Perm in "alwaysEnabledPerms" array:', perm)
@@ -94,12 +93,12 @@ rootRouter.get('/settings', async (req, res) => {
       config: {
         map: {
           ...config.map,
-          ...config.multiDomains[req.headers.host],
-          excludeList: config.excludeFromTutorial,
+          ...config.multiDomainsObj[req.headers.host],
+          excludeList: config.authentication.excludeFromTutorial,
         },
-        localeSelection: Object.fromEntries(config.localeSelection.map(locale => [locale, { name: locale }])),
-        tileServers: { auto: {}, ...config.tileServers },
-        navigation: config.navigation,
+        localeSelection: Object.fromEntries(config.map.localeSelection.map(l => [l, { name: l }])),
+        tileServers: Object.fromEntries(config.tileServers.map(s => [s.name, s])),
+        navigation: Object.fromEntries(config.navigation.map(n => [n.name, n])),
         drawer: {
           temporary: {},
           persistent: {},
@@ -111,6 +110,12 @@ rootRouter.get('/settings', async (req, res) => {
         manualAreas: config.manualAreas || {},
         icons: config.icons,
       },
+      available: {
+        pokemon: [],
+        pokestops: [],
+        gyms: [],
+        nests: [],
+      },
     }
 
     // add user options here from the config that are structured as objects
@@ -121,32 +126,29 @@ rootRouter.get('/settings', async (req, res) => {
       const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons']
 
       Object.keys(serverSettings.config).forEach(setting => {
-        if (!ignoreKeys.includes(setting)) {
-          const category = serverSettings.config[setting]
-          Object.keys(category).forEach(option => {
-            category[option].name = option
-          })
-          if (config.map[setting] && typeof config.map[setting] !== 'object') {
-            serverSettings.settings[setting] = config.map[setting]
-          } else {
-            serverSettings.settings[setting] = category[Object.keys(category)[0]].name
+        try {
+          if (!ignoreKeys.includes(setting)) {
+            const category = serverSettings.config[setting]
+            Object.keys(category).forEach(option => {
+              category[option].name = option
+            })
+            if (config.map[setting] && typeof config.map[setting] !== 'object') {
+              serverSettings.settings[setting] = config.map[setting]
+            } else {
+              serverSettings.settings[setting] = category[Object.keys(category)[0]].name
+            }
           }
+        } catch (e) {
+          console.warn(`Error setting ${setting}, most likely means there are no options set in the config`, e.message)
         }
       })
 
       serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
 
-      serverSettings.available = {
-        pokemon: [],
-        pokestops: [],
-        gyms: [],
-        nests: [],
-      }
-
       try {
         if (serverSettings.user.perms.pokemon) {
           serverSettings.available.pokemon = config.api.queryAvailable.pokemon
-            ? await Pokemon.getAvailablePokemon(Utility.dbSelection('pokemon') === 'mad')
+            ? await Pokemon.getAvailablePokemon(Utility.dbSelection('pokemon').type === 'mad')
             : []
         }
       } catch (e) {
@@ -155,7 +157,7 @@ rootRouter.get('/settings', async (req, res) => {
       try {
         if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
           serverSettings.available.gyms = config.api.queryAvailable.raids
-            ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym') === 'mad')
+            ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym').type === 'mad')
             : await Fetch.fetchRaids()
         }
       } catch (e) {
@@ -167,7 +169,7 @@ rootRouter.get('/settings', async (req, res) => {
           || serverSettings.user.perms.invasions
           || serverSettings.user.perms.lures) {
           serverSettings.available.pokestops = config.api.queryAvailable.quests
-            ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop') === 'mad')
+            ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop').type === 'mad')
             : await Fetch.fetchQuests()
         }
       } catch (e) {

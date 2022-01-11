@@ -2,10 +2,10 @@
 const fs = require('fs')
 const oldConfig = require('../src/configs/config.json')
 
-const convertObjToArr = (obj) => Object.entries(obj).map(([k, v]) => ({
+const convertObjToArr = (obj) => obj ? Object.entries(obj).map(([k, v]) => ({
   name: k,
   ...v,
-}))
+})) : undefined
 
 const convertMapObject = (obj) => ({
   general: {
@@ -50,11 +50,11 @@ const convertMapObject = (obj) => ({
   },
   theme: obj?.theme,
   clustering: {
-    gym: {
+    gyms: {
       zoomLevel: obj?.clusterZoomLevels?.gyms,
       forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
     },
-    pokestop: {
+    pokestops: {
       zoomLevel: obj?.clusterZoomLevels?.pokestops,
       forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
     },
@@ -62,11 +62,11 @@ const convertMapObject = (obj) => ({
       zoomLevel: obj?.clusterZoomLevels?.pokemon,
       forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
     },
-    portal: {
+    portals: {
       zoomLevel: obj?.clusterZoomLevels?.portals,
       forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
     },
-    spawnpoint: {
+    spawnpoints: {
       zoomLevel: obj?.clusterZoomLevels?.spawnpoints,
       forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
     },
@@ -101,7 +101,7 @@ const ensureMotd = (obj) => {
 }
 
 const mergeAuth = async () => {
-  let authMethods = await fs.promises.readdir('server/src/strategies')
+  let authMethods = await fs.promises.readdir(`${__dirname}/../src/strategies`)
     .then(files => files
       .filter(file => file !== 'local.js' && file !== 'discord.js' && file !== 'telegram.js'))
   if (authMethods?.length) {
@@ -175,43 +175,43 @@ const mergeAuth = async () => {
         enabled: checkEnabled('pvp'),
         roles: flattenArray('pvp'),
       },
-      gym: {
+      gyms: {
         enabled: checkEnabled('gyms'),
         roles: flattenArray('gyms'),
       },
-      raid: {
+      raids: {
         enabled: checkEnabled('raids'),
         roles: flattenArray('raids'),
       },
-      pokestop: {
+      pokestops: {
         enabled: checkEnabled('pokestops'),
         roles: flattenArray('pokestops'),
       },
-      quest: {
+      quests: {
         enabled: checkEnabled('quests'),
         roles: flattenArray('quests'),
       },
-      lure: {
+      lures: {
         enabled: checkEnabled('lures'),
         roles: flattenArray('lures'),
       },
-      portal: {
+      portals: {
         enabled: checkEnabled('portals'),
         roles: flattenArray('portals'),
       },
-      submissionCell: {
+      submissionCells: {
         enabled: checkEnabled('submissionCells'),
         roles: flattenArray('submissionCells'),
       },
-      invasion: {
+      invasions: {
         enabled: checkEnabled('invasions'),
         roles: flattenArray('invasions'),
       },
-      nest: {
+      nests: {
         enabled: checkEnabled('nests'),
         roles: flattenArray('nests'),
       },
-      scanArea: {
+      scanAreas: {
         enabled: checkEnabled('scanAreas'),
         roles: flattenArray('scanAreas'),
       },
@@ -219,15 +219,15 @@ const mergeAuth = async () => {
         enabled: checkEnabled('weather'),
         roles: flattenArray('weather'),
       },
-      spawnpoint: {
+      spawnpoints: {
         enabled: checkEnabled('spawnpoints'),
         roles: flattenArray('spawnpoints'),
       },
-      scanCell: {
+      scanCells: {
         enabled: checkEnabled('scanCells'),
         roles: flattenArray('s2cells'),
       },
-      device: {
+      devices: {
         enabled: checkEnabled('devices'),
         roles: flattenArray('devices'),
       },
@@ -278,29 +278,15 @@ const rebuildConfig = async () => ({
   port: oldConfig?.port,
   devOptions: oldConfig?.devOptions,
   api: {
+    ...oldConfig?.api,
+    pvpMinCp: undefined,
     sessionSecret: `${oldConfig?.api?.sessionSecret}x`,
-    reactMapSecret: oldConfig?.api?.reactMapSecret,
-    maxSessions: oldConfig?.api?.maxSessions,
-    rateLimit: oldConfig?.api?.rateLimit,
-    portalUpdateLimit: oldConfig?.api?.portalUpdateLimit,
-    weatherCellLimit: oldConfig?.api?.weatherCellLimit,
-    searchResultLimit: oldConfig?.api?.searchResultLimit,
-    nestHemisphere: oldConfig?.api?.nestHemisphere,
-    queryAvailable: oldConfig?.api?.queryAvailable
-      ? {
-        pokemon: oldConfig?.api?.queryAvailable?.pokemon,
-        quest: oldConfig?.api?.queryAvailable?.quests,
-        raid: oldConfig?.api?.queryAvailable?.raids,
-        nest: oldConfig?.api?.queryAvailable?.nests,
-      }
-      : undefined,
     pvp: {
       leagues: oldConfig?.database?.settings?.leagues,
       levels: oldConfig?.database?.settings?.pvpLevels,
       reactMapHandlesPvp: oldConfig?.database?.settings?.reactMapHandlesPvp,
       minCp: {
-        great: oldConfig?.api?.pvpMinCp?.great,
-        ultra: oldConfig?.api?.pvpMinCp?.ultra,
+        ...oldConfig?.api?.pvpMinCp,
       },
     },
   },
@@ -311,18 +297,9 @@ const rebuildConfig = async () => ({
     }))
     : undefined,
   map: convertMapObject(oldConfig?.map),
-  clientSideOptions: oldConfig?.clientSideOptions ? {
-    admin: oldConfig.clientSideOptions.admin,
-    gym: oldConfig.clientSideOptions.gyms,
-    pokestop: oldConfig.clientSideOptions.pokestops,
-    pokemon: oldConfig.clientSideOptions.pokemon,
-    wayfarer: oldConfig.clientSideOptions.wayfarer,
-  } : undefined,
+  clientSideOptions: oldConfig?.clientSideOptions,
   defaultFilters: oldConfig?.defaultFilters ? {
-    device: oldConfig?.defaultFilters?.devices,
-    gym: oldConfig?.defaultFilters?.gyms,
-    nest: oldConfig?.defaultFilters?.nests,
-    pokestop: oldConfig?.defaultFilters?.pokestops,
+    ...oldConfig?.defaultFilters,
     pokemon: {
       ...oldConfig?.defaultFilters?.pokemon,
       globalValues: {
@@ -331,12 +308,6 @@ const rebuildConfig = async () => ({
       },
       pvpValues: undefined,
     },
-    portal: oldConfig?.defaultFilters?.portals,
-    scanArea: oldConfig?.defaultFilters?.scanAreas,
-    scanCell: oldConfig?.defaultFilters?.scanCells,
-    spawnpoint: oldConfig?.defaultFilters?.spawnpoints,
-    submissionCell: oldConfig?.defaultFilters?.submissionCells,
-    weather: oldConfig?.defaultFilters?.weather,
   } : undefined,
   database: {
     settings: {
@@ -355,17 +326,11 @@ const rebuildConfig = async () => ({
   },
   webhooks: oldConfig?.webhooks,
   authentication: await mergeAuth(),
-  tileServers: oldConfig?.tileServers
-    ? convertObjToArr(oldConfig?.tileServers)
-    : undefined,
-  navigation: oldConfig?.navigation
-    ? convertObjToArr(oldConfig?.navigation)
-    : undefined,
+  tileServers: convertObjToArr(oldConfig?.tileServers),
+  navigation: convertObjToArr(oldConfig?.navigation),
   icons: oldConfig?.icons,
   rarity: oldConfig?.rarity,
-  manualAreas: oldConfig?.manualAreas
-    ? convertObjToArr(oldConfig?.manualAreas)
-    : undefined,
+  manualAreas: convertObjToArr(oldConfig?.manualAreas),
 })
 
 const cleanConfig = (obj, round) => {
@@ -392,7 +357,7 @@ const migrator = async () => {
   cleanConfig(config, '(1)')
   cleanConfig(config, '(2)')
   fs.writeFileSync(
-    'server/src/configs/local.json',
+    `${__dirname}/../src/configs/local.json`,
     JSON.stringify(config, null, 2),
     'utf8',
     () => { },

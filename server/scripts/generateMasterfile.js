@@ -6,12 +6,12 @@ const fetchJson = require('../src/services/api/fetchJson')
 const defaultRarity = require('../src/data/defaultRarity.json')
 
 const getRarityLevel = (id, pkmn) => {
-  const adminRarity = fs.existsSync('server/src/configs/config.json')
-    ? JSON.parse(fs.readFileSync('server/src/configs/config.json', 'utf8'))
-    : JSON.parse(fs.readFileSync('server/src/configs/default.json', 'utf8'))
+  const adminRarity = fs.existsSync(`${__dirname}/../src/configs/local.json`)
+    ? JSON.parse(fs.readFileSync(`${__dirname}/../src/configs/local.json`, 'utf8'))
+    : JSON.parse(fs.readFileSync(`${__dirname}/../src/configs/default.json`, 'utf8'))
   let rarity
   for (const [tier, pokemon] of Object.entries(defaultRarity)) {
-    if (adminRarity.rarity[tier].length > 0) {
+    if (adminRarity?.rarity?.[tier]?.length) {
       if (adminRarity.rarity[tier].includes((parseInt(id)))) {
         rarity = tier
       }
@@ -36,13 +36,13 @@ const generate = async () => {
     })
 
     fs.writeFile(
-      'server/src/data/masterfile.json',
+      `${__dirname}/../src/data/masterfile.json`,
       JSON.stringify(masterfile, null, 2),
       'utf8',
       () => { },
     )
   } catch (e) {
-    console.warn('Unable to generate new masterfile, using existing.')
+    console.warn('Unable to generate new masterfile, using existing.', e)
   }
 }
 

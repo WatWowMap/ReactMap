@@ -10,12 +10,12 @@ import Webhook from './layout/dialogs/webhooks/Webhook'
 
 const userSettingsCategory = category => {
   switch (category) {
-    default: return category
     case 'devices':
     case 'spawnpoints':
-    case 's2cells': return 'admin'
+    case 'scanCells': return 'admin'
     case 'submissionCells':
     case 'portals': return 'wayfarer'
+    default: return category
   }
 }
 
@@ -156,7 +156,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
                   userSettings={userSettings[userSettingsCategory(category)] || {}}
                   filters={filters[category]}
                   tileStyle={tileServer.style}
-                  clusterZoomLvl={config.clusterZoomLevels[category]}
+                  clusteringRules={config.clustering[category] || { zoomLimit: config.minZoom, forcedLimit: 10000 }}
                   staticUserSettings={staticUserSettings[category]}
                   params={manualParams}
                   setParams={setManualParams}
