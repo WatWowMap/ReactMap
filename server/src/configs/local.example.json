@@ -161,43 +161,43 @@
         "enabled": true,
         "roles": []
       },
-      "gym": {
+      "gyms": {
         "enabled": true,
         "roles": []
       },
-      "raid": {
+      "raids": {
         "enabled": true,
         "roles": []
       },
-      "pokestop": {
+      "pokestops": {
         "enabled": true,
         "roles": []
       },
-      "quest": {
+      "quests": {
         "enabled": true,
         "roles": []
       },
-      "lure": {
+      "lures": {
         "enabled": true,
         "roles": []
       },
-      "portal": {
+      "portals": {
         "enabled": true,
         "roles": []
       },
-      "submissionCell": {
+      "submissionCells": {
         "enabled": true,
         "roles": []
       },
-      "invasion": {
+      "invasions": {
         "enabled": true,
         "roles": []
       },
-      "nest": {
+      "nests": {
         "enabled": true,
         "roles": []
       },
-      "scanArea": {
+      "scanAreas": {
         "enabled": true,
         "roles": []
       },
@@ -205,14 +205,14 @@
         "enabled": true,
         "roles": []
       },
-      "spawnpoint": {
+      "spawnpoints": {
         "enabled": true,
         "roles": []
       },
-      "scanCell": {
+      "scanCells": {
         "roles": []
       },
-      "device": {
+      "devices": {
         "enabled": true,
         "roles": []
       },
