@@ -360,6 +360,12 @@ const migrator = async () => {
   const config = await rebuildConfig()
   cleanConfig(config, '(1)')
   cleanConfig(config, '(2)')
+  if (config?.tileServers?.length === 0) {
+    delete config.tileServers
+  }
+  if (config?.navigation?.length === 0) {
+    delete config.navigation
+  }
   fs.writeFileSync(
     `${__dirname}/../src/configs/local.json`,
     JSON.stringify(config, null, 2),
