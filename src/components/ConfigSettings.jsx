@@ -105,7 +105,6 @@ export default function ConfigSettings({
     localState.state.settings.tileServers = validTs.includes(localState.state.settings.tileServers)
       ? localState.state.settings.tileServers
       : serverSettings.config.tileServers[validTs[0]]?.name
-    console.log(localState)
   } else {
     serverSettings.settings.localeSelection = localStorage.getItem('i18nextLng') || serverSettings.settings.localeSelection
   }
