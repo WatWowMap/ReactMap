@@ -155,7 +155,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
                   userIcons={icons}
                   userSettings={userSettings[userSettingsCategory(category)] || {}}
                   filters={filters[category]}
-                  tileStyle={tileServer.style}
+                  tileStyle={tileServer?.style || 'light'}
                   clusteringRules={config.clustering[category] || { zoomLimit: config.minZoom, forcedLimit: 10000 }}
                   staticUserSettings={staticUserSettings[category]}
                   params={manualParams}

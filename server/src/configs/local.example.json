@@ -40,13 +40,12 @@
       "maxZoom": 18
     },
     "links": {
-      "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
-      "statsLink": "https://rdmopole2link.net"
+      "feedbackLink": "",
+      "statsLink": ""
     },
     "misc": {
       "enableQuestSetSelector": true
-    },
-    "clustering": {}
+    }
   },
   "clientSideOptions": {
     "pokemon": {
@@ -88,7 +87,7 @@
         "password": "pass123!",
         "database": "rdmdb",
         "charset": "utf8mb4",
-        "arScanColumn": false,
+        "hasAltQuests": false,
         "useFor": [
           "device",
           "gym",
@@ -107,7 +106,6 @@
         "password": "pass123!",
         "database": "manual_1",
         "charset": "utf8mb4",
-        "arScanColumn": false,
         "useFor": [
           "session",
           "user",

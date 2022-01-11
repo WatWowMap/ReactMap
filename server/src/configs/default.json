@@ -325,7 +325,6 @@
         "password": "pass123!",
         "database": "rdmdb",
         "charset": "utf8mb4",
-        "arScanColumn": false,
         "hasAltQuests": false,
         "useFor": []
       },
@@ -337,7 +336,6 @@
         "password": "pass123!",
         "database": "manualdb",
         "charset": "utf8mb4",
-        "arScanColumn": false,
         "useFor": []
       }
     ]
