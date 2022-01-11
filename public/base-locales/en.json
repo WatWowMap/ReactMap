@@ -274,7 +274,7 @@
   "pvp_subtitle": "Shows PVP rank/CP/Level info for each Pokémon",
   "quests_subtitle": "Shows quest reward and task information",
   "raids_subtitle": "Shows all raid info including the raid boss, eggs, expire time, and moveset",
-  "s2cells_subtitle": "Shows the last time a S2 cell was scanned by a device",
+  "scan_cells_subtitle": "Shows the last time a S2 cell was scanned by a device",
   "scanAreas_subtitle": "Shows available scan areas polygons",
   "spawnpoints_subtitle": "Shows spawnpoints and their estimated despawn time",
   "stats_subtitle": "Shows Pokémon stats and levels",

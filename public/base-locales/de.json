@@ -277,7 +277,7 @@
   "pvp_subtitle": "Zeigt PVP-Rang/WP/Level-Informationen für jedes Pokemon",
   "quests_subtitle": "Zeigt Quest Belohnung und Aufgabeninformationen an",
   "raids_subtitle": "Zeigt alle Raid-Informationen, einschließlich des Raid-Bosses, der Eier, der Ablaufzeit und des Movesets",
-  "s2cells_subtitle": "Zeigt an, wann eine S2-Zelle zuletzt von einem Gerät gescannt wurde",
+  "scan_cells_subtitle": "Zeigt an, wann eine S2-Zelle zuletzt von einem Gerät gescannt wurde",
   "scanAreas_subtitle": "Zeigt verfügbare Scanbereich Polygone",
   "spawnpoints_subtitle": "Zeigt Spawnpunkte und deren geschätzte Despawnzeit an",
   "stats_subtitle": "Zeigt Pokemon-Statistiken und Level an",

@@ -270,7 +270,7 @@
   "pvp_subtitle": "Muestra la información de PVP para cada Pokémon",
   "quests_subtitle": "Muestra la información de las misiones",
   "raids_subtitle": "Muestra la información de las Incursiones",
-  "s2cells_subtitle": "Muestra la última vez que una celda S2 fue escaneada por un dispositivo",
+  "scan_cells_subtitle": "Muestra la última vez que una celda S2 fue escaneada por un dispositivo",
   "scanAreas_subtitle": "Muestra los polígonos de áreas de escaneo disponibles",
   "spawnpoints_subtitle": "Muestra las ubicaciones de los spawns y las horas de expiración",
   "stats_subtitle": "Muestra las estadísticas de los Pokémon",
