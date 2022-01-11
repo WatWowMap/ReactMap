@@ -127,7 +127,7 @@
         "zoomLevel": 12,
         "forcedLimit": 5000
       }
-    },  
+    },
     "messageOfTheDay": {
       "index": 0,
       "settings": {
@@ -285,7 +285,7 @@
         ],
         "pvp": [
           1,
-          10  
+          10
         ]
       }
     },

@@ -156,8 +156,12 @@ const mergeAuth = async () => {
       ...oldConfig?.local?.areaRestrictions || [],
       ...authMethods.flatMap(m => oldConfig?.[m]?.areaRestrictions || []),
     ],
-    excludeFromTutorial: oldConfig?.excludeFromTutorial,
-    alwaysEnabledPerms: oldConfig?.alwaysEnabledPerms,
+    excludeFromTutorial: oldConfig?.excludeFromTutorial
+      ? oldConfig.excludeFromTutorial.map(perm => perm === 's2cells' ? 'scanCells' : perm)
+      : undefined,
+    alwaysEnabledPerms: oldConfig?.alwaysEnabledPerms
+      ? oldConfig.alwaysEnabledPerms.map(perm => perm === 's2cells' ? 'scanCells' : perm)
+      : undefined,
     perms: {
       map: {
         enabled: checkEnabled('map'),
