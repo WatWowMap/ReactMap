@@ -56,6 +56,6 @@ config.scanAreas = fs.existsSync(`${__dirname}/../configs/areas.json`)
   ? require('../configs/areas.json')
   : { features: [] }
 
-config.manualAreas = Object.fromEntries(config.manualAreas.map(area => [area.name, { lat: area.lat, lon: area.lon }]))
+config.manualAreas = Object.fromEntries(config.manualAreas.map(area => [area.name, area]))
 
 module.exports = config

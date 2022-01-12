@@ -315,7 +315,8 @@
     {
       "name": "New York",
       "lat": 40.7481666,
-      "lon": -74.0174788
+      "lon": -74.0174788,
+      "zoom": 15
     },
     {
       "name": "San Francisco",
