@@ -159,7 +159,7 @@ module.exports = gql`
     updated: Int
   }
 
-  type S2cell {
+  type ScanCell {
     id: ID
     level: Int
     center_lat: Float

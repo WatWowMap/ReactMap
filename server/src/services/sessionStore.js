@@ -2,25 +2,27 @@
 
 const session = require('express-session')
 const MySQLStore = require('express-mysql-session')(session)
-const config = require('./config')
-
-const { database: { schemas } } = config
-
-const dbSelection = Object.keys(schemas).find(name => schemas[name].useFor.includes('session')) || 'scanner'
+const {
+  api: { maxSessions },
+  database: { settings: { sessionTableName } },
+} = require('./config')
+const Utility = require('./Utility')
 const { Session } = require('../models/index')
+
+const dbSelection = Utility.dbSelection('session')
 
 // MySQL session store
 const sessionStore = new MySQLStore({
   // Database server IP address/hostname
-  host: schemas[dbSelection].host,
+  host: dbSelection.host,
   // Database server listening port
-  port: schemas[dbSelection].port,
+  port: dbSelection.port,
   // Database username
-  user: schemas[dbSelection].username,
+  user: dbSelection.username,
   // Password for the above database user
-  password: schemas[dbSelection].password,
+  password: dbSelection.password,
   // Database name to save sessions table to
-  database: schemas[dbSelection].database,
+  database: dbSelection.database,
   // Whether or not to automatically check for and clear expired sessions:
   clearExpired: true,
   // How frequently expired sessions will be cleared; milliseconds:
@@ -29,7 +31,7 @@ const sessionStore = new MySQLStore({
   createDatabaseTable: true,
   // Set Sessions table name
   schema: {
-    tableName: config.database.settings.sessionTableName,
+    tableName: sessionTableName,
   },
 })
 
@@ -39,7 +41,7 @@ const isValidSession = async (userId) => {
     .select('session_id')
     .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
     .andWhere('expires', '>=', ts)
-  return results.length < config.api.maxSessions
+  return results.length < maxSessions
 }
 
 const clearOtherSessions = async (userId, currentSessionId, botName) => {

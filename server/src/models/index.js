@@ -5,7 +5,7 @@ const Pokestop = require('./Pokestop')
 const Pokemon = require('./Pokemon')
 const Portal = require('./Portal')
 const Ring = require('./Ring')
-const S2cell = require('./S2cell')
+const ScanCell = require('./ScanCell')
 const Session = require('./Session')
 const Spawnpoint = require('./Spawnpoint')
 const User = require('./User')
@@ -20,7 +20,7 @@ module.exports = {
   Pokemon,
   Portal,
   Ring,
-  S2cell,
+  ScanCell,
   Session,
   Spawnpoint,
   User,

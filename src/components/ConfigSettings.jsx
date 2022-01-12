@@ -95,6 +95,16 @@ export default function ConfigSettings({
     const cached = localState.state.settings.localeSelection
     const i18cached = localStorage.getItem('i18nextLng')
     localState.state.settings.localeSelection = cached !== i18cached ? i18cached : cached
+
+    const validNav = Object.keys(serverSettings.config.navigation)
+    localState.state.settings.navigation = validNav.includes(localState.state.settings.navigation)
+      ? localState.state.settings.navigation
+      : serverSettings.config.navigation[validNav[0]]?.name
+
+    const validTs = Object.keys(serverSettings.config.tileServers)
+    localState.state.settings.tileServers = validTs.includes(localState.state.settings.tileServers)
+      ? localState.state.settings.tileServers
+      : serverSettings.config.tileServers[validTs[0]]?.name
   } else {
     serverSettings.settings.localeSelection = localStorage.getItem('i18nextLng') || serverSettings.settings.localeSelection
   }

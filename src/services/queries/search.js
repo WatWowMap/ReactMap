@@ -14,7 +14,7 @@ const core = gql`
 
 export const poi = gql`
   ${core}
-  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int) {
+  query SearchPoi($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int) {
     search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, ts: $ts) {
       ...CoreSearch
     }
@@ -23,7 +23,7 @@ export const poi = gql`
 
 export const poiWebhook = gql`
   ${Nominatim}
-  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $webhookName: String) {
+  query SearchWebhook($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $webhookName: String) {
     search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, webhookName: $webhookName) {
       id
       name
@@ -36,7 +36,7 @@ export const poiWebhook = gql`
 
 export const nests = gql`
   ${core}
-  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int) {
+  query SearchNests($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int) {
     search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, ts: $ts) {
       ...CoreSearch
       nest_pokemon_id
@@ -46,7 +46,7 @@ export const nests = gql`
 `
 
 export const quests = gql`
-  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int!, $midnight: Int) {
+  query SearchQuests($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int!, $midnight: Int) {
     searchQuest(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, ts: $ts, midnight: $midnight) {
       id
       name
@@ -75,7 +75,7 @@ export const quests = gql`
 
 export const raids = gql`
   ${core}
-  query Data($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int) {
+  query SearchRaids($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int) {
     search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, ts: $ts) {
       ...CoreSearch
       raid_pokemon_id

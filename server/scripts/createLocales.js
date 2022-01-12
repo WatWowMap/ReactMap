@@ -2,10 +2,10 @@
 const fs = require('fs')
 const path = require('path')
 
-const fetchJson = require('./api/fetchJson')
+const fetchJson = require('../src/services/api/fetchJson')
 
-const appLocalesFolder = path.resolve(__dirname, '../../../public/base-locales')
-const finalLocalesFolder = path.resolve(__dirname, '../../../public/locales')
+const appLocalesFolder = path.resolve(__dirname, '../../public/base-locales')
+const finalLocalesFolder = path.resolve(__dirname, '../../public/locales')
 
 const locales = async () => {
   const localTranslations = await fs.promises.readdir(appLocalesFolder)

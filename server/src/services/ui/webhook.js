@@ -47,15 +47,15 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             primary: {
               sliders: [
                 { name: 'iv', label: '', min: -1, max: 100, perm: 'iv', low: 'min_iv', high: 'max_iv' },
-                { name: 'level', label: '', min: 0, max: 40, perm: 'stats', low: 'min_level', high: 'max_level' },
+                { name: 'level', label: '', min: 0, max: 40, perm: 'iv', low: 'min_level', high: 'max_level' },
               ],
             },
             advanced: {
               sliders: [
-                { name: 'cp', label: '', min: 0, max: 9000, perm: 'stats', low: 'min_cp', high: 'max_cp' },
-                { name: 'atk_iv', label: '', min: 0, max: 15, perm: 'stats', low: 'atk', high: 'max_atk' },
-                { name: 'def_iv', label: '', min: 0, max: 15, perm: 'stats', low: 'def', high: 'max_def' },
-                { name: 'sta_iv', label: '', min: 0, max: 15, perm: 'stats', low: 'sta', high: 'max_sta' },
+                { name: 'cp', label: '', min: 0, max: 9000, perm: 'iv', low: 'min_cp', high: 'max_cp' },
+                { name: 'atk_iv', label: '', min: 0, max: 15, perm: 'iv', low: 'atk', high: 'max_atk' },
+                { name: 'def_iv', label: '', min: 0, max: 15, perm: 'iv', low: 'def', high: 'max_def' },
+                { name: 'sta_iv', label: '', min: 0, max: 15, perm: 'iv', low: 'sta', high: 'max_sta' },
               ],
               texts: [{ name: 'min_time', type: 'number', max: 60, adornment: 's', xs: 4, sm: 4, width: 100 }],
               booleans: [

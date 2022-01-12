@@ -2,14 +2,6 @@
 const fetchJson = require('./fetchJson')
 const config = require('../config')
 
-// const looper = (num, toLoop, staticData, skipZero) => {
-//   const arr = []
-//   for (let i = skipZero ? 1 : 0; i <= num; i += 1) {
-//     arr.push({ ...staticData, [toLoop]: i })
-//   }
-//   return arr
-// }
-
 const getWildCards = (category) => {
   switch (category) {
     case 'gym': return { team: 4, slot_changes: true, battle_changes: true }

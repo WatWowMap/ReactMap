@@ -1,5 +1,5 @@
 const fetchJson = require('./fetchJson')
-const { map: { nestHemisphere } } = require('../config')
+const { api: { nestHemisphere } } = require('../config')
 const { pokemon: masterfile } = require('../../data/masterfile.json')
 
 module.exports = async function fetchNests() {

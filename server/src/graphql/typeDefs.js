@@ -23,7 +23,7 @@ module.exports = gql`
     pokemonSingle(id: ID, perm: String): Pokemon
     portals(minLat: Float, maxLat: Float, minLon: Float, maxLon: Float, ts: Int, filters: JSON): [Portal]
     portalsSingle(id: ID, perm: String): Portal
-    s2cells(minLat: Float, maxLat: Float, minLon: Float, maxLon: Float, ts: Int, filters: JSON, zoom: Int): [S2cell]
+    scanCells(minLat: Float, maxLat: Float, minLon: Float, maxLon: Float, ts: Int, filters: JSON, zoom: Int): [ScanCell]
     scanAreas: [ScanArea]
     search(search: String, category: String, lat: Float, lon: Float, locale: String, webhookName: String, ts: Int, midnight: Int): [Search]
     searchQuest(search: String, category: String, lat: Float, lon: Float, locale: String, webhookName: String, ts: Int, midnight: Int): [SearchQuest]

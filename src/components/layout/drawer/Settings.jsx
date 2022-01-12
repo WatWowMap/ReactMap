@@ -229,7 +229,7 @@ export default function Settings({ Icons }) {
             </Button>
           </label>
         </Grid>
-        {config.map.enableStats
+        {config.map.statsLink
           && (
             <Grid item xs={t('drawer_settings_stats_width')} style={{ textAlign: 'center' }}>
               <Button
@@ -245,7 +245,7 @@ export default function Settings({ Icons }) {
               </Button>
             </Grid>
           )}
-        {config.map.enableFeedback
+        {config.map.feedbackLink
           && (
             <Grid item xs={t('drawer_settings_feedback_width')} style={{ textAlign: 'center' }}>
               <Button

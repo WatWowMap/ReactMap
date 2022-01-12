@@ -3,13 +3,13 @@ const getPolyVector = require('../services/functions/getPolyVector')
 const dbSelection = require('../services/functions/dbSelection')
 const { api: { weatherCellLimit } } = require('../services/config')
 
-class Weather extends Model {
+module.exports = class Weather extends Model {
   static get tableName() {
     return 'weather'
   }
 
   static get idColumn() {
-    return dbSelection('weather') === 'mad'
+    return dbSelection('weather').type === 'mad'
       ? 's2_cell_id' : 'id'
   }
 
@@ -39,5 +39,3 @@ class Weather extends Model {
     }))
   }
 }
-
-module.exports = Weather

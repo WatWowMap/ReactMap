@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-const { database: { settings: { leagues } } } = require('../services/config')
+const { api: { pvp: { leagues } } } = require('../services/config')
 
 class GenericFilter {
   constructor(enabled, size) {
@@ -9,7 +9,7 @@ class GenericFilter {
 }
 
 class PokemonFilter extends GenericFilter {
-  constructor(iv, level, atk, def, sta, enabled, size) {
+  constructor(iv, level, atk, def, sta, pvp, enabled, size) {
     super(enabled, size)
     this.iv = iv || [0, 100]
     this.atk_iv = atk || [0, 15]
@@ -17,10 +17,7 @@ class PokemonFilter extends GenericFilter {
     this.sta_iv = sta || [0, 15]
     this.level = level || [1, 35]
     this.adv = ''
-  }
-
-  pvp(values) {
-    leagues.forEach(league => this[league.name] = values || [(league.minRank || 1), (league.maxRank || 100)])
+    leagues.forEach(league => this[league.name] = pvp || [(league.minRank || 1), (league.maxRank || 100)])
   }
 }
 

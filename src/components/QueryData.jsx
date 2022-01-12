@@ -14,7 +14,7 @@ const getPolling = category => {
   switch (category) {
     case 'devices':
     case 'gyms':
-    case 's2cells':
+    case 'scanCells':
       return 10 * 1000
     case 'pokemon':
       return 20 * 1000
@@ -25,7 +25,7 @@ const getPolling = category => {
 }
 
 export default function QueryData({
-  bounds, onMove, map, tileStyle, clusterZoomLvl, config, params,
+  bounds, onMove, map, tileStyle, clusteringRules, config, params,
   category, available, filters, staticFilters, staticUserSettings, sizeKey,
   userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
 }) {
@@ -87,7 +87,7 @@ export default function QueryData({
   }, [filters, userSettings])
 
   const { data, previousData, refetch, error } = useQuery(Query[category](
-    filters, perms, map.getZoom(), clusterZoomLvl,
+    filters, perms, map.getZoom(), clusteringRules.zoomLevel,
   ), {
     context: { timeout: getPolling(category) },
     variables: {
@@ -119,7 +119,7 @@ export default function QueryData({
     <Clustering
       key={sizeKey}
       renderedData={renderedData[category]}
-      clusterZoomLvl={clusterZoomLvl}
+      clusteringRules={clusteringRules}
       map={map}
       config={config}
       filters={filters}
