@@ -75,7 +75,7 @@ export default function Manage({
     { name: 'close', action: () => setWebhookMode(false), icon: 'Close', color: 'primary' },
   ]
 
-  if (map.enableFeedback) {
+  if (map.feedbackLink) {
     footerButtons.unshift(
       { name: 'feedback', action: () => setFeedback(true), icon: 'BugReport', disabled: !webhookData[selectedWebhook].human, color: '#00e676' },
     )
