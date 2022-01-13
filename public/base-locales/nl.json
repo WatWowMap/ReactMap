@@ -436,5 +436,8 @@
     "invalid_credentials": "Ongeldige inloggegevens",
     "error_creating_user": "Kan op dit moment geen nieuwe gebruiker registreren",
     "discord_linked": "Discord Verbonden",
-    "telegram_linked": "Telegram Verbonden"
+    "telegram_linked": "Telegram Verbonden",
+    "pokemon_cell": "De locatie van de Pokemon kan variëren.",
+    "timer_verified": "De despawn-tijd is bevestigd.",
+    "timer_unverified": "De despawn-tijd is niet bevestigd."
   }
