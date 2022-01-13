@@ -428,5 +428,8 @@
   "level": "peil",
   "km": "km",
   "feedback": "Feedback",
-  "donor_menu": "Donormenu"
+  "donor_menu": "Donormenu",
+  "pokemon_cell": "De locatie van de Pokemon kan variëren.",
+  "timer_verified": "De despawn-tijd is bevestigd.",
+  "timer_unverified": "De despawn-tijd is niet bevestigd."
 }
