@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 
 const getAllWeather = gql`
-query Data {
+query Weather {
   weather {
     id
     latitude

@@ -1,9 +1,9 @@
 /* eslint-disable no-restricted-syntax */
-const { database: { settings: { leagues } } } = require('../config')
+const { api: { pvp: { leagues } } } = require('../config')
 
 module.exports = function generateUi(filters, perms) {
   const ui = {}
-  const ignoredKeys = ['enabled', 'filter']
+  const ignoredKeys = ['enabled', 'filter', 'showQuestSet']
 
   // builds the initial categories
   for (const [key, value] of Object.entries(filters)) {
@@ -21,16 +21,16 @@ module.exports = function generateUi(filters, perms) {
             ],
             secondary: [
               {
-                name: 'level', label: '', min: 1, max: 35, perm: 'stats',
+                name: 'level', label: '', min: 1, max: 35, perm: 'iv',
               },
               {
-                name: 'atk_iv', label: '', min: 0, max: 15, perm: 'stats',
+                name: 'atk_iv', label: '', min: 0, max: 15, perm: 'iv',
               },
               {
-                name: 'def_iv', label: '', min: 0, max: 15, perm: 'stats',
+                name: 'def_iv', label: '', min: 0, max: 15, perm: 'iv',
               },
               {
-                name: 'sta_iv', label: '', min: 0, max: 15, perm: 'stats',
+                name: 'sta_iv', label: '', min: 0, max: 15, perm: 'iv',
               },
             ],
           }
@@ -42,7 +42,7 @@ module.exports = function generateUi(filters, perms) {
           if (!ui.wayfarer) ui.wayfarer = {}
           ui.wayfarer[key] = true; break
         case 'spawnpoints':
-        case 's2cells':
+        case 'scanCells':
         case 'devices':
           if (!ui.admin) ui.admin = {}
           ui.admin[key] = true; break
@@ -62,7 +62,7 @@ module.exports = function generateUi(filters, perms) {
             case 'submissionCells':
             case 'portals': ui.wayfarer[key] = true; break
             case 'spawnpoints':
-            case 's2cells':
+            case 'scanCells':
             case 'devices': ui.admin[key] = true; break
             case 'scanAreas':
             case 'weather': ui[key].enabled = true; break

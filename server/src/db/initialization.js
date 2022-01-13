@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 const Knex = require('knex')
-const { database: { schemas: { scanner, manual } } } = require('../configs/config.example.json')
+const { database: { schemas: exampleSchemas } } = require('../configs/local.example.json')
 const { database: { schemas, settings }, devOptions: { queryDebug } } = require('../services/config')
 const models = require('../models/index')
 
 // Establishes knex connections to each database listed in the config
-const connections = Object.values(schemas).map(schema => Knex({
+const connections = schemas.map(schema => Knex({
   client: 'mysql2',
   connection: {
     host: schema.host,
@@ -24,7 +24,7 @@ const connections = Object.values(schemas).map(schema => Knex({
 }))
 
 // Binds the models to the designated databases
-Object.values(schemas).forEach((schema, index) => {
+schemas.forEach((schema, index) => {
   try {
     schema.useFor.forEach(category => {
       const capital = `${category.charAt(0).toUpperCase()}${category.slice(1)}`
@@ -32,7 +32,7 @@ Object.values(schemas).forEach((schema, index) => {
     })
   } catch (e) {
     console.error(`
-    Only ${[...scanner.useFor, ...manual.useFor].join(', ')} are valid options in the useFor fields`, '\n\n', e)
+    Only ${[exampleSchemas.flatMap(s => s.useFor)].join(', ')} are valid options in the useFor fields`, '\n\n', e)
     process.exit(9)
   }
 })

@@ -1,8 +1,10 @@
 const { Model } = require('objection')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { api: { searchResultsLimit, portalUpdateLimit } } = require('../services/config')
+const {
+  api: { searchResultsLimit, portalUpdateLimit },
+} = require('../services/config')
 
-class Portal extends Model {
+module.exports = class Portal extends Model {
   static get tableName() {
     return 'ingress_portals'
   }
@@ -40,5 +42,3 @@ class Portal extends Model {
     return query
   }
 }
-
-module.exports = Portal

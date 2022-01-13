@@ -39,7 +39,6 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
 
   const advObject = {
     iv: true,
-    stats: true,
     pvp: true,
     sliders: {
       primary: [

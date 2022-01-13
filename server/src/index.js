@@ -3,7 +3,6 @@
 /* eslint-disable global-require */
 const express = require('express')
 const path = require('path')
-const fs = require('fs')
 const logger = require('morgan')
 const compression = require('compression')
 const session = require('express-session')
@@ -14,10 +13,10 @@ const Backend = require('i18next-fs-backend')
 const { ApolloServer } = require('apollo-server-express')
 require('./db/initialization')
 
+const config = require('./services/config')
 const { Pokemon } = require('./models/index')
 const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
-const config = require('./services/config')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
 
@@ -88,17 +87,13 @@ app.use(session({
   cookie: { maxAge: 604800000 },
 }))
 
-fs.readdir(`${__dirname}/strategies/`, (e, files) => {
-  if (e) return console.error(e)
-  files.forEach(file => {
-    const trimmed = file.replace('.js', '')
-    if (config[trimmed]?.enabled) {
-      require(`./strategies/${trimmed}`)
-      console.log(file, 'strategy initialized')
-    } else {
-      console.log(file, 'strategy not enabled, if this was a mistake, make sure to add it to the config and enable it')
-    }
-  })
+config.authentication.strategies.forEach(strategy => {
+  if (strategy.enabled) {
+    require(`./strategies/${strategy.name}.js`)
+    console.log(`Strategy ${strategy.name} initialized`)
+  } else {
+    console.log(`Strategy ${strategy.name} was not initialized`)
+  }
 })
 
 app.use(passport.initialize())
@@ -120,7 +115,7 @@ passport.deserializeUser(async (user, done) => {
 i18next.use(Backend).init({
   lng: 'en',
   fallbackLng: 'en',
-  preload: config.localeSelection,
+  preload: config.map.localeSelection,
   ns: ['translation'],
   defaultNS: 'translation',
   backend: { loadPath: 'public/locales/{{lng}}/{{ns}}.json' },
@@ -143,7 +138,7 @@ app.use((err, req, res, next) => {
   }
 })
 
-if (config.database.settings.reactMapHandlesPvp) {
+if (config.api.pvp.reactMapHandlesPvp) {
   (async () => Pokemon.initOhbem())()
 }
 

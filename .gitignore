@@ -4,8 +4,8 @@
 # Config files
 server/src/configs/*
 !server/src/configs/default.json
-!server/src/configs/config.example.json
 !server/src/configs/areas.example.json
+!server/src/configs/local.example.json
 .env
 
 # Masterfile

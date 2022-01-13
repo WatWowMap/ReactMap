@@ -7,13 +7,13 @@ const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { api: { searchResultsLimit } } = require('../services/config')
 
-class Gym extends Model {
+module.exports = class Gym extends Model {
   static get tableName() {
     return 'gym'
   }
 
   static get idColumn() {
-    return dbSelection('gym') === 'mad'
+    return dbSelection('gym').type === 'mad'
       ? 'gym_id' : 'id'
   }
 
@@ -286,5 +286,3 @@ class Gym extends Model {
     return query
   }
 }
-
-module.exports = Gym

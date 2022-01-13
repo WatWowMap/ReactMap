@@ -3,9 +3,9 @@ const dbSelection = require('../services/functions/dbSelection')
 const getPolyVector = require('../services/functions/getPolyVector')
 const getAreaSql = require('../services/functions/getAreaSql')
 
-class S2cell extends Model {
+module.exports = class ScanCell extends Model {
   static get tableName() {
-    return dbSelection('s2cell') === 'mad'
+    return dbSelection('scanCell').type === 'mad'
       ? 'trs_s2cells' : 's2cell'
   }
 
@@ -27,5 +27,3 @@ class S2cell extends Model {
     }))
   }
 }
-
-module.exports = S2cell

@@ -16,8 +16,6 @@ module.exports = function permissionManager(permToCheck, perms) {
     case 'monsters':
     case 'pokemon':
     case 'pokemons': return perms.pokemon
-    case 'stat':
-    case 'stats': return perms.stats
     case 'iv':
     case 'ivs': return perms.iv
     case 'pvp':

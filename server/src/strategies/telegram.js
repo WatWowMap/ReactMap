@@ -5,7 +5,10 @@ const path = require('path')
 
 // if writing a custom strategy, rename 'telegram' below to your strategy name
 // this will automatically grab all of its unique values in the config
-const { map: { forceTutorial }, telegram: strategyConfig, alwaysEnabledPerms } = require('../services/config')
+const {
+  map: { forceTutorial },
+  authentication: { telegram: strategyConfig, perms, alwaysEnabledPerms },
+} = require('../services/config')
 const { User } = require('../models/index')
 const Fetch = require('../services/Fetch')
 const Utility = require('../services/Utility')
@@ -14,7 +17,7 @@ const authHandler = async (req, profile, done) => {
   const user = {
     ...profile,
     perms: {
-      ...Object.fromEntries(Object.keys(strategyConfig.perms).map(x => [x, false])),
+      ...Object.fromEntries(Object.keys(perms).map(x => [x, false])),
       areaRestrictions: [],
       webhooks: [],
     },
@@ -36,7 +39,7 @@ const authHandler = async (req, profile, done) => {
     }
   }))
 
-  Object.entries(strategyConfig.perms).forEach(([perm, info]) => {
+  Object.entries(perms).forEach(([perm, info]) => {
     if (info.enabled && (alwaysEnabledPerms.includes(perm)
       || info.roles.some(role => groupInfo.includes(role)))) {
       user.perms[perm] = true
