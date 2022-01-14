@@ -27,7 +27,7 @@ export default function genPokemon(t, pokemon, categories) {
         family: pkmn.family,
       }
       tempObj.pokemon[id].searchMeta = `${Object.values(tempObj.pokemon[id])
-        .flatMap(x => t(x))
+        .flatMap(x => Array.isArray(x) ? x.map(y => t(y)) : t(x))
         .join(' ')
         .toLowerCase()} ${t('pokemon').toLowerCase()}`
     })

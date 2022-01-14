@@ -146,7 +146,7 @@ const mergeAuth = async () => {
   })
 
   const checkEnabled = (perm) => oldConfig?.discord?.perms?.[perm]?.enabled
-    || oldConfig?.telegram?.perms?.[perm]?.enabled
+    || oldConfig?.telegram?.perms?.[perm]?.enabled || false
 
   const baseAuth = {
     strategies: [],
