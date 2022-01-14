@@ -228,7 +228,7 @@ export default function WebhookAdvanced({
       return ''
     }
     if (!poracleValues.pvpEntry) {
-      return poracleValues[field] === info.defaults[field] ? '' : `${field.replace(/_/g, '')}${poracleValues[field]}`
+      return poracleValues[field] === info.defaults[field] ? '' : `${field.replace(/_/g, '').replace('min', '')}${poracleValues[field]}`
     }
   }
 
