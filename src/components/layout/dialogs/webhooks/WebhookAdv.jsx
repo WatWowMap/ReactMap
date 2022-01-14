@@ -352,7 +352,7 @@ export default function WebhookAdvanced({
                 : option.min || 0,
               max: option.name === 'pvp_ranking_min_cp' && poracleValues.pvp_ranking_league
                 ? poracleValues.pvp_ranking_league || 0
-                : option.max || 0,
+                : option.max || 10000,
             }}
             InputProps={{
               endAdornment: option.adornment
