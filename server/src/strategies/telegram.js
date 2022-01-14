@@ -3,11 +3,9 @@ const { TelegramStrategy } = require('passport-telegram-official')
 const passport = require('passport')
 const path = require('path')
 
-// if writing a custom strategy, rename 'telegram' below to your strategy name
-// this will automatically grab all of its unique values in the config
 const {
   map: { forceTutorial },
-  authentication: { telegram: strategyConfig, perms, alwaysEnabledPerms },
+  authentication: { [path.parse(__filename).name]: strategyConfig, perms, alwaysEnabledPerms },
 } = require('../services/config')
 const { User } = require('../models/index')
 const Fetch = require('../services/Fetch')
@@ -53,8 +51,7 @@ const authHandler = async (req, profile, done) => {
     await User.query()
       .findOne({ telegramId: user.id })
       .then(async (userExists) => {
-        console.log(userExists)
-        if (req.user) {
+        if (req.user && userExists?.strategy === 'local') {
           await User.query()
             .update({ telegramId: user.id, telegramPerms: JSON.stringify(user.perms), webhookStrategy: 'telegram' })
             .where('id', req.user.id)

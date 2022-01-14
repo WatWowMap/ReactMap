@@ -4,11 +4,9 @@ const Strategy = require('passport-local')
 const bcrypt = require('bcrypt')
 const path = require('path')
 
-// if writing a custom strategy, rename 'local' below to your strategy name
-// this will automatically grab all of its unique values in the config
 const {
   map: { forceTutorial },
-  authentication: { local: strategyConfig, alwaysEnabledPerms, perms },
+  authentication: { [path.parse(__filename).name]: strategyConfig, alwaysEnabledPerms, perms },
 } = require('../services/config')
 const { User } = require('../models/index')
 const Utility = require('../services/Utility')
