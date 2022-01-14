@@ -476,5 +476,6 @@
   "join_button": 5,
   "pokemon_cell": "Pokemon's Location Could Vary",
   "timer_verified": "This Timer is Verified",
-  "timer_unverified": "This Timer is Unverified"
+  "timer_unverified": "This Timer is Unverified",
+  "all": "All"
 }

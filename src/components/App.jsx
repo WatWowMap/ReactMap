@@ -1,72 +1,21 @@
 import '../assets/scss/main.scss'
 
 import React, { Suspense, useEffect, useState, useCallback } from 'react'
-import {
-  ApolloClient,
-  ApolloProvider,
-  InMemoryCache,
-  createHttpLink,
-} from '@apollo/client'
+import { ApolloProvider } from '@apollo/client'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { ThemeProvider } from '@material-ui/styles'
-import ApolloLinkTimeout from 'apollo-link-timeout'
 
 import setTheme from '@assets/mui/theme'
 import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
+import client from '@services/apollo'
+
 import Auth from './layout/auth/Auth'
 import Login from './layout/auth/Login'
 import RouteChangeTracker from './RouteChangeTracker'
 import Errors from './Errors'
 import ClearStorage from './ClearStorage'
 import HolidayEffects from './HolidayEffects'
-
-const timeoutLink = new ApolloLinkTimeout(10000) // 10 second timeout
-
-const client = new ApolloClient({
-  uri: '/graphql',
-  link: timeoutLink.concat(createHttpLink({ uri: '/graphql' })),
-  cache: new InMemoryCache({
-    typePolicies: {
-      Query: {
-        fields: {
-          pokemon: {
-            merge(existing, incoming) {
-              return incoming
-            },
-          },
-          gyms: {
-            merge(existing, incoming) {
-              return incoming
-            },
-          },
-          pokestops: {
-            merge(existing, incoming) {
-              return incoming
-            },
-          },
-        },
-      },
-      SearchQuest: {
-        keyFields: ['id', 'with_ar'],
-      },
-      Pokestop: {
-        fields: {
-          quests: {
-            merge(existing, incoming) {
-              return incoming
-            },
-          },
-          invasions: {
-            merge(existing, incoming) {
-              return incoming
-            },
-          },
-        },
-      },
-    },
-  }),
-})
 
 export default function App() {
   const [serverSettings, setServerSettings] = useState(null)
