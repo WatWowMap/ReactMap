@@ -427,5 +427,13 @@
   "level": "nível",
   "km": "km",
   "feedback": "Comentários",
-  "donor_menu": "Menu Doador"
+  "donor_menu": "Menu Doador",
+  "with_ar": "Com RA",
+  "scan_cells": "Células de varredura",
+  "without_ar": "Sem RA",
+  "pokemon_cell": "A localização do Pokémon pode variar",
+  "timer_verified": "Este temporizador foi verificado",
+  "timer_unverified": "Este temporizador não foi verificado",
+  "all": "Tudo",
+  "both": "Ambos"
 }

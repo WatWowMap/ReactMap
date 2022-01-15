@@ -459,5 +459,12 @@
   "level": "nivel",
   "km": "km",
   "feedback": "Reacción",
-  "donor_menu": "Menú de donantes"
+  "donor_menu": "Menú de donantes",
+  "with_ar": "con RA",
+  "without_ar": "Sin RA",
+  "pokemon_cell": "La ubicación de Pokémon podría variar",
+  "timer_verified": "Este temporizador está verificado",
+  "timer_unverified": "Este temporizador no está verificado",
+  "all": "Todo",
+  "both": "Ambos"
 }

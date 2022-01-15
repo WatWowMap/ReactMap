@@ -467,5 +467,9 @@
   "level": "niveau",
   "km": "km",
   "feedback": "Retour",
-  "donor_menu": "Menu des donateurs"
+  "donor_menu": "Menu des donateurs",
+  "pokemon_cell": "L'emplacement de Pokemon peut varier",
+  "timer_verified": "Cette minuterie est vérifiée",
+  "timer_unverified": "Cette minuterie n'est pas vérifiée",
+  "all": "Tout"
 }

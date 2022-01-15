@@ -428,5 +428,13 @@
   "profile_name": "プロファイル名",
   "confirm_copy": "「{{profile}}」をコピーするプロファイルを選択します。これにより、そのプロファイルが完全に上書きされます。",
   "webhook_error": "{{name}}はそれを処理できませんでした。\n\n後でもう一度やり直してください。",
-  "locale_selection_nl": "Nederlands"
+  "locale_selection_nl": "Nederlands",
+  "with_ar": "AR付き",
+  "scan_cells": "スキャンセル",
+  "without_ar": "ARなし",
+  "pokemon_cell": "ポケモンの場所は変わる可能性があります",
+  "timer_verified": "このタイマーは検証済みです",
+  "timer_unverified": "このタイマーは未確認です",
+  "all": "全て",
+  "both": "両方"
 }

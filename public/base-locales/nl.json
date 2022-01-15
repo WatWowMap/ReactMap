@@ -431,5 +431,9 @@
   "donor_menu": "Donormenu",
   "pokemon_cell": "De locatie van de Pokemon kan variëren.",
   "timer_verified": "De despawn-tijd is bevestigd.",
-  "timer_unverified": "De despawn-tijd is niet bevestigd."
+  "timer_unverified": "De despawn-tijd is niet bevestigd.",
+  "with_ar": "Met AR",
+  "without_ar": "Zonder AR",
+  "all": "Allemaal",
+  "both": "Beide"
 }

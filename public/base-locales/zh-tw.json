@@ -427,5 +427,13 @@
   "level": "等級",
   "km": "公里",
   "feedback": "回饋",
-  "donor_menu": "捐助者菜單"
+  "donor_menu": "捐助者菜單",
+  "with_ar": "使用增強現實",
+  "scan_cells": "掃描細胞",
+  "without_ar": "沒有 AR",
+  "pokemon_cell": "口袋妖怪的位置可能會有所不同",
+  "timer_verified": "此計時器已驗證",
+  "timer_unverified": "此計時器未經驗證",
+  "all": "全部",
+  "both": "兩個都"
 }
