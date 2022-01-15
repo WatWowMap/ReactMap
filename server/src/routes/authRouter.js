@@ -12,8 +12,8 @@ strategies.forEach(strategy => {
   const method = strategy.type === 'local' ? 'post' : 'get'
   if (strategy.enabled) {
     router[method](`/${strategy.name}`, passport.authenticate(strategy.name, {
+      failureRedirect: '/',
       successRedirect: '/',
-      failureMessage: true,
     }))
     router[method](`/${strategy.name}/callback`,
       async (req, res, next) => passport.authenticate(strategy.name, async (err, user, info) => {

@@ -12,7 +12,7 @@ const { User } = require('../models/index')
 const Utility = require('../services/Utility')
 
 if (strategyConfig.doNothing) {
-  // This is for nothing other than demonstrating how to implement a custom local strategy with the above instructions
+  // This is for nothing other than demonstrating a custom property you can add if you need it
 }
 
 const authHandler = async (req, username, password, done) => {

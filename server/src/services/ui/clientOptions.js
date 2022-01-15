@@ -56,7 +56,7 @@ module.exports = function clientOptions(perms) {
   if (enableMapJsFilter) {
     clientMenus.pokemon.legacyFilter = { type: 'bool', perm: ['iv', 'pvp'] }
   }
-  if (clientSideOptions.pokemon.glow.length > 0) {
+  if (clientSideOptions.pokemon.glow.length) {
     clientMenus.pokemon.glow = { type: 'bool', sub: {}, perm: ['pokemon'] }
   }
   if (dbSelection('pokestop').type === 'mad') {
