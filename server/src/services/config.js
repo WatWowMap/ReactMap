@@ -1,58 +1,72 @@
+/* eslint-disable global-require */
 /* eslint-disable no-console */
-const extend = require('extend')
+process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
+
 const fs = require('fs')
-const uConfig = require('../configs/config.json')
-const eConfig = require('../configs/default.json')
+const config = require('config')
+
+// Check if new config exists
+if (!fs.existsSync(`${__dirname}/../configs/local.json`)) {
+  console.log('Config v2 (local.json) not found, you need to run the migration with "yarn config-migrate"')
+  process.exit(1)
+}
+
 const initWebhooks = require('./initWebhooks')
 
-const target = {}
+const mergeMapConfig = (obj) => ({
+  localeSelection: obj.localeSelection,
+  ...obj,
+  ...obj.general,
+  ...obj.customRoutes,
+  ...obj.links,
+  ...obj.holidayEffects,
+  ...obj.misc,
+  general: undefined,
+  customRoutes: undefined,
+  links: undefined,
+  holidayEffects: undefined,
+  misc: undefined,
+})
 
-extend(true, target, eConfig, uConfig)
+// Merge sub-objects for the map object
+config.map = mergeMapConfig(config.map)
 
-try {
-  target.authMethods = []
-  fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
-    if (e) return console.error(e)
-    files.forEach(file => {
-      const trimmed = file.replace('.js', '')
-      if (target[trimmed]?.enabled) {
-        target.authMethods.push(trimmed)
-      }
-    })
-  })
-} catch (e) {
-  console.error('Failed to initialize a strategy', e)
-}
+// Create multiDomain Objects
+config.multiDomainsObj = Object.fromEntries(
+  config.multiDomains.map(d => [d.domain, mergeMapConfig(d)]),
+)
 
-if (target.map.messageOfTheDay.messages) {
-  console.warn('You are using an old API endpoint in the message of the day section, the [messages] array should be renamed to [components]! \n They have been migrated for you in the meantime but you should update your config.json file.')
+// Consolidate Auth Methods
+// Create Authentication Objects
+config.authMethods = [...new Set(config.authentication.strategies
+  .filter(strategy => strategy.enabled)
+  .map(strategy => {
+    config.authentication[strategy.name] = strategy
+    return strategy.type
+  })),
+]
 
-  const updateFieldRec = (messages) => messages.map(message => {
-    if (message.messages) {
-      message.components = updateFieldRec(message.messages)
-      delete message.messages
-    }
-    return message
-  })
+// Auto check for scan overlay settings
+config.map.noScanAreaOverlay = Boolean(config.manualAreas.length)
 
-  target.map.messageOfTheDay.components = target.map.messageOfTheDay.messages.map(m => {
-    if (m.type !== 'parent') return m
-    if (m.messages) {
-      m.components = m.components || updateFieldRec(m.messages)
-      delete m.messages
-    }
-    return m
-  })
-  delete target.map.messageOfTheDay.messages
-}
-
-if (target.icons.defaultIcons.misc) {
-  console.warn('Warning: Setting the misc category to anything does not have an impact on the icons.')
-}
-if (target.webhooks.length) {
+// initialize webhooks
+if (config.webhooks.length) {
   (async () => {
-    target.webhookObj = await initWebhooks(target)
+    config.webhookObj = await initWebhooks(config)
   })()
 }
 
-module.exports = target
+// Check if empty
+['tileServers', 'navigation'].forEach(opt => {
+  if (!config[opt].length) console.warn(`[${opt}] is empty, you need to add options to it or remove the empty array from your config.`)
+})
+
+// Check if an areas.json exists
+config.scanAreas = fs.existsSync(`${__dirname}/../configs/areas.json`)
+  ? require('../configs/areas.json')
+  : { features: [] }
+
+// Map manual areas
+config.manualAreas = Object.fromEntries(config.manualAreas.map(area => [area.name, area]))
+
+module.exports = config

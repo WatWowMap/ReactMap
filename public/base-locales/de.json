@@ -111,7 +111,7 @@
   "next_submission": "Nächster Vorschlag!",
   "never": "nie",
   "next_gym": "Nächste Arena",
-  "s2cells": "S2 Zellen",
+  "scan_cells": "S2 Zellen",
   "devices": "Geräte",
   "use_my_location": "Meinen Standort verwenden",
   "submit_feedback_title": "Feedback/Fehlerbericht senden",
@@ -277,7 +277,7 @@
   "pvp_subtitle": "Zeigt PVP-Rang/WP/Level-Informationen für jedes Pokemon",
   "quests_subtitle": "Zeigt Quest Belohnung und Aufgabeninformationen an",
   "raids_subtitle": "Zeigt alle Raid-Informationen, einschließlich des Raid-Bosses, der Eier, der Ablaufzeit und des Movesets",
-  "s2cells_subtitle": "Zeigt an, wann eine S2-Zelle zuletzt von einem Gerät gescannt wurde",
+  "scan_cells_subtitle": "Zeigt an, wann eine S2-Zelle zuletzt von einem Gerät gescannt wurde",
   "scanAreas_subtitle": "Zeigt verfügbare Scanbereich Polygone",
   "spawnpoints_subtitle": "Zeigt Spawnpunkte und deren geschätzte Despawnzeit an",
   "stats_subtitle": "Zeigt Pokemon-Statistiken und Level an",
@@ -467,5 +467,9 @@
   "invalid_credentials": "Ungültige Anmeldeinformationen",
   "error_creating_user": "Neuer Benutzer kann derzeit nicht registriert werden",
   "discord_linked": "Discord Verknüpft",
-  "telegram_linked": "Telegram Verknüpft"
+  "telegram_linked": "Telegram Verknüpft",
+  "pokemon_cell": "Der Standort des Pokemon kann variieren",
+  "timer_verified": "Die Despawnzeit ist bestätigt",
+  "timer_unverified": "Die Despawnzeit ist nicht bestätigt",
+  "all": "Alle"
 }

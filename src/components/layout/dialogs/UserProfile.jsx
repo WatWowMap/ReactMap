@@ -46,7 +46,7 @@ export default function UserProfile({ setUserProfile }) {
     <>
       <Header titles={['user_profile']} action={() => setUserProfile(false)} />
       <DialogContent style={{ padding: 0 }}>
-        {auth.strategy === 'local' ? (
+        {auth?.strategy?.includes('local') ? (
           <LinkProfiles auth={auth} PermPage={PermPage} t={t} />
         ) : PermPage}
       </DialogContent>
@@ -103,14 +103,14 @@ const LinkProfiles = ({ auth, t, PermPage }) => {
           justifyContent="center"
           style={{ minHeight: '65vh' }}
         >
-          {auth.methods.some(method => method.includes('discord')) && (
+          {auth.methods.includes('discord') && (
             <Grid item style={{ padding: '20px 0' }}>
               {auth.discordId
                 ? <Typography color="secondary">{t('discord_linked')}</Typography>
                 : <DiscordLogin href={discordAuthUrl} text="link_discord" size="medium" />}
             </Grid>
           )}
-          {auth.methods.some(method => method.includes('telegram')) && (
+          {auth.methods.includes('telegram') && (
             <Grid item style={{ padding: '20px 0' }}>
               {auth.telegramId
                 ? <Typography color="secondary">{t('telegram_linked')}</Typography>
@@ -125,7 +125,7 @@ const LinkProfiles = ({ auth, t, PermPage }) => {
             </Grid>
             <Grid item xs={12} sm={6} md={4} style={{ textAlign: 'center' }}>
               <Select
-                value={auth.webhookStrategy}
+                value={auth.webhookStrategy || ''}
                 onChange={(e) => {
                   setWebhookStrategy({
                     variables: {

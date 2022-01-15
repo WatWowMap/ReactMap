@@ -107,7 +107,7 @@
   "next_submission": "Next Submission!",
   "never": "Never",
   "next_gym": "Next Gym",
-  "s2cells": "S2 Cells",
+  "scan_cells": "Scan Cells",
   "devices": "Devices",
   "use_my_location": "Use My Location",
   "submit_feedback_title": "Submit Feedback/Bug Report",
@@ -274,7 +274,7 @@
   "pvp_subtitle": "Shows PVP rank/CP/Level info for each Pokémon",
   "quests_subtitle": "Shows quest reward and task information",
   "raids_subtitle": "Shows all raid info including the raid boss, eggs, expire time, and moveset",
-  "s2cells_subtitle": "Shows the last time a S2 cell was scanned by a device",
+  "scan_cells_subtitle": "Shows the last time a S2 cell was scanned by a device",
   "scanAreas_subtitle": "Shows available scan areas polygons",
   "spawnpoints_subtitle": "Shows spawnpoints and their estimated despawn time",
   "stats_subtitle": "Shows Pokémon stats and levels",
@@ -334,6 +334,9 @@
   "select_webhook": "Select Bot",
   "ar_quest_true": "AR Task",
   "ar_quest_false": "No AR",
+  "with_ar": "With AR",
+  "both": "Both",
+  "without_ar": "Without AR",
   "exclude_quest_multi": "Exclude {{reward}}",
   "cluster_limit_0": "{{variable_0}} limit ({{variable_1}}) has been hit",
   "cluster_limit_1": "Please zoom in or narrow your filters",
@@ -470,5 +473,9 @@
   "webhook_footer_add_new_width": 4,
   "webhook_advanced_save_width": 2,
   "login_button": 5,
-  "join_button": 5
+  "join_button": 5,
+  "pokemon_cell": "Pokemon's Location Could Vary",
+  "timer_verified": "This Timer is Verified",
+  "timer_unverified": "This Timer is Unverified",
+  "all": "All"
 }

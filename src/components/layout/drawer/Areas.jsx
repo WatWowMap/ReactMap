@@ -29,8 +29,8 @@ export default function AreaDropDown({ scanAreasZoom, manualAreas }) {
             <MenuItem
               key={area}
               onClick={() => {
-                const { lat, lon } = manualAreas[area]
-                map.flyTo([lat, lon], scanAreasZoom)
+                const { lat, lon, zoom } = manualAreas[area]
+                map.flyTo([lat, lon], zoom || scanAreasZoom)
               }}
             >
               <Typography variant="subtitle2" align="center">

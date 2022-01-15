@@ -3,7 +3,7 @@ import React, {
   Fragment, useCallback, useState, useEffect,
 } from 'react'
 import {
-  Grid, Avatar, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem,
+  Grid, Avatar, Typography, Icon, Collapse, IconButton, Divider, Menu, MenuItem, Tooltip,
 } from '@material-ui/core'
 import {
   Check, Clear, ExpandMore, Map, MoreVert,
@@ -26,7 +26,7 @@ export default function PokemonPopup({
   } = pokemon
   const { perms } = useStatic(state => state.auth)
   const pokePerms = isTutorial ? {
-    pvp: true, stats: true, iv: true,
+    pvp: true, iv: true,
   } : perms
   const { pokemon: { [pokemon_id]: metaData } } = useStatic(state => state.masterfile)
   const popups = useStore(state => state.popups)
@@ -56,10 +56,16 @@ export default function PokemonPopup({
         classes={classes}
         isTutorial={isTutorial}
       />
-      <Timer
-        pokemon={pokemon}
-        hasStats={hasStats}
-      />
+      {pokemon.expire_timestamp && (
+        <Timer
+          pokemon={pokemon}
+          hasStats={hasStats}
+          t={t}
+        />
+      )}
+      {pokemon.seen_type === 'nearby_cell' && (
+        <Typography>{t('pokemon_cell')}</Typography>
+      )}
       {hasStats && (
         <>
           <Stats
@@ -252,7 +258,7 @@ const Stats = ({ pokemon, perms, t }) => {
   return (
     <Grid
       item
-      xs={(perms.iv || perms.stats) ? 8 : 1}
+      xs={perms.iv ? 8 : 1}
       container
       direction="column"
       justifyContent="space-around"
@@ -265,14 +271,14 @@ const Stats = ({ pokemon, perms, t }) => {
           </Typography>
         </Grid>
       )}
-      {(perms.stats && atk_iv !== null) && (
+      {(perms.iv && atk_iv !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {atk_iv} | {def_iv} | {sta_iv} {inactive_stats ? '*' : ''}
           </Typography>
         </Grid>
       )}
-      {(perms.stats && level !== null) && (
+      {(perms.iv && level !== null) && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {t('cp')} {cp} | {t('abbreviation_level')}{level}
@@ -292,9 +298,9 @@ const Info = ({
   return (
     <Grid
       item
-      xs={(perms.iv || perms.stats) ? 3 : 11}
+      xs={(perms.iv) ? 3 : 11}
       container
-      direction={(perms.iv || perms.stats) ? 'column' : 'row'}
+      direction={(perms.iv) ? 'column' : 'row'}
       justifyContent="space-around"
       alignItems="center"
     >
@@ -337,7 +343,7 @@ const Info = ({
   )
 }
 
-const Timer = ({ pokemon, hasStats }) => {
+const Timer = ({ pokemon, hasStats, t }) => {
   const { expire_timestamp, expire_timestamp_verified } = pokemon
   const despawnTimer = new Date(expire_timestamp * 1000)
   const [timer, setTimer] = useState(Utility.getTimeUntil(despawnTimer, true))
@@ -356,13 +362,19 @@ const Timer = ({ pokemon, hasStats }) => {
           {timer.str}
         </Typography>
         <Typography variant="subtitle2" align="center">
-          {despawnTimer.toLocaleTimeString(localStorage.getItem('i18nextLng'))}
+          {despawnTimer.toLocaleTimeString(localStorage.getItem('i18nextLng') || 'en')}
         </Typography>
       </Grid>
       <Grid item xs={hasStats ? 3 : 2}>
-        {expire_timestamp_verified
-          ? <Check fontSize="large" style={{ color: '#00e676' }} />
-          : <Clear fontSize="large" color="primary" />}
+        <Tooltip
+          title={expire_timestamp_verified ? t('timer_verified') : t('timer_unverified')}
+          arrow
+          enterTouchDelay={0}
+        >
+          {expire_timestamp_verified
+            ? <Check fontSize="large" style={{ color: '#00e676' }} />
+            : <Clear fontSize="large" color="primary" />}
+        </Tooltip>
       </Grid>
     </>
   )
@@ -478,7 +490,7 @@ const ExtraInfo = ({
             </Grid>
             <Grid item xs={t('popup_pokemon_data_width')} style={{ textAlign: 'right' }}>
               <Typography variant="caption">
-                {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
+                {(new Date(time * 1000)).toLocaleTimeString(localStorage.getItem('i18nextLng') || 'en')}
               </Typography>
             </Grid>
           </Fragment>

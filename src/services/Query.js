@@ -5,7 +5,7 @@ import * as pokemonIndex from './queries/pokemon'
 import getAllSpawnpoints from './queries/spawnpoint'
 import * as portalIndex from './queries/portal'
 import getAllWeather from './queries/weather'
-import getAllS2cells from './queries/s2cell'
+import getAllScanCells from './queries/scanCell'
 import getAllSubmissionCells from './queries/submissionCells'
 import { getOne, getAllNests } from './queries/nest'
 import getAllScanAreas from './queries/scanAreas'
@@ -71,7 +71,6 @@ export default class Query {
     }
     const permObj = {
       Ivs: perms.iv,
-      Stats: perms.stats,
       Pvp: perms.pvp,
     }
     let query = 'get'
@@ -92,8 +91,8 @@ export default class Query {
     return portalIndex.getAllPortals
   }
 
-  static s2cells() {
-    return getAllS2cells
+  static scanCells() {
+    return getAllScanCells
   }
 
   static spawnpoints() {

@@ -4,9 +4,10 @@ const DiscordStrategy = require('passport-discord').Strategy
 const passport = require('passport')
 const path = require('path')
 
-// if writing a custom strategy, rename 'discord' below to your strategy name
-// this will automatically grab all of its unique values in the config
-const { discord: strategyConfig } = require('../services/config')
+const {
+  map: { forceTutorial },
+  authentication: { [path.parse(__filename).name]: strategyConfig, perms },
+} = require('../services/config')
 const { User } = require('../models/index')
 const DiscordMapClient = require('../services/DiscordClient')
 const logUserAuth = require('../services/logUserAuth')
@@ -26,7 +27,7 @@ client.on('ready', () => {
 
 client.login(strategyConfig.botToken)
 
-const MapClient = new DiscordMapClient(client, strategyConfig)
+const MapClient = new DiscordMapClient(client, { ...strategyConfig, perms })
 
 const authHandler = async (req, accessToken, refreshToken, profile, done) => {
   if (!req.query.code) {
@@ -50,7 +51,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
     await User.query()
       .findOne(req.user ? { id: req.user.id } : { discordId: user.id })
       .then(async (userExists) => {
-        if (req.user) {
+        if (req.user && userExists?.strategy === 'local') {
           await User.query()
             .update({ discordId: user.id, discordPerms: JSON.stringify(user.perms), webhookStrategy: 'discord' })
             .where('id', req.user.id)
@@ -61,13 +62,14 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
           return done(null, {
             ...user,
             ...req.user,
+            username: userExists.username || user.username,
             discordId: user.id,
             perms: Utility.mergePerms(req.user.perms, user.perms),
           })
         }
         if (!userExists) {
           userExists = await User.query()
-            .insertAndFetch({ discordId: user.id, strategy: 'discord' })
+            .insertAndFetch({ discordId: user.id, strategy: 'discord', tutorial: !forceTutorial })
         }
         if (userExists.strategy !== 'discord') {
           await User.query()
@@ -75,7 +77,10 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
             .where('id', userExists.id)
           userExists.strategy = 'discord'
         }
-        return done(null, { ...user, ...userExists })
+        if (userExists.id >= 25000) {
+          console.warn('[USER] User ID is higher than 25,000! This may indicate that a Discord ID was saved as the User ID\nYou should rerun the migrations with "yarn migrate:rollback && yarn migrate:latest"')
+        }
+        return done(null, { ...user, ...userExists, username: userExists.username || user.username })
       })
   } catch (e) {
     console.error('User has failed Discord auth.', e)

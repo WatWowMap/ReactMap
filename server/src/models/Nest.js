@@ -5,7 +5,7 @@ const getAreaSql = require('../services/functions/getAreaSql')
 const { pokemon: masterPkmn } = require('../data/masterfile.json')
 const { api: { searchResultsLimit } } = require('../services/config')
 
-class Nest extends Model {
+module.exports = class Nest extends Model {
   static get tableName() {
     return 'nests'
   }
@@ -85,5 +85,3 @@ class Nest extends Model {
     return query
   }
 }
-
-module.exports = Nest

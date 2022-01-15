@@ -2,7 +2,7 @@
 const { Model } = require('objection')
 const { database: { settings: { userTableName } } } = require('../services/config')
 
-class User extends Model {
+module.exports = class User extends Model {
   static get tableName() {
     return userTableName
   }
@@ -14,5 +14,3 @@ class User extends Model {
       .then(() => console.log(`[${botName}] Cleared ${strategy} perms for user ${userId}`))
   }
 }
-
-module.exports = User

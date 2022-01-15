@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
-      - ./server/src/configs/config.json:/home/node/server/src/configs/config.json
+      - ./server/src/configs/local.json:/home/node/server/src/local/config.json
       - ./example.env:/home/node/.env
     ports:
       - "9090:8080"

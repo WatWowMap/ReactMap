@@ -1,5 +1,6 @@
 const path = require('path')
 const chalk = require('chalk')
+const fs = require('fs')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
@@ -9,10 +10,14 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const emoji = require('node-emoji')
 const ProgressBarPlugin = require('progress-bar-webpack-plugin')
 const webpack = require('webpack')
-const dotenv = require('dotenv').config({
-  path: path.join(__dirname, '.env'),
-})
+const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+const dotenv = fs.existsSync('.env')
+  ? require('dotenv').config({
+    path: path.join(__dirname, '.env'),
+  })
+  : { parsed: {} }
 const resolve = require('./webpack.config.resolve')
+const { version } = require('./package.json')
 
 module.exports = (env) => {
   const isDevelopment = env.dev
@@ -108,7 +113,7 @@ module.exports = (env) => {
           clear: false,
         }),
         new webpack.DefinePlugin({
-          'process.env': dotenv ? JSON.stringify(dotenv.parsed) : JSON.stringify({}),
+          'process.env': JSON.stringify({ ...dotenv.parsed, VERSION: version, isDevelopment }),
         }),
       ]
       if (isDevelopment) {
@@ -116,6 +121,18 @@ module.exports = (env) => {
           context: 'src',
           extensions: ['js', 'jsx'],
         }))
+      }
+      if (dotenv.parsed.SENTRY_AUTH_TOKEN && !isDevelopment) {
+        plugins.push(
+          new SentryWebpackPlugin({
+            authToken: dotenv.parsed.SENTRY_AUTH_TOKEN,
+            org: dotenv.parsed.SENTRY_ORG,
+            project: dotenv.parsed.SENTRY_PROJECT,
+            release: version,
+            include: '.',
+            ignore: ['node_modules', 'server', 'public', 'webpack.config.js'],
+          }),
+        )
       }
       return plugins
     })(),

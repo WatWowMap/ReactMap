@@ -15,6 +15,7 @@ export default function Size({ filterValues, handleChange, btnSize }) {
             key={size}
             onClick={() => handleChange('size', size)}
             color={color}
+            variant={(filterValues.size || 'md') === size ? 'contained' : 'outlined'}
             size={btnSize}
           >
             {t(size)}

@@ -3,9 +3,10 @@ const { TelegramStrategy } = require('passport-telegram-official')
 const passport = require('passport')
 const path = require('path')
 
-// if writing a custom strategy, rename 'telegram' below to your strategy name
-// this will automatically grab all of its unique values in the config
-const { telegram: strategyConfig, alwaysEnabledPerms } = require('../services/config')
+const {
+  map: { forceTutorial },
+  authentication: { [path.parse(__filename).name]: strategyConfig, perms, alwaysEnabledPerms },
+} = require('../services/config')
 const { User } = require('../models/index')
 const Fetch = require('../services/Fetch')
 const Utility = require('../services/Utility')
@@ -14,7 +15,7 @@ const authHandler = async (req, profile, done) => {
   const user = {
     ...profile,
     perms: {
-      ...Object.fromEntries(Object.keys(strategyConfig.perms).map(x => [x, false])),
+      ...Object.fromEntries(Object.keys(perms).map(x => [x, false])),
       areaRestrictions: [],
       webhooks: [],
     },
@@ -36,7 +37,7 @@ const authHandler = async (req, profile, done) => {
     }
   }))
 
-  Object.entries(strategyConfig.perms).forEach(([perm, info]) => {
+  Object.entries(perms).forEach(([perm, info]) => {
     if (info.enabled && (alwaysEnabledPerms.includes(perm)
       || info.roles.some(role => groupInfo.includes(role)))) {
       user.perms[perm] = true
@@ -50,8 +51,7 @@ const authHandler = async (req, profile, done) => {
     await User.query()
       .findOne({ telegramId: user.id })
       .then(async (userExists) => {
-        console.log(userExists)
-        if (req.user) {
+        if (req.user && userExists?.strategy === 'local') {
           await User.query()
             .update({ telegramId: user.id, telegramPerms: JSON.stringify(user.perms), webhookStrategy: 'telegram' })
             .where('id', req.user.id)
@@ -62,13 +62,14 @@ const authHandler = async (req, profile, done) => {
           return done(null, {
             ...user,
             ...req.user,
+            username: userExists.username || user.username,
             telegramId: user.id,
             perms: Utility.mergePerms(req.user.perms, user.perms),
           })
         }
         if (!userExists) {
           userExists = await User.query()
-            .insertAndFetch({ telegramId: user.id, strategy: user.provider })
+            .insertAndFetch({ telegramId: user.id, strategy: user.provider, tutorial: !forceTutorial })
         }
         if (userExists.strategy !== 'telegram') {
           await User.query()
@@ -76,7 +77,10 @@ const authHandler = async (req, profile, done) => {
             .where('id', userExists.id)
           userExists.strategy = 'telegram'
         }
-        return done(null, { ...user, ...userExists })
+        if (userExists.id >= 25000) {
+          console.warn('[USER] User ID is higher than 25,000! This may indicate that a Telegram ID was saved as the User ID\nYou should rerun the migrations with "yarn migrate:rollback && yarn migrate:latest"')
+        }
+        return done(null, { ...user, ...userExists, username: userExists.username || user.username })
       })
   } catch (e) {
     console.error('User has failed Telegram auth.', e)

@@ -9,7 +9,7 @@ module.exports = gql`
     last_lon: Float
     type: String
     isMad: Boolean
-    route: String
+    route: JSON
   }
 
   type Gym {
@@ -159,7 +159,7 @@ module.exports = gql`
     updated: Int
   }
 
-  type S2cell {
+  type ScanCell {
     id: ID
     level: Int
     center_lat: Float

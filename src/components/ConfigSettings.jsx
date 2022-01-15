@@ -1,6 +1,7 @@
 import React from 'react'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
+import * as Sentry from '@sentry/react'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
@@ -68,8 +69,11 @@ export default function ConfigSettings({
     perms: serverSettings.user ? serverSettings.user.perms : {},
     methods: serverSettings.authMethods,
   })
+  Sentry.setUser({ username: serverSettings.user.username, id: serverSettings.user.id })
 
-  setTutorial(serverSettings.user.tutorial === undefined ? localState?.state?.tutorial : !serverSettings.user.tutorial)
+  setTutorial(serverSettings.user.tutorial === undefined
+    ? serverSettings.config.map.forceTutorial
+    : !serverSettings.user.tutorial)
   setUi(serverSettings.ui)
 
   setMasterfile(serverSettings.masterfile)
@@ -86,6 +90,24 @@ export default function ConfigSettings({
 
   setUserSettings(updateObjState(serverSettings.userSettings, 'userSettings'))
   setStaticUserSettings(serverSettings.clientMenus)
+
+  if (localState?.state?.settings) {
+    const cached = localState.state.settings.localeSelection
+    const i18cached = localStorage.getItem('i18nextLng')
+    localState.state.settings.localeSelection = cached !== i18cached ? i18cached : cached
+
+    const validNav = Object.keys(serverSettings.config.navigation)
+    localState.state.settings.navigation = validNav.includes(localState.state.settings.navigation)
+      ? localState.state.settings.navigation
+      : serverSettings.config.navigation[validNav[0]]?.name
+
+    const validTs = Object.keys(serverSettings.config.tileServers)
+    localState.state.settings.tileServers = validTs.includes(localState.state.settings.tileServers)
+      ? localState.state.settings.tileServers
+      : serverSettings.config.tileServers[validTs[0]]?.name
+  } else {
+    serverSettings.settings.localeSelection = localStorage.getItem('i18nextLng') || serverSettings.settings.localeSelection
+  }
 
   setSettings(updateObjState(serverSettings.settings, 'settings'))
   setStaticSettings(serverSettings.settings)

@@ -5,7 +5,11 @@ const { pokemon: masterPkmn, items: masterItems, questRewardTypes } = require('.
 const fetchQuests = require('../services/api/fetchQuests')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { api: { searchResultsLimit }, database: { schemas, settings }, map } = require('../services/config')
+const {
+  api: { searchResultsLimit },
+  database: { settings },
+  map,
+} = require('../services/config')
 
 const questProps = {
   quest_type: true,
@@ -36,11 +40,10 @@ const invasionProps = {
   incident_expire_timestamp: true,
   grunt_type: true,
 }
-const dbType = dbSelection('pokestop')
-const { hasAltQuests } = Object.values(schemas).find(schema => schema.useFor.includes('pokestop'))
-const altQuestCheck = hasAltQuests && dbType !== 'mad'
+const { type, hasAltQuests } = dbSelection('pokestop')
+const altQuestCheck = hasAltQuests && type !== 'mad'
 
-class Pokestop extends Model {
+module.exports = class Pokestop extends Model {
   static get tableName() {
     return 'pokestop'
   }
@@ -90,7 +93,7 @@ class Pokestop extends Model {
             .as('incident_expire_timestamp'),
         ])
     }
-    if (dbType === 'chuck') {
+    if (type === 'chuck') {
       query.join('incident', 'pokestop.id', 'incident.pokestop_id')
         .select([
           '*',
@@ -226,7 +229,7 @@ class Pokestop extends Model {
         })
       }
       if (onlyInvasions && invasionPerms) {
-        if (dbType === 'chuck') {
+        if (type === 'chuck') {
           stops.orWhere(invasion => {
             invasion.whereIn('character', invasions)
               .andWhere('expiration_ms', '>=', safeTs * 1000)
@@ -273,7 +276,12 @@ class Pokestop extends Model {
       if (global || filters.onlyQuests) {
         filtered.quests = []
         pokestop.quests.forEach(quest => {
-          if (quest.quest_reward_type) {
+          if (quest.quest_reward_type && (
+            !map.enableQuestSetSelector
+            || filters.onlyShowQuestSet === 'both'
+            || (filters.onlyShowQuestSet === 'with_ar' && quest.with_ar)
+            || (filters.onlyShowQuestSet === 'without_ar' && !quest.with_ar)
+          )) {
             const newQuest = {}
             if (isMad) {
               this.parseMadRewards(quest)
@@ -501,8 +509,8 @@ class Pokestop extends Model {
       }
     }
 
-    Object.entries(quests).forEach(([type, rewards]) => {
-      switch (type) {
+    Object.entries(quests).forEach(([questType, rewards]) => {
+      switch (questType) {
         case 'items': rewards.forEach(reward => finalList.add(`q${reward.quest_item_id}`)); break
         case 'mega': rewards.forEach(reward => finalList.add(`m${reward.id}-${reward.amount}`)); break
         case 'invasions': rewards.forEach(reward => finalList.add(`i${reward.grunt_type}`)); break
@@ -529,8 +537,8 @@ class Pokestop extends Model {
       .orderBy(isMad ? 'active_fort_modifier' : 'lure_id')
 
     Object.entries(stops).forEach(stopType => {
-      const [type, rewards] = stopType
-      switch (type) {
+      const [sType, rewards] = stopType
+      switch (sType) {
         default: rewards.forEach(reward => finalList.add(`i${reward.grunt_type}`)); break
         case 'lures': rewards.forEach(reward => finalList.add(`l${reward.lure_id}`)); break
       }
@@ -600,8 +608,8 @@ class Pokestop extends Model {
     const itemIds = Object.keys(masterItems).filter(item => (
       i18next.t(`item_${item}`, { lng: locale }).toLowerCase().includes(search)
     ))
-    const rewardTypes = Object.keys(questRewardTypes).filter(type => (
-      i18next.t(`quest_reward_${type}`, { lng: locale }).toLowerCase().includes(search)
+    const rewardTypes = Object.keys(questRewardTypes).filter(rType => (
+      i18next.t(`quest_reward_${rType}`, { lng: locale }).toLowerCase().includes(search)
     ))
 
     const query = this.query()
@@ -639,7 +647,7 @@ class Pokestop extends Model {
     if (perms.areaRestrictions?.length) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
-    const results = await query.skipUndefined()
+    const results = await query
 
     if (altQuestCheck) {
       const altQuestQuery = this.query()
@@ -657,7 +665,7 @@ class Pokestop extends Model {
         })
         .limit(searchResultsLimit)
         .orderBy('distance')
-      const altQuestResults = await altQuestQuery.skipUndefined()
+      const altQuestResults = await altQuestQuery
       const remapped = altQuestResults.map(result => ({
         ...result,
         quest_rewards: result.alternative_quest_rewards,
@@ -674,5 +682,3 @@ class Pokestop extends Model {
     return results.map(result => isMad ? this.parseMadRewards(result) : this.parseRdmRewards(result)).filter(x => x)
   }
 }
-
-module.exports = Pokestop

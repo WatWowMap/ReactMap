@@ -10,23 +10,24 @@ import Webhook from './layout/dialogs/webhooks/Webhook'
 
 const userSettingsCategory = category => {
   switch (category) {
-    default: return category
     case 'devices':
     case 'spawnpoints':
-    case 's2cells': return 'admin'
+    case 'scanCells': return 'admin'
     case 'submissionCells':
     case 'portals': return 'wayfarer'
+    default: return category
   }
 }
 
 const getTileServer = (tileServers, settings, isNight) => {
-  if (tileServers[settings.tileServers].name === 'auto') {
+  const fallbackTs = Object.values(tileServers).find(server => server.name !== 'auto')
+  if (tileServers?.[settings.tileServers]?.name === 'auto') {
     const autoTile = isNight
       ? Object.values(tileServers).find(server => server.style === 'dark')
       : Object.values(tileServers).find(server => server.style === 'light')
-    return autoTile || Object.values(tileServers).find(server => server.name !== 'auto')
+    return autoTile || fallbackTs
   }
-  return tileServers[settings.tileServers]
+  return tileServers[settings.tileServers] || fallbackTs
 }
 
 export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons, webhooks }, params }) {
@@ -78,9 +79,9 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   return (
     <>
       <TileLayer
-        key={tileServer.name}
-        attribution={tileServer.attribution}
-        url={tileServer.url}
+        key={tileServer?.name}
+        attribution={tileServer?.attribution || 'Map tiles by Carto, under CC BY 3.0. Data by  <a href="https://www.openstreetmap.org/">OpenStreetMap</a>, under ODbL.'}
+        url={tileServer?.url || 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png'}
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
       />
@@ -140,7 +141,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
               return (
                 <QueryData
                   key={category}
-                  sizeKey={filters[category].filter ? Object.values(filters[category].filter).map(x => x.size).join(',') : 'md'}
+                  sizeKey={filters[category].filter ? Object.values(filters[category].filter).map(x => x ? x.size : 'md').join(',') : 'md'}
                   bounds={Utility.getQueryArgs(map)}
                   setExcludeList={setExcludeList}
                   onMove={onMove}
@@ -154,8 +155,8 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
                   userIcons={icons}
                   userSettings={userSettings[userSettingsCategory(category)] || {}}
                   filters={filters[category]}
-                  tileStyle={tileServer.style}
-                  clusterZoomLvl={config.clusterZoomLevels[category]}
+                  tileStyle={tileServer?.style || 'light'}
+                  clusteringRules={config?.clustering?.[category] || { zoomLimit: config.minZoom, forcedLimit: 10000 }}
                   staticUserSettings={staticUserSettings[category]}
                   params={manualParams}
                   setParams={setManualParams}

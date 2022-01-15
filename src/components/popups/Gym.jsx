@@ -495,16 +495,16 @@ const Timer = ({
     return () => clearTimeout(timer)
   })
 
-  return (
+  return target ? (
     <Grid item xs={start && !gym.raid_pokemon_id ? 6 : 12} style={{ textAlign: 'center' }}>
       <Typography variant="subtitle1">
-        {t(start ? 'starts' : 'ends')}: {new Date(target).toLocaleTimeString(localStorage.getItem('i18nextLng'))}
+        {t(start ? 'starts' : 'ends')}: {new Date(target).toLocaleTimeString(localStorage.getItem('i18nextLng') || 'en')}
       </Typography>
       <Typography variant="h6">
         {display.str}
       </Typography>
     </Grid>
-  )
+  ) : null
 }
 
 const Footer = ({

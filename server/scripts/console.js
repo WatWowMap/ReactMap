@@ -1,6 +1,6 @@
 const repl = require('repl')
-require('./db/initialization')
-const models = require('./models/index')
+require('../src/db/initialization')
+const models = require('../src/models/index')
 
 const replServer = repl.start({
   prompt: '> ',

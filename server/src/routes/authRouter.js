@@ -1,24 +1,22 @@
 /* eslint-disable global-require */
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable no-console */
-const fs = require('fs')
 const router = require('express').Router()
 const passport = require('passport')
 const { isValidSession, clearOtherSessions } = require('../services/sessionStore')
+const { authentication: { strategies } } = require('../services/config')
 
 // Loads up the base auth routes and any custom ones
-fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
-  if (e) return console.error(e)
-  files.forEach((file) => {
-    const trimmed = file.replace('.js', '')
-    const method = trimmed.includes('local') ? 'post' : 'get'
 
-    router[method](`/${trimmed}`, passport.authenticate(trimmed, {
+strategies.forEach(strategy => {
+  const method = strategy.type === 'local' ? 'post' : 'get'
+  if (strategy.enabled) {
+    router[method](`/${strategy.name}`, passport.authenticate(strategy.name, {
       successRedirect: '/',
       failureMessage: true,
     }))
-    router[method](`/${trimmed}/callback`,
-      async (req, res, next) => passport.authenticate(trimmed, async (err, user, info) => {
+    router[method](`/${strategy.name}/callback`,
+      async (req, res, next) => passport.authenticate(strategy.name, async (err, user, info) => {
         if (err) { return next(err) }
         if (!user) {
           res.status(401).json(info.message)
@@ -38,8 +36,8 @@ fs.readdir(`${__dirname}/../strategies/`, (e, files) => {
           }
         }
       })(req, res, next))
-    console.log(`${method.toUpperCase()} /auth/${trimmed}/callback route initialized`)
-  })
+    console.log(`${method.toUpperCase()} /auth/${strategy.name}/callback route initialized`)
+  }
 })
 
 module.exports = router

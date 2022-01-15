@@ -4,7 +4,7 @@ import nests from './Nest'
 import pokemon from './Pokemon'
 import pokestops from './Pokestop'
 import portals from './Portal'
-import s2cells from './S2cell'
+import scanCells from './ScanCell'
 import scanAreas from './ScanArea'
 import spawnpoints from './Spawnpoint'
 import submissionCells from './submissionCells/SubmissionCell'
@@ -18,7 +18,7 @@ export {
   pokestops,
   portals,
   scanAreas,
-  s2cells,
+  scanCells,
   submissionCells,
   spawnpoints,
   weather,
