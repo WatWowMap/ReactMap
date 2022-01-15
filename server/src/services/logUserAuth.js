@@ -6,7 +6,7 @@ module.exports = async function getAuthInfo(req, user, strategy) {
     || ((req.headers['x-forwarded-for'] || '').split(', ')[0])
     || (req.connection.remoteAddress || req.connection.localAddress).match('[0-9]+.[0-9].+[0-9]+.[0-9]+$')[0]
 
-  const geo = await Fetch.fetchJson(`http://ip-api.com/json/${ip}?fields=66846719&lang=en`)
+  const geo = await Fetch.json(`http://ip-api.com/json/${ip}?fields=66846719&lang=en`)
   const embed = {
     color: 0xFF0000,
     title: 'Authentication',

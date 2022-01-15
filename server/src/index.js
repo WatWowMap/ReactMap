@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable global-require */
-const express = require('express')
 const path = require('path')
+const express = require('express')
 const logger = require('morgan')
 const compression = require('compression')
 const session = require('express-session')
@@ -19,6 +19,7 @@ const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
+require('./services/checkForUpdates')
 
 const app = express()
 
