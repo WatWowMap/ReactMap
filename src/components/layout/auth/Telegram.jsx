@@ -7,7 +7,7 @@ export default function Telegram({ botName, authUrl }) {
       botName={process.env?.[botName]}
       dataAuthUrl={authUrl || '/auth/telegram/callback'}
       usePic={false}
-      lang={localStorage.getItem('i18nextLng')}
+      lang={localStorage?.getItem('i18nextLng') || 'en'}
     />
   )
 }
