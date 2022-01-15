@@ -1,0 +1,330 @@
+{
+  "interface": "0.0.0.0",
+  "port": 8080,
+  "api": {
+    "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Zx",
+    "reactMapSecret": "You Should Change Me",
+    "maxSessions": 5,
+    "queryAvailable": {
+      "pokemon": true,
+      "quests": true,
+      "raids": true,
+      "nests": false
+    },
+    "pvp": {
+      "leagues": [
+        {
+          "name": "great",
+          "cp": 1500
+        },
+        {
+          "name": "ultra",
+          "cp": 2500
+        }
+      ],
+      "levels": [
+        50,
+        51
+      ],
+      "reactMapHandlesPvp": false
+    }
+  },
+  "map": {
+    "general": {
+      "title": "ReactMap",
+      "headerTitle": "ReactMap",
+      "startLat": 0,
+      "startLon": 0,
+      "startZoom": 12,
+      "minZoom": 10,
+      "maxZoom": 18
+    },
+    "links": {
+      "feedbackLink": "",
+      "statsLink": ""
+    },
+    "misc": {
+      "enableQuestSetSelector": true
+    }
+  },
+  "clientSideOptions": {
+    "pokemon": {
+      "clustering": true,
+      "glow": [
+        {
+          "name": "Hundo",
+          "perm": "iv",
+          "num": 100,
+          "value": "#ff1744",
+          "op": "="
+        },
+        {
+          "name": "Top 3 Ranks",
+          "perm": "pvp",
+          "num": 3,
+          "value": "#0000ff",
+          "op": "<="
+        },
+        {
+          "name": "Multiple",
+          "perm": "pvp",
+          "value": "#800080"
+        }
+      ]
+    }
+  },
+  "database": {
+    "settings": {
+      "userTableName": "users",
+      "sessionTableName": "session"
+    },
+    "schemas": [
+      {
+        "type": "rdm/chuck/cdc/mad/manual",
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "user",
+        "password": "pass123!",
+        "database": "rdmdb",
+        "charset": "utf8mb4",
+        "hasAltQuests": false,
+        "useFor": [
+          "device",
+          "gym",
+          "pokemon",
+          "pokestop",
+          "scanCell",
+          "spawnpoint",
+          "weather"
+        ]
+      },
+      {
+        "type": "manual",
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "user",
+        "password": "pass123!",
+        "database": "manual_1",
+        "charset": "utf8mb4",
+        "useFor": [
+          "session",
+          "user",
+          "nest",
+          "portal"
+        ]
+      }
+    ]
+  },
+  "authentication": {
+    "strategies": [
+      {
+        "enabled": false,
+        "type": "discord",
+        "name": "discord",
+        "logChannelId": "",
+        "presence": "Map Status: Online",
+        "presenceType": 3,
+        "botToken": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectUri": "http://localhost:8080/auth/discord/callback",
+        "allowedGuilds": [],
+        "blockedGuilds": [],
+        "allowedUsers": []
+      }
+    ],
+    "areaRestrictions": [
+      {
+        "roles": [],
+        "areas": []
+      },
+      {
+        "roles": [],
+        "areas": []
+      }
+    ],
+    "alwaysEnabledPerms": [],
+    "perms": {
+      "map": {
+        "enabled": true,
+        "roles": []
+      },
+      "pokemon": {
+        "enabled": true,
+        "roles": []
+      },
+      "iv": {
+        "enabled": true,
+        "roles": []
+      },
+      "pvp": {
+        "enabled": true,
+        "roles": []
+      },
+      "gyms": {
+        "enabled": true,
+        "roles": []
+      },
+      "raids": {
+        "enabled": true,
+        "roles": []
+      },
+      "pokestops": {
+        "enabled": true,
+        "roles": []
+      },
+      "quests": {
+        "enabled": true,
+        "roles": []
+      },
+      "lures": {
+        "enabled": true,
+        "roles": []
+      },
+      "portals": {
+        "enabled": true,
+        "roles": []
+      },
+      "submissionCells": {
+        "enabled": true,
+        "roles": []
+      },
+      "invasions": {
+        "enabled": true,
+        "roles": []
+      },
+      "nests": {
+        "enabled": true,
+        "roles": []
+      },
+      "scanAreas": {
+        "enabled": true,
+        "roles": []
+      },
+      "weather": {
+        "enabled": true,
+        "roles": []
+      },
+      "spawnpoints": {
+        "enabled": true,
+        "roles": []
+      },
+      "scanCells": {
+        "roles": []
+      },
+      "devices": {
+        "enabled": true,
+        "roles": []
+      },
+      "donor": {
+        "roles": []
+      }
+    }
+  },
+  "tileServers": [
+    {
+      "name": "auto"
+    },
+    {
+      "name": "Carto",
+      "attribution": "Map tiles by Carto, under CC BY 3.0. Data by  <a href='https://www.openstreetmap.org/'>OpenStreetMap</a>, under ODbL.",
+      "url": "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png",
+      "style": "light"
+    },
+    {
+      "name": "OSM",
+      "attribution": "Map data Â© <a href='https://www.openstreetmap.org'>OpenStreetMap</a> contributors",
+      "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "style": "light"
+    },
+    {
+      "name": "Dark Matter",
+      "attribution": "Â© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors Â© <a href='https://carto.com/attributions'>CARTO</a>",
+      "url": "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      "style": "dark"
+    },
+    {
+      "name": "Satellite",
+      "attribution": "&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+      "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      "style": "dark"
+    }
+  ],
+  "icons": {
+    "Read_More_Here": "https://github.com/WatWowMap/ReactMap/wiki/Icons-Configuration",
+    "customizable": [
+      "pokemon",
+      "pokestop",
+      "gym",
+      "invasion",
+      "reward"
+    ],
+    "styles": [
+      {
+        "name": "Default",
+        "path": "https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/",
+        "modifiers": {
+          "gym": {
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 3,
+            "4": 4,
+            "5": 4,
+            "6": 18,
+            "sizeMultiplier": 1.2
+          }
+        }
+      },
+      {
+        "name": "PMSF",
+        "path": "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons-outline/",
+        "modifiers": {
+          "reward": {
+            "offsetX": 0.2,
+            "offsetY": 0.5,
+            "sizeMultiplier": 1.15
+          },
+          "invasion": {
+            "offsetX": 0.05,
+            "offsetY": 0.7,
+            "sizeMultiplier": 1.5,
+            "removeQuest": true
+          },
+          "pokestop": {
+            "sizeMultiplier": 2,
+            "manualPopup": -100
+          }
+        }
+      },
+      {
+        "name": "Home",
+        "path": "https://raw.githubusercontent.com/nileplumb/PkmnHomeIcons/master/UICONS/"
+      },
+      {
+        "name": "Shuffle",
+        "path": "https://raw.githubusercontent.com/nileplumb/PkmnShuffleMap/master/UICONS/"
+      },
+      {
+        "name": "Half Shiny",
+        "path": "https://raw.githubusercontent.com/jms412/PkmnShuffleMap/master/UICONS_Half_Shiny_Sparkles_256/"
+      }
+    ]
+  },
+  "manualAreas": [
+    {
+      "name": "New York",
+      "lat": 40.7481666,
+      "lon": -74.0174788,
+      "zoom": 15
+    },
+    {
+      "name": "San Francisco",
+      "lat": 37.79539194255634,
+      "lon": -122.39333173075096
+    },
+    {
+      "name": "Remove all of these if you'd prefer the map to read directly from your Geojson"
+    }
+  ]
+}

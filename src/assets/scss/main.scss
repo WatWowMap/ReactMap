@@ -1,5 +1,6 @@
 @import "~react-leaflet-markercluster/dist/styles.min.css";
 @import "~leaflet.locatecontrol/dist/L.Control.Locate.min.css";
+@import "holiday.scss";
 
 .leaflet-container {
   position: absolute;
@@ -219,19 +220,27 @@ img {
 .amount-holder {
   position: absolute;
   left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
+  bottom: 12px;
+  transform: translateX(-25%);
   min-width: 100%;
   color: white;
   text-shadow: #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px,
     #000 0 0 1px, #000 0 0 1px;
   font-weight: 700;
 }
-.amount-holder > div {
-  text-align: right;
-}
-.amount-holder > div:before {
-  content: "×";
+
+.search-amount-holder {
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  transform: translateX(-50%);
+  min-width: 100%;
+  font-size: x-large;
+  font-family: Roboto;
+  color: white;
+  text-shadow: #000 0 0 2px, #000 0 0 2px, #000 0 0 2px, #000 0 0 2px,
+    #000 0 0 2px, #000 0 0 2px;
+  font-weight: 700;
 }
 
 .iv-badge {
@@ -249,10 +258,17 @@ img {
   padding: 4px 3px 0 3px;
 }
 
-.weather-icon {
+.weather-fancy {
   background-color: rgba(255, 255, 255, 0.5);
   border: 2px solid rgb(41, 102, 122);
   border-radius: 48px;
+  position: absolute;
+  width: 30px;
+  height: 30px;
+}
+
+.weather-fancy > img {
+  filter: invert(75%) sepia(100%) hue-rotate(151deg) saturate(3.1);
 }
 
 .quest-popup-img {
@@ -349,4 +365,8 @@ img {
 
 .perm-wrapper img {
   width: 100%;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(100%);
 }

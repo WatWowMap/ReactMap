@@ -4,19 +4,17 @@ import {
   Grid,
   Typography,
   Fab,
-  Icon,
-  Select,
-  MenuItem,
 } from '@material-ui/core'
-import { Person } from '@material-ui/icons'
+import { Person, LockOpen } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
+import LocaleSelection from '@components/layout/general/LocaleSelection'
 
 export default function TutWelcome({ setUserProfile }) {
-  const { t, i18n } = useTranslation()
-  const { discord, loggedIn, perms } = useStatic(state => state.auth)
-  const { map: { excludeList }, localeSelection } = useStatic(state => state.config)
+  const { t } = useTranslation()
+  const { methods, loggedIn, perms } = useStatic(state => state.auth)
+  const { map: { enableUserProfile, excludeList }, localeSelection } = useStatic(state => state.config)
 
   const getPerms = () => {
     let have = 0
@@ -38,77 +36,65 @@ export default function TutWelcome({ setUserProfile }) {
         alignItems="center"
         justifyContent="center"
         spacing={2}
+        style={{ height: '100%' }}
       >
         <Grid item xs={12}>
           <Typography variant="h4" align="center" style={{ margin: 10 }}>
             {t('welcome')} {document.title}!
           </Typography>
         </Grid>
-        {discord
-          && (
-            <>
-              <Grid item xs={6}>
-                <Typography variant="subtitle2" align="center">
-                  {t('tutorialCategories')}:
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h6" gutterBottom align="center">
-                  {loggedIn ? t('viewProfile') : t('loginOptional')}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3" align="center">
-                  {getPerms()}
-                </Typography>
-              </Grid>
-              <Grid item xs={6} style={{ textAlign: 'center' }}>
-                {loggedIn ? (
-                  <Fab color="primary" onClick={() => setUserProfile(true)}>
-                    <Person />
-                  </Fab>
-                ) : (
-                  <Fab
-                    style={{ backgroundColor: 'rgb(114,136,218)', color: 'white' }}
-                    href="/auth/discord"
-                  >
-                    <Icon className="fab fa-discord" />
-                  </Fab>
-                )}
-              </Grid>
-              <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
-                <Typography variant="subtitle1" align="center">
-                  {loggedIn ? t('tutorialLoggedIn') : t('tutorialLoggedOut')}
-                </Typography>
-              </Grid>
-            </>
-          )}
+
+        <Grid item xs={6}>
+          <Typography variant="subtitle2" align="center">
+            {t('tutorial_categories')}:
+          </Typography>
+        </Grid>
+        {enableUserProfile && (
+          <Grid item xs={6}>
+            <Typography variant="h6" gutterBottom align="center">
+              {!loggedIn && methods.length ? t('login_optional') : t('view_profile')}
+            </Typography>
+          </Grid>
+        )}
+        <Grid item xs={6}>
+          <Typography variant="h3" align="center">
+            {getPerms()}
+          </Typography>
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
+          {(() => {
+            if (!loggedIn && methods.length) {
+              return (
+                <Fab color="primary" href="/login">
+                  <LockOpen />
+                </Fab>
+              )
+            }
+            return enableUserProfile ? (
+              <Fab color="primary" onClick={() => setUserProfile(true)}>
+                <Person />
+              </Fab>
+            ) : null
+          })()}
+        </Grid>
+        {enableUserProfile && (
+          <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
+            <Typography variant="subtitle1" align="center">
+              {!loggedIn && methods.length ? t('tutorial_logged_out') : t('tutorial_logged_in')}
+            </Typography>
+          </Grid>
+        )}
         <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
           <Typography variant="subtitle1" align="center">
-            {t('tutorialLanguage')}
+            {t('tutorial_language')}
           </Typography>
         </Grid>
         <Grid item xs={12} sm={10} style={{ textAlign: 'center' }}>
-          <Select
-            autoFocus
-            name="localeSelection"
-            value={localStorage.getItem('i18nextLng')}
-            onChange={(event) => i18n.changeLanguage(event.target.value)}
-            fullWidth
-          >
-            {Object.keys(localeSelection).map(option => (
-              <MenuItem
-                key={option}
-                value={option}
-              >
-                {t(`localeSelection${option}`)}
-              </MenuItem>
-            ))}
-          </Select>
+          <LocaleSelection localeSelection={localeSelection} />
         </Grid>
         <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
           <Typography variant="subtitle1" align="center">
-            {t('tutorialWelcome')}
+            {t('tutorial_welcome')}
           </Typography>
         </Grid>
       </Grid>

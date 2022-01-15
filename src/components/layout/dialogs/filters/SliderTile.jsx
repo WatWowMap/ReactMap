@@ -4,11 +4,9 @@ import {
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
-const sliderInputs = ['min', 'max']
-
 export default function SliderTile({
   filterSlide: {
-    name, min, max, color, disabled, label,
+    name, min, max, color, disabled, label, low, high,
   }, handleChange, filterValues,
 }) {
   const { t } = useTranslation()
@@ -43,7 +41,7 @@ export default function SliderTile({
         setTempTextValues(arrValues)
       } else {
         setTempTextValues(arrValues)
-        handleChange(name, arrValues)
+        handleChange(name, arrValues, low, high)
       }
     }
   }
@@ -59,13 +57,13 @@ export default function SliderTile({
     >
       <Grid item xs={4}>
         <Typography noWrap={fullName} onClick={() => setFullName(!fullName)} style={{ color: textColor }}>
-          {t(`${name}Slider`)}
+          {t(`slider_${name}`)}
         </Typography>
       </Grid>
-      {sliderInputs.map((each, index) => (
-        <Grid item xs={4} key={`${name}-${each}`}>
+      {['min', 'max'].map((each, index) => (
+        <Grid item xs={4} key={`${name}-${each}`} style={{ textAlign: index ? 'center' : 'right' }}>
           <TextField
-            style={{ width: 75 }}
+            style={{ width: 80 }}
             color={color}
             id={each}
             label={`${t(each)} ${t(label)}`}
@@ -84,17 +82,17 @@ export default function SliderTile({
           />
         </Grid>
       ))}
-      <Grid item xs={10}>
+      <Grid item xs={10} style={{ textAlign: 'center' }}>
         <Slider
           name={name}
           min={min}
           max={max}
           color={color}
-          style={{ width: 200 }}
+          style={{ width: '100%' }}
           value={tempValues}
           onChange={handleTempChange}
           onChangeCommitted={(event, newValues) => {
-            handleChange(name, newValues)
+            handleChange(name, newValues, low, high)
           }}
           disabled={disabled}
           valueLabelDisplay="auto"

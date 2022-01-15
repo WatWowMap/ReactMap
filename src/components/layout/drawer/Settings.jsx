@@ -1,39 +1,29 @@
 import React, { useState } from 'react'
 import {
-  FormControl, Grid, InputLabel, MenuItem, Select, Button, Icon, Snackbar, Slide, Dialog,
+  FormControl, Grid, InputLabel, MenuItem, Select, Button,
 } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
+import Utility from '@services/Utility'
 
-import UserProfile from '../dialogs/UserProfile'
-import Tutorial from '../dialogs/tutorial/Tutorial'
-import Feedback from '../dialogs/Feedback'
-
-function SlideTransition(props) {
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  return <Slide {...props} direction="up" />
-}
-
-export default function Settings({ toggleDialog, Icons }) {
+export default function Settings({ Icons }) {
   const { t, i18n } = useTranslation()
   const config = useStatic(state => state.config)
   const staticSettings = useStatic(state => state.settings)
-  const { discord, loggedIn } = useStatic(state => state.auth)
+  const { loggedIn, methods } = useStatic(state => state.auth)
   const setStaticIcons = useStatic(state => state.setIcons)
+  const setUserProfile = useStatic(state => state.setUserProfile)
+  const setFeedback = useStatic(state => state.setFeedback)
 
-  const tutorial = useStore(state => state.tutorial)
   const setTutorial = useStore(state => state.setTutorial)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
   const icons = useStore(state => state.icons)
   const setIcons = useStore(state => state.setIcons)
 
-  const [alert, setAlert] = useState(false)
-  const [userProfile, setUserProfile] = useState(false)
-  const [feedback, setFeedback] = useState(false)
+  const [redirect, setRedirect] = useState(false)
 
   const handleChange = event => {
     setSettings({
@@ -50,16 +40,6 @@ export default function Settings({ toggleDialog, Icons }) {
     Icons.setSelection(name, value)
     setStaticIcons(Icons)
     setIcons({ ...icons, [name]: value })
-  }
-
-  const clearStorage = () => {
-    localStorage.clear()
-    window.location.reload()
-    setAlert(true)
-  }
-
-  const handleClose = () => {
-    setAlert(false)
   }
 
   const exportSettings = () => {
@@ -88,6 +68,9 @@ export default function Settings({ toggleDialog, Icons }) {
     setTimeout(() => window.location.reload(), 1500)
   }
 
+  if (redirect) {
+    return <Redirect push to="/reset" />
+  }
   return (
     <Grid
       container
@@ -99,7 +82,7 @@ export default function Settings({ toggleDialog, Icons }) {
       {Object.keys(staticSettings).map(setting => (
         <Grid item key={setting} xs={10}>
           <FormControl style={{ width: 200, margin: 5 }}>
-            <InputLabel>{t(setting)}</InputLabel>
+            <InputLabel>{t(Utility.camelToSnake(setting))}</InputLabel>
             <Select
               autoFocus
               name={setting}
@@ -112,7 +95,7 @@ export default function Settings({ toggleDialog, Icons }) {
                   key={option}
                   value={option}
                 >
-                  {t(`${setting}${option}`)}
+                  {t(`${Utility.camelToSnake(setting)}_${option.toLowerCase()}`, Utility.getProperName(option))}
                 </MenuItem>
               ))}
             </Select>
@@ -122,7 +105,7 @@ export default function Settings({ toggleDialog, Icons }) {
       {Icons.customizable.map(category => (
         <Grid item key={category} xs={10}>
           <FormControl style={{ width: 200, margin: 5 }}>
-            <InputLabel>{t(`${category}Icons`, `${category} Icons`)}</InputLabel>
+            <InputLabel>{t(`${category}_icons`, `${category} Icons`)}</InputLabel>
             <Select
               autoFocus
               name={category}
@@ -135,7 +118,7 @@ export default function Settings({ toggleDialog, Icons }) {
                   key={option}
                   value={option}
                 >
-                  {t(`${category}${option}`, option)}
+                  {t(`${category.toLowerCase()}_${option.toLowerCase()}`, Utility.getProperName(option))}
                 </MenuItem>
               ))}
             </Select>
@@ -150,32 +133,30 @@ export default function Settings({ toggleDialog, Icons }) {
         spacing={3}
         style={{ margin: '10px 0px' }}
       >
-        <Grid item xs={t('drawerSettingsProfileWidth')} style={{ textAlign: 'center' }}>
-          <Button
-            style={{ minWidth: 100 }}
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={() => setUserProfile(true)}
-          >
-            {t('profile')}
-          </Button>
-        </Grid>
-        {discord && (
-          <Grid item xs={t('drawerSettingsLogoutWidth')} style={{ textAlign: 'center' }}>
+        {config.map.enableUserProfile && (
+          <Grid item xs={t('drawer_settings_profile_width')} style={{ textAlign: 'center' }}>
+            <Button
+              style={{ minWidth: 100 }}
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={() => setUserProfile(true)}
+            >
+              {t('profile')}
+            </Button>
+          </Grid>
+        )}
+        {Boolean(methods.length) && (
+          <Grid item xs={t('drawer_settings_logout_width')} style={{ textAlign: 'center' }}>
             {loggedIn ? (
               <Button
                 className="sidebar-button"
                 variant="contained"
-                style={{
-                  backgroundColor: 'rgb(114,136,218)',
-                  color: 'white',
-                  minWidth: 100,
-                }}
+                style={{ minWidth: 100 }}
+                color="primary"
                 size="small"
                 href="/logout"
               >
-                <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
                 {t('logout')}
               </Button>
             ) : (
@@ -183,43 +164,41 @@ export default function Settings({ toggleDialog, Icons }) {
                 <Button
                   className="sidebar-button"
                   variant="contained"
-                  style={{
-                    backgroundColor: 'rgb(114,136,218)',
-                    color: 'white',
-                    minWidth: 100,
-                  }}
+                  style={{ minWidth: 100 }}
+                  color="primary"
                   size="small"
                 >
-                  <Icon className="fab fa-discord" style={{ fontSize: 20 }} />&nbsp;
                   {t('login')}
                 </Button>
               </Link>
             )}
           </Grid>
         )}
-        <Grid item xs={t('drawerSettingsTutorialWidth')} style={{ textAlign: 'center' }}>
-          <Button
-            style={{ minWidth: 100 }}
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={() => setTutorial(true)}
-          >
-            {t('tutorial')}
-          </Button>
-        </Grid>
-        <Grid item xs={discord ? t('drawerSettingsResetFiltersDiscordWidth') : t('drawerSettingsResetFiltersWidth')} style={{ textAlign: 'center' }}>
+        {config.map.enableTutorial && (
+          <Grid item xs={t('drawer_settings_tutorial_width')} style={{ textAlign: 'center' }}>
+            <Button
+              style={{ minWidth: 100 }}
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={() => setTutorial(true)}
+            >
+              {t('tutorial')}
+            </Button>
+          </Grid>
+        )}
+        <Grid item xs={t('drawer_settings_reset_filters_width')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
             color="primary"
             size="small"
-            onClick={clearStorage}
+            onClick={() => setRedirect(true)}
           >
-            {t('resetFilters')}
+            {t('reset_filters')}
           </Button>
         </Grid>
-        <Grid item xs={t('drawerSettingsExportSettingsWidth')} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawer_settings_export_settings_width')} style={{ textAlign: 'center' }}>
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -230,7 +209,7 @@ export default function Settings({ toggleDialog, Icons }) {
             {t('export')}
           </Button>
         </Grid>
-        <Grid item xs={t('drawerSettingsImportSettingsWidth')} style={{ textAlign: 'center' }}>
+        <Grid item xs={t('drawer_settings_import_settings_width')} style={{ textAlign: 'center' }}>
           <input
             accept="application/json"
             id="contained-button-file"
@@ -250,9 +229,9 @@ export default function Settings({ toggleDialog, Icons }) {
             </Button>
           </label>
         </Grid>
-        {config.map.enableStats
+        {config.map.statsLink
           && (
-            <Grid item xs={t('drawerSettingsStatsWidth')} style={{ textAlign: 'center' }}>
+            <Grid item xs={t('drawer_settings_stats_width')} style={{ textAlign: 'center' }}>
               <Button
                 variant="contained"
                 color="secondary"
@@ -266,9 +245,9 @@ export default function Settings({ toggleDialog, Icons }) {
               </Button>
             </Grid>
           )}
-        {config.map.enableFeedback
+        {config.map.feedbackLink
           && (
-            <Grid item xs={t('drawerSettingsFeedbackWidth')} style={{ textAlign: 'center' }}>
+            <Grid item xs={t('drawer_settings_feedback_width')} style={{ textAlign: 'center' }}>
               <Button
                 variant="contained"
                 color="primary"
@@ -281,27 +260,6 @@ export default function Settings({ toggleDialog, Icons }) {
             </Grid>
           )}
       </Grid>
-      <Snackbar
-        open={alert}
-        onClose={handleClose}
-        TransitionComponent={SlideTransition}
-      >
-        <Alert onClose={handleClose} severity="success" variant="filled">
-          {t('localStorageCleared')}
-        </Alert>
-      </Snackbar>
-      <Dialog open={userProfile}>
-        <UserProfile setUserProfile={setUserProfile} />
-      </Dialog>
-      <Dialog open={tutorial}>
-        <Tutorial setUserProfile={setUserProfile} setTutorial={setTutorial} toggleDialog={toggleDialog} />
-      </Dialog>
-      <Dialog
-        open={feedback}
-        maxWidth="xs"
-      >
-        <Feedback link={config.map.feedbackLink} setFeedback={setFeedback} />
-      </Dialog>
     </Grid>
   )
 }

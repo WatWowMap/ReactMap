@@ -2,31 +2,23 @@ import React, { Fragment, useState } from 'react'
 import {
   Grid,
   Typography,
-  DialogTitle,
-  DialogActions,
-  Button,
-  IconButton,
   Switch,
   Input,
-  useMediaQuery,
   AppBar,
   Tab,
   Tabs,
+  DialogContent,
 } from '@material-ui/core'
-import { Clear, Replay, Save } from '@material-ui/icons'
-import { useTheme } from '@material-ui/styles'
 import { useTranslation, Trans } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
 import TabPanel from '../general/TabPanel'
+import Header from '../general/Header'
+import Footer from '../general/Footer'
 
-export default function UserOptions({ category, toggleDialog }) {
-  const theme = useTheme()
-  const classes = useStyles()
+export default function UserOptions({ category, toggleDialog, isMobile }) {
   const { t } = useTranslation()
-  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const { [category]: staticUserSettings } = useStatic(state => state.userSettings)
   const userSettings = useStore(state => state.userSettings)
 
@@ -35,44 +27,6 @@ export default function UserOptions({ category, toggleDialog }) {
   const [tabPages] = useState(Array.from({
     length: Math.ceil(Object.keys(staticUserSettings).length / 10),
   }, (v, i) => i))
-
-  const reset = {
-    key: 'reset',
-    icon: (
-      <IconButton onClick={() => setLocalState(userSettings[category])}>
-        <Replay color="primary" />
-      </IconButton>
-    ),
-    text: (
-      <Button onClick={() => setLocalState(userSettings[category])}>
-        <Typography variant="caption" color="primary">
-          {t('reset')}
-        </Typography>
-      </Button>
-    ),
-  }
-  const save = {
-    key: 'save',
-    icon: (
-      <IconButton
-        onClick={toggleDialog(false, category, 'options', localState)}
-      >
-        <Save color="secondary" />
-      </IconButton>
-    ),
-    text: (
-      <Button
-        onClick={toggleDialog(false, category, 'options', localState)}
-        color="secondary"
-      >
-        <Typography
-          variant="caption"
-        >
-          {t('save')}
-        </Typography>
-      </Button>
-    ),
-  }
 
   const handleChange = event => {
     const { name, value } = event.target
@@ -91,12 +45,12 @@ export default function UserOptions({ category, toggleDialog }) {
   const getLabel = (label) => {
     if (label.startsWith('pvp') && !label.includes('Mega')) {
       return (
-        <Trans i18nKey="pvpLevel">
+        <Trans i18nKey="pvp_level">
           {{ level: label.substring(3) }}
         </Trans>
       )
     }
-    return (t(label))
+    return (t(Utility.camelToSnake(label), Utility.getProperName(label)))
   }
 
   const getInputType = (option, subOption) => {
@@ -142,80 +96,75 @@ export default function UserOptions({ category, toggleDialog }) {
 
   return (
     <>
-      <DialogTitle className={classes.filterHeader}>
-        {t(`${category}Options`)}
-        <IconButton
-          onClick={toggleDialog(false, category, 'options')}
-          style={{ position: 'absolute', right: 5, top: 5 }}
-        >
-          <Clear style={{ color: 'white' }} />
-        </IconButton>
-      </DialogTitle>
-      {category === 'pokemon' && (
-        <AppBar position="static">
-          <Tabs
-            value={tab}
-            onChange={handleTabChange}
-            indicatorColor="secondary"
-            variant="fullWidth"
-            style={{ backgroundColor: '#424242', width: '100%' }}
-          >
-            {tabPages.map(each => (
-              <Tab
-                key={each}
-                label={<Trans i18nKey="page">{{ page: each + 1 }}</Trans>}
-                style={{ width: 40, minWidth: 40 }}
-              />
-            ))}
-          </Tabs>
-        </AppBar>
-      )}
-      {tabPages.map(each => (
-        <TabPanel value={tab} index={each} key={each}>
-          {Object.entries(staticUserSettings).map(([key, values], j) => {
-            const start = each * 10
-            const end = each * 10 + 10
-            if (j < start) return null
-            if (j >= end) return null
-            return (
-              <Grid
-                container
-                key={key}
-                direction="row"
-                justifyContent="center"
-                alignItems="center"
-                style={{ width: 250 }}
-                spacing={2}
-              >
-                <Grid item xs={9}>
-                  <Typography variant="body1">
-                    {getLabel(key)}
-                  </Typography>
+      <Header
+        titles={[t(`${category}_options`)]}
+        action={toggleDialog(false, category, 'options')}
+      />
+      <DialogContent style={{ padding: 0 }}>
+        {category === 'pokemon' && (
+          <AppBar position="static">
+            <Tabs
+              value={tab}
+              onChange={handleTabChange}
+              indicatorColor="secondary"
+              variant="fullWidth"
+              style={{ backgroundColor: '#424242', width: '100%' }}
+            >
+              {tabPages.map(each => (
+                <Tab
+                  key={each}
+                  label={<Trans i18nKey="page">{{ page: each + 1 }}</Trans>}
+                  style={{ width: 40, minWidth: 40 }}
+                />
+              ))}
+            </Tabs>
+          </AppBar>
+        )}
+        {tabPages.map(each => (
+          <TabPanel value={tab} index={each} key={each}>
+            {Object.entries(staticUserSettings).map(([key, values], j) => {
+              const start = each * 10
+              const end = each * 10 + 10
+              if (j < start) return null
+              if (j >= end) return null
+              return (
+                <Grid
+                  container
+                  key={key}
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                  style={isMobile ? {} : { width: 250 }}
+                  spacing={2}
+                >
+                  <Grid item xs={9}>
+                    <Typography variant="body1">
+                      {getLabel(key)}
+                    </Typography>
+                  </Grid>
+                  {getInputType(key)}
+                  {values.sub
+                    && Object.keys(values.sub).map(subOption => (
+                      <Fragment key={subOption}>
+                        <Grid item xs={9}>
+                          <Typography variant="body1">
+                            {getLabel(subOption)}
+                          </Typography>
+                        </Grid>
+                        {getInputType(key, subOption)}
+                      </Fragment>
+                    ))}
                 </Grid>
-                {getInputType(key)}
-                {values.sub
-                  && Object.keys(values.sub).map(subOption => (
-                    <Fragment key={subOption}>
-                      <Grid item xs={9}>
-                        <Typography variant="body1">
-                          {getLabel(subOption)}
-                        </Typography>
-                      </Grid>
-                      {getInputType(key, subOption)}
-                    </Fragment>
-                  ))}
-              </Grid>
-            )
-          })}
-        </TabPanel>
-      ))}
-      <DialogActions>
-        {[reset, save].map(button => (
-          <Fragment key={button.key}>
-            {isMobile ? button.icon : button.text}
-          </Fragment>
+              )
+            })}
+          </TabPanel>
         ))}
-      </DialogActions>
+      </DialogContent>
+      <Footer options={[
+        { name: 'reset', action: () => setLocalState(userSettings[category]), icon: 'Replay', color: 'primary' },
+        { name: 'save', action: toggleDialog(false, category, 'options', localState), icon: 'Save', color: 'secondary' },
+      ]}
+      />
     </>
   )
 }

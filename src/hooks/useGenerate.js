@@ -13,9 +13,9 @@ export default function useGenerate() {
   const { gyms, pokestops } = useStatic(useCallback(s => s.filters, []))
   const staticMenus = useStatic(useCallback(s => s.menus, []))
 
-  const pokeFilters = useMemo(() => genPokemon(t, pokemon, staticMenus.pokemon.categories), [])
-  const gymFilters = useMemo(() => genGyms(t, gyms, staticMenus.gyms.categories), [])
-  const stopFilters = useMemo(() => genPokestops(t, pokemon, pokestops, staticMenus.pokestops.categories), [])
+  const pokeFilters = useMemo(() => genPokemon(t, pokemon, staticMenus.pokemon.categories), [localStorage.getItem('i18nextLng')])
+  const gymFilters = useMemo(() => genGyms(t, gyms, staticMenus.gyms.categories), [localStorage.getItem('i18nextLng')])
+  const stopFilters = useMemo(() => genPokestops(t, pokemon, pokestops, staticMenus.pokestops.categories), [localStorage.getItem('i18nextLng')])
 
   return {
     ...gymFilters,

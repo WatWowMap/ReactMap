@@ -1,49 +1,53 @@
+/* eslint-disable react/no-array-index-key */
 import React from 'react'
-import {
-  DialogTitle, DialogContent, DialogActions, Button, Typography,
-} from '@material-ui/core'
-import { useTranslation } from 'react-i18next'
+import { Typography } from '@material-ui/core'
 
-import useStyles from '@hooks/useStyles'
+import DialogWrapper from '../custom/DialogWrapper'
+import CustomTile from '../custom/CustomTile'
 
-export default function Motd({ messages, newMotdIndex, setMotdIndex }) {
-  const { t } = useTranslation()
-  const classes = useStyles()
+export default function Motd({ motd, perms, handleMotdClose }) {
   return (
-    <>
-      <DialogTitle className={classes.filterHeader}>{t('messageOfTheDay')}</DialogTitle>
-      <DialogContent>
-        {messages.map(message => (
-          typeof message === 'string' ? (
-            <Typography key={message} variant="subtitle1" align="center" style={{ margin: 20 }}>
-              {message}
-            </Typography>
-          ) : (
-            <div key={`${message.title}-${message.body}`} style={{ whiteSpace: 'pre-line', margin: 20, textAlign: 'center' }}>
-              {message.title && (
-                <Typography variant="h6">
-                  {message.title}
-                </Typography>
-              )}
-              {message.body && (
-                <Typography variant="subtitle1">
-                  {message.body}
-                </Typography>
-              )}
-              {message.footer && (
-                <Typography variant="caption">
-                  {message.footer}
-                </Typography>
-              )}
-            </div>
+    <DialogWrapper
+      configObj={motd}
+      defaultTitle="message_of_the_day"
+      handleClose={handleMotdClose}
+      contentBody={
+        motd.components.map((block, i) => {
+          if (block.donorOnly && !perms.donor) return null
+          if (block.freeloaderOnly && perms.donor) return null
+          return (
+            <CustomTile
+              key={i}
+              block={block}
+              defaultReturn={block.type ? null : <DefaultMotD block={block} />}
+            />
           )
-        ))}
-      </DialogContent>
-      <DialogActions className={classes.filterFooter}>
-        <Button onClick={() => setMotdIndex(newMotdIndex)} color="primary" autoFocus>
-          {t('close')}
-        </Button>
-      </DialogActions>
-    </>
+        })
+      }
+    />
   )
 }
+
+const DefaultMotD = ({ block }) => typeof block === 'string' ? (
+  <Typography key={block} variant="subtitle1" align="center" style={{ margin: 20 }}>
+    {block}
+  </Typography>
+) : (
+  <div key={`${block.title}-${block.body}`} style={{ whiteSpace: 'pre-line', margin: 20, textAlign: 'center' }}>
+    {block.title && (
+      <Typography variant="h6">
+        {block.title}
+      </Typography>
+    )}
+    {block.body && (
+      <Typography variant="subtitle1">
+        {block.body}
+      </Typography>
+    )}
+    {block.footer && (
+      <Typography variant="caption">
+        {block.footer}
+      </Typography>
+    )}
+  </div>
+)

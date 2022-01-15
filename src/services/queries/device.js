@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 
 const getAllDevices = gql`
-  {
+  query Devices {
     devices{
       uuid
       instance_name

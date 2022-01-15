@@ -43,7 +43,7 @@ const getGlowStatus = (item, userSettings, staticUserSettings) => {
 }
 
 const PokemonTile = ({
-  item, showTimer, filters, Icons, excludeList, ts, map,
+  item, showTimer, filters, Icons, excludeList, ts, map, isNight,
   userSettings, staticUserSettings, params, showCircles, setParams,
 }) => {
   const markerRef = useRef({ [item.id]: null })
@@ -74,7 +74,7 @@ const PokemonTile = ({
       zIndexOffset={item.iv * 100}
       position={finalLocation}
       icon={(pvpCheck || glowStatus || ivCircle || weatherCheck)
-        ? fancyMarker(url, size, item, glowStatus, ivCircle, Icons, weatherCheck)
+        ? fancyMarker(url, size, item, glowStatus, ivCircle, Icons, weatherCheck, isNight)
         : basicMarker(url, size)}
     >
       <Popup position={finalLocation}>
@@ -83,6 +83,7 @@ const PokemonTile = ({
           iconUrl={url}
           userSettings={userSettings}
           Icons={Icons}
+          isNight={isNight}
         />
       </Popup>
       {(showTimer || userSettings.pokemonTimers) && (
@@ -106,7 +107,6 @@ const areEqual = (prev, next) => (
   prev.item.id === next.item.id
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
-  && prev.filters.filter[`${prev.item.pokemon_id}-${prev.item.form}`]?.size === next.filters.filter[`${next.item.pokemon_id}-${next.item.form}`]?.size
   && !next.excludeList.includes(`${prev.item.pokemon_id}-${prev.item.form}`)
   && prev.userIcons.pokemon === next.userIcons.pokemon
   && Object.keys(prev.userSettings).every(key => prev.userSettings[key] === next.userSettings[key])

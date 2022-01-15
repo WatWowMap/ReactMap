@@ -10,14 +10,13 @@ const getId = (component, item) => {
     case 'devices': return item.uuid
     case 'submissionCells': return component
     case 'nests': return item.nest_id
-    case 'scanAreas': return item.properties.name
   }
 }
-const ignoredClustering = ['devices', 'submissionCells', 's2cells', 'weather']
+const ignoredClustering = ['devices', 'submissionCells', 'scanCells', 'weather']
 
 export default function Clustering({
-  category, renderedData, userSettings, clusterZoomLvl, staticUserSettings, params,
-  filters, map, Icons, perms, tileStyle, config, userIcons, setParams,
+  category, renderedData, userSettings, clusteringRules, staticUserSettings, params,
+  filters, map, Icons, perms, tileStyle, config, userIcons, setParams, isNight,
 }) {
   const Component = index[category]
   const hideList = useStatic(state => state.hideList)
@@ -52,20 +51,21 @@ export default function Clustering({
           params={params}
           setParams={setParams}
           showCircles={showCircles}
+          isNight={isNight}
         />
       )
     }
     return null
   })
 
-  const limitHit = finalData.length > config.clusterZoomLevels.forcedClusterLimit
+  const limitHit = finalData.length > clusteringRules.forcedLimit
     && !ignoredClustering.includes(category)
 
-  return limitHit || (clusterZoomLvl && userSettings.clustering) ? (
+  return limitHit || (clusteringRules.zoomLevel && userSettings.clustering) ? (
     <>
       <MarkerClusterGroup
         key={`${limitHit}-${userSettings.clustering}-${category}`}
-        disableClusteringAtZoom={limitHit ? 20 : clusterZoomLvl}
+        disableClusteringAtZoom={limitHit ? 20 : clusteringRules.zoomLevel}
         chunkedLoading
       >
         {finalData}
@@ -73,11 +73,11 @@ export default function Clustering({
       {limitHit && (
         <Notification
           severity="warning"
-          i18nKey="clusterLimit"
+          i18nKey="cluster_limit"
           messages={[
             {
               key: 'limitHit',
-              variables: [category, config.clusterZoomLevels.forcedClusterLimit],
+              variables: [category, clusteringRules.forcedLimit],
             },
             {
               key: 'zoomIn',

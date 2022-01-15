@@ -10,6 +10,7 @@ import { useTranslation, Trans } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
+
 import Utility from '@services/Utility'
 import Dropdown from './common/Dropdown'
 import TimeTile from './common/TimeTile'
@@ -58,20 +59,18 @@ export default function PokestopPopup({
       <Grid item xs={plainPokestop ? 10 : 7}>
         <Title
           mainName={pokestop.name}
-          backup={t('unknownPokestop')}
+          backup={t('unknown_pokestop')}
         />
       </Grid>
-      <Grid item xs={2}>
-        <MenuActions
-          pokestop={pokestop}
-          perms={perms}
-          hasInvasion={hasInvasion}
-          hasQuest={hasQuest}
-          hasLure={hasLure}
-          t={t}
-          ts={ts}
-        />
-      </Grid>
+      <MenuActions
+        pokestop={pokestop}
+        perms={perms}
+        hasInvasion={hasInvasion}
+        hasQuest={hasQuest}
+        hasLure={hasLure}
+        t={t}
+        ts={ts}
+      />
       <Grid item xs={12} style={{ textAlign: 'center' }}>
         {plainPokestop ? (
           <HeaderImage
@@ -99,6 +98,7 @@ export default function PokestopPopup({
                     t={t}
                   />
                   <QuestConditions
+                    pokestop={pokestop}
                     quest={quest}
                     t={t}
                     userSettings={userSettings}
@@ -244,31 +244,32 @@ const MenuActions = ({
       }
       options.push({
         key: `${reward}-${quest.with_ar}`,
-        name: <Trans i18nKey="excludeQuestMulti">{{ reward }}</Trans>,
+        name: <Trans i18nKey="exclude_quest_multi">{{ reward }}</Trans>,
         action: () => excludeQuest(i),
       })
     })
   }
+
   if ((perms.invasions && hasInvasion)
     || (perms.lures && hasLure)) {
     if (hasInvasion) {
       invasions.forEach((invasion, i) => {
         options.push({
           key: `${invasion.grunt_type}-${invasion.incident_expire_timestamp}`,
-          name: <Trans i18nKey="excludeInvasionMulti">{{ invasion: t(`grunt_a_${invasion.grunt_type}`) }}</Trans>,
+          name: <Trans i18nKey="exclude_invasion_multi">{{ invasion: t(`grunt_a_${invasion.grunt_type}`) }}</Trans>,
           action: () => excludeInvasion(i),
         })
       })
     }
     if (hasLure) {
-      options.push({ name: 'excludeLure', action: excludeLure })
+      options.push({ name: 'exclude_lure', action: excludeLure })
     }
     options.push(
       { name: 'timer', action: handleTimer },
     )
   }
   return (
-    <Grid item xs={3} style={{ textAlign: 'right' }}>
+    <Grid item xs={2} style={{ textAlign: 'right' }}>
       <IconButton
         aria-haspopup="true"
         onClick={handleClick}
@@ -321,18 +322,20 @@ const RewardInfo = ({
     <Grid item xs={3} style={{ textAlign: 'center' }}>
       <img src={getImage()} className="quest-popup-img" />
       <Typography variant="caption" className="ar-task" noWrap>
-        {config.questMessage ? config.questMessage : t(`arQuest_${Boolean(with_ar)}`)}
+        {config.questMessage ? config.questMessage : t(`ar_quest_${Boolean(with_ar)}`)}
       </Typography>
     </Grid>
   )
 }
 
-const QuestConditions = ({ quest, t, userSettings }) => {
+const QuestConditions = ({ pokestop, quest, t, userSettings }) => {
+  const { i18n } = useTranslation()
   const {
     quest_task,
     quest_type,
     quest_target,
     quest_conditions,
+    quest_title,
   } = quest
 
   if (userSettings.madQuestText && quest_task) {
@@ -344,6 +347,25 @@ const QuestConditions = ({ quest, t, userSettings }) => {
       </Grid>
     )
   }
+
+  if (quest_title && !quest_title.includes('geotarget')) {
+    const normalized = quest_title.startsWith('quest_')
+      ? quest_title.replace('quest_', 'quest_title_').toLowerCase()
+      : `quest_title_${quest_title.toLowerCase()}`
+
+    if (i18n.exists(normalized)) {
+      return (
+        <Grid item xs={9} style={{ textAlign: 'center' }}>
+          <Typography variant="caption">
+            <Trans i18nKey={normalized}>
+              {{ amount_0: quest_target }}
+            </Trans>
+          </Typography>
+        </Grid>
+      )
+    }
+  }
+
   const [type1, type2] = Utility.parseConditions(quest_conditions)
   const primaryCondition = (
     <Typography variant="caption">
@@ -353,41 +375,52 @@ const QuestConditions = ({ quest, t, userSettings }) => {
     </Typography>
   )
   const getQuestConditions = (qType, qInfo) => {
+    const key = `quest_condition_${qType}_formatted`
     switch (qType) {
       case 1: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ types: qInfo.pokemon_type_ids.map(id => t(`poke_type_${id}`)) }}
         </Trans>
       )
       case 2: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ pokemon: qInfo.pokemon_ids.map(id => t(`poke_${id}`)) }}
         </Trans>
       )
       case 7: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ levels: qInfo.raid_levels.map(id => id) }}
         </Trans>
       )
       case 11: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ item: t(`item_${qInfo.item_id}`) }}
         </Trans>
       )
       case 8:
       case 14: return qInfo.throw_type_id ? (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ throw_type: t(`throw_type_${qInfo.throw_type_id}`) }}
         </Trans>
       ) : t('quest_condition_14')
       case 26: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ alignments: qInfo.alignment_ids.map(id => t(`alignment_${id}`)) }}
         </Trans>
       )
       case 27: return (
-        <Trans i18nKey={`quest_condition_${qType}_formatted`}>
+        <Trans i18nKey={key}>
           {{ categories: qInfo.character_category_ids.map(id => t(`character_category_${id}`)) }}
+        </Trans>
+      )
+      case 42: return (
+        <Trans i18nKey={key}>
+          {{ poi: pokestop.name }}
+        </Trans>
+      )
+      case 44: return (
+        <Trans i18nKey={key}>
+          {{ time: qInfo.time }}
         </Trans>
       )
       default: return t(`quest_condition_${qType}`)
@@ -467,12 +500,12 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
 
   const extraMetaData = [
     {
-      description: 'lastSeen',
+      description: 'last_seen',
       timer: <Timer expireTime={updated} />,
       data: Utility.dayCheck(ts, updated),
     },
     {
-      description: 'lastModified',
+      description: 'last_modified',
       timer: <Timer expireTime={last_modified_timestamp} />,
       data: Utility.dayCheck(ts, last_modified_timestamp),
     },
@@ -486,15 +519,15 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
     >
       {extraMetaData.map(meta => (
         <Fragment key={meta.description}>
-          <Grid item xs={t('popupPokestopSeenDescriptionWidth')} style={{ textAlign: 'left' }}>
+          <Grid item xs={t('popup_pokestop_description_width')} style={{ textAlign: 'left' }}>
             <Typography variant="caption">
               {t(meta.description)}:
             </Typography>
           </Grid>
-          <Grid item xs={t('popupPokestopSeenTimerWidth')} style={{ textAlign: 'right' }}>
+          <Grid item xs={t('popup_pokestop_seen_timer_width')} style={{ textAlign: 'right' }}>
             {meta.timer}
           </Grid>
-          <Grid item xs={t('popupPokestopSeenDataWidth')} style={{ textAlign: 'right' }}>
+          <Grid item xs={t('popup_pokestop_data_width')} style={{ textAlign: 'right' }}>
             <Typography variant="caption">
               {meta.data}
             </Typography>

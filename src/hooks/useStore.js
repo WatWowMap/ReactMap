@@ -31,9 +31,14 @@ const useStore = create(persist(set => ({
   setSearch: (search) => set({ search }),
   searchTab: 0,
   setSearchTab: (searchTab) => set({ searchTab }),
+  selectedWebhook: undefined,
+  setSelectedWebhook: (selectedWebhook) => set({ selectedWebhook }),
+  webhookAdv: { primary: true, advanced: false, pvp: false, distance: true, global: true },
+  setWebhookAdv: (webhookAdv) => set({ webhookAdv }),
   popups: {
     invasions: false,
     extras: false,
+    raids: true,
     pvp: false,
     names: true,
   },
@@ -47,7 +52,7 @@ const useStore = create(persist(set => ({
 }))
 
 const useStatic = create(set => ({
-  auth: { discord: true, loggedIn: false, perms: {} },
+  auth: { discord: true, loggedIn: false, perms: { } },
   setAuth: (auth) => set({ auth }),
   config: undefined,
   setConfig: (config) => set({ config }),
@@ -65,9 +70,9 @@ const useStatic = create(set => ({
   setAvailable: (available) => set({ available }),
   Icons: undefined,
   setIcons: (Icons) => set({ Icons }),
-  ui: {},
+  ui: { },
   setUi: (ui) => set({ ui }),
-  masterfile: {},
+  masterfile: { },
   setMasterfile: (masterfile) => set({ masterfile }),
   hideList: [],
   setHideList: (hideList) => set({ hideList }),
@@ -75,6 +80,18 @@ const useStatic = create(set => ({
   setExcludeList: (excludeList) => set({ excludeList }),
   timerList: [],
   setTimerList: (timerList) => set({ timerList }),
+  webhookAlert: {
+    open: false, severity: 'info', message: '',
+  },
+  setWebhookAlert: (webhookAlert) => set({ webhookAlert }),
+  webhookData: undefined,
+  setWebhookData: (webhookData) => set({ webhookData }),
+  isNight: false,
+  setIsNight: (isNight) => set({ isNight }),
+  userProfile: false,
+  setUserProfile: (userProfile) => set({ userProfile }),
+  feedback: false,
+  setFeedback: (feedback) => set({ feedback }),
 }))
 
 export { useStore, useStatic }

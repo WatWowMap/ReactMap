@@ -3,10 +3,9 @@ import React, { memo } from 'react'
 import { Polyline, Polygon } from 'react-leaflet'
 
 const DevicePoly = ({ device, color }) => {
-  const parsedRoute = JSON.parse(device.route)
-  const arrayRoute = parsedRoute[0].lat ? [parsedRoute] : parsedRoute
+  const arrayRoute = device.route[0].lat ? [device.route] : device.route
 
-  return (
+  return arrayRoute ? (
     <>
       {(device.type === 'circle_pokemon')
         ? arrayRoute.map((polygon, i) => (
@@ -24,7 +23,7 @@ const DevicePoly = ({ device, color }) => {
           />
         ))}
     </>
-  )
+  ) : null
 }
 
 const areEqual = (prev, next) => (

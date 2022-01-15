@@ -1,5 +1,7 @@
 export default function genPokemon(t, pokemon, categories) {
-  const tempObj = Object.fromEntries(categories.map(x => [x, {}]))
+  const tempObj = Object.fromEntries(categories.map(x => (
+    [x, { '0-0': { webhookOnly: true, name: t('poke_global'), perms: ['pokemon', 'raids', 'quests', 'nests'], formTypes: [] } }]
+  )))
 
   Object.entries(pokemon).forEach(([i, pkmn]) => {
     const pokeName = t(`poke_${i}`)
@@ -25,7 +27,7 @@ export default function genPokemon(t, pokemon, categories) {
         family: pkmn.family,
       }
       tempObj.pokemon[id].searchMeta = `${Object.values(tempObj.pokemon[id])
-        .flatMap(x => t(x))
+        .flatMap(x => Array.isArray(x) ? x.map(y => t(y)) : t(x))
         .join(' ')
         .toLowerCase()} ${t('pokemon').toLowerCase()}`
     })

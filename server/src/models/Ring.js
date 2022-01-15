@@ -1,10 +1,7 @@
-class Ring {
-  constructor(id, lat, lon, radius) {
+module.exports = class Ring {
+  constructor(id, lat, lon) {
     this.id = id
     this.lat = lat
     this.lon = lon
-    this.radius = radius
   }
 }
-
-module.exports = Ring

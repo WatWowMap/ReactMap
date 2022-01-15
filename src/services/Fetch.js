@@ -11,26 +11,28 @@ export default class Fetch {
       return body.serverSettings
     } catch (error) {
       console.error(error.message, '\nUnable to fetch settings at this time, please try again later.')
-      return { error: true }
+      return { error: true, status: 500 }
     }
   }
 
-  static async getIcons(iconPath, name) {
+  static async getIcons(icon) {
     try {
-      const response = await fetch(`${iconPath}/index.json`)
+      const response = icon.path.startsWith('http')
+        ? await fetch(`${icon.path}/index.json`)
+        : await fetch(`/images/uicons/${icon.path}/index.json`)
       if (!response.ok) {
         throw new Error(`${response.status} (${response.statusText})`)
       }
       const body = await response.json()
-      localStorage.setItem(`${name}_icons`, JSON.stringify({ ...body, lastFetched: Date.now() }))
+      localStorage.setItem(`${icon.name}_icons`, JSON.stringify({ ...body, lastFetched: Date.now() }))
       return body
     } catch (error) {
-      console.error(error.message, `Unable to fetch ${iconPath} at this time, attempting to load from cache.`)
-      const cached = localStorage.getItem(`${name}_icons`)
+      console.error(error.message, `Unable to fetch ${icon.path} at this time, attempting to load from cache.`)
+      const cached = localStorage.getItem(`${icon.name}_icons`)
       if (cached) {
         return JSON.parse(cached)
       }
-      console.warn(`Cache does not exist for ${name}`)
+      console.warn(`Cache does not exist for ${icon.name}`)
     }
   }
 
@@ -65,6 +67,21 @@ export default class Fetch {
         return JSON.parse(cached)
       }
       return invasions
+    }
+  }
+
+  static async login(user, endpoint = '/auth/local/callback') {
+    try {
+      return fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      })
+    } catch (error) {
+      console.error(error.message, '\nUnable to login at this time, please try again later.')
+      return { error: true, status: 500 }
     }
   }
 }

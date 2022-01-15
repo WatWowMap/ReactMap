@@ -6,10 +6,7 @@
 const requireFromString = require('require-from-string')
 const masterfile = require('../data/masterfile.json')
 const {
-  api: { pvpMinCp },
-  database: {
-    settings: { reactMapHandlesPvp },
-  },
+  api: { pvp: { minCp: pvpMinCp, reactMapHandlesPvp } },
 } = require('./config')
 
 const jsifyIvFilter = (filter) => {
@@ -228,7 +225,7 @@ const getLegacy = (results, args, perms, ohbem) => {
   }
 
   const pokemon = []
-  if (results && results.length > 0) {
+  if (results && results.length) {
     for (let i = 0; i < results.length; i++) {
       bestPvp = 4096
       const result = results[i]
@@ -236,6 +233,13 @@ const getLegacy = (results, args, perms, ohbem) => {
       if (result.pokemon_id === 132) {
         filtered.ditto_form = result.form
         result.form = masterfile.pokemon[result.pokemon_id]?.defaultFormId || 0
+        const statsToCheck = ['atk', 'def', 'sta']
+        statsToCheck.forEach(stat => {
+          if (!result[`${stat}_iv`] && result[`${stat}_inactive`]) {
+            result[`${stat}_iv`] = result[`${stat}_inactive`]
+            result.inactive_stats = true
+          }
+        })
       }
       if (!result.seen_type) {
         if (result.spawn_id === null) {
@@ -244,7 +248,7 @@ const getLegacy = (results, args, perms, ohbem) => {
           result.seen_type = 'encounter'
         }
       }
-      if (perms.iv || perms.stats) {
+      if (perms.iv) {
         filtered.atk_iv = result.atk_iv
         filtered.def_iv = result.def_iv
         filtered.sta_iv = result.sta_iv
@@ -252,7 +256,7 @@ const getLegacy = (results, args, perms, ohbem) => {
         filtered.iv = result.iv
         filtered.level = result.level
       }
-      if (perms.pvp && interestedLevelCaps.length > 0) {
+      if (perms.pvp && interestedLevelCaps.length) {
         const { great, ultra } = pvpMinCp
         filtered.cleanPvp = {}
         if (result.pvp || (reactMapHandlesPvp && result.cp)) {
@@ -290,6 +294,15 @@ const getLegacy = (results, args, perms, ohbem) => {
       if (!pokemonFilter) {
         continue
       }
+      if (!result.seen_type) {
+        if (result.spawn_id === null) {
+          filtered.seen_type = result.pokestop_id ? 'nearby_stop' : 'nearby_cell'
+        } else {
+          filtered.seen_type = 'encounter'
+        }
+      } else {
+        filtered.seen_type = result.seen_type
+      }
       filtered.id = result.id
       filtered.pokemon_id = result.pokemon_id
       filtered.lat = result.lat
@@ -308,7 +321,7 @@ const getLegacy = (results, args, perms, ohbem) => {
       filtered.cellId = result.cell_id
       filtered.expire_timestamp_verified = result.expire_timestamp_verified
       filtered.display_pokemon_id = result.display_pokemon_id
-      if (perms.iv || perms.stats) {
+      if (perms.iv) {
         filtered.move_1 = result.move_1
         filtered.move_2 = result.move_2
         filtered.weight = result.weight

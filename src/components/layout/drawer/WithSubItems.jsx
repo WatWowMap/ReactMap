@@ -1,11 +1,13 @@
 import React from 'react'
 import {
-  Grid, Typography, Switch,
+  Grid, Typography, Switch, ButtonGroup, Button,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
+import Utility from '@services/Utility'
+
 export default function WithSubItems({
-  category, filters, setFilters, subItem, noScanAreaOverlay,
+  category, filters, setFilters, subItem, noScanAreaOverlay, enableQuestSetSelector,
 }) {
   const { t } = useTranslation()
   let filterCategory
@@ -49,11 +51,35 @@ export default function WithSubItems({
   return (
     <>
       <Grid item xs={6}>
-        <Typography>{category === 'scanAreas' ? t('showPolygons') : t(subItem)}</Typography>
+        <Typography>{category === 'scanAreas' ? t('show_polygons') : t(Utility.camelToSnake(subItem))}</Typography>
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         {filterCategory}
       </Grid>
+      {enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters.pokestops.quests === true && (
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <ButtonGroup
+            size="small"
+          >
+            {['with_ar', 'both', 'without_ar'].map(questSet => (
+              <Button
+                key={questSet}
+                onClick={() => setFilters({
+                  ...filters,
+                  [category]: {
+                    ...filters[category],
+                    showQuestSet: questSet,
+                  },
+                })}
+                color={questSet === filters[category].showQuestSet ? 'primary' : 'secondary'}
+                variant={questSet === filters[category].showQuestSet ? 'contained' : 'outlined'}
+              >
+                {t(questSet)}
+              </Button>
+            ))}
+          </ButtonGroup>
+        </Grid>
+      )}
     </>
   )
 }

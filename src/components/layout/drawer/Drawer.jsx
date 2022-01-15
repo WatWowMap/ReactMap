@@ -5,6 +5,8 @@ import {
 import { ExpandMore, Clear, Settings } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
+import Utility from '@services/Utility'
+
 import SettingsMenu from './Settings'
 import WithSubItems from './WithSubItems'
 import WithSliders from './WithSliders'
@@ -21,7 +23,9 @@ export default function Sidebar({
   const classes = useStyles()
   const ui = useStatic(state => state.ui)
   const staticUserSettings = useStatic(state => state.userSettings)
-  const { map: { title, scanAreasZoom, noScanAreaOverlay }, manualAreas } = useStatic(state => state.config)
+  const { manualAreas, map: {
+    title, scanAreasZoom, noScanAreaOverlay, enableQuestSetSelector,
+  } } = useStatic(state => state.config)
   const { t } = useTranslation()
 
   const handleChange = (panel) => (event, isExpanded) => {
@@ -41,6 +45,7 @@ export default function Sidebar({
               setFilters={setFilters}
               subItem={subItem}
               noScanAreaOverlay={noScanAreaOverlay}
+              enableQuestSetSelector={enableQuestSetSelector}
             />
           ))
         ); break
@@ -69,7 +74,7 @@ export default function Sidebar({
           expandIcon={<ExpandMore style={{ color: 'white' }} />}
         >
           <Typography className={classes.heading}>
-            {t(category)}
+            {t(Utility.camelToSnake(category))}
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
@@ -83,7 +88,7 @@ export default function Sidebar({
           >
             {content}
             {staticUserSettings[category] && (
-              <Grid item xs={t('drawerGridOptionsWidth')} style={{ textAlign: 'center' }}>
+              <Grid item xs={t('drawer_grid_options_width')} style={{ textAlign: 'center' }}>
                 <Button
                   onClick={toggleDialog(true, category, 'options')}
                   variant="contained"
@@ -99,7 +104,7 @@ export default function Sidebar({
               || category === 'pokestops'
               || category === 'nests')
               && (
-                <Grid item xs={t('drawerGridAdvancedWidth')} style={{ textAlign: 'center' }}>
+                <Grid item xs={t('drawer_grid_advanced_width')} style={{ textAlign: 'center' }}>
                   <Button
                     onClick={toggleDialog(true, category, 'filters')}
                     variant="contained"
@@ -110,10 +115,10 @@ export default function Sidebar({
                 </Grid>
               )}
             {category === 'scanAreas' && (
-            <Areas
-              scanAreasZoom={scanAreasZoom}
-              manualAreas={manualAreas}
-            />
+              <Areas
+                scanAreasZoom={scanAreasZoom}
+                manualAreas={manualAreas}
+              />
             )}
           </Grid>
         </AccordionDetails>

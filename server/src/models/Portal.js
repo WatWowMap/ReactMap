@@ -1,8 +1,10 @@
 const { Model } = require('objection')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { api: { searchResultsLimit } } = require('../services/config')
+const {
+  api: { searchResultsLimit, portalUpdateLimit },
+} = require('../services/config')
 
-class Portal extends Model {
+module.exports = class Portal extends Model {
   static get tableName() {
     return 'ingress_portals'
   }
@@ -12,7 +14,8 @@ class Portal extends Model {
     const query = this.query()
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
-    if (areaRestrictions.length > 0) {
+      .andWhere('updated', '>', (Date.now() / 1000) - portalUpdateLimit * 60 * 60 * 24)
+    if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions)
     }
     return query
@@ -29,14 +32,13 @@ class Portal extends Model {
         'url',
         distance,
       ])
-      .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .whereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .andWhere('updated', '>', (Date.now() / 1000) - portalUpdateLimit * 60 * 60 * 24)
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (areaRestrictions.length > 0) {
+    if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions, isMad)
     }
     return query
   }
 }
-
-module.exports = Portal

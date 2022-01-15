@@ -19,18 +19,18 @@ export default function TutPopup({ isMobile }) {
     <DialogContent>
       <Grid
         container
-        direction="column"
-        justifyContent="space-evenly"
+        justifyContent="center"
         alignItems="center"
         spacing={2}
+        style={{ height: '100%' }}
       >
         <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
           <Typography variant="h6" align="center" gutterBottom>
-            {t('tutorialPopup0')}
+            {t('tutorial_popup_0')}
           </Typography>
           <Divider light style={{ margin: 10 }} />
           <Typography variant={size} align="center" gutterBottom>
-            {t('tutorialPopup1')}
+            {t('tutorial_popup_1')}
           </Typography>
         </Grid>
         <Grid item xs={12} sm={10} style={{ textAlign: 'center' }}>
@@ -55,11 +55,11 @@ export default function TutPopup({ isMobile }) {
         </Grid>
         <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
           <Typography variant={size} align="center" gutterBottom>
-            {t('tutorialPopup2')}
+            {t('tutorial_popup_2')}
           </Typography>
           <Divider light style={{ margin: 10 }} />
           <Typography variant={size} align="center" gutterBottom>
-            {t('tutorialPopup3')}
+            {t('tutorial_popup_3')}
           </Typography>
         </Grid>
       </Grid>

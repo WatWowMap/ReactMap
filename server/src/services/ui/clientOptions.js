@@ -1,4 +1,8 @@
-const { clientSideOptions, map: { legacyPkmnFilter }, database: { settings: { pvpLevels } } } = require('../config')
+const {
+  clientSideOptions,
+  map: { enableMapJsFilter },
+  api: { pvp: { levels } },
+} = require('../config')
 const dbSelection = require('../functions/dbSelection')
 
 module.exports = function clientOptions(perms) {
@@ -28,7 +32,6 @@ module.exports = function clientOptions(perms) {
       clustering: { type: 'bool', perm: ['pokemon'] },
       linkGlobalAndAdvanced: { type: 'bool', perm: ['pokemon'] },
       pokemonTimers: { type: 'bool', perm: ['pokemon'] },
-      prioritizePvpInfo: { type: 'bool', perm: ['pvp'] },
       ivCircles: { type: 'bool', perm: ['iv'] },
       minIvCircle: { type: 'number', perm: ['iv'], label: '%' },
       interactionRanges: { type: 'bool', perm: ['pokemon'] },
@@ -43,20 +46,20 @@ module.exports = function clientOptions(perms) {
     },
   }
 
-  pvpLevels.forEach(level => {
+  levels.forEach(level => {
     clientMenus.pokemon[`pvp${level}`] = {
       type: 'bool', perm: ['pvp'], value: true,
     }
   })
 
   // special case options that require additional checks
-  if (legacyPkmnFilter) {
-    clientMenus.pokemon.legacyFilter = { type: 'bool', perm: ['iv', 'stats', 'pvp'] }
+  if (enableMapJsFilter) {
+    clientMenus.pokemon.legacyFilter = { type: 'bool', perm: ['iv', 'pvp'] }
   }
-  if (clientSideOptions.pokemon.glow.length > 0) {
+  if (clientSideOptions.pokemon.glow.length) {
     clientMenus.pokemon.glow = { type: 'bool', sub: {}, perm: ['pokemon'] }
   }
-  if (dbSelection('pokestop') === 'mad') {
+  if (dbSelection('pokestop').type === 'mad') {
     clientMenus.pokestops.madQuestText = { type: 'bool', perm: ['quests'] }
   }
 

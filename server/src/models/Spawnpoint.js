@@ -2,14 +2,14 @@ const { Model, raw } = require('objection')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 
-class Spawnpoint extends Model {
+module.exports = class Spawnpoint extends Model {
   static get tableName() {
-    return dbSelection('spawnpoint') === 'mad'
+    return dbSelection('spawnpoint').type === 'mad'
       ? 'trs_spawn' : 'spawnpoint'
   }
 
   static get idColumn() {
-    return dbSelection('spawnpoint') === 'mad'
+    return dbSelection('spawnpoint').type === 'mad'
       ? 'spawnpoint' : 'id'
   }
 
@@ -29,11 +29,9 @@ class Spawnpoint extends Model {
     }
     query.whereBetween(`lat${isMad ? 'itude' : ''}`, [args.minLat, args.maxLat])
       .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [args.minLon, args.maxLon])
-    if (areaRestrictions.length > 0) {
+    if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions, isMad)
     }
     return query
   }
 }
-
-module.exports = Spawnpoint

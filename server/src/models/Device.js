@@ -2,13 +2,13 @@ const { Model, raw } = require('objection')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 
-class Device extends Model {
+module.exports = class Device extends Model {
   static get tableName() {
-    return dbSelection('device') === 'mad' ? 'settings_device' : 'device'
+    return dbSelection('device').type === 'mad' ? 'settings_device' : 'device'
   }
 
   static get idColumn() {
-    return dbSelection('device') === 'mad' ? 'device_id' : 'uuid'
+    return dbSelection('device').type === 'mad' ? 'device_id' : 'uuid'
   }
 
   static async getAllDevices(perms, isMad) {
@@ -36,11 +36,9 @@ class Device extends Model {
           raw('json_extract(data, "$.area")')
             .as('route'))
     }
-    if (areaRestrictions.length > 0) {
+    if (areaRestrictions.length) {
       getAreaSql(query, areaRestrictions, isMad, 'device')
     }
     return query
   }
 }
-
-module.exports = Device
