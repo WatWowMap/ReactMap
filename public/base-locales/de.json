@@ -471,5 +471,8 @@
   "pokemon_cell": "Der Standort des Pokemon kann variieren",
   "timer_verified": "Die Despawnzeit ist bestätigt",
   "timer_unverified": "Die Despawnzeit ist nicht bestätigt",
-  "all": "Alle"
+  "all": "Alle",
+  "with_ar": "Mit AR",
+  "without_ar": "Ohne AR",
+  "both": "Beide"
 }

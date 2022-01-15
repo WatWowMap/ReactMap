@@ -447,5 +447,12 @@
   "level": "poziom",
   "km": "km",
   "feedback": "Sprzężenie zwrotne",
-  "donor_menu": "Menu dawcy"
+  "donor_menu": "Menu dawcy",
+  "with_ar": "Z AR",
+  "without_ar": "Bez AR",
+  "pokemon_cell": "Lokalizacja Pokemona może się różnić",
+  "timer_verified": "Ten zegar jest zweryfikowany",
+  "timer_unverified": "Ten zegar jest niezweryfikowany",
+  "all": "Wszystkie",
+  "both": "Obydwa"
 }

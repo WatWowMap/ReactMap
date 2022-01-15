@@ -427,5 +427,13 @@
   "cluster_limit_0": "È stato raggiunto il limite {{variable_0}} ({{variable_1}})",
   "selected_areas": "{{amount}} Area selezionata",
   "selected_areas_plural": "{{amount}} Aree selezionate",
-  "webhook_selection": "{{name}} Selezione"
+  "webhook_selection": "{{name}} Selezione",
+  "with_ar": "Con AR",
+  "scan_cells": "Scansiona le celle",
+  "without_ar": "Senza AR",
+  "pokemon_cell": "La posizione dei Pokemon potrebbe variare",
+  "timer_verified": "Questo timer è verificato",
+  "timer_unverified": "Questo timer non è verificato",
+  "all": "Tutto",
+  "both": "Entrambi"
 }

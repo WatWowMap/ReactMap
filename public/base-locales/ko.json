@@ -427,5 +427,13 @@
   "cluster_limit_1": "필터를 확대하거나 좁히십시오.",
   "show_polygons": "다각형 표시",
   "pokestops": "포켓스톱",
-  "spawnpoints": "생성 지점"
+  "spawnpoints": "생성 지점",
+  "with_ar": "AR과 함께",
+  "scan_cells": "세포 스캔",
+  "without_ar": "AR 없이",
+  "pokemon_cell": "포켓몬의 위치는 다를 수 있습니다",
+  "timer_verified": "이 타이머는 확인되었습니다",
+  "timer_unverified": "이 타이머는 확인되지 않았습니다.",
+  "all": "모두",
+  "both": "둘 다"
 }

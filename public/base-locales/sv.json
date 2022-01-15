@@ -427,5 +427,13 @@
   "km": "km",
   "feedback": "Respons",
   "donor_menu": "Givarmeny",
-  "slots": "Slots"
+  "slots": "Slots",
+  "with_ar": "Med AR",
+  "scan_cells": "Skanna celler",
+  "without_ar": "Utan AR",
+  "pokemon_cell": "Pokémons plats kan variera",
+  "timer_verified": "Denna timer är verifierad",
+  "timer_unverified": "Denna timer är overifierad",
+  "all": "Allt",
+  "both": "Både"
 }
