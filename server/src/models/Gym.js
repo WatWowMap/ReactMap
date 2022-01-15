@@ -126,13 +126,13 @@ module.exports = class Gym extends Model {
         } else if (finalTeams.length === 4) {
           gym.orWhereNotNull('team_id')
         } else {
-          if (finalTeams.length > 0) {
+          if (finalTeams.length) {
             gym.orWhere(team => {
               team.whereIn('team_id', finalTeams)
             })
           }
           Object.keys(finalSlots).forEach(team => {
-            if (finalSlots[team].length > 0) {
+            if (finalSlots[team].length) {
               gym.orWhere(gymSlot => {
                 gymSlot.where('team_id', team)
                   .whereIn(isMad ? 'slots_available' : 'availble_slots', finalSlots[team])
@@ -164,7 +164,7 @@ module.exports = class Gym extends Model {
         }
       }
     })
-    if (areaRestrictions?.length > 0) {
+    if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions, isMad)
     }
 
@@ -245,7 +245,7 @@ module.exports = class Gym extends Model {
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
-    if (perms.areaRestrictions?.length > 0) {
+    if (perms.areaRestrictions?.length) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     return query
@@ -280,7 +280,7 @@ module.exports = class Gym extends Model {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
         .leftJoin('raid', 'gym.gym_id', 'raid.gym_id')
     }
-    if (perms.areaRestrictions?.length > 0) {
+    if (perms.areaRestrictions?.length) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     return query

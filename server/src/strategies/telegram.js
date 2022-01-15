@@ -23,7 +23,7 @@ const authHandler = async (req, profile, done) => {
 
   const groupInfo = await Promise.all(strategyConfig.groups.filter(async group => {
     try {
-      const response = await Fetch.fetchJson(`https://api.telegram.org/bot${strategyConfig.botToken}/getChatMember?chat_id=${group}&user_id=${user.id}`)
+      const response = await Fetch.json(`https://api.telegram.org/bot${strategyConfig.botToken}/getChatMember?chat_id=${group}&user_id=${user.id}`)
       if (!response) {
         throw new Error('Unable to query TG API or User is not in the group')
       }

@@ -75,16 +75,16 @@ rootRouter.get('/settings', async (req, res) => {
           }
           console.log('[Session Init] Legacy user detected, forcing logout, User ID:', req?.user?.id)
           req.logout()
-          return { valid: false }
+          return { valid: false, tutorial: !config.map.forceTutorial }
         } catch (e) {
           console.log('[Session Init] Issue finding user, forcing logout, User ID:', req?.user?.id)
           req.logout()
-          return { valid: false }
+          return { valid: false, tutorial: !config.map.forceTutorial }
         }
       } else if (req.session.perms) {
         return { ...req.session, valid: true }
       }
-      return { valid: false }
+      return { valid: false, tutorial: !config.map.forceTutorial }
     }
     const serverSettings = {
       user: await getUser(),
@@ -110,12 +110,7 @@ rootRouter.get('/settings', async (req, res) => {
         manualAreas: config.manualAreas || {},
         icons: config.icons,
       },
-      available: {
-        pokemon: [],
-        pokestops: [],
-        gyms: [],
-        nests: [],
-      },
+      available: {},
     }
 
     // add user options here from the config that are structured as objects
@@ -158,7 +153,7 @@ rootRouter.get('/settings', async (req, res) => {
         if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
           serverSettings.available.gyms = config.api.queryAvailable.raids
             ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym').type === 'mad')
-            : await Fetch.fetchRaids()
+            : await Fetch.raids()
         }
       } catch (e) {
         console.error('Unable to query Raids', e.message)
@@ -170,7 +165,7 @@ rootRouter.get('/settings', async (req, res) => {
           || serverSettings.user.perms.lures) {
           serverSettings.available.pokestops = config.api.queryAvailable.quests
             ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop').type === 'mad')
-            : await Fetch.fetchQuests()
+            : await Fetch.quests()
         }
       } catch (e) {
         console.error('Unable to query Pokestops', e.message)
@@ -179,7 +174,7 @@ rootRouter.get('/settings', async (req, res) => {
         if (serverSettings.user.perms.nests) {
           serverSettings.available.nests = config.api.queryAvailable.nests
             ? await Nest.getAvailableNestingSpecies()
-            : await Fetch.fetchNests()
+            : await Fetch.nests()
         }
       } catch (e) {
         console.error('Unable to query Nests', e.message)

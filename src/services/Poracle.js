@@ -343,7 +343,7 @@ export default class Poracle {
         } else {
           fields.push(...Object.keys(pkmn).filter(key => !pvpFields.includes(key) && !ignoredFields.includes(key)))
         }
-        fields.forEach(field => newPokemon[field] = pkmn[field] || defaults[field])
+        fields.forEach(field => newPokemon[field] = pkmn[field] === undefined ? defaults[field] : pkmn[field])
         return newPokemon
       }).filter(pokemon => pokemon)
     }

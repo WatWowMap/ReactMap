@@ -54,7 +54,7 @@ export default function FloatingButtons({
           <Menu fontSize={iconSize} />
         </Fab>
       </Grid>
-      {safeSearch.length > 0 ? (
+      {safeSearch.length ? (
         <Grid item>
           <Fab color={settings.navigationControls === 'react' ? 'primary' : 'secondary'} size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('search')} disabled={Boolean(webhookMode)}>
             <Search fontSize={iconSize} />

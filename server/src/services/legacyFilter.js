@@ -225,7 +225,7 @@ const getLegacy = (results, args, perms, ohbem) => {
   }
 
   const pokemon = []
-  if (results && results.length > 0) {
+  if (results && results.length) {
     for (let i = 0; i < results.length; i++) {
       bestPvp = 4096
       const result = results[i]
@@ -256,7 +256,7 @@ const getLegacy = (results, args, perms, ohbem) => {
         filtered.iv = result.iv
         filtered.level = result.level
       }
-      if (perms.pvp && interestedLevelCaps.length > 0) {
+      if (perms.pvp && interestedLevelCaps.length) {
         const { great, ultra } = pvpMinCp
         filtered.cleanPvp = {}
         if (result.pvp || (reactMapHandlesPvp && result.cp)) {

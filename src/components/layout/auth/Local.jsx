@@ -18,6 +18,7 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
     showPassword: false,
   })
   const [error, setError] = useState('')
+  const [submitted, setSubmitted] = useState(false)
   const [redirect, setRedirect] = useState(false)
   const [checkUsername, { data }] = useMutation(Query.user('checkUsername'))
 
@@ -30,6 +31,7 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setSubmitted(true)
     await Fetch.login(user, href)
       .then(async resp => {
         if (!resp.ok) {
@@ -113,7 +115,7 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
               color="primary"
               size="large"
               onClick={handleSubmit}
-              disabled={!user.username || !user.password}
+              disabled={!user.username || !user.password || submitted}
             >
               <Typography variant="subtitle2" align="center">
                 {(() => {

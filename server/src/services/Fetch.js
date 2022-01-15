@@ -5,19 +5,19 @@ const fetchNests = require('./api/fetchNests')
 const webhookApi = require('./api/webhookApi')
 
 module.exports = class Fetch {
-  static async fetchJson(url, options) {
+  static async json(url, options) {
     return fetchJson(url, options)
   }
 
-  static async fetchRaids() {
+  static async raids() {
     return fetchRaids()
   }
 
-  static async fetchQuests() {
+  static async quests() {
     return fetchQuests()
   }
 
-  static async fetchNests() {
+  static async nests() {
     return fetchNests()
   }
 
