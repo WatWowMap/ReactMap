@@ -1,4 +1,5 @@
-version: '3.1'
+version: '3.7'
+
 services:
   reactmap:
     image: ghcr.io/watwowmap/reactmap:main #pr-10
@@ -7,7 +8,10 @@ services:
     restart: unless-stopped
     volumes:
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
-      - ./server/src/configs/local.json:/home/node/server/src/local/config.json
+      - ./server/src/configs/local.json:/home/node/server/src/local/local.json
+      - ./geofence/:/home/node/public/geofence
       - ./example.env:/home/node/.env
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "9090:8080"
