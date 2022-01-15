@@ -470,5 +470,6 @@
   "telegram_linked": "Telegram Verknüpft",
   "pokemon_cell": "Der Standort des Pokemon kann variieren",
   "timer_verified": "Die Despawnzeit ist bestätigt",
-  "timer_unverified": "Die Despawnzeit ist nicht bestätigt"
+  "timer_unverified": "Die Despawnzeit ist nicht bestätigt",
+  "all": "Alle"
 }

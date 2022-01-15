@@ -647,7 +647,7 @@ module.exports = class Pokestop extends Model {
     if (perms.areaRestrictions?.length) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
-    const results = await query.skipUndefined()
+    const results = await query
 
     if (altQuestCheck) {
       const altQuestQuery = this.query()
@@ -665,7 +665,7 @@ module.exports = class Pokestop extends Model {
         })
         .limit(searchResultsLimit)
         .orderBy('distance')
-      const altQuestResults = await altQuestQuery.skipUndefined()
+      const altQuestResults = await altQuestQuery
       const remapped = altQuestResults.map(result => ({
         ...result,
         quest_rewards: result.alternative_quest_rewards,

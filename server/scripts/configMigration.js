@@ -252,7 +252,7 @@ const mergeAuth = async () => {
     if (oldConfig?.local?.perms) {
       oldConfig.local.perms.forEach(perm => {
         if (perm === 's2cells') {
-          baseAuth.perms.scanCell.roles.push('local')
+          baseAuth.perms.scanCells.roles.push('local')
         } else {
           Object.keys(baseAuth.perms).forEach(key => {
             if (perm.includes(key)) {
