@@ -26,7 +26,7 @@ module.exports = gql`
     scanCells(minLat: Float, maxLat: Float, minLon: Float, maxLon: Float, ts: Int, filters: JSON, zoom: Int): [ScanCell]
     scanAreas: [ScanArea]
     search(search: String, category: String, lat: Float, lon: Float, locale: String, webhookName: String, ts: Int, midnight: Int): [Search]
-    searchQuest(search: String, category: String, lat: Float, lon: Float, locale: String, webhookName: String, ts: Int, midnight: Int): [SearchQuest]
+    searchQuest(search: String, category: String, lat: Float, lon: Float, locale: String, webhookName: String, midnight: Int): [SearchQuest]
     spawnpoints(minLat: Float, maxLat: Float, minLon: Float, maxLon: Float, ts: Int, filters: JSON): [Spawnpoint]
     submissionCells(minLat: Float, maxLat: Float, minLon: Float, maxLon: Float, ts: Int, zoom: Int): [SubmissionCell]
     weather: [Weather]
