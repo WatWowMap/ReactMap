@@ -23,7 +23,7 @@ export default function AreaDropDown({ scanAreasZoom, manualAreas }) {
         backgroundColor: '#212121',
       }}
     >
-      {Object.keys(manualAreas).length > 0 ? (
+      {Object.keys(manualAreas).length ? (
         <MenuList>
           {Object.keys(manualAreas).map(area => (
             <MenuItem

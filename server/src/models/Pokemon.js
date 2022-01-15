@@ -226,13 +226,13 @@ module.exports = class Pokemon extends Model {
                 poke.where('pokemon_id', id)
                   .andWhere('pokemon.form', form)
               }
-              if (relevantFilters.length > 0) {
+              if (relevantFilters.length) {
                 generateSql(poke, filter, relevantFilters, true)
               }
             })
           } else if (pkmn === 'onlyIvOr' && (ivs || pvp)) {
             const relevantFilters = getRelevantKeys(filter)
-            if (relevantFilters.length > 0) {
+            if (relevantFilters.length) {
               generateSql(ivOr, filter, relevantFilters)
             } else {
               ivOr.whereNull('pokemon_id')
@@ -254,7 +254,7 @@ module.exports = class Pokemon extends Model {
           ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 100)
         }
       })
-    if (areaRestrictions?.length > 0) {
+    if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions, isMad, 'pokemon')
     }
 
@@ -301,7 +301,7 @@ module.exports = class Pokemon extends Model {
       pvpQuery.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
         .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
-      if (isMad && listOfIds.length > 0) {
+      if (isMad && listOfIds.length) {
         pvpQuery.whereRaw(`pokemon.encounter_id NOT IN ( ${listOfIds.join(',')} )`)
       } else {
         pvpQuery.whereNotIn('id', listOfIds)
@@ -316,7 +316,7 @@ module.exports = class Pokemon extends Model {
             .orWhereNotNull('pvp_rankings_ultra_league')
         })
       }
-      if (areaRestrictions?.length > 0) {
+      if (areaRestrictions?.length) {
         getAreaSql(pvpQuery, areaRestrictions, isMad, 'pokemon')
       }
       pvpResults.push(...await pvpQuery)
@@ -334,12 +334,12 @@ module.exports = class Pokemon extends Model {
       if (!pkmn.seen_type) pkmn.seen_type = 'encounter'
       Object.keys(parsed).forEach(league => {
         const { filtered, best } = getRanks(league, parsed[league], filterId)
-        if (filtered.length > 0) {
+        if (filtered.length) {
           pkmn.cleanPvp[league] = filtered
           if (best < pkmn.bestPvp) pkmn.bestPvp = best
         }
       })
-      if ((Object.keys(pkmn.cleanPvp).length > 0 || !pkmn.pvpCheck) && globalCheck(pkmn)) {
+      if ((Object.keys(pkmn.cleanPvp).length || !pkmn.pvpCheck) && globalCheck(pkmn)) {
         finalResults.push(pkmn)
       }
     })
@@ -374,7 +374,7 @@ module.exports = class Pokemon extends Model {
     if (isMad) {
       getMadSql(query)
     }
-    if (perms.areaRestrictions?.length > 0) {
+    if (perms.areaRestrictions?.length) {
       getAreaSql(query, perms.areaRestrictions, isMad, 'pokemon')
     }
     const results = await query

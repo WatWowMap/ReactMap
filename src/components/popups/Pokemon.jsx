@@ -88,7 +88,7 @@ export default function PokemonPopup({
         pokemon={pokemon}
         popups={popups}
         setPopups={setPopups}
-        hasPvp={hasLeagues.length > 0}
+        hasPvp={hasLeagues.length}
         classes={classes}
         Icons={Icons}
       />
