@@ -475,5 +475,12 @@
   "pokemon_cell": "Pokemon's Location Could Vary",
   "timer_verified": "This Timer is Verified",
   "timer_unverified": "This Timer is Unverified",
-  "all": "All"
+  "all": "All",
+  "badge_0": "None",
+  "badge_1": "Bronze",
+  "badge_2": "Silver",
+  "badge_3": "Gold",
+  "gym_badge_menu": "Edit Gym Badge",
+  "gym_badges": "Gym Badges",
+  "gymBadgeDiamonds": "Show Gym Badges"
 }

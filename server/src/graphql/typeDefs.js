@@ -38,5 +38,6 @@ module.exports = gql`
     tutorial(tutorial: Boolean): Boolean
     strategy(strategy: String): Boolean
     checkUsername(username: String): Boolean
+    setGymBadge(gymId: String, badge: Int): Boolean
   }
 `

@@ -4,7 +4,7 @@ const { raw } = require('objection')
 
 const config = require('../services/config')
 const {
-  Device, Gym, Pokemon, Pokestop, Portal, ScanCell, Spawnpoint, Weather, Nest, User,
+  Device, Gym, Pokemon, Pokestop, Portal, ScanCell, Spawnpoint, Weather, Nest, User, Badge,
 } = require('../models/index')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
@@ -32,7 +32,7 @@ module.exports = {
     gyms: (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.gyms || perms?.raids) {
-        return Gym.getAllGyms(args, perms, Utility.dbSelection('gym').type === 'mad')
+        return Gym.getAllGyms(args, perms, Utility.dbSelection('gym').type === 'mad', req?.user?.id)
       }
       return []
     },
@@ -310,6 +310,23 @@ module.exports = {
       const results = await User.query()
         .where('username', args.username)
       return Boolean(results.length)
+    },
+    setGymBadge: async (parent, args, { req }) => {
+      const perms = req.user ? req.user.perms : false
+      if (perms?.gymBadges) {
+        if (await Badge.query().where('gym_id', args.gymId).andWhere('user_id', req.user.id).first()) {
+          await Badge.query().where('gym_id', args.gymId).andWhere('user_id', req.user.id)
+            .update({ badge: args.badge })
+        } else {
+          await Badge.query().insert({
+            badge: args.badge,
+            gym_id: args.gymId,
+            user_id: req.user.id,
+          })
+        }
+        return true
+      }
+      return false
     },
   },
 }

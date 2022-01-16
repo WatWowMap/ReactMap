@@ -3,22 +3,27 @@ import React, {
   Fragment, useState, useEffect,
 } from 'react'
 import {
-  Grid, Typography, Icon, Collapse, IconButton, Divider,
+  Grid, Typography, Icon, Collapse, IconButton, Divider, ButtonGroup, Button, DialogContent, Dialog,
 } from '@material-ui/core'
 import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
 import { useTranslation, Trans } from 'react-i18next'
+import { useMutation } from '@apollo/client'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
+import Query from '@services/Query'
+
+import Header from '@components/layout/general/Header'
+import Footer from '@components/layout/general/Footer'
 
 import Title from './common/Title'
 import Dropdown from './common/Dropdown'
 import GenericTimer from './common/Timer'
 
 export default function GymPopup({
-  gym, hasRaid, ts, Icons, hasHatched,
+  gym, hasRaid, ts, Icons, hasHatched, badge, setBadge,
 }) {
   const { t } = useTranslation()
   const { perms } = useStatic(state => state.auth)
@@ -49,6 +54,8 @@ export default function GymPopup({
         perms={perms}
         hasRaid={hasRaid}
         t={t}
+        badge={badge}
+        setBadge={setBadge}
       />
       {perms.gyms && (
         <Grid item xs={12}>
@@ -97,7 +104,7 @@ export default function GymPopup({
           </Collapse>
         </Grid>
       )}
-      <Footer
+      <GymFooter
         gym={gym}
         popups={popups}
         setPopups={setPopups}
@@ -116,7 +123,7 @@ export default function GymPopup({
 }
 
 const MenuActions = ({
-  gym, perms, hasRaid, t,
+  gym, perms, hasRaid, t, badge, setBadge,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -131,6 +138,7 @@ const MenuActions = ({
   const setFilters = useStore(state => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
+  const [badgeMenu, setBadgeMenu] = useState(false)
 
   const addWebhook = useWebhook({ category: 'quickGym', selectedWebhook })
   const {
@@ -148,6 +156,11 @@ const MenuActions = ({
   const handleHide = () => {
     setAnchorEl(null)
     setHideList([...hideList, id])
+  }
+
+  const handleCloseBadge = (open) => {
+    setAnchorEl(null)
+    setBadgeMenu(open)
   }
 
   const excludeTeam = () => {
@@ -206,6 +219,9 @@ const MenuActions = ({
 
   if (perms.gyms) {
     options.push({ name: 'exclude_team', action: excludeTeam })
+    if (perms.gymBadges) {
+      options.push({ name: 'gym_badge_menu', action: () => handleCloseBadge(true) })
+    }
   }
   if (perms.raids && hasRaid) {
     options.push(
@@ -238,6 +254,15 @@ const MenuActions = ({
         handleClose={handleClose}
         options={options}
       />
+      <Dialog open={badgeMenu}>
+        <BadgeSelection
+          gym={gym}
+          setBadgeMenu={handleCloseBadge}
+          t={t}
+          badge={badge}
+          setBadge={setBadge}
+        />
+      </Dialog>
     </Grid>
   )
 }
@@ -507,7 +532,7 @@ const Timer = ({
   ) : null
 }
 
-const Footer = ({
+const GymFooter = ({
   gym, popups, setPopups, hasRaid, perms, Icons,
 }) => {
   const classes = useStyles()
@@ -612,5 +637,40 @@ const ExtraInfo = ({ gym, t, ts }) => {
         ) : null
       ))}
     </Grid>
+  )
+}
+
+const BadgeSelection = ({
+  gym, setBadgeMenu, t, badge, setBadge,
+}) => {
+  const [setBadgeInDb] = useMutation(Query.user('setGymBadge'))
+
+  return (
+    <>
+      <Header titles={['gym_badge_menu']} />
+      <DialogContent>
+        <ButtonGroup>
+          {[0, 1, 2, 3].map(i => (
+            <Button
+              key={i}
+              onClick={() => {
+                setBadgeInDb({
+                  variables: {
+                    badge: i,
+                    gymId: gym.id,
+                  },
+                })
+                setBadge(i)
+              }}
+              color={badge === i ? 'primary' : 'secondary'}
+              variant={badge === i ? 'contained' : 'outlined'}
+            >
+              {t(`badge_${i}`)}
+            </Button>
+          ))}
+        </ButtonGroup>
+      </DialogContent>
+      <Footer options={[{ name: 'close', action: () => setBadgeMenu(false), color: 'primary', align: 'right' }]} role="webhook_footer" />
+    </>
   )
 }

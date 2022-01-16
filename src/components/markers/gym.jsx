@@ -15,7 +15,7 @@ const getBadgeColor = (raidLevel) => {
   }
 }
 
-export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, userSettings) {
+export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, userSettings, badge) {
   const {
     in_battle, team_id, available_slots, raid_level, ex_raid_eligible, ar_scan_eligible,
   } = gym
@@ -58,51 +58,92 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
 
   const ReactIcon = (
     <div className="marker-image-holder top-overlay">
-      <img
-        src={gymIcon}
-        style={{
-          width: gymSize,
-          height: gymSize,
-          bottom: -1 + gymMod.offsetY,
-          left: `${gymMod.offsetX * 100}%`,
-          transform: 'translateX(-50%)',
-        }}
-      />
-      {Boolean(userSettings.showExBadge && ex_raid_eligible && !gymIcon.includes('_ex')) && (
-        <img
-          src={Icons.getMisc('ex')}
-          style={{
-            width: gymSize / 1.5,
-            height: 'auto',
-            bottom: -1 + gymMod.offsetY,
-            left: `${gymMod.offsetX * 15}%`,
-            transform: 'translateX(-50%)',
-          }}
-        />
-      )}
-      {Boolean(userSettings.showArBadge && ar_scan_eligible && !gymIcon.includes('_ar')) && (
-        <img
-          src={Icons.getMisc('ar')}
-          style={{
-            width: gymSize / 2,
-            height: 'auto',
-            bottom: 20 + gymMod.offsetY,
-            left: `${gymMod.offsetX * 10}%`,
-            transform: 'translateX(-50%)',
-          }}
-        />
-      )}
-      {Boolean(in_battle && !gymIcon.includes('_b')) && (
-        <img
-          src={Icons.getMisc('battle')}
-          style={{
-            width: gymSize,
-            height: 'auto',
-            bottom: 10 + gymMod.offsetY,
-            left: `${gymMod.offsetX * 100}%`,
-            transform: 'translateX(-50%)',
-          }}
-        />
+      {(filters.gymBadges && userSettings.gymBadgeDiamonds && badge) ? (
+        <>
+          <div
+            style={{
+              width: 48,
+              height: 48,
+              backgroundImage: `url(${gym.url ? gym.url.replace('http', 'https') : ''})`,
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat',
+              clipPath: 'polygon(50% 0%, 80% 50%, 50% 100%, 20% 50%)',
+              transform: 'translateX(-25%) translateY(-75%)',
+            }}
+          />
+          <img
+            src={Icons.getMisc(`badge_${badge}`)}
+            style={{
+              width: 48,
+              height: 48,
+              bottom: -1 + gymMod.offsetY,
+              left: `${gymMod.offsetX * 100}%`,
+              transform: 'translateX(-50%)',
+
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <img
+            src={gymIcon}
+            style={{
+              width: gymSize,
+              height: gymSize,
+              bottom: -1 + gymMod.offsetY,
+              left: `${gymMod.offsetX * 100}%`,
+              transform: 'translateX(-50%)',
+            }}
+          />
+          {Boolean(userSettings.showExBadge && ex_raid_eligible && !gymIcon.includes('_ex')) && (
+            <img
+              src={Icons.getMisc('ex')}
+              style={{
+                width: gymSize / 1.5,
+                height: 'auto',
+                bottom: -1 + gymMod.offsetY,
+                left: `${gymMod.offsetX * 15}%`,
+                transform: 'translateX(-50%)',
+              }}
+            />
+          )}
+          {Boolean(userSettings.showArBadge && ar_scan_eligible && !gymIcon.includes('_ar')) && (
+            <img
+              src={Icons.getMisc('ar')}
+              style={{
+                width: gymSize / 2,
+                height: 'auto',
+                bottom: 20 + gymMod.offsetY,
+                left: `${gymMod.offsetX * 10}%`,
+                transform: 'translateX(-50%)',
+              }}
+            />
+          )}
+          {Boolean(in_battle && !gymIcon.includes('_b')) && (
+            <img
+              src={Icons.getMisc('battle')}
+              style={{
+                width: gymSize,
+                height: 'auto',
+                bottom: 10 + gymMod.offsetY,
+                left: `${gymMod.offsetX * 100}%`,
+                transform: 'translateX(-50%)',
+              }}
+            />
+          )}
+          {Boolean(filters.gymBadges && badge) && (
+            <img
+              src={Icons.getMisc((() => { switch (badge) { case 1: return 'third'; case 2: return 'second'; default: return 'first' } })())}
+              style={{
+                width: gymSize / 2,
+                height: 'auto',
+                bottom: 15 + gymMod.offsetY,
+                left: `${gymMod.offsetX * 10}%`,
+                transform: 'translateX(50%)',
+              }}
+            />
+          )}
+        </>
       )}
       {raidIcon && (
         <img

@@ -13,4 +13,19 @@ module.exports = class User extends Model {
       .where({ [`${strategy}Id`]: userId })
       .then(() => console.log(`[${botName}] Cleared ${strategy} perms for user ${userId}`))
   }
+
+  static get relationMappings() {
+    // eslint-disable-next-line global-require
+    const Badge = require('./Badge')
+    return {
+      badges: {
+        relation: Model.HasManyRelation,
+        modelClass: Badge,
+        join: {
+          from: `${userTableName}.id`,
+          to: 'gym_badges.user_id',
+        },
+      },
+    }
+  }
 }

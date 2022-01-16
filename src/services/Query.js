@@ -32,7 +32,7 @@ export default class Query {
       if (permObj[keyPerm]) query += keyPerm
     })
     if (query === 'get'
-      && (filters.exEligible || filters.inBattle || filters.arEligible)) {
+      && (filters.exEligible || filters.inBattle || filters.arEligible || filters.gymBadges)) {
       query += 'Gyms'
     }
 

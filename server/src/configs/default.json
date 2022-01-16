@@ -178,7 +178,8 @@
       "showExBadge": false,
       "showArBadge": false,
       "raidLevelBadges": false,
-      "raidsOr": true
+      "raidsOr": true,
+      "gymBadgeDiamonds": true
     },
     "pokestops": {
       "clustering": true,
@@ -239,7 +240,8 @@
       "inBattle": false,
       "raids": true,
       "eggs": true,
-      "pokemon": true
+      "pokemon": true,
+      "gymBadges": false
     },
     "nests": {
       "enabled": false,
@@ -448,6 +450,10 @@
         "roles": []
       },
       "donor": {
+        "enabled": true,
+        "roles": []
+      },
+      "gymBadges": {
         "enabled": true,
         "roles": []
       }

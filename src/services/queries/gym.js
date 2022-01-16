@@ -21,6 +21,7 @@ const gym = gql`
     in_battle
     guarding_pokemon_id
     total_cp
+    badge
   }
 `
 
