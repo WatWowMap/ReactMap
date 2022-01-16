@@ -13,6 +13,8 @@ server/src/data/masterfile.json
 
 # Docker file
 /docker-compose.yml
+.gitref
+.gitsha
 
 # Favicon
 public/favicon/*
