@@ -115,6 +115,7 @@ const LinkProfiles = ({ auth, t }) => {
         justifyContent="center"
       >
         {['discord', 'telegram'].map((method, i) => {
+          if (!auth.methods.includes(method)) return null
           const Component = i
             ? <Telegram authUrl={telegramAuthUrl} botName={telegramBotEnvRef} />
             : <DiscordLogin href={discordAuthUrl} text="link_discord" size="medium" />
@@ -278,7 +279,7 @@ const GymBadges = ({ isMobile, t }) => {
 const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
   const { badges, columnCount, Icons, t, map } = data
   const item = badges[rowIndex * columnCount + columnIndex]
-  const [badge, setBadge] = useState(item.badge)
+  const [badge, setBadge] = useState(item?.badge || 0)
   const [badgeMenu, setBadgeMenu] = useState(false)
 
   return item ? (
