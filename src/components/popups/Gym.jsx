@@ -663,6 +663,7 @@ export const BadgeSelection = ({
                   },
                 })
                 setBadge(i)
+                setBadgeMenu(false)
               }}
               color={badge === i ? 'primary' : 'secondary'}
               variant={badge === i ? 'contained' : 'outlined'}
