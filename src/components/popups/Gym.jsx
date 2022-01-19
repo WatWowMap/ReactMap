@@ -16,7 +16,6 @@ import Utility from '@services/Utility'
 import Query from '@services/Query'
 
 import Header from '@components/layout/general/Header'
-import Footer from '@components/layout/general/Footer'
 
 import Title from './common/Title'
 import Dropdown from './common/Dropdown'
@@ -663,6 +662,7 @@ export const BadgeSelection = ({
                   },
                 })
                 setBadge(i)
+                setBadgeMenu(false)
               }}
               color={badge === i ? 'primary' : 'secondary'}
               variant={badge === i ? 'contained' : 'outlined'}
@@ -672,7 +672,6 @@ export const BadgeSelection = ({
           ))}
         </ButtonGroup>
       </DialogContent>
-      <Footer options={[{ name: 'close', action: () => setBadgeMenu(false), color: 'primary', align: 'right' }]} role="webhook_footer" />
     </>
   )
 }
