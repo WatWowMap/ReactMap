@@ -48,7 +48,7 @@ const Login = ({ clickedTwice, location, serverSettings, getServerSettings }) =>
           {t('welcome')} {serverSettings.config.map.headerTitle}
         </Typography>
       </Grid>
-      {serverSettings?.authMethods?.some(x => x.includes('discord')) && (
+      {serverSettings?.authMethods?.includes('discord') && (
         <Grid container item justifyContent="center" alignItems="center" spacing={2} style={{ marginTop: 20, marginBottom: 20 }}>
           <Grid
             item
@@ -65,7 +65,7 @@ const Login = ({ clickedTwice, location, serverSettings, getServerSettings }) =>
           )}
         </Grid>
       )}
-      {serverSettings?.authMethods?.some(x => x.includes('telegram')) && (
+      {serverSettings?.authMethods?.includes('telegram') && (
         <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
           <TelegramLogin
             botName={serverSettings.config.map.telegramBotEnvRef}
@@ -73,7 +73,7 @@ const Login = ({ clickedTwice, location, serverSettings, getServerSettings }) =>
           />
         </Grid>
       )}
-      {serverSettings?.authMethods?.some(x => x.includes('local')) && (
+      {serverSettings?.authMethods?.includes('local') && (
         <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
           <LocalLogin
             href={serverSettings.config.map.localAuthUrl}

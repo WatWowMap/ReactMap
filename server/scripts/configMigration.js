@@ -7,7 +7,7 @@ const convertObjToArr = (obj) => obj ? Object.entries(obj).map(([k, v]) => ({
   ...v,
 })) : undefined
 
-const convertMapObject = (obj) => ({
+const convertMapObject = (obj) => obj ? ({
   general: {
     title: obj?.title,
     headerTitle: obj?.headerTitle,
@@ -71,15 +71,15 @@ const convertMapObject = (obj) => ({
       forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
     },
   },
-  messageOfTheDay: obj.messageOfTheDay
+  messageOfTheDay: obj?.messageOfTheDay
     ? ensureMotd(obj?.messageOfTheDay)
     : undefined,
   donationPage: obj?.donationPage,
   loginPage: obj?.loginPage,
-})
+}) : undefined
 
 const ensureMotd = (obj) => {
-  if (obj.messages) {
+  if (obj?.messages) {
     const updateFieldRec = (messages) => messages.map(message => {
       if (message.messages) {
         message.components = updateFieldRec(message.messages)
@@ -252,7 +252,7 @@ const mergeAuth = async () => {
     if (oldConfig?.local?.perms) {
       oldConfig.local.perms.forEach(perm => {
         if (perm === 's2cells') {
-          baseAuth.perms.scanCell.roles.push('local')
+          baseAuth.perms.scanCells.roles.push('local')
         } else {
           Object.keys(baseAuth.perms).forEach(key => {
             if (perm.includes(key)) {

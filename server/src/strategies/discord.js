@@ -4,11 +4,9 @@ const DiscordStrategy = require('passport-discord').Strategy
 const passport = require('passport')
 const path = require('path')
 
-// if writing a custom strategy, rename 'discord' below to your strategy name
-// this will automatically grab all of its unique values in the config
 const {
   map: { forceTutorial },
-  authentication: { discord: strategyConfig, perms },
+  authentication: { [path.parse(__filename).name]: strategyConfig, perms },
 } = require('../services/config')
 const { User } = require('../models/index')
 const DiscordMapClient = require('../services/DiscordClient')
@@ -53,7 +51,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
     await User.query()
       .findOne(req.user ? { id: req.user.id } : { discordId: user.id })
       .then(async (userExists) => {
-        if (req.user) {
+        if (req.user && userExists?.strategy === 'local') {
           await User.query()
             .update({ discordId: user.id, discordPerms: JSON.stringify(user.perms), webhookStrategy: 'discord' })
             .where('id', req.user.id)

@@ -171,7 +171,7 @@ export default function Search({
               )}
             </Grid>
             <Grid item xs={2}>
-              <Typography variant="caption">{option.distance}km</Typography>
+              <Typography variant="caption">{option.distance}{t('km')}</Typography>
             </Grid>
           </Grid>
         ))}

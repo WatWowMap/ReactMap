@@ -213,13 +213,15 @@ export default class Poracle {
   static getId(item, category, invasions) {
     switch (category) {
       case 'egg': return `e${item.level}`
-      case 'invasion': return `i${Object.keys(invasions).find(x => invasions[x].type?.toLowerCase() === item.grunt_type.toLowerCase() && invasions[x].gender === item.gender)}`
+      case 'invasion': return `i${Object.keys(invasions)
+        .find(x => invasions[x].type?.toLowerCase() === item.grunt_type.toLowerCase()
+          && invasions[x].gender === (item.gender || 1))}`
       case 'lure': return `l${item.lure_id}`
       case 'gym': return `t${item.team}-0`
       case 'raid': return item.pokemon_id === 9000
         ? `r${item.level}`
         : `${item.pokemon_id}-${item.form}`
-      case 'quest': return (function quests() {
+      case 'quest': return (() => {
         switch (item.reward_type) {
           case 2: return `q${item.reward}`
           case 3: return `d${item.amount}`
@@ -228,7 +230,7 @@ export default class Poracle {
           case 12: return `m${item.reward}-${item.amount}`
           default: return `${item.reward}-${item.form}`
         }
-      }())
+      })()
       default: return `${item.pokemon_id}-${item.form}`
     }
   }
@@ -341,7 +343,7 @@ export default class Poracle {
         } else {
           fields.push(...Object.keys(pkmn).filter(key => !pvpFields.includes(key) && !ignoredFields.includes(key)))
         }
-        fields.forEach(field => newPokemon[field] = pkmn[field] || defaults[field])
+        fields.forEach(field => newPokemon[field] = pkmn[field] === undefined ? defaults[field] : pkmn[field])
         return newPokemon
       }).filter(pokemon => pokemon)
     }
@@ -349,7 +351,11 @@ export default class Poracle {
 
   static generateDescription(item, category, leagues, t) {
     switch (category) {
-      case 'invasion': return `${t(item.grunt_id ? `grunt_${item.grunt_id}` : 'poke_global')}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
+      case 'invasion': {
+        let name = t(item.grunt_id ? `grunt_${item.grunt_id}` : 'poke_global')
+        if (!item.gender) name = name.replace(/\(.+?\)/g, `(${t('all')})`)
+        return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
+      }
       case 'lure': return `${t(`lure_${item.lure_id}`)}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
       case 'quest': return `${t(`quest_reward_${item.reward_type}`)} | ${(function getReward() {
         switch (item.reward_type) {

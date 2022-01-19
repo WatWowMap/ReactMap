@@ -5,6 +5,7 @@ process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
 const fs = require('fs')
 const config = require('config')
 
+// Check if new config exists
 if (!fs.existsSync(`${__dirname}/../configs/local.json`)) {
   console.log('Config v2 (local.json) not found, you need to run the migration with "yarn config-migrate"')
   process.exit(1)
@@ -27,35 +28,45 @@ const mergeMapConfig = (obj) => ({
   misc: undefined,
 })
 
+// Merge sub-objects for the map object
 config.map = mergeMapConfig(config.map)
 
+// Create multiDomain Objects
 config.multiDomainsObj = Object.fromEntries(
   config.multiDomains.map(d => [d.domain, mergeMapConfig(d)]),
 )
 
-config.authMethods = []
-config.authentication.strategies.forEach(strategy => {
-  if (strategy.enabled) {
+// Consolidate Auth Methods
+// Create Authentication Objects
+config.authMethods = [...new Set(config.authentication.strategies
+  .filter(strategy => strategy.enabled)
+  .map(strategy => {
     config.authentication[strategy.name] = strategy
-    config.authMethods.push(strategy.name)
-  }
-})
+    return strategy.type
+  })),
+]
 
+// Auto check for scan overlay settings
 config.map.noScanAreaOverlay = Boolean(config.manualAreas.length)
 
+// initialize webhooks
 if (config.webhooks.length) {
   (async () => {
     config.webhookObj = await initWebhooks(config)
   })()
 }
+
+// Check if empty
 ['tileServers', 'navigation'].forEach(opt => {
   if (!config[opt].length) console.warn(`[${opt}] is empty, you need to add options to it or remove the empty array from your config.`)
 })
 
+// Check if an areas.json exists
 config.scanAreas = fs.existsSync(`${__dirname}/../configs/areas.json`)
   ? require('../configs/areas.json')
   : { features: [] }
 
+// Map manual areas
 config.manualAreas = Object.fromEntries(config.manualAreas.map(area => [area.name, area]))
 
 module.exports = config

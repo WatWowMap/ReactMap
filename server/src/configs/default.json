@@ -17,9 +17,9 @@
     },
     "queryAvailable": {
       "pokemon": false,
-      "quest": true,
-      "raid": true,
-      "nest": false
+      "quests": true,
+      "raids": true,
+      "nests": false
     },
     "pvp": {
       "leagues": [

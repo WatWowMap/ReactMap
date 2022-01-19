@@ -15,7 +15,7 @@ module.exports = class Portal extends Model {
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .andWhere('updated', '>', (Date.now() / 1000) - portalUpdateLimit * 60 * 60 * 24)
-    if (areaRestrictions?.length > 0) {
+    if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions)
     }
     return query
@@ -36,7 +36,7 @@ module.exports = class Portal extends Model {
       .andWhere('updated', '>', (Date.now() / 1000) - portalUpdateLimit * 60 * 60 * 24)
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (areaRestrictions?.length > 0) {
+    if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions, isMad)
     }
     return query
