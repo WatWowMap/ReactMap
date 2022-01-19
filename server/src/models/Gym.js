@@ -327,7 +327,7 @@ module.exports = class Gym extends Model {
     }
 
     const results = await query
-      .whereIn(isMad ? 'gym_id' : 'id', userGyms.map(gym => gym.gymId))
+      .whereIn(isMad ? 'gym.gym_id' : 'id', userGyms.map(gym => gym.gymId))
 
     return results.map(gym => {
       if (typeof gym.enabled === 'boolean') {
