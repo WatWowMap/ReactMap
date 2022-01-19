@@ -255,7 +255,8 @@ const GymBadges = ({ isMobile, t }) => {
         </Typography>
       </Grid>
       {[bronze, silver, gold].map((count, i) => (
-        <Grid item xs={4}>
+        // eslint-disable-next-line react/no-array-index-key
+        <Grid key={i} item xs={4}>
           <Typography variant="subtitle2" align="center" className={`badge_${i + 1}`}>
             {t(`badge_${i + 1}`)}: {count}
           </Typography>
