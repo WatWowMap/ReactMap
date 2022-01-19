@@ -63,7 +63,7 @@ export default function WithSubItems({
             filters={filters}
             setFilters={setFilters}
             category={category}
-            filterKey="questSet"
+            filterKey="showQuestSet"
             items={['with_ar', 'both', 'without_ar']}
           />
         </Grid>
