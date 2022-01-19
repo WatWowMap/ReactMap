@@ -481,5 +481,6 @@
   "badge_3": "Gold",
   "gym_badge_menu": "Arenaorden bearbeiten",
   "gym_badges": "Arenaorden",
-  "gym_badge_diamonds": "Arenaorden anzeigen"
+  "gym_badge_diamonds": "Arenaorden anzeigen",
+  "gym_badges_subtitle": "Die Arenaorden auf der Karte und als Liste auf der Profilseite anzeigen."
 }
