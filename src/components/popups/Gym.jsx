@@ -640,11 +640,12 @@ const ExtraInfo = ({ gym, t, ts }) => {
   )
 }
 
-const BadgeSelection = ({
+export const BadgeSelection = ({
   gym, setBadgeMenu, t, badge, setBadge,
 }) => {
-  const [setBadgeInDb] = useMutation(Query.user('setGymBadge'))
-
+  const [setBadgeInDb] = useMutation(Query.user('setGymBadge'), {
+    refetchQueries: ['GetBadgeInfo'],
+  })
   return (
     <>
       <Header titles={['gym_badge_menu']} />
@@ -653,6 +654,7 @@ const BadgeSelection = ({
           {[0, 1, 2, 3].map(i => (
             <Button
               key={i}
+              size="small"
               onClick={() => {
                 setBadgeInDb({
                   variables: {

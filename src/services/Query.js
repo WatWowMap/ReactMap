@@ -23,6 +23,9 @@ export default class Query {
     if (filters === 'id') {
       return gymIndex.getOne
     }
+    if (filters === 'badges') {
+      return gymIndex.getBadges
+    }
     const permObj = {
       Gyms: filters.raids ? filters.allGyms || perms.allGyms : filters.allGyms && perms.allGyms,
       Raids: filters.raids && perms.raids,

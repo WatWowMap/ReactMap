@@ -3,7 +3,16 @@ const { database: { settings: { userTableName } } } = require('../services/confi
 
 module.exports = class Badge extends Model {
   static get tableName() {
-    return 'gym_badges'
+    return 'gymBadges'
+  }
+
+  $beforeInsert() {
+    this.createdAt = Math.floor(Date.now() / 1000)
+    this.updatedAt = Math.floor(Date.now() / 1000)
+  }
+
+  $beforeUpdate() {
+    this.updatedAt = Math.floor(Date.now() / 1000)
   }
 
   static get relationMappings() {
@@ -14,7 +23,7 @@ module.exports = class Badge extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {
-          from: 'gym_badges.user_id',
+          from: 'gymBadges.userId',
           to: `${userTableName}.id`,
         },
       },

@@ -6,15 +6,25 @@ const { database: { settings: { userTableName } } } = require('../../services/co
 /**
  * @param {Knex} knex
  */
-exports.up = async (knex) => knex.schema.createTable('gym_badges', table => {
+exports.up = async (knex) => knex.schema.createTable('gymBadges', table => {
   table.bigIncrements('id')
-  table.bigInteger('user_id')
+    .primary()
+  table.bigInteger('userId')
     .references(`${userTableName}.id`)
+    .unsigned()
     .notNullable()
     .index()
-    .unsigned()
-  table.string('gym_id')
+  table.string('gymId')
+    .notNullable()
   table.integer('badge')
+    .unsigned()
+    .notNullable()
+    .defaultTo(0)
+  table.bigInteger('createdAt')
+    .unsigned()
+    .notNullable()
+    .defaultTo(0)
+  table.bigInteger('updatedAt')
     .unsigned()
     .notNullable()
     .defaultTo(0)
@@ -23,4 +33,4 @@ exports.up = async (knex) => knex.schema.createTable('gym_badges', table => {
 /**
  * @param {Knex} knex
  */
-exports.down = (knex) => knex.schema.dropTableIfExists('gym_badges')
+exports.down = (knex) => knex.schema.dropTableIfExists('gymBadges')

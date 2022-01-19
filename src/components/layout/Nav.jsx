@@ -129,7 +129,11 @@ export default function Nav({
           fullScreen={isMobile}
           fullWidth={!isMobile}
         >
-          <UserProfile setUserProfile={setUserProfile} />
+          <UserProfile
+            setUserProfile={setUserProfile}
+            isMobile={isMobile}
+            isTablet={isTablet}
+          />
         </Dialog>
       ) : (
         <Dialog

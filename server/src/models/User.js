@@ -23,7 +23,7 @@ module.exports = class User extends Model {
         modelClass: Badge,
         join: {
           from: `${userTableName}.id`,
-          to: 'gym_badges.user_id',
+          to: 'gymBadges.userId',
         },
       },
     }

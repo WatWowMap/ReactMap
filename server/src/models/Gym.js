@@ -73,7 +73,7 @@ module.exports = class Gym extends Model {
 
     const userBadges = onlyGymBadges && gymBadges && userId
       ? await Badge.query()
-        .where('user_id', userId)
+        .where('userId', userId)
         .andWhere('badge', ...(actualBadge === 'all' ? ['>', 0] : [actualBadge]))
       : []
 
@@ -151,7 +151,7 @@ module.exports = class Gym extends Model {
         }
       }
       if (userBadges.length) {
-        gym.orWhereIn(isMad ? 'gym_id' : 'id', userBadges.map(badge => badge.gym_id))
+        gym.orWhereIn(isMad ? 'gym.gym_id' : 'id', userBadges.map(badge => badge.gymId))
       }
       if (onlyRaids && raidPerms) {
         if (raidBosses.size) {
@@ -182,7 +182,7 @@ module.exports = class Gym extends Model {
 
     const secondaryFilter = queryResults => {
       const filteredResults = []
-      const userBadgeObj = Object.fromEntries(userBadges.map(b => [b.gym_id, b.badge]))
+      const userBadgeObj = Object.fromEntries(userBadges.map(b => [b.gymId, b.badge]))
 
       for (let i = 0; i < queryResults.length; i += 1) {
         const gym = queryResults[i]
@@ -304,5 +304,41 @@ module.exports = class Gym extends Model {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     return query
+  }
+
+  static async getGymBadges(isMad, userId) {
+    const userGyms = await Badge.query()
+      .select(['gymId', 'badge'])
+      .where('userId', userId)
+      .andWhere('badge', '>', 0)
+
+    const query = this.query()
+      .select([
+        'name',
+        'url',
+        isMad ? 'gym.gym_id AS id' : 'id',
+        isMad ? 'latitude AS lat' : 'lat',
+        isMad ? 'longitude AS lon' : 'lon',
+        isMad ? 'enabled' : 'deleted',
+      ])
+
+    if (isMad) {
+      query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+    }
+
+    const results = await query
+      .whereIn(isMad ? 'gym_id' : 'id', userGyms.map(gym => gym.gymId))
+
+    return results.map(gym => {
+      if (typeof gym.enabled === 'boolean') {
+        gym.deleted = !gym.enabled
+      }
+      const gymBadge = userGyms.find(userGym => userGym.gymId === gym.id)
+
+      if (gymBadge) {
+        gym.badge = gymBadge.badge
+      }
+      return gym
+    })
   }
 }

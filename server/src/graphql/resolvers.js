@@ -12,10 +12,17 @@ const Fetch = require('../services/Fetch')
 module.exports = {
   JSON: GraphQLJSON,
   Query: {
+    badges: (parent, args, { req }) => {
+      const perms = req.user ? req.user.perms : req.session.perms
+      if (perms?.gymBadges) {
+        return Gym.getGymBadges(Utility.dbSelection('gym').type === 'mad', req?.user?.id)
+      }
+      return []
+    },
     devices: (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.devices) {
-        return Device.getAllDevices({ areaRestrictions: [] }, Utility.dbSelection('device').type === 'mad')
+        return Device.getAllDevices(perms, Utility.dbSelection('device').type === 'mad')
       }
       return []
     },
@@ -313,15 +320,15 @@ module.exports = {
     },
     setGymBadge: async (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : false
-      if (perms?.gymBadges) {
-        if (await Badge.query().where('gym_id', args.gymId).andWhere('user_id', req.user.id).first()) {
-          await Badge.query().where('gym_id', args.gymId).andWhere('user_id', req.user.id)
+      if (perms?.gymBadges && req?.user?.id) {
+        if (await Badge.query().where('gymId', args.gymId).andWhere('userId', req.user.id).first()) {
+          await Badge.query().where('gymId', args.gymId).andWhere('userId', req.user.id)
             .update({ badge: args.badge })
         } else {
           await Badge.query().insert({
             badge: args.badge,
-            gym_id: args.gymId,
-            user_id: req.user.id,
+            gymId: args.gymId,
+            userId: req.user.id,
           })
         }
         return true

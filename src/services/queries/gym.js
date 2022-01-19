@@ -83,3 +83,17 @@ export const getOne = gql`
     }
   }
 `
+
+export const getBadges = gql`
+  query GetBadgeInfo {
+    badges {
+      id
+      name
+      url
+      lat
+      lon
+      badge
+      deleted
+    }
+  }
+`
