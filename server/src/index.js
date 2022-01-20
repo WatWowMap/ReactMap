@@ -19,7 +19,10 @@ const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
-require('./services/checkForUpdates')
+
+if (!config.devOptions.skipUpdateCheck) {
+  require('./services/checkForUpdates')
+}
 
 const app = express()
 
