@@ -10,6 +10,7 @@ const passport = require('passport')
 const rateLimit = require('express-rate-limit')
 const i18next = require('i18next')
 const Backend = require('i18next-fs-backend')
+const { ValidationError } = require('apollo-server-core')
 const { ApolloServer } = require('apollo-server-express')
 require('./db/initialization')
 
@@ -33,9 +34,15 @@ const server = new ApolloServer({
   introspection: config.devOptions.enabled,
   debug: config.devOptions.queryDebug,
   context: ({ req }) => ({ req }),
-  formatError: (e) => config.devOptions.enabled
-    ? console.error(e)
-    : console.error('GraphQL Error: ', e.message, e.path, e.location),
+  formatError: (e) => {
+    if (e instanceof ValidationError) {
+      console.warn('GraphQL Error:', e.message, '\nThis is very likely not a real issue and is caused by a user leaving an old browser session open, there is nothing you can do until they refresh.')
+    } else {
+      return config.devOptions.enabled
+        ? console.error(e)
+        : console.error('GraphQL Error: ', e.message, e.path, e.location)
+    }
+  },
 })
 
 server.start().then(() => server.applyMiddleware({ app, path: '/graphql' }))
