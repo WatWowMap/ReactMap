@@ -25,7 +25,7 @@ import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 
-import { BadgeSelection } from '@components/popups/Gym'
+import BadgeSelection from './BadgeSelection'
 import Header from '../general/Header'
 import Footer from '../general/Footer'
 import TabPanel from '../general/TabPanel'
@@ -229,7 +229,9 @@ const PermCard = ({ perms, perm, t }) => (
 )
 
 const GymBadges = ({ isMobile, t }) => {
-  const { data } = useQuery(Query.gyms('badges'))
+  const { data } = useQuery(Query.gyms('badges'), {
+    fetchPolicy: 'network-only',
+  })
   const Icons = useStatic(s => s.Icons)
   const map = useMap()
 
@@ -333,7 +335,6 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
       <Dialog open={badgeMenu}>
         <BadgeSelection
           gym={item}
-          t={t}
           badge={badge}
           setBadge={setBadge}
           setBadgeMenu={setBadgeMenu}
