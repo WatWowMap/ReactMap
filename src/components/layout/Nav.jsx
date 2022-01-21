@@ -18,6 +18,7 @@ import Search from './dialogs/Search'
 import Motd from './dialogs/Motd'
 import DonorPage from './dialogs/DonorPage'
 import Feedback from './dialogs/Feedback'
+import ResetFilters from './dialogs/ResetFilters'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
@@ -38,6 +39,8 @@ export default function Nav({
   const setUserProfile = useStatic(state => state.setUserProfile)
   const feedback = useStatic(state => state.feedback)
   const setFeedback = useStatic(state => state.setFeedback)
+  const resetfilters = useStatic(state => state.resetfilters)
+  const setResetFilters = useStatic(state => state.setResetFilters)
 
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
@@ -206,6 +209,12 @@ export default function Nav({
         maxWidth={isMobile ? 'sm' : 'xs'}
       >
         <Feedback link={config.feedbackLink} setFeedback={setFeedback} />
+      </Dialog>
+      <Dialog
+        open={resetfilters}
+        maxWidth={isMobile ? 'sm' : 'xs'}
+      >
+        <ResetFilters link={config.resetfiltersLink} setResetFilters={setResetFilters} />
       </Dialog>
       <Snackbar
         open={Boolean(webhookAlert.open)}
