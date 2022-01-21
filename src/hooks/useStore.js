@@ -92,6 +92,8 @@ const useStatic = create(set => ({
   setUserProfile: (userProfile) => set({ userProfile }),
   feedback: false,
   setFeedback: (feedback) => set({ feedback }),
+  resetfilters: false,
+  setResetFilters: (resetfilters) => set({ resetfilters }),
 }))
 
 export { useStore, useStatic }
