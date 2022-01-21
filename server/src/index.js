@@ -150,7 +150,7 @@ app.use((err, req, res, next) => {
 })
 
 if (config.api.pvp.reactMapHandlesPvp) {
-  (async () => Pokemon.initOhbem())()
+  Pokemon.initOhbem().then(() => console.log('Ohbem initialized'))
 }
 
 app.listen(config.port, config.interface, () => {
