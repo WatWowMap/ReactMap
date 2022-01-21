@@ -214,7 +214,7 @@ export default function Nav({
         open={resetfilters}
         maxWidth={isMobile ? 'sm' : 'xs'}
       >
-        <ResetFilters link={config.resetfiltersLink} setResetFilters={setResetFilters} />
+        <ResetFilters setResetFilters={setResetFilters} />
       </Dialog>
       <Snackbar
         open={Boolean(webhookAlert.open)}
