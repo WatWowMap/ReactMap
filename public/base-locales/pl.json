@@ -488,5 +488,8 @@
   "webhook_footer_add_new_width": 4,
   "webhook_advanced_save_width": 2,
   "login_button": 5,
-  "join_button": 5
+  "join_button": 5,
+  "confirm_filters_reset": "Zresetuj ustawienia",
+  "filters_reset_text": "Czy na pewno chcesz zresetować ustawienia do domyślnych wartości? Ta czynność jest nieodwracalna!",
+  "filters_reset_title": "Reset ustawień"
 }
