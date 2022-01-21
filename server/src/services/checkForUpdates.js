@@ -1,31 +1,47 @@
 /* eslint-disable no-console */
 const { exec } = require('child_process')
-
-const { version: currentVersion } = require('../../../package.json')
-const Fetch = require('./Fetch')
+const fs = require('fs')
 
 exec('git branch --show-current', async (err, stdout) => {
   try {
-    if (err || typeof stdout !== 'string' || !stdout.trim()) {
-      throw new Error('Unable to get current branch', err.message)
-    }
-    const latest = await Fetch.json(`https://raw.githubusercontent.com/WatWowMap/ReactMap/${stdout.trim()}/package.json`)
+    const gitRef = fs.readFileSync('.gitref', 'utf8')
 
-    if (!latest || !latest.version) {
-      throw new Error('Unable to fetch latest version')
+    if (err || typeof stdout !== 'string' || (!stdout.trim() && !gitRef)) {
+      throw new Error('Unable to get current branch', err)
     }
+    const branch = typeof gitRef === 'string' && gitRef.trim()
+      ? gitRef.trim()
+      : stdout.trim()
 
-    const [majorC, minorC, patchC] = currentVersion.split('.').map(x => parseInt(x))
-    const [majorN, minorN, patchN] = latest.version.split('.').map(x => parseInt(x))
+    exec('git rev-parse HEAD', async (err2, stdout2) => {
+      try {
+        const gitSha = fs.readFileSync('.gitsha', 'utf8')
 
-    if (stdout.trim() === 'main') {
-      console.info('You are on the main branch, there may be additional features available on the "develop" branch. Type "git checkout develop" in the console if you would like the latest features.')
-    }
-    if (majorC < majorN
-      || (majorC === majorN && minorC < minorN)
-      || (majorC === majorN && minorC === minorN && patchC < patchN)) {
-      console.info(`[${stdout.trim().toUpperCase()}] New version available: ${latest.version} (Current: ${currentVersion})`)
-    }
+        if (err2 || typeof stdout2 !== 'string' || (!stdout2.trim() && !gitSha)) {
+          throw new Error('Unable to get current sha', err)
+        }
+        const sha = typeof gitSha === 'string' && gitSha.trim()
+          ? gitSha.trim()
+          : stdout2.trim()
+
+        exec(`git ls-remote https://github.com/WatWowMap/ReactMap/ refs/heads/${branch}`, (err3, stdout3) => {
+          try {
+            if (err3 || typeof stdout3 !== 'string' || !stdout3?.split('\t')?.[0]) {
+              throw new Error('Unable to get remote sha', err3)
+            }
+            const remoteSha = stdout3.split('\t')[0]
+
+            if (remoteSha !== sha) {
+              console.log('There is a new version available:', remoteSha)
+            }
+          } catch (e) {
+            console.error(e.message)
+          }
+        })
+      } catch (e) {
+        console.error(e.message)
+      }
+    })
   } catch (e) {
     console.error(e.message)
   }
