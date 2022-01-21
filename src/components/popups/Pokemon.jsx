@@ -398,7 +398,7 @@ const Footer = ({
 
   return (
     <>
-      {hasPvp && (
+      {Boolean(hasPvp) && (
         <Grid item xs={4}>
           <IconButton
             className={popups.pvp ? classes.expandOpen : classes.expand}
