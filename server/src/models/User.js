@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 const { Model } = require('objection')
-const { database: { settings: { userTableName } } } = require('../services/config')
+const {
+  database: { settings: { userTableName, gymBadgeTableName } },
+} = require('../services/config')
 
 module.exports = class User extends Model {
   static get tableName() {
@@ -23,7 +25,7 @@ module.exports = class User extends Model {
         modelClass: Badge,
         join: {
           from: `${userTableName}.id`,
-          to: 'gymBadges.userId',
+          to: `${gymBadgeTableName}.userId`,
         },
       },
     }

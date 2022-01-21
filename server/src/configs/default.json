@@ -313,6 +313,7 @@
   "database": {
     "settings": {
       "userTableName": "users",
+      "gymBadgeTableName": "gymBadges",
       "sessionTableName": "session",
       "migrationTableName": "knex_migrations",
       "hideOldQuests": false,

@@ -5,7 +5,10 @@ const fetchRaids = require('../services/api/fetchRaids')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { api: { searchResultsLimit }, database: { schemas } } = require('../services/config')
+const {
+  api: { searchResultsLimit },
+  database: { schemas, settings: { gymBadgeTableName } },
+} = require('../services/config')
 const Badge = require('./Badge')
 
 const gymBadgeDb = schemas.find(x => x.useFor.includes('user'))?.database
@@ -321,7 +324,7 @@ module.exports = class Gym extends Model {
         'createdAt',
         'updatedAt',
       ])
-      .leftJoin(`${gymBadgeDb}.gymBadges`, isMad ? 'gym.gym_id' : 'gym.id', 'gymBadges.gymId')
+      .leftJoin(`${gymBadgeDb}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
       .orderBy('updatedAt')
       .where('userId', userId)
       .andWhere('badge', '>', 0)

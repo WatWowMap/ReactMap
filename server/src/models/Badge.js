@@ -1,9 +1,11 @@
 const { Model } = require('objection')
-const { database: { settings: { userTableName } } } = require('../services/config')
+const {
+  database: { settings: { userTableName, gymBadgeTableName } },
+} = require('../services/config')
 
 module.exports = class Badge extends Model {
   static get tableName() {
-    return 'gymBadges'
+    return gymBadgeTableName
   }
 
   $beforeInsert() {
@@ -23,7 +25,7 @@ module.exports = class Badge extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {
-          from: 'gymBadges.userId',
+          from: `${gymBadgeTableName}.userId`,
           to: `${userTableName}.id`,
         },
       },
