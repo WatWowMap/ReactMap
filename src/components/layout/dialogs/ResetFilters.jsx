@@ -5,11 +5,12 @@ import {
 import { useTranslation } from 'react-i18next'
 import Header from '../general/Header'
 import Footer from '../general/Footer'
-import { Link, Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
 
 export default function ResetFilters({ setResetFilters }) {
   const { t } = useTranslation()
   const [redirect, setRedirect] = useState(false)
+
   if (redirect) {
     return <Redirect push to="/reset" />
   }
@@ -29,7 +30,12 @@ export default function ResetFilters({ setResetFilters }) {
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => { setRedirect(true); setResetFilters(false) }}
+            onClick={() => 
+				{ 
+				setRedirect(true)
+				setResetFilters(false) 
+				}
+			}
           >
             {t('confirm_filters_reset')}
           </Button>
