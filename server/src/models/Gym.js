@@ -11,8 +11,8 @@ const {
 } = require('../services/config')
 const Badge = require('./Badge')
 
-const gymBadgeDb = schemas.find(x => x.useFor.includes('user'))?.database
-
+const gymBadgeDb = schemas.find(x => x.useFor.includes('user'))
+const gymDb = schemas.find(x => x.useFor.includes('gym'))
 module.exports = class Gym extends Model {
   static get tableName() {
     return 'gym'
@@ -324,11 +324,19 @@ module.exports = class Gym extends Model {
         'createdAt',
         'updatedAt',
       ])
-      .leftJoin(`${gymBadgeDb}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
       .orderBy('updatedAt')
       .where('userId', userId)
       .andWhere('badge', '>', 0)
 
+    if (gymBadgeDb.host === gymDb.host) {
+      query.leftJoin(`${gymBadgeDb.database}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
+    } else {
+      const userGyms = await Badge.query()
+        .select(['gymId', 'badge'])
+        .where('userId', userId)
+        .andWhere('badge', '>', 0)
+      query.whereIn(isMad ? 'gym.gym_id' : 'id', userGyms.map(gym => gym.gymId))
+    }
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
