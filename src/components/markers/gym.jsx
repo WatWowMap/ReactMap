@@ -32,6 +32,7 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
   let raidIcon
   let raidSize = 0
   const slotModifier = gymMod[filledSlots] || gymMod['0'] || gymSize * 0.5
+  const showDiamond = filters.gymBadges && userSettings.gymBadgeDiamonds && badge
 
   if (hasRaid) {
     const {
@@ -58,17 +59,17 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
 
   const ReactIcon = (
     <div className="marker-image-holder top-overlay">
-      {(filters.gymBadges && userSettings.gymBadgeDiamonds && badge) ? (
+      {showDiamond ? (
         <>
           <div
             style={{
-              width: 48,
-              height: 48,
+              width: 46,
+              height: 46,
               backgroundImage: `url(${gym.url ? gym.url.replace('http', 'https') : ''})`,
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat',
               clipPath: 'polygon(50% 0%, 80% 50%, 50% 100%, 20% 50%)',
-              transform: 'translateX(-25%) translateY(-75%)',
+              transform: 'translateX(-38%) translateY(-82%)',
             }}
           />
           <img
@@ -76,8 +77,8 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
             style={{
               width: 48,
               height: 48,
-              bottom: -1 + gymMod.offsetY,
-              left: `${gymMod.offsetX * 100}%`,
+              bottom: 2 + gymMod.offsetY,
+              left: `${gymMod.offsetX * 50}%`,
               transform: 'translateX(-50%)',
 
             }}
@@ -188,8 +189,9 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
 
   return L.divIcon({
     popupAnchor: [
-      7 + gymMod.popupX + raidMod.popupX,
-      (-((gymSize + raidSize * 2) + slotModifier) / 2) + gymMod.popupY + raidMod.popupY,
+      0 + gymMod.popupX + gymMod.offsetX,
+      ((-gymSize - (showDiamond ? 20 : slotModifier) - raidSize) * 0.67) + gymMod.popupY + gymMod.offsetY
+      + (raidIcon ? raidMod.offsetY + raidMod.popupY : 0),
     ],
     className: 'gym-marker',
     html: renderToString(ReactIcon),

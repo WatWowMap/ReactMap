@@ -165,7 +165,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
   )
 
   return L.divIcon({
-    popupAnchor: [popupX, (pokestopMod.manualPopup
+    popupAnchor: [popupX - 5, (pokestopMod.manualPopup
       ? pokestopMod.manualPopup - totalInvasionSize * 0.25 - totalQuestSize * 0.1
       : -(baseSize + totalInvasionSize + totalQuestSize) / popupYOffset) + popupY],
     className: 'pokestop-marker',
