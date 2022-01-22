@@ -123,31 +123,28 @@ export default function Nav({
           setDonorPage={setDonorPage}
         />
       )}
-      {userProfile ? (
-        <Dialog
-          open={userProfile}
-          fullScreen={isMobile}
-          fullWidth={!isMobile}
-        >
-          <UserProfile
-            setUserProfile={setUserProfile}
-            isMobile={isMobile}
-            isTablet={isTablet}
-          />
-        </Dialog>
-      ) : (
-        <Dialog
-          open={tutorial && enableTutorial}
-          fullScreen={isMobile}
-          maxWidth="xs"
-        >
-          <Tutorial
-            setUserProfile={setUserProfile}
-            setTutorial={setTutorial}
-            toggleDialog={toggleDialog}
-          />
-        </Dialog>
-      )}
+      <Dialog
+        open={userProfile}
+        fullScreen={isMobile}
+        fullWidth={!isMobile}
+      >
+        <UserProfile
+          setUserProfile={setUserProfile}
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
+      </Dialog>
+      <Dialog
+        open={tutorial && enableTutorial}
+        fullScreen={isMobile}
+        maxWidth="xs"
+      >
+        <Tutorial
+          setUserProfile={setUserProfile}
+          setTutorial={setTutorial}
+          toggleDialog={toggleDialog}
+        />
+      </Dialog>
       <Dialog
         fullWidth={!isMobile}
         fullScreen={isMobile}

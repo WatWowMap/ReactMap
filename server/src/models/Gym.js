@@ -315,8 +315,6 @@ module.exports = class Gym extends Model {
     const query = this.query()
       .select([
         '*',
-        'name',
-        'url',
         isMad ? 'gym.gym_id AS id' : 'gym.id',
         isMad ? 'latitude AS lat' : 'lat',
         isMad ? 'longitude AS lon' : 'lon',
@@ -344,16 +342,21 @@ module.exports = class Gym extends Model {
     const results = await query
       .whereIn(isMad ? 'gym.gym_id' : 'gym.id', userGyms.map(gym => gym.gymId))
 
-    return results.map(gym => {
-      if (typeof gym.enabled === 'boolean') {
-        gym.deleted = !gym.enabled
-      }
-      const gymBadge = userGyms.find(userGym => userGym.gymId === gym.id)
+    return results
+      .map(gym => {
+        if (typeof gym.enabled === 'boolean') {
+          gym.deleted = !gym.enabled
+        }
+        const gymBadge = userGyms.find(userGym => userGym.gymId === gym.id)
 
-      if (gymBadge) {
-        gym.badge = gymBadge.badge
-      }
-      return gym
-    })
+        if (gymBadge) {
+          gym.badge = gymBadge.badge
+          gym.updatedAt = gymBadge.updatedAt
+          gym.createdAt = gymBadge.createdAt
+        }
+        return gym
+      })
+      .sort((a, b) => a.updatedAt - b.updatedAt)
+      .reverse()
   }
 }
