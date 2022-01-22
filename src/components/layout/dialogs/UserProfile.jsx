@@ -281,10 +281,10 @@ const GymBadges = ({ isMobile, t }) => {
 const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
   const { badges, columnCount, Icons, t, map } = data
   const item = badges[rowIndex * columnCount + columnIndex]
-  const [badge, setBadge] = useState(item?.badge || 0)
+  const [badge, setBadge] = useState(item?.badge)
   const [badgeMenu, setBadgeMenu] = useState(false)
 
-  return item ? (
+  return item && badge ? (
     <Grid
       container
       style={{

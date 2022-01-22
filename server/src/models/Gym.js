@@ -13,6 +13,8 @@ const Badge = require('./Badge')
 
 const gymBadgeDb = schemas.find(x => x.useFor.includes('user'))
 const gymDb = schemas.find(x => x.useFor.includes('gym'))
+const hasSameDb = gymBadgeDb.host === gymDb.host && gymBadgeDb.user === gymDb.user
+
 module.exports = class Gym extends Model {
   static get tableName() {
     return 'gym'
@@ -325,7 +327,7 @@ module.exports = class Gym extends Model {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
 
-    if (gymBadgeDb.host === gymDb.host && gymBadgeDb.user === gymDb.user) {
+    if (hasSameDb) {
       query.leftJoin(`${gymBadgeDb.database}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
         .where('userId', userId)
         .andWhere('badge', '>', 0)
