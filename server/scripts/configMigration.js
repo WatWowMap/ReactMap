@@ -47,6 +47,7 @@ const convertMapObject = (obj) => obj ? ({
     enableTutorial: obj?.enableTutorial,
     enableUserProfile: obj?.enableUserProfile,
     enableQuestSetSelector: obj?.enableQuestSetSelector,
+    noScanAreaOverlay: obj?.noScanAreaOverlay,
   },
   theme: obj?.theme,
   clustering: {
