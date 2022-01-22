@@ -325,7 +325,7 @@ module.exports = class Gym extends Model {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
 
-    if (gymBadgeDb.host === gymDb.host) {
+    if (gymBadgeDb.host === gymDb.host && gymBadgeDb.user === gymDb.user) {
       query.leftJoin(`${gymBadgeDb.database}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
         .where('userId', userId)
         .andWhere('badge', '>', 0)
