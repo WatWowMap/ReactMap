@@ -23,7 +23,8 @@
       "nests": false
     },
     "queryLimits": {
-      "pokemon": 20000,
+      "pokemon": 10000,
+      "pokemonPvp": 25000,
       "pokestops": 5000,
       "gyms": 5000,
       "portals": 5000,

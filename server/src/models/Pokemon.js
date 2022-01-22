@@ -319,7 +319,7 @@ module.exports = class Pokemon extends Model {
       if (areaRestrictions?.length) {
         getAreaSql(pvpQuery, areaRestrictions, isMad, 'pokemon')
       }
-      pvpResults.push(...await pvpQuery.limit(queryLimits.pokemon - results.length))
+      pvpResults.push(...await pvpQuery.limit(queryLimits.pokemonPvp - results.length))
     }
 
     // filter pokes with pvp data
