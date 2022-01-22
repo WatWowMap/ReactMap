@@ -314,35 +314,46 @@ module.exports = class Gym extends Model {
   static async getGymBadges(isMad, userId) {
     const query = this.query()
       .select([
+        '*',
         'name',
         'url',
         isMad ? 'gym.gym_id AS id' : 'gym.id',
         isMad ? 'latitude AS lat' : 'lat',
         isMad ? 'longitude AS lon' : 'lon',
         isMad ? 'enabled' : 'deleted',
-        'badge',
-        'createdAt',
-        'updatedAt',
       ])
-      .orderBy('updatedAt')
-      .where('userId', userId)
-      .andWhere('badge', '>', 0)
 
-    if (gymBadgeDb.host === gymDb.host) {
-      query.leftJoin(`${gymBadgeDb.database}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
-    } else {
-      const userGyms = await Badge.query()
-        .select(['gymId', 'badge'])
-        .where('userId', userId)
-        .andWhere('badge', '>', 0)
-      query.whereIn(isMad ? 'gym.gym_id' : 'id', userGyms.map(gym => gym.gymId))
-    }
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
 
-    const results = await query
+    if (gymBadgeDb.host === gymDb.host) {
+      query.leftJoin(`${gymBadgeDb.database}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
+        .where('userId', userId)
+        .andWhere('badge', '>', 0)
+        .orderBy('updatedAt')
+      const results = await query
+      return isMad ? results.map(gym => gym.deleted = !gym.enabled) : results
+    }
 
-    return isMad ? results.map(gym => gym.deleted = !gym.enabled) : results
+    const userGyms = await Badge.query()
+      .select(['gymId', 'badge'])
+      .where('userId', userId)
+      .andWhere('badge', '>', 0)
+
+    const results = await query
+      .whereIn(isMad ? 'gym.gym_id' : 'gym.id', userGyms.map(gym => gym.gymId))
+
+    return results.map(gym => {
+      if (typeof gym.enabled === 'boolean') {
+        gym.deleted = !gym.enabled
+      }
+      const gymBadge = userGyms.find(userGym => userGym.gymId === gym.id)
+
+      if (gymBadge) {
+        gym.badge = gymBadge.badge
+      }
+      return gym
+    })
   }
 }
