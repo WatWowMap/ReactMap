@@ -90,8 +90,8 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
             style={{
               width: gymSize,
               height: gymSize,
-              bottom: -1 + gymMod.offsetY,
-              left: `${gymMod.offsetX * 100}%`,
+              bottom: 2 + gymMod.offsetY,
+              left: `${gymMod.offsetX * 50}%`,
               transform: 'translateX(-50%)',
             }}
           />
@@ -101,8 +101,8 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
               style={{
                 width: gymSize / 1.5,
                 height: 'auto',
-                bottom: -1 + gymMod.offsetY,
-                left: `${gymMod.offsetX * 15}%`,
+                bottom: 2 + gymMod.offsetY,
+                left: `${gymMod.offsetX * -33}%`,
                 transform: 'translateX(-50%)',
               }}
             />
@@ -113,8 +113,8 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
               style={{
                 width: gymSize / 2,
                 height: 'auto',
-                bottom: 20 + gymMod.offsetY,
-                left: `${gymMod.offsetX * 10}%`,
+                bottom: 23 + gymMod.offsetY,
+                left: `${gymMod.offsetX * -40}%`,
                 transform: 'translateX(-50%)',
               }}
             />
@@ -125,8 +125,8 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
               style={{
                 width: gymSize,
                 height: 'auto',
-                bottom: 10 + gymMod.offsetY,
-                left: `${gymMod.offsetX * 100}%`,
+                bottom: 13 + gymMod.offsetY,
+                left: `${gymMod.offsetX * 50}%`,
                 transform: 'translateX(-50%)',
               }}
             />
@@ -137,8 +137,8 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
               style={{
                 width: gymSize / 2,
                 height: 'auto',
-                bottom: 15 + gymMod.offsetY,
-                left: `${gymMod.offsetX * 10}%`,
+                bottom: 18 + gymMod.offsetY,
+                left: `${gymMod.offsetX * 55}%`,
                 transform: 'translateX(50%)',
               }}
             />
@@ -152,7 +152,7 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
             width: raidSize,
             height: raidSize,
             bottom: gymSize * 0.4 + slotModifier * raidMod.offsetY,
-            left: `${raidMod.offsetX * 100}%`,
+            left: `${raidMod.offsetX * 55}%`,
             transform: 'translateX(-50%)',
           }}
         />

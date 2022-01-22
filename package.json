@@ -95,7 +95,7 @@
     "lru-cache": "^6.0.0",
     "morgan": "^1.10.0",
     "mysql2": "^2.3.3",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "2",
     "node-geocoder": "^3.27.0",
     "nodes2ts": "^2.0.0",
     "objection": "^3.0.0",

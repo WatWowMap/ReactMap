@@ -13,7 +13,7 @@ import Query from '@services/Query'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 
-const profilesObject = (data) => Object.fromEntries(data.map(profile => {
+const profilesObject = (data) => data ? Object.fromEntries(data.map(profile => {
   const newProfile = { ...profile, active_hours: [] }
   const parsed = Array.isArray(profile.active_hours)
     ? profile.active_hours
@@ -25,7 +25,7 @@ const profilesObject = (data) => Object.fromEntries(data.map(profile => {
     })
   }
   return [profile.name, newProfile]
-}))
+})) : {}
 
 export default function ProfileEditing({
   webhookData, setWebhookData, selectedWebhook, handleClose, isMobile,
