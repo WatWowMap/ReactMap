@@ -1,15 +1,19 @@
 import React, { useState } from 'react'
 import {
-  Button, Typography, Divider, DialogContent,
+  Button, Typography, DialogContent,
 } from '@material-ui/core'
+import { Redirect } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+
+import { useStatic } from '@hooks/useStore'
+
 import Header from '../general/Header'
 import Footer from '../general/Footer'
-import { Redirect } from 'react-router-dom'
 
-export default function ResetFilters({ setResetFilters }) {
+export default function ResetFilters() {
   const { t } = useTranslation()
   const [redirect, setRedirect] = useState(false)
+  const setResetFilters = useStatic(state => state.setResetFilters)
 
   if (redirect) {
     return <Redirect push to="/reset" />
@@ -22,20 +26,16 @@ export default function ResetFilters({ setResetFilters }) {
           {t('filters_reset_text')}
         </Typography>
         <br />
-        <Divider />
-        <br />
         <Typography align="center">
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => 
-				{ 
-				setRedirect(true)
-				setResetFilters(false) 
-				}
-			}
+            onClick={() => {
+              setRedirect(true)
+              setResetFilters(false)
+            }}
           >
             {t('confirm_filters_reset')}
           </Button>

@@ -39,8 +39,7 @@ export default function Nav({
   const setUserProfile = useStatic(state => state.setUserProfile)
   const feedback = useStatic(state => state.feedback)
   const setFeedback = useStatic(state => state.setFeedback)
-  const resetfilters = useStatic(state => state.resetfilters)
-  const setResetFilters = useStatic(state => state.setResetFilters)
+  const resetFilters = useStatic(state => state.resetFilters)
 
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
@@ -211,10 +210,10 @@ export default function Nav({
         <Feedback link={config.feedbackLink} setFeedback={setFeedback} />
       </Dialog>
       <Dialog
-        open={resetfilters}
+        open={resetFilters}
         maxWidth={isMobile ? 'sm' : 'xs'}
       >
-        <ResetFilters setResetFilters={setResetFilters} />
+        <ResetFilters />
       </Dialog>
       <Snackbar
         open={Boolean(webhookAlert.open)}
