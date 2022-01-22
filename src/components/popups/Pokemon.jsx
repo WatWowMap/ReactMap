@@ -273,7 +273,7 @@ const Stats = ({ pokemon, t }) => {
       {atk_iv !== null && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
-            {atk_iv || '?'} | {def_iv || '?'} | {sta_iv || '?'} {inactive_stats ? '*' : ''}
+            {atk_iv} | {def_iv} | {sta_iv} {inactive_stats ? '*' : ''}
           </Typography>
         </Grid>
       )}
