@@ -6,7 +6,7 @@ const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
-  api: { searchResultsLimit },
+  api: { searchResultsLimit, queryLimits },
   database: { schemas, settings: { gymBadgeTableName } },
 } = require('../services/config')
 const Badge = require('./Badge')
@@ -222,7 +222,7 @@ module.exports = class Gym extends Model {
       }
       return filteredResults
     }
-    return secondaryFilter(await query)
+    return secondaryFilter(await query.limit(queryLimits.gyms))
   }
 
   static async getAvailableRaidBosses(isMad) {

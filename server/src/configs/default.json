@@ -1,6 +1,7 @@
 {
   "interface": "0.0.0.0",
   "port": 8080,
+  "packageSource": "git",
   "devOptions": {
     "enabled": false,
     "graphiql": false,
@@ -20,6 +21,16 @@
       "quests": true,
       "raids": true,
       "nests": false
+    },
+    "queryLimits": {
+      "pokemon": 10000,
+      "pokemonPvp": 25000,
+      "pokestops": 5000,
+      "gyms": 5000,
+      "portals": 5000,
+      "spawnpoints": 10000,
+      "nests": 2500,
+      "scanCells": 5000
     },
     "pvp": {
       "leagues": [
@@ -98,7 +109,8 @@
       "forceTutorial": true,
       "enableTutorial": true,
       "enableUserProfile": true,
-      "enableQuestSetSelector": false
+      "enableQuestSetSelector": false,
+      "noScanAreaOverlay": false
     },
     "theme": {
       "style": "dark",

@@ -483,5 +483,8 @@
   "gym_badge_menu": "Edit Gym Badge",
   "gym_badges": "Gym Badges",
   "gym_badge_diamonds": "Show Gym Badges",
-  "gym_badges_subtitle": "Displays Gym Badges on the map and a list in the profile page."
+  "gym_badges_subtitle": "Displays Gym Badges on the map and a list in the profile page.",
+  "confirm_filters_reset": "Reset filters",
+  "filters_reset_text": "Are you sure you want to reset settings to default values? This cannot be undone!",
+  "filters_reset_title": "Reset filters"
 }
