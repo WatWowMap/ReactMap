@@ -112,8 +112,8 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
         style={{
           width: baseSize,
           height: baseSize,
-          bottom: -1 + pokestopMod.offsetY,
-          left: `${pokestopMod.offsetX * 100}%`,
+          bottom: 2 + pokestopMod.offsetY,
+          left: `${pokestopMod.offsetX * 50}%`,
           transform: 'translateX(-50%)',
         }}
       />
@@ -123,7 +123,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
           style={{
             width: baseSize / 2,
             height: 'auto',
-            bottom: 20 + pokestopMod.offsetY,
+            bottom: 23 + pokestopMod.offsetY,
             left: `${pokestopMod.offsetX * 10}%`,
             transform: 'translateX(-50%)',
           }}
@@ -139,7 +139,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
               bottom: (baseSize * 0.6 + (invasionMod.removeQuest ? 10 : totalInvasionSize))
                 * rewardMod.offsetY
                 + (questSizes[i] * i),
-              left: `${rewardMod.offsetX * 100}%`,
+              left: `${rewardMod.offsetX * 50}%`,
               transform: 'translateX(-50%)',
             }}
           />
@@ -156,7 +156,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
             height: invasionSizes[i],
             bottom: baseSize * 0.5 * invasionMod.offsetY
               + (invasionSizes[i] * i),
-            left: `${invasionMod.offsetX * 100}%`,
+            left: `${invasionMod.offsetX * 50}%`,
             transform: 'translateX(-50%)',
           }}
         />

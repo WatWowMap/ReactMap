@@ -9,7 +9,7 @@ const { authentication: { strategies } } = require('../services/config')
 // Loads up the base auth routes and any custom ones
 
 strategies.forEach(strategy => {
-  const method = strategy.type === 'local' ? 'post' : 'get'
+  const method = strategy.type === 'discord' || strategy.type === 'telegram' ? 'get' : 'post'
   if (strategy.enabled) {
     router[method](`/${strategy.name}`, passport.authenticate(strategy.name, {
       failureRedirect: '/',
