@@ -5,7 +5,7 @@ const fetchRaids = require('../services/api/fetchRaids')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { api: { searchResultsLimit } } = require('../services/config')
+const { api: { searchResultsLimit, queryLimits } } = require('../services/config')
 
 module.exports = class Gym extends Model {
   static get tableName() {
@@ -197,7 +197,7 @@ module.exports = class Gym extends Model {
       }
       return filteredResults
     }
-    return secondaryFilter(await query)
+    return secondaryFilter(await query.limit(queryLimits.gyms))
   }
 
   static async getAvailableRaidBosses(isMad) {

@@ -4,7 +4,7 @@ const Ohbem = require('ohbem')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const legacyFilter = require('../services/legacyFilter')
 const {
-  api: { pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, levels } },
+  api: { pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, levels }, queryLimits },
 } = require('../services/config')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
@@ -258,7 +258,7 @@ module.exports = class Pokemon extends Model {
       getAreaSql(query, areaRestrictions, isMad, 'pokemon')
     }
 
-    const results = await query
+    const results = await query.limit(queryLimits.pokemon)
     const finalResults = []
     const pvpResults = []
     const listOfIds = []
@@ -319,7 +319,7 @@ module.exports = class Pokemon extends Model {
       if (areaRestrictions?.length) {
         getAreaSql(pvpQuery, areaRestrictions, isMad, 'pokemon')
       }
-      pvpResults.push(...await pvpQuery)
+      pvpResults.push(...await pvpQuery.limit(queryLimits.pokemon - results.length))
     }
 
     // filter pokes with pvp data

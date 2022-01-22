@@ -1,7 +1,7 @@
 const { Model } = require('objection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
-  api: { searchResultsLimit, portalUpdateLimit },
+  api: { searchResultsLimit, portalUpdateLimit, queryLimits },
 } = require('../services/config')
 
 module.exports = class Portal extends Model {
@@ -18,7 +18,7 @@ module.exports = class Portal extends Model {
     if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions)
     }
-    return query
+    return query.limit(queryLimits.portals)
   }
 
   static async search(args, perms, isMad, distance) {

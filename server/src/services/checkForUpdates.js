@@ -2,6 +2,8 @@
 const { exec } = require('child_process')
 const fs = require('fs')
 
+let isDocker = false
+
 try {
   exec('git branch --show-current', async (err, stdout) => {
     try {
@@ -9,6 +11,9 @@ try {
 
       if (!gitRef && (err || typeof stdout !== 'string' || !stdout.trim())) {
         throw new Error('Unable to get current branch', err)
+      }
+      if (typeof gitRef === 'string' && gitRef.trim()) {
+        isDocker = true
       }
       const branch = typeof gitRef === 'string' && gitRef.trim()
         ? gitRef.split('/')[2].trim()
@@ -33,7 +38,7 @@ try {
               const remoteSha = stdout3.split('\t')[0]
 
               if (remoteSha !== sha) {
-                console.log('There is a new version available:', remoteSha)
+                console.log('There is a new version available: ', remoteSha, isDocker ? 'docker-compose pull' : 'git pull', ' to update')
               }
             } catch (e) {
               console.warn('Unable to get remote SHA', e.message, 'Branch:', branch, 'Local SHA:', sha)
