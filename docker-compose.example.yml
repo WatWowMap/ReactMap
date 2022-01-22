@@ -3,11 +3,11 @@ services:
   reactmap:
     image: ghcr.io/watwowmap/reactmap:main
     container_name: reactmap
-    command: sh -c "yarn migrate:latest && yarn start"
+    command: sh -c "yarn start"
     restart: unless-stopped
     volumes:
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
-      - ./server/src/configs/local.json:/home/node/server/src/local/config.json
+      - ./server/src/configs/local.json:/home/node/server/src/configs/local.json
       - ./example.env:/home/node/.env
     ports:
       - "9090:8080"
