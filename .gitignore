@@ -38,6 +38,10 @@ server/src/models/Custom.js
 public/images/uicons/*
 !public/images/uicons/.gitkeep
 
+# Custom Image Folder for Custom Components
+public/images/custom/*
+!public/images/custom/.gitkeep
+
 # Ignore generated locales
 public/locales/*
 public/missing-locales/*
