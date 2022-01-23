@@ -56,7 +56,7 @@ export default function PokemonPopup({
         classes={classes}
         isTutorial={isTutorial}
       />
-      {pokemon.expire_timestamp && (
+      {Boolean(pokemon.expire_timestamp) && (
         <Timer
           pokemon={pokemon}
           hasStats={hasStats}
@@ -66,12 +66,11 @@ export default function PokemonPopup({
       {pokemon.seen_type === 'nearby_cell' && (
         <Typography>{t('pokemon_cell')}</Typography>
       )}
-      {hasStats && (
+      {(hasStats && pokePerms.iv) && (
         <>
           <Stats
             pokemon={pokemon}
             metaData={metaData}
-            perms={pokePerms}
             t={t}
           />
           <Divider orientation="vertical" flexItem />
@@ -239,7 +238,7 @@ const Header = ({
   )
 }
 
-const Stats = ({ pokemon, perms, t }) => {
+const Stats = ({ pokemon, t }) => {
   const {
     cp, iv, atk_iv, def_iv, sta_iv, level, inactive_stats,
   } = pokemon
@@ -258,27 +257,27 @@ const Stats = ({ pokemon, perms, t }) => {
   return (
     <Grid
       item
-      xs={perms.iv ? 8 : 1}
+      xs={8}
       container
       direction="column"
       justifyContent="space-around"
       alignItems="center"
     >
-      {(perms.iv && iv !== null) && (
+      {iv !== null && (
         <Grid item>
           <Typography variant="h5" align="center" style={{ color: getColor(iv) }}>
             {iv.toFixed(2)}{t('%')}
           </Typography>
         </Grid>
       )}
-      {(perms.iv && atk_iv !== null) && (
+      {atk_iv !== null && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {atk_iv} | {def_iv} | {sta_iv} {inactive_stats ? '*' : ''}
           </Typography>
         </Grid>
       )}
-      {(perms.iv && level !== null) && (
+      {level !== null && (
         <Grid item>
           <Typography variant="subtitle1" align="center">
             {t('cp')} {cp} | {t('abbreviation_level')}{level}
@@ -315,7 +314,7 @@ const Info = ({
           }}
         />
       )}
-      {gender && (
+      {Boolean(gender) && (
         <Grid item style={{ textAlign: 'center' }}>
           <Icon>
             {{
@@ -399,7 +398,7 @@ const Footer = ({
 
   return (
     <>
-      {hasPvp && (
+      {Boolean(hasPvp) && (
         <Grid item xs={4}>
           <IconButton
             className={popups.pvp ? classes.expandOpen : classes.expand}

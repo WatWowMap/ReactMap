@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   FormControl, Grid, InputLabel, MenuItem, Select, Button,
 } from '@material-ui/core'
-import { Link, Redirect } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
@@ -16,14 +16,13 @@ export default function Settings({ Icons }) {
   const setStaticIcons = useStatic(state => state.setIcons)
   const setUserProfile = useStatic(state => state.setUserProfile)
   const setFeedback = useStatic(state => state.setFeedback)
+  const setResetFilters = useStatic(state => state.setResetFilters)
 
   const setTutorial = useStore(state => state.setTutorial)
   const settings = useStore(state => state.settings)
   const setSettings = useStore(state => state.setSettings)
   const icons = useStore(state => state.icons)
   const setIcons = useStore(state => state.setIcons)
-
-  const [redirect, setRedirect] = useState(false)
 
   const handleChange = event => {
     setSettings({
@@ -68,9 +67,6 @@ export default function Settings({ Icons }) {
     setTimeout(() => window.location.reload(), 1500)
   }
 
-  if (redirect) {
-    return <Redirect push to="/reset" />
-  }
   return (
     <Grid
       container
@@ -193,7 +189,7 @@ export default function Settings({ Icons }) {
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => setRedirect(true)}
+            onClick={() => setResetFilters(true)}
           >
             {t('reset_filters')}
           </Button>

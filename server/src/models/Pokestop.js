@@ -6,7 +6,7 @@ const fetchQuests = require('../services/api/fetchQuests')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
-  api: { searchResultsLimit },
+  api: { searchResultsLimit, queryLimits },
   database: { settings },
   map,
 } = require('../services/config')
@@ -112,7 +112,7 @@ module.exports = class Pokestop extends Model {
 
     // returns everything if all pokestops are on
     if (onlyAllPokestops && pokestopPerms) {
-      const results = await query
+      const results = await query.limit(queryLimits.pokestops)
       const normalized = isMad ? this.mapMAD(results, safeTs) : this.mapRDM(results, safeTs)
       return this.secondaryFilter(normalized, args.filters, isMad, midnight)
     }
@@ -247,7 +247,7 @@ module.exports = class Pokestop extends Model {
         })
       }
     })
-    const results = await query
+    const results = await query.limit(queryLimits.pokestops)
     const normalized = isMad ? this.mapMAD(results, safeTs) : this.mapRDM(results, safeTs)
     return this.secondaryFilter(normalized, args.filters, isMad, midnight)
   }

@@ -1,6 +1,7 @@
 const { Model, raw } = require('objection')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
+const { api: { queryLimits } } = require('../services/config')
 
 module.exports = class Spawnpoint extends Model {
   static get tableName() {
@@ -32,6 +33,6 @@ module.exports = class Spawnpoint extends Model {
     if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions, isMad)
     }
-    return query
+    return query.limit(queryLimits.spawnpoints)
   }
 }

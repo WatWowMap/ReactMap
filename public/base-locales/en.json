@@ -475,5 +475,8 @@
   "pokemon_cell": "Pokemon's Location Could Vary",
   "timer_verified": "This Timer is Verified",
   "timer_unverified": "This Timer is Unverified",
-  "all": "All"
+  "all": "All",
+  "confirm_filters_reset": "Reset filters",
+  "filters_reset_text": "Are you sure you want to reset settings to default values? This cannot be undone!",
+  "filters_reset_title": "Reset filters"
 }

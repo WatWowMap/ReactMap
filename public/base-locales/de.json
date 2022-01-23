@@ -474,5 +474,8 @@
   "all": "Alle",
   "with_ar": "Mit AR",
   "without_ar": "Ohne AR",
-  "both": "Beide"
+  "both": "Beide",
+  "confirm_filters_reset": "Filter zurücksetzen",
+  "filters_reset_text": "Sollen die Einstellungen wirklich auf die Standardwerte zurückgesetzt werden? Das kann nicht rückgängig gemacht werden!",
+  "filters_reset_title": "Filter zurücksetzen"
 }

@@ -224,7 +224,7 @@ rootRouter.get('/settings', async (req, res) => {
         const filtered = config.webhooks.filter(webhook => serverSettings.user.perms.webhooks.includes(webhook.name))
         try {
           await Promise.all(filtered.map(async webhook => {
-            if (config.webhookObj[webhook.name].client.valid) {
+            if (webhook.enabled && config.webhookObj?.[webhook.name]?.client?.valid) {
               const { strategy, webhookStrategy, discordId, telegramId } = serverSettings.user
               const webhookId = (() => {
                 switch (strategy) {

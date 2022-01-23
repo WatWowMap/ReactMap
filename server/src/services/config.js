@@ -46,9 +46,6 @@ config.authMethods = [...new Set(config.authentication.strategies
   })),
 ]
 
-// Auto check for scan overlay settings
-config.map.noScanAreaOverlay = Boolean(config.manualAreas.length)
-
 // initialize webhooks
 if (config.webhooks.length) {
   (async () => {

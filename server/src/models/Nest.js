@@ -3,7 +3,7 @@ const i18next = require('i18next')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { pokemon: masterPkmn } = require('../data/masterfile.json')
-const { api: { searchResultsLimit } } = require('../services/config')
+const { api: { searchResultsLimit, queryLimits } } = require('../services/config')
 
 module.exports = class Nest extends Model {
   static get tableName() {
@@ -29,7 +29,7 @@ module.exports = class Nest extends Model {
     if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions)
     }
-    const results = await query
+    const results = await query.limit(queryLimits.nests)
 
     const fixedForms = queryResults => {
       const returnedResults = []
