@@ -219,6 +219,10 @@
       },
       "donor": {
         "roles": []
+      },
+      "gymBadges": {
+        "enabled": true,
+        "roles": []
       }
     }
   },

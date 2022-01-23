@@ -17,3 +17,9 @@ mutation SetUsername($username: String!) {
     checkUsername(username: $username)
   }
 `
+
+export const setGymBadge = gql`
+mutation SetGymBadge($gymId: String!, $badge: Int!) {
+    setGymBadge(gymId: $gymId, badge: $badge)
+  }
+`

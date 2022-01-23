@@ -1,6 +1,17 @@
 const { gql } = require('apollo-server-express')
 
 module.exports = gql`
+
+    type Badge {
+      id: String
+      name: String
+      url: String
+      lat: Float
+      lon: Float
+      badge: Int
+      deleted: Boolean
+    }
+  
     type Geocoder {
     latitude: Float
     longitude: Float

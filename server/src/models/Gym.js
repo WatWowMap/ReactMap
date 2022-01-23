@@ -5,7 +5,13 @@ const fetchRaids = require('../services/api/fetchRaids')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { api: { searchResultsLimit, queryLimits } } = require('../services/config')
+const {
+  api: { searchResultsLimit, queryLimits },
+  database: { schemas, settings: { gymBadgeTableName, joinGymBadgeTable } },
+} = require('../services/config')
+const Badge = require('./Badge')
+
+const gymBadgeDb = schemas.find(x => x.useFor.includes('user'))
 
 module.exports = class Gym extends Model {
   static get tableName() {
@@ -17,10 +23,10 @@ module.exports = class Gym extends Model {
       ? 'gym_id' : 'id'
   }
 
-  static async getAllGyms(args, perms, isMad) {
-    const { gyms: gymPerms, raids: raidPerms, areaRestrictions } = perms
+  static async getAllGyms(args, perms, isMad, userId) {
+    const { gyms: gymPerms, raids: raidPerms, areaRestrictions, gymBadges } = perms
     const {
-      onlyAllGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible, onlyOrRaids, ts,
+      onlyAllGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible, onlyOrRaids, onlyGymBadges, onlyBadge, ts,
     } = args.filters
     const safeTs = ts || Math.floor((new Date()).getTime() / 1000)
     const query = this.query()
@@ -68,6 +74,13 @@ module.exports = class Gym extends Model {
     const teams = []
     const eggs = []
     const slots = []
+    const actualBadge = onlyBadge === 'all' ? 'all' : onlyBadge && +onlyBadge.replace('badge_', '')
+
+    const userBadges = onlyGymBadges && gymBadges && userId
+      ? await Badge.query()
+        .where('userId', userId)
+        .andWhere('badge', ...(actualBadge === 'all' ? ['>', 0] : [actualBadge]))
+      : []
 
     Object.keys(args.filters).forEach(gym => {
       switch (gym.charAt(0)) {
@@ -82,6 +95,7 @@ module.exports = class Gym extends Model {
         default: raidBosses.add(gym.split('-')[0]); break
       }
     })
+
     if (!onlyOrRaids) raidBosses.add(0)
     const finalTeams = []
     const finalSlots = {
@@ -141,6 +155,9 @@ module.exports = class Gym extends Model {
           })
         }
       }
+      if (userBadges.length) {
+        gym.orWhereIn(isMad ? 'gym.gym_id' : 'id', userBadges.map(badge => badge.gymId))
+      }
       if (onlyRaids && raidPerms) {
         if (raidBosses.size) {
           gym.orWhere(raid => {
@@ -170,22 +187,30 @@ module.exports = class Gym extends Model {
 
     const secondaryFilter = queryResults => {
       const filteredResults = []
+      const userBadgeObj = Object.fromEntries(userBadges.map(b => [b.gymId, b.badge]))
 
       for (let i = 0; i < queryResults.length; i += 1) {
         const gym = queryResults[i]
-
         if (gym.availble_slots !== undefined) {
           gym.available_slots = gym.availble_slots
+        }
+        if (userBadgeObj[gym.id]) {
+          gym.badge = userBadgeObj[gym.id]
         }
         if (!gymPerms) {
           gym.team_id = 0
           gym.available_slots = 6
         }
-        if (!gym.raid_pokemon_id && (args.filters[`e${gym.raid_level}`] || args.filters[`r${gym.raid_level}`])) {
+        if (onlyRaids && !gym.raid_pokemon_id && (args.filters[`e${gym.raid_level}`] || args.filters[`r${gym.raid_level}`])) {
           filteredResults.push(gym)
-        } else if (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`] || args.filters[`r${gym.raid_level}`]) {
+        } else if (onlyRaids && (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`] || args.filters[`r${gym.raid_level}`])) {
           filteredResults.push(gym)
-        } else if (gymPerms && (onlyAllGyms || onlyArEligible || onlyExEligible || onlyInBattle)) {
+        } else if (gymPerms
+          && (onlyAllGyms
+            || (onlyArEligible && gym.ar_scan_eligible)
+            || (onlyExEligible && gym.ex_raid_eligible)
+            || (onlyInBattle && gym.in_battle)
+            || (userBadges.length && (actualBadge === 'all' || userBadgeObj[gym.id] === actualBadge)))) {
           if (args.filters[`t${gym.team_id}-0`]) {
             gym.raid_end_timestamp = null
             gym.raid_battle_timestamp = null
@@ -284,5 +309,53 @@ module.exports = class Gym extends Model {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     return query
+  }
+
+  static async getGymBadges(isMad, userId) {
+    const query = this.query()
+      .select([
+        '*',
+        isMad ? 'gym.gym_id AS id' : 'gym.id',
+        isMad ? 'latitude AS lat' : 'lat',
+        isMad ? 'longitude AS lon' : 'lon',
+        isMad ? 'enabled' : 'deleted',
+      ])
+
+    if (isMad) {
+      query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
+    }
+
+    if (joinGymBadgeTable) {
+      query.leftJoin(`${gymBadgeDb.database}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
+        .where('userId', userId)
+        .andWhere('badge', '>', 0)
+        .orderBy('updatedAt')
+      const results = await query
+      return isMad ? results.map(gym => gym.deleted = !gym.enabled) : results
+    }
+
+    const userGyms = await Badge.query()
+      .where('userId', userId)
+      .andWhere('badge', '>', 0)
+
+    const results = await query
+      .whereIn(isMad ? 'gym.gym_id' : 'gym.id', userGyms.map(gym => gym.gymId))
+
+    return results
+      .map(gym => {
+        if (typeof gym.enabled === 'boolean') {
+          gym.deleted = !gym.enabled
+        }
+        const gymBadge = userGyms.find(userGym => userGym.gymId === gym.id)
+
+        if (gymBadge) {
+          gym.badge = gymBadge.badge
+          gym.updatedAt = gymBadge.updatedAt
+          gym.createdAt = gymBadge.createdAt
+        }
+        return gym
+      })
+      .sort((a, b) => a.updatedAt - b.updatedAt)
+      .reverse()
   }
 }

@@ -11,6 +11,7 @@ module.exports = gql`
   scalar JSON
 
   type Query {
+    badges: [Badge]
     devices: [Device]
     geocoder(search: String, name: String): [Geocoder]
     gyms(minLat: Float, maxLat: Float, minLon: Float, maxLon: Float, ts: Int, filters: JSON): [Gym]
@@ -38,5 +39,6 @@ module.exports = gql`
     tutorial(tutorial: Boolean): Boolean
     strategy(strategy: String): Boolean
     checkUsername(username: String): Boolean
+    setGymBadge(gymId: String, badge: Int): Boolean
   }
 `

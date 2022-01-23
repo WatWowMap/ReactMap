@@ -27,6 +27,9 @@ const connections = schemas.map(schema => Knex({
 schemas.forEach((schema, index) => {
   try {
     schema.useFor.forEach(category => {
+      if (category === 'user') {
+        models.Badge.knex(connections[index])
+      }
       const capital = `${category.charAt(0).toUpperCase()}${category.slice(1)}`
       models[capital].knex(connections[index])
     })
