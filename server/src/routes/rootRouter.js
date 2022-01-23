@@ -51,7 +51,9 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 rootRouter.get('/settings', async (req, res) => {
   try {
     if (config.authentication.alwaysEnabledPerms.length || !config.authMethods.length) {
-      req.session.tutorial = !config.map.forceTutorial
+      if (req.session.tutorial === undefined) {
+        req.session.tutorial = !config.map.forceTutorial
+      }
       req.session.perms = { areaRestrictions: [], webhooks: [] }
 
       config.authentication.alwaysEnabledPerms.forEach(perm => {
