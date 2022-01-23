@@ -77,7 +77,7 @@ const GymTile = ({
       {((showTimer || userSettings.raidTimers) && hasRaid) && (
         <ToolTipWrapper
           timers={[timerToDisplay]}
-          offset={[6, 5]}
+          offset={[0, 5]}
         />
       )}
       {showCircles && (
