@@ -1,18 +1,22 @@
 /**
 * Credits: https://gist.github.com/moriakaice
 * Editor: PJ0tterr
-* Date: 15-01-2022
+* Creaded on: 15-01-2022
+* Modified on: 23-01-2022
 */
 
-const fs = require('fs');
-const path = require('path');
+/* eslint-disable no-console */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable-next-line no-plusplus */
+
+const fs = require('fs')
+const path = require('path')
 
 // Set Path where for area.json
-const configFolder = path.resolve(__dirname, '../../src/configs')
-const geofencesFolder = path.resolve(__dirname, '../../public/geofence/geofence.json')
+const configFolderArea = path.resolve(__dirname, '../../server/src/configs/areas.json')
+const geofencesFolder = path.resolve(__dirname, '../../server/src/configs/geofence/geofence.json')
 
 if (!fs.existsSync(geofencesFolder)) {
-  // eslint-disable-next-line no-console
   console.error('Error: Geofence directory does not exist:', geofencesFolder);
   return;
 }
@@ -20,25 +24,22 @@ if (!fs.existsSync(geofencesFolder)) {
 const outGeoJSON = {
   type: 'FeatureCollection',
   features: [],
-};
+}
 
 fs.readFile(geofencesFolder, 'utf8', (err, data) => {
   if (err) {
-    // eslint-disable-next-line no-console
-    console.error(err);
-    return;
+    console.error(err)
+    return
   }
-  const inGeoJSON = JSON.parse(data);
+  const inGeoJSON = JSON.parse(data)
   if (inGeoJSON.length === 0) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to parse poracle geofence file');
+    console.error('Failed to parse poracle geofence file')
     return;
   }
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < inGeoJSON.length; i++) {
     const inGeofence = inGeoJSON[i];
-    // eslint-disable-next-line no-console
-    console.log('Converting', inGeofence.name);
+    console.log('Converting', inGeofence.name)
     const outGeofence = {
       type: 'Feature',
       properties: {
@@ -51,18 +52,16 @@ fs.readFile(geofencesFolder, 'utf8', (err, data) => {
         type: 'Polygon',
         coordinates: [[]],
       },
-    };
-    // eslint-disable-next-line no-plusplus
-    for (let j = 0; j < inGeofence.path.length; j++) {
-      const coord = inGeofence.path[j];
-      inGeofence.path[j] = [coord[1], coord[0]];
+    }
+    for (let j = 0; j < inGeofence.path.length; j += 1) {
+      const coord = inGeofence.path[j]
+      inGeofence.path[j] = [coord[1], coord[0]]
     }
     outGeofence.geometry.coordinates[0] = inGeofence.path;
     outGeoJSON.features.push(outGeofence);
   }
-  const outFilePath = path.resolve(path.dirname(configFolder), 'areas.json');
+  const outFilePath = path.resolve(path.dirname(configFolderArea), 'areas.json')
   fs.writeFile(outFilePath, JSON.stringify(outGeoJSON, null, 2), 'utf8', () => {
-    // eslint-disable-next-line no-console
-    console.log(`${outFilePath} file saved.`);
-  });
-});
+    console.log(`${outFilePath} file saved.`)
+  })
+})

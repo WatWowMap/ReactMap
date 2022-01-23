@@ -9,7 +9,7 @@ services:
     volumes:
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
       - ./server/src/configs/local.json:/home/node/server/src/local/local.json
-      - ./geofence/:/home/node/public/geofence
+      - ./server/src/configs/geofence/:/home/node/server/src/geofence/
       - ./example.env:/home/node/.env
     security_opt:
       - no-new-privileges:true
