@@ -7,13 +7,11 @@ const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: { searchResultsLimit, queryLimits },
-  database: { schemas, settings: { gymBadgeTableName } },
+  database: { schemas, settings: { gymBadgeTableName, joinGymBadgeTable } },
 } = require('../services/config')
 const Badge = require('./Badge')
 
 const gymBadgeDb = schemas.find(x => x.useFor.includes('user'))
-const gymDb = schemas.find(x => x.useFor.includes('gym'))
-const hasSameDb = gymBadgeDb.host === gymDb.host && gymBadgeDb.user === gymDb.user
 
 module.exports = class Gym extends Model {
   static get tableName() {
@@ -327,7 +325,7 @@ module.exports = class Gym extends Model {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
 
-    if (hasSameDb) {
+    if (joinGymBadgeTable) {
       query.leftJoin(`${gymBadgeDb.database}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
         .where('userId', userId)
         .andWhere('badge', '>', 0)
@@ -337,7 +335,6 @@ module.exports = class Gym extends Model {
     }
 
     const userGyms = await Badge.query()
-      .select(['gymId', 'badge'])
       .where('userId', userId)
       .andWhere('badge', '>', 0)
 

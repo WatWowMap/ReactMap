@@ -328,6 +328,7 @@
       "gymBadgeTableName": "gymBadges",
       "sessionTableName": "session",
       "migrationTableName": "knex_migrations",
+      "joinGymBadgeTable": false,
       "hideOldQuests": false,
       "maxConnections": 10
     },
