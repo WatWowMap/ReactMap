@@ -16,8 +16,6 @@
     "create-locales": "node server/scripts/createLocales.js",
     "missing-locales": "node server/scripts/createLocales.js --missing",
     "config-migrate": "node server/scripts/configMigration.js",
-    "create-area": "node server/scripts/geofenceToGeoJSON.js",
-    "create-area-poracle": "node server/scripts/poracleToGeoJSON.js",
     "console": "node --experimental-repl-await ./server/src/console.js",
     "migrate:make": "knex --knexfile server/knexfile.cjs migrate:make",
     "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
