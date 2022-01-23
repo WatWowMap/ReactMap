@@ -292,7 +292,7 @@ const Info = ({
   pokemon, metaData, perms, Icons, isNight,
 }) => {
   const { gender, weather, form } = pokemon
-  const formTypes = metaData.forms[form].types || metaData.types
+  const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
 
   return (
     <Grid
