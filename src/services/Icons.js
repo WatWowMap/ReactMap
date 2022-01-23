@@ -137,10 +137,10 @@ export default class UIcons {
       : baseSize
   }
 
-  getPopupOffset(category) {
+  getModifiers(category) {
     return this.modifiers[category]
-      ? { x: this.modifiers[category].popupX || 0, y: this.modifiers[category].popupY || 0 }
-      : { x: 0, y: 0 }
+      ? this.modifiers[category]
+      : this.modifiers.base
   }
 
   getIconById(id) {
