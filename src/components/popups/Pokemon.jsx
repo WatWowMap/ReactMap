@@ -292,7 +292,7 @@ const Info = ({
   pokemon, metaData, perms, Icons, isNight,
 }) => {
   const { gender, weather, form } = pokemon
-  const formTypes = metaData.forms[form].types || metaData.types
+  const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
 
   return (
     <Grid
@@ -470,7 +470,7 @@ const ExtraInfo = ({
             </Grid>
             <Grid item xs={3} style={{ textAlign: 'right' }}>
               <Typography variant="caption">
-                {i ? `${weight.toFixed(2)}${t('kilogram')}` : `${size.toFixed(2)}${t('meter')}`}
+                {i ? `${weight ? weight.toFixed(2) : '? '}${t('kilogram')}` : `${size ? size.toFixed(2) : '? '}${t('meter')}`}
               </Typography>
             </Grid>
           </Fragment>

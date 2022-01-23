@@ -482,5 +482,8 @@
   "gym_badge_menu": "Arenaorden bearbeiten",
   "gym_badges": "Arenaorden",
   "gym_badge_diamonds": "Arenaorden anzeigen",
-  "gym_badges_subtitle": "Die Arenaorden auf der Karte und als Liste auf der Profilseite anzeigen."
+  "gym_badges_subtitle": "Die Arenaorden auf der Karte und als Liste auf der Profilseite anzeigen.",
+  "confirm_filters_reset": "Filter zurücksetzen",
+  "filters_reset_text": "Sollen die Einstellungen wirklich auf die Standardwerte zurückgesetzt werden? Das kann nicht rückgängig gemacht werden!",
+  "filters_reset_title": "Filter zurücksetzen"
 }

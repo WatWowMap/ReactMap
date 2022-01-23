@@ -302,10 +302,10 @@ const RaidImage = ({
     : Icons.getEggs(raid_level, raid_battle_timestamp < ts, raid_is_exclusive)
 
   const getRaidTypes = (id, form) => {
-    if (pokemon[id].forms[form] && pokemon[id].forms[form].types) {
+    if (pokemon[id].forms?.[form]?.types) {
       return pokemon[id].forms[form].types
     }
-    return pokemon[id].types
+    return pokemon[id]?.types || []
   }
 
   return (
