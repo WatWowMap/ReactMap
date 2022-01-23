@@ -16,6 +16,7 @@ import RouteChangeTracker from './RouteChangeTracker'
 import Errors from './Errors'
 import ClearStorage from './ClearStorage'
 import HolidayEffects from './HolidayEffects'
+import Loading from './layout/general/Loading'
 
 export default function App() {
   const [serverSettings, setServerSettings] = useState(null)
@@ -49,6 +50,7 @@ export default function App() {
     <Suspense fallback="Loading translations...">
       <ApolloProvider client={client}>
         <ThemeProvider theme={setTheme(serverSettings?.config?.map?.theme)}>
+          {!serverSettings && <Loading />}
           <Router>
             {(process.env && process.env.GOOGLE_ANALYTICS_ID) && <RouteChangeTracker />}
             <Switch>
