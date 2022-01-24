@@ -16,15 +16,28 @@ import RouteChangeTracker from './RouteChangeTracker'
 import Errors from './Errors'
 import ClearStorage from './ClearStorage'
 import HolidayEffects from './HolidayEffects'
-import Loading from './layout/general/Loading'
 
 export default function App() {
   const [serverSettings, setServerSettings] = useState(null)
+
+  const rootLoading = document.getElementById('loader')
+  const loadingText = document.getElementById('loading-text')
+  if (rootLoading) {
+    if (loadingText) {
+      loadingText.innerHTML = 'Loading Translations'
+    }
+    if (serverSettings) {
+      rootLoading.style.display = 'none'
+    }
+  }
 
   const getServerSettings = useCallback(async () => {
     const data = await Fetch.getSettings()
     const Icons = data.masterfile ? new UIcons(data.config.icons, data.masterfile.questRewardTypes) : null
     if (Icons) {
+      if (loadingText) {
+        loadingText.innerHTML = 'Loading Icons'
+      }
       await Icons.fetchIcons(data.config.icons.styles)
       if (data.config.icons.defaultIcons) {
         Icons.setSelection(data.config.icons.defaultIcons)
@@ -36,6 +49,9 @@ export default function App() {
       if (invasionCache && invasionCache.lastFetched + cacheTime > Date.now()) {
         data.masterfile.invasions = invasionCache
       } else {
+        if (loadingText) {
+          loadingText.innerHTML = 'Loading Invasions'
+        }
         data.masterfile.invasions = await Fetch.getInvasions(data.masterfile.invasions)
       }
     }
@@ -47,10 +63,9 @@ export default function App() {
   }, [])
 
   return (
-    <Suspense fallback="Loading translations...">
-      <ApolloProvider client={client}>
-        <ThemeProvider theme={setTheme(serverSettings?.config?.map?.theme)}>
-          {!serverSettings && <Loading />}
+    <ThemeProvider theme={setTheme(serverSettings?.config?.map?.theme)}>
+      <Suspense fallback="">
+        <ApolloProvider client={client}>
           <Router>
             {(process.env && process.env.GOOGLE_ANALYTICS_ID) && <RouteChangeTracker />}
             <Switch>
@@ -62,11 +77,11 @@ export default function App() {
               </Route>
               <Route exact path="/login">
                 {serverSettings && (
-                <Login
-                  clickedTwice
-                  serverSettings={serverSettings}
-                  getServerSettings={getServerSettings}
-                />
+                  <Login
+                    clickedTwice
+                    serverSettings={serverSettings}
+                    getServerSettings={getServerSettings}
+                  />
                 )}
               </Route>
               <Route exact path="/@/:lat/:lon/:zoom?">
@@ -79,8 +94,8 @@ export default function App() {
           </Router>
           <canvas id="holiday-canvas" />
           <HolidayEffects mapSettings={serverSettings?.config?.map ? serverSettings.config.map : {}} />
-        </ThemeProvider>
-      </ApolloProvider>
-    </Suspense>
+        </ApolloProvider>
+      </Suspense>
+    </ThemeProvider>
   )
 }

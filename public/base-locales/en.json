@@ -479,5 +479,5 @@
   "confirm_filters_reset": "Reset filters",
   "filters_reset_text": "Are you sure you want to reset settings to default values? This cannot be undone!",
   "filters_reset_title": "Reset filters",
-  "loading": "Loading"
+  "loading": "Loading {{category}}"
 }

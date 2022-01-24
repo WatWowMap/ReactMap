@@ -2,15 +2,23 @@ import React from 'react'
 import {
   CircularProgress, Typography, Backdrop,
 } from '@material-ui/core'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
-export default function Loading() {
+export function Text({ category }) {
   const { t } = useTranslation()
   return (
+    <Trans i18nKey="loading">
+      {{ category: t(category) }}
+    </Trans>
+  )
+}
+
+export default function Loading({ category }) {
+  return (
     <Backdrop open>
-      <CircularProgress color="primary" />&nbsp;&nbsp;
+      <CircularProgress color="primary" />&nbsp;&nbsp;&nbsp;
       <Typography color="secondary" variant="h4">
-        {t('loading')}
+        {category ? <Text category={category} /> : 'Loading Translations'}
       </Typography>
     </Backdrop>
   )
