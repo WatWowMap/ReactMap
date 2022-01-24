@@ -145,15 +145,18 @@ module.exports = {
     },
     scanAreas: (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
-      if (perms?.scanAreas && config.scanAreas.features.length) {
+      const scanAreas = config.scanAreas[req.headers.host]
+        ? config.scanAreas[req.headers.host]
+        : config.scanAreas.main
+      if (perms?.scanAreas && scanAreas.features.length) {
         try {
-          config.scanAreas.features = config.scanAreas.features
+          scanAreas.features = scanAreas.features
             .sort((a, b) => (a.properties.name > b.properties.name) ? 1 : -1)
         } catch (e) {
           console.warn('Failed to sort scan areas', e.message)
         }
       }
-      return [config.scanAreas]
+      return [scanAreas]
     },
     search: async (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms

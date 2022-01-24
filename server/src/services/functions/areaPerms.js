@@ -3,7 +3,7 @@ const config = require('../config')
 
 module.exports = function areaPerms(roles) {
   let perms = []
-  if (Object.keys(areas.names).length) {
+  if (areas.names.length) {
     roles.forEach(group => {
       config.authentication.areaRestrictions.forEach(rule => {
         if (rule.roles.includes(group)) {

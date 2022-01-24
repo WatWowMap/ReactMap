@@ -71,7 +71,8 @@
       "interactionRangeZoom": 15,
       "scanAreasZoom": 12,
       "scanCellsZoom": 13,
-      "submissionZoom": 15
+      "submissionZoom": 15,
+      "geoJsonFileName": "areas.json"
     },
     "localeSelection": [
       "en",
