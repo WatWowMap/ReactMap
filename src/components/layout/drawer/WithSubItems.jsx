@@ -1,10 +1,11 @@
 import React from 'react'
 import {
-  Grid, Typography, Switch, ButtonGroup, Button,
+  Grid, Typography, Switch,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+import MultiSelector from './MultiSelector'
 
 export default function WithSubItems({
   category, filters, setFilters, subItem, noScanAreaOverlay, enableQuestSetSelector,
@@ -56,28 +57,26 @@ export default function WithSubItems({
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         {filterCategory}
       </Grid>
-      {enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters.pokestops.quests === true && (
+      {enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters[category].quests === true && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <ButtonGroup
-            size="small"
-          >
-            {['with_ar', 'both', 'without_ar'].map(questSet => (
-              <Button
-                key={questSet}
-                onClick={() => setFilters({
-                  ...filters,
-                  [category]: {
-                    ...filters[category],
-                    showQuestSet: questSet,
-                  },
-                })}
-                color={questSet === filters[category].showQuestSet ? 'primary' : 'secondary'}
-                variant={questSet === filters[category].showQuestSet ? 'contained' : 'outlined'}
-              >
-                {t(questSet)}
-              </Button>
-            ))}
-          </ButtonGroup>
+          <MultiSelector
+            filters={filters}
+            setFilters={setFilters}
+            category={category}
+            filterKey="showQuestSet"
+            items={['with_ar', 'both', 'without_ar']}
+          />
+        </Grid>
+      )}
+      {category === 'gyms' && subItem === 'gymBadges' && filters[category].gymBadges === true && (
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <MultiSelector
+            filters={filters}
+            setFilters={setFilters}
+            category={category}
+            filterKey="badge"
+            items={['all', 'badge_1', 'badge_2', 'badge_3']}
+          />
         </Grid>
       )}
     </>

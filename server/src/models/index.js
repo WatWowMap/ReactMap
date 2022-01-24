@@ -1,3 +1,4 @@
+const Badge = require('./Badge')
 const Device = require('./Device')
 const Gym = require('./Gym')
 const Nest = require('./Nest')
@@ -13,6 +14,7 @@ const Weather = require('./Weather')
 const { PokemonFilter, GenericFilter } = require('./Filters')
 
 module.exports = {
+  Badge,
   Device,
   Gym,
   Nest,

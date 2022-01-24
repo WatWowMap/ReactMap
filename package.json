@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "React based frontend map.",
   "main": "index.js",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -16,7 +16,7 @@
     "create-locales": "node server/scripts/createLocales.js",
     "missing-locales": "node server/scripts/createLocales.js --missing",
     "config-migrate": "node server/scripts/configMigration.js",
-    "console": "node --experimental-repl-await ./server/src/console.js",
+    "console": "node --experimental-repl-await ./server/scripts/console.js",
     "migrate:make": "knex --knexfile server/knexfile.cjs migrate:make",
     "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
     "migrate:rollback": "knex --knexfile server/knexfile.cjs migrate:rollback"

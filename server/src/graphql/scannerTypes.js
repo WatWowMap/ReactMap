@@ -42,6 +42,7 @@ module.exports = gql`
     raid_pokemon_gender: Int
     raid_pokemon_evolution: Int
     ar_scan_eligible: Boolean
+    badge: Int
   }
 
   type Nest {

@@ -65,7 +65,7 @@ const PokestopTile = ({
           />
         </Popup>
         {Boolean(timers.length) && (
-          <ToolTipWrapper timers={timers} offset={[6, 4]} />
+          <ToolTipWrapper timers={timers} offset={[0, 4]} />
         )}
         {showCircles && (
           <Circle

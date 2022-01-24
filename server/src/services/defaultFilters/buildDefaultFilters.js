@@ -24,6 +24,8 @@ module.exports = function buildDefault(perms) {
       exEligible: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
       inBattle: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
       arEligible: perms.gyms ? false : undefined,
+      gymBadges: perms.gymBadges ? defaultFilters.gyms.gymBadges : undefined,
+      badge: perms.gymBadges ? 'all' : undefined,
       filter: {
         ...buildGyms(perms, defaultFilters.gyms),
         ...pokemon.raids,

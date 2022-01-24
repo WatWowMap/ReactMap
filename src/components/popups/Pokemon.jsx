@@ -470,7 +470,7 @@ const ExtraInfo = ({
             </Grid>
             <Grid item xs={3} style={{ textAlign: 'right' }}>
               <Typography variant="caption">
-                {i ? `${weight.toFixed(2)}${t('kilogram')}` : `${size.toFixed(2)}${t('meter')}`}
+                {i ? `${weight ? weight.toFixed(2) : '? '}${t('kilogram')}` : `${size ? size.toFixed(2) : '? '}${t('meter')}`}
               </Typography>
             </Grid>
           </Fragment>

@@ -25,6 +25,11 @@ export default new ApolloClient({
               return incoming
             },
           },
+          badges: {
+            merge(existing, incoming) {
+              return incoming
+            },
+          },
         },
       },
       SearchQuest: {

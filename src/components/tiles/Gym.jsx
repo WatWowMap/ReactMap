@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { memo, useState, useRef } from 'react'
+import React, { memo, useState, useRef, useEffect } from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
@@ -25,6 +25,7 @@ const GymTile = ({
   const markerRef = useRef({})
   const [done, setDone] = useState(false)
   const [stateChange, setStateChange] = useState(false)
+  const [badge, setBadge] = useState(item.badge || 0)
 
   const {
     raid_battle_timestamp, raid_end_timestamp, raid_level, raid_pokemon_id, raid_pokemon_form, team_id,
@@ -43,6 +44,14 @@ const GymTile = ({
   useMarkerTimer(timerToDisplay, item.id, markerRef, '', ts, () => setStateChange(!stateChange))
   useForcePopup(item.id, markerRef, params, setParams, done)
 
+  useEffect(() => {
+    if (filters.gymBadges) {
+      setBadge(item.badge || 0)
+    } else {
+      setBadge(0)
+    }
+  }, [filters.gymBadges, item.badge])
+
   return !excludeList.includes(`t${team_id}-0`) && (
     <Marker
       ref={(m) => {
@@ -52,7 +61,7 @@ const GymTile = ({
         }
       }}
       position={[item.lat, item.lon]}
-      icon={gymMarker(item, hasHatched, hasRaid, filters, Icons, userSettings)}
+      icon={gymMarker(item, hasHatched, hasRaid, filters, Icons, userSettings, badge)}
     >
       <Popup position={[item.lat, item.lon]}>
         <PopupContent
@@ -61,12 +70,14 @@ const GymTile = ({
           hasHatched={hasHatched}
           ts={ts}
           Icons={Icons}
+          badge={badge}
+          setBadge={setBadge}
         />
       </Popup>
       {((showTimer || userSettings.raidTimers) && hasRaid) && (
         <ToolTipWrapper
           timers={[timerToDisplay]}
-          offset={[6, 5]}
+          offset={[0, 5]}
         />
       )}
       {showCircles && (
@@ -97,16 +108,18 @@ const areEqual = (prev, next) => {
     && prev.item.raid_pokemon_id === next.item.raid_pokemon_id
     && prev.item.raid_level === next.item.raid_level
     && prev.item.in_battle === next.item.in_battle
-    && raidLogic()
-    && prev.showTimer === next.showTimer
+    && prev.item.badge === next.item.badge
+    && (`badge_${prev.item.badge}` === next.filters.badge || next.filters.badge === 'all')
     && prev.item.team_id === next.item.team_id
     && prev.item.available_slots === next.item.available_slots
+    && raidLogic()
+    && prev.showTimer === next.showTimer
+    && prev.showCircles === next.showCircles
     && !next.excludeList.includes(`${prev.item.raid_pokemon_id}-${prev.item.raid_pokemon_form}`)
     && !next.excludeList.includes(`t${prev.item.team_id}-0`)
     && !next.excludeList.includes(`e${prev.item.raid_level}`)
     && Object.keys(prev.userIcons).every(key => prev.userIcons[key] === next.userIcons[key])
     && Object.keys(prev.userSettings).every(key => prev.userSettings[key] === next.userSettings[key])
-    && prev.showCircles === next.showCircles
 }
 
 export default memo(GymTile, areEqual)

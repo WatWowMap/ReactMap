@@ -21,6 +21,7 @@ const gym = gql`
     in_battle
     guarding_pokemon_id
     total_cp
+    badge
   }
 `
 
@@ -79,6 +80,20 @@ export const getOne = gql`
     gymsSingle(id: $id, perm: $perm) {
       lat
       lon
+    }
+  }
+`
+
+export const getBadges = gql`
+  query GetBadgeInfo {
+    badges {
+      id
+      name
+      url
+      lat
+      lon
+      badge
+      deleted
     }
   }
 `
