@@ -491,5 +491,8 @@
   "join_button": 5,
   "confirm_filters_reset": "Zresetuj ustawienia",
   "filters_reset_text": "Czy na pewno chcesz zresetować ustawienia do domyślnych wartości? Ta czynność jest nieodwracalna!",
-  "filters_reset_title": "Reset ustawień"
+  "filters_reset_title": "Reset ustawień",
+  "loading": "Ładowanie {{category}}",
+  "loading_icons": "Ładowanie ikon",
+  "loading_invasions": "Ładowanie inwazji"
 }
