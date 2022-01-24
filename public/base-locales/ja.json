@@ -383,7 +383,6 @@
   "has_quest_indicator": "クエストで停止するための代替色",
   "show_ar_badge": "ARバッジを表示",
   "all_gyms": "すべてのジム",
-  "raids_or": "レイドボスをレイドとは別にフィルタリングする",
   "general": "全般的",
   "server_dev_error_0": "{{variable_0}}",
   "link_global_and_advanced": "リンクグローバル",

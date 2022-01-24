@@ -368,7 +368,6 @@
   "has_quest_indicator": "Alternative Color for Stops with Quests",
   "show_ar_badge": "Show AR Badge",
   "all_gyms": "All Gyms",
-  "raids_or": "Filter Raid Bosses Separately from Raids",
   "general": "General",
   "server_dev_error_0": "{{variable_0}}",
   "link_global_and_advanced": "Link Global & Advanced",
@@ -486,5 +485,6 @@
   "gym_badges_subtitle": "Displays Gym Badges on the map and a list in the profile page.",
   "confirm_filters_reset": "Reset filters",
   "filters_reset_text": "Are you sure you want to reset settings to default values? This cannot be undone!",
-  "filters_reset_title": "Reset filters"
+  "filters_reset_title": "Reset filters",
+  "raid_quick_select": "Quick Select"
 }

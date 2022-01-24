@@ -3,7 +3,7 @@ const { api: { pvp: { leagues } } } = require('../config')
 
 module.exports = function generateUi(filters, perms) {
   const ui = {}
-  const ignoredKeys = ['enabled', 'filter', 'showQuestSet', 'badge']
+  const ignoredKeys = ['enabled', 'filter', 'showQuestSet', 'badge', 'raidTier']
 
   // builds the initial categories
   for (const [key, value] of Object.entries(filters)) {

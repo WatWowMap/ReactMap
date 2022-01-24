@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  Grid, Typography, Switch,
+  Grid, Typography, Switch, Select, MenuItem,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
@@ -78,6 +78,34 @@ export default function WithSubItems({
             items={['all', 'badge_1', 'badge_2', 'badge_3']}
           />
         </Grid>
+      )}
+      {category === 'gyms' && subItem === 'raids' && filters[category].raids === true && (
+        <>
+          <Grid item xs={5}>
+            <Typography>{t('raid_quick_select')}</Typography>
+          </Grid>
+          <Grid item xs={7} style={{ textAlign: 'right' }}>
+            <Select
+              value={filters[category].raidTier}
+              fullWidth
+              onChange={(e) => {
+                setFilters({
+                  ...filters,
+                  [category]: {
+                    ...filters[category],
+                    raidTier: e.target.value === 'all' ? 'all' : +e.target.value,
+                  },
+                })
+              }}
+            >
+              {['all', 1, 2, 3, 4, 5, 6].map((tier, i) => (
+                <MenuItem key={tier} dense value={tier}>
+                  {t(i ? `raid_${tier}_plural` : 'all')}
+                </MenuItem>
+              ))}
+            </Select>
+          </Grid>
+        </>
       )}
     </>
   )
