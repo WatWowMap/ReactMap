@@ -435,5 +435,8 @@
   "timer_verified": "Этот таймер проверен",
   "timer_unverified": "Этот таймер не проверен",
   "all": "Все",
-  "both": "Оба"
+  "both": "Оба",
+  "loading_icons": "Получение иконок",
+  "loading_invasions": "Получение вторжений",
+  "loading": "Загрузка {{category}}"
 }

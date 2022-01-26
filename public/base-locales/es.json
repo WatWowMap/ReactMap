@@ -466,5 +466,8 @@
   "timer_verified": "Este temporizador está verificado",
   "timer_unverified": "Este temporizador no está verificado",
   "all": "Todo",
-  "both": "Ambos"
+  "both": "Ambos",
+  "loading_icons": "Obtener iconos",
+  "loading_invasions": "Ir a buscar invasiones",
+  "loading": "Cargando {{category}}"
 }

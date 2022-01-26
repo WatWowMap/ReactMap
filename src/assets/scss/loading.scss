@@ -1,0 +1,78 @@
+.loader-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-color: rgba(0, 0, 0, 0.5);
+  -webkit-tap-highlight-color: transparent;
+  flex-direction: column;
+}
+
+@keyframes circular-rotate {
+  0% {
+    transform-origin: 50% 50%;
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes circular-dash {
+  0% {
+    stroke-dasharray: 1px, 200px;
+    stroke-dashoffset: 0px;
+  }
+
+  50% {
+    stroke-dasharray: 100px, 200px;
+    stroke-dashoffset: -15px;
+  }
+
+  100% {
+    stroke-dasharray: 100px, 200px;
+    stroke-dashoffset: -125px;
+  }
+}
+
+.progress-indeterminate {
+  animation: circular-rotate 1.4s linear infinite;
+}
+
+.progress-root {
+  display: inline-block;
+}
+
+.progress-svg {
+  display: block;
+}
+
+.color-primary {
+  color: #ff5722;
+}
+
+.circle-indeterminate {
+  animation: circular-dash 1.4s ease-in-out infinite;
+  stroke-dasharray: 80px, 200px;
+  stroke-dashoffset: 0px;
+}
+
+.progress-circle {
+  stroke: currentColor;
+}
+
+.loading-text {
+  font-size: 1.5625rem;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 400;
+  line-height: 1.235;
+  letter-spacing: 0.00735em;
+  color: #00b0ff;
+  margin: 0;
+}

@@ -435,5 +435,8 @@
   "timer_verified": "이 타이머는 확인되었습니다",
   "timer_unverified": "이 타이머는 확인되지 않았습니다.",
   "all": "모두",
-  "both": "둘 다"
+  "both": "둘 다",
+  "loading_icons": "아이콘 가져오기",
+  "loading_invasions": "침략 가져오기",
+  "loading": "{{category}} 로드 중"
 }
