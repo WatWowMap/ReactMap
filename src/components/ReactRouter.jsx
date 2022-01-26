@@ -32,7 +32,7 @@ export default function ReactRouter() {
     const Icons = data.masterfile ? new UIcons(data.config.icons, data.masterfile.questRewardTypes) : null
     if (Icons) {
       if (loadingText) {
-        loadingText.innerHTML = t('loading_icons')
+        loadingText.innerText = t('loading_icons')
       }
       await Icons.fetchIcons(data.config.icons.styles)
       if (data.config.icons.defaultIcons) {
@@ -46,7 +46,7 @@ export default function ReactRouter() {
         data.masterfile.invasions = invasionCache
       } else {
         if (loadingText) {
-          loadingText.innerHTML = t('loading_invasions')
+          loadingText.innerText = t('loading_invasions')
         }
         data.masterfile.invasions = await Fetch.getInvasions(data.masterfile.invasions)
       }
