@@ -65,11 +65,12 @@ const loadScanPolygons = (fileName) => fs.existsSync(`${__dirname}/../configs/${
   : { features: [] }
 
 // Check if an areas.json exists
-config.scanAreas = config.multiDomains.length
-  ? Object.fromEntries(
-    config.multiDomains.map(d => [d.geoJsonFileName ? d.domain : 'main', loadScanPolygons(d.geoJsonFileName || config.map.geoJsonFileName)]),
-  )
-  : { main: loadScanPolygons(config.map.geoJsonFileName) }
+config.scanAreas = {
+  main: loadScanPolygons(config.map.geoJsonFileName),
+  ...Object.fromEntries(
+    config.multiDomains.map(d => [d.general?.geoJsonFileName ? d.domain : 'main', loadScanPolygons(d.general?.geoJsonFileName || config.map.geoJsonFileName)]),
+  ),
+}
 
 // Map manual areas
 config.manualAreas = Object.fromEntries(config.manualAreas.map(area => [area.name, area]))
