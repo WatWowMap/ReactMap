@@ -10,6 +10,7 @@ const SetText = () => {
   const locale = {
     // de: '',
     en: 'Loading Translations',
+    de: 'Übersetzungen werden geladen',
     es: 'Cargando Traducciones',
     // fr: '',
     it: 'Caricamento Traduzioni',
