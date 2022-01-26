@@ -8,11 +8,10 @@ import ReactRouter from './ReactRouter'
 
 const SetText = () => {
   const locale = {
-    // de: '',
-    en: 'Loading Translations',
     de: 'Übersetzungen werden geladen',
+    en: 'Loading Translations',
     es: 'Cargando Traducciones',
-    // fr: '',
+    fr: 'Chargement des traductions',
     it: 'Caricamento Traduzioni',
     ja: '翻訳を読み込み中',
     ko: '번역 로드 중',
