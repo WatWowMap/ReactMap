@@ -485,5 +485,8 @@
   "gym_badges_subtitle": "Die Arenaorden auf der Karte und als Liste auf der Profilseite anzeigen.",
   "confirm_filters_reset": "Filter zurücksetzen",
   "filters_reset_text": "Sollen die Einstellungen wirklich auf die Standardwerte zurückgesetzt werden? Das kann nicht rückgängig gemacht werden!",
-  "filters_reset_title": "Filter zurücksetzen"
+  "filters_reset_title": "Filter zurücksetzen",
+  "loading": "laden von {{category}}",
+  "loading_icons": "Icons abrufen",
+  "loading_invasions": "Rocket-Lineup abrufen"
 }
