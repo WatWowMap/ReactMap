@@ -7,7 +7,7 @@ import client from '@services/apollo'
 import ReactRouter from './ReactRouter'
 
 const SetText = () => {
-  const locale = {
+  const locales = {
     de: 'Übersetzungen werden geladen',
     en: 'Loading Translations',
     es: 'Cargando Traducciones',
@@ -22,9 +22,10 @@ const SetText = () => {
     sv: 'Laddar Översättningar',
     th: 'กำลังโหลดการแปล',
     'zh-tw': '載入翻譯',
-  }[localStorage?.getItem('i18nextLng')?.toLowerCase() || 'en']
+  }
+  const locale = localStorage?.getItem('i18nextLng') || 'en'
   const loadingText = document.getElementById('loading-text')
-  if (loadingText) loadingText.innerText = locale || 'Loading Translations'
+  if (loadingText) loadingText.innerText = locales[locale.toLowerCase()]
   return <></>
 }
 

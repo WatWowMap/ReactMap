@@ -22,7 +22,7 @@
     <h4 id="loading-text" class="loading-text">Loading Map</h4>
   </div>
   <script>
-    const locale = {
+    const locales = {
       de: 'Map wird geladen',
       en: 'Loading Map',
       es: 'Cargando Mapa',
@@ -37,9 +37,10 @@
       sv: 'Laddar karta',
       th: 'กำลังโหลดแผนที่',
       'zh-tw': '載入地圖中'
-    }[window?.localStorage?.getItem('i18nextLng')?.toLowerCase() || 'en'];
+    }
+    const locale = window?.localStorage?.getItem('i18nextLng') || 'en';
     const element = document.getElementById('loading-text');
-    if (element) element.innerText = locale || 'Loading Map';
+    if (element) element.innerText = locales[locale.toLowerCase()];
   </script>
   <div id="root"></div>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
