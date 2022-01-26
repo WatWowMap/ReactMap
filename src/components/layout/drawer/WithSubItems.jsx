@@ -5,10 +5,11 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+
 import MultiSelector from './MultiSelector'
 
 export default function WithSubItems({
-  category, filters, setFilters, subItem, noScanAreaOverlay, enableQuestSetSelector,
+  category, filters, setFilters, subItem, noScanAreaOverlay, enableQuestSetSelector, available,
 }) {
   const { t } = useTranslation()
   let filterCategory
@@ -57,7 +58,7 @@ export default function WithSubItems({
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         {filterCategory}
       </Grid>
-      {enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters[category].quests === true && (
+      {(enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters[category].quests === true) && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <MultiSelector
             filters={filters}
@@ -68,7 +69,7 @@ export default function WithSubItems({
           />
         </Grid>
       )}
-      {category === 'gyms' && subItem === 'gymBadges' && filters[category].gymBadges === true && (
+      {(category === 'gyms' && subItem === 'gymBadges' && filters[category].gymBadges === true) && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <MultiSelector
             filters={filters}
@@ -79,7 +80,7 @@ export default function WithSubItems({
           />
         </Grid>
       )}
-      {category === 'gyms' && subItem === 'raids' && filters[category].raids === true && (
+      {(category === 'gyms' && subItem === 'raids' && filters[category].raids === true && available?.gyms) && (
         <>
           <Grid item xs={5}>
             <Typography>{t('raid_quick_select')}</Typography>
@@ -98,7 +99,7 @@ export default function WithSubItems({
                 })
               }}
             >
-              {['all', 1, 2, 3, 4, 5, 6].map((tier, i) => (
+              {['all', ...available.gyms.filter(x => x.startsWith('r')).map(y => +y.slice(1))].map((tier, i) => (
                 <MenuItem key={tier} dense value={tier}>
                   {t(i ? `raid_${tier}_plural` : 'all')}
                 </MenuItem>
