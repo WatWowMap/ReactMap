@@ -435,5 +435,8 @@
   "timer_verified": "此計時器已驗證",
   "timer_unverified": "此計時器未經驗證",
   "all": "全部",
-  "both": "兩個都"
+  "both": "兩個都",
+  "loading_icons": "獲取圖標",
+  "loading_invasions": "獲取入侵",
+  "loading": "正在加載 {{category}}"
 }

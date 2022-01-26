@@ -478,5 +478,8 @@
   "all": "Alle",
   "confirm_filters_reset": "Bevestig filters resetten",
   "filters_reset_text": "Weet je zeker dat je de filters instellingen terug wilt zetten naar standaardwaarden? Dit kan niet ongedaan gemaakt worden!",
-  "filters_reset_title": "Filters resetten"
+  "filters_reset_title": "Filters resetten",
+  "loading_icons": "",
+  "loading_invasions": "",
+  "loading": ""
 }

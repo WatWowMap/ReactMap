@@ -435,5 +435,8 @@
   "timer_verified": "Questo timer è verificato",
   "timer_unverified": "Questo timer non è verificato",
   "all": "Tutto",
-  "both": "Entrambi"
+  "both": "Entrambi",
+  "loading_icons": "Recupero delle icone",
+  "loading_invasions": "Recupero delle invasioni",
+  "loading": "Caricamento {{category}}"
 }
