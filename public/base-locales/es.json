@@ -398,8 +398,8 @@
   "webhook_selection": "Selección de {{name}}",
   "server_dev_error_0": "{{variable_0}}",
   "navigation_controls": "Controles de navegación",
-  "navigation_controls_react": "Reaccionar",
-  "navigation_controls_leaflet": "Folleto",
+  "navigation_controls_react": "React",
+  "navigation_controls_leaflet": "Leaflet",
   "exclusive": "Exclusivo",
   "all_moves": "Todos los movimientos",
   "move": "Muevete",
@@ -466,5 +466,8 @@
   "timer_verified": "Este temporizador está verificado",
   "timer_unverified": "Este temporizador no está verificado",
   "all": "Todo",
-  "both": "Ambos"
+  "both": "Ambos",
+  "loading_icons": "Obtener iconos",
+  "loading_invasions": "Ir a buscar invasiones",
+  "loading": "Cargando {{category}}"
 }

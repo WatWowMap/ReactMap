@@ -1,6 +1,7 @@
 @import "~react-leaflet-markercluster/dist/styles.min.css";
 @import "~leaflet.locatecontrol/dist/L.Control.Locate.min.css";
 @import "holiday.scss";
+@import "loading.scss";
 
 .leaflet-container {
   position: absolute;
@@ -19,10 +20,7 @@
 
 body {
   background-color: rgb(53, 53, 53);
-}
-
-.markercluster-map {
-  height: 90vh;
+  margin: 0;
 }
 
 .MuiDrawer-paper {

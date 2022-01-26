@@ -392,8 +392,8 @@
   "webhook_selection": "{{name}} wybór",
   "server_dev_error_0": "{{variable_0}}",
   "navigation_controls": "Sterowanie nawigacją",
-  "navigation_controls_react": "Reagować",
-  "navigation_controls_leaflet": "Ulotka",
+  "navigation_controls_react": "React",
+  "navigation_controls_leaflet": "Leaflet",
   "exclusive": "Ekskluzywny",
   "all_moves": "Wszystkie ruchy",
   "move": "Ruch",
@@ -491,5 +491,8 @@
   "join_button": 5,
   "confirm_filters_reset": "Zresetuj ustawienia",
   "filters_reset_text": "Czy na pewno chcesz zresetować ustawienia do domyślnych wartości? Ta czynność jest nieodwracalna!",
-  "filters_reset_title": "Reset ustawień"
+  "filters_reset_title": "Reset ustawień",
+  "loading": "Ładowanie {{category}}",
+  "loading_icons": "Ładowanie ikon",
+  "loading_invasions": "Ładowanie inwazji"
 }
