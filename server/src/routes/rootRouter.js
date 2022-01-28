@@ -110,6 +110,7 @@ rootRouter.get('/settings', async (req, res) => {
         },
         manualAreas: config.manualAreas || {},
         icons: config.icons,
+        gymValidDataLimit: config.api.gymValidDataLimit,
       },
       available: {},
     }

@@ -127,6 +127,7 @@ const MenuActions = ({
   const setExcludeList = useStatic(state => state.setExcludeList)
   const timerList = useStatic(state => state.timerList)
   const setTimerList = useStatic(state => state.setTimerList)
+  const { gymValidDataLimit } = useStatic(state => state.config)
 
   const selectedWebhook = useStore(state => state.selectedWebhook)
 
@@ -138,7 +139,7 @@ const MenuActions = ({
 
   const addWebhook = useWebhook({ category: 'quickGym', selectedWebhook })
   const {
-    id, team_id, raid_pokemon_id, raid_pokemon_form, raid_level,
+    id, team_id, raid_pokemon_id, raid_pokemon_form, raid_level, updated,
   } = gym
 
   const handleClick = (event) => {
@@ -214,8 +215,10 @@ const MenuActions = ({
   ]
 
   if (perms.gyms) {
-    options.push({ name: 'exclude_team', action: excludeTeam })
-    if (perms.gymBadges) {
+    if (updated > (Date.now() / 1000 - (gymValidDataLimit * 86400))) {
+      options.push({ name: 'exclude_team', action: excludeTeam })
+    }
+    if (perms.gymBadges && filters.gyms?.gymBadges) {
       options.push({ name: 'gym_badge_menu', action: () => handleCloseBadge(true) })
     }
   }
@@ -360,8 +363,9 @@ const RaidImage = ({
 
 const GymInfo = ({ gym, t, Icons }) => {
   const {
-    team_id, available_slots, ex_raid_eligible, ar_scan_eligible,
+    team_id, available_slots, ex_raid_eligible, ar_scan_eligible, updated,
   } = gym
+  const { gymValidDataLimit } = useStatic(state => state.config)
 
   return (
     <Grid
@@ -372,16 +376,19 @@ const GymInfo = ({ gym, t, Icons }) => {
       justifyContent="space-around"
       alignItems="center"
     >
-      <Grid item xs={12}>
-        <Typography variant="h6" align="center">
-          {t(`team_${team_id}`)}
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <Typography variant="subtitle1" align="center">
-          {available_slots} {t('slots')}
-        </Typography>
-      </Grid>
+      {updated > (Date.now() / 1000 - (gymValidDataLimit * 86400)) && (
+        <Grid item xs={12}>
+          <Typography variant="h6" align="center">
+            {t(`team_${team_id}`)}
+          </Typography>
+        </Grid> && (
+          <Grid item xs={12}>
+            <Typography variant="subtitle1" align="center">
+              {available_slots} {t('slots')}
+            </Typography>
+          </Grid>
+        )
+      )}
       {ex_raid_eligible && (
         <Grid
           item
@@ -586,6 +593,7 @@ const ExtraInfo = ({ gym, t, ts }) => {
   const {
     last_modified_timestamp, updated, total_cp, guarding_pokemon_id,
   } = gym
+  const { gymValidDataLimit } = useStatic(state => state.config)
 
   const extraMetaData = [
     {
@@ -611,25 +619,29 @@ const ExtraInfo = ({ gym, t, ts }) => {
   return (
     <Grid container>
       {extraMetaData.map(meta => (
-        meta.data ? (
-          <Fragment key={meta.description}>
-            <Grid item xs={t('popup_gym_description_width')} style={{ textAlign: 'left' }}>
-              <Typography variant="caption">
-                {t(meta.description)}:
-              </Typography>
-            </Grid>
-            {meta.timer ? (
-              <Grid item xs={t('popup_gym_seen_timer_width')} style={{ textAlign: 'right' }}>
-                {meta.timer}
-              </Grid>
-            ) : null}
-            <Grid item xs={meta.timer ? t('popup_gym_data_width') : t('popup_gym_seen_timer_width')} style={{ textAlign: 'right' }}>
-              <Typography variant="caption">
-                {meta.data}
-              </Typography>
-            </Grid>
-          </Fragment>
-        ) : null
+        ((meta.data && !['defender', 'total_cp'].includes(meta.description))
+          || (meta.data
+            && ['defender', 'total_cp'].includes(meta.description)
+            && guarding_pokemon_id > 0
+            && updated > (Date.now() / 1000 - (gymValidDataLimit * 86400)))) ? (
+              <Fragment key={meta.description}>
+                <Grid item xs={t('popup_gym_description_width')} style={{ textAlign: 'left' }}>
+                  <Typography variant="caption">
+                    {t(meta.description)}:
+                  </Typography>
+                </Grid>
+                {meta.timer ? (
+                  <Grid item xs={t('popup_gym_seen_timer_width')} style={{ textAlign: 'right' }}>
+                    {meta.timer}
+                  </Grid>
+                ) : null}
+                <Grid item xs={meta.timer ? t('popup_gym_data_width') : t('popup_gym_seen_timer_width')} style={{ textAlign: 'right' }}>
+                  <Typography variant="caption">
+                    {meta.data}
+                  </Typography>
+                </Grid>
+              </Fragment>
+          ) : null
       ))}
     </Grid>
   )

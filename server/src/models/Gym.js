@@ -6,7 +6,7 @@ const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
-  api: { searchResultsLimit, queryLimits },
+  api: { searchResultsLimit, queryLimits, gymValidDataLimit },
   database: { schemas, settings: { gymBadgeTableName, joinGymBadgeTable } },
 } = require('../services/config')
 const Badge = require('./Badge')
@@ -197,7 +197,7 @@ module.exports = class Gym extends Model {
         if (userBadgeObj[gym.id]) {
           gym.badge = userBadgeObj[gym.id]
         }
-        if (!gymPerms) {
+        if (!gymPerms || (gymValidDataLimit && gym.updated < (Date.now() / 1000 - (gymValidDataLimit * 86400)))) {
           gym.team_id = 0
           gym.available_slots = 6
         }
