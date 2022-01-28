@@ -14,19 +14,18 @@ const path = require('path')
 
 // Set Path where for area.json
 const configFolderArea = path.resolve(__dirname, '../../server/src/configs/areas.json')
-const geofencesFolder = path.resolve(__dirname, '../../server/src/configs/geofence/geofence.json')
+const geofencesFile = path.resolve(__dirname, '../../server/src/configs/geofence/geofence.json')
 
-if (!fs.existsSync(geofencesFolder)) {
-  console.error('Error: Geofence directory does not exist:', geofencesFolder);
+if (!fs.existsSync(geofencesFile)) {
+  console.warning('Warning: No Geofence file was found, no area.json is generated!');
   return;
 }
-
 const outGeoJSON = {
   type: 'FeatureCollection',
   features: [],
 }
 
-fs.readFile(geofencesFolder, 'utf8', (err, data) => {
+fs.readFile(geofencesFile, 'utf8', (err, data) => {
   if (err) {
     console.error(err)
     return
