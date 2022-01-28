@@ -14,6 +14,7 @@
     "watch": "webpack --watch --env dev",
     "generate": "node server/scripts/generateMasterfile.js",
     "create-locales": "node server/scripts/createLocales.js",
+    "create-area": "node server/scripts/poracleToGeoJSON.js",
     "missing-locales": "node server/scripts/createLocales.js --missing",
     "config-migrate": "node server/scripts/configMigration.js",
     "console": "node --experimental-repl-await ./server/scripts/console.js",
