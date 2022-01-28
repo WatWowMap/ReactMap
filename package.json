@@ -7,10 +7,10 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "yarn create-locales && webpack --env prod && yarn generate && yarn migrate:latest && yarn server",
+    "start": "yarn create-locales && yarn create-area && webpack --env prod && yarn generate && yarn migrate:latest && yarn server",
     "server": "yarn generate && yarn migrate:latest && node server/src/index.js",
     "dev": "nodemon server/src/index.js --watch server",
-    "build": "yarn create-locales && webpack --env prod",
+    "build": "yarn create-locales && yarn create-area && webpack --env prod",
     "watch": "webpack --watch --env dev",
     "generate": "node server/scripts/generateMasterfile.js",
     "create-locales": "node server/scripts/createLocales.js",
