@@ -59,7 +59,7 @@ export default function FloatingButtons({
       </Grid>
       {enableFloatingProfileButton && loggedIn && (
         <Grid item>
-          <Fab color="primary" size={fabSize} onClick={() => setUserProfile(true)} disabled={Boolean(webhookMode)}>
+          <Fab color="primary" size={fabSize} onClick={() => setUserProfile(true)} title={t('user_profile')} disabled={Boolean(webhookMode)}>
             <Person fontSize={iconSize} />
           </Fab>
         </Grid>
