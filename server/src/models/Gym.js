@@ -197,9 +197,17 @@ module.exports = class Gym extends Model {
         if (userBadgeObj[gym.id]) {
           gym.badge = userBadgeObj[gym.id]
         }
-        if (!gymPerms || (gymValidDataLimit && gym.updated < (Date.now() / 1000 - (gymValidDataLimit * 86400)))) {
+        if (!gymPerms) {
           gym.team_id = 0
           gym.available_slots = 6
+        }
+        if (gymValidDataLimit && gym.updated < (Date.now() / 1000 - (gymValidDataLimit * 86400))) {
+          gym.team_id = 0
+          gym.available_slots = 6
+          gym.raid_end_timestamp = null
+          gym.raid_battle_timestamp = null
+          gym.raid_pokemon_id = null
+          gym.raid_level = null
         }
         if (onlyRaids && !gym.raid_pokemon_id && (args.filters[`e${gym.raid_level}`] || args.filters[`r${gym.raid_level}`])) {
           filteredResults.push(gym)
