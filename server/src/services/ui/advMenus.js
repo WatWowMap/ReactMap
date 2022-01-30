@@ -41,7 +41,7 @@ module.exports = function buildMenus(available) {
   const returnedItems = {}
 
   Object.entries(pokemonFilters).forEach(([key, items]) => {
-    menuFilters[key] = Object.fromEntries(items.map(item => [item, false]))
+    menuFilters[key] = Object.fromEntries(items.map(item => [item, true]))
   })
 
   Object.entries(categories).forEach(([key, items]) => {
