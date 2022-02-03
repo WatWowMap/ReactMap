@@ -7,6 +7,7 @@ import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
+import ScanNext from './layout/dialogs/ScanNext'
 
 const userSettingsCategory = category => {
   switch (category) {
@@ -30,7 +31,8 @@ const getTileServer = (tileServers, settings, isNight) => {
   return tileServers[settings.tileServers] || fallbackTs
 }
 
-export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons, webhooks }, params }) {
+export default function Map({ serverSettings: { config: { map: config, tileServers, scanNextAreaRestriction },
+  Icons, webhooks }, params }) {
   Utility.analytics(window.location.pathname)
 
   const map = useMap()
@@ -51,6 +53,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const userSettings = useStore(state => state.userSettings)
 
   const [webhookMode, setWebhookMode] = useState(false)
+  const [scanNextMode, setScanNextMode] = useState(false)
   const [manualParams, setManualParams] = useState(params)
   const [lc] = useState(L.control.locate({
     position: 'bottomright',
@@ -168,6 +171,14 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
           })
         )
       }
+      {scanNextMode && (
+        <ScanNext
+          map={map}
+          scanNextMode={scanNextMode}
+          setScanNextMode={setScanNextMode}
+          scanNextAreaRestriction={scanNextAreaRestriction}
+        />
+      )}
       <Nav
         map={map}
         setManualParams={setManualParams}
@@ -176,6 +187,8 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         webhookMode={webhookMode}
         setWebhookMode={setWebhookMode}
         webhooks={webhooks}
+        scanNextMode={scanNextMode}
+        setScanNextMode={setScanNextMode}
         settings={settings}
       />
     </>

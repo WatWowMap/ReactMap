@@ -488,5 +488,12 @@
   "filters_reset_title": "Filter zurücksetzen",
   "loading": "laden von {{category}}",
   "loading_icons": "Icons abrufen",
-  "loading_invasions": "Rocket-Lineup abrufen"
+  "loading_invasions": "Rocket-Lineup abrufen",
+  "scan_next": "Standort scannen",
+  "click_to_scan": "Hier scannen",
+  "scan_confirmed_title": "Scan-Anfrage bestätigt",
+  "scan_confirmed": "Gerät wurde an den Standort geschickt, das Ergebnis wird bald auf der Karte erscheinen!",
+  "scan_error_title": "Fehler",
+  "scan_error": "Es ist ein Fehler bei der Verarbeitung der Scan-Anfrage aufgetreten...",
+  "scan_outside_area": "Dieser Standort liegt außerhalb der Grenzen der zugelassenen Gebiete"
 }

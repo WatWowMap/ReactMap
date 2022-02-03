@@ -223,6 +223,10 @@
       "gymBadges": {
         "enabled": true,
         "roles": []
+      },
+      "scanNext": {
+        "enabled": true,
+        "roles": []
       }
     }
   },

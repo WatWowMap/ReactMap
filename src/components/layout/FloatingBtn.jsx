@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import {
-  Menu, LocationOn, ZoomIn, ZoomOut, Search, NotificationsActive, Save, CardMembership, AttachMoney, EuroSymbol,
+  Menu, LocationOn, ZoomIn, ZoomOut, Search, NotificationsActive, Save,
+  CardMembership, AttachMoney, EuroSymbol, TrackChanges,
 } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
@@ -9,7 +10,7 @@ import L from 'leaflet'
 
 import useStyles from '@hooks/useStyles'
 import useLocation from '@hooks/useLocation'
-import { useStore } from '@hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
 
 const DonationIcons = {
   dollar: AttachMoney,
@@ -21,8 +22,10 @@ export default function FloatingButtons({
   toggleDrawer, toggleDialog, safeSearch,
   isMobile, perms, webhookMode, setWebhookMode,
   settings, webhooks, donationPage, setDonorPage,
+  scanNextMode, setScanNextMode,
 }) {
   const { t } = useTranslation()
+  const { enableScanNext } = useStatic(state => state.config)
   const map = useMap()
   const ref = useRef(null)
   const classes = useStyles()
@@ -50,27 +53,34 @@ export default function FloatingButtons({
       style={{ width: isMobile ? 50 : 65 }}
     >
       <Grid item>
-        <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)} title={t('open_menu')} disabled={Boolean(webhookMode)}>
+        <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)} title={t('open_menu')} disabled={Boolean(webhookMode) || Boolean(scanNextMode)}>
           <Menu fontSize={iconSize} />
         </Fab>
       </Grid>
       {safeSearch.length ? (
         <Grid item>
-          <Fab color={settings.navigationControls === 'react' ? 'primary' : 'secondary'} size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('search')} disabled={Boolean(webhookMode)}>
+          <Fab color={settings.navigationControls === 'react' ? 'primary' : 'secondary'} size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('search')} disabled={Boolean(webhookMode) || Boolean(scanNextMode)}>
             <Search fontSize={iconSize} />
           </Fab>
         </Grid>
       ) : null}
       {(perms?.webhooks?.length && webhooks && selectedWebhook) ? (
         <Grid item>
-          <Fab color="secondary" size={fabSize} onClick={() => setWebhookMode('open')} title={selectedWebhook} disabled={Boolean(webhookMode)}>
+          <Fab color="secondary" size={fabSize} onClick={() => setWebhookMode('open')} title={selectedWebhook} disabled={Boolean(webhookMode) || Boolean(scanNextMode)}>
             <NotificationsActive fontSize={iconSize} />
+          </Fab>
+        </Grid>
+      ) : null}
+      {(perms?.scanNext && enableScanNext) ? (
+        <Grid item>
+          <Fab color={scanNextMode === 'setLocation' ? null : 'secondary'} size={fabSize} onClick={() => scanNextMode === 'setLocation' ? setScanNextMode(false) : setScanNextMode('setLocation')} title={t('scan_next')} disabled={Boolean(webhookMode)}>
+            <TrackChanges fontSize={iconSize} />
           </Fab>
         </Grid>
       ) : null}
       {showDonorPage ? (
         <Grid item>
-          <Fab color="secondary" size={fabSize} onClick={() => setDonorPage(true)} title={t('donor_menu')} disabled={Boolean(webhookMode)}>
+          <Fab color="secondary" size={fabSize} onClick={() => setDonorPage(true)} title={t('donor_menu')} disabled={Boolean(webhookMode) || Boolean(scanNextMode)}>
             <DonorIcon fontSize={iconSize} />
           </Fab>
         </Grid>

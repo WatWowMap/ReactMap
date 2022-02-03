@@ -482,5 +482,12 @@
   "gym_badges_subtitle": "Affiche les badges d'arène sur la carte et une liste dans la page profile.",
   "loading": "Chargement {{category}}",
   "loading_icons": "Récupération des Icônes",
-  "loading_invasions": "Récupération des Invasions"
+  "loading_invasions": "Récupération des Invasions",
+  "scan_next": "Scanner un emplacement",
+  "click_to_scan": "Scanner ici",
+  "scan_confirmed_title": "Demande de scan confirmée",
+  "scan_confirmed": "L'appareil a été envoyé à la position de scan, le résultat sera bientôt visible sur la map !",
+  "scan_error_title": "Erreur",
+  "scan_error": "Il y a eu une erreur lors du traitement de la demande de scan...",
+  "scan_outside_area": "Cet emplacement est en dehors des zones autorisées"
 }

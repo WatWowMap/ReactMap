@@ -356,6 +356,14 @@
       }
     ]
   },
+  "scanner": {
+    "apiEndpoint": "http://ip:port/api",
+    "apiUsername": "username",
+    "apiPassword": "password",
+    "enableScanNext": false,
+    "scanNextInstance": "scanNext",
+    "scanNextAreaRestriction": []
+  },
   "webhooks": [],
   "authentication": {
     "strategies": [
@@ -468,6 +476,10 @@
         "roles": []
       },
       "gymBadges": {
+        "enabled": true,
+        "roles": []
+      },
+      "scanNext": {
         "enabled": true,
         "roles": []
       }
