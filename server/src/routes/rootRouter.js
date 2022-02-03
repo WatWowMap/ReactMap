@@ -74,7 +74,7 @@ rootRouter.post('/scanNext', async (req, res) => {
           { lat: parseFloat(coord[0].toFixed(5)), lon: parseFloat(coord[1].toFixed(5)) }))),
       }
       console.log(`[scanNext] Request to scan new location by ${scanData.username}${scanData.userId ? ` (${scanData.userId})` : ''} - type ${scanData.scanNextType}: ${scanData.scanNextLocation[0].toFixed(5)},${scanData.scanNextLocation[0].toFixed(5)}`)
-      Axios.get(`${config.scanner.apiEndpoint}set_data`, {
+      Axios.get(`${config.scanner.apiEndpoint}/set_data`, {
         params,
         headers: {
           Authorization: `Basic ${Buffer.from(`${config.scanner.apiUsername}:${config.scanner.apiPassword}`).toString('base64')}`,

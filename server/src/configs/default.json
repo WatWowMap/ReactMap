@@ -357,7 +357,7 @@
     ]
   },
   "scanner": {
-    "apiEndpoint": "http://ip:port/api",
+    "apiEndpoint": "http://ip:port/api/",
     "apiUsername": "username",
     "apiPassword": "password",
     "enableScanNext": false,
