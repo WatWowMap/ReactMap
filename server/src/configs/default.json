@@ -107,6 +107,7 @@
       "invasionCacheHrs": 1,
       "questMessage": "",
       "navigationControls": "react",
+      "enableFloatingProfileButton": false,
       "forceTutorial": true,
       "enableTutorial": true,
       "enableUserProfile": true,
