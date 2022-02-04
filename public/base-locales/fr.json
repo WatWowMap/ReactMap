@@ -483,6 +483,8 @@
   "loading": "Chargement {{category}}",
   "loading_icons": "Récupération des Icônes",
   "loading_invasions": "Récupération des Invasions",
+  "login_button": 12,
+  "join_button": 12,
   "scan_next": "Scanner un emplacement",
   "click_to_scan": "Scanner ici",
   "scan_confirmed_title": "Demande de scan confirmée",

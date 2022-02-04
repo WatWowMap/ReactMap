@@ -31,8 +31,11 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
   const { area, zoom } = req.params
   try {
     const { scanAreas, manualAreas } = config
-    if (scanAreas.features.length) {
-      const foundArea = scanAreas.features.find(a => a.properties.name.toLowerCase() === area.toLowerCase())
+    const validScanAreas = scanAreas[req.headers.host]
+      ? scanAreas[req.headers.host]
+      : scanAreas.main
+    if (validScanAreas.features.length) {
+      const foundArea = validScanAreas.features.find(a => a.properties.name.toLowerCase() === area.toLowerCase())
       if (foundArea) {
         const [lon, lat] = center(foundArea).geometry.coordinates
         return res.redirect(`/@/${lat}/${lon}/${zoom || 18}`)
@@ -246,7 +249,7 @@ rootRouter.get('/settings', async (req, res) => {
           serverSettings.available[category].forEach(item => {
             if (!serverSettings.defaultFilters[category].filter[item] && !item.startsWith('132')) {
               serverSettings.defaultFilters[category].filter[item] = category === 'pokemon'
-                ? new PokemonFilter()
+                ? new PokemonFilter(config.defaultFilters.pokemon.allPokemon)
                 : new GenericFilter()
               if (!Number.isNaN(parseInt(item.charAt(0)))) {
                 const masterfileRef = masterfile.pokemon[item.split('-')[0]]

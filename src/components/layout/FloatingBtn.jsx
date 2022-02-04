@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import {
   Menu, LocationOn, ZoomIn, ZoomOut, Search, NotificationsActive, Save,
-  CardMembership, AttachMoney, EuroSymbol, TrackChanges,
+  CardMembership, AttachMoney, EuroSymbol, Person, TrackChanges,
 } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
@@ -22,9 +22,11 @@ export default function FloatingButtons({
   toggleDrawer, toggleDialog, safeSearch,
   isMobile, perms, webhookMode, setWebhookMode,
   settings, webhooks, donationPage, setDonorPage,
-  scanNextMode, setScanNextMode,
+  setUserProfile, scanNextMode, setScanNextMode,
 }) {
   const { t } = useTranslation()
+  const { map: { enableFloatingProfileButton } } = useStatic(state => state.config)
+  const { loggedIn } = useStatic(state => state.auth)
   const { enableScanNext } = useStatic(state => state.config)
   const map = useMap()
   const ref = useRef(null)
@@ -57,6 +59,13 @@ export default function FloatingButtons({
           <Menu fontSize={iconSize} />
         </Fab>
       </Grid>
+      {enableFloatingProfileButton && loggedIn && (
+        <Grid item>
+          <Fab color="primary" size={fabSize} onClick={() => setUserProfile(true)} title={t('user_profile')} disabled={Boolean(webhookMode) || Boolean(scanNextMode)}>
+            <Person fontSize={iconSize} />
+          </Fab>
+        </Grid>
+      )}
       {safeSearch.length ? (
         <Grid item>
           <Fab color={settings.navigationControls === 'react' ? 'primary' : 'secondary'} size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('search')} disabled={Boolean(webhookMode) || Boolean(scanNextMode)}>

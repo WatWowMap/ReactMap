@@ -126,6 +126,7 @@ export default function Nav({
           settings={settings}
           donationPage={donationPage}
           setDonorPage={setDonorPage}
+          setUserProfile={setUserProfile}
         />
       )}
       <Dialog
