@@ -261,7 +261,9 @@
       "enabled": false,
       "polygons": false,
       "pokemon": false,
-      "allPokemon": true
+      "allPokemon": true,
+      "avgFilter": [0, 100],
+      "avgSliderStep": 1
     },
     "pokestops": {
       "enabled": false,

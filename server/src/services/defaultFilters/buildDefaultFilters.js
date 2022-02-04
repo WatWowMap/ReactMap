@@ -35,6 +35,7 @@ module.exports = function buildDefault(perms) {
       enabled: defaultFilters.nests.enabled,
       pokemon: defaultFilters.nests.pokemon,
       polygons: defaultFilters.nests.polygons,
+      avgFilter: defaultFilters.nests.avgFilter,
       filter: pokemon.nests,
     } : undefined,
     pokestops: stopReducer ? {
