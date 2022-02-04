@@ -3,7 +3,10 @@ const i18next = require('i18next')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { pokemon: masterPkmn } = require('../data/masterfile.json')
-const { api: { searchResultsLimit, queryLimits } } = require('../services/config')
+const {
+  api: { searchResultsLimit, queryLimits },
+  defaultFilters: { nests: { avgFilter } },
+} = require('../services/config')
 
 module.exports = class Nest extends Model {
   static get tableName() {
@@ -26,7 +29,9 @@ module.exports = class Nest extends Model {
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .whereIn('pokemon_id', pokemon)
-      .andWhereBetween('pokemon_avg', args.filters.onlyAvgFilter)
+    if (!avgFilter.every((x, i) => x === args.filters.onlyAvgFilter[i])) {
+      query.andWhereBetween('pokemon_avg', args.filters.onlyAvgFilter)
+    }
     if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions)
     }

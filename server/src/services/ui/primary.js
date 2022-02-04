@@ -1,5 +1,8 @@
 /* eslint-disable no-restricted-syntax */
-const { api: { pvp: { leagues } } } = require('../config')
+const {
+  api: { pvp: { leagues } },
+  defaultFilters: { nests: { avgSliderStep } },
+} = require('../config')
 
 module.exports = function generateUi(filters, perms) {
   const ui = {}
@@ -15,7 +18,7 @@ module.exports = function generateUi(filters, perms) {
           sliders = {
             secondary: [
               {
-                name: 'avgFilter', label: '', min: filters.nests.avgFilter[0], max: filters.nests.avgFilter[1], perm: 'nests',
+                name: 'avgFilter', i18nKey: 'spawns_per_hour', label: '', min: filters.nests.avgFilter[0], max: filters.nests.avgFilter[1], perm: 'nests', step: avgSliderStep,
               },
             ],
           }; break

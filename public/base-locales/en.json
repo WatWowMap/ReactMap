@@ -489,6 +489,5 @@
   "filters_reset_title": "Reset filters",
   "loading": "Loading {{category}}",
   "loading_icons": "Fetching Icons",
-  "loading_invasions": "Fetching Invasions",
-  "slider_avgFilter": "Spawns/hr"
+  "loading_invasions": "Fetching Invasions"
 }
