@@ -482,5 +482,7 @@
   "gym_badges_subtitle": "Affiche les badges d'arène sur la carte et une liste dans la page profile.",
   "loading": "Chargement {{category}}",
   "loading_icons": "Récupération des Icônes",
-  "loading_invasions": "Récupération des Invasions"
+  "loading_invasions": "Récupération des Invasions",
+  "login_button": 12,
+  "join_button": 12
 }
