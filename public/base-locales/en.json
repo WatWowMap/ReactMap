@@ -494,6 +494,8 @@
   "click_to_scan": "Scan Here",
   "scan_confirmed_title": "Scan demand confirmed",
   "scan_confirmed": "Worker has been sent to location, result will soon appear on the map!",
+  "scan_loading_title": "Sending scan request",
+  "scan_loading": "Your scan request is being processed and sent to the system!",
   "scan_error_title": "Error",
   "scan_error": "There has been an error while processing the scan request...",
   "scan_outside_area": "This location is outside the boundaries of authorized areas"

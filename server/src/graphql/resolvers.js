@@ -283,6 +283,14 @@ module.exports = {
       }
       return {}
     },
+    scanner: (parent, args, { req }) => {
+      const perms = req.user ? req.user.perms : req.session.perms
+      const { category, method, data } = args
+      if (perms?.scanner?.includes(category)) {
+        return Fetch.scannerApi(category, method, data)
+      }
+      return {}
+    },
   },
   Mutation: {
     webhook: (parent, args, { req }) => {

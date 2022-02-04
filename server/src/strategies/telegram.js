@@ -46,6 +46,7 @@ const authHandler = async (req, profile, done) => {
 
   user.perms.areaRestrictions = Utility.areaPerms(groupInfo, 'telegram')
   user.perms.webhooks = Utility.webhookPerms(groupInfo, 'telegramGroups')
+  user.perms.scanner = Utility.scannerPerms(groupInfo, 'telegramGroups')
 
   try {
     await User.query()

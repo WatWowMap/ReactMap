@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 const express = require('express')
-const Axios = require('axios')
 const { default: center } = require('@turf/center')
 
 const authRouter = require('./authRouter')
@@ -52,68 +51,13 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
   }
 })
 
-rootRouter.post('/scanNext', async (req, res) => {
-  try {
-    if (req.headers['react-map-scanner-secret'] !== 'I need TurtIe\'s help on that') {
-      console.warn('[scanNext] Incorrect or missing API scanner secret')
-      return
-    }
-    if (!config.scanner.enableScanNext) {
-      res.status(200).json({ status: 'not activated' })
-    } else {
-      const scanData = req.body
-      const latRegex = /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)$/i
-      const lonRegex = /^[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/i
-      if (!scanData.scanNextLocation
-        || !(latRegex.test(scanData.scanNextLocation[0]) && lonRegex.test(scanData.scanNextLocation[1]))) {
-        res.status(200).json({ status: 'wrong coordinates' })
-      }
-      const params = {
-        scan_next: true,
-        instance_name: config.scanner.scanNextInstance,
-        lat: scanData.scanNextLocation[0].toFixed(5),
-        lon: scanData.scanNextLocation[1].toFixed(5),
-        coords: JSON.stringify(scanData.scanNextCoords.map(coord => (
-          { lat: parseFloat(coord[0].toFixed(5)), lon: parseFloat(coord[1].toFixed(5)) }))),
-      }
-      console.log(`[scanNext] Request to scan new location by ${scanData.username}${scanData.userId ? ` (${scanData.userId})` : ''} - type ${scanData.scanNextType}: ${scanData.scanNextLocation[0].toFixed(5)},${scanData.scanNextLocation[0].toFixed(5)}`)
-      Axios.get(`${config.scanner.apiEndpoint}/set_data`, {
-        params,
-        headers: {
-          Authorization: `Basic ${Buffer.from(`${config.scanner.apiUsername}:${config.scanner.apiPassword}`).toString('base64')}`,
-        },
-      }).then((response) => {
-        if (response.data.status === 'ok') {
-          console.log(`[scanNext] Request from ${scanData.username}${scanData.userId ? ` (${scanData.userId})` : ''} successful`)
-          res.status(200).json({ status: 'ok' })
-        } else {
-          console.log(`[scanNext] Request from ${scanData.username}${scanData.userId ? ` (${scanData.userId})` : ''} unsuccessful:`, response.data.statusText)
-          res.status(200).json({ status: 'error' })
-        }
-      }).catch((err) => {
-        if ([416, 404, 401].includes(err.response?.status) && err.response.statusText) {
-          console.warn('[scanNext] Scanner didn\'t accept the scan request:', err.response.statusText)
-        } else if (err.code === 'EHOSTUNREACH') {
-          console.warn('[scanNext] Scanner didn\'t accept the scan request: wrong API endpoint')
-        } else {
-          console.warn('[scanNext] Scanner didn\'t accept the scan request:', err)
-        }
-        res.status(200).json({ status: 'error' })
-      })
-    }
-  } catch (error) {
-    res.status(500).json({ error })
-    console.warn('[scanNext] Scanner error:', error)
-  }
-})
-
 rootRouter.get('/settings', async (req, res) => {
   try {
     if (config.authentication.alwaysEnabledPerms.length || !config.authMethods.length) {
       if (req.session.tutorial === undefined) {
         req.session.tutorial = !config.map.forceTutorial
       }
-      req.session.perms = { areaRestrictions: [], webhooks: [] }
+      req.session.perms = { areaRestrictions: [], webhooks: [], scanner: [] }
 
       config.authentication.alwaysEnabledPerms.forEach(perm => {
         if (config.authentication.perms[perm]) {
@@ -169,8 +113,8 @@ rootRouter.get('/settings', async (req, res) => {
         },
         manualAreas: config.manualAreas || {},
         icons: config.icons,
-        enableScanNext: config.scanner.enableScanNext,
-        scanNextAreaRestriction: config.scanner.scanNextAreaRestriction,
+        enableScanNext: config.scanner.scanNext.enabled,
+        scanNextAreaRestriction: config.scanner.scanNext.scanNextAreaRestriction,
       },
       available: {},
     }

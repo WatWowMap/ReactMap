@@ -25,9 +25,8 @@ export default function FloatingButtons({
   setUserProfile, scanNextMode, setScanNextMode,
 }) {
   const { t } = useTranslation()
-  const { map: { enableFloatingProfileButton } } = useStatic(state => state.config)
+  const { map: { enableFloatingProfileButton }, enableScanNext } = useStatic(state => state.config)
   const { loggedIn } = useStatic(state => state.auth)
-  const { enableScanNext } = useStatic(state => state.config)
   const map = useMap()
   const ref = useRef(null)
   const classes = useStyles()
@@ -80,7 +79,7 @@ export default function FloatingButtons({
           </Fab>
         </Grid>
       ) : null}
-      {(perms?.scanNext && enableScanNext) ? (
+      {(perms?.scanner?.includes('scanNext') && enableScanNext) ? (
         <Grid item>
           <Fab color={scanNextMode === 'setLocation' ? null : 'secondary'} size={fabSize} onClick={() => scanNextMode === 'setLocation' ? setScanNextMode(false) : setScanNextMode('setLocation')} title={t('scan_next')} disabled={Boolean(webhookMode)}>
             <TrackChanges fontSize={iconSize} />

@@ -360,12 +360,19 @@
     ]
   },
   "scanner": {
-    "apiEndpoint": "http://ip:port/api/",
-    "apiUsername": "username",
-    "apiPassword": "password",
-    "enableScanNext": false,
-    "scanNextInstance": "scanNext",
-    "scanNextAreaRestriction": []
+    "backendConfig": {
+      "platform": "rdm",
+      "apiEndpoint": "http://ip:port/api/",
+      "apiUsername": "username",
+      "apiPassword": "password"
+    },
+    "scanNext": {
+      "enabled": false,
+      "scanNextInstance": "scanNext",
+      "scanNextAreaRestriction": [],
+      "discordRoles": [],
+      "telegramGroups": []
+    }
   },
   "webhooks": [],
   "authentication": {
@@ -479,10 +486,6 @@
         "roles": []
       },
       "gymBadges": {
-        "enabled": true,
-        "roles": []
-      },
-      "scanNext": {
         "enabled": true,
         "roles": []
       }

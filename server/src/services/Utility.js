@@ -11,6 +11,7 @@ const webhook = require('./ui/webhook')
 const geocoder = require('./geocoder')
 const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')
+const scannerPerms = require('./functions/scannerPerms')
 const mergePerms = require('./functions/mergePerms')
 
 module.exports = class Utility {
@@ -64,6 +65,10 @@ module.exports = class Utility {
 
   static webhookPerms(roles, provider) {
     return webhookPerms(roles, provider)
+  }
+
+  static scannerPerms(roles, provider) {
+    return scannerPerms(roles, provider)
   }
 
   static mergePerms(existingPerms, incomingPerms = {}) {
