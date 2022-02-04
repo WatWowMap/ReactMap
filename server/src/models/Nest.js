@@ -18,7 +18,7 @@ module.exports = class Nest extends Model {
     const { areaRestrictions } = perms
     const pokemon = []
     Object.keys(args.filters).forEach(pkmn => {
-      if (!pkmn.startsWith('g')) {
+      if (!pkmn.startsWith('o')) {
         pokemon.push(pkmn.split('-')[0])
       }
     })
@@ -26,6 +26,7 @@ module.exports = class Nest extends Model {
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .whereIn('pokemon_id', pokemon)
+      .andWhereBetween('pokemon_avg', args.filters.onlyAvgFilter)
     if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions)
     }

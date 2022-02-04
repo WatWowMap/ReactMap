@@ -3,14 +3,22 @@ const { api: { pvp: { leagues } } } = require('../config')
 
 module.exports = function generateUi(filters, perms) {
   const ui = {}
-  const ignoredKeys = ['enabled', 'filter', 'showQuestSet', 'badge']
+  const ignoredKeys = ['enabled', 'filter', 'showQuestSet', 'badge', 'avgFilter']
 
   // builds the initial categories
   for (const [key, value] of Object.entries(filters)) {
     let sliders
     if (value) {
       switch (key) {
-        default: ui[key] = {}; break
+        case 'nests':
+          ui[key] = {}
+          sliders = {
+            secondary: [
+              {
+                name: 'avgFilter', label: '', min: filters.nests.avgFilter[0], max: filters.nests.avgFilter[1], perm: 'nests',
+              },
+            ],
+          }; break
         case 'pokemon':
           ui[key] = {}
           sliders = {
@@ -46,6 +54,7 @@ module.exports = function generateUi(filters, perms) {
         case 'devices':
           if (!ui.admin) ui.admin = {}
           ui.admin[key] = true; break
+        default: ui[key] = {}; break
       }
       // builds each subcategory
       for (const [subKey, subValue] of Object.entries(value)) {
