@@ -191,7 +191,7 @@ rootRouter.get('/settings', async (req, res) => {
           serverSettings.available[category].forEach(item => {
             if (!serverSettings.defaultFilters[category].filter[item] && !item.startsWith('132')) {
               serverSettings.defaultFilters[category].filter[item] = category === 'pokemon'
-                ? new PokemonFilter()
+                ? new PokemonFilter(config.defaultFilters.pokemon.allPokemon)
                 : new GenericFilter()
               if (!Number.isNaN(parseInt(item.charAt(0)))) {
                 const masterfileRef = masterfile.pokemon[item.split('-')[0]]

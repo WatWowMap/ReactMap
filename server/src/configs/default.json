@@ -278,6 +278,7 @@
     "pokemon": {
       "enabled": false,
       "legacyFilter": false,
+      "allPokemon": false,
       "globalValues": {
         "iv": [
           80,
