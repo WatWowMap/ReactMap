@@ -51,8 +51,6 @@ export default function ReactRouter() {
         data.masterfile.invasions = await Fetch.getInvasions(data.masterfile.invasions)
       }
     }
-    document.title = data.config.map.headerTitle
-
     setServerSettings({ ...data, Icons })
   }, [])
 
