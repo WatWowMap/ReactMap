@@ -24,7 +24,7 @@ if (process.env) {
     tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE || 0.1,
     release: VERSION,
     environment: isDevelopment ? 'development' : 'production',
-    debug: true,
+    debug: isDevelopment,
     beforeSend(event) {
       if (event?.exception?.values?.[0]?.stacktrace?.frames?.some(f => f.filename.includes('node_modules'))) {
         // do nothing for external libraries
