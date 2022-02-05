@@ -1,3 +1,4 @@
+/* eslint-disable import/no-dynamic-require */
 /* eslint-disable global-require */
 /* eslint-disable no-console */
 process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
@@ -46,9 +47,6 @@ config.authMethods = [...new Set(config.authentication.strategies
   })),
 ]
 
-// Auto check for scan overlay settings
-config.map.noScanAreaOverlay = Boolean(config.manualAreas.length)
-
 // initialize webhooks
 if (config.webhooks.length) {
   (async () => {
@@ -61,10 +59,18 @@ if (config.webhooks.length) {
   if (!config[opt].length) console.warn(`[${opt}] is empty, you need to add options to it or remove the empty array from your config.`)
 })
 
-// Check if an areas.json exists
-config.scanAreas = fs.existsSync(`${__dirname}/../configs/areas.json`)
-  ? require('../configs/areas.json')
+// Load each areas.json
+const loadScanPolygons = (fileName) => fs.existsSync(`${__dirname}/../configs/${fileName}`)
+  ? require(`../configs/${fileName}`)
   : { features: [] }
+
+// Check if an areas.json exists
+config.scanAreas = {
+  main: loadScanPolygons(config.map.geoJsonFileName),
+  ...Object.fromEntries(
+    config.multiDomains.map(d => [d.general?.geoJsonFileName ? d.domain : 'main', loadScanPolygons(d.general?.geoJsonFileName || config.map.geoJsonFileName)]),
+  ),
+}
 
 // Map manual areas
 config.manualAreas = Object.fromEntries(config.manualAreas.map(area => [area.name, area]))

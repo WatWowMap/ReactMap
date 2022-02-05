@@ -1,6 +1,7 @@
 @import "~react-leaflet-markercluster/dist/styles.min.css";
 @import "~leaflet.locatecontrol/dist/L.Control.Locate.min.css";
 @import "holiday.scss";
+@import "loading.scss";
 
 .leaflet-container {
   position: absolute;
@@ -19,10 +20,7 @@
 
 body {
   background-color: rgb(53, 53, 53);
-}
-
-.markercluster-map {
-  height: 90vh;
+  margin: 0;
 }
 
 .MuiDrawer-paper {
@@ -258,7 +256,7 @@ img {
   padding: 4px 3px 0 3px;
 }
 
-.weather-fancy {
+.weather-icon {
   background-color: rgba(255, 255, 255, 0.5);
   border: 2px solid rgb(41, 102, 122);
   border-radius: 48px;
@@ -267,7 +265,7 @@ img {
   height: 30px;
 }
 
-.weather-fancy > img {
+.weather-icon > .fancy {
   filter: invert(75%) sepia(100%) hue-rotate(151deg) saturate(3.1);
 }
 
@@ -369,4 +367,16 @@ img {
 
 input[type="time"]::-webkit-calendar-picker-indicator {
   filter: invert(100%);
+}
+
+.badge_3 {
+  color: #ffd700;
+}
+
+.badge_2 {
+  color: #c0c0c0;
+}
+
+.badge_1 {
+  color: #cd7f32;
 }

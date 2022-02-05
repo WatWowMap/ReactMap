@@ -10,7 +10,12 @@ export default new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
-          pokemon: {
+          badges: {
+            merge(existing, incoming) {
+              return incoming
+            },
+          },
+          devices: {
             merge(existing, incoming) {
               return incoming
             },
@@ -20,7 +25,29 @@ export default new ApolloClient({
               return incoming
             },
           },
+          nests: {
+            badges: {
+              merge(existing, incoming) {
+                return incoming
+              },
+            },
+          },
+          pokemon: {
+            merge(existing, incoming) {
+              return incoming
+            },
+          },
           pokestops: {
+            merge(existing, incoming) {
+              return incoming
+            },
+          },
+          portals: {
+            merge(existing, incoming) {
+              return incoming
+            },
+          },
+          spawnpoints: {
             merge(existing, incoming) {
               return incoming
             },

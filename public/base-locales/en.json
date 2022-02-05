@@ -475,5 +475,19 @@
   "pokemon_cell": "Pokemon's Location Could Vary",
   "timer_verified": "This Timer is Verified",
   "timer_unverified": "This Timer is Unverified",
-  "all": "All"
+  "all": "All",
+  "badge_0": "None",
+  "badge_1": "Bronze",
+  "badge_2": "Silver",
+  "badge_3": "Gold",
+  "gym_badge_menu": "Edit Gym Badge",
+  "gym_badges": "Gym Badges",
+  "gym_badge_diamonds": "Show Gym Badges",
+  "gym_badges_subtitle": "Displays Gym Badges on the map and a list in the profile page.",
+  "confirm_filters_reset": "Reset filters",
+  "filters_reset_text": "Are you sure you want to reset settings to default values? This cannot be undone!",
+  "filters_reset_title": "Reset filters",
+  "loading": "Loading {{category}}",
+  "loading_icons": "Fetching Icons",
+  "loading_invasions": "Fetching Invasions"
 }

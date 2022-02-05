@@ -3,7 +3,7 @@ import React, {
   Fragment, useState, useEffect,
 } from 'react'
 import {
-  Grid, Typography, Icon, Collapse, IconButton, Divider,
+  Grid, Typography, Icon, Collapse, IconButton, Divider, Dialog,
 } from '@material-ui/core'
 import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
 import { useTranslation, Trans } from 'react-i18next'
@@ -16,9 +16,10 @@ import Utility from '@services/Utility'
 import Title from './common/Title'
 import Dropdown from './common/Dropdown'
 import GenericTimer from './common/Timer'
+import BadgeSelection from '../layout/dialogs/BadgeSelection'
 
 export default function GymPopup({
-  gym, hasRaid, ts, Icons, hasHatched,
+  gym, hasRaid, ts, Icons, hasHatched, badge, setBadge,
 }) {
   const { t } = useTranslation()
   const { perms } = useStatic(state => state.auth)
@@ -49,6 +50,8 @@ export default function GymPopup({
         perms={perms}
         hasRaid={hasRaid}
         t={t}
+        badge={badge}
+        setBadge={setBadge}
       />
       {perms.gyms && (
         <Grid item xs={12}>
@@ -97,7 +100,7 @@ export default function GymPopup({
           </Collapse>
         </Grid>
       )}
-      <Footer
+      <GymFooter
         gym={gym}
         popups={popups}
         setPopups={setPopups}
@@ -116,7 +119,7 @@ export default function GymPopup({
 }
 
 const MenuActions = ({
-  gym, perms, hasRaid, t,
+  gym, perms, hasRaid, t, badge, setBadge,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -131,6 +134,7 @@ const MenuActions = ({
   const setFilters = useStore(state => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
+  const [badgeMenu, setBadgeMenu] = useState(false)
 
   const addWebhook = useWebhook({ category: 'quickGym', selectedWebhook })
   const {
@@ -148,6 +152,11 @@ const MenuActions = ({
   const handleHide = () => {
     setAnchorEl(null)
     setHideList([...hideList, id])
+  }
+
+  const handleCloseBadge = (open) => {
+    setAnchorEl(null)
+    setBadgeMenu(open)
   }
 
   const excludeTeam = () => {
@@ -206,6 +215,9 @@ const MenuActions = ({
 
   if (perms.gyms) {
     options.push({ name: 'exclude_team', action: excludeTeam })
+    if (perms.gymBadges) {
+      options.push({ name: 'gym_badge_menu', action: () => handleCloseBadge(true) })
+    }
   }
   if (perms.raids && hasRaid) {
     options.push(
@@ -238,6 +250,14 @@ const MenuActions = ({
         handleClose={handleClose}
         options={options}
       />
+      <Dialog open={badgeMenu}>
+        <BadgeSelection
+          gym={gym}
+          setBadgeMenu={handleCloseBadge}
+          badge={badge}
+          setBadge={setBadge}
+        />
+      </Dialog>
     </Grid>
   )
 }
@@ -282,10 +302,10 @@ const RaidImage = ({
     : Icons.getEggs(raid_level, raid_battle_timestamp < ts, raid_is_exclusive)
 
   const getRaidTypes = (id, form) => {
-    if (pokemon[id].forms[form] && pokemon[id].forms[form].types) {
+    if (pokemon[id].forms?.[form]?.types) {
       return pokemon[id].forms[form].types
     }
-    return pokemon[id].types
+    return pokemon[id]?.types || []
   }
 
   return (
@@ -507,7 +527,7 @@ const Timer = ({
   ) : null
 }
 
-const Footer = ({
+const GymFooter = ({
   gym, popups, setPopups, hasRaid, perms, Icons,
 }) => {
   const classes = useStyles()

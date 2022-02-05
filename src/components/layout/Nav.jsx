@@ -18,6 +18,7 @@ import Search from './dialogs/Search'
 import Motd from './dialogs/Motd'
 import DonorPage from './dialogs/DonorPage'
 import Feedback from './dialogs/Feedback'
+import ResetFilters from './dialogs/ResetFilters'
 
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
@@ -38,6 +39,7 @@ export default function Nav({
   const setUserProfile = useStatic(state => state.setUserProfile)
   const feedback = useStatic(state => state.feedback)
   const setFeedback = useStatic(state => state.setFeedback)
+  const resetFilters = useStatic(state => state.resetFilters)
 
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
@@ -121,29 +123,31 @@ export default function Nav({
           settings={settings}
           donationPage={donationPage}
           setDonorPage={setDonorPage}
+          setUserProfile={setUserProfile}
         />
       )}
-      {userProfile ? (
-        <Dialog
-          open={userProfile}
-          fullScreen={isMobile}
-          fullWidth={!isMobile}
-        >
-          <UserProfile setUserProfile={setUserProfile} />
-        </Dialog>
-      ) : (
-        <Dialog
-          open={tutorial && enableTutorial}
-          fullScreen={isMobile}
-          maxWidth="xs"
-        >
-          <Tutorial
-            setUserProfile={setUserProfile}
-            setTutorial={setTutorial}
-            toggleDialog={toggleDialog}
-          />
-        </Dialog>
-      )}
+      <Dialog
+        open={userProfile}
+        fullScreen={isMobile}
+        fullWidth={!isMobile}
+      >
+        <UserProfile
+          setUserProfile={setUserProfile}
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
+      </Dialog>
+      <Dialog
+        open={tutorial && enableTutorial}
+        fullScreen={isMobile}
+        maxWidth="xs"
+      >
+        <Tutorial
+          setUserProfile={setUserProfile}
+          setTutorial={setTutorial}
+          toggleDialog={toggleDialog}
+        />
+      </Dialog>
       <Dialog
         fullWidth={!isMobile}
         fullScreen={isMobile}
@@ -206,6 +210,12 @@ export default function Nav({
         maxWidth={isMobile ? 'sm' : 'xs'}
       >
         <Feedback link={config.feedbackLink} setFeedback={setFeedback} />
+      </Dialog>
+      <Dialog
+        open={resetFilters}
+        maxWidth={isMobile ? 'sm' : 'xs'}
+      >
+        <ResetFilters />
       </Dialog>
       <Snackbar
         open={Boolean(webhookAlert.open)}

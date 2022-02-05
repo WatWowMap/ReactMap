@@ -19,6 +19,7 @@ module.exports = function clientOptions(perms) {
       showArBadge: { type: 'bool', perm: ['gyms'] },
       raidLevelBadges: { type: 'bool', perm: ['raids'] },
       raidsOr: { type: 'bool', perm: ['raids'] },
+      gymBadgeDiamonds: { type: 'bool', perm: ['gymBadges'] },
     },
     pokestops: {
       clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },

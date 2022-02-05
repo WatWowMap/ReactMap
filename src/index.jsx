@@ -24,6 +24,14 @@ if (process.env) {
     tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE || 0.1,
     release: VERSION,
     environment: isDevelopment ? 'development' : 'production',
+    debug: true,
+    beforeSend(event) {
+      if (event?.exception?.values?.[0]?.stacktrace?.frames?.some(f => f.filename.includes('node_modules'))) {
+        // do nothing for external libraries
+        return
+      }
+      return event
+    },
   })
   // eslint-disable-next-line no-console
   console.log('ReactMap Version:', VERSION)

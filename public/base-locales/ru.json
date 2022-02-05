@@ -394,8 +394,8 @@
   "non_registered_human_desc": "Вы не можете быть зарегистрированы в {{webhook}}\n\nИли сервер в настоящее время недоступен",
   "page": "Страница {{page}}",
   "navigation_controls": "Элементы управления навигацией",
-  "navigation_controls_react": "Реагировать",
-  "navigation_controls_leaflet": "Листовка",
+  "navigation_controls_react": "React",
+  "navigation_controls_leaflet": "Leaflet",
   "exclusive": "Эксклюзивный",
   "all_moves": "Все ходы",
   "move": "Переехать",
@@ -435,5 +435,8 @@
   "timer_verified": "Этот таймер проверен",
   "timer_unverified": "Этот таймер не проверен",
   "all": "Все",
-  "both": "Оба"
+  "both": "Оба",
+  "loading_icons": "Получение иконок",
+  "loading_invasions": "Получение вторжений",
+  "loading": "Загрузка {{category}}"
 }

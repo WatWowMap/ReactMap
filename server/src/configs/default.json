@@ -1,6 +1,7 @@
 {
   "interface": "0.0.0.0",
   "port": 8080,
+  "packageSource": "git",
   "devOptions": {
     "enabled": false,
     "graphiql": false,
@@ -20,6 +21,16 @@
       "quests": true,
       "raids": true,
       "nests": false
+    },
+    "queryLimits": {
+      "pokemon": 10000,
+      "pokemonPvp": 25000,
+      "pokestops": 5000,
+      "gyms": 5000,
+      "portals": 5000,
+      "spawnpoints": 10000,
+      "nests": 2500,
+      "scanCells": 5000
     },
     "pvp": {
       "leagues": [
@@ -60,7 +71,8 @@
       "interactionRangeZoom": 15,
       "scanAreasZoom": 12,
       "scanCellsZoom": 13,
-      "submissionZoom": 15
+      "submissionZoom": 15,
+      "geoJsonFileName": "areas.json"
     },
     "localeSelection": [
       "en",
@@ -95,10 +107,12 @@
       "invasionCacheHrs": 1,
       "questMessage": "",
       "navigationControls": "react",
+      "enableFloatingProfileButton": false,
       "forceTutorial": true,
       "enableTutorial": true,
       "enableUserProfile": true,
-      "enableQuestSetSelector": false
+      "enableQuestSetSelector": false,
+      "noScanAreaOverlay": false
     },
     "theme": {
       "style": "dark",
@@ -178,7 +192,8 @@
       "showExBadge": false,
       "showArBadge": false,
       "raidLevelBadges": false,
-      "raidsOr": true
+      "raidsOr": true,
+      "gymBadgeDiamonds": true
     },
     "pokestops": {
       "clustering": true,
@@ -239,13 +254,16 @@
       "inBattle": false,
       "raids": true,
       "eggs": true,
-      "pokemon": true
+      "pokemon": true,
+      "gymBadges": false
     },
     "nests": {
       "enabled": false,
       "polygons": false,
       "pokemon": false,
-      "allPokemon": true
+      "allPokemon": true,
+      "avgFilter": [0, 100],
+      "avgSliderStep": 1
     },
     "pokestops": {
       "enabled": false,
@@ -262,6 +280,7 @@
     "pokemon": {
       "enabled": false,
       "legacyFilter": false,
+      "allPokemon": false,
       "globalValues": {
         "iv": [
           80,
@@ -311,8 +330,10 @@
   "database": {
     "settings": {
       "userTableName": "users",
+      "gymBadgeTableName": "gymBadges",
       "sessionTableName": "session",
       "migrationTableName": "knex_migrations",
+      "joinGymBadgeTable": false,
       "hideOldQuests": false,
       "maxConnections": 10
     },
@@ -448,6 +469,10 @@
         "roles": []
       },
       "donor": {
+        "enabled": true,
+        "roles": []
+      },
+      "gymBadges": {
         "enabled": true,
         "roles": []
       }

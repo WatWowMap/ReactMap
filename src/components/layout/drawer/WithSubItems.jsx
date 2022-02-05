@@ -1,23 +1,24 @@
 import React from 'react'
 import {
-  Grid, Typography, Switch, ButtonGroup, Button,
+  Grid, Typography, Switch,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+import MultiSelector from './MultiSelector'
+import SliderTile from '../dialogs/filters/SliderTile'
 
 export default function WithSubItems({
-  category, filters, setFilters, subItem, noScanAreaOverlay, enableQuestSetSelector,
+  category, filters, setFilters, subItem, noScanAreaOverlay, enableQuestSetSelector, data,
 }) {
   const { t } = useTranslation()
-  let filterCategory
 
   if (category === 'scanAreas' && noScanAreaOverlay) {
     return null
   }
 
-  if (category === 'wayfarer' || category === 'admin') {
-    filterCategory = (
+  const filterCategory = category === 'wayfarer' || category === 'admin'
+    ? (
       <Switch
         checked={filters[subItem].enabled}
         onChange={() => {
@@ -31,8 +32,7 @@ export default function WithSubItems({
         }}
       />
     )
-  } else {
-    filterCategory = (
+    : (
       <Switch
         checked={filters[category][subItem]}
         onChange={() => {
@@ -46,6 +46,23 @@ export default function WithSubItems({
         }}
       />
     )
+
+  if (category === 'nests' && subItem === 'sliders') {
+    return (
+      <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <SliderTile
+          filterSlide={data.secondary[0]}
+          handleChange={(_, values) => setFilters({
+            ...filters,
+            [category]: {
+              ...filters[category],
+              avgFilter: values,
+            },
+          })}
+          filterValues={filters[category]}
+        />
+      </Grid>
+    )
   }
 
   return (
@@ -56,28 +73,26 @@ export default function WithSubItems({
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         {filterCategory}
       </Grid>
-      {enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters.pokestops.quests === true && (
+      {enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters[category].quests === true && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <ButtonGroup
-            size="small"
-          >
-            {['with_ar', 'both', 'without_ar'].map(questSet => (
-              <Button
-                key={questSet}
-                onClick={() => setFilters({
-                  ...filters,
-                  [category]: {
-                    ...filters[category],
-                    showQuestSet: questSet,
-                  },
-                })}
-                color={questSet === filters[category].showQuestSet ? 'primary' : 'secondary'}
-                variant={questSet === filters[category].showQuestSet ? 'contained' : 'outlined'}
-              >
-                {t(questSet)}
-              </Button>
-            ))}
-          </ButtonGroup>
+          <MultiSelector
+            filters={filters}
+            setFilters={setFilters}
+            category={category}
+            filterKey="showQuestSet"
+            items={['with_ar', 'both', 'without_ar']}
+          />
+        </Grid>
+      )}
+      {category === 'gyms' && subItem === 'gymBadges' && filters[category].gymBadges === true && (
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <MultiSelector
+            filters={filters}
+            setFilters={setFilters}
+            category={category}
+            filterKey="badge"
+            items={['all', 'badge_1', 'badge_2', 'badge_3']}
+          />
         </Grid>
       )}
     </>

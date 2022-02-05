@@ -95,8 +95,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
             Icons={Icons}
           />
         ) : (
-          Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(each => {
-            const [category, value] = each
+          Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(([category, value]) => {
             let enabled = false
 
             switch (category) {
@@ -110,7 +109,8 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
                   || (filters[category].raids && value.raids)
                   || (filters[category].exEligible && value.exEligible)
                   || (filters[category].inBattle && value.inBattle)
-                  || (filters[category].arEligible && value.arEligible))
+                  || (filters[category].arEligible && value.arEligible)
+                  || (filters[category].gymBadges && value.gymBadges))
                   && !webhookMode) {
                   enabled = true
                 } break

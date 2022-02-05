@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.0.14",
+  "version": "1.0.16",
   "description": "React based frontend map.",
   "main": "index.js",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -16,7 +16,7 @@
     "create-locales": "node server/scripts/createLocales.js",
     "missing-locales": "node server/scripts/createLocales.js --missing",
     "config-migrate": "node server/scripts/configMigration.js",
-    "console": "node --experimental-repl-await ./server/src/console.js",
+    "console": "node --experimental-repl-await ./server/scripts/console.js",
     "migrate:make": "knex --knexfile server/knexfile.cjs migrate:make",
     "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
     "migrate:rollback": "knex --knexfile server/knexfile.cjs migrate:rollback"
@@ -95,7 +95,7 @@
     "lru-cache": "^6.0.0",
     "morgan": "^1.10.0",
     "mysql2": "^2.3.3",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "2",
     "node-geocoder": "^3.27.0",
     "nodes2ts": "^2.0.0",
     "objection": "^3.0.0",
