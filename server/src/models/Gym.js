@@ -208,6 +208,7 @@ module.exports = class Gym extends Model {
           gym.raid_battle_timestamp = null
           gym.raid_pokemon_id = null
           gym.raid_level = null
+          gym.in_battle = null
         }
         if (onlyRaids && !gym.raid_pokemon_id && (args.filters[`e${gym.raid_level}`] || args.filters[`r${gym.raid_level}`])) {
           filteredResults.push(gym)
