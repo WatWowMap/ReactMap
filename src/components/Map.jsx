@@ -7,7 +7,8 @@ import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
-import ScanNext from './layout/dialogs/ScanNext'
+import ScanNext from './layout/dialogs/scanner/ScanNext'
+import ScanZone from './layout/dialogs/scanner/ScanZone'
 
 const userSettingsCategory = category => {
   switch (category) {
@@ -31,7 +32,9 @@ const getTileServer = (tileServers, settings, isNight) => {
   return tileServers[settings.tileServers] || fallbackTs
 }
 
-export default function Map({ serverSettings: { config: { map: config, tileServers, scannerType, scanNextAreaRestriction },
+export default function Map({ serverSettings:
+  { config: { map: config, tileServers,
+    scanner: { scannerType, scanNextAreaRestriction, scanZoneMaxSize, scanZoneAreaRestriction } },
   Icons, webhooks }, params }) {
   Utility.analytics(window.location.pathname)
 
@@ -54,6 +57,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
 
   const [webhookMode, setWebhookMode] = useState(false)
   const [scanNextMode, setScanNextMode] = useState(false)
+  const [scanZoneMode, setScanZoneMode] = useState(false)
   const [manualParams, setManualParams] = useState(params)
   const [lc] = useState(L.control.locate({
     position: 'bottomright',
@@ -180,6 +184,16 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
           scanNextAreaRestriction={scanNextAreaRestriction}
         />
       )}
+      {scanZoneMode && (
+        <ScanZone
+          map={map}
+          scannerType={scannerType}
+          scanZoneMode={scanZoneMode}
+          setScanZoneMode={setScanZoneMode}
+          scanZoneMaxSize={scanZoneMaxSize}
+          scanZoneAreaRestriction={scanZoneAreaRestriction}
+        />
+      )}
       <Nav
         map={map}
         setManualParams={setManualParams}
@@ -190,6 +204,8 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         webhooks={webhooks}
         scanNextMode={scanNextMode}
         setScanNextMode={setScanNextMode}
+        scanZoneMode={scanZoneMode}
+        setScanZoneMode={setScanZoneMode}
         settings={settings}
       />
     </>

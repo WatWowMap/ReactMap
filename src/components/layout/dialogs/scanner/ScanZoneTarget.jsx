@@ -2,7 +2,7 @@ import React, {
   useState, useRef, useMemo, useEffect,
 } from 'react'
 import {
-  Grid, Button, ButtonGroup, Typography,
+  Grid, Button, Box, Slider, Typography,
 } from '@material-ui/core'
 import { point, polygon } from '@turf/helpers'
 import destination from '@turf/destination'
@@ -10,33 +10,44 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
-export default function ScanNextTargetMarker({
-  map, scannerType, setScanNextMode, scanNextLocation, setScanNextLocation, scanNextCoords, setScanNextCoords,
-  scanNextType, setScanNextType, scanNextAreaRestriction, scanAreas,
+export default function ScanZoneTargetMarker({
+  map, scannerType, setScanZoneMode, scanZoneLocation, setScanZoneLocation, scanZoneCoords,
+  setScanZoneCoords, scanZoneSize, setScanZoneSize, scanZoneMaxSize, scanZoneAreaRestriction, scanAreas,
 }) {
-  const [position, setPosition] = useState(scanNextLocation)
+  const [position, setPosition] = useState(scanZoneLocation)
   const radiusPokemon = 70
-  const radiusGym = 750
-  const calcScanNextCoords = (center, type) => {
-    const coords = [center]
-    if (type === 'S') return coords
-    const start = point([center[1], center[0]])
-    const distance = {
-      M: radiusPokemon * 1.732,
-      XL: radiusGym * 1.732,
+  const calcScanZoneCoords = (center, size) => {
+    let coords = [center]
+    let currentPoint = point([center[1], center[0]])
+    const stepSize = radiusPokemon * 2 * Math.cos(30 * (Math.PI / 180))
+    const bearings = {
+      1: 30,
+      2: 90,
+      3: 150,
+      4: 210,
+      5: 270,
+      6: 330,
     }
     const options = { units: 'kilometers' }
-    return coords.concat([0, 60, 120, 180, 240, 300].map(bearing => {
-      const [lon, lat] = destination(start, distance[type] / 1000, bearing, options).geometry.coordinates
-      return [lat, lon]
-    }))
+    for (let i = 1; i < size + 1; i++) {
+      let quadrant = 1
+      let step = 1
+      while (step < 6 * i + 1) {
+        currentPoint = destination(currentPoint, stepSize / 1000, step === 1 ? 330 : bearings[quadrant], options)
+        coords = coords.concat([[currentPoint.geometry.coordinates[1], currentPoint.geometry.coordinates[0]]])
+        quadrant = Math.floor(step / i) + 1
+        step += 1
+      }
+    }
+    return coords
   }
+
   const checkAreaValidity = (center) => {
-    if (!scanNextAreaRestriction?.length || !scanAreas?.length) return true
+    if (!scanZoneAreaRestriction?.length || !scanAreas?.length) return true
     let isValid = false
-    if (scanNextAreaRestriction?.length && scanAreas?.length) {
+    if (scanZoneAreaRestriction?.length && scanAreas?.length) {
       const testPoint = point([center[1], center[0]])
-      scanNextAreaRestriction.map(area => {
+      scanZoneAreaRestriction.map(area => {
         if (scanAreas.some(scanArea => scanArea.properties.name === area
           && booleanPointInPolygon(testPoint, polygon(scanArea.geometry.coordinates)))) {
           isValid = true
@@ -58,8 +69,8 @@ export default function ScanNextTargetMarker({
           const { lat, lng } = marker.getLatLng()
           map.flyTo([lat, lng])
           setPosition([lat, lng])
-          setScanNextLocation([lat, lng])
-          setScanNextCoords(calcScanNextCoords([lat, lng], scanNextType))
+          setScanZoneLocation([lat, lng])
+          setScanZoneCoords(calcScanZoneCoords([lat, lng], scanZoneSize))
           const popup = scanPopupRef.current
           if (popup) {
             popup.openOn(map)
@@ -67,7 +78,7 @@ export default function ScanNextTargetMarker({
         }
       },
     }),
-    [position, scanNextLocation, scanNextType],
+    [position, scanZoneLocation, scanZoneSize],
   )
 
   useEffect(() => {
@@ -77,7 +88,16 @@ export default function ScanNextTargetMarker({
     }
   }, [])
 
+  const handleChange = (event, newSize) => {
+    setScanZoneSize(newSize)
+    setScanZoneCoords(calcScanZoneCoords(position, newSize))
+  }
+
   const isInAllowedArea = checkAreaValidity(position)
+
+  if (scanZoneCoords.length === 1) {
+    setScanZoneCoords(calcScanZoneCoords(scanZoneLocation, 1))
+  }
 
   return (
     <>
@@ -97,36 +117,31 @@ export default function ScanNextTargetMarker({
           >
             <Grid item>
               <Typography variant="subtitle2" align="center">
-                {t('drag_and_drop')}
+                {t('scan_zone_choose')}
               </Typography>
             </Grid>
             {scannerType === 'rdm' && (
-              <Grid item xs={12} style={{ textAlign: 'center' }}>
-                <ButtonGroup
-                  size="small"
-                >
-                  {['S', 'M', 'XL'].map(item => (
-                    <Button
-                      key={item}
-                      onClick={() => {
-                        setScanNextType(item)
-                        setScanNextCoords(calcScanNextCoords(position, item))
-                      }}
-                      color={item === scanNextType ? 'primary' : 'secondary'}
-                      variant={item === scanNextType ? 'contained' : 'outlined'}
-                    >
-                      {t(item)}
-                    </Button>
-                  ))}
-                </ButtonGroup>
+              <Grid item xs={12}>
+                <Box sx={{ minWidth: 150, maxWidth: '100%' }}>
+                  <Slider
+                    xs={12}
+                    name="Type"
+                    min={1}
+                    max={scanZoneMaxSize}
+                    step={1}
+                    value={scanZoneSize}
+                    onChange={handleChange}
+                    valueLabelDisplay="auto"
+                  />
+                </Box>
               </Grid>
             )}
             <Grid item>
               <Button
                 color="secondary"
                 variant="contained"
-                disabled={scanNextAreaRestriction?.length && !isInAllowedArea}
-                onClick={() => setScanNextMode('sendCoords')}
+                disabled={scanZoneAreaRestriction?.length && !isInAllowedArea}
+                onClick={() => setScanZoneMode('sendCoords')}
               >
                 {t('click_to_scan')}
               </Button>
@@ -140,7 +155,7 @@ export default function ScanNextTargetMarker({
               <Button
                 align="left"
                 size="small"
-                onClick={() => setScanNextMode(false)}
+                onClick={() => setScanZoneMode(false)}
               >
                 {t('cancel')}
               </Button>
@@ -148,14 +163,9 @@ export default function ScanNextTargetMarker({
           </Grid>
         </Popup>
       </Marker>
-      {scanNextCoords.map(coords => (
+      {scanZoneCoords.map(coords => (
         <Circle radius={radiusPokemon} center={[coords[0], coords[1]]} fillOpacity={0.5} pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)' }} />
       ))}
-      {scanNextType === 'M'
-        ? <Circle radius={radiusGym + radiusPokemon} center={[scanNextCoords[0][0], scanNextCoords[0][1]]} fillOpacity={0.1} pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)', fillColor: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)' }} />
-        : scanNextCoords.map(coords => (
-          <Circle radius={radiusGym} center={[coords[0], coords[1]]} fillOpacity={0.1} pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)', fillColor: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)' }} />
-        ))}
     </>
   )
 }

@@ -374,6 +374,14 @@
       "scanNextAreaRestriction": [],
       "discordRoles": [],
       "telegramGroups": []
+    },
+    "scanZone": {
+      "enabled": false,
+      "scanZoneMaxSize": 20,
+      "scanZoneInstance": "scanZone",
+      "scanZoneAreaRestriction": [],
+      "discordRoles": [],
+      "telegramGroups": []
     }
   },
   "webhooks": [],

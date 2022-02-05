@@ -23,6 +23,15 @@ module.exports = async function scannerApi(category, method, data = null) {
           options: { method, headers },
         })
       } break
+      case 'scanZone': {
+        console.log(`[scannerApi] Request to scan new zone by ${data.username}${data.userId ? ` (${data.userId})` : ''} - size ${data.scanZoneSize}: ${data.scanZoneLocation[0].toFixed(5)},${data.scanZoneLocation[1].toFixed(5)}`)
+        const coords = JSON.stringify(data.scanZoneCoords.map(coord => (
+          { lat: parseFloat(coord[0].toFixed(5)), lon: parseFloat(coord[1].toFixed(5)) })))
+        Object.assign(payloadObj, {
+          url: `${config.scanner.backendConfig.apiEndpoint}/set_data?scan_next=true&instance_name=${encodeURIComponent(config.scanner.scanZone.scanZoneInstance)}&coords=${coords}`,
+          options: { method, headers },
+        })
+      } break
       default:
         console.warn('[scannerApi] Api call without category'); break
     }
@@ -43,13 +52,13 @@ module.exports = async function scannerApi(category, method, data = null) {
         console.log('[scannerApi] Wrong credentials - check your scanner API settings in config')
         return { status: 'error', message: 'scanner_wrong_credentials' }
       case 404:
-        console.log(`[scannerApi] Error: instance ${config.scanner.scanNext.scanNextInstance} does not exist`)
+        console.log(`[scannerApi] Error: instance ${config.scanner[category][`${category}Instance`]} does not exist`)
         return { status: 'error', message: 'scanner_no_instance' }
       case 416:
-        console.log(`[scannerApi] Error: instance ${config.scanner.scanNext.scanNextInstance} has no device assigned`)
+        console.log(`[scannerApi] Error: instance ${config.scanner[category][`${category}Instance`]} has no device assigned`)
         return { status: 'error', message: 'scanner_no_device_assigned' }
       case 500:
-        console.log(`[scannerApi] Error: device ${config.scanner.scanNext.scanNextDevice} does not exist`)
+        console.log(`[scannerApi] Error: device ${config.scanner[category][`${category}Device`]} does not exist`)
         return { status: 'error', message: 'scanner_no_device' }
       default:
         return { status: 'error', message: 'scanner_error' }
