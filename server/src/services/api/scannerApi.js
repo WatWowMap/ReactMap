@@ -18,7 +18,7 @@ module.exports = async function scannerApi(category, method, data = null) {
           : JSON.stringify(data.scanNextCoords.map(coord => (
             { lat: parseFloat(coord[0].toFixed(5)), lon: parseFloat(coord[1].toFixed(5)) })))
         Object.assign(payloadObj, {
-          url: config.scanner.backendConfig.platform === 'mad' ? `${config.scanner.backendConfig.apiEndpoint}/send_gps?origin=${encodeURIComponent(config.scanner.scanNext.scanNextDevice)}&coords=${coords}&sleeptime=0`
+          url: config.scanner.backendConfig.platform === 'mad' ? `${config.scanner.backendConfig.apiEndpoint}/send_gps?origin=${encodeURIComponent(config.scanner.scanNext.scanNextDevice)}&coords=${coords}&sleeptime=${config.scanner.scanNext.scanNextSleeptime}`
             : `${config.scanner.backendConfig.apiEndpoint}/set_data?scan_next=true&instance_name=${encodeURIComponent(config.scanner.scanNext.scanNextInstance)}&coords=${coords}`,
           options: { method, headers },
         })

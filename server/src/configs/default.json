@@ -370,6 +370,7 @@
       "enabled": false,
       "scanNextInstance": "scanNext",
       "scanNextDevice": "Device01",
+      "scanNextSleeptime": 5,
       "scanNextAreaRestriction": [],
       "discordRoles": [],
       "telegramGroups": []
