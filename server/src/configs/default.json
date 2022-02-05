@@ -361,7 +361,7 @@
   },
   "scanner": {
     "backendConfig": {
-      "platform": "rdm",
+      "platform": "rdm/mad",
       "apiEndpoint": "http://ip:port/api/",
       "apiUsername": "username",
       "apiPassword": "password"
@@ -369,6 +369,7 @@
     "scanNext": {
       "enabled": false,
       "scanNextInstance": "scanNext",
+      "scanNextDevice": "Device01",
       "scanNextAreaRestriction": [],
       "discordRoles": [],
       "telegramGroups": []

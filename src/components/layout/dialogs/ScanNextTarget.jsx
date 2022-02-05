@@ -11,7 +11,7 @@ import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
 export default function ScanNextTargetMarker({
-  map, setScanNextMode, scanNextLocation, setScanNextLocation, scanNextCoords, setScanNextCoords,
+  map, scannerType, setScanNextMode, scanNextLocation, setScanNextLocation, scanNextCoords, setScanNextCoords,
   scanNextType, setScanNextType, scanNextAreaRestriction, scanAreas,
 }) {
   const [position, setPosition] = useState(scanNextLocation)
@@ -100,25 +100,27 @@ export default function ScanNextTargetMarker({
                 {t('drag_and_drop')}
               </Typography>
             </Grid>
-            <Grid item xs={12} style={{ textAlign: 'center' }}>
-              <ButtonGroup
-                size="small"
-              >
-                {['S', 'M', 'XL'].map(item => (
-                  <Button
-                    key={item}
-                    onClick={() => {
-                      setScanNextType(item)
-                      setScanNextCoords(calcScanNextCoords(position, item))
-                    }}
-                    color={item === scanNextType ? 'primary' : 'secondary'}
-                    variant={item === scanNextType ? 'contained' : 'outlined'}
-                  >
-                    {t(item)}
-                  </Button>
-                ))}
-              </ButtonGroup>
-            </Grid>
+            {scannerType === 'rdm' && (
+              <Grid item xs={12} style={{ textAlign: 'center' }}>
+                <ButtonGroup
+                  size="small"
+                >
+                  {['S', 'M', 'XL'].map(item => (
+                    <Button
+                      key={item}
+                      onClick={() => {
+                        setScanNextType(item)
+                        setScanNextCoords(calcScanNextCoords(position, item))
+                      }}
+                      color={item === scanNextType ? 'primary' : 'secondary'}
+                      variant={item === scanNextType ? 'contained' : 'outlined'}
+                    >
+                      {t(item)}
+                    </Button>
+                  ))}
+                </ButtonGroup>
+              </Grid>
+            )}
             <Grid item>
               <Button
                 color="secondary"

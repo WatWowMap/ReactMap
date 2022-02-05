@@ -7,6 +7,7 @@ module.exports = async function fetchJson(url, options = undefined, log = false)
     if (!response.ok) {
       throw new Error(`${response.status} (${response.statusText})`)
     }
+
     return response.json()
   } catch (e) {
     if (log) {

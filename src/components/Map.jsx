@@ -31,7 +31,7 @@ const getTileServer = (tileServers, settings, isNight) => {
   return tileServers[settings.tileServers] || fallbackTs
 }
 
-export default function Map({ serverSettings: { config: { map: config, tileServers, scanNextAreaRestriction },
+export default function Map({ serverSettings: { config: { map: config, tileServers, scannerType, scanNextAreaRestriction },
   Icons, webhooks }, params }) {
   Utility.analytics(window.location.pathname)
 
@@ -174,6 +174,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
       {scanNextMode && (
         <ScanNext
           map={map}
+          scannerType={scannerType}
           scanNextMode={scanNextMode}
           setScanNextMode={setScanNextMode}
           scanNextAreaRestriction={scanNextAreaRestriction}

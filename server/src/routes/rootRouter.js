@@ -113,6 +113,7 @@ rootRouter.get('/settings', async (req, res) => {
         },
         manualAreas: config.manualAreas || {},
         icons: config.icons,
+        scannerType: config.scanner.backendConfig.platform,
         enableScanNext: config.scanner.scanNext.enabled,
         scanNextAreaRestriction: config.scanner.scanNext.scanNextAreaRestriction,
       },
@@ -124,7 +125,7 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.loggedIn = req.user
 
       // keys that are being sent to the frontend but are not options
-      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons', 'enableScanNext', 'scanNextAreaRestriction']
+      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons', 'scannerType', 'enableScanNext', 'scanNextAreaRestriction']
 
       Object.keys(serverSettings.config).forEach(setting => {
         try {
