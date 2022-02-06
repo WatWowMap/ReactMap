@@ -2,7 +2,7 @@ import React, {
   useState, useRef, useMemo, useEffect,
 } from 'react'
 import {
-  Grid, Button, Box, Slider, Typography,
+  Grid, Button, Box, Slider, Typography, Divider,
 } from '@material-ui/core'
 import { point, polygon } from '@turf/helpers'
 import destination from '@turf/destination'
@@ -12,14 +12,16 @@ import { useTranslation } from 'react-i18next'
 
 export default function ScanZoneTargetMarker({
   map, scannerType, setScanZoneMode, scanZoneLocation, setScanZoneLocation, scanZoneCoords,
-  setScanZoneCoords, scanZoneSize, setScanZoneSize, scanZoneMaxSize, scanZoneAreaRestriction, scanAreas,
+  setScanZoneCoords, scanZoneSize, setScanZoneSize, scanZoneMaxSize, advancedScanZoneOptions,
+  scanZoneRadius, scanZoneSpacing, scanZoneAreaRestriction, scanAreas,
 }) {
   const [position, setPosition] = useState(scanZoneLocation)
-  const radiusPokemon = 70
-  const calcScanZoneCoords = (center, size) => {
+  const [spacing, setSpacing] = useState(scanZoneSpacing)
+  const [radius, setRadius] = useState(scanZoneRadius.pokemon)
+  const calcScanZoneCoords = (center) => {
     let coords = [center]
     let currentPoint = point([center[1], center[0]])
-    const stepSize = radiusPokemon * 2 * Math.cos(30 * (Math.PI / 180))
+    const distance = radius * 2 * Math.cos(30 * (Math.PI / 180))
     const bearings = {
       1: 30,
       2: 90,
@@ -29,11 +31,11 @@ export default function ScanZoneTargetMarker({
       6: 330,
     }
     const options = { units: 'kilometers' }
-    for (let i = 1; i < size + 1; i++) {
+    for (let i = 1; i < scanZoneSize + 1; i++) {
       let quadrant = 1
       let step = 1
       while (step < 6 * i + 1) {
-        currentPoint = destination(currentPoint, stepSize / 1000, step === 1 ? 330 : bearings[quadrant], options)
+        currentPoint = destination(currentPoint, (distance * spacing) / 1000, step === 1 ? 330 : bearings[quadrant], options)
         coords = coords.concat([[currentPoint.geometry.coordinates[1], currentPoint.geometry.coordinates[0]]])
         quadrant = Math.floor(step / i) + 1
         step += 1
@@ -70,7 +72,7 @@ export default function ScanZoneTargetMarker({
           map.flyTo([lat, lng])
           setPosition([lat, lng])
           setScanZoneLocation([lat, lng])
-          setScanZoneCoords(calcScanZoneCoords([lat, lng], scanZoneSize))
+          setScanZoneCoords(calcScanZoneCoords([lat, lng]))
           const popup = scanPopupRef.current
           if (popup) {
             popup.openOn(map)
@@ -78,7 +80,7 @@ export default function ScanZoneTargetMarker({
         }
       },
     }),
-    [position, scanZoneLocation, scanZoneSize],
+    [position, scanZoneLocation, scanZoneSize, spacing, radius],
   )
 
   useEffect(() => {
@@ -88,15 +90,27 @@ export default function ScanZoneTargetMarker({
     }
   }, [])
 
-  const handleChange = (event, newSize) => {
+  const handleSizeChange = (event, newSize) => {
     setScanZoneSize(newSize)
-    setScanZoneCoords(calcScanZoneCoords(position, newSize))
+    setScanZoneCoords(calcScanZoneCoords(position))
   }
+
+  const handleSpacingChange = (event, newSpacing) => {
+    setSpacing(newSpacing)
+    setScanZoneCoords(calcScanZoneCoords(position))
+  }
+
+  const handleRadiusChange = (event, newRadius) => {
+    setRadius(newRadius)
+    setScanZoneCoords(calcScanZoneCoords(position))
+  }
+
+  const rangeMarks = [{ value: scanZoneRadius.pokemon, label: t('pokemon') }, { value: scanZoneRadius.gym, label: t('gym') }]
 
   const isInAllowedArea = checkAreaValidity(position)
 
   if (scanZoneCoords.length === 1) {
-    setScanZoneCoords(calcScanZoneCoords(scanZoneLocation, 1))
+    setScanZoneCoords(calcScanZoneCoords(scanZoneLocation))
   }
 
   return (
@@ -123,17 +137,68 @@ export default function ScanZoneTargetMarker({
             {scannerType === 'rdm' && (
               <Grid item xs={12}>
                 <Box sx={{ minWidth: 150, maxWidth: '100%' }}>
+                  <Typography variant="caption" align="left">
+                    {t('scan_zone_size')}
+                  </Typography>
                   <Slider
                     xs={12}
-                    name="Type"
+                    name="Size"
                     min={1}
                     max={scanZoneMaxSize}
                     step={1}
                     value={scanZoneSize}
-                    onChange={handleChange}
+                    onChange={handleSizeChange}
+                    onChangeCommitted={handleSizeChange}
+                    valueLabelDisplay="auto"
+                  />
+                  <Typography variant="caption" align="left">
+                    {t('scan_zone_range')}
+                  </Typography>
+                  <Slider
+                    xs={12}
+                    name="Range"
+                    marks={rangeMarks}
+                    min={-200}
+                    max={1000}
+                    step={null}
+                    value={radius}
+                    onChange={handleRadiusChange}
+                    onChangeCommitted={handleRadiusChange}
                     valueLabelDisplay="auto"
                   />
                 </Box>
+                {advancedScanZoneOptions && (
+                  <Box sx={{ minWidth: 150, maxWidth: '100%' }}>
+                    <Divider style={{ margin: 10 }} />
+                    <Typography variant="caption" align="left">
+                      {t('scan_zone_spacing')}
+                    </Typography>
+                    <Slider
+                      xs={12}
+                      name="Spacing"
+                      min={1}
+                      max={2}
+                      step={0.01}
+                      value={spacing}
+                      onChange={handleSpacingChange}
+                      onChangeCommitted={handleSpacingChange}
+                      valueLabelDisplay="auto"
+                    />
+                    <Typography variant="caption" align="left">
+                      {t('scan_zone_radius')}
+                    </Typography>
+                    <Slider
+                      xs={12}
+                      name="Radius"
+                      min={50}
+                      max={900}
+                      value={radius}
+                      onChange={handleRadiusChange}
+                      onChangeCommitted={handleRadiusChange}
+                      valueLabelDisplay="auto"
+                    />
+                  </Box>
+                )}
               </Grid>
             )}
             <Grid item>
@@ -164,7 +229,7 @@ export default function ScanZoneTargetMarker({
         </Popup>
       </Marker>
       {scanZoneCoords.map(coords => (
-        <Circle radius={radiusPokemon} center={[coords[0], coords[1]]} fillOpacity={0.5} pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)' }} />
+        <Circle radius={radius} center={[coords[0], coords[1]]} fillOpacity={0.5} pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)' }} />
       ))}
     </>
   )
