@@ -23,7 +23,6 @@ import { Autocomplete } from '@material-ui/lab'
 import { Trans, useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
-import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
 
 import Query from '@services/Query'
@@ -41,7 +40,6 @@ export default function WebhookAdvanced({
 }) {
   const idObj = Poracle.getIdObj(id)
   const { t } = useTranslation()
-  const classes = useStyles()
   const location = useStore(state => state.location)
   const selectedWebhook = useStore(s => s.selectedWebhook)
   const webhookAdv = useStore(s => s.webhookAdv)
@@ -477,7 +475,6 @@ export default function WebhookAdvanced({
                 >
                   <AccordionSummary
                     expandIcon={<ExpandMore style={{ color: 'white' }} />}
-                    className={classes.accordionSummary}
                   >
                     <Typography className={classes.heading}>
                       {t(type)}
