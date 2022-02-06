@@ -10,7 +10,8 @@ import Query from '@services/Query'
 import ScanZoneTargetMarker from './ScanZoneTarget'
 
 export default function Main({
-  scannerType, scanZoneMode, setScanZoneMode, map, scanZoneMaxSize, scanZoneAreaRestriction,
+  scannerType, scanZoneMode, setScanZoneMode, map, scanZoneMaxSize,
+  advancedScanZoneOptions, scanZoneRadius, scanZoneSpacing, scanZoneAreaRestriction,
 }) {
   const { data: scanAreas } = scanZoneAreaRestriction?.length ? useQuery(Query.scanAreas()) : { data: null }
   const { loggedIn } = useStatic(state => state.auth)
@@ -63,6 +64,9 @@ export default function Main({
           scanZoneSize={scanZoneSize}
           setScanZoneSize={setScanZoneSize}
           scanZoneMaxSize={scanZoneMaxSize}
+          advancedScanZoneOptions={advancedScanZoneOptions}
+          scanZoneRadius={scanZoneRadius}
+          scanZoneSpacing={scanZoneSpacing}
           scanZoneAreaRestriction={scanZoneAreaRestriction}
           scanAreas={scanAreas ? scanAreas[0]?.features : null}
         />

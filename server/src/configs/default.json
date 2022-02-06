@@ -378,6 +378,9 @@
     "scanZone": {
       "enabled": false,
       "scanZoneMaxSize": 20,
+      "advancedScanZoneOptions": false,
+      "scanZoneRadius": { "pokemon": 70, "gym": 750 },
+      "scanZoneSpacing": 1,
       "scanZoneInstance": "scanZone",
       "scanZoneAreaRestriction": [],
       "discordRoles": [],
