@@ -122,7 +122,7 @@ export default function ScanZoneTargetMarker({
         position={position}
         ref={scanMarkerRef}
       >
-        <Popup minWidth={90} maxWidth={150} ref={scanPopupRef}>
+        <Popup minWidth={90} maxWidth={200} ref={scanPopupRef}>
           <Grid
             container
             alignItems="center"
@@ -169,9 +169,10 @@ export default function ScanZoneTargetMarker({
                   />
                 </Box>
                 {advancedScanZoneOptions && (
-                  <Accordion>
+                  <Accordion elevation={0} style={{ marginTop: 5 }}>
                     <AccordionSummary
                       expandIcon={<ExpandMore style={{ color: 'white' }} />}
+                      style={{ margin: 0, padding: 5 }}
                     >
                       <Typography variant="caption" align="left">
                         {t('advanced')}
@@ -182,7 +183,7 @@ export default function ScanZoneTargetMarker({
                         container
                         style={{ width: 200 }}
                         direction="row"
-                        justifyContent="flex-start"
+                        justifyContent="center"
                         alignItems="center"
                       >
                         <Grid item xs={12} style={{ textAlign: 'center' }}>
