@@ -33,7 +33,7 @@ const getTileServer = (tileServers, settings, isNight) => {
 }
 
 export default function Map({ serverSettings:
-  { config: { map: config, tileServers,
+  { config: { map: config, tileServers, theme,
     scanner: { scannerType, scanNextAreaRestriction,
       scanZoneMaxSize, advancedScanZoneOptions, scanZoneRadius, scanZoneSpacing, scanZoneAreaRestriction } },
   Icons, webhooks }, params }) {
@@ -188,6 +188,7 @@ export default function Map({ serverSettings:
       {scanZoneMode && (
         <ScanZone
           map={map}
+          theme={theme}
           scannerType={scannerType}
           scanZoneMode={scanZoneMode}
           setScanZoneMode={setScanZoneMode}
