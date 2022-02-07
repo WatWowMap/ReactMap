@@ -128,6 +128,7 @@ export default function ScanZoneTargetMarker({
         marginTop: 5,
       },
     },
+    expanded: {},
   })(Accordion);
 
   const AdvancedAccordionSummary = withStyles({
@@ -145,6 +146,7 @@ export default function ScanZoneTargetMarker({
       padding: 0,
       margin: 0,
     },
+    expanded: {},
   })(AccordionSummary)
 
   return (
