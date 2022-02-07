@@ -2,15 +2,15 @@ import React, {
   useState, useRef, useMemo, useEffect,
 } from 'react'
 import {
-  Grid, Button, Box, Slider, Typography, Divider, Accordion, AccordionSummary, AccordionDetails,
+  Grid, Button, Box, Slider, Typography, Accordion, AccordionSummary, AccordionDetails,
 } from '@material-ui/core'
 import { ExpandMore } from "@material-ui/icons"
+import { withStyles } from '@material-ui/core/styles'
 import { point, polygon } from '@turf/helpers'
 import destination from '@turf/destination'
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
-import useStyles from '@hooks/useStyles'
 
 export default function ScanZoneTargetMarker({
   map, scannerType, setScanZoneMode, scanZoneLocation, setScanZoneLocation, scanZoneCoords,
@@ -63,7 +63,6 @@ export default function ScanZoneTargetMarker({
   }
 
   const { t } = useTranslation()
-  const classes = useStyles()
   const scanMarkerRef = useRef(null)
   const scanPopupRef = useRef(null)
   const eventHandlers = useMemo(
@@ -115,6 +114,38 @@ export default function ScanZoneTargetMarker({
   if (scanZoneCoords.length === 1) {
     setScanZoneCoords(calcScanZoneCoords(scanZoneLocation))
   }
+
+  const AdvancedAccordion = withStyles({
+    root: {
+      marginTop: 5,
+      border: 'none',
+      boxShadow: 'none',
+      borderRadius: 5,
+      '&:before': {
+        display: 'none',
+      },
+      '&$expanded': {
+        marginTop: 5,
+      },
+    },
+  })(Accordion);
+
+  const AdvancedAccordionSummary = withStyles({
+    root: {
+      padding: '0px 5px 0px 8px',
+      minHeight: 30,
+    },
+    content: {
+      margin: '8px 0px',
+      '&$expanded': {
+        margin: '8px 0px',
+      },
+    },
+    expandIcon: {
+      padding: 0,
+      margin: 0,
+    },
+  })(AccordionSummary)
 
   return (
     <>
@@ -171,15 +202,14 @@ export default function ScanZoneTargetMarker({
                   />
                 </Box>
                 {advancedScanZoneOptions && (
-                  <Accordion elevation={0} style={{ marginTop: 5 }}>
-                    <AccordionSummary
+                  <AdvancedAccordion>
+                    <AdvancedAccordionSummary
                       expandIcon={<ExpandMore style={{ color: 'white' }} />}
-                      style={{ margin: 0, padding: 5 }}
                     >
-                      <Typography variant="caption" align="left">
+                      <Typography variant="caption">
                         {t('advanced')}
                       </Typography>
-                    </AccordionSummary>
+                    </AdvancedAccordionSummary>
                     <AccordionDetails>
                       <Grid
                         container
@@ -189,7 +219,7 @@ export default function ScanZoneTargetMarker({
                         alignItems="center"
                       >
                         <Grid item xs={12} style={{ textAlign: 'center' }}>
-                          <Typography variant="caption" align="left">
+                          <Typography variant="caption">
                             {t('scan_zone_spacing')}
                           </Typography>
                           <Slider
@@ -203,7 +233,7 @@ export default function ScanZoneTargetMarker({
                             onChangeCommitted={handleSpacingChange}
                             valueLabelDisplay="auto"
                           />
-                          <Typography variant="caption" align="left">
+                          <Typography variant="caption">
                             {t('scan_zone_radius')}
                           </Typography>
                           <Slider
@@ -219,7 +249,7 @@ export default function ScanZoneTargetMarker({
                         </Grid>
                       </Grid>
                     </AccordionDetails>
-                  </Accordion>
+                  </AdvancedAccordion>
                 )}
               </Grid>
             )}
