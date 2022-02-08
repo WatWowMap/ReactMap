@@ -1,19 +1,16 @@
 import React, {
   useState, useRef, useMemo, useEffect,
 } from 'react'
-import {
-  Grid, Button, Box, Slider, Typography, Accordion, AccordionSummary, AccordionDetails,
-} from '@material-ui/core'
-import { ExpandMore } from "@material-ui/icons"
-import { withStyles } from '@material-ui/core/styles'
+import { Grid, Button, Box, Slider, Typography } from '@material-ui/core'
 import { point, polygon } from '@turf/helpers'
 import destination from '@turf/destination'
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
+import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
 
 export default function ScanZoneTargetMarker({
-  map, scannerType, setScanZoneMode, scanZoneLocation, setScanZoneLocation, scanZoneCoords,
+  map, theme, scannerType, setScanZoneMode, scanZoneLocation, setScanZoneLocation, scanZoneCoords,
   setScanZoneCoords, scanZoneSize, setScanZoneSize, scanZoneMaxSize, advancedScanZoneOptions,
   scanZoneRadius, scanZoneSpacing, scanZoneAreaRestriction, scanAreas,
 }) {
@@ -115,39 +112,37 @@ export default function ScanZoneTargetMarker({
     setScanZoneCoords(calcScanZoneCoords(scanZoneLocation))
   }
 
-  const AdvancedAccordion = withStyles({
-    root: {
-      marginTop: 5,
-      border: 'none',
-      boxShadow: 'none',
-      borderRadius: 5,
-      '&:before': {
-        display: 'none',
-      },
-      '&$expanded': {
-        marginTop: 5,
-      },
-    },
-    expanded: {},
-  })(Accordion);
-
-  const AdvancedAccordionSummary = withStyles({
-    root: {
-      padding: '0px 5px 0px 8px',
-      minHeight: 30,
-    },
-    content: {
-      margin: '8px 0px',
-      '&$expanded': {
-        margin: '8px 0px',
-      },
-    },
-    expandIcon: {
-      padding: 0,
-      margin: 0,
-    },
-    expanded: {},
-  })(AccordionSummary)
+  const advancedMenu = (
+    <Grid item xs={12} style={{ textAlign: 'center' }}>
+      <Typography variant="caption">
+        {t('scan_zone_spacing')}
+      </Typography>
+      <Slider
+        xs={12}
+        name="Spacing"
+        min={1}
+        max={2}
+        step={0.01}
+        value={spacing}
+        onChange={handleSpacingChange}
+        onChangeCommitted={handleSpacingChange}
+        valueLabelDisplay="auto"
+      />
+      <Typography variant="caption">
+        {t('scan_zone_radius')}
+      </Typography>
+      <Slider
+        xs={12}
+        name="Radius"
+        min={50}
+        max={900}
+        value={radius}
+        onChange={handleRadiusChange}
+        onChangeCommitted={handleRadiusChange}
+        valueLabelDisplay="auto"
+      />
+    </Grid>
+  )
 
   return (
     <>
@@ -204,53 +199,7 @@ export default function ScanZoneTargetMarker({
                   />
                 </Box>
                 {advancedScanZoneOptions && (
-                  <AdvancedAccordion>
-                    <AdvancedAccordionSummary
-                      expandIcon={<ExpandMore style={{ color: 'white' }} />}
-                    >
-                      <Typography variant="caption">
-                        {t('advanced')}
-                      </Typography>
-                    </AdvancedAccordionSummary>
-                    <AccordionDetails>
-                      <Grid
-                        container
-                        style={{ width: 200 }}
-                        direction="row"
-                        justifyContent="center"
-                        alignItems="center"
-                      >
-                        <Grid item xs={12} style={{ textAlign: 'center' }}>
-                          <Typography variant="caption">
-                            {t('scan_zone_spacing')}
-                          </Typography>
-                          <Slider
-                            xs={12}
-                            name="Spacing"
-                            min={1}
-                            max={2}
-                            step={0.01}
-                            value={spacing}
-                            onChange={handleSpacingChange}
-                            onChangeCommitted={handleSpacingChange}
-                            valueLabelDisplay="auto"
-                          />
-                          <Typography variant="caption">
-                            {t('scan_zone_radius')}
-                          </Typography>
-                          <Slider
-                            xs={12}
-                            name="Radius"
-                            min={50}
-                            max={900}
-                            value={radius}
-                            onChange={handleRadiusChange}
-                            onChangeCommitted={handleRadiusChange}
-                            valueLabelDisplay="auto"
-                          />
-                        </Grid>
-                      </Grid>
-                    </AccordionDetails>
+                  <AdvancedAccordion block={advancedMenu} theme={theme}>
                   </AdvancedAccordion>
                 )}
               </Grid>
