@@ -368,6 +368,8 @@
     },
     "scanNext": {
       "enabled": false,
+      "showScanCount": false,
+      "showScanQueue": false,
       "scanNextInstance": "scanNext",
       "scanNextDevice": "Device01",
       "scanNextSleeptime": 5,
@@ -377,7 +379,9 @@
     },
     "scanZone": {
       "enabled": false,
-      "scanZoneMaxSize": 20,
+      "showScanCount": false,
+      "showScanQueue": false,
+      "scanZoneMaxSize": 10,
       "advancedScanZoneOptions": false,
       "scanZoneRadius": { "pokemon": 70, "gym": 750 },
       "scanZoneSpacing": 1,

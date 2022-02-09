@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 
 export default function ScanNextTargetMarker({
   map, scannerType, setScanNextMode, scanNextLocation, setScanNextLocation, scanNextCoords, setScanNextCoords,
-  scanNextType, setScanNextType, scanNextAreaRestriction, scanAreas,
+  scanNextType, setScanNextType, scanNextShowScanCount, scanNextShowScanQueue, scanNextAreaRestriction, scanAreas,
 }) {
   const [position, setPosition] = useState(scanNextLocation)
   const radiusPokemon = 70
@@ -121,7 +121,12 @@ export default function ScanNextTargetMarker({
                 </ButtonGroup>
               </Grid>
             )}
-            <Grid item>
+            <Grid item style={{ textAlign: 'center' }}>
+              {scanNextShowScanCount && (
+                <Typography variant="body2" style={{ margin: '0px 0px 12px' }}>
+                  {`${t('scan_requests')}: ${scanNextCoords?.length}`}
+                </Typography>
+              )}
               <Button
                 color="secondary"
                 variant="contained"

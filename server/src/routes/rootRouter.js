@@ -116,8 +116,12 @@ rootRouter.get('/settings', async (req, res) => {
         scanner: {
           scannerType: config.scanner.backendConfig.platform,
           enableScanNext: config.scanner.scanNext.enabled,
+          scanNextShowScanCount: config.scanner.scanNext.showScanCount,
+          scanNextShowScanQueue: config.scanner.scanNext.showScanQueue,
           scanNextAreaRestriction: config.scanner.scanNext.scanNextAreaRestriction,
           enableScanZone: config.scanner.scanZone.enabled,
+          scanZoneShowScanCount: config.scanner.scanZone.showScanCount,
+          scanZoneShowScanQueue: config.scanner.scanZone.showScanQueue,
           advancedScanZoneOptions: config.scanner.scanZone.advancedScanZoneOptions,
           scanZoneRadius: config.scanner.scanZone.scanZoneRadius,
           scanZoneSpacing: config.scanner.scanZone.scanZoneSpacing,

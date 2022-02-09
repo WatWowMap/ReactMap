@@ -10,7 +10,8 @@ import Query from '@services/Query'
 import ScanNextTargetMarker from './ScanNextTarget'
 
 export default function Main({
-  scannerType, scanNextMode, setScanNextMode, map, scanNextAreaRestriction,
+  map, scanNextMode, setScanNextMode,
+  scanner: { scannerType, scanNextShowScanCount, scanNextShowScanQueue, scanNextAreaRestriction },
 }) {
   const { data: scanAreas } = scanNextAreaRestriction?.length ? useQuery(Query.scanAreas()) : { data: null }
   const { loggedIn } = useStatic(state => state.auth)
@@ -62,6 +63,8 @@ export default function Main({
           setScanNextCoords={setScanNextCoords}
           scanNextType={scanNextType}
           setScanNextType={setScanNextType}
+          scanNextShowScanCount={scanNextShowScanCount}
+          scanNextShowScanQueue={scanNextShowScanQueue}
           scanNextAreaRestriction={scanNextAreaRestriction}
           scanAreas={scanAreas ? scanAreas[0]?.features : null}
         />

@@ -493,6 +493,7 @@
   "scan_zone_range": "Portée",
   "scan_zone_spacing": "Espacement",
   "scan_zone_radius": "Rayon",
+  "scan_requests": "Demandes de Scan ",
   "click_to_scan": "Scanner ici",
   "scan_confirmed_title": "Demande de scan confirmée",
   "scan_confirmed": "L'appareil a été envoyé à la position de scan, le résultat sera bientôt visible sur la map !",

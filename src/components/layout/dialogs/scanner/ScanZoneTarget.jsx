@@ -11,8 +11,8 @@ import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
 
 export default function ScanZoneTargetMarker({
   map, theme, scannerType, setScanZoneMode, scanZoneLocation, setScanZoneLocation, scanZoneCoords,
-  setScanZoneCoords, scanZoneSize, setScanZoneSize, scanZoneMaxSize, advancedScanZoneOptions,
-  scanZoneRadius, scanZoneSpacing, scanZoneAreaRestriction, scanAreas,
+  setScanZoneCoords, scanZoneSize, setScanZoneSize, scanZoneShowScanCount, scanZoneShowScanQueue,
+  advancedScanZoneOptions, scanZoneRadius, scanZoneSpacing, scanZoneMaxSize, scanZoneAreaRestriction, scanAreas,
 }) {
   const [position, setPosition] = useState(scanZoneLocation)
   const [spacing, setSpacing] = useState(scanZoneSpacing)
@@ -204,7 +204,12 @@ export default function ScanZoneTargetMarker({
                 )}
               </Grid>
             )}
-            <Grid item>
+            <Grid item style={{ textAlign: 'center' }}>
+              {scanZoneShowScanCount && (
+                <Typography variant="body2" style={{ margin: '0px 0px 12px' }}>
+                  {`${t('scan_requests')}: ${scanZoneCoords?.length}`}
+                </Typography>
+              )}
               <Button
                 color="secondary"
                 variant="contained"

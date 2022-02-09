@@ -33,10 +33,7 @@ const getTileServer = (tileServers, settings, isNight) => {
 }
 
 export default function Map({ serverSettings:
-  { config: { map: config, tileServers, theme,
-    scanner: { scannerType, scanNextAreaRestriction,
-      scanZoneMaxSize, advancedScanZoneOptions, scanZoneRadius, scanZoneSpacing, scanZoneAreaRestriction } },
-  Icons, webhooks }, params }) {
+  { config: { map: config, tileServers, theme, scanner }, Icons, webhooks }, params }) {
   Utility.analytics(window.location.pathname)
 
   const map = useMap()
@@ -179,24 +176,18 @@ export default function Map({ serverSettings:
       {scanNextMode && (
         <ScanNext
           map={map}
-          scannerType={scannerType}
           scanNextMode={scanNextMode}
           setScanNextMode={setScanNextMode}
-          scanNextAreaRestriction={scanNextAreaRestriction}
+          scanner={scanner}
         />
       )}
       {scanZoneMode && (
         <ScanZone
           map={map}
           theme={theme}
-          scannerType={scannerType}
           scanZoneMode={scanZoneMode}
           setScanZoneMode={setScanZoneMode}
-          scanZoneMaxSize={scanZoneMaxSize}
-          advancedScanZoneOptions={advancedScanZoneOptions}
-          scanZoneRadius={scanZoneRadius}
-          scanZoneSpacing={scanZoneSpacing}
-          scanZoneAreaRestriction={scanZoneAreaRestriction}
+          scanner={scanner}
         />
       )}
       <Nav
