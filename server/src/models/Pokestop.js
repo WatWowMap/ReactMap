@@ -603,13 +603,25 @@ module.exports = class Pokestop extends Model {
     const midnight = settings.hideOldQuests ? clientMidnight : 0
 
     const pokemonIds = Object.keys(masterPkmn).filter(pkmn => (
-      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
+      i18next.t(`poke_${pkmn}`, { lng: locale })
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .includes(search)
     ))
     const itemIds = Object.keys(masterItems).filter(item => (
-      i18next.t(`item_${item}`, { lng: locale }).toLowerCase().includes(search)
+      i18next.t(`item_${item}`, { lng: locale })
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .includes(search)
     ))
     const rewardTypes = Object.keys(questRewardTypes).filter(rType => (
-      i18next.t(`quest_reward_${rType}`, { lng: locale }).toLowerCase().includes(search)
+      i18next.t(`quest_reward_${rType}`, { lng: locale })
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .includes(search)
     ))
 
     const query = this.query()
