@@ -1,39 +1,39 @@
 /* eslint-disable no-console */
-/* eslint-disable no-restricted-syntax */
 const config = require('./config')
 
 const loadAreas = () => {
-  let areas = {}
   try {
-    // eslint-disable-next-line global-require
-    const data = config.scanAreas || Error('Areas file not found')
-    areas = data
+    const normalized = { type: 'FeatureCollection', features: [] }
+    Object.values(config.scanAreas).forEach(area => {
+      if (area?.features.length) {
+        normalized.features.push(...area.features)
+      }
+    })
+    return normalized
   } catch (err) {
-    const showWarning = config.authentication.areaRestrictions.some(rule => rule.roles.length)
-    if (showWarning) {
+    if (config.authentication.areaRestrictions.some(rule => rule.roles.length)) {
       console.warn('[Area Restrictions] Disabled - `areas.json` file is missing or broken.')
     }
   }
-  return areas
 }
 
 const parseAreas = (areasObj) => {
-  let names = {}
   const polygons = {}
+  const names = []
 
-  if (Object.keys(areasObj).length === 0) {
+  if (!areasObj) {
     return { names, polygons }
   }
-
   areasObj.features.forEach(feature => {
-    if (feature.geometry.type == 'Polygon' && feature.properties.name) {
-      polygons[feature.properties.name] = []
-      for (const polygonCoordinates of feature.geometry.coordinates) {
-        polygons[feature.properties.name].push(...polygonCoordinates)
-      }
+    const { name } = feature.properties
+    if (feature.geometry.type == 'Polygon' && name) {
+      polygons[name] = []
+      feature.geometry.coordinates.forEach(coordPair => {
+        polygons[name].push(...coordPair)
+      })
+      names.push(name)
     }
   })
-  names = Object.keys(polygons)
   return { names, polygons }
 }
 
