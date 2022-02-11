@@ -161,11 +161,11 @@ module.exports = {
     search: async (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const { category, webhookName, search } = args
-      if (perms?.[category] && /^[a-z0-9,\s]+$/i.test(search)) {
+      if (perms?.[category] && /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s]+$/.test(search)) {
         const isMad = Utility.dbSelection(category.substring(0, category.length - 1)).type === 'mad'
         const distance = raw(`ROUND(( 3959 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
 
-        if (args.search === '') {
+        if (!search || !search.trim()) {
           return []
         }
         switch (args.category) {
@@ -199,11 +199,11 @@ module.exports = {
     searchQuest: async (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const { category, search } = args
-      if (perms?.[category] && /^[a-z0-9,\s]+$/i.test(search)) {
+      if (perms?.[category] && /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s]+$/.test(search)) {
         const isMad = Utility.dbSelection(category.substring(0, category.length - 1)).type === 'mad'
         const distance = raw(`ROUND(( 3959 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
 
-        if (args.search === '') {
+        if (!search || !search.trim()) {
           return []
         }
         return Pokestop.searchQuests(args, perms, isMad, distance) || []
