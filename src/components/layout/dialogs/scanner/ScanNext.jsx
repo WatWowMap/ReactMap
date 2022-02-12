@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import {
@@ -17,6 +17,7 @@ export default function Main({
   const { loggedIn } = useStatic(state => state.auth)
   const { t } = useTranslation()
   const location = useStore(s => s.location)
+  const [queue, setQueue] = useState('init')
   const [scanNextLocation, setScanNextLocation] = useState(location)
   const [scanNextCoords, setScanNextCoords] = useState([location])
   const [scanNextType, setScanNextType] = useState('S')
@@ -30,6 +31,19 @@ export default function Main({
         scanNextLocation,
         scanNextCoords,
         scanNextType,
+      },
+    },
+    fetchPolicy: 'no-cache',
+  })
+  const [getQueue, { data: scannerQueueResponse }] = useLazyQuery(Query.scanner(), {
+    variables: {
+      category: 'getQueue',
+      method: 'GET',
+      data: {
+        username: loggedIn?.username || 'a visitor',
+        userId: loggedIn?.id,
+        type: 'scan_next',
+        typeName: 'scanNext',
       },
     },
     fetchPolicy: 'no-cache',
@@ -50,12 +64,30 @@ export default function Main({
     }
   }
 
+  if (scanNextShowScanQueue) {
+    if (queue === 'init') {
+      getQueue()
+      setQueue('...')
+    }
+    useEffect(() => {
+      const timer = setInterval(() => {
+        getQueue()
+      }, 2000)
+      return () => clearInterval(timer)
+    })
+  }
+  if (scannerQueueResponse && scannerQueueResponse.scanner?.status === 'ok') {
+    setQueue(scannerQueueResponse.scanner.message)
+    scannerQueueResponse.scanner = {}
+  }
+
   return (
     <>
       {scanNextMode === 'setLocation' && (
         <ScanNextTargetMarker
           map={map}
           scannerType={scannerType}
+          queue={queue}
           setScanNextMode={setScanNextMode}
           scanNextLocation={scanNextLocation}
           setScanNextLocation={setScanNextLocation}

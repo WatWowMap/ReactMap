@@ -1,6 +1,11 @@
 /* eslint-disable no-console */
-const config = require('../config')
 const fetch = require('node-fetch')
+const config = require('../config')
+
+const scannerQueue = {
+  scanNext: {},
+  scanZone: {},
+}
 
 module.exports = async function scannerApi(category, method, data = null) {
   try {
@@ -19,7 +24,7 @@ module.exports = async function scannerApi(category, method, data = null) {
             { lat: parseFloat(coord[0].toFixed(5)), lon: parseFloat(coord[1].toFixed(5)) })))
         Object.assign(payloadObj, {
           url: config.scanner.backendConfig.platform === 'mad' ? `${config.scanner.backendConfig.apiEndpoint}/send_gps?origin=${encodeURIComponent(config.scanner.scanNext.scanNextDevice)}&coords=${coords}&sleeptime=${config.scanner.scanNext.scanNextSleeptime}`
-            : `${config.scanner.backendConfig.apiEndpoint}/set_data?scan_next=true&instance_name=${encodeURIComponent(config.scanner.scanNext.scanNextInstance)}&coords=${coords}`,
+            : `${config.scanner.backendConfig.apiEndpoint}/set_data?scan_next=true&instance=${encodeURIComponent(config.scanner.scanNext.scanNextInstance)}&coords=${coords}`,
           options: { method, headers },
         })
       } break
@@ -28,10 +33,20 @@ module.exports = async function scannerApi(category, method, data = null) {
         const coords = JSON.stringify(data.scanZoneCoords.map(coord => (
           { lat: parseFloat(coord[0].toFixed(5)), lon: parseFloat(coord[1].toFixed(5)) })))
         Object.assign(payloadObj, {
-          url: `${config.scanner.backendConfig.apiEndpoint}/set_data?scan_next=true&instance_name=${encodeURIComponent(config.scanner.scanZone.scanZoneInstance)}&coords=${coords}`,
+          url: `${config.scanner.backendConfig.apiEndpoint}/set_data?scan_next=true&instance=${encodeURIComponent(config.scanner.scanZone.scanZoneInstance)}&coords=${coords}`,
           options: { method, headers },
         })
       } break
+      case 'getQueue':
+        if (scannerQueue[data.typeName].timestamp > (Date.now() - config.scanner.backendConfig.queueRefreshInterval * 1000)) {
+          console.log(`[scannerApi] Returning queue from memory for method ${data.typeName}: ${scannerQueue[data.typeName].queue}`)
+          return { status: 'ok', message: scannerQueue[data.typeName].queue }
+        }
+        console.log(`[scannerApi] Getting queue for method ${data.typeName}`)
+        Object.assign(payloadObj, {
+          url: `${config.scanner.backendConfig.apiEndpoint}/get_data?${data.type}=true&queue_size=true&instance=${encodeURIComponent(config.scanner[data.typeName][`${data.typeName}Instance`])}`,
+          options: { method, headers },
+        }); break
       default:
         console.warn('[scannerApi] Api call without category'); break
     }
@@ -44,6 +59,14 @@ module.exports = async function scannerApi(category, method, data = null) {
     if (!scannerResponse) {
       throw new Error('[scannerApi] No data returned from server')
     }
+
+    if (scannerResponse.status === 200 && category === 'getQueue') {
+      const { data: queueData } = await scannerResponse.json()
+      console.log(`[scannerApi] Returning received queue for method ${data.typeName}: ${queueData.size}`)
+      scannerQueue[data.typeName] = { queue: queueData.size, timestamp: Date.now() }
+      return { status: 'ok', message: queueData.size }
+    }
+
     switch (scannerResponse.status) {
       case 200:
         console.log(`[scannerApi] Request from ${data.username}${data.userId ? ` (${data.userId})` : ''} successful`)

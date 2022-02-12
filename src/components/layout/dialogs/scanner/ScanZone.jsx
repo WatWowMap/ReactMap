@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import {
@@ -18,6 +18,7 @@ export default function Main({
   const { loggedIn } = useStatic(state => state.auth)
   const { t } = useTranslation()
   const location = useStore(s => s.location)
+  const [queue, setQueue] = useState('init')
   const [scanZoneLocation, setScanZoneLocation] = useState(location)
   const [scanZoneCoords, setScanZoneCoords] = useState([location])
   const [scanZoneSize, setScanZoneSize] = useState(1)
@@ -31,6 +32,19 @@ export default function Main({
         scanZoneLocation,
         scanZoneCoords,
         scanZoneSize,
+      },
+    },
+    fetchPolicy: 'no-cache',
+  })
+  const [getQueue, { data: scannerQueueResponse }] = useLazyQuery(Query.scanner(), {
+    variables: {
+      category: 'getQueue',
+      method: 'GET',
+      data: {
+        username: loggedIn?.username || 'a visitor',
+        userId: loggedIn?.id,
+        type: 'scan_next',
+        typeName: 'scanZone',
       },
     },
     fetchPolicy: 'no-cache',
@@ -51,6 +65,23 @@ export default function Main({
     }
   }
 
+  if (scanZoneShowScanQueue) {
+    if (queue === 'init') {
+      getQueue()
+      setQueue('...')
+    }
+    useEffect(() => {
+      const timer = setInterval(() => {
+        getQueue()
+      }, 2000)
+      return () => clearInterval(timer)
+    })
+  }
+  if (scannerQueueResponse && scannerQueueResponse.scanner?.status === 'ok') {
+    setQueue(scannerQueueResponse.scanner.message)
+    scannerQueueResponse.scanner = {}
+  }
+
   return (
     <>
       {scanZoneMode === 'setLocation' && (
@@ -58,6 +89,7 @@ export default function Main({
           map={map}
           theme={theme}
           scannerType={scannerType}
+          queue={queue}
           setScanZoneMode={setScanZoneMode}
           scanZoneLocation={scanZoneLocation}
           setScanZoneLocation={setScanZoneLocation}

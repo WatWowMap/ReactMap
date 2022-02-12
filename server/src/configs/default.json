@@ -364,7 +364,8 @@
       "platform": "rdm/mad",
       "apiEndpoint": "http://ip:port/api/",
       "apiUsername": "username",
-      "apiPassword": "password"
+      "apiPassword": "password",
+      "queueRefreshInterval": 5
     },
     "scanNext": {
       "enabled": false,

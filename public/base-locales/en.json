@@ -499,6 +499,7 @@
   "scan_zone_spacing": "Spacing",
   "scan_zone_radius": "Radius",
   "scan_requests": "Scan Requests",
+  "scan_queue": "Current Queue",
   "click_to_scan": "Scan Here",
   "scan_confirmed_title": "Scan demand confirmed",
   "scan_confirmed": "Worker has been sent to location, result will soon appear on the map!",

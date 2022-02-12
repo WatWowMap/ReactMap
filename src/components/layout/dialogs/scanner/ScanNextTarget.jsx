@@ -11,7 +11,7 @@ import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
 export default function ScanNextTargetMarker({
-  map, scannerType, setScanNextMode, scanNextLocation, setScanNextLocation, scanNextCoords, setScanNextCoords,
+  map, scannerType, queue, setScanNextMode, scanNextLocation, setScanNextLocation, scanNextCoords, setScanNextCoords,
   scanNextType, setScanNextType, scanNextShowScanCount, scanNextShowScanQueue, scanNextAreaRestriction, scanAreas,
 }) {
   const [position, setPosition] = useState(scanNextLocation)
@@ -125,6 +125,11 @@ export default function ScanNextTargetMarker({
               {scanNextShowScanCount && (
                 <Typography variant="body2" style={{ margin: '0px 0px 12px' }}>
                   {`${t('scan_requests')}: ${scanNextCoords?.length}`}
+                </Typography>
+              )}
+              {scanNextShowScanQueue && (
+                <Typography variant="body2" style={{ margin: '0px 0px 12px' }}>
+                  {`${t('scan_queue')}: ${queue || '...'}`}
                 </Typography>
               )}
               <Button

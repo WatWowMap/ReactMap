@@ -498,6 +498,7 @@
   "scan_zone_spacing": "Abstand",
   "scan_zone_radius": "Radius",
   "scan_requests": "Scan Anfrage",
+  "scan_queue": "Aktuelle Warteschlange",
   "click_to_scan": "Hier scannen",
   "scan_confirmed_title": "Scan-Anfrage bestätigt",
   "scan_confirmed": "Gerät wurde an den Standort geschickt, das Ergebnis wird bald auf der Karte erscheinen!",

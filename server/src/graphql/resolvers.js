@@ -286,6 +286,9 @@ module.exports = {
     scanner: (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const { category, method, data } = args
+      if (category === 'getQueue') {
+        return Fetch.scannerApi(category, method, data)
+      }
       if (perms?.scanner?.includes(category)) {
         return Fetch.scannerApi(category, method, data)
       }

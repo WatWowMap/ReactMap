@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
 
 export default function ScanZoneTargetMarker({
-  map, theme, scannerType, setScanZoneMode, scanZoneLocation, setScanZoneLocation, scanZoneCoords,
+  map, theme, scannerType, queue, setScanZoneMode, scanZoneLocation, setScanZoneLocation, scanZoneCoords,
   setScanZoneCoords, scanZoneSize, setScanZoneSize, scanZoneShowScanCount, scanZoneShowScanQueue,
   advancedScanZoneOptions, scanZoneRadius, scanZoneSpacing, scanZoneMaxSize, scanZoneAreaRestriction, scanAreas,
 }) {
@@ -199,8 +199,7 @@ export default function ScanZoneTargetMarker({
                   />
                 </Box>
                 {advancedScanZoneOptions && (
-                  <AdvancedAccordion block={advancedMenu} theme={theme}>
-                  </AdvancedAccordion>
+                  <AdvancedAccordion block={advancedMenu} theme={theme} />
                 )}
               </Grid>
             )}
@@ -208,6 +207,11 @@ export default function ScanZoneTargetMarker({
               {scanZoneShowScanCount && (
                 <Typography variant="body2" style={{ margin: '0px 0px 12px' }}>
                   {`${t('scan_requests')}: ${scanZoneCoords?.length}`}
+                </Typography>
+              )}
+              {scanZoneShowScanQueue && (
+                <Typography variant="body2" style={{ margin: '0px 0px 12px' }}>
+                  {`${t('scan_queue')}: ${queue || '...'}`}
                 </Typography>
               )}
               <Button
