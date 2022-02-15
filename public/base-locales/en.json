@@ -487,5 +487,8 @@
   "filters_reset_text": "Are you sure you want to reset settings to default values? This cannot be undone!",
   "filters_reset_title": "Reset filters",
   "raid_quick_select": "Quick Select",
-  "disabled": "Disabled"
+  "disabled": "Disabled",
+  "loading": "Loading {{category}}",
+  "loading_icons": "Fetching Icons",
+  "loading_invasions": "Fetching Invasions"
 }

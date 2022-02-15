@@ -21,9 +21,17 @@ if (process.env) {
   Sentry.init({
     dsn: SENTRY_DSN || 'https://c40dad799323428f83aee04391639345@o1096501.ingest.sentry.io/6117162',
     integrations: [new Integrations.BrowserTracing()],
-    tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE || 0.1,
+    tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE ? +SENTRY_TRACES_SAMPLE_RATE : 0.1,
     release: VERSION,
     environment: isDevelopment ? 'development' : 'production',
+    debug: isDevelopment,
+    beforeSend(event) {
+      if (event?.exception?.values?.[0]?.stacktrace?.frames?.some(f => f.filename.includes('node_modules'))) {
+        // do nothing for external libraries
+        return
+      }
+      return event
+    },
   })
   // eslint-disable-next-line no-console
   console.log('ReactMap Version:', VERSION)

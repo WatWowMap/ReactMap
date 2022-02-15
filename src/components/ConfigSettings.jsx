@@ -15,8 +15,7 @@ export default function ConfigSettings({
 }) {
   Utility.analytics('User', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
 
-  document.title = serverSettings.config.map.headerTitle
-  document.body.classList.add('dark')
+  document.title = serverSettings.config?.map?.headerTitle
 
   const setUserSettings = useStore(state => state.setUserSettings)
   const setSettings = useStore(state => state.setSettings)

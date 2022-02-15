@@ -33,8 +33,8 @@
   "weather_indicator": "날씨 부스트 표시기",
   "page": "페이지 {{page}}",
   "navigation_controls": "탐색 컨트롤",
-  "navigation_controls_react": "반응",
-  "navigation_controls_leaflet": "전단",
+  "navigation_controls_react": "React",
+  "navigation_controls_leaflet": "Leaflet",
   "exclusive": "독점적 인",
   "all_moves": "모든 동작",
   "move": "이동하다",
@@ -434,5 +434,8 @@
   "timer_verified": "이 타이머는 확인되었습니다",
   "timer_unverified": "이 타이머는 확인되지 않았습니다.",
   "all": "모두",
-  "both": "둘 다"
+  "both": "둘 다",
+  "loading_icons": "아이콘 가져오기",
+  "loading_invasions": "침략 가져오기",
+  "loading": "{{category}} 로드 중"
 }

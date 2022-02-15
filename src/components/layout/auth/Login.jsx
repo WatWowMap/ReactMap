@@ -41,7 +41,7 @@ const Login = ({ clickedTwice, location, serverSettings, getServerSettings }) =>
       direction="column"
       justifyContent="center"
       alignItems="center"
-      style={{ minHeight: '95vh' }}
+      style={{ minHeight: '95vh', width: '100%' }}
     >
       <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
         <Typography variant="h3" style={{ color: 'white' }} align="center">
@@ -49,17 +49,17 @@ const Login = ({ clickedTwice, location, serverSettings, getServerSettings }) =>
         </Typography>
       </Grid>
       {serverSettings?.authMethods?.includes('discord') && (
-        <Grid container item justifyContent="center" alignItems="center" spacing={2} style={{ marginTop: 20, marginBottom: 20 }}>
+        <Grid container item justifyContent="center" alignItems="center" style={{ marginTop: 20, marginBottom: 20 }}>
           <Grid
             item
             xs={serverSettings.config.map.discordInvite ? t('login_button') : 10}
             sm={serverSettings.config.map.discordInvite ? 3 : 10}
-            style={{ textAlign: 'center' }}
+            style={{ textAlign: 'center', marginTop: serverSettings.config.map.discordAuthUrl ? 20 : 0 }}
           >
             <DiscordLogin href={serverSettings.config.map.discordAuthUrl} />
           </Grid>
           {serverSettings.config.map.discordInvite && (
-            <Grid item xs={t('join_button')} sm={3} style={{ textAlign: 'center' }}>
+            <Grid item xs={t('join_button')} sm={3} style={{ textAlign: 'center', marginTop: 20 }}>
               <DiscordLogin href={serverSettings.config.map.discordInvite} text="join" />
             </Grid>
           )}
