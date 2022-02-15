@@ -1,66 +1,60 @@
+/* eslint-disable no-console */
 /**
 * Credits: https://gist.github.com/moriakaice
 * Editor: PJ0tterr
-* Creaded on: 15-01-2022
+* Created on: 15-01-2022
 * Modified on: 23-01-2022
 */
-
-/* eslint-disable no-console */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable-next-line no-plusplus */
 
 const fs = require('fs')
 const path = require('path')
 
 // Set Path where for area.json
 const configFolderArea = path.resolve(__dirname, '../../server/src/configs/areas.json')
-const geofencesFile = path.resolve(__dirname, '../../server/src/configs/geofence/geofence.json')
+const geofencesFile = path.resolve(__dirname, '../../server/src/configs/geofence.json')
 
-if (!fs.existsSync(geofencesFile)) {
-  console.warning('Warning: No Geofence file was found, no area.json is generated!');
-  return;
-}
-const outGeoJSON = {
-  type: 'FeatureCollection',
-  features: [],
-}
-
-fs.readFile(geofencesFile, 'utf8', (err, data) => {
-  if (err) {
-    console.error(err)
-    return
+if (fs.existsSync(geofencesFile)) {
+  const outGeoJSON = {
+    type: 'FeatureCollection',
+    features: [],
   }
-  const inGeoJSON = JSON.parse(data)
-  if (inGeoJSON.length === 0) {
-    console.error('Failed to parse poracle geofence file')
-    return;
-  }
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < inGeoJSON.length; i++) {
-    const inGeofence = inGeoJSON[i];
-    console.log('Converting', inGeofence.name)
-    const outGeofence = {
-      type: 'Feature',
-      properties: {
-        name: inGeofence.name || '',
-        color: inGeofence.color || '#000000',
-        id: inGeofence.id || 0,
 
-      },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [[]],
-      },
+  fs.readFile(geofencesFile, 'utf8', (err, data) => {
+    if (err) {
+      console.error(err)
+      return
     }
-    for (let j = 0; j < inGeofence.path.length; j += 1) {
-      const coord = inGeofence.path[j]
-      inGeofence.path[j] = [coord[1], coord[0]]
+    const inGeoJSON = JSON.parse(data)
+    if (inGeoJSON.length === 0) {
+      console.error('Failed to parse poracle geofence file')
+      return
     }
-    outGeofence.geometry.coordinates[0] = inGeofence.path;
-    outGeoJSON.features.push(outGeofence);
-  }
-  const outFilePath = path.resolve(path.dirname(configFolderArea), 'areas.json')
-  fs.writeFile(outFilePath, JSON.stringify(outGeoJSON, null, 2), 'utf8', () => {
-    console.log(`${outFilePath} file saved.`)
+    for (let i = 0; i < inGeoJSON.length; i += 1) {
+      const inGeofence = inGeoJSON[i]
+      const outGeofence = {
+        type: 'Feature',
+        properties: {
+          name: inGeofence.name || '',
+          color: inGeofence.color || '#000000',
+          id: inGeofence.id || 0,
+
+        },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[]],
+        },
+      }
+      for (let j = 0; j < inGeofence.path.length; j += 1) {
+        const coord = inGeofence.path[j]
+        inGeofence.path[j] = [coord[1], coord[0]]
+      }
+      outGeofence.geometry.coordinates[0] = inGeofence.path
+      outGeoJSON.features.push(outGeofence)
+    }
+    const outFilePath = path.resolve(path.dirname(configFolderArea), 'areas.json')
+
+    fs.writeFile(outFilePath, JSON.stringify(outGeoJSON, null, 2), 'utf8', () => {
+      console.log(`${outFilePath} file saved.`)
+    })
   })
-})
+}
