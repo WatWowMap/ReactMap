@@ -71,7 +71,8 @@
       "interactionRangeZoom": 15,
       "scanAreasZoom": 12,
       "scanCellsZoom": 13,
-      "submissionZoom": 15
+      "submissionZoom": 15,
+      "geoJsonFileName": "areas.json"
     },
     "localeSelection": [
       "en",
@@ -106,6 +107,7 @@
       "invasionCacheHrs": 1,
       "questMessage": "",
       "navigationControls": "react",
+      "enableFloatingProfileButton": false,
       "forceTutorial": true,
       "enableTutorial": true,
       "enableUserProfile": true,
@@ -258,7 +260,9 @@
       "enabled": false,
       "polygons": false,
       "pokemon": false,
-      "allPokemon": true
+      "allPokemon": true,
+      "avgFilter": [0, 100],
+      "avgSliderStep": 1
     },
     "pokestops": {
       "enabled": false,
@@ -275,6 +279,7 @@
     "pokemon": {
       "enabled": false,
       "legacyFilter": false,
+      "allPokemon": false,
       "globalValues": {
         "iv": [
           80,

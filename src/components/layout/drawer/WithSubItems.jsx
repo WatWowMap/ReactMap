@@ -7,19 +7,19 @@ import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 
 import MultiSelector from './MultiSelector'
+import SliderTile from '../dialogs/filters/SliderTile'
 
 export default function WithSubItems({
-  category, filters, setFilters, subItem, noScanAreaOverlay, enableQuestSetSelector, available,
+  category, filters, setFilters, subItem, noScanAreaOverlay, enableQuestSetSelector, data, available,
 }) {
   const { t } = useTranslation()
-  let filterCategory
 
   if (category === 'scanAreas' && noScanAreaOverlay) {
     return null
   }
 
-  if (category === 'wayfarer' || category === 'admin') {
-    filterCategory = (
+  const filterCategory = category === 'wayfarer' || category === 'admin'
+    ? (
       <Switch
         checked={filters[subItem].enabled}
         onChange={() => {
@@ -33,8 +33,7 @@ export default function WithSubItems({
         }}
       />
     )
-  } else {
-    filterCategory = (
+    : (
       <Switch
         checked={filters[category][subItem]}
         onChange={() => {
@@ -47,6 +46,23 @@ export default function WithSubItems({
           })
         }}
       />
+    )
+
+  if (category === 'nests' && subItem === 'sliders') {
+    return (
+      <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <SliderTile
+          filterSlide={data.secondary[0]}
+          handleChange={(_, values) => setFilters({
+            ...filters,
+            [category]: {
+              ...filters[category],
+              avgFilter: values,
+            },
+          })}
+          filterValues={filters[category]}
+        />
+      </Grid>
     )
   }
 
@@ -101,7 +117,7 @@ export default function WithSubItems({
             >
               {['all', ...available.gyms.filter(x => x.startsWith('r')).map(y => +y.slice(1))].map((tier, i) => (
                 <MenuItem key={tier} dense value={tier}>
-                  {t(i ? `raid_${tier}_plural` : 'all')}
+                  {t(i ? `raid_${tier}_plural` : 'disabled')}
                 </MenuItem>
               ))}
             </Select>

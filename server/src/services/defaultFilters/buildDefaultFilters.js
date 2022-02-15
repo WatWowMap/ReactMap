@@ -7,8 +7,8 @@ const buildPokestops = require('./buildPokestops')
 const buildGyms = require('./buildGyms')
 const { GenericFilter, PokemonFilter } = require('../../models/index')
 
-const base = new PokemonFilter()
-const custom = new PokemonFilter(...Object.values(defaultFilters.pokemon.globalValues))
+const base = new PokemonFilter(defaultFilters.pokemon.allPokemon)
+const custom = new PokemonFilter(defaultFilters.pokemon.allPokemon, 'md', ...Object.values(defaultFilters.pokemon.globalValues))
 
 module.exports = function buildDefault(perms) {
   const stopReducer = perms.pokestops || perms.lures || perms.quests || perms.invasions
@@ -36,6 +36,7 @@ module.exports = function buildDefault(perms) {
       enabled: defaultFilters.nests.enabled,
       pokemon: defaultFilters.nests.pokemon,
       polygons: defaultFilters.nests.polygons,
+      avgFilter: defaultFilters.nests.avgFilter,
       filter: pokemon.nests,
     } : undefined,
     pokestops: stopReducer ? {

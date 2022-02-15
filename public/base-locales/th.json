@@ -364,8 +364,8 @@
   "weather_indicator": "ตัวบ่งชี้การเพิ่มสภาพอากาศ",
   "page": "หน้า {{page}}",
   "navigation_controls": "การควบคุมการนำทาง",
-  "navigation_controls_react": "ปฏิกิริยา",
-  "navigation_controls_leaflet": "แผ่นพับ",
+  "navigation_controls_react": "React",
+  "navigation_controls_leaflet": "Leaflet",
   "exclusive": "พิเศษ",
   "all_moves": "การเคลื่อนไหวทั้งหมด",
   "move": "เคลื่อนไหว",
@@ -434,5 +434,8 @@
   "timer_verified": "ตัวจับเวลานี้ได้รับการยืนยันแล้ว",
   "timer_unverified": "ตัวจับเวลานี้ไม่ได้รับการยืนยัน",
   "all": "ทั้งหมด",
-  "both": "ทั้งคู่"
+  "both": "ทั้งคู่",
+  "loading": "กำลังโหลด {{category}}",
+  "loading_invasions": "เรียกการบุกรุก",
+  "loading_icons": "กำลังเรียกไอคอน"
 }

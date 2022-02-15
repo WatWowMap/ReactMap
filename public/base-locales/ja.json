@@ -394,7 +394,7 @@
   "page": "ページ{{page}}",
   "navigation_controls": "ナビゲーションコントロール",
   "navigation_controls_react": "React",
-  "navigation_controls_leaflet": "リーフレット",
+  "navigation_controls_leaflet": "Leaflet",
   "exclusive": "エクスクルーシブ",
   "all_moves": "すべての動き",
   "move": "動く",
@@ -435,5 +435,8 @@
   "timer_verified": "このタイマーは検証済みです",
   "timer_unverified": "このタイマーは未確認です",
   "all": "全て",
-  "both": "両方"
+  "both": "両方",
+  "loading_icons": "アイコンの取得",
+  "loading_invasions": "侵略をフェッチする",
+  "loading": "{{category}}を読み込んでいます"
 }

@@ -145,24 +145,27 @@ module.exports = {
     },
     scanAreas: (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
-      if (perms?.scanAreas && config.scanAreas.features.length) {
+      const scanAreas = config.scanAreas[req.headers.host]
+        ? config.scanAreas[req.headers.host]
+        : config.scanAreas.main
+      if (perms?.scanAreas && scanAreas.features.length) {
         try {
-          config.scanAreas.features = config.scanAreas.features
+          scanAreas.features = scanAreas.features
             .sort((a, b) => (a.properties.name > b.properties.name) ? 1 : -1)
         } catch (e) {
           console.warn('Failed to sort scan areas', e.message)
         }
       }
-      return [config.scanAreas]
+      return [scanAreas]
     },
     search: async (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
-      const { category, webhookName } = args
-      if (perms?.[category]) {
+      const { category, webhookName, search } = args
+      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
         const isMad = Utility.dbSelection(category.substring(0, category.length - 1)).type === 'mad'
         const distance = raw(`ROUND(( 3959 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
 
-        if (args.search === '') {
+        if (!search || !search.trim()) {
           return []
         }
         switch (args.category) {
@@ -195,16 +198,17 @@ module.exports = {
     },
     searchQuest: async (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
-      const { category } = args
-      if (perms?.[category]) {
+      const { category, search } = args
+      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
         const isMad = Utility.dbSelection(category.substring(0, category.length - 1)).type === 'mad'
         const distance = raw(`ROUND(( 3959 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
 
-        if (args.search === '') {
+        if (!search || !search.trim()) {
           return []
         }
         return Pokestop.searchQuests(args, perms, isMad, distance) || []
       }
+      return []
     },
     spawnpoints: (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms

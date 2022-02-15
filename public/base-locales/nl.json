@@ -477,5 +477,16 @@
   "all": "Alle",
   "confirm_filters_reset": "Bevestig filters resetten",
   "filters_reset_text": "Weet je zeker dat je de filters instellingen terug wilt zetten naar standaardwaarden? Dit kan niet ongedaan gemaakt worden!",
-  "filters_reset_title": "Filters resetten"
+  "filters_reset_title": "Filters resetten",
+  "badge_0": "Geen",
+  "badge_1": "Bronze",
+  "badge_2": "Silver",
+  "badge_3": "Gold",
+  "gym_badge_menu": "Bewerk Gym Badge",
+  "gym_badges": "Gym Badges",
+  "gym_badge_diamonds": "Toon Gym Badges",
+  "gym_badges_subtitle": "Toont Gym Badges op de kaart en een lijst op de profielpagina.",
+  "loading": "Loading {{category}}",
+  "loading_icons": "Pictogrammen aan het Ophalen",
+  "loading_invasions": "Invasions aan het Ophalen"
 }

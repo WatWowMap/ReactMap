@@ -9,7 +9,7 @@ import Utility from '@services/Utility'
 
 import SettingsMenu from './Settings'
 import WithSubItems from './WithSubItems'
-import WithSliders from './WithSliders'
+import PokemonSection from './Pokemon'
 import useStyles from '../../../hooks/useStyles'
 import { useStore, useStatic } from '../../../hooks/useStore'
 import Areas from './Areas'
@@ -45,6 +45,7 @@ export default function Sidebar({
             <WithSubItems
               key={`${category}-${subItem}`}
               category={category}
+              data={ui[category][subItem]}
               filters={filters}
               setFilters={setFilters}
               subItem={subItem}
@@ -56,7 +57,7 @@ export default function Sidebar({
         ); break
       case 'pokemon':
         content = (
-          <WithSliders
+          <PokemonSection
             category={category}
             context={ui[category]}
             specificFilter="ivOr"
