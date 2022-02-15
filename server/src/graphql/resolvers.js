@@ -161,7 +161,7 @@ module.exports = {
     search: async (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const { category, webhookName, search } = args
-      if (perms?.[category] && /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s]+$/.test(search)) {
+      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
         const isMad = Utility.dbSelection(category.substring(0, category.length - 1)).type === 'mad'
         const distance = raw(`ROUND(( 3959 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
 
@@ -199,7 +199,7 @@ module.exports = {
     searchQuest: async (parent, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const { category, search } = args
-      if (perms?.[category] && /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s]+$/.test(search)) {
+      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
         const isMad = Utility.dbSelection(category.substring(0, category.length - 1)).type === 'mad'
         const distance = raw(`ROUND(( 3959 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
 

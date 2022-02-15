@@ -139,7 +139,7 @@ export default function Search({
         label={t(`global_search_${safeSearch[searchTab]}`)}
         value={search}
         onChange={({ target: { value } }) => {
-          if (/^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s]+$/.test(value) || value === '') setSearch(value.toLowerCase())
+          if (/^[0-9\s\p{L}]+$/u.test(value) || value === '') setSearch(value.toLowerCase())
         }}
         variant="outlined"
       />
