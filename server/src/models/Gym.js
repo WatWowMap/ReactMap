@@ -83,6 +83,7 @@ module.exports = class Gym extends Model {
 
     Object.keys(args.filters).forEach(gym => {
       switch (gym.charAt(0)) {
+        case 'r':
         case 'o': break
         case 'e': eggs.push(gym.slice(1)); break
         case 't': teams.push(gym.slice(1).split('-')[0]); break
@@ -93,6 +94,11 @@ module.exports = class Gym extends Model {
         default: raidBosses.add(gym.split('-')[0]); break
       }
     })
+
+    if (!onlyAllGyms && !onlyArEligible && !onlyExEligible && !onlyInBattle && onlyRaids && !raidBosses.size && !eggs.length && onlyRaidTier === 'all' && !userBadges.length) {
+      // Returns nothing if only raids are enabled without any filters
+      return []
+    }
 
     const finalTeams = []
     const finalSlots = {
@@ -160,9 +166,8 @@ module.exports = class Gym extends Model {
           if (raidBosses.size) {
             gym.orWhere(raid => {
               raid.where(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
-                .andWhere(bosses => {
-                  bosses.whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [...raidBosses])
-                })
+                .andWhere(isMad ? 'start' : 'raid_battle_timestamp', '<=', isMad ? this.knex().fn.now() : safeTs)
+                .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [...raidBosses])
             })
           }
           if (eggs.length) {
@@ -173,10 +178,17 @@ module.exports = class Gym extends Model {
                 egg.whereIn(isMad ? 'level' : 'raid_level', eggs)
               }
               egg.andWhere(isMad ? 'start' : 'raid_battle_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
+                .orWhere(unknownEggs => {
+                  unknownEggs.where(isMad ? 'pokemon_id' : 'raid_pokemon_id', 0)
+                    .andWhere(isMad ? 'start' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
+                })
             })
           }
         } else {
-          gym.orWhere(isMad ? 'level' : 'raid_level', onlyRaidTier)
+          gym.orWhere(raidTier => {
+            raidTier.where(isMad ? 'level' : 'raid_level', onlyRaidTier)
+              .andWhere(isMad ? 'start' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
+          })
         }
       }
     })
@@ -200,10 +212,9 @@ module.exports = class Gym extends Model {
           gym.team_id = 0
           gym.available_slots = 6
         }
-        if (onlyRaids && (args.filters[`e${gym.raid_level}`]
-          || args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]
-          || onlyRaidTier === gym.raid_level
-          || onlyRaidTier === 'all')) {
+        if (onlyRaids && (onlyRaidTier === 'all'
+          ? args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`] || args.filters[`e${gym.raid_level}`]
+          : onlyRaidTier === gym.raid_level)) {
           filteredResults.push(gym)
         } else if (gymPerms
           && (onlyAllGyms
