@@ -1,15 +1,16 @@
 import React from 'react'
 import {
-  Grid, Typography, Switch,
+  Grid, Typography, Switch, Select, MenuItem,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+
 import MultiSelector from './MultiSelector'
 import SliderTile from '../dialogs/filters/SliderTile'
 
 export default function WithSubItems({
-  category, filters, setFilters, subItem, noScanAreaOverlay, enableQuestSetSelector, data,
+  category, filters, setFilters, subItem, noScanAreaOverlay, enableQuestSetSelector, data, available,
 }) {
   const { t } = useTranslation()
 
@@ -73,7 +74,7 @@ export default function WithSubItems({
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         {filterCategory}
       </Grid>
-      {enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters[category].quests === true && (
+      {(enableQuestSetSelector === true && category === 'pokestops' && subItem === 'quests' && filters[category].quests === true) && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <MultiSelector
             filters={filters}
@@ -84,7 +85,7 @@ export default function WithSubItems({
           />
         </Grid>
       )}
-      {category === 'gyms' && subItem === 'gymBadges' && filters[category].gymBadges === true && (
+      {(category === 'gyms' && subItem === 'gymBadges' && filters[category].gymBadges === true) && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <MultiSelector
             filters={filters}
@@ -94,6 +95,34 @@ export default function WithSubItems({
             items={['all', 'badge_1', 'badge_2', 'badge_3']}
           />
         </Grid>
+      )}
+      {(category === 'gyms' && subItem === 'raids' && filters[category].raids === true && available?.gyms) && (
+        <>
+          <Grid item xs={5}>
+            <Typography>{t('raid_quick_select')}</Typography>
+          </Grid>
+          <Grid item xs={7} style={{ textAlign: 'right' }}>
+            <Select
+              value={filters[category].raidTier}
+              fullWidth
+              onChange={(e) => {
+                setFilters({
+                  ...filters,
+                  [category]: {
+                    ...filters[category],
+                    raidTier: e.target.value === 'all' ? 'all' : +e.target.value,
+                  },
+                })
+              }}
+            >
+              {['all', ...available.gyms.filter(x => x.startsWith('r')).map(y => +y.slice(1))].map((tier, i) => (
+                <MenuItem key={tier} dense value={tier}>
+                  {t(i ? `raid_${tier}_plural` : 'disabled')}
+                </MenuItem>
+              ))}
+            </Select>
+          </Grid>
+        </>
       )}
     </>
   )
