@@ -31,7 +31,7 @@ const authHandler = async (req, profile, done) => {
       if (!response.ok) {
         throw new Error(`Telegram API error: ${response.status} ${response.statusText}`)
       }
-      if(response.result.status !== 'left' && response.result.status !== 'kicked') {
+      if (response.result.status !== 'left' && response.result.status !== 'kicked') {
         groupInfo.push(group)
       }
     } catch (e) {
