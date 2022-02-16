@@ -15,7 +15,7 @@ const SetText = () => {
     it: 'Caricamento Traduzioni',
     ja: '翻訳を読み込み中',
     ko: '번역 로드 중',
-    // nl: '',
+    nl: 'Vertalingen worden geladen',
     pl: 'Ładowanie tłumaczeń',
     'pt-br': 'Carregando Traduções',
     ru: 'Загрузка переводов',

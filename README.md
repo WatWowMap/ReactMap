@@ -4,7 +4,7 @@
 [![Discord](https://img.shields.io/discord/552003258000998401.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/zZ9h9Xa)  
 ## Description
 
-Pokemon GO Map frontend built with React. Currently in beta testing!
+Pokemon GO Map frontend built with React.
 
 ## Features
 
