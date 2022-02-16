@@ -215,7 +215,7 @@ const MenuActions = ({
   ]
 
   if (perms.gyms) {
-    if (updated > (Date.now() / 1000 - (gymValidDataLimit * 86400))) {
+    if (updated > gymValidDataLimit) {
       options.push({ name: 'exclude_team', action: excludeTeam })
     }
     if (perms.gymBadges && filters.gyms?.gymBadges) {
@@ -376,7 +376,7 @@ const GymInfo = ({ gym, t, Icons }) => {
       justifyContent="space-around"
       alignItems="center"
     >
-      {updated > (Date.now() / 1000 - (gymValidDataLimit * 86400)) && (
+      {(updated > gymValidDataLimit) && (
         <Grid item xs={12}>
           <Typography variant="h6" align="center">
             {t(`team_${team_id}`)}
@@ -599,49 +599,47 @@ const ExtraInfo = ({ gym, t, ts }) => {
     {
       description: 'defender',
       data: t(`poke_${guarding_pokemon_id}`),
+      check: guarding_pokemon_id && updated > gymValidDataLimit,
     },
     {
       description: 'total_cp',
       data: total_cp,
+      check: total_cp && updated > gymValidDataLimit,
     },
     {
       description: 'last_seen',
       timer: <GenericTimer expireTime={updated} />,
       data: Utility.dayCheck(ts, updated),
+      check: updated,
     },
     {
       description: 'last_modified',
       timer: <GenericTimer expireTime={last_modified_timestamp} />,
       data: Utility.dayCheck(ts, last_modified_timestamp),
+      check: last_modified_timestamp,
     },
-  ]
+  ].filter(x => Boolean(x.check))
 
   return (
     <Grid container>
       {extraMetaData.map(meta => (
-        ((meta.data && !['defender', 'total_cp'].includes(meta.description))
-          || (meta.data
-            && ['defender', 'total_cp'].includes(meta.description)
-            && guarding_pokemon_id > 0
-            && updated > (Date.now() / 1000 - (gymValidDataLimit * 86400)))) ? (
-              <Fragment key={meta.description}>
-                <Grid item xs={t('popup_gym_description_width')} style={{ textAlign: 'left' }}>
-                  <Typography variant="caption">
-                    {t(meta.description)}:
-                  </Typography>
-                </Grid>
-                {meta.timer ? (
-                  <Grid item xs={t('popup_gym_seen_timer_width')} style={{ textAlign: 'right' }}>
-                    {meta.timer}
-                  </Grid>
-                ) : null}
-                <Grid item xs={meta.timer ? t('popup_gym_data_width') : t('popup_gym_seen_timer_width')} style={{ textAlign: 'right' }}>
-                  <Typography variant="caption">
-                    {meta.data}
-                  </Typography>
-                </Grid>
-              </Fragment>
-          ) : null
+        <Fragment key={meta.description}>
+          <Grid item xs={t('popup_gym_description_width')} style={{ textAlign: 'left' }}>
+            <Typography variant="caption">
+              {t(meta.description)}:
+            </Typography>
+          </Grid>
+          {Boolean(meta.timer) && (
+            <Grid item xs={t('popup_gym_seen_timer_width')} style={{ textAlign: 'right' }}>
+              {meta.timer}
+            </Grid>
+          )}
+          <Grid item xs={meta.timer ? t('popup_gym_data_width') : t('popup_gym_seen_timer_width')} style={{ textAlign: 'right' }}>
+            <Typography variant="caption">
+              {meta.data}
+            </Typography>
+          </Grid>
+        </Fragment>
       ))}
     </Grid>
   )

@@ -228,7 +228,6 @@ module.exports = class Gym extends Model {
         } else if (gymPerms
           && (onlyAllGyms
             || (onlyArEligible && gym.ar_scan_eligible)
-            || (onlyExEligible && gym.ex_raid_eligible)
             || (onlyInBattle && gym.in_battle)
             || (userBadges.length && (actualBadge === 'all' || userBadgeObj[gym.id] === actualBadge)))) {
           if (args.filters[`t${gym.team_id}-0`]) {

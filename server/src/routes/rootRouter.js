@@ -113,7 +113,7 @@ rootRouter.get('/settings', async (req, res) => {
         },
         manualAreas: config.manualAreas || {},
         icons: config.icons,
-        gymValidDataLimit: config.api.gymValidDataLimit,
+        gymValidDataLimit: Date.now() / 1000 - (config.api.gymValidDataLimit * 86400),
       },
       available: {},
     }
