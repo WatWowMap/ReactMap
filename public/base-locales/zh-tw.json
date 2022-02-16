@@ -438,5 +438,6 @@
   "both": "兩個都",
   "loading_icons": "獲取圖標",
   "loading_invasions": "獲取入侵",
-  "loading": "正在加載 {{category}}"
+  "loading": "正在加載 {{category}}",
+  "pvp_ranking_cap": "等級"
 }

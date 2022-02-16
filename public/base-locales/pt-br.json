@@ -438,5 +438,6 @@
   "both": "Ambos",
   "loading_icons": "Buscando ícones",
   "loading_invasions": "Buscando Invasões",
-  "loading": "Carregando {{category}}"
+  "loading": "Carregando {{category}}",
+  "pvp_ranking_cap": "Nível"
 }

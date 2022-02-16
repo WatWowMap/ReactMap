@@ -484,5 +484,6 @@
   "loading_icons": "Récupération des Icônes",
   "loading_invasions": "Récupération des Invasions",
   "login_button": 12,
-  "join_button": 12
+  "join_button": 12,
+  "pvp_ranking_cap": "Niveau"
 }

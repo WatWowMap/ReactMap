@@ -28,7 +28,7 @@ if (process.env) {
     beforeSend(event) {
       if (event?.exception?.values?.[0]?.stacktrace?.frames?.some(f => f.filename.includes('node_modules'))) {
         // do nothing for external libraries
-        return
+        return null
       }
       return event
     },

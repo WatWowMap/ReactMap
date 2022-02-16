@@ -494,5 +494,6 @@
   "filters_reset_title": "Reset ustawień",
   "loading": "Ładowanie {{category}}",
   "loading_icons": "Ładowanie ikon",
-  "loading_invasions": "Ładowanie inwazji"
+  "loading_invasions": "Ładowanie inwazji",
+  "pvp_ranking_cap": "Poziom"
 }

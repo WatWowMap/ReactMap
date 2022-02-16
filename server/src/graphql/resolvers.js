@@ -12,21 +12,21 @@ const Fetch = require('../services/Fetch')
 module.exports = {
   JSON: GraphQLJSON,
   Query: {
-    badges: (parent, args, { req }) => {
+    badges: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.gymBadges) {
         return Gym.getGymBadges(Utility.dbSelection('gym').type === 'mad', req?.user?.id)
       }
       return []
     },
-    devices: (parent, args, { req }) => {
+    devices: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.devices) {
         return Device.getAllDevices(perms, Utility.dbSelection('device').type === 'mad')
       }
       return []
     },
-    geocoder: (parent, args, { req }) => {
+    geocoder: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.webhooks) {
         const webhook = config.webhookObj[args.name]
@@ -36,14 +36,14 @@ module.exports = {
       }
       return []
     },
-    gyms: (parent, args, { req }) => {
+    gyms: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.gyms || perms?.raids) {
         return Gym.getAllGyms(args, perms, Utility.dbSelection('gym').type === 'mad', req?.user?.id)
       }
       return []
     },
-    gymsSingle: (parent, args, { req }) => {
+    gymsSingle: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.[args.perm]) {
         const query = Gym.query()
@@ -58,21 +58,21 @@ module.exports = {
       }
       return {}
     },
-    nests: (parent, args, { req }) => {
+    nests: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.nests) {
         return Nest.getNestingSpecies(args, perms)
       }
       return []
     },
-    nestsSingle: (parent, args, { req }) => {
+    nestsSingle: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.[args.perm]) {
         return Nest.query().findById(args.id) || {}
       }
       return {}
     },
-    pokestops: (parent, args, { req }) => {
+    pokestops: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.pokestops
         || perms?.lures
@@ -82,7 +82,7 @@ module.exports = {
       }
       return []
     },
-    pokestopsSingle: (parent, args, { req }) => {
+    pokestopsSingle: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.[args.perm]) {
         const query = Pokestop.query()
@@ -97,7 +97,7 @@ module.exports = {
       }
       return {}
     },
-    pokemon: (parent, args, { req }) => {
+    pokemon: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.pokemon) {
         const isMad = Utility.dbSelection('pokemon').type === 'mad'
@@ -108,7 +108,7 @@ module.exports = {
       }
       return []
     },
-    pokemonSingle: (parent, args, { req }) => {
+    pokemonSingle: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.[args.perm]) {
         const query = Pokemon.query().findById(args.id)
@@ -122,28 +122,28 @@ module.exports = {
       }
       return {}
     },
-    portals: (parent, args, { req }) => {
+    portals: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.portals) {
         return Portal.getAllPortals(args, perms)
       }
       return []
     },
-    portalsSingle: (parent, args, { req }) => {
+    portalsSingle: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.[args.perm]) {
         return Portal.query().findById(args.id) || {}
       }
       return {}
     },
-    scanCells: (parent, args, { req }) => {
+    scanCells: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.scanCells && args.zoom >= config.map.scanCellsZoom) {
         return ScanCell.getAllCells(args, perms, Utility.dbSelection('pokestop').type === 'mad')
       }
       return []
     },
-    scanAreas: (parent, args, { req }) => {
+    scanAreas: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const scanAreas = config.scanAreas[req.headers.host]
         ? config.scanAreas[req.headers.host]
@@ -158,7 +158,7 @@ module.exports = {
       }
       return [scanAreas]
     },
-    search: async (parent, args, { req }) => {
+    search: async (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const { category, webhookName } = args
       if (perms?.[category]) {
@@ -196,7 +196,7 @@ module.exports = {
       }
       return []
     },
-    searchQuest: async (parent, args, { req }) => {
+    searchQuest: async (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const { category } = args
       if (perms?.[category]) {
@@ -209,14 +209,14 @@ module.exports = {
         return Pokestop.searchQuests(args, perms, isMad, distance) || []
       }
     },
-    spawnpoints: (parent, args, { req }) => {
+    spawnpoints: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.spawnpoints) {
         return Spawnpoint.getAllSpawnpoints(args, perms, Utility.dbSelection('spawnpoint').type === 'mad')
       }
       return []
     },
-    submissionCells: async (parent, args, { req }) => {
+    submissionCells: async (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.submissionCells && args.zoom >= config.map.submissionZoom - 1) {
         const isMadStops = Utility.dbSelection('pokestop').type === 'mad'
@@ -269,32 +269,31 @@ module.exports = {
       }
       return [{ placementCells: [], typeCells: [] }]
     },
-    weather: (parent, args, { req }) => {
+    weather: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.weather) {
         return Weather.getAllWeather(Utility.dbSelection('weather').type === 'mad')
       }
       return []
     },
-    webhook: (parent, args, { req }) => {
+    webhook: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.webhooks) {
-        return Fetch.webhookApi(args.category, req.user.id, args.status, args.name)
+        return Fetch.webhookApi(args.category, Utility.evalWebhookId(req.user), args.status, args.name)
       }
       return {}
     },
   },
   Mutation: {
-    webhook: (parent, args, { req }) => {
+    webhook: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : false
       const { category, data, status, name } = args
       if (perms?.webhooks?.includes(name)) {
-        const id = req.user.strategy === 'discord' ? req.user.discordId : req.user.telegramId
-        return Fetch.webhookApi(category, id, status, name, data)
+        return Fetch.webhookApi(category, Utility.evalWebhookId(req.user), status, name, data)
       }
       return {}
     },
-    tutorial: async (parent, args, { req }) => {
+    tutorial: async (_, args, { req }) => {
       if (req.user) {
         await User.query()
           .update({ tutorial: args.tutorial })
@@ -307,7 +306,7 @@ module.exports = {
       }
       return false
     },
-    strategy: async (parent, args, { req }) => {
+    strategy: async (_, args, { req }) => {
       if (req.user) {
         await User.query()
           .update({ webhookStrategy: args.strategy })
@@ -316,12 +315,12 @@ module.exports = {
       }
       return false
     },
-    checkUsername: async (parent, args) => {
+    checkUsername: async (_, args) => {
       const results = await User.query()
         .where('username', args.username)
       return Boolean(results.length)
     },
-    setGymBadge: async (parent, args, { req }) => {
+    setGymBadge: async (_, args, { req }) => {
       const perms = req.user ? req.user.perms : false
       if (perms?.gymBadges && req?.user?.id) {
         if (await Badge.query().where('gymId', args.gymId).andWhere('userId', req.user.id).first()) {

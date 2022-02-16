@@ -222,6 +222,8 @@ export default function WebhookAdvanced({
             return `${league.name}${poracleValues.pvp_ranking_worst}`
           case 'pvp_ranking_best':
             return `${league.name}high${poracleValues.pvp_ranking_best}`
+          case 'pvp_ranking_cap':
+            return pvp === 'ohbem' ? `${t('cap').toLowerCase()}${poracleValues.pvp_ranking_cap}` : ''
           default: return ''
         }
       }

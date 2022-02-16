@@ -489,5 +489,6 @@
   "filters_reset_title": "Reset filters",
   "loading": "Loading {{category}}",
   "loading_icons": "Fetching Icons",
-  "loading_invasions": "Fetching Invasions"
+  "loading_invasions": "Fetching Invasions",
+  "pvp_ranking_cap": "Level"
 }

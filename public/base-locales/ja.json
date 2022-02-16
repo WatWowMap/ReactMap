@@ -439,5 +439,6 @@
   "both": "両方",
   "loading_icons": "アイコンの取得",
   "loading_invasions": "侵略をフェッチする",
-  "loading": "{{category}}を読み込んでいます"
+  "loading": "{{category}}を読み込んでいます",
+  "pvp_ranking_cap": "レベル"
 }
