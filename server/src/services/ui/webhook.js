@@ -35,7 +35,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             pvp_ranking_worst: hookConfig.pvpFilterMaxRank,
             pvp_ranking_min_cp: 0,
             pvp_ranking_cap: hookConfig.defaultPvpCap,
-            allForms: true,
+            allForms: false,
             pvpEntry: false,
             noIv: false,
             byDistance: false,
