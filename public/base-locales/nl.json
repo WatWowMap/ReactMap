@@ -488,5 +488,6 @@
   "gym_badges_subtitle": "Toont Gym Badges op de kaart en een lijst op de profielpagina.",
   "loading": "Loading {{category}}",
   "loading_icons": "Pictogrammen aan het Ophalen",
-  "loading_invasions": "Invasions aan het Ophalen"
+  "loading_invasions": "Invasions aan het Ophalen",
+  "pvp_ranking_cap": "Level"
 }

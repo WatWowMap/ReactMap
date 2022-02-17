@@ -437,5 +437,6 @@
   "both": "Både",
   "loading_icons": "Hämta ikoner",
   "loading_invasions": "Att hämta invasioner",
-  "loading": "Laddar {{category}}"
+  "loading": "Laddar {{category}}",
+  "pvp_ranking_cap": "Nivå"
 }

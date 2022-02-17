@@ -488,5 +488,6 @@
   "raid_quick_select": "Schnellauswahl",
   "loading": "laden von {{category}}",
   "loading_icons": "Icons abrufen",
-  "loading_invasions": "Rocket-Lineup abrufen"
+  "loading_invasions": "Rocket-Lineup abrufen",
+  "pvp_ranking_cap": "Level"
 }

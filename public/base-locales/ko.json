@@ -437,5 +437,6 @@
   "both": "둘 다",
   "loading_icons": "아이콘 가져오기",
   "loading_invasions": "침략 가져오기",
-  "loading": "{{category}} 로드 중"
+  "loading": "{{category}} 로드 중",
+  "pvp_ranking_cap": "수준"
 }

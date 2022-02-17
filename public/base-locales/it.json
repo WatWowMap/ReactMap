@@ -437,5 +437,6 @@
   "both": "Entrambi",
   "loading_icons": "Recupero delle icone",
   "loading_invasions": "Recupero delle invasioni",
-  "loading": "Caricamento {{category}}"
+  "loading": "Caricamento {{category}}",
+  "pvp_ranking_cap": "Livello"
 }

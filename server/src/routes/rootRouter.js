@@ -229,14 +229,8 @@ rootRouter.get('/settings', async (req, res) => {
         try {
           await Promise.all(filtered.map(async webhook => {
             if (webhook.enabled && config.webhookObj?.[webhook.name]?.client?.valid) {
-              const { strategy, webhookStrategy, discordId, telegramId } = serverSettings.user
-              const webhookId = (() => {
-                switch (strategy) {
-                  case 'discord': return discordId
-                  case 'telegram': return telegramId
-                  default: return webhookStrategy === 'discord' ? discordId : telegramId
-                }
-              })()
+              const webhookId = Utility.evalWebhookId(serverSettings.user)
+              const { strategy, webhookStrategy } = serverSettings.user
 
               const remoteData = await Fetch.webhookApi('allProfiles', webhookId, 'GET', webhook.name)
               const { areas } = await Fetch.webhookApi('humans', webhookId, 'GET', webhook.name)

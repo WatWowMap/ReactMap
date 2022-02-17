@@ -437,5 +437,6 @@
   "both": "ทั้งคู่",
   "loading": "กำลังโหลด {{category}}",
   "loading_invasions": "เรียกการบุกรุก",
-  "loading_icons": "กำลังเรียกไอคอน"
+  "loading_icons": "กำลังเรียกไอคอน",
+  "pvp_ranking_cap": "ระดับ"
 }

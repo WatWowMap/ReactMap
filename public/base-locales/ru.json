@@ -437,5 +437,6 @@
   "both": "Оба",
   "loading_icons": "Получение иконок",
   "loading_invasions": "Получение вторжений",
-  "loading": "Загрузка {{category}}"
+  "loading": "Загрузка {{category}}",
+  "pvp_ranking_cap": "Уровень"
 }
