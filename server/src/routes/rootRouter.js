@@ -113,6 +113,7 @@ rootRouter.get('/settings', async (req, res) => {
         },
         manualAreas: config.manualAreas || {},
         icons: config.icons,
+        gymValidDataLimit: Date.now() / 1000 - (config.api.gymValidDataLimit * 86400),
       },
       available: {},
     }
@@ -122,7 +123,7 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.loggedIn = req.user
 
       // keys that are being sent to the frontend but are not options
-      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons']
+      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons', 'gymValidDataLimit']
 
       Object.keys(serverSettings.config).forEach(setting => {
         try {

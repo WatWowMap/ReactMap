@@ -87,7 +87,7 @@ export default function PokemonPopup({
         pokemon={pokemon}
         popups={popups}
         setPopups={setPopups}
-        hasPvp={hasLeagues.length}
+        hasPvp={Boolean(hasLeagues.length)}
         classes={classes}
         Icons={Icons}
       />
@@ -398,7 +398,7 @@ const Footer = ({
 
   return (
     <>
-      {Boolean(hasPvp) && (
+      {hasPvp && (
         <Grid item xs={4}>
           <IconButton
             className={popups.pvp ? classes.expandOpen : classes.expand}

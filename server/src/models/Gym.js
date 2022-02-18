@@ -6,7 +6,7 @@ const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
-  api: { searchResultsLimit, queryLimits },
+  api: { searchResultsLimit, queryLimits, gymValidDataLimit },
   database: { schemas, settings: { gymBadgeTableName, joinGymBadgeTable } },
 } = require('../services/config')
 const Badge = require('./Badge')
@@ -212,6 +212,15 @@ module.exports = class Gym extends Model {
           gym.team_id = 0
           gym.available_slots = 6
         }
+        if (gymValidDataLimit && gym.updated < (Date.now() / 1000 - (gymValidDataLimit * 86400))) {
+          gym.team_id = 0
+          gym.available_slots = 6
+          gym.raid_end_timestamp = null
+          gym.raid_battle_timestamp = null
+          gym.raid_pokemon_id = null
+          gym.raid_level = null
+          gym.in_battle = null
+        }
         if (onlyRaids && (onlyRaidTier === 'all'
           ? args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`] || args.filters[`e${gym.raid_level}`]
           : onlyRaidTier === gym.raid_level)) {
@@ -219,7 +228,6 @@ module.exports = class Gym extends Model {
         } else if (gymPerms
           && (onlyAllGyms
             || (onlyArEligible && gym.ar_scan_eligible)
-            || (onlyExEligible && gym.ex_raid_eligible)
             || (onlyInBattle && gym.in_battle)
             || (userBadges.length && (actualBadge === 'all' || userBadgeObj[gym.id] === actualBadge)))) {
           if (args.filters[`t${gym.team_id}-0`]) {
