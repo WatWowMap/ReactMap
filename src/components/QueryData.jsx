@@ -100,7 +100,7 @@ export default function QueryData({
   useEffect(() => () => setExcludeList([]))
 
   const renderedData = data || previousData || {}
-  if (error && process.env.NODE_ENV === 'development') {
+  if (error && process.env.DEVELOPMENT) {
     return (
       <Notification
         severity="error"

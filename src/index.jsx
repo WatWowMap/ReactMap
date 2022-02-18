@@ -10,7 +10,7 @@ import './services/i18n'
 if (process.env) {
   const {
     GOOGLE_ANALYTICS_ID, ANALYTICS_DEBUG_MODE, TITLE, VERSION,
-    SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE, isDevelopment,
+    SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE, DEVELOPMENT,
   } = process.env
   if (GOOGLE_ANALYTICS_ID) {
     ReactGA.initialize(GOOGLE_ANALYTICS_ID, { debug: ANALYTICS_DEBUG_MODE })
@@ -23,8 +23,8 @@ if (process.env) {
     integrations: [new Integrations.BrowserTracing()],
     tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE ? +SENTRY_TRACES_SAMPLE_RATE : 0.1,
     release: VERSION,
-    environment: isDevelopment ? 'development' : 'production',
-    debug: isDevelopment,
+    environment: DEVELOPMENT ? 'development' : 'production',
+    debug: DEVELOPMENT,
     beforeSend(event) {
       if (event?.exception?.values?.[0]?.stacktrace?.frames?.some(f => f.filename.includes('node_modules'))) {
         // do nothing for external libraries

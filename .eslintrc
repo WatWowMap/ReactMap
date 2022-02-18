@@ -1,9 +1,9 @@
 {
   "extends": [
+    "eslint:recommended",
     "airbnb-base",
     "airbnb/rules/react"
   ],
-  "parser": "@babel/eslint-parser",
   "env": {
     "browser": true,
     "jest": true

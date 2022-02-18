@@ -1,4 +1,4 @@
-import '../assets/scss/main.scss'
+import '../assets/scss/main.css'
 
 import React, { Suspense } from 'react'
 import { ApolloProvider } from '@apollo/client'

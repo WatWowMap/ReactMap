@@ -1,7 +1,5 @@
-@import "~react-leaflet-markercluster/dist/styles.min.css";
-@import "~leaflet.locatecontrol/dist/L.Control.Locate.min.css";
-@import "holiday.scss";
-@import "loading.scss";
+@import "holiday.css";
+@import "loading.css";
 
 .leaflet-container {
   position: absolute;
