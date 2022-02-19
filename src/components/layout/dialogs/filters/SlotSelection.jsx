@@ -88,13 +88,15 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters, is
               </Grid>
             </Grid>
           ))}
-          {isMobile && <Grid item xs={12} style={{ textAlign: 'center', margin: '15px 0' }}>
-            <Size
-              filterValues={filterValues[team]}
-              handleChange={handleSizeChange}
-              btnSize="medium"
-            />
-          </Grid>}
+          {isMobile && (
+            <Grid item xs={12} style={{ textAlign: 'center', margin: '15px 0' }}>
+              <Size
+                filterValues={filterValues[team]}
+                handleChange={handleSizeChange}
+                btnSize="medium"
+              />
+            </Grid>
+          )}
         </Grid>
       </DialogContent>
       <Footer options={[
