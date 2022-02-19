@@ -1,16 +1,21 @@
 {
   "extends": [
-    "eslint:recommended",
-    "airbnb-base",
-    "airbnb/rules/react"
+    "airbnb",
+    "airbnb/rules/react",
+    "eslint:recommended"
   ],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
   "env": {
     "browser": true,
-    "jest": true
+    "jest": true,
+    "node": true
   },
   "globals": {
     "document": true,
-    "window": true
+    "window": true,
+    "inject": true
   },
   "rules": {
     "linebreak-style": 0,
@@ -59,6 +64,7 @@
   "settings": {
     "node": {
       "extensions": [
+        ".mjs",
         ".js",
         ".jsx",
         ".ts",
@@ -90,6 +96,7 @@
           ]
         ],
         "extensions": [
+          ".mjs",
           ".js",
           ".jsx",
           ".ts",

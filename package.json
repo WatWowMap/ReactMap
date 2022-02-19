@@ -8,9 +8,9 @@
   "private": true,
   "scripts": {
     "start": "yarn build && yarn server",
-    "build": "yarn create-locales && node esbuild.config.js",
+    "build": "yarn create-locales && node esbuild.config.mjs",
     "server": "yarn create-area && yarn generate && yarn migrate:latest && node server/src/index.js",
-    "watch": "node esbuild.config.js --dev",
+    "watch": "node esbuild.config.mjs --dev",
     "dev": "nodemon server/src/index.js --watch server",
     "generate": "node server/scripts/generateMasterfile.js",
     "create-locales": "node server/scripts/createLocales.js",
@@ -27,7 +27,7 @@
     "yarn": "1.22.x"
   },
   "devDependencies": {
-    "@craftamap/esbuild-plugin-html": "^0.2.2",
+    "@craftamap/esbuild-plugin-html": "^0.2.3",
     "dotenv": "^10.0.0",
     "esbuild": "^0.14.22",
     "esbuild-plugin-mxn-copy": "^1.0.1",

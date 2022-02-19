@@ -79,7 +79,7 @@ export default class Utility {
   }
 
   static analytics(category, action = false, label = false, nonInteraction = false) {
-    if (process.env?.GOOGLE_ANALYTICS_ID) {
+    if (inject?.GOOGLE_ANALYTICS_ID) {
       if (action) {
         ReactGA.event({
           category, action, label, nonInteraction,

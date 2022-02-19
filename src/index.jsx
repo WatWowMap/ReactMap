@@ -7,11 +7,11 @@ import { Integrations } from '@sentry/tracing'
 import App from './components/App'
 import './services/i18n'
 
-if (process.env) {
+if (inject) {
   const {
     GOOGLE_ANALYTICS_ID, ANALYTICS_DEBUG_MODE, TITLE, VERSION,
     SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE, DEVELOPMENT,
-  } = process.env
+  } = inject
   if (GOOGLE_ANALYTICS_ID) {
     ReactGA.initialize(GOOGLE_ANALYTICS_ID, { debug: ANALYTICS_DEBUG_MODE })
   }
