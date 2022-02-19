@@ -335,7 +335,6 @@
   "message_of_the_day": "Wiadomość Dnia",
   "has_quest_indicator": "Alternatywny kolor dla Pokestopów z zadaniami",
   "show_ar_badge": "Pokaż odznakę AR",
-  "raids_or": "Filtruj raid bossy oddzielnie od raidów",
   "general": "Ogólny",
   "link_global_and_advanced": "Połącz globalne oraz zaawansowane",
   "normal_forms": "Formy normalne",
@@ -494,5 +493,6 @@
   "filters_reset_title": "Reset ustawień",
   "loading": "Ładowanie {{category}}",
   "loading_icons": "Ładowanie ikon",
-  "loading_invasions": "Ładowanie inwazji"
+  "loading_invasions": "Ładowanie inwazji",
+  "pvp_ranking_cap": "Poziom"
 }

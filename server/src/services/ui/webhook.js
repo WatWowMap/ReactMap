@@ -34,7 +34,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             pvp_ranking_best: 1,
             pvp_ranking_worst: hookConfig.pvpFilterMaxRank,
             pvp_ranking_min_cp: 0,
-            allForms: true,
+            pvp_ranking_cap: hookConfig.defaultPvpCap,
+            allForms: false,
             pvpEntry: false,
             noIv: false,
             byDistance: false,
@@ -64,7 +65,10 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
               ],
             },
             pvp: {
-              selects: [{ name: 'pvp_ranking_league', options: [{ name: 'none', cp: 0 }, ...leagues], xs: isOhbem ? 12 : 6, sm: isOhbem ? 6 : 3 }],
+              selects: [
+                { name: 'pvp_ranking_league', options: [{ name: 'none', cp: 0 }, ...leagues], xs: 6, sm: 3 },
+                ...(isOhbem ? [{ name: 'pvp_ranking_cap', options: [0, ...(hookConfig.pvpCaps || [])], xs: 6, sm: 3 }] : []),
+              ],
               texts: isOhbem
                 ? []
                 : [{ name: 'pvp_ranking_min_cp', type: 'number', adornment: 'cp', width: 110, xs: 6, sm: 3 }],

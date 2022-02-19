@@ -164,6 +164,9 @@ export default function WebhookAdvanced({
         } else {
           menuItems.push(<MenuItem key={1} value={1} dense>1</MenuItem>)
         } break
+      case 'pvp_ranking_cap': option.options.forEach(subOption => (
+        menuItems.push(<MenuItem key={subOption} value={subOption} dense>{subOption ? t(subOption, subOption) : t('all')}</MenuItem>)
+      )); break
       case 'pvp_ranking_league': option.options.forEach(league => (
         menuItems.push(<MenuItem key={league.name} value={league.cp} dense>{t(`slider_${league.name}`)}</MenuItem>)
       )); break
@@ -222,6 +225,8 @@ export default function WebhookAdvanced({
             return `${league.name}${poracleValues.pvp_ranking_worst}`
           case 'pvp_ranking_best':
             return `${league.name}high${poracleValues.pvp_ranking_best}`
+          case 'pvp_ranking_cap':
+            return pvp === 'ohbem' ? `${t('cap').toLowerCase()}${poracleValues.pvp_ranking_cap}` : ''
           default: return ''
         }
       }

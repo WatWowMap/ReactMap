@@ -26,7 +26,6 @@
   "has_quest_indicator": "퀘스트가 있는 정류장의 대체 색상",
   "show_ar_badge": "AR 배지 표시",
   "all_gyms": "모든 체육관",
-  "raids_or": "레이드와 별도로 레이드 보스 필터링",
   "general": "일반적인",
   "server_dev_error_0": "{{variable_0}}",
   "link_global_and_advanced": "링크 글로벌",
@@ -438,5 +437,6 @@
   "both": "둘 다",
   "loading_icons": "아이콘 가져오기",
   "loading_invasions": "침략 가져오기",
-  "loading": "{{category}} 로드 중"
+  "loading": "{{category}} 로드 중",
+  "pvp_ranking_cap": "수준"
 }

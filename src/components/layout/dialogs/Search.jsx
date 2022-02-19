@@ -138,7 +138,9 @@ export default function Search({
         autoComplete="off"
         label={t(`global_search_${safeSearch[searchTab]}`)}
         value={search}
-        onChange={(event) => setSearch(event.target.value.toLowerCase())}
+        onChange={({ target: { value } }) => {
+          if (/^[0-9\s\p{L}]+$/u.test(value) || value === '') setSearch(value.toLowerCase())
+        }}
         variant="outlined"
       />
       <Grid container>

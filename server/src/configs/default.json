@@ -56,7 +56,8 @@
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
     "searchResultsLimit": 15,
-    "nestHemisphere": "north"
+    "nestHemisphere": "north",
+    "gymValidDataLimit": 30
   },
   "multiDomains": [],
   "map": {
@@ -192,7 +193,6 @@
       "showExBadge": false,
       "showArBadge": false,
       "raidLevelBadges": false,
-      "raidsOr": true,
       "gymBadgeDiamonds": true
     },
     "pokestops": {
@@ -261,7 +261,9 @@
       "enabled": false,
       "polygons": false,
       "pokemon": false,
-      "allPokemon": true
+      "allPokemon": true,
+      "avgFilter": [0, 100],
+      "avgSliderStep": 1
     },
     "pokestops": {
       "enabled": false,
