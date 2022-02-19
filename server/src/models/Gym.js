@@ -121,18 +121,18 @@ module.exports = class Gym extends Model {
       slots.forEach(slot => {
         if (slot.team === team) {
           slotCount += 1
-          finalSlots[team].push(slot.slots)
+          finalSlots[team].push(+slot.slots)
         }
       })
       if (slotCount === 6 || team == 0) {
         delete finalSlots[team]
-        finalTeams.push(team)
+        finalTeams.push(+team)
       }
     })
 
     if (!onlyArEligible && !onlyExEligible && !onlyInBattle && !userBadges.length) {
       // Does some checks if no special filters are enabled
-      if (!onlyRaids && onlyAllGyms && Object.values(finalSlots).every(x => !x.length) && !finalTeams.length) {
+      if (!onlyRaids && onlyAllGyms && !slots.length && !finalTeams.length) {
         // Returns nothing if gyms are enabled but no teams are selected
         return []
       }
@@ -225,7 +225,8 @@ module.exports = class Gym extends Model {
 
       queryResults.forEach(gym => {
         const newGym = Object.fromEntries(coreFields.map(field => [field, gym[field]]))
-        const raidKey = `${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`
+        const isEgg = gym.raid_battle_timestamp > safeTs && !gym.raid_pokemon_id
+        const isRaid = gym.raid_end_timestamp > safeTs
 
         if (userBadgeObj[gym.id]) {
           newGym.badge = userBadgeObj[gym.id]
@@ -237,11 +238,14 @@ module.exports = class Gym extends Model {
           gymFields.forEach(field => newGym[field] = gym[field])
         }
         if (onlyRaids && raidPerms && (onlyRaidTier === 'all'
-          ? args.filters[raidKey] || args.filters[`e${gym.raid_level}`]
-          : onlyRaidTier === gym.raid_level)) {
+          ? (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`] && isRaid) || (args.filters[`e${gym.raid_level}`] && isEgg)
+          : onlyRaidTier === gym.raid_level && (isRaid || isEgg))) {
           raidFields.forEach(field => newGym[field] = gym[field])
+          newGym.hasRaid = true
         }
-        filteredResults.push(newGym)
+        if (newGym.hasRaid || newGym.badge || finalTeams.includes(gym.team_id) || finalSlots[gym.team_id]?.includes(gym.available_slots)) {
+          filteredResults.push(newGym)
+        }
       })
       return filteredResults
     }
