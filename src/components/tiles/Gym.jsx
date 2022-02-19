@@ -109,7 +109,7 @@ const areEqual = (prev, next) => {
     && prev.item.raid_level === next.item.raid_level
     && prev.item.in_battle === next.item.in_battle
     && prev.item.badge === next.item.badge
-    && (`badge_${prev.item.badge}` === next.filters.badge || next.filters.badge === 'all')
+    // && (`badge_${prev.item.badge}` === next.filters.badge || next.filters.badge === 'all')
     && prev.item.team_id === next.item.team_id
     && prev.item.available_slots === next.item.available_slots
     && raidLogic()

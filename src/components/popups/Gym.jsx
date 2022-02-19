@@ -400,7 +400,7 @@ const GymInfo = ({ gym, t, Icons }) => {
           }}
         />
       )}
-      {(ar_scan_eligible !== 0 && ar_scan_eligible !== null) && (
+      {ar_scan_eligible && (
         <Grid
           item
           xs={6}
