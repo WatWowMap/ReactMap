@@ -31,7 +31,7 @@ const SetText = () => {
 
 export default function App() {
   document.body.classList.add('dark')
-  console.log('hi')
+
   return (
     <Suspense fallback={<SetText />}>
       <ApolloProvider client={client}>
