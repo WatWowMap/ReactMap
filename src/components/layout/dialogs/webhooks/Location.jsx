@@ -29,8 +29,8 @@ const Location = ({
   })
 
   const { lc, color } = useLocation(map)
-  const [search, { data, previousData, loading }] = useLazyQuery(Query.geocoder(), {
-    variables: { search, name: selectedWebhook },
+  const [setSearch, { data, previousData, loading }] = useLazyQuery(Query.geocoder(), {
+    variables: { search: '', name: selectedWebhook },
   })
 
   const handleLocationChange = useCallback((location) => {
@@ -109,7 +109,7 @@ const Location = ({
               {...params}
               label={t('search_location')}
               variant="outlined"
-              onChange={(e) => search({ variables: { search: e.target.value } })}
+              onChange={(e) => setSearch({ variables: { search: e.target.value } })}
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
