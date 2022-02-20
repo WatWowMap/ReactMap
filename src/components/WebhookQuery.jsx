@@ -20,18 +20,14 @@ export default function WebhookQuery({ match, serverSettings }) {
       perm: match.params.category.toLowerCase(),
     },
   })
-  return (
-    <>
-      {data && (
-        <ConfigSettings
-          paramLocation={data[`${lowercase}Single`]
-            ? [data[`${lowercase}Single`].lat, data[`${lowercase}Single`].lon]
-            : null}
-          paramZoom={match.params.zoom}
-          match={match}
-          serverSettings={serverSettings}
-        />
-      )}
-    </>
+  return data && (
+    <ConfigSettings
+      paramLocation={data[`${lowercase}Single`]
+        ? [data[`${lowercase}Single`].lat, data[`${lowercase}Single`].lon]
+        : null}
+      paramZoom={match.params.zoom}
+      match={match}
+      serverSettings={serverSettings}
+    />
   )
 }

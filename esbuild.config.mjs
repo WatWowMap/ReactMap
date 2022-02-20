@@ -1,13 +1,15 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-console */
+import path from 'path'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
+import dotenv from 'dotenv'
+
 import { build } from 'esbuild'
 import { htmlPlugin } from '@craftamap/esbuild-plugin-html'
 import esbuildMxnCopy from 'esbuild-plugin-mxn-copy'
 import aliasPlugin from 'esbuild-plugin-path-alias'
-import path from 'path'
-import fs from 'fs'
-import dotenv from 'dotenv'
-import { fileURLToPath } from 'url'
+// import { ESLint } from 'eslint'
 
 const env = fs.existsSync('.env') ? dotenv.config() : { parsed: {} }
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -40,7 +42,36 @@ const plugins = [
   }),
 ]
 
-if (!isDevelopment) {
+if (isDevelopment) {
+  // plugins.push(
+  //   {
+  //     name: 'eslint',
+  //     setup(b) {
+  //       const eslint = new ESLint()
+
+  //       b.onLoad({
+  //         filter: /node_modules/,
+  //         // namespace: 'file',
+  //       }, async (args) => {
+  //         return {
+  //           contents: fs.readFileSync(args.path, 'utf8')
+  //             + '\n//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIiJdLCJtYXBwaW5ncyI6IkEifQ==',
+  //           loader: 'default',
+  //         }
+
+  //         const result = await eslint.lintFiles(filePath)
+  //         console.log(filePath)
+  //         const formatter = await eslint.loadFormatter('stylish')
+  //         const output = formatter.format(result)
+  //         if (output.length > 0) {
+  //           // eslint-disable-next-line no-console
+  //           console.log(output)
+  //         }
+  //       })
+  //     },
+  //   },
+  // )
+} else {
   plugins.push(
     {
       name: 'Clean Plugin',

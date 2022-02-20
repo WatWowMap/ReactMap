@@ -300,7 +300,11 @@ const RaidImage = ({
 
   const src = raid_pokemon_id
     ? Icons.getPokemon(
-      raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume,
+      raid_pokemon_id,
+      raid_pokemon_form,
+      raid_pokemon_evolution,
+      raid_pokemon_gender,
+      raid_pokemon_costume,
     )
     : Icons.getEggs(raid_level, raid_battle_timestamp < ts, raid_is_exclusive)
 
@@ -328,6 +332,7 @@ const RaidImage = ({
       >
         <img
           src={src}
+          alt={src}
           style={{
             maxHeight: 50,
             maxWidth: 50,
@@ -559,6 +564,7 @@ const GymFooter = ({
           >
             <img
               src={Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
+              alt={popups.raids ? 'gyms' : 'raids'}
               height={20}
               width="auto"
             />

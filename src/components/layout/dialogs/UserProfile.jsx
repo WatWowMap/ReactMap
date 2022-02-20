@@ -307,6 +307,7 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
       <Grid item xs={12} style={{ maxHeight: 60 }} onClick={() => map.flyTo([item.lat, item.lon], 16)}>
         <img
           src={item.url ? item.url.replace('http', 'https') : ''}
+          alt={item.url}
           style={{
             width: 48,
             height: 48,
@@ -317,6 +318,7 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
         {badge && (
           <img
             src={Icons.getMisc(`badge_${badge}`)}
+            alt={badge}
             style={{
               width: 40,
               height: 'auto',

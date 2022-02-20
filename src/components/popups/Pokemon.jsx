@@ -192,7 +192,7 @@ const Header = ({
             >{metaData.pokedexId}
             </Avatar>
           )
-          : <img src={iconUrl} style={{ maxWidth: 40, maxHeight: 40 }} />}
+          : <img src={iconUrl} style={{ maxWidth: 40, maxHeight: 40 }} alt={pokemon.pokemon_id} />}
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'center' }}>
         <Typography variant={pokeName.length > 8 ? 'h6' : 'h5'}>
@@ -407,6 +407,7 @@ const Footer = ({
             aria-expanded={popups.pvp}
           >
             <img
+              alt="pvp"
               src={Icons.getMisc('pvp')}
               height={20}
               width="auto"
@@ -513,6 +514,7 @@ const PvpInfo = ({
         img: <img
           src={Icons.getPokemon(each.pokemon, each.form, each.evolution, each.gender, each.costume)}
           height={20}
+          alt={each.pokemon}
         />,
         rank: each.rank || 0,
         cp: each.cp || 0,
@@ -528,7 +530,7 @@ const PvpInfo = ({
     <table className="table-pvp">
       <thead>
         <tr>
-          <td style={rowClass}><img src={Icons.getMisc(league === 'great' || league === 'ultra' ? league : 'cup')} height={20} /></td>
+          <td style={rowClass}><img src={Icons.getMisc(league === 'great' || league === 'ultra' ? league : 'cup')} height={20} alt="league" /></td>
           <td style={rowClass}>{t('rank')}</td>
           <td style={rowClass}>{t('cp')}</td>
           <td style={rowClass}>{t('lvl')}</td>

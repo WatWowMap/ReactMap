@@ -39,6 +39,20 @@ export default function Sidebar({
   const drawerItems = Object.keys(ui).map(category => {
     let content
     switch (category) {
+      case 'pokemon':
+        content = (
+          <PokemonSection
+            category={category}
+            context={ui[category]}
+            specificFilter="ivOr"
+            filters={filters}
+            setFilters={setFilters}
+          />
+        ); break
+      case 'settings':
+        content = (
+          <SettingsMenu toggleDialog={toggleDialog} Icons={Icons} />
+        ); break
       default:
         content = (
           Object.keys(ui[category]).map(subItem => (
@@ -55,20 +69,6 @@ export default function Sidebar({
             />
           ))
         ); break
-      case 'pokemon':
-        content = (
-          <PokemonSection
-            category={category}
-            context={ui[category]}
-            specificFilter="ivOr"
-            filters={filters}
-            setFilters={setFilters}
-          />
-        ); break
-      case 'settings':
-        content = (
-          <SettingsMenu toggleDialog={toggleDialog} Icons={Icons} />
-        )
     }
     return (
       <Accordion

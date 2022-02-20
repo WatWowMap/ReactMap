@@ -10,7 +10,8 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
   let filterId = 's0'
   let popupYOffset = 1.3
   const baseIcon = Icons.getPokestops(
-    hasLure ? lure_id : 0, hasInvasion,
+    hasLure ? lure_id : 0,
+    hasInvasion,
     (hasQuest && userSettings.hasQuestIndicator),
     (userSettings.showArBadge && ar_scan_eligible),
   )
@@ -78,9 +79,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
           }); break
         case 7:
           questIcons.unshift({
-            url: Icons.getPokemon(
-              quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny,
-            ),
+            url: Icons.getPokemon(quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny),
           }); break
         case 9:
           questIcons.unshift({
@@ -109,6 +108,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
     <div className="marker-image-holder top-overlay">
       <img
         src={baseIcon}
+        alt={baseIcon}
         style={{
           width: baseSize,
           height: baseSize,
@@ -120,6 +120,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
       {Boolean(userSettings.showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')) && (
         <img
           src={Icons.getMisc('ar')}
+          alt="ar"
           style={{
             width: baseSize / 2,
             height: 'auto',
@@ -133,6 +134,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
         <Fragment key={icon.url}>
           <img
             src={icon.url}
+            alt={icon.url}
             style={{
               width: questSizes[i],
               height: questSizes[i],
@@ -151,6 +153,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
         <img
           key={icon}
           src={icon}
+          alt={icon}
           style={{
             width: invasionSizes[i],
             height: invasionSizes[i],

@@ -125,6 +125,7 @@ export default function NestPopup({
       <Grid item xs={6} style={{ textAlign: 'center' }}>
         <img
           src={iconUrl}
+          alt={iconUrl}
           style={{
             maxHeight: 75,
             maxWidth: 75,
