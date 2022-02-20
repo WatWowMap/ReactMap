@@ -5,9 +5,7 @@ import { useTranslation, Trans } from 'react-i18next'
 export default function QuestTitle({ questTitle, questTarget }) {
   const { i18n } = useTranslation()
 
-  const normalized = questTitle.startsWith('quest_')
-    ? questTitle.replace('quest_', 'quest_title_').toLowerCase()
-    : `quest_title_${questTitle.toLowerCase()}`
+  const normalized = `quest_title_${questTitle.toLowerCase()}`
 
   return i18n.exists(normalized) ? (
     <Typography variant="caption">
