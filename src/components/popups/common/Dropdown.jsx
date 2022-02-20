@@ -14,6 +14,7 @@ export default function Dropdown({ options, anchorEl, handleClose }) {
         style: {
           maxHeight: 216,
           minWidth: 20,
+          margin: '10px 0px',
         },
       }}
     >
