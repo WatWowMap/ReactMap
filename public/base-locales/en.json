@@ -368,7 +368,6 @@
   "has_quest_indicator": "Alternative Color for Stops with Quests",
   "show_ar_badge": "Show AR Badge",
   "all_gyms": "All Gyms",
-  "raids_or": "Filter Raid Bosses Separately from Raids",
   "general": "General",
   "server_dev_error_0": "{{variable_0}}",
   "link_global_and_advanced": "Link Global & Advanced",
@@ -487,6 +486,8 @@
   "confirm_filters_reset": "Reset filters",
   "filters_reset_text": "Are you sure you want to reset settings to default values? This cannot be undone!",
   "filters_reset_title": "Reset filters",
+  "raid_quick_select": "Quick Select",
+  "disabled": "Disabled",
   "loading": "Loading {{category}}",
   "loading_icons": "Fetching Icons",
   "loading_invasions": "Fetching Invasions",
@@ -507,5 +508,6 @@
   "scan_loading": "Your scan request is being processed and sent to the system!",
   "scan_error_title": "Error",
   "scan_error": "There has been an error while processing the scan request...",
-  "scan_outside_area": "This location is outside the boundaries of authorized areas"
+  "scan_outside_area": "This location is outside the boundaries of authorized areas",
+  "pvp_ranking_cap": "Level"
 }

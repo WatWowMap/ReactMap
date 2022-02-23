@@ -349,10 +349,7 @@ const QuestConditions = ({ pokestop, quest, t, userSettings }) => {
   }
 
   if (quest_title && !quest_title.includes('geotarget')) {
-    const normalized = quest_title.startsWith('quest_')
-      ? quest_title.replace('quest_', 'quest_title_').toLowerCase()
-      : `quest_title_${quest_title.toLowerCase()}`
-
+    const normalized = `quest_title_${quest_title.toLowerCase()}`
     if (i18n.exists(normalized)) {
       return (
         <Grid item xs={9} style={{ textAlign: 'center' }}>

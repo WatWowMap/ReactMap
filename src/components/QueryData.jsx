@@ -33,7 +33,6 @@ export default function QueryData({
     const trimmed = {
       onlyLegacyExclude: [],
       onlyLegacy: userSettings.legacyFilter,
-      onlyOrRaids: userSettings.raidsOr,
       onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
     }
     Object.entries(requestedFilters).forEach(topLevelFilter => {

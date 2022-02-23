@@ -26,6 +26,7 @@ module.exports = function buildDefault(perms) {
       arEligible: perms.gyms ? false : undefined,
       gymBadges: perms.gymBadges ? defaultFilters.gyms.gymBadges : undefined,
       badge: perms.gymBadges ? 'all' : undefined,
+      raidTier: perms.raids ? 'all' : undefined,
       filter: {
         ...buildGyms(perms, defaultFilters.gyms),
         ...pokemon.raids,
@@ -35,6 +36,7 @@ module.exports = function buildDefault(perms) {
       enabled: defaultFilters.nests.enabled,
       pokemon: defaultFilters.nests.pokemon,
       polygons: defaultFilters.nests.polygons,
+      avgFilter: defaultFilters.nests.avgFilter,
       filter: pokemon.nests,
     } : undefined,
     pokestops: stopReducer ? {

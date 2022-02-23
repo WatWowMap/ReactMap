@@ -393,7 +393,6 @@
   "distance_radius": "Aperçu du rayon des distances",
   "areas": "Zones",
   "select_webhook": "Sélectionner un bot",
-  "raids_or": "Filtrer les Boss de Raids séparément des Raids",
   "general": "Générale",
   "link_global_and_advanced": "Lien global et avancé",
   "normal_forms": "Formes normales",
@@ -502,5 +501,6 @@
   "scan_loading": "Votre demande de scan est analysée et transmise au système !",
   "scan_error_title": "Erreur",
   "scan_error": "Il y a eu une erreur lors du traitement de la demande de scan...",
-  "scan_outside_area": "Cet emplacement est en dehors des zones autorisées"
+  "scan_outside_area": "Cet emplacement est en dehors des zones autorisées",
+  "pvp_ranking_cap": "Niveau"
 }

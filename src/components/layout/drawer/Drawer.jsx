@@ -9,7 +9,7 @@ import Utility from '@services/Utility'
 
 import SettingsMenu from './Settings'
 import WithSubItems from './WithSubItems'
-import WithSliders from './WithSliders'
+import PokemonSection from './Pokemon'
 import useStyles from '../../../hooks/useStyles'
 import { useStore, useStatic } from '../../../hooks/useStore'
 import Areas from './Areas'
@@ -23,9 +23,13 @@ export default function Sidebar({
   const classes = useStyles()
   const ui = useStatic(state => state.ui)
   const staticUserSettings = useStatic(state => state.userSettings)
-  const { manualAreas, map: {
-    title, scanAreasZoom, noScanAreaOverlay, enableQuestSetSelector,
-  } } = useStatic(state => state.config)
+  const {
+    manualAreas,
+    map: {
+      title, scanAreasZoom, noScanAreaOverlay, enableQuestSetSelector,
+    },
+  } = useStatic(state => state.config)
+  const available = useStatic(s => s.available)
   const { t } = useTranslation()
 
   const handleChange = (panel) => (event, isExpanded) => {
@@ -41,17 +45,19 @@ export default function Sidebar({
             <WithSubItems
               key={`${category}-${subItem}`}
               category={category}
+              data={ui[category][subItem]}
               filters={filters}
               setFilters={setFilters}
               subItem={subItem}
               noScanAreaOverlay={noScanAreaOverlay}
               enableQuestSetSelector={enableQuestSetSelector}
+              available={available}
             />
           ))
         ); break
       case 'pokemon':
         content = (
-          <WithSliders
+          <PokemonSection
             category={category}
             context={ui[category]}
             specificFilter="ivOr"

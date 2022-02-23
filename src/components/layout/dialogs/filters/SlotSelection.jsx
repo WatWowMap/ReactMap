@@ -21,10 +21,9 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters, is
 
   const handleSizeChange = (name, value) => {
     const slotsObj = filterValues
-    if (name === 'default') {
-      const resetValues = { enabled: true, size: 'md' }
-      slotsObj[team] = resetValues
-      relevantSlots.forEach(slot => slotsObj[slot] = resetValues)
+    if (name === 'all') {
+      slotsObj[team].enabled = value
+      relevantSlots.forEach(slot => slotsObj[slot].enabled = value)
     } else {
       slotsObj[team].size = value
       relevantSlots.forEach(slot => slotsObj[slot].size = value)
@@ -89,20 +88,32 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters, is
               </Grid>
             </Grid>
           ))}
+          {isMobile && (
+            <Grid item xs={12} style={{ textAlign: 'center', margin: '15px 0' }}>
+              <Size
+                filterValues={filterValues[team]}
+                handleChange={handleSizeChange}
+                btnSize="medium"
+              />
+            </Grid>
+          )}
         </Grid>
       </DialogContent>
       <Footer options={[
-        {
+        ...(isMobile ? [] : [{
           key: 'size',
-          component: <Size
-            filterValues={filterValues[team]}
-            handleChange={handleSizeChange}
-            btnSize="medium"
-          />,
-          size: isMobile ? 8 : 7,
-        },
-        { name: 'reset', action: () => handleSizeChange('default'), color: 'primary', icon: 'Replay', size: 2 },
-        { name: 'save', action: toggleSlotsMenu(false, teamId, filterValues), color: 'secondary', icon: 'Save', size: isMobile ? 2 : 3 },
+          component: (
+            <Size
+              filterValues={filterValues[team]}
+              handleChange={handleSizeChange}
+              btnSize="medium"
+            />
+          ),
+          size: 6,
+        }]),
+        { name: 'disable_all', action: () => handleSizeChange('all', false), color: 'primary', icon: 'Clear', size: 2 },
+        { name: 'enable_all', action: () => handleSizeChange('all', true), color: '#00e676', icon: 'Check', size: 2 },
+        { name: 'save', action: toggleSlotsMenu(false, teamId, filterValues), color: 'secondary', icon: 'Save', size: 2 },
       ]}
       />
     </>

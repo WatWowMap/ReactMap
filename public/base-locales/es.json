@@ -338,7 +338,6 @@
   "%": "%",
   "locale_selection": "Selección de Idioma",
   "iv_or_filter": "IV O filtro",
-  "raids_or": "Filtrar Bosses separadas de Incursiones",
   "general": "General",
   "link_global_and_advanced": "Enlaces globales y avanzadas",
   "normal_forms": "Formas normales",
@@ -469,5 +468,6 @@
   "both": "Ambos",
   "loading_icons": "Obtener iconos",
   "loading_invasions": "Ir a buscar invasiones",
-  "loading": "Cargando {{category}}"
+  "loading": "Cargando {{category}}",
+  "pvp_ranking_cap": "Nivel"
 }
