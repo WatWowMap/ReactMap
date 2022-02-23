@@ -489,6 +489,7 @@
   "loading": "laden von {{category}}",
   "loading_icons": "Icons abrufen",
   "loading_invasions": "Rocket-Lineup abrufen",
+  "pvp_ranking_cap": "Level",
   "scan_next": "Standort scannen",
   "scan_next_choose": "Ziehen Sie die Markierung per Drag & Drop um die Scanposition festzulegen",
   "scan_zone": "Scanne ein Gebiet",
@@ -506,6 +507,5 @@
   "scan_loading": "Deine Scan-Anfrage wird bearbeitet und wurde erfolgreich abgeschickt!",
   "scan_error_title": "Fehler",
   "scan_error": "Es ist ein Fehler bei der Verarbeitung der Scan-Anfrage aufgetreten...",
-  "scan_outside_area": "Dieser Standort liegt außerhalb der Grenzen der zugelassenen Gebiete",
-  "pvp_ranking_cap": "Level"
+  "scan_outside_area": "Dieser Standort liegt außerhalb der Grenzen der zugelassenen Gebiete"
 }
