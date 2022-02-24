@@ -225,7 +225,7 @@ module.exports = class Gym extends Model {
 
       queryResults.forEach(gym => {
         const newGym = Object.fromEntries(coreFields.map(field => [field, gym[field]]))
-        const isEgg = gym.raid_battle_timestamp > safeTs && !gym.raid_pokemon_id
+        const isEgg = gym.raid_battle_timestamp > safeTs || (gym.raid_end_timestamp > safeTs && !gym.raid_pokemon_id)
         const isRaid = gym.raid_end_timestamp > safeTs
 
         if (userBadgeObj[gym.id]) {
