@@ -139,7 +139,6 @@ export default function Sidebar({
       open={drawer}
       onClose={toggleDrawer(false)}
       classes={{ paper: classes.drawer }}
-      style={{ overflow: 'hidden' }}
     >
       <Grid
         container
