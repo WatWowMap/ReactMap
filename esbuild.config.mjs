@@ -23,7 +23,6 @@ if (fs.existsSync(path.resolve(__dirname, 'dist'))) {
   })
 }
 
-// console.log(eslinter.default())
 const plugins = [
   htmlPlugin({
     files: [

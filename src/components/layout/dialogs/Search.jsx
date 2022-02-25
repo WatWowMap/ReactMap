@@ -87,8 +87,6 @@ export default function Search({
         </div>
       )
     }
-    // console.log('hi')
-    // debugger
     if (raid_pokemon_id) {
       const {
         raid_pokemon_form, raid_pokemon_gender, raid_pokemon_costume, raid_pokemon_evolution,
