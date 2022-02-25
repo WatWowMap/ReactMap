@@ -9,13 +9,21 @@ import { build } from 'esbuild'
 import { htmlPlugin } from '@craftamap/esbuild-plugin-html'
 import esbuildMxnCopy from 'esbuild-plugin-mxn-copy'
 import aliasPlugin from 'esbuild-plugin-path-alias'
-// import { ESLint } from 'eslint'
+import { eslintPlugin } from 'esbuild-plugin-eslinter'
 
 const env = fs.existsSync('.env') ? dotenv.config() : { parsed: {} }
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const { version } = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json')))
 const isDevelopment = Boolean(process.argv[2] === '--dev')
 
+if (fs.existsSync(path.resolve(__dirname, 'dist'))) {
+  console.log('Cleaning up old build')
+  fs.rm(path.resolve(__dirname, 'dist'), { recursive: true }, (err) => {
+    if (err) console.log(err)
+  })
+}
+
+// console.log(eslinter.default())
 const plugins = [
   htmlPlugin({
     files: [
@@ -43,47 +51,11 @@ const plugins = [
 ]
 
 if (isDevelopment) {
-  // plugins.push(
-  //   {
-  //     name: 'eslint',
-  //     setup(b) {
-  //       const eslint = new ESLint()
-
-  //       b.onLoad({
-  //         filter: /node_modules/,
-  //         // namespace: 'file',
-  //       }, async (args) => {
-  //         return {
-  //           contents: fs.readFileSync(args.path, 'utf8')
-  //             + '\n//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIiJdLCJtYXBwaW5ncyI6IkEifQ==',
-  //           loader: 'default',
-  //         }
-
-  //         const result = await eslint.lintFiles(filePath)
-  //         console.log(filePath)
-  //         const formatter = await eslint.loadFormatter('stylish')
-  //         const output = formatter.format(result)
-  //         if (output.length > 0) {
-  //           // eslint-disable-next-line no-console
-  //           console.log(output)
-  //         }
-  //       })
-  //     },
-  //   },
-  // )
+  plugins.push(
+    eslintPlugin(),
+  )
 } else {
   plugins.push(
-    {
-      name: 'Clean Plugin',
-      setup(b) {
-        b.onStart(() => {
-          console.log('Cleaning up old build...')
-          fs.rm(b.initialOptions.outdir, { recursive: true }, (err) => {
-            if (err) console.log(err)
-          })
-        })
-      },
-    },
     {
       name: 'Compiling Plugin',
       setup(b) {
@@ -101,7 +73,7 @@ try {
     legalComments: 'none',
     bundle: true,
     outdir: 'dist/',
-    entryNames: '[name].[hash]',
+    entryNames: isDevelopment ? undefined : '[name].[hash]',
     metafile: true,
     minify: !isDevelopment,
     logLevel: isDevelopment ? 'info' : 'error',

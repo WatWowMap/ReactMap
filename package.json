@@ -30,6 +30,7 @@
     "@craftamap/esbuild-plugin-html": "^0.2.3",
     "dotenv": "^10.0.0",
     "esbuild": "^0.14.22",
+    "esbuild-plugin-eslinter": "^0.1.0",
     "esbuild-plugin-mxn-copy": "^1.0.1",
     "esbuild-plugin-path-alias": "^1.0.3",
     "eslint": "^8.9.0",
