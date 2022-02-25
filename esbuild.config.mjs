@@ -101,6 +101,7 @@ try {
     legalComments: 'none',
     bundle: true,
     outdir: 'dist/',
+    entryNames: '[name].[hash]',
     metafile: true,
     minify: !isDevelopment,
     logLevel: isDevelopment ? 'info' : 'error',
