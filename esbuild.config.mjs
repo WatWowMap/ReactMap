@@ -14,7 +14,8 @@ import { eslintPlugin } from 'esbuild-plugin-eslinter'
 const env = fs.existsSync('.env') ? dotenv.config() : { parsed: {} }
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const { version } = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json')))
-const isDevelopment = Boolean(process.argv[2] === '--dev')
+const isDevelopment = Boolean(process.argv.includes('--dev'))
+const isRelease = Boolean(process.argv.includes('--release'))
 
 if (fs.existsSync(path.resolve(__dirname, 'dist'))) {
   console.log('Cleaning up old build')
@@ -59,7 +60,7 @@ if (isDevelopment) {
       name: 'Compiling Plugin',
       setup(b) {
         b.onStart(() => {
-          console.log(`Building ${isDevelopment ? 'development' : 'production'} version ${version}`)
+          console.log(`Building production version: ${version}`)
         })
       },
     },
@@ -72,9 +73,10 @@ try {
     legalComments: 'none',
     bundle: true,
     outdir: 'dist/',
+    publicPath: '/',
     entryNames: isDevelopment ? undefined : '[name].[hash]',
     metafile: true,
-    minify: !isDevelopment,
+    minify: isRelease || !isDevelopment,
     logLevel: isDevelopment ? 'info' : 'error',
     watch: isDevelopment
       ? {
@@ -84,7 +86,7 @@ try {
         },
       }
       : false,
-    sourcemap: isDevelopment,
+    sourcemap: isRelease || isDevelopment,
     define: {
       inject: JSON.stringify({
         ...env.parsed,
