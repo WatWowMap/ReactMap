@@ -20,8 +20,8 @@ module.exports = async function initWebhooks(config) {
         }
         const [major, minor, patch] = hookConfig.version.split('.').map(x => parseInt(x))
 
-        if (major < 4 || (major === 4 && minor < 5) || (major === 4 && minor === 5 && patch < 0)) {
-          throw new Error(`Poracle must be at least version 4.5.0, current version is ${hookConfig.version}`)
+        if (major < 4 || (major === 4 && minor < 5) || (major === 4 && minor === 5 && patch < 1)) {
+          throw new Error(`Poracle must be at least version 4.5.1, current version is ${hookConfig.version}`)
         }
 
         const baseSettings = {
@@ -33,7 +33,6 @@ module.exports = async function initWebhooks(config) {
           valid: Boolean(hookConfig),
           pvp: 'rdm',
           everything: hookConfig.everythingFlagPermissions === 'allow-any',
-          gymBattles: hookConfig.gymBattles ?? false,
         }
         if (hookConfig?.pvpLittleLeagueAllowed) {
           baseSettings.leagues.push({ name: 'little', cp: 500, min: hookConfig.pvpFilterLittleMinCP })
