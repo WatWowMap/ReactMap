@@ -173,7 +173,7 @@ module.exports = class Gym extends Model {
             if (teamSlots.length) {
               gym.orWhere(gymSlot => {
                 gymSlot.where('team_id', team)
-                  .whereIn(isMad ? 'slots_available' : 'availble_slots', teamSlots)
+                  .whereIn(isMad ? 'slots_available' : 'available_slots', teamSlots)
               })
             }
           })
@@ -232,8 +232,8 @@ module.exports = class Gym extends Model {
           newGym.badge = userBadgeObj[gym.id]
         }
         if (gymPerms) {
-          if (gym.availble_slots !== undefined) {
-            gym.available_slots = gym.availble_slots
+          if (gym.available_slots !== undefined) {
+            gym.available_slots = gym.available_slots
           }
           gymFields.forEach(field => newGym[field] = gym[field])
         }
