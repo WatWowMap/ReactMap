@@ -5,10 +5,12 @@ const path = require('path')
 const { version } = require('../../package.json')
 
 /*
-  - If you are using your own flavor of Sentry you must install it
-  globally before running this file.
-  - `sudo npm install -g @sentry/cli --unsafe-perm`
-  - You must also make sure to fill out the Sentry related vars in the .env file
+  If you are using your own flavor of Sentry, be sure to fill out:
+    SENTRY_DSN=""
+    SENTRY_AUTH_TOKEN=""
+    SENTRY_ORG=""
+    SENTRY_PROJECT=""
+  These are to be placed in your .env file in the project root.
 */
 
 try {

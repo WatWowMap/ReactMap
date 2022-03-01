@@ -55,16 +55,7 @@ if (isDevelopment) {
     eslintPlugin(),
   )
 } else {
-  plugins.push(
-    {
-      name: 'Compiling Plugin',
-      setup(b) {
-        b.onStart(() => {
-          console.log(`Building production version: ${version}`)
-        })
-      },
-    },
-  )
+  console.log(`Building production version: ${version}`)
 }
 
 try {
