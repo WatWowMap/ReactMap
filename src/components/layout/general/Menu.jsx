@@ -56,9 +56,9 @@ export default function Menu({
     id: '',
   })
 
-  const { filteredObj, filteredArr, count } = useFilter(
-    tempFilters, menus, search, category, webhookCategory, categories,
-  )
+  const {
+    filteredObj, filteredArr, count,
+  } = useFilter(tempFilters, menus, search, category, webhookCategory, categories)
 
   const selectAllOrNone = (show) => {
     const newObj = {}

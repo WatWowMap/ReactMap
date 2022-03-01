@@ -7,25 +7,24 @@ const DevicePoly = ({ device, color }) => {
     device.route = JSON.parse(device.route)
   }
   const arrayRoute = device.route[0].lat ? [device.route] : device.route
-  return arrayRoute && Array.isArray(arrayRoute) ? (
-    <>
-      {(device.type === 'circle_pokemon')
-        ? arrayRoute.map((polygon, i) => (
-          <Polyline
-            key={i}
-            positions={polygon.map(route => [route.lat, route.lon])}
-            pathOptions={{ color }}
-          />
-        ))
-        : arrayRoute.map((polygon, i) => (
-          <Polygon
-            key={i}
-            positions={polygon.map(route => [route.lat, route.lon])}
-            pathOptions={{ color }}
-          />
-        ))}
-    </>
-  ) : null
+  if (Array.isArray(arrayRoute)) {
+    return device.type === 'circle_pokemon'
+      ? arrayRoute.map((polygon, i) => (
+        <Polyline
+          key={i}
+          positions={polygon.map(route => [route.lat, route.lon])}
+          pathOptions={{ color }}
+        />
+      ))
+      : arrayRoute.map((polygon, i) => (
+        <Polygon
+          key={i}
+          positions={polygon.map(route => [route.lat, route.lon])}
+          pathOptions={{ color }}
+        />
+      ))
+  }
+  return null
 }
 
 const areEqual = (prev, next) => (

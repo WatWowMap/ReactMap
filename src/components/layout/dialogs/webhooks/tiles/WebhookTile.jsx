@@ -40,6 +40,7 @@ export default function NewPokemon({
     <img
       className="grid-item"
       src={item.url}
+      alt={item.url}
       style={{
         maxHeight: isMobile ? 50 : 75,
         maxWidth: isMobile ? 50 : 75,

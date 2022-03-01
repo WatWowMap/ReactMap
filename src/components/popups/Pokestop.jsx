@@ -311,7 +311,12 @@ const RewardInfo = ({
       case 3: return Icons.getRewards(quest_reward_type, stardust_amount)
       case 4: return Icons.getRewards(quest_reward_type, candy_pokemon_id, candy_amount)
       case 7: return Icons.getPokemon(
-        quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny,
+        quest_pokemon_id,
+        quest_form_id,
+        0,
+        quest_gender_id,
+        quest_costume_id,
+        quest_shiny,
       )
       case 12: return Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount)
       default: return Icons.getRewards(quest_reward_type)
@@ -320,7 +325,7 @@ const RewardInfo = ({
 
   return (
     <Grid item xs={3} style={{ textAlign: 'center' }}>
-      <img src={getImage()} className="quest-popup-img" />
+      <img src={getImage()} className="quest-popup-img" alt="quest reward" />
       <Typography variant="caption" className="ar-task" noWrap>
         {config.questMessage ? config.questMessage : t(`ar_quest_${Boolean(with_ar)}`)}
       </Typography>
@@ -470,6 +475,7 @@ const Footer = ({
             <img
               src={Icons.getMisc(popups.invasions ? 'quest' : 'invasion')}
               className="circle pulse"
+              alt={popups.invasions ? 'quest' : 'invasion'}
             />
           </IconButton>
         </Grid>
@@ -544,10 +550,12 @@ const Invasion = ({ pokestop, Icons, t }) => {
     <div key={pkmn.id} className="invasion-reward">
       <img
         className="invasion-reward"
+        alt="invasion reward"
         src={Icons.getPokemon(pkmn.id, pkmn.form, 0, pkmn.gender, pkmn.costumeId, pkmn.shiny)}
       />
       <img
         className="invasion-reward-shadow"
+        alt="shadow"
         src={Icons.getMisc('shadow')}
       />
     </div>

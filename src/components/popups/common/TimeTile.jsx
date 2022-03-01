@@ -10,7 +10,7 @@ export default function TimeUntil({ expireTime, icon, until }) {
     <>
       {icon && (
         <Grid item xs={3} style={{ textAlign: 'center' }}>
-          <img src={icon} className="quest-popup-img" />
+          <img src={icon} className="quest-popup-img" alt={icon} />
         </Grid>
       )}
       {endTime && (

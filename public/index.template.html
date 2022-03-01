@@ -19,7 +19,12 @@
       </svg>
     </div>
     <div style="height: 10px"></div>
-    <h4 id="loading-text" class="loading-text">Loading Map</h4>
+    <h4 id="loading-text" class="loading-text"></h4>
+    <noscript>
+      <h4 class="loading-text">
+        This app requires JavaScript
+      </h4>
+    </noscript>
   </div>
   <script>
     const locales = {
@@ -38,20 +43,21 @@
       th: 'กำลังโหลดแผนที่',
       'zh-tw': '載入地圖中'
     }
-    const locale = window?.localStorage?.getItem('i18nextLng') || 'en';
-    const element = document.getElementById('loading-text');
+    const locale = window?.localStorage?.getItem('i18nextLng') || 'en'
+    const element = document.getElementById('loading-text')
     if (element) element.innerText = locales[locale.toLowerCase()];
   </script>
   <div id="root"></div>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
     integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
     crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://unpkg.com/react-leaflet-markercluster/dist/styles.min.css" />
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.73.0/dist/L.Control.Locate.min.css" />
+
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
-  <noscript>
-    You need to enable JavaScript to run this app.
-  </noscript>
 </body>
 
 </html>

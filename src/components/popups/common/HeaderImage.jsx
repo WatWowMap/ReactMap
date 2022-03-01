@@ -29,6 +29,7 @@ export default function HeaderImage({
       {Boolean(arScanEligible) && (
         <img
           className="ar-logo"
+          alt="ar"
           src={Icons.getMisc('ar')}
           style={{
             width: large ? 32 : 16,
@@ -39,6 +40,7 @@ export default function HeaderImage({
       {Boolean(exEligible) && (
         <img
           className="ex-logo"
+          alt="ex"
           src={Icons.getMisc('ex')}
           style={{
             width: large ? 32 : 16,

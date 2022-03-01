@@ -6,10 +6,10 @@ import Notification from './layout/general/Notification'
 
 const getId = (component, item) => {
   switch (component) {
-    default: return item.id
     case 'devices': return item.uuid
     case 'submissionCells': return component
     case 'nests': return item.nest_id
+    default: return item.id
   }
 }
 const ignoredClustering = ['devices', 'submissionCells', 'scanCells', 'weather']
