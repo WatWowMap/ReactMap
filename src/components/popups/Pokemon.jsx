@@ -19,9 +19,9 @@ import GenericTimer from './common/Timer'
 const rowClass = { width: 30, fontWeight: 'bold' }
 
 const leagueLookup = {
-  great: 1500,
-  ultra: 2500,
-  master: 9000,
+  great: '1500',
+  ultra: '2500',
+  master: '9000',
 }
 
 export default function PokemonPopup({
