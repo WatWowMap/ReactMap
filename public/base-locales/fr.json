@@ -484,5 +484,12 @@
   "loading_invasions": "Récupération des Invasions",
   "login_button": 12,
   "join_button": 12,
-  "pvp_ranking_cap": "Niveau"
+  "pvp_ranking_cap": "Niveau",
+  "device_icons": "Icônes de l'appareil",
+  "spawnpoint_icons": "Icônes de point d'apparition",
+  "confirm_filters_reset": "Réinitialiser les filtres",
+  "filters_reset_text": "Voulez-vous vraiment réinitialiser les paramètres aux valeurs par défaut ? \nÇa ne peut pas être annulé!",
+  "filters_reset_title": "Réinitialiser les filtres",
+  "raid_quick_select": "Sélection rapide",
+  "disabled": "Désactivé"
 }

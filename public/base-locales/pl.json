@@ -547,5 +547,7 @@
   "scan_zone_radius": "Promień [m]",
   "scan_requests": "Lokalizacje do skanu",
   "scan_queue": "Lokalizacje w kolejce",
-  "pvp_ranking_cap": "Level"
+  "pvp_ranking_cap": "Level",
+  "device_icons": "Ikony urządzeń",
+  "spawnpoint_icons": "Ikony Spawnpointów"
 }

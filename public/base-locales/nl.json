@@ -489,5 +489,9 @@
   "loading": "Loading {{category}}",
   "loading_icons": "Pictogrammen aan het Ophalen",
   "loading_invasions": "Invasions aan het Ophalen",
-  "pvp_ranking_cap": "Level"
+  "pvp_ranking_cap": "Level",
+  "device_icons": "Apparaatpictogrammen",
+  "spawnpoint_icons": "Spawnpoint-pictogrammen",
+  "raid_quick_select": "Snel selecteren",
+  "disabled": "Gehandicapt"
 }
