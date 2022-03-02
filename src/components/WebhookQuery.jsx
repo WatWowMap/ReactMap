@@ -20,7 +20,7 @@ export default function WebhookQuery({ match, serverSettings }) {
       perm: match.params.category.toLowerCase(),
     },
   })
-  return data && (
+  return data ? (
     <ConfigSettings
       paramLocation={data[`${lowercase}Single`]
         ? [data[`${lowercase}Single`].lat, data[`${lowercase}Single`].lon]
@@ -29,5 +29,5 @@ export default function WebhookQuery({ match, serverSettings }) {
       match={match}
       serverSettings={serverSettings}
     />
-  )
+  ) : null
 }
