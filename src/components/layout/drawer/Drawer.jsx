@@ -23,9 +23,13 @@ export default function Sidebar({
   const classes = useStyles()
   const ui = useStatic(state => state.ui)
   const staticUserSettings = useStatic(state => state.userSettings)
-  const { manualAreas, map: {
-    title, scanAreasZoom, noScanAreaOverlay, enableQuestSetSelector,
-  } } = useStatic(state => state.config)
+  const {
+    manualAreas,
+    map: {
+      title, scanAreasZoom, noScanAreaOverlay, enableQuestSetSelector,
+    },
+  } = useStatic(state => state.config)
+  const available = useStatic(s => s.available)
   const { t } = useTranslation()
 
   const handleChange = (panel) => (event, isExpanded) => {
@@ -35,21 +39,6 @@ export default function Sidebar({
   const drawerItems = Object.keys(ui).map(category => {
     let content
     switch (category) {
-      default:
-        content = (
-          Object.keys(ui[category]).map(subItem => (
-            <WithSubItems
-              key={`${category}-${subItem}`}
-              category={category}
-              data={ui[category][subItem]}
-              filters={filters}
-              setFilters={setFilters}
-              subItem={subItem}
-              noScanAreaOverlay={noScanAreaOverlay}
-              enableQuestSetSelector={enableQuestSetSelector}
-            />
-          ))
-        ); break
       case 'pokemon':
         content = (
           <PokemonSection
@@ -63,7 +52,23 @@ export default function Sidebar({
       case 'settings':
         content = (
           <SettingsMenu toggleDialog={toggleDialog} Icons={Icons} />
-        )
+        ); break
+      default:
+        content = (
+          Object.keys(ui[category]).map(subItem => (
+            <WithSubItems
+              key={`${category}-${subItem}`}
+              category={category}
+              data={ui[category][subItem]}
+              filters={filters}
+              setFilters={setFilters}
+              subItem={subItem}
+              noScanAreaOverlay={noScanAreaOverlay}
+              enableQuestSetSelector={enableQuestSetSelector}
+              available={available}
+            />
+          ))
+        ); break
     }
     return (
       <Accordion
@@ -134,7 +139,6 @@ export default function Sidebar({
       open={drawer}
       onClose={toggleDrawer(false)}
       classes={{ paper: classes.drawer }}
-      style={{ overflow: 'hidden' }}
     >
       <Grid
         container

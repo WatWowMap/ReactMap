@@ -34,7 +34,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             pvp_ranking_best: 1,
             pvp_ranking_worst: hookConfig.pvpFilterMaxRank,
             pvp_ranking_min_cp: 0,
-            allForms: true,
+            pvp_ranking_cap: hookConfig.defaultPvpCap,
+            allForms: false,
             pvpEntry: false,
             noIv: false,
             byDistance: false,
@@ -64,7 +65,10 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
               ],
             },
             pvp: {
-              selects: [{ name: 'pvp_ranking_league', options: [{ name: 'none', cp: 0 }, ...leagues], xs: isOhbem ? 12 : 6, sm: isOhbem ? 6 : 3 }],
+              selects: [
+                { name: 'pvp_ranking_league', options: [{ name: 'none', cp: 0 }, ...leagues], xs: 6, sm: 3 },
+                ...(isOhbem ? [{ name: 'pvp_ranking_cap', options: [0, ...(hookConfig.pvpCaps || [])], xs: 6, sm: 3 }] : []),
+              ],
               texts: isOhbem
                 ? []
                 : [{ name: 'pvp_ranking_min_cp', type: 'number', adornment: 'cp', width: 110, xs: 6, sm: 3 }],
@@ -192,7 +196,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
               ],
               booleans: [
                 { name: 'clean', xs: 4, sm: 4 },
-                { name: 'battle_changes', xs: 6, sm: 4 },
+                ...( hookConfig.gymBattles ? [{ name: 'battle_changes', xs: 6, sm: 4 }] : []),
                 { name: 'slot_changes', xs: 6, sm: 4 },
               ],
               autoComplete: [{ name: 'gymName', label: 'gym', searchCategory: 'gyms', xs: 12, sm: 12 }],

@@ -13,6 +13,7 @@ export default function weatherMarker(weather, Icons, isNight) {
     html: renderToString(
       <img
         className={disableColorShift ? '' : 'fancy'}
+        alt={weather.gameplay_condition}
         src={Icons.getWeather(weather.gameplay_condition, isNight)}
         style={{
           width: 24,

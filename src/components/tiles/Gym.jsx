@@ -11,10 +11,10 @@ import ToolTipWrapper from './Timer'
 
 const getColor = team => {
   switch (team) {
-    default: return '#A9A9A9'
     case 1: return '#0030C8'
     case 2: return '#D83C22'
     case 3: return '#F1F642'
+    default: return '#A9A9A9'
   }
 }
 
@@ -109,7 +109,6 @@ const areEqual = (prev, next) => {
     && prev.item.raid_level === next.item.raid_level
     && prev.item.in_battle === next.item.in_battle
     && prev.item.badge === next.item.badge
-    && (`badge_${prev.item.badge}` === next.filters.badge || next.filters.badge === 'all')
     && prev.item.team_id === next.item.team_id
     && prev.item.available_slots === next.item.available_slots
     && raidLogic()

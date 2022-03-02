@@ -1,4 +1,4 @@
-import '../assets/scss/main.scss'
+import '@assets/css/main.css'
 
 import React, { Suspense } from 'react'
 import { ApolloProvider } from '@apollo/client'
@@ -26,7 +26,7 @@ const SetText = () => {
   const locale = localStorage?.getItem('i18nextLng') || 'en'
   const loadingText = document.getElementById('loading-text')
   if (loadingText) loadingText.innerText = locales[locale.toLowerCase()]
-  return <></>
+  return <div />
 }
 
 export default function App() {

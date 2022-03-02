@@ -315,4 +315,14 @@ export default class UIcons {
       default: return `${baseUrl}/0.png`
     }
   }
+
+  getDevices(online) {
+    const baseUrl = `${this[this.selected.device].path}/device`
+    return online ? `${baseUrl}/1.png` : `${baseUrl}/0.png`
+  }
+
+  getSpawnpoints(hasTth) {
+    const baseUrl = `${this[this.selected.spawnpoint].path}/spawnpoint`
+    return hasTth ? `${baseUrl}/1.png` : `${baseUrl}/0.png`
+  }
 }

@@ -125,6 +125,7 @@ export default function WithSliders({
                         <img
                           style={{ maxHeight: 30, maxWidth: 30 }}
                           src={Icons.getPokemon(i ? 129 : 19)}
+                          alt={i ? 'Karp' : 'Rat'}
                         />
                       </Grid>
                       <Grid item xs={1}>

@@ -21,7 +21,8 @@ const authHandler = async (req, profile, done) => {
     },
   }
 
-  const groupInfo = await Promise.all(strategyConfig.groups.filter(async group => {
+  const groupInfo = []
+  await Promise.all(strategyConfig.groups.map(async (group) => {
     try {
       const response = await Fetch.json(`https://api.telegram.org/bot${strategyConfig.botToken}/getChatMember?chat_id=${group}&user_id=${user.id}`)
       if (!response) {
@@ -30,7 +31,9 @@ const authHandler = async (req, profile, done) => {
       if (!response.ok) {
         throw new Error(`Telegram API error: ${response.status} ${response.statusText}`)
       }
-      return response.result.status !== 'left' && response.result.status !== 'kicked'
+      if (response.result.status !== 'left' && response.result.status !== 'kicked') {
+        groupInfo.push(group)
+      }
     } catch (e) {
       console.error(e.message, `Telegram Group: ${group}`, `User: ${user.id} (${user.username})`)
       return null

@@ -124,6 +124,7 @@ module.exports = gql`
     pvp_ranking_best: Int
     pvp_ranking_min_cp: Int
     pvp_ranking_league: Int
+    pvp_ranking_cap: Int
     description: String
   }
 

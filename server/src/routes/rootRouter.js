@@ -113,6 +113,7 @@ rootRouter.get('/settings', async (req, res) => {
         },
         manualAreas: config.manualAreas || {},
         icons: config.icons,
+        gymValidDataLimit: Date.now() / 1000 - (config.api.gymValidDataLimit * 86400),
       },
       available: {},
     }
@@ -122,7 +123,7 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.loggedIn = req.user
 
       // keys that are being sent to the frontend but are not options
-      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons']
+      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons', 'gymValidDataLimit']
 
       Object.keys(serverSettings.config).forEach(setting => {
         try {
@@ -229,14 +230,8 @@ rootRouter.get('/settings', async (req, res) => {
         try {
           await Promise.all(filtered.map(async webhook => {
             if (webhook.enabled && config.webhookObj?.[webhook.name]?.client?.valid) {
-              const { strategy, webhookStrategy, discordId, telegramId } = serverSettings.user
-              const webhookId = (() => {
-                switch (strategy) {
-                  case 'discord': return discordId
-                  case 'telegram': return telegramId
-                  default: return webhookStrategy === 'discord' ? discordId : telegramId
-                }
-              })()
+              const webhookId = Utility.evalWebhookId(serverSettings.user)
+              const { strategy, webhookStrategy } = serverSettings.user
 
               const remoteData = await Fetch.webhookApi('allProfiles', webhookId, 'GET', webhook.name)
               const { areas } = await Fetch.webhookApi('humans', webhookId, 'GET', webhook.name)

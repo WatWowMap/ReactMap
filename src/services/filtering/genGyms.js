@@ -28,6 +28,7 @@ export default function genGyms(t, gyms, categories) {
             name: t(`raid_${id.slice(1).split('-')[0]}_plural`),
             perms: ['raids'],
             searchMeta: `${t(`raid_${id.slice(1)}_plural`)} ${t('raids').toLowerCase()}`,
+            webhookOnly: true,
           }; break
         default:
           tempObj.teams[id] = {

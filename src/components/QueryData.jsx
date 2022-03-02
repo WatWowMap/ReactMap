@@ -33,7 +33,6 @@ export default function QueryData({
     const trimmed = {
       onlyLegacyExclude: [],
       onlyLegacy: userSettings.legacyFilter,
-      onlyOrRaids: userSettings.raidsOr,
       onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
     }
     Object.entries(requestedFilters).forEach(topLevelFilter => {
@@ -86,22 +85,23 @@ export default function QueryData({
     }
   }, [filters, userSettings])
 
-  const { data, previousData, refetch, error } = useQuery(Query[category](
-    filters, perms, map.getZoom(), clusteringRules.zoomLevel,
-  ), {
-    context: { timeout: getPolling(category) },
-    variables: {
-      ...bounds,
-      filters: trimFilters(filters),
+  const { data, previousData, refetch, error } = useQuery(
+    Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),
+    {
+      context: { timeout: getPolling(category) },
+      variables: {
+        ...bounds,
+        filters: trimFilters(filters),
+      },
+      fetchPolicy: 'cache-and-network',
+      pollInterval: getPolling(category),
     },
-    fetchPolicy: 'cache-and-network',
-    pollInterval: getPolling(category),
-  })
+  )
 
   useEffect(() => () => setExcludeList([]))
 
   const renderedData = data || previousData || {}
-  if (error && process.env.NODE_ENV === 'development') {
+  if (error && inject.DEVELOPMENT) {
     return (
       <Notification
         severity="error"

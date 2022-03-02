@@ -32,6 +32,7 @@ export default function MenuTile({
   const image = (
     <img
       className="grid-item"
+      alt={item.url}
       src={item.url}
       style={{
         maxHeight: isMobile ? 50 : 75,

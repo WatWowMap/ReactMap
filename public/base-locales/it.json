@@ -415,7 +415,6 @@
   "has_quest_indicator": "Colore alternativo per le soste con missioni",
   "show_ar_badge": "Mostra distintivo AR",
   "all_gyms": "Tutte le palestre",
-  "raids_or": "Filtra i boss dei raid separatamente dai raid",
   "general": "Generale",
   "server_dev_error_0": "{{variable_0}}",
   "link_global_and_advanced": "Collegamento globale",
@@ -438,5 +437,6 @@
   "both": "Entrambi",
   "loading_icons": "Recupero delle icone",
   "loading_invasions": "Recupero delle invasioni",
-  "loading": "Caricamento {{category}}"
+  "loading": "Caricamento {{category}}",
+  "pvp_ranking_cap": "Livello"
 }

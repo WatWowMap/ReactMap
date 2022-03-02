@@ -6,7 +6,7 @@ const {
 
 module.exports = function generateUi(filters, perms) {
   const ui = {}
-  const ignoredKeys = ['enabled', 'filter', 'showQuestSet', 'badge', 'avgFilter']
+  const ignoredKeys = ['enabled', 'filter', 'showQuestSet', 'badge', 'avgFilter', 'raidTier']
 
   // builds the initial categories
   for (const [key, value] of Object.entries(filters)) {

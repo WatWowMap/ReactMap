@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
-export default function DevicePopup({ device, status, ts }) {
+export default function DevicePopup({ device, isOnline, ts }) {
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -23,10 +23,10 @@ export default function DevicePopup({ device, status, ts }) {
       <Timer device={device} t={t} ts={ts} />
       <Typography
         variant="subtitle1"
-        style={{ color: `${status === 'offline' ? '#ff5722' : '#00e676'}` }}
+        style={{ color: isOnline ? '#00e676' : '#ff5722' }}
         align="center"
       >
-        {t(status)}
+        {t(isOnline ? 'online' : 'offline')}
       </Typography>
     </>
   )

@@ -297,7 +297,7 @@ export default class Poracle {
   }
 
   static processor(type, entries, defaults) {
-    const pvpFields = ['pvp_ranking_league', 'pvp_ranking_best', 'pvp_ranking_worst', 'pvp_ranking_min_cp']
+    const pvpFields = ['pvp_ranking_league', 'pvp_ranking_best', 'pvp_ranking_worst', 'pvp_ranking_min_cp', 'pvp_ranking_cap']
     const ignoredFields = ['noIv', 'byDistance', 'xs', 'xl', 'allForms', 'pvpEntry']
     const dupes = {}
     switch (type) {
@@ -372,7 +372,7 @@ export default class Poracle {
       // case 'egg': return `Level ${item.level} ${item.exclusive ? 'Exclusive Only' : ''} ${item.clean ? 'clean' : ''} Template: ${item.template} ${item.team === 4 ? '' : item.team} ${item.gym_id ? 'Gym:' : ''}${item.distance ? ` | d${item.distance}` : ''}`
       case 'nest': return `${t(`poke_${item.pokemon_id}`)} | Min Spawn: ${item.min_spawn_avg}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
       case 'pokemon': return `${item.pokemon_id ? ` ${t(`poke_${item.pokemon_id}`)} | ` : ` ${t('poke_global')} | `}${item.form ? ` ${t(`form_${item.form}`)} | ` : ''}${item.pvp_ranking_league
-        ? `${t('pvp')} ${t(leagues.find(league => league.cp === item.pvp_ranking_league).name)} ${item.pvp_ranking_best}-${item.pvp_ranking_worst} ${item.pvp_ranking_min_cp ? `${item.pvp_ranking_min_cp}${t('cp')}` : ''}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
+        ? `${t('pvp')} ${t(leagues.find(league => league.cp === item.pvp_ranking_league).name)} ${item.pvp_ranking_best}-${item.pvp_ranking_worst} ${item.pvp_ranking_min_cp ? `${item.pvp_ranking_min_cp}${t('cp')}` : ''} ${item.pvp_ranking_cap ? `${t('cap')}${item.pvp_ranking_cap}` : ''}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
         : `${item.min_iv}-${item.max_iv}% | L${item.min_level}-${item.max_level}
       A${item.atk}-${item.max_atk} | D${item.def}-${item.max_def} | S${item.sta}-${item.max_sta}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`}`
       default: return item.description

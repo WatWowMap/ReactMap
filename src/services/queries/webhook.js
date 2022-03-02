@@ -150,6 +150,7 @@ const Pokemon = gql`
       pvp_ranking_league
       pvp_ranking_min_cp
       pvp_ranking_worst
+      pvp_ranking_cap
       rarity
       sta
       template

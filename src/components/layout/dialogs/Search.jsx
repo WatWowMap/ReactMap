@@ -65,9 +65,8 @@ export default function Search({
           main = Icons.getRewards(quest_reward_type, candy_pokemon_id)
           amount = main.includes('_a') ? 0 : candy_amount; break
         case 7:
-          main = Icons.getPokemon(
-            quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny,
-          ); break
+          main = Icons.getPokemon(quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny)
+          break
         case 9:
           main = Icons.getRewards(quest_reward_type, xl_candy_pokemon_id)
           amount = main.includes('_a') ? 0 : xl_candy_amount; break
@@ -82,7 +81,7 @@ export default function Search({
           maxHeight: 45, maxWidth: 45, marginLeft: isMobile ? 0 : 17, position: 'relative',
         }}
         >
-          <img src={main} style={{ maxWidth: 45, maxHeight: 45 }} />
+          <img src={main} style={{ maxWidth: 45, maxHeight: 45 }} alt={main} />
           {Boolean(main.includes('stardust') ? !main.endsWith('0.png') : !main.includes('_a') && amount)
             && <div className="search-amount-holder">x{amount}</div>}
         </div>
@@ -95,13 +94,24 @@ export default function Search({
       return (
         <img
           src={Icons.getPokemon(
-            raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume,
+            raid_pokemon_id,
+            raid_pokemon_form,
+            raid_pokemon_evolution,
+            raid_pokemon_gender,
+            raid_pokemon_costume,
           )}
+          alt={raid_pokemon_id}
           style={{ maxWidth: 45, maxHeight: 45 }}
         />
       )
     }
-    return <img src={Icons.getPokemon(nest_pokemon_id, nest_pokemon_form)} style={{ maxWidth: 45, maxHeight: 45 }} />
+    return (
+      <img
+        src={Icons.getPokemon(nest_pokemon_id, nest_pokemon_form)}
+        alt={nest_pokemon_form}
+        style={{ maxWidth: 45, maxHeight: 45 }}
+      />
+    )
   }
 
   const getBackupName = () => {
@@ -127,7 +137,7 @@ export default function Search({
           {safeSearch.map(each => (
             <Tab
               key={each}
-              icon={<img src={Icons.getMisc(each)} style={{ maxWidth: 20, height: 'auto' }} />}
+              icon={<img src={Icons.getMisc(each)} alt={each} style={{ maxWidth: 20, height: 'auto' }} />}
               style={{ width: 40, minWidth: 40 }}
             />
           ))}
@@ -138,7 +148,9 @@ export default function Search({
         autoComplete="off"
         label={t(`global_search_${safeSearch[searchTab]}`)}
         value={search}
-        onChange={(event) => setSearch(event.target.value.toLowerCase())}
+        onChange={({ target: { value } }) => {
+          if (/^[0-9\s\p{L}]+$/u.test(value) || value === '') setSearch(value.toLowerCase())
+        }}
         variant="outlined"
       />
       <Grid container>
@@ -155,7 +167,15 @@ export default function Search({
           >
             <Grid item xs={2} style={{ textAlign: 'center' }}>
               {option.url
-                ? <img src={option.url.includes('http') ? option.url : Icons.getMisc(safeSearch[searchTab])} style={{ height: 40, width: 45, objectFit: 'fill' }} />
+                ? (
+                  <img
+                    src={option.url.includes('http')
+                      ? option.url
+                      : Icons.getMisc(safeSearch[searchTab])}
+                    style={{ height: 40, width: 45, objectFit: 'fill' }}
+                    alt={option.url}
+                  />
+                )
                 : getUrl(option)}
             </Grid>
             <Grid item xs={8}>

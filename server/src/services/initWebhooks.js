@@ -20,8 +20,8 @@ module.exports = async function initWebhooks(config) {
         }
         const [major, minor, patch] = hookConfig.version.split('.').map(x => parseInt(x))
 
-        if (major < 4 || (major === 4 && minor < 3) || (major === 4 && minor === 3 && patch < 2)) {
-          throw new Error(`Poracle must be at least version 4.3.2. Current version is ${hookConfig.version}`)
+        if (major < 4 || (major === 4 && minor < 5) || (major === 4 && minor === 5 && patch < 1)) {
+          throw new Error(`Poracle must be at least version 4.5.1, current version is ${hookConfig.version}`)
         }
 
         const baseSettings = {
