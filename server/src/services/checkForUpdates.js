@@ -30,7 +30,7 @@ try {
             ? gitSha.trim()
             : stdout2.trim()
 
-          exec(`git ls-remote https://github.com/WatWowMap/ReactMap/ refs/heads/${branch}`, (err3, stdout3) => {
+          exec(`git ls-remote https://github.com/ReuschelCGN/ReactMap/ refs/heads/${branch}`, (err3, stdout3) => {
             try {
               if (err3 || typeof stdout3 !== 'string' || !stdout3?.split('\t')?.[0]) {
                 throw new Error('Unable to get remote sha', err3)
