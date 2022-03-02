@@ -16,6 +16,14 @@ import Utility from '@services/Utility'
 
 import GenericTimer from './common/Timer'
 
+const rowClass = { width: 30, fontWeight: 'bold' }
+
+const leagueLookup = {
+  great: 1500,
+  ultra: 2500,
+  master: 9000,
+}
+
 export default function PokemonPopup({
   pokemon, iconUrl, userSettings, isTutorial, Icons, isNight,
 }) {
@@ -505,32 +513,24 @@ const PvpInfo = ({
 }) => {
   if (data === null) return ''
 
-  const rows = []
-
-  data.forEach(each => {
-    if (each.rank !== null && each.cp !== null) {
-      const tempRow = {
-        id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.gender}-${each.rank}-${each.cp}-${each.lvl}-${each.cap}`,
-        img: <img
-          src={Icons.getPokemon(each.pokemon, each.form, each.evolution, each.gender, each.costume)}
-          height={20}
-          alt={each.pokemon}
-        />,
-        rank: each.rank || 0,
-        cp: each.cp || 0,
-        lvl: `${each.level || ''}${each.cap && !each.capped ? `/${each.cap}` : ''}`,
-        percent: (each.percentage * 100).toFixed(1) || 0,
-      }
-      rows.push(tempRow)
-    }
-  })
-  const rowClass = { width: 30, fontWeight: 'bold' }
+  const rows = data.map(each => each.rank !== null && each.cp !== null ? {
+    id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.gender}-${each.rank}-${each.cp}-${each.lvl}-${each.cap}`,
+    img: <img
+      src={Icons.getPokemon(each.pokemon, each.form, each.evolution, each.gender, each.costume)}
+      height={20}
+      alt={each.pokemon}
+    />,
+    rank: each.rank || 0,
+    cp: each.cp || 0,
+    lvl: `${each.level || ''}${each.cap && !each.capped ? `/${each.cap}` : ''}`,
+    percent: (each.percentage * 100).toFixed(1) || 0,
+  } : null).filter(Boolean)
 
   return (
     <table className="table-pvp">
       <thead>
         <tr>
-          <td style={rowClass}><img src={Icons.getMisc(league === 'great' || league === 'ultra' ? league : 'cup')} height={20} alt="league" /></td>
+          <td style={rowClass}><img src={Icons.getMisc(leagueLookup[league] || 500)} height={20} alt={league} /></td>
           <td style={rowClass}>{t('rank')}</td>
           <td style={rowClass}>{t('cp')}</td>
           <td style={rowClass}>{t('lvl')}</td>
