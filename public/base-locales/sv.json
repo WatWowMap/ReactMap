@@ -438,5 +438,20 @@
   "loading_icons": "Hämta ikoner",
   "loading_invasions": "Att hämta invasioner",
   "loading": "Laddar {{category}}",
-  "pvp_ranking_cap": "Nivå"
+  "pvp_ranking_cap": "Nivå",
+  "badge_0": "Ingen",
+  "device_icons": "Enhetsikoner",
+  "spawnpoint_icons": "Spawnpoint ikoner",
+  "badge_1": "Brons",
+  "badge_2": "Silver",
+  "badge_3": "Guld",
+  "gym_badge_menu": "Redigera gymmärket",
+  "gym_badges": "Gym märken",
+  "gym_badge_diamonds": "Visa gymmärken",
+  "gym_badges_subtitle": "Visar gymmärken på kartan och en lista på profilsidan.",
+  "confirm_filters_reset": "Återställ filter",
+  "filters_reset_text": "Är du säker på att du vill återställa inställningarna till standardvärdena? \nDetta kan inte göras ogjort!",
+  "filters_reset_title": "Återställ filter",
+  "raid_quick_select": "Snabbval",
+  "disabled": "Inaktiverad"
 }

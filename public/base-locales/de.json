@@ -489,5 +489,8 @@
   "loading": "laden von {{category}}",
   "loading_icons": "Icons abrufen",
   "loading_invasions": "Rocket-Lineup abrufen",
-  "pvp_ranking_cap": "Level"
+  "pvp_ranking_cap": "Level",
+  "device_icons": "Gerätesymbole",
+  "spawnpoint_icons": "Spawnpunkt-Symbole",
+  "disabled": "Deaktiviert"
 }
