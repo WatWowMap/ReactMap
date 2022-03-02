@@ -15,7 +15,8 @@ strategies.forEach(strategy => {
       failureRedirect: '/',
       successRedirect: '/',
     }))
-    router[method](`/${strategy.name}/callback`,
+    router[method](
+      `/${strategy.name}/callback`,
       async (req, res, next) => passport.authenticate(strategy.name, async (err, user, info) => {
         if (err) { return next(err) }
         if (!user) {
@@ -35,7 +36,8 @@ strategies.forEach(strategy => {
             res.redirect('/')
           }
         }
-      })(req, res, next))
+      })(req, res, next),
+    )
     console.log(`${method.toUpperCase()} /auth/${strategy.name}/callback route initialized`)
   }
 })

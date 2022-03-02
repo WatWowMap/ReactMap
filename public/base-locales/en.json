@@ -305,6 +305,8 @@
   "weather_icons": "Weather Icons",
   "misc_icons": "Misc Icons",
   "invasion_icons": "Invasion Icons",
+  "spawnpoint_icons": "Spawnpoint Icons",
+  "device_icons": "Device Icons",
   "pokemon_timers": "All Pokemon Timers",
   "show_dex_num_in_popup": "Show Pokedex # in Popup",
   "popup": "Popup",

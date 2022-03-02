@@ -3,10 +3,11 @@ import {
   IconButton, Button, Typography, useMediaQuery, Grid,
 } from '@material-ui/core'
 import { useTheme } from '@material-ui/styles'
-import * as MuiIcons from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import useStyles from '@hooks/useStyles'
+
+import * as MuiIcons from './Icons'
 
 export default function Footer({ options, role }) {
   const { t } = useTranslation()

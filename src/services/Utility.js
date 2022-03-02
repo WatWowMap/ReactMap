@@ -72,14 +72,12 @@ export default class Utility {
   static getMidnight() {
     const date = new Date()
     return Math.floor(
-      new Date(
-        date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0,
-      ).getTime() / 1000,
+      new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000,
     )
   }
 
   static analytics(category, action = false, label = false, nonInteraction = false) {
-    if (process.env?.GOOGLE_ANALYTICS_ID) {
+    if (inject?.GOOGLE_ANALYTICS_ID) {
       if (action) {
         ReactGA.event({
           category, action, label, nonInteraction,

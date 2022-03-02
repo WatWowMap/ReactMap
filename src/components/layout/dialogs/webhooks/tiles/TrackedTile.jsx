@@ -64,6 +64,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
       <Grid item xs={2} sm={1}>
         <img
           src={Icons.getIconById(id)}
+          alt={id}
           style={{ maxWidth: 40, maxHeight: 40 }}
         />
       </Grid>

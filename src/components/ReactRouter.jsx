@@ -63,7 +63,7 @@ export default function ReactRouter() {
   return (
     <ThemeProvider theme={setTheme(serverSettings?.config?.map?.theme)}>
       <Router>
-        {(process.env && process.env.GOOGLE_ANALYTICS_ID) && <RouteChangeTracker />}
+        {(inject.GOOGLE_ANALYTICS_ID) && <RouteChangeTracker />}
         <Switch>
           <Route exact path="/404" component={Errors} />
           <Route exact path="/500" component={Errors} />

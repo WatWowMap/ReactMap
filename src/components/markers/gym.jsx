@@ -5,13 +5,13 @@ import L from 'leaflet'
 
 const getBadgeColor = (raidLevel) => {
   switch (raidLevel) {
-    default: return '#292929'
     case 1:
     case 2: return '#BF05C6'
     case 3:
     case 4: return '#9E8A09'
     case 5: return '#088DB6'
     case 6: return '#21BD21'
+    default: return '#292929'
   }
 }
 
@@ -24,7 +24,9 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
   const filledSlots = available_slots !== null ? 6 - available_slots : 0
   let filterId = team_id === 0 ? `t${team_id}-0` : `g${team_id}-${filledSlots || 0}`
   const gymIcon = Icons.getGyms(
-    team_id, filledSlots, in_battle,
+    team_id,
+    filledSlots,
+    in_battle,
     userSettings.showExBadge && ex_raid_eligible,
     userSettings.showArBadge && ar_scan_eligible,
   )
@@ -47,7 +49,11 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
     if (raid_pokemon_id) {
       filterId = `${raid_pokemon_id}-${raid_pokemon_form}`
       raidIcon = Icons.getPokemon(
-        raid_pokemon_id, raid_pokemon_form, raid_pokemon_evolution, raid_pokemon_gender, raid_pokemon_costume,
+        raid_pokemon_id,
+        raid_pokemon_form,
+        raid_pokemon_evolution,
+        raid_pokemon_gender,
+        raid_pokemon_costume,
       )
       raidSize = Icons.getSize('raid', filters.filter[filterId])
     } else {
@@ -74,6 +80,7 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
           />
           <img
             src={Icons.getMisc(`badge_${badge}`)}
+            alt={badge}
             style={{
               width: 48,
               height: 48,
@@ -88,6 +95,7 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
         <>
           <img
             src={gymIcon}
+            alt={gymIcon}
             style={{
               width: gymSize,
               height: gymSize,
@@ -99,6 +107,7 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
           {Boolean(userSettings.showExBadge && ex_raid_eligible && !gymIcon.includes('_ex')) && (
             <img
               src={Icons.getMisc('ex')}
+              alt="ex"
               style={{
                 width: gymSize / 1.5,
                 height: 'auto',
@@ -111,6 +120,7 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
           {Boolean(userSettings.showArBadge && ar_scan_eligible && !gymIcon.includes('_ar')) && (
             <img
               src={Icons.getMisc('ar')}
+              alt="ar"
               style={{
                 width: gymSize / 2,
                 height: 'auto',
@@ -123,6 +133,7 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
           {Boolean(in_battle && !gymIcon.includes('_b')) && (
             <img
               src={Icons.getMisc('battle')}
+              alt="battle"
               style={{
                 width: gymSize,
                 height: 'auto',
@@ -135,6 +146,7 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
           {Boolean(filters.gymBadges && badge) && (
             <img
               src={Icons.getMisc((() => { switch (badge) { case 1: return 'third'; case 2: return 'second'; default: return 'first' } })())}
+              alt="badge"
               style={{
                 width: gymSize / 2,
                 height: 'auto',
@@ -149,6 +161,7 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
       {raidIcon && (
         <img
           src={raidIcon}
+          alt={raidIcon}
           style={{
             width: raidSize,
             height: raidSize,
@@ -172,6 +185,7 @@ export default function GymMarker(gym, hasHatched, hasRaid, filters, Icons, user
             ? (
               <img
                 src={Icons.getMisc('mega')}
+                alt="mega"
                 style={{
                   width: 17.5,
                   height: 'auto',

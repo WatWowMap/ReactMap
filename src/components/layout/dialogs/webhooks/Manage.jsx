@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import React, { useState, useEffect, useMemo } from 'react'
 import {
   DialogContent,
@@ -45,9 +46,7 @@ export default function Manage({
   const { invasions } = useStatic(s => s.masterfile)
   const { map } = useStatic(s => s.config)
   const setWebhookAlert = useStatic(state => state.setWebhookAlert)
-  const poracleFilters = useMemo(() => Poracle.filterGenerator(
-    webhookData[selectedWebhook], staticFilters, invasions,
-  ), [])
+  const poracleFilters = useMemo(() => Poracle.filterGenerator(webhookData[selectedWebhook], staticFilters, invasions), [])
   const [tabValue, setTabValue] = useState(0)
   const [feedback, setFeedback] = useState(false)
   const [addNew, setAddNew] = useState(false)
@@ -142,7 +141,7 @@ export default function Manage({
               key={each}
               icon={each === 'human'
                 ? <Person style={{ color: 'white ' }} />
-                : <img src={Icons.getMisc(each)} style={{ maxWidth: 20, height: 'auto' }} />}
+                : <img src={Icons.getMisc(each)} style={{ maxWidth: 20, height: 'auto' }} alt={each} />}
               style={{ width: 40, minWidth: 40 }}
             />
           ))}

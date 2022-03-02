@@ -48,7 +48,6 @@ export default makeStyles(theme => ({
   },
   drawer: {
     background: 'rgb(51,51,51)',
-    overflow: 'hidden',
   },
   floatingBtn: {
     '& > *': {

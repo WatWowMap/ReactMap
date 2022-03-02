@@ -5,7 +5,7 @@
 # - mount areas.json to /home/node/server/src/configs/areas.json
 # - Also mount every other configuration file necessary into the according directory.
 
-FROM node:14-alpine
+FROM node:16-alpine
 
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 ENV PATH=$PATH:/home/node/.npm-global/bin

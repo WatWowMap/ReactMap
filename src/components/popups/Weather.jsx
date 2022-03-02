@@ -46,6 +46,7 @@ export default function WeatherPopup({ weather, ts, Icons }) {
           </Typography>
           <img
             src={Icons.getTypes(type)}
+            alt={type}
             style={{
               maxWidth: 30,
               maxHeight: 30,

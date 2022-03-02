@@ -53,7 +53,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters, is
               justifyContent="center"
             >
               <Grid item xs={2} style={{ textAlign: 'center' }}>
-                <img src={Icons.getGyms(...each.slice(1).split('-'))} style={{ maxWidth: 50, maxHeight: 50 }} />
+                <img src={Icons.getGyms(...each.slice(1).split('-'))} style={{ maxWidth: 50, maxHeight: 50 }} alt={each} />
               </Grid>
               <Grid item xs={8} style={{ textAlign: 'center' }}>
                 <Size

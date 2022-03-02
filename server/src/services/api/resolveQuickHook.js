@@ -2,9 +2,9 @@
 const fetchJson = require('./fetchJson')
 const config = require('../config')
 
-const getWildCards = (category) => {
+const getWildCards = (category, gymBattles) => {
   switch (category) {
-    case 'gym': return { team: 4, slot_changes: true, battle_changes: true }
+    case 'gym': return { team: 4, slot_changes: true, battle_changes: gymBattles }
     case 'egg':
     case 'raid': return { level: 90 }
     default: return {}
@@ -22,7 +22,7 @@ module.exports = async function resolveQuickHook(category, discordId, webhookNam
             method: 'POST',
             body: JSON.stringify({
               ...webhook.client.info[subCategory].defaults,
-              ...getWildCards(subCategory),
+              ...getWildCards(subCategory, webhook.client.gymBattles),
               gym_id: data.id,
             }),
             headers: {
