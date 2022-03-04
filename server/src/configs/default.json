@@ -73,6 +73,7 @@
       "scanAreasZoom": 12,
       "scanCellsZoom": 13,
       "submissionZoom": 15,
+      "activeWeatherZoom": 13,
       "geoJsonFileName": "areas.json"
     },
     "localeSelection": [
