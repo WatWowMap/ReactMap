@@ -122,7 +122,7 @@ const LinkProfiles = ({ auth, t }) => {
           return (
             <Grid item xs={6} key={method}>
               {auth[`${method}Id`]
-                ? <Typography color="secondary" align="center">{t(`${method}_linked`)}!</Typography>
+                ? <Typography color="secondary" align="center">{t(`${method}_linked`)}! ({auth.username})</Typography>
                 : Component}
             </Grid>
           )
@@ -165,39 +165,42 @@ const LinkProfiles = ({ auth, t }) => {
   )
 }
 
-const ProfilePermissions = ({ perms, excludeList, t }) => (
-  <Grid
-    container
-    direction="row"
-    alignItems="center"
-    justifyContent="center"
-    spacing={2}
-    style={{ padding: 5 }}
-  >
-    {Object.keys(perms).map(perm => {
-      if (excludeList.includes(perm) || perm === 'donor') {
-        return null
-      }
-      return (
-        <Grid item xs={12} sm={6} key={perm}>
-          <PermCard perms={perms} perm={perm} t={t} />
-        </Grid>
-      )
-    })}
-  </Grid>
-)
+const ProfilePermissions = ({ perms, excludeList, t }) => {
+  const { map: { permImageDir, permArrayImages } } = useStatic(state => state.config)
+  return (
+    <Grid
+      container
+      direction="row"
+      alignItems="center"
+      justifyContent="center"
+      spacing={2}
+      style={{ padding: 5 }}
+    >
+      {Object.keys(perms).map(perm => {
+        if (excludeList.includes(perm) || perm === 'donor') {
+          return null
+        }
+        return (
+          <Grid item xs={12} sm={6} key={perm}>
+            <PermCard perms={perms} perm={perm} t={t} permImageDir={permImageDir} permArrayImages={permArrayImages} />
+          </Grid>
+        )
+      })}
+    </Grid>
+  )
+}
 
-const PermCard = ({ perms, perm, t }) => (
+const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
   <Card className="perm-wrapper">
     {!perms[perm] && <div className="disabled-overlay" />}
-    {perm !== 'areaRestrictions' && perm !== 'webhooks' ? (
+    {(perm !== 'areaRestrictions' && perm !== 'webhooks') || permArrayImages ? (
       <CardMedia
         style={{
           height: 250,
           border: 'black 4px solid',
           borderRadius: 4,
         }}
-        image={`/images/perms/${perm}.png`}
+        image={`/${permImageDir}/${perm}.png`}
         title={perm}
       />
     ) : (
