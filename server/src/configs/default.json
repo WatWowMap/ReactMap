@@ -114,7 +114,9 @@
       "enableTutorial": true,
       "enableUserProfile": true,
       "enableQuestSetSelector": false,
-      "noScanAreaOverlay": false
+      "noScanAreaOverlay": false,
+      "permImageDir": "images/perms",
+      "permArrayImages": false
     },
     "theme": {
       "style": "dark",
