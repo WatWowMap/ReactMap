@@ -122,7 +122,7 @@ const LinkProfiles = ({ auth, t }) => {
           return (
             <Grid item xs={6} key={method}>
               {auth[`${method}Id`]
-                ? <Typography color="secondary" align="center">{t(`${method}_linked`)}!</Typography>
+                ? <Typography color="secondary" align="center">{t(`${method}_linked`)}! ({auth.username})</Typography>
                 : Component}
             </Grid>
           )
