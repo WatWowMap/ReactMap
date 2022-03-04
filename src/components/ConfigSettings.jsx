@@ -67,6 +67,7 @@ export default function ConfigSettings({
     loggedIn: serverSettings.loggedIn,
     perms: serverSettings.user ? serverSettings.user.perms : {},
     methods: serverSettings.authMethods,
+    username: serverSettings.user.username,
   })
   Sentry.setUser({ username: serverSettings.user.username, id: serverSettings.user.id })
 
