@@ -73,6 +73,7 @@
       "scanAreasZoom": 12,
       "scanCellsZoom": 13,
       "submissionZoom": 15,
+      "activeWeatherZoom": 13,
       "geoJsonFileName": "areas.json"
     },
     "localeSelection": [
@@ -113,7 +114,9 @@
       "enableTutorial": true,
       "enableUserProfile": true,
       "enableQuestSetSelector": false,
-      "noScanAreaOverlay": false
+      "noScanAreaOverlay": false,
+      "permImageDir": "images/perms",
+      "permArrayImages": false
     },
     "theme": {
       "style": "dark",

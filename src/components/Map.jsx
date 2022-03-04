@@ -9,6 +9,7 @@ import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
 import ScanNext from './layout/dialogs/scanner/ScanNext'
 import ScanZone from './layout/dialogs/scanner/ScanZone'
+import ActiveWeather from './layout/general/ActiveWeather'
 
 const userSettingsCategory = category => {
   switch (category) {
@@ -38,11 +39,11 @@ export default function Map({ serverSettings:
 
   const map = useMap()
 
-  const staticUserSettings = useCallback(useStatic(state => state.userSettings))
-  const ui = useCallback(useStatic(state => state.ui))
-  const available = useCallback(useStatic(state => state.available))
-  const staticFilters = useCallback(useStatic(state => state.filters))
-  const setExcludeList = useCallback(useStatic(state => state.setExcludeList))
+  const staticUserSettings = useStatic(state => state.userSettings)
+  const ui = useStatic(state => state.ui)
+  const available = useStatic(state => state.available)
+  const staticFilters = useStatic(state => state.filters)
+  const setExcludeList = useStatic(state => state.setExcludeList)
 
   const filters = useStore(state => state.filters)
   const settings = useStore(state => state.settings)
@@ -203,6 +204,12 @@ export default function Map({ serverSettings:
         scanZoneMode={scanZoneMode}
         setScanZoneMode={setScanZoneMode}
         settings={settings}
+      />
+      <ActiveWeather
+        map={map}
+        Icons={Icons}
+        isNight={isNight}
+        activeWeatherZoom={config.activeWeatherZoom}
       />
     </>
   )

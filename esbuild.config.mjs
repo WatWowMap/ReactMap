@@ -69,6 +69,12 @@ try {
     metafile: true,
     minify: isRelease || !isDevelopment,
     logLevel: isDevelopment ? 'info' : 'error',
+    target: [
+      'safari11',
+      'chrome64',
+      'firefox58',
+      'edge88',
+    ],
     watch: isDevelopment
       ? {
         onRebuild(error) {
