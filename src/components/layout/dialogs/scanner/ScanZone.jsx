@@ -104,7 +104,7 @@ export default function Main({
           scanZoneSpacing={scanZoneSpacing}
           scanZoneMaxSize={scanZoneMaxSize}
           scanZoneAreaRestriction={scanZoneAreaRestriction}
-          scanAreas={scanAreas ? scanAreas[0]?.features : null}
+          scanAreas={scanAreas ? scanAreas.scanAreas[0]?.features : null}
         />
       )}
       <Dialog

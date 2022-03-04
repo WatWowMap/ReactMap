@@ -98,7 +98,7 @@ export default function Main({
           scanNextShowScanCount={scanNextShowScanCount}
           scanNextShowScanQueue={scanNextShowScanQueue}
           scanNextAreaRestriction={scanNextAreaRestriction}
-          scanAreas={scanAreas ? scanAreas[0]?.features : null}
+          scanAreas={scanAreas ? scanAreas.scanAreas[0]?.features : null}
         />
       )}
       <Dialog
