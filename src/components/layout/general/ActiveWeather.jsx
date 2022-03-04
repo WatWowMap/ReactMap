@@ -14,12 +14,12 @@ export default function ActiveWeather({ Icons, isNight, map, activeWeatherZoom }
       className="weather-icon"
       id="active-weather"
       style={{
-        zIndex: 10000,
+        zIndex: 1000,
         position: 'absolute',
-        top: 25,
-        right: 25,
-        height: 56,
-        width: 56,
+        top: 20,
+        right: 20,
+        height: 50,
+        width: 50,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -30,8 +30,8 @@ export default function ActiveWeather({ Icons, isNight, map, activeWeatherZoom }
         src={Icons.getWeather(activeCell.gameplay_condition, isNight)}
         alt={activeCell.gameplay_condition}
         style={{
-          width: 50,
-          height: 50,
+          width: 44,
+          height: 44,
         }}
       />
     </div>
