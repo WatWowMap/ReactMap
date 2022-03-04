@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect } from 'react'
 import { useQuery } from '@apollo/client'
 
 import Query from '@services/Query'
 import Utility from '@services/Utility'
+import { useStatic } from '@hooks/useStore'
 
 import Clustering from './Clustering'
 import Notification from './layout/general/Notification'
@@ -29,6 +30,7 @@ export default function QueryData({
   category, available, filters, staticFilters, staticUserSettings, sizeKey,
   userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
 }) {
+  const setActiveWeather = useStatic(state => state.setActiveWeather)
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
       onlyLegacyExclude: [],
@@ -101,6 +103,13 @@ export default function QueryData({
   useEffect(() => () => setExcludeList([]))
 
   const renderedData = data || previousData || {}
+
+  useLayoutEffect(() => {
+    if (category === 'weather' && renderedData[category]) {
+      setActiveWeather(renderedData[category])
+    }
+  }, [renderedData?.[category]])
+
   if (error && inject.DEVELOPMENT) {
     return (
       <Notification
