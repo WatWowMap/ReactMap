@@ -36,7 +36,6 @@ const convertMapObject = (obj) => obj ? ({
     christmasSnow: obj?.christmasSnow,
     newYearsFireworks: obj?.newYearsFireworks,
     valentinesDay: obj?.valentinesDay,
-    internationalWomensDay: obj?.internationalWomensDay,
   },
   misc: {
     enableMapJsFilter: obj?.legacyPkmnFilter,
