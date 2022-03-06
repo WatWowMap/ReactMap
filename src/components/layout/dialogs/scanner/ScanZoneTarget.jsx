@@ -9,7 +9,7 @@ import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
 
-export default function ScanZoneTargetMarker({
+export default function ScanZoneTarget({
   map, theme, scannerType, queue, setScanZoneMode, scanZoneLocation, setScanZoneLocation, scanZoneCoords,
   setScanZoneCoords, scanZoneSize, setScanZoneSize, scanZoneShowScanCount, scanZoneShowScanQueue,
   advancedScanZoneOptions, scanZoneRadius, scanZoneSpacing, scanZoneMaxSize, scanZoneAreaRestriction, scanAreas,
@@ -29,12 +29,13 @@ export default function ScanZoneTargetMarker({
       5: 270,
       6: 330,
     }
-    const options = { units: 'kilometers' }
-    for (let i = 1; i < scanZoneSize + 1; i++) {
+    for (let i = 1; i < scanZoneSize + 1; i += 1) {
       let quadrant = 1
       let step = 1
       while (step < 6 * i + 1) {
-        currentPoint = destination(currentPoint, (distance * spacing) / 1000, step === 1 ? 330 : bearings[quadrant], options)
+        currentPoint = destination(currentPoint, (distance * spacing) / 1000, step === 1
+          ? 330
+          : bearings[quadrant], { units: 'kilometers' })
         coords = coords.concat([[currentPoint.geometry.coordinates[1], currentPoint.geometry.coordinates[0]]])
         quadrant = Math.floor(step / i) + 1
         step += 1
@@ -217,7 +218,7 @@ export default function ScanZoneTargetMarker({
               <Button
                 color="secondary"
                 variant="contained"
-                disabled={scanZoneAreaRestriction?.length && !isInAllowedArea}
+                disabled={Boolean(scanZoneAreaRestriction?.length && !isInAllowedArea)}
                 onClick={() => setScanZoneMode('sendCoords')}
               >
                 {t('click_to_scan')}
@@ -241,7 +242,13 @@ export default function ScanZoneTargetMarker({
         </Popup>
       </Marker>
       {scanZoneCoords.map(coords => (
-        <Circle radius={radius} center={[coords[0], coords[1]]} fillOpacity={0.5} pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)' }} />
+        <Circle
+          key={[coords[0], coords[1]]}
+          radius={radius}
+          center={[coords[0], coords[1]]}
+          fillOpacity={0.5}
+          pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)' }}
+        />
       ))}
     </>
   )

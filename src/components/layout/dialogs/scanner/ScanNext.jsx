@@ -9,7 +9,7 @@ import { useStatic, useStore } from '@hooks/useStore'
 import Query from '@services/Query'
 import ScanNextTargetMarker from './ScanNextTarget'
 
-export default function Main({
+export default function ScanNext({
   map, scanNextMode, setScanNextMode,
   scanner: { scannerType, scanNextShowScanCount, scanNextShowScanQueue, scanNextAreaRestriction },
 }) {
@@ -108,11 +108,7 @@ export default function Main({
       >
         <DialogTitle>{t(`scan_${scanNextMode}_title`)}</DialogTitle>
         <DialogContent>
-          <Grid
-            item
-            justify="center"
-            align="center"
-          >
+          <Grid item style={{ textAlign: 'center' }}>
             <Typography variant="subtitle1" align="center">
               {t(`scan_${scanNextMode}`)}
             </Typography>

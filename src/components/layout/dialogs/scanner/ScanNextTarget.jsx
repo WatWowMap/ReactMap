@@ -10,7 +10,7 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
-export default function ScanNextTargetMarker({
+export default function ScanNextTarget({
   map, scannerType, queue, setScanNextMode, scanNextLocation, setScanNextLocation, scanNextCoords, setScanNextCoords,
   scanNextType, setScanNextType, scanNextShowScanCount, scanNextShowScanQueue, scanNextAreaRestriction, scanAreas,
 }) {
@@ -135,7 +135,7 @@ export default function ScanNextTargetMarker({
               <Button
                 color="secondary"
                 variant="contained"
-                disabled={scanNextAreaRestriction?.length && !isInAllowedArea}
+                disabled={Boolean(scanNextAreaRestriction?.length && !isInAllowedArea)}
                 onClick={() => setScanNextMode('sendCoords')}
               >
                 {t('click_to_scan')}
@@ -159,12 +159,38 @@ export default function ScanNextTargetMarker({
         </Popup>
       </Marker>
       {scanNextCoords.map(coords => (
-        <Circle radius={radiusPokemon} center={[coords[0], coords[1]]} fillOpacity={0.5} pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)' }} />
+        <Circle
+          key={[coords[0], coords[1]]}
+          radius={radiusPokemon}
+          center={[coords[0], coords[1]]}
+          fillOpacity={0.5}
+          pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)' }}
+        />
       ))}
       {scanNextType === 'M'
-        ? <Circle radius={radiusGym + radiusPokemon} center={[scanNextCoords[0][0], scanNextCoords[0][1]]} fillOpacity={0.1} pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)', fillColor: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)' }} />
+        ? (
+          <Circle
+            key={[scanNextCoords[0][0], scanNextCoords[0][1]]}
+            radius={radiusGym + radiusPokemon}
+            center={[scanNextCoords[0][0], scanNextCoords[0][1]]}
+            fillOpacity={0.1}
+            pathOptions={{
+              color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)',
+              fillColor: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)',
+            }}
+          />
+        )
         : scanNextCoords.map(coords => (
-          <Circle radius={radiusGym} center={[coords[0], coords[1]]} fillOpacity={0.1} pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)', fillColor: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)' }} />
+          <Circle
+            key={[coords[0], coords[1]]}
+            radius={radiusGym}
+            center={[coords[0], coords[1]]}
+            fillOpacity={0.1}
+            pathOptions={{
+              color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)',
+              fillColor: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)',
+            }}
+          />
         ))}
     </>
   )

@@ -7,9 +7,9 @@ import {
 
 import { useStatic, useStore } from '@hooks/useStore'
 import Query from '@services/Query'
-import ScanZoneTargetMarker from './ScanZoneTarget'
+import ScanZoneTarget from './ScanZoneTarget'
 
-export default function Main({
+export default function ScanZone({
   map, theme, scanZoneMode, setScanZoneMode,
   scanner: { scannerType, scanZoneShowScanCount, scanZoneShowScanQueue, advancedScanZoneOptions,
     scanZoneRadius, scanZoneSpacing, scanZoneMaxSize, scanZoneAreaRestriction },
@@ -85,7 +85,7 @@ export default function Main({
   return (
     <>
       {scanZoneMode === 'setLocation' && (
-        <ScanZoneTargetMarker
+        <ScanZoneTarget
           map={map}
           theme={theme}
           scannerType={scannerType}

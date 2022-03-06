@@ -1730,10 +1730,10 @@ esbuild-openbsd-64@0.14.22:
   resolved "https://registry.yarnpkg.com/esbuild-openbsd-64/-/esbuild-openbsd-64-0.14.22.tgz#2a73bba04e16d8ef278fbe2be85248e12a2f2cc2"
   integrity sha512-vK912As725haT313ANZZZN+0EysEEQXWC/+YE4rQvOQzLuxAQc2tjbzlAFREx3C8+uMuZj/q7E5gyVB7TzpcTA==
 
-esbuild-plugin-eslinter@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/esbuild-plugin-eslinter/-/esbuild-plugin-eslinter-0.1.1.tgz#c30bfbc40be2a14e0b24b909f70a0b93b8e8e69e"
-  integrity sha512-0YZXlDVETY17wPVJWuedwi6v6Ff5oEMFSajP+i17c16snKfrlKgZjwc1pjeJW76yftQ6CLAec0OF0YIWFtrh1g==
+esbuild-plugin-eslinter@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/esbuild-plugin-eslinter/-/esbuild-plugin-eslinter-0.1.2.tgz#4ed8db51e9baef6ce8b5034bf7ece613b5f52eaf"
+  integrity sha512-KYJyymn9B5qyzZVvLfYoXVCEx4fEJQtM2Hg20GPoJ20xYAE8tDWqFZA9TozFvHKVelW2tDuka7ieCpStp3pFSQ==
 
 esbuild-plugin-mxn-copy@^1.0.1:
   version "1.0.1"

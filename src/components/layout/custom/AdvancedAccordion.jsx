@@ -2,7 +2,7 @@ import React from 'react'
 import {
   createTheme, ThemeProvider, Grid, Typography, Accordion, AccordionSummary, AccordionDetails,
 } from '@material-ui/core'
-import { ExpandMore } from "@material-ui/icons"
+import { ExpandMore } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 import setTheme from '@assets/mui/theme'
 
@@ -58,12 +58,10 @@ export default function AdvancedAccordion({ block, theme = {} }) {
   return (
     <ThemeProvider theme={setTheme(theme)}>
       <ThemeProvider
-        theme={(theme) =>
-          createTheme({
-            ...theme,
-            ...accordionTheme,
-          })
-        }
+        theme={(theme2) => createTheme({
+          ...theme2,
+          ...accordionTheme,
+        })}
       >
         <Accordion>
           <AccordionSummary
