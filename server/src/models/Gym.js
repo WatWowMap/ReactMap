@@ -225,8 +225,8 @@ module.exports = class Gym extends Model {
 
       queryResults.forEach(gym => {
         const newGym = Object.fromEntries(coreFields.map(field => [field, gym[field]]))
-        const isEgg = gym.raid_battle_timestamp > safeTs || (gym.raid_end_timestamp > safeTs && !gym.raid_pokemon_id)
         const isRaid = gym.raid_end_timestamp > safeTs
+        const isEgg = isRaid && !gym.raid_pokemon_id
 
         if (userBadgeObj[gym.id]) {
           newGym.badge = userBadgeObj[gym.id]
@@ -243,7 +243,9 @@ module.exports = class Gym extends Model {
           raidFields.forEach(field => newGym[field] = gym[field])
           newGym.hasRaid = true
         }
-        if (newGym.hasRaid || newGym.badge || finalTeams.includes(gym.team_id) || finalSlots[gym.team_id]?.includes(gym.available_slots)) {
+        if (newGym.hasRaid || newGym.badge
+          || finalTeams.includes(gym.team_id)
+          || finalSlots[gym.team_id]?.includes(gym.available_slots)) {
           filteredResults.push(newGym)
         }
       })

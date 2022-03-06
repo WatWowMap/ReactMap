@@ -7,6 +7,7 @@ import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
+import ActiveWeather from './layout/general/ActiveWeather'
 
 const userSettingsCategory = category => {
   switch (category) {
@@ -35,11 +36,11 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
 
   const map = useMap()
 
-  const staticUserSettings = useCallback(useStatic(state => state.userSettings))
-  const ui = useCallback(useStatic(state => state.ui))
-  const available = useCallback(useStatic(state => state.available))
-  const staticFilters = useCallback(useStatic(state => state.filters))
-  const setExcludeList = useCallback(useStatic(state => state.setExcludeList))
+  const staticUserSettings = useStatic(state => state.userSettings)
+  const ui = useStatic(state => state.ui)
+  const available = useStatic(state => state.available)
+  const staticFilters = useStatic(state => state.filters)
+  const setExcludeList = useStatic(state => state.setExcludeList)
 
   const filters = useStore(state => state.filters)
   const settings = useStore(state => state.settings)
@@ -177,6 +178,12 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         setWebhookMode={setWebhookMode}
         webhooks={webhooks}
         settings={settings}
+      />
+      <ActiveWeather
+        map={map}
+        Icons={Icons}
+        isNight={isNight}
+        activeWeatherZoom={config.activeWeatherZoom}
       />
     </>
   )

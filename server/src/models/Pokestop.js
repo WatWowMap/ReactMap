@@ -49,8 +49,7 @@ module.exports = class Pokestop extends Model {
   }
 
   static get idColumn() {
-    return dbSelection('pokestop') === 'mad'
-      ? 'pokestop_id' : 'id'
+    return type === 'mad' ? 'pokestop_id' : 'id'
   }
 
   static async getAllPokestops(args, perms, isMad) {
@@ -539,8 +538,8 @@ module.exports = class Pokestop extends Model {
     Object.entries(stops).forEach(stopType => {
       const [sType, rewards] = stopType
       switch (sType) {
-        default: rewards.forEach(reward => finalList.add(`i${reward.grunt_type}`)); break
         case 'lures': rewards.forEach(reward => finalList.add(`l${reward.lure_id}`)); break
+        default: rewards.forEach(reward => finalList.add(`i${reward.grunt_type}`)); break
       }
     })
     return [...finalList]

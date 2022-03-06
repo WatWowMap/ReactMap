@@ -487,11 +487,11 @@
   "gym_badge_diamonds": "Toon Gym Badges",
   "gym_badges_subtitle": "Toont Gym Badges op de kaart en een lijst op de profielpagina.",
   "loading": "Loading {{category}}",
-  "loading_icons": "Pictogrammen aan het Ophalen",
-  "loading_invasions": "Invasions aan het Ophalen",
+  "loading_icons": "Pictogrammen ophalen",
+  "loading_invasions": "Invasions ophalen",
   "pvp_ranking_cap": "Level",
-  "device_icons": "Apparaatpictogrammen",
-  "spawnpoint_icons": "Spawnpoint-pictogrammen",
-  "raid_quick_select": "Snel selecteren",
-  "disabled": "Gehandicapt"
+  "spawnpoint_icons": "Spawnpoint Icons",
+  "device_icons": "Device Icons",
+  "raid_quick_select": "Snel Raids Selecteren",
+  "disabled": "Uitgeschakeld"
 }

@@ -170,7 +170,7 @@ export default function Search({
                 ? (
                   <img
                     src={option.url.includes('http')
-                      ? option.url
+                      ? option.url.replace(/^http:\/\//, 'https://')
                       : Icons.getMisc(safeSearch[searchTab])}
                     style={{ height: 40, width: 45, objectFit: 'fill' }}
                     alt={option.url}
