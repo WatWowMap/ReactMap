@@ -10,7 +10,7 @@ export default function HolidayEffects({ mapSettings }) {
 
     return null
   }
-  if (mapSettings.InternationalWomensDay && date.getMonth() === 2 && date.getDate() === 8) {
+  if (mapSettings.internationalWomensDay && date.getMonth() === 2 && date.getDate() === 8) {
     const flower = new HolidayAnimations('https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Emoji_u1f338.svg/20px-Emoji_u1f338.svg.png')
     flower.initialize()
 
