@@ -7,7 +7,7 @@ import {
 
 import { useStatic, useStore } from '@hooks/useStore'
 import Query from '@services/Query'
-import ScanNextTargetMarker from './ScanNextTarget'
+import ScanNextTarget from './ScanNextTarget'
 
 export default function ScanNext({
   map, scanNextMode, setScanNextMode,
@@ -71,7 +71,9 @@ export default function ScanNext({
     }
     useEffect(() => {
       const timer = setInterval(() => {
-        getQueue()
+        if (scanNextMode === 'setLocation') {
+          getQueue()
+        }
       }, 2000)
       return () => clearInterval(timer)
     })
@@ -84,7 +86,7 @@ export default function ScanNext({
   return (
     <>
       {scanNextMode === 'setLocation' && (
-        <ScanNextTargetMarker
+        <ScanNextTarget
           map={map}
           scannerType={scannerType}
           queue={queue}
