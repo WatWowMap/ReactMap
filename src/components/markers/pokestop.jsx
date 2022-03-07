@@ -39,7 +39,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
       popupY += invasionMod.popupY
     })
   }
-  if (hasQuest && !(hasInvasion && invasionMod.removeQuest)) {
+  if (hasQuest && !(hasInvasion && invasionMod?.removeQuest)) {
     const { quests } = pokestop
 
     quests.forEach(quest => {
@@ -138,7 +138,7 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
             style={{
               width: questSizes[i],
               height: questSizes[i],
-              bottom: (baseSize * 0.6 + (invasionMod.removeQuest ? 10 : totalInvasionSize))
+              bottom: (baseSize * 0.6 + (invasionMod?.removeQuest ? 10 : totalInvasionSize))
                 * rewardMod.offsetY
                 + (questSizes[i] * i),
               left: `${rewardMod.offsetX * 50}%`,
