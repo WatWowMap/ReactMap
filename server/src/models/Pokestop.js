@@ -318,7 +318,9 @@ module.exports = class Pokestop extends Model {
           }
         })
       }
-      filteredResults.push(filtered)
+      if (global || filtered.quests?.length || filtered.lure_id || filtered.invasions) {
+        filteredResults.push(filtered)
+      }
     }
     return filteredResults
   }
