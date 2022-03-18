@@ -6,7 +6,7 @@ const fetchQuests = require('../services/api/fetchQuests')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
-  api: { searchResultsLimit, queryLimits },
+  api: { searchResultsLimit, queryLimits, stopValidDataLimit, hideOldPokestops },
   database: { settings },
   map,
 } = require('../services/config')
@@ -91,6 +91,11 @@ module.exports = class Pokestop extends Model {
           raw('UNIX_TIMESTAMP(incident_expiration)')
             .as('incident_expire_timestamp'),
         ])
+      if (hideOldPokestops) {
+        query.whereRaw(`UNIX_TIMESTAMP(last_updated) > ${Date.now() / 1000 - (stopValidDataLimit * 86400)}`)
+      }
+    } else if (hideOldPokestops) {
+      query.where('updated', '>', Date.now() / 1000 - (stopValidDataLimit * 86400))
     }
     if (type === 'chuck') {
       query.join('incident', 'pokestop.id', 'incident.pokestop_id')
