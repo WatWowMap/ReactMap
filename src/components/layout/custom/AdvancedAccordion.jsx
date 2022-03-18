@@ -4,7 +4,6 @@ import {
 } from '@material-ui/core'
 import { ExpandMore } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
-import setTheme from '@assets/mui/theme'
 
 const accordionTheme = {
   overrides: {
@@ -56,7 +55,7 @@ const accordionTheme = {
 export default function AdvancedAccordion({ block, theme = {} }) {
   const { t } = useTranslation()
   return (
-    <ThemeProvider theme={setTheme(theme)}>
+    <ThemeProvider theme={theme}>
       <ThemeProvider
         theme={(theme2) => createTheme({
           ...theme2,

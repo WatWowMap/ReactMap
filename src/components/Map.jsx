@@ -35,7 +35,7 @@ const getTileServer = (tileServers, settings, isNight) => {
 }
 
 export default function Map({ serverSettings:
-  { config: { map: config, tileServers, theme, scanner }, Icons, webhooks }, params }) {
+  { config: { map: config, tileServers, scanner }, Icons, webhooks }, params }) {
   Utility.analytics(window.location.pathname)
 
   const map = useMap()
