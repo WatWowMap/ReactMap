@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { TileLayer, useMap, ZoomControl } from 'react-leaflet'
+import { useMediaQuery } from '@material-ui/core'
+import { useTheme } from '@material-ui/styles'
 import L from 'leaflet'
 
 import Utility from '@services/Utility'
@@ -7,7 +9,6 @@ import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
-import ActiveWeather from './layout/general/ActiveWeather'
 
 const userSettingsCategory = category => {
   switch (category) {
@@ -36,6 +37,10 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
 
   const map = useMap()
   map.attributionControl.setPrefix(config.attributionPrefix || '')
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
+  const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
 
   const staticUserSettings = useStatic(state => state.userSettings)
   const ui = useStatic(state => state.ui)
@@ -163,6 +168,7 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
                   params={manualParams}
                   setParams={setManualParams}
                   isNight={isNight}
+                  isMobile={isMobile}
                 />
               )
             }
@@ -179,12 +185,8 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         setWebhookMode={setWebhookMode}
         webhooks={webhooks}
         settings={settings}
-      />
-      <ActiveWeather
-        map={map}
-        Icons={Icons}
-        isNight={isNight}
-        activeWeatherZoom={config.activeWeatherZoom}
+        isMobile={isMobile}
+        isTablet={isTablet}
       />
     </>
   )
