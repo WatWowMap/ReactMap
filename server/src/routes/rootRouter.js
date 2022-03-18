@@ -57,8 +57,10 @@ rootRouter.get('/settings', async (req, res) => {
       if (req.session.tutorial === undefined) {
         req.session.tutorial = !config.map.forceTutorial
       }
-      req.session.perms = { areaRestrictions: [], webhooks: [] }
-
+      req.session.perms = {
+        areaRestrictions: Utility.areaPerms(['none']),
+        webhooks: [],
+      }
       config.authentication.alwaysEnabledPerms.forEach(perm => {
         if (config.authentication.perms[perm]) {
           req.session.perms[perm] = true

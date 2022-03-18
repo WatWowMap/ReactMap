@@ -2,14 +2,16 @@ import React from 'react'
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { point, polygon } from '@turf/helpers'
 
-import { useStore, useStatic } from '@hooks/useStore'
+import { useStore } from '@hooks/useStore'
 
-export default function ActiveWeather({ Icons, isNight, map, activeWeatherZoom }) {
-  const activeWeather = useStatic(state => state.activeWeather)
+export default function ActiveWeather({ Icons, isNight, map, zoom, weather, isMobile }) {
   const location = useStore(state => state.location)
-  const activeCell = activeWeather.find(cell => cell && booleanPointInPolygon(point(location), polygon([cell.polygon])))
+  const { disableColorShift = false } = Icons.getModifiers('weather')
+  const active = weather.find(
+    cell => cell && booleanPointInPolygon(point(location), polygon([cell.polygon])),
+  )
 
-  return activeCell?.gameplay_condition && map.getZoom() > activeWeatherZoom ? (
+  return active?.gameplay_condition && map.getZoom() > zoom ? (
     <div
       className="weather-icon"
       id="active-weather"
@@ -18,20 +20,20 @@ export default function ActiveWeather({ Icons, isNight, map, activeWeatherZoom }
         position: 'absolute',
         top: 20,
         right: 20,
-        height: 50,
-        width: 50,
+        height: isMobile ? 36 : 50,
+        width: isMobile ? 36 : 50,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
       <img
-        className="fancy"
-        src={Icons.getWeather(activeCell.gameplay_condition, isNight)}
-        alt={activeCell.gameplay_condition}
+        className={disableColorShift ? '' : 'fancy'}
+        src={Icons.getWeather(active.gameplay_condition, isNight)}
+        alt={active.gameplay_condition}
         style={{
-          width: 44,
-          height: 44,
+          width: isMobile ? 24 : 36,
+          height: isMobile ? 24 : 36,
         }}
       />
     </div>
