@@ -72,7 +72,9 @@ export default function ScanZone({
     }
     useEffect(() => {
       const timer = setInterval(() => {
-        getQueue()
+        if (scanZoneMode === 'setLocation') {
+          getQueue()
+        }
       }, 2000)
       return () => clearInterval(timer)
     })
@@ -114,11 +116,7 @@ export default function ScanZone({
       >
         <DialogTitle>{t(`scan_${scanZoneMode}_title`)}</DialogTitle>
         <DialogContent>
-          <Grid
-            item
-            justify="center"
-            align="center"
-          >
+          <Grid item style={{ textAlign: 'center' }}>
             <Typography variant="subtitle1" align="center">
               {t(`scan_${scanZoneMode}`)}
             </Typography>
