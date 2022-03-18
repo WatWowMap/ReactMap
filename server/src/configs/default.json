@@ -57,7 +57,10 @@
     "weatherCellLimit": 3,
     "searchResultsLimit": 15,
     "nestHemisphere": "north",
-    "gymValidDataLimit": 30
+    "gymValidDataLimit": 30,
+    "hideOldGyms": false,
+    "stopValidDataLimit": 30,
+    "hideOldPokestops": false
   },
   "multiDomains": [],
   "map": {
