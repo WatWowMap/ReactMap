@@ -686,6 +686,7 @@ module.exports = class Pokestop extends Model {
         quest_pokemon_id: result.alternative_quest_pokemon_id,
         quest_item_id: result.alternative_quest_item_id,
         quest_title: result.alternative_quest_title,
+        quest_target: result.alternative_quest_target,
         with_ar: true,
       }))
       results.push(...remapped)
