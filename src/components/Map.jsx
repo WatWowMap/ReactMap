@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { TileLayer, useMap, ZoomControl } from 'react-leaflet'
+import { useMediaQuery } from '@material-ui/core'
+import { useTheme } from '@material-ui/styles'
 import L from 'leaflet'
 
 import Utility from '@services/Utility'
@@ -9,7 +11,6 @@ import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
 import ScanNext from './layout/dialogs/scanner/ScanNext'
 import ScanZone from './layout/dialogs/scanner/ScanZone'
-import ActiveWeather from './layout/general/ActiveWeather'
 
 const userSettingsCategory = category => {
   switch (category) {
@@ -38,6 +39,11 @@ export default function Map({ serverSettings:
   Utility.analytics(window.location.pathname)
 
   const map = useMap()
+  map.attributionControl.setPrefix(config.attributionPrefix || '')
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
+  const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
 
   const staticUserSettings = useStatic(state => state.userSettings)
   const ui = useStatic(state => state.ui)
@@ -86,7 +92,7 @@ export default function Map({ serverSettings:
     <>
       <TileLayer
         key={tileServer?.name}
-        attribution={tileServer?.attribution || 'Map tiles by Carto, under CC BY 3.0. Data by  <a href="https://www.openstreetmap.org/">OpenStreetMap</a>, under ODbL.'}
+        attribution={tileServer?.attribution || ''}
         url={tileServer?.url || 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png'}
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
@@ -167,6 +173,7 @@ export default function Map({ serverSettings:
                   params={manualParams}
                   setParams={setManualParams}
                   isNight={isNight}
+                  isMobile={isMobile}
                 />
               )
             }
@@ -204,12 +211,8 @@ export default function Map({ serverSettings:
         scanZoneMode={scanZoneMode}
         setScanZoneMode={setScanZoneMode}
         settings={settings}
-      />
-      <ActiveWeather
-        map={map}
-        Icons={Icons}
-        isNight={isNight}
-        activeWeatherZoom={config.activeWeatherZoom}
+        isMobile={isMobile}
+        isTablet={isTablet}
       />
     </>
   )

@@ -57,7 +57,10 @@
     "weatherCellLimit": 3,
     "searchResultsLimit": 15,
     "nestHemisphere": "north",
-    "gymValidDataLimit": 30
+    "gymValidDataLimit": 30,
+    "hideOldGyms": false,
+    "stopValidDataLimit": 30,
+    "hideOldPokestops": false
   },
   "multiDomains": [],
   "map": {
@@ -74,7 +77,8 @@
       "scanCellsZoom": 13,
       "submissionZoom": 15,
       "activeWeatherZoom": 13,
-      "geoJsonFileName": "areas.json"
+      "geoJsonFileName": "areas.json",
+      "attributionPrefix": "<a href='https://github.com/WatWowMap/ReactMap' target='_blank' rel='noreferrer'>ReactMap</a>"
     },
     "localeSelection": [
       "en",
@@ -100,7 +104,8 @@
     "holidayEffects": {
       "christmasSnow": true,
       "newYearsFireworks": true,
-      "valentinesDay": true
+      "valentinesDay": true,
+      "internationalWomensDay": true
     },
     "misc": {
       "enableMapJsFilter": true,
