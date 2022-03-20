@@ -22,12 +22,13 @@ const isRelease = Boolean(process.argv.includes('--release'))
 
 const hasCustom = await (async function checkFolders(folder, isCustom = false) {
   for (const file of await fs.promises.readdir(folder)) {
+    if (isCustom) return true
     if (file.startsWith('.')) continue
     if (!file.includes('.')) isCustom = await checkFolders(`${folder}/${file}`, isCustom)
     if (/\.custom.(jsx?|css)$/.test(file)) return true
   }
   return isCustom
-}(`${__dirname}/src`))
+}(path.resolve(__dirname, 'src')))
 
 if (await fs.existsSync(path.resolve(__dirname, 'dist'))) {
   console.log('Cleaning up old build')
