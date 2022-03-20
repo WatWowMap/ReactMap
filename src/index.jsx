@@ -10,7 +10,7 @@ import './services/i18n'
 if (inject) {
   const {
     GOOGLE_ANALYTICS_ID, ANALYTICS_DEBUG_MODE, TITLE, VERSION,
-    SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE, DEVELOPMENT,
+    SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE, DEVELOPMENT, CUSTOM,
   } = inject
   if (GOOGLE_ANALYTICS_ID) {
     ReactGA.initialize(GOOGLE_ANALYTICS_ID, { debug: ANALYTICS_DEBUG_MODE })
@@ -26,11 +26,7 @@ if (inject) {
     environment: DEVELOPMENT ? 'development' : 'production',
     debug: DEVELOPMENT,
     beforeSend(event) {
-      if (event?.exception?.values?.[0]?.stacktrace?.frames?.some(f => f.filename.includes('node_modules'))) {
-        // do nothing for external libraries
-        return null
-      }
-      return event
+      return CUSTOM ? null : event
     },
   })
   // eslint-disable-next-line no-console

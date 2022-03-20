@@ -1,3 +1,6 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-continue */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-console */
 import path from 'path'
@@ -16,6 +19,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const { version } = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json')))
 const isDevelopment = Boolean(process.argv.includes('--dev'))
 const isRelease = Boolean(process.argv.includes('--release'))
+
+const hasCustom = await (async function checkFolders(folder, isCustom = false) {
+  for (const file of await fs.promises.readdir(folder)) {
+    if (file.startsWith('.')) continue
+    if (!file.includes('.')) isCustom = await checkFolders(`${folder}/${file}`, isCustom)
+    if (/\.custom.(jsx?|css)$/.test(file)) return true
+  }
+  return isCustom
+}(`${__dirname}/src`))
 
 if (await fs.existsSync(path.resolve(__dirname, 'dist'))) {
   console.log('Cleaning up old build')
@@ -36,41 +48,6 @@ const plugins = [
       },
     ],
   }),
-  {
-    name: 'Custom Loader',
-    setup(build) {
-      const customPaths = []
-      build.onLoad({ filter: /\.(jsx?|css)$/ }, async (args) => {
-        const isNodeModule = /node_modules/.test(args.path)
-        if (!isNodeModule) {
-          const [base, suffix] = args.path.split('.')
-          const newPath = `${base}.custom.${suffix}`
-          if (await fs.existsSync(newPath)) {
-            customPaths.push(newPath)
-            return {
-              contents: await fs.readFileSync(newPath, 'utf8'),
-              loader: suffix,
-              watchFiles: isDevelopment ? [newPath] : undefined,
-            }
-          }
-        }
-      })
-      build.onEnd(() => {
-        if (customPaths.length && !isDevelopment) {
-          console.log(`
-======================================================
-                       WARNING:
-       Custom files aren't officially supported
-        Be sure to watch for breaking changes!
-
-${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
-
-======================================================
-`)
-        }
-      })
-    },
-  },
   esbuildMxnCopy({
     copy: [
       { from: 'public/images', to: 'dist/' },
@@ -90,6 +67,45 @@ if (isDevelopment) {
     eslintPlugin(),
   )
 } else {
+  if (hasCustom) {
+    plugins.push(
+      {
+        name: 'Custom Loader',
+        setup(build) {
+          const customPaths = []
+          build.onLoad({ filter: /\.(jsx?|css)$/ }, async (args) => {
+            const isNodeModule = /node_modules/.test(args.path)
+            if (!isNodeModule) {
+              const [base, suffix] = args.path.split('.')
+              const newPath = `${base}.custom.${suffix}`
+              if (await fs.existsSync(newPath)) {
+                customPaths.push(newPath)
+                return {
+                  contents: await fs.readFileSync(newPath, 'utf8'),
+                  loader: suffix,
+                  watchFiles: isDevelopment ? [newPath] : undefined,
+                }
+              }
+            }
+          })
+          build.onEnd(() => {
+            if (customPaths.length && !isDevelopment) {
+              console.log(`
+======================================================
+                       WARNING:
+       Custom files aren't officially supported
+        Be sure to watch for breaking changes!
+    
+${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
+    
+======================================================
+`)
+            }
+          })
+        },
+      },
+    )
+  }
   console.log(`Building production version: ${version}`)
 }
 
@@ -124,6 +140,8 @@ try {
         ...env.parsed,
         VERSION: version,
         DEVELOPMENT: isDevelopment,
+        CUSTOM: hasCustom,
+        LOCALES: await fs.promises.readdir(`${__dirname}/public/locales`),
       }),
     },
     plugins,
