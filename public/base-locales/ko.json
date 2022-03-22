@@ -438,5 +438,20 @@
   "loading_icons": "아이콘 가져오기",
   "loading_invasions": "침략 가져오기",
   "loading": "{{category}} 로드 중",
-  "pvp_ranking_cap": "수준"
+  "pvp_ranking_cap": "수준",
+  "badge_0": "없음",
+  "device_icons": "장치 아이콘",
+  "spawnpoint_icons": "생성 지점 아이콘",
+  "badge_1": "청동",
+  "badge_2": "은",
+  "badge_3": "금",
+  "gym_badge_menu": "체육관 배지 수정",
+  "gym_badges": "체육관 배지",
+  "gym_badge_diamonds": "체육관 배지 표시",
+  "gym_badges_subtitle": "지도에 체육관 배지를 표시하고 프로필 페이지에 목록을 표시합니다.",
+  "confirm_filters_reset": "필터 재설정",
+  "filters_reset_text": "설정을 기본값으로 재설정하시겠습니까? \n이 취소 할 수 없습니다!",
+  "filters_reset_title": "필터 재설정",
+  "raid_quick_select": "빠른 선택",
+  "disabled": "장애가있는"
 }

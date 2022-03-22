@@ -494,5 +494,9 @@
   "loading": "Ładowanie {{category}}",
   "loading_icons": "Ładowanie ikon",
   "loading_invasions": "Ładowanie inwazji",
-  "pvp_ranking_cap": "Poziom"
+  "pvp_ranking_cap": "Poziom",
+  "device_icons": "Ikony urządzeń",
+  "spawnpoint_icons": "Ikony Spawnpointów",
+  "raid_quick_select": "Szybki wybór",
+  "disabled": "Wyłączone"
 }
