@@ -438,5 +438,20 @@
   "loading_icons": "Recupero delle icone",
   "loading_invasions": "Recupero delle invasioni",
   "loading": "Caricamento {{category}}",
-  "pvp_ranking_cap": "Livello"
+  "pvp_ranking_cap": "Livello",
+  "badge_0": "Nessuno",
+  "device_icons": "Icone del dispositivo",
+  "spawnpoint_icons": "Icone del punto di spawn",
+  "badge_1": "Bronzo",
+  "badge_2": "Argento",
+  "badge_3": "Oro",
+  "gym_badge_menu": "Modifica badge palestra",
+  "gym_badges": "Distintivi da palestra",
+  "gym_badge_diamonds": "Mostra badge palestra",
+  "gym_badges_subtitle": "Visualizza i badge della palestra sulla mappa e un elenco nella pagina del profilo.",
+  "confirm_filters_reset": "Ripristina i filtri",
+  "filters_reset_text": "Sei sicuro di voler ripristinare le impostazioni ai valori predefiniti? \nQuesto non può essere annullato!",
+  "filters_reset_title": "Ripristina i filtri",
+  "raid_quick_select": "Selezione rapida",
+  "disabled": "Disabilitato"
 }
