@@ -489,5 +489,13 @@
   "loading": "laden von {{category}}",
   "loading_icons": "Icons abrufen",
   "loading_invasions": "Rocket-Lineup abrufen",
-  "pvp_ranking_cap": "Level"
+  "pvp_ranking_cap": "Level",
+  "device_icons": "Gerätesymbole",
+  "spawnpoint_icons": "Spawnpunkt-Symbole",
+  "disabled": "Deaktiviert",
+  "lc_title": "folge deinem Standort",
+  "lc_metersUnit": "Meter",
+  "lc_feetUnit": "Fuss",
+  "lc_popup": "Dein Standort befindet sich innerhalb von {distance} {unit} Abstand zu diesem Punkt.",
+  "lc_outsideMapBoundsMsg": "Dein Standort scheint sich außerhalb der Grenzen der Karte zu befinden."
 }

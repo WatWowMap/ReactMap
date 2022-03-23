@@ -469,5 +469,20 @@
   "loading_icons": "Obtener iconos",
   "loading_invasions": "Ir a buscar invasiones",
   "loading": "Cargando {{category}}",
-  "pvp_ranking_cap": "Nivel"
+  "pvp_ranking_cap": "Nivel",
+  "badge_0": "Ninguna",
+  "device_icons": "Iconos de dispositivos",
+  "spawnpoint_icons": "Iconos de puntos de aparición",
+  "badge_1": "Bronce",
+  "badge_2": "Plata",
+  "badge_3": "Oro",
+  "gym_badge_menu": "Editar insignia de gimnasio",
+  "gym_badges": "insignias de gimnasio",
+  "gym_badge_diamonds": "Mostrar insignias de gimnasio",
+  "gym_badges_subtitle": "Muestra insignias de gimnasio en el mapa y una lista en la página de perfil.",
+  "confirm_filters_reset": "Restablecer filtros",
+  "filters_reset_text": "¿Está seguro de que desea restablecer la configuración a los valores predeterminados? \n¡Esto no se puede deshacer!",
+  "filters_reset_title": "Restablecer filtros",
+  "raid_quick_select": "Selección rápida",
+  "disabled": "Discapacitado"
 }
