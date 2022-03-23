@@ -1,3 +1,6 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-continue */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-console */
 import path from 'path'
@@ -5,7 +8,7 @@ import fs from 'fs'
 import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
 
-import { build } from 'esbuild'
+import { build as compile } from 'esbuild'
 import { htmlPlugin } from '@craftamap/esbuild-plugin-html'
 import esbuildMxnCopy from 'esbuild-plugin-mxn-copy'
 import aliasPlugin from 'esbuild-plugin-path-alias'
@@ -17,9 +20,19 @@ const { version } = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.
 const isDevelopment = Boolean(process.argv.includes('--dev'))
 const isRelease = Boolean(process.argv.includes('--release'))
 
-if (fs.existsSync(path.resolve(__dirname, 'dist'))) {
+const hasCustom = await (async function checkFolders(folder, isCustom = false) {
+  for (const file of await fs.promises.readdir(folder)) {
+    if (isCustom) return true
+    if (file.startsWith('.')) continue
+    if (!file.includes('.')) isCustom = await checkFolders(`${folder}/${file}`, isCustom)
+    if (/\.custom.(jsx?|css)$/.test(file)) return true
+  }
+  return isCustom
+}(path.resolve(__dirname, 'src')))
+
+if (await fs.existsSync(path.resolve(__dirname, 'dist'))) {
   console.log('Cleaning up old build')
-  fs.rm(path.resolve(__dirname, 'dist'), { recursive: true }, (err) => {
+  await fs.rm(path.resolve(__dirname, 'dist'), { recursive: true }, (err) => {
     if (err) console.log(err)
   })
 }
@@ -30,7 +43,7 @@ const plugins = [
       {
         entryPoints: ['src/index.jsx'],
         filename: 'index.html',
-        htmlTemplate: fs.readFileSync('./public/index.template.html'),
+        htmlTemplate: await fs.readFileSync('./public/index.template.html'),
         scriptLoading: 'defer',
         favicon: './public/favicon/favicon.ico',
       },
@@ -55,11 +68,50 @@ if (isDevelopment) {
     eslintPlugin(),
   )
 } else {
+  if (hasCustom) {
+    plugins.push(
+      {
+        name: 'Custom Loader',
+        setup(build) {
+          const customPaths = []
+          build.onLoad({ filter: /\.(jsx?|css)$/ }, async (args) => {
+            const isNodeModule = /node_modules/.test(args.path)
+            if (!isNodeModule) {
+              const [base, suffix] = args.path.split('.')
+              const newPath = `${base}.custom.${suffix}`
+              if (await fs.existsSync(newPath)) {
+                customPaths.push(newPath)
+                return {
+                  contents: await fs.readFileSync(newPath, 'utf8'),
+                  loader: suffix,
+                  watchFiles: isDevelopment ? [newPath] : undefined,
+                }
+              }
+            }
+          })
+          build.onEnd(() => {
+            if (customPaths.length && !isDevelopment) {
+              console.log(`
+======================================================
+                       WARNING:
+       Custom files aren't officially supported
+        Be sure to watch for breaking changes!
+    
+${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
+    
+======================================================
+`)
+            }
+          })
+        },
+      },
+    )
+  }
   console.log(`Building production version: ${version}`)
 }
 
 try {
-  await build({
+  await compile({
     entryPoints: ['src/index.jsx'],
     legalComments: 'none',
     bundle: true,
@@ -89,6 +141,8 @@ try {
         ...env.parsed,
         VERSION: version,
         DEVELOPMENT: isDevelopment,
+        CUSTOM: hasCustom,
+        LOCALES: await fs.promises.readdir(`${__dirname}/public/locales`),
       }),
     },
     plugins,

@@ -511,5 +511,10 @@
   "scan_error_title": "Error",
   "scan_error": "There has been an error while processing the scan request...",
   "scan_outside_area": "This location is outside the boundaries of authorized areas",
-  "pvp_ranking_cap": "Level"
+  "pvp_ranking_cap": "Level",
+  "lc_title": "Follow Your Location",
+  "lc_metersUnit": "meters",
+  "lc_feetUnit": "feet",
+  "lc_popup": "You are within {distance} {unit} from this point",
+  "lc_outsideMapBoundsMsg": "You seem located outside the boundaries of the map"
 }

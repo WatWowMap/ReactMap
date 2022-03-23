@@ -438,5 +438,20 @@
   "loading": "กำลังโหลด {{category}}",
   "loading_invasions": "เรียกการบุกรุก",
   "loading_icons": "กำลังเรียกไอคอน",
-  "pvp_ranking_cap": "ระดับ"
+  "pvp_ranking_cap": "ระดับ",
+  "badge_0": "ไม่มี",
+  "device_icons": "ไอคอนอุปกรณ์",
+  "spawnpoint_icons": "ไอคอนจุดไข่",
+  "badge_1": "บรอนซ์",
+  "badge_2": "เงิน",
+  "badge_3": "ทอง",
+  "gym_badge_menu": "แก้ไขป้ายยิม",
+  "gym_badges": "ป้ายยิม",
+  "gym_badge_diamonds": "แสดงป้ายยิม",
+  "gym_badges_subtitle": "แสดง Gym Badges บนแผนที่และรายการในหน้าโปรไฟล์",
+  "confirm_filters_reset": "รีเซ็ตตัวกรอง",
+  "filters_reset_text": "คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตการตั้งค่าเป็นค่าเริ่มต้น \nสิ่งนี้ไม่สามารถยกเลิกได้!",
+  "filters_reset_title": "รีเซ็ตตัวกรอง",
+  "raid_quick_select": "เลือกด่วน",
+  "disabled": "พิการ"
 }

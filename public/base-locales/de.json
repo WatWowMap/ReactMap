@@ -507,5 +507,13 @@
   "scan_loading": "Deine Scan-Anfrage wird bearbeitet und wurde erfolgreich abgeschickt!",
   "scan_error_title": "Fehler",
   "scan_error": "Es ist ein Fehler bei der Verarbeitung der Scan-Anfrage aufgetreten...",
-  "scan_outside_area": "Dieser Standort liegt außerhalb der Grenzen der zugelassenen Gebiete"
+  "scan_outside_area": "Dieser Standort liegt außerhalb der Grenzen der zugelassenen Gebiete",
+  "device_icons": "Gerätesymbole",
+  "spawnpoint_icons": "Spawnpunkt-Symbole",
+  "disabled": "Deaktiviert",
+  "lc_title": "folge deinem Standort",
+  "lc_metersUnit": "Meter",
+  "lc_feetUnit": "Fuss",
+  "lc_popup": "Dein Standort befindet sich innerhalb von {distance} {unit} Abstand zu diesem Punkt.",
+  "lc_outsideMapBoundsMsg": "Dein Standort scheint sich außerhalb der Grenzen der Karte zu befinden."
 }

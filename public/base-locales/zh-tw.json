@@ -438,5 +438,20 @@
   "loading_icons": "獲取圖標",
   "loading_invasions": "獲取入侵",
   "loading": "正在加載 {{category}}",
-  "pvp_ranking_cap": "等級"
+  "pvp_ranking_cap": "等級",
+  "badge_0": "沒有",
+  "device_icons": "設備圖標",
+  "spawnpoint_icons": "生成點圖標",
+  "badge_1": "青銅",
+  "badge_2": "銀",
+  "badge_3": "金子",
+  "gym_badge_menu": "編輯健身房徽章",
+  "gym_badges": "健身房徽章",
+  "gym_badge_diamonds": "顯示健身房徽章",
+  "gym_badges_subtitle": "在地圖上顯示健身房徽章並在個人資料頁面中顯示列表。",
+  "confirm_filters_reset": "重置過濾器",
+  "filters_reset_text": "您確定要將設置重置為默認值嗎？\n這不能被撤消！",
+  "filters_reset_title": "重置過濾器",
+  "raid_quick_select": "快速選擇",
+  "disabled": "已禁用"
 }

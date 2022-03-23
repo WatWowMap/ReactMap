@@ -439,5 +439,20 @@
   "loading_icons": "アイコンの取得",
   "loading_invasions": "侵略をフェッチする",
   "loading": "{{category}}を読み込んでいます",
-  "pvp_ranking_cap": "レベル"
+  "pvp_ranking_cap": "レベル",
+  "badge_0": "なし",
+  "device_icons": "デバイスアイコン",
+  "spawnpoint_icons": "スポーンポイントアイコン",
+  "badge_1": "ブロンズ",
+  "badge_2": "銀",
+  "badge_3": "ゴールド",
+  "gym_badge_menu": "ジムバッジを編集する",
+  "gym_badges": "ジムバッジ",
+  "gym_badge_diamonds": "ジムバッジを表示する",
+  "gym_badges_subtitle": "マップ上にジムバッジを表示し、プロファイルページにリストを表示します。",
+  "confirm_filters_reset": "フィルタをリセット",
+  "filters_reset_text": "設定をデフォルト値にリセットしてもよろしいですか？\nこれは、元に戻すことはできません！",
+  "filters_reset_title": "フィルタをリセット",
+  "raid_quick_select": "クイックセレクト",
+  "disabled": "無効"
 }
