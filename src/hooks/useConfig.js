@@ -1,6 +1,5 @@
-import React from 'react'
-import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
+import { useParams } from 'react-router-dom'
 import * as Sentry from '@sentry/react'
 
 import Utility from '@services/Utility'
@@ -8,15 +7,12 @@ import { useStore, useStatic } from '@hooks/useStore'
 
 import useGenerate from '@hooks/useGenerate'
 
-import Map from './Map'
-
-export default function ConfigSettings({
-  serverSettings, match, paramLocation, paramZoom,
-}) {
+export default function useConfig(serverSettings, paramLocation) {
   Utility.analytics('User', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
 
   document.title = serverSettings.config?.map?.headerTitle
 
+  const params = useParams()
   const setUserSettings = useStore(state => state.setUserSettings)
   const setSettings = useStore(state => state.setSettings)
   const setFilters = useStore(state => state.setFilters)
@@ -136,39 +132,13 @@ export default function ConfigSettings({
     if (paramLocation && paramLocation[0] !== null) {
       return paramLocation
     }
-    if (match.params.lat) {
-      return [match.params.lat, match.params.lon]
+    if (params.lat) {
+      return [params.lat, params.lon]
     }
     return updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
   }
 
   setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
-  const getStartZoom = () => {
-    if (paramZoom) {
-      return paramZoom
-    }
-    if (match.params.zoom) {
-      return match.params.zoom || 15
-    }
-    return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
-  }
 
   setIsNight(Utility.nightCheck(...getStartLocation()))
-
-  return (
-    <MapContainer
-      tap={false}
-      center={getStartLocation()}
-      zoom={getStartZoom()}
-      zoomControl={false}
-      preferCanvas
-    >
-      {(serverSettings.user && serverSettings.user.perms.map) && (
-        <Map
-          serverSettings={serverSettings}
-          params={match.params}
-        />
-      )}
-    </MapContainer>
-  )
 }

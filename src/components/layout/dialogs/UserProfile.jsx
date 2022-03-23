@@ -337,7 +337,7 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
           {item.name || t('unknown_gym')}
         </Typography>
       </Grid>
-      <Dialog open={badgeMenu}>
+      <Dialog open={badgeMenu} onClose={() => setBadgeMenu(false)}>
         <BadgeSelection
           gym={item}
           badge={badge}

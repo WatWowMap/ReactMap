@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Dialog, Snackbar } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 
 import Utility from '@services/Utility'
 import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
+import useHash from '@hooks/useHash'
 import SlideTransition from '@assets/mui/SlideTransition'
 
 import FloatingBtn from './FloatingBtn'
@@ -27,6 +28,8 @@ export default function Nav({
   isMobile, isTablet,
 }) {
   const classes = useStyles()
+  const [isOpen, toggleHash] = useHash()
+  const [isDrawerOpen, toggleDrawerHash, drawerHash] = useHash()
 
   const { perms } = useStatic(state => state.auth)
   const webhookAlert = useStatic(state => state.webhookAlert)
@@ -37,6 +40,7 @@ export default function Nav({
   const feedback = useStatic(state => state.feedback)
   const setFeedback = useStatic(state => state.setFeedback)
   const resetFilters = useStatic(state => state.resetFilters)
+  const setResetFilters = useStatic(state => state.setResetFilters)
 
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
@@ -67,6 +71,7 @@ export default function Nav({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
+    toggleDrawerHash(open, ['drawer'])
     setDrawer(open)
   }
 
@@ -82,8 +87,8 @@ export default function Nav({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
+    toggleHash(open, [type, category], true)
     setDialog({ open, category, type })
-
     if (filter && type === 'search') {
       setManualParams({ id: filter.id })
       map.flyTo([filter.lat, filter.lon], 16)
@@ -95,6 +100,14 @@ export default function Nav({
       setUserSettings({ ...userSettings, [category]: filter })
     }
   }
+
+  useEffect(() => {
+    setDialog({ ...dialog, open: isOpen })
+  }, [isOpen])
+
+  useEffect(() => {
+    setDrawer(isDrawerOpen && drawerHash.includes('#drawer'))
+  }, [isDrawerOpen])
 
   return (
     <>
@@ -127,6 +140,7 @@ export default function Nav({
         open={userProfile}
         fullScreen={isMobile}
         fullWidth={!isMobile}
+        onClose={() => setUserProfile(false)}
       >
         <UserProfile
           setUserProfile={setUserProfile}
@@ -138,6 +152,7 @@ export default function Nav({
         open={tutorial && enableTutorial}
         fullScreen={isMobile}
         maxWidth="xs"
+        onClose={() => setTutorial(false)}
       >
         <Tutorial
           setUserProfile={setUserProfile}
@@ -150,6 +165,7 @@ export default function Nav({
         fullScreen={isMobile}
         maxWidth="md"
         open={dialog.open && dialog.type === 'filters'}
+        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <FilterMenu
           toggleDialog={toggleDialog}
@@ -162,6 +178,7 @@ export default function Nav({
       <Dialog
         maxWidth="sm"
         open={dialog.open && dialog.type === 'options'}
+        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <UserOptions
           toggleDialog={toggleDialog}
@@ -176,6 +193,7 @@ export default function Nav({
           container: classes.container,
         }}
         open={dialog.open && dialog.type === 'search'}
+        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <Search
           toggleDialog={toggleDialog}
@@ -187,6 +205,7 @@ export default function Nav({
       <Dialog
         maxWidth="sm"
         open={Boolean(motd && !tutorial)}
+        onClose={handleMotdClose}
       >
         <Motd
           motd={messageOfTheDay}
@@ -196,6 +215,7 @@ export default function Nav({
       </Dialog>
       <Dialog
         open={donorPage}
+        onClose={() => setDonorPage(false)}
       >
         <DonorPage
           donorPage={donationPage}
@@ -205,12 +225,14 @@ export default function Nav({
       <Dialog
         open={feedback}
         maxWidth={isMobile ? 'sm' : 'xs'}
+        onClose={() => setFeedback(false)}
       >
         <Feedback link={config.feedbackLink} setFeedback={setFeedback} />
       </Dialog>
       <Dialog
         open={resetFilters}
         maxWidth={isMobile ? 'sm' : 'xs'}
+        onClose={() => setResetFilters(false)}
       >
         <ResetFilters />
       </Dialog>

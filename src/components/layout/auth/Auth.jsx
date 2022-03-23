@@ -1,21 +1,23 @@
 import React from 'react'
-import { Redirect, withRouter } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 
-import ConfigSettings from '../../ConfigSettings'
+import ConfigSettings from '../../Container'
 import Login from './Login'
 import WebhookQuery from '../../WebhookQuery'
 
-const Auth = ({ serverSettings, getServerSettings, match }) => {
+export default function Auth({ serverSettings, getServerSettings }) {
+  const params = useParams()
+
   if (serverSettings.error) {
     return (
-      <Redirect push to={{ pathname: `${serverSettings.status}` }} />
+      <Navigate push to={{ pathname: `${serverSettings.status}` }} />
     )
   }
 
   if ((serverSettings.authMethods.length && !serverSettings.user)
     || (serverSettings.user && !serverSettings.user?.perms?.map)) {
-    if (match.params.category || match.params.lat) {
-      localStorage.setItem('params', JSON.stringify(match.params))
+    if (params.category || params.lat) {
+      localStorage.setItem('params', JSON.stringify(params))
     }
     return <Login serverSettings={serverSettings} getServerSettings={getServerSettings} />
   }
@@ -25,19 +27,17 @@ const Auth = ({ serverSettings, getServerSettings, match }) => {
     const url = cachedParams.category
       ? `/id/${cachedParams.category}/${cachedParams.id}/${cachedParams.zoom || 18}`
       : `/@/${cachedParams.lat}/${cachedParams.lon}/${cachedParams.zoom || 18}`
-    return <Redirect push to={url} />
+    return <Navigate push to={url} />
   }
-  if (match.params.category) {
+  if (params.category) {
     return (
       <WebhookQuery
-        match={match}
+        params={params}
         serverSettings={serverSettings}
       />
     )
   }
   return (
-    <ConfigSettings serverSettings={serverSettings} match={match} />
+    <ConfigSettings serverSettings={serverSettings} params={params} />
   )
 }
-
-export default withRouter(Auth)

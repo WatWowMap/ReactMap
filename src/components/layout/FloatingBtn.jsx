@@ -10,6 +10,7 @@ import L from 'leaflet'
 import useStyles from '@hooks/useStyles'
 import useLocation from '@hooks/useLocation'
 import { useStore, useStatic } from '@hooks/useStore'
+import useHash from '@hooks/useHash'
 
 const DonationIcons = {
   dollar: AttachMoney,
@@ -24,6 +25,8 @@ export default function FloatingButtons({
   setUserProfile,
 }) {
   const { t } = useTranslation()
+  const [isOpen, toggleHash, hash] = useHash()
+
   const { map: { enableFloatingProfileButton } } = useStatic(state => state.config)
   const { loggedIn } = useStatic(state => state.auth)
   const map = useMap()
@@ -41,6 +44,12 @@ export default function FloatingButtons({
     && donationPage.showOnMap && donationPage.components.length
 
   const DonorIcon = showDonorPage ? DonationIcons[donationPage.fabIcon || 'card'] : null
+
+  useEffect(() => {
+    if (hash.includes(`#${selectedWebhook}`)) {
+      setWebhookMode(isOpen ? 'open' : false)
+    }
+  }, [isOpen])
 
   return (
     <Grid
@@ -73,7 +82,16 @@ export default function FloatingButtons({
       ) : null}
       {(perms?.webhooks?.length && webhooks && selectedWebhook) ? (
         <Grid item>
-          <Fab color="secondary" size={fabSize} onClick={() => setWebhookMode('open')} title={selectedWebhook} disabled={Boolean(webhookMode)}>
+          <Fab
+            color="secondary"
+            size={fabSize}
+            onClick={() => {
+              toggleHash(true, [selectedWebhook])
+              setWebhookMode('open')
+            }}
+            title={selectedWebhook}
+            disabled={Boolean(webhookMode)}
+          >
             <NotificationsActive fontSize={iconSize} />
           </Fab>
         </Grid>

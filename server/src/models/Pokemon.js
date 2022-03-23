@@ -169,6 +169,14 @@ module.exports = class Pokemon extends Model {
     const generateSql = (queryBase, filter, relevant) => {
       relevant.forEach(key => {
         switch (key) {
+          case 'level':
+          case 'atk_iv':
+          case 'def_iv':
+          case 'sta_iv':
+          case 'iv':
+            if (ivs) {
+              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
+            } break
           default:
             if (pvp) {
               queryPvp = true
@@ -180,14 +188,6 @@ module.exports = class Pokemon extends Model {
                 // doesn't return everything if only pvp stats for individual pokemon
                 queryBase.whereNull('pokemon_id')
               }
-            } break
-          case 'level':
-          case 'atk_iv':
-          case 'def_iv':
-          case 'sta_iv':
-          case 'iv':
-            if (ivs) {
-              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
             } break
         }
       })

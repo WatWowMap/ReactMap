@@ -493,5 +493,6 @@
   "loading": "Loading {{category}}",
   "loading_icons": "Fetching Icons",
   "loading_invasions": "Fetching Invasions",
+  "loading_settings": "Fetching Settings",
   "pvp_ranking_cap": "Level"
 }
