@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
 const Ohbem = require('ohbem')
@@ -157,6 +158,7 @@ module.exports = class Pokemon extends Model {
     const getRelevantKeys = filter => {
       const relevantKeys = []
       keys.forEach(key => {
+        if (!filter[key]) return console.log(`[PKMN]: ${key} is not valid`)
         if (!arrayCheck(filter, key)) {
           relevantKeys.push(key)
         }
