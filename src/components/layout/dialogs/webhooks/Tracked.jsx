@@ -93,7 +93,8 @@ const Tracked = ({
       <ReactWindow
         columnCount={1}
         length={profileFiltered.length}
-        offset={15}
+        offset={0}
+        columnWidthCorrection={20}
         data={{
           isMobile,
           Icons,
