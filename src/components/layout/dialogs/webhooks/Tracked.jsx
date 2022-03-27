@@ -26,7 +26,7 @@ const Tracked = ({
   const { invasions } = useStatic(s => s.masterfile)
   const profileFiltered = tracked.filter(x => x.profile_no === webhookData[selectedWebhook].human.current_profile_no)
     .sort((a, b) => a[staticInfo[category].sortProp] - b[staticInfo[category].sortProp])
-  let profileFilteredSearch = profileFiltered
+  const [profileFilteredFinal, setProfileFilteredFinal] = useState(profileFiltered)
 
   useEffect(() => {
     if (newWebhookData?.webhook?.[category]) {
@@ -74,8 +74,10 @@ const Tracked = ({
 
   useEffect(() => {
     if (search) {
-      profileFilteredSearch = profileFiltered
-        .filter(x => (x.description.toLowerCase().includes(search) || x.pokemon_id.toString().includes(search)))
+      setProfileFilteredFinal(profileFiltered
+        .filter(x => x.description && x.description.toLowerCase().includes(search)))
+    } else {
+      setProfileFilteredFinal(profileFiltered)
     }
   }, [search])
 
@@ -106,16 +108,16 @@ const Tracked = ({
         setSearch={setSearch}
         category={category}
       />
-      {profileFilteredSearch.length ? (
+      {profileFilteredFinal.length ? (
         <ReactWindow
           columnCount={1}
-          length={profileFilteredSearch.length}
+          length={profileFilteredFinal.length}
           offset={0}
           columnWidthCorrection={20}
           data={{
             isMobile,
             Icons,
-            tileItem: profileFilteredSearch,
+            tileItem: profileFilteredFinal,
             syncWebhook,
             selectedWebhook,
             tracked,
