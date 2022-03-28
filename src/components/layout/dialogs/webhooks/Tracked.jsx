@@ -104,11 +104,13 @@ const Tracked = ({
 
   return (
     <div style={{ height: '95%' }}>
-      <AdvSearch
-        search={search}
-        setSearch={setSearch}
-        category={category}
-      />
+      {['pokemon', 'raid', 'egg', 'gym'].includes(category) ? (
+        <AdvSearch
+          search={search}
+          setSearch={setSearch}
+          category={category}
+        />
+      ) : null}
       {profileFilteredFinal.length ? (
         <ReactWindow
           columnCount={1}
