@@ -500,5 +500,6 @@
   "lc_metersUnit": "meters",
   "lc_feetUnit": "feet",
   "lc_popup": "You are within {distance} {unit} from this point",
-  "lc_outsideMapBoundsMsg": "You seem located outside the boundaries of the map"
+  "lc_outsideMapBoundsMsg": "You seem located outside the boundaries of the map",
+  "no_alerts": "No Alerts Found"
 }

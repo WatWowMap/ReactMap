@@ -500,5 +500,6 @@
   "device_icons": "Ikony urządzeń",
   "spawnpoint_icons": "Ikony Spawnpointów",
   "raid_quick_select": "Szybki wybór",
-  "disabled": "Wyłączone"
+  "disabled": "Wyłączone",
+  "no_alerts": "Nie znaleziono alertów"
 }

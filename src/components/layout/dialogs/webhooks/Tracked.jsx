@@ -143,7 +143,7 @@ const Tracked = ({
           <Grid container alignItems="center" justifyContent="center" direction="column" style={{ height: '100%' }}>
             <Grid item style={{ whiteSpace: 'pre-line' }}>
               <Typography variant="h6" align="center">
-                {t('no_filter_results')}
+                {t('no_alerts')}
               </Typography>
             </Grid>
           </Grid>
