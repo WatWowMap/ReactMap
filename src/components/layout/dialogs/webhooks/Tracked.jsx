@@ -75,7 +75,8 @@ const Tracked = ({
   useEffect(() => {
     if (search) {
       setProfileFilteredFinal(profileFiltered
-        .filter(x => x.description && x.description.toLowerCase().includes(search)))
+        .filter(x => (x.description && x.description.toLowerCase().includes(search))
+          || (x.pokemon_id && x.pokemon_id.toString().includes(search))))
     } else {
       setProfileFilteredFinal(profileFiltered)
     }
