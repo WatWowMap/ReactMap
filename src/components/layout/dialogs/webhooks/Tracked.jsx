@@ -104,19 +104,17 @@ const Tracked = ({
 
   return (
     <div style={{ height: '95%', width: '96%', marginLeft: 'auto', marginRight: 'auto' }}>
-      {['pokemon', 'raid', 'egg', 'gym'].includes(category) ? (
-        <AdvSearch
-          search={search}
-          setSearch={setSearch}
-          category={category}
-        />
-      ) : null}
+      <AdvSearch
+        search={search}
+        setSearch={setSearch}
+        category={category}
+      />
       {searchFiltered.length ? (
         <ReactWindow
           columnCount={1}
           length={searchFiltered.length}
           offset={0}
-          // columnWidthCorrection={20}
+          columnWidthCorrection={10}
           data={{
             isMobile,
             Icons,
