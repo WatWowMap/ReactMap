@@ -103,7 +103,7 @@ const Tracked = ({
   }
 
   return (
-    <div style={{ height: '95%', width: '96%', marginLeft: 'auto', marginRight: 'auto' }}>
+    <div style={{ height: '95%' }}>
       <AdvSearch
         search={search}
         setSearch={setSearch}
@@ -114,7 +114,7 @@ const Tracked = ({
           columnCount={1}
           length={searchFiltered.length}
           offset={0}
-          columnWidthCorrection={10}
+          columnWidthCorrection={18}
           data={{
             isMobile,
             Icons,
