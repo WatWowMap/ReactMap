@@ -195,4 +195,9 @@ module.exports = gql`
     updated: Int
     polygon: [[Float]]
   }
+
+  type ScannerApi {
+    status: String
+    message: String
+  }
 `

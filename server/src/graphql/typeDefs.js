@@ -32,6 +32,7 @@ module.exports = gql`
     submissionCells(minLat: Float, maxLat: Float, minLon: Float, maxLon: Float, ts: Int, zoom: Int): [SubmissionCell]
     weather: [Weather]
     webhook(category: String, status: String, name: String): Poracle
+    scanner(category: String, method: String, data: JSON): ScannerApi
   }
 
   type Mutation {

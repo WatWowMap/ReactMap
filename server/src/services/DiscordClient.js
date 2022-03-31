@@ -6,7 +6,7 @@
 /* eslint-disable import/no-dynamic-require */
 /* global BigInt */
 const fs = require('fs')
-const { authentication: { alwaysEnabledPerms }, webhooks } = require('./config')
+const { authentication: { alwaysEnabledPerms }, scanner, webhooks } = require('./config')
 const Utility = require('./Utility')
 
 module.exports = class DiscordMapClient {
@@ -58,6 +58,7 @@ module.exports = class DiscordMapClient {
     const perms = Object.fromEntries(Object.keys(this.config.perms).map(x => [x, false]))
     perms.areaRestrictions = []
     perms.webhooks = []
+    perms.scanner = []
     try {
       const { guildsFull } = user
       const guilds = user.guilds.map(guild => guild.id)
@@ -65,6 +66,7 @@ module.exports = class DiscordMapClient {
         Object.keys(perms).forEach((key) => perms[key] = true)
         perms.areaRestrictions = []
         perms.webhooks = webhooks.map(x => x.name)
+        perms.scanner = Object.keys(scanner).map(x => x !== 'backendConfig' && scanner[x].enabled && x).filter(x => x !== false)
         console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
         return perms
       }
@@ -98,6 +100,7 @@ module.exports = class DiscordMapClient {
           }
           perms.areaRestrictions.push(...Utility.areaPerms(userRoles, 'discord'))
           perms.webhooks.push(...Utility.webhookPerms(userRoles, 'discordRoles'))
+          perms.scanner.push(...Utility.scannerPerms(userRoles, 'discordRoles'))
         }
       }
       if (perms.areaRestrictions.length) {
