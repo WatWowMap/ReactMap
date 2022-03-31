@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from 'react'
+import React, { useEffect, useMemo, useState, memo } from 'react'
 import { useMutation } from '@apollo/client'
 import { Trans } from 'react-i18next'
 
@@ -24,9 +24,6 @@ const Tracked = ({
   const [selected, setSelected] = useState({})
   const [staticInfo] = useState(webhookData[selectedWebhook].info)
   const { invasions } = useStatic(s => s.masterfile)
-  const profileFiltered = tracked.filter(x => x.profile_no === webhookData[selectedWebhook].human.current_profile_no)
-    .sort((a, b) => a[staticInfo[category].sortProp] - b[staticInfo[category].sortProp])
-  const [profileFilteredFinal, setProfileFilteredFinal] = useState(profileFiltered)
 
   useEffect(() => {
     if (newWebhookData?.webhook?.[category]) {
@@ -72,15 +69,18 @@ const Tracked = ({
     },
   }))
 
-  useEffect(() => {
-    if (search) {
-      setProfileFilteredFinal(profileFiltered
-        .filter(x => (x.description && x.description.toLowerCase().includes(search))
-          || (x.pokemon_id && x.pokemon_id.toString().includes(search))))
-    } else {
-      setProfileFilteredFinal(profileFiltered)
-    }
-  }, [search])
+  const profileFiltered = useMemo(() => tracked
+    .filter(x => x.profile_no === webhookData[selectedWebhook].human.current_profile_no)
+    .map(y => ({
+      ...y,
+      description: Poracle.generateDescription(y, category, webhookData[selectedWebhook].leagues, t)?.replace(/\*/g, '') || '',
+    }))
+    .sort((a, b) => (
+      a[staticInfo[category].sortProp] - b[staticInfo[category].sortProp]
+    )), [tracked, webhookData[selectedWebhook].human.current_profile_no])
+
+  const searchFiltered = profileFiltered.filter(x => x.description.toLowerCase().includes(search)
+    || (x.pokemon_id && x.pokemon_id.toString().includes(search)))
 
   const handleAll = () => {
     const newObj = {}
@@ -103,7 +103,7 @@ const Tracked = ({
   }
 
   return (
-    <div style={{ height: '95%' }}>
+    <div style={{ height: '95%', width: '96%', marginLeft: 'auto', marginRight: 'auto' }}>
       {['pokemon', 'raid', 'egg', 'gym'].includes(category) ? (
         <AdvSearch
           search={search}
@@ -111,16 +111,16 @@ const Tracked = ({
           category={category}
         />
       ) : null}
-      {profileFilteredFinal.length ? (
+      {searchFiltered.length ? (
         <ReactWindow
           columnCount={1}
-          length={profileFilteredFinal.length}
+          length={searchFiltered.length}
           offset={0}
-          columnWidthCorrection={20}
+          // columnWidthCorrection={20}
           data={{
             isMobile,
             Icons,
-            tileItem: profileFilteredFinal,
+            tileItem: searchFiltered,
             syncWebhook,
             selectedWebhook,
             tracked,
@@ -129,11 +129,9 @@ const Tracked = ({
             setSelected,
             setSend,
             setTempFilters,
-            leagues: webhookData[selectedWebhook].leagues,
             category,
             Poracle,
             invasions,
-            t,
             Utility,
           }}
           Tile={PokemonTile}

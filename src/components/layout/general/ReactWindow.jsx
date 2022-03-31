@@ -13,7 +13,7 @@ export default function ReactWindow({
           width={width}
           height={height}
           columnCount={columnCount}
-          columnWidth={width / columnCount - (columnWidthCorrection || 5)}
+          columnWidth={Math.floor(width / columnCount) - (columnWidthCorrection || 5)}
           rowCount={Math.ceil(length / columnCount)}
           rowHeight={(columnCount > 1 ? 120 : 60) + offset}
           itemData={{
