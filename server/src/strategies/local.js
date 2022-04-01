@@ -25,6 +25,7 @@ const authHandler = async (req, username, password, done) => {
       ),
       areaRestrictions: Utility.areaPerms(localPerms, 'local'),
       webhooks: [],
+      scanner: [],
     },
   }
 

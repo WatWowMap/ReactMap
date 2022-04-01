@@ -369,6 +369,39 @@
       }
     ]
   },
+  "scanner": {
+    "backendConfig": {
+      "platform": "rdm/mad",
+      "apiEndpoint": "http://ip:port/api/",
+      "apiUsername": "username",
+      "apiPassword": "password",
+      "queueRefreshInterval": 5
+    },
+    "scanNext": {
+      "enabled": false,
+      "showScanCount": false,
+      "showScanQueue": false,
+      "scanNextInstance": "scanNext",
+      "scanNextDevice": "Device01",
+      "scanNextSleeptime": 5,
+      "scanNextAreaRestriction": [],
+      "discordRoles": [],
+      "telegramGroups": []
+    },
+    "scanZone": {
+      "enabled": false,
+      "showScanCount": false,
+      "showScanQueue": false,
+      "scanZoneMaxSize": 10,
+      "advancedScanZoneOptions": false,
+      "scanZoneRadius": { "pokemon": 70, "gym": 750 },
+      "scanZoneSpacing": 1,
+      "scanZoneInstance": "scanZone",
+      "scanZoneAreaRestriction": [],
+      "discordRoles": [],
+      "telegramGroups": []
+    }
+  },
   "webhooks": [],
   "authentication": {
     "strategies": [

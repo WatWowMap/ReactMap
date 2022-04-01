@@ -3,6 +3,7 @@ const fetchRaids = require('./api/fetchRaids')
 const fetchQuests = require('./api/fetchQuests')
 const fetchNests = require('./api/fetchNests')
 const webhookApi = require('./api/webhookApi')
+const scannerApi = require('./api/scannerApi')
 
 module.exports = class Fetch {
   static async json(url, options) {
@@ -23,5 +24,9 @@ module.exports = class Fetch {
 
   static async webhookApi(category, discordId, method, name, data) {
     return webhookApi(category, discordId, method, name, data)
+  }
+
+  static async scannerApi(category, method, data) {
+    return scannerApi(category, method, data)
   }
 }

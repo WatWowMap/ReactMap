@@ -11,6 +11,7 @@ import { getOne, getAllNests } from './queries/nest'
 import getAllScanAreas from './queries/scanAreas'
 import * as searchIndex from './queries/search'
 import * as webhookIndex from './queries/webhook'
+import scanner from './queries/scanner'
 import getGeocoder from './queries/geocoder'
 import * as user from './queries/user'
 
@@ -126,6 +127,10 @@ export default class Query {
 
   static webhook(type) {
     return webhookIndex[type]
+  }
+
+  static scanner() {
+    return scanner
   }
 
   static geocoder() {

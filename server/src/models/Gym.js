@@ -204,7 +204,7 @@ module.exports = class Gym extends Model {
                 eggStatus.where(isMad ? 'start' : 'raid_battle_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
                   .orWhere(unknownEggs => {
                     unknownEggs.where(isMad ? 'pokemon_id' : 'raid_pokemon_id', 0)
-                      .andWhere(isMad ? 'start' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
+                      .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
                   })
               })
             })
@@ -212,7 +212,7 @@ module.exports = class Gym extends Model {
         } else {
           gym.orWhere(raidTier => {
             raidTier.where(isMad ? 'level' : 'raid_level', onlyRaidTier)
-              .andWhere(isMad ? 'start' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
+              .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
           })
         }
       }

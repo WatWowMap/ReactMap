@@ -9,6 +9,8 @@ import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
+import ScanNext from './layout/dialogs/scanner/ScanNext'
+import ScanZone from './layout/dialogs/scanner/ScanZone'
 
 const userSettingsCategory = category => {
   switch (category) {
@@ -32,7 +34,8 @@ const getTileServer = (tileServers, settings, isNight) => {
   return tileServers[settings.tileServers] || fallbackTs
 }
 
-export default function Map({ serverSettings: { config: { map: config, tileServers }, Icons, webhooks }, params }) {
+export default function Map({ serverSettings:
+  { config: { map: config, tileServers, scanner }, Icons, webhooks }, params }) {
   Utility.analytics(window.location.pathname)
 
   const map = useMap()
@@ -58,6 +61,8 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
   const userSettings = useStore(state => state.userSettings)
 
   const [webhookMode, setWebhookMode] = useState(false)
+  const [scanNextMode, setScanNextMode] = useState(false)
+  const [scanZoneMode, setScanZoneMode] = useState(false)
   const [manualParams, setManualParams] = useState(params)
   const [lc] = useState(L.control.locate({
     position: 'bottomright',
@@ -177,6 +182,23 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
           })
         )
       }
+      {scanNextMode && (
+        <ScanNext
+          map={map}
+          scanNextMode={scanNextMode}
+          setScanNextMode={setScanNextMode}
+          scanner={scanner}
+        />
+      )}
+      {scanZoneMode && (
+        <ScanZone
+          map={map}
+          theme={theme}
+          scanZoneMode={scanZoneMode}
+          setScanZoneMode={setScanZoneMode}
+          scanner={scanner}
+        />
+      )}
       <Nav
         map={map}
         setManualParams={setManualParams}
@@ -185,6 +207,10 @@ export default function Map({ serverSettings: { config: { map: config, tileServe
         webhookMode={webhookMode}
         setWebhookMode={setWebhookMode}
         webhooks={webhooks}
+        scanNextMode={scanNextMode}
+        setScanNextMode={setScanNextMode}
+        scanZoneMode={scanZoneMode}
+        setScanZoneMode={setScanZoneMode}
         settings={settings}
         isMobile={isMobile}
         isTablet={isTablet}

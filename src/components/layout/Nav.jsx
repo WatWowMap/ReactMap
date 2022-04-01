@@ -24,6 +24,7 @@ const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 export default function Nav({
   map, setManualParams, Icons, config,
   setWebhookMode, webhookMode, settings, webhooks,
+  setScanNextMode, scanNextMode, setScanZoneMode, scanZoneMode,
   isMobile, isTablet,
 }) {
   const classes = useStyles()
@@ -117,6 +118,10 @@ export default function Nav({
           webhooks={webhooks}
           webhookMode={webhookMode}
           setWebhookMode={setWebhookMode}
+          scanNextMode={scanNextMode}
+          setScanNextMode={setScanNextMode}
+          scanZoneMode={scanZoneMode}
+          setScanZoneMode={setScanZoneMode}
           settings={settings}
           donationPage={donationPage}
           setDonorPage={setDonorPage}
