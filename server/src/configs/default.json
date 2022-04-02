@@ -17,6 +17,7 @@
       "requests": 1000
     },
     "queryAvailable": {
+      "updateHours": 1,
       "pokemon": false,
       "quests": true,
       "raids": true,

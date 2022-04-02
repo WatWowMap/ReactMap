@@ -3,7 +3,6 @@ const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const fetchRaids = require('../services/api/fetchRaids')
 const { pokemon: masterfile } = require('../data/masterfile.json')
-const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },
@@ -24,12 +23,7 @@ module.exports = class Gym extends Model {
     return 'gym'
   }
 
-  static get idColumn() {
-    return dbSelection('gym').type === 'mad'
-      ? 'gym_id' : 'id'
-  }
-
-  static async getAllGyms(args, perms, isMad, userId) {
+  static async getAll(perms, args, { isMad }, userId) {
     const { gyms: gymPerms, raids: raidPerms, areaRestrictions, gymBadges } = perms
     const {
       onlyAllGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible, onlyRaidTier, onlyGymBadges, onlyBadge, ts,
@@ -258,7 +252,7 @@ module.exports = class Gym extends Model {
     return secondaryFilter(await query.limit(queryLimits.gyms))
   }
 
-  static async getAvailableRaidBosses(isMad) {
+  static async getAvailable({ isMad }) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const results = await this.query()
       .select([
@@ -286,7 +280,7 @@ module.exports = class Gym extends Model {
     })
   }
 
-  static async search(args, perms, isMad, distance) {
+  static async search(perms, args, { isMad }, distance) {
     const query = this.query()
       .select([
         'name',
@@ -309,7 +303,7 @@ module.exports = class Gym extends Model {
     return query
   }
 
-  static async searchRaids(args, perms, isMad, distance) {
+  static async searchRaids(perms, args, { isMad }, distance) {
     const { search, locale } = args
     const pokemonIds = Object.keys(masterfile).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
@@ -390,5 +384,36 @@ module.exports = class Gym extends Model {
       })
       .sort((a, b) => a.updatedAt - b.updatedAt)
       .reverse()
+  }
+
+  static getOne(id, { isMad }) {
+    return this.query()
+      .select([
+        isMad ? 'latitude AS lat' : 'lat',
+        isMad ? 'longitude AS lon' : 'lon',
+      ])
+      .where(isMad ? 'gym_id' : 'id', id)
+      .first()
+  }
+
+  static getSubmissions(args, { isMad }) {
+    const query = this.query()
+      .whereBetween(`lat${isMad ? 'itude' : ''}`, [args.minLat - 0.025, args.maxLat + 0.025])
+      .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [args.minLon - 0.025, args.maxLon + 0.025])
+      .andWhere(isMad ? 'enabled' : 'deleted', isMad)
+    if (isMad) {
+      query.select([
+        'gym_id AS id',
+        'latitude AS lat',
+        'longitude AS lon',
+      ])
+    } else {
+      query.select(['id', 'lat', 'lon'])
+        .andWhere(poi => {
+          poi.whereNull('sponsor_id')
+            .orWhere('sponsor_id', 0)
+        })
+    }
+    return query
   }
 }

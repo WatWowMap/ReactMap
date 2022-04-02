@@ -17,7 +17,7 @@ module.exports = class Nest extends Model {
     return 'nest_id'
   }
 
-  static async getNestingSpecies(args, perms) {
+  static async getAll(perms, args) {
     const { areaRestrictions } = perms
     const pokemon = []
     Object.keys(args.filters).forEach(pkmn => {
@@ -26,6 +26,7 @@ module.exports = class Nest extends Model {
       }
     })
     const query = this.query()
+      .select(['*', 'nest_id AS id'])
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .whereIn('pokemon_id', pokemon)
@@ -53,7 +54,7 @@ module.exports = class Nest extends Model {
     return fixedForms(results)
   }
 
-  static async getAvailableNestingSpecies() {
+  static async getAvailable() {
     const results = await this.query()
       .select(['pokemon_id', 'pokemon_form'])
       .groupBy('pokemon_id', 'pokemon_form')
@@ -67,7 +68,7 @@ module.exports = class Nest extends Model {
     })
   }
 
-  static async search(args, perms, isMad, distance) {
+  static async search(perms, args, { isMad }, distance) {
     const { search, locale } = args
     const pokemonIds = Object.keys(masterPkmn).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
@@ -89,5 +90,9 @@ module.exports = class Nest extends Model {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     return query
+  }
+
+  static getOne(id) {
+    return this.query().findById(id).select(['lat', 'lon'])
   }
 }

@@ -1,3 +1,4 @@
+const Db = require('../db/initialization')
 const Badge = require('./Badge')
 const Device = require('./Device')
 const Gym = require('./Gym')
@@ -13,7 +14,7 @@ const User = require('./User')
 const Weather = require('./Weather')
 const { PokemonFilter, GenericFilter } = require('./Filters')
 
-module.exports = {
+const models = {
   Badge,
   Device,
   Gym,
@@ -21,12 +22,18 @@ module.exports = {
   Pokestop,
   Pokemon,
   Portal,
-  Ring,
   ScanCell,
   Session,
   Spawnpoint,
   User,
   Weather,
+}
+
+Db.bindConnections(models)
+
+module.exports = {
+  ...models,
+  Ring,
   PokemonFilter,
   GenericFilter,
 }

@@ -1,11 +1,8 @@
 /* eslint-disable no-console */
 const GraphQLJSON = require('graphql-type-json')
-const { raw } = require('objection')
 
 const config = require('../services/config')
-const {
-  Device, Gym, Pokemon, Pokestop, Portal, ScanCell, Spawnpoint, Weather, Nest, User, Badge,
-} = require('../models/index')
+const { Gym, User, Badge } = require('../models/index')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 
@@ -19,10 +16,10 @@ module.exports = {
       }
       return []
     },
-    devices: (_, args, { req }) => {
+    devices: async (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.devices) {
-        return Device.getAllDevices(perms, Utility.dbSelection('device').type === 'mad')
+        return Db.getAll('Device', perms)
       }
       return []
     },
@@ -36,110 +33,86 @@ module.exports = {
       }
       return []
     },
-    gyms: (_, args, { req }) => {
+    gyms: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.gyms || perms?.raids) {
-        return Gym.getAllGyms(args, perms, Utility.dbSelection('gym').type === 'mad', req?.user?.id)
+        return Db.getAll('Gym', perms, args, req?.user?.id)
       }
       return []
     },
-    gymsSingle: (_, args, { req }) => {
+    gymsSingle: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.[args.perm]) {
-        const query = Gym.query()
-          .findById(args.id)
-        if (Utility.dbSelection('gym').type === 'mad') {
-          query.select([
-            'latitude AS lat',
-            'longitude AS lon',
-          ])
-        }
-        return query || {}
+        return Db.getOne('Gym', args.id)
       }
       return {}
     },
-    nests: (_, args, { req }) => {
+    nests: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.nests) {
-        return Nest.getNestingSpecies(args, perms)
+        return Db.getAll('Nest', perms, args)
       }
       return []
     },
-    nestsSingle: (_, args, { req }) => {
+    nestsSingle: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.[args.perm]) {
-        return Nest.query().findById(args.id) || {}
+        return Db.getOne('Nest', args.id)
       }
       return {}
     },
-    pokestops: (_, args, { req }) => {
+    pokestops: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.pokestops
         || perms?.lures
         || perms?.quests
         || perms?.invasions) {
-        return Pokestop.getAllPokestops(args, perms, Utility.dbSelection('pokestop').type === 'mad')
+        return Db.getAll('Pokestop', perms, args)
       }
       return []
     },
-    pokestopsSingle: (_, args, { req }) => {
+    pokestopsSingle: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.[args.perm]) {
-        const query = Pokestop.query()
-          .findById(args.id)
-        if (Utility.dbSelection('pokestop').type === 'mad') {
-          query.select([
-            'latitude AS lat',
-            'longitude AS lon',
-          ])
-        }
-        return query || {}
+        return Db.getOne('Pokestop', args.id)
       }
       return {}
     },
-    pokemon: (_, args, { req, DbClass }) => {
+    pokemon: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.pokemon) {
-        const isMad = Utility.dbSelection('pokemon').type === 'mad'
         if (args.filters.onlyLegacy) {
-          return Pokemon.getLegacy(args, perms, isMad, DbClass.pvpV2)
+          return Db.getAll('Pokemon', perms, args, 0, 'getLegacy')
         }
-        return Pokemon.getPokemon(args, perms, isMad, DbClass.pvpV2)
+        return Db.getAll('Pokemon', perms, args)
       }
       return []
     },
-    pokemonSingle: (_, args, { req }) => {
+    pokemonSingle: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.[args.perm]) {
-        const query = Pokemon.query().findById(args.id)
-        if (Utility.dbSelection('pokemon').type === 'mad') {
-          query.select([
-            'latitude AS lat',
-            'longitude AS lon',
-          ])
-        }
-        return query || {}
+        return Db.getOne('Pokemon', args.id)
       }
       return {}
     },
-    portals: (_, args, { req }) => {
+    portals: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.portals) {
-        return Portal.getAllPortals(args, perms)
+        return Db.getAll('Portal', perms, args)
       }
       return []
     },
-    portalsSingle: (_, args, { req }) => {
+    portalsSingle: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.[args.perm]) {
-        return Portal.query().findById(args.id) || {}
+        return Db.getOne('Portal', args.id)
       }
       return {}
     },
-    scanCells: (_, args, { req }) => {
+    scanCells: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.scanCells && args.zoom >= config.map.scanCellsZoom) {
-        return ScanCell.getAllCells(args, perms, Utility.dbSelection('pokestop').type === 'mad')
+        return Db.getAll('ScanCell', perms, args)
       }
       return []
     },
@@ -158,23 +131,20 @@ module.exports = {
       }
       return [scanAreas]
     },
-    search: async (_, args, { req }) => {
+    search: async (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const { category, webhookName, search } = args
       if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
-        const isMad = Utility.dbSelection(category.substring(0, category.length - 1)).type === 'mad'
-        const distance = raw(`ROUND(( 3959 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
-
         if (!search || !search.trim()) {
           return []
         }
         switch (args.category) {
           case 'pokestops':
-            return Pokestop.search(args, perms, isMad, distance)
+            return Db.search('Pokestop', perms, args)
           case 'raids':
-            return Gym.searchRaids(args, perms, isMad, distance)
+            return Db.search('Gym', perms, args, 'searchRaids')
           case 'gyms': {
-            const results = await Gym.search(args, perms, isMad, distance)
+            const results = await Db.search('Gym', perms, args)
             const webhook = webhookName ? config.webhookObj[webhookName] : null
             if (webhook && results.length) {
               const withFormatted = await Promise.all(results.map(async result => ({
@@ -187,79 +157,36 @@ module.exports = {
             return results
           }
           case 'portals':
-            return Portal.search(args, perms, isMad, distance)
+            return Db.search('Portal', perms, args)
           case 'nests':
-            return Nest.search(args, perms, isMad, distance)
+            return Db.search('Nest', perms, args)
           default: return []
         }
       }
       return []
     },
-    searchQuest: async (_, args, { req }) => {
+    searchQuest: async (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const { category, search } = args
       if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
-        const isMad = Utility.dbSelection(category.substring(0, category.length - 1)).type === 'mad'
-        const distance = raw(`ROUND(( 3959 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
-
         if (!search || !search.trim()) {
           return []
         }
-        return Pokestop.searchQuests(args, perms, isMad, distance) || []
+        return Db.search('Pokestop', perms, args, 'searchQuests')
       }
       return []
     },
-    spawnpoints: (_, args, { req }) => {
+    spawnpoints: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.spawnpoints) {
-        return Spawnpoint.getAllSpawnpoints(args, perms, Utility.dbSelection('spawnpoint').type === 'mad')
+        return Db.getAll('Spawnpoint', perms, args)
       }
       return []
     },
-    submissionCells: async (_, args, { req }) => {
+    submissionCells: async (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.submissionCells && args.zoom >= config.map.submissionZoom - 1) {
-        const isMadStops = Utility.dbSelection('pokestop').type === 'mad'
-        const isMadGyms = Utility.dbSelection('gym').type === 'mad'
-
-        const stopQuery = Pokestop.query()
-        if (isMadStops) {
-          stopQuery.select([
-            'pokestop_id AS id',
-            'latitude AS lat',
-            'longitude AS lon',
-          ])
-        } else {
-          stopQuery.select(['id', 'lat', 'lon'])
-            .andWhere(poi => {
-              poi.whereNull('sponsor_id')
-                .orWhere('sponsor_id', 0)
-            })
-        }
-
-        const gymQuery = Gym.query()
-        if (isMadGyms) {
-          gymQuery.select([
-            'gym_id AS id',
-            'latitude AS lat',
-            'longitude AS lon',
-          ])
-        } else {
-          gymQuery.select(['id', 'lat', 'lon'])
-            .where(poi => {
-              poi.whereNull('sponsor_id')
-                .orWhere('sponsor_id', 0)
-            })
-        }
-
-        [stopQuery, gymQuery].forEach((query, i) => {
-          const isMad = [isMadStops, isMadGyms]
-          query.whereBetween(`lat${isMad[i] ? 'itude' : ''}`, [args.minLat - 0.025, args.maxLat + 0.025])
-            .andWhereBetween(`lon${isMad[i] ? 'gitude' : ''}`, [args.minLon - 0.025, args.maxLon + 0.025])
-            .andWhere(isMad[i] ? 'enabled' : 'deleted', isMad[i])
-        })
-        const pokestops = await stopQuery
-        const gyms = await gymQuery
+        const [pokestops, gyms] = await Db.submissionCells(args)
         return [{
           placementCells: args.zoom >= config.map.submissionZoom
             ? Utility.getPlacementCells(args, pokestops, gyms)
@@ -269,10 +196,10 @@ module.exports = {
       }
       return [{ placementCells: [], typeCells: [] }]
     },
-    weather: (_, args, { req }) => {
+    weather: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.weather) {
-        return Weather.getAllWeather(Utility.dbSelection('weather').type === 'mad')
+        return Db.getAll('Weather')
       }
       return []
     },
