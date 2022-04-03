@@ -9,7 +9,7 @@ const Fetch = require('../services/Fetch')
 module.exports = {
   JSON: GraphQLJSON,
   Query: {
-    badges: async (_, args, { req, Db }) => {
+    badges: async (_, _args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.gymBadges) {
         const badges = await Badge.getAll(req.user?.id)
@@ -17,7 +17,7 @@ module.exports = {
       }
       return []
     },
-    devices: (_, args, { req, Db }) => {
+    devices: (_, _args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.devices) {
         return Db.getAll('Device', perms)
@@ -117,7 +117,7 @@ module.exports = {
       }
       return []
     },
-    scanAreas: (_, args, { req }) => {
+    scanAreas: (_, _args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const scanAreas = config.scanAreas[req.headers.host]
         ? config.scanAreas[req.headers.host]
@@ -197,7 +197,7 @@ module.exports = {
       }
       return [{ placementCells: [], typeCells: [] }]
     },
-    weather: (_, args, { req, Db }) => {
+    weather: (_, _args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.weather) {
         return Db.getAll('Weather')
@@ -211,7 +211,7 @@ module.exports = {
       }
       return {}
     },
-    scanner: (parent, args, { req }) => {
+    scanner: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const { category, method, data } = args
       if (category === 'getQueue') {

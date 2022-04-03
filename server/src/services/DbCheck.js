@@ -73,7 +73,7 @@ module.exports = class DbCheck {
   }
 
   async determineType() {
-    console.log('[Init] Determining database types')
+    console.log('[DB] Determining database types..')
     await Promise.all(this.connections.map(async (schema, i) => {
       const isMad = await DbCheck.isMadDb(schema)
       Object.entries(this.models).forEach(([category, sources]) => {
@@ -95,7 +95,7 @@ module.exports = class DbCheck {
       Object.entries(this.models).forEach(([model, sources]) => {
         if (this.singleModels.includes(model)) {
           if (sources.length > 1) {
-            console.error(`[Init] ${model} only supports one database connection`)
+            console.error(`[DB] ${model} only supports one database connection`)
             process.exit(0)
           }
           if (model === 'User') {
@@ -107,7 +107,7 @@ module.exports = class DbCheck {
             this.models[model][i].SubModel = models[model].bindKnex(this.connections[source.connection])
           })
         }
-        console.log(`[Init] Bound ${model} to ${sources.length} connections`)
+        console.log(`[DB] Bound ${model} to ${sources.length} connections`)
       })
     } catch (e) {
       console.error(`
@@ -190,7 +190,7 @@ module.exports = class DbCheck {
         await source.SubModel.query()
           .whereNotNull('alternative_quest_type')
           .limit(1)
-        source.hasAltQuest = true
+        source.hasAltQuests = true
       } catch (_) {
         source.hasAltQuests = false
       }
