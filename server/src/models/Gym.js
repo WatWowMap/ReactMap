@@ -6,11 +6,8 @@ const { pokemon: masterfile } = require('../data/masterfile.json')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },
-  database: { schemas, settings: { gymBadgeTableName, joinGymBadgeTable } },
 } = require('../services/config')
 const Badge = require('./Badge')
-
-const gymBadgeDb = schemas.find(x => x.useFor.includes('user'))
 
 const coreFields = ['id', 'name', 'url', 'lat', 'lon', 'updated', 'last_modified_timestamp']
 
@@ -338,7 +335,7 @@ module.exports = class Gym extends Model {
     return query
   }
 
-  static async getGymBadges(isMad, userId) {
+  static async getBadges(userGyms, { isMad }) {
     const query = this.query()
       .select([
         '*',
@@ -352,18 +349,15 @@ module.exports = class Gym extends Model {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
 
-    if (joinGymBadgeTable) {
-      query.leftJoin(`${gymBadgeDb.database}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
-        .where('userId', userId)
-        .andWhere('badge', '>', 0)
-        .orderBy('updatedAt')
-      const results = await query
-      return isMad ? results.map(gym => gym.deleted = !gym.enabled) : results
-    }
-
-    const userGyms = await Badge.query()
-      .where('userId', userId)
-      .andWhere('badge', '>', 0)
+    // Come back to this later, maybe
+    // if (joinGymBadgeTable) {
+    //   query.leftJoin(`${gymBadgeDb.database}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
+    //     .where('userId', userId)
+    //     .andWhere('badge', '>', 0)
+    //     .orderBy('updatedAt')
+    //   const results = await query
+    //   return isMad ? results.map(gym => gym.deleted = !gym.enabled) : results
+    // }
 
     const results = await query
       .whereIn(isMad ? 'gym.gym_id' : 'gym.id', userGyms.map(gym => gym.gymId))

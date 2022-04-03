@@ -2,21 +2,22 @@
 const GraphQLJSON = require('graphql-type-json')
 
 const config = require('../services/config')
-const { Gym, User, Badge } = require('../models/index')
+const { User, Badge } = require('../models/index')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 
 module.exports = {
   JSON: GraphQLJSON,
   Query: {
-    badges: (_, args, { req }) => {
+    badges: async (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.gymBadges) {
-        return Gym.getGymBadges(Utility.dbSelection('gym').type === 'mad', req?.user?.id)
+        const badges = await Badge.getAll(req.user?.id)
+        return Db.getBadges(badges)
       }
       return []
     },
-    devices: async (_, args, { req, Db }) => {
+    devices: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.devices) {
         return Db.getAll('Device', perms)
@@ -165,7 +166,7 @@ module.exports = {
       }
       return []
     },
-    searchQuest: async (_, args, { req, Db }) => {
+    searchQuest: (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       const { category, search } = args
       if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {

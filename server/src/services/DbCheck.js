@@ -92,18 +92,22 @@ module.exports = class DbCheck {
 
   bindConnections(models) {
     try {
-      Object.entries(this.models).forEach(([category, sources]) => {
-        models[category].knex(this.connections[sources[0].connection])
-
-        if (!this.singleModels.includes(category)) {
+      Object.entries(this.models).forEach(([model, sources]) => {
+        if (this.singleModels.includes(model)) {
+          if (sources.length > 1) {
+            console.error(`[Init] ${model} only supports one database connection`)
+            process.exit(0)
+          }
+          if (model === 'User') {
+            models.Badge.knex(this.connections[sources[0].connection])
+          }
+          models[model].knex(this.connections[sources[0].connection])
+        } else {
           sources.forEach((source, i) => {
-            if (category === 'Pokemon') {
-              this.models[category][i].ohbem = this.ohbem
-            }
-            this.models[category][i].SubModel = models[category].bindKnex(this.connections[source.connection])
+            this.models[model][i].SubModel = models[model].bindKnex(this.connections[source.connection])
           })
         }
-        console.log(`[Init] Bound ${category} to ${sources.length} connections`)
+        console.log(`[Init] Bound ${model} to ${sources.length} connections`)
       })
     } catch (e) {
       console.error(`
@@ -270,5 +274,12 @@ module.exports = class DbCheck {
       source.SubModel.getAvailable(source)
     )))
     this.available.pokemon = DbCheck.deDupeAvailable(pokemon)
+  }
+
+  async getBadges(gymBadges) {
+    const data = await Promise.all(this.models.Gym.map(async (source) => (
+      source.SubModel.getBadges(gymBadges, source)
+    )))
+    return DbCheck.deDupeResults(data)
   }
 }
