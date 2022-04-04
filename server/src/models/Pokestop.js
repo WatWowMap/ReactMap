@@ -457,7 +457,6 @@ module.exports = class Pokestop extends Model {
         ...quests.items,
         ...await this.query()
           .select('alternative_quest_item_id AS quest_item_id')
-          .from('pokestop')
           .where('alternative_quest_reward_type', 2)
           .groupBy('alternative_quest_item_id'),
       ]
@@ -521,8 +520,8 @@ module.exports = class Pokestop extends Model {
         .where('alternative_quest_reward_type', 12)
       if (hasRewardAmount) {
         altMegaQuery
-          .distinct('quest_reward_amount AS amount')
-          .distinct('quest_pokemon_id AS id')
+          .distinct('alternative_quest_reward_amount AS amount')
+          .distinct('alternative_quest_pokemon_id AS id')
       } else {
         altMegaQuery
           .distinct(raw('json_extract(alternative_quest_rewards, "$[0].info.pokemon_id")')
@@ -543,7 +542,7 @@ module.exports = class Pokestop extends Model {
       quests.candy = [
         ...quests.candy,
         ...await this.query()
-          .distinct('alternative_quest_pokemon_id')
+          .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
           .where('alternative_quest_reward_type', 4),
       ]
     }
@@ -555,7 +554,7 @@ module.exports = class Pokestop extends Model {
       quests.xlCandy = [
         ...quests.xlCandy,
         ...await this.query()
-          .distinct('alternative_quest_pokemon_id')
+          .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
           .where('alternative_quest_reward_type', 9),
       ]
     }
