@@ -17,11 +17,16 @@
       "requests": 1000
     },
     "queryAvailable": {
-      "updateHours": 1,
       "pokemon": false,
       "quests": true,
       "raids": true,
       "nests": false
+    },
+    "queryUpdateHours": {
+      "pokemon": 0.5,
+      "quests": 1,
+      "raids": 0.5,
+      "nests": 12
     },
     "queryLimits": {
       "pokemon": 10000,

@@ -42,17 +42,29 @@ module.exports = class DbCheck {
       });
     (async () => {
       await this.determineType()
-      await this.pvp()
-      await this.pokestopChecks()
-      await this.updateAvailable()
       if (apiSettings.pvp.reactMapHandlesPvp) {
         await this.initOhbem(apiSettings.pvp.leagues, apiSettings.pvp.levels)
       }
+      await this.pvp()
+      await this.pokestopChecks()
+      await this.availableGyms()
+      await this.availableNests()
+      await this.availablePokemon()
+      await this.availablePokestops()
     })()
 
     setInterval(async () => {
-      await this.updateAvailable()
-    }, 1000 * 60 * 60 * apiSettings.queryAvailable.updateHours)
+      await this.availableGyms()
+    }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.raids)
+    setInterval(async () => {
+      await this.availableNests()
+    }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.nests)
+    setInterval(async () => {
+      await this.availablePokemon()
+    }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.pokemon)
+    setInterval(async () => {
+      await this.availablePokestops()
+    }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.quests)
   }
 
   get getAvailable() {
@@ -254,22 +266,28 @@ module.exports = class DbCheck {
     return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]
   }
 
-  async updateAvailable() {
-    const gyms = await Promise.all(this.models.Gym.map(async (source) => (
-      source.SubModel.getAvailable(source)
-    )))
-    this.available.gyms = DbCheck.deDupeAvailable(gyms)
-
+  async availablePokestops() {
     const pokestops = await Promise.all(this.models.Pokestop.map(async (source) => (
       source.SubModel.getAvailable(source)
     )))
     this.available.pokestops = DbCheck.deDupeAvailable(pokestops)
+  }
 
+  async availableGyms() {
+    const gyms = await Promise.all(this.models.Gym.map(async (source) => (
+      source.SubModel.getAvailable(source)
+    )))
+    this.available.gyms = DbCheck.deDupeAvailable(gyms)
+  }
+
+  async availableNests() {
     const nests = await Promise.all(this.models.Nest.map(async (source) => (
       source.SubModel.getAvailable(source)
     )))
     this.available.nests = DbCheck.deDupeAvailable(nests)
+  }
 
+  async availablePokemon() {
     const pokemon = await Promise.all(this.models.Pokemon.map(async (source) => (
       source.SubModel.getAvailable(source)
     )))
