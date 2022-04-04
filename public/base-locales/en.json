@@ -21,6 +21,11 @@
   "search_nests": "Search Nests",
   "search_gyms": "Search Gyms",
   "search_pokestops": "Search PokéStops",
+  "search_raids": "Search Raids",
+  "search_eggs": "Search Eggs",
+  "search_quests": "Search Quests",
+  "search_lures": "Search Lures",
+  "search_invasions": "Search Invasions",
   "sm": "sm",
   "md": "md",
   "lg": "lg",
@@ -516,5 +521,6 @@
   "lc_metersUnit": "meters",
   "lc_feetUnit": "feet",
   "lc_popup": "You are within {distance} {unit} from this point",
-  "lc_outsideMapBoundsMsg": "You seem located outside the boundaries of the map"
+  "lc_outsideMapBoundsMsg": "You seem located outside the boundaries of the map",
+  "no_alerts": "No Alerts Found"
 }
