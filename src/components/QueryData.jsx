@@ -6,6 +6,7 @@ import Utility from '@services/Utility'
 
 import Clustering from './Clustering'
 import Notification from './layout/general/Notification'
+import ActiveWeather from './layout/general/ActiveWeather'
 
 const withAvailableList = ['pokestops', 'gyms', 'nests']
 const filterSkipList = ['filter', 'enabled', 'legacy']
@@ -25,7 +26,7 @@ const getPolling = category => {
 }
 
 export default function QueryData({
-  bounds, onMove, map, tileStyle, clusteringRules, config, params,
+  bounds, onMove, map, tileStyle, clusteringRules, config, params, isMobile,
   category, available, filters, staticFilters, staticUserSettings, sizeKey,
   userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
 }) {
@@ -101,6 +102,7 @@ export default function QueryData({
   useEffect(() => () => setExcludeList([]))
 
   const renderedData = data || previousData || {}
+
   if (error && inject.DEVELOPMENT) {
     return (
       <Notification
@@ -116,23 +118,35 @@ export default function QueryData({
     )
   }
   return renderedData[category] ? (
-    <Clustering
-      key={sizeKey}
-      renderedData={renderedData[category]}
-      clusteringRules={clusteringRules}
-      map={map}
-      config={config}
-      filters={filters}
-      Icons={Icons}
-      userIcons={userIcons}
-      tileStyle={tileStyle}
-      perms={perms}
-      category={category}
-      userSettings={userSettings}
-      staticUserSettings={staticUserSettings}
-      params={params}
-      setParams={setParams}
-      isNight={isNight}
-    />
+    <>
+      <Clustering
+        key={sizeKey}
+        renderedData={renderedData[category]}
+        clusteringRules={clusteringRules}
+        map={map}
+        config={config}
+        filters={filters}
+        Icons={Icons}
+        userIcons={userIcons}
+        tileStyle={tileStyle}
+        perms={perms}
+        category={category}
+        userSettings={userSettings}
+        staticUserSettings={staticUserSettings}
+        params={params}
+        setParams={setParams}
+        isNight={isNight}
+      />
+      {category === 'weather' && (
+        <ActiveWeather
+          Icons={Icons}
+          isNight={isNight}
+          weather={renderedData[category]}
+          isMobile={isMobile}
+          zoom={config.activeWeatherZoom}
+          map={map}
+        />
+      )}
+    </>
   ) : null
 }

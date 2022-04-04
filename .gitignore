@@ -59,3 +59,8 @@ Desktop.ini
 # Linux
 .directory
 *~
+
+# Custom Files
+src/**/*.custom.jsx
+src/**/*.custom.js
+src/**/*.custom.css

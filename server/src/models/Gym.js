@@ -6,7 +6,7 @@ const { pokemon: masterfile } = require('../data/masterfile.json')
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
-  api: { searchResultsLimit, queryLimits, gymValidDataLimit },
+  api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },
   database: { schemas, settings: { gymBadgeTableName, joinGymBadgeTable } },
 } = require('../services/config')
 const Badge = require('./Badge')
@@ -70,8 +70,10 @@ module.exports = class Gym extends Model {
           raw('UNIX_TIMESTAMP(gym.last_scanned)')
             .as('updated'),
         ])
-        .whereRaw(`UNIX_TIMESTAMP(gym.last_scanned) > ${Date.now() / 1000 - (gymValidDataLimit * 86400)}`)
-    } else {
+      if (hideOldGyms) {
+        query.whereRaw(`UNIX_TIMESTAMP(gym.last_scanned) > ${Date.now() / 1000 - (gymValidDataLimit * 86400)}`)
+      }
+    } else if (hideOldGyms) {
       query.where('updated', '>', Date.now() / 1000 - (gymValidDataLimit * 86400))
     }
     query.whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
@@ -202,7 +204,7 @@ module.exports = class Gym extends Model {
                 eggStatus.where(isMad ? 'start' : 'raid_battle_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
                   .orWhere(unknownEggs => {
                     unknownEggs.where(isMad ? 'pokemon_id' : 'raid_pokemon_id', 0)
-                      .andWhere(isMad ? 'start' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
+                      .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
                   })
               })
             })
@@ -210,7 +212,7 @@ module.exports = class Gym extends Model {
         } else {
           gym.orWhere(raidTier => {
             raidTier.where(isMad ? 'level' : 'raid_level', onlyRaidTier)
-              .andWhere(isMad ? 'start' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
+              .andWhere(isMad ? 'end' : 'raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
           })
         }
       }
@@ -235,7 +237,9 @@ module.exports = class Gym extends Model {
           if (gym.availble_slots !== undefined) {
             gym.available_slots = gym.availble_slots
           }
-          gymFields.forEach(field => newGym[field] = gym[field])
+          if (gym.updated > Date.now() / 1000 - (gymValidDataLimit * 86400)) {
+            gymFields.forEach(field => newGym[field] = gym[field])
+          }
         }
         if (onlyRaids && raidPerms && (onlyRaidTier === 'all'
           ? (args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`] && isRaid) || (args.filters[`e${gym.raid_level}`] && isEgg)

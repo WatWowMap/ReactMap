@@ -1,7 +1,7 @@
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 
-const useStore = create(persist(
+export const useStore = create(persist(
   set => ({
     location: undefined,
     setLocation: (location) => set({ location }),
@@ -53,7 +53,7 @@ const useStore = create(persist(
   },
 ))
 
-const useStatic = create(set => ({
+export const useStatic = create(set => ({
   auth: { discord: true, loggedIn: false, perms: {} },
   setAuth: (auth) => set({ auth }),
   config: undefined,
@@ -97,5 +97,3 @@ const useStatic = create(set => ({
   resetFilters: false,
   setResetFilters: (resetFilters) => set({ resetFilters }),
 }))
-
-export { useStore, useStatic }

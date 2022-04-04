@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
 const Ohbem = require('ohbem')
@@ -9,7 +10,6 @@ const {
 const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 
-const { type: dbType } = dbSelection('pokemon')
 const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
 const ivCalc = 'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
 const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', ...leagues.map(league => league.name)]
@@ -79,7 +79,7 @@ module.exports = class Pokemon extends Model {
     })
   }
 
-  static async getPokemon(args, perms, isMad) {
+  static async getPokemon(args, perms, isMad, pvpV2) {
     const {
       iv: ivs, pvp, areaRestrictions,
     } = perms
@@ -97,9 +97,9 @@ module.exports = class Pokemon extends Model {
 
     const pvpCheck = (pkmn, league, min, max) => {
       const rankCheck = pkmn.rank <= max && pkmn.rank >= min
-      const cpCheck = dbType === 'chuck' || reactMapHandlesPvp || pkmn.cp >= pvpMinCp[league]
+      const cpCheck = pvpV2 || reactMapHandlesPvp || pkmn.cp >= pvpMinCp[league]
       const megaCheck = !pkmn.evolution || onlyPvpMega
-      const capCheck = dbType === 'chuck' || reactMapHandlesPvp ? pkmn.capped || args.filters[`onlyPvp${pkmn.cap}`] : true
+      const capCheck = pvpV2 || reactMapHandlesPvp ? pkmn.capped || args.filters[`onlyPvp${pkmn.cap}`] : true
       return rankCheck && cpCheck && megaCheck && capCheck
     }
 
@@ -138,9 +138,8 @@ module.exports = class Pokemon extends Model {
 
     // parse PVP JSON(s)
     const getParsedPvp = (pokemon) => {
-      if (dbType === 'chuck') {
-        return JSON.parse(pokemon.pvp)
-      }
+      if (pokemon.pvp) return JSON.parse(pokemon.pvp)
+
       const parsed = {}
       const pvpKeys = ['great', 'ultra']
       pvpKeys.forEach(league => {
@@ -158,6 +157,7 @@ module.exports = class Pokemon extends Model {
     const getRelevantKeys = filter => {
       const relevantKeys = []
       keys.forEach(key => {
+        if (!filter[key]) return console.log(`[PKMN]: ${key} is not valid`)
         if (!arrayCheck(filter, key)) {
           relevantKeys.push(key)
         }
@@ -169,6 +169,14 @@ module.exports = class Pokemon extends Model {
     const generateSql = (queryBase, filter, relevant) => {
       relevant.forEach(key => {
         switch (key) {
+          case 'level':
+          case 'atk_iv':
+          case 'def_iv':
+          case 'sta_iv':
+          case 'iv':
+            if (ivs) {
+              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
+            } break
           default:
             if (pvp) {
               queryPvp = true
@@ -180,14 +188,6 @@ module.exports = class Pokemon extends Model {
                 // doesn't return everything if only pvp stats for individual pokemon
                 queryBase.whereNull('pokemon_id')
               }
-            } break
-          case 'level':
-          case 'atk_iv':
-          case 'def_iv':
-          case 'sta_iv':
-          case 'iv':
-            if (ivs) {
-              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
             } break
         }
       })
@@ -279,7 +279,7 @@ module.exports = class Pokemon extends Model {
       if (pvp && ((pkmn.pvp_rankings_great_league
         || pkmn.pvp_rankings_ultra_league
         || pkmn.pvp)
-        || (dbType === 'mad' && reactMapHandlesPvp && pkmn.cp))) {
+        || (isMad && reactMapHandlesPvp && pkmn.cp))) {
         noPvp = false
         listOfIds.push(pkmn.id)
         pvpResults.push(pkmn)
@@ -290,7 +290,7 @@ module.exports = class Pokemon extends Model {
     })
 
     // second query for pvp
-    if (queryPvp && (dbType !== 'mad' || reactMapHandlesPvp)) {
+    if (queryPvp && (!isMad || reactMapHandlesPvp)) {
       const pvpQuery = this.query()
       if (isMad) {
         getMadSql(pvpQuery)
@@ -308,7 +308,7 @@ module.exports = class Pokemon extends Model {
       }
       if (reactMapHandlesPvp) {
         pvpQuery.whereNotNull('cp')
-      } else if (dbType === 'chuck') {
+      } else if (pvpV2) {
         pvpQuery.whereNotNull('pvp')
       } else {
         pvpQuery.andWhere(pvpBuilder => {

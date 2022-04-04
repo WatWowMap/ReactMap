@@ -97,14 +97,14 @@ module.exports = {
       }
       return {}
     },
-    pokemon: (_, args, { req }) => {
+    pokemon: (_, args, { req, DbClass }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.pokemon) {
         const isMad = Utility.dbSelection('pokemon').type === 'mad'
         if (args.filters.onlyLegacy) {
-          return Pokemon.getLegacy(args, perms, isMad)
+          return Pokemon.getLegacy(args, perms, isMad, DbClass.pvpV2)
         }
-        return Pokemon.getPokemon(args, perms, isMad)
+        return Pokemon.getPokemon(args, perms, isMad, DbClass.pvpV2)
       }
       return []
     },
@@ -179,9 +179,8 @@ module.exports = {
             if (webhook && results.length) {
               const withFormatted = await Promise.all(results.map(async result => ({
                 ...result,
-                formatted: await Utility.geocoder(
-                  webhook.server.nominatimUrl, { lat: result.lat, lon: result.lon }, true,
-                ),
+                formatted:
+                  await Utility.geocoder(webhook.server.nominatimUrl, { lat: result.lat, lon: result.lon }, true),
               })))
               return withFormatted
             }
@@ -281,6 +280,17 @@ module.exports = {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.webhooks) {
         return Fetch.webhookApi(args.category, Utility.evalWebhookId(req.user), args.status, args.name)
+      }
+      return {}
+    },
+    scanner: (parent, args, { req }) => {
+      const perms = req.user ? req.user.perms : req.session.perms
+      const { category, method, data } = args
+      if (category === 'getQueue') {
+        return Fetch.scannerApi(category, method, data)
+      }
+      if (perms?.scanner?.includes(category)) {
+        return Fetch.scannerApi(category, method, data)
       }
       return {}
     },

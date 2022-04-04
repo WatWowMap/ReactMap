@@ -57,7 +57,10 @@
     "weatherCellLimit": 3,
     "searchResultsLimit": 15,
     "nestHemisphere": "north",
-    "gymValidDataLimit": 30
+    "gymValidDataLimit": 30,
+    "hideOldGyms": false,
+    "stopValidDataLimit": 30,
+    "hideOldPokestops": false
   },
   "multiDomains": [],
   "map": {
@@ -73,7 +76,9 @@
       "scanAreasZoom": 12,
       "scanCellsZoom": 13,
       "submissionZoom": 15,
-      "geoJsonFileName": "areas.json"
+      "activeWeatherZoom": 13,
+      "geoJsonFileName": "areas.json",
+      "attributionPrefix": "<a href='https://github.com/WatWowMap/ReactMap' target='_blank' rel='noreferrer'>ReactMap</a>"
     },
     "localeSelection": [
       "en",
@@ -99,7 +104,8 @@
     "holidayEffects": {
       "christmasSnow": true,
       "newYearsFireworks": true,
-      "valentinesDay": true
+      "valentinesDay": true,
+      "internationalWomensDay": true
     },
     "misc": {
       "enableMapJsFilter": true,
@@ -113,7 +119,9 @@
       "enableTutorial": true,
       "enableUserProfile": true,
       "enableQuestSetSelector": false,
-      "noScanAreaOverlay": false
+      "noScanAreaOverlay": false,
+      "permImageDir": "images/perms",
+      "permArrayImages": false
     },
     "theme": {
       "style": "dark",
@@ -360,6 +368,39 @@
         "useFor": []
       }
     ]
+  },
+  "scanner": {
+    "backendConfig": {
+      "platform": "rdm/mad",
+      "apiEndpoint": "http://ip:port/api/",
+      "apiUsername": "username",
+      "apiPassword": "password",
+      "queueRefreshInterval": 5
+    },
+    "scanNext": {
+      "enabled": false,
+      "showScanCount": false,
+      "showScanQueue": false,
+      "scanNextInstance": "scanNext",
+      "scanNextDevice": "Device01",
+      "scanNextSleeptime": 5,
+      "scanNextAreaRestriction": [],
+      "discordRoles": [],
+      "telegramGroups": []
+    },
+    "scanZone": {
+      "enabled": false,
+      "showScanCount": false,
+      "showScanQueue": false,
+      "scanZoneMaxSize": 10,
+      "advancedScanZoneOptions": false,
+      "scanZoneRadius": { "pokemon": 70, "gym": 750 },
+      "scanZoneSpacing": 1,
+      "scanZoneInstance": "scanZone",
+      "scanZoneAreaRestriction": [],
+      "discordRoles": [],
+      "telegramGroups": []
+    }
   },
   "webhooks": [],
   "authentication": {

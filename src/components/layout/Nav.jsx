@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { Dialog, useMediaQuery, Snackbar } from '@material-ui/core'
+import { Dialog, Snackbar } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
-import { useTheme } from '@material-ui/styles'
 
 import Utility from '@services/Utility'
 import useStyles from '@hooks/useStyles'
@@ -25,11 +24,10 @@ const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 export default function Nav({
   map, setManualParams, Icons, config,
   setWebhookMode, webhookMode, settings, webhooks,
+  setScanNextMode, scanNextMode, setScanZoneMode, scanZoneMode,
+  isMobile, isTablet,
 }) {
   const classes = useStyles()
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
-  const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
 
   const { perms } = useStatic(state => state.auth)
   const webhookAlert = useStatic(state => state.webhookAlert)
@@ -120,6 +118,10 @@ export default function Nav({
           webhooks={webhooks}
           webhookMode={webhookMode}
           setWebhookMode={setWebhookMode}
+          scanNextMode={scanNextMode}
+          setScanNextMode={setScanNextMode}
+          scanZoneMode={scanZoneMode}
+          setScanZoneMode={setScanZoneMode}
           settings={settings}
           donationPage={donationPage}
           setDonorPage={setDonorPage}

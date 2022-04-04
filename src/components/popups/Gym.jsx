@@ -228,17 +228,17 @@ const MenuActions = ({
       { name: 'timer', action: handleTimer },
     )
   }
-  if (perms.webhooks?.includes(selectedWebhook)) {
+  perms.webhooks.forEach(hook => {
     options.push({
       name: (
         <Trans i18nKey="webhook_entry">
-          {{ category: t('gym') }}{{ name: selectedWebhook }}
+          {{ category: t('gym') }}{{ name: hook }}
         </Trans>
       ),
       action: () => addWebhook(gym),
-      key: 'webhook',
+      key: hook,
     })
-  }
+  })
 
   return (
     <Grid item xs={2} style={{ textAlign: 'right' }}>

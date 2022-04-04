@@ -57,8 +57,11 @@ rootRouter.get('/settings', async (req, res) => {
       if (req.session.tutorial === undefined) {
         req.session.tutorial = !config.map.forceTutorial
       }
-      req.session.perms = { areaRestrictions: [], webhooks: [] }
-
+      req.session.perms = {
+        areaRestrictions: Utility.areaPerms(['none']),
+        webhooks: [],
+        scanner: [],
+      }
       config.authentication.alwaysEnabledPerms.forEach(perm => {
         if (config.authentication.perms[perm]) {
           req.session.perms[perm] = true
@@ -113,6 +116,21 @@ rootRouter.get('/settings', async (req, res) => {
         },
         manualAreas: config.manualAreas || {},
         icons: config.icons,
+        scanner: {
+          scannerType: config.scanner.backendConfig.platform,
+          enableScanNext: config.scanner.scanNext.enabled,
+          scanNextShowScanCount: config.scanner.scanNext.showScanCount,
+          scanNextShowScanQueue: config.scanner.scanNext.showScanQueue,
+          scanNextAreaRestriction: config.scanner.scanNext.scanNextAreaRestriction,
+          enableScanZone: config.scanner.scanZone.enabled,
+          scanZoneShowScanCount: config.scanner.scanZone.showScanCount,
+          scanZoneShowScanQueue: config.scanner.scanZone.showScanQueue,
+          advancedScanZoneOptions: config.scanner.scanZone.advancedScanZoneOptions,
+          scanZoneRadius: config.scanner.scanZone.scanZoneRadius,
+          scanZoneSpacing: config.scanner.scanZone.scanZoneSpacing,
+          scanZoneMaxSize: config.scanner.scanZone.scanZoneMaxSize,
+          scanZoneAreaRestriction: config.scanner.scanZone.scanZoneAreaRestriction,
+        },
         gymValidDataLimit: Date.now() / 1000 - (config.api.gymValidDataLimit * 86400),
       },
       available: {},
@@ -123,7 +141,7 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.loggedIn = req.user
 
       // keys that are being sent to the frontend but are not options
-      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons', 'gymValidDataLimit']
+      const ignoreKeys = ['map', 'manualAreas', 'limit', 'icons', 'scanner', 'gymValidDataLimit']
 
       Object.keys(serverSettings.config).forEach(setting => {
         try {
