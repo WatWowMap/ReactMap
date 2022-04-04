@@ -307,18 +307,17 @@ module.exports = class Pokestop extends Model {
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
       const filtered = {}
-      const global = filters.onlyAllPokestops || (pokestop.ar_scan_eligible && filters.onlyArEligible)
 
       this.fieldAssigner(filtered, pokestop, ['id', 'lat', 'lon', 'enabled', 'ar_scan_eligible', 'url', 'name', 'last_modified_timestamp', 'updated'])
 
-      if (global || filters.onlyInvasions) {
+      if (filters.onlyAllPokestops || filters.onlyInvasions) {
         filtered.invasions = pokestop.invasions.filter(invasion => filters[`i${invasion.grunt_type}`])
       }
-      if (global || (filters.onlyLures && filters[`l${pokestop.lure_id}`])) {
+      if (filters.onlyAllPokestops || (filters.onlyLures && filters[`l${pokestop.lure_id}`])) {
         this.fieldAssigner(filtered, pokestop, ['lure_id', 'lure_expire_timestamp'])
       }
 
-      if (global || filters.onlyQuests) {
+      if (filters.onlyAllPokestops || filters.onlyQuests) {
         filtered.quests = []
         pokestop.quests.forEach(quest => {
           if (quest.quest_reward_type && (
@@ -356,7 +355,7 @@ module.exports = class Pokestop extends Model {
               default:
                 newQuest.key = `u${quest.quest_reward_type}`
             }
-            if (quest.quest_timestamp >= midnight && (global || filters[newQuest.key]
+            if (quest.quest_timestamp >= midnight && (filters.onlyAllPokestops || filters[newQuest.key]
               || (filters[`u${quest.quest_reward_type}`] && map.enableQuestRewardTypeFilters))) {
               this.fieldAssigner(newQuest, quest, fields)
               filtered.quests.push(newQuest)
@@ -364,7 +363,10 @@ module.exports = class Pokestop extends Model {
           }
         })
       }
-      if (global || filtered.quests?.length || filtered.lure_id || filtered.invasions) {
+      if ((pokestop.ar_scan_eligible && filters.onlyArEligible)
+        || filtered.quests?.length
+        || filtered.lure_id
+        || filtered.invasions) {
         filteredResults.push(filtered)
       }
     }
