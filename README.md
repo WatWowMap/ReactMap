@@ -20,7 +20,7 @@ Pokemon GO Map frontend built with React.
 - Submissions Cells
 - Last Scanned Cells
 - Spawnpoints
-- Discord Auth & Permission Based Viewing
+- Discord, Telegram, Local, and Custom Auth & Permission Based Viewing
 
 ## Live Demo
 
@@ -29,7 +29,7 @@ Pokemon GO Map frontend built with React.
 
 ## PreReqs
 
-- NodeJS (V14+)
+- NodeJS (V16+)
 - MySQL (Only 8.0+ has been tested)
 - Or MariaDB (10.4 has been tested)
 - Yarn (npm install -g yarn)
