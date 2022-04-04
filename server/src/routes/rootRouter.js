@@ -9,9 +9,8 @@ const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 const masterfile = require('../data/masterfile.json')
-const {
-  Pokemon, Gym, Pokestop, Nest, PokemonFilter, GenericFilter, User,
-} = require('../models/index')
+const { PokemonFilter, GenericFilter, User } = require('../models/index')
+const Db = require('../db/initialization')
 
 const rootRouter = new express.Router()
 
@@ -166,7 +165,7 @@ rootRouter.get('/settings', async (req, res) => {
       try {
         if (serverSettings.user.perms.pokemon) {
           serverSettings.available.pokemon = config.api.queryAvailable.pokemon
-            ? await Pokemon.getAvailablePokemon(Utility.dbSelection('pokemon').type === 'mad')
+            ? Db.getAvailable.pokemon
             : []
         }
       } catch (e) {
@@ -175,7 +174,7 @@ rootRouter.get('/settings', async (req, res) => {
       try {
         if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
           serverSettings.available.gyms = config.api.queryAvailable.raids
-            ? await Gym.getAvailableRaidBosses(Utility.dbSelection('gym').type === 'mad')
+            ? Db.getAvailable.gyms
             : await Fetch.raids()
         }
       } catch (e) {
@@ -187,7 +186,7 @@ rootRouter.get('/settings', async (req, res) => {
           || serverSettings.user.perms.invasions
           || serverSettings.user.perms.lures) {
           serverSettings.available.pokestops = config.api.queryAvailable.quests
-            ? await Pokestop.getAvailableQuests(Utility.dbSelection('pokestop').type === 'mad')
+            ? Db.getAvailable.pokestops
             : await Fetch.quests()
         }
       } catch (e) {
@@ -196,7 +195,7 @@ rootRouter.get('/settings', async (req, res) => {
       try {
         if (serverSettings.user.perms.nests) {
           serverSettings.available.nests = config.api.queryAvailable.nests
-            ? await Nest.getAvailableNestingSpecies()
+            ? Db.getAvailable.nests
             : await Fetch.nests()
         }
       } catch (e) {

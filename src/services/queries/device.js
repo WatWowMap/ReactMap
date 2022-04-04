@@ -3,7 +3,7 @@ import { gql } from '@apollo/client'
 const getAllDevices = gql`
   query Devices {
     devices{
-      uuid
+      id
       instance_name
       last_seen
       last_lat

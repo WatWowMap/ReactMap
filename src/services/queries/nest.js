@@ -2,7 +2,7 @@ import { gql } from '@apollo/client'
 
 const core = gql`
   fragment CoreNest on Nest {
-    nest_id
+    id
     lat
     lon
   }

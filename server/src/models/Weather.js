@@ -1,6 +1,5 @@
 const { Model, ref, raw } = require('objection')
 const getPolyVector = require('../services/functions/getPolyVector')
-const dbSelection = require('../services/functions/dbSelection')
 const { api: { weatherCellLimit } } = require('../services/config')
 
 module.exports = class Weather extends Model {
@@ -8,12 +7,7 @@ module.exports = class Weather extends Model {
     return 'weather'
   }
 
-  static get idColumn() {
-    return dbSelection('weather').type === 'mad'
-      ? 's2_cell_id' : 'id'
-  }
-
-  static async getAllWeather(isMad) {
+  static async getAll(_perms, _args, { isMad }) {
     const query = this.query()
       .select([
         '*',
