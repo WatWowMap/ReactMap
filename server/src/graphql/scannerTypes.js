@@ -2,7 +2,7 @@ const { gql } = require('apollo-server-express')
 
 module.exports = gql`
   type Device {
-    uuid: ID
+    id: ID
     instance_name: String
     last_seen: Int
     last_lat: Float
@@ -46,7 +46,7 @@ module.exports = gql`
   }
 
   type Nest {
-    nest_id: ID
+    id: ID
     lat: Float
     lon: Float
     pokemon_id: Int

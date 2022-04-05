@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable global-require */
-require('./db/initialization')
 
 const path = require('path')
 const express = require('express')
@@ -15,13 +14,12 @@ const Backend = require('i18next-fs-backend')
 const { ValidationError } = require('apollo-server-core')
 const { ApolloServer } = require('apollo-server-express')
 
+const Db = require('./db/initialization')
 const config = require('./services/config')
-const { Pokemon } = require('./models/index')
 const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
-const context = require('./graphql/context')
 
 if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')
@@ -35,7 +33,7 @@ const server = new ApolloServer({
   resolvers,
   introspection: config.devOptions.enabled,
   debug: config.devOptions.queryDebug,
-  context: ({ req }) => ({ ...context, req }),
+  context: ({ req }) => ({ Db, req }),
   formatError: (e) => {
     if (e instanceof ValidationError) {
       console.warn('GraphQL Error:', e.message, '\nThis is very likely not a real issue and is caused by a user leaving an old browser session open, there is nothing you can do until they refresh.')
@@ -150,10 +148,6 @@ app.use((err, req, res, next) => {
       return res.redirect('/')
   }
 })
-
-if (config.api.pvp.reactMapHandlesPvp) {
-  Pokemon.initOhbem().then(() => console.log('Ohbem initialized'))
-}
 
 app.listen(config.port, config.interface, () => {
   console.log(`Server is now listening at http://${config.interface}:${config.port}`)

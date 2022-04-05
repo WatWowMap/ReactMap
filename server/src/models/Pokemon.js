@@ -1,13 +1,11 @@
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
-const Ohbem = require('ohbem')
 const { pokemon: masterfile } = require('../data/masterfile.json')
 const legacyFilter = require('../services/legacyFilter')
 const {
-  api: { pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, levels }, queryLimits },
+  api: { pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp }, queryLimits },
 } = require('../services/config')
-const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 
 const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
@@ -20,7 +18,6 @@ const madKeys = {
   def_iv: 'individual_defense',
   sta_iv: 'individual_stamina',
 }
-let ohbem = null
 
 const getMadSql = q => (
   q.leftJoin('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
@@ -60,26 +57,7 @@ module.exports = class Pokemon extends Model {
     return 'pokemon'
   }
 
-  static get idColumn() {
-    return dbSelection('pokemon').type === 'mad'
-      ? 'encounter_id' : 'id'
-  }
-
-  static async initOhbem() {
-    const leagueObj = Object.fromEntries(leagues.map(league => [league.name, league.cp]))
-    const hasLittle = leagues.find(league => league.name === 'little')
-    if (hasLittle) {
-      leagueObj.little = hasLittle.littleCupRules ? 500 : { little: false, cap: 500 }
-    }
-    ohbem = new Ohbem({
-      leagues: leagueObj,
-      pokemonData: await Ohbem.fetchPokemonData(),
-      levelCaps: levels,
-      cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
-    })
-  }
-
-  static async getPokemon(args, perms, isMad, pvpV2) {
+  static async getAll(perms, args, { isMad, pvpV2 }, _userId, Ohbem) {
     const {
       iv: ivs, pvp, areaRestrictions,
     } = perms
@@ -324,7 +302,7 @@ module.exports = class Pokemon extends Model {
 
     // filter pokes with pvp data
     pvpResults.forEach(pkmn => {
-      const parsed = reactMapHandlesPvp ? this.getOhbemPvp(pkmn) : getParsedPvp(pkmn)
+      const parsed = reactMapHandlesPvp ? this.getOhbemPvp(pkmn, Ohbem) : getParsedPvp(pkmn)
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       pkmn.cleanPvp = {}
       pkmn.bestPvp = 4096
@@ -346,9 +324,9 @@ module.exports = class Pokemon extends Model {
     return finalResults
   }
 
-  static getOhbemPvp(pokemon) {
+  static getOhbemPvp(pokemon, Ohbem) {
     try {
-      return ohbem.queryPvPRank(
+      return Ohbem.queryPvPRank(
         pokemon.pokemon_id,
         pokemon.form,
         pokemon.costume,
@@ -365,7 +343,7 @@ module.exports = class Pokemon extends Model {
     }
   }
 
-  static async getLegacy(args, perms, isMad) {
+  static async getLegacy(perms, args, { isMad }, _userId, Ohbem) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const query = this.query()
       .where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
@@ -378,10 +356,10 @@ module.exports = class Pokemon extends Model {
       getAreaSql(query, perms.areaRestrictions, isMad, 'pokemon')
     }
     const results = await query
-    return legacyFilter(results, args, perms, ohbem)
+    return legacyFilter(results, args, perms, Ohbem)
   }
 
-  static async getAvailablePokemon(isMad) {
+  static async getAvailable({ isMad }) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const results = await this.query()
       .select('pokemon_id', 'form')
@@ -389,5 +367,15 @@ module.exports = class Pokemon extends Model {
       .groupBy('pokemon_id', 'form')
       .orderBy('pokemon_id', 'form')
     return results.map(pkmn => `${pkmn.pokemon_id}-${pkmn.form}`)
+  }
+
+  static getOne(id, { isMad }) {
+    return this.query()
+      .select([
+        isMad ? 'latitude AS lat' : 'lat',
+        isMad ? 'longitude AS lon' : 'lon',
+      ])
+      .where(isMad ? 'encounter_id' : 'id', id)
+      .first()
   }
 }

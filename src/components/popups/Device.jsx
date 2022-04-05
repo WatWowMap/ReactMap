@@ -15,7 +15,7 @@ export default function DevicePopup({ device, isOnline, ts }) {
   return (
     <>
       <Typography variant="h6" align="center">
-        {device.uuid}
+        {device.id}
       </Typography>
       <Typography variant="subtitle2">
         {t('instance')} {device.instance_name}

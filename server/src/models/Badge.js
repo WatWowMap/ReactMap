@@ -31,4 +31,10 @@ module.exports = class Badge extends Model {
       },
     }
   }
+
+  static async getAll(userId) {
+    return this.query()
+      .where('userId', userId)
+      .andWhere('badge', '>', 0)
+  }
 }
