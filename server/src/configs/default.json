@@ -22,6 +22,12 @@
       "raids": true,
       "nests": false
     },
+    "queryUpdateHours": {
+      "pokemon": 0.5,
+      "quests": 1,
+      "raids": 0.5,
+      "nests": 12
+    },
     "queryLimits": {
       "pokemon": 10000,
       "pokemonPvp": 25000,
@@ -347,24 +353,19 @@
     },
     "schemas": [
       {
-        "type": "rdm",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",
         "password": "pass123!",
         "database": "rdmdb",
-        "charset": "utf8mb4",
-        "hasAltQuests": false,
         "useFor": []
       },
       {
-        "type": "manual",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",
         "password": "pass123!",
         "database": "manualdb",
-        "charset": "utf8mb4",
         "useFor": []
       }
     ]

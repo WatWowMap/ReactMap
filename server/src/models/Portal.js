@@ -9,7 +9,7 @@ module.exports = class Portal extends Model {
     return 'ingress_portals'
   }
 
-  static async getAllPortals(args, perms) {
+  static async getAll(perms, args) {
     const { areaRestrictions } = perms
     const query = this.query()
       .whereBetween('lat', [args.minLat, args.maxLat])
@@ -21,7 +21,7 @@ module.exports = class Portal extends Model {
     return query.limit(queryLimits.portals)
   }
 
-  static async search(args, perms, isMad, distance) {
+  static async search(perms, args, { isMad }, distance) {
     const { areaRestrictions } = perms
     const query = this.query()
       .select([
@@ -40,5 +40,9 @@ module.exports = class Portal extends Model {
       getAreaSql(query, areaRestrictions, isMad)
     }
     return query
+  }
+
+  static getOne(id) {
+    return this.query().findById(id).select(['lat', 'lon'])
   }
 }

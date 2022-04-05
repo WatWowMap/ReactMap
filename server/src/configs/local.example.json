@@ -40,10 +40,6 @@
       "minZoom": 10,
       "maxZoom": 18
     },
-    "links": {
-      "feedbackLink": "",
-      "statsLink": ""
-    },
     "misc": {
       "enableQuestSetSelector": true
     }
@@ -75,20 +71,13 @@
     }
   },
   "database": {
-    "settings": {
-      "userTableName": "users",
-      "sessionTableName": "session"
-    },
     "schemas": [
       {
-        "type": "rdm/chuck/cdc/mad/manual",
         "host": "127.0.0.1",
         "port": 3306,
-        "username": "user",
-        "password": "pass123!",
-        "database": "rdmdb",
-        "charset": "utf8mb4",
-        "hasAltQuests": false,
+        "username": "scanner_user",
+        "password": "scanner_paw",
+        "database": "scanner_db",
         "useFor": [
           "device",
           "gym",
@@ -100,13 +89,11 @@
         ]
       },
       {
-        "type": "manual",
         "host": "127.0.0.1",
         "port": 3306,
-        "username": "user",
-        "password": "pass123!",
-        "database": "manual_1",
-        "charset": "utf8mb4",
+        "username": "manual_user",
+        "password": "manual_pw",
+        "database": "manual_db",
         "useFor": [
           "session",
           "user",
@@ -283,24 +270,7 @@
       },
       {
         "name": "PMSF",
-        "path": "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons-outline/",
-        "modifiers": {
-          "reward": {
-            "offsetX": 0.2,
-            "offsetY": 0.5,
-            "sizeMultiplier": 1.15
-          },
-          "invasion": {
-            "offsetX": 0.05,
-            "offsetY": 0.7,
-            "sizeMultiplier": 1.5,
-            "removeQuest": true
-          },
-          "pokestop": {
-            "sizeMultiplier": 2,
-            "manualPopup": -100
-          }
-        }
+        "path": "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons-outline/"
       },
       {
         "name": "Home",
@@ -318,6 +288,9 @@
   },
   "manualAreas": [
     {
+      "name": "Remove all of these if you'd prefer the map to read directly from your Geojson"
+    },
+    {
       "name": "New York",
       "lat": 40.7481666,
       "lon": -74.0174788,
@@ -327,9 +300,6 @@
       "name": "San Francisco",
       "lat": 37.79539194255634,
       "lon": -122.39333173075096
-    },
-    {
-      "name": "Remove all of these if you'd prefer the map to read directly from your Geojson"
     }
   ]
 }
