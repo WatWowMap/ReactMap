@@ -24,10 +24,9 @@ class PvpWrapper extends Ohbem {
   }
 
   resultWithCache(pokemon, currentTs) {
+    const key = `${pokemon.id},${pokemon.updated}`
+    if (this.rmCache.has(key)) return this.rmCache.get(key)
     try {
-      const key = `${pokemon.id},${pokemon.updated}`
-      if (this.rmCache.has(key)) return this.rmCache.get(key)
-
       const result = this.queryPvPRank(
         pokemon.pokemon_id,
         pokemon.form,

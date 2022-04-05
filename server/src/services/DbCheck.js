@@ -233,18 +233,20 @@ module.exports = class DbCheck {
   }
 
   async updateAvailable(model, dest) {
-    const results = await Promise.all(this.models[model].map(async (source) => (
-      source.SubModel.getAvailable(source)
-    )))
-    if (results.length === 1) [this.available[dest]] = results
-    if (results.length > 1) {
-      const returnSet = new Set()
-      for (let i = 0; i < results.length; i += 1) {
-        for (let j = 0; j < results[i].length; j += 1) {
-          returnSet.add(results[i][j])
+    if (this.models[model]) {
+      const results = await Promise.all(this.models[model].map(async (source) => (
+        source.SubModel.getAvailable(source)
+      )))
+      if (results.length === 1) [this.available[dest]] = results
+      if (results.length > 1) {
+        const returnSet = new Set()
+        for (let i = 0; i < results.length; i += 1) {
+          for (let j = 0; j < results[i].length; j += 1) {
+            returnSet.add(results[i][j])
+          }
         }
+        this.available[dest] = [...returnSet]
       }
-      this.available[dest] = [...returnSet]
     }
   }
 }
