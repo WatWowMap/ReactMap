@@ -39,6 +39,7 @@ module.exports = class DbCheck {
         })
       });
     (async () => {
+      await this.determineType()
       await this.pvp()
       await this.pokestopChecks()
       await this.updateAvailable('Gym', 'gyms')
