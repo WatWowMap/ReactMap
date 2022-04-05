@@ -13,7 +13,7 @@ module.exports = {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.gymBadges) {
         const badges = await Badge.getAll(req.user?.id)
-        return Db.getBadges(badges)
+        return Db.getAll('Gym', badges, {}, req.user?.id, 'getBadges')
       }
       return []
     },

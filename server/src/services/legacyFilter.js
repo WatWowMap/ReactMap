@@ -8,6 +8,7 @@ const masterfile = require('../data/masterfile.json')
 const {
   api: { pvp: { minCp: pvpMinCp, reactMapHandlesPvp } },
 } = require('./config')
+const PvpWrapper = require('./PvpWrapper')
 
 const jsifyIvFilter = (filter) => {
   const input = filter.toUpperCase()
@@ -99,7 +100,7 @@ const jsifyIvFilter = (filter) => {
   return requireFromString(`module.exports = (pokemon) => ${result};`)
 }
 
-const getLegacy = (results, args, perms, ohbem) => {
+const getLegacy = (results, args, perms) => {
   const pokemonLookup = {}
   const formLookup = {}
   const pokemonFilterIV = { or: args.filters.onlyIvOr.adv }
@@ -260,16 +261,7 @@ const getLegacy = (results, args, perms, ohbem) => {
         const { great, ultra } = pvpMinCp
         filtered.cleanPvp = {}
         if (result.pvp || (reactMapHandlesPvp && result.cp)) {
-          const pvpResults = reactMapHandlesPvp ? ohbem.queryPvPRank(
-            result.pokemon_id,
-            result.form,
-            result.costume,
-            result.gender,
-            result.atk_iv,
-            result.def_iv,
-            result.sta_iv,
-            result.level,
-          ) : JSON.parse(result.pvp)
+          const pvpResults = reactMapHandlesPvp ? PvpWrapper.resultWithCache(result) : JSON.parse(result.pvp)
           Object.keys(pvpResults).forEach(league => {
             filterLeagueStats(pvpResults[league], filtered.cleanPvp[league] = [])
           })
