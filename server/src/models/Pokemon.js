@@ -66,7 +66,7 @@ module.exports = class Pokemon extends Model {
       onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyLinkGlobal, ts,
     } = args.filters
     let queryPvp = false
-    const safeTs = ts || Math.floor((new Date()).getTime() / 1000)
+    const safeTs = ts || Math.floor(Date.now() / 1000)
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !pvp) {
@@ -304,7 +304,7 @@ module.exports = class Pokemon extends Model {
     // filter pokes with pvp data
     pvpResults.forEach(pkmn => {
       const parsed = reactMapHandlesPvp
-        ? PvpWrapper.resultWithCache(pkmn)
+        ? PvpWrapper.resultWithCache(pkmn, safeTs)
         : getParsedPvp(pkmn)
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       pkmn.cleanPvp = {}
@@ -340,7 +340,7 @@ module.exports = class Pokemon extends Model {
       getAreaSql(query, perms.areaRestrictions, isMad, 'pokemon')
     }
     const results = await query
-    return legacyFilter(results, args, perms)
+    return legacyFilter(results, args, perms, ts)
   }
 
   static async getAvailable({ isMad }) {

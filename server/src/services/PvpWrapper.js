@@ -23,7 +23,7 @@ class PvpWrapper extends Ohbem {
     })()
   }
 
-  resultWithCache(pokemon) {
+  resultWithCache(pokemon, currentTs) {
     try {
       const key = `${pokemon.id},${pokemon.updated}`
       if (this.rmCache.has(key)) return this.rmCache.get(key)
@@ -38,7 +38,7 @@ class PvpWrapper extends Ohbem {
         pokemon.sta_iv,
         pokemon.level,
       )
-      this.rmCache.set(key, result, pokemon.expire_timestamp)
+      this.rmCache.set(key, result, pokemon.expire_timestamp - currentTs)
       return result
     } catch (e) {
       if (pokemon.pokemon_id !== 132) {

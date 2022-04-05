@@ -100,7 +100,7 @@ const jsifyIvFilter = (filter) => {
   return requireFromString(`module.exports = (pokemon) => ${result};`)
 }
 
-const getLegacy = (results, args, perms) => {
+const getLegacy = (results, args, perms, ts) => {
   const pokemonLookup = {}
   const formLookup = {}
   const pokemonFilterIV = { or: args.filters.onlyIvOr.adv }
@@ -261,7 +261,7 @@ const getLegacy = (results, args, perms) => {
         const { great, ultra } = pvpMinCp
         filtered.cleanPvp = {}
         if (result.pvp || (reactMapHandlesPvp && result.cp)) {
-          const pvpResults = reactMapHandlesPvp ? PvpWrapper.resultWithCache(result) : JSON.parse(result.pvp)
+          const pvpResults = reactMapHandlesPvp ? PvpWrapper.resultWithCache(result, ts) : JSON.parse(result.pvp)
           Object.keys(pvpResults).forEach(league => {
             filterLeagueStats(pvpResults[league], filtered.cleanPvp[league] = [])
           })
