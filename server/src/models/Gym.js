@@ -335,7 +335,7 @@ module.exports = class Gym extends Model {
     return query
   }
 
-  static async getBadges(userGyms, { isMad }) {
+  static async getBadges(userGyms, _, { isMad }) {
     const query = this.query()
       .select([
         '*',
@@ -348,17 +348,6 @@ module.exports = class Gym extends Model {
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
-
-    // Come back to this later, maybe
-    // if (joinGymBadgeTable) {
-    //   query.leftJoin(`${gymBadgeDb.database}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
-    //     .where('userId', userId)
-    //     .andWhere('badge', '>', 0)
-    //     .orderBy('updatedAt')
-    //   const results = await query
-    //   return isMad ? results.map(gym => gym.deleted = !gym.enabled) : results
-    // }
-
     const results = await query
       .whereIn(isMad ? 'gym.gym_id' : 'gym.id', userGyms.map(gym => gym.gymId))
 

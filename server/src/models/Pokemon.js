@@ -7,6 +7,7 @@ const {
   api: { pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp }, queryLimits },
 } = require('../services/config')
 const getAreaSql = require('../services/functions/getAreaSql')
+const PvpWrapper = require('../services/PvpWrapper')
 
 const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
 const ivCalc = 'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
@@ -57,7 +58,7 @@ module.exports = class Pokemon extends Model {
     return 'pokemon'
   }
 
-  static async getAll(perms, args, { isMad, pvpV2 }, _userId, Ohbem) {
+  static async getAll(perms, args, { isMad, pvpV2 }) {
     const {
       iv: ivs, pvp, areaRestrictions,
     } = perms
@@ -65,7 +66,7 @@ module.exports = class Pokemon extends Model {
       onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyLinkGlobal, ts,
     } = args.filters
     let queryPvp = false
-    const safeTs = ts || Math.floor((new Date()).getTime() / 1000)
+    const safeTs = ts || Math.floor(Date.now() / 1000)
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !pvp) {
@@ -302,7 +303,9 @@ module.exports = class Pokemon extends Model {
 
     // filter pokes with pvp data
     pvpResults.forEach(pkmn => {
-      const parsed = reactMapHandlesPvp ? this.getOhbemPvp(pkmn, Ohbem) : getParsedPvp(pkmn)
+      const parsed = reactMapHandlesPvp
+        ? PvpWrapper.resultWithCache(pkmn, safeTs)
+        : getParsedPvp(pkmn)
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       pkmn.cleanPvp = {}
       pkmn.bestPvp = 4096
@@ -324,26 +327,7 @@ module.exports = class Pokemon extends Model {
     return finalResults
   }
 
-  static getOhbemPvp(pokemon, Ohbem) {
-    try {
-      return Ohbem.queryPvPRank(
-        pokemon.pokemon_id,
-        pokemon.form,
-        pokemon.costume,
-        pokemon.gender,
-        pokemon.atk_iv,
-        pokemon.def_iv,
-        pokemon.sta_iv,
-        pokemon.level,
-      )
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('Unable to process PVP Stats for Pokemon with ID#: ', pokemon.id, '\n', e.message)
-      return {}
-    }
-  }
-
-  static async getLegacy(perms, args, { isMad }, _userId, Ohbem) {
+  static async getLegacy(perms, args, { isMad }) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const query = this.query()
       .where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
@@ -356,7 +340,7 @@ module.exports = class Pokemon extends Model {
       getAreaSql(query, perms.areaRestrictions, isMad, 'pokemon')
     }
     const results = await query
-    return legacyFilter(results, args, perms, Ohbem)
+    return legacyFilter(results, args, perms, ts)
   }
 
   static async getAvailable({ isMad }) {
