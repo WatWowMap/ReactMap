@@ -2,13 +2,11 @@
 /* eslint-disable no-console */
 const knex = require('knex')
 const { raw } = require('objection')
-const Ohbem = require('ohbem')
 
 module.exports = class DbCheck {
   constructor(validModels, dbSettings, queryDebug, apiSettings) {
     this.validModels = validModels.flatMap(s => s.useFor)
     this.singleModels = ['User', 'Badge', 'Session']
-    this.ohbem = null
     this.searchLimit = apiSettings.searchLimit
     this.models = {}
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
@@ -42,28 +40,25 @@ module.exports = class DbCheck {
       });
     (async () => {
       await this.determineType()
-      if (apiSettings.pvp.reactMapHandlesPvp) {
-        await this.initOhbem(apiSettings.pvp.leagues, apiSettings.pvp.levels)
-      }
       await this.pvp()
       await this.pokestopChecks()
-      await this.availableGyms()
-      await this.availableNests()
-      await this.availablePokemon()
-      await this.availablePokestops()
+      await this.updateAvailable('Gym', 'gyms')
+      await this.updateAvailable('Pokestop', 'pokestops')
+      await this.updateAvailable('Nest', 'nests')
+      await this.updateAvailable('Pokemon', 'pokemon')
     })()
 
     setInterval(async () => {
-      await this.availableGyms()
+      await this.updateAvailable('Gym', 'gyms')
     }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.raids)
     setInterval(async () => {
-      await this.availableNests()
+      await this.updateAvailable('Nest', 'nests')
     }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.nests)
     setInterval(async () => {
-      await this.availablePokemon()
+      await this.updateAvailable('Pokemon', 'pokemon')
     }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.pokemon)
     setInterval(async () => {
-      await this.availablePokestops()
+      await this.updateAvailable('Pokestop', 'pokestops')
     }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.quests)
   }
 
@@ -131,20 +126,6 @@ module.exports = class DbCheck {
     }
   }
 
-  async initOhbem(leagues, levels) {
-    const leagueObj = Object.fromEntries(leagues.map(league => [league.name, league.cp]))
-    const hasLittle = leagues.find(league => league.name === 'little')
-    if (hasLittle) {
-      leagueObj.little = hasLittle.littleCupRules ? 500 : { little: false, cap: 500 }
-    }
-    this.ohbem = new Ohbem({
-      leagues: leagueObj,
-      pokemonData: await Ohbem.fetchPokemonData(),
-      levelCaps: levels,
-      cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
-    })
-  }
-
   static deDupeResults(results) {
     if (results.length === 1) return results[0]
     if (results.length > 1) {
@@ -155,20 +136,6 @@ module.exports = class DbCheck {
         }
       }
       return Object.values(returnObj)
-    }
-    return []
-  }
-
-  static deDupeAvailable(results) {
-    if (results.length === 1) return results[0]
-    if (results.length > 1) {
-      const returnSet = new Set()
-      for (let i = 0; i < results.length; i += 1) {
-        for (let j = 0; j < results[i].length; j += 1) {
-          returnSet.add(results[i][j])
-        }
-      }
-      return [...returnSet]
     }
     return []
   }
@@ -228,7 +195,7 @@ module.exports = class DbCheck {
 
   async getAll(model, perms, args, userId, method = 'getAll') {
     const data = await Promise.all(this.models[model].map(async (source) => (
-      source.SubModel[method](perms, args, source, userId, this.ohbem)
+      source.SubModel[method](perms, args, source, userId)
     )))
     return DbCheck.deDupeResults(data)
   }
@@ -266,38 +233,21 @@ module.exports = class DbCheck {
     return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]
   }
 
-  async availablePokestops() {
-    const pokestops = await Promise.all(this.models.Pokestop.map(async (source) => (
-      source.SubModel.getAvailable(source)
-    )))
-    this.available.pokestops = DbCheck.deDupeAvailable(pokestops)
-  }
-
-  async availableGyms() {
-    const gyms = await Promise.all(this.models.Gym.map(async (source) => (
-      source.SubModel.getAvailable(source)
-    )))
-    this.available.gyms = DbCheck.deDupeAvailable(gyms)
-  }
-
-  async availableNests() {
-    const nests = await Promise.all(this.models.Nest.map(async (source) => (
-      source.SubModel.getAvailable(source)
-    )))
-    this.available.nests = DbCheck.deDupeAvailable(nests)
-  }
-
-  async availablePokemon() {
-    const pokemon = await Promise.all(this.models.Pokemon.map(async (source) => (
-      source.SubModel.getAvailable(source)
-    )))
-    this.available.pokemon = DbCheck.deDupeAvailable(pokemon)
-  }
-
-  async getBadges(gymBadges) {
-    const data = await Promise.all(this.models.Gym.map(async (source) => (
-      source.SubModel.getBadges(gymBadges, source)
-    )))
-    return DbCheck.deDupeResults(data)
+  async updateAvailable(model, dest) {
+    if (this.models[model]) {
+      const results = await Promise.all(this.models[model].map(async (source) => (
+        source.SubModel.getAvailable(source)
+      )))
+      if (results.length === 1) [this.available[dest]] = results
+      if (results.length > 1) {
+        const returnSet = new Set()
+        for (let i = 0; i < results.length; i += 1) {
+          for (let j = 0; j < results[i].length; j += 1) {
+            returnSet.add(results[i][j])
+          }
+        }
+        this.available[dest] = [...returnSet]
+      }
+    }
   }
 }
