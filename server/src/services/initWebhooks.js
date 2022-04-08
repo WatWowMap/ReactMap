@@ -33,6 +33,7 @@ module.exports = async function initWebhooks(config) {
           valid: Boolean(hookConfig),
           pvp: 'rdm',
           everything: hookConfig.everythingFlagPermissions === 'allow-any',
+          gymBattles: hookConfig.gymBattles,
         }
         if (hookConfig?.pvpLittleLeagueAllowed) {
           baseSettings.leagues.push({ name: 'little', cp: 500, min: hookConfig.pvpFilterLittleMinCP })
