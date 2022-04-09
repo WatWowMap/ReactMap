@@ -1,9 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
-const {
-  Event: { masterfile: { pokemon: masterfile } },
-} = require('../services/initialization')
+const { Event } = require('../services/initialization')
 const legacyFilter = require('../services/legacyFilter')
 const {
   api: { pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, leagueObj }, queryLimits },
@@ -177,7 +175,7 @@ module.exports = class Pokemon extends Model {
 
     const handleDitto = (pkmn) => {
       pkmn.ditto_form = pkmn.form
-      pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
+      pkmn.form = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
       const statsToCheck = ['atk', 'def', 'sta']
       statsToCheck.forEach(stat => {
         if (!pkmn[`${stat}_iv`] && pkmn[`${stat}_inactive`]) {

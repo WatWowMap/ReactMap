@@ -1,11 +1,7 @@
 /* eslint-disable camelcase */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const {
-  Event: { masterfile: {
-    pokemon: masterPkmn, items: masterItems, questRewardTypes,
-  } },
-} = require('../services/initialization')
+const { Event } = require('../services/initialization')
 
 const fetchQuests = require('../services/api/fetchQuests')
 const getAreaSql = require('../services/functions/getAreaSql')
@@ -681,21 +677,21 @@ module.exports = class Pokestop extends Model {
     const { search, locale, midnight: clientMidnight } = args
     const midnight = settings.hideOldQuests ? clientMidnight : 0
 
-    const pokemonIds = Object.keys(masterPkmn).filter(pkmn => (
+    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale })
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
         .includes(search)
     ))
-    const itemIds = Object.keys(masterItems).filter(item => (
+    const itemIds = Object.keys(Event.masterfile.items).filter(item => (
       i18next.t(`item_${item}`, { lng: locale })
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
         .includes(search)
     ))
-    const rewardTypes = Object.keys(questRewardTypes).filter(rType => (
+    const rewardTypes = Object.keys(Event.masterfile.questRewardTypes).filter(rType => (
       i18next.t(`quest_reward_${rType}`, { lng: locale })
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')

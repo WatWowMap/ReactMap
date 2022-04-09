@@ -1,6 +1,4 @@
-const {
-  Event: { masterfile },
-} = require('../initialization')
+const { Event } = require('../initialization')
 const { map } = require('../config')
 
 const categories = {
@@ -16,14 +14,14 @@ if (map.enableQuestRewardTypeFilters) {
 
 const pokemonFilters = {
   generations: [...new Set(
-    Object.values(masterfile.pokemon)
+    Object.values(Event.masterfile.pokemon)
       .map(val => `generation_${val.genId}`),
   )].filter(val => val !== undefined),
-  types: Object.keys(masterfile.types)
+  types: Object.keys(Event.masterfile.types)
     .map(key => `poke_type_${key}`)
     .filter(val => val !== 'poke_type_0'),
   rarity: [...new Set(
-    Object.values(masterfile.pokemon)
+    Object.values(Event.masterfile.pokemon)
       .map(val => val.rarity),
   )].filter(val => val !== undefined),
   forms: ['normalForms', 'altForms', 'Alola', 'Galarian'],

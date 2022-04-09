@@ -1,8 +1,6 @@
 /* eslint-disable no-console */
 const fetchJson = require('./fetchJson')
-const {
-  Event: { masterfile: { pokemon: masterfile } },
-} = require('../initialization')
+const { Event } = require('../initialization')
 
 module.exports = async function fetchQuests() {
   try {
@@ -16,7 +14,7 @@ module.exports = async function fetchQuests() {
             case 'stardust': questsInfo.push(`d${reward.amount}`); break
             case 'item': questsInfo.push(`q${reward.id}`); break
             case 'energy': questsInfo.push(`m${reward.reward.id}-${reward.amount}`); break
-            default: questsInfo.push(`${reward.reward.id}-${reward.reward.form || masterfile[reward.reward.id].defaultFormId}`); break
+            default: questsInfo.push(`${reward.reward.id}-${reward.reward.form || Event.masterfile.pokemon[reward.reward.id].defaultFormId}`); break
           }
         })
       })
