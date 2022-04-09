@@ -1,4 +1,4 @@
-const Db = require('../db/initialization')
+const { Db } = require('../services/initialization')
 const Badge = require('./Badge')
 const Device = require('./Device')
 const Gym = require('./Gym')

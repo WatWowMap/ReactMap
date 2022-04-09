@@ -1,5 +1,8 @@
+/* eslint-disable no-console */
 const fetchJson = require('./fetchJson')
-const { pokemon: masterfile } = require('../../data/masterfile.json')
+const {
+  Event: { masterfile: { pokemon: masterfile } },
+} = require('../initialization')
 
 module.exports = async function fetchRaids() {
   try {

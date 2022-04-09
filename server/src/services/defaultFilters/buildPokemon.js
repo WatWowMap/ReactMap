@@ -1,5 +1,7 @@
 /* eslint-disable no-restricted-syntax */
-const masterfile = require('../../data/masterfile.json')
+const {
+  Event: { masterfile },
+} = require('../initialization')
 const { GenericFilter } = require('../../models/index')
 
 module.exports = function buildPokemon(defaults, base, custom) {

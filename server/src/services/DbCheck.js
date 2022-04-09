@@ -9,7 +9,6 @@ module.exports = class DbCheck {
     this.singleModels = ['User', 'Badge', 'Session']
     this.searchLimit = apiSettings.searchLimit
     this.models = {}
-    this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
     this.connections = dbSettings.schemas
       .filter(s => s.useFor.length)
       .map((schema, i) => {
@@ -42,24 +41,7 @@ module.exports = class DbCheck {
       await this.determineType()
       await this.pvp()
       await this.pokestopChecks()
-      await this.updateAvailable('Gym', 'gyms')
-      await this.updateAvailable('Pokestop', 'pokestops')
-      await this.updateAvailable('Nest', 'nests')
-      await this.updateAvailable('Pokemon', 'pokemon')
     })()
-
-    setInterval(async () => {
-      await this.updateAvailable('Gym', 'gyms')
-    }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.raids)
-    setInterval(async () => {
-      await this.updateAvailable('Nest', 'nests')
-    }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.nests)
-    setInterval(async () => {
-      await this.updateAvailable('Pokemon', 'pokemon')
-    }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.pokemon)
-    setInterval(async () => {
-      await this.updateAvailable('Pokestop', 'pokestops')
-    }, 1000 * 60 * 60 * apiSettings.queryUpdateHours.quests)
   }
 
   get getAvailable() {
@@ -233,12 +215,12 @@ module.exports = class DbCheck {
     return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]
   }
 
-  async updateAvailable(model, dest) {
+  async updateAvailable(model) {
     if (this.models[model]) {
       const results = await Promise.all(this.models[model].map(async (source) => (
         source.SubModel.getAvailable(source)
       )))
-      if (results.length === 1) [this.available[dest]] = results
+      if (results.length === 1) return results[0]
       if (results.length > 1) {
         const returnSet = new Set()
         for (let i = 0; i < results.length; i += 1) {
@@ -246,7 +228,7 @@ module.exports = class DbCheck {
             returnSet.add(results[i][j])
           }
         }
-        this.available[dest] = [...returnSet]
+        return [...returnSet]
       }
     }
   }

@@ -1,17 +1,11 @@
+/* eslint-disable no-console */
 const Ohbem = require('ohbem')
 const NodeCache = require('node-cache')
 
-const { api: { pvp } } = require('./config')
-
-class PvpWrapper extends Ohbem {
+module.exports = class PvpWrapper extends Ohbem {
   constructor(config) {
-    const leagueObj = Object.fromEntries(config.leagues.map(league => [league.name, league.cp]))
-    const hasLittle = config.leagues.find(league => league.name === 'little')
-    if (hasLittle) {
-      leagueObj.little = hasLittle.littleCupRules ? 500 : { little: false, cap: 500 }
-    }
     super({
-      leagues: leagueObj,
+      leagues: config.leagueObj,
       pokemonData: {},
       levelCaps: config.levels,
       cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
@@ -24,6 +18,8 @@ class PvpWrapper extends Ohbem {
   }
 
   resultWithCache(pokemon, currentTs) {
+    if (pokemon.pokemon_id === 132) return {}
+
     const key = `${pokemon.id},${pokemon.updated}`
     if (this.rmCache.has(key)) return this.rmCache.get(key)
     try {
@@ -40,14 +36,8 @@ class PvpWrapper extends Ohbem {
       this.rmCache.set(key, result, pokemon.expire_timestamp - currentTs)
       return result
     } catch (e) {
-      if (pokemon.pokemon_id !== 132) {
-        // Skip ditto
-        // eslint-disable-next-line no-console
-        console.error('[PKMN] Unable to process PVP Stats for Pokemon with ID#: ', pokemon.id, `#${pokemon.pokemon_id} - ${pokemon.form}`, '\n', e.message)
-      }
+      console.error('[PKMN] Unable to process PVP Stats for Pokemon with ID#: ', pokemon.id, `#${pokemon.pokemon_id} - ${pokemon.form}`, '\n', e.message)
       return {}
     }
   }
 }
-
-module.exports = pvp.reactMapHandlesPvp ? new PvpWrapper(pvp) : null

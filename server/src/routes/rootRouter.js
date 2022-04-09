@@ -8,9 +8,8 @@ const apiRouter = require('./api/apiIndex')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
-const masterfile = require('../data/masterfile.json')
-const { PokemonFilter, GenericFilter, User } = require('../models/index')
-const Db = require('../db/initialization')
+const { User } = require('../models/index')
+const { Event } = require('../services/initialization')
 
 const rootRouter = new express.Router()
 
@@ -79,11 +78,11 @@ rootRouter.get('/settings', async (req, res) => {
             delete user.password
             return { ...req.user, ...user, valid: true, username: user.username || req.user.username }
           }
-          console.log('[Session Init] Legacy user detected, forcing logout, User ID:', req?.user?.id)
+          console.log('[SESSION] Legacy user detected, forcing logout, User ID:', req?.user?.id)
           req.logout()
           return { valid: false, tutorial: !config.map.forceTutorial }
         } catch (e) {
-          console.log('[Session Init] Issue finding user, forcing logout, User ID:', req?.user?.id)
+          console.log('[SESSION] Issue finding user, forcing logout, User ID:', req?.user?.id)
           req.logout()
           return { valid: false, tutorial: !config.map.forceTutorial }
         }
@@ -114,7 +113,7 @@ rootRouter.get('/settings', async (req, res) => {
           leaflet: {},
         },
         manualAreas: config.manualAreas || {},
-        icons: config.icons,
+        icons: { ...config.icons, styles: Event.uicons },
         scanner: {
           scannerType: config.scanner.backendConfig.platform,
           enableScanNext: config.scanner.scanNext.enabled,
@@ -162,73 +161,24 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
 
-      try {
-        if (serverSettings.user.perms.pokemon) {
-          serverSettings.available.pokemon = config.api.queryAvailable.pokemon
-            ? Db.getAvailable.pokemon
-            : []
-        }
-      } catch (e) {
-        console.error('Unable to query Pokemon', e.message)
+      if (serverSettings.user.perms.pokemon) {
+        serverSettings.available.pokemon = Event.available.pokemon
       }
-      try {
-        if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
-          serverSettings.available.gyms = config.api.queryAvailable.raids
-            ? Db.getAvailable.gyms
-            : await Fetch.raids()
-        }
-      } catch (e) {
-        console.error('Unable to query Raids', e.message)
+      if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
+        serverSettings.available.gyms = Event.available.gyms
       }
-      try {
-        if (serverSettings.user.perms.quests
-          || serverSettings.user.perms.pokestops
-          || serverSettings.user.perms.invasions
-          || serverSettings.user.perms.lures) {
-          serverSettings.available.pokestops = config.api.queryAvailable.quests
-            ? Db.getAvailable.pokestops
-            : await Fetch.quests()
-        }
-      } catch (e) {
-        console.error('Unable to query Pokestops', e.message)
+      if (serverSettings.user.perms.quests
+        || serverSettings.user.perms.pokestops
+        || serverSettings.user.perms.invasions
+        || serverSettings.user.perms.lures) {
+        serverSettings.available.pokestops = Event.available.pokestops
       }
-      try {
-        if (serverSettings.user.perms.nests) {
-          serverSettings.available.nests = config.api.queryAvailable.nests
-            ? Db.getAvailable.nests
-            : await Fetch.nests()
-        }
-      } catch (e) {
-        console.error('Unable to query Nests', e.message)
+      if (serverSettings.user.perms.nests) {
+        serverSettings.available.nests = Event.available.nests
       }
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile
       // Primary for quest rewards that are form unset, despite normally have a set form
-      try {
-        Object.keys(serverSettings.available).forEach(category => {
-          serverSettings.available[category].forEach(item => {
-            if (!serverSettings.defaultFilters[category].filter[item] && !item.startsWith('132')) {
-              serverSettings.defaultFilters[category].filter[item] = category === 'pokemon'
-                ? new PokemonFilter(config.defaultFilters.pokemon.allPokemon)
-                : new GenericFilter()
-              if (!Number.isNaN(parseInt(item.charAt(0)))) {
-                const masterfileRef = masterfile.pokemon[item.split('-')[0]]
-                if (masterfileRef) {
-                  if (!masterfileRef.forms) {
-                    masterfileRef.forms = {}
-                  }
-                  masterfileRef.forms[item.split('-')[1]] = { name: '*', category }
-                  console.log(`Added ${masterfileRef.name} Key: ${item} to masterfile. (${category})`)
-                } else {
-                  console.warn('Missing and unable to add', category, item)
-                }
-              }
-            }
-          })
-        })
-      } catch (e) {
-        console.warn(e, '\nUnable to add missing items to the filters')
-      }
 
       serverSettings.ui = Utility.buildPrimaryUi(serverSettings.defaultFilters, serverSettings.user.perms)
 
@@ -239,14 +189,14 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.userSettings = clientValues
       serverSettings.clientMenus = clientMenus
 
-      serverSettings.masterfile = masterfile
+      serverSettings.masterfile = { ...Event.masterfile, invasions: Event.invasions }
 
       if (config.webhooks.length && serverSettings.user?.perms?.webhooks?.length) {
         serverSettings.webhooks = {}
         const filtered = config.webhooks.filter(webhook => serverSettings.user.perms.webhooks.includes(webhook.name))
         try {
           await Promise.all(filtered.map(async webhook => {
-            if (webhook.enabled && config.webhookObj?.[webhook.name]?.client?.valid) {
+            if (webhook.enabled && Event.webhookObj?.[webhook.name]?.client?.valid) {
               const webhookId = Utility.evalWebhookId(serverSettings.user)
               const { strategy, webhookStrategy } = serverSettings.user
 
@@ -255,17 +205,17 @@ rootRouter.get('/settings', async (req, res) => {
 
               if (remoteData && areas) {
                 serverSettings.webhooks[webhook.name] = remoteData.human.admin_disable
-                  ? config.webhookObj[webhook.name].client
+                  ? Event.webhookObj[webhook.name].client
                   : {
-                    ...config.webhookObj[webhook.name].client,
+                    ...Event.webhookObj[webhook.name].client,
                     ...remoteData,
-                    hasNominatim: Boolean(config.webhookObj[webhook.name].server.nominatimUrl),
-                    locale: remoteData.human.language || config.webhookObj[webhook.name].client.locale,
+                    hasNominatim: Boolean(Event.webhookObj[webhook.name].server.nominatimUrl),
+                    locale: remoteData.human.language || Event.webhookObj[webhook.name].client.locale,
                     available: areas
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .filter(area => area.userSelectable !== false)
                       .map(area => area.name),
-                    templates: config.webhookObj[webhook.name].client.templates[webhookStrategy || strategy],
+                    templates: Event.webhookObj[webhook.name].client.templates[webhookStrategy || strategy],
                   }
               }
             }

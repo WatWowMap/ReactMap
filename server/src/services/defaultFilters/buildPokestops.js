@@ -1,5 +1,7 @@
 const { GenericFilter } = require('../../models/index')
-const { items, questRewardTypes, invasions } = require('../../data/masterfile.json')
+const {
+  Event: { masterfile: { items, questRewardTypes }, invasions },
+} = require('../initialization')
 
 module.exports = function buildPokestops(perms, defaults) {
   const quests = { s0: new GenericFilter() }

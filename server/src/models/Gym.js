@@ -2,7 +2,9 @@
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const fetchRaids = require('../services/api/fetchRaids')
-const { pokemon: masterfile } = require('../data/masterfile.json')
+const {
+  Event: { masterfile: { pokemon: masterfile } },
+} = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },

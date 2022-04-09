@@ -14,7 +14,7 @@ const Backend = require('i18next-fs-backend')
 const { ValidationError } = require('apollo-server-core')
 const { ApolloServer } = require('apollo-server-express')
 
-const Db = require('./db/initialization')
+const { Db } = require('./services/initialization')
 const config = require('./services/config')
 const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
@@ -101,9 +101,9 @@ app.use(session({
 config.authentication.strategies.forEach(strategy => {
   if (strategy.enabled) {
     require(`./strategies/${strategy.name}.js`)
-    console.log(`Strategy ${strategy.name} initialized`)
+    console.log(`[AUTH] Strategy ${strategy.name} initialized`)
   } else {
-    console.log(`Strategy ${strategy.name} was not initialized`)
+    console.log(`[AUTH] Strategy ${strategy.name} was not initialized`)
   }
 })
 
@@ -150,7 +150,7 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(config.port, config.interface, () => {
-  console.log(`Server is now listening at http://${config.interface}:${config.port}`)
+  console.log(`[INIT] Server is now listening at http://${config.interface}:${config.port}`)
 })
 
 module.exports = app

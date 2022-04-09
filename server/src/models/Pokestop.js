@@ -1,7 +1,12 @@
 /* eslint-disable camelcase */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const { pokemon: masterPkmn, items: masterItems, questRewardTypes } = require('../data/masterfile.json')
+const {
+  Event: { masterfile: {
+    pokemon: masterPkmn, items: masterItems, questRewardTypes,
+  } },
+} = require('../services/initialization')
+
 const fetchQuests = require('../services/api/fetchQuests')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {

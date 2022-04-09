@@ -12,7 +12,7 @@ const locales = async () => {
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
   const englishRef = fs.readFileSync(path.resolve(appLocalesFolder, 'en.json'), { encoding: 'utf8', flag: 'r' })
 
-  fs.mkdir(finalLocalesFolder, (error) => error ? console.log('Locales folder already exists, skipping') : console.log('locales folder created'))
+  fs.mkdir(finalLocalesFolder, (error) => error ? console.log('[LOCALES] Locales folder already exists, skipping') : console.log('[LOCALES] locales folder created'))
 
   const availableRemote = await fetchJson('https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/index.json')
 
@@ -21,14 +21,14 @@ const locales = async () => {
     const baseName = locale.replace('.json', '')
     const trimmedRemoteFiles = {}
 
-    fs.mkdir(`${finalLocalesFolder}/${baseName}`, (error) => error ? console.log(`${locale} already exists, skipping`) : console.log(`${locale} folder created`))
+    fs.mkdir(`${finalLocalesFolder}/${baseName}`, (error) => error ? {} : console.log(`[LOCALES] ${locale} folder created`))
 
     try {
       const hasRemote = availableRemote.includes(locale)
       const remoteFiles = await fetchJson(`https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/static/locales/${hasRemote ? baseName : 'en'}.json`)
 
       if (!hasRemote) {
-        console.warn('No remote translation found for', locale, 'using english')
+        console.warn('[LOCALES] No remote translation found for', locale, 'using English')
       }
 
       Object.keys(remoteFiles).forEach(key => {
@@ -57,7 +57,7 @@ const locales = async () => {
       'utf8',
       () => { },
     )
-    console.log(`${locale}`, 'file saved.')
+    console.log(`[LOCALES] ${locale}`, 'file saved.')
   }))
 }
 
@@ -65,7 +65,7 @@ const missing = async () => {
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
   const englishRef = JSON.parse(fs.readFileSync(path.resolve(appLocalesFolder, 'en.json'), { encoding: 'utf8', flag: 'r' }))
 
-  fs.mkdir(missingFolder, (error) => error ? console.log('Locales folder already exists, skipping') : console.log('locales folder created'))
+  fs.mkdir(missingFolder, (error) => error ? {} : console.log('[LOCALES] Locales folder created'))
 
   localTranslations.forEach(locale => {
     const reactMapTranslations = JSON.parse(fs.readFileSync(path.resolve(appLocalesFolder, locale), { encoding: 'utf8', flag: 'r' }))
@@ -82,7 +82,7 @@ const missing = async () => {
       'utf8',
       () => { },
     )
-    console.log(`${locale}`, 'file saved.')
+    console.log(`[LOCALES] ${locale}`, 'file saved.')
   })
 }
 
@@ -90,9 +90,9 @@ module.exports.locales = locales
 module.exports.missing = missing
 
 if (require.main === module) {
-  locales().then(() => console.log('Translations generated'))
+  locales().then(() => console.log('[LOCALES] Translations generated'))
 
   if (process.argv[2] === '--missing') {
-    missing().then(() => console.log('Missing translations generated'))
+    missing().then(() => console.log('[LOCALES] Missing translations generated'))
   }
 }

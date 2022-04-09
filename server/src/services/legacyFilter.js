@@ -4,11 +4,10 @@
 /* eslint-disable no-cond-assign */
 /* eslint-disable default-case */
 const requireFromString = require('require-from-string')
-const masterfile = require('../data/masterfile.json')
 const {
   api: { pvp: { minCp: pvpMinCp, reactMapHandlesPvp } },
 } = require('./config')
-const PvpWrapper = require('./PvpWrapper')
+const { Pvp, Event: { masterfile } } = require('./initialization')
 
 const jsifyIvFilter = (filter) => {
   const input = filter.toUpperCase()
@@ -261,7 +260,7 @@ const getLegacy = (results, args, perms, ts) => {
         const { great, ultra } = pvpMinCp
         filtered.cleanPvp = {}
         if (result.pvp || (reactMapHandlesPvp && result.cp)) {
-          const pvpResults = reactMapHandlesPvp ? PvpWrapper.resultWithCache(result, ts) : JSON.parse(result.pvp)
+          const pvpResults = reactMapHandlesPvp ? Pvp.resultWithCache(result, ts) : JSON.parse(result.pvp)
           Object.keys(pvpResults).forEach(league => {
             filterLeagueStats(pvpResults[league], filtered.cleanPvp[league] = [])
           })
