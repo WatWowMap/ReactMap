@@ -3,9 +3,8 @@ const fetchJson = require('./api/fetchJson')
 const webhookUi = require('./ui/webhook')
 
 module.exports = async function initWebhooks(webhook, config) {
-  const webhookObj = {}
   try {
-    if (!webhook.name || webhookObj[webhook.name]) {
+    if (!webhook.name) {
       throw new Error('Webhook name property is required and must be unique')
     }
     if (webhook.enabled) {
@@ -64,8 +63,7 @@ module.exports = async function initWebhooks(webhook, config) {
           }
         })
       }
-
-      webhookObj[webhook.name] = {
+      return {
         server: {
           provider: webhook.provider,
           platform: webhook.platform,
@@ -90,5 +88,5 @@ module.exports = async function initWebhooks(webhook, config) {
   } catch (e) {
     console.log(config.devOptions.enabled ? e : e.message, 'An error has occurred during webhook initialization')
   }
-  return webhookObj
+  return {}
 }
