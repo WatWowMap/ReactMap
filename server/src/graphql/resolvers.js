@@ -126,6 +126,7 @@ module.exports = {
       if (perms?.scanAreas && scanAreas.features.length) {
         try {
           scanAreas.features = scanAreas.features
+            .filter(feature => !feature.properties.hidden)
             .sort((a, b) => (a.properties.name > b.properties.name) ? 1 : -1)
         } catch (e) {
           console.warn('Failed to sort scan areas', e.message)
