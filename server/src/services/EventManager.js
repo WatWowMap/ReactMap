@@ -146,7 +146,7 @@ module.exports = class EventManager {
 
   async getWebhooks(config) {
     await Promise.all(config.webhooks.map(async webhook => {
-      this.webhookObj = await initWebhooks(webhook, config)
+      this.webhookObj = { ...this.webhookObj, [webhook.name]: await initWebhooks(webhook, config) }
     }))
   }
 }
