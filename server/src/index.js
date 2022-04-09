@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable global-require */
+process.title = 'ReactMap'
 
 const path = require('path')
 const express = require('express')
