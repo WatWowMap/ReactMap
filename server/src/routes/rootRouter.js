@@ -9,7 +9,7 @@ const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 const { User } = require('../models/index')
-const { Event } = require('../services/initialization')
+const { Event, Db } = require('../services/initialization')
 
 const rootRouter = new express.Router()
 
@@ -162,19 +162,27 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
 
       if (serverSettings.user.perms.pokemon) {
-        serverSettings.available.pokemon = Event.available.pokemon
+        serverSettings.available.pokemon = config.api.queryOnSessionInit.pokemon
+          ? await Db.getAvailable('Pokemon')
+          : Event.available.pokemon
       }
       if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
-        serverSettings.available.gyms = Event.available.gyms
+        serverSettings.available.gyms = config.api.queryOnSessionInit.raids
+          ? await Db.getAvailable('Gym')
+          : Event.available.gyms
       }
       if (serverSettings.user.perms.quests
         || serverSettings.user.perms.pokestops
         || serverSettings.user.perms.invasions
         || serverSettings.user.perms.lures) {
-        serverSettings.available.pokestops = Event.available.pokestops
+        serverSettings.available.pokestops = config.api.queryOnSessionInit.quests
+          ? await Db.getAvailable('Pokestop')
+          : Event.available.pokestops
       }
       if (serverSettings.user.perms.nests) {
-        serverSettings.available.nests = Event.available.nests
+        serverSettings.available.nests = config.api.queryOnSessionInit.nests
+          ? await Db.getAvailable('Nest')
+          : Event.available.nests
       }
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile

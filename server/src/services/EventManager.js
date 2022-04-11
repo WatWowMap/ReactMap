@@ -17,10 +17,10 @@ module.exports = class EventManager {
     (async () => {
       // Set initials
       await this.getUicons(config.icons.styles)
-      this.available.gyms = await Db.updateAvailable('Gym')
-      this.available.nests = await Db.updateAvailable('Nest')
-      this.available.pokemon = await Db.updateAvailable('Pokemon')
-      this.available.pokestops = await Db.updateAvailable('Pokestop')
+      this.available.gyms = await Db.getAvailable('Gym')
+      this.available.nests = await Db.getAvailable('Nest')
+      this.available.pokemon = await Db.getAvailable('Pokemon')
+      this.available.pokestops = await Db.getAvailable('Pokestop')
       await this.getMasterfile()
       await this.getInvasions()
       await this.getWebhooks(config)
@@ -29,16 +29,16 @@ module.exports = class EventManager {
 
   setTimers(config, Db) {
     setInterval(async () => {
-      this.available.gyms = await Db.updateAvailable('Gym')
+      this.available.gyms = await Db.getAvailable('Gym')
     }, 1000 * 60 * 60 * (config.api.queryUpdateHours.raids || 1))
     setInterval(async () => {
-      this.available.nests = await Db.updateAvailable('Nest')
+      this.available.nests = await Db.getAvailable('Nest')
     }, 1000 * 60 * 60 * (config.api.queryUpdateHours.nests || 6))
     setInterval(async () => {
-      this.available.pokemon = await Db.updateAvailable('Pokemon')
+      this.available.pokemon = await Db.getAvailable('Pokemon')
     }, 1000 * 60 * 60 * (config.api.queryUpdateHours.pokemon || 1))
     setInterval(async () => {
-      this.available.pokestops = await Db.updateAvailable('Pokestop')
+      this.available.pokestops = await Db.getAvailable('Pokestop')
     }, 1000 * 60 * 60 * (config.api.queryUpdateHours.quests || 3))
     setInterval(async () => {
       await this.getUicons(config.icons.styles)
@@ -56,30 +56,34 @@ module.exports = class EventManager {
 
   async getUicons(styles) {
     console.log('[EVENT] Fetching Latest UICONS')
-    if (!styles.some(icon => icon.path === this.baseUrl)) {
-      styles.push({
-        name: 'Base',
-        path: this.baseUrl,
-        modifiers: {
-          gym: {
-            0: 1,
-            1: 1,
-            2: 1,
-            3: 3,
-            4: 4,
-            5: 4,
-            6: 18,
-            sizeMultiplier: 1.2,
+    try {
+      if (!styles.some(icon => icon.path === this.baseUrl)) {
+        styles.push({
+          name: 'Base',
+          path: this.baseUrl,
+          modifiers: {
+            gym: {
+              0: 1,
+              1: 1,
+              2: 1,
+              3: 3,
+              4: 4,
+              5: 4,
+              6: 18,
+              sizeMultiplier: 1.2,
+            },
           },
-        },
-      })
+        })
+      }
+      this.uicons = await Promise.all(styles.map(async style => {
+        const response = style.path.startsWith('http')
+          ? await fetchJson(`${style.path}/index.json`)
+          : await fs.readFile(`../../../public/images/uicons/${style.path}/index.json`)
+        return { ...style, data: response }
+      }))
+    } catch (e) {
+      console.log('[ERROR] Failed to generate latest uicons:\n', e.message)
     }
-    this.uicons = await Promise.all(styles.map(async style => {
-      const response = style.path.startsWith('http')
-        ? await fetchJson(`${style.path}/index.json`)
-        : await fs.readFile(`../../../public/images/uicons/${style.path}/index.json`)
-      return { ...style, data: response }
-    }))
   }
 
   async getInvasions() {
@@ -105,15 +109,15 @@ module.exports = class EventManager {
           }),
         ))
     } catch (e) {
-      console.log(e)
+      console.log('Unable to generate latest invasions:\n', e.message)
     }
   }
 
   async getMasterfile() {
     console.log('[EVENT] Fetching Latest Masterfile')
-    this.masterfile = await generate()
-      .then((masterfile) => {
-        try {
+    try {
+      this.masterfile = await generate()
+        .then((masterfile) => {
           Object.entries(this.available).forEach(([category, entries]) => {
             entries.forEach(item => {
               if (!Number.isNaN(parseInt(item.charAt(0)))) {
@@ -137,11 +141,11 @@ module.exports = class EventManager {
               }
             })
           })
-        } catch (e) {
-          console.warn(e, '\nUnable to add missing items to the filters')
-        }
-        return masterfile
-      })
+          return masterfile
+        })
+    } catch (e) {
+      console.log('[ERROR] Failed to generate latest masterfile:\n', e.message)
+    }
   }
 
   async getWebhooks(config) {

@@ -44,10 +44,6 @@ module.exports = class DbCheck {
     })()
   }
 
-  get getAvailable() {
-    return this.available
-  }
-
   static async isMadDb(connection) {
     try {
       await connection('trs_quest').limit(1).first()
@@ -215,20 +211,24 @@ module.exports = class DbCheck {
     return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]
   }
 
-  async updateAvailable(model) {
+  async getAvailable(model) {
     if (this.models[model]) {
-      const results = await Promise.all(this.models[model].map(async (source) => (
-        source.SubModel.getAvailable(source)
-      )))
-      if (results.length === 1) return results[0]
-      if (results.length > 1) {
-        const returnSet = new Set()
-        for (let i = 0; i < results.length; i += 1) {
-          for (let j = 0; j < results[i].length; j += 1) {
-            returnSet.add(results[i][j])
+      try {
+        const results = await Promise.all(this.models[model].map(async (source) => (
+          source.SubModel.getAvailable(source)
+        )))
+        if (results.length === 1) return results[0]
+        if (results.length > 1) {
+          const returnSet = new Set()
+          for (let i = 0; i < results.length; i += 1) {
+            for (let j = 0; j < results[i].length; j += 1) {
+              returnSet.add(results[i][j])
+            }
           }
+          return [...returnSet]
         }
-        return [...returnSet]
+      } catch (e) {
+        console.warn('Unable to query available for:', model, '\n', e.message)
       }
     }
   }

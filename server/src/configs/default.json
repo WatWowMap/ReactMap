@@ -20,7 +20,13 @@
       "pokemon": 0.5,
       "quests": 1,
       "raids": 0.5,
-      "nests": 12
+      "nests": 3
+    },
+    "queryOnSessionInit": {
+      "pokemon": false,
+      "quests": false,
+      "raids": false,
+      "nests": false
     },
     "queryLimits": {
       "pokemon": 10000,
