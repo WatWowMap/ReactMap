@@ -2,6 +2,7 @@
 const GraphQLJSON = require('graphql-type-json')
 
 const config = require('../services/config')
+const { Event } = require('../services/initialization')
 const { User, Badge } = require('../models/index')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
@@ -27,7 +28,7 @@ module.exports = {
     geocoder: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : req.session.perms
       if (perms?.webhooks) {
-        const webhook = config.webhookObj[args.name]
+        const webhook = Event.webhookObj[args.name]
         if (webhook) {
           return Utility.geocoder(webhook.server.nominatimUrl, args.search)
         }
@@ -147,7 +148,7 @@ module.exports = {
             return Db.search('Gym', perms, args, 'searchRaids')
           case 'gyms': {
             const results = await Db.search('Gym', perms, args)
-            const webhook = webhookName ? config.webhookObj[webhookName] : null
+            const webhook = webhookName ? Event.webhookObj[webhookName] : null
             if (webhook && results.length) {
               const withFormatted = await Promise.all(results.map(async result => ({
                 ...result,

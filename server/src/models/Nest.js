@@ -1,12 +1,12 @@
 const { Model } = require('objection')
 const i18next = require('i18next')
-const { pokemon: masterfile } = require('../data/masterfile.json')
+const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { pokemon: masterPkmn } = require('../data/masterfile.json')
 const {
   api: { searchResultsLimit, queryLimits },
   defaultFilters: { nests: { avgFilter } },
 } = require('../services/config')
+const fetchNests = require('../services/api/fetchNests')
 
 module.exports = class Nest extends Model {
   static get tableName() {
@@ -42,7 +42,7 @@ module.exports = class Nest extends Model {
       const returnedResults = []
       queryResults.forEach(pkmn => {
         if (pkmn.pokemon_form == 0 || pkmn.pokemon_form === null) {
-          const formId = masterfile[pkmn.pokemon_id].defaultFormId
+          const formId = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
           if (formId) pkmn.pokemon_form = formId
         }
         if (args.filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
@@ -62,7 +62,7 @@ module.exports = class Nest extends Model {
 
     return results.map(pokemon => {
       if (pokemon.pokemon_form == 0 || pokemon.pokemon_form === null) {
-        return `${pokemon.pokemon_id}-${masterfile[pokemon.pokemon_id].defaultFormId || 0}`
+        return `${pokemon.pokemon_id}-${Event.masterfile.pokemon[pokemon.pokemon_id].defaultFormId || 0}`
       }
       return `${pokemon.pokemon_id}-${pokemon.pokemon_form || 0}`
     })
@@ -70,7 +70,7 @@ module.exports = class Nest extends Model {
 
   static async search(perms, args, { isMad }, distance) {
     const { search, locale } = args
-    const pokemonIds = Object.keys(masterPkmn).filter(pkmn => (
+    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
     ))
     const query = this.query()
@@ -89,7 +89,9 @@ module.exports = class Nest extends Model {
     if (perms.areaRestrictions?.length) {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
-    return query
+    const results = await query
+
+    return results.length ? results : fetchNests()
   }
 
   static getOne(id) {

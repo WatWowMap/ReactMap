@@ -38,7 +38,7 @@ strategies.forEach(strategy => {
         }
       })(req, res, next),
     )
-    console.log(`${method.toUpperCase()} /auth/${strategy.name}/callback route initialized`)
+    console.log(`[AUTH] ${method.toUpperCase()} /auth/${strategy.name}/callback route initialized`)
   }
 })
 

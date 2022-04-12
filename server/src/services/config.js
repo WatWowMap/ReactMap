@@ -8,11 +8,9 @@ const config = require('config')
 
 // Check if new config exists
 if (!fs.existsSync(`${__dirname}/../configs/local.json`)) {
-  console.log('Config v2 (local.json) not found, you need to run the migration with "yarn config-migrate"')
+  console.log('[CONFIG] Config v2 (local.json) not found, you need to run the migration with "yarn config-migrate"')
   process.exit(1)
 }
-
-const initWebhooks = require('./initWebhooks')
 
 const mergeMapConfig = (obj) => ({
   localeSelection: obj.localeSelection,
@@ -45,14 +43,7 @@ config.authMethods = [...new Set(config.authentication.strategies
     config.authentication[strategy.name] = strategy
     return strategy.type
   })),
-]
-
-// initialize webhooks
-if (config.webhooks.length) {
-  (async () => {
-    config.webhookObj = await initWebhooks(config)
-  })()
-}
+];
 
 // Check if empty
 ['tileServers', 'navigation'].forEach(opt => {
@@ -70,6 +61,12 @@ config.scanAreas = {
   ...Object.fromEntries(
     config.multiDomains.map(d => [d.general?.geoJsonFileName ? d.domain : 'main', loadScanPolygons(d.general?.geoJsonFileName || config.map.geoJsonFileName)]),
   ),
+}
+
+config.api.pvp.leagueObj = Object.fromEntries(config.api.pvp.leagues.map(league => [league.name, league.cp]))
+const hasLittle = config.api.pvp.leagues.find(league => league.name === 'little')
+if (hasLittle) {
+  config.api.pvp.leagueObj.little = hasLittle.littleCupRules ? 500 : { little: false, cap: 500 }
 }
 
 // Map manual areas
