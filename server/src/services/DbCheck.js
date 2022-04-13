@@ -229,7 +229,9 @@ module.exports = class DbCheck {
         }
       } catch (e) {
         console.warn('Unable to query available for:', model, '\n', e.message)
+        return []
       }
     }
+    return []
   }
 }

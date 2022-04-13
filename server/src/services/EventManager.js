@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const { promises: fs } = require('fs')
+const path = require('path')
 const { generate } = require('../../scripts/generateMasterfile')
 const fetchJson = require('./api/fetchJson')
 const initWebhooks = require('./initWebhooks')
@@ -78,7 +79,7 @@ module.exports = class EventManager {
       this.uicons = await Promise.all(styles.map(async style => {
         const response = style.path.startsWith('http')
           ? await fetchJson(`${style.path}/index.json`)
-          : await fs.readFile(`../../../public/images/uicons/${style.path}/index.json`)
+          : JSON.parse(await fs.readFile(path.resolve(__dirname, `../../../public/images/uicons/${style.path}/index.json`)))
         return { ...style, data: response }
       }))
     } catch (e) {
