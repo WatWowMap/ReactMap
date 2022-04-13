@@ -16,7 +16,7 @@ const Utility = require('../services/Utility')
 const client = new Discord.Client()
 
 client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`)
+  console.log(`[DISCORD] Logged in as ${client.user.tag}!`)
   client.user.setPresence({
     activity: {
       name: strategyConfig.presence,
@@ -83,7 +83,7 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
         return done(null, { ...user, ...userExists, username: userExists.username || user.username })
       })
   } catch (e) {
-    console.error('User has failed Discord auth.', e)
+    console.error('[AUTH] User has failed Discord auth.', e)
   }
 }
 

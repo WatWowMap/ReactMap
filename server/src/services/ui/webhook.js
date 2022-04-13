@@ -196,7 +196,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
               ],
               booleans: [
                 { name: 'clean', xs: 4, sm: 4 },
-                ...( hookConfig.gymBattles ? [{ name: 'battle_changes', xs: 6, sm: 4 }] : []),
+                ...(hookConfig.gymBattles ? [{ name: 'battle_changes', xs: 6, sm: 4 }] : []),
                 { name: 'slot_changes', xs: 6, sm: 4 },
               ],
               autoComplete: [{ name: 'gymName', label: 'gym', searchCategory: 'gyms', xs: 12, sm: 12 }],

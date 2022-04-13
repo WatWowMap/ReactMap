@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
-const { pokemon: masterfile } = require('../data/masterfile.json')
+const { Event } = require('../services/initialization')
 const legacyFilter = require('../services/legacyFilter')
 const {
-  api: { pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp }, queryLimits },
+  api: { pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, leagueObj }, queryLimits },
 } = require('../services/config')
 const getAreaSql = require('../services/functions/getAreaSql')
-const PvpWrapper = require('../services/PvpWrapper')
+const { Pvp } = require('../services/initialization')
 
 const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
 const ivCalc = 'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
@@ -130,13 +130,12 @@ module.exports = class Pokemon extends Model {
     }
 
     // checks if filters are set to default and skips them if so
-    const arrayCheck = (filter, key) => filter[key].every((v, i) => v === onlyStandard[key][i])
+    const arrayCheck = (filter, key) => filter[key]?.every((v, i) => v === onlyStandard[key][i])
 
     // cycles through the above arrayCheck
     const getRelevantKeys = filter => {
       const relevantKeys = []
       keys.forEach(key => {
-        if (!filter[key]) return console.log(`[PKMN]: ${key} is not valid`)
         if (!arrayCheck(filter, key)) {
           relevantKeys.push(key)
         }
@@ -176,7 +175,7 @@ module.exports = class Pokemon extends Model {
 
     const handleDitto = (pkmn) => {
       pkmn.ditto_form = pkmn.form
-      pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
+      pkmn.form = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
       const statsToCheck = ['atk', 'def', 'sta']
       statsToCheck.forEach(stat => {
         if (!pkmn[`${stat}_iv`] && pkmn[`${stat}_inactive`]) {
@@ -304,7 +303,7 @@ module.exports = class Pokemon extends Model {
     // filter pokes with pvp data
     pvpResults.forEach(pkmn => {
       const parsed = reactMapHandlesPvp
-        ? PvpWrapper.resultWithCache(pkmn, safeTs)
+        ? Pvp.resultWithCache(pkmn, safeTs)
         : getParsedPvp(pkmn)
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       pkmn.cleanPvp = {}
@@ -314,10 +313,12 @@ module.exports = class Pokemon extends Model {
       }
       if (!pkmn.seen_type) pkmn.seen_type = 'encounter'
       Object.keys(parsed).forEach(league => {
-        const { filtered, best } = getRanks(league, parsed[league], filterId)
-        if (filtered.length) {
-          pkmn.cleanPvp[league] = filtered
-          if (best < pkmn.bestPvp) pkmn.bestPvp = best
+        if (leagueObj[league]) {
+          const { filtered, best } = getRanks(league, parsed[league], filterId)
+          if (filtered.length) {
+            pkmn.cleanPvp[league] = filtered
+            if (best < pkmn.bestPvp) pkmn.bestPvp = best
+          }
         }
       })
       if ((Object.keys(pkmn.cleanPvp).length || !pkmn.pvpCheck) && globalCheck(pkmn)) {

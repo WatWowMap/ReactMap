@@ -1,30 +1,27 @@
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const fs = require('fs')
-
+const { rarity } = require('../src/services/config')
 const fetchJson = require('../src/services/api/fetchJson')
 const defaultRarity = require('../src/data/defaultRarity.json')
 
 const getRarityLevel = (id, pkmn) => {
-  const adminRarity = fs.existsSync(`${__dirname}/../src/configs/local.json`)
-    ? JSON.parse(fs.readFileSync(`${__dirname}/../src/configs/local.json`, 'utf8'))
-    : JSON.parse(fs.readFileSync(`${__dirname}/../src/configs/default.json`, 'utf8'))
-  let rarity
+  let pkmnRarity
   for (const [tier, pokemon] of Object.entries(defaultRarity)) {
-    if (adminRarity?.rarity?.[tier]?.length) {
-      if (adminRarity.rarity[tier].includes((parseInt(id)))) {
-        rarity = tier
+    if (rarity?.[tier]?.length) {
+      if (rarity[tier].includes((parseInt(id)))) {
+        pkmnRarity = tier
       }
     } else if (pokemon.includes(parseInt(id))) {
-      rarity = tier
+      pkmnRarity = tier
     }
   }
-  if (pkmn.legendary) rarity = 'legendary'
-  if (pkmn.mythical) rarity = 'mythical'
-  return rarity
+  if (pkmn.legendary) pkmnRarity = 'legendary'
+  if (pkmn.mythical) pkmnRarity = 'mythical'
+  return pkmnRarity
 }
 
-const generate = async () => {
+const generate = async (save) => {
   try {
     const masterfile = await fetchJson('https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-react-map.json')
 
@@ -35,12 +32,15 @@ const generate = async () => {
       delete pokemon.legendary
     })
 
-    fs.writeFile(
-      `${__dirname}/../src/data/masterfile.json`,
-      JSON.stringify(masterfile, null, 2),
-      'utf8',
-      () => { },
-    )
+    if (save) {
+      fs.writeFile(
+        `${__dirname}/../src/data/masterfile.json`,
+        JSON.stringify(masterfile, null, 2),
+        'utf8',
+        () => { },
+      )
+    }
+    return masterfile
   } catch (e) {
     console.warn('Unable to generate new masterfile, using existing.', e)
   }
@@ -49,5 +49,5 @@ const generate = async () => {
 module.exports.generate = generate
 
 if (require.main === module) {
-  generate().then(() => console.log('Masterfile generated'))
+  generate(true).then(() => console.log('Masterfile generated'))
 }
