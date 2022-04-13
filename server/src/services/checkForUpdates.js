@@ -38,18 +38,18 @@ try {
               const remoteSha = stdout3.split('\t')[0]
 
               if (remoteSha !== sha) {
-                console.log('There is a new version available: ', remoteSha, isDocker ? 'docker-compose pull' : 'git pull', ' to update')
+                console.log('[UPDATE] There is a new version available: ', remoteSha, isDocker ? 'docker-compose pull' : 'git pull', ' to update')
               }
             } catch (e) {
-              console.warn('Unable to get remote SHA', e.message, 'Branch:', branch, 'Local SHA:', sha)
+              console.warn('[UPDATE] Unable to get remote SHA', e.message, 'Branch:', branch, 'Local SHA:', sha)
             }
           })
         } catch (e) {
-          console.warn('Unable to get current SHA', e.message, 'Branch:', branch)
+          console.warn('[UPDATE] Unable to get current SHA', e.message, 'Branch:', branch)
         }
       })
     } catch (e) {
-      console.warn('Unable to get current branch', e.message)
+      console.warn('[UPDATE] Unable to get current branch', e.message)
     }
   })
 } catch (e) {

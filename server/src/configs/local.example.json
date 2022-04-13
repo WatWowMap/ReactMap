@@ -6,12 +6,6 @@
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Zx",
     "reactMapSecret": "You Should Change Me",
     "maxSessions": 5,
-    "queryAvailable": {
-      "pokemon": true,
-      "quests": true,
-      "raids": true,
-      "nests": false
-    },
     "pvp": {
       "leagues": [
         {

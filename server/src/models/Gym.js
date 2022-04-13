@@ -2,7 +2,7 @@
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const fetchRaids = require('../services/api/fetchRaids')
-const { pokemon: masterfile } = require('../data/masterfile.json')
+const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },
@@ -302,7 +302,7 @@ module.exports = class Gym extends Model {
 
   static async searchRaids(perms, args, { isMad }, distance) {
     const { search, locale } = args
-    const pokemonIds = Object.keys(masterfile).filter(pkmn => (
+    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
     ))
     const safeTs = args.ts || Math.floor((new Date()).getTime() / 1000)

@@ -16,17 +16,17 @@
       "time": 60,
       "requests": 1000
     },
-    "queryAvailable": {
-      "pokemon": false,
-      "quests": true,
-      "raids": true,
-      "nests": false
-    },
     "queryUpdateHours": {
       "pokemon": 0.5,
       "quests": 1,
       "raids": 0.5,
-      "nests": 12
+      "nests": 3
+    },
+    "queryOnSessionInit": {
+      "pokemon": false,
+      "quests": false,
+      "raids": false,
+      "nests": false
     },
     "queryLimits": {
       "pokemon": 10000,
@@ -118,6 +118,8 @@
       "questRewardTypeFilters": false,
       "fetchLatestInvasions": true,
       "invasionCacheHrs": 1,
+      "masterfileCacheHrs": 6,
+      "webhookCacheHrs": 1,
       "questMessage": "",
       "navigationControls": "react",
       "enableFloatingProfileButton": false,

@@ -31,7 +31,7 @@ const hasCustom = await (async function checkFolders(folder, isCustom = false) {
 }(path.resolve(__dirname, 'src')))
 
 if (await fs.existsSync(path.resolve(__dirname, 'dist'))) {
-  console.log('Cleaning up old build')
+  console.log('[BUILD] Cleaning up old build')
   await fs.rm(path.resolve(__dirname, 'dist'), { recursive: true }, (err) => {
     if (err) console.log(err)
   })
@@ -107,7 +107,7 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
       },
     )
   }
-  console.log(`Building production version: ${version}`)
+  console.log(`[BUILD] Building production version: ${version}`)
 }
 
 try {
@@ -151,5 +151,5 @@ try {
   console.error(e)
   process.exit(1)
 } finally {
-  console.log('React Map Compiled')
+  console.log('[BUILD] React Map Compiled')
 }
