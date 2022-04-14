@@ -9,11 +9,10 @@ const EventManager = require('./EventManager')
 const PvpWrapper = require('./PvpWrapper')
 
 const Db = new DbCheck(exampleSchemas, config.database, config.devOptions.queryDebug, config.api)
+const Pvp = config.api.pvp.reactMapHandlesPvp ? new PvpWrapper(config.api.pvp) : null
 
 module.exports = {
   Db,
-  Event: new EventManager(config, staticMf, Db),
-  Pvp: config.api.pvp.reactMapHandlesPvp
-    ? new PvpWrapper(config.api.pvp)
-    : null,
+  Pvp,
+  Event: new EventManager(config, staticMf, Db, Pvp),
 }

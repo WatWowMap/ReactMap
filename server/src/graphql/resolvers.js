@@ -129,7 +129,7 @@ module.exports = {
             .filter(feature => !feature.properties.hidden)
             .sort((a, b) => (a.properties.name > b.properties.name) ? 1 : -1)
         } catch (e) {
-          console.warn('Failed to sort scan areas', e.message)
+          console.warn('[WARN] Failed to sort scan areas', e.message)
         }
       }
       return [scanAreas]

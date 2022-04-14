@@ -9,7 +9,7 @@ const migrationUrl = 'src/db/migrations'
 const selectedDb = schemas.find(db => db.useFor.includes('user'))
 
 if (!selectedDb) {
-  console.warn('No database selected for React Map Tables, one schema must contain "user" in its useFor array')
+  console.warn('[DB] No database selected for React Map Tables, one schema must contain "user" in its useFor array')
   process.exit(9)
 }
 

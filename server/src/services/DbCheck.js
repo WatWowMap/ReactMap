@@ -69,7 +69,7 @@ module.exports = class DbCheck {
             }
           })
         } catch (e) {
-          console.log(e.message)
+          console.error('[DB]', e.message)
         }
       })
     }))
@@ -228,7 +228,8 @@ module.exports = class DbCheck {
           return [...returnSet]
         }
       } catch (e) {
-        console.warn('Unable to query available for:', model, '\n', e.message)
+        console.warn('[WARN] Unable to query available for:', model, '\n', e.message)
+        if (model === 'Nest') console.warn('[WARN] This is likely due to "nest" being in a useFor array but not in the database')
         return []
       }
     }
