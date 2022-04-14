@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import {
-  Menu, LocationOn, ZoomIn, ZoomOut, Search, NotificationsActive, Save, CardMembership, AttachMoney, EuroSymbol, Person,
+  Menu, LocationOn, ZoomIn, ZoomOut, Search, NotificationsActive, Save,
+  CardMembership, AttachMoney, EuroSymbol, Person, TrackChanges, BlurOn,
 } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
@@ -22,12 +23,14 @@ export default function FloatingButtons({
   toggleDrawer, toggleDialog, safeSearch,
   isMobile, perms, webhookMode, setWebhookMode,
   settings, webhooks, donationPage, setDonorPage,
-  setUserProfile,
+  setUserProfile, scanNextMode, setScanNextMode,
+  scanZoneMode, setScanZoneMode,
 }) {
   const { t } = useTranslation()
   const [isOpen, toggleHash, hash] = useHash()
 
-  const { map: { enableFloatingProfileButton } } = useStatic(state => state.config)
+  const { map: { enableFloatingProfileButton },
+    scanner: { scannerType, enableScanNext, enableScanZone } } = useStatic(state => state.config)
   const { loggedIn } = useStatic(state => state.auth)
   const map = useMap()
   const ref = useRef(null)
@@ -59,23 +62,23 @@ export default function FloatingButtons({
       alignItems="flex-start"
       className={classes.floatingBtn}
       ref={ref}
-      style={{ width: isMobile ? 50 : 65 }}
+      style={{ width: isMobile ? 50 : 65, zIndex: 5000 }}
     >
       <Grid item>
-        <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)} title={t('open_menu')} disabled={Boolean(webhookMode)}>
+        <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)} title={t('open_menu')} disabled={Boolean(webhookMode) || Boolean(scanNextMode) || Boolean(scanZoneMode)}>
           <Menu fontSize={iconSize} />
         </Fab>
       </Grid>
       {enableFloatingProfileButton && loggedIn && (
         <Grid item>
-          <Fab color="primary" size={fabSize} onClick={() => setUserProfile(true)} title={t('user_profile')} disabled={Boolean(webhookMode)}>
+          <Fab color="primary" size={fabSize} onClick={() => setUserProfile(true)} title={t('user_profile')} disabled={Boolean(webhookMode) || Boolean(scanNextMode) || Boolean(scanZoneMode)}>
             <Person fontSize={iconSize} />
           </Fab>
         </Grid>
       )}
       {safeSearch.length ? (
         <Grid item>
-          <Fab color={settings.navigationControls === 'react' ? 'primary' : 'secondary'} size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('search')} disabled={Boolean(webhookMode)}>
+          <Fab color={settings.navigationControls === 'react' ? 'primary' : 'secondary'} size={fabSize} onClick={toggleDialog(true, '', 'search')} title={t('search')} disabled={Boolean(webhookMode) || Boolean(scanNextMode) || Boolean(scanZoneMode)}>
             <Search fontSize={iconSize} />
           </Fab>
         </Grid>
@@ -90,15 +93,29 @@ export default function FloatingButtons({
               setWebhookMode('open')
             }}
             title={selectedWebhook}
-            disabled={Boolean(webhookMode)}
+            disabled={Boolean(webhookMode) || Boolean(scanNextMode) || Boolean(scanZoneMode)}
           >
             <NotificationsActive fontSize={iconSize} />
           </Fab>
         </Grid>
       ) : null}
+      {(perms?.scanner?.includes('scanNext') && enableScanNext) ? (
+        <Grid item>
+          <Fab color={scanNextMode === 'setLocation' ? null : 'secondary'} size={fabSize} onClick={() => scanNextMode === 'setLocation' ? setScanNextMode(false) : setScanNextMode('setLocation')} title={t('scan_next')} disabled={Boolean(webhookMode) || Boolean(scanZoneMode)}>
+            <TrackChanges fontSize={iconSize} />
+          </Fab>
+        </Grid>
+      ) : null}
+      {(perms?.scanner?.includes('scanZone') && enableScanZone && scannerType === 'rdm') ? (
+        <Grid item>
+          <Fab color={scanZoneMode === 'setLocation' ? null : 'secondary'} size={fabSize} onClick={() => scanZoneMode === 'setLocation' ? setScanZoneMode(false) : setScanZoneMode('setLocation')} title={t('scan_zone')} disabled={Boolean(webhookMode) || Boolean(scanNextMode)}>
+            <BlurOn fontSize={iconSize} />
+          </Fab>
+        </Grid>
+      ) : null}
       {showDonorPage ? (
         <Grid item>
-          <Fab color="secondary" size={fabSize} onClick={() => setDonorPage(true)} title={t('donor_menu')} disabled={Boolean(webhookMode)}>
+          <Fab color="secondary" size={fabSize} onClick={() => setDonorPage(true)} title={t('donor_menu')} disabled={Boolean(webhookMode) || Boolean(scanNextMode) || Boolean(scanZoneMode)}>
             <DonorIcon fontSize={iconSize} />
           </Fab>
         </Grid>

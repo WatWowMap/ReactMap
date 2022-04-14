@@ -6,9 +6,7 @@ import Notification from './layout/general/Notification'
 
 const getId = (component, item) => {
   switch (component) {
-    case 'devices': return item.uuid
     case 'submissionCells': return component
-    case 'nests': return item.nest_id
     default: return item.id
   }
 }

@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-const masterfile = require('../../data/masterfile.json')
+const { Event } = require('../initialization')
 const { GenericFilter } = require('../../models/index')
 
 module.exports = function buildPokemon(defaults, base, custom) {
@@ -9,7 +9,7 @@ module.exports = function buildPokemon(defaults, base, custom) {
     quests: { global: new GenericFilter() },
     nests: { global: new GenericFilter() },
   }
-  for (const [i, pkmn] of Object.entries(masterfile.pokemon)) {
+  for (const [i, pkmn] of Object.entries(Event.masterfile.pokemon)) {
     for (const j of Object.keys(pkmn.forms)) {
       pokemon.full[`${i}-${j}`] = base
       pokemon.raids[`${i}-${j}`] = new GenericFilter(defaults.gyms.pokemon)

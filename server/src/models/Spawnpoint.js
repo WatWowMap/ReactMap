@@ -1,20 +1,13 @@
 const { Model, raw } = require('objection')
-const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { api: { queryLimits } } = require('../services/config')
 
 module.exports = class Spawnpoint extends Model {
   static get tableName() {
-    return dbSelection('spawnpoint').type === 'mad'
-      ? 'trs_spawn' : 'spawnpoint'
+    return 'spawnpoint'
   }
 
-  static get idColumn() {
-    return dbSelection('spawnpoint').type === 'mad'
-      ? 'spawnpoint' : 'id'
-  }
-
-  static async getAllSpawnpoints(args, perms, isMad) {
+  static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const query = this.query()
     if (isMad) {
@@ -33,6 +26,8 @@ module.exports = class Spawnpoint extends Model {
     if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions, isMad)
     }
-    return query.limit(queryLimits.spawnpoints)
+    return query
+      .limit(queryLimits.spawnpoints)
+      .from(isMad ? 'trs_spawn' : 'spawnpoint')
   }
 }

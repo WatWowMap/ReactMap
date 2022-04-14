@@ -44,12 +44,12 @@ const isValidSession = async (userId) => {
   return results.length < maxSessions
 }
 
-const clearOtherSessions = async (userId, currentSessionId, botName) => {
+const clearOtherSessions = async (userId, currentSessionId) => {
   const results = await Session.query()
     .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
     .andWhere('session_id', '!=', currentSessionId || '')
     .delete()
-  console.log(`[Session${botName && ` - ${botName}`}] Clear Result:`, results)
+  console.log('[Session] Clear Result:', results)
 }
 
 const clearDiscordSessions = async (discordId, botName) => {

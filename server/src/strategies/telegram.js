@@ -49,6 +49,7 @@ const authHandler = async (req, profile, done) => {
 
   user.perms.areaRestrictions = Utility.areaPerms(groupInfo, 'telegram')
   user.perms.webhooks = Utility.webhookPerms(groupInfo, 'telegramGroups')
+  user.perms.scanner = Utility.scannerPerms(groupInfo, 'telegramGroups')
 
   try {
     await User.query()
@@ -62,6 +63,7 @@ const authHandler = async (req, profile, done) => {
             .where('telegramId', user.id)
             .whereNot('id', req.user.id)
             .delete()
+          console.log('[TELEGRAM]', user.username, `(${user.id})`, 'Authenticated successfully.')
           return done(null, {
             ...user,
             ...req.user,
@@ -83,10 +85,11 @@ const authHandler = async (req, profile, done) => {
         if (userExists.id >= 25000) {
           console.warn('[USER] User ID is higher than 25,000! This may indicate that a Telegram ID was saved as the User ID\nYou should rerun the migrations with "yarn migrate:rollback && yarn migrate:latest"')
         }
+        console.log('[TELEGRAM]', user.username, `(${user.id})`, 'Authenticated successfully.')
         return done(null, { ...user, ...userExists, username: userExists.username || user.username })
       })
   } catch (e) {
-    console.error('User has failed Telegram auth.', e)
+    console.error('[TELEGRAM] User has failed Telegram auth.', e)
   }
 }
 

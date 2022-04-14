@@ -1,5 +1,5 @@
 const { GenericFilter } = require('../../models/index')
-const { items, questRewardTypes, invasions } = require('../../data/masterfile.json')
+const { Event } = require('../initialization')
 
 module.exports = function buildPokestops(perms, defaults) {
   const quests = { s0: new GenericFilter() }
@@ -9,20 +9,20 @@ module.exports = function buildPokestops(perms, defaults) {
     }
   }
   if (perms.quests) {
-    Object.keys(items).forEach(item => {
+    Object.keys(Event.masterfile.items).forEach(item => {
       quests[`q${item}`] = new GenericFilter(defaults.items)
     })
     for (let i = 200; i <= 2000; i += 100) {
       quests[`d${i}`] = new GenericFilter(defaults.items)
     }
-    Object.keys(questRewardTypes).forEach(type => {
+    Object.keys(Event.masterfile.questRewardTypes).forEach(type => {
       if (type !== '0') {
         quests[`u${type}`] = new GenericFilter()
       }
     })
   }
   if (perms.invasions) {
-    Object.keys(invasions).forEach(type => {
+    Object.keys(Event.invasions).forEach(type => {
       if (type != 0) {
         quests[`i${type}`] = new GenericFilter(defaults.allInvasions)
       }

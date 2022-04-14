@@ -18,15 +18,15 @@ const NestTile = ({
   const parsedJson = JSON.parse(item.polygon_path)
   const recent = ts - item.updated < 172800000
 
-  useForcePopup(item.nest_id, markerRef, params, setParams, done)
+  useForcePopup(item.id, markerRef, params, setParams, done)
 
   return (
     <>
       {filters.pokemon && (
         <Marker
           ref={(m) => {
-            markerRef.current[item.nest_id] = m
-            if (!done && item.nest_id === params.id) {
+            markerRef.current[item.id] = m
+            if (!done && item.id === params.id) {
               setDone(true)
             }
           }}
@@ -51,7 +51,7 @@ const NestTile = ({
 }
 
 const areEqual = (prev, next) => (
-  prev.item.nest_id === next.item.nest_id
+  prev.item.id === next.item.id
   && prev.item.updated === next.item.updated
   && prev.filters.pokemon === next.filters.pokemon
   && prev.filters.polygons === next.filters.polygons

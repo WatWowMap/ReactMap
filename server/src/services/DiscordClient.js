@@ -6,7 +6,7 @@
 /* eslint-disable import/no-dynamic-require */
 /* global BigInt */
 const fs = require('fs')
-const { authentication: { alwaysEnabledPerms }, webhooks } = require('./config')
+const { authentication: { alwaysEnabledPerms }, scanner, webhooks } = require('./config')
 const Utility = require('./Utility')
 
 module.exports = class DiscordMapClient {
@@ -33,7 +33,7 @@ module.exports = class DiscordMapClient {
         .keyArray()
       return roles
     } catch (e) {
-      console.error('Failed to get roles in guild', guildId, 'for user', userId)
+      console.error('[DISCORD] Failed to get roles in guild', guildId, 'for user', userId)
     }
     return []
   }
@@ -50,7 +50,7 @@ module.exports = class DiscordMapClient {
         })
       })
     } catch (e) {
-      console.error('Failed to activate an event', e.message)
+      console.error('[DISCORD] Failed to activate an event', e.message)
     }
   }
 
@@ -58,6 +58,7 @@ module.exports = class DiscordMapClient {
     const perms = Object.fromEntries(Object.keys(this.config.perms).map(x => [x, false]))
     perms.areaRestrictions = []
     perms.webhooks = []
+    perms.scanner = []
     try {
       const { guildsFull } = user
       const guilds = user.guilds.map(guild => guild.id)
@@ -65,7 +66,8 @@ module.exports = class DiscordMapClient {
         Object.keys(perms).forEach((key) => perms[key] = true)
         perms.areaRestrictions = []
         perms.webhooks = webhooks.map(x => x.name)
-        console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
+        perms.scanner = Object.keys(scanner).map(x => x !== 'backendConfig' && scanner[x].enabled && x).filter(x => x !== false)
+        console.log(`[DISCORD] User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
         return perms
       }
       for (let i = 0; i < this.config.blockedGuilds.length; i += 1) {
@@ -98,6 +100,7 @@ module.exports = class DiscordMapClient {
           }
           perms.areaRestrictions.push(...Utility.areaPerms(userRoles, 'discord'))
           perms.webhooks.push(...Utility.webhookPerms(userRoles, 'discordRoles'))
+          perms.scanner.push(...Utility.scannerPerms(userRoles, 'discordRoles'))
         }
       }
       if (perms.areaRestrictions.length) {
@@ -107,7 +110,7 @@ module.exports = class DiscordMapClient {
         perms.webhooks = [...new Set(perms.webhooks)]
       }
     } catch (e) {
-      console.warn('Failed to get perms for user', user.id, e.message)
+      console.warn('[DISCORD] Failed to get perms for user', user.id, e.message)
     }
     return perms
   }
@@ -124,7 +127,7 @@ module.exports = class DiscordMapClient {
         channel.send(message)
       }
     } catch (e) {
-      console.error('Failed to send message to discord', e.message)
+      console.error('[DISCORD] Failed to send message to discord', e.message)
     }
   }
 }

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 const fetchJson = require('./fetchJson')
-const config = require('../config')
+const { Event } = require('../initialization')
 
 const getWildCards = (category, gymBattles) => {
   switch (category) {
@@ -12,7 +12,7 @@ const getWildCards = (category, gymBattles) => {
 }
 
 module.exports = async function resolveQuickHook(category, discordId, webhookName, data) {
-  const webhook = config.webhookObj[webhookName]
+  const webhook = Event.webhookObj[webhookName]
   try {
     switch (category) {
       case 'quickGym': {

@@ -107,6 +107,7 @@ export default function PokemonPopup({
             data={cleanPvp[league]}
             t={t}
             Icons={Icons}
+            pokemon={pokemon}
           />
         ))}
       </Collapse>
@@ -509,14 +510,14 @@ const ExtraInfo = ({
 }
 
 const PvpInfo = ({
-  league, data, t, Icons,
+  pokemon, league, data, t, Icons,
 }) => {
   if (data === null) return ''
 
   const rows = data.map(each => each.rank !== null && each.cp !== null ? {
     id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.gender}-${each.rank}-${each.cp}-${each.lvl}-${each.cap}`,
     img: <img
-      src={Icons.getPokemon(each.pokemon, each.form, each.evolution, each.gender, each.costume)}
+      src={Icons.getPokemon(each.pokemon, each.form, each.evolution, each.gender, pokemon.costume)}
       height={20}
       alt={each.pokemon}
     />,

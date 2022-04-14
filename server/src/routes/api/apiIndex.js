@@ -13,7 +13,7 @@ fs.readdir(`${__dirname}/v1/`, (e, files) => {
       router.use(`/v1/${file.replace('.js', '')}`, require(`./v1/${file}`))
       console.log(`[API] Loaded ${file}`)
     } catch (err) {
-      console.warn('Unable to load API endpoint:', file, '\n', err)
+      console.warn('[WARN] Unable to load API endpoint:', file, '\n', err)
     }
   })
 })

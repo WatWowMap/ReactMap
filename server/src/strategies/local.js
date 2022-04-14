@@ -25,6 +25,7 @@ const authHandler = async (req, username, password, done) => {
       ),
       areaRestrictions: Utility.areaPerms(localPerms, 'local'),
       webhooks: [],
+      scanner: [],
     },
   }
 
@@ -42,6 +43,7 @@ const authHandler = async (req, username, password, done) => {
                 tutorial: !forceTutorial,
               })
             user.id = newUser.id
+            console.log('[LOCAL]', user.username, `(${user.id})`, 'Authenticated successfully.')
             return done(null, user)
           } catch (e) {
             return done(null, user, { message: 'error_creating_user' })
@@ -60,6 +62,7 @@ const authHandler = async (req, username, password, done) => {
             userExists.strategy = 'local'
           }
           user.id = userExists.id
+          console.log('[LOCAL]', user.username, `(${user.id})`, 'Authenticated successfully.')
           return done(null, user)
         }
         return done(null, false, { message: 'invalid_credentials' })

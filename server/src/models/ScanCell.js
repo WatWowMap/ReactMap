@@ -1,16 +1,14 @@
 const { Model, ref } = require('objection')
-const dbSelection = require('../services/functions/dbSelection')
 const getPolyVector = require('../services/functions/getPolyVector')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { api: { queryLimits } } = require('../services/config')
 
 module.exports = class ScanCell extends Model {
   static get tableName() {
-    return dbSelection('scanCell').type === 'mad'
-      ? 'trs_s2cells' : 's2cell'
+    return 's2cell'
   }
 
-  static async getAllCells(args, perms, isMad) {
+  static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const query = this.query()
       .select(['*', ref('id')
@@ -21,7 +19,9 @@ module.exports = class ScanCell extends Model {
     if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions, isMad, 's2cell')
     }
-    const results = await query.limit(queryLimits.scanCells)
+    const results = await query
+      .limit(queryLimits.scanCells)
+      .from(isMad ? 'trs_s2cells' : 's2cell')
     return results.map(cell => ({
       ...cell,
       polygon: getPolyVector(cell.id, 'polygon'),
