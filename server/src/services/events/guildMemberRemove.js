@@ -7,6 +7,6 @@ module.exports = async (client, member) => {
     await clearDiscordSessions(member.id, client.user.username)
     await User.clearPerms(member.id, 'discord', client.user.username)
   } catch (e) {
-    console.error(`Could not clear sessions for ${member.username}`)
+    console.error(`[SESSION] Could not clear sessions for ${member.username}`)
   }
 }

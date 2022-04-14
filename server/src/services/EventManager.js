@@ -1,12 +1,14 @@
 /* eslint-disable no-console */
 const { promises: fs } = require('fs')
 const path = require('path')
+const Ohbem = require('ohbem')
+
 const { generate } = require('../../scripts/generateMasterfile')
 const fetchJson = require('./api/fetchJson')
 const initWebhooks = require('./initWebhooks')
 
 module.exports = class EventManager {
-  constructor(config, masterfile, Db) {
+  constructor(config, masterfile, Db, Pvp) {
     this.masterfile = masterfile
     this.invasions = masterfile.invasions
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
@@ -14,7 +16,7 @@ module.exports = class EventManager {
     this.baseUrl = 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
     this.webhookObj = {}
 
-    this.setTimers(config, Db);
+    this.setTimers(config, Db, Pvp);
     (async () => {
       // Set initials
       await this.getUicons(config.icons.styles)
@@ -28,7 +30,7 @@ module.exports = class EventManager {
     })()
   }
 
-  setTimers(config, Db) {
+  setTimers(config, Db, Pvp) {
     setInterval(async () => {
       this.available.gyms = await Db.getAvailable('Gym')
     }, 1000 * 60 * 60 * (config.api.queryUpdateHours.raids || 1))
@@ -50,6 +52,12 @@ module.exports = class EventManager {
     setInterval(async () => {
       await this.getMasterfile()
     }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
+    if (Pvp) {
+      setInterval(async () => {
+        console.log('[EVENT] Fetching Latest PVP Masterfile')
+        Pvp.updatePokemonData(await Ohbem.fetchPokemonData())
+      }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
+    }
     setInterval(async () => {
       await this.getWebhooks(config)
     }, 1000 * 60 * 60 * (config.map.webhookCacheHrs || 1))
@@ -83,7 +91,7 @@ module.exports = class EventManager {
         return { ...style, data: response }
       }))
     } catch (e) {
-      console.log('[ERROR] Failed to generate latest uicons:\n', e.message)
+      console.warn('[WARN] Failed to generate latest uicons:\n', e.message)
     }
   }
 
@@ -93,11 +101,11 @@ module.exports = class EventManager {
       this.invasions = await fetchJson('https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/grunts.json')
         .then(response => Object.fromEntries(
           Object.entries(this.invasions).map(([type, info]) => {
-            const latest = response ? response[type] : {}
+            const latest = response ? response[type] : { active: false }
             const newInvasion = this.invasions[type]
             if (info.encounters) {
               Object.keys(info.encounters).forEach((position, i) => {
-                if (latest && latest.active) {
+                if (latest?.active) {
                   newInvasion.encounters[position] = latest.lineup.team[i].map((pkmn, j) => (
                     pkmn.template === 'UNSET' && info.encounters[position][j]
                       ? info.encounters[position][j]
@@ -110,7 +118,7 @@ module.exports = class EventManager {
           }),
         ))
     } catch (e) {
-      console.log('Unable to generate latest invasions:\n', e.message)
+      console.warn('[WARN] Unable to generate latest invasions:\n', e.message)
     }
   }
 
@@ -145,7 +153,7 @@ module.exports = class EventManager {
           return masterfile
         })
     } catch (e) {
-      console.log('[ERROR] Failed to generate latest masterfile:\n', e.message)
+      console.warn('[WARN] Failed to generate latest masterfile:\n', e.message)
     }
   }
 

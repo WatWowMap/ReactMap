@@ -42,7 +42,7 @@ const generate = async (save) => {
     }
     return masterfile
   } catch (e) {
-    console.warn('Unable to generate new masterfile, using existing.', e)
+    console.warn('[WARN] Unable to generate new masterfile, using existing.', e)
   }
 }
 

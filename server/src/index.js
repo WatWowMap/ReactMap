@@ -37,11 +37,11 @@ const server = new ApolloServer({
   context: ({ req }) => ({ Db, req }),
   formatError: (e) => {
     if (e instanceof ValidationError) {
-      console.warn('GraphQL Error:', e.message, '\nThis is very likely not a real issue and is caused by a user leaving an old browser session open, there is nothing you can do until they refresh.')
+      console.warn('[GraphQL Error]:', e.message, '\nThis is very likely not a real issue and is caused by a user leaving an old browser session open, there is nothing you can do until they refresh.')
     } else {
       return config.devOptions.enabled
         ? console.error(e)
-        : console.error('GraphQL Error: ', e.message, e.path, e.location)
+        : console.error('[GraphQL Error]: ', e.message, e.path, e.location)
     }
   },
 })
@@ -139,7 +139,7 @@ app.use(rootRouter, requestRateLimiter)
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error('Express Error:', err.message)
+  console.error('[Express Error]:', err.message)
   switch (err.message) {
     case 'NoCodeProvided':
       return res.redirect('/404')

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const fetch = require('node-fetch')
 
 module.exports = async function fetchJson(url, options = undefined, log = false) {

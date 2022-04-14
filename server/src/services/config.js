@@ -11,6 +11,9 @@ if (!fs.existsSync(`${__dirname}/../configs/local.json`)) {
   console.log('[CONFIG] Config v2 (local.json) not found, you need to run the migration with "yarn config-migrate"')
   process.exit(1)
 }
+if (fs.existsSync(`${__dirname}/../configs/config.json`)) {
+  console.log('[CONFIG] Config v1 (config.json) found, it is fine to leave it but make sure you are using and updating local.json instead.')
+}
 
 const mergeMapConfig = (obj) => ({
   localeSelection: obj.localeSelection,
