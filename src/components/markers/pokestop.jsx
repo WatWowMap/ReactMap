@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React from 'react'
+import React, { Fragment } from 'react'
 import { renderToString } from 'react-dom/server'
 import L from 'leaflet'
 
@@ -10,11 +10,15 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
   let filterId = 's0'
   let popupYOffset = 1.3
   const baseIcon = Icons.getPokestops(
-    hasLure ? lure_id : 0, hasInvasion,
+    hasLure ? lure_id : 0,
+    hasInvasion,
     (hasQuest && userSettings.hasQuestIndicator),
     (userSettings.showArBadge && ar_scan_eligible),
   )
   let baseSize = Icons.getSize('pokestop', filters.filter[filterId])
+  let popupX = 7 + pokestopMod.popupX
+  let { popupY } = pokestopMod
+
   const invasionIcons = []
   const invasionSizes = []
   const questIcons = []
@@ -31,9 +35,11 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
       invasionIcons.unshift(Icons.getInvasions(invasion.grunt_type))
       invasionSizes.unshift(Icons.getSize('invasion', filters.filter[filterId]))
       popupYOffset += rewardMod.offsetY - 1
+      popupX += invasionMod.popupX
+      popupY += invasionMod.popupY
     })
   }
-  if (hasQuest && !(hasInvasion && invasionMod.removeQuest)) {
+  if (hasQuest && !(hasInvasion && invasionMod?.removeQuest)) {
     const { quests } = pokestop
 
     quests.forEach(quest => {
@@ -57,24 +63,41 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
       } = quest
       switch (quest_reward_type) {
         case 2:
-          questIcons.unshift(Icons.getRewards(quest_reward_type, quest_item_id, item_amount)); break
+          questIcons.unshift({
+            url: Icons.getRewards(quest_reward_type, quest_item_id, item_amount),
+            amount: item_amount > 1 && item_amount,
+          }); break
         case 3:
-          questIcons.unshift(Icons.getRewards(quest_reward_type, stardust_amount)); break
+          questIcons.unshift({
+            url: Icons.getRewards(quest_reward_type, stardust_amount),
+            amount: stardust_amount,
+          }); break
         case 4:
-          questIcons.unshift(Icons.getRewards(quest_reward_type, candy_pokemon_id, candy_amount)); break
+          questIcons.unshift({
+            url: Icons.getRewards(quest_reward_type, candy_pokemon_id, candy_amount),
+            amount: candy_amount,
+          }); break
         case 7:
-          questIcons.unshift(Icons.getPokemon(
-            quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny,
-          )); break
+          questIcons.unshift({
+            url: Icons.getPokemon(quest_pokemon_id, quest_form_id, 0, quest_gender_id, quest_costume_id, quest_shiny),
+          }); break
         case 9:
-          questIcons.unshift(Icons.getRewards(quest_reward_type, xl_candy_pokemon_id, xl_candy_amount)); break
+          questIcons.unshift({
+            url: Icons.getRewards(quest_reward_type, xl_candy_pokemon_id, xl_candy_amount),
+            amount: xl_candy_amount,
+          }); break
         case 12:
-          questIcons.unshift(Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount)); break
+          questIcons.unshift({
+            url: Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount),
+            amount: mega_amount,
+          }); break
         default:
-          questIcons.unshift(Icons.getRewards(quest_reward_type))
+          questIcons.unshift({ url: Icons.getRewards(quest_reward_type) })
       }
       questSizes.unshift(Icons.getSize('reward', filters.filter[key]))
       popupYOffset += rewardMod.offsetY - 1
+      popupX += rewardMod.popupX
+      popupY += rewardMod.popupY
     })
   }
 
@@ -85,51 +108,58 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
     <div className="marker-image-holder top-overlay">
       <img
         src={baseIcon}
+        alt={baseIcon}
         style={{
           width: baseSize,
           height: baseSize,
-          bottom: -1 + pokestopMod.offsetY,
-          left: `${pokestopMod.offsetX * 100}%`,
+          bottom: 2 + pokestopMod.offsetY,
+          left: `${pokestopMod.offsetX * 50}%`,
           transform: 'translateX(-50%)',
         }}
       />
       {Boolean(userSettings.showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')) && (
         <img
           src={Icons.getMisc('ar')}
+          alt="ar"
           style={{
             width: baseSize / 2,
             height: 'auto',
-            bottom: 20 + pokestopMod.offsetY,
+            bottom: 23 + pokestopMod.offsetY,
             left: `${pokestopMod.offsetX * 10}%`,
             transform: 'translateX(-50%)',
           }}
         />
       )}
       {questIcons.map((icon, i) => (
-        <img
-          key={icon}
-          src={icon}
-          style={{
-            width: questSizes[i],
-            height: questSizes[i],
-            bottom: (baseSize * 0.6 + (invasionMod.removeQuest ? 10 : totalInvasionSize))
-              * rewardMod.offsetY
-              + (questSizes[i] * i),
-            left: `${rewardMod.offsetX * 100}%`,
-            transform: 'translateX(-50%)',
-          }}
-        />
+        <Fragment key={icon.url}>
+          <img
+            src={icon.url}
+            alt={icon.url}
+            style={{
+              width: questSizes[i],
+              height: questSizes[i],
+              bottom: (baseSize * 0.6 + (invasionMod?.removeQuest ? 10 : totalInvasionSize))
+                * rewardMod.offsetY
+                + (questSizes[i] * i),
+              left: `${rewardMod.offsetX * 50}%`,
+              transform: 'translateX(-50%)',
+            }}
+          />
+          {Boolean(icon.url.includes('stardust') ? !icon.url.endsWith('0.png') : !icon.url.includes('_a') && icon.amount)
+            && <div className="amount-holder">x{icon.amount}</div>}
+        </Fragment>
       ))}
       {invasionIcons.map((icon, i) => (
         <img
           key={icon}
           src={icon}
+          alt={icon}
           style={{
             width: invasionSizes[i],
             height: invasionSizes[i],
             bottom: baseSize * 0.5 * invasionMod.offsetY
               + (invasionSizes[i] * i),
-            left: `${invasionMod.offsetX * 100}%`,
+            left: `${invasionMod.offsetX * 50}%`,
             transform: 'translateX(-50%)',
           }}
         />
@@ -137,15 +167,10 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
     </div>
   )
 
-  const getPopupAnchorY = () => {
-    if (pokestopMod.manualPopup) {
-      return pokestopMod.manualPopup - totalInvasionSize * 0.25 - totalQuestSize * 0.1
-    }
-    return -(baseSize + totalInvasionSize + totalQuestSize) / popupYOffset
-  }
-
   return L.divIcon({
-    popupAnchor: [7, getPopupAnchorY()],
+    popupAnchor: [popupX - 5, (pokestopMod.manualPopup
+      ? pokestopMod.manualPopup - totalInvasionSize * 0.25 - totalQuestSize * 0.1
+      : -(baseSize + totalInvasionSize + totalQuestSize) / popupYOffset) + popupY],
     className: 'pokestop-marker',
     html: renderToString(ReactIcon),
   })

@@ -12,7 +12,7 @@ const DeviceTile = ({
 }) => {
   const [poly, setPoly] = useState(false)
   const markerRef = useRef(null)
-  const status = ts - item.last_seen < 900 ? 'online' : 'offline'
+  const isOnline = ts - item.last_seen < 900
 
   useEffect(() => {
     if (poly && markerRef) {
@@ -23,7 +23,7 @@ const DeviceTile = ({
   return (
     <Marker
       position={[item.last_lat, item.last_lon]}
-      icon={deviceMarker(status, Icons)}
+      icon={deviceMarker(isOnline, Icons)}
       ref={markerRef}
     >
       <Popup
@@ -33,7 +33,7 @@ const DeviceTile = ({
       >
         <PopupContent
           device={item}
-          status={status}
+          isOnline={isOnline}
           ts={ts}
         />
       </Popup>
@@ -47,6 +47,7 @@ const areEqual = (prev, next) => (
   && prev.item.last_lat === next.item.last_lat
   && prev.item.last_lon === next.item.last_lon
   && prev.item.last_seen === next.item.last_seen
+  && prev.userIcons.device === next.userIcons.device
 )
 
 export default memo(DeviceTile, areEqual)

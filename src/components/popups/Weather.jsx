@@ -30,13 +30,13 @@ export default function WeatherPopup({ weather, ts, Icons }) {
       </Grid>
       <Grid item xs={12}>
         <Typography variant="subtitle2" align="center">
-          {t('lastUpdated')}:
+          {t('last_updated')}:
         </Typography>
       </Grid>
       <Timer updated={updated} ts={ts} />
       <Grid item xs={12}>
         <Typography variant="subtitle2" align="center">
-          {t('boostedTypes')}:
+          {t('boosted_types')}:
         </Typography>
       </Grid>
       {weatherTypes[gameplay_condition].types.map(type => (
@@ -46,6 +46,7 @@ export default function WeatherPopup({ weather, ts, Icons }) {
           </Typography>
           <img
             src={Icons.getTypes(type)}
+            alt={type}
             style={{
               maxWidth: 30,
               maxHeight: 30,

@@ -1,21 +1,19 @@
-const { defaultFilters, database: { schemas }, map: { legacyPkmnFilter } } = require('../config')
+const {
+  defaultFilters,
+  map: { enableMapJsFilter },
+} = require('../config')
 const buildPokemon = require('./buildPokemon')
 const buildPokestops = require('./buildPokestops')
 const buildGyms = require('./buildGyms')
 const { GenericFilter, PokemonFilter } = require('../../models/index')
 
-const base = new PokemonFilter()
-base.pvp()
-const custom = new PokemonFilter(...Object.values(defaultFilters.pokemon.globalValues))
-custom.pvp(defaultFilters.pokemon.pvpValues)
+const base = new PokemonFilter(defaultFilters.pokemon.allPokemon)
+const custom = new PokemonFilter(defaultFilters.pokemon.allPokemon, 'md', ...Object.values(defaultFilters.pokemon.globalValues))
 
 module.exports = function buildDefault(perms) {
   const stopReducer = perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
-  const pokemonReducer = perms.iv || perms.stats || perms.pvp
-  const hasAr = poi => Object.values(schemas).some(
-    schema => schema.useFor.includes(poi) && schema.arScanColumn === true,
-  )
+  const pokemonReducer = perms.iv || perms.pvp
   const pokemon = buildPokemon(defaultFilters, base, custom)
 
   return {
@@ -25,7 +23,10 @@ module.exports = function buildDefault(perms) {
       raids: perms.raids ? defaultFilters.gyms.raids : undefined,
       exEligible: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
       inBattle: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
-      arEligible: hasAr('gym') && perms.gyms ? false : undefined,
+      arEligible: perms.gyms ? false : undefined,
+      gymBadges: perms.gymBadges ? defaultFilters.gyms.gymBadges : undefined,
+      badge: perms.gymBadges ? 'all' : undefined,
+      raidTier: perms.raids ? 'all' : undefined,
       filter: {
         ...buildGyms(perms, defaultFilters.gyms),
         ...pokemon.raids,
@@ -35,6 +36,7 @@ module.exports = function buildDefault(perms) {
       enabled: defaultFilters.nests.enabled,
       pokemon: defaultFilters.nests.pokemon,
       polygons: defaultFilters.nests.polygons,
+      avgFilter: defaultFilters.nests.avgFilter,
       filter: pokemon.nests,
     } : undefined,
     pokestops: stopReducer ? {
@@ -42,8 +44,9 @@ module.exports = function buildDefault(perms) {
       allPokestops: perms.pokestops ? defaultFilters.pokestops.enabled : undefined,
       lures: perms.lures ? defaultFilters.pokestops.lures : undefined,
       quests: perms.quests ? defaultFilters.pokestops.quests : undefined,
+      showQuestSet: defaultFilters.pokestops.questSet,
       invasions: perms.invasions ? defaultFilters.pokestops.invasions : undefined,
-      arEligible: hasAr('pokestop') && perms.pokestops ? false : undefined,
+      arEligible: perms.pokestops ? false : undefined,
       filter: {
         ...buildPokestops(perms, defaultFilters.pokestops),
         ...pokemon.quests,
@@ -51,9 +54,8 @@ module.exports = function buildDefault(perms) {
     } : undefined,
     pokemon: perms.pokemon ? {
       enabled: defaultFilters.pokemon.enabled,
-      legacy: (pokemonReducer && legacyPkmnFilter) ? defaultFilters.pokemon.legacyFilter : undefined,
+      legacy: (pokemonReducer && enableMapJsFilter) ? defaultFilters.pokemon.legacyFilter : undefined,
       iv: perms.iv ? true : undefined,
-      stats: perms.stats ? true : undefined,
       pvp: perms.pvp ? true : undefined,
       standard: base,
       ivOr: custom,
@@ -91,7 +93,7 @@ module.exports = function buildDefault(perms) {
         unconfirmed: new GenericFilter(),
       },
     } : undefined,
-    s2cells: perms.s2cells ? {
+    scanCells: perms.scanCells ? {
       enabled: defaultFilters.scanCells.enabled,
       filter: { global: new GenericFilter() },
     } : undefined,

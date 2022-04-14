@@ -2,7 +2,7 @@ import { gql } from '@apollo/client'
 
 const core = gql`
   fragment CoreNest on Nest {
-    nest_id
+    id
     lat
     lon
   }
@@ -10,7 +10,7 @@ const core = gql`
 
 export const getAllNests = gql`
   ${core}
-  query Data($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
+  query Nests($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
     nests(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
       ...CoreNest
       name
@@ -25,7 +25,7 @@ export const getAllNests = gql`
 
 export const getOne = gql`
   ${core}
-  query Data($id: ID!, $perm: String!) {
+  query GetOneNest($id: ID!, $perm: String!) {
     nestsSingle(id: $id, perm: $perm) {
       ...CoreNest
     }

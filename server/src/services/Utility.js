@@ -11,6 +11,9 @@ const webhook = require('./ui/webhook')
 const geocoder = require('./geocoder')
 const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')
+const scannerPerms = require('./functions/scannerPerms')
+const mergePerms = require('./functions/mergePerms')
+const evalWebhookId = require('./functions/evalWebhookId')
 
 module.exports = class Utility {
   static getPolyVector(s2cellId, type) {
@@ -33,8 +36,8 @@ module.exports = class Utility {
     return primaryUi(filters, perms)
   }
 
-  static buildAdvMenus() {
-    return advMenus()
+  static buildAdvMenus(available) {
+    return advMenus(available)
   }
 
   static buildClientOptions(perms) {
@@ -63,5 +66,17 @@ module.exports = class Utility {
 
   static webhookPerms(roles, provider) {
     return webhookPerms(roles, provider)
+  }
+
+  static scannerPerms(roles, provider) {
+    return scannerPerms(roles, provider)
+  }
+
+  static mergePerms(existingPerms, incomingPerms = {}) {
+    return mergePerms(existingPerms, incomingPerms)
+  }
+
+  static evalWebhookId(user) {
+    return evalWebhookId(user)
   }
 }

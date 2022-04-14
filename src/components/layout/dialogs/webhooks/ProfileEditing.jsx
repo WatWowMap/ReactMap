@@ -13,7 +13,7 @@ import Query from '@services/Query'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 
-const profilesObject = (data) => Object.fromEntries(data.map(profile => {
+const profilesObject = (data) => data ? Object.fromEntries(data.map(profile => {
   const newProfile = { ...profile, active_hours: [] }
   const parsed = Array.isArray(profile.active_hours)
     ? profile.active_hours
@@ -25,7 +25,7 @@ const profilesObject = (data) => Object.fromEntries(data.map(profile => {
     })
   }
   return [profile.name, newProfile]
-}))
+})) : {}
 
 export default function ProfileEditing({
   webhookData, setWebhookData, selectedWebhook, handleClose, isMobile,
@@ -186,7 +186,7 @@ export default function ProfileEditing({
         <Grid container spacing={2} alignItems="center" justifyContent="center">
           <Grid item xs={12} sm={4}>
             <Typography variant="h6" align="center">
-              {t('addNewProfile')}
+              {t('add_new_profile')}
             </Typography>
           </Grid>
           <Grid item xs={7} sm={5}>
@@ -196,7 +196,7 @@ export default function ProfileEditing({
                 ? t('profile_error')
                 : t('profile_name')}
               value={newProfile}
-              onChange={(event) => setNewProfile(event.target.value)}
+              onChange={(event) => setNewProfile(event.target.value?.toLowerCase())}
               variant="outlined"
               error={Boolean(profiles[newProfile]) || newProfile === 'all'}
             />
@@ -346,7 +346,7 @@ export default function ProfileEditing({
           action: handleCloseMenu,
           icon: 'Save',
         }]}
-        role="webhookAdvanced"
+        role="webhook_advanced"
       />
     </>
   )

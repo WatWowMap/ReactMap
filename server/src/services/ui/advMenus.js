@@ -1,4 +1,4 @@
-const masterfile = require('../../data/masterfile.json')
+const { Event } = require('../initialization')
 const { map } = require('../config')
 
 const categories = {
@@ -14,14 +14,14 @@ if (map.enableQuestRewardTypeFilters) {
 
 const pokemonFilters = {
   generations: [...new Set(
-    Object.values(masterfile.pokemon)
+    Object.values(Event.masterfile.pokemon)
       .map(val => `generation_${val.genId}`),
   )].filter(val => val !== undefined),
-  types: Object.keys(masterfile.types)
+  types: Object.keys(Event.masterfile.types)
     .map(key => `poke_type_${key}`)
     .filter(val => val !== 'poke_type_0'),
   rarity: [...new Set(
-    Object.values(masterfile.pokemon)
+    Object.values(Event.masterfile.pokemon)
       .map(val => val.rarity),
   )].filter(val => val !== undefined),
   forms: ['normalForms', 'altForms', 'Alola', 'Galarian'],
@@ -32,19 +32,18 @@ module.exports = function buildMenus() {
   const menuFilters = {}
   const returnedItems = {}
 
-  Object.entries(pokemonFilters).forEach(filter => {
-    const [key, items] = filter
-    menuFilters[key] = {}
-    items.forEach(item => menuFilters[key][item] = item === 'onlyAvailable')
+  Object.entries(pokemonFilters).forEach(([key, items]) => {
+    menuFilters[key] = Object.fromEntries(items.map(item => [item, false]))
   })
 
-  Object.entries(categories).forEach(category => {
-    const [key, items] = category
+  Object.entries(categories).forEach(([key, items]) => {
     returnedItems[key] = {
       categories: items,
-      filters: { ...menuFilters, categories: {} },
+      filters: {
+        ...menuFilters,
+        categories: Object.fromEntries(items.map(item => [item, false])),
+      },
     }
-    items.forEach(item => returnedItems[key].filters.categories[item] = false)
   })
   return returnedItems
 }

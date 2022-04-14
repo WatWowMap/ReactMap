@@ -7,13 +7,13 @@ export default function setTheme(theme) {
       type: 'dark',
       primary: {
         light: '#ff784e',
-        main: theme.primary,
+        main: theme?.primary || '#ff5722',
         dark: '#b23c17',
         contrastText: '#fff',
       },
       secondary: {
         light: '#33bfff',
-        main: theme.secondary,
+        main: theme?.secondary || '#00b0ff',
         dark: '#007bb2',
         contrastText: '#fff',
       },

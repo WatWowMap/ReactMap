@@ -45,12 +45,12 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
   const getLabel = (label) => {
     if (label.startsWith('pvp') && !label.includes('Mega')) {
       return (
-        <Trans i18nKey="pvpLevel">
+        <Trans i18nKey="pvp_level">
           {{ level: label.substring(3) }}
         </Trans>
       )
     }
-    return (t(label))
+    return (t(Utility.camelToSnake(label), Utility.getProperName(label)))
   }
 
   const getInputType = (option, subOption) => {
@@ -97,7 +97,7 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
   return (
     <>
       <Header
-        titles={[t(`${category}Options`)]}
+        titles={[t(`${category}_options`)]}
         action={toggleDialog(false, category, 'options')}
       />
       <DialogContent style={{ padding: 0 }}>

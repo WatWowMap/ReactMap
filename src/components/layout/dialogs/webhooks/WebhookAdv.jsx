@@ -34,7 +34,7 @@ import SliderTile from '@components/layout/dialogs/filters/SliderTile'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 
-const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive', 'lure_id', 'reward', 'reward_type', 'grunt_type', 'grunt_id', 'gym_id', 'slot_changes', 'team', 'battle_changes', 'shiny']
+const skipFields = ['profile_no', 'allForms', 'pvpEntry', 'noIv', 'byDistance', 'distance', 'xs', 'xl', 'clean', 'gender', 'description', 'uid', 'id', 'ping', 'pokemon_id', 'form', '__typename', 'allMoves', 'enabled', 'level', 'exclusive', 'lure_id', 'reward', 'reward_type', 'grunt_type', 'grunt_id', 'gym_id', 'slot_changes', 'team', 'battle_changes', 'shiny', 'everything_individually']
 
 export default function WebhookAdvanced({
   category, id, toggleWebhook, tempFilters, isMobile,
@@ -47,11 +47,12 @@ export default function WebhookAdvanced({
   const webhookAdv = useStore(s => s.webhookAdv)
   const setWebhookAdv = useStore(s => s.setWebhookAdv)
   const { [selectedWebhook]: {
-    info: { [category]: info }, profile, human, templates, prefix, leagues, pvp, addressFormat, hasNominatim, locale,
+    info: { [category]: info },
+    profile, human, templates, prefix, leagues, pvp, addressFormat, hasNominatim, locale, everything,
   } } = useStatic(s => s.webhookData)
   const { pokemon, moves, types } = useStatic(s => s.masterfile)
 
-  Utility.analytics('/poracle')
+  Utility.analytics(`/poracle/${category}`)
 
   const [search, { data, previousData, loading }] = useLazyQuery(Query.search('webhook'), {
     variables: {
@@ -73,7 +74,7 @@ export default function WebhookAdvanced({
 
   const handleSlider = (event, values, low, high) => {
     setFilterValues({ ...filterValues, [event]: values })
-    setPoracleValues({ ...poracleValues, [low]: values[0], [high]: values[1] })
+    setPoracleValues({ ...poracleValues, [low]: values[0], [high]: values[1], pvpEntry: event.startsWith('pvp') })
   }
 
   const handleSwitch = (event) => {
@@ -82,7 +83,7 @@ export default function WebhookAdvanced({
       case 'xl':
         setPoracleValues({
           ...poracleValues,
-          min_weight: checked ? Math.ceil(pokemon[idObj.pokemonId].weight * 1.313) : info.defaults.min_weight,
+          min_weight: checked ? Math.ceil(pokemon[idObj.id].weight * 1.313) : info.defaults.min_weight,
           max_weight: info.defaults.max_weight,
           [name]: checked,
           xs: false,
@@ -91,7 +92,7 @@ export default function WebhookAdvanced({
         setPoracleValues({
           ...poracleValues,
           min_weight: info.defaults.min_weight,
-          max_weight: checked ? Math.floor(pokemon[idObj.pokemonId].weight / 1.6431924) : info.defaults.max_weight,
+          max_weight: checked ? Math.floor(pokemon[idObj.id].weight / 1.6431924) : info.defaults.max_weight,
           [name]: checked,
           xl: false,
         }); break
@@ -129,6 +130,9 @@ export default function WebhookAdvanced({
     if (name === 'pvp_ranking_league') {
       newObj.pvp_ranking_min_cp = pvp === 'ohbem' ? 0 : value - 50
     }
+    if (name.startsWith('pvp')) {
+      newObj.pvpEntry = true
+    }
     if (name === 'move' && value !== 9000) {
       newObj.allMoves = false
     }
@@ -150,48 +154,51 @@ export default function WebhookAdvanced({
     const menuItems = []
     switch (option.name) {
       case 'template': templates[poracleValues.noIv ? `${category}NoIv` : category]?.[locale]?.forEach(item => (
-        menuItems.push(<MenuItem key={item} value={item}>{item}</MenuItem>)
+        menuItems.push(<MenuItem key={item} value={item} dense>{item}</MenuItem>)
       )); break
       case 'profile_no':
         if (profile.length) {
           profile.forEach(pro => (
-            menuItems.push(<MenuItem key={pro.name} value={pro.profile_no}>{pro.name}</MenuItem>)
+            menuItems.push(<MenuItem key={pro.name} value={pro.profile_no} dense>{pro.name}</MenuItem>)
           ))
         } else {
-          menuItems.push(<MenuItem key={1} value={1}>1</MenuItem>)
+          menuItems.push(<MenuItem key={1} value={1} dense>1</MenuItem>)
         } break
+      case 'pvp_ranking_cap': option.options.forEach(subOption => (
+        menuItems.push(<MenuItem key={subOption} value={subOption} dense>{subOption ? t(subOption, subOption) : t('all')}</MenuItem>)
+      )); break
       case 'pvp_ranking_league': option.options.forEach(league => (
-        menuItems.push(<MenuItem key={league.name} value={league.cp}>{t(`${league.name}Slider`)}</MenuItem>)
+        menuItems.push(<MenuItem key={league.name} value={league.cp} dense>{t(`slider_${league.name}`)}</MenuItem>)
       )); break
       case 'gender': option.options.forEach(gender => (
-        menuItems.push(<MenuItem key={gender} value={gender}>{t(`gender_${gender}`)}</MenuItem>)
+        menuItems.push(<MenuItem key={gender} value={gender} dense>{t(`gender_${gender}`)}</MenuItem>)
       )); break
       case 'team': option.options.forEach(team => (
-        menuItems.push(<MenuItem key={team} value={team}>{t(`team_${team}`, t('any'))}</MenuItem>)
+        menuItems.push(<MenuItem key={team} value={team} dense>{t(`team_${team}`, t('any'))}</MenuItem>)
       )); break
       case 'move':
-        menuItems.push(<MenuItem key={9000} value={9000}>{t('any')}</MenuItem>)
+        menuItems.push(<MenuItem key={9000} value={9000} dense>{t('any')}</MenuItem>)
         if (id === 'global') {
           Object.keys(moves).forEach(move => {
             if (moves[move].type) {
-              menuItems.push(<MenuItem key={move} value={move}>{t(`move_${move}`)}</MenuItem>)
+              menuItems.push(<MenuItem key={move} value={move} dense>{t(`move_${move}`)}</MenuItem>)
             }
           })
-        } else if (pokemon[idObj.pokemonId]) {
+        } else if (pokemon[idObj.id]) {
           ['quickMoves', 'chargedMoves'].forEach(moveType => {
-            if (pokemon[idObj.pokemonId]?.forms?.[idObj.form]?.[moveType]) {
-              pokemon[idObj.pokemonId]?.forms?.[idObj.form]?.[moveType].forEach(move => {
-                menuItems.push(<MenuItem key={move} value={move}>{t(`move_${move}`)}</MenuItem>)
+            if (pokemon[idObj.id]?.forms?.[idObj.form]?.[moveType]) {
+              pokemon[idObj.id]?.forms?.[idObj.form]?.[moveType].forEach(move => {
+                menuItems.push(<MenuItem key={move} value={move} dense>{t(`move_${move}`)}</MenuItem>)
               })
-            } else if (pokemon[idObj.pokemonId][moveType]) {
-              pokemon[idObj.pokemonId][moveType].forEach(move => {
-                menuItems.push(<MenuItem key={move} value={move}>{t(`move_${move}`)}</MenuItem>)
+            } else if (pokemon[idObj.id][moveType]) {
+              pokemon[idObj.id][moveType].forEach(move => {
+                menuItems.push(<MenuItem key={move} value={move} dense>{t(`move_${move}`)}</MenuItem>)
               })
             }
           })
         } break
       default: option.options.forEach(subOption => (
-        menuItems.push(<MenuItem key={subOption} value={subOption}>{t(subOption, subOption)}</MenuItem>)
+        menuItems.push(<MenuItem key={subOption} value={subOption} dense>{t(subOption, subOption)}</MenuItem>)
       ))
     }
     return menuItems
@@ -206,24 +213,27 @@ export default function WebhookAdvanced({
     if (field === 'slot_changes' && poracleValues.slot_changes) return ` ${t('slot_changes_poracle')} `
     if (field === 'battle_changes' && poracleValues.battle_changes) return ` ${t('battle_changes_poracle')} `
     if (field === 'team' && poracleValues.team !== 4) return t(`team_${poracleValues.team}`)
+    if (field === 'everything_individually' && poracleValues.everything_individually) return ` ${t('individually')} `
     if (skipFields.includes(field)) return ''
     if (field.startsWith('pvp')) {
-      if (poracleValues.pvpEntry && poracleValues.pvp_ranking_league) {
+      if (poracleValues.pvpEntry && poracleValues.pvp_ranking_league && poracleValues[field] !== info.defaults[field]) {
         const league = leagues.find(x => x.cp === poracleValues.pvp_ranking_league) || {}
         switch (field) {
           case 'pvp_ranking_min_cp':
-            return pvp === 'ohbem' ? '' : `${league.name}cp${poracleValues.pvp_ranking_min_cp}`
+            return pvp === 'ohbem' ? '' : `${league.name}${t('cp')}${poracleValues.pvp_ranking_min_cp}`
           case 'pvp_ranking_worst':
-            return `${league.name}high${poracleValues.pvp_ranking_worst}`
+            return `${league.name}${poracleValues.pvp_ranking_worst}`
           case 'pvp_ranking_best':
-            return `${league.name}${poracleValues.pvp_ranking_best}`
+            return `${league.name}high${poracleValues.pvp_ranking_best}`
+          case 'pvp_ranking_cap':
+            return pvp === 'ohbem' ? `${t('cap').toLowerCase()}${poracleValues.pvp_ranking_cap}` : ''
           default: return ''
         }
       }
       return ''
     }
     if (!poracleValues.pvpEntry) {
-      return poracleValues[field] === info.defaults[field] ? '' : `${field.replace(/_/g, '')}${poracleValues[field]}`
+      return poracleValues[field] === info.defaults[field] ? '' : `${field.replace(/_/g, '').replace('min', '')}${poracleValues[field]}`
     }
   }
 
@@ -241,18 +251,18 @@ export default function WebhookAdvanced({
       }
       case 'q': return `${prefix}${t('quest')} ${t(`item_${idObj.id}`).replace(' ', '_')}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
-      case 'm': return `${prefix}${t('quest')} ${t('energy')}${t(`poke_${idObj.pokemonId}`)}
+      case 'm': return `${prefix}${t('quest')} ${t('energy')}${t(`poke_${idObj.id}`)}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
-      case 'c': return `${prefix}${t('quest')} ${t('candy')}${t(`poke_${idObj.pokemonId}`)}
+      case 'c': return `${prefix}${t('quest')} ${t('candy')}${t(`poke_${idObj.id}`)}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
-      case 'x': return `${prefix}${t('quest')} ${t('xl')}${t(`poke_${idObj.pokemonId}`)}
+      case 'x': return `${prefix}${t('quest')} ${t('xl')}${t(`poke_${idObj.id}`)}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'd': return `${prefix}${t('quest')} ${t('stardust')}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'l': return `${prefix}${t('lure')} ${t(`lure_${idObj.id}`).toLowerCase()}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       default: return `${prefix}${category === 'pokemon' ? t('track') : t(category)} 
-      ${t(`poke_${idObj.pokemonId}`)} 
+      ${t(`poke_${idObj.id === '0' ? 'global' : idObj.id}`)} 
       ${!poracleValues.allForms && +idObj.form ? `form:${t(`form_${idObj.form}`).replace(/ /g, '_')}` : ''} 
       ${poracleValues.noIv ? `${poracleValues.clean ? ` ${t('clean')} ` : ''}${poracleValues.byDistance && parseInt(poracleValues.distance) ? ` d${poracleValues.distance} ` : ''}` : Object.keys(poracleValues).map(checkDefaults).join(' ')}
       ${poracleValues.gender ? ` ${t(`gender_${poracleValues.gender}`)}` : ''}`
@@ -261,6 +271,9 @@ export default function WebhookAdvanced({
 
   const getDisabled = (option) => {
     switch (option.name) {
+      case 'xl':
+      case 'xs': return !pokemon[idObj.id]
+      case 'allForms': return idObj.id === '0'
       case 'distance': return !poracleValues.byDistance
       case 'amount': return option?.disabled?.some(x => id.startsWith(x)) || /\d/.test(id.charAt(0))
       case 'pvpEntry': return human.blocked_alerts?.includes('pvp')
@@ -290,6 +303,7 @@ export default function WebhookAdvanced({
               value={poracleValues[option.name]}
               onChange={handleSelect}
               label={t(option.name)}
+              disabled={getDisabled(option)}
             >
               {getOptions(option)}
             </Select>
@@ -310,7 +324,7 @@ export default function WebhookAdvanced({
         >
           <Grid item xs={6} style={{ textAlign: 'center' }}>
             <Typography variant="subtitle2">
-              {t(option.name)}
+              {t(Utility.camelToSnake(option.name))}
             </Typography>
           </Grid>
           <Grid item xs={6} style={{ textAlign: 'center' }}>
@@ -336,14 +350,18 @@ export default function WebhookAdvanced({
             disabled={getDisabled(option)}
             type={option.type || 'text'}
             size="small"
-            style={{ width: 120 }}
+            style={{ width: option.width || 120 }}
             inputProps={{
-              min: 0,
-              max: option.max,
+              min: option.name === 'pvp_ranking_min_cp' && poracleValues.pvp_ranking_league
+                ? leagues.find(x => x.cp === poracleValues.pvp_ranking_league)?.min || 0
+                : option.min || 0,
+              max: option.name === 'pvp_ranking_min_cp' && poracleValues.pvp_ranking_league
+                ? poracleValues.pvp_ranking_league || 0
+                : option.max || 10000,
             }}
             InputProps={{
               endAdornment: option.adornment
-                ? <InputAdornment position="end">{option.adornment}</InputAdornment>
+                ? <InputAdornment position="end">{t(option.adornment)}</InputAdornment>
                 : null,
             }}
           />
@@ -380,7 +398,13 @@ export default function WebhookAdvanced({
                   {...params}
                   label={<Trans i18nKey="search_specific">{{ category: t(option.label) }}</Trans>}
                   variant="outlined"
-                  onChange={(e) => search({ variables: { search: e.target.value, category: option.searchCategory } })}
+                  onChange={(e) => search({
+                    variables: {
+                      search: e.target.value,
+                      category: option.searchCategory,
+                      ts: Math.floor(Date.now() / 1000),
+                    },
+                  })}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -439,6 +463,7 @@ export default function WebhookAdvanced({
       <DialogContent style={{ color: 'white', padding: '8px 5px' }}>
         {Object.keys(info.ui).map(type => {
           if (human.blocked_alerts && JSON.parse(human.blocked_alerts).includes(type)) return null
+          if (type === 'global' && (idObj.id !== 'global' || !everything)) return null
           const Items = (
             <Grid
               container
@@ -450,13 +475,14 @@ export default function WebhookAdvanced({
           )
           return (
             <Paper style={{ margin: 10, width: '95%' }} elevation={3} key={type}>
-              {(type === 'general' || type === 'distanceOrArea') ? Items : (
+              {(type === 'general' || type === 'distanceOrArea' || type === 'global') ? Items : (
                 <Accordion
                   expanded={webhookAdv[type]}
                   onChange={handleChange(type)}
                 >
                   <AccordionSummary
                     expandIcon={<ExpandMore style={{ color: 'white' }} />}
+                    className={classes.accordionSummary}
                   >
                     <Typography className={classes.heading}>
                       {t(type)}
@@ -476,7 +502,7 @@ export default function WebhookAdvanced({
           </Typography>
         </Paper>
       </DialogContent>
-      <Footer options={footerOptions} role="webhookAdvanced" />
+      <Footer options={footerOptions} role="webhook_advanced" />
     </>
   )
 }

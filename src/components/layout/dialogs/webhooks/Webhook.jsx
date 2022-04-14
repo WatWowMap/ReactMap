@@ -26,7 +26,7 @@ export default function Main({
   const setWebhookData = useStatic(s => s.setWebhookData)
 
   const selectedWebhook = useStore(s => s.selectedWebhook)
-  const setSelectedWebhook = useStore(s => s.selectedWebhook)
+  const setSelectedWebhook = useStore(s => s.setSelectedWebhook)
 
   return (
     <>

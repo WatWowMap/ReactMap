@@ -125,6 +125,7 @@ export default function NestPopup({
       <Grid item xs={6} style={{ textAlign: 'center' }}>
         <img
           src={iconUrl}
+          alt={iconUrl}
           style={{
             maxHeight: 75,
             maxWidth: 75,
@@ -137,13 +138,13 @@ export default function NestPopup({
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'center' }}>
         <Typography variant="subtitle2">
-          {t('lastUpdated')}
+          {t('last_updated')}
         </Typography>
         <Typography variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'} style={{ color: getColor(lastUpdated.diff) }}>
           {lastUpdated.str}
         </Typography>
         <Typography variant="subtitle2">
-          ~{pokemon_avg} {t('spawnsPerHour')}
+          ~{pokemon_avg} {t('spawns_per_hour')}
         </Typography>
       </Grid>
       <Grid item xs={12}>
@@ -152,13 +153,13 @@ export default function NestPopup({
       <Grid item xs={12} style={{ textAlign: 'center' }}>
         {recent ? (
           <Typography variant="caption">
-            {t('nestEstimated')}<br />
-            {t('verifyNests')}
+            {t('nest_estimated')}<br />
+            {t('verify_nests')}
           </Typography>
         ) : (
           <Typography variant="caption">
-            {t('nestOutOfDate')}<br />
-            {t('nestCheckCurrent')}
+            {t('nest_out_of_date')}<br />
+            {t('nest_check_current')}
           </Typography>
         )}
       </Grid>

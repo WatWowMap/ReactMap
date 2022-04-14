@@ -9,7 +9,7 @@ import useStyles from '@hooks/useStyles'
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
-import FilterOptions from './Options'
+import Options from './Options'
 
 export default function OptionsContainer({
   advMenu, setAdvMenu, menus, setMenus, categories,
@@ -50,13 +50,13 @@ export default function OptionsContainer({
       : Object.keys(options).length > 1) {
       if (menus[category].filters[cat]) {
         Object.entries(menus[category].filters[cat]).forEach(([filter, bool]) => {
-          if (bool) {
+          if (bool && options[filter] !== undefined) {
             applied.push(filter)
           }
         })
       }
       return (
-        <FilterOptions
+        <Options
           key={cat}
           name={cat}
           options={options}
@@ -74,7 +74,7 @@ export default function OptionsContainer({
     <Grid container key="resetShowing" justifyContent="center" alignItems="center" style={{ margin: '10px 0' }}>
       <Grid item xs={5} sm={6} style={{ textAlign: 'center' }}>
         <Button onClick={handleReset} color="primary" size="small">
-          {t('resetFilters')}
+          {t('reset_filters')}
         </Button>
       </Grid>
       <Grid item xs={7} sm={6} style={{ textAlign: 'center' }}>
@@ -86,7 +86,7 @@ export default function OptionsContainer({
         {applied.map(x => (
           <Chip
             key={x}
-            label={t(x)}
+            label={t(Utility.camelToSnake(x))}
             variant="outlined"
             size="small"
             color={menus[category].filters.others.reverse ? 'secondary' : 'primary'}
@@ -98,7 +98,7 @@ export default function OptionsContainer({
   )
   if (isMobile) {
     allFilterMenus.unshift(
-      <Grid container key="resetShowing" justifyContent="center" alignItems="center">
+      <Grid container key="close" justifyContent="center" alignItems="center">
         <Grid item xs={12} style={{ textAlign: 'right' }}>
           <IconButton onClick={toggleDrawer(false)}>
             <Clear style={{ color: 'white' }} />

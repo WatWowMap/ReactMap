@@ -1,18 +1,14 @@
+/* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
-const Ohbem = require('ohbem')
-const { pokemon: masterfile } = require('../data/masterfile.json')
+const { Event } = require('../services/initialization')
 const legacyFilter = require('../services/legacyFilter')
 const {
-  api: { pvpMinCp },
-  database: {
-    settings: { leagues, reactMapHandlesPvp, pvpLevels },
-  },
+  api: { pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, leagueObj }, queryLimits },
 } = require('../services/config')
-const dbSelection = require('../services/functions/dbSelection')
 const getAreaSql = require('../services/functions/getAreaSql')
+const { Pvp } = require('../services/initialization')
 
-const dbType = dbSelection('pokemon')
 const levelCalc = 'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
 const ivCalc = 'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
 const keys = ['iv', 'level', 'atk_iv', 'def_iv', 'sta_iv', ...leagues.map(league => league.name)]
@@ -23,7 +19,6 @@ const madKeys = {
   def_iv: 'individual_defense',
   sta_iv: 'individual_stamina',
 }
-let ohbem = null
 
 const getMadSql = q => (
   q.leftJoin('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
@@ -58,48 +53,32 @@ const getMadSql = q => (
     ])
 )
 
-class Pokemon extends Model {
+module.exports = class Pokemon extends Model {
   static get tableName() {
     return 'pokemon'
   }
 
-  static get idColumn() {
-    return dbSelection('pokemon') === 'mad'
-      ? 'encounter_id' : 'id'
-  }
-
-  static async initOhbem() {
-    const leagueObj = {}
-    leagues.forEach(league => leagueObj[league.name] = league.cp)
-    ohbem = new Ohbem({
-      leagues: leagueObj,
-      pokemonData: await Ohbem.fetchPokemonData(),
-      levelCaps: pvpLevels,
-      cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
-    })
-  }
-
-  static async getPokemon(args, perms, isMad) {
-    const ts = Math.floor((new Date()).getTime() / 1000)
+  static async getAll(perms, args, { isMad, pvpV2 }) {
     const {
-      stats, iv: ivs, pvp, areaRestrictions,
+      iv: ivs, pvp, areaRestrictions,
     } = perms
     const {
-      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyLinkGlobal,
+      onlyStandard, onlyIvOr, onlyXlKarp, onlyXsRat, onlyZeroIv, onlyHundoIv, onlyPvpMega, onlyLinkGlobal, ts,
     } = args.filters
     let queryPvp = false
+    const safeTs = ts || Math.floor(Date.now() / 1000)
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
-    if (!ivs && !stats && !pvp) {
+    if (!ivs && !pvp) {
       const noPokemonSelect = Object.keys(args.filters).find(x => x.charAt(0) !== 'o')
       if (!noPokemonSelect) return []
     }
 
     const pvpCheck = (pkmn, league, min, max) => {
       const rankCheck = pkmn.rank <= max && pkmn.rank >= min
-      const cpCheck = dbType === 'chuck' || reactMapHandlesPvp || pkmn.cp >= pvpMinCp[league]
+      const cpCheck = pvpV2 || reactMapHandlesPvp || pkmn.cp >= pvpMinCp[league]
       const megaCheck = !pkmn.evolution || onlyPvpMega
-      const capCheck = dbType === 'chuck' || reactMapHandlesPvp ? pkmn.capped || args.filters[`onlyPvp${pkmn.cap}`] : true
+      const capCheck = pvpV2 || reactMapHandlesPvp ? pkmn.capped || args.filters[`onlyPvp${pkmn.cap}`] : true
       return rankCheck && cpCheck && megaCheck && capCheck
     }
 
@@ -138,9 +117,8 @@ class Pokemon extends Model {
 
     // parse PVP JSON(s)
     const getParsedPvp = (pokemon) => {
-      if (dbType === 'chuck') {
-        return JSON.parse(pokemon.pvp)
-      }
+      if (pokemon.pvp) return JSON.parse(pokemon.pvp)
+
       const parsed = {}
       const pvpKeys = ['great', 'ultra']
       pvpKeys.forEach(league => {
@@ -152,7 +130,7 @@ class Pokemon extends Model {
     }
 
     // checks if filters are set to default and skips them if so
-    const arrayCheck = (filter, key) => filter[key].every((v, i) => v === onlyStandard[key][i])
+    const arrayCheck = (filter, key) => filter[key]?.every((v, i) => v === onlyStandard[key][i])
 
     // cycles through the above arrayCheck
     const getRelevantKeys = filter => {
@@ -169,6 +147,14 @@ class Pokemon extends Model {
     const generateSql = (queryBase, filter, relevant) => {
       relevant.forEach(key => {
         switch (key) {
+          case 'level':
+          case 'atk_iv':
+          case 'def_iv':
+          case 'sta_iv':
+          case 'iv':
+            if (ivs) {
+              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
+            } break
           default:
             if (pvp) {
               queryPvp = true
@@ -181,29 +167,29 @@ class Pokemon extends Model {
                 queryBase.whereNull('pokemon_id')
               }
             } break
-          case 'iv':
-            if (ivs) {
-              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
-            } break
-          case 'level':
-          case 'atk_iv':
-          case 'def_iv':
-          case 'sta_iv':
-            if (stats) {
-              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
-            } break
         }
       })
     }
 
     const globalCheck = (pkmn) => onlyLinkGlobal ? args.filters[`${pkmn.pokemon_id}-${pkmn.form}`] : true
 
+    const handleDitto = (pkmn) => {
+      pkmn.ditto_form = pkmn.form
+      pkmn.form = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
+      const statsToCheck = ['atk', 'def', 'sta']
+      statsToCheck.forEach(stat => {
+        if (!pkmn[`${stat}_iv`] && pkmn[`${stat}_inactive`]) {
+          pkmn[`${stat}_iv`] = pkmn[`${stat}_inactive`]
+          pkmn.inactive_stats = true
+        }
+      })
+    }
     // query builder
     const query = this.query()
     if (isMad) {
       getMadSql(query)
     }
-    query.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+    query.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
       .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
       .andWhere(ivOr => {
@@ -218,13 +204,13 @@ class Pokemon extends Model {
                 poke.where('pokemon_id', id)
                   .andWhere('pokemon.form', form)
               }
-              if (relevantFilters.length > 0) {
+              if (relevantFilters.length) {
                 generateSql(poke, filter, relevantFilters, true)
               }
             })
-          } else if (pkmn === 'onlyIvOr' && (ivs || stats || pvp)) {
+          } else if (pkmn === 'onlyIvOr' && (ivs || pvp)) {
             const relevantFilters = getRelevantKeys(filter)
-            if (relevantFilters.length > 0) {
+            if (relevantFilters.length) {
               generateSql(ivOr, filter, relevantFilters)
             } else {
               ivOr.whereNull('pokemon_id')
@@ -246,9 +232,11 @@ class Pokemon extends Model {
           ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 100)
         }
       })
-    getAreaSql(query, areaRestrictions, isMad, 'pokemon')
+    if (areaRestrictions?.length) {
+      getAreaSql(query, areaRestrictions, isMad, 'pokemon')
+    }
 
-    const results = await query
+    const results = await query.limit(queryLimits.pokemon)
     const finalResults = []
     const pvpResults = []
     const listOfIds = []
@@ -257,8 +245,7 @@ class Pokemon extends Model {
     results.forEach(pkmn => {
       let noPvp = true
       if (pkmn.pokemon_id === 132 && !pkmn.ditto_form) {
-        pkmn.ditto_form = pkmn.form
-        pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
+        handleDitto(pkmn)
       }
       if (!pkmn.seen_type) {
         if (pkmn.spawn_id === null) {
@@ -270,7 +257,7 @@ class Pokemon extends Model {
       if (pvp && ((pkmn.pvp_rankings_great_league
         || pkmn.pvp_rankings_ultra_league
         || pkmn.pvp)
-        || (dbType === 'mad' && reactMapHandlesPvp && pkmn.cp))) {
+        || (isMad && reactMapHandlesPvp && pkmn.cp))) {
         noPvp = false
         listOfIds.push(pkmn.id)
         pvpResults.push(pkmn)
@@ -281,7 +268,7 @@ class Pokemon extends Model {
     })
 
     // second query for pvp
-    if (queryPvp && (dbType !== 'mad' || reactMapHandlesPvp)) {
+    if (queryPvp && (!isMad || reactMapHandlesPvp)) {
       const pvpQuery = this.query()
       if (isMad) {
         getMadSql(pvpQuery)
@@ -289,17 +276,17 @@ class Pokemon extends Model {
       } else {
         pvpQuery.select(['*', raw(true).as('pvpCheck')])
       }
-      pvpQuery.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+      pvpQuery.where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : safeTs)
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [args.minLat, args.maxLat])
         .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [args.minLon, args.maxLon])
-      if (isMad && listOfIds.length > 0) {
+      if (isMad && listOfIds.length) {
         pvpQuery.whereRaw(`pokemon.encounter_id NOT IN ( ${listOfIds.join(',')} )`)
       } else {
         pvpQuery.whereNotIn('id', listOfIds)
       }
       if (reactMapHandlesPvp) {
         pvpQuery.whereNotNull('cp')
-      } else if (dbType === 'chuck') {
+      } else if (pvpV2) {
         pvpQuery.whereNotNull('pvp')
       } else {
         pvpQuery.andWhere(pvpBuilder => {
@@ -307,58 +294,41 @@ class Pokemon extends Model {
             .orWhereNotNull('pvp_rankings_ultra_league')
         })
       }
-      getAreaSql(pvpQuery, areaRestrictions, isMad, 'pokemon')
-      pvpResults.push(...await pvpQuery)
+      if (areaRestrictions?.length) {
+        getAreaSql(pvpQuery, areaRestrictions, isMad, 'pokemon')
+      }
+      pvpResults.push(...await pvpQuery.limit(queryLimits.pokemonPvp - results.length))
     }
 
     // filter pokes with pvp data
     pvpResults.forEach(pkmn => {
-      const parsed = reactMapHandlesPvp ? this.getOhbemPvp(pkmn) : getParsedPvp(pkmn)
+      const parsed = reactMapHandlesPvp
+        ? Pvp.resultWithCache(pkmn, safeTs)
+        : getParsedPvp(pkmn)
       const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
       pkmn.cleanPvp = {}
       pkmn.bestPvp = 4096
-      if (pkmn.pokemon_id === 132) {
-        pkmn.ditto_form = pkmn.form
-        pkmn.form = masterfile[pkmn.pokemon_id].defaultFormId
+      if (pkmn.pokemon_id === 132 && !pkmn.ditto_form && pkmn.pvpCheck) {
+        handleDitto(pkmn)
       }
       if (!pkmn.seen_type) pkmn.seen_type = 'encounter'
       Object.keys(parsed).forEach(league => {
-        const { filtered, best } = getRanks(league, parsed[league], filterId)
-        if (filtered.length > 0) {
-          pkmn.cleanPvp[league] = filtered
-          if (best < pkmn.bestPvp) pkmn.bestPvp = best
+        if (leagueObj[league]) {
+          const { filtered, best } = getRanks(league, parsed[league], filterId)
+          if (filtered.length) {
+            pkmn.cleanPvp[league] = filtered
+            if (best < pkmn.bestPvp) pkmn.bestPvp = best
+          }
         }
       })
-      if ((Object.keys(pkmn.cleanPvp).length > 0 || !pkmn.pvpCheck) && globalCheck(pkmn)) {
+      if ((Object.keys(pkmn.cleanPvp).length || !pkmn.pvpCheck) && globalCheck(pkmn)) {
         finalResults.push(pkmn)
       }
     })
     return finalResults
   }
 
-  static getOhbemPvp(pokemon) {
-    try {
-      if (pokemon.pokemon_id && pokemon.level
-        && pokemon.atk_iv && pokemon.def_iv && pokemon.sta_iv) {
-        return ohbem.queryPvPRank(
-          pokemon.pokemon_id,
-          pokemon.form,
-          pokemon.costume,
-          pokemon.gender,
-          pokemon.atk_iv,
-          pokemon.def_iv,
-          pokemon.sta_iv,
-          pokemon.level,
-        )
-      }
-      return {}
-    } catch (e) {
-      console.error(`Unable to process ${JSON.stringify(pokemon)}`, e)
-      return {}
-    }
-  }
-
-  static async getLegacy(args, perms, isMad) {
+  static async getLegacy(perms, args, { isMad }) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const query = this.query()
       .where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
@@ -367,14 +337,14 @@ class Pokemon extends Model {
     if (isMad) {
       getMadSql(query)
     }
-    if (perms.areaRestrictions?.length > 0) {
+    if (perms.areaRestrictions?.length) {
       getAreaSql(query, perms.areaRestrictions, isMad, 'pokemon')
     }
     const results = await query
-    return legacyFilter(results, args, perms, ohbem)
+    return legacyFilter(results, args, perms, ts)
   }
 
-  static async getAvailablePokemon(isMad) {
+  static async getAvailable({ isMad }) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const results = await this.query()
       .select('pokemon_id', 'form')
@@ -383,6 +353,14 @@ class Pokemon extends Model {
       .orderBy('pokemon_id', 'form')
     return results.map(pkmn => `${pkmn.pokemon_id}-${pkmn.form}`)
   }
-}
 
-module.exports = Pokemon
+  static getOne(id, { isMad }) {
+    return this.query()
+      .select([
+        isMad ? 'latitude AS lat' : 'lat',
+        isMad ? 'longitude AS lon' : 'lon',
+      ])
+      .where(isMad ? 'encounter_id' : 'id', id)
+      .first()
+  }
+}

@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useState } from 'react'
 import { Grid, IconButton, Typography } from '@material-ui/core'
 import {
@@ -27,20 +26,13 @@ export default function MenuTile({
         enabled: !tempFilters[item.id].enabled,
       },
     })
-    Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id].enabled}`, type)
+    Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id]?.enabled}`, type)
   }
-
-  const backgroundColor = columnIndex % 2
-    ? rowIndex % 2 === 0
-      ? 'rgba(1, 1, 1, 0.01)'
-      : 'rgba(240, 240, 240, 0.01)'
-    : rowIndex % 2
-      ? 'rgba(1, 1, 1, 0.01)'
-      : 'rgba(240, 240, 240, 0.01)'
 
   const image = (
     <img
       className="grid-item"
+      alt={item.url}
       src={item.url}
       style={{
         maxHeight: isMobile ? 50 : 75,
@@ -51,7 +43,7 @@ export default function MenuTile({
   )
   const selection = (
     <IconButton onClick={handleFilterChange}>
-      {tempFilters[item.id].enabled
+      {tempFilters[item.id]?.enabled
         ? <Check style={{ color: '#00e676' }} />
         : <Clear color="primary" />}
     </IconButton>
@@ -88,7 +80,11 @@ export default function MenuTile({
 
   return (
     <Grid
-      style={{ ...style, backgroundColor, textAlign: 'center' }}
+      style={{
+        ...style,
+        backgroundColor: Utility.getTileBackground(columnIndex, rowIndex),
+        textAlign: 'center',
+      }}
       container
       justifyContent="center"
       alignItems="center"

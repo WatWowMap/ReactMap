@@ -20,7 +20,7 @@ export default function SpawnpointPopup({ spawnpoint, ts }) {
         {despawn ? `00:${minuteFixed}` : '?'}
       </Typography>
       <Typography variant="subtitle1" align="center">
-        {t('lastUpdated')}
+        {t('last_updated')}
       </Typography>
       <Typography variant="subtitle2" align="center">
         {Utility.dayCheck(ts, updated)}

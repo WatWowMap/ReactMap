@@ -1,104 +1,41 @@
-import '../assets/scss/main.scss'
+import '@assets/css/main.css'
 
-import React, { Suspense, useEffect, useState } from 'react'
-import {
-  ApolloClient,
-  ApolloProvider,
-  InMemoryCache,
-  createHttpLink,
-} from '@apollo/client'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import React, { Suspense } from 'react'
+import { ApolloProvider } from '@apollo/client'
+import client from '@services/apollo'
 
-import AbortableLink from '@classes/AbortableLink'
-import UIcons from '@services/Icons'
-import Fetch from '@services/Fetch'
-import Auth from './Auth'
-import Login from './Login'
-import RouteChangeTracker from './RouteChangeTracker'
+import ReactRouter from './ReactRouter'
 
-const client = new ApolloClient({
-  uri: '/graphql',
-  link: new AbortableLink().concat(createHttpLink()),
-  cache: new InMemoryCache({
-    typePolicies: {
-      Query: {
-        fields: {
-          pokemon: {
-            merge(existing, incoming) {
-              return incoming
-            },
-          },
-          gyms: {
-            merge(existing, incoming) {
-              return incoming
-            },
-          },
-          pokestops: {
-            merge(existing, incoming) {
-              return incoming
-            },
-          },
-        },
-      },
-      Pokestop: {
-        fields: {
-          quests: {
-            merge(existing, incoming) {
-              return incoming
-            },
-          },
-          invasions: {
-            merge(existing, incoming) {
-              return incoming
-            },
-          },
-        },
-      },
-    },
-  }),
-})
+const SetText = () => {
+  const locales = {
+    de: 'Übersetzungen werden geladen',
+    en: 'Loading Translations',
+    es: 'Cargando Traducciones',
+    fr: 'Chargement des traductions',
+    it: 'Caricamento Traduzioni',
+    ja: '翻訳を読み込み中',
+    ko: '번역 로드 중',
+    nl: 'Vertalingen worden geladen',
+    pl: 'Ładowanie tłumaczeń',
+    'pt-br': 'Carregando Traduções',
+    ru: 'Загрузка переводов',
+    sv: 'Laddar Översättningar',
+    th: 'กำลังโหลดการแปล',
+    'zh-tw': '載入翻譯',
+  }
+  const locale = localStorage?.getItem('i18nextLng') || 'en'
+  const loadingText = document.getElementById('loading-text')
+  if (loadingText) loadingText.innerText = locales[locale.toLowerCase()]
+  return <div />
+}
 
 export default function App() {
-  const [serverSettings, setServerSettings] = useState(null)
-
-  const getServerSettings = async () => {
-    const data = await Fetch.getSettings()
-    const Icons = data.masterfile ? new UIcons(data.config.icons, data.masterfile.questRewardTypes) : null
-    if (Icons) {
-      await Icons.fetchIcons(data.config.icons.styles)
-      if (data.config.icons.defaultIcons) {
-        Icons.setSelection(data.config.icons.defaultIcons)
-      }
-    }
-    if (data.ui?.pokestops?.invasions && data.config?.map.fetchLatestInvasions) {
-      const invasionCache = JSON.parse(localStorage.getItem('invasions_cache'))
-      const cacheTime = data.config.map.invasionCacheHrs * 60 * 60 * 1000
-      if (invasionCache && invasionCache.lastFetched + cacheTime > Date.now()) {
-        data.masterfile.invasions = invasionCache
-      } else {
-        data.masterfile.invasions = await Fetch.getInvasions(data.masterfile.invasions)
-      }
-    }
-    setServerSettings({ ...data, Icons })
-  }
-  useEffect(() => {
-    getServerSettings()
-  }, [])
+  document.body.classList.add('dark')
 
   return (
-    <Suspense fallback="Loading translations...">
+    <Suspense fallback={<SetText />}>
       <ApolloProvider client={client}>
-        <Router>
-          {(process.env && process.env.GOOGLE_ANALYTICS_ID) && <RouteChangeTracker />}
-          <Switch>
-            <Route exact path="/">
-              {serverSettings && <Auth serverSettings={serverSettings} />}
-            </Route>
-            <Route exact path="/login">
-              <Login clickedTwice serverSettings={serverSettings} />
-            </Route>
-          </Switch>
-        </Router>
+        <ReactRouter />
       </ApolloProvider>
     </Suspense>
   )

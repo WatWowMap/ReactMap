@@ -4,7 +4,9 @@ import {
   DialogContent,
   Drawer,
   Grid,
+  Typography,
 } from '@material-ui/core'
+import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import { useStore } from '@hooks/useStore'
@@ -31,6 +33,7 @@ export default function Menu({
   const setMenus = useStore(state => state.setMenus)
   const advMenu = useStore(state => state.advMenu)
   const setAdvMenu = useStore(state => state.setAdvMenu)
+  const { t } = useTranslation()
 
   let columnCount = isTablet ? 3 : 5
   if (isMobile) columnCount = 1
@@ -53,25 +56,16 @@ export default function Menu({
     id: '',
   })
 
-  const { filteredObj, filteredArr, count } = useFilter(tempFilters, menus, search, category, categories)
-
-  const generateSlots = (teamId, show) => {
-    const slotObj = {}
-    for (let i = 1; i <= 6; i += 1) {
-      const slotKey = `g${teamId.charAt(1)}-${i}`
-      slotObj[slotKey] = typeof show === 'boolean'
-        ? { ...tempFilters[slotKey], enabled: show }
-        : { ...tempFilters[slotKey], size: show.size }
-    }
-    return slotObj
-  }
+  const {
+    filteredObj, filteredArr, count,
+  } = useFilter(tempFilters, menus, search, category, webhookCategory, categories)
 
   const selectAllOrNone = (show) => {
     const newObj = {}
     Object.entries(filteredObj).forEach(([key, item]) => {
       newObj[key] = { ...item, enabled: show }
       if (key.startsWith('t') && key.charAt(1) != 0 && !webhookCategory) {
-        Object.assign(newObj, generateSlots(key, show))
+        Object.assign(newObj, Utility.generateSlots(key, show, tempFilters))
       }
     })
     setTempFilters({ ...tempFilters, ...newObj })
@@ -97,16 +91,17 @@ export default function Menu({
       })
     } else if (id === 'global') {
       setAdvancedFilter({ open })
+      const newObj = tempFilters
       Object.entries(filteredObj).forEach(item => {
         const [key, { enabled }] = item
-        filteredObj[key] = { ...newFilters, enabled }
+        newObj[key] = { ...newFilters, enabled }
 
         // ugly patch for also changing gym slots with the apply to all
         if (key.startsWith('t') && key.charAt(1) != 0) {
-          generateSlots(key, newFilters)
+          Object.assign(newObj, Utility.generateSlots(key, newFilters, tempFilters))
         }
       })
-      setTempFilters({ ...tempFilters, ...filteredObj, [id]: newFilters })
+      setTempFilters({ ...tempFilters, ...newObj, [id]: newFilters })
     } else {
       setAdvancedFilter({ open })
       setTempFilters({ ...tempFilters, [id]: newFilters })
@@ -118,9 +113,26 @@ export default function Menu({
       return
     }
     if (id === 'global' && !open && newFilters) {
-      Object.keys(filteredObj).forEach(item => {
-        filteredObj[item] = { ...tempFilters[item], ...newFilters, enabled: true }
-      })
+      const wildCards = (() => {
+        switch (webhookCategory) {
+          case 'raid': return ['r90']
+          case 'egg': return ['e90']
+          case 'gym': return ['t4']
+          case 'invasion': return ['i0']
+          default: return ['0-0']
+        }
+      })()
+      if (newFilters.everything_individually !== false) {
+        Object.keys(filteredObj).forEach(item => {
+          if (!wildCards.includes(item)) {
+            filteredObj[item] = { ...tempFilters[item], ...newFilters, enabled: true }
+          }
+        })
+      } else {
+        wildCards.forEach(item => {
+          filteredObj[item] = { ...tempFilters[item], ...newFilters, enabled: true }
+        })
+      }
       setTempFilters({ ...tempFilters, ...filteredObj, [id]: newFilters })
     } else if (id && newFilters && !open) {
       setTempFilters({ ...tempFilters, [id]: { ...tempFilters[id], ...newFilters, enabled: true } })
@@ -177,9 +189,9 @@ export default function Menu({
   const footerButtons = [
     { name: 'help', action: () => setHelpDialog(!helpDialog), icon: 'HelpOutline', color: 'white' },
     { name: 'openFilter', action: toggleDrawer(true), icon: 'Ballot', color: 'white', mobileOnly: true },
-    { name: 'applyToAll', action: webhookCategory ? toggleWebhook(true, 'global') : toggleAdvMenu(true, 'global'), icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize', color: 'white' },
-    { name: 'disableAll', action: () => selectAllOrNone(false), icon: 'Clear', color: 'primary' },
-    { name: 'enableAll', action: () => selectAllOrNone(true), icon: 'Check', color: '#00e676' },
+    { name: 'apply_to_all', action: webhookCategory ? toggleWebhook(true, 'global') : toggleAdvMenu(true, 'global'), icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize', color: 'white' },
+    { name: 'disable_all', action: () => selectAllOrNone(false), icon: 'Clear', color: 'primary' },
+    { name: 'enable_all', action: () => selectAllOrNone(true), icon: 'Check', color: '#00e676' },
     ...extraButtons,
   ]
 
@@ -203,31 +215,43 @@ export default function Menu({
               setSearch={setSearch}
               category={category}
             />
-            <div style={{ flex: '1 1 auto' }}>
-              <ReactWindow
-                columnCount={columnCount}
-                length={filteredArr.length}
-                flex
-                offset={0}
-                data={{
-                  isMobile,
-                  tileItem: filteredArr,
-                  tempFilters,
-                  setTempFilters,
-                  toggleAdvMenu,
-                  toggleSlotsMenu,
-                  type: category,
-                  Utility,
-                  toggleWebhook,
-                  webhookCategory,
-                }}
-                Tile={Tile}
-              />
-            </div>
+            {filteredArr.length ? (
+              <div style={{ flex: '1 1 auto' }}>
+                <ReactWindow
+                  columnCount={columnCount}
+                  length={filteredArr.length}
+                  flex
+                  offset={0}
+                  data={{
+                    isMobile,
+                    tileItem: filteredArr,
+                    tempFilters,
+                    setTempFilters,
+                    toggleAdvMenu,
+                    toggleSlotsMenu,
+                    type: category,
+                    Utility,
+                    toggleWebhook,
+                    webhookCategory,
+                  }}
+                  Tile={Tile}
+                />
+              </div>
+            ) : (
+              <div style={{ flex: '1 1 auto' }}>
+                <Grid container alignItems="center" justifyContent="center" direction="column" style={{ height: '100%' }}>
+                  <Grid item style={{ whiteSpace: 'pre-line' }}>
+                    <Typography variant="h6" align="center">
+                      {t('no_filter_results')}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </div>
+            )}
           </Grid>
         </Grid>
       </DialogContent>
-      <Footer options={footerButtons} role="dialogFilterFooter" />
+      <Footer options={footerButtons} role="dialog_filter_footer" />
       <Drawer
         anchor="bottom"
         open={filterDrawer}

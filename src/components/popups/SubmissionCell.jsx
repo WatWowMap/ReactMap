@@ -14,7 +14,7 @@ export default function SubmissionCellPopup({ cell }) {
   if ((cell.count === 1 && cell.count_gyms < 1)
     || (cell.count === 5 && cell.count_gyms < 2)
     || (cell.count === 19 && cell.count_gyms < 3)) {
-    untilNextGym = t('nextSubmission')
+    untilNextGym = t('next_submission')
   }
 
   useEffect(() => {
@@ -24,12 +24,12 @@ export default function SubmissionCellPopup({ cell }) {
   return (
     <>
       <Typography variant="h6" align="center">
-        <Trans i18nKey="s2CellLevel">
+        <Trans i18nKey="s2_cell_level">
           {{ level: cell.level }}
         </Trans>
       </Typography>
       <Typography variant="subtitle2" align="center">
-        {t('totalCount')}: {cell.count}
+        {t('total_count')}: {cell.count}
       </Typography>
       <Typography variant="subtitle2" align="center">
         {t('pokestops')}: {cell.count_pokestops}
@@ -38,7 +38,7 @@ export default function SubmissionCellPopup({ cell }) {
         {t('gyms')}: {cell.count_gyms}
       </Typography>
       <Typography variant="subtitle2" align="center">
-        {t('nextGym')}: {untilNextGym}
+        {t('next_gym')}: {untilNextGym}
       </Typography>
     </>
   )

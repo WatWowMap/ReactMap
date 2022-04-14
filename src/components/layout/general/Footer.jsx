@@ -3,18 +3,17 @@ import {
   IconButton, Button, Typography, useMediaQuery, Grid,
 } from '@material-ui/core'
 import { useTheme } from '@material-ui/styles'
-import * as MuiIcons from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
 import useStyles from '@hooks/useStyles'
+
+import * as MuiIcons from './Icons'
 
 export default function Footer({ options, role }) {
   const { t } = useTranslation()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const classes = useStyles()
-
-  const capitalizeFirstChar = str => `${str.charAt(0).toUpperCase()}${str.substring(1)}`
 
   return (
     <Grid
@@ -45,7 +44,7 @@ export default function Footer({ options, role }) {
         return (
           <Grid
             item
-            xs={isMobile ? actualSize : +t(`${role}${capitalizeFirstChar(key)}Width`) || actualSize}
+            xs={isMobile ? actualSize : +t(`${role}_key_width`) || actualSize}
             key={key}
             style={{ textAlign: button.align || 'center' }}
           >

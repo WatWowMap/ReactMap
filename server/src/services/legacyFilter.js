@@ -4,13 +4,10 @@
 /* eslint-disable no-cond-assign */
 /* eslint-disable default-case */
 const requireFromString = require('require-from-string')
-const masterfile = require('../data/masterfile.json')
 const {
-  api: { pvpMinCp },
-  database: {
-    settings: { reactMapHandlesPvp },
-  },
+  api: { pvp: { minCp: pvpMinCp, reactMapHandlesPvp } },
 } = require('./config')
+const { Pvp, Event } = require('./initialization')
 
 const jsifyIvFilter = (filter) => {
   const input = filter.toUpperCase()
@@ -102,7 +99,7 @@ const jsifyIvFilter = (filter) => {
   return requireFromString(`module.exports = (pokemon) => ${result};`)
 }
 
-const getLegacy = (results, args, perms, ohbem) => {
+const getLegacy = (results, args, perms, ts) => {
   const pokemonLookup = {}
   const formLookup = {}
   const pokemonFilterIV = { or: args.filters.onlyIvOr.adv }
@@ -123,7 +120,7 @@ const getLegacy = (results, args, perms, ohbem) => {
     if (split.length === 2) {
       const pokemonId = parseInt(split[0])
       const formId = parseInt(split[1])
-      if ((masterfile.pokemon[pokemonId] || {}).defaultFormId === formId) {
+      if ((Event.masterfile.pokemon[pokemonId] || {}).defaultFormId === formId) {
         pokemonLookup[pokemonId] = false
       }
       formLookup[formId] = false
@@ -148,7 +145,7 @@ const getLegacy = (results, args, perms, ohbem) => {
         console.warn('Unrecognized key', key)
       } else {
         pokemonLookup[pokemonId] = false
-        const defaultForm = (masterfile.pokemon[pokemonId] || {}).defaultFormId
+        const defaultForm = (Event.masterfile.pokemon[pokemonId] || {}).defaultFormId
         if (defaultForm) {
           formLookup[defaultForm] = false
         }
@@ -170,7 +167,7 @@ const getLegacy = (results, args, perms, ohbem) => {
       if (split.length === 2) {
         const pokemonId = parseInt(split[0])
         const formId = parseInt(split[1])
-        if ((masterfile.pokemon[pokemonId] || {}).defaultFormId === formId) {
+        if ((Event.masterfile.pokemon[pokemonId] || {}).defaultFormId === formId) {
           pokemonLookup[pokemonId] = jsFilter
         }
         formLookup[formId] = jsFilter
@@ -185,7 +182,7 @@ const getLegacy = (results, args, perms, ohbem) => {
           console.warn('Unrecognized key', key)
         } else {
           pokemonLookup[pokemonId] = jsFilter
-          const defaultForm = (masterfile.pokemon[pokemonId] || {}).defaultFormId
+          const defaultForm = (Event.masterfile.pokemon[pokemonId] || {}).defaultFormId
           if (defaultForm) {
             formLookup[defaultForm] = jsFilter
           }
@@ -204,7 +201,7 @@ const getLegacy = (results, args, perms, ohbem) => {
         continue
       }
       if (entry.evolution) {
-        if (masterfile.pokemon[entry.pokemon].tempEvolutions[entry.evolution].unreleased
+        if (Event.masterfile.pokemon[entry.pokemon].tempEvolutions[entry.evolution].unreleased
           ? !interestedMegas.includes('experimental')
           : !interestedMegas.includes(entry.evolution)) {
           continue
@@ -228,14 +225,21 @@ const getLegacy = (results, args, perms, ohbem) => {
   }
 
   const pokemon = []
-  if (results && results.length > 0) {
+  if (results && results.length) {
     for (let i = 0; i < results.length; i++) {
       bestPvp = 4096
       const result = results[i]
       const filtered = {}
       if (result.pokemon_id === 132) {
         filtered.ditto_form = result.form
-        result.form = masterfile.pokemon[result.pokemon_id]?.defaultFormId || 0
+        result.form = Event.masterfile.pokemon[result.pokemon_id]?.defaultFormId || 0
+        const statsToCheck = ['atk', 'def', 'sta']
+        statsToCheck.forEach(stat => {
+          if (!result[`${stat}_iv`] && result[`${stat}_inactive`]) {
+            result[`${stat}_iv`] = result[`${stat}_inactive`]
+            result.inactive_stats = true
+          }
+        })
       }
       if (!result.seen_type) {
         if (result.spawn_id === null) {
@@ -244,7 +248,7 @@ const getLegacy = (results, args, perms, ohbem) => {
           result.seen_type = 'encounter'
         }
       }
-      if (perms.iv || perms.stats) {
+      if (perms.iv) {
         filtered.atk_iv = result.atk_iv
         filtered.def_iv = result.def_iv
         filtered.sta_iv = result.sta_iv
@@ -252,20 +256,11 @@ const getLegacy = (results, args, perms, ohbem) => {
         filtered.iv = result.iv
         filtered.level = result.level
       }
-      if (perms.pvp && interestedLevelCaps.length > 0) {
+      if (perms.pvp && interestedLevelCaps.length) {
         const { great, ultra } = pvpMinCp
         filtered.cleanPvp = {}
         if (result.pvp || (reactMapHandlesPvp && result.cp)) {
-          const pvpResults = reactMapHandlesPvp ? ohbem.queryPvPRank(
-            result.pokemon_id,
-            result.form,
-            result.costume,
-            result.gender,
-            result.atk_iv,
-            result.def_iv,
-            result.sta_iv,
-            result.level,
-          ) : JSON.parse(result.pvp)
+          const pvpResults = reactMapHandlesPvp ? Pvp.resultWithCache(result, ts) : JSON.parse(result.pvp)
           Object.keys(pvpResults).forEach(league => {
             filterLeagueStats(pvpResults[league], filtered.cleanPvp[league] = [])
           })
@@ -290,6 +285,15 @@ const getLegacy = (results, args, perms, ohbem) => {
       if (!pokemonFilter) {
         continue
       }
+      if (!result.seen_type) {
+        if (result.spawn_id === null) {
+          filtered.seen_type = result.pokestop_id ? 'nearby_stop' : 'nearby_cell'
+        } else {
+          filtered.seen_type = 'encounter'
+        }
+      } else {
+        filtered.seen_type = result.seen_type
+      }
       filtered.id = result.id
       filtered.pokemon_id = result.pokemon_id
       filtered.lat = result.lat
@@ -308,7 +312,7 @@ const getLegacy = (results, args, perms, ohbem) => {
       filtered.cellId = result.cell_id
       filtered.expire_timestamp_verified = result.expire_timestamp_verified
       filtered.display_pokemon_id = result.display_pokemon_id
-      if (perms.iv || perms.stats) {
+      if (perms.iv) {
         filtered.move_1 = result.move_1
         filtered.move_2 = result.move_2
         filtered.weight = result.weight

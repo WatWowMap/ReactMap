@@ -5,9 +5,11 @@ import {
 import { ExpandMore, Clear, Settings } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
+import Utility from '@services/Utility'
+
 import SettingsMenu from './Settings'
 import WithSubItems from './WithSubItems'
-import WithSliders from './WithSliders'
+import PokemonSection from './Pokemon'
 import useStyles from '../../../hooks/useStyles'
 import { useStore, useStatic } from '../../../hooks/useStore'
 import Areas from './Areas'
@@ -21,7 +23,13 @@ export default function Sidebar({
   const classes = useStyles()
   const ui = useStatic(state => state.ui)
   const staticUserSettings = useStatic(state => state.userSettings)
-  const { map: { title, scanAreasZoom, noScanAreaOverlay }, manualAreas } = useStatic(state => state.config)
+  const {
+    manualAreas,
+    map: {
+      title, scanAreasZoom, noScanAreaOverlay, enableQuestSetSelector,
+    },
+  } = useStatic(state => state.config)
+  const available = useStatic(s => s.available)
   const { t } = useTranslation()
 
   const handleChange = (panel) => (event, isExpanded) => {
@@ -31,22 +39,9 @@ export default function Sidebar({
   const drawerItems = Object.keys(ui).map(category => {
     let content
     switch (category) {
-      default:
-        content = (
-          Object.keys(ui[category]).map(subItem => (
-            <WithSubItems
-              key={`${category}-${subItem}`}
-              category={category}
-              filters={filters}
-              setFilters={setFilters}
-              subItem={subItem}
-              noScanAreaOverlay={noScanAreaOverlay}
-            />
-          ))
-        ); break
       case 'pokemon':
         content = (
-          <WithSliders
+          <PokemonSection
             category={category}
             context={ui[category]}
             specificFilter="ivOr"
@@ -57,7 +52,23 @@ export default function Sidebar({
       case 'settings':
         content = (
           <SettingsMenu toggleDialog={toggleDialog} Icons={Icons} />
-        )
+        ); break
+      default:
+        content = (
+          Object.keys(ui[category]).map(subItem => (
+            <WithSubItems
+              key={`${category}-${subItem}`}
+              category={category}
+              data={ui[category][subItem]}
+              filters={filters}
+              setFilters={setFilters}
+              subItem={subItem}
+              noScanAreaOverlay={noScanAreaOverlay}
+              enableQuestSetSelector={enableQuestSetSelector}
+              available={available}
+            />
+          ))
+        ); break
     }
     return (
       <Accordion
@@ -69,7 +80,7 @@ export default function Sidebar({
           expandIcon={<ExpandMore style={{ color: 'white' }} />}
         >
           <Typography className={classes.heading}>
-            {t(category)}
+            {t(Utility.camelToSnake(category))}
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
@@ -83,7 +94,7 @@ export default function Sidebar({
           >
             {content}
             {staticUserSettings[category] && (
-              <Grid item xs={t('drawerGridOptionsWidth')} style={{ textAlign: 'center' }}>
+              <Grid item xs={t('drawer_grid_options_width')} style={{ textAlign: 'center' }}>
                 <Button
                   onClick={toggleDialog(true, category, 'options')}
                   variant="contained"
@@ -99,7 +110,7 @@ export default function Sidebar({
               || category === 'pokestops'
               || category === 'nests')
               && (
-                <Grid item xs={t('drawerGridAdvancedWidth')} style={{ textAlign: 'center' }}>
+                <Grid item xs={t('drawer_grid_advanced_width')} style={{ textAlign: 'center' }}>
                   <Button
                     onClick={toggleDialog(true, category, 'filters')}
                     variant="contained"
@@ -110,10 +121,10 @@ export default function Sidebar({
                 </Grid>
               )}
             {category === 'scanAreas' && (
-            <Areas
-              scanAreasZoom={scanAreasZoom}
-              manualAreas={manualAreas}
-            />
+              <Areas
+                scanAreasZoom={scanAreasZoom}
+                manualAreas={manualAreas}
+              />
             )}
           </Grid>
         </AccordionDetails>
@@ -128,7 +139,6 @@ export default function Sidebar({
       open={drawer}
       onClose={toggleDrawer(false)}
       classes={{ paper: classes.drawer }}
-      style={{ overflow: 'hidden' }}
     >
       <Grid
         container

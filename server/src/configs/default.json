@@ -1,13 +1,7 @@
 {
   "interface": "0.0.0.0",
   "port": 8080,
-  "localeSelection": [
-    "en",
-    "de",
-    "pl",
-    "es",
-    "fr"
-  ],
+  "packageSource": "git",
   "devOptions": {
     "enabled": false,
     "graphiql": false,
@@ -16,64 +10,154 @@
   },
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
+    "reactMapSecret": "",
     "maxSessions": 5,
     "rateLimit": {
       "time": 60,
       "requests": 1000
     },
-    "pvpMinCp": {
-      "great": 1400,
-      "ultra": 2400
+    "queryUpdateHours": {
+      "pokemon": 0.5,
+      "quests": 1,
+      "raids": 0.5,
+      "nests": 3
     },
-    "queryAvailable": {
-      "pokemon": true,
+    "queryOnSessionInit": {
+      "pokemon": false,
       "quests": false,
       "raids": false,
       "nests": false
     },
+    "queryLimits": {
+      "pokemon": 10000,
+      "pokemonPvp": 25000,
+      "pokestops": 5000,
+      "gyms": 5000,
+      "portals": 5000,
+      "spawnpoints": 10000,
+      "nests": 2500,
+      "scanCells": 5000
+    },
+    "pvp": {
+      "leagues": [
+        {
+          "name": "great",
+          "cp": 1500
+        },
+        {
+          "name": "ultra",
+          "cp": 2500
+        }
+      ],
+      "levels": [
+        50,
+        51
+      ],
+      "reactMapHandlesPvp": false,
+      "minCp": {
+        "great": 1400,
+        "ultra": 2400
+      }
+    },
+    "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
-    "searchResultsLimit": 15
-  },
-  "multiDomains": {},
-  "map": {
-    "title": "ReactMap",
-    "headerTitle": "ReactMap",
+    "searchResultsLimit": 15,
     "nestHemisphere": "north",
-    "enableFeedback": false,
-    "feedbackLink": "https://forms.gle/wKqWRs9Z7XEAPB7AA",
-    "enableStats": false,
-    "statsLink": "https://rdmopole2link.net",
-    "rolesLinkName": "Role Upgrading Info",
-    "rolesLink": "https://discordsomething.net",
-    "startLat": 0,
-    "startLon": 0,
-    "startZoom": 12,
-    "minZoom": 10,
-    "maxZoom": 18,
-    "noScanAreaOverlay": false,
-    "interactionRangeZoom": 15,
-    "scanAreasZoom": 12,
-    "scanCellsZoom": 13,
-    "submissionZoom": 15,
-    "legacyPkmnFilter": true,
-    "enableQuestRewardTypeFilters": false,
-    "fetchLatestInvasions": true,
-    "invasionCacheHrs": 1,
-    "questMessage": "",
-    "navigationControls": "react",
+    "gymValidDataLimit": 30,
+    "hideOldGyms": false,
+    "stopValidDataLimit": 30,
+    "hideOldPokestops": false
+  },
+  "multiDomains": [],
+  "map": {
+    "general": {
+      "title": "ReactMap",
+      "headerTitle": "ReactMap",
+      "startLat": 0,
+      "startLon": 0,
+      "startZoom": 12,
+      "minZoom": 10,
+      "maxZoom": 18,
+      "interactionRangeZoom": 15,
+      "scanAreasZoom": 12,
+      "scanCellsZoom": 13,
+      "submissionZoom": 15,
+      "activeWeatherZoom": 13,
+      "geoJsonFileName": "areas.json",
+      "attributionPrefix": "<a href='https://github.com/WatWowMap/ReactMap' target='_blank' rel='noreferrer'>ReactMap</a>"
+    },
+    "localeSelection": [
+      "en",
+      "de",
+      "pl",
+      "es",
+      "fr",
+      "nl"
+    ],
+    "customRoutes": {
+      "discordAuthUrl": "/auth/discord/callback",
+      "telegramAuthUrl": "/auth/telegram/callback",
+      "telegramBotEnvRef": "TELEGRAM_BOT_NAME",
+      "localAuthUrl": "/auth/local/callback"
+    },
+    "links": {
+      "discordInvite": "",
+      "feedbackLink": "",
+      "statsLink": "",
+      "rolesLinkName": "Role Upgrading Info",
+      "rolesLink": ""
+    },
+    "holidayEffects": {
+      "christmasSnow": true,
+      "newYearsFireworks": true,
+      "valentinesDay": true,
+      "internationalWomensDay": true
+    },
+    "misc": {
+      "enableMapJsFilter": true,
+      "questRewardTypeFilters": false,
+      "fetchLatestInvasions": true,
+      "invasionCacheHrs": 1,
+      "masterfileCacheHrs": 6,
+      "webhookCacheHrs": 1,
+      "questMessage": "",
+      "navigationControls": "react",
+      "enableFloatingProfileButton": false,
+      "forceTutorial": true,
+      "enableTutorial": true,
+      "enableUserProfile": true,
+      "enableQuestSetSelector": false,
+      "noScanAreaOverlay": false,
+      "permImageDir": "images/perms",
+      "permArrayImages": false
+    },
     "theme": {
       "style": "dark",
       "primary": "#ff5722",
       "secondary": "#00b0ff",
       "drawer": "temporary"
     },
-    "clusterZoomLevels": {
-      "forcedClusterLimit": 2500,
-      "gyms": 13,
-      "pokestops": 14,
-      "pokemon": 15,
-      "portals": 14,
-      "spawnpoints": 12
+    "clustering": {
+      "gyms": {
+        "zoomLevel": 13,
+        "forcedLimit": 2500
+      },
+      "pokestops": {
+        "zoomLevel": 14,
+        "forcedLimit": 2500
+      },
+      "pokemon": {
+        "zoomLevel": 15,
+        "forcedLimit": 3000
+      },
+      "portals": {
+        "zoomLevel": 14,
+        "forcedLimit": 3000
+      },
+      "spawnpoints": {
+        "zoomLevel": 12,
+        "forcedLimit": 5000
+      }
     },
     "messageOfTheDay": {
       "index": 0,
@@ -82,10 +166,36 @@
         "parentAlignItems": "center",
         "parentJustifyContent": "center",
         "parentStyle": {},
-        "permanent": false
+        "permanent": false,
+        "freeloaderOnly": false,
+        "donorOnly": false
       },
-      "messages": [],
+      "titles": [],
+      "components": [],
       "footerButtons": []
+    },
+    "donationPage": {
+      "showOnMap": false,
+      "showToDonors": false,
+      "fabIcon": "card",
+      "settings": {
+        "parentSpacing": 0,
+        "parentAlignItems": "center",
+        "parentJustifyContent": "center",
+        "parentStyle": {}
+      },
+      "titles": [],
+      "components": [],
+      "footerButtons": []
+    },
+    "loginPage": {
+      "settings": {
+        "parentSpacing": 0,
+        "parentAlignItems": "center",
+        "parentJustifyContent": "center",
+        "parentStyle": {}
+      },
+      "components": []
     }
   },
   "clientSideOptions": {
@@ -99,7 +209,7 @@
       "showExBadge": false,
       "showArBadge": false,
       "raidLevelBadges": false,
-      "raidsOr": true
+      "gymBadgeDiamonds": true
     },
     "pokestops": {
       "clustering": true,
@@ -160,18 +270,22 @@
       "inBattle": false,
       "raids": true,
       "eggs": true,
-      "pokemon": true
+      "pokemon": true,
+      "gymBadges": false
     },
     "nests": {
       "enabled": false,
       "polygons": false,
       "pokemon": false,
-      "allPokemon": true
+      "allPokemon": true,
+      "avgFilter": [0, 100],
+      "avgSliderStep": 1
     },
     "pokestops": {
       "enabled": false,
       "lures": true,
       "quests": true,
+      "questSet": "both",
       "items": true,
       "megaEnergy": true,
       "candy": true,
@@ -182,6 +296,7 @@
     "pokemon": {
       "enabled": false,
       "legacyFilter": false,
+      "allPokemon": false,
       "globalValues": {
         "iv": [
           80,
@@ -202,12 +317,12 @@
         "sta_iv": [
           0,
           15
+        ],
+        "pvp": [
+          1,
+          10
         ]
-      },
-      "pvpValues": [
-        1,
-        10
-      ]
+      }
     },
     "portals": {
       "enabled": false
@@ -231,66 +346,106 @@
   "database": {
     "settings": {
       "userTableName": "users",
+      "gymBadgeTableName": "gymBadges",
       "sessionTableName": "session",
       "migrationTableName": "knex_migrations",
-      "leagues": [],
-      "reactMapHandlesPvp": false,
-      "pvpLevels": [],
-      "hideOldQuests": true
+      "joinGymBadgeTable": false,
+      "hideOldQuests": false,
+      "maxConnections": 10
     },
-    "schemas": {
-      "scanner": {
-        "type": "rdm",
+    "schemas": [
+      {
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",
         "password": "pass123!",
         "database": "rdmdb",
-        "charset": "utf8mb4",
-        "arScanColumn": false,
-        "hasAltQuests": false,
         "useFor": []
       },
-      "manual": {
-        "type": "manual",
+      {
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",
         "password": "pass123!",
         "database": "manualdb",
-        "charset": "utf8mb4",
-        "arScanColumn": false,
         "useFor": []
       }
+    ]
+  },
+  "scanner": {
+    "backendConfig": {
+      "platform": "rdm/mad",
+      "apiEndpoint": "http://ip:port/api/",
+      "apiUsername": "username",
+      "apiPassword": "password",
+      "queueRefreshInterval": 5
+    },
+    "scanNext": {
+      "enabled": false,
+      "showScanCount": false,
+      "showScanQueue": false,
+      "scanNextInstance": "scanNext",
+      "scanNextDevice": "Device01",
+      "scanNextSleeptime": 5,
+      "scanNextAreaRestriction": [],
+      "discordRoles": [],
+      "telegramGroups": []
+    },
+    "scanZone": {
+      "enabled": false,
+      "showScanCount": false,
+      "showScanQueue": false,
+      "scanZoneMaxSize": 10,
+      "advancedScanZoneOptions": false,
+      "scanZoneRadius": { "pokemon": 70, "gym": 750 },
+      "scanZoneSpacing": 1,
+      "scanZoneInstance": "scanZone",
+      "scanZoneAreaRestriction": [],
+      "discordRoles": [],
+      "telegramGroups": []
     }
   },
   "webhooks": [],
-  "excludeFromTutorial": [],
-  "alwaysEnabledPerms": [],
-  "discord": {
-    "enabled": false,
-    "logChannelId": "",
-    "presence": "Map Status: Online",
-    "presenceType": 3,
-    "botToken": "",
-    "clientId": "",
-    "clientSecret": "",
-    "redirectUri": "http://localhost:8080/auth/discord/callback",
-    "allowedGuilds": [],
-    "blockedGuilds": [],
-    "allowedUsers": [],
+  "authentication": {
+    "strategies": [
+      {
+        "name": "discord",
+        "type": "discord",
+        "enabled": false,
+        "logChannelId": "",
+        "presence": "Map Status: Online",
+        "presenceType": 3,
+        "botToken": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectUri": "http://localhost:8080/auth/discord/callback",
+        "allowedGuilds": [],
+        "blockedGuilds": [],
+        "allowedUsers": []
+      },
+      {
+        "name": "telegram",
+        "type": "telegram",
+        "enabled": false,
+        "botToken": "",
+        "groups": []
+      },
+      {
+        "name": "local",
+        "type": "local",
+        "enabled": false
+      }
+    ],
     "areaRestrictions": [],
     "skipAreaRestrictionPerms": [],
+    "excludeFromTutorial": [],
+    "alwaysEnabledPerms": [],
     "perms": {
       "map": {
         "enabled": true,
         "roles": []
       },
       "pokemon": {
-        "enabled": true,
-        "roles": []
-      },
-      "stats": {
         "enabled": true,
         "roles": []
       },
@@ -350,7 +505,7 @@
         "enabled": true,
         "roles": []
       },
-      "s2cells": {
+      "scanCells": {
         "enabled": true,
         "roles": []
       },
@@ -361,129 +516,72 @@
       "donor": {
         "enabled": true,
         "roles": []
-      }
-    }
-  },
-  "telegram": {
-    "enabled": false,
-    "botToken": "",
-    "groups": [""],
-    "areaRestrictions": [],
-    "perms": {
-      "map": {
-        "enabled": true,
-        "roles": []
       },
-      "gyms": {
-        "enabled": true,
-        "roles": []
-      },
-      "raids": {
-        "enabled": true,
-        "roles": []
-      },
-      "nests": {
-        "enabled": true,
-        "roles": []
-      },
-      "pokestops": {
-        "enabled": true,
-        "roles": []
-      },
-      "quests": {
-        "enabled": true,
-        "roles": []
-      },
-      "lures": {
-        "enabled": true,
-        "roles": []
-      },
-      "invasions": {
-        "enabled": true,
-        "roles": []
-      },
-      "pokemon": {
-        "enabled": true,
-        "roles": []
-      },
-      "stats": {
-        "enabled": true,
-        "roles": []
-      },
-      "iv": {
-        "enabled": true,
-        "roles": []
-      },
-      "pvp": {
-        "enabled": true,
-        "roles": []
-      },
-      "portals": {
-        "enabled": true,
-        "roles": []
-      },
-      "submissionCells": {
-        "enabled": true,
-        "roles": []
-      },
-      "scanAreas": {
-        "enabled": true,
-        "roles": []
-      },
-      "weather": {
-        "enabled": true,
-        "roles": []
-      },
-      "s2cells": {
-        "enabled": true,
-        "roles": []
-      },
-      "spawnpoints": {
-        "enabled": true,
-        "roles": []
-      },
-      "devices": {
+      "gymBadges": {
         "enabled": true,
         "roles": []
       }
     }
   },
-  "tileServers": {
-    "Default": {
+  "tileServers": [
+    {
+      "name": "auto"
+    },
+    {
+      "name": "Carto",
       "attribution": "Map tiles by Carto, under CC BY 3.0. Data by  <a href='https://www.openstreetmap.org/'>OpenStreetMap</a>, under ODbL.",
       "url": "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png",
       "style": "light"
     },
-    "OSM": {
+    {
+      "name": "OSM",
       "attribution": "Map data Â© <a href='https://www.openstreetmap.org'>OpenStreetMap</a> contributors",
       "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
       "style": "light"
     },
-    "DarkMatter": {
+    {
+      "name": "Dark Matter",
       "attribution": "Â© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors Â© <a href='https://carto.com/attributions'>CARTO</a>",
       "url": "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       "style": "dark"
     },
-    "Satellite": {
+    {
+      "name": "Satellite",
       "attribution": "&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
       "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       "style": "dark"
+    },
+    {
+      "name": "AlidadeSmoothDark",
+      "attribution": "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors",
+      "url": "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
+      "style": "dark"
+    },
+    {
+      "name": "ThunderForest",
+      "attribution": "&copy; <a href='http://www.thunderforest.com/'>Thunderforest</a>, &copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+      "url": "https://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png",
+      "style": "dark"
     }
-  },
-  "navigation": {
-    "GoogleMaps": {
+  ],
+  "navigation": [
+    {
+      "name": "Google Maps",
       "url": "https://www.google.com/maps/place/{x},{y}"
     },
-    "AppleMaps": {
+    {
+      "name": "Apple Maps",
       "url": "https://maps.apple.com/maps?daddr={x},{y}"
     },
-    "Waze": {
+    {
+      "name": "Waze",
       "url": "https://www.waze.com/ul?ll={x},{y}"
     },
-    "Intel": {
+    {
+      "name": "Intel",
       "url": "https://intel.ingress.com/intel?pll={x},{y}"
     }
-  },
+  ],
   "icons": {
     "Read_More_Here": "https://github.com/WatWowMap/ReactMap/wiki/Icons-Configuration",
     "customizable": [],
@@ -555,5 +653,5 @@
     "regional": [],
     "event": []
   },
-  "manualAreas": {}
+  "manualAreas": []
 }

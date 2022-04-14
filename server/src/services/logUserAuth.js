@@ -1,14 +1,12 @@
 /* eslint-disable no-console */
 const Fetch = require('./Fetch')
-const config = require('./config')
 
 module.exports = async function getAuthInfo(req, user, strategy) {
   const ip = req.headers['cf-connecting-ip']
     || ((req.headers['x-forwarded-for'] || '').split(', ')[0])
     || (req.connection.remoteAddress || req.connection.localAddress).match('[0-9]+.[0-9].+[0-9]+.[0-9]+$')[0]
 
-  const url = `http://ip-api.com/json/${ip}?fields=66846719&lang=${config.map.locale || 'en'}`
-  const geo = await Fetch.fetchJson(url)
+  const geo = await Fetch.json(`http://ip-api.com/json/${ip}?fields=66846719&lang=en`)
   const embed = {
     color: 0xFF0000,
     title: 'Authentication',
@@ -64,15 +62,15 @@ module.exports = async function getAuthInfo(req, user, strategy) {
     timestamp: new Date(),
   }
   if (user.valid) {
-    console.log(user.username, `(${user.id})`, 'Authenticated successfully.')
+    console.log('[DISCORD]', user.username, `(${user.id})`, 'Authenticated successfully.')
     embed.description = `${user.username} Successfully Authenticated`
     embed.color = 0x00FF00
   } else if (user.blocked) {
-    console.warn(user.id, 'Blocked due to', user.blocked)
+    console.warn('[DISCORD]', user.id, 'Blocked due to', user.blocked)
     embed.description = `User Blocked Due to ${user.blocked}`
     embed.color = 0xFF0000
   } else {
-    console.warn(user.id, 'Not authorized to access map')
+    console.warn('[DISCORD]', user.id, 'Not authorized to access map')
   }
   return embed
 }

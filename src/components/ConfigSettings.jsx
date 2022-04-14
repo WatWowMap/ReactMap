@@ -1,12 +1,11 @@
 import React from 'react'
 import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
-import { ThemeProvider } from '@material-ui/styles'
+import * as Sentry from '@sentry/react'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
 
-import setTheme from '@assets/mui/theme'
 import useGenerate from '@hooks/useGenerate'
 
 import Map from './Map'
@@ -14,11 +13,9 @@ import Map from './Map'
 export default function ConfigSettings({
   serverSettings, match, paramLocation, paramZoom,
 }) {
-  Utility.analytics('Discord', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
+  Utility.analytics('User', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
 
-  document.title = serverSettings.config.map.headerTitle
-  const theme = setTheme(serverSettings.config.map.theme)
-  document.body.classList.add('dark')
+  document.title = serverSettings.config?.map?.headerTitle
 
   const setUserSettings = useStore(state => state.setUserSettings)
   const setSettings = useStore(state => state.setSettings)
@@ -28,6 +25,7 @@ export default function ConfigSettings({
   const setMenus = useStore(state => state.setMenus)
   const setIcons = useStore(state => state.setIcons)
   const setSelectedWebhook = useStore(state => state.setSelectedWebhook)
+  const setTutorial = useStore(state => state.setTutorial)
 
   const setAuth = useStatic(state => state.setAuth)
   const setStaticUserSettings = useStatic(state => state.setUserSettings)
@@ -46,7 +44,7 @@ export default function ConfigSettings({
   const localState = JSON.parse(localStorage.getItem('local-state'))
 
   const updateObjState = (defaults, category) => {
-    if (localState && localState.state && localState.state[category]) {
+    if (localState?.state?.[category]) {
       const newState = {}
       extend(true, newState, defaults, localState.state[category])
       return newState
@@ -55,7 +53,7 @@ export default function ConfigSettings({
   }
 
   const updatePositionState = (defaults, category) => {
-    if (localState && localState.state && localState.state[category]) {
+    if (localState?.state?.[category]) {
       return localState.state[category]
     }
     return defaults
@@ -63,25 +61,53 @@ export default function ConfigSettings({
 
   setAuth({
     strategy: serverSettings.user.strategy,
+    discordId: serverSettings.user.discordId,
+    telegramId: serverSettings.user.telegramId,
+    webhookStrategy: serverSettings.user.webhookStrategy,
     loggedIn: serverSettings.loggedIn,
     perms: serverSettings.user ? serverSettings.user.perms : {},
     methods: serverSettings.authMethods,
+    username: serverSettings.user.username,
   })
+  Sentry.setUser({ username: serverSettings.user.username, id: serverSettings.user.id })
+
+  setTutorial(serverSettings.user.tutorial === undefined
+    ? Boolean(localState?.state?.tutorial)
+    : !serverSettings.user.tutorial)
   setUi(serverSettings.ui)
+
   setMasterfile(serverSettings.masterfile)
   setAvailable(serverSettings.available)
-
   setMenus(updateObjState(serverSettings.menus, 'menus'))
   setStaticMenus(serverSettings.menus)
 
   if (localState?.state?.filters?.pokemon?.standard) {
     delete localState.state.filters.pokemon.standard
   }
+
   setFilters(updateObjState(serverSettings.defaultFilters, 'filters'))
   setStaticFilters(serverSettings.defaultFilters)
 
   setUserSettings(updateObjState(serverSettings.userSettings, 'userSettings'))
   setStaticUserSettings(serverSettings.clientMenus)
+
+  if (localState?.state?.settings) {
+    const cached = localState.state.settings.localeSelection
+    const i18cached = localStorage.getItem('i18nextLng')
+    localState.state.settings.localeSelection = cached !== i18cached ? i18cached : cached
+
+    const validNav = Object.keys(serverSettings.config.navigation)
+    localState.state.settings.navigation = validNav.includes(localState.state.settings.navigation)
+      ? localState.state.settings.navigation
+      : serverSettings.config.navigation[validNav[0]]?.name
+
+    const validTs = Object.keys(serverSettings.config.tileServers)
+    localState.state.settings.tileServers = validTs.includes(localState.state.settings.tileServers)
+      ? localState.state.settings.tileServers
+      : serverSettings.config.tileServers[validTs[0]]?.name
+  } else {
+    serverSettings.settings.localeSelection = localStorage.getItem('i18nextLng') || serverSettings.settings.localeSelection
+  }
 
   setSettings(updateObjState(serverSettings.settings, 'settings'))
   setStaticSettings(serverSettings.settings)
@@ -130,21 +156,19 @@ export default function ConfigSettings({
   setIsNight(Utility.nightCheck(...getStartLocation()))
 
   return (
-    <ThemeProvider theme={theme}>
-      <MapContainer
-        tap={false}
-        center={getStartLocation()}
-        zoom={getStartZoom()}
-        zoomControl={false}
-        preferCanvas
-      >
-        {(serverSettings.user && serverSettings.user.perms.map) && (
-          <Map
-            serverSettings={serverSettings}
-            params={match.params}
-          />
-        )}
-      </MapContainer>
-    </ThemeProvider>
+    <MapContainer
+      tap={false}
+      center={getStartLocation()}
+      zoom={getStartZoom()}
+      zoomControl={false}
+      preferCanvas
+    >
+      {(serverSettings.user && serverSettings.user.perms.map) && (
+        <Map
+          serverSettings={serverSettings}
+          params={match.params}
+        />
+      )}
+    </MapContainer>
   )
 }

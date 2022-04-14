@@ -37,6 +37,9 @@ export default makeStyles(theme => ({
   formControlLabel: {
     marginTop: theme.spacing(1),
   },
+  accordionSummary: {
+    backgroundColor: '#2e2e2e',
+  },
   list: {
     width: 'auto',
     zIndex: 9998,
@@ -45,7 +48,6 @@ export default makeStyles(theme => ({
   },
   drawer: {
     background: 'rgb(51,51,51)',
-    overflow: 'hidden',
   },
   floatingBtn: {
     '& > *': {

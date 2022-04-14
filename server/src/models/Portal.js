@@ -1,22 +1,27 @@
 const { Model } = require('objection')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { api: { searchResultsLimit } } = require('../services/config')
+const {
+  api: { searchResultsLimit, portalUpdateLimit, queryLimits },
+} = require('../services/config')
 
-class Portal extends Model {
+module.exports = class Portal extends Model {
   static get tableName() {
     return 'ingress_portals'
   }
 
-  static async getAllPortals(args, perms) {
+  static async getAll(perms, args) {
     const { areaRestrictions } = perms
     const query = this.query()
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
-    getAreaSql(query, areaRestrictions, false, 'portals')
-    return query
+      .andWhere('updated', '>', (Date.now() / 1000) - portalUpdateLimit * 60 * 60 * 24)
+    if (areaRestrictions?.length) {
+      getAreaSql(query, areaRestrictions, false, 'portals')
+    }
+    return query.limit(queryLimits.portals)
   }
 
-  static async search(args, perms, isMad, distance) {
+  static async search(perms, args, { isMad }, distance) {
     const { areaRestrictions } = perms
     const query = this.query()
       .select([
@@ -27,12 +32,17 @@ class Portal extends Model {
         'url',
         distance,
       ])
-      .orWhereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .whereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .andWhere('updated', '>', (Date.now() / 1000) - portalUpdateLimit * 60 * 60 * 24)
       .limit(searchResultsLimit)
       .orderBy('distance')
-    getAreaSql(query, areaRestrictions, isMad, 'portals')
+    if (areaRestrictions?.length) {
+      getAreaSql(query, areaRestrictions, isMad, 'portals')
+    }
     return query
   }
-}
 
-module.exports = Portal
+  static getOne(id) {
+    return this.query().findById(id).select(['lat', 'lon'])
+  }
+}

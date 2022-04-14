@@ -1,29 +1,30 @@
+/* eslint-disable no-console */
 const fetchJson = require('./fetchJson')
-const config = require('../config')
+const { Event } = require('../initialization')
 
-const looper = (num, toLoop, staticData, skipZero) => {
-  const arr = []
-  for (let i = skipZero ? 1 : 0; i <= num; i += 1) {
-    arr.push({ ...staticData, [toLoop]: i })
+const getWildCards = (category, gymBattles) => {
+  switch (category) {
+    case 'gym': return { team: 4, slot_changes: true, battle_changes: gymBattles }
+    case 'egg':
+    case 'raid': return { level: 90 }
+    default: return {}
   }
-  return arr
 }
 
 module.exports = async function resolveQuickHook(category, discordId, webhookName, data) {
-  const webhook = config.webhookObj[webhookName]
+  const webhook = Event.webhookObj[webhookName]
   try {
     switch (category) {
       case 'quickGym': {
         const subCategories = ['raid', 'egg', 'gym']
         await Promise.all(subCategories.map(async subCategory => {
-          const hookArray = subCategory === 'gym'
-            ? looper(3, 'team', webhook.client.info[subCategory].defaults, false)
-              .map(x => ({ ...x, slot_changes: true, battle_changes: true }))
-            : looper(6, 'level', webhook.client.info[subCategory].defaults, true)
-          const withId = hookArray.map(x => ({ ...x, gym_id: data.id }))
           const post = await fetchJson(`${webhook.server.host}:${webhook.server.port}/api/tracking/${subCategory}/${discordId}`, {
             method: 'POST',
-            body: JSON.stringify(withId),
+            body: JSON.stringify({
+              ...webhook.client.info[subCategory].defaults,
+              ...getWildCards(subCategory, webhook.client.gymBattles),
+              gym_id: data.id,
+            }),
             headers: {
               'X-Poracle-Secret': webhook.server.poracleSecret,
               Accept: 'application/json',

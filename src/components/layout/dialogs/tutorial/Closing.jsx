@@ -21,14 +21,14 @@ export default function TutClosing() {
         {closing.map(i => (
           <Grid item xs={12} key={i}>
             <Typography variant={i ? 'subtitle1' : 'h5'} align="center">
-              {t(`tutorialClosing${i}`)}
+              {t(`tutorial_closing_${i}`)}
             </Typography>
             <Divider light style={{ margin: 10 }} />
           </Grid>
         ))}
         <Grid item xs={12}>
           <Typography variant="subtitle1" align="center">
-            {t('tutorialClosing5')}
+            {t('tutorial_closing_5')}
           </Typography>
         </Grid>
       </Grid>

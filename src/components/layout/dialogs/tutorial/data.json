@@ -266,7 +266,7 @@
       "label": "",
       "min": 0,
       "max": 15,
-      "perm": "stats",
+      "perm": "iv",
       "disabled": false,
       "color": "secondary"
     },
@@ -275,7 +275,7 @@
       "label": "",
       "min": 0,
       "max": 15,
-      "perm": "stats",
+      "perm": "iv",
       "disabled": false,
       "color": "secondary"
     },
@@ -284,7 +284,7 @@
       "label": "",
       "min": 0,
       "max": 15,
-      "perm": "stats",
+      "perm": "iv",
       "disabled": false,
       "color": "secondary"
     },

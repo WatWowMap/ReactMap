@@ -1,9 +1,8 @@
 module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
   switch (provider) {
     case 'poracle': {
-      const pvpMax = hookConfig[`pvpFilter${leagues[0].name.charAt(0).toUpperCase()}${leagues[0].name.substring(1)}MinCP`] || 4096
       const isOhbem = pvp === 'ohbem'
-      return {
+      const poracleUiObj = {
         human: true,
         pokemon: {
           sortProp: 'pokemon_id',
@@ -34,39 +33,45 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             pvp_ranking_league: 0,
             pvp_ranking_best: 1,
             pvp_ranking_worst: hookConfig.pvpFilterMaxRank,
-            pvp_ranking_min_cp: isOhbem ? 0 : leagues[0].cp - 50,
-            allForms: true,
+            pvp_ranking_min_cp: 0,
+            pvp_ranking_cap: hookConfig.defaultPvpCap,
+            allForms: false,
             pvpEntry: false,
             noIv: false,
             byDistance: false,
             xs: false,
             xl: false,
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
+              || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
             primary: {
               sliders: [
                 { name: 'iv', label: '', min: -1, max: 100, perm: 'iv', low: 'min_iv', high: 'max_iv' },
-                { name: 'level', label: '', min: 0, max: 40, perm: 'stats', low: 'min_level', high: 'max_level' },
+                { name: 'level', label: '', min: 0, max: 40, perm: 'iv', low: 'min_level', high: 'max_level' },
               ],
             },
             advanced: {
               sliders: [
-                { name: 'cp', label: '', min: 0, max: 9000, perm: 'stats', low: 'min_cp', high: 'max_cp' },
-                { name: 'atk_iv', label: '', min: 0, max: 15, perm: 'stats', low: 'atk', high: 'max_atk' },
-                { name: 'def_iv', label: '', min: 0, max: 15, perm: 'stats', low: 'def', high: 'max_def' },
-                { name: 'sta_iv', label: '', min: 0, max: 15, perm: 'stats', low: 'sta', high: 'max_sta' },
+                { name: 'cp', label: '', min: 0, max: 9000, perm: 'iv', low: 'min_cp', high: 'max_cp' },
+                { name: 'atk_iv', label: '', min: 0, max: 15, perm: 'iv', low: 'atk', high: 'max_atk' },
+                { name: 'def_iv', label: '', min: 0, max: 15, perm: 'iv', low: 'def', high: 'max_def' },
+                { name: 'sta_iv', label: '', min: 0, max: 15, perm: 'iv', low: 'sta', high: 'max_sta' },
               ],
-              texts: [{ name: 'min_time', type: 'number', max: 60, adornment: 's', xs: 4, sm: 4 }],
+              texts: [{ name: 'min_time', type: 'number', max: 60, adornment: 's', xs: 4, sm: 4, width: 100 }],
               booleans: [
                 { name: 'xs', xs: 4, sm: 4, override: true },
                 { name: 'xl', xs: 4, sm: 4, override: true },
               ],
             },
             pvp: {
-              selects: [{ name: 'pvp_ranking_league', options: [{ name: 'none', cp: 0 }, ...leagues], xs: 6, sm: isOhbem ? 6 : 3 }],
+              selects: [
+                { name: 'pvp_ranking_league', options: [{ name: 'none', cp: 0 }, ...leagues], xs: 6, sm: 3 },
+                ...(isOhbem ? [{ name: 'pvp_ranking_cap', options: [0, ...(hookConfig.pvpCaps || [])], xs: 6, sm: 3 }] : []),
+              ],
               texts: isOhbem
                 ? []
-                : [{ name: 'pvp_ranking_min_cp', max: pvpMax, type: 'number', adornment: 'cp', xs: 6, sm: 3 }],
+                : [{ name: 'pvp_ranking_min_cp', type: 'number', adornment: 'cp', width: 110, xs: 6, sm: 3 }],
               sliders: [{ name: 'pvp', label: 'rank', min: 1, max: hookConfig.pvpFilterMaxRank, perm: 'pvp', low: 'pvp_ranking_best', high: 'pvp_ranking_worst' }],
             },
             general: {
@@ -86,6 +91,9 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
+            global: {
+              booleans: [],
+            },
           },
         },
         raid: {
@@ -104,6 +112,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             byDistance: false,
             allMoves: true,
             allForms: true,
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
+              || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
             general: {
@@ -125,6 +135,9 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
+            global: {
+              booleans: [],
+            },
           },
         },
         egg: {
@@ -137,6 +150,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             team: 4,
             gym_id: null,
             byDistance: false,
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
+              || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
             general: {
@@ -155,6 +170,9 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
             },
+            global: {
+              booleans: [],
+            },
           },
         },
         gym: {
@@ -167,6 +185,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             battle_changes: false,
             gym_id: null,
             byDistance: false,
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
+              || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
             general: {
@@ -176,7 +196,7 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
               ],
               booleans: [
                 { name: 'clean', xs: 4, sm: 4 },
-                { name: 'battle_changes', xs: 6, sm: 4 },
+                ...(hookConfig.gymBattles ? [{ name: 'battle_changes', xs: 6, sm: 4 }] : []),
                 { name: 'slot_changes', xs: 6, sm: 4 },
               ],
               autoComplete: [{ name: 'gymName', label: 'gym', searchCategory: 'gyms', xs: 12, sm: 12 }],
@@ -184,6 +204,9 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 6, sm: 8, override: true }],
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
+            },
+            global: {
+              booleans: [],
             },
           },
         },
@@ -195,6 +218,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             grunt_type: null,
             gender: 0,
             byDistance: false,
+            everything_individually: hookConfig.everythingFlagPermissions === 'allow-and-always-individually'
+              || hookConfig.everythingFlagPermissions === 'deny',
           },
           ui: {
             general: {
@@ -209,6 +234,9 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                 booleans: [{ name: 'byDistance', max: hookConfig.maxDistance, xs: 6, sm: 8, override: true }],
                 texts: [{ name: 'distance', type: 'number', adornment: 'm', xs: 6, sm: 4 }],
               },
+            },
+            global: {
+              booleans: [],
             },
           },
         },
@@ -297,6 +325,13 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
           },
         },
       }
+      Object.values(poracleUiObj).forEach(category => {
+        if (typeof category === 'object' && category?.ui?.global
+          && hookConfig.everythingFlagPermissions === 'allow-any') {
+          category.ui.global.booleans.push({ name: 'everything_individually', xs: 12, sm: 12, override: true })
+        }
+      })
+      return poracleUiObj
     }
     default: return {}
   }

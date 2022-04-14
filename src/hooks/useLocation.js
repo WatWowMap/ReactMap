@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import Locate from 'leaflet.locatecontrol'
 import L from 'leaflet'
+import { useTranslation } from 'react-i18next'
 
 export default function useLocation(map) {
   const [color, setColor] = useState('inherit')
+  const { t } = useTranslation()
+
   const [lc] = useState(() => {
     const LocateFab = Locate.extend({
       _setClasses(state) {
@@ -49,6 +52,16 @@ export default function useLocation(map) {
     const result = new LocateFab({
       keepCurrentZoomLevel: true,
       setView: 'untilPan',
+      options: {
+        title: t('lc_title'),
+        metersUnit: t('lc_metersUnit'),
+        feetUnit: t('lc_feetUnit'),
+        popup: t('lc_popup'),
+        outsideMapBoundsMsg: t('lc_outsideMapBoundsMsg'),
+        locateOptions: {
+          maximumAge: 5000,
+        },
+      },
     })
     result.addTo(map)
     return result

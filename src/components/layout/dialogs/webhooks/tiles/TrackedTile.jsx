@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useState } from 'react'
 import {
   Grid, Typography, IconButton, Dialog, Checkbox,
@@ -9,20 +8,12 @@ import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 
 export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   const {
-    tileItem, columnCount, Icons, syncWebhook, selectedWebhook, selected, setSelected,
-    tracked, setTracked, isMobile, setSend, setTempFilters, leagues, category, t, Poracle, invasions,
+    tileItem, columnCount, Icons, syncWebhook, selectedWebhook, selected, setSelected, Utility,
+    tracked, setTracked, isMobile, setSend, setTempFilters, category, Poracle, invasions,
   } = data
   const [editDialog, setEditDialog] = useState(false)
   const item = tileItem[rowIndex * columnCount + columnIndex]
   if (!item) return null
-
-  const backgroundColor = columnIndex % 2
-    ? rowIndex % 2 === 0
-      ? 'rgba(1, 1, 1, 0.01)'
-      : 'rgba(240, 240, 240, 0.01)'
-    : rowIndex % 2
-      ? 'rgba(1, 1, 1, 0.01)'
-      : 'rgba(240, 240, 240, 0.01)'
 
   const toggleWebhook = (open, id, newFilters) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -45,7 +36,10 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
     item.allForms = !item.form
   }
   if (category === 'invasion') {
-    item.grunt_id = Object.keys(invasions).find(key => invasions[key]?.type?.toLowerCase() === item.grunt_type)
+    item.grunt_id = Object.keys(invasions).find(
+      key => invasions[key]?.type?.toLowerCase() === item.grunt_type.toLowerCase()
+        && invasions[key].gender === (item.gender || 1),
+    )
   }
   if (category === 'pokemon') {
     item.pvpEntry = Boolean(item.pvp_ranking_league)
@@ -60,19 +54,23 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
       container
       item
       xs={12}
-      style={{ ...style, backgroundColor }}
+      style={{
+        ...style,
+        backgroundColor: Utility.getTileBackground(columnIndex, rowIndex),
+      }}
       justifyContent="center"
       alignItems="center"
     >
       <Grid item xs={2} sm={1}>
         <img
           src={Icons.getIconById(id)}
+          alt={id}
           style={{ maxWidth: 40, maxHeight: 40 }}
         />
       </Grid>
       <Grid item xs={6} sm={8} md={9}>
         <Typography variant="caption">
-          {Poracle.generateDescription(item, category, leagues, t)?.replace(/\*/g, '')}
+          {item.description}
         </Typography>
       </Grid>
       <Grid item xs={4} sm={3} md={2} style={{ textAlign: 'right' }}>

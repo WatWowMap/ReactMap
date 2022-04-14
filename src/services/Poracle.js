@@ -7,19 +7,31 @@ export default class Poracle {
           global: { ...pokemon.defaults, profile_no: human.current_profile_no },
           '0-0': { ...pokemon.defaults, profile_no: human.current_profile_no },
         },
-        raid: { global: { ...raid.defaults, profile_no: human.current_profile_no } },
-        egg: { global: { ...egg.defaults, profile_no: human.current_profile_no } },
-        gym: { global: { ...gym.defaults, profile_no: human.current_profile_no } },
+        raid: {
+          global: { ...raid.defaults, profile_no: human.current_profile_no },
+          r90: { ...raid.defaults, level: 90, profile_no: human.current_profile_no },
+        },
+        egg: {
+          global: { ...egg.defaults, profile_no: human.current_profile_no },
+          e90: { ...egg.defaults, level: 90, profile_no: human.current_profile_no },
+        },
+        gym: {
+          global: { ...gym.defaults, profile_no: human.current_profile_no },
+          t4: { ...gym.defaults, profile_no: human.current_profile_no },
+        },
         invasion: {
           global: { ...invasion.defaults, profile_no: human.current_profile_no },
-          'i0-0': { ...invasion.defaults, profile_no: human.current_profile_no },
+          i0: { ...invasion.defaults, grunt_type: 'everything', profile_no: human.current_profile_no },
         },
         lure: {
           global: { ...lure.defaults, profile_no: human.current_profile_no },
-          l0: { ...lure.defaults, profile_no: human.current_profile_no },
         },
-        nest: { global: { ...nest.defaults, profile_no: human.current_profile_no } },
-        quest: { global: { ...quest.defaults, profile_no: human.current_profile_no } },
+        nest: {
+          global: { ...nest.defaults, profile_no: human.current_profile_no },
+        },
+        quest: {
+          global: { ...quest.defaults, profile_no: human.current_profile_no },
+        },
       }
       Object.keys(reactMapFilters.pokemon.filter).forEach(key => {
         filters.pokemon[key] = {
@@ -201,13 +213,15 @@ export default class Poracle {
   static getId(item, category, invasions) {
     switch (category) {
       case 'egg': return `e${item.level}`
-      case 'invasion': return `i${Object.keys(invasions).find(x => invasions[x].type?.toLowerCase() === item.grunt_type)}`
+      case 'invasion': return `i${Object.keys(invasions)
+        .find(x => invasions[x].type?.toLowerCase() === item.grunt_type.toLowerCase()
+          && invasions[x].gender === (item.gender || 1))}`
       case 'lure': return `l${item.lure_id}`
       case 'gym': return `t${item.team}-0`
       case 'raid': return item.pokemon_id === 9000
         ? `r${item.level}`
         : `${item.pokemon_id}-${item.form}`
-      case 'quest': return (function quests() {
+      case 'quest': return (() => {
         switch (item.reward_type) {
           case 2: return `q${item.reward}`
           case 3: return `d${item.amount}`
@@ -216,7 +230,7 @@ export default class Poracle {
           case 12: return `m${item.reward}-${item.amount}`
           default: return `${item.reward}-${item.form}`
         }
-      }())
+      })()
       default: return `${item.pokemon_id}-${item.form}`
     }
   }
@@ -228,23 +242,33 @@ export default class Poracle {
       case 'l': return { id: id.replace('l', ''), type: 'lure' }
       case 'r': return { id: id.replace('r', ''), type: 'raid' }
       case 'q': return { id: id.replace('q', ''), type: 'item' }
-      case 'm': return { pokemonId: id.split('-')[0].replace('m', ''), type: 'pokemon' }
-      case 'c': return { pokemonId: id.replace('c', ''), type: 'pokemon' }
-      case 'x': return { pokemonId: id.replace('x', ''), type: 'pokemon' }
+      case 'm': return { id: id.split('-')[0].replace('m', ''), type: 'pokemon' }
+      case 'c': return { id: id.replace('c', ''), type: 'pokemon' }
+      case 'x': return { id: id.replace('x', ''), type: 'pokemon' }
       case 'd': return { id: 3, type: 'quest_reward' }
       case 't': return { id: id.split('-')[0].replace('t', ''), type: 'gym' }
-      default: return { pokemonId: id.split('-')[0], form: id.split('-')[1], type: 'pokemon' }
+      default: return { id: id.split('-')[0], form: id.split('-')[1], type: 'pokemon' }
     }
   }
 
   static getTitles(idObj) {
     switch (idObj.type) {
-      case 'egg': return [`egg_${idObj.id}_plural`]
-      case 'invasion': return [`grunt_a_${idObj.id}`]
+      case 'egg': return idObj.id === '90'
+        ? ['poke_global']
+        : [`egg_${idObj.id}_plural`]
+      case 'invasion': return idObj.id === '0'
+        ? ['poke_global']
+        : [`grunt_a_${idObj.id}`]
       case 'lure': return [`lure_${idObj.id}`]
-      case 'raid': return [`raid_${idObj.id}_plural`]
-      case 'pokemon': return [`poke_${idObj.pokemonId}`, +idObj.form ? `form_${idObj.form}` : '']
-      case 'gym': return [`team_${idObj.id}`]
+      case 'raid': return idObj.id === '90'
+        ? ['poke_global']
+        : [`raid_${idObj.id}_plural`]
+      case 'pokemon': return idObj.id === '0'
+        ? ['poke_global']
+        : [`poke_${idObj.id}`, +idObj.form ? `form_${idObj.form}` : '']
+      case 'gym': return idObj.id === '4'
+        ? ['poke_global']
+        : [`team_${idObj.id}`]
       default: return [`${idObj.type}_${idObj.id}`]
     }
   }
@@ -273,7 +297,7 @@ export default class Poracle {
   }
 
   static processor(type, entries, defaults) {
-    const pvpFields = ['pvp_ranking_league', 'pvp_ranking_best', 'pvp_ranking_worst', 'pvp_ranking_min_cp']
+    const pvpFields = ['pvp_ranking_league', 'pvp_ranking_best', 'pvp_ranking_worst', 'pvp_ranking_min_cp', 'pvp_ranking_cap']
     const ignoredFields = ['noIv', 'byDistance', 'xs', 'xl', 'allForms', 'pvpEntry']
     const dupes = {}
     switch (type) {
@@ -319,7 +343,7 @@ export default class Poracle {
         } else {
           fields.push(...Object.keys(pkmn).filter(key => !pvpFields.includes(key) && !ignoredFields.includes(key)))
         }
-        fields.forEach(field => newPokemon[field] = pkmn[field] || defaults[field])
+        fields.forEach(field => newPokemon[field] = pkmn[field] === undefined ? defaults[field] : pkmn[field])
         return newPokemon
       }).filter(pokemon => pokemon)
     }
@@ -327,7 +351,11 @@ export default class Poracle {
 
   static generateDescription(item, category, leagues, t) {
     switch (category) {
-      case 'invasion': return `${t(`grunt_${item.grunt_id}`)}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
+      case 'invasion': {
+        let name = t(item.grunt_id ? `grunt_${item.grunt_id}` : 'poke_global')
+        if (!item.gender) name = name.replace(/\(.+?\)/g, `(${t('all')})`)
+        return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
+      }
       case 'lure': return `${t(`lure_${item.lure_id}`)}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
       case 'quest': return `${t(`quest_reward_${item.reward_type}`)} | ${(function getReward() {
         switch (item.reward_type) {
@@ -344,7 +372,7 @@ export default class Poracle {
       // case 'egg': return `Level ${item.level} ${item.exclusive ? 'Exclusive Only' : ''} ${item.clean ? 'clean' : ''} Template: ${item.template} ${item.team === 4 ? '' : item.team} ${item.gym_id ? 'Gym:' : ''}${item.distance ? ` | d${item.distance}` : ''}`
       case 'nest': return `${t(`poke_${item.pokemon_id}`)} | Min Spawn: ${item.min_spawn_avg}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
       case 'pokemon': return `${item.pokemon_id ? ` ${t(`poke_${item.pokemon_id}`)} | ` : ` ${t('poke_global')} | `}${item.form ? ` ${t(`form_${item.form}`)} | ` : ''}${item.pvp_ranking_league
-        ? `${t('pvp')} ${t(leagues.find(league => league.cp === item.pvp_ranking_league).name)} ${item.pvp_ranking_best}-${item.pvp_ranking_worst} ${item.pvp_ranking_min_cp ? `${item.pvp_ranking_min_cp}${t('cp')}` : ''}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
+        ? `${t('pvp')} ${t(leagues.find(league => league.cp === item.pvp_ranking_league).name)} ${item.pvp_ranking_best}-${item.pvp_ranking_worst} ${item.pvp_ranking_min_cp ? `${item.pvp_ranking_min_cp}${t('cp')}` : ''} ${item.pvp_ranking_cap ? `${t('cap')}${item.pvp_ranking_cap}` : ''}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`
         : `${item.min_iv}-${item.max_iv}% | L${item.min_level}-${item.max_level}
       A${item.atk}-${item.max_atk} | D${item.def}-${item.max_def} | S${item.sta}-${item.max_sta}${item.clean ? ` | ${t('clean')} ` : ''}${item.distance ? ` | d${item.distance}` : ''}`}`
       default: return item.description

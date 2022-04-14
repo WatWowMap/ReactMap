@@ -4,8 +4,8 @@
 # Config files
 server/src/configs/*
 !server/src/configs/default.json
-!server/src/configs/config.example.json
 !server/src/configs/areas.example.json
+!server/src/configs/local.example.json
 .env
 
 # Masterfile
@@ -13,6 +13,8 @@ server/src/data/masterfile.json
 
 # Docker file
 /docker-compose.yml
+.gitref
+.gitsha
 
 # Favicon
 public/favicon/*
@@ -22,9 +24,27 @@ public/favicon/*
 server/src/strategies/*
 !server/src/strategies/discord.js
 !server/src/strategies/telegram.js
+!server/src/strategies/local.js
+
+# API Endpoints
+server/src/routes/api/v1/*
+!server/src/routes/api/v1/users.js
+!server/src/routes/api/v1/sessions.js
+
+# custom model
+server/src/models/Custom.js
+
+# Local UICONS Repos
+public/images/uicons/*
+!public/images/uicons/.gitkeep
+
+# Custom Image Folder for Custom Components
+public/images/custom/*
+!public/images/custom/.gitkeep
 
 # Ignore generated locales
 public/locales/*
+public/missing-locales/*
 
 # OS X
 .DS_Store*
@@ -40,5 +60,7 @@ Desktop.ini
 .directory
 *~
 
-# VS Code
-/.vscode/
+# Custom Files
+src/**/*.custom.jsx
+src/**/*.custom.js
+src/**/*.custom.css

@@ -29,8 +29,8 @@ const Location = ({
   })
 
   const { lc, color } = useLocation(map)
-  const [search, { data, previousData, loading }] = useLazyQuery(Query.geocoder(), {
-    variables: { search, name: selectedWebhook },
+  const [setSearch, { data, previousData, loading }] = useLazyQuery(Query.geocoder(), {
+    variables: { search: '', name: selectedWebhook },
   })
 
   const handleLocationChange = useCallback((location) => {
@@ -53,7 +53,7 @@ const Location = ({
     }
   }, [webhookLocation])
 
-  useEffect(() => () => lc._deactivate(), [])
+  useEffect(() => () => lc.stop(), [])
 
   const fetchedData = data || previousData
 
@@ -78,12 +78,12 @@ const Location = ({
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Button size="small" variant="contained" color="secondary" onClick={() => lc._onClick()} startIcon={<LocationOn color={color} />}>
-          {t('myLocation')}
+          {t('my_location')}
         </Button>
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Button size="small" variant="contained" color="primary" onClick={() => setWebhookMode('location')}>
-          {t('chooseOnMap')}
+          {t('choose_on_map')}
         </Button>
       </Grid>
       <Grid item xs={12}>
@@ -109,7 +109,7 @@ const Location = ({
               {...params}
               label={t('search_location')}
               variant="outlined"
-              onChange={(e) => search({ variables: { search: e.target.value } })}
+              onChange={(e) => setSearch({ variables: { search: e.target.value } })}
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (

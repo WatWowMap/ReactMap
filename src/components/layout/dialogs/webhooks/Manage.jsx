@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import React, { useState, useEffect, useMemo } from 'react'
 import {
   DialogContent,
@@ -45,9 +46,7 @@ export default function Manage({
   const { invasions } = useStatic(s => s.masterfile)
   const { map } = useStatic(s => s.config)
   const setWebhookAlert = useStatic(state => state.setWebhookAlert)
-  const poracleFilters = useMemo(() => Poracle.filterGenerator(
-    webhookData[selectedWebhook], staticFilters, invasions,
-  ), [])
+  const poracleFilters = useMemo(() => Poracle.filterGenerator(webhookData[selectedWebhook], staticFilters, invasions), [])
   const [tabValue, setTabValue] = useState(0)
   const [feedback, setFeedback] = useState(false)
   const [addNew, setAddNew] = useState(false)
@@ -65,7 +64,7 @@ export default function Manage({
   const footerButtons = [
     {
       name: tabValue
-        ? <Trans i18nKey="addNew">{{ category: t(filteredData[tabValue]) }}</Trans>
+        ? <Trans i18nKey="add_new">{{ category: t(filteredData[tabValue]) }}</Trans>
         : t('manage_profiles'),
       action: () => setAddNew(true),
       icon: tabValue ? 'Add' : 'People',
@@ -75,7 +74,7 @@ export default function Manage({
     { name: 'close', action: () => setWebhookMode(false), icon: 'Close', color: 'primary' },
   ]
 
-  if (map.enableFeedback) {
+  if (map.feedbackLink) {
     footerButtons.unshift(
       { name: 'feedback', action: () => setFeedback(true), icon: 'BugReport', disabled: !webhookData[selectedWebhook].human, color: '#00e676' },
     )
@@ -128,7 +127,7 @@ export default function Manage({
 
   return (
     <>
-      <Header names={[selectedWebhook]} action={() => setWebhookMode(false)} titles={['manageWebhook']} />
+      <Header names={[selectedWebhook]} action={() => setWebhookMode(false)} titles={['manage_webhook']} />
       <AppBar position="static">
         <Tabs
           value={tabValue}
@@ -142,13 +141,13 @@ export default function Manage({
               key={each}
               icon={each === 'human'
                 ? <Person style={{ color: 'white ' }} />
-                : <img src={Icons.getMisc(each)} style={{ maxWidth: 20, height: 'auto' }} />}
+                : <img src={Icons.getMisc(each)} style={{ maxWidth: 20, height: 'auto' }} alt={each} />}
               style={{ width: 40, minWidth: 40 }}
             />
           ))}
         </Tabs>
       </AppBar>
-      <DialogContent style={{ padding: '0', height: isMobile ? '100%' : '70vh' }}>
+      <DialogContent style={{ padding: 0, height: isMobile ? '100%' : '70vh' }}>
         {webhookData[selectedWebhook].human && !poracleFilters.error ? filteredData.map((key, i) => (
           <TabPanel value={tabValue} index={i} key={key} virtual>
             {key === 'human' ? (
@@ -189,7 +188,7 @@ export default function Manage({
           </TabPanel>
         )) : <WebhookError selectedWebhook={selectedWebhook} />}
       </DialogContent>
-      <Footer options={footerButtons} role="webhookFooter" />
+      <Footer options={footerButtons} role="webhook_footer" />
       <Dialog
         classes={{
           scrollPaper: classes.scrollPaper,

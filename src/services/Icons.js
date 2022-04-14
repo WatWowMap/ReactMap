@@ -1,7 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
-import Fetch from '@services/Fetch'
-
 export default class UIcons {
   constructor({ customizable, sizes, cacheHrs }, questRewardTypes) {
     this.customizable = customizable
@@ -13,6 +9,8 @@ export default class UIcons {
         offsetX: 1,
         offsetY: 1,
         sizeMultiplier: 1,
+        popupX: 0,
+        popupY: 0,
       },
     }
     this.cacheMs = cacheHrs * 60 * 60 * 1000
@@ -21,75 +19,64 @@ export default class UIcons {
     ))
   }
 
-  async fetchIcons(icons) {
+  build(icons) {
     const baseUrl = 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
-    if (!icons.some(icon => icon.path === baseUrl)) {
-      icons.push({
-        name: 'Base',
-        path: baseUrl,
-        modifiers: {
-          gym: {
-            0: 1,
-            1: 1,
-            2: 1,
-            3: 3,
-            4: 4,
-            5: 4,
-            6: 18,
-            sizeMultiplier: 1.2,
-          },
-        },
-      })
-    }
-    for (const icon of icons) {
-      const cachedIndex = JSON.parse(localStorage.getItem(`${icon.name}_icons`))
-      const data = cachedIndex && cachedIndex.lastFetched + this.cacheMs > Date.now()
-        ? cachedIndex
-        : await Fetch.getIcons(icon.path, icon.name)
-      if (data) {
-        this[icon.name] = { indexes: Object.keys(data), ...icon }
-        if (!this[icon.name].modifiers) {
-          this[icon.name].modifiers = {}
-        }
-        this[icon.name].indexes.forEach(category => {
-          let isValid = false
-          if (!parseInt(category) && category !== '0' && category !== 'lastFetched') {
-            if (Array.isArray(data[category])) {
-              this[icon.name][category] = new Set(data[category])
-              isValid = true
-            } else {
-              Object.keys(data[category]).forEach(subCategory => {
-                if (Array.isArray(data[category][subCategory])) {
-                  this[icon.name][subCategory] = new Set(data[category][subCategory])
-                  isValid = true
+
+    icons.forEach(icon => {
+      try {
+        const { data } = icon
+        if (data) {
+          this[icon.name] = { indexes: Object.keys(data), ...icon }
+
+          if (!icon.path.startsWith('http')) {
+            this[icon.name].path = `/images/uicons/${icon.path}`
+          }
+          if (!this[icon.name].modifiers) {
+            this[icon.name].modifiers = {}
+          }
+          this[icon.name].indexes.forEach(category => {
+            let isValid = false
+            if (!parseInt(category) && category !== '0' && category !== 'lastFetched') {
+              if (Array.isArray(data[category])) {
+                this[icon.name][category] = new Set(data[category])
+                isValid = true
+              } else {
+                Object.keys(data[category]).forEach(subCategory => {
+                  if (Array.isArray(data[category][subCategory])) {
+                    this[icon.name][subCategory] = new Set(data[category][subCategory])
+                    isValid = true
+                  }
+                })
+              }
+              if (!this[category]) {
+                this[category] = []
+              }
+              if (isValid) {
+                this[category].push(icon.name)
+              }
+              if (!this[icon.name].modifiers[category]) {
+                this[icon.name].modifiers[category] = this.modifiers.base
+              } else {
+                this[icon.name].modifiers[category] = {
+                  ...this.modifiers.base,
+                  ...this[icon.name].modifiers[category],
                 }
-              })
-            }
-            if (!this[category]) {
-              this[category] = []
-            }
-            if (isValid) {
-              this[category].push(icon.name)
-            }
-            if (!this[icon.name].modifiers[category]) {
-              this[icon.name].modifiers[category] = this.modifiers.base
-            } else {
-              this[icon.name].modifiers[category] = {
-                ...this.modifiers.base,
-                ...this[icon.name].modifiers[category],
+              }
+              if (icon.path === baseUrl) {
+                this.selected.misc = icon.name
+              }
+              if (!this.selected[category]) {
+                this.selected[category] = icon.name
+                this.modifiers[category] = this[icon.name].modifiers[category]
               }
             }
-            if (icon.path === baseUrl) {
-              this.selected.misc = icon.name
-            }
-            if (!this.selected[category]) {
-              this.selected[category] = icon.name
-              this.modifiers[category] = this[icon.name].modifiers[category]
-            }
-          }
-        })
+          })
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('Issue loading', icon, '\n', e)
       }
-    }
+    })
   }
 
   get selection() {
@@ -126,6 +113,12 @@ export default class UIcons {
       : baseSize
   }
 
+  getModifiers(category) {
+    return this.modifiers[category]
+      ? this.modifiers[category]
+      : this.modifiers.base
+  }
+
   getIconById(id) {
     switch (id.charAt(0)) {
       case 'c': return this.getRewards(4, ...id.slice(1).split('-'))
@@ -152,12 +145,12 @@ export default class UIcons {
     const costumeSuffixes = costume ? [`_c${costume}`, ''] : ['']
     const genderSuffixes = gender ? [`_g${gender}`, ''] : ['']
     const shinySuffixes = shiny ? ['_shiny', ''] : ['']
-    for (const evolutionSuffix of evolutionSuffixes) {
-      for (const formSuffix of formSuffixes) {
-        for (const costumeSuffix of costumeSuffixes) {
-          for (const genderSuffix of genderSuffixes) {
-            for (const shinySuffix of shinySuffixes) {
-              const result = `${pokemonId}${evolutionSuffix}${formSuffix}${costumeSuffix}${genderSuffix}${shinySuffix}.png`
+    for (let f = 0; f < formSuffixes.length; f += 1) {
+      for (let c = 0; c < costumeSuffixes.length; c += 1) {
+        for (let g = 0; g < genderSuffixes.length; g += 1) {
+          for (let s = 0; s < shinySuffixes.length; s += 1) {
+            for (let e = 0; e < evolutionSuffixes.length; e += 1) {
+              const result = `${pokemonId}${evolutionSuffixes[e]}${formSuffixes[f]}${costumeSuffixes[c]}${genderSuffixes[g]}${shinySuffixes[s]}.png`
               if (this[this.selected.pokemon].pokemon.has(result)) {
                 return `${baseUrl}/${result}`
               }
@@ -183,10 +176,10 @@ export default class UIcons {
     const invasionSuffixes = invasionActive ? ['_i', ''] : ['']
     const questSuffixes = questActive ? ['_q', ''] : ['']
     const arSuffixes = ar ? ['_ar', ''] : ['']
-    for (const invasionSuffix of invasionSuffixes) {
-      for (const questSuffix of questSuffixes) {
-        for (const arSuffix of arSuffixes) {
-          const result = `${lureId}${questSuffix}${invasionSuffix}${arSuffix}.png`
+    for (let i = 0; i < invasionSuffixes.length; i += 1) {
+      for (let q = 0; q < questSuffixes.length; q += 1) {
+        for (let a = 0; a < arSuffixes.length; a += 1) {
+          const result = `${lureId}${questSuffixes[q]}${invasionSuffixes[i]}${arSuffixes[a]}.png`
           if (this[this.selected.pokestop].pokestop.has(result)) {
             return `${baseUrl}/${result}`
           }
@@ -201,8 +194,8 @@ export default class UIcons {
     const baseUrl = `${this[this.selected.reward].path}/reward/${category}`
     if (this[this.selected.reward][category]) {
       const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
-      for (const aSuffix of amountSuffixes) {
-        const result = `${id}${aSuffix}.png`
+      for (let a = 0; a < amountSuffixes.length; a += 1) {
+        const result = `${id}${amountSuffixes[a]}.png`
         if (this[this.selected.reward][category].has(result)) {
           return `${baseUrl}/${result}`
         }
@@ -226,11 +219,11 @@ export default class UIcons {
     const inBattleSuffixes = inBattle ? ['_b', ''] : ['']
     const exSuffixes = ex ? ['_ex', ''] : ['']
     const arSuffixes = ar ? ['_ar', ''] : ['']
-    for (const trainerSuffix of trainerSuffixes) {
-      for (const inBattleSuffix of inBattleSuffixes) {
-        for (const exSuffix of exSuffixes) {
-          for (const arSuffix of arSuffixes) {
-            const result = `${teamId}${trainerSuffix}${inBattleSuffix}${exSuffix}${arSuffix}.png`
+    for (let t = 0; t < trainerSuffixes.length; t += 1) {
+      for (let b = 0; b < inBattleSuffixes.length; b += 1) {
+        for (let e = 0; e < exSuffixes.length; e += 1) {
+          for (let a = 0; a < arSuffixes.length; a += 1) {
+            const result = `${teamId}${trainerSuffixes[t]}${inBattleSuffixes[b]}${exSuffixes[e]}${arSuffixes[a]}.png`
             if (this[this.selected.gym].gym.has(result)) {
               return `${baseUrl}/${result}`
             }
@@ -245,9 +238,9 @@ export default class UIcons {
     const baseUrl = `${this[this.selected.raid].path}/raid/egg`
     const hatchedSuffixes = hatched ? ['_h', ''] : ['']
     const exSuffixes = ex ? ['_ex', ''] : ['']
-    for (const hatchedSuffix of hatchedSuffixes) {
-      for (const exSuffix of exSuffixes) {
-        const result = `${level}${hatchedSuffix}${exSuffix}.png`
+    for (let h = 0; h < hatchedSuffixes.length; h += 1) {
+      for (let e = 0; e < exSuffixes.length; e += 1) {
+        const result = `${level}${hatchedSuffixes[h]}${exSuffixes[e]}.png`
         if (this[this.selected.raid].egg && this[this.selected.raid].egg.has(result)) {
           return `${baseUrl}/${result}`
         }
@@ -268,8 +261,8 @@ export default class UIcons {
   getWeather(weatherId, isNight = false) {
     const baseUrl = `${this[this.selected.weather].path}/weather`
     const timeSuffixes = isNight ? ['_n', ''] : ['_d', '']
-    for (const timeSuffix of timeSuffixes) {
-      const result = `${weatherId}${timeSuffix}.png`
+    for (let t = 0; t < timeSuffixes.length; t += 1) {
+      const result = `${weatherId}${timeSuffixes[t]}.png`
       if (this[this.selected.weather].weather.has(result)) {
         return `${baseUrl}/${result}`
       }
@@ -297,5 +290,15 @@ export default class UIcons {
         return `${baseUrl}/${fileName}s.png`
       default: return `${baseUrl}/0.png`
     }
+  }
+
+  getDevices(online) {
+    const baseUrl = `${this[this.selected.device].path}/device`
+    return online ? `${baseUrl}/1.png` : `${baseUrl}/0.png`
+  }
+
+  getSpawnpoints(hasTth) {
+    const baseUrl = `${this[this.selected.spawnpoint].path}/spawnpoint`
+    return hasTth ? `${baseUrl}/1.png` : `${baseUrl}/0.png`
   }
 }

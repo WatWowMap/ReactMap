@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
-export default function DevicePopup({ device, status, ts }) {
+export default function DevicePopup({ device, isOnline, ts }) {
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -15,7 +15,7 @@ export default function DevicePopup({ device, status, ts }) {
   return (
     <>
       <Typography variant="h6" align="center">
-        {device.uuid}
+        {device.id}
       </Typography>
       <Typography variant="subtitle2">
         {t('instance')} {device.instance_name}
@@ -23,10 +23,10 @@ export default function DevicePopup({ device, status, ts }) {
       <Timer device={device} t={t} ts={ts} />
       <Typography
         variant="subtitle1"
-        style={{ color: `${status === 'offline' ? '#ff5722' : '#00e676'}` }}
+        style={{ color: isOnline ? '#00e676' : '#ff5722' }}
         align="center"
       >
-        {t(status)}
+        {t(isOnline ? 'online' : 'offline')}
       </Typography>
     </>
   )
@@ -46,7 +46,7 @@ const Timer = ({ device, t, ts }) => {
 
   return (
     <Typography variant="caption">
-      {t('lastSeen')}: {Utility.dayCheck(ts, last_seen)} ({since.str})
+      {t('last_seen')}: {Utility.dayCheck(ts, last_seen)} ({since.str})
     </Typography>
   )
 }

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 export default function SliderTile({
   filterSlide: {
-    name, min, max, color, disabled, label, low, high,
+    name, min, max, color, disabled, label, low, high, step, i18nKey,
   }, handleChange, filterValues,
 }) {
   const { t } = useTranslation()
@@ -57,7 +57,7 @@ export default function SliderTile({
     >
       <Grid item xs={4}>
         <Typography noWrap={fullName} onClick={() => setFullName(!fullName)} style={{ color: textColor }}>
-          {t(`${name}Slider`)}
+          {t(i18nKey || `slider_${name}`)}
         </Typography>
       </Grid>
       {['min', 'max'].map((each, index) => (
@@ -96,6 +96,7 @@ export default function SliderTile({
           }}
           disabled={disabled}
           valueLabelDisplay="auto"
+          step={step}
         />
       </Grid>
     </Grid>

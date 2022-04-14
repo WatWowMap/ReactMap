@@ -50,7 +50,7 @@ const Areas = ({
   const ChooseOnMap = (
     <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
       <Button size="small" variant="contained" color="primary" onClick={() => setWebhookMode('areas')}>
-        {t('chooseOnMap')}
+        {t('choose_on_map')}
       </Button>
     </Grid>
   )
@@ -73,12 +73,12 @@ const Areas = ({
       {isMobile && ChooseOnMap}
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Button size="small" variant="contained" color="primary" onClick={() => handleClick('none')}>
-          {t('disableAll')}
+          {t('disable_all')}
         </Button>
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Button size="small" variant="contained" color="secondary" onClick={() => handleClick('all')}>
-          {t('enableAll')}
+          {t('enable_all')}
         </Button>
       </Grid>
       {!isMobile && ChooseOnMap}
@@ -107,7 +107,7 @@ const Areas = ({
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h6" align="center">
-          <Trans i18nKey="selectedAreas" count={selectedAreas.length}>
+          <Trans i18nKey="selected_areas" count={selectedAreas.length}>
             {{ amount: selectedAreas.length }}
           </Trans>
         </Typography>

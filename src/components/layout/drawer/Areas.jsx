@@ -23,14 +23,14 @@ export default function AreaDropDown({ scanAreasZoom, manualAreas }) {
         backgroundColor: '#212121',
       }}
     >
-      {Object.keys(manualAreas).length > 0 ? (
+      {Object.keys(manualAreas).length ? (
         <MenuList>
           {Object.keys(manualAreas).map(area => (
             <MenuItem
               key={area}
               onClick={() => {
-                const { lat, lon } = manualAreas[area]
-                map.flyTo([lat, lon], scanAreasZoom)
+                const { lat, lon, zoom } = manualAreas[area]
+                map.flyTo([lat, lon], zoom || scanAreasZoom)
               }}
             >
               <Typography variant="subtitle2" align="center">
@@ -41,7 +41,7 @@ export default function AreaDropDown({ scanAreasZoom, manualAreas }) {
         </MenuList>
       ) : (
         <MenuList>
-          {data && data.scanAreas.features.map(area => (
+          {data && data.scanAreas[0].features.map(area => (
             <MenuItem
               key={area.properties.name}
               onClick={() => {

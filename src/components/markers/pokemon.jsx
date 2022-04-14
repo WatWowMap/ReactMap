@@ -11,19 +11,20 @@ export const basicMarker = (iconUrl, size) => new Icon({
 })
 
 export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons, weatherCheck, isNight) => {
-  const { pokemon: pokemonMod } = Icons.modifiers
+  const { pokemon: pokemonMod, weather: weatherMod } = Icons.modifiers
   let badge
   switch (pkmn.bestPvp) {
-    default: break
     case 1: badge = 'first'; break
     case 2: badge = 'second'; break
     case 3: badge = 'third'; break
+    default: break
   }
 
   const ReactIcon = (
     <div className="marker-image-holder top-overlay">
       <img
         src={iconUrl}
+        alt={pkmn.pokemon_id}
         style={{
           WebkitFilter: glow ? `drop-shadow(0 0 10px ${glow})drop-shadow(0 0 10px ${glow})` : undefined,
           height: size,
@@ -33,6 +34,7 @@ export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons, weatherC
       {badge && (
         <img
           src={Icons.getMisc(badge)}
+          alt={badge}
           style={{
             width: size / 2,
             height: 'auto',
@@ -54,20 +56,24 @@ export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons, weatherC
       )}
       {Boolean(weatherCheck) && (
         <div
-          className="weather-fancy"
+          className="weather-icon"
           style={{
             width: size / 2,
             height: size / 2,
             top: -size * pokemonMod.offsetY,
             left: `${pokemonMod.offsetX * size * 5}%`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <img
             src={Icons.getWeather(pkmn.weather, isNight)}
+            alt={pkmn.weather}
+            className={weatherMod.disableColorShift ? '' : 'fancy'}
             style={{
               width: size / 3,
-              height: 'auto',
-              padding: size / 12,
+              height: size / 3,
             }}
           />
         </div>
@@ -76,7 +82,7 @@ export const fancyMarker = (iconUrl, size, pkmn, glow, ivCircle, Icons, weatherC
   )
 
   return L.divIcon({
-    popupAnchor: [0, size * -0.7 * pokemonMod.offsetY],
+    popupAnchor: [0 + pokemonMod.popupX, size * -0.7 * pokemonMod.offsetY + pokemonMod.popupY],
     iconAnchor: [size / 2, 0],
     className: 'pokemon-marker',
     html: renderToString(ReactIcon),
