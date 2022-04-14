@@ -54,6 +54,7 @@ module.exports = class EventManager {
     }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
     if (Pvp) {
       setInterval(async () => {
+        console.log('[EVENT] Fetching Latest PVP Masterfile')
         Pvp.updatePokemonData(await Ohbem.fetchPokemonData())
       }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
     }
@@ -104,7 +105,7 @@ module.exports = class EventManager {
             const newInvasion = this.invasions[type]
             if (info.encounters) {
               Object.keys(info.encounters).forEach((position, i) => {
-                if (latest.active) {
+                if (latest?.active) {
                   newInvasion.encounters[position] = latest.lineup.team[i].map((pkmn, j) => (
                     pkmn.template === 'UNSET' && info.encounters[position][j]
                       ? info.encounters[position][j]
