@@ -18,8 +18,8 @@ export const Nominatim = gql`
 
 export default gql`
   ${Nominatim}
-  query Geocoder($search: String!, $name: String!) {
-    geocoder(search: $search, name: $name) {
+  query Geocoder($search: String!, $name: String!, $version: String!) {
+    geocoder(search: $search, name: $name, version: $version) {
       ...Nominatim
     }
   }

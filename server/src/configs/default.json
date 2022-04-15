@@ -12,6 +12,7 @@
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
     "reactMapSecret": "",
     "maxSessions": 5,
+    "cookieAgeDays": 7,
     "rateLimit": {
       "time": 60,
       "requests": 1000

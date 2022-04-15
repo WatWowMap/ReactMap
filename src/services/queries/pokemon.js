@@ -66,8 +66,8 @@ export const getIvs = gql`
 export const getPvp = gql`
   ${core}
   ${pvp}
-  query PokemonPVP($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!, $ts: Int) {
-    pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters, ts: $ts) {
+  query PokemonPVP($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!, $ts: Int, $version: String!) {
+    pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters, ts: $ts, version: $version) {
       ...CorePokemon
       ...Pvp
     }
@@ -78,8 +78,8 @@ export const getIvsPvp = gql`
   ${core}
   ${ivs}
   ${pvp}
-  query PokemonIVsPVP($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!, $ts: Int) {
-    pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters, ts: $ts) {
+  query PokemonIVsPVP($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!, $ts: Int, $version: String!) {
+    pokemon(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters, ts: $ts, version: $version) {
       ...CorePokemon
       ...Iv
       ...Pvp
@@ -88,8 +88,8 @@ export const getIvsPvp = gql`
 `
 
 export const getOne = gql`
-  query GetOnePokemon($id: ID!, $perm: String!) {
-    pokemonSingle(id: $id, perm: $perm) {
+  query GetOnePokemon($id: ID!, $perm: String!, $version: String!) {
+    pokemonSingle(id: $id, perm: $perm, version: $version) {
       lat
       lon
     }

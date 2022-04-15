@@ -75,6 +75,7 @@ export default function QueryData({
       refetch({
         ...Utility.getQueryArgs(map),
         filters: trimFilters(filters),
+        version: inject.VERSION,
       })
     }
   }
@@ -93,6 +94,7 @@ export default function QueryData({
       variables: {
         ...bounds,
         filters: trimFilters(filters),
+        version: inject.VERSION,
       },
       fetchPolicy: 'cache-and-network',
       pollInterval: getPolling(category),
@@ -101,6 +103,9 @@ export default function QueryData({
 
   useEffect(() => () => setExcludeList([]))
 
+  // console.log('query', error, error ? Object.entries(error).forEach(m => {
+  //   console.log(m[0], m[1])
+  // }) : '')
   const renderedData = data || previousData || {}
 
   if (error && inject.DEVELOPMENT) {

@@ -24,6 +24,7 @@ export default function ScanZone({
   const [scanZoneSize, setScanZoneSize] = useState(1)
   const [scanZone, { error: scannerError, data: scannerResponse }] = useLazyQuery(Query.scanner(), {
     variables: {
+      version: inject.VERSION,
       category: 'scanZone',
       method: 'GET',
       data: {
@@ -38,6 +39,7 @@ export default function ScanZone({
   })
   const [getQueue, { data: scannerQueueResponse }] = useLazyQuery(Query.scanner(), {
     variables: {
+      version: inject.VERSION,
       category: 'getQueue',
       method: 'GET',
       data: {

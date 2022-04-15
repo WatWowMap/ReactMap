@@ -10,8 +10,8 @@ const core = gql`
 
 export const getAllNests = gql`
   ${core}
-  query Nests($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!) {
-    nests(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters) {
+  query Nests($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!, $version: String!) {
+    nests(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters, version: $version) {
       ...CoreNest
       name
       pokemon_id
@@ -25,8 +25,8 @@ export const getAllNests = gql`
 
 export const getOne = gql`
   ${core}
-  query GetOneNest($id: ID!, $perm: String!) {
-    nestsSingle(id: $id, perm: $perm) {
+  query GetOneNest($id: ID!, $perm: String!, $version: String!) {
+    nestsSingle(id: $id, perm: $perm, version: $version) {
       ...CoreNest
     }
   }
