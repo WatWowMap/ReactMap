@@ -9,6 +9,10 @@ module.exports = function buildPokemon(defaults, base, custom) {
     quests: { global: new GenericFilter() },
     nests: { global: new GenericFilter() },
   }
+  const energyAmounts = new Set(['10', '20', ...Event.available.pokestops
+    .filter((e) => e.startsWith('m'))
+    .map((e) => e.split('-')[1])])
+
   for (const [i, pkmn] of Object.entries(Event.masterfile.pokemon)) {
     for (const j of Object.keys(pkmn.forms)) {
       pokemon.full[`${i}-${j}`] = base
@@ -21,8 +25,9 @@ module.exports = function buildPokemon(defaults, base, custom) {
       pokemon.quests[`x${pkmn.family}`] = new GenericFilter(defaults.pokestops.candy)
     }
     if (pkmn.tempEvolutions) {
-      pokemon.quests[`m${i}-10`] = new GenericFilter(defaults.pokestops.megaEnergy)
-      pokemon.quests[`m${i}-20`] = new GenericFilter(defaults.pokestops.megaEnergy)
+      energyAmounts.forEach((a) => {
+        pokemon.quests[`m${i}-${a}`] = new GenericFilter(defaults.pokestops.megaEnergy)
+      })
     }
   }
   return pokemon
