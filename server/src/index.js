@@ -40,11 +40,13 @@ const server = new ApolloServer({
     return { req, res, Db, perms, version }
   },
   formatError: (e) => {
-    console.warn(['GQL'], config.devOptions.enabled ? e : e.message)
-    if (e instanceof ValidationError) {
-      // console.warn('[GraphQL Error]:', config.devOptions.enabled ? e : e.message, '\nThis is very likely not a real issue and is caused by a user leaving an old browser session open, there is nothing you can do until they refresh.')
+    if (e instanceof ValidationError || e?.message.includes('skipUndefined()')) {
       return { message: 'old_client' }
     }
+    if (['old_client', 'session_expired'].includes(e.message)) {
+      return { message: e.message }
+    }
+    console.warn(['GQL'], config.devOptions.enabled ? e : e.message)
     return { message: e.message }
   },
 })

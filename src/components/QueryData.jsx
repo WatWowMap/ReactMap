@@ -29,6 +29,7 @@ export default function QueryData({
   bounds, onMove, map, tileStyle, clusteringRules, config, params, isMobile,
   category, available, filters, staticFilters, staticUserSettings, sizeKey,
   userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
+  setError,
 }) {
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
@@ -103,25 +104,30 @@ export default function QueryData({
 
   useEffect(() => () => setExcludeList([]))
 
-  // console.log('query', error, error ? Object.entries(error).forEach(m => {
-  //   console.log(m[0], m[1])
-  // }) : '')
-  const renderedData = data || previousData || {}
-
-  if (error && inject.DEVELOPMENT) {
-    return (
-      <Notification
-        severity="error"
-        i18nKey="server_dev_error_0"
-        messages={[
-          {
-            key: 'error',
-            variables: [error],
-          },
-        ]}
-      />
-    )
+  if (error) {
+    if (inject.DEVELOPMENT) {
+      return (
+        <Notification
+          severity="error"
+          i18nKey="server_dev_error_0"
+          messages={[
+            {
+              key: 'error',
+              variables: [error],
+            },
+          ]}
+        />
+      )
+    }
+    const message = error?.networkError?.result?.errors?.find(x => x?.message === 'old_client')?.message
+      || error?.message
+    if (message === 'session_expired' || message === 'old_client') {
+      setError(message)
+      return null
+    }
   }
+
+  const renderedData = data || previousData || {}
   return renderedData[category] ? (
     <>
       <Clustering
