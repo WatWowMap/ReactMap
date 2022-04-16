@@ -7,7 +7,8 @@ const getPolyVector = require('./getPolyVector')
 const { Ring } = require('../../models/index')
 
 module.exports = function getPlacementCells(bounds, pokestops, gyms) {
-  const allCoords = [...pokestops, ...gyms]
+  // dedupe poi entries
+  const allCoords = Object.values(Object.fromEntries([...pokestops, ...gyms].map(poi => [poi.id, poi])))
 
   const regionCoverer = new S2RegionCoverer()
   regionCoverer.minLevel = 17
