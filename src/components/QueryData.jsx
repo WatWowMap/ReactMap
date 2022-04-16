@@ -29,7 +29,7 @@ export default function QueryData({
   bounds, onMove, map, tileStyle, clusteringRules, config, params, isMobile,
   category, available, filters, staticFilters, staticUserSettings, sizeKey,
   userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
-  setError,
+  setError, active,
 }) {
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
@@ -97,8 +97,9 @@ export default function QueryData({
         filters: trimFilters(filters),
         version: inject.VERSION,
       },
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: active ? 'cache-first' : 'cache-only',
       pollInterval: getPolling(category),
+      skip: !active,
     },
   )
 

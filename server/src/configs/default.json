@@ -130,7 +130,8 @@
       "enableQuestSetSelector": false,
       "noScanAreaOverlay": false,
       "permImageDir": "images/perms",
-      "permArrayImages": false
+      "permArrayImages": false,
+      "clientTimeoutMinutes": 30
     },
     "theme": {
       "style": "dark",

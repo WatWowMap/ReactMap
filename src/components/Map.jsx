@@ -66,6 +66,8 @@ export default function Map({ serverSettings:
   const [scanZoneMode, setScanZoneMode] = useState(false)
   const [manualParams, setManualParams] = useState(params)
   const [error, setError] = useState('')
+  const [windowState, setWindowState] = useState(true)
+  const [active, setActive] = useState(true)
 
   const [lc] = useState(L.control.locate({
     position: 'bottomright',
@@ -82,6 +84,24 @@ export default function Map({ serverSettings:
   }, [map])
 
   const tileServer = useMemo(() => getTileServer(tileServers, settings, isNight), [settings.tileServers])
+
+  useEffect(() => {
+    window.addEventListener('focus', () => setWindowState(true))
+    window.addEventListener('blur', () => setWindowState(false))
+    return () => {
+      window.removeEventListener('focus', () => setWindowState(true))
+      window.removeEventListener('blur', () => setWindowState(false))
+    }
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => setActive(windowState), 1000 * 60 * config.clientTimeoutMinutes)
+    if (windowState) {
+      clearTimeout(timer)
+      setActive(windowState)
+    }
+    return () => clearTimeout(timer)
+  }, [windowState])
 
   useEffect(() => {
     if (settings.navigationControls === 'leaflet') {
@@ -178,6 +198,7 @@ export default function Map({ serverSettings:
                 isNight={isNight}
                 isMobile={isMobile}
                 setError={setError}
+                active={active}
               />
             )
           }
