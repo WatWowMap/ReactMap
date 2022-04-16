@@ -234,6 +234,7 @@ const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
 const GymBadges = ({ isMobile, t }) => {
   const { data } = useQuery(Query.gyms('badges'), {
     fetchPolicy: 'network-only',
+    variables: { version: inject.VERSION },
   })
   const Icons = useStatic(s => s.Icons)
   const map = useMap()

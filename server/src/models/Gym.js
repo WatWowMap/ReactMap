@@ -133,6 +133,10 @@ module.exports = class Gym extends Model {
         // Returns nothing if only raids are enabled without any filters
         return []
       }
+      if (onlyGymBadges && !userBadges.length && !onlyAllGyms && !onlyRaids) {
+        // Returns nothing if only gym badges are enabled without any badges
+        return []
+      }
     }
 
     query.andWhere(gym => {

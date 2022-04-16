@@ -10,7 +10,9 @@ import Utility from '@services/Utility'
 import Query from '@services/Query'
 
 export default function AreaDropDown({ scanAreasZoom, manualAreas }) {
-  const { data } = useQuery(Query.scanAreas())
+  const { data } = useQuery(Query.scanAreas(), {
+    variables: { version: inject.VERSION },
+  })
   const map = useMap()
 
   return (
