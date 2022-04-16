@@ -40,13 +40,16 @@ const server = new ApolloServer({
     return { req, res, Db, perms, version }
   },
   formatError: (e) => {
+    if (config.devOptions.enabled) {
+      console.log(e)
+    }
     if (e instanceof ValidationError || e?.message.includes('skipUndefined()')) {
       return { message: 'old_client' }
     }
     if (['old_client', 'session_expired'].includes(e.message)) {
       return { message: e.message }
     }
-    console.warn(['GQL'], config.devOptions.enabled ? e : e.message)
+    console.warn(['GQL'], e.message)
     return { message: e.message }
   },
 })
