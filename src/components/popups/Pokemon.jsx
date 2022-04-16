@@ -124,7 +124,7 @@ export default function PokemonPopup({
 }
 
 const Header = ({
-  pokemon, metaData, t, iconUrl, userSettings, classes,
+  pokemon, metaData, t, iconUrl, userSettings, classes, isTutorial,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -185,7 +185,7 @@ const Header = ({
     { name: 'timer', action: handleTimer },
     { name: 'hide', action: handleHide },
   ]
-  if (filters.pokemon.filter[`${pokemon_id}-${form}`]?.enabled) {
+  if (isTutorial || filters?.pokemon?.filter?.[`${pokemon_id}-${form}`]?.enabled) {
     options.push({ name: 'exclude', action: handleExclude })
   }
   const pokeName = t(`poke_${metaData.pokedexId}`)
