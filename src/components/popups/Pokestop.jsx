@@ -73,13 +73,16 @@ export default function PokestopPopup({
       />
       <Grid item xs={12} style={{ textAlign: 'center' }}>
         {plainPokestop ? (
-          <HeaderImage
-            Icons={Icons}
-            alt={pokestop.name}
-            url={pokestop.url}
-            arScanEligible={pokestop.ar_scan_eligible}
-            large
-          />
+          <>
+            <HeaderImage
+              Icons={Icons}
+              alt={pokestop.name}
+              url={pokestop.url}
+              arScanEligible={pokestop.ar_scan_eligible}
+              large
+            />
+            <PowerUp {...pokestop} />
+          </>
         ) : (
           <Collapse in={!popups.invasions || !hasInvasion} timeout="auto" unmountOnExit>
             <Grid

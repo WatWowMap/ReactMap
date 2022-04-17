@@ -16,7 +16,7 @@ export default function PowerUp({
       <TimeTile
         expireTime={power_up_end_timestamp}
         until
-        size={4}
+        size={5}
         icon={(
           <>
             <Typography align="center" variant="subtitle2">
