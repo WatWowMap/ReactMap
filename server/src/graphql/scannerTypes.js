@@ -43,6 +43,9 @@ module.exports = gql`
     raid_pokemon_evolution: Int
     ar_scan_eligible: Boolean
     badge: Int
+    power_up_level: Int
+    power_up_points: Int
+    power_up_end_timestamp: Int
   }
 
   type Nest {
@@ -110,6 +113,9 @@ module.exports = gql`
     ar_scan_eligible: Boolean
     quests: [Quest]
     invasions: [Invasion]
+    power_up_level: Int
+    power_up_points: Int
+    power_up_end_timestamp: Int
   }
 
   type Pokemon {

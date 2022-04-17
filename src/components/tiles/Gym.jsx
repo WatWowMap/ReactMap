@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, { memo, useState, useRef, useEffect } from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 

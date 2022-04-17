@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Typography } from '@material-ui/core'
+import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
 export default function TimeSince({ expireTime, until }) {
+  const { t } = useTranslation()
   const endTime = new Date(expireTime * 1000)
   const [timerEnd, setTimerEnd] = useState(Utility.getTimeUntil(endTime, until))
 
@@ -16,7 +18,7 @@ export default function TimeSince({ expireTime, until }) {
 
   return (
     <Typography variant="subtitle2">
-      {timerEnd.str}
+      {timerEnd.str.replace('days', t('days')).replace('day', t('day'))}
     </Typography>
   )
 }
