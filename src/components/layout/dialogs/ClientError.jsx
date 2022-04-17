@@ -21,7 +21,7 @@ export default function ClientError({ error }) {
         </Typography>
         <br />
         <Button
-          onClick={() => window.location.reload(true)}
+          onClick={() => window.location = window.location.href}
           variant="contained"
           color="primary"
           style={{ marginBottom: 20 }}
