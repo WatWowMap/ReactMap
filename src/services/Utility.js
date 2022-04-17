@@ -108,4 +108,12 @@ export default class Utility {
       midnight: this.getMidnight(),
     }
   }
+
+  static getBlockContent(block = {}, field = 'content') {
+    if (!block[field]) return ''
+    return typeof block[field] === 'string'
+      ? block[field]
+      : block[field][localStorage.getItem('i18nextLng')]
+      || Object.values(block[field])[0] || ''
+  }
 }

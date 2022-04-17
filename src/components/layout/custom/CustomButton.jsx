@@ -1,5 +1,8 @@
 import React from 'react'
 import { Button, Icon, Typography } from '@material-ui/core'
+
+import Utility from '@services/Utility'
+
 import LinkWrapper from './LinkWrapper'
 
 export default function CustomButton({ block, isMuiColor = false }) {
@@ -13,7 +16,7 @@ export default function CustomButton({ block, isMuiColor = false }) {
     >
       {Boolean(block.icon) && <Icon className={block.icon} style={{ fontSize: 30 }} />}&nbsp;
       <Typography variant="button" align="right">
-        {block.content}
+        {Utility.getBlockContent(block)}
       </Typography>
     </Button>
   )
