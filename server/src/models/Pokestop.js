@@ -313,7 +313,7 @@ module.exports = class Pokestop extends Model {
       if (perms.pokestops) {
         this.fieldAssigner(filtered, pokestop, ['ar_scan_eligible', 'power_up_points', 'power_up_level', 'power_up_end_timestamp'])
       }
-      if (perms.invasion && (filters.onlyAllPokestops || filters.onlyInvasions)) {
+      if (perms.invasions && (filters.onlyAllPokestops || filters.onlyInvasions)) {
         filtered.invasions = pokestop.invasions.filter(invasion => filters[`i${invasion.grunt_type}`])
       }
       if (perms.lures
