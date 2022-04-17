@@ -109,11 +109,12 @@ export default class Utility {
     }
   }
 
-  static getBlockContent(block = {}, field = 'content') {
-    if (!block[field]) return ''
-    return typeof block[field] === 'string'
-      ? block[field]
-      : block[field][localStorage.getItem('i18nextLng')]
-      || Object.values(block[field])[0] || ''
+  static getBlockContent(content) {
+    if (!content) return ''
+    if (typeof content === 'string') return content
+    return typeof content === 'object'
+      ? content[localStorage.getItem('i18nextLng')]
+      || Object.values(content)[0]
+      : ''
   }
 }

@@ -16,7 +16,7 @@ export default function CustomButton({ block, isMuiColor = false }) {
     >
       {Boolean(block.icon) && <Icon className={block.icon} style={{ fontSize: 30 }} />}&nbsp;
       <Typography variant="button" align="right">
-        {Utility.getBlockContent(block)}
+        {Utility.getBlockContent(block.content)}
       </Typography>
     </Button>
   )

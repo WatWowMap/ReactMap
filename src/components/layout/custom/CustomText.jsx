@@ -12,7 +12,7 @@ export default function CustomText({ block, isMuiColor = false }) {
       color={isMuiColor ? block.color : 'inherit'}
       style={block.style || { color: isMuiColor ? 'inherit' : block.color }}
     >
-      {Utility.getBlockContent(block)}
+      {Utility.getBlockContent(block.content)}
     </Typography>
   )
   return block.link ? <LinkWrapper block={block} element={text} /> : text

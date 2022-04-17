@@ -38,17 +38,17 @@ const DefaultMotD = ({ block }) => typeof block === 'string' ? (
   <div key={`${block.title}-${block.body}`} style={{ whiteSpace: 'pre-line', margin: 20, textAlign: 'center' }}>
     {block.title && (
       <Typography variant="h6">
-        {Utility.getBlockContent(block, 'title')}
+        {Utility.getBlockContent(block.title)}
       </Typography>
     )}
     {block.body && (
       <Typography variant="subtitle1">
-        {Utility.getBlockContent(block, 'body')}
+        {Utility.getBlockContent(block.body)}
       </Typography>
     )}
     {block.footer && (
       <Typography variant="caption">
-        {Utility.getBlockContent(block, 'footer')}
+        {Utility.getBlockContent(block.footer)}
       </Typography>
     )}
   </div>
