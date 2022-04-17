@@ -31,7 +31,7 @@ module.exports = {
       return []
     },
     geocoder: (_, args, { perms, version }) => {
-      if (args.version && args.version && args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.webhooks) {
@@ -237,7 +237,7 @@ module.exports = {
           typeCells: Utility.getTypeCells(args, pokestops, gyms),
         }]
       }
-      return []
+      return [{ placementCells: [], typeCells: [] }]
     },
     weather: (_, args, { perms, version, Db }) => {
       if (args.version && args.version !== version) throw new UserInputError('old_client')
