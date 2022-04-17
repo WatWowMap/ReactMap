@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
 
 import Utility from '@services/Utility'
-import { useStore } from '@hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
 import Query from '@services/Query'
 import Header from '../general/Header'
 import QuestTitle from '../general/QuestTitle'
@@ -23,6 +23,7 @@ export default function Search({
   const setSearch = useStore(state => state.setSearch)
   const searchTab = useStore(state => state.searchTab)
   const setSearchTab = useStore(state => state.setSearchTab)
+  const { map } = useStatic(state => state.config)
 
   const handleTabChange = (event, newValue) => {
     setSearchTab(newValue)
@@ -163,7 +164,7 @@ export default function Search({
             onClick={toggleDialog(false, '', 'search', option)}
             justifyContent="space-between"
             alignItems="center"
-            style={{ backgroundColor: index % 2 ? 'rgba(1, 1, 1, 0.05)' : 'rgba(240, 240, 240, 0.05)', height: 50 }}
+            style={{ backgroundColor: index % 2 ? 'rgba(1, 1, 1, 0.05)' : 'rgba(240, 240, 240, 0.05)', padding: '10px 5px' }}
           >
             <Grid item xs={2} style={{ textAlign: 'center' }}>
               {option.url
@@ -190,8 +191,14 @@ export default function Search({
                 />
               )}
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={2} style={{ textAlign: 'center' }}>
               <Typography variant="caption">{option.distance}{t('km')}</Typography>
+              <br />
+              {safeSearch[searchTab] === 'quests' && (
+                <Typography variant="caption" className="ar-task" noWrap>
+                  {map.questMessage || t(`ar_quest_${Boolean(option.with_ar)}`)}
+                </Typography>
+              )}
             </Grid>
           </Grid>
         ))}
