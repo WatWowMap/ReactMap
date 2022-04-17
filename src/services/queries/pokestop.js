@@ -9,11 +9,6 @@ const core = gql`
     lon
     updated
     last_modified_timestamp
-  }
-`
-
-const pokestop = gql`
-  fragment Pokestop on Pokestop {
     ar_scan_eligible
     power_up_level
     power_up_points
@@ -68,11 +63,9 @@ const invasion = gql`
 
 export const getPokestops = gql`
   ${core}
-  ${pokestop}
   query Pokestops($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!, $ts: Int!, $midnight: Int!) {
     pokestops(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters, ts: $ts, midnight: $midnight) {
       ...CorePokestop
-      ...Pokestop
     }
   }
 `
