@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, { Fragment } from 'react'
 import { renderToString } from 'react-dom/server'
 import L from 'leaflet'

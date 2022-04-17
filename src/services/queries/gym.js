@@ -22,6 +22,9 @@ const gym = gql`
     guarding_pokemon_id
     total_cp
     badge
+    power_up_level
+    power_up_points
+    power_up_end_timestamp
   }
 `
 

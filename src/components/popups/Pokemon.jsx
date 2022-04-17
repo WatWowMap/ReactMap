@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, {
   Fragment, useCallback, useState, useEffect,
 } from 'react'
@@ -124,7 +123,7 @@ export default function PokemonPopup({
 }
 
 const Header = ({
-  pokemon, metaData, t, iconUrl, userSettings, classes,
+  pokemon, metaData, t, iconUrl, userSettings, classes, isTutorial,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -182,11 +181,12 @@ const Header = ({
   }
 
   const options = [
-    { name: 'hide', action: handleHide },
-    { name: 'exclude', action: handleExclude },
     { name: 'timer', action: handleTimer },
+    { name: 'hide', action: handleHide },
   ]
-
+  if (isTutorial || filters?.pokemon?.filter?.[`${pokemon_id}-${form}`]?.enabled) {
+    options.push({ name: 'exclude', action: handleExclude })
+  }
   const pokeName = t(`poke_${metaData.pokedexId}`)
   const formName = metaData.forms?.[form]?.name === 'Normal' || form === 0 ? '' : t(`form_${pokemon.form}`)
 

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const { Event } = require('../services/initialization')
@@ -114,7 +113,7 @@ module.exports = class Pokestop extends Model {
     if (onlyAllPokestops && pokestopPerms) {
       const results = await query.limit(queryLimits.pokestops)
       const normalized = isMad ? this.mapMAD(results, safeTs) : this.mapRDM(results, safeTs)
-      return this.secondaryFilter(normalized, args.filters, isMad, midnight)
+      return this.secondaryFilter(normalized, args.filters, isMad, midnight, perms)
     }
 
     const stardust = []
@@ -295,7 +294,7 @@ module.exports = class Pokestop extends Model {
     })
     const results = await query.limit(queryLimits.pokestops)
     const normalized = isMad ? this.mapMAD(results, safeTs) : this.mapRDM(results, safeTs)
-    return this.secondaryFilter(normalized, args.filters, isMad, midnight)
+    return this.secondaryFilter(normalized, args.filters, isMad, midnight, perms)
   }
 
   static fieldAssigner(target, source, fields) {
@@ -303,22 +302,27 @@ module.exports = class Pokestop extends Model {
   }
 
   // filters and removes unwanted data
-  static secondaryFilter(queryResults, filters, isMad, midnight) {
+  static secondaryFilter(queryResults, filters, isMad, midnight, perms) {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
       const filtered = {}
 
-      this.fieldAssigner(filtered, pokestop, ['id', 'lat', 'lon', 'enabled', 'ar_scan_eligible', 'url', 'name', 'last_modified_timestamp', 'updated'])
+      this.fieldAssigner(filtered, pokestop, ['id', 'lat', 'lon', 'enabled', 'url', 'name', 'last_modified_timestamp', 'updated'])
 
-      if (filters.onlyAllPokestops || filters.onlyInvasions) {
+      if (perms.pokestops) {
+        this.fieldAssigner(filtered, pokestop, ['ar_scan_eligible', 'power_up_points', 'power_up_level', 'power_up_end_timestamp'])
+      }
+      if (perms.invasion && (filters.onlyAllPokestops || filters.onlyInvasions)) {
         filtered.invasions = pokestop.invasions.filter(invasion => filters[`i${invasion.grunt_type}`])
       }
-      if (filters.onlyAllPokestops || (filters.onlyLures && filters[`l${pokestop.lure_id}`])) {
+      if (perms.lures
+        && (filters.onlyAllPokestops
+          || (filters.onlyLures && filters[`l${pokestop.lure_id}`]))) {
         this.fieldAssigner(filtered, pokestop, ['lure_id', 'lure_expire_timestamp'])
       }
 
-      if (filters.onlyAllPokestops || filters.onlyQuests) {
+      if (perms.quests && (filters.onlyAllPokestops || filters.onlyQuests)) {
         filtered.quests = []
         pokestop.quests.forEach(quest => {
           if (quest.quest_reward_type && (

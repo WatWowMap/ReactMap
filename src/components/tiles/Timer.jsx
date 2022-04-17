@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Tooltip } from 'react-leaflet'
+import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 
 const Timer = ({ timestamp }) => {
+  const { t } = useTranslation()
   const [timer, setTimer] = useState(Utility.getTimeUntil(new Date(timestamp * 1000), true))
 
   useEffect(() => {
@@ -14,7 +16,7 @@ const Timer = ({ timestamp }) => {
 
   return (
     <div>
-      {timer.str}
+      {timer.str.replace('days', t('days')).replace('day', t('day'))}
     </div>
   )
 }

@@ -10,6 +10,9 @@ const core = gql`
     updated
     last_modified_timestamp
     ar_scan_eligible
+    power_up_level
+    power_up_points
+    power_up_end_timestamp
   }
 `
 

@@ -529,5 +529,8 @@
   "session_expired_body": "Your session has expired",
   "old_client_title": "Outdated",
   "old_client_body": "A new version of this map is available",
-  "refresh": "Refresh"
+  "refresh": "Refresh",
+  "points": "Points",
+  "day": "Day",
+  "days": "Days"
 }

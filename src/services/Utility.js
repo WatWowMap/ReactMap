@@ -42,6 +42,10 @@ export default class Utility {
     return str.replace(/([a-z](?=[A-Z]))/g, '$1_').toLowerCase()
   }
 
+  static capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
+
   static getTileBackground(columnIndex, rowIndex) {
     return columnIndex % 2
       ? rowIndex % 2 === 0
@@ -108,5 +112,14 @@ export default class Utility {
       midnight: this.getMidnight(),
       version: inject.VERSION,
     }
+  }
+
+  static getBlockContent(content) {
+    if (!content) return ''
+    if (typeof content === 'string') return content
+    return typeof content === 'object'
+      ? content[localStorage.getItem('i18nextLng')]
+      || Object.values(content)[0]
+      : ''
   }
 }
