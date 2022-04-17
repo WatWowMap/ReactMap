@@ -86,8 +86,9 @@ module.exports = class Pokemon extends Model {
       const [min, max] = getMinMax(filterId, league)
       let best = 4096
       const filtered = data.filter(pkmn => {
-        if (pkmn.rank < best) best = pkmn.rank
-        return pvpCheck(pkmn, league, min, max)
+        const valid = pvpCheck(pkmn, league, min, max)
+        if (valid && pkmn.rank < best) best = pkmn.rank
+        return valid
       })
       return { filtered, best }
     }

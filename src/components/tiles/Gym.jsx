@@ -117,8 +117,6 @@ const areEqual = (prev, next) => {
     && !next.excludeList.includes(`${prev.item.raid_pokemon_id}-${prev.item.raid_pokemon_form}`)
     && !next.excludeList.includes(`t${prev.item.team_id}-0`)
     && !next.excludeList.includes(`e${prev.item.raid_level}`)
-    && Object.keys(prev.userIcons).every(key => prev.userIcons[key] === next.userIcons[key])
-    && Object.keys(prev.userSettings).every(key => prev.userSettings[key] === next.userSettings[key])
 }
 
 export default memo(GymTile, areEqual)

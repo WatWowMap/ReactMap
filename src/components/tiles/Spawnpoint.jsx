@@ -32,7 +32,6 @@ const SpawnpointTile = ({ item, Icons, ts }) => {
 const areEqual = (prev, next) => (
   prev.item.id === next.item.id
   && prev.item.updated === next.item.updated
-  && prev.userIcons.spawnpoint === next.userIcons.spawnpoint
 )
 
 export default memo(SpawnpointTile, areEqual)
