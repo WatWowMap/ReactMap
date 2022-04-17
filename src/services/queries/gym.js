@@ -9,6 +9,9 @@ const core = gql`
     lon
     updated
     last_modified_timestamp
+    power_up_level
+    power_up_points
+    power_up_end_timestamp
   }
 `
 

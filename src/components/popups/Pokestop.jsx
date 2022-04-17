@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, {
   Fragment, useState, useEffect,
 } from 'react'
@@ -18,6 +17,7 @@ import Navigation from './common/Navigation'
 import Title from './common/Title'
 import HeaderImage from './common/HeaderImage'
 import Timer from './common/Timer'
+import PowerUp from './common/PowerUp'
 
 export default function PokestopPopup({
   pokestop, ts, hasLure, hasInvasion, hasQuest, Icons, userSettings, config,
@@ -88,6 +88,7 @@ export default function PokestopPopup({
               alignItems="center"
               spacing={1}
             >
+              <PowerUp {...pokestop} divider={hasInvasion || hasQuest || hasLure} />
               {hasQuest && pokestop.quests.map((quest, index) => (
                 <Fragment key={quest.with_ar}>
                   {index ? <Divider light flexItem className="popup-divider" /> : null}

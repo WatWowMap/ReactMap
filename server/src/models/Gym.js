@@ -9,7 +9,7 @@ const {
 } = require('../services/config')
 const Badge = require('./Badge')
 
-const coreFields = ['id', 'name', 'url', 'lat', 'lon', 'updated', 'last_modified_timestamp']
+const coreFields = ['id', 'name', 'url', 'lat', 'lon', 'updated', 'last_modified_timestamp', 'power_up_points', 'power_up_level', 'power_up_end_timestamp']
 
 const gymFields = ['available_slots', 'ex_raid_eligible', 'ar_scan_eligible', 'team_id', 'in_battle', 'guarding_pokemon_id', 'total_cp']
 

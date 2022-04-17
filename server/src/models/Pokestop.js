@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const { Event } = require('../services/initialization')
@@ -309,7 +308,7 @@ module.exports = class Pokestop extends Model {
       const pokestop = queryResults[i]
       const filtered = {}
 
-      this.fieldAssigner(filtered, pokestop, ['id', 'lat', 'lon', 'enabled', 'ar_scan_eligible', 'url', 'name', 'last_modified_timestamp', 'updated'])
+      this.fieldAssigner(filtered, pokestop, ['id', 'lat', 'lon', 'enabled', 'ar_scan_eligible', 'url', 'name', 'last_modified_timestamp', 'updated', 'power_up_points', 'power_up_level', 'power_up_end_timestamp'])
 
       if (filters.onlyAllPokestops || filters.onlyInvasions) {
         filtered.invasions = pokestop.invasions.filter(invasion => filters[`i${invasion.grunt_type}`])

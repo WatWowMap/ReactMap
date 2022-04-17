@@ -523,5 +523,8 @@
   "lc_popup": "You are within {distance} {unit} from this point",
   "lc_outsideMapBoundsMsg": "You seem located outside the boundaries of the map",
   "no_alerts": "No Alerts Found",
-  "loading_settings": "Loading Settings"
+  "loading_settings": "Loading Settings",
+  "points": "Points",
+  "day": "Day",
+  "days": "Days"
 }
