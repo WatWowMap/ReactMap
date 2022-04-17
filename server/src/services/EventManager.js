@@ -16,9 +16,8 @@ module.exports = class EventManager {
     this.baseUrl = 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
     this.webhookObj = {}
 
-    this.setTimers(config, Db, Pvp);
-    (async () => {
-      // Set initials
+    setTimeout(async () => {
+      // Set initials, comes with a timeout just to make sure all databases get configured first
       await this.getUicons(config.icons.styles)
       this.available.gyms = await Db.getAvailable('Gym')
       this.available.nests = await Db.getAvailable('Nest')
@@ -27,7 +26,8 @@ module.exports = class EventManager {
       await this.getMasterfile()
       await this.getInvasions()
       await this.getWebhooks(config)
-    })()
+    }, 2000)
+    this.setTimers(config, Db, Pvp)
   }
 
   setTimers(config, Db, Pvp) {
