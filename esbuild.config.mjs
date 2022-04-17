@@ -7,8 +7,8 @@ import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
-
 import { build as compile } from 'esbuild'
+import { createServer } from 'esbuild-server'
 import { htmlPlugin } from '@craftamap/esbuild-plugin-html'
 import esbuildMxnCopy from 'esbuild-plugin-mxn-copy'
 import aliasPlugin from 'esbuild-plugin-path-alias'
@@ -19,6 +19,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const { version } = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json')))
 const isDevelopment = Boolean(process.argv.includes('--dev'))
 const isRelease = Boolean(process.argv.includes('--release'))
+const isServing = Boolean(process.argv.includes('--serve'))
 
 const hasCustom = await (async function checkFolders(folder, isCustom = false) {
   for (const file of await fs.promises.readdir(folder)) {
@@ -43,9 +44,12 @@ const plugins = [
       {
         entryPoints: ['src/index.jsx'],
         filename: 'index.html',
-        htmlTemplate: await fs.readFileSync('./public/index.template.html'),
+        htmlTemplate: await fs.readFileSync('./public/index.html'),
         scriptLoading: 'defer',
         favicon: './public/favicon/favicon.ico',
+        extraScripts: [
+          { src: '/esbuild-livereload.js', tags: ['async'] },
+        ],
       },
     ],
   }),
@@ -96,9 +100,9 @@ if (isDevelopment) {
                        WARNING:
        Custom files aren't officially supported
         Be sure to watch for breaking changes!
-    
+
 ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
-    
+
 ======================================================
 `)
             }
@@ -110,43 +114,60 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
   console.log(`[BUILD] Building production version: ${version}`)
 }
 
+const esbuild = {
+  entryPoints: ['src/index.jsx'],
+  legalComments: 'none',
+  bundle: true,
+  outdir: 'dist/',
+  publicPath: '/',
+  entryNames: isDevelopment ? undefined : '[name].[hash]',
+  metafile: true,
+  minify: isRelease || !isDevelopment,
+  logLevel: isDevelopment ? 'info' : 'error',
+  target: [
+    'safari11',
+    'chrome64',
+    'firefox58',
+    'edge88',
+  ],
+  watch: isDevelopment
+    ? {
+      onRebuild(error) {
+        if (error) console.error('Recompiling failed:', error)
+        else console.log('Recompiled successfully')
+      },
+    }
+    : false,
+  sourcemap: isRelease || isDevelopment,
+  define: {
+    inject: JSON.stringify({
+      ...env.parsed,
+      VERSION: version,
+      DEVELOPMENT: isDevelopment,
+      CUSTOM: hasCustom,
+      LOCALES: await fs.promises.readdir(`${__dirname}/public/locales`),
+    }),
+  },
+  plugins,
+}
+
 try {
-  await compile({
-    entryPoints: ['src/index.jsx'],
-    legalComments: 'none',
-    bundle: true,
-    outdir: 'dist/',
-    publicPath: '/',
-    entryNames: isDevelopment ? undefined : '[name].[hash]',
-    metafile: true,
-    minify: isRelease || !isDevelopment,
-    logLevel: isDevelopment ? 'info' : 'error',
-    target: [
-      'safari11',
-      'chrome64',
-      'firefox58',
-      'edge88',
-    ],
-    watch: isDevelopment
-      ? {
-        onRebuild(error) {
-          if (error) console.error('Recompiling failed:', error)
-          else console.log('Recompiled successfully')
+  if (isServing) {
+    if (!env.parsed.DEV_PORT) throw new Error('DEV_PORT is not set, in .env file, it should match the port you set in your config')
+    await createServer(
+      esbuild,
+      {
+        port: +env.parsed.DEV_PORT + 1,
+        static: 'public',
+        open: true,
+        proxy: {
+          '/': `http://localhost:${env.parsed.DEV_PORT}`,
         },
-      }
-      : false,
-    sourcemap: isRelease || isDevelopment,
-    define: {
-      inject: JSON.stringify({
-        ...env.parsed,
-        VERSION: version,
-        DEVELOPMENT: isDevelopment,
-        CUSTOM: hasCustom,
-        LOCALES: await fs.promises.readdir(`${__dirname}/public/locales`),
-      }),
-    },
-    plugins,
-  })
+      },
+    ).start()
+  } else {
+    await compile(esbuild)
+  }
 } catch (e) {
   console.error(e)
   process.exit(1)
