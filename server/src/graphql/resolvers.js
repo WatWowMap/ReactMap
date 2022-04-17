@@ -12,7 +12,7 @@ module.exports = {
   JSON: GraphQLJSON,
   Query: {
     badges: async (_, args, { req, perms, Db, version }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.gymBadges) {
@@ -22,7 +22,7 @@ module.exports = {
       return []
     },
     devices: (_, args, { perms, Db, version }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.devices) {
@@ -31,7 +31,7 @@ module.exports = {
       return []
     },
     geocoder: (_, args, { perms, version }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.webhooks) {
@@ -43,7 +43,7 @@ module.exports = {
       return []
     },
     gyms: (_, args, { perms, version, req, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.gyms || perms?.raids) {
@@ -52,7 +52,7 @@ module.exports = {
       return []
     },
     gymsSingle: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.[args.perm]) {
@@ -61,7 +61,7 @@ module.exports = {
       return {}
     },
     nests: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.nests) {
@@ -70,7 +70,7 @@ module.exports = {
       return []
     },
     nestsSingle: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.[args.perm]) {
@@ -79,7 +79,7 @@ module.exports = {
       return {}
     },
     pokestops: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.pokestops
@@ -91,7 +91,7 @@ module.exports = {
       return []
     },
     pokestopsSingle: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.[args.perm]) {
@@ -100,7 +100,7 @@ module.exports = {
       return {}
     },
     pokemon: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.pokemon) {
@@ -112,7 +112,7 @@ module.exports = {
       return []
     },
     pokemonSingle: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.[args.perm]) {
@@ -121,7 +121,7 @@ module.exports = {
       return {}
     },
     portals: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.portals) {
@@ -130,7 +130,7 @@ module.exports = {
       return []
     },
     portalsSingle: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.[args.perm]) {
@@ -139,7 +139,7 @@ module.exports = {
       return {}
     },
     scanCells: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.scanCells && args.zoom >= config.map.scanCellsZoom) {
@@ -148,7 +148,7 @@ module.exports = {
       return []
     },
     scanAreas: (_, args, { perms, version, req }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       const scanAreas = config.scanAreas[req.headers.host]
@@ -167,7 +167,7 @@ module.exports = {
       return []
     },
     search: async (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       const { category, webhookName, search } = args
@@ -203,7 +203,7 @@ module.exports = {
       return []
     },
     searchQuest: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       const { category, search } = args
@@ -216,7 +216,7 @@ module.exports = {
       return []
     },
     spawnpoints: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.spawnpoints) {
@@ -225,7 +225,7 @@ module.exports = {
       return []
     },
     submissionCells: async (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.submissionCells && args.zoom >= config.map.submissionZoom - 1) {
@@ -240,7 +240,7 @@ module.exports = {
       return []
     },
     weather: (_, args, { perms, version, Db }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.weather) {
@@ -249,7 +249,7 @@ module.exports = {
       return []
     },
     webhook: (_, args, { perms, version, req }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.webhooks) {
@@ -258,7 +258,7 @@ module.exports = {
       return {}
     },
     scanner: (_, args, { perms, version }) => {
-      if (args.version !== version) throw new UserInputError('old_client')
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       const { category, method, data } = args

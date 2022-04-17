@@ -41,7 +41,7 @@ const server = new ApolloServer({
   },
   formatError: (e) => {
     if (config.devOptions.enabled) {
-      console.log(e)
+      console.warn(e)
     }
     if (e instanceof ValidationError || e?.message.includes('skipUndefined()')) {
       return { message: 'old_client' }

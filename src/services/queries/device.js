@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 
 const getAllDevices = gql`
-  query Devices($version: String!) {
+  query Devices($version: String) {
     devices(version: $version) {
       id
       instance_name
