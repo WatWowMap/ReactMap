@@ -1,5 +1,6 @@
 import React from 'react'
-import { render } from 'react-dom'
+import { createRoot } from 'react-dom/client'
+
 import ReactGA from 'react-ga'
 import * as Sentry from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
@@ -33,6 +34,5 @@ if (inject) {
   console.log('ReactMap Version:', VERSION)
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  render(<App />, document.getElementById('root'))
-})
+const container = document.getElementById('root')
+createRoot(container).render(<App />)
