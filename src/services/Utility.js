@@ -110,6 +110,7 @@ export default class Utility {
       zoom: Math.floor(map.getZoom()),
       ts: Math.floor(Date.now() / 1000),
       midnight: this.getMidnight(),
+      version: inject.VERSION,
     }
   }
 

@@ -524,6 +524,12 @@
   "lc_outsideMapBoundsMsg": "You seem located outside the boundaries of the map",
   "no_alerts": "No Alerts Found",
   "loading_settings": "Loading Settings",
+  "refresh_to_continue": "Please refresh before continuing",
+  "session_expired_title": "Session Expired",
+  "session_expired_body": "Your session has expired",
+  "old_client_title": "Outdated",
+  "old_client_body": "A new version of this map is available",
+  "refresh": "Refresh",
   "points": "Points",
   "day": "Day",
   "days": "Days"
