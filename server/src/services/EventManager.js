@@ -26,7 +26,7 @@ module.exports = class EventManager {
       await this.getMasterfile()
       await this.getInvasions()
       await this.getWebhooks(config)
-    }, 2000)
+    }, 1000)
     this.setTimers(config, Db, Pvp)
   }
 
