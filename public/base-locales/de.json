@@ -270,7 +270,7 @@
   "quests_subtitle": "Zeigt Quest Belohnung und Aufgabeninformationen an",
   "raids_subtitle": "Zeigt alle Raid-Informationen, einschließlich des Raid-Bosses, der Eier, der Ablaufzeit und des Movesets",
   "scan_cells_subtitle": "Zeigt an, wann eine S2-Zelle zuletzt von einem Gerät gescannt wurde",
-  "scanAreas_subtitle": "Zeigt verfügbare Scanbereich Polygone",
+  "scan_areas_subtitle": "Zeigt verfügbare Scanbereich Polygone",
   "spawnpoints_subtitle": "Zeigt Spawnpunkte und deren geschätzte Despawnzeit an",
   "stats_subtitle": "Zeigt Pokemon-Statistiken und Level an",
   "submissionCells_subtitle": "Zeigt nützliche Informationen für das Einreichen neuer POIs an",
@@ -516,11 +516,6 @@
   "lc_feetUnit": "Fuss",
   "lc_popup": "Dein Standort befindet sich innerhalb von {distance} {unit} Abstand zu diesem Punkt.",
   "lc_outsideMapBoundsMsg": "Dein Standort scheint sich außerhalb der Grenzen der Karte zu befinden.",
-  "loading_settings": "Lade Einstellungen",
-  "refresh_to_continue": "Bitte aktualisiere, bevor du fortfährst",
-  "session_expired_title": "Sitzung abgelaufen",
-  "session_expired_body": "Deine Sitzung ist abgelaufen",
-  "old_client_title": "Veraltet",
-  "old_client_body": "Eine neue Version der Map ist verfügbar",
-  "refresh": "Aktualisieren"
+  "scanner": "Scanner",
+  "scanner_subtitle": "Ermöglicht on Demand scannen eines Standorts, innerhalb des Scangebietes"
 }
