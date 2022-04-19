@@ -618,7 +618,6 @@ module.exports = class Pokestop extends Model {
         ])
         .where(multiInvasionMs ? 'expiration_ms' : 'incident.expiration', '>=', ts * (multiInvasionMs ? 1000 : 1))
         .orderBy('grunt_type')
-        .then(results => [...new Set(results.map(r => r.grunt_type))])
     } else {
       stops.invasions = await this.query()
         .select(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
