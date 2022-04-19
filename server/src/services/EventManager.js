@@ -26,7 +26,7 @@ module.exports = class EventManager {
       await this.getMasterfile()
       await this.getInvasions()
       await this.getWebhooks(config)
-    }, 1000)
+    }, config.database.settings.startupDelayMs)
     this.setTimers(config, Db, Pvp)
   }
 

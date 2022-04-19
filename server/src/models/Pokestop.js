@@ -91,7 +91,7 @@ module.exports = class Pokestop extends Model {
       query.where('pokestop.updated', '>', Date.now() / 1000 - (stopValidDataLimit * 86400))
     }
     if (hasMultiInvasions) {
-      query.join('incident', 'pokestop.id', 'incident.pokestop_id')
+      query.leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
         .select([
           '*',
           'pokestop.id AS id',
@@ -606,7 +606,7 @@ module.exports = class Pokestop extends Model {
 
     if (hasMultiInvasions) {
       stops.invasions = await this.query()
-        .join('incident', 'pokestop.id', 'incident.pokestop_id')
+        .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
         .select([
           '*',
           'pokestop.id AS id',
