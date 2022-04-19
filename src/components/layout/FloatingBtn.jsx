@@ -38,7 +38,9 @@ export default function FloatingButtons({
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'medium'
 
-  useEffect(() => L.DomEvent.disableClickPropagation(ref.current))
+  useEffect(() => {
+    L.DomEvent.disableClickPropagation(ref.current)
+  }, [])
 
   const showDonorPage = (perms.donor ? donationPage.showToDonors : true)
     && donationPage.showOnMap && donationPage.components.length

@@ -19,7 +19,7 @@ module.exports = async function geocoder(nominatimUrl, search, reverse) {
     const results = reverse ? await stockGeocoder.reverse(search) : await stockGeocoder.geocode(search)
     return reverse ? results[0] : results
   } catch (e) {
-    console.warn('Unable to geocode', search)
+    console.warn('[GEOCODER] Unable to geocode', search)
     return {}
   }
 }

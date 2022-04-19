@@ -12,6 +12,7 @@ ENV PATH=$PATH:/home/node/.npm-global/bin
 
 WORKDIR /home/node
 COPY package.json .
+COPY yarn.lock .
 RUN apk add git
 RUN npm install -g yarn
 COPY . .

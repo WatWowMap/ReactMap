@@ -44,7 +44,7 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
       return res.redirect('/404')
     }
   } catch (e) {
-    console.error(`Error navigating to ${area}`, e.message)
+    console.error(`[ERROR] Error navigating to ${area}`, e.message)
     res.redirect('/404')
   }
 })
@@ -64,7 +64,7 @@ rootRouter.get('/settings', async (req, res) => {
         if (config.authentication.perms[perm]) {
           req.session.perms[perm] = true
         } else {
-          console.warn('Invalid Perm in "alwaysEnabledPerms" array:', perm)
+          console.warn('[AUTH] Invalid Perm in "alwaysEnabledPerms" array:', perm)
         }
       })
       req.session.save()
@@ -230,7 +230,7 @@ rootRouter.get('/settings', async (req, res) => {
           }))
         } catch (e) {
           serverSettings.webhooks = null
-          console.warn(e.message, 'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database. User ID:', serverSettings.user.id)
+          console.warn('[AUTH]', e.message, 'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database. User ID:', serverSettings.user.id)
         }
       }
     }

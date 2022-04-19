@@ -4,11 +4,10 @@ export default function formatInterval(intervalMs) {
   const h = Math.floor(diff / 3600)
   const m = Math.floor((diff % 3600) / 60)
   const s = Math.floor(diff % 3600 % 60)
-  let str = []
+  const str = []
 
-  // TODO: localize
   if (d > 0) {
-    str = [`${d} Days`]
+    str.push(`${d} ${d > 1 ? 'days' : 'day'}`)
   } else {
     if (h > 0) str.push(`${h}h`)
     if (m > 0) str.push(`${m}m`)
