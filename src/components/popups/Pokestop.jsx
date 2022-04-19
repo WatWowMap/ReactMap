@@ -122,13 +122,15 @@ export default function PokestopPopup({
               {hasInvasion && (
                 <>
                   {(hasQuest || hasLure) && <Divider light flexItem className="popup-divider" />}
-                  {invasions.map(invasion => (
-                    <TimeTile
-                      key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
-                      expireTime={invasion.incident_expire_timestamp}
-                      icon={Icons.getInvasions(invasion.grunt_type)}
-                      until
-                    />
+                  {invasions.map((invasion, index) => (
+                    <Fragment key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}>
+                      {index ? <Divider light flexItem className="popup-divider" /> : null}
+                      <TimeTile
+                        expireTime={invasion.incident_expire_timestamp}
+                        icon={Icons.getInvasions(invasion.grunt_type)}
+                        until
+                      />
+                    </Fragment>
                   ))}
                 </>
               )}
