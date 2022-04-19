@@ -508,6 +508,8 @@
   "scan_error_title": "Fehler",
   "scan_error": "Es ist ein Fehler bei der Verarbeitung der Scan-Anfrage aufgetreten...",
   "scan_outside_area": "Dieser Standort liegt außerhalb der Grenzen der zugelassenen Gebiete",
+  "scanner": "Scanner",
+  "scanner_subtitle": "Ermöglicht on Demand scannen eines Standorts, innerhalb des Scangebietes",
   "device_icons": "Gerätesymbole",
   "spawnpoint_icons": "Spawnpunkt-Symbole",
   "disabled": "Deaktiviert",
@@ -516,6 +518,11 @@
   "lc_feetUnit": "Fuss",
   "lc_popup": "Dein Standort befindet sich innerhalb von {distance} {unit} Abstand zu diesem Punkt.",
   "lc_outsideMapBoundsMsg": "Dein Standort scheint sich außerhalb der Grenzen der Karte zu befinden.",
-  "scanner": "Scanner",
-  "scanner_subtitle": "Ermöglicht on Demand scannen eines Standorts, innerhalb des Scangebietes"
+  "loading_settings": "Lade Einstellungen",
+  "refresh_to_continue": "Bitte aktualisiere, bevor du fortfährst",
+  "session_expired_title": "Sitzung abgelaufen",
+  "session_expired_body": "Deine Sitzung ist abgelaufen",
+  "old_client_title": "Veraltet",
+  "old_client_body": "Eine neue Version der Map ist verfügbar",
+  "refresh": "Aktualisieren"
 }
