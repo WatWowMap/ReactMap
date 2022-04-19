@@ -147,7 +147,6 @@ module.exports = gql`
     cleanPvp: JSON
     bestPvp: Int
     seen_type: String
-    inactive_stats: Boolean
     changed: Boolean
     expire_timestamp: Int
     first_seen_timestamp: Int
