@@ -353,7 +353,8 @@
       "migrationTableName": "knex_migrations",
       "joinGymBadgeTable": false,
       "hideOldQuests": false,
-      "maxConnections": 10
+      "maxConnections": 10,
+      "startupDelayMs": 1000
     },
     "schemas": [
       {
