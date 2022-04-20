@@ -4,14 +4,15 @@
 process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
 
 const fs = require('fs')
+const path = require('path')
 const config = require('config')
 
 // Check if new config exists
-if (!fs.existsSync(`${__dirname}/../configs/local.json`)) {
+if (!fs.existsSync(path.resolve(`${__dirname}/../configs/local.json`))) {
   console.log('[CONFIG] Config v2 (local.json) not found, you need to run the migration with "yarn config-migrate"')
   process.exit(1)
 }
-if (fs.existsSync(`${__dirname}/../configs/config.json`)) {
+if (fs.existsSync(path.resolve(`${__dirname}/../configs/config.json`))) {
   console.log('[CONFIG] Config v1 (config.json) found, it is fine to leave it but make sure you are using and updating local.json instead.')
 }
 
@@ -54,7 +55,7 @@ config.authMethods = [...new Set(config.authentication.strategies
 })
 
 // Load each areas.json
-const loadScanPolygons = (fileName) => fs.existsSync(`${__dirname}/../configs/${fileName}`)
+const loadScanPolygons = (fileName) => fs.existsSync(path.resolve(`${__dirname}/../configs/${fileName}`))
   ? require(`../configs/${fileName}`)
   : { features: [] }
 
