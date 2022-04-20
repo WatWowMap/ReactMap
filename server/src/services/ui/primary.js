@@ -64,13 +64,6 @@ module.exports = function generateUi(filters, perms) {
         if ((!ignoredKeys.includes(subKey) && subValue !== undefined)
           || key === 'weather' || key === 'scanAreas') {
           switch (key) {
-            default: ui[key][subKey] = true; break
-            case 'pokemon':
-              ui[key][subKey] = true; break
-            case 'pokestops':
-              ui[key][subKey] = true; break
-            case 'gyms':
-              ui[key][subKey] = true; break
             case 'submissionCells':
             case 'portals': ui.wayfarer[key] = true; break
             case 'spawnpoints':
@@ -78,6 +71,7 @@ module.exports = function generateUi(filters, perms) {
             case 'devices': ui.admin[key] = true; break
             case 'scanAreas':
             case 'weather': ui[key].enabled = true; break
+            default: ui[key][subKey] = true; break
           }
         }
       }
