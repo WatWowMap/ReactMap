@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const NodeGeocoder = require('node-geocoder')
 
 module.exports = async function geocoder(nominatimUrl, search, reverse) {
