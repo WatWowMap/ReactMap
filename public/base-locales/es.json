@@ -517,7 +517,7 @@
   "lc_title": "Sigue tu ubicación",
   "lc_metersUnit": "metros",
   "lc_feetUnit": "pies",
-  "lc_popup": "Estás a {distancia} {unidad} de este punto",
+  "lc_popup": "Estás a {distance} {unit} de este punto",
   "lc_outsideMapBoundsMsg": "Pareces estar fuera de los límites del mapa.",
   "no_alerts": "No se encontraron alertas",
   "loading_settings": "Configuración de carga",

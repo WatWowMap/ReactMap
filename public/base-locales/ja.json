@@ -487,7 +487,7 @@
   "lc_title": "あなたの場所に従ってください",
   "lc_metersUnit": "メートル",
   "lc_feetUnit": "フィート",
-  "lc_popup": "この時点から{距離}{ユニット}内にいます",
+  "lc_popup": "この時点から{distance}{unit}内にいます",
   "lc_outsideMapBoundsMsg": "あなたは地図の境界の外にいるようです",
   "no_alerts": "アラートが見つかりません",
   "loading_settings": "設定の読み込み",
