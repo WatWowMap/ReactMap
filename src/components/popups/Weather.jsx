@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, { useState, useEffect } from 'react'
 import { Grid, Typography } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
@@ -33,7 +32,7 @@ export default function WeatherPopup({ weather, ts, Icons }) {
           {t('last_updated')}:
         </Typography>
       </Grid>
-      <Timer updated={updated} ts={ts} />
+      <Timer updated={updated} ts={ts} t={t} />
       <Grid item xs={12}>
         <Typography variant="subtitle2" align="center">
           {t('boosted_types')}:
@@ -58,7 +57,7 @@ export default function WeatherPopup({ weather, ts, Icons }) {
   )
 }
 
-const Timer = ({ updated, ts }) => {
+const Timer = ({ updated, ts, t }) => {
   const lastUpdated = new Date(updated * 1000)
   const [timer, setTimer] = useState(Utility.getTimeUntil(lastUpdated))
 
@@ -99,7 +98,7 @@ const Timer = ({ updated, ts }) => {
           gutterBottom
           style={{ color }}
         >
-          ({timer.str})
+          ({timer.str.replace('days', t('days')).replace('day', t('day'))})
         </Typography>
       </Grid>
     </>

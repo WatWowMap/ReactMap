@@ -11,7 +11,7 @@ const Badge = require('./Badge')
 
 const coreFields = ['id', 'name', 'url', 'lat', 'lon', 'updated', 'last_modified_timestamp']
 
-const gymFields = ['available_slots', 'ex_raid_eligible', 'ar_scan_eligible', 'team_id', 'in_battle', 'guarding_pokemon_id', 'total_cp']
+const gymFields = ['available_slots', 'ex_raid_eligible', 'ar_scan_eligible', 'team_id', 'in_battle', 'guarding_pokemon_id', 'total_cp', 'power_up_points', 'power_up_level', 'power_up_end_timestamp']
 
 const raidFields = ['raid_level', 'raid_battle_timestamp', 'raid_end_timestamp', 'raid_pokemon_id', 'raid_pokemon_form', 'raid_pokemon_gender', 'raid_pokemon_costume', 'raid_pokemon_evolution', 'raid_pokemon_move_1', 'raid_pokemon_move_2']
 
@@ -131,6 +131,10 @@ module.exports = class Gym extends Model {
       }
       if (!onlyAllGyms && onlyRaids && onlyRaidTier === 'all' && !raidBosses.size && !eggs.length) {
         // Returns nothing if only raids are enabled without any filters
+        return []
+      }
+      if (onlyGymBadges && !userBadges.length && !onlyAllGyms && !onlyRaids) {
+        // Returns nothing if only gym badges are enabled without any badges
         return []
       }
     }

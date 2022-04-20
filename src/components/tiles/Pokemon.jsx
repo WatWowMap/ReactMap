@@ -126,7 +126,6 @@ const areEqual = (prev, next) => (
   && prev.showTimer === next.showTimer
   && !next.excludeList.includes(`${prev.item.pokemon_id}-${prev.item.form}`)
   && prev.userIcons.pokemon === next.userIcons.pokemon
-  && Object.keys(prev.userSettings).every(key => prev.userSettings[key] === next.userSettings[key])
   && prev.showCircles === next.showCircles
 )
 

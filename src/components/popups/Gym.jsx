@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, {
   Fragment, useState, useEffect,
 } from 'react'
@@ -17,6 +16,7 @@ import Title from './common/Title'
 import Dropdown from './common/Dropdown'
 import GenericTimer from './common/Timer'
 import BadgeSelection from '../layout/dialogs/BadgeSelection'
+import PowerUp from './common/PowerUp'
 
 export default function GymPopup({
   gym, hasRaid, ts, Icons, hasHatched, badge, setBadge,
@@ -100,6 +100,7 @@ export default function GymPopup({
           </Collapse>
         </Grid>
       )}
+      <PowerUp {...gym} />
       <GymFooter
         gym={gym}
         popups={popups}
@@ -533,7 +534,7 @@ const Timer = ({
         {t(start ? 'starts' : 'ends')}: {new Date(target).toLocaleTimeString(localStorage.getItem('i18nextLng') || 'en')}
       </Typography>
       <Typography variant="h6">
-        {display.str}
+        {display.str.replace('days', t('days')).replace('day', t('day'))}
       </Typography>
     </Grid>
   ) : null

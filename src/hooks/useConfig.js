@@ -65,7 +65,12 @@ export default function useConfig(serverSettings, paramLocation) {
     methods: serverSettings.authMethods,
     username: serverSettings.user.username,
   })
-  Sentry.setUser({ username: serverSettings.user.username, id: serverSettings.user.id })
+  Sentry.setUser({
+    username: serverSettings.user.username,
+    id: serverSettings.user.discordId
+      || serverSettings.user.telegramId
+      || serverSettings.user.id,
+  })
 
   setTutorial(serverSettings.user.tutorial === undefined
     ? Boolean(localState?.state?.tutorial)

@@ -18,6 +18,7 @@ export default function WebhookQuery({ params, serverSettings }) {
     variables: {
       id: params.id,
       perm: params.category.toLowerCase(),
+      version: inject.VERSION,
     },
   })
   return data ? (

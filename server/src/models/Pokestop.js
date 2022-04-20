@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const { Event } = require('../services/initialization')
@@ -89,10 +88,10 @@ module.exports = class Pokestop extends Model {
         query.whereRaw(`UNIX_TIMESTAMP(last_updated) > ${Date.now() / 1000 - (stopValidDataLimit * 86400)}`)
       }
     } else if (hideOldPokestops) {
-      query.where('updated', '>', Date.now() / 1000 - (stopValidDataLimit * 86400))
+      query.where('pokestop.updated', '>', Date.now() / 1000 - (stopValidDataLimit * 86400))
     }
     if (hasMultiInvasions) {
-      query.join('incident', 'pokestop.id', 'incident.pokestop_id')
+      query.leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
         .select([
           '*',
           'pokestop.id AS id',
@@ -114,7 +113,7 @@ module.exports = class Pokestop extends Model {
     if (onlyAllPokestops && pokestopPerms) {
       const results = await query.limit(queryLimits.pokestops)
       const normalized = isMad ? this.mapMAD(results, safeTs) : this.mapRDM(results, safeTs)
-      return this.secondaryFilter(normalized, args.filters, isMad, midnight)
+      return this.secondaryFilter(normalized, args.filters, isMad, midnight, perms)
     }
 
     const stardust = []
@@ -295,7 +294,7 @@ module.exports = class Pokestop extends Model {
     })
     const results = await query.limit(queryLimits.pokestops)
     const normalized = isMad ? this.mapMAD(results, safeTs) : this.mapRDM(results, safeTs)
-    return this.secondaryFilter(normalized, args.filters, isMad, midnight)
+    return this.secondaryFilter(normalized, args.filters, isMad, midnight, perms)
   }
 
   static fieldAssigner(target, source, fields) {
@@ -303,22 +302,27 @@ module.exports = class Pokestop extends Model {
   }
 
   // filters and removes unwanted data
-  static secondaryFilter(queryResults, filters, isMad, midnight) {
+  static secondaryFilter(queryResults, filters, isMad, midnight, perms) {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
       const filtered = {}
 
-      this.fieldAssigner(filtered, pokestop, ['id', 'lat', 'lon', 'enabled', 'ar_scan_eligible', 'url', 'name', 'last_modified_timestamp', 'updated'])
+      this.fieldAssigner(filtered, pokestop, ['id', 'lat', 'lon', 'enabled', 'url', 'name', 'last_modified_timestamp', 'updated'])
 
-      if (filters.onlyAllPokestops || filters.onlyInvasions) {
+      if (perms.pokestops) {
+        this.fieldAssigner(filtered, pokestop, ['ar_scan_eligible', 'power_up_points', 'power_up_level', 'power_up_end_timestamp'])
+      }
+      if (perms.invasions && (filters.onlyAllPokestops || filters.onlyInvasions)) {
         filtered.invasions = pokestop.invasions.filter(invasion => filters[`i${invasion.grunt_type}`])
       }
-      if (filters.onlyAllPokestops || (filters.onlyLures && filters[`l${pokestop.lure_id}`])) {
+      if (perms.lures
+        && (filters.onlyAllPokestops
+          || (filters.onlyLures && filters[`l${pokestop.lure_id}`]))) {
         this.fieldAssigner(filtered, pokestop, ['lure_id', 'lure_expire_timestamp'])
       }
 
-      if (filters.onlyAllPokestops || filters.onlyQuests) {
+      if (perms.quests && (filters.onlyAllPokestops || filters.onlyQuests)) {
         filtered.quests = []
         pokestop.quests.forEach(quest => {
           if (quest.quest_reward_type && (
@@ -445,7 +449,7 @@ module.exports = class Pokestop extends Model {
     return Object.values(filtered)
   }
 
-  static async getAvailable({ isMad, hasAltQuests, hasRewardAmount }) {
+  static async getAvailable({ isMad, hasAltQuests, hasMultiInvasions, multiInvasionMs, hasRewardAmount }) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const finalList = new Set()
     const quests = {}
@@ -600,11 +604,27 @@ module.exports = class Pokestop extends Model {
       return fetchQuests()
     }
 
-    stops.invasions = await this.query()
-      .select(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
-      .where(isMad ? 'incident_expiration' : 'incident_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
-      .groupBy('grunt_type')
-      .orderBy('grunt_type')
+    if (hasMultiInvasions) {
+      stops.invasions = await this.query()
+        .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
+        .select([
+          '*',
+          'pokestop.id AS id',
+          'incident.id AS incidentId',
+          raw(multiInvasionMs
+            ? 'FLOOR(incident.expiration_ms / 1000) AS incident_expire_timestamp'
+            : 'incident.expiration AS incident_expire_timestamp'),
+          'incident.character AS grunt_type',
+        ])
+        .where(multiInvasionMs ? 'expiration_ms' : 'incident.expiration', '>=', ts * (multiInvasionMs ? 1000 : 1))
+        .orderBy('grunt_type')
+    } else {
+      stops.invasions = await this.query()
+        .select(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
+        .where(isMad ? 'incident_expiration' : 'incident_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+        .groupBy('grunt_type')
+        .orderBy('grunt_type')
+    }
     stops.lures = await this.query()
       .select(isMad ? 'active_fort_modifier AS lure_id' : 'lure_id')
       .andWhere(isMad ? 'lure_expiration' : 'lure_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)

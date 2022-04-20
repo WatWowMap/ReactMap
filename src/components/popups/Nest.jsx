@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, { useState, useEffect } from 'react'
 import {
   Grid, Typography, IconButton, Divider, Menu, MenuItem,
@@ -141,7 +140,7 @@ export default function NestPopup({
           {t('last_updated')}
         </Typography>
         <Typography variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'} style={{ color: getColor(lastUpdated.diff) }}>
-          {lastUpdated.str}
+          {lastUpdated.str.replace('days', t('days')).replace('day', t('day'))}
         </Typography>
         <Typography variant="subtitle2">
           ~{pokemon_avg} {t('spawns_per_hour')}
