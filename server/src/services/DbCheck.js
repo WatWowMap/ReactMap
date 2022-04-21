@@ -153,7 +153,7 @@ module.exports = class DbCheck {
       }
       try {
         await source.SubModel.query()
-          .join('incident', 'pokestop.id', 'incident.pokestop_id')
+          .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
           .limit(1)
         source.hasMultiInvasions = true
       } catch (_) {
@@ -161,7 +161,7 @@ module.exports = class DbCheck {
       }
       try {
         await source.SubModel.query()
-          .join('incident', 'pokestop.id', 'incident.pokestop_id')
+          .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
           .select('expiration_ms')
           .limit(1)
         source.multiInvasionMs = true
@@ -213,10 +213,12 @@ module.exports = class DbCheck {
 
   async getAvailable(model) {
     if (this.models[model]) {
+      console.log(`[DB] Querying available for ${model}`)
       try {
         const results = await Promise.all(this.models[model].map(async (source) => (
           source.SubModel.getAvailable(source)
         )))
+        console.log(`[DB] Updating available for ${model}`)
         if (results.length === 1) return results[0]
         if (results.length > 1) {
           const returnSet = new Set()
