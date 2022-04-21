@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 const { promises: fs } = require('fs')
 const path = require('path')
@@ -23,6 +24,10 @@ module.exports = class EventManager {
       this.available.nests = await Db.getAvailable('Nest')
       this.available.pokemon = await Db.getAvailable('Pokemon')
       this.available.pokestops = await Db.getAvailable('Pokestop')
+      while (!this.available.pokestops.length) {
+        console.log('Trying again...')
+        this.available.pokestops = await Db.getAvailable('Pokestop')
+      }
       await this.getMasterfile()
       await this.getInvasions()
       await this.getWebhooks(config)

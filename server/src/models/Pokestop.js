@@ -113,7 +113,7 @@ module.exports = class Pokestop extends Model {
     if (onlyAllPokestops && pokestopPerms) {
       const results = await query.limit(queryLimits.pokestops)
       const normalized = isMad ? this.mapMAD(results, safeTs) : this.mapRDM(results, safeTs)
-      return this.secondaryFilter(normalized, args.filters, isMad, midnight, perms)
+      return this.secondaryFilter(normalized, args.filters, isMad, midnight, perms, true)
     }
 
     const stardust = []
@@ -302,7 +302,7 @@ module.exports = class Pokestop extends Model {
   }
 
   // filters and removes unwanted data
-  static secondaryFilter(queryResults, filters, isMad, midnight, perms) {
+  static secondaryFilter(queryResults, filters, isMad, midnight, perms, global = false) {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
@@ -369,9 +369,10 @@ module.exports = class Pokestop extends Model {
         })
       }
       if ((pokestop.ar_scan_eligible && filters.onlyArEligible)
+        || global
         || filtered.quests?.length
-        || filtered.lure_id
-        || filtered.invasions) {
+        || filtered.invasions?.length
+        || filtered.lure_id) {
         filteredResults.push(filtered)
       }
     }

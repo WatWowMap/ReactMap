@@ -138,7 +138,7 @@ i18next.use(Backend).init({
   preload: config.map.localeSelection,
   ns: ['translation'],
   defaultNS: 'translation',
-  backend: { loadPath: 'public/locales/{{lng}}/{{ns}}.json' },
+  backend: { loadPath: path.resolve(`${__dirname}/../../public/locales/{{lng}}/{{ns}}.json`) },
 }, (err, t) => {
   if (err) return console.error(err)
 })
