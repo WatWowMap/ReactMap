@@ -51,6 +51,8 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 
 rootRouter.get('/settings', async (req, res) => {
   try {
+    if (!Event.uicons.length) throw new Error('Icons Have Not Been Fetched Yet')
+
     if (config.authentication.alwaysEnabledPerms.length || !config.authMethods.length) {
       if (req.session.tutorial === undefined) {
         req.session.tutorial = !config.map.forceTutorial
@@ -236,6 +238,7 @@ rootRouter.get('/settings', async (req, res) => {
     }
     res.status(200).json({ serverSettings })
   } catch (error) {
+    console.error(error)
     res.status(500).json({ error: error.message, status: 500 })
   }
 })

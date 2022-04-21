@@ -37,7 +37,6 @@ module.exports = class DbCheck {
           },
         })
       });
-
     (async () => {
       await this.determineType()
       await this.pvp()
@@ -214,11 +213,12 @@ module.exports = class DbCheck {
 
   async getAvailable(model) {
     if (this.models[model]) {
-      console.log(`[DB] Setting available for ${model}`)
+      console.log(`[DB] Querying available for ${model}`)
       try {
         const results = await Promise.all(this.models[model].map(async (source) => (
           source.SubModel.getAvailable(source)
         )))
+        console.log(`[DB] Updating available for ${model}`)
         if (results.length === 1) return results[0]
         if (results.length > 1) {
           const returnSet = new Set()
