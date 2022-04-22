@@ -33,7 +33,7 @@ module.exports = class DiscordMapClient {
         .keyArray()
       return roles
     } catch (e) {
-      console.error('Failed to get roles in guild', guildId, 'for user', userId)
+      console.error('[DISCORD] Failed to get roles in guild', guildId, 'for user', userId)
     }
     return []
   }
@@ -50,7 +50,7 @@ module.exports = class DiscordMapClient {
         })
       })
     } catch (e) {
-      console.error('Failed to activate an event', e.message)
+      console.error('[DISCORD] Failed to activate an event', e.message)
     }
   }
 
@@ -67,7 +67,7 @@ module.exports = class DiscordMapClient {
         perms.areaRestrictions = []
         perms.webhooks = webhooks.map(x => x.name)
         perms.scanner = Object.keys(scanner).map(x => x !== 'backendConfig' && scanner[x].enabled && x).filter(x => x !== false)
-        console.log(`User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
+        console.log(`[DISCORD] User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
         return perms
       }
       for (let i = 0; i < this.config.blockedGuilds.length; i += 1) {
@@ -110,7 +110,7 @@ module.exports = class DiscordMapClient {
         perms.webhooks = [...new Set(perms.webhooks)]
       }
     } catch (e) {
-      console.warn('Failed to get perms for user', user.id, e.message)
+      console.warn('[DISCORD] Failed to get perms for user', user.id, e.message)
     }
     return perms
   }
@@ -127,7 +127,7 @@ module.exports = class DiscordMapClient {
         channel.send(message)
       }
     } catch (e) {
-      console.error('Failed to send message to discord', e.message)
+      console.error('[DISCORD] Failed to send message to discord', e.message)
     }
   }
 }

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable global-require */
-require('./db/initialization')
+process.title = 'ReactMap'
 
 const path = require('path')
 const express = require('express')
@@ -15,13 +15,13 @@ const Backend = require('i18next-fs-backend')
 const { ValidationError } = require('apollo-server-core')
 const { ApolloServer } = require('apollo-server-express')
 
+const { Db } = require('./services/initialization')
 const config = require('./services/config')
-const { Pokemon } = require('./models/index')
 const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
-const context = require('./graphql/context')
+const { version } = require('../../package.json')
 
 if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')
@@ -35,15 +35,22 @@ const server = new ApolloServer({
   resolvers,
   introspection: config.devOptions.enabled,
   debug: config.devOptions.queryDebug,
-  context: ({ req }) => ({ ...context, req }),
+  context: ({ req, res }) => {
+    const perms = req.user ? req.user.perms : req.session.perms
+    return { req, res, Db, perms, version }
+  },
   formatError: (e) => {
-    if (e instanceof ValidationError) {
-      console.warn('GraphQL Error:', e.message, '\nThis is very likely not a real issue and is caused by a user leaving an old browser session open, there is nothing you can do until they refresh.')
-    } else {
-      return config.devOptions.enabled
-        ? console.error(e)
-        : console.error('GraphQL Error: ', e.message, e.path, e.location)
+    if (config.devOptions.enabled) {
+      console.warn(e)
     }
+    if (e instanceof ValidationError || e?.message.includes('skipUndefined()')) {
+      return { message: 'old_client' }
+    }
+    if (['old_client', 'session_expired'].includes(e.message)) {
+      return { message: e.message }
+    }
+    console.warn(['GQL'], e.message)
+    return { message: e.message }
   },
 })
 
@@ -97,15 +104,15 @@ app.use(session({
   store: sessionStore,
   resave: true,
   saveUninitialized: false,
-  cookie: { maxAge: 604800000 },
+  cookie: { maxAge: 86400000 * config.api.cookieAgeDays },
 }))
 
 config.authentication.strategies.forEach(strategy => {
   if (strategy.enabled) {
     require(`./strategies/${strategy.name}.js`)
-    console.log(`Strategy ${strategy.name} initialized`)
+    console.log(`[AUTH] Strategy ${strategy.name} initialized`)
   } else {
-    console.log(`Strategy ${strategy.name} was not initialized`)
+    console.log(`[AUTH] Strategy ${strategy.name} was not initialized`)
   }
 })
 
@@ -131,7 +138,7 @@ i18next.use(Backend).init({
   preload: config.map.localeSelection,
   ns: ['translation'],
   defaultNS: 'translation',
-  backend: { loadPath: 'public/locales/{{lng}}/{{ns}}.json' },
+  backend: { loadPath: path.resolve(`${__dirname}/../../public/locales/{{lng}}/{{ns}}.json`) },
 }, (err, t) => {
   if (err) return console.error(err)
 })
@@ -140,7 +147,7 @@ app.use(rootRouter, requestRateLimiter)
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error('Express Error:', err.message)
+  console.error('[Express Error]:', err.message)
   switch (err.message) {
     case 'NoCodeProvided':
       return res.redirect('/404')
@@ -151,12 +158,8 @@ app.use((err, req, res, next) => {
   }
 })
 
-if (config.api.pvp.reactMapHandlesPvp) {
-  Pokemon.initOhbem().then(() => console.log('Ohbem initialized'))
-}
-
 app.listen(config.port, config.interface, () => {
-  console.log(`Server is now listening at http://${config.interface}:${config.port}`)
+  console.log(`[INIT] Server is now listening at http://${config.interface}:${config.port}`)
 })
 
 module.exports = app

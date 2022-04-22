@@ -2,20 +2,16 @@
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const fetchRaids = require('../services/api/fetchRaids')
-const { pokemon: masterfile } = require('../data/masterfile.json')
-const dbSelection = require('../services/functions/dbSelection')
+const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },
-  database: { schemas, settings: { gymBadgeTableName, joinGymBadgeTable } },
 } = require('../services/config')
 const Badge = require('./Badge')
 
-const gymBadgeDb = schemas.find(x => x.useFor.includes('user'))
-
 const coreFields = ['id', 'name', 'url', 'lat', 'lon', 'updated', 'last_modified_timestamp']
 
-const gymFields = ['available_slots', 'ex_raid_eligible', 'ar_scan_eligible', 'team_id', 'in_battle', 'guarding_pokemon_id', 'total_cp']
+const gymFields = ['available_slots', 'ex_raid_eligible', 'ar_scan_eligible', 'team_id', 'in_battle', 'guarding_pokemon_id', 'total_cp', 'power_up_points', 'power_up_level', 'power_up_end_timestamp']
 
 const raidFields = ['raid_level', 'raid_battle_timestamp', 'raid_end_timestamp', 'raid_pokemon_id', 'raid_pokemon_form', 'raid_pokemon_gender', 'raid_pokemon_costume', 'raid_pokemon_evolution', 'raid_pokemon_move_1', 'raid_pokemon_move_2']
 
@@ -24,12 +20,7 @@ module.exports = class Gym extends Model {
     return 'gym'
   }
 
-  static get idColumn() {
-    return dbSelection('gym').type === 'mad'
-      ? 'gym_id' : 'id'
-  }
-
-  static async getAllGyms(args, perms, isMad, userId) {
+  static async getAll(perms, args, { isMad }, userId) {
     const { gyms: gymPerms, raids: raidPerms, areaRestrictions, gymBadges } = perms
     const {
       onlyAllGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible, onlyRaidTier, onlyGymBadges, onlyBadge, ts,
@@ -140,6 +131,10 @@ module.exports = class Gym extends Model {
       }
       if (!onlyAllGyms && onlyRaids && onlyRaidTier === 'all' && !raidBosses.size && !eggs.length) {
         // Returns nothing if only raids are enabled without any filters
+        return []
+      }
+      if (onlyGymBadges && !userBadges.length && !onlyAllGyms && !onlyRaids) {
+        // Returns nothing if only gym badges are enabled without any badges
         return []
       }
     }
@@ -258,7 +253,7 @@ module.exports = class Gym extends Model {
     return secondaryFilter(await query.limit(queryLimits.gyms))
   }
 
-  static async getAvailableRaidBosses(isMad) {
+  static async getAvailable({ isMad }) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const results = await this.query()
       .select([
@@ -286,7 +281,7 @@ module.exports = class Gym extends Model {
     })
   }
 
-  static async search(args, perms, isMad, distance) {
+  static async search(perms, args, { isMad }, distance) {
     const query = this.query()
       .select([
         'name',
@@ -309,9 +304,9 @@ module.exports = class Gym extends Model {
     return query
   }
 
-  static async searchRaids(args, perms, isMad, distance) {
+  static async searchRaids(perms, args, { isMad }, distance) {
     const { search, locale } = args
-    const pokemonIds = Object.keys(masterfile).filter(pkmn => (
+    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter(pkmn => (
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
     ))
     const safeTs = args.ts || Math.floor((new Date()).getTime() / 1000)
@@ -344,7 +339,7 @@ module.exports = class Gym extends Model {
     return query
   }
 
-  static async getGymBadges(isMad, userId) {
+  static async getBadges(userGyms, _, { isMad }) {
     const query = this.query()
       .select([
         '*',
@@ -357,20 +352,6 @@ module.exports = class Gym extends Model {
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
-
-    if (joinGymBadgeTable) {
-      query.leftJoin(`${gymBadgeDb.database}.${gymBadgeTableName}`, isMad ? 'gym.gym_id' : 'gym.id', `${gymBadgeTableName}.gymId`)
-        .where('userId', userId)
-        .andWhere('badge', '>', 0)
-        .orderBy('updatedAt')
-      const results = await query
-      return isMad ? results.map(gym => gym.deleted = !gym.enabled) : results
-    }
-
-    const userGyms = await Badge.query()
-      .where('userId', userId)
-      .andWhere('badge', '>', 0)
-
     const results = await query
       .whereIn(isMad ? 'gym.gym_id' : 'gym.id', userGyms.map(gym => gym.gymId))
 
@@ -390,5 +371,36 @@ module.exports = class Gym extends Model {
       })
       .sort((a, b) => a.updatedAt - b.updatedAt)
       .reverse()
+  }
+
+  static getOne(id, { isMad }) {
+    return this.query()
+      .select([
+        isMad ? 'latitude AS lat' : 'lat',
+        isMad ? 'longitude AS lon' : 'lon',
+      ])
+      .where(isMad ? 'gym_id' : 'id', id)
+      .first()
+  }
+
+  static getSubmissions(args, { isMad }) {
+    const query = this.query()
+      .whereBetween(`lat${isMad ? 'itude' : ''}`, [args.minLat - 0.025, args.maxLat + 0.025])
+      .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [args.minLon - 0.025, args.maxLon + 0.025])
+      .andWhere(isMad ? 'enabled' : 'deleted', isMad)
+    if (isMad) {
+      query.select([
+        'gym_id AS id',
+        'latitude AS lat',
+        'longitude AS lon',
+      ])
+    } else {
+      query.select(['id', 'lat', 'lon'])
+        .andWhere(poi => {
+          poi.whereNull('sponsor_id')
+            .orWhere('sponsor_id', 0)
+        })
+    }
+    return query
   }
 }

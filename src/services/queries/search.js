@@ -14,8 +14,8 @@ const core = gql`
 
 export const poi = gql`
   ${core}
-  query SearchPoi($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!) {
-    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale) {
+  query SearchPoi($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $version: String) {
+    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, version: $version) {
       ...CoreSearch
     }
   }
@@ -23,8 +23,8 @@ export const poi = gql`
 
 export const poiWebhook = gql`
   ${Nominatim}
-  query SearchWebhook($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $webhookName: String) {
-    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, webhookName: $webhookName) {
+  query SearchWebhook($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $webhookName: String, $version: String) {
+    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, webhookName: $webhookName, version: $version) {
       id
       name
       formatted {
@@ -36,8 +36,8 @@ export const poiWebhook = gql`
 
 export const nests = gql`
   ${core}
-  query SearchNests($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!) {
-    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale) {
+  query SearchNests($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $version: String) {
+    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, version: $version) {
       ...CoreSearch
       nest_pokemon_id
       nest_pokemon_form
@@ -46,8 +46,8 @@ export const nests = gql`
 `
 
 export const quests = gql`
-  query SearchQuests($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $midnight: Int) {
-    searchQuest(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, midnight: $midnight) {
+  query SearchQuests($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $midnight: Int, $version: String) {
+    searchQuest(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, midnight: $midnight, version: $version) {
       id
       name
       lat
@@ -75,8 +75,8 @@ export const quests = gql`
 
 export const raids = gql`
   ${core}
-  query SearchRaids($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int) {
-    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, ts: $ts) {
+  query SearchRaids($search: String!, $category: String!, $lat: Float!, $lon: Float!, $locale: String!, $ts: Int, $version: String) {
+    search(search: $search, category: $category, lat: $lat, lon: $lon, locale: $locale, ts: $ts, version: $version) {
       ...CoreSearch
       raid_pokemon_id
       raid_pokemon_form

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, {
   Fragment, useState, useEffect,
 } from 'react'
@@ -18,6 +17,7 @@ import Navigation from './common/Navigation'
 import Title from './common/Title'
 import HeaderImage from './common/HeaderImage'
 import Timer from './common/Timer'
+import PowerUp from './common/PowerUp'
 
 export default function PokestopPopup({
   pokestop, ts, hasLure, hasInvasion, hasQuest, Icons, userSettings, config,
@@ -73,13 +73,16 @@ export default function PokestopPopup({
       />
       <Grid item xs={12} style={{ textAlign: 'center' }}>
         {plainPokestop ? (
-          <HeaderImage
-            Icons={Icons}
-            alt={pokestop.name}
-            url={pokestop.url}
-            arScanEligible={pokestop.ar_scan_eligible}
-            large
-          />
+          <>
+            <HeaderImage
+              Icons={Icons}
+              alt={pokestop.name}
+              url={pokestop.url}
+              arScanEligible={pokestop.ar_scan_eligible}
+              large
+            />
+            <PowerUp {...pokestop} />
+          </>
         ) : (
           <Collapse in={!popups.invasions || !hasInvasion} timeout="auto" unmountOnExit>
             <Grid
@@ -88,6 +91,7 @@ export default function PokestopPopup({
               alignItems="center"
               spacing={1}
             >
+              <PowerUp {...pokestop} divider={hasInvasion || hasQuest || hasLure} />
               {hasQuest && pokestop.quests.map((quest, index) => (
                 <Fragment key={quest.with_ar}>
                   {index ? <Divider light flexItem className="popup-divider" /> : null}
@@ -118,13 +122,15 @@ export default function PokestopPopup({
               {hasInvasion && (
                 <>
                   {(hasQuest || hasLure) && <Divider light flexItem className="popup-divider" />}
-                  {invasions.map(invasion => (
-                    <TimeTile
-                      key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
-                      expireTime={invasion.incident_expire_timestamp}
-                      icon={Icons.getInvasions(invasion.grunt_type)}
-                      until
-                    />
+                  {invasions.map((invasion, index) => (
+                    <Fragment key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}>
+                      {index ? <Divider light flexItem className="popup-divider" /> : null}
+                      <TimeTile
+                        expireTime={invasion.incident_expire_timestamp}
+                        icon={Icons.getInvasions(invasion.grunt_type)}
+                        until
+                      />
+                    </Fragment>
                   ))}
                 </>
               )}

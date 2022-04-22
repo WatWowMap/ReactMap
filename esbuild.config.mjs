@@ -14,8 +14,8 @@ import esbuildMxnCopy from 'esbuild-plugin-mxn-copy'
 import aliasPlugin from 'esbuild-plugin-path-alias'
 import { eslintPlugin } from 'esbuild-plugin-eslinter'
 
-const env = fs.existsSync('.env') ? dotenv.config() : { parsed: {} }
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const env = fs.existsSync(`${__dirname}/.env`) ? dotenv.config() : { parsed: {} }
 const { version } = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json')))
 const isDevelopment = Boolean(process.argv.includes('--dev'))
 const isRelease = Boolean(process.argv.includes('--release'))
@@ -30,9 +30,9 @@ const hasCustom = await (async function checkFolders(folder, isCustom = false) {
   return isCustom
 }(path.resolve(__dirname, 'src')))
 
-if (await fs.existsSync(path.resolve(__dirname, 'dist'))) {
-  console.log('Cleaning up old build')
-  await fs.rm(path.resolve(__dirname, 'dist'), { recursive: true }, (err) => {
+if (fs.existsSync(path.resolve(__dirname, 'dist'))) {
+  console.log('[BUILD] Cleaning up old build')
+  fs.rm(path.resolve(__dirname, 'dist'), { recursive: true }, (err) => {
     if (err) console.log(err)
   })
 }
@@ -43,7 +43,7 @@ const plugins = [
       {
         entryPoints: ['src/index.jsx'],
         filename: 'index.html',
-        htmlTemplate: await fs.readFileSync('./public/index.template.html'),
+        htmlTemplate: fs.readFileSync('./public/index.template.html'),
         scriptLoading: 'defer',
         favicon: './public/favicon/favicon.ico',
       },
@@ -79,10 +79,10 @@ if (isDevelopment) {
             if (!isNodeModule) {
               const [base, suffix] = args.path.split('.')
               const newPath = `${base}.custom.${suffix}`
-              if (await fs.existsSync(newPath)) {
+              if (fs.existsSync(newPath)) {
                 customPaths.push(newPath)
                 return {
-                  contents: await fs.readFileSync(newPath, 'utf8'),
+                  contents: fs.readFileSync(newPath, 'utf8'),
                   loader: suffix,
                   watchFiles: isDevelopment ? [newPath] : undefined,
                 }
@@ -107,7 +107,7 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
       },
     )
   }
-  console.log(`Building production version: ${version}`)
+  console.log(`[BUILD] Building production version: ${version}`)
 }
 
 try {
@@ -151,5 +151,5 @@ try {
   console.error(e)
   process.exit(1)
 } finally {
-  console.log('React Map Compiled')
+  console.log('[BUILD] React Map Compiled')
 }

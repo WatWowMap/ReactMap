@@ -1,5 +1,6 @@
+/* eslint-disable no-console */
 const fetchJson = require('./fetchJson')
-const { pokemon: masterfile } = require('../../data/masterfile.json')
+const { Event } = require('../initialization')
 
 module.exports = async function fetchRaids() {
   try {
@@ -8,7 +9,7 @@ module.exports = async function fetchRaids() {
     Object.entries(pogoInfoResults).forEach(raidTier => {
       const [egg, bosses] = raidTier
       raidsInfo.push(`e${egg}`, `r${egg}`)
-      bosses.forEach(boss => raidsInfo.push(`${boss.id}-${boss.form || masterfile[boss.id].defaultFormId}`))
+      bosses.forEach(boss => raidsInfo.push(`${boss.id}-${boss.form || Event.masterfile.pokemon[boss.id].defaultFormId}`))
     })
     return raidsInfo
   } catch (e) {

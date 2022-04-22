@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const { exec } = require('child_process')
+const path = require('path')
 const fs = require('fs')
 
 let isDocker = false
@@ -7,7 +8,7 @@ let isDocker = false
 try {
   exec('git branch --show-current', async (err, stdout) => {
     try {
-      const gitRef = fs.readFileSync('.gitref', 'utf8')
+      const gitRef = fs.readFileSync(path.resolve(`${__dirname}/../../../.gitref`), 'utf8')
 
       if (!gitRef && (err || typeof stdout !== 'string' || !stdout.trim())) {
         throw new Error('Unable to get current branch', err)
@@ -21,7 +22,7 @@ try {
 
       exec('git rev-parse HEAD', async (err2, stdout2) => {
         try {
-          const gitSha = fs.readFileSync('.gitsha', 'utf8')
+          const gitSha = fs.readFileSync(path.resolve(`${__dirname}/../../../.gitsha`), 'utf8')
 
           if (!gitSha && (err2 || typeof stdout2 !== 'string' || !stdout2.trim())) {
             throw new Error('Unable to get current sha', err)
@@ -38,18 +39,18 @@ try {
               const remoteSha = stdout3.split('\t')[0]
 
               if (remoteSha !== sha) {
-                console.log('There is a new version available: ', remoteSha, isDocker ? 'docker-compose pull' : 'git pull', ' to update')
+                console.log('[UPDATE] There is a new version available: ', remoteSha, isDocker ? 'docker-compose pull' : 'git pull', ' to update')
               }
             } catch (e) {
-              console.warn('Unable to get remote SHA', e.message, 'Branch:', branch, 'Local SHA:', sha)
+              console.warn('[UPDATE] Unable to get remote SHA', e.message, 'Branch:', branch, 'Local SHA:', sha)
             }
           })
         } catch (e) {
-          console.warn('Unable to get current SHA', e.message, 'Branch:', branch)
+          console.warn('[UPDATE] Unable to get current SHA', e.message, 'Branch:', branch)
         }
       })
     } catch (e) {
-      console.warn('Unable to get current branch', e.message)
+      console.warn('[UPDATE] Unable to get current branch', e.message)
     }
   })
 } catch (e) {

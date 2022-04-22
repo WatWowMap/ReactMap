@@ -1,5 +1,5 @@
 const repl = require('repl')
-require('../src/db/initialization')
+const Db = require('../src/services/initialization')
 const models = require('../src/models/index')
 
 const replServer = repl.start({
@@ -7,3 +7,4 @@ const replServer = repl.start({
 })
 
 replServer.context.models = models
+replServer.context.Db = Db

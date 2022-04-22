@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, {
   Fragment, useCallback, useState, useEffect,
 } from 'react'
@@ -107,6 +106,7 @@ export default function PokemonPopup({
             data={cleanPvp[league]}
             t={t}
             Icons={Icons}
+            pokemon={pokemon}
           />
         ))}
       </Collapse>
@@ -123,7 +123,7 @@ export default function PokemonPopup({
 }
 
 const Header = ({
-  pokemon, metaData, t, iconUrl, userSettings, classes,
+  pokemon, metaData, t, iconUrl, userSettings, classes, isTutorial,
 }) => {
   const hideList = useStatic(state => state.hideList)
   const setHideList = useStatic(state => state.setHideList)
@@ -181,11 +181,12 @@ const Header = ({
   }
 
   const options = [
-    { name: 'hide', action: handleHide },
-    { name: 'exclude', action: handleExclude },
     { name: 'timer', action: handleTimer },
+    { name: 'hide', action: handleHide },
   ]
-
+  if (isTutorial || filters?.pokemon?.filter?.[`${pokemon_id}-${form}`]?.enabled) {
+    options.push({ name: 'exclude', action: handleExclude })
+  }
   const pokeName = t(`poke_${metaData.pokedexId}`)
   const formName = metaData.forms?.[form]?.name === 'Normal' || form === 0 ? '' : t(`form_${pokemon.form}`)
 
@@ -509,14 +510,14 @@ const ExtraInfo = ({
 }
 
 const PvpInfo = ({
-  league, data, t, Icons,
+  pokemon, league, data, t, Icons,
 }) => {
   if (data === null) return ''
 
   const rows = data.map(each => each.rank !== null && each.cp !== null ? {
     id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.gender}-${each.rank}-${each.cp}-${each.lvl}-${each.cap}`,
     img: <img
-      src={Icons.getPokemon(each.pokemon, each.form, each.evolution, each.gender, each.costume)}
+      src={Icons.getPokemon(each.pokemon, each.form, each.evolution, each.gender, pokemon.costume)}
       height={20}
       alt={each.pokemon}
     />,

@@ -38,7 +38,8 @@ module.exports = async function scannerApi(category, method, data = null) {
         })
       } break
       case 'getQueue':
-        if (scannerQueue[data.typeName].timestamp > (Date.now() - config.scanner.backendConfig.queueRefreshInterval * 1000)) {
+        if (scannerQueue[data.typeName].timestamp
+          > (Date.now() - config.scanner.backendConfig.queueRefreshInterval * 1000)) {
           console.log(`[scannerApi] Returning queue from memory for method ${data.typeName}: ${scannerQueue[data.typeName].queue}`)
           return { status: 'ok', message: scannerQueue[data.typeName].queue }
         }

@@ -2,7 +2,7 @@ const { gql } = require('apollo-server-express')
 
 module.exports = gql`
   type Device {
-    uuid: ID
+    id: ID
     instance_name: String
     last_seen: Int
     last_lat: Float
@@ -43,10 +43,13 @@ module.exports = gql`
     raid_pokemon_evolution: Int
     ar_scan_eligible: Boolean
     badge: Int
+    power_up_level: Int
+    power_up_points: Int
+    power_up_end_timestamp: Int
   }
 
   type Nest {
-    nest_id: ID
+    id: ID
     lat: Float
     lon: Float
     pokemon_id: Int
@@ -110,6 +113,9 @@ module.exports = gql`
     ar_scan_eligible: Boolean
     quests: [Quest]
     invasions: [Invasion]
+    power_up_level: Int
+    power_up_points: Int
+    power_up_end_timestamp: Int
   }
 
   type Pokemon {
@@ -141,7 +147,6 @@ module.exports = gql`
     cleanPvp: JSON
     bestPvp: Int
     seen_type: String
-    inactive_stats: Boolean
     changed: Boolean
     expire_timestamp: Int
     first_seen_timestamp: Int

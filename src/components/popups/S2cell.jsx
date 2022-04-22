@@ -25,7 +25,7 @@ export default function S2CellPopup({ cell, ts }) {
         </Trans>
       </Typography>
       <Typography variant="subtitle2" align="center">
-        {timer.str}
+        {timer.str.replace('days', t('days')).replace('day', t('day'))}
       </Typography>
       <Typography variant="subtitle1" align="center">
         {t('last_updated')}:

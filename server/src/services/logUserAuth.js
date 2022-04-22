@@ -62,15 +62,15 @@ module.exports = async function getAuthInfo(req, user, strategy) {
     timestamp: new Date(),
   }
   if (user.valid) {
-    console.log(user.username, `(${user.id})`, 'Authenticated successfully.')
+    console.log('[DISCORD]', user.username, `(${user.id})`, 'Authenticated successfully.')
     embed.description = `${user.username} Successfully Authenticated`
     embed.color = 0x00FF00
   } else if (user.blocked) {
-    console.warn(user.id, 'Blocked due to', user.blocked)
+    console.warn('[DISCORD]', user.id, 'Blocked due to', user.blocked)
     embed.description = `User Blocked Due to ${user.blocked}`
     embed.color = 0xFF0000
   } else {
-    console.warn(user.id, 'Not authorized to access map')
+    console.warn('[DISCORD]', user.id, 'Not authorized to access map')
   }
   return embed
 }

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, { useState, useEffect } from 'react'
 import { Typography } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
@@ -15,7 +14,7 @@ export default function DevicePopup({ device, isOnline, ts }) {
   return (
     <>
       <Typography variant="h6" align="center">
-        {device.uuid}
+        {device.id}
       </Typography>
       <Typography variant="subtitle2">
         {t('instance')} {device.instance_name}
@@ -46,7 +45,7 @@ const Timer = ({ device, t, ts }) => {
 
   return (
     <Typography variant="caption">
-      {t('last_seen')}: {Utility.dayCheck(ts, last_seen)} ({since.str})
+      {t('last_seen')}: {Utility.dayCheck(ts, last_seen)} ({since.str.replace('days', t('days')).replace('day', t('day'))})
     </Typography>
   )
 }

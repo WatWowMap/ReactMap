@@ -589,14 +589,6 @@
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-1.3.2.tgz#93e25bf9ee75fe0fd80b594bc4feb0e862111b5a"
   integrity sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==
 
-"@types/node-fetch@^2.5.12":
-  version "2.5.12"
-  resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.5.12.tgz#8a6f779b1d4e60b7a57fb6fd48d84fb545b9cc66"
-  integrity sha512-MKgC4dlq4kKNa/mYrwpKfzQMB5X3ee5U6fSprkKpToBqBmX4nFZL9cW5jl6sWn+xpRJ7ypWh2yyqqr8UUCstSw==
-  dependencies:
-    "@types/node" "*"
-    form-data "^3.0.0"
-
 "@types/node@*":
   version "16.0.1"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.0.1.tgz#70cedfda26af7a2ca073fdcc9beb2fff4aa693f8"
@@ -1195,6 +1187,11 @@ clone-response@^1.0.2:
   integrity sha1-0dyXOSAxTfZ/vrlCI7TuNQI56Ws=
   dependencies:
     mimic-response "^1.0.0"
+
+clone@2.x:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
+  integrity sha1-G39Ln1kfHo+DZwQBYANFoCiHQ18=
 
 clsx@^1.0.4:
   version "1.1.1"
@@ -2185,15 +2182,6 @@ flatted@^3.1.0:
   version "3.2.5"
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.5.tgz#76c8584f4fc843db64702a6bd04ab7a8bd666da3"
   integrity sha512-WIWGi2L3DyTUvUrwRKgGi9TwxQMUEqPOPQBVi71R96jZXJdFskXEmf54BoZaS1kknGODoIGASGEzBUYdyMCBJg==
-
-form-data@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/form-data/-/form-data-3.0.1.tgz#ebd53791b78356a99af9a300d4282c4d5eb9755f"
-  integrity sha512-RHkBKtLWUVwd7SqRIvCZMEvAMoGUp0XU+seQiZejj0COz3RI3hWP4sCv3gZWWLjJTd7rGwcsF5eKZGii0r/hbg==
-  dependencies:
-    asynckit "^0.4.0"
-    combined-stream "^1.0.8"
-    mime-types "^2.1.12"
 
 form-data@^4.0.0:
   version "4.0.0"
@@ -3361,6 +3349,13 @@ node-addon-api@^3.1.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.2.1.tgz#81325e0a2117789c0128dab65e7e38f07ceba161"
   integrity sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==
 
+node-cache@^5.1.2:
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/node-cache/-/node-cache-5.1.2.tgz#f264dc2ccad0a780e76253a694e9fd0ed19c398d"
+  integrity sha512-t1QzWwnk4sjLWaQAS8CHgOJ+RAfmHpxFWmc36IWTiWHQfs0w5JDMBS1b1ZxQteo0vVVuWJvIUKHDkkeK7vIGCg==
+  dependencies:
+    clone "2.x"
+
 node-fetch@2, node-fetch@^2.6.7:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
@@ -3538,14 +3533,14 @@ objection@^3.0.0:
     ajv "^8.6.2"
     db-errors "^0.2.3"
 
-ohbem@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/ohbem/-/ohbem-1.4.0.tgz#2318349a2cf738d3be84602f68bff704fc64e747"
-  integrity sha512-1qGLYuKg93jyhOFBGcPvYFP61VMr6sSXe6jk+cL43za2nwa36jweBtPBSz5MYCYclkHyz1EEc5rhwvwBOMXBtQ==
+ohbem@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/ohbem/-/ohbem-1.4.1.tgz#6efbbaf7dc43a2bbed1dc657204dd5842dc83cfe"
+  integrity sha512-IFroShGCDYSNVWz/k+JG5nmGo9AgAuqPQW2t5sNpeMJ+o8KbS1FjvJer5idk/EgXukhSlLJcsOPOdYiYOTVX4A==
   optionalDependencies:
     lru-cache "^6.0.0"
-    node-fetch "^2.6.1"
-    pogo-data-generator "^1.2.2"
+    node-fetch "^2.6.7"
+    pogo-data-generator "^1.4.8"
 
 on-finished@~2.3.0:
   version "2.3.0"
@@ -3745,13 +3740,12 @@ picomatch@^2.2.1:
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.0.tgz#f1f061de8f6a4bf022892e2d128234fb98302972"
   integrity sha512-lY1Q/PiJGC2zOv/z391WOTD+Z02bCgsFfvxoXXf6h7kv9o+WmsmzYqrAwY63sNgOxE4xEdq0WyUnXfKeBrSvYw==
 
-pogo-data-generator@^1.2.2:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/pogo-data-generator/-/pogo-data-generator-1.2.3.tgz#882762d0ab52be4336d5b1a892d64b6519148c61"
-  integrity sha512-fHpCk5DoN5KlTrZV6a0GDAH+l2NyMpyDEv/MMTMlqOENRVeNRH7q86c4OCpZrIx300QQWLHQVovMMTsCeoWE8w==
+pogo-data-generator@^1.4.8:
+  version "1.4.8"
+  resolved "https://registry.yarnpkg.com/pogo-data-generator/-/pogo-data-generator-1.4.8.tgz#87cf7308e2d1af62921c2121b18c8228465c1d38"
+  integrity sha512-3iRxpzuXrXc17E5WOoW2w1igXvE46R2K1YjCx3y0vFkzCxj1GtqKiu7vAbAnDGrHajuiGwfRSkTkGWVWGM59Ow==
   dependencies:
-    "@types/node-fetch" "^2.5.12"
-    node-fetch "^2.6.1"
+    node-fetch "^2.6.7"
     pogo-protos "github:Furtif/pogo-protos"
 
 "pogo-protos@github:Furtif/pogo-protos":
@@ -3906,7 +3900,7 @@ rc@^1.2.8:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-dom@^17.0.2:
+react-dom@17.0.2:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-17.0.2.tgz#ecffb6845e3ad8dbfcdc498f0d0a939736502c23"
   integrity sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA==
@@ -3991,13 +3985,6 @@ react-router@5.2.0:
     tiny-invariant "^1.0.2"
     tiny-warning "^1.0.0"
 
-react-telegram-login@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/react-telegram-login/-/react-telegram-login-1.1.2.tgz#28b9bdd68bb2710afca19354ac1f9428092836f0"
-  integrity sha512-pDP+bvfaklWgnK5O6yvZnIwgky0nnYUU6Zhk0EjdMSkPsLQoOzZRsXIoZnbxyBXhi7346bsxMH+EwwJPTxClDw==
-  dependencies:
-    react "^16.13.1"
-
 react-transition-group@^4.4.0:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.4.2.tgz#8b59a56f09ced7b55cbd53c36768b922890d5470"
@@ -4021,16 +4008,7 @@ react-window@^1.8.6:
     "@babel/runtime" "^7.0.0"
     memoize-one ">=3.1.1 <6"
 
-react@^16.13.1:
-  version "16.14.0"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.14.0.tgz#94d776ddd0aaa37da3eda8fc5b6b18a4c9a3114d"
-  integrity sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==
-  dependencies:
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
-    prop-types "^15.6.2"
-
-react@^17.0.2:
+react@17.0.2:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react/-/react-17.0.2.tgz#d0b5cc516d29eb3eee383f75b62864cfb6800037"
   integrity sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==

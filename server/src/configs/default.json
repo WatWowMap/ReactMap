@@ -12,14 +12,21 @@
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
     "reactMapSecret": "",
     "maxSessions": 5,
+    "cookieAgeDays": 7,
     "rateLimit": {
       "time": 60,
       "requests": 1000
     },
-    "queryAvailable": {
+    "queryUpdateHours": {
+      "pokemon": 0.5,
+      "quests": 1,
+      "raids": 0.5,
+      "nests": 3
+    },
+    "queryOnSessionInit": {
       "pokemon": false,
-      "quests": true,
-      "raids": true,
+      "quests": false,
+      "raids": false,
       "nests": false
     },
     "queryLimits": {
@@ -112,6 +119,8 @@
       "questRewardTypeFilters": false,
       "fetchLatestInvasions": true,
       "invasionCacheHrs": 1,
+      "masterfileCacheHrs": 6,
+      "webhookCacheHrs": 1,
       "questMessage": "",
       "navigationControls": "react",
       "enableFloatingProfileButton": false,
@@ -121,7 +130,8 @@
       "enableQuestSetSelector": false,
       "noScanAreaOverlay": false,
       "permImageDir": "images/perms",
-      "permArrayImages": false
+      "permArrayImages": false,
+      "clientTimeoutMinutes": 30
     },
     "theme": {
       "style": "dark",
@@ -343,28 +353,24 @@
       "migrationTableName": "knex_migrations",
       "joinGymBadgeTable": false,
       "hideOldQuests": false,
-      "maxConnections": 10
+      "maxConnections": 10,
+      "startupDelayMs": 1000
     },
     "schemas": [
       {
-        "type": "rdm",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",
         "password": "pass123!",
         "database": "rdmdb",
-        "charset": "utf8mb4",
-        "hasAltQuests": false,
         "useFor": []
       },
       {
-        "type": "manual",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "user",
         "password": "pass123!",
         "database": "manualdb",
-        "charset": "utf8mb4",
         "useFor": []
       }
     ]

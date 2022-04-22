@@ -23,6 +23,7 @@ export default function ScanNext({
   const [scanNextType, setScanNextType] = useState('S')
   const [scanNext, { error: scannerError, data: scannerResponse }] = useLazyQuery(Query.scanner(), {
     variables: {
+      version: inject.VERSION,
       category: 'scanNext',
       method: 'GET',
       data: {
@@ -37,6 +38,7 @@ export default function ScanNext({
   })
   const [getQueue, { data: scannerQueueResponse }] = useLazyQuery(Query.scanner(), {
     variables: {
+      version: inject.VERSION,
       category: 'getQueue',
       method: 'GET',
       data: {

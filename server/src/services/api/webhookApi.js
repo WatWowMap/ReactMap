@@ -2,10 +2,11 @@
 const config = require('../config')
 const resolveQuickHook = require('./resolveQuickHook')
 const fetchJson = require('./fetchJson')
+const { Event } = require('../initialization')
 
 module.exports = async function webhookApi(category, discordId, method, webhookName, data = null) {
   try {
-    const webhook = config.webhookObj[webhookName]?.server
+    const webhook = Event.webhookObj[webhookName]?.server
     if (!webhook) {
       throw new Error('Invalid Webhook selected: ', webhookName)
     }
