@@ -94,8 +94,12 @@ module.exports = class Pokestop extends Model {
       query.leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
         .select([
           '*',
+          'pokestop.updated',
           'pokestop.id AS id',
           'incident.id AS incidentId',
+          raw(multiInvasionMs
+            ? 'FLOOR(incident.updated_ms / 1000) AS incident_updated'
+            : 'incident.updated AS incident_updated'),
           raw(multiInvasionMs
             ? 'FLOOR(incident.expiration_ms / 1000) AS incident_expire_timestamp'
             : 'incident.expiration AS incident_expire_timestamp'),

@@ -524,5 +524,20 @@
   "session_expired_body": "Deine Sitzung ist abgelaufen",
   "old_client_title": "Veraltet",
   "old_client_body": "Eine neue Version der Map ist verfügbar",
-  "refresh": "Aktualisieren"
+  "refresh": "Aktualisieren",
+  "search_raids": "Suche nach Raids",
+  "search_eggs": "Suche nach Eier",
+  "search_quests": "Suche nach Quests",
+  "search_lures": "Suche nach Lockmodulen",
+  "search_invasions": "Suche nach Invasionen",
+  "locale_selection_ko": "한국어",
+  "locale_selection_zh-tw": "中文",
+  "locale_selection_ru": "Русский",
+  "locale_selection_pt-br": "Portugiesisch",
+  "locale_selection_sv": "Schwedisch",
+  "locale_selection_th": "ไทย",
+  "no_alerts": "Keine Benachrichtigungen gefunden",
+  "points": "Punkte",
+  "day": "Tag",
+  "days": "Tage"
 }
