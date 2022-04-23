@@ -605,7 +605,7 @@ module.exports = class Pokestop extends Model {
       }
     })
 
-    if (finalList.length === 0) {
+    if (finalList.size === 0) {
       return fetchQuests()
     }
 
@@ -754,7 +754,7 @@ module.exports = class Pokestop extends Model {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     const results = await query
-    const mapped = results.map(q => ({ ...q, with_ar: true }))
+    const mapped = results.map(q => ({ ...q, with_ar: q.with_ar ?? true }))
 
     if (hasAltQuests) {
       const altQuestQuery = this.query()
