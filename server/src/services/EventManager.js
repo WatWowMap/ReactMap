@@ -16,6 +16,7 @@ module.exports = class EventManager {
     this.uicons = []
     this.baseUrl = 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
     this.webhookObj = {}
+    this.pokestopTry = 1
 
     setTimeout(async () => {
       // Set initials, comes with a timeout just to make sure all databases get configured first
@@ -24,9 +25,10 @@ module.exports = class EventManager {
       this.available.nests = await Db.getAvailable('Nest')
       this.available.pokemon = await Db.getAvailable('Pokemon')
       this.available.pokestops = await Db.getAvailable('Pokestop')
-      while (!this.available.pokestops.length) {
-        console.log('Trying again...')
+      while (!this.available.pokestops.length && this.pokestopTry <= config.database.settings.availableRetryCount) {
+        console.log(`[EVENT] No pokestops found, trying again in 10 seconds (attempt ${this.pokestopTry} / ${config.database.settings.availableRetryCount})`)
         this.available.pokestops = await Db.getAvailable('Pokestop')
+        this.pokestopTry += 1
       }
       await this.getMasterfile()
       await this.getInvasions()
