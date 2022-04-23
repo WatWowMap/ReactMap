@@ -754,6 +754,7 @@ module.exports = class Pokestop extends Model {
       getAreaSql(query, perms.areaRestrictions, isMad)
     }
     const results = await query
+    const mapped = results.map(q => ({ ...q, with_ar: true }))
 
     if (hasAltQuests) {
       const altQuestQuery = this.query()
@@ -776,13 +777,13 @@ module.exports = class Pokestop extends Model {
         quest_item_id: result.alternative_quest_item_id,
         quest_title: result.alternative_quest_title,
         quest_target: result.alternative_quest_target,
-        with_ar: true,
+        with_ar: false,
       }))
-      results.push(...remapped)
-      results.sort((a, b) => a.distance - b.distance)
-      results.length = searchResultsLimit
+      mapped.push(...remapped)
+      mapped.sort((a, b) => a.distance - b.distance)
+      mapped.length = searchResultsLimit
     }
-    return results.map(result => isMad ? this.parseMadRewards(result) : this.parseRdmRewards(result)).filter(x => x)
+    return mapped.map(result => isMad ? this.parseMadRewards(result) : this.parseRdmRewards(result)).filter(x => x)
   }
 
   static getOne(id, { isMad }) {
