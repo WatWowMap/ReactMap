@@ -1,3 +1,4 @@
+/* eslint-disable no-promise-executor-return */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 const { promises: fs } = require('fs')
@@ -26,7 +27,8 @@ module.exports = class EventManager {
       this.available.pokemon = await Db.getAvailable('Pokemon')
       this.available.pokestops = await Db.getAvailable('Pokestop')
       while (!this.available.pokestops.length && this.pokestopTry <= config.database.settings.availableRetryCount) {
-        console.log(`[EVENT] No pokestops found, trying again in 10 seconds (attempt ${this.pokestopTry} / ${config.database.settings.availableRetryCount})`)
+        console.log(`[EVENT] No pokestops found, trying again in 1 second (attempt ${this.pokestopTry} / ${config.database.settings.availableRetryCount})`)
+        await new Promise(resolve => setTimeout(resolve, 1000))
         this.available.pokestops = await Db.getAvailable('Pokestop')
         this.pokestopTry += 1
       }
