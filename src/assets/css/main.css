@@ -1,6 +1,10 @@
 @import "holiday.css";
 @import "loading.css";
 
+.leaflet-control-container .leaflet-top, .leaflet-control-container .leaflet-bottom {
+    transform: translate3d(0px, 0px, 0px);
+}
+
 .leaflet-container {
   position: absolute;
   max-width: 100% !important;

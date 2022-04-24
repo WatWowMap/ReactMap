@@ -233,13 +233,6 @@ const getLegacy = (results, args, perms, ts) => {
       if (result.pokemon_id === 132) {
         filtered.ditto_form = result.form
         result.form = Event.masterfile.pokemon[result.pokemon_id]?.defaultFormId || 0
-        const statsToCheck = ['atk', 'def', 'sta']
-        statsToCheck.forEach(stat => {
-          if (!result[`${stat}_iv`] && result[`${stat}_inactive`]) {
-            result[`${stat}_iv`] = result[`${stat}_inactive`]
-            result.inactive_stats = true
-          }
-        })
       }
       if (!result.seen_type) {
         if (result.spawn_id === null) {

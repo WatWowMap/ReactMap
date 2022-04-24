@@ -145,7 +145,20 @@ export default function stopMarker(pokestop, hasQuest, hasLure, hasInvasion, fil
             }}
           />
           {Boolean(icon.url.includes('stardust') ? !icon.url.endsWith('0.png') : !icon.url.includes('_a') && icon.amount)
-            && <div className="amount-holder">x{icon.amount}</div>}
+            && (
+              <div
+                className="amount-holder"
+                style={{
+                  bottom: (baseSize * 0.6 + (invasionMod?.removeQuest ? 10 : totalInvasionSize))
+                    * rewardMod.offsetY
+                    + (questSizes[i] * i),
+                  left: `${rewardMod.offsetX * 50}%`,
+                  transform: 'translateX(-50%)',
+                }}
+              >
+                x{icon.amount}
+              </div>
+            )}
         </Fragment>
       ))}
       {invasionIcons.map((icon, i) => (

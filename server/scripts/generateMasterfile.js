@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const fs = require('fs')
+const path = require('path')
 const { rarity } = require('../src/services/config')
 const fetchJson = require('../src/services/api/fetchJson')
 const defaultRarity = require('../src/data/defaultRarity.json')
@@ -33,8 +34,8 @@ const generate = async (save) => {
     })
 
     if (save) {
-      fs.writeFile(
-        `${__dirname}/../src/data/masterfile.json`,
+      fs.writeFileSync(
+        path.resolve(`${__dirname}/../src/data/masterfile.json`),
         JSON.stringify(masterfile, null, 2),
         'utf8',
         () => { },

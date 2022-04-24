@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
   try {
     if (api.reactMapSecret && req.headers['react-map-secret'] === api.reactMapSecret) {
       const ts = Math.floor((new Date()).getTime() / 1000)
-      res.status(await Session.query()
+      res.status(200).json(await Session.query()
         .where('expires', '>=', ts))
     } else {
       throw new Error('Incorrect or missing API secret')

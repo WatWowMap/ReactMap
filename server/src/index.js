@@ -21,6 +21,7 @@ const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
+const { version } = require('../../package.json')
 
 if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')
@@ -34,15 +35,22 @@ const server = new ApolloServer({
   resolvers,
   introspection: config.devOptions.enabled,
   debug: config.devOptions.queryDebug,
-  context: ({ req }) => ({ Db, req }),
+  context: ({ req, res }) => {
+    const perms = req.user ? req.user.perms : req.session.perms
+    return { req, res, Db, perms, version }
+  },
   formatError: (e) => {
-    if (e instanceof ValidationError) {
-      console.warn('[GraphQL Error]:', e.message, '\nThis is very likely not a real issue and is caused by a user leaving an old browser session open, there is nothing you can do until they refresh.')
-    } else {
-      return config.devOptions.enabled
-        ? console.error(e)
-        : console.error('[GraphQL Error]: ', e.message, e.path, e.location)
+    if (config.devOptions.enabled) {
+      console.warn(e)
     }
+    if (e instanceof ValidationError || e?.message.includes('skipUndefined()')) {
+      return { message: 'old_client' }
+    }
+    if (['old_client', 'session_expired'].includes(e.message)) {
+      return { message: e.message }
+    }
+    console.warn(['GQL'], e.message)
+    return { message: e.message }
   },
 })
 
@@ -96,7 +104,7 @@ app.use(session({
   store: sessionStore,
   resave: true,
   saveUninitialized: false,
-  cookie: { maxAge: 604800000 },
+  cookie: { maxAge: 86400000 * config.api.cookieAgeDays },
 }))
 
 config.authentication.strategies.forEach(strategy => {
@@ -130,7 +138,7 @@ i18next.use(Backend).init({
   preload: config.map.localeSelection,
   ns: ['translation'],
   defaultNS: 'translation',
-  backend: { loadPath: 'public/locales/{{lng}}/{{ns}}.json' },
+  backend: { loadPath: path.resolve(`${__dirname}/../../public/locales/{{lng}}/{{ns}}.json`) },
 }, (err, t) => {
   if (err) return console.error(err)
 })

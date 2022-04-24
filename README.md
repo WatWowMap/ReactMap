@@ -24,7 +24,7 @@ Pokemon GO Map frontend built with React.
 
 ## Live Demo
 
-- You can find a live demo version of this app [here](https://www.reactmap.dev/).
+- You can sometimes find a live demo version of this app [here](https://www.reactmap.dev/).
 - To get the full experience you will need to have a Discord account
 
 ## PreReqs

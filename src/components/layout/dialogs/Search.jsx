@@ -38,6 +38,7 @@ export default function Search({
       locale: localStorage.getItem('i18nextLng'),
       ts: Math.floor(Date.now() / 1000),
       midnight: Utility.getMidnight(),
+      version: inject.VERSION,
     },
   })
 
