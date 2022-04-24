@@ -3,6 +3,8 @@ import React, { memo } from 'react'
 import { Polyline, Polygon, Circle } from 'react-leaflet'
 
 const DevicePoly = ({ device, color }) => {
+  if (!device.route) return null
+
   if (typeof device.route === 'string') {
     device.route = JSON.parse(device.route)
   }
