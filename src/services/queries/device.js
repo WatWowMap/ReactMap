@@ -11,6 +11,7 @@ const getAllDevices = gql`
       route
       type
       isMad
+      radius
     }
   }
 `
