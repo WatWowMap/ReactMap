@@ -354,7 +354,8 @@
       "joinGymBadgeTable": false,
       "hideOldQuests": false,
       "maxConnections": 10,
-      "startupDelayMs": 1000
+      "startupDelayMs": 1000,
+      "availableRetryCount": 5
     },
     "schemas": [
       {

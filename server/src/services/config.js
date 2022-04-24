@@ -73,6 +73,10 @@ if (hasLittle) {
   config.api.pvp.leagueObj.little = hasLittle.littleCupRules ? 500 : { little: false, cap: 500 }
 }
 
+if (!config.authentication.strategies.length || !config.authentication.strategies.find(strategy => strategy.enabled)) {
+  config.authentication.alwaysEnabledPerms = Object.keys(config.authentication.perms)
+}
+
 // Map manual areas
 config.manualAreas = Object.fromEntries(config.manualAreas.map(area => [area.name, area]))
 
