@@ -500,5 +500,6 @@
   "day": "낮",
   "days": "날",
   "scan_cells_subtitle": "장치가 S2 셀을 마지막으로 스캔한 시간을 표시합니다.",
-  "locale_selection_nl": "네덜란드"
+  "locale_selection_nl": "네덜란드",
+  "react_error": "문제가 발생했습니다."
 }
