@@ -500,5 +500,6 @@
   "day": "天",
   "days": "天",
   "scan_cells_subtitle": "顯示設備上次掃描 S2 單元的時間",
-  "locale_selection_nl": "荷蘭"
+  "locale_selection_nl": "荷蘭",
+  "react_error": "出問題了"
 }

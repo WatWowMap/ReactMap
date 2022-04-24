@@ -500,5 +500,6 @@
   "day": "Dia",
   "days": "Dias",
   "scan_cells_subtitle": "Mostra a última vez que uma célula S2 foi verificada por um dispositivo",
-  "locale_selection_nl": "Países Baixos"
+  "locale_selection_nl": "Países Baixos",
+  "react_error": "Algo deu errado"
 }

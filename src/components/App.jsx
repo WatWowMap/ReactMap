@@ -5,6 +5,7 @@ import { ApolloProvider } from '@apollo/client'
 import client from '@services/apollo'
 
 import ReactRouter from './ReactRouter'
+import ErrorBoundary from './ErrorBoundary'
 
 const SetText = () => {
   const locales = {
@@ -35,7 +36,9 @@ export default function App() {
   return (
     <Suspense fallback={<SetText />}>
       <ApolloProvider client={client}>
-        <ReactRouter />
+        <ErrorBoundary>
+          <ReactRouter />
+        </ErrorBoundary>
       </ApolloProvider>
     </Suspense>
   )
