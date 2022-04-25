@@ -500,5 +500,6 @@
   "day": "Giorno",
   "days": "Giorni",
   "scan_cells_subtitle": "Mostra l'ultima volta che una cella S2 è stata scansionata da un dispositivo",
-  "locale_selection_ja": "日本語"
+  "locale_selection_ja": "日本語",
+  "react_error": "Qualcosa è andato storto"
 }
