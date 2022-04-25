@@ -10,29 +10,25 @@ import { withTranslation } from 'react-i18next'
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props)
-    this.state = { hasError: false, message: '', info: '' }
+    this.state = { hasError: false, message: '' }
   }
 
-  componentDidCatch(error, info) {
+  componentDidCatch(error) {
     this.setState({
       hasError: true,
-      message: inject.DEVELOPMENT ? error : error?.message || '',
-      info: inject.DEVELOPMENT ? info : '',
+      message: error?.message || '',
     })
   }
 
   render() {
     return this.state.hasError ? (
-      <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh', width: '100%', textAlign: 'center' }}>
+      <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh', width: '100vw', textAlign: 'center' }}>
         <Grid item xs={12}>
           <Typography variant="h3" align="center" style={{ color: 'white' }}>
             {this.props.t('react_error')}
           </Typography>
           <Typography variant="subtitle2" align="center" style={{ color: 'white' }}>
             {this.state.message}
-          </Typography>
-          <Typography variant="subtitle2" align="center" style={{ color: 'white' }}>
-            {this.state.info}
           </Typography>
           <br />
           <br />
