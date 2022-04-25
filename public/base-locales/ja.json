@@ -500,5 +500,6 @@
   "points": "ポイント",
   "day": "日",
   "days": "日々",
-  "scan_cells_subtitle": "S2セルがデバイスによって最後にスキャンされた時刻を示します"
+  "scan_cells_subtitle": "S2セルがデバイスによって最後にスキャンされた時刻を示します",
+  "react_error": "何かがおかしい"
 }

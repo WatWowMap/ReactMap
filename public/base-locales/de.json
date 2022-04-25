@@ -539,5 +539,6 @@
   "no_alerts": "Keine Benachrichtigungen gefunden",
   "points": "Punkte",
   "day": "Tag",
-  "days": "Tage"
+  "days": "Tage",
+  "react_error": "Etwas ist schiefgelaufen"
 }

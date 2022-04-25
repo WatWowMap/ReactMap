@@ -532,5 +532,6 @@
   "refresh": "Refresh",
   "points": "Points",
   "day": "Day",
-  "days": "Days"
+  "days": "Days",
+  "react_error": "Something Went Wrong"
 }
