@@ -156,6 +156,7 @@ export default function QueryData({
           weather={renderedData[category]}
           isMobile={isMobile}
           zoom={config.activeWeatherZoom}
+          clickable={userSettings.clickableIcon}
           map={map}
         />
       )}
