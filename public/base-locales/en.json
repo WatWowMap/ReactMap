@@ -280,7 +280,7 @@
   "quests_subtitle": "Shows quest reward and task information",
   "raids_subtitle": "Shows all raid info including the raid boss, eggs, expire time, and moveset",
   "scan_cells_subtitle": "Shows the last time a S2 cell was scanned by a device",
-  "scanAreas_subtitle": "Shows available scan areas polygons",
+  "scan_areas_subtitle": "Shows available scan areas polygons",
   "spawnpoints_subtitle": "Shows spawnpoints and their estimated despawn time",
   "stats_subtitle": "Shows Pokémon stats and levels",
   "submission_cells_subtitle": "Shows information useful for submitting new POIs",
