@@ -259,6 +259,9 @@
       "clustering": true,
       "oldPortals": "#0000ff",
       "newPortals": "#16b819"
+    },
+    "weather": {
+      "clickableIcon": false
     }
   },
   "defaultFilters": {
