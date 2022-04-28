@@ -95,10 +95,10 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@craftamap/esbuild-plugin-html@^0.3.1":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@craftamap/esbuild-plugin-html/-/esbuild-plugin-html-0.3.1.tgz#d16363f57c0200db81df2184c729f55042d1e004"
-  integrity sha512-Ru6m6RjkDRvD1yOg0GB4BJuwBRNiLt3Z4D68G4P9ByDtKxc0+9jjHsaMDOLHL8kM5npFiypZwUwjS+HaNpDHWw==
+"@craftamap/esbuild-plugin-html@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@craftamap/esbuild-plugin-html/-/esbuild-plugin-html-0.4.0.tgz#51bb66c8e92dd87aadd614e4771d1b6ca23861f6"
+  integrity sha512-8k9oyOBritQ0cjE/ugajijU4KME4ZwgHrpeVSltV2PQ21XEnTxXLaU3HcBGGFhyLHs9dLeOOsfezwCd+7bh3Cw==
   dependencies:
     jsdom "^17.0.0"
     lodash.template "^4.5.0"

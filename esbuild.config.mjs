@@ -47,9 +47,9 @@ const plugins = [
         htmlTemplate: fs.readFileSync('./public/index.html'),
         scriptLoading: 'defer',
         favicon: './public/favicon/favicon.ico',
-        extraScripts: [
-          { src: '/esbuild-livereload.js', tags: ['async'] },
-        ],
+        extraScripts: isServing ? [
+          { src: '/esbuild-livereload.js', attrs: { async: true } },
+        ] : undefined,
       },
     ],
   }),
