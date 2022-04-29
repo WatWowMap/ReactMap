@@ -11,6 +11,7 @@
     "build": "yarn create-locales && node esbuild.config.mjs",
     "server": "yarn create-area && yarn generate && yarn migrate:latest && node server/src/index.js",
     "watch": "node esbuild.config.mjs --dev",
+    "serve": "node esbuild.config.mjs --dev --serve",
     "dev": "nodemon server/src/index.js --watch server",
     "generate": "node server/scripts/generateMasterfile.js",
     "genEnvConfig": "node server/scripts/genEnvConfig.js",
@@ -29,12 +30,13 @@
     "yarn": "1.22.x"
   },
   "devDependencies": {
-    "@craftamap/esbuild-plugin-html": "^0.3.1",
+    "@craftamap/esbuild-plugin-html": "^0.4.0",
     "@sentry/cli": "^1.73.0",
-    "esbuild": "^0.14.22",
+    "esbuild": "^0.14.36",
     "esbuild-plugin-eslinter": "^0.1.2",
     "esbuild-plugin-mxn-copy": "^1.0.1",
     "esbuild-plugin-path-alias": "^1.0.3",
+    "esbuild-server": "^0.1.0",
     "eslint": "^8.9.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-import-resolver-alias": "^1.1.2",
