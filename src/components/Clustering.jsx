@@ -21,6 +21,7 @@ export default function Clustering({
   const showCircles = userSettings.interactionRanges && currentZoom >= config.interactionRangeZoom
 
   const finalData = renderedData.map((each) => {
+    if (!each) return null
     const id = each.id || category
     if (!hideList.includes(id)) {
       return (
