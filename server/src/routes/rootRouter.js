@@ -24,6 +24,14 @@ rootRouter.get('/logout', (req, res) => {
   res.redirect('/')
 })
 
+rootRouter.post('/clientError', (req) => {
+  const { body: { error }, user } = req
+  const userName = user?.username || user?.discordId || user?.telegramId || user?.id || 'Unknown'
+  if (error && config.devOptions.clientErrors) {
+    console.error('[CLIENT]', error, `- User: ${userName}`)
+  }
+})
+
 rootRouter.get('/area/:area/:zoom?', (req, res) => {
   const { area, zoom } = req.params
   try {
