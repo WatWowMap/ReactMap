@@ -133,7 +133,7 @@ rootRouter.get('/settings', async (req, res) => {
         },
         gymValidDataLimit: Date.now() / 1000 - (config.api.gymValidDataLimit * 86400),
       },
-      available: {},
+      available: { pokemon: [], pokestops: [], gyms: [], nests: [] },
     }
 
     // add user options here from the config that are structured as objects
@@ -161,8 +161,6 @@ rootRouter.get('/settings', async (req, res) => {
         }
       })
 
-      serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
-
       if (serverSettings.user.perms.pokemon) {
         serverSettings.available.pokemon = config.api.queryOnSessionInit.pokemon
           ? await Db.getAvailable('Pokemon')
@@ -186,6 +184,8 @@ rootRouter.get('/settings', async (req, res) => {
           ? await Db.getAvailable('Nest')
           : Event.available.nests
       }
+
+      serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms, serverSettings.available)
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile
       // Primary for quest rewards that are form unset, despite normally have a set form

@@ -48,7 +48,6 @@ export default function Map({ serverSettings:
 
   const staticUserSettings = useStatic(state => state.userSettings)
   const ui = useStatic(state => state.ui)
-  const available = useStatic(state => state.available)
   const staticFilters = useStatic(state => state.filters)
   const setExcludeList = useStatic(state => state.setExcludeList)
 
@@ -184,7 +183,6 @@ export default function Map({ serverSettings:
                 map={map}
                 category={category}
                 config={config}
-                available={available[category]}
                 Icons={Icons}
                 staticFilters={staticFilters[category].filter}
                 userIcons={icons}

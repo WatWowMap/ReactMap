@@ -2,14 +2,14 @@
 const { Event } = require('../initialization')
 const { GenericFilter } = require('../../models/index')
 
-module.exports = function buildPokemon(defaults, base, custom) {
+module.exports = function buildPokemon(defaults, base, custom, available) {
   const pokemon = {
     full: { global: custom },
     raids: { global: new GenericFilter() },
     quests: { global: new GenericFilter() },
     nests: { global: new GenericFilter() },
   }
-  const energyAmounts = new Set(['10', '20', ...Event.available.pokestops
+  const energyAmounts = new Set(['10', '20', ...available.pokestops
     .filter((e) => e.startsWith('m'))
     .map((e) => e.split('-')[1])])
 
