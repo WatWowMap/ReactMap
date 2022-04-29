@@ -16,9 +16,10 @@ services:
       MANUAL_DB_USER: manual_username
       MANUAL_DB_PASSWORD: manual_user_pw
       MANUAL_DB_NAME: manual_db
-      TITLE: ReactMap
-      START_LAT: 0
-      START_LON: 0
+      MAP_GENERAL_TITLE: ReactMap
+      MAP_GENERAL_START_LAT: 0
+      MAP_GENERAL_START_LON: 0
+      ARRAY_VALUE_EXAMPLE: "[3, 4, 5]"
     volumes:
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
       - ./server/src/configs/local.json:/home/node/server/src/configs/local.json

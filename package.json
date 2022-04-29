@@ -13,6 +13,7 @@
     "watch": "node esbuild.config.mjs --dev",
     "dev": "nodemon server/src/index.js --watch server",
     "generate": "node server/scripts/generateMasterfile.js",
+    "genEnvConfig": "node server/scripts/genEnvConfig.js",
     "create-locales": "node server/scripts/createLocales.js",
     "missing-locales": "node server/scripts/createLocales.js --missing",
     "create-area": "node server/scripts/poracleToGeoJSON.js",
@@ -30,7 +31,6 @@
   "devDependencies": {
     "@craftamap/esbuild-plugin-html": "^0.3.1",
     "@sentry/cli": "^1.73.0",
-    "dotenv": "^10.0.0",
     "esbuild": "^0.14.22",
     "esbuild-plugin-eslinter": "^0.1.2",
     "esbuild-plugin-mxn-copy": "^1.0.1",
@@ -63,6 +63,7 @@
     "compression": "^1.7.4",
     "config": "^3.3.6",
     "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-mysql-session": "^2.1.6",
     "express-rate-limit": "^5.2.6",
