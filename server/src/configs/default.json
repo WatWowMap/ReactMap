@@ -389,7 +389,7 @@
       "showScanCount": false,
       "showScanQueue": false,
       "scanNextInstance": "scanNext",
-      "scanNextDevice": "Device01",
+      "scanNextDevice": "Device01",  //not needed for RDM users, only MAD
       "scanNextSleeptime": 5,
       "scanNextAreaRestriction": [],
       "discordRoles": [],
