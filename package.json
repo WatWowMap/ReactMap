@@ -14,7 +14,7 @@
     "serve": "node esbuild.config.mjs --dev --serve",
     "dev": "nodemon server/src/index.js --watch server",
     "generate": "node server/scripts/generateMasterfile.js",
-    "genEnvConfig": "node server/scripts/genEnvConfig.js",
+    "gen-env-config": "node server/scripts/genEnvConfig.js",
     "create-locales": "node server/scripts/createLocales.js",
     "missing-locales": "node server/scripts/createLocales.js --missing",
     "create-area": "node server/scripts/poracleToGeoJSON.js",
