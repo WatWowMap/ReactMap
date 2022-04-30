@@ -67,7 +67,8 @@
     "gymValidDataLimit": 30,
     "hideOldGyms": false,
     "stopValidDataLimit": 30,
-    "hideOldPokestops": false
+    "hideOldPokestops": false,
+    "fetchTimeoutMs": 3000
   },
   "multiDomains": [],
   "map": {
