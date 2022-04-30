@@ -65,6 +65,9 @@ if (fs.existsSync(path.resolve(`${__dirname}/../configs/config.json`))) {
 }
 
 const mergeMapConfig = (obj) => {
+  if (process.env.TELEGRAM_BOT_NAME && !obj?.customRoutes?.telegramBotName) {
+    obj.telegramBotName = process.env.TELEGRAM_BOT_NAME
+  }
   if (obj?.customRoutes?.telegramBotEnvRef) {
     console.warn('[CONFIG] customRoutes.telegramBotEnvRef is deprecated, please use customRoutes.telegramBotName instead\n(Move them from your .env file to your config file)')
     obj.customRoutes.telegramBotName = process.env[obj.customRoutes.telegramBotEnvRef]
