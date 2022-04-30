@@ -21,7 +21,7 @@ export default function Generator({
     case 'button': return <CustomButton block={block} isMuiColor={isMuiColor} />
     case 'text': return <CustomText block={block} isMuiColor={isMuiColor} />
     case 'divider': return <Divider {...block} />
-    case 'telegram': return <Telegram botName={inject?.[block.telegramBotEnvRef]} authUrl={block.telegramAuthUrl} />
+    case 'telegram': return <Telegram botName={block.telegramBotName} authUrl={block.telegramAuthUrl} />
     case 'discord': return <DiscordLogin href={block.link} text={block.text} />
     case 'localLogin': return (
       <LocalLogin

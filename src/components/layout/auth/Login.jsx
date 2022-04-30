@@ -68,7 +68,7 @@ const Login = ({ clickedTwice, location, serverSettings, getServerSettings }) =>
       {serverSettings?.authMethods?.includes('telegram') && (
         <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
           <TelegramLogin
-            botName={serverSettings.config.map.telegramBotEnvRef}
+            botName={serverSettings.config.map.telegramBotName}
             authUrl={serverSettings.config.map.telegramAuthUrl}
           />
         </Grid>
