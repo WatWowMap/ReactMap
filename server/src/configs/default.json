@@ -98,7 +98,7 @@
     "customRoutes": {
       "discordAuthUrl": "/auth/discord/callback",
       "telegramAuthUrl": "/auth/telegram/callback",
-      "telegramBotEnvRef": "TELEGRAM_BOT_NAME",
+      "telegramBotName": "",
       "localAuthUrl": "/auth/local/callback"
     },
     "links": {

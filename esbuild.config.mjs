@@ -141,7 +141,11 @@ const esbuild = {
   sourcemap: isRelease || isDevelopment,
   define: {
     inject: JSON.stringify({
-      ...env.parsed,
+      GOOGLE_ANALYTICS_ID: env.parsed.GOOGLE_ANALYTICS_ID || '',
+      ANALYTICS_DEBUG_MODE: env.parsed.ANALYTICS_DEBUG_MODE || false,
+      TITLE: env.parsed.TITLE || env.parsed.MAP_GENERAL_TITLE || '',
+      SENTRY_DSN: env.parsed.SENTRY_DSN || '',
+      SENTRY_TRACES_SAMPLE_RATE: env.parsed.SENTRY_TRACES_SAMPLE_RATE || 0.1,
       VERSION: version,
       DEVELOPMENT: isDevelopment,
       CUSTOM: hasCustom,

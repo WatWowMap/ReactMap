@@ -64,20 +64,36 @@ if (fs.existsSync(path.resolve(`${__dirname}/../configs/config.json`))) {
   console.log('[CONFIG] Config v1 (config.json) found, it is fine to leave it but make sure you are using and updating local.json instead.')
 }
 
-const mergeMapConfig = (obj) => ({
-  localeSelection: obj.localeSelection,
-  ...obj,
-  ...obj.general,
-  ...obj.customRoutes,
-  ...obj.links,
-  ...obj.holidayEffects,
-  ...obj.misc,
-  general: undefined,
-  customRoutes: undefined,
-  links: undefined,
-  holidayEffects: undefined,
-  misc: undefined,
-})
+const mergeMapConfig = (obj) => {
+  if (obj?.customRoutes?.telegramBotEnvRef) {
+    console.warn('[CONFIG] customRoutes.telegramBotEnvRef is deprecated, please use customRoutes.telegramBotName instead\n(Move them from your .env file to your config file)')
+    obj.customRoutes.telegramBotName = process.env[obj.customRoutes.telegramBotEnvRef]
+  }
+  ['messageOfTheDay', 'donationPage', 'loginPage'].forEach(category => {
+    if (obj?.[category]?.components) {
+      obj[category].components.forEach(component => {
+        if (component.type === 'telegram') {
+          component.telegramBotName = process.env[component.telegramBotEnvRef]
+          console.warn('[CONFIG] telegramBotEnvRef is deprecated, please use telegramBotName instead\n', category, component)
+        }
+      })
+    }
+  })
+  return {
+    localeSelection: obj.localeSelection,
+    ...obj,
+    ...obj.general,
+    ...obj.customRoutes,
+    ...obj.links,
+    ...obj.holidayEffects,
+    ...obj.misc,
+    general: undefined,
+    customRoutes: undefined,
+    links: undefined,
+    holidayEffects: undefined,
+    misc: undefined,
+  }
+}
 
 // Merge sub-objects for the map object
 config.map = mergeMapConfig(config.map)

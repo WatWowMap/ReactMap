@@ -22,7 +22,7 @@ const convertMapObject = (obj) => obj ? ({
   customRoutes: {
     discordAuthUrl: obj?.discordAuthUrl,
     telegramAuthUrl: obj?.telegramAuthUrl,
-    telegramBotEnvRef: obj?.telegramBotEnvRef,
+    telegramBotName: obj?.telegramBotEnvRef,
     localAuthUrl: obj?.localAuthUrl,
   },
   links: {

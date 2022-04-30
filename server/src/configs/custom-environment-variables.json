@@ -223,7 +223,7 @@
     "customRoutes": {
       "discordAuthUrl": "MAP_CUSTOM_ROUTES_DISCORD_AUTH_URL",
       "telegramAuthUrl": "MAP_CUSTOM_ROUTES_TELEGRAM_AUTH_URL",
-      "telegramBotEnvRef": "MAP_CUSTOM_ROUTES_TELEGRAM_BOT_ENV_REF",
+      "telegramBotName": "MAP_CUSTOM_ROUTES_TELEGRAM_BOT_NAME",
       "localAuthUrl": "MAP_CUSTOM_ROUTES_LOCAL_AUTH_URL"
     },
     "links": {
