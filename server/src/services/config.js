@@ -66,18 +66,22 @@ if (fs.existsSync(path.resolve(`${__dirname}/../configs/config.json`))) {
 
 const mergeMapConfig = (obj) => {
   if (process.env.TELEGRAM_BOT_NAME && !obj?.customRoutes?.telegramBotName) {
-    obj.telegramBotName = process.env.TELEGRAM_BOT_NAME
+    if (obj.customRoutes) obj.customRoutes.telegramBotName = process.env.TELEGRAM_BOT_NAME
+    console.warn('[CONFIG] TELEGRAM_BOT_NAME has been moved from the .env file to your config, telegramBotEnvRef is now deprecated.\nplease use customRoutes.telegramBotName instead\n(Move them from your .env file to your config file)')
   }
   if (obj?.customRoutes?.telegramBotEnvRef) {
-    console.warn('[CONFIG] customRoutes.telegramBotEnvRef is deprecated, please use customRoutes.telegramBotName instead\n(Move them from your .env file to your config file)')
+    console.warn('[CONFIG] TELEGRAM_BOT_NAME has been moved from the .env file to your config, telegramBotEnvRef is now deprecated.\nplease use customRoutes.telegramBotName instead\n(Move them from your .env file to your config file)')
     obj.customRoutes.telegramBotName = process.env[obj.customRoutes.telegramBotEnvRef]
   }
   ['messageOfTheDay', 'donationPage', 'loginPage'].forEach(category => {
     if (obj?.[category]?.components) {
       obj[category].components.forEach(component => {
         if (component.type === 'telegram') {
+          console.warn('[CONFIG] telegramBotEnvRef is deprecated, please use telegramBotName instead\n', category)
+          console.warn('OLD:\n', component)
           component.telegramBotName = process.env[component.telegramBotEnvRef]
-          console.warn('[CONFIG] telegramBotEnvRef is deprecated, please use telegramBotName instead\n', category, component)
+          delete component.telegramBotEnvRef
+          console.warn('NEW:\n', component)
         }
       })
     }
