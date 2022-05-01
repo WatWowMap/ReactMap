@@ -118,6 +118,7 @@ module.exports = class EventManager {
     try {
       this.masterfile = await generate()
         .then((masterfile) => {
+          if (!masterfile) return this.masterfile
           Object.entries(this.available).forEach(([category, entries]) => {
             entries.forEach(item => {
               if (!Number.isNaN(parseInt(item.charAt(0)))) {
