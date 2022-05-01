@@ -178,6 +178,7 @@
   "nests_options": "Nest Options",
   "wayfarer_options": "Wayfarer Options",
   "admin_options": "Admin Options",
+  "weather_options": "Weather Options",
   "clustering": "Clustering",
   "glow": "Glow",
   "legacy_filter": "Legacy Filter",
@@ -532,5 +533,7 @@
   "refresh": "Refresh",
   "points": "Points",
   "day": "Day",
-  "days": "Days"
+  "days": "Days",
+  "react_error": "Something Went Wrong",
+  "clickable_icon": "Icon is Clickable"
 }

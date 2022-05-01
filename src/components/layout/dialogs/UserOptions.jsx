@@ -97,7 +97,7 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
   return (
     <>
       <Header
-        titles={[t(`${category}_options`)]}
+        titles={[`${category}_options`]}
         action={toggleDialog(false, category, 'options')}
       />
       <DialogContent style={{ padding: 0 }}>

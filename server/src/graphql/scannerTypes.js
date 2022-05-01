@@ -10,6 +10,7 @@ module.exports = gql`
     type: String
     isMad: Boolean
     route: JSON
+    radius: Int
   }
 
   type Gym {

@@ -8,26 +8,17 @@ const fetchJson = require('./api/fetchJson')
 const initWebhooks = require('./initWebhooks')
 
 module.exports = class EventManager {
-  constructor(config, masterfile, Db, Pvp) {
+  constructor(masterfile) {
     this.masterfile = masterfile
     this.invasions = masterfile.invasions
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
     this.uicons = []
     this.baseUrl = 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
     this.webhookObj = {}
+  }
 
-    setTimeout(async () => {
-      // Set initials, comes with a timeout just to make sure all databases get configured first
-      await this.getUicons(config.icons.styles)
-      this.available.gyms = await Db.getAvailable('Gym')
-      this.available.nests = await Db.getAvailable('Nest')
-      this.available.pokemon = await Db.getAvailable('Pokemon')
-      this.available.pokestops = await Db.getAvailable('Pokestop')
-      await this.getMasterfile()
-      await this.getInvasions()
-      await this.getWebhooks(config)
-    }, config.database.settings.startupDelayMs)
-    this.setTimers(config, Db, Pvp)
+  async setAvailable(category, model, Db) {
+    this.available[category] = await Db.getAvailable(model)
   }
 
   setTimers(config, Db, Pvp) {

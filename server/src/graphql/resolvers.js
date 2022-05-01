@@ -164,7 +164,7 @@ module.exports = {
         }
         return [scanAreas]
       }
-      return []
+      return [{ features: [] }]
     },
     search: async (_, args, { perms, version, Db }) => {
       if (args.version && args.version !== version) throw new UserInputError('old_client')

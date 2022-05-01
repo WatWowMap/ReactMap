@@ -24,6 +24,9 @@ module.exports = async function fetchQuests() {
         questsInfo.push(`i${grunt}`)
       }
     })
+    for (let i = 1; i <= 5; i += 1) {
+      questsInfo.push(`l50${i}`)
+    }
     return questsInfo
   } catch (e) {
     console.warn(e, '\nUnable to fetch available quests and invasions from GitHub')

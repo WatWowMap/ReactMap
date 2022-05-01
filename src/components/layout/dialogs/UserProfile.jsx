@@ -97,7 +97,7 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
 
 const LinkProfiles = ({ auth, t }) => {
   const setAuth = useStatic(state => state.setAuth)
-  const { map: { discordAuthUrl, telegramAuthUrl, telegramBotEnvRef } } = useStatic(state => state.config)
+  const { map: { discordAuthUrl, telegramAuthUrl, telegramBotName } } = useStatic(state => state.config)
 
   const [refreshing, setRefreshing] = useState(false)
 
@@ -117,7 +117,7 @@ const LinkProfiles = ({ auth, t }) => {
         {['discord', 'telegram'].map((method, i) => {
           if (!auth.methods.includes(method)) return null
           const Component = i
-            ? <Telegram authUrl={telegramAuthUrl} botName={telegramBotEnvRef} />
+            ? <Telegram authUrl={telegramAuthUrl} botName={telegramBotName} />
             : <DiscordLogin href={discordAuthUrl} text="link_discord" size="medium" />
           return (
             <Grid item xs={6} key={method}>

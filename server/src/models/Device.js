@@ -36,6 +36,8 @@ module.exports = class Device extends Model {
           'instance_name',
           raw('json_extract(data, "$.area")')
             .as('route'),
+          raw('json_extract(data, "$.radius")')
+            .as('radius'),
         )
     }
     if (areaRestrictions.length) {
