@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 import { useStore } from '@hooks/useStore'
 import useFilter from '@hooks/useFilter'
-import useHash from '@hooks/useHash'
 
 import ReactWindow from '@components/layout/general/ReactWindow'
 import Header from '@components/layout/general/Header'
@@ -29,8 +28,6 @@ export default function Menu({
   title, titleAction, extraButtons = [],
 }) {
   Utility.analytics(`/advanced/${category}`)
-
-  const [isOpen, toggleHash, hash] = useHash()
 
   const menus = useStore(state => state.menus)
   const setMenus = useStore(state => state.setMenus)
@@ -78,7 +75,6 @@ export default function Menu({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    toggleHash(open, ['adv-drawer'], true)
     setFilterDrawer(open)
   }
 
@@ -86,7 +82,6 @@ export default function Menu({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    toggleHash(open, ['advanced', id], true)
     if (open) {
       setAdvancedFilter({
         open,
@@ -117,7 +112,6 @@ export default function Menu({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    toggleHash(open, ['webhook', category, id], true)
     if (id === 'global' && !open && newFilters) {
       const wildCards = (() => {
         switch (webhookCategory) {
@@ -150,7 +144,6 @@ export default function Menu({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    toggleHash(open, [id, 'slots'], true)
     if (open) {
       setSlotsMenu({
         open,
@@ -201,21 +194,6 @@ export default function Menu({
     { name: 'enable_all', action: () => selectAllOrNone(true), icon: 'Check', color: '#00e676' },
     ...extraButtons,
   ]
-
-  React.useEffect(() => {
-    if (hash.includes('advanced')) {
-      setAdvancedFilter({ ...advancedFilter, open: isOpen })
-    }
-    if (hash.includes('slots')) {
-      setSlotsMenu({ ...slotsMenu, open: isOpen })
-    }
-    if (hash.includes('adv-drawer')) {
-      setFilterDrawer(isOpen)
-    }
-    if (hash.includes('webhook')) {
-      setWebhook({ ...webhook, open: isOpen })
-    }
-  }, [isOpen])
 
   return (
     <>

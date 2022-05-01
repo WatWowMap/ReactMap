@@ -6,7 +6,6 @@ import { useTheme } from '@material-ui/core/styles'
 
 import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
-import useHash from '@hooks/useHash'
 
 import DraggableMarker from './Draggable'
 import Manage from './Manage'
@@ -17,7 +16,6 @@ export default function Main({
 }) {
   const theme = useTheme()
   const classes = useStyles()
-  const [, toggleHash] = useHash()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
 
@@ -29,11 +27,6 @@ export default function Main({
 
   const selectedWebhook = useStore(s => s.selectedWebhook)
   const setSelectedWebhook = useStore(s => s.setSelectedWebhook)
-
-  const handleWebhookClose = () => {
-    toggleHash(false, [selectedWebhook])
-    setWebhookMode(false)
-  }
 
   return (
     <>
@@ -47,7 +40,7 @@ export default function Main({
         style={{ display: webhookMode === 'open' ? 'block' : 'none' }}
         maxWidth="md"
         open={Boolean(webhookMode)}
-        onClose={handleWebhookClose}
+        onClose={() => setWebhookMode(false)}
       >
         <Manage
           map={map}
@@ -64,7 +57,7 @@ export default function Main({
           setWebhookLocation={setWebhookLocation}
           selectedWebhook={selectedWebhook}
           setSelectedWebhook={setSelectedWebhook}
-          handleWebhookClose={handleWebhookClose}
+          handleWebhookClose={() => setWebhookMode(false)}
         />
       </Dialog>
       {webhookMode === 'location' && (

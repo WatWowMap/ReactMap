@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Dialog, Snackbar } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 
 import Utility from '@services/Utility'
 import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
-import useHash from '@hooks/useHash'
 import SlideTransition from '@assets/mui/SlideTransition'
 
 import FloatingBtn from './FloatingBtn'
@@ -29,9 +28,6 @@ export default function Nav({
   isMobile, isTablet,
 }) {
   const classes = useStyles()
-  const [isOpen, toggleHash] = useHash()
-  const [isDrawerOpen, toggleDrawerHash, drawerHash] = useHash()
-
   const { perms } = useStatic(state => state.auth)
   const webhookAlert = useStatic(state => state.webhookAlert)
   const setWebhookAlert = useStatic(state => state.setWebhookAlert)
@@ -72,7 +68,6 @@ export default function Nav({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    toggleDrawerHash(open, ['drawer'])
     setDrawer(open)
   }
 
@@ -88,7 +83,6 @@ export default function Nav({
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
-    toggleHash(open, [type, category], true)
     setDialog({ open, category, type })
     if (filter && type === 'search') {
       setManualParams({ id: filter.id })
@@ -101,14 +95,6 @@ export default function Nav({
       setUserSettings({ ...userSettings, [category]: filter })
     }
   }
-
-  useEffect(() => {
-    setDialog({ ...dialog, open: isOpen })
-  }, [isOpen])
-
-  useEffect(() => {
-    setDrawer(isDrawerOpen && drawerHash.includes('#drawer'))
-  }, [isDrawerOpen])
 
   return (
     <>
