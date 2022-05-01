@@ -106,6 +106,6 @@
     "react-window": "^1.8.6",
     "require-from-string": "^2.0.2",
     "suncalc": "^1.8.0",
-    "zustand": "^3.3.3"
+    "zustand": "^4.0.0-rc.1"
   }
 }
