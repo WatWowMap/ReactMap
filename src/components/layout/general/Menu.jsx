@@ -86,7 +86,7 @@ export default function Menu({
       setAdvancedFilter({
         open,
         id,
-        tempFilters: tempFilters[id],
+        tempFilters: tempFilters[id] ?? filters.standard,
         standard: filters.standard,
       })
     } else if (id === 'global') {
@@ -233,6 +233,7 @@ export default function Menu({
                     Utility,
                     toggleWebhook,
                     webhookCategory,
+                    standard: filters.standard,
                   }}
                   Tile={Tile}
                 />

@@ -5,8 +5,6 @@ import * as Sentry from '@sentry/react'
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
 
-import useGenerate from '@hooks/useGenerate'
-
 export default function useConfig(serverSettings, paramLocation) {
   Utility.analytics('User', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
 
@@ -34,7 +32,6 @@ export default function useConfig(serverSettings, paramLocation) {
   const setUi = useStatic(state => state.setUi)
   const setStaticFilters = useStatic(state => state.setFilters)
   const setWebhookData = useStatic(state => state.setWebhookData)
-  const setMenuFilters = useStatic(state => state.setMenuFilters)
   const setIsNight = useStatic(state => state.setIsNight)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
@@ -121,7 +118,6 @@ export default function useConfig(serverSettings, paramLocation) {
   }
   setIcons(serverSettings.Icons.selection)
   setStaticIcons(serverSettings.Icons)
-  setMenuFilters(useGenerate())
   setConfig(serverSettings.config)
   setWebhookData(serverSettings.webhooks)
 
