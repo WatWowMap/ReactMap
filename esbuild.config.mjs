@@ -146,6 +146,7 @@ const esbuild = {
       TITLE: env.parsed.TITLE || env.parsed.MAP_GENERAL_TITLE || '',
       SENTRY_DSN: env.parsed.SENTRY_DSN || '',
       SENTRY_TRACES_SAMPLE_RATE: env.parsed.SENTRY_TRACES_SAMPLE_RATE || 0.1,
+      SENTRY_DEBUG: env.parsed.SENTRY_DEBUG || false,
       VERSION: version,
       DEVELOPMENT: isDevelopment,
       CUSTOM: hasCustom,
