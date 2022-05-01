@@ -1,10 +1,12 @@
 import '@assets/css/main.css'
 
 import React, { Suspense } from 'react'
+import { BrowserRouter } from 'react-router-dom'
+
 import { ApolloProvider } from '@apollo/client'
 import client from '@services/apollo'
 
-import ReactRouter from './ReactRouter'
+import Config from './Config'
 import ErrorBoundary from './ErrorBoundary'
 
 const SetText = () => {
@@ -32,12 +34,13 @@ const SetText = () => {
 
 export default function App() {
   document.body.classList.add('dark')
-
   return (
     <Suspense fallback={<SetText />}>
       <ApolloProvider client={client}>
         <ErrorBoundary>
-          <ReactRouter />
+          <BrowserRouter>
+            <Config />
+          </BrowserRouter>
         </ErrorBoundary>
       </ApolloProvider>
     </Suspense>

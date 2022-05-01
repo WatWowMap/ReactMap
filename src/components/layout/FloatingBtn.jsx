@@ -26,6 +26,7 @@ export default function FloatingButtons({
   scanZoneMode, setScanZoneMode,
 }) {
   const { t } = useTranslation()
+
   const { map: { enableFloatingProfileButton },
     scanner: { scannerType, enableScanNext, enableScanZone } } = useStatic(state => state.config)
   const { loggedIn } = useStatic(state => state.auth)
@@ -78,7 +79,13 @@ export default function FloatingButtons({
       ) : null}
       {(perms?.webhooks?.length && webhooks && selectedWebhook) ? (
         <Grid item>
-          <Fab color="secondary" size={fabSize} onClick={() => setWebhookMode('open')} title={selectedWebhook} disabled={Boolean(webhookMode) || Boolean(scanNextMode) || Boolean(scanZoneMode)}>
+          <Fab
+            color="secondary"
+            size={fabSize}
+            onClick={() => setWebhookMode('open')}
+            title={selectedWebhook}
+            disabled={Boolean(webhookMode) || Boolean(scanNextMode) || Boolean(scanZoneMode)}
+          >
             <NotificationsActive fontSize={iconSize} />
           </Fab>
         </Grid>
