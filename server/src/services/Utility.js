@@ -16,67 +16,67 @@ const mergePerms = require('./functions/mergePerms')
 const evalWebhookId = require('./functions/evalWebhookId')
 
 module.exports = class Utility {
-  static getPolyVector(s2cellId, type) {
-    return getPolyVector(s2cellId, type)
+  static getPolyVector(...args) {
+    return getPolyVector(...args)
   }
 
-  static getPlacementCells(bounds, pokestops, gyms) {
-    return getPlacementCells(bounds, pokestops, gyms)
+  static getPlacementCells(...args) {
+    return getPlacementCells(...args)
   }
 
-  static getTypeCells(bounds, pokestops, gyms) {
-    return getTypeCells(bounds, pokestops, gyms)
+  static getTypeCells(...args) {
+    return getTypeCells(...args)
   }
 
-  static buildDefaultFilters(perms) {
-    return buildDefaultFilters(perms)
+  static buildDefaultFilters(...args) {
+    return buildDefaultFilters(...args)
   }
 
-  static buildPrimaryUi(filters, perms) {
-    return primaryUi(filters, perms)
+  static buildPrimaryUi(...args) {
+    return primaryUi(...args)
   }
 
-  static buildAdvMenus(available) {
-    return advMenus(available)
+  static buildAdvMenus(...args) {
+    return advMenus(...args)
   }
 
-  static buildClientOptions(perms) {
-    return clientOptions(perms)
+  static buildClientOptions(...args) {
+    return clientOptions(...args)
   }
 
-  static dbSelection(category) {
-    return dbSelection(category)
+  static dbSelection(...args) {
+    return dbSelection(...args)
   }
 
-  static permissions(permToCheck, perms) {
-    return permissions(permToCheck, perms)
+  static permissions(...args) {
+    return permissions(...args)
   }
 
-  static webhookUi(provider, hookConfig, pvp) {
-    return webhook(provider, hookConfig, pvp)
+  static webhookUi(...args) {
+    return webhook(...args)
   }
 
-  static async geocoder(nominatimUrl, search, reverse) {
-    return geocoder(nominatimUrl, search, reverse)
+  static async geocoder(...args) {
+    return geocoder(...args)
   }
 
-  static areaPerms(roles, provider) {
-    return areaPerms(roles, provider)
+  static areaPerms(...args) {
+    return areaPerms(...args)
   }
 
-  static webhookPerms(roles, provider) {
-    return webhookPerms(roles, provider)
+  static webhookPerms(...args) {
+    return webhookPerms(...args)
   }
 
-  static scannerPerms(roles, provider) {
-    return scannerPerms(roles, provider)
+  static scannerPerms(...args) {
+    return scannerPerms(...args)
   }
 
   static mergePerms(existingPerms, incomingPerms = {}) {
     return mergePerms(existingPerms, incomingPerms)
   }
 
-  static evalWebhookId(user) {
-    return evalWebhookId(user)
+  static evalWebhookId(...args) {
+    return evalWebhookId(...args)
   }
 }

@@ -254,7 +254,7 @@ const MenuActions = ({
         handleClose={handleClose}
         options={options}
       />
-      <Dialog open={badgeMenu}>
+      <Dialog open={badgeMenu} onClose={handleCloseBadge}>
         <BadgeSelection
           gym={gym}
           setBadgeMenu={handleCloseBadge}

@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 const knex = require('knex')
 const { raw } = require('objection')
@@ -17,7 +16,7 @@ module.exports = class DbCheck {
           if (!this.models[capital]) {
             this.models[capital] = []
           }
-          this.models[capital].push({ connection: i, isMad: false })
+          this.models[capital].push({ connection: i })
         })
         return knex({
           client: 'mysql2',
@@ -36,21 +35,7 @@ module.exports = class DbCheck {
             },
           },
         })
-      });
-    (async () => {
-      await this.determineType()
-      await this.pvp()
-      await this.pokestopChecks()
-    })()
-  }
-
-  static async isMadDb(connection) {
-    try {
-      await connection('trs_quest').limit(1).first()
-      return true
-    } catch (e) {
-      return false
-    }
+      })
   }
 
   static getDistance(args, isMad) {
@@ -58,20 +43,36 @@ module.exports = class DbCheck {
   }
 
   async determineType() {
-    console.log('[DB] Determining database types..')
+    console.log(`[DB] Determining database types for ${this.connections.length} connection${this.connections.length > 1 ? 's' : ''}`)
     await Promise.all(this.connections.map(async (schema, i) => {
-      const isMad = await DbCheck.isMadDb(schema)
-      Object.entries(this.models).forEach(([category, sources]) => {
-        try {
+      try {
+        const isMad = await schema('trs_quest').columnInfo().then(col => Object.keys(col).length > 0)
+        const pvpV2 = await schema('pokemon').columnInfo().then(col => 'pvp' in col)
+        const [hasRewardAmount, hasAltQuests] = await schema('pokestop').columnInfo()
+          .then(columns => ([
+            ['quest_reward_amount', 'item_reward_amount'].some(c => c in columns),
+            'alternative_quest_type' in columns,
+          ]))
+        const [hasMultiInvasions, multiInvasionMs] = await schema('incident').columnInfo()
+          .then(columns => ([
+            'character' in columns,
+            'expiration_ms' in columns,
+          ]))
+        Object.entries(this.models).forEach(([category, sources]) => {
           sources.forEach((source, j) => {
             if (source.connection === i) {
               this.models[category][j].isMad = isMad
+              this.models[category][j].pvpV2 = pvpV2
+              this.models[category][j].hasRewardAmount = hasRewardAmount
+              this.models[category][j].hasAltQuests = hasAltQuests
+              this.models[category][j].hasMultiInvasions = hasMultiInvasions
+              this.models[category][j].multiInvasionMs = multiInvasionMs
             }
           })
-        } catch (e) {
-          console.error('[DB]', e.message)
-        }
-      })
+        })
+      } catch (e) {
+        console.error('[DB]', e.message)
+      }
     }))
   }
 
@@ -92,7 +93,7 @@ module.exports = class DbCheck {
             this.models[model][i].SubModel = models[model].bindKnex(this.connections[source.connection])
           })
         }
-        console.log(`[DB] Bound ${model} to ${sources.length} connections`)
+        console.log(`[DB] Bound ${model} to ${sources.length} connection${sources.length > 1 ? 's' : ''}`)
       })
     } catch (e) {
       console.error(`
@@ -118,59 +119,6 @@ module.exports = class DbCheck {
     return []
   }
 
-  async pvp() {
-    await Promise.all(this.models.Pokemon.map(async (source) => {
-      try {
-        await source.SubModel.query()
-          .whereNotNull('pvp')
-          .limit(1)
-        source.pvpV2 = true
-      } catch (_) {
-        source.pvpV2 = false
-      }
-    }))
-  }
-
-  async pokestopChecks() {
-    await Promise.all(this.models.Pokestop.map(async (source) => {
-      try {
-        if (!source.isMad) {
-          await source.SubModel.query()
-            .whereNotNull('quest_reward_amount')
-            .limit(1)
-        }
-        source.hasRewardAmount = true
-      } catch (_) {
-        source.hasRewardAmount = false
-      }
-      try {
-        await source.SubModel.query()
-          .whereNotNull('alternative_quest_type')
-          .limit(1)
-        source.hasAltQuests = true
-      } catch (_) {
-        source.hasAltQuests = false
-      }
-      try {
-        await source.SubModel.query()
-          .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
-          .limit(1)
-        source.hasMultiInvasions = true
-      } catch (_) {
-        source.hasMultiInvasions = false
-      }
-      try {
-        await source.SubModel.query()
-          .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
-          .select('expiration_ms')
-          .limit(1)
-        source.multiInvasionMs = true
-      } catch (_) {
-        source.multiInvasionMs = false
-      }
-    }))
-  }
-
   async getAll(model, perms, args, userId, method = 'getAll') {
     const data = await Promise.all(this.models[model].map(async (source) => (
       source.SubModel[method](perms, args, source, userId)
@@ -179,15 +127,11 @@ module.exports = class DbCheck {
   }
 
   async getOne(model, id, method = 'getOne') {
-    const sources = this.models[model]
-    let foundObj
-    let source = 0
-    while (!foundObj && source < sources.length) {
-      const found = await sources[source].SubModel[method](id, sources[source])
-      foundObj = found
-      source += 1
-    }
-    return foundObj || {}
+    const data = await Promise.all(this.models[model].map(async (source) => (
+      source.SubModel[method](id, source)
+    )))
+    const cleaned = DbCheck.deDupeResults(data.filter(Boolean))
+    return (Array.isArray(cleaned) ? cleaned[0] : cleaned) || {}
   }
 
   async search(model, perms, args, method = 'search') {
@@ -218,7 +162,7 @@ module.exports = class DbCheck {
         const results = await Promise.all(this.models[model].map(async (source) => (
           source.SubModel.getAvailable(source)
         )))
-        console.log(`[DB] Updating available for ${model}`)
+        console.log(`[DB] Setting available for ${model}`)
         if (results.length === 1) return results[0]
         if (results.length > 1) {
           const returnSet = new Set()

@@ -9,8 +9,8 @@ import './services/i18n'
 
 if (inject) {
   const {
-    GOOGLE_ANALYTICS_ID, ANALYTICS_DEBUG_MODE, TITLE, VERSION,
-    SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE, DEVELOPMENT, CUSTOM,
+    GOOGLE_ANALYTICS_ID, ANALYTICS_DEBUG_MODE, TITLE, VERSION, CUSTOM,
+    SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE, DEVELOPMENT, SENTRY_DEBUG,
   } = inject
   if (GOOGLE_ANALYTICS_ID) {
     ReactGA.initialize(GOOGLE_ANALYTICS_ID, { debug: ANALYTICS_DEBUG_MODE })
@@ -24,7 +24,7 @@ if (inject) {
     tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE ? +SENTRY_TRACES_SAMPLE_RATE : 0.1,
     release: VERSION,
     environment: DEVELOPMENT ? 'development' : 'production',
-    debug: DEVELOPMENT,
+    debug: SENTRY_DEBUG,
     beforeSend: async (event) => {
       const errors = event.exception.values
       const isLibrary = errors.find(e => e?.value?.includes('_'))

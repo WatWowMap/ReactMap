@@ -15,8 +15,8 @@ const Backend = require('i18next-fs-backend')
 const { ValidationError } = require('apollo-server-core')
 const { ApolloServer } = require('apollo-server-express')
 
-const { Db } = require('./services/initialization')
 const config = require('./services/config')
+const { Db, Event } = require('./services/initialization')
 const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
@@ -37,7 +37,7 @@ const server = new ApolloServer({
   debug: config.devOptions.queryDebug,
   context: ({ req, res }) => {
     const perms = req.user ? req.user.perms : req.session.perms
-    return { req, res, Db, perms, version }
+    return { req, res, Db, Event, perms, version }
   },
   formatError: (e) => {
     if (config.devOptions.enabled) {
