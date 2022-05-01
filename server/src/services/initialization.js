@@ -15,20 +15,6 @@ const Event = new EventManager(staticMf)
 
 Event.setTimers(config, Db, Pvp)
 
-Db.determineType()
-  .then(async () => {
-    await Promise.all([
-      Event.getUicons(config.icons.styles),
-      Event.getMasterfile(),
-      Event.getInvasions(),
-      Event.getWebhooks(config),
-      Event.setAvailable('gyms', 'Gym', Db),
-      Event.setAvailable('pokestops', 'Pokestop', Db),
-      Event.setAvailable('pokemon', 'Pokemon', Db),
-      Event.setAvailable('nests', 'Nest', Db),
-    ])
-  })
-
 module.exports = {
   Db,
   Pvp,

@@ -56,43 +56,45 @@ module.exports = class EventManager {
 
   async getUicons(styles) {
     console.log('[EVENT] Fetching Latest UICONS')
-    try {
-      if (!styles.some(icon => icon.path === this.baseUrl)) {
-        styles.push({
-          name: 'Base',
-          path: this.baseUrl,
-          modifiers: {
-            gym: {
-              0: 1,
-              1: 1,
-              2: 1,
-              3: 3,
-              4: 4,
-              5: 4,
-              6: 18,
-              sizeMultiplier: 1.2,
-            },
+    if (!styles.some(icon => icon.path === this.baseUrl)) {
+      styles.push({
+        name: 'Base',
+        path: this.baseUrl,
+        modifiers: {
+          gym: {
+            0: 1,
+            1: 1,
+            2: 1,
+            3: 3,
+            4: 4,
+            5: 4,
+            6: 18,
+            sizeMultiplier: 1.2,
           },
-        })
-      }
-      this.uicons = await Promise.all(styles.map(async style => {
+        },
+      })
+    }
+    this.uicons = await Promise.all(styles.map(async style => {
+      try {
         const response = style.path.startsWith('http')
           ? await fetchJson(`${style.path}/index.json`)
           : JSON.parse(await fs.readFile(path.resolve(__dirname, `../../../public/images/uicons/${style.path}/index.json`)))
         return { ...style, data: response }
-      }))
-    } catch (e) {
-      console.warn('[WARN] Failed to generate latest uicons:\n', e.message)
-    }
+      } catch (e) {
+        console.warn('[WARN] Failed to generate latest uicons for:', style, '\n', e.message)
+        console.warn(`[WARN] Make sure the path follows one of these two formats: \n\tRemote: ${this.baseUrl}\n\tLocal: wwm-uicons (And the uicons folder is found at /public/images/uicons/wwm-uicons/)`)
+      }
+    }))
+    this.uicons = this.uicons.filter(Boolean)
   }
 
   async getInvasions() {
     console.log('[EVENT] Fetching Latest Invasions')
     try {
       this.invasions = await fetchJson('https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/grunts.json')
-        .then(response => Object.fromEntries(
+        .then(response => response ? Object.fromEntries(
           Object.entries(this.invasions).map(([type, info]) => {
-            const latest = response ? response[type] : { active: false }
+            const latest = response[type]
             const newInvasion = this.invasions[type]
             if (info.encounters) {
               Object.keys(info.encounters).forEach((position, i) => {
@@ -107,7 +109,7 @@ module.exports = class EventManager {
             }
             return [type, newInvasion]
           }),
-        ))
+        ) : this.invasions)
     } catch (e) {
       console.warn('[WARN] Unable to generate latest invasions:\n', e.message)
     }
@@ -118,6 +120,7 @@ module.exports = class EventManager {
     try {
       this.masterfile = await generate()
         .then((masterfile) => {
+          if (!masterfile) return this.masterfile
           Object.entries(this.available).forEach(([category, entries]) => {
             entries.forEach(item => {
               if (!Number.isNaN(parseInt(item.charAt(0)))) {

@@ -295,7 +295,7 @@ module.exports = class Pokestop extends Model {
     const results = await query
     const normalized = isMad ? this.mapMAD(results, safeTs) : this.mapRDM(results, safeTs)
     if (normalized.length > queryLimits.pokestops) normalized.length = queryLimits.pokestops
-    return this.secondaryFilter(normalized, args.filters, isMad, midnight, perms)
+    return this.secondaryFilter(normalized, args.filters, isMad, safeTs, midnight, perms)
   }
 
   static fieldAssigner(target, source, fields) {
@@ -303,7 +303,7 @@ module.exports = class Pokestop extends Model {
   }
 
   // filters and removes unwanted data
-  static secondaryFilter(queryResults, filters, isMad, midnight, perms, global = false) {
+  static secondaryFilter(queryResults, filters, isMad, safeTs, midnight, perms, global = false) {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
@@ -319,7 +319,7 @@ module.exports = class Pokestop extends Model {
       }
       if (perms.lures
         && (filters.onlyAllPokestops
-          || (filters.onlyLures && filters[`l${pokestop.lure_id}`]))) {
+          || (filters.onlyLures && pokestop.lure_expire_timestamp >= safeTs && filters[`l${pokestop.lure_id}`]))) {
         this.fieldAssigner(filtered, pokestop, ['lure_id', 'lure_expire_timestamp'])
       }
 
