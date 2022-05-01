@@ -1,5 +1,3 @@
-/* eslint-disable no-promise-executor-return */
-/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 const { promises: fs } = require('fs')
 const path = require('path')
@@ -10,33 +8,17 @@ const fetchJson = require('./api/fetchJson')
 const initWebhooks = require('./initWebhooks')
 
 module.exports = class EventManager {
-  constructor(config, masterfile, Db, Pvp) {
+  constructor(masterfile) {
     this.masterfile = masterfile
     this.invasions = masterfile.invasions
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
     this.uicons = []
     this.baseUrl = 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
     this.webhookObj = {}
-    this.pokestopTry = 1
+  }
 
-    setTimeout(async () => {
-      // Set initials, comes with a timeout just to make sure all databases get configured first
-      await this.getUicons(config.icons.styles)
-      this.available.gyms = await Db.getAvailable('Gym')
-      this.available.nests = await Db.getAvailable('Nest')
-      this.available.pokemon = await Db.getAvailable('Pokemon')
-      this.available.pokestops = await Db.getAvailable('Pokestop')
-      while (!this.available.pokestops.length && this.pokestopTry <= config.database.settings.availableRetryCount) {
-        console.log(`[EVENT] No pokestops found, trying again in 1 second (attempt ${this.pokestopTry} / ${config.database.settings.availableRetryCount})`)
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        this.available.pokestops = await Db.getAvailable('Pokestop')
-        this.pokestopTry += 1
-      }
-      await this.getMasterfile()
-      await this.getInvasions()
-      await this.getWebhooks(config)
-    }, config.database.settings.startupDelayMs)
-    this.setTimers(config, Db, Pvp)
+  async setAvailable(category, model, Db) {
+    this.available[category] = await Db.getAvailable(model)
   }
 
   setTimers(config, Db, Pvp) {
