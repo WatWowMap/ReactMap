@@ -36,6 +36,7 @@ if (inject) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            version: VERSION,
           },
           body: JSON.stringify({ error }),
         })
