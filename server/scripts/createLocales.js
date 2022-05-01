@@ -73,11 +73,11 @@ const missing = async () => {
 
     Object.keys(englishRef).forEach(key => {
       if (!reactMapTranslations[key]) {
-        missingKeys[key] = englishRef[key]
+        missingKeys[key] = process.argv.includes('--ally') ? `t('${key}')` : englishRef[key]
       }
     })
     fs.writeFile(
-      path.resolve(missingFolder, locale),
+      path.resolve(missingFolder, process.argv.includes('--ally') ? locale.replace('.json', '.js') : locale),
       JSON.stringify(missingKeys, null, 2),
       'utf8',
       () => { },

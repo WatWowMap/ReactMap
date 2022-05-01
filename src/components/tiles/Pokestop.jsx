@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, { useState, memo, useRef } from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 
@@ -82,12 +81,12 @@ const areEqual = (prev, next) => (
   prev.item.id === next.item.id
   && prev.item.lure_expire_timestamp === next.item.lure_expire_timestamp
   && prev.item.quests?.length === next.item.quests?.length
-  && prev.item.quests?.every((q, i) => q.with_ar === next.item.quests[i].with_ar)
   && prev.item.invasions?.length === next.item.invasions?.length
   && prev.item.updated === next.item.updated
   && prev.showTimer === next.showTimer
-  && Object.keys(prev.userIcons).every(key => prev.userIcons[key] === next.userIcons[key])
-  && Object.keys(prev.userSettings).every(key => prev.userSettings[key] === next.userSettings[key])
+  && (prev.item.quests && next.item.quests
+    ? prev.item.quests.every((q, i) => q.with_ar === next.item.quests[i]?.with_ar)
+    : true)
   && (prev.item.quests
     ? !prev.item.quests.some(quest => next.excludeList.includes(quest.key))
     : true)

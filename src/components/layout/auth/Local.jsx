@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import {
   Grid, Typography, Button, OutlinedInput, InputLabel, FormControl, InputAdornment, IconButton,
 } from '@material-ui/core'
@@ -47,7 +47,7 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
   }
 
   if (redirect) {
-    return <Redirect push to="/" />
+    return <Navigate push to="/" />
   }
 
   return (

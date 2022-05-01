@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 const fetch = require('node-fetch')
+const { AbortError } = require('node-fetch')
+
 const config = require('../config')
 
 const scannerQueue = {
@@ -8,6 +10,12 @@ const scannerQueue = {
 }
 
 module.exports = async function scannerApi(category, method, data = null) {
+  const controller = new AbortController()
+
+  const timeout = setTimeout(() => {
+    controller.abort()
+  }, config.api.fetchTimeoutMs)
+
   try {
     const headers = {}
     switch (config.scanner.backendConfig.platform) {
@@ -88,7 +96,13 @@ module.exports = async function scannerApi(category, method, data = null) {
         return { status: 'error', message: 'scanner_error' }
     }
   } catch (e) {
-    console.log('[scannerApi] There was a problem processing that scanner request')
+    if (e instanceof AbortError) {
+      console.log('Request to the scanner timed out and was aborted')
+    } else {
+      console.log('[scannerApi] There was a problem processing that scanner request')
+    }
     return { status: 'error', message: 'scanner_error' }
+  } finally {
+    clearTimeout(timeout)
   }
 }

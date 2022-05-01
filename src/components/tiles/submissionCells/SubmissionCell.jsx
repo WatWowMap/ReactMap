@@ -12,7 +12,7 @@ export default function SubmissionCellTile({
       {(item?.placementCells?.rings && zoomLimit)
         && item.placementCells.rings.map(ring => (
           <RingTile
-            key={`r${ring.id}-${ring.lat}-${ring.lon}`}
+            key={ring.id}
             ring={ring}
             zoom={zoomLimit}
           />

@@ -2,10 +2,10 @@ import React from 'react'
 import { useQuery } from '@apollo/client'
 
 import Query from '@services/Query'
-import ConfigSettings from './ConfigSettings'
+import ConfigSettings from './Container'
 
-export default function WebhookQuery({ match, serverSettings }) {
-  let lowercase = match.params.category.toLowerCase()
+export default function WebhookQuery({ params, serverSettings }) {
+  let lowercase = params.category.toLowerCase()
   if (lowercase === 'invasions'
     || lowercase === 'lures'
     || lowercase === 'quests') {
@@ -16,8 +16,9 @@ export default function WebhookQuery({ match, serverSettings }) {
   }
   const { data } = useQuery(Query[lowercase]('id'), {
     variables: {
-      id: match.params.id,
-      perm: match.params.category.toLowerCase(),
+      id: params.id,
+      perm: params.category.toLowerCase(),
+      version: inject.VERSION,
     },
   })
   return data ? (
@@ -25,8 +26,8 @@ export default function WebhookQuery({ match, serverSettings }) {
       paramLocation={data[`${lowercase}Single`]
         ? [data[`${lowercase}Single`].lat, data[`${lowercase}Single`].lon]
         : null}
-      paramZoom={match.params.zoom}
-      match={match}
+      paramZoom={params.zoom}
+      params={params}
       serverSettings={serverSettings}
     />
   ) : null

@@ -178,6 +178,7 @@
   "nests_options": "Nest Options",
   "wayfarer_options": "Wayfarer Options",
   "admin_options": "Admin Options",
+  "weather_options": "Weather Options",
   "clustering": "Clustering",
   "glow": "Glow",
   "legacy_filter": "Legacy Filter",
@@ -523,5 +524,16 @@
   "lc_popup": "You are within {distance} {unit} from this point",
   "lc_outsideMapBoundsMsg": "You seem located outside the boundaries of the map",
   "no_alerts": "No Alerts Found",
-  "loading_settings": "Loading Settings"
+  "loading_settings": "Loading Settings",
+  "refresh_to_continue": "Please refresh before continuing",
+  "session_expired_title": "Session Expired",
+  "session_expired_body": "Your session has expired",
+  "old_client_title": "Outdated",
+  "old_client_body": "A new version of this map is available",
+  "refresh": "Refresh",
+  "points": "Points",
+  "day": "Day",
+  "days": "Days",
+  "react_error": "Something Went Wrong",
+  "clickable_icon": "Icon is Clickable"
 }

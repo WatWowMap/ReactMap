@@ -8,7 +8,6 @@ import Clustering from './Clustering'
 import Notification from './layout/general/Notification'
 import ActiveWeather from './layout/general/ActiveWeather'
 
-const withAvailableList = ['pokestops', 'gyms', 'nests']
 const filterSkipList = ['filter', 'enabled', 'legacy']
 
 const getPolling = category => {
@@ -27,8 +26,9 @@ const getPolling = category => {
 
 export default function QueryData({
   bounds, onMove, map, tileStyle, clusteringRules, config, params, isMobile,
-  category, available, filters, staticFilters, staticUserSettings, sizeKey,
+  category, filters, staticFilters, staticUserSettings, sizeKey,
   userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
+  setError, active,
 }) {
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
@@ -52,14 +52,7 @@ export default function QueryData({
       const [id, specifics] = filter
 
       if (specifics && specifics.enabled && staticFilters[id]) {
-        if (withAvailableList.includes(category)
-          && !Number.isNaN(parseInt(id.charAt(0)))) {
-          if (available?.includes(id)) {
-            trimmed[id] = specifics
-          }
-        } else {
-          trimmed[id] = specifics
-        }
+        trimmed[id] = specifics
       } else if (userSettings.legacyFilter) {
         trimmed.onlyLegacyExclude.push(id)
       }
@@ -75,6 +68,7 @@ export default function QueryData({
       refetch({
         ...Utility.getQueryArgs(map),
         filters: trimFilters(filters),
+        version: inject.VERSION,
       })
     }
   }
@@ -93,30 +87,40 @@ export default function QueryData({
       variables: {
         ...bounds,
         filters: trimFilters(filters),
+        version: inject.VERSION,
       },
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: active ? 'cache-first' : 'cache-only',
       pollInterval: getPolling(category),
+      skip: !active,
     },
   )
 
   useEffect(() => () => setExcludeList([]))
 
-  const renderedData = data || previousData || {}
-
-  if (error && inject.DEVELOPMENT) {
-    return (
-      <Notification
-        severity="error"
-        i18nKey="server_dev_error_0"
-        messages={[
-          {
-            key: 'error',
-            variables: [error],
-          },
-        ]}
-      />
-    )
+  if (error) {
+    if (inject.DEVELOPMENT) {
+      return (
+        <Notification
+          severity="error"
+          i18nKey="server_dev_error_0"
+          messages={[
+            {
+              key: 'error',
+              variables: [error],
+            },
+          ]}
+        />
+      )
+    }
+    const message = error?.networkError?.result?.errors?.find(x => x?.message === 'old_client')?.message
+      || error?.message
+    if (message === 'session_expired' || message === 'old_client') {
+      setError(message)
+      return null
+    }
   }
+
+  const renderedData = data || previousData || {}
   return renderedData[category] ? (
     <>
       <Clustering
@@ -144,6 +148,7 @@ export default function QueryData({
           weather={renderedData[category]}
           isMobile={isMobile}
           zoom={config.activeWeatherZoom}
+          clickable={userSettings.clickableIcon}
           map={map}
         />
       )}

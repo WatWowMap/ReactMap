@@ -104,6 +104,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
         open={editDialog}
         fullWidth={!isMobile}
         fullScreen={isMobile}
+        onClose={() => setEditDialog(false)}
       >
         <WebhookAdvanced
           id={id}

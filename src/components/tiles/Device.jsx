@@ -47,7 +47,6 @@ const areEqual = (prev, next) => (
   && prev.item.last_lat === next.item.last_lat
   && prev.item.last_lon === next.item.last_lon
   && prev.item.last_seen === next.item.last_seen
-  && prev.userIcons.device === next.userIcons.device
 )
 
 export default memo(DeviceTile, areEqual)
