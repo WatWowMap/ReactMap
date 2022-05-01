@@ -29,7 +29,10 @@ export default function Config() {
   }
   const getServerSettings = useCallback(async () => {
     const data = await Fetch.getSettings()
-    const Icons = data.masterfile ? new UIcons(data.config.icons, data.masterfile.questRewardTypes) : null
+    if (data.masterfile?.questRewardTypes) {
+      localStorage.setItem('questRewardTypes', JSON.stringify(data.masterfile.questRewardTypes))
+    }
+    const Icons = new UIcons(data.config.icons, data.masterfile ? data.masterfile.questRewardTypes : JSON.parse(localStorage.getItem('questRewardTypes')))
     if (Icons) {
       Icons.build(data.config.icons.styles)
       if (data.config.icons.defaultIcons) {
