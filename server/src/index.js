@@ -158,8 +158,23 @@ app.use((err, req, res, next) => {
   }
 })
 
-app.listen(config.port, config.interface, () => {
-  console.log(`[INIT] Server is now listening at http://${config.interface}:${config.port}`)
-})
+Db.determineType()
+  .then(async () => {
+    await Promise.all([
+      Event.getUicons(config.icons.styles),
+      Event.getMasterfile(),
+      Event.getInvasions(),
+      Event.getWebhooks(config),
+      Event.setAvailable('gyms', 'Gym', Db),
+      Event.setAvailable('pokestops', 'Pokestop', Db),
+      Event.setAvailable('pokemon', 'Pokemon', Db),
+      Event.setAvailable('nests', 'Nest', Db),
+    ])
+      .then(() => {
+        app.listen(config.port, config.interface, () => {
+          console.log(`[INIT] Server is now listening at http://${config.interface}:${config.port}`)
+        })
+      })
+  })
 
 module.exports = app
