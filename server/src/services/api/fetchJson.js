@@ -1,14 +1,13 @@
 /* eslint-disable no-console */
 const fetch = require('node-fetch')
 const { AbortError } = require('node-fetch')
-const { api } = require('../config')
 
 module.exports = async function fetchJson(url, options = undefined, log = false) {
   const controller = new AbortController()
 
   const timeout = setTimeout(() => {
     controller.abort()
-  }, api.fetchTimeoutMs)
+  }, 5000)
 
   try {
     if (log) console.log(url, options)
