@@ -18,7 +18,11 @@
       "__name": "DEV_OPTIONS_QUERY_DEBUG",
       "__format": "boolean"
     },
-    "clientPath": "DEV_OPTIONS_CLIENT_PATH"
+    "clientPath": "DEV_OPTIONS_CLIENT_PATH",
+    "clientErrors": {
+      "__name": "DEV_OPTIONS_CLIENT_ERRORS",
+      "__format": "boolean"
+    }
   },
   "api": {
     "sessionSecret": "API_SESSION_SECRET",
@@ -163,6 +167,10 @@
     "hideOldPokestops": {
       "__name": "API_HIDE_OLD_POKESTOPS",
       "__format": "boolean"
+    },
+    "fetchTimeoutMs": {
+      "__name": "API_FETCH_TIMEOUT_MS",
+      "__format": "number"
     }
   },
   "multiDomains": {
@@ -781,14 +789,6 @@
       },
       "maxConnections": {
         "__name": "DATABASE_SETTINGS_MAX_CONNECTIONS",
-        "__format": "number"
-      },
-      "startupDelayMs": {
-        "__name": "DATABASE_SETTINGS_STARTUP_DELAY_MS",
-        "__format": "number"
-      },
-      "availableRetryCount": {
-        "__name": "DATABASE_SETTINGS_AVAILABLE_RETRY_COUNT",
         "__format": "number"
       }
     },
