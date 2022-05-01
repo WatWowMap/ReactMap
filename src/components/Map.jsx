@@ -6,6 +6,9 @@ import L from 'leaflet'
 
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
+import useRefresh from '@hooks/useRefresh'
+import useGenerate from '@hooks/useGenerate'
+
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
@@ -67,13 +70,14 @@ export default function Map({ serverSettings:
   const [error, setError] = useState('')
   const [windowState, setWindowState] = useState(true)
   const [active, setActive] = useState(true)
-
   const [lc] = useState(L.control.locate({
     position: 'bottomright',
     icon: 'fas fa-location-arrow',
     keepCurrentZoomLevel: true,
     setView: 'untilPan',
   }))
+  const startFetching = useRefresh(active)
+  useGenerate()
 
   const onMove = useCallback((latLon) => {
     const newCenter = latLon || map.getCenter()
@@ -109,6 +113,12 @@ export default function Map({ serverSettings:
       lc.remove()
     }
   }, [settings.navigationControls])
+
+  useEffect(() => {
+    if (active) {
+      startFetching()
+    }
+  }, [active])
 
   return (
     <>

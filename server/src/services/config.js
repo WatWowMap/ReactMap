@@ -76,7 +76,7 @@ const mergeMapConfig = (obj) => {
   ['messageOfTheDay', 'donationPage', 'loginPage'].forEach(category => {
     if (obj?.[category]?.components) {
       obj[category].components.forEach(component => {
-        if (component.type === 'telegram') {
+        if (component.type === 'telegram' && component.telegramBotEnvRef) {
           console.warn('[CONFIG] telegramBotEnvRef is deprecated, please use telegramBotName instead\n', category)
           console.warn('OLD:\n', component)
           component.telegramBotName = process.env[component.telegramBotEnvRef]

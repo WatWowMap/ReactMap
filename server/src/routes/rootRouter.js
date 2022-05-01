@@ -108,6 +108,7 @@ rootRouter.get('/settings', async (req, res) => {
       user: await getUser(),
       settings: {},
       authMethods: config.authMethods,
+      masterfile: { ...Event.masterfile, invasions: Event.invasions },
       config: {
         map: {
           ...config.map,
@@ -209,8 +210,6 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.userSettings = clientValues
       serverSettings.clientMenus = clientMenus
-
-      serverSettings.masterfile = { ...Event.masterfile, invasions: Event.invasions }
 
       if (config.webhooks.length && serverSettings.user?.perms?.webhooks?.length) {
         serverSettings.webhooks = {}
