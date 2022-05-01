@@ -1,7 +1,7 @@
 import React from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 
-import ConfigSettings from '../../Container'
+import Container from '../../Container'
 import Login from './Login'
 import WebhookQuery from '../../WebhookQuery'
 
@@ -38,6 +38,6 @@ export default function Auth({ serverSettings, getServerSettings }) {
     )
   }
   return (
-    <ConfigSettings serverSettings={serverSettings} params={params} />
+    <Container serverSettings={serverSettings} params={params} />
   )
 }
