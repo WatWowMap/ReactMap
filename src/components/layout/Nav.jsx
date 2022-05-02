@@ -28,7 +28,6 @@ export default function Nav({
   isMobile, isTablet,
 }) {
   const classes = useStyles()
-
   const { perms } = useStatic(state => state.auth)
   const webhookAlert = useStatic(state => state.webhookAlert)
   const setWebhookAlert = useStatic(state => state.setWebhookAlert)
@@ -38,6 +37,7 @@ export default function Nav({
   const feedback = useStatic(state => state.feedback)
   const setFeedback = useStatic(state => state.setFeedback)
   const resetFilters = useStatic(state => state.resetFilters)
+  const setResetFilters = useStatic(state => state.setResetFilters)
 
   const filters = useStore(state => state.filters)
   const setFilters = useStore(state => state.setFilters)
@@ -84,7 +84,6 @@ export default function Nav({
       return
     }
     setDialog({ open, category, type })
-
     if (filter && type === 'search') {
       setManualParams({ id: filter.id })
       map.flyTo([filter.lat, filter.lon], 16)
@@ -132,6 +131,7 @@ export default function Nav({
         open={userProfile}
         fullScreen={isMobile}
         fullWidth={!isMobile}
+        onClose={() => setUserProfile(false)}
       >
         <UserProfile
           setUserProfile={setUserProfile}
@@ -143,6 +143,7 @@ export default function Nav({
         open={tutorial && enableTutorial}
         fullScreen={isMobile}
         maxWidth="xs"
+        onClose={() => setTutorial(false)}
       >
         <Tutorial
           setUserProfile={setUserProfile}
@@ -155,6 +156,7 @@ export default function Nav({
         fullScreen={isMobile}
         maxWidth="md"
         open={dialog.open && dialog.type === 'filters'}
+        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <FilterMenu
           toggleDialog={toggleDialog}
@@ -167,6 +169,7 @@ export default function Nav({
       <Dialog
         maxWidth="sm"
         open={dialog.open && dialog.type === 'options'}
+        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <UserOptions
           toggleDialog={toggleDialog}
@@ -181,6 +184,7 @@ export default function Nav({
           container: classes.container,
         }}
         open={dialog.open && dialog.type === 'search'}
+        onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
         <Search
           toggleDialog={toggleDialog}
@@ -192,6 +196,7 @@ export default function Nav({
       <Dialog
         maxWidth="sm"
         open={Boolean(motd && !tutorial)}
+        onClose={handleMotdClose}
       >
         <Motd
           motd={messageOfTheDay}
@@ -201,6 +206,7 @@ export default function Nav({
       </Dialog>
       <Dialog
         open={donorPage}
+        onClose={() => setDonorPage(false)}
       >
         <DonorPage
           donorPage={donationPage}
@@ -210,12 +216,14 @@ export default function Nav({
       <Dialog
         open={feedback}
         maxWidth={isMobile ? 'sm' : 'xs'}
+        onClose={() => setFeedback(false)}
       >
         <Feedback link={config.feedbackLink} setFeedback={setFeedback} />
       </Dialog>
       <Dialog
         open={resetFilters}
         maxWidth={isMobile ? 'sm' : 'xs'}
+        onClose={() => setResetFilters(false)}
       >
         <ResetFilters />
       </Dialog>

@@ -1,6 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react'
-import { withRouter } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Grid, Typography, useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@material-ui/styles'
@@ -11,12 +11,13 @@ import DiscordLogin from './Discord'
 import TelegramLogin from './Telegram'
 import CustomTile from '../custom/CustomTile'
 
-const Login = ({ clickedTwice, location, serverSettings, getServerSettings }) => {
+export default function Login({ clickedTwice, serverSettings, getServerSettings }) {
+  const location = useLocation()
   const { t } = useTranslation()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
-
   const { settings, components } = serverSettings.config.map.loginPage
+
   return components.length ? (
     <Grid
       container
@@ -68,7 +69,7 @@ const Login = ({ clickedTwice, location, serverSettings, getServerSettings }) =>
       {serverSettings?.authMethods?.includes('telegram') && (
         <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
           <TelegramLogin
-            botName={serverSettings.config.map.telegramBotEnvRef}
+            botName={serverSettings.config.map.telegramBotName}
             authUrl={serverSettings.config.map.telegramAuthUrl}
           />
         </Grid>
@@ -95,5 +96,3 @@ const Login = ({ clickedTwice, location, serverSettings, getServerSettings }) =>
     </Grid>
   )
 }
-
-export default withRouter(Login)

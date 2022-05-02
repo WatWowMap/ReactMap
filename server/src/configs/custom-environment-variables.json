@@ -1,0 +1,1335 @@
+{
+  "interface": "INTERFACE",
+  "port": {
+    "__name": "PORT",
+    "__format": "number"
+  },
+  "packageSource": "PACKAGE_SOURCE",
+  "devOptions": {
+    "enabled": {
+      "__name": "DEV_OPTIONS_ENABLED",
+      "__format": "boolean"
+    },
+    "graphiql": {
+      "__name": "DEV_OPTIONS_GRAPHIQL",
+      "__format": "boolean"
+    },
+    "queryDebug": {
+      "__name": "DEV_OPTIONS_QUERY_DEBUG",
+      "__format": "boolean"
+    },
+    "clientPath": "DEV_OPTIONS_CLIENT_PATH"
+  },
+  "api": {
+    "sessionSecret": "API_SESSION_SECRET",
+    "reactMapSecret": "API_REACT_MAP_SECRET",
+    "maxSessions": {
+      "__name": "API_MAX_SESSIONS",
+      "__format": "number"
+    },
+    "cookieAgeDays": {
+      "__name": "API_COOKIE_AGE_DAYS",
+      "__format": "number"
+    },
+    "rateLimit": {
+      "time": {
+        "__name": "API_RATE_LIMIT_TIME",
+        "__format": "number"
+      },
+      "requests": {
+        "__name": "API_RATE_LIMIT_REQUESTS",
+        "__format": "number"
+      }
+    },
+    "queryUpdateHours": {
+      "pokemon": {
+        "__name": "API_QUERY_UPDATE_HOURS_POKEMON",
+        "__format": "number"
+      },
+      "quests": {
+        "__name": "API_QUERY_UPDATE_HOURS_QUESTS",
+        "__format": "number"
+      },
+      "raids": {
+        "__name": "API_QUERY_UPDATE_HOURS_RAIDS",
+        "__format": "number"
+      },
+      "nests": {
+        "__name": "API_QUERY_UPDATE_HOURS_NESTS",
+        "__format": "number"
+      }
+    },
+    "queryOnSessionInit": {
+      "pokemon": {
+        "__name": "API_QUERY_ON_SESSION_INIT_POKEMON",
+        "__format": "boolean"
+      },
+      "quests": {
+        "__name": "API_QUERY_ON_SESSION_INIT_QUESTS",
+        "__format": "boolean"
+      },
+      "raids": {
+        "__name": "API_QUERY_ON_SESSION_INIT_RAIDS",
+        "__format": "boolean"
+      },
+      "nests": {
+        "__name": "API_QUERY_ON_SESSION_INIT_NESTS",
+        "__format": "boolean"
+      }
+    },
+    "queryLimits": {
+      "pokemon": {
+        "__name": "API_QUERY_LIMITS_POKEMON",
+        "__format": "number"
+      },
+      "pokemonPvp": {
+        "__name": "API_QUERY_LIMITS_POKEMON_PVP",
+        "__format": "number"
+      },
+      "pokestops": {
+        "__name": "API_QUERY_LIMITS_POKESTOPS",
+        "__format": "number"
+      },
+      "gyms": {
+        "__name": "API_QUERY_LIMITS_GYMS",
+        "__format": "number"
+      },
+      "portals": {
+        "__name": "API_QUERY_LIMITS_PORTALS",
+        "__format": "number"
+      },
+      "spawnpoints": {
+        "__name": "API_QUERY_LIMITS_SPAWNPOINTS",
+        "__format": "number"
+      },
+      "nests": {
+        "__name": "API_QUERY_LIMITS_NESTS",
+        "__format": "number"
+      },
+      "scanCells": {
+        "__name": "API_QUERY_LIMITS_SCAN_CELLS",
+        "__format": "number"
+      }
+    },
+    "pvp": {
+      "leagues": {
+        "__name": "API_PVP_LEAGUES",
+        "__format": "json"
+      },
+      "levels": {
+        "__name": "API_PVP_LEVELS",
+        "__format": "json"
+      },
+      "reactMapHandlesPvp": {
+        "__name": "API_PVP_REACT_MAP_HANDLES_PVP",
+        "__format": "boolean"
+      },
+      "minCp": {
+        "great": {
+          "__name": "API_PVP_MIN_CP_GREAT",
+          "__format": "number"
+        },
+        "ultra": {
+          "__name": "API_PVP_MIN_CP_ULTRA",
+          "__format": "number"
+        }
+      }
+    },
+    "portalUpdateLimit": {
+      "__name": "API_PORTAL_UPDATE_LIMIT",
+      "__format": "number"
+    },
+    "weatherCellLimit": {
+      "__name": "API_WEATHER_CELL_LIMIT",
+      "__format": "number"
+    },
+    "searchResultsLimit": {
+      "__name": "API_SEARCH_RESULTS_LIMIT",
+      "__format": "number"
+    },
+    "nestHemisphere": "API_NEST_HEMISPHERE",
+    "gymValidDataLimit": {
+      "__name": "API_GYM_VALID_DATA_LIMIT",
+      "__format": "number"
+    },
+    "hideOldGyms": {
+      "__name": "API_HIDE_OLD_GYMS",
+      "__format": "boolean"
+    },
+    "stopValidDataLimit": {
+      "__name": "API_STOP_VALID_DATA_LIMIT",
+      "__format": "number"
+    },
+    "hideOldPokestops": {
+      "__name": "API_HIDE_OLD_POKESTOPS",
+      "__format": "boolean"
+    }
+  },
+  "multiDomains": {
+    "__name": "MULTI_DOMAINS",
+    "__format": "json"
+  },
+  "map": {
+    "general": {
+      "title": "MAP_GENERAL_TITLE",
+      "headerTitle": "MAP_GENERAL_HEADER_TITLE",
+      "startLat": {
+        "__name": "MAP_GENERAL_START_LAT",
+        "__format": "number"
+      },
+      "startLon": {
+        "__name": "MAP_GENERAL_START_LON",
+        "__format": "number"
+      },
+      "startZoom": {
+        "__name": "MAP_GENERAL_START_ZOOM",
+        "__format": "number"
+      },
+      "minZoom": {
+        "__name": "MAP_GENERAL_MIN_ZOOM",
+        "__format": "number"
+      },
+      "maxZoom": {
+        "__name": "MAP_GENERAL_MAX_ZOOM",
+        "__format": "number"
+      },
+      "interactionRangeZoom": {
+        "__name": "MAP_GENERAL_INTERACTION_RANGE_ZOOM",
+        "__format": "number"
+      },
+      "scanAreasZoom": {
+        "__name": "MAP_GENERAL_SCAN_AREAS_ZOOM",
+        "__format": "number"
+      },
+      "scanCellsZoom": {
+        "__name": "MAP_GENERAL_SCAN_CELLS_ZOOM",
+        "__format": "number"
+      },
+      "submissionZoom": {
+        "__name": "MAP_GENERAL_SUBMISSION_ZOOM",
+        "__format": "number"
+      },
+      "activeWeatherZoom": {
+        "__name": "MAP_GENERAL_ACTIVE_WEATHER_ZOOM",
+        "__format": "number"
+      },
+      "geoJsonFileName": "MAP_GENERAL_GEO_JSON_FILE_NAME",
+      "attributionPrefix": "MAP_GENERAL_ATTRIBUTION_PREFIX"
+    },
+    "localeSelection": {
+      "__name": "MAP_LOCALE_SELECTION",
+      "__format": "json"
+    },
+    "customRoutes": {
+      "discordAuthUrl": "MAP_CUSTOM_ROUTES_DISCORD_AUTH_URL",
+      "telegramAuthUrl": "MAP_CUSTOM_ROUTES_TELEGRAM_AUTH_URL",
+      "telegramBotName": "MAP_CUSTOM_ROUTES_TELEGRAM_BOT_NAME",
+      "localAuthUrl": "MAP_CUSTOM_ROUTES_LOCAL_AUTH_URL"
+    },
+    "links": {
+      "discordInvite": "MAP_LINKS_DISCORD_INVITE",
+      "feedbackLink": "MAP_LINKS_FEEDBACK_LINK",
+      "statsLink": "MAP_LINKS_STATS_LINK",
+      "rolesLinkName": "MAP_LINKS_ROLES_LINK_NAME",
+      "rolesLink": "MAP_LINKS_ROLES_LINK"
+    },
+    "holidayEffects": {
+      "christmasSnow": {
+        "__name": "MAP_HOLIDAY_EFFECTS_CHRISTMAS_SNOW",
+        "__format": "boolean"
+      },
+      "newYearsFireworks": {
+        "__name": "MAP_HOLIDAY_EFFECTS_NEW_YEARS_FIREWORKS",
+        "__format": "boolean"
+      },
+      "valentinesDay": {
+        "__name": "MAP_HOLIDAY_EFFECTS_VALENTINES_DAY",
+        "__format": "boolean"
+      },
+      "internationalWomensDay": {
+        "__name": "MAP_HOLIDAY_EFFECTS_INTERNATIONAL_WOMENS_DAY",
+        "__format": "boolean"
+      }
+    },
+    "misc": {
+      "enableMapJsFilter": {
+        "__name": "MAP_MISC_ENABLE_MAP_JS_FILTER",
+        "__format": "boolean"
+      },
+      "questRewardTypeFilters": {
+        "__name": "MAP_MISC_QUEST_REWARD_TYPE_FILTERS",
+        "__format": "boolean"
+      },
+      "fetchLatestInvasions": {
+        "__name": "MAP_MISC_FETCH_LATEST_INVASIONS",
+        "__format": "boolean"
+      },
+      "invasionCacheHrs": {
+        "__name": "MAP_MISC_INVASION_CACHE_HRS",
+        "__format": "number"
+      },
+      "masterfileCacheHrs": {
+        "__name": "MAP_MISC_MASTERFILE_CACHE_HRS",
+        "__format": "number"
+      },
+      "webhookCacheHrs": {
+        "__name": "MAP_MISC_WEBHOOK_CACHE_HRS",
+        "__format": "number"
+      },
+      "questMessage": "MAP_MISC_QUEST_MESSAGE",
+      "navigationControls": "MAP_MISC_NAVIGATION_CONTROLS",
+      "enableFloatingProfileButton": {
+        "__name": "MAP_MISC_ENABLE_FLOATING_PROFILE_BUTTON",
+        "__format": "boolean"
+      },
+      "forceTutorial": {
+        "__name": "MAP_MISC_FORCE_TUTORIAL",
+        "__format": "boolean"
+      },
+      "enableTutorial": {
+        "__name": "MAP_MISC_ENABLE_TUTORIAL",
+        "__format": "boolean"
+      },
+      "enableUserProfile": {
+        "__name": "MAP_MISC_ENABLE_USER_PROFILE",
+        "__format": "boolean"
+      },
+      "enableQuestSetSelector": {
+        "__name": "MAP_MISC_ENABLE_QUEST_SET_SELECTOR",
+        "__format": "boolean"
+      },
+      "noScanAreaOverlay": {
+        "__name": "MAP_MISC_NO_SCAN_AREA_OVERLAY",
+        "__format": "boolean"
+      },
+      "permImageDir": "MAP_MISC_PERM_IMAGE_DIR",
+      "permArrayImages": {
+        "__name": "MAP_MISC_PERM_ARRAY_IMAGES",
+        "__format": "boolean"
+      },
+      "clientTimeoutMinutes": {
+        "__name": "MAP_MISC_CLIENT_TIMEOUT_MINUTES",
+        "__format": "number"
+      }
+    },
+    "theme": {
+      "style": "MAP_THEME_STYLE",
+      "primary": "MAP_THEME_PRIMARY",
+      "secondary": "MAP_THEME_SECONDARY",
+      "drawer": "MAP_THEME_DRAWER"
+    },
+    "clustering": {
+      "gyms": {
+        "zoomLevel": {
+          "__name": "MAP_CLUSTERING_GYMS_ZOOM_LEVEL",
+          "__format": "number"
+        },
+        "forcedLimit": {
+          "__name": "MAP_CLUSTERING_GYMS_FORCED_LIMIT",
+          "__format": "number"
+        }
+      },
+      "pokestops": {
+        "zoomLevel": {
+          "__name": "MAP_CLUSTERING_POKESTOPS_ZOOM_LEVEL",
+          "__format": "number"
+        },
+        "forcedLimit": {
+          "__name": "MAP_CLUSTERING_POKESTOPS_FORCED_LIMIT",
+          "__format": "number"
+        }
+      },
+      "pokemon": {
+        "zoomLevel": {
+          "__name": "MAP_CLUSTERING_POKEMON_ZOOM_LEVEL",
+          "__format": "number"
+        },
+        "forcedLimit": {
+          "__name": "MAP_CLUSTERING_POKEMON_FORCED_LIMIT",
+          "__format": "number"
+        }
+      },
+      "portals": {
+        "zoomLevel": {
+          "__name": "MAP_CLUSTERING_PORTALS_ZOOM_LEVEL",
+          "__format": "number"
+        },
+        "forcedLimit": {
+          "__name": "MAP_CLUSTERING_PORTALS_FORCED_LIMIT",
+          "__format": "number"
+        }
+      },
+      "spawnpoints": {
+        "zoomLevel": {
+          "__name": "MAP_CLUSTERING_SPAWNPOINTS_ZOOM_LEVEL",
+          "__format": "number"
+        },
+        "forcedLimit": {
+          "__name": "MAP_CLUSTERING_SPAWNPOINTS_FORCED_LIMIT",
+          "__format": "number"
+        }
+      }
+    },
+    "messageOfTheDay": {
+      "index": {
+        "__name": "MAP_MESSAGE_OF_THE_DAY_INDEX",
+        "__format": "number"
+      },
+      "settings": {
+        "parentSpacing": {
+          "__name": "MAP_MESSAGE_OF_THE_DAY_SETTINGS_PARENT_SPACING",
+          "__format": "number"
+        },
+        "parentAlignItems": "MAP_MESSAGE_OF_THE_DAY_SETTINGS_PARENT_ALIGN_ITEMS",
+        "parentJustifyContent": "MAP_MESSAGE_OF_THE_DAY_SETTINGS_PARENT_JUSTIFY_CONTENT",
+        "parentStyle": {},
+        "permanent": {
+          "__name": "MAP_MESSAGE_OF_THE_DAY_SETTINGS_PERMANENT",
+          "__format": "boolean"
+        },
+        "freeloaderOnly": {
+          "__name": "MAP_MESSAGE_OF_THE_DAY_SETTINGS_FREELOADER_ONLY",
+          "__format": "boolean"
+        },
+        "donorOnly": {
+          "__name": "MAP_MESSAGE_OF_THE_DAY_SETTINGS_DONOR_ONLY",
+          "__format": "boolean"
+        }
+      },
+      "titles": {
+        "__name": "MAP_MESSAGE_OF_THE_DAY_TITLES",
+        "__format": "json"
+      },
+      "components": {
+        "__name": "MAP_MESSAGE_OF_THE_DAY_COMPONENTS",
+        "__format": "json"
+      },
+      "footerButtons": {
+        "__name": "MAP_MESSAGE_OF_THE_DAY_FOOTER_BUTTONS",
+        "__format": "json"
+      }
+    },
+    "donationPage": {
+      "showOnMap": {
+        "__name": "MAP_DONATION_PAGE_SHOW_ON_MAP",
+        "__format": "boolean"
+      },
+      "showToDonors": {
+        "__name": "MAP_DONATION_PAGE_SHOW_TO_DONORS",
+        "__format": "boolean"
+      },
+      "fabIcon": "MAP_DONATION_PAGE_FAB_ICON",
+      "settings": {
+        "parentSpacing": {
+          "__name": "MAP_DONATION_PAGE_SETTINGS_PARENT_SPACING",
+          "__format": "number"
+        },
+        "parentAlignItems": "MAP_DONATION_PAGE_SETTINGS_PARENT_ALIGN_ITEMS",
+        "parentJustifyContent": "MAP_DONATION_PAGE_SETTINGS_PARENT_JUSTIFY_CONTENT",
+        "parentStyle": {}
+      },
+      "titles": {
+        "__name": "MAP_DONATION_PAGE_TITLES",
+        "__format": "json"
+      },
+      "components": {
+        "__name": "MAP_DONATION_PAGE_COMPONENTS",
+        "__format": "json"
+      },
+      "footerButtons": {
+        "__name": "MAP_DONATION_PAGE_FOOTER_BUTTONS",
+        "__format": "json"
+      }
+    },
+    "loginPage": {
+      "settings": {
+        "parentSpacing": {
+          "__name": "MAP_LOGIN_PAGE_SETTINGS_PARENT_SPACING",
+          "__format": "number"
+        },
+        "parentAlignItems": "MAP_LOGIN_PAGE_SETTINGS_PARENT_ALIGN_ITEMS",
+        "parentJustifyContent": "MAP_LOGIN_PAGE_SETTINGS_PARENT_JUSTIFY_CONTENT",
+        "parentStyle": {}
+      },
+      "components": {
+        "__name": "MAP_LOGIN_PAGE_COMPONENTS",
+        "__format": "json"
+      }
+    }
+  },
+  "clientSideOptions": {
+    "admin": {
+      "devicePathColor": "CLIENT_SIDE_OPTIONS_ADMIN_DEVICE_PATH_COLOR"
+    },
+    "gyms": {
+      "clustering": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_CLUSTERING",
+        "__format": "boolean"
+      },
+      "raidTimers": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_RAID_TIMERS",
+        "__format": "boolean"
+      },
+      "interactionRanges": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "showExBadge": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_SHOW_EX_BADGE",
+        "__format": "boolean"
+      },
+      "showArBadge": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_SHOW_AR_BADGE",
+        "__format": "boolean"
+      },
+      "raidLevelBadges": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_RAID_LEVEL_BADGES",
+        "__format": "boolean"
+      },
+      "gymBadgeDiamonds": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_GYM_BADGE_DIAMONDS",
+        "__format": "boolean"
+      }
+    },
+    "pokestops": {
+      "clustering": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_CLUSTERING",
+        "__format": "boolean"
+      },
+      "invasionTimers": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_INVASION_TIMERS",
+        "__format": "boolean"
+      },
+      "lureTimers": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_LURE_TIMERS",
+        "__format": "boolean"
+      },
+      "interactionRanges": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "madQuestText": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_MAD_QUEST_TEXT",
+        "__format": "boolean"
+      },
+      "hasQuestIndicator": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_HAS_QUEST_INDICATOR",
+        "__format": "boolean"
+      },
+      "showArBadge": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_SHOW_AR_BADGE",
+        "__format": "boolean"
+      }
+    },
+    "pokemon": {
+      "clustering": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_CLUSTERING",
+        "__format": "boolean"
+      },
+      "pokemonTimers": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_POKEMON_TIMERS",
+        "__format": "boolean"
+      },
+      "legacyFilter": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_LEGACY_FILTER",
+        "__format": "boolean"
+      },
+      "ivCircles": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_IV_CIRCLES",
+        "__format": "boolean"
+      },
+      "minIvCircle": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_MIN_IV_CIRCLE",
+        "__format": "number"
+      },
+      "weatherIndicator": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_WEATHER_INDICATOR",
+        "__format": "boolean"
+      },
+      "interactionRanges": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "showDexNumInPopup": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_SHOW_DEX_NUM_IN_POPUP",
+        "__format": "boolean"
+      },
+      "pvpMega": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_PVP_MEGA",
+        "__format": "boolean"
+      },
+      "linkGlobalAndAdvanced": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_LINK_GLOBAL_AND_ADVANCED",
+        "__format": "boolean"
+      },
+      "glow": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_GLOW",
+        "__format": "json"
+      }
+    },
+    "wayfarer": {
+      "clustering": {
+        "__name": "CLIENT_SIDE_OPTIONS_WAYFARER_CLUSTERING",
+        "__format": "boolean"
+      },
+      "oldPortals": "CLIENT_SIDE_OPTIONS_WAYFARER_OLD_PORTALS",
+      "newPortals": "CLIENT_SIDE_OPTIONS_WAYFARER_NEW_PORTALS"
+    },
+    "weather": {
+      "clickableIcon": {
+        "__name": "CLIENT_SIDE_OPTIONS_WEATHER_CLICKABLE_ICON",
+        "__format": "boolean"
+      }
+    }
+  },
+  "defaultFilters": {
+    "devices": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_DEVICES_ENABLED",
+        "__format": "boolean"
+      }
+    },
+    "gyms": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_GYMS_ENABLED",
+        "__format": "boolean"
+      },
+      "allGyms": {
+        "__name": "DEFAULT_FILTERS_GYMS_ALL_GYMS",
+        "__format": "boolean"
+      },
+      "exEligible": {
+        "__name": "DEFAULT_FILTERS_GYMS_EX_ELIGIBLE",
+        "__format": "boolean"
+      },
+      "inBattle": {
+        "__name": "DEFAULT_FILTERS_GYMS_IN_BATTLE",
+        "__format": "boolean"
+      },
+      "raids": {
+        "__name": "DEFAULT_FILTERS_GYMS_RAIDS",
+        "__format": "boolean"
+      },
+      "eggs": {
+        "__name": "DEFAULT_FILTERS_GYMS_EGGS",
+        "__format": "boolean"
+      },
+      "pokemon": {
+        "__name": "DEFAULT_FILTERS_GYMS_POKEMON",
+        "__format": "boolean"
+      },
+      "gymBadges": {
+        "__name": "DEFAULT_FILTERS_GYMS_GYM_BADGES",
+        "__format": "boolean"
+      }
+    },
+    "nests": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_NESTS_ENABLED",
+        "__format": "boolean"
+      },
+      "polygons": {
+        "__name": "DEFAULT_FILTERS_NESTS_POLYGONS",
+        "__format": "boolean"
+      },
+      "pokemon": {
+        "__name": "DEFAULT_FILTERS_NESTS_POKEMON",
+        "__format": "boolean"
+      },
+      "allPokemon": {
+        "__name": "DEFAULT_FILTERS_NESTS_ALL_POKEMON",
+        "__format": "boolean"
+      },
+      "avgFilter": {
+        "__name": "DEFAULT_FILTERS_NESTS_AVG_FILTER",
+        "__format": "json"
+      },
+      "avgSliderStep": {
+        "__name": "DEFAULT_FILTERS_NESTS_AVG_SLIDER_STEP",
+        "__format": "number"
+      }
+    },
+    "pokestops": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_ENABLED",
+        "__format": "boolean"
+      },
+      "lures": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_LURES",
+        "__format": "boolean"
+      },
+      "quests": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_QUESTS",
+        "__format": "boolean"
+      },
+      "questSet": "DEFAULT_FILTERS_POKESTOPS_QUEST_SET",
+      "items": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_ITEMS",
+        "__format": "boolean"
+      },
+      "megaEnergy": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_MEGA_ENERGY",
+        "__format": "boolean"
+      },
+      "candy": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_CANDY",
+        "__format": "boolean"
+      },
+      "pokemon": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_POKEMON",
+        "__format": "boolean"
+      },
+      "invasions": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_INVASIONS",
+        "__format": "boolean"
+      },
+      "allInvasions": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_ALL_INVASIONS",
+        "__format": "boolean"
+      }
+    },
+    "pokemon": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_POKEMON_ENABLED",
+        "__format": "boolean"
+      },
+      "legacyFilter": {
+        "__name": "DEFAULT_FILTERS_POKEMON_LEGACY_FILTER",
+        "__format": "boolean"
+      },
+      "allPokemon": {
+        "__name": "DEFAULT_FILTERS_POKEMON_ALL_POKEMON",
+        "__format": "boolean"
+      },
+      "globalValues": {
+        "iv": {
+          "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_IV",
+          "__format": "json"
+        },
+        "level": {
+          "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_LEVEL",
+          "__format": "json"
+        },
+        "atk_iv": {
+          "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_ATK_IV",
+          "__format": "json"
+        },
+        "def_iv": {
+          "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_DEF_IV",
+          "__format": "json"
+        },
+        "sta_iv": {
+          "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_STA_IV",
+          "__format": "json"
+        },
+        "pvp": {
+          "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_PVP",
+          "__format": "json"
+        }
+      }
+    },
+    "portals": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_PORTALS_ENABLED",
+        "__format": "boolean"
+      }
+    },
+    "scanAreas": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_SCAN_AREAS_ENABLED",
+        "__format": "boolean"
+      }
+    },
+    "scanCells": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_SCAN_CELLS_ENABLED",
+        "__format": "boolean"
+      }
+    },
+    "spawnpoints": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_SPAWNPOINTS_ENABLED",
+        "__format": "boolean"
+      }
+    },
+    "submissionCells": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_ENABLED",
+        "__format": "boolean"
+      }
+    },
+    "weather": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_WEATHER_ENABLED",
+        "__format": "boolean"
+      }
+    }
+  },
+  "database": {
+    "settings": {
+      "userTableName": "DATABASE_SETTINGS_USER_TABLE_NAME",
+      "gymBadgeTableName": "DATABASE_SETTINGS_GYM_BADGE_TABLE_NAME",
+      "sessionTableName": "DATABASE_SETTINGS_SESSION_TABLE_NAME",
+      "migrationTableName": "DATABASE_SETTINGS_MIGRATION_TABLE_NAME",
+      "joinGymBadgeTable": {
+        "__name": "DATABASE_SETTINGS_JOIN_GYM_BADGE_TABLE",
+        "__format": "boolean"
+      },
+      "hideOldQuests": {
+        "__name": "DATABASE_SETTINGS_HIDE_OLD_QUESTS",
+        "__format": "boolean"
+      },
+      "maxConnections": {
+        "__name": "DATABASE_SETTINGS_MAX_CONNECTIONS",
+        "__format": "number"
+      },
+      "startupDelayMs": {
+        "__name": "DATABASE_SETTINGS_STARTUP_DELAY_MS",
+        "__format": "number"
+      },
+      "availableRetryCount": {
+        "__name": "DATABASE_SETTINGS_AVAILABLE_RETRY_COUNT",
+        "__format": "number"
+      }
+    },
+    "schemas": {
+      "__name": "DATABASE_SCHEMAS",
+      "__format": "json"
+    }
+  },
+  "scanner": {
+    "backendConfig": {
+      "platform": "SCANNER_BACKEND_CONFIG_PLATFORM",
+      "apiEndpoint": "SCANNER_BACKEND_CONFIG_API_ENDPOINT",
+      "apiUsername": "SCANNER_BACKEND_CONFIG_API_USERNAME",
+      "apiPassword": "SCANNER_BACKEND_CONFIG_API_PASSWORD",
+      "queueRefreshInterval": {
+        "__name": "SCANNER_BACKEND_CONFIG_QUEUE_REFRESH_INTERVAL",
+        "__format": "number"
+      }
+    },
+    "scanNext": {
+      "enabled": {
+        "__name": "SCANNER_SCAN_NEXT_ENABLED",
+        "__format": "boolean"
+      },
+      "showScanCount": {
+        "__name": "SCANNER_SCAN_NEXT_SHOW_SCAN_COUNT",
+        "__format": "boolean"
+      },
+      "showScanQueue": {
+        "__name": "SCANNER_SCAN_NEXT_SHOW_SCAN_QUEUE",
+        "__format": "boolean"
+      },
+      "scanNextInstance": "SCANNER_SCAN_NEXT_SCAN_NEXT_INSTANCE",
+      "scanNextDevice": "SCANNER_SCAN_NEXT_SCAN_NEXT_DEVICE",
+      "scanNextSleeptime": {
+        "__name": "SCANNER_SCAN_NEXT_SCAN_NEXT_SLEEPTIME",
+        "__format": "number"
+      },
+      "scanNextAreaRestriction": {
+        "__name": "SCANNER_SCAN_NEXT_SCAN_NEXT_AREA_RESTRICTION",
+        "__format": "json"
+      },
+      "discordRoles": {
+        "__name": "SCANNER_SCAN_NEXT_DISCORD_ROLES",
+        "__format": "json"
+      },
+      "telegramGroups": {
+        "__name": "SCANNER_SCAN_NEXT_TELEGRAM_GROUPS",
+        "__format": "json"
+      }
+    },
+    "scanZone": {
+      "enabled": {
+        "__name": "SCANNER_SCAN_ZONE_ENABLED",
+        "__format": "boolean"
+      },
+      "showScanCount": {
+        "__name": "SCANNER_SCAN_ZONE_SHOW_SCAN_COUNT",
+        "__format": "boolean"
+      },
+      "showScanQueue": {
+        "__name": "SCANNER_SCAN_ZONE_SHOW_SCAN_QUEUE",
+        "__format": "boolean"
+      },
+      "scanZoneMaxSize": {
+        "__name": "SCANNER_SCAN_ZONE_SCAN_ZONE_MAX_SIZE",
+        "__format": "number"
+      },
+      "advancedScanZoneOptions": {
+        "__name": "SCANNER_SCAN_ZONE_ADVANCED_SCAN_ZONE_OPTIONS",
+        "__format": "boolean"
+      },
+      "scanZoneRadius": {
+        "pokemon": {
+          "__name": "SCANNER_SCAN_ZONE_SCAN_ZONE_RADIUS_POKEMON",
+          "__format": "number"
+        },
+        "gym": {
+          "__name": "SCANNER_SCAN_ZONE_SCAN_ZONE_RADIUS_GYM",
+          "__format": "number"
+        }
+      },
+      "scanZoneSpacing": {
+        "__name": "SCANNER_SCAN_ZONE_SCAN_ZONE_SPACING",
+        "__format": "number"
+      },
+      "scanZoneInstance": "SCANNER_SCAN_ZONE_SCAN_ZONE_INSTANCE",
+      "scanZoneAreaRestriction": {
+        "__name": "SCANNER_SCAN_ZONE_SCAN_ZONE_AREA_RESTRICTION",
+        "__format": "json"
+      },
+      "discordRoles": {
+        "__name": "SCANNER_SCAN_ZONE_DISCORD_ROLES",
+        "__format": "json"
+      },
+      "telegramGroups": {
+        "__name": "SCANNER_SCAN_ZONE_TELEGRAM_GROUPS",
+        "__format": "json"
+      }
+    }
+  },
+  "webhooks": {
+    "__name": "WEBHOOKS",
+    "__format": "json"
+  },
+  "authentication": {
+    "strategies": {
+      "__name": "AUTHENTICATION_STRATEGIES",
+      "__format": "json"
+    },
+    "areaRestrictions": {
+      "__name": "AUTHENTICATION_AREA_RESTRICTIONS",
+      "__format": "json"
+    },
+    "excludeFromTutorial": {
+      "__name": "AUTHENTICATION_EXCLUDE_FROM_TUTORIAL",
+      "__format": "json"
+    },
+    "alwaysEnabledPerms": {
+      "__name": "AUTHENTICATION_ALWAYS_ENABLED_PERMS",
+      "__format": "json"
+    },
+    "perms": {
+      "map": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_MAP_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_MAP_ROLES",
+          "__format": "json"
+        }
+      },
+      "pokemon": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_POKEMON_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_POKEMON_ROLES",
+          "__format": "json"
+        }
+      },
+      "iv": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_IV_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_IV_ROLES",
+          "__format": "json"
+        }
+      },
+      "pvp": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_PVP_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_PVP_ROLES",
+          "__format": "json"
+        }
+      },
+      "gyms": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_GYMS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_GYMS_ROLES",
+          "__format": "json"
+        }
+      },
+      "raids": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_RAIDS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_RAIDS_ROLES",
+          "__format": "json"
+        }
+      },
+      "pokestops": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_POKESTOPS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_POKESTOPS_ROLES",
+          "__format": "json"
+        }
+      },
+      "quests": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_QUESTS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_QUESTS_ROLES",
+          "__format": "json"
+        }
+      },
+      "lures": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_LURES_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_LURES_ROLES",
+          "__format": "json"
+        }
+      },
+      "portals": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_PORTALS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_PORTALS_ROLES",
+          "__format": "json"
+        }
+      },
+      "submissionCells": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_SUBMISSION_CELLS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_SUBMISSION_CELLS_ROLES",
+          "__format": "json"
+        }
+      },
+      "invasions": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_INVASIONS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_INVASIONS_ROLES",
+          "__format": "json"
+        }
+      },
+      "nests": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_NESTS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_NESTS_ROLES",
+          "__format": "json"
+        }
+      },
+      "scanAreas": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_SCAN_AREAS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_SCAN_AREAS_ROLES",
+          "__format": "json"
+        }
+      },
+      "weather": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_WEATHER_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_WEATHER_ROLES",
+          "__format": "json"
+        }
+      },
+      "spawnpoints": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_SPAWNPOINTS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_SPAWNPOINTS_ROLES",
+          "__format": "json"
+        }
+      },
+      "scanCells": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_SCAN_CELLS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_SCAN_CELLS_ROLES",
+          "__format": "json"
+        }
+      },
+      "devices": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_DEVICES_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_DEVICES_ROLES",
+          "__format": "json"
+        }
+      },
+      "donor": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_DONOR_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_DONOR_ROLES",
+          "__format": "json"
+        }
+      },
+      "gymBadges": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_GYM_BADGES_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_GYM_BADGES_ROLES",
+          "__format": "json"
+        }
+      }
+    }
+  },
+  "tileServers": {
+    "__name": "TILE_SERVERS",
+    "__format": "json"
+  },
+  "navigation": {
+    "__name": "NAVIGATION",
+    "__format": "json"
+  },
+  "icons": {
+    "Read_More_Here": "ICONS_READ_MORE_HERE",
+    "customizable": {
+      "__name": "ICONS_CUSTOMIZABLE",
+      "__format": "json"
+    },
+    "styles": {
+      "__name": "ICONS_STYLES",
+      "__format": "json"
+    },
+    "defaultIcons": {},
+    "cacheHrs": {
+      "__name": "ICONS_CACHE_HRS",
+      "__format": "number"
+    },
+    "sizes": {
+      "device": {
+        "sm": {
+          "__name": "ICONS_SIZES_DEVICE_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_DEVICE_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_DEVICE_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_DEVICE_XL",
+          "__format": "number"
+        }
+      },
+      "nest": {
+        "sm": {
+          "__name": "ICONS_SIZES_NEST_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_NEST_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_NEST_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_NEST_XL",
+          "__format": "number"
+        }
+      },
+      "gym": {
+        "sm": {
+          "__name": "ICONS_SIZES_GYM_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_GYM_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_GYM_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_GYM_XL",
+          "__format": "number"
+        }
+      },
+      "raid": {
+        "sm": {
+          "__name": "ICONS_SIZES_RAID_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_RAID_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_RAID_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_RAID_XL",
+          "__format": "number"
+        }
+      },
+      "pokestop": {
+        "sm": {
+          "__name": "ICONS_SIZES_POKESTOP_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_POKESTOP_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_POKESTOP_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_POKESTOP_XL",
+          "__format": "number"
+        }
+      },
+      "invasion": {
+        "sm": {
+          "__name": "ICONS_SIZES_INVASION_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_INVASION_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_INVASION_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_INVASION_XL",
+          "__format": "number"
+        }
+      },
+      "reward": {
+        "sm": {
+          "__name": "ICONS_SIZES_REWARD_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_REWARD_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_REWARD_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_REWARD_XL",
+          "__format": "number"
+        }
+      },
+      "pokemon": {
+        "sm": {
+          "__name": "ICONS_SIZES_POKEMON_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_POKEMON_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_POKEMON_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_POKEMON_XL",
+          "__format": "number"
+        }
+      },
+      "spawnpoint": {
+        "sm": {
+          "__name": "ICONS_SIZES_SPAWNPOINT_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_SPAWNPOINT_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_SPAWNPOINT_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_SPAWNPOINT_XL",
+          "__format": "number"
+        }
+      }
+    }
+  },
+  "rarity": {
+    "common": {
+      "__name": "RARITY_COMMON",
+      "__format": "json"
+    },
+    "uncommon": {
+      "__name": "RARITY_UNCOMMON",
+      "__format": "json"
+    },
+    "rare": {
+      "__name": "RARITY_RARE",
+      "__format": "json"
+    },
+    "ultraRare": {
+      "__name": "RARITY_ULTRA_RARE",
+      "__format": "json"
+    },
+    "regional": {
+      "__name": "RARITY_REGIONAL",
+      "__format": "json"
+    },
+    "event": {
+      "__name": "RARITY_EVENT",
+      "__format": "json"
+    }
+  },
+  "manualAreas": {
+    "__name": "MANUAL_AREAS",
+    "__format": "json"
+  }
+}
