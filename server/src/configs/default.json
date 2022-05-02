@@ -67,7 +67,8 @@
     "gymValidDataLimit": 30,
     "hideOldGyms": false,
     "stopValidDataLimit": 30,
-    "hideOldPokestops": false
+    "hideOldPokestops": false,
+    "fetchTimeoutMs": 3000
   },
   "multiDomains": [],
   "map": {
@@ -98,7 +99,7 @@
     "customRoutes": {
       "discordAuthUrl": "/auth/discord/callback",
       "telegramAuthUrl": "/auth/telegram/callback",
-      "telegramBotEnvRef": "TELEGRAM_BOT_NAME",
+      "telegramBotName": "",
       "localAuthUrl": "/auth/local/callback"
     },
     "links": {
@@ -283,7 +284,10 @@
       "polygons": false,
       "pokemon": false,
       "allPokemon": true,
-      "avgFilter": [0, 100],
+      "avgFilter": [
+        0,
+        100
+      ],
       "avgSliderStep": 1
     },
     "pokestops": {
@@ -356,28 +360,9 @@
       "migrationTableName": "knex_migrations",
       "joinGymBadgeTable": false,
       "hideOldQuests": false,
-      "maxConnections": 10,
-      "startupDelayMs": 1000,
-      "availableRetryCount": 5
+      "maxConnections": 10
     },
-    "schemas": [
-      {
-        "host": "127.0.0.1",
-        "port": 3306,
-        "username": "user",
-        "password": "pass123!",
-        "database": "rdmdb",
-        "useFor": []
-      },
-      {
-        "host": "127.0.0.1",
-        "port": 3306,
-        "username": "user",
-        "password": "pass123!",
-        "database": "manualdb",
-        "useFor": []
-      }
-    ]
+    "schemas": []
   },
   "scanner": {
     "backendConfig": {
@@ -404,7 +389,10 @@
       "showScanQueue": false,
       "scanZoneMaxSize": 10,
       "advancedScanZoneOptions": false,
-      "scanZoneRadius": { "pokemon": 70, "gym": 750 },
+      "scanZoneRadius": {
+        "pokemon": 70,
+        "gym": 750
+      },
       "scanZoneSpacing": 1,
       "scanZoneInstance": "scanZone",
       "scanZoneAreaRestriction": [],
@@ -555,18 +543,6 @@
       "name": "Satellite",
       "attribution": "&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
       "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      "style": "dark"
-    },
-    {
-      "name": "AlidadeSmoothDark",
-      "attribution": "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors",
-      "url": "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
-      "style": "dark"
-    },
-    {
-      "name": "ThunderForest",
-      "attribution": "&copy; <a href='http://www.thunderforest.com/'>Thunderforest</a>, &copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
-      "url": "https://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png",
       "style": "dark"
     }
   ],

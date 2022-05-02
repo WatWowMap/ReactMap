@@ -295,7 +295,7 @@ module.exports = class Pokestop extends Model {
     const results = await query
     const normalized = isMad ? this.mapMAD(results, safeTs) : this.mapRDM(results, safeTs)
     if (normalized.length > queryLimits.pokestops) normalized.length = queryLimits.pokestops
-    return this.secondaryFilter(normalized, args.filters, isMad, midnight, perms)
+    return this.secondaryFilter(normalized, args.filters, isMad, safeTs, midnight, perms)
   }
 
   static fieldAssigner(target, source, fields) {
@@ -303,7 +303,7 @@ module.exports = class Pokestop extends Model {
   }
 
   // filters and removes unwanted data
-  static secondaryFilter(queryResults, filters, isMad, midnight, perms, global = false) {
+  static secondaryFilter(queryResults, filters, isMad, safeTs, midnight, perms, global = false) {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
@@ -319,7 +319,7 @@ module.exports = class Pokestop extends Model {
       }
       if (perms.lures
         && (filters.onlyAllPokestops
-          || (filters.onlyLures && filters[`l${pokestop.lure_id}`]))) {
+          || (filters.onlyLures && pokestop.lure_expire_timestamp >= safeTs && filters[`l${pokestop.lure_id}`]))) {
         this.fieldAssigner(filtered, pokestop, ['lure_id', 'lure_expire_timestamp'])
       }
 
@@ -456,6 +456,7 @@ module.exports = class Pokestop extends Model {
     const finalList = new Set()
     const quests = {}
     const stops = {}
+
     quests.items = await this.query()
       .select('quest_item_id')
       .from(isMad ? 'trs_quest' : 'pokestop')
@@ -602,10 +603,6 @@ module.exports = class Pokestop extends Model {
       }
     })
 
-    if (finalList.size === 0) {
-      return fetchQuests()
-    }
-
     if (hasMultiInvasions) {
       stops.invasions = await this.query()
         .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
@@ -620,12 +617,16 @@ module.exports = class Pokestop extends Model {
         ])
         .where(multiInvasionMs ? 'expiration_ms' : 'incident.expiration', '>=', ts * (multiInvasionMs ? 1000 : 1))
         .orderBy('grunt_type')
-    } else {
+    } else if (hasMultiInvasions === false) {
       stops.invasions = await this.query()
         .select(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
         .where(isMad ? 'incident_expiration' : 'incident_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
         .groupBy('grunt_type')
         .orderBy('grunt_type')
+    } else {
+      stops.invasions = Object.keys(Event.masterfile.invasions)
+        .filter(grunt => +grunt < 100)
+        .map(i => ({ grunt_type: i }))
     }
     stops.lures = await this.query()
       .select(isMad ? 'active_fort_modifier AS lure_id' : 'lure_id')
@@ -640,7 +641,7 @@ module.exports = class Pokestop extends Model {
         default: rewards.forEach(reward => finalList.add(`i${reward.grunt_type}`)); break
       }
     })
-    return [...finalList]
+    return finalList.size === 0 ? fetchQuests() : [...finalList]
   }
 
   static parseRdmRewards = (quest) => {

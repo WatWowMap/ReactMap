@@ -40,6 +40,7 @@ export default function Main({
         style={{ display: webhookMode === 'open' ? 'block' : 'none' }}
         maxWidth="md"
         open={Boolean(webhookMode)}
+        onClose={() => setWebhookMode(false)}
       >
         <Manage
           map={map}
@@ -56,6 +57,7 @@ export default function Main({
           setWebhookLocation={setWebhookLocation}
           selectedWebhook={selectedWebhook}
           setSelectedWebhook={setSelectedWebhook}
+          handleWebhookClose={() => setWebhookMode(false)}
         />
       </Dialog>
       {webhookMode === 'location' && (

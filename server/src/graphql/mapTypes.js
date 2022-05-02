@@ -1,7 +1,15 @@
 const { gql } = require('apollo-server-express')
 
 module.exports = gql`
-
+    type Available {
+      masterfile: JSON
+      pokestops: [String]
+      gyms: [String]
+      pokemon: [String]
+      nests: [String]
+      filters: JSON
+    }
+  
     type Badge {
       id: String
       name: String

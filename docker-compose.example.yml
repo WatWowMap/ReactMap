@@ -5,6 +5,21 @@ services:
     container_name: reactmap
     command: sh -c "yarn start"
     restart: unless-stopped
+    environment:
+      SCANNER_DB_HOST: 127.0.0.1
+      SCANNER_DB_PORT: 3306
+      SCANNER_DB_USER: scanner_username
+      SCANNER_DB_PASSWORD: scanner_user_pw
+      SCANNER_DB_NAME: realdevicemap
+      MANUAL_DB_HOST: 127.0.0.1
+      MANUAL_DB_PORT: 3306
+      MANUAL_DB_USER: manual_username
+      MANUAL_DB_PASSWORD: manual_user_pw
+      MANUAL_DB_NAME: manual_db
+      MAP_GENERAL_TITLE: ReactMap
+      MAP_GENERAL_START_LAT: 0
+      MAP_GENERAL_START_LON: 0
+      ARRAY_VALUE_EXAMPLE: "[3, 4, 5]"
     volumes:
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
       - ./server/src/configs/local.json:/home/node/server/src/configs/local.json
