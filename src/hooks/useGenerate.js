@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import genPokemon from '@services/filtering/genPokemon'
@@ -9,9 +9,9 @@ import { useStatic } from '@hooks/useStore'
 
 export default function useGenerate() {
   const { t } = useTranslation()
-  const { pokemon } = useStatic(useCallback(s => s.masterfile, []))
-  const { gyms, pokestops } = useStatic(useCallback(s => s.filters, []))
-  const staticMenus = useStatic(useCallback(s => s.menus, []))
+  const { pokemon } = useStatic(s => s.masterfile)
+  const { gyms, pokestops } = useStatic(s => s.filters)
+  const staticMenus = useStatic(s => s.menus)
   const setMenuFilters = useStatic(s => s.setMenuFilters)
 
   useEffect(() => {

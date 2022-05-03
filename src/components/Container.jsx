@@ -1,12 +1,14 @@
 import React from 'react'
 import { MapContainer } from 'react-leaflet'
-import { useStore } from '@hooks/useStore'
+
+import useGenerate from '@hooks/useGenerate'
+import useRefresh from '@hooks/useRefresh'
 
 import Map from './Map'
 
-export default function Container({ serverSettings, params }) {
-  const location = useStore(state => state.location)
-  const zoom = useStore(state => state.zoom)
+export default function Container({ serverSettings, params, location, zoom }) {
+  useGenerate()
+  useRefresh()
 
   return (
     <MapContainer

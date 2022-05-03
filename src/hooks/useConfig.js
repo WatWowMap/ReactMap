@@ -139,7 +139,12 @@ export default function useConfig(serverSettings, paramLocation) {
     return updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
   }
 
-  setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
+  const startLocation = getStartLocation()
+  const zoom = updatePositionState(serverSettings.config.map.startZoom, 'zoom')
 
-  setIsNight(Utility.nightCheck(...getStartLocation()))
+  setZoom(zoom)
+
+  setIsNight(Utility.nightCheck(...startLocation))
+
+  return { location: startLocation, zoom }
 }
