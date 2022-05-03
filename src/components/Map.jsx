@@ -6,8 +6,6 @@ import L from 'leaflet'
 
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
-import useRefresh from '@hooks/useRefresh'
-import useGenerate from '@hooks/useGenerate'
 
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
@@ -53,6 +51,8 @@ export default function Map({ serverSettings:
   const ui = useStatic(state => state.ui)
   const staticFilters = useStatic(state => state.filters)
   const setExcludeList = useStatic(state => state.setExcludeList)
+  const active = useStatic(state => state.active)
+  const setActive = useStatic(state => state.setActive)
 
   const filters = useStore(state => state.filters)
   const settings = useStore(state => state.settings)
@@ -69,15 +69,12 @@ export default function Map({ serverSettings:
   const [manualParams, setManualParams] = useState(params)
   const [error, setError] = useState('')
   const [windowState, setWindowState] = useState(true)
-  const [active, setActive] = useState(true)
   const [lc] = useState(L.control.locate({
     position: 'bottomright',
     icon: 'fas fa-location-arrow',
     keepCurrentZoomLevel: true,
     setView: 'untilPan',
   }))
-  const startFetching = useRefresh(active)
-  useGenerate()
 
   const onMove = useCallback((latLon) => {
     const newCenter = latLon || map.getCenter()
@@ -86,14 +83,18 @@ export default function Map({ serverSettings:
     setIsNight(Utility.nightCheck(newCenter.lat, newCenter.lng))
   }, [map])
 
-  const tileServer = useMemo(() => getTileServer(tileServers, settings, isNight), [settings.tileServers])
+  const tileServer = useMemo(() => getTileServer(tileServers, settings, isNight), [isNight, settings.tileServers])
+
+  const onFocus = () => setWindowState(true)
+
+  const onBlur = () => setWindowState(false)
 
   useEffect(() => {
-    window.addEventListener('focus', () => setWindowState(true))
-    window.addEventListener('blur', () => setWindowState(false))
+    window.addEventListener('focus', onFocus)
+    window.addEventListener('blur', onBlur)
     return () => {
-      window.removeEventListener('focus', () => setWindowState(true))
-      window.removeEventListener('blur', () => setWindowState(false))
+      window.removeEventListener('focus', onFocus)
+      window.removeEventListener('blur', onBlur)
     }
   }, [])
 
@@ -113,12 +114,6 @@ export default function Map({ serverSettings:
       lc.remove()
     }
   }, [settings.navigationControls])
-
-  useEffect(() => {
-    if (active) {
-      startFetching()
-    }
-  }, [active])
 
   return (
     <>
