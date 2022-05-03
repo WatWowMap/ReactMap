@@ -5,7 +5,7 @@ import Container from '../../Container'
 import Login from './Login'
 import WebhookQuery from '../../WebhookQuery'
 
-export default function Auth({ serverSettings, getServerSettings }) {
+export default function Auth({ serverSettings, getServerSettings, location, zoom }) {
   const params = useParams()
 
   if (serverSettings.error) {
@@ -38,6 +38,6 @@ export default function Auth({ serverSettings, getServerSettings }) {
     )
   }
   return (
-    <Container serverSettings={serverSettings} params={params} />
+    <Container serverSettings={serverSettings} params={params} location={location} zoom={zoom} />
   )
 }

@@ -54,6 +54,8 @@ export const useStore = create(persist(
 ))
 
 export const useStatic = create(set => ({
+  active: true,
+  setActive: (active) => set({ active }),
   auth: { discord: true, loggedIn: false, perms: {} },
   setAuth: (auth) => set({ auth }),
   config: undefined,

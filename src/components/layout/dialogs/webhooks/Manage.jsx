@@ -70,7 +70,7 @@ export default function Manage({
       action: () => setAddNew(true),
       icon: tabValue ? 'Add' : 'People',
       key: 'addNew',
-      disabled: !webhookData[selectedWebhook].human,
+      disabled: !webhookData[selectedWebhook]?.human,
     },
     { name: 'close', action: handleWebhookClose, icon: 'Close', color: 'primary' },
   ]

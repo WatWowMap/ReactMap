@@ -9,7 +9,7 @@ module.exports = function buildPokemon(defaults, base, custom, available) {
     quests: { global: new GenericFilter() },
     nests: { global: new GenericFilter() },
   }
-  const energyAmounts = new Set(['10', '20', ...available.pokestops
+  const energyAmounts = new Set([...defaults.pokestops.baseMegaEnergyAmounts, ...available.pokestops
     .filter((e) => e.startsWith('m'))
     .map((e) => e.split('-')[1])])
 

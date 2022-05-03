@@ -10,6 +10,7 @@ const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 const { User } = require('../models/index')
 const { Event, Db } = require('../services/initialization')
+const { version } = require('../../../package.json')
 
 const rootRouter = new express.Router()
 
@@ -22,6 +23,16 @@ rootRouter.use('/api', apiRouter)
 rootRouter.get('/logout', (req, res) => {
   req.logout()
   res.redirect('/')
+})
+
+rootRouter.post('/clientError', (req) => {
+  if (req.headers.version === version && req.isAuthenticated()) {
+    const { body: { error }, user } = req
+    const userName = user?.username || user?.discordId || user?.telegramId || user?.id || 'Unknown'
+    if (error && config.devOptions.clientErrors) {
+      console.error('[CLIENT]', error, `- User: ${userName}`)
+    }
+  }
 })
 
 rootRouter.get('/area/:area/:zoom?', (req, res) => {
