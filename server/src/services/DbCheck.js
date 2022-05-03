@@ -50,7 +50,7 @@ module.exports = class DbCheck {
         const pvpV2 = await schema('pokemon').columnInfo().then(col => 'pvp' in col)
         const [hasRewardAmount, hasAltQuests] = await schema('pokestop').columnInfo()
           .then(columns => ([
-            ['quest_reward_amount', 'item_reward_amount'].some(c => c in columns),
+            ('quest_reward_amount' in columns || isMad),
             'alternative_quest_type' in columns,
           ]))
         const [hasMultiInvasions, multiInvasionMs] = await schema('incident').columnInfo()
