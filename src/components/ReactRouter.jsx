@@ -8,9 +8,16 @@ import Errors from './Errors'
 import ClearStorage from './ClearStorage'
 
 export default function ReactRouter({ serverSettings, getServerSettings }) {
-  useConfig(serverSettings)
+  const { location, zoom } = useConfig(serverSettings)
 
-  const authRoute = <Auth serverSettings={serverSettings} getServerSettings={getServerSettings} />
+  const authRoute = (
+    <Auth
+      serverSettings={serverSettings}
+      getServerSettings={getServerSettings}
+      location={location}
+      zoom={zoom}
+    />
+  )
 
   return (
     <Routes>

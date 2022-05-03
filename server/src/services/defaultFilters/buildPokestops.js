@@ -1,32 +1,51 @@
 const { GenericFilter } = require('../../models/index')
 const { Event } = require('../initialization')
 
-module.exports = function buildPokestops(perms, defaults) {
+module.exports = function buildPokestops(perms, defaults, available) {
   const quests = { s0: new GenericFilter() }
   if (perms.lures) {
-    for (let i = 1; i <= 5; i += 1) {
-      quests[`l50${i}`] = new GenericFilter(defaults.lures)
-    }
+    defaults.baseLureIds.forEach(lure => {
+      quests[`l${lure}`] = new GenericFilter(defaults.lures)
+    })
   }
   if (perms.quests) {
     Object.keys(Event.masterfile.items).forEach(item => {
       quests[`q${item}`] = new GenericFilter(defaults.items)
     })
-    for (let i = 200; i <= 2000; i += 100) {
-      quests[`d${i}`] = new GenericFilter(defaults.items)
+    for (let i = defaults.stardust.min; i <= defaults.stardust.max; i += defaults.stardust.interval) {
+      quests[`d${i}`] = new GenericFilter(defaults.stardust.enabled)
     }
     Object.keys(Event.masterfile.questRewardTypes).forEach(type => {
       if (type !== '0') {
-        quests[`u${type}`] = new GenericFilter()
+        quests[`u${type}`] = new GenericFilter(defaults.rewardTypes)
       }
     })
   }
   if (perms.invasions) {
     Object.keys(Event.invasions).forEach(type => {
-      if (type != 0) {
+      if (type !== '0') {
         quests[`i${type}`] = new GenericFilter(defaults.allInvasions)
       }
     })
   }
+  available.pokestops.forEach(avail => {
+    if (perms.lures && avail.startsWith('l')) {
+      quests[avail] = new GenericFilter(defaults.lures)
+    }
+    if (perms.quests) {
+      if (avail.startsWith('q')) {
+        quests[avail] = new GenericFilter(defaults.items)
+      }
+      if (avail.startsWith('d')) {
+        quests[avail] = new GenericFilter(defaults.stardust.enabled)
+      }
+      if (avail.startsWith('u')) {
+        quests[avail] = new GenericFilter(defaults.rewardTypes)
+      }
+    }
+    if (perms.invasions && avail.startsWith('i')) {
+      quests[avail] = new GenericFilter(defaults.allInvasions)
+    }
+  })
   return quests
 }

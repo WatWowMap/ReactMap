@@ -22,18 +22,26 @@ module.exports = class EventManager {
   }
 
   setTimers(config, Db, Pvp) {
-    setInterval(async () => {
-      this.available.gyms = await Db.getAvailable('Gym')
-    }, 1000 * 60 * 60 * (config.api.queryUpdateHours.raids || 1))
-    setInterval(async () => {
-      this.available.nests = await Db.getAvailable('Nest')
-    }, 1000 * 60 * 60 * (config.api.queryUpdateHours.nests || 6))
-    setInterval(async () => {
-      this.available.pokemon = await Db.getAvailable('Pokemon')
-    }, 1000 * 60 * 60 * (config.api.queryUpdateHours.pokemon || 1))
-    setInterval(async () => {
-      this.available.pokestops = await Db.getAvailable('Pokestop')
-    }, 1000 * 60 * 60 * (config.api.queryUpdateHours.quests || 3))
+    if (!config.api.queryOnSessionInit.raids) {
+      setInterval(async () => {
+        this.available.gyms = await Db.getAvailable('Gym')
+      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.raids || 1))
+    }
+    if (!config.api.queryOnSessionInit.nests) {
+      setInterval(async () => {
+        this.available.nests = await Db.getAvailable('Nest')
+      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.nests || 6))
+    }
+    if (!config.api.queryOnSessionInit.pokemon) {
+      setInterval(async () => {
+        this.available.pokemon = await Db.getAvailable('Pokemon')
+      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.pokemon || 1))
+    }
+    if (!config.api.queryOnSessionInit.quests) {
+      setInterval(async () => {
+        this.available.pokestops = await Db.getAvailable('Pokestop')
+      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.quests || 3))
+    }
     setInterval(async () => {
       await this.getUicons(config.icons.styles)
     }, 1000 * 60 * 60 * (config.icons.cacheHrs || 3))
