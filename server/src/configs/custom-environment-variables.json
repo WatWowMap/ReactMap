@@ -163,6 +163,10 @@
     "hideOldPokestops": {
       "__name": "API_HIDE_OLD_POKESTOPS",
       "__format": "boolean"
+    },
+    "fetchTimeoutMs": {
+      "__name": "API_FETCH_TIMEOUT_MS",
+      "__format": "number"
     }
   },
   "multiDomains": {
@@ -621,6 +625,18 @@
       "gymBadges": {
         "__name": "DEFAULT_FILTERS_GYMS_GYM_BADGES",
         "__format": "boolean"
+      },
+      "baseRaidTiers": {
+        "__name": "DEFAULT_FILTERS_GYMS_BASE_RAID_TIERS",
+        "__format": "json"
+      },
+      "baseTeamIds": {
+        "__name": "DEFAULT_FILTERS_GYMS_BASE_TEAM_IDS",
+        "__format": "json"
+      },
+      "baseGymSlotAmounts": {
+        "__name": "DEFAULT_FILTERS_GYMS_BASE_GYM_SLOT_AMOUNTS",
+        "__format": "json"
       }
     },
     "nests": {
@@ -686,6 +702,36 @@
       "allInvasions": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_ALL_INVASIONS",
         "__format": "boolean"
+      },
+      "rewardTypes": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_REWARD_TYPES",
+        "__format": "boolean"
+      },
+      "baseMegaEnergyAmounts": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_BASE_MEGA_ENERGY_AMOUNTS",
+        "__format": "json"
+      },
+      "baseLureIds": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_BASE_LURE_IDS",
+        "__format": "json"
+      },
+      "stardust": {
+        "min": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_STARDUST_MIN",
+          "__format": "number"
+        },
+        "max": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_STARDUST_MAX",
+          "__format": "number"
+        },
+        "interval": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_STARDUST_INTERVAL",
+          "__format": "number"
+        },
+        "enabled": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_STARDUST_ENABLED",
+          "__format": "boolean"
+        }
       }
     },
     "pokemon": {
@@ -781,14 +827,6 @@
       },
       "maxConnections": {
         "__name": "DATABASE_SETTINGS_MAX_CONNECTIONS",
-        "__format": "number"
-      },
-      "startupDelayMs": {
-        "__name": "DATABASE_SETTINGS_STARTUP_DELAY_MS",
-        "__format": "number"
-      },
-      "availableRetryCount": {
-        "__name": "DATABASE_SETTINGS_AVAILABLE_RETRY_COUNT",
         "__format": "number"
       }
     },

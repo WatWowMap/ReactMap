@@ -6,6 +6,7 @@ const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },
+  defaultFilters: { gyms: { baseTeamIds, baseGymSlotAmounts } },
 } = require('../services/config')
 const Badge = require('./Badge')
 
@@ -92,7 +93,7 @@ module.exports = class Gym extends Model {
         case 't': teams.push(gym.slice(1).split('-')[0]); break
         case 'g': slots.push({
           team: gym.slice(1).split('-')[0],
-          slots: 6 - gym.slice(1).split('-')[1],
+          slots: baseGymSlotAmounts.length - gym.slice(1).split('-')[1],
         }); break
         default: {
           const [id, form] = gym.split('-')
@@ -103,11 +104,7 @@ module.exports = class Gym extends Model {
     })
 
     const finalTeams = []
-    const finalSlots = {
-      1: [],
-      2: [],
-      3: [],
-    }
+    const finalSlots = Object.fromEntries(baseTeamIds.map(team => [team, []]))
 
     teams.forEach(team => {
       let slotCount = 0
@@ -117,7 +114,7 @@ module.exports = class Gym extends Model {
           finalSlots[team].push(+slot.slots)
         }
       })
-      if (slotCount === 6 || team == 0) {
+      if (slotCount === baseGymSlotAmounts.length || team == 0) {
         delete finalSlots[team]
         finalTeams.push(+team)
       }
@@ -270,15 +267,35 @@ module.exports = class Gym extends Model {
         isMad ? 'level' : 'raid_level',
       ])
       .orderBy(isMad ? 'pokemon_id' : 'raid_pokemon_id', 'asc')
-    if (results.length === 0) {
-      return fetchRaids()
+    const teamResults = await this.query()
+      .select([
+        'team_id AS team',
+        isMad ? 'slots_available AS slots' : 'availble_slots AS slots',
+      ])
+      .groupBy([
+        'team_id',
+        isMad ? 'slots_available' : 'availble_slots',
+      ])
+      .then((r) => {
+        const unique = new Set()
+        r.forEach(result => {
+          if (result.slots) {
+            unique.add(`g${result.team}-${result.slots}`)
+          } else {
+            unique.add(`t${result.team}-0`)
+          }
+        })
+        return [...unique]
+      })
+    if (!results.length) {
+      return [...teamResults, ...await fetchRaids()]
     }
-    return results.flatMap(result => {
+    return [...teamResults, ...results.flatMap(result => {
       if (result.raid_pokemon_id) {
         return `${result.raid_pokemon_id}-${result.raid_pokemon_form}`
       }
       return [`e${result.raid_level}`, `r${result.raid_level}`]
-    })
+    })]
   }
 
   static async search(perms, args, { isMad }, distance) {

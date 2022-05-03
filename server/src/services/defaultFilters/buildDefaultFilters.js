@@ -48,7 +48,7 @@ module.exports = function buildDefault(perms, available) {
       invasions: perms.invasions ? defaultFilters.pokestops.invasions : undefined,
       arEligible: perms.pokestops ? false : undefined,
       filter: {
-        ...buildPokestops(perms, defaultFilters.pokestops),
+        ...buildPokestops(perms, defaultFilters.pokestops, available),
         ...pokemon.quests,
       },
     } : undefined,
