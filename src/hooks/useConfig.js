@@ -1,16 +1,14 @@
 import extend from 'extend'
-import { useParams } from 'react-router-dom'
 import * as Sentry from '@sentry/react'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
 
-export default function useConfig(serverSettings) {
+export default function useConfig(serverSettings, params) {
   Utility.analytics('User', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
 
   document.title = serverSettings.config?.map?.headerTitle
 
-  const params = useParams()
   const setUserSettings = useStore(state => state.setUserSettings)
   const setSettings = useStore(state => state.setSettings)
   const setFilters = useStore(state => state.setFilters)
