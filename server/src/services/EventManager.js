@@ -126,37 +126,38 @@ module.exports = class EventManager {
   async getMasterfile() {
     console.log('[EVENT] Fetching Latest Masterfile')
     try {
-      this.masterfile = await generate()
-        .then((masterfile) => {
-          if (!masterfile) return this.masterfile
-          Object.entries(this.available).forEach(([category, entries]) => {
-            entries.forEach(item => {
-              if (!Number.isNaN(parseInt(item.charAt(0)))) {
-                const [id, form] = item.split('-')
-                if (!masterfile.pokemon[id]) {
-                  masterfile.pokemon[id] = {
-                    pokedexId: +id,
-                    types: [],
-                    quickMoves: [],
-                    chargeMoves: [],
-                  }
-                  console.log(`[MF] Added ${id} to Pokemon`)
-                }
-                if (!masterfile.pokemon[id].forms) {
-                  masterfile.pokemon[id].forms = {}
-                }
-                if (!masterfile.pokemon[id].forms[form]) {
-                  masterfile.pokemon[id].forms[form] = { name: '*', category }
-                  console.log(`[MF] Added ${masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`)
-                }
-              }
-            })
-          })
-          return masterfile
-        })
+      const newMf = await generate()
+      this.masterfile = newMf ?? this.masterfile
+      this.addAvailable()
     } catch (e) {
       console.warn('[WARN] Failed to generate latest masterfile:\n', e.message)
     }
+  }
+
+  addAvailable() {
+    Object.entries(this.available).forEach(([category, entries]) => {
+      entries.forEach(item => {
+        if (!Number.isNaN(parseInt(item.charAt(0)))) {
+          const [id, form] = item.split('-')
+          if (!this.masterfile.pokemon[id]) {
+            this.masterfile.pokemon[id] = {
+              pokedexId: +id,
+              types: [],
+              quickMoves: [],
+              chargeMoves: [],
+            }
+            console.log(`[MF] Added ${id} to Pokemon`)
+          }
+          if (!this.masterfile.pokemon[id].forms) {
+            this.masterfile.pokemon[id].forms = {}
+          }
+          if (!this.masterfile.pokemon[id].forms[form]) {
+            this.masterfile.pokemon[id].forms[form] = { name: '*', category }
+            console.log(`[MF] Added ${this.masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`)
+          }
+        }
+      })
+    })
   }
 
   async getWebhooks(config) {
