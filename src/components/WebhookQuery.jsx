@@ -2,9 +2,9 @@ import React from 'react'
 import { useQuery } from '@apollo/client'
 
 import Query from '@services/Query'
-import ConfigSettings from './Container'
+import Container from './Container'
 
-export default function WebhookQuery({ params, serverSettings }) {
+export default function WebhookQuery({ params, serverSettings, location, zoom }) {
   let lowercase = params.category.toLowerCase()
   if (lowercase === 'invasions'
     || lowercase === 'lures'
@@ -22,11 +22,11 @@ export default function WebhookQuery({ params, serverSettings }) {
     },
   })
   return data ? (
-    <ConfigSettings
-      paramLocation={data[`${lowercase}Single`]
+    <Container
+      location={data[`${lowercase}Single`]
         ? [data[`${lowercase}Single`].lat, data[`${lowercase}Single`].lon]
-        : null}
-      paramZoom={params.zoom}
+        : location}
+      zoom={params.zoom || zoom}
       params={params}
       serverSettings={serverSettings}
     />

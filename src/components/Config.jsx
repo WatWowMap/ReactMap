@@ -21,12 +21,6 @@ export default function Config() {
       rootLoading.style.display = 'none'
     }
   }
-
-  if (rootLoading) {
-    if (serverSettings) {
-      rootLoading.style.display = 'none'
-    }
-  }
   const getServerSettings = useCallback(async () => {
     const data = await Fetch.getSettings()
     if (data.masterfile?.questRewardTypes) {

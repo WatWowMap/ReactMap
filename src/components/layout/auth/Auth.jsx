@@ -34,6 +34,8 @@ export default function Auth({ serverSettings, getServerSettings, location, zoom
       <WebhookQuery
         params={params}
         serverSettings={serverSettings}
+        location={location}
+        zoom={zoom}
       />
     )
   }
