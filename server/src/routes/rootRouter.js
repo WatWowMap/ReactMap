@@ -62,8 +62,6 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 
 rootRouter.get('/settings', async (req, res) => {
   try {
-    if (!Event.uicons.length) throw new Error('Icons Have Not Been Fetched Yet')
-
     if (config.authentication.alwaysEnabledPerms.length || !config.authMethods.length) {
       if (req.session.tutorial === undefined) {
         req.session.tutorial = !config.map.forceTutorial
@@ -195,6 +193,10 @@ rootRouter.get('/settings', async (req, res) => {
         serverSettings.available.nests = config.api.queryOnSessionInit.nests
           ? await Db.getAvailable('Nest')
           : Event.available.nests
+      }
+      if (Object.values(config.api.queryOnSessionInit).some(v => v)) {
+        Event.addAvailable()
+        serverSettings.masterfile = { ...Event.masterfile, invasions: Event.invasions }
       }
 
       serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms, serverSettings.available)

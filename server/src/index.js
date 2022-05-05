@@ -171,6 +171,7 @@ Db.determineType()
       Event.setAvailable('nests', 'Nest', Db),
     ])
       .then(() => {
+        Event.addAvailable()
         app.listen(config.port, config.interface, () => {
           console.log(`[INIT] Server is now listening at http://${config.interface}:${config.port}`)
         })

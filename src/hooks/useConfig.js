@@ -1,16 +1,14 @@
 import extend from 'extend'
-import { useParams } from 'react-router-dom'
 import * as Sentry from '@sentry/react'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
 
-export default function useConfig(serverSettings, paramLocation) {
+export default function useConfig(serverSettings, params) {
   Utility.analytics('User', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
 
   document.title = serverSettings.config?.map?.headerTitle
 
-  const params = useParams()
   const setUserSettings = useStore(state => state.setUserSettings)
   const setSettings = useStore(state => state.setSettings)
   const setFilters = useStore(state => state.setFilters)
@@ -127,24 +125,15 @@ export default function useConfig(serverSettings, paramLocation) {
     setSelectedWebhook(Object.keys(serverSettings.webhooks)[0])
   }
 
-  setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
+  const location = params.lat && params.lon
+    ? [params.lat, params.lon]
+    : updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
 
-  const getStartLocation = () => {
-    if (paramLocation && paramLocation[0] !== null) {
-      return paramLocation
-    }
-    if (params.lat) {
-      return [params.lat, params.lon]
-    }
-    return updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
-  }
-
-  const startLocation = getStartLocation()
-  const zoom = updatePositionState(serverSettings.config.map.startZoom, 'zoom')
+  const zoom = params.zoom || updatePositionState(serverSettings.config.map.startZoom, 'zoom')
 
   setZoom(zoom)
+  setLocation(location)
+  setIsNight(Utility.nightCheck(...location))
 
-  setIsNight(Utility.nightCheck(...startLocation))
-
-  return { location: startLocation, zoom }
+  return { location, zoom }
 }
