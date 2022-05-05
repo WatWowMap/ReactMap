@@ -1,12 +1,15 @@
 import React from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 
+import useConfig from '@hooks/useConfig'
+
 import Container from '../../Container'
 import Login from './Login'
 import WebhookQuery from '../../WebhookQuery'
 
-export default function Auth({ serverSettings, getServerSettings, location, zoom }) {
+export default function Auth({ serverSettings, getServerSettings }) {
   const params = useParams()
+  const { location, zoom } = useConfig(serverSettings, params)
 
   if (serverSettings.error) {
     return (
@@ -34,6 +37,8 @@ export default function Auth({ serverSettings, getServerSettings, location, zoom
       <WebhookQuery
         params={params}
         serverSettings={serverSettings}
+        location={location}
+        zoom={zoom}
       />
     )
   }
