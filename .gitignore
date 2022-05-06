@@ -20,7 +20,7 @@ server/src/data/masterfile.json
 
 # Favicon
 public/favicon/*
-!public/favicon/favicon.ico
+!public/favicon/fallback.ico
 
 # Strategies
 server/src/strategies/*
