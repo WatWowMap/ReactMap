@@ -23,17 +23,19 @@ export default function Config() {
   }
   const getServerSettings = useCallback(async () => {
     const data = await Fetch.getSettings()
-    if (data.masterfile?.questRewardTypes) {
-      localStorage.setItem('questRewardTypes', JSON.stringify(data.masterfile.questRewardTypes))
-    }
-    const Icons = new UIcons(data.config.icons, data.masterfile ? data.masterfile.questRewardTypes : JSON.parse(localStorage.getItem('questRewardTypes')))
-    if (Icons) {
-      Icons.build(data.config.icons.styles)
-      if (data.config.icons.defaultIcons) {
-        Icons.setSelection(data.config.icons.defaultIcons)
+    if (data?.config && data?.masterfile) {
+      if (data.masterfile?.questRewardTypes) {
+        localStorage.setItem('questRewardTypes', JSON.stringify(data.masterfile.questRewardTypes))
       }
+      const Icons = new UIcons(data.config.icons, data.masterfile ? data.masterfile.questRewardTypes : JSON.parse(localStorage.getItem('questRewardTypes')))
+      if (Icons) {
+        Icons.build(data.config.icons.styles)
+        if (data.config.icons.defaultIcons) {
+          Icons.setSelection(data.config.icons.defaultIcons)
+        }
+      }
+      setServerSettings({ ...data, Icons })
     }
-    setServerSettings({ ...data, Icons })
   }, [])
 
   useEffect(() => {

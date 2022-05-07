@@ -80,7 +80,7 @@ const Tracked = ({
     )), [tracked, webhookData[selectedWebhook].human.current_profile_no])
 
   const searchFiltered = profileFiltered.filter(x => x.description.toLowerCase().includes(search)
-    || (x.pokemon_id && x.pokemon_id.toString().includes(search)))
+    || (x.pokemon_id && x.pokemon_id?.toString()?.includes(search)))
 
   const handleAll = () => {
     const newObj = {}
