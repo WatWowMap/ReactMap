@@ -44,9 +44,11 @@ const plugins = [
       {
         entryPoints: ['src/index.jsx'],
         filename: 'index.html',
-        htmlTemplate: fs.readFileSync('./public/index.html'),
+        htmlTemplate: fs.readFileSync(path.resolve(__dirname, './public/index.html')),
         scriptLoading: 'defer',
-        favicon: './public/favicon/favicon.ico',
+        favicon: fs.existsSync(path.resolve(__dirname, './public/favicon/favicon.ico'))
+          ? path.resolve(__dirname, './public/favicon/favicon.ico')
+          : path.resolve(__dirname, './public/favicon/fallback.ico'),
         extraScripts: isServing ? [
           { src: '/esbuild-livereload.js', attrs: { async: true } },
         ] : undefined,
@@ -55,8 +57,8 @@ const plugins = [
   }),
   esbuildMxnCopy({
     copy: [
-      { from: 'public/images', to: 'dist/' },
-      { from: 'public/locales', to: 'dist/' },
+      { from: path.resolve(__dirname, './public/images'), to: 'dist/' },
+      { from: path.resolve(__dirname, './public/locales'), to: 'dist/' },
     ],
   }),
   aliasPlugin({

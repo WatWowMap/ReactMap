@@ -10,7 +10,7 @@ export default function AdvSearch({ search, setSearch, category }) {
   const classes = useStyles()
 
   const handleSearchChange = event => {
-    setSearch(event.target.value.toString().toLowerCase())
+    setSearch(event.target.value?.toString()?.toLowerCase() || '')
   }
 
   const resetSearch = () => {

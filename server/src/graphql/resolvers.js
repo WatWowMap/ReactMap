@@ -44,7 +44,7 @@ module.exports = {
       }
       return []
     },
-    geocoder: (_, args, { perms, version }) => {
+    geocoder: (_, args, { perms, version, Event }) => {
       if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -180,7 +180,7 @@ module.exports = {
       }
       return [{ features: [] }]
     },
-    search: async (_, args, { perms, version, Db }) => {
+    search: async (_, args, { Event, perms, version, Db }) => {
       if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
