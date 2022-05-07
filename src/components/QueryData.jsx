@@ -8,7 +8,6 @@ import Clustering from './Clustering'
 import Notification from './layout/general/Notification'
 import ActiveWeather from './layout/general/ActiveWeather'
 
-const withAvailableList = ['pokestops', 'gyms', 'nests']
 const filterSkipList = ['filter', 'enabled', 'legacy']
 
 const getPolling = category => {
@@ -27,7 +26,7 @@ const getPolling = category => {
 
 export default function QueryData({
   bounds, onMove, map, tileStyle, clusteringRules, config, params, isMobile,
-  category, available, filters, staticFilters, staticUserSettings, sizeKey,
+  category, filters, staticFilters, staticUserSettings, sizeKey,
   userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
   setError, active,
 }) {
@@ -53,14 +52,7 @@ export default function QueryData({
       const [id, specifics] = filter
 
       if (specifics && specifics.enabled && staticFilters[id]) {
-        if (withAvailableList.includes(category)
-          && !Number.isNaN(parseInt(id.charAt(0)))) {
-          if (available?.includes(id)) {
-            trimmed[id] = specifics
-          }
-        } else {
-          trimmed[id] = specifics
-        }
+        trimmed[id] = specifics
       } else if (userSettings.legacyFilter) {
         trimmed.onlyLegacyExclude.push(id)
       }
@@ -156,6 +148,7 @@ export default function QueryData({
           weather={renderedData[category]}
           isMobile={isMobile}
           zoom={config.activeWeatherZoom}
+          clickable={userSettings.clickableIcon}
           map={map}
         />
       )}

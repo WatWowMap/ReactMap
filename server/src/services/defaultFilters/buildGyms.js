@@ -1,28 +1,36 @@
 const { GenericFilter } = require('../../models/index')
-const { Event } = require('../initialization')
 
-module.exports = function buildGyms(perms, defaults) {
+module.exports = function buildGyms(perms, defaults, available) {
   const gymFilters = {}
 
   if (perms.gyms) {
-    for (let i = 0; i <= 3; i += 1) {
-      gymFilters[`t${i}-0`] = new GenericFilter(defaults.allGyms)
+    defaults.baseTeamIds.forEach((team, i) => {
+      gymFilters[`t${team}-0`] = new GenericFilter(defaults.allGyms)
       if (i) {
-        for (let j = 1; j <= 6; j += 1) {
-          gymFilters[`g${i}-${j}`] = new GenericFilter(defaults.allGyms)
-        }
+        defaults.baseGymSlotAmounts.forEach(slot => {
+          gymFilters[`g${team}-${slot}`] = new GenericFilter(defaults.allGyms)
+        })
       }
-    }
+    })
   }
   if (perms.raids) {
-    Event.available.gyms.forEach(avail => {
+    defaults.baseRaidTiers.forEach(tier => {
+      gymFilters[`e${tier}`] = new GenericFilter(defaults.eggs)
+      gymFilters[`r${tier}`] = new GenericFilter(defaults.raids)
+    })
+  }
+  available.gyms.forEach(avail => {
+    if (perms.gyms && (avail.startsWith('t') || avail.startsWith('g'))) {
+      gymFilters[avail] = new GenericFilter(defaults.allGyms)
+    }
+    if (perms.raids) {
       if (avail.startsWith('e')) {
         gymFilters[avail] = new GenericFilter(defaults.eggs)
       }
       if (avail.startsWith('r')) {
         gymFilters[avail] = new GenericFilter(defaults.raids)
       }
-    })
-  }
+    }
+  })
   return gymFilters
 }

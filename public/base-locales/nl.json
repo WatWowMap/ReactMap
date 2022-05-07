@@ -532,5 +532,6 @@
   "refresh": "Vernieuw",
   "points": "Punten",
   "day": "Dag",
-  "days": "Dagen"
+  "days": "Dagen",
+  "react_error": "Er ging iets mis"
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {
   Button, Typography, DialogContent,
 } from '@material-ui/core'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
@@ -16,7 +16,7 @@ export default function ResetFilters() {
   const setResetFilters = useStatic(state => state.setResetFilters)
 
   if (redirect) {
-    return <Redirect push to="/reset" />
+    return <Navigate push to="/reset" />
   }
   return (
     <>

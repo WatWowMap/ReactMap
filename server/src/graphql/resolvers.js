@@ -3,7 +3,6 @@ const GraphQLJSON = require('graphql-type-json')
 const { AuthenticationError, UserInputError } = require('apollo-server-core')
 
 const config = require('../services/config')
-const { Event } = require('../services/initialization')
 const { User, Badge } = require('../models/index')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
@@ -11,6 +10,21 @@ const Fetch = require('../services/Fetch')
 module.exports = {
   JSON: GraphQLJSON,
   Query: {
+    available: (_, args, { Event, perms, version }) => {
+      if (args.version && args.version !== version) throw new UserInputError('old_client')
+      if (!perms) throw new AuthenticationError('session_expired')
+      const available = {
+        pokemon: perms.pokemon ? Event.available.pokemon : [],
+        gyms: perms.gyms ? Event.available.gyms : [],
+        nests: perms.nests ? Event.available.nests : [],
+        pokestops: perms.pokestops ? Event.available.pokestops : [],
+      }
+      return {
+        ...available,
+        masterfile: { ...Event.masterfile, invasions: Event.invasions },
+        filters: Utility.buildDefaultFilters(perms, available),
+      }
+    },
     badges: async (_, args, { req, perms, Db, version }) => {
       if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
@@ -30,7 +44,7 @@ module.exports = {
       }
       return []
     },
-    geocoder: (_, args, { perms, version }) => {
+    geocoder: (_, args, { perms, version, Event }) => {
       if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -166,7 +180,7 @@ module.exports = {
       }
       return [{ features: [] }]
     },
-    search: async (_, args, { perms, version, Db }) => {
+    search: async (_, args, { Event, perms, version, Db }) => {
       if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 

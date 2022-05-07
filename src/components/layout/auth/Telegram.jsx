@@ -8,7 +8,7 @@ export default function Telegram({ botName, authUrl }) {
 
     const script = document.createElement('script')
     script.src = 'https://telegram.org/js/telegram-widget.js?4'
-    script.setAttribute('data-telegram-login', inject?.[botName])
+    script.setAttribute('data-telegram-login', botName)
     script.setAttribute('data-auth-url', authUrl)
     script.setAttribute('data-lang', (localStorage?.getItem('i18nextLng') || 'en'))
     script.setAttribute('data-userpic', 'false')

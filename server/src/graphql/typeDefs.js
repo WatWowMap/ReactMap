@@ -11,6 +11,7 @@ module.exports = gql`
   scalar JSON
 
   type Query {
+    available(version: String): Available
     badges(version: String): [Badge]
     devices(version: String): [Device]
     geocoder(search: String, name: String, version: String): [Geocoder]

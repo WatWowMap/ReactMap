@@ -1,18 +1,10 @@
-import React from 'react'
-import { MapContainer } from 'react-leaflet'
 import extend from 'extend'
 import * as Sentry from '@sentry/react'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
 
-import useGenerate from '@hooks/useGenerate'
-
-import Map from './Map'
-
-export default function ConfigSettings({
-  serverSettings, match, paramLocation, paramZoom,
-}) {
+export default function useConfig(serverSettings, params) {
   Utility.analytics('User', serverSettings.user ? `${serverSettings.user.username} (${serverSettings.user.id})` : 'Not Logged In', 'Permissions', true)
 
   document.title = serverSettings.config?.map?.headerTitle
@@ -38,7 +30,6 @@ export default function ConfigSettings({
   const setUi = useStatic(state => state.setUi)
   const setStaticFilters = useStatic(state => state.setFilters)
   const setWebhookData = useStatic(state => state.setWebhookData)
-  const setMenuFilters = useStatic(state => state.setMenuFilters)
   const setIsNight = useStatic(state => state.setIsNight)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
@@ -125,7 +116,6 @@ export default function ConfigSettings({
   }
   setIcons(serverSettings.Icons.selection)
   setStaticIcons(serverSettings.Icons)
-  setMenuFilters(useGenerate())
   setConfig(serverSettings.config)
   setWebhookData(serverSettings.webhooks)
 
@@ -135,45 +125,15 @@ export default function ConfigSettings({
     setSelectedWebhook(Object.keys(serverSettings.webhooks)[0])
   }
 
-  setLocation(updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location'))
+  const location = params.lat && params.lon
+    ? [params.lat, params.lon]
+    : updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
 
-  const getStartLocation = () => {
-    if (paramLocation && paramLocation[0] !== null) {
-      return paramLocation
-    }
-    if (match.params.lat) {
-      return [match.params.lat, match.params.lon]
-    }
-    return updatePositionState([serverSettings.config.map.startLat, serverSettings.config.map.startLon], 'location')
-  }
+  const zoom = params.zoom || updatePositionState(serverSettings.config.map.startZoom, 'zoom')
 
-  setZoom(updatePositionState(serverSettings.config.map.startZoom, 'zoom'))
-  const getStartZoom = () => {
-    if (paramZoom) {
-      return paramZoom
-    }
-    if (match.params.zoom) {
-      return match.params.zoom || 15
-    }
-    return updatePositionState(serverSettings.config.map.startZoom, 'zoom')
-  }
+  setZoom(zoom)
+  setLocation(location)
+  setIsNight(Utility.nightCheck(...location))
 
-  setIsNight(Utility.nightCheck(...getStartLocation()))
-
-  return (
-    <MapContainer
-      tap={false}
-      center={getStartLocation()}
-      zoom={getStartZoom()}
-      zoomControl={false}
-      preferCanvas
-    >
-      {(serverSettings.user && serverSettings.user.perms.map) && (
-        <Map
-          serverSettings={serverSettings}
-          params={match.params}
-        />
-      )}
-    </MapContainer>
-  )
+  return { location, zoom }
 }

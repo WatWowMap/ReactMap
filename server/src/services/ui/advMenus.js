@@ -41,6 +41,10 @@ module.exports = function buildMenus() {
       categories: items,
       filters: {
         ...menuFilters,
+        others: {
+          ...menuFilters.others,
+          onlyAvailable: true,
+        },
         categories: Object.fromEntries(items.map(item => [item, false])),
       },
     }

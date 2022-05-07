@@ -137,7 +137,7 @@ export default function WebhookAdvanced({
       newObj.allMoves = false
     }
     if (name === 'template') {
-      newObj[name] = value.toString()
+      newObj[name] = value?.toString() || ''
     }
     setPoracleValues({ ...poracleValues, ...newObj })
   }

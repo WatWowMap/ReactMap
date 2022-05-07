@@ -9,7 +9,8 @@ export default function MenuTile({
 }) {
   const [name, setName] = useState(true)
   const {
-    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu, isMobile, type, toggleSlotsMenu, Utility,
+    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu,
+    isMobile, type, toggleSlotsMenu, Utility, standard,
   } = data
 
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -19,12 +20,12 @@ export default function MenuTile({
   }
 
   const handleFilterChange = () => {
+    const newFilter = tempFilters[item.id]
+      ? { ...tempFilters[item.id], enabled: !tempFilters[item.id].enabled }
+      : { ...standard, enabled: true }
     setTempFilters({
       ...tempFilters,
-      [item.id]: {
-        ...tempFilters[item.id],
-        enabled: !tempFilters[item.id].enabled,
-      },
+      [item.id]: newFilter,
     })
     Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id]?.enabled}`, type)
   }

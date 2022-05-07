@@ -10,6 +10,7 @@ const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 const { User } = require('../models/index')
 const { Event, Db } = require('../services/initialization')
+const { version } = require('../../../package.json')
 
 const rootRouter = new express.Router()
 
@@ -22,6 +23,16 @@ rootRouter.use('/api', apiRouter)
 rootRouter.get('/logout', (req, res) => {
   req.logout()
   res.redirect('/')
+})
+
+rootRouter.post('/clientError', (req) => {
+  if (req.headers.version === version && req.isAuthenticated()) {
+    const { body: { error }, user } = req
+    const userName = user?.username || user?.discordId || user?.telegramId || user?.id || 'Unknown'
+    if (error && config.devOptions.clientErrors) {
+      console.error('[CLIENT]', error, `- User: ${userName}`)
+    }
+  }
 })
 
 rootRouter.get('/area/:area/:zoom?', (req, res) => {
@@ -51,8 +62,6 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 
 rootRouter.get('/settings', async (req, res) => {
   try {
-    if (!Event.uicons.length) throw new Error('Icons Have Not Been Fetched Yet')
-
     if (config.authentication.alwaysEnabledPerms.length || !config.authMethods.length) {
       if (req.session.tutorial === undefined) {
         req.session.tutorial = !config.map.forceTutorial
@@ -97,6 +106,7 @@ rootRouter.get('/settings', async (req, res) => {
       user: await getUser(),
       settings: {},
       authMethods: config.authMethods,
+      masterfile: { ...Event.masterfile, invasions: Event.invasions },
       config: {
         map: {
           ...config.map,
@@ -133,7 +143,7 @@ rootRouter.get('/settings', async (req, res) => {
         },
         gymValidDataLimit: Date.now() / 1000 - (config.api.gymValidDataLimit * 86400),
       },
-      available: {},
+      available: { pokemon: [], pokestops: [], gyms: [], nests: [] },
     }
 
     // add user options here from the config that are structured as objects
@@ -161,8 +171,6 @@ rootRouter.get('/settings', async (req, res) => {
         }
       })
 
-      serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms)
-
       if (serverSettings.user.perms.pokemon) {
         serverSettings.available.pokemon = config.api.queryOnSessionInit.pokemon
           ? await Db.getAvailable('Pokemon')
@@ -186,6 +194,12 @@ rootRouter.get('/settings', async (req, res) => {
           ? await Db.getAvailable('Nest')
           : Event.available.nests
       }
+      if (Object.values(config.api.queryOnSessionInit).some(v => v)) {
+        Event.addAvailable()
+        serverSettings.masterfile = { ...Event.masterfile, invasions: Event.invasions }
+      }
+
+      serverSettings.defaultFilters = Utility.buildDefaultFilters(serverSettings.user.perms, serverSettings.available)
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile
       // Primary for quest rewards that are form unset, despite normally have a set form
@@ -198,8 +212,6 @@ rootRouter.get('/settings', async (req, res) => {
 
       serverSettings.userSettings = clientValues
       serverSettings.clientMenus = clientMenus
-
-      serverSettings.masterfile = { ...Event.masterfile, invasions: Event.invasions }
 
       if (config.webhooks.length && serverSettings.user?.perms?.webhooks?.length) {
         serverSettings.webhooks = {}

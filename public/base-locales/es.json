@@ -529,5 +529,6 @@
   "refresh": "Actualizar",
   "points": "Puntos",
   "day": "Día",
-  "days": "Dias"
+  "days": "Dias",
+  "react_error": "Algo salió mal"
 }

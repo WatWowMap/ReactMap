@@ -10,11 +10,11 @@ const { GenericFilter, PokemonFilter } = require('../../models/index')
 const base = new PokemonFilter(defaultFilters.pokemon.allPokemon)
 const custom = new PokemonFilter(defaultFilters.pokemon.allPokemon, 'md', ...Object.values(defaultFilters.pokemon.globalValues))
 
-module.exports = function buildDefault(perms) {
+module.exports = function buildDefault(perms, available) {
   const stopReducer = perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
   const pokemonReducer = perms.iv || perms.pvp
-  const pokemon = buildPokemon(defaultFilters, base, custom)
+  const pokemon = buildPokemon(defaultFilters, base, custom, available)
 
   return {
     gyms: gymReducer ? {
@@ -28,7 +28,7 @@ module.exports = function buildDefault(perms) {
       badge: perms.gymBadges ? 'all' : undefined,
       raidTier: perms.raids ? 'all' : undefined,
       filter: {
-        ...buildGyms(perms, defaultFilters.gyms),
+        ...buildGyms(perms, defaultFilters.gyms, available),
         ...pokemon.raids,
       },
     } : undefined,
@@ -48,7 +48,7 @@ module.exports = function buildDefault(perms) {
       invasions: perms.invasions ? defaultFilters.pokestops.invasions : undefined,
       arEligible: perms.pokestops ? false : undefined,
       filter: {
-        ...buildPokestops(perms, defaultFilters.pokestops),
+        ...buildPokestops(perms, defaultFilters.pokestops, available),
         ...pokemon.quests,
       },
     } : undefined,

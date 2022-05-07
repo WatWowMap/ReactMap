@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import genPokemon from '@services/filtering/genPokemon'
@@ -9,17 +9,16 @@ import { useStatic } from '@hooks/useStore'
 
 export default function useGenerate() {
   const { t } = useTranslation()
-  const { pokemon } = useStatic(useCallback(s => s.masterfile, []))
-  const { gyms, pokestops } = useStatic(useCallback(s => s.filters, []))
-  const staticMenus = useStatic(useCallback(s => s.menus, []))
+  const { pokemon } = useStatic(s => s.masterfile)
+  const { gyms, pokestops } = useStatic(s => s.filters)
+  const staticMenus = useStatic(s => s.menus)
+  const setMenuFilters = useStatic(s => s.setMenuFilters)
 
-  const pokeFilters = useMemo(() => genPokemon(t, pokemon, staticMenus.pokemon.categories), [localStorage.getItem('i18nextLng')])
-  const gymFilters = useMemo(() => genGyms(t, gyms, staticMenus.gyms.categories), [localStorage.getItem('i18nextLng')])
-  const stopFilters = useMemo(() => genPokestops(t, pokemon, pokestops, staticMenus.pokestops.categories), [localStorage.getItem('i18nextLng')])
+  useEffect(() => {
+    const pokeFilters = genPokemon(t, pokemon, staticMenus.pokemon.categories)
+    const gymFilters = genGyms(t, gyms, staticMenus.gyms.categories)
+    const stopFilters = genPokestops(t, pokemon, pokestops, staticMenus.pokestops.categories)
 
-  return {
-    ...gymFilters,
-    ...stopFilters,
-    ...pokeFilters,
-  }
+    setMenuFilters({ ...gymFilters, ...stopFilters, ...pokeFilters })
+  }, [localStorage.getItem('i18nextLng'), pokemon])
 }

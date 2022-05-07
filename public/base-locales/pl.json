@@ -537,5 +537,6 @@
   "refresh": "Odśwież",
   "points": "Punkty",
   "day": "Dzień",
-  "days": "Dni"
+  "days": "Dni",
+  "react_error": "Coś poszło nie tak"
 }

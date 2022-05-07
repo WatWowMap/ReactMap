@@ -44,6 +44,9 @@ module.exports = function clientOptions(perms) {
       oldPortals: { type: 'color', perm: ['portals'] },
       newPortals: { type: 'color', perm: ['portals'] },
     },
+    weather: {
+      clickableIcon: { type: 'bool', perm: ['weather'] },
+    },
   }
 
   levels.forEach(level => {

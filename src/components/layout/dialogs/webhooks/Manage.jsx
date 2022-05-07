@@ -35,6 +35,7 @@ export default function Manage({
   selectedAreas, setSelectedAreas,
   webhookLocation, setWebhookLocation,
   webhookData, setWebhookData,
+  handleWebhookClose,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
@@ -69,9 +70,9 @@ export default function Manage({
       action: () => setAddNew(true),
       icon: tabValue ? 'Add' : 'People',
       key: 'addNew',
-      disabled: !webhookData[selectedWebhook].human,
+      disabled: !webhookData[selectedWebhook]?.human,
     },
-    { name: 'close', action: () => setWebhookMode(false), icon: 'Close', color: 'primary' },
+    { name: 'close', action: handleWebhookClose, icon: 'Close', color: 'primary' },
   ]
 
   if (map.feedbackLink) {
@@ -129,7 +130,7 @@ export default function Manage({
 
   return (
     <>
-      <Header names={[selectedWebhook]} action={() => setWebhookMode(false)} titles={['manage_webhook']} />
+      <Header names={[selectedWebhook]} action={handleWebhookClose} titles={['manage_webhook']} />
       <AppBar position="static">
         <Tabs
           value={tabValue}

@@ -86,7 +86,7 @@ export default function Menu({
       setAdvancedFilter({
         open,
         id,
-        tempFilters: tempFilters[id],
+        tempFilters: tempFilters[id] ?? filters.standard,
         standard: filters.standard,
       })
     } else if (id === 'global') {
@@ -233,6 +233,7 @@ export default function Menu({
                     Utility,
                     toggleWebhook,
                     webhookCategory,
+                    standard: filters.standard,
                   }}
                   Tile={Tile}
                 />
@@ -283,6 +284,7 @@ export default function Menu({
       </Dialog>
       <Dialog
         open={helpDialog}
+        onClose={() => setHelpDialog(false)}
       >
         <Help
           toggleHelp={() => setHelpDialog(!helpDialog)}
@@ -294,6 +296,7 @@ export default function Menu({
         open={webhook.open}
         fullWidth={!isMobile}
         fullScreen={isMobile}
+        onClose={toggleWebhook(false)}
       >
         <WebhookAdvanced
           id={webhook.id}

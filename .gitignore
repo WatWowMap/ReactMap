@@ -6,7 +6,9 @@ server/src/configs/*
 !server/src/configs/default.json
 !server/src/configs/areas.example.json
 !server/src/configs/local.example.json
+!server/src/configs/custom-environment-variables.json
 .env
+
 
 # Masterfile
 server/src/data/masterfile.json
@@ -18,7 +20,7 @@ server/src/data/masterfile.json
 
 # Favicon
 public/favicon/*
-!public/favicon/favicon.ico
+!public/favicon/fallback.ico
 
 # Strategies
 server/src/strategies/*
