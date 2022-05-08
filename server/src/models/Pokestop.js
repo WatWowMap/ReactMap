@@ -303,7 +303,7 @@ module.exports = class Pokestop extends Model {
   }
 
   // filters and removes unwanted data
-  static secondaryFilter(queryResults, filters, isMad, safeTs, midnight, perms, global = false) {
+  static secondaryFilter(queryResults, filters, isMad, safeTs, midnight, perms) {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
@@ -315,7 +315,9 @@ module.exports = class Pokestop extends Model {
         this.fieldAssigner(filtered, pokestop, ['ar_scan_eligible', 'power_up_points', 'power_up_level', 'power_up_end_timestamp'])
       }
       if (perms.invasions && (filters.onlyAllPokestops || filters.onlyInvasions)) {
-        filtered.invasions = pokestop.invasions.filter(invasion => filters[`i${invasion.grunt_type}`])
+        filtered.invasions = filters.onlyAllPokestops
+          ? pokestop.invasions
+          : pokestop.invasions.filter(invasion => filters[`i${invasion.grunt_type}`])
       }
       if (perms.lures
         && (filters.onlyAllPokestops
@@ -370,7 +372,7 @@ module.exports = class Pokestop extends Model {
         })
       }
       if ((pokestop.ar_scan_eligible && filters.onlyArEligible)
-        || global
+        || filters.onlyAllPokestops
         || filtered.quests?.length
         || filtered.invasions?.length
         || filtered.lure_id) {
