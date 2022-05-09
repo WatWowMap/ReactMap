@@ -542,6 +542,5 @@
   "lightMapBorder": "Light Map Border",
   "darkMapBorder": "Dark Map Border",
   "cellBlocked": "Cell Blocked",
-  "cellUnblocked": "Cell Free",
   "poiColor": "POI Color"
 }

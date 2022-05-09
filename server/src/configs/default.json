@@ -267,7 +267,6 @@
       "lightMapBorder": "#000000",
       "darkMapBorder": "#ff0000",
       "cellBlocked": "#000000",
-      "cellFree": "#00FF00",
       "poiColor": "#03ffff"
     },
     "weather": {

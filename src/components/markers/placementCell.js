@@ -1,6 +1,6 @@
 export default function placementStyle(cellBlocked, tileStyle, userSettings) {
   return {
-    fillColor: cellBlocked ? userSettings.cellBlocked : userSettings.cellFree,
+    fillColor: userSettings.cellBlocked,
     color: tileStyle === 'dark' ? userSettings.darkMapBorder : userSettings.lightMapBorder,
     opacity: 0.75,
     fillOpacity: cellBlocked ? 0.25 : 0,

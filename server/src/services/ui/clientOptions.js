@@ -49,7 +49,6 @@ module.exports = function clientOptions(perms) {
       lightMapBorder: { type: 'color', perm: ['submissionCells'] },
       darkMapBorder: { type: 'color', perm: ['submissionCells'] },
       cellBlocked: { type: 'color', perm: ['submissionCells'] },
-      cellFree: { type: 'color', perm: ['submissionCells'] },
       poiColor: { type: 'color', perm: ['submissionCells'] },
     },
     weather: {
