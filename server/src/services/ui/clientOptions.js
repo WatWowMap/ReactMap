@@ -43,9 +43,19 @@ module.exports = function clientOptions(perms) {
       clustering: { type: 'bool', perm: ['portals'] },
       oldPortals: { type: 'color', perm: ['portals'] },
       newPortals: { type: 'color', perm: ['portals'] },
+      oneStopTillNext: { type: 'color', perm: ['submissionCells'] },
+      twoStopsTillNext: { type: 'color', perm: ['submissionCells'] },
+      noMoreGyms: { type: 'color', perm: ['submissionCells'] },
+      lightMapBorder: { type: 'color', perm: ['submissionCells'] },
+      darkMapBorder: { type: 'color', perm: ['submissionCells'] },
+      cellBlocked: { type: 'color', perm: ['submissionCells'] },
+      cellFree: { type: 'color', perm: ['submissionCells'] },
+      poiColor: { type: 'color', perm: ['submissionCells'] },
     },
     weather: {
       clickableIcon: { type: 'bool', perm: ['weather'] },
+      lightMapBorder: { type: 'color', perm: ['weather'] },
+      darkMapBorder: { type: 'color', perm: ['weather'] },
     },
   }
 

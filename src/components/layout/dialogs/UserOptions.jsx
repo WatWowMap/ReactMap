@@ -101,7 +101,7 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
         action={toggleDialog(false, category, 'options')}
       />
       <DialogContent style={{ padding: 0 }}>
-        {category === 'pokemon' && (
+        {tabPages.length > 1 && (
           <AppBar position="static">
             <Tabs
               value={tab}

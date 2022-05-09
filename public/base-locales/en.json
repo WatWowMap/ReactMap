@@ -535,5 +535,13 @@
   "day": "Day",
   "days": "Days",
   "react_error": "Something Went Wrong",
-  "clickable_icon": "Icon is Clickable"
+  "clickable_icon": "Icon is Clickable",
+  "twoStopsTillNext": "2 stops until next",
+  "oneStopTillNext": "1 stop until next",
+  "noMoreGyms": "No more gyms",
+  "lightMapBorder": "Light Map Border",
+  "darkMapBorder": "Dark Map Border",
+  "cellBlocked": "Cell Blocked",
+  "cellUnblocked": "Cell Free",
+  "poiColor": "POI Color"
 }
