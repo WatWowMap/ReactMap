@@ -3,6 +3,7 @@ on: [push, pull_request]
 
 jobs:
   Lint:
+    needs: sync
     runs-on: ubuntu-latest
     strategy:
       matrix:

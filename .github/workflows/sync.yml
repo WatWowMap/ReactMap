@@ -2,7 +2,7 @@ name: Sync Env Vars
 on: [push, pull_request]
 
 jobs:
-  change-and-push:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
