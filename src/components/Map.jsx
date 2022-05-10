@@ -179,7 +179,7 @@ export default function Map({ serverSettings:
             Utility.analytics('Data', `${category} being fetched`, category, true)
             return (
               <QueryData
-                key={`${category}-${Object.values(userSettings[category] || {}).join('')}-${Object.values(icons).join('')}`}
+                key={`${category}-${Object.values(userSettings[userSettingsCategory(category)] || {}).join('')}-${Object.values(icons).join('')}`}
                 sizeKey={filters[category].filter ? Object.values(filters[category].filter).map(x => x ? x.size : 'md').join(',') : 'md'}
                 bounds={Utility.getQueryArgs(map)}
                 setExcludeList={setExcludeList}

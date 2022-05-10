@@ -102,7 +102,6 @@ export default function PokestopPopup({
                     t={t}
                   />
                   <QuestConditions
-                    pokestop={pokestop}
                     quest={quest}
                     t={t}
                     userSettings={userSettings}
@@ -339,7 +338,7 @@ const RewardInfo = ({
   )
 }
 
-const QuestConditions = ({ pokestop, quest, t, userSettings }) => {
+const QuestConditions = ({ quest, t, userSettings }) => {
   const { i18n } = useTranslation()
   const {
     quest_task,
@@ -419,11 +418,6 @@ const QuestConditions = ({ pokestop, quest, t, userSettings }) => {
       case 27: return (
         <Trans i18nKey={key}>
           {{ categories: qInfo.character_category_ids.map(id => t(`character_category_${id}`)) }}
-        </Trans>
-      )
-      case 42: return (
-        <Trans i18nKey={key}>
-          {{ poi: pokestop.name }}
         </Trans>
       )
       case 44: return (

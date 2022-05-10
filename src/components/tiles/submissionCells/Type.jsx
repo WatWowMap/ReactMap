@@ -4,10 +4,10 @@ import { Polygon, Popup, Tooltip } from 'react-leaflet'
 import PopupContent from '../../popups/SubmissionCell'
 import typeStyle from '../../markers/typeCell'
 
-const TypeTile = ({ cell, tileStyle }) => (
+const TypeTile = ({ cell, tileStyle, userSettings }) => (
   <Polygon
     positions={cell.polygon}
-    pathOptions={typeStyle(cell, tileStyle)}
+    pathOptions={typeStyle(cell, tileStyle, userSettings)}
   >
     <Popup
       position={[cell.lat, cell.lon]}
@@ -28,6 +28,7 @@ const areEqual = (prev, next) => (
   prev.cell.id === next.cell.id
   && prev.cell.count === next.cell.count
   && prev.zoom === next.zoom
+  && prev.tileStyle === next.tileStyle
 )
 
 export default memo(TypeTile, areEqual)
