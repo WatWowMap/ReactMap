@@ -24,7 +24,7 @@ const Timer = ({ timestamp }) => {
 export default function TooltipWrapper({ timers, offset }) {
   return (
     <Tooltip direction="bottom" permanent offset={offset}>
-      {timers.map((timer, i) => (
+      {[...new Set(timers)].map((timer, i) => (
         // eslint-disable-next-line react/no-array-index-key
         <Timer key={timer + i * 123} timestamp={timer} multi={timers.length > 1} />
       ))}

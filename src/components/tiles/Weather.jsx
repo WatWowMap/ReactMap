@@ -4,7 +4,7 @@ import { Popup, Polyline, Marker } from 'react-leaflet'
 import weatherMarker from '../markers/weather'
 import PopupContent from '../popups/Weather'
 
-const WeatherTile = ({ item, ts, Icons, isNight, tileStyle }) => {
+const WeatherTile = ({ item, ts, Icons, isNight, tileStyle, userSettings }) => {
   const [popup, setPopup] = useState(false)
   const markerRef = useRef(null)
 
@@ -18,10 +18,10 @@ const WeatherTile = ({ item, ts, Icons, isNight, tileStyle }) => {
     <Polyline
       key={item.id}
       positions={item.polygon}
-      pathOptions={{ color: tileStyle === 'light' ? '#246377' : 'red', opacity: 0.25 }}
+      pathOptions={{ color: tileStyle === 'dark' ? userSettings.darkMapBorder : userSettings.lightMapBorder, opacity: 0.25 }}
     >
       <Marker
-        icon={weatherMarker(item, Icons, isNight)}
+        icon={weatherMarker(item, Icons, isNight, userSettings)}
         position={[item.latitude, item.longitude]}
         zIndexOffset={10000}
         ref={markerRef}
@@ -41,6 +41,7 @@ const WeatherTile = ({ item, ts, Icons, isNight, tileStyle }) => {
 const areEqual = (prev, next) => (
   prev.item.gameplay_condition === next.item.gameplay_condition
   && prev.item.updated === next.item.updated
+  && prev.tileStyle === next.tileStyle
 )
 
 export default memo(WeatherTile, areEqual)
