@@ -536,11 +536,11 @@
   "days": "Days",
   "react_error": "Something Went Wrong",
   "clickable_icon": "Icon is Clickable",
-  "twoStopsTillNext": "2 stops until next",
-  "oneStopTillNext": "1 stop until next",
-  "noMoreGyms": "No more gyms",
-  "lightMapBorder": "Light Map Border",
-  "darkMapBorder": "Dark Map Border",
-  "cellBlocked": "Cell Blocked",
-  "poiColor": "POI Color"
+  "two_stops_till_next": "2 stops until next",
+  "one_stop_till_next": "1 stop until next",
+  "no_more_gyms": "No more gyms",
+  "light_map_border": "Light Map Border",
+  "dark_map_border": "Dark Map Border",
+  "cell_blocked": "Cell Blocked",
+  "poi_color": "POI Color"
 }
