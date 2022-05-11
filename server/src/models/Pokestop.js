@@ -150,126 +150,131 @@ module.exports = class Pokestop extends Model {
         }
         if (onlyQuests && questPerms) {
           stops.orWhere(quest => {
-            quest.where('quest_timestamp', '>=', midnight)
-              .andWhere(questTypes => {
-                questTypes.orWhereIn('quest_item_id', items)
-                  .orWhereIn('quest_pokemon_id', pokemon)
+            quest.where(timestamps => {
+              timestamps.where('quest_timestamp', '>=', midnight)
+              if (hasAltQuests) {
+                timestamps.orWhere('alternative_quest_timestamp', '>=', midnight)
+              }
+            })
+            quest.andWhere(questTypes => {
+              questTypes.orWhereIn('quest_item_id', items)
+                .orWhereIn('quest_pokemon_id', pokemon)
+              if (hasAltQuests) {
+                questTypes.orWhereIn('alternative_quest_item_id', items)
+                  .orWhereIn('alternative_quest_pokemon_id', pokemon)
+              }
+              if (hasRewardAmount) {
+                questTypes.orWhereIn(isMad ? 'quest_stardust' : 'quest_reward_amount', stardust)
                 if (hasAltQuests) {
-                  questTypes.orWhereIn('alternative_quest_item_id', items)
-                    .orWhereIn('alternative_quest_pokemon_id', pokemon)
+                  questTypes.orWhereIn('alternative_quest_reward_amount', stardust)
                 }
-                if (hasRewardAmount) {
-                  questTypes.orWhereIn(isMad ? 'quest_stardust' : 'quest_reward_amount', stardust)
-                  if (hasAltQuests) {
-                    questTypes.orWhereIn('alternative_quest_reward_amount', stardust)
-                  }
-                } else {
-                  stardust.forEach(amount => {
-                    questTypes.orWhere(dust => {
-                      dust.where('quest_reward_type', 3)
-                        .andWhere(raw(`json_extract(quest_rewards, "$[0].info.amount") = ${amount}`))
-                    })
-                    if (hasAltQuests) {
-                      questTypes.orWhere(altDust => {
-                        altDust.where('alternative_quest_reward_type', 3)
-                          .andWhere(raw(`json_extract(alternative_quest_rewards, "$[0].info.amount") = ${amount}`))
-                      })
-                    }
+              } else {
+                stardust.forEach(amount => {
+                  questTypes.orWhere(dust => {
+                    dust.where('quest_reward_type', 3)
+                      .andWhere(raw(`json_extract(quest_rewards, "$[0].info.amount") = ${amount}`))
                   })
-                }
-                energy.forEach(megaEnergy => {
-                  const [pokeId, amount] = megaEnergy.split('-')
-                  if (hasRewardAmount) {
-                    questTypes.orWhere(mega => {
-                      mega.where('quest_reward_type', 12)
-                        .andWhere(isMad ? 'quest_item_amount' : 'quest_reward_amount', amount)
-                        .andWhere('quest_pokemon_id', pokeId)
+                  if (hasAltQuests) {
+                    questTypes.orWhere(altDust => {
+                      altDust.where('alternative_quest_reward_type', 3)
+                        .andWhere(raw(`json_extract(alternative_quest_rewards, "$[0].info.amount") = ${amount}`))
                     })
-                    if (hasAltQuests) {
-                      questTypes.orWhere(altMega => {
-                        altMega.where('alternative_quest_reward_type', 12)
-                          .andWhere('alternative_quest_reward_amount', amount)
-                          .andWhere('alternative_quest_pokemon_id', pokeId)
-                      })
-                    }
-                  } else {
-                    questTypes.orWhere(mega => {
-                      mega.where('quest_reward_type', 12)
-                      if (hasRewardAmount) {
-                        mega.andWhere('quest_reward_amount', amount)
-                          .andWhere('quest_pokemon_id', pokeId)
-                      } else {
-                        mega.andWhere(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.pokemon_id") = ${pokeId}`))
-                          .andWhere(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.amount") = ${amount}`))
-                      }
-                    })
-                    if (hasAltQuests) {
-                      questTypes.orWhere(altMega => {
-                        altMega.where('alternative_quest_reward_type', 12)
-                        if (hasRewardAmount) {
-                          altMega.andWhere('alternative_quest_reward_amount', amount)
-                            .andWhere('alternative_quest_pokemon_id', pokeId)
-                        } else {
-                          altMega.andWhere(raw(`json_extract(alternative_quest_rewards, "$[0].info.pokemon_id") = ${pokeId}`))
-                            .andWhere(raw(`json_extract(alternative_quest_rewards, "$[0].info.amount") = ${amount}`))
-                        }
-                      })
-                    }
                   }
                 })
+              }
+              energy.forEach(megaEnergy => {
+                const [pokeId, amount] = megaEnergy.split('-')
                 if (hasRewardAmount) {
-                  questTypes.orWhere('quest_reward_type', 4)
-                    .whereIn('quest_pokemon_id', candy)
+                  questTypes.orWhere(mega => {
+                    mega.where('quest_reward_type', 12)
+                      .andWhere(isMad ? 'quest_item_amount' : 'quest_reward_amount', amount)
+                      .andWhere('quest_pokemon_id', pokeId)
+                  })
                   if (hasAltQuests) {
-                    questTypes.orWhere('alternative_quest_reward_type', 4)
-                      .whereIn('alternative_quest_pokemon_id', candy)
+                    questTypes.orWhere(altMega => {
+                      altMega.where('alternative_quest_reward_type', 12)
+                        .andWhere('alternative_quest_reward_amount', amount)
+                        .andWhere('alternative_quest_pokemon_id', pokeId)
+                    })
                   }
                 } else {
-                  candy.forEach(poke => {
-                    questTypes.orWhere(candies => {
-                      candies.where('quest_reward_type', 4)
-                        .where(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'candy' : 'info'}.pokemon_id") = ${poke}`))
-                    })
-                    if (hasAltQuests) {
-                      questTypes.orWhere(altCandies => {
-                        altCandies.where('alternative_quest_reward_type', 4)
-                          .where(raw(`json_extract(alternative_quest_rewards, "$[0].info.pokemon_id") = ${poke}`))
-                      })
+                  questTypes.orWhere(mega => {
+                    mega.where('quest_reward_type', 12)
+                    if (hasRewardAmount) {
+                      mega.andWhere('quest_reward_amount', amount)
+                        .andWhere('quest_pokemon_id', pokeId)
+                    } else {
+                      mega.andWhere(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.pokemon_id") = ${pokeId}`))
+                        .andWhere(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.amount") = ${amount}`))
                     }
                   })
-                }
-                if (hasRewardAmount) {
-                  questTypes.orWhere('quest_reward_type', 9)
-                    .whereIn('quest_pokemon_id', xlCandy)
                   if (hasAltQuests) {
-                    questTypes.orWhere('alternative_quest_reward_type', 9)
-                      .whereIn('alternative_quest_pokemon_id', xlCandy)
-                  }
-                } else {
-                  xlCandy.forEach(poke => {
-                    questTypes.orWhere(xlCandies => {
-                      xlCandies.where('quest_reward_type', 9)
-                        .where(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'xl_candy' : 'info'}.pokemon_id") = ${poke}`))
-                    })
-                    if (hasAltQuests) {
-                      questTypes.orWhere(altXlCandies => {
-                        altXlCandies.where('alternative_quest_reward_type', 9)
-                          .where(raw(`json_extract(alternative_quest_rewards, "$[0].info.pokemon_id") = ${poke}`))
-                      })
-                    }
-                  })
-                }
-                if (general.length && map.enableQuestRewardTypeFilters) {
-                  questTypes.orWhere(rewardType => {
-                    rewardType.whereIn('quest_reward_type', general)
-                  })
-                  if (hasAltQuests) {
-                    questTypes.orWhere(altRewardType => {
-                      altRewardType.whereIn('alternative_quest_reward_type', general)
+                    questTypes.orWhere(altMega => {
+                      altMega.where('alternative_quest_reward_type', 12)
+                      if (hasRewardAmount) {
+                        altMega.andWhere('alternative_quest_reward_amount', amount)
+                          .andWhere('alternative_quest_pokemon_id', pokeId)
+                      } else {
+                        altMega.andWhere(raw(`json_extract(alternative_quest_rewards, "$[0].info.pokemon_id") = ${pokeId}`))
+                          .andWhere(raw(`json_extract(alternative_quest_rewards, "$[0].info.amount") = ${amount}`))
+                      }
                     })
                   }
                 }
               })
+              if (hasRewardAmount) {
+                questTypes.orWhere('quest_reward_type', 4)
+                  .whereIn('quest_pokemon_id', candy)
+                if (hasAltQuests) {
+                  questTypes.orWhere('alternative_quest_reward_type', 4)
+                    .whereIn('alternative_quest_pokemon_id', candy)
+                }
+              } else {
+                candy.forEach(poke => {
+                  questTypes.orWhere(candies => {
+                    candies.where('quest_reward_type', 4)
+                      .where(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'candy' : 'info'}.pokemon_id") = ${poke}`))
+                  })
+                  if (hasAltQuests) {
+                    questTypes.orWhere(altCandies => {
+                      altCandies.where('alternative_quest_reward_type', 4)
+                        .where(raw(`json_extract(alternative_quest_rewards, "$[0].info.pokemon_id") = ${poke}`))
+                    })
+                  }
+                })
+              }
+              if (hasRewardAmount) {
+                questTypes.orWhere('quest_reward_type', 9)
+                  .whereIn('quest_pokemon_id', xlCandy)
+                if (hasAltQuests) {
+                  questTypes.orWhere('alternative_quest_reward_type', 9)
+                    .whereIn('alternative_quest_pokemon_id', xlCandy)
+                }
+              } else {
+                xlCandy.forEach(poke => {
+                  questTypes.orWhere(xlCandies => {
+                    xlCandies.where('quest_reward_type', 9)
+                      .where(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'xl_candy' : 'info'}.pokemon_id") = ${poke}`))
+                  })
+                  if (hasAltQuests) {
+                    questTypes.orWhere(altXlCandies => {
+                      altXlCandies.where('alternative_quest_reward_type', 9)
+                        .where(raw(`json_extract(alternative_quest_rewards, "$[0].info.pokemon_id") = ${poke}`))
+                    })
+                  }
+                })
+              }
+              if (general.length && map.enableQuestRewardTypeFilters) {
+                questTypes.orWhere(rewardType => {
+                  rewardType.whereIn('quest_reward_type', general)
+                })
+                if (hasAltQuests) {
+                  questTypes.orWhere(altRewardType => {
+                    altRewardType.whereIn('alternative_quest_reward_type', general)
+                  })
+                }
+              }
+            })
           })
         }
         if (onlyInvasions && invasionPerms) {
