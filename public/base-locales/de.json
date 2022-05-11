@@ -167,7 +167,8 @@
   "gyms_options": "Arena Optionen",
   "nests_options": "Nest Optionen",
   "wayfarer_options": "Wayfarer Optionen",
-  "admin_options": "Admin Option",
+  "admin_options": "Admin Optionen",
+  "weather_options": "Wetter Optionen",
   "clustering": "Clustering",
   "glow": "Leuchten",
   "legacy_filter": "Legacy Filter",
@@ -540,5 +541,13 @@
   "points": "Punkte",
   "day": "Tag",
   "days": "Tage",
-  "react_error": "Etwas ist schiefgelaufen"
+  "react_error": "Etwas ist schiefgelaufen",
+  "clickable_icon": "Icon ist anklickbar",
+  "two_stops_till_next": "2 Stops bis zur nächsten",
+  "one_stop_till_next": "1 Stop bis zur nächsten",
+  "no_more_gyms": "keine weitere Arena",
+  "light_map_border": "heller Kartenrand",
+  "dark_map_border": "dunkler Kartenrand",
+  "cell_blocked": "Zelle ist blockiert",
+  "poi_color": "POI Farbe"
 }
