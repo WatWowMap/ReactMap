@@ -133,7 +133,8 @@
       "noScanAreaOverlay": false,
       "permImageDir": "images/perms",
       "permArrayImages": false,
-      "clientTimeoutMinutes": 30
+      "clientTimeoutMinutes": 30,
+      "distanceUnit" : "km"
     },
     "theme": {
       "style": "dark",
