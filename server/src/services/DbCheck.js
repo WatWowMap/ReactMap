@@ -40,7 +40,7 @@ module.exports = class DbCheck {
   }
 
   static getDistance(args, isMad, distanceUnit) {
-    return raw(`ROUND(( ${(distanceUnit == 'mi') ? '3959' : '6371'} * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
+    return raw(`ROUND(( ${distanceUnit === 'mi' ? '3959' : '6371'} * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
   }
 
   async determineType() {
