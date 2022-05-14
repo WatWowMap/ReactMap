@@ -192,7 +192,7 @@ export default function Search({
               )}
             </Grid>
             <Grid item xs={2} style={{ textAlign: 'center' }}>
-              <Typography variant="caption">{option.distance}{t('km')}</Typography>
+              <Typography variant="caption">{option.distance} {map.distanceUnit === 'mi' ? t('mi') : t('km')}</Typography>
               <br />
               {safeSearch[searchTab] === 'quests' && (
                 <Typography variant="caption" className="ar-task" noWrap>
