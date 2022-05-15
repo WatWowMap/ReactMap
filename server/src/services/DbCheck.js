@@ -3,7 +3,7 @@ const knex = require('knex')
 const { raw } = require('objection')
 
 module.exports = class DbCheck {
-  constructor(validModels, dbSettings, queryDebug, apiSettings) {
+  constructor(validModels, dbSettings, queryDebug, apiSettings, distanceUnit) {
     this.validModels = validModels.flatMap(s => s.useFor)
     this.singleModels = ['User', 'Badge', 'Session']
     this.searchLimit = apiSettings.searchLimit
@@ -36,10 +36,11 @@ module.exports = class DbCheck {
           },
         })
       })
+    this.distanceUnit = distanceUnit
   }
 
-  static getDistance(args, isMad) {
-    return raw(`ROUND(( 6371 * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
+  static getDistance(args, isMad, distanceUnit) {
+    return raw(`ROUND(( ${distanceUnit === 'mi' ? '3959' : '6371'} * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
   }
 
   async determineType() {
@@ -136,7 +137,7 @@ module.exports = class DbCheck {
 
   async search(model, perms, args, method = 'search') {
     const data = await Promise.all(this.models[model].map(async (source) => (
-      source.SubModel[method](perms, args, source, DbCheck.getDistance(args, source.isMad))
+      source.SubModel[method](perms, args, source, DbCheck.getDistance(args, source.isMad, this.distanceUnit))
     )))
     const deDuped = DbCheck.deDupeResults(data).sort((a, b) => a.distance - b.distance)
     if (deDuped.length > this.searchLimit) {
