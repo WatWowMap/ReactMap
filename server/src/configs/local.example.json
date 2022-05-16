@@ -67,6 +67,7 @@
   "database": {
     "schemas": [
       {
+        "note": "Scanner Database",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "scanner_user",
@@ -83,14 +84,25 @@
         ]
       },
       {
+        "note": "React Map Database, where the migrations are ran through this app",
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "reactmap_user",
+        "password": "reactmap_paw",
+        "database": "reactmap_db",
+        "useFor": [
+          "session",
+          "user"
+        ]
+      },
+      {
+        "note": "Manual Database generally used for storing nests or portal tables, more info on the Wiki",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "manual_user",
         "password": "manual_pw",
         "database": "manual_db",
         "useFor": [
-          "session",
-          "user",
           "nest",
           "portal"
         ]
