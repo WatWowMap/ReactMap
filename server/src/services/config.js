@@ -145,7 +145,9 @@ if (hasLittle) {
 }
 
 if (!config.authentication.strategies.length || !config.authentication.strategies.find(strategy => strategy.enabled)) {
-  config.authentication.alwaysEnabledPerms = Object.keys(config.authentication.perms)
+  config.authentication.alwaysEnabledPerms = Object.keys(config.authentication.perms).filter(
+    perm => config.authentication.perms[perm].enabled,
+  )
 }
 
 // Map manual areas
