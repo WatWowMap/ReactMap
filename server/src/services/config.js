@@ -145,7 +145,9 @@ if (hasLittle) {
 }
 
 if (!config.authentication.strategies.length || !config.authentication.strategies.find(strategy => strategy.enabled)) {
-  config.authentication.alwaysEnabledPerms = Object.keys(config.authentication.perms)
+  const enabled = Object.keys(config.authentication.perms).filter(perm => config.authentication.perms[perm].enabled)
+  console.warn('[CONFIG] No authentication strategies enabled, adding the following perms to alwaysEnabledPerms array:\n', enabled)
+  config.authentication.alwaysEnabledPerms = enabled
 }
 
 // Map manual areas
