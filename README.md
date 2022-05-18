@@ -26,6 +26,8 @@ Pokemon GO Map frontend built with React.
 - Last Scanned Cells
 - Spawnpoints
 - Discord, Telegram, Local, and Custom Auth & Permission Based Viewing
+- Gym Badge tracking
+- Webhook alert management for [Poracle](https://github.com/KartulUdus/PoracleJS)
 - Extremely configurable and supports custom, git friendly, code injection
 
 ## Live Demo

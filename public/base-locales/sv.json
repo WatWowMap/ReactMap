@@ -501,5 +501,14 @@
   "days": "dagar",
   "scan_cells_subtitle": "Visar senaste gången en S2-cell skannades av en enhet",
   "locale_selection_nl": "nederländska",
-  "react_error": "Något gick fel"
+  "react_error": "Något gick fel",
+  "clickable_icon": "Ikonen är klickbar",
+  "weather_options": "Väderalternativ",
+  "two_stops_till_next": "2 stopp till nästa",
+  "one_stop_till_next": "1 stopp till nästa",
+  "no_more_gyms": "Inga fler gym",
+  "light_map_border": "Ljus kartgräns",
+  "dark_map_border": "Mörk kartgräns",
+  "cell_blocked": "Cell blockerad",
+  "poi_color": "POI-färg"
 }

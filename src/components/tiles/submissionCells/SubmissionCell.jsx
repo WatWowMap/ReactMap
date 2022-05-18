@@ -4,7 +4,7 @@ import PlacementTile from './Placement'
 import RingTile from './Ring'
 
 export default function SubmissionCellTile({
-  item, tileStyle, config, zoom,
+  item, tileStyle, config, zoom, userSettings,
 }) {
   const zoomLimit = zoom >= config.submissionZoom
   return zoom >= (config.submissionZoom - 1) && (
@@ -15,6 +15,7 @@ export default function SubmissionCellTile({
             key={ring.id}
             ring={ring}
             zoom={zoomLimit}
+            userSettings={userSettings}
           />
         ))}
       {(item?.placementCells?.cells && zoomLimit)
@@ -24,6 +25,7 @@ export default function SubmissionCellTile({
             cell={cell}
             tileStyle={tileStyle}
             zoom={zoomLimit}
+            userSettings={userSettings}
           />
         ))}
       {item?.typeCells && item.typeCells.map(cell => (
@@ -32,6 +34,7 @@ export default function SubmissionCellTile({
           cell={cell}
           tileStyle={tileStyle}
           zoom={zoom >= (config.submissionZoom - 1)}
+          userSettings={userSettings}
         />
       ))}
     </>

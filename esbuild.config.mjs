@@ -15,7 +15,7 @@ import aliasPlugin from 'esbuild-plugin-path-alias'
 import { eslintPlugin } from 'esbuild-plugin-eslinter'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const env = fs.existsSync(`${__dirname}/.env`) ? dotenv.config() : { parsed: {} }
+const env = fs.existsSync(`${__dirname}/.env`) ? dotenv.config() : { parsed: process.env }
 const { version } = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json')))
 const isDevelopment = Boolean(process.argv.includes('--dev'))
 const isRelease = Boolean(process.argv.includes('--release'))

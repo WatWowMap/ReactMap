@@ -6,7 +6,7 @@ const fs = require('fs')
 let isDocker = false
 
 try {
-  exec('git branch --show-current', async (err, stdout) => {
+  exec('git branch --show-current', (err, stdout) => {
     try {
       const gitRef = fs.readFileSync(path.resolve(`${__dirname}/../../../.gitref`), 'utf8')
 
@@ -20,12 +20,12 @@ try {
         ? gitRef.split('/')[2].trim()
         : stdout.trim()
 
-      exec('git rev-parse HEAD', async (err2, stdout2) => {
+      exec('git rev-parse HEAD', (err2, stdout2) => {
         try {
           const gitSha = fs.readFileSync(path.resolve(`${__dirname}/../../../.gitsha`), 'utf8')
 
           if (!gitSha && (err2 || typeof stdout2 !== 'string' || !stdout2.trim())) {
-            throw new Error('Unable to get current sha', err)
+            throw new Error('Unable to get current sha', err2)
           }
           const sha = typeof gitSha === 'string' && gitSha.trim()
             ? gitSha.trim()

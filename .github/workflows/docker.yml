@@ -6,10 +6,31 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  Docker:
+  Sync:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: "yarn"
+      - name: Generate latest env vars
+        run: |
+          yarn gen-env-config
+      - name: Commit and push changes
+        uses: devops-infra/action-commit-push@v0.9.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          commit_message: Synced docker env vars with latest config
+  Docker:
+    needs: Sync
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
 
     - name: Set .gitsha
       if: github.event_name == 'push'

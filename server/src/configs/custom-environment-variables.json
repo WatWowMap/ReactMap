@@ -318,7 +318,8 @@
       "clientTimeoutMinutes": {
         "__name": "MAP_MISC_CLIENT_TIMEOUT_MINUTES",
         "__format": "number"
-      }
+      },
+      "distanceUnit": "MAP_MISC_DISTANCE_UNIT"
     },
     "theme": {
       "style": "MAP_THEME_STYLE",
@@ -581,13 +582,22 @@
         "__format": "boolean"
       },
       "oldPortals": "CLIENT_SIDE_OPTIONS_WAYFARER_OLD_PORTALS",
-      "newPortals": "CLIENT_SIDE_OPTIONS_WAYFARER_NEW_PORTALS"
+      "newPortals": "CLIENT_SIDE_OPTIONS_WAYFARER_NEW_PORTALS",
+      "twoStopsTillNext": "CLIENT_SIDE_OPTIONS_WAYFARER_TWO_STOPS_TILL_NEXT",
+      "oneStopTillNext": "CLIENT_SIDE_OPTIONS_WAYFARER_ONE_STOP_TILL_NEXT",
+      "noMoreGyms": "CLIENT_SIDE_OPTIONS_WAYFARER_NO_MORE_GYMS",
+      "lightMapBorder": "CLIENT_SIDE_OPTIONS_WAYFARER_LIGHT_MAP_BORDER",
+      "darkMapBorder": "CLIENT_SIDE_OPTIONS_WAYFARER_DARK_MAP_BORDER",
+      "cellBlocked": "CLIENT_SIDE_OPTIONS_WAYFARER_CELL_BLOCKED",
+      "poiColor": "CLIENT_SIDE_OPTIONS_WAYFARER_POI_COLOR"
     },
     "weather": {
       "clickableIcon": {
         "__name": "CLIENT_SIDE_OPTIONS_WEATHER_CLICKABLE_ICON",
         "__format": "boolean"
-      }
+      },
+      "darkMapBorder": "CLIENT_SIDE_OPTIONS_WEATHER_DARK_MAP_BORDER",
+      "lightMapBorder": "CLIENT_SIDE_OPTIONS_WEATHER_LIGHT_MAP_BORDER"
     }
   },
   "defaultFilters": {

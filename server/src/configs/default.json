@@ -133,7 +133,8 @@
       "noScanAreaOverlay": false,
       "permImageDir": "images/perms",
       "permArrayImages": false,
-      "clientTimeoutMinutes": 30
+      "clientTimeoutMinutes": 30,
+      "distanceUnit" : "km"
     },
     "theme": {
       "style": "dark",
@@ -260,10 +261,19 @@
     "wayfarer": {
       "clustering": true,
       "oldPortals": "#0000ff",
-      "newPortals": "#16b819"
+      "newPortals": "#16b819",
+      "twoStopsTillNext": "#ffa500",
+      "oneStopTillNext": "#ff0000",
+      "noMoreGyms": "#000000",
+      "lightMapBorder": "#000000",
+      "darkMapBorder": "#ff0000",
+      "cellBlocked": "#000000",
+      "poiColor": "#03ffff"
     },
     "weather": {
-      "clickableIcon": false
+      "clickableIcon": false,
+      "darkMapBorder": "#ff0000",
+      "lightMapBorder": "#246377"
     }
   },
   "defaultFilters": {

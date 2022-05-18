@@ -537,5 +537,14 @@
   "points": "Points",
   "day": "Jour",
   "days": "Jours",
-  "react_error": "Un problème est survenu"
+  "react_error": "Un problème est survenu",
+  "clickable_icon": "L'icône est cliquable",
+  "weather_options": "Options météo",
+  "two_stops_till_next": "2 arrêts jusqu'à la prochaine",
+  "one_stop_till_next": "1 arrêt jusqu'au prochain",
+  "no_more_gyms": "Plus de gymnases",
+  "light_map_border": "Bordure de carte lumineuse",
+  "dark_map_border": "Bordure de carte sombre",
+  "cell_blocked": "Cellule bloquée",
+  "poi_color": "Couleur du point d'intérêt"
 }

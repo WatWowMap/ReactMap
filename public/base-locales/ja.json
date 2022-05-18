@@ -501,5 +501,14 @@
   "day": "日",
   "days": "日々",
   "scan_cells_subtitle": "S2セルがデバイスによって最後にスキャンされた時刻を示します",
-  "react_error": "何かがおかしい"
+  "react_error": "何かがおかしい",
+  "clickable_icon": "アイコンはクリック可能",
+  "weather_options": "天気オプション",
+  "two_stops_till_next": "次まで2ストップ",
+  "one_stop_till_next": "次まで1ストップ",
+  "no_more_gyms": "これ以上のジムはありません",
+  "light_map_border": "ライトマップボーダー",
+  "dark_map_border": "ダークマップボーダー",
+  "cell_blocked": "セルがブロックされました",
+  "poi_color": "POIカラー"
 }

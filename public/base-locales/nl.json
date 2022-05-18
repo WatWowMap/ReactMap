@@ -533,5 +533,14 @@
   "points": "Punten",
   "day": "Dag",
   "days": "Dagen",
-  "react_error": "Er ging iets mis"
+  "react_error": "Er ging iets mis",
+  "clickable_icon": "Icoon is klikbaar",
+  "weather_options": "Weer opties",
+  "two_stops_till_next": "2 haltes tot de volgende",
+  "one_stop_till_next": "1 halte tot de volgende",
+  "no_more_gyms": "Geen sportscholen meer",
+  "light_map_border": "Lichte kaartrand",
+  "dark_map_border": "Donkere kaartrand",
+  "cell_blocked": "Cel geblokkeerd",
+  "poi_color": "POI-kleur"
 }
