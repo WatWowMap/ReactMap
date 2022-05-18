@@ -501,5 +501,14 @@
   "days": "Dias",
   "scan_cells_subtitle": "Mostra a última vez que uma célula S2 foi verificada por um dispositivo",
   "locale_selection_nl": "Países Baixos",
-  "react_error": "Algo deu errado"
+  "react_error": "Algo deu errado",
+  "clickable_icon": "O ícone é clicável",
+  "weather_options": "Opções de clima",
+  "two_stops_till_next": "2 paradas até a próxima",
+  "one_stop_till_next": "1 parada até a próxima",
+  "no_more_gyms": "Não há mais ginásios",
+  "light_map_border": "Borda do mapa de luz",
+  "dark_map_border": "Borda do mapa escuro",
+  "cell_blocked": "Célula bloqueada",
+  "poi_color": "Cor do POI"
 }

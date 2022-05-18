@@ -530,5 +530,14 @@
   "points": "Puntos",
   "day": "Día",
   "days": "Dias",
-  "react_error": "Algo salió mal"
+  "react_error": "Algo salió mal",
+  "clickable_icon": "Se puede hacer clic en el icono",
+  "weather_options": "Opciones meteorológicas",
+  "two_stops_till_next": "2 paradas hasta la próxima",
+  "one_stop_till_next": "1 parada hasta la próxima",
+  "no_more_gyms": "No más gimnasios",
+  "light_map_border": "Borde de mapa claro",
+  "dark_map_border": "Borde oscuro del mapa",
+  "cell_blocked": "Celda bloqueada",
+  "poi_color": "Color de punto de interés"
 }
