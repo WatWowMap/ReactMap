@@ -6,7 +6,7 @@
 
 [![GitHub Release](https://img.shields.io/github/release/WatWowMap/ReactMap.svg)](https://github.com/WatWowMap/ReactMap/releases/)
 [![GitHub Contributors](https://img.shields.io/github/contributors/WatWowMap/ReactMap.svg)](https://github.com/WatWowMap/ReactMap/graphs/contributors/)
-[![Discord](https://img.shields.io/discord/552003258000998401.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/zZ9h9Xa)
+[![Discord](https://img.shields.io/discord/907337201044582452.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/EYYsKPVawn)
 
 ## Description
 
@@ -15,8 +15,9 @@ Pokemon GO Map frontend built with React.
 ## Features
 
 - Pokemon IVs, PVP Stats, Moves, Levels, CP and more
+- Built in PVP Engine for backends that don't store PVP stats in a database
 - Gym & Raid Filtering
-- Pokestops, Quests, Lures, & Invasions
+- Pokestops, Dual Quests (AR and non-AR), Lures, & Multiple Invasion Support
 - Devices
 - Weather
 - Portals
@@ -27,6 +28,7 @@ Pokemon GO Map frontend built with React.
 - Discord, Telegram, Local, and Custom Auth & Permission Based Viewing
 - Gym Badge tracking
 - Webhook alert management for [Poracle](https://github.com/KartulUdus/PoracleJS)
+- Extremely configurable and supports custom, git friendly, code injection
 
 ## Live Demo
 
@@ -43,12 +45,16 @@ Pokemon GO Map frontend built with React.
 ## Backends Supported
 
 - [Chuck](https://github.com/WatWowMap/Chuck)
-- [RealDeviceMap (RDM)](https://github.com/realdevicemap/realdevicemap)
 - [Map-A-Droid (MAD)](https://github.com/Map-A-Droid/MAD)
+- [RealDeviceMap (RDM)](https://github.com/realdevicemap/realdevicemap)
 
 ## Installation Instructions & More
 
 - Check out the [Wiki](https://github.com/WatWowMap/ReactMap/wiki)!
+
+## Support
+
+- Join the [Discord](https://discord.gg/EYYsKPVawn)!
 
 ## Credits
 
