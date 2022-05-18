@@ -501,5 +501,14 @@
   "days": "Дни",
   "scan_cells_subtitle": "Показывает, когда устройство последний раз сканировало ячейку S2.",
   "locale_selection_nl": "Нидерланды",
-  "react_error": "Что-то пошло не так"
+  "react_error": "Что-то пошло не так",
+  "clickable_icon": "Иконка кликабельна",
+  "weather_options": "Параметры погоды",
+  "two_stops_till_next": "2 остановки до следующей",
+  "one_stop_till_next": "1 остановка до следующей",
+  "no_more_gyms": "Нет больше тренажерных залов",
+  "light_map_border": "Граница световой карты",
+  "dark_map_border": "Темная граница карты",
+  "cell_blocked": "Сотовый заблокирован",
+  "poi_color": "Цвет POI"
 }

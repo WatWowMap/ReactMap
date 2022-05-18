@@ -501,5 +501,14 @@
   "days": "天",
   "scan_cells_subtitle": "顯示設備上次掃描 S2 單元的時間",
   "locale_selection_nl": "荷蘭",
-  "react_error": "出問題了"
+  "react_error": "出問題了",
+  "clickable_icon": "圖標可點擊",
+  "weather_options": "天氣選項",
+  "two_stops_till_next": "2 站直到下一站",
+  "one_stop_till_next": "1 站到下一個",
+  "no_more_gyms": "沒有健身房了",
+  "light_map_border": "光照貼圖邊框",
+  "dark_map_border": "深色地圖邊框",
+  "cell_blocked": "單元格阻塞",
+  "poi_color": "興趣點顏色"
 }
