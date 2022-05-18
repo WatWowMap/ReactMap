@@ -10,20 +10,6 @@ import ActiveWeather from './layout/general/ActiveWeather'
 
 const filterSkipList = ['filter', 'enabled', 'legacy']
 
-const getPolling = category => {
-  switch (category) {
-    case 'devices':
-    case 'gyms':
-    case 'scanCells':
-      return 10 * 1000
-    case 'pokemon':
-      return 20 * 1000
-    case 'pokestops': return 5 * 60 * 1000
-    case 'weather': return 30 * 1000
-    default: return 10 * 60 * 1000
-  }
-}
-
 export default function QueryData({
   bounds, onMove, map, tileStyle, clusteringRules, config, params, isMobile,
   category, filters, staticFilters, staticUserSettings, sizeKey,
@@ -83,14 +69,14 @@ export default function QueryData({
   const { data, previousData, refetch, error } = useQuery(
     Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),
     {
-      context: { timeout: getPolling(category) },
+      context: { timeout: (config.polling[category] || 10) * 1000 },
       variables: {
         ...bounds,
         filters: trimFilters(filters),
         version: inject.VERSION,
       },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
-      pollInterval: getPolling(category),
+      pollInterval: (config.polling[category] || 10) * 1000,
       skip: !active,
     },
   )

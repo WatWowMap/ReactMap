@@ -112,6 +112,7 @@ rootRouter.get('/settings', async (req, res) => {
           ...config.map,
           ...config.multiDomainsObj[req.headers.host],
           excludeList: config.authentication.excludeFromTutorial,
+          polling: config.api.polling,
         },
         localeSelection: Object.fromEntries(config.map.localeSelection.map(l => [l, { name: l }])),
         tileServers: Object.fromEntries(config.tileServers.map(s => [s.name, s])),
