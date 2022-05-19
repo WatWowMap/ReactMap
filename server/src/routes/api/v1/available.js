@@ -44,7 +44,7 @@ const getAll = async (compare) => {
   return Object.fromEntries(Object.keys(queryObj).map((key, i) => [key, available[i]]))
 }
 
-router.get('/:category', async (req, res) => {
+router.get(['/', '/:category'], async (req, res) => {
   const { model, category } = queryObj[resolveCategory(req.params.category)] || {}
   const { current, equal } = req.query
   try {
