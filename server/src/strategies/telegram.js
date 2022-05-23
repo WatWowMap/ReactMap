@@ -21,7 +21,7 @@ const authHandler = async (req, profile, done) => {
     },
   }
 
-  const groupInfo = []
+  const chatInfo = [user.id]
   await Promise.all(strategyConfig.groups.map(async (group) => {
     try {
       const response = await Fetch.json(`https://api.telegram.org/bot${strategyConfig.botToken}/getChatMember?chat_id=${group}&user_id=${user.id}`)
@@ -32,7 +32,7 @@ const authHandler = async (req, profile, done) => {
         throw new Error(`Telegram API error: ${response.status} ${response.statusText}`)
       }
       if (response.result.status !== 'left' && response.result.status !== 'kicked') {
-        groupInfo.push(group)
+        chatInfo.push(group)
       }
     } catch (e) {
       console.error(e.message, `Telegram Group: ${group}`, `User: ${user.id} (${user.username})`)
@@ -42,14 +42,14 @@ const authHandler = async (req, profile, done) => {
 
   Object.entries(perms).forEach(([perm, info]) => {
     if (info.enabled && (alwaysEnabledPerms.includes(perm)
-      || info.roles.some(role => groupInfo.includes(role)))) {
+      || info.roles.some(role => chatInfo.includes(role)))) {
       user.perms[perm] = true
     }
   })
 
-  user.perms.areaRestrictions = Utility.areaPerms(groupInfo, 'telegram')
-  user.perms.webhooks = Utility.webhookPerms(groupInfo, 'telegramGroups')
-  user.perms.scanner = Utility.scannerPerms(groupInfo, 'telegramGroups')
+  user.perms.areaRestrictions = Utility.areaPerms(chatInfo, 'telegram')
+  user.perms.webhooks = Utility.webhookPerms(chatInfo, 'telegramGroups')
+  user.perms.scanner = Utility.scannerPerms(chatInfo, 'telegramGroups')
 
   try {
     await User.query()
