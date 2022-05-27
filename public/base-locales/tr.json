@@ -1,3 +1,12 @@
 {
-  "react_error": "Bir şeyler yanlış gitti"
+  "react_error": "Bir şeyler yanlış gitti",
+  "clickable_icon": "Simge Tıklanabilir",
+  "weather_options": "Hava Durumu Seçenekleri",
+  "two_stops_till_next": "bir sonrakine kadar 2 durak",
+  "one_stop_till_next": "bir sonrakine kadar 1 durak",
+  "no_more_gyms": "Artık spor salonu yok",
+  "light_map_border": "Hafif Harita Sınırı",
+  "dark_map_border": "Karanlık Harita Kenarlığı",
+  "cell_blocked": "Hücre Engellendi",
+  "poi_color": "POI Rengi"
 }

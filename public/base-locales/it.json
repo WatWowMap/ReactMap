@@ -501,5 +501,14 @@
   "days": "Giorni",
   "scan_cells_subtitle": "Mostra l'ultima volta che una cella S2 è stata scansionata da un dispositivo",
   "locale_selection_ja": "日本語",
-  "react_error": "Qualcosa è andato storto"
+  "react_error": "Qualcosa è andato storto",
+  "clickable_icon": "L'icona è cliccabile",
+  "weather_options": "Opzioni meteo",
+  "two_stops_till_next": "2 fermate fino al prossimo",
+  "one_stop_till_next": "1 fermata fino al prossimo",
+  "no_more_gyms": "Niente più palestre",
+  "light_map_border": "Bordo mappa chiaro",
+  "dark_map_border": "Bordo mappa scuro",
+  "cell_blocked": "Cella bloccata",
+  "poi_color": "Colore PDI"
 }

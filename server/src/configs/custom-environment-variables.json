@@ -45,6 +45,48 @@
         "__format": "number"
       }
     },
+    "polling": {
+      "devices": {
+        "__name": "API_POLLING_DEVICES",
+        "__format": "number"
+      },
+      "gyms": {
+        "__name": "API_POLLING_GYMS",
+        "__format": "number"
+      },
+      "nests": {
+        "__name": "API_POLLING_NESTS",
+        "__format": "number"
+      },
+      "pokemon": {
+        "__name": "API_POLLING_POKEMON",
+        "__format": "number"
+      },
+      "pokestops": {
+        "__name": "API_POLLING_POKESTOPS",
+        "__format": "number"
+      },
+      "portals": {
+        "__name": "API_POLLING_PORTALS",
+        "__format": "number"
+      },
+      "scanAreas": {
+        "__name": "API_POLLING_SCAN_AREAS",
+        "__format": "number"
+      },
+      "scanCells": {
+        "__name": "API_POLLING_SCAN_CELLS",
+        "__format": "number"
+      },
+      "submissionCells": {
+        "__name": "API_POLLING_SUBMISSION_CELLS",
+        "__format": "number"
+      },
+      "weather": {
+        "__name": "API_POLLING_WEATHER",
+        "__format": "number"
+      }
+    },
     "queryUpdateHours": {
       "pokemon": {
         "__name": "API_QUERY_UPDATE_HOURS_POKEMON",

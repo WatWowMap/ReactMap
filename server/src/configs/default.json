@@ -18,6 +18,18 @@
       "time": 60,
       "requests": 1000
     },
+    "polling": {
+      "devices": 10,
+      "gyms": 10,
+      "nests": 300,
+      "pokemon": 20,
+      "pokestops": 300,
+      "portals": 300,
+      "scanAreas": 10000,
+      "scanCells": 10,
+      "submissionCells": 500,
+      "weather": 30
+    },
     "queryUpdateHours": {
       "pokemon": 0.5,
       "quests": 1,

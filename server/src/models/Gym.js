@@ -244,9 +244,11 @@ module.exports = class Gym extends Model {
           raidFields.forEach(field => newGym[field] = gym[field])
           newGym.hasRaid = true
         }
-        if (newGym.hasRaid || newGym.badge
-          || finalTeams.includes(gym.team_id)
-          || finalSlots[gym.team_id]?.includes(gym.available_slots)) {
+        if ((onlyAllGyms || onlyExEligible || onlyArEligible || onlyInBattle) && (finalTeams.includes(gym.team_id)
+          || finalSlots[gym.team_id]?.includes(gym.available_slots))) {
+          newGym.hasGym = true
+        }
+        if (newGym.hasRaid || newGym.badge || newGym.hasGym) {
           filteredResults.push(newGym)
         }
       })
