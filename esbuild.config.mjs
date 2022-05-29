@@ -124,7 +124,9 @@ const esbuild = {
   publicPath: '/',
   entryNames: isDevelopment ? undefined : '[name].[hash]',
   metafile: true,
-  minify: isRelease || !isDevelopment,
+  minify: env.parsed.NO_MINIFIED
+    ? false
+    : isRelease || !isDevelopment,
   logLevel: isDevelopment ? 'info' : 'error',
   target: ['safari11.1', 'chrome64', 'firefox66', 'edge88'],
   watch: isDevelopment
