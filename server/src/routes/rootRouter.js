@@ -69,7 +69,7 @@ rootRouter.get('/settings', async (req, res) => {
       req.session.perms = {
         areaRestrictions: Utility.areaPerms(['none']),
         webhooks: [],
-        scanner: [],
+        scanner: Object.keys(config.scanner).filter((key) => key !== 'backendConfig' && config.scanner[key].enabled && !config.scanner[key].discordRoles.length && !config.scanner[key].telegramGroups.length),
       }
       config.authentication.alwaysEnabledPerms.forEach(perm => {
         if (config.authentication.perms[perm]) {

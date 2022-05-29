@@ -25,7 +25,17 @@ services:
       - ./server/src/configs/local.json:/home/node/server/src/configs/local.json
       - ./server/src/configs/geofence.json/:/home/node/server/src/configs/geofence.json
       - ./example.env:/home/node/.env
-    security_opt: 
-      - no-new-privileges:true  #https://nodramadevops.com/2019/06/running-docker-application-containers-more-securely/
+    security_opt:
+      - no-new-privileges:true #https://nodramadevops.com/2019/06/running-docker-application-containers-more-securely/
     ports:
       - "9090:8080"
+  # nginx:
+  #   image: nginx
+  #   container_name: nginx
+  #   depends_on:
+  #     - reactmap
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./server/src/configs/nginx.conf:/etc/nginx/conf.d/default.conf
