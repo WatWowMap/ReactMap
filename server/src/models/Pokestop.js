@@ -357,6 +357,7 @@ module.exports = class Pokestop extends Model {
                 newQuest.key = `c${quest.candy_pokemon_id}`
                 fields.push('candy_pokemon_id', 'candy_amount'); break
               case 7:
+                quest.quest_form_id = quest.quest_form_id ?? 0
                 newQuest.key = `${quest.quest_pokemon_id}-${quest.quest_form_id}`
                 fields.push('quest_pokemon_id', 'quest_form_id', 'quest_costume_id', 'quest_gender_id', 'quest_shiny'); break
               case 9:
@@ -606,7 +607,7 @@ module.exports = class Pokestop extends Model {
         case 'stardust': rewards.forEach(reward => finalList.add(`d${reward.amount}`)); break
         case 'candy': rewards.forEach(reward => finalList.add(`c${reward.id}`)); break
         case 'xlCandy': rewards.forEach(reward => finalList.add(`x${reward.id}`)); break
-        default: rewards.forEach(reward => finalList.add(`${reward.quest_pokemon_id}-${reward.form}`)); break
+        default: rewards.forEach(reward => finalList.add(`${reward.quest_pokemon_id}-${reward.form ?? 0}`)); break
       }
     })
 
