@@ -117,7 +117,7 @@ export default function WithSubItems({
             >
               {['all', ...available.gyms.filter(x => x.startsWith('r')).map(y => +y.slice(1))].map((tier, i) => (
                 <MenuItem key={tier} dense value={tier}>
-                  {t(i ? `raid_${tier}_plural` : 'disabled')}
+                  {t(i ? `raid_${tier}_plural` : 'all')}
                 </MenuItem>
               ))}
             </Select>
