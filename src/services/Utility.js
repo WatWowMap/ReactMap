@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import ReactGA from 'react-ga'
+import ReactGA from 'react-ga4'
 import SunCalc from 'suncalc'
 
 import formatInterval from './functions/formatInterval'
