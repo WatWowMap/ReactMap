@@ -27,6 +27,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           commit_message: Synced docker env vars with latest config
   Docker:
+    if: ${{ always() }}
     needs: Sync
     runs-on: ubuntu-latest
     steps:

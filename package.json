@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "React based frontend map.",
   "main": "ReactMap.mjs",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -27,7 +27,7 @@
   },
   "engines": {
     "node": ">=16",
-    "yarn": "1.22.x"
+    "yarn": "^1.22.x"
   },
   "devDependencies": {
     "@craftamap/esbuild-plugin-html": "^0.4.0",
