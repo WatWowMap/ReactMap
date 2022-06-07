@@ -26,7 +26,7 @@
     "release": "node server/scripts/newRelease.js"
   },
   "engines": {
-    "node": "^16",
+    "node": ">=16",
     "yarn": "^1.22.x"
   },
   "devDependencies": {
