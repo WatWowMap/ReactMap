@@ -48,6 +48,10 @@ if (fs.existsSync(geofencesFile)) {
         const coord = inGeofence.path[j]
         inGeofence.path[j] = [coord[1], coord[0]]
       }
+      const lastCoords = inGeofence.path.slice(-1)
+      if (inGeofence.path[0][0] !== lastCoords[0][0] || inGeofence.path[0][1] !== lastCoords[0][1]) {
+        inGeofence.path.push(inGeofence.path[0])
+      }
       outGeofence.geometry.coordinates[0] = inGeofence.path
       outGeoJSON.features.push(outGeofence)
     }

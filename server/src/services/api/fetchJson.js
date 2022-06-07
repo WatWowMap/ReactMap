@@ -21,7 +21,7 @@ module.exports = async function fetchJson(url, options = undefined, log = false)
       console.log('Request to', url, 'timed out and was aborted')
     } else if (log) {
       console.warn(e)
-    } else {
+    } else if (e instanceof Error) {
       console.warn(e.message, '\n', e.code, `\nUnable to fetch ${url}`)
     }
     return null

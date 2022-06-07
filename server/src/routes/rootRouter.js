@@ -69,7 +69,7 @@ rootRouter.get('/settings', async (req, res) => {
       req.session.perms = {
         areaRestrictions: Utility.areaPerms(['none']),
         webhooks: [],
-        scanner: [],
+        scanner: Object.keys(config.scanner).filter((key) => key !== 'backendConfig' && config.scanner[key].enabled && !config.scanner[key].discordRoles.length && !config.scanner[key].telegramGroups.length),
       }
       config.authentication.alwaysEnabledPerms.forEach(perm => {
         if (config.authentication.perms[perm]) {
@@ -112,6 +112,7 @@ rootRouter.get('/settings', async (req, res) => {
           ...config.map,
           ...config.multiDomainsObj[req.headers.host],
           excludeList: config.authentication.excludeFromTutorial,
+          polling: config.api.polling,
         },
         localeSelection: Object.fromEntries(config.map.localeSelection.map(l => [l, { name: l }])),
         tileServers: Object.fromEntries(config.tileServers.map(s => [s.name, s])),
