@@ -126,7 +126,7 @@ export default function AdvancedFilter({
             <Select name="adv" value={filterValues.adv || ''} fullWidth onChange={(e) => handleChange(e)}>
               <MenuItem value=""><Typography variant="caption">{t('all')}</Typography></MenuItem>
               {questConditions?.[advancedFilter.id].map(({ title, target }) => (
-                <MenuItem key={title} value={title}><QuestTitle questTitle={title} questTarget={target} /></MenuItem>
+                <MenuItem key={`${title}-${target}`} value={title}><QuestTitle questTitle={title} questTarget={target} /></MenuItem>
               ))}
             </Select>
           </Grid>
