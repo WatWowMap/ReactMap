@@ -18,7 +18,7 @@ export default function AdvancedFilter({
   Utility.analytics(`/${type}/${advancedFilter.id}`)
 
   const ui = useStatic(state => state.ui)
-  const { questConditions } = useStatic(state => state.available)
+  const { questConditions = {} } = useStatic(state => state.available)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore(state => state.filters)
   const userSettings = useStore(state => state.userSettings)
@@ -64,20 +64,18 @@ export default function AdvancedFilter({
   // Provides a reset if that condition is no longer available
   useEffect(() => {
     if (type === 'pokestops' && ui.pokestops?.quests) {
-      if (!questConditions && filterValues.adv) {
+      if (!questConditions[advancedFilter.id] && filterValues.adv) {
         setFilterValues({ ...filterValues, adv: '' })
-      } else if (questConditions
-        && (!questConditions[advancedFilter.id]
-          || questConditions[advancedFilter.id].every(cond => cond.title !== filterValues.adv))) {
+      } else if (questConditions[advancedFilter.id]?.every(cond => cond.title !== filterValues.adv)) {
         setFilterValues({ ...filterValues, adv: '' })
       }
     }
   }, [])
 
-  return (
+  return advancedFilter.id ? (
     <>
       <Header
-        titles={[type === 'pokemon' ? t('advanced') : t('set_size')]}
+        titles={[type === 'pokemon' || (!advancedFilter.id.startsWith('l') && !advancedFilter.id.startsWith('i')) ? t('advanced') : t('set_size')]}
         action={toggleAdvMenu(false, type, filters.filter)}
       />
       <DialogContent style={{ color: 'white' }}>
@@ -125,14 +123,17 @@ export default function AdvancedFilter({
           <Grid item xs={12} style={{ textAlign: 'center', marginTop: 10, marginBottom: 10 }}>
             <Select name="adv" value={filterValues.adv || ''} fullWidth onChange={(e) => handleChange(e)}>
               <MenuItem value=""><Typography variant="caption">{t('all')}</Typography></MenuItem>
-              {questConditions?.[advancedFilter.id].map(({ title, target }) => (
-                <MenuItem key={`${title}-${target}`} value={title}><QuestTitle questTitle={title} questTarget={target} /></MenuItem>
-              ))}
+              {questConditions[advancedFilter.id]
+                .slice()
+                .sort((a, b) => a.title.localeCompare(b.title))
+                .map(({ title, target }) => (
+                  <MenuItem key={`${title}-${target}`} value={title}><QuestTitle questTitle={title} questTarget={target} /></MenuItem>
+                ))}
             </Select>
           </Grid>
         )}
       </DialogContent>
       <Footer options={footerOptions} />
     </>
-  )
+  ) : null
 }
