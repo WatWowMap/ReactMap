@@ -8,6 +8,7 @@ module.exports = class DbCheck {
     this.singleModels = ['User', 'Badge', 'Session']
     this.searchLimit = apiSettings.searchLimit
     this.models = {}
+    this.questConditions = {}
     this.connections = dbSettings.schemas
       .filter(s => s.useFor.length)
       .map((schema, i) => {
@@ -164,12 +165,20 @@ module.exports = class DbCheck {
           source.SubModel.getAvailable(source)
         )))
         console.log(`[DB] Setting available for ${model}`)
-        if (results.length === 1) return results[0]
+        results.forEach(result => {
+          if ('withConditions' in result) {
+            this.questConditions = {
+              ...this.questConditions,
+              ...result.withConditions,
+            }
+          }
+        })
+        if (results.length === 1) return results[0].available
         if (results.length > 1) {
           const returnSet = new Set()
           for (let i = 0; i < results.length; i += 1) {
-            for (let j = 0; j < results[i].length; j += 1) {
-              returnSet.add(results[i][j])
+            for (let j = 0; j < results[i].available.length; j += 1) {
+              returnSet.add(results[i].available[j])
             }
           }
           return [...returnSet]

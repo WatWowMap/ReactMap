@@ -371,8 +371,10 @@ module.exports = class Pokestop extends Model {
             }
             if (quest.quest_timestamp >= midnight && (filters.onlyAllPokestops || filters[newQuest.key]
               || (filters[`u${quest.quest_reward_type}`] && map.enableQuestRewardTypeFilters))) {
-              this.fieldAssigner(newQuest, quest, fields)
-              filtered.quests.push(newQuest)
+              if (filters[newQuest.key].adv ? quest.quest_title === filters[newQuest.key].adv : true) {
+                this.fieldAssigner(newQuest, quest, fields)
+                filtered.quests.push(newQuest)
+              }
             }
           }
         })
@@ -462,194 +464,187 @@ module.exports = class Pokestop extends Model {
   static async getAvailable({ isMad, hasAltQuests, hasMultiInvasions, multiInvasionMs, hasRewardAmount }) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const finalList = new Set()
-    const quests = {}
-    const stops = {}
+    const conditions = {}
+    const queries = {}
 
-    quests.items = await this.query()
-      .select('quest_item_id')
+    const process = (key, title, target) => {
+      if (title) {
+        if (key in conditions) {
+          conditions[key][`${title}-${target}`] = { title, target }
+        } else {
+          conditions[key] = { [`${title}-${target}`]: { title, target } }
+        }
+      }
+      finalList.add(key)
+    }
+
+    queries.items = this.query()
+      .select('quest_item_id', 'quest_title', 'quest_target')
       .from(isMad ? 'trs_quest' : 'pokestop')
       .where('quest_reward_type', 2)
-      .groupBy('quest_item_id')
+      .groupBy('quest_item_id', 'quest_title', 'quest_target')
     if (hasAltQuests) {
-      quests.items = [
-        ...quests.items,
-        ...await this.query()
-          .select('alternative_quest_item_id AS quest_item_id')
-          .where('alternative_quest_reward_type', 2)
-          .groupBy('alternative_quest_item_id'),
-      ]
+      queries.itemsAlt = this.query()
+        .select('alternative_quest_item_id AS quest_item_id', 'alternative_quest_title AS quest_title', 'alternative_quest_target AS quest_target')
+        .where('alternative_quest_reward_type', 2)
+        .groupBy('alternative_quest_item_id', 'alternative_quest_title', 'alternative_quest_target')
     }
     if (isMad) {
-      quests.stardust = await this.query()
-        .select('quest_stardust AS amount')
+      queries.stardust = this.query()
+        .select('quest_stardust AS amount', 'quest_title', 'quest_target')
         .from('trs_quest')
         .where('quest_stardust', '>', 0)
-        .groupBy('amount')
+        .groupBy('amount', 'quest_title', 'quest_target')
     } else {
-      const dustQuery = this.query()
+      queries.stardust = this.query()
         .where('quest_reward_type', 3)
       if (hasRewardAmount) {
-        dustQuery
-          .select('quest_reward_amount AS amount')
+        queries.stardust
+          .select('quest_reward_amount AS amount', 'quest_title', 'quest_target')
           .where('quest_reward_amount', '>', 0)
-          .groupBy('amount')
+          .groupBy('amount', 'quest_title', 'quest_target')
       } else {
-        dustQuery
+        queries.stardust
+          .select('quest_title', 'quest_target')
           .distinct(raw('json_extract(quest_rewards, "$[0].info.amount")')
             .as('amount'))
       }
-      quests.stardust = await dustQuery
       if (hasAltQuests) {
-        const altDustQuery = this.query()
+        queries.stardustAlt = this.query()
           .where('alternative_quest_reward_type', 3)
         if (hasRewardAmount) {
-          altDustQuery
-            .select('alternative_quest_reward_amount AS amount')
+          queries.stardustAlt
+            .select('alternative_quest_reward_amount AS amount', 'alternative_quest_title AS quest_title', 'alternative_quest_target AS quest_target')
             .where('alternative_quest_reward_amount', '>', 0)
-            .groupBy('amount')
+            .groupBy('amount', 'alternative_quest_title', 'alternative_quest_target')
         } else {
-          altDustQuery
+          queries.stardustAlt
+            .select('alternative_quest_title AS quest_title', 'alternative_quest_target AS quest_target')
             .distinct(raw('json_extract(alternative_quest_rewards, "$[0].info.amount")')
               .as('amount'))
         }
-        quests.stardust = [
-          ...quests.stardust,
-          ...await altDustQuery,
-        ]
       }
     }
-    const megaQuery = this.query()
+    queries.mega = this.query()
       .from(isMad ? 'trs_quest' : 'pokestop')
       .where('quest_reward_type', 12)
     if (hasRewardAmount) {
-      megaQuery
+      queries.mega
+        .select('quest_title', 'quest_target')
         .distinct(`${isMad ? 'quest_item_amount' : 'quest_reward_amount'} AS amount`)
         .distinct('quest_pokemon_id AS id')
     } else {
-      megaQuery
+      queries.mega
+        .select('quest_title', 'quest_target')
         .distinct(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.pokemon_id")`)
           .as('id'))
         .distinct(raw(`json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${isMad ? 'mega_resource' : 'info'}.amount")`)
           .as('amount'))
     }
-    quests.mega = await megaQuery
     if (hasAltQuests) {
-      const altMegaQuery = this.query()
+      queries.megaAlt = this.query()
         .where('alternative_quest_reward_type', 12)
       if (hasRewardAmount) {
-        altMegaQuery
+        queries.megaAlt
+          .select('alternative_quest_title AS quest_title', 'alternative_quest_target AS quest_target')
           .distinct('alternative_quest_reward_amount AS amount')
           .distinct('alternative_quest_pokemon_id AS id')
       } else {
-        altMegaQuery
+        queries.megaAlt
+          .select('alternative_quest_title AS quest_title', 'alternative_quest_target AS quest_target')
           .distinct(raw('json_extract(alternative_quest_rewards, "$[0].info.pokemon_id")')
             .as('id'))
           .distinct(raw('json_extract(alternative_quest_rewards, "$[0].info.amount")')
             .as('amount'))
       }
-      quests.mega = [
-        ...quests.mega,
-        ...await altMegaQuery,
-      ]
     }
-    quests.candy = await this.query()
+    queries.candy = this.query()
+      .select('quest_title', 'quest_target')
       .distinct('quest_pokemon_id')
       .from(isMad ? 'trs_quest' : 'pokestop')
       .where('quest_reward_type', 4)
     if (hasAltQuests) {
-      quests.candy = [
-        ...quests.candy,
-        ...await this.query()
-          .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
-          .where('alternative_quest_reward_type', 4),
-      ]
+      queries.candyAlt = this.query()
+        .select('alternative_quest_title AS quest_title', 'alternative_quest_target AS quest_target')
+        .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
+        .where('alternative_quest_reward_type', 4)
     }
-    quests.xlCandy = await this.query()
+    queries.xlCandy = this.query()
+      .select('quest_title', 'quest_target')
       .distinct('quest_pokemon_id')
       .from(isMad ? 'trs_quest' : 'pokestop')
       .where('quest_reward_type', 9)
     if (hasAltQuests) {
-      quests.xlCandy = [
-        ...quests.xlCandy,
-        ...await this.query()
-          .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
-          .where('alternative_quest_reward_type', 9),
-      ]
+      queries.xlCandyAlt = this.query()
+        .select('alternative_quest_title AS quest_title', 'alternative_quest_target AS quest_target')
+        .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
+        .where('alternative_quest_reward_type', 9)
     }
     if (isMad) {
-      quests.pokemon = await this.query()
-        .select('quest_pokemon_id', 'quest_pokemon_form_id AS form')
+      queries.pokemon = this.query()
+        .select('quest_pokemon_id', 'quest_pokemon_form_id AS form', 'quest_title', 'quest_target')
         .from('trs_quest')
         .where('quest_reward_type', 7)
-        .groupBy('quest_pokemon_id', 'quest_pokemon_form_id')
+        .groupBy('quest_pokemon_id', 'quest_pokemon_form_id', 'quest_title', 'quest_target')
     } else {
-      quests.pokemon = await this.query()
+      queries.pokemon = this.query()
         .distinct('quest_pokemon_id')
         .select(raw('json_extract(quest_rewards, "$[0].info.form_id")')
-          .as('form'))
+          .as('form'), 'quest_title', 'quest_target')
         .where('quest_reward_type', 7)
       if (hasAltQuests) {
-        quests.pokemon = [
-          ...quests.pokemon,
-          ...await this.query()
-            .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
-            .select(raw('json_extract(alternative_quest_rewards, "$[0].info.form_id")')
-              .as('form'))
-            .where('alternative_quest_reward_type', 7),
-        ]
+        queries.pokemonAlt = this.query()
+          .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
+          .select(raw('json_extract(alternative_quest_rewards, "$[0].info.form_id")')
+            .as('form'), 'alternative_quest_title AS quest_title', 'alternative_quest_target AS quest_target')
+          .where('alternative_quest_reward_type', 7)
       }
     }
-    Object.entries(quests).forEach(([questType, rewards]) => {
-      switch (questType) {
-        case 'items': rewards.forEach(reward => finalList.add(`q${reward.quest_item_id}`)); break
-        case 'mega': rewards.forEach(reward => finalList.add(`m${reward.id}-${reward.amount}`)); break
-        case 'invasions': rewards.forEach(reward => finalList.add(`i${reward.grunt_type}`)); break
-        case 'stardust': rewards.forEach(reward => finalList.add(`d${reward.amount}`)); break
-        case 'candy': rewards.forEach(reward => finalList.add(`c${reward.id}`)); break
-        case 'xlCandy': rewards.forEach(reward => finalList.add(`x${reward.id}`)); break
-        default: rewards.forEach(reward => finalList.add(`${reward.quest_pokemon_id}-${reward.form ?? 0}`)); break
-      }
-    })
-
     if (hasMultiInvasions) {
-      stops.invasions = await this.query()
+      queries.invasions = this.query()
         .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
-        .select([
-          '*',
-          'pokestop.id AS id',
-          'incident.id AS incidentId',
-          raw(multiInvasionMs
-            ? 'FLOOR(incident.expiration_ms / 1000) AS incident_expire_timestamp'
-            : 'incident.expiration AS incident_expire_timestamp'),
-          'incident.character AS grunt_type',
-        ])
+        .distinct('incident.character AS grunt_type')
         .where(multiInvasionMs ? 'expiration_ms' : 'incident.expiration', '>=', ts * (multiInvasionMs ? 1000 : 1))
         .orderBy('grunt_type')
-    } else if (hasMultiInvasions === false) {
-      stops.invasions = await this.query()
-        .select(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
-        .where(isMad ? 'incident_expiration' : 'incident_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
-        .groupBy('grunt_type')
-        .orderBy('grunt_type')
     } else {
-      stops.invasions = Object.keys(Event.masterfile.invasions)
-        .filter(grunt => +grunt < 100)
-        .map(i => ({ grunt_type: i }))
+      queries.invasions = this.query()
+        .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
+        .where(isMad ? 'incident_expiration' : 'incident_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
+        .orderBy('grunt_type')
     }
-    stops.lures = await this.query()
+    queries.lures = this.query()
       .select(isMad ? 'active_fort_modifier AS lure_id' : 'lure_id')
       .andWhere(isMad ? 'lure_expiration' : 'lure_expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
       .groupBy(isMad ? 'active_fort_modifier' : 'lure_id')
       .orderBy(isMad ? 'active_fort_modifier' : 'lure_id')
 
-    Object.entries(stops).forEach(stopType => {
-      const [sType, rewards] = stopType
-      switch (sType) {
+    const resolved = Object.fromEntries(
+      await Promise.all(
+        Object.entries(queries).map(async ([key, query]) => ([key, await query])),
+      ),
+    )
+    Object.entries(resolved).forEach(([questType, rewards]) => {
+      switch (questType) {
+        case 'itemsAlt':
+        case 'items': rewards.forEach(reward => process(`q${reward.quest_item_id}`, reward.quest_title, reward.quest_target)); break
+        case 'megaAlt':
+        case 'mega': rewards.forEach(reward => process(`m${reward.id}-${reward.amount}`, reward.quest_title, reward.quest_target)); break
+        case 'stardustAlt':
+        case 'stardust': rewards.forEach(reward => process(`d${reward.amount}`, reward.quest_title, reward.quest_target)); break
+        case 'candyAlt':
+        case 'candy': rewards.forEach(reward => process(`c${reward.id}`, reward.quest_title, reward.quest_target)); break
+        case 'xlCandyAlt':
+        case 'xlCandy': rewards.forEach(reward => process(`x${reward.id}`, reward.quest_title, reward.quest_target)); break
         case 'lures': rewards.forEach(reward => finalList.add(`l${reward.lure_id}`)); break
-        default: rewards.forEach(reward => finalList.add(`i${reward.grunt_type}`)); break
+        case 'invasions': rewards.forEach(reward => finalList.add(`i${reward.grunt_type}`)); break
+        default: rewards.forEach(reward => process(`${reward.quest_pokemon_id}-${reward.form ?? 0}`, reward.quest_title, reward.quest_target)); break
       }
     })
-    return finalList.size === 0 ? fetchQuests() : [...finalList]
+    const withConditions = Object.fromEntries(
+      Object.entries(conditions).map(([key, titles]) => [key, Object.values(titles)]),
+    )
+
+    return { available: finalList.size ? [...finalList] : await fetchQuests(), withConditions }
   }
 
   static parseRdmRewards = (quest) => {
@@ -774,6 +769,9 @@ module.exports = class Pokestop extends Model {
         })
         .limit(searchResultsLimit)
         .orderBy('distance')
+      if (perms.areaRestrictions?.length) {
+        getAreaSql(altQuestQuery, perms.areaRestrictions, isMad)
+      }
       const altQuestResults = await altQuestQuery
       const remapped = altQuestResults.map(result => ({
         ...result,
