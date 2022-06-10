@@ -121,6 +121,7 @@ export default function AdvancedFilter({
         )}
         {(type === 'pokestops' && ui.pokestops?.quests && questConditions?.[advancedFilter.id]) && (
           <Grid item xs={12} style={{ textAlign: 'center', marginTop: 10, marginBottom: 10 }}>
+            <Typography variant="h6">{t('quest_condition')}</Typography>
             <Select name="adv" value={filterValues.adv || ''} fullWidth onChange={(e) => handleChange(e)}>
               <MenuItem value=""><Typography variant="caption">{t('all')}</Typography></MenuItem>
               {questConditions[advancedFilter.id]
