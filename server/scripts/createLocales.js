@@ -32,14 +32,13 @@ const locales = async () => {
       }
 
       Object.keys(remoteFiles).forEach(key => {
-        const cleanKey = key.replace(/\r/g, '')
         if (!key.startsWith('desc_') && !key.startsWith('pokemon_category_')) {
           if (key.startsWith('quest_') || key.startsWith('challenge_')) {
-            trimmedRemoteFiles[cleanKey] = remoteFiles[key]
+            trimmedRemoteFiles[key] = remoteFiles[key]
               .replace(/%\{/g, '{{')
               .replace(/\}/g, '}}')
           } else {
-            trimmedRemoteFiles[cleanKey] = remoteFiles[key]
+            trimmedRemoteFiles[key] = remoteFiles[key]
           }
         }
       })

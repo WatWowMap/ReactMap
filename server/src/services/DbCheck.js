@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const knex = require('knex')
 const { raw } = require('objection')
+const extend = require('extend')
 
 module.exports = class DbCheck {
   constructor(validModels, dbSettings, queryDebug, apiSettings, distanceUnit) {
@@ -165,14 +166,16 @@ module.exports = class DbCheck {
           source.SubModel.getAvailable(source)
         )))
         console.log(`[DB] Setting available for ${model}`)
-        results.forEach(result => {
-          if ('withConditions' in result) {
-            this.questConditions = {
-              ...this.questConditions,
-              ...result.withConditions,
+        if (model === 'Pokestop') {
+          results.forEach(result => {
+            if ('conditions' in result) {
+              this.questConditions = extend(true, this.questConditions, result.conditions)
             }
-          }
-        })
+          })
+          this.questConditions = Object.fromEntries(
+            Object.entries(this.questConditions).map(([key, titles]) => [key, Object.values(titles)]),
+          )
+        }
         if (results.length === 1) return results[0].available
         if (results.length > 1) {
           const returnSet = new Set()

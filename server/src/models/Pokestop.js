@@ -640,11 +640,7 @@ module.exports = class Pokestop extends Model {
         default: rewards.forEach(reward => process(`${reward.quest_pokemon_id}-${reward.form ?? 0}`, reward.quest_title, reward.quest_target)); break
       }
     })
-    const withConditions = Object.fromEntries(
-      Object.entries(conditions).map(([key, titles]) => [key, Object.values(titles)]),
-    )
-
-    return { available: finalList.size ? [...finalList] : await fetchQuests(), withConditions }
+    return { available: finalList.size ? [...finalList] : await fetchQuests(), conditions }
   }
 
   static parseRdmRewards = (quest) => {
