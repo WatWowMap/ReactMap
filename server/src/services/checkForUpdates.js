@@ -11,7 +11,7 @@ try {
       const gitRef = fs.readFileSync(path.resolve(`${__dirname}/../../../.gitref`), 'utf8')
 
       if (!gitRef && (err || typeof stdout !== 'string' || !stdout.trim())) {
-        throw new Error('Unable to get current branch', err)
+        throw new Error(err)
       }
       if (typeof gitRef === 'string' && gitRef.trim()) {
         isDocker = true
@@ -25,7 +25,7 @@ try {
           const gitSha = fs.readFileSync(path.resolve(`${__dirname}/../../../.gitsha`), 'utf8')
 
           if (!gitSha && (err2 || typeof stdout2 !== 'string' || !stdout2.trim())) {
-            throw new Error('Unable to get current sha', err2)
+            throw new Error(err2)
           }
           const sha = typeof gitSha === 'string' && gitSha.trim()
             ? gitSha.trim()
@@ -34,7 +34,7 @@ try {
           exec(`git ls-remote https://github.com/WatWowMap/ReactMap/ refs/heads/${branch}`, (err3, stdout3) => {
             try {
               if (err3 || typeof stdout3 !== 'string' || !stdout3?.split('\t')?.[0]) {
-                throw new Error('Unable to get remote sha', err3)
+                throw new Error(err3)
               }
               const remoteSha = stdout3.split('\t')[0]
 
@@ -42,15 +42,15 @@ try {
                 console.log('[UPDATE] There is a new version available: ', remoteSha, isDocker ? 'docker-compose pull' : 'git pull', ' to update')
               }
             } catch (e) {
-              console.warn('[UPDATE] Unable to get remote SHA', e.message, 'Branch:', branch, 'Local SHA:', sha)
+              console.log('[UPDATE] Unable to get remote SHA:', e.message, '\nBranch:', branch, 'Local SHA:', sha, '\nProceeding normally...')
             }
           })
         } catch (e) {
-          console.warn('[UPDATE] Unable to get current SHA', e.message, 'Branch:', branch)
+          console.log('[UPDATE] Unable to get current SHA:', e.message, '\nBranch:', branch, '\nProceeding normally...')
         }
       })
     } catch (e) {
-      console.warn('[UPDATE] Unable to get current branch', e.message)
+      console.log('[UPDATE] Unable to determine the local git branch:', e.message, '\nProceeding normally...')
     }
   })
 } catch (e) {
