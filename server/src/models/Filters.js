@@ -5,6 +5,7 @@ class GenericFilter {
   constructor(enabled, size) {
     this.enabled = enabled || false
     this.size = size || 'md'
+    this.adv = ''
   }
 }
 
@@ -16,7 +17,6 @@ class PokemonFilter extends GenericFilter {
     this.def_iv = def || [0, 15]
     this.sta_iv = sta || [0, 15]
     this.level = level || [1, 35]
-    this.adv = ''
     leagues.forEach(league => this[league.name] = pvp || [(league.minRank || 1), (league.maxRank || 100)])
   }
 }

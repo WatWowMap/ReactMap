@@ -10,7 +10,7 @@ const Fetch = require('../services/Fetch')
 module.exports = {
   JSON: GraphQLJSON,
   Query: {
-    available: (_, args, { Event, perms, version }) => {
+    available: (_, args, { Event, Db, perms, version }) => {
       if (args.version && args.version !== version) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
       const available = {
@@ -18,6 +18,7 @@ module.exports = {
         gyms: perms.gyms ? Event.available.gyms : [],
         nests: perms.nests ? Event.available.nests : [],
         pokestops: perms.pokestops ? Event.available.pokestops : [],
+        questConditions: perms.quests ? Db.questConditions : {},
       }
       return {
         ...available,

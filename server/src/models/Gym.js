@@ -290,14 +290,16 @@ module.exports = class Gym extends Model {
         return [...unique]
       })
     if (!results.length) {
-      return [...teamResults, ...await fetchRaids()]
+      return { available: [...teamResults, ...await fetchRaids()] }
     }
-    return [...teamResults, ...results.flatMap(result => {
-      if (result.raid_pokemon_id) {
-        return `${result.raid_pokemon_id}-${result.raid_pokemon_form}`
-      }
-      return [`e${result.raid_level}`, `r${result.raid_level}`]
-    })]
+    return {
+      available: [...teamResults, ...results.flatMap(result => {
+        if (result.raid_pokemon_id) {
+          return `${result.raid_pokemon_id}-${result.raid_pokemon_form}`
+        }
+        return [`e${result.raid_level}`, `r${result.raid_level}`]
+      })],
+    }
   }
 
   static async search(perms, args, { isMad }, distance) {

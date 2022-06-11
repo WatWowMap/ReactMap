@@ -342,7 +342,7 @@ module.exports = class Pokemon extends Model {
       .where(isMad ? 'disappear_time' : 'expire_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
       .groupBy('pokemon_id', 'form')
       .orderBy('pokemon_id', 'form')
-    return results.map(pkmn => `${pkmn.pokemon_id}-${pkmn.form}`)
+    return { available: results.map(pkmn => `${pkmn.pokemon_id}-${pkmn.form}`) }
   }
 
   static getOne(id, { isMad }) {
