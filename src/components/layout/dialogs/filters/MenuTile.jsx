@@ -54,7 +54,8 @@ export default function MenuTile({
     if (type === 'pokemon') {
       return <Tune style={{ color: 'white' }} />
     }
-    if (item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0) {
+    if ((type === 'pokestops' && !item.id.startsWith('l') && !item.id.startsWith('i'))
+      || (item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0)) {
       return <Settings style={{ color: 'white' }} />
     }
     return <FormatSize style={{ color: 'white' }} />

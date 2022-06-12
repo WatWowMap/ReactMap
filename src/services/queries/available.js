@@ -9,6 +9,7 @@ const getAvailable = gql`
       pokemon
       nests
       filters
+      questConditions
     }
   }
 `

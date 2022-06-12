@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Grid, DialogContent } from '@material-ui/core'
+import React, { useState, useEffect } from 'react'
+import { Select, Typography, Grid, DialogContent, MenuItem } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
@@ -10,6 +10,7 @@ import Footer from '@components/layout/general/Footer'
 import StringFilter from './StringFilter'
 import SliderTile from './SliderTile'
 import Size from './Size'
+import QuestTitle from '../../general/QuestTitle'
 
 export default function AdvancedFilter({
   toggleAdvMenu, advancedFilter, type, isTutorial,
@@ -17,6 +18,7 @@ export default function AdvancedFilter({
   Utility.analytics(`/${type}/${advancedFilter.id}`)
 
   const ui = useStatic(state => state.ui)
+  const { questConditions = {} } = useStatic(state => state.available)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore(state => state.filters)
   const userSettings = useStore(state => state.userSettings)
@@ -59,10 +61,21 @@ export default function AdvancedFilter({
     )
   }
 
-  return (
+  // Provides a reset if that condition is no longer available
+  useEffect(() => {
+    if (type === 'pokestops' && ui.pokestops?.quests) {
+      if (!questConditions[advancedFilter.id] && filterValues.adv) {
+        setFilterValues({ ...filterValues, adv: '' })
+      } else if (questConditions[advancedFilter.id]?.every(cond => cond.title !== filterValues.adv)) {
+        setFilterValues({ ...filterValues, adv: '' })
+      }
+    }
+  }, [])
+
+  return advancedFilter.id ? (
     <>
       <Header
-        titles={[type === 'pokemon' ? t('advanced') : t('set_size')]}
+        titles={[type === 'pokemon' || (!advancedFilter.id.startsWith('l') && !advancedFilter.id.startsWith('i')) ? t('advanced') : t('set_size')]}
         action={toggleAdvMenu(false, type, filters.filter)}
       />
       <DialogContent style={{ color: 'white' }}>
@@ -106,8 +119,22 @@ export default function AdvancedFilter({
             />
           </Grid>
         )}
+        {(type === 'pokestops' && ui.pokestops?.quests && questConditions?.[advancedFilter.id]) && (
+          <Grid item xs={12} style={{ textAlign: 'center', marginTop: 10, marginBottom: 10 }}>
+            <Typography variant="h6">{t('quest_condition')}</Typography>
+            <Select name="adv" value={filterValues.adv || ''} fullWidth onChange={(e) => handleChange(e)}>
+              <MenuItem value=""><Typography variant="caption">{t('all')}</Typography></MenuItem>
+              {questConditions[advancedFilter.id]
+                .slice()
+                .sort((a, b) => a.title.localeCompare(b.title))
+                .map(({ title, target }) => (
+                  <MenuItem key={`${title}-${target}`} value={title}><QuestTitle questTitle={title} questTarget={target} /></MenuItem>
+                ))}
+            </Select>
+          </Grid>
+        )}
       </DialogContent>
       <Footer options={footerOptions} />
     </>
-  )
+  ) : null
 }

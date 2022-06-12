@@ -189,6 +189,7 @@ rootRouter.get('/settings', async (req, res) => {
         serverSettings.available.pokestops = config.api.queryOnSessionInit.quests
           ? await Db.getAvailable('Pokestop')
           : Event.available.pokestops
+        serverSettings.available.withConditions = Db.questConditions
       }
       if (serverSettings.user.perms.nests) {
         serverSettings.available.nests = config.api.queryOnSessionInit.nests

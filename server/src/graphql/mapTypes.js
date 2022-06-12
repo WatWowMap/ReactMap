@@ -8,6 +8,7 @@ module.exports = gql`
       pokemon: [String]
       nests: [String]
       filters: JSON
+      questConditions: JSON
     }
   
     type Badge {
