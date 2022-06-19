@@ -21,7 +21,7 @@ module.exports = class Gym extends Model {
     return 'gym'
   }
 
-  static async getAll(perms, args, { isMad }, userId) {
+  static async getAll(perms, args, { isMad, availableSlotsCol }, userId) {
     const { gyms: gymPerms, raids: raidPerms, areaRestrictions, gymBadges } = perms
     const {
       onlyAllGyms, onlyRaids, onlyExEligible, onlyInBattle, onlyArEligible, onlyRaidTier, onlyGymBadges, onlyBadge, ts,
@@ -167,7 +167,7 @@ module.exports = class Gym extends Model {
             if (teamSlots.length) {
               gym.orWhere(gymSlot => {
                 gymSlot.where('team_id', team)
-                  .whereIn(isMad ? 'slots_available' : 'availble_slots', teamSlots)
+                  .whereIn(isMad ? 'slots_available' : availableSlotsCol, teamSlots)
               })
             }
           })
@@ -252,7 +252,7 @@ module.exports = class Gym extends Model {
     return secondaryFilter(await query.limit(queryLimits.gyms))
   }
 
-  static async getAvailable({ isMad }) {
+  static async getAvailable({ isMad, availableSlotsCol }) {
     const ts = Math.floor((new Date()).getTime() / 1000)
     const results = await this.query()
       .select([
@@ -272,11 +272,11 @@ module.exports = class Gym extends Model {
     const teamResults = await this.query()
       .select([
         'team_id AS team',
-        isMad ? 'slots_available AS slots' : 'availble_slots AS slots',
+        isMad ? 'slots_available AS slots' : `${availableSlotsCol} AS slots`,
       ])
       .groupBy([
         'team_id',
-        isMad ? 'slots_available' : 'availble_slots',
+        isMad ? 'slots_available' : availableSlotsCol,
       ])
       .then((r) => {
         const unique = new Set()
