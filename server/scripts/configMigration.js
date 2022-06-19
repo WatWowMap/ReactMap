@@ -9,84 +9,84 @@ const oldConfig = JSON.parse(
 const convertObjToArr = (obj) =>
   obj
     ? Object.entries(obj).map(([k, v]) => ({
-      name: k,
-      ...v,
-    }))
+        name: k,
+        ...v,
+      }))
     : undefined
 
 const convertMapObject = (obj) =>
   obj
     ? {
-      general: {
-        title: obj?.title,
-        headerTitle: obj?.headerTitle,
-        startLat: obj?.startLat,
-        startLon: obj?.startLon,
-        startZoom: obj?.startZoom,
-        minZoom: obj?.minZoom,
-        maxZoom: obj?.maxZoom,
-        interactionRangeZoom: obj?.interactionRangeZoom,
-      },
-      localeSelection: obj?.localeSelection,
-      customRoutes: {
-        discordAuthUrl: obj?.discordAuthUrl,
-        telegramAuthUrl: obj?.telegramAuthUrl,
-        telegramBotName: obj?.telegramBotEnvRef,
-        localAuthUrl: obj?.localAuthUrl,
-      },
-      links: {
-        discordInvite: obj?.discordInvite,
-        feedbackLink: obj?.feedbackLink,
-        statsLink: obj?.statsLink,
-        rolesLinksName: obj?.rolesLinksName,
-        rolesLink: obj?.rolesLink,
-      },
-      holidayEffects: {
-        christmasSnow: obj?.christmasSnow,
-        newYearsFireworks: obj?.newYearsFireworks,
-        valentinesDay: obj?.valentinesDay,
-      },
-      misc: {
-        enableMapJsFilter: obj?.legacyPkmnFilter,
-        questRewardTypeFilters: obj?.questRewardTypeFilters,
-        fetchLatestInvasions: obj?.fetchLatestInvasions,
-        invasionCacheHrs: obj?.invasionCacheHrs,
-        navigationControls: obj?.navigationControls,
-        forceTutorial: obj?.forceTutorial,
-        enableTutorial: obj?.enableTutorial,
-        enableUserProfile: obj?.enableUserProfile,
-        enableQuestSetSelector: obj?.enableQuestSetSelector,
-        noScanAreaOverlay: obj?.noScanAreaOverlay,
-      },
-      theme: obj?.theme,
-      clustering: {
-        gyms: {
-          zoomLevel: obj?.clusterZoomLevels?.gyms,
-          forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+        general: {
+          title: obj?.title,
+          headerTitle: obj?.headerTitle,
+          startLat: obj?.startLat,
+          startLon: obj?.startLon,
+          startZoom: obj?.startZoom,
+          minZoom: obj?.minZoom,
+          maxZoom: obj?.maxZoom,
+          interactionRangeZoom: obj?.interactionRangeZoom,
         },
-        pokestops: {
-          zoomLevel: obj?.clusterZoomLevels?.pokestops,
-          forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+        localeSelection: obj?.localeSelection,
+        customRoutes: {
+          discordAuthUrl: obj?.discordAuthUrl,
+          telegramAuthUrl: obj?.telegramAuthUrl,
+          telegramBotName: obj?.telegramBotEnvRef,
+          localAuthUrl: obj?.localAuthUrl,
         },
-        pokemon: {
-          zoomLevel: obj?.clusterZoomLevels?.pokemon,
-          forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+        links: {
+          discordInvite: obj?.discordInvite,
+          feedbackLink: obj?.feedbackLink,
+          statsLink: obj?.statsLink,
+          rolesLinksName: obj?.rolesLinksName,
+          rolesLink: obj?.rolesLink,
         },
-        portals: {
-          zoomLevel: obj?.clusterZoomLevels?.portals,
-          forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+        holidayEffects: {
+          christmasSnow: obj?.christmasSnow,
+          newYearsFireworks: obj?.newYearsFireworks,
+          valentinesDay: obj?.valentinesDay,
         },
-        spawnpoints: {
-          zoomLevel: obj?.clusterZoomLevels?.spawnpoints,
-          forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+        misc: {
+          enableMapJsFilter: obj?.legacyPkmnFilter,
+          questRewardTypeFilters: obj?.questRewardTypeFilters,
+          fetchLatestInvasions: obj?.fetchLatestInvasions,
+          invasionCacheHrs: obj?.invasionCacheHrs,
+          navigationControls: obj?.navigationControls,
+          forceTutorial: obj?.forceTutorial,
+          enableTutorial: obj?.enableTutorial,
+          enableUserProfile: obj?.enableUserProfile,
+          enableQuestSetSelector: obj?.enableQuestSetSelector,
+          noScanAreaOverlay: obj?.noScanAreaOverlay,
         },
-      },
-      messageOfTheDay: obj?.messageOfTheDay
-        ? ensureMotd(obj?.messageOfTheDay)
-        : undefined,
-      donationPage: obj?.donationPage,
-      loginPage: obj?.loginPage,
-    }
+        theme: obj?.theme,
+        clustering: {
+          gyms: {
+            zoomLevel: obj?.clusterZoomLevels?.gyms,
+            forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+          },
+          pokestops: {
+            zoomLevel: obj?.clusterZoomLevels?.pokestops,
+            forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+          },
+          pokemon: {
+            zoomLevel: obj?.clusterZoomLevels?.pokemon,
+            forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+          },
+          portals: {
+            zoomLevel: obj?.clusterZoomLevels?.portals,
+            forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+          },
+          spawnpoints: {
+            zoomLevel: obj?.clusterZoomLevels?.spawnpoints,
+            forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+          },
+        },
+        messageOfTheDay: obj?.messageOfTheDay
+          ? ensureMotd(obj?.messageOfTheDay)
+          : undefined,
+        donationPage: obj?.donationPage,
+        loginPage: obj?.loginPage,
+      }
     : undefined
 
 const ensureMotd = (obj) => {
@@ -184,13 +184,13 @@ const mergeAuth = async () => {
     ],
     excludeFromTutorial: oldConfig?.excludeFromTutorial
       ? oldConfig.excludeFromTutorial.map((perm) =>
-        perm === 's2cells' ? 'scanCells' : perm,
-      )
+          perm === 's2cells' ? 'scanCells' : perm,
+        )
       : undefined,
     alwaysEnabledPerms: oldConfig?.alwaysEnabledPerms
       ? oldConfig.alwaysEnabledPerms.map((perm) =>
-        perm === 's2cells' ? 'scanCells' : perm,
-      )
+          perm === 's2cells' ? 'scanCells' : perm,
+        )
       : undefined,
     perms: {
       map: {
@@ -330,24 +330,24 @@ const rebuildConfig = async () => ({
   },
   multiDomains: oldConfig.multiDomains
     ? Object.entries(oldConfig.multiDomains).map(([domain, values]) => ({
-      domain,
-      ...convertMapObject(values),
-    }))
+        domain,
+        ...convertMapObject(values),
+      }))
     : undefined,
   map: convertMapObject(oldConfig?.map),
   clientSideOptions: oldConfig?.clientSideOptions,
   defaultFilters: oldConfig?.defaultFilters
     ? {
-      ...oldConfig?.defaultFilters,
-      pokemon: {
-        ...oldConfig?.defaultFilters?.pokemon,
-        globalValues: {
-          ...oldConfig?.defaultFilters?.pokemon?.globalValues,
-          pvp: oldConfig?.defaultFilters?.pokemon?.pvpValues,
+        ...oldConfig?.defaultFilters,
+        pokemon: {
+          ...oldConfig?.defaultFilters?.pokemon,
+          globalValues: {
+            ...oldConfig?.defaultFilters?.pokemon?.globalValues,
+            pvp: oldConfig?.defaultFilters?.pokemon?.pvpValues,
+          },
+          pvpValues: undefined,
         },
-        pvpValues: undefined,
-      },
-    }
+      }
     : undefined,
   database: {
     settings: {
@@ -409,7 +409,7 @@ const migrator = async () => {
     `${__dirname}/../src/configs/local.json`,
     JSON.stringify(config, null, 2),
     'utf8',
-    () => { },
+    () => {},
   )
 }
 
