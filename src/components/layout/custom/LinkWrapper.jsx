@@ -14,10 +14,7 @@ export default function LinkWrapper({ block, element }) {
       {element}
     </Link>
   ) : (
-    <RouterLink
-      to={block.link}
-      style={block.style}
-    >
+    <RouterLink to={block.link} style={block.style}>
       {element}
     </RouterLink>
   )

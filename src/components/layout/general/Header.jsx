@@ -10,20 +10,22 @@ export default function Header({ names = [], titles, action }) {
 
   return (
     <DialogTitle className={classes.filterHeader}>
-      {titles.map((title, index) => (
+      {titles.map((title, index) =>
         names[index] ? (
           <Trans i18nKey={title} key={title}>
             {{ name: t(names[index]) }}
           </Trans>
-        ) : `${t(title)} `
-      ))}
+        ) : (
+          `${t(title)} `
+        ),
+      )}
       {Boolean(action) && (
-      <IconButton
-        onClick={action}
-        style={{ position: 'absolute', right: 5, top: 2, color: 'white' }}
-      >
-        <Clear />
-      </IconButton>
+        <IconButton
+          onClick={action}
+          style={{ position: 'absolute', right: 5, top: 2, color: 'white' }}
+        >
+          <Clear />
+        </IconButton>
       )}
     </DialogTitle>
   )

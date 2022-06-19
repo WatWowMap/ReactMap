@@ -1,7 +1,5 @@
 import React from 'react'
-import {
-  Grid, Typography, Button, Chip, IconButton,
-} from '@material-ui/core'
+import { Grid, Typography, Button, Chip, IconButton } from '@material-ui/core'
 import { Clear } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
@@ -12,15 +10,27 @@ import Utility from '@services/Utility'
 import Options from './Options'
 
 export default function OptionsContainer({
-  advMenu, setAdvMenu, menus, setMenus, categories,
-  category, handleReset, count, isMobile, toggleDrawer,
+  advMenu,
+  setAdvMenu,
+  menus,
+  setMenus,
+  categories,
+  category,
+  handleReset,
+  count,
+  isMobile,
+  toggleDrawer,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
-  const { [category]: staticMenus } = useStatic(state => state.menus)
+  const { [category]: staticMenus } = useStatic((state) => state.menus)
 
   const handleChange = (name, event) => {
-    Utility.analytics('Filtering Options', `New Value: ${event.target.checked}`, `Category: ${category} Name: ${name}.${event.target.name}`)
+    Utility.analytics(
+      'Filtering Options',
+      `New Value: ${event.target.checked}`,
+      `Category: ${category} Name: ${name}.${event.target.name}`,
+    )
     setMenus({
       ...menus,
       [category]: {
@@ -44,34 +54,48 @@ export default function OptionsContainer({
   }
 
   const applied = []
-  const allFilterMenus = Object.entries(staticMenus.filters).map(([cat, options]) => {
-    if (categories
-      ? categories.length > 1 || cat === 'others' || (categories.includes('pokemon') && cat !== 'categories')
-      : Object.keys(options).length > 1) {
-      if (menus[category].filters[cat]) {
-        Object.entries(menus[category].filters[cat]).forEach(([filter, bool]) => {
-          if (bool && options[filter] !== undefined) {
-            applied.push(filter)
-          }
-        })
+  const allFilterMenus = Object.entries(staticMenus.filters).map(
+    ([cat, options]) => {
+      if (
+        categories
+          ? categories.length > 1 ||
+            cat === 'others' ||
+            (categories.includes('pokemon') && cat !== 'categories')
+          : Object.keys(options).length > 1
+      ) {
+        if (menus[category].filters[cat]) {
+          Object.entries(menus[category].filters[cat]).forEach(
+            ([filter, bool]) => {
+              if (bool && options[filter] !== undefined) {
+                applied.push(filter)
+              }
+            },
+          )
+        }
+        return (
+          <Options
+            key={cat}
+            name={cat}
+            options={options}
+            userSelection={menus[category].filters[cat]}
+            handleChange={handleChange}
+            expanded={advMenu[category]}
+            handleAccordion={handleAccordion}
+          />
+        )
       }
-      return (
-        <Options
-          key={cat}
-          name={cat}
-          options={options}
-          userSelection={menus[category].filters[cat]}
-          handleChange={handleChange}
-          expanded={advMenu[category]}
-          handleAccordion={handleAccordion}
-        />
-      )
-    }
-    return null
-  })
+      return null
+    },
+  )
 
   allFilterMenus.push(
-    <Grid container key="resetShowing" justifyContent="center" alignItems="center" style={{ margin: '10px 0' }}>
+    <Grid
+      container
+      key="resetShowing"
+      justifyContent="center"
+      alignItems="center"
+      style={{ margin: '10px 0' }}
+    >
       <Grid item xs={5} sm={6} style={{ textAlign: 'center' }}>
         <Button onClick={handleReset} color="primary" size="small">
           {t('reset_filters')}
@@ -83,13 +107,15 @@ export default function OptionsContainer({
         </Typography>
       </Grid>
       <Grid item xs={12} className={classes.areaChips}>
-        {applied.map(x => (
+        {applied.map((x) => (
           <Chip
             key={x}
             label={t(Utility.camelToSnake(x))}
             variant="outlined"
             size="small"
-            color={menus[category].filters.others.reverse ? 'secondary' : 'primary'}
+            color={
+              menus[category].filters.others.reverse ? 'secondary' : 'primary'
+            }
             style={{ margin: 3 }}
           />
         ))}

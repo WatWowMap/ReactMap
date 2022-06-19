@@ -1,14 +1,19 @@
 /* global BigInt */
 
 const {
-  S2LatLng, S2RegionCoverer, S2CellId, S2LatLngRect,
+  S2LatLng,
+  S2RegionCoverer,
+  S2CellId,
+  S2LatLngRect,
 } = require('nodes2ts')
 const getPolyVector = require('./getPolyVector')
 const { Ring } = require('../../models/index')
 
 module.exports = function getPlacementCells(bounds, pokestops, gyms) {
   // dedupe poi entries
-  const allCoords = Object.values(Object.fromEntries([...pokestops, ...gyms].map(poi => [poi.id, poi])))
+  const allCoords = Object.values(
+    Object.fromEntries([...pokestops, ...gyms].map((poi) => [poi.id, poi])),
+  )
 
   const regionCoverer = new S2RegionCoverer()
   regionCoverer.minLevel = 17
@@ -32,14 +37,16 @@ module.exports = function getPlacementCells(bounds, pokestops, gyms) {
   }
   for (let i = 0; i < allCoords.length; i += 1) {
     const coords = allCoords[i]
-    const level17Cell = S2CellId.fromPoint(S2LatLng.fromDegrees(coords.lat, coords.lon).toPoint()).parentL(17)
+    const level17Cell = S2CellId.fromPoint(
+      S2LatLng.fromDegrees(coords.lat, coords.lon).toPoint(),
+    ).parentL(17)
     const cellId = BigInt(level17Cell.id).toString()
     const cell = indexedCells[cellId]
     if (cell) {
       cell.blocked = true
     }
   }
-  const rings = allCoords.map(poi => new Ring(poi.id, poi.lat, poi.lon))
+  const rings = allCoords.map((poi) => new Ring(poi.id, poi.lat, poi.lon))
 
   return {
     cells: Object.values(indexedCells),

@@ -43,7 +43,10 @@ const server = new ApolloServer({
     if (config.devOptions.enabled) {
       console.warn(e)
     }
-    if (e instanceof ValidationError || e?.message.includes('skipUndefined()')) {
+    if (
+      e instanceof ValidationError ||
+      e?.message.includes('skipUndefined()')
+    ) {
       return { message: 'old_client' }
     }
     if (['old_client', 'session_expired'].includes(e.message)) {
@@ -57,20 +60,25 @@ const server = new ApolloServer({
 server.start().then(() => server.applyMiddleware({ app, path: '/graphql' }))
 
 if (config.devOptions.enabled) {
-  app.use(logger((tokens, req, res) => [
-    tokens.method(req, res),
-    tokens.url(req, res),
-    tokens.status(req, res),
-    tokens['response-time'](req, res),
-    'ms',
-    req.user ? `- ${req.user.username}` : 'Not Logged In',
-    '-',
-    req.headers['x-forwarded-for'],
-  ].join(' ')))
+  app.use(
+    logger((tokens, req, res) =>
+      [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens['response-time'](req, res),
+        'ms',
+        req.user ? `- ${req.user.username}` : 'Not Logged In',
+        '-',
+        req.headers['x-forwarded-for'],
+      ].join(' '),
+    ),
+  )
 }
 
 const RateLimitTime = config.api.rateLimit.time * 60 * 1000
-const MaxRequestsPerHour = config.api.rateLimit.requests * (RateLimitTime / 1000)
+const MaxRequestsPerHour =
+  config.api.rateLimit.requests * (RateLimitTime / 1000)
 
 const rateLimitOptions = {
   windowMs: RateLimitTime, // Time window in milliseconds
@@ -97,17 +105,19 @@ app.use(express.json({ limit: '50mb' }))
 
 app.use(express.static(path.join(__dirname, config.devOptions.clientPath)))
 
-app.use(session({
-  name: 'discord',
-  key: 'session',
-  secret: config.api.sessionSecret,
-  store: sessionStore,
-  resave: true,
-  saveUninitialized: false,
-  cookie: { maxAge: 86400000 * config.api.cookieAgeDays },
-}))
+app.use(
+  session({
+    name: 'discord',
+    key: 'session',
+    secret: config.api.sessionSecret,
+    store: sessionStore,
+    resave: true,
+    saveUninitialized: false,
+    cookie: { maxAge: 86400000 * config.api.cookieAgeDays },
+  }),
+)
 
-config.authentication.strategies.forEach(strategy => {
+config.authentication.strategies.forEach((strategy) => {
   if (strategy.enabled) {
     require(`./strategies/${strategy.name}.js`)
     console.log(`[AUTH] Strategy ${strategy.name} initialized`)
@@ -132,16 +142,23 @@ passport.deserializeUser(async (user, done) => {
   }
 })
 
-i18next.use(Backend).init({
-  lng: 'en',
-  fallbackLng: 'en',
-  preload: config.map.localeSelection,
-  ns: ['translation'],
-  defaultNS: 'translation',
-  backend: { loadPath: path.resolve(`${__dirname}/../../public/locales/{{lng}}/{{ns}}.json`) },
-}, (err, t) => {
-  if (err) return console.error(err)
-})
+i18next.use(Backend).init(
+  {
+    lng: 'en',
+    fallbackLng: 'en',
+    preload: config.map.localeSelection,
+    ns: ['translation'],
+    defaultNS: 'translation',
+    backend: {
+      loadPath: path.resolve(
+        `${__dirname}/../../public/locales/{{lng}}/{{ns}}.json`,
+      ),
+    },
+  },
+  (err, t) => {
+    if (err) return console.error(err)
+  },
+)
 
 app.use(rootRouter, requestRateLimiter)
 
@@ -151,31 +168,31 @@ app.use((err, req, res, next) => {
   switch (err.message) {
     case 'NoCodeProvided':
       return res.redirect('/404')
-    case 'Failed to fetch user\'s guilds':
+    case "Failed to fetch user's guilds":
       return res.redirect('/login')
     default:
       return res.redirect('/')
   }
 })
 
-Db.determineType()
-  .then(async () => {
-    await Promise.all([
-      Event.getUicons(config.icons.styles),
-      Event.getMasterfile(),
-      Event.getInvasions(),
-      Event.getWebhooks(config),
-      Event.setAvailable('gyms', 'Gym', Db),
-      Event.setAvailable('pokestops', 'Pokestop', Db),
-      Event.setAvailable('pokemon', 'Pokemon', Db),
-      Event.setAvailable('nests', 'Nest', Db),
-    ])
-      .then(() => {
-        Event.addAvailable()
-        app.listen(config.port, config.interface, () => {
-          console.log(`[INIT] Server is now listening at http://${config.interface}:${config.port}`)
-        })
-      })
+Db.determineType().then(async () => {
+  await Promise.all([
+    Event.getUicons(config.icons.styles),
+    Event.getMasterfile(),
+    Event.getInvasions(),
+    Event.getWebhooks(config),
+    Event.setAvailable('gyms', 'Gym', Db),
+    Event.setAvailable('pokestops', 'Pokestop', Db),
+    Event.setAvailable('pokemon', 'Pokemon', Db),
+    Event.setAvailable('nests', 'Nest', Db),
+  ]).then(() => {
+    Event.addAvailable()
+    app.listen(config.port, config.interface, () => {
+      console.log(
+        `[INIT] Server is now listening at http://${config.interface}:${config.port}`,
+      )
+    })
   })
+})
 
 module.exports = app

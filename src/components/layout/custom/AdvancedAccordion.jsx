@@ -1,6 +1,12 @@
 import React from 'react'
 import {
-  createTheme, ThemeProvider, Grid, Typography, Accordion, AccordionSummary, AccordionDetails,
+  createTheme,
+  ThemeProvider,
+  Grid,
+  Typography,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@material-ui/core'
 import { ExpandMore } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
@@ -57,18 +63,18 @@ export default function AdvancedAccordion({ block, theme = {} }) {
   return (
     <ThemeProvider theme={theme}>
       <ThemeProvider
-        theme={(theme2) => createTheme({
-          ...theme2,
-          ...accordionTheme,
-        })}
+        theme={(theme2) =>
+          createTheme({
+            ...theme2,
+            ...accordionTheme,
+          })
+        }
       >
         <Accordion>
           <AccordionSummary
             expandIcon={<ExpandMore style={{ color: 'white' }} />}
           >
-            <Typography variant="caption">
-              {t('advanced')}
-            </Typography>
+            <Typography variant="caption">{t('advanced')}</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Grid

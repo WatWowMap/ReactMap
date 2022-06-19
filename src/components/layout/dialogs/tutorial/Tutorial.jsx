@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import {
-  DialogActions, Button, MobileStepper, useMediaQuery,
+  DialogActions,
+  Button,
+  MobileStepper,
+  useMediaQuery,
 } from '@material-ui/core'
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons'
 import { useTheme } from '@material-ui/core/styles'
@@ -18,7 +21,11 @@ import Popups from './Popups'
 
 const steps = ['intro', 'sidebar', 'sliders', 'advanced', 'popups', 'closing']
 
-export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) {
+export default function Tutorial({
+  toggleDialog,
+  setTutorial,
+  setUserProfile,
+}) {
   const theme = useTheme()
   const { t } = useTranslation()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
@@ -40,12 +47,18 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
 
   const getStepContent = (stepIndex) => {
     switch (stepIndex) {
-      case 0: return <Welcome setUserProfile={setUserProfile} />
-      case 1: return <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />
-      case 2: return <Sliders isMobile={isMobile} />
-      case 3: return <Advanced isMobile={isMobile} />
-      case 4: return <Popups isMobile={isMobile} />
-      default: return <Closing />
+      case 0:
+        return <Welcome setUserProfile={setUserProfile} />
+      case 1:
+        return <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />
+      case 2:
+        return <Sliders isMobile={isMobile} />
+      case 3:
+        return <Advanced isMobile={isMobile} />
+      case 4:
+        return <Popups isMobile={isMobile} />
+      default:
+        return <Closing />
     }
   }
 
@@ -60,18 +73,34 @@ export default function Tutorial({ toggleDialog, setTutorial, setUserProfile }) 
           position="static"
           activeStep={activeStep}
           style={{ maxWidth: 400, flexGrow: 1 }}
-          nextButton={(
-            <Button size="small" onClick={activeStep === 5 ? handleTutClose : handleNext} name="open">
+          nextButton={
+            <Button
+              size="small"
+              onClick={activeStep === 5 ? handleTutClose : handleNext}
+              name="open"
+            >
               {activeStep === 5 ? t('finish') : t('next')}
-              {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+              {theme.direction === 'rtl' ? (
+                <KeyboardArrowLeft />
+              ) : (
+                <KeyboardArrowRight />
+              )}
             </Button>
-          )}
-          backButton={(
-            <Button size="small" onClick={handleBack} disabled={activeStep === 0}>
-              {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+          }
+          backButton={
+            <Button
+              size="small"
+              onClick={handleBack}
+              disabled={activeStep === 0}
+            >
+              {theme.direction === 'rtl' ? (
+                <KeyboardArrowRight />
+              ) : (
+                <KeyboardArrowLeft />
+              )}
               {t('back')}
             </Button>
-          )}
+          }
         />
       </DialogActions>
     </>

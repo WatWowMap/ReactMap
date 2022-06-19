@@ -12,16 +12,12 @@ export default function ClientError({ error }) {
       <Header titles={[`${error}_title`]} />
       <DialogContent style={{ textAlign: 'center', whiteSpace: 'pre-line' }}>
         <br />
-        <Typography variant="h6">
-          {t(`${error}_body`)}
-        </Typography>
+        <Typography variant="h6">{t(`${error}_body`)}</Typography>
         <br />
-        <Typography variant="h6">
-          {t('refresh_to_continue')}
-        </Typography>
+        <Typography variant="h6">{t('refresh_to_continue')}</Typography>
         <br />
         <Button
-          onClick={() => window.location = window.location.href}
+          onClick={() => (window.location = window.location.href)}
           variant="contained"
           color="primary"
           style={{ marginBottom: 20 }}

@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
 import {
-  Grid, DialogContent, Typography, Fab, Divider, Button,
+  Grid,
+  DialogContent,
+  Typography,
+  Fab,
+  Divider,
+  Button,
 } from '@material-ui/core'
 import { Menu, Settings } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
@@ -12,9 +17,10 @@ import data from './data.json'
 export default function TutSidebar({ toggleDialog, isMobile }) {
   const { t } = useTranslation()
   const [tempFilters, setTempFilters] = useState(data.filters)
-  const { perms } = useStatic(state => state.auth)
+  const { perms } = useStatic((state) => state.auth)
 
-  const permCheck = perms.pokestops || perms.invasions || perms.quests || perms.lures
+  const permCheck =
+    perms.pokestops || perms.invasions || perms.quests || perms.lures
 
   return (
     <DialogContent>
@@ -57,7 +63,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
             margin: 10,
           }}
         >
-          {Object.keys(tempFilters.pokestops).map(subItem => {
+          {Object.keys(tempFilters.pokestops).map((subItem) => {
             if (subItem === 'filter') {
               return null
             }
@@ -71,7 +77,11 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
               />
             )
           })}
-          <Grid item xs={t('drawer_grid_options_width')} style={{ textAlign: 'center' }}>
+          <Grid
+            item
+            xs={t('drawer_grid_options_width')}
+            style={{ textAlign: 'center' }}
+          >
             <Button
               onClick={toggleDialog(true, 'pokestops', 'options')}
               variant="contained"
@@ -81,7 +91,11 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
               {t('options')}
             </Button>
           </Grid>
-          <Grid item xs={t('drawer_grid_advanced_width')} style={{ textAlign: 'center' }}>
+          <Grid
+            item
+            xs={t('drawer_grid_advanced_width')}
+            style={{ textAlign: 'center' }}
+          >
             <Button
               onClick={toggleDialog(true, 'pokestops', 'filters')}
               variant="contained"

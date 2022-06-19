@@ -19,23 +19,34 @@ import Footer from '../general/Footer'
 
 export default function UserOptions({ category, toggleDialog, isMobile }) {
   const { t } = useTranslation()
-  const { [category]: staticUserSettings } = useStatic(state => state.userSettings)
-  const userSettings = useStore(state => state.userSettings)
+  const { [category]: staticUserSettings } = useStatic(
+    (state) => state.userSettings,
+  )
+  const userSettings = useStore((state) => state.userSettings)
 
   const [localState, setLocalState] = useState(userSettings[category])
   const [tab, setTab] = useState(0)
-  const [tabPages] = useState(Array.from({
-    length: Math.ceil(Object.keys(staticUserSettings).length / 10),
-  }, (v, i) => i))
+  const [tabPages] = useState(
+    Array.from(
+      {
+        length: Math.ceil(Object.keys(staticUserSettings).length / 10),
+      },
+      (v, i) => i,
+    ),
+  )
 
-  const handleChange = event => {
+  const handleChange = (event) => {
     const { name, value } = event.target
     if (value) {
       setLocalState({ ...localState, [name]: value })
     } else {
       setLocalState({ ...localState, [name]: !localState[name] })
     }
-    Utility.analytics('User Options', `Name: ${name} New Value: ${value || !localState[name]}`, category)
+    Utility.analytics(
+      'User Options',
+      `Name: ${name} New Value: ${value || !localState[name]}`,
+      category,
+    )
   }
 
   const handleTabChange = (event, newValue) => {
@@ -44,53 +55,52 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
 
   const getLabel = (label) => {
     if (label.startsWith('pvp') && !label.includes('Mega')) {
-      return (
-        <Trans i18nKey="pvp_level">
-          {{ level: label.substring(3) }}
-        </Trans>
-      )
+      return <Trans i18nKey="pvp_level">{{ level: label.substring(3) }}</Trans>
     }
-    return (t(Utility.camelToSnake(label), Utility.getProperName(label)))
+    return t(Utility.camelToSnake(label), Utility.getProperName(label))
   }
 
   const getInputType = (option, subOption) => {
     const fullOption = subOption
-      ? staticUserSettings[option].sub[subOption] : staticUserSettings[option]
+      ? staticUserSettings[option].sub[subOption]
+      : staticUserSettings[option]
 
     switch (fullOption.type) {
-      case 'bool': return (
-        <Grid item xs={3} style={{ textAlign: 'right' }}>
-          <Switch
-            color="secondary"
-            checked={localState[subOption || option]}
-            name={subOption || option}
-            onChange={handleChange}
-            disabled={fullOption.disabled}
-          />
-        </Grid>
-      )
-      default: return (
-        <Grid item xs={3} style={{ textAlign: 'right' }}>
-          <Input
-            color="secondary"
-            id={subOption || option}
-            label={subOption || option}
-            name={subOption || option}
-            style={{ width: 50 }}
-            value={localState[subOption || option]}
-            onChange={handleChange}
-            variant="outlined"
-            size="small"
-            type={fullOption.type}
-            disabled={fullOption.disabled}
-            endAdornment={fullOption.label || ''}
-            inputProps={{
-              min: 0,
-              max: 100,
-            }}
-          />
-        </Grid>
-      )
+      case 'bool':
+        return (
+          <Grid item xs={3} style={{ textAlign: 'right' }}>
+            <Switch
+              color="secondary"
+              checked={localState[subOption || option]}
+              name={subOption || option}
+              onChange={handleChange}
+              disabled={fullOption.disabled}
+            />
+          </Grid>
+        )
+      default:
+        return (
+          <Grid item xs={3} style={{ textAlign: 'right' }}>
+            <Input
+              color="secondary"
+              id={subOption || option}
+              label={subOption || option}
+              name={subOption || option}
+              style={{ width: 50 }}
+              value={localState[subOption || option]}
+              onChange={handleChange}
+              variant="outlined"
+              size="small"
+              type={fullOption.type}
+              disabled={fullOption.disabled}
+              endAdornment={fullOption.label || ''}
+              inputProps={{
+                min: 0,
+                max: 100,
+              }}
+            />
+          </Grid>
+        )
     }
   }
 
@@ -110,7 +120,7 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
               variant="fullWidth"
               style={{ backgroundColor: '#424242', width: '100%' }}
             >
-              {tabPages.map(each => (
+              {tabPages.map((each) => (
                 <Tab
                   key={each}
                   label={<Trans i18nKey="page">{{ page: each + 1 }}</Trans>}
@@ -120,7 +130,7 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
             </Tabs>
           </AppBar>
         )}
-        {tabPages.map(each => (
+        {tabPages.map((each) => (
           <TabPanel value={tab} index={each} key={each}>
             {Object.entries(staticUserSettings).map(([key, values], j) => {
               const start = each * 10
@@ -138,13 +148,11 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
                   spacing={2}
                 >
                   <Grid item xs={9}>
-                    <Typography variant="body1">
-                      {getLabel(key)}
-                    </Typography>
+                    <Typography variant="body1">{getLabel(key)}</Typography>
                   </Grid>
                   {getInputType(key)}
-                  {values.sub
-                    && Object.keys(values.sub).map(subOption => (
+                  {values.sub &&
+                    Object.keys(values.sub).map((subOption) => (
                       <Fragment key={subOption}>
                         <Grid item xs={9}>
                           <Typography variant="body1">
@@ -160,10 +168,21 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
           </TabPanel>
         ))}
       </DialogContent>
-      <Footer options={[
-        { name: 'reset', action: () => setLocalState(userSettings[category]), icon: 'Replay', color: 'primary' },
-        { name: 'save', action: toggleDialog(false, category, 'options', localState), icon: 'Save', color: 'secondary' },
-      ]}
+      <Footer
+        options={[
+          {
+            name: 'reset',
+            action: () => setLocalState(userSettings[category]),
+            icon: 'Replay',
+            color: 'primary',
+          },
+          {
+            name: 'save',
+            action: toggleDialog(false, category, 'options', localState),
+            icon: 'Save',
+            color: 'secondary',
+          },
+        ]}
       />
     </>
   )

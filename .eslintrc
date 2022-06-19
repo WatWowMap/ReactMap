@@ -2,7 +2,8 @@
   "extends": [
     "airbnb",
     "airbnb/rules/react",
-    "eslint:recommended"
+    "eslint:recommended",
+    "prettier"
   ],
   "parserOptions": {
     "ecmaVersion": "latest"

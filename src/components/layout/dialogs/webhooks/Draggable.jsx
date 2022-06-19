@@ -1,14 +1,20 @@
-import React, {
-  useState, useRef, useMemo, useEffect,
-} from 'react'
+import React, { useState, useRef, useMemo, useEffect } from 'react'
 import {
-  Grid, Button, Typography, OutlinedInput, InputAdornment, FormControl,
+  Grid,
+  Button,
+  Typography,
+  OutlinedInput,
+  InputAdornment,
+  FormControl,
 } from '@material-ui/core'
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
 export default function DraggableMarker({
-  map, setWebhookMode, webhookLocation, setWebhookLocation,
+  map,
+  setWebhookMode,
+  webhookLocation,
+  setWebhookLocation,
 }) {
   const [position, setPosition] = useState(webhookLocation)
   const [radius, setRadius] = useState(0)
@@ -65,14 +71,16 @@ export default function DraggableMarker({
               <FormControl variant="outlined">
                 <OutlinedInput
                   value={radius}
-                  onChange={(e) => setRadius(e.target.value.replace(/[^0-9.]/g, ''))}
-                  endAdornment={<InputAdornment position="end">{t('m')}</InputAdornment>}
+                  onChange={(e) =>
+                    setRadius(e.target.value.replace(/[^0-9.]/g, ''))
+                  }
+                  endAdornment={
+                    <InputAdornment position="end">{t('m')}</InputAdornment>
+                  }
                   labelWidth={0}
                 />
               </FormControl>
-              <Typography variant="caption">
-                {t('distance_radius')}
-              </Typography>
+              <Typography variant="caption">{t('distance_radius')}</Typography>
             </Grid>
             <Grid item>
               <Button

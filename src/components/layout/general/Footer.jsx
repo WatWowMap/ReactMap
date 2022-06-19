@@ -1,6 +1,10 @@
 import React from 'react'
 import {
-  IconButton, Button, Typography, useMediaQuery, Grid,
+  IconButton,
+  Button,
+  Typography,
+  useMediaQuery,
+  Grid,
 } from '@material-ui/core'
 import { useTheme } from '@material-ui/styles'
 import { useTranslation } from 'react-i18next'
@@ -23,7 +27,7 @@ export default function Footer({ options, role }) {
       alignItems="center"
       style={{ minHeight: 50 }}
     >
-      {options.map(button => {
+      {options.map((button) => {
         const key = button.key || button.name
         const actualSize = button.size || Math.floor(12 / options.length)
         if (button.component) {
@@ -72,10 +76,10 @@ export default function Footer({ options, role }) {
                 disabled={button.disabled}
               >
                 {!button.mobileOnly && (
-                  <Typography
-                    variant="caption"
-                  >
-                    {typeof button.name === 'string' ? t(button.name) : button.name}
+                  <Typography variant="caption">
+                    {typeof button.name === 'string'
+                      ? t(button.name)
+                      : button.name}
                   </Typography>
                 )}
               </Button>

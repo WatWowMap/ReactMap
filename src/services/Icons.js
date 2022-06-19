@@ -14,15 +14,17 @@ export default class UIcons {
       },
     }
     this.cacheMs = cacheHrs * 60 * 60 * 1000
-    Object.entries(questRewardTypes).forEach(([id, category]) => (
-      this.questRewardTypes[id] = category.toLowerCase().replace(' ', '_')
-    ))
+    Object.entries(questRewardTypes).forEach(
+      ([id, category]) =>
+        (this.questRewardTypes[id] = category.toLowerCase().replace(' ', '_')),
+    )
   }
 
   build(icons) {
-    const baseUrl = 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
+    const baseUrl =
+      'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
 
-    icons.forEach(icon => {
+    icons.forEach((icon) => {
       try {
         const { data } = icon
         if (data) {
@@ -34,16 +36,22 @@ export default class UIcons {
           if (!this[icon.name].modifiers) {
             this[icon.name].modifiers = {}
           }
-          this[icon.name].indexes.forEach(category => {
+          this[icon.name].indexes.forEach((category) => {
             let isValid = false
-            if (!parseInt(category) && category !== '0' && category !== 'lastFetched') {
+            if (
+              !parseInt(category) &&
+              category !== '0' &&
+              category !== 'lastFetched'
+            ) {
               if (Array.isArray(data[category])) {
                 this[icon.name][category] = new Set(data[category])
                 isValid = true
               } else {
-                Object.keys(data[category]).forEach(subCategory => {
+                Object.keys(data[category]).forEach((subCategory) => {
                   if (Array.isArray(data[category][subCategory])) {
-                    this[icon.name][subCategory] = new Set(data[category][subCategory])
+                    this[icon.name][subCategory] = new Set(
+                      data[category][subCategory],
+                    )
                     isValid = true
                   }
                 })
@@ -84,12 +92,12 @@ export default class UIcons {
   }
 
   checkValid(localIconObj) {
-    return Object.values(localIconObj).every(icon => this[icon])
+    return Object.values(localIconObj).every((icon) => this[icon])
   }
 
   setSelection(categories, value) {
     if (typeof categories === 'object') {
-      Object.keys(categories).forEach(category => {
+      Object.keys(categories).forEach((category) => {
         if (category !== 'misc') {
           this.selected[category] = categories[category]
           this.modifiers[category] = this[categories[category]]
@@ -121,24 +129,45 @@ export default class UIcons {
 
   getIconById(id) {
     switch (id.charAt(0)) {
-      case 'c': return this.getRewards(4, ...id.slice(1).split('-'))
-      case 'd': return this.getRewards(3, id.slice(1))
-      case 'e': return this.getEggs(id.slice(1), false)
-      case 'g': return this.getGyms(...id.slice(1).split('-'))
-      case 'i': return this.getInvasions(id.slice(1))
-      case 'l': return this.getPokestops(id.slice(1))
-      case 'm': return this.getPokemon(id.slice(1).split('-')[0], 0, 1)
-      case 'q': return this.getRewards(2, ...id.slice(1).split('-'))
-      case 'r': return this.getEggs(id.slice(1), true)
-      case 's': return this.getPokestops(0)
-      case 't': return this.getGyms(...id.slice(1).split('-'))
-      case 'u': return this.getRewards(id.slice(1))
-      case 'x': return this.getRewards(9, ...id.slice(1).split('-'))
-      default: return this.getPokemon(...id.split('-'))
+      case 'c':
+        return this.getRewards(4, ...id.slice(1).split('-'))
+      case 'd':
+        return this.getRewards(3, id.slice(1))
+      case 'e':
+        return this.getEggs(id.slice(1), false)
+      case 'g':
+        return this.getGyms(...id.slice(1).split('-'))
+      case 'i':
+        return this.getInvasions(id.slice(1))
+      case 'l':
+        return this.getPokestops(id.slice(1))
+      case 'm':
+        return this.getPokemon(id.slice(1).split('-')[0], 0, 1)
+      case 'q':
+        return this.getRewards(2, ...id.slice(1).split('-'))
+      case 'r':
+        return this.getEggs(id.slice(1), true)
+      case 's':
+        return this.getPokestops(0)
+      case 't':
+        return this.getGyms(...id.slice(1).split('-'))
+      case 'u':
+        return this.getRewards(id.slice(1))
+      case 'x':
+        return this.getRewards(9, ...id.slice(1).split('-'))
+      default:
+        return this.getPokemon(...id.split('-'))
     }
   }
 
-  getPokemon(pokemonId, form = 0, evolution = 0, gender = 0, costume = 0, shiny = false) {
+  getPokemon(
+    pokemonId,
+    form = 0,
+    evolution = 0,
+    gender = 0,
+    costume = 0,
+    shiny = false,
+  ) {
     const baseUrl = `${this[this.selected.pokemon].path}/pokemon`
     const evolutionSuffixes = evolution ? [`_e${evolution}`, ''] : ['']
     const formSuffixes = form ? [`_f${form}`, ''] : ['']
@@ -171,7 +200,12 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
-  getPokestops(lureId, invasionActive = false, questActive = false, ar = false) {
+  getPokestops(
+    lureId,
+    invasionActive = false,
+    questActive = false,
+    ar = false,
+  ) {
     const baseUrl = `${this[this.selected.pokestop].path}/pokestop`
     const invasionSuffixes = invasionActive ? ['_i', ''] : ['']
     const questSuffixes = questActive ? ['_q', ''] : ['']
@@ -213,7 +247,13 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
-  getGyms(teamId = 0, trainerCount = 0, inBattle = false, ex = false, ar = false) {
+  getGyms(
+    teamId = 0,
+    trainerCount = 0,
+    inBattle = false,
+    ex = false,
+    ar = false,
+  ) {
     const baseUrl = `${this[this.selected.gym].path}/gym`
     const trainerSuffixes = trainerCount ? [`_t${trainerCount}`, ''] : ['']
     const inBattleSuffixes = inBattle ? ['_b', ''] : ['']
@@ -241,7 +281,10 @@ export default class UIcons {
     for (let h = 0; h < hatchedSuffixes.length; h += 1) {
       for (let e = 0; e < exSuffixes.length; e += 1) {
         const result = `${level}${hatchedSuffixes[h]}${exSuffixes[e]}.png`
-        if (this[this.selected.raid].egg && this[this.selected.raid].egg.has(result)) {
+        if (
+          this[this.selected.raid].egg &&
+          this[this.selected.raid].egg.has(result)
+        ) {
           return `${baseUrl}/${result}`
         }
       }
@@ -284,11 +327,14 @@ export default class UIcons {
     switch (true) {
       case this[this.selected.misc].misc.has(`${fileName}.png`):
         return `${baseUrl}/${fileName}.png`
-      case fileName.endsWith('s') && this[this.selected.misc].misc.has(`${fileName.slice(0, -1)}.png`):
+      case fileName.endsWith('s') &&
+        this[this.selected.misc].misc.has(`${fileName.slice(0, -1)}.png`):
         return `${baseUrl}/${fileName.slice(0, -1)}.png`
-      case !fileName.endsWith('s') && this[this.selected.misc].misc.has(`${fileName}s.png`):
+      case !fileName.endsWith('s') &&
+        this[this.selected.misc].misc.has(`${fileName}s.png`):
         return `${baseUrl}/${fileName}s.png`
-      default: return `${baseUrl}/0.png`
+      default:
+        return `${baseUrl}/0.png`
     }
   }
 

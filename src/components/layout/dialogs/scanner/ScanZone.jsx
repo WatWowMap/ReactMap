@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import {
-  Dialog, DialogContent, DialogTitle, DialogActions, Button, Grid, Typography,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogActions,
+  Button,
+  Grid,
+  Typography,
 } from '@material-ui/core'
 
 import { useStatic, useStore } from '@hooks/useStore'
@@ -10,47 +16,64 @@ import Query from '@services/Query'
 import ScanZoneTarget from './ScanZoneTarget'
 
 export default function ScanZone({
-  map, theme, scanZoneMode, setScanZoneMode,
-  scanner: { scannerType, scanZoneShowScanCount, scanZoneShowScanQueue, advancedScanZoneOptions,
-    scanZoneRadius, scanZoneSpacing, scanZoneMaxSize, scanZoneAreaRestriction },
+  map,
+  theme,
+  scanZoneMode,
+  setScanZoneMode,
+  scanner: {
+    scannerType,
+    scanZoneShowScanCount,
+    scanZoneShowScanQueue,
+    advancedScanZoneOptions,
+    scanZoneRadius,
+    scanZoneSpacing,
+    scanZoneMaxSize,
+    scanZoneAreaRestriction,
+  },
 }) {
-  const { data: scanAreas } = scanZoneAreaRestriction?.length ? useQuery(Query.scanAreas()) : { data: null }
-  const { loggedIn } = useStatic(state => state.auth)
+  const { data: scanAreas } = scanZoneAreaRestriction?.length
+    ? useQuery(Query.scanAreas())
+    : { data: null }
+  const { loggedIn } = useStatic((state) => state.auth)
   const { t } = useTranslation()
-  const location = useStore(s => s.location)
+  const location = useStore((s) => s.location)
   const [queue, setQueue] = useState('init')
   const [scanZoneLocation, setScanZoneLocation] = useState(location)
   const [scanZoneCoords, setScanZoneCoords] = useState([location])
   const [scanZoneSize, setScanZoneSize] = useState(1)
-  const [scanZone, { error: scannerError, data: scannerResponse }] = useLazyQuery(Query.scanner(), {
-    variables: {
-      version: inject.VERSION,
-      category: 'scanZone',
-      method: 'GET',
-      data: {
-        username: loggedIn?.username || 'a visitor',
-        userId: loggedIn?.id,
-        scanZoneLocation,
-        scanZoneCoords,
-        scanZoneSize,
+  const [scanZone, { error: scannerError, data: scannerResponse }] =
+    useLazyQuery(Query.scanner(), {
+      variables: {
+        version: inject.VERSION,
+        category: 'scanZone',
+        method: 'GET',
+        data: {
+          username: loggedIn?.username || 'a visitor',
+          userId: loggedIn?.id,
+          scanZoneLocation,
+          scanZoneCoords,
+          scanZoneSize,
+        },
       },
-    },
-    fetchPolicy: 'no-cache',
-  })
-  const [getQueue, { data: scannerQueueResponse }] = useLazyQuery(Query.scanner(), {
-    variables: {
-      version: inject.VERSION,
-      category: 'getQueue',
-      method: 'GET',
-      data: {
-        username: loggedIn?.username || 'a visitor',
-        userId: loggedIn?.id,
-        type: 'scan_next',
-        typeName: 'scanZone',
+      fetchPolicy: 'no-cache',
+    })
+  const [getQueue, { data: scannerQueueResponse }] = useLazyQuery(
+    Query.scanner(),
+    {
+      variables: {
+        version: inject.VERSION,
+        category: 'getQueue',
+        method: 'GET',
+        data: {
+          username: loggedIn?.username || 'a visitor',
+          userId: loggedIn?.id,
+          type: 'scan_next',
+          typeName: 'scanZone',
+        },
       },
+      fetchPolicy: 'no-cache',
     },
-    fetchPolicy: 'no-cache',
-  })
+  )
 
   if (scanZoneMode === 'sendCoords') {
     scanZone()

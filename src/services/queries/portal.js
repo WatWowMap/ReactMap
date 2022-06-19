@@ -1,8 +1,20 @@
 import { gql } from '@apollo/client'
 
 export const getAllPortals = gql`
-  query Portals($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $version: String) {
-    portals(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, version: $version) {
+  query Portals(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $version: String
+  ) {
+    portals(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      version: $version
+    ) {
       id
       lat
       lon

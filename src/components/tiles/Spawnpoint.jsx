@@ -15,7 +15,11 @@ const SpawnpointTile = ({ item, Icons, ts }) => {
   return modifiers.useImage ? (
     <Marker
       position={[item.lat, item.lon]}
-      icon={spawnpointMarker(Icons.getSpawnpoints(item.despawn_sec), size * 6, modifiers)}
+      icon={spawnpointMarker(
+        Icons.getSpawnpoints(item.despawn_sec),
+        size * 6,
+        modifiers,
+      )}
     >
       {popup}
     </Marker>
@@ -29,9 +33,7 @@ const SpawnpointTile = ({ item, Icons, ts }) => {
     </Circle>
   )
 }
-const areEqual = (prev, next) => (
-  prev.item.id === next.item.id
-  && prev.item.updated === next.item.updated
-)
+const areEqual = (prev, next) =>
+  prev.item.id === next.item.id && prev.item.updated === next.item.updated
 
 export default memo(SpawnpointTile, areEqual)

@@ -6,13 +6,23 @@ export default function WebhookError({ selectedWebhook }) {
   const { t } = useTranslation()
 
   return (
-    <Grid container direction="column" justifyContent="center" alignItems="center" style={{ height: '100%' }}>
+    <Grid
+      container
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      style={{ height: '100%' }}
+    >
       <Grid item>
         <Typography variant="h4" align="center">
           {t('non_registered_human_title')}
         </Typography>
         <br />
-        <Typography variant="h6" align="center" style={{ whiteSpace: 'pre-line' }}>
+        <Typography
+          variant="h6"
+          align="center"
+          style={{ whiteSpace: 'pre-line' }}
+        >
           <Trans i18nKey="non_registered_human_desc">
             {{ webhook: selectedWebhook }}
           </Trans>

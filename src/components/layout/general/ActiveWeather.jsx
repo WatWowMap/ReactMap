@@ -9,13 +9,22 @@ import WeatherPopup from '@components/popups/Weather'
 import Header from './Header'
 import Footer from './Footer'
 
-export default function ActiveWeather({ Icons, isNight, map, zoom, weather, isMobile, clickable }) {
-  const location = useStore(state => state.location)
+export default function ActiveWeather({
+  Icons,
+  isNight,
+  map,
+  zoom,
+  weather,
+  isMobile,
+  clickable,
+}) {
+  const location = useStore((state) => state.location)
   const [open, setOpen] = useState(false)
 
   const { disableColorShift = false } = Icons.getModifiers('weather')
   const active = weather.find(
-    cell => cell && booleanPointInPolygon(point(location), polygon([cell.polygon])),
+    (cell) =>
+      cell && booleanPointInPolygon(point(location), polygon([cell.polygon])),
   )
 
   return active?.gameplay_condition && map.getZoom() > zoom ? (
@@ -48,14 +57,25 @@ export default function ActiveWeather({ Icons, isNight, map, zoom, weather, isMo
       </div>
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs">
         <Header titles={['weather']} action={() => setOpen(false)} />
-        <DialogContent style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <WeatherPopup
-            weather={active}
-            Icons={Icons}
-            ts={Date.now() / 1000}
-          />
+        <DialogContent
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <WeatherPopup weather={active} Icons={Icons} ts={Date.now() / 1000} />
         </DialogContent>
-        <Footer options={[{ icon: 'Close', name: 'close', action: () => setOpen(false), color: 'primary' }]} />
+        <Footer
+          options={[
+            {
+              icon: 'Close',
+              name: 'close',
+              action: () => setOpen(false),
+              color: 'primary',
+            },
+          ]}
+        />
       </Dialog>
     </Fragment>
   ) : null

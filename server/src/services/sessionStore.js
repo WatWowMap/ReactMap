@@ -4,7 +4,9 @@ const session = require('express-session')
 const MySQLStore = require('express-mysql-session')(session)
 const {
   api: { maxSessions },
-  database: { settings: { sessionTableName } },
+  database: {
+    settings: { sessionTableName },
+  },
 } = require('./config')
 const Utility = require('./Utility')
 const { Session } = require('../models/index')
@@ -36,7 +38,7 @@ const sessionStore = new MySQLStore({
 })
 
 const isValidSession = async (userId) => {
-  const ts = Math.floor((new Date()).getTime() / 1000)
+  const ts = Math.floor(new Date().getTime() / 1000)
   const results = await Session.query()
     .select('session_id')
     .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
@@ -54,7 +56,9 @@ const clearOtherSessions = async (userId, currentSessionId) => {
 
 const clearDiscordSessions = async (discordId, botName) => {
   const results = await Session.query()
-    .whereRaw(`json_extract(data, '$.passport.user.discordId') = '${discordId}'`)
+    .whereRaw(
+      `json_extract(data, '$.passport.user.discordId') = '${discordId}'`,
+    )
     .orWhereRaw(`json_extract(data, '$.passport.user.id') = '${discordId}'`)
     .delete()
   console.log(`[Session${botName && ` - ${botName}`}] Clear Result:`, results)

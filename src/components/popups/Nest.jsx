@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import {
-  Grid, Typography, IconButton, Divider, Menu, MenuItem,
+  Grid,
+  Typography,
+  IconButton,
+  Divider,
+  Menu,
+  MenuItem,
 } from '@material-ui/core'
 import { MoreVert } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
@@ -8,23 +13,19 @@ import { useTranslation } from 'react-i18next'
 import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
-export default function NestPopup({
-  nest, iconUrl, pokemon, recent,
-}) {
+export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
   const { t } = useTranslation()
-  const hideList = useStatic(state => state.hideList)
-  const setHideList = useStatic(state => state.setHideList)
-  const excludeList = useStatic(state => state.excludeList)
-  const setExcludeList = useStatic(state => state.setExcludeList)
-  const filters = useStore(state => state.filters)
-  const setFilters = useStore(state => state.setFilters)
+  const hideList = useStatic((state) => state.hideList)
+  const setHideList = useStatic((state) => state.setHideList)
+  const excludeList = useStatic((state) => state.excludeList)
+  const setExcludeList = useStatic((state) => state.setExcludeList)
+  const filters = useStore((state) => state.filters)
+  const setFilters = useStore((state) => state.setFilters)
   const [parkName, setParkName] = useState(true)
   const [anchorEl, setAnchorEl] = useState(false)
-  const {
-    id, name, updated, pokemon_avg,
-  } = nest
+  const { id, name, updated, pokemon_avg } = nest
 
-  const lastUpdated = Utility.getTimeUntil((new Date(updated * 1000)))
+  const lastUpdated = Utility.getTimeUntil(new Date(updated * 1000))
 
   const getColor = (timeSince) => {
     let color = '#00e676'
@@ -96,10 +97,7 @@ export default function NestPopup({
         </Typography>
       </Grid>
       <Grid item xs={3}>
-        <IconButton
-          aria-haspopup="true"
-          onClick={handleClick}
-        >
+        <IconButton aria-haspopup="true" onClick={handleClick}>
           <MoreVert style={{ color: 'white' }} />
         </IconButton>
       </Grid>
@@ -136,10 +134,11 @@ export default function NestPopup({
         </Typography>
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'center' }}>
-        <Typography variant="subtitle2">
-          {t('last_updated')}
-        </Typography>
-        <Typography variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'} style={{ color: getColor(lastUpdated.diff) }}>
+        <Typography variant="subtitle2">{t('last_updated')}</Typography>
+        <Typography
+          variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'}
+          style={{ color: getColor(lastUpdated.diff) }}
+        >
           {lastUpdated.str.replace('days', t('days')).replace('day', t('day'))}
         </Typography>
         <Typography variant="subtitle2">
@@ -152,12 +151,14 @@ export default function NestPopup({
       <Grid item xs={12} style={{ textAlign: 'center' }}>
         {recent ? (
           <Typography variant="caption">
-            {t('nest_estimated')}<br />
+            {t('nest_estimated')}
+            <br />
             {t('verify_nests')}
           </Typography>
         ) : (
           <Typography variant="caption">
-            {t('nest_out_of_date')}<br />
+            {t('nest_out_of_date')}
+            <br />
             {t('nest_check_current')}
           </Typography>
         )}

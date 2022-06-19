@@ -4,7 +4,9 @@ const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: { searchResultsLimit, queryLimits },
-  defaultFilters: { nests: { avgFilter } },
+  defaultFilters: {
+    nests: { avgFilter },
+  },
 } = require('../services/config')
 const fetchNests = require('../services/api/fetchNests')
 
@@ -20,7 +22,7 @@ module.exports = class Nest extends Model {
   static async getAll(perms, args) {
     const { areaRestrictions } = perms
     const pokemon = []
-    Object.keys(args.filters).forEach(pkmn => {
+    Object.keys(args.filters).forEach((pkmn) => {
       if (!pkmn.startsWith('o')) {
         pokemon.push(pkmn.split('-')[0])
       }
@@ -38,9 +40,9 @@ module.exports = class Nest extends Model {
     }
     const results = await query.limit(queryLimits.nests)
 
-    const fixedForms = queryResults => {
+    const fixedForms = (queryResults) => {
       const returnedResults = []
-      queryResults.forEach(pkmn => {
+      queryResults.forEach((pkmn) => {
         if (pkmn.pokemon_form == 0 || pkmn.pokemon_form === null) {
           const formId = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
           if (formId) pkmn.pokemon_form = formId
@@ -61,20 +63,24 @@ module.exports = class Nest extends Model {
       .orderBy('pokemon_id', 'asc')
 
     return {
-      available: results.length ? results.map(pokemon => {
-        if (pokemon.pokemon_form == 0 || pokemon.pokemon_form === null) {
-          return `${pokemon.pokemon_id}-${Event.masterfile.pokemon[pokemon.pokemon_id].defaultFormId || 0}`
-        }
-        return `${pokemon.pokemon_id}-${pokemon.pokemon_form || 0}`
-      }) : fetchNests(),
+      available: results.length
+        ? results.map((pokemon) => {
+            if (pokemon.pokemon_form == 0 || pokemon.pokemon_form === null) {
+              return `${pokemon.pokemon_id}-${
+                Event.masterfile.pokemon[pokemon.pokemon_id].defaultFormId || 0
+              }`
+            }
+            return `${pokemon.pokemon_id}-${pokemon.pokemon_form || 0}`
+          })
+        : fetchNests(),
     }
   }
 
   static async search(perms, args, { isMad }, distance) {
     const { search, locale } = args
-    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter(pkmn => (
-      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search)
-    ))
+    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
+      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
+    )
     const query = this.query()
       .select([
         'nest_id AS id',

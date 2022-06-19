@@ -1,6 +1,9 @@
 /* global BigInt */
 const {
-  S2LatLng, S2RegionCoverer, S2CellId, S2LatLngRect,
+  S2LatLng,
+  S2RegionCoverer,
+  S2CellId,
+  S2LatLngRect,
 } = require('nodes2ts')
 const getPolyVector = require('./getPolyVector')
 
@@ -29,7 +32,9 @@ module.exports = function getTypeCells(bounds, pokestops, gyms) {
   }
   for (let i = 0; i < gyms.length; i += 1) {
     const coords = gyms[i]
-    const level14Cell = S2CellId.fromPoint(S2LatLng.fromDegrees(coords.lat, coords.lon).toPoint()).parentL(14)
+    const level14Cell = S2CellId.fromPoint(
+      S2LatLng.fromDegrees(coords.lat, coords.lon).toPoint(),
+    ).parentL(14)
     const cellId = BigInt(level14Cell.id).toString()
     const cell = indexedCells[cellId]
     if (cell) {
@@ -39,7 +44,9 @@ module.exports = function getTypeCells(bounds, pokestops, gyms) {
   }
   for (let i = 0; i < pokestops.length; i += 1) {
     const coords = pokestops[i]
-    const level14Cell = S2CellId.fromPoint(S2LatLng.fromDegrees(coords.lat, coords.lon).toPoint()).parentL(14)
+    const level14Cell = S2CellId.fromPoint(
+      S2LatLng.fromDegrees(coords.lat, coords.lon).toPoint(),
+    ).parentL(14)
     const cellId = BigInt(level14Cell.id).toString()
     const cell = indexedCells[cellId]
     if (cell) {

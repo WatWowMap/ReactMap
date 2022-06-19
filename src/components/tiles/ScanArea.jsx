@@ -3,11 +3,14 @@ import { GeoJSON } from 'react-leaflet'
 import Utility from '@services/Utility'
 
 export default function ScanAreaTile({
-  item, webhookMode, selectedAreas, setSelectedAreas,
+  item,
+  webhookMode,
+  selectedAreas,
+  setSelectedAreas,
 }) {
   const handleClick = (name) => {
     if (selectedAreas.includes(name)) {
-      setSelectedAreas(selectedAreas.filter(h => h !== name))
+      setSelectedAreas(selectedAreas.filter((h) => h !== name))
     } else {
       setSelectedAreas([...selectedAreas, name])
     }
@@ -21,13 +24,21 @@ export default function ScanAreaTile({
         weight: feature.properties['stroke-width'] || 3,
         opacity: feature.properties['stroke-opacity'] || 1,
         fillColor: feature.properties.fill || '#3388ff',
-        fillOpacity: selectedAreas && selectedAreas.includes(name) && webhookMode === 'areas' ? 0.8 : 0.2,
+        fillOpacity:
+          selectedAreas &&
+          selectedAreas.includes(name) &&
+          webhookMode === 'areas'
+            ? 0.8
+            : 0.2,
       })
       if (webhookMode) {
         layer.on('click', () => handleClick(name))
-        layer.bindTooltip(popupContent, {
-          permanent: true, direction: 'top',
-        }).openTooltip()
+        layer
+          .bindTooltip(popupContent, {
+            permanent: true,
+            direction: 'top',
+          })
+          .openTooltip()
       } else {
         layer.bindPopup(popupContent)
       }
@@ -35,10 +46,6 @@ export default function ScanAreaTile({
   }
 
   return (
-    <GeoJSON
-      key={selectedAreas}
-      data={item}
-      onEachFeature={onEachFeature}
-    />
+    <GeoJSON key={selectedAreas} data={item} onEachFeature={onEachFeature} />
   )
 }

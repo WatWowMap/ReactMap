@@ -1,7 +1,5 @@
 import React from 'react'
-import {
-  Button, Typography, Divider, DialogContent,
-} from '@material-ui/core'
+import { Button, Typography, Divider, DialogContent } from '@material-ui/core'
 import { Create } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 import Header from '../general/Header'
@@ -38,7 +36,17 @@ export default function Feedback({ link, setFeedback }) {
           </Button>
         </Typography>
       </DialogContent>
-      <Footer options={[{ name: 'close', action: () => setFeedback(false), color: 'primary', align: 'right' }]} role="webhook_footer" />
+      <Footer
+        options={[
+          {
+            name: 'close',
+            action: () => setFeedback(false),
+            color: 'primary',
+            align: 'right',
+          },
+        ]}
+        role="webhook_footer"
+      />
     </>
   )
 }

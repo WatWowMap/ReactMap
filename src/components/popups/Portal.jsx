@@ -7,13 +7,15 @@ import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
 export default function PortalPopup({ portal, ts, Icons }) {
-  const { navigation } = useStore(state => state.settings)
-  const { navigation: { [navigation]: { url } } } = useStatic(state => state.config)
+  const { navigation } = useStore((state) => state.settings)
+  const {
+    navigation: {
+      [navigation]: { url },
+    },
+  } = useStatic((state) => state.config)
   const { t } = useTranslation()
   const [portalName, setPortalName] = useState(true)
-  const {
-    url: imageUrl, name, lat, lon, updated, imported,
-  } = portal
+  const { url: imageUrl, name, lat, lon, updated, imported } = portal
 
   const src = imageUrl
     ? imageUrl.replace('http://', 'https://')
@@ -72,10 +74,14 @@ export default function PortalPopup({ portal, ts, Icons }) {
         </a>
       </Grid>
       <Grid item xs={12} style={{ textAlign: 'center' }}>
-        {extraMetaData.map(meta => (
+        {extraMetaData.map((meta) => (
           <Fragment key={meta.description}>
-            <Typography variant="subtitle1" style={{ textAlign: 'center' }}>{meta.description}</Typography>
-            <Typography variant="caption" style={{ textAlign: 'center' }}>{meta.data}</Typography>
+            <Typography variant="subtitle1" style={{ textAlign: 'center' }}>
+              {meta.description}
+            </Typography>
+            <Typography variant="caption" style={{ textAlign: 'center' }}>
+              {meta.data}
+            </Typography>
           </Fragment>
         ))}
       </Grid>

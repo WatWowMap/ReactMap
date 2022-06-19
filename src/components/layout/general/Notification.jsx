@@ -28,7 +28,9 @@ export default function Notification({ severity, i18nKey, messages }) {
         {messages.map((message, i) => (
           <Fragment key={message.key}>
             <Trans i18nKey={`${i18nKey}_${i}`}>
-              {message.variables.map((variable, j) => ({ [`variable_${j}`]: t(variable) }))}
+              {message.variables.map((variable, j) => ({
+                [`variable_${j}`]: t(variable),
+              }))}
             </Trans>
             <br />
           </Fragment>

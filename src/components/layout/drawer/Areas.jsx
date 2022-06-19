@@ -1,8 +1,6 @@
 import React from 'react'
 import { useQuery } from '@apollo/client'
-import {
-  Paper, MenuItem, MenuList, Typography,
-} from '@material-ui/core'
+import { Paper, MenuItem, MenuList, Typography } from '@material-ui/core'
 import center from '@turf/center'
 import { useMap } from 'react-leaflet'
 
@@ -27,7 +25,7 @@ export default function AreaDropDown({ scanAreasZoom, manualAreas }) {
     >
       {Object.keys(manualAreas).length ? (
         <MenuList>
-          {Object.keys(manualAreas).map(area => (
+          {Object.keys(manualAreas).map((area) => (
             <MenuItem
               key={area}
               onClick={() => {
@@ -43,19 +41,20 @@ export default function AreaDropDown({ scanAreasZoom, manualAreas }) {
         </MenuList>
       ) : (
         <MenuList>
-          {data && data.scanAreas[0].features.map(area => (
-            <MenuItem
-              key={area.properties.name}
-              onClick={() => {
-                const [lon, lat] = center(area).geometry.coordinates
-                map.flyTo([lat, lon], scanAreasZoom)
-              }}
-            >
-              <Typography variant="subtitle2" align="center">
-                {Utility.getProperName(area.properties.name)}
-              </Typography>
-            </MenuItem>
-          ))}
+          {data &&
+            data.scanAreas[0].features.map((area) => (
+              <MenuItem
+                key={area.properties.name}
+                onClick={() => {
+                  const [lon, lat] = center(area).geometry.coordinates
+                  map.flyTo([lat, lon], scanAreasZoom)
+                }}
+              >
+                <Typography variant="subtitle2" align="center">
+                  {Utility.getProperName(area.properties.name)}
+                </Typography>
+              </MenuItem>
+            ))}
         </MenuList>
       )}
     </Paper>

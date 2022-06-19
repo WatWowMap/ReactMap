@@ -53,7 +53,11 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
       .then(async (userExists) => {
         if (req.user && userExists?.strategy === 'local') {
           await User.query()
-            .update({ discordId: user.id, discordPerms: JSON.stringify(user.perms), webhookStrategy: 'discord' })
+            .update({
+              discordId: user.id,
+              discordPerms: JSON.stringify(user.perms),
+              webhookStrategy: 'discord',
+            })
             .where('id', req.user.id)
           await User.query()
             .where('discordId', user.id)
@@ -68,8 +72,11 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
           })
         }
         if (!userExists) {
-          userExists = await User.query()
-            .insertAndFetch({ discordId: user.id, strategy: 'discord', tutorial: !forceTutorial })
+          userExists = await User.query().insertAndFetch({
+            discordId: user.id,
+            strategy: 'discord',
+            tutorial: !forceTutorial,
+          })
         }
         if (userExists.strategy !== 'discord') {
           await User.query()
@@ -78,19 +85,31 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
           userExists.strategy = 'discord'
         }
         if (userExists.id >= 25000) {
-          console.warn('[USER] User ID is higher than 25,000! This may indicate that a Discord ID was saved as the User ID\nYou should rerun the migrations with "yarn migrate:rollback && yarn migrate:latest"')
+          console.warn(
+            '[USER] User ID is higher than 25,000! This may indicate that a Discord ID was saved as the User ID\nYou should rerun the migrations with "yarn migrate:rollback && yarn migrate:latest"',
+          )
         }
-        return done(null, { ...user, ...userExists, username: userExists.username || user.username })
+        return done(null, {
+          ...user,
+          ...userExists,
+          username: userExists.username || user.username,
+        })
       })
   } catch (e) {
     console.error('[AUTH] User has failed Discord auth.', e)
   }
 }
 
-passport.use(path.parse(__filename).name, new DiscordStrategy({
-  clientID: strategyConfig.clientId,
-  clientSecret: strategyConfig.clientSecret,
-  callbackURL: strategyConfig.redirectUri,
-  scope: ['identify', 'guilds'],
-  passReqToCallback: true,
-}, authHandler))
+passport.use(
+  path.parse(__filename).name,
+  new DiscordStrategy(
+    {
+      clientID: strategyConfig.clientId,
+      clientSecret: strategyConfig.clientSecret,
+      callbackURL: strategyConfig.redirectUri,
+      scope: ['identify', 'guilds'],
+      passReqToCallback: true,
+    },
+    authHandler,
+  ),
+)

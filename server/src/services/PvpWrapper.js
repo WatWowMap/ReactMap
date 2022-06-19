@@ -10,9 +10,8 @@ module.exports = class PvpWrapper extends Ohbem {
       levelCaps: config.levels,
       cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
     })
-    this.rmCache = new NodeCache({ stdTTL: 60 * 60 * 1.5 });
-
-    (async () => {
+    this.rmCache = new NodeCache({ stdTTL: 60 * 60 * 1.5 })
+    ;(async () => {
       this.updatePokemonData(await Ohbem.fetchPokemonData())
     })()
   }
@@ -36,7 +35,13 @@ module.exports = class PvpWrapper extends Ohbem {
       this.rmCache.set(key, result, pokemon.expire_timestamp - currentTs)
       return result
     } catch (e) {
-      console.error('[PKMN] Unable to process PVP Stats for Pokemon with ID#: ', pokemon.id, `#${pokemon.pokemon_id} - ${pokemon.form}`, '\n', e.message)
+      console.error(
+        '[PKMN] Unable to process PVP Stats for Pokemon with ID#: ',
+        pokemon.id,
+        `#${pokemon.pokemon_id} - ${pokemon.form}`,
+        '\n',
+        e.message,
+      )
       return {}
     }
   }

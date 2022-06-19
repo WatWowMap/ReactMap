@@ -2,20 +2,29 @@ name: Lint
 on: [push]
 
 jobs:
-  Lint:
+  lint:
+    name: Run Basic Checks
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [16.x]
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Checkout Code
+        id: checkout-code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'yarn'
 
-    - name: Test the Testcases
-      run:
-        npm install -g yarn
-        yarn install
-        yarn build
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Lint
+        run: yarn eslint:check
+
+      - name: Prettier
+        run: yarn prettier:check
+
+      - name: Build
+        run: yarn build

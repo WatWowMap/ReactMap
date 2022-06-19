@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import {
-  Dialog, DialogContent, DialogTitle, DialogActions, Button, Grid, Typography,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogActions,
+  Button,
+  Grid,
+  Typography,
 } from '@material-ui/core'
 
 import { useStatic, useStore } from '@hooks/useStore'
@@ -10,46 +16,59 @@ import Query from '@services/Query'
 import ScanNextTarget from './ScanNextTarget'
 
 export default function ScanNext({
-  map, scanNextMode, setScanNextMode,
-  scanner: { scannerType, scanNextShowScanCount, scanNextShowScanQueue, scanNextAreaRestriction },
+  map,
+  scanNextMode,
+  setScanNextMode,
+  scanner: {
+    scannerType,
+    scanNextShowScanCount,
+    scanNextShowScanQueue,
+    scanNextAreaRestriction,
+  },
 }) {
-  const { data: scanAreas } = scanNextAreaRestriction?.length ? useQuery(Query.scanAreas()) : { data: null }
-  const { loggedIn } = useStatic(state => state.auth)
+  const { data: scanAreas } = scanNextAreaRestriction?.length
+    ? useQuery(Query.scanAreas())
+    : { data: null }
+  const { loggedIn } = useStatic((state) => state.auth)
   const { t } = useTranslation()
-  const location = useStore(s => s.location)
+  const location = useStore((s) => s.location)
   const [queue, setQueue] = useState('init')
   const [scanNextLocation, setScanNextLocation] = useState(location)
   const [scanNextCoords, setScanNextCoords] = useState([location])
   const [scanNextType, setScanNextType] = useState('S')
-  const [scanNext, { error: scannerError, data: scannerResponse }] = useLazyQuery(Query.scanner(), {
-    variables: {
-      version: inject.VERSION,
-      category: 'scanNext',
-      method: 'GET',
-      data: {
-        username: loggedIn?.username || 'a visitor',
-        userId: loggedIn?.id,
-        scanNextLocation,
-        scanNextCoords,
-        scanNextType,
+  const [scanNext, { error: scannerError, data: scannerResponse }] =
+    useLazyQuery(Query.scanner(), {
+      variables: {
+        version: inject.VERSION,
+        category: 'scanNext',
+        method: 'GET',
+        data: {
+          username: loggedIn?.username || 'a visitor',
+          userId: loggedIn?.id,
+          scanNextLocation,
+          scanNextCoords,
+          scanNextType,
+        },
       },
-    },
-    fetchPolicy: 'no-cache',
-  })
-  const [getQueue, { data: scannerQueueResponse }] = useLazyQuery(Query.scanner(), {
-    variables: {
-      version: inject.VERSION,
-      category: 'getQueue',
-      method: 'GET',
-      data: {
-        username: loggedIn?.username || 'a visitor',
-        userId: loggedIn?.id,
-        type: 'scan_next',
-        typeName: 'scanNext',
+      fetchPolicy: 'no-cache',
+    })
+  const [getQueue, { data: scannerQueueResponse }] = useLazyQuery(
+    Query.scanner(),
+    {
+      variables: {
+        version: inject.VERSION,
+        category: 'getQueue',
+        method: 'GET',
+        data: {
+          username: loggedIn?.username || 'a visitor',
+          userId: loggedIn?.id,
+          type: 'scan_next',
+          typeName: 'scanNext',
+        },
       },
+      fetchPolicy: 'no-cache',
     },
-    fetchPolicy: 'no-cache',
-  })
+  )
 
   if (scanNextMode === 'sendCoords') {
     scanNext()
