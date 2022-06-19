@@ -7,16 +7,22 @@ import { useStatic } from '@hooks/useStore'
 export default function useWebhook({ category, selectedWebhook }) {
   const [syncWebhook, { data }] = useMutation(Query.webhook('quickAdd'))
   const { t } = useTranslation()
-  const webhookData = useStatic(state => state.webhookData)
-  const setWebhookData = useStatic(state => state.setWebhookData)
-  const setWebhookAlert = useStatic(state => state.setWebhookAlert)
+  const webhookData = useStatic((state) => state.webhookData)
+  const setWebhookData = useStatic((state) => state.setWebhookData)
+  const setWebhookAlert = useStatic((state) => state.setWebhookAlert)
 
   useEffect(() => {
     if (data?.webhook) {
       if (data.webhook.status === 'success') {
-        data.webhook.message = t(`webhook_success_${category.replace('quick', '').toLowerCase()}`)
+        data.webhook.message = t(
+          `webhook_success_${category.replace('quick', '').toLowerCase()}`,
+        )
       }
-      setWebhookAlert({ open: true, severity: data.webhook.status, message: data.webhook.message })
+      setWebhookAlert({
+        open: true,
+        severity: data.webhook.status,
+        message: data.webhook.message,
+      })
       if (webhookData?.[selectedWebhook]) {
         return setWebhookData({
           ...webhookData,

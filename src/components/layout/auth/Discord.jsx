@@ -17,7 +17,8 @@ export default function DiscordLogin({ href, text, size }) {
       size={size || 'large'}
       href={href || '/auth/discord/callback'}
     >
-      <Icon className="fab fa-discord" style={{ fontSize: 30 }} />&nbsp;
+      <Icon className="fab fa-discord" style={{ fontSize: 30 }} />
+      &nbsp;
       <Typography variant="h6" align="center">
         {text ? t(text) : t('login')}
       </Typography>

@@ -1,15 +1,11 @@
-import React, {
-  memo, useRef, useEffect, useState,
-} from 'react'
+import React, { memo, useRef, useEffect, useState } from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
 import deviceMarker from '../markers/device'
 import PopupContent from '../popups/Device'
 import DevicePoly from '../popups/DevicePoly'
 
-const DeviceTile = ({
-  item, ts, Icons, userSettings,
-}) => {
+const DeviceTile = ({ item, ts, Icons, userSettings }) => {
   const [poly, setPoly] = useState(false)
   const markerRef = useRef(null)
   const isOnline = ts - item.last_seen < 900
@@ -31,22 +27,19 @@ const DeviceTile = ({
         onOpen={() => setPoly(true)}
         onClose={() => setPoly(false)}
       >
-        <PopupContent
-          device={item}
-          isOnline={isOnline}
-          ts={ts}
-        />
+        <PopupContent device={item} isOnline={isOnline} ts={ts} />
       </Popup>
-      {(poly && !item.isMad) && <DevicePoly device={item} color={userSettings.devicePathColor} />}
+      {poly && !item.isMad && (
+        <DevicePoly device={item} color={userSettings.devicePathColor} />
+      )}
     </Marker>
   )
 }
 
-const areEqual = (prev, next) => (
-  prev.item.type === next.item.type
-  && prev.item.last_lat === next.item.last_lat
-  && prev.item.last_lon === next.item.last_lon
-  && prev.item.last_seen === next.item.last_seen
-)
+const areEqual = (prev, next) =>
+  prev.item.type === next.item.type &&
+  prev.item.last_lat === next.item.last_lat &&
+  prev.item.last_lon === next.item.last_lon &&
+  prev.item.last_seen === next.item.last_seen
 
 export default memo(DeviceTile, areEqual)

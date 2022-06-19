@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 const { Model } = require('objection')
 const {
-  database: { settings: { userTableName, gymBadgeTableName } },
+  database: {
+    settings: { userTableName, gymBadgeTableName },
+  },
 } = require('../services/config')
 
 module.exports = class User extends Model {
@@ -13,7 +15,11 @@ module.exports = class User extends Model {
     await this.query()
       .update({ [`${strategy}Perms`]: null })
       .where({ [`${strategy}Id`]: userId })
-      .then(() => console.log(`[${botName}] Cleared ${strategy} perms for user ${userId}`))
+      .then(() =>
+        console.log(
+          `[${botName}] Cleared ${strategy} perms for user ${userId}`,
+        ),
+      )
   }
 
   static get relationMappings() {

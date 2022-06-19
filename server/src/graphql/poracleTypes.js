@@ -155,7 +155,7 @@ module.exports = gql`
     shiny: Boolean
     description: String
   }
-  
+
   type PoracleNest {
     uid: Int
     id: ID

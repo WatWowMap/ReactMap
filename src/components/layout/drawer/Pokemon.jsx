@@ -1,7 +1,5 @@
 import React, { useEffect, useState, Fragment } from 'react'
-import {
-  Grid, Typography, Switch, AppBar, Tab, Tabs,
-} from '@material-ui/core'
+import { Grid, Typography, Switch, AppBar, Tab, Tabs } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
@@ -11,13 +9,19 @@ import SliderTile from '../dialogs/filters/SliderTile'
 import TabPanel from '../general/TabPanel'
 
 export default function WithSliders({
-  category, filters, setFilters, context, specificFilter,
+  category,
+  filters,
+  setFilters,
+  context,
+  specificFilter,
 }) {
-  const userSettings = useStore(state => state.userSettings)
+  const userSettings = useStore((state) => state.userSettings)
   const { t } = useTranslation()
-  const [tempLegacy, setTempLegacy] = useState(filters[category][specificFilter])
+  const [tempLegacy, setTempLegacy] = useState(
+    filters[category][specificFilter],
+  )
   const [openTab, setOpenTab] = useState(0)
-  const Icons = useStatic(state => state.Icons)
+  const Icons = useStatic((state) => state.Icons)
 
   useEffect(() => {
     setFilters({
@@ -32,15 +36,25 @@ export default function WithSliders({
   const handleChange = (event, values) => {
     if (values) {
       setTempLegacy({
-        ...tempLegacy, [event]: values,
+        ...tempLegacy,
+        [event]: values,
       })
-      Utility.analytics('Global Pokemon', `${event}: ${values}`, `${category} Text`)
+      Utility.analytics(
+        'Global Pokemon',
+        `${event}: ${values}`,
+        `${category} Text`,
+      )
     } else {
       const { name, value } = event.target
       setTempLegacy({
-        ...tempLegacy, [name]: value,
+        ...tempLegacy,
+        [name]: value,
       })
-      Utility.analytics('Global Pokemon', `${name}: ${value}`, `${category} Sliders`)
+      Utility.analytics(
+        'Global Pokemon',
+        `${name}: ${value}`,
+        `${category} Sliders`,
+      )
     }
   }
 
@@ -51,9 +65,7 @@ export default function WithSliders({
   return (
     <>
       <Grid item xs={6}>
-        <Typography>
-          {t('enabled')}
-        </Typography>
+        <Typography>{t('enabled')}</Typography>
       </Grid>
       <Grid item xs={6} style={{ textAlign: 'right' }}>
         <Switch
@@ -69,12 +81,10 @@ export default function WithSliders({
           }}
         />
       </Grid>
-      {(userSettings[category].legacyFilter && context.legacy) ? (
+      {userSettings[category].legacyFilter && context.legacy ? (
         <>
           <Grid item xs={12}>
-            <Typography>
-              {t('iv_or_filter')}
-            </Typography>
+            <Typography>{t('iv_or_filter')}</Typography>
           </Grid>
           <Grid item xs={12}>
             <StringFilter
@@ -93,14 +103,18 @@ export default function WithSliders({
               variant="fullWidth"
               style={{ backgroundColor: '#424242' }}
             >
-              {Object.keys(context.sliders).map(slider => (
-                <Tab label={t(slider)} key={slider} style={{ width: 5, minWidth: 5 }} />
+              {Object.keys(context.sliders).map((slider) => (
+                <Tab
+                  label={t(slider)}
+                  key={slider}
+                  style={{ width: 5, minWidth: 5 }}
+                />
               ))}
             </Tabs>
           </AppBar>
           {Object.keys(context.sliders).map((slider, index) => (
             <TabPanel value={openTab} index={index} key={slider}>
-              {Object.values(context.sliders[slider]).map(subItem => (
+              {Object.values(context.sliders[slider]).map((subItem) => (
                 <Grid item xs={12} key={subItem.name}>
                   <SliderTile
                     filterSlide={subItem}
@@ -118,68 +132,64 @@ export default function WithSliders({
                 justifyContent="center"
                 style={{ width: 250 }}
               >
-                {index ? (
-                  ['xsRat', 'xlKarp'].map((each, i) => (
-                    <Fragment key={each}>
-                      <Grid item xs={2}>
-                        <img
-                          style={{ maxHeight: 30, maxWidth: 30 }}
-                          src={Icons.getPokemon(i ? 129 : 19)}
-                          alt={i ? 'Karp' : 'Rat'}
-                        />
-                      </Grid>
-                      <Grid item xs={1}>
-                        <Typography
-                          variant="subtitle2"
-                        >
-                          {i ? t('xl').toUpperCase() : t('xs').toUpperCase()}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={3}>
-                        <Switch
-                          color="primary"
-                          disabled={!context[each]}
-                          checked={filters[category][each]}
-                          onChange={() => {
-                            setFilters({
-                              ...filters,
-                              [category]: {
-                                ...filters[category],
-                                [each]: !filters[category][each],
-                              },
-                            })
-                          }}
-                        />
-                      </Grid>
-                    </Fragment>
-                  ))
-                ) : (
-                  ['zeroIv', 'hundoIv'].map(each => (
-                    <Fragment key={each}>
-                      <Grid item xs={3}>
-                        <Typography>
-                          {t(Utility.camelToSnake(each))}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={3}>
-                        <Switch
-                          color="primary"
-                          disabled={!context[each]}
-                          checked={filters[category][each]}
-                          onChange={() => {
-                            setFilters({
-                              ...filters,
-                              [category]: {
-                                ...filters[category],
-                                [each]: !filters[category][each],
-                              },
-                            })
-                          }}
-                        />
-                      </Grid>
-                    </Fragment>
-                  ))
-                )}
+                {index
+                  ? ['xsRat', 'xlKarp'].map((each, i) => (
+                      <Fragment key={each}>
+                        <Grid item xs={2}>
+                          <img
+                            style={{ maxHeight: 30, maxWidth: 30 }}
+                            src={Icons.getPokemon(i ? 129 : 19)}
+                            alt={i ? 'Karp' : 'Rat'}
+                          />
+                        </Grid>
+                        <Grid item xs={1}>
+                          <Typography variant="subtitle2">
+                            {i ? t('xl').toUpperCase() : t('xs').toUpperCase()}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Switch
+                            color="primary"
+                            disabled={!context[each]}
+                            checked={filters[category][each]}
+                            onChange={() => {
+                              setFilters({
+                                ...filters,
+                                [category]: {
+                                  ...filters[category],
+                                  [each]: !filters[category][each],
+                                },
+                              })
+                            }}
+                          />
+                        </Grid>
+                      </Fragment>
+                    ))
+                  : ['zeroIv', 'hundoIv'].map((each) => (
+                      <Fragment key={each}>
+                        <Grid item xs={3}>
+                          <Typography>
+                            {t(Utility.camelToSnake(each))}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Switch
+                            color="primary"
+                            disabled={!context[each]}
+                            checked={filters[category][each]}
+                            onChange={() => {
+                              setFilters({
+                                ...filters,
+                                [category]: {
+                                  ...filters[category],
+                                  [each]: !filters[category][each],
+                                },
+                              })
+                            }}
+                          />
+                        </Grid>
+                      </Fragment>
+                    ))}
               </Grid>
             </TabPanel>
           ))}

@@ -6,7 +6,11 @@
 /* eslint-disable import/no-dynamic-require */
 /* global BigInt */
 const fs = require('fs')
-const { authentication: { alwaysEnabledPerms }, scanner, webhooks } = require('./config')
+const {
+  authentication: { alwaysEnabledPerms },
+  scanner,
+  webhooks,
+} = require('./config')
 const Utility = require('./Utility')
 
 module.exports = class DiscordMapClient {
@@ -25,15 +29,19 @@ module.exports = class DiscordMapClient {
     try {
       const members = await this.client.guilds.cache
         .get(guildId)
-        .members
-        .fetch()
+        .members.fetch()
       const member = members.get(userId)
       const roles = member.roles.cache
-        .filter(x => BigInt(x.id).toString())
+        .filter((x) => BigInt(x.id).toString())
         .keyArray()
       return roles
     } catch (e) {
-      console.error('[DISCORD] Failed to get roles in guild', guildId, 'for user', userId)
+      console.error(
+        '[DISCORD] Failed to get roles in guild',
+        guildId,
+        'for user',
+        userId,
+      )
     }
     return []
   }
@@ -55,25 +63,31 @@ module.exports = class DiscordMapClient {
   }
 
   async getPerms(user) {
-    const perms = Object.fromEntries(Object.keys(this.config.perms).map(x => [x, false]))
+    const perms = Object.fromEntries(
+      Object.keys(this.config.perms).map((x) => [x, false]),
+    )
     perms.areaRestrictions = []
     perms.webhooks = []
     perms.scanner = []
     try {
       const { guildsFull } = user
-      const guilds = user.guilds.map(guild => guild.id)
+      const guilds = user.guilds.map((guild) => guild.id)
       if (this.config.allowedUsers.includes(user.id)) {
-        Object.keys(perms).forEach((key) => perms[key] = true)
+        Object.keys(perms).forEach((key) => (perms[key] = true))
         perms.areaRestrictions = []
-        perms.webhooks = webhooks.map(x => x.name)
-        perms.scanner = Object.keys(scanner).map(x => x !== 'backendConfig' && scanner[x].enabled && x).filter(x => x !== false)
-        console.log(`[DISCORD] User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`)
+        perms.webhooks = webhooks.map((x) => x.name)
+        perms.scanner = Object.keys(scanner)
+          .map((x) => x !== 'backendConfig' && scanner[x].enabled && x)
+          .filter((x) => x !== false)
+        console.log(
+          `[DISCORD] User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`,
+        )
         return perms
       }
       for (let i = 0; i < this.config.blockedGuilds.length; i += 1) {
         const guildId = this.config.blockedGuilds[i]
         if (guilds.includes(guildId)) {
-          perms.blocked = guildsFull.find(x => x.id === guildId).name
+          perms.blocked = guildsFull.find((x) => x.id === guildId).name
           return perms
         }
       }
@@ -98,8 +112,12 @@ module.exports = class DiscordMapClient {
               }
             }
           }
-          perms.areaRestrictions.push(...Utility.areaPerms(userRoles, 'discord'))
-          perms.webhooks.push(...Utility.webhookPerms(userRoles, 'discordRoles'))
+          perms.areaRestrictions.push(
+            ...Utility.areaPerms(userRoles, 'discord'),
+          )
+          perms.webhooks.push(
+            ...Utility.webhookPerms(userRoles, 'discordRoles'),
+          )
           perms.scanner.push(...Utility.scannerPerms(userRoles, 'discordRoles'))
         }
       }
@@ -120,9 +138,7 @@ module.exports = class DiscordMapClient {
       return
     }
     try {
-      const channel = await this.client.channels.cache
-        .get(channelId)
-        .fetch()
+      const channel = await this.client.channels.cache.get(channelId).fetch()
       if (channel && message) {
         channel.send(message)
       }

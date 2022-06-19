@@ -5,7 +5,9 @@ import Utility from '@services/Utility'
 
 const Timer = ({ timestamp }) => {
   const { t } = useTranslation()
-  const [timer, setTimer] = useState(Utility.getTimeUntil(new Date(timestamp * 1000), true))
+  const [timer, setTimer] = useState(
+    Utility.getTimeUntil(new Date(timestamp * 1000), true),
+  )
 
   useEffect(() => {
     const timer2 = setTimeout(() => {
@@ -15,9 +17,7 @@ const Timer = ({ timestamp }) => {
   })
 
   return (
-    <div>
-      {timer.str.replace('days', t('days')).replace('day', t('day'))}
-    </div>
+    <div>{timer.str.replace('days', t('days')).replace('day', t('day'))}</div>
   )
 }
 
@@ -25,8 +25,12 @@ export default function TooltipWrapper({ timers, offset }) {
   return (
     <Tooltip direction="bottom" permanent offset={offset}>
       {[...new Set(timers)].map((timer, i) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <Timer key={timer + i * 123} timestamp={timer} multi={timers.length > 1} />
+        <Timer
+          // eslint-disable-next-line react/no-array-index-key
+          key={timer + i * 123}
+          timestamp={timer}
+          multi={timers.length > 1}
+        />
       ))}
     </Tooltip>
   )

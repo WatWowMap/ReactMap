@@ -8,8 +8,17 @@ const staticMf = require('../data/masterfile.json')
 const DbCheck = require('./DbCheck')
 const EventManager = require('./EventManager')
 const PvpWrapper = require('./PvpWrapper')
-const Db = new DbCheck(exampleSchemas, config.database, config.devOptions.queryDebug, config.api, config.map.distanceUnit)
-const Pvp = config.api.pvp.reactMapHandlesPvp ? new PvpWrapper(config.api.pvp) : null
+
+const Db = new DbCheck(
+  exampleSchemas,
+  config.database,
+  config.devOptions.queryDebug,
+  config.api,
+  config.map.distanceUnit,
+)
+const Pvp = config.api.pvp.reactMapHandlesPvp
+  ? new PvpWrapper(config.api.pvp)
+  : null
 const Event = new EventManager(staticMf)
 
 Event.setTimers(config, Db, Pvp)

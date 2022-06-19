@@ -18,7 +18,13 @@ const WeatherTile = ({ item, ts, Icons, isNight, tileStyle, userSettings }) => {
     <Polyline
       key={item.id}
       positions={item.polygon}
-      pathOptions={{ color: tileStyle === 'dark' ? userSettings.darkMapBorder : userSettings.lightMapBorder, opacity: 0.25 }}
+      pathOptions={{
+        color:
+          tileStyle === 'dark'
+            ? userSettings.darkMapBorder
+            : userSettings.lightMapBorder,
+        opacity: 0.25,
+      }}
     >
       <Marker
         icon={weatherMarker(item, Icons, isNight, userSettings)}
@@ -38,10 +44,9 @@ const WeatherTile = ({ item, ts, Icons, isNight, tileStyle, userSettings }) => {
   )
 }
 
-const areEqual = (prev, next) => (
-  prev.item.gameplay_condition === next.item.gameplay_condition
-  && prev.item.updated === next.item.updated
-  && prev.tileStyle === next.tileStyle
-)
+const areEqual = (prev, next) =>
+  prev.item.gameplay_condition === next.item.gameplay_condition &&
+  prev.item.updated === next.item.updated &&
+  prev.tileStyle === next.tileStyle
 
 export default memo(WeatherTile, areEqual)

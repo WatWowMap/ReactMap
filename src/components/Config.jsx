@@ -25,9 +25,17 @@ export default function Config() {
     const data = await Fetch.getSettings()
     if (data?.config && data?.masterfile) {
       if (data.masterfile?.questRewardTypes) {
-        localStorage.setItem('questRewardTypes', JSON.stringify(data.masterfile.questRewardTypes))
+        localStorage.setItem(
+          'questRewardTypes',
+          JSON.stringify(data.masterfile.questRewardTypes),
+        )
       }
-      const Icons = new UIcons(data.config.icons, data.masterfile ? data.masterfile.questRewardTypes : JSON.parse(localStorage.getItem('questRewardTypes')))
+      const Icons = new UIcons(
+        data.config.icons,
+        data.masterfile
+          ? data.masterfile.questRewardTypes
+          : JSON.parse(localStorage.getItem('questRewardTypes')),
+      )
       if (Icons) {
         Icons.build(data.config.icons.styles)
         if (data.config.icons.defaultIcons) {
@@ -53,9 +61,16 @@ export default function Config() {
 
   return (
     <ThemeProvider theme={setTheme(serverSettings?.config?.map?.theme)}>
-      <ReactRouter serverSettings={serverSettings} getServerSettings={getServerSettings} />
+      <ReactRouter
+        serverSettings={serverSettings}
+        getServerSettings={getServerSettings}
+      />
       <canvas id="holiday-canvas" />
-      <HolidayEffects mapSettings={serverSettings?.config?.map ? serverSettings.config.map : {}} />
+      <HolidayEffects
+        mapSettings={
+          serverSettings?.config?.map ? serverSettings.config.map : {}
+        }
+      />
     </ThemeProvider>
   )
 }

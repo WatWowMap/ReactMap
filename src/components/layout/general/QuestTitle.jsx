@@ -9,9 +9,7 @@ export default function QuestTitle({ questTitle, questTarget }) {
 
   return i18n.exists(normalized) ? (
     <Typography variant="caption">
-      <Trans i18nKey={normalized}>
-        {{ amount_0: questTarget }}
-      </Trans>
+      <Trans i18nKey={normalized}>{{ amount_0: questTarget }}</Trans>
     </Typography>
   ) : null
 }

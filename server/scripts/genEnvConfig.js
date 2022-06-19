@@ -2,7 +2,8 @@
 const fs = require('fs')
 const sourceConfig = require('../src/configs/default.json')
 
-const camelToSnake = str => str.replace(/([a-z](?=[A-Z]))/g, '$1_').toUpperCase()
+const camelToSnake = (str) =>
+  str.replace(/([a-z](?=[A-Z]))/g, '$1_').toUpperCase()
 
 const recursiveObjCheck = (obj, key = '', parentKey = '') => {
   const snakeKey = `${parentKey}${camelToSnake(key)}`
@@ -11,9 +12,10 @@ const recursiveObjCheck = (obj, key = '', parentKey = '') => {
   }
   if (typeof obj === 'object') {
     return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => (
-        [k, recursiveObjCheck(v, k, key ? `${snakeKey}_` : snakeKey)]
-      )),
+      Object.entries(obj).map(([k, v]) => [
+        k,
+        recursiveObjCheck(v, k, key ? `${snakeKey}_` : snakeKey),
+      ]),
     )
   }
   return typeof obj === 'string'

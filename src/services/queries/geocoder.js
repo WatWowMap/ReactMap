@@ -3,16 +3,16 @@ import { gql } from '@apollo/client'
 export const Nominatim = gql`
   fragment Nominatim on Geocoder {
     latitude
-      longitude
-      streetNumber
-      streetName
-      neighborhood
-      suburb
-      city
-      state
-      zipcode
-      country
-      countryCode
+    longitude
+    streetNumber
+    streetName
+    neighborhood
+    suburb
+    city
+    state
+    zipcode
+    country
+    countryCode
   }
 `
 

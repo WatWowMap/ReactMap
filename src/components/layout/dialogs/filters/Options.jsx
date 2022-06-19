@@ -16,15 +16,18 @@ import Utility from '@services/Utility'
 import useStyles from '@hooks/useStyles'
 
 export default function FilterOptions({
-  name, options, handleChange, expanded, handleAccordion, userSelection,
+  name,
+  options,
+  handleChange,
+  expanded,
+  handleAccordion,
+  userSelection,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
   return (
     <Accordion expanded={expanded === name} onChange={handleAccordion(name)}>
-      <AccordionSummary
-        expandIcon={<ExpandMore style={{ color: 'white' }} />}
-      >
+      <AccordionSummary expandIcon={<ExpandMore style={{ color: 'white' }} />}>
         <Typography className={classes.heading}>
           {t(Utility.camelToSnake(name))}
         </Typography>
@@ -32,16 +35,16 @@ export default function FilterOptions({
       <AccordionDetails>
         <FormControl component="fieldset" className={classes.formControl}>
           <FormGroup>
-            {Object.keys(options).map(key => (
+            {Object.keys(options).map((key) => (
               <FormControlLabel
                 key={key}
-                control={(
+                control={
                   <Checkbox
                     checked={userSelection[key]}
                     onChange={(e) => handleChange(name, e)}
                     name={key}
                   />
-                )}
+                }
                 value={key}
                 label={t(Utility.camelToSnake(key))}
               />

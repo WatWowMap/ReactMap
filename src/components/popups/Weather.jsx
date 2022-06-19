@@ -7,11 +7,15 @@ import Utility from '@services/Utility'
 
 export default function WeatherPopup({ weather, ts, Icons }) {
   const { t } = useTranslation()
-  const { weather: weatherTypes } = useStatic(state => state.masterfile)
+  const { weather: weatherTypes } = useStatic((state) => state.masterfile)
   const { gameplay_condition, updated } = weather
 
   useEffect(() => {
-    Utility.analytics('Popup', `Type: ${t(`weather_${gameplay_condition}`)}`, 'Weather')
+    Utility.analytics(
+      'Popup',
+      `Type: ${t(`weather_${gameplay_condition}`)}`,
+      'Weather',
+    )
   }, [])
 
   return (
@@ -38,11 +42,9 @@ export default function WeatherPopup({ weather, ts, Icons }) {
           {t('boosted_types')}:
         </Typography>
       </Grid>
-      {weatherTypes[gameplay_condition].types.map(type => (
+      {weatherTypes[gameplay_condition].types.map((type) => (
         <Grid item xs={4} key={type} style={{ textAlign: 'center' }}>
-          <Typography variant="caption">
-            {t(`poke_type_${type}`)}
-          </Typography>
+          <Typography variant="caption">{t(`poke_type_${type}`)}</Typography>
           <img
             src={Icons.getTypes(type)}
             alt={type}

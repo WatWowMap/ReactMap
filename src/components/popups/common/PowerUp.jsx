@@ -7,7 +7,10 @@ import Utility from '@services/Utility'
 import TimeTile from './TimeTile'
 
 export default function PowerUp({
-  power_up_level, power_up_points, power_up_end_timestamp, divider,
+  power_up_level,
+  power_up_points,
+  power_up_end_timestamp,
+  divider,
 }) {
   const { t } = useTranslation()
   if (!power_up_level) return null
@@ -17,7 +20,7 @@ export default function PowerUp({
         expireTime={power_up_end_timestamp}
         until
         size={5}
-        icon={(
+        icon={
           <>
             <Typography align="center" variant="subtitle2">
               {Utility.capitalize(t('level'))} {power_up_level}
@@ -26,7 +29,7 @@ export default function PowerUp({
               {power_up_points} {t('points')}
             </Typography>
           </>
-        )}
+        }
       />
       {divider && <Divider light flexItem className="popup-divider" />}
     </Grid>

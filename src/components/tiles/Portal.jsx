@@ -6,9 +6,7 @@ import useForcePopup from '@hooks/useForcePopup'
 import PopupContent from '../popups/Portal'
 import marker from '../markers/portal'
 
-const PortalTile = ({
-  item, userSettings, ts, params, Icons, setParams,
-}) => {
+const PortalTile = ({ item, userSettings, ts, params, Icons, setParams }) => {
   const [done, setDone] = useState(false)
   const markerRef = useRef({})
 
@@ -34,11 +32,10 @@ const PortalTile = ({
   )
 }
 
-const areEqual = (prev, next) => (
-  prev.item.id === next.item.id
-  && prev.userSettings.clustering === next.userSettings.clustering
-  && prev.userSettings.oldPortals === next.userSettings.oldPortals
-  && prev.userSettings.newPortals === next.userSettings.newPortals
-)
+const areEqual = (prev, next) =>
+  prev.item.id === next.item.id &&
+  prev.userSettings.clustering === next.userSettings.clustering &&
+  prev.userSettings.oldPortals === next.userSettings.oldPortals &&
+  prev.userSettings.newPortals === next.userSettings.newPortals
 
 export default memo(PortalTile, areEqual)

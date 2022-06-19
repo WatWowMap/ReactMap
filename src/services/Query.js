@@ -28,15 +28,22 @@ export default class Query {
       return gymIndex.getBadges
     }
     const permObj = {
-      Gyms: filters.raids ? filters.allGyms || perms.allGyms : filters.allGyms && perms.allGyms,
+      Gyms: filters.raids
+        ? filters.allGyms || perms.allGyms
+        : filters.allGyms && perms.allGyms,
       Raids: filters.raids && perms.raids,
     }
     let query = 'get'
-    Object.keys(permObj).forEach(keyPerm => {
+    Object.keys(permObj).forEach((keyPerm) => {
       if (permObj[keyPerm]) query += keyPerm
     })
-    if (query === 'get'
-      && (filters.exEligible || filters.inBattle || filters.arEligible || filters.gymBadges)) {
+    if (
+      query === 'get' &&
+      (filters.exEligible ||
+        filters.inBattle ||
+        filters.arEligible ||
+        filters.gymBadges)
+    ) {
       query += 'Gyms'
     }
 
@@ -61,7 +68,7 @@ export default class Query {
     }
     let query = 'get'
 
-    Object.keys(permObj).forEach(keyPerm => {
+    Object.keys(permObj).forEach((keyPerm) => {
       if (permObj[keyPerm]) query += keyPerm
     })
 
@@ -79,7 +86,7 @@ export default class Query {
     }
     let query = 'get'
 
-    Object.keys(permObj).forEach(keyPerm => {
+    Object.keys(permObj).forEach((keyPerm) => {
       if (permObj[keyPerm]) query += keyPerm
     })
     if (query === 'get') query += 'Pokemon'
@@ -119,9 +126,12 @@ export default class Query {
     switch (category) {
       case 'raids':
       case 'nests':
-      case 'quests': return searchIndex[category]
-      case 'webhook': return searchIndex.poiWebhook
-      default: return searchIndex.poi
+      case 'quests':
+        return searchIndex[category]
+      case 'webhook':
+        return searchIndex.poiWebhook
+      default:
+        return searchIndex.poi
     }
   }
 

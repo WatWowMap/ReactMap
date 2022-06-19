@@ -1,6 +1,8 @@
 const { Model, raw } = require('objection')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { api: { queryLimits } } = require('../services/config')
+const {
+  api: { queryLimits },
+} = require('../services/config')
 
 module.exports = class Spawnpoint extends Model {
   static get tableName() {
@@ -15,14 +17,16 @@ module.exports = class Spawnpoint extends Model {
         'spawnpoint AS id',
         'latitude AS lat',
         'longitude AS lon',
-        raw('ROUND(calc_endminsec)')
-          .as('despawn_sec'),
-        raw('UNIX_TIMESTAMP(last_scanned)')
-          .as('updated'),
+        raw('ROUND(calc_endminsec)').as('despawn_sec'),
+        raw('UNIX_TIMESTAMP(last_scanned)').as('updated'),
       ])
     }
-    query.whereBetween(`lat${isMad ? 'itude' : ''}`, [args.minLat, args.maxLat])
-      .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [args.minLon, args.maxLon])
+    query
+      .whereBetween(`lat${isMad ? 'itude' : ''}`, [args.minLat, args.maxLat])
+      .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [
+        args.minLon,
+        args.maxLon,
+      ])
     if (areaRestrictions?.length) {
       getAreaSql(query, areaRestrictions, isMad)
     }

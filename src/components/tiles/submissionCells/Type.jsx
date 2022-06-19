@@ -9,26 +9,19 @@ const TypeTile = ({ cell, tileStyle, userSettings }) => (
     positions={cell.polygon}
     pathOptions={typeStyle(cell, tileStyle, userSettings)}
   >
-    <Popup
-      position={[cell.lat, cell.lon]}
-    >
+    <Popup position={[cell.lat, cell.lon]}>
       <PopupContent cell={cell} />
     </Popup>
-    <Tooltip
-      position={[cell.lat, cell.lon]}
-      direction="center"
-      permanent
-    >
+    <Tooltip position={[cell.lat, cell.lon]} direction="center" permanent>
       {cell.count}
     </Tooltip>
   </Polygon>
 )
 
-const areEqual = (prev, next) => (
-  prev.cell.id === next.cell.id
-  && prev.cell.count === next.cell.count
-  && prev.zoom === next.zoom
-  && prev.tileStyle === next.tileStyle
-)
+const areEqual = (prev, next) =>
+  prev.cell.id === next.cell.id &&
+  prev.cell.count === next.cell.count &&
+  prev.zoom === next.zoom &&
+  prev.tileStyle === next.tileStyle
 
 export default memo(TypeTile, areEqual)

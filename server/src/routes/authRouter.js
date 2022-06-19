@@ -3,22 +3,32 @@
 /* eslint-disable no-console */
 const router = require('express').Router()
 const passport = require('passport')
-const { isValidSession, clearOtherSessions } = require('../services/sessionStore')
-const { authentication: { strategies } } = require('../services/config')
+const {
+  isValidSession,
+  clearOtherSessions,
+} = require('../services/sessionStore')
+const {
+  authentication: { strategies },
+} = require('../services/config')
 
 // Loads up the base auth routes and any custom ones
 
-strategies.forEach(strategy => {
-  const method = strategy.type === 'discord' || strategy.type === 'telegram' ? 'get' : 'post'
+strategies.forEach((strategy) => {
+  const method =
+    strategy.type === 'discord' || strategy.type === 'telegram' ? 'get' : 'post'
   if (strategy.enabled) {
-    router[method](`/${strategy.name}`, passport.authenticate(strategy.name, {
-      failureRedirect: '/',
-      successRedirect: '/',
-    }))
     router[method](
-      `/${strategy.name}/callback`,
-      async (req, res, next) => passport.authenticate(strategy.name, async (err, user, info) => {
-        if (err) { return next(err) }
+      `/${strategy.name}`,
+      passport.authenticate(strategy.name, {
+        failureRedirect: '/',
+        successRedirect: '/',
+      }),
+    )
+    router[method](`/${strategy.name}/callback`, async (req, res, next) =>
+      passport.authenticate(strategy.name, async (err, user, info) => {
+        if (err) {
+          return next(err)
+        }
         if (!user) {
           res.status(401).json(info.message)
         } else {
@@ -26,7 +36,9 @@ strategies.forEach(strategy => {
             return req.login(user, async () => {
               const { id } = user
               if (!(await isValidSession(id))) {
-                console.debug('[Session] Detected multiple sessions, clearing old ones...')
+                console.debug(
+                  '[Session] Detected multiple sessions, clearing old ones...',
+                )
                 await clearOtherSessions(id, req.sessionID)
               }
               return res.redirect('/')
@@ -38,7 +50,11 @@ strategies.forEach(strategy => {
         }
       })(req, res, next),
     )
-    console.log(`[AUTH] ${method.toUpperCase()} /auth/${strategy.name}/callback route initialized`)
+    console.log(
+      `[AUTH] ${method.toUpperCase()} /auth/${
+        strategy.name
+      }/callback route initialized`,
+    )
   }
 })
 

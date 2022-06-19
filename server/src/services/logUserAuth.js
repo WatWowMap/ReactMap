@@ -2,13 +2,18 @@
 const Fetch = require('./Fetch')
 
 module.exports = async function getAuthInfo(req, user, strategy) {
-  const ip = req.headers['cf-connecting-ip']
-    || ((req.headers['x-forwarded-for'] || '').split(', ')[0])
-    || (req.connection.remoteAddress || req.connection.localAddress).match('[0-9]+.[0-9].+[0-9]+.[0-9]+$')[0]
+  const ip =
+    req.headers['cf-connecting-ip'] ||
+    (req.headers['x-forwarded-for'] || '').split(', ')[0] ||
+    (req.connection.remoteAddress || req.connection.localAddress).match(
+      '[0-9]+.[0-9].+[0-9]+.[0-9]+$',
+    )[0]
 
-  const geo = await Fetch.json(`http://ip-api.com/json/${ip}?fields=66846719&lang=en`)
+  const geo = await Fetch.json(
+    `http://ip-api.com/json/${ip}?fields=66846719&lang=en`,
+  )
   const embed = {
-    color: 0xFF0000,
+    color: 0xff0000,
     title: 'Authentication',
     author: {
       name: `${user.username}`,
@@ -62,13 +67,18 @@ module.exports = async function getAuthInfo(req, user, strategy) {
     timestamp: new Date(),
   }
   if (user.valid) {
-    console.log('[DISCORD]', user.username, `(${user.id})`, 'Authenticated successfully.')
+    console.log(
+      '[DISCORD]',
+      user.username,
+      `(${user.id})`,
+      'Authenticated successfully.',
+    )
     embed.description = `${user.username} Successfully Authenticated`
-    embed.color = 0x00FF00
+    embed.color = 0x00ff00
   } else if (user.blocked) {
     console.warn('[DISCORD]', user.id, 'Blocked due to', user.blocked)
     embed.description = `User Blocked Due to ${user.blocked}`
-    embed.color = 0xFF0000
+    embed.color = 0xff0000
   } else {
     console.warn('[DISCORD]', user.id, 'Not authorized to access map')
   }

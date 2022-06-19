@@ -18,7 +18,10 @@ export default function useLocation(map) {
         setColor('inherit')
       },
       onAdd() {
-        const container = L.DomUtil.create('div', 'react-locate-control leaflet-bar leaflet-control')
+        const container = L.DomUtil.create(
+          'div',
+          'react-locate-control leaflet-bar leaflet-control',
+        )
         this._container = container
         this._map = map
         this._layer = this.options.layer || new L.LayerGroup()
@@ -27,7 +30,10 @@ export default function useLocation(map) {
         this._compassHeading = null
         this._prevBounds = null
 
-        const linkAndIcon = this.options.createButtonCallback(container, this.options)
+        const linkAndIcon = this.options.createButtonCallback(
+          container,
+          this.options,
+        )
         this._link = linkAndIcon.link
         this._icon = linkAndIcon.icon
 

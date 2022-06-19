@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-import {
-  Button, Typography, DialogContent,
-} from '@material-ui/core'
+import { Button, Typography, DialogContent } from '@material-ui/core'
 import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -13,7 +11,7 @@ import Footer from '../general/Footer'
 export default function ResetFilters() {
   const { t } = useTranslation()
   const [redirect, setRedirect] = useState(false)
-  const setResetFilters = useStatic(state => state.setResetFilters)
+  const setResetFilters = useStatic((state) => state.setResetFilters)
 
   if (redirect) {
     return <Navigate push to="/reset" />
@@ -42,7 +40,17 @@ export default function ResetFilters() {
         </Typography>
         <br />
       </DialogContent>
-      <Footer options={[{ name: 'close', action: () => setResetFilters(false), color: 'primary', align: 'right' }]} role="webhook_footer" />
+      <Footer
+        options={[
+          {
+            name: 'close',
+            action: () => setResetFilters(false),
+            color: 'primary',
+            align: 'right',
+          },
+        ]}
+        role="webhook_footer"
+      />
     </>
   )
 }

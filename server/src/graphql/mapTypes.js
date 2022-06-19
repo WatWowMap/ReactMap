@@ -1,27 +1,27 @@
 const { gql } = require('apollo-server-express')
 
 module.exports = gql`
-    type Available {
-      masterfile: JSON
-      pokestops: [String]
-      gyms: [String]
-      pokemon: [String]
-      nests: [String]
-      filters: JSON
-      questConditions: JSON
-    }
-  
-    type Badge {
-      id: String
-      name: String
-      url: String
-      lat: Float
-      lon: Float
-      badge: Int
-      deleted: Boolean
-    }
-  
-    type Geocoder {
+  type Available {
+    masterfile: JSON
+    pokestops: [String]
+    gyms: [String]
+    pokemon: [String]
+    nests: [String]
+    filters: JSON
+    questConditions: JSON
+  }
+
+  type Badge {
+    id: String
+    name: String
+    url: String
+    lat: Float
+    lon: Float
+    badge: Int
+    deleted: Boolean
+  }
+
+  type Geocoder {
     latitude: Float
     longitude: Float
     streetNumber: String
@@ -37,7 +37,7 @@ module.exports = gql`
   }
 
   type Geometry {
-    type: String 
+    type: String
     coordinates: [[[Float]]]
   }
 
