@@ -76,9 +76,9 @@ module.exports = class DiscordMapClient {
         Object.keys(perms).forEach((key) => (perms[key] = true))
         perms.areaRestrictions = []
         perms.webhooks = webhooks.map((x) => x.name)
-        perms.scanner = Object.keys(scanner)
-          .map((x) => x !== 'backendConfig' && scanner[x].enabled && x)
-          .filter((x) => x !== false)
+        perms.scanner = Object.keys(scanner).filter(
+          (x) => x !== 'backendConfig' && x && scanner[x].enabled,
+        )
         console.log(
           `[DISCORD] User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
