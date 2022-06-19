@@ -49,8 +49,11 @@ module.exports = class DbCheck {
     console.log(`[DB] Determining database types for ${this.connections.length} connection${this.connections.length > 1 ? 's' : ''}`)
     await Promise.all(this.connections.map(async (schema, i) => {
       try {
-        const isMad = await schema('trs_quest').columnInfo().then(col => Object.keys(col).length > 0)
-        const pvpV2 = await schema('pokemon').columnInfo().then(col => 'pvp' in col)
+        const [isMad, pvpV2] = await schema('pokemon').columnInfo()
+          .then(columns => [
+            'cp_multiplier' in columns,
+            'pvp' in columns,
+          ])
         const [hasRewardAmount, hasAltQuests] = await schema('pokestop').columnInfo()
           .then(columns => ([
             ('quest_reward_amount' in columns || isMad),
@@ -61,6 +64,10 @@ module.exports = class DbCheck {
             'character' in columns,
             'expiration_ms' in columns,
           ]))
+        const [availableSlotsCol] = await schema('gym').columnInfo()
+          .then(columns => ([
+            'availble_slots' in columns ? 'availble_slots' : 'available_slots',
+          ]))
         Object.entries(this.models).forEach(([category, sources]) => {
           sources.forEach((source, j) => {
             if (source.connection === i) {
@@ -70,6 +77,7 @@ module.exports = class DbCheck {
               this.models[category][j].hasAltQuests = hasAltQuests
               this.models[category][j].hasMultiInvasions = hasMultiInvasions
               this.models[category][j].multiInvasionMs = multiInvasionMs
+              this.models[category][j].availableSlotsCol = availableSlotsCol
             }
           })
         })
