@@ -1,9 +1,14 @@
 /* eslint-disable no-console */
+const fs = require('fs')
+const { resolve } = require('path')
 const {
   database: { schemas: exampleSchemas },
 } = require('../configs/local.example.json')
 const config = require('./config')
-const staticMf = require('../data/masterfile.json')
+
+const staticMf = JSON.parse(
+  fs.readFileSync(resolve(__dirname, '../data/masterfile.json')),
+)
 
 const DbCheck = require('./DbCheck')
 const EventManager = require('./EventManager')
