@@ -60,16 +60,18 @@ export default function AreaDropDown({ scanAreasZoom }) {
               onClick={
                 details
                   ? () => {
-                      map.flyTo(
-                        details.properties.center,
-                        details.properties.zoom || scanAreasZoom,
-                      )
+                      if (details?.properties) {
+                        map.flyTo(
+                          details.properties.center,
+                          details.properties.zoom || scanAreasZoom,
+                        )
+                      }
                     }
                   : undefined
               }
               style={{
-                border: `1px solid ${details.properties.color || 'grey'}`,
-                backgroundColor: details.properties.fillColor || 'none',
+                border: `1px solid ${details?.properties?.color || 'grey'}`,
+                backgroundColor: details?.properties?.fillColor || 'none',
               }}
             >
               <MenuItem>
