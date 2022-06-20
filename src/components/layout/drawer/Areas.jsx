@@ -14,7 +14,7 @@ export default function AreaDropDown({ scanAreasZoom }) {
 
   if (loading || error) return null
 
-  const stuff = React.useMemo(() => {
+  const areas = React.useMemo(() => {
     const parents = {}
     data.scanAreas[0].features.forEach((feature) => {
       if (feature.properties.parent && !parents[feature.properties.parent]) {
@@ -28,6 +28,9 @@ export default function AreaDropDown({ scanAreasZoom }) {
         }
       }
     })
+    if (!Object.keys(parents).length) {
+      parents[''] = { children: data.scanAreas[0].features }
+    }
     return parents
   }, [])
 
@@ -41,44 +44,54 @@ export default function AreaDropDown({ scanAreasZoom }) {
         backgroundColor: '#212121',
       }}
     >
-      {Object.entries(stuff).map(([parent, { details, children }]) => (
+      {Object.entries(areas).map(([parent, { details, children }]) => (
         <Grid
           key={parent}
           container
           alignItems="center"
           justifyContent="center"
         >
-          <Grid
-            item
-            xs={12}
-            onClick={
-              details
-                ? () => {
-                    map.flyTo(
-                      details.properties.center,
-                      details.properties.zoom || scanAreasZoom,
-                    )
-                  }
-                : undefined
-            }
-          >
-            <MenuItem>
-              <Typography variant="h6" align="center" style={{ width: '100%' }}>
-                {Utility.getProperName(parent)}
-              </Typography>
-            </MenuItem>
-          </Grid>
+          {Boolean(parent) && (
+            <Grid
+              item
+              xs={12}
+              onClick={
+                details
+                  ? () => {
+                      map.flyTo(
+                        details.properties.center,
+                        details.properties.zoom || scanAreasZoom,
+                      )
+                    }
+                  : undefined
+              }
+              style={{ border: '1px solid grey' }}
+            >
+              <MenuItem>
+                <Typography
+                  variant="h6"
+                  align="center"
+                  style={{ width: '100%' }}
+                >
+                  {Utility.getProperName(parent)}
+                </Typography>
+              </MenuItem>
+            </Grid>
+          )}
           {children.map((feat, i) => (
             <Grid
               key={feat.properties.name}
               item
-              xs={children.length % 2 === 1 && i === children.length -1 ? 12 : 6}
+              xs={
+                children.length % 2 === 1 && i === children.length - 1 ? 12 : 6
+              }
               onClick={() => {
                 map.flyTo(
                   feat.properties.center,
                   feat.properties.zoom || scanAreasZoom,
                 )
               }}
+              style={{ border: '1px solid grey' }}
             >
               <MenuItem>
                 <Typography
