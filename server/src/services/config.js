@@ -4,14 +4,15 @@
 process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
 
 const fs = require('fs')
-const path = require('path')
+const { resolve } = require('path')
 const dotenv = require('dotenv')
+const { default: center } = require('@turf/center')
 
 dotenv.config()
 
 const config = require('config')
 
-if (!fs.existsSync(path.resolve(`${__dirname}/../configs/local.json`))) {
+if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
   // add database env variables from .env or docker-compose
   const {
     SCANNER_DB_HOST,
@@ -82,7 +83,7 @@ if (!fs.existsSync(path.resolve(`${__dirname}/../configs/local.json`))) {
     )
   }
 }
-if (fs.existsSync(path.resolve(`${__dirname}/../configs/config.json`))) {
+if (fs.existsSync(resolve(`${__dirname}/../configs/config.json`))) {
   console.log(
     '[CONFIG] Config v1 (config.json) found, it is fine to leave it but make sure you are using and updating local.json instead.',
   )
@@ -166,14 +167,44 @@ config.authMethods = [
 })
 
 // Load each areas.json
-const loadScanPolygons = (fileName) =>
-  fs.existsSync(path.resolve(`${__dirname}/../configs/${fileName}`))
-    ? require(`../configs/${fileName}`)
+const loadScanPolygons = (fileName) => {
+  const geojson = fs.existsSync(resolve(`${__dirname}/../configs/${fileName}`))
+    ? JSON.parse(fs.readFileSync(resolve(__dirname, `../configs/${fileName}`)))
     : { features: [] }
+  return {
+    ...geojson,
+    features: geojson.features.map((f) => ({
+      ...f,
+      properties: {
+        ...f.properties,
+        center: center(f).geometry.coordinates.reverse(),
+      },
+    })),
+  }
+}
 
 // Check if an areas.json exists
 config.scanAreas = {
-  main: loadScanPolygons(config.map.geoJsonFileName),
+  main: config.manualAreas.length
+    ? {
+        type: 'FeatureCollection',
+        features: config.manualAreas
+          .filter((area) => ['lat', 'lon', 'name'].every((k) => k in area))
+          .map((area) => ({
+            type: 'Feature',
+            properties: {
+              name: area.name,
+              center: [area.lat, area.lon],
+              zoom: area.zoom,
+              parent: area.parent,
+            },
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[[area.lon, area.lat]]],
+            },
+          })),
+      }
+    : loadScanPolygons(config.map.geoJsonFileName),
   ...Object.fromEntries(
     config.multiDomains.map((d) => [
       d.general?.geoJsonFileName ? d.domain : 'main',
@@ -209,10 +240,5 @@ if (
   )
   config.authentication.alwaysEnabledPerms = enabled
 }
-
-// Map manual areas
-config.manualAreas = Object.fromEntries(
-  config.manualAreas.map((area) => [area.name, area]),
-)
 
 module.exports = config

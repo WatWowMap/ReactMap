@@ -36,7 +36,6 @@ export default function Sidebar({
   const ui = useStatic((state) => state.ui)
   const staticUserSettings = useStatic((state) => state.userSettings)
   const {
-    manualAreas,
     map: { title, scanAreasZoom, noScanAreaOverlay, enableQuestSetSelector },
   } = useStatic((state) => state.config)
   const available = useStatic((s) => s.available)
@@ -137,7 +136,7 @@ export default function Sidebar({
               </Grid>
             )}
             {category === 'scanAreas' && (
-              <Areas scanAreasZoom={scanAreasZoom} manualAreas={manualAreas} />
+              <Areas scanAreasZoom={scanAreasZoom} />
             )}
           </Grid>
         </AccordionDetails>
