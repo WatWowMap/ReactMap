@@ -173,13 +173,16 @@ const loadScanPolygons = (fileName) => {
     : { features: [] }
   return {
     ...geojson,
-    features: geojson.features.map((f) => ({
-      ...f,
-      properties: {
-        ...f.properties,
-        center: center(f).geometry.coordinates.reverse(),
-      },
-    })),
+    features: geojson.features
+      .filter((f) => !f.properties.hidden)
+      .map((f) => ({
+        ...f,
+        properties: {
+          ...f.properties,
+          center: center(f).geometry.coordinates.reverse(),
+        },
+      }))
+      .sort((a, b) => a.properties.name.localeCompare(b.properties.name)),
   }
 }
 
@@ -190,19 +193,21 @@ config.scanAreas = {
         type: 'FeatureCollection',
         features: config.manualAreas
           .filter((area) => ['lat', 'lon', 'name'].every((k) => k in area))
-          .map((area) => ({
-            type: 'Feature',
-            properties: {
-              name: area.name,
-              center: [area.lat, area.lon],
-              zoom: area.zoom,
-              parent: area.parent,
-            },
-            geometry: {
-              type: 'Polygon',
-              coordinates: [[[area.lon, area.lat]]],
-            },
-          })),
+          .map((area) => {
+            const { lat, lon, ...rest } = area
+            return {
+              type: 'Feature',
+              properties: {
+                center: [lat, lon],
+                ...rest,
+              },
+              geometry: {
+                type: 'Polygon',
+                coordinates: [[[lon, lat]]],
+              },
+            }
+          })
+          .sort((a, b) => a.properties.name.localeCompare(b.properties.name)),
       }
     : loadScanPolygons(config.map.geoJsonFileName),
   ...Object.fromEntries(

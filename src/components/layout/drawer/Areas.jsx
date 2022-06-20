@@ -15,7 +15,7 @@ export default function AreaDropDown({ scanAreasZoom }) {
   if (loading || error) return null
 
   const areas = React.useMemo(() => {
-    const parents = {}
+    const parents = { '': { children: [] } }
     data.scanAreas[0].features.forEach((feature) => {
       if (feature.properties.parent && !parents[feature.properties.parent]) {
         parents[feature.properties.parent] = {
@@ -26,6 +26,8 @@ export default function AreaDropDown({ scanAreasZoom }) {
             (area) => area.properties.parent === feature.properties.parent,
           ),
         }
+      } else {
+        parents[''].children.push(feature)
       }
     })
     if (!Object.keys(parents).length) {
@@ -65,7 +67,10 @@ export default function AreaDropDown({ scanAreasZoom }) {
                     }
                   : undefined
               }
-              style={{ border: '1px solid grey' }}
+              style={{
+                border: `1px solid ${details.properties.color || 'grey'}`,
+                backgroundColor: details.properties.fillColor || 'none',
+              }}
             >
               <MenuItem>
                 <Typography
@@ -91,7 +96,10 @@ export default function AreaDropDown({ scanAreasZoom }) {
                   feat.properties.zoom || scanAreasZoom,
                 )
               }}
-              style={{ border: '1px solid grey' }}
+              style={{
+                border: `1px solid ${feat.properties.color || 'grey'}`,
+                backgroundColor: feat.properties.fillColor || 'none',
+              }}
             >
               <MenuItem>
                 <Typography
