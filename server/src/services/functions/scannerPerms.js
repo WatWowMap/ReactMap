@@ -5,7 +5,8 @@ module.exports = function scannerPerms(roles, provider) {
   roles.forEach((role) => {
     Object.keys(scanner).forEach((mode) => {
       if (
-        scanner[mode][provider]?.enabled &&
+        scanner[mode]?.enabled &&
+        scanner[mode][provider] &&
         (scanner[mode][provider].includes(role) ||
           !scanner[mode][provider].length)
       ) {
