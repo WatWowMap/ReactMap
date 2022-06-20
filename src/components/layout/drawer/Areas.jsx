@@ -33,6 +33,11 @@ export default function AreaDropDown({ scanAreasZoom }) {
     if (!Object.keys(parents).length) {
       parents[''] = { children: data.scanAreas[0].features }
     }
+    Object.values(parents).forEach(({ children }) => {
+      if (children.length % 2 === 1) {
+        children.push({ type: 'Feature', properties: { name: '' } })
+      }
+    })
     return parents
   }, [])
 
@@ -40,7 +45,7 @@ export default function AreaDropDown({ scanAreasZoom }) {
     <Paper
       style={{
         minHeight: 50,
-        maxHeight: 250,
+        maxHeight: Math.min(data.scanAreas[0].features.length, 12) * 50,
         width: '100%',
         overflow: 'auto',
         backgroundColor: '#212121',
@@ -74,7 +79,7 @@ export default function AreaDropDown({ scanAreasZoom }) {
                 backgroundColor: details?.properties?.fillColor || 'none',
               }}
             >
-              <MenuItem>
+              <MenuItem disabled={!details}>
                 <Typography
                   variant="h6"
                   align="center"
@@ -93,23 +98,29 @@ export default function AreaDropDown({ scanAreasZoom }) {
                 children.length % 2 === 1 && i === children.length - 1 ? 12 : 6
               }
               onClick={() => {
-                map.flyTo(
-                  feat.properties.center,
-                  feat.properties.zoom || scanAreasZoom,
-                )
+                if (feat.properties?.center) {
+                  map.flyTo(
+                    feat.properties.center,
+                    feat.properties.zoom || scanAreasZoom,
+                  )
+                }
               }}
               style={{
                 border: `1px solid ${feat.properties.color || 'grey'}`,
                 backgroundColor: feat.properties.fillColor || 'none',
               }}
             >
-              <MenuItem>
+              <MenuItem disabled={!feat.properties.name}>
                 <Typography
                   variant="subtitle2"
                   align="center"
                   style={{ width: '100%' }}
                 >
-                  {Utility.getProperName(feat.properties.name)}
+                  {feat.properties.name ? (
+                    Utility.getProperName(feat.properties.name)
+                  ) : (
+                    <>&nbsp;</>
+                  )}
                 </Typography>
               </MenuItem>
             </Grid>
