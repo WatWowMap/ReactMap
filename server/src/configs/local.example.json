@@ -303,9 +303,21 @@
       "zoom": 15
     },
     {
+      "name": "California",
+      "lat": 37.1931249,
+      "lon": -123.7961458
+    },
+    {
       "name": "San Francisco",
       "lat": 37.79539194255634,
-      "lon": -122.39333173075096
+      "lon": -122.39333173075096,
+      "parent": "California"
+    },
+    {
+      "name": "Houston",
+      "lat": 33.6145517,
+      "lon": -108.6038347,
+      "parent": "Texas"
     }
   ]
 }
