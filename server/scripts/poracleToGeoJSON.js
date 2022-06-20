@@ -1,17 +1,23 @@
 /* eslint-disable no-console */
 /**
-* Credits: https://gist.github.com/moriakaice
-* Editor: PJ0tterr
-* Created on: 15-01-2022
-* Modified on: 23-01-2022
-*/
+ * Credits: https://gist.github.com/moriakaice
+ * Editor: PJ0tterr
+ * Created on: 15-01-2022
+ * Modified on: 23-01-2022
+ */
 
 const fs = require('fs')
 const path = require('path')
 
 // Set Path where for area.json
-const configFolderArea = path.resolve(__dirname, '../../server/src/configs/areas.json')
-const geofencesFile = path.resolve(__dirname, '../../server/src/configs/geofence.json')
+const configFolderArea = path.resolve(
+  __dirname,
+  '../../server/src/configs/areas.json',
+)
+const geofencesFile = path.resolve(
+  __dirname,
+  '../../server/src/configs/geofence.json',
+)
 
 if (fs.existsSync(geofencesFile)) {
   const outGeoJSON = {
@@ -37,7 +43,6 @@ if (fs.existsSync(geofencesFile)) {
           name: inGeofence.name || '',
           color: inGeofence.color || '#000000',
           id: inGeofence.id || 0,
-
         },
         geometry: {
           type: 'Polygon',
@@ -49,16 +54,27 @@ if (fs.existsSync(geofencesFile)) {
         inGeofence.path[j] = [coord[1], coord[0]]
       }
       const lastCoords = inGeofence.path.slice(-1)
-      if (inGeofence.path[0][0] !== lastCoords[0][0] || inGeofence.path[0][1] !== lastCoords[0][1]) {
+      if (
+        inGeofence.path[0][0] !== lastCoords[0][0] ||
+        inGeofence.path[0][1] !== lastCoords[0][1]
+      ) {
         inGeofence.path.push(inGeofence.path[0])
       }
       outGeofence.geometry.coordinates[0] = inGeofence.path
       outGeoJSON.features.push(outGeofence)
     }
-    const outFilePath = path.resolve(path.dirname(configFolderArea), 'areas.json')
+    const outFilePath = path.resolve(
+      path.dirname(configFolderArea),
+      'areas.json',
+    )
 
-    fs.writeFile(outFilePath, JSON.stringify(outGeoJSON, null, 2), 'utf8', () => {
-      console.log(`${outFilePath} file saved.`)
-    })
+    fs.writeFile(
+      outFilePath,
+      JSON.stringify(outGeoJSON, null, 2),
+      'utf8',
+      () => {
+        console.log(`${outFilePath} file saved.`)
+      },
+    )
   })
 }

@@ -6,6 +6,6 @@
     "esbenp.prettier-vscode",
     "leizongmin.node-module-intellisense",
     "eg2.vscode-npm-script",
-    "2gua.rainbow-brackets"
+    "graphql.vscode-graphql"
   ]
 }

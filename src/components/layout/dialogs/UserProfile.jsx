@@ -37,8 +37,10 @@ import ReactWindow from '../general/ReactWindow'
 export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
   Utility.analytics('/user-profile')
   const { t } = useTranslation()
-  const auth = useStatic(state => state.auth)
-  const { map: { excludeList, rolesLinkName, rolesLink } } = useStatic(state => state.config)
+  const auth = useStatic((state) => state.auth)
+  const {
+    map: { excludeList, rolesLinkName, rolesLink },
+  } = useStatic((state) => state.config)
 
   const [tab, setTab] = useState(0)
 
@@ -58,7 +60,7 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
             variant="fullWidth"
             style={{ backgroundColor: '#424242', width: '100%' }}
           >
-            {['profile', 'access'].map(each => (
+            {['profile', 'access'].map((each) => (
               <Tab
                 key={each}
                 label={t(each)}
@@ -86,18 +88,25 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
           />
         </TabPanel>
       </DialogContent>
-      <Footer options={[
-        { name: rolesLinkName, link: rolesLink, color: 'primary' },
-        { name: 'close', color: 'secondary', action: () => setUserProfile(false) },
-      ]}
+      <Footer
+        options={[
+          { name: rolesLinkName, link: rolesLink, color: 'primary' },
+          {
+            name: 'close',
+            color: 'secondary',
+            action: () => setUserProfile(false),
+          },
+        ]}
       />
     </>
   )
 }
 
 const LinkProfiles = ({ auth, t }) => {
-  const setAuth = useStatic(state => state.setAuth)
-  const { map: { discordAuthUrl, telegramAuthUrl, telegramBotName } } = useStatic(state => state.config)
+  const setAuth = useStatic((state) => state.setAuth)
+  const {
+    map: { discordAuthUrl, telegramAuthUrl, telegramBotName },
+  } = useStatic((state) => state.config)
 
   const [refreshing, setRefreshing] = useState(false)
 
@@ -109,30 +118,40 @@ const LinkProfiles = ({ auth, t }) => {
 
   return (
     <>
-      <Grid
-        container
-        alignItems="center"
-        justifyContent="center"
-      >
+      <Grid container alignItems="center" justifyContent="center">
         {['discord', 'telegram'].map((method, i) => {
           if (!auth.methods.includes(method)) return null
-          const Component = i
-            ? <Telegram authUrl={telegramAuthUrl} botName={telegramBotName} />
-            : <DiscordLogin href={discordAuthUrl} text="link_discord" size="medium" />
+          const Component = i ? (
+            <Telegram authUrl={telegramAuthUrl} botName={telegramBotName} />
+          ) : (
+            <DiscordLogin
+              href={discordAuthUrl}
+              text="link_discord"
+              size="medium"
+            />
+          )
           return (
             <Grid item xs={6} key={method}>
-              {auth[`${method}Id`]
-                ? <Typography color="secondary" align="center">{t(`${method}_linked`)}! ({auth.username})</Typography>
-                : Component}
+              {auth[`${method}Id`] ? (
+                <Typography color="secondary" align="center">
+                  {t(`${method}_linked`)}! ({auth.username})
+                </Typography>
+              ) : (
+                Component
+              )}
             </Grid>
           )
         })}
-        {(auth.discordId && auth.telegramId) && (
+        {auth.discordId && auth.telegramId && (
           <Grid container item alignItems="center" justifyContent="center">
-            <Grid item xs={6} sm={6} md={5} style={{ textAlign: 'center', padding: '20px 0' }}>
-              <Typography>
-                {t('select_webhook_strategy')}
-              </Typography>
+            <Grid
+              item
+              xs={6}
+              sm={6}
+              md={5}
+              style={{ textAlign: 'center', padding: '20px 0' }}
+            >
+              <Typography>{t('select_webhook_strategy')}</Typography>
             </Grid>
             <Grid item xs={6} sm={6} md={5} style={{ textAlign: 'center' }}>
               <Select
@@ -148,25 +167,33 @@ const LinkProfiles = ({ auth, t }) => {
                 }}
                 style={{ minWidth: 100 }}
               >
-                {['discord', 'telegram'].map((x) => (
+                {['discord', 'telegram'].map((x) =>
                   auth[`${x}Id`] ? (
                     <MenuItem key={x} value={x}>
                       {Utility.getProperName(x)}
                     </MenuItem>
-                  ) : null
-                ))}
+                  ) : null,
+                )}
               </Select>
             </Grid>
           </Grid>
         )}
       </Grid>
-      {refreshing && <Notification severity="success" i18nKey="webhook_strategy_success" messages={[{ key: 'redirecting', variables: [] }]} />}
+      {refreshing && (
+        <Notification
+          severity="success"
+          i18nKey="webhook_strategy_success"
+          messages={[{ key: 'redirecting', variables: [] }]}
+        />
+      )}
     </>
   )
 }
 
 const ProfilePermissions = ({ perms, excludeList, t }) => {
-  const { map: { permImageDir, permArrayImages } } = useStatic(state => state.config)
+  const {
+    map: { permImageDir, permArrayImages },
+  } = useStatic((state) => state.config)
   return (
     <Grid
       container
@@ -176,13 +203,19 @@ const ProfilePermissions = ({ perms, excludeList, t }) => {
       spacing={2}
       style={{ padding: 5 }}
     >
-      {Object.keys(perms).map(perm => {
+      {Object.keys(perms).map((perm) => {
         if (excludeList.includes(perm) || perm === 'donor') {
           return null
         }
         return (
           <Grid item xs={12} sm={6} key={perm}>
-            <PermCard perms={perms} perm={perm} t={t} permImageDir={permImageDir} permArrayImages={permArrayImages} />
+            <PermCard
+              perms={perms}
+              perm={perm}
+              t={t}
+              permImageDir={permImageDir}
+              permArrayImages={permArrayImages}
+            />
           </Grid>
         )
       })}
@@ -211,11 +244,9 @@ const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
           borderRadius: 4,
         }}
       >
-        {perms[perm].map(area => (
+        {perms[perm].map((area) => (
           <ListItem key={area}>
-            <Typography>
-              {Utility.getProperName(area)}
-            </Typography>
+            <Typography>{Utility.getProperName(area)}</Typography>
           </ListItem>
         ))}
       </List>
@@ -236,7 +267,7 @@ const GymBadges = ({ isMobile, t }) => {
     fetchPolicy: 'network-only',
     variables: { version: inject.VERSION },
   })
-  const Icons = useStatic(s => s.Icons)
+  const Icons = useStatic((s) => s.Icons)
   const map = useMap()
 
   let gold = 0
@@ -244,11 +275,17 @@ const GymBadges = ({ isMobile, t }) => {
   let bronze = 0
 
   if (data?.badges) {
-    data.badges.forEach(gym => {
+    data.badges.forEach((gym) => {
       switch (gym.badge) {
-        case 3: gold += 1; break
-        case 2: silver += 1; break
-        case 1: bronze += 1; break
+        case 3:
+          gold += 1
+          break
+        case 2:
+          silver += 1
+          break
+        case 1:
+          bronze += 1
+          break
         default:
       }
     })
@@ -264,7 +301,11 @@ const GymBadges = ({ isMobile, t }) => {
       {[bronze, silver, gold].map((count, i) => (
         // eslint-disable-next-line react/no-array-index-key
         <Grid key={i} item xs={4}>
-          <Typography variant="subtitle2" align="center" className={`badge_${i + 1}`}>
+          <Typography
+            variant="subtitle2"
+            align="center"
+            className={`badge_${i + 1}`}
+          >
             {t(`badge_${i + 1}`)}: {count}
           </Typography>
         </Grid>
@@ -308,7 +349,12 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
       >
         <Edit style={{ color: 'white' }} />
       </IconButton>
-      <Grid item xs={12} style={{ maxHeight: 60 }} onClick={() => map.flyTo([item.lat, item.lon], 16)}>
+      <Grid
+        item
+        xs={12}
+        style={{ maxHeight: 60 }}
+        onClick={() => map.flyTo([item.lat, item.lon], 16)}
+      >
         <img
           src={item.url ? item.url.replace('http', 'https') : ''}
           alt={item.url}

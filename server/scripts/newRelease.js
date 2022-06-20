@@ -24,18 +24,24 @@ try {
         throw new Error(err1)
       }
       console.log(stdout1)
-      exec(`sentry-cli releases files ${version} upload-sourcemaps ${path.resolve(__dirname, '../../dist')}`, (err2, stdout2) => {
-        if (err2) {
-          throw new Error(err2)
-        }
-        console.log(stdout2)
-        exec(`sentry-cli releases finalize ${version}`, (err3, stdout3) => {
-          if (err3) {
-            throw new Error(err3)
+      exec(
+        `sentry-cli releases files ${version} upload-sourcemaps ${path.resolve(
+          __dirname,
+          '../../dist',
+        )}`,
+        (err2, stdout2) => {
+          if (err2) {
+            throw new Error(err2)
           }
-          console.log(stdout3)
-        })
-      })
+          console.log(stdout2)
+          exec(`sentry-cli releases finalize ${version}`, (err3, stdout3) => {
+            if (err3) {
+              throw new Error(err3)
+            }
+            console.log(stdout3)
+          })
+        },
+      )
     })
   })
 } catch (e) {

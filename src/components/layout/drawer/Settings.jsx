@@ -1,6 +1,11 @@
 import React from 'react'
 import {
-  FormControl, Grid, InputLabel, MenuItem, Select, Button,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  Button,
 } from '@material-ui/core'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -10,21 +15,21 @@ import Utility from '@services/Utility'
 
 export default function Settings({ Icons }) {
   const { t, i18n } = useTranslation()
-  const config = useStatic(state => state.config)
-  const staticSettings = useStatic(state => state.settings)
-  const { loggedIn, methods } = useStatic(state => state.auth)
-  const setStaticIcons = useStatic(state => state.setIcons)
-  const setUserProfile = useStatic(state => state.setUserProfile)
-  const setFeedback = useStatic(state => state.setFeedback)
-  const setResetFilters = useStatic(state => state.setResetFilters)
+  const config = useStatic((state) => state.config)
+  const staticSettings = useStatic((state) => state.settings)
+  const { loggedIn, methods } = useStatic((state) => state.auth)
+  const setStaticIcons = useStatic((state) => state.setIcons)
+  const setUserProfile = useStatic((state) => state.setUserProfile)
+  const setFeedback = useStatic((state) => state.setFeedback)
+  const setResetFilters = useStatic((state) => state.setResetFilters)
 
-  const setTutorial = useStore(state => state.setTutorial)
-  const settings = useStore(state => state.settings)
-  const setSettings = useStore(state => state.setSettings)
-  const icons = useStore(state => state.icons)
-  const setIcons = useStore(state => state.setIcons)
+  const setTutorial = useStore((state) => state.setTutorial)
+  const settings = useStore((state) => state.settings)
+  const setSettings = useStore((state) => state.setSettings)
+  const icons = useStore((state) => state.icons)
+  const setIcons = useStore((state) => state.setIcons)
 
-  const handleChange = event => {
+  const handleChange = (event) => {
     setSettings({
       ...settings,
       [event.target.name]: config[event.target.name][event.target.value].name,
@@ -34,7 +39,7 @@ export default function Settings({ Icons }) {
     }
   }
 
-  const handleIconChange = event => {
+  const handleIconChange = (event) => {
     const { name, value } = event.target
     Icons.setSelection(name, value)
     setStaticIcons(Icons)
@@ -44,7 +49,10 @@ export default function Settings({ Icons }) {
   const exportSettings = () => {
     const json = localStorage.getItem('local-state')
     const el = document.createElement('a')
-    el.setAttribute('href', `data:application/json;chartset=utf-8,${encodeURIComponent(json)}`)
+    el.setAttribute(
+      'href',
+      `data:application/json;chartset=utf-8,${encodeURIComponent(json)}`,
+    )
     el.setAttribute('download', 'settings.json')
     el.style.display = 'none'
     document.body.appendChild(el)
@@ -75,7 +83,7 @@ export default function Settings({ Icons }) {
       alignItems="center"
       spacing={1}
     >
-      {Object.keys(staticSettings).map(setting => (
+      {Object.keys(staticSettings).map((setting) => (
         <Grid item key={setting} xs={10}>
           <FormControl style={{ width: 200, margin: 5 }}>
             <InputLabel>{t(Utility.camelToSnake(setting))}</InputLabel>
@@ -86,22 +94,24 @@ export default function Settings({ Icons }) {
               onChange={handleChange}
               fullWidth
             >
-              {Object.keys(config[setting]).map(option => (
-                <MenuItem
-                  key={option}
-                  value={option}
-                >
-                  {t(`${Utility.camelToSnake(setting)}_${option.toLowerCase()}`, Utility.getProperName(option))}
+              {Object.keys(config[setting]).map((option) => (
+                <MenuItem key={option} value={option}>
+                  {t(
+                    `${Utility.camelToSnake(setting)}_${option.toLowerCase()}`,
+                    Utility.getProperName(option),
+                  )}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Grid>
       ))}
-      {Icons.customizable.map(category => (
+      {Icons.customizable.map((category) => (
         <Grid item key={category} xs={10}>
           <FormControl style={{ width: 200, margin: 5 }}>
-            <InputLabel>{t(`${category}_icons`, `${category} Icons`)}</InputLabel>
+            <InputLabel>
+              {t(`${category}_icons`, `${category} Icons`)}
+            </InputLabel>
             <Select
               autoFocus
               name={category}
@@ -109,12 +119,12 @@ export default function Settings({ Icons }) {
               onChange={handleIconChange}
               fullWidth
             >
-              {Icons[category].map(option => (
-                <MenuItem
-                  key={option}
-                  value={option}
-                >
-                  {t(`${category.toLowerCase()}_${option.toLowerCase()}`, Utility.getProperName(option))}
+              {Icons[category].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {t(
+                    `${category.toLowerCase()}_${option.toLowerCase()}`,
+                    Utility.getProperName(option),
+                  )}
                 </MenuItem>
               ))}
             </Select>
@@ -130,7 +140,11 @@ export default function Settings({ Icons }) {
         style={{ margin: '10px 0px' }}
       >
         {config.map.enableUserProfile && (
-          <Grid item xs={t('drawer_settings_profile_width')} style={{ textAlign: 'center' }}>
+          <Grid
+            item
+            xs={t('drawer_settings_profile_width')}
+            style={{ textAlign: 'center' }}
+          >
             <Button
               style={{ minWidth: 100 }}
               variant="contained"
@@ -143,7 +157,11 @@ export default function Settings({ Icons }) {
           </Grid>
         )}
         {Boolean(methods.length) && (
-          <Grid item xs={t('drawer_settings_logout_width')} style={{ textAlign: 'center' }}>
+          <Grid
+            item
+            xs={t('drawer_settings_logout_width')}
+            style={{ textAlign: 'center' }}
+          >
             {loggedIn ? (
               <Button
                 className="sidebar-button"
@@ -171,7 +189,11 @@ export default function Settings({ Icons }) {
           </Grid>
         )}
         {config.map.enableTutorial && (
-          <Grid item xs={t('drawer_settings_tutorial_width')} style={{ textAlign: 'center' }}>
+          <Grid
+            item
+            xs={t('drawer_settings_tutorial_width')}
+            style={{ textAlign: 'center' }}
+          >
             <Button
               style={{ minWidth: 100 }}
               variant="contained"
@@ -183,7 +205,11 @@ export default function Settings({ Icons }) {
             </Button>
           </Grid>
         )}
-        <Grid item xs={t('drawer_settings_reset_filters_width')} style={{ textAlign: 'center' }}>
+        <Grid
+          item
+          xs={t('drawer_settings_reset_filters_width')}
+          style={{ textAlign: 'center' }}
+        >
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -194,7 +220,11 @@ export default function Settings({ Icons }) {
             {t('reset_filters')}
           </Button>
         </Grid>
-        <Grid item xs={t('drawer_settings_export_settings_width')} style={{ textAlign: 'center' }}>
+        <Grid
+          item
+          xs={t('drawer_settings_export_settings_width')}
+          style={{ textAlign: 'center' }}
+        >
           <Button
             style={{ minWidth: 100 }}
             variant="contained"
@@ -205,7 +235,11 @@ export default function Settings({ Icons }) {
             {t('export')}
           </Button>
         </Grid>
-        <Grid item xs={t('drawer_settings_import_settings_width')} style={{ textAlign: 'center' }}>
+        <Grid
+          item
+          xs={t('drawer_settings_import_settings_width')}
+          style={{ textAlign: 'center' }}
+        >
           <input
             accept="application/json"
             id="contained-button-file"
@@ -225,36 +259,42 @@ export default function Settings({ Icons }) {
             </Button>
           </label>
         </Grid>
-        {config.map.statsLink
-          && (
-            <Grid item xs={t('drawer_settings_stats_width')} style={{ textAlign: 'center' }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                style={{ minWidth: 100 }}
-                href={config.map.statsLink}
-                target="_blank"
-                rel="noreferrer"
-                size="small"
-              >
-                {t('stats')}
-              </Button>
-            </Grid>
-          )}
-        {config.map.feedbackLink
-          && (
-            <Grid item xs={t('drawer_settings_feedback_width')} style={{ textAlign: 'center' }}>
-              <Button
-                variant="contained"
-                color="primary"
-                style={{ minWidth: 100 }}
-                onClick={() => setFeedback(true)}
-                size="small"
-              >
-                {t('feedback')}
-              </Button>
-            </Grid>
-          )}
+        {config.map.statsLink && (
+          <Grid
+            item
+            xs={t('drawer_settings_stats_width')}
+            style={{ textAlign: 'center' }}
+          >
+            <Button
+              variant="contained"
+              color="secondary"
+              style={{ minWidth: 100 }}
+              href={config.map.statsLink}
+              target="_blank"
+              rel="noreferrer"
+              size="small"
+            >
+              {t('stats')}
+            </Button>
+          </Grid>
+        )}
+        {config.map.feedbackLink && (
+          <Grid
+            item
+            xs={t('drawer_settings_feedback_width')}
+            style={{ textAlign: 'center' }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              style={{ minWidth: 100 }}
+              onClick={() => setFeedback(true)}
+              size="small"
+            >
+              {t('feedback')}
+            </Button>
+          </Grid>
+        )}
       </Grid>
     </Grid>
   )

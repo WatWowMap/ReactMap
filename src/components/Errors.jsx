@@ -25,7 +25,11 @@ export default function Errors() {
         </Typography>
       </Grid>
       <Grid item style={{ paddingTop: 20 }}>
-        <Button variant="outlined" color="secondary" onClick={() => window.location = window.location.origin}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => (window.location = window.location.origin)}
+        >
           {t('go_back')}
         </Button>
       </Grid>

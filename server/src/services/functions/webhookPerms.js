@@ -3,8 +3,8 @@ const { webhooks } = require('../config')
 module.exports = function webhookPerms(roles, provider) {
   let perms = []
   if (webhooks.length) {
-    roles.forEach(role => {
-      webhooks.forEach(webhook => {
+    roles.forEach((role) => {
+      webhooks.forEach((webhook) => {
         if (webhook?.[provider]?.includes(role)) {
           perms.push(webhook.name)
         }

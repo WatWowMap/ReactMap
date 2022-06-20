@@ -11,46 +11,70 @@ import ActiveWeather from './layout/general/ActiveWeather'
 const filterSkipList = ['filter', 'enabled', 'legacy']
 
 export default function QueryData({
-  bounds, onMove, map, tileStyle, clusteringRules, config, params, isMobile,
-  category, filters, staticFilters, staticUserSettings, sizeKey,
-  userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
-  setError, active,
+  bounds,
+  onMove,
+  map,
+  tileStyle,
+  clusteringRules,
+  config,
+  params,
+  isMobile,
+  category,
+  filters,
+  staticFilters,
+  staticUserSettings,
+  sizeKey,
+  userSettings,
+  perms,
+  Icons,
+  userIcons,
+  setParams,
+  isNight,
+  setExcludeList,
+  setError,
+  active,
 }) {
-  const trimFilters = useCallback(requestedFilters => {
-    const trimmed = {
-      onlyLegacyExclude: [],
-      onlyLegacy: userSettings.legacyFilter,
-      onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
-    }
-    Object.entries(requestedFilters).forEach(topLevelFilter => {
-      const [id, specifics] = topLevelFilter
+  const trimFilters = useCallback(
+    (requestedFilters) => {
+      const trimmed = {
+        onlyLegacyExclude: [],
+        onlyLegacy: userSettings.legacyFilter,
+        onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
+      }
+      Object.entries(requestedFilters).forEach((topLevelFilter) => {
+        const [id, specifics] = topLevelFilter
 
-      if (!filterSkipList.includes(id)) {
-        trimmed[`only${id.charAt(0).toUpperCase()}${id.slice(1)}`] = specifics
-      }
-    })
-    Object.entries(userSettings).forEach(([entryK, entryV]) => {
-      if (entryK.startsWith('pvp')) {
-        trimmed[`only${entryK.charAt(0).toUpperCase()}${entryK.slice(1)}`] = entryV
-      }
-    })
-    Object.entries(requestedFilters.filter).forEach(filter => {
-      const [id, specifics] = filter
+        if (!filterSkipList.includes(id)) {
+          trimmed[`only${id.charAt(0).toUpperCase()}${id.slice(1)}`] = specifics
+        }
+      })
+      Object.entries(userSettings).forEach(([entryK, entryV]) => {
+        if (entryK.startsWith('pvp')) {
+          trimmed[`only${entryK.charAt(0).toUpperCase()}${entryK.slice(1)}`] =
+            entryV
+        }
+      })
+      Object.entries(requestedFilters.filter).forEach((filter) => {
+        const [id, specifics] = filter
 
-      if (specifics && specifics.enabled && staticFilters[id]) {
-        trimmed[id] = specifics
-      } else if (userSettings.legacyFilter) {
-        trimmed.onlyLegacyExclude.push(id)
-      }
-    })
-    return trimmed
-  }, [userSettings, filters])
+        if (specifics && specifics.enabled && staticFilters[id]) {
+          trimmed[id] = specifics
+        } else if (userSettings.legacyFilter) {
+          trimmed.onlyLegacyExclude.push(id)
+        }
+      })
+      return trimmed
+    },
+    [userSettings, filters],
+  )
 
   const refetchData = () => {
     onMove()
-    if (category !== 'weather'
-      && category !== 'device'
-      && category !== 'scanAreas') {
+    if (
+      category !== 'weather' &&
+      category !== 'device' &&
+      category !== 'scanAreas'
+    ) {
       refetch({
         ...Utility.getQueryArgs(map),
         filters: trimFilters(filters),
@@ -98,8 +122,10 @@ export default function QueryData({
         />
       )
     }
-    const message = error?.networkError?.result?.errors?.find(x => x?.message === 'old_client')?.message
-      || error?.message
+    const message =
+      error?.networkError?.result?.errors?.find(
+        (x) => x?.message === 'old_client',
+      )?.message || error?.message
     if (message === 'session_expired' || message === 'old_client') {
       setError(message)
       return null

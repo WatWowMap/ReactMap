@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
 import {
-  Grid, Typography, IconButton, Dialog, Checkbox,
+  Grid,
+  Typography,
+  IconButton,
+  Dialog,
+  Checkbox,
 } from '@material-ui/core'
 import { DeleteForever, Edit } from '@material-ui/icons'
 
@@ -8,19 +12,40 @@ import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 
 export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   const {
-    tileItem, columnCount, Icons, syncWebhook, selectedWebhook, selected, setSelected, Utility,
-    tracked, setTracked, isMobile, setSend, setTempFilters, category, Poracle, invasions,
+    tileItem,
+    columnCount,
+    Icons,
+    syncWebhook,
+    selectedWebhook,
+    selected,
+    setSelected,
+    Utility,
+    tracked,
+    setTracked,
+    isMobile,
+    setSend,
+    setTempFilters,
+    category,
+    Poracle,
+    invasions,
   } = data
   const [editDialog, setEditDialog] = useState(false)
   const item = tileItem[rowIndex * columnCount + columnIndex]
   if (!item) return null
 
   const toggleWebhook = (open, id, newFilters) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+    if (
+      event.type === 'keydown' &&
+      (event.key === 'Tab' || event.key === 'Shift')
+    ) {
       return
     }
     setEditDialog(open)
-    if (id && newFilters && !Object.keys(newFilters).every(key => newFilters[key] === item[key])) {
+    if (
+      id &&
+      newFilters &&
+      !Object.keys(newFilters).every((key) => newFilters[key] === item[key])
+    ) {
       // eslint-disable-next-line camelcase
       setTempFilters({ [id]: { ...newFilters, enabled: true } })
       setSend(true)
@@ -37,8 +62,9 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
   }
   if (category === 'invasion') {
     item.grunt_id = Object.keys(invasions).find(
-      key => invasions[key]?.type?.toLowerCase() === item.grunt_type.toLowerCase()
-        && invasions[key].gender === (item.gender || 1),
+      (key) =>
+        invasions[key]?.type?.toLowerCase() === item.grunt_type.toLowerCase() &&
+        invasions[key].gender === (item.gender || 1),
     )
   }
   if (category === 'pokemon') {
@@ -69,9 +95,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
         />
       </Grid>
       <Grid item xs={6} sm={8} md={9}>
-        <Typography variant="caption">
-          {item.description}
-        </Typography>
+        <Typography variant="caption">{item.description}</Typography>
       </Grid>
       <Grid item xs={4} sm={3} md={2} style={{ textAlign: 'right' }}>
         <IconButton size="small" onClick={() => setEditDialog(true)}>
@@ -80,7 +104,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
         <IconButton
           size="small"
           onClick={() => {
-            setTracked(tracked.filter(p => p.uid !== item.uid))
+            setTracked(tracked.filter((p) => p.uid !== item.uid))
             syncWebhook({
               variables: {
                 category,

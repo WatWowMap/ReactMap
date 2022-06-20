@@ -9,7 +9,7 @@ export default function AdvSearch({ search, setSearch, category }) {
   const { t } = useTranslation()
   const classes = useStyles()
 
-  const handleSearchChange = event => {
+  const handleSearchChange = (event) => {
     setSearch(event.target.value?.toString()?.toLowerCase() || '')
   }
 
@@ -18,7 +18,12 @@ export default function AdvSearch({ search, setSearch, category }) {
   }
 
   return (
-    <Paper elevation={0} variant="outlined" className={classes.search} key="search">
+    <Paper
+      elevation={0}
+      variant="outlined"
+      className={classes.search}
+      key="search"
+    >
       <InputBase
         className={classes.input}
         placeholder={t(`search_${category}`, t(`search_${category}s`))}
@@ -29,10 +34,7 @@ export default function AdvSearch({ search, setSearch, category }) {
         autoComplete="off"
         variant="outlined"
       />
-      <IconButton
-        className={classes.iconButton}
-        onClick={resetSearch}
-      >
+      <IconButton className={classes.iconButton} onClick={resetSearch}>
         <HighlightOff style={{ color: '#848484' }} />
       </IconButton>
     </Paper>

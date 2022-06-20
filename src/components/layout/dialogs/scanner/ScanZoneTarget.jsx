@@ -1,6 +1,4 @@
-import React, {
-  useState, useRef, useMemo, useEffect,
-} from 'react'
+import React, { useState, useRef, useMemo, useEffect } from 'react'
 import { Grid, Button, Box, Slider, Typography } from '@material-ui/core'
 import { point, polygon } from '@turf/helpers'
 import destination from '@turf/destination'
@@ -10,9 +8,25 @@ import { useTranslation } from 'react-i18next'
 import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
 
 export default function ScanZoneTarget({
-  map, theme, scannerType, queue, setScanZoneMode, scanZoneLocation, setScanZoneLocation, scanZoneCoords,
-  setScanZoneCoords, scanZoneSize, setScanZoneSize, scanZoneShowScanCount, scanZoneShowScanQueue,
-  advancedScanZoneOptions, scanZoneRadius, scanZoneSpacing, scanZoneMaxSize, scanZoneAreaRestriction, scanAreas,
+  map,
+  theme,
+  scannerType,
+  queue,
+  setScanZoneMode,
+  scanZoneLocation,
+  setScanZoneLocation,
+  scanZoneCoords,
+  setScanZoneCoords,
+  scanZoneSize,
+  setScanZoneSize,
+  scanZoneShowScanCount,
+  scanZoneShowScanQueue,
+  advancedScanZoneOptions,
+  scanZoneRadius,
+  scanZoneSpacing,
+  scanZoneMaxSize,
+  scanZoneAreaRestriction,
+  scanAreas,
 }) {
   const [position, setPosition] = useState(scanZoneLocation)
   const [spacing, setSpacing] = useState(scanZoneSpacing)
@@ -33,10 +47,18 @@ export default function ScanZoneTarget({
       let quadrant = 1
       let step = 1
       while (step < 6 * i + 1) {
-        currentPoint = destination(currentPoint, (distance * spacing) / 1000, step === 1
-          ? 330
-          : bearings[quadrant], { units: 'kilometers' })
-        coords = coords.concat([[currentPoint.geometry.coordinates[1], currentPoint.geometry.coordinates[0]]])
+        currentPoint = destination(
+          currentPoint,
+          (distance * spacing) / 1000,
+          step === 1 ? 330 : bearings[quadrant],
+          { units: 'kilometers' },
+        )
+        coords = coords.concat([
+          [
+            currentPoint.geometry.coordinates[1],
+            currentPoint.geometry.coordinates[0],
+          ],
+        ])
         quadrant = Math.floor(step / i) + 1
         step += 1
       }
@@ -49,9 +71,17 @@ export default function ScanZoneTarget({
     let isValid = false
     if (scanZoneAreaRestriction?.length && scanAreas?.length) {
       const testPoint = point([center[1], center[0]])
-      scanZoneAreaRestriction.map(area => {
-        if (scanAreas.some(scanArea => scanArea.properties.name === area
-          && booleanPointInPolygon(testPoint, polygon(scanArea.geometry.coordinates)))) {
+      scanZoneAreaRestriction.map((area) => {
+        if (
+          scanAreas.some(
+            (scanArea) =>
+              scanArea.properties.name === area &&
+              booleanPointInPolygon(
+                testPoint,
+                polygon(scanArea.geometry.coordinates),
+              ),
+          )
+        ) {
           isValid = true
         }
         return true
@@ -105,7 +135,10 @@ export default function ScanZoneTarget({
     setScanZoneCoords(calcScanZoneCoords(position))
   }
 
-  const rangeMarks = [{ value: scanZoneRadius.pokemon, label: t('pokemon') }, { value: scanZoneRadius.gym, label: t('gym') }]
+  const rangeMarks = [
+    { value: scanZoneRadius.pokemon, label: t('pokemon') },
+    { value: scanZoneRadius.gym, label: t('gym') },
+  ]
 
   const isInAllowedArea = checkAreaValidity(position)
 
@@ -115,9 +148,7 @@ export default function ScanZoneTarget({
 
   const advancedMenu = (
     <Grid item xs={12} style={{ textAlign: 'center' }}>
-      <Typography variant="caption">
-        {t('scan_zone_spacing')}
-      </Typography>
+      <Typography variant="caption">{t('scan_zone_spacing')}</Typography>
       <Slider
         xs={12}
         name="Spacing"
@@ -129,9 +160,7 @@ export default function ScanZoneTarget({
         onChangeCommitted={handleSpacingChange}
         valueLabelDisplay="auto"
       />
-      <Typography variant="caption">
-        {t('scan_zone_radius')}
-      </Typography>
+      <Typography variant="caption">{t('scan_zone_radius')}</Typography>
       <Slider
         xs={12}
         name="Radius"
@@ -218,14 +247,20 @@ export default function ScanZoneTarget({
               <Button
                 color="secondary"
                 variant="contained"
-                disabled={Boolean(scanZoneAreaRestriction?.length && !isInAllowedArea)}
+                disabled={Boolean(
+                  scanZoneAreaRestriction?.length && !isInAllowedArea,
+                )}
                 onClick={() => setScanZoneMode('sendCoords')}
               >
                 {t('click_to_scan')}
               </Button>
             </Grid>
             <Grid item style={{ display: isInAllowedArea ? 'none' : 'block' }}>
-              <Typography variant="body2" align="center" style={{ fontStyle: 'italic' }}>
+              <Typography
+                variant="body2"
+                align="center"
+                style={{ fontStyle: 'italic' }}
+              >
                 {t('scan_outside_area')}
               </Typography>
             </Grid>
@@ -241,13 +276,15 @@ export default function ScanZoneTarget({
           </Grid>
         </Popup>
       </Marker>
-      {scanZoneCoords.map(coords => (
+      {scanZoneCoords.map((coords) => (
         <Circle
           key={[coords[0], coords[1]]}
           radius={radius}
           center={[coords[0], coords[1]]}
           fillOpacity={0.5}
-          pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)' }}
+          pathOptions={{
+            color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)',
+          }}
         />
       ))}
     </>

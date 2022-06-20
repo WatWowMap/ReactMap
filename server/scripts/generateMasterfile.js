@@ -10,7 +10,7 @@ const getRarityLevel = (id, pkmn) => {
   let pkmnRarity
   for (const [tier, pokemon] of Object.entries(defaultRarity)) {
     if (rarity?.[tier]?.length) {
-      if (rarity[tier].includes((parseInt(id)))) {
+      if (rarity[tier].includes(parseInt(id))) {
         pkmnRarity = tier
       }
     } else if (pokemon.includes(parseInt(id))) {
@@ -25,9 +25,11 @@ const getRarityLevel = (id, pkmn) => {
 
 const generate = async (save) => {
   try {
-    const masterfile = await fetchJson('https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-react-map.json')
+    const masterfile = await fetchJson(
+      'https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-react-map.json',
+    )
 
-    Object.values(masterfile.pokemon).forEach(pokemon => {
+    Object.values(masterfile.pokemon).forEach((pokemon) => {
       pokemon.rarity = getRarityLevel(pokemon.pokedexId, pokemon)
       pokemon.types = pokemon.types || []
       delete pokemon.mythical
@@ -39,7 +41,7 @@ const generate = async (save) => {
         path.resolve(`${__dirname}/../src/data/masterfile.json`),
         JSON.stringify(masterfile, null, 2),
         'utf8',
-        () => { },
+        () => {},
       )
     }
     return masterfile

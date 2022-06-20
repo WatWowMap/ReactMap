@@ -1,7 +1,7 @@
 import { makeStyles } from '@material-ui/styles'
 import { purple } from '@material-ui/core/colors'
 
-export default makeStyles(theme => ({
+export default makeStyles((theme) => ({
   gridItem: {
     height: 75,
     width: 'auto',

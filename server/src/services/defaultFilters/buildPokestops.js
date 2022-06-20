@@ -4,31 +4,35 @@ const { Event } = require('../initialization')
 module.exports = function buildPokestops(perms, defaults, available) {
   const quests = { s0: new GenericFilter() }
   if (perms.lures) {
-    defaults.baseLureIds.forEach(lure => {
+    defaults.baseLureIds.forEach((lure) => {
       quests[`l${lure}`] = new GenericFilter(defaults.lures)
     })
   }
   if (perms.quests) {
-    Object.keys(Event.masterfile.items).forEach(item => {
+    Object.keys(Event.masterfile.items).forEach((item) => {
       quests[`q${item}`] = new GenericFilter(defaults.items)
     })
-    for (let i = defaults.stardust.min; i <= defaults.stardust.max; i += defaults.stardust.interval) {
+    for (
+      let i = defaults.stardust.min;
+      i <= defaults.stardust.max;
+      i += defaults.stardust.interval
+    ) {
       quests[`d${i}`] = new GenericFilter(defaults.stardust.enabled)
     }
-    Object.keys(Event.masterfile.questRewardTypes).forEach(type => {
+    Object.keys(Event.masterfile.questRewardTypes).forEach((type) => {
       if (type !== '0') {
         quests[`u${type}`] = new GenericFilter(defaults.rewardTypes)
       }
     })
   }
   if (perms.invasions) {
-    Object.keys(Event.invasions).forEach(type => {
+    Object.keys(Event.invasions).forEach((type) => {
       if (type !== '0') {
         quests[`i${type}`] = new GenericFilter(defaults.allInvasions)
       }
     })
   }
-  available.pokestops.forEach(avail => {
+  available.pokestops.forEach((avail) => {
     if (perms.lures && avail.startsWith('l')) {
       quests[avail] = new GenericFilter(defaults.lures)
     }

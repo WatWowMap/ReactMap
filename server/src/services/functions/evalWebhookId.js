@@ -4,8 +4,11 @@ module.exports = function evalWebhookId(user) {
   }
   const { strategy, webhookStrategy, discordId, telegramId } = user
   switch (strategy) {
-    case 'discord': return discordId
-    case 'telegram': return telegramId
-    default: return webhookStrategy === 'discord' ? discordId : telegramId
+    case 'discord':
+      return discordId
+    case 'telegram':
+      return telegramId
+    default:
+      return webhookStrategy === 'discord' ? discordId : telegramId
   }
 }

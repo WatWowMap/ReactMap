@@ -13,11 +13,8 @@ export default function LocaleSelection({ localeSelection }) {
       onChange={(event) => i18n.changeLanguage(event.target.value)}
       fullWidth
     >
-      {Object.keys(localeSelection).map(option => (
-        <MenuItem
-          key={option}
-          value={option}
-        >
+      {Object.keys(localeSelection).map((option) => (
+        <MenuItem key={option} value={option}>
           {t(`locale_selection_${option}`)}
         </MenuItem>
       ))}

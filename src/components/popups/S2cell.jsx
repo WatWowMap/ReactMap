@@ -20,9 +20,7 @@ export default function S2CellPopup({ cell, ts }) {
   return (
     <>
       <Typography variant="h6" align="center">
-        <Trans i18nKey="s2_cell_level">
-          {{ level: 15 }}
-        </Trans>
+        <Trans i18nKey="s2_cell_level">{{ level: 15 }}</Trans>
       </Typography>
       <Typography variant="subtitle2" align="center">
         {timer.str.replace('days', t('days')).replace('day', t('day'))}

@@ -3,7 +3,7 @@ export default function formatInterval(intervalMs) {
   const d = Math.floor(diff / 86400)
   const h = Math.floor(diff / 3600)
   const m = Math.floor((diff % 3600) / 60)
-  const s = Math.floor(diff % 3600 % 60)
+  const s = Math.floor((diff % 3600) % 60)
   const str = []
 
   if (d > 0) {

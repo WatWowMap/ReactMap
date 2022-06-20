@@ -1,7 +1,5 @@
 /* global BigInt */
-const {
-  S2LatLng, S2Cell, S2CellId, S2Point,
-} = require('nodes2ts')
+const { S2LatLng, S2Cell, S2CellId, S2Point } = require('nodes2ts')
 
 module.exports = function getPolyVector(s2cellId, polyline) {
   const s2cell = new S2Cell(new S2CellId(BigInt(s2cellId).toString()))
@@ -10,10 +8,7 @@ module.exports = function getPolyVector(s2cellId, polyline) {
     const coordinate = s2cell.getVertex(i)
     const point = new S2Point(coordinate.x, coordinate.y, coordinate.z)
     const latLng = S2LatLng.fromPoint(point)
-    polygon.push([
-      latLng.latDegrees,
-      latLng.lngDegrees,
-    ])
+    polygon.push([latLng.latDegrees, latLng.lngDegrees])
   }
   if (polyline) {
     polygon.push(polygon[0])

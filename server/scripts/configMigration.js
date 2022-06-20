@@ -1,94 +1,105 @@
 /* eslint-disable no-console */
 const fs = require('fs')
-const oldConfig = require('../src/configs/config.json')
+const { resolve } = require('path')
 
-const convertObjToArr = (obj) => obj ? Object.entries(obj).map(([k, v]) => ({
-  name: k,
-  ...v,
-})) : undefined
+const oldConfig = JSON.parse(
+  fs.readFileSync(resolve(__dirname, '../src/configs/config.json')),
+)
 
-const convertMapObject = (obj) => obj ? ({
-  general: {
-    title: obj?.title,
-    headerTitle: obj?.headerTitle,
-    startLat: obj?.startLat,
-    startLon: obj?.startLon,
-    startZoom: obj?.startZoom,
-    minZoom: obj?.minZoom,
-    maxZoom: obj?.maxZoom,
-    interactionRangeZoom: obj?.interactionRangeZoom,
-  },
-  localeSelection: obj?.localeSelection,
-  customRoutes: {
-    discordAuthUrl: obj?.discordAuthUrl,
-    telegramAuthUrl: obj?.telegramAuthUrl,
-    telegramBotName: obj?.telegramBotEnvRef,
-    localAuthUrl: obj?.localAuthUrl,
-  },
-  links: {
-    discordInvite: obj?.discordInvite,
-    feedbackLink: obj?.feedbackLink,
-    statsLink: obj?.statsLink,
-    rolesLinksName: obj?.rolesLinksName,
-    rolesLink: obj?.rolesLink,
-  },
-  holidayEffects: {
-    christmasSnow: obj?.christmasSnow,
-    newYearsFireworks: obj?.newYearsFireworks,
-    valentinesDay: obj?.valentinesDay,
-  },
-  misc: {
-    enableMapJsFilter: obj?.legacyPkmnFilter,
-    questRewardTypeFilters: obj?.questRewardTypeFilters,
-    fetchLatestInvasions: obj?.fetchLatestInvasions,
-    invasionCacheHrs: obj?.invasionCacheHrs,
-    navigationControls: obj?.navigationControls,
-    forceTutorial: obj?.forceTutorial,
-    enableTutorial: obj?.enableTutorial,
-    enableUserProfile: obj?.enableUserProfile,
-    enableQuestSetSelector: obj?.enableQuestSetSelector,
-    noScanAreaOverlay: obj?.noScanAreaOverlay,
-  },
-  theme: obj?.theme,
-  clustering: {
-    gyms: {
-      zoomLevel: obj?.clusterZoomLevels?.gyms,
-      forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
-    },
-    pokestops: {
-      zoomLevel: obj?.clusterZoomLevels?.pokestops,
-      forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
-    },
-    pokemon: {
-      zoomLevel: obj?.clusterZoomLevels?.pokemon,
-      forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
-    },
-    portals: {
-      zoomLevel: obj?.clusterZoomLevels?.portals,
-      forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
-    },
-    spawnpoints: {
-      zoomLevel: obj?.clusterZoomLevels?.spawnpoints,
-      forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
-    },
-  },
-  messageOfTheDay: obj?.messageOfTheDay
-    ? ensureMotd(obj?.messageOfTheDay)
-    : undefined,
-  donationPage: obj?.donationPage,
-  loginPage: obj?.loginPage,
-}) : undefined
+const convertObjToArr = (obj) =>
+  obj
+    ? Object.entries(obj).map(([k, v]) => ({
+        name: k,
+        ...v,
+      }))
+    : undefined
+
+const convertMapObject = (obj) =>
+  obj
+    ? {
+        general: {
+          title: obj?.title,
+          headerTitle: obj?.headerTitle,
+          startLat: obj?.startLat,
+          startLon: obj?.startLon,
+          startZoom: obj?.startZoom,
+          minZoom: obj?.minZoom,
+          maxZoom: obj?.maxZoom,
+          interactionRangeZoom: obj?.interactionRangeZoom,
+        },
+        localeSelection: obj?.localeSelection,
+        customRoutes: {
+          discordAuthUrl: obj?.discordAuthUrl,
+          telegramAuthUrl: obj?.telegramAuthUrl,
+          telegramBotName: obj?.telegramBotEnvRef,
+          localAuthUrl: obj?.localAuthUrl,
+        },
+        links: {
+          discordInvite: obj?.discordInvite,
+          feedbackLink: obj?.feedbackLink,
+          statsLink: obj?.statsLink,
+          rolesLinksName: obj?.rolesLinksName,
+          rolesLink: obj?.rolesLink,
+        },
+        holidayEffects: {
+          christmasSnow: obj?.christmasSnow,
+          newYearsFireworks: obj?.newYearsFireworks,
+          valentinesDay: obj?.valentinesDay,
+        },
+        misc: {
+          enableMapJsFilter: obj?.legacyPkmnFilter,
+          questRewardTypeFilters: obj?.questRewardTypeFilters,
+          fetchLatestInvasions: obj?.fetchLatestInvasions,
+          invasionCacheHrs: obj?.invasionCacheHrs,
+          navigationControls: obj?.navigationControls,
+          forceTutorial: obj?.forceTutorial,
+          enableTutorial: obj?.enableTutorial,
+          enableUserProfile: obj?.enableUserProfile,
+          enableQuestSetSelector: obj?.enableQuestSetSelector,
+          noScanAreaOverlay: obj?.noScanAreaOverlay,
+        },
+        theme: obj?.theme,
+        clustering: {
+          gyms: {
+            zoomLevel: obj?.clusterZoomLevels?.gyms,
+            forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+          },
+          pokestops: {
+            zoomLevel: obj?.clusterZoomLevels?.pokestops,
+            forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+          },
+          pokemon: {
+            zoomLevel: obj?.clusterZoomLevels?.pokemon,
+            forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+          },
+          portals: {
+            zoomLevel: obj?.clusterZoomLevels?.portals,
+            forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+          },
+          spawnpoints: {
+            zoomLevel: obj?.clusterZoomLevels?.spawnpoints,
+            forcedLimit: obj?.clusterZoomLevels?.forcedClusterLimit,
+          },
+        },
+        messageOfTheDay: obj?.messageOfTheDay
+          ? ensureMotd(obj?.messageOfTheDay)
+          : undefined,
+        donationPage: obj?.donationPage,
+        loginPage: obj?.loginPage,
+      }
+    : undefined
 
 const ensureMotd = (obj) => {
   if (obj?.messages) {
-    const updateFieldRec = (messages) => messages.map(message => {
-      if (message.messages) {
-        message.components = updateFieldRec(message.messages)
-        delete message.messages
-      }
-      return message
-    })
-    obj.components = obj.messages.map(m => {
+    const updateFieldRec = (messages) =>
+      messages.map((message) => {
+        if (message.messages) {
+          message.components = updateFieldRec(message.messages)
+          delete message.messages
+        }
+        return message
+      })
+    obj.components = obj.messages.map((m) => {
       if (m.type !== 'parent') return m
       if (m.messages) {
         m.components = m.components || updateFieldRec(m.messages)
@@ -102,19 +113,31 @@ const ensureMotd = (obj) => {
 }
 
 const mergeAuth = async () => {
-  let authMethods = await fs.promises.readdir(`${__dirname}/../src/strategies`)
-    .then(files => files
-      .filter(file => file !== 'local.js' && file !== 'discord.js' && file !== 'telegram.js'))
+  let authMethods = await fs.promises
+    .readdir(`${__dirname}/../src/strategies`)
+    .then((files) =>
+      files.filter(
+        (file) =>
+          file !== 'local.js' &&
+          file !== 'discord.js' &&
+          file !== 'telegram.js',
+      ),
+    )
   if (authMethods?.length) {
-    authMethods = authMethods.map(file => file.replace('.js', ''))
-    console.log('Found Custom Auth Methods:', authMethods, '\n', 'You should double check these were migrated correctly!')
+    authMethods = authMethods.map((file) => file.replace('.js', ''))
+    console.log(
+      'Found Custom Auth Methods:',
+      authMethods,
+      '\n',
+      'You should double check these were migrated correctly!',
+    )
   }
 
-  const flattenArray = (perm) => ([
-    ...oldConfig?.discord?.perms?.[perm]?.roles || [],
-    ...oldConfig?.telegram?.perms?.[perm]?.roles || [],
-    ...authMethods.flatMap(m => oldConfig?.[m]?.perms[perm]?.roles || []),
-  ])
+  const flattenArray = (perm) => [
+    ...(oldConfig?.discord?.perms?.[perm]?.roles || []),
+    ...(oldConfig?.telegram?.perms?.[perm]?.roles || []),
+    ...authMethods.flatMap((m) => oldConfig?.[m]?.perms[perm]?.roles || []),
+  ]
 
   const discordObj = (obj, name) => ({
     name,
@@ -146,22 +169,28 @@ const mergeAuth = async () => {
     type: 'local',
   })
 
-  const checkEnabled = (perm) => oldConfig?.discord?.perms?.[perm]?.enabled
-    || oldConfig?.telegram?.perms?.[perm]?.enabled || false
+  const checkEnabled = (perm) =>
+    oldConfig?.discord?.perms?.[perm]?.enabled ||
+    oldConfig?.telegram?.perms?.[perm]?.enabled ||
+    false
 
   const baseAuth = {
     strategies: [],
     areaRestrictions: [
-      ...oldConfig?.discord?.areaRestrictions || [],
-      ...oldConfig?.telegram?.areaRestrictions || [],
-      ...oldConfig?.local?.areaRestrictions || [],
-      ...authMethods.flatMap(m => oldConfig?.[m]?.areaRestrictions || []),
+      ...(oldConfig?.discord?.areaRestrictions || []),
+      ...(oldConfig?.telegram?.areaRestrictions || []),
+      ...(oldConfig?.local?.areaRestrictions || []),
+      ...authMethods.flatMap((m) => oldConfig?.[m]?.areaRestrictions || []),
     ],
     excludeFromTutorial: oldConfig?.excludeFromTutorial
-      ? oldConfig.excludeFromTutorial.map(perm => perm === 's2cells' ? 'scanCells' : perm)
+      ? oldConfig.excludeFromTutorial.map((perm) =>
+          perm === 's2cells' ? 'scanCells' : perm,
+        )
       : undefined,
     alwaysEnabledPerms: oldConfig?.alwaysEnabledPerms
-      ? oldConfig.alwaysEnabledPerms.map(perm => perm === 's2cells' ? 'scanCells' : perm)
+      ? oldConfig.alwaysEnabledPerms.map((perm) =>
+          perm === 's2cells' ? 'scanCells' : perm,
+        )
       : undefined,
     perms: {
       map: {
@@ -251,11 +280,11 @@ const mergeAuth = async () => {
   if (oldConfig?.local) {
     baseAuth.strategies.push(localObj(oldConfig?.local, 'local'))
     if (oldConfig?.local?.perms) {
-      oldConfig.local.perms.forEach(perm => {
+      oldConfig.local.perms.forEach((perm) => {
         if (perm === 's2cells') {
           baseAuth.perms.scanCells.roles.push('local')
         } else {
-          Object.keys(baseAuth.perms).forEach(key => {
+          Object.keys(baseAuth.perms).forEach((key) => {
             if (perm.includes(key)) {
               baseAuth.perms[key].roles.push('local')
             }
@@ -264,7 +293,7 @@ const mergeAuth = async () => {
       })
     }
   }
-  authMethods.forEach(m => {
+  authMethods.forEach((m) => {
     if (m.toLowerCase().includes('discord')) {
       baseAuth.strategies.push(discordObj(oldConfig[m], m))
     } else if (m.toLowerCase().includes('telegram')) {
@@ -272,7 +301,11 @@ const mergeAuth = async () => {
     } else if (m.toLowerCase().includes('local')) {
       baseAuth.strategies.push(localObj(oldConfig[m], m))
     } else {
-      console.warn('Unable to process Auth Method:', m, 'you will need to manually migrate this!')
+      console.warn(
+        'Unable to process Auth Method:',
+        m,
+        'you will need to manually migrate this!',
+      )
     }
   })
   return baseAuth
@@ -297,23 +330,25 @@ const rebuildConfig = async () => ({
   },
   multiDomains: oldConfig.multiDomains
     ? Object.entries(oldConfig.multiDomains).map(([domain, values]) => ({
-      domain,
-      ...convertMapObject(values),
-    }))
+        domain,
+        ...convertMapObject(values),
+      }))
     : undefined,
   map: convertMapObject(oldConfig?.map),
   clientSideOptions: oldConfig?.clientSideOptions,
-  defaultFilters: oldConfig?.defaultFilters ? {
-    ...oldConfig?.defaultFilters,
-    pokemon: {
-      ...oldConfig?.defaultFilters?.pokemon,
-      globalValues: {
-        ...oldConfig?.defaultFilters?.pokemon?.globalValues,
-        pvp: oldConfig?.defaultFilters?.pokemon?.pvpValues,
-      },
-      pvpValues: undefined,
-    },
-  } : undefined,
+  defaultFilters: oldConfig?.defaultFilters
+    ? {
+        ...oldConfig?.defaultFilters,
+        pokemon: {
+          ...oldConfig?.defaultFilters?.pokemon,
+          globalValues: {
+            ...oldConfig?.defaultFilters?.pokemon?.globalValues,
+            pvp: oldConfig?.defaultFilters?.pokemon?.pvpValues,
+          },
+          pvpValues: undefined,
+        },
+      }
+    : undefined,
   database: {
     settings: {
       ...oldConfig?.database?.settings,
@@ -321,7 +356,7 @@ const rebuildConfig = async () => ({
       reactMapHandlesPvp: undefined,
       pvpLevels: undefined,
     },
-    schemas: Object.values(oldConfig?.database?.schemas).map(s => {
+    schemas: Object.values(oldConfig?.database?.schemas).map((s) => {
       if (s.useFor.includes('s2cell')) {
         const s2cellIndex = s.useFor.indexOf('s2cell')
         s.useFor[s2cellIndex] = 'scanCell'
@@ -341,13 +376,16 @@ const rebuildConfig = async () => ({
 const cleanConfig = (obj, round) => {
   Object.entries(obj).forEach(([key, value]) => {
     if (Array.isArray(value)) {
-      value.forEach(subObj => {
+      value.forEach((subObj) => {
         if (typeof subObj === 'object') {
           cleanConfig(subObj, round)
         }
       })
     } else if (typeof value === 'object') {
-      if (!Object.keys(value).length || Object.values(value).every(v => v === undefined)) {
+      if (
+        !Object.keys(value).length ||
+        Object.values(value).every((v) => v === undefined)
+      ) {
         delete obj[key]
         console.log('Removed empty object:', key, round)
       } else {
@@ -371,7 +409,7 @@ const migrator = async () => {
     `${__dirname}/../src/configs/local.json`,
     JSON.stringify(config, null, 2),
     'utf8',
-    () => { },
+    () => {},
   )
 }
 

@@ -1,6 +1,13 @@
 import { useEffect } from 'react'
 
-export default function useMarkerTimer(itemExpire, itemId, ref, map, ts, callback) {
+export default function useMarkerTimer(
+  itemExpire,
+  itemId,
+  ref,
+  map,
+  ts,
+  callback,
+) {
   useEffect(() => {
     if (itemExpire > ts && itemExpire !== Infinity) {
       const timeout = setTimeout(() => {

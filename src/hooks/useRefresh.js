@@ -5,10 +5,10 @@ import { useEffect } from 'react'
 import { useStatic } from './useStore'
 
 export default function useRefresh() {
-  const setAvailable = useStatic(s => s.setAvailable)
-  const setMasterfile = useStatic(s => s.setMasterfile)
-  const setStaticFilters = useStatic(s => s.setFilters)
-  const active = useStatic(s => s.active)
+  const setAvailable = useStatic((s) => s.setAvailable)
+  const setMasterfile = useStatic((s) => s.setMasterfile)
+  const setStaticFilters = useStatic((s) => s.setFilters)
+  const active = useStatic((s) => s.active)
 
   const { data, stopPolling, startPolling } = useQuery(getAvailable, {
     variables: { version: inject.VERSION },

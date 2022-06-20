@@ -46,8 +46,24 @@ const raid = gql`
 export const getGyms = gql`
   ${core}
   ${gym}
-  query Gyms($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!, $ts: Int!, $version: String) {
-    gyms(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters, ts: $ts, version: $version) {
+  query Gyms(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $version: String
+  ) {
+    gyms(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      version: $version
+    ) {
       ...CoreGym
       ...Gym
     }
@@ -57,8 +73,24 @@ export const getGyms = gql`
 export const getRaids = gql`
   ${core}
   ${raid}
-  query Raids($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!, $ts: Int!, $version: String) {
-    gyms(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters, ts: $ts, version: $version) {
+  query Raids(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $version: String
+  ) {
+    gyms(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      version: $version
+    ) {
       ...CoreGym
       ...Raid
     }
@@ -69,8 +101,24 @@ export const getGymsRaids = gql`
   ${core}
   ${gym}
   ${raid}
-  query GymsRaids($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $filters: JSON!, $ts: Int!, $version: String) {
-    gyms(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon, filters: $filters, ts: $ts, version: $version) {
+  query GymsRaids(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $version: String
+  ) {
+    gyms(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      version: $version
+    ) {
       ...CoreGym
       ...Gym
       ...Raid

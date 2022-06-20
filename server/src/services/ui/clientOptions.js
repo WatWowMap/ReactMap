@@ -1,7 +1,9 @@
 const {
   clientSideOptions,
   map: { enableMapJsFilter },
-  api: { pvp: { levels } },
+  api: {
+    pvp: { levels },
+  },
 } = require('../config')
 const dbSelection = require('../functions/dbSelection')
 
@@ -58,9 +60,11 @@ module.exports = function clientOptions(perms) {
     },
   }
 
-  levels.forEach(level => {
+  levels.forEach((level) => {
     clientMenus.pokemon[`pvp${level}`] = {
-      type: 'bool', perm: ['pvp'], value: true,
+      type: 'bool',
+      perm: ['pvp'],
+      value: true,
     }
   })
 
@@ -78,13 +82,14 @@ module.exports = function clientOptions(perms) {
   // only the keys & values are stored locally
   const clientValues = {}
 
-  Object.entries(clientMenus).forEach(category => {
+  Object.entries(clientMenus).forEach((category) => {
     const [key, options] = category
     clientValues[key] = {}
-    Object.entries(options).forEach(option => {
+    Object.entries(options).forEach((option) => {
       const [name, meta] = option
-      clientMenus[key][name].value = clientSideOptions[key][name] || meta.value || false
-      clientMenus[key][name].disabled = !meta.perm.some(x => perms[x])
+      clientMenus[key][name].value =
+        clientSideOptions[key][name] || meta.value || false
+      clientMenus[key][name].disabled = !meta.perm.some((x) => perms[x])
       clientValues[key][name] = meta.value
       if (meta.sub) clientMenus[key][name].sub = {}
       delete clientMenus[key][name].perm
@@ -93,7 +98,7 @@ module.exports = function clientOptions(perms) {
 
   clientMenus.pokemon.glow.value = true
   clientValues.pokemon.glow = true
-  clientSideOptions.pokemon.glow.forEach(option => {
+  clientSideOptions.pokemon.glow.forEach((option) => {
     clientMenus.pokemon.glow.sub[option.name] = { ...option }
     clientMenus.pokemon.glow.sub[option.name].disabled = !perms[option.perm]
     clientMenus.pokemon.glow.sub[option.name].type = 'color'
