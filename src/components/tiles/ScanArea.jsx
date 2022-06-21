@@ -20,10 +20,12 @@ export default function ScanAreaTile({
       const name = feature.properties.name.toLowerCase()
       const popupContent = Utility.getProperName(name)
       layer.setStyle({
-        color: feature.properties.stroke || '#3388ff',
+        color:
+          feature.properties.color || feature.properties.stroke || '#3388ff',
         weight: feature.properties['stroke-width'] || 3,
         opacity: feature.properties['stroke-opacity'] || 1,
-        fillColor: feature.properties.fill || '#3388ff',
+        fillColor:
+          feature.properties.fillColor || feature.properties.fill || '#3388ff',
         fillOpacity:
           selectedAreas &&
           selectedAreas.includes(name) &&

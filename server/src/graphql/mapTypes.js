@@ -52,6 +52,12 @@ module.exports = gql`
     features: [Feature]
   }
 
+  type ScanAreasMenu {
+    name: String
+    details: Feature
+    children: [Feature]
+  }
+
   type Search {
     id: ID
     name: String

@@ -74,14 +74,14 @@ export default function WithSubItems({
 
   return (
     <>
-      <Grid item xs={6}>
+      <Grid item xs={8}>
         <Typography>
           {category === 'scanAreas'
             ? t('show_polygons')
             : t(Utility.camelToSnake(subItem))}
         </Typography>
       </Grid>
-      <Grid item xs={6} style={{ textAlign: 'right' }}>
+      <Grid item xs={4} style={{ textAlign: 'right' }}>
         {filterCategory}
       </Grid>
       {enableQuestSetSelector === true &&
