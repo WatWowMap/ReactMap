@@ -220,6 +220,36 @@ config.scanAreas = {
   ),
 }
 
+config.scanAreasMenu = Object.fromEntries(
+  Object.entries(config.scanAreas).map(([domain, areas]) => {
+    const parents = { '': { children: [], name: '' } }
+    areas.features.forEach((feature) => {
+      if (feature.properties.parent) {
+        parents[feature.properties.parent] = {
+          name: feature.properties.parent,
+          details: areas.features.find(
+            (area) => area.properties.name === feature.properties.parent,
+          ),
+          children: [],
+        }
+      }
+    })
+    areas.features.forEach((feature) => {
+      if (feature.properties.parent) {
+        parents[feature.properties.parent].children.push(feature)
+      } else if (!parents[feature.properties.name]) {
+        parents[''].children.push(feature)
+      }
+    })
+    Object.values(parents).forEach(({ children }) => {
+      if (children.length % 2 === 1) {
+        children.push({ type: 'Feature', properties: { name: '' } })
+      }
+    })
+    return [domain, Object.values(parents)]
+  }),
+)
+
 config.api.pvp.leagueObj = Object.fromEntries(
   config.api.pvp.leagues.map((league) => [league.name, league.cp]),
 )

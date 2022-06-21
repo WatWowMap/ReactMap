@@ -8,7 +8,7 @@ import getAllWeather from './queries/weather'
 import getAllScanCells from './queries/scanCell'
 import getAllSubmissionCells from './queries/submissionCells'
 import { getOne, getAllNests } from './queries/nest'
-import getAllScanAreas from './queries/scanAreas'
+import { getAllScanAreas, getScanAreasMenu } from './queries/scanAreas'
 import * as searchIndex from './queries/search'
 import * as webhookIndex from './queries/webhook'
 import scanner from './queries/scanner'
@@ -120,6 +120,10 @@ export default class Query {
 
   static scanAreas() {
     return getAllScanAreas
+  }
+
+  static scanAreasMenu() {
+    return getScanAreasMenu
   }
 
   static search(category) {

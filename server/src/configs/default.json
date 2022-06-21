@@ -143,6 +143,7 @@
       "enableUserProfile": true,
       "enableQuestSetSelector": false,
       "noScanAreaOverlay": false,
+      "scanAreaMenuHeight": 400,
       "permImageDir": "images/perms",
       "permArrayImages": false,
       "clientTimeoutMinutes": 30,

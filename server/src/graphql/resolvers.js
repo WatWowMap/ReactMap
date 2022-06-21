@@ -192,6 +192,19 @@ module.exports = {
       }
       return [{ features: [] }]
     },
+    scanAreasMenu: (_, args, { perms, version, req }) => {
+      if (args.version && args.version !== version)
+        throw new UserInputError('old_client')
+      if (!perms) throw new AuthenticationError('session_expired')
+
+      const scanAreas = config.scanAreasMenu[req.headers.host]
+        ? config.scanAreasMenu[req.headers.host]
+        : config.scanAreasMenu.main
+      if (perms?.scanAreas && scanAreas.length) {
+        return scanAreas
+      }
+      return []
+    },
     search: async (_, args, { Event, perms, version, Db }) => {
       if (args.version && args.version !== version)
         throw new UserInputError('old_client')

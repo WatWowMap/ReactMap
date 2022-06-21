@@ -6,59 +6,32 @@ import { useMap } from 'react-leaflet'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 
-export default function AreaDropDown({ scanAreasZoom }) {
-  const { data, loading, error } = useQuery(Query.scanAreas(), {
+export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
+  const { data, loading, error } = useQuery(Query.scanAreasMenu(), {
     variables: { version: inject.VERSION },
   })
   const map = useMap()
 
   if (loading || error) return null
 
-  const areas = React.useMemo(() => {
-    const parents = { '': { children: [] } }
-    data.scanAreas[0].features.forEach((feature) => {
-      if (feature.properties.parent && !parents[feature.properties.parent]) {
-        parents[feature.properties.parent] = {
-          details: data.scanAreas[0].features.find(
-            (area) => area.properties.name === feature.properties.parent,
-          ),
-          children: data.scanAreas[0].features.filter(
-            (area) => area.properties.parent === feature.properties.parent,
-          ),
-        }
-      } else {
-        parents[''].children.push(feature)
-      }
-    })
-    if (!Object.keys(parents).length) {
-      parents[''] = { children: data.scanAreas[0].features }
-    }
-    Object.values(parents).forEach(({ children }) => {
-      if (children.length % 2 === 1) {
-        children.push({ type: 'Feature', properties: { name: '' } })
-      }
-    })
-    return parents
-  }, [])
-
   return (
     <Paper
       style={{
         minHeight: 50,
-        maxHeight: Math.min(data.scanAreas[0].features.length, 12) * 50,
+        maxHeight: scanAreaMenuHeight || 400,
         width: '100%',
         overflow: 'auto',
         backgroundColor: '#212121',
       }}
     >
-      {Object.entries(areas).map(([parent, { details, children }]) => (
+      {data?.scanAreasMenu?.map(({ name, details, children }) => (
         <Grid
-          key={parent}
+          key={name || ''}
           container
           alignItems="center"
           justifyContent="center"
         >
-          {Boolean(parent) && (
+          {Boolean(name) && (
             <Grid
               item
               xs={12}
@@ -85,7 +58,7 @@ export default function AreaDropDown({ scanAreasZoom }) {
                   align="center"
                   style={{ width: '100%' }}
                 >
-                  {Utility.getProperName(parent)}
+                  {Utility.getProperName(name)}
                 </Typography>
               </MenuItem>
             </Grid>

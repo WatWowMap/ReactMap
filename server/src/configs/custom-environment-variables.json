@@ -352,6 +352,10 @@
         "__name": "MAP_MISC_NO_SCAN_AREA_OVERLAY",
         "__format": "boolean"
       },
+      "scanAreaMenuHeight": {
+        "__name": "MAP_MISC_SCAN_AREA_MENU_HEIGHT",
+        "__format": "number"
+      },
       "permImageDir": "MAP_MISC_PERM_IMAGE_DIR",
       "permArrayImages": {
         "__name": "MAP_MISC_PERM_ARRAY_IMAGES",
