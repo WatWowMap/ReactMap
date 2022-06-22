@@ -49,7 +49,7 @@ export function ScanAreaTile({
         .openTooltip()
       if (webhookMode) {
         layer.on('click', () => handleClick(name.toLowerCase()))
-      } else {
+      } else if (!feature.properties.manual) {
         layer.on('click', () => setAreas(name))
       }
     }

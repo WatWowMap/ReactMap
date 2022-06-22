@@ -119,9 +119,10 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
                       )}
                       style={{
                         color: feat.properties.name ? 'none' : '#212121',
+                        display: feat.properties.manual ? 'none' : 'block',
                       }}
                       onChange={() => setAreas(feat.properties.name)}
-                      disabled={!feat.properties.name}
+                      disabled={!feat.properties.name || feat.properties.manual}
                     />
                   </Grid>
                 </Grid>

@@ -205,7 +205,13 @@ module.exports = {
 
           filtered.forEach(({ children }) => {
             if (children.length % 2 === 1) {
-              children.push({ type: 'Feature', properties: { name: '' } })
+              children.push({
+                type: 'Feature',
+                properties: {
+                  name: '',
+                  manual: Boolean(config.manualAreas.length),
+                },
+              })
             }
           })
 

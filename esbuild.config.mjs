@@ -16,6 +16,7 @@ import { eslintPlugin } from 'esbuild-plugin-eslinter'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const env = fs.existsSync(`${__dirname}/.env`) ? dotenv.config() : { parsed: process.env }
+const { version } = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json')))
 const isDevelopment = Boolean(process.argv.includes('--dev'))
 const isRelease = Boolean(process.argv.includes('--release'))
 const isServing = Boolean(process.argv.includes('--serve'))
@@ -112,7 +113,7 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
       },
     )
   }
-  console.log(`[BUILD] Building production version: ${process.env.version}`)
+  console.log(`[BUILD] Building production version: ${version}`)
 }
 
 const esbuild = {
@@ -145,7 +146,7 @@ const esbuild = {
       SENTRY_DSN: env.parsed.SENTRY_DSN || '',
       SENTRY_TRACES_SAMPLE_RATE: env.parsed.SENTRY_TRACES_SAMPLE_RATE || 0.1,
       SENTRY_DEBUG: env.parsed.SENTRY_DEBUG || false,
-      VERSION: process.env.version,
+      VERSION: version,
       DEVELOPMENT: isDevelopment,
       CUSTOM: hasCustom,
       LOCALES: await fs.promises.readdir(`${__dirname}/public/locales`),
