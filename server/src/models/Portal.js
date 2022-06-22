@@ -11,25 +11,33 @@ module.exports = class Portal extends Model {
 
   static async getAll(perms, args) {
     const { areaRestrictions } = perms
+    const {
+      filters: { userAreas = [] },
+      minLat,
+      minLon,
+      maxLat,
+      maxLon,
+    } = args
     const query = this.query()
-      .whereBetween('lat', [args.minLat, args.maxLat])
-      .andWhereBetween('lon', [args.minLon, args.maxLon])
+      .whereBetween('lat', [minLat, maxLat])
+      .andWhereBetween('lon', [minLon, maxLon])
       .andWhere(
         'updated',
         '>',
         Date.now() / 1000 - portalUpdateLimit * 60 * 60 * 24,
       )
-    if (areaRestrictions?.length) {
-      getAreaSql(query, areaRestrictions)
+    if (!getAreaSql(query, areaRestrictions, userAreas)) {
+      return []
     }
     return query.limit(queryLimits.portals)
   }
 
   static async search(perms, args, { isMad }, distance) {
     const { areaRestrictions } = perms
+    const { userAreas = [], search } = args
     const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
-      .whereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .whereRaw(`LOWER(name) LIKE '%${search}%'`)
       .andWhere(
         'updated',
         '>',
@@ -37,8 +45,8 @@ module.exports = class Portal extends Model {
       )
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (areaRestrictions?.length) {
-      getAreaSql(query, areaRestrictions, isMad)
+    if (!getAreaSql(query, areaRestrictions, userAreas, isMad)) {
+      return []
     }
     return query
   }

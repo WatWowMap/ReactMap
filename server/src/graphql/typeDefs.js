@@ -13,7 +13,7 @@ module.exports = gql`
   type Query {
     available(version: String): Available
     badges(version: String): [Badge]
-    devices(version: String): [Device]
+    devices(version: String, filters: JSON): [Device]
     geocoder(search: String, name: String, version: String): [Geocoder]
     gyms(
       minLat: Float
@@ -88,6 +88,7 @@ module.exports = gql`
       ts: Int
       midnight: Int
       version: String
+      userAreas: [String]
     ): [Search]
     searchQuest(
       search: String
@@ -98,6 +99,7 @@ module.exports = gql`
       webhookName: String
       midnight: Int
       version: String
+      userAreas: [String]
     ): [SearchQuest]
     spawnpoints(
       minLat: Float
@@ -117,7 +119,7 @@ module.exports = gql`
       zoom: Int
       version: String
     ): [SubmissionCell]
-    weather(version: String): [Weather]
+    weather(version: String, filters: JSON): [Weather]
     webhook(
       category: String
       status: String

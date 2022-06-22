@@ -1,16 +1,19 @@
 import React from 'react'
 import { useQuery } from '@apollo/client'
-import { Grid, Paper, MenuItem, Typography } from '@material-ui/core'
+import { Grid, Paper, MenuItem, Typography, Checkbox } from '@material-ui/core'
 import { useMap } from 'react-leaflet'
 
 import Utility from '@services/Utility'
 import Query from '@services/Query'
+import { useStore } from '@hooks/useStore'
 
 export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
   const { data, loading, error } = useQuery(Query.scanAreasMenu(), {
     variables: { version: inject.VERSION },
   })
   const map = useMap()
+  const { scanAreas } = useStore((s) => s.filters)
+  const setAreas = useStore((s) => s.setAreas)
 
   if (loading || error) return null
 
@@ -84,17 +87,44 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
               }}
             >
               <MenuItem disabled={!feat.properties.name}>
-                <Typography
-                  variant="subtitle2"
-                  align="center"
-                  style={{ width: '100%' }}
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent="space-between"
                 >
-                  {feat.properties.name ? (
-                    Utility.getProperName(feat.properties.name)
-                  ) : (
-                    <>&nbsp;</>
-                  )}
-                </Typography>
+                  <Grid item xs={10} style={{ textAlign: 'center' }}>
+                    <Typography
+                      variant="caption"
+                      align="center"
+                      style={{ width: '100%', fontWeight: 'bold' }}
+                      onClick={() => {
+                        if (feat.properties?.center) {
+                          map.flyTo(
+                            feat.properties.center,
+                            feat.properties.zoom || scanAreasZoom,
+                          )
+                        }
+                      }}
+                    >
+                      {feat.properties.name ? (
+                        Utility.getProperName(feat.properties.name)
+                      ) : (
+                        <>&nbsp;</>
+                      )}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={2} style={{ textAlign: 'right' }}>
+                    <Checkbox
+                      size="small"
+                      checked={scanAreas.filter.areas.includes(
+                        feat.properties.name,
+                      )}
+                      style={{ color: feat.properties.name ? 'none' : '#212121' }}
+                      onChange={() => setAreas(feat.properties.name)}
+                      disabled={!feat.properties.name}
+                    />
+                  </Grid>
+                </Grid>
               </MenuItem>
             </Grid>
           ))}

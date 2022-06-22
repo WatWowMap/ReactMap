@@ -21,6 +21,7 @@ export const poi = gql`
     $lon: Float!
     $locale: String!
     $version: String
+    $userAreas: [String]
   ) {
     search(
       search: $search
@@ -29,6 +30,7 @@ export const poi = gql`
       lon: $lon
       locale: $locale
       version: $version
+      userAreas: $userAreas
     ) {
       ...CoreSearch
     }
@@ -45,6 +47,7 @@ export const poiWebhook = gql`
     $locale: String!
     $webhookName: String
     $version: String
+    $userAreas: [String]
   ) {
     search(
       search: $search
@@ -54,6 +57,7 @@ export const poiWebhook = gql`
       locale: $locale
       webhookName: $webhookName
       version: $version
+      userAreas: $userAreas
     ) {
       id
       name
@@ -73,6 +77,7 @@ export const nests = gql`
     $lon: Float!
     $locale: String!
     $version: String
+    $userAreas: [String]
   ) {
     search(
       search: $search
@@ -81,6 +86,7 @@ export const nests = gql`
       lon: $lon
       locale: $locale
       version: $version
+      userAreas: $userAreas
     ) {
       ...CoreSearch
       nest_pokemon_id
@@ -98,6 +104,7 @@ export const quests = gql`
     $locale: String!
     $midnight: Int
     $version: String
+    $userAreas: [String]
   ) {
     searchQuest(
       search: $search
@@ -107,6 +114,7 @@ export const quests = gql`
       locale: $locale
       midnight: $midnight
       version: $version
+      userAreas: $userAreas
     ) {
       id
       name
@@ -143,6 +151,7 @@ export const raids = gql`
     $locale: String!
     $ts: Int
     $version: String
+    $userAreas: [String]
   ) {
     search(
       search: $search
@@ -152,6 +161,7 @@ export const raids = gql`
       locale: $locale
       ts: $ts
       version: $version
+      userAreas: $userAreas
     ) {
       ...CoreSearch
       raid_pokemon_id

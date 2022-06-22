@@ -44,7 +44,7 @@ module.exports = {
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.devices) {
-        return Db.getAll('Device', perms)
+        return Db.getAll('Device', perms, args)
       }
       return []
     },
@@ -188,7 +188,16 @@ module.exports = {
         ? config.scanAreas[req.headers.host]
         : config.scanAreas.main
       if (perms?.scanAreas && scanAreas.features.length) {
-        return [scanAreas]
+        return [
+          {
+            ...scanAreas,
+            features: scanAreas.features.filter(
+              (feature) =>
+                !perms.areaRestrictions.length ||
+                perms.areaRestrictions.includes(feature.properties.name),
+            ),
+          },
+        ]
       }
       return [{ features: [] }]
     },
@@ -201,6 +210,24 @@ module.exports = {
         ? config.scanAreasMenu[req.headers.host]
         : config.scanAreasMenu.main
       if (perms?.scanAreas && scanAreas.length) {
+        if (perms.areaRestrictions.length) {
+          const filtered = scanAreas
+            .map((parent) => ({
+              ...parent,
+              children: parent.children.filter((child) =>
+                perms.areaRestrictions.includes(child.properties.name),
+              ),
+            }))
+            .filter((parent) => parent.children.length)
+
+          filtered.forEach(({ children }) => {
+            if (children.length % 2 === 1) {
+              children.push({ type: 'Feature', properties: { name: '' } })
+            }
+          })
+
+          return filtered
+        }
         return scanAreas
       }
       return []
@@ -281,7 +308,7 @@ module.exports = {
         perms?.submissionCells &&
         args.zoom >= config.map.submissionZoom - 1
       ) {
-        const [pokestops, gyms] = await Db.submissionCells(args)
+        const [pokestops, gyms] = await Db.submissionCells(perms, args)
         return [
           {
             placementCells:
@@ -300,7 +327,7 @@ module.exports = {
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.weather) {
-        return Db.getAll('Weather')
+        return Db.getAll('Weather', perms, args)
       }
       return []
     },

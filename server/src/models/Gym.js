@@ -70,6 +70,7 @@ module.exports = class Gym extends Model {
       onlyGymBadges,
       onlyBadge,
       ts,
+      userAreas = [],
     } = args.filters
     const safeTs = ts || Math.floor(new Date().getTime() / 1000)
     const query = this.query()
@@ -314,8 +315,8 @@ module.exports = class Gym extends Model {
         }
       }
     })
-    if (areaRestrictions?.length) {
-      getAreaSql(query, areaRestrictions, isMad)
+    if (!getAreaSql(query, areaRestrictions, userAreas, isMad)) {
+      return []
     }
 
     const secondaryFilter = (queryResults) => {
@@ -427,6 +428,8 @@ module.exports = class Gym extends Model {
   }
 
   static async search(perms, args, { isMad }, distance) {
+    const { areaRestrictions } = perms
+    const { userAreas = [], search } = args
     const query = this.query()
       .select([
         'name',
@@ -437,20 +440,20 @@ module.exports = class Gym extends Model {
         distance,
       ])
       .where(isMad ? 'enabled' : 'deleted', isMad)
-      .whereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .whereRaw(`LOWER(name) LIKE '%${search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
-    if (perms.areaRestrictions?.length) {
-      getAreaSql(query, perms.areaRestrictions, isMad)
+    if (!getAreaSql(query, areaRestrictions, userAreas, isMad)) {
+      return []
     }
     return query
   }
 
   static async searchRaids(perms, args, { isMad }, distance) {
-    const { search, locale } = args
+    const { search, locale, userAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
@@ -489,8 +492,8 @@ module.exports = class Gym extends Model {
         .leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
         .leftJoin('raid', 'gym.gym_id', 'raid.gym_id')
     }
-    if (perms.areaRestrictions?.length) {
-      getAreaSql(query, perms.areaRestrictions, isMad)
+    if (!getAreaSql(query, perms.areaRestrictions, userAreas, isMad)) {
+      return []
     }
     return query
   }
@@ -540,15 +543,22 @@ module.exports = class Gym extends Model {
       .first()
   }
 
-  static getSubmissions(args, { isMad }) {
+  static getSubmissions(perms, args, { isMad }) {
+    const {
+      filters: { userAreas = [] },
+      minLat,
+      minLon,
+      maxLat,
+      maxLon,
+    } = args
     const query = this.query()
       .whereBetween(`lat${isMad ? 'itude' : ''}`, [
-        args.minLat - 0.025,
-        args.maxLat + 0.025,
+        minLat - 0.025,
+        maxLat + 0.025,
       ])
       .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [
-        args.minLon - 0.025,
-        args.maxLon + 0.025,
+        minLon - 0.025,
+        maxLon + 0.025,
       ])
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {
@@ -558,6 +568,10 @@ module.exports = class Gym extends Model {
         poi.whereNull('sponsor_id').orWhere('sponsor_id', 0)
       })
     }
+    if (!getAreaSql(query, perms.areaRestrictions, userAreas, isMad)) {
+      return []
+    }
+
     return query
   }
 }

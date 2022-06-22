@@ -12,18 +12,25 @@ module.exports = class ScanCell extends Model {
 
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
+    const {
+      filters: { userAreas = [] },
+      minLat,
+      minLon,
+      maxLat,
+      maxLon,
+    } = args
     const query = this.query()
       .select(['*', ref('id').castTo('CHAR').as('id')])
       .whereBetween(`center_lat${isMad ? 'itude' : ''}`, [
-        args.minLat - 0.01,
-        args.maxLat + 0.01,
+        minLat - 0.01,
+        maxLat + 0.01,
       ])
       .andWhereBetween(`center_lon${isMad ? 'gitude' : ''}`, [
-        args.minLon - 0.01,
-        args.maxLon + 0.01,
+        minLon - 0.01,
+        maxLon + 0.01,
       ])
-    if (areaRestrictions?.length) {
-      getAreaSql(query, areaRestrictions, isMad, 's2cell')
+    if (!getAreaSql(query, areaRestrictions, userAreas, isMad, 's2cell')) {
+      return []
     }
     const results = await query
       .limit(queryLimits.scanCells)

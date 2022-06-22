@@ -100,7 +100,7 @@ module.exports = function buildDefault(perms, available) {
     scanAreas: perms.scanAreas
       ? {
           enabled: defaultFilters.scanAreas.enabled,
-          filter: {},
+          filter: { areas: [] },
         }
       : undefined,
     submissionCells: perms.submissionCells

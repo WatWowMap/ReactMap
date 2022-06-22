@@ -21,22 +21,23 @@ module.exports = class Nest extends Model {
 
   static async getAll(perms, args) {
     const { areaRestrictions } = perms
+    const { minLat, minLon, maxLat, maxLon, filters } = args
     const pokemon = []
-    Object.keys(args.filters).forEach((pkmn) => {
+    Object.keys(filters).forEach((pkmn) => {
       if (!pkmn.startsWith('o')) {
         pokemon.push(pkmn.split('-')[0])
       }
     })
     const query = this.query()
       .select(['*', 'nest_id AS id'])
-      .whereBetween('lat', [args.minLat, args.maxLat])
-      .andWhereBetween('lon', [args.minLon, args.maxLon])
+      .whereBetween('lat', [minLat, maxLat])
+      .andWhereBetween('lon', [minLon, maxLon])
       .whereIn('pokemon_id', pokemon)
-    if (!avgFilter.every((x, i) => x === args.filters.onlyAvgFilter[i])) {
-      query.andWhereBetween('pokemon_avg', args.filters.onlyAvgFilter)
+    if (!avgFilter.every((x, i) => x === filters.onlyAvgFilter[i])) {
+      query.andWhereBetween('pokemon_avg', filters.onlyAvgFilter)
     }
-    if (areaRestrictions?.length) {
-      getAreaSql(query, areaRestrictions)
+    if (!getAreaSql(query, areaRestrictions, filters.userAreas || [])) {
+      return []
     }
     const results = await query.limit(queryLimits.nests)
 
@@ -47,7 +48,7 @@ module.exports = class Nest extends Model {
           const formId = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
           if (formId) pkmn.pokemon_form = formId
         }
-        if (args.filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
+        if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
           returnedResults.push(pkmn)
         }
       })
@@ -77,7 +78,7 @@ module.exports = class Nest extends Model {
   }
 
   static async search(perms, args, { isMad }, distance) {
-    const { search, locale } = args
+    const { search, locale, userAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
@@ -94,8 +95,8 @@ module.exports = class Nest extends Model {
       .whereIn('pokemon_id', pokemonIds)
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (perms.areaRestrictions?.length) {
-      getAreaSql(query, perms.areaRestrictions, isMad)
+    if (!getAreaSql(query, perms.areaRestrictions, userAreas, isMad)) {
+      return []
     }
     return query
   }
