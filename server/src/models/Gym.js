@@ -70,7 +70,7 @@ module.exports = class Gym extends Model {
       onlyGymBadges,
       onlyBadge,
       ts,
-      userAreas = [],
+      onlyAreas = [],
     } = args.filters
     const safeTs = ts || Math.floor(new Date().getTime() / 1000)
     const query = this.query()
@@ -142,7 +142,6 @@ module.exports = class Gym extends Model {
 
     Object.keys(args.filters).forEach((gym) => {
       switch (gym.charAt(0)) {
-        case 'u': // userAreas
         case 'r':
         case 'o':
           break
@@ -316,7 +315,7 @@ module.exports = class Gym extends Model {
         }
       }
     })
-    if (!getAreaSql(query, areaRestrictions, userAreas, isMad)) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
 
@@ -430,7 +429,7 @@ module.exports = class Gym extends Model {
 
   static async search(perms, args, { isMad }, distance) {
     const { areaRestrictions } = perms
-    const { userAreas = [], search } = args
+    const { onlyAreas = [], search } = args
     const query = this.query()
       .select([
         'name',
@@ -447,14 +446,14 @@ module.exports = class Gym extends Model {
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
-    if (!getAreaSql(query, areaRestrictions, userAreas, isMad)) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
     return query
   }
 
   static async searchRaids(perms, args, { isMad }, distance) {
-    const { search, locale, userAreas = [] } = args
+    const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
@@ -493,7 +492,7 @@ module.exports = class Gym extends Model {
         .leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
         .leftJoin('raid', 'gym.gym_id', 'raid.gym_id')
     }
-    if (!getAreaSql(query, perms.areaRestrictions, userAreas, isMad)) {
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
     return query
@@ -546,7 +545,7 @@ module.exports = class Gym extends Model {
 
   static getSubmissions(perms, args, { isMad }) {
     const {
-      filters: { userAreas = [] },
+      filters: { onlyAreas = [] },
       minLat,
       minLon,
       maxLat,
@@ -569,7 +568,7 @@ module.exports = class Gym extends Model {
         poi.whereNull('sponsor_id').orWhere('sponsor_id', 0)
       })
     }
-    if (!getAreaSql(query, perms.areaRestrictions, userAreas, isMad)) {
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
 

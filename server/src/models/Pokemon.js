@@ -81,7 +81,7 @@ module.exports = class Pokemon extends Model {
       onlyPvpMega,
       onlyLinkGlobal,
       ts,
-      userAreas = [],
+      onlyAreas = [],
     } = args.filters
     let queryPvp = false
     const safeTs = ts || Math.floor(Date.now() / 1000)
@@ -258,7 +258,7 @@ module.exports = class Pokemon extends Model {
           ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 100)
         }
       })
-    if (!getAreaSql(query, areaRestrictions, userAreas, isMad, 'pokemon')) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'pokemon')) {
       return []
     }
 
@@ -339,7 +339,7 @@ module.exports = class Pokemon extends Model {
         })
       }
       if (
-        !getAreaSql(pvpQuery, areaRestrictions, userAreas, isMad, 'pokemon')
+        !getAreaSql(pvpQuery, areaRestrictions, onlyAreas, isMad, 'pokemon')
       ) {
         return []
       }
@@ -403,7 +403,7 @@ module.exports = class Pokemon extends Model {
       !getAreaSql(
         query,
         perms.areaRestrictions,
-        args.filters.userAreas,
+        args.filters.onlyAreas,
         isMad,
         'pokemon',
       )

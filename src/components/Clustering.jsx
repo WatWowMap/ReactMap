@@ -22,7 +22,7 @@ export default function Clustering({
   userIcons,
   setParams,
   isNight,
-  userAreas,
+  onlyAreas,
 }) {
   const Component = index[category]
   const hideList = useStatic((state) => state.hideList)
@@ -60,7 +60,7 @@ export default function Clustering({
           setParams={setParams}
           showCircles={showCircles}
           isNight={isNight}
-          userAreas={userAreas}
+          onlyAreas={onlyAreas}
         />
       )
     }

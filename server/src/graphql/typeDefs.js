@@ -82,7 +82,7 @@ module.exports = gql`
       ts: Int
       midnight: Int
 
-      userAreas: [String]
+      onlyAreas: [String]
     ): [Search]
     searchQuest(
       search: String
@@ -93,7 +93,7 @@ module.exports = gql`
       webhookName: String
       midnight: Int
 
-      userAreas: [String]
+      onlyAreas: [String]
     ): [SearchQuest]
     spawnpoints(
       minLat: Float

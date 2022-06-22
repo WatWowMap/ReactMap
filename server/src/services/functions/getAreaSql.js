@@ -3,15 +3,15 @@ const areas = require('../areas')
 module.exports = function getAreaRestrictionSql(
   query,
   areaRestrictions,
-  userAreas,
+  onlyAreas,
   isMad,
   category,
 ) {
-  if (!areaRestrictions?.length && !userAreas?.length) return true
+  if (!areaRestrictions?.length && !onlyAreas?.length) return true
 
   const consolidatedAreas = areaRestrictions.length
-    ? areaRestrictions.filter((area) => userAreas.includes(area))
-    : userAreas
+    ? areaRestrictions.filter((area) => onlyAreas.includes(area))
+    : onlyAreas
 
   if (!consolidatedAreas.length) return false
 

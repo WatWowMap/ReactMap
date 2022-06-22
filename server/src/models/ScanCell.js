@@ -13,7 +13,7 @@ module.exports = class ScanCell extends Model {
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const {
-      filters: { userAreas = [] },
+      filters: { onlyAreas = [] },
       minLat,
       minLon,
       maxLat,
@@ -29,7 +29,7 @@ module.exports = class ScanCell extends Model {
         minLon - 0.01,
         maxLon + 0.01,
       ])
-    if (!getAreaSql(query, areaRestrictions, userAreas, isMad, 's2cell')) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 's2cell')) {
       return []
     }
     const results = await query

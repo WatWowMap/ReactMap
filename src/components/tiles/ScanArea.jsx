@@ -9,7 +9,7 @@ export function ScanAreaTile({
   webhookMode,
   selectedAreas,
   setSelectedAreas,
-  userAreas,
+  onlyAreas,
 }) {
   const setAreas = useStore((s) => s.setAreas)
 
@@ -37,7 +37,7 @@ export function ScanAreaTile({
           fillOpacity:
             (selectedAreas?.includes(name.toLowerCase()) &&
               webhookMode === 'areas') ||
-            userAreas?.includes(name)
+            onlyAreas?.includes(name)
               ? 0.8
               : 0.2,
         })
@@ -57,7 +57,7 @@ export function ScanAreaTile({
 
   return (
     <GeoJSON
-      key={`${selectedAreas}-${userAreas ? userAreas.join('') : ''}`}
+      key={`${selectedAreas}-${onlyAreas ? onlyAreas.join('') : ''}`}
       data={item}
       onEachFeature={onEachFeature}
     />
@@ -65,9 +65,9 @@ export function ScanAreaTile({
 }
 
 const areEqual = (prev, next) =>
-  (prev.userAreas && next.userAreas
-    ? prev.userAreas.length === next.userAreas.length &&
-      prev.userAreas.every((_, i) => prev.userAreas[i] === next.userAreas[i])
+  (prev.onlyAreas && next.onlyAreas
+    ? prev.onlyAreas.length === next.onlyAreas.length &&
+      prev.onlyAreas.every((_, i) => prev.onlyAreas[i] === next.onlyAreas[i])
     : true) &&
   (prev.selectedAreas && next.selectedAreas
     ? prev.selectedAreas.length === next.selectedAreas.length &&

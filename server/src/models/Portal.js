@@ -12,7 +12,7 @@ module.exports = class Portal extends Model {
   static async getAll(perms, args) {
     const { areaRestrictions } = perms
     const {
-      filters: { userAreas = [] },
+      filters: { onlyAreas = [] },
       minLat,
       minLon,
       maxLat,
@@ -26,7 +26,7 @@ module.exports = class Portal extends Model {
         '>',
         Date.now() / 1000 - portalUpdateLimit * 60 * 60 * 24,
       )
-    if (!getAreaSql(query, areaRestrictions, userAreas)) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas)) {
       return []
     }
     return query.limit(queryLimits.portals)
@@ -34,7 +34,7 @@ module.exports = class Portal extends Model {
 
   static async search(perms, args, { isMad }, distance) {
     const { areaRestrictions } = perms
-    const { userAreas = [], search } = args
+    const { onlyAreas = [], search } = args
     const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
       .whereRaw(`LOWER(name) LIKE '%${search}%'`)
@@ -45,7 +45,7 @@ module.exports = class Portal extends Model {
       )
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (!getAreaSql(query, areaRestrictions, userAreas, isMad)) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
     return query

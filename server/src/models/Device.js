@@ -8,7 +8,7 @@ module.exports = class Device extends Model {
 
   static async getAll(perms, args, settings) {
     const { areaRestrictions } = perms
-    const { userAreas } = args.filters
+    const { onlyAreas } = args.filters
     const query = this.query()
     if (settings.isMad) {
       query
@@ -38,7 +38,7 @@ module.exports = class Device extends Model {
         )
     }
     if (
-      !getAreaSql(query, areaRestrictions, userAreas, settings.isMad, 'device')
+      !getAreaSql(query, areaRestrictions, onlyAreas, settings.isMad, 'device')
     ) {
       return []
     }

@@ -33,7 +33,7 @@ export default function QueryData({
   setExcludeList,
   setError,
   active,
-  userAreas,
+  onlyAreas,
 }) {
   const trimFilters = useCallback(
     (requestedFilters) => {
@@ -41,7 +41,7 @@ export default function QueryData({
         onlyLegacyExclude: [],
         onlyLegacy: userSettings.legacyFilter,
         onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
-        userAreas,
+        onlyAreas,
       }
       Object.entries(requestedFilters).forEach((topLevelFilter) => {
         const [id, specifics] = topLevelFilter
@@ -67,7 +67,7 @@ export default function QueryData({
       })
       return trimmed
     },
-    [userSettings, filters, userAreas],
+    [userSettings, filters, onlyAreas],
   )
 
   const refetchData = () => {
@@ -89,7 +89,7 @@ export default function QueryData({
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [filters, userSettings, userAreas])
+  }, [filters, userSettings, onlyAreas])
 
   const { data, previousData, refetch, error } = useQuery(
     Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),
@@ -152,7 +152,7 @@ export default function QueryData({
         params={params}
         setParams={setParams}
         isNight={isNight}
-        userAreas={userAreas}
+        onlyAreas={onlyAreas}
       />
       {category === 'weather' && (
         <ActiveWeather

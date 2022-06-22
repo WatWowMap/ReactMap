@@ -36,7 +36,7 @@ module.exports = class Nest extends Model {
     if (!avgFilter.every((x, i) => x === filters.onlyAvgFilter[i])) {
       query.andWhereBetween('pokemon_avg', filters.onlyAvgFilter)
     }
-    if (!getAreaSql(query, areaRestrictions, filters.userAreas || [])) {
+    if (!getAreaSql(query, areaRestrictions, filters.onlyAreas || [])) {
       return []
     }
     const results = await query.limit(queryLimits.nests)
@@ -78,7 +78,7 @@ module.exports = class Nest extends Model {
   }
 
   static async search(perms, args, { isMad }, distance) {
-    const { search, locale, userAreas = [] } = args
+    const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
@@ -95,7 +95,7 @@ module.exports = class Nest extends Model {
       .whereIn('pokemon_id', pokemonIds)
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (!getAreaSql(query, perms.areaRestrictions, userAreas, isMad)) {
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
     return query
