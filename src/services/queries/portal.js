@@ -6,14 +6,12 @@ export const getAllPortals = gql`
     $minLon: Float!
     $maxLat: Float!
     $maxLon: Float!
-    $version: String
   ) {
     portals(
       minLat: $minLat
       minLon: $minLon
       maxLat: $maxLat
       maxLon: $maxLon
-      version: $version
     ) {
       id
       lat
@@ -27,8 +25,8 @@ export const getAllPortals = gql`
 `
 
 export const getOne = gql`
-  query GetOnePortal($id: ID!, $perm: String!, $version: String) {
-    portalsSingle(id: $id, perm: $perm, version: $version) {
+  query GetOnePortal($id: ID!, $perm: String!) {
+    portalsSingle(id: $id, perm: $perm) {
       lat
       lon
     }

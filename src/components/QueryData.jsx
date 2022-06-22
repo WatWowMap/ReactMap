@@ -80,7 +80,6 @@ export default function QueryData({
       refetch({
         ...Utility.getQueryArgs(map),
         filters: trimFilters(filters),
-        version: inject.VERSION,
       })
     }
   }
@@ -99,7 +98,6 @@ export default function QueryData({
       variables: {
         ...bounds,
         filters: trimFilters(filters),
-        version: inject.VERSION,
       },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
       pollInterval: (config.polling[category] || 10) * 1000,

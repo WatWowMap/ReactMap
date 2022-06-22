@@ -8,9 +8,7 @@ import Query from '@services/Query'
 import { useStore } from '@hooks/useStore'
 
 export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
-  const { data, loading, error } = useQuery(Query.scanAreasMenu(), {
-    variables: { version: inject.VERSION },
-  })
+  const { data, loading, error } = useQuery(Query.scanAreasMenu())
   const map = useMap()
   const { scanAreas } = useStore((s) => s.filters)
   const setAreas = useStore((s) => s.setAreas)

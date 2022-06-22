@@ -11,10 +11,10 @@ module.exports = gql`
   scalar JSON
 
   type Query {
-    available(version: String): Available
-    badges(version: String): [Badge]
-    devices(version: String, filters: JSON): [Device]
-    geocoder(search: String, name: String, version: String): [Geocoder]
+    available: Available
+    badges: [Badge]
+    devices(filters: JSON): [Device]
+    geocoder(search: String, name: String): [Geocoder]
     gyms(
       minLat: Float
       maxLat: Float
@@ -22,9 +22,8 @@ module.exports = gql`
       maxLon: Float
       ts: Int
       filters: JSON
-      version: String
     ): [Gym]
-    gymsSingle(id: ID, perm: String, version: String): Gym
+    gymsSingle(id: ID, perm: String): Gym
     nests(
       minLat: Float
       maxLat: Float
@@ -32,9 +31,8 @@ module.exports = gql`
       maxLon: Float
       ts: Int
       filters: JSON
-      version: String
     ): [Nest]
-    nestsSingle(id: ID, perm: String, version: String): Nest
+    nestsSingle(id: ID, perm: String): Nest
     pokestops(
       minLat: Float
       maxLat: Float
@@ -43,9 +41,8 @@ module.exports = gql`
       ts: Int
       midnight: Int
       filters: JSON
-      version: String
     ): [Pokestop]
-    pokestopsSingle(id: ID, perm: String, version: String): Pokestop
+    pokestopsSingle(id: ID, perm: String): Pokestop
     pokemon(
       minLat: Float
       maxLat: Float
@@ -53,9 +50,8 @@ module.exports = gql`
       maxLon: Float
       ts: Int
       filters: JSON
-      version: String
     ): [Pokemon]
-    pokemonSingle(id: ID, perm: String, version: String): Pokemon
+    pokemonSingle(id: ID, perm: String): Pokemon
     portals(
       minLat: Float
       maxLat: Float
@@ -63,9 +59,8 @@ module.exports = gql`
       maxLon: Float
       ts: Int
       filters: JSON
-      version: String
     ): [Portal]
-    portalsSingle(id: ID, perm: String, version: String): Portal
+    portalsSingle(id: ID, perm: String): Portal
     scanCells(
       minLat: Float
       maxLat: Float
@@ -74,10 +69,9 @@ module.exports = gql`
       ts: Int
       filters: JSON
       zoom: Int
-      version: String
     ): [ScanCell]
-    scanAreas(version: String): [ScanArea]
-    scanAreasMenu(version: String): [ScanAreasMenu]
+    scanAreas: [ScanArea]
+    scanAreasMenu: [ScanAreasMenu]
     search(
       search: String
       category: String
@@ -87,7 +81,7 @@ module.exports = gql`
       webhookName: String
       ts: Int
       midnight: Int
-      version: String
+
       userAreas: [String]
     ): [Search]
     searchQuest(
@@ -98,7 +92,7 @@ module.exports = gql`
       locale: String
       webhookName: String
       midnight: Int
-      version: String
+
       userAreas: [String]
     ): [SearchQuest]
     spawnpoints(
@@ -108,7 +102,6 @@ module.exports = gql`
       maxLon: Float
       ts: Int
       filters: JSON
-      version: String
     ): [Spawnpoint]
     submissionCells(
       minLat: Float
@@ -117,21 +110,10 @@ module.exports = gql`
       maxLon: Float
       ts: Int
       zoom: Int
-      version: String
     ): [SubmissionCell]
-    weather(version: String, filters: JSON): [Weather]
-    webhook(
-      category: String
-      status: String
-      name: String
-      version: String
-    ): Poracle
-    scanner(
-      category: String
-      method: String
-      data: JSON
-      version: String
-    ): ScannerApi
+    weather(filters: JSON): [Weather]
+    webhook(category: String, status: String, name: String): Poracle
+    scanner(category: String, method: String, data: JSON): ScannerApi
   }
 
   type Mutation {

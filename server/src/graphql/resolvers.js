@@ -10,8 +10,8 @@ const Fetch = require('../services/Fetch')
 module.exports = {
   JSON: GraphQLJSON,
   Query: {
-    available: (_, args, { Event, Db, perms, version }) => {
-      if (args.version && args.version !== version)
+    available: (_, args, { req, Event, Db, perms, version }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
       const available = {
@@ -28,7 +28,7 @@ module.exports = {
       }
     },
     badges: async (_, args, { req, perms, Db, version }) => {
-      if (args.version && args.version !== version)
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -38,8 +38,8 @@ module.exports = {
       }
       return []
     },
-    devices: (_, args, { perms, Db, version }) => {
-      if (args.version && args.version !== version)
+    devices: (_, args, { req, perms, Db, version }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -48,8 +48,8 @@ module.exports = {
       }
       return []
     },
-    geocoder: (_, args, { perms, version, Event }) => {
-      if (args.version && args.version !== version)
+    geocoder: (_, args, { req, perms, version, Event }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -61,8 +61,8 @@ module.exports = {
       }
       return []
     },
-    gyms: (_, args, { perms, version, req, Db }) => {
-      if (args.version && args.version !== version)
+    gyms: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -71,8 +71,8 @@ module.exports = {
       }
       return []
     },
-    gymsSingle: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    gymsSingle: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -81,8 +81,8 @@ module.exports = {
       }
       return {}
     },
-    nests: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    nests: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -91,8 +91,8 @@ module.exports = {
       }
       return []
     },
-    nestsSingle: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    nestsSingle: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -101,8 +101,8 @@ module.exports = {
       }
       return {}
     },
-    pokestops: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    pokestops: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -116,8 +116,8 @@ module.exports = {
       }
       return []
     },
-    pokestopsSingle: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    pokestopsSingle: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -126,8 +126,8 @@ module.exports = {
       }
       return {}
     },
-    pokemon: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    pokemon: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -139,8 +139,8 @@ module.exports = {
       }
       return []
     },
-    pokemonSingle: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    pokemonSingle: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -149,8 +149,8 @@ module.exports = {
       }
       return {}
     },
-    portals: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    portals: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -159,8 +159,8 @@ module.exports = {
       }
       return []
     },
-    portalsSingle: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    portalsSingle: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -169,8 +169,8 @@ module.exports = {
       }
       return {}
     },
-    scanCells: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    scanCells: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -179,8 +179,8 @@ module.exports = {
       }
       return []
     },
-    scanAreas: (_, args, { perms, version, req }) => {
-      if (args.version && args.version !== version)
+    scanAreas: (_, args, { req, perms, version }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -201,8 +201,8 @@ module.exports = {
       }
       return [{ features: [] }]
     },
-    scanAreasMenu: (_, args, { perms, version, req }) => {
-      if (args.version && args.version !== version)
+    scanAreasMenu: (_, args, { req, perms, version }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -232,8 +232,8 @@ module.exports = {
       }
       return []
     },
-    search: async (_, args, { Event, perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    search: async (_, args, { req, Event, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -275,8 +275,8 @@ module.exports = {
       }
       return []
     },
-    searchQuest: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    searchQuest: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -289,8 +289,8 @@ module.exports = {
       }
       return []
     },
-    spawnpoints: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    spawnpoints: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -299,8 +299,8 @@ module.exports = {
       }
       return []
     },
-    submissionCells: async (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    submissionCells: async (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -321,8 +321,8 @@ module.exports = {
       }
       return [{ placementCells: [], typeCells: [] }]
     },
-    weather: (_, args, { perms, version, Db }) => {
-      if (args.version && args.version !== version)
+    weather: (_, args, { req, perms, version, Db }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -331,8 +331,8 @@ module.exports = {
       }
       return []
     },
-    webhook: (_, args, { perms, version, req }) => {
-      if (args.version && args.version !== version)
+    webhook: (_, args, { req, perms, version }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
@@ -346,8 +346,8 @@ module.exports = {
       }
       return {}
     },
-    scanner: (_, args, { perms, version }) => {
-      if (args.version && args.version !== version)
+    scanner: (_, args, { req, perms, version }) => {
+      if (req.headers['apollographql-client-version'] !== version)
         throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 

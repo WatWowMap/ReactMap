@@ -53,7 +53,6 @@ export const getGyms = gql`
     $maxLon: Float!
     $filters: JSON!
     $ts: Int!
-    $version: String
   ) {
     gyms(
       minLat: $minLat
@@ -62,7 +61,6 @@ export const getGyms = gql`
       maxLon: $maxLon
       filters: $filters
       ts: $ts
-      version: $version
     ) {
       ...CoreGym
       ...Gym
@@ -80,7 +78,6 @@ export const getRaids = gql`
     $maxLon: Float!
     $filters: JSON!
     $ts: Int!
-    $version: String
   ) {
     gyms(
       minLat: $minLat
@@ -89,7 +86,6 @@ export const getRaids = gql`
       maxLon: $maxLon
       filters: $filters
       ts: $ts
-      version: $version
     ) {
       ...CoreGym
       ...Raid
@@ -108,7 +104,6 @@ export const getGymsRaids = gql`
     $maxLon: Float!
     $filters: JSON!
     $ts: Int!
-    $version: String
   ) {
     gyms(
       minLat: $minLat
@@ -117,7 +112,6 @@ export const getGymsRaids = gql`
       maxLon: $maxLon
       filters: $filters
       ts: $ts
-      version: $version
     ) {
       ...CoreGym
       ...Gym
@@ -127,8 +121,8 @@ export const getGymsRaids = gql`
 `
 
 export const getOne = gql`
-  query GetOneGym($id: ID!, $perm: String!, $version: String) {
-    gymsSingle(id: $id, perm: $perm, version: $version) {
+  query GetOneGym($id: ID!, $perm: String!) {
+    gymsSingle(id: $id, perm: $perm) {
       lat
       lon
     }
@@ -136,8 +130,8 @@ export const getOne = gql`
 `
 
 export const getBadges = gql`
-  query GetBadgeInfo($version: String) {
-    badges(version: $version) {
+  query GetBadgeInfo {
+    badges {
       id
       name
       url
