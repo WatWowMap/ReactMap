@@ -188,16 +188,22 @@ module.exports = {
         ? config.scanAreas[req.headers.host]
         : config.scanAreas.main
       if (perms?.scanAreas && scanAreas.features.length) {
-        try {
-          scanAreas.features = scanAreas.features
-            .filter((feature) => !feature.properties.hidden)
-            .sort((a, b) => (a.properties.name > b.properties.name ? 1 : -1))
-        } catch (e) {
-          console.warn('[WARN] Failed to sort scan areas', e.message)
-        }
         return [scanAreas]
       }
       return [{ features: [] }]
+    },
+    scanAreasMenu: (_, args, { perms, version, req }) => {
+      if (args.version && args.version !== version)
+        throw new UserInputError('old_client')
+      if (!perms) throw new AuthenticationError('session_expired')
+
+      const scanAreas = config.scanAreasMenu[req.headers.host]
+        ? config.scanAreasMenu[req.headers.host]
+        : config.scanAreasMenu.main
+      if (perms?.scanAreas && scanAreas.length) {
+        return scanAreas
+      }
+      return []
     },
     search: async (_, args, { Event, perms, version, Db }) => {
       if (args.version && args.version !== version)

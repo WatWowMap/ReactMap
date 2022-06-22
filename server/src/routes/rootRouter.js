@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 const express = require('express')
-const { default: center } = require('@turf/center')
 
 const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
@@ -46,7 +45,7 @@ rootRouter.post('/clientError', (req) => {
 rootRouter.get('/area/:area/:zoom?', (req, res) => {
   const { area, zoom } = req.params
   try {
-    const { scanAreas, manualAreas } = config
+    const { scanAreas } = config
     const validScanAreas = scanAreas[req.headers.host]
       ? scanAreas[req.headers.host]
       : scanAreas.main
@@ -55,13 +54,7 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
         (a) => a.properties.name.toLowerCase() === area.toLowerCase(),
       )
       if (foundArea) {
-        const [lon, lat] = center(foundArea).geometry.coordinates
-        return res.redirect(`/@/${lat}/${lon}/${zoom || 18}`)
-      }
-      if (manualAreas.length) {
-        const { lat, lon } = manualAreas.find(
-          (a) => a.name.toLowerCase() === area.toLowerCase(),
-        )
+        const [lat, lon] = foundArea.properties.center
         return res.redirect(`/@/${lat}/${lon}/${zoom || 18}`)
       }
       return res.redirect('/404')
@@ -166,7 +159,6 @@ rootRouter.get('/settings', async (req, res) => {
           react: {},
           leaflet: {},
         },
-        manualAreas: config.manualAreas || {},
         icons: { ...config.icons, styles: Event.uicons },
         scanner: {
           scannerType: config.scanner.backendConfig.platform,
@@ -199,7 +191,6 @@ rootRouter.get('/settings', async (req, res) => {
       // keys that are being sent to the frontend but are not options
       const ignoreKeys = [
         'map',
-        'manualAreas',
         'limit',
         'icons',
         'scanner',

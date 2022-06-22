@@ -132,8 +132,8 @@ export default function QueryData({
     }
   }
 
-  const renderedData = data || previousData || {}
-  return renderedData[category] ? (
+  const renderedData = data || previousData || { [category]: [] }
+  return (
     <>
       <Clustering
         key={sizeKey}
@@ -165,5 +165,5 @@ export default function QueryData({
         />
       )}
     </>
-  ) : null
+  )
 }

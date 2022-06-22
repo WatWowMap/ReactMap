@@ -77,6 +77,7 @@ module.exports = gql`
       version: String
     ): [ScanCell]
     scanAreas(version: String): [ScanArea]
+    scanAreasMenu(version: String): [ScanAreasMenu]
     search(
       search: String
       category: String
