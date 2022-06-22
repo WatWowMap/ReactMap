@@ -142,6 +142,7 @@ module.exports = class Gym extends Model {
 
     Object.keys(args.filters).forEach((gym) => {
       switch (gym.charAt(0)) {
+        case 'u': // userAreas
         case 'r':
         case 'o':
           break
@@ -160,8 +161,8 @@ module.exports = class Gym extends Model {
         default:
           {
             const [id, form] = gym.split('-')
-            raidBosses.add(id)
-            raidForms.add(form)
+            if (id) raidBosses.add(id)
+            if (form) raidForms.add(form)
           }
           break
       }
@@ -235,7 +236,7 @@ module.exports = class Gym extends Model {
         } else {
           if (finalTeams.length) {
             gym.orWhere((team) => {
-              team.whereIn('team_id', finalTeams)
+              team.whereIn('team_id', finalTeams || [])
             })
           }
           Object.entries(finalSlots).forEach(([team, teamSlots]) => {
@@ -245,7 +246,7 @@ module.exports = class Gym extends Model {
                   .where('team_id', team)
                   .whereIn(
                     isMad ? 'slots_available' : availableSlotsCol,
-                    teamSlots,
+                    teamSlots || [],
                   )
               })
             }
@@ -255,7 +256,7 @@ module.exports = class Gym extends Model {
       if (userBadges.length) {
         gym.orWhereIn(
           isMad ? 'gym.gym_id' : 'id',
-          userBadges.map((badge) => badge.gymId),
+          userBadges.map((badge) => badge.gymId) || [],
         )
       }
       if (onlyRaids && raidPerms) {
@@ -269,10 +270,10 @@ module.exports = class Gym extends Model {
                   isMad ? this.knex().fn.now() : safeTs,
                 )
                 .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [
-                  ...raidBosses,
+                  ...(raidBosses || []),
                 ])
                 .whereIn(isMad ? 'raid.form' : 'raid_pokemon_form', [
-                  ...raidForms,
+                  ...(raidForms || []),
                 ])
             })
           }
@@ -281,7 +282,7 @@ module.exports = class Gym extends Model {
               if (eggs.length === 6) {
                 egg.where(isMad ? 'level' : 'raid_level', '>', 0)
               } else {
-                egg.whereIn(isMad ? 'level' : 'raid_level', eggs)
+                egg.whereIn(isMad ? 'level' : 'raid_level', eggs || [])
               }
               egg.andWhere((eggStatus) => {
                 eggStatus
@@ -512,7 +513,7 @@ module.exports = class Gym extends Model {
     }
     const results = await query.whereIn(
       isMad ? 'gym.gym_id' : 'gym.id',
-      userGyms.map((gym) => gym.gymId),
+      userGyms.map((gym) => gym.gymId) || [],
     )
 
     return results
