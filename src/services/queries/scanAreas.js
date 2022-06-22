@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 
 export const getAllScanAreas = gql`
-  query ScanAreas() {
+  query ScanAreas {
     scanAreas {
       type
       features {
