@@ -338,7 +338,9 @@ module.exports = class Pokemon extends Model {
             .orWhereNotNull('pvp_rankings_ultra_league')
         })
       }
-      if (!getAreaSql(pvpQuery, areaRestrictions, userAreas, isMad, 'pokemon')) {
+      if (
+        !getAreaSql(pvpQuery, areaRestrictions, userAreas, isMad, 'pokemon')
+      ) {
         return []
       }
       pvpResults.push(

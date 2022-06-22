@@ -1181,7 +1181,9 @@ module.exports = class Pokestop extends Model {
         })
         .limit(searchResultsLimit)
         .orderBy('distance')
-      if (!getAreaSql(altQuestQuery, perms.areaRestrictions, userAreas, isMad)) {
+      if (
+        !getAreaSql(altQuestQuery, perms.areaRestrictions, userAreas, isMad)
+      ) {
         return []
       }
       const altQuestResults = await altQuestQuery

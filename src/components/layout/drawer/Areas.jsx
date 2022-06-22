@@ -119,7 +119,9 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
                       checked={scanAreas.filter.areas.includes(
                         feat.properties.name,
                       )}
-                      style={{ color: feat.properties.name ? 'none' : '#212121' }}
+                      style={{
+                        color: feat.properties.name ? 'none' : '#212121',
+                      }}
                       onChange={() => setAreas(feat.properties.name)}
                       disabled={!feat.properties.name}
                     />

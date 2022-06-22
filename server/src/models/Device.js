@@ -37,7 +37,9 @@ module.exports = class Device extends Model {
           raw('json_extract(data, "$.radius")').as('radius'),
         )
     }
-    if (!getAreaSql(query, areaRestrictions, userAreas, settings.isMad, 'device')) {
+    if (
+      !getAreaSql(query, areaRestrictions, userAreas, settings.isMad, 'device')
+    ) {
       return []
     }
     return query.from(settings.isMad ? 'settings_device' : 'device')

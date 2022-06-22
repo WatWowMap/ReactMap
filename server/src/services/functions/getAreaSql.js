@@ -13,7 +13,7 @@ module.exports = function getAreaRestrictionSql(
     ? areaRestrictions.filter((area) => userAreas.includes(area))
     : userAreas
 
-    if (!consolidatedAreas.length) return false
+  if (!consolidatedAreas.length) return false
 
   let columns = ['lat', 'lon']
   if (isMad) {

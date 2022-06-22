@@ -1,6 +1,6 @@
 import React from 'react'
 
-import ScanAreaTile from '@components/tiles/ScanArea'
+import MemoScanArea from '@components/tiles/ScanArea'
 
 export default function AreaSelection({
   map,
@@ -22,7 +22,7 @@ export default function AreaSelection({
       ),
     }
     return (
-      <ScanAreaTile
+      <MemoScanArea
         map={map}
         item={filtered}
         webhookMode={webhookMode}

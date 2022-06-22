@@ -35,7 +35,11 @@ const parseAreas = (areasObj) => {
       feature.geometry.coordinates.forEach((coordPair) => {
         polygons[name].push(...coordPair)
       })
-      if (polygons[name][0].every((coord, i) => coord !== polygons[name][polygons[name].length - 1][i])) {
+      if (
+        polygons[name][0].every(
+          (coord, i) => coord !== polygons[name][polygons[name].length - 1][i],
+        )
+      ) {
         polygons[name].push(polygons[name][0])
       }
       names.push(name)
