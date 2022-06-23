@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const getAllScanAreas = gql`
-  query ScanAreas($version: String) {
-    scanAreas(version: $version) {
+  query ScanAreas {
+    scanAreas {
       type
       features {
         type
@@ -17,8 +17,8 @@ export const getAllScanAreas = gql`
 `
 
 export const getScanAreasMenu = gql`
-  query ScanAreasMenu($version: String) {
-    scanAreasMenu(version: $version) {
+  query ScanAreasMenu {
+    scanAreasMenu {
       name
       details {
         properties

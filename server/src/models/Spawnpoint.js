@@ -11,6 +11,13 @@ module.exports = class Spawnpoint extends Model {
 
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
+    const {
+      filters: { onlyAreas = [] },
+      minLat,
+      minLon,
+      maxLat,
+      maxLon,
+    } = args
     const query = this.query()
     if (isMad) {
       query.select([
@@ -22,13 +29,10 @@ module.exports = class Spawnpoint extends Model {
       ])
     }
     query
-      .whereBetween(`lat${isMad ? 'itude' : ''}`, [args.minLat, args.maxLat])
-      .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [
-        args.minLon,
-        args.maxLon,
-      ])
-    if (areaRestrictions?.length) {
-      getAreaSql(query, areaRestrictions, isMad)
+      .whereBetween(`lat${isMad ? 'itude' : ''}`, [minLat, maxLat])
+      .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [minLon, maxLon])
+    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
+      return []
     }
     return query
       .limit(queryLimits.spawnpoints)

@@ -71,7 +71,6 @@ export const getPokestops = gql`
     $filters: JSON!
     $ts: Int!
     $midnight: Int!
-    $version: String
   ) {
     pokestops(
       minLat: $minLat
@@ -81,7 +80,6 @@ export const getPokestops = gql`
       filters: $filters
       ts: $ts
       midnight: $midnight
-      version: $version
     ) {
       ...CorePokestop
     }
@@ -99,7 +97,6 @@ export const getLures = gql`
     $filters: JSON!
     $ts: Int!
     $midnight: Int!
-    $version: String
   ) {
     pokestops(
       minLat: $minLat
@@ -109,7 +106,6 @@ export const getLures = gql`
       filters: $filters
       ts: $ts
       midnight: $midnight
-      version: $version
     ) {
       ...CorePokestop
       ...Lure
@@ -128,7 +124,6 @@ export const getQuests = gql`
     $filters: JSON!
     $ts: Int!
     $midnight: Int!
-    $version: String
   ) {
     pokestops(
       minLat: $minLat
@@ -138,7 +133,6 @@ export const getQuests = gql`
       filters: $filters
       ts: $ts
       midnight: $midnight
-      version: $version
     ) {
       ...CorePokestop
       ...Quest
@@ -157,7 +151,6 @@ export const getInvasions = gql`
     $filters: JSON!
     $ts: Int!
     $midnight: Int!
-    $version: String
   ) {
     pokestops(
       minLat: $minLat
@@ -167,7 +160,6 @@ export const getInvasions = gql`
       filters: $filters
       ts: $ts
       midnight: $midnight
-      version: $version
     ) {
       ...CorePokestop
       ...Invasion
@@ -187,7 +179,6 @@ export const getLuresQuests = gql`
     $filters: JSON!
     $ts: Int!
     $midnight: Int!
-    $version: String
   ) {
     pokestops(
       minLat: $minLat
@@ -197,7 +188,6 @@ export const getLuresQuests = gql`
       filters: $filters
       ts: $ts
       midnight: $midnight
-      version: $version
     ) {
       ...CorePokestop
       ...Lure
@@ -218,7 +208,6 @@ export const getLuresInvasions = gql`
     $filters: JSON!
     $ts: Int!
     $midnight: Int!
-    $version: String
   ) {
     pokestops(
       minLat: $minLat
@@ -228,7 +217,6 @@ export const getLuresInvasions = gql`
       filters: $filters
       ts: $ts
       midnight: $midnight
-      version: $version
     ) {
       ...CorePokestop
       ...Lure
@@ -249,7 +237,6 @@ export const getQuestsInvasions = gql`
     $filters: JSON!
     $ts: Int!
     $midnight: Int!
-    $version: String
   ) {
     pokestops(
       minLat: $minLat
@@ -259,7 +246,6 @@ export const getQuestsInvasions = gql`
       filters: $filters
       ts: $ts
       midnight: $midnight
-      version: $version
     ) {
       ...CorePokestop
       ...Quest
@@ -281,7 +267,6 @@ export const getLuresQuestsInvasions = gql`
     $filters: JSON!
     $ts: Int!
     $midnight: Int!
-    $version: String
   ) {
     pokestops(
       minLat: $minLat
@@ -291,7 +276,6 @@ export const getLuresQuestsInvasions = gql`
       filters: $filters
       ts: $ts
       midnight: $midnight
-      version: $version
     ) {
       ...CorePokestop
       ...Lure
@@ -302,8 +286,8 @@ export const getLuresQuestsInvasions = gql`
 `
 
 export const getOne = gql`
-  query GetOnePokestop($id: ID!, $perm: String!, $version: String) {
-    pokestopsSingle(id: $id, perm: $perm, version: $version) {
+  query GetOnePokestop($id: ID!, $perm: String!) {
+    pokestopsSingle(id: $id, perm: $perm) {
       lat
       lon
     }

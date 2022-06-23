@@ -6,8 +6,9 @@ module.exports = class Device extends Model {
     return 'device'
   }
 
-  static async getAll(perms, _args, settings) {
+  static async getAll(perms, args, settings) {
     const { areaRestrictions } = perms
+    const { onlyAreas } = args.filters
     const query = this.query()
     if (settings.isMad) {
       query
@@ -36,8 +37,10 @@ module.exports = class Device extends Model {
           raw('json_extract(data, "$.radius")').as('radius'),
         )
     }
-    if (areaRestrictions.length) {
-      getAreaSql(query, areaRestrictions, settings.isMad, 'device')
+    if (
+      !getAreaSql(query, areaRestrictions, onlyAreas, settings.isMad, 'device')
+    ) {
+      return []
     }
     return query.from(settings.isMad ? 'settings_device' : 'device')
   }

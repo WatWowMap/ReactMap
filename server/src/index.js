@@ -37,22 +37,41 @@ const server = new ApolloServer({
   debug: config.devOptions.queryDebug,
   context: ({ req, res }) => {
     const perms = req.user ? req.user.perms : req.session.perms
-    return { req, res, Db, Event, perms, version }
+    return {
+      req,
+      res,
+      Db,
+      Event,
+      perms,
+      serverV: version,
+      clientV: req.headers['apollographql-client-version']?.trim() || '',
+    }
   },
   formatError: (e) => {
     if (config.devOptions.enabled) {
-      console.warn(e)
+      console.warn(['GQL'], e)
+      return e
     }
     if (
       e instanceof ValidationError ||
-      e?.message.includes('skipUndefined()')
+      e?.message.includes('skipUndefined()') ||
+      e?.message === 'old_client'
     ) {
+      if (config.devOptions.enabled) {
+        console.log(
+          '[GQL] Old client detected, forcing user to refresh, no need to report this error unless it continues to happen',
+        )
+      }
       return { message: 'old_client' }
     }
-    if (['old_client', 'session_expired'].includes(e.message)) {
-      return { message: e.message }
+    if (e.message === 'session_expired') {
+      if (config.devOptions.enabled) {
+        console.log(
+          '[GQL] user session expired, forcing logout, no need to report this error unless it continues to happen',
+        )
+      }
+      return { message: 'session_expired' }
     }
-    console.warn(['GQL'], e.message)
     return { message: e.message }
   },
 })

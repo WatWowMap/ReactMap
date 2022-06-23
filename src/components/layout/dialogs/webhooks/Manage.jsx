@@ -123,7 +123,6 @@ export default function Manage({
     if (save === 'profiles') {
       syncWebhook({
         variables: {
-          version: inject.VERSION,
           category: 'allProfiles',
           data: null,
           status: 'GET',
@@ -143,7 +142,6 @@ export default function Manage({
     } else {
       syncWebhook({
         variables: {
-          version: inject.VERSION,
           category: 'allProfiles',
           data: null,
           status: 'GET',

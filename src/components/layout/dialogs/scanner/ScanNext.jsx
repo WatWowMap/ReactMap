@@ -39,7 +39,6 @@ export default function ScanNext({
   const [scanNext, { error: scannerError, data: scannerResponse }] =
     useLazyQuery(Query.scanner(), {
       variables: {
-        version: inject.VERSION,
         category: 'scanNext',
         method: 'GET',
         data: {
@@ -56,7 +55,6 @@ export default function ScanNext({
     Query.scanner(),
     {
       variables: {
-        version: inject.VERSION,
         category: 'getQueue',
         method: 'GET',
         data: {

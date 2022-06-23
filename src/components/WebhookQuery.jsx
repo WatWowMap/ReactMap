@@ -25,7 +25,6 @@ export default function WebhookQuery({
     variables: {
       id: params.id,
       perm: params.category.toLowerCase(),
-      version: inject.VERSION,
     },
   })
   return data ? (

@@ -11,7 +11,6 @@ export default function useRefresh() {
   const active = useStatic((s) => s.active)
 
   const { data, stopPolling, startPolling } = useQuery(getAvailable, {
-    variables: { version: inject.VERSION },
     fetchPolicy: active ? 'network-only' : 'cache-only',
     pollInterval: 1000 * 60 * 60,
   })

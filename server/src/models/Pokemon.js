@@ -81,6 +81,7 @@ module.exports = class Pokemon extends Model {
       onlyPvpMega,
       onlyLinkGlobal,
       ts,
+      onlyAreas = [],
     } = args.filters
     let queryPvp = false
     const safeTs = ts || Math.floor(Date.now() / 1000)
@@ -257,8 +258,8 @@ module.exports = class Pokemon extends Model {
           ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 100)
         }
       })
-    if (areaRestrictions?.length) {
-      getAreaSql(query, areaRestrictions, isMad, 'pokemon')
+    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'pokemon')) {
+      return []
     }
 
     const results = await query.limit(queryLimits.pokemon)
@@ -337,8 +338,10 @@ module.exports = class Pokemon extends Model {
             .orWhereNotNull('pvp_rankings_ultra_league')
         })
       }
-      if (areaRestrictions?.length) {
-        getAreaSql(pvpQuery, areaRestrictions, isMad, 'pokemon')
+      if (
+        !getAreaSql(pvpQuery, areaRestrictions, onlyAreas, isMad, 'pokemon')
+      ) {
+        return []
       }
       pvpResults.push(
         ...(await pvpQuery.limit(queryLimits.pokemonPvp - results.length)),
@@ -396,8 +399,16 @@ module.exports = class Pokemon extends Model {
     if (isMad) {
       getMadSql(query)
     }
-    if (perms.areaRestrictions?.length) {
-      getAreaSql(query, perms.areaRestrictions, isMad, 'pokemon')
+    if (
+      !getAreaSql(
+        query,
+        perms.areaRestrictions,
+        args.filters.onlyAreas,
+        isMad,
+        'pokemon',
+      )
+    ) {
+      return []
     }
     const results = await query
     return legacyFilter(results, args, perms, ts)
