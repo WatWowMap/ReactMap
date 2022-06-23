@@ -12,20 +12,22 @@ export const useStore = create(
       setFilters: (filters) => set({ filters }),
       setAreas: (area) => {
         const { filters } = get()
-        set({
-          filters: {
-            ...filters,
-            scanAreas: {
-              ...filters.scanAreas,
-              filter: {
-                ...filters.scanAreas.filter,
-                areas: filters.scanAreas.filter.areas.includes(area)
-                  ? filters.scanAreas.filter.areas.filter((a) => a !== area)
-                  : [...filters.scanAreas.filter.areas, area],
+        if (filters?.scanAreas?.filter?.areas) {
+          set({
+            filters: {
+              ...filters,
+              scanAreas: {
+                ...filters.scanAreas,
+                filter: {
+                  ...filters.scanAreas.filter,
+                  areas: filters.scanAreas.filter.areas.includes(area)
+                    ? filters.scanAreas.filter.areas.filter((a) => a !== area)
+                    : [...filters.scanAreas.filter.areas, area],
+                },
               },
             },
-          },
-        })
+          })
+        }
       },
       settings: undefined,
       setSettings: (settings) => set({ settings }),
