@@ -48,8 +48,8 @@ const server = new ApolloServer({
     }
   },
   formatError: (e) => {
-    console.warn(['GQL'], e)
     if (config.devOptions.enabled) {
+      console.warn(['GQL'], e)
       return e
     }
     if (
@@ -57,15 +57,19 @@ const server = new ApolloServer({
       e?.message.includes('skipUndefined()') ||
       e?.message === 'old_client'
     ) {
-      console.log(
-        '[GQL] Old client detected, forcing user to refresh, no need to report this error unless it continues to happen',
-      )
+      if (config.devOptions.enabled) {
+        console.log(
+          '[GQL] Old client detected, forcing user to refresh, no need to report this error unless it continues to happen',
+        )
+      }
       return { message: 'old_client' }
     }
     if (e.message === 'session_expired') {
-      console.log(
-        '[GQL] user session expired, forcing logout, no need to report this error unless it continues to happen',
-      )
+      if (config.devOptions.enabled) {
+        console.log(
+          '[GQL] user session expired, forcing logout, no need to report this error unless it continues to happen',
+        )
+      }
       return { message: 'session_expired' }
     }
     return { message: e.message }
