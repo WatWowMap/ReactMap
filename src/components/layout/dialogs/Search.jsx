@@ -25,6 +25,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
   const setSearch = useStore((state) => state.setSearch)
   const searchTab = useStore((state) => state.searchTab)
   const setSearchTab = useStore((state) => state.setSearchTab)
+  const { scanAreas } = useStore((state) => state.filters)
   const { map } = useStatic((state) => state.config)
 
   const handleTabChange = (event, newValue) => {
@@ -45,7 +46,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
       locale: localStorage.getItem('i18nextLng'),
       ts: Math.floor(Date.now() / 1000),
       midnight: Utility.getMidnight(),
-      version: inject.VERSION,
+      onlyAreas: scanAreas.filter.areas,
     },
   })
 

@@ -16,7 +16,6 @@ export const getAllNests = gql`
     $maxLat: Float!
     $maxLon: Float!
     $filters: JSON!
-    $version: String
   ) {
     nests(
       minLat: $minLat
@@ -24,7 +23,6 @@ export const getAllNests = gql`
       maxLat: $maxLat
       maxLon: $maxLon
       filters: $filters
-      version: $version
     ) {
       ...CoreNest
       name
@@ -39,8 +37,8 @@ export const getAllNests = gql`
 
 export const getOne = gql`
   ${core}
-  query GetOneNest($id: ID!, $perm: String!, $version: String) {
-    nestsSingle(id: $id, perm: $perm, version: $version) {
+  query GetOneNest($id: ID!, $perm: String!) {
+    nestsSingle(id: $id, perm: $perm) {
       ...CoreNest
     }
   }

@@ -198,15 +198,15 @@ module.exports = class DbCheck {
     return deDuped
   }
 
-  async submissionCells(args) {
+  async submissionCells(perms, args) {
     const stopData = await Promise.all(
       this.models.Pokestop.map(async (source) =>
-        source.SubModel.getSubmissions(args, source),
+        source.SubModel.getSubmissions(perms, args, source),
       ),
     )
     const gymData = await Promise.all(
       this.models.Gym.map(async (source) =>
-        source.SubModel.getSubmissions(args, source),
+        source.SubModel.getSubmissions(perms, args, source),
       ),
     )
     return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]

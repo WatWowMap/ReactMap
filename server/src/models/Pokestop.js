@@ -68,6 +68,7 @@ module.exports = class Pokestop extends Model {
         onlyInvasions,
         onlyArEligible,
         onlyAllPokestops,
+        onlyAreas = [],
       },
       ts,
       midnight: clientMidnight,
@@ -147,8 +148,8 @@ module.exports = class Pokestop extends Model {
       .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
-    if (areaRestrictions?.length) {
-      getAreaSql(query, areaRestrictions, isMad)
+    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
+      return []
     }
 
     if (!onlyAllPokestops) {
@@ -1083,6 +1084,7 @@ module.exports = class Pokestop extends Model {
   }
 
   static async search(perms, args, { isMad }, distance) {
+    const { onlyAreas = [], search } = args
     const query = this.query()
       .select([
         'name',
@@ -1093,17 +1095,17 @@ module.exports = class Pokestop extends Model {
         distance,
       ])
       .where(isMad ? 'enabled' : 'deleted', isMad)
-      .whereRaw(`LOWER(name) LIKE '%${args.search}%'`)
+      .whereRaw(`LOWER(name) LIKE '%${search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (perms.areaRestrictions?.length) {
-      getAreaSql(query, perms.areaRestrictions, isMad)
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+      return []
     }
     return query
   }
 
   static async searchQuests(perms, args, { isMad, hasAltQuests }, distance) {
-    const { search, locale, midnight: clientMidnight } = args
+    const { search, onlyAreas = [], locale, midnight: clientMidnight } = args
     const midnight = settings.hideOldQuests ? clientMidnight : 0
 
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
@@ -1160,8 +1162,8 @@ module.exports = class Pokestop extends Model {
           'quest_pokemon_costume_id AS quest_costume_id',
         ])
     }
-    if (perms.areaRestrictions?.length) {
-      getAreaSql(query, perms.areaRestrictions, isMad)
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+      return []
     }
     const results = await query
     const mapped = results.map((q) => ({ ...q, with_ar: q.with_ar ?? true }))
@@ -1179,8 +1181,10 @@ module.exports = class Pokestop extends Model {
         })
         .limit(searchResultsLimit)
         .orderBy('distance')
-      if (perms.areaRestrictions?.length) {
-        getAreaSql(altQuestQuery, perms.areaRestrictions, isMad)
+      if (
+        !getAreaSql(altQuestQuery, perms.areaRestrictions, onlyAreas, isMad)
+      ) {
+        return []
       }
       const altQuestResults = await altQuestQuery
       const remapped = altQuestResults.map((result) => ({
@@ -1214,15 +1218,22 @@ module.exports = class Pokestop extends Model {
       .first()
   }
 
-  static getSubmissions(args, { isMad }) {
+  static getSubmissions(perms, args, { isMad }) {
+    const {
+      filters: { onlyAreas = [] },
+      minLat,
+      minLon,
+      maxLat,
+      maxLon,
+    } = args
     const query = this.query()
       .whereBetween(`lat${isMad ? 'itude' : ''}`, [
-        args.minLat - 0.025,
-        args.maxLat + 0.025,
+        minLat - 0.025,
+        maxLat + 0.025,
       ])
       .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [
-        args.minLon - 0.025,
-        args.maxLon + 0.025,
+        minLon - 0.025,
+        maxLon + 0.025,
       ])
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {
@@ -1231,6 +1242,9 @@ module.exports = class Pokestop extends Model {
       query.select(['id', 'lat', 'lon']).andWhere((poi) => {
         poi.whereNull('sponsor_id').orWhere('sponsor_id', 0)
       })
+    }
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+      return []
     }
     return query
   }

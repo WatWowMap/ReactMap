@@ -6,6 +6,8 @@ const timeoutLink = new ApolloLinkTimeout(10000) // 10 second timeout
 export default new ApolloClient({
   uri: '/graphql',
   link: timeoutLink.concat(createHttpLink({ uri: '/graphql' })),
+  name: inject.TITLE,
+  version: inject.VERSION,
   cache: new InMemoryCache({
     typePolicies: {
       Query: {

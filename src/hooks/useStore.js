@@ -3,13 +3,30 @@ import { persist } from 'zustand/middleware'
 
 export const useStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       location: undefined,
       setLocation: (location) => set({ location }),
       zoom: undefined,
       setZoom: (zoom) => set({ zoom }),
       filters: undefined,
       setFilters: (filters) => set({ filters }),
+      setAreas: (area) => {
+        const { filters } = get()
+        set({
+          filters: {
+            ...filters,
+            scanAreas: {
+              ...filters.scanAreas,
+              filter: {
+                ...filters.scanAreas.filter,
+                areas: filters.scanAreas.filter.areas.includes(area)
+                  ? filters.scanAreas.filter.areas.filter((a) => a !== area)
+                  : [...filters.scanAreas.filter.areas, area],
+              },
+            },
+          },
+        })
+      },
       settings: undefined,
       setSettings: (settings) => set({ settings }),
       userSettings: undefined,

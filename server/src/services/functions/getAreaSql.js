@@ -3,9 +3,21 @@ const areas = require('../areas')
 module.exports = function getAreaRestrictionSql(
   query,
   areaRestrictions,
+  onlyAreas,
   isMad,
   category,
 ) {
+  if (!areaRestrictions?.length && !onlyAreas?.length) return true
+
+  const cleanUserAreas = onlyAreas.filter((area) => areas.names.includes(area))
+  const consolidatedAreas = areaRestrictions.length
+    ? areaRestrictions.filter(
+        (area) => !cleanUserAreas.length || cleanUserAreas.includes(area),
+      )
+    : cleanUserAreas
+
+  if (!consolidatedAreas.length) return false
+
   let columns = ['lat', 'lon']
   if (isMad) {
     if (category === 'device') {
@@ -24,11 +36,14 @@ module.exports = function getAreaRestrictionSql(
   }
 
   query.andWhere((restrictions) => {
-    areaRestrictions.forEach((area) => {
-      const polygon = areas.polygons[area].map((e) => e.join(' ')).join()
-      restrictions.orWhereRaw(
-        `ST_CONTAINS(ST_GeomFromText("POLYGON((${polygon}))"), POINT(${columns[1]}, ${columns[0]}))`,
-      )
+    consolidatedAreas.forEach((area) => {
+      if (areas.polygons[area]) {
+        const polygon = areas.polygons[area].map((e) => e.join(' ')).join()
+        restrictions.orWhereRaw(
+          `ST_CONTAINS(ST_GeomFromText("POLYGON((${polygon}))"), POINT(${columns[1]}, ${columns[0]}))`,
+        )
+      }
     })
   })
+  return true
 }

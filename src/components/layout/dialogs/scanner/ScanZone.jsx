@@ -44,7 +44,6 @@ export default function ScanZone({
   const [scanZone, { error: scannerError, data: scannerResponse }] =
     useLazyQuery(Query.scanner(), {
       variables: {
-        version: inject.VERSION,
         category: 'scanZone',
         method: 'GET',
         data: {
@@ -61,7 +60,6 @@ export default function ScanZone({
     Query.scanner(),
     {
       variables: {
-        version: inject.VERSION,
         category: 'getQueue',
         method: 'GET',
         data: {

@@ -33,6 +33,7 @@ export default function QueryData({
   setExcludeList,
   setError,
   active,
+  onlyAreas,
 }) {
   const trimFilters = useCallback(
     (requestedFilters) => {
@@ -40,6 +41,7 @@ export default function QueryData({
         onlyLegacyExclude: [],
         onlyLegacy: userSettings.legacyFilter,
         onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
+        onlyAreas,
       }
       Object.entries(requestedFilters).forEach((topLevelFilter) => {
         const [id, specifics] = topLevelFilter
@@ -65,7 +67,7 @@ export default function QueryData({
       })
       return trimmed
     },
-    [userSettings, filters],
+    [userSettings, filters, onlyAreas],
   )
 
   const refetchData = () => {
@@ -78,7 +80,6 @@ export default function QueryData({
       refetch({
         ...Utility.getQueryArgs(map),
         filters: trimFilters(filters),
-        version: inject.VERSION,
       })
     }
   }
@@ -88,7 +89,7 @@ export default function QueryData({
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [filters, userSettings])
+  }, [filters, userSettings, onlyAreas])
 
   const { data, previousData, refetch, error } = useQuery(
     Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),
@@ -97,7 +98,6 @@ export default function QueryData({
       variables: {
         ...bounds,
         filters: trimFilters(filters),
-        version: inject.VERSION,
       },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
       pollInterval: (config.polling[category] || 10) * 1000,
@@ -152,6 +152,7 @@ export default function QueryData({
         params={params}
         setParams={setParams}
         isNight={isNight}
+        onlyAreas={onlyAreas}
       />
       {category === 'weather' && (
         <ActiveWeather
