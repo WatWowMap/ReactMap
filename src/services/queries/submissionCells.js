@@ -7,6 +7,7 @@ const getAllSubmissionCells = gql`
     $maxLat: Float!
     $maxLon: Float!
     $zoom: Int!
+    $filters: JSON
   ) {
     submissionCells(
       minLat: $minLat
@@ -14,6 +15,7 @@ const getAllSubmissionCells = gql`
       maxLat: $maxLat
       maxLon: $maxLon
       zoom: $zoom
+      filters: $filters
     ) {
       placementCells {
         cells {

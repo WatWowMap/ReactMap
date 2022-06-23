@@ -110,6 +110,7 @@ module.exports = gql`
       maxLon: Float
       ts: Int
       zoom: Int
+      filters: JSON
     ): [SubmissionCell]
     weather(filters: JSON): [Weather]
     webhook(category: String, status: String, name: String): Poracle
