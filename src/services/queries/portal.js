@@ -6,12 +6,14 @@ export const getAllPortals = gql`
     $minLon: Float!
     $maxLat: Float!
     $maxLon: Float!
+    $filters: JSON
   ) {
     portals(
       minLat: $minLat
       minLon: $minLon
       maxLat: $maxLat
       maxLon: $maxLon
+      filters: $filters
     ) {
       id
       lat

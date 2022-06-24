@@ -26,13 +26,13 @@ module.exports = function getPlacementCells(bounds, pokestops, gyms) {
   const coveringCells = regionCoverer.getCoveringCells(region)
   for (let i = 0; i < coveringCells.length; i += 1) {
     const cell = coveringCells[i]
-    const polygon = getPolyVector(cell.id)
+    const { poly } = getPolyVector(cell.id)
     const cellId = BigInt(cell.id).toString()
     indexedCells[cellId] = {
       id: cellId,
       level: 17,
       blocked: false,
-      polygon,
+      polygon: poly,
     }
   }
   for (let i = 0; i < allCoords.length; i += 1) {
