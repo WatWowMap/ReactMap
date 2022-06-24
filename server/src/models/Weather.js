@@ -1,5 +1,12 @@
 const { Model, ref, raw } = require('objection')
+const { polygon, point } = require('@turf/helpers')
+const { default: pointInPolygon } = require('@turf/boolean-point-in-polygon')
+const { default: booleanOverlap } = require('@turf/boolean-overlap')
+
 const getPolyVector = require('../services/functions/getPolyVector')
+const config = require('../services/config')
+const areas = require('../services/areas')
+
 const {
   api: { weatherCellLimit },
 } = require('../services/config')
@@ -9,7 +16,7 @@ module.exports = class Weather extends Model {
     return 'weather'
   }
 
-  static async getAll(_perms, _args, { isMad }) {
+  static async getAll(perms, args, { isMad }) {
     const query = this.query().select([
       '*',
       ref(isMad ? 's2_cell_id' : 'id')
@@ -27,9 +34,41 @@ module.exports = class Weather extends Model {
       query.where('updated', '>=', ms)
     }
     const results = await query
-    return results.map((cell) => ({
-      ...cell,
-      polygon: getPolyVector(cell.id, true),
-    }))
+
+    const cleanUserAreas = args.filters.onlyAreas.filter((area) =>
+      areas.names.includes(area),
+    )
+    const merged = perms.areaRestrictions.length
+      ? perms.areaRestrictions.filter(
+          (area) => !cleanUserAreas.length || cleanUserAreas.includes(area),
+        )
+      : cleanUserAreas
+
+    return results
+      .map((cell) => {
+        const { poly, revPoly } = getPolyVector(cell.id, true)
+        const geojson = polygon([revPoly])
+        const hasOverlap =
+          !merged.length ||
+          merged.some(
+            (area) =>
+              pointInPolygon(
+                point(config.scanAreasObj[area].geometry.coordinates[0][0]),
+                geojson,
+              ) ||
+              pointInPolygon(
+                point([cell.longitude, cell.latitude]),
+                config.scanAreasObj[area],
+              ) ||
+              booleanOverlap(geojson, config.scanAreasObj[area]),
+          )
+        return (
+          hasOverlap && {
+            ...cell,
+            polygon: poly,
+          }
+        )
+      })
+      .filter(Boolean)
   }
 }

@@ -10,6 +10,7 @@ export function ScanAreaTile({
   selectedAreas,
   setSelectedAreas,
   onlyAreas,
+  userSettings,
 }) {
   const setAreas = useStore((s) => s.setAreas)
 
@@ -42,11 +43,13 @@ export function ScanAreaTile({
               : 0.2,
         })
         .bindTooltip(popupContent, {
-          permanent: true,
+          permanent: userSettings ? userSettings.alwaysShowLabels : true,
           direction: 'top',
           className: 'area-tooltip',
         })
-        .openTooltip()
+      if (!userSettings || userSettings.alwaysShowLabels) {
+        layer.openTooltip()
+      }
       if (webhookMode) {
         layer.on('click', () => handleClick(name.toLowerCase()))
       } else if (!feature.properties.manual) {
