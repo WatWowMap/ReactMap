@@ -283,6 +283,9 @@
       "cellBlocked": "#000000",
       "poiColor": "#03ffff"
     },
+    "scanAreas": {
+      "alwaysShowLabels": true
+    },
     "weather": {
       "clickableIcon": false,
       "darkMapBorder": "#ff0000",

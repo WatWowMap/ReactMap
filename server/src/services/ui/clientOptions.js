@@ -53,6 +53,9 @@ module.exports = function clientOptions(perms) {
       cellBlocked: { type: 'color', perm: ['submissionCells'] },
       poiColor: { type: 'color', perm: ['submissionCells'] },
     },
+    scanAreas: {
+      alwaysShowLabels: { type: 'bool', perm: ['scanAreas'] },
+    },
     weather: {
       clickableIcon: { type: 'bool', perm: ['weather'] },
       lightMapBorder: { type: 'color', perm: ['weather'] },
