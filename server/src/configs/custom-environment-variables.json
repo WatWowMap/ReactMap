@@ -637,6 +637,12 @@
       "cellBlocked": "CLIENT_SIDE_OPTIONS_WAYFARER_CELL_BLOCKED",
       "poiColor": "CLIENT_SIDE_OPTIONS_WAYFARER_POI_COLOR"
     },
+    "scanAreas": {
+      "alwaysShowLabels": {
+        "__name": "CLIENT_SIDE_OPTIONS_SCAN_AREAS_ALWAYS_SHOW_LABELS",
+        "__format": "boolean"
+      }
+    },
     "weather": {
       "clickableIcon": {
         "__name": "CLIENT_SIDE_OPTIONS_WEATHER_CLICKABLE_ICON",
