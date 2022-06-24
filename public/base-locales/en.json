@@ -544,5 +544,7 @@
   "dark_map_border": "Dark Map Border",
   "cell_blocked": "Cell Blocked",
   "poi_color": "POI Color",
-  "quest_condition": "Quest Condition"
+  "quest_condition": "Quest Condition",
+  "always_show_labels": "Always Show Labels",
+  "scan_areas_options": "Scan Areas Options"
 }

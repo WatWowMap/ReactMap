@@ -107,7 +107,7 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
   return (
     <>
       <Header
-        titles={[`${category}_options`]}
+        titles={[`${Utility.camelToSnake(category)}_options`]}
         action={toggleDialog(false, category, 'options')}
       />
       <DialogContent style={{ padding: 0 }}>
