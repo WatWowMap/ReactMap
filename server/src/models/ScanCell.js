@@ -37,7 +37,7 @@ module.exports = class ScanCell extends Model {
       .from(isMad ? 'trs_s2cells' : 's2cell')
     return results.map((cell) => ({
       ...cell,
-      polygon: getPolyVector(cell.id, 'polygon'),
+      polygon: getPolyVector(cell.id, 'polygon').poly,
     }))
   }
 }

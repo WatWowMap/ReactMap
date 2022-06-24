@@ -253,6 +253,11 @@ config.scanAreasMenu = Object.fromEntries(
     return [domain, Object.values(parents)]
   }),
 )
+config.scanAreasObj = Object.fromEntries(
+  Object.values(config.scanAreas)
+    .flatMap((areas) => areas.features)
+    .map((feature) => [feature.properties.name, feature]),
+)
 
 config.api.pvp.leagueObj = Object.fromEntries(
   config.api.pvp.leagues.map((league) => [league.name, league.cp]),

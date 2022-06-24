@@ -19,7 +19,7 @@ module.exports = function getTypeCells(bounds, pokestops, gyms) {
   const coveringCells = regionCoverer.getCoveringCells(region)
   for (let i = 0; i < coveringCells.length; i += 1) {
     const cell = coveringCells[i]
-    const polygon = getPolyVector(cell.id)
+    const { poly } = getPolyVector(cell.id)
     const cellId = BigInt(cell.id).toString()
     indexedCells[cellId] = {
       id: cellId,
@@ -27,7 +27,7 @@ module.exports = function getTypeCells(bounds, pokestops, gyms) {
       count: 0,
       count_pokestops: 0,
       count_gyms: 0,
-      polygon,
+      polygon: poly,
     }
   }
   for (let i = 0; i < gyms.length; i += 1) {

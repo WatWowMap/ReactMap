@@ -7,6 +7,7 @@ const getAllScanCells = gql`
     $maxLat: Float!
     $maxLon: Float!
     $zoom: Int!
+    $filters: JSON
   ) {
     scanCells(
       minLat: $minLat
@@ -14,6 +15,7 @@ const getAllScanCells = gql`
       maxLat: $maxLat
       maxLon: $maxLon
       zoom: $zoom
+      filters: $filters
     ) {
       id
       center_lat
