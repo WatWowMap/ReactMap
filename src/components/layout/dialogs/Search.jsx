@@ -46,7 +46,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
       locale: localStorage.getItem('i18nextLng'),
       ts: Math.floor(Date.now() / 1000),
       midnight: Utility.getMidnight(),
-      onlyAreas: scanAreas.filter.areas,
+      onlyAreas: scanAreas?.filter?.areas || [],
     },
   })
 
