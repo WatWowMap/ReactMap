@@ -6,12 +6,14 @@ const getAllSpawnpoints = gql`
     $minLon: Float!
     $maxLat: Float!
     $maxLon: Float!
+    $filters: JSON
   ) {
     spawnpoints(
       minLat: $minLat
       minLon: $minLon
       maxLat: $maxLat
       maxLon: $maxLon
+      filters: $filters
     ) {
       id
       lat
