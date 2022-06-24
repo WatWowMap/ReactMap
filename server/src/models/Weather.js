@@ -35,13 +35,15 @@ module.exports = class Weather extends Model {
     }
     const results = await query
 
-    const cleanUserAreas = args.filters.onlyAreas.filter((area) => areas.names.includes(area))
+    const cleanUserAreas = args.filters.onlyAreas.filter((area) =>
+      areas.names.includes(area),
+    )
     const merged = perms.areaRestrictions.length
       ? perms.areaRestrictions.filter(
           (area) => !cleanUserAreas.length || cleanUserAreas.includes(area),
         )
       : cleanUserAreas
-  
+
     return results
       .map((cell) => {
         const { poly, revPoly } = getPolyVector(cell.id, true)
