@@ -223,14 +223,16 @@ rootRouter.get('/settings', async (req, res) => {
       })
 
       if (serverSettings.user.perms.pokemon) {
-        serverSettings.available.pokemon = config.api.queryOnSessionInit.pokemon
-          ? await Db.getAvailable('Pokemon')
-          : Event.available.pokemon
+        if (config.api.queryOnSessionInit.pokemon) {
+          Event.setAvailable('pokemon', 'Pokemon', Db, false)
+        }
+        serverSettings.available.pokemon = Event.getAvailable('pokemon')
       }
       if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
-        serverSettings.available.gyms = config.api.queryOnSessionInit.raids
-          ? await Db.getAvailable('Gym')
-          : Event.available.gyms
+        if (config.api.queryOnSessionInit.raids) {
+          Event.setAvailable('gyms', 'Gym', Db, false)
+        }
+        serverSettings.available.gyms = Event.getAvailable('gyms')
       }
       if (
         serverSettings.user.perms.quests ||
@@ -238,16 +240,16 @@ rootRouter.get('/settings', async (req, res) => {
         serverSettings.user.perms.invasions ||
         serverSettings.user.perms.lures
       ) {
-        serverSettings.available.pokestops = config.api.queryOnSessionInit
-          .quests
-          ? await Db.getAvailable('Pokestop')
-          : Event.available.pokestops
-        serverSettings.available.withConditions = Db.questConditions
+        if (config.api.queryOnSessionInit.quests) {
+          Event.setAvailable('pokestops', 'Pokestop', Db, false)
+        }
+        serverSettings.available.pokestops = Event.getAvailable('pokestops')
       }
       if (serverSettings.user.perms.nests) {
-        serverSettings.available.nests = config.api.queryOnSessionInit.nests
-          ? await Db.getAvailable('Nest')
-          : Event.available.nests
+        if (config.api.queryOnSessionInit.nests) {
+          Event.setAvailable('nests', 'Nest', Db, false)
+        }
+        serverSettings.available.nests = Event.getAvailable('nests')
       }
       if (Object.values(config.api.queryOnSessionInit).some((v) => v)) {
         Event.addAvailable()

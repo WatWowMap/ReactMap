@@ -18,29 +18,33 @@ module.exports = class EventManager {
     this.webhookObj = {}
   }
 
-  async setAvailable(category, model, Db) {
-    this.available[category] = await Db.getAvailable(model)
+  getAvailable(category) {
+    return this.available[category]
+  }
+
+  async setAvailable(category, model, Db, log) {
+    this.available[category] = await Db.getAvailable(model, log)
   }
 
   setTimers(config, Db, Pvp) {
     if (!config.api.queryOnSessionInit.raids) {
       setInterval(async () => {
-        this.available.gyms = await Db.getAvailable('Gym')
+        await this.setAvailable('gyms', 'Gym', Db, true)
       }, 1000 * 60 * 60 * (config.api.queryUpdateHours.raids || 1))
     }
     if (!config.api.queryOnSessionInit.nests) {
       setInterval(async () => {
-        this.available.nests = await Db.getAvailable('Nest')
+        await this.setAvailable('nests', 'Nest', Db, true)
       }, 1000 * 60 * 60 * (config.api.queryUpdateHours.nests || 6))
     }
     if (!config.api.queryOnSessionInit.pokemon) {
       setInterval(async () => {
-        this.available.pokemon = await Db.getAvailable('Pokemon')
+        await this.setAvailable('pokemon', 'Pokemon', Db, true)
       }, 1000 * 60 * 60 * (config.api.queryUpdateHours.pokemon || 1))
     }
     if (!config.api.queryOnSessionInit.quests) {
       setInterval(async () => {
-        this.available.pokestops = await Db.getAvailable('Pokestop')
+        await this.setAvailable('pokestops', 'Pokestop', Db, true)
       }, 1000 * 60 * 60 * (config.api.queryUpdateHours.quests || 3))
     }
     setInterval(async () => {
