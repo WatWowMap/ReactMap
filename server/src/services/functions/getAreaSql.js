@@ -8,7 +8,11 @@ module.exports = function getAreaRestrictionSql(
   isMad,
   category,
 ) {
-  if (!areaRestrictions?.length && (!onlyAreas?.length || config.manualAreas.length)) return true
+  if (
+    !areaRestrictions?.length &&
+    (!onlyAreas?.length || config.manualAreas.length)
+  )
+    return true
 
   const cleanUserAreas = onlyAreas.filter((area) => areas.names.includes(area))
   const consolidatedAreas = areaRestrictions.length
