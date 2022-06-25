@@ -214,10 +214,9 @@ module.exports = {
               })
             }
           })
-
           return filtered
         }
-        return scanAreas
+        return scanAreas.filter((parent) => parent.children.length)
       }
       return []
     },

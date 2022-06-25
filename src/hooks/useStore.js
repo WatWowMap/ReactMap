@@ -10,8 +10,19 @@ export const useStore = create(
       setZoom: (zoom) => set({ zoom }),
       filters: undefined,
       setFilters: (filters) => set({ filters }),
-      setAreas: (area) => {
+      setAreas: (areas = [], validAreas = [], unselectAll = false) => {
         const { filters } = get()
+        const incoming = new Set(Array.isArray(areas) ? areas : [areas])
+        const existing = new Set(filters?.scanAreas?.filter?.areas || [])
+
+        incoming.forEach((area) => {
+          if (existing.has(area) || unselectAll) {
+            existing.delete(area)
+          } else {
+            existing.add(area)
+          }
+        })
+
         if (filters?.scanAreas?.filter?.areas) {
           set({
             filters: {
@@ -20,9 +31,9 @@ export const useStore = create(
                 ...filters.scanAreas,
                 filter: {
                   ...filters.scanAreas.filter,
-                  areas: filters.scanAreas.filter.areas.includes(area)
-                    ? filters.scanAreas.filter.areas.filter((a) => a !== area)
-                    : [...filters.scanAreas.filter.areas, area],
+                  areas: [...existing].filter((area) =>
+                    validAreas.includes(area),
+                  ),
                 },
               },
             },
