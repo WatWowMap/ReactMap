@@ -31,15 +31,15 @@
       "weather": 30
     },
     "queryUpdateHours": {
-      "pokemon": 0.5,
-      "quests": 1,
-      "raids": 0.5,
-      "nests": 3
+      "pokemon": 0.25,
+      "quests": 0.5,
+      "raids": 0.2,
+      "nests": 1
     },
     "queryOnSessionInit": {
       "pokemon": false,
       "quests": false,
-      "raids": false,
+      "raids": true,
       "nests": false
     },
     "queryLimits": {
