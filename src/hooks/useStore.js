@@ -31,8 +31,8 @@ export const useStore = create(
                 ...filters.scanAreas,
                 filter: {
                   ...filters.scanAreas.filter,
-                  areas: [...existing].filter((area) =>
-                    validAreas.includes(area),
+                  areas: [...existing].filter(
+                    (area) => !validAreas.length || validAreas.includes(area),
                   ),
                 },
               },
