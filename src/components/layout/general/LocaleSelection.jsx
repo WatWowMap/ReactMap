@@ -9,7 +9,7 @@ export default function LocaleSelection({ localeSelection }) {
     <Select
       autoFocus
       name="localeSelection"
-      value={localStorage.getItem('i18nextLng')}
+      value={localStorage.getItem('i18nextLng') || 'en'}
       onChange={(event) => i18n.changeLanguage(event.target.value)}
       fullWidth
     >
