@@ -7,14 +7,14 @@
  */
 
 const fs = require('fs')
-const path = require('path')
+const { resolve, dirname } = require('path')
 
 // Set Path where for area.json
-const configFolderArea = path.resolve(
+const configFolderArea = resolve(
   __dirname,
   '../../server/src/configs/areas.json',
 )
-const geofencesFile = path.resolve(
+const geofencesFile = resolve(
   __dirname,
   '../../server/src/configs/geofence.json',
 )
@@ -36,37 +36,27 @@ if (fs.existsSync(geofencesFile)) {
       return
     }
     for (let i = 0; i < inGeoJSON.length; i += 1) {
-      const inGeofence = inGeoJSON[i]
+      const { path, ...rest } = inGeoJSON[i]
       const outGeofence = {
         type: 'Feature',
-        properties: {
-          name: inGeofence.name || '',
-          color: inGeofence.color || '#000000',
-          id: inGeofence.id || 0,
-        },
+        properties: rest,
         geometry: {
           type: 'Polygon',
           coordinates: [[]],
         },
       }
-      for (let j = 0; j < inGeofence.path.length; j += 1) {
-        const coord = inGeofence.path[j]
-        inGeofence.path[j] = [coord[1], coord[0]]
+      for (let j = 0; j < path.length; j += 1) {
+        const coord = path[j]
+        path[j] = [coord[1], coord[0]]
       }
-      const lastCoords = inGeofence.path.slice(-1)
-      if (
-        inGeofence.path[0][0] !== lastCoords[0][0] ||
-        inGeofence.path[0][1] !== lastCoords[0][1]
-      ) {
-        inGeofence.path.push(inGeofence.path[0])
+      const lastCoords = path.slice(-1)
+      if (path[0][0] !== lastCoords[0][0] || path[0][1] !== lastCoords[0][1]) {
+        path.push(path[0])
       }
-      outGeofence.geometry.coordinates[0] = inGeofence.path
+      outGeofence.geometry.coordinates[0] = path
       outGeoJSON.features.push(outGeofence)
     }
-    const outFilePath = path.resolve(
-      path.dirname(configFolderArea),
-      'areas.json',
-    )
+    const outFilePath = resolve(dirname(configFolderArea), 'areas.json')
 
     fs.writeFile(
       outFilePath,
