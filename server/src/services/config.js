@@ -169,7 +169,9 @@ config.authMethods = [
 const manualGeojson = {
   type: 'FeatureCollection',
   features: config.manualAreas
-    .filter((area) => ['lat', 'lon', 'name'].every((k) => k in area && !area.hidden))
+    .filter((area) =>
+      ['lat', 'lon', 'name'].every((k) => k in area && !area.hidden),
+    )
     .map((area) => {
       const { lat, lon, ...rest } = area
       return {
