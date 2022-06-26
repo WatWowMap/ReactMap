@@ -94,7 +94,7 @@
       "minZoom": 10,
       "maxZoom": 18,
       "interactionRangeZoom": 15,
-      "scanAreasZoom": 12,
+      "scanAreasZoom": 15,
       "scanCellsZoom": 13,
       "submissionZoom": 15,
       "activeWeatherZoom": 13,

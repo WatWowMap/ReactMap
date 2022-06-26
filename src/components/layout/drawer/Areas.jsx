@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useQuery } from '@apollo/client'
 import { Grid, Button, Paper } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
@@ -12,10 +12,12 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
   const { t } = useTranslation()
   const setAreas = useStore((s) => s.setAreas)
 
-  const allAreas = React.useMemo(() => {
+  const allAreas = useMemo(() => {
     if (data?.scanAreasMenu) {
       return data.scanAreasMenu.flatMap((parent) =>
-        parent.children.map((child) => child.properties.name),
+        parent.children
+          .filter((child) => !child.properties.manual)
+          .map((child) => child.properties.name),
       )
     }
     return []
@@ -52,7 +54,7 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
           <Grid
             key={name || ''}
             container
-            alignItems="center"
+            alignItems="stretch"
             justifyContent="center"
           >
             {name && (

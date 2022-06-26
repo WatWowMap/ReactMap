@@ -168,17 +168,18 @@ module.exports = {
       if (clientV !== serverV) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
-      const scanAreas = config.scanAreas[req.headers.host]
-        ? config.scanAreas[req.headers.host]
-        : config.scanAreas.main
-      if (perms?.scanAreas && scanAreas.features.length) {
+      if (perms?.scanAreas) {
+        const scanAreas = config.scanAreas[req.headers.host]
+          ? config.scanAreas[req.headers.host]
+          : config.scanAreas.main
         return [
           {
             ...scanAreas,
             features: scanAreas.features.filter(
               (feature) =>
-                !perms.areaRestrictions.length ||
-                perms.areaRestrictions.includes(feature.properties.name),
+                !feature.properties.hidden &&
+                (!perms.areaRestrictions.length ||
+                  perms.areaRestrictions.includes(feature.properties.name)),
             ),
           },
         ]
@@ -189,10 +190,11 @@ module.exports = {
       if (clientV !== serverV) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
-      const scanAreas = config.scanAreasMenu[req.headers.host]
-        ? config.scanAreasMenu[req.headers.host]
-        : config.scanAreasMenu.main
-      if (perms?.scanAreas && scanAreas.length) {
+      if (perms?.scanAreas) {
+        const scanAreas = config.scanAreasMenu[req.headers.host]
+          ? config.scanAreasMenu[req.headers.host]
+          : config.scanAreasMenu.main
+
         if (perms.areaRestrictions.length) {
           const filtered = scanAreas
             .map((parent) => ({
@@ -203,6 +205,7 @@ module.exports = {
             }))
             .filter((parent) => parent.children.length)
 
+          // Adds new blanks to account for area restrictions trimming some
           filtered.forEach(({ children }) => {
             if (children.length % 2 === 1) {
               children.push({
