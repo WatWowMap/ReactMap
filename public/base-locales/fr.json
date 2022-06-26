@@ -546,5 +546,9 @@
   "light_map_border": "Bordure de carte claire",
   "dark_map_border": "Bordure de carte sombre",
   "cell_blocked": "Cellule bloquée",
-  "poi_color": "Couleur du point d'intérêt"
+  "poi_color": "Couleur du point d'intérêt",
+  "ultra_beast": "Ultra Bête",
+  "quest_condition": "État de la quête",
+  "always_show_labels": "Toujours afficher les étiquettes",
+  "scan_areas_options": "Options des zones de numérisation"
 }

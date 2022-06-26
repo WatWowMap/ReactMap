@@ -510,5 +510,9 @@
   "light_map_border": "ライトマップボーダー",
   "dark_map_border": "ダークマップボーダー",
   "cell_blocked": "セルがブロックされました",
-  "poi_color": "POIカラー"
+  "poi_color": "POIカラー",
+  "ultra_beast": "ウルトラビースト",
+  "quest_condition": "クエスト条件",
+  "always_show_labels": "常にラベルを表示する",
+  "scan_areas_options": "スキャンエリアオプション"
 }
