@@ -21,13 +21,16 @@ export default function AreaTile({
 
   const hasAll =
     childAreas &&
-    childAreas.every((c) => scanAreas.filter.areas.includes(c.properties.name))
+    childAreas.every(
+      (c) =>
+        c.properties.manual ||
+        scanAreas.filter.areas.includes(c.properties.name),
+    )
   const hasSome =
     childAreas &&
     childAreas.some((c) => scanAreas.filter.areas.includes(c.properties.name))
-  const hasManual = childAreas
-    ? childAreas.some((c) => c.properties.manual)
-    : feature.properties.manual
+  const hasManual =
+    feature?.properties?.manual || childAreas.every((c) => c.properties.manual)
 
   return (
     <Grid
@@ -43,8 +46,9 @@ export default function AreaTile({
       }}
     >
       <MenuItem
+        style={{ height: '100%' }}
         onClick={() => {
-          if (feature?.properties) {
+          if (feature?.properties?.center) {
             map.flyTo(
               feature.properties.center,
               feature.properties.zoom || scanAreasZoom,
@@ -52,48 +56,53 @@ export default function AreaTile({
           }
         }}
       >
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid
-            item
-            // eslint-disable-next-line no-nested-ternary
-            xs={hasManual ? 12 : name ? 11 : 10}
-            style={{ textAlign: 'center' }}
-          >
+        <Grid container alignItems="center" justifyContent="center">
+          <Grid item xs={name ? 11 : 10} style={{ textAlign: 'center' }}>
             <Typography
               variant={name ? 'h6' : 'caption'}
               align="center"
-              style={{ width: '100%', fontWeight: 'bold' }}
+              style={{
+                whiteSpace: 'pre-wrap',
+              }}
             >
               {name || feature.properties.name ? (
                 Utility.getProperName(name || feature.properties.name)
+                  .split(' ')
+                  .join('\n')
               ) : (
                 <>&nbsp;</>
               )}
             </Typography>
           </Grid>
-          {!hasManual && (
-            <Grid item xs={name ? 1 : 2} style={{ textAlign: 'right' }}>
-              <Checkbox
-                size="small"
-                indeterminate={name ? hasSome && !hasAll : false}
-                checked={
+          <Grid item xs={name ? 1 : 2} style={{ textAlign: 'right' }}>
+            <Checkbox
+              size="small"
+              indeterminate={name ? hasSome && !hasAll : false}
+              checked={
+                name
+                  ? hasAll
+                  : scanAreas.filter.areas.includes(feature.properties.name)
+              }
+              onChange={() =>
+                setAreas(
                   name
-                    ? hasAll
-                    : scanAreas.filter.areas.includes(feature.properties.name)
-                }
-                onChange={() =>
-                  setAreas(
-                    name
-                      ? childAreas.map((c) => c.properties.name)
-                      : feature.properties.name,
-                    allAreas,
-                    name ? hasSome : false,
-                  )
-                }
-                disabled={!childAreas.length}
-              />
-            </Grid>
-          )}
+                    ? childAreas.map((c) => c.properties.name)
+                    : feature.properties.name,
+                  allAreas,
+                  name ? hasSome : false,
+                )
+              }
+              style={{
+                color:
+                  !childAreas.length || hasManual
+                    ? feature?.properties?.fillColor ||
+                      feature?.properties?.fill ||
+                      '#212121'
+                    : 'none',
+              }}
+              disabled={!childAreas.length || hasManual}
+            />
+          </Grid>
         </Grid>
       </MenuItem>
     </Grid>

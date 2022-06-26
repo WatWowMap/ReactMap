@@ -314,13 +314,15 @@
       "name": "San Francisco",
       "lat": 37.79539194255634,
       "lon": -122.39333173075096,
-      "parent": "California"
+      "parent": "California",
+      "hidden": false
     },
     {
       "name": "Houston",
       "lat": 33.6145517,
       "lon": -108.6038347,
-      "parent": "Texas"
+      "parent": "Texas",
+      "domain": "map_2.your_map.com"
     }
   ]
 }

@@ -52,15 +52,16 @@ module.exports = class Weather extends Model {
           !merged.length ||
           merged.some(
             (area) =>
-              pointInPolygon(
+              config.scanAreasObj[area] &&
+              (pointInPolygon(
                 point(config.scanAreasObj[area].geometry.coordinates[0][0]),
                 geojson,
               ) ||
-              pointInPolygon(
-                point([cell.longitude, cell.latitude]),
-                config.scanAreasObj[area],
-              ) ||
-              booleanOverlap(geojson, config.scanAreasObj[area]),
+                pointInPolygon(
+                  point([cell.longitude, cell.latitude]),
+                  config.scanAreasObj[area],
+                ) ||
+                booleanOverlap(geojson, config.scanAreasObj[area])),
           )
         return (
           hasOverlap && {
