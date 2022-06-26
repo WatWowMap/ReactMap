@@ -6,7 +6,7 @@ const loadAreas = () => {
     const normalized = { type: 'FeatureCollection', features: [] }
     Object.values(config.scanAreas).forEach((area) => {
       if (area?.features.length) {
-        normalized.features.push(...area.features)
+        normalized.features.push(...area.features.filter((f) => !f.manual))
       }
     })
     return normalized
