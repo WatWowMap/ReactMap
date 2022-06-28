@@ -539,5 +539,9 @@
   "light_map_border": "Borde de mapa claro",
   "dark_map_border": "Borde oscuro del mapa",
   "cell_blocked": "Celda bloqueada",
-  "poi_color": "Color de punto de interés"
+  "poi_color": "Color de punto de interés",
+  "ultra_beast": "Ultrabestia",
+  "quest_condition": "Condición de misión",
+  "always_show_labels": "Mostrar siempre etiquetas",
+  "scan_areas_options": "Opciones de áreas de escaneo"
 }

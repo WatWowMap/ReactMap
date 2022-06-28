@@ -547,5 +547,9 @@
   "light_map_border": "heller Kartenrand",
   "dark_map_border": "dunkler Kartenrand",
   "cell_blocked": "Zelle ist blockiert",
-  "poi_color": "POI Farbe"
+  "poi_color": "POI Farbe",
+  "ultra_beast": "Ultrabestie",
+  "quest_condition": "Questbedingung",
+  "always_show_labels": "Labels immer anzeigen",
+  "scan_areas_options": "Optionen für Scanbereiche"
 }
