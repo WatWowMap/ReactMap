@@ -510,5 +510,9 @@
   "light_map_border": "Bordo mappa chiaro",
   "dark_map_border": "Bordo mappa scuro",
   "cell_blocked": "Cella bloccata",
-  "poi_color": "Colore PDI"
+  "poi_color": "Colore PDI",
+  "ultra_beast": "Ultra bestia",
+  "quest_condition": "Condizione di ricerca",
+  "always_show_labels": "Mostra sempre le etichette",
+  "scan_areas_options": "Opzioni delle aree di scansione"
 }

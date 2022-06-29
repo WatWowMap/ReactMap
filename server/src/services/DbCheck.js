@@ -212,16 +212,16 @@ module.exports = class DbCheck {
     return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]
   }
 
-  async getAvailable(model) {
+  async getAvailable(model, log = true) {
     if (this.models[model]) {
-      console.log(`[DB] Querying available for ${model}`)
+      if (log) console.log(`[DB] Querying available for ${model}`)
       try {
         const results = await Promise.all(
           this.models[model].map(async (source) =>
             source.SubModel.getAvailable(source),
           ),
         )
-        console.log(`[DB] Setting available for ${model}`)
+        if (log) console.log(`[DB] Setting available for ${model}`)
         if (model === 'Pokestop') {
           results.forEach((result) => {
             if ('conditions' in result) {

@@ -1,136 +1,85 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useQuery } from '@apollo/client'
-import { Grid, Paper, MenuItem, Typography, Checkbox } from '@material-ui/core'
-import { useMap } from 'react-leaflet'
+import { Grid, Button, Paper } from '@material-ui/core'
+import { useTranslation } from 'react-i18next'
 
-import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { useStore } from '@hooks/useStore'
+import AreaTile from './AreaTile'
 
 export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
   const { data, loading, error } = useQuery(Query.scanAreasMenu())
-  const map = useMap()
-  const { scanAreas } = useStore((s) => s.filters)
+  const { t } = useTranslation()
   const setAreas = useStore((s) => s.setAreas)
+
+  const allAreas = useMemo(() => {
+    if (data?.scanAreasMenu) {
+      return data.scanAreasMenu.flatMap((parent) =>
+        parent.children
+          .filter((child) => !child.properties.manual)
+          .map((child) => child.properties.name),
+      )
+    }
+    return []
+  }, [data])
 
   if (loading || error) return null
 
   return (
-    <Paper
-      style={{
-        minHeight: 50,
-        maxHeight: scanAreaMenuHeight || 400,
-        width: '100%',
-        overflow: 'auto',
-        backgroundColor: '#212121',
-      }}
-    >
-      {data?.scanAreasMenu?.map(({ name, details, children }) => (
-        <Grid
-          key={name || ''}
-          container
-          alignItems="center"
-          justifyContent="center"
+    <>
+      <Grid
+        item
+        xs={t('drawer_grid_advanced_width')}
+        style={{ textAlign: 'center' }}
+      >
+        <Button
+          onClick={() => setAreas()}
+          variant="contained"
+          color="primary"
+          style={{ minWidth: '80%' }}
         >
-          {Boolean(name) && (
-            <Grid
-              item
-              xs={12}
-              onClick={
-                details
-                  ? () => {
-                      if (details?.properties) {
-                        map.flyTo(
-                          details.properties.center,
-                          details.properties.zoom || scanAreasZoom,
-                        )
-                      }
-                    }
-                  : undefined
-              }
-              style={{
-                border: `1px solid ${details?.properties?.color || 'grey'}`,
-                backgroundColor: details?.properties?.fillColor || 'none',
-              }}
-            >
-              <MenuItem disabled={!details}>
-                <Typography
-                  variant="h6"
-                  align="center"
-                  style={{ width: '100%' }}
-                >
-                  {Utility.getProperName(name)}
-                </Typography>
-              </MenuItem>
-            </Grid>
-          )}
-          {children.map((feat, i) => (
-            <Grid
-              key={feat.properties.name}
-              item
-              xs={
-                children.length % 2 === 1 && i === children.length - 1 ? 12 : 6
-              }
-              onClick={() => {
-                if (feat.properties?.center) {
-                  map.flyTo(
-                    feat.properties.center,
-                    feat.properties.zoom || scanAreasZoom,
-                  )
-                }
-              }}
-              style={{
-                border: `1px solid ${feat.properties.color || 'grey'}`,
-                backgroundColor: feat.properties.fillColor || 'none',
-              }}
-            >
-              <MenuItem disabled={!feat.properties.name}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <Grid item xs={10} style={{ textAlign: 'center' }}>
-                    <Typography
-                      variant="caption"
-                      align="center"
-                      style={{ width: '100%', fontWeight: 'bold' }}
-                      onClick={() => {
-                        if (feat.properties?.center) {
-                          map.flyTo(
-                            feat.properties.center,
-                            feat.properties.zoom || scanAreasZoom,
-                          )
-                        }
-                      }}
-                    >
-                      {feat.properties.name ? (
-                        Utility.getProperName(feat.properties.name)
-                      ) : (
-                        <>&nbsp;</>
-                      )}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={2} style={{ textAlign: 'right' }}>
-                    <Checkbox
-                      size="small"
-                      checked={scanAreas.filter.areas.includes(
-                        feat.properties.name,
-                      )}
-                      style={{
-                        color: feat.properties.name ? 'none' : '#212121',
-                        display: feat.properties.manual ? 'none' : 'block',
-                      }}
-                      onChange={() => setAreas(feat.properties.name)}
-                      disabled={!feat.properties.name || feat.properties.manual}
-                    />
-                  </Grid>
-                </Grid>
-              </MenuItem>
-            </Grid>
-          ))}
-        </Grid>
-      ))}
-    </Paper>
+          {t('reset')}
+        </Button>
+      </Grid>
+      <Paper
+        style={{
+          minHeight: 50,
+          maxHeight: scanAreaMenuHeight || 400,
+          width: '100%',
+          overflow: 'auto',
+          backgroundColor: '#212121',
+        }}
+      >
+        {data?.scanAreasMenu?.map(({ name, details, children }) => (
+          <Grid
+            key={name || ''}
+            container
+            alignItems="stretch"
+            justifyContent="center"
+          >
+            {name && (
+              <AreaTile
+                key={name}
+                name={name}
+                feature={details}
+                allAreas={allAreas}
+                childAreas={children}
+                scanAreasZoom={scanAreasZoom}
+              />
+            )}
+            {children.map((feature, i) => (
+              <AreaTile
+                key={feature?.properties?.name || i}
+                feature={feature}
+                allAreas={allAreas}
+                childAreas={children}
+                scanAreasZoom={scanAreasZoom}
+                i={i}
+              />
+            ))}
+          </Grid>
+        ))}
+      </Paper>
+    </>
   )
 }

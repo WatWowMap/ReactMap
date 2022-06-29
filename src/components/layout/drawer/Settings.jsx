@@ -90,7 +90,7 @@ export default function Settings({ Icons }) {
             <Select
               autoFocus
               name={setting}
-              value={config[setting][settings[setting]]?.name}
+              value={config[setting][settings[setting]]?.name || ''}
               onChange={handleChange}
               fullWidth
             >

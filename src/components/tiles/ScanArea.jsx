@@ -13,6 +13,9 @@ export function ScanAreaTile({
   userSettings,
 }) {
   const setAreas = useStore((s) => s.setAreas)
+  const names = item.features
+    .filter((f) => !f.properties.manual)
+    .map((f) => f.properties.name)
 
   const handleClick = (name) => {
     if (selectedAreas.includes(name)) {
@@ -53,7 +56,7 @@ export function ScanAreaTile({
       if (webhookMode) {
         layer.on('click', () => handleClick(name.toLowerCase()))
       } else if (!feature.properties.manual) {
-        layer.on('click', () => setAreas(name))
+        layer.on('click', () => setAreas(name, names))
       }
     }
   }

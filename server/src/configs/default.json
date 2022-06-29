@@ -31,15 +31,15 @@
       "weather": 30
     },
     "queryUpdateHours": {
-      "pokemon": 0.5,
-      "quests": 1,
-      "raids": 0.5,
-      "nests": 3
+      "pokemon": 0.25,
+      "quests": 0.5,
+      "raids": 0.2,
+      "nests": 1
     },
     "queryOnSessionInit": {
       "pokemon": false,
       "quests": false,
-      "raids": false,
+      "raids": true,
       "nests": false
     },
     "queryLimits": {
@@ -94,7 +94,7 @@
       "minZoom": 10,
       "maxZoom": 18,
       "interactionRangeZoom": 15,
-      "scanAreasZoom": 12,
+      "scanAreasZoom": 15,
       "scanCellsZoom": 13,
       "submissionZoom": 15,
       "activeWeatherZoom": 13,
@@ -104,10 +104,16 @@
     "localeSelection": [
       "en",
       "de",
-      "pl",
       "es",
       "fr",
-      "nl"
+      "it",
+      "ja",
+      "ko",
+      "nl",
+      "pl",
+      "ru",
+      "sv",
+      "th"
     ],
     "customRoutes": {
       "discordAuthUrl": "/auth/discord/callback",
@@ -147,7 +153,7 @@
       "permImageDir": "images/perms",
       "permArrayImages": false,
       "clientTimeoutMinutes": 30,
-      "distanceUnit" : "km"
+      "distanceUnit": "km"
     },
     "theme": {
       "style": "dark",

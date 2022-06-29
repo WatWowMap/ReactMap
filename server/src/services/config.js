@@ -166,51 +166,54 @@ config.authMethods = [
   }
 })
 
+const manualGeojson = {
+  type: 'FeatureCollection',
+  features: config.manualAreas
+    .filter((area) =>
+      ['lat', 'lon', 'name'].every((k) => k in area && !area.hidden),
+    )
+    .map((area) => {
+      const { lat, lon, ...rest } = area
+      return {
+        type: 'Feature',
+        properties: {
+          center: [lat, lon],
+          manual: true,
+          ...rest,
+        },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[lon, lat]]],
+        },
+      }
+    }),
+}
+
 // Load each areas.json
-const loadScanPolygons = (fileName) => {
+const loadScanPolygons = (fileName, domain) => {
   const geojson = fs.existsSync(resolve(`${__dirname}/../configs/${fileName}`))
     ? JSON.parse(fs.readFileSync(resolve(__dirname, `../configs/${fileName}`)))
     : { features: [] }
   return {
     ...geojson,
-    features: geojson.features
-      .filter((f) => !f.properties.hidden)
-      .map((f) => ({
+    features: [
+      ...manualGeojson.features.filter(
+        (f) => !f.properties.domain || f.properties.domain === domain,
+      ),
+      ...geojson.features.map((f) => ({
         ...f,
         properties: {
           ...f.properties,
           center: center(f).geometry.coordinates.reverse(),
         },
-      }))
-      .sort((a, b) => a.properties.name.localeCompare(b.properties.name)),
+      })),
+    ].sort((a, b) => a.properties.name.localeCompare(b.properties.name)),
   }
 }
 
 // Check if an areas.json exists
 config.scanAreas = {
-  main: config.manualAreas.length
-    ? {
-        type: 'FeatureCollection',
-        features: config.manualAreas
-          .filter((area) => ['lat', 'lon', 'name'].every((k) => k in area))
-          .map((area) => {
-            const { lat, lon, ...rest } = area
-            return {
-              type: 'Feature',
-              properties: {
-                center: [lat, lon],
-                manual: true,
-                ...rest,
-              },
-              geometry: {
-                type: 'Polygon',
-                coordinates: [[[lon, lat]]],
-              },
-            }
-          })
-          .sort((a, b) => a.properties.name.localeCompare(b.properties.name)),
-      }
-    : loadScanPolygons(config.map.geoJsonFileName),
+  main: loadScanPolygons(config.map.geoJsonFileName),
   ...Object.fromEntries(
     config.multiDomains.map((d) => [
       d.general?.geoJsonFileName ? d.domain : 'main',
@@ -224,7 +227,13 @@ config.scanAreas = {
 config.scanAreasMenu = Object.fromEntries(
   Object.entries(config.scanAreas).map(([domain, areas]) => {
     const parents = { '': { children: [], name: '' } }
-    areas.features.forEach((feature) => {
+
+    const noHidden = {
+      ...areas,
+      features: areas.features.filter((f) => !f.properties.hidden),
+    }
+    // Finds unique parents and determines if the parents have their own properties
+    noHidden.features.forEach((feature) => {
       if (feature.properties.parent) {
         parents[feature.properties.parent] = {
           name: feature.properties.parent,
@@ -235,13 +244,17 @@ config.scanAreasMenu = Object.fromEntries(
         }
       }
     })
-    areas.features.forEach((feature) => {
+
+    // Finds the children of each parent
+    noHidden.features.forEach((feature) => {
       if (feature.properties.parent) {
         parents[feature.properties.parent].children.push(feature)
       } else if (!parents[feature.properties.name]) {
         parents[''].children.push(feature)
       }
     })
+
+    // Create blanks for better formatting when there's an odd number of children
     Object.values(parents).forEach(({ children }) => {
       if (children.length % 2 === 1) {
         children.push({

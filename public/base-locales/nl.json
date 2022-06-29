@@ -542,5 +542,9 @@
   "light_map_border": "Lichte kaartrand",
   "dark_map_border": "Donkere kaartrand",
   "cell_blocked": "Cel geblokkeerd",
-  "poi_color": "POI-kleur"
+  "poi_color": "POI-kleur",
+  "ultra_beast": "Ultrabeest",
+  "quest_condition": "Quest-voorwaarde",
+  "always_show_labels": "Altijd labels weergeven",
+  "scan_areas_options": "Opties voor scangebieden"
 }
