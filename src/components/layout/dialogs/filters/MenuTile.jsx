@@ -1,16 +1,20 @@
 import React, { useState } from 'react'
 import { Grid, IconButton, Typography } from '@material-ui/core'
-import {
-  Check, Clear, Tune, FormatSize, Settings,
-} from '@material-ui/icons'
+import { Check, Clear, Tune, FormatSize, Settings } from '@material-ui/icons'
 
-export default function MenuTile({
-  data, rowIndex, columnIndex, style,
-}) {
+export default function MenuTile({ data, rowIndex, columnIndex, style }) {
   const [name, setName] = useState(true)
   const {
-    tileItem, columnCount, tempFilters, setTempFilters, toggleAdvMenu,
-    isMobile, type, toggleSlotsMenu, Utility, standard,
+    tileItem,
+    columnCount,
+    tempFilters,
+    setTempFilters,
+    toggleAdvMenu,
+    isMobile,
+    type,
+    toggleSlotsMenu,
+    Utility,
+    standard,
   } = data
 
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -27,7 +31,11 @@ export default function MenuTile({
       ...tempFilters,
       [item.id]: newFilter,
     })
-    Utility.analytics('Filtering', `${item.name} Status: ${!tempFilters[item.id]?.enabled}`, type)
+    Utility.analytics(
+      'Filtering',
+      `${item.name} Status: ${!tempFilters[item.id]?.enabled}`,
+      type,
+    )
   }
 
   const image = (
@@ -44,9 +52,11 @@ export default function MenuTile({
   )
   const selection = (
     <IconButton onClick={handleFilterChange}>
-      {tempFilters[item.id]?.enabled
-        ? <Check style={{ color: '#00e676' }} />
-        : <Clear color="primary" />}
+      {tempFilters[item.id]?.enabled ? (
+        <Check style={{ color: '#00e676' }} />
+      ) : (
+        <Clear color="primary" />
+      )}
     </IconButton>
   )
 
@@ -54,15 +64,23 @@ export default function MenuTile({
     if (type === 'pokemon') {
       return <Tune style={{ color: 'white' }} />
     }
-    if (item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0) {
+    if (
+      (type === 'pokestops' &&
+        !item.id.startsWith('l') &&
+        !item.id.startsWith('i')) ||
+      (item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0)
+    ) {
       return <Settings style={{ color: 'white' }} />
     }
     return <FormatSize style={{ color: 'white' }} />
   }
   const advMenu = (
     <IconButton
-      onClick={(item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0)
-        ? toggleSlotsMenu(true, item.id.charAt(1)) : toggleAdvMenu(true, item.id)}
+      onClick={
+        item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0
+          ? toggleSlotsMenu(true, item.id.charAt(1))
+          : toggleAdvMenu(true, item.id)
+      }
     >
       {getAdvMenuIcon()}
     </IconButton>

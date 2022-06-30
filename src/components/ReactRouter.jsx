@@ -20,13 +20,13 @@ export default function ReactRouter({ serverSettings, getServerSettings }) {
       <Route path="reset" element={<ClearStorage />} />
       <Route
         path="login"
-        element={(
+        element={
           <Login
             clickedTwice
             serverSettings={serverSettings}
             getServerSettings={getServerSettings}
           />
-        )}
+        }
       />
       <Route path="@/:lat/:lon" element={authRoute} />
       <Route path="@/:lat/:lon/:zoom" element={authRoute} />

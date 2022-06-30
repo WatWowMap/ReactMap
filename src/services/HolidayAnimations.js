@@ -17,9 +17,9 @@ export default class HolidayAnimations {
   }
 
   move() {
-    this.images.forEach(item => {
+    this.images.forEach((item) => {
       item.y += item.ys
-      item.x += item.x > (this.h / 2) ? item.xs : -item.xs
+      item.x += item.x > this.h / 2 ? item.xs : -item.xs
       if (item.y > this.h) {
         item.x = Math.random() * this.w
         item.y = -1 * this.imageHeight
@@ -30,7 +30,7 @@ export default class HolidayAnimations {
   draw() {
     this.setCanvasSize()
     this.ctx.clearRect(0, 0, this.w, this.h)
-    this.images.forEach(item => {
+    this.images.forEach((item) => {
       item.image = new Image()
       item.image.style.height = item.height
       item.image.src = this.image
@@ -46,7 +46,7 @@ export default class HolidayAnimations {
     }
     this.setCanvasSize()
     for (let a = 0; a < 30; a += 1) {
-      const scale = (Math.random() * (1 - this.minScale)) + this.minScale
+      const scale = Math.random() * (1 - this.minScale) + this.minScale
       this.images.push({
         x: Math.random() * this.w,
         xs: Math.random() * 2 - 1,

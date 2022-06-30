@@ -8,7 +8,7 @@ import getAllWeather from './queries/weather'
 import getAllScanCells from './queries/scanCell'
 import getAllSubmissionCells from './queries/submissionCells'
 import { getOne, getAllNests } from './queries/nest'
-import getAllScanAreas from './queries/scanAreas'
+import { getAllScanAreas, getScanAreasMenu } from './queries/scanAreas'
 import * as searchIndex from './queries/search'
 import * as webhookIndex from './queries/webhook'
 import scanner from './queries/scanner'
@@ -28,15 +28,22 @@ export default class Query {
       return gymIndex.getBadges
     }
     const permObj = {
-      Gyms: filters.raids ? filters.allGyms || perms.allGyms : filters.allGyms && perms.allGyms,
+      Gyms: filters.raids
+        ? filters.allGyms || perms.allGyms
+        : filters.allGyms && perms.allGyms,
       Raids: filters.raids && perms.raids,
     }
     let query = 'get'
-    Object.keys(permObj).forEach(keyPerm => {
+    Object.keys(permObj).forEach((keyPerm) => {
       if (permObj[keyPerm]) query += keyPerm
     })
-    if (query === 'get'
-      && (filters.exEligible || filters.inBattle || filters.arEligible || filters.gymBadges)) {
+    if (
+      query === 'get' &&
+      (filters.exEligible ||
+        filters.inBattle ||
+        filters.arEligible ||
+        filters.gymBadges)
+    ) {
       query += 'Gyms'
     }
 
@@ -61,7 +68,7 @@ export default class Query {
     }
     let query = 'get'
 
-    Object.keys(permObj).forEach(keyPerm => {
+    Object.keys(permObj).forEach((keyPerm) => {
       if (permObj[keyPerm]) query += keyPerm
     })
 
@@ -79,7 +86,7 @@ export default class Query {
     }
     let query = 'get'
 
-    Object.keys(permObj).forEach(keyPerm => {
+    Object.keys(permObj).forEach((keyPerm) => {
       if (permObj[keyPerm]) query += keyPerm
     })
     if (query === 'get') query += 'Pokemon'
@@ -115,13 +122,20 @@ export default class Query {
     return getAllScanAreas
   }
 
+  static scanAreasMenu() {
+    return getScanAreasMenu
+  }
+
   static search(category) {
     switch (category) {
       case 'raids':
       case 'nests':
-      case 'quests': return searchIndex[category]
-      case 'webhook': return searchIndex.poiWebhook
-      default: return searchIndex.poi
+      case 'quests':
+        return searchIndex[category]
+      case 'webhook':
+        return searchIndex.poiWebhook
+      default:
+        return searchIndex.poi
     }
   }
 

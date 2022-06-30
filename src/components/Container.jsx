@@ -18,11 +18,8 @@ export default function Container({ serverSettings, params, location, zoom }) {
       zoomControl={false}
       preferCanvas
     >
-      {(serverSettings.user && serverSettings.user.perms.map) && (
-        <Map
-          serverSettings={serverSettings}
-          params={params}
-        />
+      {serverSettings.user && serverSettings.user.perms.map && (
+        <Map serverSettings={serverSettings} params={params} />
       )}
     </MapContainer>
   )

@@ -1,9 +1,8 @@
-name: Lint
-on: [push]
+name: Release
+on: [release]
 
 jobs:
-  lint:
-    name: Run Basic Checks
+  sentry:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -20,11 +19,5 @@ jobs:
       - name: Install Dependencies
         run: yarn
 
-      - name: Lint
-        run: yarn eslint:check
-
-      - name: Prettier
-        run: yarn prettier:check
-
-      - name: Build
-        run: yarn build
+      - name: Sentry Build
+        run: yarn release

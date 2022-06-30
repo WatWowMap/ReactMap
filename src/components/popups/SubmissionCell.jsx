@@ -11,9 +11,11 @@ export default function SubmissionCellPopup({ cell }) {
   if (cell.count_gyms < 3) {
     untilNextGym = gymThreshold[cell.count_gyms] - cell.count
   }
-  if ((cell.count === 1 && cell.count_gyms < 1)
-    || (cell.count === 5 && cell.count_gyms < 2)
-    || (cell.count === 19 && cell.count_gyms < 3)) {
+  if (
+    (cell.count === 1 && cell.count_gyms < 1) ||
+    (cell.count === 5 && cell.count_gyms < 2) ||
+    (cell.count === 19 && cell.count_gyms < 3)
+  ) {
     untilNextGym = t('next_submission')
   }
 
@@ -24,9 +26,7 @@ export default function SubmissionCellPopup({ cell }) {
   return (
     <>
       <Typography variant="h6" align="center">
-        <Trans i18nKey="s2_cell_level">
-          {{ level: cell.level }}
-        </Trans>
+        <Trans i18nKey="s2_cell_level">{{ level: cell.level }}</Trans>
       </Typography>
       <Typography variant="subtitle2" align="center">
         {t('total_count')}: {cell.count}

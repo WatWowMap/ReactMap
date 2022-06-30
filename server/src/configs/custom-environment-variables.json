@@ -352,6 +352,10 @@
         "__name": "MAP_MISC_NO_SCAN_AREA_OVERLAY",
         "__format": "boolean"
       },
+      "scanAreaMenuHeight": {
+        "__name": "MAP_MISC_SCAN_AREA_MENU_HEIGHT",
+        "__format": "number"
+      },
       "permImageDir": "MAP_MISC_PERM_IMAGE_DIR",
       "permArrayImages": {
         "__name": "MAP_MISC_PERM_ARRAY_IMAGES",
@@ -632,6 +636,12 @@
       "darkMapBorder": "CLIENT_SIDE_OPTIONS_WAYFARER_DARK_MAP_BORDER",
       "cellBlocked": "CLIENT_SIDE_OPTIONS_WAYFARER_CELL_BLOCKED",
       "poiColor": "CLIENT_SIDE_OPTIONS_WAYFARER_POI_COLOR"
+    },
+    "scanAreas": {
+      "alwaysShowLabels": {
+        "__name": "CLIENT_SIDE_OPTIONS_SCAN_AREAS_ALWAYS_SHOW_LABELS",
+        "__format": "boolean"
+      }
     },
     "weather": {
       "clickableIcon": {

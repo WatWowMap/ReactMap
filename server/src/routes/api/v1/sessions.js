@@ -5,10 +5,12 @@ const { Session } = require('../../../models/index')
 
 router.get('/', async (req, res) => {
   try {
-    if (api.reactMapSecret && req.headers['react-map-secret'] === api.reactMapSecret) {
-      const ts = Math.floor((new Date()).getTime() / 1000)
-      res.status(200).json(await Session.query()
-        .where('expires', '>=', ts))
+    if (
+      api.reactMapSecret &&
+      req.headers['react-map-secret'] === api.reactMapSecret
+    ) {
+      const ts = Math.floor(new Date().getTime() / 1000)
+      res.status(200).json(await Session.query().where('expires', '>=', ts))
     } else {
       throw new Error('Incorrect or missing API secret')
     }
@@ -20,9 +22,13 @@ router.get('/', async (req, res) => {
 })
 router.get('/hasValid/:id', async (req, res) => {
   try {
-    if (api.reactMapSecret && req.headers['react-map-secret'] === api.reactMapSecret) {
-      const results = await Session.query()
-        .whereRaw(`json_extract(data, '$.passport.user.id') = ${req.params.id}`)
+    if (
+      api.reactMapSecret &&
+      req.headers['react-map-secret'] === api.reactMapSecret
+    ) {
+      const results = await Session.query().whereRaw(
+        `json_extract(data, '$.passport.user.id') = ${req.params.id}`,
+      )
       res.status(200).json({
         valid: Boolean(results.length),
         length: results.length,
@@ -38,7 +44,10 @@ router.get('/hasValid/:id', async (req, res) => {
 
 router.get('/clearSessions/:id', async (req, res) => {
   try {
-    if (api.reactMapSecret && req.headers['react-map-secret'] === api.reactMapSecret) {
+    if (
+      api.reactMapSecret &&
+      req.headers['react-map-secret'] === api.reactMapSecret
+    ) {
       const results = await Session.query()
         .whereRaw(`json_extract(data, '$.passport.user.id') = ${req.params.id}`)
         .delete()
@@ -48,7 +57,10 @@ router.get('/clearSessions/:id', async (req, res) => {
     }
     console.log(`[API] api/v1/sessions/clearSessions/${req.params.id}`)
   } catch (e) {
-    console.error(`[API Error] api/v1/sessions/clearSessions/${req.params.id}`, e)
+    console.error(
+      `[API Error] api/v1/sessions/clearSessions/${req.params.id}`,
+      e,
+    )
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })

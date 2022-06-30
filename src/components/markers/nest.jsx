@@ -2,12 +2,24 @@ import React from 'react'
 import { renderToString } from 'react-dom/server'
 import L from 'leaflet'
 
-export default function nestMarker(iconUrl, nest, pokemon, filters, Icons, recent) {
+export default function nestMarker(
+  iconUrl,
+  nest,
+  pokemon,
+  filters,
+  Icons,
+  recent,
+) {
   const { types } = pokemon
   const filterId = `${nest.pokemon_id}-${nest.pokemon_form}`
   const size = Icons.getSize('nest', filters.filter[filterId])
   const {
-    offsetX, offsetY, popupX, popupY, sizeMultiplier, nestMonSizeMulti = 1,
+    offsetX,
+    offsetY,
+    popupX,
+    popupY,
+    sizeMultiplier,
+    nestMonSizeMulti = 1,
   } = Icons.getModifiers('nest')
   const { nest: nestMod } = Icons.modifiers
   const opacity = recent ? 1 : 0.5

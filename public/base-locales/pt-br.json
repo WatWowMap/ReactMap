@@ -510,5 +510,9 @@
   "light_map_border": "Borda do mapa de luz",
   "dark_map_border": "Borda do mapa escuro",
   "cell_blocked": "Célula bloqueada",
-  "poi_color": "Cor do POI"
+  "poi_color": "Cor do POI",
+  "ultra_beast": "Ultra Besta",
+  "quest_condition": "Condição da Missão",
+  "always_show_labels": "Sempre mostrar marcadores",
+  "scan_areas_options": "Opções de áreas de digitalização"
 }

@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Grid, Typography, Slider, TextField,
-} from '@material-ui/core'
+import { Grid, Typography, Slider, TextField } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 export default function SliderTile({
   filterSlide: {
-    name, min, max, color, disabled, label, low, high, step, i18nKey,
-  }, handleChange, filterValues,
+    name,
+    min,
+    max,
+    color,
+    disabled,
+    label,
+    low,
+    high,
+    step,
+    i18nKey,
+  },
+  handleChange,
+  filterValues,
 }) {
   const { t } = useTranslation()
   const [tempValues, setTempValues] = useState(filterValues[name])
@@ -46,22 +55,29 @@ export default function SliderTile({
     }
   }
 
-  const textColor = (tempValues[0] === min && tempValues[1] === max) || disabled ? '#616161' : 'white'
+  const textColor =
+    (tempValues[0] === min && tempValues[1] === max) || disabled
+      ? '#616161'
+      : 'white'
 
   return (
-    <Grid
-      container
-      direction="row"
-      justifyContent="center"
-      alignItems="center"
-    >
+    <Grid container direction="row" justifyContent="center" alignItems="center">
       <Grid item xs={4}>
-        <Typography noWrap={fullName} onClick={() => setFullName(!fullName)} style={{ color: textColor }}>
+        <Typography
+          noWrap={fullName}
+          onClick={() => setFullName(!fullName)}
+          style={{ color: textColor }}
+        >
           {t(i18nKey || `slider_${name}`)}
         </Typography>
       </Grid>
       {['min', 'max'].map((each, index) => (
-        <Grid item xs={4} key={`${name}-${each}`} style={{ textAlign: index ? 'center' : 'right' }}>
+        <Grid
+          item
+          xs={4}
+          key={`${name}-${each}`}
+          style={{ textAlign: index ? 'center' : 'right' }}
+        >
           <TextField
             style={{ width: 80 }}
             color={color}

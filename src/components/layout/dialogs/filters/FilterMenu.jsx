@@ -3,7 +3,11 @@ import Menu from '@components/layout/general/Menu'
 import Tile from '@components/layout/dialogs/filters/MenuTile'
 
 export default function FilterMenu({
-  toggleDialog, category, isMobile, isTablet, filters,
+  toggleDialog,
+  category,
+  isMobile,
+  isTablet,
+  filters,
 }) {
   const [tempFilters, setTempFilters] = useState(filters.filter)
   return (
@@ -18,7 +22,12 @@ export default function FilterMenu({
       tempFilters={tempFilters}
       setTempFilters={setTempFilters}
       extraButtons={[
-        { name: 'save', action: toggleDialog(false, category, 'filters', tempFilters), icon: 'Save', color: 'secondary' },
+        {
+          name: 'save',
+          action: toggleDialog(false, category, 'filters', tempFilters),
+          icon: 'Save',
+          color: 'secondary',
+        },
       ]}
     />
   )

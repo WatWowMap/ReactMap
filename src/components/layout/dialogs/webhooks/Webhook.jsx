@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-import {
-  useMediaQuery, Dialog,
-} from '@material-ui/core'
+import { useMediaQuery, Dialog } from '@material-ui/core'
 import { useTheme } from '@material-ui/core/styles'
 
 import useStyles from '@hooks/useStyles'
@@ -11,9 +9,7 @@ import DraggableMarker from './Draggable'
 import Manage from './Manage'
 import AreaSelection from './AreaSelection'
 
-export default function Main({
-  webhookMode, setWebhookMode, Icons, map,
-}) {
+export default function Main({ webhookMode, setWebhookMode, Icons, map }) {
   const theme = useTheme()
   const classes = useStyles()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
@@ -22,11 +18,11 @@ export default function Main({
   const [selectedAreas, setSelectedAreas] = useState([])
   const [webhookLocation, setWebhookLocation] = useState([])
 
-  const webhookData = useStatic(s => s.webhookData)
-  const setWebhookData = useStatic(s => s.setWebhookData)
+  const webhookData = useStatic((s) => s.webhookData)
+  const setWebhookData = useStatic((s) => s.setWebhookData)
 
-  const selectedWebhook = useStore(s => s.selectedWebhook)
-  const setSelectedWebhook = useStore(s => s.setSelectedWebhook)
+  const selectedWebhook = useStore((s) => s.selectedWebhook)
+  const setSelectedWebhook = useStore((s) => s.setSelectedWebhook)
 
   return (
     <>

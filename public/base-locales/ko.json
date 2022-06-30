@@ -510,5 +510,9 @@
   "light_map_border": "라이트 맵 테두리",
   "dark_map_border": "어두운 지도 테두리",
   "cell_blocked": "차단된 셀",
-  "poi_color": "POI 색상"
+  "poi_color": "POI 색상",
+  "ultra_beast": "울트라 비스트",
+  "quest_condition": "퀘스트 조건",
+  "always_show_labels": "항상 레이블 표시",
+  "scan_areas_options": "스캔 영역 옵션"
 }

@@ -1,63 +1,85 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useQuery } from '@apollo/client'
-import {
-  Paper, MenuItem, MenuList, Typography,
-} from '@material-ui/core'
-import center from '@turf/center'
-import { useMap } from 'react-leaflet'
+import { Grid, Button, Paper } from '@material-ui/core'
+import { useTranslation } from 'react-i18next'
 
-import Utility from '@services/Utility'
 import Query from '@services/Query'
+import { useStore } from '@hooks/useStore'
+import AreaTile from './AreaTile'
 
-export default function AreaDropDown({ scanAreasZoom, manualAreas }) {
-  const { data } = useQuery(Query.scanAreas(), {
-    variables: { version: inject.VERSION },
-  })
-  const map = useMap()
+export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
+  const { data, loading, error } = useQuery(Query.scanAreasMenu())
+  const { t } = useTranslation()
+  const setAreas = useStore((s) => s.setAreas)
+
+  const allAreas = useMemo(() => {
+    if (data?.scanAreasMenu) {
+      return data.scanAreasMenu.flatMap((parent) =>
+        parent.children
+          .filter((child) => !child.properties.manual)
+          .map((child) => child.properties.name),
+      )
+    }
+    return []
+  }, [data])
+
+  if (loading || error) return null
 
   return (
-    <Paper
-      style={{
-        minHeight: 50,
-        maxHeight: 250,
-        width: '100%',
-        overflow: 'auto',
-        backgroundColor: '#212121',
-      }}
-    >
-      {Object.keys(manualAreas).length ? (
-        <MenuList>
-          {Object.keys(manualAreas).map(area => (
-            <MenuItem
-              key={area}
-              onClick={() => {
-                const { lat, lon, zoom } = manualAreas[area]
-                map.flyTo([lat, lon], zoom || scanAreasZoom)
-              }}
-            >
-              <Typography variant="subtitle2" align="center">
-                {area}
-              </Typography>
-            </MenuItem>
-          ))}
-        </MenuList>
-      ) : (
-        <MenuList>
-          {data && data.scanAreas[0].features.map(area => (
-            <MenuItem
-              key={area.properties.name}
-              onClick={() => {
-                const [lon, lat] = center(area).geometry.coordinates
-                map.flyTo([lat, lon], scanAreasZoom)
-              }}
-            >
-              <Typography variant="subtitle2" align="center">
-                {Utility.getProperName(area.properties.name)}
-              </Typography>
-            </MenuItem>
-          ))}
-        </MenuList>
-      )}
-    </Paper>
+    <>
+      <Grid
+        item
+        xs={t('drawer_grid_advanced_width')}
+        style={{ textAlign: 'center' }}
+      >
+        <Button
+          onClick={() => setAreas()}
+          variant="contained"
+          color="primary"
+          style={{ minWidth: '80%' }}
+        >
+          {t('reset')}
+        </Button>
+      </Grid>
+      <Paper
+        style={{
+          minHeight: 50,
+          maxHeight: scanAreaMenuHeight || 400,
+          width: '100%',
+          overflow: 'auto',
+          backgroundColor: '#212121',
+        }}
+      >
+        {data?.scanAreasMenu?.map(({ name, details, children }) => (
+          <Grid
+            key={name || ''}
+            container
+            alignItems="stretch"
+            justifyContent="center"
+          >
+            {name && (
+              <AreaTile
+                key={name}
+                name={name}
+                feature={details}
+                allAreas={allAreas}
+                childAreas={children}
+                scanAreasZoom={scanAreasZoom}
+              />
+            )}
+            {children.map((feature, i) => (
+              <AreaTile
+                key={feature?.properties?.name || i}
+                feature={feature}
+                allAreas={allAreas}
+                childAreas={children}
+                scanAreasZoom={scanAreasZoom}
+                i={i}
+              />
+            ))}
+          </Grid>
+        ))}
+      </Paper>
+    </>
   )
 }

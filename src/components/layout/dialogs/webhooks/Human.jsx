@@ -1,8 +1,11 @@
-import React, {
-  useState, useEffect, memo,
-} from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import {
-  Grid, Divider, Typography, Select, MenuItem, Switch,
+  Grid,
+  Divider,
+  Typography,
+  Select,
+  MenuItem,
+  Switch,
 } from '@material-ui/core'
 import { useMutation } from '@apollo/client'
 import { Trans } from 'react-i18next'
@@ -14,20 +17,32 @@ import Location from './Location'
 import Areas from './Areas'
 
 const Human = ({
-  webhookMode, setWebhookMode,
-  selectedAreas, setSelectedAreas,
-  selectedWebhook, setSelectedWebhook,
-  webhookLocation, setWebhookLocation,
-  isMobile, t, webhookData, setWebhookData,
+  webhookMode,
+  setWebhookMode,
+  selectedAreas,
+  setSelectedAreas,
+  selectedWebhook,
+  setSelectedWebhook,
+  webhookLocation,
+  setWebhookLocation,
+  isMobile,
+  t,
+  webhookData,
+  setWebhookData,
   setWebhookAlert,
 }) => {
-  const { perms } = useStatic(s => s.auth)
-  const location = useStore(s => s.location)
-  const [syncWebhook, { data: newWebhookData }] = useMutation(Query.webhook('setHuman'), {
-    fetchPolicy: 'no-cache',
-  })
+  const { perms } = useStatic((s) => s.auth)
+  const location = useStore((s) => s.location)
+  const [syncWebhook, { data: newWebhookData }] = useMutation(
+    Query.webhook('setHuman'),
+    {
+      fetchPolicy: 'no-cache',
+    },
+  )
 
-  const [currentHuman, setCurrentHuman] = useState(webhookData[selectedWebhook].human)
+  const [currentHuman, setCurrentHuman] = useState(
+    webhookData[selectedWebhook].human,
+  )
 
   useEffect(() => {
     if (newWebhookData?.webhook) {
@@ -35,7 +50,11 @@ const Human = ({
         setWebhookAlert({
           open: true,
           severity: newWebhookData.webhook.status,
-          message: <Trans i18nKey={newWebhookData.webhook.message}>{{ name: selectedWebhook }}</Trans>,
+          message: (
+            <Trans i18nKey={newWebhookData.webhook.message}>
+              {{ name: selectedWebhook }}
+            </Trans>
+          ),
         })
       } else if (newWebhookData.webhook.human) {
         setWebhookData({
@@ -60,24 +79,22 @@ const Human = ({
     setSelectedAreas(JSON.parse(area))
   }, [currentHuman])
 
-  useEffect(() => () => setWebhookData({
-    ...webhookData,
-    [selectedWebhook]: {
-      ...webhookData[selectedWebhook],
-      human: currentHuman,
-    },
-  }))
+  useEffect(
+    () => () =>
+      setWebhookData({
+        ...webhookData,
+        [selectedWebhook]: {
+          ...webhookData[selectedWebhook],
+          human: currentHuman,
+        },
+      }),
+  )
 
   const multipleHooks = perms.webhooks.length > 1
   const gridSize = multipleHooks ? 2 : 3
 
   return (
-    <Grid
-      container
-      justifyContent="flex-start"
-      alignItems="center"
-      spacing={2}
-    >
+    <Grid container justifyContent="flex-start" alignItems="center" spacing={2}>
       <Grid
         container
         item
@@ -87,15 +104,15 @@ const Human = ({
         spacing={2}
       >
         <Grid item xs={6} sm={gridSize}>
-          <Typography variant="h6">
-            {t('select_profile')}
-          </Typography>
+          <Typography variant="h6">{t('select_profile')}</Typography>
         </Grid>
         <Grid item xs={6} sm={gridSize} style={{ textAlign: 'center' }}>
           <Select
-            value={webhookData[selectedWebhook].profile.length
-              ? currentHuman.current_profile_no
-              : ''}
+            value={
+              webhookData[selectedWebhook].profile.length
+                ? currentHuman.current_profile_no
+                : ''
+            }
             onChange={(e) => {
               syncWebhook({
                 variables: {
@@ -109,16 +126,16 @@ const Human = ({
             style={{ minWidth: 100 }}
           >
             {webhookData[selectedWebhook].profile.map((profile) => (
-              <MenuItem key={profile.profile_no} value={profile.profile_no}>{profile.name}</MenuItem>
+              <MenuItem key={profile.profile_no} value={profile.profile_no}>
+                {profile.name}
+              </MenuItem>
             ))}
           </Select>
         </Grid>
         {multipleHooks && (
           <>
             <Grid item xs={6} sm={gridSize}>
-              <Typography variant="h6">
-                {t('select_webhook')}
-              </Typography>
+              <Typography variant="h6">{t('select_webhook')}</Typography>
             </Grid>
             <Grid item xs={6} sm={gridSize} style={{ textAlign: 'center' }}>
               <Select
@@ -127,16 +144,16 @@ const Human = ({
                 style={{ minWidth: 100 }}
               >
                 {perms.webhooks.map((webhook) => (
-                  <MenuItem key={webhook} value={webhook}>{webhook}</MenuItem>
+                  <MenuItem key={webhook} value={webhook}>
+                    {webhook}
+                  </MenuItem>
                 ))}
               </Select>
             </Grid>
           </>
         )}
         <Grid item xs={6} sm={gridSize}>
-          <Typography variant="h6">
-            {t('enabled')}
-          </Typography>
+          <Typography variant="h6">{t('enabled')}</Typography>
         </Grid>
         <Grid item xs={6} sm={gridSize} style={{ textAlign: 'center' }}>
           <Switch
@@ -189,7 +206,9 @@ const Human = ({
           currentHuman={currentHuman}
           isMobile={isMobile}
         />
-      ) : <Typography>{`Invalid Area File Received from ${selectedWebhook}`}</Typography>}
+      ) : (
+        <Typography>{`Invalid Area File Received from ${selectedWebhook}`}</Typography>
+      )}
     </Grid>
   )
 }
@@ -198,16 +217,17 @@ const areEqual = (prev, next) => {
   const prevSelected = prev.webhookData[prev.selectedWebhook]
   const nextSelected = next.webhookData[next.selectedWebhook]
   return (
-    prev.selectedWebhook === next.selectedWebhook
-    && prevSelected.human.current_profile_no === nextSelected.human.current_profile_no
-    && prevSelected.human.latitude === nextSelected.human.latitude
-    && prevSelected.human.longitude === nextSelected.human.longitude
-    && prevSelected.human.area === nextSelected.human.area
-    && prev.addNew === next.addNew
-    && prev.selectedAreas.length === next.selectedAreas.length
-    && prev.isMobile === next.isMobile
-    && prev.webhookLocation.join('') === next.webhookLocation.join('')
-    && prev.webhookMode === next.webhookMode
+    prev.selectedWebhook === next.selectedWebhook &&
+    prevSelected.human.current_profile_no ===
+      nextSelected.human.current_profile_no &&
+    prevSelected.human.latitude === nextSelected.human.latitude &&
+    prevSelected.human.longitude === nextSelected.human.longitude &&
+    prevSelected.human.area === nextSelected.human.area &&
+    prev.addNew === next.addNew &&
+    prev.selectedAreas.length === next.selectedAreas.length &&
+    prev.isMobile === next.isMobile &&
+    prev.webhookLocation.join('') === next.webhookLocation.join('') &&
+    prev.webhookMode === next.webhookMode
   )
 }
 

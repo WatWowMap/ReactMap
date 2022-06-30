@@ -7,18 +7,33 @@ import Notification from './layout/general/Notification'
 const ignoredClustering = ['devices', 'submissionCells', 'scanCells', 'weather']
 
 export default function Clustering({
-  category, renderedData, userSettings, clusteringRules, staticUserSettings, params,
-  filters, map, Icons, perms, tileStyle, config, userIcons, setParams, isNight,
+  category,
+  renderedData,
+  userSettings,
+  clusteringRules,
+  staticUserSettings,
+  params,
+  filters,
+  map,
+  Icons,
+  perms,
+  tileStyle,
+  config,
+  userIcons,
+  setParams,
+  isNight,
+  onlyAreas,
 }) {
   const Component = index[category]
-  const hideList = useStatic(state => state.hideList)
-  const excludeList = useStatic(state => state.excludeList)
-  const timerList = useStatic(state => state.timerList)
+  const hideList = useStatic((state) => state.hideList)
+  const excludeList = useStatic((state) => state.excludeList)
+  const timerList = useStatic((state) => state.timerList)
 
   const ts = Math.floor(Date.now() / 1000)
   const currentZoom = map.getZoom()
 
-  const showCircles = userSettings.interactionRanges && currentZoom >= config.interactionRangeZoom
+  const showCircles =
+    userSettings.interactionRanges && currentZoom >= config.interactionRangeZoom
 
   const finalData = renderedData.map((each) => {
     if (!each) return null
@@ -45,14 +60,16 @@ export default function Clustering({
           setParams={setParams}
           showCircles={showCircles}
           isNight={isNight}
+          onlyAreas={onlyAreas}
         />
       )
     }
     return null
   })
 
-  const limitHit = finalData.length > clusteringRules.forcedLimit
-    && !ignoredClustering.includes(category)
+  const limitHit =
+    finalData.length > clusteringRules.forcedLimit &&
+    !ignoredClustering.includes(category)
 
   return limitHit || (clusteringRules.zoomLevel && userSettings.clustering) ? (
     <>
@@ -80,5 +97,7 @@ export default function Clustering({
         />
       )}
     </>
-  ) : finalData
+  ) : (
+    finalData
+  )
 }

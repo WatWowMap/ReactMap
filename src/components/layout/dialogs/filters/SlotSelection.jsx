@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
-import {
-  Grid, DialogContent, IconButton,
-} from '@material-ui/core'
-import {
-  Clear, Check,
-} from '@material-ui/icons'
+import { Grid, DialogContent, IconButton } from '@material-ui/core'
+import { Clear, Check } from '@material-ui/icons'
 
 import { useStatic } from '@hooks/useStore'
 
@@ -12,28 +8,38 @@ import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 import Size from './Size'
 
-export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters, isMobile }) {
-  const Icons = useStatic(state => state.Icons)
+export default function SlotSelection({
+  teamId,
+  toggleSlotsMenu,
+  tempFilters,
+  isMobile,
+}) {
+  const Icons = useStatic((state) => state.Icons)
   const [filterValues, setFilterValues] = useState(tempFilters)
   const [team] = useState(`t${teamId}-0`)
 
-  const relevantSlots = Object.keys(filterValues).filter(each => each.charAt(0) === 'g' && each.charAt(1) === teamId)
+  const relevantSlots = Object.keys(filterValues).filter(
+    (each) => each.charAt(0) === 'g' && each.charAt(1) === teamId,
+  )
 
   const handleSizeChange = (name, value) => {
     const slotsObj = filterValues
     if (name === 'all') {
       slotsObj[team].enabled = value
-      relevantSlots.forEach(slot => slotsObj[slot].enabled = value)
+      relevantSlots.forEach((slot) => (slotsObj[slot].enabled = value))
     } else {
       slotsObj[team].size = value
-      relevantSlots.forEach(slot => slotsObj[slot].size = value)
+      relevantSlots.forEach((slot) => (slotsObj[slot].size = value))
     }
     setFilterValues({ ...slotsObj })
   }
 
   return (
     <>
-      <Header titles={[`team_${teamId}`, 'slot_selection']} action={toggleSlotsMenu(false)} />
+      <Header
+        titles={[`team_${teamId}`, 'slot_selection']}
+        action={toggleSlotsMenu(false)}
+      />
       <DialogContent style={{ color: 'white' }}>
         <Grid
           container
@@ -41,7 +47,7 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters, is
           justifyContent="center"
           alignItems="center"
         >
-          {relevantSlots.map(each => (
+          {relevantSlots.map((each) => (
             <Grid
               container
               item
@@ -53,7 +59,11 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters, is
               justifyContent="center"
             >
               <Grid item xs={2} style={{ textAlign: 'center' }}>
-                <img src={Icons.getGyms(...each.slice(1).split('-'))} style={{ maxWidth: 50, maxHeight: 50 }} alt={each} />
+                <img
+                  src={Icons.getGyms(...each.slice(1).split('-'))}
+                  style={{ maxWidth: 50, maxHeight: 50 }}
+                  alt={each}
+                />
               </Grid>
               <Grid item xs={8} style={{ textAlign: 'center' }}>
                 <Size
@@ -71,25 +81,32 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters, is
                 />
               </Grid>
               <Grid item xs={2}>
-                <IconButton onClick={() => {
-                  setFilterValues({
-                    ...filterValues,
-                    [each]: {
-                      ...filterValues[each],
-                      enabled: !filterValues[each].enabled,
-                    },
-                  })
-                }}
+                <IconButton
+                  onClick={() => {
+                    setFilterValues({
+                      ...filterValues,
+                      [each]: {
+                        ...filterValues[each],
+                        enabled: !filterValues[each].enabled,
+                      },
+                    })
+                  }}
                 >
-                  {filterValues[each].enabled
-                    ? <Check style={{ color: '#00e676' }} />
-                    : <Clear color="primary" />}
+                  {filterValues[each].enabled ? (
+                    <Check style={{ color: '#00e676' }} />
+                  ) : (
+                    <Clear color="primary" />
+                  )}
                 </IconButton>
               </Grid>
             </Grid>
           ))}
           {isMobile && (
-            <Grid item xs={12} style={{ textAlign: 'center', margin: '15px 0' }}>
+            <Grid
+              item
+              xs={12}
+              style={{ textAlign: 'center', margin: '15px 0' }}
+            >
               <Size
                 filterValues={filterValues[team]}
                 handleChange={handleSizeChange}
@@ -99,22 +116,45 @@ export default function SlotSelection({ teamId, toggleSlotsMenu, tempFilters, is
           )}
         </Grid>
       </DialogContent>
-      <Footer options={[
-        ...(isMobile ? [] : [{
-          key: 'size',
-          component: (
-            <Size
-              filterValues={filterValues[team]}
-              handleChange={handleSizeChange}
-              btnSize="medium"
-            />
-          ),
-          size: 6,
-        }]),
-        { name: 'disable_all', action: () => handleSizeChange('all', false), color: 'primary', icon: 'Clear', size: 2 },
-        { name: 'enable_all', action: () => handleSizeChange('all', true), color: '#00e676', icon: 'Check', size: 2 },
-        { name: 'save', action: toggleSlotsMenu(false, teamId, filterValues), color: 'secondary', icon: 'Save', size: 2 },
-      ]}
+      <Footer
+        options={[
+          ...(isMobile
+            ? []
+            : [
+                {
+                  key: 'size',
+                  component: (
+                    <Size
+                      filterValues={filterValues[team]}
+                      handleChange={handleSizeChange}
+                      btnSize="medium"
+                    />
+                  ),
+                  size: 6,
+                },
+              ]),
+          {
+            name: 'disable_all',
+            action: () => handleSizeChange('all', false),
+            color: 'primary',
+            icon: 'Clear',
+            size: 2,
+          },
+          {
+            name: 'enable_all',
+            action: () => handleSizeChange('all', true),
+            color: '#00e676',
+            icon: 'Check',
+            size: 2,
+          },
+          {
+            name: 'save',
+            action: toggleSlotsMenu(false, teamId, filterValues),
+            color: 'secondary',
+            icon: 'Save',
+            size: 2,
+          },
+        ]}
       />
     </>
   )

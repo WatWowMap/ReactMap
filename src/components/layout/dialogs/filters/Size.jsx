@@ -8,14 +8,17 @@ export default function Size({ filterValues, handleChange, btnSize }) {
 
   return (
     <ButtonGroup>
-      {sizes.map(size => {
-        const color = (filterValues.size || 'md') === size ? 'primary' : 'secondary'
+      {sizes.map((size) => {
+        const color =
+          (filterValues.size || 'md') === size ? 'primary' : 'secondary'
         return (
           <Button
             key={size}
             onClick={() => handleChange('size', size)}
             color={color}
-            variant={(filterValues.size || 'md') === size ? 'contained' : 'outlined'}
+            variant={
+              (filterValues.size || 'md') === size ? 'contained' : 'outlined'
+            }
             size={btnSize}
           >
             {t(size)}

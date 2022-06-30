@@ -510,5 +510,9 @@
   "light_map_border": "Граница световой карты",
   "dark_map_border": "Темная граница карты",
   "cell_blocked": "Сотовый заблокирован",
-  "poi_color": "Цвет POI"
+  "poi_color": "Цвет POI",
+  "ultra_beast": "Ультра Чудовище",
+  "quest_condition": "Состояние квеста",
+  "always_show_labels": "Всегда показывать ярлыки",
+  "scan_areas_options": "Параметры областей сканирования"
 }

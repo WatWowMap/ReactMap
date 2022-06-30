@@ -13,7 +13,7 @@ export default function StringFilter({ filterValues, setFilterValues }) {
     message: t('overwrites'),
   })
 
-  const validationCheck = event => {
+  const validationCheck = (event) => {
     let { value } = event.target
     Utility.analytics('Filtering', value, 'Legacy')
     if (Utility.checkAdvFilter(value)) {

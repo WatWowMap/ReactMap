@@ -11,10 +11,7 @@ const DevicePoly = ({ device, color }) => {
   if (device.type === 'leveling') {
     return (
       <>
-        <Circle
-          center={device.route}
-          pathOptions={{ color }}
-        />
+        <Circle center={device.route} pathOptions={{ color }} />
         <Circle
           center={device.route}
           radius={device.radius}
@@ -27,26 +24,24 @@ const DevicePoly = ({ device, color }) => {
   if (Array.isArray(arrayRoute)) {
     return device?.type?.includes('circle')
       ? arrayRoute.map((polygon, i) => (
-        <Polyline
-          key={i}
-          positions={polygon.map(route => [route.lat, route.lon])}
-          pathOptions={{ color }}
-        />
-      ))
+          <Polyline
+            key={i}
+            positions={polygon.map((route) => [route.lat, route.lon])}
+            pathOptions={{ color }}
+          />
+        ))
       : arrayRoute.map((polygon, i) => (
-        <Polygon
-          key={i}
-          positions={polygon.map(route => [route.lat, route.lon])}
-          pathOptions={{ color }}
-        />
-      ))
+          <Polygon
+            key={i}
+            positions={polygon.map((route) => [route.lat, route.lon])}
+            pathOptions={{ color }}
+          />
+        ))
   }
   return null
 }
 
-const areEqual = (prev, next) => (
-  prev.device.type === next.device.type
-  && prev.color === next.color
-)
+const areEqual = (prev, next) =>
+  prev.device.type === next.device.type && prev.color === next.color
 
 export default memo(DevicePoly, areEqual)
