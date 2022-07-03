@@ -699,12 +699,18 @@
     }
   },
   "rarity": {
+    "percents": {
+      "uncommon": 0.25,
+      "rare": 0.1,
+      "ultraRare": 0.01
+    },
     "common": [],
     "uncommon": [],
     "rare": [],
     "ultraRare": [],
     "regional": [],
-    "event": []
+    "event": [],
+    "never": []
   },
   "manualAreas": []
 }

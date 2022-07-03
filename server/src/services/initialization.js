@@ -20,6 +20,7 @@ const Db = new DbCheck(
   config.devOptions.queryDebug,
   config.api,
   config.map.distanceUnit,
+  config.rarity.percents
 )
 const Pvp = config.api.pvp.reactMapHandlesPvp
   ? new PvpWrapper(config.api.pvp)
