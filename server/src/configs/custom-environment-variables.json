@@ -1407,6 +1407,20 @@
     }
   },
   "rarity": {
+    "percents": {
+      "uncommon": {
+        "__name": "RARITY_PERCENTS_UNCOMMON",
+        "__format": "number"
+      },
+      "rare": {
+        "__name": "RARITY_PERCENTS_RARE",
+        "__format": "number"
+      },
+      "ultraRare": {
+        "__name": "RARITY_PERCENTS_ULTRA_RARE",
+        "__format": "number"
+      }
+    },
     "common": {
       "__name": "RARITY_COMMON",
       "__format": "json"
@@ -1429,6 +1443,10 @@
     },
     "event": {
       "__name": "RARITY_EVENT",
+      "__format": "json"
+    },
+    "never": {
+      "__name": "RARITY_NEVER",
       "__format": "json"
     }
   },
