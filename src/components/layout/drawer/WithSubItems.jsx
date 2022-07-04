@@ -156,7 +156,7 @@ export default function WithSubItems({
                 <Typography>
                   {i ? (
                     <Trans i18nKey="s2_cell_level">
-                      {{ level: i === 1 ? 14 : 17 }}
+                      {{ level: item.substring(1, 3) }}
                     </Trans>
                   ) : (
                     t('poi')
