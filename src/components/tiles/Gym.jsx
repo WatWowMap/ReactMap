@@ -32,6 +32,8 @@ const GymTile = ({
   params,
   showCircles,
   setParams,
+  config,
+  zoom,
 }) => {
   const markerRef = useRef({})
   const [done, setDone] = useState(false)
@@ -114,6 +116,13 @@ const GymTile = ({
             center={[item.lat, item.lon]}
             radius={70}
             pathOptions={{ color: getColor(item.team_id), weight: 1 }}
+          />
+        )}
+        {userSettings['300mRange'] && zoom >= config.interactionRangeZoom && (
+          <Circle
+            center={[item.lat, item.lon]}
+            radius={300}
+            pathOptions={{ color: getColor(item.team_id), weight: 0.5 }}
           />
         )}
       </Marker>

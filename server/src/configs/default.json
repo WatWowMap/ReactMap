@@ -230,6 +230,7 @@
       "clustering": true,
       "raidTimers": false,
       "interactionRanges": false,
+      "300mRange": false,
       "showExBadge": false,
       "showArBadge": false,
       "raidLevelBadges": false,
@@ -240,6 +241,7 @@
       "invasionTimers": false,
       "lureTimers": false,
       "interactionRanges": false,
+      "lureRange": false,
       "madQuestText": false,
       "hasQuestIndicator": true,
       "showArBadge": false
@@ -417,7 +419,10 @@
       "enabled": false
     },
     "submissionCells": {
-      "enabled": false
+      "enabled": false,
+      "rings": true,
+      "s17Cells": true,
+      "s14Cells": true
     },
     "weather": {
       "enabled": true

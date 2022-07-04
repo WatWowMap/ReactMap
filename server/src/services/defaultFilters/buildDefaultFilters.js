@@ -106,6 +106,9 @@ module.exports = function buildDefault(perms, available) {
     submissionCells: perms.submissionCells
       ? {
           enabled: defaultFilters.submissionCells.enabled,
+          rings: defaultFilters.submissionCells.rings,
+          s17Cells: defaultFilters.submissionCells.s17Cells,
+          s14Cells: defaultFilters.submissionCells.s14Cells,
           filter: { global: new GenericFilter() },
         }
       : undefined,
