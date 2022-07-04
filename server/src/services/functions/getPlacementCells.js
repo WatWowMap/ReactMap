@@ -51,7 +51,7 @@ module.exports = function getPlacementCells(bounds, pokestops, gyms) {
     : []
 
   return {
-    cells: Object.values(indexedCells),
+    cells: bounds.filters.onlyS17Cells ? Object.values(indexedCells) : [],
     rings,
   }
 }
