@@ -14,5 +14,5 @@ module.exports = function scannerPerms(roles, provider) {
       }
     })
   })
-  return  [...new Set(perms)]
+  return [...new Set(perms)]
 }
