@@ -136,7 +136,7 @@ module.exports = class DbCheck {
     const results = await Promise.all(
       this.models.Pokemon.map(async (source) =>
         source.isMad
-          ? () => []
+          ? []
           : source.SubModel.query()
               .select('pokemon_id', raw('SUM(count) as total'))
               .from('pokemon_stats')
