@@ -10,6 +10,7 @@ const RingTile = ({ ring, userSettings }) => (
       fillColor: userSettings.poiColor,
       color: userSettings.poiColor,
     }}
+    pane="circlePane"
   />
 )
 
