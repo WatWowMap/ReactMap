@@ -299,10 +299,10 @@ module.exports = {
         return [
           {
             placementCells:
-              args.zoom >= config.map.submissionZoom
+              args.zoom >= config.map.submissionZoom && args.filters.onlyS17Cells
                 ? Utility.getPlacementCells(args, pokestops, gyms)
                 : [],
-            typeCells: Utility.getTypeCells(args, pokestops, gyms),
+            typeCells: args.filters.onlyS14Cells ? Utility.getTypeCells(args, pokestops, gyms) : [],
           },
         ]
       }
