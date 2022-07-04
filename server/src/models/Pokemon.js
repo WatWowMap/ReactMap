@@ -416,8 +416,8 @@ module.exports = class Pokemon extends Model {
 
   static async getAvailable({ isMad }) {
     const ts = Math.floor(new Date().getTime() / 1000)
-    const results = await this.query()
-      .select('pokemon_id', 'form')
+    const availableQuery = this.query()
+      .select(['pokemon_id', 'form'])
       .where(
         isMad ? 'disappear_time' : 'expire_timestamp',
         '>=',
@@ -425,8 +425,23 @@ module.exports = class Pokemon extends Model {
       )
       .groupBy('pokemon_id', 'form')
       .orderBy('pokemon_id', 'form')
+    const rarityQuery = this.query()
+      .select(['pokemon_id AS id', 'form as formId'])
+      .count('pokemon_id AS count')
+      .groupBy('pokemon_id', 'form')
+      .where(
+        isMad ? 'disappear_time' : 'expire_timestamp',
+        '>=',
+        isMad ? this.knex().fn.now() : ts,
+      )
+
+    const [available, rarity] = await Promise.all([availableQuery, rarityQuery])
+
     return {
-      available: results.map((pkmn) => `${pkmn.pokemon_id}-${pkmn.form}`),
+      available: available.map((pkmn) => `${pkmn.pokemon_id}-${pkmn.form}`),
+      rarity: Object.fromEntries(
+        rarity.map((pkmn) => [`${pkmn.id}-${pkmn.formId}`, pkmn.count]),
+      ),
     }
   }
 

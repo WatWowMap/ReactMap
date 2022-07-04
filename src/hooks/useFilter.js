@@ -27,7 +27,15 @@ export default function useFilter(
   const menuFilters = useStatic(useCallback((s) => s.menuFilters, []))
 
   const {
-    filters: { generations, types, rarity, forms, others, categories },
+    filters: {
+      generations,
+      types,
+      rarity,
+      historicRarity,
+      forms,
+      others,
+      categories,
+    },
   } = menus[category]
   const tempAdvFilter = {}
   const filteredArr = []
@@ -41,9 +49,11 @@ export default function useFilter(
       menus[category].filters[subCategory],
     ).every((val) => val === false)
   })
-  tempAdvFilter.all = Object.values(tempAdvFilter).every((val) => val === true)
 
-  if ((others.selected && others.unselected) || tempAdvFilter.all) {
+  if (
+    (others.selected && others.unselected) ||
+    Object.values(tempAdvFilter).every((val) => val === true)
+  ) {
     switchKey = 'all'
   } else if (others.selected) {
     switchKey = 'selected'
@@ -138,6 +148,8 @@ export default function useFilter(
                   ((tempAdvFilter.generations || generations[item.genId]) &&
                     (tempAdvFilter.types || typeResolver(item.formTypes)) &&
                     (tempAdvFilter.rarity || rarity[item.rarity]) &&
+                    (tempAdvFilter.historicRarity ||
+                      historicRarity[item.historic]) &&
                     (tempAdvFilter.categories || categories[subCategory]) &&
                     (tempAdvFilter.forms ||
                       forms[item.formName] ||
@@ -167,6 +179,8 @@ export default function useFilter(
                     ((tempAdvFilter.generations || generations[item.genId]) &&
                       (tempAdvFilter.types || typeResolver(item.formTypes)) &&
                       (tempAdvFilter.rarity || rarity[item.rarity]) &&
+                      (tempAdvFilter.historicRarity ||
+                        historicRarity[item.historic]) &&
                       (tempAdvFilter.categories || categories[subCategory]) &&
                       (tempAdvFilter.forms ||
                         forms[item.formName] ||
@@ -211,6 +225,7 @@ export default function useFilter(
                   generations[item.genId] ||
                   item.formTypes.some((x) => types[x]) ||
                   rarity[item.rarity] ||
+                  historicRarity[item.historic] ||
                   forms[item.name] ||
                   (forms.altForms && item.formId != item.defaultFormId) ||
                   (forms.normalForms && item.formId === item.defaultFormId) ||
