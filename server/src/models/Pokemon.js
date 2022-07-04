@@ -439,7 +439,9 @@ module.exports = class Pokemon extends Model {
 
     return {
       available: available.map((pkmn) => `${pkmn.pokemon_id}-${pkmn.form}`),
-      rarity: Object.fromEntries(rarity.map((pkmn) => [`${pkmn.id}-${pkmn.formId}`, pkmn.count])),
+      rarity: Object.fromEntries(
+        rarity.map((pkmn) => [`${pkmn.id}-${pkmn.formId}`, pkmn.count]),
+      ),
     }
   }
 

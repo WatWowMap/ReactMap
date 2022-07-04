@@ -4,7 +4,14 @@ const { raw } = require('objection')
 const extend = require('extend')
 
 module.exports = class DbCheck {
-  constructor(validModels, dbSettings, queryDebug, apiSettings, distanceUnit, rarityPercents) {
+  constructor(
+    validModels,
+    dbSettings,
+    queryDebug,
+    apiSettings,
+    distanceUnit,
+    rarityPercents,
+  ) {
     this.validModels = validModels.flatMap((s) => s.useFor)
     this.singleModels = ['User', 'Badge', 'Session']
     this.searchLimit = apiSettings.searchLimit
