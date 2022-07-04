@@ -547,5 +547,7 @@
   "quest_condition": "Quest Condition",
   "always_show_labels": "Always Show Labels",
   "scan_areas_options": "Scan Areas Options",
-  "poi": "Points of Interest"
+  "poi": "Points of Interest",
+  "300m_range": "300m Range",
+  "lure_range": "Lure Range"
 }
