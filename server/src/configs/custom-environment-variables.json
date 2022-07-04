@@ -868,6 +868,18 @@
       "enabled": {
         "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_ENABLED",
         "__format": "boolean"
+      },
+      "rings": {
+        "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_RINGS",
+        "__format": "boolean"
+      },
+      "s17Cells": {
+        "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_S17CELLS",
+        "__format": "boolean"
+      },
+      "s14Cells": {
+        "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_S14CELLS",
+        "__format": "boolean"
       }
     },
     "weather": {
