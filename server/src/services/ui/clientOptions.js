@@ -17,7 +17,7 @@ module.exports = function clientOptions(perms) {
       clustering: { type: 'bool', perm: ['gyms', 'raids'] },
       raidTimers: { type: 'bool', perm: ['raids'] },
       interactionRanges: { type: 'bool', perm: ['gyms', 'raids'] },
-      "300mRange": { type: 'bool', perm: ['raids'] },
+      '300mRange': { type: 'bool', perm: ['raids'] },
       showExBadge: { type: 'bool', perm: ['gyms'] },
       showArBadge: { type: 'bool', perm: ['gyms'] },
       raidLevelBadges: { type: 'bool', perm: ['raids'] },

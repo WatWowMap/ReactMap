@@ -419,7 +419,10 @@
       "enabled": false
     },
     "submissionCells": {
-      "enabled": false
+      "enabled": false,
+      "rings": true,
+      "s17Cells": true,
+      "s14Cells": true
     },
     "weather": {
       "enabled": true
