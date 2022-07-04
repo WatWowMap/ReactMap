@@ -21,7 +21,7 @@ export default function Container({ serverSettings, params, location, zoom }) {
       {serverSettings.user && serverSettings.user.perms.map && (
         <Map serverSettings={serverSettings} params={params} />
       )}
-      <Pane name="circlePane" style={{ zIndex: 450 }} />
+      <Pane name="circlePane" style={{ zIndex: 450, pointerEvents: 'none' }} />
     </MapContainer>
   )
 }
