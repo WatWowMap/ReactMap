@@ -529,6 +529,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_INTERACTION_RANGES",
         "__format": "boolean"
       },
+      "300mRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_300M_RANGE",
+        "__format": "boolean"
+      },
       "showExBadge": {
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_SHOW_EX_BADGE",
         "__format": "boolean"
@@ -561,6 +565,10 @@
       },
       "interactionRanges": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "lureRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_LURE_RANGE",
         "__format": "boolean"
       },
       "madQuestText": {

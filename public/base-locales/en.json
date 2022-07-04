@@ -546,5 +546,7 @@
   "poi_color": "POI Color",
   "quest_condition": "Quest Condition",
   "always_show_labels": "Always Show Labels",
-  "scan_areas_options": "Scan Areas Options"
+  "scan_areas_options": "Scan Areas Options",
+  "300m_range": "300m Range",
+  "lure_range": "Lure Range"
 }
