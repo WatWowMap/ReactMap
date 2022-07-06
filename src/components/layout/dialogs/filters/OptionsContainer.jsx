@@ -67,7 +67,7 @@ export default function OptionsContainer({
           Object.entries(menus[category].filters[cat]).forEach(
             ([filter, bool]) => {
               if (bool && options[filter] !== undefined) {
-                applied.push(filter)
+                applied.push(`${cat}-${filter}`)
               }
             },
           )
@@ -110,7 +110,7 @@ export default function OptionsContainer({
         {applied.map((x) => (
           <Chip
             key={x}
-            label={t(Utility.camelToSnake(x))}
+            label={t(Utility.camelToSnake(x.split('-')[1]))}
             variant="outlined"
             size="small"
             color={

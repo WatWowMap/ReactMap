@@ -46,10 +46,12 @@ module.exports = function getPlacementCells(bounds, pokestops, gyms) {
       cell.blocked = true
     }
   }
-  const rings = allCoords.map((poi) => new Ring(poi.id, poi.lat, poi.lon))
+  const rings = bounds.filters.onlyRings
+    ? allCoords.map((poi) => new Ring(poi.id, poi.lat, poi.lon))
+    : []
 
   return {
-    cells: Object.values(indexedCells),
+    cells: bounds.filters.onlyS17Cells ? Object.values(indexedCells) : [],
     rings,
   }
 }

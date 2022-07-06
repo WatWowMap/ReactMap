@@ -37,7 +37,7 @@ export default function FilterOptions({
           <FormGroup>
             {Object.keys(options).map((key) => (
               <FormControlLabel
-                key={key}
+                key={`${name}-${key}`}
                 control={
                   <Checkbox
                     checked={userSelection[key]}

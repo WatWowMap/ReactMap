@@ -302,7 +302,9 @@ module.exports = {
               args.zoom >= config.map.submissionZoom
                 ? Utility.getPlacementCells(args, pokestops, gyms)
                 : [],
-            typeCells: Utility.getTypeCells(args, pokestops, gyms),
+            typeCells: args.filters.onlyS14Cells
+              ? Utility.getTypeCells(args, pokestops, gyms)
+              : [],
           },
         ]
       }

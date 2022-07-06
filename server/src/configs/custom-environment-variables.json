@@ -529,6 +529,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_INTERACTION_RANGES",
         "__format": "boolean"
       },
+      "300mRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_300M_RANGE",
+        "__format": "boolean"
+      },
       "showExBadge": {
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_SHOW_EX_BADGE",
         "__format": "boolean"
@@ -561,6 +565,10 @@
       },
       "interactionRanges": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "lureRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_LURE_RANGE",
         "__format": "boolean"
       },
       "madQuestText": {
@@ -867,6 +875,18 @@
     "submissionCells": {
       "enabled": {
         "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_ENABLED",
+        "__format": "boolean"
+      },
+      "rings": {
+        "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_RINGS",
+        "__format": "boolean"
+      },
+      "s17Cells": {
+        "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_S17CELLS",
+        "__format": "boolean"
+      },
+      "s14Cells": {
+        "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_S14CELLS",
         "__format": "boolean"
       }
     },
@@ -1407,6 +1427,20 @@
     }
   },
   "rarity": {
+    "percents": {
+      "uncommon": {
+        "__name": "RARITY_PERCENTS_UNCOMMON",
+        "__format": "number"
+      },
+      "rare": {
+        "__name": "RARITY_PERCENTS_RARE",
+        "__format": "number"
+      },
+      "ultraRare": {
+        "__name": "RARITY_PERCENTS_ULTRA_RARE",
+        "__format": "number"
+      }
+    },
     "common": {
       "__name": "RARITY_COMMON",
       "__format": "json"
@@ -1429,6 +1463,10 @@
     },
     "event": {
       "__name": "RARITY_EVENT",
+      "__format": "json"
+    },
+    "never": {
+      "__name": "RARITY_NEVER",
       "__format": "json"
     }
   },

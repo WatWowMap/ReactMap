@@ -54,7 +54,7 @@ module.exports = class EventManager {
       await this.getInvasions()
     }, 1000 * 60 * 60 * (config.map.invasionCacheHrs || 1))
     setInterval(async () => {
-      await this.getMasterfile()
+      await this.getMasterfile(Db.historical, Db.rarity)
     }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
     if (Pvp) {
       setInterval(async () => {
@@ -154,10 +154,10 @@ module.exports = class EventManager {
     }
   }
 
-  async getMasterfile() {
+  async getMasterfile(historical, dbRarity) {
     console.log('[EVENT] Fetching Latest Masterfile')
     try {
-      const newMf = await generate()
+      const newMf = await generate(false, historical, dbRarity)
       this.masterfile = newMf ?? this.masterfile
       this.addAvailable()
     } catch (e) {

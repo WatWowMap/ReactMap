@@ -6,7 +6,6 @@ const primaryUi = require('./ui/primary')
 const advMenus = require('./ui/advMenus')
 const clientOptions = require('./ui/clientOptions')
 const dbSelection = require('./functions/dbSelection')
-const permissions = require('./functions/permissions')
 const webhook = require('./ui/webhook')
 const geocoder = require('./geocoder')
 const areaPerms = require('./functions/areaPerms')
@@ -46,10 +45,6 @@ module.exports = class Utility {
 
   static dbSelection(...args) {
     return dbSelection(...args)
-  }
-
-  static permissions(...args) {
-    return permissions(...args)
   }
 
   static webhookUi(...args) {

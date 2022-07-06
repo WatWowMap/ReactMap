@@ -1,7 +1,7 @@
 const { scanner } = require('../config')
 
 module.exports = function scannerPerms(roles, provider) {
-  let perms = []
+  const perms = []
   roles.forEach((role) => {
     Object.keys(scanner).forEach((mode) => {
       if (
@@ -14,8 +14,5 @@ module.exports = function scannerPerms(roles, provider) {
       }
     })
   })
-  if (perms.length) {
-    perms = [...new Set(perms)]
-  }
-  return perms
+  return [...new Set(perms)]
 }
