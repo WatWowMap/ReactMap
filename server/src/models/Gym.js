@@ -212,7 +212,7 @@ module.exports = class Gym extends Model {
       }
     }
 
-    if (onlyLevels !== 'all' && !isMad) {
+    if (onlyAllGyms && onlyLevels !== 'all' && !isMad) {
       query.andWhere('power_up_level', onlyLevels)
     }
     query.andWhere((gym) => {
@@ -407,10 +407,12 @@ module.exports = class Gym extends Model {
       .then((r) => {
         const unique = new Set()
         r.forEach((result) => {
-          if (result.slots) {
-            unique.add(`g${result.team}-${result.slots}`)
-          } else {
-            unique.add(`t${result.team}-0`)
+          if (result.team) {
+            if (result.slots) {
+              unique.add(`g${result.team}-${result.slots}`)
+            } else {
+              unique.add(`t${result.team}-0`)
+            }
           }
         })
         return [...unique]
