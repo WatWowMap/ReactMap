@@ -57,6 +57,7 @@ module.exports = function clientOptions(perms) {
     },
     scanAreas: {
       alwaysShowLabels: { type: 'bool', perm: ['scanAreas'] },
+      tapToToggle: { type: 'bool', perm: ['scanAreas'] },
     },
     weather: {
       clickableIcon: { type: 'bool', perm: ['weather'] },

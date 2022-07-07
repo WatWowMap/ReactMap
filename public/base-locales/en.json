@@ -550,5 +550,6 @@
   "historic_rarity": "Historic Rarity",
   "poi": "Points of Interest",
   "300m_range": "300m Range",
-  "lure_range": "Lure Range"
+  "lure_range": "Lure Range",
+  "tap_to_toggle": "Tap To Toggle"
 }

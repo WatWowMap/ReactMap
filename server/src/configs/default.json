@@ -300,7 +300,8 @@
       "poiColor": "#03ffff"
     },
     "scanAreas": {
-      "alwaysShowLabels": true
+      "alwaysShowLabels": true,
+      "tapToToggle": true
     },
     "weather": {
       "clickableIcon": false,
