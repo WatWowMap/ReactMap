@@ -94,14 +94,14 @@ export default function AreaTile({
               }
               style={{
                 color:
-                  !childAreas.length || hasManual || !feature.properties.name
+                  !childAreas.length || hasManual || !feature?.properties?.name
                     ? feature?.properties?.fillColor ||
                       feature?.properties?.fill ||
                       '#212121'
                     : 'none',
               }}
               disabled={
-                !childAreas.length || hasManual || !feature.properties.name
+                !childAreas.length || hasManual || !feature?.properties?.name
               }
             />
           </Grid>
