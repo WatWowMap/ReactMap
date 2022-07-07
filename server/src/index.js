@@ -196,7 +196,7 @@ app.use((err, req, res, next) => {
 
 Db.determineType().then(async () => {
   await Promise.all([
-    Db.initRarity(),
+    Db.historicalRarity(),
     Event.setAvailable('gyms', 'Gym', Db),
     Event.setAvailable('pokestops', 'Pokestop', Db),
     Event.setAvailable('pokemon', 'Pokemon', Db),
