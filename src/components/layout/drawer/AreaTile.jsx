@@ -61,14 +61,14 @@ export default function AreaTile({
             <Typography
               variant={name ? 'h6' : 'caption'}
               align="center"
-              style={{
-                whiteSpace: 'pre-wrap',
-              }}
+              style={{ whiteSpace: 'pre-wrap', width: '100%' }}
             >
               {name || feature.properties.name ? (
-                Utility.getProperName(name || feature.properties.name)
-                  .split(' ')
-                  .join('\n')
+                Utility.getProperName(
+                  name ||
+                    feature.properties.formattedName ||
+                    feature.properties.name,
+                )
               ) : (
                 <>&nbsp;</>
               )}
@@ -94,13 +94,15 @@ export default function AreaTile({
               }
               style={{
                 color:
-                  !childAreas.length || hasManual
+                  !childAreas.length || hasManual || !feature.properties.name
                     ? feature?.properties?.fillColor ||
                       feature?.properties?.fill ||
                       '#212121'
                     : 'none',
               }}
-              disabled={!childAreas.length || hasManual}
+              disabled={
+                !childAreas.length || hasManual || !feature.properties.name
+              }
             />
           </Grid>
         </Grid>
