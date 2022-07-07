@@ -54,6 +54,9 @@ module.exports = class EventManager {
       await this.getInvasions()
     }, 1000 * 60 * 60 * (config.map.invasionCacheHrs || 1))
     setInterval(async () => {
+      await Db.historicalRarity()
+    }, 1000 * 60 * 60 * (config.api.queryUpdateHours.historicalRarity || 6))
+    setInterval(async () => {
       await this.getMasterfile(Db.historical, Db.rarity)
     }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
     if (Pvp) {

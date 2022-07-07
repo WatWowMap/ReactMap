@@ -118,21 +118,40 @@ module.exports = class DbCheck {
     )
   }
 
-  setRarity(id, percent, historical = false) {
-    if (percent === 0) {
-      this[historical ? 'historical' : 'rarity'].set(id, 'never')
-    } else if (percent < this.rarityPercents.ultraRare) {
-      this[historical ? 'historical' : 'rarity'].set(id, 'ultraRare')
-    } else if (percent < this.rarityPercents.rare) {
-      this[historical ? 'historical' : 'rarity'].set(id, 'rare')
-    } else if (percent < this.rarityPercents.uncommon) {
-      this[historical ? 'historical' : 'rarity'].set(id, 'uncommon')
-    } else {
-      this[historical ? 'historical' : 'rarity'].set(id, 'common')
-    }
+  setRarity(results, historical = false) {
+    const base = {}
+    const mapKey = historical ? 'historical' : 'rarity'
+    let total = 0
+    results.forEach((result) => {
+      Object.entries(historical ? result : result.rarity).forEach(
+        ([key, count]) => {
+          if (key in base) {
+            base[key] += count
+          } else {
+            base[key] = count
+          }
+          total += count
+        },
+      )
+    })
+    Object.entries(base).forEach(([id, count]) => {
+      const percent = (count / total) * 100
+      if (percent === 0) {
+        this[mapKey].set(id, 'never')
+      } else if (percent < this.rarityPercents.ultraRare) {
+        this[mapKey].set(id, 'ultraRare')
+      } else if (percent < this.rarityPercents.rare) {
+        this[mapKey].set(id, 'rare')
+      } else if (percent < this.rarityPercents.uncommon) {
+        this[mapKey].set(id, 'uncommon')
+      } else {
+        this[mapKey].set(id, 'common')
+      }
+    })
   }
 
-  async initRarity() {
+  async historicalRarity() {
+    console.log('[DB] Setting historical rarity stats')
     const results = await Promise.all(
       this.models.Pokemon.map(async (source) =>
         source.isMad
@@ -143,21 +162,14 @@ module.exports = class DbCheck {
               .groupBy('pokemon_id'),
       ),
     )
-    const consolidated = {}
-    let total = 0
-    results.forEach((result) => {
-      result.forEach((row) => {
-        if (consolidated[row.pokemon_id]) {
-          consolidated[row.pokemon_id] += +row.total
-        } else {
-          consolidated[row.pokemon_id] = +row.total
-        }
-        total += +row.total
-      })
-    })
-    Object.entries(consolidated).forEach(([id, count]) => {
-      this.setRarity(+id, (count / total) * 100, true)
-    })
+    this.setRarity(
+      results.map((result) =>
+        Object.fromEntries(
+          result.map((pkmn) => [`${pkmn.pokemon_id}`, +pkmn.total]),
+        ),
+      ),
+      true,
+    )
   }
 
   bindConnections(models) {
@@ -292,21 +304,7 @@ module.exports = class DbCheck {
           )
         }
         if (model === 'Pokemon') {
-          const base = {}
-          let total = 0
-          results.forEach((result) => {
-            Object.entries(result.rarity).forEach(([key, count]) => {
-              if (key in base) {
-                base[key] += count
-              } else {
-                base[key] = count
-              }
-              total += count
-            })
-          })
-          Object.entries(base).forEach(([id, count]) => {
-            this.setRarity(id, (count / total) * 100)
-          })
+          this.setRarity(results, false)
         }
         if (results.length === 1) return results[0].available
         if (results.length > 1) {

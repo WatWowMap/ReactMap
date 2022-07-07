@@ -55,7 +55,7 @@ export function ScanAreaTile({
       }
       if (webhookMode) {
         layer.on('click', () => handleClick(name.toLowerCase()))
-      } else if (!feature.properties.manual) {
+      } else if (!feature.properties.manual && userSettings?.tapToToggle) {
         layer.on('click', () => setAreas(name, names))
       }
     }

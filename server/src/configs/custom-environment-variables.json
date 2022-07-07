@@ -103,6 +103,10 @@
       "nests": {
         "__name": "API_QUERY_UPDATE_HOURS_NESTS",
         "__format": "number"
+      },
+      "historicalRarity": {
+        "__name": "API_QUERY_UPDATE_HOURS_HISTORICAL_RARITY",
+        "__format": "number"
       }
     },
     "queryOnSessionInit": {
@@ -648,6 +652,10 @@
     "scanAreas": {
       "alwaysShowLabels": {
         "__name": "CLIENT_SIDE_OPTIONS_SCAN_AREAS_ALWAYS_SHOW_LABELS",
+        "__format": "boolean"
+      },
+      "tapToToggle": {
+        "__name": "CLIENT_SIDE_OPTIONS_SCAN_AREAS_TAP_TO_TOGGLE",
         "__format": "boolean"
       }
     },

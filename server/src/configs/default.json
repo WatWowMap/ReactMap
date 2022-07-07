@@ -34,7 +34,8 @@
       "pokemon": 0.25,
       "quests": 0.5,
       "raids": 0.2,
-      "nests": 1
+      "nests": 1,
+      "historicalRarity": 6
     },
     "queryOnSessionInit": {
       "pokemon": false,
@@ -299,7 +300,8 @@
       "poiColor": "#03ffff"
     },
     "scanAreas": {
-      "alwaysShowLabels": true
+      "alwaysShowLabels": true,
+      "tapToToggle": true
     },
     "weather": {
       "clickableIcon": false,
