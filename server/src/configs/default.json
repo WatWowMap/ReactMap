@@ -316,6 +316,7 @@
     "gyms": {
       "enabled": true,
       "allGyms": true,
+      "levels": "all",
       "exEligible": false,
       "inBattle": false,
       "raids": true,
@@ -356,6 +357,7 @@
     },
     "pokestops": {
       "enabled": false,
+      "levels": "all",
       "lures": true,
       "quests": true,
       "questSet": "both",

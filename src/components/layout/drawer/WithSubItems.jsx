@@ -98,6 +98,24 @@ export default function WithSubItems({
             />
           </Grid>
         )}
+      {((category === 'pokestops' && subItem === 'allPokestops') ||
+        (category === 'gyms' && subItem === 'allGyms')) &&
+        filters[category][subItem] === true && (
+          <>
+            <Grid item xs={4} style={{ textAlign: 'center' }}>
+              <Typography>{t('power_up')}</Typography>
+            </Grid>
+            <Grid item xs={8} style={{ textAlign: 'center' }}>
+              <MultiSelector
+                filters={filters}
+                setFilters={setFilters}
+                category={category}
+                filterKey="levels"
+                items={['all', '1', '2', '3']}
+              />
+            </Grid>
+          </>
+        )}
       {category === 'gyms' &&
         subItem === 'gymBadges' &&
         filters[category].gymBadges === true && (

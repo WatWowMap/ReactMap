@@ -684,6 +684,7 @@
         "__name": "DEFAULT_FILTERS_GYMS_ALL_GYMS",
         "__format": "boolean"
       },
+      "levels": "DEFAULT_FILTERS_GYMS_LEVELS",
       "exEligible": {
         "__name": "DEFAULT_FILTERS_GYMS_EX_ELIGIBLE",
         "__format": "boolean"
@@ -752,6 +753,7 @@
         "__name": "DEFAULT_FILTERS_POKESTOPS_ENABLED",
         "__format": "boolean"
       },
+      "levels": "DEFAULT_FILTERS_POKESTOPS_LEVELS",
       "lures": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_LURES",
         "__format": "boolean"
