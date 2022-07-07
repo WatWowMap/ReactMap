@@ -103,6 +103,10 @@
       "nests": {
         "__name": "API_QUERY_UPDATE_HOURS_NESTS",
         "__format": "number"
+      },
+      "historicalRarity": {
+        "__name": "API_QUERY_UPDATE_HOURS_HISTORICAL_RARITY",
+        "__format": "number"
       }
     },
     "queryOnSessionInit": {
