@@ -653,6 +653,10 @@
       "alwaysShowLabels": {
         "__name": "CLIENT_SIDE_OPTIONS_SCAN_AREAS_ALWAYS_SHOW_LABELS",
         "__format": "boolean"
+      },
+      "tapToToggle": {
+        "__name": "CLIENT_SIDE_OPTIONS_SCAN_AREAS_TAP_TO_TOGGLE",
+        "__format": "boolean"
       }
     },
     "weather": {
