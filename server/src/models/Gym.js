@@ -61,6 +61,7 @@ module.exports = class Gym extends Model {
       gymBadges,
     } = perms
     const {
+      onlyLevels,
       onlyAllGyms,
       onlyRaids,
       onlyExEligible,
@@ -211,6 +212,9 @@ module.exports = class Gym extends Model {
       }
     }
 
+    if (onlyLevels !== 'all' && !isMad) {
+      query.andWhere('power_up_level', onlyLevels)
+    }
     query.andWhere((gym) => {
       if (onlyExEligible && gymPerms) {
         gym.orWhere((ex) => {
