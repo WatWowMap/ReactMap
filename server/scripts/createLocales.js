@@ -10,77 +10,123 @@ const missingFolder = path.resolve(__dirname, '../../public/missing-locales')
 
 const locales = async () => {
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
-  const englishRef = fs.readFileSync(path.resolve(appLocalesFolder, 'en.json'), { encoding: 'utf8', flag: 'r' })
+  const englishRef = fs.readFileSync(
+    path.resolve(appLocalesFolder, 'en.json'),
+    { encoding: 'utf8', flag: 'r' },
+  )
 
-  fs.mkdir(finalLocalesFolder, (error) => error ? console.log('[LOCALES] Locales folder already exists, skipping') : console.log('[LOCALES] locales folder created'))
+  fs.mkdir(finalLocalesFolder, (error) =>
+    error
+      ? console.log('[LOCALES] Locales folder already exists, skipping')
+      : console.log('[LOCALES] locales folder created'),
+  )
 
-  const availableRemote = await fetchJson('https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/index.json')
+  const availableRemote = await fetchJson(
+    'https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/index.json',
+  )
 
-  await Promise.all(localTranslations.map(async locale => {
-    const reactMapTranslations = fs.readFileSync(path.resolve(appLocalesFolder, locale), { encoding: 'utf8', flag: 'r' })
-    const baseName = locale.replace('.json', '')
-    const trimmedRemoteFiles = {}
+  await Promise.all(
+    localTranslations.map(async (locale) => {
+      const reactMapTranslations = fs.readFileSync(
+        path.resolve(appLocalesFolder, locale),
+        { encoding: 'utf8', flag: 'r' },
+      )
+      const baseName = locale.replace('.json', '')
+      const trimmedRemoteFiles = {}
 
-    fs.mkdir(`${finalLocalesFolder}/${baseName}`, (error) => error ? {} : console.log(`[LOCALES] ${locale} folder created`))
+      fs.mkdir(`${finalLocalesFolder}/${baseName}`, (error) =>
+        error ? {} : console.log(`[LOCALES] ${locale} folder created`),
+      )
 
-    try {
-      const hasRemote = availableRemote.includes(locale)
-      const remoteFiles = await fetchJson(`https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/static/locales/${hasRemote ? baseName : 'en'}.json`)
+      try {
+        const hasRemote = availableRemote.includes(locale)
+        const remoteFiles = await fetchJson(
+          `https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/static/locales/${
+            hasRemote ? baseName : 'en'
+          }.json`,
+        )
 
-      if (!hasRemote) {
-        console.warn('[LOCALES] No remote translation found for', locale, 'using English')
+        if (!hasRemote) {
+          console.warn(
+            '[LOCALES] No remote translation found for',
+            locale,
+            'using English',
+          )
+        }
+
+        Object.keys(remoteFiles).forEach((key) => {
+          if (
+            !key.startsWith('desc_') &&
+            !key.startsWith('pokemon_category_')
+          ) {
+            if (key.startsWith('quest_') || key.startsWith('challenge_')) {
+              trimmedRemoteFiles[key] = remoteFiles[key]
+                .replace(/%\{/g, '{{')
+                .replace(/\}/g, '}}')
+            } else {
+              trimmedRemoteFiles[key] = remoteFiles[key]
+            }
+          }
+        })
+      } catch (e) {
+        console.warn(e, '\n', locale)
       }
 
-      Object.keys(remoteFiles).forEach(key => {
-        if (!key.startsWith('desc_') && !key.startsWith('pokemon_category_')) {
-          if (key.startsWith('quest_') || key.startsWith('challenge_')) {
-            trimmedRemoteFiles[key] = remoteFiles[key]
-              .replace(/%\{/g, '{{')
-              .replace(/\}/g, '}}')
-          } else {
-            trimmedRemoteFiles[key] = remoteFiles[key]
-          }
-        }
-      })
-    } catch (e) {
-      console.warn(e, '\n', locale)
-    }
-
-    const finalTranslations = {
-      ...JSON.parse(englishRef),
-      ...trimmedRemoteFiles,
-      ...JSON.parse(reactMapTranslations),
-    }
-    fs.writeFile(
-      path.resolve(finalLocalesFolder, baseName, 'translation.json'),
-      JSON.stringify(finalTranslations, null, 2),
-      'utf8',
-      () => { },
-    )
-    console.log(`[LOCALES] ${locale}`, 'file saved.')
-  }))
+      const finalTranslations = {
+        ...JSON.parse(englishRef),
+        ...trimmedRemoteFiles,
+        ...JSON.parse(reactMapTranslations),
+      }
+      fs.writeFile(
+        path.resolve(finalLocalesFolder, baseName, 'translation.json'),
+        JSON.stringify(finalTranslations, null, 2),
+        'utf8',
+        () => {},
+      )
+      console.log(`[LOCALES] ${locale}`, 'file saved.')
+    }),
+  )
 }
 
 const missing = async () => {
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
-  const englishRef = JSON.parse(fs.readFileSync(path.resolve(appLocalesFolder, 'en.json'), { encoding: 'utf8', flag: 'r' }))
+  const englishRef = JSON.parse(
+    fs.readFileSync(path.resolve(appLocalesFolder, 'en.json'), {
+      encoding: 'utf8',
+      flag: 'r',
+    }),
+  )
 
-  fs.mkdir(missingFolder, (error) => error ? {} : console.log('[LOCALES] Locales folder created'))
+  fs.mkdir(missingFolder, (error) =>
+    error ? {} : console.log('[LOCALES] Locales folder created'),
+  )
 
-  localTranslations.forEach(locale => {
-    const reactMapTranslations = JSON.parse(fs.readFileSync(path.resolve(appLocalesFolder, locale), { encoding: 'utf8', flag: 'r' }))
+  localTranslations.forEach((locale) => {
+    const reactMapTranslations = JSON.parse(
+      fs.readFileSync(path.resolve(appLocalesFolder, locale), {
+        encoding: 'utf8',
+        flag: 'r',
+      }),
+    )
     const missingKeys = {}
 
-    Object.keys(englishRef).forEach(key => {
+    Object.keys(englishRef).forEach((key) => {
       if (!reactMapTranslations[key]) {
-        missingKeys[key] = process.argv.includes('--ally') ? `t('${key}')` : englishRef[key]
+        missingKeys[key] = process.argv.includes('--ally')
+          ? `t('${key}')`
+          : englishRef[key]
       }
     })
     fs.writeFile(
-      path.resolve(missingFolder, process.argv.includes('--ally') ? locale.replace('.json', '.js') : locale),
+      path.resolve(
+        missingFolder,
+        process.argv.includes('--ally')
+          ? locale.replace('.json', '.js')
+          : locale,
+      ),
       JSON.stringify(missingKeys, null, 2),
       'utf8',
-      () => { },
+      () => {},
     )
     console.log(`[LOCALES] ${locale}`, 'file saved.')
   })
@@ -93,6 +139,8 @@ if (require.main === module) {
   locales().then(() => console.log('[LOCALES] Translations generated'))
 
   if (process.argv[2] === '--missing') {
-    missing().then(() => console.log('[LOCALES] Missing translations generated'))
+    missing().then(() =>
+      console.log('[LOCALES] Missing translations generated'),
+    )
   }
 }

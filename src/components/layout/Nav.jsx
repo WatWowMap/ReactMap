@@ -22,31 +22,43 @@ import ResetFilters from './dialogs/ResetFilters'
 const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
 
 export default function Nav({
-  map, setManualParams, Icons, config,
-  setWebhookMode, webhookMode, settings, webhooks,
-  setScanNextMode, scanNextMode, setScanZoneMode, scanZoneMode,
-  isMobile, isTablet,
+  map,
+  setManualParams,
+  Icons,
+  config,
+  setWebhookMode,
+  webhookMode,
+  settings,
+  webhooks,
+  setScanNextMode,
+  scanNextMode,
+  setScanZoneMode,
+  scanZoneMode,
+  isMobile,
+  isTablet,
 }) {
   const classes = useStyles()
-  const { perms } = useStatic(state => state.auth)
-  const webhookAlert = useStatic(state => state.webhookAlert)
-  const setWebhookAlert = useStatic(state => state.setWebhookAlert)
-  const { map: { enableTutorial, messageOfTheDay, donationPage } } = useStatic(state => state.config)
-  const userProfile = useStatic(state => state.userProfile)
-  const setUserProfile = useStatic(state => state.setUserProfile)
-  const feedback = useStatic(state => state.feedback)
-  const setFeedback = useStatic(state => state.setFeedback)
-  const resetFilters = useStatic(state => state.resetFilters)
-  const setResetFilters = useStatic(state => state.setResetFilters)
+  const { perms } = useStatic((state) => state.auth)
+  const webhookAlert = useStatic((state) => state.webhookAlert)
+  const setWebhookAlert = useStatic((state) => state.setWebhookAlert)
+  const {
+    map: { enableTutorial, messageOfTheDay, donationPage },
+  } = useStatic((state) => state.config)
+  const userProfile = useStatic((state) => state.userProfile)
+  const setUserProfile = useStatic((state) => state.setUserProfile)
+  const feedback = useStatic((state) => state.feedback)
+  const setFeedback = useStatic((state) => state.setFeedback)
+  const resetFilters = useStatic((state) => state.resetFilters)
+  const setResetFilters = useStatic((state) => state.setResetFilters)
 
-  const filters = useStore(state => state.filters)
-  const setFilters = useStore(state => state.setFilters)
-  const userSettings = useStore(state => state.userSettings)
-  const setUserSettings = useStore(state => state.setUserSettings)
-  const tutorial = useStore(state => state.tutorial)
-  const setTutorial = useStore(state => state.setTutorial)
-  const motdIndex = useStore(state => state.motdIndex)
-  const setMotdIndex = useStore(s => s.setMotdIndex)
+  const filters = useStore((state) => state.filters)
+  const setFilters = useStore((state) => state.setFilters)
+  const userSettings = useStore((state) => state.userSettings)
+  const setUserSettings = useStore((state) => state.setUserSettings)
+  const tutorial = useStore((state) => state.tutorial)
+  const setTutorial = useStore((state) => state.setTutorial)
+  const motdIndex = useStore((state) => state.motdIndex)
+  const setMotdIndex = useStore((s) => s.setMotdIndex)
 
   const [drawer, setDrawer] = useState(false)
   const [dialog, setDialog] = useState({
@@ -55,17 +67,24 @@ export default function Nav({
     type: '',
   })
   const [motd, setMotd] = useState(
-    messageOfTheDay.components.length
-    && (messageOfTheDay.index > motdIndex || messageOfTheDay.settings.permanent)
-    && ((perms.donor ? messageOfTheDay.settings.donorOnly : messageOfTheDay.settings.freeloaderOnly)
-      || (!messageOfTheDay.settings.donorOnly && !messageOfTheDay.settings.freeloaderOnly)),
+    messageOfTheDay.components.length &&
+      (messageOfTheDay.index > motdIndex ||
+        messageOfTheDay.settings.permanent) &&
+      ((perms.donor
+        ? messageOfTheDay.settings.donorOnly
+        : messageOfTheDay.settings.freeloaderOnly) ||
+        (!messageOfTheDay.settings.donorOnly &&
+          !messageOfTheDay.settings.freeloaderOnly)),
   )
   const [donorPage, setDonorPage] = useState(false)
 
-  const safeSearch = searchable.filter(category => perms[category])
+  const safeSearch = searchable.filter((category) => perms[category])
 
   const toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+    if (
+      event.type === 'keydown' &&
+      (event.key === 'Tab' || event.key === 'Shift')
+    ) {
       return
     }
     setDrawer(open)
@@ -79,8 +98,15 @@ export default function Nav({
   }
 
   const toggleDialog = (open, category, type, filter) => (event) => {
-    Utility.analytics('Menu Toggle', `Open: ${open}`, `Category: ${category} Menu: ${type}`)
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+    Utility.analytics(
+      'Menu Toggle',
+      `Open: ${open}`,
+      `Category: ${category} Menu: ${type}`,
+    )
+    if (
+      event.type === 'keydown' &&
+      (event.key === 'Tab' || event.key === 'Shift')
+    ) {
       return
     }
     setDialog({ open, category, type })
@@ -204,10 +230,7 @@ export default function Nav({
           handleMotdClose={handleMotdClose}
         />
       </Dialog>
-      <Dialog
-        open={donorPage}
-        onClose={() => setDonorPage(false)}
-      >
+      <Dialog open={donorPage} onClose={() => setDonorPage(false)}>
         <DonorPage
           donorPage={donationPage}
           handleDonorClose={() => setDonorPage(false)}
@@ -229,11 +252,15 @@ export default function Nav({
       </Dialog>
       <Snackbar
         open={Boolean(webhookAlert.open)}
-        onClose={() => setWebhookAlert({ open: false, severity: 'info', message: '' })}
+        onClose={() =>
+          setWebhookAlert({ open: false, severity: 'info', message: '' })
+        }
         TransitionComponent={SlideTransition}
       >
         <Alert
-          onClose={() => setWebhookAlert({ open: false, severity: 'info', message: '' })}
+          onClose={() =>
+            setWebhookAlert({ open: false, severity: 'info', message: '' })
+          }
           severity={webhookAlert.severity}
           variant="filled"
           style={{ whiteSpace: 'pre-line', textAlign: 'center' }}

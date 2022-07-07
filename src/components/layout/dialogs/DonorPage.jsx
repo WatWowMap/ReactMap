@@ -7,25 +7,18 @@ import DialogWrapper from '../custom/DialogWrapper'
 import CustomTile from '../custom/CustomTile'
 
 export default function DonorPage({ donorPage, handleDonorClose }) {
-  const { perms } = useStatic(s => s.auth)
+  const { perms } = useStatic((s) => s.auth)
 
   return (
     <DialogWrapper
       configObj={donorPage}
       defaultTitle="donor_page"
       handleClose={handleDonorClose}
-      contentBody={
-        donorPage.components.map((block, i) => {
-          if (block.donorOnly && !perms.donor) return null
-          if (block.freeloaderOnly && perms.donor) return null
-          return (
-            <CustomTile
-              key={i}
-              block={block}
-            />
-          )
-        })
-      }
+      contentBody={donorPage.components.map((block, i) => {
+        if (block.donorOnly && !perms.donor) return null
+        if (block.freeloaderOnly && perms.donor) return null
+        return <CustomTile key={i} block={block} />
+      })}
     />
   )
 }

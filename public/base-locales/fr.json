@@ -540,11 +540,15 @@
   "react_error": "Un problème est survenu",
   "clickable_icon": "L'icône est cliquable",
   "weather_options": "Options météo",
-  "two_stops_till_next": "2 arrêts jusqu'à la prochaine",
-  "one_stop_till_next": "1 arrêt jusqu'au prochain",
-  "no_more_gyms": "Plus de gymnases",
-  "light_map_border": "Bordure de carte lumineuse",
+  "two_stops_till_next": "2 pokéstops jusqu'à la prochaine",
+  "one_stop_till_next": "1 pokéstops jusqu'à la prochaine",
+  "no_more_gyms": "Plus d'arènes",
+  "light_map_border": "Bordure de carte claire",
   "dark_map_border": "Bordure de carte sombre",
   "cell_blocked": "Cellule bloquée",
-  "poi_color": "Couleur du point d'intérêt"
+  "poi_color": "Couleur du point d'intérêt",
+  "ultra_beast": "Ultra Bête",
+  "quest_condition": "État de la quête",
+  "always_show_labels": "Toujours afficher les étiquettes",
+  "scan_areas_options": "Options des zones de numérisation"
 }

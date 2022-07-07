@@ -19,7 +19,7 @@ export default function BadgeSelection({ gym, setBadgeMenu, badge, setBadge }) {
       <Header titles={['gym_badge_menu']} action={() => setBadgeMenu(false)} />
       <DialogContent>
         <ButtonGroup>
-          {[0, 1, 2, 3].map(i => (
+          {[0, 1, 2, 3].map((i) => (
             <Button
               key={i}
               size="small"
@@ -41,7 +41,17 @@ export default function BadgeSelection({ gym, setBadgeMenu, badge, setBadge }) {
           ))}
         </ButtonGroup>
       </DialogContent>
-      <Footer options={[{ name: 'close', action: () => setBadgeMenu(false), color: 'primary', align: 'right' }]} role="webhook_footer" />
+      <Footer
+        options={[
+          {
+            name: 'close',
+            action: () => setBadgeMenu(false),
+            color: 'primary',
+            align: 'right',
+          },
+        ]}
+        role="webhook_footer"
+      />
     </>
   )
 }

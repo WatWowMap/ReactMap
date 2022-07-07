@@ -510,5 +510,9 @@
   "light_map_border": "เส้นขอบแผนที่แสง",
   "dark_map_border": "เส้นขอบแผนที่มืด",
   "cell_blocked": "เซลล์ถูกบล็อก",
-  "poi_color": "POI สี"
+  "poi_color": "POI สี",
+  "ultra_beast": "อุลตร้าบีสท์",
+  "quest_condition": "เงื่อนไขภารกิจ",
+  "always_show_labels": "แสดงป้ายกำกับเสมอ",
+  "scan_areas_options": "ตัวเลือกพื้นที่สแกน"
 }

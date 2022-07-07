@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.2.6",
+  "version": "1.3.2",
   "description": "React based frontend map.",
   "main": "ReactMap.mjs",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -23,11 +23,15 @@
     "migrate:make": "knex --knexfile server/knexfile.cjs migrate:make",
     "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
     "migrate:rollback": "knex --knexfile server/knexfile.cjs migrate:rollback",
-    "release": "node server/scripts/newRelease.js"
+    "release": "node server/scripts/newRelease.js",
+    "prettier:check": "prettier --check \"**/*.{js,jsx}\"",
+    "prettier:fix": "prettier --write \"**/*.{js,jsx}\"",
+    "eslint:check": "eslint \"**/*.{js,jsx}\"",
+    "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix"
   },
   "engines": {
     "node": ">=16",
-    "yarn": "1.22.x"
+    "yarn": "^1.22.x"
   },
   "devDependencies": {
     "@craftamap/esbuild-plugin-html": "^0.4.0",
@@ -39,12 +43,14 @@
     "esbuild-server": "^0.1.0",
     "eslint": "^8.9.0",
     "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "prettier": "^2.6.2"
   },
   "dependencies": {
     "@apollo/client": "^3.3.11",
@@ -54,6 +60,7 @@
     "@material-ui/styles": "^4.11.4",
     "@sentry/react": "^6.19.7",
     "@sentry/tracing": "^6.19.7",
+    "@turf/boolean-overlap": "^6.5.0",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/center": "^6.3.0",
     "@turf/destination": "^6.5.0",
@@ -97,7 +104,7 @@
     "prop-types": "^15.7.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-ga": "^3.3.0",
+    "react-ga4": "^1.4.1",
     "react-i18next": "^11.16.7",
     "react-leaflet": "3.2.2",
     "react-leaflet-markercluster": "3.0.0-rc1",

@@ -3,7 +3,12 @@ import { FixedSizeGrid } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 
 export default function ReactWindow({
-  columnCount, length, Tile, data, offset, columnWidthCorrection,
+  columnCount,
+  length,
+  Tile,
+  data,
+  offset,
+  columnWidthCorrection,
 }) {
   return (
     <AutoSizer>
@@ -13,7 +18,9 @@ export default function ReactWindow({
           width={width}
           height={height}
           columnCount={columnCount}
-          columnWidth={Math.floor(width / columnCount) - (columnWidthCorrection || 5)}
+          columnWidth={
+            Math.floor(width / columnCount) - (columnWidthCorrection || 5)
+          }
           rowCount={Math.ceil(length / columnCount)}
           rowHeight={(columnCount > 1 ? 120 : 60) + offset}
           itemData={{

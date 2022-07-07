@@ -5,7 +5,10 @@ const { User } = require('../../../models/index')
 
 router.get('/', async (req, res) => {
   try {
-    if (api.reactMapSecret && req.headers['react-map-secret'] === api.reactMapSecret) {
+    if (
+      api.reactMapSecret &&
+      req.headers['react-map-secret'] === api.reactMapSecret
+    ) {
       res.status(200).json(await User.query())
     } else {
       throw new Error('Incorrect or missing API secret')
@@ -19,7 +22,10 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    if (api.reactMapSecret && req.headers['react-map-secret'] === api.reactMapSecret) {
+    if (
+      api.reactMapSecret &&
+      req.headers['react-map-secret'] === api.reactMapSecret
+    ) {
       res.status(200).json(await User.query().findById(req.params.id))
     } else {
       throw new Error('Incorrect or missing API secret')

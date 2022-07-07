@@ -1,7 +1,14 @@
 import React, { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import {
-  Grid, Typography, Button, OutlinedInput, InputLabel, FormControl, InputAdornment, IconButton,
+  Grid,
+  Typography,
+  Button,
+  OutlinedInput,
+  InputLabel,
+  FormControl,
+  InputAdornment,
+  IconButton,
 } from '@material-ui/core'
 import { Visibility, VisibilityOff } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
@@ -10,7 +17,11 @@ import { useMutation } from '@apollo/client'
 import Fetch from '@services/Fetch'
 import Query from '@services/Query'
 
-export default function LocalLogin({ href, serverSettings, getServerSettings }) {
+export default function LocalLogin({
+  href,
+  serverSettings,
+  getServerSettings,
+}) {
   const { t } = useTranslation()
   const [user, setUser] = useState({
     username: '',
@@ -32,18 +43,17 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitted(true)
-    await Fetch.login(user, href)
-      .then(async resp => {
-        if (!resp.ok) {
-          setError(t(await resp.json()))
+    await Fetch.login(user, href).then(async (resp) => {
+      if (!resp.ok) {
+        setError(t(await resp.json()))
+      }
+      if (resp.redirected) {
+        await getServerSettings()
+        if (serverSettings.user.valid) {
+          setRedirect(true)
         }
-        if (resp.redirected) {
-          await getServerSettings()
-          if (serverSettings.user.valid) {
-            setRedirect(true)
-          }
-        }
-      })
+      }
+    })
   }
 
   if (redirect) {
@@ -53,12 +63,7 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          spacing={2}
-        >
+        <Grid container justifyContent="center" alignItems="center" spacing={2}>
           <Grid item xs={12} sm={5} style={{ textAlign: 'center' }}>
             <FormControl variant="outlined" color="secondary">
               <InputLabel htmlFor="username">{t('local_username')}</InputLabel>
@@ -72,7 +77,9 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
                 color="secondary"
                 labelWidth={t('local_username').length * 9}
                 style={{ width: 250 }}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(e) }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSubmit(e)
+                }}
               />
             </FormControl>
           </Grid>
@@ -88,20 +95,24 @@ export default function LocalLogin({ href, serverSettings, getServerSettings }) 
                 autoComplete="current-password"
                 color="secondary"
                 labelWidth={t('local_password').length * 9}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(e) }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSubmit(e)
+                }}
                 style={{ width: 250 }}
-                endAdornment={(
+                endAdornment={
                   <InputAdornment position="end">
                     <IconButton
                       style={{ color: 'white' }}
                       name="showPassword"
-                      onClick={() => setUser({ ...user, showPassword: !user.showPassword })}
+                      onClick={() =>
+                        setUser({ ...user, showPassword: !user.showPassword })
+                      }
                       onMouseDown={(e) => e.preventDefault()}
                     >
                       {user.showPassword ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>
-                )}
+                }
               />
             </FormControl>
           </Grid>

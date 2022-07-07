@@ -1,59 +1,97 @@
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export const useStore = create(persist(
-  set => ({
-    location: undefined,
-    setLocation: (location) => set({ location }),
-    zoom: undefined,
-    setZoom: (zoom) => set({ zoom }),
-    filters: undefined,
-    setFilters: (filters) => set({ filters }),
-    settings: undefined,
-    setSettings: (settings) => set({ settings }),
-    userSettings: undefined,
-    setUserSettings: (userSettings) => set({ userSettings }),
-    icons: undefined,
-    setIcons: (icons) => set({ icons }),
-    menus: undefined,
-    setMenus: (menus) => set({ menus }),
-    tutorial: true,
-    setTutorial: (tutorial) => set({ tutorial }),
-    sidebar: undefined,
-    setSidebar: (sidebar) => set({ sidebar }),
-    advMenu: {
-      pokemon: 'others',
-      gyms: 'categories',
-      pokestops: 'categories',
-      nests: 'others',
-    },
-    setAdvMenu: (advMenu) => set({ advMenu }),
-    search: '',
-    setSearch: (search) => set({ search }),
-    searchTab: 0,
-    setSearchTab: (searchTab) => set({ searchTab }),
-    selectedWebhook: undefined,
-    setSelectedWebhook: (selectedWebhook) => set({ selectedWebhook }),
-    webhookAdv: { primary: true, advanced: false, pvp: false, distance: true, global: true },
-    setWebhookAdv: (webhookAdv) => set({ webhookAdv }),
-    popups: {
-      invasions: false,
-      extras: false,
-      raids: true,
-      pvp: false,
-      names: true,
-    },
-    setPopups: (popups) => set({ popups }),
-    motdIndex: 0,
-    setMotdIndex: (motdIndex) => set({ motdIndex }),
-  }),
-  {
-    name: 'local-state',
-    getStorage: () => localStorage,
-  },
-))
+export const useStore = create(
+  persist(
+    (set, get) => ({
+      location: undefined,
+      setLocation: (location) => set({ location }),
+      zoom: undefined,
+      setZoom: (zoom) => set({ zoom }),
+      filters: undefined,
+      setFilters: (filters) => set({ filters }),
+      setAreas: (areas = [], validAreas = [], unselectAll = false) => {
+        const { filters } = get()
+        const incoming = new Set(Array.isArray(areas) ? areas : [areas])
+        const existing = new Set(filters?.scanAreas?.filter?.areas || [])
 
-export const useStatic = create(set => ({
+        incoming.forEach((area) => {
+          if (existing.has(area) || unselectAll) {
+            existing.delete(area)
+          } else {
+            existing.add(area)
+          }
+        })
+
+        if (filters?.scanAreas?.filter?.areas) {
+          set({
+            filters: {
+              ...filters,
+              scanAreas: {
+                ...filters.scanAreas,
+                filter: {
+                  ...filters.scanAreas.filter,
+                  areas: [...existing].filter((area) =>
+                    validAreas.includes(area),
+                  ),
+                },
+              },
+            },
+          })
+        }
+      },
+      settings: undefined,
+      setSettings: (settings) => set({ settings }),
+      userSettings: undefined,
+      setUserSettings: (userSettings) => set({ userSettings }),
+      icons: undefined,
+      setIcons: (icons) => set({ icons }),
+      menus: undefined,
+      setMenus: (menus) => set({ menus }),
+      tutorial: true,
+      setTutorial: (tutorial) => set({ tutorial }),
+      sidebar: undefined,
+      setSidebar: (sidebar) => set({ sidebar }),
+      advMenu: {
+        pokemon: 'others',
+        gyms: 'categories',
+        pokestops: 'categories',
+        nests: 'others',
+      },
+      setAdvMenu: (advMenu) => set({ advMenu }),
+      search: '',
+      setSearch: (search) => set({ search }),
+      searchTab: 0,
+      setSearchTab: (searchTab) => set({ searchTab }),
+      selectedWebhook: undefined,
+      setSelectedWebhook: (selectedWebhook) => set({ selectedWebhook }),
+      webhookAdv: {
+        primary: true,
+        advanced: false,
+        pvp: false,
+        distance: true,
+        global: true,
+      },
+      setWebhookAdv: (webhookAdv) => set({ webhookAdv }),
+      popups: {
+        invasions: false,
+        extras: false,
+        raids: true,
+        pvp: false,
+        names: true,
+      },
+      setPopups: (popups) => set({ popups }),
+      motdIndex: 0,
+      setMotdIndex: (motdIndex) => set({ motdIndex }),
+    }),
+    {
+      name: 'local-state',
+      getStorage: () => localStorage,
+    },
+  ),
+)
+
+export const useStatic = create((set) => ({
   active: true,
   setActive: (active) => set({ active }),
   auth: { discord: true, loggedIn: false, perms: {} },
@@ -85,7 +123,9 @@ export const useStatic = create(set => ({
   timerList: [],
   setTimerList: (timerList) => set({ timerList }),
   webhookAlert: {
-    open: false, severity: 'info', message: '',
+    open: false,
+    severity: 'info',
+    message: '',
   },
   setWebhookAlert: (webhookAlert) => set({ webhookAlert }),
   webhookData: undefined,

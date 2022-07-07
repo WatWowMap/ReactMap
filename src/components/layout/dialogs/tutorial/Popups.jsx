@@ -1,7 +1,5 @@
 import React from 'react'
-import {
-  Grid, DialogContent, Typography, Divider,
-} from '@material-ui/core'
+import { Grid, DialogContent, Typography, Divider } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
@@ -10,9 +8,11 @@ import data from './data.json'
 
 export default function TutPopup({ isMobile }) {
   const { t } = useTranslation()
-  const Icons = useStatic(state => state.Icons)
-  const { map: { startLat, startLon } } = useStatic(state => state.config)
-  const ts = Math.floor((new Date()).getTime() / 1000)
+  const Icons = useStatic((state) => state.Icons)
+  const {
+    map: { startLat, startLon },
+  } = useStatic((state) => state.config)
+  const ts = Math.floor(new Date().getTime() / 1000)
   const size = isMobile ? 'subtitle2' : 'subtitle1'
 
   return (

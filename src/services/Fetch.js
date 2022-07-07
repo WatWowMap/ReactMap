@@ -10,7 +10,10 @@ export default class Fetch {
       const body = await response.json()
       return body.serverSettings
     } catch (error) {
-      console.error(error.message, '\nUnable to fetch settings at this time, please try again later.')
+      console.error(
+        error.message,
+        '\nUnable to fetch settings at this time, please try again later.',
+      )
       return { error: true, status: 500 }
     }
   }
@@ -25,7 +28,10 @@ export default class Fetch {
         body: JSON.stringify(user),
       })
     } catch (error) {
-      console.error(error.message, '\nUnable to login at this time, please try again later.')
+      console.error(
+        error.message,
+        '\nUnable to login at this time, please try again later.',
+      )
       return { error: true, status: 500 }
     }
   }

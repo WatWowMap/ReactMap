@@ -1,10 +1,5 @@
 import React from 'react'
-import {
-  DialogContent,
-  Grid,
-  Typography,
-  Fab,
-} from '@material-ui/core'
+import { DialogContent, Grid, Typography, Fab } from '@material-ui/core'
 import { Person, LockOpen } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
 
@@ -13,13 +8,16 @@ import LocaleSelection from '@components/layout/general/LocaleSelection'
 
 export default function TutWelcome({ setUserProfile }) {
   const { t } = useTranslation()
-  const { methods, loggedIn, perms } = useStatic(state => state.auth)
-  const { map: { enableUserProfile, excludeList }, localeSelection } = useStatic(state => state.config)
+  const { methods, loggedIn, perms } = useStatic((state) => state.auth)
+  const {
+    map: { enableUserProfile, excludeList },
+    localeSelection,
+  } = useStatic((state) => state.config)
 
   const getPerms = () => {
     let have = 0
     let total = 0
-    Object.keys(perms).forEach(perm => {
+    Object.keys(perms).forEach((perm) => {
       if (!excludeList.includes(perm)) {
         have += perms[perm] ? 1 : 0
         total += 1
@@ -52,7 +50,9 @@ export default function TutWelcome({ setUserProfile }) {
         {enableUserProfile && (
           <Grid item xs={6}>
             <Typography variant="h6" gutterBottom align="center">
-              {!loggedIn && methods.length ? t('login_optional') : t('view_profile')}
+              {!loggedIn && methods.length
+                ? t('login_optional')
+                : t('view_profile')}
             </Typography>
           </Grid>
         )}
@@ -80,7 +80,9 @@ export default function TutWelcome({ setUserProfile }) {
         {enableUserProfile && (
           <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
             <Typography variant="subtitle1" align="center">
-              {!loggedIn && methods.length ? t('tutorial_logged_out') : t('tutorial_logged_in')}
+              {!loggedIn && methods.length
+                ? t('tutorial_logged_out')
+                : t('tutorial_logged_in')}
             </Typography>
           </Grid>
         )}

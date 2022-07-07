@@ -6,16 +6,16 @@ import Utility from '@services/Utility'
 
 export default function SpawnpointPopup({ spawnpoint, ts }) {
   const { t } = useTranslation()
-  const {
-    despawn_sec: despawn, lat, lon, updated,
-  } = spawnpoint
+  const { despawn_sec: despawn, lat, lon, updated } = spawnpoint
 
   const minute = despawn > 60 ? Math.round(despawn / 60) : despawn
   const minuteFixed = minute < 10 ? `0${minute}` : minute
 
   return (
     <>
-      <Typography variant="h5" align="center">{t('spawnpoint')}</Typography>
+      <Typography variant="h5" align="center">
+        {t('spawnpoint')}
+      </Typography>
       <Typography variant="h6" align="center">
         {despawn ? `00:${minuteFixed}` : '?'}
       </Typography>
@@ -30,7 +30,8 @@ export default function SpawnpointPopup({ spawnpoint, ts }) {
         {t('location')}
       </Typography>
       <Typography variant="subtitle2" align="center">
-        {lat},<br />{lon}
+        {lat},<br />
+        {lon}
       </Typography>
     </>
   )

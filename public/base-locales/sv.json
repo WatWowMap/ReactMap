@@ -510,5 +510,9 @@
   "light_map_border": "Ljus kartgräns",
   "dark_map_border": "Mörk kartgräns",
   "cell_blocked": "Cell blockerad",
-  "poi_color": "POI-färg"
+  "poi_color": "POI-färg",
+  "ultra_beast": "Ultra Beast",
+  "quest_condition": "Quest tillstånd",
+  "always_show_labels": "Visa alltid etiketter",
+  "scan_areas_options": "Alternativ för skanningsområden"
 }

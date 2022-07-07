@@ -37,7 +37,7 @@
   "generations": "Generations",
   "types": "Types",
   "forms": "Forms",
-  "rarity": "Rarity",
+  "rarity": "Current Rarity",
   "others": "Others",
   "categories": "Categories",
   "rank": "Rank",
@@ -543,5 +543,14 @@
   "light_map_border": "Light Map Border",
   "dark_map_border": "Dark Map Border",
   "cell_blocked": "Cell Blocked",
-  "poi_color": "POI Color"
+  "poi_color": "POI Color",
+  "quest_condition": "Quest Condition",
+  "always_show_labels": "Always Show Labels",
+  "scan_areas_options": "Scan Areas Options",
+  "historic_rarity": "Historic Rarity",
+  "poi": "Points of Interest",
+  "300m_range": "300m Range",
+  "lure_range": "Lure Range",
+  "tap_to_toggle": "Tap To Toggle",
+  "power_up": "Power Up"
 }

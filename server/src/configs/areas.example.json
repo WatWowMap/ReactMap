@@ -34,7 +34,8 @@
         "stroke": "#352BFF",
         "stroke-width": 2.0,
         "fill": "#0651FF",
-        "hidden": false
+        "hidden": false,
+        "parent": "USA"
       }
     }
   ]

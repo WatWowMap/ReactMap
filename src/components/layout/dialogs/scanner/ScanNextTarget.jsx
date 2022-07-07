@@ -1,9 +1,5 @@
-import React, {
-  useState, useRef, useMemo, useEffect,
-} from 'react'
-import {
-  Grid, Button, ButtonGroup, Typography,
-} from '@material-ui/core'
+import React, { useState, useRef, useMemo, useEffect } from 'react'
+import { Grid, Button, ButtonGroup, Typography } from '@material-ui/core'
 import { point, polygon } from '@turf/helpers'
 import destination from '@turf/destination'
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
@@ -11,8 +7,20 @@ import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
 export default function ScanNextTarget({
-  map, scannerType, queue, setScanNextMode, scanNextLocation, setScanNextLocation, scanNextCoords, setScanNextCoords,
-  scanNextType, setScanNextType, scanNextShowScanCount, scanNextShowScanQueue, scanNextAreaRestriction, scanAreas,
+  map,
+  scannerType,
+  queue,
+  setScanNextMode,
+  scanNextLocation,
+  setScanNextLocation,
+  scanNextCoords,
+  setScanNextCoords,
+  scanNextType,
+  setScanNextType,
+  scanNextShowScanCount,
+  scanNextShowScanQueue,
+  scanNextAreaRestriction,
+  scanAreas,
 }) {
   const [position, setPosition] = useState(scanNextLocation)
   const radiusPokemon = 70
@@ -26,19 +34,34 @@ export default function ScanNextTarget({
       XL: radiusGym * 1.732,
     }
     const options = { units: 'kilometers' }
-    return coords.concat([0, 60, 120, 180, 240, 300].map(bearing => {
-      const [lon, lat] = destination(start, distance[type] / 1000, bearing, options).geometry.coordinates
-      return [lat, lon]
-    }))
+    return coords.concat(
+      [0, 60, 120, 180, 240, 300].map((bearing) => {
+        const [lon, lat] = destination(
+          start,
+          distance[type] / 1000,
+          bearing,
+          options,
+        ).geometry.coordinates
+        return [lat, lon]
+      }),
+    )
   }
   const checkAreaValidity = (center) => {
     if (!scanNextAreaRestriction?.length || !scanAreas?.length) return true
     let isValid = false
     if (scanNextAreaRestriction?.length && scanAreas?.length) {
       const testPoint = point([center[1], center[0]])
-      scanNextAreaRestriction.map(area => {
-        if (scanAreas.some(scanArea => scanArea.properties.name === area
-          && booleanPointInPolygon(testPoint, polygon(scanArea.geometry.coordinates)))) {
+      scanNextAreaRestriction.map((area) => {
+        if (
+          scanAreas.some(
+            (scanArea) =>
+              scanArea.properties.name === area &&
+              booleanPointInPolygon(
+                testPoint,
+                polygon(scanArea.geometry.coordinates),
+              ),
+          )
+        ) {
           isValid = true
         }
         return true
@@ -102,10 +125,8 @@ export default function ScanNextTarget({
             </Grid>
             {scannerType === 'rdm' && (
               <Grid item xs={12} style={{ textAlign: 'center' }}>
-                <ButtonGroup
-                  size="small"
-                >
-                  {['S', 'M', 'XL'].map(item => (
+                <ButtonGroup size="small">
+                  {['S', 'M', 'XL'].map((item) => (
                     <Button
                       key={item}
                       onClick={() => {
@@ -135,14 +156,20 @@ export default function ScanNextTarget({
               <Button
                 color="secondary"
                 variant="contained"
-                disabled={Boolean(scanNextAreaRestriction?.length && !isInAllowedArea)}
+                disabled={Boolean(
+                  scanNextAreaRestriction?.length && !isInAllowedArea,
+                )}
                 onClick={() => setScanNextMode('sendCoords')}
               >
                 {t('click_to_scan')}
               </Button>
             </Grid>
             <Grid item style={{ display: isInAllowedArea ? 'none' : 'block' }}>
-              <Typography variant="body2" align="center" style={{ fontStyle: 'italic' }}>
+              <Typography
+                variant="body2"
+                align="center"
+                style={{ fontStyle: 'italic' }}
+              >
                 {t('scan_outside_area')}
               </Typography>
             </Grid>
@@ -158,40 +185,48 @@ export default function ScanNextTarget({
           </Grid>
         </Popup>
       </Marker>
-      {scanNextCoords.map(coords => (
+      {scanNextCoords.map((coords) => (
         <Circle
           key={[coords[0], coords[1]]}
           radius={radiusPokemon}
           center={[coords[0], coords[1]]}
           fillOpacity={0.5}
-          pathOptions={{ color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)' }}
+          pathOptions={{
+            color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)',
+          }}
         />
       ))}
-      {scanNextType === 'M'
-        ? (
-          <Circle
-            key={[scanNextCoords[0][0], scanNextCoords[0][1]]}
-            radius={radiusGym + radiusPokemon}
-            center={[scanNextCoords[0][0], scanNextCoords[0][1]]}
-            fillOpacity={0.1}
-            pathOptions={{
-              color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)',
-              fillColor: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)',
-            }}
-          />
-        )
-        : scanNextCoords.map(coords => (
+      {scanNextType === 'M' ? (
+        <Circle
+          key={[scanNextCoords[0][0], scanNextCoords[0][1]]}
+          radius={radiusGym + radiusPokemon}
+          center={[scanNextCoords[0][0], scanNextCoords[0][1]]}
+          fillOpacity={0.1}
+          pathOptions={{
+            color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)',
+            fillColor: !isInAllowedArea
+              ? 'rgb(255, 100, 90)'
+              : 'rgb(255, 165, 0)',
+          }}
+        />
+      ) : (
+        scanNextCoords.map((coords) => (
           <Circle
             key={[coords[0], coords[1]]}
             radius={radiusGym}
             center={[coords[0], coords[1]]}
             fillOpacity={0.1}
             pathOptions={{
-              color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)',
-              fillColor: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)',
+              color: !isInAllowedArea
+                ? 'rgb(255, 100, 90)'
+                : 'rgb(255, 165, 0)',
+              fillColor: !isInAllowedArea
+                ? 'rgb(255, 100, 90)'
+                : 'rgb(255, 165, 0)',
             }}
           />
-        ))}
+        ))
+      )}
     </>
   )
 }

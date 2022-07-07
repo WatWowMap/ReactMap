@@ -14,7 +14,10 @@ export default function CustomButton({ block, isMuiColor = false }) {
       href={block.href}
       style={block.style || { color: isMuiColor ? 'inherit' : block.color }}
     >
-      {Boolean(block.icon) && <Icon className={block.icon} style={{ fontSize: 30 }} />}&nbsp;
+      {Boolean(block.icon) && (
+        <Icon className={block.icon} style={{ fontSize: 30 }} />
+      )}
+      &nbsp;
       <Typography variant="button" align="right">
         {Utility.getBlockContent(block.content)}
       </Typography>

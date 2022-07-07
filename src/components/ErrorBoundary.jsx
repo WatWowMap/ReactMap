@@ -22,18 +22,27 @@ class ErrorBoundary extends Component {
 
   render() {
     return this.state.hasError ? (
-      <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh', width: '100vw', textAlign: 'center' }}>
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        style={{ height: '100vh', width: '100vw', textAlign: 'center' }}
+      >
         <Grid item xs={12}>
           <Typography variant="h3" align="center" style={{ color: 'white' }}>
             {this.props.t('react_error')}
           </Typography>
-          <Typography variant="subtitle2" align="center" style={{ color: 'white' }}>
+          <Typography
+            variant="subtitle2"
+            align="center"
+            style={{ color: 'white' }}
+          >
             {this.state.message}
           </Typography>
           <br />
           <br />
           <Button
-            onClick={() => window.location = window.location.href}
+            onClick={() => (window.location = window.location.href)}
             variant="contained"
             color="primary"
             startIcon={<Refresh />}
@@ -42,7 +51,9 @@ class ErrorBoundary extends Component {
           </Button>
         </Grid>
       </Grid>
-    ) : this.props.children
+    ) : (
+      this.props.children
+    )
   }
 }
 

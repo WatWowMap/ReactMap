@@ -45,7 +45,8 @@ const Timer = ({ device, t, ts }) => {
 
   return (
     <Typography variant="caption">
-      {t('last_seen')}: {Utility.dayCheck(ts, last_seen)} ({since.str.replace('days', t('days')).replace('day', t('day'))})
+      {t('last_seen')}: {Utility.dayCheck(ts, last_seen)} (
+      {since.str.replace('days', t('days')).replace('day', t('day'))})
     </Typography>
   )
 }

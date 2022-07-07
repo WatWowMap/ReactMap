@@ -9,15 +9,12 @@ export default function LocaleSelection({ localeSelection }) {
     <Select
       autoFocus
       name="localeSelection"
-      value={localStorage.getItem('i18nextLng')}
+      value={localStorage.getItem('i18nextLng') || 'en'}
       onChange={(event) => i18n.changeLanguage(event.target.value)}
       fullWidth
     >
-      {Object.keys(localeSelection).map(option => (
-        <MenuItem
-          key={option}
-          value={option}
-        >
+      {Object.keys(localeSelection).map((option) => (
+        <MenuItem key={option} value={option}>
           {t(`locale_selection_${option}`)}
         </MenuItem>
       ))}

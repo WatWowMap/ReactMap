@@ -11,7 +11,11 @@ import DiscordLogin from './Discord'
 import TelegramLogin from './Telegram'
 import CustomTile from '../custom/CustomTile'
 
-export default function Login({ clickedTwice, serverSettings, getServerSettings }) {
+export default function Login({
+  clickedTwice,
+  serverSettings,
+  getServerSettings,
+}) {
   const location = useLocation()
   const { t } = useTranslation()
   const theme = useTheme()
@@ -50,18 +54,37 @@ export default function Login({ clickedTwice, serverSettings, getServerSettings 
         </Typography>
       </Grid>
       {serverSettings?.authMethods?.includes('discord') && (
-        <Grid container item justifyContent="center" alignItems="center" style={{ marginTop: 20, marginBottom: 20 }}>
+        <Grid
+          container
+          item
+          justifyContent="center"
+          alignItems="center"
+          style={{ marginTop: 20, marginBottom: 20 }}
+        >
           <Grid
             item
-            xs={serverSettings.config.map.discordInvite ? t('login_button') : 10}
+            xs={
+              serverSettings.config.map.discordInvite ? t('login_button') : 10
+            }
             sm={serverSettings.config.map.discordInvite ? 3 : 10}
-            style={{ textAlign: 'center', marginTop: serverSettings.config.map.discordAuthUrl ? 20 : 0 }}
+            style={{
+              textAlign: 'center',
+              marginTop: serverSettings.config.map.discordAuthUrl ? 20 : 0,
+            }}
           >
             <DiscordLogin href={serverSettings.config.map.discordAuthUrl} />
           </Grid>
           {serverSettings.config.map.discordInvite && (
-            <Grid item xs={t('join_button')} sm={3} style={{ textAlign: 'center', marginTop: 20 }}>
-              <DiscordLogin href={serverSettings.config.map.discordInvite} text="join" />
+            <Grid
+              item
+              xs={t('join_button')}
+              sm={3}
+              style={{ textAlign: 'center', marginTop: 20 }}
+            >
+              <DiscordLogin
+                href={serverSettings.config.map.discordInvite}
+                text="join"
+              />
             </Grid>
           )}
         </Grid>
@@ -90,8 +113,19 @@ export default function Login({ clickedTwice, serverSettings, getServerSettings 
           </Typography>
         </Grid>
       )}
-      <Grid item style={{ marginTop: 20, marginBottom: 20, bottom: 0, position: 'absolute', width: isMobile ? '50%' : '20%' }}>
-        <LocaleSelection localeSelection={serverSettings.config.localeSelection} />
+      <Grid
+        item
+        style={{
+          marginTop: 20,
+          marginBottom: 20,
+          bottom: 0,
+          position: 'absolute',
+          width: isMobile ? '50%' : '20%',
+        }}
+      >
+        <LocaleSelection
+          localeSelection={serverSettings.config.localeSelection}
+        />
       </Grid>
     </Grid>
   )

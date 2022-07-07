@@ -11,50 +11,75 @@ import ActiveWeather from './layout/general/ActiveWeather'
 const filterSkipList = ['filter', 'enabled', 'legacy']
 
 export default function QueryData({
-  bounds, onMove, map, tileStyle, clusteringRules, config, params, isMobile,
-  category, filters, staticFilters, staticUserSettings, sizeKey,
-  userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
-  setError, active,
+  bounds,
+  onMove,
+  map,
+  tileStyle,
+  clusteringRules,
+  config,
+  params,
+  isMobile,
+  category,
+  filters,
+  staticFilters,
+  staticUserSettings,
+  sizeKey,
+  userSettings,
+  perms,
+  Icons,
+  userIcons,
+  setParams,
+  isNight,
+  setExcludeList,
+  setError,
+  active,
+  onlyAreas,
 }) {
-  const trimFilters = useCallback(requestedFilters => {
-    const trimmed = {
-      onlyLegacyExclude: [],
-      onlyLegacy: userSettings.legacyFilter,
-      onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
-    }
-    Object.entries(requestedFilters).forEach(topLevelFilter => {
-      const [id, specifics] = topLevelFilter
+  const trimFilters = useCallback(
+    (requestedFilters) => {
+      const trimmed = {
+        onlyLegacyExclude: [],
+        onlyLegacy: userSettings.legacyFilter,
+        onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
+        onlyAreas,
+      }
+      Object.entries(requestedFilters).forEach((topLevelFilter) => {
+        const [id, specifics] = topLevelFilter
 
-      if (!filterSkipList.includes(id)) {
-        trimmed[`only${id.charAt(0).toUpperCase()}${id.slice(1)}`] = specifics
-      }
-    })
-    Object.entries(userSettings).forEach(([entryK, entryV]) => {
-      if (entryK.startsWith('pvp')) {
-        trimmed[`only${entryK.charAt(0).toUpperCase()}${entryK.slice(1)}`] = entryV
-      }
-    })
-    Object.entries(requestedFilters.filter).forEach(filter => {
-      const [id, specifics] = filter
+        if (!filterSkipList.includes(id)) {
+          trimmed[`only${id.charAt(0).toUpperCase()}${id.slice(1)}`] = specifics
+        }
+      })
+      Object.entries(userSettings).forEach(([entryK, entryV]) => {
+        if (entryK.startsWith('pvp')) {
+          trimmed[`only${entryK.charAt(0).toUpperCase()}${entryK.slice(1)}`] =
+            entryV
+        }
+      })
+      Object.entries(requestedFilters.filter).forEach((filter) => {
+        const [id, specifics] = filter
 
-      if (specifics && specifics.enabled && staticFilters[id]) {
-        trimmed[id] = specifics
-      } else if (userSettings.legacyFilter) {
-        trimmed.onlyLegacyExclude.push(id)
-      }
-    })
-    return trimmed
-  }, [userSettings, filters])
+        if (specifics && specifics.enabled && staticFilters[id]) {
+          trimmed[id] = specifics
+        } else if (userSettings.legacyFilter) {
+          trimmed.onlyLegacyExclude.push(id)
+        }
+      })
+      return trimmed
+    },
+    [userSettings, filters, onlyAreas],
+  )
 
   const refetchData = () => {
     onMove()
-    if (category !== 'weather'
-      && category !== 'device'
-      && category !== 'scanAreas') {
+    if (
+      category !== 'weather' &&
+      category !== 'device' &&
+      category !== 'scanAreas'
+    ) {
       refetch({
         ...Utility.getQueryArgs(map),
         filters: trimFilters(filters),
-        version: inject.VERSION,
       })
     }
   }
@@ -64,7 +89,7 @@ export default function QueryData({
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [filters, userSettings])
+  }, [filters, userSettings, onlyAreas])
 
   const { data, previousData, refetch, error } = useQuery(
     Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),
@@ -73,7 +98,6 @@ export default function QueryData({
       variables: {
         ...bounds,
         filters: trimFilters(filters),
-        version: inject.VERSION,
       },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
       pollInterval: (config.polling[category] || 10) * 1000,
@@ -98,16 +122,18 @@ export default function QueryData({
         />
       )
     }
-    const message = error?.networkError?.result?.errors?.find(x => x?.message === 'old_client')?.message
-      || error?.message
+    const message =
+      error?.networkError?.result?.errors?.find(
+        (x) => x?.message === 'old_client',
+      )?.message || error?.message
     if (message === 'session_expired' || message === 'old_client') {
       setError(message)
       return null
     }
   }
 
-  const renderedData = data || previousData || {}
-  return renderedData[category] ? (
+  const renderedData = data || previousData || { [category]: [] }
+  return (
     <>
       <Clustering
         key={sizeKey}
@@ -126,6 +152,7 @@ export default function QueryData({
         params={params}
         setParams={setParams}
         isNight={isNight}
+        onlyAreas={onlyAreas}
       />
       {category === 'weather' && (
         <ActiveWeather
@@ -139,5 +166,5 @@ export default function QueryData({
         />
       )}
     </>
-  ) : null
+  )
 }

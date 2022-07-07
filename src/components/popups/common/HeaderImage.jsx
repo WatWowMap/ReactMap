@@ -2,11 +2,14 @@ import React from 'react'
 import { Avatar, Link } from '@material-ui/core'
 
 export default function HeaderImage({
-  url, exEligible, arScanEligible, alt, Icons, large,
+  url,
+  exEligible,
+  arScanEligible,
+  alt,
+  Icons,
+  large,
 }) {
-  const src = url
-    ? url.replace('http://', 'https://')
-    : Icons.getPokestops(0)
+  const src = url ? url.replace('http://', 'https://') : Icons.getPokestops(0)
 
   const Image = (
     <Avatar
@@ -25,7 +28,9 @@ export default function HeaderImage({
         <Link href={src} target="_blank" rel="noreferrer">
           {Image}
         </Link>
-      ) : Image}
+      ) : (
+        Image
+      )}
       {Boolean(arScanEligible) && (
         <img
           className="ar-logo"

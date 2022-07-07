@@ -1,22 +1,27 @@
 import React, { useState } from 'react'
 import { Grid, IconButton, Typography } from '@material-ui/core'
-import {
-  Check, Clear, Tune,
-} from '@material-ui/icons'
+import { Check, Clear, Tune } from '@material-ui/icons'
 
 const getOtherData = (id) => {
   switch (id.charAt(0)) {
     case 'e':
-    case 'r': return { level: id.slice(1) }
-    default: return { pokemon_id: id.split('-')[0], form: id.split('-')[1] }
+    case 'r':
+      return { level: id.slice(1) }
+    default:
+      return { pokemon_id: id.split('-')[0], form: id.split('-')[1] }
   }
 }
-export default function NewPokemon({
-  data, rowIndex, columnIndex, style,
-}) {
+export default function NewPokemon({ data, rowIndex, columnIndex, style }) {
   const [name, setName] = useState(true)
   const {
-    tileItem, columnCount, tempFilters, setTempFilters, isMobile, type, Utility, toggleWebhook,
+    tileItem,
+    columnCount,
+    tempFilters,
+    setTempFilters,
+    isMobile,
+    type,
+    Utility,
+    toggleWebhook,
   } = data
 
   const item = tileItem[rowIndex * columnCount + columnIndex]
@@ -28,12 +33,18 @@ export default function NewPokemon({
   const handleFilterChange = () => {
     setTempFilters({
       ...tempFilters,
-      [item.id]: tempFilters[item.id] ? {
-        ...tempFilters[item.id],
-        enabled: !tempFilters[item.id]?.enabled,
-      } : tempFilters[item.id] = { enabled: true, ...getOtherData(item.id) },
+      [item.id]: tempFilters[item.id]
+        ? {
+            ...tempFilters[item.id],
+            enabled: !tempFilters[item.id]?.enabled,
+          }
+        : (tempFilters[item.id] = { enabled: true, ...getOtherData(item.id) }),
     })
-    Utility.analytics('Webhook Filtering', `${item.name} Status: ${!tempFilters[item.id]?.enabled}`, type)
+    Utility.analytics(
+      'Webhook Filtering',
+      `${item.name} Status: ${!tempFilters[item.id]?.enabled}`,
+      type,
+    )
   }
 
   const image = (
@@ -50,16 +61,16 @@ export default function NewPokemon({
   )
   const selection = (
     <IconButton onClick={handleFilterChange}>
-      {tempFilters[item.id] && tempFilters[item.id]?.enabled
-        ? <Check style={{ color: '#00e676' }} />
-        : <Clear color="primary" />}
+      {tempFilters[item.id] && tempFilters[item.id]?.enabled ? (
+        <Check style={{ color: '#00e676' }} />
+      ) : (
+        <Clear color="primary" />
+      )}
     </IconButton>
   )
 
   const advMenu = (
-    <IconButton
-      onClick={toggleWebhook(true, item.id)}
-    >
+    <IconButton onClick={toggleWebhook(true, item.id)}>
       <Tune style={{ color: 'white' }} />
     </IconButton>
   )

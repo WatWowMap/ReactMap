@@ -1,23 +1,28 @@
 import React from 'react'
 
-import ScanAreaTile from '@components/tiles/ScanArea'
+import MemoScanArea from '@components/tiles/ScanArea'
 
 export default function AreaSelection({
-  map, selectedWebhook,
-  webhookMode, setWebhookMode,
-  selectedAreas, setSelectedAreas,
+  map,
+  selectedWebhook,
+  webhookMode,
+  setWebhookMode,
+  selectedAreas,
+  setSelectedAreas,
   webhookData,
 }) {
   if (webhookData[selectedWebhook]) {
-    const lower = webhookData[selectedWebhook].available.map(a => a.toLowerCase())
+    const lower = webhookData[selectedWebhook].available.map((a) =>
+      a.toLowerCase(),
+    )
     const filtered = {
       ...webhookData[selectedWebhook].areas,
-      features: webhookData[selectedWebhook].areas.features.filter(feature => (
-        lower.includes(feature.properties.name.toLowerCase())
-      )),
+      features: webhookData[selectedWebhook].areas.features.filter((feature) =>
+        lower.includes(feature.properties.name.toLowerCase()),
+      ),
     }
     return (
-      <ScanAreaTile
+      <MemoScanArea
         map={map}
         item={filtered}
         webhookMode={webhookMode}

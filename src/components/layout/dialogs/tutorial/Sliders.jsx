@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-import {
-  Grid, DialogContent, Typography, Divider,
-} from '@material-ui/core'
+import { Grid, DialogContent, Typography, Divider } from '@material-ui/core'
 import { useTranslation, Trans } from 'react-i18next'
 
 import SliderTile from '../filters/SliderTile'
@@ -16,20 +14,27 @@ export default function TutSliders() {
   const handleChange = (event, values) => {
     if (values) {
       setTemp({
-        ...temp, [event]: values,
+        ...temp,
+        [event]: values,
       })
     } else {
       const { name, value } = event.target
       setTemp({
-        ...temp, [name]: value,
+        ...temp,
+        [name]: value,
       })
     }
   }
-  const fullCheck = { }
-  const slidersToUse = data.sliders.filter(slider => relevant.includes(slider.name))
-  const arrayCheck = (filter, key) => filter[key].every((v, i) => v === ivOr[key][i])
-  Object.keys(temp).forEach(key => fullCheck[key] = !arrayCheck(temp, key))
-  const disabled = Object.keys(fullCheck).filter(key => fullCheck[key] === false)
+  const fullCheck = {}
+  const slidersToUse = data.sliders.filter((slider) =>
+    relevant.includes(slider.name),
+  )
+  const arrayCheck = (filter, key) =>
+    filter[key].every((v, i) => v === ivOr[key][i])
+  Object.keys(temp).forEach((key) => (fullCheck[key] = !arrayCheck(temp, key)))
+  const disabled = Object.keys(fullCheck).filter(
+    (key) => fullCheck[key] === false,
+  )
 
   return (
     <DialogContent>
@@ -52,7 +57,7 @@ export default function TutSliders() {
           alignItems="center"
           style={{ width: 300 }}
         >
-          {slidersToUse.map(slider => (
+          {slidersToUse.map((slider) => (
             <Grid item xs={12} key={slider.name}>
               <SliderTile
                 filterSlide={slider}
@@ -63,9 +68,7 @@ export default function TutSliders() {
           ))}
         </Grid>
         <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="h6">
-            {t('tutorial_sliders_1')}
-          </Typography>
+          <Typography variant="h6">{t('tutorial_sliders_1')}</Typography>
           {fullCheck.iv && (
             <Typography variant="subtitle2" color="secondary">
               <Trans i18nKey="tutorial_sliders_2">
@@ -76,7 +79,11 @@ export default function TutSliders() {
           )}
           {fullCheck.level && (
             <Typography variant="subtitle2" color="secondary">
-              <Trans i18nKey={fullCheck.iv ? 'tutorial_sliders_3alt' : 'tutorial_sliders_3'}>
+              <Trans
+                i18nKey={
+                  fullCheck.iv ? 'tutorial_sliders_3alt' : 'tutorial_sliders_3'
+                }
+              >
                 {{ level0: temp.level[0] }}
                 {{ level1: temp.level[1] }}
               </Trans>
@@ -84,7 +91,13 @@ export default function TutSliders() {
           )}
           {fullCheck.great && (
             <Typography variant="subtitle2" color="primary">
-              <Trans i18nKey={(fullCheck.iv || fullCheck.level) ? 'tutorial_sliders_4alt' : 'tutorial_sliders_4'}>
+              <Trans
+                i18nKey={
+                  fullCheck.iv || fullCheck.level
+                    ? 'tutorial_sliders_4alt'
+                    : 'tutorial_sliders_4'
+                }
+              >
                 {{ gl0: temp.great[0] }}
                 {{ gl1: temp.great[1] }}
               </Trans>
@@ -92,16 +105,20 @@ export default function TutSliders() {
           )}
           {fullCheck.ultra && (
             <Typography variant="subtitle2" color="primary">
-              <Trans i18nKey={(fullCheck.iv || fullCheck.level || fullCheck.great) ? 'tutorial_sliders_5alt' : 'tutorial_sliders_5'}>
+              <Trans
+                i18nKey={
+                  fullCheck.iv || fullCheck.level || fullCheck.great
+                    ? 'tutorial_sliders_5alt'
+                    : 'tutorial_sliders_5'
+                }
+              >
                 {{ ul0: temp.ultra[0] }}
                 {{ ul1: temp.ultra[1] }}
               </Trans>
             </Typography>
           )}
           {disabled.length === 4 && (
-            <Typography variant="caption">
-              {t('tutorial_sliders_9')}
-            </Typography>
+            <Typography variant="caption">{t('tutorial_sliders_9')}</Typography>
           )}
         </Grid>
         <Grid item xs={12}>
@@ -114,12 +131,10 @@ export default function TutSliders() {
           <Typography variant="subtitle2" color="primary">
             {t('tutorial_sliders_7')}
           </Typography>
-          <Typography variant="subtitle2">
-            {t('tutorial_sliders_8')}
-          </Typography>
+          <Typography variant="subtitle2">{t('tutorial_sliders_8')}</Typography>
           {disabled.length && (
             <Typography variant="caption">
-              ({disabled.map(each => t(`slider_${each}`)).join(', ')})
+              ({disabled.map((each) => t(`slider_${each}`)).join(', ')})
             </Typography>
           )}
         </Grid>

@@ -300,12 +300,29 @@
       "name": "New York",
       "lat": 40.7481666,
       "lon": -74.0174788,
-      "zoom": 15
+      "zoom": 15,
+      "color": "blue"
+    },
+    {
+      "name": "California",
+      "lat": 37.1931249,
+      "lon": -123.7961458,
+      "color": "orange",
+      "fillColor": "purple"
     },
     {
       "name": "San Francisco",
       "lat": 37.79539194255634,
-      "lon": -122.39333173075096
+      "lon": -122.39333173075096,
+      "parent": "California",
+      "hidden": false
+    },
+    {
+      "name": "Houston",
+      "lat": 33.6145517,
+      "lon": -108.6038347,
+      "parent": "Texas",
+      "domain": "map_2.your_map.com"
     }
   ]
 }

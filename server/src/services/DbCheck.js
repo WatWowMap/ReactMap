@@ -1,18 +1,32 @@
 /* eslint-disable no-console */
 const knex = require('knex')
 const { raw } = require('objection')
+const extend = require('extend')
 
 module.exports = class DbCheck {
-  constructor(validModels, dbSettings, queryDebug, apiSettings, distanceUnit) {
-    this.validModels = validModels.flatMap(s => s.useFor)
+  constructor(
+    validModels,
+    dbSettings,
+    queryDebug,
+    apiSettings,
+    distanceUnit,
+    rarityPercents,
+  ) {
+    this.validModels = validModels.flatMap((s) => s.useFor)
     this.singleModels = ['User', 'Badge', 'Session']
     this.searchLimit = apiSettings.searchLimit
+    this.rarityPercents = rarityPercents
     this.models = {}
+    this.questConditions = {}
+    this.rarity = new Map()
+    this.historical = new Map()
     this.connections = dbSettings.schemas
-      .filter(s => s.useFor.length)
+      .filter((s) => s.useFor.length)
       .map((schema, i) => {
-        schema.useFor.forEach(category => {
-          const capital = `${category.charAt(0).toUpperCase()}${category.slice(1)}`
+        schema.useFor.forEach((category) => {
+          const capital = `${category.charAt(0).toUpperCase()}${category.slice(
+            1,
+          )}`
           if (!this.models[capital]) {
             this.models[capital] = []
           }
@@ -40,41 +54,122 @@ module.exports = class DbCheck {
   }
 
   static getDistance(args, isMad, distanceUnit) {
-    return raw(`ROUND(( ${distanceUnit === 'mi' ? '3959' : '6371'} * acos( cos( radians(${args.lat}) ) * cos( radians( ${isMad ? 'latitude' : 'lat'} ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${args.lon}) ) + sin( radians(${args.lat}) ) * sin( radians( ${isMad ? 'latitude' : 'lat'} ) ) ) ),2)`).as('distance')
+    return raw(
+      `ROUND(( ${
+        distanceUnit === 'mi' ? '3959' : '6371'
+      } * acos( cos( radians(${args.lat}) ) * cos( radians( ${
+        isMad ? 'latitude' : 'lat'
+      } ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${
+        args.lon
+      }) ) + sin( radians(${args.lat}) ) * sin( radians( ${
+        isMad ? 'latitude' : 'lat'
+      } ) ) ) ),2)`,
+    ).as('distance')
   }
 
   async determineType() {
-    console.log(`[DB] Determining database types for ${this.connections.length} connection${this.connections.length > 1 ? 's' : ''}`)
-    await Promise.all(this.connections.map(async (schema, i) => {
-      try {
-        const isMad = await schema('trs_quest').columnInfo().then(col => Object.keys(col).length > 0)
-        const pvpV2 = await schema('pokemon').columnInfo().then(col => 'pvp' in col)
-        const [hasRewardAmount, hasAltQuests] = await schema('pokestop').columnInfo()
-          .then(columns => ([
-            ('quest_reward_amount' in columns || isMad),
-            'alternative_quest_type' in columns,
-          ]))
-        const [hasMultiInvasions, multiInvasionMs] = await schema('incident').columnInfo()
-          .then(columns => ([
-            'character' in columns,
-            'expiration_ms' in columns,
-          ]))
-        Object.entries(this.models).forEach(([category, sources]) => {
-          sources.forEach((source, j) => {
-            if (source.connection === i) {
-              this.models[category][j].isMad = isMad
-              this.models[category][j].pvpV2 = pvpV2
-              this.models[category][j].hasRewardAmount = hasRewardAmount
-              this.models[category][j].hasAltQuests = hasAltQuests
-              this.models[category][j].hasMultiInvasions = hasMultiInvasions
-              this.models[category][j].multiInvasionMs = multiInvasionMs
-            }
+    console.log(
+      `[DB] Determining database types for ${
+        this.connections.length
+      } connection${this.connections.length > 1 ? 's' : ''}`,
+    )
+    await Promise.all(
+      this.connections.map(async (schema, i) => {
+        try {
+          const [isMad, pvpV2] = await schema('pokemon')
+            .columnInfo()
+            .then((columns) => ['cp_multiplier' in columns, 'pvp' in columns])
+          const [hasRewardAmount, hasAltQuests] = await schema('pokestop')
+            .columnInfo()
+            .then((columns) => [
+              'quest_reward_amount' in columns || isMad,
+              'alternative_quest_type' in columns,
+            ])
+          const [hasMultiInvasions, multiInvasionMs] = await schema('incident')
+            .columnInfo()
+            .then((columns) => [
+              'character' in columns,
+              'expiration_ms' in columns,
+            ])
+          const [availableSlotsCol] = await schema('gym')
+            .columnInfo()
+            .then((columns) => [
+              'availble_slots' in columns
+                ? 'availble_slots'
+                : 'available_slots',
+            ])
+          Object.entries(this.models).forEach(([category, sources]) => {
+            sources.forEach((source, j) => {
+              if (source.connection === i) {
+                this.models[category][j].isMad = isMad
+                this.models[category][j].pvpV2 = pvpV2
+                this.models[category][j].hasRewardAmount = hasRewardAmount
+                this.models[category][j].hasAltQuests = hasAltQuests
+                this.models[category][j].hasMultiInvasions = hasMultiInvasions
+                this.models[category][j].multiInvasionMs = multiInvasionMs
+                this.models[category][j].availableSlotsCol = availableSlotsCol
+              }
+            })
           })
-        })
-      } catch (e) {
-        console.error('[DB]', e.message)
+        } catch (e) {
+          console.error('[DB]', e.message)
+        }
+      }),
+    )
+  }
+
+  setRarity(results, historical = false) {
+    const base = {}
+    const mapKey = historical ? 'historical' : 'rarity'
+    let total = 0
+    results.forEach((result) => {
+      Object.entries(historical ? result : result.rarity).forEach(
+        ([key, count]) => {
+          if (key in base) {
+            base[key] += count
+          } else {
+            base[key] = count
+          }
+          total += count
+        },
+      )
+    })
+    Object.entries(base).forEach(([id, count]) => {
+      const percent = (count / total) * 100
+      if (percent === 0) {
+        this[mapKey].set(id, 'never')
+      } else if (percent < this.rarityPercents.ultraRare) {
+        this[mapKey].set(id, 'ultraRare')
+      } else if (percent < this.rarityPercents.rare) {
+        this[mapKey].set(id, 'rare')
+      } else if (percent < this.rarityPercents.uncommon) {
+        this[mapKey].set(id, 'uncommon')
+      } else {
+        this[mapKey].set(id, 'common')
       }
-    }))
+    })
+  }
+
+  async historicalRarity() {
+    console.log('[DB] Setting historical rarity stats')
+    const results = await Promise.all(
+      this.models.Pokemon.map(async (source) =>
+        source.isMad
+          ? []
+          : source.SubModel.query()
+              .select('pokemon_id', raw('SUM(count) as total'))
+              .from('pokemon_stats')
+              .groupBy('pokemon_id'),
+      ),
+    )
+    this.setRarity(
+      results.map((result) =>
+        Object.fromEntries(
+          result.map((pkmn) => [`${pkmn.pokemon_id}`, +pkmn.total]),
+        ),
+      ),
+      true,
+    )
   }
 
   bindConnections(models) {
@@ -91,16 +186,24 @@ module.exports = class DbCheck {
           models[model].knex(this.connections[sources[0].connection])
         } else {
           sources.forEach((source, i) => {
-            this.models[model][i].SubModel = models[model].bindKnex(this.connections[source.connection])
+            this.models[model][i].SubModel = models[model].bindKnex(
+              this.connections[source.connection],
+            )
           })
         }
-        console.log(`[DB] Bound ${model} to ${sources.length} connection${sources.length > 1 ? 's' : ''}`)
+        console.log(
+          `[DB] Bound ${model} to ${sources.length} connection${
+            sources.length > 1 ? 's' : ''
+          }`,
+        )
       })
     } catch (e) {
       console.error(`
   Error: ${e.message}
 
-  Info: Only ${[this.validModels].join(', ')} are valid options in the useFor arrays
+  Info: Only ${[this.validModels].join(
+    ', ',
+  )} are valid options in the useFor arrays
   `)
       process.exit(9)
     }
@@ -121,62 +224,110 @@ module.exports = class DbCheck {
   }
 
   async getAll(model, perms, args, userId, method = 'getAll') {
-    const data = await Promise.all(this.models[model].map(async (source) => (
-      source.SubModel[method](perms, args, source, userId)
-    )))
+    const data = await Promise.all(
+      this.models[model].map(async (source) =>
+        source.SubModel[method](perms, args, source, userId),
+      ),
+    )
     return DbCheck.deDupeResults(data)
   }
 
   async getOne(model, id, method = 'getOne') {
-    const data = await Promise.all(this.models[model].map(async (source) => (
-      source.SubModel[method](id, source)
-    )))
+    const data = await Promise.all(
+      this.models[model].map(async (source) =>
+        source.SubModel[method](id, source),
+      ),
+    )
     const cleaned = DbCheck.deDupeResults(data.filter(Boolean))
     return (Array.isArray(cleaned) ? cleaned[0] : cleaned) || {}
   }
 
   async search(model, perms, args, method = 'search') {
-    const data = await Promise.all(this.models[model].map(async (source) => (
-      source.SubModel[method](perms, args, source, DbCheck.getDistance(args, source.isMad, this.distanceUnit))
-    )))
-    const deDuped = DbCheck.deDupeResults(data).sort((a, b) => a.distance - b.distance)
+    const data = await Promise.all(
+      this.models[model].map(async (source) =>
+        source.SubModel[method](
+          perms,
+          args,
+          source,
+          DbCheck.getDistance(args, source.isMad, this.distanceUnit),
+        ),
+      ),
+    )
+    const deDuped = DbCheck.deDupeResults(data).sort(
+      (a, b) => a.distance - b.distance,
+    )
     if (deDuped.length > this.searchLimit) {
       deDuped.length = this.searchLimit
     }
     return deDuped
   }
 
-  async submissionCells(args) {
-    const stopData = await Promise.all(this.models.Pokestop.map(async (source) => (
-      source.SubModel.getSubmissions(args, source)
-    )))
-    const gymData = await Promise.all(this.models.Gym.map(async (source) => (
-      source.SubModel.getSubmissions(args, source)
-    )))
+  async submissionCells(perms, args) {
+    const stopData = await Promise.all(
+      this.models.Pokestop.map(async (source) =>
+        source.SubModel.getSubmissions(perms, args, source),
+      ),
+    )
+    const gymData = await Promise.all(
+      this.models.Gym.map(async (source) =>
+        source.SubModel.getSubmissions(perms, args, source),
+      ),
+    )
     return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]
   }
 
-  async getAvailable(model) {
+  async getAvailable(model, log = true) {
     if (this.models[model]) {
-      console.log(`[DB] Querying available for ${model}`)
+      if (log) console.log(`[DB] Querying available for ${model}`)
       try {
-        const results = await Promise.all(this.models[model].map(async (source) => (
-          source.SubModel.getAvailable(source)
-        )))
-        console.log(`[DB] Setting available for ${model}`)
-        if (results.length === 1) return results[0]
+        const results = await Promise.all(
+          this.models[model].map(async (source) =>
+            source.SubModel.getAvailable(source),
+          ),
+        )
+        if (log) console.log(`[DB] Setting available for ${model}`)
+        if (model === 'Pokestop') {
+          results.forEach((result) => {
+            if ('conditions' in result) {
+              this.questConditions = extend(
+                true,
+                this.questConditions,
+                result.conditions,
+              )
+            }
+          })
+          this.questConditions = Object.fromEntries(
+            Object.entries(this.questConditions).map(([key, titles]) => [
+              key,
+              Object.values(titles),
+            ]),
+          )
+        }
+        if (model === 'Pokemon') {
+          this.setRarity(results, false)
+        }
+        if (results.length === 1) return results[0].available
         if (results.length > 1) {
           const returnSet = new Set()
           for (let i = 0; i < results.length; i += 1) {
-            for (let j = 0; j < results[i].length; j += 1) {
-              returnSet.add(results[i][j])
+            for (let j = 0; j < results[i].available.length; j += 1) {
+              returnSet.add(results[i].available[j])
             }
           }
           return [...returnSet]
         }
       } catch (e) {
-        console.warn('[WARN] Unable to query available for:', model, '\n', e.message)
-        if (model === 'Nest') console.warn('[WARN] This is likely due to "nest" being in a useFor array but not in the database')
+        console.warn(
+          '[WARN] Unable to query available for:',
+          model,
+          '\n',
+          e.message,
+        )
+        if (model === 'Nest') {
+          console.warn(
+            '[WARN] This is likely due to "nest" being in a useFor array but not in the database',
+          )
+        }
         return []
       }
     }

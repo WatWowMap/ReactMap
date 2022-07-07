@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import ReactGA from 'react-ga'
+import ReactGA from 'react-ga4'
 import SunCalc from 'suncalc'
 
 import formatInterval from './functions/formatInterval'
@@ -52,17 +52,18 @@ export default class Utility {
         ? 'rgba(1, 1, 1, 0.01)'
         : 'rgba(240, 240, 240, 0.01)'
       : rowIndex % 2
-        ? 'rgba(1, 1, 1, 0.01)'
-        : 'rgba(240, 240, 240, 0.01)'
+      ? 'rgba(1, 1, 1, 0.01)'
+      : 'rgba(240, 240, 240, 0.01)'
   }
 
   static generateSlots = (teamId, show, tempFilters) => {
     const slotObj = {}
     for (let i = 1; i <= 6; i += 1) {
       const slotKey = `g${teamId.charAt(1)}-${i}`
-      slotObj[slotKey] = typeof show === 'boolean'
-        ? { ...tempFilters[slotKey], enabled: show }
-        : { ...tempFilters[slotKey], size: show.size }
+      slotObj[slotKey] =
+        typeof show === 'boolean'
+          ? { ...tempFilters[slotKey], enabled: show }
+          : { ...tempFilters[slotKey], size: show.size }
     }
     return slotObj
   }
@@ -76,15 +77,31 @@ export default class Utility {
   static getMidnight() {
     const date = new Date()
     return Math.floor(
-      new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1, 0).getTime() / 1000,
+      new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        0,
+        0,
+        1,
+        0,
+      ).getTime() / 1000,
     )
   }
 
-  static analytics(category, action = false, label = false, nonInteraction = false) {
+  static analytics(
+    category,
+    action = false,
+    label = false,
+    nonInteraction = false,
+  ) {
     if (inject?.GOOGLE_ANALYTICS_ID) {
       if (action) {
         ReactGA.event({
-          category, action, label, nonInteraction,
+          category,
+          action,
+          label,
+          nonInteraction,
         })
       } else {
         ReactGA.pageview(category)
@@ -97,7 +114,13 @@ export default class Utility {
     sm: sizeObj?.sm || sizeObj?.xs || 12,
     md: sizeObj?.md || sizeObj?.sm || sizeObj?.xs || 12,
     lg: sizeObj?.lg || sizeObj?.md || sizeObj?.sm || sizeObj?.xs || 12,
-    xl: sizeObj?.xl || sizeObj?.lg || sizeObj?.md || sizeObj?.sm || sizeObj?.xs || 12,
+    xl:
+      sizeObj?.xl ||
+      sizeObj?.lg ||
+      sizeObj?.md ||
+      sizeObj?.sm ||
+      sizeObj?.xs ||
+      12,
   })
 
   static getQueryArgs(map) {
@@ -110,7 +133,6 @@ export default class Utility {
       zoom: Math.floor(map.getZoom()),
       ts: Math.floor(Date.now() / 1000),
       midnight: this.getMidnight(),
-      version: inject.VERSION,
     }
   }
 
@@ -118,8 +140,7 @@ export default class Utility {
     if (!content) return ''
     if (typeof content === 'string') return content
     return typeof content === 'object'
-      ? content[localStorage.getItem('i18nextLng')]
-      || Object.values(content)[0]
+      ? content[localStorage.getItem('i18nextLng')] || Object.values(content)[0]
       : ''
   }
 }

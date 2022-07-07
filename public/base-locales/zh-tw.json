@@ -510,5 +510,9 @@
   "light_map_border": "光照貼圖邊框",
   "dark_map_border": "深色地圖邊框",
   "cell_blocked": "單元格阻塞",
-  "poi_color": "興趣點顏色"
+  "poi_color": "興趣點顏色",
+  "ultra_beast": "超野獸",
+  "quest_condition": "任務條件",
+  "always_show_labels": "始終顯示標籤",
+  "scan_areas_options": "掃描區域選項"
 }

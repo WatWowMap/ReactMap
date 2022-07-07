@@ -4,15 +4,19 @@ const config = require('./config')
 const loadAreas = () => {
   try {
     const normalized = { type: 'FeatureCollection', features: [] }
-    Object.values(config.scanAreas).forEach(area => {
+    Object.values(config.scanAreas).forEach((area) => {
       if (area?.features.length) {
-        normalized.features.push(...area.features)
+        normalized.features.push(...area.features.filter((f) => !f.manual))
       }
     })
     return normalized
   } catch (err) {
-    if (config.authentication.areaRestrictions.some(rule => rule.roles.length)) {
-      console.warn('[Area Restrictions] Disabled - `areas.json` file is missing or broken.')
+    if (
+      config.authentication.areaRestrictions.some((rule) => rule.roles.length)
+    ) {
+      console.warn(
+        '[Area Restrictions] Disabled - `areas.json` file is missing or broken.',
+      )
     }
   }
 }
@@ -24,13 +28,20 @@ const parseAreas = (areasObj) => {
   if (!areasObj) {
     return { names, polygons }
   }
-  areasObj.features.forEach(feature => {
+  areasObj.features.forEach((feature) => {
     const { name } = feature.properties
     if (feature.geometry.type == 'Polygon' && name) {
       polygons[name] = []
-      feature.geometry.coordinates.forEach(coordPair => {
+      feature.geometry.coordinates.forEach((coordPair) => {
         polygons[name].push(...coordPair)
       })
+      if (
+        polygons[name][0].every(
+          (coord, i) => coord !== polygons[name][polygons[name].length - 1][i],
+        )
+      ) {
+        polygons[name].push(polygons[name][0])
+      }
       names.push(name)
     }
   })
