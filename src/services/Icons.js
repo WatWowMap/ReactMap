@@ -174,11 +174,11 @@ export default class UIcons {
     const costumeSuffixes = costume ? [`_c${costume}`, ''] : ['']
     const genderSuffixes = gender ? [`_g${gender}`, ''] : ['']
     const shinySuffixes = shiny ? ['_shiny', ''] : ['']
-    for (let f = 0; f < formSuffixes.length; f += 1) {
-      for (let c = 0; c < costumeSuffixes.length; c += 1) {
-        for (let g = 0; g < genderSuffixes.length; g += 1) {
-          for (let s = 0; s < shinySuffixes.length; s += 1) {
-            for (let e = 0; e < evolutionSuffixes.length; e += 1) {
+    for (let e = 0; e < evolutionSuffixes.length; e += 1) {
+      for (let f = 0; f < formSuffixes.length; f += 1) {
+        for (let c = 0; c < costumeSuffixes.length; c += 1) {
+          for (let g = 0; g < genderSuffixes.length; g += 1) {
+            for (let s = 0; s < shinySuffixes.length; s += 1) {
               const result = `${pokemonId}${evolutionSuffixes[e]}${formSuffixes[f]}${costumeSuffixes[c]}${genderSuffixes[g]}${shinySuffixes[s]}.png`
               if (this[this.selected.pokemon].pokemon.has(result)) {
                 return `${baseUrl}/${result}`
