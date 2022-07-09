@@ -7,7 +7,7 @@ import Utility from '@services/Utility'
 export default function SubmissionCellPopup({ cell }) {
   const { t } = useTranslation()
   const gymThreshold = [2, 6, 20]
-  let untilNextGym = t('never')
+  let untilNextGym = t('never_alt', t('never'))
   if (cell.count_gyms < 3) {
     untilNextGym = gymThreshold[cell.count_gyms] - cell.count
   }
