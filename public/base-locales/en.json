@@ -552,5 +552,6 @@
   "300m_range": "300m Range",
   "lure_range": "Lure Range",
   "tap_to_toggle": "Tap To Toggle",
-  "power_up": "Power Up"
+  "power_up": "Power Up",
+  "never_alt": "Never"
 }
