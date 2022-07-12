@@ -205,7 +205,7 @@ Db.determineType().then(async () => {
     await Promise.all([
       Event.getUicons(config.icons.styles),
       Event.getMasterfile(Db.historical, Db.rarity),
-      Event.getInvasions(),
+      Event.getInvasions(config.api.pogoApiEndpoints.invasions),
       Event.getWebhooks(config),
     ]).then(() => {
       Event.addAvailable()

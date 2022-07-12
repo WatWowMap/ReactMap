@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const fs = require('fs')
 const path = require('path')
+const { api } = require('../src/services/config')
 
 const fetchJson = require('../src/services/api/fetchJson')
 
@@ -9,6 +10,8 @@ const finalLocalesFolder = path.resolve(__dirname, '../../public/locales')
 const missingFolder = path.resolve(__dirname, '../../public/missing-locales')
 
 const locales = async () => {
+  if (!api.pogoApiEndpoints.translations)
+    console.error('[LOCALES] No translations endpoint')
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
   const englishRef = fs.readFileSync(
     path.resolve(appLocalesFolder, 'en.json'),
@@ -22,7 +25,7 @@ const locales = async () => {
   )
 
   const availableRemote = await fetchJson(
-    'https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/index.json',
+    `${api.pogoApiEndpoints.translations}/index.json`,
   )
 
   await Promise.all(
@@ -41,7 +44,7 @@ const locales = async () => {
       try {
         const hasRemote = availableRemote.includes(locale)
         const remoteFiles = await fetchJson(
-          `https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/static/locales/${
+          `${api.pogoApiEndpoints.translations}/static/locales/${
             hasRemote ? baseName : 'en'
           }.json`,
         )
