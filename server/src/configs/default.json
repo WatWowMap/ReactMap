@@ -82,7 +82,12 @@
     "hideOldGyms": false,
     "stopValidDataLimit": 30,
     "hideOldPokestops": false,
-    "fetchTimeoutMs": 3000
+    "fetchTimeoutMs": 3000,
+    "pogoApiEndpoints": {
+      "invasions": "https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/grunts.json",
+      "masterfile": "https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-react-map.json",
+      "translations": "https://raw.githubusercontent.com/WatWowMap/pogo-translations/master"
+    }
   },
   "multiDomains": [],
   "map": {
