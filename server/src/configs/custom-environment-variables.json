@@ -217,6 +217,11 @@
     "fetchTimeoutMs": {
       "__name": "API_FETCH_TIMEOUT_MS",
       "__format": "number"
+    },
+    "pogoApiEndpoints": {
+      "invasions": "API_POGO_API_ENDPOINTS_INVASIONS",
+      "masterfile": "API_POGO_API_ENDPOINTS_MASTERFILE",
+      "translations": "API_POGO_API_ENDPOINTS_TRANSLATIONS"
     }
   },
   "multiDomains": {
