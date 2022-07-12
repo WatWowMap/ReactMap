@@ -19,8 +19,9 @@ const generate = async (
   dbRarity = new Map(),
 ) => {
   try {
-    if (!api.pogoApiEndpoints.masterfile) throw new Error('No masterfile endpoint')
-    
+    if (!api.pogoApiEndpoints.masterfile)
+      throw new Error('No masterfile endpoint')
+
     const masterfile = await fetchJson(api.pogoApiEndpoints.masterfile)
 
     const newMf = {

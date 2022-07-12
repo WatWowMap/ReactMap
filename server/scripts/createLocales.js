@@ -10,7 +10,8 @@ const finalLocalesFolder = path.resolve(__dirname, '../../public/locales')
 const missingFolder = path.resolve(__dirname, '../../public/missing-locales')
 
 const locales = async () => {
-  if (!api.pogoApiEndpoints.translations) console.error('[LOCALES] No translations endpoint')
+  if (!api.pogoApiEndpoints.translations)
+    console.error('[LOCALES] No translations endpoint')
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
   const englishRef = fs.readFileSync(
     path.resolve(appLocalesFolder, 'en.json'),
