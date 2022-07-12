@@ -1,6 +1,6 @@
 const fs = require('fs')
 const { resolve } = require('path')
-const { rarity: customRarity } = require('../src/services/config')
+const { rarity: customRarity, api } = require('../src/services/config')
 const fetchJson = require('../src/services/api/fetchJson')
 const defaultRarity = require('../src/data/defaultRarity.json')
 
@@ -19,9 +19,10 @@ const generate = async (
   dbRarity = new Map(),
 ) => {
   try {
-    const masterfile = await fetchJson(
-      'https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-react-map.json',
-    )
+    if (!api.pogoApiEndpoints.masterfile)
+      throw new Error('No masterfile endpoint')
+
+    const masterfile = await fetchJson(api.pogoApiEndpoints.masterfile)
 
     const newMf = {
       ...masterfile,
