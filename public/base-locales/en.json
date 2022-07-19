@@ -553,5 +553,10 @@
   "lure_range": "Lure Range",
   "tap_to_toggle": "Tap To Toggle",
   "power_up": "Power Up",
-  "never_alt": "Never"
+  "never_alt": "Never",
+  "seen_nearby_stop": "Seen Nearby",
+  "seen_nearby_cell": "Seen in this Cell",
+  "seen_lure_encounter": "Lure Encounter",
+  "seen_lure_wild": "Lure Spawn",
+  "seen_wild": "Wild Spawn"
 }

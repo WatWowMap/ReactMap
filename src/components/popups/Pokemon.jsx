@@ -80,11 +80,18 @@ export default function PokemonPopup({
         classes={classes}
         isTutorial={isTutorial}
       />
-      {Boolean(pokemon.expire_timestamp) && (
-        <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
+      {pokemon.seen_type !== 'encounter' && (
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Typography variant="caption">
+            {t(`seen_${pokemon.seen_type}`, '')}
+          </Typography>
+        </Grid>
       )}
       {pokemon.seen_type === 'nearby_cell' && (
         <Typography>{t('pokemon_cell')}</Typography>
+      )}
+      {!!pokemon.expire_timestamp && (
+        <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
       )}
       {hasStats && pokePerms.iv && (
         <>
@@ -103,7 +110,7 @@ export default function PokemonPopup({
         pokemon={pokemon}
         popups={popups}
         setPopups={setPopups}
-        hasPvp={Boolean(hasLeagues.length)}
+        hasPvp={!!hasLeagues.length}
         classes={classes}
         Icons={Icons}
       />
@@ -243,7 +250,7 @@ const Header = ({
       <Menu
         anchorEl={anchorEl}
         keepMounted
-        open={Boolean(anchorEl)}
+        open={!!anchorEl}
         onClose={handleClose}
         PaperProps={{
           style: {
@@ -346,7 +353,7 @@ const Info = ({ pokemon, metaData, perms, Icons, isNight }) => {
           }}
         />
       )}
-      {Boolean(gender) && (
+      {!!gender && (
         <Grid item style={{ textAlign: 'center' }}>
           <Icon>
             {{
