@@ -379,8 +379,7 @@
     "theme": {
       "style": "MAP_THEME_STYLE",
       "primary": "MAP_THEME_PRIMARY",
-      "secondary": "MAP_THEME_SECONDARY",
-      "drawer": "MAP_THEME_DRAWER"
+      "secondary": "MAP_THEME_SECONDARY"
     },
     "clustering": {
       "gyms": {
