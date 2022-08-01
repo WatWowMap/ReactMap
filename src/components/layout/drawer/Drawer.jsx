@@ -29,7 +29,6 @@ export default function Sidebar({
   toggleDialog,
   Icons,
 }) {
-  const { drawer: drawerStyle } = useStore((state) => state.settings)
   const sidebar = useStore((state) => state.sidebar)
   const setSidebar = useStore((state) => state.setSidebar)
   const classes = useStyles()
@@ -156,7 +155,7 @@ export default function Sidebar({
   return (
     <Drawer
       anchor="left"
-      variant={drawerStyle}
+      variant="temporary"
       open={drawer}
       onClose={toggleDrawer(false)}
       classes={{ paper: classes.drawer }}

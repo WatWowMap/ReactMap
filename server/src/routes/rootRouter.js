@@ -151,10 +151,6 @@ rootRouter.get('/settings', async (req, res) => {
         navigation: Object.fromEntries(
           config.navigation.map((n) => [n.name, n]),
         ),
-        drawer: {
-          temporary: {},
-          persistent: {},
-        },
         navigationControls: {
           react: {},
           leaflet: {},

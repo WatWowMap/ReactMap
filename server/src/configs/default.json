@@ -164,8 +164,7 @@
     "theme": {
       "style": "dark",
       "primary": "#ff5722",
-      "secondary": "#00b0ff",
-      "drawer": "temporary"
+      "secondary": "#00b0ff"
     },
     "clustering": {
       "gyms": {
