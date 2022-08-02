@@ -4,12 +4,22 @@ const { raw } = require('objection')
 const extend = require('extend')
 
 module.exports = class DbCheck {
-  constructor(validModels, dbSettings, queryDebug, apiSettings, distanceUnit) {
+  constructor(
+    validModels,
+    dbSettings,
+    queryDebug,
+    apiSettings,
+    distanceUnit,
+    rarityPercents,
+  ) {
     this.validModels = validModels.flatMap((s) => s.useFor)
     this.singleModels = ['User', 'Badge', 'Session']
     this.searchLimit = apiSettings.searchLimit
+    this.rarityPercents = rarityPercents
     this.models = {}
     this.questConditions = {}
+    this.rarity = new Map()
+    this.historical = new Map()
     this.connections = dbSettings.schemas
       .filter((s) => s.useFor.length)
       .map((schema, i) => {
@@ -105,6 +115,60 @@ module.exports = class DbCheck {
           console.error('[DB]', e.message)
         }
       }),
+    )
+  }
+
+  setRarity(results, historical = false) {
+    const base = {}
+    const mapKey = historical ? 'historical' : 'rarity'
+    let total = 0
+    results.forEach((result) => {
+      Object.entries(historical ? result : result.rarity).forEach(
+        ([key, count]) => {
+          if (key in base) {
+            base[key] += count
+          } else {
+            base[key] = count
+          }
+          total += count
+        },
+      )
+    })
+    Object.entries(base).forEach(([id, count]) => {
+      const percent = (count / total) * 100
+      if (percent === 0) {
+        this[mapKey].set(id, 'never')
+      } else if (percent < this.rarityPercents.ultraRare) {
+        this[mapKey].set(id, 'ultraRare')
+      } else if (percent < this.rarityPercents.rare) {
+        this[mapKey].set(id, 'rare')
+      } else if (percent < this.rarityPercents.uncommon) {
+        this[mapKey].set(id, 'uncommon')
+      } else {
+        this[mapKey].set(id, 'common')
+      }
+    })
+  }
+
+  async historicalRarity() {
+    console.log('[DB] Setting historical rarity stats')
+    const results = await Promise.all(
+      this.models.Pokemon.map(async (source) =>
+        source.isMad
+          ? []
+          : source.SubModel.query()
+              .select('pokemon_id', raw('SUM(count) as total'))
+              .from('pokemon_stats')
+              .groupBy('pokemon_id'),
+      ),
+    )
+    this.setRarity(
+      results.map((result) =>
+        Object.fromEntries(
+          result.map((pkmn) => [`${pkmn.pokemon_id}`, +pkmn.total]),
+        ),
+      ),
+      true,
     )
   }
 
@@ -238,6 +302,9 @@ module.exports = class DbCheck {
               Object.values(titles),
             ]),
           )
+        }
+        if (model === 'Pokemon') {
+          this.setRarity(results, false)
         }
         if (results.length === 1) return results[0].available
         if (results.length > 1) {

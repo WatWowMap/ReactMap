@@ -551,5 +551,7 @@
   "ultra_beast": "Ultrabestie",
   "quest_condition": "Questbedingung",
   "always_show_labels": "Labels immer anzeigen",
-  "scan_areas_options": "Optionen für Scanbereiche"
+  "scan_areas_options": "Optionen für Scanbereiche",
+  "tap_to_toggle": "Tippen zum Umschalten",
+  "power_up": "Aufladung"
 }

@@ -103,6 +103,10 @@
       "nests": {
         "__name": "API_QUERY_UPDATE_HOURS_NESTS",
         "__format": "number"
+      },
+      "historicalRarity": {
+        "__name": "API_QUERY_UPDATE_HOURS_HISTORICAL_RARITY",
+        "__format": "number"
       }
     },
     "queryOnSessionInit": {
@@ -213,6 +217,11 @@
     "fetchTimeoutMs": {
       "__name": "API_FETCH_TIMEOUT_MS",
       "__format": "number"
+    },
+    "pogoApiEndpoints": {
+      "invasions": "API_POGO_API_ENDPOINTS_INVASIONS",
+      "masterfile": "API_POGO_API_ENDPOINTS_MASTERFILE",
+      "translations": "API_POGO_API_ENDPOINTS_TRANSLATIONS"
     }
   },
   "multiDomains": {
@@ -370,8 +379,7 @@
     "theme": {
       "style": "MAP_THEME_STYLE",
       "primary": "MAP_THEME_PRIMARY",
-      "secondary": "MAP_THEME_SECONDARY",
-      "drawer": "MAP_THEME_DRAWER"
+      "secondary": "MAP_THEME_SECONDARY"
     },
     "clustering": {
       "gyms": {
@@ -529,6 +537,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_INTERACTION_RANGES",
         "__format": "boolean"
       },
+      "300mRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_300M_RANGE",
+        "__format": "boolean"
+      },
       "showExBadge": {
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_SHOW_EX_BADGE",
         "__format": "boolean"
@@ -561,6 +573,10 @@
       },
       "interactionRanges": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "lureRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_LURE_RANGE",
         "__format": "boolean"
       },
       "madQuestText": {
@@ -641,6 +657,10 @@
       "alwaysShowLabels": {
         "__name": "CLIENT_SIDE_OPTIONS_SCAN_AREAS_ALWAYS_SHOW_LABELS",
         "__format": "boolean"
+      },
+      "tapToToggle": {
+        "__name": "CLIENT_SIDE_OPTIONS_SCAN_AREAS_TAP_TO_TOGGLE",
+        "__format": "boolean"
       }
     },
     "weather": {
@@ -668,6 +688,7 @@
         "__name": "DEFAULT_FILTERS_GYMS_ALL_GYMS",
         "__format": "boolean"
       },
+      "levels": "DEFAULT_FILTERS_GYMS_LEVELS",
       "exEligible": {
         "__name": "DEFAULT_FILTERS_GYMS_EX_ELIGIBLE",
         "__format": "boolean"
@@ -736,6 +757,7 @@
         "__name": "DEFAULT_FILTERS_POKESTOPS_ENABLED",
         "__format": "boolean"
       },
+      "levels": "DEFAULT_FILTERS_POKESTOPS_LEVELS",
       "lures": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_LURES",
         "__format": "boolean"
@@ -867,6 +889,18 @@
     "submissionCells": {
       "enabled": {
         "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_ENABLED",
+        "__format": "boolean"
+      },
+      "rings": {
+        "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_RINGS",
+        "__format": "boolean"
+      },
+      "s17Cells": {
+        "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_S17CELLS",
+        "__format": "boolean"
+      },
+      "s14Cells": {
+        "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_S14CELLS",
         "__format": "boolean"
       }
     },
@@ -1407,6 +1441,20 @@
     }
   },
   "rarity": {
+    "percents": {
+      "uncommon": {
+        "__name": "RARITY_PERCENTS_UNCOMMON",
+        "__format": "number"
+      },
+      "rare": {
+        "__name": "RARITY_PERCENTS_RARE",
+        "__format": "number"
+      },
+      "ultraRare": {
+        "__name": "RARITY_PERCENTS_ULTRA_RARE",
+        "__format": "number"
+      }
+    },
     "common": {
       "__name": "RARITY_COMMON",
       "__format": "json"
@@ -1429,6 +1477,10 @@
     },
     "event": {
       "__name": "RARITY_EVENT",
+      "__format": "json"
+    },
+    "never": {
+      "__name": "RARITY_NEVER",
       "__format": "json"
     }
   },

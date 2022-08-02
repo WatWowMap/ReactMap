@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Grid, Typography, Switch, Select, MenuItem } from '@material-ui/core'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
@@ -98,6 +98,24 @@ export default function WithSubItems({
             />
           </Grid>
         )}
+      {((category === 'pokestops' && subItem === 'allPokestops') ||
+        (category === 'gyms' && subItem === 'allGyms')) &&
+        filters[category][subItem] === true && (
+          <>
+            <Grid item xs={4} style={{ textAlign: 'center' }}>
+              <Typography>{t('power_up')}</Typography>
+            </Grid>
+            <Grid item xs={8} style={{ textAlign: 'center' }}>
+              <MultiSelector
+                filters={filters}
+                setFilters={setFilters}
+                category={category}
+                filterKey="levels"
+                items={['all', '1', '2', '3']}
+              />
+            </Grid>
+          </>
+        )}
       {category === 'gyms' &&
         subItem === 'gymBadges' &&
         filters[category].gymBadges === true && (
@@ -148,6 +166,40 @@ export default function WithSubItems({
             </Grid>
           </>
         )}
+      {category === 'wayfarer' && subItem === 'submissionCells' && (
+        <>
+          {['rings', 's14Cells', 's17Cells'].map((item, i) => (
+            <Fragment key={item}>
+              <Grid item xs={8}>
+                <Typography>
+                  {i ? (
+                    <Trans i18nKey="s2_cell_level">
+                      {{ level: item.substring(1, 3) }}
+                    </Trans>
+                  ) : (
+                    t('poi')
+                  )}
+                </Typography>
+              </Grid>
+              <Grid item xs={4} style={{ textAlign: 'right' }}>
+                <Switch
+                  checked={filters[subItem][item]}
+                  onChange={() => {
+                    setFilters({
+                      ...filters,
+                      [subItem]: {
+                        ...filters[subItem],
+                        [item]: !filters[subItem][item],
+                      },
+                    })
+                  }}
+                  disabled={!filters[subItem].enabled}
+                />
+              </Grid>
+            </Fragment>
+          ))}
+        </>
+      )}
     </>
   )
 }

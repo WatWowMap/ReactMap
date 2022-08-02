@@ -34,7 +34,8 @@
       "pokemon": 0.25,
       "quests": 0.5,
       "raids": 0.2,
-      "nests": 1
+      "nests": 1,
+      "historicalRarity": 6
     },
     "queryOnSessionInit": {
       "pokemon": false,
@@ -81,7 +82,12 @@
     "hideOldGyms": false,
     "stopValidDataLimit": 30,
     "hideOldPokestops": false,
-    "fetchTimeoutMs": 3000
+    "fetchTimeoutMs": 3000,
+    "pogoApiEndpoints": {
+      "invasions": "https://raw.githubusercontent.com/WatWowMap/event-info/main/grunts/formatted.json",
+      "masterfile": "https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-react-map.json",
+      "translations": "https://raw.githubusercontent.com/WatWowMap/pogo-translations/master"
+    }
   },
   "multiDomains": [],
   "map": {
@@ -158,8 +164,7 @@
     "theme": {
       "style": "dark",
       "primary": "#ff5722",
-      "secondary": "#00b0ff",
-      "drawer": "temporary"
+      "secondary": "#00b0ff"
     },
     "clustering": {
       "gyms": {
@@ -230,6 +235,7 @@
       "clustering": true,
       "raidTimers": false,
       "interactionRanges": false,
+      "300mRange": false,
       "showExBadge": false,
       "showArBadge": false,
       "raidLevelBadges": false,
@@ -240,6 +246,7 @@
       "invasionTimers": false,
       "lureTimers": false,
       "interactionRanges": false,
+      "lureRange": false,
       "madQuestText": false,
       "hasQuestIndicator": true,
       "showArBadge": false
@@ -261,6 +268,13 @@
           "perm": "iv",
           "num": 100,
           "value": "#ff1744",
+          "op": "="
+        },
+        {
+          "name": "Nundo",
+          "perm": "iv",
+          "num": 0,
+          "value": "#000000",
           "op": "="
         },
         {
@@ -290,7 +304,8 @@
       "poiColor": "#03ffff"
     },
     "scanAreas": {
-      "alwaysShowLabels": true
+      "alwaysShowLabels": true,
+      "tapToToggle": true
     },
     "weather": {
       "clickableIcon": false,
@@ -305,6 +320,7 @@
     "gyms": {
       "enabled": true,
       "allGyms": true,
+      "levels": "all",
       "exEligible": false,
       "inBattle": false,
       "raids": true,
@@ -345,6 +361,7 @@
     },
     "pokestops": {
       "enabled": false,
+      "levels": "all",
       "lures": true,
       "quests": true,
       "questSet": "both",
@@ -417,7 +434,10 @@
       "enabled": false
     },
     "submissionCells": {
-      "enabled": false
+      "enabled": false,
+      "rings": true,
+      "s17Cells": true,
+      "s14Cells": true
     },
     "weather": {
       "enabled": true
@@ -699,12 +719,18 @@
     }
   },
   "rarity": {
+    "percents": {
+      "uncommon": 0.25,
+      "rare": 0.1,
+      "ultraRare": 0.01
+    },
     "common": [],
     "uncommon": [],
     "rare": [],
     "ultraRare": [],
     "regional": [],
-    "event": []
+    "event": [],
+    "never": []
   },
   "manualAreas": []
 }

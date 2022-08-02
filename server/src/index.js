@@ -196,20 +196,24 @@ app.use((err, req, res, next) => {
 
 Db.determineType().then(async () => {
   await Promise.all([
-    Event.getUicons(config.icons.styles),
-    Event.getMasterfile(),
-    Event.getInvasions(),
-    Event.getWebhooks(config),
+    Db.historicalRarity(),
     Event.setAvailable('gyms', 'Gym', Db),
     Event.setAvailable('pokestops', 'Pokestop', Db),
     Event.setAvailable('pokemon', 'Pokemon', Db),
     Event.setAvailable('nests', 'Nest', Db),
-  ]).then(() => {
-    Event.addAvailable()
-    app.listen(config.port, config.interface, () => {
-      console.log(
-        `[INIT] Server is now listening at http://${config.interface}:${config.port}`,
-      )
+  ]).then(async () => {
+    await Promise.all([
+      Event.getUicons(config.icons.styles),
+      Event.getMasterfile(Db.historical, Db.rarity),
+      Event.getInvasions(config.api.pogoApiEndpoints.invasions),
+      Event.getWebhooks(config),
+    ]).then(() => {
+      Event.addAvailable()
+      app.listen(config.port, config.interface, () => {
+        console.log(
+          `[INIT] Server is now listening at http://${config.interface}:${config.port}`,
+        )
+      })
     })
   })
 })

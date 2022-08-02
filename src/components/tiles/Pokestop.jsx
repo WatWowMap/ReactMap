@@ -21,6 +21,7 @@ const PokestopTile = ({
   showCircles,
   config,
   setParams,
+  zoom,
 }) => {
   const markerRef = useRef({})
   const [done, setDone] = useState(false)
@@ -104,6 +105,13 @@ const PokestopTile = ({
           <Circle
             center={[item.lat, item.lon]}
             radius={70}
+            pathOptions={{ color: '#0DA8E7', weight: 1 }}
+          />
+        )}
+        {userSettings.lureRange && zoom >= config.interactionRangeZoom && (
+          <Circle
+            center={[item.lat, item.lon]}
+            radius={40}
             pathOptions={{ color: '#0DA8E7', weight: 1 }}
           />
         )}

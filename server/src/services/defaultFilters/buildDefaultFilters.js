@@ -26,6 +26,7 @@ module.exports = function buildDefault(perms, available) {
       ? {
           enabled: defaultFilters.gyms.enabled,
           allGyms: perms.gyms ? defaultFilters.gyms.enabled : undefined,
+          levels: perms.gyms ? defaultFilters.gyms.levels : undefined,
           raids: perms.raids ? defaultFilters.gyms.raids : undefined,
           exEligible: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
           inBattle: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
@@ -56,6 +57,7 @@ module.exports = function buildDefault(perms, available) {
           allPokestops: perms.pokestops
             ? defaultFilters.pokestops.enabled
             : undefined,
+          levels: perms.pokestops ? defaultFilters.pokestops.levels : undefined,
           lures: perms.lures ? defaultFilters.pokestops.lures : undefined,
           quests: perms.quests ? defaultFilters.pokestops.quests : undefined,
           showQuestSet: defaultFilters.pokestops.questSet,
@@ -106,6 +108,9 @@ module.exports = function buildDefault(perms, available) {
     submissionCells: perms.submissionCells
       ? {
           enabled: defaultFilters.submissionCells.enabled,
+          rings: defaultFilters.submissionCells.rings,
+          s17Cells: defaultFilters.submissionCells.s17Cells,
+          s14Cells: defaultFilters.submissionCells.s14Cells,
           filter: { global: new GenericFilter() },
         }
       : undefined,

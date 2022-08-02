@@ -63,6 +63,7 @@ module.exports = class Pokestop extends Model {
   ) {
     const {
       filters: {
+        onlyLevels,
         onlyLures,
         onlyQuests,
         onlyInvasions,
@@ -462,6 +463,8 @@ module.exports = class Pokestop extends Model {
           })
         }
       })
+    } else if (onlyLevels !== 'all' && !isMad) {
+      query.andWhere('power_up_level', onlyLevels)
     }
     const results = await query
     const normalized = isMad

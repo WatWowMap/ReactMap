@@ -53,7 +53,7 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
       ],
     })
   } else {
-    throw new Error(
+    console.error(
       'Missing scanner database config! \nCheck to make sure you have SCANNER_DB_HOST,SCANNER_DB_PORT, SCANNER_DB_NAME, SCANNER_DB_USERNAME, and SCANNER_DB_PASSWORD',
     )
   }
@@ -73,7 +73,7 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
       useFor: ['session', 'user', 'nest', 'portal'],
     })
   } else {
-    throw new Error(
+    console.error(
       'Missing manual database config! \nCheck to make sure you have MANUAL_DB_HOST,MANUAL_DB_PORT, MANUAL_DB_NAME, MANUAL_DB_USERNAME, and MANUAL_DB_PASSWORD',
     )
   }

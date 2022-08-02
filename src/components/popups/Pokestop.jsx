@@ -633,16 +633,19 @@ const Invasion = ({ pokestop, Icons, t }) => {
   )
 
   const getRewardPercent = (grunt) => {
-    if (grunt.type === 'Giovanni') {
-      return { third: '100%' }
-    }
     if (grunt.type.startsWith('NPC')) {
       return {}
     }
-    if (grunt.second_reward) {
+    if (grunt.secondReward) {
       return { first: '85%', second: '15%' }
     }
-    return { first: '100%' }
+    if (grunt.thirdReward) {
+      return { third: '100%' }
+    }
+    if (grunt.firstReward) {
+      return { first: '100%' }
+    }
+    return {}
   }
 
   return invasions.map((invasion) => (

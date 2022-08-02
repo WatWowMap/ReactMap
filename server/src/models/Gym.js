@@ -61,6 +61,7 @@ module.exports = class Gym extends Model {
       gymBadges,
     } = perms
     const {
+      onlyLevels,
       onlyAllGyms,
       onlyRaids,
       onlyExEligible,
@@ -211,6 +212,9 @@ module.exports = class Gym extends Model {
       }
     }
 
+    if (onlyAllGyms && onlyLevels !== 'all' && !isMad) {
+      query.andWhere('power_up_level', onlyLevels)
+    }
     query.andWhere((gym) => {
       if (onlyExEligible && gymPerms) {
         gym.orWhere((ex) => {
@@ -403,10 +407,12 @@ module.exports = class Gym extends Model {
       .then((r) => {
         const unique = new Set()
         r.forEach((result) => {
-          if (result.slots) {
-            unique.add(`g${result.team}-${result.slots}`)
-          } else {
-            unique.add(`t${result.team}-0`)
+          if (result.team) {
+            if (result.slots) {
+              unique.add(`g${result.team}-${result.slots}`)
+            } else {
+              unique.add(`t${result.team}-0`)
+            }
           }
         })
         return [...unique]
