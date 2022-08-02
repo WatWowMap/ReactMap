@@ -128,33 +128,10 @@ module.exports = class EventManager {
     if (endpoint) {
       console.log('[EVENT] Fetching Latest Invasions')
       try {
-        this.invasions = await fetchJson(endpoint).then((response) =>
-          response
-            ? Object.fromEntries(
-                Object.entries(this.invasions).map(([type, info]) => {
-                  const latest = response[type]
-                  const newInvasion = this.invasions[type]
-                  if (info.encounters) {
-                    Object.keys(info.encounters).forEach((position, i) => {
-                      if (latest?.active) {
-                        newInvasion.encounters[position] = latest.lineup.team[
-                          i
-                        ].map((pkmn, j) =>
-                          pkmn.template === 'UNSET' &&
-                          info.encounters[position][j]
-                            ? info.encounters[position][j]
-                            : { id: pkmn.id, form: pkmn.form },
-                        )
-                        newInvasion.second_reward =
-                          latest.lineup.rewards.length > 1
-                      }
-                    })
-                  }
-                  return [type, newInvasion]
-                }),
-              )
-            : this.invasions,
-        )
+        const newInvasions = await fetchJson(endpoint)
+        if (newInvasions) {
+          this.invasions = newInvasions
+        }
       } catch (e) {
         console.warn('[WARN] Unable to generate latest invasions:\n', e.message)
       }
