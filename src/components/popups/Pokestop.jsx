@@ -20,6 +20,7 @@ import Title from './common/Title'
 import HeaderImage from './common/HeaderImage'
 import Timer from './common/Timer'
 import PowerUp from './common/PowerUp'
+import NameTT from './common/NameTT'
 
 export default function PokestopPopup({
   pokestop,
@@ -135,6 +136,7 @@ export default function PokestopPopup({
                     expireTime={lure_expire_timestamp}
                     icon={Icons.getPokestops(lure_id)}
                     until
+                    tt={`lure_${lure_id}`}
                   />
                 </>
               )}
@@ -154,6 +156,7 @@ export default function PokestopPopup({
                         expireTime={invasion.incident_expire_timestamp}
                         icon={Icons.getInvasions(invasion.grunt_type)}
                         until
+                        tt={`grunt_a_${invasion.grunt_type}`}
                       />
                     </Fragment>
                   ))}
@@ -336,6 +339,8 @@ const RewardInfo = ({ quest, Icons, config, t }) => {
     stardust_amount,
     candy_pokemon_id,
     candy_amount,
+    xl_candy_pokemon_id,
+    xl_candy_amount,
     mega_pokemon_id,
     mega_amount,
     quest_reward_type,
@@ -347,37 +352,73 @@ const RewardInfo = ({ quest, Icons, config, t }) => {
     with_ar,
   } = quest
 
-  const getImage = () => {
+  const image = (() => {
     switch (quest_reward_type) {
       case 2:
-        return Icons.getRewards(quest_reward_type, quest_item_id, item_amount)
+        return {
+          tooltip: `item_${quest_item_id}`,
+          src: Icons.getRewards(quest_reward_type, quest_item_id, item_amount),
+        }
       case 3:
-        return Icons.getRewards(quest_reward_type, stardust_amount)
+        return {
+          tooltip: `stardust`,
+          src: Icons.getRewards(quest_reward_type, stardust_amount),
+        }
       case 4:
-        return Icons.getRewards(
-          quest_reward_type,
-          candy_pokemon_id,
-          candy_amount,
-        )
+        return {
+          tooltip: `poke_${candy_pokemon_id}`,
+          src: Icons.getRewards(
+            quest_reward_type,
+            candy_pokemon_id,
+            candy_amount,
+          ),
+        }
       case 7:
-        return Icons.getPokemon(
-          quest_pokemon_id,
-          quest_form_id,
-          0,
-          quest_gender_id,
-          quest_costume_id,
-          quest_shiny,
-        )
+        return {
+          tooltip: [
+            quest_form_id ? `form_${quest_form_id}` : '',
+            `poke_${quest_pokemon_id}`,
+          ],
+          src: Icons.getPokemon(
+            quest_pokemon_id,
+            quest_form_id,
+            0,
+            quest_gender_id,
+            quest_costume_id,
+            quest_shiny,
+          ),
+        }
+      case 9:
+        return {
+          tooltip: `poke_${xl_candy_pokemon_id}`,
+          src: Icons.getRewards(
+            quest_reward_type,
+            xl_candy_pokemon_id,
+            xl_candy_amount,
+          ),
+        }
       case 12:
-        return Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount)
+        return {
+          tooltip: `poke_${mega_pokemon_id}`,
+          src: Icons.getRewards(
+            quest_reward_type,
+            mega_pokemon_id,
+            mega_amount,
+          ),
+        }
       default:
-        return Icons.getRewards(quest_reward_type)
+        return {
+          tooltip: `quest_reward_${quest_reward_type}`,
+          src: Icons.getRewards(quest_reward_type),
+        }
     }
-  }
+  })()
 
   return (
     <Grid item xs={3} style={{ textAlign: 'center' }}>
-      <img src={getImage()} className="quest-popup-img" alt="quest reward" />
+      <NameTT id={image.tooltip}>
+        <img src={image.src} className="quest-popup-img" alt="quest reward" />
+      </NameTT>
       <Typography variant="caption" className="ar-task" noWrap>
         {config.questMessage
           ? config.questMessage
@@ -611,25 +652,30 @@ const Invasion = ({ pokestop, Icons, t }) => {
   const encounterNum = { first: '#1', second: '#2', third: '#3' }
 
   const makeShadowPokemon = (pkmn) => (
-    <div key={pkmn.id} className="invasion-reward">
-      <img
-        className="invasion-reward"
-        alt="invasion reward"
-        src={Icons.getPokemon(
-          pkmn.id,
-          pkmn.form,
-          0,
-          pkmn.gender,
-          pkmn.costumeId,
-          pkmn.shiny,
-        )}
-      />
-      <img
-        className="invasion-reward-shadow"
-        alt="shadow"
-        src={Icons.getMisc('shadow')}
-      />
-    </div>
+    <NameTT
+      key={pkmn.id}
+      id={[pkmn.form ? `form_${pkmn.form}` : '', `poke_${pkmn.id}`]}
+    >
+      <div className="invasion-reward">
+        <img
+          className="invasion-reward"
+          alt="invasion reward"
+          src={Icons.getPokemon(
+            pkmn.id,
+            pkmn.form,
+            0,
+            pkmn.gender,
+            pkmn.costumeId,
+            pkmn.shiny,
+          )}
+        />
+        <img
+          className="invasion-reward-shadow"
+          alt="shadow"
+          src={Icons.getMisc('shadow')}
+        />
+      </div>
+    </NameTT>
   )
 
   const getRewardPercent = (grunt) => {

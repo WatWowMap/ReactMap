@@ -19,6 +19,7 @@ import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
 import GenericTimer from './common/Timer'
+import NameTT from './common/NameTT'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -572,17 +573,24 @@ const PvpInfo = ({ pokemon, league, data, t, Icons }) => {
         ? {
             id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.gender}-${each.rank}-${each.cp}-${each.lvl}-${each.cap}`,
             img: (
-              <img
-                src={Icons.getPokemon(
-                  each.pokemon,
-                  each.form,
-                  each.evolution,
-                  each.gender,
-                  pokemon.costume,
-                )}
-                height={20}
-                alt={each.pokemon}
-              />
+              <NameTT
+                id={[
+                  each.form ? `form_${each.form}` : '',
+                  `poke_${each.pokemon}`,
+                ]}
+              >
+                <img
+                  src={Icons.getPokemon(
+                    each.pokemon,
+                    each.form,
+                    each.evolution,
+                    each.gender,
+                    pokemon.costume,
+                  )}
+                  height={20}
+                  alt={t(`poke_${each.pokemon}`)}
+                />
+              </NameTT>
             ),
             rank: each.rank || 0,
             cp: each.cp || 0,
