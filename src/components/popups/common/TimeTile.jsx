@@ -4,7 +4,13 @@ import { Grid, Typography } from '@material-ui/core'
 import Timer from './Timer'
 import NameTT from './NameTT'
 
-export default function TimeTile({ expireTime, icon, until, size = 3, tt = [] }) {
+export default function TimeTile({
+  expireTime,
+  icon,
+  until,
+  size = 3,
+  tt = [],
+}) {
   const endTime = new Date(expireTime * 1000)
   return (
     <>
