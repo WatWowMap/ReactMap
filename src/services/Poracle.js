@@ -565,4 +565,49 @@ export default class Poracle {
         return item.description
     }
   }
+
+  static parseImport(file, reference) {
+    try {
+      const uploading = {}
+      const parsed = JSON.parse(file)
+      const lowerCase = reference.available.map((val) => val.toLowerCase())
+      Object.entries(parsed).forEach(([key, values]) => {
+        if (Array.isArray(values) && key !== 'profile') {
+          uploading[key] = reference.info[key] 
+            ? values.map((val) =>
+                Object.fromEntries(
+                  Object.keys(reference.info[key].defaults).map((valKey) => [
+                    valKey,
+                    val[valKey],
+                  ]),
+                ),
+              )
+            : []
+        } else if (key === 'profile') {
+          uploading[key] = values
+        } else {
+          const jsonAreas =
+            typeof parsed[key].area === 'string'
+              ? JSON.parse(parsed[key].area)
+              : parsed[key].area
+          const area = `[${jsonAreas
+            .filter((a) => lowerCase.includes(a))
+            .map((a) => `"${a}"`)
+            .join(', ')}]`
+          uploading[key] = {
+            ...Object.fromEntries(
+              Object.keys(reference[key]).map((valKey) => [
+                valKey,
+                parsed[key][valKey],
+              ]),
+            ),
+            area,
+          }
+        }
+      })
+      return uploading
+    } catch (e) {
+      return { error: e.message }
+    }
+  }
 }

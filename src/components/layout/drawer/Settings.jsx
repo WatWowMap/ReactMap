@@ -12,6 +12,8 @@ import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
+import ExportButton from '../general/Export'
+import ImportButton from '../general/Import'
 
 export default function Settings({ Icons }) {
   const { t, i18n } = useTranslation()
@@ -44,35 +46,6 @@ export default function Settings({ Icons }) {
     Icons.setSelection(name, value)
     setStaticIcons(Icons)
     setIcons({ ...icons, [name]: value })
-  }
-
-  const exportSettings = () => {
-    const json = localStorage.getItem('local-state')
-    const el = document.createElement('a')
-    el.setAttribute(
-      'href',
-      `data:application/json;chartset=utf-8,${encodeURIComponent(json)}`,
-    )
-    el.setAttribute('download', 'settings.json')
-    el.style.display = 'none'
-    document.body.appendChild(el)
-    el.click()
-    document.body.removeChild(el)
-  }
-
-  const importSettings = (e) => {
-    const file = e.target.files[0]
-    if (!file) {
-      return
-    }
-    const reader = new FileReader()
-    reader.onload = function parse(newSettings) {
-      const contents = newSettings.target.result
-      localStorage.clear()
-      localStorage.setItem('local-state', contents)
-    }
-    reader.readAsText(file)
-    setTimeout(() => window.location.reload(), 1500)
   }
 
   return (
@@ -225,39 +198,24 @@ export default function Settings({ Icons }) {
           xs={t('drawer_settings_export_settings_width')}
           style={{ textAlign: 'center' }}
         >
-          <Button
-            style={{ minWidth: 100 }}
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={exportSettings}
-          >
-            {t('export')}
-          </Button>
+          <ExportButton
+            json={localStorage.getItem('local-state')}
+            fileName="settings.json"
+          />
         </Grid>
         <Grid
           item
           xs={t('drawer_settings_import_settings_width')}
           style={{ textAlign: 'center' }}
         >
-          <input
-            accept="application/json"
-            id="contained-button-file"
-            type="file"
-            style={{ display: 'none' }}
-            onChange={importSettings}
+          <ImportButton
+            onload={(newSettings) => {
+              const { result } = newSettings.target
+              localStorage.clear()
+              localStorage.setItem('local-state', result)
+            }}
+            postCb={() => setTimeout(() => window.location.reload(), 1500)}
           />
-          <label htmlFor="contained-button-file">
-            <Button
-              component="span"
-              style={{ minWidth: 100 }}
-              variant="contained"
-              color="primary"
-              size="small"
-            >
-              {t('import')}
-            </Button>
-          </label>
         </Grid>
         {config.map.statsLink && (
           <Grid

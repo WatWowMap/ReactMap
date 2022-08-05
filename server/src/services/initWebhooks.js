@@ -36,10 +36,10 @@ module.exports = async function initWebhooks(webhook, config) {
       if (
         major < 4 ||
         (major === 4 && minor < 5) ||
-        (major === 4 && minor === 5 && patch < 1)
+        (major === 4 && minor === 5 && patch < 6)
       ) {
         throw new Error(
-          `Poracle must be at least version 4.5.1, current version is ${hookConfig.version}`,
+          `Poracle must be at least version 4.5.6, current version is ${hookConfig.version}`,
         )
       }
 

@@ -77,7 +77,7 @@ export default function useConfig(serverSettings, params) {
 
   setTutorial(
     serverSettings.user.tutorial === undefined
-      ? Boolean(localState?.state?.tutorial)
+      ? !!localState?.state?.tutorial
       : !serverSettings.user.tutorial,
   )
   setUi(serverSettings.ui)

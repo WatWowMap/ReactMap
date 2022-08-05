@@ -10,7 +10,10 @@ import {
 import { useMutation } from '@apollo/client'
 import { Trans } from 'react-i18next'
 
+import ExportButton from '@components/layout/general/Export'
+import ImportButton from '@components/layout/general/Import'
 import { useStore, useStatic } from '@hooks/useStore'
+import Poracle from '@services/Poracle'
 import Query from '@services/Query'
 
 import Location from './Location'
@@ -39,6 +42,9 @@ const Human = ({
       fetchPolicy: 'no-cache',
     },
   )
+  const [importData] = useMutation(Query.webhook('importWebhook'), {
+    fetchPolicy: 'no-cache',
+  })
 
   const [currentHuman, setCurrentHuman] = useState(
     webhookData[selectedWebhook].human,
@@ -78,17 +84,6 @@ const Human = ({
     }
     setSelectedAreas(JSON.parse(area))
   }, [currentHuman])
-
-  useEffect(
-    () => () =>
-      setWebhookData({
-        ...webhookData,
-        [selectedWebhook]: {
-          ...webhookData[selectedWebhook],
-          human: currentHuman,
-        },
-      }),
-  )
 
   const multipleHooks = perms.webhooks.length > 1
   const gridSize = multipleHooks ? 2 : 3
@@ -209,6 +204,70 @@ const Human = ({
       ) : (
         <Typography>{`Invalid Area File Received from ${selectedWebhook}`}</Typography>
       )}
+      <Divider
+        light
+        flexItem
+        style={{ height: 5, width: '100%', margin: '15px 0px' }}
+      />
+      <Grid item xs={6} sm={3} md={2}>
+        <ExportButton
+          json={JSON.stringify(
+            Object.fromEntries(
+              [
+                'human',
+                'gym',
+                'raid',
+                'egg',
+                'pokemon',
+                'nest',
+                'invasion',
+                'lure',
+                'quest',
+                'profile',
+              ].map((key, i) => [
+                key,
+                i
+                  ? webhookData[selectedWebhook]?.[key]?.map((p) => ({
+                      ...p,
+                      description: undefined,
+                      uid: undefined,
+                      __typename: undefined,
+                    })) || []
+                  : webhookData[selectedWebhook]?.[key] || {},
+              ]),
+            ),
+            null,
+            2,
+          )}
+          fileName={`${selectedWebhook}.json`}
+        />
+      </Grid>
+      <Grid item xs={6} sm={3} md={2}>
+        <ImportButton
+          onload={(newSettings) => {
+            const { result } = newSettings.target
+            const data = Poracle.parseImport(
+              result,
+              webhookData[selectedWebhook],
+            )
+            setWebhookData({
+              ...webhookData,
+              [selectedWebhook]: {
+                ...webhookData[selectedWebhook],
+                ...data,
+              },
+            })
+            importData({
+              variables: {
+                category: 'importWebhook',
+                data,
+                status: 'POST',
+                name: selectedWebhook,
+              },
+            })
+          }}
+        />
+      </Grid>
     </Grid>
   )
 }
@@ -227,7 +286,8 @@ const areEqual = (prev, next) => {
     prev.selectedAreas.length === next.selectedAreas.length &&
     prev.isMobile === next.isMobile &&
     prev.webhookLocation.join('') === next.webhookLocation.join('') &&
-    prev.webhookMode === next.webhookMode
+    prev.webhookMode === next.webhookMode &&
+    prevSelected.profile.length === nextSelected.profile.length
   )
 }
 

@@ -245,7 +245,7 @@ export const allProfiles = gql`
   ${Quest}
   ${Raid}
   ${Weather}
-  query Webhook($category: String!, $status: String!, $name: String!) {
+  query AllProfiles($category: String!, $status: String!, $name: String!) {
     webhook(category: $category, status: $status, name: $name) {
       ...PoracleHuman
       ...PoracleEgg
@@ -326,6 +326,25 @@ export const setProfile = gql`
     webhook(data: $data, category: $category, status: $status, name: $name) {
       ...Base
       ...PoracleProfile
+    }
+  }
+`
+
+export const importWebhook = gql`
+  ${base}
+  mutation WebhookImport(
+    $data: JSON!
+    $category: String!
+    $status: String!
+    $name: String!
+  ) {
+    webhook(
+      data: $data
+      category: $category
+      status: $status
+      name: $name
+    ) {
+      ...Base
     }
   }
 `

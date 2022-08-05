@@ -6,7 +6,7 @@ const { Event } = require('../initialization')
 
 module.exports = async function webhookApi(
   category,
-  discordId,
+  userId,
   method,
   webhookName,
   data = null,
@@ -32,21 +32,21 @@ module.exports = async function webhookApi(
         Object.assign(payloadObj, {
           url: `${webhook.host}:${
             webhook.port
-          }/api/humans/${discordId}/${category}${data ? `/${data}` : ''}`,
+          }/api/humans/${userId}/${category}${data ? `/${data}` : ''}`,
           options: { method, headers },
           get: 'human',
         })
         break
       case 'setLocation':
         Object.assign(payloadObj, {
-          url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}/${data[0]}/${data[1]}`,
+          url: `${webhook.host}:${webhook.port}/api/humans/${userId}/${category}/${data[0]}/${data[1]}`,
           options: { method, headers },
           get: 'human',
         })
         break
       case 'setAreas':
         Object.assign(payloadObj, {
-          url: `${webhook.host}:${webhook.port}/api/humans/${discordId}/${category}`,
+          url: `${webhook.host}:${webhook.port}/api/humans/${userId}/${category}`,
           options: {
             method,
             headers,
@@ -63,13 +63,13 @@ module.exports = async function webhookApi(
         break
       case 'areaSecurity':
         Object.assign(payloadObj, {
-          url: `${webhook.host}:${webhook.port}/api/geofence/${discordId}`,
+          url: `${webhook.host}:${webhook.port}/api/geofence/${userId}`,
           options: { method, headers },
         })
         break
       case 'humans':
         Object.assign(payloadObj, {
-          url: `${webhook.host}:${webhook.port}/api/humans/${discordId}`,
+          url: `${webhook.host}:${webhook.port}/api/humans/${userId}`,
           options: { method, headers },
         })
         break
@@ -81,9 +81,7 @@ module.exports = async function webhookApi(
         {
           const [main, sub] = category.split('-')
           Object.assign(payloadObj, {
-            url: `${webhook.host}:${
-              webhook.port
-            }/api/${main}/${discordId}/${sub}${
+            url: `${webhook.host}:${webhook.port}/api/${main}/${userId}/${sub}${
               sub === 'copy' ? `/${data.from}/${data.to}` : ''
             }${method === 'DELETE' ? `/${data}` : ''}`,
             options: {
@@ -109,7 +107,7 @@ module.exports = async function webhookApi(
         {
           const [main, sub] = category.split('-')
           Object.assign(payloadObj, {
-            url: `${webhook.host}:${webhook.port}/api/tracking/${main}/${discordId}/${sub}`,
+            url: `${webhook.host}:${webhook.port}/api/tracking/${main}/${userId}/${sub}`,
             options: {
               method,
               headers,
@@ -130,7 +128,7 @@ module.exports = async function webhookApi(
         Object.assign(payloadObj, {
           url: `${webhook.host}:${
             webhook.port
-          }/api/tracking/${category}/${discordId}${
+          }/api/tracking/${category}/${userId}${
             method === 'DELETE' ? `/byUid/${data.uid}` : ''
           }`,
           options: {
@@ -142,12 +140,22 @@ module.exports = async function webhookApi(
         })
         break
       case 'quickGym':
-        return resolveQuickHook(category, discordId, webhookName, data)
+        return resolveQuickHook(category, userId, webhookName, data)
+      case 'importWebhook':
+        Object.assign(payloadObj, {
+          url: `${webhook.host}:${webhook.port}/api/import/${userId}`,
+          options: {
+            method,
+            headers,
+            body: data ? JSON.stringify(data) : null,
+          },
+        })
+        break
       default:
         Object.assign(payloadObj, {
           url: `${webhook.host}:${
             webhook.port
-          }/api/tracking/${category}/${discordId}${
+          }/api/tracking/${category}/${userId}${
             method === 'DELETE' ? `/byUid/${data.uid}` : ''
           }`,
           options: {
@@ -175,14 +183,14 @@ module.exports = async function webhookApi(
       throw new Error('No data returned from server')
     }
     if (payloadObj.get) {
-      const getUrl = (function getUrl() {
+      const getUrl = (() => {
         switch (payloadObj.get) {
           case 'profiles':
-            return `${webhook.host}:${webhook.port}/api/profiles/${discordId}`
+            return `${webhook.host}:${webhook.port}/api/profiles/${userId}`
           case 'human':
-            return `${webhook.host}:${webhook.port}/api/humans/one/${discordId}`
+            return `${webhook.host}:${webhook.port}/api/humans/one/${userId}`
           default:
-            return `${webhook.host}:${webhook.port}/api/tracking/${payloadObj.get}/${discordId}`
+            return `${webhook.host}:${webhook.port}/api/tracking/${payloadObj.get}/${userId}`
         }
       })()
       const get = await fetchJson(
