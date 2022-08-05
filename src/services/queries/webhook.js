@@ -338,12 +338,7 @@ export const importWebhook = gql`
     $status: String!
     $name: String!
   ) {
-    webhook(
-      data: $data
-      category: $category
-      status: $status
-      name: $name
-    ) {
+    webhook(data: $data, category: $category, status: $status, name: $name) {
       ...Base
     }
   }

@@ -573,7 +573,7 @@ export default class Poracle {
       const lowerCase = reference.available.map((val) => val.toLowerCase())
       Object.entries(parsed).forEach(([key, values]) => {
         if (Array.isArray(values) && key !== 'profile') {
-          uploading[key] = reference.info[key] 
+          uploading[key] = reference.info[key]
             ? values.map((val) =>
                 Object.fromEntries(
                   Object.keys(reference.info[key].defaults).map((valKey) => [
