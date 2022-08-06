@@ -59,6 +59,7 @@ module.exports = class Pokestop extends Model {
       hasMultiInvasions,
       multiInvasionMs,
       hasRewardAmount,
+      hasLayerColumn,
     },
   ) {
     const {
@@ -110,6 +111,9 @@ module.exports = class Pokestop extends Model {
             'incident_expire_timestamp',
           ),
         ])
+      if (hasLayerColumn) {
+        query.select('layer AS with_ar')
+      }
       if (hideOldPokestops) {
         query.whereRaw(
           `UNIX_TIMESTAMP(last_updated) > ${
