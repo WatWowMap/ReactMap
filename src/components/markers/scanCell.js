@@ -1,5 +1,4 @@
-export default function scanCellMarker(updated) {
-  const ago = Date.now() / 1000 - updated
+export default function scanCellMarker(ago) {
   const value = ago <= 1050 ? 0 : Math.min((ago - 1050) / 750, 1)
   const hue = ((1 - value) * 120).toString(10)
 

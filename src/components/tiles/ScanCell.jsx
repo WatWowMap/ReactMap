@@ -6,7 +6,7 @@ import marker from '../markers/scanCell'
 
 const ScanCellTile = ({ item, config, zoom, ts }) =>
   zoom >= config.scanCellsZoom && (
-    <Polygon positions={item.polygon} pathOptions={marker(item.updated)}>
+    <Polygon positions={item.polygon} pathOptions={marker(ts - item.updated)}>
       <Popup position={[item.center_lat, item.center_lon]}>
         <PopupContent cell={item} ts={ts} />
       </Popup>
