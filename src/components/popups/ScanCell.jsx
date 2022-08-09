@@ -4,7 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
-export default function S2CellPopup({ cell, ts }) {
+export default function ScanCellPopup({ cell, ts }) {
   const { t } = useTranslation()
   const { id, updated } = cell
   const lastUpdated = new Date(updated * 1000)
