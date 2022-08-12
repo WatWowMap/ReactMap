@@ -18,6 +18,7 @@ module.exports = class DbCheck {
     this.rarityPercents = rarityPercents
     this.models = {}
     this.questConditions = {}
+    this.memEndpoints = {}
     this.rarity = new Map()
     this.historical = new Map()
     this.connections = dbSettings.schemas
@@ -32,6 +33,9 @@ module.exports = class DbCheck {
           }
           this.models[capital].push({ connection: i })
         })
+        if (schema.endpoint) {
+          this.memEndpoints[i] = schema.endpoint
+        }
         return knex({
           client: 'mysql2',
           connection: {
@@ -76,9 +80,13 @@ module.exports = class DbCheck {
     await Promise.all(
       this.connections.map(async (schema, i) => {
         try {
-          const [isMad, pvpV2] = await schema('pokemon')
+          const [isMad, pvpV2, mem] = await schema('pokemon')
             .columnInfo()
-            .then((columns) => ['cp_multiplier' in columns, 'pvp' in columns])
+            .then((columns) => [
+              'cp_multiplier' in columns,
+              'pvp' in columns,
+              Object.keys(columns).length ? false : this.memEndpoints[i],
+            ])
           const [hasRewardAmount, hasAltQuests] = await schema('pokestop')
             .columnInfo()
             .then((columns) => [
@@ -108,6 +116,7 @@ module.exports = class DbCheck {
               if (source.connection === i) {
                 this.models[category][j].isMad = isMad
                 this.models[category][j].pvpV2 = pvpV2
+                this.models[category][j].mem = mem
                 this.models[category][j].hasRewardAmount = hasRewardAmount
                 this.models[category][j].hasAltQuests = hasAltQuests
                 this.models[category][j].hasMultiInvasions = hasMultiInvasions

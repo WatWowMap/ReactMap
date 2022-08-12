@@ -11,6 +11,7 @@ const {
 } = require('../services/config')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { Pvp } = require('../services/initialization')
+const fetchJson = require('../services/api/fetchJson')
 
 const levelCalc =
   'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
@@ -69,7 +70,7 @@ module.exports = class Pokemon extends Model {
     return 'pokemon'
   }
 
-  static async getAll(perms, args, { isMad, pvpV2 }) {
+  static async getAll(perms, args, { isMad, pvpV2, mem }) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const {
       onlyStandard,
@@ -262,7 +263,16 @@ module.exports = class Pokemon extends Model {
       return []
     }
 
-    const results = await query.limit(queryLimits.pokemon)
+    const results = mem
+      ? await fetchJson(mem, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: query.toKnexQuery().toString(),
+        })
+      : await query.limit(queryLimits.pokemon)
     const finalResults = []
     const pvpResults = []
     const listOfIds = []
@@ -344,7 +354,16 @@ module.exports = class Pokemon extends Model {
         return []
       }
       pvpResults.push(
-        ...(await pvpQuery.limit(queryLimits.pokemonPvp - results.length)),
+        ...(mem
+          ? await fetchJson(mem, {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: pvpQuery.toKnexQuery().toString(),
+            })
+          : await pvpQuery.limit(queryLimits.pokemonPvp - results.length)),
       )
     }
 
@@ -414,7 +433,8 @@ module.exports = class Pokemon extends Model {
     return legacyFilter(results, args, perms, ts)
   }
 
-  static async getAvailable({ isMad }) {
+  static async getAvailable({ isMad, mem }) {
+    if (mem) return []
     const ts = Math.floor(new Date().getTime() / 1000)
     const availableQuery = this.query()
       .select(['pokemon_id', 'form'])
