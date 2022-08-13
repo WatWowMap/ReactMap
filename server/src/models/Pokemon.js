@@ -436,7 +436,6 @@ module.exports = class Pokemon extends Model {
   }
 
   static async getAvailable({ isMad, mem }) {
-    if (mem) return [{ available: [], rarity: [] }]
     const ts = Math.floor(Date.now() / 1000)
     const availableQuery = this.evalQuery(
       mem,
