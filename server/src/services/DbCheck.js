@@ -85,7 +85,7 @@ module.exports = class DbCheck {
             .then((columns) => [
               'cp_multiplier' in columns,
               'pvp' in columns,
-              Object.keys(columns).length ? false : this.memEndpoints[i],
+              Object.keys(columns).length ? '' : this.memEndpoints[i],
             ])
           const [hasRewardAmount, hasAltQuests] = await schema('pokestop')
             .columnInfo()
