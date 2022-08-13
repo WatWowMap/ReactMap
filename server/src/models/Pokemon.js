@@ -263,16 +263,7 @@ module.exports = class Pokemon extends Model {
       return []
     }
 
-    const results = mem
-      ? await fetchJson(mem, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: query.toKnexQuery().toString(),
-        })
-      : await query.limit(queryLimits.pokemon)
+    const results = await this.evalQuery(mem, query.limit(queryLimits.pokemon))
     const finalResults = []
     const pvpResults = []
     const listOfIds = []
@@ -356,16 +347,10 @@ module.exports = class Pokemon extends Model {
         return []
       }
       pvpResults.push(
-        ...(mem
-          ? await fetchJson(mem, {
-              method: 'POST',
-              headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-              },
-              body: pvpQuery.toKnexQuery().toString(),
-            })
-          : await pvpQuery.limit(queryLimits.pokemonPvp - results.length)),
+        ...(await this.evalQuery(
+          mem,
+          pvpQuery.limit(queryLimits.pokemonPvp - results.length),
+        )),
       )
     }
 
@@ -403,8 +388,21 @@ module.exports = class Pokemon extends Model {
     return finalResults
   }
 
-  static async getLegacy(perms, args, { isMad }) {
-    const ts = Math.floor(new Date().getTime() / 1000)
+  static async evalQuery(mem, query) {
+    return mem
+      ? fetchJson(mem, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: query.toKnexQuery().toString(),
+        })
+      : query
+  }
+
+  static async getLegacy(perms, args, { mem, isMad }) {
+    const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
       .where(
         isMad ? 'disappear_time' : 'expire_timestamp',
@@ -433,31 +431,37 @@ module.exports = class Pokemon extends Model {
     ) {
       return []
     }
-    const results = await query
+    const results = await this.evalQuery(mem, query)
     return legacyFilter(results, args, perms, ts)
   }
 
   static async getAvailable({ isMad, mem }) {
     if (mem) return [{ available: [], rarity: [] }]
-    const ts = Math.floor(new Date().getTime() / 1000)
-    const availableQuery = this.query()
-      .select(['pokemon_id', 'form'])
-      .where(
-        isMad ? 'disappear_time' : 'expire_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : ts,
-      )
-      .groupBy('pokemon_id', 'form')
-      .orderBy('pokemon_id', 'form')
-    const rarityQuery = this.query()
-      .select(['pokemon_id AS id', 'form as formId'])
-      .count('pokemon_id AS count')
-      .groupBy('pokemon_id', 'form')
-      .where(
-        isMad ? 'disappear_time' : 'expire_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : ts,
-      )
+    const ts = Math.floor(Date.now() / 1000)
+    const availableQuery = this.evalQuery(
+      mem,
+      this.query()
+        .select(['pokemon_id', 'form'])
+        .where(
+          isMad ? 'disappear_time' : 'expire_timestamp',
+          '>=',
+          isMad ? this.knex().fn.now() : ts,
+        )
+        .groupBy('pokemon_id', 'form')
+        .orderBy('pokemon_id', 'form'),
+    )
+    const rarityQuery = this.evalQuery(
+      mem,
+      this.query()
+        .select(['pokemon_id AS id', 'form as formId'])
+        .count('pokemon_id AS count')
+        .groupBy('pokemon_id', 'form')
+        .where(
+          isMad ? 'disappear_time' : 'expire_timestamp',
+          '>=',
+          isMad ? this.knex().fn.now() : ts,
+        ),
+    )
 
     const [available, rarity] = await Promise.all([availableQuery, rarityQuery])
 
@@ -469,13 +473,16 @@ module.exports = class Pokemon extends Model {
     }
   }
 
-  static getOne(id, { isMad }) {
-    return this.query()
-      .select([
-        isMad ? 'latitude AS lat' : 'lat',
-        isMad ? 'longitude AS lon' : 'lon',
-      ])
-      .where(isMad ? 'encounter_id' : 'id', id)
-      .first()
+  static getOne(id, { isMad, mem }) {
+    return this.evalQuery(
+      mem,
+      this.query()
+        .select([
+          isMad ? 'latitude AS lat' : 'lat',
+          isMad ? 'longitude AS lon' : 'lon',
+        ])
+        .where(isMad ? 'encounter_id' : 'id', id)
+        .first(),
+    )
   }
 }
