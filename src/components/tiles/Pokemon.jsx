@@ -126,7 +126,11 @@ const PokemonTile = ({
         zIndexOffset={item.iv * 100}
         position={finalLocation}
         icon={
-          pvpCheck || glowStatus || ivCircle || weatherCheck || item.seen_type === 'nearby_cell'
+          pvpCheck ||
+          glowStatus ||
+          ivCircle ||
+          weatherCheck ||
+          item.seen_type === 'nearby_cell'
             ? fancyMarker(
                 url,
                 size,

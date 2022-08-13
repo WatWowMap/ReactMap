@@ -11,7 +11,6 @@ const {
     stopValidDataLimit,
     hideOldPokestops,
   },
-  database: { settings },
   map,
 } = require('../services/config')
 
@@ -75,7 +74,7 @@ module.exports = class Pokestop extends Model {
       ts,
       midnight: clientMidnight,
     } = args
-    const midnight = settings.hideOldQuests ? clientMidnight || 0 : 0
+    const midnight = clientMidnight || 0
     const safeTs = ts || Math.floor(new Date().getTime() / 1000)
 
     const {
@@ -1113,7 +1112,7 @@ module.exports = class Pokestop extends Model {
 
   static async searchQuests(perms, args, { isMad, hasAltQuests }, distance) {
     const { search, onlyAreas = [], locale, midnight: clientMidnight } = args
-    const midnight = settings.hideOldQuests ? clientMidnight : 0
+    const midnight = clientMidnight || 0
 
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next
