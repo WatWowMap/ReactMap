@@ -359,9 +359,9 @@ const getLegacy = (results, args, perms, ts) => {
       filtered.pokestop_id = result.pokestop_id
       filtered.first_seen_timestamp = result.first_seen_timestamp
       filtered.updated = result.updated
-      filtered.changed = result.changed
+      filtered.changed = !!result.changed
       filtered.cellId = result.cell_id
-      filtered.expire_timestamp_verified = result.expire_timestamp_verified
+      filtered.expire_timestamp_verified = !!result.expire_timestamp_verified
       filtered.display_pokemon_id = result.display_pokemon_id
       if (perms.iv) {
         filtered.move_1 = result.move_1

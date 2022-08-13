@@ -303,6 +303,8 @@ module.exports = class Pokemon extends Model {
         pvpResults.push(pkmn)
       }
       if (noPvp && globalCheck(pkmn)) {
+        pkmn.changed = !!pkmn.changed
+        pkmn.expire_timestamp_verified = !!pkmn.expire_timestamp_verified  
         finalResults.push(pkmn)
       }
     })
@@ -393,6 +395,8 @@ module.exports = class Pokemon extends Model {
         (Object.keys(pkmn.cleanPvp).length || !pkmn.pvpCheck) &&
         globalCheck(pkmn)
       ) {
+        pkmn.changed = !!pkmn.changed
+        pkmn.expire_timestamp_verified = !!pkmn.expire_timestamp_verified  
         finalResults.push(pkmn)
       }
     })
