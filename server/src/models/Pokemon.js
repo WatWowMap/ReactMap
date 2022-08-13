@@ -434,7 +434,7 @@ module.exports = class Pokemon extends Model {
   }
 
   static async getAvailable({ isMad, mem }) {
-    if (mem) return []
+    if (mem) return [{ available: [], rarity: [] }]
     const ts = Math.floor(new Date().getTime() / 1000)
     const availableQuery = this.query()
       .select(['pokemon_id', 'form'])

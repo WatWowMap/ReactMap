@@ -169,7 +169,7 @@ module.exports = class DbCheck {
     console.log('[DB] Setting historical rarity stats')
     const results = await Promise.all(
       this.models.Pokemon.map(async (source) =>
-        source.isMad
+        source.isMad || source.mem
           ? []
           : source.SubModel.query()
               .select('pokemon_id', raw('SUM(count) as total'))
