@@ -23,7 +23,7 @@ module.exports = {
       return {
         ...available,
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
-        filters: Utility.buildDefaultFilters(perms, available),
+        filters: Utility.buildDefaultFilters(perms, available, Db.models),
       }
     },
     badges: async (_, _args, { req, perms, Db, serverV, clientV }) => {

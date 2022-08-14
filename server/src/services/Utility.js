@@ -5,7 +5,6 @@ const buildDefaultFilters = require('./defaultFilters/buildDefaultFilters')
 const primaryUi = require('./ui/primary')
 const advMenus = require('./ui/advMenus')
 const clientOptions = require('./ui/clientOptions')
-const dbSelection = require('./functions/dbSelection')
 const webhook = require('./ui/webhook')
 const geocoder = require('./geocoder')
 const areaPerms = require('./functions/areaPerms')
@@ -41,10 +40,6 @@ module.exports = class Utility {
 
   static buildClientOptions(...args) {
     return clientOptions(...args)
-  }
-
-  static dbSelection(...args) {
-    return dbSelection(...args)
   }
 
   static webhookUi(...args) {

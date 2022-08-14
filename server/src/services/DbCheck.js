@@ -34,6 +34,7 @@ module.exports = class DbCheck {
         })
         return knex({
           client: 'mysql2',
+          acquireConnectionTimeout: 10000,
           connection: {
             host: schema.host,
             port: schema.port,
@@ -43,6 +44,7 @@ module.exports = class DbCheck {
           },
           debug: queryDebug,
           pool: {
+            min: 0,
             max: dbSettings.settings.maxConnections,
             afterCreate(conn, done) {
               conn.query('SET time_zone="+00:00";', (err) => done(err, conn))
@@ -159,7 +161,7 @@ module.exports = class DbCheck {
   async historicalRarity() {
     console.log('[DB] Setting historical rarity stats')
     const results = await Promise.all(
-      this.models.Pokemon.map(async (source) =>
+      (this.models.Pokemon ?? []).map(async (source) =>
         source.isMad
           ? []
           : source.SubModel.query()
@@ -218,13 +220,21 @@ module.exports = class DbCheck {
   static deDupeResults(results) {
     if (results.length === 1) return results[0]
     if (results.length > 1) {
-      const returnObj = {}
-      for (let i = 0; i < results.length; i += 1) {
-        for (let j = 0; j < results[i].length; j += 1) {
-          returnObj[results[i][j].id] = results[i][j]
+      const returnObj = new Map()
+      const { length } = results
+      for (let i = 0; i < length; i += 1) {
+        const { length: subLength } = results[i]
+        for (let j = 0; j < subLength; j += 1) {
+          const item = results[i][j]
+          if (
+            !returnObj.has(item.id) ||
+            item.updated > returnObj.get(item.id).updated
+          ) {
+            returnObj.set(item.id, item)
+          }
         }
       }
-      return Object.values(returnObj)
+      return returnObj.values()
     }
     return []
   }
