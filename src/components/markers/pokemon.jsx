@@ -53,7 +53,7 @@ export const fancyMarker = (
       {pkmn.seen_type === 'nearby_cell' && (
         <img
           src={Icons.getMisc('grass')}
-          alt='nearby_cell'
+          alt="nearby_cell"
           style={{
             width: size / 1.5,
             height: 'auto',

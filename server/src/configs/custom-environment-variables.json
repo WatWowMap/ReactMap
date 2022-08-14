@@ -917,14 +917,6 @@
       "gymBadgeTableName": "DATABASE_SETTINGS_GYM_BADGE_TABLE_NAME",
       "sessionTableName": "DATABASE_SETTINGS_SESSION_TABLE_NAME",
       "migrationTableName": "DATABASE_SETTINGS_MIGRATION_TABLE_NAME",
-      "joinGymBadgeTable": {
-        "__name": "DATABASE_SETTINGS_JOIN_GYM_BADGE_TABLE",
-        "__format": "boolean"
-      },
-      "hideOldQuests": {
-        "__name": "DATABASE_SETTINGS_HIDE_OLD_QUESTS",
-        "__format": "boolean"
-      },
       "maxConnections": {
         "__name": "DATABASE_SETTINGS_MAX_CONNECTIONS",
         "__format": "number"
