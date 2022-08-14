@@ -78,12 +78,13 @@ const server = new ApolloServer({
     if (config.devOptions.enabled) {
       const endpoint =
         context?.operation?.selectionSet?.selections?.[0]?.name?.value
+      const returned = data?.data?.[endpoint]?.length
       console.log(
         '[GQL]',
         'Endpoint:',
         endpoint,
-        'Returned:',
-        data?.data?.[endpoint]?.length,
+        returned ? 'Returned:' : '',
+        returned || '',
       )
     }
     return null

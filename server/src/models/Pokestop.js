@@ -59,6 +59,7 @@ module.exports = class Pokestop extends Model {
       multiInvasionMs,
       hasRewardAmount,
       hasLayerColumn,
+      hasPowerUp,
     },
   ) {
     const {
@@ -466,7 +467,7 @@ module.exports = class Pokestop extends Model {
           })
         }
       })
-    } else if (onlyLevels !== 'all' && !isMad) {
+    } else if (onlyLevels !== 'all' && hasPowerUp) {
       query.andWhere('power_up_level', onlyLevels)
     }
     const results = await query

@@ -34,7 +34,6 @@ module.exports = class DbCheck {
         })
         return knex({
           client: 'mysql2',
-          acquireConnectionTimeout: 10000,
           connection: {
             host: schema.host,
             port: schema.port,
@@ -44,7 +43,6 @@ module.exports = class DbCheck {
           },
           debug: queryDebug,
           pool: {
-            min: 0,
             max: dbSettings.settings.maxConnections,
             afterCreate(conn, done) {
               conn.query('SET time_zone="+00:00";', (err) => done(err, conn))
@@ -81,10 +79,13 @@ module.exports = class DbCheck {
           const [isMad, pvpV2] = await schema('pokemon')
             .columnInfo()
             .then((columns) => ['cp_multiplier' in columns, 'pvp' in columns])
-          const [hasRewardAmount, hasAltQuests] = await schema('pokestop')
+          const [hasRewardAmount, hasPowerUp, hasAltQuests] = await schema(
+            'pokestop',
+          )
             .columnInfo()
             .then((columns) => [
               'quest_reward_amount' in columns || isMad,
+              'power_up_level' in columns,
               'alternative_quest_type' in columns,
             ])
           const [hasLayerColumn] = isMad
@@ -111,6 +112,7 @@ module.exports = class DbCheck {
                 this.models[category][j].isMad = isMad
                 this.models[category][j].pvpV2 = pvpV2
                 this.models[category][j].hasRewardAmount = hasRewardAmount
+                this.models[category][j].hasPowerUp = hasPowerUp
                 this.models[category][j].hasAltQuests = hasAltQuests
                 this.models[category][j].hasMultiInvasions = hasMultiInvasions
                 this.models[category][j].multiInvasionMs = multiInvasionMs
