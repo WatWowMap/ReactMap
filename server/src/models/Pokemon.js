@@ -389,16 +389,19 @@ module.exports = class Pokemon extends Model {
   }
 
   static async evalQuery(mem, query) {
-    return mem
-      ? fetchJson(mem, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: query.toKnexQuery().toString(),
-        })
-      : query
+    console.log('query length', query.toKnexQuery().toString().length)
+    return (
+      (mem
+        ? fetchJson(mem, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: query.toKnexQuery().toString(),
+          })
+        : query) || []
+    )
   }
 
   static async getLegacy(perms, args, { mem, isMad }) {
