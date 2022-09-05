@@ -8,7 +8,7 @@ import DevicePoly from '../popups/DevicePoly'
 const DeviceTile = ({ item, ts, Icons, userSettings }) => {
   const [poly, setPoly] = useState(false)
   const markerRef = useRef(null)
-  const isOnline = ts - item.last_seen < 900
+  const isOnline = ts - item.updated < 900
 
   useEffect(() => {
     if (poly && markerRef) {
@@ -40,6 +40,6 @@ const areEqual = (prev, next) =>
   prev.item.type === next.item.type &&
   prev.item.last_lat === next.item.last_lat &&
   prev.item.last_lon === next.item.last_lon &&
-  prev.item.last_seen === next.item.last_seen
+  prev.item.updated === next.item.updated
 
 export default memo(DeviceTile, areEqual)

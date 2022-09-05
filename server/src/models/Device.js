@@ -18,7 +18,7 @@ module.exports = class Device extends Model {
           'settings_device.name AS id',
           'settings_area.name AS instance_name',
           'mode AS type',
-          raw('UNIX_TIMESTAMP(lastProtoDateTime)').as('last_seen'),
+          raw('UNIX_TIMESTAMP(lastProtoDateTime)').as('updated'),
           raw('X(currentPos)').as('last_lat'),
           raw('Y(currentPos)').as('last_lon'),
           raw(true).as('isMad'),
@@ -28,7 +28,7 @@ module.exports = class Device extends Model {
         .join('instance', 'device.instance_name', 'instance.name')
         .select(
           'uuid AS id',
-          'last_seen',
+          'last_seen AS updated',
           'last_lat',
           'last_lon',
           'type',

@@ -5,13 +5,13 @@ const MySQLStore = require('express-mysql-session')(session)
 const {
   api: { maxSessions },
   database: {
+    schemas,
     settings: { sessionTableName },
   },
 } = require('./config')
-const Utility = require('./Utility')
 const { Session } = require('../models/index')
 
-const dbSelection = Utility.dbSelection('session')
+const dbSelection = schemas.find(({ useFor }) => useFor?.includes('session'))
 
 // MySQL session store
 const sessionStore = new MySQLStore({

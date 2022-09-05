@@ -5,7 +5,7 @@ const getAllDevices = gql`
     devices(filters: $filters) {
       id
       instance_name
-      last_seen
+      updated
       last_lat
       last_lon
       route
