@@ -10,9 +10,11 @@ import {
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
 
-import Utility from '@services/Utility'
+import NameTT from '@components/popups/common/NameTT'
 import { useStore, useStatic } from '@hooks/useStore'
+import Utility from '@services/Utility'
 import Query from '@services/Query'
+
 import Header from '../general/Header'
 import QuestTitle from '../general/QuestTitle'
 
@@ -77,20 +79,28 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
       } = option
       let main
       let amount = 0
+      let tt = ''
       switch (quest_reward_type) {
         case 2:
           main = Icons.getRewards(quest_reward_type, quest_item_id, item_amount)
           amount = main.includes('_a') || item_amount <= 1 ? 0 : item_amount
+          tt = `item_${quest_item_id}`
           break
         case 3:
+          tt = `stardust`
           main = Icons.getRewards(quest_reward_type, stardust_amount)
           amount = main.includes('_a') ? 0 : stardust_amount
           break
         case 4:
+          tt = `poke_${candy_pokemon_id}`
           main = Icons.getRewards(quest_reward_type, candy_pokemon_id)
           amount = main.includes('_a') ? 0 : candy_amount
           break
         case 7:
+          tt = [
+            quest_form_id ? `form_${quest_form_id}` : '',
+            `poke_${quest_pokemon_id}`,
+          ]
           main = Icons.getPokemon(
             quest_pokemon_id,
             quest_form_id,
@@ -101,10 +111,12 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
           )
           break
         case 9:
+          tt = `poke_${xl_candy_pokemon_id}`
           main = Icons.getRewards(quest_reward_type, xl_candy_pokemon_id)
           amount = main.includes('_a') ? 0 : xl_candy_amount
           break
         case 12:
+          tt = `poke_${mega_pokemon_id}`
           main = Icons.getRewards(
             quest_reward_type,
             mega_pokemon_id,
@@ -124,7 +136,13 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
             position: 'relative',
           }}
         >
-          <img src={main} style={{ maxWidth: 45, maxHeight: 45 }} alt={main} />
+          <NameTT id={tt}>
+            <img
+              src={main}
+              style={{ maxWidth: 45, maxHeight: 45 }}
+              alt={main}
+            />
+          </NameTT>
           {Boolean(
             main.includes('stardust')
               ? !main.endsWith('0.png')
@@ -141,25 +159,40 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
         raid_pokemon_evolution,
       } = option
       return (
-        <img
-          src={Icons.getPokemon(
-            raid_pokemon_id,
-            raid_pokemon_form,
-            raid_pokemon_evolution,
-            raid_pokemon_gender,
-            raid_pokemon_costume,
-          )}
-          alt={raid_pokemon_id}
-          style={{ maxWidth: 45, maxHeight: 45 }}
-        />
+        <NameTT
+          id={[
+            raid_pokemon_form ? `form_${raid_pokemon_form}` : '',
+            raid_pokemon_evolution ? `evo_${raid_pokemon_evolution}` : '',
+            `poke_${raid_pokemon_id}`,
+          ]}
+        >
+          <img
+            src={Icons.getPokemon(
+              raid_pokemon_id,
+              raid_pokemon_form,
+              raid_pokemon_evolution,
+              raid_pokemon_gender,
+              raid_pokemon_costume,
+            )}
+            alt={raid_pokemon_id}
+            style={{ maxWidth: 45, maxHeight: 45 }}
+          />
+        </NameTT>
       )
     }
     return (
-      <img
-        src={Icons.getPokemon(nest_pokemon_id, nest_pokemon_form)}
-        alt={nest_pokemon_form}
-        style={{ maxWidth: 45, maxHeight: 45 }}
-      />
+      <NameTT
+        id={[
+          nest_pokemon_form ? `form_${nest_pokemon_form}` : '',
+          `poke_${nest_pokemon_id}`,
+        ]}
+      >
+        <img
+          src={Icons.getPokemon(nest_pokemon_id, nest_pokemon_form)}
+          alt={nest_pokemon_form}
+          style={{ maxWidth: 45, maxHeight: 45 }}
+        />
+      </NameTT>
     )
   }
 

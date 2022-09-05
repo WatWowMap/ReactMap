@@ -11,7 +11,6 @@ const {
     stopValidDataLimit,
     hideOldPokestops,
   },
-  database: { settings },
   map,
 } = require('../services/config')
 
@@ -59,6 +58,7 @@ module.exports = class Pokestop extends Model {
       hasMultiInvasions,
       multiInvasionMs,
       hasRewardAmount,
+      hasLayerColumn,
     },
   ) {
     const {
@@ -74,7 +74,7 @@ module.exports = class Pokestop extends Model {
       ts,
       midnight: clientMidnight,
     } = args
-    const midnight = settings.hideOldQuests ? clientMidnight || 0 : 0
+    const midnight = clientMidnight || 0
     const safeTs = ts || Math.floor(new Date().getTime() / 1000)
 
     const {
@@ -110,6 +110,9 @@ module.exports = class Pokestop extends Model {
             'incident_expire_timestamp',
           ),
         ])
+      if (hasLayerColumn) {
+        query.select('layer AS with_ar')
+      }
       if (hideOldPokestops) {
         query.whereRaw(
           `UNIX_TIMESTAMP(last_updated) > ${
@@ -1109,7 +1112,7 @@ module.exports = class Pokestop extends Model {
 
   static async searchQuests(perms, args, { isMad, hasAltQuests }, distance) {
     const { search, onlyAreas = [], locale, midnight: clientMidnight } = args
-    const midnight = settings.hideOldQuests ? clientMidnight : 0
+    const midnight = clientMidnight || 0
 
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next

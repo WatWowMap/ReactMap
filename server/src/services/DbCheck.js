@@ -85,6 +85,11 @@ module.exports = class DbCheck {
               'quest_reward_amount' in columns || isMad,
               'alternative_quest_type' in columns,
             ])
+          const [hasLayerColumn] = isMad
+            ? await schema('trs_quest')
+                .columnInfo()
+                .then((columns) => ['layer' in columns])
+            : [false]
           const [hasMultiInvasions, multiInvasionMs] = await schema('incident')
             .columnInfo()
             .then((columns) => [
@@ -108,6 +113,7 @@ module.exports = class DbCheck {
                 this.models[category][j].hasMultiInvasions = hasMultiInvasions
                 this.models[category][j].multiInvasionMs = multiInvasionMs
                 this.models[category][j].availableSlotsCol = availableSlotsCol
+                this.models[category][j].hasLayerColumn = hasLayerColumn
               }
             })
           })
