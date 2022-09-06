@@ -79,10 +79,13 @@ module.exports = class DbCheck {
           const [isMad, pvpV2] = await schema('pokemon')
             .columnInfo()
             .then((columns) => ['cp_multiplier' in columns, 'pvp' in columns])
-          const [hasRewardAmount, hasAltQuests] = await schema('pokestop')
+          const [hasRewardAmount, hasPowerUp, hasAltQuests] = await schema(
+            'pokestop',
+          )
             .columnInfo()
             .then((columns) => [
               'quest_reward_amount' in columns || isMad,
+              'power_up_level' in columns,
               'alternative_quest_type' in columns,
             ])
           const [hasLayerColumn] = isMad
@@ -109,6 +112,7 @@ module.exports = class DbCheck {
                 this.models[category][j].isMad = isMad
                 this.models[category][j].pvpV2 = pvpV2
                 this.models[category][j].hasRewardAmount = hasRewardAmount
+                this.models[category][j].hasPowerUp = hasPowerUp
                 this.models[category][j].hasAltQuests = hasAltQuests
                 this.models[category][j].hasMultiInvasions = hasMultiInvasions
                 this.models[category][j].multiInvasionMs = multiInvasionMs
@@ -159,7 +163,7 @@ module.exports = class DbCheck {
   async historicalRarity() {
     console.log('[DB] Setting historical rarity stats')
     const results = await Promise.all(
-      this.models.Pokemon.map(async (source) =>
+      (this.models.Pokemon ?? []).map(async (source) =>
         source.isMad
           ? []
           : source.SubModel.query()
@@ -218,13 +222,21 @@ module.exports = class DbCheck {
   static deDupeResults(results) {
     if (results.length === 1) return results[0]
     if (results.length > 1) {
-      const returnObj = {}
-      for (let i = 0; i < results.length; i += 1) {
-        for (let j = 0; j < results[i].length; j += 1) {
-          returnObj[results[i][j].id] = results[i][j]
+      const returnObj = new Map()
+      const { length } = results
+      for (let i = 0; i < length; i += 1) {
+        const { length: subLength } = results[i]
+        for (let j = 0; j < subLength; j += 1) {
+          const item = results[i][j]
+          if (
+            !returnObj.has(item.id) ||
+            item.updated > returnObj.get(item.id).updated
+          ) {
+            returnObj.set(item.id, item)
+          }
         }
       }
-      return Object.values(returnObj)
+      return returnObj.values()
     }
     return []
   }

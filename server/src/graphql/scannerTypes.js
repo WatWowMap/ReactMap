@@ -4,7 +4,7 @@ module.exports = gql`
   type Device {
     id: ID
     instance_name: String
-    last_seen: Int
+    updated: Int
     last_lat: Float
     last_lon: Float
     type: String

@@ -258,6 +258,7 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.defaultFilters = Utility.buildDefaultFilters(
         serverSettings.user.perms,
         serverSettings.available,
+        Db.models,
       )
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile

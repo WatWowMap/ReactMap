@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.3.3",
+  "version": "1.3.5",
   "description": "React based frontend map.",
   "main": "ReactMap.mjs",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -66,7 +66,7 @@
     "@turf/destination": "^6.5.0",
     "@turf/helpers": "^6.5.0",
     "apollo-link-timeout": "^4.0.0",
-    "apollo-server-core": "^3.5.0",
+    "apollo-server-core": "^3.10.1",
     "apollo-server-express": "^3.5.0",
     "bcrypt": "^5.0.1",
     "compression": "^1.7.4",

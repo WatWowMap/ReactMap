@@ -32,8 +32,8 @@ export default function DevicePopup({ device, isOnline, ts }) {
 }
 
 const Timer = ({ device, t, ts }) => {
-  const { last_seen } = device
-  const lastSeen = new Date(last_seen * 1000)
+  const { updated } = device
+  const lastSeen = new Date(updated * 1000)
   const [since, setSince] = useState(Utility.getTimeUntil(lastSeen))
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const Timer = ({ device, t, ts }) => {
 
   return (
     <Typography variant="caption">
-      {t('last_seen')}: {Utility.dayCheck(ts, last_seen)} (
+      {t('last_seen')}: {Utility.dayCheck(ts, updated)} (
       {since.str.replace('days', t('days')).replace('day', t('day'))})
     </Typography>
   )
