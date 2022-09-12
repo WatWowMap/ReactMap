@@ -19,8 +19,8 @@ module.exports = class Device extends Model {
           'settings_area.name AS instance_name',
           'mode AS type',
           raw('UNIX_TIMESTAMP(lastProtoDateTime)').as('last_seen'),
-          raw('X(currentPos)').as('last_lat'),
-          raw('Y(currentPos)').as('last_lon'),
+          raw('Y(currentPos)').as('last_lat'),
+          raw('X(currentPos)').as('last_lon'),
           raw(true).as('isMad'),
         ])
     } else {
