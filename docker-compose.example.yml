@@ -8,12 +8,12 @@ services:
     environment:
       SCANNER_DB_HOST: 127.0.0.1
       SCANNER_DB_PORT: 3306
-      SCANNER_DB_USER: scanner_username
+      SCANNER_DB_USERNAME: scanner_username
       SCANNER_DB_PASSWORD: scanner_user_pw
       SCANNER_DB_NAME: realdevicemap
       MANUAL_DB_HOST: 127.0.0.1
       MANUAL_DB_PORT: 3306
-      MANUAL_DB_USER: manual_username
+      MANUAL_DB_USERNAME: manual_username
       MANUAL_DB_PASSWORD: manual_user_pw
       MANUAL_DB_NAME: manual_db
       MAP_GENERAL_TITLE: ReactMap
