@@ -820,6 +820,24 @@
           "__name": "DEFAULT_FILTERS_POKESTOPS_STARDUST_ENABLED",
           "__format": "boolean"
         }
+      },
+      "xp": {
+        "min": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_XP_MIN",
+          "__format": "number"
+        },
+        "max": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_XP_MAX",
+          "__format": "number"
+        },
+        "interval": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_XP_INTERVAL",
+          "__format": "number"
+        },
+        "enabled": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_XP_ENABLED",
+          "__format": "boolean"
+        }
       }
     },
     "pokemon": {
