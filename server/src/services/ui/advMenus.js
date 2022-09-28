@@ -12,12 +12,13 @@ const categories = {
     'quest_reward_4',
     'quest_reward_9',
     'quest_reward_3',
+    'quest_reward_1',
   ],
   pokemon: ['pokemon'],
   nests: ['pokemon'],
 }
 
-if (map.enableQuestRewardTypeFilters) {
+if (map.questRewardTypeFilters) {
   categories.pokestops.push('general')
 }
 

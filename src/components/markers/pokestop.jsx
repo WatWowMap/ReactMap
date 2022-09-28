@@ -57,6 +57,7 @@ export default function stopMarker(
       const {
         quest_item_id,
         item_amount,
+        xp_amount,
         stardust_amount,
         candy_pokemon_id,
         candy_amount,
@@ -73,6 +74,12 @@ export default function stopMarker(
         key,
       } = quest
       switch (quest_reward_type) {
+        case 1:
+          questIcons.unshift({
+            url: Icons.getRewards(quest_reward_type, xp_amount),
+            amount: xp_amount,
+          })
+          break
         case 2:
           questIcons.unshift({
             url: Icons.getRewards(

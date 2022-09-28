@@ -159,6 +159,7 @@ module.exports = class Pokestop extends Model {
 
     if (!onlyAllPokestops) {
       // Skips ugly query if all pokestops are selected anyway
+      const xp = []
       const stardust = []
       const invasions = []
       const lures = []
@@ -184,6 +185,9 @@ module.exports = class Pokestop extends Model {
             break
           case 'm':
             energy.push(pokestop.slice(1))
+            break
+          case 'p':
+            xp.push(pokestop.slice(1))
             break
           case 'q':
             items.push(pokestop.slice(1))
@@ -263,6 +267,37 @@ module.exports = class Pokestop extends Model {
                     questTypes.orWhere((altDust) => {
                       altDust
                         .where('alternative_quest_reward_type', 3)
+                        .andWhere(
+                          raw(
+                            `json_extract(alternative_quest_rewards, "$[0].info.amount") = ${amount}`,
+                          ),
+                        )
+                    })
+                  }
+                })
+              }
+              if (hasRewardAmount) {
+                if (!isMad) {
+                  questTypes.orWhereIn('quest_reward_amount', xp)
+                }
+                if (hasAltQuests) {
+                  questTypes.orWhereIn('alternative_quest_reward_amount', xp)
+                }
+              } else {
+                xp.forEach((amount) => {
+                  questTypes.orWhere((xpReward) => {
+                    xpReward
+                      .where('quest_reward_type', 1)
+                      .andWhere(
+                        raw(
+                          `json_extract(quest_rewards, "$[0].info.amount") = ${amount}`,
+                        ),
+                      )
+                  })
+                  if (hasAltQuests) {
+                    questTypes.orWhere((altXpReward) => {
+                      altXpReward
+                        .where('alternative_quest_reward_type', 1)
                         .andWhere(
                           raw(
                             `json_extract(alternative_quest_rewards, "$[0].info.amount") = ${amount}`,
@@ -574,6 +609,10 @@ module.exports = class Pokestop extends Model {
               'quest_title',
             ]
             switch (quest.quest_reward_type) {
+              case 1:
+                newQuest.key = `p${quest.xp_amount}`
+                fields.push('xp_amount')
+                break
               case 2:
                 newQuest.key = `q${quest.quest_item_id}`
                 fields.push('quest_item_id', 'item_amount')
@@ -733,6 +772,7 @@ module.exports = class Pokestop extends Model {
       finalList.add(key)
     }
 
+    queries.xp = this.query()
     queries.items = this.query()
       .select('quest_item_id', 'quest_title', 'quest_target')
       .from(isMad ? 'trs_quest' : 'pokestop')
@@ -759,6 +799,52 @@ module.exports = class Pokestop extends Model {
         .where('quest_stardust', '>', 0)
         .groupBy('amount', 'quest_title', 'quest_target')
     } else {
+      queries.xp = this.query().where('quest_reward_type', 1)
+      if (hasRewardAmount) {
+        queries.xp
+          .select(
+            'quest_reward_amount AS amount',
+            'quest_title',
+            'quest_target',
+          )
+          .where('quest_reward_amount', '>', 0)
+          .groupBy('amount', 'quest_title', 'quest_target')
+      } else {
+        queries.xp
+          .select('quest_title', 'quest_target')
+          .distinct(
+            raw('json_extract(quest_rewards, "$[0].info.amount")').as('amount'),
+          )
+      }
+      if (hasAltQuests) {
+        queries.xpAlt = this.query().where('alternative_quest_reward_type', 1)
+        if (hasRewardAmount) {
+          queries.xpAlt
+            .select(
+              'alternative_quest_reward_amount AS amount',
+              'alternative_quest_title AS quest_title',
+              'alternative_quest_target AS quest_target',
+            )
+            .where('alternative_quest_reward_amount', '>', 0)
+            .groupBy(
+              'amount',
+              'alternative_quest_title',
+              'alternative_quest_target',
+            )
+        } else {
+          queries.xpAlt
+            .select(
+              'alternative_quest_title AS quest_title',
+              'alternative_quest_target AS quest_target',
+            )
+            .distinct(
+              raw(
+                'json_extract(alternative_quest_rewards, "$[0].info.amount")',
+              ).as('amount'),
+            )
+        }
+      }
+
       queries.stardust = this.query().where('quest_reward_type', 3)
       if (hasRewardAmount) {
         queries.stardust
@@ -967,6 +1053,16 @@ module.exports = class Pokestop extends Model {
     )
     Object.entries(resolved).forEach(([questType, rewards]) => {
       switch (questType) {
+        case 'xp':
+        case 'xpAlt':
+          rewards.forEach((reward) =>
+            process(
+              `p${reward.amount}`,
+              reward.quest_title,
+              reward.quest_target,
+            ),
+          )
+          break
         case 'itemsAlt':
         case 'items':
           rewards.forEach((reward) =>
@@ -1036,6 +1132,9 @@ module.exports = class Pokestop extends Model {
     if (quest.quest_reward_type) {
       const { info } = JSON.parse(quest.quest_rewards)[0]
       switch (quest.quest_reward_type) {
+        case 1:
+          Object.keys(info).forEach((x) => (quest[`xp_${x}`] = info[x]))
+          break
         case 2:
           Object.keys(info).forEach((x) => (quest[`item_${x}`] = info[x]))
           break
@@ -1067,6 +1166,9 @@ module.exports = class Pokestop extends Model {
         quest.quest_rewards,
       )[0]
       switch (quest.quest_reward_type) {
+        case 1:
+          Object.keys(item).forEach((x) => (quest[`xp_${x}`] = item[x]))
+          break
         case 2:
           Object.keys(item).forEach((x) => (quest[`item_${x}`] = item[x]))
           break
