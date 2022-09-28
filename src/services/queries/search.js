@@ -126,6 +126,7 @@ export const quests = gql`
       item_amount
       candy_pokemon_id
       candy_amount
+      xp_amount
       with_ar
       quest_title
       quest_target
