@@ -72,6 +72,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
         stardust_amount,
         candy_amount,
         xl_candy_amount,
+        xp_amount,
         mega_pokemon_id,
         mega_amount,
         candy_pokemon_id,
@@ -81,6 +82,11 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
       let amount = 0
       let tt = ''
       switch (quest_reward_type) {
+        case 1:
+          main = Icons.getRewards(quest_reward_type, xp_amount)
+          amount = main.endsWith('/0.png') ? 0 : item_amount
+          tt = `item_${quest_item_id}`
+          break
         case 2:
           main = Icons.getRewards(quest_reward_type, quest_item_id, item_amount)
           amount = main.includes('_a') || item_amount <= 1 ? 0 : item_amount
@@ -89,7 +95,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
         case 3:
           tt = `stardust`
           main = Icons.getRewards(quest_reward_type, stardust_amount)
-          amount = main.includes('_a') ? 0 : stardust_amount
+          amount = main.endsWith('/0.png') ? 0 : stardust_amount
           break
         case 4:
           tt = `poke_${candy_pokemon_id}`
@@ -143,11 +149,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
               alt={main}
             />
           </NameTT>
-          {Boolean(
-            main.includes('stardust')
-              ? !main.endsWith('0.png')
-              : !main.includes('_a') && amount,
-          ) && <div className="search-amount-holder">x{amount}</div>}
+          {!!amount && <div className="search-amount-holder">x{amount}</div>}
         </div>
       )
     }

@@ -337,6 +337,7 @@ const RewardInfo = ({ quest, Icons, config, t }) => {
     quest_item_id,
     item_amount,
     stardust_amount,
+    xp_amount,
     candy_pokemon_id,
     candy_amount,
     xl_candy_pokemon_id,
@@ -354,6 +355,11 @@ const RewardInfo = ({ quest, Icons, config, t }) => {
 
   const image = (() => {
     switch (quest_reward_type) {
+      case 1:
+        return {
+          tooltip: `quest_reward_1`,
+          src: Icons.getRewards(quest_reward_type, xp_amount),
+        }
       case 2:
         return {
           tooltip: `item_${quest_item_id}`,
@@ -361,7 +367,7 @@ const RewardInfo = ({ quest, Icons, config, t }) => {
         }
       case 3:
         return {
-          tooltip: `stardust`,
+          tooltip: `quest_reward_2`,
           src: Icons.getRewards(quest_reward_type, stardust_amount),
         }
       case 4:

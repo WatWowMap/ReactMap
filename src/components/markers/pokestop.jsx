@@ -182,7 +182,8 @@ export default function stopMarker(
         />
       )}
       {questIcons.map((icon, i) => (
-        <Fragment key={icon.url}>
+        // eslint-disable-next-line react/no-array-index-key
+        <Fragment key={`${icon.url}-${i}`}>
           <img
             src={icon.url}
             alt={icon.url}
@@ -200,7 +201,7 @@ export default function stopMarker(
           />
           {Boolean(
             icon.url.includes('stardust') || icon.url.includes('experience')
-              ? !icon.url.endsWith('0.png')
+              ? icon.url.endsWith('/0.png')
               : !icon.url.includes('_a') && icon.amount,
           ) && (
             <div
