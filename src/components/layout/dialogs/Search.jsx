@@ -83,19 +83,19 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
       let tt = ''
       switch (quest_reward_type) {
         case 1:
+          tt = `quest_reward_${quest_reward_type}`
           main = Icons.getRewards(quest_reward_type, xp_amount)
-          amount = main.endsWith('/0.png') ? 0 : item_amount
-          tt = `item_${quest_item_id}`
+          amount = main.endsWith('/0.png') ? xp_amount : 0
           break
         case 2:
+          tt = `item_${quest_item_id}`
           main = Icons.getRewards(quest_reward_type, quest_item_id, item_amount)
           amount = main.includes('_a') || item_amount <= 1 ? 0 : item_amount
-          tt = `item_${quest_item_id}`
           break
         case 3:
-          tt = `stardust`
+          tt = `quest_reward_3`
           main = Icons.getRewards(quest_reward_type, stardust_amount)
-          amount = main.endsWith('/0.png') ? 0 : stardust_amount
+          amount = main.endsWith('/0.png') ? stardust_amount : 0
           break
         case 4:
           tt = `poke_${candy_pokemon_id}`
@@ -131,6 +131,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
           amount = main.includes('_a') ? 0 : mega_amount
           break
         default:
+          tt = `quest_reward_${quest_reward_type}`
           main = Icons.getRewards(quest_reward_type)
       }
       return (
@@ -146,7 +147,12 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
             <img
               src={main}
               style={{ maxWidth: 45, maxHeight: 45 }}
-              alt={main}
+              alt={tt}
+              onError={(e) => {
+                e.target.onerror = null
+                e.target.src =
+                  'https://github.com/WatWowMap/wwm-uicons/blob/main/misc/0.png'
+              }}
             />
           </NameTT>
           {!!amount && <div className="search-amount-holder">x{amount}</div>}
