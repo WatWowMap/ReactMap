@@ -57,6 +57,7 @@ export default function PokestopPopup({
         direction="row"
         justifyContent="space-evenly"
         alignItems="center"
+        style={{ width: 200 }}
         spacing={1}
       >
         {!plainPokestop && (

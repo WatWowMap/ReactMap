@@ -315,10 +315,6 @@
         "__name": "MAP_MISC_ENABLE_MAP_JS_FILTER",
         "__format": "boolean"
       },
-      "questRewardTypeFilters": {
-        "__name": "MAP_MISC_QUEST_REWARD_TYPE_FILTERS",
-        "__format": "boolean"
-      },
       "fetchLatestInvasions": {
         "__name": "MAP_MISC_FETCH_LATEST_INVASIONS",
         "__format": "boolean"
