@@ -1099,6 +1099,7 @@ module.exports = class Pokestop extends Model {
     let questTypes = [
       ...new Set([
         ...(await this.query()
+          .from(isMad ? 'trs_quest' : 'pokestop')
           .distinct('quest_reward_type')
           .whereNotNull('quest_reward_type')
           .then((results) => results.map((x) => x.quest_reward_type))),
