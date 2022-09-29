@@ -20,7 +20,7 @@ export default function WeatherPopup({ weather, ts, Icons }) {
   }, [])
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Grid
         container
         direction="row"

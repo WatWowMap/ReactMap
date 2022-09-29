@@ -19,7 +19,7 @@ export default function ScanCellPopup({ cell, ts }) {
   })
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Typography variant="h6" align="center">
         <Trans i18nKey="s2_cell_level">{{ level: 15 }}</Trans>
       </Typography>

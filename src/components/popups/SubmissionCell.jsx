@@ -25,7 +25,7 @@ export default function SubmissionCellPopup({ cell }) {
   }, [])
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Typography variant="h6" align="center">
         <Trans i18nKey="s2_cell_level">{{ level: cell.level }}</Trans>
       </Typography>

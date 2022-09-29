@@ -80,7 +80,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
   }, [])
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Grid
         container
         justifyContent="center"

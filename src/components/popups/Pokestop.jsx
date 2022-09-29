@@ -51,10 +51,9 @@ export default function PokestopPopup({
   const plainPokestop = !hasLure && !hasQuest && !hasInvasion
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Grid
         container
-        style={{ width: 200 }}
         direction="row"
         justifyContent="space-evenly"
         alignItems="center"

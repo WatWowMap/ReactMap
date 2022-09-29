@@ -62,7 +62,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
 
     if (quest_reward_type) {
       const { src, amount, tt } = Utility.getRewardInfo(option, Icons)
-      
+
       return (
         <div
           style={{

@@ -13,7 +13,7 @@ export default function SpawnpointPopup({ spawnpoint, ts }) {
   const minuteFixed = minute < 10 ? `0${minute}` : minute
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Typography variant="h5" align="center">
         {t('spawnpoint')}
       </Typography>

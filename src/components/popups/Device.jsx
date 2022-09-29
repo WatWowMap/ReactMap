@@ -13,7 +13,7 @@ export default function DevicePopup({ device, isOnline, ts }) {
   }, [])
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Typography variant="h6" align="center">
         {device.id}
       </Typography>
