@@ -336,102 +336,34 @@ const MenuActions = ({
 }
 
 const RewardInfo = ({ quest, Icons, config, t }) => {
-  const {
-    quest_item_id,
-    item_amount,
-    stardust_amount,
-    xp_amount,
-    candy_pokemon_id,
-    candy_amount,
-    xl_candy_pokemon_id,
-    xl_candy_amount,
-    mega_pokemon_id,
-    mega_amount,
-    quest_reward_type,
-    quest_pokemon_id,
-    quest_form_id,
-    quest_gender_id,
-    quest_costume_id,
-    quest_shiny,
-    with_ar,
-  } = quest
-
-  const image = (() => {
-    switch (quest_reward_type) {
-      case 1:
-        return {
-          tooltip: `quest_reward_1`,
-          src: Icons.getRewards(quest_reward_type, xp_amount),
-        }
-      case 2:
-        return {
-          tooltip: `item_${quest_item_id}`,
-          src: Icons.getRewards(quest_reward_type, quest_item_id, item_amount),
-        }
-      case 3:
-        return {
-          tooltip: `quest_reward_2`,
-          src: Icons.getRewards(quest_reward_type, stardust_amount),
-        }
-      case 4:
-        return {
-          tooltip: `poke_${candy_pokemon_id}`,
-          src: Icons.getRewards(
-            quest_reward_type,
-            candy_pokemon_id,
-            candy_amount,
-          ),
-        }
-      case 7:
-        return {
-          tooltip: [
-            quest_form_id ? `form_${quest_form_id}` : '',
-            `poke_${quest_pokemon_id}`,
-          ],
-          src: Icons.getPokemon(
-            quest_pokemon_id,
-            quest_form_id,
-            0,
-            quest_gender_id,
-            quest_costume_id,
-            quest_shiny,
-          ),
-        }
-      case 9:
-        return {
-          tooltip: `poke_${xl_candy_pokemon_id}`,
-          src: Icons.getRewards(
-            quest_reward_type,
-            xl_candy_pokemon_id,
-            xl_candy_amount,
-          ),
-        }
-      case 12:
-        return {
-          tooltip: `poke_${mega_pokemon_id}`,
-          src: Icons.getRewards(
-            quest_reward_type,
-            mega_pokemon_id,
-            mega_amount,
-          ),
-        }
-      default:
-        return {
-          tooltip: `quest_reward_${quest_reward_type}`,
-          src: Icons.getRewards(quest_reward_type),
-        }
-    }
-  })()
+  const { src, amount, tt } = Utility.getRewardInfo(quest, Icons)
 
   return (
-    <Grid item xs={3} style={{ textAlign: 'center' }}>
-      <NameTT id={image.tooltip}>
-        <img src={image.src} className="quest-popup-img" alt="quest reward" />
+    <Grid item xs={3} style={{ textAlign: 'center', position: 'relative' }}>
+      <NameTT id={tt}>
+        <img
+          src={src}
+          style={{ maxWidth: 35, maxHeight: 35 }}
+          alt={tt}
+          onError={(e) => {
+            e.target.onerror = null
+            e.target.src =
+              'https://github.com/WatWowMap/wwm-uicons/blob/main/misc/0.png'
+          }}
+        />
       </NameTT>
+      {!!amount && (
+        <div
+          className="search-amount-holder"
+          style={{ fontSize: 'medium', bottom: 20 }}
+        >
+          x{amount}
+        </div>
+      )}
       <Typography variant="caption" className="ar-task" noWrap>
         {config.questMessage
           ? config.questMessage
-          : t(`ar_quest_${Boolean(with_ar)}`)}
+          : t(`ar_quest_${Boolean(quest.with_ar)}`)}
       </Typography>
     </Grid>
   )
