@@ -9,10 +9,11 @@ import {
 import { ExpandMore, MoreVert } from '@material-ui/icons'
 import { useTranslation, Trans } from 'react-i18next'
 
+import ErrorBoundary from '@components/ErrorBoundary'
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
-
 import Utility from '@services/Utility'
+
 import Dropdown from './common/Dropdown'
 import TimeTile from './common/TimeTile'
 import Navigation from './common/Navigation'
@@ -50,141 +51,143 @@ export default function PokestopPopup({
   const plainPokestop = !hasLure && !hasQuest && !hasInvasion
 
   return (
-    <Grid
-      container
-      style={{ width: 200 }}
-      direction="row"
-      justifyContent="space-evenly"
-      alignItems="center"
-      spacing={1}
-    >
-      {!plainPokestop && (
-        <Grid item xs={3} style={{ textAlign: 'center' }}>
-          <HeaderImage
-            Icons={Icons}
-            alt={pokestop.name}
-            url={pokestop.url}
-            arScanEligible={pokestop.ar_scan_eligible}
-          />
-        </Grid>
-      )}
-      <Grid item xs={plainPokestop ? 10 : 7}>
-        <Title mainName={pokestop.name} backup={t('unknown_pokestop')} />
-      </Grid>
-      <MenuActions
-        pokestop={pokestop}
-        perms={perms}
-        hasInvasion={hasInvasion}
-        hasQuest={hasQuest}
-        hasLure={hasLure}
-        t={t}
-        ts={ts}
-      />
-      <Grid item xs={12} style={{ textAlign: 'center' }}>
-        {plainPokestop ? (
-          <>
+    <ErrorBoundary>
+      <Grid
+        container
+        style={{ width: 200 }}
+        direction="row"
+        justifyContent="space-evenly"
+        alignItems="center"
+        spacing={1}
+      >
+        {!plainPokestop && (
+          <Grid item xs={3} style={{ textAlign: 'center' }}>
             <HeaderImage
               Icons={Icons}
               alt={pokestop.name}
               url={pokestop.url}
               arScanEligible={pokestop.ar_scan_eligible}
-              large
             />
-            <PowerUp {...pokestop} />
-          </>
-        ) : (
-          <Collapse
-            in={!popups.invasions || !hasInvasion}
-            timeout="auto"
-            unmountOnExit
-          >
-            <Grid
-              container
-              justifyContent="center"
-              alignItems="center"
-              spacing={1}
-            >
-              <PowerUp
-                {...pokestop}
-                divider={hasInvasion || hasQuest || hasLure}
+          </Grid>
+        )}
+        <Grid item xs={plainPokestop ? 10 : 7}>
+          <Title mainName={pokestop.name} backup={t('unknown_pokestop')} />
+        </Grid>
+        <MenuActions
+          pokestop={pokestop}
+          perms={perms}
+          hasInvasion={hasInvasion}
+          hasQuest={hasQuest}
+          hasLure={hasLure}
+          t={t}
+          ts={ts}
+        />
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          {plainPokestop ? (
+            <>
+              <HeaderImage
+                Icons={Icons}
+                alt={pokestop.name}
+                url={pokestop.url}
+                arScanEligible={pokestop.ar_scan_eligible}
+                large
               />
-              {hasQuest &&
-                pokestop.quests.map((quest, index) => (
-                  <Fragment key={quest.with_ar}>
-                    {index ? (
-                      <Divider light flexItem className="popup-divider" />
-                    ) : null}
-                    <RewardInfo
-                      quest={quest}
-                      Icons={Icons}
-                      config={config}
-                      t={t}
-                    />
-                    <QuestConditions
-                      quest={quest}
-                      t={t}
-                      userSettings={userSettings}
-                    />
-                  </Fragment>
-                ))}
-              {hasLure && (
-                <>
-                  {hasQuest && (
-                    <Divider light flexItem className="popup-divider" />
-                  )}
-                  <TimeTile
-                    expireTime={lure_expire_timestamp}
-                    icon={Icons.getPokestops(lure_id)}
-                    until
-                    tt={`lure_${lure_id}`}
-                  />
-                </>
-              )}
-              {hasInvasion && (
-                <>
-                  {(hasQuest || hasLure) && (
-                    <Divider light flexItem className="popup-divider" />
-                  )}
-                  {invasions.map((invasion, index) => (
-                    <Fragment
-                      key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
-                    >
+              <PowerUp {...pokestop} />
+            </>
+          ) : (
+            <Collapse
+              in={!popups.invasions || !hasInvasion}
+              timeout="auto"
+              unmountOnExit
+            >
+              <Grid
+                container
+                justifyContent="center"
+                alignItems="center"
+                spacing={1}
+              >
+                <PowerUp
+                  {...pokestop}
+                  divider={hasInvasion || hasQuest || hasLure}
+                />
+                {hasQuest &&
+                  pokestop.quests.map((quest, index) => (
+                    <Fragment key={quest.with_ar}>
                       {index ? (
                         <Divider light flexItem className="popup-divider" />
                       ) : null}
-                      <TimeTile
-                        expireTime={invasion.incident_expire_timestamp}
-                        icon={Icons.getInvasions(invasion.grunt_type)}
-                        until
-                        tt={`grunt_a_${invasion.grunt_type}`}
+                      <RewardInfo
+                        quest={quest}
+                        Icons={Icons}
+                        config={config}
+                        t={t}
+                      />
+                      <QuestConditions
+                        quest={quest}
+                        t={t}
+                        userSettings={userSettings}
                       />
                     </Fragment>
                   ))}
-                </>
-              )}
-            </Grid>
+                {hasLure && (
+                  <>
+                    {hasQuest && (
+                      <Divider light flexItem className="popup-divider" />
+                    )}
+                    <TimeTile
+                      expireTime={lure_expire_timestamp}
+                      icon={Icons.getPokestops(lure_id)}
+                      until
+                      tt={`lure_${lure_id}`}
+                    />
+                  </>
+                )}
+                {hasInvasion && (
+                  <>
+                    {(hasQuest || hasLure) && (
+                      <Divider light flexItem className="popup-divider" />
+                    )}
+                    {invasions.map((invasion, index) => (
+                      <Fragment
+                        key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
+                      >
+                        {index ? (
+                          <Divider light flexItem className="popup-divider" />
+                        ) : null}
+                        <TimeTile
+                          expireTime={invasion.incident_expire_timestamp}
+                          icon={Icons.getInvasions(invasion.grunt_type)}
+                          until
+                          tt={`grunt_a_${invasion.grunt_type}`}
+                        />
+                      </Fragment>
+                    ))}
+                  </>
+                )}
+              </Grid>
+            </Collapse>
+          )}
+        </Grid>
+        {perms.invasions && hasInvasion && (
+          <Collapse in={popups.invasions} timeout="auto" unmountOnExit>
+            <Invasion pokestop={pokestop} Icons={Icons} t={t} />
+          </Collapse>
+        )}
+        <Footer
+          pokestop={pokestop}
+          popups={popups}
+          setPopups={setPopups}
+          hasInvasion={hasInvasion}
+          perms={perms}
+          Icons={Icons}
+        />
+        {perms.allPokestops && (
+          <Collapse in={popups.extras} timeout="auto" unmountOnExit>
+            <ExtraInfo pokestop={pokestop} t={t} ts={ts} />
           </Collapse>
         )}
       </Grid>
-      {perms.invasions && hasInvasion && (
-        <Collapse in={popups.invasions} timeout="auto" unmountOnExit>
-          <Invasion pokestop={pokestop} Icons={Icons} t={t} />
-        </Collapse>
-      )}
-      <Footer
-        pokestop={pokestop}
-        popups={popups}
-        setPopups={setPopups}
-        hasInvasion={hasInvasion}
-        perms={perms}
-        Icons={Icons}
-      />
-      {perms.allPokestops && (
-        <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-          <ExtraInfo pokestop={pokestop} t={t} ts={ts} />
-        </Collapse>
-      )}
-    </Grid>
+    </ErrorBoundary>
   )
 }
 

@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
+import ErrorBoundary from '@components/ErrorBoundary'
 
 export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
   const { t } = useTranslation()
@@ -79,90 +80,94 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
   }, [])
 
   return (
-    <Grid
-      container
-      justifyContent="center"
-      alignItems="center"
-      style={{ width: 200 }}
-      spacing={1}
-    >
-      <Grid item xs={9}>
-        <Typography
-          variant={name.length > 20 ? 'subtitle2' : 'h6'}
-          align="center"
-          noWrap={parkName}
-          onClick={() => setParkName(!parkName)}
-        >
-          {name}
-        </Typography>
-      </Grid>
-      <Grid item xs={3}>
-        <IconButton aria-haspopup="true" onClick={handleClick}>
-          <MoreVert style={{ color: 'white' }} />
-        </IconButton>
-      </Grid>
-      <Menu
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-        PaperProps={{
-          style: {
-            maxHeight: 216,
-            minWidth: '20ch',
-          },
-        }}
+    <ErrorBoundary>
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        style={{ width: 200 }}
+        spacing={1}
       >
-        {options.map((option) => (
-          <MenuItem key={option.key || option.name} onClick={option.action}>
-            {typeof option.name === 'string' ? t(option.name) : option.name}
-          </MenuItem>
-        ))}
-      </Menu>
-      <Grid item xs={6} style={{ textAlign: 'center' }}>
-        <img
-          src={iconUrl}
-          alt={iconUrl}
-          style={{
-            maxHeight: 75,
-            maxWidth: 75,
+        <Grid item xs={9}>
+          <Typography
+            variant={name.length > 20 ? 'subtitle2' : 'h6'}
+            align="center"
+            noWrap={parkName}
+            onClick={() => setParkName(!parkName)}
+          >
+            {name}
+          </Typography>
+        </Grid>
+        <Grid item xs={3}>
+          <IconButton aria-haspopup="true" onClick={handleClick}>
+            <MoreVert style={{ color: 'white' }} />
+          </IconButton>
+        </Grid>
+        <Menu
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+          PaperProps={{
+            style: {
+              maxHeight: 216,
+              minWidth: '20ch',
+            },
           }}
-        />
-        <br />
-        <Typography variant="caption">
-          {t(`poke_${pokemon.pokemon_id}`)}
-        </Typography>
-      </Grid>
-      <Grid item xs={6} style={{ textAlign: 'center' }}>
-        <Typography variant="subtitle2">{t('last_updated')}</Typography>
-        <Typography
-          variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'}
-          style={{ color: getColor(lastUpdated.diff) }}
         >
-          {lastUpdated.str.replace('days', t('days')).replace('day', t('day'))}
-        </Typography>
-        <Typography variant="subtitle2">
-          ~{pokemon_avg} {t('spawns_per_hour')}
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <Divider style={{ color: 'white', margin: 4 }} />
-      </Grid>
-      <Grid item xs={12} style={{ textAlign: 'center' }}>
-        {recent ? (
+          {options.map((option) => (
+            <MenuItem key={option.key || option.name} onClick={option.action}>
+              {typeof option.name === 'string' ? t(option.name) : option.name}
+            </MenuItem>
+          ))}
+        </Menu>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <img
+            src={iconUrl}
+            alt={iconUrl}
+            style={{
+              maxHeight: 75,
+              maxWidth: 75,
+            }}
+          />
+          <br />
           <Typography variant="caption">
-            {t('nest_estimated')}
-            <br />
-            {t('verify_nests')}
+            {t(`poke_${pokemon.pokemon_id}`)}
           </Typography>
-        ) : (
-          <Typography variant="caption">
-            {t('nest_out_of_date')}
-            <br />
-            {t('nest_check_current')}
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <Typography variant="subtitle2">{t('last_updated')}</Typography>
+          <Typography
+            variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'}
+            style={{ color: getColor(lastUpdated.diff) }}
+          >
+            {lastUpdated.str
+              .replace('days', t('days'))
+              .replace('day', t('day'))}
           </Typography>
-        )}
+          <Typography variant="subtitle2">
+            ~{pokemon_avg} {t('spawns_per_hour')}
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider style={{ color: 'white', margin: 4 }} />
+        </Grid>
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          {recent ? (
+            <Typography variant="caption">
+              {t('nest_estimated')}
+              <br />
+              {t('verify_nests')}
+            </Typography>
+          ) : (
+            <Typography variant="caption">
+              {t('nest_out_of_date')}
+              <br />
+              {t('nest_check_current')}
+            </Typography>
+          )}
+        </Grid>
       </Grid>
-    </Grid>
+    </ErrorBoundary>
   )
 }

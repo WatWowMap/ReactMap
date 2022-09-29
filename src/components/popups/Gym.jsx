@@ -15,6 +15,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
+import ErrorBoundary from '@components/ErrorBoundary'
 
 import Title from './common/Title'
 import Dropdown from './common/Dropdown'
@@ -45,77 +46,83 @@ export default function GymPopup({
   }, [])
 
   return (
-    <Grid
-      container
-      style={{ width: 200 }}
-      direction="row"
-      justifyContent="space-evenly"
-      alignItems="center"
-      spacing={1}
-    >
-      <Grid item xs={10}>
-        <Title mainName={gym.name} backup={t('unknown_gym')} />
+    <ErrorBoundary>
+      <Grid
+        container
+        style={{ width: 200 }}
+        direction="row"
+        justifyContent="space-evenly"
+        alignItems="center"
+        spacing={1}
+      >
+        <Grid item xs={10}>
+          <Title mainName={gym.name} backup={t('unknown_gym')} />
+        </Grid>
+        <MenuActions
+          gym={gym}
+          perms={perms}
+          hasRaid={hasRaid}
+          t={t}
+          badge={badge}
+          setBadge={setBadge}
+        />
+        {perms.gyms && (
+          <Grid item xs={12}>
+            <Collapse
+              in={!popups.raids || !hasRaid}
+              timeout="auto"
+              unmountOnExit
+            >
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="space-evenly"
+                spacing={1}
+              >
+                <PoiImage Icons={Icons} gym={gym} />
+                <Divider orientation="vertical" flexItem />
+                <GymInfo gym={gym} t={t} Icons={Icons} />
+              </Grid>
+            </Collapse>
+          </Grid>
+        )}
+        {perms.raids && (
+          <Grid item xs={12}>
+            <Collapse in={popups.raids && hasRaid} timeout="auto" unmountOnExit>
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="center"
+                spacing={1}
+              >
+                <RaidImage gym={gym} ts={ts} Icons={Icons} t={t} />
+                <Divider orientation="vertical" flexItem />
+                <RaidInfo gym={gym} t={t} Icons={Icons} ts={ts} />
+                {Boolean(
+                  gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
+                ) && <Timer gym={gym} start t={t} />}
+                <Timer gym={gym} ts={ts} t={t} hasHatched={hasHatched} />
+              </Grid>
+            </Collapse>
+          </Grid>
+        )}
+        <PowerUp {...gym} />
+        <GymFooter
+          gym={gym}
+          popups={popups}
+          setPopups={setPopups}
+          hasRaid={hasRaid}
+          perms={perms}
+          t={t}
+          Icons={Icons}
+        />
+        {perms.gyms && (
+          <Collapse in={popups.extras} timeout="auto" unmountOnExit>
+            <ExtraInfo gym={gym} t={t} ts={ts} />
+          </Collapse>
+        )}
       </Grid>
-      <MenuActions
-        gym={gym}
-        perms={perms}
-        hasRaid={hasRaid}
-        t={t}
-        badge={badge}
-        setBadge={setBadge}
-      />
-      {perms.gyms && (
-        <Grid item xs={12}>
-          <Collapse in={!popups.raids || !hasRaid} timeout="auto" unmountOnExit>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="space-evenly"
-              spacing={1}
-            >
-              <PoiImage Icons={Icons} gym={gym} />
-              <Divider orientation="vertical" flexItem />
-              <GymInfo gym={gym} t={t} Icons={Icons} />
-            </Grid>
-          </Collapse>
-        </Grid>
-      )}
-      {perms.raids && (
-        <Grid item xs={12}>
-          <Collapse in={popups.raids && hasRaid} timeout="auto" unmountOnExit>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="center"
-              spacing={1}
-            >
-              <RaidImage gym={gym} ts={ts} Icons={Icons} t={t} />
-              <Divider orientation="vertical" flexItem />
-              <RaidInfo gym={gym} t={t} Icons={Icons} ts={ts} />
-              {Boolean(
-                gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
-              ) && <Timer gym={gym} start t={t} />}
-              <Timer gym={gym} ts={ts} t={t} hasHatched={hasHatched} />
-            </Grid>
-          </Collapse>
-        </Grid>
-      )}
-      <PowerUp {...gym} />
-      <GymFooter
-        gym={gym}
-        popups={popups}
-        setPopups={setPopups}
-        hasRaid={hasRaid}
-        perms={perms}
-        t={t}
-        Icons={Icons}
-      />
-      {perms.gyms && (
-        <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-          <ExtraInfo gym={gym} t={t} ts={ts} />
-        </Collapse>
-      )}
-    </Grid>
+    </ErrorBoundary>
   )
 }
 

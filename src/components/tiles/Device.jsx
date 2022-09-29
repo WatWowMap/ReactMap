@@ -1,3 +1,4 @@
+import ErrorBoundary from '@components/ErrorBoundary'
 import React, { memo, useRef, useEffect, useState } from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
@@ -30,7 +31,9 @@ const DeviceTile = ({ item, ts, Icons, userSettings }) => {
         <PopupContent device={item} isOnline={isOnline} ts={ts} />
       </Popup>
       {poly && !item.isMad && (
-        <DevicePoly device={item} color={userSettings.devicePathColor} />
+        <ErrorBoundary>
+          <DevicePoly device={item} color={userSettings.devicePathColor} />
+        </ErrorBoundary>
       )}
     </Marker>
   )
