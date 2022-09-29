@@ -159,6 +159,7 @@ module.exports = class Pokestop extends Model {
 
     if (!onlyAllPokestops) {
       // Skips ugly query if all pokestops are selected anyway
+      const xp = []
       const stardust = []
       const invasions = []
       const lures = []
@@ -184,6 +185,9 @@ module.exports = class Pokestop extends Model {
             break
           case 'm':
             energy.push(pokestop.slice(1))
+            break
+          case 'p':
+            xp.push(pokestop.slice(1))
             break
           case 'q':
             items.push(pokestop.slice(1))
@@ -238,15 +242,20 @@ module.exports = class Pokestop extends Model {
                   .orWhereIn('alternative_quest_pokemon_id', pokemon)
               }
               if (hasRewardAmount) {
-                questTypes.orWhereIn(
-                  isMad ? 'quest_stardust' : 'quest_reward_amount',
-                  stardust,
-                )
+                questTypes.orWhere((dust) => {
+                  dust
+                    .where('quest_reward_type', 3)
+                    .whereIn(
+                      isMad ? 'quest_stardust' : 'quest_reward_amount',
+                      stardust,
+                    )
+                })
                 if (hasAltQuests) {
-                  questTypes.orWhereIn(
-                    'alternative_quest_reward_amount',
-                    stardust,
-                  )
+                  questTypes.orWhere((dust) => {
+                    dust
+                      .where('alternative_quest_reward_type', 3)
+                      .whereIn('alternative_quest_reward_amount', stardust)
+                  })
                 }
               } else {
                 stardust.forEach((amount) => {
@@ -263,6 +272,46 @@ module.exports = class Pokestop extends Model {
                     questTypes.orWhere((altDust) => {
                       altDust
                         .where('alternative_quest_reward_type', 3)
+                        .andWhere(
+                          raw(
+                            `json_extract(alternative_quest_rewards, "$[0].info.amount") = ${amount}`,
+                          ),
+                        )
+                    })
+                  }
+                })
+              }
+              if (hasRewardAmount) {
+                questTypes.orWhere((exp) => {
+                  exp
+                    .where('quest_reward_type', 1)
+                    .whereIn(
+                      isMad ? 'quest_item_amount' : 'quest_reward_amount',
+                      xp,
+                    )
+                })
+                if (hasAltQuests) {
+                  questTypes.orWhere((exp) => {
+                    exp
+                      .where('alternative_quest_reward_type', 1)
+                      .whereIn('alternative_quest_reward_amount', xp)
+                  })
+                }
+              } else {
+                xp.forEach((amount) => {
+                  questTypes.orWhere((xpReward) => {
+                    xpReward
+                      .where('quest_reward_type', 1)
+                      .andWhere(
+                        raw(
+                          `json_extract(quest_rewards, "$[0].info.amount") = ${amount}`,
+                        ),
+                      )
+                  })
+                  if (hasAltQuests) {
+                    questTypes.orWhere((altXpReward) => {
+                      altXpReward
+                        .where('alternative_quest_reward_type', 1)
                         .andWhere(
                           raw(
                             `json_extract(alternative_quest_rewards, "$[0].info.amount") = ${amount}`,
@@ -419,7 +468,7 @@ module.exports = class Pokestop extends Model {
                   }
                 })
               }
-              if (general.length && map.enableQuestRewardTypeFilters) {
+              if (general.length) {
                 questTypes.orWhere((rewardType) => {
                   rewardType.whereIn('quest_reward_type', general)
                 })
@@ -574,6 +623,10 @@ module.exports = class Pokestop extends Model {
               'quest_title',
             ]
             switch (quest.quest_reward_type) {
+              case 1:
+                newQuest.key = `p${quest.xp_amount}`
+                fields.push('xp_amount')
+                break
               case 2:
                 newQuest.key = `q${quest.quest_item_id}`
                 fields.push('quest_item_id', 'item_amount')
@@ -615,8 +668,7 @@ module.exports = class Pokestop extends Model {
                   (filters[newQuest.key].adv
                     ? quest.quest_title === filters[newQuest.key].adv
                     : true)) ||
-                (filters[`u${quest.quest_reward_type}`] &&
-                  map.enableQuestRewardTypeFilters))
+                filters[`u${quest.quest_reward_type}`])
             ) {
               this.fieldAssigner(newQuest, quest, fields)
               filtered.quests.push(newQuest)
@@ -733,6 +785,7 @@ module.exports = class Pokestop extends Model {
       finalList.add(key)
     }
 
+    // items
     queries.items = this.query()
       .select('quest_item_id', 'quest_title', 'quest_target')
       .from(isMad ? 'trs_quest' : 'pokestop')
@@ -752,6 +805,9 @@ module.exports = class Pokestop extends Model {
           'alternative_quest_target',
         )
     }
+    // items
+
+    // stardust
     if (isMad) {
       queries.stardust = this.query()
         .select('quest_stardust AS amount', 'quest_title', 'quest_target')
@@ -808,6 +864,65 @@ module.exports = class Pokestop extends Model {
         }
       }
     }
+    // stardust
+
+    // xp
+    if (isMad) {
+      queries.xp = this.query()
+        .select('quest_item_amount AS amount', 'quest_title', 'quest_target')
+        .from('trs_quest')
+        .where('quest_reward_type', 1)
+        .groupBy('quest_item_amount', 'quest_title', 'quest_target')
+    } else {
+      queries.xp = this.query().where('quest_reward_type', 1)
+      if (hasRewardAmount) {
+        queries.xp
+          .select(
+            'quest_reward_amount AS amount',
+            'quest_title',
+            'quest_target',
+          )
+          .where('quest_reward_amount', '>', 0)
+          .groupBy('amount', 'quest_title', 'quest_target')
+      } else {
+        queries.xp
+          .select('quest_title', 'quest_target')
+          .distinct(
+            raw('json_extract(quest_rewards, "$[0].info.amount")').as('amount'),
+          )
+      }
+      if (hasAltQuests) {
+        queries.xpAlt = this.query().where('alternative_quest_reward_type', 1)
+        if (hasRewardAmount) {
+          queries.xpAlt
+            .select(
+              'alternative_quest_reward_amount AS amount',
+              'alternative_quest_title AS quest_title',
+              'alternative_quest_target AS quest_target',
+            )
+            .where('alternative_quest_reward_amount', '>', 0)
+            .groupBy(
+              'amount',
+              'alternative_quest_title',
+              'alternative_quest_target',
+            )
+        } else {
+          queries.xpAlt
+            .select(
+              'alternative_quest_title AS quest_title',
+              'alternative_quest_target AS quest_target',
+            )
+            .distinct(
+              raw(
+                'json_extract(alternative_quest_rewards, "$[0].info.amount")',
+              ).as('amount'),
+            )
+        }
+      }
+    }
+    // xp
+
+    // mega
     queries.mega = this.query()
       .from(isMad ? 'trs_quest' : 'pokestop')
       .where('quest_reward_type', 12)
@@ -864,6 +979,9 @@ module.exports = class Pokestop extends Model {
           )
       }
     }
+    // mega
+
+    // candy
     queries.candy = this.query()
       .select('quest_title', 'quest_target')
       .distinct('quest_pokemon_id')
@@ -878,6 +996,9 @@ module.exports = class Pokestop extends Model {
         .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
         .where('alternative_quest_reward_type', 4)
     }
+    // candy
+
+    // xl candy
     queries.xlCandy = this.query()
       .select('quest_title', 'quest_target')
       .distinct('quest_pokemon_id')
@@ -892,6 +1013,9 @@ module.exports = class Pokestop extends Model {
         .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
         .where('alternative_quest_reward_type', 9)
     }
+    // xl candy
+
+    // pokemon
     if (isMad) {
       queries.pokemon = this.query()
         .select(
@@ -930,6 +1054,9 @@ module.exports = class Pokestop extends Model {
           .where('alternative_quest_reward_type', 7)
       }
     }
+    // pokemon
+
+    // invasions
     if (hasMultiInvasions) {
       queries.invasions = this.query()
         .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
@@ -950,6 +1077,9 @@ module.exports = class Pokestop extends Model {
         )
         .orderBy('grunt_type')
     }
+    // invasions
+
+    // lures
     queries.lures = this.query()
       .select(isMad ? 'active_fort_modifier AS lure_id' : 'lure_id')
       .andWhere(
@@ -959,14 +1089,43 @@ module.exports = class Pokestop extends Model {
       )
       .groupBy(isMad ? 'active_fort_modifier' : 'lure_id')
       .orderBy(isMad ? 'active_fort_modifier' : 'lure_id')
+    // lures
 
     const resolved = Object.fromEntries(
       await Promise.all(
         Object.entries(queries).map(async ([key, query]) => [key, await query]),
       ),
     )
+    let questTypes = [
+      ...new Set([
+        ...(await this.query()
+          .distinct('quest_reward_type')
+          .whereNotNull('quest_reward_type')
+          .then((results) => results.map((x) => x.quest_reward_type))),
+        ...(hasAltQuests
+          ? await this.query()
+              .distinct('alternative_quest_reward_type')
+              .whereNotNull('alternative_quest_reward_type')
+              .then((results) =>
+                results.map((x) => x.alternative_quest_reward_type),
+              )
+          : []),
+      ]),
+    ]
+
     Object.entries(resolved).forEach(([questType, rewards]) => {
       switch (questType) {
+        case 'xp':
+        case 'xpAlt':
+          rewards.forEach((reward) =>
+            process(
+              `p${reward.amount}`,
+              reward.quest_title,
+              reward.quest_target,
+            ),
+          )
+          questTypes = questTypes.filter((x) => x !== 1)
+          break
         case 'itemsAlt':
         case 'items':
           rewards.forEach((reward) =>
@@ -976,6 +1135,7 @@ module.exports = class Pokestop extends Model {
               reward.quest_target,
             ),
           )
+          questTypes = questTypes.filter((x) => x !== 2)
           break
         case 'megaAlt':
         case 'mega':
@@ -986,6 +1146,7 @@ module.exports = class Pokestop extends Model {
               reward.quest_target,
             ),
           )
+          questTypes = questTypes.filter((x) => x !== 9)
           break
         case 'stardustAlt':
         case 'stardust':
@@ -996,18 +1157,21 @@ module.exports = class Pokestop extends Model {
               reward.quest_target,
             ),
           )
+          questTypes = questTypes.filter((x) => x !== 3)
           break
         case 'candyAlt':
         case 'candy':
           rewards.forEach((reward) =>
             process(`c${reward.id}`, reward.quest_title, reward.quest_target),
           )
+          questTypes = questTypes.filter((x) => x !== 4)
           break
         case 'xlCandyAlt':
         case 'xlCandy':
           rewards.forEach((reward) =>
             process(`x${reward.id}`, reward.quest_title, reward.quest_target),
           )
+          questTypes = questTypes.filter((x) => x !== 12)
           break
         case 'lures':
           rewards.forEach((reward) => finalList.add(`l${reward.lure_id}`))
@@ -1023,11 +1187,16 @@ module.exports = class Pokestop extends Model {
               reward.quest_target,
             ),
           )
+          questTypes = questTypes.filter((x) => x !== 7)
           break
       }
     })
+
     return {
-      available: finalList.size ? [...finalList] : await fetchQuests(),
+      available:
+        finalList.size || questTypes.length
+          ? [...finalList, ...questTypes.map((type) => `u${type}`)]
+          : await fetchQuests(),
       conditions,
     }
   }
@@ -1036,6 +1205,9 @@ module.exports = class Pokestop extends Model {
     if (quest.quest_reward_type) {
       const { info } = JSON.parse(quest.quest_rewards)[0]
       switch (quest.quest_reward_type) {
+        case 1:
+          Object.keys(info).forEach((x) => (quest[`xp_${x}`] = info[x]))
+          break
         case 2:
           Object.keys(info).forEach((x) => (quest[`item_${x}`] = info[x]))
           break
@@ -1063,10 +1235,13 @@ module.exports = class Pokestop extends Model {
 
   static parseMadRewards = (quest) => {
     if (quest.quest_reward_type) {
-      const { item, candy, xl_candy, mega_resource } = JSON.parse(
+      const { item, exp, candy, xl_candy, mega_resource } = JSON.parse(
         quest.quest_rewards,
       )[0]
       switch (quest.quest_reward_type) {
+        case 1:
+          quest.xp_amount = exp
+          break
         case 2:
           Object.keys(item).forEach((x) => (quest[`item_${x}`] = item[x]))
           break

@@ -142,7 +142,6 @@
     },
     "misc": {
       "enableMapJsFilter": true,
-      "questRewardTypeFilters": false,
       "fetchLatestInvasions": true,
       "invasionCacheHrs": 1,
       "masterfileCacheHrs": 6,
@@ -386,6 +385,12 @@
       "stardust": {
         "min": 100,
         "max": 2000,
+        "interval": 100,
+        "enabled": true
+      },
+      "xp": {
+        "min": 100,
+        "max": 1000,
         "interval": 100,
         "enabled": true
       }

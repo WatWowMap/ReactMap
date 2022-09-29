@@ -3,6 +3,7 @@ import { Typography } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+import ErrorBoundary from '@components/ErrorBoundary'
 
 export default function DevicePopup({ device, isOnline, ts }) {
   const { t } = useTranslation()
@@ -12,7 +13,7 @@ export default function DevicePopup({ device, isOnline, ts }) {
   }, [])
 
   return (
-    <>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Typography variant="h6" align="center">
         {device.id}
       </Typography>
@@ -27,7 +28,7 @@ export default function DevicePopup({ device, isOnline, ts }) {
       >
         {t(isOnline ? 'online' : 'offline')}
       </Typography>
-    </>
+    </ErrorBoundary>
   )
 }
 

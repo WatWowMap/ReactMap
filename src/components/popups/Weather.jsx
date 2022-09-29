@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
+import ErrorBoundary from '@components/ErrorBoundary'
 
 export default function WeatherPopup({ weather, ts, Icons }) {
   const { t } = useTranslation()
@@ -19,43 +20,45 @@ export default function WeatherPopup({ weather, ts, Icons }) {
   }, [])
 
   return (
-    <Grid
-      container
-      direction="row"
-      justifyContent="center"
-      alignItems="center"
-      style={{ width: 150 }}
-    >
-      <Grid item xs={12}>
-        <Typography variant="h6" align="center">
-          {t(`weather_${gameplay_condition}`)}
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <Typography variant="subtitle2" align="center">
-          {t('last_updated')}:
-        </Typography>
-      </Grid>
-      <Timer updated={updated} ts={ts} t={t} />
-      <Grid item xs={12}>
-        <Typography variant="subtitle2" align="center">
-          {t('boosted_types')}:
-        </Typography>
-      </Grid>
-      {weatherTypes[gameplay_condition].types.map((type) => (
-        <Grid item xs={4} key={type} style={{ textAlign: 'center' }}>
-          <Typography variant="caption">{t(`poke_type_${type}`)}</Typography>
-          <img
-            src={Icons.getTypes(type)}
-            alt={type}
-            style={{
-              maxWidth: 30,
-              maxHeight: 30,
-            }}
-          />
+    <ErrorBoundary noRefresh style={{}} variant="h5">
+      <Grid
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        style={{ width: 150 }}
+      >
+        <Grid item xs={12}>
+          <Typography variant="h6" align="center">
+            {t(`weather_${gameplay_condition}`)}
+          </Typography>
         </Grid>
-      ))}
-    </Grid>
+        <Grid item xs={12}>
+          <Typography variant="subtitle2" align="center">
+            {t('last_updated')}:
+          </Typography>
+        </Grid>
+        <Timer updated={updated} ts={ts} t={t} />
+        <Grid item xs={12}>
+          <Typography variant="subtitle2" align="center">
+            {t('boosted_types')}:
+          </Typography>
+        </Grid>
+        {weatherTypes[gameplay_condition].types.map((type) => (
+          <Grid item xs={4} key={type} style={{ textAlign: 'center' }}>
+            <Typography variant="caption">{t(`poke_type_${type}`)}</Typography>
+            <img
+              src={Icons.getTypes(type)}
+              alt={type}
+              style={{
+                maxWidth: 30,
+                maxHeight: 30,
+              }}
+            />
+          </Grid>
+        ))}
+      </Grid>
+    </ErrorBoundary>
   )
 }
 

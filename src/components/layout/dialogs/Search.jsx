@@ -61,72 +61,8 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
     } = option
 
     if (quest_reward_type) {
-      const {
-        quest_pokemon_id,
-        quest_form_id,
-        quest_gender_id,
-        quest_costume_id,
-        quest_shiny,
-        quest_item_id,
-        item_amount,
-        stardust_amount,
-        candy_amount,
-        xl_candy_amount,
-        mega_pokemon_id,
-        mega_amount,
-        candy_pokemon_id,
-        xl_candy_pokemon_id,
-      } = option
-      let main
-      let amount = 0
-      let tt = ''
-      switch (quest_reward_type) {
-        case 2:
-          main = Icons.getRewards(quest_reward_type, quest_item_id, item_amount)
-          amount = main.includes('_a') || item_amount <= 1 ? 0 : item_amount
-          tt = `item_${quest_item_id}`
-          break
-        case 3:
-          tt = `stardust`
-          main = Icons.getRewards(quest_reward_type, stardust_amount)
-          amount = main.includes('_a') ? 0 : stardust_amount
-          break
-        case 4:
-          tt = `poke_${candy_pokemon_id}`
-          main = Icons.getRewards(quest_reward_type, candy_pokemon_id)
-          amount = main.includes('_a') ? 0 : candy_amount
-          break
-        case 7:
-          tt = [
-            quest_form_id ? `form_${quest_form_id}` : '',
-            `poke_${quest_pokemon_id}`,
-          ]
-          main = Icons.getPokemon(
-            quest_pokemon_id,
-            quest_form_id,
-            0,
-            quest_gender_id,
-            quest_costume_id,
-            quest_shiny,
-          )
-          break
-        case 9:
-          tt = `poke_${xl_candy_pokemon_id}`
-          main = Icons.getRewards(quest_reward_type, xl_candy_pokemon_id)
-          amount = main.includes('_a') ? 0 : xl_candy_amount
-          break
-        case 12:
-          tt = `poke_${mega_pokemon_id}`
-          main = Icons.getRewards(
-            quest_reward_type,
-            mega_pokemon_id,
-            mega_amount,
-          )
-          amount = main.includes('_a') ? 0 : mega_amount
-          break
-        default:
-          main = Icons.getRewards(quest_reward_type)
-      }
+      const { src, amount, tt } = Utility.getRewardInfo(option, Icons)
+
       return (
         <div
           style={{
@@ -138,16 +74,17 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
         >
           <NameTT id={tt}>
             <img
-              src={main}
+              src={src}
               style={{ maxWidth: 45, maxHeight: 45 }}
-              alt={main}
+              alt={tt}
+              onError={(e) => {
+                e.target.onerror = null
+                e.target.src =
+                  'https://github.com/WatWowMap/wwm-uicons/blob/main/misc/0.png'
+              }}
             />
           </NameTT>
-          {Boolean(
-            main.includes('stardust')
-              ? !main.endsWith('0.png')
-              : !main.includes('_a') && amount,
-          ) && <div className="search-amount-holder">x{amount}</div>}
+          {!!amount && <div className="search-amount-holder">x{amount}</div>}
         </div>
       )
     }

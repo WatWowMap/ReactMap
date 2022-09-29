@@ -89,6 +89,7 @@ module.exports = gql`
     candy_amount: Int
     xl_candy_pokemon_id: Int
     xl_candy_amount: Int
+    xp_amount: Int
     with_ar: Boolean
     key: String
   }
