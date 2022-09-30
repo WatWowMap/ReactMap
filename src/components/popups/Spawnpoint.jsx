@@ -3,6 +3,7 @@ import { Typography } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+import ErrorBoundary from '@components/ErrorBoundary'
 
 export default function SpawnpointPopup({ spawnpoint, ts }) {
   const { t } = useTranslation()
@@ -12,7 +13,7 @@ export default function SpawnpointPopup({ spawnpoint, ts }) {
   const minuteFixed = minute < 10 ? `0${minute}` : minute
 
   return (
-    <>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Typography variant="h5" align="center">
         {t('spawnpoint')}
       </Typography>
@@ -33,6 +34,6 @@ export default function SpawnpointPopup({ spawnpoint, ts }) {
         {lat},<br />
         {lon}
       </Typography>
-    </>
+    </ErrorBoundary>
   )
 }
