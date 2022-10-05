@@ -286,7 +286,7 @@ module.exports = class Pokestop extends Model {
                   exp
                     .where('quest_reward_type', 1)
                     .whereIn(
-                      isMad ? 'quest_item_amount' : 'quest_reward_amount',
+                      isMad ? 'quest_stardust' : 'quest_reward_amount',
                       xp,
                     )
                 })
@@ -869,10 +869,10 @@ module.exports = class Pokestop extends Model {
     // xp
     if (isMad) {
       queries.xp = this.query()
-        .select('quest_item_amount AS amount', 'quest_title', 'quest_target')
+        .select('quest_stardust AS amount', 'quest_title', 'quest_target')
         .from('trs_quest')
         .where('quest_reward_type', 1)
-        .groupBy('quest_item_amount', 'quest_title', 'quest_target')
+        .groupBy('quest_stardust', 'quest_title', 'quest_target')
     } else {
       queries.xp = this.query().where('quest_reward_type', 1)
       if (hasRewardAmount) {
