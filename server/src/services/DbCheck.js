@@ -180,7 +180,7 @@ module.exports = class DbCheck {
           ),
         ),
         true,
-      )  
+      )
     } catch (e) {
       console.error('[DB] Failed to set historical rarity stats', e)
     }
