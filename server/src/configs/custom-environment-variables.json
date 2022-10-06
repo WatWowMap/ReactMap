@@ -31,6 +31,10 @@
       "__name": "API_MAX_SESSIONS",
       "__format": "number"
     },
+    "sessionCheckIntervalMs": {
+      "__name": "API_SESSION_CHECK_INTERVAL_MS",
+      "__format": "number"
+    },
     "cookieAgeDays": {
       "__name": "API_COOKIE_AGE_DAYS",
       "__format": "number"
