@@ -21,6 +21,7 @@ rootRouter.use('/api', apiRouter)
 
 rootRouter.get('/logout', (req, res) => {
   req.logout()
+  req.session.destroy()
   res.redirect('/')
 })
 
