@@ -122,7 +122,7 @@ const esbuild = {
   bundle: true,
   outdir: 'dist/',
   publicPath: '/',
-  entryNames: isDevelopment ? undefined : '[name].[hash]',
+  entryNames: isDevelopment ? undefined : `[name]-${version}-[hash]`,
   metafile: true,
   minify: env.parsed.NO_MINIFIED
     ? false

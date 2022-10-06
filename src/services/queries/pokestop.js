@@ -46,6 +46,7 @@ const quest = gql`
       candy_amount
       xl_candy_pokemon_id
       xl_candy_amount
+      xp_amount
       with_ar
       key
     }

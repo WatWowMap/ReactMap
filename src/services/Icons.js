@@ -143,6 +143,8 @@ export default class UIcons {
         return this.getPokestops(id.slice(1))
       case 'm':
         return this.getPokemon(id.slice(1).split('-')[0], 0, 1)
+      case 'p':
+        return this.getRewards(1, id.slice(1))
       case 'q':
         return this.getRewards(2, ...id.slice(1).split('-'))
       case 'r':

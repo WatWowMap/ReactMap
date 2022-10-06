@@ -57,6 +57,7 @@ export default function stopMarker(
       const {
         quest_item_id,
         item_amount,
+        xp_amount,
         stardust_amount,
         candy_pokemon_id,
         candy_amount,
@@ -73,6 +74,12 @@ export default function stopMarker(
         key,
       } = quest
       switch (quest_reward_type) {
+        case 1:
+          questIcons.unshift({
+            url: Icons.getRewards(quest_reward_type, xp_amount),
+            amount: xp_amount,
+          })
+          break
         case 2:
           questIcons.unshift({
             url: Icons.getRewards(
@@ -175,7 +182,8 @@ export default function stopMarker(
         />
       )}
       {questIcons.map((icon, i) => (
-        <Fragment key={icon.url}>
+        // eslint-disable-next-line react/no-array-index-key
+        <Fragment key={`${icon.url}-${i}`}>
           <img
             src={icon.url}
             alt={icon.url}
@@ -192,8 +200,8 @@ export default function stopMarker(
             }}
           />
           {Boolean(
-            icon.url.includes('stardust')
-              ? !icon.url.endsWith('0.png')
+            icon.url.includes('stardust') || icon.url.includes('experience')
+              ? icon.url.endsWith('/0.png')
               : !icon.url.includes('_a') && icon.amount,
           ) && (
             <div

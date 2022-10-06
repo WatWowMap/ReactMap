@@ -10,7 +10,10 @@ import { withTranslation } from 'react-i18next'
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props)
-    this.state = { hasError: false, message: '' }
+    this.state = {
+      hasError: false,
+      message: '',
+    }
   }
 
   componentDidCatch(error) {
@@ -26,10 +29,20 @@ class ErrorBoundary extends Component {
         container
         justifyContent="center"
         alignItems="center"
-        style={{ height: '100vh', width: '100vw', textAlign: 'center' }}
+        style={
+          this.props.style ?? {
+            height: '100vh',
+            width: '100vw',
+            textAlign: 'center',
+          }
+        }
       >
         <Grid item xs={12}>
-          <Typography variant="h3" align="center" style={{ color: 'white' }}>
+          <Typography
+            variant={this.props.variant || 'h3'}
+            align="center"
+            style={{ color: 'white' }}
+          >
             {this.props.t('react_error')}
           </Typography>
           <Typography
@@ -39,16 +52,20 @@ class ErrorBoundary extends Component {
           >
             {this.state.message}
           </Typography>
-          <br />
-          <br />
-          <Button
-            onClick={() => (window.location = window.location.href)}
-            variant="contained"
-            color="primary"
-            startIcon={<Refresh />}
-          >
-            {this.props.t('refresh')}
-          </Button>
+          {!this.props.noRefresh && (
+            <>
+              <br />
+              <br />
+              <Button
+                onClick={() => (window.location = window.location.href)}
+                variant="contained"
+                color="primary"
+                startIcon={<Refresh />}
+              >
+                {this.props.t('refresh')}
+              </Button>
+            </>
+          )}
         </Grid>
       </Grid>
     ) : (

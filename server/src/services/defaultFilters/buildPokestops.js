@@ -24,6 +24,18 @@ module.exports = function buildPokestops(perms, defaults, available) {
         quests[`u${type}`] = new GenericFilter(defaults.rewardTypes)
       }
     })
+    for (
+      let i = defaults.xp.min;
+      i <= defaults.xp.max;
+      i += defaults.xp.interval
+    ) {
+      quests[`p${i}`] = new GenericFilter(defaults.xp.enabled)
+    }
+    Object.keys(Event.masterfile.questRewardTypes).forEach((type) => {
+      if (type !== '0') {
+        quests[`u${type}`] = new GenericFilter(defaults.rewardTypes)
+      }
+    })
   }
   if (perms.invasions) {
     Object.keys(Event.invasions).forEach((type) => {
