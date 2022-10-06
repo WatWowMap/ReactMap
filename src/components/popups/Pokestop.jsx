@@ -279,13 +279,13 @@ const MenuActions = ({
           reward = `${t('stardust')} x${quest.stardust_amount}`
           break
         case 4:
-          reward = `${t(`poke_${quest.candy_pokemon_id} ${t('candy')}`)}`
+          reward = `${t(`poke_${quest.candy_pokemon_id}`)} ${t('candy')}`
           break
         case 7:
           reward = t(`poke_${quest.quest_pokemon_id}`)
           break
         case 9:
-          reward = t(`poke_${quest.quest_pokemon_id} ${t('xl')}`)
+          reward = `${t(`poke_${quest.quest_pokemon_id}`)} ${t('xl')}`
           break
         case 12:
           reward = `${t(`poke_${quest.mega_pokemon_id}`)} x${quest.mega_amount}`
