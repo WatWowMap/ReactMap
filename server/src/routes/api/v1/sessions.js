@@ -27,10 +27,12 @@ router.get('/hasValid/:id', async (req, res) => {
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
       const results = await Session.query().whereRaw(
-        `json_extract(data, '$.passport.user.id') = ${req.params.id}`,
+        `json_extract(data, '$.passport.user.id') = ${req.params.id}
+          OR json_extract(data, '$.passport.user.discordId') = "${req.params.id}"
+          OR json_extract(data, '$.passport.user.telegramId') = "${req.params.id}"`,
       )
       res.status(200).json({
-        valid: Boolean(results.length),
+        valid: !!results.length,
         length: results.length,
       })
       console.log(`[API] api/v1/sessions/hasValid/${req.params.id}`)
@@ -50,7 +52,11 @@ router.get('/clearSessions/:id', async (req, res) => {
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
       const results = await Session.query()
-        .whereRaw(`json_extract(data, '$.passport.user.id') = ${req.params.id}`)
+        .whereRaw(
+          `json_extract(data, '$.passport.user.id') = ${req.params.id}
+            OR json_extract(data, '$.passport.user.discordId') = "${req.params.id}"
+            OR json_extract(data, '$.passport.user.telegramId') = "${req.params.id}"`,
+        )
         .delete()
       res.status(200).json({ results })
       console.log(`[API] api/v1/sessions/clearSessions/${req.params.id}`)
