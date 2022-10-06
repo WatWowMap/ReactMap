@@ -33,6 +33,7 @@ router.get('/hasValid/:id', async (req, res) => {
         valid: Boolean(results.length),
         length: results.length,
       })
+      console.log(`[API] api/v1/sessions/hasValid/${req.params.id}`)
     } else {
       throw new Error('Incorrect or missing API secret')
     }
@@ -51,7 +52,8 @@ router.get('/clearSessions/:id', async (req, res) => {
       const results = await Session.query()
         .whereRaw(`json_extract(data, '$.passport.user.id') = ${req.params.id}`)
         .delete()
-      res.status(200).json(results, 'Sessions Cleared')
+      res.status(200).json({ results })
+      console.log(`[API] api/v1/sessions/clearSessions/${req.params.id}`)
     } else {
       throw new Error('Incorrect or missing API secret')
     }
