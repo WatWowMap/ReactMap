@@ -106,11 +106,12 @@ const checkExtraJsons = (fileName, domain = '') => {
     domain &&
     fs.existsSync(resolve(`${__dirname}/../configs/${fileName}/${domain}.json`))
   ) {
-    const domainJson = JSON.parse(
-      fs.readFileSync(
-        resolve(__dirname, `../configs/${fileName}/${domain}.json`),
-      ),
-    ) || {}
+    const domainJson =
+      JSON.parse(
+        fs.readFileSync(
+          resolve(__dirname, `../configs/${fileName}/${domain}.json`),
+        ),
+      ) || {}
     if (Object.keys(domainJson).length) {
       console.log(
         `[CONFIG] config ${fileName}/${domain}.json found, overwriting your config.map.${fileName} with the found data.`,
