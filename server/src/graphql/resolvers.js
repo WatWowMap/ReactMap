@@ -388,6 +388,21 @@ module.exports = {
       const results = await User.query().where('username', args.username)
       return Boolean(results.length)
     },
+    setExtraFields: async (_, { key, value }, { req }) => {
+      if (req.user?.id) {
+        const user = await User.query().findById(req.user.id)
+        if (user) {
+          const data =
+            typeof user.data === 'string'
+              ? JSON.parse(user.data)
+              : user.data || {}
+          data[key] = value
+          await user.$query().update({ data: JSON.stringify(data) })
+        }
+        return true
+      }
+      return false
+    },
     setGymBadge: async (_, args, { req }) => {
       const perms = req.user ? req.user.perms : false
       if (perms?.gymBadges && req?.user?.id) {

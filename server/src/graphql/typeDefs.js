@@ -81,7 +81,6 @@ module.exports = gql`
       webhookName: String
       ts: Int
       midnight: Int
-
       onlyAreas: [String]
     ): [Search]
     searchQuest(
@@ -123,5 +122,6 @@ module.exports = gql`
     strategy(strategy: String): Boolean
     checkUsername(username: String): Boolean
     setGymBadge(gymId: String, badge: Int): Boolean
+    setExtraFields(key: String, value: String): Boolean
   }
 `
