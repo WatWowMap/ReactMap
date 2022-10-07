@@ -20,7 +20,9 @@ rootRouter.use('/auth', authRouter)
 rootRouter.use('/api', apiRouter)
 
 rootRouter.get('/logout', (req, res) => {
-  req.logout()
+  req.logout((err) => {
+    if (err) console.error('[AUTH] Unable to logout', err)
+  })
   req.session.destroy()
   res.redirect('/')
 })
