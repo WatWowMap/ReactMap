@@ -178,6 +178,7 @@ rootRouter.get('/settings', async (req, res) => {
         gymValidDataLimit:
           Date.now() / 1000 - config.api.gymValidDataLimit * 86400,
       },
+      extraUserFields: config.database.settings.extraUserFields,
       available: { pokemon: [], pokestops: [], gyms: [], nests: [] },
     }
 

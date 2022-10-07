@@ -455,7 +455,8 @@
       "gymBadgeTableName": "gymBadges",
       "sessionTableName": "session",
       "migrationTableName": "knex_migrations",
-      "maxConnections": 10
+      "maxConnections": 10,
+      "extraUserFields": []
     },
     "schemas": []
   },
