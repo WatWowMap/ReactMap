@@ -1,10 +1,10 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react'
 import { Grid, Button, ButtonGroup, Typography } from '@material-ui/core'
-import { point, polygon } from '@turf/helpers'
+import { point } from '@turf/helpers'
 import destination from '@turf/destination'
-import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
+import Utility from '@services/Utility'
 
 const RADIUS_POKEMON = 70
 const RADIUS_GYM = 750
@@ -49,30 +49,6 @@ export default function ScanNextTarget({
 }) {
   const [position, setPosition] = useState(scanNextLocation)
 
-  const checkAreaValidity = (center) => {
-    if (!scanNextAreaRestriction?.length || !scanAreas?.length) return true
-    let isValid = false
-    if (scanNextAreaRestriction?.length && scanAreas?.length) {
-      const testPoint = point([center[1], center[0]])
-      scanNextAreaRestriction.map((area) => {
-        if (
-          scanAreas.some(
-            (scanArea) =>
-              scanArea.properties.name === area &&
-              booleanPointInPolygon(
-                testPoint,
-                polygon(scanArea.geometry.coordinates),
-              ),
-          )
-        ) {
-          isValid = true
-        }
-        return true
-      })
-    }
-    return isValid
-  }
-
   const { t } = useTranslation()
   const scanMarkerRef = useRef(null)
   const scanPopupRef = useRef(null)
@@ -103,7 +79,11 @@ export default function ScanNextTarget({
     }
   }, [])
 
-  const isInAllowedArea = checkAreaValidity(position)
+  const isInAllowedArea = Utility.checkAreaValidity(
+    position,
+    scanNextAreaRestriction,
+    scanAreas,
+  )
 
   return (
     <>

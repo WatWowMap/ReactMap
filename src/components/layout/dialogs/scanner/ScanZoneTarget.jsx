@@ -1,11 +1,46 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react'
 import { Grid, Button, Box, Slider, Typography } from '@material-ui/core'
-import { point, polygon } from '@turf/helpers'
+import { point } from '@turf/helpers'
 import destination from '@turf/destination'
-import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
+import Utility from '@services/Utility'
+
+const calcScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
+  let coords = [center]
+  let currentPoint = point([center[1], center[0]])
+  const distance = radius * 2 * Math.cos(30 * (Math.PI / 180))
+  const bearings = {
+    1: 30,
+    2: 90,
+    3: 150,
+    4: 210,
+    5: 270,
+    6: 330,
+  }
+  for (let i = 1; i < scanZoneSize + 1; i += 1) {
+    let quadrant = 1
+    let step = 1
+    while (step < 6 * i + 1) {
+      currentPoint = destination(
+        currentPoint,
+        (distance * spacing) / 1000,
+        step === 1 ? 330 : bearings[quadrant],
+        { units: 'kilometers' },
+      )
+      coords = coords.concat([
+        [
+          currentPoint.geometry.coordinates[1],
+          currentPoint.geometry.coordinates[0],
+        ],
+      ])
+      quadrant = Math.floor(step / i) + 1
+      step += 1
+    }
+  }
+  return coords
+}
 
 export default function ScanZoneTarget({
   map,
@@ -31,64 +66,6 @@ export default function ScanZoneTarget({
   const [position, setPosition] = useState(scanZoneLocation)
   const [spacing, setSpacing] = useState(scanZoneSpacing)
   const [radius, setRadius] = useState(scanZoneRadius.pokemon)
-  const calcScanZoneCoords = (center) => {
-    let coords = [center]
-    let currentPoint = point([center[1], center[0]])
-    const distance = radius * 2 * Math.cos(30 * (Math.PI / 180))
-    const bearings = {
-      1: 30,
-      2: 90,
-      3: 150,
-      4: 210,
-      5: 270,
-      6: 330,
-    }
-    for (let i = 1; i < scanZoneSize + 1; i += 1) {
-      let quadrant = 1
-      let step = 1
-      while (step < 6 * i + 1) {
-        currentPoint = destination(
-          currentPoint,
-          (distance * spacing) / 1000,
-          step === 1 ? 330 : bearings[quadrant],
-          { units: 'kilometers' },
-        )
-        coords = coords.concat([
-          [
-            currentPoint.geometry.coordinates[1],
-            currentPoint.geometry.coordinates[0],
-          ],
-        ])
-        quadrant = Math.floor(step / i) + 1
-        step += 1
-      }
-    }
-    return coords
-  }
-
-  const checkAreaValidity = (center) => {
-    if (!scanZoneAreaRestriction?.length || !scanAreas?.length) return true
-    let isValid = false
-    if (scanZoneAreaRestriction?.length && scanAreas?.length) {
-      const testPoint = point([center[1], center[0]])
-      scanZoneAreaRestriction.map((area) => {
-        if (
-          scanAreas.some(
-            (scanArea) =>
-              scanArea.properties.name === area &&
-              booleanPointInPolygon(
-                testPoint,
-                polygon(scanArea.geometry.coordinates),
-              ),
-          )
-        ) {
-          isValid = true
-        }
-        return true
-      })
-    }
-    return isValid
-  }
 
   const { t } = useTranslation()
   const scanMarkerRef = useRef(null)
@@ -102,7 +79,9 @@ export default function ScanZoneTarget({
           map.flyTo([lat, lng])
           setPosition([lat, lng])
           setScanZoneLocation([lat, lng])
-          setScanZoneCoords(calcScanZoneCoords([lat, lng]))
+          setScanZoneCoords(
+            calcScanZoneCoords([lat, lng], radius, spacing, scanZoneSize),
+          )
           const popup = scanPopupRef.current
           if (popup) {
             popup.openOn(map)
@@ -120,19 +99,25 @@ export default function ScanZoneTarget({
     }
   }, [])
 
-  const handleSizeChange = (event, newSize) => {
+  const handleSizeChange = (_event, newSize) => {
     setScanZoneSize(newSize)
-    setScanZoneCoords(calcScanZoneCoords(position))
+    setScanZoneCoords(
+      calcScanZoneCoords(position, radius, spacing, scanZoneSize),
+    )
   }
 
-  const handleSpacingChange = (event, newSpacing) => {
+  const handleSpacingChange = (_event, newSpacing) => {
     setSpacing(newSpacing)
-    setScanZoneCoords(calcScanZoneCoords(position))
+    setScanZoneCoords(
+      calcScanZoneCoords(position, radius, spacing, scanZoneSize),
+    )
   }
 
-  const handleRadiusChange = (event, newRadius) => {
+  const handleRadiusChange = (_event, newRadius) => {
     setRadius(newRadius)
-    setScanZoneCoords(calcScanZoneCoords(position))
+    setScanZoneCoords(
+      calcScanZoneCoords(position, radius, spacing, scanZoneSize),
+    )
   }
 
   const rangeMarks = [
@@ -140,10 +125,16 @@ export default function ScanZoneTarget({
     { value: scanZoneRadius.gym, label: t('gym') },
   ]
 
-  const isInAllowedArea = checkAreaValidity(position)
+  const isInAllowedArea = Utility.checkAreaValidity(
+    position,
+    scanZoneAreaRestriction,
+    scanAreas,
+  )
 
   if (scanZoneCoords.length === 1) {
-    setScanZoneCoords(calcScanZoneCoords(scanZoneLocation))
+    setScanZoneCoords(
+      calcScanZoneCoords(scanZoneLocation, radius, spacing, scanZoneSize),
+    )
   }
 
   const advancedMenu = (

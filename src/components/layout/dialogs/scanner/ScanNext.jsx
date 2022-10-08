@@ -91,7 +91,7 @@ export default function ScanNext({
         }
       }, 2000)
     }
-    return () => timer ? clearInterval(timer) : null
+    return () => (timer ? clearInterval(timer) : null)
   })
 
   useEffect(() => {
@@ -121,10 +121,7 @@ export default function ScanNext({
           scanAreas={scanAreas ? scanAreas.scanAreas[0]?.features : null}
         />
       )}
-      <ScanDialog
-        scanNextMode={scanNextMode}
-        setScanNextMode={setScanNextMode}
-      />
+      <ScanDialog scanMode={scanNextMode} setScanMode={setScanNextMode} />
     </>
   )
 }

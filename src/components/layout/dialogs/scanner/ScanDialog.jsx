@@ -4,23 +4,23 @@ import { useTranslation } from 'react-i18next'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 
-export default function ScanDialog({ scanNextMode, setScanNextMode }) {
+export default function ScanDialog({ scanMode, setScanMode }) {
   const { t } = useTranslation()
 
   return (
     <Dialog
-      onClose={() => setScanNextMode(false)}
-      open={['confirmed', 'loading', 'error'].includes(scanNextMode)}
+      onClose={() => setScanMode(false)}
+      open={['confirmed', 'loading', 'error'].includes(scanMode)}
       maxWidth="xs"
     >
       <Header
-        titles={[`scan_${scanNextMode}_title`]}
-        action={() => setScanNextMode(false)}
+        titles={[`scan_${scanMode}_title`]}
+        action={() => setScanMode(false)}
       />
       <DialogContent>
         <Grid item style={{ textAlign: 'center' }}>
           <Typography variant="subtitle1" align="center">
-            {t(`scan_${scanNextMode}`)}
+            {t(`scan_${scanMode}`)}
           </Typography>
         </Grid>
       </DialogContent>
@@ -31,7 +31,7 @@ export default function ScanDialog({ scanNextMode, setScanNextMode }) {
             icon: 'Clear',
             color: 'primary',
             align: 'right',
-            action: () => setScanNextMode(false),
+            action: () => setScanMode(false),
           },
         ]}
       />
