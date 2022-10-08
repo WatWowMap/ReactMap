@@ -82,7 +82,7 @@ export default function Map({
   const [lc] = useState(
     L.control.locate({
       position: 'bottomright',
-      icon: 'fas fa-location-arrow',
+      icon: 'fas fa-crosshairs',
       keepCurrentZoomLevel: true,
       setView: 'untilPan',
     }),
