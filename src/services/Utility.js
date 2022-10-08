@@ -9,6 +9,7 @@ import dayCheck from './functions/dayCheck'
 import parseQuestConditions from './functions/parseConditions'
 import formatter from './functions/formatter'
 import getRewardInfo from './functions/getRewardInfo'
+import checkAreaValidity from './functions/checkAreaValidity'
 
 export default class Utility {
   static getProperName(word) {
@@ -147,5 +148,9 @@ export default class Utility {
     return typeof content === 'object'
       ? content[localStorage.getItem('i18nextLng')] || Object.values(content)[0]
       : ''
+  }
+
+  static checkAreaValidity(...args) {
+    return checkAreaValidity(...args)
   }
 }

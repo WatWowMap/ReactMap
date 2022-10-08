@@ -37,17 +37,17 @@ module.exports = async function scannerApi(category, method, data = null) {
           console.log(
             `[scannerApi] Request to scan new location by ${data.username}${
               data.userId ? ` (${data.userId})` : ''
-            } - type ${data.scanNextType}: ${data.scanNextLocation[0].toFixed(
+            } - type ${data.scanNextType}: ${data.scanLocation[0].toFixed(
               5,
-            )},${data.scanNextLocation[1].toFixed(5)}`,
+            )},${data.scanLocation[1].toFixed(5)}`,
           )
           const coords =
             config.scanner.backendConfig.platform === 'mad'
-              ? `${parseFloat(
-                  data.scanNextCoords[0][0].toFixed(5),
-                )},${parseFloat(data.scanNextCoords[0][1].toFixed(5))}`
+              ? `${parseFloat(data.scanCoords[0][0].toFixed(5))},${parseFloat(
+                  data.scanCoords[0][1].toFixed(5),
+                )}`
               : JSON.stringify(
-                  data.scanNextCoords.map((coord) => ({
+                  data.scanCoords.map((coord) => ({
                     lat: parseFloat(coord[0].toFixed(5)),
                     lon: parseFloat(coord[1].toFixed(5)),
                   })),
@@ -76,12 +76,12 @@ module.exports = async function scannerApi(category, method, data = null) {
           console.log(
             `[scannerApi] Request to scan new zone by ${data.username}${
               data.userId ? ` (${data.userId})` : ''
-            } - size ${data.scanZoneSize}: ${data.scanZoneLocation[0].toFixed(
+            } - size ${data.scanZoneSize}: ${data.scanLocation[0].toFixed(
               5,
-            )},${data.scanZoneLocation[1].toFixed(5)}`,
+            )},${data.scanLocation[1].toFixed(5)}`,
           )
           const coords = JSON.stringify(
-            data.scanZoneCoords.map((coord) => ({
+            data.scanCoords.map((coord) => ({
               lat: parseFloat(coord[0].toFixed(5)),
               lon: parseFloat(coord[1].toFixed(5)),
             })),
