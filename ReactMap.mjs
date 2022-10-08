@@ -1,11 +1,6 @@
-/* eslint-disable import/extensions */
-import { generate } from './server/scripts/generateMasterfile.js'
-import { locales } from './server/scripts/createLocales.js'
-import { connection } from './server/knexfile.cjs'
+/* eslint-disable no-console */
+import './ReactMap.js'
 
-connection.migrate.latest().then(() => (
-  generate(true)
-    .then(() => locales()
-      .then(() => import('./esbuild.config.mjs'))
-      .then(() => import('./server/src/index.js')))
-))
+console.warn(
+  '[WARN] ReactMap.mjs is being deprecated and support will be removed in version 1.8.0. Please change your PM2 script to use ReactMap.js instead.',
+)

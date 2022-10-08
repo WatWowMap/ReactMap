@@ -1,5 +1,3 @@
-/* eslint-disable import/no-dynamic-require */
-/* eslint-disable global-require */
 /* eslint-disable no-console */
 process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
 
@@ -89,6 +87,42 @@ if (fs.existsSync(resolve(`${__dirname}/../configs/config.json`))) {
   )
 }
 
+const checkExtraJsons = (fileName, domain = '') => {
+  const generalJson = fs.existsSync(
+    resolve(`${__dirname}/../configs/${fileName}.json`),
+  )
+    ? JSON.parse(
+        fs.readFileSync(resolve(__dirname, `../configs/${fileName}.json`)),
+      )
+    : {}
+  if (Object.keys(generalJson).length) {
+    console.log(
+      `[CONFIG] config ${fileName}.json found, overwriting your config.map.${fileName} with the found data.`,
+    )
+  }
+  if (
+    domain &&
+    fs.existsSync(resolve(`${__dirname}/../configs/${fileName}/${domain}.json`))
+  ) {
+    const domainJson =
+      JSON.parse(
+        fs.readFileSync(
+          resolve(__dirname, `../configs/${fileName}/${domain}.json`),
+        ),
+      ) || {}
+    if (Object.keys(domainJson).length) {
+      console.log(
+        `[CONFIG] config ${fileName}/${domain}.json found, overwriting your config.map.${fileName} with the found data.`,
+      )
+    }
+    return {
+      ...generalJson,
+      ...domainJson,
+    }
+  }
+  return generalJson
+}
+
 const mergeMapConfig = (obj) => {
   if (process.env.TELEGRAM_BOT_NAME && !obj?.customRoutes?.telegramBotName) {
     if (obj.customRoutes)
@@ -120,6 +154,7 @@ const mergeMapConfig = (obj) => {
       })
     }
   })
+
   return {
     localeSelection: obj.localeSelection,
     ...obj,
@@ -128,6 +163,18 @@ const mergeMapConfig = (obj) => {
     ...obj.links,
     ...obj.holidayEffects,
     ...obj.misc,
+    messageOfTheDay: {
+      ...obj.messageOfTheDay,
+      ...checkExtraJsons('messageOfTheDay', obj.domain),
+    },
+    donationPage: {
+      ...obj.donationPage,
+      ...checkExtraJsons('donationPage', obj.domain),
+    },
+    loginPage: {
+      ...obj.loginPage,
+      ...checkExtraJsons('loginPage', obj.domain),
+    },
     general: undefined,
     customRoutes: undefined,
     links: undefined,

@@ -286,7 +286,7 @@ module.exports = class Pokestop extends Model {
                   exp
                     .where('quest_reward_type', 1)
                     .whereIn(
-                      isMad ? 'quest_item_amount' : 'quest_reward_amount',
+                      isMad ? 'quest_stardust' : 'quest_reward_amount',
                       xp,
                     )
                 })
@@ -869,10 +869,10 @@ module.exports = class Pokestop extends Model {
     // xp
     if (isMad) {
       queries.xp = this.query()
-        .select('quest_item_amount AS amount', 'quest_title', 'quest_target')
+        .select('quest_stardust AS amount', 'quest_title', 'quest_target')
         .from('trs_quest')
         .where('quest_reward_type', 1)
-        .groupBy('quest_item_amount', 'quest_title', 'quest_target')
+        .groupBy('quest_stardust', 'quest_title', 'quest_target')
     } else {
       queries.xp = this.query().where('quest_reward_type', 1)
       if (hasRewardAmount) {
@@ -984,7 +984,7 @@ module.exports = class Pokestop extends Model {
     // candy
     queries.candy = this.query()
       .select('quest_title', 'quest_target')
-      .distinct('quest_pokemon_id')
+      .distinct('quest_pokemon_id AS id')
       .from(isMad ? 'trs_quest' : 'pokestop')
       .where('quest_reward_type', 4)
     if (hasAltQuests) {
@@ -993,7 +993,7 @@ module.exports = class Pokestop extends Model {
           'alternative_quest_title AS quest_title',
           'alternative_quest_target AS quest_target',
         )
-        .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
+        .distinct('alternative_quest_pokemon_id AS id')
         .where('alternative_quest_reward_type', 4)
     }
     // candy
@@ -1001,7 +1001,7 @@ module.exports = class Pokestop extends Model {
     // xl candy
     queries.xlCandy = this.query()
       .select('quest_title', 'quest_target')
-      .distinct('quest_pokemon_id')
+      .distinct('quest_pokemon_id AS id')
       .from(isMad ? 'trs_quest' : 'pokestop')
       .where('quest_reward_type', 9)
     if (hasAltQuests) {
@@ -1010,7 +1010,7 @@ module.exports = class Pokestop extends Model {
           'alternative_quest_title AS quest_title',
           'alternative_quest_target AS quest_target',
         )
-        .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
+        .distinct('alternative_quest_pokemon_id AS id')
         .where('alternative_quest_reward_type', 9)
     }
     // xl candy

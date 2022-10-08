@@ -31,6 +31,10 @@
       "__name": "API_MAX_SESSIONS",
       "__format": "number"
     },
+    "sessionCheckIntervalMs": {
+      "__name": "API_SESSION_CHECK_INTERVAL_MS",
+      "__format": "number"
+    },
     "cookieAgeDays": {
       "__name": "API_COOKIE_AGE_DAYS",
       "__format": "number"
@@ -934,6 +938,10 @@
       "maxConnections": {
         "__name": "DATABASE_SETTINGS_MAX_CONNECTIONS",
         "__format": "number"
+      },
+      "extraUserFields": {
+        "__name": "DATABASE_SETTINGS_EXTRA_USER_FIELDS",
+        "__format": "json"
       }
     },
     "schemas": {

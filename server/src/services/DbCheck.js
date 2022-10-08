@@ -162,24 +162,28 @@ module.exports = class DbCheck {
 
   async historicalRarity() {
     console.log('[DB] Setting historical rarity stats')
-    const results = await Promise.all(
-      (this.models.Pokemon ?? []).map(async (source) =>
-        source.isMad
-          ? []
-          : source.SubModel.query()
-              .select('pokemon_id', raw('SUM(count) as total'))
-              .from('pokemon_stats')
-              .groupBy('pokemon_id'),
-      ),
-    )
-    this.setRarity(
-      results.map((result) =>
-        Object.fromEntries(
-          result.map((pkmn) => [`${pkmn.pokemon_id}`, +pkmn.total]),
+    try {
+      const results = await Promise.all(
+        (this.models.Pokemon ?? []).map(async (source) =>
+          source.isMad
+            ? []
+            : source.SubModel.query()
+                .select('pokemon_id', raw('SUM(count) as total'))
+                .from('pokemon_stats')
+                .groupBy('pokemon_id'),
         ),
-      ),
-      true,
-    )
+      )
+      this.setRarity(
+        results.map((result) =>
+          Object.fromEntries(
+            result.map((pkmn) => [`${pkmn.pokemon_id}`, +pkmn.total]),
+          ),
+        ),
+        true,
+      )
+    } catch (e) {
+      console.error('[DB] Failed to set historical rarity stats', e)
+    }
   }
 
   bindConnections(models) {

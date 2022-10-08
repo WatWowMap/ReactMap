@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
 
 const session = require('express-session')
+const mysql2 = require('mysql2/promise')
 const MySQLStore = require('express-mysql-session')(session)
 const {
-  api: { maxSessions },
+  api: { maxSessions, sessionCheckIntervalMs },
   database: {
     schemas,
     settings: { sessionTableName },
@@ -13,55 +14,62 @@ const { Session } = require('../models/index')
 
 const dbSelection = schemas.find(({ useFor }) => useFor?.includes('session'))
 
-// MySQL session store
-const sessionStore = new MySQLStore({
-  // Database server IP address/hostname
-  host: dbSelection.host,
-  // Database server listening port
-  port: dbSelection.port,
-  // Database username
-  user: dbSelection.username,
-  // Password for the above database user
-  password: dbSelection.password,
-  // Database name to save sessions table to
-  database: dbSelection.database,
-  // Whether or not to automatically check for and clear expired sessions:
-  clearExpired: true,
-  // How frequently expired sessions will be cleared; milliseconds:
-  checkExpirationInterval: 900000,
-  // Whether or not to create the sessions database table, if one does not already exist
-  createDatabaseTable: true,
-  // Set Sessions table name
-  schema: {
-    tableName: sessionTableName,
+const sessionStore = new MySQLStore(
+  {
+    clearExpired: true,
+    checkExpirationInterval: sessionCheckIntervalMs,
+    createDatabaseTable: true,
+    schema: {
+      tableName: sessionTableName,
+    },
   },
-})
+  mysql2.createPool({
+    host: dbSelection.host,
+    port: dbSelection.port,
+    user: dbSelection.username,
+    password: dbSelection.password,
+    database: dbSelection.database,
+  }),
+)
 
 const isValidSession = async (userId) => {
-  const ts = Math.floor(new Date().getTime() / 1000)
-  const results = await Session.query()
-    .select('session_id')
-    .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
-    .andWhere('expires', '>=', ts)
-  return results.length < maxSessions
+  try {
+    const ts = Math.floor(new Date().getTime() / 1000)
+    const results = await Session.query()
+      .select('session_id')
+      .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
+      .andWhere('expires', '>=', ts)
+    return results.length < maxSessions
+  } catch (e) {
+    console.error('[SESSION] Unable to validate session', e)
+    return false
+  }
 }
 
 const clearOtherSessions = async (userId, currentSessionId) => {
-  const results = await Session.query()
-    .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
-    .andWhere('session_id', '!=', currentSessionId || '')
-    .delete()
-  console.log('[Session] Clear Result:', results)
+  try {
+    const results = await Session.query()
+      .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
+      .andWhere('session_id', '!=', currentSessionId || '')
+      .delete()
+    console.log('[Session] Clear Result:', results)
+  } catch (e) {
+    console.error('[SESSION] Unable to clear other sessions', e)
+  }
 }
 
 const clearDiscordSessions = async (discordId, botName) => {
-  const results = await Session.query()
-    .whereRaw(
-      `json_extract(data, '$.passport.user.discordId') = '${discordId}'`,
-    )
-    .orWhereRaw(`json_extract(data, '$.passport.user.id') = '${discordId}'`)
-    .delete()
-  console.log(`[Session${botName && ` - ${botName}`}] Clear Result:`, results)
+  try {
+    const results = await Session.query()
+      .whereRaw(
+        `json_extract(data, '$.passport.user.discordId') = '${discordId}'`,
+      )
+      .orWhereRaw(`json_extract(data, '$.passport.user.id') = '${discordId}'`)
+      .delete()
+    console.log(`[Session${botName && ` - ${botName}`}] Clear Result:`, results)
+  } catch (e) {
+    console.error('[SESSION] Unable to clear Discord sessions', e)
+  }
 }
 
 module.exports = {
