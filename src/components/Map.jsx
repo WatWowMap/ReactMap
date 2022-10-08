@@ -10,8 +10,7 @@ import { useStatic, useStore } from '@hooks/useStore'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
-import ScanNext from './layout/dialogs/scanner/ScanNext'
-import ScanZone from './layout/dialogs/scanner/ScanZone'
+import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
 import ClientError from './layout/dialogs/ClientError'
 
 const userSettingsCategory = (category) => {
@@ -275,20 +274,23 @@ export default function Map({
         )
       )}
       {scanNextMode && (
-        <ScanNext
+        <ScanOnDemand
           map={map}
-          scanNextMode={scanNextMode}
-          setScanNextMode={setScanNextMode}
+          theme={theme}
+          scanMode={scanNextMode}
+          setScanMode={setScanNextMode}
           scanner={scanner}
+          mode="scanNext"
         />
       )}
       {scanZoneMode && (
-        <ScanZone
+        <ScanOnDemand
           map={map}
           theme={theme}
-          scanZoneMode={scanZoneMode}
-          setScanZoneMode={setScanZoneMode}
+          scanMode={scanZoneMode}
+          setScanMode={setScanZoneMode}
           scanner={scanner}
+          mode="scanZone"
         />
       )}
       <Nav
