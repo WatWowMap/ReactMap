@@ -6,6 +6,31 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
+const RADIUS_POKEMON = 70
+const RADIUS_GYM = 750
+const DISTANCE = {
+  M: RADIUS_POKEMON * 1.732,
+  XL: RADIUS_GYM * 1.732,
+}
+
+const calcScanNextCoords = (center, type) => {
+  const coords = [center]
+  if (type === 'S') return coords
+  const start = point([center[1], center[0]])
+  const options = { units: 'kilometers' }
+  return coords.concat(
+    [0, 60, 120, 180, 240, 300].map((bearing) => {
+      const [lon, lat] = destination(
+        start,
+        DISTANCE[type] / 1000,
+        bearing,
+        options,
+      ).geometry.coordinates
+      return [lat, lon]
+    }),
+  )
+}
+
 export default function ScanNextTarget({
   map,
   scannerType,
@@ -23,29 +48,7 @@ export default function ScanNextTarget({
   scanAreas,
 }) {
   const [position, setPosition] = useState(scanNextLocation)
-  const radiusPokemon = 70
-  const radiusGym = 750
-  const calcScanNextCoords = (center, type) => {
-    const coords = [center]
-    if (type === 'S') return coords
-    const start = point([center[1], center[0]])
-    const distance = {
-      M: radiusPokemon * 1.732,
-      XL: radiusGym * 1.732,
-    }
-    const options = { units: 'kilometers' }
-    return coords.concat(
-      [0, 60, 120, 180, 240, 300].map((bearing) => {
-        const [lon, lat] = destination(
-          start,
-          distance[type] / 1000,
-          bearing,
-          options,
-        ).geometry.coordinates
-        return [lat, lon]
-      }),
-    )
-  }
+
   const checkAreaValidity = (center) => {
     if (!scanNextAreaRestriction?.length || !scanAreas?.length) return true
     let isValid = false
@@ -188,7 +191,7 @@ export default function ScanNextTarget({
       {scanNextCoords.map((coords) => (
         <Circle
           key={[coords[0], coords[1]]}
-          radius={radiusPokemon}
+          radius={RADIUS_POKEMON}
           center={[coords[0], coords[1]]}
           fillOpacity={0.5}
           pathOptions={{
@@ -199,7 +202,7 @@ export default function ScanNextTarget({
       {scanNextType === 'M' ? (
         <Circle
           key={[scanNextCoords[0][0], scanNextCoords[0][1]]}
-          radius={radiusGym + radiusPokemon}
+          radius={RADIUS_GYM + RADIUS_POKEMON}
           center={[scanNextCoords[0][0], scanNextCoords[0][1]]}
           fillOpacity={0.1}
           pathOptions={{
@@ -213,7 +216,7 @@ export default function ScanNextTarget({
         scanNextCoords.map((coords) => (
           <Circle
             key={[coords[0], coords[1]]}
-            radius={radiusGym}
+            radius={RADIUS_GYM}
             center={[coords[0], coords[1]]}
             fillOpacity={0.1}
             pathOptions={{
