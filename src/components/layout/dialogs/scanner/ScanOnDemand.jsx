@@ -10,7 +10,6 @@ import ScanDialog from './ScanDialog'
 
 export default function ScanOnDemand({
   map,
-  theme,
   scanMode,
   setScanMode,
   scanner: {
@@ -139,7 +138,6 @@ export default function ScanOnDemand({
           ) : (
             <ScanZoneTarget
               map={map}
-              theme={theme}
               scannerType={scannerType}
               queue={queue}
               setScanZoneMode={setScanMode}

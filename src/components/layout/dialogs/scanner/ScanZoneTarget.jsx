@@ -44,7 +44,6 @@ const calcScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
 
 export default function ScanZoneTarget({
   map,
-  theme,
   scannerType,
   queue,
   setScanZoneMode,
@@ -92,13 +91,6 @@ export default function ScanZoneTarget({
     [position, scanZoneLocation, scanZoneSize, spacing, radius],
   )
 
-  useEffect(() => {
-    const marker = scanMarkerRef.current
-    if (marker) {
-      marker.openPopup()
-    }
-  }, [])
-
   const handleSizeChange = (_event, newSize) => {
     setScanZoneSize(newSize)
     setScanZoneCoords(
@@ -132,6 +124,13 @@ export default function ScanZoneTarget({
     }
   }, [scanZoneCoords.length])
 
+  useEffect(() => {
+    const marker = scanMarkerRef.current
+    if (marker) {
+      marker.openPopup()
+    }
+  }, [])
+
   return (
     <>
       <Marker
@@ -160,21 +159,18 @@ export default function ScanZoneTarget({
                     {t('scan_zone_size')}
                   </Typography>
                   <Slider
-                    xs={12}
                     name="Size"
                     min={1}
                     max={scanZoneMaxSize}
                     step={1}
                     value={scanZoneSize}
                     onChange={handleSizeChange}
-                    onChangeCommitted={handleSizeChange}
                     valueLabelDisplay="auto"
                   />
                   <Typography variant="caption" align="left">
                     {t('scan_zone_range')}
                   </Typography>
                   <Slider
-                    xs={12}
                     name="Range"
                     marks={[
                       { value: scanZoneRadius.pokemon, label: t('pokemon') },
@@ -185,45 +181,38 @@ export default function ScanZoneTarget({
                     step={null}
                     value={radius}
                     onChange={handleRadiusChange}
-                    onChangeCommitted={handleRadiusChange}
                     valueLabelDisplay="auto"
                   />
                 </Box>
                 {advancedScanZoneOptions && (
-                  <AdvancedAccordion
-                    block={
-                      <Grid item xs={12} style={{ textAlign: 'center' }}>
-                        <Typography variant="caption">
-                          {t('scan_zone_spacing')}
-                        </Typography>
-                        <Slider
-                          xs={12}
-                          name="Spacing"
-                          min={1}
-                          max={2}
-                          step={0.01}
-                          value={spacing}
-                          onChange={handleSpacingChange}
-                          onChangeCommitted={handleSpacingChange}
-                          valueLabelDisplay="auto"
-                        />
-                        <Typography variant="caption">
-                          {t('scan_zone_radius')}
-                        </Typography>
-                        <Slider
-                          xs={12}
-                          name="Radius"
-                          min={50}
-                          max={900}
-                          value={radius}
-                          onChange={handleRadiusChange}
-                          onChangeCommitted={handleRadiusChange}
-                          valueLabelDisplay="auto"
-                        />
-                      </Grid>
-                    }
-                    theme={theme}
-                  />
+                  <AdvancedAccordion>
+                    <Grid item xs={12} style={{ textAlign: 'center' }}>
+                      <Typography variant="caption">
+                        {t('scan_zone_spacing')}
+                      </Typography>
+                      <Slider
+                        xs={12}
+                        name="Spacing"
+                        min={1}
+                        max={2}
+                        step={0.01}
+                        value={spacing}
+                        onChange={handleSpacingChange}
+                        valueLabelDisplay="auto"
+                      />
+                      <Typography variant="caption">
+                        {t('scan_zone_radius')}
+                      </Typography>
+                      <Slider
+                        name="Radius"
+                        min={50}
+                        max={900}
+                        value={radius}
+                        onChange={handleRadiusChange}
+                        valueLabelDisplay="auto"
+                      />
+                    </Grid>
+                  </AdvancedAccordion>
                 )}
               </Grid>
             )}

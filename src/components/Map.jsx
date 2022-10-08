@@ -163,7 +163,7 @@ export default function Map({
         Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(
           ([category, value]) => {
             let enabled = false
-
+            if (scanZoneMode === 'setLocation') return null
             switch (category) {
               case 'scanAreas':
                 if (
@@ -276,7 +276,6 @@ export default function Map({
       {scanNextMode && (
         <ScanOnDemand
           map={map}
-          theme={theme}
           scanMode={scanNextMode}
           setScanMode={setScanNextMode}
           scanner={scanner}
@@ -286,7 +285,6 @@ export default function Map({
       {scanZoneMode && (
         <ScanOnDemand
           map={map}
-          theme={theme}
           scanMode={scanZoneMode}
           setScanMode={setScanZoneMode}
           scanner={scanner}
