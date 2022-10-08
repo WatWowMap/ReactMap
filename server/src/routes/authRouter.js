@@ -1,4 +1,3 @@
-/* eslint-disable import/no-dynamic-require */
 /* eslint-disable no-console */
 const router = require('express').Router()
 const passport = require('passport')

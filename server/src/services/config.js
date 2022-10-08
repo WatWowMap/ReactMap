@@ -1,4 +1,3 @@
-/* eslint-disable import/no-dynamic-require */
 /* eslint-disable no-console */
 process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
 

@@ -20,6 +20,7 @@
   },
   "rules": {
     "global-require": 0,
+    "import/no-dynamic-require": 0,
     "camelcase": 0,
     "react/jsx-props-no-spreading": 0,
     "linebreak-style": 0,
@@ -97,10 +98,6 @@
           [
             "@assets",
             "./src/assets/"
-          ],
-          [
-            "@classes",
-            "./src/classes/"
           ]
         ],
         "extensions": [

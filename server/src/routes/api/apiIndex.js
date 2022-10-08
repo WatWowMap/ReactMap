@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable import/no-dynamic-require */
 
 const router = require('express').Router()
 const fs = require('fs')

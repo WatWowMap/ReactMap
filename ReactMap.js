@@ -1,3 +1,4 @@
+/* eslint-disable import/extensions */
 const { generate } = require('./server/scripts/generateMasterfile')
 const { locales } = require('./server/scripts/createLocales')
 const { connection } = require('./server/knexfile.cjs')
