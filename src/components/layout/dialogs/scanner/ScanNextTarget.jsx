@@ -79,11 +79,9 @@ export default function ScanNextTarget({
     }
   }, [])
 
-  const isInAllowedArea = Utility.checkAreaValidity(
-    position,
-    scanNextAreaRestriction,
-    scanAreas,
-  )
+  const isInAllowedArea = scanNextAreaRestriction.length
+    ? Utility.checkAreaValidity(position, scanNextAreaRestriction, scanAreas)
+    : true
 
   return (
     <>

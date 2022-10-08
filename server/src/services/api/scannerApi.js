@@ -43,9 +43,9 @@ module.exports = async function scannerApi(category, method, data = null) {
           )
           const coords =
             config.scanner.backendConfig.platform === 'mad'
-              ? `${parseFloat(
-                  data.scanCoords[0][0].toFixed(5),
-                )},${parseFloat(data.scanCoords[0][1].toFixed(5))}`
+              ? `${parseFloat(data.scanCoords[0][0].toFixed(5))},${parseFloat(
+                  data.scanCoords[0][1].toFixed(5),
+                )}`
               : JSON.stringify(
                   data.scanCoords.map((coord) => ({
                     lat: parseFloat(coord[0].toFixed(5)),
