@@ -58,7 +58,7 @@ export default function ScanNextTarget({
         const marker = scanMarkerRef.current
         if (marker) {
           const { lat, lng } = marker.getLatLng()
-          map.flyTo([lat, lng])
+          map.panTo([lat, lng])
           setPosition([lat, lng])
           setScanNextLocation([lat, lng])
           setScanNextCoords(calcScanNextCoords([lat, lng], scanNextType))
@@ -91,7 +91,7 @@ export default function ScanNextTarget({
         position={position}
         ref={scanMarkerRef}
       >
-        <Popup minWidth={90} maxWidth={150} ref={scanPopupRef}>
+        <Popup minWidth={90} maxWidth={150} ref={scanPopupRef} autoPan={false}>
           <Grid
             container
             alignItems="center"

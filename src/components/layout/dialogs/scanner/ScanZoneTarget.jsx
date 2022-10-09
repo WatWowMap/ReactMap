@@ -75,7 +75,7 @@ export default function ScanZoneTarget({
         const marker = scanMarkerRef.current
         if (marker) {
           const { lat, lng } = marker.getLatLng()
-          map.flyTo([lat, lng])
+          map.panTo([lat, lng])
           setPosition([lat, lng])
           setScanZoneLocation([lat, lng])
           setScanZoneCoords(
@@ -139,7 +139,7 @@ export default function ScanZoneTarget({
         position={position}
         ref={scanMarkerRef}
       >
-        <Popup minWidth={90} maxWidth={200} ref={scanPopupRef}>
+        <Popup minWidth={90} maxWidth={200} ref={scanPopupRef} autoPan={false}>
           <Grid
             container
             alignItems="center"
