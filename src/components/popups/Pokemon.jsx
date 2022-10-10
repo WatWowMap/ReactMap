@@ -68,7 +68,7 @@ export default function PokemonPopup({
     <ErrorBoundary noRefresh style={{}} variant="h5">
       <Grid
         container
-        style={{ minWidth: 200 }}
+        style={{ width: 200 }}
         alignItems="center"
         justifyContent="center"
         spacing={1}
