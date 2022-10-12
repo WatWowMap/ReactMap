@@ -29,6 +29,19 @@ export default function HolidayEffects({ mapSettings }) {
     return null
   }
   if (
+    mapSettings.halloweenEffect &&
+    date.getMonth() === 9 &&
+    date.getDate() >= 20 &&
+    date.getDate() <= 31
+  ) {
+    const halloweenpumpkin = new HolidayAnimations(
+      'https://raw.githubusercontent.com/ReuschelCGN/pogoicons/main/NPC/halloween_ghost_22.png',
+    )
+    halloweenpumpkin.initialize()
+
+    return null
+  }
+  if (
     mapSettings.christmasSnow &&
     date.getMonth() === 11 &&
     date.getDate() >= 24 &&
