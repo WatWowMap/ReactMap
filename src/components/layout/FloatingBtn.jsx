@@ -70,7 +70,7 @@ export default function FloatingButtons({
   const showDonorPage =
     (perms.donor ? donationPage.showToDonors : true) &&
     donationPage.showOnMap &&
-    donationPage.components.length
+    donationPage?.components?.length
 
   const DonorIcon = showDonorPage
     ? DonationIcons[donationPage.fabIcon || 'card']

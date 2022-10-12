@@ -22,7 +22,7 @@ export default function Login({
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const { settings, components } = serverSettings.config.map.loginPage
 
-  return components.length ? (
+  return components?.length ? (
     <Grid
       container
       spacing={settings.parentSpacing || 0}
