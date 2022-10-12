@@ -27,8 +27,20 @@
   "api": {
     "sessionSecret": "API_SESSION_SECRET",
     "reactMapSecret": "API_REACT_MAP_SECRET",
+    "showSchemasInConfigApi": {
+      "__name": "API_SHOW_SCHEMAS_IN_CONFIG_API",
+      "__format": "boolean"
+    },
+    "showStrategiesInConfigApi": {
+      "__name": "API_SHOW_STRATEGIES_IN_CONFIG_API",
+      "__format": "boolean"
+    },
     "maxSessions": {
       "__name": "API_MAX_SESSIONS",
+      "__format": "number"
+    },
+    "sessionCheckIntervalMs": {
+      "__name": "API_SESSION_CHECK_INTERVAL_MS",
       "__format": "number"
     },
     "cookieAgeDays": {
@@ -217,6 +229,11 @@
     "fetchTimeoutMs": {
       "__name": "API_FETCH_TIMEOUT_MS",
       "__format": "number"
+    },
+    "pogoApiEndpoints": {
+      "invasions": "API_POGO_API_ENDPOINTS_INVASIONS",
+      "masterfile": "API_POGO_API_ENDPOINTS_MASTERFILE",
+      "translations": "API_POGO_API_ENDPOINTS_TRANSLATIONS"
     }
   },
   "multiDomains": {
@@ -310,10 +327,6 @@
         "__name": "MAP_MISC_ENABLE_MAP_JS_FILTER",
         "__format": "boolean"
       },
-      "questRewardTypeFilters": {
-        "__name": "MAP_MISC_QUEST_REWARD_TYPE_FILTERS",
-        "__format": "boolean"
-      },
       "fetchLatestInvasions": {
         "__name": "MAP_MISC_FETCH_LATEST_INVASIONS",
         "__format": "boolean"
@@ -374,8 +387,7 @@
     "theme": {
       "style": "MAP_THEME_STYLE",
       "primary": "MAP_THEME_PRIMARY",
-      "secondary": "MAP_THEME_SECONDARY",
-      "drawer": "MAP_THEME_DRAWER"
+      "secondary": "MAP_THEME_SECONDARY"
     },
     "clustering": {
       "gyms": {
@@ -816,6 +828,24 @@
           "__name": "DEFAULT_FILTERS_POKESTOPS_STARDUST_ENABLED",
           "__format": "boolean"
         }
+      },
+      "xp": {
+        "min": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_XP_MIN",
+          "__format": "number"
+        },
+        "max": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_XP_MAX",
+          "__format": "number"
+        },
+        "interval": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_XP_INTERVAL",
+          "__format": "number"
+        },
+        "enabled": {
+          "__name": "DEFAULT_FILTERS_POKESTOPS_XP_ENABLED",
+          "__format": "boolean"
+        }
       }
     },
     "pokemon": {
@@ -913,17 +943,13 @@
       "gymBadgeTableName": "DATABASE_SETTINGS_GYM_BADGE_TABLE_NAME",
       "sessionTableName": "DATABASE_SETTINGS_SESSION_TABLE_NAME",
       "migrationTableName": "DATABASE_SETTINGS_MIGRATION_TABLE_NAME",
-      "joinGymBadgeTable": {
-        "__name": "DATABASE_SETTINGS_JOIN_GYM_BADGE_TABLE",
-        "__format": "boolean"
-      },
-      "hideOldQuests": {
-        "__name": "DATABASE_SETTINGS_HIDE_OLD_QUESTS",
-        "__format": "boolean"
-      },
       "maxConnections": {
         "__name": "DATABASE_SETTINGS_MAX_CONNECTIONS",
         "__format": "number"
+      },
+      "extraUserFields": {
+        "__name": "DATABASE_SETTINGS_EXTRA_USER_FIELDS",
+        "__format": "json"
       }
     },
     "schemas": {

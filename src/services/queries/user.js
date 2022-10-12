@@ -23,3 +23,9 @@ export const setGymBadge = gql`
     setGymBadge(gymId: $gymId, badge: $badge)
   }
 `
+
+export const setExtraFields = gql`
+  mutation SetExtraFields($key: String, $value: String) {
+    setExtraFields(key: $key, value: $value)
+  }
+`

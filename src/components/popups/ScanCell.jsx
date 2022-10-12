@@ -3,8 +3,9 @@ import { Typography } from '@material-ui/core'
 import { Trans, useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+import ErrorBoundary from '@components/ErrorBoundary'
 
-export default function S2CellPopup({ cell, ts }) {
+export default function ScanCellPopup({ cell, ts }) {
   const { t } = useTranslation()
   const { id, updated } = cell
   const lastUpdated = new Date(updated * 1000)
@@ -18,7 +19,7 @@ export default function S2CellPopup({ cell, ts }) {
   })
 
   return (
-    <>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Typography variant="h6" align="center">
         <Trans i18nKey="s2_cell_level">{{ level: 15 }}</Trans>
       </Typography>
@@ -34,6 +35,6 @@ export default function S2CellPopup({ cell, ts }) {
       <Typography variant="subtitle1" align="center">
         {t('id')}: {id}
       </Typography>
-    </>
+    </ErrorBoundary>
   )
 }

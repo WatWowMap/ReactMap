@@ -12,7 +12,10 @@
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
     "reactMapSecret": "",
+    "showSchemasInConfigApi": false,
+    "showStrategiesInConfigApi": false,
     "maxSessions": 5,
+    "sessionCheckIntervalMs": 900000,
     "cookieAgeDays": 7,
     "rateLimit": {
       "time": 60,
@@ -82,7 +85,12 @@
     "hideOldGyms": false,
     "stopValidDataLimit": 30,
     "hideOldPokestops": false,
-    "fetchTimeoutMs": 3000
+    "fetchTimeoutMs": 3000,
+    "pogoApiEndpoints": {
+      "invasions": "https://raw.githubusercontent.com/WatWowMap/event-info/main/grunts/formatted.json",
+      "masterfile": "https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-react-map.json",
+      "translations": "https://raw.githubusercontent.com/WatWowMap/pogo-translations/master"
+    }
   },
   "multiDomains": [],
   "map": {
@@ -137,7 +145,6 @@
     },
     "misc": {
       "enableMapJsFilter": true,
-      "questRewardTypeFilters": false,
       "fetchLatestInvasions": true,
       "invasionCacheHrs": 1,
       "masterfileCacheHrs": 6,
@@ -159,8 +166,7 @@
     "theme": {
       "style": "dark",
       "primary": "#ff5722",
-      "secondary": "#00b0ff",
-      "drawer": "temporary"
+      "secondary": "#00b0ff"
     },
     "clustering": {
       "gyms": {
@@ -384,6 +390,12 @@
         "max": 2000,
         "interval": 100,
         "enabled": true
+      },
+      "xp": {
+        "min": 100,
+        "max": 1000,
+        "interval": 100,
+        "enabled": true
       }
     },
     "pokemon": {
@@ -445,9 +457,8 @@
       "gymBadgeTableName": "gymBadges",
       "sessionTableName": "session",
       "migrationTableName": "knex_migrations",
-      "joinGymBadgeTable": false,
-      "hideOldQuests": false,
-      "maxConnections": 10
+      "maxConnections": 10,
+      "extraUserFields": []
     },
     "schemas": []
   },

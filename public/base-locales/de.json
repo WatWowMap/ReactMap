@@ -551,5 +551,13 @@
   "ultra_beast": "Ultrabestie",
   "quest_condition": "Questbedingung",
   "always_show_labels": "Labels immer anzeigen",
-  "scan_areas_options": "Optionen für Scanbereiche"
+  "scan_areas_options": "Optionen für Scanbereiche",
+  "tap_to_toggle": "Tippen zum Umschalten",
+  "power_up": "Aufladung",
+  "never_alt": "Nie",
+  "seen_nearby_stop": "über Nearby gesehen",
+  "seen_nearby_cell": "in dieser S2 Zelle gesehen",
+  "seen_lure_encounter": "getroffen am Lockmodul",
+  "seen_lure_wild": "Spawn am Lockmodul",
+  "seen_wild": "Spawn in der Wildnis"
 }

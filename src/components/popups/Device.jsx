@@ -3,6 +3,7 @@ import { Typography } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+import ErrorBoundary from '@components/ErrorBoundary'
 
 export default function DevicePopup({ device, isOnline, ts }) {
   const { t } = useTranslation()
@@ -12,7 +13,7 @@ export default function DevicePopup({ device, isOnline, ts }) {
   }, [])
 
   return (
-    <>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Typography variant="h6" align="center">
         {device.id}
       </Typography>
@@ -27,13 +28,13 @@ export default function DevicePopup({ device, isOnline, ts }) {
       >
         {t(isOnline ? 'online' : 'offline')}
       </Typography>
-    </>
+    </ErrorBoundary>
   )
 }
 
 const Timer = ({ device, t, ts }) => {
-  const { last_seen } = device
-  const lastSeen = new Date(last_seen * 1000)
+  const { updated } = device
+  const lastSeen = new Date(updated * 1000)
   const [since, setSince] = useState(Utility.getTimeUntil(lastSeen))
 
   useEffect(() => {
@@ -45,7 +46,7 @@ const Timer = ({ device, t, ts }) => {
 
   return (
     <Typography variant="caption">
-      {t('last_seen')}: {Utility.dayCheck(ts, last_seen)} (
+      {t('last_seen')}: {Utility.dayCheck(ts, updated)} (
       {since.str.replace('days', t('days')).replace('day', t('day'))})
     </Typography>
   )

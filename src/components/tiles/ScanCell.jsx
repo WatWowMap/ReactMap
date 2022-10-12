@@ -1,12 +1,12 @@
 import React, { memo } from 'react'
 import { Polygon, Popup } from 'react-leaflet'
 
-import PopupContent from '../popups/S2cell'
-import marker from '../markers/s2cell'
+import PopupContent from '../popups/ScanCell'
+import marker from '../markers/scanCell'
 
-const S2cellTile = ({ item, config, zoom, ts }) =>
+const ScanCellTile = ({ item, config, zoom, ts }) =>
   zoom >= config.scanCellsZoom && (
-    <Polygon positions={item.polygon} pathOptions={marker(item.updated)}>
+    <Polygon positions={item.polygon} pathOptions={marker(ts - item.updated)}>
       <Popup position={[item.center_lat, item.center_lon]}>
         <PopupContent cell={item} ts={ts} />
       </Popup>
@@ -18,4 +18,4 @@ const areEqual = (prev, next) =>
   prev.item.updated === next.item.updated &&
   prev.zoom === next.zoom
 
-export default memo(S2cellTile, areEqual)
+export default memo(ScanCellTile, areEqual)

@@ -17,8 +17,10 @@ import { useTranslation } from 'react-i18next'
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
+import ErrorBoundary from '@components/ErrorBoundary'
 
 import GenericTimer from './common/Timer'
+import NameTT from './common/NameTT'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -63,66 +65,75 @@ export default function PokemonPopup({
   }, [])
 
   return (
-    <Grid
-      container
-      style={{ minWidth: 200 }}
-      alignItems="center"
-      justifyContent="center"
-      spacing={1}
-    >
-      <Header
-        pokemon={pokemon}
-        metaData={metaData}
-        iconUrl={iconUrl}
-        t={t}
-        perms={perms}
-        userSettings={userSettings}
-        classes={classes}
-        isTutorial={isTutorial}
-      />
-      {Boolean(pokemon.expire_timestamp) && (
-        <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
-      )}
-      {pokemon.seen_type === 'nearby_cell' && (
-        <Typography>{t('pokemon_cell')}</Typography>
-      )}
-      {hasStats && pokePerms.iv && (
-        <>
-          <Stats pokemon={pokemon} metaData={metaData} t={t} />
-          <Divider orientation="vertical" flexItem />
-        </>
-      )}
-      <Info
-        pokemon={pokemon}
-        metaData={metaData}
-        perms={pokePerms}
-        Icons={Icons}
-        isNight={isNight}
-      />
-      <Footer
-        pokemon={pokemon}
-        popups={popups}
-        setPopups={setPopups}
-        hasPvp={Boolean(hasLeagues.length)}
-        classes={classes}
-        Icons={Icons}
-      />
-      <Collapse in={popups.pvp && perms.pvp} timeout="auto" unmountOnExit>
-        {hasLeagues.map((league) => (
-          <PvpInfo
-            key={league}
-            league={league}
-            data={cleanPvp[league]}
-            t={t}
-            Icons={Icons}
-            pokemon={pokemon}
-          />
-        ))}
-      </Collapse>
-      <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-        <ExtraInfo pokemon={pokemon} perms={pokePerms} t={t} Icons={Icons} />
-      </Collapse>
-    </Grid>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
+      <Grid
+        container
+        style={{ width: 200 }}
+        alignItems="center"
+        justifyContent="center"
+        spacing={1}
+      >
+        <Header
+          pokemon={pokemon}
+          metaData={metaData}
+          iconUrl={iconUrl}
+          t={t}
+          perms={perms}
+          userSettings={userSettings}
+          classes={classes}
+          isTutorial={isTutorial}
+        />
+        {pokemon.seen_type !== 'encounter' && (
+          <Grid item xs={12} style={{ textAlign: 'center' }}>
+            <Typography variant="caption">
+              {t(`seen_${pokemon.seen_type}`, '')}
+            </Typography>
+          </Grid>
+        )}
+        {pokemon.seen_type === 'nearby_cell' && (
+          <Typography>{t('pokemon_cell')}</Typography>
+        )}
+        {!!pokemon.expire_timestamp && (
+          <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
+        )}
+        {hasStats && pokePerms.iv && (
+          <>
+            <Stats pokemon={pokemon} metaData={metaData} t={t} />
+            <Divider orientation="vertical" flexItem />
+          </>
+        )}
+        <Info
+          pokemon={pokemon}
+          metaData={metaData}
+          perms={pokePerms}
+          Icons={Icons}
+          isNight={isNight}
+        />
+        <Footer
+          pokemon={pokemon}
+          popups={popups}
+          setPopups={setPopups}
+          hasPvp={!!hasLeagues.length}
+          classes={classes}
+          Icons={Icons}
+        />
+        <Collapse in={popups.pvp && perms.pvp} timeout="auto" unmountOnExit>
+          {hasLeagues.map((league) => (
+            <PvpInfo
+              key={league}
+              league={league}
+              data={cleanPvp[league]}
+              t={t}
+              Icons={Icons}
+              pokemon={pokemon}
+            />
+          ))}
+        </Collapse>
+        <Collapse in={popups.extras} timeout="auto" unmountOnExit>
+          <ExtraInfo pokemon={pokemon} perms={pokePerms} t={t} Icons={Icons} />
+        </Collapse>
+      </Grid>
+    </ErrorBoundary>
   )
 }
 
@@ -243,7 +254,7 @@ const Header = ({
       <Menu
         anchorEl={anchorEl}
         keepMounted
-        open={Boolean(anchorEl)}
+        open={!!anchorEl}
         onClose={handleClose}
         PaperProps={{
           style: {
@@ -346,7 +357,7 @@ const Info = ({ pokemon, metaData, perms, Icons, isNight }) => {
           }}
         />
       )}
-      {Boolean(gender) && (
+      {!!gender && (
         <Grid item style={{ textAlign: 'center' }}>
           <Icon>
             {{
@@ -565,17 +576,24 @@ const PvpInfo = ({ pokemon, league, data, t, Icons }) => {
         ? {
             id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.gender}-${each.rank}-${each.cp}-${each.lvl}-${each.cap}`,
             img: (
-              <img
-                src={Icons.getPokemon(
-                  each.pokemon,
-                  each.form,
-                  each.evolution,
-                  each.gender,
-                  pokemon.costume,
-                )}
-                height={20}
-                alt={each.pokemon}
-              />
+              <NameTT
+                id={[
+                  each.form ? `form_${each.form}` : '',
+                  `poke_${each.pokemon}`,
+                ]}
+              >
+                <img
+                  src={Icons.getPokemon(
+                    each.pokemon,
+                    each.form,
+                    each.evolution,
+                    each.gender,
+                    pokemon.costume,
+                  )}
+                  height={20}
+                  alt={t(`poke_${each.pokemon}`)}
+                />
+              </NameTT>
             ),
             rank: each.rank || 0,
             cp: each.cp || 0,

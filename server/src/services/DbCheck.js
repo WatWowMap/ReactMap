@@ -79,12 +79,20 @@ module.exports = class DbCheck {
           const [isMad, pvpV2] = await schema('pokemon')
             .columnInfo()
             .then((columns) => ['cp_multiplier' in columns, 'pvp' in columns])
-          const [hasRewardAmount, hasAltQuests] = await schema('pokestop')
+          const [hasRewardAmount, hasPowerUp, hasAltQuests] = await schema(
+            'pokestop',
+          )
             .columnInfo()
             .then((columns) => [
               'quest_reward_amount' in columns || isMad,
+              'power_up_level' in columns,
               'alternative_quest_type' in columns,
             ])
+          const [hasLayerColumn] = isMad
+            ? await schema('trs_quest')
+                .columnInfo()
+                .then((columns) => ['layer' in columns])
+            : [false]
           const [hasMultiInvasions, multiInvasionMs] = await schema('incident')
             .columnInfo()
             .then((columns) => [
@@ -104,10 +112,12 @@ module.exports = class DbCheck {
                 this.models[category][j].isMad = isMad
                 this.models[category][j].pvpV2 = pvpV2
                 this.models[category][j].hasRewardAmount = hasRewardAmount
+                this.models[category][j].hasPowerUp = hasPowerUp
                 this.models[category][j].hasAltQuests = hasAltQuests
                 this.models[category][j].hasMultiInvasions = hasMultiInvasions
                 this.models[category][j].multiInvasionMs = multiInvasionMs
                 this.models[category][j].availableSlotsCol = availableSlotsCol
+                this.models[category][j].hasLayerColumn = hasLayerColumn
               }
             })
           })
@@ -152,24 +162,28 @@ module.exports = class DbCheck {
 
   async historicalRarity() {
     console.log('[DB] Setting historical rarity stats')
-    const results = await Promise.all(
-      this.models.Pokemon.map(async (source) =>
-        source.isMad
-          ? []
-          : source.SubModel.query()
-              .select('pokemon_id', raw('SUM(count) as total'))
-              .from('pokemon_stats')
-              .groupBy('pokemon_id'),
-      ),
-    )
-    this.setRarity(
-      results.map((result) =>
-        Object.fromEntries(
-          result.map((pkmn) => [`${pkmn.pokemon_id}`, +pkmn.total]),
+    try {
+      const results = await Promise.all(
+        (this.models.Pokemon ?? []).map(async (source) =>
+          source.isMad
+            ? []
+            : source.SubModel.query()
+                .select('pokemon_id', raw('SUM(count) as total'))
+                .from('pokemon_stats')
+                .groupBy('pokemon_id'),
         ),
-      ),
-      true,
-    )
+      )
+      this.setRarity(
+        results.map((result) =>
+          Object.fromEntries(
+            result.map((pkmn) => [`${pkmn.pokemon_id}`, +pkmn.total]),
+          ),
+        ),
+        true,
+      )
+    } catch (e) {
+      console.error('[DB] Failed to set historical rarity stats', e)
+    }
   }
 
   bindConnections(models) {
@@ -212,13 +226,21 @@ module.exports = class DbCheck {
   static deDupeResults(results) {
     if (results.length === 1) return results[0]
     if (results.length > 1) {
-      const returnObj = {}
-      for (let i = 0; i < results.length; i += 1) {
-        for (let j = 0; j < results[i].length; j += 1) {
-          returnObj[results[i][j].id] = results[i][j]
+      const returnObj = new Map()
+      const { length } = results
+      for (let i = 0; i < length; i += 1) {
+        const { length: subLength } = results[i]
+        for (let j = 0; j < subLength; j += 1) {
+          const item = results[i][j]
+          if (
+            !returnObj.has(item.id) ||
+            item.updated > returnObj.get(item.id).updated
+          ) {
+            returnObj.set(item.id, item)
+          }
         }
       }
-      return Object.values(returnObj)
+      return returnObj.values()
     }
     return []
   }

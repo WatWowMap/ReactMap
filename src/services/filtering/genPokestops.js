@@ -56,6 +56,17 @@ export default function genPokestops(t, pokemon, pokestops, categories) {
             }
           }
           break
+        case 'p':
+          if (tempObj.quest_reward_1) {
+            tempObj.quest_reward_1[id] = {
+              name: `x${id.slice(1)}`,
+              perms: ['quests'],
+            }
+            tempObj.quest_reward_1[id].searchMeta = `${t(
+              'quest_reward_1',
+            ).toLowerCase()} ${tempObj.quest_reward_1[id].name.toLowerCase()}`
+          }
+          break
         case 'q':
           if (tempObj.items) {
             tempObj.items[id] = {

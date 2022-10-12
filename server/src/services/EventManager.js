@@ -50,15 +50,19 @@ module.exports = class EventManager {
     setInterval(async () => {
       await this.getUicons(config.icons.styles)
     }, 1000 * 60 * 60 * (config.icons.cacheHrs || 3))
-    setInterval(async () => {
-      await this.getInvasions()
-    }, 1000 * 60 * 60 * (config.map.invasionCacheHrs || 1))
+    if (config.api.pogoApiEndpoints.invasions) {
+      setInterval(async () => {
+        await this.getInvasions(config.api.pogoApiEndpoints.invasions)
+      }, 1000 * 60 * 60 * (config.map.invasionCacheHrs || 1))
+    }
     setInterval(async () => {
       await Db.historicalRarity()
     }, 1000 * 60 * 60 * (config.api.queryUpdateHours.historicalRarity || 6))
-    setInterval(async () => {
-      await this.getMasterfile(Db.historical, Db.rarity)
-    }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
+    if (config.api.pogoApiEndpoints.masterfile) {
+      setInterval(async () => {
+        await this.getMasterfile(Db.historical, Db.rarity)
+      }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
+    }
     if (Pvp) {
       setInterval(async () => {
         console.log('[EVENT] Fetching Latest PVP Masterfile')
@@ -120,40 +124,17 @@ module.exports = class EventManager {
     this.uicons = this.uicons.filter(Boolean)
   }
 
-  async getInvasions() {
-    console.log('[EVENT] Fetching Latest Invasions')
-    try {
-      this.invasions = await fetchJson(
-        'https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/grunts.json',
-      ).then((response) =>
-        response
-          ? Object.fromEntries(
-              Object.entries(this.invasions).map(([type, info]) => {
-                const latest = response[type]
-                const newInvasion = this.invasions[type]
-                if (info.encounters) {
-                  Object.keys(info.encounters).forEach((position, i) => {
-                    if (latest?.active) {
-                      newInvasion.encounters[position] = latest.lineup.team[
-                        i
-                      ].map((pkmn, j) =>
-                        pkmn.template === 'UNSET' &&
-                        info.encounters[position][j]
-                          ? info.encounters[position][j]
-                          : { id: pkmn.id, form: pkmn.form },
-                      )
-                      newInvasion.second_reward =
-                        latest.lineup.rewards.length > 1
-                    }
-                  })
-                }
-                return [type, newInvasion]
-              }),
-            )
-          : this.invasions,
-      )
-    } catch (e) {
-      console.warn('[WARN] Unable to generate latest invasions:\n', e.message)
+  async getInvasions(endpoint) {
+    if (endpoint) {
+      console.log('[EVENT] Fetching Latest Invasions')
+      try {
+        const newInvasions = await fetchJson(endpoint)
+        if (newInvasions) {
+          this.invasions = newInvasions
+        }
+      } catch (e) {
+        console.warn('[WARN] Unable to generate latest invasions:\n', e.message)
+      }
     }
   }
 

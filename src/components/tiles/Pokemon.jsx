@@ -106,9 +106,10 @@ const PokemonTile = ({
   const pvpCheck = item.bestPvp !== null && item.bestPvp < 4
   const weatherCheck = item.weather && userSettings.weatherIndicator
 
-  const finalLocation = item.seen_type?.startsWith('nearby')
-    ? getOffset([item.lat, item.lon], item.seen_type, item.id)
-    : [item.lat, item.lon]
+  const finalLocation =
+    item.seen_type?.startsWith('nearby') || item.seen_type?.includes('lure')
+      ? getOffset([item.lat, item.lon], item.seen_type, item.id)
+      : [item.lat, item.lon]
 
   useForcePopup(item.id, markerRef, params, setParams, done)
 
@@ -125,7 +126,11 @@ const PokemonTile = ({
         zIndexOffset={item.iv * 100}
         position={finalLocation}
         icon={
-          pvpCheck || glowStatus || ivCircle || weatherCheck
+          pvpCheck ||
+          glowStatus ||
+          ivCircle ||
+          weatherCheck ||
+          item.seen_type === 'nearby_cell'
             ? fancyMarker(
                 url,
                 size,

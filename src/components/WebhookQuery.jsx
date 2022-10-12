@@ -30,7 +30,7 @@ export default function WebhookQuery({
   return data ? (
     <Container
       location={
-        data[`${lowercase}Single`]
+        data[`${lowercase}Single`]?.lat && data[`${lowercase}Single`]?.lon
           ? [data[`${lowercase}Single`].lat, data[`${lowercase}Single`].lon]
           : location
       }
