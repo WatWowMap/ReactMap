@@ -116,6 +116,7 @@ const checkExtraJsons = (fileName, domain = '') => {
       )
     }
     return {
+      components: [],
       ...generalJson,
       ...domainJson,
     }
