@@ -5,10 +5,10 @@ const { Event } = require('../initialization')
 module.exports = async function fetchQuests() {
   try {
     const quests = await fetchJson(
-      'https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/quests.json',
+      'https://raw.githubusercontent.com/ReuschelCGN/pogoinfo/v2/active/quests.json',
     )
     const grunts = await fetchJson(
-      'https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/grunts.json',
+      'https://raw.githubusercontent.com/ReuschelCGN/pogoinfo/v2/active/grunts.json',
     )
     const questsInfo = []
     Object.values(quests).forEach((questType) => {
