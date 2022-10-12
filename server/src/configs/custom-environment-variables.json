@@ -320,6 +320,10 @@
       "internationalWomensDay": {
         "__name": "MAP_HOLIDAY_EFFECTS_INTERNATIONAL_WOMENS_DAY",
         "__format": "boolean"
+      },
+      "halloweenEffect": {
+        "__name": "MAP_HOLIDAY_EFFECTS_HALLOWEEN_EFFECT",
+        "__format": "boolean"
       }
     },
     "misc": {
