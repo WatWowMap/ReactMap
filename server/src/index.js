@@ -140,7 +140,7 @@ app.use(express.static(path.join(__dirname, config.devOptions.clientPath)))
 
 app.use(
   session({
-    name: 'discord',
+    name: 'reactmap',
     key: 'session',
     secret: config.api.sessionSecret,
     store: sessionStore,
