@@ -12,6 +12,8 @@
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
     "reactMapSecret": "",
+    "showSchemasInConfigApi": false,
+    "showStrategiesInConfigApi": false,
     "maxSessions": 5,
     "sessionCheckIntervalMs": 900000,
     "cookieAgeDays": 7,

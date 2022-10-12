@@ -27,6 +27,14 @@
   "api": {
     "sessionSecret": "API_SESSION_SECRET",
     "reactMapSecret": "API_REACT_MAP_SECRET",
+    "showSchemasInConfigApi": {
+      "__name": "API_SHOW_SCHEMAS_IN_CONFIG_API",
+      "__format": "boolean"
+    },
+    "showStrategiesInConfigApi": {
+      "__name": "API_SHOW_STRATEGIES_IN_CONFIG_API",
+      "__format": "boolean"
+    },
     "maxSessions": {
       "__name": "API_MAX_SESSIONS",
       "__format": "number"

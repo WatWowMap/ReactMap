@@ -14,23 +14,25 @@ const { Session } = require('../models/index')
 
 const dbSelection = schemas.find(({ useFor }) => useFor?.includes('session'))
 
-const sessionStore = new MySQLStore(
-  {
-    clearExpired: true,
-    checkExpirationInterval: sessionCheckIntervalMs,
-    createDatabaseTable: true,
-    schema: {
-      tableName: sessionTableName,
-    },
-  },
-  mysql2.createPool({
-    host: dbSelection.host,
-    port: dbSelection.port,
-    user: dbSelection.username,
-    password: dbSelection.password,
-    database: dbSelection.database,
-  }),
-)
+const sessionStore = dbSelection
+  ? new MySQLStore(
+      {
+        clearExpired: true,
+        checkExpirationInterval: sessionCheckIntervalMs,
+        createDatabaseTable: true,
+        schema: {
+          tableName: sessionTableName,
+        },
+      },
+      mysql2.createPool({
+        host: dbSelection.host,
+        port: dbSelection.port,
+        user: dbSelection.username,
+        password: dbSelection.password,
+        database: dbSelection.database,
+      }),
+    )
+  : null
 
 const isValidSession = async (userId) => {
   try {
