@@ -1,65 +1,89 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Map</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Map</title>
-</head>
-
-<body>
-  <div id="loader" class="loader-flex">
-    <div class="progress-root color-primary progress-indeterminate" role="progressbar"
-      style="width: 40px; height: 40px;">
-      <svg class="progress-svg" viewBox="22 22 44 44">
-        <circle class="progress-circle circle-indeterminate" cx="44" cy="44" r="20.2" fill="none" stroke-width="3.6">
-        </circle>
-      </svg>
+  <body>
+    <div id="loader" class="loader-flex">
+      <div
+        class="progress-root color-primary progress-indeterminate"
+        role="progressbar"
+        style="width: 40px; height: 40px"
+      >
+        <svg class="progress-svg" viewBox="22 22 44 44">
+          <circle
+            class="progress-circle circle-indeterminate"
+            cx="44"
+            cy="44"
+            r="20.2"
+            fill="none"
+            stroke-width="3.6"
+          ></circle>
+        </svg>
+      </div>
+      <div style="height: 10px"></div>
+      <h4 id="loading-text" class="loading-text"></h4>
+      <noscript>
+        <h4 class="loading-text">This app requires JavaScript</h4>
+      </noscript>
     </div>
-    <div style="height: 10px"></div>
-    <h4 id="loading-text" class="loading-text"></h4>
-    <noscript>
-      <h4 class="loading-text">
-        This app requires JavaScript
-      </h4>
-    </noscript>
-  </div>
-  <script>
-    const locales = {
-      de: 'Map wird geladen',
-      en: 'Loading Map',
-      es: 'Cargando Mapa',
-      fr: 'Chargement de la Map',
-      it: 'Caricamento Mappa',
-      ja: 'マップを読み込み中',
-      ko: '맵 로딩 중',
-      nl: 'Map word geladen',
-      pl: 'Ładowanie mapy',
-      'pt-br': 'Carregando Mapa',
-      ru: 'Загрузка карты',
-      sv: 'Laddar karta',
-      th: 'กำลังโหลดแผนที่',
-      'zh-tw': '載入地圖中'
-    }
-    const locale = window?.localStorage?.getItem('i18nextLng') || 'en'
-    const element = document.getElementById('loading-text')
-    if (element) element.innerText = locales[locale.toLowerCase()];
-  </script>
-  <div id="root"></div>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
-    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-    crossorigin="anonymous" />
-  <link rel="stylesheet" href="https://unpkg.com/react-leaflet-markercluster/dist/styles.min.css" />
-  <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.73.0/dist/L.Control.Locate.min.css" />
+    <canvas id="holiday-canvas"></canvas>
+    <script>
+      const locales = {
+        de: 'Map wird geladen',
+        en: 'Loading Map',
+        es: 'Cargando Mapa',
+        fr: 'Chargement de la Map',
+        it: 'Caricamento Mappa',
+        ja: 'マップを読み込み中',
+        ko: '맵 로딩 중',
+        nl: 'Map word geladen',
+        pl: 'Ładowanie mapy',
+        'pt-br': 'Carregando Mapa',
+        ru: 'Загрузка карты',
+        sv: 'Laddar karta',
+        th: 'กำลังโหลดแผนที่',
+        'zh-tw': '載入地圖中',
+      }
+      const locale = window?.localStorage?.getItem('i18nextLng') || 'en'
+      const element = document.getElementById('loading-text')
+      if (element) element.innerText = locales[locale.toLowerCase()]
+    </script>
+    <div id="root"></div>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/react-leaflet-markercluster/dist/styles.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.73.0/dist/L.Control.Locate.min.css"
+    />
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
-
-</body>
-
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.0.7/css/all.css"
+    />
+  </body>
 </html>
