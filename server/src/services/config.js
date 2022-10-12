@@ -156,13 +156,22 @@ const mergeMapConfig = (obj) => {
     }
   })
 
+  if (
+    obj?.holidayEffects &&
+    !Array.isArray(obj?.holidayEffects) &&
+    typeof obj?.holidayEffects === 'object'
+  ) {
+    console.warn(
+      '[CONFIG] holidayEffects has been changed to an array, please update your config. Check out `server/src/configs/default.json` for an example.',
+    )
+    obj.holidayEffects = []
+  }
   return {
     localeSelection: obj.localeSelection,
     ...obj,
     ...obj.general,
     ...obj.customRoutes,
     ...obj.links,
-    ...obj.holidayEffects,
     ...obj.misc,
     messageOfTheDay: {
       ...obj.messageOfTheDay,
@@ -179,7 +188,6 @@ const mergeMapConfig = (obj) => {
     general: undefined,
     customRoutes: undefined,
     links: undefined,
-    holidayEffects: undefined,
     misc: undefined,
   }
 }
