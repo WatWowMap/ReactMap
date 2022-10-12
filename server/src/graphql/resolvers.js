@@ -23,7 +23,7 @@ module.exports = {
       return {
         ...available,
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
-        filters: Utility.buildDefaultFilters(perms, available),
+        filters: Utility.buildDefaultFilters(perms, available, Db.models),
       }
     },
     badges: async (_, _args, { req, perms, Db, serverV, clientV }) => {
@@ -387,6 +387,21 @@ module.exports = {
     checkUsername: async (_, args) => {
       const results = await User.query().where('username', args.username)
       return Boolean(results.length)
+    },
+    setExtraFields: async (_, { key, value }, { req }) => {
+      if (req.user?.id) {
+        const user = await User.query().findById(req.user.id)
+        if (user) {
+          const data =
+            typeof user.data === 'string'
+              ? JSON.parse(user.data)
+              : user.data || {}
+          data[key] = value
+          await user.$query().update({ data: JSON.stringify(data) })
+        }
+        return true
+      }
+      return false
     },
     setGymBadge: async (_, args, { req }) => {
       const perms = req.user ? req.user.perms : false

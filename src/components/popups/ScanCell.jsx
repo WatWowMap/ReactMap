@@ -3,6 +3,7 @@ import { Typography } from '@material-ui/core'
 import { Trans, useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+import ErrorBoundary from '@components/ErrorBoundary'
 
 export default function ScanCellPopup({ cell, ts }) {
   const { t } = useTranslation()
@@ -18,7 +19,7 @@ export default function ScanCellPopup({ cell, ts }) {
   })
 
   return (
-    <>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Typography variant="h6" align="center">
         <Trans i18nKey="s2_cell_level">{{ level: 15 }}</Trans>
       </Typography>
@@ -34,6 +35,6 @@ export default function ScanCellPopup({ cell, ts }) {
       <Typography variant="subtitle1" align="center">
         {t('id')}: {id}
       </Typography>
-    </>
+    </ErrorBoundary>
   )
 }

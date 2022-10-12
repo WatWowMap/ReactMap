@@ -1,5 +1,4 @@
 const { Event } = require('../initialization')
-const { map } = require('../config')
 
 const categories = {
   gyms: ['teams', 'eggs', 'raids', 'pokemon'],
@@ -12,13 +11,11 @@ const categories = {
     'quest_reward_4',
     'quest_reward_9',
     'quest_reward_3',
+    'quest_reward_1',
+    'general',
   ],
   pokemon: ['pokemon'],
   nests: ['pokemon'],
-}
-
-if (map.enableQuestRewardTypeFilters) {
-  categories.pokestops.push('general')
 }
 
 const baseRarity = [

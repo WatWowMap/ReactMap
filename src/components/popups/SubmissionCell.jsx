@@ -3,6 +3,7 @@ import { Typography } from '@material-ui/core'
 import { Trans, useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+import ErrorBoundary from '@components/ErrorBoundary'
 
 export default function SubmissionCellPopup({ cell }) {
   const { t } = useTranslation()
@@ -24,7 +25,7 @@ export default function SubmissionCellPopup({ cell }) {
   }, [])
 
   return (
-    <>
+    <ErrorBoundary noRefresh style={{}} variant="h5">
       <Typography variant="h6" align="center">
         <Trans i18nKey="s2_cell_level">{{ level: cell.level }}</Trans>
       </Typography>
@@ -40,6 +41,6 @@ export default function SubmissionCellPopup({ cell }) {
       <Typography variant="subtitle2" align="center">
         {t('next_gym')}: {untilNextGym}
       </Typography>
-    </>
+    </ErrorBoundary>
   )
 }

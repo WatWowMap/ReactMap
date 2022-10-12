@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { Grid, Fab } from '@material-ui/core'
 import {
   Menu,
-  LocationOn,
+  MyLocation,
   ZoomIn,
   ZoomOut,
   Search,
@@ -70,7 +70,7 @@ export default function FloatingButtons({
   const showDonorPage =
     (perms.donor ? donationPage.showToDonors : true) &&
     donationPage.showOnMap &&
-    donationPage.components.length
+    donationPage?.components?.length
 
   const DonorIcon = showDonorPage
     ? DonationIcons[donationPage.fabIcon || 'card']
@@ -216,7 +216,7 @@ export default function FloatingButtons({
               onClick={() => lc._onClick()}
               title={t('use_my_location')}
             >
-              <LocationOn color={color} fontSize={iconSize} />
+              <MyLocation color={color} fontSize={iconSize} />
             </Fab>
           </Grid>
           <Grid item>

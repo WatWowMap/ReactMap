@@ -15,6 +15,7 @@ import {
   CardContent,
   IconButton,
   Dialog,
+  TextField,
 } from '@material-ui/core'
 import { Edit } from '@material-ui/icons'
 import { useTranslation } from 'react-i18next'
@@ -72,6 +73,7 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
         <TabPanel value={tab} index={0}>
           <div style={{ minHeight: '70vh' }}>
             <LinkProfiles auth={auth} t={t} />
+            <ExtraFields auth={auth} />
             <GymBadges
               badges={auth.badges}
               isMobile={isMobile}
@@ -187,6 +189,54 @@ const LinkProfiles = ({ auth, t }) => {
         />
       )}
     </>
+  )
+}
+
+const ExtraFields = ({ auth }) => {
+  const extraUserFields = useStatic((state) => state.extraUserFields)
+  const setAuth = useStatic((state) => state.setAuth)
+
+  const [setField] = useMutation(Query.user('setExtraFields'))
+
+  return (
+    <Grid
+      container
+      alignItems="center"
+      justifyContent="center"
+      style={{ marginBottom: 10 }}
+    >
+      {extraUserFields.map((field) => {
+        const locale = localStorage.getItem('i18nextLng') || 'en'
+        const label =
+          typeof field === 'string' ? field : field[locale] || field.name
+        const key = typeof field === 'string' ? field : field.database
+        if (!key || !label) return null
+        return (
+          <Grid key={label} item xs={5} style={{ margin: '10px 0' }}>
+            <TextField
+              variant="outlined"
+              label={label}
+              value={auth.data?.[key] || ''}
+              onChange={({ target: { value } }) => {
+                setAuth({
+                  ...auth,
+                  data: {
+                    ...auth.data,
+                    [key]: value,
+                  },
+                })
+                setField({
+                  variables: {
+                    key,
+                    value,
+                  },
+                })
+              }}
+            />
+          </Grid>
+        )
+      })}
+    </Grid>
   )
 }
 
