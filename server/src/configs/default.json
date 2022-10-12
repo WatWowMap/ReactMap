@@ -12,7 +12,10 @@
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
     "reactMapSecret": "",
+    "showSchemasInConfigApi": false,
+    "showStrategiesInConfigApi": false,
     "maxSessions": 5,
+    "sessionCheckIntervalMs": 900000,
     "cookieAgeDays": 7,
     "rateLimit": {
       "time": 60,
@@ -142,7 +145,6 @@
     },
     "misc": {
       "enableMapJsFilter": true,
-      "questRewardTypeFilters": false,
       "fetchLatestInvasions": true,
       "invasionCacheHrs": 1,
       "masterfileCacheHrs": 6,
@@ -388,6 +390,12 @@
         "max": 2000,
         "interval": 100,
         "enabled": true
+      },
+      "xp": {
+        "min": 100,
+        "max": 1000,
+        "interval": 100,
+        "enabled": true
       }
     },
     "pokemon": {
@@ -449,9 +457,8 @@
       "gymBadgeTableName": "gymBadges",
       "sessionTableName": "session",
       "migrationTableName": "knex_migrations",
-      "joinGymBadgeTable": false,
-      "hideOldQuests": false,
-      "maxConnections": 10
+      "maxConnections": 10,
+      "extraUserFields": []
     },
     "schemas": []
   },

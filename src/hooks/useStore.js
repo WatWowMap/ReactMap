@@ -138,4 +138,6 @@ export const useStatic = create((set) => ({
   setFeedback: (feedback) => set({ feedback }),
   resetFilters: false,
   setResetFilters: (resetFilters) => set({ resetFilters }),
+  extraUserFields: [],
+  setExtraUserFields: (extraUserFields) => set({ extraUserFields }),
 }))

@@ -20,7 +20,10 @@ rootRouter.use('/auth', authRouter)
 rootRouter.use('/api', apiRouter)
 
 rootRouter.get('/logout', (req, res) => {
-  req.logout()
+  req.logout((err) => {
+    if (err) console.error('[AUTH] Unable to logout', err)
+  })
+  req.session.destroy()
   res.redirect('/')
 })
 
@@ -177,6 +180,7 @@ rootRouter.get('/settings', async (req, res) => {
         gymValidDataLimit:
           Date.now() / 1000 - config.api.gymValidDataLimit * 86400,
       },
+      extraUserFields: config.database.settings.extraUserFields,
       available: { pokemon: [], pokestops: [], gyms: [], nests: [] },
     }
 
@@ -258,6 +262,7 @@ rootRouter.get('/settings', async (req, res) => {
       serverSettings.defaultFilters = Utility.buildDefaultFilters(
         serverSettings.user.perms,
         serverSettings.available,
+        Db.models,
       )
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile

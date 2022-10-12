@@ -1,6 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable import/no-dynamic-require */
-/* eslint-disable global-require */
 process.title = 'ReactMap'
 
 const path = require('path')
@@ -74,6 +72,21 @@ const server = new ApolloServer({
     }
     return { message: e.message }
   },
+  formatResponse: (data, context) => {
+    if (config.devOptions.enabled) {
+      const endpoint =
+        context?.operation?.selectionSet?.selections?.[0]?.name?.value
+      const returned = data?.data?.[endpoint]?.length
+      console.log(
+        '[GQL]',
+        'Endpoint:',
+        endpoint,
+        returned ? 'Returned:' : '',
+        returned || '',
+      )
+    }
+    return null
+  },
 })
 
 server.start().then(() => server.applyMiddleware({ app, path: '/graphql' }))
@@ -82,6 +95,7 @@ if (config.devOptions.enabled) {
   app.use(
     logger((tokens, req, res) =>
       [
+        '[EXPRESS]',
         tokens.method(req, res),
         tokens.url(req, res),
         tokens.status(req, res),
@@ -126,7 +140,7 @@ app.use(express.static(path.join(__dirname, config.devOptions.clientPath)))
 
 app.use(
   session({
-    name: 'discord',
+    name: 'reactmap',
     key: 'session',
     secret: config.api.sessionSecret,
     store: sessionStore,

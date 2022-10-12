@@ -67,7 +67,7 @@ export default function Nav({
     type: '',
   })
   const [motd, setMotd] = useState(
-    messageOfTheDay.components.length &&
+    messageOfTheDay.components?.length &&
       (messageOfTheDay.index > motdIndex ||
         messageOfTheDay.settings.permanent) &&
       ((perms.donor

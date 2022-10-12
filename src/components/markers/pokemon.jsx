@@ -50,6 +50,18 @@ export const fancyMarker = (
           width: size,
         }}
       />
+      {pkmn.seen_type === 'nearby_cell' && (
+        <img
+          src={Icons.getMisc('grass')}
+          alt="nearby_cell"
+          style={{
+            width: size / 1.5,
+            height: 'auto',
+            bottom: (-size / 5) * pokemonMod.offsetY,
+            left: `10%`,
+          }}
+        />
+      )}
       {badge && (
         <img
           src={Icons.getMisc(badge)}

@@ -5,7 +5,6 @@ const {
     pvp: { levels },
   },
 } = require('../config')
-const dbSelection = require('../functions/dbSelection')
 
 module.exports = function clientOptions(perms) {
   // the values here are the relevant perms to use them, they are looped through and the values are set based on your config, then the type is set based off of those values in the above function
@@ -80,9 +79,6 @@ module.exports = function clientOptions(perms) {
   }
   if (clientSideOptions.pokemon.glow.length) {
     clientMenus.pokemon.glow = { type: 'bool', sub: {}, perm: ['pokemon'] }
-  }
-  if (dbSelection('pokestop').type === 'mad') {
-    clientMenus.pokestops.madQuestText = { type: 'bool', perm: ['quests'] }
   }
 
   // only the keys & values are stored locally

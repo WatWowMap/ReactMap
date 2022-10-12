@@ -38,6 +38,7 @@ export default function useConfig(serverSettings, params) {
   const setStaticFilters = useStatic((state) => state.setFilters)
   const setWebhookData = useStatic((state) => state.setWebhookData)
   const setIsNight = useStatic((state) => state.setIsNight)
+  const setExtraUserFields = useStatic((state) => state.setExtraUserFields)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
 
@@ -58,14 +59,15 @@ export default function useConfig(serverSettings, params) {
   }
 
   setAuth({
-    strategy: serverSettings.user.strategy,
-    discordId: serverSettings.user.discordId,
-    telegramId: serverSettings.user.telegramId,
-    webhookStrategy: serverSettings.user.webhookStrategy,
+    strategy: serverSettings.user?.strategy || '',
+    discordId: serverSettings.user?.discordId || '',
+    telegramId: serverSettings.user?.telegramId || '',
+    webhookStrategy: serverSettings.user?.webhookStrategy || '',
     loggedIn: serverSettings.loggedIn,
     perms: serverSettings.user ? serverSettings.user.perms : {},
     methods: serverSettings.authMethods,
-    username: serverSettings.user.username,
+    username: serverSettings.user?.username || '',
+    data: serverSettings.user?.data || {},
   })
   Sentry.setUser({
     username: serverSettings.user.username,
@@ -86,6 +88,7 @@ export default function useConfig(serverSettings, params) {
   setAvailable(serverSettings.available)
   setMenus(updateObjState(serverSettings.menus, 'menus'))
   setStaticMenus(serverSettings.menus)
+  setExtraUserFields(serverSettings.extraUserFields)
 
   if (localState?.state?.filters?.pokemon?.standard) {
     delete localState.state.filters.pokemon.standard
