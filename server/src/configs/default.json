@@ -141,7 +141,8 @@
       "christmasSnow": true,
       "newYearsFireworks": true,
       "valentinesDay": true,
-      "internationalWomensDay": true
+      "internationalWomensDay": true,
+      "halloweenEffect": true
     },
     "misc": {
       "enableMapJsFilter": true,
