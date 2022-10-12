@@ -174,14 +174,17 @@ const mergeMapConfig = (obj) => {
     ...obj.links,
     ...obj.misc,
     messageOfTheDay: {
+      ...config.map.messageOfTheDay,
       ...obj.messageOfTheDay,
       ...checkExtraJsons('messageOfTheDay', obj.domain),
     },
     donationPage: {
+      ...config.map.donationPage,
       ...obj.donationPage,
       ...checkExtraJsons('donationPage', obj.domain),
     },
     loginPage: {
+      ...config.map.loginPage,
       ...obj.loginPage,
       ...checkExtraJsons('loginPage', obj.domain),
     },
