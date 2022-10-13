@@ -550,5 +550,17 @@
   "ultra_beast": "Ultra Bête",
   "quest_condition": "État de la quête",
   "always_show_labels": "Toujours afficher les étiquettes",
-  "scan_areas_options": "Options des zones de numérisation"
+  "scan_areas_options": "Options des zones de numérisation",
+  "historic_rarity": "Rareté historique",
+  "poi": "Points d'interêts",
+  "300m_range": "Portée 300m",
+  "lure_range": "Gamme de leurres",
+  "tap_to_toggle": "Appuyez pour basculer",
+  "power_up": "Mise sous tension",
+  "never_alt": "Jamais",
+  "seen_nearby_stop": "Vu à proximité",
+  "seen_nearby_cell": "Vu dans cette cellule",
+  "seen_lure_encounter": "Rencontre de leurre",
+  "seen_lure_wild": "Frai de leurre",
+  "seen_wild": "Frai sauvage"
 }

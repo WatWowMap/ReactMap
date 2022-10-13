@@ -546,5 +546,17 @@
   "ultra_beast": "Ultrabeest",
   "quest_condition": "Quest-voorwaarde",
   "always_show_labels": "Altijd labels weergeven",
-  "scan_areas_options": "Opties voor scangebieden"
+  "scan_areas_options": "Opties voor scangebieden",
+  "historic_rarity": "Historische zeldzaamheid",
+  "poi": "Nuttige Plaatsen",
+  "300m_range": "300m bereik",
+  "lure_range": "Lokbereik",
+  "tap_to_toggle": "Tik om te wisselen",
+  "power_up": "Opstarten",
+  "never_alt": "Nooit",
+  "seen_nearby_stop": "In de buurt gezien",
+  "seen_nearby_cell": "Gezien in deze cel",
+  "seen_lure_encounter": "Ontmoeting met lokken",
+  "seen_lure_wild": "lokken spawn",
+  "seen_wild": "Wilde spawn"
 }
