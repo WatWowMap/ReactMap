@@ -104,7 +104,7 @@ const PokestopTile = ({
         {showCircles && (
           <Circle
             center={[item.lat, item.lon]}
-            radius={70}
+            radius={80}
             pathOptions={{ color: '#0DA8E7', weight: 1 }}
           />
         )}
@@ -112,7 +112,7 @@ const PokestopTile = ({
           <Circle
             center={[item.lat, item.lon]}
             radius={40}
-            pathOptions={{ color: '#0DA8E7', weight: 1 }}
+            pathOptions={{ color: '#32cd32', weight: 1 }}
           />
         )}
       </Marker>
