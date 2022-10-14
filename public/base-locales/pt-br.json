@@ -514,5 +514,17 @@
   "ultra_beast": "Ultra Besta",
   "quest_condition": "Condição da Missão",
   "always_show_labels": "Sempre mostrar marcadores",
-  "scan_areas_options": "Opções de áreas de digitalização"
+  "scan_areas_options": "Opções de áreas de digitalização",
+  "historic_rarity": "Raridade Histórica",
+  "poi": "Pontos de interesse",
+  "300m_range": "Alcance de 300m",
+  "lure_range": "Alcance da isca",
+  "tap_to_toggle": "Toque para alternar",
+  "power_up": "Energizar",
+  "never_alt": "Nunca",
+  "seen_nearby_stop": "Visto nas proximidades",
+  "seen_nearby_cell": "Visto nesta célula",
+  "seen_lure_encounter": "Encontro de atração",
+  "seen_lure_wild": "Lure Spawn",
+  "seen_wild": "Cria Selvagem"
 }
