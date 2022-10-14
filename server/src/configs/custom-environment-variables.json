@@ -305,26 +305,8 @@
       "rolesLink": "MAP_LINKS_ROLES_LINK"
     },
     "holidayEffects": {
-      "christmasSnow": {
-        "__name": "MAP_HOLIDAY_EFFECTS_CHRISTMAS_SNOW",
-        "__format": "boolean"
-      },
-      "newYearsFireworks": {
-        "__name": "MAP_HOLIDAY_EFFECTS_NEW_YEARS_FIREWORKS",
-        "__format": "boolean"
-      },
-      "valentinesDay": {
-        "__name": "MAP_HOLIDAY_EFFECTS_VALENTINES_DAY",
-        "__format": "boolean"
-      },
-      "internationalWomensDay": {
-        "__name": "MAP_HOLIDAY_EFFECTS_INTERNATIONAL_WOMENS_DAY",
-        "__format": "boolean"
-      },
-      "halloweenEffect": {
-        "__name": "MAP_HOLIDAY_EFFECTS_HALLOWEEN_EFFECT",
-        "__format": "boolean"
-      }
+      "__name": "MAP_HOLIDAY_EFFECTS",
+      "__format": "json"
     },
     "misc": {
       "enableMapJsFilter": {

@@ -66,9 +66,7 @@ export default function Config() {
         getServerSettings={getServerSettings}
       />
       <HolidayEffects
-        mapSettings={
-          serverSettings?.config?.map ? serverSettings.config.map : {}
-        }
+        holidayEffects={serverSettings?.config?.map?.holidayEffects || []}
       />
     </ThemeProvider>
   )
