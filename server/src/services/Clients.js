@@ -7,7 +7,6 @@ module.exports = Object.fromEntries(
   config.authentication.strategies
     .filter(({ name, enabled }) => {
       if (enabled) {
-        require(resolve(__dirname, `../strategies/${name}.js`))
         console.log(`[AUTH] Strategy ${name} initialized`)
       } else {
         console.log(`[AUTH] Strategy ${name} was not initialized`)
