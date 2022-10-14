@@ -35,6 +35,7 @@ const authHandler = async (req, username, password, done) => {
       webhooks: [],
       scanner: [],
     },
+    rmStrategy: path.parse(__filename).name,
   }
 
   try {
@@ -100,3 +101,5 @@ passport.use(
     authHandler,
   ),
 )
+
+module.exports = null
