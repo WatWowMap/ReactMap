@@ -12,10 +12,11 @@ const {
 const Utility = require('./Utility')
 
 module.exports = class DiscordMapClient {
-  constructor(client, config, accessToken) {
+  constructor(client, config, logChannelId) {
     this.client = client
     this.config = config
-    this.accessToken = accessToken
+    this.accessToken = null
+    this.logChannelId = logChannelId
     this.discordEvents()
   }
 
@@ -131,12 +132,14 @@ module.exports = class DiscordMapClient {
     return perms
   }
 
-  async sendMessage(channelId, message) {
-    if (!channelId) {
+  async sendMessage(message) {
+    if (!this.logChannelId || typeof message !== 'object') {
       return
     }
     try {
-      const channel = await this.client.channels.cache.get(channelId).fetch()
+      const channel = await this.client.channels.cache
+        .get(this.logChannelId)
+        .fetch()
       if (channel && message) {
         channel.send(message)
       }

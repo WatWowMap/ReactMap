@@ -23,6 +23,7 @@ const authHandler = async (req, profile, done) => {
       areaRestrictions: [],
       webhooks: [],
     },
+    rmStrategy: path.parse(__filename).name,
   }
 
   const chatInfo = [user.id]
@@ -146,3 +147,5 @@ passport.use(
     authHandler,
   ),
 )
+
+module.exports = null

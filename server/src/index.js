@@ -150,15 +150,6 @@ app.use(
   }),
 )
 
-config.authentication.strategies.forEach((strategy) => {
-  if (strategy.enabled) {
-    require(`./strategies/${strategy.name}.js`)
-    console.log(`[AUTH] Strategy ${strategy.name} initialized`)
-  } else {
-    console.log(`[AUTH] Strategy ${strategy.name} was not initialized`)
-  }
-})
-
 app.use(passport.initialize())
 
 app.use(passport.session())

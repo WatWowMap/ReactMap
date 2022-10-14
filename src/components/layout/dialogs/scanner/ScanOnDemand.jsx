@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import React, { useEffect, useState } from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useStore } from '@hooks/useStore'
 import Query from '@services/Query'
 import ScanNextTarget from './ScanNextTarget'
 import ScanZoneTarget from './ScanZoneTarget'
@@ -27,8 +27,6 @@ export default function ScanOnDemand({
   },
   mode,
 }) {
-  const { loggedIn } = useStatic((state) => state.auth)
-
   const location = useStore((s) => s.location)
 
   const [queue, setQueue] = useState('init')
@@ -44,8 +42,6 @@ export default function ScanOnDemand({
         category: mode,
         method: 'GET',
         data: {
-          username: loggedIn?.username || 'a visitor',
-          userId: loggedIn?.id,
           scanLocation,
           scanCoords,
           scanNextType,
@@ -61,8 +57,6 @@ export default function ScanOnDemand({
         category: 'getQueue',
         method: 'GET',
         data: {
-          username: loggedIn?.username || 'a visitor',
-          userId: loggedIn?.id,
           type: 'scan_next',
           typeName: mode,
         },
