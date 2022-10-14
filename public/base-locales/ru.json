@@ -514,5 +514,17 @@
   "ultra_beast": "Ультра Чудовище",
   "quest_condition": "Состояние квеста",
   "always_show_labels": "Всегда показывать ярлыки",
-  "scan_areas_options": "Параметры областей сканирования"
+  "scan_areas_options": "Параметры областей сканирования",
+  "historic_rarity": "Историческая редкость",
+  "poi": "Точки интереса",
+  "300m_range": "300 м Диапазон",
+  "lure_range": "Диапазон приманки",
+  "tap_to_toggle": "Нажмите, чтобы переключить",
+  "power_up": "Включите питание",
+  "never_alt": "Никогда",
+  "seen_nearby_stop": "Видел поблизости",
+  "seen_nearby_cell": "Видно в этой ячейке",
+  "seen_lure_encounter": "Приманка",
+  "seen_lure_wild": "Приманка Спаун",
+  "seen_wild": "Дикое отродье"
 }

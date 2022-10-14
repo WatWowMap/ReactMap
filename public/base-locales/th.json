@@ -514,5 +514,17 @@
   "ultra_beast": "อุลตร้าบีสท์",
   "quest_condition": "เงื่อนไขภารกิจ",
   "always_show_labels": "แสดงป้ายกำกับเสมอ",
-  "scan_areas_options": "ตัวเลือกพื้นที่สแกน"
+  "scan_areas_options": "ตัวเลือกพื้นที่สแกน",
+  "historic_rarity": "ความหายากทางประวัติศาสตร์",
+  "poi": "จุดสนใจ",
+  "300m_range": "ระยะ 300 เมตร",
+  "lure_range": "ช่วงล่อ",
+  "tap_to_toggle": "แตะเพื่อสลับ",
+  "power_up": "เพิ่มพลัง",
+  "never_alt": "ไม่เคย",
+  "seen_nearby_stop": "เห็นอยู่ใกล้ๆ",
+  "seen_nearby_cell": "เห็นในเซลล์นี้",
+  "seen_lure_encounter": "ล่อเผชิญหน้า",
+  "seen_lure_wild": "วางไข่ล่อ",
+  "seen_wild": "วางไข่ป่า"
 }

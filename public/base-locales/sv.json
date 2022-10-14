@@ -514,5 +514,17 @@
   "ultra_beast": "Ultra Beast",
   "quest_condition": "Quest tillstånd",
   "always_show_labels": "Visa alltid etiketter",
-  "scan_areas_options": "Alternativ för skanningsområden"
+  "scan_areas_options": "Alternativ för skanningsområden",
+  "historic_rarity": "Historisk sällsynthet",
+  "poi": "Intressepunkter",
+  "300m_range": "300 m räckvidd",
+  "lure_range": "Lure Range",
+  "tap_to_toggle": "Tryck för att växla",
+  "power_up": "Slå på",
+  "never_alt": "Aldrig",
+  "seen_nearby_stop": "Ses i närheten",
+  "seen_nearby_cell": "Ses i denna cell",
+  "seen_lure_encounter": "Lure Encounter",
+  "seen_lure_wild": "Lure Spawn",
+  "seen_wild": "Wild Spawn"
 }
