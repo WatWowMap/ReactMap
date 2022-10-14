@@ -31,6 +31,8 @@ const MapClient = new DiscordMapClient(
   client,
   { ...strategyConfig, perms },
   strategyConfig.logChannelId,
+  strategyConfig.scanNextLogChannelId,
+  strategyConfig.scanZoneLogChannelId,
 )
 
 const authHandler = async (req, accessToken, refreshToken, profile, done) => {

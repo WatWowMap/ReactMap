@@ -559,6 +559,8 @@
         "type": "discord",
         "enabled": false,
         "logChannelId": "",
+        "scanNextLogChannelId": "",
+        "scanZoneLogChannelId": "",
         "presence": "Map Status: Online",
         "presenceType": 3,
         "botToken": "",

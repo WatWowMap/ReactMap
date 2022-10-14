@@ -50,13 +50,16 @@ module.exports = async function scannerApi(
         break
     }
     const payloadObj = {}
+    const cache = userCache.has(user.id)
+      ? userCache.get(user.id)
+      : { coordinates: 0, requests: 0 }
+
     switch (category) {
       case 'scanNext':
-        userCache.set(
-          user.id,
-          userCache.has(user.id) ? userCache.get(user.id) + 1 : 1,
-        )
-
+        userCache.set(user.id, {
+          coordinates: cache.coordinates + coords.length,
+          requests: cache.requests + 1,
+        })
         console.log(
           `[scannerApi] Request to scan new location by ${user.username}${
             user.id ? ` (${user.id})` : ''
@@ -83,11 +86,10 @@ module.exports = async function scannerApi(
         })
         break
       case 'scanZone':
-        userCache.set(
-          user.id,
-          userCache.has(user.id) ? userCache.get(user.id) + 1 : 1,
-        )
-
+        userCache.set(user.id, {
+          coordinates: cache.coordinates + coords.length,
+          requests: cache.requests + 1,
+        })
         console.log(
           `[scannerApi] Request to scan new zone by ${user.username}${
             user.id ? ` (${user.id})` : ''
@@ -160,73 +162,67 @@ module.exports = async function scannerApi(
 
     if (Clients[user.rmStrategy]) {
       const capitalized = category.replace('scan', 'Scan ')
+      const updatedCache = userCache.get(user.id)
       const trimmed = coords
         .filter((_c, i) => i < 25)
         .map((c) => `${c.lat}, ${c.lon}`)
         .join('\n')
       switch (user.strategy) {
         case 'discord':
-          await Clients[user.rmStrategy].sendMessage({
-            embed: {
-              title: `${capitalized} Request`,
-              author: {
-                name: user.username,
-                icon_url: `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`,
+          await Clients[user.rmStrategy].sendMessage(
+            {
+              embed: {
+                title: `${capitalized} Request`,
+                author: {
+                  name: user.username,
+                  icon_url: `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`,
+                },
+                thumbnail: {
+                  url:
+                    config.authentication.strategies.find(
+                      (strategy) => strategy.name === user.rmStrategy,
+                    )?.thumbnailUrl ??
+                    `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
+                },
+                timestamp: new Date(),
+                description: `<@${user.discordId}>\n${capitalized} Size: ${
+                  category === 'scanNext'
+                    ? data.scanNextType
+                    : data.scanZoneSize
+                }\nCoordinates: ${coords.length}\n`,
+                color:
+                  category === 'scanNext'
+                    ? config.map.theme.primary
+                    : config.map.theme.secondary,
+                fields: [
+                  {
+                    name: `User History`,
+                    value: `Total Requests: ${updatedCache.requests}\nTotal Coordinates: ${updatedCache.coordinates}`,
+                    inline: true,
+                  },
+                  {
+                    name: 'Instance',
+                    value: `${
+                      config.scanner.backendConfig.platform === 'mad'
+                        ? `Device: ${config.scanner.scanNext.scanNextDevice}`
+                        : ''
+                    }\nName: ${
+                      config.scanner[category]?.[`${category}Instance`]
+                    }\nQueue: ${scannerQueue[category]?.queue || 0}`,
+                    inline: true,
+                  },
+                  {
+                    name: `Coordinates (${coords.length})`,
+                    value:
+                      coords.length > 25
+                        ? `${trimmed}\n...${coords.length - 25} more`
+                        : trimmed,
+                  },
+                ],
               },
-              thumbnail: {
-                url:
-                  config.authentication.strategies.find(
-                    (strategy) => strategy.name === user.rmStrategy,
-                  )?.thumbnailUrl ??
-                  `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
-              },
-              timestamp: new Date(),
-              color:
-                category === 'scanNext'
-                  ? config.map.theme.primary
-                  : config.map.theme.secondary,
-              fields: [
-                {
-                  name: `User`,
-                  value: `Tag: <@${user.discordId}>\nRequest Count: ${
-                    userCache.get(user.id) || 1
-                  }`,
-                  inline: true,
-                },
-                {
-                  name: 'Instance',
-                  value: `${
-                    config.scanner.backendConfig.platform === 'mad'
-                      ? `Device: ${config.scanner.scanNext.scanNextDevice}`
-                      : ''
-                  }\nName: ${
-                    config.scanner[category]?.[`${category}Instance`]
-                  }\nQueue: ${scannerQueue[category]?.queue || 0}`,
-                  inline: true,
-                },
-                {
-                  name: `Coords (${coords.length})`,
-                  value:
-                    coords.length > 25
-                      ? `${trimmed}\n...${coords.length - 25} more`
-                      : trimmed,
-                },
-                {
-                  name: 'Location',
-                  value: data.scanLocation.map((c) => c.toFixed(5)).join(', '),
-                  inline: true,
-                },
-                {
-                  name: `${capitalized} Size`,
-                  value:
-                    category === 'scanNext'
-                      ? data.scanNextType
-                      : data.scanZoneSize,
-                  inline: true,
-                },
-              ],
             },
-          })
+            category,
+          )
           break
         default:
       }

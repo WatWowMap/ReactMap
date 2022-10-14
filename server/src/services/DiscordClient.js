@@ -12,11 +12,15 @@ const {
 const Utility = require('./Utility')
 
 module.exports = class DiscordMapClient {
-  constructor(client, config, logChannelId) {
+  constructor(client, config, logChannelId, scanNextChannel, scanZoneChannel) {
     this.client = client
     this.config = config
     this.accessToken = null
-    this.logChannelId = logChannelId
+    this.loggingChannels = {
+      main: logChannelId,
+      scanNext: scanNextChannel,
+      scanZone: scanZoneChannel,
+    }
     this.discordEvents()
   }
 
@@ -132,16 +136,18 @@ module.exports = class DiscordMapClient {
     return perms
   }
 
-  async sendMessage(message) {
-    if (!this.logChannelId || typeof message !== 'object') {
+  async sendMessage(message, channel = 'main') {
+    const safeChannel =
+      this.loggingChannels[channel] ?? this.loggingChannels.main
+    if (!safeChannel || typeof message !== 'object') {
       return
     }
     try {
-      const channel = await this.client.channels.cache
-        .get(this.logChannelId)
+      const foundChannel = await this.client.channels.cache
+        .get(safeChannel)
         .fetch()
-      if (channel && message) {
-        channel.send(message)
+      if (foundChannel && message) {
+        foundChannel.send(message)
       }
     } catch (e) {
       console.error('[DISCORD] Failed to send message to discord', e.message)
