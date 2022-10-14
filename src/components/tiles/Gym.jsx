@@ -114,7 +114,7 @@ const GymTile = ({
         {showCircles && (
           <Circle
             center={[item.lat, item.lon]}
-            radius={70}
+            radius={80}
             pathOptions={{ color: getColor(item.team_id), weight: 1 }}
           />
         )}
