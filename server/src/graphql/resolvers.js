@@ -333,16 +333,16 @@ module.exports = {
       }
       return {}
     },
-    scanner: (_, args, { perms, serverV, clientV }) => {
+    scanner: (_, args, { req, perms, serverV, clientV }) => {
       if (clientV !== serverV) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       const { category, method, data } = args
       if (category === 'getQueue') {
-        return Fetch.scannerApi(category, method, data)
+        return Fetch.scannerApi(category, method, data, req?.user)
       }
       if (perms?.scanner?.includes(category)) {
-        return Fetch.scannerApi(category, method, data)
+        return Fetch.scannerApi(category, method, data, req?.user)
       }
       return {}
     },

@@ -27,7 +27,13 @@ client.on('ready', () => {
 
 client.login(strategyConfig.botToken)
 
-const MapClient = new DiscordMapClient(client, { ...strategyConfig, perms })
+const MapClient = new DiscordMapClient(
+  client,
+  { ...strategyConfig, perms },
+  strategyConfig.logChannelId,
+  strategyConfig.scanNextLogChannelId,
+  strategyConfig.scanZoneLogChannelId,
+)
 
 const authHandler = async (req, accessToken, refreshToken, profile, done) => {
   if (!req.query.code) {
@@ -40,9 +46,10 @@ const authHandler = async (req, accessToken, refreshToken, profile, done) => {
     user.perms = await MapClient.getPerms(profile)
     user.valid = user.perms.map !== false
     user.blocked = user.perms.blocked
+    user.rmStrategy = path.parse(__filename).name
 
     const embed = await logUserAuth(req, user, 'Discord')
-    await MapClient.sendMessage(strategyConfig.logChannelId, { embed })
+    await MapClient.sendMessage({ embed })
 
     if (user) {
       delete user.guilds
@@ -113,3 +120,5 @@ passport.use(
     authHandler,
   ),
 )
+
+module.exports = MapClient
