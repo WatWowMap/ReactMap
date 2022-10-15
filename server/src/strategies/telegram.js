@@ -2,6 +2,7 @@
 const { TelegramStrategy } = require('passport-telegram-official')
 const passport = require('passport')
 const path = require('path')
+const fetch = require('node-fetch')
 
 const {
   map: { forceTutorial },
@@ -12,7 +13,6 @@ const {
   },
 } = require('../services/config')
 const { User } = require('../models/index')
-const Fetch = require('../services/Fetch')
 const Utility = require('../services/Utility')
 
 const authHandler = async (req, profile, done) => {
@@ -30,7 +30,7 @@ const authHandler = async (req, profile, done) => {
   await Promise.all(
     strategyConfig.groups.map(async (group) => {
       try {
-        const response = await Fetch.json(
+        const response = await fetch(
           `https://api.telegram.org/bot${strategyConfig.botToken}/getChatMember?chat_id=${group}&user_id=${user.id}`,
         )
         if (!response) {
