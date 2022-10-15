@@ -25,7 +25,9 @@ module.exports = async function getAuthInfo(req, user, strategy) {
 
   const geo = await fetch(
     `http://ip-api.com/json/${ip}?fields=66846719&lang=en`,
-  ).catch((err) => console.warn('failed to fetch user information', err))
+  )
+    .then((res) => res.json())
+    .catch((err) => console.warn('failed to fetch user information', err))
 
   const embed = {
     color: 0xff0000,
