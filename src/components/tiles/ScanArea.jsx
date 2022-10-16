@@ -15,7 +15,7 @@ export function ScanAreaTile({
   const setAreas = useStore((s) => s.setAreas)
   const names = item.features
     .filter((f) => !f.properties.manual)
-    .map((f) => f.properties.name)
+    .map((f) => f.properties.key)
 
   const handleClick = (name) => {
     if (selectedAreas.includes(name)) {
@@ -26,7 +26,7 @@ export function ScanAreaTile({
   }
   const onEachFeature = (feature, layer) => {
     if (feature.properties && feature.properties.name) {
-      const { name } = feature.properties
+      const { name, key } = feature.properties
       const popupContent = Utility.getProperName(name)
       layer
         .setStyle({
@@ -41,7 +41,7 @@ export function ScanAreaTile({
           fillOpacity:
             (selectedAreas?.includes(name.toLowerCase()) &&
               webhookMode === 'areas') ||
-            onlyAreas?.includes(name)
+            onlyAreas?.includes(webhookMode ? name : key)
               ? 0.8
               : 0.2,
         })
@@ -56,7 +56,7 @@ export function ScanAreaTile({
       if (webhookMode) {
         layer.on('click', () => handleClick(name.toLowerCase()))
       } else if (!feature.properties.manual && userSettings?.tapToToggle) {
-        layer.on('click', () => setAreas(name, names))
+        layer.on('click', () => setAreas(key, names))
       }
     }
   }

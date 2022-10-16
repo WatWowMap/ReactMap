@@ -1,9 +1,7 @@
-import React from 'react'
+import * as React from 'react'
 import { Grid, MenuItem, Typography, Checkbox } from '@material-ui/core'
-import { useMap } from 'react-leaflet'
 
 import Utility from '@services/Utility'
-import { useStore } from '@hooks/useStore'
 
 export default function AreaTile({
   name,
@@ -12,11 +10,10 @@ export default function AreaTile({
   scanAreasZoom,
   allAreas,
   i,
+  map,
+  scanAreas,
+  setAreas,
 }) {
-  const { scanAreas } = useStore((s) => s.filters)
-  const setAreas = useStore((s) => s.setAreas)
-  const map = useMap()
-
   if (!scanAreas) return null
 
   const hasAll =
@@ -81,13 +78,11 @@ export default function AreaTile({
               checked={
                 name
                   ? hasAll
-                  : scanAreas.filter.areas.includes(feature.properties.name)
+                  : scanAreas.filter.areas.includes(feature.properties.key)
               }
               onChange={() =>
                 setAreas(
-                  name
-                    ? childAreas.map((c) => c.properties.name)
-                    : feature.properties.name,
+                  name ? childAreas.map((c) => c.key) : feature.properties.key,
                   allAreas,
                   name ? hasSome : false,
                 )

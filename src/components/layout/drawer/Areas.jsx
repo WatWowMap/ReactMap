@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { useMap } from 'react-leaflet'
 import { useQuery } from '@apollo/client'
 import { Grid, Button, Paper } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
@@ -11,13 +12,15 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
   const { data, loading, error } = useQuery(Query.scanAreasMenu())
   const { t } = useTranslation()
   const setAreas = useStore((s) => s.setAreas)
+  const { scanAreas } = useStore((s) => s.filters)
+  const map = useMap()
 
   const allAreas = useMemo(() => {
     if (data?.scanAreasMenu) {
       return data.scanAreasMenu.flatMap((parent) =>
         parent.children
           .filter((child) => !child.properties.manual)
-          .map((child) => child.properties.name),
+          .map((child) => child.properties.key),
       )
     }
     return []
@@ -65,6 +68,9 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
                 allAreas={allAreas}
                 childAreas={children}
                 scanAreasZoom={scanAreasZoom}
+                map={map}
+                scanAreas={scanAreas}
+                setAreas={setAreas}
               />
             )}
             {children.map((feature, i) => (
@@ -75,6 +81,9 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
                 childAreas={children}
                 scanAreasZoom={scanAreasZoom}
                 i={i}
+                map={map}
+                scanAreas={scanAreas}
+                setAreas={setAreas}
               />
             ))}
           </Grid>
