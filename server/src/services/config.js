@@ -238,6 +238,7 @@ const manualGeojson = {
         properties: {
           center: [lat, lon],
           manual: true,
+          key: rest.parent ? `${rest.parent}-${rest.name}` : rest.name,
           ...rest,
         },
         geometry: {
@@ -263,6 +264,9 @@ const loadScanPolygons = (fileName, domain) => {
         ...f,
         properties: {
           ...f.properties,
+          key: f.properties.parent
+            ? `${f.properties.parent}-${f.properties.name}`
+            : f.properties.name,
           center: center(f).geometry.coordinates.reverse(),
         },
       })),
@@ -318,11 +322,14 @@ config.scanAreasMenu = Object.fromEntries(
       if (children.length % 2 === 1) {
         children.push({
           type: 'Feature',
-          properties: { name: '', manual: Boolean(config.manualAreas.length) },
+          properties: { name: '', manual: !!config.manualAreas.length },
         })
       }
     })
-    return [domain, Object.values(parents)]
+    return [
+      domain,
+      Object.values(parents).sort((a, b) => a.name.localeCompare(b.name)),
+    ]
   }),
 )
 config.scanAreasObj = Object.fromEntries(

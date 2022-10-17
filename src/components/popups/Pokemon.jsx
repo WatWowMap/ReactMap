@@ -174,20 +174,22 @@ const Header = ({
   const handleExclude = () => {
     setAnchorEl(null)
     const key = `${pokemon_id}-${form}`
-    setFilters({
-      ...filters,
-      pokemon: {
-        ...filters.pokemon,
-        filter: {
-          ...filters.pokemon.filter,
-          [key]: {
-            ...filters.pokemon.filter[key],
-            enabled: false,
+    if (filters?.pokemon?.filter) {
+      setFilters({
+        ...filters,
+        pokemon: {
+          ...filters.pokemon,
+          filter: {
+            ...filters.pokemon.filter,
+            [key]: {
+              ...filters.pokemon.filter[key],
+              enabled: false,
+            },
           },
         },
-      },
-    })
-    setExcludeList([...excludeList, key])
+      })
+      setExcludeList([...excludeList, key])
+    }
   }
 
   const handleTimer = () => {
