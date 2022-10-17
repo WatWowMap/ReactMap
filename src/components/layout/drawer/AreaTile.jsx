@@ -21,11 +21,11 @@ export default function AreaTile({
     childAreas.every(
       (c) =>
         c.properties.manual ||
-        scanAreas.filter.areas.includes(c.properties.name),
+        scanAreas.filter.areas.includes(c.properties.key),
     )
   const hasSome =
     childAreas &&
-    childAreas.some((c) => scanAreas.filter.areas.includes(c.properties.name))
+    childAreas.some((c) => scanAreas.filter.areas.includes(c.properties.key))
   const hasManual =
     feature?.properties?.manual || childAreas.every((c) => c.properties.manual)
 
@@ -82,7 +82,9 @@ export default function AreaTile({
               }
               onChange={() =>
                 setAreas(
-                  name ? childAreas.map((c) => c.key) : feature.properties.key,
+                  name
+                    ? childAreas.map((c) => c.properties.key)
+                    : feature.properties.key,
                   allAreas,
                   name ? hasSome : false,
                 )
