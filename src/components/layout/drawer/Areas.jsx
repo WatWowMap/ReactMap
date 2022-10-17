@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useMap } from 'react-leaflet'
 import { useQuery } from '@apollo/client'
-import { Grid, Button, Paper } from '@material-ui/core'
+import { Grid, Button, Paper, TextField } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import Query from '@services/Query'
@@ -12,7 +12,8 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
   const { data, loading, error } = useQuery(Query.scanAreasMenu())
   const { t } = useTranslation()
   const setAreas = useStore((s) => s.setAreas)
-  const { scanAreas } = useStore((s) => s.filters)
+  const filters = useStore((s) => s.filters)
+  const setFilters = useStore((s) => s.setFilters)
   const map = useMap()
 
   const allAreas = useMemo(() => {
@@ -44,6 +45,26 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
           {t('reset')}
         </Button>
       </Grid>
+      <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <TextField
+          label={t('search')}
+          variant="outlined"
+          fullWidth
+          value={filters?.scanAreas?.filter?.search || ''}
+          onChange={(e) =>
+            setFilters({
+              ...filters,
+              scanAreas: {
+                ...filters.scanAreas,
+                filter: {
+                  ...filters.scanAreas.filter,
+                  search: e.target.value || '',
+                },
+              },
+            })
+          }
+        />
+      </Grid>
       <Paper
         style={{
           minHeight: 50,
@@ -53,41 +74,55 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
           backgroundColor: '#212121',
         }}
       >
-        {data?.scanAreasMenu?.map(({ name, details, children }) => (
-          <Grid
-            key={name || ''}
-            container
-            alignItems="stretch"
-            justifyContent="center"
-          >
-            {name && (
-              <AreaTile
-                key={name}
-                name={name}
-                feature={details}
-                allAreas={allAreas}
-                childAreas={children}
-                scanAreasZoom={scanAreasZoom}
-                map={map}
-                scanAreas={scanAreas}
-                setAreas={setAreas}
-              />
-            )}
-            {children.map((feature, i) => (
-              <AreaTile
-                key={feature?.properties?.name || i}
-                feature={feature}
-                allAreas={allAreas}
-                childAreas={children}
-                scanAreasZoom={scanAreasZoom}
-                i={i}
-                map={map}
-                scanAreas={scanAreas}
-                setAreas={setAreas}
-              />
-            ))}
-          </Grid>
-        ))}
+        {data?.scanAreasMenu
+          ?.map((area) => ({
+            ...area,
+            children: area.children.filter(
+              (feature) =>
+                filters.scanAreas?.filter?.search === '' ||
+                feature.properties?.key
+                  ?.toLowerCase()
+                  ?.includes(filters?.scanAreas?.filter?.search?.toLowerCase()),
+            ),
+          }))
+          .map(({ name, details, children }) => {
+            if (!children.length) return null
+            return (
+              <Grid
+                key={name || ''}
+                container
+                alignItems="stretch"
+                justifyContent="center"
+              >
+                {name && (
+                  <AreaTile
+                    key={name}
+                    name={name}
+                    feature={details}
+                    allAreas={allAreas}
+                    childAreas={children}
+                    scanAreasZoom={scanAreasZoom}
+                    map={map}
+                    scanAreas={filters.scanAreas}
+                    setAreas={setAreas}
+                  />
+                )}
+                {children.map((feature, i) => (
+                  <AreaTile
+                    key={feature?.properties?.name || i}
+                    feature={feature}
+                    allAreas={allAreas}
+                    childAreas={children}
+                    scanAreasZoom={scanAreasZoom}
+                    i={i}
+                    map={map}
+                    scanAreas={filters.scanAreas}
+                    setAreas={setAreas}
+                  />
+                ))}
+              </Grid>
+            )
+          })}
       </Paper>
     </>
   )

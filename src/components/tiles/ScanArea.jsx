@@ -11,8 +11,10 @@ export function ScanAreaTile({
   setSelectedAreas,
   onlyAreas,
   userSettings,
+  filters,
 }) {
   const setAreas = useStore((s) => s.setAreas)
+
   const names = item.features
     .filter((f) => !f.properties.manual)
     .map((f) => f.properties.key)
@@ -63,14 +65,26 @@ export function ScanAreaTile({
 
   return (
     <GeoJSON
-      key={`${selectedAreas}-${onlyAreas ? onlyAreas.join('') : ''}`}
-      data={item}
+      key={`${selectedAreas}-${onlyAreas ? onlyAreas.join('') : ''}-${
+        filters?.filter?.search
+      }`}
+      data={{
+        ...item,
+        features: item.features.filter(
+          (f) =>
+            filters?.filter?.search === '' ||
+            f.properties.key
+              .toLowerCase()
+              .includes(filters.filter.search.toLowerCase()),
+        ),
+      }}
       onEachFeature={onEachFeature}
     />
   )
 }
 
 const areEqual = (prev, next) =>
+  prev.filters?.filter?.search === next.filters?.filter?.search &&
   (prev.onlyAreas && next.onlyAreas
     ? prev.onlyAreas.length === next.onlyAreas.length &&
       prev.onlyAreas.every((_, i) => prev.onlyAreas[i] === next.onlyAreas[i])

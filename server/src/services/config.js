@@ -238,6 +238,7 @@ const manualGeojson = {
         properties: {
           center: [lat, lon],
           manual: true,
+          key: rest.parent ? `${rest.parent}-${rest.name}` : rest.name,
           ...rest,
         },
         geometry: {
