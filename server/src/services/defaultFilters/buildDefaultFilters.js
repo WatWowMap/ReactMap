@@ -109,7 +109,7 @@ module.exports = function buildDefault(perms, available, dbModels) {
     scanAreas: perms.scanAreas
       ? {
           enabled: defaultFilters.scanAreas.enabled,
-          filter: { areas: [] },
+          filter: { areas: [], search: '' },
         }
       : undefined,
     submissionCells:
