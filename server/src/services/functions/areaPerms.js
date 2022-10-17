@@ -1,4 +1,4 @@
-const { names } = require('../areas')
+const { names, withoutParents } = require('../areas')
 const {
   authentication: { areaRestrictions },
 } = require('../config')
@@ -12,6 +12,8 @@ module.exports = function areaPerms(roles) {
           for (let k = 0; k < areaRestrictions[j].areas.length; k += 1) {
             if (names.includes(areaRestrictions[j].areas[k])) {
               perms.push(areaRestrictions[j].areas[k])
+            } else if (withoutParents[areaRestrictions[j].areas[k]]) {
+              perms.push(...withoutParents[areaRestrictions[j].areas[k]])
             }
           }
         } else {
