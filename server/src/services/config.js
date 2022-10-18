@@ -10,6 +10,28 @@ dotenv.config()
 
 const config = require('config')
 
+try {
+  const refLength = +fs.readFileSync(
+    resolve(__dirname, '../../../.configref'),
+    'utf8',
+  )
+  const defaultLength = fs.readFileSync(
+    resolve(__dirname, '../configs/default.json'),
+    'utf8',
+  ).length
+
+  if (refLength !== defaultLength) {
+    console.error(
+      '[CONFIG] It looks like you have modified the `default.json` file, you should not do this! Make all of your config changes in your `local.json` file.',
+    )
+  }
+} catch (e) {
+  console.error(
+    '[CONFIG] Error trying to read either the default.json or .ref file',
+    e,
+  )
+}
+
 if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
   // add database env variables from .env or docker-compose
   const {
