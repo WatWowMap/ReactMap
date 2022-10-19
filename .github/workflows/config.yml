@@ -1,5 +1,5 @@
 name: Config
-on: [push]
+on: [push, release]
 
 env:
   REGISTRY: ghcr.io
