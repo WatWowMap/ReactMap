@@ -550,5 +550,17 @@
   "ultra_beast": "Ultra Bête",
   "quest_condition": "État de la quête",
   "always_show_labels": "Toujours afficher les étiquettes",
-  "scan_areas_options": "Options des zones de numérisation"
+  "scan_areas_options": "Options des zones de scan",
+  "historic_rarity": "Rareté historique",
+  "poi": "POI",
+  "300m_range": "Portée 300m",
+  "lure_range": "Distance des Leurres",
+  "tap_to_toggle": "Appuyez pour basculer",
+  "power_up": "Recharger",
+  "never_alt": "Jamais",
+  "seen_nearby_stop": "Vus à proximité",
+  "seen_nearby_cell": "Vus dans cette cellule",
+  "seen_lure_encounter": "Pokemon de Leurre",
+  "seen_lure_wild": "Pokemon Sauvage de Leurre",
+  "seen_wild": "Pokemon Sauvage"
 }

@@ -1,6 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable import/no-dynamic-require */
-/* eslint-disable global-require */
 process.title = 'ReactMap'
 
 const path = require('path')
@@ -142,7 +140,7 @@ app.use(express.static(path.join(__dirname, config.devOptions.clientPath)))
 
 app.use(
   session({
-    name: 'discord',
+    name: 'reactmap',
     key: 'session',
     secret: config.api.sessionSecret,
     store: sessionStore,
@@ -151,15 +149,6 @@ app.use(
     cookie: { maxAge: 86400000 * config.api.cookieAgeDays },
   }),
 )
-
-config.authentication.strategies.forEach((strategy) => {
-  if (strategy.enabled) {
-    require(`./strategies/${strategy.name}.js`)
-    console.log(`[AUTH] Strategy ${strategy.name} initialized`)
-  } else {
-    console.log(`[AUTH] Strategy ${strategy.name} was not initialized`)
-  }
-})
 
 app.use(passport.initialize())
 

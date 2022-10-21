@@ -1,9 +1,7 @@
-import React from 'react'
+import * as React from 'react'
 import { Grid, MenuItem, Typography, Checkbox } from '@material-ui/core'
-import { useMap } from 'react-leaflet'
 
 import Utility from '@services/Utility'
-import { useStore } from '@hooks/useStore'
 
 export default function AreaTile({
   name,
@@ -12,11 +10,10 @@ export default function AreaTile({
   scanAreasZoom,
   allAreas,
   i,
+  map,
+  scanAreas,
+  setAreas,
 }) {
-  const { scanAreas } = useStore((s) => s.filters)
-  const setAreas = useStore((s) => s.setAreas)
-  const map = useMap()
-
   if (!scanAreas) return null
 
   const hasAll =
@@ -24,11 +21,11 @@ export default function AreaTile({
     childAreas.every(
       (c) =>
         c.properties.manual ||
-        scanAreas.filter.areas.includes(c.properties.name),
+        scanAreas.filter.areas.includes(c.properties.key),
     )
   const hasSome =
     childAreas &&
-    childAreas.some((c) => scanAreas.filter.areas.includes(c.properties.name))
+    childAreas.some((c) => scanAreas.filter.areas.includes(c.properties.key))
   const hasManual =
     feature?.properties?.manual || childAreas.every((c) => c.properties.manual)
 
@@ -81,13 +78,13 @@ export default function AreaTile({
               checked={
                 name
                   ? hasAll
-                  : scanAreas.filter.areas.includes(feature.properties.name)
+                  : scanAreas.filter.areas.includes(feature.properties.key)
               }
               onChange={() =>
                 setAreas(
                   name
-                    ? childAreas.map((c) => c.properties.name)
-                    : feature.properties.name,
+                    ? childAreas.map((c) => c.properties.key)
+                    : feature.properties.key,
                   allAreas,
                   name ? hasSome : false,
                 )

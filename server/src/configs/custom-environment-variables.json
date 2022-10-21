@@ -27,6 +27,14 @@
   "api": {
     "sessionSecret": "API_SESSION_SECRET",
     "reactMapSecret": "API_REACT_MAP_SECRET",
+    "showSchemasInConfigApi": {
+      "__name": "API_SHOW_SCHEMAS_IN_CONFIG_API",
+      "__format": "boolean"
+    },
+    "showStrategiesInConfigApi": {
+      "__name": "API_SHOW_STRATEGIES_IN_CONFIG_API",
+      "__format": "boolean"
+    },
     "maxSessions": {
       "__name": "API_MAX_SESSIONS",
       "__format": "number"
@@ -297,22 +305,8 @@
       "rolesLink": "MAP_LINKS_ROLES_LINK"
     },
     "holidayEffects": {
-      "christmasSnow": {
-        "__name": "MAP_HOLIDAY_EFFECTS_CHRISTMAS_SNOW",
-        "__format": "boolean"
-      },
-      "newYearsFireworks": {
-        "__name": "MAP_HOLIDAY_EFFECTS_NEW_YEARS_FIREWORKS",
-        "__format": "boolean"
-      },
-      "valentinesDay": {
-        "__name": "MAP_HOLIDAY_EFFECTS_VALENTINES_DAY",
-        "__format": "boolean"
-      },
-      "internationalWomensDay": {
-        "__name": "MAP_HOLIDAY_EFFECTS_INTERNATIONAL_WOMENS_DAY",
-        "__format": "boolean"
-      }
+      "__name": "MAP_HOLIDAY_EFFECTS",
+      "__format": "json"
     },
     "misc": {
       "enableMapJsFilter": {
@@ -938,6 +932,10 @@
       "maxConnections": {
         "__name": "DATABASE_SETTINGS_MAX_CONNECTIONS",
         "__format": "number"
+      },
+      "extraUserFields": {
+        "__name": "DATABASE_SETTINGS_EXTRA_USER_FIELDS",
+        "__format": "json"
       }
     },
     "schemas": {

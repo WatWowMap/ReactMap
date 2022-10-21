@@ -2,6 +2,7 @@
 const { TelegramStrategy } = require('passport-telegram-official')
 const passport = require('passport')
 const path = require('path')
+const fetch = require('node-fetch')
 
 const {
   map: { forceTutorial },
@@ -12,7 +13,6 @@ const {
   },
 } = require('../services/config')
 const { User } = require('../models/index')
-const Fetch = require('../services/Fetch')
 const Utility = require('../services/Utility')
 
 const authHandler = async (req, profile, done) => {
@@ -23,15 +23,16 @@ const authHandler = async (req, profile, done) => {
       areaRestrictions: [],
       webhooks: [],
     },
+    rmStrategy: path.parse(__filename).name,
   }
 
   const chatInfo = [user.id]
   await Promise.all(
     strategyConfig.groups.map(async (group) => {
       try {
-        const response = await Fetch.json(
+        const response = await fetch(
           `https://api.telegram.org/bot${strategyConfig.botToken}/getChatMember?chat_id=${group}&user_id=${user.id}`,
-        )
+        ).then(async (res) => res.json())
         if (!response) {
           throw new Error('Unable to query TG API or User is not in the group')
         }
@@ -146,3 +147,5 @@ passport.use(
     authHandler,
   ),
 )
+
+module.exports = null

@@ -24,11 +24,13 @@ const SetText = () => {
     ru: 'Загрузка переводов',
     sv: 'Laddar Översättningar',
     th: 'กำลังโหลดการแปล',
+    tr: 'Çeviriler Yükleniyor',
     'zh-tw': '載入翻譯',
   }
   const locale = localStorage?.getItem('i18nextLng') || 'en'
   const loadingText = document.getElementById('loading-text')
-  if (loadingText) loadingText.innerText = locales[locale.toLowerCase()]
+  if (loadingText)
+    loadingText.innerText = locales[locale.toLowerCase()] || locales.en
   return <div />
 }
 

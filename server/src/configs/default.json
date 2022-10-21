@@ -12,6 +12,8 @@
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
     "reactMapSecret": "",
+    "showSchemasInConfigApi": false,
+    "showStrategiesInConfigApi": false,
     "maxSessions": 5,
     "sessionCheckIntervalMs": 900000,
     "cookieAgeDays": 7,
@@ -135,12 +137,65 @@
       "rolesLinkName": "Role Upgrading Info",
       "rolesLink": ""
     },
-    "holidayEffects": {
-      "christmasSnow": true,
-      "newYearsFireworks": true,
-      "valentinesDay": true,
-      "internationalWomensDay": true
-    },
+    "holidayEffects": [
+      {
+        "name": "Valentine's Day",
+        "enabled": true,
+        "images": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/A_perfect_SVG_heart.svg/20px-A_perfect_SVG_heart.svg.png"
+        ],
+        "imageScale": 1.5,
+        "startMonth": 1,
+        "startDay": 14,
+        "endMonth": 1,
+        "endDay": 14
+      },
+      {
+        "name": "International Women's Day",
+        "enabled": true,
+        "images": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Emoji_u1f338.svg/20px-Emoji_u1f338.svg.png"
+        ],
+        "imageScale": 1,
+        "startDay": 8,
+        "startMonth": 3,
+        "endDay": 8,
+        "endMonth": 3
+      },
+      {
+        "name": "Halloween",
+        "enabled": true,
+        "images": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Fluent_Emoji_flat_1f383.svg/640px-Fluent_Emoji_flat_1f383.svg.png",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Ghost.svg/640px-Ghost.svg.png"
+        ],
+        "imageScale": 2,
+        "startDay": 29,
+        "startMonth": 10,
+        "endDay": 31,
+        "endMonth": 10
+      },
+      {
+        "name": "Christmas",
+        "enabled": true,
+        "images": [],
+        "css": "snow",
+        "startDay": 25,
+        "startMonth": 12,
+        "endDay": 26,
+        "endMonth": 12
+      },
+      {
+        "name": "New Years",
+        "enabled": true,
+        "images": [],
+        "css": "fireworks",
+        "startDay": 31,
+        "startMonth": 12,
+        "endDay": 1,
+        "endMonth": 1
+      }
+    ],
     "misc": {
       "enableMapJsFilter": true,
       "fetchLatestInvasions": true,
@@ -455,7 +510,8 @@
       "gymBadgeTableName": "gymBadges",
       "sessionTableName": "session",
       "migrationTableName": "knex_migrations",
-      "maxConnections": 10
+      "maxConnections": 10,
+      "extraUserFields": []
     },
     "schemas": []
   },
@@ -503,6 +559,8 @@
         "type": "discord",
         "enabled": false,
         "logChannelId": "",
+        "scanNextLogChannelId": "",
+        "scanZoneLogChannelId": "",
         "presence": "Map Status: Online",
         "presenceType": 3,
         "botToken": "",
@@ -511,7 +569,8 @@
         "redirectUri": "http://localhost:8080/auth/discord/callback",
         "allowedGuilds": [],
         "blockedGuilds": [],
-        "allowedUsers": []
+        "allowedUsers": [],
+        "thumbnailUrl": "https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png"
       },
       {
         "name": "telegram",

@@ -7,7 +7,7 @@ import {
   CircularProgress,
 } from '@material-ui/core'
 import { Autocomplete } from '@material-ui/lab'
-import { LocationOn } from '@material-ui/icons'
+import { LocationOn, MyLocation } from '@material-ui/icons'
 import { useLazyQuery } from '@apollo/client'
 import { useMapEvents } from 'react-leaflet'
 
@@ -93,7 +93,7 @@ const Location = ({
           variant="contained"
           color="secondary"
           onClick={() => lc._onClick()}
-          startIcon={<LocationOn color={color} />}
+          startIcon={<MyLocation color={color} />}
         >
           {t('my_location')}
         </Button>

@@ -333,16 +333,16 @@ module.exports = {
       }
       return {}
     },
-    scanner: (_, args, { perms, serverV, clientV }) => {
+    scanner: (_, args, { req, perms, serverV, clientV }) => {
       if (clientV !== serverV) throw new UserInputError('old_client')
       if (!perms) throw new AuthenticationError('session_expired')
 
       const { category, method, data } = args
       if (category === 'getQueue') {
-        return Fetch.scannerApi(category, method, data)
+        return Fetch.scannerApi(category, method, data, req?.user)
       }
       if (perms?.scanner?.includes(category)) {
-        return Fetch.scannerApi(category, method, data)
+        return Fetch.scannerApi(category, method, data, req?.user)
       }
       return {}
     },
@@ -387,6 +387,21 @@ module.exports = {
     checkUsername: async (_, args) => {
       const results = await User.query().where('username', args.username)
       return Boolean(results.length)
+    },
+    setExtraFields: async (_, { key, value }, { req }) => {
+      if (req.user?.id) {
+        const user = await User.query().findById(req.user.id)
+        if (user) {
+          const data =
+            typeof user.data === 'string'
+              ? JSON.parse(user.data)
+              : user.data || {}
+          data[key] = value
+          await user.$query().update({ data: JSON.stringify(data) })
+        }
+        return true
+      }
+      return false
     },
     setGymBadge: async (_, args, { req }) => {
       const perms = req.user ? req.user.perms : false
