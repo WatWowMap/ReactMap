@@ -21,7 +21,13 @@ jobs:
         with:
           files: |
             server/src/configs/default.json
-      - name: Run step if any of the listed files above change
+      - name: Run script
         if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           yarn config-check
+      - name: Commit and push changes
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: devops-infra/action-commit-push@v0.9.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          commit_message: Sync character count for config ref file
