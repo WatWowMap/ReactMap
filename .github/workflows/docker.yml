@@ -18,10 +18,18 @@ jobs:
         with:
           node-version: 16
           cache: 'yarn'
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v33
+        with:
+          files: |
+            server/src/configs/default.json
       - name: Generate latest env vars
+        if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           yarn gen-env-config
       - name: Commit and push changes
+        if: steps.changed-files.outputs.any_changed == 'true'
         uses: devops-infra/action-commit-push@v0.9.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -41,7 +49,7 @@ jobs:
         run: 'echo ${{github.ref}} > .gitref'
 
       - name: Log in to the Container registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
