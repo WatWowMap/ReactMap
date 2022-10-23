@@ -11,7 +11,7 @@ import Footer from './Footer'
 
 export default function ActiveWeather({
   Icons,
-  isNight,
+  timeOfDay,
   map,
   zoom,
   weather,
@@ -47,7 +47,7 @@ export default function ActiveWeather({
       >
         <img
           className={disableColorShift ? '' : 'fancy'}
-          src={Icons.getWeather(active.gameplay_condition, isNight)}
+          src={Icons.getWeather(active.gameplay_condition, timeOfDay)}
           alt={active.gameplay_condition}
           style={{
             width: isMobile ? 24 : 36,

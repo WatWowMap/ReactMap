@@ -21,7 +21,7 @@ export default function Clustering({
   config,
   userIcons,
   setParams,
-  isNight,
+  timeOfDay,
   onlyAreas,
 }) {
   const Component = index[category]
@@ -59,7 +59,7 @@ export default function Clustering({
           params={params}
           setParams={setParams}
           showCircles={showCircles}
-          isNight={isNight}
+          timeOfDay={timeOfDay}
           onlyAreas={onlyAreas}
         />
       )

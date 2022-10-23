@@ -19,7 +19,7 @@ export const fancyMarker = (
   ivCircle,
   Icons,
   weatherCheck,
-  isNight,
+  timeOfDay,
 ) => {
   const { pokemon: pokemonMod, weather: weatherMod } = Icons.modifiers
   let badge
@@ -99,7 +99,7 @@ export const fancyMarker = (
           }}
         >
           <img
-            src={Icons.getWeather(pkmn.weather, isNight)}
+            src={Icons.getWeather(pkmn.weather, timeOfDay)}
             alt={pkmn.weather}
             className={weatherMod.disableColorShift ? '' : 'fancy'}
             style={{
