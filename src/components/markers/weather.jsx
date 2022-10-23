@@ -2,7 +2,7 @@ import React from 'react'
 import { renderToString } from 'react-dom/server'
 import L from 'leaflet'
 
-export default function weatherMarker(weather, Icons, isNight) {
+export default function weatherMarker(weather, Icons, timeOfDay) {
   const {
     offsetX,
     offsetY,
@@ -21,7 +21,7 @@ export default function weatherMarker(weather, Icons, isNight) {
       <img
         className={disableColorShift ? '' : 'fancy'}
         alt={weather.gameplay_condition}
-        src={Icons.getWeather(weather.gameplay_condition, isNight)}
+        src={Icons.getWeather(weather.gameplay_condition, timeOfDay)}
         style={{
           width: 24,
           height: 24,
