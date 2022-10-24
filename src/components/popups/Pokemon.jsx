@@ -36,7 +36,7 @@ export default function PokemonPopup({
   userSettings,
   isTutorial,
   Icons,
-  isNight,
+  timeOfDay,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
@@ -107,7 +107,7 @@ export default function PokemonPopup({
           metaData={metaData}
           perms={pokePerms}
           Icons={Icons}
-          isNight={isNight}
+          timeOfDay={timeOfDay}
         />
         <Footer
           pokemon={pokemon}
@@ -335,7 +335,7 @@ const Stats = ({ pokemon, t }) => {
   )
 }
 
-const Info = ({ pokemon, metaData, perms, Icons, isNight }) => {
+const Info = ({ pokemon, metaData, perms, Icons, timeOfDay }) => {
   const { gender, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
 
@@ -355,7 +355,7 @@ const Info = ({ pokemon, metaData, perms, Icons, isNight }) => {
           style={{
             height: 24,
             width: 24,
-            backgroundImage: `url(${Icons.getWeather(weather, isNight)})`,
+            backgroundImage: `url(${Icons.getWeather(weather, timeOfDay)})`,
           }}
         />
       )}

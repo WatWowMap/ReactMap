@@ -29,7 +29,7 @@ export default function QueryData({
   Icons,
   userIcons,
   setParams,
-  isNight,
+  timeOfDay,
   setExcludeList,
   setError,
   active,
@@ -151,13 +151,13 @@ export default function QueryData({
         staticUserSettings={staticUserSettings}
         params={params}
         setParams={setParams}
-        isNight={isNight}
+        timeOfDay={timeOfDay}
         onlyAreas={onlyAreas}
       />
       {category === 'weather' && (
         <ActiveWeather
           Icons={Icons}
-          isNight={isNight}
+          timeOfDay={timeOfDay}
           weather={renderedData[category]}
           isMobile={isMobile}
           zoom={config.activeWeatherZoom}

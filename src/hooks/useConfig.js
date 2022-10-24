@@ -37,7 +37,7 @@ export default function useConfig(serverSettings, params) {
   const setUi = useStatic((state) => state.setUi)
   const setStaticFilters = useStatic((state) => state.setFilters)
   const setWebhookData = useStatic((state) => state.setWebhookData)
-  const setIsNight = useStatic((state) => state.setIsNight)
+  const setTimeOfDay = useStatic((state) => state.setTimeOfDay)
   const setExtraUserFields = useStatic((state) => state.setExtraUserFields)
 
   const localState = JSON.parse(localStorage.getItem('local-state'))
@@ -165,7 +165,7 @@ export default function useConfig(serverSettings, params) {
 
   setZoom(zoom)
   setLocation(location)
-  setIsNight(Utility.nightCheck(...location))
+  setTimeOfDay(Utility.timeCheck(...location))
 
   return { location, zoom }
 }

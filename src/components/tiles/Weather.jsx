@@ -4,7 +4,14 @@ import { Popup, Polyline, Marker } from 'react-leaflet'
 import weatherMarker from '../markers/weather'
 import PopupContent from '../popups/Weather'
 
-const WeatherTile = ({ item, ts, Icons, isNight, tileStyle, userSettings }) => {
+const WeatherTile = ({
+  item,
+  ts,
+  Icons,
+  timeOfDay,
+  tileStyle,
+  userSettings,
+}) => {
   const [popup, setPopup] = useState(false)
   const markerRef = useRef(null)
 
@@ -27,7 +34,7 @@ const WeatherTile = ({ item, ts, Icons, isNight, tileStyle, userSettings }) => {
       }}
     >
       <Marker
-        icon={weatherMarker(item, Icons, isNight, userSettings)}
+        icon={weatherMarker(item, Icons, timeOfDay, userSettings)}
         position={[item.latitude, item.longitude]}
         zIndexOffset={10000}
         ref={markerRef}
