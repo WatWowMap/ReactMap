@@ -74,7 +74,7 @@ const PokemonTile = ({
   excludeList,
   ts,
   map,
-  isNight,
+  timeOfDay,
   userSettings,
   staticUserSettings,
   params,
@@ -139,7 +139,7 @@ const PokemonTile = ({
                 ivCircle,
                 Icons,
                 weatherCheck,
-                isNight,
+                timeOfDay,
               )
             : basicMarker(url, size)
         }
@@ -150,7 +150,7 @@ const PokemonTile = ({
             iconUrl={url}
             userSettings={userSettings}
             Icons={Icons}
-            isNight={isNight}
+            timeOfDay={timeOfDay}
           />
         </Popup>
         {(showTimer || userSettings.pokemonTimers) && (

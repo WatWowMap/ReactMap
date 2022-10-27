@@ -74,10 +74,19 @@ export default class Utility {
     return slotObj
   }
 
-  static nightCheck(lat, lon) {
+  static timeCheck(lat, lon) {
     const date = new Date()
     const times = SunCalc.getTimes(date, lat, lon)
-    return date <= times.sunrise || date >= times.sunset
+    switch (true) {
+      case date > times.dawn && date < times.sunriseEnd:
+        return 'dawn'
+      case date > times.dusk && date < times.night:
+        return 'dusk'
+      case date > times.night:
+        return 'night'
+      default:
+        return 'day'
+    }
   }
 
   static getMidnight() {
