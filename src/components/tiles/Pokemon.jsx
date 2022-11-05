@@ -74,7 +74,7 @@ const PokemonTile = ({
   excludeList,
   ts,
   map,
-  isNight,
+  timeOfDay,
   userSettings,
   staticUserSettings,
   params,
@@ -139,7 +139,7 @@ const PokemonTile = ({
                 ivCircle,
                 Icons,
                 weatherCheck,
-                isNight,
+                timeOfDay,
               )
             : basicMarker(url, size)
         }
@@ -150,7 +150,7 @@ const PokemonTile = ({
             iconUrl={url}
             userSettings={userSettings}
             Icons={Icons}
-            isNight={isNight}
+            timeOfDay={timeOfDay}
           />
         </Popup>
         {(showTimer || userSettings.pokemonTimers) && (
@@ -159,7 +159,7 @@ const PokemonTile = ({
         {showCircles && (
           <Circle
             center={finalLocation}
-            radius={35}
+            radius={70}
             pathOptions={{ color: '#BA42F6', weight: 1 }}
           />
         )}

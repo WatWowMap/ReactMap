@@ -26,7 +26,7 @@ module.exports = class Fetch {
     return webhookApi(category, discordId, method, name, data)
   }
 
-  static async scannerApi(category, method, data) {
-    return scannerApi(category, method, data)
+  static async scannerApi(category, method, data, user) {
+    return scannerApi(category, method, data, user)
   }
 }

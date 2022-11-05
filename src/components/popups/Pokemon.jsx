@@ -36,7 +36,7 @@ export default function PokemonPopup({
   userSettings,
   isTutorial,
   Icons,
-  isNight,
+  timeOfDay,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
@@ -107,7 +107,7 @@ export default function PokemonPopup({
           metaData={metaData}
           perms={pokePerms}
           Icons={Icons}
-          isNight={isNight}
+          timeOfDay={timeOfDay}
         />
         <Footer
           pokemon={pokemon}
@@ -174,20 +174,22 @@ const Header = ({
   const handleExclude = () => {
     setAnchorEl(null)
     const key = `${pokemon_id}-${form}`
-    setFilters({
-      ...filters,
-      pokemon: {
-        ...filters.pokemon,
-        filter: {
-          ...filters.pokemon.filter,
-          [key]: {
-            ...filters.pokemon.filter[key],
-            enabled: false,
+    if (filters?.pokemon?.filter) {
+      setFilters({
+        ...filters,
+        pokemon: {
+          ...filters.pokemon,
+          filter: {
+            ...filters.pokemon.filter,
+            [key]: {
+              ...filters.pokemon.filter[key],
+              enabled: false,
+            },
           },
         },
-      },
-    })
-    setExcludeList([...excludeList, key])
+      })
+      setExcludeList([...excludeList, key])
+    }
   }
 
   const handleTimer = () => {
@@ -333,7 +335,7 @@ const Stats = ({ pokemon, t }) => {
   )
 }
 
-const Info = ({ pokemon, metaData, perms, Icons, isNight }) => {
+const Info = ({ pokemon, metaData, perms, Icons, timeOfDay }) => {
   const { gender, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
 
@@ -353,7 +355,7 @@ const Info = ({ pokemon, metaData, perms, Icons, isNight }) => {
           style={{
             height: 24,
             width: 24,
-            backgroundImage: `url(${Icons.getWeather(weather, isNight)})`,
+            backgroundImage: `url(${Icons.getWeather(weather, timeOfDay)})`,
           }}
         />
       )}

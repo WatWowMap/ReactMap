@@ -1,8 +1,12 @@
 /* eslint-disable no-console */
-const { capitalize } = require('@material-ui/core')
-const Fetch = require('./Fetch')
+const fetch = require('node-fetch')
 
-const capCamel = (str) => capitalize(str.replace(/([a-z](?=[A-Z]))/g, '$1 '))
+const capCamel = (str) =>
+  str
+    .replace(/([a-z](?=[A-Z]))/g, '$1 ')
+    .split(' ')
+    .map((str2) => str2.charAt(0).toUpperCase() + str2.slice(1))
+    .join(' ')
 
 const mapPerms = (perms, userPerms) =>
   perms
@@ -19,14 +23,20 @@ module.exports = async function getAuthInfo(req, user, strategy) {
       '[0-9]+.[0-9].+[0-9]+.[0-9]+$',
     )[0]
 
-  const geo = await Fetch.json(
+  const geo = await fetch(
     `http://ip-api.com/json/${ip}?fields=66846719&lang=en`,
   )
+    .then((res) => res.json())
+    .catch((err) => {
+      console.warn('failed to fetch user information', err)
+      return {}
+    })
+
   const embed = {
     color: 0xff0000,
     title: 'Authentication',
     author: {
-      name: `${user.username}`,
+      name: user.username,
       icon_url: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`,
     },
     description: `${user.username} ${

@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.5.1",
+  "version": "1.6.7",
   "description": "React based frontend map.",
   "main": "ReactMap.js",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -19,13 +19,14 @@
     "missing-locales": "node server/scripts/createLocales.js --missing",
     "create-area": "node server/scripts/poracleToGeoJSON.js",
     "config-migrate": "node server/scripts/configMigration.js",
+    "config-check": "node server/scripts/configCheck.js",
     "console": "node --experimental-repl-await ./server/scripts/console.js",
     "migrate:make": "knex --knexfile server/knexfile.cjs migrate:make",
     "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
     "migrate:rollback": "knex --knexfile server/knexfile.cjs migrate:rollback",
     "release": "node server/scripts/newRelease.js",
-    "prettier:check": "prettier --check \"**/*.{js,jsx}\"",
-    "prettier:fix": "prettier --write \"**/*.{js,jsx}\"",
+    "prettier:check": "prettier --check \"**/*.{css,html,js,jsx}\"",
+    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx}\"",
     "eslint:check": "eslint \"**/*.{js,jsx}\"",
     "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix"
   },
@@ -35,7 +36,7 @@
   },
   "devDependencies": {
     "@craftamap/esbuild-plugin-html": "^0.4.0",
-    "@sentry/cli": "^1.73.0",
+    "@sentry/cli": "^2.7.0",
     "esbuild": "^0.14.36",
     "esbuild-plugin-eslinter": "^0.1.2",
     "esbuild-plugin-mxn-copy": "^1.0.1",
@@ -58,8 +59,8 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/styles": "^4.11.4",
-    "@sentry/react": "^6.19.7",
-    "@sentry/tracing": "^6.19.7",
+    "@sentry/react": "^7.15.0",
+    "@sentry/tracing": "^7.15.0",
     "@turf/boolean-overlap": "^6.5.0",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/center": "^6.3.0",
@@ -112,7 +113,7 @@
     "react-virtualized-auto-sizer": "^1.0.5",
     "react-window": "^1.8.6",
     "require-from-string": "^2.0.2",
-    "suncalc": "^1.8.0",
+    "suncalc": "^1.9.0",
     "zustand": "^4.0.0-rc.1"
   }
 }

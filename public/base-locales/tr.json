@@ -12,5 +12,17 @@
   "ultra_beast": "Ultra Canavar",
   "quest_condition": "Görev Durumu",
   "always_show_labels": "Etiketleri Her Zaman Göster",
-  "scan_areas_options": "Tarama Alanları Seçenekleri"
+  "scan_areas_options": "Tarama Alanları Seçenekleri",
+  "historic_rarity": "Tarihi Nadirlik",
+  "poi": "İlgi noktaları",
+  "300m_range": "300m Menzil",
+  "lure_range": "Cazibe Aralığı",
+  "tap_to_toggle": "Değiştirmek için dokunun",
+  "power_up": "Güç Ver",
+  "never_alt": "Hiçbir zaman",
+  "seen_nearby_stop": "Yakınlarda Görülme",
+  "seen_nearby_cell": "Bu Hücrede Görülen",
+  "seen_lure_encounter": "cazibesi karşılaşma",
+  "seen_lure_wild": "yem yumurtlama",
+  "seen_wild": "vahşi yumurtlama"
 }

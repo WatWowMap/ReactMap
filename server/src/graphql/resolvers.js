@@ -11,7 +11,8 @@ module.exports = {
   JSON: GraphQLJSON,
   Query: {
     available: (_, _args, { Event, Db, perms, serverV, clientV }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
       const available = {
         pokemon: perms.pokemon ? Event.available.pokemon : [],
@@ -27,7 +28,8 @@ module.exports = {
       }
     },
     badges: async (_, _args, { req, perms, Db, serverV, clientV }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.gymBadges) {
@@ -37,7 +39,8 @@ module.exports = {
       return []
     },
     devices: (_, args, { perms, Db, serverV, clientV }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.devices) {
@@ -46,7 +49,8 @@ module.exports = {
       return []
     },
     geocoder: (_, args, { perms, serverV, clientV, Event }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.webhooks) {
@@ -58,7 +62,8 @@ module.exports = {
       return []
     },
     gyms: (_, args, { req, perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.gyms || perms?.raids) {
@@ -67,7 +72,8 @@ module.exports = {
       return []
     },
     gymsSingle: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.[args.perm]) {
@@ -76,7 +82,8 @@ module.exports = {
       return {}
     },
     nests: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.nests) {
@@ -85,7 +92,8 @@ module.exports = {
       return []
     },
     nestsSingle: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.[args.perm]) {
@@ -94,7 +102,8 @@ module.exports = {
       return {}
     },
     pokestops: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (
@@ -108,7 +117,8 @@ module.exports = {
       return []
     },
     pokestopsSingle: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.[args.perm]) {
@@ -117,7 +127,8 @@ module.exports = {
       return {}
     },
     pokemon: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.pokemon) {
@@ -129,7 +140,8 @@ module.exports = {
       return []
     },
     pokemonSingle: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.[args.perm]) {
@@ -138,7 +150,8 @@ module.exports = {
       return {}
     },
     portals: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.portals) {
@@ -147,7 +160,8 @@ module.exports = {
       return []
     },
     portalsSingle: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.[args.perm]) {
@@ -156,7 +170,8 @@ module.exports = {
       return {}
     },
     scanCells: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.scanCells && args.zoom >= config.map.scanCellsZoom) {
@@ -165,7 +180,8 @@ module.exports = {
       return []
     },
     scanAreas: (_, _args, { req, perms, serverV, clientV }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.scanAreas) {
@@ -187,7 +203,8 @@ module.exports = {
       return [{ features: [] }]
     },
     scanAreasMenu: (_, _args, { req, perms, serverV, clientV }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.scanAreas) {
@@ -224,7 +241,8 @@ module.exports = {
       return []
     },
     search: async (_, args, { Event, perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       const { category, webhookName, search } = args
@@ -266,7 +284,8 @@ module.exports = {
       return []
     },
     searchQuest: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       const { category, search } = args
@@ -279,7 +298,8 @@ module.exports = {
       return []
     },
     spawnpoints: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.spawnpoints) {
@@ -288,7 +308,8 @@ module.exports = {
       return []
     },
     submissionCells: async (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (
@@ -311,7 +332,8 @@ module.exports = {
       return [{ placementCells: [], typeCells: [] }]
     },
     weather: (_, args, { perms, serverV, clientV, Db }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.weather) {
@@ -320,7 +342,8 @@ module.exports = {
       return []
     },
     webhook: (_, args, { req, perms, serverV, clientV }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.webhooks) {
@@ -333,16 +356,17 @@ module.exports = {
       }
       return {}
     },
-    scanner: (_, args, { perms, serverV, clientV }) => {
-      if (clientV !== serverV) throw new UserInputError('old_client')
+    scanner: (_, args, { req, perms, serverV, clientV }) => {
+      if (clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
 
       const { category, method, data } = args
       if (category === 'getQueue') {
-        return Fetch.scannerApi(category, method, data)
+        return Fetch.scannerApi(category, method, data, req?.user)
       }
       if (perms?.scanner?.includes(category)) {
-        return Fetch.scannerApi(category, method, data)
+        return Fetch.scannerApi(category, method, data, req?.user)
       }
       return {}
     },

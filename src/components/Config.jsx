@@ -65,11 +65,8 @@ export default function Config() {
         serverSettings={serverSettings}
         getServerSettings={getServerSettings}
       />
-      <canvas id="holiday-canvas" />
       <HolidayEffects
-        mapSettings={
-          serverSettings?.config?.map ? serverSettings.config.map : {}
-        }
+        holidayEffects={serverSettings?.config?.map?.holidayEffects || []}
       />
     </ThemeProvider>
   )

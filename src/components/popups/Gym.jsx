@@ -343,9 +343,7 @@ const RaidImage = ({ gym, ts, Icons, t }) => {
         />
       </Grid>
       <Grid item xs={12} style={{ textAlign: 'center' }}>
-        <Typography variant="subtitle2">
-          {`${t('tier')} ${raid_level}`}
-        </Typography>
+        <Typography variant="caption">{t(`raid_${raid_level}`)}</Typography>
       </Grid>
       {raid_pokemon_id > 0 &&
         getRaidTypes(raid_pokemon_id, raid_pokemon_form).map((type) => (

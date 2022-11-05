@@ -514,5 +514,17 @@
   "ultra_beast": "울트라 비스트",
   "quest_condition": "퀘스트 조건",
   "always_show_labels": "항상 레이블 표시",
-  "scan_areas_options": "스캔 영역 옵션"
+  "scan_areas_options": "스캔 영역 옵션",
+  "historic_rarity": "역사적 희귀성",
+  "poi": "가볼만한 곳",
+  "300m_range": "300m 범위",
+  "lure_range": "루어 레인지",
+  "tap_to_toggle": "탭하여 토글",
+  "power_up": "파워업",
+  "never_alt": "절대",
+  "seen_nearby_stop": "주변에서 본",
+  "seen_nearby_cell": "이 셀에서 본",
+  "seen_lure_encounter": "루어 인카운터",
+  "seen_lure_wild": "루어 스폰",
+  "seen_wild": "와일드 스폰"
 }

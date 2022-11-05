@@ -11,9 +11,11 @@ module.exports = function getAreaRestrictionSql(
 
   const cleanUserAreas = onlyAreas.filter((area) => areas.names.includes(area))
   const consolidatedAreas = areaRestrictions.length
-    ? areaRestrictions.filter(
-        (area) => !cleanUserAreas.length || cleanUserAreas.includes(area),
-      )
+    ? areaRestrictions
+        .filter(
+          (area) => !cleanUserAreas.length || cleanUserAreas.includes(area),
+        )
+        .flatMap((area) => areas.withoutParents[area] || area)
     : cleanUserAreas
 
   if (!consolidatedAreas.length) return false

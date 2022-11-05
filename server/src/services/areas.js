@@ -24,35 +24,42 @@ const loadAreas = () => {
 const parseAreas = (areasObj) => {
   const polygons = {}
   const names = []
+  const withoutParents = {}
 
   if (!areasObj) {
     return { names, polygons }
   }
   areasObj.features.forEach((feature) => {
-    const { name } = feature.properties
-    if (feature.geometry.type == 'Polygon' && name) {
-      polygons[name] = []
+    const { name, key, manual } = feature.properties
+    if (feature.geometry.type == 'Polygon' && name && !manual) {
+      polygons[key] = []
       feature.geometry.coordinates.forEach((coordPair) => {
-        polygons[name].push(...coordPair)
+        polygons[key].push(...coordPair)
       })
       if (
-        polygons[name][0].every(
-          (coord, i) => coord !== polygons[name][polygons[name].length - 1][i],
+        polygons[key][0].every(
+          (coord, i) => coord !== polygons[key][polygons[key].length - 1][i],
         )
       ) {
-        polygons[name].push(polygons[name][0])
+        polygons[key].push(polygons[key][0])
       }
-      names.push(name)
+      names.push(key)
+      if (withoutParents[name]) {
+        withoutParents[name].push(key)
+      } else {
+        withoutParents[name] = [key]
+      }
     }
   })
-  return { names, polygons }
+  return { names, withoutParents, polygons }
 }
 
 const raw = loadAreas()
-const { names, polygons } = parseAreas(raw)
+const { names, withoutParents, polygons } = parseAreas(raw)
 
 module.exports = {
   raw,
   names,
+  withoutParents,
   polygons,
 }

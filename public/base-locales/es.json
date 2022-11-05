@@ -543,5 +543,17 @@
   "ultra_beast": "Ultrabestia",
   "quest_condition": "Condición de misión",
   "always_show_labels": "Mostrar siempre etiquetas",
-  "scan_areas_options": "Opciones de áreas de escaneo"
+  "scan_areas_options": "Opciones de áreas de escaneo",
+  "historic_rarity": "Rareza histórica",
+  "poi": "Puntos de interés",
+  "300m_range": "Alcance de 300 m",
+  "lure_range": "Gama de señuelos",
+  "tap_to_toggle": "Toque para alternar",
+  "power_up": "Encender",
+  "never_alt": "Nunca",
+  "seen_nearby_stop": "visto cerca",
+  "seen_nearby_cell": "Visto en esta celda",
+  "seen_lure_encounter": "Encuentro de señuelos",
+  "seen_lure_wild": "Engendro de señuelo",
+  "seen_wild": "Engendro salvaje"
 }

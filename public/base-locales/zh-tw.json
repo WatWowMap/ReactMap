@@ -514,5 +514,17 @@
   "ultra_beast": "超野獸",
   "quest_condition": "任務條件",
   "always_show_labels": "始終顯示標籤",
-  "scan_areas_options": "掃描區域選項"
+  "scan_areas_options": "掃描區域選項",
+  "historic_rarity": "歷史稀有",
+  "poi": "興趣點",
+  "300m_range": "300m 範圍",
+  "lure_range": "誘餌範圍",
+  "tap_to_toggle": "點擊切換",
+  "power_up": "充電",
+  "never_alt": "絕不",
+  "seen_nearby_stop": "在附近看到",
+  "seen_nearby_cell": "在這個單元格中看到",
+  "seen_lure_encounter": "誘惑遭遇",
+  "seen_lure_wild": "引誘產卵",
+  "seen_wild": "野生菌種"
 }

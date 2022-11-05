@@ -10,6 +10,28 @@ dotenv.config()
 
 const config = require('config')
 
+try {
+  const refLength = +fs.readFileSync(
+    resolve(__dirname, '../../../.configref'),
+    'utf8',
+  )
+  const defaultLength = fs.readFileSync(
+    resolve(__dirname, '../configs/default.json'),
+    'utf8',
+  ).length
+
+  if (refLength !== defaultLength) {
+    console.error(
+      '[CONFIG] It looks like you have modified the `default.json` file, you should not do this! Make all of your config changes in your `local.json` file.',
+    )
+  }
+} catch (e) {
+  console.error(
+    '[CONFIG] Error trying to read either the default.json or .ref file',
+    e,
+  )
+}
+
 if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
   // add database env variables from .env or docker-compose
   const {
@@ -156,30 +178,41 @@ const mergeMapConfig = (obj) => {
     }
   })
 
+  if (
+    obj?.holidayEffects &&
+    !Array.isArray(obj?.holidayEffects) &&
+    typeof obj?.holidayEffects === 'object'
+  ) {
+    console.warn(
+      '[CONFIG] holidayEffects has been changed to an array, please update your config. Check out `server/src/configs/default.json` for an example.',
+    )
+    obj.holidayEffects = []
+  }
   return {
     localeSelection: obj.localeSelection,
     ...obj,
     ...obj.general,
     ...obj.customRoutes,
     ...obj.links,
-    ...obj.holidayEffects,
     ...obj.misc,
     messageOfTheDay: {
+      ...config.map.messageOfTheDay,
       ...obj.messageOfTheDay,
       ...checkExtraJsons('messageOfTheDay', obj.domain),
     },
     donationPage: {
+      ...config.map.donationPage,
       ...obj.donationPage,
       ...checkExtraJsons('donationPage', obj.domain),
     },
     loginPage: {
+      ...config.map.loginPage,
       ...obj.loginPage,
       ...checkExtraJsons('loginPage', obj.domain),
     },
     general: undefined,
     customRoutes: undefined,
     links: undefined,
-    holidayEffects: undefined,
     misc: undefined,
   }
 }
@@ -227,6 +260,7 @@ const manualGeojson = {
         properties: {
           center: [lat, lon],
           manual: true,
+          key: rest.parent ? `${rest.parent}-${rest.name}` : rest.name,
           ...rest,
         },
         geometry: {
@@ -252,6 +286,9 @@ const loadScanPolygons = (fileName, domain) => {
         ...f,
         properties: {
           ...f.properties,
+          key: f.properties.parent
+            ? `${f.properties.parent}-${f.properties.name}`
+            : f.properties.name,
           center: center(f).geometry.coordinates.reverse(),
         },
       })),
@@ -307,11 +344,14 @@ config.scanAreasMenu = Object.fromEntries(
       if (children.length % 2 === 1) {
         children.push({
           type: 'Feature',
-          properties: { name: '', manual: Boolean(config.manualAreas.length) },
+          properties: { name: '', manual: !!config.manualAreas.length },
         })
       }
     })
-    return [domain, Object.values(parents)]
+    return [
+      domain,
+      Object.values(parents).sort((a, b) => a.name.localeCompare(b.name)),
+    ]
   }),
 )
 config.scanAreasObj = Object.fromEntries(

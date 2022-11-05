@@ -514,5 +514,17 @@
   "ultra_beast": "ウルトラビースト",
   "quest_condition": "クエスト条件",
   "always_show_labels": "常にラベルを表示する",
-  "scan_areas_options": "スキャンエリアオプション"
+  "scan_areas_options": "スキャンエリアオプション",
+  "historic_rarity": "ヒストリックレアリティ",
+  "poi": "興味がある点",
+  "300m_range": "300mレンジ",
+  "lure_range": "ルアーレンジ",
+  "tap_to_toggle": "タップして切り替え",
+  "power_up": "パワーアップ",
+  "never_alt": "一度もない",
+  "seen_nearby_stop": "近くで見た",
+  "seen_nearby_cell": "このセルに表示",
+  "seen_lure_encounter": "ルアーエンカウンター",
+  "seen_lure_wild": "ルアースポーン",
+  "seen_wild": "ワイルドスポーン"
 }

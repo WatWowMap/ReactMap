@@ -514,5 +514,17 @@
   "ultra_beast": "Ultra bestia",
   "quest_condition": "Condizione di ricerca",
   "always_show_labels": "Mostra sempre le etichette",
-  "scan_areas_options": "Opzioni delle aree di scansione"
+  "scan_areas_options": "Opzioni delle aree di scansione",
+  "historic_rarity": "Rarità storica",
+  "poi": "Punti di interesse",
+  "300m_range": "Portata 300 m",
+  "lure_range": "Gamma di esca",
+  "tap_to_toggle": "Tocca per attivare",
+  "power_up": "Accendere",
+  "never_alt": "Mai",
+  "seen_nearby_stop": "Visto nelle vicinanze",
+  "seen_nearby_cell": "Visto in questa cella",
+  "seen_lure_encounter": "Incontro di richiamo",
+  "seen_lure_wild": "Esca Spawn",
+  "seen_wild": "Progenie selvatica"
 }

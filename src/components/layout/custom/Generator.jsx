@@ -11,6 +11,7 @@ import Telegram from '../auth/Telegram'
 import CustomText from './CustomText'
 import CustomButton from './CustomButton'
 import CustomImg from './CustomImg'
+import LocaleSelection from '../general/LocaleSelection'
 
 export default function Generator({
   block = {},
@@ -43,6 +44,12 @@ export default function Generator({
           href={block.localAuthUrl}
           serverSettings={serverSettings}
           getServerSettings={getServerSettings}
+        />
+      )
+    case 'localeSelection':
+      return (
+        <LocaleSelection
+          localeSelection={serverSettings.config.localeSelection}
         />
       )
     case 'parent':
