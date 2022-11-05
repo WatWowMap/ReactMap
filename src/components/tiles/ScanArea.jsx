@@ -41,7 +41,7 @@ export function ScanAreaTile({
             feature.properties.fill ||
             '#3388ff',
           fillOpacity:
-            (selectedAreas?.includes(name.toLowerCase()) &&
+            (selectedAreas?.includes(name?.toLowerCase()) &&
               webhookMode === 'areas') ||
             onlyAreas?.includes(webhookMode ? name : key)
               ? 0.8
@@ -55,7 +55,7 @@ export function ScanAreaTile({
       if (!userSettings || userSettings.alwaysShowLabels) {
         layer.openTooltip()
       }
-      if (webhookMode) {
+      if (webhookMode && name) {
         layer.on('click', () => handleClick(name.toLowerCase()))
       } else if (!feature.properties.manual && userSettings?.tapToToggle) {
         layer.on('click', () => setAreas(key, names))
@@ -72,6 +72,7 @@ export function ScanAreaTile({
         ...item,
         features: item.features.filter(
           (f) =>
+          webhookMode ||
             filters?.filter?.search === '' ||
             f.properties.key
               .toLowerCase()
