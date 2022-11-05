@@ -72,7 +72,7 @@ export function ScanAreaTile({
         ...item,
         features: item.features.filter(
           (f) =>
-          webhookMode ||
+            webhookMode ||
             filters?.filter?.search === '' ||
             f.properties.key
               .toLowerCase()
