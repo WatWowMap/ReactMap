@@ -14,7 +14,12 @@ export default function Container({ serverSettings, params, location, zoom }) {
     <MapContainer
       tap={false}
       center={location}
-      zoom={zoom}
+      zoom={
+        zoom < serverSettings.config.map.minZoom ||
+        zoom > serverSettings.config.map.maxZoom
+          ? serverSettings.config.map.minZoom
+          : zoom
+      }
       zoomControl={false}
       preferCanvas
     >
