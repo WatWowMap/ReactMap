@@ -42,7 +42,7 @@ const server = new ApolloServer({
       Event,
       perms,
       serverV: version,
-      clientV: req.headers['apollographql-client-version']?.trim() || '',
+      clientV: req.headers['apollographql-client-version']?.trim() || version,
     }
   },
   formatError: (e) => {
@@ -55,11 +55,12 @@ const server = new ApolloServer({
       e?.message.includes('skipUndefined()') ||
       e?.message === 'old_client'
     ) {
-      if (config.devOptions.enabled) {
-        console.log(
-          '[GQL] Old client detected, forcing user to refresh, no need to report this error unless it continues to happen',
-        )
-      }
+      console.log(
+        '[GQL] Old client detected, forcing user to refresh, no need to report this error unless it continues to happen\nClient:',
+        e.extensions.clientV,
+        'Server:',
+        e.extensions.serverV,
+      )
       return { message: 'old_client' }
     }
     if (e.message === 'session_expired') {
