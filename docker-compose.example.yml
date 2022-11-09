@@ -15,7 +15,7 @@ services:
       SCANNER_DB_PASSWORD: scanner_user_pw
       SCANNER_DB_NAME: scanner_db
 
-      # Your ReactMap Database 
+      # Your ReactMap Database
       # optional, but recommended, if omitted it will default to your manual database
       REACT_MAP_DB_HOST: 127.0.0.1
       REACT_MAP_DB_PORT: 3306
@@ -29,11 +29,11 @@ services:
       MANUAL_DB_USERNAME: manual_username
       MANUAL_DB_PASSWORD: manual_user_pw
       MANUAL_DB_NAME: manual_db
-    
+
       # Other config values - the below env vars will override anything, including `local.json`
-      # More config values you can add: 
-      #   https://github.com/WatWowMap/ReactMap/blob/main/server/src/configs/custom-environment-variables.json 
-      # Config wiki page: 
+      # More config values you can add:
+      #   https://github.com/WatWowMap/ReactMap/blob/main/server/src/configs/custom-environment-variables.json
+      # Config wiki page:
       #   https://github.com/WatWowMap/ReactMap/wiki/04.-Full-Config-Explanation
       # Devs recommened that you use a `local.json` config file though instead of env variables!
       MAP_GENERAL_TITLE: ReactMap
@@ -42,17 +42,18 @@ services:
       # ARRAY_VALUE_EXAMPLE: "[3, 4, 5]"
 
     volumes:
-    # All of these are optional - comment out whichever ones you aren't using
+      # All of these are optional - comment out whichever ones you aren't using
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
       - ./server/src/configs/local.json:/home/node/server/src/configs/local.json
       - ./server/src/configs/geofence.json/:/home/node/server/src/configs/geofence.json
       - ./example.env:/home/node/.env
-  
+
     security_opt:
-      - no-new-privileges:true #https://nodramadevops.com/2019/06/running-docker-application-containers-more-securely/
-  
+     # https://nodramadevops.com/2019/06/running-docker-application-containers-more-securely/ 
+     - no-new-privileges:true 
+
     ports:
-      - "9090:8080"
+      - '9090:8080'
   # nginx:
   #   image: nginx
   #   container_name: nginx
