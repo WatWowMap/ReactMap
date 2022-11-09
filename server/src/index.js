@@ -19,7 +19,7 @@ const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
-const { version } = require('../../package.json')
+const pkg = require('../../package.json')
 
 if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')
@@ -41,8 +41,9 @@ const server = new ApolloServer({
       Db,
       Event,
       perms,
-      serverV: version,
-      clientV: req.headers['apollographql-client-version']?.trim() || version,
+      serverV: pkg.version || 1,
+      clientV:
+        req.headers['apollographql-client-version']?.trim() || pkg.version || 1,
     }
   },
   formatError: (e) => {

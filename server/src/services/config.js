@@ -40,6 +40,11 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
     SCANNER_DB_NAME,
     SCANNER_DB_USERNAME,
     SCANNER_DB_PASSWORD,
+    REACT_MAP_DB_HOST,
+    REACT_MAP_DB_PORT,
+    REACT_MAP_DB_USERNAME,
+    REACT_MAP_DB_PASSWORD,
+    REACT_MAP_DB_NAME,
     MANUAL_DB_HOST,
     MANUAL_DB_PORT,
     MANUAL_DB_NAME,
@@ -49,13 +54,26 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
     MAP_GENERAL_START_LON,
   } = process.env
 
-  if (
+  const hasScannerDb =
     SCANNER_DB_HOST &&
     SCANNER_DB_PORT &&
     SCANNER_DB_NAME &&
     SCANNER_DB_USERNAME &&
     SCANNER_DB_PASSWORD
-  ) {
+  const hasReactMapDb =
+    REACT_MAP_DB_HOST &&
+    REACT_MAP_DB_PORT &&
+    REACT_MAP_DB_USERNAME &&
+    REACT_MAP_DB_PASSWORD &&
+    REACT_MAP_DB_NAME
+  const hasManualDb =
+    MANUAL_DB_HOST &&
+    MANUAL_DB_PORT &&
+    MANUAL_DB_NAME &&
+    MANUAL_DB_USERNAME &&
+    MANUAL_DB_PASSWORD
+
+  if (hasScannerDb) {
     config.database.schemas.push({
       host: SCANNER_DB_HOST,
       port: +SCANNER_DB_PORT,
@@ -77,20 +95,30 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
       'Missing scanner database config! \nCheck to make sure you have SCANNER_DB_HOST,SCANNER_DB_PORT, SCANNER_DB_NAME, SCANNER_DB_USERNAME, and SCANNER_DB_PASSWORD',
     )
   }
-  if (
-    MANUAL_DB_HOST &&
-    MANUAL_DB_PORT &&
-    MANUAL_DB_NAME &&
-    MANUAL_DB_USERNAME &&
-    MANUAL_DB_PASSWORD
-  ) {
+  if (hasReactMapDb) {
+    config.database.schemas.push({
+      host: REACT_MAP_DB_HOST,
+      port: +REACT_MAP_DB_PORT,
+      database: REACT_MAP_DB_USERNAME,
+      username: REACT_MAP_DB_PASSWORD,
+      password: REACT_MAP_DB_NAME,
+      useFor: ['session', 'user'],
+    })
+  } else {
+    console.log(
+      'Missing ReactMap specific table, attempting to use the manual database instead.',
+    )
+  }
+  if (hasManualDb) {
     config.database.schemas.push({
       host: MANUAL_DB_HOST,
       port: +MANUAL_DB_PORT,
       database: MANUAL_DB_NAME,
       username: MANUAL_DB_USERNAME,
       password: MANUAL_DB_PASSWORD,
-      useFor: ['session', 'user', 'nest', 'portal'],
+      useFor: hasReactMapDb
+        ? ['nest', 'portal']
+        : ['session', 'user', 'nest', 'portal'],
     })
   } else {
     console.error(
