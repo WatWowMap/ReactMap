@@ -49,8 +49,8 @@ services:
       - ./example.env:/home/node/.env
 
     security_opt:
-     # https://nodramadevops.com/2019/06/running-docker-application-containers-more-securely/ 
-      - no-new-privileges:true 
+      # https://nodramadevops.com/2019/06/running-docker-application-containers-more-securely/
+      - no-new-privileges:true
 
     ports:
       - '9090:8080'
