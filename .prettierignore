@@ -4,6 +4,4 @@ public/missing-locales
 public/images/custom
 public/images/uicons
 server/src/configs/
-
-## file extensions
-!*.yml
+.github/workflows/
