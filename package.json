@@ -27,8 +27,8 @@
     "release": "node server/scripts/newRelease.js",
     "prettier:check": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
     "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\"",
-    "eslint:check": "eslint \"**/*.{js,jsx,yml}\"",
-    "eslint:fix": "eslint \"**/*.{js,jsx,yml}\" --fix"
+    "eslint:check": "eslint \"**/*.{js,jsx}\"",
+    "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix"
   },
   "engines": {
     "node": ">=16",
