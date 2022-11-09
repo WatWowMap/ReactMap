@@ -558,5 +558,7 @@
   "seen_nearby_cell": "Seen in this Cell",
   "seen_lure_encounter": "Lure Encounter",
   "seen_lure_wild": "Lure Spawn",
-  "seen_wild": "Wild Spawn"
+  "seen_wild": "Wild Spawn",
+  "event_stops": "Event Stops",
+  "event_stop_timers": "Event Stop Timers"
 }

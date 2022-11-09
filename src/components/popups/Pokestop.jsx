@@ -48,7 +48,10 @@ export default function PokestopPopup({
     )
   }, [])
 
-  const plainPokestop = !hasLure && !hasQuest && !hasInvasion
+  const hasEventInvasion = invasions?.some((invasion) => !invasion.grunt_type)
+
+  const plainPokestop =
+    !hasLure && !hasQuest && !hasInvasion && !hasEventInvasion
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
@@ -142,7 +145,7 @@ export default function PokestopPopup({
                     />
                   </>
                 )}
-                {hasInvasion && (
+                {(hasInvasion || hasEventInvasion) && (
                   <>
                     {(hasQuest || hasLure) && (
                       <Divider light flexItem className="popup-divider" />
