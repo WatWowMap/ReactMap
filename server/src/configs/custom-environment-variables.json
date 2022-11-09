@@ -565,6 +565,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_LURE_TIMERS",
         "__format": "boolean"
       },
+      "eventStopTimers": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_EVENT_STOP_TIMERS",
+        "__format": "boolean"
+      },
       "interactionRanges": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_INTERACTION_RANGES",
         "__format": "boolean"
@@ -758,6 +762,10 @@
       },
       "quests": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_QUESTS",
+        "__format": "boolean"
+      },
+      "eventStops": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_EVENT_STOPS",
         "__format": "boolean"
       },
       "questSet": "DEFAULT_FILTERS_POKESTOPS_QUEST_SET",
