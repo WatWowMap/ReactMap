@@ -11,12 +11,11 @@ const esbuildMxnCopy = require('esbuild-plugin-mxn-copy')
 const aliasPlugin = require('esbuild-plugin-path-alias')
 const { eslintPlugin } = require('esbuild-plugin-eslinter')
 
+const pkg = require('./package.json')
+
 const env = fs.existsSync(resolve(__dirname, '.env'))
   ? dotenv.config()
   : { parsed: process.env }
-const { version } = JSON.parse(
-  fs.readFileSync(resolve(__dirname, 'package.json')),
-)
 const isDevelopment = Boolean(process.argv.includes('--dev'))
 const isRelease = Boolean(process.argv.includes('--release'))
 const isServing = Boolean(process.argv.includes('--serve'))
@@ -112,7 +111,7 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
       },
     })
   }
-  console.log(`[BUILD] Building production version: ${version}`)
+  console.log(`[BUILD] Building production version: ${pkg.version}`)
 }
 
 const esbuild = {
@@ -121,7 +120,7 @@ const esbuild = {
   bundle: true,
   outdir: 'dist/',
   publicPath: '/',
-  entryNames: isDevelopment ? undefined : `[name]-${version}-[hash]`,
+  entryNames: isDevelopment ? undefined : `[name]-${pkg.version}-[hash]`,
   metafile: true,
   minify: env.parsed.NO_MINIFIED ? false : isRelease || !isDevelopment,
   logLevel: isDevelopment ? 'info' : 'error',
@@ -143,7 +142,7 @@ const esbuild = {
       SENTRY_DSN: env.parsed.SENTRY_DSN || '',
       SENTRY_TRACES_SAMPLE_RATE: env.parsed.SENTRY_TRACES_SAMPLE_RATE || 0.1,
       SENTRY_DEBUG: env.parsed.SENTRY_DEBUG || false,
-      VERSION: version,
+      VERSION: pkg.version,
       DEVELOPMENT: isDevelopment,
       CUSTOM: hasCustom,
       LOCALES: fs.readdirSync(resolve(__dirname, 'public/locales')),

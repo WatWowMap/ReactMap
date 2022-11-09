@@ -1090,7 +1090,8 @@ module.exports = class Pokestop extends Model {
       queries.invasions = this.query()
         .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
         .distinct('incident.character AS grunt_type')
-        .where(
+        .where('incident.character', '>', 0)
+        .andWhere(
           multiInvasionMs ? 'expiration_ms' : 'incident.expiration',
           '>=',
           ts * (multiInvasionMs ? 1000 : 1),
@@ -1104,7 +1105,7 @@ module.exports = class Pokestop extends Model {
           '>',
           0,
         )
-        .where(
+        .andWhere(
           isMad ? 'incident_expiration' : 'incident_expire_timestamp',
           '>=',
           isMad ? this.knex().fn.now() : ts,
@@ -1131,6 +1132,7 @@ module.exports = class Pokestop extends Model {
         Object.entries(queries).map(async ([key, query]) => [key, await query]),
       ),
     )
+
     let questTypes = [
       ...new Set([
         ...(await this.query()

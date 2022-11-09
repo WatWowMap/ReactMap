@@ -6,29 +6,54 @@ services:
     command: sh -c "yarn start"
     restart: unless-stopped
     environment:
+      # All database values are ignored if you are using a `local.json` file!
+
+      # Your Scanner Database
       SCANNER_DB_HOST: 127.0.0.1
       SCANNER_DB_PORT: 3306
       SCANNER_DB_USERNAME: scanner_username
       SCANNER_DB_PASSWORD: scanner_user_pw
-      SCANNER_DB_NAME: realdevicemap
+      SCANNER_DB_NAME: scanner_db
+
+      # Your ReactMap Database
+      # optional, but recommended, if omitted it will default to your manual database
+      REACT_MAP_DB_HOST: 127.0.0.1
+      REACT_MAP_DB_PORT: 3306
+      REACT_MAP_DB_USERNAME: react_map_username
+      REACT_MAP_DB_PASSWORD: react_map_user_pw
+      REACT_MAP_DB_NAME: react_map_db
+
+      # Your Manual Database (Optional - Nests & Portals)
       MANUAL_DB_HOST: 127.0.0.1
       MANUAL_DB_PORT: 3306
       MANUAL_DB_USERNAME: manual_username
       MANUAL_DB_PASSWORD: manual_user_pw
       MANUAL_DB_NAME: manual_db
+
+      # Other config values - the below env vars will override anything, including `local.json`
+      # More config values you can add:
+      #   https://github.com/WatWowMap/ReactMap/blob/main/server/src/configs/custom-environment-variables.json
+      # Config wiki page:
+      #   https://github.com/WatWowMap/ReactMap/wiki/04.-Full-Config-Explanation
+      # Devs recommened that you use a `local.json` config file though instead of env variables!
       MAP_GENERAL_TITLE: ReactMap
       MAP_GENERAL_START_LAT: 0
       MAP_GENERAL_START_LON: 0
-      ARRAY_VALUE_EXAMPLE: "[3, 4, 5]"
+      # ARRAY_VALUE_EXAMPLE: "[3, 4, 5]"
+
     volumes:
+      # All of these are optional - comment out whichever ones you aren't using
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
       - ./server/src/configs/local.json:/home/node/server/src/configs/local.json
       - ./server/src/configs/geofence.json/:/home/node/server/src/configs/geofence.json
       - ./example.env:/home/node/.env
+
     security_opt:
-      - no-new-privileges:true #https://nodramadevops.com/2019/06/running-docker-application-containers-more-securely/
+      # https://nodramadevops.com/2019/06/running-docker-application-containers-more-securely/
+      - no-new-privileges:true
+
     ports:
-      - "9090:8080"
+      - '9090:8080'
   # nginx:
   #   image: nginx
   #   container_name: nginx
