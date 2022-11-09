@@ -8,7 +8,7 @@ const { Event } = require('../initialization')
 module.exports = async function fetchNests() {
   try {
     const { [nestHemisphere]: nesting } = await fetchJson(
-      'https://raw.githubusercontent.com/ccev/pogoinfo/v2/nests/species-ids.json',
+      'https://raw.githubusercontent.com/ReuschelCGN/pogoinfo/v2/nests/species-ids.json',
     )
     return nesting.map(
       (pokemon) =>
