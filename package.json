@@ -25,8 +25,8 @@
     "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
     "migrate:rollback": "knex --knexfile server/knexfile.cjs migrate:rollback",
     "release": "node server/scripts/newRelease.js",
-    "prettier:check": "prettier --check \"**/*.{css,html,js,jsx}\"",
-    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx}\"",
+    "prettier:check": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
+    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\"",
     "eslint:check": "eslint \"**/*.{js,jsx}\"",
     "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix"
   },
