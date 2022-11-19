@@ -70,6 +70,7 @@ module.exports = class Pokestop extends Model {
         onlyInvasions,
         onlyArEligible,
         onlyAllPokestops,
+        onlyEventStops,
         onlyAreas = [],
       },
       ts,
@@ -515,11 +516,24 @@ module.exports = class Pokestop extends Model {
             ar.where(isMad ? 'is_ar_scan_eligible' : 'ar_scan_eligible', 1)
           })
         }
+        if (onlyEventStops && pokestopPerms) {
+          stops.orWhere((event) => {
+            event
+              .where('display_type', 7)
+              .andWhere('character', 0)
+              .andWhere(
+                multiInvasionMs ? 'expiration_ms' : 'expiration',
+                '>=',
+                safeTs * (multiInvasionMs ? 1000 : 1),
+              )
+          })
+        }
       })
     } else if (onlyLevels !== 'all' && hasPowerUp) {
       query.andWhere('power_up_level', onlyLevels)
     }
     const results = await query
+
     const normalized = isMad
       ? this.mapMAD(results, safeTs)
       : this.mapRDM(results, safeTs)
@@ -571,16 +585,25 @@ module.exports = class Pokestop extends Model {
           'power_up_level',
           'power_up_end_timestamp',
         ])
+        if (filters.onlyEventStops) {
+          filtered.invasions = pokestop.invasions.filter(
+            (invasion) => !invasion.grunt_type,
+          )
+        }
       }
       if (
         perms.invasions &&
         (filters.onlyAllPokestops || filters.onlyInvasions)
       ) {
-        filtered.invasions = filters.onlyAllPokestops
-          ? pokestop.invasions
-          : pokestop.invasions.filter(
-              (invasion) => filters[`i${invasion.grunt_type}`],
-            )
+        filtered.invasions = [
+          ...(Array.isArray(filtered.invasions) ? filtered.invasions : []),
+          ...(filters.onlyAllPokestops
+            ? pokestop.invasions
+            : pokestop.invasions.filter(
+                (invasion) =>
+                  invasion.grunt_type && filters[`i${invasion.grunt_type}`],
+              )),
+        ]
       }
       if (
         perms.lures &&
@@ -715,7 +738,10 @@ module.exports = class Pokestop extends Model {
           }
         })
       }
-      if (invasion.grunt_type && invasion.incident_expire_timestamp >= ts) {
+      if (
+        typeof invasion.grunt_type === 'number' &&
+        invasion.incident_expire_timestamp >= ts
+      ) {
         filtered[result.id].invasions.push(invasion)
       }
       filtered[result.id].quests.push(quest)
@@ -755,7 +781,10 @@ module.exports = class Pokestop extends Model {
       if (altQuest.quest_reward_type) {
         filtered[result.id].quests.push(altQuest)
       }
-      if (invasion.grunt_type && invasion.incident_expire_timestamp >= ts) {
+      if (
+        typeof invasion.grunt_type === 'number' &&
+        invasion.incident_expire_timestamp >= ts
+      ) {
         filtered[result.id].invasions.push(invasion)
       }
     }
@@ -1061,7 +1090,8 @@ module.exports = class Pokestop extends Model {
       queries.invasions = this.query()
         .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
         .distinct('incident.character AS grunt_type')
-        .where(
+        .where('incident.character', '>', 0)
+        .andWhere(
           multiInvasionMs ? 'expiration_ms' : 'incident.expiration',
           '>=',
           ts * (multiInvasionMs ? 1000 : 1),
@@ -1071,10 +1101,16 @@ module.exports = class Pokestop extends Model {
       queries.invasions = this.query()
         .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
         .where(
+          isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type',
+          '>',
+          0,
+        )
+        .andWhere(
           isMad ? 'incident_expiration' : 'incident_expire_timestamp',
           '>=',
           isMad ? this.knex().fn.now() : ts,
         )
+
         .orderBy('grunt_type')
     }
     // invasions
@@ -1096,6 +1132,7 @@ module.exports = class Pokestop extends Model {
         Object.entries(queries).map(async ([key, query]) => [key, await query]),
       ),
     )
+
     let questTypes = [
       ...new Set([
         ...(await this.query()

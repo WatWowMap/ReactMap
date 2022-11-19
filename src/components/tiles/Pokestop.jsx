@@ -34,6 +34,7 @@ const PokestopTile = ({
     item.invasions &&
     item.invasions.some(
       (invasion) =>
+        invasion.grunt_type &&
         !excludeList.includes(`i${invasion.grunt_type}`) &&
         invasion.incident_expire_timestamp > newTs,
     )
@@ -49,6 +50,17 @@ const PokestopTile = ({
   }
   if ((showTimer || userSettings.lureTimers) && hasLure) {
     timers.push(item.lure_expire_timestamp)
+  }
+  if (
+    (showTimer || userSettings.eventStopTimers) &&
+    !hasInvasion &&
+    item.invasions?.length
+  ) {
+    item.invasions.forEach((invasion) => {
+      if (!invasion.grunt_type) {
+        timers.push(invasion.incident_expire_timestamp)
+      }
+    })
   }
 
   useMarkerTimer(
@@ -66,7 +78,10 @@ const PokestopTile = ({
       (hasQuest && perms.quests) ||
         (hasLure && perms.lures) ||
         (hasInvasion && perms.invasions) ||
-        ((filters.allPokestops || item.ar_scan_eligible) && perms.allPokestops),
+        ((filters.allPokestops ||
+          item.ar_scan_eligible ||
+          filters.eventStops) &&
+          perms.allPokestops),
     ) && (
       <Marker
         ref={(m) => {

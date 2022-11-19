@@ -42,12 +42,16 @@ export default function stopMarker(
   if (hasInvasion) {
     const { invasions } = pokestop
     invasions.forEach((invasion) => {
-      filterId = `i${invasion.grunt_type}`
-      invasionIcons.unshift(Icons.getInvasions(invasion.grunt_type))
-      invasionSizes.unshift(Icons.getSize('invasion', filters.filter[filterId]))
-      popupYOffset += rewardMod.offsetY - 1
-      popupX += invasionMod.popupX
-      popupY += invasionMod.popupY
+      if (invasion.grunt_type) {
+        filterId = `i${invasion.grunt_type}`
+        invasionIcons.unshift(Icons.getInvasions(invasion.grunt_type))
+        invasionSizes.unshift(
+          Icons.getSize('invasion', filters.filter[filterId]),
+        )
+        popupYOffset += rewardMod.offsetY - 1
+        popupX += invasionMod.popupX
+        popupY += invasionMod.popupY
+      }
     })
   }
   if (hasQuest && !(hasInvasion && invasionMod?.removeQuest)) {

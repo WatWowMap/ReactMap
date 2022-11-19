@@ -1,5 +1,5 @@
 name: Docker
-on: [push, release]
+on: [push]
 
 env:
   REGISTRY: ghcr.io
@@ -10,18 +10,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 2
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v32
+        with:
+          files: |
+            server/src/configs/*.json
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: "yarn"
+          cache: 'yarn'
       - name: Generate latest env vars
+        if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           yarn gen-env-config
       - name: Commit and push changes
+        if: steps.changed-files.outputs.any_changed == 'true'
         uses: devops-infra/action-commit-push@v0.9.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -31,33 +40,32 @@ jobs:
     needs: Sync
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-    - name: Set .gitsha
-      if: github.event_name == 'push'
-      run: "echo ${{github.sha}} > .gitsha"
-    - name: Set .gitref
-      if: github.event_name == 'push'
-      run: "echo ${{github.ref}} > .gitref"
+      - name: Set .gitsha
+        if: github.event_name == 'push'
+        run: 'echo ${{github.sha}} > .gitsha'
+      - name: Set .gitref
+        if: github.event_name == 'push'
+        run: 'echo ${{github.ref}} > .gitref'
 
-    - name: Log in to the Container registry
-      uses: docker/login-action@v1
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
-      uses: docker/metadata-action@v3
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

@@ -25,7 +25,7 @@ module.exports = class Device extends Model {
         ])
     } else {
       query
-        .join('instance', 'device.instance_name', 'instance.name')
+        .leftJoin('instance', 'device.instance_name', 'instance.name')
         .select(
           'uuid AS id',
           'last_seen AS updated',
@@ -42,6 +42,11 @@ module.exports = class Device extends Model {
     ) {
       return []
     }
-    return query.from(settings.isMad ? 'settings_device' : 'device')
+    const results = await query.from(
+      settings.isMad ? 'settings_device' : 'device',
+    )
+    return results.filter(
+      (device) => device.id && device.last_lat && device.last_lon,
+    )
   }
 }

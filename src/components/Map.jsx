@@ -27,14 +27,15 @@ const userSettingsCategory = (category) => {
   }
 }
 
-const getTileServer = (tileServers, settings, isNight) => {
+const getTileServer = (tileServers, settings, timeOfDay) => {
   const fallbackTs = Object.values(tileServers).find(
     (server) => server.name !== 'auto',
   )
   if (tileServers?.[settings.tileServers]?.name === 'auto') {
-    const autoTile = isNight
-      ? Object.values(tileServers).find((server) => server.style === 'dark')
-      : Object.values(tileServers).find((server) => server.style === 'light')
+    const autoTile =
+      timeOfDay === 'night'
+        ? Object.values(tileServers).find((server) => server.style === 'dark')
+        : Object.values(tileServers).find((server) => server.style === 'light')
     return autoTile || fallbackTs
   }
   return tileServers[settings.tileServers] || fallbackTs
@@ -68,8 +69,8 @@ export default function Map({
   const settings = useStore((state) => state.settings)
   const icons = useStore((state) => state.icons)
   const setLocation = useStore((s) => s.setLocation)
-  const isNight = useStatic((state) => state.isNight)
-  const setIsNight = useStatic((state) => state.setIsNight)
+  const timeOfDay = useStatic((state) => state.timeOfDay)
+  const setTimeOfDay = useStatic((state) => state.setTimeOfDay)
   const setZoom = useStore((state) => state.setZoom)
   const userSettings = useStore((state) => state.userSettings)
 
@@ -93,14 +94,14 @@ export default function Map({
       const newCenter = latLon || map.getCenter()
       setLocation([newCenter.lat, newCenter.lng])
       setZoom(Math.floor(map.getZoom()))
-      setIsNight(Utility.nightCheck(newCenter.lat, newCenter.lng))
+      setTimeOfDay(Utility.timeCheck(newCenter.lat, newCenter.lng))
     },
     [map],
   )
 
   const tileServer = useMemo(
-    () => getTileServer(tileServers, settings, isNight),
-    [isNight, settings.tileServers],
+    () => getTileServer(tileServers, settings, timeOfDay),
+    [timeOfDay, settings.tileServers],
   )
 
   const onFocus = () => setWindowState(true)
@@ -142,6 +143,7 @@ export default function Map({
         key={tileServer?.name}
         attribution={tileServer?.attribution || ''}
         url={
+          tileServer?.[timeOfDay] ||
           tileServer?.url ||
           'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png'
         }
@@ -201,6 +203,7 @@ export default function Map({
                     (filters[category].lures && value.lures) ||
                     (filters[category].invasions && value.invasions) ||
                     (filters[category].quests && value.quests) ||
+                    (filters[category].eventStops && value.eventStops) ||
                     (filters[category].arEligible && value.arEligible)) &&
                   !webhookMode
                 ) {
@@ -262,7 +265,7 @@ export default function Map({
                   staticUserSettings={staticUserSettings[category]}
                   params={manualParams}
                   setParams={setManualParams}
-                  isNight={isNight}
+                  timeOfDay={timeOfDay}
                   isMobile={isMobile}
                   setError={setError}
                   active={active}

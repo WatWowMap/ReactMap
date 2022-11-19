@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.6.5",
+  "version": "1.6.8",
   "description": "React based frontend map.",
   "main": "ReactMap.js",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -25,8 +25,8 @@
     "migrate:latest": "knex --knexfile server/knexfile.cjs migrate:latest",
     "migrate:rollback": "knex --knexfile server/knexfile.cjs migrate:rollback",
     "release": "node server/scripts/newRelease.js",
-    "prettier:check": "prettier --check \"**/*.{css,html,js,jsx}\"",
-    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx}\"",
+    "prettier:check": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
+    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\"",
     "eslint:check": "eslint \"**/*.{js,jsx}\"",
     "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix"
   },
@@ -113,7 +113,7 @@
     "react-virtualized-auto-sizer": "^1.0.5",
     "react-window": "^1.8.6",
     "require-from-string": "^2.0.2",
-    "suncalc": "^1.8.0",
+    "suncalc": "^1.9.0",
     "zustand": "^4.0.0-rc.1"
   }
 }

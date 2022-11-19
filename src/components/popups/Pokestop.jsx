@@ -48,7 +48,10 @@ export default function PokestopPopup({
     )
   }, [])
 
-  const plainPokestop = !hasLure && !hasQuest && !hasInvasion
+  const hasEventInvasion = invasions?.some((invasion) => !invasion.grunt_type)
+
+  const plainPokestop =
+    !hasLure && !hasQuest && !hasInvasion && !hasEventInvasion
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
@@ -142,7 +145,7 @@ export default function PokestopPopup({
                     />
                   </>
                 )}
-                {hasInvasion && (
+                {(hasInvasion || hasEventInvasion) && (
                   <>
                     {(hasQuest || hasLure) && (
                       <Divider light flexItem className="popup-divider" />
@@ -156,7 +159,11 @@ export default function PokestopPopup({
                         ) : null}
                         <TimeTile
                           expireTime={invasion.incident_expire_timestamp}
-                          icon={Icons.getInvasions(invasion.grunt_type)}
+                          icon={
+                            invasion.grunt_type
+                              ? Icons.getInvasions(invasion.grunt_type)
+                              : Icons.getMisc('event_coin')
+                          }
                           until
                           tt={`grunt_a_${invasion.grunt_type}`}
                         />

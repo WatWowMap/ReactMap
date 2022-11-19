@@ -19,7 +19,7 @@ const { sessionStore } = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
-const { version } = require('../../package.json')
+const pkg = require('../../package.json')
 
 if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')
@@ -41,8 +41,9 @@ const server = new ApolloServer({
       Db,
       Event,
       perms,
-      serverV: version,
-      clientV: req.headers['apollographql-client-version']?.trim() || '',
+      serverV: pkg.version || 1,
+      clientV:
+        req.headers['apollographql-client-version']?.trim() || pkg.version || 1,
     }
   },
   formatError: (e) => {
@@ -55,11 +56,12 @@ const server = new ApolloServer({
       e?.message.includes('skipUndefined()') ||
       e?.message === 'old_client'
     ) {
-      if (config.devOptions.enabled) {
-        console.log(
-          '[GQL] Old client detected, forcing user to refresh, no need to report this error unless it continues to happen',
-        )
-      }
+      console.log(
+        '[GQL] Old client detected, forcing user to refresh, no need to report this error unless it continues to happen\nClient:',
+        e.extensions.clientV,
+        'Server:',
+        e.extensions.serverV,
+      )
       return { message: 'old_client' }
     }
     if (e.message === 'session_expired') {

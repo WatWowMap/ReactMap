@@ -26,6 +26,7 @@ module.exports = function clientOptions(perms) {
       clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },
       invasionTimers: { type: 'bool', perm: ['invasions'] },
       lureTimers: { type: 'bool', perm: ['lures'] },
+      eventStopTimers: { type: 'bool', perm: ['pokestops'] },
       interactionRanges: { type: 'bool', perm: ['pokestops'] },
       lureRange: { type: 'bool', perm: ['lures'] },
       hasQuestIndicator: { type: 'bool', perm: ['quests'] },
