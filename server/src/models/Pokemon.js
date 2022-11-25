@@ -25,6 +25,7 @@ const keys = [
   'atk_iv',
   'def_iv',
   'sta_iv',
+  'gender',
   ...leagues.map((league) => league.name),
 ]
 const madKeys = {
@@ -158,7 +159,9 @@ module.exports = class Pokemon extends Model {
 
     // checks if filters are set to default and skips them if so
     const arrayCheck = (filter, key) =>
-      filter[key]?.every((v, i) => v === onlyStandard[key][i])
+      Array.isArray(filter[key])
+        ? filter[key]?.every((v, i) => v === onlyStandard[key][i])
+        : filter[key] === onlyStandard[key]
 
     // cycles through the above arrayCheck
     const getRelevantKeys = (filter) => {
@@ -175,6 +178,9 @@ module.exports = class Pokemon extends Model {
     const generateSql = (queryBase, filter, relevant) => {
       relevant.forEach((key) => {
         switch (key) {
+          case 'gender':
+            queryBase.andWhere('pokemon.gender', filter[key])
+            break
           case 'level':
           case 'atk_iv':
           case 'def_iv':

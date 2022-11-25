@@ -7,6 +7,7 @@ import Utility from '@services/Utility'
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 import TabPanel from '../general/TabPanel'
+import GenderFilter from '../dialogs/filters/Gender'
 
 export default function WithSliders({
   category,
@@ -190,6 +191,24 @@ export default function WithSliders({
                         </Grid>
                       </Fragment>
                     ))}
+                {!index && (
+                  <GenderFilter
+                    filter={filters[category].ivOr}
+                    setFilter={(newValue) =>
+                      setFilters({
+                        ...filters,
+                        [category]: {
+                          ...filters[category],
+                          ivOr: {
+                            ...filters[category].ivOr,
+                            gender: newValue,
+                          },
+                        },
+                      })
+                    }
+                    category="pokemon"
+                  />
+                )}
               </Grid>
             </TabPanel>
           ))}
