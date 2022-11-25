@@ -192,22 +192,31 @@ export default function WithSliders({
                       </Fragment>
                     ))}
                 {!index && (
-                  <GenderFilter
-                    filter={filters[category].ivOr}
-                    setFilter={(newValue) =>
-                      setFilters({
-                        ...filters,
-                        [category]: {
-                          ...filters[category],
-                          ivOr: {
-                            ...filters[category].ivOr,
-                            gender: newValue,
+                  <Grid
+                    container
+                    alignItems="center"
+                    justifyContent="flex-start"
+                    item
+                    xs={category ? 12 : 6}
+                    style={{ margin: '10px 0' }}
+                  >
+                    <GenderFilter
+                      filter={filters[category].ivOr}
+                      setFilter={(newValue) =>
+                        setFilters({
+                          ...filters,
+                          [category]: {
+                            ...filters[category],
+                            ivOr: {
+                              ...filters[category].ivOr,
+                              gender: newValue,
+                            },
                           },
-                        },
-                      })
-                    }
-                    category="pokemon"
-                  />
+                        })
+                      }
+                      category="pokemon"
+                    />
+                  </Grid>
                 )}
               </Grid>
             </TabPanel>

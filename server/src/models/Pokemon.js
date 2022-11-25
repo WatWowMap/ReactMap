@@ -21,6 +21,7 @@ const ivCalc =
   'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
 const keys = [
   'iv',
+  'cp',
   'level',
   'atk_iv',
   'def_iv',
@@ -34,6 +35,8 @@ const madKeys = {
   atk_iv: 'individual_attack',
   def_iv: 'individual_defense',
   sta_iv: 'individual_stamina',
+  gender: 'pokemon.gender',
+  cp: 'cp',
 }
 
 const getMadSql = (q) =>
@@ -181,6 +184,7 @@ module.exports = class Pokemon extends Model {
           case 'gender':
             queryBase.andWhere('pokemon.gender', filter[key])
             break
+          case 'cp':
           case 'level':
           case 'atk_iv':
           case 'def_iv':
