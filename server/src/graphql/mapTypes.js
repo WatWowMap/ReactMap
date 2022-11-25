@@ -73,6 +73,12 @@ module.exports = gql`
     raid_pokemon_gender: Int
     raid_pokemon_costume: Int
     raid_pokemon_evolution: Int
+    pokemon_id: Int
+    form: Int
+    gender: Int
+    costume: Int
+    shiny: Int
+    iv: Float
   }
 
   type SearchQuest {

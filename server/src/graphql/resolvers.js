@@ -251,6 +251,8 @@ module.exports = {
           return []
         }
         switch (args.category) {
+          case 'pokemon':
+            return Db.search('Pokemon', perms, args)
           case 'pokestops':
             return Db.search('Pokestop', perms, args)
           case 'raids':

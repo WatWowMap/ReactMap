@@ -33,6 +33,15 @@
       "submissionCells": 500,
       "weather": 30
     },
+    "searchable": {
+      "quests": true,
+      "pokestops": true,
+      "raids": true,
+      "gyms": true,
+      "portals": true,
+      "nests": true,
+      "pokemon": true
+    },
     "queryUpdateHours": {
       "pokemon": 0.25,
       "quests": 0.5,
