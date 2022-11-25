@@ -134,26 +134,33 @@ export default function AdvancedFilter({
                 />
               </Grid>
             ) : (
-              <>
-                {Object.entries(ui[type].sliders).map(([category, sliders]) => (
-                  <Grid item xs={12} sm={6} key={category}>
-                    {sliders.map((each) => (
-                      <SliderTile
-                        key={each.name}
-                        filterSlide={each}
-                        handleChange={handleChange}
-                        filterValues={filterValues}
+              Object.entries(ui[type].sliders).map(([category, sliders], i) => (
+                <Grid item xs={12} sm={6} key={category}>
+                  {category === 'primary' && i === 0 && ui.pokemon.gender && (
+                    <Grid
+                      container
+                      item
+                      xs={12}
+                      style={{ paddingBottom: '30px' }}
+                    >
+                      <GenderFilter
+                        filter={filterValues}
+                        setFilter={(newValue) =>
+                          setFilterValues({ ...filterValues, gender: newValue })
+                        }
                       />
-                    ))}
-                  </Grid>
-                ))}
-                <GenderFilter
-                  filter={filterValues}
-                  setFilter={(newValue) =>
-                    setFilterValues({ ...filterValues, gender: newValue })
-                  }
-                />
-              </>
+                    </Grid>
+                  )}
+                  {sliders.map((each) => (
+                    <SliderTile
+                      key={each.name}
+                      filterSlide={each}
+                      handleChange={handleChange}
+                      filterValues={filterValues}
+                    />
+                  ))}
+                </Grid>
+              ))
             )}
           </Grid>
         ) : (

@@ -8,18 +8,17 @@ export default function GenderFilter({ category, filter, setFilter }) {
   const { t } = useTranslation()
 
   return (
-    <Grid
-      container
-      alignItems="center"
-      justifyContent="flex-start"
-      item
-      xs={12}
-      style={{ margin: '10px 0' }}
-    >
-      <Grid item xs={3}>
-        <Typography>{t('gender')}</Typography>
-      </Grid>
-      <Grid item xs={9} style={{ textAlign: category ? 'right' : 'inherit' }}>
+    <>
+      {category && (
+        <Grid item xs={2}>
+          <Typography>{t('gender')}</Typography>
+        </Grid>
+      )}
+      <Grid
+        item
+        xs={category ? 10 : 12}
+        style={{ textAlign: category ? 'right' : 'center' }}
+      >
         <MultiSelector
           category={category}
           filterKey="gender"
@@ -29,6 +28,6 @@ export default function GenderFilter({ category, filter, setFilter }) {
           setFilters={setFilter}
         />
       </Grid>
-    </Grid>
+    </>
   )
 }

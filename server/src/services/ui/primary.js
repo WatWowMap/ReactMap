@@ -48,6 +48,13 @@ const refSliders = {
         max: 15,
         perm: 'iv',
       },
+      {
+        name: 'cp',
+        label: '',
+        min: 10,
+        max: 5000,
+        perm: 'iv',
+      },
     ],
   },
   nests: {
