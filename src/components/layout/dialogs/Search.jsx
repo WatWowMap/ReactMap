@@ -58,6 +58,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
       nest_pokemon_id,
       nest_pokemon_form,
       raid_pokemon_id,
+      pokemon_id,
     } = option
 
     if (quest_reward_type) {
@@ -86,6 +87,18 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
           </NameTT>
           {!!amount && <div className="search-amount-holder">x{amount}</div>}
         </div>
+      )
+    }
+    if (pokemon_id) {
+      const { form, gender, costume, shiny } = option
+      return (
+        <NameTT id={[form ? `form_${form}` : '', `poke_${pokemon_id}`]}>
+          <img
+            src={Icons.getPokemon(pokemon_id, form, 0, gender, costume, shiny)}
+            alt={nest_pokemon_form}
+            style={{ maxWidth: 45, maxHeight: 45 }}
+          />
+        </NameTT>
       )
     }
     if (raid_pokemon_id) {
@@ -216,7 +229,14 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
             </Grid>
             <Grid item xs={8}>
               <Typography variant="caption" style={{ fontWeight: 'bold' }}>
-                {option.name || getBackupName()}
+                {safeSearch[searchTab] === 'pokemon'
+                  ? `${t(`poke_${option.pokemon_id}`)} ${
+                      option.form &&
+                      t(`form_${option.form}`) !== t('poke_type_1')
+                        ? `(${t(`form_${option.form}`)})`
+                        : ''
+                    }${option.iv ? ` - ${option.iv}%` : ''}`
+                  : option.name || getBackupName()}
               </Typography>
               <br />
               {option.quest_title && option.quest_target && (

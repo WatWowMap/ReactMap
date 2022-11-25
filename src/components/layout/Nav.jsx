@@ -19,8 +19,6 @@ import DonorPage from './dialogs/DonorPage'
 import Feedback from './dialogs/Feedback'
 import ResetFilters from './dialogs/ResetFilters'
 
-const searchable = ['quests', 'pokestops', 'raids', 'gyms', 'portals', 'nests']
-
 export default function Nav({
   map,
   setManualParams,
@@ -77,8 +75,6 @@ export default function Nav({
           !messageOfTheDay.settings.freeloaderOnly)),
   )
   const [donorPage, setDonorPage] = useState(false)
-
-  const safeSearch = searchable.filter((category) => perms[category])
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -137,7 +133,7 @@ export default function Nav({
         <FloatingBtn
           toggleDrawer={toggleDrawer}
           toggleDialog={toggleDialog}
-          safeSearch={safeSearch}
+          safeSearch={config.searchable}
           isMobile={isMobile}
           perms={perms}
           webhooks={webhooks}
@@ -214,7 +210,7 @@ export default function Nav({
       >
         <Search
           toggleDialog={toggleDialog}
-          safeSearch={safeSearch}
+          safeSearch={config.searchable}
           isMobile={isMobile}
           Icons={Icons}
         />
