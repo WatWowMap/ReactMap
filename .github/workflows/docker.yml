@@ -7,8 +7,6 @@ env:
 
 jobs:
   Docker:
-    if: ${{ always() }}
-    needs: Sync
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
