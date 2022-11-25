@@ -8,30 +8,36 @@ export default function MultiSelector({
   category,
   filterKey,
   items,
+  tKey,
 }) {
   const { t } = useTranslation()
+  const filterValue =
+    typeof filters === 'object' && category
+      ? filters[category]?.[filterKey]
+      : filters
+
   return (
     <ButtonGroup size="small">
       {items.map((item) => (
         <Button
           key={item}
-          onClick={() =>
-            setFilters({
-              ...filters,
-              [category]: {
-                ...filters[category],
-                [filterKey]: item,
-              },
-            })
-          }
-          color={
-            item === filters[category][filterKey] ? 'primary' : 'secondary'
-          }
-          variant={
-            item === filters[category][filterKey] ? 'contained' : 'outlined'
-          }
+          onClick={() => {
+            if (typeof filters === 'object' && category) {
+              setFilters({
+                ...filters,
+                [category]: {
+                  ...filters[category],
+                  [filterKey]: item,
+                },
+              })
+            } else {
+              setFilters(item)
+            }
+          }}
+          color={item === filterValue ? 'primary' : 'secondary'}
+          variant={item === filterValue ? 'contained' : 'outlined'}
         >
-          {t(item)}
+          {t(tKey ? `${tKey}${item}` : item).trim() || t('any')}
         </Button>
       ))}
     </ButtonGroup>

@@ -21,6 +21,7 @@ class PokemonFilter extends GenericFilter {
     this.def_iv = def || [0, 15]
     this.sta_iv = sta || [0, 15]
     this.level = level || [1, 35]
+    this.gender = 0
     leagues.forEach(
       (league) =>
         (this[league.name] = pvp || [

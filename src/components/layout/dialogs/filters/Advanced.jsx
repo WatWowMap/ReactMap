@@ -17,6 +17,7 @@ import StringFilter from './StringFilter'
 import SliderTile from './SliderTile'
 import Size from './Size'
 import QuestTitle from '../../general/QuestTitle'
+import GenderFilter from './Gender'
 
 export default function AdvancedFilter({
   toggleAdvMenu,
@@ -133,18 +134,26 @@ export default function AdvancedFilter({
                 />
               </Grid>
             ) : (
-              Object.entries(ui[type].sliders).map(([category, sliders]) => (
-                <Grid item xs={12} sm={6} key={category}>
-                  {sliders.map((each) => (
-                    <SliderTile
-                      key={each.name}
-                      filterSlide={each}
-                      handleChange={handleChange}
-                      filterValues={filterValues}
-                    />
-                  ))}
-                </Grid>
-              ))
+              <>
+                {Object.entries(ui[type].sliders).map(([category, sliders]) => (
+                  <Grid item xs={12} sm={6} key={category}>
+                    {sliders.map((each) => (
+                      <SliderTile
+                        key={each.name}
+                        filterSlide={each}
+                        handleChange={handleChange}
+                        filterValues={filterValues}
+                      />
+                    ))}
+                  </Grid>
+                ))}
+                <GenderFilter
+                  filter={filterValues}
+                  setFilter={(newValue) =>
+                    setFilterValues({ ...filterValues, gender: newValue })
+                  }
+                />
+              </>
             )}
           </Grid>
         ) : (

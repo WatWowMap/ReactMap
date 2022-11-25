@@ -93,6 +93,7 @@ module.exports = function buildDefault(perms, available, dbModels) {
             ivOr: custom,
             xsRat: false,
             xlKarp: false,
+            gender: 0,
             zeroIv: perms.iv ? false : undefined,
             hundoIv: perms.iv ? true : undefined,
             filter: pokemon.full,
