@@ -133,6 +133,7 @@ export default class Query {
       case 'raids':
       case 'nests':
       case 'quests':
+      case 'pokemon':
         return searchIndex[category]
       case 'webhook':
         return searchIndex.poiWebhook

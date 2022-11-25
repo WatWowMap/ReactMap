@@ -1,10 +1,13 @@
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
+const i18next = require('i18next')
+
 const { Event } = require('../services/initialization')
 const legacyFilter = require('../services/legacyFilter')
 const {
   api: {
+    searchResultsLimit,
     pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, leagueObj },
     queryLimits,
   },
@@ -453,5 +456,43 @@ module.exports = class Pokemon extends Model {
       ])
       .where(isMad ? 'encounter_id' : 'id', id)
       .first()
+  }
+
+  static async search(perms, args, { isMad }, distance) {
+    const { search, locale, onlyAreas = [] } = args
+    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
+      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
+    )
+    const safeTs = args.ts || Math.floor(Date.now() / 1000)
+    const query = this.query()
+      .select([distance])
+      .whereIn('pokemon_id', pokemonIds)
+      .andWhere(
+        isMad ? 'disappear_time' : 'expire_timestamp',
+        '>=',
+        isMad ? this.knex().fn.now() : safeTs,
+      )
+      .limit(searchResultsLimit)
+      .orderBy('distance')
+    if (isMad) {
+      getMadSql(query)
+    } else {
+      query.select([
+        'id',
+        'lat',
+        'lon',
+        'pokemon_id',
+        'form',
+        'costume',
+        'gender',
+        'iv',
+        'shiny',
+      ])
+    }
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+      return []
+    }
+    const results = await query
+    return results.map((poke) => ({ ...poke, iv: perms.iv ? poke.iv : null }))
   }
 }
