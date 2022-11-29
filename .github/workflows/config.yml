@@ -6,7 +6,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  sync:
+  Sync:
     name: Check for config changes
     runs-on: ubuntu-latest
     steps:
@@ -20,7 +20,7 @@ jobs:
         uses: tj-actions/changed-files@v32
         with:
           files: |
-            server/src/configs/default.json
+            server/src/configs/*
       - name: Setup Node.js environment
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: actions/setup-node@v3
@@ -31,6 +31,10 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           yarn config-check
+      - name: Generate latest env vars
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          yarn gen-env-config
       - name: Commit and push changes
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: devops-infra/action-commit-push@v0.9.0

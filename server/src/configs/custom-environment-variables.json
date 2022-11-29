@@ -99,6 +99,36 @@
         "__format": "number"
       }
     },
+    "searchable": {
+      "quests": {
+        "__name": "API_SEARCHABLE_QUESTS",
+        "__format": "boolean"
+      },
+      "pokestops": {
+        "__name": "API_SEARCHABLE_POKESTOPS",
+        "__format": "boolean"
+      },
+      "raids": {
+        "__name": "API_SEARCHABLE_RAIDS",
+        "__format": "boolean"
+      },
+      "gyms": {
+        "__name": "API_SEARCHABLE_GYMS",
+        "__format": "boolean"
+      },
+      "portals": {
+        "__name": "API_SEARCHABLE_PORTALS",
+        "__format": "boolean"
+      },
+      "nests": {
+        "__name": "API_SEARCHABLE_NESTS",
+        "__format": "boolean"
+      },
+      "pokemon": {
+        "__name": "API_SEARCHABLE_POKEMON",
+        "__format": "boolean"
+      }
+    },
     "queryUpdateHours": {
       "pokemon": {
         "__name": "API_QUERY_UPDATE_HOURS_POKEMON",
@@ -855,6 +885,14 @@
         "__name": "DEFAULT_FILTERS_POKEMON_ALL_POKEMON",
         "__format": "boolean"
       },
+      "xsRat": {
+        "__name": "DEFAULT_FILTERS_POKEMON_XS_RAT",
+        "__format": "boolean"
+      },
+      "xlKarp": {
+        "__name": "DEFAULT_FILTERS_POKEMON_XL_KARP",
+        "__format": "boolean"
+      },
       "globalValues": {
         "iv": {
           "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_IV",
@@ -878,6 +916,14 @@
         },
         "pvp": {
           "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_PVP",
+          "__format": "json"
+        },
+        "gender": {
+          "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_GENDER",
+          "__format": "number"
+        },
+        "cp": {
+          "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_CP",
           "__format": "json"
         }
       }

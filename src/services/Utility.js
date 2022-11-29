@@ -82,7 +82,7 @@ export default class Utility {
         return 'dawn'
       case date > times.dusk && date < times.night:
         return 'dusk'
-      case date > times.night:
+      case date > times.night || date < times.nightEnd:
         return 'night'
       default:
         return 'day'

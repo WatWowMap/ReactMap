@@ -1,10 +1,13 @@
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
+const i18next = require('i18next')
+
 const { Event } = require('../services/initialization')
 const legacyFilter = require('../services/legacyFilter')
 const {
   api: {
+    searchResultsLimit,
     pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, leagueObj },
     queryLimits,
   },
@@ -18,10 +21,12 @@ const ivCalc =
   'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
 const keys = [
   'iv',
+  'cp',
   'level',
   'atk_iv',
   'def_iv',
   'sta_iv',
+  'gender',
   ...leagues.map((league) => league.name),
 ]
 const madKeys = {
@@ -30,6 +35,8 @@ const madKeys = {
   atk_iv: 'individual_attack',
   def_iv: 'individual_defense',
   sta_iv: 'individual_stamina',
+  gender: 'pokemon.gender',
+  cp: 'cp',
 }
 
 const getMadSql = (q) =>
@@ -155,7 +162,9 @@ module.exports = class Pokemon extends Model {
 
     // checks if filters are set to default and skips them if so
     const arrayCheck = (filter, key) =>
-      filter[key]?.every((v, i) => v === onlyStandard[key][i])
+      Array.isArray(filter[key])
+        ? filter[key]?.every((v, i) => v === onlyStandard[key][i])
+        : filter[key] === onlyStandard[key]
 
     // cycles through the above arrayCheck
     const getRelevantKeys = (filter) => {
@@ -172,6 +181,10 @@ module.exports = class Pokemon extends Model {
     const generateSql = (queryBase, filter, relevant) => {
       relevant.forEach((key) => {
         switch (key) {
+          case 'gender':
+            queryBase.andWhere('pokemon.gender', filter[key])
+            break
+          case 'cp':
           case 'level':
           case 'atk_iv':
           case 'def_iv':
@@ -453,5 +466,43 @@ module.exports = class Pokemon extends Model {
       ])
       .where(isMad ? 'encounter_id' : 'id', id)
       .first()
+  }
+
+  static async search(perms, args, { isMad }, distance) {
+    const { search, locale, onlyAreas = [] } = args
+    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
+      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
+    )
+    const safeTs = args.ts || Math.floor(Date.now() / 1000)
+    const query = this.query()
+      .select([distance])
+      .whereIn('pokemon_id', pokemonIds)
+      .andWhere(
+        isMad ? 'disappear_time' : 'expire_timestamp',
+        '>=',
+        isMad ? this.knex().fn.now() : safeTs,
+      )
+      .limit(searchResultsLimit)
+      .orderBy('distance')
+    if (isMad) {
+      getMadSql(query)
+    } else {
+      query.select([
+        'id',
+        'lat',
+        'lon',
+        'pokemon_id',
+        'form',
+        'costume',
+        'gender',
+        'iv',
+        'shiny',
+      ])
+    }
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+      return []
+    }
+    const results = await query
+    return results.map((poke) => ({ ...poke, iv: perms.iv ? poke.iv : null }))
   }
 }
