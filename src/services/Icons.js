@@ -23,7 +23,6 @@ export default class UIcons {
   build(icons) {
     const baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
-
     icons.forEach((icon) => {
       try {
         const { data } = icon
@@ -207,17 +206,23 @@ export default class UIcons {
     invasionActive = false,
     questActive = false,
     ar = false,
+    power = 0,
+    display = '',
   ) {
     const baseUrl = `${this[this.selected.pokestop].path}/pokestop`
-    const invasionSuffixes = invasionActive ? ['_i', ''] : ['']
+    const invasionSuffixes =
+      invasionActive || display ? [`_i${display}`, ''] : ['']
     const questSuffixes = questActive ? ['_q', ''] : ['']
     const arSuffixes = ar ? ['_ar', ''] : ['']
+    const powerUpSuffixes = power ? [`_p${power}`, ''] : ['']
     for (let i = 0; i < invasionSuffixes.length; i += 1) {
       for (let q = 0; q < questSuffixes.length; q += 1) {
         for (let a = 0; a < arSuffixes.length; a += 1) {
-          const result = `${lureId}${questSuffixes[q]}${invasionSuffixes[i]}${arSuffixes[a]}.png`
-          if (this[this.selected.pokestop].pokestop.has(result)) {
-            return `${baseUrl}/${result}`
+          for (let p = 0; p < powerUpSuffixes.length; p += 1) {
+            const result = `${lureId}${invasionSuffixes[i]}${questSuffixes[q]}${arSuffixes[a]}${powerUpSuffixes[p]}.png`
+            if (this[this.selected.pokestop].pokestop.has(result)) {
+              return `${baseUrl}/${result}`
+            }
           }
         }
       }
