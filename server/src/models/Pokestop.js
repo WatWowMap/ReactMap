@@ -589,11 +589,17 @@ module.exports = class Pokestop extends Model {
           filtered.invasions = pokestop.invasions.filter(
             (invasion) => !invasion.grunt_type,
           )
+          if (filtered.invasions.length) {
+            filtered.display_type = Math.max(
+              ...filtered.invasions.map((inv) => inv.display_type),
+            )
+          }
         }
       }
       if (
         perms.invasions &&
-        (filters.onlyAllPokestops || filters.onlyInvasions)
+        ((filters.onlyAllPokestops && filters.onlyInvasions) ||
+          filters.onlyInvasions)
       ) {
         filtered.invasions = [
           ...(Array.isArray(filtered.invasions) ? filtered.invasions : []),
