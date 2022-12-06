@@ -121,7 +121,7 @@ module.exports = async function getAuthInfo(req, user, strategy) {
     ],
     timestamp: new Date(),
   }
-  if (user.perms.areaRestrictions.length) {
+  if (user.perms.areaRestrictions.length > 15) {
     embed.fields.push({
       name: 'Area Restrictions',
       value: user.perms.areaRestrictions.map((str) => capCamel(str)).join('\n'),
