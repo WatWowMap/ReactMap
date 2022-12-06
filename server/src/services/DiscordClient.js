@@ -127,8 +127,11 @@ module.exports = class DiscordMapClient {
       if (perms.areaRestrictions.length) {
         perms.areaRestrictions = [...new Set(perms.areaRestrictions)]
       }
-      if (perms.webhooks.length) {
-        perms.webhooks = [...new Set(perms.webhooks)]
+      if (perms.areaRestrictions.length < 15) {
+        perms.areaRestrictions = [...new Set(perms.areaRestrictions)]
+      } else {
+        console.warn('[DISCORD] Area list too long, number of areas:', perms.areaRestrictions.length, 'List:', perms.areaRestrictions)
+        perms.areaRestrictions = ["More than 15 areas, see log for full list"]
       }
     } catch (e) {
       console.warn('[DISCORD] Failed to get perms for user', user.id, e.message)
