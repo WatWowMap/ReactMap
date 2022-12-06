@@ -129,6 +129,7 @@ module.exports = class DiscordMapClient {
       }
       if (perms.webhooks.length) {
         perms.webhooks = [...new Set(perms.webhooks)]
+      }
     } catch (e) {
       console.warn('[DISCORD] Failed to get perms for user', user.id, e.message)
     }
