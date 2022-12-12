@@ -1101,7 +1101,7 @@ module.exports = class Pokestop extends Model {
       queries.invasions = this.query()
         .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
         .where(
-          isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type',
+          isMad ? 'incident_grunt_type' : 'grunt_type',
           '>',
           0,
         )
