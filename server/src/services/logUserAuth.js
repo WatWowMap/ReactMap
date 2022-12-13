@@ -122,9 +122,16 @@ module.exports = async function getAuthInfo(req, user, strategy) {
     timestamp: new Date(),
   }
   if (user.perms.areaRestrictions.length) {
+    const trimmed = user.perms.areaRestrictions
+      .filter((_f, i) => i < 15)
+      .map((f) => capCamel(f))
+      .join('\n')
     embed.fields.push({
-      name: 'Area Restrictions',
-      value: user.perms.areaRestrictions.map((str) => capCamel(str)).join('\n'),
+      name: `(${user.perms.areaRestrictions.length}) Area Restrictions`,
+      value:
+        user.perms.areaRestrictions.length > 15
+          ? `${trimmed}\n...${user.perms.areaRestrictions.length - 15} more`
+          : trimmed,
       inline: true,
     })
   }
