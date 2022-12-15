@@ -327,6 +327,7 @@
       "showDexNumInPopup": false,
       "pvpMega": false,
       "linkGlobalAndAdvanced": false,
+      "showSizeIndicator": false,
       "glow": [
         {
           "name": "Hundo",
@@ -497,7 +498,8 @@
         "cp": [
           10,
           5000
-        ]
+        ],
+        "spawnSize": 0
       }
     },
     "portals": {

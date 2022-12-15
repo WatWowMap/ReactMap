@@ -8,6 +8,7 @@ import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 import TabPanel from '../general/TabPanel'
 import GenderFilter from '../dialogs/filters/Gender'
+import MultiSelector from './MultiSelector'
 
 export default function WithSliders({
   category,
@@ -133,8 +134,29 @@ export default function WithSliders({
                 justifyContent="center"
                 style={{ width: 250 }}
               >
-                {index
-                  ? ['xsRat', 'xlKarp'].map((each, i) => (
+                {index ? (
+                  <>
+                    <Grid item xs={12} style={{ margin: '14px 0' }}>
+                      <MultiSelector
+                        filterKey="spawn_size"
+                        items={[0, 1, 2, 3, 4, 5]}
+                        tKey="size_"
+                        filters={filters[category].ivOr.spawn_size}
+                        setFilters={(newValue) =>
+                          setFilters({
+                            ...filters,
+                            [category]: {
+                              ...filters[category],
+                              ivOr: {
+                                ...filters[category].ivOr,
+                                spawn_size: newValue,
+                              },
+                            },
+                          })
+                        }
+                      />
+                    </Grid>
+                    {['xsRat', 'xlKarp'].map((each, i) => (
                       <Fragment key={each}>
                         <Grid item xs={2}>
                           <img
@@ -165,32 +187,33 @@ export default function WithSliders({
                           />
                         </Grid>
                       </Fragment>
-                    ))
-                  : ['zeroIv', 'hundoIv'].map((each) => (
-                      <Fragment key={each}>
-                        <Grid item xs={3}>
-                          <Typography>
-                            {t(Utility.camelToSnake(each))}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Switch
-                            color="primary"
-                            disabled={!context[each]}
-                            checked={filters[category][each]}
-                            onChange={() => {
-                              setFilters({
-                                ...filters,
-                                [category]: {
-                                  ...filters[category],
-                                  [each]: !filters[category][each],
-                                },
-                              })
-                            }}
-                          />
-                        </Grid>
-                      </Fragment>
                     ))}
+                  </>
+                ) : (
+                  ['zeroIv', 'hundoIv'].map((each) => (
+                    <Fragment key={each}>
+                      <Grid item xs={3}>
+                        <Typography>{t(Utility.camelToSnake(each))}</Typography>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Switch
+                          color="primary"
+                          disabled={!context[each]}
+                          checked={filters[category][each]}
+                          onChange={() => {
+                            setFilters({
+                              ...filters,
+                              [category]: {
+                                ...filters[category],
+                                [each]: !filters[category][each],
+                              },
+                            })
+                          }}
+                        />
+                      </Grid>
+                    </Fragment>
+                  ))
+                )}
                 {!index && (
                   <Grid
                     container

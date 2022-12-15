@@ -561,5 +561,13 @@
   "seen_lure_wild": "Lure Spawn",
   "seen_wild": "Wild Spawn",
   "event_stops": "Event Stops",
-  "event_stop_timers": "Event Stop Timers"
+  "event_stop_timers": "Event Stop Timers",
+  "spawn_size": "Spawn Size",
+  "size_0": "Any",
+  "size_1": "XXS",
+  "size_2": "XS",
+  "size_3": "M",
+  "size_4": "XL",
+  "size_5": "XXL",
+  "show_size_indicator": "Show Size Indicator"
 }

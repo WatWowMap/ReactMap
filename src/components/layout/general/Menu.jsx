@@ -354,6 +354,7 @@ export default function Menu({
           advancedFilter={advancedFilter}
           toggleAdvMenu={toggleAdvMenu}
           type={category}
+          isMobile={isMobile}
         />
       </Dialog>
       <Dialog open={slotsMenu.open} onClose={toggleSlotsMenu(false)}>

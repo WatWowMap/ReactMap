@@ -27,6 +27,7 @@ const keys = [
   'def_iv',
   'sta_iv',
   'gender',
+  'spawnSize',
   ...leagues.map((league) => league.name),
 ]
 const madKeys = {
@@ -55,7 +56,7 @@ const getMadSql = (q) =>
       'individual_attack AS atk_iv',
       'individual_defense AS def_iv',
       'individual_stamina AS sta_iv',
-      'height AS size',
+      'height',
       'pokemon.form',
       'pokemon.gender',
       'pokemon.costume',
@@ -76,7 +77,7 @@ module.exports = class Pokemon extends Model {
     return 'pokemon'
   }
 
-  static async getAll(perms, args, { isMad, pvpV2 }) {
+  static async getAll(perms, args, { isMad, pvpV2, hasSize, hasHeight }) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const {
       onlyStandard,
@@ -181,6 +182,11 @@ module.exports = class Pokemon extends Model {
     const generateSql = (queryBase, filter, relevant) => {
       relevant.forEach((key) => {
         switch (key) {
+          case 'spawn_size':
+            if (hasSize) {
+              queryBase.andWhere('pokemon.size', filter[key])
+            }
+            break
           case 'gender':
             queryBase.andWhere('pokemon.gender', filter[key])
             break
@@ -219,6 +225,8 @@ module.exports = class Pokemon extends Model {
     const query = this.query()
     if (isMad) {
       getMadSql(query)
+    } else {
+      query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
     }
     query
       .where(

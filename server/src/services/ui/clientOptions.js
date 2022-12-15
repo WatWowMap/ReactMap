@@ -42,6 +42,7 @@ module.exports = function clientOptions(perms) {
       showDexNumInPopup: { type: 'bool', perm: ['pokemon'] },
       weatherIndicator: { type: 'bool', perm: ['pokemon'] },
       pvpMega: { type: 'bool', perm: ['pokemon'] },
+      showSizeIndicator: { type: 'bool', perm: ['pokemon'] },
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'] },

@@ -134,6 +134,7 @@ module.exports = gql`
     display_pokemon_id: Int
     ditto_form: Int
     weight: Float
+    height: Float
     size: Float
     move_1: Int
     move_2: Int

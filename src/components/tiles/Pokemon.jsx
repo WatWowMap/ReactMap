@@ -140,6 +140,7 @@ const PokemonTile = ({
                 Icons,
                 weatherCheck,
                 timeOfDay,
+                userSettings,
               )
             : basicMarker(url, size)
         }

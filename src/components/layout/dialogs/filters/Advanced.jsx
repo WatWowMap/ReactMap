@@ -13,6 +13,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
+import MultiSelector from '@components/layout/drawer/MultiSelector'
 import StringFilter from './StringFilter'
 import SliderTile from './SliderTile'
 import Size from './Size'
@@ -24,6 +25,7 @@ export default function AdvancedFilter({
   advancedFilter,
   type,
   isTutorial,
+  isMobile,
 }) {
   Utility.analytics(`/${type}/${advancedFilter.id}`)
 
@@ -134,33 +136,87 @@ export default function AdvancedFilter({
                 />
               </Grid>
             ) : (
-              Object.entries(ui[type].sliders).map(([category, sliders], i) => (
-                <Grid item xs={12} sm={6} key={category}>
-                  {category === 'primary' && i === 0 && ui.pokemon.gender && (
-                    <Grid
-                      container
-                      item
-                      xs={12}
-                      style={{ paddingBottom: '30px' }}
-                    >
-                      <GenderFilter
-                        filter={filterValues}
-                        setFilter={(newValue) =>
-                          setFilterValues({ ...filterValues, gender: newValue })
+              <>
+                {Object.entries(ui[type].sliders).map(([category, sliders]) => (
+                  <Grid item xs={12} sm={6} key={category}>
+                    {sliders.map((each) => (
+                      <SliderTile
+                        key={each.name}
+                        filterSlide={each}
+                        handleChange={handleChange}
+                        filterValues={filterValues}
+                      />
+                    ))}
+                  </Grid>
+                ))}
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  style={{ marginTop: 5, marginBottom: 20 }}
+                >
+                  <Grid
+                    container
+                    item
+                    xs={12}
+                    sm={6}
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
+                    <GenderFilter
+                      filter={filterValues}
+                      setFilter={(newValue) =>
+                        setFilterValues({
+                          ...filterValues,
+                          gender: newValue,
+                        })
+                      }
+                    />
+                    <Grid item xs={12}>
+                      <Typography
+                        variant="caption"
+                        disabled={filterValues.gender === 0}
+                      >
+                        {t('gender')}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid
+                    container
+                    item
+                    xs={12}
+                    sm={6}
+                    style={{
+                      textAlign: 'center',
+                      marginTop: isMobile ? 20 : undefined,
+                    }}
+                  >
+                    <Grid item xs={12}>
+                      <MultiSelector
+                        filterKey="spawn_size"
+                        items={[0, 1, 2, 3, 4, 5]}
+                        tKey="size_"
+                        filters={filterValues.spawn_size}
+                        setFilters={(newValue) =>
+                          setFilterValues({
+                            ...filterValues,
+                            spawn_size: newValue,
+                          })
                         }
                       />
                     </Grid>
-                  )}
-                  {sliders.map((each) => (
-                    <SliderTile
-                      key={each.name}
-                      filterSlide={each}
-                      handleChange={handleChange}
-                      filterValues={filterValues}
-                    />
-                  ))}
+                    <Grid item xs={12}>
+                      <Typography
+                        variant="caption"
+                        disabled={filterValues.spawn_size === 0}
+                      >
+                        {t('spawn_size')}
+                      </Typography>
+                    </Grid>
+                  </Grid>
                 </Grid>
-              ))
+              </>
             )}
           </Grid>
         ) : (

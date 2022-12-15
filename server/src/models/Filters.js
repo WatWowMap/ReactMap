@@ -14,7 +14,19 @@ class GenericFilter {
 }
 
 class PokemonFilter extends GenericFilter {
-  constructor(enabled, size, iv, level, atk, def, sta, pvp, gender, cp) {
+  constructor(
+    enabled,
+    size,
+    iv,
+    level,
+    atk,
+    def,
+    sta,
+    pvp,
+    gender,
+    cp,
+    spawnSize,
+  ) {
     super(enabled, size)
     this.iv = iv || [0, 100]
     this.atk_iv = atk || [0, 15]
@@ -23,6 +35,7 @@ class PokemonFilter extends GenericFilter {
     this.level = level || [1, 35]
     this.cp = cp || [10, 5000]
     this.gender = gender || 0
+    this.spawn_size = spawnSize || 0
     leagues.forEach(
       (league) =>
         (this[league.name] = pvp || [
