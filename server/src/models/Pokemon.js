@@ -181,16 +181,24 @@ module.exports = class Pokemon extends Model {
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (queryBase, filter, relevant) => {
+      const sizeCheck =
+        relevant.length === 2 &&
+        relevant.includes('xxs') &&
+        relevant.includes('xxl')
       relevant.forEach((key) => {
         switch (key) {
           case 'xxs':
             if (hasSize) {
-              queryBase.orWhere('pokemon.size', 1)
+              queryBase[
+                sizeCheck || relevant.length === 1 ? 'andWhere' : 'orWhere'
+              ]('pokemon.size', 1)
             }
             break
           case 'xxl':
             if (hasSize) {
-              queryBase.orWhere('pokemon.size', 5)
+              queryBase[
+                sizeCheck || relevant.length === 1 ? 'andWhere' : 'orWhere'
+              ]('pokemon.size', 5)
             }
             break
           case 'gender':
