@@ -181,55 +181,45 @@ module.exports = class Pokemon extends Model {
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (queryBase, filter, relevant) => {
-      const sizeCheck =
-        relevant.length === 2 &&
-        relevant.includes('xxs') &&
-        relevant.includes('xxl')
-      relevant.forEach((key) => {
-        switch (key) {
-          case 'xxs':
-            if (hasSize) {
-              queryBase[
-                sizeCheck || relevant.length === 1 ? 'andWhere' : 'orWhere'
-              ]('pokemon.size', 1)
-            }
-            break
-          case 'xxl':
-            if (hasSize) {
-              queryBase[
-                sizeCheck || relevant.length === 1 ? 'andWhere' : 'orWhere'
-              ]('pokemon.size', 5)
-            }
-            break
-          case 'gender':
-            queryBase.andWhere('pokemon.gender', filter[key])
-            break
-          case 'cp':
-          case 'level':
-          case 'atk_iv':
-          case 'def_iv':
-          case 'sta_iv':
-          case 'iv':
-            if (ivs) {
-              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
-            }
-            break
-          default:
-            if (pvp) {
-              queryPvp = true
-              if (
-                !relevant.includes('iv') &&
-                !relevant.includes('level') &&
-                !relevant.includes('atk_iv') &&
-                !relevant.includes('def_iv') &&
-                !relevant.includes('sta_iv')
-              ) {
-                // doesn't return everything if only pvp stats for individual pokemon
-                queryBase.whereNull('pokemon_id')
+      queryBase.andWhere((pkmn) => {
+        relevant.forEach((key) => {
+          switch (key) {
+            case 'xxs':
+            case 'xxl':
+              if (hasSize) {
+                pkmn.orWhere('pokemon.size', key === 'xxl' ? 5 : 1)
               }
-            }
-            break
-        }
+              break
+            case 'gender':
+              pkmn.andWhere('pokemon.gender', filter[key])
+              break
+            case 'cp':
+            case 'level':
+            case 'atk_iv':
+            case 'def_iv':
+            case 'sta_iv':
+            case 'iv':
+              if (ivs) {
+                pkmn.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
+              }
+              break
+            default:
+              if (pvp) {
+                queryPvp = true
+                if (
+                  !relevant.includes('iv') &&
+                  !relevant.includes('level') &&
+                  !relevant.includes('atk_iv') &&
+                  !relevant.includes('def_iv') &&
+                  !relevant.includes('sta_iv')
+                ) {
+                  // doesn't return everything if only pvp stats for individual pokemon
+                  pkmn.whereNull('pokemon_id')
+                }
+              }
+              break
+          }
+        })
       })
     }
 
@@ -268,7 +258,7 @@ module.exports = class Pokemon extends Model {
                 poke.where('pokemon_id', id).andWhere('pokemon.form', form)
               }
               if (relevantFilters.length) {
-                generateSql(poke, filter, relevantFilters, true)
+                generateSql(poke, filter, relevantFilters)
               }
             })
           } else if (pkmn === 'onlyIvOr' && (ivs || pvp)) {
