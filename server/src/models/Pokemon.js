@@ -185,12 +185,12 @@ module.exports = class Pokemon extends Model {
         switch (key) {
           case 'xxs':
             if (hasSize) {
-              queryBase.andWhere('pokemon.size', 1)
+              queryBase.orWhere('pokemon.size', 1)
             }
             break
           case 'xxl':
             if (hasSize) {
-              queryBase.andWhere('pokemon.size', 5)
+              queryBase.orWhere('pokemon.size', 5)
             }
             break
           case 'gender':
