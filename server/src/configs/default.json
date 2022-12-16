@@ -499,7 +499,8 @@
           10,
           5000
         ],
-        "spawnSize": 0
+        "xxs": false,
+        "xxl": false
       }
     },
     "portals": {

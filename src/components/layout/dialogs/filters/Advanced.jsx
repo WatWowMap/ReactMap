@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { Fragment, useState, useEffect } from 'react'
 import {
   Select,
   Typography,
   Grid,
   DialogContent,
   MenuItem,
+  Switch,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
@@ -13,7 +14,6 @@ import { useStore, useStatic } from '@hooks/useStore'
 
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
-import MultiSelector from '@components/layout/drawer/MultiSelector'
 import StringFilter from './StringFilter'
 import SliderTile from './SliderTile'
 import Size from './Size'
@@ -155,65 +155,47 @@ export default function AdvancedFilter({
                   xs={12}
                   style={{ marginTop: 5, marginBottom: 20 }}
                 >
+                  <GenderFilter
+                    filter={filterValues}
+                    setFilter={(newValue) =>
+                      setFilterValues({
+                        ...filterValues,
+                        gender: newValue,
+                      })
+                    }
+                  />
                   <Grid
                     container
                     item
                     xs={12}
                     sm={6}
+                    justifyContent="center"
+                    alignItems="center"
                     style={{
-                      textAlign: 'center',
-                    }}
-                  >
-                    <GenderFilter
-                      filter={filterValues}
-                      setFilter={(newValue) =>
-                        setFilterValues({
-                          ...filterValues,
-                          gender: newValue,
-                        })
-                      }
-                    />
-                    <Grid item xs={12}>
-                      <Typography
-                        variant="caption"
-                        disabled={filterValues.gender === 0}
-                      >
-                        {t('gender')}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                  <Grid
-                    container
-                    item
-                    xs={12}
-                    sm={6}
-                    style={{
-                      textAlign: 'center',
                       marginTop: isMobile ? 20 : undefined,
                     }}
                   >
-                    <Grid item xs={12}>
-                      <MultiSelector
-                        filterKey="spawn_size"
-                        items={[0, 1, 2, 3, 4, 5]}
-                        tKey="size_"
-                        filters={filterValues.spawn_size}
-                        setFilters={(newValue) =>
-                          setFilterValues({
-                            ...filterValues,
-                            spawn_size: newValue,
-                          })
-                        }
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography
-                        variant="caption"
-                        disabled={filterValues.spawn_size === 0}
-                      >
-                        {t('spawn_size')}
-                      </Typography>
-                    </Grid>
+                    {['xxs', 'xxl'].map((each, i) => (
+                      <Fragment key={each}>
+                        <Grid item xs={3}>
+                          <Typography variant="subtitle2" align="center">
+                            {t(i ? 'size_5' : 'size_1')}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Switch
+                            color="primary"
+                            checked={filterValues[each]}
+                            onChange={() => {
+                              setFilterValues({
+                                ...filterValues,
+                                [each]: !filterValues[each],
+                              })
+                            }}
+                          />
+                        </Grid>
+                      </Fragment>
+                    ))}
                   </Grid>
                 </Grid>
               </>

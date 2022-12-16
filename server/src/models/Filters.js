@@ -25,7 +25,8 @@ class PokemonFilter extends GenericFilter {
     pvp,
     gender,
     cp,
-    spawnSize,
+    xxs,
+    xxl,
   ) {
     super(enabled, size)
     this.iv = iv || [0, 100]
@@ -35,7 +36,8 @@ class PokemonFilter extends GenericFilter {
     this.level = level || [1, 35]
     this.cp = cp || [10, 5000]
     this.gender = gender || 0
-    this.spawn_size = spawnSize || 0
+    this.xss = xxs || false
+    this.xxl = xxl || false
     leagues.forEach(
       (league) =>
         (this[league.name] = pvp || [

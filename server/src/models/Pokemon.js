@@ -27,7 +27,8 @@ const keys = [
   'def_iv',
   'sta_iv',
   'gender',
-  'spawnSize',
+  'xxs',
+  'xxl',
   ...leagues.map((league) => league.name),
 ]
 const madKeys = {
@@ -182,9 +183,14 @@ module.exports = class Pokemon extends Model {
     const generateSql = (queryBase, filter, relevant) => {
       relevant.forEach((key) => {
         switch (key) {
-          case 'spawn_size':
+          case 'xxs':
             if (hasSize) {
-              queryBase.andWhere('pokemon.size', filter[key])
+              queryBase.andWhere('pokemon.size', 1)
+            }
+            break
+          case 'xxl':
+            if (hasSize) {
+              queryBase.andWhere('pokemon.size', 5)
             }
             break
           case 'gender':

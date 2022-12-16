@@ -1,5 +1,13 @@
 import React, { useEffect, useState, Fragment } from 'react'
-import { Grid, Typography, Switch, AppBar, Tab, Tabs } from '@material-ui/core'
+import {
+  Grid,
+  Typography,
+  Switch,
+  AppBar,
+  Tab,
+  Tabs,
+  Divider,
+} from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
@@ -8,7 +16,6 @@ import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 import TabPanel from '../general/TabPanel'
 import GenderFilter from '../dialogs/filters/Gender'
-import MultiSelector from './MultiSelector'
 
 export default function WithSliders({
   category,
@@ -136,26 +143,37 @@ export default function WithSliders({
               >
                 {index ? (
                   <>
-                    <Grid item xs={12} style={{ margin: '14px 0' }}>
-                      <MultiSelector
-                        filterKey="spawn_size"
-                        items={[0, 1, 2, 3, 4, 5]}
-                        tKey="size_"
-                        filters={filters[category].ivOr.spawn_size}
-                        setFilters={(newValue) =>
-                          setFilters({
-                            ...filters,
-                            [category]: {
-                              ...filters[category],
-                              ivOr: {
-                                ...filters[category].ivOr,
-                                spawn_size: newValue,
-                              },
-                            },
-                          })
-                        }
-                      />
-                    </Grid>
+                    {['xxs', 'xxl'].map((each, i) => (
+                      <Fragment key={each}>
+                        <Grid item xs={3}>
+                          <Typography variant="subtitle2" align="center">
+                            {t(i ? 'size_5' : 'size_1')}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Switch
+                            color="primary"
+                            checked={filters[category][each]}
+                            onChange={() => {
+                              setFilters({
+                                ...filters,
+                                [category]: {
+                                  ...filters[category],
+                                  ivOr: {
+                                    ...filters[category].ivOr,
+                                    [each]: !filters[category].ivOr[each],
+                                  },
+                                },
+                              })
+                            }}
+                          />
+                        </Grid>
+                      </Fragment>
+                    ))}
+                    <Divider
+                      flexItem
+                      style={{ width: '100%', height: 2, margin: '8px 0' }}
+                    />
                     {['xsRat', 'xlKarp'].map((each, i) => (
                       <Fragment key={each}>
                         <Grid item xs={2}>
