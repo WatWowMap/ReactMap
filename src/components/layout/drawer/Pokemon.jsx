@@ -153,7 +153,7 @@ export default function WithSliders({
                         <Grid item xs={3}>
                           <Switch
                             color="primary"
-                            checked={filters[category][each]}
+                            checked={filters[category].ivOr[each]}
                             onChange={() => {
                               setFilters({
                                 ...filters,
