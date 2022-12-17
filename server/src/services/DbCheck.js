@@ -80,12 +80,16 @@ module.exports = class DbCheck {
     await Promise.all(
       this.connections.map(async (schema, i) => {
         try {
-          const [isMad, pvpV2, mem] = await schema('pokemon')
+          const [isMad, pvpV2, mem, hasSize, hasHeight] = await schema(
+            'pokemon',
+          )
             .columnInfo()
             .then((columns) => [
               'cp_multiplier' in columns,
               'pvp' in columns,
               Object.keys(columns).length ? '' : this.memEndpoints[i],
+              'size' in columns,
+              'height' in columns,
             ])
           const [hasRewardAmount, hasPowerUp, hasAltQuests] = await schema(
             'pokestop',
@@ -120,6 +124,8 @@ module.exports = class DbCheck {
                 this.models[category][j].isMad = isMad
                 this.models[category][j].pvpV2 = pvpV2
                 this.models[category][j].mem = mem
+                this.models[category][j].hasSize = hasSize
+                this.models[category][j].hasHeight = hasHeight
                 this.models[category][j].hasRewardAmount = hasRewardAmount
                 this.models[category][j].hasPowerUp = hasPowerUp
                 this.models[category][j].hasAltQuests = hasAltQuests

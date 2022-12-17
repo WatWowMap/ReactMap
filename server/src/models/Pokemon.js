@@ -1,10 +1,13 @@
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
+const i18next = require('i18next')
+
 const { Event } = require('../services/initialization')
 const legacyFilter = require('../services/legacyFilter')
 const {
   api: {
+    searchResultsLimit,
     pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, leagueObj },
     queryLimits,
   },
@@ -19,10 +22,14 @@ const ivCalc =
   'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
 const keys = [
   'iv',
+  'cp',
   'level',
   'atk_iv',
   'def_iv',
   'sta_iv',
+  'gender',
+  'xxs',
+  'xxl',
   ...leagues.map((league) => league.name),
 ]
 const madKeys = {
@@ -31,6 +38,8 @@ const madKeys = {
   atk_iv: 'individual_attack',
   def_iv: 'individual_defense',
   sta_iv: 'individual_stamina',
+  gender: 'pokemon.gender',
+  cp: 'cp',
 }
 
 const getMadSql = (q) =>
@@ -49,7 +58,7 @@ const getMadSql = (q) =>
       'individual_attack AS atk_iv',
       'individual_defense AS def_iv',
       'individual_stamina AS sta_iv',
-      'height AS size',
+      'height',
       'pokemon.form',
       'pokemon.gender',
       'pokemon.costume',
@@ -70,7 +79,7 @@ module.exports = class Pokemon extends Model {
     return 'pokemon'
   }
 
-  static async getAll(perms, args, { isMad, pvpV2, mem }) {
+  static async getAll(perms, args, { isMad, pvpV2, mem, hasSize, hasHeight }) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const {
       onlyStandard,
@@ -156,7 +165,9 @@ module.exports = class Pokemon extends Model {
 
     // checks if filters are set to default and skips them if so
     const arrayCheck = (filter, key) =>
-      filter[key]?.every((v, i) => v === onlyStandard[key][i])
+      Array.isArray(filter[key])
+        ? filter[key]?.every((v, i) => v === onlyStandard[key][i])
+        : filter[key] === onlyStandard[key]
 
     // cycles through the above arrayCheck
     const getRelevantKeys = (filter) => {
@@ -171,33 +182,45 @@ module.exports = class Pokemon extends Model {
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (queryBase, filter, relevant) => {
-      relevant.forEach((key) => {
-        switch (key) {
-          case 'level':
-          case 'atk_iv':
-          case 'def_iv':
-          case 'sta_iv':
-          case 'iv':
-            if (ivs) {
-              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
-            }
-            break
-          default:
-            if (pvp) {
-              queryPvp = true
-              if (
-                !relevant.includes('iv') &&
-                !relevant.includes('level') &&
-                !relevant.includes('atk_iv') &&
-                !relevant.includes('def_iv') &&
-                !relevant.includes('sta_iv')
-              ) {
-                // doesn't return everything if only pvp stats for individual pokemon
-                queryBase.whereNull('pokemon_id')
+      queryBase.andWhere((pkmn) => {
+        relevant.forEach((key) => {
+          switch (key) {
+            case 'xxs':
+            case 'xxl':
+              if (hasSize) {
+                pkmn.orWhere('pokemon.size', key === 'xxl' ? 5 : 1)
               }
-            }
-            break
-        }
+              break
+            case 'gender':
+              pkmn.andWhere('pokemon.gender', filter[key])
+              break
+            case 'cp':
+            case 'level':
+            case 'atk_iv':
+            case 'def_iv':
+            case 'sta_iv':
+            case 'iv':
+              if (ivs) {
+                pkmn.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
+              }
+              break
+            default:
+              if (pvp) {
+                queryPvp = true
+                if (
+                  !relevant.includes('iv') &&
+                  !relevant.includes('level') &&
+                  !relevant.includes('atk_iv') &&
+                  !relevant.includes('def_iv') &&
+                  !relevant.includes('sta_iv')
+                ) {
+                  // doesn't return everything if only pvp stats for individual pokemon
+                  pkmn.whereNull('pokemon_id')
+                }
+              }
+              break
+          }
+        })
       })
     }
 
@@ -207,6 +230,8 @@ module.exports = class Pokemon extends Model {
     const query = this.query()
     if (isMad) {
       getMadSql(query)
+    } else {
+      query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
     }
     query
       .where(
@@ -234,7 +259,7 @@ module.exports = class Pokemon extends Model {
                 poke.where('pokemon_id', id).andWhere('pokemon.form', form)
               }
               if (relevantFilters.length) {
-                generateSql(poke, filter, relevantFilters, true)
+                generateSql(poke, filter, relevantFilters)
               }
             })
           } else if (pkmn === 'onlyIvOr' && (ivs || pvp)) {
@@ -404,8 +429,8 @@ module.exports = class Pokemon extends Model {
     )
   }
 
-  static async getLegacy(perms, args, { mem, isMad }) {
-    const ts = Math.floor(Date.now() / 1000)
+  static async getLegacy(perms, args, { isMad, mem, hasSize, hasHeight }) {
+    const ts = Math.floor(new Date().getTime() / 1000)
     const query = this.query()
       .where(
         isMad ? 'disappear_time' : 'expire_timestamp',
@@ -422,6 +447,8 @@ module.exports = class Pokemon extends Model {
       ])
     if (isMad) {
       getMadSql(query)
+    } else {
+      query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
     }
     if (
       !getAreaSql(
@@ -486,5 +513,43 @@ module.exports = class Pokemon extends Model {
         .where(isMad ? 'encounter_id' : 'id', id)
         .first(),
     )
+  }
+
+  static async search(perms, args, { isMad }, distance) {
+    const { search, locale, onlyAreas = [] } = args
+    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
+      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
+    )
+    const safeTs = args.ts || Math.floor(Date.now() / 1000)
+    const query = this.query()
+      .select([distance])
+      .whereIn('pokemon_id', pokemonIds)
+      .andWhere(
+        isMad ? 'disappear_time' : 'expire_timestamp',
+        '>=',
+        isMad ? this.knex().fn.now() : safeTs,
+      )
+      .limit(searchResultsLimit)
+      .orderBy('distance')
+    if (isMad) {
+      getMadSql(query)
+    } else {
+      query.select([
+        'id',
+        'lat',
+        'lon',
+        'pokemon_id',
+        'form',
+        'costume',
+        'gender',
+        'iv',
+        'shiny',
+      ])
+    }
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+      return []
+    }
+    const results = await query
+    return results.map((poke) => ({ ...poke, iv: perms.iv ? poke.iv : null }))
   }
 }

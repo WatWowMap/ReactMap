@@ -14,7 +14,7 @@ module.exports = async function fetchRaids() {
       bosses.forEach((boss) =>
         raidsInfo.push(
           `${boss.id}-${
-            boss.form || Event.masterfile.pokemon[boss.id].defaultFormId
+            boss.form || Event.masterfile.pokemon[boss.id]?.defaultFormId || 0
           }`,
         ),
       )

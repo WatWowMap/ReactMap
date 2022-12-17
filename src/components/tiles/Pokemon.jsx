@@ -130,7 +130,8 @@ const PokemonTile = ({
           glowStatus ||
           ivCircle ||
           weatherCheck ||
-          item.seen_type === 'nearby_cell'
+          item.seen_type === 'nearby_cell' ||
+          (Number.isInteger(item.size) && (item.size !== 3 || item.size !== 0))
             ? fancyMarker(
                 url,
                 size,
@@ -140,6 +141,7 @@ const PokemonTile = ({
                 Icons,
                 weatherCheck,
                 timeOfDay,
+                userSettings,
               )
             : basicMarker(url, size)
         }

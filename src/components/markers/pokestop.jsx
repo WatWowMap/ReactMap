@@ -11,7 +11,7 @@ export default function stopMarker(
   Icons,
   userSettings,
 ) {
-  const { lure_id, ar_scan_eligible } = pokestop
+  const { lure_id, ar_scan_eligible, power_up_level, display_type } = pokestop
   const {
     invasion: invasionMod,
     pokestop: pokestopMod,
@@ -24,7 +24,9 @@ export default function stopMarker(
     hasLure ? lure_id : 0,
     hasInvasion,
     hasQuest && userSettings.hasQuestIndicator,
-    userSettings.showArBadge && ar_scan_eligible,
+    ar_scan_eligible && userSettings.showArBadge,
+    power_up_level,
+    display_type || '',
   )
   let baseSize = Icons.getSize('pokestop', filters.filter[filterId])
   let popupX = 7 + pokestopMod.popupX
@@ -42,12 +44,16 @@ export default function stopMarker(
   if (hasInvasion) {
     const { invasions } = pokestop
     invasions.forEach((invasion) => {
-      filterId = `i${invasion.grunt_type}`
-      invasionIcons.unshift(Icons.getInvasions(invasion.grunt_type))
-      invasionSizes.unshift(Icons.getSize('invasion', filters.filter[filterId]))
-      popupYOffset += rewardMod.offsetY - 1
-      popupX += invasionMod.popupX
-      popupY += invasionMod.popupY
+      if (invasion.grunt_type) {
+        filterId = `i${invasion.grunt_type}`
+        invasionIcons.unshift(Icons.getInvasions(invasion.grunt_type))
+        invasionSizes.unshift(
+          Icons.getSize('invasion', filters.filter[filterId]),
+        )
+        popupYOffset += rewardMod.offsetY - 1
+        popupX += invasionMod.popupX
+        popupY += invasionMod.popupY
+      }
     })
   }
   if (hasQuest && !(hasInvasion && invasionMod?.removeQuest)) {

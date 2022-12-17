@@ -188,6 +188,10 @@ rootRouter.get('/settings', async (req, res) => {
     if (serverSettings.user.valid) {
       serverSettings.loggedIn = req.user
 
+      serverSettings.config.map.searchable = Object.keys(
+        config.api.searchable,
+      ).filter((k) => config.api.searchable[k] && serverSettings.user.perms[k])
+
       // keys that are being sent to the frontend but are not options
       const ignoreKeys = [
         'map',

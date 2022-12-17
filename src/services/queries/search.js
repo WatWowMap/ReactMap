@@ -89,6 +89,36 @@ export const nests = gql`
   }
 `
 
+export const pokemon = gql`
+  ${core}
+  query SearchPokemon(
+    $search: String!
+    $category: String!
+    $lat: Float!
+    $lon: Float!
+    $locale: String!
+    $onlyAreas: [String]
+  ) {
+    search(
+      search: $search
+      category: $category
+      lat: $lat
+      lon: $lon
+      locale: $locale
+      onlyAreas: $onlyAreas
+    ) {
+      ...CoreSearch
+      pokemon_id
+      pokemon_id
+      form
+      gender
+      costume
+      shiny
+      iv
+    }
+  }
+`
+
 export const quests = gql`
   query SearchQuests(
     $search: String!

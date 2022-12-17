@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { Fragment, useState, useEffect } from 'react'
 import {
   Select,
   Typography,
   Grid,
   DialogContent,
   MenuItem,
+  Switch,
 } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
@@ -17,12 +18,14 @@ import StringFilter from './StringFilter'
 import SliderTile from './SliderTile'
 import Size from './Size'
 import QuestTitle from '../../general/QuestTitle'
+import GenderFilter from './Gender'
 
 export default function AdvancedFilter({
   toggleAdvMenu,
   advancedFilter,
   type,
   isTutorial,
+  isMobile,
 }) {
   Utility.analytics(`/${type}/${advancedFilter.id}`)
 
@@ -133,18 +136,69 @@ export default function AdvancedFilter({
                 />
               </Grid>
             ) : (
-              Object.entries(ui[type].sliders).map(([category, sliders]) => (
-                <Grid item xs={12} sm={6} key={category}>
-                  {sliders.map((each) => (
-                    <SliderTile
-                      key={each.name}
-                      filterSlide={each}
-                      handleChange={handleChange}
-                      filterValues={filterValues}
-                    />
-                  ))}
+              <>
+                {Object.entries(ui[type].sliders).map(([category, sliders]) => (
+                  <Grid item xs={12} sm={6} key={category}>
+                    {sliders.map((each) => (
+                      <SliderTile
+                        key={each.name}
+                        filterSlide={each}
+                        handleChange={handleChange}
+                        filterValues={filterValues}
+                      />
+                    ))}
+                  </Grid>
+                ))}
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  style={{ marginTop: 5, marginBottom: 20 }}
+                >
+                  <GenderFilter
+                    filter={filterValues}
+                    setFilter={(newValue) =>
+                      setFilterValues({
+                        ...filterValues,
+                        gender: newValue,
+                      })
+                    }
+                  />
+                  <Grid
+                    container
+                    item
+                    xs={12}
+                    sm={6}
+                    justifyContent="center"
+                    alignItems="center"
+                    style={{
+                      marginTop: isMobile ? 20 : undefined,
+                    }}
+                  >
+                    {['xxs', 'xxl'].map((each, i) => (
+                      <Fragment key={each}>
+                        <Grid item xs={3}>
+                          <Typography variant="subtitle2" align="center">
+                            {t(i ? 'size_5' : 'size_1')}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Switch
+                            color="primary"
+                            checked={filterValues[each]}
+                            onChange={() => {
+                              setFilterValues({
+                                ...filterValues,
+                                [each]: !filterValues[each],
+                              })
+                            }}
+                          />
+                        </Grid>
+                      </Fragment>
+                    ))}
+                  </Grid>
                 </Grid>
-              ))
+              </>
             )}
           </Grid>
         ) : (

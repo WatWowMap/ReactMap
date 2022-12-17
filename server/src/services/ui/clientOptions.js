@@ -26,6 +26,7 @@ module.exports = function clientOptions(perms) {
       clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },
       invasionTimers: { type: 'bool', perm: ['invasions'] },
       lureTimers: { type: 'bool', perm: ['lures'] },
+      eventStopTimers: { type: 'bool', perm: ['pokestops'] },
       interactionRanges: { type: 'bool', perm: ['pokestops'] },
       lureRange: { type: 'bool', perm: ['lures'] },
       hasQuestIndicator: { type: 'bool', perm: ['quests'] },
@@ -41,6 +42,7 @@ module.exports = function clientOptions(perms) {
       showDexNumInPopup: { type: 'bool', perm: ['pokemon'] },
       weatherIndicator: { type: 'bool', perm: ['pokemon'] },
       pvpMega: { type: 'bool', perm: ['pokemon'] },
+      showSizeIndicator: { type: 'bool', perm: ['pokemon'] },
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'] },

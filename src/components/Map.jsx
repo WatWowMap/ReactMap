@@ -203,6 +203,7 @@ export default function Map({
                     (filters[category].lures && value.lures) ||
                     (filters[category].invasions && value.invasions) ||
                     (filters[category].quests && value.quests) ||
+                    (filters[category].eventStops && value.eventStops) ||
                     (filters[category].arEligible && value.arEligible)) &&
                   !webhookMode
                 ) {

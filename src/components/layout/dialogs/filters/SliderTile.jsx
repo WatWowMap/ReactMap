@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-duplicate-props */
 import React, { useState, useEffect } from 'react'
 import { Grid, Typography, Slider, TextField } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
@@ -79,8 +80,7 @@ export default function SliderTile({
           style={{ textAlign: index ? 'center' : 'right' }}
         >
           <TextField
-            style={{ width: 80 }}
-            color={color}
+            style={{ width: 80, color: textColor }}
             id={each}
             label={`${t(each)} ${t(label)}`}
             name={name}
@@ -90,6 +90,12 @@ export default function SliderTile({
             size="small"
             type="number"
             disabled={disabled}
+            InputLabelProps={{
+              style: { color: textColor },
+            }}
+            InputProps={{
+              style: { color: textColor },
+            }}
             inputProps={{
               min,
               max,
@@ -107,7 +113,7 @@ export default function SliderTile({
           style={{ width: '100%' }}
           value={tempValues}
           onChange={handleTempChange}
-          onChangeCommitted={(event, newValues) => {
+          onChangeCommitted={(_, newValues) => {
             handleChange(name, newValues, low, high)
           }}
           disabled={disabled}

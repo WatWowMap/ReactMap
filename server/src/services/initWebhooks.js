@@ -120,7 +120,7 @@ module.exports = async function initWebhooks(webhook, config) {
                 baseSettings.pvp,
                 baseSettings.leagues,
               ),
-              areas: areas.geoJSON || [],
+              areas: areas.geoJSON || { features: [] },
               templates,
             }
           : baseSettings,

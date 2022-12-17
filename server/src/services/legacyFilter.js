@@ -368,6 +368,7 @@ const getLegacy = (results, args, perms, ts) => {
         filtered.move_2 = result.move_2
         filtered.weight = result.weight
         filtered.size = result.size
+        filtered.height = result.height
       }
       pokemon.push(filtered)
     }

@@ -33,6 +33,15 @@
       "submissionCells": 500,
       "weather": 30
     },
+    "searchable": {
+      "quests": true,
+      "pokestops": true,
+      "raids": true,
+      "gyms": true,
+      "portals": true,
+      "nests": true,
+      "pokemon": true
+    },
     "queryUpdateHours": {
       "pokemon": 0.25,
       "quests": 0.5,
@@ -115,6 +124,8 @@
       "de",
       "es",
       "fr",
+      "hi",
+      "id",
       "it",
       "ja",
       "ko",
@@ -122,7 +133,8 @@
       "pl",
       "ru",
       "sv",
-      "th"
+      "th",
+      "tr"
     ],
     "customRoutes": {
       "discordAuthUrl": "/auth/discord/callback",
@@ -300,6 +312,7 @@
       "clustering": true,
       "invasionTimers": false,
       "lureTimers": false,
+      "eventStopTimers": false,
       "interactionRanges": false,
       "lureRange": false,
       "madQuestText": false,
@@ -317,6 +330,7 @@
       "showDexNumInPopup": false,
       "pvpMega": false,
       "linkGlobalAndAdvanced": false,
+      "showSizeIndicator": false,
       "glow": [
         {
           "name": "Hundo",
@@ -419,6 +433,7 @@
       "levels": "all",
       "lures": true,
       "quests": true,
+      "eventStops": false,
       "questSet": "both",
       "items": true,
       "megaEnergy": true,
@@ -455,6 +470,8 @@
       "enabled": false,
       "legacyFilter": false,
       "allPokemon": false,
+      "xsRat": false,
+      "xlKarp": false,
       "globalValues": {
         "iv": [
           80,
@@ -479,7 +496,14 @@
         "pvp": [
           1,
           10
-        ]
+        ],
+        "gender": 0,
+        "cp": [
+          10,
+          5000
+        ],
+        "xxs": false,
+        "xxl": false
       }
     },
     "portals": {

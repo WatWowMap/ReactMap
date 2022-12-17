@@ -64,6 +64,9 @@ module.exports = function buildDefault(perms, available, dbModels) {
               ? defaultFilters.pokestops.levels
               : undefined,
             lures: perms.lures ? defaultFilters.pokestops.lures : undefined,
+            eventStops: perms.pokestops
+              ? defaultFilters.pokestops.eventStops
+              : undefined,
             quests: perms.quests ? defaultFilters.pokestops.quests : undefined,
             showQuestSet: defaultFilters.pokestops.questSet,
             invasions: perms.invasions
@@ -88,8 +91,9 @@ module.exports = function buildDefault(perms, available, dbModels) {
             pvp: perms.pvp ? true : undefined,
             standard: base,
             ivOr: custom,
-            xsRat: false,
-            xlKarp: false,
+            xsRat: defaultFilters.pokemon.xsRat,
+            xlKarp: defaultFilters.pokemon.xlKarp,
+            gender: defaultFilters.pokemon.globalValues.gender,
             zeroIv: perms.iv ? false : undefined,
             hundoIv: perms.iv ? true : undefined,
             filter: pokemon.full,

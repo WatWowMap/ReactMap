@@ -64,7 +64,9 @@ export default class Query {
     const permObj = {
       Lures: filters.lures && perms.lures,
       Quests: filters.quests && perms.quests,
-      Invasions: filters.invasions && perms.invasions,
+      Invasions:
+        (filters.invasions && perms.invasions) ||
+        (filters.eventStops && perms.allPokestops),
     }
     let query = 'get'
 
@@ -131,6 +133,7 @@ export default class Query {
       case 'raids':
       case 'nests':
       case 'quests':
+      case 'pokemon':
         return searchIndex[category]
       case 'webhook':
         return searchIndex.poiWebhook
