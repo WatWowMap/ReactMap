@@ -20,6 +20,7 @@ export const fancyMarker = (
   Icons,
   weatherCheck,
   timeOfDay,
+  userSettings,
 ) => {
   const { pokemon: pokemonMod, weather: weatherMod } = Icons.modifiers
   let badge
@@ -85,6 +86,20 @@ export const fancyMarker = (
           {Math.round(pkmn.iv)}
         </div>
       )}
+      {userSettings?.showSizeIndicator &&
+        Number.isInteger(pkmn.size) &&
+        pkmn.size !== 3 && (
+          <div
+            className="iv-badge"
+            style={{
+              bottom: (-size / 5) * pokemonMod.offsetY,
+              right: `${pokemonMod.offsetX * size}%`,
+              fontSize: 10,
+            }}
+          >
+            {{ 1: 'XXS', 2: 'XS', 3: 'MD', 4: 'XL', 5: 'XXL' }[pkmn.size]}
+          </div>
+        )}
       {Boolean(weatherCheck) && (
         <div
           className="weather-icon"

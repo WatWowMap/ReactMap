@@ -29,6 +29,7 @@ const ivs = gql`
     sta_iv
     weight
     size
+    height
     move_1
     move_2
     weather
