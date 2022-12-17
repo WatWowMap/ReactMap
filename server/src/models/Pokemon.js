@@ -405,7 +405,7 @@ module.exports = class Pokemon extends Model {
     return finalResults
   }
 
-  static async getLegacy(perms, args, { isMad }) {
+  static async getLegacy(perms, args, { isMad, hasSize, hasHeight }) {
     const ts = Math.floor(new Date().getTime() / 1000)
     const query = this.query()
       .where(
@@ -423,6 +423,8 @@ module.exports = class Pokemon extends Model {
       ])
     if (isMad) {
       getMadSql(query)
+    } else {
+      query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
     }
     if (
       !getAreaSql(
