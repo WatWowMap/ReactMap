@@ -124,6 +124,8 @@
       "de",
       "es",
       "fr",
+      "hi",
+      "id",
       "it",
       "ja",
       "ko",
@@ -131,7 +133,8 @@
       "pl",
       "ru",
       "sv",
-      "th"
+      "th",
+      "tr"
     ],
     "customRoutes": {
       "discordAuthUrl": "/auth/discord/callback",
