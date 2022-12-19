@@ -10,6 +10,18 @@ dotenv.config()
 
 const config = require('config')
 
+const allowedMenuItems = [
+  'gyms',
+  'nests',
+  'pokestops',
+  'pokemon',
+  'wayfarer',
+  'scanAreas',
+  'weather',
+  'admin',
+  'settings',
+]
+
 try {
   const refLength = +fs.readFileSync(
     resolve(__dirname, '../../../.configref'),
@@ -216,10 +228,21 @@ const mergeMapConfig = (obj) => {
     )
     obj.holidayEffects = []
   }
+
+  const menuOrder = obj?.general?.menuOrder
+    ? obj.general.menuOrder.filter((x) => allowedMenuItems.includes(x))
+    : []
+  allowedMenuItems.forEach((item) => {
+    if (!menuOrder.includes(item)) {
+      menuOrder.push(item)
+    }
+  })
+
   return {
     localeSelection: obj.localeSelection,
     ...obj,
     ...obj.general,
+    menuOrder,
     ...obj.customRoutes,
     ...obj.links,
     ...obj.misc,
