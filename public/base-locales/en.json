@@ -569,5 +569,6 @@
   "size_3": "M",
   "size_4": "XL",
   "size_5": "XXL",
-  "show_size_indicator": "Show Size Indicator"
+  "show_size_indicator": "Show Size Indicator",
+  "size": "Size"
 }

@@ -351,14 +351,13 @@ export default function WebhookAdvanced({
   const checkDefaults = (field) => {
     if (
       field === 'size' &&
-      poracleValues.size > 0 &&
-      poracleValues.size === poracleValues.max_size
+      (poracleValues.size > 1 || poracleValues.max_size < 5)
     )
-      return `size:${t(`size_${poracleValues.size}`)}`
-    if (field === 'size' && poracleValues.size > 0)
-      return `size:${t(`size_${poracleValues.size}`)}-${t(
-        `size_${poracleValues.max_size}`,
-      )}`
+      return poracleValues.size === poracleValues.max_size
+        ? `size:${t(`size_${poracleValues.size}`)}`
+        : `size:${t(`size_${poracleValues.size}`)}-${t(
+            `size_${poracleValues.max_size}`,
+          )}`
 
     if (
       field === 'distance' &&
