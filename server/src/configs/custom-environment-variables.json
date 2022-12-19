@@ -661,6 +661,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_LINK_GLOBAL_AND_ADVANCED",
         "__format": "boolean"
       },
+      "showSizeIndicator": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_SHOW_SIZE_INDICATOR",
+        "__format": "boolean"
+      },
       "glow": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_GLOW",
         "__format": "json"
@@ -925,6 +929,14 @@
         "cp": {
           "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_CP",
           "__format": "json"
+        },
+        "xxs": {
+          "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_XXS",
+          "__format": "boolean"
+        },
+        "xxl": {
+          "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_XXL",
+          "__format": "boolean"
         }
       }
     },

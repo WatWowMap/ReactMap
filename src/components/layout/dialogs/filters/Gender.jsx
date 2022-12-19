@@ -17,6 +17,7 @@ export default function GenderFilter({ category, filter, setFilter }) {
       <Grid
         item
         xs={category ? 10 : 12}
+        sm={category ? undefined : 6}
         style={{ textAlign: category ? 'right' : 'center' }}
       >
         <MultiSelector
