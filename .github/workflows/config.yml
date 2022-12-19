@@ -37,8 +37,6 @@ jobs:
           yarn gen-env-config
       - name: Configure git
         if: steps.changed-files.outputs.any_changed == 'true'
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "turtlesocks-bot"
           git config --global user.email "turtlesocks-bot@users.noreply.github.com"
