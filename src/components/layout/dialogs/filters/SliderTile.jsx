@@ -15,6 +15,8 @@ export default function SliderTile({
     high,
     step,
     i18nKey,
+    marks,
+    markI18n,
   },
   handleChange,
   filterValues,
@@ -56,8 +58,10 @@ export default function SliderTile({
     }
   }
 
+  if (!tempValues) return null
+
   const textColor =
-    (tempValues[0] === min && tempValues[1] === max) || disabled
+    (tempValues && tempValues[0] === min && tempValues[1] === max) || disabled
       ? '#616161'
       : 'white'
 
@@ -118,7 +122,16 @@ export default function SliderTile({
           }}
           disabled={disabled}
           valueLabelDisplay="auto"
+          valueLabelFormat={marks ? (e) => t(`${markI18n}${e}`) : undefined}
           step={step}
+          marks={
+            marks
+              ? marks.map((each) => ({
+                  value: each,
+                  label: t(`${markI18n}${each}`),
+                }))
+              : undefined
+          }
         />
       </Grid>
     </Grid>

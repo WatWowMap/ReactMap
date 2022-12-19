@@ -354,6 +354,8 @@ export default class Poracle {
         reactMapFriendly[`${key}_iv`] = [values[key], values[`max_${key}`]]
       } else if (key.startsWith('rarity')) {
         reactMapFriendly.rarity = [values[key], values[`max_${key}`]]
+      } else if (key.startsWith('size')) {
+        reactMapFriendly.size = [values[key], values[`max_${key}`]]
       } else {
         reactMapFriendly[key] = values[key]
       }

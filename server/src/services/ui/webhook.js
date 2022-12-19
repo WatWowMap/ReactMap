@@ -23,6 +23,8 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
             max_iv: 100,
             min_level: 0,
             max_level: 40,
+            size: 0,
+            max_size: 5,
             rarity: -1,
             max_rarity: 6,
             sta: 0,
@@ -107,6 +109,17 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                   low: 'sta',
                   high: 'max_sta',
                 },
+                {
+                  name: 'size',
+                  label: '',
+                  min: 0,
+                  max: 5,
+                  perm: 'iv',
+                  low: 'size',
+                  high: 'max_size',
+                  marks: [0, 1, 2, 3, 4, 5],
+                  markI18n: 'size_',
+                },
               ],
               texts: [
                 {
@@ -114,14 +127,10 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
                   type: 'number',
                   max: 60,
                   adornment: 's',
-                  xs: 4,
-                  sm: 4,
+                  xs: 12,
+                  sm: 6,
                   width: 100,
                 },
-              ],
-              booleans: [
-                { name: 'xs', xs: 4, sm: 4, override: true },
-                { name: 'xl', xs: 4, sm: 4, override: true },
               ],
             },
             pvp: {

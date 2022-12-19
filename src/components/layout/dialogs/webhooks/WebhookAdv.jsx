@@ -47,6 +47,7 @@ const skipFields = [
   'gender',
   'description',
   'uid',
+  'max_size',
   'id',
   'ping',
   'pokemon_id',
@@ -349,9 +350,20 @@ export default function WebhookAdvanced({
 
   const checkDefaults = (field) => {
     if (
+      field === 'size' &&
+      poracleValues.size > 0 &&
+      poracleValues.size === poracleValues.max_size
+    )
+      return `size:${t(`size_${poracleValues.size}`)}`
+    if (field === 'size' && poracleValues.size > 0)
+      return `size:${t(`size_${poracleValues.size}`)}-${t(
+        `size_${poracleValues.max_size}`,
+      )}`
+
+    if (
       field === 'distance' &&
       poracleValues.byDistance &&
-      parseInt(poracleValues.distance)
+      +poracleValues.distance
     )
       return `d${poracleValues.distance}`
     if (field === 'min_time' && parseInt(poracleValues.min_time))
