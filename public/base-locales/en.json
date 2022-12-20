@@ -49,6 +49,7 @@
   "slider_def_iv": "Defense",
   "slider_sta_iv": "Stamina",
   "slider_level": "Level",
+  "slider_size": "Size",
   "abbreviation_level": "L",
   "lvl": "Lvl",
   "cap": "Cap",
@@ -568,5 +569,6 @@
   "size_3": "M",
   "size_4": "XL",
   "size_5": "XXL",
-  "show_size_indicator": "Show Size Indicator"
+  "show_size_indicator": "Show Size Indicator",
+  "size": "Size"
 }

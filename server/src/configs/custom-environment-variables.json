@@ -315,7 +315,11 @@
         "__format": "number"
       },
       "geoJsonFileName": "MAP_GENERAL_GEO_JSON_FILE_NAME",
-      "attributionPrefix": "MAP_GENERAL_ATTRIBUTION_PREFIX"
+      "attributionPrefix": "MAP_GENERAL_ATTRIBUTION_PREFIX",
+      "menuOrder": {
+        "__name": "MAP_GENERAL_MENU_ORDER",
+        "__format": "json"
+      }
     },
     "localeSelection": {
       "__name": "MAP_LOCALE_SELECTION",
