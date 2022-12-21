@@ -17,9 +17,12 @@ export default function TutWelcome({ setUserProfile }) {
   const getPerms = () => {
     let have = 0
     let total = 0
+
     Object.keys(perms).forEach((perm) => {
       if (!excludeList.includes(perm)) {
-        have += perms[perm] ? 1 : 0
+        have += (Array.isArray(perms[perm]) ? perms[perm].length : perms[perm])
+          ? 1
+          : 0
         total += 1
       }
     })

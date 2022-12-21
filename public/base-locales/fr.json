@@ -269,7 +269,7 @@
   "quests_subtitle": "Affiche les récompenses de quêtes et tâches",
   "raids_subtitle": "Affiche les informations de raids y compris les Boss et leurs attaques, Oeufs et heure d'expiration",
   "scan_cells_subtitle": "Affiche la dernière fois que la cellule S2 a été scannée",
-  "scanAreas_subtitle": "Affiche les zones de scan",
+  "scan_areas_subtitle": "Affiche les zones de scan",
   "spawnpoints_subtitle": "Affiche les points d'apparition et les heures d'expiration estimées",
   "stats_subtitle": "Affiche les Stats et Niveaux des Pokémon",
   "submissionCells_subtitle": "Affiche les informations utiles à la création de nouveaux Points d'Intérêts",

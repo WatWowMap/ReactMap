@@ -78,6 +78,9 @@ rootRouter.get('/settings', async (req, res) => {
         req.session.tutorial = !config.map.forceTutorial
       }
       req.session.perms = {
+        ...Object.fromEntries(
+          Object.keys(config.authentication.perms).map((p) => [p, false]),
+        ),
         areaRestrictions: Utility.areaPerms(['none']),
         webhooks: [],
         scanner: Object.keys(config.scanner).filter(

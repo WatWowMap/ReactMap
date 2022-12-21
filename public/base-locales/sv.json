@@ -267,7 +267,7 @@
   "quests_subtitle": "Visar uppdragsbelöning och uppgiftsinformation",
   "raids_subtitle": "Visar all raidinformation inklusive raidbossen, ägg, utgångstid och moveset",
   "s2cells_subtitle": "Visar senaste gången en S2-cell skannades av en enhet",
-  "scanAreas_subtitle": "Visar tillgängliga skanningsområdens polygoner",
+  "scan_areas_subtitle": "Visar tillgängliga skanningsområdens polygoner",
   "spawnpoints_subtitle": "Visar spawnpoints och deras beräknade despawn-tid",
   "stats_subtitle": "Visar Pokémon-statistik och nivåer",
   "submission_cells_subtitle": "Visar information som är användbar för att skicka in nya sevärdheter",

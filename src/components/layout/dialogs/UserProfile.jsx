@@ -3,8 +3,6 @@ import {
   Grid,
   Typography,
   DialogContent,
-  List,
-  ListItem,
   AppBar,
   Tabs,
   Tab,
@@ -275,8 +273,13 @@ const ProfilePermissions = ({ perms, excludeList, t }) => {
 
 const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
   <Card className="perm-wrapper">
-    {!perms[perm] && <div className="disabled-overlay" />}
-    {(perm !== 'areaRestrictions' && perm !== 'webhooks') || permArrayImages ? (
+    {(Array.isArray(perms[perm]) ? !perms[perm].length : !perms[perm]) && (
+      <div className="disabled-overlay" />
+    )}
+    {(perm !== 'areaRestrictions' &&
+      perm !== 'webhooks' &&
+      perm !== 'scanner') ||
+    permArrayImages ? (
       <CardMedia
         style={{
           height: 250,
@@ -287,19 +290,25 @@ const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
         title={perm}
       />
     ) : (
-      <List
+      <Grid
+        container
+        direction="column"
         style={{
-          height: 235,
+          height: 260,
           border: 'black 4px solid',
           borderRadius: 4,
+          textAlign: 'center',
+          backgroundColor: '#222222',
         }}
+        alignItems="center"
+        justifyContent="center"
       >
         {perms[perm].map((area) => (
-          <ListItem key={area}>
+          <Grid key={area} item>
             <Typography>{Utility.getProperName(area)}</Typography>
-          </ListItem>
+          </Grid>
         ))}
-      </List>
+      </Grid>
     )}
     <CardContent style={{ height: 100 }}>
       <Typography gutterBottom variant="h6" noWrap>
