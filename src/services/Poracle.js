@@ -564,7 +564,7 @@ export default class Poracle {
               }`
         }${
           item.size > 1 || item.max_size < 5
-            ? `${t('size', 'Size')}:${
+            ? ` | ${t('size', 'Size')}:${
                 item.size === item.max_size
                   ? `size:${t(`size_${item.size}`)}`
                   : `size:${t(`size_${item.size}`)}-${t(
