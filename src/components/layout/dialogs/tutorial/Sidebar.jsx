@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import Menu from '@material-ui/icons/Menu'
+import Settings from '@material-ui/icons/Settings'
 import {
   Grid,
   DialogContent,
@@ -7,7 +9,7 @@ import {
   Divider,
   Button,
 } from '@material-ui/core'
-import { Menu, Settings } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'

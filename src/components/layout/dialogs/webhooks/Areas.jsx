@@ -1,6 +1,8 @@
 import React, { memo, useEffect } from 'react'
+import Done from '@material-ui/icons/Done'
+import Clear from '@material-ui/icons/Clear'
 import { Grid, Typography, Chip, Button } from '@material-ui/core'
-import { Done, Clear } from '@material-ui/icons'
+
 import { Trans } from 'react-i18next'
 
 import useStyles from '@hooks/useStyles'

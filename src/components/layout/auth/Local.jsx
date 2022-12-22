@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import Visibility from '@material-ui/icons/Visibility'
+import VisibilityOff from '@material-ui/icons/VisibilityOff'
 import { Navigate } from 'react-router-dom'
 import {
   Grid,
@@ -10,7 +12,7 @@ import {
   InputAdornment,
   IconButton,
 } from '@material-ui/core'
-import { Visibility, VisibilityOff } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 

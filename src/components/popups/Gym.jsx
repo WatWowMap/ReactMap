@@ -1,4 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react'
+import ExpandMore from '@material-ui/icons/ExpandMore'
+import Map from '@material-ui/icons/Map'
+import MoreVert from '@material-ui/icons/MoreVert'
 import {
   Grid,
   Typography,
@@ -8,7 +11,7 @@ import {
   Divider,
   Dialog,
 } from '@material-ui/core'
-import { ExpandMore, Map, MoreVert } from '@material-ui/icons'
+
 import { useTranslation, Trans } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'

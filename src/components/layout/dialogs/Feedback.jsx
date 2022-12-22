@@ -1,6 +1,7 @@
 import React from 'react'
+import Create from '@material-ui/icons/Create'
 import { Button, Typography, Divider, DialogContent } from '@material-ui/core'
-import { Create } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 import Header from '../general/Header'
 import Footer from '../general/Footer'
