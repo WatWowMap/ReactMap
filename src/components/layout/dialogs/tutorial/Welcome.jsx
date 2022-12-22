@@ -8,7 +8,7 @@ import LocaleSelection from '@components/layout/general/LocaleSelection'
 
 export default function TutWelcome({ setUserProfile }) {
   const { t } = useTranslation()
-  const { methods, loggedIn, perms } = useStatic((state) => state.auth)
+  const { methods, loggedIn, perms, counts } = useStatic((state) => state.auth)
   const {
     map: { enableUserProfile, excludeList },
     localeSelection,
@@ -18,12 +18,19 @@ export default function TutWelcome({ setUserProfile }) {
     let have = 0
     let total = 0
 
-    Object.keys(perms).forEach((perm) => {
+    Object.entries(perms).forEach(([perm, value]) => {
       if (!excludeList.includes(perm)) {
-        have += (Array.isArray(perms[perm]) ? perms[perm].length : perms[perm])
+        have += (
+          Array.isArray(value)
+            ? (value.length && counts[perm]) ||
+              (perm === 'areaRestrictions' && !value.length && counts[perm] > 0)
+            : value
+        )
           ? 1
           : 0
-        total += 1
+        if (counts[perm] !== 0 && perm !== 'donor') {
+          total += 1
+        }
       }
     })
     return `${have} / ${total}`

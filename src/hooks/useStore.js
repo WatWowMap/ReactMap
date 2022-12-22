@@ -94,7 +94,22 @@ export const useStore = create(
 export const useStatic = create((set) => ({
   active: true,
   setActive: (active) => set({ active }),
-  auth: { discord: true, loggedIn: false, perms: {} },
+  auth: {
+    strategy: '',
+    discordId: '',
+    telegramId: '',
+    webhookStrategy: '',
+    loggedIn: false,
+    perms: {},
+    methods: [],
+    username: '',
+    data: {},
+    counts: {
+      areaRestrictions: 0,
+      webhooks: 0,
+      scanner: 0,
+    },
+  },
   setAuth: (auth) => set({ auth }),
   config: undefined,
   setConfig: (config) => set({ config }),
