@@ -19,16 +19,16 @@ export default function TutWelcome({ setUserProfile }) {
     let total = 0
 
     Object.entries(perms).forEach(([perm, value]) => {
+      if (
+        (perm === 'areaRestrictions' && !value.length && counts[perm] > 0) ||
+        perm === 'donor'
+      )
+        return
       if (!excludeList.includes(perm)) {
-        have += (
-          Array.isArray(value)
-            ? (value.length && counts[perm]) ||
-              (perm === 'areaRestrictions' && !value.length && counts[perm] > 0)
-            : value
-        )
+        have += (Array.isArray(value) ? value.length && counts[perm] : value)
           ? 1
           : 0
-        if (counts[perm] !== 0 && perm !== 'donor') {
+        if (counts[perm] !== 0) {
           total += 1
         }
       }

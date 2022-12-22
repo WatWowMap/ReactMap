@@ -254,12 +254,17 @@ const ProfilePermissions = ({ auth, excludeList, t }) => {
         if (Array.isArray(auth.perms[perm]) && auth.counts[perm] === 0) {
           return null
         }
+        if (
+          perm === 'areaRestrictions' &&
+          !auth.perms[perm].length &&
+          auth.counts[perm] > 0
+        )
+          return null
         return (
           <Grid item xs={12} sm={6} key={perm}>
             <PermCard
               perms={auth.perms}
               perm={perm}
-              counts={auth.counts}
               t={t}
               permImageDir={permImageDir}
               permArrayImages={permArrayImages}
@@ -271,74 +276,57 @@ const ProfilePermissions = ({ auth, excludeList, t }) => {
   )
 }
 
-const PermCard = ({
-  perms,
-  counts,
-  perm,
-  t,
-  permImageDir,
-  permArrayImages,
-}) => {
-  const specialAreaRestrictions =
-    perm === 'areaRestrictions' && !perms[perm].length && counts[perm] > 0
-  return (
-    <Card className="perm-wrapper">
-      {!specialAreaRestrictions &&
-        (Array.isArray(perms[perm]) ? !perms[perm].length : !perms[perm]) && (
-          <div className="disabled-overlay" />
-        )}
-      {(perm !== 'areaRestrictions' &&
-        perm !== 'webhooks' &&
-        perm !== 'scanner') ||
-      permArrayImages ? (
-        <CardMedia
-          style={{
-            height: 250,
-            border: 'black 4px solid',
-            borderRadius: 4,
-          }}
-          image={`/${permImageDir}/${perm}.png`}
-          title={perm}
-        />
-      ) : (
-        <Grid
-          container
-          direction="column"
-          style={{
-            height: 260,
-            border: 'black 4px solid',
-            borderRadius: 4,
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-            textAlign: 'center',
-            backgroundColor: '#222222',
-          }}
-          alignItems="center"
-          justifyContent="center"
-        >
-          {specialAreaRestrictions && (
-            <Grid item>
-              <Typography>{t('all')}</Typography>
-            </Grid>
-          )}
-          {perms[perm].map((area) => (
-            <Grid key={area} item>
-              <Typography>{Utility.getProperName(area)}</Typography>
-            </Grid>
-          ))}
-        </Grid>
-      )}
-      <CardContent style={{ height: 100 }}>
-        <Typography gutterBottom variant="h6" noWrap>
-          {t(Utility.camelToSnake(perm))}
-        </Typography>
-        <Typography variant="body2" color="textSecondary" component="p">
-          {t(`${Utility.camelToSnake(perm)}_subtitle`)}
-        </Typography>
-      </CardContent>
-    </Card>
-  )
-}
+const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
+  <Card className="perm-wrapper">
+    {(Array.isArray(perms[perm]) ? !perms[perm].length : !perms[perm]) && (
+      <div className="disabled-overlay" />
+    )}
+    {(perm !== 'areaRestrictions' &&
+      perm !== 'webhooks' &&
+      perm !== 'scanner') ||
+    permArrayImages ? (
+      <CardMedia
+        style={{
+          height: 250,
+          border: 'black 4px solid',
+          borderRadius: 4,
+        }}
+        image={`/${permImageDir}/${perm}.png`}
+        title={perm}
+      />
+    ) : (
+      <Grid
+        container
+        direction="column"
+        style={{
+          height: 260,
+          border: 'black 4px solid',
+          borderRadius: 4,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,
+          textAlign: 'center',
+          backgroundColor: '#222222',
+        }}
+        alignItems="center"
+        justifyContent="center"
+      >
+        {perms[perm].map((area) => (
+          <Grid key={area} item>
+            <Typography>{Utility.getProperName(area)}</Typography>
+          </Grid>
+        ))}
+      </Grid>
+    )}
+    <CardContent style={{ height: 100 }}>
+      <Typography gutterBottom variant="h6" noWrap>
+        {t(Utility.camelToSnake(perm))}
+      </Typography>
+      <Typography variant="body2" color="textSecondary" component="p">
+        {t(`${Utility.camelToSnake(perm)}_subtitle`)}
+      </Typography>
+    </CardContent>
+  </Card>
+)
 
 const GymBadges = ({ isMobile, t }) => {
   const { data } = useQuery(Query.gyms('badges'), {
