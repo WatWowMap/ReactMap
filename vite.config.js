@@ -150,7 +150,7 @@ module.exports = defineConfig(({ mode }) => {
         strict: false,
       },
       proxy: {
-        '/api': {
+        '/': {
           target: `http://0.0.0.0:${env.PORT || 8080}`,
           changeOrigin: true,
           secure: false,
