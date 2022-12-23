@@ -362,7 +362,7 @@
   "quests_subtitle": "퀘스트 보상 및 작업 정보 표시",
   "raids_subtitle": "레이드 보스, 알, 만료 시간 및 이동 세트를 포함한 모든 레이드 정보를 표시합니다.",
   "s2cells_subtitle": "장치가 S2 셀을 마지막으로 스캔한 시간을 표시합니다.",
-  "scanAreas_subtitle": "사용 가능한 스캔 영역 폴리곤을 표시합니다.",
+  "scan_areas_subtitle": "사용 가능한 스캔 영역 폴리곤을 표시합니다.",
   "spawnpoints_subtitle": "스폰 지점과 예상 디스폰 시간을 표시합니다.",
   "stats_subtitle": "포켓몬 통계 및 레벨 표시",
   "submission_cells_subtitle": "새 POI 제출에 유용한 정보 표시",

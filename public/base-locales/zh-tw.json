@@ -268,7 +268,7 @@
   "quests_subtitle": "顯示任務獎勵和任務信息",
   "raids_subtitle": "顯示所有突襲信息，包括突襲首領、雞蛋、過期時間和移動設置",
   "s2cells_subtitle": "顯示設備上次掃描 S2 單元的時間",
-  "scanAreas_subtitle": "顯示可用的掃描區域多邊形",
+  "scan_areas_subtitle": "顯示可用的掃描區域多邊形",
   "spawnpoints_subtitle": "顯示出生點及其估計的消失時間",
   "stats_subtitle": "顯示神奇寶貝的統計數據和等級",
   "submission_cells_subtitle": "顯示對提交新 POI 有用的信息",

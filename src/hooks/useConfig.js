@@ -65,9 +65,10 @@ export default function useConfig(serverSettings, params) {
     webhookStrategy: serverSettings.user?.webhookStrategy || '',
     loggedIn: serverSettings.loggedIn,
     perms: serverSettings.user ? serverSettings.user.perms : {},
-    methods: serverSettings.authMethods,
+    methods: serverSettings.authMethods || [],
     username: serverSettings.user?.username || '',
     data: serverSettings.user?.data || {},
+    counts: serverSettings.config.map.authCounts || {},
   })
   Sentry.setUser({
     username: serverSettings.user.username,
