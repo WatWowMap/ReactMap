@@ -1115,6 +1115,10 @@
       "__name": "AUTHENTICATION_STRATEGIES",
       "__format": "json"
     },
+    "strictAreaRestrictions": {
+      "__name": "AUTHENTICATION_STRICT_AREA_RESTRICTIONS",
+      "__format": "boolean"
+    },
     "areaRestrictions": {
       "__name": "AUTHENTICATION_AREA_RESTRICTIONS",
       "__format": "json"
