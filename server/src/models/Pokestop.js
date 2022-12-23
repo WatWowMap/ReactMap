@@ -589,11 +589,17 @@ module.exports = class Pokestop extends Model {
           filtered.invasions = pokestop.invasions.filter(
             (invasion) => !invasion.grunt_type,
           )
+          if (filtered.invasions.length) {
+            filtered.display_type = Math.max(
+              ...filtered.invasions.map((inv) => inv.display_type),
+            )
+          }
         }
       }
       if (
         perms.invasions &&
-        (filters.onlyAllPokestops || filters.onlyInvasions)
+        ((filters.onlyAllPokestops && filters.onlyInvasions) ||
+          filters.onlyInvasions)
       ) {
         filtered.invasions = [
           ...(Array.isArray(filtered.invasions) ? filtered.invasions : []),
@@ -1100,11 +1106,7 @@ module.exports = class Pokestop extends Model {
     } else {
       queries.invasions = this.query()
         .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
-        .where(
-          isMad ? 'incident_grunt_type' : 'grunt_type',
-          '>',
-          0,
-        )
+        .where(isMad ? 'incident_grunt_type' : 'grunt_type', '>', 0)
         .andWhere(
           isMad ? 'incident_expiration' : 'incident_expire_timestamp',
           '>=',

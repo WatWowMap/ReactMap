@@ -117,13 +117,26 @@
       "submissionZoom": 15,
       "activeWeatherZoom": 13,
       "geoJsonFileName": "areas.json",
-      "attributionPrefix": "<a href='https://github.com/WatWowMap/ReactMap' target='_blank' rel='noreferrer'>ReactMap</a>"
+      "attributionPrefix": "<a href='https://github.com/WatWowMap/ReactMap' target='_blank' rel='noreferrer'>ReactMap</a>",
+      "menuOrder": [
+        "gyms",
+        "nests",
+        "pokestops",
+        "pokemon",
+        "wayfarer",
+        "scanAreas",
+        "weather",
+        "admin",
+        "settings"
+      ]
     },
     "localeSelection": [
       "en",
       "de",
       "es",
       "fr",
+      "hi",
+      "id",
       "it",
       "ja",
       "ko",
@@ -131,7 +144,8 @@
       "pl",
       "ru",
       "sv",
-      "th"
+      "th",
+      "tr"
     ],
     "customRoutes": {
       "discordAuthUrl": "/auth/discord/callback",
@@ -327,6 +341,7 @@
       "showDexNumInPopup": false,
       "pvpMega": false,
       "linkGlobalAndAdvanced": false,
+      "showSizeIndicator": false,
       "glow": [
         {
           "name": "Hundo",
@@ -497,7 +512,9 @@
         "cp": [
           10,
           5000
-        ]
+        ],
+        "xxs": false,
+        "xxl": false
       }
     },
     "portals": {

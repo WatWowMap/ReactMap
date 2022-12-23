@@ -27,6 +27,8 @@ const keys = [
   'def_iv',
   'sta_iv',
   'gender',
+  'xxs',
+  'xxl',
   ...leagues.map((league) => league.name),
 ]
 const madKeys = {
@@ -55,7 +57,7 @@ const getMadSql = (q) =>
       'individual_attack AS atk_iv',
       'individual_defense AS def_iv',
       'individual_stamina AS sta_iv',
-      'height AS size',
+      'height',
       'pokemon.form',
       'pokemon.gender',
       'pokemon.costume',
@@ -76,7 +78,7 @@ module.exports = class Pokemon extends Model {
     return 'pokemon'
   }
 
-  static async getAll(perms, args, { isMad, pvpV2 }) {
+  static async getAll(perms, args, { isMad, pvpV2, hasSize, hasHeight }) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const {
       onlyStandard,
@@ -179,37 +181,45 @@ module.exports = class Pokemon extends Model {
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
     const generateSql = (queryBase, filter, relevant) => {
-      relevant.forEach((key) => {
-        switch (key) {
-          case 'gender':
-            queryBase.andWhere('pokemon.gender', filter[key])
-            break
-          case 'cp':
-          case 'level':
-          case 'atk_iv':
-          case 'def_iv':
-          case 'sta_iv':
-          case 'iv':
-            if (ivs) {
-              queryBase.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
-            }
-            break
-          default:
-            if (pvp) {
-              queryPvp = true
-              if (
-                !relevant.includes('iv') &&
-                !relevant.includes('level') &&
-                !relevant.includes('atk_iv') &&
-                !relevant.includes('def_iv') &&
-                !relevant.includes('sta_iv')
-              ) {
-                // doesn't return everything if only pvp stats for individual pokemon
-                queryBase.whereNull('pokemon_id')
+      queryBase.andWhere((pkmn) => {
+        relevant.forEach((key) => {
+          switch (key) {
+            case 'xxs':
+            case 'xxl':
+              if (hasSize) {
+                pkmn.orWhere('pokemon.size', key === 'xxl' ? 5 : 1)
               }
-            }
-            break
-        }
+              break
+            case 'gender':
+              pkmn.andWhere('pokemon.gender', filter[key])
+              break
+            case 'cp':
+            case 'level':
+            case 'atk_iv':
+            case 'def_iv':
+            case 'sta_iv':
+            case 'iv':
+              if (ivs) {
+                pkmn.andWhereBetween(isMad ? madKeys[key] : key, filter[key])
+              }
+              break
+            default:
+              if (pvp) {
+                queryPvp = true
+                if (
+                  !relevant.includes('iv') &&
+                  !relevant.includes('level') &&
+                  !relevant.includes('atk_iv') &&
+                  !relevant.includes('def_iv') &&
+                  !relevant.includes('sta_iv')
+                ) {
+                  // doesn't return everything if only pvp stats for individual pokemon
+                  pkmn.whereNull('pokemon_id')
+                }
+              }
+              break
+          }
+        })
       })
     }
 
@@ -219,6 +229,8 @@ module.exports = class Pokemon extends Model {
     const query = this.query()
     if (isMad) {
       getMadSql(query)
+    } else {
+      query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
     }
     query
       .where(
@@ -246,7 +258,7 @@ module.exports = class Pokemon extends Model {
                 poke.where('pokemon_id', id).andWhere('pokemon.form', form)
               }
               if (relevantFilters.length) {
-                generateSql(poke, filter, relevantFilters, true)
+                generateSql(poke, filter, relevantFilters)
               }
             })
           } else if (pkmn === 'onlyIvOr' && (ivs || pvp)) {
@@ -393,7 +405,7 @@ module.exports = class Pokemon extends Model {
     return finalResults
   }
 
-  static async getLegacy(perms, args, { isMad }) {
+  static async getLegacy(perms, args, { isMad, hasSize, hasHeight }) {
     const ts = Math.floor(new Date().getTime() / 1000)
     const query = this.query()
       .where(
@@ -411,6 +423,8 @@ module.exports = class Pokemon extends Model {
       ])
     if (isMad) {
       getMadSql(query)
+    } else {
+      query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
     }
     if (
       !getAreaSql(

@@ -294,7 +294,7 @@
   "quests_subtitle": "クエストの報酬とタスク情報を表示します",
   "raids_subtitle": "レイドボス、エッグ、有効期限、ムーブセットを含むすべてのレイド情報を表示します",
   "s2cells_subtitle": "S2セルがデバイスによって最後にスキャンされた時刻を示します",
-  "scanAreas_subtitle": "使用可能なスキャン領域のポリゴンを表示します",
+  "scan_areas_subtitle": "使用可能なスキャン領域のポリゴンを表示します",
   "spawnpoints_subtitle": "スポーンポイントとその推定デスポーン時間を表示します",
   "stats_subtitle": "ポケモンの統計とレベルを表示します",
   "submission_cells_subtitle": "新しいPOIの送信に役立つ情報を表示します",

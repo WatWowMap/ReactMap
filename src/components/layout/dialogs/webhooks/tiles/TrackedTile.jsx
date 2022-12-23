@@ -46,7 +46,6 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
       newFilters &&
       !Object.keys(newFilters).every((key) => newFilters[key] === item[key])
     ) {
-      // eslint-disable-next-line camelcase
       setTempFilters({ [id]: { ...newFilters, enabled: true } })
       setSend(true)
     }

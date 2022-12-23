@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.7.2",
+  "version": "1.7.5",
   "description": "React based frontend map.",
   "main": "ReactMap.js",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -74,7 +74,7 @@
     "config": "^3.3.6",
     "discord.js": "^12.5.3",
     "dotenv": "^10.0.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-mysql-session": "^2.1.6",
     "express-rate-limit": "^5.2.6",
     "express-session": "^1.17.1",

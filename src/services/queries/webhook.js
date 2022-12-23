@@ -152,6 +152,8 @@ const Pokemon = gql`
       pvp_ranking_worst
       pvp_ranking_cap
       rarity
+      size
+      max_size
       sta
       template
       uid

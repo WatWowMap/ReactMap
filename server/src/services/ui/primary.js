@@ -5,6 +5,7 @@ const {
   defaultFilters: {
     nests: { avgSliderStep, avgFilter },
   },
+  map: { menuOrder },
 } = require('../config')
 
 const refSliders = {
@@ -168,5 +169,12 @@ module.exports = function generateUi(filters, perms) {
 
   ui.settings = true
 
-  return ui
+  // sorts the menus
+  const sortedUi = {}
+  menuOrder.forEach((category) => {
+    if (ui[category]) {
+      sortedUi[category] = ui[category]
+    }
+  })
+  return sortedUi
 }

@@ -354,6 +354,8 @@ export default class Poracle {
         reactMapFriendly[`${key}_iv`] = [values[key], values[`max_${key}`]]
       } else if (key.startsWith('rarity')) {
         reactMapFriendly.rarity = [values[key], values[`max_${key}`]]
+      } else if (key.startsWith('size')) {
+        reactMapFriendly.size = [values[key], values[`max_${key}`]]
       } else {
         reactMapFriendly[key] = values[key]
       }
@@ -471,7 +473,7 @@ export default class Poracle {
                 ),
               )
             }
-            fields.forEach(
+            new Set(fields).forEach(
               (field) =>
                 (newPokemon[field] =
                   pkmn[field] === undefined ? defaults[field] : pkmn[field]),
@@ -560,6 +562,16 @@ export default class Poracle {
               }-${item.max_sta}${item.clean ? ` | ${t('clean')} ` : ''}${
                 item.distance ? ` | d${item.distance}` : ''
               }`
+        }${
+          item.size > 1 || item.max_size < 5
+            ? ` | ${t('size', 'Size')}:${
+                item.size === item.max_size
+                  ? `size:${t(`size_${item.size}`)}`
+                  : `size:${t(`size_${item.size}`)}-${t(
+                      `size_${item.max_size}`,
+                    )}`
+              }`
+            : ''
         }`
       default:
         return item.description

@@ -120,6 +120,8 @@ module.exports = gql`
     min_time: Int
     rarity: Int
     max_rarity: Int
+    size: Int
+    max_size: Int
     pvp_ranking_worst: Int
     pvp_ranking_best: Int
     pvp_ranking_min_cp: Int

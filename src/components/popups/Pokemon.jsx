@@ -108,6 +108,7 @@ export default function PokemonPopup({
           perms={pokePerms}
           Icons={Icons}
           timeOfDay={timeOfDay}
+          t={t}
         />
         <Footer
           pokemon={pokemon}
@@ -335,8 +336,8 @@ const Stats = ({ pokemon, t }) => {
   )
 }
 
-const Info = ({ pokemon, metaData, perms, Icons, timeOfDay }) => {
-  const { gender, weather, form } = pokemon
+const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
+  const { gender, size, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
 
   return (
@@ -370,6 +371,19 @@ const Info = ({ pokemon, metaData, perms, Icons, timeOfDay }) => {
           </Icon>
         </Grid>
       )}
+      {!!size && Number.isInteger(size) && (
+        <Grid
+          item
+          style={{
+            height: 24,
+            width: 24,
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="caption">{t(`size_${size}`)}</Typography>
+        </Grid>
+      )}
+
       {formTypes.map((type) => (
         <Grid
           item
@@ -498,7 +512,7 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
 const ExtraInfo = ({ pokemon, perms, t, Icons }) => {
   const { moves } = useStatic((state) => state.masterfile)
 
-  const { move_1, move_2, weight, size, first_seen_timestamp, updated, iv } =
+  const { move_1, move_2, weight, height, first_seen_timestamp, updated, iv } =
     pokemon
 
   return (
@@ -526,7 +540,7 @@ const ExtraInfo = ({ pokemon, perms, t, Icons }) => {
                 <Typography variant="caption">
                   {i
                     ? `${weight ? weight.toFixed(2) : '? '}${t('kilogram')}`
-                    : `${size ? size.toFixed(2) : '? '}${t('meter')}`}
+                    : `${height ? height.toFixed(2) : '? '}${t('meter')}`}
                 </Typography>
               </Grid>
             </Fragment>
@@ -534,7 +548,7 @@ const ExtraInfo = ({ pokemon, perms, t, Icons }) => {
         })}
       {[first_seen_timestamp, updated].map((time, i) =>
         time ? (
-          <Fragment key={time}>
+          <Fragment key={`${time}-${i ? 'updated' : 'first'}`}>
             <Grid
               item
               xs={t('popup_pokemon_description_width')}

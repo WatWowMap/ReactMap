@@ -15,6 +15,9 @@ export default function SliderTile({
     high,
     step,
     i18nKey,
+    marks,
+    markI18n,
+    noTextInput,
   },
   handleChange,
   filterValues,
@@ -56,14 +59,16 @@ export default function SliderTile({
     }
   }
 
+  if (!tempValues) return null
+
   const textColor =
-    (tempValues[0] === min && tempValues[1] === max) || disabled
+    (tempValues && tempValues[0] === min && tempValues[1] === max) || disabled
       ? '#616161'
       : 'white'
 
   return (
     <Grid container direction="row" justifyContent="center" alignItems="center">
-      <Grid item xs={4}>
+      <Grid item xs={noTextInput ? 12 : 4}>
         <Typography
           noWrap={fullName}
           onClick={() => setFullName(!fullName)}
@@ -72,7 +77,7 @@ export default function SliderTile({
           {t(i18nKey || `slider_${name}`)}
         </Typography>
       </Grid>
-      {['min', 'max'].map((each, index) => (
+      {(noTextInput ? [] : ['min', 'max']).map((each, index) => (
         <Grid
           item
           xs={4}
@@ -118,7 +123,16 @@ export default function SliderTile({
           }}
           disabled={disabled}
           valueLabelDisplay="auto"
+          valueLabelFormat={marks ? (e) => t(`${markI18n}${e}`) : undefined}
           step={step}
+          marks={
+            marks
+              ? marks.map((each) => ({
+                  value: each,
+                  label: t(`${markI18n}${each}`),
+                }))
+              : undefined
+          }
         />
       </Grid>
     </Grid>

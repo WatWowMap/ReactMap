@@ -118,6 +118,7 @@ module.exports = gql`
     power_up_level: Int
     power_up_points: Int
     power_up_end_timestamp: Int
+    display_type: Int
   }
 
   type Pokemon {
@@ -133,6 +134,7 @@ module.exports = gql`
     display_pokemon_id: Int
     ditto_form: Int
     weight: Float
+    height: Float
     size: Float
     move_1: Int
     move_2: Int
