@@ -1,6 +1,8 @@
 import React from 'react'
+import Person from '@material-ui/icons/Person'
+import LockOpen from '@material-ui/icons/LockOpen'
 import { DialogContent, Grid, Typography, Fab } from '@material-ui/core'
-import { Person, LockOpen } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'

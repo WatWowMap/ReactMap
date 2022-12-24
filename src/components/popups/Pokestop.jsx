@@ -1,4 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react'
+import ExpandMore from '@material-ui/icons/ExpandMore'
+import MoreVert from '@material-ui/icons/MoreVert'
 import {
   Grid,
   Typography,
@@ -6,7 +8,7 @@ import {
   IconButton,
   Divider,
 } from '@material-ui/core'
-import { ExpandMore, MoreVert } from '@material-ui/icons'
+
 import { useTranslation, Trans } from 'react-i18next'
 
 import ErrorBoundary from '@components/ErrorBoundary'
