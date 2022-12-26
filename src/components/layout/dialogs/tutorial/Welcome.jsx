@@ -1,6 +1,8 @@
 import React from 'react'
+import Person from '@material-ui/icons/Person'
+import LockOpen from '@material-ui/icons/LockOpen'
 import { DialogContent, Grid, Typography, Fab } from '@material-ui/core'
-import { Person, LockOpen } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
@@ -8,7 +10,7 @@ import LocaleSelection from '@components/layout/general/LocaleSelection'
 
 export default function TutWelcome({ setUserProfile }) {
   const { t } = useTranslation()
-  const { methods, loggedIn, perms } = useStatic((state) => state.auth)
+  const { methods, loggedIn, perms, counts } = useStatic((state) => state.auth)
   const {
     map: { enableUserProfile, excludeList },
     localeSelection,
@@ -17,10 +19,20 @@ export default function TutWelcome({ setUserProfile }) {
   const getPerms = () => {
     let have = 0
     let total = 0
-    Object.keys(perms).forEach((perm) => {
+
+    Object.entries(perms).forEach(([perm, value]) => {
+      if (
+        (perm === 'areaRestrictions' && !value.length && counts[perm] > 0) ||
+        perm === 'donor'
+      )
+        return
       if (!excludeList.includes(perm)) {
-        have += perms[perm] ? 1 : 0
-        total += 1
+        have += (Array.isArray(value) ? value.length && counts[perm] : value)
+          ? 1
+          : 0
+        if (counts[perm] !== 0) {
+          total += 1
+        }
       }
     })
     return `${have} / ${total}`

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import Check from '@material-ui/icons/Check'
+import Clear from '@material-ui/icons/Clear'
+import Tune from '@material-ui/icons/Tune'
 import { Grid, IconButton, Typography } from '@material-ui/core'
-import { Check, Clear, Tune } from '@material-ui/icons'
 
 const getOtherData = (id) => {
   switch (id.charAt(0)) {

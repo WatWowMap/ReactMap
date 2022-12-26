@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react'
+import Map from '@material-ui/icons/Map'
 import { Grid, Typography, IconButton } from '@material-ui/core'
-import { Map } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'

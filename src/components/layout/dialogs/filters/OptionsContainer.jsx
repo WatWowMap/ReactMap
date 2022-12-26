@@ -1,6 +1,7 @@
 import React from 'react'
+import Clear from '@material-ui/icons/Clear'
 import { Grid, Typography, Button, Chip, IconButton } from '@material-ui/core'
-import { Clear } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 import useStyles from '@hooks/useStyles'

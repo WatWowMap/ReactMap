@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
+import Check from '@material-ui/icons/Check'
+import Clear from '@material-ui/icons/Clear'
+import Tune from '@material-ui/icons/Tune'
+import FormatSize from '@material-ui/icons/FormatSize'
+import Settings from '@material-ui/icons/Settings'
 import { Grid, IconButton, Typography } from '@material-ui/core'
-import { Check, Clear, Tune, FormatSize, Settings } from '@material-ui/icons'
 
 export default function MenuTile({ data, rowIndex, columnIndex, style }) {
   const [name, setName] = useState(true)

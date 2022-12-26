@@ -78,6 +78,9 @@ rootRouter.get('/settings', async (req, res) => {
         req.session.tutorial = !config.map.forceTutorial
       }
       req.session.perms = {
+        ...Object.fromEntries(
+          Object.keys(config.authentication.perms).map((p) => [p, false]),
+        ),
         areaRestrictions: Utility.areaPerms(['none']),
         webhooks: [],
         scanner: Object.keys(config.scanner).filter(
@@ -144,6 +147,12 @@ rootRouter.get('/settings', async (req, res) => {
           ...config.multiDomainsObj[req.headers.host],
           excludeList: config.authentication.excludeFromTutorial,
           polling: config.api.polling,
+          authCounts: {
+            areaRestrictions: config.authentication.areaRestrictions.length,
+            webhooks: config.webhooks.filter((w) => w.enabled).length,
+            scanner: Object.values(config.scanner).filter((s) => s.enabled)
+              .length,
+          },
         },
         localeSelection: Object.fromEntries(
           config.map.localeSelection.map((l) => [l, { name: l }]),

@@ -3,8 +3,6 @@ import {
   Grid,
   Typography,
   DialogContent,
-  List,
-  ListItem,
   AppBar,
   Tabs,
   Tab,
@@ -17,7 +15,7 @@ import {
   Dialog,
   TextField,
 } from '@material-ui/core'
-import { Edit } from '@material-ui/icons'
+import Edit from '@material-ui/icons/Edit'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
@@ -83,11 +81,7 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
           </div>
         </TabPanel>
         <TabPanel value={tab} index={1}>
-          <ProfilePermissions
-            perms={auth.perms}
-            excludeList={excludeList}
-            t={t}
-          />
+          <ProfilePermissions auth={auth} excludeList={excludeList} t={t} />
         </TabPanel>
       </DialogContent>
       <Footer
@@ -240,7 +234,7 @@ const ExtraFields = ({ auth }) => {
   )
 }
 
-const ProfilePermissions = ({ perms, excludeList, t }) => {
+const ProfilePermissions = ({ auth, excludeList, t }) => {
   const {
     map: { permImageDir, permArrayImages },
   } = useStatic((state) => state.config)
@@ -253,14 +247,23 @@ const ProfilePermissions = ({ perms, excludeList, t }) => {
       spacing={2}
       style={{ padding: 5 }}
     >
-      {Object.keys(perms).map((perm) => {
+      {Object.keys(auth.perms).map((perm) => {
         if (excludeList.includes(perm) || perm === 'donor') {
           return null
         }
+        if (Array.isArray(auth.perms[perm]) && auth.counts[perm] === 0) {
+          return null
+        }
+        if (
+          perm === 'areaRestrictions' &&
+          !auth.perms[perm].length &&
+          auth.counts[perm] > 0
+        )
+          return null
         return (
           <Grid item xs={12} sm={6} key={perm}>
             <PermCard
-              perms={perms}
+              perms={auth.perms}
               perm={perm}
               t={t}
               permImageDir={permImageDir}
@@ -275,8 +278,13 @@ const ProfilePermissions = ({ perms, excludeList, t }) => {
 
 const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
   <Card className="perm-wrapper">
-    {!perms[perm] && <div className="disabled-overlay" />}
-    {(perm !== 'areaRestrictions' && perm !== 'webhooks') || permArrayImages ? (
+    {(Array.isArray(perms[perm]) ? !perms[perm].length : !perms[perm]) && (
+      <div className="disabled-overlay" />
+    )}
+    {(perm !== 'areaRestrictions' &&
+      perm !== 'webhooks' &&
+      perm !== 'scanner') ||
+    permArrayImages ? (
       <CardMedia
         style={{
           height: 250,
@@ -287,19 +295,27 @@ const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
         title={perm}
       />
     ) : (
-      <List
+      <Grid
+        container
+        direction="column"
         style={{
-          height: 235,
+          height: 260,
           border: 'black 4px solid',
           borderRadius: 4,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,
+          textAlign: 'center',
+          backgroundColor: '#222222',
         }}
+        alignItems="center"
+        justifyContent="center"
       >
         {perms[perm].map((area) => (
-          <ListItem key={area}>
+          <Grid key={area} item>
             <Typography>{Utility.getProperName(area)}</Typography>
-          </ListItem>
+          </Grid>
         ))}
-      </List>
+      </Grid>
     )}
     <CardContent style={{ height: 100 }}>
       <Typography gutterBottom variant="h6" noWrap>

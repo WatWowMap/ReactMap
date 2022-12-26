@@ -1,6 +1,6 @@
 import React from 'react'
+import Map from '@material-ui/icons/Map'
 import { IconButton } from '@material-ui/core'
-import { Map } from '@material-ui/icons'
 
 import { useStore, useStatic } from '@hooks/useStore'
 

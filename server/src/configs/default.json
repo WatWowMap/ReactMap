@@ -620,6 +620,7 @@
         "enabled": false
       }
     ],
+    "strictAreaRestrictions": false,
     "areaRestrictions": [],
     "excludeFromTutorial": [],
     "alwaysEnabledPerms": [],

@@ -1,4 +1,7 @@
 import React from 'react'
+import ExpandMore from '@material-ui/icons/ExpandMore'
+import Clear from '@material-ui/icons/Clear'
+import Settings from '@material-ui/icons/Settings'
 import {
   Drawer,
   Button,
@@ -9,7 +12,7 @@ import {
   Grid,
   IconButton,
 } from '@material-ui/core'
-import { ExpandMore, Clear, Settings } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
