@@ -74,7 +74,7 @@ const loadScanPolygons = async (fileName, domain) => {
   }
 }
 
-const loadAreas = async () => {
+const loadAreas = () => {
   try {
     const normalized = { type: 'FeatureCollection', features: [] }
     Object.values(config.scanAreas).forEach((area) => {
@@ -94,7 +94,7 @@ const loadAreas = async () => {
   }
 }
 
-const parseAreas = async (areasObj) => {
+const parseAreas = (areasObj) => {
   const polygons = {}
   const names = []
   const withoutParents = {}
@@ -194,8 +194,8 @@ const { raw, names, withoutParents, polygons } = (async () => {
       .map((feature) => [feature.properties.name, feature]),
   )
 })().then(async () => ({
-  raw: await loadAreas(),
-  ...(await parseAreas(raw)),
+  raw: loadAreas(),
+  ...parseAreas(raw),
 }))
 
 module.exports = {
