@@ -2,9 +2,9 @@
 const { default: center } = require('@turf/center')
 const fs = require('fs')
 const { resolve } = require('path')
+const fetch = require('node-fetch')
 
 const config = require('./config')
-const fetchJson = require('./api/fetchJson')
 
 const manualGeojson = {
   type: 'FeatureCollection',
@@ -33,7 +33,7 @@ const manualGeojson = {
 const getGeojson = async (location) => {
   if (location.startsWith('http')) {
     console.log('Loading Kōji URL', location)
-    return fetchJson(
+    return fetch(
       location,
       {
         headers: {
@@ -41,9 +41,49 @@ const getGeojson = async (location) => {
         },
       },
       true,
-    ).then((res) => res?.data || { features: [] })
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        if (res?.data) {
+          fs.writeFileSync(
+            resolve(
+              __dirname,
+              `../configs/koji_backups/${location.replace(/\//g, '__')}.json`,
+            ),
+            JSON.stringify(res.data),
+          )
+          return res.data
+        }
+        return { features: [] }
+      })
+      .catch((err) => {
+        console.error(
+          '[AREAS] Failed to fetch koji geojson, attempting to read from backup \n[AREAS]',
+          err.message,
+        )
+        if (
+          fs.existsSync(
+            resolve(
+              __dirname,
+              `../configs/koji_backups/${location.replace(/\//g, '__')}.json`,
+            ),
+          )
+        ) {
+          console.log('[AREAS] Reading from koji_backups for', location)
+          return JSON.parse(
+            fs.readFileSync(
+              resolve(
+                __dirname,
+                `../configs/koji_backups/${location.replace(/\//g, '__')}.json`,
+              ),
+            ),
+          )
+        }
+        console.warn('[AREAS] No backup found for', location)
+        return { features: [] }
+      })
   }
-  if (fs.existsSync(resolve(`${__dirname}/../configs/${location}`))) {
+  if (fs.existsSync(resolve(__dirname, `../configs/${location}`))) {
     return JSON.parse(
       fs.readFileSync(resolve(__dirname, `../configs/${location}`)),
     )
