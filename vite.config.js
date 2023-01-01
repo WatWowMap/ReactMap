@@ -15,7 +15,7 @@ const customFilePlugin = (isDevelopment) => {
   const customPaths = []
   return {
     name: 'vite-plugin-custom-file-checker',
-    transform(_src, id) {
+    load(id) {
       if (fileRegex.test(id) && !/node_modules/.test(id)) {
         const ext = extname(id)
         const newPath = id.replace(ext, `.custom${ext}`)
