@@ -3,18 +3,22 @@ import HolidayAnimations from '@services/HolidayAnimations'
 
 export default function HolidayEffects({ holidayEffects }) {
   const date = new Date()
+  const day = date.getDate()
+  const month = date.getMonth() + 1
   return holidayEffects.map((holiday) => {
     if (
       holiday.enabled &&
-      date.getMonth() >= holiday.startMonth - 1 &&
-      date.getMonth() <= holiday.endMonth - 1 &&
-      date.getDate() >= holiday.startDay &&
-      date.getDate() <= holiday.endDay
+      (month === holiday.startMonth ||
+        month === holiday.endMonth ||
+        (month >= holiday.startMonth && month <= holiday.endMonth)) &&
+      (day === holiday.startDay ||
+        day === holiday.endDay ||
+        (day >= holiday.startDay && day <= holiday.endDay))
     ) {
       switch (holiday.css) {
         case 'snow':
           return (
-            <div className="winter-is-coming">
+            <div className="winter-is-coming" key={holiday.name}>
               <div className="snow snow--near" />
               <div className="snow snow--near snow--alt" />
               <div className="snow snow--mid" />
@@ -25,7 +29,7 @@ export default function HolidayEffects({ holidayEffects }) {
           )
         case 'fireworks':
           return (
-            <div className="pyro">
+            <div className="pyro" key={holiday.name}>
               <div className="before" />
               <div className="after" />
             </div>
