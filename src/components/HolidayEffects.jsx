@@ -4,21 +4,24 @@ import HolidayAnimations from '@services/HolidayAnimations'
 
 export default function HolidayEffects({ holidayEffects }) {
   const date = new Date()
-  const day = date.getDate()
-  const month = date.getMonth() + 1
   return holidayEffects.map((holiday) => {
-    if (
-      holiday.enabled &&
-      (holiday.startMonth < holiday.endMonth
-        ? month >= holiday.startMonth &&
-          (holiday.startDay < holiday.endDay
-            ? day >= holiday.startDay
-            : day <= holiday.startDay)
-        : month <= holiday.startMonth &&
-          (holiday.startDay < holiday.endDay
-            ? day >= holiday.startDay
-            : day <= holiday.startDay))
-    ) {
+    const start = new Date(
+      date.getFullYear() - (holiday.startMonth > holiday.endMonth ? 1 : 0),
+      holiday.startMonth - 1,
+      holiday.startDay,
+      0,
+      0,
+      0,
+    )
+    const end = new Date(
+      date.getFullYear(),
+      holiday.endMonth - 1,
+      holiday.endDay,
+      23,
+      59,
+      59,
+    )
+    if (holiday.enabled && date >= start && date <= end) {
       switch (holiday.css) {
         case 'snow':
           return (
