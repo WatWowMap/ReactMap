@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react'
 import HolidayAnimations from '@services/HolidayAnimations'
 
@@ -8,12 +9,15 @@ export default function HolidayEffects({ holidayEffects }) {
   return holidayEffects.map((holiday) => {
     if (
       holiday.enabled &&
-      (month === holiday.startMonth ||
-        month === holiday.endMonth ||
-        (month >= holiday.startMonth && month <= holiday.endMonth)) &&
-      (day === holiday.startDay ||
-        day === holiday.endDay ||
-        (day >= holiday.startDay && day <= holiday.endDay))
+      (holiday.startMonth < holiday.endMonth
+        ? month >= holiday.startMonth &&
+          (holiday.startDay < holiday.endDay
+            ? day >= holiday.startDay
+            : day <= holiday.startDay)
+        : month <= holiday.startMonth &&
+          (holiday.startDay < holiday.endDay
+            ? day >= holiday.startDay
+            : day <= holiday.startDay))
     ) {
       switch (holiday.css) {
         case 'snow':
