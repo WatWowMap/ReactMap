@@ -1,20 +1,31 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react'
 import HolidayAnimations from '@services/HolidayAnimations'
 
 export default function HolidayEffects({ holidayEffects }) {
   const date = new Date()
   return holidayEffects.map((holiday) => {
-    if (
-      holiday.enabled &&
-      date.getMonth() >= holiday.startMonth - 1 &&
-      date.getMonth() <= holiday.endMonth - 1 &&
-      date.getDate() >= holiday.startDay &&
-      date.getDate() <= holiday.endDay
-    ) {
+    const start = new Date(
+      date.getFullYear() - (holiday.startMonth > holiday.endMonth ? 1 : 0),
+      holiday.startMonth - 1,
+      holiday.startDay,
+      0,
+      0,
+      0,
+    )
+    const end = new Date(
+      date.getFullYear(),
+      holiday.endMonth - 1,
+      holiday.endDay,
+      23,
+      59,
+      59,
+    )
+    if (holiday.enabled && date >= start && date <= end) {
       switch (holiday.css) {
         case 'snow':
           return (
-            <div className="winter-is-coming">
+            <div className="winter-is-coming" key={holiday.name}>
               <div className="snow snow--near" />
               <div className="snow snow--near snow--alt" />
               <div className="snow snow--mid" />
@@ -25,7 +36,7 @@ export default function HolidayEffects({ holidayEffects }) {
           )
         case 'fireworks':
           return (
-            <div className="pyro">
+            <div className="pyro" key={holiday.name}>
               <div className="before" />
               <div className="after" />
             </div>
