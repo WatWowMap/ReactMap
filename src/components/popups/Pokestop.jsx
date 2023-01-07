@@ -164,7 +164,10 @@ export default function PokestopPopup({
                           icon={
                             invasion.grunt_type
                               ? Icons.getInvasions(invasion.grunt_type)
-                              : Icons.getMisc('event_coin')
+                              : {
+                                  7: Icons.getMisc('event_coin'),
+                                  8: Icons.getPokemon(352),
+                                }[pokestop.display_type]
                           }
                           until
                           tt={`grunt_a_${invasion.grunt_type}`}
