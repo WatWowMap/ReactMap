@@ -42,6 +42,7 @@ Object.keys(questProps).forEach((key) => {
 const invasionProps = {
   incident_expire_timestamp: true,
   grunt_type: true,
+  display_type: true,
 }
 
 module.exports = class Pokestop extends Model {
@@ -519,7 +520,7 @@ module.exports = class Pokestop extends Model {
         if (onlyEventStops && pokestopPerms) {
           stops.orWhere((event) => {
             event
-              .where('display_type', 7)
+              .where('display_type', '>=', 7)
               .andWhere('character', 0)
               .andWhere(
                 multiInvasionMs ? 'expiration_ms' : 'expiration',
@@ -590,9 +591,12 @@ module.exports = class Pokestop extends Model {
             (invasion) => !invasion.grunt_type,
           )
           if (filtered.invasions.length) {
-            filtered.display_type = Math.max(
+            const displayType = Math.max(
               ...filtered.invasions.map((inv) => inv.display_type),
             )
+            if (displayType) {
+              filtered.display_type = displayType
+            }
           }
         }
       }
