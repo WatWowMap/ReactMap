@@ -519,7 +519,7 @@ module.exports = class Pokestop extends Model {
         if (onlyEventStops && pokestopPerms) {
           stops.orWhere((event) => {
             event
-              .where('display_type', 7)
+              .where('display_type', '>=', 7)
               .andWhere('character', 0)
               .andWhere(
                 multiInvasionMs ? 'expiration_ms' : 'expiration',
