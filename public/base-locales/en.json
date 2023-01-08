@@ -424,6 +424,7 @@
   "battle_changes_poracle": "battle_changes",
   "auto": "Auto",
   "webhooks_subtitle": "Manage your alerts directly from the map for these bots",
+  "event_stops_subtitle": "Displays special event Pokéstops such as Kecleon",
   "webhooks": "Alerts",
   "scanner": "Scanner Actions",
   "everything_individually": "Add Individual Alerts",
