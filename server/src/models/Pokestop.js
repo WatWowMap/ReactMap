@@ -518,7 +518,7 @@ module.exports = class Pokestop extends Model {
             ar.where(isMad ? 'is_ar_scan_eligible' : 'ar_scan_eligible', 1)
           })
         }
-        if (onlyEventStops && eventStopPerms) {
+        if (onlyEventStops && eventStopPerms && !isMad) {
           stops.orWhere((event) => {
             event
               .where('display_type', '>=', 7)
