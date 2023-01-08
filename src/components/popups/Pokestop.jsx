@@ -683,23 +683,23 @@ const Invasion = ({ pokestop, Icons, t }) => {
       <Grid item xs={12}>
         <table className="table-invasion">
           <tbody>
-            {Object.keys(invasionInfo[invasion.grunt_type].encounters).map(
-              (position) => (
-                <tr key={position}>
-                  <td>{encounterNum[position]}</td>
-                  <td>
-                    {invasionInfo[invasion.grunt_type].encounters[position].map(
-                      (data) => makeShadowPokemon(data),
-                    )}
-                  </td>
-                  <td>
-                    {getRewardPercent(invasionInfo[invasion.grunt_type])[
-                      position
-                    ] || ''}
-                  </td>
-                </tr>
-              ),
-            )}
+            {Object.keys(
+              invasionInfo[invasion.grunt_type]?.encounters || {},
+            ).map((position) => (
+              <tr key={position}>
+                <td>{encounterNum[position]}</td>
+                <td>
+                  {invasionInfo[invasion.grunt_type].encounters[position].map(
+                    (data) => makeShadowPokemon(data),
+                  )}
+                </td>
+                <td>
+                  {getRewardPercent(invasionInfo[invasion.grunt_type])[
+                    position
+                  ] || ''}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </Grid>
