@@ -13,7 +13,6 @@ const core = gql`
     power_up_level
     power_up_points
     power_up_end_timestamp
-    display_type
   }
 `
 
@@ -59,6 +58,15 @@ const invasion = gql`
     invasions {
       incident_expire_timestamp
       grunt_type
+    }
+  }
+`
+
+const event = gql`
+  fragment Event on Pokestop {
+    events {
+      display_type
+      event_expire_timestamp
     }
   }
 `
@@ -169,6 +177,33 @@ export const getInvasions = gql`
   }
 `
 
+export const getEvents = gql`
+  ${core}
+  ${event}
+  query Events(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $midnight: Int!
+  ) {
+    pokestops(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      midnight: $midnight
+    ) {
+      ...CorePokestop
+      ...Event
+    }
+  }
+`
+
 export const getLuresQuests = gql`
   ${core}
   ${lure}
@@ -227,6 +262,35 @@ export const getLuresInvasions = gql`
   }
 `
 
+export const getLuresEvents = gql`
+  ${core}
+  ${lure}
+  ${event}
+  query LuresEvents(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $midnight: Int!
+  ) {
+    pokestops(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      midnight: $midnight
+    ) {
+      ...CorePokestop
+      ...Lure
+      ...Event
+    }
+  }
+`
+
 export const getQuestsInvasions = gql`
   ${core}
   ${quest}
@@ -252,6 +316,64 @@ export const getQuestsInvasions = gql`
       ...CorePokestop
       ...Quest
       ...Invasion
+    }
+  }
+`
+
+export const getQuestsEvents = gql`
+  ${core}
+  ${quest}
+  ${event}
+  query QuestsEvents(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $midnight: Int!
+  ) {
+    pokestops(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      midnight: $midnight
+    ) {
+      ...CorePokestop
+      ...Quest
+      ...Event
+    }
+  }
+`
+
+export const getInvasionsEvents = gql`
+  ${core}
+  ${invasion}
+  ${event}
+  query InvasionsEvents(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $midnight: Int!
+  ) {
+    pokestops(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      midnight: $midnight
+    ) {
+      ...CorePokestop
+      ...Invasion
+      ...Event
     }
   }
 `
@@ -283,6 +405,132 @@ export const getLuresQuestsInvasions = gql`
       ...Lure
       ...Quest
       ...Invasion
+    }
+  }
+`
+
+export const getLuresQuestsEvents = gql`
+  ${core}
+  ${lure}
+  ${quest}
+  ${event}
+  query LuresQuestEvents(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $midnight: Int!
+  ) {
+    pokestops(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      midnight: $midnight
+    ) {
+      ...CorePokestop
+      ...Lure
+      ...Quest
+      ...Event
+    }
+  }
+`
+
+export const getLuresInvasionsEvents = gql`
+  ${core}
+  ${lure}
+  ${invasion}
+  ${event}
+  query LuresInvasionsEvents(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $midnight: Int!
+  ) {
+    pokestops(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      midnight: $midnight
+    ) {
+      ...CorePokestop
+      ...Lure
+      ...Invasion
+      ...Event
+    }
+  }
+`
+
+export const getQuestsInvasionsEvents = gql`
+  ${core}
+  ${quest}
+  ${invasion}
+  ${event}
+  query QuestsInvasionsEvents(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $midnight: Int!
+  ) {
+    pokestops(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      midnight: $midnight
+    ) {
+      ...CorePokestop
+      ...Quest
+      ...Invasion
+      ...Event
+    }
+  }
+`
+
+export const getLuresQuestsInvasionsEvents = gql`
+  ${core}
+  ${lure}
+  ${quest}
+  ${invasion}
+  ${event}
+  query LuresQuestInvasionsEvents(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $midnight: Int!
+  ) {
+    pokestops(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      midnight: $midnight
+    ) {
+      ...CorePokestop
+      ...Lure
+      ...Quest
+      ...Invasion
+      ...Event
     }
   }
 `

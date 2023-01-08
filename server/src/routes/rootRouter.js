@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
 const express = require('express')
+const fs = require('fs')
+const { resolve } = require('path')
 
 const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
-const apiRouter = require('./api/apiIndex')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
@@ -17,17 +18,22 @@ rootRouter.use('/', clientRouter)
 
 rootRouter.use('/auth', authRouter)
 
-rootRouter.use('/api', apiRouter)
-
-rootRouter.get('/logout', (req, res) => {
-  req.logout((err) => {
-    if (err) console.error('[AUTH] Unable to logout', err)
+fs.readdir(resolve(__dirname, './api/v1/'), (e, files) => {
+  if (e) return console.error(e, 'Error initializing an API endpoint')
+  files.forEach((file) => {
+    try {
+      rootRouter.use(
+        `/v1/${file.replace('.js', '')}`,
+        require(resolve(__dirname, './api/v1/', file)),
+      )
+      console.log(`[API] Loaded ${file}`)
+    } catch (err) {
+      console.warn('[WARN] Unable to load API endpoint:', file, '\n', err)
+    }
   })
-  req.session.destroy()
-  res.redirect('/')
 })
 
-rootRouter.post('/clientError', (req) => {
+rootRouter.post('/api/error/client', (req) => {
   if (req.headers.version === version && req.isAuthenticated()) {
     const {
       body: { error },
@@ -68,7 +74,7 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
   }
 })
 
-rootRouter.get('/settings', async (req, res) => {
+rootRouter.get('/api/settings', async (req, res) => {
   try {
     if (
       config.authentication.alwaysEnabledPerms.length ||
