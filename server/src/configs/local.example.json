@@ -167,6 +167,10 @@
         "enabled": true,
         "roles": []
       },
+      "eventStops": {
+        "enabled": true,
+        "roles": []
+      },
       "quests": {
         "enabled": true,
         "roles": []

@@ -64,9 +64,8 @@ export default class Query {
     const permObj = {
       Lures: filters.lures && perms.lures,
       Quests: filters.quests && perms.quests,
-      Invasions:
-        (filters.invasions && perms.invasions) ||
-        (filters.eventStops && perms.allPokestops),
+      Invasions: filters.invasions && perms.invasions,
+      Events: filters.eventStops && perms.eventStops,
     }
     let query = 'get'
 

@@ -169,7 +169,7 @@ export default function Settings({ Icons }) {
                 style={{ minWidth: 100 }}
                 color="primary"
                 size="small"
-                href="/logout"
+                href="/auth/logout"
               >
                 {t('logout')}
               </Button>

@@ -208,7 +208,7 @@ export default class UIcons {
     questActive = false,
     ar = false,
     power = 0,
-    display = '',
+    display = 0,
   ) {
     const baseUrl = `${this[this.selected.pokestop].path}/pokestop`
     const invasionSuffixes =

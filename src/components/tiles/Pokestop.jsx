@@ -42,6 +42,10 @@ const PokestopTile = ({
   const hasQuest =
     item.quests && item.quests.some((quest) => !excludeList.includes(quest.key))
 
+  const hasEvent =
+    item.events &&
+    item.events.some((event) => event.event_expire_timestamp > newTs)
+
   const timers = []
   if ((showTimer || userSettings.invasionTimers) && hasInvasion) {
     item.invasions.forEach((invasion) =>
@@ -51,14 +55,10 @@ const PokestopTile = ({
   if ((showTimer || userSettings.lureTimers) && hasLure) {
     timers.push(item.lure_expire_timestamp)
   }
-  if (
-    (showTimer || userSettings.eventStopTimers) &&
-    !hasInvasion &&
-    item.invasions?.length
-  ) {
-    item.invasions.forEach((invasion) => {
-      if (!invasion.grunt_type) {
-        timers.push(invasion.incident_expire_timestamp)
+  if (showTimer || (userSettings.eventStopTimers && hasEvent)) {
+    item.events.forEach((event) => {
+      if (!event.grunt_type) {
+        timers.push(event.event_expire_timestamp)
       }
     })
   }
@@ -78,10 +78,8 @@ const PokestopTile = ({
       (hasQuest && perms.quests) ||
         (hasLure && perms.lures) ||
         (hasInvasion && perms.invasions) ||
-        ((filters.allPokestops ||
-          item.ar_scan_eligible ||
-          filters.eventStops) &&
-          perms.allPokestops),
+        (hasEvent && perms.eventStops && filters.eventStops) ||
+        ((filters.allPokestops || item.ar_scan_eligible) && perms.allPokestops),
     ) && (
       <Marker
         ref={(m) => {
@@ -99,6 +97,7 @@ const PokestopTile = ({
           filters,
           Icons,
           userSettings,
+          hasEvent,
         )}
       >
         <Popup position={[item.lat, item.lon]}>
@@ -108,6 +107,7 @@ const PokestopTile = ({
             hasLure={hasLure}
             hasInvasion={hasInvasion}
             hasQuest={hasQuest}
+            hasEvent={hasEvent}
             Icons={Icons}
             userSettings={userSettings}
             config={config}
