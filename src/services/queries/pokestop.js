@@ -471,6 +471,37 @@ export const getLuresInvasionsEvents = gql`
   }
 `
 
+export const getQuestsInvasionsEvents = gql`
+  ${core}
+  ${quest}
+  ${invasion}
+  ${event}
+  query QuestsInvasionsEvents(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON!
+    $ts: Int!
+    $midnight: Int!
+  ) {
+    pokestops(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+      ts: $ts
+      midnight: $midnight
+    ) {
+      ...CorePokestop
+      ...Quest
+      ...Invasion
+      ...Event
+    }
+  }
+`
+
 export const getLuresQuestsInvasionsEvents = gql`
   ${core}
   ${lure}
