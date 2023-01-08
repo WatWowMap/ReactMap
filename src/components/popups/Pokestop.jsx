@@ -31,6 +31,7 @@ export default function PokestopPopup({
   hasLure,
   hasInvasion,
   hasQuest,
+  hasEvent,
   Icons,
   userSettings,
   config,
@@ -39,7 +40,7 @@ export default function PokestopPopup({
   const { pokestops: perms } = useStatic((state) => state.ui)
   const popups = useStore((state) => state.popups)
   const setPopups = useStore((state) => state.setPopups)
-  const { lure_expire_timestamp, lure_id, invasions } = pokestop
+  const { lure_expire_timestamp, lure_id, invasions, events } = pokestop
 
   useEffect(() => {
     const has = { hasLure, hasQuest, hasInvasion }
@@ -50,10 +51,7 @@ export default function PokestopPopup({
     )
   }, [])
 
-  const hasEventInvasion = invasions?.some((invasion) => !invasion.grunt_type)
-
-  const plainPokestop =
-    !hasLure && !hasQuest && !hasInvasion && !hasEventInvasion
+  const plainPokestop = !hasLure && !hasQuest && !hasInvasion && !hasEvent
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
@@ -147,7 +145,7 @@ export default function PokestopPopup({
                     />
                   </>
                 )}
-                {(hasInvasion || hasEventInvasion) && (
+                {hasInvasion && (
                   <>
                     {(hasQuest || hasLure) && (
                       <Divider light flexItem className="popup-divider" />
@@ -161,16 +159,41 @@ export default function PokestopPopup({
                         ) : null}
                         <TimeTile
                           expireTime={invasion.incident_expire_timestamp}
-                          icon={
-                            invasion.grunt_type
-                              ? Icons.getInvasions(invasion.grunt_type)
-                              : {
-                                  7: Icons.getMisc('event_coin'),
-                                  8: Icons.getPokemon(352),
-                                }[pokestop.display_type]
-                          }
+                          icon={Icons.getInvasions(invasion.grunt_type)}
                           until
                           tt={`grunt_a_${invasion.grunt_type}`}
+                        />
+                      </Fragment>
+                    ))}
+                  </>
+                )}
+                {hasEvent && (
+                  <>
+                    {(hasQuest || hasLure || hasInvasion) && (
+                      <Divider light flexItem className="popup-divider" />
+                    )}
+                    {events.map((event, index) => (
+                      <Fragment
+                        key={`${event.display_Type}-${event.event_expire_timestamp}`}
+                      >
+                        {index ? (
+                          <Divider light flexItem className="popup-divider" />
+                        ) : null}
+                        <TimeTile
+                          expireTime={event.event_expire_timestamp}
+                          icon={
+                            {
+                              7: Icons.getMisc('event_coin'),
+                              8: Icons.getPokemon(352),
+                            }[event.display_type] || Icons.getMisc(0)
+                          }
+                          until
+                          tt={
+                            {
+                              7: t('event_coin'),
+                              8: t('poke_352'),
+                            }[event.display_type] || '???'
+                          }
                         />
                       </Fragment>
                     ))}

@@ -85,6 +85,7 @@ module.exports = class Pokestop extends Model {
       quests: questPerms,
       invasions: invasionPerms,
       pokestops: pokestopPerms,
+      eventStops: eventStopPerms,
       areaRestrictions,
     } = perms
 
@@ -517,7 +518,7 @@ module.exports = class Pokestop extends Model {
             ar.where(isMad ? 'is_ar_scan_eligible' : 'ar_scan_eligible', 1)
           })
         }
-        if (onlyEventStops && pokestopPerms) {
+        if (onlyEventStops && eventStopPerms) {
           stops.orWhere((event) => {
             event
               .where('display_type', '>=', 7)
@@ -540,7 +541,7 @@ module.exports = class Pokestop extends Model {
       : this.mapRDM(results, safeTs)
     if (normalized.length > queryLimits.pokestops)
       normalized.length = queryLimits.pokestops
-    return this.secondaryFilter(
+    const finalResults = this.secondaryFilter(
       normalized,
       args.filters,
       isMad,
@@ -548,6 +549,7 @@ module.exports = class Pokestop extends Model {
       midnight,
       perms,
     )
+    return finalResults
   }
 
   static fieldAssigner(target, source, fields) {
@@ -586,34 +588,20 @@ module.exports = class Pokestop extends Model {
           'power_up_level',
           'power_up_end_timestamp',
         ])
-        if (filters.onlyEventStops) {
-          filtered.invasions = pokestop.invasions.filter(
-            (invasion) => !invasion.grunt_type,
-          )
-          if (filtered.invasions.length) {
-            const displayType = Math.max(
-              ...filtered.invasions.map((inv) => inv.display_type),
-            )
-            if (displayType) {
-              filtered.display_type = displayType
-            }
-          }
-        }
       }
-      if (
-        perms.invasions &&
-        ((filters.onlyAllPokestops && filters.onlyInvasions) ||
-          filters.onlyInvasions)
-      ) {
-        filtered.invasions = [
-          ...(Array.isArray(filtered.invasions) ? filtered.invasions : []),
-          ...(filters.onlyAllPokestops
-            ? pokestop.invasions
-            : pokestop.invasions.filter(
-                (invasion) =>
-                  invasion.grunt_type && filters[`i${invasion.grunt_type}`],
-              )),
-        ]
+      if (perms.eventStops && filters.onlyEventStops) {
+        filtered.events = pokestop.invasions
+          .filter((event) => !event.grunt_type)
+          .map((event) => ({
+            event_expire_timestamp: event.incident_expire_timestamp,
+            display_type: event.display_type,
+          }))
+      }
+      if (perms.invasions && filters.onlyInvasions) {
+        filtered.invasions = pokestop.invasions.filter(
+          (invasion) =>
+            invasion.grunt_type && filters[`i${invasion.grunt_type}`],
+        )
       }
       if (
         perms.lures &&
@@ -714,7 +702,8 @@ module.exports = class Pokestop extends Model {
         filters.onlyAllPokestops ||
         filtered.quests?.length ||
         filtered.invasions?.length ||
-        filtered.lure_id
+        filtered.lure_id ||
+        filtered.events?.length
       ) {
         filteredResults.push(filtered)
       }

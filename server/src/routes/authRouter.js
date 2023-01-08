@@ -56,4 +56,12 @@ strategies.forEach((strategy) => {
   }
 })
 
+router.get('/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) console.error('[AUTH] Unable to logout', err)
+  })
+  req.session.destroy()
+  res.redirect('/')
+})
+
 module.exports = router
