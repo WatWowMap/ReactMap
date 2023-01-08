@@ -208,7 +208,7 @@ export default class UIcons {
     questActive = false,
     ar = false,
     power = 0,
-    display = 0,
+    display = '',
   ) {
     const baseUrl = `${this[this.selected.pokestop].path}/pokestop`
     const invasionSuffixes =
@@ -216,6 +216,7 @@ export default class UIcons {
     const questSuffixes = questActive ? ['_q', ''] : ['']
     const arSuffixes = ar ? ['_ar', ''] : ['']
     const powerUpSuffixes = power ? [`_p${power}`, ''] : ['']
+
     for (let i = 0; i < invasionSuffixes.length; i += 1) {
       for (let q = 0; q < questSuffixes.length; q += 1) {
         for (let a = 0; a < arSuffixes.length; a += 1) {

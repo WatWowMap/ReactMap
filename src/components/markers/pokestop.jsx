@@ -27,7 +27,7 @@ export default function stopMarker(
     hasQuest && userSettings.hasQuestIndicator,
     ar_scan_eligible && userSettings.showArBadge,
     power_up_level,
-    hasEvent ? events[0].display_type : 0,
+    hasEvent ? events[0].display_type : '',
   )
   let baseSize = Icons.getSize('pokestop', filters.filter[filterId])
   let popupX = 7 + pokestopMod.popupX
