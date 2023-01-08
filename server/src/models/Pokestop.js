@@ -45,6 +45,8 @@ const invasionProps = {
   display_type: true,
 }
 
+const MADE_UP_MAD_INVASIONS = [352]
+
 module.exports = class Pokestop extends Model {
   static get tableName() {
     return 'pokestop'
@@ -510,6 +512,12 @@ module.exports = class Pokestop extends Model {
                   '>=',
                   isMad ? this.knex().fn.now() : safeTs,
                 )
+              if (isMad) {
+                invasion.whereNotIn(
+                  'incident_grunt_type',
+                  MADE_UP_MAD_INVASIONS,
+                )
+              }
             })
           }
         }
@@ -522,7 +530,7 @@ module.exports = class Pokestop extends Model {
           stops.orWhere((event) => {
             if (isMad) {
               event
-                .whereIn('incident_grunt_type', [352])
+                .whereIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
                 .andWhere('incident_expiration', '>=', this.knex().fn.now())
             } else {
               event
@@ -598,7 +606,9 @@ module.exports = class Pokestop extends Model {
       if (perms.eventStops && filters.onlyEventStops) {
         filtered.events = pokestop.invasions
           .filter((event) =>
-            isMad ? event.grunt_type === 352 : !event.grunt_type,
+            isMad
+              ? MADE_UP_MAD_INVASIONS.includes(event.grunt_type)
+              : !event.grunt_type,
           )
           .map((event) => ({
             event_expire_timestamp: event.incident_expire_timestamp,
