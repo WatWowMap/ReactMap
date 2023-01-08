@@ -518,16 +518,22 @@ module.exports = class Pokestop extends Model {
             ar.where(isMad ? 'is_ar_scan_eligible' : 'ar_scan_eligible', 1)
           })
         }
-        if (onlyEventStops && eventStopPerms && !isMad) {
+        if (onlyEventStops && eventStopPerms) {
           stops.orWhere((event) => {
-            event
-              .where('display_type', '>=', 7)
-              .andWhere('character', 0)
-              .andWhere(
-                multiInvasionMs ? 'expiration_ms' : 'expiration',
-                '>=',
-                safeTs * (multiInvasionMs ? 1000 : 1),
-              )
+            if (isMad) {
+              event
+                .whereIn('incident_grunt_type', [352])
+                .andWhere('incident_expiration', '>=', this.knex().fn.now())
+            } else {
+              event
+                .where('display_type', '>=', 7)
+                .andWhere('character', 0)
+                .andWhere(
+                  multiInvasionMs ? 'expiration_ms' : 'expiration',
+                  '>=',
+                  safeTs * (multiInvasionMs ? 1000 : 1),
+                )
+            }
           })
         }
       })
@@ -591,10 +597,12 @@ module.exports = class Pokestop extends Model {
       }
       if (perms.eventStops && filters.onlyEventStops) {
         filtered.events = pokestop.invasions
-          .filter((event) => !event.grunt_type)
+          .filter((event) =>
+            isMad ? event.grunt_type === 352 : !event.grunt_type,
+          )
           .map((event) => ({
             event_expire_timestamp: event.incident_expire_timestamp,
-            display_type: event.display_type,
+            display_type: isMad ? 8 : event.display_type,
           }))
       }
       if (perms.invasions && filters.onlyInvasions) {
@@ -1096,6 +1104,9 @@ module.exports = class Pokestop extends Model {
           ts * (multiInvasionMs ? 1000 : 1),
         )
         .orderBy('grunt_type')
+      if (isMad) {
+        queries.invasions.where('incident.character', '<', 300)
+      }
     } else {
       queries.invasions = this.query()
         .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
