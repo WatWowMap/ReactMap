@@ -99,6 +99,11 @@ module.exports = gql`
     incident_expire_timestamp: Int
   }
 
+  type Event {
+    display_type: Int
+    event_expire_timestamp: Int
+  }
+
   type Pokestop {
     id: ID
     lat: Float
@@ -115,10 +120,10 @@ module.exports = gql`
     ar_scan_eligible: Boolean
     quests: [Quest]
     invasions: [Invasion]
+    events: [Event]
     power_up_level: Int
     power_up_points: Int
     power_up_end_timestamp: Int
-    display_type: Int
   }
 
   type Pokemon {

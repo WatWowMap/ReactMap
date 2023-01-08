@@ -15,7 +15,7 @@ const customFilePlugin = (isDevelopment) => {
   const customPaths = []
   return {
     name: 'vite-plugin-custom-file-checker',
-    transform(_src, id) {
+    load(id) {
       if (fileRegex.test(id) && !/node_modules/.test(id)) {
         const ext = extname(id)
         const newPath = id.replace(ext, `.custom${ext}`)
@@ -150,7 +150,17 @@ module.exports = defineConfig(({ mode }) => {
         strict: false,
       },
       proxy: {
-        '/': {
+        '/api': {
+          target: `http://0.0.0.0:${env.PORT || 8080}`,
+          changeOrigin: true,
+          secure: false,
+        },
+        '/auth': {
+          target: `http://0.0.0.0:${env.PORT || 8080}`,
+          changeOrigin: true,
+          secure: false,
+        },
+        '/graphql': {
           target: `http://0.0.0.0:${env.PORT || 8080}`,
           changeOrigin: true,
           secure: false,

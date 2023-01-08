@@ -1205,6 +1205,16 @@
           "__format": "json"
         }
       },
+      "eventStops": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_EVENT_STOPS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_EVENT_STOPS_ROLES",
+          "__format": "json"
+        }
+      },
       "quests": {
         "enabled": {
           "__name": "AUTHENTICATION_PERMS_QUESTS_ENABLED",

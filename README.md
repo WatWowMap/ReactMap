@@ -29,7 +29,7 @@ Pokemon GO Map frontend built with React.
 - Gym Badge tracking
 - Webhook alert management for [Poracle](https://github.com/KartulUdus/PoracleJS)
 - Extremely configurable and supports custom, git friendly, code injection
-- Multi domain customization 
+- Multi domain customization
 - Unlimited database support for multi-tenancy setups
 
 ## Live Demo
@@ -49,6 +49,7 @@ Pokemon GO Map frontend built with React.
 - [Chuck](https://github.com/WatWowMap/Chuck)
 - [Map-A-Droid (MAD)](https://github.com/Map-A-Droid/MAD)
 - [RealDeviceMap (RDM)](https://github.com/realdevicemap/realdevicemap)
+- [Golbat](https://github.com/UnownHash/Golbat)
 
 ## Installation Instructions & More
 
