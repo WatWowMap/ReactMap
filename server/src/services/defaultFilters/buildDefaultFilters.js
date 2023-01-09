@@ -64,7 +64,7 @@ module.exports = function buildDefault(perms, available, dbModels) {
               ? defaultFilters.pokestops.levels
               : undefined,
             lures: perms.lures ? defaultFilters.pokestops.lures : undefined,
-            eventStops: perms.pokestops
+            eventStops: perms.eventStops
               ? defaultFilters.pokestops.eventStops
               : undefined,
             quests: perms.quests ? defaultFilters.pokestops.quests : undefined,

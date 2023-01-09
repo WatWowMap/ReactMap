@@ -142,7 +142,7 @@ app.use(express.static(path.join(__dirname, config.devOptions.clientPath)))
 
 app.use(
   session({
-    name: 'reactmap',
+    name: 'reactmap0',
     key: 'session',
     secret: config.api.sessionSecret,
     store: sessionStore,

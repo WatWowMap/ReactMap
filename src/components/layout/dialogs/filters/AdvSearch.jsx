@@ -1,6 +1,7 @@
 import React from 'react'
+import HighlightOff from '@material-ui/icons/HighlightOff'
 import { Paper, InputBase, IconButton } from '@material-ui/core'
-import { HighlightOff } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 import useStyles from '@hooks/useStyles'

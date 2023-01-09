@@ -45,7 +45,7 @@ if (inject) {
         const error = errors[0]
           ? `${errors[0].type}: ${errors[0].value}`
           : 'Unknown error'
-        await fetch('/clientError', {
+        await fetch('/api/error/client', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

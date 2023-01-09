@@ -315,7 +315,11 @@
         "__format": "number"
       },
       "geoJsonFileName": "MAP_GENERAL_GEO_JSON_FILE_NAME",
-      "attributionPrefix": "MAP_GENERAL_ATTRIBUTION_PREFIX"
+      "attributionPrefix": "MAP_GENERAL_ATTRIBUTION_PREFIX",
+      "menuOrder": {
+        "__name": "MAP_GENERAL_MENU_ORDER",
+        "__format": "json"
+      }
     },
     "localeSelection": {
       "__name": "MAP_LOCALE_SELECTION",
@@ -1111,6 +1115,10 @@
       "__name": "AUTHENTICATION_STRATEGIES",
       "__format": "json"
     },
+    "strictAreaRestrictions": {
+      "__name": "AUTHENTICATION_STRICT_AREA_RESTRICTIONS",
+      "__format": "boolean"
+    },
     "areaRestrictions": {
       "__name": "AUTHENTICATION_AREA_RESTRICTIONS",
       "__format": "json"
@@ -1191,6 +1199,16 @@
         },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_POKESTOPS_ROLES",
+          "__format": "json"
+        }
+      },
+      "eventStops": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_EVENT_STOPS_ENABLED",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_EVENT_STOPS_ROLES",
           "__format": "json"
         }
       },

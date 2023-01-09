@@ -1,7 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react'
 import { Grid, Typography, Button } from '@material-ui/core'
-import { Refresh } from '@material-ui/icons'
+import Refresh from '@material-ui/icons/Refresh'
 import { withTranslation } from 'react-i18next'
 
 // This component uses React Classes due to componentDidCatch() not being available in React Hooks

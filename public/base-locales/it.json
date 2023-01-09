@@ -330,7 +330,7 @@
   "quests_subtitle": "Mostra la ricompensa della missione e le informazioni sull'attività",
   "raids_subtitle": "Mostra tutte le informazioni sul raid, inclusi il boss del raid, le uova, l'ora di scadenza e il moveset",
   "s2cells_subtitle": "Mostra l'ultima volta che una cella S2 è stata scansionata da un dispositivo",
-  "scanAreas_subtitle": "Mostra i poligoni delle aree di scansione disponibili",
+  "scan_areas_subtitle": "Mostra i poligoni delle aree di scansione disponibili",
   "spawnpoints_subtitle": "Mostra i punti di spawn e il loro tempo di despawn stimato",
   "stats_subtitle": "Mostra le statistiche e i livelli dei Pokémon",
   "submission_cells_subtitle": "Mostra informazioni utili per inviare nuovi POI",

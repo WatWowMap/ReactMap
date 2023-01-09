@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import DeleteForever from '@material-ui/icons/DeleteForever'
+import Edit from '@material-ui/icons/Edit'
 import {
   Grid,
   Typography,
@@ -6,7 +8,6 @@ import {
   Dialog,
   Checkbox,
 } from '@material-ui/core'
-import { DeleteForever, Edit } from '@material-ui/icons'
 
 import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 
@@ -46,7 +47,6 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
       newFilters &&
       !Object.keys(newFilters).every((key) => newFilters[key] === item[key])
     ) {
-      // eslint-disable-next-line camelcase
       setTempFilters({ [id]: { ...newFilters, enabled: true } })
       setSend(true)
     }

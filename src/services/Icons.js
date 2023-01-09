@@ -25,17 +25,18 @@ export default class UIcons {
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
     icons.forEach((icon) => {
       try {
-        const { data } = icon
+        const { data, name: unclean, path } = icon
+        const name = unclean.endsWith('/') ? unclean.slice(0, -1) : unclean
         if (data) {
-          this[icon.name] = { indexes: Object.keys(data), ...icon }
+          this[name] = { indexes: Object.keys(data), ...icon }
 
-          if (!icon.path.startsWith('http')) {
-            this[icon.name].path = `/images/uicons/${icon.path}`
+          if (!path.startsWith('http')) {
+            this[name].path = `/images/uicons/${path}`
           }
-          if (!this[icon.name].modifiers) {
-            this[icon.name].modifiers = {}
+          if (!this[name].modifiers) {
+            this[name].modifiers = {}
           }
-          this[icon.name].indexes.forEach((category) => {
+          this[name].indexes.forEach((category) => {
             let isValid = false
             if (
               !parseInt(category) &&
@@ -43,12 +44,12 @@ export default class UIcons {
               category !== 'lastFetched'
             ) {
               if (Array.isArray(data[category])) {
-                this[icon.name][category] = new Set(data[category])
+                this[name][category] = new Set(data[category])
                 isValid = true
               } else {
                 Object.keys(data[category]).forEach((subCategory) => {
                   if (Array.isArray(data[category][subCategory])) {
-                    this[icon.name][subCategory] = new Set(
+                    this[name][subCategory] = new Set(
                       data[category][subCategory],
                     )
                     isValid = true
@@ -59,22 +60,22 @@ export default class UIcons {
                 this[category] = []
               }
               if (isValid) {
-                this[category].push(icon.name)
+                this[category].push(name)
               }
-              if (!this[icon.name].modifiers[category]) {
-                this[icon.name].modifiers[category] = this.modifiers.base
+              if (!this[name].modifiers[category]) {
+                this[name].modifiers[category] = this.modifiers.base
               } else {
-                this[icon.name].modifiers[category] = {
+                this[name].modifiers[category] = {
                   ...this.modifiers.base,
-                  ...this[icon.name].modifiers[category],
+                  ...this[name].modifiers[category],
                 }
               }
-              if (icon.path === baseUrl) {
-                this.selected.misc = icon.name
+              if (path === baseUrl) {
+                this.selected.misc = name
               }
               if (!this.selected[category]) {
-                this.selected[category] = icon.name
-                this.modifiers[category] = this[icon.name].modifiers[category]
+                this.selected[category] = name
+                this.modifiers[category] = this[name].modifiers[category]
               }
             }
           })
@@ -215,6 +216,7 @@ export default class UIcons {
     const questSuffixes = questActive ? ['_q', ''] : ['']
     const arSuffixes = ar ? ['_ar', ''] : ['']
     const powerUpSuffixes = power ? [`_p${power}`, ''] : ['']
+
     for (let i = 0; i < invasionSuffixes.length; i += 1) {
       for (let q = 0; q < questSuffixes.length; q += 1) {
         for (let a = 0; a < arSuffixes.length; a += 1) {

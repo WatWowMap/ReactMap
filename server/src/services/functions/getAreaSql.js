@@ -1,3 +1,4 @@
+const { authentication } = require('../config')
 const areas = require('../areas')
 
 module.exports = function getAreaRestrictionSql(
@@ -7,6 +8,13 @@ module.exports = function getAreaRestrictionSql(
   isMad,
   category,
 ) {
+  if (
+    authentication.strictAreaRestrictions &&
+    authentication.areaRestrictions.length &&
+    !areaRestrictions.length
+  )
+    return false
+
   if (!areaRestrictions?.length && !onlyAreas?.length) return true
 
   const cleanUserAreas = onlyAreas.filter((area) => areas.names.includes(area))

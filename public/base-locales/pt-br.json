@@ -268,7 +268,7 @@
   "quests_subtitle": "Mostra a recompensa da missão e informações sobre a tarefa",
   "raids_subtitle": "Mostra todas as informações da invasão, incluindo o chefe da invasão, ovos, tempo de expiração e moveset",
   "s2cells_subtitle": "Mostra a última vez que uma célula S2 foi lida por um dispositivo",
-  "scanAreas_subtitle": "Mostra os polígonos das áreas de digitalização disponíveis",
+  "scan_areas_subtitle": "Mostra os polígonos das áreas de digitalização disponíveis",
   "spawnpoints_subtitle": "Mostra pontos de spawn e seu tempo estimado de despawn",
   "stats_subtitle": "Mostra estatísticas e níveis do Pokémon",
   "submission_cells_subtitle": "Mostra informações úteis para o envio de novos POIs",

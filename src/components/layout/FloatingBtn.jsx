@@ -1,20 +1,19 @@
 import React, { useEffect, useRef } from 'react'
+import Menu from '@material-ui/icons/Menu'
+import MyLocation from '@material-ui/icons/MyLocation'
+import ZoomIn from '@material-ui/icons/ZoomIn'
+import ZoomOut from '@material-ui/icons/ZoomOut'
+import Search from '@material-ui/icons/Search'
+import NotificationsActive from '@material-ui/icons/NotificationsActive'
+import Save from '@material-ui/icons/Save'
+import CardMembership from '@material-ui/icons/CardMembership'
+import AttachMoney from '@material-ui/icons/AttachMoney'
+import EuroSymbol from '@material-ui/icons/EuroSymbol'
+import Person from '@material-ui/icons/Person'
+import TrackChanges from '@material-ui/icons/TrackChanges'
+import BlurOn from '@material-ui/icons/BlurOn'
 import { Grid, Fab } from '@material-ui/core'
-import {
-  Menu,
-  MyLocation,
-  ZoomIn,
-  ZoomOut,
-  Search,
-  NotificationsActive,
-  Save,
-  CardMembership,
-  AttachMoney,
-  EuroSymbol,
-  Person,
-  TrackChanges,
-  BlurOn,
-} from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
 import L from 'leaflet'

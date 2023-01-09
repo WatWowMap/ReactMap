@@ -1,4 +1,5 @@
 import React from 'react'
+import ExpandMore from '@material-ui/icons/ExpandMore'
 import {
   FormControl,
   FormGroup,
@@ -9,7 +10,7 @@ import {
   AccordionDetails,
   Typography,
 } from '@material-ui/core'
-import { ExpandMore } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'

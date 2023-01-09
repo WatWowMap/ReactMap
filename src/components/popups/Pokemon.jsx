@@ -1,4 +1,9 @@
 import React, { Fragment, useCallback, useState, useEffect } from 'react'
+import Check from '@material-ui/icons/Check'
+import Clear from '@material-ui/icons/Clear'
+import ExpandMore from '@material-ui/icons/ExpandMore'
+import Map from '@material-ui/icons/Map'
+import MoreVert from '@material-ui/icons/MoreVert'
 import {
   Grid,
   Avatar,
@@ -11,7 +16,7 @@ import {
   MenuItem,
   Tooltip,
 } from '@material-ui/core'
-import { Check, Clear, ExpandMore, Map, MoreVert } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
