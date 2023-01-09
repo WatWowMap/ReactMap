@@ -108,7 +108,7 @@ module.exports = async function getAuthInfo(req, user, strategy) {
       {
         name: 'Pokestops',
         value: mapPerms(
-          ['pokestops', 'quests', 'lures', 'invasions'],
+          ['pokestops', 'eventStops', 'quests', 'lures', 'invasions'],
           user.perms,
         ),
         inline: true,
