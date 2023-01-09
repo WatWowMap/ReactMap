@@ -434,6 +434,7 @@
   "battle_changes_poracle": "wird_angegriffen",
   "auto": "Auto",
   "webhooks_subtitle": "Verwalte deine Benachrichtigungen für diese Bots, direkt von der Karte aus.",
+  "event_stops_subtitle": "Zeigt spezielle Event Pokestops wie z.B. Kecleon Stops an.",
   "webhooks": "Benachrichtigungen",
   "everything_individually": "Individuelle Benachrichtigungen hinzufügen",
   "individually": "individuell",
