@@ -1,4 +1,5 @@
 import React from 'react'
+import ExpandMore from '@material-ui/icons/ExpandMore'
 import {
   withStyles,
   Grid,
@@ -7,7 +8,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@material-ui/core'
-import { ExpandMore } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 const StyledAccordion = withStyles({

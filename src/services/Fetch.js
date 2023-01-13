@@ -3,7 +3,7 @@
 export default class Fetch {
   static async getSettings() {
     try {
-      const response = await fetch('/settings')
+      const response = await fetch('/api/settings')
       if (!response.ok) {
         throw new Error(`${response.status} (${response.statusText})`)
       }

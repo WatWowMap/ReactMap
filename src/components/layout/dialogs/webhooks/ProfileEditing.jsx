@@ -1,4 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import Clear from '@material-ui/icons/Clear'
+import Edit from '@material-ui/icons/Edit'
+import DeleteForever from '@material-ui/icons/DeleteForever'
+import Save from '@material-ui/icons/Save'
+import FileCopy from '@material-ui/icons/FileCopy'
 import {
   DialogContent,
   Grid,
@@ -12,7 +17,7 @@ import {
   TextField,
   IconButton,
 } from '@material-ui/core'
-import { Clear, Edit, DeleteForever, Save, FileCopy } from '@material-ui/icons'
+
 import { Trans, useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 

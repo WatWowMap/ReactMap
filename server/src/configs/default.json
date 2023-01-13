@@ -620,6 +620,7 @@
         "enabled": false
       }
     ],
+    "strictAreaRestrictions": false,
     "areaRestrictions": [],
     "excludeFromTutorial": [],
     "alwaysEnabledPerms": [],
@@ -649,6 +650,10 @@
         "roles": []
       },
       "pokestops": {
+        "enabled": true,
+        "roles": []
+      },
+      "eventStops": {
         "enabled": true,
         "roles": []
       },

@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-no-duplicate-props */
 import React, { useState } from 'react'
+import ExpandMore from '@material-ui/icons/ExpandMore'
 import {
   Grid,
   DialogContent,
@@ -18,7 +19,7 @@ import {
   Divider,
   CircularProgress,
 } from '@material-ui/core'
-import { ExpandMore } from '@material-ui/icons'
+
 import { Autocomplete } from '@material-ui/lab'
 import { Trans, useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'

@@ -1,6 +1,7 @@
 import React from 'react'
+import Clear from '@material-ui/icons/Clear'
 import { IconButton, DialogTitle } from '@material-ui/core'
-import { Clear } from '@material-ui/icons'
+
 import { Trans, useTranslation } from 'react-i18next'
 import useStyles from '@hooks/useStyles'
 

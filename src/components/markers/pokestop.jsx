@@ -10,8 +10,9 @@ export default function stopMarker(
   filters,
   Icons,
   userSettings,
+  hasEvent,
 ) {
-  const { lure_id, ar_scan_eligible, power_up_level, display_type } = pokestop
+  const { lure_id, ar_scan_eligible, power_up_level, events } = pokestop
   const {
     invasion: invasionMod,
     pokestop: pokestopMod,
@@ -26,7 +27,7 @@ export default function stopMarker(
     hasQuest && userSettings.hasQuestIndicator,
     ar_scan_eligible && userSettings.showArBadge,
     power_up_level,
-    display_type || '',
+    hasEvent ? events[0].display_type : '',
   )
   let baseSize = Icons.getSize('pokestop', filters.filter[filterId])
   let popupX = 7 + pokestopMod.popupX

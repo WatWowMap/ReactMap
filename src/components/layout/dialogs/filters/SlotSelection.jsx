@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
+import Clear from '@material-ui/icons/Clear'
+import Check from '@material-ui/icons/Check'
 import { Grid, DialogContent, IconButton } from '@material-ui/core'
-import { Clear, Check } from '@material-ui/icons'
 
 import { useStatic } from '@hooks/useStore'
 

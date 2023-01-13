@@ -1,4 +1,12 @@
 import React, { useState } from 'react'
+import Tune from '@material-ui/icons/Tune'
+import Ballot from '@material-ui/icons/Ballot'
+import Check from '@material-ui/icons/Check'
+import Clear from '@material-ui/icons/Clear'
+import Save from '@material-ui/icons/Save'
+import HelpOutline from '@material-ui/icons/HelpOutline'
+import FormatSize from '@material-ui/icons/FormatSize'
+
 import {
   Grid,
   DialogContent,
@@ -7,15 +15,7 @@ import {
   Button,
   Dialog,
 } from '@material-ui/core'
-import {
-  Tune,
-  Ballot,
-  Check,
-  Clear,
-  Save,
-  HelpOutline,
-  FormatSize,
-} from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'

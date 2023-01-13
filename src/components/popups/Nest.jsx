@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import MoreVert from '@material-ui/icons/MoreVert'
 import {
   Grid,
   Typography,
@@ -7,7 +8,7 @@ import {
   Menu,
   MenuItem,
 } from '@material-ui/core'
-import { MoreVert } from '@material-ui/icons'
+
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'

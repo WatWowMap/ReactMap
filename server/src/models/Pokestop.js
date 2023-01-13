@@ -45,6 +45,11 @@ const invasionProps = {
   display_type: true,
 }
 
+const MADE_UP_MAD_INVASIONS = [352]
+const MAD_GRUNT_MAP = {
+  352: 8,
+}
+
 module.exports = class Pokestop extends Model {
   static get tableName() {
     return 'pokestop'
@@ -85,6 +90,7 @@ module.exports = class Pokestop extends Model {
       quests: questPerms,
       invasions: invasionPerms,
       pokestops: pokestopPerms,
+      eventStops: eventStopPerms,
       areaRestrictions,
     } = perms
 
@@ -509,6 +515,12 @@ module.exports = class Pokestop extends Model {
                   '>=',
                   isMad ? this.knex().fn.now() : safeTs,
                 )
+              if (isMad) {
+                invasion.whereNotIn(
+                  'incident_grunt_type',
+                  MADE_UP_MAD_INVASIONS,
+                )
+              }
             })
           }
         }
@@ -517,16 +529,22 @@ module.exports = class Pokestop extends Model {
             ar.where(isMad ? 'is_ar_scan_eligible' : 'ar_scan_eligible', 1)
           })
         }
-        if (onlyEventStops && pokestopPerms) {
+        if (onlyEventStops && eventStopPerms) {
           stops.orWhere((event) => {
-            event
-              .where('display_type', '>=', 7)
-              .andWhere('character', 0)
-              .andWhere(
-                multiInvasionMs ? 'expiration_ms' : 'expiration',
-                '>=',
-                safeTs * (multiInvasionMs ? 1000 : 1),
-              )
+            if (isMad) {
+              event
+                .whereIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
+                .andWhere('incident_expiration', '>=', this.knex().fn.now())
+            } else {
+              event
+                .where('display_type', '>=', 7)
+                .andWhere('character', 0)
+                .andWhere(
+                  multiInvasionMs ? 'expiration_ms' : 'expiration',
+                  '>=',
+                  safeTs * (multiInvasionMs ? 1000 : 1),
+                )
+            }
           })
         }
       })
@@ -540,7 +558,7 @@ module.exports = class Pokestop extends Model {
       : this.mapRDM(results, safeTs)
     if (normalized.length > queryLimits.pokestops)
       normalized.length = queryLimits.pokestops
-    return this.secondaryFilter(
+    const finalResults = this.secondaryFilter(
       normalized,
       args.filters,
       isMad,
@@ -548,6 +566,7 @@ module.exports = class Pokestop extends Model {
       midnight,
       perms,
     )
+    return finalResults
   }
 
   static fieldAssigner(target, source, fields) {
@@ -586,34 +605,29 @@ module.exports = class Pokestop extends Model {
           'power_up_level',
           'power_up_end_timestamp',
         ])
-        if (filters.onlyEventStops) {
-          filtered.invasions = pokestop.invasions.filter(
-            (invasion) => !invasion.grunt_type,
-          )
-          if (filtered.invasions.length) {
-            const displayType = Math.max(
-              ...filtered.invasions.map((inv) => inv.display_type),
-            )
-            if (displayType) {
-              filtered.display_type = displayType
-            }
-          }
-        }
       }
-      if (
-        perms.invasions &&
-        ((filters.onlyAllPokestops && filters.onlyInvasions) ||
-          filters.onlyInvasions)
-      ) {
-        filtered.invasions = [
-          ...(Array.isArray(filtered.invasions) ? filtered.invasions : []),
-          ...(filters.onlyAllPokestops
-            ? pokestop.invasions
-            : pokestop.invasions.filter(
-                (invasion) =>
-                  invasion.grunt_type && filters[`i${invasion.grunt_type}`],
-              )),
-        ]
+      if (perms.eventStops && filters.onlyEventStops) {
+        filtered.events = pokestop.invasions
+          .filter((event) =>
+            isMad
+              ? MADE_UP_MAD_INVASIONS.includes(event.grunt_type)
+              : !event.grunt_type,
+          )
+          .map((event) => ({
+            event_expire_timestamp: event.incident_expire_timestamp,
+            display_type: isMad
+              ? MAD_GRUNT_MAP[event.grunt_type] || 8
+              : event.display_type,
+          }))
+      }
+      if (perms.invasions && filters.onlyInvasions) {
+        filtered.invasions = pokestop.invasions.filter(
+          (invasion) =>
+            filters[`i${invasion.grunt_type}`] &&
+            (isMad
+              ? !MADE_UP_MAD_INVASIONS.includes(invasion.grunt_type)
+              : invasion.grunt_type),
+        )
       }
       if (
         perms.lures &&
@@ -714,7 +728,8 @@ module.exports = class Pokestop extends Model {
         filters.onlyAllPokestops ||
         filtered.quests?.length ||
         filtered.invasions?.length ||
-        filtered.lure_id
+        filtered.lure_id ||
+        filtered.events?.length
       ) {
         filteredResults.push(filtered)
       }
@@ -1118,6 +1133,9 @@ module.exports = class Pokestop extends Model {
         )
 
         .orderBy('grunt_type')
+    }
+    if (isMad) {
+      queries.invasions.whereNotIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
     }
     // invasions
 

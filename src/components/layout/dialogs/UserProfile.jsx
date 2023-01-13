@@ -15,7 +15,7 @@ import {
   Dialog,
   TextField,
 } from '@material-ui/core'
-import { Edit } from '@material-ui/icons'
+import Edit from '@material-ui/icons/Edit'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'

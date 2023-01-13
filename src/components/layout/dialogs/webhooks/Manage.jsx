@@ -1,7 +1,8 @@
 /* eslint-disable max-len */
 import React, { useState, useEffect, useMemo } from 'react'
+import Person from '@material-ui/icons/Person'
 import { DialogContent, Dialog, AppBar, Tabs, Tab } from '@material-ui/core'
-import { Person } from '@material-ui/icons'
+
 import { useTranslation, Trans } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
