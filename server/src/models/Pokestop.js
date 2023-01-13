@@ -625,7 +625,7 @@ module.exports = class Pokestop extends Model {
           (invasion) =>
             filters[`i${invasion.grunt_type}`] &&
             (isMad
-              ? MADE_UP_MAD_INVASIONS.includes(invasion.grunt_type)
+              ? invasion.grunt_type != MADE_UP_MAD_INVASIONS
               : invasion.grunt_type),
         )
       }
