@@ -46,6 +46,9 @@ const invasionProps = {
 }
 
 const MADE_UP_MAD_INVASIONS = [352]
+const MAD_GRUNT_MAP = {
+  352: 8,
+}
 
 module.exports = class Pokestop extends Model {
   static get tableName() {
@@ -612,13 +615,18 @@ module.exports = class Pokestop extends Model {
           )
           .map((event) => ({
             event_expire_timestamp: event.incident_expire_timestamp,
-            display_type: isMad ? 8 : event.display_type,
+            display_type: isMad
+              ? MAD_GRUNT_MAP[event.grunt_type] || 8
+              : event.display_type,
           }))
       }
       if (perms.invasions && filters.onlyInvasions) {
         filtered.invasions = pokestop.invasions.filter(
           (invasion) =>
-            invasion.grunt_type && filters[`i${invasion.grunt_type}`],
+            filters[`i${invasion.grunt_type}`] &&
+            (isMad
+              ? !MADE_UP_MAD_INVASIONS.includes(invasion.grunt_type)
+              : invasion.grunt_type),
         )
       }
       if (
@@ -1114,9 +1122,6 @@ module.exports = class Pokestop extends Model {
           ts * (multiInvasionMs ? 1000 : 1),
         )
         .orderBy('grunt_type')
-      if (isMad) {
-        queries.invasions.where('incident.character', '<', 300)
-      }
     } else {
       queries.invasions = this.query()
         .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
@@ -1128,6 +1133,9 @@ module.exports = class Pokestop extends Model {
         )
 
         .orderBy('grunt_type')
+    }
+    if (isMad) {
+      queries.invasions.whereNotIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
     }
     // invasions
 

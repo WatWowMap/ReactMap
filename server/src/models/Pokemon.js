@@ -212,7 +212,10 @@ module.exports = class Pokemon extends Model {
                   !relevant.includes('level') &&
                   !relevant.includes('atk_iv') &&
                   !relevant.includes('def_iv') &&
-                  !relevant.includes('sta_iv')
+                  !relevant.includes('sta_iv') &&
+                  !relevant.includes('cp') &&
+                  !relevant.includes('xxs') &&
+                  !relevant.includes('xxl')
                 ) {
                   // doesn't return everything if only pvp stats for individual pokemon
                   pkmn.whereNull('pokemon_id')
