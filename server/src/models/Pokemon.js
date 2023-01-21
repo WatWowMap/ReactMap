@@ -14,6 +14,7 @@ const {
 } = require('../services/config')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { Pvp } = require('../services/initialization')
+const fetchJson = require('../services/api/fetchJson')
 
 const levelCalc =
   'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
@@ -78,7 +79,7 @@ module.exports = class Pokemon extends Model {
     return 'pokemon'
   }
 
-  static async getAll(perms, args, { isMad, pvpV2, hasSize, hasHeight }) {
+  static async getAll(perms, args, { isMad, pvpV2, mem, hasSize, hasHeight }) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const {
       onlyStandard,
@@ -290,7 +291,7 @@ module.exports = class Pokemon extends Model {
       return []
     }
 
-    const results = await query.limit(queryLimits.pokemon)
+    const results = await this.evalQuery(mem, query.limit(queryLimits.pokemon))
     const finalResults = []
     const pvpResults = []
     const listOfIds = []
@@ -321,6 +322,8 @@ module.exports = class Pokemon extends Model {
         pvpResults.push(pkmn)
       }
       if (noPvp && globalCheck(pkmn)) {
+        pkmn.changed = !!pkmn.changed
+        pkmn.expire_timestamp_verified = !!pkmn.expire_timestamp_verified
         finalResults.push(pkmn)
       }
     })
@@ -372,7 +375,10 @@ module.exports = class Pokemon extends Model {
         return []
       }
       pvpResults.push(
-        ...(await pvpQuery.limit(queryLimits.pokemonPvp - results.length)),
+        ...(await this.evalQuery(
+          mem,
+          pvpQuery.limit(queryLimits.pokemonPvp - results.length),
+        )),
       )
     }
 
@@ -402,13 +408,31 @@ module.exports = class Pokemon extends Model {
         (Object.keys(pkmn.cleanPvp).length || !pkmn.pvpCheck) &&
         globalCheck(pkmn)
       ) {
+        pkmn.changed = !!pkmn.changed
+        pkmn.expire_timestamp_verified = !!pkmn.expire_timestamp_verified
         finalResults.push(pkmn)
       }
     })
     return finalResults
   }
 
-  static async getLegacy(perms, args, { isMad, hasSize, hasHeight }) {
+  static async evalQuery(mem, query) {
+    console.log('query length', query.toKnexQuery().toString().length)
+    return (
+      (mem
+        ? fetchJson(mem, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: query.toKnexQuery().toString(),
+          })
+        : query) || []
+    )
+  }
+
+  static async getLegacy(perms, args, { isMad, mem, hasSize, hasHeight }) {
     const ts = Math.floor(new Date().getTime() / 1000)
     const query = this.query()
       .where(
@@ -440,30 +464,36 @@ module.exports = class Pokemon extends Model {
     ) {
       return []
     }
-    const results = await query
+    const results = await this.evalQuery(mem, query)
     return legacyFilter(results, args, perms, ts)
   }
 
-  static async getAvailable({ isMad }) {
-    const ts = Math.floor(new Date().getTime() / 1000)
-    const availableQuery = this.query()
-      .select(['pokemon_id', 'form'])
-      .where(
-        isMad ? 'disappear_time' : 'expire_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : ts,
-      )
-      .groupBy('pokemon_id', 'form')
-      .orderBy('pokemon_id', 'form')
-    const rarityQuery = this.query()
-      .select(['pokemon_id AS id', 'form as formId'])
-      .count('pokemon_id AS count')
-      .groupBy('pokemon_id', 'form')
-      .where(
-        isMad ? 'disappear_time' : 'expire_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : ts,
-      )
+  static async getAvailable({ isMad, mem }) {
+    const ts = Math.floor(Date.now() / 1000)
+    const availableQuery = this.evalQuery(
+      mem,
+      this.query()
+        .select(['pokemon_id', 'form'])
+        .where(
+          isMad ? 'disappear_time' : 'expire_timestamp',
+          '>=',
+          isMad ? this.knex().fn.now() : ts,
+        )
+        .groupBy('pokemon_id', 'form')
+        .orderBy('pokemon_id', 'form'),
+    )
+    const rarityQuery = this.evalQuery(
+      mem,
+      this.query()
+        .select(['pokemon_id AS id', 'form as formId'])
+        .count('pokemon_id AS count')
+        .groupBy('pokemon_id', 'form')
+        .where(
+          isMad ? 'disappear_time' : 'expire_timestamp',
+          '>=',
+          isMad ? this.knex().fn.now() : ts,
+        ),
+    )
 
     const [available, rarity] = await Promise.all([availableQuery, rarityQuery])
 
@@ -475,14 +505,17 @@ module.exports = class Pokemon extends Model {
     }
   }
 
-  static getOne(id, { isMad }) {
-    return this.query()
-      .select([
-        isMad ? 'latitude AS lat' : 'lat',
-        isMad ? 'longitude AS lon' : 'lon',
-      ])
-      .where(isMad ? 'encounter_id' : 'id', id)
-      .first()
+  static getOne(id, { isMad, mem }) {
+    return this.evalQuery(
+      mem,
+      this.query()
+        .select([
+          isMad ? 'latitude AS lat' : 'lat',
+          isMad ? 'longitude AS lon' : 'lon',
+        ])
+        .where(isMad ? 'encounter_id' : 'id', id)
+        .first(),
+    )
   }
 
   static async search(perms, args, { isMad }, distance) {

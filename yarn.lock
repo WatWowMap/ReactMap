@@ -1235,9 +1235,9 @@ ajv@^6.10.0, ajv@^6.12.4:
     uri-js "^4.2.2"
 
 ajv@^8.6.2:
-  version "8.8.2"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.8.2.tgz#01b4fef2007a28bf75f0b7fc009f62679de4abbb"
-  integrity sha512-x9VuX+R/jcFj1DHo/fCp99esgGDWiHENrKxaCENuCxpoMCmAt/COCGVDwA7kleEpEzJjDnvh3yGoOuLu0Dtllw==
+  version "8.11.0"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.11.0.tgz#977e91dd96ca669f54a11e23e378e33b884a565f"
+  integrity sha512-wGgprdCvMalC0BztXvitD2hC04YffAvtsUn93JbGXYLAtCUO4xd17mCCZQxUOItiBwZvJScWo8NIvQMQ71rdpg==
   dependencies:
     fast-deep-equal "^3.1.1"
     json-schema-traverse "^1.0.0"
@@ -3691,10 +3691,10 @@ object.values@^1.1.5:
     define-properties "^1.1.3"
     es-abstract "^1.19.1"
 
-objection@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/objection/-/objection-3.0.0.tgz#213e76db48c774935813d184adc4a2cc1461c773"
-  integrity sha512-dIQZKlWQ24SWQSLkd8t/h+MUTr3P3ziVT9rztRtZT/tt/SGFyj4Zgvp+TN/SXfxgVMSfBLQxeLlioe0n64suMg==
+objection@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/objection/-/objection-3.0.1.tgz#f67dc698187d10524e5d1b5d37a54e5bba49a42a"
+  integrity sha512-rqNnyQE+C55UHjdpTOJEKQHJGZ/BGtBBtgxdUpKG4DQXRUmqxfmgS/MhPWxB9Pw0mLSVLEltr6soD4c0Sddy0Q==
   dependencies:
     ajv "^8.6.2"
     db-errors "^0.2.3"
