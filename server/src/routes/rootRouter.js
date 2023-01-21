@@ -23,7 +23,7 @@ fs.readdir(resolve(__dirname, './api/v1/'), (e, files) => {
   files.forEach((file) => {
     try {
       rootRouter.use(
-        `/v1/${file.replace('.js', '')}`,
+        `/api/v1/${file.replace('.js', '')}`,
         require(resolve(__dirname, './api/v1/', file)),
       )
       console.log(`[API] Loaded ${file}`)
