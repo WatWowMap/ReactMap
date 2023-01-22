@@ -417,7 +417,6 @@ module.exports = class Pokemon extends Model {
   }
 
   static async evalQuery(mem, query) {
-    console.log('query length', query.toKnexQuery().toString().length)
     return (
       (mem
         ? fetchJson(mem, {
