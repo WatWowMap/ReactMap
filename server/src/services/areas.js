@@ -6,6 +6,8 @@ const fetch = require('node-fetch')
 
 const config = require('./config')
 
+const DEFAULT_RETURN = { type: 'FeatureCollectin', features: [] }
+
 const manualGeojson = {
   type: 'FeatureCollection',
   features: config.manualAreas
@@ -31,93 +33,107 @@ const manualGeojson = {
 }
 
 const getGeojson = async (location) => {
-  if (location.startsWith('http')) {
-    console.log('Loading Kōji URL', location)
-    return fetch(
-      location,
-      {
-        headers: {
-          Authorization: `Bearer ${config.api.kojiOptions.bearerToken}`,
+  try {
+    if (location.startsWith('http')) {
+      console.log('Loading Kōji URL', location)
+      return fetch(
+        location,
+        {
+          headers: {
+            Authorization: `Bearer ${config.api.kojiOptions.bearerToken}`,
+          },
         },
-      },
-      true,
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        if (res?.data) {
-          fs.writeFileSync(
-            resolve(
-              __dirname,
-              `../configs/koji_backups/${location.replace(/\//g, '__')}.json`,
-            ),
-            JSON.stringify(res.data),
-          )
-          return res.data
-        }
-        return { features: [] }
-      })
-      .catch((err) => {
-        console.error(
-          '[AREAS] Failed to fetch koji geojson, attempting to read from backup \n[AREAS]',
-          err.message,
-        )
-        if (
-          fs.existsSync(
-            resolve(
-              __dirname,
-              `../configs/koji_backups/${location.replace(/\//g, '__')}.json`,
-            ),
-          )
-        ) {
-          console.log('[AREAS] Reading from koji_backups for', location)
-          return JSON.parse(
-            fs.readFileSync(
+        true,
+      )
+        .then((res) => res.json())
+        .then((res) => {
+          if (res?.data) {
+            fs.writeFileSync(
               resolve(
                 __dirname,
                 `../configs/koji_backups/${location.replace(/\//g, '__')}.json`,
               ),
-            ),
+              JSON.stringify(res.data),
+            )
+            return res.data
+          }
+          return DEFAULT_RETURN
+        })
+        .catch((err) => {
+          console.error(
+            '[AREAS] Failed to fetch koji geojson, attempting to read from backup \n[AREAS]',
+            err.message,
           )
-        }
-        console.warn('[AREAS] No backup found for', location)
-        return { features: [] }
-      })
+          if (
+            fs.existsSync(
+              resolve(
+                __dirname,
+                `../configs/koji_backups/${location.replace(/\//g, '__')}.json`,
+              ),
+            )
+          ) {
+            console.log('[AREAS] Reading from koji_backups for', location)
+            return JSON.parse(
+              fs.readFileSync(
+                resolve(
+                  __dirname,
+                  `../configs/koji_backups/${location.replace(
+                    /\//g,
+                    '__',
+                  )}.json`,
+                ),
+              ),
+            )
+          }
+          console.warn('[AREAS] No backup found for', location)
+          return DEFAULT_RETURN
+        })
+    }
+    if (fs.existsSync(resolve(__dirname, `../configs/${location}`))) {
+      return JSON.parse(
+        fs.readFileSync(resolve(__dirname, `../configs/${location}`)),
+      )
+    }
+  } catch (e) {
+    console.warn('[AREAS] Issue with getting the geojson', e)
   }
-  if (fs.existsSync(resolve(__dirname, `../configs/${location}`))) {
-    return JSON.parse(
-      fs.readFileSync(resolve(__dirname, `../configs/${location}`)),
-    )
-  }
-  return { features: [] }
+  return DEFAULT_RETURN
 }
 
 // Load each areas.json
 const loadScanPolygons = async (fileName, domain) => {
-  const geojson = await getGeojson(fileName)
-  return {
-    ...geojson,
-    features: [
-      ...manualGeojson.features.filter(
-        (f) => !f.properties.domain || f.properties.domain === domain,
-      ),
-      ...geojson.features.map((f) => ({
-        ...f,
-        properties: {
-          ...f.properties,
-          key: f.properties.parent
-            ? `${f.properties.parent}-${f.properties.name}`
-            : f.properties.name,
-          center: center(f).geometry.coordinates.reverse(),
-        },
-      })),
-    ].sort((a, b) => a.properties.name.localeCompare(b.properties.name)),
+  try {
+    const geojson = await getGeojson(fileName)
+    return {
+      ...geojson,
+      features: [
+        ...manualGeojson.features.filter(
+          (f) => !f.properties.domain || f.properties.domain === domain,
+        ),
+        ...geojson.features.map((f) => ({
+          ...f,
+          properties: {
+            ...f.properties,
+            key: f.properties.parent
+              ? `${f.properties.parent}-${f.properties.name}`
+              : f.properties.name,
+            center: center(f).geometry.coordinates.reverse(),
+          },
+        })),
+      ].sort((a, b) => a.properties.name.localeCompare(b.properties.name)),
+    }
+  } catch {
+    console.warn(
+      `[AREAS] Failed to load ${fileName} for ${domain}. Using empty areas.json`,
+    )
+    return DEFAULT_RETURN
   }
 }
 
-const loadAreas = () => {
+const loadAreas = (scanAreas) => {
   try {
     const normalized = { type: 'FeatureCollection', features: [] }
-    Object.values(config.scanAreas).forEach((area) => {
+    Object.values(scanAreas).forEach((area) => {
       if (area?.features.length) {
         normalized.features.push(...area.features.filter((f) => !f.manual))
       }
@@ -131,6 +147,7 @@ const loadAreas = () => {
         '[Area Restrictions] Disabled - `areas.json` file is missing or broken.',
       )
     }
+    return DEFAULT_RETURN
   }
 }
 
@@ -142,21 +159,18 @@ const parseAreas = (areasObj) => {
   if (!areasObj) {
     return { names, polygons }
   }
+  console.log('stuff')
   areasObj.features.forEach((feature) => {
     const { name, key, manual } = feature.properties
-    if (feature.geometry.type == 'Polygon' && name && !manual) {
-      polygons[key] = []
-      feature.geometry.coordinates.forEach((coordPair) => {
-        polygons[key].push(...coordPair)
-      })
-      if (
-        polygons[key][0].every(
-          (coord, i) => coord !== polygons[key][polygons[key].length - 1][i],
-        )
-      ) {
-        polygons[key].push(polygons[key][0])
-      }
+    if (
+      (feature.geometry.type == 'Polygon' ||
+        feature.geometry.type === 'MultiPolygon') &&
+      name &&
+      !manual
+    ) {
+      polygons[key] = feature.geometry
       names.push(key)
+
       if (withoutParents[name]) {
         withoutParents[name].push(key)
       } else {
@@ -168,8 +182,8 @@ const parseAreas = (areasObj) => {
 }
 
 // Check if an areas.json exists
-const { raw, names, withoutParents, polygons } = (async () => {
-  config.scanAreas = {
+module.exports = async () => {
+  const scanAreas = {
     main: await loadScanPolygons(config.map.geoJsonFileName),
     ...Object.fromEntries(
       await Promise.all(
@@ -183,8 +197,8 @@ const { raw, names, withoutParents, polygons } = (async () => {
     ),
   }
 
-  config.scanAreasMenu = Object.fromEntries(
-    Object.entries(config.scanAreas).map(([domain, areas]) => {
+  const scanAreasMenu = Object.fromEntries(
+    Object.entries(scanAreas).map(([domain, areas]) => {
       const parents = { '': { children: [], name: '' } }
 
       const noHidden = {
@@ -228,19 +242,18 @@ const { raw, names, withoutParents, polygons } = (async () => {
       ]
     }),
   )
-  config.scanAreasObj = Object.fromEntries(
-    Object.values(config.scanAreas)
+  const scanAreasObj = Object.fromEntries(
+    Object.values(scanAreas)
       .flatMap((areas) => areas.features)
       .map((feature) => [feature.properties.name, feature]),
   )
-})().then(async () => ({
-  raw: loadAreas(),
-  ...parseAreas(raw),
-}))
 
-module.exports = {
-  raw,
-  names,
-  withoutParents,
-  polygons,
+  const raw = loadAreas(scanAreas)
+  return {
+    scanAreas,
+    scanAreasMenu,
+    scanAreasObj,
+    raw,
+    ...parseAreas(raw),
+  }
 }
