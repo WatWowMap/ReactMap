@@ -159,7 +159,6 @@ const parseAreas = (areasObj) => {
   if (!areasObj) {
     return { names, polygons }
   }
-  console.log('stuff')
   areasObj.features.forEach((feature) => {
     const { name, key, manual } = feature.properties
     if (
