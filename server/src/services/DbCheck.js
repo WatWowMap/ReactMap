@@ -105,10 +105,12 @@ module.exports = class DbCheck {
                 .columnInfo()
                 .then((columns) => ['layer' in columns])
             : [false]
-          const [hasMultiInvasions, multiInvasionMs] = await schema('incident')
+          const [hasMultiInvasions, multiInvasionMs] = await schema(
+            isMad ? 'pokestop_incident' : 'incident',
+          )
             .columnInfo()
             .then((columns) => [
-              'character' in columns,
+              (isMad ? 'character_display' : 'character') in columns,
               'expiration_ms' in columns,
             ])
           const [availableSlotsCol] = await schema('gym')
