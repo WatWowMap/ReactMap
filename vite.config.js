@@ -3,6 +3,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable import/no-extraneous-dependencies */
 const { defineConfig, loadEnv } = require('vite')
+const commonjs = require('vite-plugin-commonjs')
 const { default: react } = require('@vitejs/plugin-react')
 const { default: checker } = require('vite-plugin-checker')
 const { viteStaticCopy } = require('vite-plugin-static-copy')
@@ -70,6 +71,8 @@ module.exports = defineConfig(({ mode }) => {
 
   return {
     plugins: [
+      // @ts-ignore
+      commonjs(),
       react({
         jsxRuntime: 'classic',
       }),
