@@ -101,12 +101,11 @@ module.exports = class Pokestop extends Model {
         .leftJoin('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
         .select([
           '*',
-          'pokestop_id AS id',
+          'pokestop.pokestop_id AS id',
           'latitude AS lat',
           'longitude AS lon',
           'active_fort_modifier AS lure_id',
           'image AS url',
-          'incident_grunt_type AS grunt_type',
           'is_ar_scan_eligible AS ar_scan_eligible',
           'quest_stardust AS stardust_amount',
           'quest_condition AS quest_conditions',
@@ -171,6 +170,8 @@ module.exports = class Pokestop extends Model {
             'incident.character AS grunt_type',
           ])
       }
+    } else if (isMad) {
+      query.select('incident_grunt_type AS grunt_type')
     }
     query
       .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
