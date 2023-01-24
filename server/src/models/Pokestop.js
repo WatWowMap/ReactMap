@@ -803,7 +803,11 @@ module.exports = class Pokestop extends Model {
       ) {
         filtered[result.id].invasions.push(invasion)
       }
-      filtered[result.id].quests.push(quest)
+      if (
+        !filtered[result.id].quests.find((q) => q.with_ar === quest.with_ar)
+      ) {
+        filtered[result.id].quests.push(quest)
+      }
     }
     return Object.values(filtered)
   }
