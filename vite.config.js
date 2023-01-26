@@ -51,7 +51,7 @@ module.exports = defineConfig(({ mode }) => {
   const pkg = JSON.parse(
     fs.readFileSync(resolve(__dirname, 'package.json'), 'utf8'),
   )
-
+  const version = env.npm_package_version || pkg.version
   const hasCustom = (function checkFolders(folder, isCustom = false) {
     const files = fs.readdirSync(folder)
     for (let i = 0; i < files.length; i += 1) {
@@ -65,7 +65,7 @@ module.exports = defineConfig(({ mode }) => {
   })(resolve(__dirname, 'src'))
 
   if (mode === 'production') {
-    console.log(`[BUILD] Building production version: ${pkg.version}`)
+    console.log(`[BUILD] Building production version: ${version}`)
   }
 
   return {
@@ -115,7 +115,7 @@ module.exports = defineConfig(({ mode }) => {
         SENTRY_DSN: env.SENTRY_DSN || '',
         SENTRY_TRACES_SAMPLE_RATE: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
         SENTRY_DEBUG: env.SENTRY_DEBUG || false,
-        VERSION: env.npm_package_version || pkg.version,
+        VERSION: version,
         DEVELOPMENT: mode === 'development',
         CUSTOM: hasCustom,
         LOCALES: fs.readdirSync(resolve(__dirname, 'public/locales')),
@@ -132,6 +132,7 @@ module.exports = defineConfig(({ mode }) => {
       input: { main: resolve(__dirname, 'index.html') },
       assetsDir: '',
       emptyOutDir: true,
+      chunkSizeWarningLimit: 2000,
       rollupOptions: {
         plugins: [
           // @ts-ignore
@@ -140,6 +141,13 @@ module.exports = defineConfig(({ mode }) => {
             hook: 'generateBundle',
           }),
         ],
+        output: {
+          manualChunks: (id) => {
+            if (id.endsWith('.css')) return 'index'
+            if (id.includes('node_modules')) return 'vendor'
+            if (id.includes('src')) return version.replaceAll('.', '-')
+          },
+        },
       },
     },
     server: {

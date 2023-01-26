@@ -38,7 +38,7 @@ if (inject) {
     debug: SENTRY_DEBUG,
     beforeSend: async (event) => {
       const errors = event.exception.values
-      const isLibrary = errors.find((e) => e?.value?.includes('_'))
+      const isLibrary = errors.find((e) => e?.value?.includes('vendor'))
       const fetchError = errors.find((e) => e?.value?.includes('<'))
 
       if (!isLibrary) {
