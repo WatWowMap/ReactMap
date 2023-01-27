@@ -21,8 +21,6 @@ export default class UIcons {
   }
 
   build(icons) {
-    const baseUrl =
-      'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
     icons.forEach((icon) => {
       try {
         const { data, name: unclean, path } = icon
@@ -70,7 +68,7 @@ export default class UIcons {
                   ...this[name].modifiers[category],
                 }
               }
-              if (path === baseUrl) {
+              if (path.includes('wwm')) {
                 this.selected.misc = name
               }
               if (!this.selected[category]) {
@@ -85,6 +83,8 @@ export default class UIcons {
         console.error('Issue loading', icon, '\n', e)
       }
     })
+    // for debugging purposes/viewing
+    window.uicons = this
   }
 
   get selection() {
@@ -98,14 +98,14 @@ export default class UIcons {
   setSelection(categories, value) {
     if (typeof categories === 'object') {
       Object.keys(categories).forEach((category) => {
-        if (category !== 'misc') {
+        if (this[categories[category]]) {
           this.selected[category] = categories[category]
           this.modifiers[category] = this[categories[category]]
             ? this[categories[category]].modifiers[category]
             : this.modifiers.base
         }
       })
-    } else if (categories !== 'misc') {
+    } else if (this[categories]) {
       this.selected[categories] = value
       this.modifiers[categories] = this[value]
         ? this[value].modifiers[categories]
