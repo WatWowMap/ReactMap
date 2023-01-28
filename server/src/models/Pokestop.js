@@ -799,7 +799,10 @@ module.exports = class Pokestop extends Model {
       }
       if (
         typeof invasion.grunt_type === 'number' &&
-        invasion.incident_expire_timestamp >= ts
+        invasion.incident_expire_timestamp >= ts &&
+        !filtered[result.id].invasions.find(
+          (q) => q.grunt_type === invasion.grunt_type,
+        )
       ) {
         filtered[result.id].invasions.push(invasion)
       }
