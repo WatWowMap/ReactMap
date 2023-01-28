@@ -5,7 +5,6 @@ import MoreVert from '@material-ui/icons/MoreVert'
 import {
   Grid,
   Typography,
-  Icon,
   Collapse,
   IconButton,
   Divider,
@@ -25,6 +24,7 @@ import Dropdown from './common/Dropdown'
 import GenericTimer from './common/Timer'
 import BadgeSelection from '../layout/dialogs/BadgeSelection'
 import PowerUp from './common/PowerUp'
+import GenderIcon from './common/GenderIcon'
 
 export default function GymPopup({
   gym,
@@ -362,9 +362,9 @@ const RaidImage = ({ gym, ts, Icons, t }) => {
             }}
           />
         ))}
-      {raid_pokemon_id > 0 && raid_pokemon_gender != 3 && (
+      {!!raid_pokemon_gender && (
         <Grid item xs={4} style={{ textAlign: 'center' }}>
-          <Icon>{raid_pokemon_gender === 1 ? 'male' : 'female'}</Icon>
+          <GenderIcon gender={raid_pokemon_gender} />
         </Grid>
       )}
     </Grid>

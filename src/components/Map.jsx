@@ -132,9 +132,9 @@ export default function Map({
   useEffect(() => {
     if (settings.navigationControls === 'leaflet') {
       lc.addTo(map)
-    } else {
-      lc.remove()
+      return () => lc.remove()
     }
+    lc.remove()
   }, [settings.navigationControls])
 
   return (

@@ -28,7 +28,7 @@ const generate = async (
       ...masterfile,
       pokemon: Object.fromEntries(
         Object.values(masterfile.pokemon).map((pokemon) => {
-          const { legendary, mythical, ultraBeast, ...rest } = pokemon
+          const { legendary, mythical, ultraBeast } = pokemon
           const historic =
             historicRarity.get(pokemon.pokedexId.toString()) || 'never'
 
@@ -53,7 +53,7 @@ const generate = async (
               },
             ]),
           )
-          return [pokemon.pokedexId, { ...rest, forms, rarity, historic }]
+          return [pokemon.pokedexId, { ...pokemon, forms, rarity, historic }]
         }),
       ),
     }

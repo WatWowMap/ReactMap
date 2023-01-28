@@ -18,6 +18,7 @@ module.exports = class DbCheck {
     this.rarityPercents = rarityPercents
     this.models = {}
     this.questConditions = {}
+    this.memEndpoints = {}
     this.rarity = new Map()
     this.historical = new Map()
     this.connections = dbSettings.schemas
@@ -32,6 +33,9 @@ module.exports = class DbCheck {
           }
           this.models[capital].push({ connection: i })
         })
+        if (schema.endpoint) {
+          this.memEndpoints[i] = schema.endpoint
+        }
         return knex({
           client: 'mysql2',
           connection: {
@@ -76,11 +80,14 @@ module.exports = class DbCheck {
     await Promise.all(
       this.connections.map(async (schema, i) => {
         try {
-          const [isMad, pvpV2, hasSize, hasHeight] = await schema('pokemon')
+          const [isMad, pvpV2, mem, hasSize, hasHeight] = await schema(
+            'pokemon',
+          )
             .columnInfo()
             .then((columns) => [
               'cp_multiplier' in columns,
               'pvp' in columns,
+              Object.keys(columns).length ? '' : this.memEndpoints[i],
               'size' in columns,
               'height' in columns,
             ])
@@ -98,10 +105,12 @@ module.exports = class DbCheck {
                 .columnInfo()
                 .then((columns) => ['layer' in columns])
             : [false]
-          const [hasMultiInvasions, multiInvasionMs] = await schema('incident')
+          const [hasMultiInvasions, multiInvasionMs] = await schema(
+            isMad ? 'pokestop_incident' : 'incident',
+          )
             .columnInfo()
             .then((columns) => [
-              'character' in columns,
+              (isMad ? 'character_display' : 'character') in columns,
               'expiration_ms' in columns,
             ])
           const [availableSlotsCol] = await schema('gym')
@@ -116,6 +125,7 @@ module.exports = class DbCheck {
               if (source.connection === i) {
                 this.models[category][j].isMad = isMad
                 this.models[category][j].pvpV2 = pvpV2
+                this.models[category][j].mem = mem
                 this.models[category][j].hasSize = hasSize
                 this.models[category][j].hasHeight = hasHeight
                 this.models[category][j].hasRewardAmount = hasRewardAmount
@@ -172,7 +182,7 @@ module.exports = class DbCheck {
     try {
       const results = await Promise.all(
         (this.models.Pokemon ?? []).map(async (source) =>
-          source.isMad
+          source.isMad || source.mem
             ? []
             : source.SubModel.query()
                 .select('pokemon_id', raw('SUM(count) as total'))

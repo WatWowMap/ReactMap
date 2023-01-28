@@ -147,7 +147,9 @@ export default function useFilter(
                 if (
                   ((tempAdvFilter.generations || generations[item.genId]) &&
                     (tempAdvFilter.types || typeResolver(item.formTypes)) &&
-                    (tempAdvFilter.rarity || rarity[item.rarity]) &&
+                    (tempAdvFilter.rarity ||
+                      rarity[item.rarity] ||
+                      Object.entries(rarity).some(([k, v]) => v && item[k])) &&
                     (tempAdvFilter.historicRarity ||
                       historicRarity[item.historic]) &&
                     (tempAdvFilter.categories || categories[subCategory]) &&
@@ -178,7 +180,11 @@ export default function useFilter(
                   if (
                     ((tempAdvFilter.generations || generations[item.genId]) &&
                       (tempAdvFilter.types || typeResolver(item.formTypes)) &&
-                      (tempAdvFilter.rarity || rarity[item.rarity]) &&
+                      (tempAdvFilter.rarity ||
+                        rarity[item.rarity] ||
+                        Object.entries(rarity).some(
+                          ([k, v]) => v && item[k],
+                        )) &&
                       (tempAdvFilter.historicRarity ||
                         historicRarity[item.historic]) &&
                       (tempAdvFilter.categories || categories[subCategory]) &&
@@ -225,6 +231,7 @@ export default function useFilter(
                   generations[item.genId] ||
                   item.formTypes.some((x) => types[x]) ||
                   rarity[item.rarity] ||
+                  Object.entries(rarity).some(([k, v]) => v && item[k]) ||
                   historicRarity[item.historic] ||
                   forms[item.name] ||
                   (forms.altForms && item.formId != item.defaultFormId) ||

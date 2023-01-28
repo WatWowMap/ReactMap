@@ -14,7 +14,7 @@ const { Pvp, Event } = require('./initialization')
 const jsifyIvFilter = (filter) => {
   const input = filter.toUpperCase()
   const tokenizer =
-    /\s*([()|&!,]|([ADSL]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
+    /\s*([()|&!,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
   let result = ''
   let expectClause = true // expect a clause or '('
   let stack = 0
@@ -36,11 +36,17 @@ const jsifyIvFilter = (filter) => {
           case 'D':
             column = 'def_iv'
             break
+          case 'G':
+            column = 'gender'
+            break
           case 'S':
             column = 'sta_iv'
             break
           case 'L':
             column = 'level'
+            break
+          case 'X':
+            column = 'size'
             break
           case 'CP':
             column = 'cp'
@@ -288,6 +294,10 @@ const getLegacy = (results, args, perms, ts) => {
         filtered.cp = result.cp
         filtered.iv = result.iv
         filtered.level = result.level
+        filtered.weight = result.weight
+        filtered.size = result.size
+        filtered.height = result.height
+        filtered.gender = result.gender
       }
       if (perms.pvp && interestedLevelCaps.length) {
         const { great, ultra } = pvpMinCp
@@ -351,7 +361,6 @@ const getLegacy = (results, args, perms, ts) => {
       filtered.lon = result.lon
       filtered.spawn_id = result.spawn_id
       filtered.expire_timestamp = result.expire_timestamp
-      filtered.gender = result.gender
       filtered.form = result.form
       filtered.costume = result.costume
       filtered.weather = result.weather
@@ -359,16 +368,13 @@ const getLegacy = (results, args, perms, ts) => {
       filtered.pokestop_id = result.pokestop_id
       filtered.first_seen_timestamp = result.first_seen_timestamp
       filtered.updated = result.updated
-      filtered.changed = result.changed
+      filtered.changed = !!result.changed
       filtered.cellId = result.cell_id
-      filtered.expire_timestamp_verified = result.expire_timestamp_verified
+      filtered.expire_timestamp_verified = !!result.expire_timestamp_verified
       filtered.display_pokemon_id = result.display_pokemon_id
       if (perms.iv) {
         filtered.move_1 = result.move_1
         filtered.move_2 = result.move_2
-        filtered.weight = result.weight
-        filtered.size = result.size
-        filtered.height = result.height
       }
       pokemon.push(filtered)
     }

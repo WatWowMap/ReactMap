@@ -8,7 +8,6 @@ import {
   Grid,
   Avatar,
   Typography,
-  Icon,
   Collapse,
   IconButton,
   Divider,
@@ -26,6 +25,7 @@ import ErrorBoundary from '@components/ErrorBoundary'
 
 import GenericTimer from './common/Timer'
 import NameTT from './common/NameTT'
+import GenderIcon from './common/GenderIcon'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -367,13 +367,7 @@ const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
       )}
       {!!gender && (
         <Grid item style={{ textAlign: 'center' }}>
-          <Icon>
-            {{
-              1: 'male',
-              2: 'female',
-              3: 'transgender',
-            }[gender] || ''}
-          </Icon>
+          <GenderIcon gender={gender} />
         </Grid>
       )}
       {!!size && Number.isInteger(size) && (
