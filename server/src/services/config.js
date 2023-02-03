@@ -111,9 +111,9 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
     config.database.schemas.push({
       host: REACT_MAP_DB_HOST,
       port: +REACT_MAP_DB_PORT,
-      database: REACT_MAP_DB_USERNAME,
-      username: REACT_MAP_DB_PASSWORD,
-      password: REACT_MAP_DB_NAME,
+      database: REACT_MAP_DB_NAME,
+      username: REACT_MAP_DB_USERNAME,
+      password: REACT_MAP_DB_PASSWORD,
       useFor: ['session', 'user'],
     })
   } else {
