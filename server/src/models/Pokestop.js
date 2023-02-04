@@ -636,7 +636,10 @@ module.exports = class Pokestop extends Model {
           'power_up_end_timestamp',
         ])
       }
-      if (perms.eventStops && filters.onlyEventStops) {
+      if (
+        perms.eventStops &&
+        (filters.onlyAllPokestops || filters.onlyEventStops)
+      ) {
         filtered.events = pokestop.invasions
           .filter((event) =>
             isMad && !hasMultiInvasions
@@ -651,10 +654,13 @@ module.exports = class Pokestop extends Model {
                 : event.display_type,
           }))
       }
-      if (perms.invasions && filters.onlyInvasions) {
+      if (
+        perms.invasions &&
+        (filters.onlyAllPokestops || filters.onlyInvasions)
+      ) {
         filtered.invasions = pokestop.invasions.filter(
           (invasion) =>
-            filters[`i${invasion.grunt_type}`] &&
+            (filters[`i${invasion.grunt_type}`] || filters.onlyAllPokestops) &&
             (isMad && !hasMultiInvasions
               ? !MADE_UP_MAD_INVASIONS.includes(invasion.grunt_type)
               : invasion.grunt_type),

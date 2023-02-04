@@ -140,6 +140,7 @@ const areEqual = (prev, next) =>
   prev.item.lure_expire_timestamp === next.item.lure_expire_timestamp &&
   prev.item.quests?.length === next.item.quests?.length &&
   prev.item.invasions?.length === next.item.invasions?.length &&
+  prev.item.events?.length === next.item.events?.length &&
   prev.item.updated === next.item.updated &&
   prev.showTimer === next.showTimer &&
   (prev.item.quests && next.item.quests
