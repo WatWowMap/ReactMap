@@ -5,6 +5,7 @@ import destination from '@turf/destination'
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
+import fallbackIcon from '@components/markers/fallback'
 
 const RADIUS_POKEMON = 70
 const RADIUS_GYM = 750
@@ -90,6 +91,7 @@ export default function ScanNextTarget({
         eventHandlers={eventHandlers}
         position={position}
         ref={scanMarkerRef}
+        icon={fallbackIcon()}
       >
         <Popup minWidth={90} maxWidth={150} ref={scanPopupRef} autoPan={false}>
           <Grid

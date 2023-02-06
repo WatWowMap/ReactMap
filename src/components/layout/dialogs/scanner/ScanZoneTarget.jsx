@@ -6,6 +6,7 @@ import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
 import Utility from '@services/Utility'
+import fallbackIcon from '@components/markers/fallback'
 
 const calcScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
   let coords = [center]
@@ -138,6 +139,7 @@ export default function ScanZoneTarget({
         eventHandlers={eventHandlers}
         position={position}
         ref={scanMarkerRef}
+        icon={fallbackIcon()}
       >
         <Popup minWidth={90} maxWidth={200} ref={scanPopupRef} autoPan={false}>
           <Grid
