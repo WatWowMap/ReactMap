@@ -55,7 +55,7 @@ const PokestopTile = ({
   if ((showTimer || userSettings.lureTimers) && hasLure) {
     timers.push(item.lure_expire_timestamp)
   }
-  if (showTimer || (userSettings.eventStopTimers && hasEvent)) {
+  if ((showTimer || userSettings.eventStopTimers) && hasEvent) {
     item.events.forEach((event) => {
       if (!event.grunt_type) {
         timers.push(event.event_expire_timestamp)
