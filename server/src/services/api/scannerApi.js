@@ -30,11 +30,12 @@ module.exports = async function scannerApi(
       parseFloat(data.scanCoords[0][0].toFixed(5)),
       parseFloat(data.scanCoords[0][1].toFixed(5)),
     ]
-    : config.scanner.backendConfig.platform === 'scout'
-    ? data.scanCoords.map((coord) => [
-      parseFloat(coord[0].toFixed(5)),
-      parseFloat(coord[1].toFixed(5)),
-    ])
+    : config.scanner.backendConfig.platform === 'custom'
+    ? [ data.scanCoords.map((coord) => [
+        parseFloat(coord[0].toFixed(5)),
+        parseFloat(coord[1].toFixed(5)),
+      ])
+    ]
     : data.scanCoords?.map((coord) => ({
       lat: parseFloat(coord[0].toFixed(5)),
       lon: parseFloat(coord[1].toFixed(5)),
@@ -50,6 +51,15 @@ module.exports = async function scannerApi(
             `${config.scanner.backendConfig.apiUsername}:${config.scanner.backendConfig.apiPassword}`,
           ).toString('base64')}`,
         })
+        break
+      case 'custom':
+        if (config.scanner.backendConfig.apiUsername || config.scanner.backendConfig.apiPassword) {
+          Object.assign(headers, {
+            Authorization: `Basic ${Buffer.from(
+                `${config.scanner.backendConfig.apiUsername}:${config.scanner.backendConfig.apiPassword}`,
+            ).toString('base64')}`,
+          })
+        }
         break
       default:
         break
@@ -95,13 +105,13 @@ module.exports = async function scannerApi(
               options: { method, headers },
             })
             break
-          case 'scout':
+          case 'custom':
             Object.assign(payloadObj, {
               url: config.scanner.backendConfig.apiEndpoint,
               options: {
                 method: 'POST',
                 headers,
-                body: JSON.stringify(coords)
+                body: coords
               },
             })
             break
@@ -122,13 +132,13 @@ module.exports = async function scannerApi(
           )},${data.scanLocation[1].toFixed(5)}`,
         )
         switch (config.scanner.backendConfig.platform) {
-          case 'scout':
+          case 'custom':
             Object.assign(payloadObj, {
               url: config.scanner.backendConfig.apiEndpoint,
               options: {
                 method: 'POST',
                 headers,
-                body: JSON.stringify(coords)
+                body: coords
               },
             });
             break;
@@ -154,7 +164,7 @@ module.exports = async function scannerApi(
         }
         console.log(`[scannerApi] Getting queue for method ${data.typeName}`)
         switch (config.scanner.backendConfig.platform) {
-          case 'scout':
+          case 'custom':
             Object.assign(payloadObj, {
               url: `${config.scanner.backendConfig.apiEndpoint}/queue`,
               options: { method, headers },
@@ -189,7 +199,7 @@ module.exports = async function scannerApi(
     }
 
     if (scannerResponse.status === 200 && category === 'getQueue') {
-      if (config.scanner.backendConfig.platform === 'scout') {
+      if (config.scanner.backendConfig.platform === 'custom') {
         const { data: queueData } = await scannerResponse.json()
         console.log(
           `[scannerApi] Returning received queue for method ${data.typeName}: ${queueData.queue}`,
