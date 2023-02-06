@@ -26,7 +26,8 @@ module.exports = async function scannerApi(
 
   const coords =
     config.scanner.backendConfig.platform === 'mad'
-      ? [        parseFloat(data.scanCoords[0][0].toFixed(5)),
+      ? [
+          parseFloat(data.scanCoords[0][0].toFixed(5)),
           parseFloat(data.scanCoords[0][1].toFixed(5)),
         ]
       : config.scanner.backendConfig.platform === 'custom'
@@ -220,7 +221,7 @@ module.exports = async function scannerApi(
       }
     }
 
-    if (Clients[user.rmStrategy]) {
+    if (Clients[user.rmStrategy] && config.scanner.backendConfig.sendDiscordMessage) {
       const capitalized = category.replace('scan', 'Scan ')
       const updatedCache = userCache.get(user.id)
       const trimmed = coords
