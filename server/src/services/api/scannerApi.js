@@ -26,14 +26,19 @@ module.exports = async function scannerApi(
 
   const coords =
     config.scanner.backendConfig.platform === 'mad'
-      ? [
-          parseFloat(data.scanCoords[0][0].toFixed(5)),
-          parseFloat(data.scanCoords[0][1].toFixed(5)),
-        ]
-      : data.scanCoords?.map((coord) => ({
-          lat: parseFloat(coord[0].toFixed(5)),
-          lon: parseFloat(coord[1].toFixed(5)),
-        })) || []
+    ? [
+      parseFloat(data.scanCoords[0][0].toFixed(5)),
+      parseFloat(data.scanCoords[0][1].toFixed(5)),
+    ]
+    : config.scanner.backendConfig.platform === 'scout'
+    ? data.scanCoords.map((coord) => [
+      parseFloat(coord[0].toFixed(5)),
+      parseFloat(coord[1].toFixed(5)),
+    ])
+    : data.scanCoords?.map((coord) => ({
+      lat: parseFloat(coord[0].toFixed(5)),
+      lon: parseFloat(coord[1].toFixed(5)),
+    })) || []
 
   try {
     const headers = {}
@@ -67,23 +72,42 @@ module.exports = async function scannerApi(
             5,
           )},${data.scanLocation[1].toFixed(5)}`,
         )
-        Object.assign(payloadObj, {
-          url:
-            config.scanner.backendConfig.platform === 'mad'
-              ? `${
-                  config.scanner.backendConfig.apiEndpoint
-                }/send_gps?origin=${encodeURIComponent(
-                  config.scanner.scanNext.scanNextDevice,
-                )}&coords=${JSON.stringify(coords)}&sleeptime=${
-                  config.scanner.scanNext.scanNextSleeptime
-                }`
-              : `${
-                  config.scanner.backendConfig.apiEndpoint
-                }/set_data?scan_next=true&instance=${encodeURIComponent(
-                  config.scanner.scanNext.scanNextInstance,
-                )}&coords=${JSON.stringify(coords)}`,
-          options: { method, headers },
-        })
+        switch (config.scanner.backendConfig.platform) {
+          case 'mad':
+            Object.assign(payloadObj, {
+              url: `${
+                config.scanner.backendConfig.apiEndpoint
+              }/send_gps?origin=${encodeURIComponent(
+                config.scanner.scanNext.scanNextDevice,
+              )}&coords=${JSON.stringify(coords)}&sleeptime=${
+                config.scanner.scanNext.scanNextSleeptime
+              }`,
+              options: { method, headers },
+            })
+            break
+          case 'rdm':
+            Object.assign(payloadObj, {
+              url: `${
+                config.scanner.backendConfig.apiEndpoint
+              }/set_data?scan_next=true&instance=${encodeURIComponent(
+                config.scanner.scanNext.scanNextInstance,
+              )}&coords=${JSON.stringify(coords)}`,
+              options: { method, headers },
+            })
+            break
+          case 'scout':
+            Object.assign(payloadObj, {
+              url: config.scanner.backendConfig.apiEndpoint,
+              options: {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(coords)
+              },
+            })
+            break
+          default:
+            break
+        }
         break
       case 'scanZone':
         userCache.set(user.id, {
@@ -97,14 +121,24 @@ module.exports = async function scannerApi(
             5,
           )},${data.scanLocation[1].toFixed(5)}`,
         )
-        Object.assign(payloadObj, {
-          url: `${
-            config.scanner.backendConfig.apiEndpoint
-          }/set_data?scan_next=true&instance=${encodeURIComponent(
-            config.scanner.scanZone.scanZoneInstance,
-          )}&coords=${JSON.stringify(coords)}`,
-          options: { method, headers },
-        })
+        switch (config.scanner.backendConfig.platform) {
+          case 'scout':
+            Object.assign(payloadObj, {
+              url: config.scanner.backendConfig.apiEndpoint,
+              options: {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(coords)
+              },
+            });
+            break;
+          default:
+            Object.assign(payloadObj, {
+              url: `${config.scanner.backendConfig.apiEndpoint}/set_data?scan_next=true&instance=${encodeURIComponent(config.scanner.scanZone.scanZoneInstance)}&coords=${JSON.stringify(coords)}`,
+              options: { method, headers },
+            });
+            break;
+        }
         break
       case 'getQueue':
         if (
@@ -119,14 +153,20 @@ module.exports = async function scannerApi(
           return { status: 'ok', message: scannerQueue[data.typeName].queue }
         }
         console.log(`[scannerApi] Getting queue for method ${data.typeName}`)
-        Object.assign(payloadObj, {
-          url: `${config.scanner.backendConfig.apiEndpoint}/get_data?${
-            data.type
-          }=true&queue_size=true&instance=${encodeURIComponent(
-            config.scanner[data.typeName][`${data.typeName}Instance`],
-          )}`,
-          options: { method, headers },
-        })
+        switch (config.scanner.backendConfig.platform) {
+          case 'scout':
+            Object.assign(payloadObj, {
+              url: `${config.scanner.backendConfig.apiEndpoint}/queue`,
+              options: { method, headers },
+            });
+            break;
+          default:
+            Object.assign(payloadObj, {
+              url: `${config.scanner.backendConfig.apiEndpoint}/get_data?${data.type}=true&queue_size=true&instance=${encodeURIComponent(config.scanner[data.typeName][`${data.typeName}Instance`])}`,
+              options: { method, headers },
+            });
+            break;
+        }
         break
       default:
         console.warn('[scannerApi] Api call without category')
@@ -149,15 +189,27 @@ module.exports = async function scannerApi(
     }
 
     if (scannerResponse.status === 200 && category === 'getQueue') {
-      const { data: queueData } = await scannerResponse.json()
-      console.log(
-        `[scannerApi] Returning received queue for method ${data.typeName}: ${queueData.size}`,
-      )
-      scannerQueue[data.typeName] = {
-        queue: queueData.size,
-        timestamp: Date.now(),
+      if (config.scanner.backendConfig.platform === 'scout') {
+        const { data: queueData } = await scannerResponse.json()
+        console.log(
+          `[scannerApi] Returning received queue for method ${data.typeName}: ${queueData.queue}`,
+        )
+        scannerQueue[data.typeName] = {
+          queue: queueData.queue,
+          timestamp: Date.now(),
+        }
+        return { status: 'ok', message: queueData.queue }
+      } else {
+        const { data: queueData } = await scannerResponse.json()
+        console.log(
+          `[scannerApi] Returning received queue for method ${data.typeName}: ${queueData.size}`,
+        )
+        scannerQueue[data.typeName] = {
+          queue: queueData.size,
+          timestamp: Date.now(),
+        }
+        return { status: 'ok', message: queueData.size }
       }
-      return { status: 'ok', message: queueData.size }
     }
 
     if (Clients[user.rmStrategy]) {
