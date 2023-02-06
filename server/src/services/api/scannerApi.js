@@ -226,8 +226,11 @@ module.exports = async function scannerApi(
       const updatedCache = userCache.get(user.id)
       const trimmed = coords
         .filter((_c, i) => i < 25)
-        .map((c) => `${c.lat}, ${c.lon}`)
-        .join('\n')
+        .map((c) => config.scanner.backendConfig.platform === 'custom'
+          ? `${c[0]}, ${c[1]}`
+          : `${c.lat}, ${c.lon}`
+        )
+        .join('\n');
       switch (user.strategy) {
         case 'discord':
           await Clients[user.rmStrategy].sendMessage(
@@ -268,7 +271,7 @@ module.exports = async function scannerApi(
                         ? `Device: ${config.scanner.scanNext.scanNextDevice}`
                         : ''
                     }\nName: ${
-                      config.scanner[category]?.[`${category}Instance`]
+                      config.scanner[category]?.[`${category}Instance`] || '-'
                     }\nQueue: ${scannerQueue[category]?.queue || 0}`,
                     inline: true,
                   },
