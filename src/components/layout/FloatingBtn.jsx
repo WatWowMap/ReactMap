@@ -172,7 +172,7 @@ export default function FloatingButtons({
       ) : null}
       {perms?.scanner?.includes('scanZone') &&
       enableScanZone &&
-      scannerType === 'rdm' || scannerType === 'custom' ? (
+      scannerType !== 'mad'  ? (
         <Grid item>
           <Fab
             color={scanZoneMode === 'setLocation' ? null : 'secondary'}
