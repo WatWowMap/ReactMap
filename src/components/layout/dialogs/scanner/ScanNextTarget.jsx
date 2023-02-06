@@ -104,7 +104,7 @@ export default function ScanNextTarget({
                 {t('scan_next_choose')}
               </Typography>
             </Grid>
-            {scannerType === 'rdm' || scannerType === 'custom' && (
+            {scannerType !== 'mad' && (
               <Grid item xs={12} style={{ textAlign: 'center' }}>
                 <ButtonGroup size="small">
                   {['S', 'M', 'XL'].map((item) => (
