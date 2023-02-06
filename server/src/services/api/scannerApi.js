@@ -36,10 +36,11 @@ module.exports = async function scannerApi(
         parseFloat(coord[1].toFixed(5)),
       ])
     ]
-    : data.scanCoords?.map((coord) => ({
-      lat: parseFloat(coord[0].toFixed(5)),
-      lon: parseFloat(coord[1].toFixed(5)),
-    })) || []
+    : data.scanCoords.map((coord) => [
+        parseFloat(coord[0].toFixed(5)),
+        parseFloat(coord[1].toFixed(5)),
+      ])
+    || []
 
   try {
     const headers = {}
@@ -198,7 +199,7 @@ module.exports = async function scannerApi(
       throw new Error('[scannerApi] No data returned from server')
     }
 
-    if (scannerResponse.status === 200 && category === 'getQueue') {
+    if (scannerResponse.status === 200 || scannerResponse.status === 201 && category === 'getQueue') {
       if (config.scanner.backendConfig.platform === 'custom') {
         const { data: queueData } = await scannerResponse.json()
         console.log(
@@ -292,6 +293,7 @@ module.exports = async function scannerApi(
 
     switch (scannerResponse.status) {
       case 200:
+      case 201:
         console.log(
           `[scannerApi] Request from ${user.username || 'a visitor'}${
             user.id ? ` (${user.id})` : ''
