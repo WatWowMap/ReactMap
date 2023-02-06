@@ -152,7 +152,7 @@ export default function ScanZoneTarget({
                 {t('scan_zone_choose')}
               </Typography>
             </Grid>
-            {scannerType === 'rdm' && (
+            {scannerType === 'rdm' || scannerType === 'custom' && (
               <Grid item xs={12}>
                 <Box>
                   <Typography variant="caption" align="left">

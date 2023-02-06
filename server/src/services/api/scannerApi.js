@@ -26,21 +26,18 @@ module.exports = async function scannerApi(
 
   const coords =
     config.scanner.backendConfig.platform === 'mad'
-    ? [
-      parseFloat(data.scanCoords[0][0].toFixed(5)),
-      parseFloat(data.scanCoords[0][1].toFixed(5)),
-    ]
-    : config.scanner.backendConfig.platform === 'custom'
-    ? [ data.scanCoords.map((coord) => [
-        parseFloat(coord[0].toFixed(5)),
-        parseFloat(coord[1].toFixed(5)),
-      ])
-    ]
-    : data.scanCoords.map((coord) => [
-        parseFloat(coord[0].toFixed(5)),
-        parseFloat(coord[1].toFixed(5)),
-      ])
-    || []
+      ? [        parseFloat(data.scanCoords[0][0].toFixed(5)),
+          parseFloat(data.scanCoords[0][1].toFixed(5)),
+        ]
+      : config.scanner.backendConfig.platform === 'custom'
+      ? data.scanCoords?.map((coord) => [
+          parseFloat(coord[0].toFixed(5)),
+          parseFloat(coord[1].toFixed(5)),
+        ]) || []
+      : data.scanCoords?.map((coord) => ({
+          lat: parseFloat(coord[0].toFixed(5)),
+          lon: parseFloat(coord[1].toFixed(5)),
+        })) || []
 
   try {
     const headers = {}
@@ -112,7 +109,7 @@ module.exports = async function scannerApi(
               options: {
                 method: 'POST',
                 headers,
-                body: coords
+                body: JSON.stringify(coords)
               },
             })
             break
@@ -139,7 +136,7 @@ module.exports = async function scannerApi(
               options: {
                 method: 'POST',
                 headers,
-                body: coords
+                body: JSON.stringify(coords)
               },
             });
             break;
@@ -201,15 +198,15 @@ module.exports = async function scannerApi(
 
     if (scannerResponse.status === 200 || scannerResponse.status === 201 && category === 'getQueue') {
       if (config.scanner.backendConfig.platform === 'custom') {
-        const { data: queueData } = await scannerResponse.json()
+        const { queue: queue } = await scannerResponse.json()
         console.log(
-          `[scannerApi] Returning received queue for method ${data.typeName}: ${queueData.queue}`,
+          `[scannerApi] Returning received queue for method ${data.typeName}: ${queue}`,
         )
         scannerQueue[data.typeName] = {
-          queue: queueData.queue,
+          queue: queue,
           timestamp: Date.now(),
         }
-        return { status: 'ok', message: queueData.queue }
+        return { status: 'ok', message: queue }
       } else {
         const { data: queueData } = await scannerResponse.json()
         console.log(
