@@ -76,23 +76,10 @@ module.exports = class EventManager {
 
   async getUicons(styles) {
     console.log('[EVENT] Fetching Latest UICONS')
-    if (!styles.some((icon) => icon.path === this.baseUrl)) {
-      styles.push({
-        name: 'Base',
-        path: this.baseUrl,
-        modifiers: {
-          gym: {
-            0: 1,
-            1: 1,
-            2: 1,
-            3: 3,
-            4: 4,
-            5: 4,
-            6: 18,
-            sizeMultiplier: 1.2,
-          },
-        },
-      })
+    if (!styles.some((icon) => icon.path.includes('wwm'))) {
+      console.log(
+        '[UICONS] Base uicons not found in config (either remotely or locally). This may be fine, but some things might be broken, such as items from the `misc` folder.',
+      )
     }
     this.uicons = await Promise.all(
       styles.map(async (style) => {

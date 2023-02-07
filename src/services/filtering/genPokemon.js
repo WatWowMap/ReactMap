@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 export default function genPokemon(t, pokemon, categories) {
   const tempObj = Object.fromEntries(
     categories.map((x) => [
@@ -36,12 +37,23 @@ export default function genPokemon(t, pokemon, categories) {
         formTypes,
         rarity: form.rarity || pkmn.rarity,
         historic: pkmn.historic,
+        legendary: pkmn.legendary,
+        mythical: pkmn.mythical,
+        ultraBeast: pkmn.ultraBeast,
         genId: `generation_${pkmn.genId}`,
         perms: ['pokemon', 'raids', 'quests', 'nests'],
         family: pkmn.family,
       }
-      tempObj.pokemon[id].searchMeta = `${Object.values(tempObj.pokemon[id])
-        .flatMap((x) => (Array.isArray(x) ? x.map((y) => t(y)) : t(x)))
+      tempObj.pokemon[id].searchMeta = `${Object.entries(tempObj.pokemon[id])
+        .flatMap(([k, v]) =>
+          Array.isArray(v)
+            ? v.map((y) => t(y))
+            : typeof v === 'boolean'
+            ? v
+              ? t(k)
+              : ''
+            : t(v),
+        )
         .join(' ')
         .toLowerCase()} ${t('pokemon').toLowerCase()}`
     })

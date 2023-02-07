@@ -1025,6 +1025,10 @@
       "queueRefreshInterval": {
         "__name": "SCANNER_BACKEND_CONFIG_QUEUE_REFRESH_INTERVAL",
         "__format": "number"
+      },
+      "sendDiscordMessage": {
+        "__name": "SCANNER_BACKEND_CONFIG_SEND_DISCORD_MESSAGE",
+        "__format": "boolean"
       }
     },
     "scanNext": {

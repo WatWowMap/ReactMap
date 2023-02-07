@@ -1,3 +1,20 @@
+const freezeProps = (target, property) => {
+  const {
+    value,
+    get = () => value,
+    set = () => undefined,
+    // eslint-disable-next-line no-unused-vars
+    writable: _writable,
+    ...desc
+  } = Object.getOwnPropertyDescriptor(target, property)
+  Object.defineProperty(target, property, {
+    ...desc,
+    get,
+    set,
+    configurable: false,
+  })
+}
+
 export default class UIcons {
   constructor({ customizable, sizes, cacheHrs }, questRewardTypes) {
     this.customizable = customizable
@@ -18,11 +35,13 @@ export default class UIcons {
       ([id, category]) =>
         (this.questRewardTypes[id] = category.toLowerCase().replace(' ', '_')),
     )
+    // Freezing since we don't change them in the codebase but we're exposing uicons to the global object and we don't want them to be changed in the browser console
+    freezeProps(this, 'customizable')
+    freezeProps(this, 'sizes')
+    freezeProps(this, 'questRewardTypes')
   }
 
   build(icons) {
-    const baseUrl =
-      'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
     icons.forEach((icon) => {
       try {
         const { data, name: unclean, path } = icon
@@ -70,7 +89,7 @@ export default class UIcons {
                   ...this[name].modifiers[category],
                 }
               }
-              if (path === baseUrl) {
+              if (path.includes('wwm')) {
                 this.selected.misc = name
               }
               if (!this.selected[category]) {
@@ -85,6 +104,13 @@ export default class UIcons {
         console.error('Issue loading', icon, '\n', e)
       }
     })
+    // for debugging purposes/viewing
+    Object.defineProperty(window, 'uicons', {
+      value: this,
+      writable: false,
+      enumerable: true,
+      configurable: false,
+    })
   }
 
   get selection() {
@@ -98,14 +124,14 @@ export default class UIcons {
   setSelection(categories, value) {
     if (typeof categories === 'object') {
       Object.keys(categories).forEach((category) => {
-        if (category !== 'misc') {
+        if (this[categories[category]]) {
           this.selected[category] = categories[category]
           this.modifiers[category] = this[categories[category]]
             ? this[categories[category]].modifiers[category]
             : this.modifiers.base
         }
       })
-    } else if (categories !== 'misc') {
+    } else if (this[categories]) {
       this.selected[categories] = value
       this.modifiers[categories] = this[value]
         ? this[value].modifiers[categories]

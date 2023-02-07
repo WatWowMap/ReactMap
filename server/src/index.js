@@ -30,6 +30,7 @@ const app = express()
 
 const server = new ApolloServer({
   cors: true,
+  cache: 'bounded',
   typeDefs,
   resolvers,
   introspection: config.devOptions.enabled,

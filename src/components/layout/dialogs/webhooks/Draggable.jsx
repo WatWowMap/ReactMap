@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core'
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
+import fallbackIcon from '@components/markers/fallback'
 
 export default function DraggableMarker({
   map,
@@ -53,6 +54,7 @@ export default function DraggableMarker({
         eventHandlers={eventHandlers}
         position={position}
         ref={markerRef}
+        icon={fallbackIcon()}
       >
         <Popup minWidth={90} maxWidth={150} ref={popupRef}>
           <Grid

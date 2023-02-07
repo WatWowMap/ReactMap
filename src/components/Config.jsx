@@ -34,7 +34,7 @@ export default function Config() {
         data.config.icons,
         data.masterfile
           ? data.masterfile.questRewardTypes
-          : JSON.parse(localStorage.getItem('questRewardTypes')),
+          : JSON.parse(localStorage.getItem('questRewardTypes') || '{}'),
       )
       if (Icons) {
         Icons.build(data.config.icons.styles)

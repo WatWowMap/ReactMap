@@ -72,3 +72,4 @@ Desktop.ini
 src/**/*.custom.jsx
 src/**/*.custom.js
 src/**/*.custom.css
+.idea/
