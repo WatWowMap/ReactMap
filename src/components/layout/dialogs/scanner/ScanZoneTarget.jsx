@@ -177,7 +177,7 @@ export default function ScanZoneTarget({
                       { value: scanZoneRadius.gym, label: t('gym') },
                     ]}
                     min={-200}
-                    max={1000}
+                    max={1400}
                     step={null}
                     value={radius}
                     onChange={handleRadiusChange}
