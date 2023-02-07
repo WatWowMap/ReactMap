@@ -561,7 +561,8 @@
       "apiEndpoint": "http://ip:port/api/",
       "apiUsername": "username",
       "apiPassword": "password",
-      "queueRefreshInterval": 5
+      "queueRefreshInterval": 5,
+      "sendDiscordMessage": true
     },
     "scanNext": {
       "enabled": false,
