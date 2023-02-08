@@ -210,8 +210,8 @@ module.exports = async function scannerApi(
     }
 
     if (
-      scannerResponse.status === 200 ||
-      (scannerResponse.status === 201 && category === 'getQueue')
+      (scannerResponse.status === 200 || scannerResponse.status === 201) &&
+      category === 'getQueue'
     ) {
       if (config.scanner.backendConfig.platform === 'custom') {
         const { queue } = await scannerResponse.json()
