@@ -27,7 +27,7 @@ router.get('/hasValid/:id', async (req, res) => {
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
       const results = await Session.query().whereRaw(
-        `json_extract(data, '$.passport.user.id') = ${req.params.id}
+        `json_extract(data, '$.passport.user.id') = "${req.params.id}"
           OR json_extract(data, '$.passport.user.discordId') = "${req.params.id}"
           OR json_extract(data, '$.passport.user.telegramId') = "${req.params.id}"`,
       )
@@ -53,7 +53,7 @@ router.get('/clearSessions/:id', async (req, res) => {
     ) {
       const results = await Session.query()
         .whereRaw(
-          `json_extract(data, '$.passport.user.id') = ${req.params.id}
+          `json_extract(data, '$.passport.user.id') = "${req.params.id}"
             OR json_extract(data, '$.passport.user.discordId') = "${req.params.id}"
             OR json_extract(data, '$.passport.user.telegramId') = "${req.params.id}"`,
         )
