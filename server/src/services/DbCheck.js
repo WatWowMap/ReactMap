@@ -120,6 +120,10 @@ module.exports = class DbCheck {
                 ? 'availble_slots'
                 : 'available_slots',
             ])
+          const [polygon] = await schema('nest')
+            .columnInfo()
+            .then((columns) => ['polygon' in columns])
+
           Object.entries(this.models).forEach(([category, sources]) => {
             sources.forEach((source, j) => {
               if (source.connection === i) {
@@ -135,6 +139,7 @@ module.exports = class DbCheck {
                 this.models[category][j].multiInvasionMs = multiInvasionMs
                 this.models[category][j].availableSlotsCol = availableSlotsCol
                 this.models[category][j].hasLayerColumn = hasLayerColumn
+                this.models[category][j].polygon = polygon
               }
             })
           })

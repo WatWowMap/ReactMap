@@ -19,7 +19,7 @@ module.exports = class Nest extends Model {
     return 'nest_id'
   }
 
-  static async getAll(perms, args) {
+  static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
     const { minLat, minLon, maxLat, maxLon, filters } = args
     const pokemon = []
@@ -36,6 +36,9 @@ module.exports = class Nest extends Model {
     if (!avgFilter.every((x, i) => x === filters.onlyAvgFilter[i])) {
       query.andWhereBetween('pokemon_avg', filters.onlyAvgFilter)
     }
+    if (polygon) {
+      query.select(this.raw('ST_AsGeoJSON(polygon)').as('polygon'))
+    }
     if (!getAreaSql(query, areaRestrictions, filters.onlyAreas || [])) {
       return []
     }
@@ -48,6 +51,14 @@ module.exports = class Nest extends Model {
           const formId = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
           if (formId) pkmn.pokemon_form = formId
         }
+        pkmn.polygon_path =
+          JSON.stringify(pkmn.polygon) ??
+          JSON.stringify({
+            type: 'Polygon',
+            coordinates: JSON.parse(pkmn.polygon_path).map((line) =>
+              line.map((point) => [point[1], point[0]]),
+            ),
+          })
         if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
           returnedResults.push(pkmn)
         }
