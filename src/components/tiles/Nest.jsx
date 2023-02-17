@@ -48,9 +48,9 @@ const NestTile = ({ item, filters, Icons, ts, params, setParams }) => {
           </Popup>
         </Marker>
       )}
-      {geometry && filters.polygons && (
-        <GeoJSON data={{ geometry, type: 'Feature' }} />
-      )}
+      {typeof geometry !== 'string' &&
+        geometry?.coordinates?.length &&
+        filters.polygons && <GeoJSON data={{ geometry, type: 'Feature' }} />}
     </>
   )
 }
