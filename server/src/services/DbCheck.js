@@ -120,7 +120,7 @@ module.exports = class DbCheck {
                 ? 'availble_slots'
                 : 'available_slots',
             ])
-          const [polygon] = await schema('nest')
+          const [polygon] = await schema('nests')
             .columnInfo()
             .then((columns) => ['polygon' in columns])
 

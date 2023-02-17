@@ -51,14 +51,14 @@ module.exports = class Nest extends Model {
           const formId = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
           if (formId) pkmn.pokemon_form = formId
         }
-        pkmn.polygon_path =
-          JSON.stringify(pkmn.polygon) ??
-          JSON.stringify({
-            type: 'Polygon',
-            coordinates: JSON.parse(pkmn.polygon_path).map((line) =>
-              line.map((point) => [point[1], point[0]]),
-            ),
-          })
+        pkmn.polygon_path = polygon
+          ? JSON.stringify(pkmn.polygon || { type: 'Polygon', coordinates: [] })
+          : JSON.stringify({
+              type: 'Polygon',
+              coordinates: JSON.parse(pkmn.polygon_path || '[]').map((line) =>
+                line.map((point) => [point[1], point[0]]),
+              ),
+            })
         if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
           returnedResults.push(pkmn)
         }
