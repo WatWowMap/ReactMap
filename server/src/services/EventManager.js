@@ -71,14 +71,18 @@ module.exports = class EventManager {
     setInterval(async () => {
       await this.getWebhooks(config)
     }, 1000 * 60 * 60 * (config.map.webhookCacheHrs || 1))
-    const newDate = new Date()
-    if (
-      config.authentication.trialPeriod.enabled &&
-      config.authentication.trialPeriod.end.js >= newDate
-    ) {
-      setTimeout(async () => {
-        await Db.models.Session.clear()
-      }, config.authentication.trialPeriod.end.js - newDate)
+    if (config.authentication.trialPeriod.enabled) {
+      const newDate = new Date()
+      if (config.authentication.trialPeriod.start.js >= newDate) {
+        setTimeout(async () => {
+          await Db.models.Session.clear()
+        }, config.authentication.trialPeriod.start.js - newDate)
+      }
+      if (config.authentication.trialPeriod.end.js >= newDate) {
+        setTimeout(async () => {
+          await Db.models.Session.clear()
+        }, config.authentication.trialPeriod.end.js - newDate)
+      }
     }
   }
 
