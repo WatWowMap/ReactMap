@@ -443,14 +443,16 @@ config.authentication.areaRestrictions =
 config.authentication.strategies = config.authentication.strategies.map(
   (strategy) => ({
     ...strategy,
-    allowedGuilds: strategy.allowedGuilds
+    allowedGuilds: Array.isArray(strategy.allowedGuilds)
       ? strategy.allowedGuilds.map(replaceAliases)
       : undefined,
-    blockedGuilds: strategy.blockedGuilds
+    blockedGuilds: Array.isArray(strategy.blockedGuilds)
       ? strategy.blockedGuilds.map(replaceAliases)
       : undefined,
-    groups: strategy.groups ? strategy.groups.map(replaceAliases) : undefined,
-    allowedUsers: strategy.allowedUsers
+    groups: Array.isArray(strategy.groups)
+      ? strategy.groups.map(replaceAliases)
+      : undefined,
+    allowedUsers: Array.isArray(strategy.allowedUsers)
       ? strategy.allowedUsers.map(replaceAliases)
       : undefined,
   }),
