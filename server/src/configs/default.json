@@ -630,6 +630,7 @@
     "areaRestrictions": [],
     "excludeFromTutorial": [],
     "alwaysEnabledPerms": [],
+    "aliases": [],
     "perms": {
       "map": {
         "enabled": true,
