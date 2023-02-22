@@ -1,5 +1,8 @@
 /* eslint-disable no-console */
 const fetch = require('node-fetch')
+const { TelegramStrategy } = require('passport-telegram-official')
+const passport = require('passport')
+
 const Utility = require('./Utility')
 const { Db } = require('./initialization')
 const {
@@ -145,5 +148,18 @@ module.exports = class TelegramClient {
     } catch (e) {
       console.error('[TELEGRAM] User has failed Telegram auth.', e)
     }
+  }
+
+  initPassport() {
+    passport.use(
+      this.rmStrategy,
+      new TelegramStrategy(
+        {
+          botToken: this.strategy.botToken,
+          passReqToCallback: true,
+        },
+        (...args) => this.authHandler(...args),
+      ),
+    )
   }
 }

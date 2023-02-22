@@ -1,6 +1,3 @@
-const { Strategy: DiscordStrategy } = require('passport-discord')
-const passport = require('passport')
-
 const { authentication } = require('../services/config')
 const DiscordClient = require('../services/DiscordClient')
 
@@ -10,20 +7,8 @@ module.exports = (strategy) => {
   )
   if (strategyConfig) {
     const Client = new DiscordClient(strategyConfig, strategy)
+    Client.initPassport()
 
-    passport.use(
-      strategy,
-      new DiscordStrategy(
-        {
-          clientID: strategyConfig.clientId,
-          clientSecret: strategyConfig.clientSecret,
-          callbackURL: strategyConfig.redirectUri,
-          scope: ['identify', 'guilds'],
-          passReqToCallback: true,
-        },
-        Client.authHandler,
-      ),
-    )
     return Client
   }
 }

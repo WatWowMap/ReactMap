@@ -4,7 +4,11 @@
 /* eslint-disable no-restricted-syntax */
 /* global BigInt */
 const fs = require('fs')
+const { resolve } = require('path')
 const Discord = require('discord.js')
+const { Strategy: DiscordStrategy } = require('passport-discord')
+const passport = require('passport')
+
 const { Db } = require('./initialization')
 const logUserAuth = require('./logUserAuth')
 
@@ -25,26 +29,29 @@ module.exports = class DiscordClient {
       process.exit(1)
     }
     this.client = new Discord.Client()
-    this.config = strategy
+    this.strategy = strategy
     this.rmStrategy = rmStrategy
     this.loggingChannels = {
       main: strategy.logChannelId,
       scanNext: strategy.scanNextChannel,
       scanZone: strategy.scanZoneChannel,
     }
+    this.perms = authentication.perms
+    this.alwaysEnabledPerms = authentication.alwaysEnabledPerms
+
     this.discordEvents()
 
     this.client.on('ready', () => {
       console.log(`[DISCORD] Logged in as ${this.client.user.tag}!`)
       this.client.user.setPresence({
         activity: {
-          name: this.config.presence,
-          type: this.config.presenceType,
+          name: this.strategy.presence,
+          type: this.strategy.presenceType,
         },
       })
     })
 
-    this.client.login(this.config.botToken)
+    this.client.login(this.strategy.botToken)
   }
 
   async getUserRoles(guildId, userId) {
@@ -68,13 +75,13 @@ module.exports = class DiscordClient {
     return []
   }
 
-  async discordEvents() {
-    this.client.config = this.config
+  discordEvents() {
+    this.client.config = this.strategy
     try {
-      fs.readdir(`${__dirname}/events/`, (err, files) => {
-        if (err) return this.log.error(err)
+      fs.readdir(resolve(__dirname, 'events'), (err, files) => {
+        if (err) console.error('[DISCORD]', err)
         files.forEach((file) => {
-          const event = require(`${__dirname}/events/${file}`)
+          const event = require(resolve(__dirname, 'events', file))
           const eventName = file.split('.')[0]
           this.client.on(eventName, event.bind(null, this.client))
         })
@@ -92,9 +99,7 @@ module.exports = class DiscordClient {
       date <= authentication.trialPeriod.end.js
 
     const perms = {
-      ...Object.fromEntries(
-        Object.keys(this.config.perms).map((x) => [x, false]),
-      ),
+      ...Object.fromEntries(Object.keys(this.perms).map((x) => [x, false])),
       areaRestrictions: [],
       webhooks: [],
       scanner: [],
@@ -102,7 +107,7 @@ module.exports = class DiscordClient {
     try {
       const { guildsFull } = user
       const guilds = user.guilds.map((guild) => guild.id)
-      if (this.config.allowedUsers.includes(user.id)) {
+      if (this.strategy.allowedUsers.includes(user.id)) {
         Object.keys(perms).forEach((key) => (perms[key] = true))
         perms.areaRestrictions = []
         perms.webhooks = webhooks.map((x) => x.name)
@@ -114,22 +119,22 @@ module.exports = class DiscordClient {
         )
         return perms
       }
-      for (let i = 0; i < this.config.blockedGuilds.length; i += 1) {
-        const guildId = this.config.blockedGuilds[i]
+      for (let i = 0; i < this.strategy.blockedGuilds.length; i += 1) {
+        const guildId = this.strategy.blockedGuilds[i]
         if (guilds.includes(guildId)) {
-          perms.blocked = guildsFull.find((x) => x.id === guildId).name
+          perms.blocked = !!guildsFull.find((x) => x.id === guildId)
           return perms
         }
       }
-      for (let i = 0; i < this.config.allowedGuilds.length; i += 1) {
-        const guildId = this.config.allowedGuilds[i]
+      for (let i = 0; i < this.strategy.allowedGuilds.length; i += 1) {
+        const guildId = this.strategy.allowedGuilds[i]
         if (guilds.includes(guildId)) {
-          const keys = Object.keys(this.config.perms)
+          const keys = Object.keys(this.perms)
           const userRoles = await this.getUserRoles(guildId, user.id)
           // Roles & Perms
           for (let j = 0; j < keys.length; j += 1) {
             const key = keys[j]
-            const configItem = this.config.perms[key]
+            const configItem = this.perms[key]
             const permIsPartOfTrial =
               configItem.trialPeriodEligible && trialActive
             if (configItem.enabled) {
@@ -197,16 +202,20 @@ module.exports = class DiscordClient {
       throw new Error('NoCodeProvided')
     }
     try {
-      const user = profile
-      user.username = `${profile.username}#${profile.discriminator}`
-      user.perms = await this.getPerms(profile)
+      const user = {
+        ...profile,
+        username: `${profile.username}#${profile.discriminator}`,
+        perms: await this.getPerms(profile),
+        rmStrategy: this.rmStrategy,
+      }
       user.valid = user.perms.map !== false
-      user.blocked = user.perms.blocked
-      user.rmStrategy = this.rmStrategy
 
       const embed = await logUserAuth(req, user, 'Discord')
       await this.sendMessage({ embed })
 
+      if (user.perms.blocked) {
+        return done(null, false)
+      }
       if (user) {
         delete user.guilds
       }
@@ -256,5 +265,21 @@ module.exports = class DiscordClient {
     } catch (e) {
       console.error('[AUTH] User has failed Discord auth.', e)
     }
+  }
+
+  initPassport() {
+    passport.use(
+      this.rmStrategy,
+      new DiscordStrategy(
+        {
+          clientID: this.strategy.clientId,
+          clientSecret: this.strategy.clientSecret,
+          callbackURL: this.strategy.redirectUri,
+          scope: ['identify', 'guilds'],
+          passReqToCallback: true,
+        },
+        (...args) => this.authHandler(...args),
+      ),
+    )
   }
 }
