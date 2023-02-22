@@ -12,7 +12,7 @@ module.exports = Object.fromEntries(
       )
       return !!enabled
     })
-    .map(({ name, type }) => {
+    .map(({ name, type }, i) => {
       try {
         const buildStrategy = fs.existsSync(
           resolve(__dirname, `../strategies/${name}.js`),
@@ -20,7 +20,7 @@ module.exports = Object.fromEntries(
           ? require(resolve(__dirname, `../strategies/${name}.js`))
           : require(resolve(__dirname, `../strategies/${type}.js`))
         return [
-          name,
+          name ?? `${type}-${i}}`,
           typeof buildStrategy === 'function'
             ? buildStrategy(name)
             : buildStrategy,

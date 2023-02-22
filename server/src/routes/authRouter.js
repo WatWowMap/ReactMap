@@ -8,19 +8,20 @@ const { Db } = require('../services/initialization')
 
 // Loads up the base auth routes and any custom ones
 
-strategies.forEach((strategy) => {
+strategies.forEach((strategy, i) => {
   const method =
     strategy.type === 'discord' || strategy.type === 'telegram' ? 'get' : 'post'
   if (strategy.enabled) {
+    const name = strategy.name ?? `${strategy.type}-${i}`
     router[method](
-      `/${strategy.name}`,
-      passport.authenticate(strategy.name, {
+      `/${name}`,
+      passport.authenticate(name, {
         failureRedirect: '/',
         successRedirect: '/',
       }),
     )
-    router[method](`/${strategy.name}/callback`, async (req, res, next) =>
-      passport.authenticate(strategy.name, async (err, user, info) => {
+    router[method](`/${name}/callback`, async (req, res, next) =>
+      passport.authenticate(name, async (err, user, info) => {
         if (err) {
           return next(err)
         }
@@ -34,7 +35,7 @@ strategies.forEach((strategy) => {
                 console.debug(
                   '[Session] Detected multiple sessions, clearing old ones...',
                 )
-                await Db.models.SessionclearOtherSessions(id, req.sessionID)
+                await Db.models.Session.clearOtherSessions(id, req.sessionID)
               }
               return res.redirect('/')
             })
@@ -46,9 +47,7 @@ strategies.forEach((strategy) => {
       })(req, res, next),
     )
     console.log(
-      `[AUTH] ${method.toUpperCase()} /auth/${
-        strategy.name
-      }/callback route initialized`,
+      `[AUTH] ${method.toUpperCase()} /auth/${name}/callback route initialized`,
     )
   }
 })
