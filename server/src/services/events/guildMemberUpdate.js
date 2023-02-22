@@ -1,20 +1,12 @@
 /* eslint-disable no-console */
-/* global BigInt */
 const { Db } = require('../initialization')
+const { authentication } = require('../config')
 
 module.exports = async (client, oldPresence, newPresence) => {
-  const rolesBefore = oldPresence.roles.cache
-    .filter((x) => BigInt(x.id).toString())
-    .keyArray()
-  const rolesAfter = newPresence.roles.cache
-    .filter((x) => BigInt(x.id).toString())
-    .keyArray()
+  const rolesBefore = oldPresence._roles
+  const rolesAfter = newPresence._roles
   const perms = [
-    ...new Set(
-      Object.values(client.config.perms)
-        .map((x) => x.roles)
-        .flat(),
-    ),
+    ...new Set(Object.values(authentication.perms).flatMap((x) => x.roles)),
   ]
   const roleDiff = rolesBefore
     .filter((x) => !rolesAfter.includes(x))

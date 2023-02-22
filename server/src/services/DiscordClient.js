@@ -2,10 +2,9 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
-/* global BigInt */
 const fs = require('fs')
 const { resolve } = require('path')
-const Discord = require('discord.js')
+const { Client } = require('discord.js')
 const { Strategy: DiscordStrategy } = require('passport-discord')
 const passport = require('passport')
 
@@ -22,13 +21,15 @@ const Utility = require('./Utility')
 
 module.exports = class DiscordClient {
   constructor(strategy, rmStrategy) {
-    if (strategy instanceof Discord.Client || typeof rmStrategy !== 'string') {
+    if (strategy instanceof Client || typeof rmStrategy !== 'string') {
       console.error(
         '[DISCORD] You are using an outdated strategy, please update your custom strategy to reflect the newest changes found in `server/src/strategies/discord.js`',
       )
       process.exit(1)
     }
-    this.client = new Discord.Client()
+    this.client = new Client({
+      intents: ['GuildMessages', 'GuildMembers', 'Guilds'],
+    })
     this.strategy = strategy
     this.rmStrategy = rmStrategy
     this.loggingChannels = {
@@ -60,10 +61,7 @@ module.exports = class DiscordClient {
         .get(guildId)
         .members.fetch()
       const member = members.get(userId)
-      const roles = member.roles.cache
-        .filter((x) => BigInt(x.id).toString())
-        .keyArray()
-      return roles
+      return member._roles
     } catch (e) {
       console.error(
         '[DISCORD] Failed to get roles in guild',
@@ -76,7 +74,6 @@ module.exports = class DiscordClient {
   }
 
   discordEvents() {
-    this.client.config = this.strategy
     try {
       fs.readdir(resolve(__dirname, 'events'), (err, files) => {
         if (err) console.error('[DISCORD]', err)
@@ -108,8 +105,7 @@ module.exports = class DiscordClient {
       const { guildsFull } = user
       const guilds = user.guilds.map((guild) => guild.id)
       if (this.strategy.allowedUsers.includes(user.id)) {
-        Object.keys(perms).forEach((key) => (perms[key] = true))
-        perms.areaRestrictions = []
+        Object.keys(this.perms).forEach((key) => (perms[key] = true))
         perms.webhooks = webhooks.map((x) => x.name)
         perms.scanner = Object.keys(scanner).filter(
           (x) => x !== 'backendConfig' && x && scanner[x].enabled,
@@ -179,18 +175,16 @@ module.exports = class DiscordClient {
     return perms
   }
 
-  async sendMessage(message, channel = 'main') {
+  sendMessage(embed, channel = 'main') {
     const safeChannel =
       this.loggingChannels[channel] ?? this.loggingChannels.main
-    if (!safeChannel || typeof message !== 'object') {
+    if (!safeChannel || typeof embed !== 'object') {
       return
     }
     try {
-      const foundChannel = await this.client.channels.cache
-        .get(safeChannel)
-        .fetch()
-      if (foundChannel && message) {
-        foundChannel.send(message)
+      const foundChannel = this.client.channels.cache.get(safeChannel)
+      if (foundChannel && embed) {
+        foundChannel.send({ embeds: [embed] })
       }
     } catch (e) {
       console.error('[DISCORD] Failed to send message to discord', e.message)
@@ -211,7 +205,7 @@ module.exports = class DiscordClient {
       user.valid = user.perms.map !== false
 
       const embed = await logUserAuth(req, user, 'Discord')
-      await this.sendMessage({ embed })
+      this.sendMessage(embed)
 
       if (user.perms.blocked) {
         return done(null, false)
