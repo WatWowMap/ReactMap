@@ -423,6 +423,41 @@ if (hasLittle) {
     : { little: false, cap: 500 }
 }
 
+const aliasObj = Object.fromEntries(
+  config.authentication.aliases.map((alias) => [alias.name, alias.role]),
+)
+
+const replaceAliases = (role) => aliasObj[role] ?? role
+
+Object.keys(config.authentication.perms).forEach((perm) => {
+  config.authentication.perms[perm].roles =
+    config.authentication.perms[perm].roles.map(replaceAliases)
+})
+
+config.authentication.areaRestrictions =
+  config.authentication.areaRestrictions.map(({ roles, areas }) => ({
+    roles: roles.map(replaceAliases),
+    areas,
+  }))
+
+config.authentication.strategies = config.authentication.strategies.map(
+  (strategy) => ({
+    ...strategy,
+    allowedGuilds: Array.isArray(strategy.allowedGuilds)
+      ? strategy.allowedGuilds.map(replaceAliases)
+      : undefined,
+    blockedGuilds: Array.isArray(strategy.blockedGuilds)
+      ? strategy.blockedGuilds.map(replaceAliases)
+      : undefined,
+    groups: Array.isArray(strategy.groups)
+      ? strategy.groups.map(replaceAliases)
+      : undefined,
+    allowedUsers: Array.isArray(strategy.allowedUsers)
+      ? strategy.allowedUsers.map(replaceAliases)
+      : undefined,
+  }),
+)
+
 if (
   !config.authentication.strategies.length ||
   !config.authentication.strategies.find((strategy) => strategy.enabled)
