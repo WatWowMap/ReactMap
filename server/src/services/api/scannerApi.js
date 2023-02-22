@@ -236,7 +236,7 @@ module.exports = async function scannerApi(
     }
 
     if (
-      Clients[user.rmStrategy] &&
+      Clients[user.rmStrategy]?.sendMessage &&
       config.scanner.backendConfig.sendDiscordMessage
     ) {
       const capitalized = category.replace('scan', 'Scan ')

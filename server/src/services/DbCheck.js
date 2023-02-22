@@ -28,10 +28,14 @@ module.exports = class DbCheck {
           const capital = `${category.charAt(0).toUpperCase()}${category.slice(
             1,
           )}`
-          if (!this.models[capital]) {
-            this.models[capital] = []
+          if (this.singleModels.includes(capital)) {
+            this.models[capital] = { connection: i }
+          } else {
+            if (!this.models[capital]) {
+              this.models[capital] = []
+            }
+            this.models[capital].push({ connection: i })
           }
-          this.models[capital].push({ connection: i })
         })
         if (schema.endpoint) {
           this.memEndpoints[i] = schema.endpoint
@@ -212,9 +216,11 @@ module.exports = class DbCheck {
             process.exit(0)
           }
           if (model === 'User') {
-            models.Badge.knex(this.connections[sources[0].connection])
+            this.models.Badge = models.Badge
+            this.models.Badge.knex(this.connections[sources.connection])
           }
-          models[model].knex(this.connections[sources[0].connection])
+          this.models[model] = models[model]
+          this.models[model].knex(this.connections[sources.connection])
         } else {
           sources.forEach((source, i) => {
             this.models[model][i].SubModel = models[model].bindKnex(

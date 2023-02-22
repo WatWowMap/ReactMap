@@ -2,7 +2,6 @@
 const { promises: fs } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
-
 const { generate } = require('../../scripts/generateMasterfile')
 const fetchJson = require('./api/fetchJson')
 const initWebhooks = require('./initWebhooks')
@@ -72,6 +71,15 @@ module.exports = class EventManager {
     setInterval(async () => {
       await this.getWebhooks(config)
     }, 1000 * 60 * 60 * (config.map.webhookCacheHrs || 1))
+    const newDate = new Date()
+    if (
+      config.authentication.trialPeriod.enabled &&
+      config.authentication.trialPeriod.end.js >= newDate
+    ) {
+      setTimeout(async () => {
+        await Db.models.Session.clear()
+      }, config.authentication.trialPeriod.end.js - newDate)
+    }
   }
 
   async getUicons(styles) {

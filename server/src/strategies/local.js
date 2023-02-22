@@ -12,14 +12,14 @@ const {
     perms,
   },
 } = require('../services/config')
-const { User } = require('../models/index')
+const { Db } = require('../services/initialization')
 const Utility = require('../services/Utility')
 
 if (strategyConfig.doNothing) {
   // This is for nothing other than demonstrating a custom property you can add if you need it
 }
 
-const authHandler = async (req, username, password, done) => {
+const authHandler = async (_req, username, password, done) => {
   const localPerms = Object.keys(perms).filter((key) =>
     perms[key].roles.includes('local'),
   )
@@ -39,12 +39,12 @@ const authHandler = async (req, username, password, done) => {
   }
 
   try {
-    await User.query()
+    await Db.models.User.query()
       .findOne({ username })
       .then(async (userExists) => {
         if (!userExists) {
           try {
-            const newUser = await User.query().insertAndFetch({
+            const newUser = await Db.models.User.query().insertAndFetch({
               username,
               password: await bcrypt.hash(password, 10),
               strategy: 'local',
@@ -69,7 +69,7 @@ const authHandler = async (req, username, password, done) => {
             }
           })
           if (userExists.strategy !== 'local') {
-            await User.query()
+            await Db.models.User.query()
               .update({ strategy: 'local' })
               .where('id', userExists.id)
             userExists.strategy = 'local'

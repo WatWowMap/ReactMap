@@ -2,12 +2,9 @@
 const router = require('express').Router()
 const passport = require('passport')
 const {
-  isValidSession,
-  clearOtherSessions,
-} = require('../services/sessionStore')
-const {
   authentication: { strategies },
 } = require('../services/config')
+const { Db } = require('../services/initialization')
 
 // Loads up the base auth routes and any custom ones
 
@@ -33,11 +30,11 @@ strategies.forEach((strategy) => {
           try {
             return req.login(user, async () => {
               const { id } = user
-              if (!(await isValidSession(id))) {
+              if (!(await Db.models.Session.isValidSession(id))) {
                 console.debug(
                   '[Session] Detected multiple sessions, clearing old ones...',
                 )
-                await clearOtherSessions(id, req.sessionID)
+                await Db.models.SessionclearOtherSessions(id, req.sessionID)
               }
               return res.redirect('/')
             })

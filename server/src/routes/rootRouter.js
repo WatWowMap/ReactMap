@@ -8,7 +8,6 @@ const clientRouter = require('./clientRouter')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
-const { User } = require('../models/index')
 const { Event, Db } = require('../services/initialization')
 const { version } = require('../../../package.json')
 
@@ -113,7 +112,7 @@ rootRouter.get('/api/settings', async (req, res) => {
     const getUser = async () => {
       if (config.authMethods.length && req.user) {
         try {
-          const user = await User.query().findById(req.user.id)
+          const user = await Db.models.User.query().findById(req.user.id)
           if (user) {
             delete user.password
             return {

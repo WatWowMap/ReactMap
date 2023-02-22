@@ -15,7 +15,7 @@ const { ApolloServer } = require('apollo-server-express')
 
 const config = require('./services/config')
 const { Db, Event } = require('./services/initialization')
-const { sessionStore } = require('./services/sessionStore')
+const sessionStore = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
@@ -216,7 +216,6 @@ Db.determineType().then(async () => {
       Event.getInvasions(config.api.pogoApiEndpoints.invasions),
       Event.getWebhooks(config),
     ]).then(() => {
-      Event.addAvailable()
       app.listen(config.port, config.interface, () => {
         console.log(
           `[INIT] Server is now listening at http://${config.interface}:${config.port}`,
