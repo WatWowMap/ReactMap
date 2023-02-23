@@ -319,6 +319,56 @@
       "menuOrder": {
         "__name": "MAP_GENERAL_MENU_ORDER",
         "__format": "json"
+      },
+      "trialPeriod": {
+        "start": {
+          "year": {
+            "__name": "MAP_GENERAL_TRIAL_PERIOD_START_YEAR",
+            "__format": "number"
+          },
+          "month": {
+            "__name": "MAP_GENERAL_TRIAL_PERIOD_START_MONTH",
+            "__format": "number"
+          },
+          "day": {
+            "__name": "MAP_GENERAL_TRIAL_PERIOD_START_DAY",
+            "__format": "number"
+          },
+          "hour": {
+            "__name": "MAP_GENERAL_TRIAL_PERIOD_START_HOUR",
+            "__format": "number"
+          },
+          "minute": {
+            "__name": "MAP_GENERAL_TRIAL_PERIOD_START_MINUTE",
+            "__format": "number"
+          }
+        },
+        "end": {
+          "year": {
+            "__name": "MAP_GENERAL_TRIAL_PERIOD_END_YEAR",
+            "__format": "number"
+          },
+          "month": {
+            "__name": "MAP_GENERAL_TRIAL_PERIOD_END_MONTH",
+            "__format": "number"
+          },
+          "day": {
+            "__name": "MAP_GENERAL_TRIAL_PERIOD_END_DAY",
+            "__format": "number"
+          },
+          "hour": {
+            "__name": "MAP_GENERAL_TRIAL_PERIOD_END_HOUR",
+            "__format": "number"
+          },
+          "minute": {
+            "__name": "MAP_GENERAL_TRIAL_PERIOD_END_MINUTE",
+            "__format": "number"
+          }
+        },
+        "roles": {
+          "__name": "MAP_GENERAL_TRIAL_PERIOD_ROLES",
+          "__format": "json"
+        }
       }
     },
     "localeSelection": {
@@ -1033,6 +1083,10 @@
         "__name": "SCANNER_SCAN_NEXT_ENABLED",
         "__format": "boolean"
       },
+      "trialPeriodEligible": {
+        "__name": "SCANNER_SCAN_NEXT_TRIAL_PERIOD_ELIGIBLE",
+        "__format": "boolean"
+      },
       "showScanCount": {
         "__name": "SCANNER_SCAN_NEXT_SHOW_SCAN_COUNT",
         "__format": "boolean"
@@ -1063,6 +1117,10 @@
     "scanZone": {
       "enabled": {
         "__name": "SCANNER_SCAN_ZONE_ENABLED",
+        "__format": "boolean"
+      },
+      "trialPeriodEligible": {
+        "__name": "SCANNER_SCAN_ZONE_TRIAL_PERIOD_ELIGIBLE",
         "__format": "boolean"
       },
       "showScanCount": {
@@ -1145,6 +1203,10 @@
           "__name": "AUTHENTICATION_PERMS_MAP_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_MAP_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_MAP_ROLES",
           "__format": "json"
@@ -1153,6 +1215,10 @@
       "pokemon": {
         "enabled": {
           "__name": "AUTHENTICATION_PERMS_POKEMON_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_POKEMON_TRIAL_PERIOD_ELIGIBLE",
           "__format": "boolean"
         },
         "roles": {
@@ -1165,6 +1231,10 @@
           "__name": "AUTHENTICATION_PERMS_IV_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_IV_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_IV_ROLES",
           "__format": "json"
@@ -1173,6 +1243,10 @@
       "pvp": {
         "enabled": {
           "__name": "AUTHENTICATION_PERMS_PVP_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_PVP_TRIAL_PERIOD_ELIGIBLE",
           "__format": "boolean"
         },
         "roles": {
@@ -1185,6 +1259,10 @@
           "__name": "AUTHENTICATION_PERMS_GYMS_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_GYMS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_GYMS_ROLES",
           "__format": "json"
@@ -1193,6 +1271,10 @@
       "raids": {
         "enabled": {
           "__name": "AUTHENTICATION_PERMS_RAIDS_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_RAIDS_TRIAL_PERIOD_ELIGIBLE",
           "__format": "boolean"
         },
         "roles": {
@@ -1205,6 +1287,10 @@
           "__name": "AUTHENTICATION_PERMS_POKESTOPS_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_POKESTOPS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_POKESTOPS_ROLES",
           "__format": "json"
@@ -1213,6 +1299,10 @@
       "eventStops": {
         "enabled": {
           "__name": "AUTHENTICATION_PERMS_EVENT_STOPS_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_EVENT_STOPS_TRIAL_PERIOD_ELIGIBLE",
           "__format": "boolean"
         },
         "roles": {
@@ -1225,6 +1315,10 @@
           "__name": "AUTHENTICATION_PERMS_QUESTS_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_QUESTS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_QUESTS_ROLES",
           "__format": "json"
@@ -1235,6 +1329,10 @@
           "__name": "AUTHENTICATION_PERMS_LURES_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_LURES_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_LURES_ROLES",
           "__format": "json"
@@ -1243,6 +1341,10 @@
       "portals": {
         "enabled": {
           "__name": "AUTHENTICATION_PERMS_PORTALS_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_PORTALS_TRIAL_PERIOD_ELIGIBLE",
           "__format": "boolean"
         },
         "roles": {
@@ -1265,6 +1367,10 @@
           "__name": "AUTHENTICATION_PERMS_INVASIONS_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_INVASIONS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_INVASIONS_ROLES",
           "__format": "json"
@@ -1273,6 +1379,10 @@
       "nests": {
         "enabled": {
           "__name": "AUTHENTICATION_PERMS_NESTS_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_NESTS_TRIAL_PERIOD_ELIGIBLE",
           "__format": "boolean"
         },
         "roles": {
@@ -1285,6 +1395,10 @@
           "__name": "AUTHENTICATION_PERMS_SCAN_AREAS_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_SCAN_AREAS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_SCAN_AREAS_ROLES",
           "__format": "json"
@@ -1293,6 +1407,10 @@
       "weather": {
         "enabled": {
           "__name": "AUTHENTICATION_PERMS_WEATHER_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_WEATHER_TRIAL_PERIOD_ELIGIBLE",
           "__format": "boolean"
         },
         "roles": {
@@ -1305,6 +1423,10 @@
           "__name": "AUTHENTICATION_PERMS_SPAWNPOINTS_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_SPAWNPOINTS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_SPAWNPOINTS_ROLES",
           "__format": "json"
@@ -1313,6 +1435,10 @@
       "scanCells": {
         "enabled": {
           "__name": "AUTHENTICATION_PERMS_SCAN_CELLS_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_SCAN_CELLS_TRIAL_PERIOD_ELIGIBLE",
           "__format": "boolean"
         },
         "roles": {
@@ -1325,6 +1451,10 @@
           "__name": "AUTHENTICATION_PERMS_DEVICES_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_DEVICES_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_DEVICES_ROLES",
           "__format": "json"
@@ -1335,6 +1465,10 @@
           "__name": "AUTHENTICATION_PERMS_DONOR_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_DONOR_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_DONOR_ROLES",
           "__format": "json"
@@ -1343,6 +1477,10 @@
       "gymBadges": {
         "enabled": {
           "__name": "AUTHENTICATION_PERMS_GYM_BADGES_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_GYM_BADGES_TRIAL_PERIOD_ELIGIBLE",
           "__format": "boolean"
         },
         "roles": {
