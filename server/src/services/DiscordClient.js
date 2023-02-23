@@ -115,7 +115,7 @@ module.exports = class DiscordClient {
         webhookPerms.add(...webhooks.map((x) => x.name))
         scannerPerms.add(
           ...Object.keys(scanner).filter(
-            (x) => x !== 'backendConfig' && x && scannerPerms[x].enabled,
+            (x) => x !== 'backendConfig' && x && scanner[x].enabled,
           ),
         )
         console.log(
