@@ -30,7 +30,7 @@
     "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix"
   },
   "engines": {
-    "node": ">=16",
+    "node": ">=18",
     "yarn": "^1.22.x"
   },
   "devDependencies": {
