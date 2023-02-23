@@ -15,6 +15,7 @@ module.exports = class EventManager {
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
     this.webhookObj = {}
+    this.Clients = {}
   }
 
   getAvailable(category) {
@@ -23,6 +24,18 @@ module.exports = class EventManager {
 
   async setAvailable(category, model, Db, log) {
     this.available[category] = await Db.getAvailable(model, log)
+  }
+
+  set clients(clients) {
+    this.Clients = clients
+  }
+
+  chatLog(embed) {
+    Object.values(this.Clients).forEach((client) => {
+      if (client?.sendMessage) {
+        client.sendMessage({ ...embed }, 'event')
+      }
+    })
   }
 
   setTimers(config, Db, Pvp) {
@@ -81,6 +94,10 @@ module.exports = class EventManager {
       )
       setTimeout(async () => {
         await Db.models.Session.clear()
+        this.chatLog({
+          description: `Trial period has started.`,
+          timestamp: new Date(),
+        })
       }, config.map.trialPeriod.start.js - newDate)
     }
     if (config.map.trialPeriod.end.js >= newDate) {
@@ -90,6 +107,10 @@ module.exports = class EventManager {
       )
       setTimeout(async () => {
         await Db.models.Session.clear()
+        this.chatLog({
+          description: `Trial period has ended.`,
+          timestamp: new Date(),
+        })
       }, config.map.trialPeriod.end.js - newDate)
     }
   }

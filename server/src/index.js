@@ -15,11 +15,14 @@ const { ApolloServer } = require('apollo-server-express')
 
 const config = require('./services/config')
 const { Db, Event } = require('./services/initialization')
+const Clients = require('./services/Clients')
 const sessionStore = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
 const pkg = require('../../package.json')
+
+Event.clients = Clients
 
 if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')

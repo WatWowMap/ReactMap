@@ -30,10 +30,15 @@ module.exports = class DiscordClient {
     this.client = new Client({
       intents: ['GuildMessages', 'GuildMembers', 'Guilds'],
     })
-    this.strategy = strategy
+    this.strategy = {
+      thumbnailUrl:
+        'https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png',
+      ...strategy,
+    }
     this.rmStrategy = rmStrategy
     this.loggingChannels = {
       main: strategy.logChannelId,
+      event: strategy.eventLogChannelId,
       scanNext: strategy.scanNextChannel,
       scanZone: strategy.scanZoneChannel,
     }
@@ -93,83 +98,74 @@ module.exports = class DiscordClient {
     const trialActive =
       date >= trialPeriod.start.js && date <= trialPeriod.end.js
 
-    const perms = {
-      ...Object.fromEntries(Object.keys(this.perms).map((x) => [x, false])),
-      areaRestrictions: [],
-      webhooks: [],
-      scanner: [],
-    }
+    const perms = Object.fromEntries(
+      Object.keys(this.perms).map((x) => [x, false]),
+    )
+    const areaRestrictions = new Set()
+    const webhookPerms = new Set()
+    const scannerPerms = new Set()
+
     try {
       const { guildsFull } = user
       const guilds = user.guilds.map((guild) => guild.id)
       if (this.strategy.allowedUsers.includes(user.id)) {
         Object.keys(this.perms).forEach((key) => (perms[key] = true))
-        perms.webhooks = webhooks.map((x) => x.name)
-        perms.scanner = Object.keys(scanner).filter(
-          (x) => x !== 'backendConfig' && x && scanner[x].enabled,
+        webhookPerms.add(...webhooks.map((x) => x.name))
+        scannerPerms.add(
+          ...Object.keys(scanner).filter(
+            (x) => x !== 'backendConfig' && x && scannerPerms[x].enabled,
+          ),
         )
         console.log(
           `[DISCORD] User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
-        return perms
-      }
-      for (let i = 0; i < this.strategy.blockedGuilds.length; i += 1) {
-        const guildId = this.strategy.blockedGuilds[i]
-        if (guilds.includes(guildId)) {
-          perms.blocked = !!guildsFull.find((x) => x.id === guildId)
-          return perms
+      } else {
+        for (let i = 0; i < this.strategy.blockedGuilds.length; i += 1) {
+          const guildId = this.strategy.blockedGuilds[i]
+          if (guilds.includes(guildId)) {
+            perms.blocked = !!guildsFull.find((x) => x.id === guildId)
+            return perms
+          }
         }
-      }
-      for (let i = 0; i < this.strategy.allowedGuilds.length; i += 1) {
-        const guildId = this.strategy.allowedGuilds[i]
-        if (guilds.includes(guildId)) {
-          const keys = Object.keys(this.perms)
-          const userRoles = await this.getUserRoles(guildId, user.id)
-          // Roles & Perms
-          for (let j = 0; j < keys.length; j += 1) {
-            const key = keys[j]
-            const configItem = this.perms[key]
-            const permIsPartOfTrial =
-              configItem.trialPeriodEligible && trialActive
-            if (configItem.enabled) {
-              if (authentication.alwaysEnabledPerms.includes(key)) {
-                perms[key] = true
-              } else {
-                for (let k = 0; k < userRoles.length; k += 1) {
-                  if (
-                    configItem.roles.includes(userRoles[k]) ||
-                    (permIsPartOfTrial &&
-                      trialPeriod.roles.includes(userRoles[k]))
-                  ) {
-                    perms[key] = true
+        await Promise.all(
+          this.strategy.allowedGuilds.map(async (guildId) => {
+            if (guilds.includes(guildId)) {
+              const userRoles = await this.getUserRoles(guildId, user.id)
+              Object.entries(this.perms).forEach(([perm, info]) => {
+                if (info.enabled) {
+                  if (authentication.alwaysEnabledPerms.includes(perm)) {
+                    perms[perm] = true
+                  } else {
+                    for (let j = 0; j < userRoles.length; j += 1) {
+                      if (info.roles.includes(userRoles[j])) {
+                        perms[perm] = true
+                        return
+                      }
+                    }
                   }
                 }
-              }
+              })
+              areaRestrictions.add(
+                ...Utility.areaPerms(userRoles, 'discord', trialActive),
+              )
+              webhookPerms.add(
+                ...Utility.webhookPerms(userRoles, 'discordRoles', trialActive),
+              )
+              scannerPerms.add(
+                ...Utility.scannerPerms(userRoles, 'discordRoles', trialActive),
+              )
             }
-          }
-          perms.areaRestrictions.push(
-            ...Utility.areaPerms(userRoles, 'discord', trialActive),
-          )
-          perms.webhooks.push(
-            ...Utility.webhookPerms(userRoles, 'discordRoles', trialActive),
-          )
-          perms.scanner.push(
-            ...Utility.scannerPerms(userRoles, 'discordRoles', trialActive),
-          )
-        }
-      }
-      if (perms.areaRestrictions.length) {
-        perms.areaRestrictions = [...new Set(perms.areaRestrictions)]
-      }
-      if (perms.webhooks.length) {
-        perms.webhooks = [...new Set(perms.webhooks)]
-      }
-      if (perms.scanner.length) {
-        perms.scanner = [...new Set(perms.scanner)]
+          }),
+        )
       }
     } catch (e) {
       console.warn('[DISCORD] Failed to get perms for user', user.id, e.message)
     }
+    perms.areaRestrictions = [...areaRestrictions].filter(
+      (x) => typeof x === 'string',
+    )
+    perms.webhooks = [...webhookPerms].filter((x) => typeof x === 'string')
+    perms.scanner = [...scannerPerms].filter((x) => typeof x === 'string')
     return perms
   }
 
@@ -179,9 +175,19 @@ module.exports = class DiscordClient {
     if (!safeChannel || typeof embed !== 'object') {
       return
     }
+    if (!embed.author) {
+      embed.author = {
+        name: this.rmStrategy,
+        icon_url: this.strategy.thumbnailUrl,
+      }
+    }
     try {
       const foundChannel = this.client.channels.cache.get(safeChannel)
-      if (foundChannel && embed) {
+      if (
+        foundChannel &&
+        foundChannel.isTextBased() &&
+        typeof embed === 'object'
+      ) {
         foundChannel.send({ embeds: [embed] })
       }
     } catch (e) {

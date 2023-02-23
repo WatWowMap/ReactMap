@@ -15,6 +15,7 @@ module.exports = class Session extends Model {
   static async clear() {
     const results = await this.query().delete()
     console.log('[Session] Clear Result:', results)
+    return results
   }
 
   static async isValidSession(userId) {
@@ -38,9 +39,11 @@ module.exports = class Session extends Model {
         .andWhere('session_id', '!=', currentSessionId || '')
         .delete()
       console.log('[Session] Clear Result:', results)
+      return results
     } catch (e) {
       console.error('[SESSION] Unable to clear other sessions', e)
     }
+    return 0
   }
 
   static async clearDiscordSessions(discordId, botName) {
@@ -55,8 +58,10 @@ module.exports = class Session extends Model {
         `[Session${botName && ` - ${botName}`}] Clear Result:`,
         results,
       )
+      return results
     } catch (e) {
       console.error('[SESSION] Unable to clear Discord sessions', e)
     }
+    return 0
   }
 }
