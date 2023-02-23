@@ -39,8 +39,8 @@ module.exports = class DiscordClient {
     this.loggingChannels = {
       main: strategy.logChannelId,
       event: strategy.eventLogChannelId,
-      scanNext: strategy.scanNextChannel,
-      scanZone: strategy.scanZoneChannel,
+      scanNext: strategy.scanNextLogChannelId,
+      scanZone: strategy.scanZoneLogChannelId,
     }
     this.perms = authentication.perms
     this.alwaysEnabledPerms = authentication.alwaysEnabledPerms
@@ -100,24 +100,23 @@ module.exports = class DiscordClient {
       date >= this.strategy.trialPeriod.start.js &&
       date <= this.strategy.trialPeriod.end.js
 
-    const perms = Object.fromEntries(
-      Object.keys(this.perms).map((x) => [x, false]),
-    )
-    const areaRestrictions = new Set()
-    const webhookPerms = new Set()
-    const scannerPerms = new Set()
+    const perms = {
+      ...Object.fromEntries(Object.keys(this.perms).map((x) => [x, false])),
+      areaRestrictions: new Set(),
+      webhooks: new Set(),
+      scanner: new Set(),
+    }
 
     try {
       const { guildsFull } = user
       const guilds = user.guilds.map((guild) => guild.id)
       if (this.strategy.allowedUsers.includes(user.id)) {
         Object.keys(this.perms).forEach((key) => (perms[key] = true))
-        webhookPerms.add(...webhooks.map((x) => x.name))
-        scannerPerms.add(
-          ...Object.keys(scanner).filter(
-            (x) => x !== 'backendConfig' && x && scanner[x].enabled,
-          ),
+        webhooks.forEach((x) => perms.webhooks.add(x.name))
+        Object.keys(scanner).forEach(
+          (x) => scanner[x]?.enabled && perms.scanner.add(x),
         )
+        console.log({ perms })
         console.log(
           `[DISCORD] User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
@@ -154,15 +153,20 @@ module.exports = class DiscordClient {
                   }
                 }
               })
-              areaRestrictions.add(
-                ...Utility.areaPerms(userRoles, 'discord', trialActive),
+              Utility.areaPerms(userRoles, 'discord', trialActive).forEach(
+                (x) => perms.areaRestrictions.add(x),
               )
-              webhookPerms.add(
-                ...Utility.webhookPerms(userRoles, 'discordRoles', trialActive),
-              )
-              scannerPerms.add(
-                ...Utility.scannerPerms(userRoles, 'discordRoles', trialActive),
-              )
+              Utility.webhookPerms(
+                userRoles,
+                'discordRoles',
+                trialActive,
+              ).forEach((x) => perms.webhooks.add(x))
+
+              Utility.scannerPerms(
+                userRoles,
+                'discordRoles',
+                trialActive,
+              ).forEach((x) => perms.scanner.add(x))
             }
           }),
         )
@@ -170,11 +174,9 @@ module.exports = class DiscordClient {
     } catch (e) {
       console.warn('[DISCORD] Failed to get perms for user', user.id, e.message)
     }
-    perms.areaRestrictions = [...areaRestrictions].filter(
-      (x) => typeof x === 'string',
-    )
-    perms.webhooks = [...webhookPerms].filter((x) => typeof x === 'string')
-    perms.scanner = [...scannerPerms].filter((x) => typeof x === 'string')
+    Object.entries(perms).forEach(([key, value]) => {
+      if (value instanceof Set) perms[key] = [...value]
+    })
     return perms
   }
 
