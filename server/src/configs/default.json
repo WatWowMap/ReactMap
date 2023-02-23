@@ -128,7 +128,24 @@
         "weather",
         "admin",
         "settings"
-      ]
+      ],
+      "trialPeriod": {
+        "start": {
+          "year": 2023,
+          "month": 1,
+          "day": 1,
+          "hour": 14,
+          "minute": 0
+        },
+        "end": {
+          "year": 2023,
+          "month": 1,
+          "day": 2,
+          "hour": 14,
+          "minute": 0
+        },
+        "roles": []
+      }
     },
     "localeSelection": [
       "en",
@@ -633,24 +650,6 @@
     "excludeFromTutorial": [],
     "alwaysEnabledPerms": [],
     "aliases": [],
-    "trialPeriod": {
-      "enabled": false,
-      "start": {
-        "year": 2023,
-        "month": 1,
-        "day": 1,
-        "hour": 14,
-        "minute": 0
-      },
-      "end": {
-        "year": 2023,
-        "month": 1,
-        "day": 2,
-        "hour": 14,
-        "minute": 0
-      },
-      "roles": []
-    },
     "perms": {
       "map": {
         "enabled": true,

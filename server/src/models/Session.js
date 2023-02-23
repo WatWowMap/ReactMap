@@ -13,7 +13,8 @@ module.exports = class Session extends Model {
   }
 
   static async clear() {
-    await this.query().delete()
+    const results = await this.query().delete()
+    console.log('[Session] Clear Result:', results)
   }
 
   static async isValidSession(userId) {

@@ -71,18 +71,26 @@ module.exports = class EventManager {
     setInterval(async () => {
       await this.getWebhooks(config)
     }, 1000 * 60 * 60 * (config.map.webhookCacheHrs || 1))
-    if (config.authentication.trialPeriod.enabled) {
-      const newDate = new Date()
-      if (config.authentication.trialPeriod.start.js >= newDate) {
-        setTimeout(async () => {
-          await Db.models.Session.clear()
-        }, config.authentication.trialPeriod.start.js - newDate)
-      }
-      if (config.authentication.trialPeriod.end.js >= newDate) {
-        setTimeout(async () => {
-          await Db.models.Session.clear()
-        }, config.authentication.trialPeriod.end.js - newDate)
-      }
+    const newDate = new Date()
+
+    if (config.map.trialPeriod.start.js >= newDate) {
+      console.log(
+        '[EVENT] Trial period starting in',
+        +((config.map.trialPeriod.start.js - newDate) / 1000 / 60).toFixed(2),
+        'minutes',
+      )
+      setTimeout(async () => {
+        await Db.models.Session.clear()
+      }, config.map.trialPeriod.start.js - newDate)
+    }
+    if (config.map.trialPeriod.end.js >= newDate) {
+      console.log(
+        '[EVENT] Trial period ending in',
+        +((config.map.trialPeriod.end.js - newDate) / 1000 / 60).toFixed(2),
+      )
+      setTimeout(async () => {
+        await Db.models.Session.clear()
+      }, config.map.trialPeriod.end.js - newDate)
     }
   }
 

@@ -486,12 +486,8 @@ const getJsDate = (dataObj) =>
     dataObj.millisecond || 0,
   )
 
-config.authentication.trialPeriod.start.js = getJsDate(
-  config.authentication.trialPeriod.start,
-)
-config.authentication.trialPeriod.end.js = getJsDate(
-  config.authentication.trialPeriod.end,
-)
+config.map.trialPeriod.start.js = getJsDate(config.map.trialPeriod.start)
+config.map.trialPeriod.end.js = getJsDate(config.map.trialPeriod.end)
 
 if (
   !config.authentication.strategies.length ||
