@@ -169,17 +169,21 @@ module.exports = class DiscordClient {
     return perms
   }
 
+  getBaseEmbed() {
+    return {
+      author: {
+        name: this.rmStrategy,
+        icon_url: this.strategy.thumbnailUrl,
+      },
+      timestamp: new Date(),
+    }
+  }
+
   sendMessage(embed, channel = 'main') {
     const safeChannel =
       this.loggingChannels[channel] ?? this.loggingChannels.main
     if (!safeChannel || typeof embed !== 'object') {
       return
-    }
-    if (!embed.author) {
-      embed.author = {
-        name: this.rmStrategy,
-        icon_url: this.strategy.thumbnailUrl,
-      }
     }
     try {
       const foundChannel = this.client.channels.cache.get(safeChannel)
@@ -188,7 +192,7 @@ module.exports = class DiscordClient {
         foundChannel.isTextBased() &&
         typeof embed === 'object'
       ) {
-        foundChannel.send({ embeds: [embed] })
+        foundChannel.send({ embeds: [{ ...this.getBaseEmbed(), ...embed }] })
       }
     } catch (e) {
       console.error('[DISCORD] Failed to send message to discord', e.message)
