@@ -416,6 +416,17 @@ const aliasObj = Object.fromEntries(
 
 const replaceAliases = (role) => aliasObj[role] ?? role
 
+const getJsDate = (dataObj = {}) =>
+  new Date(
+    dataObj.year,
+    dataObj.month - 1,
+    dataObj.day,
+    dataObj.hour || 0,
+    dataObj.minute || 0,
+    dataObj.second || 0,
+    dataObj.millisecond || 0,
+  )
+
 const replaceBothAliases = (incomingObj) => ({
   ...incomingObj,
   discordRoles: Array.isArray(incomingObj.discordRoles)
@@ -442,16 +453,28 @@ config.authentication.strategies = config.authentication.strategies.map(
     ...strategy,
     allowedGuilds: Array.isArray(strategy.allowedGuilds)
       ? strategy.allowedGuilds.map(replaceAliases)
-      : undefined,
+      : [],
     blockedGuilds: Array.isArray(strategy.blockedGuilds)
       ? strategy.blockedGuilds.map(replaceAliases)
-      : undefined,
+      : [],
     groups: Array.isArray(strategy.groups)
       ? strategy.groups.map(replaceAliases)
-      : undefined,
+      : [],
     allowedUsers: Array.isArray(strategy.allowedUsers)
       ? strategy.allowedUsers.map(replaceAliases)
-      : undefined,
+      : [],
+    trialPeriod: {
+      ...strategy.trialPeriod,
+      start: {
+        js: getJsDate(strategy?.trialPeriod?.start),
+      },
+      end: {
+        js: getJsDate(strategy?.trialPeriod?.end),
+      },
+      roles: Array.isArray(strategy?.trialPeriod?.roles)
+        ? strategy.trialPeriod.roles.map(replaceAliases)
+        : [],
+    },
   }),
 )
 
@@ -474,20 +497,6 @@ if (Array.isArray(config.webhooks)) {
 Object.keys(config.scanner || {}).forEach((key) => {
   config.scanner[key] = replaceBothAliases(config.scanner[key] || {})
 })
-
-const getJsDate = (dataObj) =>
-  new Date(
-    dataObj.year,
-    dataObj.month - 1,
-    dataObj.day,
-    dataObj.hour || 0,
-    dataObj.minute || 0,
-    dataObj.second || 0,
-    dataObj.millisecond || 0,
-  )
-
-config.map.trialPeriod.start.js = getJsDate(config.map.trialPeriod.start)
-config.map.trialPeriod.end.js = getJsDate(config.map.trialPeriod.end)
 
 if (
   !config.authentication.strategies.length ||

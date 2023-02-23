@@ -128,24 +128,7 @@
         "weather",
         "admin",
         "settings"
-      ],
-      "trialPeriod": {
-        "start": {
-          "year": 2023,
-          "month": 1,
-          "day": 1,
-          "hour": 14,
-          "minute": 0
-        },
-        "end": {
-          "year": 2023,
-          "month": 1,
-          "day": 2,
-          "hour": 14,
-          "minute": 0
-        },
-        "roles": []
-      }
+      ]
     },
     "localeSelection": [
       "en",
@@ -630,14 +613,48 @@
         "allowedGuilds": [],
         "blockedGuilds": [],
         "allowedUsers": [],
-        "thumbnailUrl": "https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png"
+        "thumbnailUrl": "https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png",
+        "trialPeriod": {
+          "start": {
+            "year": 2023,
+            "month": 1,
+            "day": 1,
+            "hour": 14,
+            "minute": 0
+          },
+          "end": {
+            "year": 2023,
+            "month": 1,
+            "day": 2,
+            "hour": 14,
+            "minute": 0
+          },
+          "roles": []
+        }
       },
       {
         "name": "telegram",
         "type": "telegram",
         "enabled": false,
         "botToken": "",
-        "groups": []
+        "groups": [],
+        "trialPeriod": {
+          "start": {
+            "year": 2023,
+            "month": 1,
+            "day": 1,
+            "hour": 14,
+            "minute": 0
+          },
+          "end": {
+            "year": 2023,
+            "month": 1,
+            "day": 2,
+            "hour": 14,
+            "minute": 0
+          },
+          "roles": []
+        }
       },
       {
         "name": "local",

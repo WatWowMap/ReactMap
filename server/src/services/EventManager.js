@@ -30,10 +30,15 @@ module.exports = class EventManager {
     this.Clients = clients
   }
 
-  chatLog(embed) {
-    Object.values(this.Clients).forEach((client) => {
-      if (client?.sendMessage) client.sendMessage(embed, 'event')
-    })
+  chatLog(embed, clientName) {
+    if (clientName) {
+      if (this.Clients[clientName]?.sendMessage)
+        this.Clients[clientName].sendMessage(embed, 'event')
+    } else {
+      Object.values(this.Clients).forEach((client) => {
+        if (client?.sendMessage) client.sendMessage(embed, 'event')
+      })
+    }
   }
 
   setTimers(config, Db, Pvp) {
@@ -92,29 +97,40 @@ module.exports = class EventManager {
       await this.getWebhooks(config)
       this.chatLog({ description: 'Refreshed webhook settings' })
     }, 1000 * 60 * 60 * (config.map.webhookCacheHrs || 1))
-    const newDate = new Date()
 
-    if (config.map.trialPeriod.start.js >= newDate) {
-      console.log(
-        '[EVENT] Trial period starting in',
-        +((config.map.trialPeriod.start.js - newDate) / 1000 / 60).toFixed(2),
-        'minutes',
-      )
-      setTimeout(async () => {
-        await Db.models.Session.clear()
-        this.chatLog({ description: `Trial period has started.` })
-      }, config.map.trialPeriod.start.js - newDate)
-    }
-    if (config.map.trialPeriod.end.js >= newDate) {
-      console.log(
-        '[EVENT] Trial period ending in',
-        +((config.map.trialPeriod.end.js - newDate) / 1000 / 60).toFixed(2),
-      )
-      setTimeout(async () => {
-        await Db.models.Session.clear()
-        this.chatLog({ description: `Trial period has ended.` })
-      }, config.map.trialPeriod.end.js - newDate)
-    }
+    const newDate = new Date()
+    config.authentication.strategies.forEach((strategy) => {
+      if (strategy.enabled) {
+        if (strategy.trialPeriod.start.js >= newDate) {
+          console.log(
+            '[EVENT] Trial period starting in',
+            +((strategy.trialPeriod.start.js - newDate) / 1000 / 60).toFixed(2),
+            `minutes for ${strategy.name}`,
+          )
+          setTimeout(async () => {
+            await Db.models.Session.clear()
+            this.chatLog(
+              { description: `Trial period has started.` },
+              strategy.name,
+            )
+          }, strategy.trialPeriod.start.js - newDate)
+        }
+        if (strategy.trialPeriod.end.js >= newDate) {
+          console.log(
+            '[EVENT] Trial period ending in',
+            +((strategy.trialPeriod.end.js - newDate) / 1000 / 60).toFixed(2),
+            `minutes for ${strategy.name}`,
+          )
+          setTimeout(async () => {
+            await Db.models.Session.clear()
+            this.chatLog(
+              { description: `Trial period has ended.` },
+              strategy.name,
+            )
+          }, strategy.trialPeriod.end.js - newDate)
+        }
+      }
+    })
   }
 
   async getUicons(styles) {

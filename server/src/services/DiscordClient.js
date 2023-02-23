@@ -15,7 +15,7 @@ const {
   authentication,
   scanner,
   webhooks,
-  map: { forceTutorial, trialPeriod },
+  map: { forceTutorial },
 } = require('./config')
 const Utility = require('./Utility')
 
@@ -96,7 +96,9 @@ module.exports = class DiscordClient {
   async getPerms(user) {
     const date = new Date()
     const trialActive =
-      date >= trialPeriod.start.js && date <= trialPeriod.end.js
+      this.strategy.trialPeriod &&
+      date >= this.strategy.trialPeriod.start.js &&
+      date <= this.strategy.trialPeriod.end.js
 
     const perms = Object.fromEntries(
       Object.keys(this.perms).map((x) => [x, false]),
@@ -137,7 +139,14 @@ module.exports = class DiscordClient {
                     perms[perm] = true
                   } else {
                     for (let j = 0; j < userRoles.length; j += 1) {
-                      if (info.roles.includes(userRoles[j])) {
+                      if (
+                        info.roles.includes(userRoles[j]) ||
+                        (trialActive &&
+                          info.trialPeriodEligible &&
+                          this.strategy.trialPeriod.roles.includes(
+                            userRoles[j],
+                          ))
+                      ) {
                         perms[perm] = true
                         return
                       }

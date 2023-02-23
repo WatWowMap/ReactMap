@@ -125,7 +125,24 @@
         "redirectUri": "http://localhost:8080/auth/discord/callback",
         "allowedGuilds": [],
         "blockedGuilds": [],
-        "allowedUsers": []
+        "allowedUsers": [],
+        "trialPeriod": {
+          "start": {
+            "year": 2023,
+            "month": 1,
+            "day": 1,
+            "hour": 14,
+            "minute": 0
+          },
+          "end": {
+            "year": 2023,
+            "month": 1,
+            "day": 2,
+            "hour": 14,
+            "minute": 0
+          },
+          "roles": []
+        }
       }
     ],
     "areaRestrictions": [

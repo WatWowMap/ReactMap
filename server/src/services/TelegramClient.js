@@ -6,7 +6,7 @@ const passport = require('passport')
 const Utility = require('./Utility')
 const { Db } = require('./initialization')
 const {
-  map: { forceTutorial, trialPeriod },
+  map: { forceTutorial },
   authentication,
 } = require('./config')
 
@@ -61,7 +61,9 @@ module.exports = class TelegramClient {
   getUserPerms(user, groups) {
     const date = new Date()
     const trialActive =
-      date >= trialPeriod.start.js && date <= trialPeriod.end.js
+      this.strategy.trialPeriod &&
+      date >= this.strategy.trialPeriod.start.js &&
+      date <= this.strategy.trialPeriod.end.js
 
     const newUserObj = {
       ...user,
@@ -72,7 +74,11 @@ module.exports = class TelegramClient {
             info.enabled &&
               (this.alwaysEnabledPerms.includes(perm) ||
                 info.roles.some((role) => groups.includes(role)) ||
-                (trialActive && info.trialPeriodEligible)),
+                (trialActive &&
+                  info.trialPeriodEligible &&
+                  this.strategy.trialPeriod.roles.some((role) =>
+                    groups.includes(role),
+                  ))),
           ]),
         ),
         areaRestrictions: Utility.areaPerms(groups, 'telegram', trialActive),
