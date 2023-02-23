@@ -319,56 +319,6 @@
       "menuOrder": {
         "__name": "MAP_GENERAL_MENU_ORDER",
         "__format": "json"
-      },
-      "trialPeriod": {
-        "start": {
-          "year": {
-            "__name": "MAP_GENERAL_TRIAL_PERIOD_START_YEAR",
-            "__format": "number"
-          },
-          "month": {
-            "__name": "MAP_GENERAL_TRIAL_PERIOD_START_MONTH",
-            "__format": "number"
-          },
-          "day": {
-            "__name": "MAP_GENERAL_TRIAL_PERIOD_START_DAY",
-            "__format": "number"
-          },
-          "hour": {
-            "__name": "MAP_GENERAL_TRIAL_PERIOD_START_HOUR",
-            "__format": "number"
-          },
-          "minute": {
-            "__name": "MAP_GENERAL_TRIAL_PERIOD_START_MINUTE",
-            "__format": "number"
-          }
-        },
-        "end": {
-          "year": {
-            "__name": "MAP_GENERAL_TRIAL_PERIOD_END_YEAR",
-            "__format": "number"
-          },
-          "month": {
-            "__name": "MAP_GENERAL_TRIAL_PERIOD_END_MONTH",
-            "__format": "number"
-          },
-          "day": {
-            "__name": "MAP_GENERAL_TRIAL_PERIOD_END_DAY",
-            "__format": "number"
-          },
-          "hour": {
-            "__name": "MAP_GENERAL_TRIAL_PERIOD_END_HOUR",
-            "__format": "number"
-          },
-          "minute": {
-            "__name": "MAP_GENERAL_TRIAL_PERIOD_END_MINUTE",
-            "__format": "number"
-          }
-        },
-        "roles": {
-          "__name": "MAP_GENERAL_TRIAL_PERIOD_ROLES",
-          "__format": "json"
-        }
       }
     },
     "localeSelection": {
