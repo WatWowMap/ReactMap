@@ -276,19 +276,6 @@ config.multiDomainsObj = Object.fromEntries(
   config.multiDomains.map((d) => [d.domain, mergeMapConfig(d)]),
 )
 
-// Consolidate Auth Methods
-// Create Authentication Objects
-config.authMethods = [
-  ...new Set(
-    config.authentication.strategies
-      .filter((strategy) => strategy.enabled)
-      .map((strategy) => {
-        config.authentication[strategy.name] = strategy
-        return strategy.type
-      }),
-  ),
-]
-
 // Check if empty
 ;['tileServers', 'navigation'].forEach((opt) => {
   if (!config[opt].length) {
@@ -467,6 +454,19 @@ config.authentication.strategies = config.authentication.strategies.map(
       : undefined,
   }),
 )
+
+// Consolidate Auth Methods
+// Create Authentication Objects
+config.authMethods = [
+  ...new Set(
+    config.authentication.strategies
+      .filter((strategy) => strategy.enabled)
+      .map((strategy) => {
+        config.authentication[strategy.name] = strategy
+        return strategy.type
+      }),
+  ),
+]
 
 if (Array.isArray(config.webhooks)) {
   config.webhooks = config.webhooks.map(replaceBothAliases)

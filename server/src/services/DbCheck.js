@@ -125,22 +125,24 @@ module.exports = class DbCheck {
                 : 'available_slots',
             ])
           Object.entries(this.models).forEach(([category, sources]) => {
-            sources.forEach((source, j) => {
-              if (source.connection === i) {
-                this.models[category][j].isMad = isMad
-                this.models[category][j].pvpV2 = pvpV2
-                this.models[category][j].mem = mem
-                this.models[category][j].hasSize = hasSize
-                this.models[category][j].hasHeight = hasHeight
-                this.models[category][j].hasRewardAmount = hasRewardAmount
-                this.models[category][j].hasPowerUp = hasPowerUp
-                this.models[category][j].hasAltQuests = hasAltQuests
-                this.models[category][j].hasMultiInvasions = hasMultiInvasions
-                this.models[category][j].multiInvasionMs = multiInvasionMs
-                this.models[category][j].availableSlotsCol = availableSlotsCol
-                this.models[category][j].hasLayerColumn = hasLayerColumn
-              }
-            })
+            if (Array.isArray(sources)) {
+              sources.forEach((source, j) => {
+                if (source.connection === i) {
+                  this.models[category][j].isMad = isMad
+                  this.models[category][j].pvpV2 = pvpV2
+                  this.models[category][j].mem = mem
+                  this.models[category][j].hasSize = hasSize
+                  this.models[category][j].hasHeight = hasHeight
+                  this.models[category][j].hasRewardAmount = hasRewardAmount
+                  this.models[category][j].hasPowerUp = hasPowerUp
+                  this.models[category][j].hasAltQuests = hasAltQuests
+                  this.models[category][j].hasMultiInvasions = hasMultiInvasions
+                  this.models[category][j].multiInvasionMs = multiInvasionMs
+                  this.models[category][j].availableSlotsCol = availableSlotsCol
+                  this.models[category][j].hasLayerColumn = hasLayerColumn
+                }
+              })
+            }
           })
         } catch (e) {
           console.error('[DB]', e.message)
@@ -229,7 +231,7 @@ module.exports = class DbCheck {
           })
         }
         console.log(
-          `[DB] Bound ${model} to ${sources.length} connection${
+          `[DB] Bound ${model} to ${sources.length ?? 1} connection${
             sources.length > 1 ? 's' : ''
           }`,
         )
