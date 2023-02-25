@@ -1,4 +1,5 @@
 {
+  "READ_ME": "https://github.com/WatWowMap/ReactMap/wiki/04.-Full-Config-Explanation",
   "interface": "0.0.0.0",
   "port": 8080,
   "packageSource": "git/docker",
@@ -135,6 +136,16 @@
       {
         "roles": [],
         "areas": []
+      }
+    ],
+    "aliases": [
+      {
+        "role": "123415123541",
+        "name": "verified"
+      },
+      {
+        "role": "897581458191",
+        "name": "supporter"
       }
     ],
     "alwaysEnabledPerms": [],

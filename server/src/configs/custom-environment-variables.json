@@ -1138,6 +1138,10 @@
       "__name": "AUTHENTICATION_ALWAYS_ENABLED_PERMS",
       "__format": "json"
     },
+    "aliases": {
+      "__name": "AUTHENTICATION_ALIASES",
+      "__format": "json"
+    },
     "perms": {
       "map": {
         "enabled": {
