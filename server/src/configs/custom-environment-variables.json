@@ -1306,6 +1306,10 @@
           "__name": "AUTHENTICATION_PERMS_SUBMISSION_CELLS_ENABLED",
           "__format": "boolean"
         },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_SUBMISSION_CELLS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_SUBMISSION_CELLS_ROLES",
           "__format": "json"
