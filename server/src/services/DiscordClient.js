@@ -23,7 +23,8 @@ module.exports = class DiscordClient {
   constructor(strategy, rmStrategy) {
     if (strategy instanceof Client || typeof rmStrategy !== 'string') {
       console.error(
-        '[DISCORD] You are using an outdated strategy, please update your custom strategy to reflect the newest changes found in `server/src/strategies/discord.js`',
+        `[${this.rmStrategy?.toUpperCase()}]`,
+        'You are using an outdated strategy, please update your custom strategy to reflect the newest changes found in `server/src/strategies/discord.js`',
       )
       process.exit(1)
     }
@@ -48,7 +49,10 @@ module.exports = class DiscordClient {
     this.discordEvents()
 
     this.client.on('ready', () => {
-      console.log(`[DISCORD] Logged in as ${this.client.user.tag}!`)
+      console.log(
+        `[${this.rmStrategy?.toUpperCase()}]`,
+        `Logged in as ${this.client.user.tag}!`,
+      )
       this.client.user.setPresence({
         activity: {
           name: this.strategy.presence,
@@ -69,7 +73,8 @@ module.exports = class DiscordClient {
       return member._roles
     } catch (e) {
       console.error(
-        '[DISCORD] Failed to get roles in guild',
+        `[${this.rmStrategy?.toUpperCase()}]`,
+        'Failed to get roles in guild',
         guildId,
         'for user',
         userId,
@@ -81,7 +86,7 @@ module.exports = class DiscordClient {
   discordEvents() {
     try {
       fs.readdir(resolve(__dirname, 'events'), (err, files) => {
-        if (err) console.error('[DISCORD]', err)
+        if (err) console.error(`[${this.rmStrategy?.toUpperCase()}]`, err)
         files.forEach((file) => {
           const event = require(resolve(__dirname, 'events', file))
           const eventName = file.split('.')[0]
@@ -89,7 +94,11 @@ module.exports = class DiscordClient {
         })
       })
     } catch (e) {
-      console.error('[DISCORD] Failed to activate an event', e.message)
+      console.error(
+        `[${this.rmStrategy?.toUpperCase()}]`,
+        'Failed to activate an event',
+        e.message,
+      )
     }
   }
 
@@ -117,7 +126,8 @@ module.exports = class DiscordClient {
           (x) => scanner[x]?.enabled && perms.scanner.add(x),
         )
         console.log(
-          `[DISCORD] User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`,
+          `[${this.rmStrategy?.toUpperCase()}]`,
+          `User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
       } else {
         for (let i = 0; i < this.strategy.blockedGuilds.length; i += 1) {
@@ -171,11 +181,17 @@ module.exports = class DiscordClient {
         )
       }
     } catch (e) {
-      console.warn('[DISCORD] Failed to get perms for user', user.id, e.message)
+      console.warn(
+        `[${this.rmStrategy?.toUpperCase()}]`,
+        'Failed to get perms for user',
+        user.id,
+        e.message,
+      )
     }
     Object.entries(perms).forEach(([key, value]) => {
       if (value instanceof Set) perms[key] = [...value]
     })
+    console.log(perms)
     return perms
   }
 
@@ -190,6 +206,7 @@ module.exports = class DiscordClient {
   }
 
   sendMessage(embed, channel = 'main') {
+    // if (!process.env.NODE_APP_INSTANCE || process.env.NODE_APP_INSTANCE === 0) {
     const safeChannel =
       this.loggingChannels[channel] ?? this.loggingChannels.main
     if (!safeChannel || typeof embed !== 'object') {
@@ -205,8 +222,13 @@ module.exports = class DiscordClient {
         foundChannel.send({ embeds: [{ ...this.getBaseEmbed(), ...embed }] })
       }
     } catch (e) {
-      console.error('[DISCORD] Failed to send message to discord', e.message)
+      console.error(
+        `[${this.rmStrategy?.toUpperCase()}]`,
+        'Failed to send message to discord',
+        e.message,
+      )
     }
+    // }
   }
 
   async authHandler(req, _accessToken, _refreshToken, profile, done) {
@@ -275,7 +297,11 @@ module.exports = class DiscordClient {
           })
         })
     } catch (e) {
-      console.error('[AUTH] User has failed Discord auth.', e)
+      console.error(
+        `[${this.rmStrategy?.toUpperCase()}]`,
+        'User has failed auth.',
+        e,
+      )
     }
   }
 

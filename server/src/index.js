@@ -195,7 +195,7 @@ app.use(rootRouter, requestRateLimiter)
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error('[Express Error]:', err.message)
+  console.error('[EXPRESS]:', err)
   switch (err.message) {
     case 'NoCodeProvided':
       return res.redirect('/404')

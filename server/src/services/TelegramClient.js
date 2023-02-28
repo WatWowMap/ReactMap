@@ -46,7 +46,7 @@ module.exports = class TelegramClient {
           }
         } catch (e) {
           console.error(
-            '[TELEGRAM]',
+            `[${this.rmStrategy?.toUpperCase()}]`,
             e.message,
             `Telegram Group: ${group}`,
             `User: ${user.id} (${user.username})`,
@@ -111,7 +111,7 @@ module.exports = class TelegramClient {
               .whereNot('id', req.user.id)
               .delete()
             console.log(
-              '[TELEGRAM]',
+              `[${this.rmStrategy?.toUpperCase()}]`,
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -138,7 +138,7 @@ module.exports = class TelegramClient {
             userExists.strategy = 'telegram'
           }
           console.log(
-            '[TELEGRAM]',
+            `[${this.rmStrategy?.toUpperCase()}]`,
             user.username,
             `(${user.id})`,
             'Authenticated successfully.',
@@ -150,7 +150,11 @@ module.exports = class TelegramClient {
           })
         })
     } catch (e) {
-      console.error('[TELEGRAM] User has failed Telegram auth.', e)
+      console.error(
+        `[${this.rmStrategy?.toUpperCase()}]`,
+        'User has failed auth.',
+        e,
+      )
     }
   }
 

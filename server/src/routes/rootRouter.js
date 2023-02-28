@@ -126,14 +126,14 @@ rootRouter.get('/api/settings', async (req, res) => {
             '[SESSION] Legacy user detected, forcing logout, User ID:',
             req?.user?.id,
           )
-          req.logout()
+          req.logout(() => {})
           return { valid: false, tutorial: !config.map.forceTutorial }
         } catch (e) {
           console.log(
             '[SESSION] Issue finding user, forcing logout, User ID:',
             req?.user?.id,
           )
-          req.logout()
+          req.logout(() => {})
           return { valid: false, tutorial: !config.map.forceTutorial }
         }
       } else if (req.session.perms) {

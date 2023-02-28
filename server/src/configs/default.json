@@ -721,6 +721,7 @@
       },
       "submissionCells": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "invasions": {

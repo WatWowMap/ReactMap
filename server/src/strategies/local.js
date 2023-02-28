@@ -4,13 +4,11 @@ const Strategy = require('passport-local')
 const bcrypt = require('bcrypt')
 const path = require('path')
 
+const { name } = path.parse(__filename)
+
 const {
   map: { forceTutorial },
-  authentication: {
-    [path.parse(__filename).name]: strategyConfig,
-    alwaysEnabledPerms,
-    perms,
-  },
+  authentication: { [name]: strategyConfig, alwaysEnabledPerms, perms },
 } = require('../services/config')
 const { Db } = require('../services/initialization')
 const Utility = require('../services/Utility')
@@ -52,7 +50,7 @@ const authHandler = async (_req, username, password, done) => {
             })
             user.id = newUser.id
             console.log(
-              '[LOCAL]',
+              `[${name.toUpperCase()}]`,
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -76,7 +74,7 @@ const authHandler = async (_req, username, password, done) => {
           }
           user.id = userExists.id
           console.log(
-            '[LOCAL]',
+            `[${name.toUpperCase()}]`,
             user.username,
             `(${user.id})`,
             'Authenticated successfully.',
@@ -86,7 +84,11 @@ const authHandler = async (_req, username, password, done) => {
         return done(null, false, { message: 'invalid_credentials' })
       })
   } catch (e) {
-    console.error('User has failed Local authentication.', e.message)
+    console.error(
+      `[${name.toUpperCase()}]`,
+      'User has failed authentication.',
+      e.message,
+    )
   }
 }
 
