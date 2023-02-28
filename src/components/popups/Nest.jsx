@@ -25,7 +25,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
   const setFilters = useStore((state) => state.setFilters)
   const [parkName, setParkName] = useState(true)
   const [anchorEl, setAnchorEl] = useState(false)
-  const { id, name, updated, pokemon_avg } = nest
+  const { id = 0, name = '', updated = 0, pokemon_avg = 0 } = nest
 
   const lastUpdated = Utility.getTimeUntil(new Date(updated * 1000))
 

@@ -264,6 +264,9 @@
       "invasions": "API_POGO_API_ENDPOINTS_INVASIONS",
       "masterfile": "API_POGO_API_ENDPOINTS_MASTERFILE",
       "translations": "API_POGO_API_ENDPOINTS_TRANSLATIONS"
+    },
+    "kojiOptions": {
+      "bearerToken": "API_KOJI_OPTIONS_BEARER_TOKEN"
     }
   },
   "multiDomains": {

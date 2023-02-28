@@ -184,9 +184,9 @@ module.exports = {
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.scanAreas) {
-        const scanAreas = config.scanAreas[req.headers.host]
-          ? config.scanAreas[req.headers.host]
-          : config.scanAreas.main
+        const scanAreas = config.areas.scanAreas[req.headers.host]
+          ? config.areas.scanAreas[req.headers.host]
+          : config.areas.scanAreas.main
         return [
           {
             ...scanAreas,
@@ -207,9 +207,9 @@ module.exports = {
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.scanAreas) {
-        const scanAreas = config.scanAreasMenu[req.headers.host]
-          ? config.scanAreasMenu[req.headers.host]
-          : config.scanAreasMenu.main
+        const scanAreas = config.areas.scanAreasMenu[req.headers.host]
+          ? config.areas.scanAreasMenu[req.headers.host]
+          : config.areas.scanAreasMenu.main
 
         if (perms.areaRestrictions.length) {
           const filtered = scanAreas

@@ -36,17 +36,6 @@ module.exports = gql`
     provider: String
   }
 
-  type Geometry {
-    type: String
-    coordinates: [[[Float]]]
-  }
-
-  type Feature {
-    type: String
-    properties: JSON
-    geometry: Geometry
-  }
-
   type ScanArea {
     type: String
     features: JSON

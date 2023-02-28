@@ -21,6 +21,7 @@ const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
 const pkg = require('../../package.json')
+const getAreas = require('./services/areas')
 
 Event.clients = Clients
 
@@ -218,6 +219,7 @@ Db.determineType().then(async () => {
       Event.getMasterfile(Db.historical, Db.rarity),
       Event.getInvasions(config.api.pogoApiEndpoints.invasions),
       Event.getWebhooks(config),
+      (config.areas = await getAreas()),
     ]).then(() => {
       app.listen(config.port, config.interface, () => {
         console.log(
