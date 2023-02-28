@@ -12,6 +12,7 @@ const { Db } = require('./initialization')
 const logUserAuth = require('./logUserAuth')
 
 const {
+  devOptions,
   authentication,
   scanner,
   webhooks,
@@ -70,7 +71,7 @@ module.exports = class DiscordClient {
         .get(guildId)
         .members.fetch()
       const member = members.get(userId)
-      return member._roles
+      return member.roles.cache.map((role) => role.id)
     } catch (e) {
       console.error(
         `[${this.rmStrategy?.toUpperCase()}]`,
@@ -191,7 +192,13 @@ module.exports = class DiscordClient {
     Object.entries(perms).forEach(([key, value]) => {
       if (value instanceof Set) perms[key] = [...value]
     })
-    console.log(perms)
+    if (devOptions.enabled) {
+      console.log(
+        `[${this.rmStrategy?.toUpperCase()}]`,
+        'Perms:',
+        JSON.stringify(perms),
+      )
+    }
     return perms
   }
 
