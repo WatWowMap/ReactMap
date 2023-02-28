@@ -842,10 +842,6 @@
         "__name": "DEFAULT_FILTERS_POKESTOPS_BASE_MEGA_ENERGY_AMOUNTS",
         "__format": "json"
       },
-      "baseLureIds": {
-        "__name": "DEFAULT_FILTERS_POKESTOPS_BASE_LURE_IDS",
-        "__format": "json"
-      },
       "stardust": {
         "min": {
           "__name": "DEFAULT_FILTERS_POKESTOPS_STARDUST_MIN",
