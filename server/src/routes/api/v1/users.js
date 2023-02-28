@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const router = require('express').Router()
 const { api } = require('../../../services/config')
-const { User } = require('../../../models/index')
+const { Db } = require('../../../services/initialization')
 
 router.get('/', async (req, res) => {
   try {
@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
       api.reactMapSecret &&
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
-      res.status(200).json(await User.query())
+      res.status(200).json(await Db.models.User.query())
     } else {
       throw new Error('Incorrect or missing API secret')
     }
@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
       api.reactMapSecret &&
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
-      const user = await User.query().findById(req.params.id)
+      const user = await Db.models.User.query().findById(req.params.id)
       res
         .status(200)
         .json(user || { status: 'error', reason: 'User Not Found' })
@@ -46,7 +46,9 @@ router.get('/discord/:id', async (req, res) => {
       api.reactMapSecret &&
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
-      const user = await User.query().where('discordId', req.params.id).first()
+      const user = await Db.models.User.query()
+        .where('discordId', req.params.id)
+        .first()
       res
         .status(200)
         .json(user || { status: 'error', reason: 'User Not Found' })
@@ -66,7 +68,9 @@ router.get('/telegram/:id', async (req, res) => {
       api.reactMapSecret &&
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
-      const user = await User.query().where('telegramId', req.params.id).first()
+      const user = await Db.models.User.query()
+        .where('telegramId', req.params.id)
+        .first()
       res
         .status(200)
         .json(user || { status: 'error', reason: 'User Not Found' })

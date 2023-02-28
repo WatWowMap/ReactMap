@@ -236,7 +236,7 @@ module.exports = async function scannerApi(
     }
 
     if (
-      Clients[user.rmStrategy] &&
+      Clients[user.rmStrategy]?.sendMessage &&
       config.scanner.backendConfig.sendDiscordMessage
     ) {
       const capitalized = category.replace('scan', 'Scan ')
@@ -251,57 +251,49 @@ module.exports = async function scannerApi(
         .join('\n')
       switch (user.strategy) {
         case 'discord':
-          await Clients[user.rmStrategy].sendMessage(
+          Clients[user.rmStrategy].sendMessage(
             {
-              embed: {
-                title: `${capitalized} Request`,
-                author: {
-                  name: user.username,
-                  icon_url: `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`,
-                },
-                thumbnail: {
-                  url:
-                    config.authentication.strategies.find(
-                      (strategy) => strategy.name === user.rmStrategy,
-                    )?.thumbnailUrl ??
-                    `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
-                },
-                timestamp: new Date(),
-                description: `<@${user.discordId}>\n${capitalized} Size: ${
-                  category === 'scanNext'
-                    ? data.scanNextType
-                    : data.scanZoneSize
-                }\nCoordinates: ${coords.length}\n`,
-                color:
-                  category === 'scanNext'
-                    ? config.map.theme.primary
-                    : config.map.theme.secondary,
-                fields: [
-                  {
-                    name: `User History`,
-                    value: `Total Requests: ${updatedCache.requests}\nTotal Coordinates: ${updatedCache.coordinates}`,
-                    inline: true,
-                  },
-                  {
-                    name: 'Instance',
-                    value: `${
-                      config.scanner.backendConfig.platform === 'mad'
-                        ? `Device: ${config.scanner.scanNext.scanNextDevice}`
-                        : ''
-                    }\nName: ${
-                      config.scanner[category]?.[`${category}Instance`] || '-'
-                    }\nQueue: ${scannerQueue[category]?.queue || 0}`,
-                    inline: true,
-                  },
-                  {
-                    name: `Coordinates (${coords.length})`,
-                    value:
-                      coords.length > 25
-                        ? `${trimmed}\n...${coords.length - 25} more`
-                        : trimmed,
-                  },
-                ],
+              title: `${capitalized} Request`,
+              author: {
+                name: user.username,
+                icon_url: `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`,
               },
+              thumbnail: {
+                url:
+                  config.authentication.strategies.find(
+                    (strategy) => strategy.name === user.rmStrategy,
+                  )?.thumbnailUrl ??
+                  `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
+              },
+              timestamp: new Date(),
+              description: `<@${user.discordId}>\n${capitalized} Size: ${
+                category === 'scanNext' ? data.scanNextType : data.scanZoneSize
+              }\nCoordinates: ${coords.length}\n`,
+              fields: [
+                {
+                  name: `User History`,
+                  value: `Total Requests: ${updatedCache.requests}\nTotal Coordinates: ${updatedCache.coordinates}`,
+                  inline: true,
+                },
+                {
+                  name: 'Instance',
+                  value: `${
+                    config.scanner.backendConfig.platform === 'mad'
+                      ? `Device: ${config.scanner.scanNext.scanNextDevice}`
+                      : ''
+                  }\nName: ${
+                    config.scanner[category]?.[`${category}Instance`] || '-'
+                  }\nQueue: ${scannerQueue[category]?.queue || 0}`,
+                  inline: true,
+                },
+                {
+                  name: `Coordinates (${coords.length})`,
+                  value:
+                    coords.length > 25
+                      ? `${trimmed}\n...${coords.length - 25} more`
+                      : trimmed,
+                },
+              ],
             },
             category,
           )

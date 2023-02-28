@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const router = require('express').Router()
 const { api } = require('../../../services/config')
-const { Session } = require('../../../models/index')
+const { Db } = require('../../../services/initialization')
 
 router.get('/', async (req, res) => {
   try {
@@ -10,7 +10,9 @@ router.get('/', async (req, res) => {
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
       const ts = Math.floor(new Date().getTime() / 1000)
-      res.status(200).json(await Session.query().where('expires', '>=', ts))
+      res
+        .status(200)
+        .json(await Db.models.Session.query().where('expires', '>=', ts))
     } else {
       throw new Error('Incorrect or missing API secret')
     }
@@ -26,7 +28,7 @@ router.get('/hasValid/:id', async (req, res) => {
       api.reactMapSecret &&
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
-      const results = await Session.query().whereRaw(
+      const results = await Db.models.Session.query().whereRaw(
         `json_extract(data, '$.passport.user.id') = ${req.params.id}
           OR json_extract(data, '$.passport.user.discordId') = "${req.params.id}"
           OR json_extract(data, '$.passport.user.telegramId') = "${req.params.id}"`,
@@ -51,7 +53,7 @@ router.get('/clearSessions/:id', async (req, res) => {
       api.reactMapSecret &&
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
-      const results = await Session.query()
+      const results = await Db.models.Session.query()
         .whereRaw(
           `json_extract(data, '$.passport.user.id') = ${req.params.id}
             OR json_extract(data, '$.passport.user.discordId') = "${req.params.id}"

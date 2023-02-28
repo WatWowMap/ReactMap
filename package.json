@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.9.9",
+  "version": "1.10.0",
   "description": "React based frontend map.",
   "main": "ReactMap.js",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -30,7 +30,7 @@
     "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix"
   },
   "engines": {
-    "node": ">=16",
+    "node": ">=18",
     "yarn": "^1.22.x"
   },
   "devDependencies": {
@@ -70,7 +70,7 @@
     "bcrypt": "^5.0.1",
     "compression": "^1.7.4",
     "config": "^3.3.9",
-    "discord.js": "^12.5.3",
+    "discord.js": "^14.7.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.3",
     "express-mysql-session": "^2.1.6",

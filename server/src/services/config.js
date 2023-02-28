@@ -275,19 +275,6 @@ config.multiDomainsObj = Object.fromEntries(
   config.multiDomains.map((d) => [d.domain, mergeMapConfig(d)]),
 )
 
-// Consolidate Auth Methods
-// Create Authentication Objects
-config.authMethods = [
-  ...new Set(
-    config.authentication.strategies
-      .filter((strategy) => strategy.enabled)
-      .map((strategy) => {
-        config.authentication[strategy.name] = strategy
-        return strategy.type
-      }),
-  ),
-]
-
 // Check if empty
 ;['tileServers', 'navigation'].forEach((opt) => {
   if (!config[opt].length) {
@@ -315,6 +302,27 @@ const aliasObj = Object.fromEntries(
 
 const replaceAliases = (role) => aliasObj[role] ?? role
 
+const getJsDate = (dataObj = {}) =>
+  new Date(
+    dataObj.year,
+    dataObj.month - 1,
+    dataObj.day,
+    dataObj.hour || 0,
+    dataObj.minute || 0,
+    dataObj.second || 0,
+    dataObj.millisecond || 0,
+  )
+
+const replaceBothAliases = (incomingObj) => ({
+  ...incomingObj,
+  discordRoles: Array.isArray(incomingObj.discordRoles)
+    ? incomingObj.discordRoles.map(replaceAliases)
+    : undefined,
+  telegramGroups: Array.isArray(incomingObj.telegramGroups)
+    ? incomingObj.telegramGroups.map(replaceAliases)
+    : undefined,
+})
+
 Object.keys(config.authentication.perms).forEach((perm) => {
   config.authentication.perms[perm].roles =
     config.authentication.perms[perm].roles.map(replaceAliases)
@@ -331,18 +339,50 @@ config.authentication.strategies = config.authentication.strategies.map(
     ...strategy,
     allowedGuilds: Array.isArray(strategy.allowedGuilds)
       ? strategy.allowedGuilds.map(replaceAliases)
-      : undefined,
+      : [],
     blockedGuilds: Array.isArray(strategy.blockedGuilds)
       ? strategy.blockedGuilds.map(replaceAliases)
-      : undefined,
+      : [],
     groups: Array.isArray(strategy.groups)
       ? strategy.groups.map(replaceAliases)
-      : undefined,
+      : [],
     allowedUsers: Array.isArray(strategy.allowedUsers)
       ? strategy.allowedUsers.map(replaceAliases)
-      : undefined,
+      : [],
+    trialPeriod: {
+      ...strategy.trialPeriod,
+      start: {
+        js: getJsDate(strategy?.trialPeriod?.start),
+      },
+      end: {
+        js: getJsDate(strategy?.trialPeriod?.end),
+      },
+      roles: Array.isArray(strategy?.trialPeriod?.roles)
+        ? strategy.trialPeriod.roles.map(replaceAliases)
+        : [],
+    },
   }),
 )
+
+// Consolidate Auth Methods
+// Create Authentication Objects
+config.authMethods = [
+  ...new Set(
+    config.authentication.strategies
+      .filter((strategy) => strategy.enabled)
+      .map((strategy) => {
+        config.authentication[strategy.name] = strategy
+        return strategy.type
+      }),
+  ),
+]
+
+if (Array.isArray(config.webhooks)) {
+  config.webhooks = config.webhooks.map(replaceBothAliases)
+}
+Object.keys(config.scanner || {}).forEach((key) => {
+  config.scanner[key] = replaceBothAliases(config.scanner[key] || {})
+})
 
 if (
   !config.authentication.strategies.length ||

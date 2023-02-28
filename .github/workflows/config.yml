@@ -25,7 +25,7 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'yarn'
       - name: Run script
         if: steps.changed-files.outputs.any_changed == 'true'

@@ -38,7 +38,7 @@ module.exports = gql`
 
   type ScanArea {
     type: String
-    features: [JSON]
+    features: JSON
   }
 
   type ScanAreasMenu {

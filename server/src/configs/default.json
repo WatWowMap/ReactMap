@@ -569,6 +569,7 @@
     },
     "scanNext": {
       "enabled": false,
+      "trialPeriodEligible": false,
       "showScanCount": false,
       "showScanQueue": false,
       "scanNextInstance": "scanNext",
@@ -580,6 +581,7 @@
     },
     "scanZone": {
       "enabled": false,
+      "trialPeriodEligible": false,
       "showScanCount": false,
       "showScanQueue": false,
       "scanZoneMaxSize": 10,
@@ -614,14 +616,48 @@
         "allowedGuilds": [],
         "blockedGuilds": [],
         "allowedUsers": [],
-        "thumbnailUrl": "https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png"
+        "thumbnailUrl": "https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png",
+        "trialPeriod": {
+          "start": {
+            "year": 2023,
+            "month": 1,
+            "day": 1,
+            "hour": 14,
+            "minute": 0
+          },
+          "end": {
+            "year": 2023,
+            "month": 1,
+            "day": 2,
+            "hour": 14,
+            "minute": 0
+          },
+          "roles": []
+        }
       },
       {
         "name": "telegram",
         "type": "telegram",
         "enabled": false,
         "botToken": "",
-        "groups": []
+        "groups": [],
+        "trialPeriod": {
+          "start": {
+            "year": 2023,
+            "month": 1,
+            "day": 1,
+            "hour": 14,
+            "minute": 0
+          },
+          "end": {
+            "year": 2023,
+            "month": 1,
+            "day": 2,
+            "hour": 14,
+            "minute": 0
+          },
+          "roles": []
+        }
       },
       {
         "name": "local",
@@ -637,46 +673,57 @@
     "perms": {
       "map": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "pokemon": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "iv": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "pvp": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "gyms": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "raids": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "pokestops": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "eventStops": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "quests": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "lures": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "portals": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "submissionCells": {
@@ -685,38 +732,47 @@
       },
       "invasions": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "nests": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "scanAreas": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "weather": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "spawnpoints": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "scanCells": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "devices": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "donor": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "gymBadges": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       }
     }
