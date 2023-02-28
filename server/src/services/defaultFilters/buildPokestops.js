@@ -3,14 +3,12 @@ const { Event } = require('../initialization')
 
 module.exports = function buildPokestops(perms, defaults, available) {
   const quests = { s0: new GenericFilter() }
-  if (perms.lures) {
-    defaults.baseLureIds.forEach((lure) => {
-      quests[`l${lure}`] = new GenericFilter(defaults.lures)
-    })
-  }
   if (perms.quests) {
     Object.keys(Event.masterfile.items).forEach((item) => {
       quests[`q${item}`] = new GenericFilter(defaults.items)
+      if (Event.masterfile.items[item]?.includes('Troy Disk') && perms.lures) {
+        quests[`l${item}`] = new GenericFilter(defaults.lures)
+      }
     })
     for (
       let i = defaults.stardust.min;
