@@ -1,5 +1,4 @@
-const { authentication } = require('../config')
-const areas = require('../areas')
+const config = require('../config')
 
 module.exports = function getAreaRestrictionSql(
   query,
@@ -9,21 +8,23 @@ module.exports = function getAreaRestrictionSql(
   category,
 ) {
   if (
-    authentication.strictAreaRestrictions &&
-    authentication.areaRestrictions.length &&
+    config.authentication.strictAreaRestrictions &&
+    config.authentication.areaRestrictions.length &&
     !areaRestrictions.length
   )
     return false
 
   if (!areaRestrictions?.length && !onlyAreas?.length) return true
 
-  const cleanUserAreas = onlyAreas.filter((area) => areas.names.includes(area))
+  const cleanUserAreas = onlyAreas.filter((area) =>
+    config.areas.names.includes(area),
+  )
   const consolidatedAreas = areaRestrictions.length
     ? areaRestrictions
         .filter(
           (area) => !cleanUserAreas.length || cleanUserAreas.includes(area),
         )
-        .flatMap((area) => areas.withoutParents[area] || area)
+        .flatMap((area) => config.areas.withoutParents[area] || area)
     : cleanUserAreas
 
   if (!consolidatedAreas.length) return false
@@ -47,10 +48,11 @@ module.exports = function getAreaRestrictionSql(
 
   query.andWhere((restrictions) => {
     consolidatedAreas.forEach((area) => {
-      if (areas.polygons[area]) {
-        const polygon = areas.polygons[area].map((e) => e.join(' ')).join()
+      if (config.areas.polygons[area]) {
         restrictions.orWhereRaw(
-          `ST_CONTAINS(ST_GeomFromText("POLYGON((${polygon}))"), POINT(${columns[1]}, ${columns[0]}))`,
+          `ST_CONTAINS(ST_GeomFromGeoJSON('${JSON.stringify(
+            config.areas.polygons[area],
+          )}', 2, 0), POINT(${columns[1]}, ${columns[0]}))`,
         )
       }
     })
