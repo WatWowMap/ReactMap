@@ -214,8 +214,7 @@ module.exports = class DiscordClient {
 
   sendMessage(embed, channel = 'main') {
     // if (!process.env.NODE_APP_INSTANCE || process.env.NODE_APP_INSTANCE === 0) {
-    const safeChannel =
-      this.loggingChannels[channel] ?? this.loggingChannels.main
+    const safeChannel = this.loggingChannels[channel]
     if (!safeChannel || typeof embed !== 'object') {
       return
     }
