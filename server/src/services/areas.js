@@ -161,15 +161,39 @@ const parseAreas = (areasObj) => {
   }
   areasObj.features.forEach((feature) => {
     const { name, key, manual } = feature.properties
-    if (
-      (feature.geometry.type == 'Polygon' ||
-        feature.geometry.type === 'MultiPolygon') &&
-      name &&
-      !manual
-    ) {
+    if (name && !manual && feature.geometry.type.includes('Polygon')) {
+      const { coordinates } = feature.geometry
+      if (feature.geometry.type === 'Polygon') {
+        coordinates.forEach((polygon, i) => {
+          if (
+            polygon[0][0] !== polygon[polygon.length - 1][0] ||
+            polygon[0][1] !== polygon[polygon.length - 1][1]
+          ) {
+            console.warn('[AREAS] Polygon not closed', name, `Index (${i})`)
+            polygon.push(polygon[0])
+          }
+        })
+      } else {
+        coordinates.forEach((poly, i) => {
+          poly.forEach((polygon, j) => {
+            if (
+              polygon[0][0] !== polygon[polygon.length - 1][0] ||
+              polygon[0][1] !== polygon[polygon.length - 1][1]
+            ) {
+              console.warn(
+                '[AREAS] MultiPolygon contains unclosed Polygon',
+                name,
+                `Polygon (${i})`,
+                `Index (${j})`,
+              )
+              polygon.push(polygon[0])
+            }
+          })
+        })
+      }
+      feature.geometry.coordinates = coordinates
       polygons[key] = feature.geometry
       names.push(key)
-
       if (withoutParents[name]) {
         withoutParents[name].push(key)
       } else {
