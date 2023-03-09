@@ -4,7 +4,6 @@ process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
 const fs = require('fs')
 const { resolve } = require('path')
 const dotenv = require('dotenv')
-const { default: center } = require('@turf/center')
 
 dotenv.config()
 
@@ -276,6 +275,95 @@ config.multiDomainsObj = Object.fromEntries(
   config.multiDomains.map((d) => [d.domain, mergeMapConfig(d)]),
 )
 
+// Check if empty
+;['tileServers', 'navigation'].forEach((opt) => {
+  if (!config[opt].length) {
+    console.warn(
+      `[${opt}] is empty, you need to add options to it or remove the empty array from your config.`,
+    )
+  }
+})
+
+config.api.pvp.leagueObj = Object.fromEntries(
+  config.api.pvp.leagues.map((league) => [league.name, league.cp]),
+)
+const hasLittle = config.api.pvp.leagues.find(
+  (league) => league.name === 'little',
+)
+if (hasLittle) {
+  config.api.pvp.leagueObj.little = hasLittle.littleCupRules
+    ? 500
+    : { little: false, cap: 500 }
+}
+
+const aliasObj = Object.fromEntries(
+  config.authentication.aliases.map((alias) => [alias.name, alias.role]),
+)
+
+const replaceAliases = (role) => aliasObj[role] ?? role
+
+const getJsDate = (dataObj = {}) =>
+  new Date(
+    dataObj.year,
+    dataObj.month - 1,
+    dataObj.day,
+    dataObj.hour || 0,
+    dataObj.minute || 0,
+    dataObj.second || 0,
+    dataObj.millisecond || 0,
+  )
+
+const replaceBothAliases = (incomingObj) => ({
+  ...incomingObj,
+  discordRoles: Array.isArray(incomingObj.discordRoles)
+    ? incomingObj.discordRoles.map(replaceAliases)
+    : undefined,
+  telegramGroups: Array.isArray(incomingObj.telegramGroups)
+    ? incomingObj.telegramGroups.map(replaceAliases)
+    : undefined,
+})
+
+Object.keys(config.authentication.perms).forEach((perm) => {
+  config.authentication.perms[perm].roles =
+    config.authentication.perms[perm].roles.map(replaceAliases)
+})
+
+config.authentication.areaRestrictions =
+  config.authentication.areaRestrictions.map(({ roles, areas }) => ({
+    roles: roles.map(replaceAliases),
+    areas,
+  }))
+
+config.authentication.strategies = config.authentication.strategies.map(
+  (strategy) => ({
+    ...strategy,
+    allowedGuilds: Array.isArray(strategy.allowedGuilds)
+      ? strategy.allowedGuilds.map(replaceAliases)
+      : [],
+    blockedGuilds: Array.isArray(strategy.blockedGuilds)
+      ? strategy.blockedGuilds.map(replaceAliases)
+      : [],
+    groups: Array.isArray(strategy.groups)
+      ? strategy.groups.map(replaceAliases)
+      : [],
+    allowedUsers: Array.isArray(strategy.allowedUsers)
+      ? strategy.allowedUsers.map(replaceAliases)
+      : [],
+    trialPeriod: {
+      ...strategy.trialPeriod,
+      start: {
+        js: getJsDate(strategy?.trialPeriod?.start),
+      },
+      end: {
+        js: getJsDate(strategy?.trialPeriod?.end),
+      },
+      roles: Array.isArray(strategy?.trialPeriod?.roles)
+        ? strategy.trialPeriod.roles.map(replaceAliases)
+        : [],
+    },
+  }),
+)
+
 // Consolidate Auth Methods
 // Create Authentication Objects
 config.authMethods = [
@@ -289,139 +377,12 @@ config.authMethods = [
   ),
 ]
 
-// Check if empty
-;['tileServers', 'navigation'].forEach((opt) => {
-  if (!config[opt].length) {
-    console.warn(
-      `[${opt}] is empty, you need to add options to it or remove the empty array from your config.`,
-    )
-  }
+if (Array.isArray(config.webhooks)) {
+  config.webhooks = config.webhooks.map(replaceBothAliases)
+}
+Object.keys(config.scanner || {}).forEach((key) => {
+  config.scanner[key] = replaceBothAliases(config.scanner[key] || {})
 })
-
-const manualGeojson = {
-  type: 'FeatureCollection',
-  features: config.manualAreas
-    .filter((area) =>
-      ['lat', 'lon', 'name'].every((k) => k in area && !area.hidden),
-    )
-    .map((area) => {
-      const { lat, lon, ...rest } = area
-      return {
-        type: 'Feature',
-        properties: {
-          center: [lat, lon],
-          manual: true,
-          key: rest.parent ? `${rest.parent}-${rest.name}` : rest.name,
-          ...rest,
-        },
-        geometry: {
-          type: 'Polygon',
-          coordinates: [[[lon, lat]]],
-        },
-      }
-    }),
-}
-
-// Load each areas.json
-const loadScanPolygons = (fileName, domain) => {
-  const geojson = fs.existsSync(resolve(`${__dirname}/../configs/${fileName}`))
-    ? JSON.parse(fs.readFileSync(resolve(__dirname, `../configs/${fileName}`)))
-    : { features: [] }
-  return {
-    ...geojson,
-    features: [
-      ...manualGeojson.features.filter(
-        (f) => !f.properties.domain || f.properties.domain === domain,
-      ),
-      ...geojson.features.map((f) => ({
-        ...f,
-        properties: {
-          ...f.properties,
-          key: f.properties.parent
-            ? `${f.properties.parent}-${f.properties.name}`
-            : f.properties.name,
-          center: center(f).geometry.coordinates.reverse(),
-        },
-      })),
-    ].sort((a, b) => a.properties.name.localeCompare(b.properties.name)),
-  }
-}
-
-// Check if an areas.json exists
-config.scanAreas = {
-  main: loadScanPolygons(config.map.geoJsonFileName),
-  ...Object.fromEntries(
-    config.multiDomains.map((d) => [
-      d.general?.geoJsonFileName ? d.domain : 'main',
-      loadScanPolygons(
-        d.general?.geoJsonFileName || config.map.geoJsonFileName,
-      ),
-    ]),
-  ),
-}
-
-config.scanAreasMenu = Object.fromEntries(
-  Object.entries(config.scanAreas).map(([domain, areas]) => {
-    const parents = { '': { children: [], name: '' } }
-
-    const noHidden = {
-      ...areas,
-      features: areas.features.filter((f) => !f.properties.hidden),
-    }
-    // Finds unique parents and determines if the parents have their own properties
-    noHidden.features.forEach((feature) => {
-      if (feature.properties.parent) {
-        parents[feature.properties.parent] = {
-          name: feature.properties.parent,
-          details: areas.features.find(
-            (area) => area.properties.name === feature.properties.parent,
-          ),
-          children: [],
-        }
-      }
-    })
-
-    // Finds the children of each parent
-    noHidden.features.forEach((feature) => {
-      if (feature.properties.parent) {
-        parents[feature.properties.parent].children.push(feature)
-      } else if (!parents[feature.properties.name]) {
-        parents[''].children.push(feature)
-      }
-    })
-
-    // Create blanks for better formatting when there's an odd number of children
-    Object.values(parents).forEach(({ children }) => {
-      if (children.length % 2 === 1) {
-        children.push({
-          type: 'Feature',
-          properties: { name: '', manual: !!config.manualAreas.length },
-        })
-      }
-    })
-    return [
-      domain,
-      Object.values(parents).sort((a, b) => a.name.localeCompare(b.name)),
-    ]
-  }),
-)
-config.scanAreasObj = Object.fromEntries(
-  Object.values(config.scanAreas)
-    .flatMap((areas) => areas.features)
-    .map((feature) => [feature.properties.name, feature]),
-)
-
-config.api.pvp.leagueObj = Object.fromEntries(
-  config.api.pvp.leagues.map((league) => [league.name, league.cp]),
-)
-const hasLittle = config.api.pvp.leagues.find(
-  (league) => league.name === 'little',
-)
-if (hasLittle) {
-  config.api.pvp.leagueObj.little = hasLittle.littleCupRules
-    ? 500
-    : { little: false, cap: 500 }
-}
 
 if (
   !config.authentication.strategies.length ||

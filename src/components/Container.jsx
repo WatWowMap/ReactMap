@@ -26,6 +26,8 @@ export default function Container({ serverSettings, params, location, zoom }) {
       {serverSettings.user && serverSettings.user.perms.map && (
         <Map serverSettings={serverSettings} params={params} />
       )}
+      <Pane name="geojson" style={{ zIndex: 501 }} />
+      <Pane name="scanCells" style={{ zIndex: 400 }} />
       <Pane name="circlePane" style={{ zIndex: 450, pointerEvents: 'none' }} />
     </MapContainer>
   )

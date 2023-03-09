@@ -1,4 +1,5 @@
 {
+  "READ_ME": "https://github.com/WatWowMap/ReactMap/wiki/04.-Full-Config-Explanation",
   "interface": "0.0.0.0",
   "port": 8080,
   "packageSource": "git/docker",
@@ -124,7 +125,24 @@
         "redirectUri": "http://localhost:8080/auth/discord/callback",
         "allowedGuilds": [],
         "blockedGuilds": [],
-        "allowedUsers": []
+        "allowedUsers": [],
+        "trialPeriod": {
+          "start": {
+            "year": 2023,
+            "month": 1,
+            "day": 1,
+            "hour": 14,
+            "minute": 0
+          },
+          "end": {
+            "year": 2023,
+            "month": 1,
+            "day": 2,
+            "hour": 14,
+            "minute": 0
+          },
+          "roles": []
+        }
       }
     ],
     "areaRestrictions": [
@@ -137,88 +155,121 @@
         "areas": []
       }
     ],
+    "aliases": [
+      {
+        "role": "123415123541",
+        "name": "verified"
+      },
+      {
+        "role": "897581458191",
+        "name": "supporter"
+      }
+    ],
     "alwaysEnabledPerms": [],
     "perms": {
       "map": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "pokemon": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "iv": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "pvp": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "gyms": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "raids": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "pokestops": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "eventStops": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "quests": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "lures": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "portals": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "submissionCells": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "invasions": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "nests": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "scanAreas": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "weather": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "spawnpoints": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "scanCells": {
+        "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "devices": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "donor": {
+        "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       },
       "gymBadges": {
         "enabled": true,
+        "trialPeriodEligible": false,
         "roles": []
       }
     }

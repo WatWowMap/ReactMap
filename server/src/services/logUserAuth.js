@@ -157,7 +157,7 @@ module.exports = async function getAuthInfo(req, user, strategy) {
       'Authenticated successfully.',
     )
     embed.color = 0x00ff00
-  } else if (user.blocked) {
+  } else if (user.perms?.blocked) {
     console.warn('[DISCORD]', user.id, 'Blocked due to', user.blocked)
     embed.description = `User Blocked Due to ${user.blocked}`
     embed.color = 0xff0000

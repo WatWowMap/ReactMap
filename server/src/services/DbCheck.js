@@ -28,10 +28,14 @@ module.exports = class DbCheck {
           const capital = `${category.charAt(0).toUpperCase()}${category.slice(
             1,
           )}`
-          if (!this.models[capital]) {
-            this.models[capital] = []
+          if (this.singleModels.includes(capital)) {
+            this.models[capital] = { connection: i }
+          } else {
+            if (!this.models[capital]) {
+              this.models[capital] = []
+            }
+            this.models[capital].push({ connection: i })
           }
-          this.models[capital].push({ connection: i })
         })
         if (schema.endpoint) {
           this.memEndpoints[i] = schema.endpoint
@@ -120,23 +124,30 @@ module.exports = class DbCheck {
                 ? 'availble_slots'
                 : 'available_slots',
             ])
+          const [polygon] = await schema('nests')
+            .columnInfo()
+            .then((columns) => ['polygon' in columns])
+
           Object.entries(this.models).forEach(([category, sources]) => {
-            sources.forEach((source, j) => {
-              if (source.connection === i) {
-                this.models[category][j].isMad = isMad
-                this.models[category][j].pvpV2 = pvpV2
-                this.models[category][j].mem = mem
-                this.models[category][j].hasSize = hasSize
-                this.models[category][j].hasHeight = hasHeight
-                this.models[category][j].hasRewardAmount = hasRewardAmount
-                this.models[category][j].hasPowerUp = hasPowerUp
-                this.models[category][j].hasAltQuests = hasAltQuests
-                this.models[category][j].hasMultiInvasions = hasMultiInvasions
-                this.models[category][j].multiInvasionMs = multiInvasionMs
-                this.models[category][j].availableSlotsCol = availableSlotsCol
-                this.models[category][j].hasLayerColumn = hasLayerColumn
-              }
-            })
+            if (Array.isArray(sources)) {
+              sources.forEach((source, j) => {
+                if (source.connection === i) {
+                  this.models[category][j].isMad = isMad
+                  this.models[category][j].pvpV2 = pvpV2
+                  this.models[category][j].mem = mem
+                  this.models[category][j].hasSize = hasSize
+                  this.models[category][j].hasHeight = hasHeight
+                  this.models[category][j].hasRewardAmount = hasRewardAmount
+                  this.models[category][j].hasPowerUp = hasPowerUp
+                  this.models[category][j].hasAltQuests = hasAltQuests
+                  this.models[category][j].hasMultiInvasions = hasMultiInvasions
+                  this.models[category][j].multiInvasionMs = multiInvasionMs
+                  this.models[category][j].availableSlotsCol = availableSlotsCol
+                  this.models[category][j].hasLayerColumn = hasLayerColumn
+                  this.models[category][j].polygon = polygon
+                }
+              })
+            }
           })
         } catch (e) {
           console.error('[DB]', e.message)
@@ -212,9 +223,11 @@ module.exports = class DbCheck {
             process.exit(0)
           }
           if (model === 'User') {
-            models.Badge.knex(this.connections[sources[0].connection])
+            this.models.Badge = models.Badge
+            this.models.Badge.knex(this.connections[sources.connection])
           }
-          models[model].knex(this.connections[sources[0].connection])
+          this.models[model] = models[model]
+          this.models[model].knex(this.connections[sources.connection])
         } else {
           sources.forEach((source, i) => {
             this.models[model][i].SubModel = models[model].bindKnex(
@@ -223,7 +236,7 @@ module.exports = class DbCheck {
           })
         }
         console.log(
-          `[DB] Bound ${model} to ${sources.length} connection${
+          `[DB] Bound ${model} to ${sources.length ?? 1} connection${
             sources.length > 1 ? 's' : ''
           }`,
         )

@@ -4,22 +4,20 @@ const Strategy = require('passport-local')
 const bcrypt = require('bcrypt')
 const path = require('path')
 
+const { name } = path.parse(__filename)
+
 const {
   map: { forceTutorial },
-  authentication: {
-    [path.parse(__filename).name]: strategyConfig,
-    alwaysEnabledPerms,
-    perms,
-  },
+  authentication: { [name]: strategyConfig, alwaysEnabledPerms, perms },
 } = require('../services/config')
-const { User } = require('../models/index')
+const { Db } = require('../services/initialization')
 const Utility = require('../services/Utility')
 
 if (strategyConfig.doNothing) {
   // This is for nothing other than demonstrating a custom property you can add if you need it
 }
 
-const authHandler = async (req, username, password, done) => {
+const authHandler = async (_req, username, password, done) => {
   const localPerms = Object.keys(perms).filter((key) =>
     perms[key].roles.includes('local'),
   )
@@ -39,12 +37,12 @@ const authHandler = async (req, username, password, done) => {
   }
 
   try {
-    await User.query()
+    await Db.models.User.query()
       .findOne({ username })
       .then(async (userExists) => {
         if (!userExists) {
           try {
-            const newUser = await User.query().insertAndFetch({
+            const newUser = await Db.models.User.query().insertAndFetch({
               username,
               password: await bcrypt.hash(password, 10),
               strategy: 'local',
@@ -52,7 +50,7 @@ const authHandler = async (req, username, password, done) => {
             })
             user.id = newUser.id
             console.log(
-              '[LOCAL]',
+              `[${name.toUpperCase()}]`,
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -69,14 +67,14 @@ const authHandler = async (req, username, password, done) => {
             }
           })
           if (userExists.strategy !== 'local') {
-            await User.query()
+            await Db.models.User.query()
               .update({ strategy: 'local' })
               .where('id', userExists.id)
             userExists.strategy = 'local'
           }
           user.id = userExists.id
           console.log(
-            '[LOCAL]',
+            `[${name.toUpperCase()}]`,
             user.username,
             `(${user.id})`,
             'Authenticated successfully.',
@@ -86,7 +84,11 @@ const authHandler = async (req, username, password, done) => {
         return done(null, false, { message: 'invalid_credentials' })
       })
   } catch (e) {
-    console.error('User has failed Local authentication.', e.message)
+    console.error(
+      `[${name.toUpperCase()}]`,
+      'User has failed authentication.',
+      e.message,
+    )
   }
 }
 

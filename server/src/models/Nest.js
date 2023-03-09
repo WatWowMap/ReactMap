@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 const { Model } = require('objection')
 const i18next = require('i18next')
 const { Event } = require('../services/initialization')
@@ -19,7 +20,7 @@ module.exports = class Nest extends Model {
     return 'nest_id'
   }
 
-  static async getAll(perms, args) {
+  static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
     const { minLat, minLon, maxLat, maxLon, filters } = args
     const pokemon = []
@@ -30,11 +31,15 @@ module.exports = class Nest extends Model {
     })
     const query = this.query()
       .select(['*', 'nest_id AS id'])
+      .whereNotNull('pokemon_id')
       .whereBetween('lat', [minLat, maxLat])
       .andWhereBetween('lon', [minLon, maxLon])
       .whereIn('pokemon_id', pokemon)
     if (!avgFilter.every((x, i) => x === filters.onlyAvgFilter[i])) {
       query.andWhereBetween('pokemon_avg', filters.onlyAvgFilter)
+    }
+    if (polygon) {
+      query.select(this.raw('ST_AsGeoJSON(polygon)').as('polygon'))
     }
     if (!getAreaSql(query, areaRestrictions, filters.onlyAreas || [])) {
       return []
@@ -48,6 +53,18 @@ module.exports = class Nest extends Model {
           const formId = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
           if (formId) pkmn.pokemon_form = formId
         }
+        pkmn.polygon_path = polygon
+          ? typeof pkmn.polygon === 'string' && pkmn.polygon
+            ? pkmn.polygon
+            : JSON.stringify(
+                pkmn.polygon || { type: 'Polygon', coordinates: [] },
+              )
+          : JSON.stringify({
+              type: 'Polygon',
+              coordinates: JSON.parse(pkmn.polygon_path || '[]').map((line) =>
+                line.map((point) => [point[1], point[0]]),
+              ),
+            })
         if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
           returnedResults.push(pkmn)
         }
@@ -60,6 +77,7 @@ module.exports = class Nest extends Model {
   static async getAvailable() {
     const results = await this.query()
       .select(['pokemon_id', 'pokemon_form'])
+      .whereNotNull('pokemon_id')
       .groupBy('pokemon_id', 'pokemon_form')
       .orderBy('pokemon_id', 'asc')
 
@@ -93,6 +111,7 @@ module.exports = class Nest extends Model {
         distance,
       ])
       .whereIn('pokemon_id', pokemonIds)
+      .whereNotNull('pokemon_id')
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {

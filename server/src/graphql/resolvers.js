@@ -3,7 +3,6 @@ const GraphQLJSON = require('graphql-type-json')
 const { AuthenticationError, UserInputError } = require('apollo-server-core')
 
 const config = require('../services/config')
-const { User, Badge } = require('../models/index')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 
@@ -33,7 +32,7 @@ module.exports = {
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.gymBadges) {
-        const badges = await Badge.getAll(req.user?.id)
+        const badges = await Db.models.Badge.getAll(req.user?.id)
         return Db.getAll('Gym', badges, {}, req.user?.id, 'getBadges')
       }
       return []
@@ -185,9 +184,9 @@ module.exports = {
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.scanAreas) {
-        const scanAreas = config.scanAreas[req.headers.host]
-          ? config.scanAreas[req.headers.host]
-          : config.scanAreas.main
+        const scanAreas = config.areas.scanAreas[req.headers.host]
+          ? config.areas.scanAreas[req.headers.host]
+          : config.areas.scanAreas.main
         return [
           {
             ...scanAreas,
@@ -208,9 +207,9 @@ module.exports = {
       if (!perms) throw new AuthenticationError('session_expired')
 
       if (perms?.scanAreas) {
-        const scanAreas = config.scanAreasMenu[req.headers.host]
-          ? config.scanAreasMenu[req.headers.host]
-          : config.scanAreasMenu.main
+        const scanAreas = config.areas.scanAreasMenu[req.headers.host]
+          ? config.areas.scanAreasMenu[req.headers.host]
+          : config.areas.scanAreasMenu.main
 
         if (perms.areaRestrictions.length) {
           const filtered = scanAreas
@@ -388,9 +387,9 @@ module.exports = {
       }
       return {}
     },
-    tutorial: async (_, args, { req }) => {
+    tutorial: async (_, args, { req, Db }) => {
       if (req.user) {
-        await User.query()
+        await Db.models.User.query()
           .update({ tutorial: args.tutorial })
           .where('id', req.user.id)
         return true
@@ -401,22 +400,25 @@ module.exports = {
       }
       return false
     },
-    strategy: async (_, args, { req }) => {
+    strategy: async (_, args, { req, Db }) => {
       if (req.user) {
-        await User.query()
+        await Db.models.User.query()
           .update({ webhookStrategy: args.strategy })
           .where('id', req.user.id)
         return true
       }
       return false
     },
-    checkUsername: async (_, args) => {
-      const results = await User.query().where('username', args.username)
+    checkUsername: async (_, args, { Db }) => {
+      const results = await Db.models.User.query().where(
+        'username',
+        args.username,
+      )
       return Boolean(results.length)
     },
-    setExtraFields: async (_, { key, value }, { req }) => {
+    setExtraFields: async (_, { key, value }, { req, Db }) => {
       if (req.user?.id) {
-        const user = await User.query().findById(req.user.id)
+        const user = await Db.models.User.query().findById(req.user.id)
         if (user) {
           const data =
             typeof user.data === 'string'
@@ -429,21 +431,21 @@ module.exports = {
       }
       return false
     },
-    setGymBadge: async (_, args, { req }) => {
+    setGymBadge: async (_, args, { req, Db }) => {
       const perms = req.user ? req.user.perms : false
       if (perms?.gymBadges && req?.user?.id) {
         if (
-          await Badge.query()
+          await Db.models.Badge.query()
             .where('gymId', args.gymId)
             .andWhere('userId', req.user.id)
             .first()
         ) {
-          await Badge.query()
+          await Db.models.Badge.query()
             .where('gymId', args.gymId)
             .andWhere('userId', req.user.id)
             .update({ badge: args.badge })
         } else {
-          await Badge.query().insert({
+          await Db.models.Badge.query().insert({
             badge: args.badge,
             gymId: args.gymId,
             userId: req.user.id,

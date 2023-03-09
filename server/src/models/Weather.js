@@ -1,11 +1,9 @@
 const { Model, ref, raw } = require('objection')
-const { polygon, point } = require('@turf/helpers')
-const { default: pointInPolygon } = require('@turf/boolean-point-in-polygon')
+const { polygon } = require('@turf/helpers')
 const { default: booleanOverlap } = require('@turf/boolean-overlap')
 
 const getPolyVector = require('../services/functions/getPolyVector')
 const config = require('../services/config')
-const areas = require('../services/areas')
 
 const {
   api: { weatherCellLimit },
@@ -36,7 +34,7 @@ module.exports = class Weather extends Model {
     const results = await query
 
     const cleanUserAreas = args.filters.onlyAreas.filter((area) =>
-      areas.names.includes(area),
+      config.areas.names.includes(area),
     )
     const merged = perms.areaRestrictions.length
       ? perms.areaRestrictions.filter(
@@ -52,16 +50,8 @@ module.exports = class Weather extends Model {
           !merged.length ||
           merged.some(
             (area) =>
-              config.scanAreasObj[area] &&
-              (pointInPolygon(
-                point(config.scanAreasObj[area].geometry.coordinates[0][0]),
-                geojson,
-              ) ||
-                pointInPolygon(
-                  point([cell.longitude, cell.latitude]),
-                  config.scanAreasObj[area],
-                ) ||
-                booleanOverlap(geojson, config.scanAreasObj[area])),
+              config.areas.scanAreasObj[area] &&
+              booleanOverlap(geojson, config.areas.scanAreasObj[area]),
           )
         return (
           hasOverlap && {

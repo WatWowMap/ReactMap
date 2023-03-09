@@ -1,5 +1,5 @@
 import React, { memo, useRef, useState } from 'react'
-import { Polygon, Marker, Popup } from 'react-leaflet'
+import { GeoJSON, Marker, Popup } from 'react-leaflet'
 
 import useForcePopup from '@hooks/useForcePopup'
 import { useStatic } from '@hooks/useStore'
@@ -13,7 +13,7 @@ const NestTile = ({ item, filters, Icons, ts, params, setParams }) => {
   const { pokemon } = useStatic((state) => state.masterfile)
 
   const iconUrl = Icons.getPokemon(item.pokemon_id, item.pokemon_form)
-  const parsedJson = JSON.parse(item.polygon_path)
+  const geometry = JSON.parse(item.polygon_path)
   const recent = ts - item.updated < 172800000
 
   useForcePopup(item.id, markerRef, params, setParams, done)
@@ -48,11 +48,9 @@ const NestTile = ({ item, filters, Icons, ts, params, setParams }) => {
           </Popup>
         </Marker>
       )}
-      {parsedJson &&
-        filters.polygons &&
-        parsedJson.map((polygon) => (
-          <Polygon positions={polygon} key={polygon} />
-        ))}
+      {typeof geometry !== 'string' &&
+        geometry?.coordinates?.length &&
+        filters.polygons && <GeoJSON data={{ geometry, type: 'Feature' }} />}
     </>
   )
 }

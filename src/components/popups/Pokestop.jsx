@@ -455,7 +455,7 @@ const QuestConditions = ({ quest, t, userSettings }) => {
       case 2:
         return (
           <Trans i18nKey={key}>
-            {{ pokemon: qInfo.pokemon_ids.map((id) => t(`poke_${id}`)) }}
+            {{ pokemon: qInfo.pokemon_ids.map((id) => ` ${t(`poke_${id}`)}`) }}
           </Trans>
         )
       case 7:
@@ -502,7 +502,11 @@ const QuestConditions = ({ quest, t, userSettings }) => {
     }
   }
   return (
-    <Grid item xs={9} style={{ textAlign: 'center' }}>
+    <Grid
+      item
+      xs={9}
+      style={{ textAlign: 'center', maxHeight: 150, overflow: 'auto' }}
+    >
       {primaryCondition}
       {type1 && (
         <>

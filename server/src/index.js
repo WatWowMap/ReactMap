@@ -15,11 +15,15 @@ const { ApolloServer } = require('apollo-server-express')
 
 const config = require('./services/config')
 const { Db, Event } = require('./services/initialization')
-const { sessionStore } = require('./services/sessionStore')
+const Clients = require('./services/Clients')
+const sessionStore = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
 const pkg = require('../../package.json')
+const getAreas = require('./services/areas')
+
+Event.clients = Clients
 
 if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')
@@ -191,7 +195,7 @@ app.use(rootRouter, requestRateLimiter)
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error('[Express Error]:', err.message)
+  console.error('[EXPRESS]:', err)
   switch (err.message) {
     case 'NoCodeProvided':
       return res.redirect('/404')
@@ -215,8 +219,8 @@ Db.determineType().then(async () => {
       Event.getMasterfile(Db.historical, Db.rarity),
       Event.getInvasions(config.api.pogoApiEndpoints.invasions),
       Event.getWebhooks(config),
+      (config.areas = await getAreas()),
     ]).then(() => {
-      Event.addAvailable()
       app.listen(config.port, config.interface, () => {
         console.log(
           `[INIT] Server is now listening at http://${config.interface}:${config.port}`,
