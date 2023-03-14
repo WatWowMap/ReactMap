@@ -108,6 +108,10 @@
         "__name": "API_SEARCHABLE_POKESTOPS",
         "__format": "boolean"
       },
+      "lures": {
+        "__name": "API_SEARCHABLE_LURES",
+        "__format": "boolean"
+      },
       "raids": {
         "__name": "API_SEARCHABLE_RAIDS",
         "__format": "boolean"

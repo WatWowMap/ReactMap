@@ -83,6 +83,16 @@ module.exports = gql`
       midnight: Int
       onlyAreas: [String]
     ): [Search]
+    searchLure(
+      search: String
+      category: String
+      lat: Float
+      lon: Float
+      locale: String
+      webhookName: String
+      midnight: Int
+      onlyAreas: [String]
+    ): [SearchLure]
     searchQuest(
       search: String
       category: String

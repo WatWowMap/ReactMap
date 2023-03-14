@@ -129,6 +129,7 @@ export default class Query {
 
   static search(category) {
     switch (category) {
+      case 'lures':
       case 'raids':
       case 'nests':
       case 'quests':

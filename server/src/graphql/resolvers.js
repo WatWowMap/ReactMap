@@ -284,6 +284,20 @@ module.exports = {
       }
       return []
     },
+    searchLure: (_, args, { perms, serverV, clientV, Db }) => {
+      if (clientV && serverV && clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
+      if (!perms) throw new AuthenticationError('session_expired')
+
+      const { category, search } = args
+      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
+        if (!search || !search.trim()) {
+          return []
+        }
+        return Db.search('Pokestop', perms, args, 'searchLures')
+      }
+      return []
+    },
     searchQuest: (_, args, { perms, serverV, clientV, Db }) => {
       if (clientV && serverV && clientV !== serverV)
         throw new UserInputError('old_client', { clientV, serverV })
