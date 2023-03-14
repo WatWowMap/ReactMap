@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react'
 import {
   Tabs,
@@ -59,6 +60,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
       nest_pokemon_form,
       raid_pokemon_id,
       pokemon_id,
+      lure_id,
     } = option
 
     if (quest_reward_type) {
@@ -130,6 +132,17 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
         </NameTT>
       )
     }
+    if (lure_id) {
+      return (
+        <NameTT id={`lure_${lure_id}`}>
+          <img
+            src={Icons.getPokestops(lure_id)}
+            alt={lure_id}
+            style={{ maxWidth: 45, maxHeight: 45 }}
+          />
+        </NameTT>
+      )
+    }
     return (
       <NameTT
         id={[
@@ -196,7 +209,11 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
       />
       <Grid container>
         {fetchedData?.[
-          safeSearch[searchTab] === 'quests' ? 'searchQuest' : 'search'
+          safeSearch[searchTab] === 'quests'
+            ? 'searchQuest'
+            : safeSearch[searchTab] === 'lures'
+            ? 'searchLure'
+            : 'search'
         ]?.map((option, index) => (
           <Grid
             container
@@ -244,6 +261,13 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
                   questTitle={option.quest_title}
                   questTarget={option.quest_target}
                 />
+              )}
+              {!!option.lure_expire_timestamp && (
+                <Typography variant="caption" style={{ fontWeight: 'bold' }}>
+                  {new Date(
+                    option.lure_expire_timestamp * 1000,
+                  ).toLocaleString()}
+                </Typography>
               )}
             </Grid>
             <Grid item xs={2} style={{ textAlign: 'center' }}>

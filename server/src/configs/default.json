@@ -36,6 +36,7 @@
     "searchable": {
       "quests": true,
       "pokestops": true,
+      "lures": true,
       "raids": true,
       "gyms": true,
       "portals": true,

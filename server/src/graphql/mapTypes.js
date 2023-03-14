@@ -70,6 +70,17 @@ module.exports = gql`
     iv: Float
   }
 
+  type SearchLure {
+    id: ID
+    name: String
+    url: String
+    lat: Float
+    lon: Float
+    distance: Float
+    lure_id: Int
+    lure_expire_timestamp: Int
+  }
+
   type SearchQuest {
     id: ID
     name: String
