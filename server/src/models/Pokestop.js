@@ -1512,8 +1512,7 @@ module.exports = class Pokestop extends Model {
   }
 
   static async searchLures(perms, args, { isMad }, distance) {
-    const { search, onlyAreas = [], locale, midnight: clientMidnight } = args
-    const midnight = clientMidnight || 0
+    const { search, onlyAreas = [], locale } = args
 
     const lureIds = Object.keys(Event.masterfile.items)
       .filter((item) => Event.masterfile.items[item].startsWith('Troy Disk'))
@@ -1542,7 +1541,7 @@ module.exports = class Pokestop extends Model {
       .andWhere(
         isMad ? 'lure_expiration' : 'lure_expire_timestamp',
         '>=',
-        midnight || 0,
+        isMad ? this.knex().fn.now() : Math.floor(Date.now() / 1000),
       )
       .whereIn('lure_id', lureIds)
       .limit(searchResultsLimit)
