@@ -102,7 +102,7 @@ module.exports = async function getAuthInfo(req, user, strategy) {
       },
       {
         name: 'Wayfarer',
-        value: mapPerms(['portals', 'submissionCells'], user.perms),
+        value: mapPerms(['portals', 'submissionCells', 's2cells'], user.perms),
         inline: true,
       },
       {

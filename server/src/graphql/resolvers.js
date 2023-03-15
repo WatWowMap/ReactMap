@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
+/* global BigInt */
 const GraphQLJSON = require('graphql-type-json')
 const { AuthenticationError, UserInputError } = require('apollo-server-core')
+const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 
 const config = require('../services/config')
 const Utility = require('../services/Utility')
@@ -167,6 +169,31 @@ module.exports = {
         return Db.getOne('Portal', args.id)
       }
       return {}
+    },
+    s2cells: (_, args, { perms, serverV, clientV }) => {
+      if (clientV && serverV && clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
+      if (!perms) throw new AuthenticationError('session_expired')
+      if (perms?.s2cells) {
+        const { onlyCells } = args.filters
+        return onlyCells.flatMap((level) => {
+          const regionCoverer = new S2RegionCoverer()
+          const region = S2LatLngRect.fromLatLng(
+            S2LatLng.fromDegrees(args.minLat, args.minLon),
+            S2LatLng.fromDegrees(args.maxLat, args.maxLon),
+          )
+          regionCoverer.minLevel = level
+          regionCoverer.maxLevel = level
+          return regionCoverer.getCoveringCells(region).map((cell) => {
+            const id = BigInt(cell.id).toString()
+            return {
+              id,
+              coords: Utility.getPolyVector(id).poly,
+            }
+          })
+        })
+      }
+      return []
     },
     scanCells: (_, args, { perms, serverV, clientV, Db }) => {
       if (clientV && serverV && clientV !== serverV)

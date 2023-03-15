@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import Clear from '@material-ui/icons/Clear'
@@ -53,108 +54,6 @@ export default function Sidebar({
     setSidebar(isExpanded ? panel : false)
   }
 
-  const drawerItems = Object.keys(ui).map((category) => {
-    let content
-    switch (category) {
-      case 'pokemon':
-        content = (
-          <PokemonSection
-            category={category}
-            context={ui[category]}
-            specificFilter="ivOr"
-            filters={filters}
-            setFilters={setFilters}
-          />
-        )
-        break
-      case 'settings':
-        content = <SettingsMenu toggleDialog={toggleDialog} Icons={Icons} />
-        break
-      default:
-        content = Object.keys(ui[category]).map((subItem) => (
-          <WithSubItems
-            key={`${category}-${subItem}`}
-            category={category}
-            data={ui[category][subItem]}
-            filters={filters}
-            setFilters={setFilters}
-            subItem={subItem}
-            noScanAreaOverlay={noScanAreaOverlay}
-            enableQuestSetSelector={enableQuestSetSelector}
-            available={available}
-          />
-        ))
-        break
-    }
-    return (
-      <Accordion
-        key={category}
-        expanded={sidebar === category}
-        onChange={handleChange(category)}
-      >
-        <AccordionSummary
-          expandIcon={<ExpandMore style={{ color: 'white' }} />}
-        >
-          <Typography className={classes.heading}>
-            {t(Utility.camelToSnake(category))}
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Grid
-            container
-            style={{ width: 300 }}
-            spacing={3}
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-          >
-            {content}
-            {staticUserSettings[category] && (
-              <Grid
-                item
-                xs={t('drawer_grid_options_width')}
-                style={{ textAlign: 'center' }}
-              >
-                <Button
-                  onClick={toggleDialog(true, category, 'options')}
-                  variant="contained"
-                  color="secondary"
-                  startIcon={<Settings style={{ color: 'white' }} />}
-                >
-                  {t('options')}
-                </Button>
-              </Grid>
-            )}
-            {(category === 'pokemon' ||
-              category === 'gyms' ||
-              category === 'pokestops' ||
-              category === 'nests') && (
-              <Grid
-                item
-                xs={t('drawer_grid_advanced_width')}
-                style={{ textAlign: 'center' }}
-              >
-                <Button
-                  onClick={toggleDialog(true, category, 'filters')}
-                  variant="contained"
-                  color="primary"
-                >
-                  {t('advanced')}
-                </Button>
-              </Grid>
-            )}
-            {category === 'scanAreas' && (
-              <Areas
-                scanAreasZoom={scanAreasZoom}
-                scanAreaMenuHeight={scanAreaMenuHeight}
-              />
-            )}
-          </Grid>
-        </AccordionDetails>
-      </Accordion>
-    )
-  })
-
   return (
     <Drawer
       anchor="left"
@@ -193,7 +92,97 @@ export default function Sidebar({
           </IconButton>
         </Grid>
       </Grid>
-      {drawerItems}
+      {Object.keys(ui).map((category) => (
+        <Accordion
+          key={category}
+          expanded={sidebar === category}
+          onChange={handleChange(category)}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMore style={{ color: 'white' }} />}
+          >
+            <Typography className={classes.heading}>
+              {t(Utility.camelToSnake(category))}
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Grid
+              container
+              style={{ width: 300 }}
+              spacing={3}
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+            >
+              {category === 'pokemon' ? (
+                <PokemonSection
+                  category={category}
+                  context={ui[category]}
+                  specificFilter="ivOr"
+                  filters={filters}
+                  setFilters={setFilters}
+                />
+              ) : category === 'settings' ? (
+                <SettingsMenu toggleDialog={toggleDialog} Icons={Icons} />
+              ) : (
+                Object.keys(ui[category]).map((subItem) => (
+                  <WithSubItems
+                    key={`${category}-${subItem}`}
+                    category={category}
+                    data={ui[category][subItem]}
+                    filters={filters}
+                    setFilters={setFilters}
+                    subItem={subItem}
+                    noScanAreaOverlay={noScanAreaOverlay}
+                    enableQuestSetSelector={enableQuestSetSelector}
+                    available={available}
+                  />
+                ))
+              )}
+              {staticUserSettings[category] && (
+                <Grid
+                  item
+                  xs={t('drawer_grid_options_width')}
+                  style={{ textAlign: 'center' }}
+                >
+                  <Button
+                    onClick={toggleDialog(true, category, 'options')}
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<Settings style={{ color: 'white' }} />}
+                  >
+                    {t('options')}
+                  </Button>
+                </Grid>
+              )}
+              {(category === 'pokemon' ||
+                category === 'gyms' ||
+                category === 'pokestops' ||
+                category === 'nests') && (
+                <Grid
+                  item
+                  xs={t('drawer_grid_advanced_width')}
+                  style={{ textAlign: 'center' }}
+                >
+                  <Button
+                    onClick={toggleDialog(true, category, 'filters')}
+                    variant="contained"
+                    color="primary"
+                  >
+                    {t('advanced')}
+                  </Button>
+                </Grid>
+              )}
+              {category === 'scanAreas' && (
+                <Areas
+                  scanAreasZoom={scanAreasZoom}
+                  scanAreaMenuHeight={scanAreaMenuHeight}
+                />
+              )}
+            </Grid>
+          </AccordionDetails>
+        </Accordion>
+      ))}
     </Drawer>
   )
 }

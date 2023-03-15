@@ -14,6 +14,7 @@ import * as webhookIndex from './queries/webhook'
 import scanner from './queries/scanner'
 import getGeocoder from './queries/geocoder'
 import * as user from './queries/user'
+import s2cell from './queries/s2cell'
 
 export default class Query {
   static devices() {
@@ -156,5 +157,9 @@ export default class Query {
 
   static user(type) {
     return user[type]
+  }
+
+  static s2cells() {
+    return s2cell
   }
 }

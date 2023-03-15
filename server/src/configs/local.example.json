@@ -227,6 +227,11 @@
         "trialPeriodEligible": false,
         "roles": []
       },
+      "s2cells": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
       "invasions": {
         "enabled": true,
         "trialPeriodEligible": false,

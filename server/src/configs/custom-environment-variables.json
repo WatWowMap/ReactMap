@@ -989,6 +989,16 @@
         "__format": "boolean"
       }
     },
+    "s2cells": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_S2CELLS_ENABLED",
+        "__format": "boolean"
+      },
+      "cells": {
+        "__name": "DEFAULT_FILTERS_S2CELLS_CELLS",
+        "__format": "json"
+      }
+    },
     "weather": {
       "enabled": {
         "__name": "DEFAULT_FILTERS_WEATHER_ENABLED",
@@ -1386,6 +1396,20 @@
         },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_SPAWNPOINTS_ROLES",
+          "__format": "json"
+        }
+      },
+      "s2cells": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_S2CELLS_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_S2CELLS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_S2CELLS_ROLES",
           "__format": "json"
         }
       },

@@ -61,6 +61,13 @@ module.exports = gql`
       filters: JSON
     ): [Portal]
     portalsSingle(id: ID, perm: String): Portal
+    s2cells(
+      minLat: Float
+      maxLat: Float
+      minLon: Float
+      maxLon: Float
+      filters: JSON
+    ): [S2Cell]
     scanCells(
       minLat: Float
       maxLat: Float
