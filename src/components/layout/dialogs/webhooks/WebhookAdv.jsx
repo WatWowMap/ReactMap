@@ -495,6 +495,7 @@ export default function WebhookAdvanced({
   }
 
   const getDisabled = (option) => {
+    if (typeof option?.disabled === 'boolean') return option.disabled
     switch (option.name) {
       case 'xl':
       case 'xs':
