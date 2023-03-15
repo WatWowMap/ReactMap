@@ -142,23 +142,6 @@ const Areas = ({
             </Grid>
           )
         })}
-        {/* {webhookData.available.map((area) => {
-          const included = selectedAreas.includes(area.toLowerCase())
-          return (
-            <Chip
-              key={area}
-              label={area}
-              clickable
-              variant={included ? 'default' : 'outlined'}
-              deleteIcon={included ? <Done /> : <Clear />}
-              size={isMobile ? 'small' : 'medium'}
-              color={included ? 'secondary' : 'primary'}
-              onClick={() => handleClick(area)}
-              onDelete={() => handleClick(area)}
-              style={{ margin: 3 }}
-            />
-          )
-        })} */}
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h6" align="center">
