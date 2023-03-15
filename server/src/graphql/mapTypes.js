@@ -36,6 +36,11 @@ module.exports = gql`
     provider: String
   }
 
+  type S2Cell {
+    id: String
+    coords: [[Float]]
+  }
+
   type ScanArea {
     type: String
     features: JSON

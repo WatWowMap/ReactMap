@@ -210,6 +210,17 @@ export default function Map({
                   enabled = true
                 }
                 break
+              case 's2cells':
+                if (
+                  filters[category] &&
+                  filters[category]?.enabled &&
+                  filters[category]?.cells?.length &&
+                  value &&
+                  !webhookMode
+                ) {
+                  enabled = true
+                }
+                break
               default:
                 if (
                   filters[category] &&

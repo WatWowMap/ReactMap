@@ -9,6 +9,7 @@ import scanAreas from './ScanArea'
 import spawnpoints from './Spawnpoint'
 import submissionCells from './submissionCells/SubmissionCell'
 import weather from './Weather'
+import s2cells from './S2Cell'
 
 export {
   devices,
@@ -22,4 +23,5 @@ export {
   submissionCells,
   spawnpoints,
   weather,
+  s2cells,
 }

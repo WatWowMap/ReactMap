@@ -123,7 +123,8 @@ module.exports = function generateUi(filters, perms) {
         if (
           (!ignoredKeys.includes(subKey) && subValue !== undefined) ||
           key === 'weather' ||
-          key === 'scanAreas'
+          key === 'scanAreas' ||
+          (key === 's2cells' && subKey !== 'filter')
         ) {
           switch (key) {
             case 'submissionCells':
@@ -176,5 +177,5 @@ module.exports = function generateUi(filters, perms) {
       sortedUi[category] = ui[category]
     }
   })
-  return sortedUi
+  return { ...sortedUi, ...ui }
 }

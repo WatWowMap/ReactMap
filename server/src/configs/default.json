@@ -128,6 +128,7 @@
         "pokestops",
         "pokemon",
         "wayfarer",
+        "s2cells",
         "scanAreas",
         "weather",
         "admin",
@@ -537,6 +538,10 @@
       "s17Cells": true,
       "s14Cells": true
     },
+    "s2cells": {
+      "enabled": false,
+      "cells": []
+    },
     "weather": {
       "enabled": true
     }
@@ -746,6 +751,11 @@
         "roles": []
       },
       "spawnpoints": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "s2cells": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []
