@@ -179,7 +179,7 @@ export default function Menu({
         [id]: { ...tempFilters[id], ...newFilters, enabled: true },
       })
     }
-    setWebhook({ open, id })
+    setWebhook({ open, id: id ?? '' })
   }
 
   const toggleSlotsMenu = (open, id, newFilters) => (event) => {
@@ -373,7 +373,7 @@ export default function Menu({
         />
       </Dialog>
       <Dialog
-        open={webhook.open}
+        open={!!(webhook.open && webhook.id)}
         fullWidth={!isMobile}
         fullScreen={isMobile}
         onClose={toggleWebhook(false)}

@@ -67,8 +67,8 @@ export default function useFilter(
 
   const addItem = (id, item) => {
     count.show += 1
-    filteredObj[id] = tempFilters[id]
     item.url = Icons.getIconById(id)
+    filteredObj[id] = tempFilters[id]
     filteredArr.push(item)
   }
 

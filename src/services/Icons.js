@@ -154,6 +154,11 @@ export default class UIcons {
   }
 
   getIconById(id) {
+    if (id === 'kecleon') {
+      id = '352'
+    } else if (id === 'gold-stop') {
+      id = 'l506'
+    }
     switch (id.charAt(0)) {
       case 'c':
         return this.getRewards(4, ...id.slice(1).split('-'))
