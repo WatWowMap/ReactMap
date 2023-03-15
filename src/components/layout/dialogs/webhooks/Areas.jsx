@@ -1,11 +1,9 @@
-import React, { memo, useEffect } from 'react'
+import React, { memo, useEffect, useMemo } from 'react'
 import Done from '@material-ui/icons/Done'
 import Clear from '@material-ui/icons/Clear'
-import { Grid, Typography, Chip, Button } from '@material-ui/core'
+import { Grid, Typography, Chip, Button, Divider } from '@material-ui/core'
 
 import { Trans } from 'react-i18next'
-
-import useStyles from '@hooks/useStyles'
 
 const Areas = ({
   webhookMode,
@@ -17,8 +15,6 @@ const Areas = ({
   selectedWebhook,
   isMobile,
 }) => {
-  const classes = useStyles()
-
   const handleClick = (areaName) => {
     areaName = areaName.toLowerCase()
     let newAreas = []
@@ -66,6 +62,18 @@ const Areas = ({
       </Button>
     </Grid>
   )
+  const byGroupProperty = useMemo(
+    () =>
+      webhookData.areas.features.reduce((acc, cur) => {
+        const { group } = cur.properties
+        if (!acc[group]) {
+          acc[group] = []
+        }
+        acc[group].push(cur)
+        return acc
+      }, {}),
+    [webhookData.areas.features.length],
+  )
 
   return (
     <Grid
@@ -102,8 +110,39 @@ const Areas = ({
         </Button>
       </Grid>
       {!isMobile && ChooseOnMap}
-      <Grid item xs={12} className={classes.areaChips}>
-        {webhookData.available.map((area) => {
+      <Grid item container xs={12} alignItems="center" justifyContent="center">
+        {Object.entries(byGroupProperty).map(([group, features]) => {
+          const filtered = features.filter((feature) =>
+            webhookData.available.includes(feature.properties.name),
+          )
+          return (
+            <Grid item xs={12} key={group}>
+              <Divider style={{ margin: '20px 0' }} />
+              <Typography variant="h3" gutterBottom>
+                {group}
+              </Typography>
+              {filtered.map((feature) => {
+                const { name } = feature.properties
+                const included = selectedAreas.includes(name.toLowerCase())
+                return (
+                  <Chip
+                    key={`${group}_${name}`}
+                    label={name}
+                    clickable
+                    variant={included ? 'default' : 'outlined'}
+                    deleteIcon={included ? <Done /> : <Clear />}
+                    size={isMobile ? 'small' : 'medium'}
+                    color={included ? 'secondary' : 'primary'}
+                    onClick={() => handleClick(name)}
+                    onDelete={() => handleClick(name)}
+                    style={{ margin: 3 }}
+                  />
+                )
+              })}
+            </Grid>
+          )
+        })}
+        {/* {webhookData.available.map((area) => {
           const included = selectedAreas.includes(area.toLowerCase())
           return (
             <Chip
@@ -119,7 +158,7 @@ const Areas = ({
               style={{ margin: 3 }}
             />
           )
-        })}
+        })} */}
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h6" align="center">
