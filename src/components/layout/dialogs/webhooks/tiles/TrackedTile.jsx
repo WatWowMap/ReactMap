@@ -125,7 +125,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
         />
       </Grid>
       <Dialog
-        open={editDialog}
+        open={!!(editDialog && id)}
         fullWidth={!isMobile}
         fullScreen={isMobile}
         onClose={() => setEditDialog(false)}
