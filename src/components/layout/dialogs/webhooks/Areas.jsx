@@ -118,7 +118,7 @@ const Areas = ({
           return (
             <Grid item xs={12} key={group}>
               <Divider style={{ margin: '20px 0' }} />
-              <Typography variant="h3" gutterBottom>
+              <Typography variant="h4" gutterBottom>
                 {group}
               </Typography>
               {filtered.map((feature) => {
