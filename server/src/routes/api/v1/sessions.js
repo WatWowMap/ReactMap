@@ -65,7 +65,6 @@ router.get('/clearSessions/:id', async (req, res) => {
     } else {
       throw new Error('Incorrect or missing API secret')
     }
-    console.log(`[API] api/v1/sessions/clearSessions/${req.params.id}`)
   } catch (e) {
     console.error(
       `[API Error] api/v1/sessions/clearSessions/${req.params.id}`,
