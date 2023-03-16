@@ -479,26 +479,23 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
 
 const Backups = ({ t, auth, isMobile }) => {
   const { data, loading: allLoading } = useQuery(Query.user('getBackups'), {
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'no-cache',
   })
   const [create, { loading: createLoading }] = useMutation(
     Query.user('createBackup'),
     {
-      fetchPolicy: 'network-only',
       refetchQueries: ['GetBackups'],
     },
   )
   const [update, { loading: updateLoading }] = useMutation(
     Query.user('updateBackup'),
     {
-      fetchPolicy: 'network-only',
       refetchQueries: ['GetBackups'],
     },
   )
   const [remove, { loading: removeLoading }] = useMutation(
     Query.user('deleteBackup'),
     {
-      fetchPolicy: 'network-only',
       refetchQueries: ['GetBackups'],
     },
   )
@@ -551,7 +548,7 @@ const Backups = ({ t, auth, isMobile }) => {
           variant="outlined"
         />
       </Grid>
-      <Grid item xs={5} sm={4} textAlign="center">
+      <Grid item xs={5} sm={4}>
         <Button
           size="small"
           disabled={
@@ -608,7 +605,7 @@ const Backups = ({ t, auth, isMobile }) => {
                     variables: {
                       backup: {
                         id: backup.id,
-                        name,
+                        name: backup.name,
                         data: useStore.getState(),
                       },
                     },

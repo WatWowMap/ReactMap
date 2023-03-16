@@ -450,7 +450,7 @@ module.exports = {
       if (!perms || req.user?.id === undefined)
         throw new AuthenticationError('session_expired')
       if (perms?.backups) {
-        await Db.models.Backup.update(args)
+        await Db.models.Backup.update(args.backup)
       }
     },
     webhook: (_, args, { req }) => {

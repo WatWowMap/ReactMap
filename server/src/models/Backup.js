@@ -53,7 +53,9 @@ module.exports = class Backup extends Model {
   }
 
   static async update({ id, name, data }) {
-    return this.query().patchAndFetchById(id, { name, data })
+    return this.query()
+      .update({ name, data: JSON.stringify(data) })
+      .where('id', +id)
   }
 
   static async delete(id) {
