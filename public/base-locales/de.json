@@ -60,6 +60,7 @@
   "pokemon": "Pokemon",
   "wayfarer": "Wayfarer",
   "scan_areas": "Gebiete",
+  "s2cells": "S2 Zellen",
   "weather": "Wetter",
   "admin": "Admin",
   "settings": "Einstellungen",
@@ -567,5 +568,16 @@
   "seen_nearby_cell": "in dieser S2 Zelle gesehen",
   "seen_lure_encounter": "getroffen am Lockmodul",
   "seen_lure_wild": "Spawn am Lockmodul",
-  "seen_wild": "Spawn in der Wildnis"
+  "seen_wild": "Spawn in der Wildnis",
+  "event_stops": "Event Stops",
+  "event_stop_timers": "Event Stop Timer",
+  "size_0": "alle",
+  "size_1": "XXS",
+  "size_2": "XS",
+  "size_3": "M",
+  "size_4": "XL",
+  "size_5": "XXL",
+  "show_size_indicator": "Größen Marker anzeigen",
+  "size": "Größe",
+  "gold_stop": "Gold Stop"
 }
