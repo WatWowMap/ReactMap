@@ -62,7 +62,7 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
             variant="fullWidth"
             style={{ backgroundColor: '#424242', width: '100%' }}
           >
-            {['profile', 'access'].map((each) => (
+            {['profile', 'badges', 'access'].map((each) => (
               <Tab
                 key={each}
                 label={t(each)}
@@ -83,6 +83,10 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
                 t={t}
               />
             )}
+          </div>
+        </TabPanel>
+        <TabPanel value={tab} index={1}>
+          <div style={{ minHeight: '70vh' }}>
             <GymBadges
               badges={auth.badges}
               isMobile={isMobile}
@@ -91,7 +95,7 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
             />
           </div>
         </TabPanel>
-        <TabPanel value={tab} index={1}>
+        <TabPanel value={tab} index={2}>
           <ProfilePermissions auth={auth} excludeList={excludeList} t={t} />
         </TabPanel>
       </DialogContent>
@@ -477,7 +481,7 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
   ) : null
 }
 
-const Backups = ({ t, auth, isMobile }) => {
+const Backups = ({ t, auth }) => {
   const { data, loading: allLoading } = useQuery(Query.user('getBackups'), {
     fetchPolicy: 'no-cache',
   })
@@ -504,6 +508,7 @@ const Backups = ({ t, auth, isMobile }) => {
   )
   const [disabled, setDisabled] = useState(false)
   const [name, setName] = useState('')
+  const [existing, setExisting] = useState({})
 
   React.useEffect(() => {
     if (fullBackup?.backup?.data) {
@@ -517,6 +522,12 @@ const Backups = ({ t, auth, isMobile }) => {
       setTimeout(() => window.location.reload(), 1500)
     }
   }, [fullBackup])
+
+  React.useEffect(() => {
+    if (data?.backups) {
+      setExisting(Object.fromEntries(data.backups.map((b) => [b.id, b.name])))
+    }
+  }, [data])
 
   const loading =
     allLoading ||
@@ -538,24 +549,17 @@ const Backups = ({ t, auth, isMobile }) => {
           {t('profile_backups')}
         </Typography>
       </Grid>
-      {!isMobile && (
-        <Grid item xs={12} sm={4}>
-          <Typography variant="subtitle2" align="center">
-            {t('new_backup')}:
-          </Typography>
-        </Grid>
-      )}
       <Grid item xs={5} sm={4}>
         <TextField
-          label={t('name')}
+          label={t('new_backup')}
           fullWidth
           size="small"
-          value={name}
+          value={name || ''}
           onChange={(e) => setName(e.target.value)}
           variant="outlined"
         />
       </Grid>
-      <Grid item xs={5} sm={4}>
+      <Grid item xs={7} sm={6} style={{ textAlign: 'center' }}>
         <Button
           size="small"
           disabled={
@@ -569,6 +573,7 @@ const Backups = ({ t, auth, isMobile }) => {
             create({
               variables: { backup: { name, data: useStore.getState() } },
             })
+            setName('')
           }}
         >
           {t('create')}
@@ -583,18 +588,27 @@ const Backups = ({ t, auth, isMobile }) => {
           xs={12}
           alignItems="center"
           justifyContent="center"
+          style={{ marginTop: 12 }}
         >
           <Divider
             flexItem
             style={{ width: '90%', height: 1, margin: '10px 0' }}
           />
-          <Grid item xs={3} sm={6}>
-            <Typography variant="h6" align="center">
-              {backup.name}
-              {localStorage.getItem('last-loaded') === backup.name && '*'}
-            </Typography>
+          <Grid item xs={5} sm={4}>
+            <TextField
+              label={`${t('name')}${
+                localStorage.getItem('last-loaded') === backup.name ? '*' : ''
+              }`}
+              fullWidth
+              size="small"
+              value={existing[backup.id] || ''}
+              onChange={(e) =>
+                setExisting({ ...existing, [backup.id]: e.target.value })
+              }
+              variant="outlined"
+            />
           </Grid>
-          <Grid item xs={9} sm={6}>
+          <Grid item xs={7} sm={6} style={{ textAlign: 'center' }}>
             <ButtonGroup variant="contained" size="small">
               <Button
                 disabled={loading}
@@ -613,7 +627,7 @@ const Backups = ({ t, auth, isMobile }) => {
                     variables: {
                       backup: {
                         id: backup.id,
-                        name: backup.name,
+                        name: existing[backup.id],
                         data: useStore.getState(),
                       },
                     },

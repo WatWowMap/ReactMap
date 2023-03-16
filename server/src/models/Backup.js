@@ -34,8 +34,8 @@ module.exports = class Backup extends Model {
     }
   }
 
-  static async getOne(id) {
-    return this.query().findById(id)
+  static async getOne(id, userId) {
+    return this.query().findById(id).where('userId', userId)
   }
 
   static async getAll(userId) {
@@ -45,20 +45,21 @@ module.exports = class Backup extends Model {
       .whereNotNull('data')
   }
 
-  static async create({ userId, name, data }) {
+  static async create({ name, data }, userId) {
     const count = await this.query().count().where('userId', userId).first()
     if (count['count(*)'] < userBackupLimits) {
-      return this.query().insert({ userId, name, data })
+      return this.query().insert({ userId, name, data: JSON.stringify(data) })
     }
   }
 
-  static async update({ id, name, data }) {
+  static async update({ id, name, data }, userId) {
     return this.query()
       .update({ name, data: JSON.stringify(data) })
       .where('id', +id)
+      .where('userId', userId)
   }
 
-  static async delete(id) {
-    return this.query().deleteById(id)
+  static async delete(id, userId) {
+    return this.query().deleteById(id).where('userId', userId)
   }
 }

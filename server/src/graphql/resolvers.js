@@ -28,12 +28,12 @@ module.exports = {
         filters: Utility.buildDefaultFilters(perms, available, Db.models),
       }
     },
-    backup: (_, args, { perms, Db, serverV, clientV }) => {
+    backup: (_, args, { req, perms, Db, serverV, clientV }) => {
       if (clientV && serverV && clientV !== serverV)
         throw new UserInputError('old_client', { clientV, serverV })
       if (!perms) throw new AuthenticationError('session_expired')
-      if (perms?.backups) {
-        return Db.models.Backup.getOne(args.id)
+      if (perms?.backups && req?.user?.id) {
+        return Db.models.Backup.getOne(args.id, req?.user?.id)
       }
       return {}
     },
@@ -435,22 +435,22 @@ module.exports = {
     createBackup: async (_, args, { req, perms, Db }) => {
       if (!perms || req.user?.id === undefined)
         throw new AuthenticationError('session_expired')
-      if (perms?.backups) {
-        await Db.models.Backup.create({ ...args.backup, userId: req.user.id })
+      if (perms?.backups && req.user?.id) {
+        await Db.models.Backup.create(args.backup, req.user.id)
       }
     },
     deleteBackup: async (_, args, { req, perms, Db }) => {
       if (!perms || req.user?.id === undefined)
         throw new AuthenticationError('session_expired')
-      if (perms?.backups) {
-        await Db.models.Backup.delete(args.id)
+      if (perms?.backups && req.user?.id) {
+        await Db.models.Backup.delete(args.id, req.user.id)
       }
     },
     updateBackup: async (_, args, { req, perms, Db }) => {
       if (!perms || req.user?.id === undefined)
         throw new AuthenticationError('session_expired')
-      if (perms?.backups) {
-        await Db.models.Backup.update(args.backup)
+      if (perms?.backups && req.user?.id) {
+        await Db.models.Backup.update(args.backup, req.user.id)
       }
     },
     webhook: (_, args, { req }) => {
