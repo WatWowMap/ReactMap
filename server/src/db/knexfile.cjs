@@ -32,9 +32,9 @@ const getConnection = (basePath = '') => {
     },
     migrations: {
       tableName: migrationTableName,
-      directory: path.join(basePath, migrationUrl),
+      directory: migrationUrl,
       extensions: 'cjs',
-      stub: path.join(basePath, migrationUrl, 'migration.stub.cjs'),
+      stub: path.join(migrationUrl, 'migration.stub.cjs'),
     },
   }
   return basePath ? knex(connection) : connection

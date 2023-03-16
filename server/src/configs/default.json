@@ -555,6 +555,7 @@
       "migrationTableName": "knex_migrations",
       "maxConnections": 10,
       "userBackupLimits": 10,
+      "userBackupSizeLimit": 10000000,
       "extraUserFields": []
     },
     "schemas": []
