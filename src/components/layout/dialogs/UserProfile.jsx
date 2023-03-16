@@ -14,13 +14,16 @@ import {
   IconButton,
   Dialog,
   TextField,
+  Button,
+  ButtonGroup,
+  Divider,
 } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 import { useTranslation } from 'react-i18next'
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { useStatic } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 
@@ -72,6 +75,14 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
           <div style={{ minHeight: '70vh' }}>
             <LinkProfiles auth={auth} t={t} />
             <ExtraFields auth={auth} />
+            {auth.perms.backups && (
+              <Backups
+                isMobile={isMobile}
+                auth={auth}
+                isTablet={isTablet}
+                t={t}
+              />
+            )}
             <GymBadges
               badges={auth.badges}
               isMobile={isMobile}
@@ -359,7 +370,12 @@ const GymBadges = ({ isMobile, t }) => {
   return data ? (
     <Grid container alignItems="center" justifyContent="center">
       <Grid item xs={12}>
-        <Typography variant="h5" align="center" gutterBottom>
+        <Typography
+          variant="h5"
+          align="center"
+          gutterBottom
+          style={{ margin: '20px 0' }}
+        >
           {t('gym_badges')}
         </Typography>
       </Grid>
@@ -457,6 +473,164 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
           setBadgeMenu={setBadgeMenu}
         />
       </Dialog>
+    </Grid>
+  ) : null
+}
+
+const Backups = ({ t, auth, isMobile }) => {
+  const { data, loading: allLoading } = useQuery(Query.user('getBackups'), {
+    fetchPolicy: 'network-only',
+  })
+  const [create, { loading: createLoading }] = useMutation(
+    Query.user('createBackup'),
+    {
+      fetchPolicy: 'network-only',
+      refetchQueries: ['GetBackups'],
+    },
+  )
+  const [update, { loading: updateLoading }] = useMutation(
+    Query.user('updateBackup'),
+    {
+      fetchPolicy: 'network-only',
+      refetchQueries: ['GetBackups'],
+    },
+  )
+  const [remove, { loading: removeLoading }] = useMutation(
+    Query.user('deleteBackup'),
+    {
+      fetchPolicy: 'network-only',
+      refetchQueries: ['GetBackups'],
+    },
+  )
+  const [load, { data: fullBackup, loading: fullLoading }] = useLazyQuery(
+    Query.user('getFullBackup'),
+  )
+
+  const [name, setName] = useState('')
+
+  React.useEffect(() => {
+    if (fullBackup?.backup?.data) {
+      localStorage.clear()
+      localStorage.setItem(
+        'local-state',
+        JSON.stringify({ state: fullBackup.backup.data }),
+      )
+      setTimeout(() => window.location.reload(), 1500)
+    }
+  }, [fullBackup])
+
+  const loading =
+    allLoading || createLoading || updateLoading || removeLoading || fullLoading
+
+  return data ? (
+    <Grid container alignItems="center" justifyContent="center">
+      <Grid item xs={12}>
+        <Typography
+          variant="h5"
+          align="center"
+          gutterBottom
+          style={{ margin: '20px 0' }}
+        >
+          {t('profile_backups')}
+        </Typography>
+      </Grid>
+      {!isMobile && (
+        <Grid item xs={12} sm={4}>
+          <Typography variant="subtitle2" align="center">
+            {t('new_backup')}:
+          </Typography>
+        </Grid>
+      )}
+      <Grid item xs={5} sm={4}>
+        <TextField
+          label={t('name')}
+          fullWidth
+          size="small"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          variant="outlined"
+        />
+      </Grid>
+      <Grid item xs={5} sm={4} textAlign="center">
+        <Button
+          size="small"
+          disabled={
+            data.backups.length >= auth.userBackupLimits ||
+            data.backups.some((x) => x.name === name) ||
+            loading
+          }
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            create({
+              variables: { backup: { name, data: useStore.getState() } },
+            })
+          }}
+        >
+          {t('create')}
+        </Button>
+      </Grid>
+
+      {data.backups.map((backup) => (
+        <Grid
+          key={backup.name}
+          container
+          item
+          xs={12}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Divider
+            flexItem
+            style={{ width: '90%', height: 1, margin: '10px 0' }}
+          />
+          <Grid item xs={3} sm={6}>
+            <Typography variant="subtitle2" align="center">
+              {backup.name}
+            </Typography>
+          </Grid>
+          <Grid item xs={9} sm={6}>
+            <ButtonGroup variant="contained" size="small">
+              <Button
+                disabled={loading}
+                color="secondary"
+                onClick={() => {
+                  load({ variables: { id: backup.id } })
+                }}
+              >
+                {t('load')}
+              </Button>
+              <Button
+                disabled={loading}
+                color="secondary"
+                onClick={() => {
+                  update({
+                    variables: {
+                      backup: {
+                        id: backup.id,
+                        name,
+                        data: useStore.getState(),
+                      },
+                    },
+                  })
+                }}
+              >
+                {t('update')}
+              </Button>
+              <Button
+                disabled={loading}
+                color="primary"
+                onClick={() => {
+                  remove({ variables: { id: backup.id } })
+                }}
+              >
+                {t('delete')}
+              </Button>
+            </ButtonGroup>
+          </Grid>
+        </Grid>
+      ))}
+      <Divider flexItem style={{ width: '90%', height: 1, margin: '10px 0' }} />
     </Grid>
   ) : null
 }

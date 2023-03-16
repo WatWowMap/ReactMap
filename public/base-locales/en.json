@@ -576,5 +576,12 @@
   "size_5": "XXL",
   "show_size_indicator": "Show Size Indicator",
   "size": "Size",
-  "gold_stop": "Gold Stop"
+  "gold_stop": "Gold Stop",
+  "profile_backups": "Profile Swapping",
+  "new_backup": "New Backup",
+  "create": "Create",
+  "load": "Load",
+  "update": "Update",
+  "delete": "Delete",
+  "name": "Name"
 }

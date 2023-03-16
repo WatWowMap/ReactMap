@@ -137,4 +137,24 @@ module.exports = gql`
     placementCells: PlacementCell
     typeCells: [WayfarerCell]
   }
+
+  type Backup {
+    id: ID
+    userId: ID
+    name: String
+    data: JSON
+    createdAt: Int
+    updatedAt: Int
+  }
+
+  input BackupCreate {
+    name: String
+    data: JSON
+  }
+
+  input BackupUpdate {
+    id: ID
+    name: String
+    data: JSON
+  }
 `

@@ -109,6 +109,7 @@ export const useStatic = create((set) => ({
       webhooks: 0,
       scanner: 0,
     },
+    userBackupLimits: 0,
   },
   setAuth: (auth) => set({ auth }),
   config: undefined,

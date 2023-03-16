@@ -28,6 +28,24 @@ module.exports = {
         filters: Utility.buildDefaultFilters(perms, available, Db.models),
       }
     },
+    backup: (_, args, { perms, Db, serverV, clientV }) => {
+      if (clientV && serverV && clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
+      if (!perms) throw new AuthenticationError('session_expired')
+      if (perms?.backups) {
+        return Db.models.Backup.getOne(args.id)
+      }
+      return {}
+    },
+    backups: (_, _args, { req, perms, Db, serverV, clientV }) => {
+      if (clientV && serverV && clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
+      if (!perms) throw new AuthenticationError('session_expired')
+      if (perms?.backups) {
+        return Db.models.Backup.getAll(req.user?.id)
+      }
+      return []
+    },
     badges: async (_, _args, { req, perms, Db, serverV, clientV }) => {
       if (clientV && serverV && clientV !== serverV)
         throw new UserInputError('old_client', { clientV, serverV })
@@ -414,6 +432,27 @@ module.exports = {
     },
   },
   Mutation: {
+    createBackup: async (_, args, { req, perms, Db }) => {
+      if (!perms || req.user?.id === undefined)
+        throw new AuthenticationError('session_expired')
+      if (perms?.backups) {
+        await Db.models.Backup.create({ ...args.backup, userId: req.user.id })
+      }
+    },
+    deleteBackup: async (_, args, { req, perms, Db }) => {
+      if (!perms || req.user?.id === undefined)
+        throw new AuthenticationError('session_expired')
+      if (perms?.backups) {
+        await Db.models.Backup.delete(args.id)
+      }
+    },
+    updateBackup: async (_, args, { req, perms, Db }) => {
+      if (!perms || req.user?.id === undefined)
+        throw new AuthenticationError('session_expired')
+      if (perms?.backups) {
+        await Db.models.Backup.update(args)
+      }
+    },
     webhook: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : false
       const { category, data, status, name } = args

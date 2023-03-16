@@ -69,6 +69,7 @@ export default function useConfig(serverSettings, params) {
     username: serverSettings.user?.username || '',
     data: serverSettings.user?.data || {},
     counts: serverSettings.config.map.authCounts || {},
+    userBackupLimits: serverSettings.userBackupLimits || 0,
   })
   Sentry.setUser({
     username: serverSettings.user.username,
