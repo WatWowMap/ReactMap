@@ -502,11 +502,12 @@ const Backups = ({ t, auth, isMobile }) => {
   const [load, { data: fullBackup, loading: fullLoading }] = useLazyQuery(
     Query.user('getFullBackup'),
   )
-
+  const [disabled, setDisabled] = useState(false)
   const [name, setName] = useState('')
 
   React.useEffect(() => {
     if (fullBackup?.backup?.data) {
+      setDisabled(true)
       localStorage.clear()
       localStorage.setItem(
         'local-state',
@@ -517,7 +518,12 @@ const Backups = ({ t, auth, isMobile }) => {
   }, [fullBackup])
 
   const loading =
-    allLoading || createLoading || updateLoading || removeLoading || fullLoading
+    allLoading ||
+    createLoading ||
+    updateLoading ||
+    removeLoading ||
+    fullLoading ||
+    disabled
 
   return data ? (
     <Grid container alignItems="center" justifyContent="center">
