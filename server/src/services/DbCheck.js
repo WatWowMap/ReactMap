@@ -13,7 +13,7 @@ module.exports = class DbCheck {
     rarityPercents,
   ) {
     this.validModels = validModels.flatMap((s) => s.useFor)
-    this.singleModels = ['User', 'Badge', 'Session']
+    this.singleModels = ['User', 'Badge', 'Session', 'Backup']
     this.searchLimit = apiSettings.searchLimit
     this.rarityPercents = rarityPercents
     this.models = {}
@@ -225,6 +225,8 @@ module.exports = class DbCheck {
           if (model === 'User') {
             this.models.Badge = models.Badge
             this.models.Badge.knex(this.connections[sources.connection])
+            this.models.Backup = models.Backup
+            this.models.Backup.knex(this.connections[sources.connection])
           }
           this.models[model] = models[model]
           this.models[model].knex(this.connections[sources.connection])

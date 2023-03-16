@@ -89,6 +89,7 @@ const ignoredKeys = [
   'filter',
   'showQuestSet',
   'badge',
+  'backup',
   'avgFilter',
   'raidTier',
   'levels',

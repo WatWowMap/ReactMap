@@ -115,7 +115,10 @@ module.exports = async function getAuthInfo(req, user, strategy) {
       },
       {
         name: 'Other',
-        value: mapPerms(['nests', 'weather', 'scanAreas', 'donor'], user.perms),
+        value: mapPerms(
+          ['nests', 'weather', 'scanAreas', 'donor', 'backups'],
+          user.perms,
+        ),
         inline: true,
       },
     ],

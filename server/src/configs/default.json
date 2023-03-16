@@ -551,8 +551,11 @@
       "userTableName": "users",
       "gymBadgeTableName": "gymBadges",
       "sessionTableName": "session",
+      "backupTableName": "backups",
       "migrationTableName": "knex_migrations",
       "maxConnections": 10,
+      "userBackupLimits": 10,
+      "userBackupSizeLimit": 10000000,
       "extraUserFields": []
     },
     "schemas": []
@@ -776,6 +779,11 @@
         "roles": []
       },
       "gymBadges": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "backups": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []

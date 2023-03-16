@@ -290,6 +290,9 @@
   "submission_cells_subtitle": "Shows information useful for submitting new POIs",
   "weather_subtitle": "Shows in game weather info for each cell",
   "scanner_subtitle": "Interact directly with the scanner in various ways",
+  "s2cells_subtitle": "Displays S2 Cells in a variety of levels on the map",
+  "backups_subtitle": "Enables backing up and loading of settings across devices",
+  "backups": "Backups",
   "user_profile": "User Profile",
   "candy": "Candy",
   "show_ex_badge": "Show EX Badge",
@@ -576,5 +579,12 @@
   "size_5": "XXL",
   "show_size_indicator": "Show Size Indicator",
   "size": "Size",
-  "gold_stop": "Gold Stop"
+  "gold_stop": "Gold Stop",
+  "profile_backups": "Profile Swapping",
+  "new_backup": "New Backup",
+  "create": "Create",
+  "load": "Load",
+  "update": "Update",
+  "delete": "Delete",
+  "name": "Name"
 }

@@ -276,6 +276,11 @@
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []
+      },
+      "backups": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
       }
     }
   },

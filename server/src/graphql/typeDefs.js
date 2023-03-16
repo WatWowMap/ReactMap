@@ -13,6 +13,8 @@ module.exports = gql`
   type Query {
     available: Available
     badges: [Badge]
+    backup(id: ID): Backup
+    backups: [Backup]
     devices(filters: JSON): [Device]
     geocoder(search: String, name: String): [Geocoder]
     gyms(
@@ -134,6 +136,9 @@ module.exports = gql`
   }
 
   type Mutation {
+    createBackup(backup: BackupCreate): Boolean
+    updateBackup(backup: BackupUpdate): Boolean
+    deleteBackup(id: ID): Boolean
     webhook(category: String, data: JSON, status: String, name: String): Poracle
     tutorial(tutorial: Boolean): Boolean
     strategy(strategy: String): Boolean
