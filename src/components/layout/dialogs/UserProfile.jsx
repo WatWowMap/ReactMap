@@ -513,6 +513,7 @@ const Backups = ({ t, auth, isMobile }) => {
         'local-state',
         JSON.stringify({ state: fullBackup.backup.data }),
       )
+      localStorage.setItem('last-loaded', fullBackup.backup.name)
       setTimeout(() => window.location.reload(), 1500)
     }
   }, [fullBackup])
@@ -588,8 +589,9 @@ const Backups = ({ t, auth, isMobile }) => {
             style={{ width: '90%', height: 1, margin: '10px 0' }}
           />
           <Grid item xs={3} sm={6}>
-            <Typography variant="subtitle2" align="center">
+            <Typography variant="h6" align="center">
               {backup.name}
+              {localStorage.getItem('last-loaded') === backup.name && '*'}
             </Typography>
           </Grid>
           <Grid item xs={9} sm={6}>

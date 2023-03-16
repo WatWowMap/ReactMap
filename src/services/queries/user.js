@@ -44,6 +44,7 @@ export const getBackups = gql`
 export const getFullBackup = gql`
   query GetFullBackup($id: ID!) {
     backup(id: $id) {
+      name
       data
     }
   }
