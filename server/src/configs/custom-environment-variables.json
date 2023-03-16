@@ -1021,6 +1021,10 @@
         "__name": "DATABASE_SETTINGS_USER_BACKUP_LIMITS",
         "__format": "number"
       },
+      "userBackupSizeLimit": {
+        "__name": "DATABASE_SETTINGS_USER_BACKUP_SIZE_LIMIT",
+        "__format": "number"
+      },
       "extraUserFields": {
         "__name": "DATABASE_SETTINGS_EXTRA_USER_FIELDS",
         "__format": "json"
