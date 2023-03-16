@@ -1011,9 +1011,14 @@
       "userTableName": "DATABASE_SETTINGS_USER_TABLE_NAME",
       "gymBadgeTableName": "DATABASE_SETTINGS_GYM_BADGE_TABLE_NAME",
       "sessionTableName": "DATABASE_SETTINGS_SESSION_TABLE_NAME",
+      "backupTableName": "DATABASE_SETTINGS_BACKUP_TABLE_NAME",
       "migrationTableName": "DATABASE_SETTINGS_MIGRATION_TABLE_NAME",
       "maxConnections": {
         "__name": "DATABASE_SETTINGS_MAX_CONNECTIONS",
+        "__format": "number"
+      },
+      "userBackupLimits": {
+        "__name": "DATABASE_SETTINGS_USER_BACKUP_LIMITS",
         "__format": "number"
       },
       "extraUserFields": {
@@ -1466,6 +1471,20 @@
         },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_GYM_BADGES_ROLES",
+          "__format": "json"
+        }
+      },
+      "backups": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_BACKUPS_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_BACKUPS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_BACKUPS_ROLES",
           "__format": "json"
         }
       }
