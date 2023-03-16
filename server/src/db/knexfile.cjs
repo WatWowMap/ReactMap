@@ -9,7 +9,7 @@ const {
   },
 } = require('../services/config')
 
-const migrationUrl = 'src/db/migrations'
+const migrationUrl = path.resolve(__dirname, 'migrations')
 
 const selectedDb = schemas.find((db) => db.useFor.includes('user'))
 
