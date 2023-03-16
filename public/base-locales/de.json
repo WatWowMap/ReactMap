@@ -277,6 +277,9 @@
   "stats_subtitle": "Zeigt Pokemon-Statistiken und Level an",
   "submissionCells_subtitle": "Zeigt nützliche Informationen für das Einreichen neuer POIs an",
   "weather_subtitle": "Zeigt Wetterinformationen im Spiel für jede Zelle an",
+  "s2cells_subtitle": "Zeigt S2-Zellen in verschiedenen Level auf der Map an",
+  "backups_subtitle": "Ermöglicht das Sichern und Laden von Einstellungen über verschiedene Geräte hinweg",
+  "backups": "Sicherungen",
   "user_profile": "Benutzer-Profil",
   "candy": "Bonbon",
   "show_ex_badge": "EX Abzeichen anzeigen",
@@ -579,5 +582,12 @@
   "size_5": "XXL",
   "show_size_indicator": "Größen Marker",
   "size": "Größe",
-  "gold_stop": "Gold Stop"
+  "gold_stop": "Gold Stop",
+  "profile_backups": "Profil Sicherungen",
+  "new_backup": "neue Sicherungen",
+  "create": "erstellen",
+  "load": "laden",
+  "update": "aktualisieren",
+  "delete": "löschen",
+  "name": "Name"
 }
