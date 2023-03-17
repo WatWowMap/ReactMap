@@ -43,7 +43,7 @@ try {
               : stdout2.trim()
 
           exec(
-            `git ls-remote https://github.com/WatWowMap/ReactMap/ refs/heads/${branch}`,
+            `git ls-remote https://github.com/ReuschelCGN/ReactMap/ refs/heads/${branch}`,
             (err3, stdout3) => {
               try {
                 if (
