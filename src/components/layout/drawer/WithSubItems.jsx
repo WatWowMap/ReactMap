@@ -3,6 +3,7 @@ import { Grid, Typography, Switch, Select, MenuItem } from '@material-ui/core'
 import { Trans, useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+import { useStatic } from '@hooks/useStore'
 
 import MultiSelector from './MultiSelector'
 import SliderTile from '../dialogs/filters/SliderTile'
@@ -15,9 +16,9 @@ export default function WithSubItems({
   noScanAreaOverlay,
   enableQuestSetSelector,
   data,
-  available,
 }) {
   const { t } = useTranslation()
+  const available = useStatic((s) => s.available)
 
   if (category === 'scanAreas' && noScanAreaOverlay) {
     return null

@@ -1,58 +1,18 @@
-/* eslint-disable no-nested-ternary */
 import React from 'react'
-import ExpandMore from '@material-ui/icons/ExpandMore'
 import Clear from '@material-ui/icons/Clear'
-import Settings from '@material-ui/icons/Settings'
-import {
-  Drawer,
-  Button,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Grid,
-  IconButton,
-} from '@material-ui/core'
+import { Drawer, Typography, Grid, IconButton } from '@material-ui/core'
 
-import { useTranslation } from 'react-i18next'
+import { useStatic } from '@hooks/useStore'
+import Buttons from './Buttons'
+import DrawerSection from './Section'
 
-import Utility from '@services/Utility'
-
-import SettingsMenu from './Settings'
-import WithSubItems from './WithSubItems'
-import PokemonSection from './Pokemon'
-import useStyles from '../../../hooks/useStyles'
-import { useStore, useStatic } from '../../../hooks/useStore'
-import Areas from './Areas'
-
-export default function Sidebar({
-  drawer,
-  toggleDrawer,
-  filters,
-  setFilters,
-  toggleDialog,
-  Icons,
-}) {
-  const sidebar = useStore((state) => state.sidebar)
-  const setSidebar = useStore((state) => state.setSidebar)
-  const classes = useStyles()
-  const ui = useStatic((state) => state.ui)
-  const staticUserSettings = useStatic((state) => state.userSettings)
+export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
   const {
-    map: {
-      title,
-      scanAreasZoom,
-      scanAreaMenuHeight,
-      noScanAreaOverlay,
-      enableQuestSetSelector,
+    config: {
+      map: { title },
     },
-  } = useStatic((state) => state.config)
-  const available = useStatic((s) => s.available)
-  const { t } = useTranslation()
-
-  const handleChange = (panel) => (event, isExpanded) => {
-    setSidebar(isExpanded ? panel : false)
-  }
+    ui,
+  } = useStatic.getState()
 
   return (
     <Drawer
@@ -60,7 +20,6 @@ export default function Sidebar({
       variant="temporary"
       open={drawer}
       onClose={toggleDrawer(false)}
-      classes={{ paper: classes.drawer }}
     >
       <Grid container alignItems="center" justifyContent="center">
         <Grid
@@ -92,97 +51,15 @@ export default function Sidebar({
           </IconButton>
         </Grid>
       </Grid>
-      {Object.keys(ui).map((category) => (
-        <Accordion
+      {Object.entries(ui).map(([category, value]) => (
+        <DrawerSection
           key={category}
-          expanded={sidebar === category}
-          onChange={handleChange(category)}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMore style={{ color: 'white' }} />}
-          >
-            <Typography className={classes.heading}>
-              {t(Utility.camelToSnake(category))}
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid
-              container
-              style={{ width: 300 }}
-              spacing={3}
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-            >
-              {category === 'pokemon' ? (
-                <PokemonSection
-                  category={category}
-                  context={ui[category]}
-                  specificFilter="ivOr"
-                  filters={filters}
-                  setFilters={setFilters}
-                />
-              ) : category === 'settings' ? (
-                <SettingsMenu toggleDialog={toggleDialog} Icons={Icons} />
-              ) : (
-                Object.keys(ui[category]).map((subItem) => (
-                  <WithSubItems
-                    key={`${category}-${subItem}`}
-                    category={category}
-                    data={ui[category][subItem]}
-                    filters={filters}
-                    setFilters={setFilters}
-                    subItem={subItem}
-                    noScanAreaOverlay={noScanAreaOverlay}
-                    enableQuestSetSelector={enableQuestSetSelector}
-                    available={available}
-                  />
-                ))
-              )}
-              {staticUserSettings[category] && (
-                <Grid
-                  item
-                  xs={t('drawer_grid_options_width')}
-                  style={{ textAlign: 'center' }}
-                >
-                  <Button
-                    onClick={toggleDialog(true, category, 'options')}
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<Settings style={{ color: 'white' }} />}
-                  >
-                    {t('options')}
-                  </Button>
-                </Grid>
-              )}
-              {(category === 'pokemon' ||
-                category === 'gyms' ||
-                category === 'pokestops' ||
-                category === 'nests') && (
-                <Grid
-                  item
-                  xs={t('drawer_grid_advanced_width')}
-                  style={{ textAlign: 'center' }}
-                >
-                  <Button
-                    onClick={toggleDialog(true, category, 'filters')}
-                    variant="contained"
-                    color="primary"
-                  >
-                    {t('advanced')}
-                  </Button>
-                </Grid>
-              )}
-              {category === 'scanAreas' && (
-                <Areas
-                  scanAreasZoom={scanAreasZoom}
-                  scanAreaMenuHeight={scanAreaMenuHeight}
-                />
-              )}
-            </Grid>
-          </AccordionDetails>
-        </Accordion>
+          category={category}
+          value={value}
+          toggleDialog={toggleDialog}
+        />
       ))}
+      <Buttons />
     </Drawer>
   )
 }

@@ -11,9 +11,8 @@ import AreaTile from './AreaTile'
 export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
   const { data, loading, error } = useQuery(Query.scanAreasMenu())
   const { t } = useTranslation()
-  const setAreas = useStore((s) => s.setAreas)
   const filters = useStore((s) => s.filters)
-  const setFilters = useStore((s) => s.setFilters)
+  const { setAreas, setFilters } = useStore.getState()
   const map = useMap()
 
   const allAreas = useMemo(() => {
