@@ -322,6 +322,10 @@
         "__format": "number"
       },
       "geoJsonFileName": "MAP_GENERAL_GEO_JSON_FILE_NAME",
+      "separateDrawerActions": {
+        "__name": "MAP_GENERAL_SEPARATE_DRAWER_ACTIONS",
+        "__format": "boolean"
+      },
       "attributionPrefix": "MAP_GENERAL_ATTRIBUTION_PREFIX",
       "menuOrder": {
         "__name": "MAP_GENERAL_MENU_ORDER",
