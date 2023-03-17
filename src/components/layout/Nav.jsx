@@ -204,7 +204,7 @@ export default function Nav({
       >
         <Search
           toggleDialog={toggleDialog}
-          safeSearch={config.searchable}
+          safeSearch={config.map.searchable}
           isMobile={isMobile}
           Icons={Icons}
         />
@@ -231,7 +231,7 @@ export default function Nav({
         maxWidth={isMobile ? 'sm' : 'xs'}
         onClose={() => setFeedback(false)}
       >
-        <Feedback link={config.feedbackLink} setFeedback={setFeedback} />
+        <Feedback link={config.map.feedbackLink} setFeedback={setFeedback} />
       </Dialog>
       <Dialog
         open={resetFilters}
