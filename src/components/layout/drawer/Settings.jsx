@@ -22,11 +22,16 @@ import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import DrawerActions from './Actions'
 
-function FCSelect({ name, label, value, handleChange, children, icon }) {
+function FCSelect({ name, label, value, handleChange, children, icon, color }) {
   return (
     <ListItem dense>
       {icon && <ListItemIcon>{icon}</ListItemIcon>}
-      <FormControl size="small" fullWidth style={{ margin: '3px 0' }}>
+      <FormControl
+        size="small"
+        color={color || 'primary'}
+        fullWidth
+        style={{ margin: '3px 0' }}
+      >
         <InputLabel>{label}</InputLabel>
         <Select
           autoFocus
@@ -61,7 +66,6 @@ export default function Settings() {
     <List dense style={{ width: '100%' }}>
       {Object.keys(staticSettings).map((setting) => {
         const Icon = ICON_MAP[setting] || DevicesOtherIcon
-
         return (
           <FCSelect
             key={setting}
@@ -95,6 +99,7 @@ export default function Settings() {
         <FCSelect
           key={category}
           name={category}
+          color="secondary"
           value={icons[category]}
           label={t(`${category}_icons`, `${category} Icons`)}
           handleChange={({ target }) => {

@@ -512,14 +512,25 @@ const Backups = ({ t, auth }) => {
 
   React.useEffect(() => {
     if (fullBackup?.backup?.data) {
-      setDisabled(true)
-      localStorage.clear()
-      localStorage.setItem(
-        'local-state',
-        JSON.stringify({ state: fullBackup.backup.data }),
-      )
-      localStorage.setItem('last-loaded', fullBackup.backup.name)
-      setTimeout(() => window.location.reload(), 1500)
+      try {
+        setDisabled(true)
+        localStorage.clear()
+        localStorage.setItem(
+          'local-state',
+          JSON.stringify({
+            state:
+              typeof fullBackup.backup.data === 'string'
+                ? JSON.parse(fullBackup.backup.data)
+                : fullBackup.backup.data,
+          }),
+        )
+        localStorage.setItem('last-loaded', fullBackup.backup.name)
+        setTimeout(() => window.location.reload(), 1500)
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e)
+        setDisabled(false)
+      }
     }
   }, [fullBackup])
 
