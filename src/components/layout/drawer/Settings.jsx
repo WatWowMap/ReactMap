@@ -102,7 +102,7 @@ export default function Settings() {
             setStaticIcons(Icons)
             setIcons({ ...icons, [target.name]: target.value })
           }}
-          icon={<img src={Icons.getMisc(category)} alt={category} width={25} />}
+          icon={<img src={Icons.getMisc(category)} alt={category} width={24} />}
         >
           {Icons[category].map((option) => (
             <MenuItem key={option} value={option}>
