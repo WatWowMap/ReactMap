@@ -200,8 +200,8 @@ module.exports = {
             S2LatLng.fromDegrees(args.minLat, args.minLon),
             S2LatLng.fromDegrees(args.maxLat, args.maxLon),
           )
-          regionCoverer.minLevel = level
-          regionCoverer.maxLevel = level
+          regionCoverer.setMinLevel(level)
+          regionCoverer.setMaxLevel(level)
           return regionCoverer.getCoveringCells(region).map((cell) => {
             const id = BigInt(cell.id).toString()
             return {

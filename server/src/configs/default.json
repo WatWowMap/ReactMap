@@ -121,6 +121,7 @@
       "submissionZoom": 15,
       "activeWeatherZoom": 13,
       "geoJsonFileName": "areas.json",
+      "separateDrawerActions": false,
       "attributionPrefix": "<a href='https://github.com/WatWowMap/ReactMap' target='_blank' rel='noreferrer'>ReactMap</a>",
       "menuOrder": [
         "gyms",

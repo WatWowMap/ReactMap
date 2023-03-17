@@ -3,13 +3,13 @@ import Clear from '@material-ui/icons/Clear'
 import { Drawer, Typography, Grid, IconButton } from '@material-ui/core'
 
 import { useStatic } from '@hooks/useStore'
-import Buttons from './Buttons'
+import Actions from './Actions'
 import DrawerSection from './Section'
 
 export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
   const {
     config: {
-      map: { title },
+      map: { title, separateDrawerActions },
     },
     ui,
   } = useStatic.getState()
@@ -59,7 +59,7 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
           toggleDialog={toggleDialog}
         />
       ))}
-      <Buttons />
+      {separateDrawerActions && <Actions />}
     </Drawer>
   )
 }
