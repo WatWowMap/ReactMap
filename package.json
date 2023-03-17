@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.10.4",
+  "version": "1.10.5",
   "description": "React based frontend map.",
   "main": "ReactMap.js",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
