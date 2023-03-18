@@ -21,7 +21,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import DrawerActions from './Actions'
 
-function FCSelect({ name, label, value, handleChange, children, icon, color }) {
+function FCSelect({ name, label, value, onChange, children, icon, color }) {
   return (
     <ListItem dense>
       {icon && <ListItemIcon>{icon}</ListItemIcon>}
@@ -36,7 +36,7 @@ function FCSelect({ name, label, value, handleChange, children, icon, color }) {
           autoFocus
           name={name}
           value={value}
-          onChange={handleChange}
+          onChange={onChange}
           fullWidth
         >
           {children}
@@ -104,7 +104,7 @@ export default function Settings() {
           color="secondary"
           value={icons[category]}
           label={t(`${category}_icons`, `${category} Icons`)}
-          handleChange={({ target }) => {
+          onChange={({ target }) => {
             Icons.setSelection(target.name, target.value)
             setStaticIcons(Icons)
             setIcons({ ...icons, [target.name]: target.value })
