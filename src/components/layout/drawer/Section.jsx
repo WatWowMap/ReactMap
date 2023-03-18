@@ -1,6 +1,5 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react'
-import shallow from 'zustand/shallow'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import Settings from '@material-ui/icons/Settings'
 import {
@@ -27,7 +26,8 @@ export default function DrawerSection({ category, value, toggleDialog }) {
   const { setSidebar, setFilters } = useStore.getState()
   const { config } = useStatic.getState()
 
-  const { sidebar, filters } = useStore((s) => s, shallow)
+  const sidebar = useStore((s) => s.sidebar)
+  const filters = useStore((s) => s.filters)
 
   const staticUserSettings = useStatic((s) => s.userSettings)
 

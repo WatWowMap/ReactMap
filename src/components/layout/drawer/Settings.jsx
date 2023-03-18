@@ -1,5 +1,4 @@
 import React from 'react'
-import shallow from 'zustand/shallow'
 import {
   Divider,
   FormControl,
@@ -59,8 +58,11 @@ export default function Settings() {
   const { config, setIcons: setStaticIcons } = useStatic.getState()
   const { setIcons, setSettings } = useStore.getState()
 
-  const { Icons, settings: staticSettings } = useStatic((s) => s, shallow)
-  const { settings, icons } = useStore((state) => state, shallow)
+  const Icons = useStatic((s) => s.Icons)
+  const staticSettings = useStatic((s) => s.settings)
+
+  const settings = useStore((s) => s.settings)
+  const icons = useStore((s) => s.icons)
 
   return (
     <List dense style={{ width: '100%' }}>

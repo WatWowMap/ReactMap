@@ -38,10 +38,9 @@ export default function Menu({
 }) {
   Utility.analytics(`/advanced/${category}`)
 
+  const { setMenus, setAdvMenu } = useStore.getState()
   const menus = useStore((state) => state.menus)
-  const setMenus = useStore((state) => state.setMenus)
   const advMenu = useStore((state) => state.advMenu)
-  const setAdvMenu = useStore((state) => state.setAdvMenu)
   const { t } = useTranslation()
 
   let columnCount = isTablet ? 3 : 5
