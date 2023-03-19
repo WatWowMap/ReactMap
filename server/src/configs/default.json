@@ -320,6 +320,7 @@
       "raidTimers": false,
       "interactionRanges": false,
       "300mRange": false,
+      "customRange": 0,
       "showExBadge": false,
       "showArBadge": false,
       "raidLevelBadges": false,
@@ -332,6 +333,7 @@
       "eventStopTimers": false,
       "interactionRanges": false,
       "lureRange": false,
+      "customRange": 0,
       "madQuestText": false,
       "hasQuestIndicator": true,
       "showArBadge": false
@@ -388,6 +390,10 @@
       "darkMapBorder": "#ff0000",
       "cellBlocked": "#000000",
       "poiColor": "#03ffff"
+    },
+    "s2cells": {
+      "darkMapBorder": "#ff0000",
+      "lightMapBorder": "#246377"
     },
     "scanAreas": {
       "alwaysShowLabels": true,

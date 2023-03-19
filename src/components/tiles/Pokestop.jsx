@@ -130,6 +130,13 @@ const PokestopTile = ({
             pathOptions={{ color: '#32cd32', weight: 1 }}
           />
         )}
+        {!!userSettings.customRange && zoom >= config.interactionRangeZoom && (
+          <Circle
+            center={[item.lat, item.lon]}
+            radius={userSettings.customRange}
+            pathOptions={{ color: 'purple', weight: 0.5 }}
+          />
+        )}
       </Marker>
     )
   )
