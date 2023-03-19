@@ -95,8 +95,8 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
               disabled={fullOption.disabled}
               endAdornment={fullOption.label || ''}
               inputProps={{
-                min: 0,
-                max: 100,
+                min: fullOption.min || 0,
+                max: fullOption.max || 100,
               }}
             />
           </Grid>

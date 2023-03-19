@@ -17,6 +17,12 @@ module.exports = function clientOptions(perms) {
       raidTimers: { type: 'bool', perm: ['raids'] },
       interactionRanges: { type: 'bool', perm: ['gyms', 'raids'] },
       '300mRange': { type: 'bool', perm: ['raids'] },
+      customRange: {
+        type: 'number',
+        perm: ['raids', 'gyms'],
+        min: 0,
+        max: 5000,
+      },
       showExBadge: { type: 'bool', perm: ['gyms'] },
       showArBadge: { type: 'bool', perm: ['gyms'] },
       raidLevelBadges: { type: 'bool', perm: ['raids'] },
@@ -29,6 +35,12 @@ module.exports = function clientOptions(perms) {
       eventStopTimers: { type: 'bool', perm: ['pokestops'] },
       interactionRanges: { type: 'bool', perm: ['pokestops'] },
       lureRange: { type: 'bool', perm: ['lures'] },
+      customRange: {
+        type: 'number',
+        perm: ['raids', 'gyms'],
+        min: 0,
+        max: 5000,
+      },
       hasQuestIndicator: { type: 'bool', perm: ['quests'] },
       showArBadge: { type: 'bool', perm: ['pokestops'] },
     },
@@ -55,6 +67,10 @@ module.exports = function clientOptions(perms) {
       darkMapBorder: { type: 'color', perm: ['submissionCells'] },
       cellBlocked: { type: 'color', perm: ['submissionCells'] },
       poiColor: { type: 'color', perm: ['submissionCells'] },
+    },
+    s2cells: {
+      lightMapBorder: { type: 'color', perm: ['s2cells'] },
+      darkMapBorder: { type: 'color', perm: ['s2cells'] },
     },
     scanAreas: {
       alwaysShowLabels: { type: 'bool', perm: ['scanAreas'] },

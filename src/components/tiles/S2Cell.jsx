@@ -1,12 +1,16 @@
 import * as React from 'react'
 import { Polyline } from 'react-leaflet'
 
-function BaseCell({ item }) {
+function BaseCell({ item, tileStyle, userSettings }) {
   return (
     <Polyline
       key={item.id}
       positions={[...item.coords, item.coords[0]]}
-      color="black"
+      color={
+        tileStyle === 'dark'
+          ? userSettings.darkMapBorder || 'red'
+          : userSettings.lightMapBorder || 'black'
+      }
       weight={0.5}
     />
   )
