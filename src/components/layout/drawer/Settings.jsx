@@ -1,5 +1,4 @@
 import React from 'react'
-import shallow from 'zustand/shallow'
 import {
   Divider,
   FormControl,
@@ -22,7 +21,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import DrawerActions from './Actions'
 
-function FCSelect({ name, label, value, handleChange, children, icon, color }) {
+function FCSelect({ name, label, value, onChange, children, icon, color }) {
   return (
     <ListItem dense>
       {icon && <ListItemIcon>{icon}</ListItemIcon>}
@@ -37,7 +36,7 @@ function FCSelect({ name, label, value, handleChange, children, icon, color }) {
           autoFocus
           name={name}
           value={value}
-          onChange={handleChange}
+          onChange={onChange}
           fullWidth
         >
           {children}
@@ -59,8 +58,11 @@ export default function Settings() {
   const { config, setIcons: setStaticIcons } = useStatic.getState()
   const { setIcons, setSettings } = useStore.getState()
 
-  const { Icons, settings: staticSettings } = useStatic((s) => s, shallow)
-  const { settings, icons } = useStore((state) => state, shallow)
+  const Icons = useStatic((s) => s.Icons)
+  const staticSettings = useStatic((s) => s.settings)
+
+  const settings = useStore((s) => s.settings)
+  const icons = useStore((s) => s.icons)
 
   return (
     <List dense style={{ width: '100%' }}>
@@ -102,7 +104,7 @@ export default function Settings() {
           color="secondary"
           value={icons[category]}
           label={t(`${category}_icons`, `${category} Icons`)}
-          handleChange={({ target }) => {
+          onChange={({ target }) => {
             Icons.setSelection(target.name, target.value)
             setStaticIcons(Icons)
             setIcons({ ...icons, [target.name]: target.value })

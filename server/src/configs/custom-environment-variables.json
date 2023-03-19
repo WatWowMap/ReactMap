@@ -580,6 +580,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_300M_RANGE",
         "__format": "boolean"
       },
+      "customRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_CUSTOM_RANGE",
+        "__format": "number"
+      },
       "showExBadge": {
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_SHOW_EX_BADGE",
         "__format": "boolean"
@@ -621,6 +625,10 @@
       "lureRange": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_LURE_RANGE",
         "__format": "boolean"
+      },
+      "customRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_CUSTOM_RANGE",
+        "__format": "number"
       },
       "madQuestText": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_MAD_QUEST_TEXT",
@@ -699,6 +707,10 @@
       "darkMapBorder": "CLIENT_SIDE_OPTIONS_WAYFARER_DARK_MAP_BORDER",
       "cellBlocked": "CLIENT_SIDE_OPTIONS_WAYFARER_CELL_BLOCKED",
       "poiColor": "CLIENT_SIDE_OPTIONS_WAYFARER_POI_COLOR"
+    },
+    "s2cells": {
+      "darkMapBorder": "CLIENT_SIDE_OPTIONS_S2CELLS_DARK_MAP_BORDER",
+      "lightMapBorder": "CLIENT_SIDE_OPTIONS_S2CELLS_LIGHT_MAP_BORDER"
     },
     "scanAreas": {
       "alwaysShowLabels": {
