@@ -33,7 +33,6 @@ export default function FloatingButtons({
   toggleDialog,
   safeSearch,
   isMobile,
-  perms,
   webhookMode,
   setWebhookMode,
   settings,
@@ -49,10 +48,13 @@ export default function FloatingButtons({
   const { t } = useTranslation()
 
   const {
-    map: { enableFloatingProfileButton },
-    scanner: { scannerType, enableScanNext, enableScanZone },
-  } = useStatic((state) => state.config)
-  const { loggedIn } = useStatic((state) => state.auth)
+    config: {
+      map: { enableFloatingProfileButton },
+      scanner: { scannerType, enableScanNext, enableScanZone },
+    },
+    auth: { loggedIn, perms },
+  } = useStatic.getState()
+
   const map = useMap()
   const ref = useRef(null)
   const classes = useStyles()

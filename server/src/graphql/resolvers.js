@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
+/* global BigInt */
 const GraphQLJSON = require('graphql-type-json')
 const { AuthenticationError, UserInputError } = require('apollo-server-core')
+const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 
 const config = require('../services/config')
 const Utility = require('../services/Utility')
@@ -25,6 +27,24 @@ module.exports = {
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
         filters: Utility.buildDefaultFilters(perms, available, Db.models),
       }
+    },
+    backup: (_, args, { req, perms, Db, serverV, clientV }) => {
+      if (clientV && serverV && clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
+      if (!perms) throw new AuthenticationError('session_expired')
+      if (perms?.backups && req?.user?.id) {
+        return Db.models.Backup.getOne(args.id, req?.user?.id)
+      }
+      return {}
+    },
+    backups: (_, _args, { req, perms, Db, serverV, clientV }) => {
+      if (clientV && serverV && clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
+      if (!perms) throw new AuthenticationError('session_expired')
+      if (perms?.backups) {
+        return Db.models.Backup.getAll(req.user?.id)
+      }
+      return []
     },
     badges: async (_, _args, { req, perms, Db, serverV, clientV }) => {
       if (clientV && serverV && clientV !== serverV)
@@ -168,6 +188,31 @@ module.exports = {
       }
       return {}
     },
+    s2cells: (_, args, { perms, serverV, clientV }) => {
+      if (clientV && serverV && clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
+      if (!perms) throw new AuthenticationError('session_expired')
+      if (perms?.s2cells) {
+        const { onlyCells } = args.filters
+        return onlyCells.flatMap((level) => {
+          const regionCoverer = new S2RegionCoverer()
+          const region = S2LatLngRect.fromLatLng(
+            S2LatLng.fromDegrees(args.minLat, args.minLon),
+            S2LatLng.fromDegrees(args.maxLat, args.maxLon),
+          )
+          regionCoverer.setMinLevel(level)
+          regionCoverer.setMaxLevel(level)
+          return regionCoverer.getCoveringCells(region).map((cell) => {
+            const id = BigInt(cell.id).toString()
+            return {
+              id,
+              coords: Utility.getPolyVector(id).poly,
+            }
+          })
+        })
+      }
+      return []
+    },
     scanCells: (_, args, { perms, serverV, clientV, Db }) => {
       if (clientV && serverV && clientV !== serverV)
         throw new UserInputError('old_client', { clientV, serverV })
@@ -284,6 +329,20 @@ module.exports = {
       }
       return []
     },
+    searchLure: (_, args, { perms, serverV, clientV, Db }) => {
+      if (clientV && serverV && clientV !== serverV)
+        throw new UserInputError('old_client', { clientV, serverV })
+      if (!perms) throw new AuthenticationError('session_expired')
+
+      const { category, search } = args
+      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
+        if (!search || !search.trim()) {
+          return []
+        }
+        return Db.search('Pokestop', perms, args, 'searchLures')
+      }
+      return []
+    },
     searchQuest: (_, args, { perms, serverV, clientV, Db }) => {
       if (clientV && serverV && clientV !== serverV)
         throw new UserInputError('old_client', { clientV, serverV })
@@ -373,6 +432,27 @@ module.exports = {
     },
   },
   Mutation: {
+    createBackup: async (_, args, { req, perms, Db }) => {
+      if (!perms || req.user?.id === undefined)
+        throw new AuthenticationError('session_expired')
+      if (perms?.backups && req.user?.id) {
+        await Db.models.Backup.create(args.backup, req.user.id)
+      }
+    },
+    deleteBackup: async (_, args, { req, perms, Db }) => {
+      if (!perms || req.user?.id === undefined)
+        throw new AuthenticationError('session_expired')
+      if (perms?.backups && req.user?.id) {
+        await Db.models.Backup.delete(args.id, req.user.id)
+      }
+    },
+    updateBackup: async (_, args, { req, perms, Db }) => {
+      if (!perms || req.user?.id === undefined)
+        throw new AuthenticationError('session_expired')
+      if (perms?.backups && req.user?.id) {
+        await Db.models.Backup.update(args.backup, req.user.id)
+      }
+    },
     webhook: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : false
       const { category, data, status, name } = args

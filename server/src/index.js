@@ -22,6 +22,7 @@ const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
 const pkg = require('../../package.json')
 const getAreas = require('./services/areas')
+const { connection } = require('./db/knexfile.cjs')
 
 Event.clients = Clients
 
@@ -206,7 +207,8 @@ app.use((err, req, res, next) => {
   }
 })
 
-Db.determineType().then(async () => {
+connection.migrate.latest().then(async () => {
+  await Db.determineType()
   await Promise.all([
     Db.historicalRarity(),
     Event.setAvailable('gyms', 'Gym', Db),

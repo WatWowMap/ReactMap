@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 export default class Poracle {
   static filterGenerator = (poracleInfo, reactMapFilters, invasions) => {
     try {
@@ -38,6 +39,16 @@ export default class Poracle {
           i0: {
             ...invasion.defaults,
             grunt_type: 'everything',
+            profile_no: human.current_profile_no,
+          },
+          'gold-stop': {
+            ...invasion.defaults,
+            grunt_type: 'gold-stop',
+            profile_no: human.current_profile_no,
+          },
+          kecleon: {
+            ...invasion.defaults,
+            grunt_type: 'kecleon',
             profile_no: human.current_profile_no,
           },
         },
@@ -251,12 +262,16 @@ export default class Poracle {
       case 'egg':
         return `e${item.level}`
       case 'invasion':
-        return `i${Object.keys(invasions).find(
-          (x) =>
-            invasions[x].type?.toLowerCase() ===
-              item.grunt_type.toLowerCase() &&
-            invasions[x].gender === (item.gender || 1),
-        )}`
+        return item.grunt_type === 'gold-stop'
+          ? 'gold-stop'
+          : item.grunt_type === 'kecleon'
+          ? 'kecleon'
+          : `i${Object.keys(invasions).find(
+              (x) =>
+                invasions[x].type?.toLowerCase() ===
+                  item.grunt_type.toLowerCase() &&
+                invasions[x].gender === (item.gender || 1),
+            )}`
       case 'lure':
         return `l${item.lure_id}`
       case 'gym':
@@ -288,6 +303,10 @@ export default class Poracle {
   }
 
   static getIdObj(id) {
+    if (!id) return {}
+    if (id === 'gold-stop') return { id: 'gold-stop', type: 'invasion' }
+    if (id === 'kecleon') return { id: 'kecleon', type: 'invasion' }
+
     switch (id.charAt(0)) {
       case 'e':
         return { id: id.replace('e', ''), type: 'egg' }
@@ -319,6 +338,8 @@ export default class Poracle {
       case 'egg':
         return idObj.id === '90' ? ['poke_global'] : [`egg_${idObj.id}_plural`]
       case 'invasion':
+        if (idObj.id === 'gold-stop') return ['gold_stop']
+        if (idObj.id === 'kecleon') return ['poke_352']
         return idObj.id === '0' ? ['poke_global'] : [`grunt_a_${idObj.id}`]
       case 'lure':
         return [`lure_${idObj.id}`]

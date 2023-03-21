@@ -15,6 +15,7 @@ const allowedMenuItems = [
   'pokestops',
   'pokemon',
   'wayfarer',
+  's2cells',
   'scanAreas',
   'weather',
   'admin',

@@ -36,6 +36,7 @@
     "searchable": {
       "quests": true,
       "pokestops": true,
+      "lures": true,
       "raids": true,
       "gyms": true,
       "portals": true,
@@ -120,6 +121,7 @@
       "submissionZoom": 15,
       "activeWeatherZoom": 13,
       "geoJsonFileName": "areas.json",
+      "separateDrawerActions": false,
       "attributionPrefix": "<a href='https://github.com/WatWowMap/ReactMap' target='_blank' rel='noreferrer'>ReactMap</a>",
       "menuOrder": [
         "gyms",
@@ -127,6 +129,7 @@
         "pokestops",
         "pokemon",
         "wayfarer",
+        "s2cells",
         "scanAreas",
         "weather",
         "admin",
@@ -317,6 +320,7 @@
       "raidTimers": false,
       "interactionRanges": false,
       "300mRange": false,
+      "customRange": 0,
       "showExBadge": false,
       "showArBadge": false,
       "raidLevelBadges": false,
@@ -329,6 +333,7 @@
       "eventStopTimers": false,
       "interactionRanges": false,
       "lureRange": false,
+      "customRange": 0,
       "madQuestText": false,
       "hasQuestIndicator": true,
       "showArBadge": false
@@ -385,6 +390,10 @@
       "darkMapBorder": "#ff0000",
       "cellBlocked": "#000000",
       "poiColor": "#03ffff"
+    },
+    "s2cells": {
+      "darkMapBorder": "#ff0000",
+      "lightMapBorder": "#246377"
     },
     "scanAreas": {
       "alwaysShowLabels": true,
@@ -536,6 +545,10 @@
       "s17Cells": true,
       "s14Cells": true
     },
+    "s2cells": {
+      "enabled": false,
+      "cells": []
+    },
     "weather": {
       "enabled": true
     }
@@ -545,8 +558,11 @@
       "userTableName": "users",
       "gymBadgeTableName": "gymBadges",
       "sessionTableName": "session",
+      "backupTableName": "backups",
       "migrationTableName": "knex_migrations",
       "maxConnections": 10,
+      "userBackupLimits": 10,
+      "userBackupSizeLimit": 10000000,
       "extraUserFields": []
     },
     "schemas": []
@@ -749,6 +765,11 @@
         "trialPeriodEligible": false,
         "roles": []
       },
+      "s2cells": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
       "scanCells": {
         "enabled": true,
         "trialPeriodEligible": false,
@@ -765,6 +786,11 @@
         "roles": []
       },
       "gymBadges": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "backups": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []

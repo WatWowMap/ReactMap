@@ -3,6 +3,7 @@ import { Grid, Typography, Switch, Select, MenuItem } from '@material-ui/core'
 import { Trans, useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+import { useStatic } from '@hooks/useStore'
 
 import MultiSelector from './MultiSelector'
 import SliderTile from '../dialogs/filters/SliderTile'
@@ -15,9 +16,9 @@ export default function WithSubItems({
   noScanAreaOverlay,
   enableQuestSetSelector,
   data,
-  available,
 }) {
   const { t } = useTranslation()
+  const available = useStatic((s) => s.available)
 
   if (category === 'scanAreas' && noScanAreaOverlay) {
     return null
@@ -68,6 +69,38 @@ export default function WithSubItems({
           }
           filterValues={filters[category]}
         />
+      </Grid>
+    )
+  }
+
+  if (category === 's2cells' && subItem === 'cells') {
+    return (
+      <Grid item xs={10}>
+        <Select
+          fullWidth
+          value={
+            Array.isArray(filters[category][subItem])
+              ? filters[category][subItem]
+              : []
+          }
+          renderValue={(selected) => selected.join(', ')}
+          multiple
+          onChange={({ target }) =>
+            setFilters({
+              ...filters,
+              [category]: {
+                ...filters[category],
+                [subItem]: target.value,
+              },
+            })
+          }
+        >
+          {[10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((level) => (
+            <MenuItem key={level} value={level}>
+              Level {level}
+            </MenuItem>
+          ))}
+        </Select>
       </Grid>
     )
   }

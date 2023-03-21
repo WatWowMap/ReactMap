@@ -2,14 +2,21 @@
 const path = require('path')
 const knex = require('knex')
 
-const { database: { schemas, settings: { migrationTableName } } } = require('./src/services/config')
+const {
+  database: {
+    schemas,
+    settings: { migrationTableName },
+  },
+} = require('../services/config')
 
-const migrationUrl = 'src/db/migrations'
+const migrationUrl = path.resolve(__dirname, 'migrations')
 
-const selectedDb = schemas.find(db => db.useFor.includes('user'))
+const selectedDb = schemas.find((db) => db.useFor.includes('user'))
 
 if (!selectedDb) {
-  console.warn('[DB] No database selected for React Map Tables, one schema must contain "user" in its useFor array')
+  console.warn(
+    '[DB] No database selected for React Map Tables, one schema must contain "user" in its useFor array',
+  )
   process.exit(9)
 }
 
@@ -25,9 +32,9 @@ const getConnection = (basePath = '') => {
     },
     migrations: {
       tableName: migrationTableName,
-      directory: path.join(basePath, migrationUrl),
+      directory: migrationUrl,
       extensions: 'cjs',
-      stub: path.join(basePath, migrationUrl, 'migration.stub.cjs'),
+      stub: path.join(migrationUrl, 'migration.stub.cjs'),
     },
   }
   return basePath ? knex(connection) : connection

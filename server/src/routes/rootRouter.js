@@ -145,6 +145,7 @@ rootRouter.get('/api/settings', async (req, res) => {
       user: await getUser(),
       settings: {},
       authMethods: config.authMethods,
+      userBackupLimits: config.database.settings.userBackupLimits,
       masterfile: { ...Event.masterfile, invasions: Event.invasions },
       config: {
         map: {

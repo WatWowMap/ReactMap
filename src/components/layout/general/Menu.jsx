@@ -38,10 +38,9 @@ export default function Menu({
 }) {
   Utility.analytics(`/advanced/${category}`)
 
+  const { setMenus, setAdvMenu } = useStore.getState()
   const menus = useStore((state) => state.menus)
-  const setMenus = useStore((state) => state.setMenus)
   const advMenu = useStore((state) => state.advMenu)
-  const setAdvMenu = useStore((state) => state.setAdvMenu)
   const { t } = useTranslation()
 
   let columnCount = isTablet ? 3 : 5
@@ -179,7 +178,7 @@ export default function Menu({
         [id]: { ...tempFilters[id], ...newFilters, enabled: true },
       })
     }
-    setWebhook({ open, id })
+    setWebhook({ open, id: id ?? '' })
   }
 
   const toggleSlotsMenu = (open, id, newFilters) => (event) => {
@@ -373,7 +372,7 @@ export default function Menu({
         />
       </Dialog>
       <Dialog
-        open={webhook.open}
+        open={!!(webhook.open && webhook.id)}
         fullWidth={!isMobile}
         fullScreen={isMobile}
         onClose={toggleWebhook(false)}

@@ -420,6 +420,17 @@ export default function WebhookAdvanced({
   }
 
   const getPoracleString = () => {
+    if (!id) return ''
+    if (id === 'gold-stop')
+      return `${prefix}${t('invasion')} gold-stop ${Object.keys(poracleValues)
+        .map(checkDefaults)
+        .join(' ')}`
+    if (id === 'kecleon')
+      return `${prefix}${t('invasion')} ${t('poke_352')} ${Object.keys(
+        poracleValues,
+      )
+        .map(checkDefaults)
+        .join(' ')}`
     switch (id.charAt(0)) {
       case 't':
         return `${prefix}${t('gym')}
@@ -484,6 +495,7 @@ export default function WebhookAdvanced({
   }
 
   const getDisabled = (option) => {
+    if (typeof option?.disabled === 'boolean') return option.disabled
     switch (option.name) {
       case 'xl':
       case 'xs':

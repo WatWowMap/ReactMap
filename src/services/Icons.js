@@ -21,6 +21,7 @@ export default class UIcons {
     this.sizes = sizes
     this.selected = {}
     this.questRewardTypes = {}
+    this.fallback = ''
     this.modifiers = {
       base: {
         offsetX: 1,
@@ -42,13 +43,32 @@ export default class UIcons {
   }
 
   build(icons) {
-    icons.forEach((icon) => {
+    icons.forEach((icon, i) => {
       try {
-        const { data, name: unclean, path } = icon
-        const name = unclean.endsWith('/') ? unclean.slice(0, -1) : unclean
-        if (data) {
-          this[name] = { indexes: Object.keys(data), ...icon }
+        const { data, name: dirtyName, path: dirtyPath } = icon
+        const name = dirtyName.endsWith('/')
+          ? dirtyName?.slice(0, -1)
+          : dirtyName
+        const path = dirtyPath?.endsWith('/')
+          ? dirtyPath.slice(0, -1)
+          : dirtyPath
 
+        if (data) {
+          this[name] = {
+            indexes: Object.keys(data),
+            ...icon,
+            path,
+          }
+          if (!i) {
+            this.fallback = path
+          }
+          if (!path) {
+            // eslint-disable-next-line no-console
+            console.error('No path provided for', name, 'using default path')
+            this[
+              name
+            ].path = `https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/`
+          }
           if (!path.startsWith('http')) {
             this[name].path = `/images/uicons/${path}`
           }
@@ -154,6 +174,11 @@ export default class UIcons {
   }
 
   getIconById(id) {
+    if (id === 'kecleon') {
+      id = '352'
+    } else if (id === 'gold-stop') {
+      id = 'l506'
+    }
     switch (id.charAt(0)) {
       case 'c':
         return this.getRewards(4, ...id.slice(1).split('-'))
@@ -196,7 +221,9 @@ export default class UIcons {
     costume = 0,
     shiny = false,
   ) {
-    const baseUrl = `${this[this.selected.pokemon].path}/pokemon`
+    const baseUrl = `${
+      this[this.selected.pokemon]?.path || this.fallback
+    }/pokemon`
     const evolutionSuffixes = evolution ? [`_e${evolution}`, ''] : ['']
     const formSuffixes = form ? [`_f${form}`, ''] : ['']
     const costumeSuffixes = costume ? [`_c${costume}`, ''] : ['']
@@ -220,7 +247,7 @@ export default class UIcons {
   }
 
   getTypes(typeId) {
-    const baseUrl = `${this[this.selected.type].path}/type`
+    const baseUrl = `${this[this.selected.type]?.path || this.fallback}/type`
     const result = `${typeId}.png`
     if (this[this.selected.type].type.has(result)) {
       return `${baseUrl}/${result}`
@@ -236,7 +263,9 @@ export default class UIcons {
     power = 0,
     display = '',
   ) {
-    const baseUrl = `${this[this.selected.pokestop].path}/pokestop`
+    const baseUrl = `${
+      this[this.selected.pokestop]?.path || this.fallback
+    }/pokestop`
     const invasionSuffixes =
       invasionActive || display ? [`_i${display}`, ''] : ['']
     const questSuffixes = questActive ? ['_q', ''] : ['']
@@ -260,7 +289,9 @@ export default class UIcons {
 
   getRewards(rewardType, id, amount) {
     const category = this.questRewardTypes[rewardType] || 'unset'
-    const baseUrl = `${this[this.selected.reward].path}/reward/${category}`
+    const baseUrl = `${
+      this[this.selected.reward]?.path || this.fallback
+    }/reward/${category}`
     if (this[this.selected.reward][category]) {
       const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
       for (let a = 0; a < amountSuffixes.length; a += 1) {
@@ -274,7 +305,9 @@ export default class UIcons {
   }
 
   getInvasions(gruntType) {
-    const baseUrl = `${this[this.selected.invasion].path}/invasion`
+    const baseUrl = `${
+      this[this.selected.invasion]?.path || this.fallback
+    }/invasion`
     const result = `${gruntType}.png`
     if (this[this.selected.invasion].invasion.has(result)) {
       return `${baseUrl}/${result}`
@@ -289,7 +322,7 @@ export default class UIcons {
     ex = false,
     ar = false,
   ) {
-    const baseUrl = `${this[this.selected.gym].path}/gym`
+    const baseUrl = `${this[this.selected.gym]?.path || this.fallback}/gym`
     const trainerSuffixes = trainerCount ? [`_t${trainerCount}`, ''] : ['']
     const inBattleSuffixes = inBattle ? ['_b', ''] : ['']
     const exSuffixes = ex ? ['_ex', ''] : ['']
@@ -310,7 +343,9 @@ export default class UIcons {
   }
 
   getEggs(level, hatched = false, ex = false) {
-    const baseUrl = `${this[this.selected.raid].path}/raid/egg`
+    const baseUrl = `${
+      this[this.selected.raid]?.path || this.fallback
+    }/raid/egg`
     const hatchedSuffixes = hatched ? ['_h', ''] : ['']
     const exSuffixes = ex ? ['_ex', ''] : ['']
     for (let h = 0; h < hatchedSuffixes.length; h += 1) {
@@ -328,7 +363,7 @@ export default class UIcons {
   }
 
   getTeams(teamId = 0) {
-    const baseUrl = `${this[this.selected.team].path}/team`
+    const baseUrl = `${this[this.selected.team]?.path || this.fallback}/team`
     const result = `${teamId}.png`
     if (this[this.selected.team].team.has(result)) {
       return `${baseUrl}/${result}`
@@ -337,7 +372,9 @@ export default class UIcons {
   }
 
   getWeather(weatherId, timeOfDay = false) {
-    const baseUrl = `${this[this.selected.weather].path}/weather`
+    const baseUrl = `${
+      this[this.selected.weather]?.path || this.fallback
+    }/weather`
     const timeSuffixes = timeOfDay === 'night' ? ['_n', ''] : ['_d', '']
     for (let t = 0; t < timeSuffixes.length; t += 1) {
       const result = `${weatherId}${timeSuffixes[t]}.png`
@@ -349,7 +386,7 @@ export default class UIcons {
   }
 
   getNests(typeId) {
-    const baseUrl = `${this[this.selected.nest].path}/nest`
+    const baseUrl = `${this[this.selected.nest]?.path || this.fallback}/nest`
     const result = `${typeId}.png`
     if (this[this.selected.nest].nest.has(result)) {
       return `${baseUrl}/${result}`
@@ -357,29 +394,41 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
+  doesMiscHave(fileName) {
+    return this[this.selected.misc].misc.has(`${fileName}.png`)
+  }
+
   getMisc(fileName) {
-    const baseUrl = `${this[this.selected.misc].path}/misc`
-    switch (true) {
-      case this[this.selected.misc].misc.has(`${fileName}.png`):
-        return `${baseUrl}/${fileName}.png`
-      case fileName.endsWith('s') &&
-        this[this.selected.misc].misc.has(`${fileName.slice(0, -1)}.png`):
-        return `${baseUrl}/${fileName.slice(0, -1)}.png`
-      case !fileName.endsWith('s') &&
-        this[this.selected.misc].misc.has(`${fileName}s.png`):
-        return `${baseUrl}/${fileName}s.png`
-      default:
-        return `${baseUrl}/0.png`
+    const baseUrl = `${this[this.selected.misc]?.path || this.fallback}/misc`
+    if (this.doesMiscHave(fileName)) {
+      return `${baseUrl}/${fileName}.png`
     }
+    if (fileName.endsWith('s') && this.doesMiscHave(fileName.slice(0, -1))) {
+      return `${baseUrl}/${fileName.slice(0, -1)}.png`
+    }
+    if (!fileName.endsWith('s') && this.doesMiscHave(`${fileName}s.png`)) {
+      return `${baseUrl}/${fileName}s.png`
+    }
+    if (
+      this[this.selected[fileName]]?.path &&
+      this[this.selected[fileName]][fileName]?.has('0.png')
+    ) {
+      return `${this[this.selected[fileName]]?.path}/${fileName}/0.png`
+    }
+    return `${baseUrl}/0.png`
   }
 
   getDevices(online) {
-    const baseUrl = `${this[this.selected.device].path}/device`
+    const baseUrl = `${
+      this[this.selected.device]?.path || this.fallback
+    }/device`
     return online ? `${baseUrl}/1.png` : `${baseUrl}/0.png`
   }
 
   getSpawnpoints(hasTth) {
-    const baseUrl = `${this[this.selected.spawnpoint].path}/spawnpoint`
+    const baseUrl = `${
+      this[this.selected.spawnpoint]?.path || this.fallback
+    }/spawnpoint`
     return hasTth ? `${baseUrl}/1.png` : `${baseUrl}/0.png`
   }
 }

@@ -14,13 +14,16 @@ import {
   IconButton,
   Dialog,
   TextField,
+  Button,
+  ButtonGroup,
+  Divider,
 } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 import { useTranslation } from 'react-i18next'
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { useStatic } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 
@@ -59,7 +62,7 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
             variant="fullWidth"
             style={{ backgroundColor: '#424242', width: '100%' }}
           >
-            {['profile', 'access'].map((each) => (
+            {['profile', 'badges', 'access'].map((each) => (
               <Tab
                 key={each}
                 label={t(each)}
@@ -72,6 +75,18 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
           <div style={{ minHeight: '70vh' }}>
             <LinkProfiles auth={auth} t={t} />
             <ExtraFields auth={auth} />
+            {auth.perms.backups && (
+              <Backups
+                isMobile={isMobile}
+                auth={auth}
+                isTablet={isTablet}
+                t={t}
+              />
+            )}
+          </div>
+        </TabPanel>
+        <TabPanel value={tab} index={1}>
+          <div style={{ minHeight: '70vh' }}>
             <GymBadges
               badges={auth.badges}
               isMobile={isMobile}
@@ -80,7 +95,7 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
             />
           </div>
         </TabPanel>
-        <TabPanel value={tab} index={1}>
+        <TabPanel value={tab} index={2}>
           <ProfilePermissions auth={auth} excludeList={excludeList} t={t} />
         </TabPanel>
       </DialogContent>
@@ -359,7 +374,12 @@ const GymBadges = ({ isMobile, t }) => {
   return data ? (
     <Grid container alignItems="center" justifyContent="center">
       <Grid item xs={12}>
-        <Typography variant="h5" align="center" gutterBottom>
+        <Typography
+          variant="h5"
+          align="center"
+          gutterBottom
+          style={{ margin: '20px 0' }}
+        >
           {t('gym_badges')}
         </Typography>
       </Grid>
@@ -457,6 +477,190 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
           setBadgeMenu={setBadgeMenu}
         />
       </Dialog>
+    </Grid>
+  ) : null
+}
+
+const Backups = ({ t, auth }) => {
+  const { data, loading: allLoading } = useQuery(Query.user('getBackups'), {
+    fetchPolicy: 'no-cache',
+  })
+  const [create, { loading: createLoading }] = useMutation(
+    Query.user('createBackup'),
+    {
+      refetchQueries: ['GetBackups'],
+    },
+  )
+  const [update, { loading: updateLoading }] = useMutation(
+    Query.user('updateBackup'),
+    {
+      refetchQueries: ['GetBackups'],
+    },
+  )
+  const [remove, { loading: removeLoading }] = useMutation(
+    Query.user('deleteBackup'),
+    {
+      refetchQueries: ['GetBackups'],
+    },
+  )
+  const [load, { data: fullBackup, loading: fullLoading }] = useLazyQuery(
+    Query.user('getFullBackup'),
+  )
+  const [disabled, setDisabled] = useState(false)
+  const [name, setName] = useState('')
+  const [existing, setExisting] = useState({})
+
+  React.useEffect(() => {
+    if (fullBackup?.backup?.data) {
+      try {
+        setDisabled(true)
+        localStorage.clear()
+        localStorage.setItem(
+          'local-state',
+          JSON.stringify({
+            state:
+              typeof fullBackup.backup.data === 'string'
+                ? JSON.parse(fullBackup.backup.data)
+                : fullBackup.backup.data,
+          }),
+        )
+        localStorage.setItem('last-loaded', fullBackup.backup.name)
+        setTimeout(() => window.location.reload(), 1500)
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e)
+        setDisabled(false)
+      }
+    }
+  }, [fullBackup])
+
+  React.useEffect(() => {
+    if (data?.backups) {
+      setExisting(Object.fromEntries(data.backups.map((b) => [b.id, b.name])))
+    }
+  }, [data])
+
+  const loading =
+    allLoading ||
+    createLoading ||
+    updateLoading ||
+    removeLoading ||
+    fullLoading ||
+    disabled
+
+  return data ? (
+    <Grid container alignItems="center" justifyContent="center">
+      <Grid item xs={12}>
+        <Typography
+          variant="h5"
+          align="center"
+          gutterBottom
+          style={{ margin: '20px 0' }}
+        >
+          {t('profile_backups')}
+        </Typography>
+      </Grid>
+      <Grid item xs={5} sm={4}>
+        <TextField
+          label={t('new_backup')}
+          fullWidth
+          size="small"
+          value={name || ''}
+          onChange={(e) => setName(e.target.value)}
+          variant="outlined"
+        />
+      </Grid>
+      <Grid item xs={7} sm={6} style={{ textAlign: 'center' }}>
+        <Button
+          size="small"
+          disabled={
+            data.backups.length >= auth.userBackupLimits ||
+            data.backups.some((x) => x.name === name) ||
+            loading
+          }
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            create({
+              variables: { backup: { name, data: useStore.getState() } },
+            })
+            setName('')
+          }}
+        >
+          {t('create')}
+        </Button>
+      </Grid>
+
+      {data.backups.map((backup) => (
+        <Grid
+          key={backup.name}
+          container
+          item
+          xs={12}
+          alignItems="center"
+          justifyContent="center"
+          style={{ marginTop: 12 }}
+        >
+          <Divider
+            flexItem
+            style={{ width: '90%', height: 1, margin: '10px 0' }}
+          />
+          <Grid item xs={5} sm={4}>
+            <TextField
+              label={`${t('name')}${
+                localStorage.getItem('last-loaded') === backup.name ? '*' : ''
+              }`}
+              fullWidth
+              size="small"
+              value={existing[backup.id] || ''}
+              onChange={(e) =>
+                setExisting({ ...existing, [backup.id]: e.target.value })
+              }
+              variant="outlined"
+            />
+          </Grid>
+          <Grid item xs={7} sm={6} style={{ textAlign: 'center' }}>
+            <ButtonGroup variant="contained" size="small">
+              <Button
+                disabled={loading}
+                color="secondary"
+                onClick={() => {
+                  load({ variables: { id: backup.id } })
+                }}
+              >
+                {t('load')}
+              </Button>
+              <Button
+                disabled={loading}
+                color="secondary"
+                onClick={() => {
+                  update({
+                    variables: {
+                      backup: {
+                        id: backup.id,
+                        name: existing[backup.id],
+                        data: useStore.getState(),
+                      },
+                    },
+                  })
+                }}
+              >
+                {t('update')}
+              </Button>
+              <Button
+                disabled={loading}
+                color="primary"
+                onClick={() => {
+                  remove({ variables: { id: backup.id } })
+                }}
+              >
+                {t('delete')}
+              </Button>
+            </ButtonGroup>
+          </Grid>
+        </Grid>
+      ))}
+      <Divider flexItem style={{ width: '90%', height: 1, margin: '10px 0' }} />
     </Grid>
   ) : null
 }

@@ -7,11 +7,14 @@ import Errors from './Errors'
 import ClearStorage from './ClearStorage'
 
 export default function ReactRouter({ serverSettings, getServerSettings }) {
-  const authRoute = (
-    <Auth
-      serverSettings={serverSettings}
-      getServerSettings={getServerSettings}
-    />
+  const authRoute = React.useMemo(
+    () => (
+      <Auth
+        serverSettings={serverSettings}
+        getServerSettings={getServerSettings}
+      />
+    ),
+    [],
   )
 
   return (

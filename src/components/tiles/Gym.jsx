@@ -125,6 +125,13 @@ const GymTile = ({
             pathOptions={{ color: getColor(item.team_id), weight: 0.5 }}
           />
         )}
+        {!!userSettings.customRange && zoom >= config.interactionRangeZoom && (
+          <Circle
+            center={[item.lat, item.lon]}
+            radius={userSettings.customRange}
+            pathOptions={{ color: getColor(item.team_id), weight: 0.5 }}
+          />
+        )}
       </Marker>
     )
   )

@@ -1,4 +1,5 @@
 const { Db } = require('../services/initialization')
+const Backup = require('./Backup')
 const Badge = require('./Badge')
 const Device = require('./Device')
 const Gym = require('./Gym')
@@ -15,6 +16,7 @@ const Weather = require('./Weather')
 const { PokemonFilter, GenericFilter } = require('./Filters')
 
 const models = {
+  Backup,
   Badge,
   Device,
   Gym,

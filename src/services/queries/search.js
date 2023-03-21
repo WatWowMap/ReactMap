@@ -35,6 +35,34 @@ export const poi = gql`
   }
 `
 
+export const lures = gql`
+  query SearchLures(
+    $search: String!
+    $category: String!
+    $lat: Float!
+    $lon: Float!
+    $locale: String!
+    $onlyAreas: [String]
+  ) {
+    searchLure(
+      search: $search
+      category: $category
+      lat: $lat
+      lon: $lon
+      locale: $locale
+      onlyAreas: $onlyAreas
+    ) {
+      id
+      name
+      lat
+      lon
+      distance
+      lure_id
+      lure_expire_timestamp
+    }
+  }
+`
+
 export const poiWebhook = gql`
   ${Nominatim}
   query SearchWebhook(

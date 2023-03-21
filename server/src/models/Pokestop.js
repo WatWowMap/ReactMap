@@ -1511,6 +1511,48 @@ module.exports = class Pokestop extends Model {
       .filter((x) => x)
   }
 
+  static async searchLures(perms, args, { isMad }, distance) {
+    const { search, onlyAreas = [], locale } = args
+
+    const lureIds = Object.keys(Event.masterfile.items)
+      .filter((item) => Event.masterfile.items[item].startsWith('Troy Disk'))
+      .filter((lure) =>
+        i18next
+          .t(`lure_${lure}`, { lng: locale })
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .includes(search),
+      )
+    const query = this.query()
+      .select([
+        '*',
+        isMad ? 'pokestop_id AS id' : 'id',
+        isMad ? 'latitude AS lat' : 'lat',
+        isMad ? 'longitude AS lon' : 'lon',
+        isMad ? 'quest_reward AS quest_rewards' : 'quest_rewards',
+        isMad ? 'active_fort_modifier AS lure_id' : 'lure_id',
+        isMad
+          ? 'lure_expiration AS lure_expire_timestamp'
+          : 'lure_expire_timestamp',
+        distance,
+      ])
+      .where(isMad ? 'enabled' : 'deleted', isMad)
+      .andWhere(
+        isMad ? 'lure_expiration' : 'lure_expire_timestamp',
+        '>=',
+        isMad ? this.knex().fn.now() : Math.floor(Date.now() / 1000),
+      )
+      .whereIn('lure_id', lureIds)
+      .limit(searchResultsLimit)
+      .orderBy('distance')
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+      return []
+    }
+    const results = await query
+    return results
+  }
+
   static getOne(id, { isMad }) {
     return this.query()
       .select([

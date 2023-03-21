@@ -36,6 +36,11 @@ module.exports = gql`
     provider: String
   }
 
+  type S2Cell {
+    id: String
+    coords: [[Float]]
+  }
+
   type ScanArea {
     type: String
     features: JSON
@@ -68,6 +73,17 @@ module.exports = gql`
     costume: Int
     shiny: Int
     iv: Float
+  }
+
+  type SearchLure {
+    id: ID
+    name: String
+    url: String
+    lat: Float
+    lon: Float
+    distance: Float
+    lure_id: Int
+    lure_expire_timestamp: Int
   }
 
   type SearchQuest {
@@ -120,5 +136,25 @@ module.exports = gql`
   type SubmissionCell {
     placementCells: PlacementCell
     typeCells: [WayfarerCell]
+  }
+
+  type Backup {
+    id: ID
+    userId: ID
+    name: String
+    data: JSON
+    createdAt: Int
+    updatedAt: Int
+  }
+
+  input BackupCreate {
+    name: String
+    data: JSON
+  }
+
+  input BackupUpdate {
+    id: ID
+    name: String
+    data: JSON
   }
 `

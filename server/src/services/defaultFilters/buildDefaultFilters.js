@@ -126,6 +126,13 @@ module.exports = function buildDefault(perms, available, dbModels) {
             filter: { global: new GenericFilter() },
           }
         : undefined,
+    s2cells: perms.s2cells
+      ? {
+          enabled: defaultFilters.s2cells.enabled,
+          cells: defaultFilters.s2cells.cells,
+          filter: { global: new GenericFilter() },
+        }
+      : undefined,
     weather:
       perms.weather && dbModels.Weather
         ? {

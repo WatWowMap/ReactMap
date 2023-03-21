@@ -8,6 +8,16 @@ export default function genPokestops(t, pokemon, pokestops, categories) {
       perms: ['invasions'],
       webhookOnly: true,
     }
+    tempObj.invasions['gold-stop'] = {
+      name: t('gold_stop'),
+      perms: ['invasions'],
+      webhookOnly: true,
+    }
+    tempObj.invasions.kecleon = {
+      name: t('poke_352'),
+      perms: ['invasions'],
+      webhookOnly: true,
+    }
   }
 
   Object.keys(pokestops.filter).forEach((id) => {

@@ -13,6 +13,8 @@ module.exports = gql`
   type Query {
     available: Available
     badges: [Badge]
+    backup(id: ID): Backup
+    backups: [Backup]
     devices(filters: JSON): [Device]
     geocoder(search: String, name: String): [Geocoder]
     gyms(
@@ -61,6 +63,13 @@ module.exports = gql`
       filters: JSON
     ): [Portal]
     portalsSingle(id: ID, perm: String): Portal
+    s2cells(
+      minLat: Float
+      maxLat: Float
+      minLon: Float
+      maxLon: Float
+      filters: JSON
+    ): [S2Cell]
     scanCells(
       minLat: Float
       maxLat: Float
@@ -83,6 +92,16 @@ module.exports = gql`
       midnight: Int
       onlyAreas: [String]
     ): [Search]
+    searchLure(
+      search: String
+      category: String
+      lat: Float
+      lon: Float
+      locale: String
+      webhookName: String
+      midnight: Int
+      onlyAreas: [String]
+    ): [SearchLure]
     searchQuest(
       search: String
       category: String
@@ -117,6 +136,9 @@ module.exports = gql`
   }
 
   type Mutation {
+    createBackup(backup: BackupCreate): Boolean
+    updateBackup(backup: BackupUpdate): Boolean
+    deleteBackup(id: ID): Boolean
     webhook(category: String, data: JSON, status: String, name: String): Poracle
     tutorial(tutorial: Boolean): Boolean
     strategy(strategy: String): Boolean
