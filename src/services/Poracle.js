@@ -475,6 +475,8 @@ export default class Poracle {
               'gender',
               'rarity',
               'max_rarity',
+              'size',
+              'max_size',
             ]
             const newPokemon = {}
             if (pkmn.allForms) {
