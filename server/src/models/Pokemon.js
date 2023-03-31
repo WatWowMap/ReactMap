@@ -524,7 +524,7 @@ module.exports = class Pokemon extends Model {
     )
     const safeTs = args.ts || Math.floor(Date.now() / 1000)
     const query = this.query()
-      .select([distance])
+      .select(['pokemon_id', distance])
       .whereIn('pokemon_id', pokemonIds)
       .andWhere(
         isMad ? 'disappear_time' : 'expire_timestamp',
@@ -534,7 +534,15 @@ module.exports = class Pokemon extends Model {
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (isMad) {
-      getMadSql(query)
+      query.select([
+        ref('encounter_id').castTo('CHAR').as('id'),
+        'latitude AS lat',
+        'longitude AS lon',
+        'form',
+        'gender',
+        'costume',
+        raw(ivCalc).as('iv'),
+      ])
     } else {
       query.select([
         'id',
