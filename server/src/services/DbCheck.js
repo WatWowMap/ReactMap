@@ -327,7 +327,10 @@ module.exports = class DbCheck {
         source.SubModel.getSubmissions(perms, args, source),
       ),
     )
-    return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]
+    return [
+      [...DbCheck.deDupeResults(stopData)],
+      [...DbCheck.deDupeResults(gymData)],
+    ]
   }
 
   async getAvailable(model, log = true) {

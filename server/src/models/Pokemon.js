@@ -548,7 +548,6 @@ module.exports = class Pokemon extends Model {
         'id',
         'lat',
         'lon',
-        'pokemon_id',
         'form',
         'costume',
         'gender',
