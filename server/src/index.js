@@ -53,10 +53,6 @@ const server = new ApolloServer({
     }
   },
   formatError: (e) => {
-    if (config.devOptions.enabled) {
-      console.warn(['GQL'], e)
-      return e
-    }
     if (
       e instanceof ValidationError ||
       e?.message.includes('skipUndefined()') ||
@@ -77,6 +73,10 @@ const server = new ApolloServer({
         )
       }
       return { message: 'session_expired' }
+    }
+    console.warn('[GQL]', e)
+    if (config.devOptions.enabled) {
+      return e
     }
     return { message: e.message }
   },
