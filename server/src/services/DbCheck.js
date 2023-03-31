@@ -307,7 +307,7 @@ module.exports = class DbCheck {
         ),
       ),
     )
-    const deDuped = DbCheck.deDupeResults(data).sort(
+    const deDuped = [...DbCheck.deDupeResults(data)].sort(
       (a, b) => a.distance - b.distance,
     )
     if (deDuped.length > this.searchLimit) {

@@ -384,7 +384,7 @@ module.exports = {
                 ? Utility.getPlacementCells(args, pokestops, gyms)
                 : [],
             typeCells: args.filters.onlyS14Cells
-              ? Utility.getTypeCells(args, pokestops, gyms)
+              ? Utility.getTypeCells(args, [...pokestops], [...gyms])
               : [],
           },
         ]
