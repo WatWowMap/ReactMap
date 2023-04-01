@@ -1530,7 +1530,6 @@ module.exports = class Pokestop extends Model {
         isMad ? 'pokestop_id AS id' : 'id',
         isMad ? 'latitude AS lat' : 'lat',
         isMad ? 'longitude AS lon' : 'lon',
-        isMad ? 'quest_reward AS quest_rewards' : 'quest_rewards',
         isMad ? 'active_fort_modifier AS lure_id' : 'lure_id',
         isMad
           ? 'lure_expiration AS lure_expire_timestamp'
@@ -1543,7 +1542,7 @@ module.exports = class Pokestop extends Model {
         '>=',
         isMad ? this.knex().fn.now() : Math.floor(Date.now() / 1000),
       )
-      .whereIn('lure_id', lureIds)
+      .whereIn(isMad ? 'active_fort_modifier' : 'lure_id', lureIds)
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
