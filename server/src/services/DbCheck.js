@@ -91,7 +91,7 @@ module.exports = class DbCheck {
             .then((columns) => [
               'cp_multiplier' in columns,
               'pvp' in columns,
-              Object.keys(columns).length ? '' : this.memEndpoints[i],
+              this.memEndpoints[i] || '',
               'size' in columns,
               'height' in columns,
             ])

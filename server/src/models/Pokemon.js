@@ -291,7 +291,60 @@ module.exports = class Pokemon extends Model {
       return []
     }
 
-    const results = await this.evalQuery(mem, query.limit(queryLimits.pokemon))
+    const results =
+      (await this.evalQuery(
+        mem,
+        query.limit(queryLimits.pokemon),
+        JSON.stringify({
+          min: {
+            latitude: args.minLat,
+            longitude: args.minLon,
+          },
+          max: {
+            latitude: args.maxLat,
+            longitude: args.maxLon,
+          },
+          filters: Object.fromEntries(
+            Object.entries(args.filters)
+              .filter(([k]) => k.includes('-'))
+              .map(([k, v]) => {
+                const {
+                  // eslint-disable-next-line no-unused-vars
+                  enabled,
+                  // eslint-disable-next-line no-unused-vars
+                  size,
+                  // eslint-disable-next-line no-unused-vars
+                  adv,
+                  iv,
+                  atk_iv,
+                  def_iv,
+                  sta_iv,
+                  cp,
+                  level,
+                  gender,
+                  xxs,
+                  xxl,
+                  ...rest
+                } = v
+                return [
+                  k,
+                  {
+                    iv,
+                    atk_iv,
+                    def_iv,
+                    sta_iv,
+                    cp,
+                    level,
+                    gender,
+                    xxs,
+                    xxl,
+                    pvp: rest,
+                  },
+                ]
+              }),
+          ),
+        }),
+      )) || []
     const finalResults = []
     const pvpResults = []
     const listOfIds = []
@@ -416,7 +469,7 @@ module.exports = class Pokemon extends Model {
     return finalResults
   }
 
-  static async evalQuery(mem, query) {
+  static async evalQuery(mem, query, body) {
     return (
       (mem
         ? fetchJson(mem, {
@@ -425,7 +478,7 @@ module.exports = class Pokemon extends Model {
               Accept: 'application/json',
               'Content-Type': 'application/json',
             },
-            body: query.toKnexQuery().toString(),
+            body,
           })
         : query) || []
     )

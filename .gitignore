@@ -12,8 +12,6 @@ server/src/configs/koji_backups/*
 !server/src/configs/custom-environment-variables.json
 .env
 
-
-
 # Masterfile
 server/src/data/masterfile.json
 
@@ -73,3 +71,6 @@ src/**/*.custom.jsx
 src/**/*.custom.js
 src/**/*.custom.css
 .idea/
+
+# Logs
+server/src/models/queries/*.txt
