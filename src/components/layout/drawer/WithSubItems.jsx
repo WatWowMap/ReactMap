@@ -22,6 +22,7 @@ export default function WithSubItems({
   subItem,
   noScanAreaOverlay,
   enableQuestSetSelector,
+  enableConfirmedInvasions,
   data,
 }) {
   const { t } = useTranslation()
@@ -138,44 +139,46 @@ export default function WithSubItems({
             />
           </Grid>
         )}
-      {category === 'pokestops' && subItem === 'invasions' && (
-        <Grid
-          item
-          xs={12}
-          style={{
-            textAlign: 'center',
-            padding: filters[category][subItem] ? 12 : 0,
-            transition: 'padding 0.3s',
-          }}
-        >
-          <Collapse in={filters[category][subItem]}>
-            <Grid
-              container
-              style={{ width: '100%' }}
-              alignItems="center"
-              justifyContent="flex-end"
-            >
-              <Grid item xs={5} style={{ textAlign: 'left' }}>
-                <Typography>{t('only_confirmed')}</Typography>
+      {category === 'pokestops' &&
+        subItem === 'invasions' &&
+        enableConfirmedInvasions && (
+          <Grid
+            item
+            xs={12}
+            style={{
+              textAlign: 'center',
+              padding: filters[category][subItem] ? 12 : 0,
+              transition: 'padding 0.3s',
+            }}
+          >
+            <Collapse in={filters[category][subItem]}>
+              <Grid
+                container
+                style={{ width: '100%' }}
+                alignItems="center"
+                justifyContent="flex-end"
+              >
+                <Grid item xs={5} style={{ textAlign: 'left' }}>
+                  <Typography>{t('only_confirmed')}</Typography>
+                </Grid>
+                <Grid item xs={5} style={{ textAlign: 'right' }}>
+                  <Switch
+                    checked={filters[category].confirmed}
+                    onChange={() => {
+                      setFilters({
+                        ...filters,
+                        [category]: {
+                          ...filters[category],
+                          confirmed: !filters[category].confirmed,
+                        },
+                      })
+                    }}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={5} style={{ textAlign: 'right' }}>
-                <Switch
-                  checked={filters[category].confirmed}
-                  onChange={() => {
-                    setFilters({
-                      ...filters,
-                      [category]: {
-                        ...filters[category],
-                        confirmed: !filters[category].confirmed,
-                      },
-                    })
-                  }}
-                />
-              </Grid>
-            </Grid>
-          </Collapse>
-        </Grid>
-      )}
+            </Collapse>
+          </Grid>
+        )}
       {((category === 'pokestops' && subItem === 'allPokestops') ||
         (category === 'gyms' && subItem === 'allGyms')) &&
         filters[category][subItem] === true && (
