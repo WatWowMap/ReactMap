@@ -180,6 +180,8 @@ export default class UIcons {
       id = 'l506'
     }
     switch (id.charAt(0)) {
+      case 'a':
+        return this.getPokemon(...id.slice(1).split('-'))
       case 'c':
         return this.getRewards(4, ...id.slice(1).split('-'))
       case 'd':

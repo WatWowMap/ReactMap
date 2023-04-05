@@ -587,5 +587,7 @@
   "load": "Load",
   "update": "Update",
   "delete": "Delete",
-  "name": "Name"
+  "name": "Name",
+  "only_confirmed": "Only Confirmed",
+  "rocket_pokemon": "Rocket Pokemon"
 }
