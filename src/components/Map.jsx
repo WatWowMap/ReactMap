@@ -141,7 +141,7 @@ export default function Map({
     <>
       <TileLayer
         key={tileServer?.name}
-        attribution={tileServer?.attribution || ''}
+        {...(tileServer || {})}
         url={
           tileServer?.[timeOfDay] ||
           tileServer?.url ||
