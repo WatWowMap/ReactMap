@@ -160,9 +160,20 @@ export default function PokestopPopup({
                         ) : null}
                         <TimeTile
                           expireTime={invasion.incident_expire_timestamp}
-                          icon={Icons.getInvasions(invasion.grunt_type)}
+                          icon={Icons.getInvasions(
+                            invasion.grunt_type,
+                            invasion.confirmed,
+                          )}
                           until
-                          tt={`grunt_a_${invasion.grunt_type}`}
+                          tt={
+                            invasion.grunt_type === 44 && !invasion.confirmed
+                              ? [
+                                  `grunt_a_${invasion.grunt_type}`,
+                                  ' / ',
+                                  'decoy',
+                                ]
+                              : `grunt_a_${invasion.grunt_type}`
+                          }
                         />
                       </Fragment>
                     ))}

@@ -589,5 +589,6 @@
   "delete": "Delete",
   "name": "Name",
   "only_confirmed": "Only Confirmed",
-  "rocket_pokemon": "Rocket Pokemon"
+  "rocket_pokemon": "Rocket Pokemon",
+  "decoy": "Decoy"
 }

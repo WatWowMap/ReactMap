@@ -306,13 +306,16 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
-  getInvasions(gruntType) {
+  getInvasions(gruntType, confirmed = false) {
     const baseUrl = `${
       this[this.selected.invasion]?.path || this.fallback
     }/invasion`
-    const result = `${gruntType}.png`
-    if (this[this.selected.invasion].invasion.has(result)) {
-      return `${baseUrl}/${result}`
+    const confirmedSuffixes = confirmed ? [''] : ['_u', '']
+    for (let c = 0; c < confirmedSuffixes.length; c += 1) {
+      const result = `${gruntType}${confirmedSuffixes[c]}.png`
+      if (this[this.selected.invasion].invasion.has(result)) {
+        return `${baseUrl}/${result}`
+      }
     }
     return `${baseUrl}/0.png`
   }
