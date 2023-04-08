@@ -191,7 +191,7 @@ export default class UIcons {
       case 'g':
         return this.getGyms(...id.slice(1).split('-'))
       case 'i':
-        return this.getInvasions(id.slice(1))
+        return this.getInvasions(id.slice(1), true)
       case 'l':
         return this.getPokestops(id.slice(1))
       case 'm':
