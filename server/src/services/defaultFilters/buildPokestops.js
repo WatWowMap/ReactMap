@@ -1,5 +1,6 @@
 const { GenericFilter } = require('../../models/index')
 const { Event } = require('../initialization')
+const { map } = require('../config')
 
 module.exports = function buildPokestops(perms, defaults, available) {
   const quests = { s0: new GenericFilter() }
@@ -57,8 +58,13 @@ module.exports = function buildPokestops(perms, defaults, available) {
         quests[avail] = new GenericFilter(defaults.rewardTypes)
       }
     }
-    if (perms.invasions && avail.startsWith('i')) {
-      quests[avail] = new GenericFilter(defaults.allInvasions)
+    if (perms.invasions) {
+      if (avail.startsWith('i')) {
+        quests[avail] = new GenericFilter(defaults.allInvasions)
+      }
+      if (avail.startsWith('a') && map.enableConfirmedInvasions) {
+        quests[avail] = new GenericFilter(defaults.invasionPokemon)
+      }
     }
   })
   return quests

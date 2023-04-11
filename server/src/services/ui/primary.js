@@ -93,6 +93,7 @@ const ignoredKeys = [
   'avgFilter',
   'raidTier',
   'levels',
+  'confirmed',
 ]
 
 module.exports = function generateUi(filters, perms) {

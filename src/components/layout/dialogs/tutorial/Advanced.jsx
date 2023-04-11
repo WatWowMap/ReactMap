@@ -19,6 +19,7 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
+import { useStatic } from '@hooks/useStore'
 
 import ReactWindow from '@components/layout/general/ReactWindow'
 import Advanced from '../filters/Advanced'
@@ -28,6 +29,7 @@ import data from './data.json'
 
 export default function TutAdvanced({ isMobile, toggleHelp, category }) {
   const { t } = useTranslation()
+  const Icons = useStatic((s) => s.Icons)
   const [isPokemon, setIsPokemon] = useState(category === 'pokemon')
 
   if (!category) {
@@ -161,6 +163,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
                   toggleSlotsMenu,
                   type: category,
                   Utility,
+                  Icons,
                 }}
                 offset={0}
               />

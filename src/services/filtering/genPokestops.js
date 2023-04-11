@@ -23,6 +23,16 @@ export default function genPokestops(t, pokemon, pokestops, categories) {
   Object.keys(pokestops.filter).forEach((id) => {
     if (id !== 'global' && !/\d/.test(id.charAt(0))) {
       switch (id.charAt(0)) {
+        case 'a':
+          if (tempObj.rocket_pokemon) {
+            const name = t(`poke_${id.slice(1).split('-')[0]}`)
+            tempObj.rocket_pokemon[id] = {
+              name,
+              perms: ['invasions'],
+            }
+            tempObj.rocket_pokemon[id].searchMeta = name.toLowerCase()
+          }
+          break
         case 'i':
           if (tempObj.invasions) {
             tempObj.invasions[id] = {

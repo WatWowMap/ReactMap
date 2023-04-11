@@ -396,6 +396,10 @@
         "__name": "MAP_MISC_ENABLE_QUEST_SET_SELECTOR",
         "__format": "boolean"
       },
+      "enableConfirmedInvasions": {
+        "__name": "MAP_MISC_ENABLE_CONFIRMED_INVASIONS",
+        "__format": "boolean"
+      },
       "noScanAreaOverlay": {
         "__name": "MAP_MISC_NO_SCAN_AREA_OVERLAY",
         "__format": "boolean"
@@ -830,6 +834,10 @@
         "__format": "boolean"
       },
       "questSet": "DEFAULT_FILTERS_POKESTOPS_QUEST_SET",
+      "confirmed": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_CONFIRMED",
+        "__format": "boolean"
+      },
       "items": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_ITEMS",
         "__format": "boolean"
@@ -852,6 +860,10 @@
       },
       "allInvasions": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_ALL_INVASIONS",
+        "__format": "boolean"
+      },
+      "invasionPokemon": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_INVASION_POKEMON",
         "__format": "boolean"
       },
       "rewardTypes": {

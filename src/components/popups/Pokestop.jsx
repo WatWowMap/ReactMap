@@ -12,6 +12,7 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 
 import ErrorBoundary from '@components/ErrorBoundary'
+import { Check, Clear } from '@components/layout/general/Icons'
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
@@ -159,9 +160,20 @@ export default function PokestopPopup({
                         ) : null}
                         <TimeTile
                           expireTime={invasion.incident_expire_timestamp}
-                          icon={Icons.getInvasions(invasion.grunt_type)}
+                          icon={Icons.getInvasions(
+                            invasion.grunt_type,
+                            invasion.confirmed,
+                          )}
                           until
-                          tt={`grunt_a_${invasion.grunt_type}`}
+                          tt={
+                            invasion.grunt_type === 44 && !invasion.confirmed
+                              ? [
+                                  `grunt_a_${invasion.grunt_type}`,
+                                  ' / ',
+                                  'decoy',
+                                ]
+                              : `grunt_a_${invasion.grunt_type}`
+                          }
                         />
                       </Fragment>
                     ))}
@@ -633,7 +645,7 @@ const Invasion = ({ pokestop, Icons, t }) => {
 
   const makeShadowPokemon = (pkmn) => (
     <NameTT
-      key={pkmn.id}
+      key={`${pkmn.id}_${pkmn.form}`}
       id={[pkmn.form ? `form_${pkmn.form}` : '', `poke_${pkmn.id}`]}
     >
       <div className="invasion-reward">
@@ -679,31 +691,44 @@ const Invasion = ({ pokestop, Icons, t }) => {
       container
       key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
     >
-      <Grid item xs={12}>
+      <Grid item xs={9}>
         <Typography variant="h6" align="center">
           {t(`grunt_a_${invasion.grunt_type}`)}
         </Typography>
+      </Grid>
+      <Grid item xs={3} style={{ alignItems: 'center', display: 'flex' }}>
+        {invasion.confirmed ? (
+          <Check fontSize="medium" color="action" />
+        ) : (
+          <Clear fontSize="medium" color="error" />
+        )}
       </Grid>
       <Grid item xs={12}>
         <table className="table-invasion">
           <tbody>
             {Object.keys(
               invasionInfo[invasion.grunt_type]?.encounters || {},
-            ).map((position) => (
-              <tr key={position}>
-                <td>{encounterNum[position]}</td>
-                <td>
-                  {invasionInfo[invasion.grunt_type].encounters[position].map(
-                    (data) => makeShadowPokemon(data),
-                  )}
-                </td>
-                <td>
-                  {getRewardPercent(invasionInfo[invasion.grunt_type])[
-                    position
-                  ] || ''}
-                </td>
-              </tr>
-            ))}
+            ).map((position, i) => {
+              const id = invasion[`slot_${i + 1}_pokemon_id`]
+              const form = invasion[`slot_${i + 1}_form`]
+              return (
+                <tr key={position}>
+                  <td>{encounterNum[position]}</td>
+                  <td>
+                    {id
+                      ? makeShadowPokemon({ id, form })
+                      : invasionInfo[invasion.grunt_type].encounters[
+                          position
+                        ].map((data) => makeShadowPokemon(data))}
+                  </td>
+                  <td>
+                    {getRewardPercent(invasionInfo[invasion.grunt_type])[
+                      position
+                    ] || ''}
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </Grid>
