@@ -64,7 +64,6 @@
     "@turf/center": "^6.3.0",
     "@turf/destination": "^6.5.0",
     "@turf/helpers": "^6.5.0",
-    "apollo-link-timeout": "^4.0.0",
     "apollo-server-core": "^3.11.1",
     "apollo-server-express": "^3.5.0",
     "bcrypt": "^5.0.1",
