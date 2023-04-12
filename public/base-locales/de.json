@@ -590,5 +590,8 @@
   "load": "laden",
   "update": "aktualisieren",
   "delete": "löschen",
-  "name": "Name"
+  "name": "Name",
+  "only_confirmed": "nur bestätigte",
+  "rocket_pokemon": "Crypto-Pokemon",
+  "decoy": "Täusch-Rüpel"
 }
