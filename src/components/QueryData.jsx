@@ -82,7 +82,7 @@ export default function QueryData({
       category !== 'device' &&
       category !== 'scanAreas'
     ) {
-      refetch({
+      timeout.doRefetch({
         ...Utility.getQueryArgs(map),
         filters: trimFilters(filters),
       })
