@@ -100,9 +100,7 @@ export default function QueryData({
     Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),
     {
       context: {
-        context: {
-          abortableContext: timeout,
-        },
+        abortableContext: timeout,
       },
       variables: {
         ...bounds,
