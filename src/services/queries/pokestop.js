@@ -58,6 +58,13 @@ const invasion = gql`
     invasions {
       incident_expire_timestamp
       grunt_type
+      confirmed
+      slot_1_pokemon_id
+      slot_1_form
+      slot_2_pokemon_id
+      slot_2_form
+      slot_3_pokemon_id
+      slot_3_form
     }
   }
 `

@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
+import RobustTimeout from '@services/apollo/RobustTimeout'
 
 import Query from '@services/Query'
 import Utility from '@services/Utility'
@@ -35,6 +36,10 @@ export default function QueryData({
   active,
   onlyAreas,
 }) {
+  const [timeout] = useState(
+    () => new RobustTimeout((config.polling[category] || 10) * 1000),
+  )
+
   const trimFilters = useCallback(
     (requestedFilters) => {
       const trimmed = {
@@ -77,7 +82,7 @@ export default function QueryData({
       category !== 'device' &&
       category !== 'scanAreas'
     ) {
-      refetch({
+      timeout.doRefetch({
         ...Utility.getQueryArgs(map),
         filters: trimFilters(filters),
       })
@@ -94,16 +99,19 @@ export default function QueryData({
   const { data, previousData, refetch, error } = useQuery(
     Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),
     {
-      context: { timeout: (config.polling[category] || 10) * 1000 },
+      context: {
+        abortableContext: timeout,
+      },
       variables: {
         ...bounds,
         filters: trimFilters(filters),
       },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
-      pollInterval: (config.polling[category] || 10) * 1000,
+      // pollInterval: (config.polling[category] || 10) * 1000,
       skip: !active,
     },
   )
+  timeout.setupTimeout(refetch)
 
   useEffect(() => () => setExcludeList([]))
 

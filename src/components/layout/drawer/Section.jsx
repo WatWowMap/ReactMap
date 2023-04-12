@@ -72,6 +72,7 @@ export default function DrawerSection({ category, value, toggleDialog }) {
                 subItem={subItem}
                 noScanAreaOverlay={config.map.noScanAreaOverlay}
                 enableQuestSetSelector={config.map.enableQuestSetSelector}
+                enableConfirmedInvasions={config.map.enableConfirmedInvasions}
               />
             ))
           )}

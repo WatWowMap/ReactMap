@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 const { Event } = require('../initialization')
 const { GenericFilter } = require('../../models/index')
+const { map } = require('../config')
 
 module.exports = function buildPokemon(defaults, base, custom, available) {
   const pokemon = {
@@ -8,6 +9,7 @@ module.exports = function buildPokemon(defaults, base, custom, available) {
     raids: { global: new GenericFilter() },
     quests: { global: new GenericFilter() },
     nests: { global: new GenericFilter() },
+    rocket: { global: new GenericFilter() },
   }
   const energyAmounts = new Set([
     ...defaults.pokestops.baseMegaEnergyAmounts,
@@ -23,6 +25,11 @@ module.exports = function buildPokemon(defaults, base, custom, available) {
       pokemon.quests[`${i}-${j}`] = new GenericFilter(
         defaults.pokestops.pokemon,
       )
+      if (map.enableConfirmedInvasions) {
+        pokemon.rocket[`a${i}-${j}`] = new GenericFilter(
+          defaults.pokestops.invasionPokemon,
+        )
+      }
       pokemon.nests[`${i}-${j}`] = new GenericFilter(defaults.nests.allPokemon)
     }
     if (pkmn.family == i) {
