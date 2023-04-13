@@ -2,6 +2,8 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
 const i18next = require('i18next')
+// const fs = require('fs')
+// const { resolve } = require('path')
 
 const { Event } = require('../services/initialization')
 const legacyFilter = require('../services/legacyFilter')
@@ -304,6 +306,16 @@ module.exports = class Pokemon extends Model {
             latitude: args.maxLat,
             longitude: args.maxLon,
           },
+          standard: onlyStandard,
+          global: onlyIvOr,
+          xlKarp: onlyXlKarp,
+          xsRat: onlyXsRat,
+          zeroIv: onlyZeroIv,
+          hundoIv: onlyHundoIv,
+          pvpMega: onlyPvpMega,
+          pvp50: args.filters.onlyPvp50,
+          pvp51: args.filters.onlyPvp51,
+          linkGlobal: onlyLinkGlobal,
           filters: Object.fromEntries(
             Object.entries(args.filters)
               .filter(([k]) => k.includes('-'))
@@ -470,6 +482,7 @@ module.exports = class Pokemon extends Model {
   }
 
   static async evalQuery(mem, query, body) {
+    // fs.writeFileSync('request.json', body)
     return (
       (mem
         ? fetchJson(mem, {
