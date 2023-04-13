@@ -109,14 +109,14 @@ module.exports = class DbCheck {
                 .columnInfo()
                 .then((columns) => ['layer' in columns])
             : [false]
-          const [hasMultiInvasions, multiInvasionMs] = await schema(
-            isMad ? 'pokestop_incident' : 'incident',
-          )
-            .columnInfo()
-            .then((columns) => [
-              (isMad ? 'character_display' : 'character') in columns,
-              'expiration_ms' in columns,
-            ])
+          const [hasMultiInvasions, multiInvasionMs, hasConfirmed] =
+            await schema(isMad ? 'pokestop_incident' : 'incident')
+              .columnInfo()
+              .then((columns) => [
+                (isMad ? 'character_display' : 'character') in columns,
+                'expiration_ms' in columns,
+                'confirmed' in columns,
+              ])
           const [availableSlotsCol] = await schema('gym')
             .columnInfo()
             .then((columns) => [
@@ -145,6 +145,7 @@ module.exports = class DbCheck {
                   this.models[category][j].availableSlotsCol = availableSlotsCol
                   this.models[category][j].hasLayerColumn = hasLayerColumn
                   this.models[category][j].polygon = polygon
+                  this.models[category][j].hasConfirmed = hasConfirmed
                 }
               })
             }

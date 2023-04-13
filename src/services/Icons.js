@@ -180,6 +180,8 @@ export default class UIcons {
       id = 'l506'
     }
     switch (id.charAt(0)) {
+      case 'a':
+        return this.getPokemon(...id.slice(1).split('-'))
       case 'c':
         return this.getRewards(4, ...id.slice(1).split('-'))
       case 'd':
@@ -189,7 +191,7 @@ export default class UIcons {
       case 'g':
         return this.getGyms(...id.slice(1).split('-'))
       case 'i':
-        return this.getInvasions(id.slice(1))
+        return this.getInvasions(id.slice(1), true)
       case 'l':
         return this.getPokestops(id.slice(1))
       case 'm':
@@ -304,13 +306,16 @@ export default class UIcons {
     return `${baseUrl}/0.png`
   }
 
-  getInvasions(gruntType) {
+  getInvasions(gruntType, confirmed = false) {
     const baseUrl = `${
       this[this.selected.invasion]?.path || this.fallback
     }/invasion`
-    const result = `${gruntType}.png`
-    if (this[this.selected.invasion].invasion.has(result)) {
-      return `${baseUrl}/${result}`
+    const confirmedSuffixes = confirmed ? [''] : ['_u', '']
+    for (let c = 0; c < confirmedSuffixes.length; c += 1) {
+      const result = `${gruntType}${confirmedSuffixes[c]}.png`
+      if (this[this.selected.invasion].invasion.has(result)) {
+        return `${baseUrl}/${result}`
+      }
     }
     return `${baseUrl}/0.png`
   }

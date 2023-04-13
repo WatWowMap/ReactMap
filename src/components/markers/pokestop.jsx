@@ -47,7 +47,9 @@ export default function stopMarker(
     invasions.forEach((invasion) => {
       if (invasion.grunt_type) {
         filterId = `i${invasion.grunt_type}`
-        invasionIcons.unshift(Icons.getInvasions(invasion.grunt_type))
+        invasionIcons.unshift(
+          Icons.getInvasions(invasion.grunt_type, invasion.confirmed),
+        )
         invasionSizes.unshift(
           Icons.getSize('invasion', filters.filter[filterId]),
         )

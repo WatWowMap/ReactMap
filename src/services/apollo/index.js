@@ -1,11 +1,9 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client'
-import ApolloLinkTimeout from 'apollo-link-timeout'
-
-const timeoutLink = new ApolloLinkTimeout(10000) // 10 second timeout
+import AbortableLink from './AbortableLink'
 
 export default new ApolloClient({
   uri: '/graphql',
-  link: timeoutLink.concat(createHttpLink({ uri: '/graphql' })),
+  link: new AbortableLink().concat(createHttpLink()),
   name: inject.TITLE,
   version: inject.VERSION,
   cache: new InMemoryCache({

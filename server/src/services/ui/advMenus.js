@@ -8,6 +8,7 @@ const categories = {
     'quest_reward_12',
     'invasions',
     'pokemon',
+    'rocket_pokemon',
     'quest_reward_4',
     'quest_reward_9',
     'quest_reward_3',

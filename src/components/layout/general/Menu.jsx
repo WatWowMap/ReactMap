@@ -9,7 +9,7 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import { useStore } from '@hooks/useStore'
+import { useStore, useStatic } from '@hooks/useStore'
 import useFilter from '@hooks/useFilter'
 
 import ReactWindow from '@components/layout/general/ReactWindow'
@@ -42,6 +42,7 @@ export default function Menu({
   const menus = useStore((state) => state.menus)
   const advMenu = useStore((state) => state.advMenu)
   const { t } = useTranslation()
+  const Icons = useStatic((s) => s.Icons)
 
   let columnCount = isTablet ? 3 : 5
   if (isMobile) columnCount = 1
@@ -316,6 +317,7 @@ export default function Menu({
                     toggleWebhook,
                     webhookCategory,
                     standard: filters.standard,
+                    Icons,
                   }}
                   Tile={Tile}
                 />

@@ -44,6 +44,13 @@ const invasionProps = {
   incident_expire_timestamp: true,
   grunt_type: true,
   display_type: true,
+  confirmed: true,
+  slot_1_pokemon_id: true,
+  slot_1_form: true,
+  slot_2_pokemon_id: true,
+  slot_2_form: true,
+  slot_3_pokemon_id: true,
+  slot_3_form: true,
 }
 
 const MADE_UP_MAD_INVASIONS = [352]
@@ -67,6 +74,7 @@ module.exports = class Pokestop extends Model {
       hasRewardAmount,
       hasLayerColumn,
       hasPowerUp,
+      hasConfirmed,
     },
   ) {
     const {
@@ -78,6 +86,7 @@ module.exports = class Pokestop extends Model {
         onlyArEligible,
         onlyAllPokestops,
         onlyEventStops,
+        onlyConfirmed,
         onlyAreas = [],
       },
       ts,
@@ -193,6 +202,7 @@ module.exports = class Pokestop extends Model {
       const candy = []
       const xlCandy = []
       const general = []
+      const rocketPokemon = []
       // preps arrays for interested objects
       Object.keys(args.filters).forEach((pokestop) => {
         switch (pokestop.charAt(0)) {
@@ -221,6 +231,9 @@ module.exports = class Pokestop extends Model {
             break
           case 'x':
             xlCandy.push(pokestop.slice(1))
+            break
+          case 'a':
+            rocketPokemon.push(pokestop.slice(1).split('-')[0])
             break
           case 'u':
             general.push(pokestop.slice(1))
@@ -511,17 +524,42 @@ module.exports = class Pokestop extends Model {
         if (onlyInvasions && invasionPerms) {
           if (hasMultiInvasions) {
             stops.orWhere((invasion) => {
-              invasion
-                .whereIn(isMad ? 'character_display' : 'character', invasions)
-                .andWhere(
-                  multiInvasionMs
-                    ? 'expiration_ms'
-                    : isMad
-                    ? 'incident_expiration'
-                    : 'expiration',
-                  '>=',
-                  safeTs * (multiInvasionMs ? 1000 : 1),
+              invasion.andWhere(
+                multiInvasionMs
+                  ? 'expiration_ms'
+                  : isMad
+                  ? 'incident_expiration'
+                  : 'expiration',
+                '>=',
+                safeTs * (multiInvasionMs ? 1000 : 1),
+              )
+              if (hasConfirmed) {
+                if (onlyConfirmed) {
+                  invasion.andWhere('confirmed', onlyConfirmed)
+                }
+                if (rocketPokemon.length) {
+                  invasion.andWhere((rocket) => {
+                    rocket
+                      .whereIn('slot_1_pokemon_id', rocketPokemon)
+                      .orWhereIn('slot_2_pokemon_id', rocketPokemon)
+                      .orWhereIn('slot_3_pokemon_id', rocketPokemon)
+                      .orWhereIn(
+                        isMad ? 'character_display' : 'character',
+                        invasions,
+                      )
+                  })
+                } else {
+                  invasion.whereIn(
+                    isMad ? 'character_display' : 'character',
+                    invasions,
+                  )
+                }
+              } else {
+                invasion.whereIn(
+                  isMad ? 'character_display' : 'character',
+                  invasions,
                 )
+              }
             })
           } else {
             stops.orWhere((invasion) => {
@@ -540,6 +578,9 @@ module.exports = class Pokestop extends Model {
                   'incident_grunt_type',
                   MADE_UP_MAD_INVASIONS,
                 )
+              }
+              if (hasConfirmed) {
+                invasion.andWhere('confirmed', onlyConfirmed)
               }
             })
           }
@@ -594,6 +635,7 @@ module.exports = class Pokestop extends Model {
       midnight,
       perms,
       hasMultiInvasions,
+      hasConfirmed,
     )
     return finalResults
   }
@@ -611,6 +653,7 @@ module.exports = class Pokestop extends Model {
     midnight,
     perms,
     hasMultiInvasions,
+    hasConfirmed,
   ) {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
@@ -660,7 +703,20 @@ module.exports = class Pokestop extends Model {
       ) {
         filtered.invasions = pokestop.invasions.filter(
           (invasion) =>
-            (filters[`i${invasion.grunt_type}`] || filters.onlyAllPokestops) &&
+            ((hasConfirmed
+              ? filters[
+                  `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
+                ] ||
+                filters[
+                  `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
+                ] ||
+                filters[
+                  `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
+                ] ||
+                filters[`i${invasion.grunt_type}`]
+              : filters[`i${invasion.grunt_type}`]) ||
+              (filters.onlyAllPokestops &&
+                (filters.onlyConfirmed ? invasion.confirmed : true))) &&
             (isMad && !hasMultiInvasions
               ? !MADE_UP_MAD_INVASIONS.includes(invasion.grunt_type)
               : invasion.grunt_type),
@@ -869,6 +925,7 @@ module.exports = class Pokestop extends Model {
     hasMultiInvasions,
     multiInvasionMs,
     hasRewardAmount,
+    hasConfirmed,
   }) {
     const ts = Math.floor(new Date().getTime() / 1000)
     const finalList = new Set()
@@ -1196,6 +1253,34 @@ module.exports = class Pokestop extends Model {
     if (isMad && !hasMultiInvasions) {
       queries.invasions.whereNotIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
     }
+    if (hasConfirmed) {
+      queries.rocketPokemon = this.query()
+        .select([
+          'slot_1_pokemon_id',
+          'slot_1_form',
+          'slot_2_pokemon_id',
+          'slot_2_form',
+          'slot_3_pokemon_id',
+          'slot_3_form',
+        ])
+        .whereNotNull('slot_1_pokemon_id')
+        .whereNotNull('slot_2_pokemon_id')
+        .whereNotNull('slot_3_pokemon_id')
+        .groupBy([
+          'slot_1_pokemon_id',
+          'slot_1_form',
+          'slot_2_pokemon_id',
+          'slot_2_form',
+          'slot_3_pokemon_id',
+          'slot_3_form',
+        ])
+        .orderBy([
+          'slot_1_pokemon_id',
+          'slot_2_pokemon_id',
+          'slot_3_pokemon_id',
+        ])
+        .from('incident')
+    }
     // invasions
 
     // lures
@@ -1299,6 +1384,21 @@ module.exports = class Pokestop extends Model {
           break
         case 'invasions':
           rewards.forEach((reward) => finalList.add(`i${reward.grunt_type}`))
+          break
+        case 'rocketPokemon':
+          if (hasConfirmed) {
+            rewards.forEach((reward) => {
+              finalList.add(
+                `a${reward.slot_1_pokemon_id}-${reward.slot_1_form}`,
+              )
+              finalList.add(
+                `a${reward.slot_2_pokemon_id}-${reward.slot_2_form}`,
+              )
+              finalList.add(
+                `a${reward.slot_3_pokemon_id}-${reward.slot_3_form}`,
+              )
+            })
+          }
           break
         default:
           rewards.forEach((reward) =>
