@@ -233,66 +233,116 @@ module.exports = class Pokemon extends Model {
       onlyLinkGlobal ? args.filters[`${pkmn.pokemon_id}-${pkmn.form}`] : true
     // query builder
     const query = this.query()
-    if (isMad) {
-      getMadSql(query)
-    } else {
-      query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
-    }
-    query
-      .where(
-        isMad ? 'disappear_time' : 'expire_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : safeTs,
-      )
-      .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
-        args.minLat,
-        args.maxLat,
-      ])
-      .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [
-        args.minLon,
-        args.maxLon,
-      ])
-      .andWhere((ivOr) => {
-        for (const [pkmn, filter] of Object.entries(args.filters)) {
-          if (pkmn.includes('-')) {
-            const relevantFilters = getRelevantKeys(filter)
-            const [id, form] = pkmn.split('-')
-            ivOr.orWhere((poke) => {
-              if (id === '132') {
-                poke.where('pokemon_id', id)
-              } else {
-                poke.where('pokemon_id', id).andWhere('pokemon.form', form)
-              }
+
+    if (!mem) {
+      if (isMad) {
+        getMadSql(query)
+      } else {
+        query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
+      }
+      query
+        .where(
+          isMad ? 'disappear_time' : 'expire_timestamp',
+          '>=',
+          isMad ? this.knex().fn.now() : safeTs,
+        )
+        .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
+          args.minLat,
+          args.maxLat,
+        ])
+        .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [
+          args.minLon,
+          args.maxLon,
+        ])
+        .andWhere((ivOr) => {
+          for (const [pkmn, filter] of Object.entries(args.filters)) {
+            if (pkmn.includes('-')) {
+              const relevantFilters = getRelevantKeys(filter)
+              const [id, form] = pkmn.split('-')
+              ivOr.orWhere((poke) => {
+                if (id === '132') {
+                  poke.where('pokemon_id', id)
+                } else {
+                  poke.where('pokemon_id', id).andWhere('pokemon.form', form)
+                }
+                if (relevantFilters.length) {
+                  generateSql(poke, filter, relevantFilters)
+                }
+              })
+            } else if (pkmn === 'onlyIvOr' && (ivs || pvp)) {
+              const relevantFilters = getRelevantKeys(filter)
               if (relevantFilters.length) {
-                generateSql(poke, filter, relevantFilters)
+                generateSql(ivOr, filter, relevantFilters)
+              } else {
+                ivOr.whereNull('pokemon_id')
               }
-            })
-          } else if (pkmn === 'onlyIvOr' && (ivs || pvp)) {
-            const relevantFilters = getRelevantKeys(filter)
-            if (relevantFilters.length) {
-              generateSql(ivOr, filter, relevantFilters)
-            } else {
-              ivOr.whereNull('pokemon_id')
             }
           }
-        }
-        if (onlyXlKarp) {
-          ivOr.orWhere('pokemon_id', 129).andWhere('weight', '>=', 13.125)
-        }
-        if (onlyXsRat) {
-          ivOr.orWhere('pokemon_id', 19).andWhere('weight', '<=', 2.40625)
-        }
-        if (onlyZeroIv && ivs) {
-          ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 0)
-        }
-        if (onlyHundoIv && ivs) {
-          ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 100)
-        }
-      })
-    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'pokemon')) {
-      return []
+          if (onlyXlKarp) {
+            ivOr.orWhere('pokemon_id', 129).andWhere('weight', '>=', 13.125)
+          }
+          if (onlyXsRat) {
+            ivOr.orWhere('pokemon_id', 19).andWhere('weight', '<=', 2.40625)
+          }
+          if (onlyZeroIv && ivs) {
+            ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 0)
+          }
+          if (onlyHundoIv && ivs) {
+            ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 100)
+          }
+        })
+      if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'pokemon')) {
+        return []
+      }
     }
 
+    const nullOrValue = (filter) => {
+      const {
+        // eslint-disable-next-line no-unused-vars
+        enabled,
+        // eslint-disable-next-line no-unused-vars
+        size,
+        // eslint-disable-next-line no-unused-vars
+        adv,
+        iv,
+        atk_iv,
+        def_iv,
+        sta_iv,
+        cp,
+        level,
+        gender,
+        xxs,
+        xxl,
+        ...rest
+      } = filter
+      return {
+        iv: iv.some((val, i) => val !== onlyStandard.iv[i]) ? iv : undefined,
+        atk_iv: atk_iv.some((val, i) => val !== onlyStandard.atk_iv[i])
+          ? atk_iv
+          : undefined,
+        def_iv: def_iv.some((val, i) => val !== onlyStandard.def_iv[i])
+          ? def_iv
+          : undefined,
+        sta_iv: sta_iv.some((val, i) => val !== onlyStandard.sta_iv[i])
+          ? sta_iv
+          : undefined,
+        cp: cp.some((val, i) => val !== onlyStandard.cp[i]) ? cp : undefined,
+        level: level.some((val, i) => val !== onlyStandard.level[i])
+          ? level
+          : undefined,
+        gender,
+        xxs,
+        xxl,
+        pvp: Object.fromEntries(
+          Object.entries(rest).map(([league, values]) => {
+            if (values.some((val, i) => val !== onlyStandard[league][i])) {
+              return [league, values]
+            }
+            return [league, undefined]
+          }),
+        ),
+      }
+    }
     const results =
       (await this.evalQuery(
         mem,
@@ -307,7 +357,7 @@ module.exports = class Pokemon extends Model {
             longitude: args.maxLon,
           },
           standard: onlyStandard,
-          global: onlyIvOr,
+          global: nullOrValue(onlyIvOr),
           xlKarp: onlyXlKarp,
           xsRat: onlyXsRat,
           zeroIv: onlyZeroIv,
@@ -319,41 +369,7 @@ module.exports = class Pokemon extends Model {
           filters: Object.fromEntries(
             Object.entries(args.filters)
               .filter(([k]) => k.includes('-'))
-              .map(([k, v]) => {
-                const {
-                  // eslint-disable-next-line no-unused-vars
-                  enabled,
-                  // eslint-disable-next-line no-unused-vars
-                  size,
-                  // eslint-disable-next-line no-unused-vars
-                  adv,
-                  iv,
-                  atk_iv,
-                  def_iv,
-                  sta_iv,
-                  cp,
-                  level,
-                  gender,
-                  xxs,
-                  xxl,
-                  ...rest
-                } = v
-                return [
-                  k,
-                  {
-                    iv,
-                    atk_iv,
-                    def_iv,
-                    sta_iv,
-                    cp,
-                    level,
-                    gender,
-                    xxs,
-                    xxl,
-                    pvp: rest,
-                  },
-                ]
-              }),
+              .map(([k, v]) => [k, nullOrValue(v)]),
           ),
         }),
       )) || []
@@ -361,6 +377,9 @@ module.exports = class Pokemon extends Model {
     const pvpResults = []
     const listOfIds = []
 
+    if (mem) {
+      return results
+    }
     // form checker
     results.forEach((pkmn) => {
       let noPvp = true
