@@ -377,9 +377,9 @@ module.exports = class Pokemon extends Model {
     const pvpResults = []
     const listOfIds = []
 
-    if (mem) {
-      return results
-    }
+    // if (mem) {
+    //   return results
+    // }
     // form checker
     results.forEach((pkmn) => {
       let noPvp = true
