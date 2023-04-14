@@ -343,45 +343,43 @@ module.exports = class Pokemon extends Model {
     const results =
       (await this.evalQuery(
         mem,
-        query.limit(queryLimits.pokemon),
-        JSON.stringify({
-          min: {
-            latitude: args.minLat,
-            longitude: args.minLon,
-          },
-          max: {
-            latitude: args.maxLat,
-            longitude: args.maxLon,
-          },
-          // standard: onlyStandard,
-          global: {
-            ...nullOrValue(onlyIvOr, 'global'),
-            additional: {
-              include_zeroiv: onlyZeroIv,
-              include_hundoiv: onlyHundoIv,
-              include_everything: false,
-            },
-          },
-          // xlKarp: onlyXlKarp,
-          // xsRat: onlyXsRat,
-          // pvpMega: onlyPvpMega,
-          // pvp50: args.filters.onlyPvp50,
-          // pvp51: args.filters.onlyPvp51,
-          // linkGlobal: onlyLinkGlobal,
-          filters: Object.fromEntries(
-            Object.entries(args.filters)
-              .filter(([k]) => k.includes('-'))
-              .map(([k, v]) => [k, nullOrValue(v, k)]),
-          ),
-        }),
+        mem
+          ? JSON.stringify({
+              min: {
+                latitude: args.minLat,
+                longitude: args.minLon,
+              },
+              max: {
+                latitude: args.maxLat,
+                longitude: args.maxLon,
+              },
+              // standard: onlyStandard,
+              global: {
+                ...nullOrValue(onlyIvOr, 'global'),
+                additional: {
+                  include_zeroiv: onlyZeroIv,
+                  include_hundoiv: onlyHundoIv,
+                  include_everything: false,
+                },
+              },
+              // xlKarp: onlyXlKarp,
+              // xsRat: onlyXsRat,
+              // pvpMega: onlyPvpMega,
+              // pvp50: args.filters.onlyPvp50,
+              // pvp51: args.filters.onlyPvp51,
+              // linkGlobal: onlyLinkGlobal,
+              filters: Object.fromEntries(
+                Object.entries(args.filters)
+                  .filter(([k]) => k.includes('-'))
+                  .map(([k, v]) => [k, nullOrValue(v, k)]),
+              ),
+            })
+          : query.limit(queryLimits.pokemon),
       )) || []
     const finalResults = []
     const pvpResults = []
     const listOfIds = []
 
-    // if (mem) {
-    //   return results
-    // }
     // form checker
     results.forEach((pkmn) => {
       let noPvp = true
@@ -502,12 +500,12 @@ module.exports = class Pokemon extends Model {
     return finalResults
   }
 
-  static async evalQuery(mem, query, body) {
+  static async evalQuery(mem, query) {
     if (queryDebug) {
-      if (mem && body) {
+      if (mem && typeof query === 'string') {
         fs.writeFileSync(
           resolve(__dirname, './queries', `${Date.now()}.json`),
-          body,
+          query,
         )
       } else {
         fs.writeFileSync(
@@ -524,13 +522,13 @@ module.exports = class Pokemon extends Model {
               Accept: 'application/json',
               'Content-Type': 'application/json',
             },
-            body,
+            body: query,
           })
         : query) || []
     )
   }
 
-  static async getLegacy(perms, args, { isMad, mem, hasSize, hasHeight }) {
+  static async getLegacy(perms, args, { isMad, hasSize, hasHeight }) {
     const ts = Math.floor(new Date().getTime() / 1000)
     const query = this.query()
       .where(
@@ -562,7 +560,32 @@ module.exports = class Pokemon extends Model {
     ) {
       return []
     }
-    const results = await this.evalQuery(mem, query)
+    const results =
+      (await this.evalQuery(
+        null,
+        // mem
+        //   ? JSON.stringify({
+        //       min: {
+        //         latitude: args.minLat,
+        //         longitude: args.minLon,
+        //       },
+        //       max: {
+        //         latitude: args.maxLat,
+        //         longitude: args.maxLon,
+        //       },
+        //       global: {
+        //         iv: [0, 100],
+        //         level: [0, 100],
+
+        //         additional: {
+        //           include_everything: true,
+        //         },
+        //       },
+        //       filters: {},
+        //     })
+        //   :
+        query,
+      )) || []
     return legacyFilter(results, args, perms, ts)
   }
 

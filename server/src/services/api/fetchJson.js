@@ -14,7 +14,7 @@ module.exports = async function fetchJson(
 
   try {
     if (log) console.log(url, options)
-    const response = await fetch(url, options)
+    const response = await fetch(url, { ...options, signal: controller.signal })
     if (!response.ok) {
       throw new Error(`${response.status} (${response.statusText})`)
     }
