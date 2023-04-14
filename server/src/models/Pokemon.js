@@ -552,10 +552,11 @@ module.exports = class Pokemon extends Model {
     return legacyFilter(results, args, perms, ts)
   }
 
+  // eslint-disable-next-line no-unused-vars
   static async getAvailable({ isMad, mem }) {
     const ts = Math.floor(Date.now() / 1000)
     const availableQuery = this.evalQuery(
-      mem,
+      null,
       this.query()
         .select(['pokemon_id', 'form'])
         .where(
@@ -567,7 +568,7 @@ module.exports = class Pokemon extends Model {
         .orderBy('pokemon_id', 'form'),
     )
     const rarityQuery = this.evalQuery(
-      mem,
+      null,
       this.query()
         .select(['pokemon_id AS id', 'form as formId'])
         .count('pokemon_id AS count')
@@ -589,9 +590,10 @@ module.exports = class Pokemon extends Model {
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   static getOne(id, { isMad, mem }) {
     return this.evalQuery(
-      mem,
+      null,
       this.query()
         .select([
           isMad ? 'latitude AS lat' : 'lat',
