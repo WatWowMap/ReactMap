@@ -115,7 +115,8 @@
   },
   "nodemonConfig": {
     "ignore": [
-      "server/src/configs/koji_backups/**"
+      "server/src/configs/koji_backups/**",
+      "server/src/models/queries/**"
     ]
   }
 }

@@ -2,12 +2,13 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
 const i18next = require('i18next')
-// const fs = require('fs')
-// const { resolve } = require('path')
+const fs = require('fs')
+const { resolve } = require('path')
 
 const { Event } = require('../services/initialization')
 const legacyFilter = require('../services/legacyFilter')
 const {
+  devOptions: { queryDebug },
   api: {
     searchResultsLimit,
     pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, leagueObj },
@@ -315,32 +316,28 @@ module.exports = class Pokemon extends Model {
         xxl,
         ...rest
       } = filter
+      const localPvp = Object.fromEntries(
+        Object.entries(rest).map(([league, values]) => {
+          if (values.some((val, i) => val !== onlyStandard[league][i])) {
+            return [league, values]
+          }
+          return [league, undefined]
+        }),
+      )
       return {
-        iv: iv.some((val, i) => val !== onlyStandard.iv[i]) ? iv : undefined,
-        atk_iv: atk_iv.some((val, i) => val !== onlyStandard.atk_iv[i])
-          ? atk_iv
-          : undefined,
-        def_iv: def_iv.some((val, i) => val !== onlyStandard.def_iv[i])
-          ? def_iv
-          : undefined,
-        sta_iv: sta_iv.some((val, i) => val !== onlyStandard.sta_iv[i])
-          ? sta_iv
-          : undefined,
-        cp: cp.some((val, i) => val !== onlyStandard.cp[i]) ? cp : undefined,
-        level: level.some((val, i) => val !== onlyStandard.level[i])
-          ? level
-          : undefined,
-        gender,
-        xxs,
-        xxl,
-        pvp: Object.fromEntries(
-          Object.entries(rest).map(([league, values]) => {
-            if (values.some((val, i) => val !== onlyStandard[league][i])) {
-              return [league, values]
-            }
-            return [league, undefined]
-          }),
-        ),
+        iv: !arrayCheck(filter, 'iv') ? iv : undefined,
+        atk_iv: !arrayCheck(filter, 'atk_iv') ? atk_iv : undefined,
+        def_iv: !arrayCheck(filter, 'def_iv') ? def_iv : undefined,
+        sta_iv: !arrayCheck(filter, 'sta_iv') ? sta_iv : undefined,
+        cp: !arrayCheck(filter, 'cp') ? cp : undefined,
+        level: !arrayCheck(filter, 'level') ? level : undefined,
+        gender: !arrayCheck(filter, 'gender') ? gender : undefined,
+        xxs: !arrayCheck(filter, 'xxs') ? xxs : undefined,
+        xxl: !arrayCheck(filter, 'xxl') ? xxl : undefined,
+        pvp: Object.keys(localPvp).length ? localPvp : undefined,
+        additional: {
+          include_everything: !getRelevantKeys(filter).length,
+        },
       }
     }
     const results =
@@ -356,20 +353,25 @@ module.exports = class Pokemon extends Model {
             latitude: args.maxLat,
             longitude: args.maxLon,
           },
-          standard: onlyStandard,
-          global: nullOrValue(onlyIvOr),
-          xlKarp: onlyXlKarp,
-          xsRat: onlyXsRat,
-          zeroIv: onlyZeroIv,
-          hundoIv: onlyHundoIv,
-          pvpMega: onlyPvpMega,
-          pvp50: args.filters.onlyPvp50,
-          pvp51: args.filters.onlyPvp51,
-          linkGlobal: onlyLinkGlobal,
+          // standard: onlyStandard,
+          global: {
+            ...nullOrValue(onlyIvOr, 'global'),
+            additional: {
+              include_zeroiv: onlyZeroIv,
+              include_hundoiv: onlyHundoIv,
+              include_everything: false,
+            },
+          },
+          // xlKarp: onlyXlKarp,
+          // xsRat: onlyXsRat,
+          // pvpMega: onlyPvpMega,
+          // pvp50: args.filters.onlyPvp50,
+          // pvp51: args.filters.onlyPvp51,
+          // linkGlobal: onlyLinkGlobal,
           filters: Object.fromEntries(
             Object.entries(args.filters)
               .filter(([k]) => k.includes('-'))
-              .map(([k, v]) => [k, nullOrValue(v)]),
+              .map(([k, v]) => [k, nullOrValue(v, k)]),
           ),
         }),
       )) || []
@@ -501,7 +503,19 @@ module.exports = class Pokemon extends Model {
   }
 
   static async evalQuery(mem, query, body) {
-    // fs.writeFileSync('request.json', body)
+    if (queryDebug) {
+      if (mem && body) {
+        fs.writeFileSync(
+          resolve(__dirname, './queries', `${Date.now()}.json`),
+          body,
+        )
+      } else {
+        fs.writeFileSync(
+          resolve(__dirname, './queries', `${Date.now()}.txt`),
+          query.toKnexQuery().toString(),
+        )
+      }
+    }
     return (
       (mem
         ? fetchJson(mem, {
