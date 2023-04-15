@@ -924,14 +924,6 @@
         "__name": "DEFAULT_FILTERS_POKEMON_ALL_POKEMON",
         "__format": "boolean"
       },
-      "xsRat": {
-        "__name": "DEFAULT_FILTERS_POKEMON_XS_RAT",
-        "__format": "boolean"
-      },
-      "xlKarp": {
-        "__name": "DEFAULT_FILTERS_POKEMON_XL_KARP",
-        "__format": "boolean"
-      },
       "globalValues": {
         "iv": {
           "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_IV",
