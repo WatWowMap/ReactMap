@@ -37,8 +37,8 @@ module.exports = class DbCheck {
             this.models[capital].push({ connection: i })
           }
         })
-        if (schema.endpoint) {
-          this.memEndpoints[i] = schema.endpoint
+        if (schema.pokemon) {
+          this.memEndpoints[i] = schema.pokemon
         }
         return knex({
           client: 'mysql2',
