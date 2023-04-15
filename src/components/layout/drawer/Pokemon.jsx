@@ -1,16 +1,8 @@
 import React, { useEffect, useState, Fragment } from 'react'
-import {
-  Grid,
-  Typography,
-  Switch,
-  AppBar,
-  Tab,
-  Tabs,
-  Divider,
-} from '@material-ui/core'
+import { Grid, Typography, Switch, AppBar, Tab, Tabs } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic } from '@hooks/useStore'
+import { useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
@@ -30,7 +22,6 @@ export default function WithSliders({
     filters[category][specificFilter],
   )
   const [openTab, setOpenTab] = useState(0)
-  const Icons = useStatic((state) => state.Icons)
 
   useEffect(() => {
     setFilters({
@@ -170,11 +161,11 @@ export default function WithSliders({
                         </Grid>
                       </Fragment>
                     ))}
-                    <Divider
+                    {/* <Divider
                       flexItem
                       style={{ width: '100%', height: 2, margin: '8px 0' }}
-                    />
-                    {['xsRat', 'xlKarp'].map((each, i) => (
+                    /> */}
+                    {/* {['xsRat', 'xlKarp'].map((each, i) => (
                       <Fragment key={each}>
                         <Grid item xs={2}>
                           <img
@@ -205,7 +196,7 @@ export default function WithSliders({
                           />
                         </Grid>
                       </Fragment>
-                    ))}
+                    ))} */}
                   </>
                 ) : (
                   ['zeroIv', 'hundoIv'].map((each) => (

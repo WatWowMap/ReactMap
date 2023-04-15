@@ -87,8 +87,8 @@ module.exports = class Pokemon extends Model {
     const {
       onlyStandard,
       onlyIvOr,
-      onlyXlKarp,
-      onlyXsRat,
+      // onlyXlKarp,
+      // onlyXsRat,
       onlyZeroIv,
       onlyHundoIv,
       onlyPvpMega,
@@ -279,12 +279,12 @@ module.exports = class Pokemon extends Model {
               }
             }
           }
-          if (onlyXlKarp) {
-            ivOr.orWhere('pokemon_id', 129).andWhere('weight', '>=', 13.125)
-          }
-          if (onlyXsRat) {
-            ivOr.orWhere('pokemon_id', 19).andWhere('weight', '<=', 2.40625)
-          }
+          // if (onlyXlKarp) {
+          //   ivOr.orWhere('pokemon_id', 129).andWhere('weight', '>=', 13.125)
+          // }
+          // if (onlyXsRat) {
+          //   ivOr.orWhere('pokemon_id', 19).andWhere('weight', '<=', 2.40625)
+          // }
           if (onlyZeroIv && ivs) {
             ivOr.orWhere(isMad ? raw(ivCalc) : 'iv', 0)
           }
