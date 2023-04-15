@@ -494,8 +494,6 @@
       "enabled": false,
       "legacyFilter": false,
       "allPokemon": false,
-      "xsRat": false,
-      "xlKarp": false,
       "globalValues": {
         "iv": [
           80,
