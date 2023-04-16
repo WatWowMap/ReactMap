@@ -342,7 +342,7 @@ module.exports = class Pokemon extends Model {
     }
     const results =
       (await this.evalQuery(
-        mem,
+        mem ? `${mem}/api/pokemon/scan` : null,
         mem
           ? JSON.stringify({
               min: {
@@ -500,7 +500,7 @@ module.exports = class Pokemon extends Model {
     return finalResults
   }
 
-  static async evalQuery(mem, query) {
+  static async evalQuery(mem, query, method = 'POST') {
     if (queryDebug) {
       if (mem && typeof query === 'string') {
         fs.writeFileSync(
@@ -517,7 +517,7 @@ module.exports = class Pokemon extends Model {
     return (
       (mem
         ? fetchJson(mem, {
-            method: 'POST',
+            method,
             headers: {
               Accept: 'application/json',
               'Content-Type': 'application/json',
@@ -630,14 +630,17 @@ module.exports = class Pokemon extends Model {
   // eslint-disable-next-line no-unused-vars
   static getOne(id, { isMad, mem }) {
     return this.evalQuery(
-      null,
-      this.query()
-        .select([
-          isMad ? 'latitude AS lat' : 'lat',
-          isMad ? 'longitude AS lon' : 'lon',
-        ])
-        .where(isMad ? 'encounter_id' : 'id', id)
-        .first(),
+      mem ? `${mem}/api/pokemon/id/${id}` : null,
+      mem
+        ? undefined
+        : this.query()
+            .select([
+              isMad ? 'latitude AS lat' : 'lat',
+              isMad ? 'longitude AS lon' : 'lon',
+            ])
+            .where(isMad ? 'encounter_id' : 'id', id)
+            .first(),
+      'GET',
     )
   }
 

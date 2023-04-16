@@ -578,6 +578,13 @@ const ExtraInfo = ({ pokemon, perms, t, Icons }) => {
           </Fragment>
         ) : null,
       )}
+      {process.env.NODE_ENV === 'development' && (
+        <Grid item xs={12} style={{ paddingTop: 10 }}>
+          <Typography variant="subtitle1" align="center">
+            {pokemon.id}
+          </Typography>
+        </Grid>
+      )}
     </Grid>
   )
 }
