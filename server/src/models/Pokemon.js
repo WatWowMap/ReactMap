@@ -514,18 +514,17 @@ module.exports = class Pokemon extends Model {
         )
       }
     }
-    return (
-      (mem
-        ? fetchJson(mem, {
-            method,
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: query,
-          })
-        : query) || []
-    )
+    const results = await (mem
+      ? fetchJson(mem, {
+          method,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: query,
+        })
+      : query)
+    return results || []
   }
 
   static async getLegacy(perms, args, { isMad, hasSize, hasHeight }) {
@@ -592,37 +591,26 @@ module.exports = class Pokemon extends Model {
   // eslint-disable-next-line no-unused-vars
   static async getAvailable({ isMad, mem }) {
     const ts = Math.floor(Date.now() / 1000)
-    const availableQuery = this.evalQuery(
-      null,
-      this.query()
-        .select(['pokemon_id', 'form'])
-        .where(
-          isMad ? 'disappear_time' : 'expire_timestamp',
-          '>=',
-          isMad ? this.knex().fn.now() : ts,
-        )
-        .groupBy('pokemon_id', 'form')
-        .orderBy('pokemon_id', 'form'),
+    const available = await this.evalQuery(
+      mem ? `${mem}/api/pokemon/available` : null,
+      mem
+        ? undefined
+        : this.query()
+            .select(['pokemon_id AS id', 'form'])
+            .count('pokemon_id AS count')
+            .where(
+              isMad ? 'disappear_time' : 'expire_timestamp',
+              '>=',
+              isMad ? this.knex().fn.now() : ts,
+            )
+            .groupBy('pokemon_id', 'form')
+            .orderBy('pokemon_id', 'form'),
+      'GET',
     )
-    const rarityQuery = this.evalQuery(
-      null,
-      this.query()
-        .select(['pokemon_id AS id', 'form as formId'])
-        .count('pokemon_id AS count')
-        .groupBy('pokemon_id', 'form')
-        .where(
-          isMad ? 'disappear_time' : 'expire_timestamp',
-          '>=',
-          isMad ? this.knex().fn.now() : ts,
-        ),
-    )
-
-    const [available, rarity] = await Promise.all([availableQuery, rarityQuery])
-
     return {
-      available: available.map((pkmn) => `${pkmn.pokemon_id}-${pkmn.form}`),
+      available: available.map((pkmn) => `${pkmn.id}-${pkmn.form}`),
       rarity: Object.fromEntries(
-        rarity.map((pkmn) => [`${pkmn.id}-${pkmn.formId}`, pkmn.count]),
+        available.map((pkmn) => [`${pkmn.id}-${pkmn.form}`, pkmn.count]),
       ),
     }
   }
