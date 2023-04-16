@@ -6,7 +6,7 @@ const fetch = require('node-fetch')
 
 const config = require('./config')
 
-const DEFAULT_RETURN = { type: 'FeatureCollectin', features: [] }
+const DEFAULT_RETURN = { type: 'FeatureCollection', features: [] }
 
 const manualGeojson = {
   type: 'FeatureCollection',
@@ -120,11 +120,17 @@ const loadScanPolygons = async (fileName, domain) => {
             center: center(f).geometry.coordinates.reverse(),
           },
         })),
-      ].sort((a, b) => a.properties.name.localeCompare(b.properties.name)),
+      ].sort((a, b) =>
+        a.properties.name
+          ? a.properties.name.localeCompare(b.properties.name)
+          : 0,
+      ),
     }
   } catch {
     console.warn(
-      `[AREAS] Failed to load ${fileName} for ${domain}. Using empty areas.json`,
+      `[AREAS] Failed to load ${fileName} for ${
+        domain || 'map'
+      }. Using empty areas.json`,
     )
     return DEFAULT_RETURN
   }
