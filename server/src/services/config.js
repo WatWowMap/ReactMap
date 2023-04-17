@@ -2,9 +2,6 @@ process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
 
 const fs = require('fs')
 const { resolve } = require('path')
-const dotenv = require('dotenv')
-
-dotenv.config()
 
 const config = require('config')
 const { log, HELPERS } = require('./logger')
