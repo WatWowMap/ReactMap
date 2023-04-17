@@ -1,7 +1,6 @@
-/* eslint-disable no-console */
 const { exec } = require('child_process')
 const path = require('path')
-
+const { log } = require('../src/services/logger')
 const { version } = require('../../package.json')
 
 /*
@@ -18,12 +17,12 @@ try {
     if (err0) {
       throw new Error(err0)
     }
-    console.log(stdout0)
+    log.info(stdout0)
     exec(`sentry-cli releases new ${version}`, (err1, stdout1) => {
       if (err1) {
         throw new Error(err1)
       }
-      console.log(stdout1)
+      log.info(stdout1)
       exec(
         `sentry-cli releases files ${version} upload-sourcemaps ${path.resolve(
           __dirname,
@@ -33,17 +32,17 @@ try {
           if (err2) {
             throw new Error(err2)
           }
-          console.log(stdout2)
+          log.info(stdout2)
           exec(`sentry-cli releases finalize ${version}`, (err3, stdout3) => {
             if (err3) {
               throw new Error(err3)
             }
-            console.log(stdout3)
+            log.info(stdout3)
           })
         },
       )
     })
   })
 } catch (e) {
-  console.log(e.message)
+  log.error(e)
 }

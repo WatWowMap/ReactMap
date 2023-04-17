@@ -1,5 +1,5 @@
-/* eslint-disable no-console */
 const NodeGeocoder = require('node-geocoder')
+const { log } = require('./logger')
 
 module.exports = async function geocoder(nominatimUrl, search, reverse) {
   try {
@@ -22,7 +22,7 @@ module.exports = async function geocoder(nominatimUrl, search, reverse) {
       : await stockGeocoder.geocode(search)
     return reverse ? results[0] : results
   } catch (e) {
-    console.warn('[GEOCODER] Unable to geocode', search)
+    log.warn('[GEOCODER] Unable to geocode for', search, e)
     return {}
   }
 }

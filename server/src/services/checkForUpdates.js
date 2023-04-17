@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
 const { exec } = require('child_process')
 const path = require('path')
 const fs = require('fs')
+const { log, HELPERS } = require('./logger')
 
 let isDocker = false
 
@@ -56,16 +56,18 @@ try {
                 const remoteSha = stdout3.split('\t')[0]
 
                 if (remoteSha !== sha) {
-                  console.log(
-                    '[UPDATE] There is a new version available: ',
+                  log.info(
+                    HELPERS.update,
+                    'There is a new version available: ',
                     remoteSha,
                     isDocker ? 'docker-compose pull' : 'git pull',
                     ' to update',
                   )
                 }
               } catch (e) {
-                console.log(
-                  '[UPDATE] Unable to get remote SHA:',
+                log.info(
+                  HELPERS.update,
+                  'Unable to get remote SHA:',
                   e.message,
                   '\nBranch:',
                   branch,
@@ -77,8 +79,9 @@ try {
             },
           )
         } catch (e) {
-          console.log(
-            '[UPDATE] Unable to get current SHA:',
+          log.info(
+            HELPERS.update,
+            'Unable to get current SHA:',
             e.message,
             '\nBranch:',
             branch,
@@ -87,13 +90,14 @@ try {
         }
       })
     } catch (e) {
-      console.log(
-        '[UPDATE] Unable to determine the local git branch:',
+      log.info(
+        HELPERS.update,
+        'Unable to determine the local git branch, upgrading your version of git will likely resolve this issue:',
         e.message,
         '\nProceeding normally...',
       )
     }
   })
 } catch (e) {
-  console.log(e.message)
+  log.warn(HELPERS.update, e)
 }
