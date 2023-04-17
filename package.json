@@ -59,7 +59,6 @@
     "@material-ui/styles": "^4.11.4",
     "@sentry/node": "^7.48.0",
     "@sentry/react": "^7.48.0",
-    "@sentry/tracing": "^7.15.0",
     "@turf/boolean-contains": "^6.5.0",
     "@turf/boolean-overlap": "^6.5.0",
     "@turf/boolean-point-in-polygon": "^6.5.0",
