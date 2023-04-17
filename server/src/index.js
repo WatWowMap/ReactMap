@@ -1,5 +1,5 @@
 process.title = 'ReactMap'
-process.env.FORCE_COLOR = 1
+process.env.FORCE_COLOR = 3
 
 require('dotenv').config()
 const path = require('path')
@@ -134,11 +134,12 @@ const server = new ApolloServer({
     const returned = data?.data?.[endpoint]?.length || 0
     log.info(
       HELPERS.gql,
-      'Endpoint:',
-      endpoint,
-      'Returned:',
+      HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
+      '|',
+      context.operationName,
+      '|',
       returned || 0,
-      'User:',
+      '|',
       context.context.req?.user?.username || 'Not Logged In',
     )
 
@@ -284,9 +285,10 @@ connection.migrate.latest().then(async () => {
       (config.areas = await getAreas()),
     ]).then(() => {
       app.listen(config.port, config.interface, () => {
-        rainbow(
+        const text = rainbow(
           `Server is now listening at http://${config.interface}:${config.port}`,
         )
+        setTimeout(() => text.stop(), 10_000)
       })
     })
   })

@@ -48,6 +48,7 @@ const getGeojson = async (location) => {
         .then((res) => res.json())
         .then((res) => {
           if (res?.data) {
+            log.info(HELPERS.areas, 'Caching', location, 'from Kōji')
             fs.writeFileSync(
               resolve(
                 __dirname,

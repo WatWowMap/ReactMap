@@ -133,10 +133,10 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
         ? ['nest', 'portal']
         : ['session', 'user', 'nest', 'portal'],
     })
-  } else {
+  } else if (!hasReactMapDb) {
     log.error(
       HELPERS.config,
-      'Missing manual database config! \nCheck to make sure you have MANUAL_DB_HOST,MANUAL_DB_PORT, MANUAL_DB_NAME, MANUAL_DB_USERNAME, and MANUAL_DB_PASSWORD',
+      'Neither a ReactMap database or Manual database was found, you will need one of these to proceed.',
     )
   }
   if (!MAP_GENERAL_START_LAT || !MAP_GENERAL_START_LON) {
@@ -151,6 +151,25 @@ if (fs.existsSync(resolve(`${__dirname}/../configs/config.json`))) {
     HELPERS.config,
     'Config v1 (config.json) found, it is fine to leave it but make sure you are using and updating local.json instead.',
   )
+}
+
+if (config.icons.styles.length === 0) {
+  config.icons.styles.push({
+    name: 'Default',
+    path: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/',
+    modifiers: {
+      gym: {
+        0: 1,
+        1: 1,
+        2: 1,
+        3: 3,
+        4: 4,
+        5: 4,
+        6: 18,
+        sizeMultiplier: 1.2,
+      },
+    },
+  })
 }
 
 const checkExtraJsons = (fileName, domain = '') => {
