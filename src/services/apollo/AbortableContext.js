@@ -6,8 +6,9 @@ import { Observable } from '@apollo/client/utilities/observables/Observable'
  * @author Mygod
  */
 export default class AbortableContext {
-  constructor() {
+  constructor(error = 'Request aborted') {
     this._pendingOp = null
+    this._error = error
   }
 
   _abort() {
@@ -32,7 +33,7 @@ export default class AbortableContext {
       operation.setContext({ fetchOptions })
     }
 
-    observer.error(new Error('Request aborted'))
+    if (this._error) observer.error(new Error(this._error))
     subscription.unsubscribe()
   }
 

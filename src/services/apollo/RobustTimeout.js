@@ -2,7 +2,7 @@ import AbortableContext from './AbortableContext'
 
 export default class RobustTimeout extends AbortableContext {
   constructor(ms) {
-    super()
+    super(null)
     this._ms = ms
     this._lastUpdated = 0
   }
