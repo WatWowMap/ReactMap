@@ -315,25 +315,27 @@ module.exports = class Pokemon extends Model {
         xxl,
         ...rest
       } = filter
-      const localPvp = Object.fromEntries(
-        Object.entries(rest).map(([league, values]) => {
-          if (values.some((val, i) => val !== onlyStandard[league][i])) {
-            return [league, values]
-          }
-          return [league, undefined]
-        }),
-      )
+      const localPvp = pvp
+        ? Object.fromEntries(
+            Object.entries(rest).map(([league, values]) => {
+              if (values.some((val, i) => val !== onlyStandard[league][i])) {
+                return [league, values]
+              }
+              return [league, undefined]
+            }),
+          )
+        : undefined
       return {
-        iv: !arrayCheck(filter, 'iv') ? iv : undefined,
-        atk_iv: !arrayCheck(filter, 'atk_iv') ? atk_iv : undefined,
-        def_iv: !arrayCheck(filter, 'def_iv') ? def_iv : undefined,
-        sta_iv: !arrayCheck(filter, 'sta_iv') ? sta_iv : undefined,
-        cp: !arrayCheck(filter, 'cp') ? cp : undefined,
-        level: !arrayCheck(filter, 'level') ? level : undefined,
-        gender: !arrayCheck(filter, 'gender') ? gender : undefined,
+        iv: ivs && !arrayCheck(filter, 'iv') ? iv : undefined,
+        atk_iv: ivs && !arrayCheck(filter, 'atk_iv') ? atk_iv : undefined,
+        def_iv: ivs && !arrayCheck(filter, 'def_iv') ? def_iv : undefined,
+        sta_iv: ivs && !arrayCheck(filter, 'sta_iv') ? sta_iv : undefined,
+        cp: ivs && !arrayCheck(filter, 'cp') ? cp : undefined,
+        level: ivs && !arrayCheck(filter, 'level') ? level : undefined,
+        gender: ivs && !arrayCheck(filter, 'gender') ? gender : undefined,
         xxs: !arrayCheck(filter, 'xxs') ? xxs : undefined,
         xxl: !arrayCheck(filter, 'xxl') ? xxl : undefined,
-        pvp: Object.keys(localPvp).length ? localPvp : undefined,
+        pvp: Object.keys(localPvp || {}).length ? localPvp : undefined,
         additional: {
           include_everything: !getRelevantKeys(filter).length,
         },
