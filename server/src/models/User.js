@@ -1,10 +1,11 @@
-/* eslint-disable no-console */
 const { Model } = require('objection')
+
 const {
   database: {
     settings: { userTableName, gymBadgeTableName },
   },
 } = require('../services/config')
+const { log, HELPERS } = require('../services/logger')
 
 module.exports = class User extends Model {
   static get tableName() {
@@ -16,8 +17,9 @@ module.exports = class User extends Model {
       .update({ [`${strategy}Perms`]: null })
       .where({ [`${strategy}Id`]: userId })
       .then(() =>
-        console.log(
-          `[${botName}] Cleared ${strategy} perms for user ${userId}`,
+        log.info(
+          HELPERS.custom(botName, '#fff2cc'),
+          `Cleared ${strategy} perms for user ${userId}`,
         ),
       )
   }

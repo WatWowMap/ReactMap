@@ -1,10 +1,10 @@
-/* eslint-disable no-console */
 const { default: center } = require('@turf/center')
 const fs = require('fs')
 const { resolve } = require('path')
 const fetch = require('node-fetch')
 
 const config = require('./config')
+const { log, HELPERS } = require('./logger')
 
 const DEFAULT_RETURN = { type: 'FeatureCollection', features: [] }
 
@@ -35,7 +35,7 @@ const manualGeojson = {
 const getGeojson = async (location) => {
   try {
     if (location.startsWith('http')) {
-      console.log('Loading Kōji URL', location)
+      log.info(HELPERS.areas, 'Loading Kōji URL', location)
       return fetch(
         location,
         {
@@ -60,9 +60,10 @@ const getGeojson = async (location) => {
           return DEFAULT_RETURN
         })
         .catch((err) => {
-          console.error(
-            '[AREAS] Failed to fetch koji geojson, attempting to read from backup \n[AREAS]',
-            err.message,
+          log.error(
+            HELPERS.areas,
+            'Failed to fetch Kōji geojson, attempting to read from backup',
+            err,
           )
           if (
             fs.existsSync(
@@ -72,7 +73,7 @@ const getGeojson = async (location) => {
               ),
             )
           ) {
-            console.log('[AREAS] Reading from koji_backups for', location)
+            log.info(HELPERS.areas, 'Reading from koji_backups for', location)
             return JSON.parse(
               fs.readFileSync(
                 resolve(
@@ -85,7 +86,7 @@ const getGeojson = async (location) => {
               ),
             )
           }
-          console.warn('[AREAS] No backup found for', location)
+          log.warn(HELPERS.areas, 'No backup found for', location)
           return DEFAULT_RETURN
         })
     }
@@ -95,7 +96,7 @@ const getGeojson = async (location) => {
       )
     }
   } catch (e) {
-    console.warn('[AREAS] Issue with getting the geojson', e)
+    log.warn(HELPERS.areas, 'Issue with getting the geojson', e)
   }
   return DEFAULT_RETURN
 }
@@ -127,8 +128,9 @@ const loadScanPolygons = async (fileName, domain) => {
       ),
     }
   } catch {
-    console.warn(
-      `[AREAS] Failed to load ${fileName} for ${
+    log.warn(
+      HELPERS.areas,
+      `Failed to load ${fileName} for ${
         domain || 'map'
       }. Using empty areas.json`,
     )
@@ -149,8 +151,9 @@ const loadAreas = (scanAreas) => {
     if (
       config.authentication.areaRestrictions.some((rule) => rule.roles.length)
     ) {
-      console.warn(
-        '[Area Restrictions] Disabled - `areas.json` file is missing or broken.',
+      log.warn(
+        HELPERS.areas,
+        'Area restrictions disabled - `areas.json` file is missing or broken.',
       )
     }
     return DEFAULT_RETURN
@@ -175,7 +178,7 @@ const parseAreas = (areasObj) => {
             polygon[0][0] !== polygon[polygon.length - 1][0] ||
             polygon[0][1] !== polygon[polygon.length - 1][1]
           ) {
-            console.warn('[AREAS] Polygon not closed', name, `Index (${i})`)
+            log.warn(HELPERS.areas, 'Polygon not closed', name, `Index (${i})`)
             polygon.push(polygon[0])
           }
         })
@@ -186,8 +189,9 @@ const parseAreas = (areasObj) => {
               polygon[0][0] !== polygon[polygon.length - 1][0] ||
               polygon[0][1] !== polygon[polygon.length - 1][1]
             ) {
-              console.warn(
-                '[AREAS] MultiPolygon contains unclosed Polygon',
+              log.warn(
+                HELPERS.areas,
+                'MultiPolygon contains unclosed Polygon',
                 name,
                 `Polygon (${i})`,
                 `Index (${j})`,

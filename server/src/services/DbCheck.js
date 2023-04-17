@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
 const knex = require('knex')
 const { raw } = require('objection')
 const extend = require('extend')
+const { log, HELPERS } = require('./logger')
 
 module.exports = class DbCheck {
   constructor(
@@ -76,10 +76,11 @@ module.exports = class DbCheck {
   }
 
   async determineType() {
-    console.log(
-      `[DB] Determining database types for ${
-        this.connections.length
-      } connection${this.connections.length > 1 ? 's' : ''}`,
+    log.info(
+      HELPERS.db,
+      `Determining database types for ${this.connections.length} connection${
+        this.connections.length > 1 ? 's' : ''
+      }`,
     )
     await Promise.all(
       this.connections.map(async (schema, i) => {
@@ -151,7 +152,7 @@ module.exports = class DbCheck {
             }
           })
         } catch (e) {
-          console.error('[DB]', e.message)
+          log.error(HELPERS.db, e)
         }
       }),
     )
@@ -190,7 +191,7 @@ module.exports = class DbCheck {
   }
 
   async historicalRarity() {
-    console.log('[DB] Setting historical rarity stats')
+    log.info(HELPERS.db, 'Setting historical rarity stats')
     try {
       const results = await Promise.all(
         (this.models.Pokemon ?? []).map(async (source) =>
@@ -211,7 +212,7 @@ module.exports = class DbCheck {
         true,
       )
     } catch (e) {
-      console.error('[DB] Failed to set historical rarity stats', e)
+      log.error(HELPERS.db, 'Failed to set historical rarity stats', e)
     }
   }
 
@@ -220,7 +221,11 @@ module.exports = class DbCheck {
       Object.entries(this.models).forEach(([model, sources]) => {
         if (this.singleModels.includes(model)) {
           if (sources.length > 1) {
-            console.error(`[DB] ${model} only supports one database connection`)
+            log.error(
+              HELPERS.db,
+              model,
+              `only supports one database connection`,
+            )
             process.exit(0)
           }
           if (model === 'User') {
@@ -238,15 +243,16 @@ module.exports = class DbCheck {
             )
           })
         }
-        console.log(
-          `[DB] Bound ${model} to ${sources.length ?? 1} connection${
+        log.info(
+          HELPERS.db,
+          `Bound ${model} to ${sources.length ?? 1} connection${
             sources.length > 1 ? 's' : ''
           }`,
         )
       })
     } catch (e) {
-      console.error(`
-  Error: ${e.message}
+      log.error(`
+  Error: ${e}
 
   Info: Only ${[this.validModels].join(
     ', ',
@@ -334,16 +340,16 @@ module.exports = class DbCheck {
     ]
   }
 
-  async getAvailable(model, log = true) {
+  async getAvailable(model) {
     if (this.models[model]) {
-      if (log) console.log(`[DB] Querying available for ${model}`)
+      log.info(HELPERS.db, `Querying available for ${model}`)
       try {
         const results = await Promise.all(
           this.models[model].map(async (source) =>
             source.SubModel.getAvailable(source),
           ),
         )
-        if (log) console.log(`[DB] Setting available for ${model}`)
+        log.info(HELPERS.db, `Setting available for ${model}`)
         if (model === 'Pokestop') {
           results.forEach((result) => {
             if ('conditions' in result) {
@@ -375,15 +381,11 @@ module.exports = class DbCheck {
           return [...returnSet]
         }
       } catch (e) {
-        console.warn(
-          '[WARN] Unable to query available for:',
-          model,
-          '\n',
-          e.message,
-        )
+        log.warn(HELPERS.db, 'Unable to query available for:', model, '\n', e)
         if (model === 'Nest') {
-          console.warn(
-            '[WARN] This is likely due to "nest" being in a useFor array but not in the database',
+          log.warn(
+            HELPERS.db,
+            'This is likely due to "nest" being in a useFor array but not in the database',
           )
         }
         return []

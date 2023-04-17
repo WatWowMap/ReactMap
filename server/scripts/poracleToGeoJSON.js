@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Credits: https://gist.github.com/moriakaice
  * Editor: PJ0tterr
@@ -8,6 +7,7 @@
 
 const fs = require('fs')
 const { resolve, dirname } = require('path')
+const { log } = require('../src/services/logger')
 
 // Set Path where for area.json
 const configFolderArea = resolve(
@@ -27,12 +27,12 @@ if (fs.existsSync(geofencesFile)) {
 
   fs.readFile(geofencesFile, 'utf8', (err, data) => {
     if (err) {
-      console.error(err)
+      log.error(err)
       return
     }
     const inGeoJSON = JSON.parse(data)
     if (inGeoJSON.length === 0) {
-      console.error('Failed to parse poracle geofence file')
+      log.error('Failed to parse poracle geofence file')
       return
     }
     for (let i = 0; i < inGeoJSON.length; i += 1) {
@@ -63,7 +63,7 @@ if (fs.existsSync(geofencesFile)) {
       JSON.stringify(outGeoJSON, null, 2),
       'utf8',
       () => {
-        console.log(`${outFilePath} file saved.`)
+        log.info(`${outFilePath} file saved.`)
       },
     )
   })

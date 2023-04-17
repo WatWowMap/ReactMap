@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const express = require('express')
 const fs = require('fs')
 const { resolve } = require('path')
@@ -10,6 +9,7 @@ const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 const { Event, Db } = require('../services/initialization')
 const { version } = require('../../../package.json')
+const { log, HELPERS } = require('../services/logger')
 
 const rootRouter = new express.Router()
 
@@ -18,16 +18,16 @@ rootRouter.use('/', clientRouter)
 rootRouter.use('/auth', authRouter)
 
 fs.readdir(resolve(__dirname, './api/v1/'), (e, files) => {
-  if (e) return console.error(e, 'Error initializing an API endpoint')
+  if (e) return log.error(HELPERS.api, 'Error initializing an API endpoint', e)
   files.forEach((file) => {
     try {
       rootRouter.use(
         `/api/v1/${file.replace('.js', '')}`,
         require(resolve(__dirname, './api/v1/', file)),
       )
-      console.log(`[API] Loaded ${file}`)
+      log.info(HELPERS.api, `Loaded ${file}`)
     } catch (err) {
-      console.warn('[WARN] Unable to load API endpoint:', file, '\n', err)
+      log.warn(HELPERS.api, 'Unable to load API endpoint:', file, '\n', err)
     }
   })
 })
@@ -45,7 +45,7 @@ rootRouter.post('/api/error/client', (req) => {
       user?.id ||
       'Unknown'
     if (error && config.devOptions.clientErrors) {
-      console.error('[CLIENT]', error, `- User: ${userName}`)
+      log.warn(HELPERS.client, `User: ${userName}`, error)
     }
   }
 })
@@ -68,7 +68,7 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
       return res.redirect('/404')
     }
   } catch (e) {
-    console.error(`[ERROR] Error navigating to ${area}`, e.message)
+    log.error(HELPERS.express, `Error navigating to ${area}`, e)
     res.redirect('/404')
   }
 })
@@ -100,8 +100,9 @@ rootRouter.get('/api/settings', async (req, res) => {
         if (config.authentication.perms[perm]) {
           req.session.perms[perm] = true
         } else {
-          console.warn(
-            '[AUTH] Invalid Perm in "alwaysEnabledPerms" array:',
+          log.warn(
+            HELPERS.auth,
+            'Invalid Perm in "alwaysEnabledPerms" array:',
             perm,
           )
         }
@@ -122,18 +123,19 @@ rootRouter.get('/api/settings', async (req, res) => {
               username: user.username || req.user.username,
             }
           }
-          console.log(
-            '[SESSION] Legacy user detected, forcing logout, User ID:',
+          log.info(
+            HELPERS.session,
+            'Legacy user detected, forcing logout, User ID:',
             req?.user?.id,
           )
           req.logout(() => {})
           return { valid: false, tutorial: !config.map.forceTutorial }
         } catch (e) {
-          console.log(
-            '[SESSION] Issue finding user, forcing logout, User ID:',
+          log.info(
+            HELPERS.session,
+            'Issue finding user, User ID:',
             req?.user?.id,
           )
-          req.logout(() => {})
           return { valid: false, tutorial: !config.map.forceTutorial }
         }
       } else if (req.session.perms) {
@@ -234,9 +236,10 @@ rootRouter.get('/api/settings', async (req, res) => {
             }
           }
         } catch (e) {
-          console.warn(
+          log.warn(
+            HELPERS.config,
             `Error setting ${setting}, most likely means there are no options set in the config`,
-            e.message,
+            e,
           )
         }
       })
@@ -360,9 +363,9 @@ rootRouter.get('/api/settings', async (req, res) => {
           )
         } catch (e) {
           serverSettings.webhooks = null
-          console.warn(
-            '[AUTH]',
-            e.message,
+          log.warn(
+            HELPERS.auth,
+            e,
             'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database. User ID:',
             serverSettings.user.id,
           )
@@ -371,7 +374,7 @@ rootRouter.get('/api/settings', async (req, res) => {
     }
     res.status(200).json({ serverSettings })
   } catch (error) {
-    console.error(error)
+    log.error(HELPERS.express, error)
     res.status(500).json({ error: error.message, status: 500 })
   }
 })

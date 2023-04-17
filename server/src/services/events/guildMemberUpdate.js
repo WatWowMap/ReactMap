@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
 const { Db } = require('../initialization')
 const { authentication } = require('../config')
+const { log, HELPERS } = require('../logger')
 
 module.exports = async (client, oldPresence, newPresence) => {
   const rolesBefore = oldPresence._roles
@@ -24,7 +24,8 @@ module.exports = async (client, oldPresence, newPresence) => {
       )
     }
   } catch (e) {
-    console.error(
+    log.error(
+      HELPERS.session,
       `Could not clear sessions for ${oldPresence.user.username}#${oldPresence.user.discriminator}`,
     )
   }

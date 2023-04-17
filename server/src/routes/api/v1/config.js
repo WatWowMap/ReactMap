@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
 const path = require('path')
 const router = require('express').Router()
 const config = require('../../../services/config')
+const { log, HELPERS } = require('../../../services/logger')
 
 router.get('/', (req, res) => {
   try {
@@ -31,9 +31,9 @@ router.get('/', (req, res) => {
     } else {
       throw new Error('Incorrect or missing API secret')
     }
-    console.log(`[API] api/v1/${path.parse(__filename).name}`)
+    log.info(HELPERS.api, `api/v1/${path.parse(__filename).name}`)
   } catch (e) {
-    console.error(`[API Error] api/v1/${path.parse(__filename).name}`, e)
+    log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}`, e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })
