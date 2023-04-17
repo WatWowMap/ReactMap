@@ -1,6 +1,7 @@
 process.title = 'ReactMap'
 process.env.FORCE_COLOR = 1
 
+require('dotenv').config()
 const path = require('path')
 const express = require('express')
 const logger = require('morgan')
