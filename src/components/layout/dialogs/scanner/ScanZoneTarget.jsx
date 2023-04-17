@@ -115,9 +115,7 @@ export default function ScanZoneTarget({
 
   const handleSizeChange = (_event, newSize) => {
     setScanZoneSize(newSize)
-    setScanZoneCoords(
-      calcScanZoneCoords(position, radius, spacing, scanZoneSize),
-    )
+    setScanZoneCoords(calcScanZoneCoords(position, radius, spacing, newSize))
   }
 
   const handleSpacingChange = (_event, newSpacing) => {
