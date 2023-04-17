@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
 const fetchJson = require('./fetchJson')
 const { Event } = require('../initialization')
+const { log, HELPERS } = require('../logger')
 
 const getWildCards = (category, gymBattles) => {
   switch (category) {
@@ -66,9 +66,10 @@ module.exports = async function resolveQuickHook(
       message: 'Success',
     }
   } catch (e) {
-    console.log(
-      e.message,
+    log.info(
+      HELPERS.webhooks,
       'There was a problem processing that webhook request',
+      e,
     )
     return { status: 'error', message: e.message }
   }

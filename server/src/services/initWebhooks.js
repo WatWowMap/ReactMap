@@ -1,5 +1,5 @@
-/* eslint-disable no-console */
 const fetchJson = require('./api/fetchJson')
+const { log, HELPERS } = require('./logger')
 const webhookUi = require('./ui/webhook')
 
 module.exports = async function initWebhooks(webhook, config) {
@@ -83,7 +83,7 @@ module.exports = async function initWebhooks(webhook, config) {
           (x) => !webhook.areasToSkip.includes(x.properties.name.toLowerCase()),
         )
       } else {
-        console.warn('No geofences found')
+        log.warn(HELPERS.webhooks, 'No geofences found')
       }
 
       if (templates) {
@@ -126,11 +126,12 @@ module.exports = async function initWebhooks(webhook, config) {
           : baseSettings,
       }
     }
-    console.log(`[EVENT] ${webhook.name} webhook initialized`)
+    log.info(HELPERS.webhooks, `${webhook.name} webhook initialized`)
   } catch (e) {
-    console.log(
-      config.devOptions.enabled ? e : e.message,
+    log.error(
+      HELPERS.webhooks,
       'An error has occurred during webhook initialization',
+      e,
     )
   }
   return {}

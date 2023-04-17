@@ -1,5 +1,5 @@
-/* eslint-disable no-console */
 const fetch = require('node-fetch')
+const { log, HELPERS } = require('./logger')
 
 const capCamel = (str) =>
   str
@@ -15,7 +15,7 @@ const mapPerms = (perms, userPerms) =>
     )
     .join('\n')
 
-module.exports = async function getAuthInfo(req, user, strategy) {
+module.exports = async function getAuthInfo(req, user, strategy = 'custom') {
   const ip =
     req.headers['cf-connecting-ip'] ||
     (req.headers['x-forwarded-for'] || '').split(', ')[0] ||
@@ -28,7 +28,11 @@ module.exports = async function getAuthInfo(req, user, strategy) {
   )
     .then((res) => res.json())
     .catch((err) => {
-      console.warn('failed to fetch user information', err)
+      log.warn(
+        HELPERS.custom(strategy.toUpperCase(), '#7289da'),
+        'failed to fetch user information',
+        err,
+      )
       return {}
     })
 
@@ -153,19 +157,28 @@ module.exports = async function getAuthInfo(req, user, strategy) {
     })
   }
   if (user.valid) {
-    console.log(
-      '[DISCORD]',
+    log.info(
+      HELPERS.custom(strategy.toUpperCase(), '#7289da'),
       user.username,
       `(${user.id})`,
       'Authenticated successfully.',
     )
     embed.color = 0x00ff00
   } else if (user.perms?.blocked) {
-    console.warn('[DISCORD]', user.id, 'Blocked due to', user.blocked)
+    log.warn(
+      HELPERS.custom(strategy.toUpperCase(), '#7289da'),
+      user.id,
+      'Blocked due to',
+      user.blocked,
+    )
     embed.description = `User Blocked Due to ${user.blocked}`
     embed.color = 0xff0000
   } else {
-    console.warn('[DISCORD]', user.id, 'Not authorized to access map')
+    log.warn(
+      HELPERS.custom(strategy.toUpperCase(), '#7289da'),
+      user.id,
+      'Not authorized to access map',
+    )
   }
   return embed
 }

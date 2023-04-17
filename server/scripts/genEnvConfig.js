@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
 const fs = require('fs')
 const sourceConfig = require('../src/configs/default.json')
+const { log } = require('../src/services/logger')
 
 const camelToSnake = (str) =>
   str.replace(/([a-z](?=[A-Z]))/g, '$1_').toUpperCase()
@@ -33,5 +33,5 @@ const generateEnvConfig = async () => {
 module.exports.generateEnvConfig = generateEnvConfig
 
 if (require.main === module) {
-  generateEnvConfig().then(() => console.log('Env Config Generated'))
+  generateEnvConfig().then(() => log.info('Env Config Generated'))
 }

@@ -1,8 +1,8 @@
-/* eslint-disable no-console */
 const config = require('../config')
 const resolveQuickHook = require('./resolveQuickHook')
 const fetchJson = require('./fetchJson')
 const { Event } = require('../initialization')
+const { log, HELPERS } = require('../logger')
 
 module.exports = async function webhookApi(
   category,
@@ -194,9 +194,10 @@ module.exports = async function webhookApi(
     }
     return post
   } catch (e) {
-    console.log(
-      e.message,
+    log.error(
+      HELPERS.webhooks,
       'There was a problem processing that webhook request',
+      e,
     )
     return { status: 'error', message: 'webhook_error' }
   }

@@ -1,10 +1,10 @@
-/* eslint-disable no-console */
 const { promises: fs } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
 const { generate } = require('../../scripts/generateMasterfile')
 const fetchJson = require('./api/fetchJson')
 const initWebhooks = require('./initWebhooks')
+const { log, HELPERS } = require('./logger')
 
 module.exports = class EventManager {
   constructor(masterfile) {
@@ -22,8 +22,8 @@ module.exports = class EventManager {
     return this.available[category]
   }
 
-  async setAvailable(category, model, Db, log) {
-    this.available[category] = await Db.getAvailable(model, log)
+  async setAvailable(category, model, Db) {
+    this.available[category] = await Db.getAvailable(model)
   }
 
   set clients(clients) {
@@ -88,7 +88,7 @@ module.exports = class EventManager {
     }
     if (Pvp) {
       setInterval(async () => {
-        console.log('[EVENT] Fetching Latest PVP Masterfile')
+        log.info(HELPERS.event, 'Fetching Latest PVP Masterfile')
         Pvp.updatePokemonData(await Ohbem.fetchPokemonData())
         this.chatLog({ description: 'Refreshed PVP masterfile' })
       }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
@@ -102,8 +102,9 @@ module.exports = class EventManager {
     config.authentication.strategies.forEach((strategy) => {
       if (strategy.enabled) {
         if (strategy.trialPeriod.start.js >= newDate) {
-          console.log(
-            '[EVENT] Trial period starting in',
+          log.info(
+            HELPERS.event,
+            'Trial period starting in',
             +((strategy.trialPeriod.start.js - newDate) / 1000 / 60).toFixed(2),
             `minutes for ${strategy.name}`,
           )
@@ -116,8 +117,9 @@ module.exports = class EventManager {
           }, strategy.trialPeriod.start.js - newDate)
         }
         if (strategy.trialPeriod.end.js >= newDate) {
-          console.log(
-            '[EVENT] Trial period ending in',
+          log.info(
+            HELPERS.event,
+            'Trial period ending in',
             +((strategy.trialPeriod.end.js - newDate) / 1000 / 60).toFixed(2),
             `minutes for ${strategy.name}`,
           )
@@ -134,10 +136,11 @@ module.exports = class EventManager {
   }
 
   async getUicons(styles) {
-    console.log('[EVENT] Fetching Latest UICONS')
+    log.info(HELPERS.event, 'Fetching Latest UICONS')
     if (!styles.some((icon) => icon.path.includes('wwm'))) {
-      console.log(
-        '[UICONS] Base uicons not found in config (either remotely or locally). This may be fine, but some things might be broken, such as items from the `misc` folder.',
+      log.info(
+        HELPERS.event,
+        'Base uicons not found in config (either remotely or locally). This may be fine, but some things might be broken, such as items from the `misc` folder.',
       )
     }
     this.uicons = await Promise.all(
@@ -155,14 +158,16 @@ module.exports = class EventManager {
               )
           return { ...style, data: response }
         } catch (e) {
-          console.warn(
-            '[WARN] Failed to generate latest uicons for:',
+          log.warn(
+            HELPERS.event,
+            'Failed to generate latest uicons for:',
             style,
             '\n',
-            e.message,
+            e,
           )
-          console.warn(
-            `[WARN] Make sure the path follows one of these two formats: \n\tRemote: ${this.baseUrl}\n\tLocal: wwm-uicons (And the uicons folder is found at /public/images/uicons/wwm-uicons/)`,
+          log.warn(
+            HELPERS.event,
+            `Make sure the path follows one of these two formats: \n\tRemote: ${this.baseUrl}\n\tLocal: wwm-uicons (And the uicons folder is found at /public/images/uicons/wwm-uicons/)`,
           )
         }
       }),
@@ -172,26 +177,26 @@ module.exports = class EventManager {
 
   async getInvasions(endpoint) {
     if (endpoint) {
-      console.log('[EVENT] Fetching Latest Invasions')
+      log.info(HELPERS.event, 'Fetching Latest Invasions')
       try {
         const newInvasions = await fetchJson(endpoint)
         if (newInvasions) {
           this.invasions = newInvasions
         }
       } catch (e) {
-        console.warn('[WARN] Unable to generate latest invasions:\n', e.message)
+        log.warn(HELPERS.event, 'Unable to generate latest invasions:\n', e)
       }
     }
   }
 
   async getMasterfile(historical, dbRarity) {
-    console.log('[EVENT] Fetching Latest Masterfile')
+    log.info(HELPERS.event, 'Fetching Latest Masterfile')
     try {
       const newMf = await generate(false, historical, dbRarity)
       this.masterfile = newMf ?? this.masterfile
       this.addAvailable()
     } catch (e) {
-      console.warn('[WARN] Failed to generate latest masterfile:\n', e.message)
+      log.warn(HELPERS.event, 'Failed to generate latest masterfile:\n', e)
     }
   }
 
@@ -207,15 +212,16 @@ module.exports = class EventManager {
               quickMoves: [],
               chargeMoves: [],
             }
-            console.log(`[MF] Added ${id} to Pokemon`)
+            log.info(HELPERS.event, `Added ${id} to Pokemon`)
           }
           if (!this.masterfile.pokemon[id].forms) {
             this.masterfile.pokemon[id].forms = {}
           }
           if (!this.masterfile.pokemon[id].forms[form]) {
             this.masterfile.pokemon[id].forms[form] = { name: '*', category }
-            console.log(
-              `[MF] Added ${this.masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`,
+            log.info(
+              HELPERS.event,
+              `Added ${this.masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`,
             )
           }
         }

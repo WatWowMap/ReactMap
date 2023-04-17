@@ -1,8 +1,7 @@
-/* eslint-disable no-console */
 const fs = require('fs')
 const path = require('path')
 const { api } = require('../src/services/config')
-
+const { log, HELPERS } = require('../src/services/logger')
 const fetchJson = require('../src/services/api/fetchJson')
 
 const appLocalesFolder = path.resolve(__dirname, '../../public/base-locales')
@@ -11,7 +10,7 @@ const missingFolder = path.resolve(__dirname, '../../public/missing-locales')
 
 const locales = async () => {
   if (!api.pogoApiEndpoints.translations)
-    console.error('[LOCALES] No translations endpoint')
+    log.error(HELPERS.locales, 'No translations endpoint')
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
   const englishRef = fs.readFileSync(
     path.resolve(appLocalesFolder, 'en.json'),
@@ -20,8 +19,8 @@ const locales = async () => {
 
   fs.mkdir(finalLocalesFolder, (error) =>
     error
-      ? console.log('[LOCALES] Locales folder already exists, skipping')
-      : console.log('[LOCALES] locales folder created'),
+      ? log.info(HELPERS.locales, 'Locales folder already exists, skipping')
+      : log.info(HELPERS.locales, '[LOCALES] locales folder created'),
   )
 
   const availableRemote = await fetchJson(
@@ -38,7 +37,7 @@ const locales = async () => {
       const trimmedRemoteFiles = {}
 
       fs.mkdir(`${finalLocalesFolder}/${baseName}`, (error) =>
-        error ? {} : console.log(`[LOCALES] ${locale} folder created`),
+        error ? {} : log.info(HELPERS.locales, locale, `folder created`),
       )
 
       try {
@@ -50,8 +49,9 @@ const locales = async () => {
         )
 
         if (!hasRemote) {
-          console.warn(
-            '[LOCALES] No remote translation found for',
+          log.warn(
+            HELPERS.locales,
+            'No remote translation found for',
             locale,
             'using English',
           )
@@ -72,7 +72,7 @@ const locales = async () => {
           }
         })
       } catch (e) {
-        console.warn(e, '\n', locale)
+        log.error(HELPERS.locales, e, '\n', locale)
       }
 
       const finalTranslations = {
@@ -86,7 +86,7 @@ const locales = async () => {
         'utf8',
         () => {},
       )
-      console.log(`[LOCALES] ${locale}`, 'file saved.')
+      log.info(HELPERS.locales, locale, 'file saved.')
     }),
   )
 }
@@ -101,7 +101,7 @@ const missing = async () => {
   )
 
   fs.mkdir(missingFolder, (error) =>
-    error ? {} : console.log('[LOCALES] Locales folder created'),
+    error ? {} : log.info(HELPERS.locales, 'Locales folder created'),
   )
 
   localTranslations.forEach((locale) => {
@@ -131,7 +131,7 @@ const missing = async () => {
       'utf8',
       () => {},
     )
-    console.log(`[LOCALES] ${locale}`, 'file saved.')
+    log.info(HELPERS.locales, locale, 'file saved.')
   })
 }
 
@@ -139,11 +139,11 @@ module.exports.locales = locales
 module.exports.missing = missing
 
 if (require.main === module) {
-  locales().then(() => console.log('[LOCALES] Translations generated'))
+  locales().then(() => log.info(HELPERS.locales, 'Translations generated'))
 
   if (process.argv[2] === '--missing') {
     missing().then(() =>
-      console.log('[LOCALES] Missing translations generated'),
+      log.info(HELPERS.locales, 'Missing translations generated'),
     )
   }
 }

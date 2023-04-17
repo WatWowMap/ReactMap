@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const fetch = require('node-fetch')
 const { TelegramStrategy } = require('passport-telegram-official')
 const passport = require('passport')
@@ -9,6 +8,7 @@ const {
   map: { forceTutorial },
   authentication,
 } = require('./config')
+const { log, HELPERS } = require('./logger')
 
 module.exports = class TelegramClient {
   constructor(strategy, rmStrategy) {
@@ -45,9 +45,9 @@ module.exports = class TelegramClient {
             groups.push(group)
           }
         } catch (e) {
-          console.error(
-            `[${this.rmStrategy?.toUpperCase()}]`,
-            e.message,
+          log.error(
+            HELPERS.custom(this.rmStrategy?.toUpperCase(), '#26A8EA'),
+            e,
             `Telegram Group: ${group}`,
             `User: ${user.id} (${user.username})`,
           )
@@ -110,8 +110,8 @@ module.exports = class TelegramClient {
               .where('telegramId', user.id)
               .whereNot('id', req.user.id)
               .delete()
-            console.log(
-              `[${this.rmStrategy?.toUpperCase()}]`,
+            log.info(
+              HELPERS.custom(this.rmStrategy?.toUpperCase(), '#26A8EA'),
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -137,8 +137,8 @@ module.exports = class TelegramClient {
               .where('id', userExists.id)
             userExists.strategy = 'telegram'
           }
-          console.log(
-            `[${this.rmStrategy?.toUpperCase()}]`,
+          log.info(
+            HELPERS.custom(this.rmStrategy?.toUpperCase(), '#26A8EA'),
             user.username,
             `(${user.id})`,
             'Authenticated successfully.',
@@ -150,8 +150,8 @@ module.exports = class TelegramClient {
           })
         })
     } catch (e) {
-      console.error(
-        `[${this.rmStrategy?.toUpperCase()}]`,
+      log.error(
+        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#26A8EA'),
         'User has failed auth.',
         e,
       )

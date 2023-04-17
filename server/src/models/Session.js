@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const { Model } = require('objection')
 const {
   api: { maxSessions },
@@ -6,6 +5,7 @@ const {
     settings: { sessionTableName },
   },
 } = require('../services/config')
+const { log, HELPERS } = require('../services/logger')
 
 module.exports = class Session extends Model {
   static get tableName() {
@@ -14,7 +14,7 @@ module.exports = class Session extends Model {
 
   static async clear() {
     const results = await this.query().delete()
-    console.log('[Session] Clear Result:', results)
+    log.info(HELPERS.session, 'Clear Result:', results)
     return results
   }
 
@@ -27,7 +27,7 @@ module.exports = class Session extends Model {
         .andWhere('expires', '>=', ts)
       return results.length < maxSessions
     } catch (e) {
-      console.error('[SESSION] Unable to validate session', e)
+      log.error(HELPERS.session, 'Unable to validate session', e)
       return false
     }
   }
@@ -38,10 +38,10 @@ module.exports = class Session extends Model {
         .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
         .andWhere('session_id', '!=', currentSessionId || '')
         .delete()
-      console.log('[Session] Clear Result:', results)
+      log.info(HELPERS.session, 'Clear Result:', results)
       return results
     } catch (e) {
-      console.error('[SESSION] Unable to clear other sessions', e)
+      log.error(HELPERS.session, 'Unable to clear other sessions', e)
     }
     return 0
   }
@@ -54,13 +54,10 @@ module.exports = class Session extends Model {
         )
         .orWhereRaw(`json_extract(data, '$.passport.user.id') = '${discordId}'`)
         .delete()
-      console.log(
-        `[Session${botName && ` - ${botName}`}] Clear Result:`,
-        results,
-      )
+      log.info(`[Session${botName && ` - ${botName}`}] Clear Result:`, results)
       return results
     } catch (e) {
-      console.error('[SESSION] Unable to clear Discord sessions', e)
+      log.error(HELPERS.session, 'Unable to clear Discord sessions', e)
     }
     return 0
   }
