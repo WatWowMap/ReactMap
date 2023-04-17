@@ -78,12 +78,10 @@ const server = new ApolloServer({
       return { message: 'old_client' }
     }
     if (e.message === 'session_expired') {
-      if (config.devOptions.enabled) {
-        log.info(
-          HELPERS.gql,
-          'user session expired, forcing logout, no need to report this error unless it continues to happen',
-        )
-      }
+      log.debug(
+        HELPERS.gql,
+        'user session expired, forcing logout, no need to report this error unless it continues to happen',
+      )
       return { message: 'session_expired' }
     }
     log.error(HELPERS.gql, e)

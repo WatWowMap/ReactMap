@@ -234,7 +234,7 @@ module.exports = class EventManager {
       config.webhooks.map(async (webhook) => {
         this.webhookObj = {
           ...this.webhookObj,
-          [webhook.name]: await initWebhooks(webhook, config),
+          [webhook.name]: await initWebhooks(webhook),
         }
       }),
     )
