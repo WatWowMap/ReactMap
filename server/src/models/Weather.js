@@ -1,6 +1,8 @@
 const { Model, ref, raw } = require('objection')
-const { polygon } = require('@turf/helpers')
+const { polygon, point } = require('@turf/helpers')
 const { default: booleanOverlap } = require('@turf/boolean-overlap')
+const { default: pointInPolygon } = require('@turf/boolean-point-in-polygon')
+const { default: booleanContains } = require('@turf/boolean-contains')
 
 const getPolyVector = require('../services/functions/getPolyVector')
 const config = require('../services/config')
@@ -42,17 +44,33 @@ module.exports = class Weather extends Model {
         )
       : cleanUserAreas
 
+    const boundPolygon = polygon([
+      [
+        [args.minLon, args.minLat],
+        [args.maxLon, args.minLat],
+        [args.maxLon, args.maxLat],
+        [args.minLon, args.maxLat],
+        [args.minLon, args.minLat],
+      ],
+    ])
+
     return results
       .map((cell) => {
+        const center = point([cell.longitude, cell.latitude])
         const { poly, revPoly } = getPolyVector(cell.id, true)
         const geojson = polygon([revPoly])
         const hasOverlap =
-          !merged.length ||
-          merged.some(
-            (area) =>
-              config.areas.scanAreasObj[area] &&
-              booleanOverlap(geojson, config.areas.scanAreasObj[area]),
-          )
+          (pointInPolygon(center, boundPolygon) ||
+            booleanOverlap(geojson, boundPolygon) ||
+            booleanContains(geojson, boundPolygon)) &&
+          (!merged.length ||
+            merged.some(
+              (area) =>
+                config.areas.scanAreasObj[area] &&
+                (pointInPolygon(center, config.areas.scanAreasObj[area]) ||
+                  booleanOverlap(geojson, config.areas.scanAreasObj[area]) ||
+                  booleanContains(geojson, config.areas.scanAreasObj[area])),
+            ))
         return (
           hasOverlap && {
             ...cell,

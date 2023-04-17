@@ -110,7 +110,6 @@ module.exports = gql`
       locale: String
       webhookName: String
       midnight: Int
-
       onlyAreas: [String]
     ): [SearchQuest]
     spawnpoints(
@@ -130,7 +129,13 @@ module.exports = gql`
       zoom: Int
       filters: JSON
     ): [SubmissionCell]
-    weather(filters: JSON): [Weather]
+    weather(
+      minLat: Float
+      maxLat: Float
+      minLon: Float
+      maxLon: Float
+      filters: JSON
+    ): [Weather]
     webhook(category: String, status: String, name: String): Poracle
     scanner(category: String, method: String, data: JSON): ScannerApi
   }
