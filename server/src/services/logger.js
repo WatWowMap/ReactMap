@@ -30,10 +30,24 @@ const HELPERS = {
   db: chalk.hex('#aa00ff')('[DB]'),
   event: chalk.hex('#283593')('[EVENT]'),
   webhooks: chalk.hex('#1de9b6')('[WEBHOOKS]'),
-  pokemon: chalk.hex('#ffc107')('[POKEMON]'),
+  geocoder: chalk.hex('#ff5722')('[GEOCODER]'),
   fetch: chalk.hex('#880e4f')('[FETCH]'),
   scanner: chalk.hex('#b39ddb')('[SCANNER]'),
   build: chalk.hex('#ef6c00')('[BUILD]'),
+
+  pokemon: chalk.hex('#f44336')('[POKEMON]'),
+  pokestops: chalk.hex('#e91e63')('[POKESTOPS]'),
+  gyms: chalk.hex('#9c27b0')('[GYMS]'),
+  weather: chalk.hex('#3f51b5')('[WEATHER]'),
+  available: chalk.hex('#2196f3')('[AVAILABLE]'),
+  scanAreas: chalk.hex('#00bcd4')('[SCAN AREAS]'),
+  scanAreasMenu: chalk.hex('#009688')('[SCAN AREAS MENU]'),
+  submissionCells: chalk.hex('#4caf50')('[SUBMISSION CELLS]'),
+  spawnpoints: chalk.hex('#8bc34a')('[SPAWNPOINTS]'),
+  scanCells: chalk.hex('#ffeb3b')('[SCAN CELLS]'),
+  s2cells: chalk.hex('#ffc107')('[S2 CELLS]'),
+  devices: chalk.hex('#ff9800')('[DEVICE]'),
+
   custom: (text, color = '#64b5f6') => chalk.hex(color)(`[${text}]`),
 }
 
