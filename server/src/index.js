@@ -111,11 +111,7 @@ const server = new ApolloServer({
 
 server.start().then(() => server.applyMiddleware({ app, path: '/graphql' }))
 
-if (
-  config.devOptions.logLevel !== 'warn' &&
-  config.devOptions.logLevel !== 'error' &&
-  config.devOptions.logLevel !== 'info'
-) {
+if (process.env.LOG_LEVEL === 'debug' || process.env.LOG_LEVEL === 'trace') {
   app.use(
     logger((tokens, req, res) =>
       [
