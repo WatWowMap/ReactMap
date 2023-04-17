@@ -23,6 +23,7 @@ const StyledAccordion = withStyles({
     '&$expanded': {
       marginTop: 5,
     },
+    width: '100%',
   },
   rounded: {
     borderRadius: 5,
@@ -64,16 +65,20 @@ export default function AdvancedAccordion({ block = null, children }) {
       >
         <Typography variant="caption">{t('advanced')}</Typography>
       </StyledAccordionSummary>
-      <AccordionDetails>
-        <Grid
-          container
-          style={{ width: 200 }}
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-        >
-          {block ?? children}
-        </Grid>
+      <AccordionDetails style={{ width: '100%' }}>
+        {block ? (
+          <Grid
+            container
+            style={{ width: 200 }}
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+          >
+            {block}
+          </Grid>
+        ) : (
+          children
+        )}
       </AccordionDetails>
     </StyledAccordion>
   )

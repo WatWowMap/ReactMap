@@ -1,5 +1,14 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react'
-import { Grid, Button, Box, Slider, Typography } from '@material-ui/core'
+import {
+  Button,
+  ButtonGroup,
+  Slider,
+  List,
+  ListItemText,
+  ListItem,
+  ListSubheader,
+  Divider,
+} from '@material-ui/core'
 import { point } from '@turf/helpers'
 import destination from '@turf/destination'
 import { Circle, Marker, Popup } from 'react-leaflet'
@@ -7,6 +16,13 @@ import { useTranslation } from 'react-i18next'
 import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
 import Utility from '@services/Utility'
 import fallbackIcon from '@components/markers/fallback'
+import {
+  InAllowedArea,
+  ScanCancel,
+  ScanConfirm,
+  ScanQueue,
+  ScanRequests,
+} from './Shared'
 
 const calcScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
   let coords = [center]
@@ -41,6 +57,11 @@ const calcScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
     }
   }
   return coords
+}
+
+const RADIUS = {
+  pokemon: 70,
+  gym: 750,
 }
 
 export default function ScanZoneTarget({
@@ -102,14 +123,14 @@ export default function ScanZoneTarget({
   const handleSpacingChange = (_event, newSpacing) => {
     setSpacing(newSpacing)
     setScanZoneCoords(
-      calcScanZoneCoords(position, radius, spacing, scanZoneSize),
+      calcScanZoneCoords(position, radius, newSpacing, scanZoneSize),
     )
   }
 
   const handleRadiusChange = (_event, newRadius) => {
     setRadius(newRadius)
     setScanZoneCoords(
-      calcScanZoneCoords(position, radius, spacing, scanZoneSize),
+      calcScanZoneCoords(position, newRadius, spacing, scanZoneSize),
     )
   }
 
@@ -142,24 +163,19 @@ export default function ScanZoneTarget({
         icon={fallbackIcon()}
       >
         <Popup minWidth={90} maxWidth={200} ref={scanPopupRef} autoPan={false}>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="center"
-            direction="column"
-            spacing={2}
-          >
-            <Grid item>
-              <Typography variant="subtitle2" align="center">
-                {t('scan_zone_choose')}
-              </Typography>
-            </Grid>
+          <List>
+            <ListItemText
+              className="no-leaflet-margin"
+              secondary={t('scan_zone_choose')}
+              style={{ textAlign: 'center' }}
+            />
+            <Divider style={{ margin: '10px 0' }} />
             {scannerType !== 'mad' && (
-              <Grid item xs={12}>
-                <Box>
-                  <Typography variant="caption" align="left">
-                    {t('scan_zone_size')}
-                  </Typography>
+              <>
+                <ListSubheader disableSticky style={{ lineHeight: 2 }}>
+                  {t('scan_zone_size')}
+                </ListSubheader>
+                <ListItem style={{ padding: 0 }}>
                   <Slider
                     name="Size"
                     min={1}
@@ -169,96 +185,81 @@ export default function ScanZoneTarget({
                     onChange={handleSizeChange}
                     valueLabelDisplay="auto"
                   />
-                  <Typography variant="caption" align="left">
-                    {t('scan_zone_range')}
-                  </Typography>
-                  <Slider
-                    name="Range"
-                    marks={[
-                      { value: scanZoneRadius.pokemon, label: t('pokemon') },
-                      { value: scanZoneRadius.gym, label: t('gym') },
-                    ]}
-                    min={-200}
-                    max={1400}
-                    step={null}
-                    value={radius}
-                    onChange={handleRadiusChange}
-                    valueLabelDisplay="auto"
-                  />
-                </Box>
+                </ListItem>
+                <ListSubheader disableSticky style={{ lineHeight: 2 }}>
+                  {t('scan_zone_range')}
+                </ListSubheader>
+                <ListItem style={{ padding: 2 }}>
+                  <ButtonGroup size="small" fullWidth>
+                    {['pokemon', 'gym'].map((item) => (
+                      <Button
+                        key={item}
+                        onClick={() => handleRadiusChange(null, RADIUS[item])}
+                        color={
+                          RADIUS[item] === radius ? 'primary' : 'secondary'
+                        }
+                        variant={
+                          RADIUS[item] === radius ? 'contained' : 'outlined'
+                        }
+                      >
+                        {t(item)}
+                      </Button>
+                    ))}
+                  </ButtonGroup>
+                </ListItem>
                 {advancedScanZoneOptions && (
-                  <AdvancedAccordion>
-                    <Grid item xs={12} style={{ textAlign: 'center' }}>
-                      <Typography variant="caption">
-                        {t('scan_zone_spacing')}
-                      </Typography>
-                      <Slider
-                        xs={12}
-                        name="Spacing"
-                        min={1}
-                        max={2}
-                        step={0.01}
-                        value={spacing}
-                        onChange={handleSpacingChange}
-                        valueLabelDisplay="auto"
-                      />
-                      <Typography variant="caption">
-                        {t('scan_zone_radius')}
-                      </Typography>
-                      <Slider
-                        name="Radius"
-                        min={50}
-                        max={900}
-                        value={radius}
-                        onChange={handleRadiusChange}
-                        valueLabelDisplay="auto"
-                      />
-                    </Grid>
-                  </AdvancedAccordion>
+                  <ListItem style={{ padding: '10px 0' }}>
+                    <AdvancedAccordion>
+                      <List
+                        style={{
+                          textAlign: 'center',
+                          width: '80%',
+                          padding: 0,
+                        }}
+                      >
+                        <ListSubheader disableSticky style={{ lineHeight: 2 }}>
+                          {t('scan_zone_spacing')}
+                        </ListSubheader>
+                        <Slider
+                          name="Spacing"
+                          min={1}
+                          max={2}
+                          step={0.01}
+                          value={spacing}
+                          onChange={handleSpacingChange}
+                          valueLabelDisplay="auto"
+                          style={{ margin: 0, padding: 0 }}
+                        />
+                        <ListSubheader disableSticky style={{ lineHeight: 2 }}>
+                          {t('scan_zone_radius')}
+                        </ListSubheader>
+                        <Slider
+                          name="Radius"
+                          min={50}
+                          max={900}
+                          value={radius}
+                          onChange={handleRadiusChange}
+                          valueLabelDisplay="auto"
+                        />
+                      </List>
+                    </AdvancedAccordion>
+                  </ListItem>
                 )}
-              </Grid>
+              </>
             )}
-            <Grid item style={{ textAlign: 'center' }}>
-              {scanZoneShowScanCount && (
-                <Typography variant="body2" style={{ margin: '0px 0px 12px' }}>
-                  {`${t('scan_requests')}: ${scanZoneCoords?.length}`}
-                </Typography>
-              )}
-              {scanZoneShowScanQueue && (
-                <Typography variant="body2" style={{ margin: '0px 0px 12px' }}>
-                  {`${t('scan_queue')}: ${queue || '...'}`}
-                </Typography>
-              )}
-              <Button
-                color="secondary"
-                variant="contained"
-                disabled={Boolean(
-                  scanZoneAreaRestriction?.length && !isInAllowedArea,
-                )}
-                onClick={() => setScanZoneMode('sendCoords')}
-              >
-                {t('click_to_scan')}
-              </Button>
-            </Grid>
-            <Grid item style={{ display: isInAllowedArea ? 'none' : 'block' }}>
-              <Typography
-                variant="body2"
-                align="center"
-                style={{ fontStyle: 'italic' }}
-              >
-                {t('scan_outside_area')}
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Button
-                align="left"
-                size="small"
-                onClick={() => setScanZoneMode(false)}
-              >
-                {t('cancel')}
-              </Button>
-            </Grid>
-          </Grid>
+            {scanZoneShowScanCount && (
+              <ScanRequests amount={scanZoneCoords?.length} />
+            )}
+            {scanZoneShowScanQueue && <ScanQueue queue={queue} />}
+            <Divider style={{ margin: '10px 0' }} />
+            <ScanConfirm
+              isInAllowedArea={isInAllowedArea}
+              setMode={setScanZoneMode}
+              areaRestrictions={scanZoneAreaRestriction}
+            />
+            <InAllowedArea isInAllowedArea={isInAllowedArea} />
+            <ScanCancel setMode={setScanZoneMode} />
+          </List>
         </Popup>
       </Marker>
       {scanZoneCoords.map((coords) => (
