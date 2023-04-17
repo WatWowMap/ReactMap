@@ -1,14 +1,15 @@
-/* eslint-disable no-console */
 const { resolve } = require('path')
 const fs = require('fs')
 
 const config = require('./config')
+const { log, HELPERS } = require('./logger')
 
 module.exports = Object.fromEntries(
   config.authentication.strategies
     .filter(({ name, enabled }) => {
-      console.log(
-        `[AUTH] Strategy ${name} ${enabled ? '' : 'was not '}initialized`,
+      log.info(
+        HELPERS.auth,
+        `Strategy ${name} ${enabled ? '' : 'was not '}initialized`,
       )
       return !!enabled
     })
@@ -26,9 +27,10 @@ module.exports = Object.fromEntries(
             : buildStrategy,
         ]
       } catch (e) {
-        console.error(
+        log.error(
+          HELPERS.auth,
           `\nFailed to load ${name} to log scanner requests, this likely means that you are using a non-updated custom strategy, please view the newly updated module.exports found at the bottom of the base strategy file:\n /server/src/strategies/${type}.js.\nRelevant Changes: https://github.com/WatWowMap/ReactMap/pull/590/files#diff-394ccb49bcfb0f1a2579a922821e914aeb25904dace1658cd251d70f63c5d529`,
-          e.message,
+          e,
         )
         return [name, null]
       }

@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
 const fetchJson = require('./fetchJson')
 const { Event } = require('../initialization')
+const { log, HELPERS } = require('../logger')
 
 module.exports = async function fetchRaids() {
   try {
@@ -21,7 +21,7 @@ module.exports = async function fetchRaids() {
     })
     return raidsInfo
   } catch (e) {
-    console.warn(e, '\nUnable to fetch available raids from GitHub')
+    log.warn(HELPERS.fetch, 'Unable to fetch available raids from GitHub', e)
     return []
   }
 }

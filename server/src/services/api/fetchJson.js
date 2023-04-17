@@ -1,11 +1,7 @@
-/* eslint-disable no-console */
 const fetch = require('node-fetch')
+const { log, HELPERS } = require('../logger')
 
-module.exports = async function fetchJson(
-  url,
-  options = undefined,
-  log = false,
-) {
+module.exports = async function fetchJson(url, options = undefined) {
   const controller = new AbortController()
 
   const timeout = setTimeout(() => {
@@ -13,18 +9,14 @@ module.exports = async function fetchJson(
   }, 5000)
 
   try {
-    if (log) console.log(url, options)
+    log.debug(HELPERS.fetch, url, options || '')
     const response = await fetch(url, { ...options, signal: controller.signal })
     if (!response.ok) {
       throw new Error(`${response.status} (${response.statusText})`)
     }
     return response.json()
   } catch (e) {
-    if (log) {
-      console.warn(e)
-    } else if (e instanceof Error) {
-      console.warn(e.message, '\n', e.code, `\nUnable to fetch ${url}`)
-    }
+    log.warn(HELPERS.fetch, `Unable to fetch ${url}`, '\n', e)
     return null
   } finally {
     clearTimeout(timeout)

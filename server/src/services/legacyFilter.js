@@ -10,6 +10,7 @@ const {
   },
 } = require('./config')
 const { Pvp, Event } = require('./initialization')
+const { log, HELPERS } = require('./logger')
 
 const jsifyIvFilter = (filter) => {
   const input = filter.toUpperCase()
@@ -167,8 +168,7 @@ const getLegacy = (results, args, perms, ts) => {
     } else {
       const pokemonId = parseInt(key)
       if (Number.isNaN(pokemonId)) {
-        // eslint-disable-next-line no-console
-        console.warn('Unrecognized key', key)
+        log.warn('Unrecognized key', key)
       } else {
         pokemonLookup[pokemonId] = false
         const defaultForm = (Event.masterfile.pokemon[pokemonId] || {})
@@ -207,8 +207,7 @@ const getLegacy = (results, args, perms, ts) => {
       } else {
         const pokemonId = parseInt(key)
         if (Number.isNaN(pokemonId)) {
-          // eslint-disable-next-line no-console
-          console.warn('Unrecognized key', key)
+          log.warn(HELPERS.pokemon, 'Unrecognized key', key)
         } else {
           pokemonLookup[pokemonId] = jsFilter
           const defaultForm = (Event.masterfile.pokemon[pokemonId] || {})

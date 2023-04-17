@@ -1,8 +1,8 @@
-/* eslint-disable no-console */
 const path = require('path')
 const router = require('express').Router()
 const { api } = require('../../../services/config')
 const { Db, Event } = require('../../../services/initialization')
+const { log, HELPERS } = require('../../../services/logger')
 
 const queryObj = {
   pokemon: { model: 'Pokemon', category: 'pokemon' },
@@ -104,9 +104,9 @@ router.get(['/', '/:category'], async (req, res) => {
     } else {
       throw new Error('Incorrect or missing API secret')
     }
-    console.log(`[API] api/v1/${path.parse(__filename).name}`)
+    log.info(HELPERS.api, `api/v1/${path.parse(__filename).name}`)
   } catch (e) {
-    console.error(`[API Error] api/v1/${path.parse(__filename).name}`, e)
+    log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}`, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })
@@ -135,13 +135,14 @@ router.put('/:category', async (req, res) => {
     } else {
       throw new Error('Incorrect or missing API secret')
     }
-    console.log(
-      `[API] api/v1/${path.parse(__filename).name} - updated availabled for ${
+    log.info(
+      HELPERS.api,
+      `api/v1/${path.parse(__filename).name} - updated availabled for ${
         category || 'all'
       }`,
     )
   } catch (e) {
-    console.error(`[API] api/v1/${path.parse(__filename).name}`, e)
+    log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}`, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })

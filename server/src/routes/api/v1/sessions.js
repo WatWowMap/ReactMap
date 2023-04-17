@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
 const router = require('express').Router()
 const { api } = require('../../../services/config')
 const { Db } = require('../../../services/initialization')
+const { log, HELPERS } = require('../../../services/logger')
 
 router.get('/', async (req, res) => {
   try {
@@ -16,9 +16,9 @@ router.get('/', async (req, res) => {
     } else {
       throw new Error('Incorrect or missing API secret')
     }
-    console.log('[API] api/v1/sessions')
+    log.info(HELPERS.api, 'api/v1/sessions')
   } catch (e) {
-    console.error('[API Error] api/v1/sessions/', e)
+    log.error(HELPERS.api, 'api/v1/sessions/', e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })
@@ -37,12 +37,12 @@ router.get('/hasValid/:id', async (req, res) => {
         valid: !!results.length,
         length: results.length,
       })
-      console.log(`[API] api/v1/sessions/hasValid/${req.params.id}`)
+      log.info(HELPERS.api, `api/v1/sessions/hasValid/${req.params.id}`)
     } else {
       throw new Error('Incorrect or missing API secret')
     }
   } catch (e) {
-    console.error(`[API Error] api/v1/sessions/hasValid/${req.params.id}`, e)
+    log.error(HELPERS.api, `api/v1/sessions/hasValid/${req.params.id}`, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })
@@ -61,15 +61,12 @@ router.get('/clearSessions/:id', async (req, res) => {
         )
         .delete()
       res.status(200).json({ results })
-      console.log(`[API] api/v1/sessions/clearSessions/${req.params.id}`)
+      log.info(HELPERS.api, `api/v1/sessions/clearSessions/${req.params.id}`)
     } else {
       throw new Error('Incorrect or missing API secret')
     }
   } catch (e) {
-    console.error(
-      `[API Error] api/v1/sessions/clearSessions/${req.params.id}`,
-      e,
-    )
+    log.error(HELPERS.api, `api/v1/sessions/clearSessions/${req.params.id}`, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })

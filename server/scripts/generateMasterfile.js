@@ -1,6 +1,7 @@
 const fs = require('fs')
 const { resolve } = require('path')
 const { rarity: customRarity, api } = require('../src/services/config')
+const { log, HELPERS } = require('../src/services/logger')
 const fetchJson = require('../src/services/api/fetchJson')
 const defaultRarity = require('../src/data/defaultRarity.json')
 
@@ -68,14 +69,18 @@ const generate = async (
     }
     return newMf
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.warn('[WARN] Unable to generate new masterfile, using existing.', e)
+    log.warn(
+      HELPERS.masterfile,
+      'Unable to generate new masterfile, using existing.',
+      e,
+    )
   }
 }
 
 module.exports.generate = generate
 
 if (require.main === module) {
-  // eslint-disable-next-line no-console
-  generate(true).then(() => console.log('Masterfile generated'))
+  generate(true).then(() =>
+    log.info(HELPERS.masterfile, 'Masterfile generated'),
+  )
 }

@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 const session = require('express-session')
 const mysql2 = require('mysql2/promise')
 const MySQLStore = require('express-mysql-session')(session)

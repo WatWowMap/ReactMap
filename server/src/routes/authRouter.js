@@ -1,10 +1,10 @@
-/* eslint-disable no-console */
 const router = require('express').Router()
 const passport = require('passport')
 const {
   authentication: { strategies },
 } = require('../services/config')
 const { Db } = require('../services/initialization')
+const { log, HELPERS } = require('../services/logger')
 
 // Loads up the base auth routes and any custom ones
 
@@ -32,29 +32,31 @@ strategies.forEach((strategy, i) => {
             return req.login(user, async () => {
               const { id } = user
               if (!(await Db.models.Session.isValidSession(id))) {
-                console.debug(
-                  '[Session] Detected multiple sessions, clearing old ones...',
+                log.info(
+                  HELPERS.auth,
+                  'Detected multiple sessions, clearing old ones...',
                 )
                 await Db.models.Session.clearOtherSessions(id, req.sessionID)
               }
               return res.redirect('/')
             })
           } catch (error) {
-            console.error(error)
+            log.error(HELPERS.auth, error)
             res.redirect('/')
           }
         }
       })(req, res, next),
     )
-    console.log(
-      `[AUTH] ${method.toUpperCase()} /auth/${name}/callback route initialized`,
+    log.info(
+      HELPERS.auth,
+      `${method.toUpperCase()} /auth/${name}/callback route initialized`,
     )
   }
 })
 
 router.get('/logout', (req, res) => {
   req.logout((err) => {
-    if (err) console.error('[AUTH] Unable to logout', err)
+    if (err) log.error(HELPERS.auth, 'Unable to logout', err)
   })
   req.session.destroy()
   res.redirect('/')

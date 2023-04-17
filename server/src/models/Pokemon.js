@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
 const i18next = require('i18next')

@@ -1,5 +1,5 @@
-/* eslint-disable no-console */
 process.title = 'ReactMap'
+process.env.FORCE_COLOR = 1
 
 const path = require('path')
 const express = require('express')
@@ -12,8 +12,10 @@ const i18next = require('i18next')
 const Backend = require('i18next-fs-backend')
 const { ValidationError } = require('apollo-server-core')
 const { ApolloServer } = require('apollo-server-express')
+const { rainbow } = require('chalkercli')
 
 const config = require('./services/config')
+const { log, HELPERS } = require('./services/logger')
 const { Db, Event } = require('./services/initialization')
 const Clients = require('./services/Clients')
 const sessionStore = require('./services/sessionStore')
@@ -33,6 +35,12 @@ if (!config.devOptions.skipUpdateCheck) {
 const app = express()
 
 const server = new ApolloServer({
+  logger: {
+    debug: (e) => log.debug(HELPERS.gql, e),
+    info: (e) => log.info(HELPERS.gql, e),
+    warn: (e) => log.warn(HELPERS.gql, e),
+    error: (e) => log.error(HELPERS.gql, e),
+  },
   cors: true,
   cache: 'bounded',
   typeDefs,
@@ -58,52 +66,55 @@ const server = new ApolloServer({
       e?.message.includes('skipUndefined()') ||
       e?.message === 'old_client'
     ) {
-      console.log(
-        '[GQL] Old client detected, forcing user to refresh, no need to report this error unless it continues to happen\nClient:',
+      log.info(
+        HELPERS.gql,
+        'Old client detected, forcing user to refresh, no need to report this error unless it continues to happen\nClient:',
         e.extensions.clientV,
         'Server:',
         e.extensions.serverV,
+        'User:',
+        e.extensions.req.user?.username || 'Not Logged In',
       )
       return { message: 'old_client' }
     }
     if (e.message === 'session_expired') {
-      if (config.devOptions.enabled) {
-        console.log(
-          '[GQL] user session expired, forcing logout, no need to report this error unless it continues to happen',
-        )
-      }
+      log.debug(
+        HELPERS.gql,
+        'user session expired, forcing logout, no need to report this error unless it continues to happen',
+      )
       return { message: 'session_expired' }
     }
-    console.warn('[GQL]', e)
+    log.error(HELPERS.gql, e)
     if (config.devOptions.enabled) {
       return e
     }
     return { message: e.message }
   },
   formatResponse: (data, context) => {
-    if (config.devOptions.enabled) {
-      const endpoint =
-        context?.operation?.selectionSet?.selections?.[0]?.name?.value
-      const returned = data?.data?.[endpoint]?.length
-      console.log(
-        '[GQL]',
-        'Endpoint:',
-        endpoint,
-        returned ? 'Returned:' : '',
-        returned || '',
-      )
-    }
-    return null
+    const endpoint =
+      context?.operation?.selectionSet?.selections?.[0]?.name?.value
+    const returned = data?.data?.[endpoint]?.length || 0
+    log.info(
+      HELPERS.gql,
+      'Endpoint:',
+      endpoint,
+      'Returned:',
+      returned || 0,
+      'User:',
+      context.context.req?.user?.username || 'Not Logged In',
+    )
+    return data
   },
 })
 
 server.start().then(() => server.applyMiddleware({ app, path: '/graphql' }))
 
-if (config.devOptions.enabled) {
+if (process.env.LOG_LEVEL === 'debug' || process.env.LOG_LEVEL === 'trace') {
   app.use(
     logger((tokens, req, res) =>
       [
-        '[EXPRESS]',
+        HELPERS.info,
+        HELPERS.express,
         tokens.method(req, res),
         tokens.url(req, res),
         tokens.status(req, res),
@@ -131,10 +142,12 @@ const rateLimitOptions = {
     type: 'error',
     message: `Too many requests from this IP, please try again in ${config.api.rateLimit.time} minutes.`,
   },
-  /* eslint-disable no-unused-vars */
-  onLimitReached: (req, res, options) => {
-    // eslint-disable-next-line no-console
-    console.warn('user is being rate limited')
+  onLimitReached: (req, res) => {
+    log.info(
+      HELPERS.express,
+      req?.user?.username || 'user',
+      'is being rate limited',
+    )
     res.redirect('/429')
   },
 }
@@ -187,8 +200,8 @@ i18next.use(Backend).init(
       ),
     },
   },
-  (err, t) => {
-    if (err) return console.error(err)
+  (err) => {
+    if (err) return log.error(HELPERS.i18n, err)
   },
 )
 
@@ -196,7 +209,7 @@ app.use(rootRouter, requestRateLimiter)
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error('[EXPRESS]:', err)
+  log.error(HELPERS.express, err)
   switch (err.message) {
     case 'NoCodeProvided':
       return res.redirect('/404')
@@ -224,8 +237,8 @@ connection.migrate.latest().then(async () => {
       (config.areas = await getAreas()),
     ]).then(() => {
       app.listen(config.port, config.interface, () => {
-        console.log(
-          `[INIT] Server is now listening at http://${config.interface}:${config.port}`,
+        rainbow(
+          `Server is now listening at http://${config.interface}:${config.port}`,
         )
       })
     })

@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
 const path = require('path')
 const knex = require('knex')
+const { log, HELPERS } = require('../services/logger')
 
 const {
   database: {
@@ -14,8 +14,9 @@ const migrationUrl = path.resolve(__dirname, 'migrations')
 const selectedDb = schemas.find((db) => db.useFor.includes('user'))
 
 if (!selectedDb) {
-  console.warn(
-    '[DB] No database selected for React Map Tables, one schema must contain "user" in its useFor array',
+  log.error(
+    HELPERS.db,
+    'No database selected for React Map Tables, one schema must contain "user" in its useFor array',
   )
   process.exit(9)
 }

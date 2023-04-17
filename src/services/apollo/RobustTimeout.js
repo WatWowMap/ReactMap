@@ -2,21 +2,20 @@ import AbortableContext from './AbortableContext'
 
 export default class RobustTimeout extends AbortableContext {
   constructor(ms) {
-    super()
+    super(null)
     this._ms = ms
     this._lastUpdated = 0
   }
 
   doRefetch(variables) {
     const now = Date.now()
-    if (now - this._lastUpdated < (this._pendingOp.length ? 4000 : 500)) {
+    if (now - this._lastUpdated < (this._pendingOp ? 5000 : 500)) {
       if (variables !== undefined) {
         this._pendingVariables = variables
       }
       return
     }
     this._lastUpdated = now
-    this.abortAll()
     if (this._ms) {
       clearTimeout(this.timeout)
       this.timeout = setTimeout(() => this.doRefetch(), this._ms)

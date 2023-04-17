@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const fs = require('fs')
 const sourceConfig = require('../src/configs/default.json')
 
@@ -33,5 +32,6 @@ const generateEnvConfig = async () => {
 module.exports.generateEnvConfig = generateEnvConfig
 
 if (require.main === module) {
+  // eslint-disable-next-line no-console
   generateEnvConfig().then(() => console.log('Env Config Generated'))
 }
