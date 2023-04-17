@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.13.1",
+  "version": "1.13.2",
   "description": "React based frontend map.",
   "main": "ReactMap.js",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -59,6 +59,7 @@
     "@material-ui/styles": "^4.11.4",
     "@sentry/react": "^7.15.0",
     "@sentry/tracing": "^7.15.0",
+    "@turf/boolean-contains": "^6.5.0",
     "@turf/boolean-overlap": "^6.5.0",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/center": "^6.3.0",
