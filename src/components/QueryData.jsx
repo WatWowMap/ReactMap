@@ -77,11 +77,7 @@ export default function QueryData({
 
   const refetchData = () => {
     onMove()
-    if (
-      category !== 'weather' &&
-      category !== 'device' &&
-      category !== 'scanAreas'
-    ) {
+    if (category !== 'device' && category !== 'scanAreas') {
       timeout.doRefetch({
         ...Utility.getQueryArgs(map),
         filters: trimFilters(filters),
