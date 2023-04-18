@@ -12,7 +12,7 @@ import EuroSymbol from '@material-ui/icons/EuroSymbol'
 import Person from '@material-ui/icons/Person'
 import TrackChanges from '@material-ui/icons/TrackChanges'
 import BlurOn from '@material-ui/icons/BlurOn'
-import { Grid, Fab } from '@material-ui/core'
+import { Grid, Fab, Icon } from '@material-ui/core'
 
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
@@ -49,7 +49,7 @@ export default function FloatingButtons({
 
   const {
     config: {
-      map: { enableFloatingProfileButton },
+      map: { enableFloatingProfileButton, customFloatingIcons = [] },
       scanner: { scannerType, enableScanNext, enableScanZone },
     },
     auth: { loggedIn, perms },
@@ -254,6 +254,23 @@ export default function FloatingButtons({
           </Fab>
         </Grid>
       )}
+      {customFloatingIcons.map((icon) => (
+        <Grid item key={`${icon.color}${icon.href}${icon.icon}`}>
+          <Fab
+            color={icon.color || 'secondary'}
+            size={fabSize}
+            href={icon.href}
+            referrerPolicy="no-referrer"
+            target={icon.target || '_blank'}
+          >
+            <Icon
+              className={icon.icon}
+              fontSize={iconSize}
+              style={{ color: 'white' }}
+            />
+          </Fab>
+        </Grid>
+      ))}
     </Grid>
   )
 }

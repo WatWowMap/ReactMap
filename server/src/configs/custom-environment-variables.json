@@ -417,7 +417,11 @@
         "__name": "MAP_MISC_CLIENT_TIMEOUT_MINUTES",
         "__format": "number"
       },
-      "distanceUnit": "MAP_MISC_DISTANCE_UNIT"
+      "distanceUnit": "MAP_MISC_DISTANCE_UNIT",
+      "customFloatingIcons": {
+        "__name": "MAP_MISC_CUSTOM_FLOATING_ICONS",
+        "__format": "json"
+      }
     },
     "theme": {
       "style": "MAP_THEME_STYLE",
