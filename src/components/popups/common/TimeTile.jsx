@@ -1,5 +1,10 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react'
-import { Grid, Typography } from '@material-ui/core'
+import { Collapse, Grid, IconButton, Typography } from '@material-ui/core'
+import ExpandMore from '@material-ui/icons/ExpandMore'
+import ExpandLess from '@material-ui/icons/ExpandLess'
+
+import { useStore } from '@hooks/useStore'
 
 import Timer from './Timer'
 import NameTT from './NameTT'
@@ -10,8 +15,13 @@ export default function TimeTile({
   until,
   size = 3,
   tt = [],
+  expandKey,
+  caption,
+  children,
 }) {
   const endTime = new Date(expireTime * 1000)
+  const expanded = useStore((state) => !!state.popups[expandKey])
+
   return (
     <>
       {icon && (
@@ -23,10 +33,19 @@ export default function TimeTile({
           ) : (
             icon
           )}
+          {caption && (
+            <Typography variant="caption" className="ar-task" noWrap>
+              {caption}
+            </Typography>
+          )}
         </Grid>
       )}
       {endTime && (
-        <Grid item xs={icon ? 12 - size : 12} style={{ textAlign: 'center' }}>
+        <Grid
+          item
+          xs={icon ? (children ? 10 : 12) - size : children ? 10 : 12}
+          style={{ textAlign: 'center' }}
+        >
           <Timer expireTime={expireTime} until={until} />
           <Typography variant="caption">
             {new Date(endTime).toLocaleTimeString(
@@ -34,6 +53,23 @@ export default function TimeTile({
             )}
           </Typography>
         </Grid>
+      )}
+      {expandKey && children && (
+        <>
+          <Grid item xs={2}>
+            <IconButton
+              style={{ color: 'white' }}
+              onClick={() =>
+                useStore.setState({ popups: { [expandKey]: !expanded } })
+              }
+            >
+              {expanded ? <ExpandLess /> : <ExpandMore />}
+            </IconButton>
+          </Grid>
+          <Collapse timeout="auto" unmountOnExit in={expanded}>
+            {children}
+          </Collapse>
+        </>
       )}
     </>
   )
