@@ -503,6 +503,9 @@ module.exports = class Pokemon extends Model {
 
   static async evalQuery(mem, query, method = 'POST') {
     if (queryDebug) {
+      if (!fs.existsSync(resolve(__dirname, './queries'))) {
+        fs.rmdirSync(resolve(__dirname, './queries'), { recursive: true })
+      }
       if (mem && typeof query === 'string') {
         fs.writeFileSync(
           resolve(__dirname, './queries', `${Date.now()}.json`),
