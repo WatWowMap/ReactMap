@@ -15,6 +15,7 @@ const {
   },
 } = require('../services/config')
 const getAreaSql = require('../services/functions/getAreaSql')
+const filterRTree = require('../services/functions/filterRTree')
 const { Pvp } = require('../services/initialization')
 const fetchJson = require('../services/api/fetchJson')
 
@@ -341,75 +342,77 @@ module.exports = class Pokemon extends Model {
         },
       }
     }
-    const results =
-      (await this.evalQuery(
-        mem ? `${mem}/api/pokemon/scan` : null,
-        mem
-          ? JSON.stringify({
-              min: {
-                latitude: args.minLat,
-                longitude: args.minLon,
+    const results = await this.evalQuery(
+      mem ? `${mem}/api/pokemon/scan` : null,
+      mem
+        ? JSON.stringify({
+            min: {
+              latitude: args.minLat,
+              longitude: args.minLon,
+            },
+            max: {
+              latitude: args.maxLat,
+              longitude: args.maxLon,
+            },
+            // standard: onlyStandard,
+            global: {
+              ...nullOrValue(onlyIvOr, 'global'),
+              additional: {
+                include_zeroiv: onlyZeroIv,
+                include_hundoiv: onlyHundoIv,
+                include_everything: false,
               },
-              max: {
-                latitude: args.maxLat,
-                longitude: args.maxLon,
-              },
-              // standard: onlyStandard,
-              global: {
-                ...nullOrValue(onlyIvOr, 'global'),
-                additional: {
-                  include_zeroiv: onlyZeroIv,
-                  include_hundoiv: onlyHundoIv,
-                  include_everything: false,
-                },
-              },
-              // xlKarp: onlyXlKarp,
-              // xsRat: onlyXsRat,
-              // pvpMega: onlyPvpMega,
-              // pvp50: args.filters.onlyPvp50,
-              // pvp51: args.filters.onlyPvp51,
-              // linkGlobal: onlyLinkGlobal,
-              filters: Object.fromEntries(
-                Object.entries(args.filters)
-                  .filter(([k]) => k.includes('-'))
-                  .map(([k, v]) => [k, nullOrValue(v, k)]),
-              ),
-            })
-          : query.limit(queryLimits.pokemon),
-      )) || []
+            },
+            // xlKarp: onlyXlKarp,
+            // xsRat: onlyXsRat,
+            // pvpMega: onlyPvpMega,
+            // pvp50: args.filters.onlyPvp50,
+            // pvp51: args.filters.onlyPvp51,
+            // linkGlobal: onlyLinkGlobal,
+            filters: Object.fromEntries(
+              Object.entries(args.filters)
+                .filter(([k]) => k.includes('-'))
+                .map(([k, v]) => [k, nullOrValue(v, k)]),
+            ),
+          })
+        : query.limit(queryLimits.pokemon),
+    )
+
     const finalResults = []
     const pvpResults = []
     const listOfIds = []
 
     // form checker
     results.forEach((pkmn) => {
-      let noPvp = true
-      if (pkmn.pokemon_id === 132 && !pkmn.ditto_form) {
-        pkmn.ditto_form = pkmn.form
-        pkmn.form = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
-      }
-      if (!pkmn.seen_type) {
-        if (pkmn.spawn_id === null) {
-          pkmn.seen_type = pkmn.pokestop_id ? 'nearby_stop' : 'nearby_cell'
-        } else {
-          pkmn.seen_type = 'encounter'
+      if (!mem || filterRTree(pkmn, areaRestrictions, onlyAreas)) {
+        let noPvp = true
+        if (pkmn.pokemon_id === 132 && !pkmn.ditto_form) {
+          pkmn.ditto_form = pkmn.form
+          pkmn.form = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
         }
-      }
-      if (
-        pvp &&
-        (pkmn.pvp_rankings_great_league ||
-          pkmn.pvp_rankings_ultra_league ||
-          pkmn.pvp ||
-          (isMad && reactMapHandlesPvp && pkmn.cp))
-      ) {
-        noPvp = false
-        listOfIds.push(pkmn.id)
-        pvpResults.push(pkmn)
-      }
-      if (noPvp && globalCheck(pkmn)) {
-        pkmn.changed = !!pkmn.changed
-        pkmn.expire_timestamp_verified = !!pkmn.expire_timestamp_verified
-        finalResults.push(pkmn)
+        if (!pkmn.seen_type) {
+          if (pkmn.spawn_id === null) {
+            pkmn.seen_type = pkmn.pokestop_id ? 'nearby_stop' : 'nearby_cell'
+          } else {
+            pkmn.seen_type = 'encounter'
+          }
+        }
+        if (
+          pvp &&
+          (pkmn.pvp_rankings_great_league ||
+            pkmn.pvp_rankings_ultra_league ||
+            pkmn.pvp ||
+            (isMad && reactMapHandlesPvp && pkmn.cp))
+        ) {
+          noPvp = false
+          listOfIds.push(pkmn.id)
+          pvpResults.push(pkmn)
+        }
+        if (noPvp && globalCheck(pkmn)) {
+          pkmn.changed = !!pkmn.changed
+          pkmn.expire_timestamp_verified = !!pkmn.expire_timestamp_verified
+          finalResults.push(pkmn)
+        }
       }
     })
 
@@ -531,7 +534,7 @@ module.exports = class Pokemon extends Model {
     return results || []
   }
 
-  static async getLegacy(perms, args, { isMad, hasSize, hasHeight }) {
+  static async getLegacy(perms, args, { isMad, hasSize, hasHeight, mem }) {
     const ts = Math.floor(new Date().getTime() / 1000)
     const query = this.query()
       .where(
@@ -563,33 +566,41 @@ module.exports = class Pokemon extends Model {
     ) {
       return []
     }
-    const results =
-      (await this.evalQuery(
-        null,
-        // mem
-        //   ? JSON.stringify({
-        //       min: {
-        //         latitude: args.minLat,
-        //         longitude: args.minLon,
-        //       },
-        //       max: {
-        //         latitude: args.maxLat,
-        //         longitude: args.maxLon,
-        //       },
-        //       global: {
-        //         iv: [0, 100],
-        //         level: [0, 100],
+    const results = await this.evalQuery(
+      null,
+      // mem
+      //   ? JSON.stringify({
+      //       min: {
+      //         latitude: args.minLat,
+      //         longitude: args.minLon,
+      //       },
+      //       max: {
+      //         latitude: args.maxLat,
+      //         longitude: args.maxLon,
+      //       },
+      //       global: {
+      //         iv: [0, 100],
+      //         level: [0, 100],
 
-        //         additional: {
-        //           include_everything: true,
-        //         },
-        //       },
-        //       filters: {},
-        //     })
-        //   :
-        query,
-      )) || []
-    return legacyFilter(results, args, perms, ts)
+      //         additional: {
+      //           include_everything: true,
+      //         },
+      //       },
+      //       filters: {},
+      //     })
+      //   :
+      query,
+    )
+    return legacyFilter(
+      results.filter(
+        (item) =>
+          !mem ||
+          filterRTree(item, perms.areaRestrictions, args.filter.onlyAreas),
+      ),
+      args,
+      perms,
+      ts,
+    )
   }
 
   // eslint-disable-next-line no-unused-vars
@@ -636,7 +647,7 @@ module.exports = class Pokemon extends Model {
     )
   }
 
-  static async search(perms, args, { isMad }, distance) {
+  static async search(perms, args, { isMad, mem }, distance) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
@@ -678,6 +689,12 @@ module.exports = class Pokemon extends Model {
       return []
     }
     const results = await query
-    return results.map((poke) => ({ ...poke, iv: perms.iv ? poke.iv : null }))
+    return results
+      .filter(
+        (item) =>
+          !mem ||
+          filterRTree(item, perms.areaRestrictions, args.filter.onlyAreas),
+      )
+      .map((poke) => ({ ...poke, iv: perms.iv ? poke.iv : null }))
   }
 }

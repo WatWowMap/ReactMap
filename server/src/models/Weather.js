@@ -36,7 +36,7 @@ module.exports = class Weather extends Model {
     const results = await query
 
     const cleanUserAreas = args.filters.onlyAreas.filter((area) =>
-      config.areas.names.includes(area),
+      config.areas.names.has(area),
     )
     const merged = perms.areaRestrictions.length
       ? perms.areaRestrictions.filter(

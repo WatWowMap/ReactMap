@@ -2,6 +2,7 @@ const { default: center } = require('@turf/center')
 const fs = require('fs')
 const { resolve } = require('path')
 const fetch = require('node-fetch')
+const RTree = require('rtree')
 
 const config = require('./config')
 const { log, HELPERS } = require('./logger')
@@ -163,7 +164,7 @@ const loadAreas = (scanAreas) => {
 
 const parseAreas = (areasObj) => {
   const polygons = {}
-  const names = []
+  const names = new Set()
   const withoutParents = {}
 
   if (!areasObj) {
@@ -204,7 +205,7 @@ const parseAreas = (areasObj) => {
       }
       feature.geometry.coordinates = coordinates
       polygons[key] = feature.geometry
-      names.push(key)
+      names.add(key)
       if (withoutParents[name]) {
         withoutParents[name].push(key)
       } else {
@@ -282,12 +283,24 @@ module.exports = async () => {
       .map((feature) => [feature.properties.name, feature]),
   )
 
+  const myRTree = RTree()
+  myRTree.geoJSON({
+    type: 'FeatureCollection',
+    features: Object.values(scanAreasObj).filter(
+      (f) =>
+        !f.properties.manual &&
+        !f.properties.hidden &&
+        f.geometry.type.includes('Polygon'),
+    ),
+  })
+
   const raw = loadAreas(scanAreas)
   return {
     scanAreas,
     scanAreasMenu,
     scanAreasObj,
     raw,
+    myRTree,
     ...parseAreas(raw),
   }
 }
