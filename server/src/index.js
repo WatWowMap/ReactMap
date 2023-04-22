@@ -1,6 +1,7 @@
-/* eslint-disable no-console */
 process.title = 'ReactMap'
+process.env.FORCE_COLOR = 3
 
+require('dotenv').config()
 const path = require('path')
 const express = require('express')
 const logger = require('morgan')
@@ -12,8 +13,11 @@ const i18next = require('i18next')
 const Backend = require('i18next-fs-backend')
 const { ValidationError } = require('apollo-server-core')
 const { ApolloServer } = require('apollo-server-express')
+const { rainbow } = require('chalkercli')
+const Sentry = require('@sentry/node')
 
 const config = require('./services/config')
+const { log, HELPERS } = require('./services/logger')
 const { Db, Event } = require('./services/initialization')
 const Clients = require('./services/Clients')
 const sessionStore = require('./services/sessionStore')
@@ -32,7 +36,40 @@ if (!config.devOptions.skipUpdateCheck) {
 
 const app = express()
 
+Sentry.init({
+  dsn:
+    process.env.SENTRY_DSN ||
+    'https://c40dad799323428f83aee04391639345@o1096501.ingest.sentry.io/6117162',
+  environment: process.env.NODE_ENV || 'production',
+  integrations: [
+    // enable HTTP calls tracing
+    new Sentry.Integrations.Http({ tracing: true }),
+    // enable Express.js middleware tracing
+    new Sentry.Integrations.Express({
+      // to trace all requests to the default router
+      app,
+      // alternatively, you can specify the routes you want to trace:
+      // router: someRouter,
+    }),
+    ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
+  ],
+  tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE) || 0.1,
+  version: pkg.version,
+})
+
+// RequestHandler creates a separate execution context, so that all
+// transactions/spans/breadcrumbs are isolated across requests
+app.use(Sentry.Handlers.requestHandler())
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler())
+
 const server = new ApolloServer({
+  logger: {
+    debug: (e) => log.debug(HELPERS.gql, e),
+    info: (e) => log.info(HELPERS.gql, e),
+    warn: (e) => log.warn(HELPERS.gql, e),
+    error: (e) => log.error(HELPERS.gql, e),
+  },
   cors: true,
   cache: 'bounded',
   typeDefs,
@@ -41,6 +78,14 @@ const server = new ApolloServer({
   debug: config.devOptions.queryDebug,
   context: ({ req, res }) => {
     const perms = req.user ? req.user.perms : req.session.perms
+    let transaction = res.__sentry_transaction
+    if (!transaction) {
+      transaction = Sentry.startTransaction({ name: 'POST /graphql' })
+    }
+    Sentry.configureScope((scope) => {
+      scope.setSpan(transaction)
+    })
+
     return {
       req,
       res,
@@ -50,6 +95,7 @@ const server = new ApolloServer({
       serverV: pkg.version || 1,
       clientV:
         req.headers['apollographql-client-version']?.trim() || pkg.version || 1,
+      transaction,
     }
   },
   formatError: (e) => {
@@ -58,52 +104,63 @@ const server = new ApolloServer({
       e?.message.includes('skipUndefined()') ||
       e?.message === 'old_client'
     ) {
-      console.log(
-        '[GQL] Old client detected, forcing user to refresh, no need to report this error unless it continues to happen\nClient:',
+      log.info(
+        HELPERS.gql,
+        'Old client detected, forcing user to refresh, no need to report this error unless it continues to happen\nClient:',
         e.extensions.clientV,
         'Server:',
         e.extensions.serverV,
+        'User:',
+        e.extensions.req.user?.username || 'Not Logged In',
       )
       return { message: 'old_client' }
     }
     if (e.message === 'session_expired') {
-      if (config.devOptions.enabled) {
-        console.log(
-          '[GQL] user session expired, forcing logout, no need to report this error unless it continues to happen',
-        )
-      }
+      log.debug(
+        HELPERS.gql,
+        'user session expired, forcing logout, no need to report this error unless it continues to happen',
+      )
       return { message: 'session_expired' }
     }
-    console.warn('[GQL]', e)
+    log.error(HELPERS.gql, e)
     if (config.devOptions.enabled) {
       return e
     }
     return { message: e.message }
   },
   formatResponse: (data, context) => {
-    if (config.devOptions.enabled) {
-      const endpoint =
-        context?.operation?.selectionSet?.selections?.[0]?.name?.value
-      const returned = data?.data?.[endpoint]?.length
-      console.log(
-        '[GQL]',
-        'Endpoint:',
-        endpoint,
-        returned ? 'Returned:' : '',
-        returned || '',
-      )
+    const endpoint =
+      context?.operation?.selectionSet?.selections?.[0]?.name?.value
+    const returned = data?.data?.[endpoint]?.length || 0
+    log.info(
+      HELPERS.gql,
+      HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
+      '|',
+      context.operationName,
+      '|',
+      returned || 0,
+      '|',
+      context.context.req?.user?.username || 'Not Logged In',
+    )
+
+    const { transaction } = context.context
+
+    if (returned) {
+      transaction.setMeasurement(`${endpoint}.returned`, returned)
     }
-    return null
+
+    return data
   },
 })
 
 server.start().then(() => server.applyMiddleware({ app, path: '/graphql' }))
 
-if (config.devOptions.enabled) {
+if (process.env.LOG_LEVEL === 'debug' || process.env.LOG_LEVEL === 'trace') {
   app.use(
     logger((tokens, req, res) =>
       [
-        '[EXPRESS]',
+        HELPERS.info,
+        HELPERS.express,
         tokens.method(req, res),
         tokens.url(req, res),
         tokens.status(req, res),
@@ -131,10 +188,12 @@ const rateLimitOptions = {
     type: 'error',
     message: `Too many requests from this IP, please try again in ${config.api.rateLimit.time} minutes.`,
   },
-  /* eslint-disable no-unused-vars */
-  onLimitReached: (req, res, options) => {
-    // eslint-disable-next-line no-console
-    console.warn('user is being rate limited')
+  onLimitReached: (req, res) => {
+    log.info(
+      HELPERS.express,
+      req?.user?.username || 'user',
+      'is being rate limited',
+    )
     res.redirect('/429')
   },
 }
@@ -187,16 +246,18 @@ i18next.use(Backend).init(
       ),
     },
   },
-  (err, t) => {
-    if (err) return console.error(err)
+  (err) => {
+    if (err) return log.error(HELPERS.i18n, err)
   },
 )
 
 app.use(rootRouter, requestRateLimiter)
 
+app.use(Sentry.Handlers.errorHandler())
+
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error('[EXPRESS]:', err)
+  log.error(HELPERS.express, err)
   switch (err.message) {
     case 'NoCodeProvided':
       return res.redirect('/404')
@@ -224,9 +285,10 @@ connection.migrate.latest().then(async () => {
       (config.areas = await getAreas()),
     ]).then(() => {
       app.listen(config.port, config.interface, () => {
-        console.log(
-          `[INIT] Server is now listening at http://${config.interface}:${config.port}`,
+        const text = rainbow(
+          `Server is now listening at http://${config.interface}:${config.port}`,
         )
+        setTimeout(() => text.stop(), 10_000)
       })
     })
   })

@@ -1,5 +1,4 @@
 // @ts-check
-/* eslint-disable no-console */
 /* eslint-disable no-continue */
 /* eslint-disable import/no-extraneous-dependencies */
 const { defineConfig, loadEnv } = require('vite')
@@ -9,6 +8,8 @@ const { viteStaticCopy } = require('vite-plugin-static-copy')
 const removeFiles = require('rollup-plugin-delete')
 const { resolve, extname } = require('path')
 const fs = require('fs')
+
+const { log, HELPERS } = require('./server/src/services/logger')
 
 const customFilePlugin = (isDevelopment) => {
   const fileRegex = /\.(jsx?|css)$/
@@ -30,7 +31,7 @@ const customFilePlugin = (isDevelopment) => {
     },
     buildEnd() {
       if (customPaths.length && !isDevelopment) {
-        console.log(`
+        log.warn(`
 ======================================================
              WARNING:
 Custom files aren't officially supported
@@ -65,7 +66,7 @@ module.exports = defineConfig(({ mode }) => {
   })(resolve(__dirname, 'src'))
 
   if (mode === 'production') {
-    console.log(`[BUILD] Building production version: ${version}`)
+    log.info(HELPERS.build, `Building production version: ${version}`)
   }
 
   return {

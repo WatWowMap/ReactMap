@@ -1,8 +1,7 @@
-/* eslint-disable no-console */
-const config = require('../config')
 const resolveQuickHook = require('./resolveQuickHook')
 const fetchJson = require('./fetchJson')
 const { Event } = require('../initialization')
+const { log, HELPERS } = require('../logger')
 
 module.exports = async function webhookApi(
   category,
@@ -165,11 +164,7 @@ module.exports = async function webhookApi(
         'Content-Type': 'application/json',
       })
     }
-    const post = await fetchJson(
-      payloadObj.url,
-      payloadObj.options,
-      config.devOptions.enabled,
-    )
+    const post = await fetchJson(payloadObj.url, payloadObj.options)
 
     if (!post) {
       throw new Error('No data returned from server')
@@ -185,18 +180,15 @@ module.exports = async function webhookApi(
             return `${webhook.host}:${webhook.port}/api/tracking/${payloadObj.get}/${discordId}`
         }
       })()
-      const get = await fetchJson(
-        getUrl,
-        { method: 'GET', headers },
-        config.devOptions.enabled,
-      )
+      const get = await fetchJson(getUrl, { method: 'GET', headers })
       return { ...post, ...get }
     }
     return post
   } catch (e) {
-    console.log(
-      e.message,
+    log.error(
+      HELPERS.webhooks,
       'There was a problem processing that webhook request',
+      e,
     )
     return { status: 'error', message: 'webhook_error' }
   }

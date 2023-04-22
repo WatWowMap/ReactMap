@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const passport = require('passport')
 const Strategy = require('passport-local')
 const bcrypt = require('bcrypt')
@@ -12,6 +11,7 @@ const {
 } = require('../services/config')
 const { Db } = require('../services/initialization')
 const Utility = require('../services/Utility')
+const { log, HELPERS } = require('../services/logger')
 
 if (strategyConfig.doNothing) {
   // This is for nothing other than demonstrating a custom property you can add if you need it
@@ -49,8 +49,8 @@ const authHandler = async (_req, username, password, done) => {
               tutorial: !forceTutorial,
             })
             user.id = newUser.id
-            console.log(
-              `[${name.toUpperCase()}]`,
+            log.info(
+              HELPERS.custom(name.toUpperCase()),
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -73,8 +73,8 @@ const authHandler = async (_req, username, password, done) => {
             userExists.strategy = 'local'
           }
           user.id = userExists.id
-          console.log(
-            `[${name.toUpperCase()}]`,
+          log.info(
+            HELPERS.custom(name.toUpperCase()),
             user.username,
             `(${user.id})`,
             'Authenticated successfully.',
@@ -84,10 +84,10 @@ const authHandler = async (_req, username, password, done) => {
         return done(null, false, { message: 'invalid_credentials' })
       })
   } catch (e) {
-    console.error(
-      `[${name.toUpperCase()}]`,
+    log.error(
+      HELPERS.custom(name.toUpperCase()),
       'User has failed authentication.',
-      e.message,
+      e,
     )
   }
 }

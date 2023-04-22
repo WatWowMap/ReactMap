@@ -16,6 +16,9 @@
   left: 0;
   right: 0;
 }
+.leaflet-popup-content .no-leaflet-margin p {
+  margin: 0px !important;
+}
 
 .react-locate-control {
   display: none;

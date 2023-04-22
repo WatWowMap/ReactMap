@@ -1,8 +1,20 @@
 import { gql } from '@apollo/client'
 
 const getAllWeather = gql`
-  query Weather($filters: JSON) {
-    weather(filters: $filters) {
+  query Weather(
+    $minLat: Float!
+    $minLon: Float!
+    $maxLat: Float!
+    $maxLon: Float!
+    $filters: JSON
+  ) {
+    weather(
+      minLat: $minLat
+      minLon: $minLon
+      maxLat: $maxLat
+      maxLon: $maxLon
+      filters: $filters
+    ) {
       id
       latitude
       longitude

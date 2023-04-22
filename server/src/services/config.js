@@ -1,13 +1,10 @@
-/* eslint-disable no-console */
 process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
 
 const fs = require('fs')
 const { resolve } = require('path')
-const dotenv = require('dotenv')
-
-dotenv.config()
 
 const config = require('config')
+const { log, HELPERS } = require('./logger')
 
 const allowedMenuItems = [
   'gyms',
@@ -33,13 +30,15 @@ try {
   ).length
 
   if (refLength !== defaultLength) {
-    console.error(
-      '[CONFIG] It looks like you have modified the `default.json` file, you should not do this! Make all of your config changes in your `local.json` file.',
+    log.error(
+      HELPERS.config,
+      'It looks like you have modified the `default.json` file, you should not do this! Make all of your config changes in your `local.json` file.',
     )
   }
 } catch (e) {
-  console.error(
-    '[CONFIG] Error trying to read either the default.json or .ref file',
+  log.error(
+    HELPERS.config,
+    'Error trying to read either the default.json or .ref file',
     e,
   )
 }
@@ -103,7 +102,8 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
       ],
     })
   } else {
-    console.error(
+    log.error(
+      HELPERS.config,
       'Missing scanner database config! \nCheck to make sure you have SCANNER_DB_HOST,SCANNER_DB_PORT, SCANNER_DB_NAME, SCANNER_DB_USERNAME, and SCANNER_DB_PASSWORD',
     )
   }
@@ -117,7 +117,8 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
       useFor: ['session', 'user'],
     })
   } else {
-    console.log(
+    log.info(
+      HELPERS.config,
       'Missing ReactMap specific table, attempting to use the manual database instead.',
     )
   }
@@ -132,21 +133,43 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
         ? ['nest', 'portal']
         : ['session', 'user', 'nest', 'portal'],
     })
-  } else {
-    console.error(
-      'Missing manual database config! \nCheck to make sure you have MANUAL_DB_HOST,MANUAL_DB_PORT, MANUAL_DB_NAME, MANUAL_DB_USERNAME, and MANUAL_DB_PASSWORD',
+  } else if (!hasReactMapDb) {
+    log.error(
+      HELPERS.config,
+      'Neither a ReactMap database or Manual database was found, you will need one of these to proceed.',
     )
   }
   if (!MAP_GENERAL_START_LAT || !MAP_GENERAL_START_LON) {
-    console.warn(
+    log.warn(
+      HELPERS.config,
       'Missing, MAP_GENERAL_START_LAT OR MAP_GENERAL_START_LON\nYou will be able to proceed but you should add these values to your docker-compose file',
     )
   }
 }
 if (fs.existsSync(resolve(`${__dirname}/../configs/config.json`))) {
-  console.log(
-    '[CONFIG] Config v1 (config.json) found, it is fine to leave it but make sure you are using and updating local.json instead.',
+  log.info(
+    HELPERS.config,
+    'Config v1 (config.json) found, it is fine to leave it but make sure you are using and updating local.json instead.',
   )
+}
+
+if (config.icons.styles.length === 0) {
+  config.icons.styles.push({
+    name: 'Default',
+    path: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/',
+    modifiers: {
+      gym: {
+        0: 1,
+        1: 1,
+        2: 1,
+        3: 3,
+        4: 4,
+        5: 4,
+        6: 18,
+        sizeMultiplier: 1.2,
+      },
+    },
+  })
 }
 
 const checkExtraJsons = (fileName, domain = '') => {
@@ -158,8 +181,9 @@ const checkExtraJsons = (fileName, domain = '') => {
       )
     : {}
   if (Object.keys(generalJson).length) {
-    console.log(
-      `[CONFIG] config ${fileName}.json found, overwriting your config.map.${fileName} with the found data.`,
+    log.info(
+      HELPERS.config,
+      `config ${fileName}.json found, overwriting your config.map.${fileName} with the found data.`,
     )
   }
   if (
@@ -173,8 +197,9 @@ const checkExtraJsons = (fileName, domain = '') => {
         ),
       ) || {}
     if (Object.keys(domainJson).length) {
-      console.log(
-        `[CONFIG] config ${fileName}/${domain}.json found, overwriting your config.map.${fileName} with the found data.`,
+      log.info(
+        HELPERS.config,
+        `config ${fileName}/${domain}.json found, overwriting your config.map.${fileName} with the found data.`,
       )
     }
     return {
@@ -190,13 +215,15 @@ const mergeMapConfig = (obj) => {
   if (process.env.TELEGRAM_BOT_NAME && !obj?.customRoutes?.telegramBotName) {
     if (obj.customRoutes)
       obj.customRoutes.telegramBotName = process.env.TELEGRAM_BOT_NAME
-    console.warn(
-      '[CONFIG] TELEGRAM_BOT_NAME has been moved from the .env file to your config, telegramBotEnvRef is now deprecated.\nplease use customRoutes.telegramBotName instead\n(Move them from your .env file to your config file)',
+    log.warn(
+      HELPERS.config,
+      'TELEGRAM_BOT_NAME has been moved from the .env file to your config, telegramBotEnvRef is now deprecated.\nplease use customRoutes.telegramBotName instead\n(Move them from your .env file to your config file)',
     )
   }
   if (obj?.customRoutes?.telegramBotEnvRef) {
-    console.warn(
-      '[CONFIG] TELEGRAM_BOT_NAME has been moved from the .env file to your config, telegramBotEnvRef is now deprecated.\nplease use customRoutes.telegramBotName instead\n(Move them from your .env file to your config file)',
+    log.warn(
+      HELPERS.config,
+      'TELEGRAM_BOT_NAME has been moved from the .env file to your config, telegramBotEnvRef is now deprecated.\nplease use customRoutes.telegramBotName instead\n(Move them from your .env file to your config file)',
     )
     obj.customRoutes.telegramBotName =
       process.env[obj.customRoutes.telegramBotEnvRef]
@@ -205,14 +232,15 @@ const mergeMapConfig = (obj) => {
     if (obj?.[category]?.components) {
       obj[category].components.forEach((component) => {
         if (component.type === 'telegram' && component.telegramBotEnvRef) {
-          console.warn(
-            '[CONFIG] telegramBotEnvRef is deprecated, please use telegramBotName instead\n',
+          log.warn(
+            HELPERS.config,
+            'telegramBotEnvRef is deprecated, please use telegramBotName instead\n',
             category,
           )
-          console.warn('OLD:\n', component)
+          log.warn('OLD:\n', component)
           component.telegramBotName = process.env[component.telegramBotEnvRef]
           delete component.telegramBotEnvRef
-          console.warn('NEW:\n', component)
+          log.warn('NEW:\n', component)
         }
       })
     }
@@ -223,8 +251,9 @@ const mergeMapConfig = (obj) => {
     !Array.isArray(obj?.holidayEffects) &&
     typeof obj?.holidayEffects === 'object'
   ) {
-    console.warn(
-      '[CONFIG] holidayEffects has been changed to an array, please update your config. Check out `server/src/configs/default.json` for an example.',
+    log.warn(
+      HELPERS.config,
+      'holidayEffects has been changed to an array, please update your config. Check out `server/src/configs/default.json` for an example.',
     )
     obj.holidayEffects = []
   }
@@ -279,8 +308,8 @@ config.multiDomainsObj = Object.fromEntries(
 // Check if empty
 ;['tileServers', 'navigation'].forEach((opt) => {
   if (!config[opt].length) {
-    console.warn(
-      `[${opt}] is empty, you need to add options to it or remove the empty array from your config.`,
+    log.warn(
+      `[${opt.toUpperCase()}] is empty, you need to add options to it or remove the empty array from your config.`,
     )
   }
 })
@@ -392,8 +421,9 @@ if (
   const enabled = Object.keys(config.authentication.perms).filter(
     (perm) => config.authentication.perms[perm].enabled,
   )
-  console.warn(
-    '[CONFIG] No authentication strategies enabled, adding the following perms to alwaysEnabledPerms array:\n',
+  log.warn(
+    HELPERS.config,
+    'No authentication strategies enabled, adding the following perms to alwaysEnabledPerms array:\n',
     enabled,
   )
   config.authentication.alwaysEnabledPerms = enabled

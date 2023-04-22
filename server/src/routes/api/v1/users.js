@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
 const router = require('express').Router()
 const { api } = require('../../../services/config')
 const { Db } = require('../../../services/initialization')
+const { log, HELPERS } = require('../../../services/logger')
 
 router.get('/', async (req, res) => {
   try {
@@ -13,9 +13,9 @@ router.get('/', async (req, res) => {
     } else {
       throw new Error('Incorrect or missing API secret')
     }
-    console.log('[API] api/v1/users')
+    log.info(HELPERS.api, 'api/v1/users')
   } catch (e) {
-    console.error('[API Error] api/v1/sessions', e)
+    log.error('api/v1/sessions', e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })
@@ -33,9 +33,9 @@ router.get('/:id', async (req, res) => {
     } else {
       throw new Error('Incorrect or missing API secret')
     }
-    console.log(`[API] api/v1/users/${req.params.id}`)
+    log.info(HELPERS.api, `api/v1/users/${req.params.id}`)
   } catch (e) {
-    console.error(`[API Error] api/v1/users/${req.params.id}`, e)
+    log.error(HELPERS.api, `api/v1/users/${req.params.id}`, e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })
@@ -55,9 +55,9 @@ router.get('/discord/:id', async (req, res) => {
     } else {
       throw new Error('Incorrect or missing API secret')
     }
-    console.log(`[API] api/v1/users/discord/${req.params.id}`)
+    log.info(HELPERS.api, `api/v1/users/discord/${req.params.id}`)
   } catch (e) {
-    console.error(`[API Error] api/v1/users/discord/${req.params.id}`, e)
+    log.error(HELPERS.api, `api/v1/users/discord/${req.params.id}`, e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })
@@ -77,9 +77,9 @@ router.get('/telegram/:id', async (req, res) => {
     } else {
       throw new Error('Incorrect or missing API secret')
     }
-    console.log(`[API] api/v1/users/telegram/${req.params.id}`)
+    log.info(HELPERS.api, `api/v1/users/telegram/${req.params.id}`)
   } catch (e) {
-    console.error(`[API Error] api/v1/users/telegram/${req.params.id}`, e)
+    log.error(HELPERS.api, `api/v1/users/telegram/${req.params.id}`, e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })

@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
 const fetchJson = require('./fetchJson')
 const { Event } = require('../initialization')
+const { log, HELPERS } = require('../logger')
 
 module.exports = async function fetchQuests() {
   try {
@@ -46,9 +46,10 @@ module.exports = async function fetchQuests() {
     }
     return questsInfo
   } catch (e) {
-    console.warn(
+    log.warn(
+      HELPERS.fetch,
+      'nUnable to fetch available quests and invasions from GitHub',
       e,
-      '\nUnable to fetch available quests and invasions from GitHub',
     )
     return []
   }

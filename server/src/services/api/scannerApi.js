@@ -1,10 +1,10 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-console */
 const fetch = require('node-fetch')
 const NodeCache = require('node-cache')
 
 const Clients = require('../Clients')
 const config = require('../config')
+const { log, HELPERS } = require('../logger')
 
 const scannerQueue = {
   scanNext: {},
@@ -78,8 +78,9 @@ module.exports = async function scannerApi(
           coordinates: cache.coordinates + coords.length,
           requests: cache.requests + 1,
         })
-        console.log(
-          `[scannerApi] Request to scan new location by ${user.username}${
+        log.info(
+          HELPERS.scanner,
+          `Request to scan new location by ${user.username}${
             user.id ? ` (${user.id})` : ''
           } - type ${data.scanNextType}: ${data.scanLocation[0].toFixed(
             5,
@@ -127,8 +128,9 @@ module.exports = async function scannerApi(
           coordinates: cache.coordinates + coords.length,
           requests: cache.requests + 1,
         })
-        console.log(
-          `[scannerApi] Request to scan new zone by ${user.username}${
+        log.info(
+          HELPERS.scanner,
+          `Request to scan new zone by ${user.username}${
             user.id ? ` (${user.id})` : ''
           } - size ${data.scanZoneSize}: ${data.scanLocation[0].toFixed(
             5,
@@ -162,14 +164,15 @@ module.exports = async function scannerApi(
           scannerQueue[data.typeName].timestamp >
           Date.now() - config.scanner.backendConfig.queueRefreshInterval * 1000
         ) {
-          console.log(
-            `[scannerApi] Returning queue from memory for method ${
-              data.typeName
-            }: ${scannerQueue[data.typeName].queue}`,
+          log.info(
+            HELPERS.scanner,
+            `Returning queue from memory for method ${data.typeName}: ${
+              scannerQueue[data.typeName].queue
+            }`,
           )
           return { status: 'ok', message: scannerQueue[data.typeName].queue }
         }
-        console.log(`[scannerApi] Getting queue for method ${data.typeName}`)
+        log.info(HELPERS.scanner, `Getting queue for method ${data.typeName}`)
         switch (config.scanner.backendConfig.platform) {
           case 'custom':
             Object.assign(payloadObj, {
@@ -190,7 +193,7 @@ module.exports = async function scannerApi(
         }
         break
       default:
-        console.warn('[scannerApi] Api call without category')
+        log.warn(HELPERS.scanner, 'Api call without category')
         break
     }
 
@@ -203,10 +206,13 @@ module.exports = async function scannerApi(
         'Content-Type': 'application/json',
       })
     }
-    const scannerResponse = await fetch(payloadObj.url, payloadObj.options)
+    const scannerResponse = await fetch(payloadObj.url, {
+      ...payloadObj.options,
+      signal: controller.signal,
+    })
 
     if (!scannerResponse) {
-      throw new Error('[scannerApi] No data returned from server')
+      throw new Error('No data returned from server')
     }
 
     if (
@@ -215,8 +221,9 @@ module.exports = async function scannerApi(
     ) {
       if (config.scanner.backendConfig.platform === 'custom') {
         const { queue } = await scannerResponse.json()
-        console.log(
-          `[scannerApi] Returning received queue for method ${data.typeName}: ${queue}`,
+        log.info(
+          HELPERS.scanner,
+          `Returning received queue for method ${data.typeName}: ${queue}`,
         )
         scannerQueue[data.typeName] = {
           queue,
@@ -225,8 +232,9 @@ module.exports = async function scannerApi(
         return { status: 'ok', message: queue }
       }
       const { data: queueData } = await scannerResponse.json()
-      console.log(
-        `[scannerApi] Returning received queue for method ${data.typeName}: ${queueData.size}`,
+      log.info(
+        HELPERS.scanner,
+        `Returning received queue for method ${data.typeName}: ${queueData.size}`,
       )
       scannerQueue[data.typeName] = {
         queue: queueData.size,
@@ -305,34 +313,39 @@ module.exports = async function scannerApi(
     switch (scannerResponse.status) {
       case 200:
       case 201:
-        console.log(
-          `[scannerApi] Request from ${user.username || 'a visitor'}${
+        log.info(
+          HELPERS.scanner,
+          `Request from ${user.username || 'a visitor'}${
             user.id ? ` (${user.id})` : ''
           } successful`,
         )
         return { status: 'ok', message: 'scanner_ok' }
       case 401:
-        console.log(
-          '[scannerApi] Wrong credentials - check your scanner API settings in config',
+        log.info(
+          HELPERS.scanner,
+          'Wrong credentials - check your scanner API settings in config',
         )
         return { status: 'error', message: 'scanner_wrong_credentials' }
       case 404:
-        console.log(
-          `[scannerApi] Error: instance ${
+        log.info(
+          HELPERS.scanner,
+          `Error: instance ${
             config.scanner[category][`${category}Instance`]
           } does not exist`,
         )
         return { status: 'error', message: 'scanner_no_instance' }
       case 416:
-        console.log(
-          `[scannerApi] Error: instance ${
+        log.info(
+          HELPERS.scanner,
+          `Error: instance ${
             config.scanner[category][`${category}Instance`]
           } has no device assigned`,
         )
         return { status: 'error', message: 'scanner_no_device_assigned' }
       case 500:
-        console.log(
-          `[scannerApi] Error: device ${
+        log.info(
+          HELPERS.scanner,
+          `Error: device ${
             config.scanner[category][`${category}Device`]
           } does not exist`,
         )
@@ -342,8 +355,9 @@ module.exports = async function scannerApi(
     }
   } catch (e) {
     if (e instanceof Error) {
-      console.log(
-        '[scannerApi] There was a problem processing that scanner request',
+      log.error(
+        HELPERS.scanner,
+        'There was a problem processing that scanner request',
         e,
       )
     }

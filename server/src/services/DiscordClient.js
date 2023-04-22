@@ -1,7 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 const fs = require('fs')
 const { resolve } = require('path')
 const { Client } = require('discord.js')
@@ -12,19 +8,19 @@ const { Db } = require('./initialization')
 const logUserAuth = require('./logUserAuth')
 
 const {
-  devOptions,
   authentication,
   scanner,
   webhooks,
   map: { forceTutorial },
 } = require('./config')
 const Utility = require('./Utility')
+const { log, HELPERS } = require('./logger')
 
 module.exports = class DiscordClient {
   constructor(strategy, rmStrategy) {
     if (strategy instanceof Client || typeof rmStrategy !== 'string') {
-      console.error(
-        `[${this.rmStrategy?.toUpperCase()}]`,
+      log.error(
+        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
         'You are using an outdated strategy, please update your custom strategy to reflect the newest changes found in `server/src/strategies/discord.js`',
       )
       process.exit(1)
@@ -37,7 +33,7 @@ module.exports = class DiscordClient {
         'https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png',
       ...strategy,
     }
-    this.rmStrategy = rmStrategy
+    this.rmStrategy = rmStrategy || 'custom'
     this.loggingChannels = {
       main: strategy.logChannelId,
       event: strategy.eventLogChannelId,
@@ -50,8 +46,8 @@ module.exports = class DiscordClient {
     this.discordEvents()
 
     this.client.on('ready', () => {
-      console.log(
-        `[${this.rmStrategy?.toUpperCase()}]`,
+      log.info(
+        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
         `Logged in as ${this.client.user.tag}!`,
       )
       this.client.user.setPresence({
@@ -73,8 +69,8 @@ module.exports = class DiscordClient {
       const member = members.get(userId)
       return member.roles.cache.map((role) => role.id)
     } catch (e) {
-      console.error(
-        `[${this.rmStrategy?.toUpperCase()}]`,
+      log.error(
+        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
         'Failed to get roles in guild',
         guildId,
         'for user',
@@ -87,7 +83,11 @@ module.exports = class DiscordClient {
   discordEvents() {
     try {
       fs.readdir(resolve(__dirname, 'events'), (err, files) => {
-        if (err) console.error(`[${this.rmStrategy?.toUpperCase()}]`, err)
+        if (err)
+          log.error(
+            HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
+            err,
+          )
         files.forEach((file) => {
           const event = require(resolve(__dirname, 'events', file))
           const eventName = file.split('.')[0]
@@ -95,10 +95,10 @@ module.exports = class DiscordClient {
         })
       })
     } catch (e) {
-      console.error(
-        `[${this.rmStrategy?.toUpperCase()}]`,
+      log.error(
+        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
         'Failed to activate an event',
-        e.message,
+        e,
       )
     }
   }
@@ -126,8 +126,8 @@ module.exports = class DiscordClient {
         Object.keys(scanner).forEach(
           (x) => scanner[x]?.enabled && perms.scanner.add(x),
         )
-        console.log(
-          `[${this.rmStrategy?.toUpperCase()}]`,
+        log.info(
+          HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
           `User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
       } else {
@@ -182,23 +182,21 @@ module.exports = class DiscordClient {
         )
       }
     } catch (e) {
-      console.warn(
-        `[${this.rmStrategy?.toUpperCase()}]`,
+      log.warn(
+        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
         'Failed to get perms for user',
         user.id,
-        e.message,
+        e,
       )
     }
     Object.entries(perms).forEach(([key, value]) => {
       if (value instanceof Set) perms[key] = [...value]
     })
-    if (devOptions.enabled) {
-      console.log(
-        `[${this.rmStrategy?.toUpperCase()}]`,
-        'Perms:',
-        JSON.stringify(perms),
-      )
-    }
+    log.debug(
+      HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
+      'Perms:',
+      JSON.stringify(perms),
+    )
     return perms
   }
 
@@ -213,7 +211,6 @@ module.exports = class DiscordClient {
   }
 
   sendMessage(embed, channel = 'main') {
-    // if (!process.env.NODE_APP_INSTANCE || process.env.NODE_APP_INSTANCE === 0) {
     const safeChannel = this.loggingChannels[channel]
     if (!safeChannel || typeof embed !== 'object') {
       return
@@ -228,13 +225,12 @@ module.exports = class DiscordClient {
         foundChannel.send({ embeds: [{ ...this.getBaseEmbed(), ...embed }] })
       }
     } catch (e) {
-      console.error(
-        `[${this.rmStrategy?.toUpperCase()}]`,
+      log.error(
+        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
         'Failed to send message to discord',
-        e.message,
+        e,
       )
     }
-    // }
   }
 
   async authHandler(req, _accessToken, _refreshToken, profile, done) {
@@ -303,8 +299,8 @@ module.exports = class DiscordClient {
           })
         })
     } catch (e) {
-      console.error(
-        `[${this.rmStrategy?.toUpperCase()}]`,
+      log.error(
+        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
         'User has failed auth.',
         e,
       )
