@@ -3,6 +3,8 @@ const { Model, raw, ref } = require('objection')
 const i18next = require('i18next')
 const fs = require('fs')
 const { resolve } = require('path')
+const { default: getDistance } = require('@turf/distance')
+const { point } = require('@turf/helpers')
 
 const { Event } = require('../services/initialization')
 const legacyFilter = require('../services/legacyFilter')
@@ -13,6 +15,7 @@ const {
     pvp: { minCp: pvpMinCp, leagues, reactMapHandlesPvp, leagueObj },
     queryLimits,
   },
+  map: { distanceUnit },
 } = require('../services/config')
 const getAreaSql = require('../services/functions/getAreaSql')
 const filterRTree = require('../services/functions/filterRTree')
@@ -354,6 +357,11 @@ module.exports = class Pokemon extends Model {
               latitude: args.maxLat,
               longitude: args.maxLon,
             },
+            center: {
+              latitude: 0,
+              longitude: 0,
+            },
+            searchIds: [],
             // standard: onlyStandard,
             global: {
               ...nullOrValue(onlyIvOr, 'global'),
@@ -363,6 +371,7 @@ module.exports = class Pokemon extends Model {
                 include_everything: false,
               },
             },
+            limit: queryLimits.pokemon + queryLimits.pokemonPvp,
             // xlKarp: onlyXlKarp,
             // xsRat: onlyXsRat,
             // pvpMega: onlyPvpMega,
@@ -688,13 +697,41 @@ module.exports = class Pokemon extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
-    const results = await query
+    const results = await this.evalQuery(
+      mem ? `${mem}/api/pokemon/search` : null,
+      mem
+        ? JSON.stringify({
+            center: {
+              latitude: args.lat,
+              longitude: args.lon,
+            },
+            limit: searchResultsLimit,
+            searchIds: pokemonIds.map((id) => +id),
+            global: {},
+            filters: {},
+          })
+        : query,
+    )
     return results
       .filter(
-        (item) =>
-          !mem ||
-          filterRTree(item, perms.areaRestrictions, args.filter.onlyAreas),
+        (item) => !mem || filterRTree(item, perms.areaRestrictions, onlyAreas),
       )
-      .map((poke) => ({ ...poke, iv: perms.iv ? poke.iv : null }))
+      .map((poke) => ({
+        ...poke,
+        iv: perms.iv && poke.iv ? poke.iv.toFixed(2) : null,
+        distance:
+          poke.distance ||
+          getDistance(
+            point([poke.lon, poke.lat]),
+            point([args.lon, args.lat]),
+            {
+              units:
+                distanceUnit.toLowerCase() === 'km' ||
+                distanceUnit.toLowerCase() === 'kilometers'
+                  ? 'kilometers'
+                  : 'miles',
+            },
+          ).toFixed(2),
+      }))
   }
 }
