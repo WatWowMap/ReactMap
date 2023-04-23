@@ -516,7 +516,7 @@ module.exports = class Pokemon extends Model {
   static async evalQuery(mem, query, method = 'POST') {
     if (queryDebug) {
       if (!fs.existsSync(resolve(__dirname, './queries'))) {
-        fs.rmdirSync(resolve(__dirname, './queries'), { recursive: true })
+        fs.mkdirSync(resolve(__dirname, './queries'), { recursive: true })
       }
       if (mem && typeof query === 'string') {
         fs.writeFileSync(
@@ -576,29 +576,27 @@ module.exports = class Pokemon extends Model {
       return []
     }
     const results = await this.evalQuery(
-      null,
-      // mem
-      //   ? JSON.stringify({
-      //       min: {
-      //         latitude: args.minLat,
-      //         longitude: args.minLon,
-      //       },
-      //       max: {
-      //         latitude: args.maxLat,
-      //         longitude: args.maxLon,
-      //       },
-      //       global: {
-      //         iv: [0, 100],
-      //         level: [0, 100],
-
-      //         additional: {
-      //           include_everything: true,
-      //         },
-      //       },
-      //       filters: {},
-      //     })
-      //   :
-      query,
+      mem ? `${mem}/api/pokemon/scan` : null,
+      mem
+        ? JSON.stringify({
+            min: {
+              latitude: args.minLat,
+              longitude: args.minLon,
+            },
+            max: {
+              latitude: args.maxLat,
+              longitude: args.maxLon,
+            },
+            global: {
+              expert: args.filters.onlyIvOr.adv,
+            },
+            filters: Object.fromEntries(
+              Object.entries(args.filters)
+                .filter(([k, v]) => k.includes('-') && v.adv)
+                .map(([k, v]) => [k, { expert: v.adv }]),
+            ),
+          })
+        : query,
     )
     return legacyFilter(
       results.filter(
