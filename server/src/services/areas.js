@@ -280,7 +280,7 @@ module.exports = async () => {
   const scanAreasObj = Object.fromEntries(
     Object.values(scanAreas)
       .flatMap((areas) => areas.features)
-      .map((feature) => [feature.properties.name, feature]),
+      .map((feature) => [feature.properties.key, feature]),
   )
 
   const myRTree = RTree()

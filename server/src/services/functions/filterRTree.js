@@ -1,3 +1,6 @@
+const { default: pointInPolygon } = require('@turf/boolean-point-in-polygon')
+const { point } = require('@turf/helpers')
+
 const config = require('../config')
 
 module.exports = function getAreaRestrictionSql(
@@ -25,11 +28,14 @@ module.exports = function getAreaRestrictionSql(
       w: 0,
       h: 0,
     })
-    .map((feature) => feature?.properties?.name)
-    .filter(Boolean)
+    .filter((feature) => feature?.properties?.key)
 
-  return (
+  const foundInRtree =
     foundFeatures.length &&
-    consolidatedAreas.some((area) => foundFeatures.includes(area))
-  )
+    foundFeatures.some(
+      (feature) =>
+        consolidatedAreas.includes(feature.properties.key) &&
+        pointInPolygon(point([item.lon, item.lat]), feature),
+    )
+  return foundInRtree
 }
