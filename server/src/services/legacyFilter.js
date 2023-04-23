@@ -327,6 +327,11 @@ const getLegacy = (results, args, perms, ts) => {
             )
           }
         }
+        Object.entries(filtered.cleanPvp).forEach(([league, pvpResults]) => {
+          if (!pvpResults.length) {
+            delete filtered.cleanPvp[league]
+          }
+        })
         filtered.bestPvp = bestPvp
       }
       let pokemonFilter =
