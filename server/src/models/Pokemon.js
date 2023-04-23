@@ -713,7 +713,9 @@ module.exports = class Pokemon extends Model {
     )
     return results
       .filter(
-        (item) => !mem || filterRTree(item, perms.areaRestrictions, onlyAreas),
+        (item, i) =>
+          i < searchResultsLimit &&
+          (!mem || filterRTree(item, perms.areaRestrictions, onlyAreas)),
       )
       .map((poke) => ({
         ...poke,
