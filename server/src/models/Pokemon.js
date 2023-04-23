@@ -602,7 +602,7 @@ module.exports = class Pokemon extends Model {
       results.filter(
         (item) =>
           !mem ||
-          filterRTree(item, perms.areaRestrictions, args.filter.onlyAreas),
+          filterRTree(item, perms.areaRestrictions, args.filters.onlyAreas),
       ),
       args,
       perms,
