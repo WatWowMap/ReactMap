@@ -593,7 +593,7 @@ module.exports = class Pokemon extends Model {
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
             filters: Object.fromEntries(
               Object.entries(args.filters)
-                .filter(([k, v]) => k.includes('-') && v.adv)
+                .filter(([k, v]) => k.includes('-') && v.enabled)
                 .map(([k, v]) => [k, { expert: v.adv }]),
             ),
           })
