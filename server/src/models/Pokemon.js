@@ -590,6 +590,7 @@ module.exports = class Pokemon extends Model {
             global: {
               expert: args.filters.onlyIvOr.adv,
             },
+            limit: queryLimits.pokemon + queryLimits.pokemonPvp,
             filters: Object.fromEntries(
               Object.entries(args.filters)
                 .filter(([k, v]) => k.includes('-') && v.adv)
@@ -703,7 +704,7 @@ module.exports = class Pokemon extends Model {
               latitude: args.lat,
               longitude: args.lon,
             },
-            limit: searchResultsLimit,
+            limit: searchResultsLimit * 4,
             searchIds: pokemonIds.map((id) => +id),
             global: {},
             filters: {},
