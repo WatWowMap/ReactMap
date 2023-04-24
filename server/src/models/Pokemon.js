@@ -322,7 +322,10 @@ module.exports = class Pokemon extends Model {
       const localPvp = pvp
         ? Object.fromEntries(
             Object.entries(rest).map(([league, values]) => {
-              if (values.some((val, i) => val !== onlyStandard[league][i])) {
+              if (
+                Array.isArray(values) &&
+                values.some((val, i) => val !== onlyStandard[league][i])
+              ) {
                 return [league, values]
               }
               return [league, undefined]
