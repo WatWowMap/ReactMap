@@ -157,7 +157,10 @@ module.exports = class Pokemon extends Model {
 
     // parse PVP JSON(s)
     const getParsedPvp = (pokemon) => {
-      if (pokemon.pvp) return JSON.parse(pokemon.pvp)
+      if (pokemon.pvp)
+        return typeof pokemon.pvp === 'string'
+          ? JSON.parse(pokemon.pvp)
+          : pokemon.pvp
 
       const parsed = {}
       const pvpKeys = ['great', 'ultra']
