@@ -29,7 +29,7 @@ module.exports = async function getAuthInfo(req, user, strategy = 'custom') {
     .then((res) => res.json())
     .catch((err) => {
       log.warn(
-        HELPERS.custom(strategy.toUpperCase(), '#7289da'),
+        HELPERS.custom(strategy, '#7289da'),
         'failed to fetch user information',
         err,
       )
@@ -158,7 +158,7 @@ module.exports = async function getAuthInfo(req, user, strategy = 'custom') {
   }
   if (user.valid) {
     log.info(
-      HELPERS.custom(strategy.toUpperCase(), '#7289da'),
+      HELPERS.custom(strategy, '#7289da'),
       user.username,
       `(${user.id})`,
       'Authenticated successfully.',
@@ -166,7 +166,7 @@ module.exports = async function getAuthInfo(req, user, strategy = 'custom') {
     embed.color = 0x00ff00
   } else if (user.perms?.blocked) {
     log.warn(
-      HELPERS.custom(strategy.toUpperCase(), '#7289da'),
+      HELPERS.custom(strategy, '#7289da'),
       user.id,
       'Blocked due to',
       user.blocked,
@@ -175,7 +175,7 @@ module.exports = async function getAuthInfo(req, user, strategy = 'custom') {
     embed.color = 0xff0000
   } else {
     log.warn(
-      HELPERS.custom(strategy.toUpperCase(), '#7289da'),
+      HELPERS.custom(strategy, '#7289da'),
       user.id,
       'Not authorized to access map',
     )
