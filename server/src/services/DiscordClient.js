@@ -20,7 +20,7 @@ module.exports = class DiscordClient {
   constructor(strategy, rmStrategy) {
     if (strategy instanceof Client || typeof rmStrategy !== 'string') {
       log.error(
-        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
+        HELPERS.custom(this.rmStrategy, '#7289da'),
         'You are using an outdated strategy, please update your custom strategy to reflect the newest changes found in `server/src/strategies/discord.js`',
       )
       process.exit(1)
@@ -47,7 +47,7 @@ module.exports = class DiscordClient {
 
     this.client.on('ready', () => {
       log.info(
-        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
+        HELPERS.custom(this.rmStrategy, '#7289da'),
         `Logged in as ${this.client.user.tag}!`,
       )
       this.client.user.setPresence({
@@ -70,7 +70,7 @@ module.exports = class DiscordClient {
       return member.roles.cache.map((role) => role.id)
     } catch (e) {
       log.error(
-        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
+        HELPERS.custom(this.rmStrategy, '#7289da'),
         'Failed to get roles in guild',
         guildId,
         'for user',
@@ -83,11 +83,7 @@ module.exports = class DiscordClient {
   discordEvents() {
     try {
       fs.readdir(resolve(__dirname, 'events'), (err, files) => {
-        if (err)
-          log.error(
-            HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
-            err,
-          )
+        if (err) log.error(HELPERS.custom(this.rmStrategy, '#7289da'), err)
         files.forEach((file) => {
           const event = require(resolve(__dirname, 'events', file))
           const eventName = file.split('.')[0]
@@ -96,7 +92,7 @@ module.exports = class DiscordClient {
       })
     } catch (e) {
       log.error(
-        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
+        HELPERS.custom(this.rmStrategy, '#7289da'),
         'Failed to activate an event',
         e,
       )
@@ -127,7 +123,7 @@ module.exports = class DiscordClient {
           (x) => scanner[x]?.enabled && perms.scanner.add(x),
         )
         log.info(
-          HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
+          HELPERS.custom(this.rmStrategy, '#7289da'),
           `User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
       } else {
@@ -183,7 +179,7 @@ module.exports = class DiscordClient {
       }
     } catch (e) {
       log.warn(
-        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
+        HELPERS.custom(this.rmStrategy, '#7289da'),
         'Failed to get perms for user',
         user.id,
         e,
@@ -193,7 +189,7 @@ module.exports = class DiscordClient {
       if (value instanceof Set) perms[key] = [...value]
     })
     log.debug(
-      HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
+      HELPERS.custom(this.rmStrategy, '#7289da'),
       'Perms:',
       JSON.stringify(perms),
     )
@@ -226,7 +222,7 @@ module.exports = class DiscordClient {
       }
     } catch (e) {
       log.error(
-        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
+        HELPERS.custom(this.rmStrategy, '#7289da'),
         'Failed to send message to discord',
         e,
       )
@@ -300,7 +296,7 @@ module.exports = class DiscordClient {
         })
     } catch (e) {
       log.error(
-        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#7289da'),
+        HELPERS.custom(this.rmStrategy, '#7289da'),
         'User has failed auth.',
         e,
       )

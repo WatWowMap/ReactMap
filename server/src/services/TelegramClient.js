@@ -46,7 +46,7 @@ module.exports = class TelegramClient {
           }
         } catch (e) {
           log.error(
-            HELPERS.custom(this.rmStrategy?.toUpperCase(), '#26A8EA'),
+            HELPERS.custom(this.rmStrategy, '#26A8EA'),
             e,
             `Telegram Group: ${group}`,
             `User: ${user.id} (${user.username})`,
@@ -111,7 +111,7 @@ module.exports = class TelegramClient {
               .whereNot('id', req.user.id)
               .delete()
             log.info(
-              HELPERS.custom(this.rmStrategy?.toUpperCase(), '#26A8EA'),
+              HELPERS.custom(this.rmStrategy, '#26A8EA'),
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -138,7 +138,7 @@ module.exports = class TelegramClient {
             userExists.strategy = 'telegram'
           }
           log.info(
-            HELPERS.custom(this.rmStrategy?.toUpperCase(), '#26A8EA'),
+            HELPERS.custom(this.rmStrategy, '#26A8EA'),
             user.username,
             `(${user.id})`,
             'Authenticated successfully.',
@@ -151,7 +151,7 @@ module.exports = class TelegramClient {
         })
     } catch (e) {
       log.error(
-        HELPERS.custom(this.rmStrategy?.toUpperCase(), '#26A8EA'),
+        HELPERS.custom(this.rmStrategy, '#26A8EA'),
         'User has failed auth.',
         e,
       )
