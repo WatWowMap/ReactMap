@@ -80,6 +80,7 @@ export default function AreaTile({
                   ? hasAll
                   : scanAreas.filter.areas.includes(feature.properties.key)
               }
+              onClick={(e) => e.stopPropagation()}
               onChange={() =>
                 setAreas(
                   name
