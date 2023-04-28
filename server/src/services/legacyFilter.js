@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-continue */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-plusplus */
@@ -304,7 +305,9 @@ const getLegacy = (results, args, perms, ts) => {
         if (result.pvp || (reactMapHandlesPvp && result.cp)) {
           const pvpResults = reactMapHandlesPvp
             ? Pvp.resultWithCache(result, ts)
-            : JSON.parse(result.pvp)
+            : typeof result.pvp === 'string'
+            ? JSON.parse(result.pvp)
+            : result.pvp
           Object.keys(pvpResults).forEach((league) => {
             filterLeagueStats(
               pvpResults[league],
