@@ -12,7 +12,7 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 
 import ErrorBoundary from '@components/ErrorBoundary'
-import { Check, Clear } from '@components/layout/general/Icons'
+import { Check, Help } from '@components/layout/general/Icons'
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
@@ -669,7 +669,7 @@ const Invasion = ({ invasion, Icons, t }) => {
         {invasion.confirmed ? (
           <Check fontSize="medium" color="action" />
         ) : (
-          <Clear fontSize="medium" color="error" />
+          <Help fontSize="medium" style={{ color: 'white' }} />
         )}
       </Grid>
       <Grid item xs={12}>
