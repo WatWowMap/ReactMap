@@ -53,7 +53,7 @@ rootRouter.post('/api/error/client', (req) => {
 rootRouter.get('/area/:area/:zoom?', (req, res) => {
   const { area, zoom } = req.params
   try {
-    const { scanAreas } = config
+    const { scanAreas } = config.areas
     const validScanAreas = scanAreas[req.headers.host]
       ? scanAreas[req.headers.host]
       : scanAreas.main
