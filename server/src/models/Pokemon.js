@@ -343,11 +343,11 @@ module.exports = class Pokemon extends Model {
         cp: ivs && !arrayCheck(filter, 'cp') ? cp : undefined,
         level: ivs && !arrayCheck(filter, 'level') ? level : undefined,
         gender: ivs && !arrayCheck(filter, 'gender') ? gender : undefined,
-        xxs: !arrayCheck(filter, 'xxs') ? xxs : undefined,
-        xxl: !arrayCheck(filter, 'xxl') ? xxl : undefined,
         pvp: Object.keys(localPvp || {}).length ? localPvp : undefined,
         additional: {
           include_everything: !getRelevantKeys(filter).length,
+          include_xxs: xxs || undefined,
+          include_xxl: xxl || undefined,
         },
       }
     }
