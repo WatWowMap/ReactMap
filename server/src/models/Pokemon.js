@@ -346,8 +346,8 @@ module.exports = class Pokemon extends Model {
         pvp: Object.keys(localPvp || {}).length ? localPvp : undefined,
         additional: {
           include_everything: !getRelevantKeys(filter).length,
-          include_xxs: xxs || undefined,
-          include_xxl: xxl || undefined,
+          include_xxs: xxs || false,
+          include_xxl: xxl || false,
         },
       }
     }
@@ -372,6 +372,8 @@ module.exports = class Pokemon extends Model {
             global: {
               ...nullOrValue(onlyIvOr, 'global'),
               additional: {
+                include_xxs: onlyIvOr.xxs || false,
+                include_xxl: onlyIvOr.xxl || false,
                 include_zeroiv: onlyZeroIv,
                 include_hundoiv: onlyHundoIv,
                 include_everything: false,
