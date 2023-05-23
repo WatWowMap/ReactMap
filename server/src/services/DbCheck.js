@@ -1,4 +1,4 @@
-const knex = require('knex')
+const { knex } = require('knex')
 const { raw } = require('objection')
 const extend = require('extend')
 const { log, HELPERS } = require('./logger')
