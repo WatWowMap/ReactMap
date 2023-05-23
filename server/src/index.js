@@ -132,6 +132,9 @@ const server = new ApolloServer({
     const endpoint =
       context?.operation?.selectionSet?.selections?.[0]?.name?.value
     const returned = data?.data?.[endpoint]?.length || 0
+
+    const elapsed = process.hrtime(context.context.req._startAt)
+
     log.info(
       HELPERS.gql,
       HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
@@ -139,6 +142,8 @@ const server = new ApolloServer({
       context.operationName,
       '|',
       returned || 0,
+      '|',
+      `${(elapsed[0] * 1e3 + elapsed[1] * 1e-6).toFixed(2)}ms`,
       '|',
       context.context.req?.user?.username || 'Not Logged In',
     )
