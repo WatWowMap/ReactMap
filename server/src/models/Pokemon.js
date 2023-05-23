@@ -85,7 +85,11 @@ module.exports = class Pokemon extends Model {
     return 'pokemon'
   }
 
-  static async getAll(perms, args, { isMad, pvpV2, mem, hasSize, hasHeight }) {
+  static async getAll(
+    perms,
+    args,
+    { isMad, pvpV2, mem, hasSize, hasHeight, secret },
+  ) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const {
       onlyStandard,
@@ -393,6 +397,8 @@ module.exports = class Pokemon extends Model {
             ),
           })
         : query.limit(queryLimits.pokemon),
+      'POST',
+      secret,
     )
 
     const finalResults = []
@@ -521,7 +527,7 @@ module.exports = class Pokemon extends Model {
     return finalResults
   }
 
-  static async evalQuery(mem, query, method = 'POST') {
+  static async evalQuery(mem, query, method = 'POST', secret = '') {
     if (queryDebug) {
       if (!fs.existsSync(resolve(__dirname, './queries'))) {
         fs.mkdirSync(resolve(__dirname, './queries'), { recursive: true })
@@ -531,7 +537,7 @@ module.exports = class Pokemon extends Model {
           resolve(__dirname, './queries', `${Date.now()}.json`),
           query,
         )
-      } else {
+      } else if (typeof query === 'object') {
         fs.writeFileSync(
           resolve(__dirname, './queries', `${Date.now()}.txt`),
           query.toKnexQuery().toString(),
@@ -544,6 +550,7 @@ module.exports = class Pokemon extends Model {
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
+            Authentication: secret ? `Bearer ${secret}` : undefined,
           },
           body: query,
         })
@@ -551,7 +558,11 @@ module.exports = class Pokemon extends Model {
     return results || []
   }
 
-  static async getLegacy(perms, args, { isMad, hasSize, hasHeight, mem }) {
+  static async getLegacy(
+    perms,
+    args,
+    { isMad, hasSize, hasHeight, mem, secret },
+  ) {
     const ts = Math.floor(new Date().getTime() / 1000)
     const query = this.query()
       .where(
@@ -606,6 +617,8 @@ module.exports = class Pokemon extends Model {
             ),
           })
         : query,
+      'POST',
+      secret,
     )
     return legacyFilter(
       results.filter(
@@ -620,7 +633,7 @@ module.exports = class Pokemon extends Model {
   }
 
   // eslint-disable-next-line no-unused-vars
-  static async getAvailable({ isMad, mem }) {
+  static async getAvailable({ isMad, mem, secret }) {
     const ts = Math.floor(Date.now() / 1000)
     const available = await this.evalQuery(
       mem ? `${mem}/api/pokemon/available` : null,
@@ -637,6 +650,7 @@ module.exports = class Pokemon extends Model {
             .groupBy('pokemon_id', 'form')
             .orderBy('pokemon_id', 'form'),
       'GET',
+      secret,
     )
     return {
       available: available.map((pkmn) => `${pkmn.id}-${pkmn.form}`),
@@ -647,7 +661,7 @@ module.exports = class Pokemon extends Model {
   }
 
   // eslint-disable-next-line no-unused-vars
-  static getOne(id, { isMad, mem }) {
+  static getOne(id, { isMad, mem, secret }) {
     return this.evalQuery(
       mem ? `${mem}/api/pokemon/id/${id}` : null,
       mem
@@ -660,10 +674,11 @@ module.exports = class Pokemon extends Model {
             .where(isMad ? 'encounter_id' : 'id', id)
             .first(),
       'GET',
+      secret,
     )
   }
 
-  static async search(perms, args, { isMad, mem }, distance) {
+  static async search(perms, args, { isMad, mem, secret }, distance) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
@@ -718,6 +733,8 @@ module.exports = class Pokemon extends Model {
             filters: {},
           })
         : query,
+      'POST',
+      secret,
     )
     return results
       .filter(
