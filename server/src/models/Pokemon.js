@@ -550,7 +550,7 @@ module.exports = class Pokemon extends Model {
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            Authentication: secret ? `Bearer ${secret}` : undefined,
+            'X-Golbat-Secret': secret || undefined,
           },
           body: query,
         })
