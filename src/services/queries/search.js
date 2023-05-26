@@ -218,6 +218,7 @@ export const raids = gql`
       raid_pokemon_gender
       raid_pokemon_costume
       raid_pokemon_evolution
+      raid_pokemon_alignment
     }
   }
 `

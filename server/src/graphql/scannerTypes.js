@@ -35,6 +35,7 @@ module.exports = gql`
     raid_pokemon_move_2: Int
     raid_pokemon_form: Int
     raid_pokemon_cp: Int
+    raid_pokemon_alignment: Int
     raid_is_exclusive: Boolean
     total_cp: Int
     first_seen_timestamp: Int
