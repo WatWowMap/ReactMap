@@ -48,6 +48,7 @@ export default function LocalLogin({
     await Fetch.login(user, href).then(async (resp) => {
       if (!resp.ok) {
         setError(t(await resp.json()))
+        setSubmitted(false)
       }
       if (resp.redirected) {
         await getServerSettings()
@@ -66,7 +67,7 @@ export default function LocalLogin({
     <>
       <form onSubmit={handleSubmit}>
         <Grid container justifyContent="center" alignItems="center" spacing={2}>
-          <Grid item xs={12} sm={5} style={{ textAlign: 'center' }}>
+          <Grid item style={{ textAlign: 'center' }}>
             <FormControl variant="outlined" color="secondary">
               <InputLabel htmlFor="username">{t('local_username')}</InputLabel>
               <OutlinedInput
@@ -85,7 +86,7 @@ export default function LocalLogin({
               />
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={5} style={{ textAlign: 'center' }}>
+          <Grid item style={{ textAlign: 'center' }}>
             <FormControl variant="outlined" color="secondary">
               <InputLabel htmlFor="password">{t('local_password')}</InputLabel>
               <OutlinedInput
@@ -118,7 +119,7 @@ export default function LocalLogin({
               />
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={2} style={{ textAlign: 'center' }}>
+          <Grid item style={{ textAlign: 'center' }}>
             <Button
               variant="contained"
               style={{

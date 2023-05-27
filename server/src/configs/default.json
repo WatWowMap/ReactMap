@@ -275,6 +275,7 @@
       }
     },
     "messageOfTheDay": {
+      "dialogMaxWidth": "sm",
       "index": 0,
       "settings": {
         "parentSpacing": 0,

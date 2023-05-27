@@ -125,12 +125,12 @@ export default class UIcons {
       }
     })
     // for debugging purposes/viewing
-    Object.defineProperty(window, 'uicons', {
-      value: this,
-      writable: false,
-      enumerable: true,
-      configurable: false,
-    })
+//    Object.defineProperty(window, 'uicons', {
+//      value: this,
+//      writable: false,
+//      enumerable: true,
+//      configurable: false,
+//    })
   }
 
   get selection() {

@@ -263,10 +263,25 @@ module.exports = class DiscordClient {
                 webhookStrategy: 'discord',
               })
               .where('id', req.user.id)
+            const oldUser = await Db.models.User.query()
+              .where('discordId', user.id)
+              .whereNot('id', req.user.id)
+              .first()
+            await Db.models.Badge.query()
+              .update({
+                userId: req.user.id,
+              })
+              .where('userId', oldUser.id)
             await Db.models.User.query()
               .where('discordId', user.id)
               .whereNot('id', req.user.id)
               .delete()
+            await Db.models.User.query()
+              .update({
+                data: oldUser.data,
+              })
+              .where('id', req.user.id)
+              .where('data', null)
             return done(null, {
               ...user,
               ...req.user,

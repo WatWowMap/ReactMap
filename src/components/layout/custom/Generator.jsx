@@ -68,9 +68,14 @@ export default function Generator({
               key={i}
               item
               {...Utility.getSizes(subBlock.gridSizes)}
-              style={subBlock.gridStyle || { textAlign: 'center' }}
+              style={subBlock.style || { textAlign: 'center' }}
             >
-              <Generator block={subBlock} defaultReturn={defaultReturn} />
+              <Generator
+                block={subBlock}
+                defaultReturn={defaultReturn}
+                serverSettings={serverSettings}
+                getServerSettings={getServerSettings}
+              />
             </Grid>
           ))}
         </Grid>
