@@ -305,6 +305,7 @@ const RaidImage = ({ gym, ts, Icons, t }) => {
     raid_pokemon_gender,
     raid_pokemon_costume,
     raid_pokemon_evolution,
+    raid_pokemon_alignment,
     raid_battle_timestamp,
     raid_is_exclusive,
   } = gym
@@ -317,6 +318,7 @@ const RaidImage = ({ gym, ts, Icons, t }) => {
         raid_pokemon_evolution,
         raid_pokemon_gender,
         raid_pokemon_costume,
+        raid_pokemon_alignment,
       )
     : Icons.getEggs(raid_level, raid_battle_timestamp < ts, raid_is_exclusive)
 

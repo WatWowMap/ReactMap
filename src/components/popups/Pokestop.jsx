@@ -612,32 +612,34 @@ const Invasion = ({ invasion, Icons, t }) => {
   const { invasions: invasionInfo } = useStatic((state) => state.masterfile)
   const encounterNum = { first: '#1', second: '#2', third: '#3' }
 
-  const makeShadowPokemon = (pkmn) => (
-    <NameTT
-      key={`${pkmn.id}_${pkmn.form}`}
-      id={[pkmn.form ? `form_${pkmn.form}` : '', `poke_${pkmn.id}`]}
-    >
-      <div className="invasion-reward">
-        <img
-          className="invasion-reward"
-          alt="invasion reward"
-          src={Icons.getPokemon(
-            pkmn.id,
-            pkmn.form,
-            0,
-            pkmn.gender,
-            pkmn.costumeId,
-            pkmn.shiny,
+  const makeShadowPokemon = (pkmn) => {
+    const src = Icons.getPokemon(
+      pkmn.id,
+      pkmn.form,
+      0,
+      pkmn.gender,
+      pkmn.costumeId,
+      1,
+      pkmn.shiny,
+    )
+    return (
+      <NameTT
+        key={`${pkmn.id}_${pkmn.form}`}
+        id={[pkmn.form ? `form_${pkmn.form}` : '', `poke_${pkmn.id}`]}
+      >
+        <div className="invasion-reward">
+          <img className="invasion-reward" alt="invasion reward" src={src} />
+          {!src.includes('_a1') && (
+            <img
+              className="invasion-reward-shadow"
+              alt="shadow"
+              src={Icons.getMisc('shadow')}
+            />
           )}
-        />
-        <img
-          className="invasion-reward-shadow"
-          alt="shadow"
-          src={Icons.getMisc('shadow')}
-        />
-      </div>
-    </NameTT>
-  )
+        </div>
+      </NameTT>
+    )
+  }
 
   const getRewardPercent = (grunt) => {
     if (grunt.type.startsWith('NPC')) {

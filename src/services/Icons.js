@@ -221,6 +221,7 @@ export default class UIcons {
     evolution = 0,
     gender = 0,
     costume = 0,
+    alignment = 0,
     shiny = false,
   ) {
     const baseUrl = `${
@@ -230,15 +231,19 @@ export default class UIcons {
     const formSuffixes = form ? [`_f${form}`, ''] : ['']
     const costumeSuffixes = costume ? [`_c${costume}`, ''] : ['']
     const genderSuffixes = gender ? [`_g${gender}`, ''] : ['']
+    const alignmentSuffixes = alignment ? [`_a${alignment}`, ''] : ['']
     const shinySuffixes = shiny ? ['_s', ''] : ['']
+
     for (let e = 0; e < evolutionSuffixes.length; e += 1) {
       for (let f = 0; f < formSuffixes.length; f += 1) {
         for (let c = 0; c < costumeSuffixes.length; c += 1) {
           for (let g = 0; g < genderSuffixes.length; g += 1) {
-            for (let s = 0; s < shinySuffixes.length; s += 1) {
-              const result = `${pokemonId}${evolutionSuffixes[e]}${formSuffixes[f]}${costumeSuffixes[c]}${genderSuffixes[g]}${shinySuffixes[s]}.png`
-              if (this[this.selected.pokemon].pokemon.has(result)) {
-                return `${baseUrl}/${result}`
+            for (let a = 0; a < alignmentSuffixes.length; a += 1) {
+              for (let s = 0; s < shinySuffixes.length; s += 1) {
+                const result = `${pokemonId}${evolutionSuffixes[e]}${formSuffixes[f]}${costumeSuffixes[c]}${genderSuffixes[g]}${alignmentSuffixes[a]}${shinySuffixes[s]}.png`
+                if (this[this.selected.pokemon].pokemon.has(result)) {
+                  return `${baseUrl}/${result}`
+                }
               }
             }
           }

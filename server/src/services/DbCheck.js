@@ -118,12 +118,13 @@ module.exports = class DbCheck {
                 'expiration_ms' in columns,
                 'confirmed' in columns,
               ])
-          const [availableSlotsCol] = await schema('gym')
+          const [availableSlotsCol, hasAlignment] = await schema('gym')
             .columnInfo()
             .then((columns) => [
               'availble_slots' in columns
                 ? 'availble_slots'
                 : 'available_slots',
+              'raid_pokemon_alignment' in columns,
             ])
           const [polygon] = await schema('nests')
             .columnInfo()
@@ -147,6 +148,7 @@ module.exports = class DbCheck {
                   this.models[category][j].hasLayerColumn = hasLayerColumn
                   this.models[category][j].polygon = polygon
                   this.models[category][j].hasConfirmed = hasConfirmed
+                  this.models[category][j].hasAlignment = hasAlignment
                 }
               })
             }
