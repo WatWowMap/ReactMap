@@ -25,7 +25,7 @@ export default function getRewardInfo(quest, Icons) {
     case 1:
       tt = `quest_reward_${quest_reward_type}`
       src = Icons.getRewards(quest_reward_type, xp_amount)
-      amount = src.endsWith('/0.png') ? xp_amount : 0
+      amount = src.includes('/0.') ? xp_amount : 0
       break
     case 2:
       tt = `item_${quest_item_id}`
@@ -35,7 +35,7 @@ export default function getRewardInfo(quest, Icons) {
     case 3:
       tt = `quest_reward_3`
       src = Icons.getRewards(quest_reward_type, stardust_amount)
-      amount = src.endsWith('/0.png') ? stardust_amount : 0
+      amount = src.includes('/0.') ? stardust_amount : 0
       break
     case 4:
       tt = `poke_${candy_pokemon_id}`

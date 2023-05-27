@@ -380,7 +380,7 @@ const RewardInfo = ({ quest, Icons, config, t }) => {
           onError={(e) => {
             e.target.onerror = null
             e.target.src =
-              'https://github.com/WatWowMap/wwm-uicons/blob/main/misc/0.png'
+              'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/misc/0.webp'
           }}
         />
       </NameTT>
