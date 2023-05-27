@@ -12,13 +12,13 @@ module.exports = class DbCheck {
     distanceUnit,
     rarityPercents,
   ) {
-    this.validModels = validModels.flatMap((s) => s.useFor)
+    this.validModels = validModels
     this.singleModels = ['User', 'Badge', 'Session', 'Backup']
     this.searchLimit = apiSettings.searchLimit
     this.rarityPercents = rarityPercents
     this.models = {}
     this.questConditions = {}
-    this.memEndpoints = {}
+    this.endpoints = {}
     this.rarity = new Map()
     this.historical = new Map()
     this.connections = dbSettings.schemas
@@ -38,7 +38,8 @@ module.exports = class DbCheck {
           }
         })
         if (schema.endpoint) {
-          this.memEndpoints[i] = schema.endpoint
+          this.endpoints[i] = schema
+          return null
         }
         return knex({
           client: 'mysql2',
@@ -52,9 +53,14 @@ module.exports = class DbCheck {
           debug: queryDebug,
           pool: {
             max: dbSettings.settings.maxConnections,
-            afterCreate(conn, done) {
-              conn.query('SET time_zone="+00:00";', (err) => done(err, conn))
-            },
+            afterCreate: (conn, done) =>
+              conn.query('SET time_zone="+00:00";', (err) => done(err, conn)),
+          },
+          log: {
+            warn: (message) => log.warn(HELPERS.db, message),
+            error: (message) => log.error(HELPERS.db, message),
+            debug: (message) => log.debug(HELPERS.db, message),
+            enableColors: true,
           },
         })
       })
@@ -75,7 +81,66 @@ module.exports = class DbCheck {
     ).as('distance')
   }
 
-  async determineType() {
+  static async schemaCheck(schema) {
+    const [isMad, pvpV2, hasSize, hasHeight] = await schema('pokemon')
+      .columnInfo()
+      .then((columns) => [
+        'cp_multiplier' in columns,
+        'pvp' in columns,
+        'size' in columns,
+        'height' in columns,
+      ])
+    const [hasRewardAmount, hasPowerUp, hasAltQuests] = await schema('pokestop')
+      .columnInfo()
+      .then((columns) => [
+        'quest_reward_amount' in columns || isMad,
+        'power_up_level' in columns,
+        'alternative_quest_type' in columns,
+      ])
+    const [hasLayerColumn] = isMad
+      ? await schema('trs_quest')
+          .columnInfo()
+          .then((columns) => ['layer' in columns])
+      : [false]
+    const [hasMultiInvasions, multiInvasionMs, hasConfirmed] = await schema(
+      isMad ? 'pokestop_incident' : 'incident',
+    )
+      .columnInfo()
+      .then((columns) => [
+        (isMad ? 'character_display' : 'character') in columns,
+        'expiration_ms' in columns,
+        'confirmed' in columns,
+      ])
+    const [availableSlotsCol, hasAlignment] = await schema('gym')
+      .columnInfo()
+      .then((columns) => [
+        'availble_slots' in columns ? 'availble_slots' : 'available_slots',
+        'raid_pokemon_alignment' in columns,
+      ])
+    const [polygon] = await schema('nests')
+      .columnInfo()
+      .then((columns) => ['polygon' in columns])
+
+    return {
+      isMad,
+      pvpV2,
+      mem: false,
+      hasSize,
+      hasHeight,
+      hasRewardAmount,
+      hasPowerUp,
+      hasAltQuests,
+      hasLayerColumn,
+      hasMultiInvasions,
+      multiInvasionMs,
+      hasConfirmed,
+      availableSlotsCol,
+      polygon,
+      hasAlignment,
+    }
+  }
+
+  async getDbContext() {
     log.info(
       HELPERS.db,
       `Determining database types for ${this.connections.length} connection${
@@ -85,70 +150,18 @@ module.exports = class DbCheck {
     await Promise.all(
       this.connections.map(async (schema, i) => {
         try {
-          const [isMad, pvpV2, mem, hasSize, hasHeight] = await schema(
-            'pokemon',
-          )
-            .columnInfo()
-            .then((columns) => [
-              'cp_multiplier' in columns,
-              'pvp' in columns,
-              Object.keys(columns).length ? '' : this.memEndpoints[i],
-              'size' in columns,
-              'height' in columns,
-            ])
-          const [hasRewardAmount, hasPowerUp, hasAltQuests] = await schema(
-            'pokestop',
-          )
-            .columnInfo()
-            .then((columns) => [
-              'quest_reward_amount' in columns || isMad,
-              'power_up_level' in columns,
-              'alternative_quest_type' in columns,
-            ])
-          const [hasLayerColumn] = isMad
-            ? await schema('trs_quest')
-                .columnInfo()
-                .then((columns) => ['layer' in columns])
-            : [false]
-          const [hasMultiInvasions, multiInvasionMs, hasConfirmed] =
-            await schema(isMad ? 'pokestop_incident' : 'incident')
-              .columnInfo()
-              .then((columns) => [
-                (isMad ? 'character_display' : 'character') in columns,
-                'expiration_ms' in columns,
-                'confirmed' in columns,
-              ])
-          const [availableSlotsCol, hasAlignment] = await schema('gym')
-            .columnInfo()
-            .then((columns) => [
-              'availble_slots' in columns
-                ? 'availble_slots'
-                : 'available_slots',
-              'raid_pokemon_alignment' in columns,
-            ])
-          const [polygon] = await schema('nests')
-            .columnInfo()
-            .then((columns) => ['polygon' in columns])
+          const schemaContext = schema
+            ? await DbCheck.schemaCheck(schema)
+            : {
+                mem: this.endpoints[i].endpoint,
+                secret: this.endpoints[i].secret,
+              }
 
           Object.entries(this.models).forEach(([category, sources]) => {
             if (Array.isArray(sources)) {
               sources.forEach((source, j) => {
                 if (source.connection === i) {
-                  this.models[category][j].isMad = isMad
-                  this.models[category][j].pvpV2 = pvpV2
-                  this.models[category][j].mem = mem
-                  this.models[category][j].hasSize = hasSize
-                  this.models[category][j].hasHeight = hasHeight
-                  this.models[category][j].hasRewardAmount = hasRewardAmount
-                  this.models[category][j].hasPowerUp = hasPowerUp
-                  this.models[category][j].hasAltQuests = hasAltQuests
-                  this.models[category][j].hasMultiInvasions = hasMultiInvasions
-                  this.models[category][j].multiInvasionMs = multiInvasionMs
-                  this.models[category][j].availableSlotsCol = availableSlotsCol
-                  this.models[category][j].hasLayerColumn = hasLayerColumn
-                  this.models[category][j].polygon = polygon
-                  this.models[category][j].hasConfirmed = hasConfirmed
-                  this.models[category][j].hasAlignment = hasAlignment
+                  Object.assign(this.models[category][j], schemaContext)
                 }
               })
             }
@@ -240,9 +253,13 @@ module.exports = class DbCheck {
           this.models[model].knex(this.connections[sources.connection])
         } else {
           sources.forEach((source, i) => {
-            this.models[model][i].SubModel = models[model].bindKnex(
-              this.connections[source.connection],
-            )
+            if (this.connections[source.connection]) {
+              this.models[model][i].SubModel = models[model].bindKnex(
+                this.connections[source.connection],
+              )
+            } else {
+              this.models[model][i].SubModel = models[model]
+            }
           })
         }
         log.info(
@@ -253,13 +270,13 @@ module.exports = class DbCheck {
         )
       })
     } catch (e) {
-      log.error(`
-  Error: ${e}
-
-  Info: Only ${[this.validModels].join(
-    ', ',
-  )} are valid options in the useFor arrays
-  `)
+      log.error(
+        HELPERS.db,
+        e,
+        `| Only ${[this.validModels].join(
+          ', ',
+        )} are valid options in the useFor arrays`,
+      )
       process.exit(9)
     }
   }
@@ -347,9 +364,10 @@ module.exports = class DbCheck {
       log.info(HELPERS.db, `Querying available for ${model}`)
       try {
         const results = await Promise.all(
-          this.models[model].map(async (source) =>
-            source.SubModel.getAvailable(source),
-          ),
+          this.models[model].map(async (source) => {
+            log.info(source.SubModel)
+            return source.SubModel.getAvailable(source)
+          }),
         )
         log.info(HELPERS.db, `Setting available for ${model}`)
         if (model === 'Pokestop') {

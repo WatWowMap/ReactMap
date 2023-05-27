@@ -112,20 +112,6 @@ export default function QueryData({
   useEffect(() => () => setExcludeList([]))
 
   if (error) {
-    if (inject.DEVELOPMENT) {
-      return (
-        <Notification
-          severity="error"
-          i18nKey="server_dev_error_0"
-          messages={[
-            {
-              key: 'error',
-              variables: [error],
-            },
-          ]}
-        />
-      )
-    }
     const message =
       error?.networkError?.result?.errors?.find(
         (x) => x?.message === 'old_client',
@@ -167,6 +153,18 @@ export default function QueryData({
           zoom={config.activeWeatherZoom}
           clickable={userSettings.clickableIcon}
           map={map}
+        />
+      )}
+      {process.env.NODE_ENV === 'development' && error && (
+        <Notification
+          severity="error"
+          i18nKey="server_dev_error_0"
+          messages={[
+            {
+              key: 'error',
+              variables: [error?.message],
+            },
+          ]}
         />
       )}
     </>

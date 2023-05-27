@@ -1,4 +1,5 @@
 const fetch = require('node-fetch')
+const config = require('../config')
 const { log, HELPERS } = require('../logger')
 
 module.exports = async function fetchJson(url, options = undefined) {
@@ -6,11 +7,11 @@ module.exports = async function fetchJson(url, options = undefined) {
 
   const timeout = setTimeout(() => {
     controller.abort()
-  }, 5000)
+  }, config.api.fetchTimeoutMs)
 
   try {
     log.debug(HELPERS.fetch, url, options || '')
-    const response = await fetch(url, options)
+    const response = await fetch(url, { ...options, signal: controller.signal })
     if (!response.ok) {
       throw new Error(`${response.status} (${response.statusText})`)
     }

@@ -74,6 +74,7 @@
         "username": "scanner_user",
         "password": "scanner_paw",
         "database": "scanner_db",
+        "pokemon": "http://in-memory.pokemon/endpoint (remove if unused)",
         "useFor": [
           "device",
           "gym",

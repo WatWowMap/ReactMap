@@ -274,7 +274,7 @@ app.use((err, req, res, next) => {
 })
 
 connection.migrate.latest().then(async () => {
-  await Db.determineType()
+  await Db.getDbContext()
   await Promise.all([
     Db.historicalRarity(),
     Event.setAvailable('gyms', 'Gym', Db),
