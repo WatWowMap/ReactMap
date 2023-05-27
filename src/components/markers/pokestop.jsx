@@ -211,7 +211,7 @@ export default function stopMarker(
           />
           {Boolean(
             icon.url.includes('stardust') || icon.url.includes('experience')
-              ? icon.url.endsWith('/0.png')
+              ? icon.url.includes('/0.')
               : !icon.url.includes('_a') && icon.amount,
           ) && (
             <div
