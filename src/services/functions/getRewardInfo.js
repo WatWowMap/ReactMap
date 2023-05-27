@@ -53,6 +53,7 @@ export default function getRewardInfo(quest, Icons) {
         0,
         quest_gender_id,
         quest_costume_id,
+        0,
         quest_shiny,
       )
       break

@@ -46,6 +46,7 @@ const raidFields = [
   'raid_pokemon_evolution',
   'raid_pokemon_move_1',
   'raid_pokemon_move_2',
+  'raid_pokemon_alignment',
 ]
 
 module.exports = class Gym extends Model {
@@ -359,6 +360,7 @@ module.exports = class Gym extends Model {
             : onlyRaidTier === gym.raid_level && (isRaid || isEgg))
         ) {
           raidFields.forEach((field) => (newGym[field] = gym[field]))
+          if (!newGym.raid_pokemon_alignment) newGym.raid_pokemon_alignment = 0
           newGym.hasRaid = true
         }
         if (
@@ -458,7 +460,7 @@ module.exports = class Gym extends Model {
     return query
   }
 
-  static async searchRaids(perms, args, { isMad }, distance) {
+  static async searchRaids(perms, args, { isMad, hasAlignment }, distance) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
@@ -497,6 +499,9 @@ module.exports = class Gym extends Model {
       query
         .leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
         .leftJoin('raid', 'gym.gym_id', 'raid.gym_id')
+    }
+    if (hasAlignment) {
+      query.select('raid_pokemon_alignment')
     }
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []

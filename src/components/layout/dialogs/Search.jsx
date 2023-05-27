@@ -96,7 +96,15 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
       return (
         <NameTT id={[form ? `form_${form}` : '', `poke_${pokemon_id}`]}>
           <img
-            src={Icons.getPokemon(pokemon_id, form, 0, gender, costume, shiny)}
+            src={Icons.getPokemon(
+              pokemon_id,
+              form,
+              0,
+              gender,
+              costume,
+              0,
+              shiny,
+            )}
             alt={nest_pokemon_form}
             style={{ maxWidth: 45, maxHeight: 45 }}
           />
@@ -109,6 +117,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
         raid_pokemon_gender,
         raid_pokemon_costume,
         raid_pokemon_evolution,
+        raid_pokemon_alignment,
       } = option
       return (
         <NameTT
@@ -125,6 +134,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
               raid_pokemon_evolution,
               raid_pokemon_gender,
               raid_pokemon_costume,
+              raid_pokemon_alignment,
             )}
             alt={raid_pokemon_id}
             style={{ maxWidth: 45, maxHeight: 45 }}
