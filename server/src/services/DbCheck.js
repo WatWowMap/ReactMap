@@ -136,7 +136,7 @@ module.exports = class DbCheck {
       hasConfirmed,
       availableSlotsCol,
       polygon,
-      hasAlignment
+      hasAlignment,
     }
   }
 
