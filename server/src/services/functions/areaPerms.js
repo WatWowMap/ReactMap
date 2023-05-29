@@ -10,7 +10,7 @@ module.exports = function areaPerms(roles) {
       if (areaRestrictions[j].roles.includes(roles[i])) {
         if (areaRestrictions[j].areas.length) {
           for (let k = 0; k < areaRestrictions[j].areas.length; k += 1) {
-            if (config.areas.names.includes(areaRestrictions[j].areas[k])) {
+            if (config.areas.names.has(areaRestrictions[j].areas[k])) {
               perms.push(areaRestrictions[j].areas[k])
             } else if (
               config.areas.withoutParents[areaRestrictions[j].areas[k]]

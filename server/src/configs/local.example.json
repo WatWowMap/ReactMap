@@ -74,6 +74,7 @@
         "username": "scanner_user",
         "password": "scanner_paw",
         "database": "scanner_db",
+        "pokemon": "http://in-memory.pokemon/endpoint (remove if unused)",
         "useFor": [
           "device",
           "gym",
@@ -325,7 +326,7 @@
     "styles": [
       {
         "name": "Default",
-        "path": "https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/",
+        "path": "https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main",
         "modifiers": {
           "gym": {
             "0": 1,

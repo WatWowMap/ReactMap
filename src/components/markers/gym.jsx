@@ -62,6 +62,7 @@ export default function GymMarker(
       raid_pokemon_costume,
       raid_pokemon_gender,
       raid_pokemon_form,
+      raid_pokemon_alignment,
       raid_is_exclusive,
     } = gym
 
@@ -73,6 +74,7 @@ export default function GymMarker(
         raid_pokemon_evolution,
         raid_pokemon_gender,
         raid_pokemon_costume,
+        raid_pokemon_alignment,
       )
       raidSize = Icons.getSize('raid', filters.filter[filterId])
     } else {

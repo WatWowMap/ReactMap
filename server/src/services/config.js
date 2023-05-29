@@ -156,7 +156,7 @@ if (fs.existsSync(resolve(`${__dirname}/../configs/config.json`))) {
 if (config.icons.styles.length === 0) {
   config.icons.styles.push({
     name: 'Default',
-    path: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/',
+    path: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main',
     modifiers: {
       gym: {
         0: 1,

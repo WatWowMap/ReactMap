@@ -67,6 +67,7 @@ module.exports = gql`
     raid_pokemon_gender: Int
     raid_pokemon_costume: Int
     raid_pokemon_evolution: Int
+    raid_pokemon_alignment: Int
     pokemon_id: Int
     form: Int
     gender: Int

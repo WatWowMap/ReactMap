@@ -40,6 +40,7 @@ const raid = gql`
     raid_pokemon_evolution
     raid_pokemon_move_1
     raid_pokemon_move_2
+    raid_pokemon_alignment
   }
 `
 
