@@ -233,7 +233,7 @@ const getLegacy = (results, args, perms, ts) => {
         (minCp && entry.cp < minCp) ||
         (entry.cap !== undefined &&
           (entry.capped
-            ? interestedLevelCaps[interestedLevelCaps.length - 1] < entry.cap
+            ? Math.max(interestedLevelCaps) < entry.cap
             : !interestedLevelCaps.includes(entry.cap)))
       ) {
         continue
