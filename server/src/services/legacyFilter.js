@@ -182,6 +182,8 @@ const getLegacy = (results, args, perms, ts) => {
       }
     }
   }
+  interestedLevelCaps.sort()
+  
 
   // eslint-disable-next-line no-unused-vars
   let orIv = (_) => false
@@ -233,7 +235,7 @@ const getLegacy = (results, args, perms, ts) => {
         (minCp && entry.cp < minCp) ||
         (entry.cap !== undefined &&
           (entry.capped
-            ? Math.max(interestedLevelCaps) < entry.cap
+            ? interestedLevelCaps[interestedLevelCaps.length - 1] < entry.cap
             : !interestedLevelCaps.includes(entry.cap)))
       ) {
         continue
