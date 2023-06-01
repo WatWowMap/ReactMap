@@ -43,6 +43,7 @@ export default function Config() {
         }
       }
       setServerSettings({ ...data, Icons })
+      document.title = data.config?.map?.headerTitle
     }
   }, [])
 

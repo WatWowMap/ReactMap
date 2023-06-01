@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import RobustTimeout from '@services/apollo/RobustTimeout'
 
+import { useStatic } from '@hooks/useStore'
 import Query from '@services/Query'
 import Utility from '@services/Utility'
 
@@ -31,7 +32,6 @@ export default function QueryData({
   userIcons,
   setParams,
   timeOfDay,
-  setExcludeList,
   setError,
   active,
   onlyAreas,
@@ -75,22 +75,22 @@ export default function QueryData({
     [userSettings, filters, onlyAreas],
   )
 
-  const refetchData = () => {
-    onMove()
-    if (category !== 'device' && category !== 'scanAreas') {
-      timeout.doRefetch({
-        ...Utility.getQueryArgs(map),
-        filters: trimFilters(filters),
-      })
-    }
-  }
-
   useEffect(() => {
+    const refetchData = () => {
+      onMove()
+      if (category !== 'device' && category !== 'scanAreas') {
+        timeout.doRefetch({
+          ...Utility.getQueryArgs(map),
+          filters: trimFilters(filters),
+        })
+      }
+    }
+
     map.on('moveend', refetchData)
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [filters, userSettings, onlyAreas])
+  }, [])
 
   const { data, previousData, refetch, error } = useQuery(
     Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),
@@ -109,7 +109,7 @@ export default function QueryData({
   )
   timeout.setupTimeout(refetch)
 
-  useEffect(() => () => setExcludeList([]))
+  useEffect(() => () => useStatic.setState({ excludeList: [] }))
 
   if (error) {
     const message =

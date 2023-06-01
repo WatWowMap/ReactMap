@@ -17,7 +17,6 @@ export default function Generator({
   block = {},
   defaultReturn = null,
   serverSettings,
-  getServerSettings,
 }) {
   const isMuiColor = block.color === 'primary' || block.color === 'secondary'
   switch (block.type) {
@@ -40,11 +39,7 @@ export default function Generator({
       return <DiscordLogin href={block.link} text={block.text} />
     case 'localLogin':
       return (
-        <LocalLogin
-          href={block.localAuthUrl}
-          serverSettings={serverSettings}
-          getServerSettings={getServerSettings}
-        />
+        <LocalLogin href={block.localAuthUrl} serverSettings={serverSettings} />
       )
     case 'localeSelection':
       return (
@@ -70,7 +65,11 @@ export default function Generator({
               {...Utility.getSizes(subBlock.gridSizes)}
               style={subBlock.gridStyle || { textAlign: 'center' }}
             >
-              <Generator block={subBlock} defaultReturn={defaultReturn} />
+              <Generator
+                block={subBlock}
+                defaultReturn={defaultReturn}
+                serverSettings={serverSettings}
+              />
             </Grid>
           ))}
         </Grid>

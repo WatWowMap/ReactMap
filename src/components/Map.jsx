@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { TileLayer, useMap, ZoomControl } from 'react-leaflet'
+import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
+import { useMap, ZoomControl, TileLayer } from 'react-leaflet'
 import { useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@material-ui/styles'
 import L from 'leaflet'
 
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
+import useTileLayer from '@hooks/useTileLayer'
 
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
 import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
 import ClientError from './layout/dialogs/ClientError'
+import { GenerateCells } from './tiles/S2Cell'
 
 const userSettingsCategory = (category) => {
   switch (category) {
@@ -27,23 +29,9 @@ const userSettingsCategory = (category) => {
   }
 }
 
-const getTileServer = (tileServers, settings, timeOfDay) => {
-  const fallbackTs = Object.values(tileServers).find(
-    (server) => server.name !== 'auto',
-  )
-  if (tileServers?.[settings.tileServers]?.name === 'auto') {
-    const autoTile =
-      timeOfDay === 'night'
-        ? Object.values(tileServers).find((server) => server.style === 'dark')
-        : Object.values(tileServers).find((server) => server.style === 'light')
-    return autoTile || fallbackTs
-  }
-  return tileServers[settings.tileServers] || fallbackTs
-}
-
 export default function Map({
   serverSettings: {
-    config: { map: config, tileServers, scanner },
+    config: { map: config, scanner },
     Icons,
     webhooks,
   },
@@ -57,21 +45,17 @@ export default function Map({
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
+  const tileLayer = useTileLayer()
 
   const staticUserSettings = useStatic((state) => state.userSettings)
   const ui = useStatic((state) => state.ui)
   const staticFilters = useStatic((state) => state.filters)
-  const setExcludeList = useStatic((state) => state.setExcludeList)
   const active = useStatic((state) => state.active)
-  const setActive = useStatic((state) => state.setActive)
 
   const filters = useStore((state) => state.filters)
   const settings = useStore((state) => state.settings)
   const icons = useStore((state) => state.icons)
-  const setLocation = useStore((s) => s.setLocation)
   const timeOfDay = useStatic((state) => state.timeOfDay)
-  const setTimeOfDay = useStatic((state) => state.setTimeOfDay)
-  const setZoom = useStore((state) => state.setZoom)
   const userSettings = useStore((state) => state.userSettings)
 
   const [webhookMode, setWebhookMode] = useState(false)
@@ -80,28 +64,19 @@ export default function Map({
   const [manualParams, setManualParams] = useState(params)
   const [error, setError] = useState('')
   const [windowState, setWindowState] = useState(true)
-  const [lc] = useState(
-    L.control.locate({
-      position: 'bottomright',
-      icon: 'fas fa-crosshairs',
-      keepCurrentZoomLevel: true,
-      setView: 'untilPan',
-    }),
-  )
 
   const onMove = useCallback(
     (latLon) => {
       const newCenter = latLon || map.getCenter()
-      setLocation([newCenter.lat, newCenter.lng])
-      setZoom(Math.floor(map.getZoom()))
-      setTimeOfDay(Utility.timeCheck(newCenter.lat, newCenter.lng))
+      useStore.setState({
+        location: [newCenter.lat, newCenter.lng],
+        zoom: Math.floor(map.getZoom()),
+      })
+      useStatic.setState({
+        timeOfDay: Utility.timeCheck(newCenter.lat, newCenter.lng),
+      })
     },
     [map],
-  )
-
-  const tileServer = useMemo(
-    () => getTileServer(tileServers, settings, timeOfDay),
-    [timeOfDay, settings.tileServers],
   )
 
   const onFocus = () => setWindowState(true)
@@ -119,38 +94,32 @@ export default function Map({
 
   useEffect(() => {
     const timer = setTimeout(
-      () => setActive(windowState),
+      () => useStatic.setState({ active: windowState }),
       1000 * 60 * config.clientTimeoutMinutes,
     )
     if (windowState) {
       clearTimeout(timer)
-      setActive(windowState)
+      useStatic.setState({ active: windowState })
     }
     return () => clearTimeout(timer)
   }, [windowState])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const lc = L.control.locate({
+      position: 'bottomright',
+      icon: 'fas fa-crosshairs',
+      keepCurrentZoomLevel: true,
+      setView: 'untilPan',
+    })
     if (settings.navigationControls === 'leaflet') {
       lc.addTo(map)
-      return () => lc.remove()
     }
-    lc.remove()
+    return () => lc.remove()
   }, [settings.navigationControls])
 
   return (
     <>
-      <TileLayer
-        key={tileServer?.name}
-        {...(tileServer || {})}
-        url={
-          tileServer?.[timeOfDay] ||
-          tileServer?.url ||
-          'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png'
-        }
-        minZoom={config.minZoom}
-        maxZoom={config.maxZoom}
-        zIndex={250}
-      />
+      <TileLayer {...tileLayer} />
       {settings.navigationControls === 'leaflet' && (
         <ZoomControl position="bottomright" />
       )}
@@ -239,6 +208,15 @@ export default function Map({
                 category,
                 true,
               )
+              if (category === 's2cells') {
+                return (
+                  <GenerateCells
+                    key={category}
+                    tileStyle={tileLayer?.style || 'light'}
+                    onMove={onMove}
+                  />
+                )
+              }
               return (
                 <QueryData
                   key={`${category}-${Object.values(
@@ -252,7 +230,6 @@ export default function Map({
                       : 'md'
                   }
                   bounds={Utility.getQueryArgs(map)}
-                  setExcludeList={setExcludeList}
                   onMove={onMove}
                   perms={value}
                   map={map}
@@ -266,7 +243,7 @@ export default function Map({
                   }
                   filters={filters[category]}
                   onlyAreas={filters?.scanAreas?.filter?.areas || []}
-                  tileStyle={tileServer?.style || 'light'}
+                  tileStyle={tileLayer?.style || 'light'}
                   clusteringRules={
                     config?.clustering?.[category] || {
                       zoomLimit: config.minZoom,

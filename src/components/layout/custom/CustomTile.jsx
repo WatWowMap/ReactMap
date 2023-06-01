@@ -10,14 +10,12 @@ export default function CustomTile({
   block,
   defaultReturn,
   serverSettings = {},
-  getServerSettings = () => {},
 }) {
   return block.type === 'parent' ? (
     <Generator
       block={block}
       defaultReturn={defaultReturn}
       serverSettings={serverSettings}
-      getServerSettings={getServerSettings}
     />
   ) : (
     <Grid
@@ -29,7 +27,6 @@ export default function CustomTile({
         block={block}
         defaultReturn={defaultReturn}
         serverSettings={serverSettings}
-        getServerSettings={getServerSettings}
       />
     </Grid>
   )
