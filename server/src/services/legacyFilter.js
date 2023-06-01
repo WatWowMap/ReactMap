@@ -136,6 +136,8 @@ const getLegacy = (results, args, perms, ts) => {
   const interestedLevelCaps = Object.keys(args.filters)
     .filter((x) => x.startsWith('onlyPvp') && args.filters[x])
     .map((y) => parseInt(y.substring(7)))
+    .filter(Boolean)
+
   const interestedMegas = args.filters.onlyPvpMega
     ? [1, 2, 3, 'experimental_stats']
     : []
@@ -180,6 +182,7 @@ const getLegacy = (results, args, perms, ts) => {
       }
     }
   }
+  interestedLevelCaps.sort()
 
   // eslint-disable-next-line no-unused-vars
   let orIv = (_) => false

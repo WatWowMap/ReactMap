@@ -4,10 +4,9 @@ import { Navigate, useParams } from 'react-router-dom'
 import useConfig from '@hooks/useConfig'
 
 import Container from '../../Container'
-import Login from './Login'
 import WebhookQuery from '../../WebhookQuery'
 
-export default function Auth({ serverSettings, getServerSettings }) {
+export default function Auth({ serverSettings }) {
   const params = useParams()
   const { location, zoom } = useConfig(serverSettings, params)
 
@@ -22,12 +21,7 @@ export default function Auth({ serverSettings, getServerSettings }) {
     if (params.category || params.lat) {
       localStorage.setItem('params', JSON.stringify(params))
     }
-    return (
-      <Login
-        serverSettings={serverSettings}
-        getServerSettings={getServerSettings}
-      />
-    )
+    return <Navigate push to="/login" />
   }
   const cachedParams = JSON.parse(localStorage.getItem('params'))
   if (cachedParams) {
