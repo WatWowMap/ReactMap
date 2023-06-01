@@ -13,7 +13,7 @@ module.exports = class EventManager {
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
     this.uicons = []
     this.baseUrl =
-      'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/'
+      'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
     this.webhookObj = {}
     this.Clients = {}
   }

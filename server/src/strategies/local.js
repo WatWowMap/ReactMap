@@ -50,7 +50,7 @@ const authHandler = async (_req, username, password, done) => {
             })
             user.id = newUser.id
             log.info(
-              HELPERS.custom(name.toUpperCase()),
+              HELPERS.custom(name),
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -74,7 +74,7 @@ const authHandler = async (_req, username, password, done) => {
           }
           user.id = userExists.id
           log.info(
-            HELPERS.custom(name.toUpperCase()),
+            HELPERS.custom(name),
             user.username,
             `(${user.id})`,
             'Authenticated successfully.',
@@ -84,11 +84,7 @@ const authHandler = async (_req, username, password, done) => {
         return done(null, false, { message: 'invalid_credentials' })
       })
   } catch (e) {
-    log.error(
-      HELPERS.custom(name.toUpperCase()),
-      'User has failed authentication.',
-      e,
-    )
+    log.error(HELPERS.custom(name), 'User has failed authentication.', e)
   }
 }
 

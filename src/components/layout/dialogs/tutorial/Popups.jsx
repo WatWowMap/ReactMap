@@ -45,7 +45,7 @@ export default function TutPopup({ isMobile }) {
                   lat: startLat,
                   lon: startLon,
                 }}
-                iconUrl="https://mygod.github.io/pokicons/v2/16.png"
+                iconUrl="https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/pokemon/16.webp"
                 userSettings={{ prioritizePvpInfo: false }}
                 isTutorial
                 Icons={Icons}

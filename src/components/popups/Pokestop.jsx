@@ -12,7 +12,7 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 
 import ErrorBoundary from '@components/ErrorBoundary'
-import { Check, Clear } from '@components/layout/general/Icons'
+import { Check, Help } from '@components/layout/general/Icons'
 import { useStore, useStatic } from '@hooks/useStore'
 import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
@@ -380,7 +380,7 @@ const RewardInfo = ({ quest, Icons, config, t }) => {
           onError={(e) => {
             e.target.onerror = null
             e.target.src =
-              'https://github.com/WatWowMap/wwm-uicons/blob/main/misc/0.png'
+              'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/misc/0.webp'
           }}
         />
       </NameTT>
@@ -612,32 +612,34 @@ const Invasion = ({ invasion, Icons, t }) => {
   const { invasions: invasionInfo } = useStatic((state) => state.masterfile)
   const encounterNum = { first: '#1', second: '#2', third: '#3' }
 
-  const makeShadowPokemon = (pkmn) => (
-    <NameTT
-      key={`${pkmn.id}_${pkmn.form}`}
-      id={[pkmn.form ? `form_${pkmn.form}` : '', `poke_${pkmn.id}`]}
-    >
-      <div className="invasion-reward">
-        <img
-          className="invasion-reward"
-          alt="invasion reward"
-          src={Icons.getPokemon(
-            pkmn.id,
-            pkmn.form,
-            0,
-            pkmn.gender,
-            pkmn.costumeId,
-            pkmn.shiny,
+  const makeShadowPokemon = (pkmn) => {
+    const src = Icons.getPokemon(
+      pkmn.id,
+      pkmn.form,
+      0,
+      pkmn.gender,
+      pkmn.costumeId,
+      1,
+      pkmn.shiny,
+    )
+    return (
+      <NameTT
+        key={`${pkmn.id}_${pkmn.form}`}
+        id={[pkmn.form ? `form_${pkmn.form}` : '', `poke_${pkmn.id}`]}
+      >
+        <div className="invasion-reward">
+          <img className="invasion-reward" alt="invasion reward" src={src} />
+          {!src.includes('_a1') && (
+            <img
+              className="invasion-reward-shadow"
+              alt="shadow"
+              src={Icons.getMisc('shadow')}
+            />
           )}
-        />
-        <img
-          className="invasion-reward-shadow"
-          alt="shadow"
-          src={Icons.getMisc('shadow')}
-        />
-      </div>
-    </NameTT>
-  )
+        </div>
+      </NameTT>
+    )
+  }
 
   const getRewardPercent = (grunt) => {
     if (grunt.type.startsWith('NPC')) {
@@ -669,7 +671,7 @@ const Invasion = ({ invasion, Icons, t }) => {
         {invasion.confirmed ? (
           <Check fontSize="medium" color="action" />
         ) : (
-          <Clear fontSize="medium" color="error" />
+          <Help fontSize="medium" style={{ color: 'white' }} />
         )}
       </Grid>
       <Grid item xs={12}>

@@ -67,7 +67,7 @@ export default class UIcons {
             console.error('No path provided for', name, 'using default path')
             this[
               name
-            ].path = `https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/`
+            ].path = `https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main`
           }
           if (!path.startsWith('http')) {
             this[name].path = `/images/uicons/${path}`
@@ -88,6 +88,9 @@ export default class UIcons {
               } else {
                 Object.keys(data[category]).forEach((subCategory) => {
                   if (Array.isArray(data[category][subCategory])) {
+                    this[name].extension =
+                      data[category][subCategory][0]?.split('.')[1] ||
+                      this[name].extension
                     this[name][subCategory] = new Set(
                       data[category][subCategory],
                     )
@@ -125,12 +128,14 @@ export default class UIcons {
       }
     })
     // for debugging purposes/viewing
-    Object.defineProperty(window, 'uicons', {
-      value: this,
-      writable: false,
-      enumerable: true,
-      configurable: false,
-    })
+    if (!window.uicons) {
+      Object.defineProperty(window, 'uicons', {
+        value: this,
+        writable: false,
+        enumerable: true,
+        configurable: false,
+      })
+    }
   }
 
   get selection() {
@@ -221,40 +226,49 @@ export default class UIcons {
     evolution = 0,
     gender = 0,
     costume = 0,
+    alignment = 0,
     shiny = false,
   ) {
     const baseUrl = `${
       this[this.selected.pokemon]?.path || this.fallback
     }/pokemon`
+    const extension = this[this.selected.pokemon]?.extension || 'png'
+
     const evolutionSuffixes = evolution ? [`_e${evolution}`, ''] : ['']
     const formSuffixes = form ? [`_f${form}`, ''] : ['']
     const costumeSuffixes = costume ? [`_c${costume}`, ''] : ['']
     const genderSuffixes = gender ? [`_g${gender}`, ''] : ['']
+    const alignmentSuffixes = alignment ? [`_a${alignment}`, ''] : ['']
     const shinySuffixes = shiny ? ['_s', ''] : ['']
+
     for (let e = 0; e < evolutionSuffixes.length; e += 1) {
       for (let f = 0; f < formSuffixes.length; f += 1) {
         for (let c = 0; c < costumeSuffixes.length; c += 1) {
           for (let g = 0; g < genderSuffixes.length; g += 1) {
-            for (let s = 0; s < shinySuffixes.length; s += 1) {
-              const result = `${pokemonId}${evolutionSuffixes[e]}${formSuffixes[f]}${costumeSuffixes[c]}${genderSuffixes[g]}${shinySuffixes[s]}.png`
-              if (this[this.selected.pokemon].pokemon.has(result)) {
-                return `${baseUrl}/${result}`
+            for (let a = 0; a < alignmentSuffixes.length; a += 1) {
+              for (let s = 0; s < shinySuffixes.length; s += 1) {
+                const result = `${pokemonId}${evolutionSuffixes[e]}${formSuffixes[f]}${costumeSuffixes[c]}${genderSuffixes[g]}${alignmentSuffixes[a]}${shinySuffixes[s]}.${extension}`
+                if (this[this.selected.pokemon].pokemon.has(result)) {
+                  return `${baseUrl}/${result}`
+                }
               }
             }
           }
         }
       }
     }
-    return `${baseUrl}/0.png`
+    return `${baseUrl}/0.${extension}`
   }
 
   getTypes(typeId) {
     const baseUrl = `${this[this.selected.type]?.path || this.fallback}/type`
-    const result = `${typeId}.png`
+    const extension = this[this.selected.type]?.extension || 'png'
+
+    const result = `${typeId}.${extension}`
     if (this[this.selected.type].type.has(result)) {
       return `${baseUrl}/${result}`
     }
-    return `${baseUrl}/0.png`
+    return `${baseUrl}/0.${extension}`
   }
 
   getPokestops(
@@ -268,6 +282,8 @@ export default class UIcons {
     const baseUrl = `${
       this[this.selected.pokestop]?.path || this.fallback
     }/pokestop`
+    const extension = this[this.selected.pokestop]?.extension || 'png'
+
     const invasionSuffixes =
       invasionActive || display ? [`_i${display}`, ''] : ['']
     const questSuffixes = questActive ? ['_q', ''] : ['']
@@ -278,7 +294,7 @@ export default class UIcons {
       for (let q = 0; q < questSuffixes.length; q += 1) {
         for (let a = 0; a < arSuffixes.length; a += 1) {
           for (let p = 0; p < powerUpSuffixes.length; p += 1) {
-            const result = `${lureId}${invasionSuffixes[i]}${questSuffixes[q]}${arSuffixes[a]}${powerUpSuffixes[p]}.png`
+            const result = `${lureId}${invasionSuffixes[i]}${questSuffixes[q]}${arSuffixes[a]}${powerUpSuffixes[p]}.${extension}`
             if (this[this.selected.pokestop].pokestop.has(result)) {
               return `${baseUrl}/${result}`
             }
@@ -286,7 +302,7 @@ export default class UIcons {
         }
       }
     }
-    return `${baseUrl}/0.png`
+    return `${baseUrl}/0.${extension}`
   }
 
   getRewards(rewardType, id, amount) {
@@ -294,30 +310,34 @@ export default class UIcons {
     const baseUrl = `${
       this[this.selected.reward]?.path || this.fallback
     }/reward/${category}`
+    const extension = this[this.selected.reward]?.extension || 'png'
+
     if (this[this.selected.reward][category]) {
       const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
       for (let a = 0; a < amountSuffixes.length; a += 1) {
-        const result = `${id}${amountSuffixes[a]}.png`
+        const result = `${id}${amountSuffixes[a]}.${extension}`
         if (this[this.selected.reward][category].has(result)) {
           return `${baseUrl}/${result}`
         }
       }
     }
-    return `${baseUrl}/0.png`
+    return `${baseUrl}/0.${extension}`
   }
 
   getInvasions(gruntType, confirmed = false) {
     const baseUrl = `${
       this[this.selected.invasion]?.path || this.fallback
     }/invasion`
+    const extension = this[this.selected.invasion]?.extension || 'png'
+
     const confirmedSuffixes = confirmed ? [''] : ['_u', '']
     for (let c = 0; c < confirmedSuffixes.length; c += 1) {
-      const result = `${gruntType}${confirmedSuffixes[c]}.png`
+      const result = `${gruntType}${confirmedSuffixes[c]}.${extension}`
       if (this[this.selected.invasion].invasion.has(result)) {
         return `${baseUrl}/${result}`
       }
     }
-    return `${baseUrl}/0.png`
+    return `${baseUrl}/0.${extension}`
   }
 
   getGyms(
@@ -328,6 +348,8 @@ export default class UIcons {
     ar = false,
   ) {
     const baseUrl = `${this[this.selected.gym]?.path || this.fallback}/gym`
+    const extension = this[this.selected.gym]?.extension || 'png'
+
     const trainerSuffixes = trainerCount ? [`_t${trainerCount}`, ''] : ['']
     const inBattleSuffixes = inBattle ? ['_b', ''] : ['']
     const exSuffixes = ex ? ['_ex', ''] : ['']
@@ -336,7 +358,7 @@ export default class UIcons {
       for (let b = 0; b < inBattleSuffixes.length; b += 1) {
         for (let e = 0; e < exSuffixes.length; e += 1) {
           for (let a = 0; a < arSuffixes.length; a += 1) {
-            const result = `${teamId}${trainerSuffixes[t]}${inBattleSuffixes[b]}${exSuffixes[e]}${arSuffixes[a]}.png`
+            const result = `${teamId}${trainerSuffixes[t]}${inBattleSuffixes[b]}${exSuffixes[e]}${arSuffixes[a]}.${extension}`
             if (this[this.selected.gym].gym.has(result)) {
               return `${baseUrl}/${result}`
             }
@@ -344,18 +366,20 @@ export default class UIcons {
         }
       }
     }
-    return `${baseUrl}/0.png`
+    return `${baseUrl}/0.${extension}`
   }
 
   getEggs(level, hatched = false, ex = false) {
     const baseUrl = `${
       this[this.selected.raid]?.path || this.fallback
     }/raid/egg`
+    const extension = this[this.selected.raid]?.extension || 'png'
+
     const hatchedSuffixes = hatched ? ['_h', ''] : ['']
     const exSuffixes = ex ? ['_ex', ''] : ['']
     for (let h = 0; h < hatchedSuffixes.length; h += 1) {
       for (let e = 0; e < exSuffixes.length; e += 1) {
-        const result = `${level}${hatchedSuffixes[h]}${exSuffixes[e]}.png`
+        const result = `${level}${hatchedSuffixes[h]}${exSuffixes[e]}.${extension}`
         if (
           this[this.selected.raid].egg &&
           this[this.selected.raid].egg.has(result)
@@ -364,76 +388,93 @@ export default class UIcons {
         }
       }
     }
-    return `${baseUrl}/0.png`
+    return `${baseUrl}/0.${extension}`
   }
 
   getTeams(teamId = 0) {
     const baseUrl = `${this[this.selected.team]?.path || this.fallback}/team`
-    const result = `${teamId}.png`
+    const extension = this[this.selected.team]?.extension || 'png'
+
+    const result = `${teamId}.${extension}`
     if (this[this.selected.team].team.has(result)) {
       return `${baseUrl}/${result}`
     }
-    return `${baseUrl}/0.png`
+    return `${baseUrl}/0.${extension}`
   }
 
   getWeather(weatherId, timeOfDay = false) {
     const baseUrl = `${
       this[this.selected.weather]?.path || this.fallback
     }/weather`
+    const extension = this[this.selected.weather]?.extension || 'png'
+
     const timeSuffixes = timeOfDay === 'night' ? ['_n', ''] : ['_d', '']
     for (let t = 0; t < timeSuffixes.length; t += 1) {
-      const result = `${weatherId}${timeSuffixes[t]}.png`
+      const result = `${weatherId}${timeSuffixes[t]}.${extension}`
       if (this[this.selected.weather].weather.has(result)) {
         return `${baseUrl}/${result}`
       }
     }
-    return `${baseUrl}/0.png`
+    return `${baseUrl}/0.${extension}`
   }
 
   getNests(typeId) {
     const baseUrl = `${this[this.selected.nest]?.path || this.fallback}/nest`
-    const result = `${typeId}.png`
+    const extension = this[this.selected.nest]?.extension || 'png'
+
+    const result = `${typeId}.${extension}`
     if (this[this.selected.nest].nest.has(result)) {
       return `${baseUrl}/${result}`
     }
-    return `${baseUrl}/0.png`
+    return `${baseUrl}/0.${extension}`
   }
 
   doesMiscHave(fileName) {
-    return this[this.selected.misc].misc.has(`${fileName}.png`)
+    return this[this.selected.misc].misc.has(
+      `${fileName}.${this[this.selected.misc].extension || 'png'}`,
+    )
   }
 
   getMisc(fileName) {
     const baseUrl = `${this[this.selected.misc]?.path || this.fallback}/misc`
+    const extension = this[this.selected.misc]?.extension || 'png'
+
     if (this.doesMiscHave(fileName)) {
-      return `${baseUrl}/${fileName}.png`
+      return `${baseUrl}/${fileName}.${extension}`
     }
     if (fileName.endsWith('s') && this.doesMiscHave(fileName.slice(0, -1))) {
-      return `${baseUrl}/${fileName.slice(0, -1)}.png`
+      return `${baseUrl}/${fileName.slice(0, -1)}.${extension}`
     }
-    if (!fileName.endsWith('s') && this.doesMiscHave(`${fileName}s.png`)) {
-      return `${baseUrl}/${fileName}s.png`
+    if (
+      !fileName.endsWith('s') &&
+      this.doesMiscHave(`${fileName}s.${extension}`)
+    ) {
+      return `${baseUrl}/${fileName}s.${extension}`
     }
     if (
       this[this.selected[fileName]]?.path &&
-      this[this.selected[fileName]][fileName]?.has('0.png')
+      this[this.selected[fileName]][fileName]?.has(`0.${extension}`)
     ) {
-      return `${this[this.selected[fileName]]?.path}/${fileName}/0.png`
+      return `${this[this.selected[fileName]]?.path}/${fileName}/0.${extension}`
     }
-    return `${baseUrl}/0.png`
+    return `${baseUrl}/0.${extension}`
   }
 
   getDevices(online) {
     const baseUrl = `${
       this[this.selected.device]?.path || this.fallback
     }/device`
-    return online ? `${baseUrl}/1.png` : `${baseUrl}/0.png`
+    const extension = this[this.selected.device]?.extension || 'png'
+
+    return online ? `${baseUrl}/1.${extension}` : `${baseUrl}/0.${extension}`
   }
 
   getSpawnpoints(hasTth) {
     const baseUrl = `${
       this[this.selected.spawnpoint]?.path || this.fallback
     }/spawnpoint`
-    return hasTth ? `${baseUrl}/1.png` : `${baseUrl}/0.png`
+    const extension = this[this.selected.spawnpoint]?.extension || 'png'
+
+    return hasTth ? `${baseUrl}/1.${extension}` : `${baseUrl}/0.${extension}`
   }
 }

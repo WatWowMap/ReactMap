@@ -48,7 +48,8 @@ const HELPERS = {
   s2cells: chalk.hex('#ffc107')('[S2 CELLS]'),
   devices: chalk.hex('#ff9800')('[DEVICE]'),
 
-  custom: (text, color = '#64b5f6') => chalk.hex(color)(`[${text}]`),
+  custom: (text = '', color = '#64b5f6') =>
+    chalk.hex(color)(`[${text.toUpperCase()}]`),
 }
 
 module.exports.HELPERS = HELPERS

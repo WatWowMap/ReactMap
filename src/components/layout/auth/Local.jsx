@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import Visibility from '@material-ui/icons/Visibility'
 import VisibilityOff from '@material-ui/icons/VisibilityOff'
-import { Navigate } from 'react-router-dom'
 import {
   Grid,
   Typography,
@@ -19,11 +18,7 @@ import { useMutation } from '@apollo/client'
 import Fetch from '@services/Fetch'
 import Query from '@services/Query'
 
-export default function LocalLogin({
-  href,
-  serverSettings,
-  getServerSettings,
-}) {
+export default function LocalLogin({ href }) {
   const { t } = useTranslation()
   const [user, setUser] = useState({
     username: '',
@@ -32,7 +27,6 @@ export default function LocalLogin({
   })
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [redirect, setRedirect] = useState(false)
   const [checkUsername, { data }] = useMutation(Query.user('checkUsername'))
 
   const handleChange = (e) => {
@@ -45,21 +39,13 @@ export default function LocalLogin({
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitted(true)
-    await Fetch.login(user, href).then(async (resp) => {
-      if (!resp.ok) {
-        setError(t(await resp.json()))
-      }
-      if (resp.redirected) {
-        await getServerSettings()
-        if (serverSettings.user.valid) {
-          setRedirect(true)
-        }
-      }
-    })
-  }
+    const resp = await Fetch.login(user, href)
 
-  if (redirect) {
-    return <Navigate push to="/" />
+    if (!resp.ok) {
+      setError(t(await resp.json()))
+    } else {
+      window.location.replace('/')
+    }
   }
 
   return (
