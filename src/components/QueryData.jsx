@@ -75,22 +75,22 @@ export default function QueryData({
     [userSettings, filters, onlyAreas],
   )
 
-  const refetchData = () => {
-    onMove()
-    if (category !== 'device' && category !== 'scanAreas') {
-      timeout.doRefetch({
-        ...Utility.getQueryArgs(map),
-        filters: trimFilters(filters),
-      })
-    }
-  }
-
   useEffect(() => {
+    const refetchData = () => {
+      onMove()
+      if (category !== 'device' && category !== 'scanAreas') {
+        timeout.doRefetch({
+          ...Utility.getQueryArgs(map),
+          filters: trimFilters(filters),
+        })
+      }
+    }
+
     map.on('moveend', refetchData)
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [filters, userSettings, onlyAreas])
+  }, [])
 
   const { data, previousData, refetch, error } = useQuery(
     Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),

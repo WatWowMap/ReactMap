@@ -13,6 +13,7 @@ import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
 import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
 import ClientError from './layout/dialogs/ClientError'
+import { GenerateCells } from './tiles/S2Cell'
 
 const userSettingsCategory = (category) => {
   switch (category) {
@@ -207,6 +208,15 @@ export default function Map({
                 category,
                 true,
               )
+              if (category === 's2cells') {
+                return (
+                  <GenerateCells
+                    key={category}
+                    tileStyle={tileLayer?.style || 'light'}
+                    onMove={onMove}
+                  />
+                )
+              }
               return (
                 <QueryData
                   key={`${category}-${Object.values(
