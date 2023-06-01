@@ -590,5 +590,6 @@
   "name": "Name",
   "only_confirmed": "Only Confirmed",
   "rocket_pokemon": "Rocket Pokemon",
-  "decoy": "Decoy"
+  "decoy": "Decoy",
+  "s2_cell_limit_0": "You attempted to generate more than 20,000 cells ({{variable_0}})"
 }
