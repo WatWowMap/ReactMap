@@ -183,7 +183,6 @@ const getLegacy = (results, args, perms, ts) => {
     }
   }
   interestedLevelCaps.sort()
-  
 
   // eslint-disable-next-line no-unused-vars
   let orIv = (_) => false

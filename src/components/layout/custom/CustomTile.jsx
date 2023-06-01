@@ -12,7 +12,14 @@ export default function CustomTile({
   serverSettings = {},
   getServerSettings = () => {},
 }) {
-  return (
+  return block.type === 'parent' ? (
+    <Generator
+      block={block}
+      defaultReturn={defaultReturn}
+      serverSettings={serverSettings}
+      getServerSettings={getServerSettings}
+    />
+  ) : (
     <Grid
       item
       {...Utility.getSizes(block.gridSizes)}
