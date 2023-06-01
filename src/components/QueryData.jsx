@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import RobustTimeout from '@services/apollo/RobustTimeout'
 
+import { useStatic } from '@hooks/useStore'
 import Query from '@services/Query'
 import Utility from '@services/Utility'
 
@@ -31,7 +32,6 @@ export default function QueryData({
   userIcons,
   setParams,
   timeOfDay,
-  setExcludeList,
   setError,
   active,
   onlyAreas,
@@ -109,7 +109,7 @@ export default function QueryData({
   )
   timeout.setupTimeout(refetch)
 
-  useEffect(() => () => setExcludeList([]))
+  useEffect(() => () => useStatic.setState({ excludeList: [] }))
 
   if (error) {
     const message =
