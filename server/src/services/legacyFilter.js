@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-continue */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-plusplus */
@@ -135,7 +136,9 @@ const getLegacy = (results, args, perms, ts) => {
   const interestedLevelCaps = Object.keys(args.filters)
     .filter((x) => x.startsWith('onlyPvp') && args.filters[x])
     .map((y) => parseInt(y.substring(7)))
-  const interestedMegas = args.filters.pvpMega
+    .filter(Boolean)
+
+  const interestedMegas = args.filters.onlyPvpMega
     ? [1, 2, 3, 'experimental_stats']
     : []
 
@@ -179,6 +182,7 @@ const getLegacy = (results, args, perms, ts) => {
       }
     }
   }
+  interestedLevelCaps.sort()
 
   // eslint-disable-next-line no-unused-vars
   let orIv = (_) => false
@@ -304,7 +308,9 @@ const getLegacy = (results, args, perms, ts) => {
         if (result.pvp || (reactMapHandlesPvp && result.cp)) {
           const pvpResults = reactMapHandlesPvp
             ? Pvp.resultWithCache(result, ts)
-            : JSON.parse(result.pvp)
+            : typeof result.pvp === 'string'
+            ? JSON.parse(result.pvp)
+            : result.pvp
           Object.keys(pvpResults).forEach((league) => {
             filterLeagueStats(
               pvpResults[league],
@@ -327,6 +333,11 @@ const getLegacy = (results, args, perms, ts) => {
             )
           }
         }
+        Object.entries(filtered.cleanPvp).forEach(([league, pvpResults]) => {
+          if (!pvpResults.length) {
+            delete filtered.cleanPvp[league]
+          }
+        })
         filtered.bestPvp = bestPvp
       }
       let pokemonFilter =

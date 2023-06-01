@@ -123,6 +123,7 @@ export default function stopMarker(
               0,
               quest_gender_id,
               quest_costume_id,
+              0,
               quest_shiny,
             ),
           })
@@ -210,7 +211,7 @@ export default function stopMarker(
           />
           {Boolean(
             icon.url.includes('stardust') || icon.url.includes('experience')
-              ? icon.url.endsWith('/0.png')
+              ? icon.url.includes('/0.')
               : !icon.url.includes('_a') && icon.amount,
           ) && (
             <div
