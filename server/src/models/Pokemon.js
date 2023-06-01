@@ -516,7 +516,7 @@ module.exports = class Pokemon extends Model {
         }
       })
       if (
-        (Object.keys(pkmn.cleanPvp).length || !pkmn.pvpCheck) &&
+        (Object.keys(pkmn.cleanPvp).length || (!pkmn.pvpCheck && !mem)) &&
         globalCheck(pkmn)
       ) {
         pkmn.changed = !!pkmn.changed

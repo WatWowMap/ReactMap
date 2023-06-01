@@ -155,6 +155,7 @@ module.exports = class DbCheck {
             : {
                 mem: this.endpoints[i].endpoint,
                 secret: this.endpoints[i].secret,
+                pvpV2: true,
               }
 
           Object.entries(this.models).forEach(([category, sources]) => {
