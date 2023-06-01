@@ -10,8 +10,6 @@ export default function useConfig(serverSettings, params) {
   const [state, setState] = useState({ set: false, zoom: 10, location: [0, 0] })
 
   if (!state.set) {
-    document.title = serverSettings.config?.map?.headerTitle
-
     Utility.analytics(
       'User',
       serverSettings.user
