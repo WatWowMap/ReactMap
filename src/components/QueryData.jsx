@@ -90,7 +90,7 @@ export default function QueryData({
     return () => {
       map.off('moveend', refetchData)
     }
-  }, [])
+  }, [filters, userSettings, onlyAreas])
 
   const { data, previousData, refetch, error } = useQuery(
     Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),

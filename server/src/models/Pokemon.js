@@ -26,6 +26,8 @@ const levelCalc =
   'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'
 const ivCalc =
   'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
+const leagueNames = new Set(leagues.map((league) => league.name))
+
 const keys = [
   'iv',
   'cp',
@@ -36,8 +38,9 @@ const keys = [
   'gender',
   'xxs',
   'xxl',
-  ...leagues.map((league) => league.name),
+  ...leagueNames,
 ]
+
 const madKeys = {
   iv: raw(ivCalc),
   level: raw(levelCalc),
@@ -191,6 +194,29 @@ module.exports = class Pokemon extends Model {
         }
       })
       return relevantKeys
+    }
+
+    const isValid = (pkmn) => {
+      const filterId = `${pkmn.pokemon_id}-${pkmn.form}`
+      const filter = args.filters[filterId] || onlyIvOr
+      const local = getRelevantKeys(filter).filter((x) => !leagueNames.has(x))
+      if (onlyZeroIv && pkmn.iv === 0) return true
+      if (onlyHundoIv && pkmn.iv === 100) return true
+      for (let i = 0; i < local.length; i += 1) {
+        const key = local[i]
+        switch (key) {
+          case 'xxs':
+          case 'xxl':
+            if (pkmn.size === (key === 'xxl' ? 5 : 1)) return true
+            break
+          default: {
+            const [min, max] = getMinMax(filterId, key)
+            if (pkmn[key] >= min && pkmn[key] <= max) return true
+            break
+          }
+        }
+      }
+      return false
     }
 
     // generates specific SQL for each slider that isn't set to default, along with perm checks
@@ -516,10 +542,8 @@ module.exports = class Pokemon extends Model {
           }
         }
       })
-      if (
-        (Object.keys(pkmn.cleanPvp).length || !pkmn.pvpCheck) &&
-        globalCheck(pkmn)
-      ) {
+      const valid = isValid(pkmn)
+      if ((Object.keys(pkmn.cleanPvp).length || valid) && globalCheck(pkmn)) {
         pkmn.changed = !!pkmn.changed
         pkmn.expire_timestamp_verified = !!pkmn.expire_timestamp_verified
         finalResults.push(pkmn)
