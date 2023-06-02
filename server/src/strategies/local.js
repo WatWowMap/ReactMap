@@ -77,7 +77,8 @@ const authHandler = async (_req, username, password, done) => {
         if (bcrypt.compareSync(password, userExists.password)) {
           ;['discordPerms', 'telegramPerms'].forEach((permSet) => {
             if (userExists[permSet]) {
-              user.perms = Utility.mergePerms(user.perms, JSON.parse(userExists[permSet]))
+              user.perms = Utility.mergePerms(user.perms,
+                typeof userExists[permSet] === 'string' ? JSON.parse(userExists[permSet]) : userExists[permSet])
             }
           })
           if (userExists.strategy !== 'local') {
@@ -88,7 +89,9 @@ const authHandler = async (_req, username, password, done) => {
           }
           user.id = userExists.id
           user.username = userExists.username
-          user.status = userExists.data ? JSON.parse(userExists.data).status || 'local' : 'local'
+          user.status = userExists.data ?
+            (typeof userExists.data === 'string' ? JSON.parse(userExists.data).status : userExists.data.status) || 'local'
+            : 'local'
           Object.entries(perms).forEach(([perm, info]) => {
             if (info.enabled) {
               if (
@@ -104,6 +107,11 @@ const authHandler = async (_req, username, password, done) => {
               }
             }
           })
+          Utility.webhookPerms(
+              [user.status],
+              'localStatus',
+              trialActive,
+          ).forEach((x) => user.perms.webhooks.push(x))
           log.info(
             HELPERS.custom(name),
             user.username,
