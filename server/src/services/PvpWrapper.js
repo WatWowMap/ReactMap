@@ -2,6 +2,20 @@ const Ohbem = require('ohbem')
 const NodeCache = require('node-cache')
 const { log, HELPERS } = require('./logger')
 
+/**
+ * @typedef {object} PokemonEntry
+ * @property {number} pokemon
+ * @property {number} form
+ * @property {number} cap
+ * @property {number} value
+ * @property {number} level
+ * @property {number} cp
+ * @property {number} percentage
+ * @property {number} rank
+ * @property {boolean} capped
+ * @property {number} evolution
+ */
+
 module.exports = class PvpWrapper extends Ohbem {
   constructor(config) {
     super({
@@ -16,6 +30,10 @@ module.exports = class PvpWrapper extends Ohbem {
     })()
   }
 
+  /**
+   * @param {object} pokemon
+   * @returns {{ [key in typeof import("./filters/pokemon/constants").LEAGUES[number]]: PokemonEntry[] }}
+   */
   resultWithCache(pokemon, currentTs) {
     if (pokemon.pokemon_id === 132) return {}
 
