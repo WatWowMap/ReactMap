@@ -221,6 +221,10 @@
         "__format": "boolean"
       },
       "minCp": {
+        "little": {
+          "__name": "API_PVP_MIN_CP_LITTLE",
+          "__format": "number"
+        },
         "great": {
           "__name": "API_PVP_MIN_CP_GREAT",
           "__format": "number"
