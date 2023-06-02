@@ -428,6 +428,7 @@ module.exports = class Pokemon extends Model {
             (isMad && reactMapHandlesPvp && pkmn.cp))
         ) {
           noPvp = false
+          // pkmn.pvpCheck = true
           listOfIds.push(pkmn.id)
           pvpResults.push(pkmn)
         }
@@ -516,7 +517,7 @@ module.exports = class Pokemon extends Model {
         }
       })
       if (
-        (Object.keys(pkmn.cleanPvp).length || (!pkmn.pvpCheck && !mem)) &&
+        (Object.keys(pkmn.cleanPvp).length || !pkmn.pvpCheck) &&
         globalCheck(pkmn)
       ) {
         pkmn.changed = !!pkmn.changed
