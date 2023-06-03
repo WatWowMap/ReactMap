@@ -12,7 +12,7 @@ const { filterRTree } = require('../../functions/filterRTree')
 const { Event, Pvp } = require('../../initialization')
 const { log, HELPERS } = require('../../logger')
 
-module.exports = class PkmnFilter {
+module.exports = class PkmnBackend {
   /**
    * @param {`${number}-${number}` | 'global'} id
    * @param {import('./constants').PkmnFilter} filter

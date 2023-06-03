@@ -1,6 +1,6 @@
 const { raw } = require('objection')
 const config = require('../../config')
-const { PokemonFilter } = require('../../../models/Filters')
+const PokemonFilter = require('./Frontend')
 
 const LEVEL_CALC =
   'IFNULL(IF(cp_multiplier < 0.734, ROUND(58.35178527 * cp_multiplier * cp_multiplier - 2.838007664 * cp_multiplier + 0.8539209906), ROUND(171.0112688 * cp_multiplier - 95.20425243)), NULL)'

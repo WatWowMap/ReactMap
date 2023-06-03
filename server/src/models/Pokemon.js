@@ -27,7 +27,7 @@ const {
   LEAGUES,
   MAD_KEY_MAP,
 } = require('../services/filters/pokemon/constants')
-const PkmnFilter = require('../services/filters/pokemon/Filter')
+const PkmnFilter = require('../services/filters/pokemon/Backend')
 const { log, HELPERS } = require('../services/logger')
 
 module.exports = class Pokemon extends Model {
