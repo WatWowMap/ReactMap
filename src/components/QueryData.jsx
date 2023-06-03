@@ -45,6 +45,7 @@ export default function QueryData({
       const trimmed = {
         onlyLegacy: userSettings.legacyFilter,
         onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
+        onlyAllPvp: userSettings.showAllPvpRanks,
         onlyAreas,
       }
       Object.entries(requestedFilters).forEach((topLevelFilter) => {

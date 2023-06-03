@@ -97,10 +97,6 @@ module.exports = class PkmnFilter {
       if (andStr) andStr += '&'
       andStr += `CP${filter.cp.join('-')}`
     }
-    if (keys.has('gender')) {
-      if (andStr) andStr += '&'
-      andStr += `G${filter.gender}`
-    }
     let orStr = ''
     if (keys.has('xxs')) {
       if (orStr) orStr += '|'
@@ -122,13 +118,17 @@ module.exports = class PkmnFilter {
       if (orStr) orStr += '|'
       orStr += `LC${filter.little.join('-')}`
     }
+    if (andStr && !(andStr.startsWith('(') && andStr.endsWith(')')) && orStr) {
+      andStr = `(${andStr})`
+    }
     if (orStr && andStr) {
       orStr = `(${orStr})`
     }
-    if (andStr && !andStr.startsWith('(') && !andStr.startsWith(')') && orStr) {
-      andStr = `(${andStr})`
+    let merged = andStr ? `${andStr}${orStr ? `|${orStr}` : ''}` : orStr
+    if (keys.has('gender')) {
+      if (merged) merged = `(${merged})`
+      merged += `&G${filter.gender}`
     }
-    const merged = andStr ? `${andStr}${orStr ? `|${orStr}` : ''}` : orStr
     log.debug(HELPERS.pokemon, this.id, {
       andStr,
       orStr,
@@ -185,7 +185,7 @@ module.exports = class PkmnFilter {
   }
 
   /**
-   * @param {import("../../PvpWrapper").PokemonEntry} entry
+   * @param {import("../../../types").PvpEntry} entry
    * @param {typeof import("./constants").LEAGUES[number]} league
    * @returns {boolean}
    */

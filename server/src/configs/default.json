@@ -355,6 +355,7 @@
       "interactionRanges": false,
       "showDexNumInPopup": false,
       "pvpMega": false,
+      "showAllPvpRanks": false,
       "linkGlobalAndAdvanced": false,
       "showSizeIndicator": false,
       "glow": [

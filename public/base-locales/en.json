@@ -591,5 +591,6 @@
   "only_confirmed": "Only Confirmed",
   "rocket_pokemon": "Rocket Pokemon",
   "decoy": "Decoy",
-  "s2_cell_limit_0": "You attempted to generate more than 20,000 cells ({{variable_0}})"
+  "s2_cell_limit_0": "You attempted to generate more than 20,000 cells ({{variable_0}})",
+  "show_all_pvp_ranks": "Show All PVP Ranks"
 }
