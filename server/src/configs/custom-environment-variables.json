@@ -485,6 +485,7 @@
       }
     },
     "messageOfTheDay": {
+      "dialogMaxWidth": "MAP_MESSAGE_OF_THE_DAY_DIALOG_MAX_WIDTH",
       "index": {
         "__name": "MAP_MESSAGE_OF_THE_DAY_INDEX",
         "__format": "number"

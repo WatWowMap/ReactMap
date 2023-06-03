@@ -210,7 +210,7 @@ export default function Nav({
         />
       </Dialog>
       <Dialog
-        maxWidth="sm"
+        maxWidth={config.map.messageOfTheDay.dialogMaxWidth || 'sm'}
         open={Boolean(motd && !tutorial)}
         onClose={handleMotdClose}
       >

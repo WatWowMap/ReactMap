@@ -58,20 +58,28 @@ export default function Generator({
           alignItems={block.alignItems}
           justifyContent={block.justifyContent}
         >
-          {block.components.map((subBlock, i) => (
-            <Grid
-              key={i}
-              item
-              {...Utility.getSizes(subBlock.gridSizes)}
-              style={subBlock.gridStyle || { textAlign: 'center' }}
-            >
+          {block.components.map((subBlock, i) => {
+            const nextGenerator = (
               <Generator
                 block={subBlock}
                 defaultReturn={defaultReturn}
                 serverSettings={serverSettings}
               />
-            </Grid>
-          ))}
+            )
+
+            return subBlock.type === 'parent' ? (
+              nextGenerator
+            ) : (
+              <Grid
+                key={i}
+                item
+                {...Utility.getSizes(subBlock.gridSizes)}
+                style={subBlock.gridStyle || { textAlign: 'center' }}
+              >
+                {nextGenerator}
+              </Grid>
+            )
+          })}
         </Grid>
       )
     default:
