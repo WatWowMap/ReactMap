@@ -183,7 +183,7 @@ function jsifyIvFilter(filter) {
   if (expectClause || stack !== 0 || lastIndex < filter.length) {
     return null
   }
-  log.info(HELPERS.pokemon, result)
+  log.debug(HELPERS.pokemon, result)
   return requireFromString(`module.exports = (pokemon) => ${result};`)
 }
 

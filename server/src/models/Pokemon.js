@@ -302,8 +302,9 @@ module.exports = class Pokemon extends Model {
         listOfIds.push(pkmn.id)
         pvpResults.push(pkmn)
       }
-      if (noPvp && filter.valid(pkmn)) {
-        finalResults.push(filter.build(pkmn))
+      const result = filter.build(pkmn)
+      if (noPvp && filter.valid(result)) {
+        finalResults.push(result)
       }
     }
     // second query for pvp
