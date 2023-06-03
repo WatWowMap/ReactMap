@@ -43,7 +43,6 @@ export default function QueryData({
   const trimFilters = useCallback(
     (requestedFilters) => {
       const trimmed = {
-        onlyLegacyExclude: [],
         onlyLegacy: userSettings.legacyFilter,
         onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
         onlyAreas,
@@ -66,8 +65,6 @@ export default function QueryData({
 
         if (specifics && specifics.enabled && staticFilters[id]) {
           trimmed[id] = specifics
-        } else if (userSettings.legacyFilter) {
-          trimmed.onlyLegacyExclude.push(id)
         }
       })
       return trimmed

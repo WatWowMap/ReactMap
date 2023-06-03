@@ -1,5 +1,7 @@
 {
-  "i18n-ally.localesPaths": ["public/base-locales"],
+  "i18n-ally.localesPaths": [
+    "public/base-locales"
+  ],
   "i18n-ally.keystyle": "flat",
   "[javascript]": {
     "editor.autoClosingBrackets": "always",
@@ -9,5 +11,6 @@
     "editor.autoClosingBrackets": "always",
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "docwriter.style": "JSDoc"
 }

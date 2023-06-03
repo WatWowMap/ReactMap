@@ -31,6 +31,10 @@ const models = {
   Weather,
 }
 
+/**
+ * @typedef {typeof models} DbModels
+ */
+
 Db.bindConnections(models)
 
 module.exports = {

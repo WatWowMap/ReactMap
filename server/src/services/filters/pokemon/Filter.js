@@ -48,10 +48,8 @@ module.exports = class PkmnFilter {
     this.perms = perms
     this.mods = mods
 
-    this.expertFilter =
-      mods.onlyLegacy && filter.adv ? jsifyIvFilter(filter.adv) : null
-    this.expertGlobalFilter =
-      mods.onlyLegacy && global.adv ? jsifyIvFilter(filter.adv) : null
+    this.expertFilter = this.getExpertCallback(filter.adv)
+    this.expertGlobalFilter = this.getExpertCallback(global.adv)
 
     if (this.id !== 'global') this.mergeGlobal(global)
 
@@ -62,6 +60,16 @@ module.exports = class PkmnFilter {
 
   get keyArray() {
     return [...this.relevantKeys]
+  }
+
+  /**
+   * @param {string} filter
+   * @returns {(pokemon?: import("../../../types").Pokemon) => boolean}
+   */
+  getExpertCallback(filter) {
+    return this.mods.onlyLegacy && filter
+      ? jsifyIvFilter(filter)
+      : () => !filter && this.mods.onlyLegacy
   }
 
   /**
@@ -290,10 +298,10 @@ module.exports = class PkmnFilter {
         !this.mods.onlyLinkGlobal ||
         (this.pokemon === pokemon.pokemon_id && this.form === pokemon.form)
       ) {
-        if (this.expertFilter && this.expertFilter(pokemon)) {
+        if (this.expertFilter(pokemon)) {
           return true
         }
-        if (this.expertGlobalFilter && this.expertGlobalFilter(pokemon)) {
+        if (this.expertGlobalFilter(pokemon)) {
           return true
         }
         if (this.mods.onlyLegacy) return false
