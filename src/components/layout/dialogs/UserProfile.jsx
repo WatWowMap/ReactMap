@@ -53,7 +53,10 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
 
   return (
     <>
-      <Header titles={['user_profile', `- ${auth.username}`]} action={() => setUserProfile(false)} />
+      <Header
+        titles={['user_profile', `- ${auth.username}`]}
+        action={() => setUserProfile(false)}
+      />
       <DialogContent style={{ padding: 0 }}>
         <AppBar position="static">
           <Tabs
@@ -102,10 +105,16 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
       </DialogContent>
       <Footer
         options={[
-          (rolesLink ?
-            { name: typeof rolesLinkName === 'string' ?
-              rolesLinkName : rolesLinkName[locale] || Object.values(rolesLinkName)[0],
-            link: rolesLink, color: 'primary' } : {}),
+          rolesLink
+            ? {
+                name:
+                  typeof rolesLinkName === 'string'
+                    ? rolesLinkName
+                    : rolesLinkName[locale] || Object.values(rolesLinkName)[0],
+                link: rolesLink,
+                color: 'primary',
+              }
+            : {},
           {
             name: 'close',
             color: 'secondary',
@@ -149,7 +158,8 @@ const LinkProfiles = ({ auth, t }) => {
             <Grid item xs={12} key={method} align="center">
               {auth[`${method}Id`] ? (
                 <Typography color="secondary">
-                  {t('user_username')}: {auth.username} ({t(`${method}_linked`)})
+                  {t('user_username')}: {auth.username} ({t(`${method}_linked`)}
+                  )
                 </Typography>
               ) : (
                 Component
@@ -225,7 +235,13 @@ const ExtraFields = ({ auth }) => {
         const key = typeof field === 'string' ? field : field.database
         if (!key || !label) return null
         return (
-          <Grid key={label} item xs={5} align="center" style={{ margin: '10px 0' }}>
+          <Grid
+            key={label}
+            item
+            xs={5}
+            align="center"
+            style={{ margin: '10px 0' }}
+          >
             <TextField
               disabled={field.disabled}
               variant="outlined"
