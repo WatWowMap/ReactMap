@@ -692,6 +692,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_PVP_MEGA",
         "__format": "boolean"
       },
+      "showAllPvpRanks": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_SHOW_ALL_PVP_RANKS",
+        "__format": "boolean"
+      },
       "linkGlobalAndAdvanced": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_LINK_GLOBAL_AND_ADVANCED",
         "__format": "boolean"
