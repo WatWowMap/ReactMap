@@ -134,7 +134,7 @@ function jsifyIvFilter(filter) {
           upper = parseFloat(match[4])
         }
         if (subColumn) {
-          result += `((pokemon['${column}']['${subColumn}'] || []).some(x => x.rank >= ${lower} && x.rank <= ${upper}))`
+          result += `((pokemon['${column}']?.['${subColumn}'] || []).some(x => x.rank >= ${lower} && x.rank <= ${upper}))`
         } else {
           result += `(pokemon['${column}'] !== null && pokemon['${column}'] >= ${lower} && pokemon['${column}'] <= ${upper})`
         }
