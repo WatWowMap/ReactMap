@@ -407,6 +407,8 @@ module.exports = class PkmnBackend {
       const { cleanPvp, bestPvp } = this.buildPvp(pokemon)
       result.bestPvp = bestPvp
       result.cleanPvp = cleanPvp
+    } else {
+      result.cleanPvp = {}
     }
     return result
   }
