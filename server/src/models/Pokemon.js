@@ -24,8 +24,11 @@ const {
   LEVELS,
   IV_CALC,
   LEVEL_CALC,
+  LEAGUES,
+  MAD_KEY_MAP,
 } = require('../services/filters/pokemon/constants')
 const PkmnFilter = require('../services/filters/pokemon/Filter')
+const { log, HELPERS } = require('../services/logger')
 
 module.exports = class Pokemon extends Model {
   static get tableName() {
@@ -125,7 +128,7 @@ module.exports = class Pokemon extends Model {
     } = args.filters
     const { hasSize, hasHeight, isMad, mem, secret, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
-    let queryPvp = false
+    let queryPvp = LEAGUES.some((league) => globalFilter.filterKeys.has(league))
 
     const safeTs = ts || Math.floor(Date.now() / 1000)
 
@@ -138,16 +141,24 @@ module.exports = class Pokemon extends Model {
     }
     const query = this.query()
 
+    const pokemonIds = []
+    const pokemonForms = []
+    filterMap.forEach((filter) => {
+      pokemonIds.push(filter.pokemon)
+      pokemonForms.push(filter.form)
+      if (
+        !queryPvp &&
+        LEAGUES.some((league) => filter.filterKeys.has(league))
+      ) {
+        queryPvp = true
+      }
+    })
+
     if (!mem) {
       if (isMad) {
         Pokemon.getMadSql(query)
-        query.select(raw(true).as('checked'))
       } else {
-        query.select([
-          '*',
-          hasSize && !hasHeight ? 'size AS height' : 'size',
-          raw(true).as('checked'),
-        ])
+        query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
       }
       query
         .where(
@@ -165,32 +176,60 @@ module.exports = class Pokemon extends Model {
         ])
         .andWhere((ivOr) => {
           if (ivs || pvp) {
-            if (globalFilter.relevantKeys.size) {
-              queryPvp = globalFilter.generateSql(ivOr, queryPvp)
+            if (globalFilter.filterKeys.size) {
+              const keys = globalFilter.filterKeys
+              ivOr.andWhere((pkmn) => {
+                for (let i = 0; i < keys.length; i += 1) {
+                  const key = keys[i]
+                  switch (key) {
+                    case 'xxs':
+                    case 'xxl':
+                      if (hasSize) {
+                        pkmn.orWhere('pokemon.size', key === 'xxl' ? 5 : 1)
+                      }
+                      break
+                    case 'gender':
+                      pkmn.andWhere('pokemon.gender', onlyIvOr[key])
+                      break
+                    case 'cp':
+                    case 'level':
+                    case 'atk_iv':
+                    case 'def_iv':
+                    case 'sta_iv':
+                    case 'iv':
+                      if (perms.iv) {
+                        pkmn.andWhereBetween(
+                          isMad ? MAD_KEY_MAP[key] : key,
+                          onlyIvOr[key],
+                        )
+                      }
+                      break
+                    default:
+                      if (perms.pvp) {
+                        if (
+                          !globalFilter.filterKeys.has('iv') &&
+                          !globalFilter.filterKeys.has('level') &&
+                          !globalFilter.filterKeys.has('atk_iv') &&
+                          !globalFilter.filterKeys.has('def_iv') &&
+                          !globalFilter.filterKeys.has('sta_iv') &&
+                          !globalFilter.filterKeys.has('cp') &&
+                          !globalFilter.filterKeys.has('xxs') &&
+                          !globalFilter.filterKeys.has('xxl')
+                        ) {
+                          // doesn't return everything if only pvp stats for individual pokemon
+                          pkmn.whereNull('pokemon_id')
+                        }
+                      }
+                      break
+                  }
+                }
+              })
             } else {
               ivOr.whereNull('pokemon_id')
             }
+            ivOr.orWhereIn('pokemon_id', pokemonIds)
+            ivOr.orWhereIn('pokemon.form', pokemonForms)
           }
-          filterMap.forEach((filter) => {
-            ivOr.orWhere((pokeQuery) => {
-              if (filter.pokemon === 132) {
-                pokeQuery.where('pokemon_id', filter.pokemon)
-              } else {
-                pokeQuery
-                  .where('pokemon_id', filter.pokemon)
-                  .andWhere('pokemon.form', filter.form)
-              }
-              if (filter.relevantKeys.size) {
-                queryPvp = filter.generateSql(pokeQuery, queryPvp)
-              }
-            })
-          })
-          // if (onlyXlKarp) {
-          //   ivOr.orWhere('pokemon_id', 129).andWhere('weight', '>=', 13.125)
-          // }
-          // if (onlyXsRat) {
-          //   ivOr.orWhere('pokemon_id', 19).andWhere('weight', '<=', 2.40625)
-          // }
           if (onlyZeroIv && ivs) {
             ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 0)
           }
@@ -272,9 +311,6 @@ module.exports = class Pokemon extends Model {
       const pvpQuery = this.query()
       if (isMad) {
         Pokemon.getMadSql(pvpQuery)
-        pvpQuery.select(raw(true).as('pvpCheck'))
-      } else {
-        pvpQuery.select(['*', raw(true).as('pvpCheck')])
       }
       pvpQuery
         .where(
@@ -314,7 +350,6 @@ module.exports = class Pokemon extends Model {
         return []
       }
       pvpResults.push(
-        /** @type {import("../types").Pokemon[]} */
         ...(await this.evalQuery(
           mem,
           pvpQuery.limit(queryLimits.pokemonPvp - results.length),
@@ -370,6 +405,7 @@ module.exports = class Pokemon extends Model {
           body: query,
         })
       : query)
+    log.debug(HELPERS.pokemon, 'raw result length', results.length)
     return results || []
   }
 
