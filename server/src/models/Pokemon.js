@@ -307,7 +307,7 @@ module.exports = class Pokemon extends Model {
       }
     }
     // second query for pvp
-    if (queryPvp && (!isMad || reactMapHandlesPvp)) {
+    if (!mem && queryPvp && (!isMad || reactMapHandlesPvp)) {
       const pvpQuery = this.query()
       if (isMad) {
         Pokemon.getMadSql(pvpQuery)
@@ -405,7 +405,7 @@ module.exports = class Pokemon extends Model {
           body: query,
         })
       : query)
-    log.debug(HELPERS.pokemon, 'raw result length', results.length)
+    log.debug(HELPERS.pokemon, 'raw result length', results?.length || 0)
     return results || []
   }
 
