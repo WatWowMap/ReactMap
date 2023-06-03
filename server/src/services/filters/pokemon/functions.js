@@ -5,6 +5,7 @@
 /* eslint-disable no-cond-assign */
 /* eslint-disable default-case */
 const requireFromString = require('require-from-string')
+const { log, HELPERS } = require('../../logger')
 
 /**
  * @param {object} pokemon
@@ -182,6 +183,7 @@ function jsifyIvFilter(filter) {
   if (expectClause || stack !== 0 || lastIndex < filter.length) {
     return null
   }
+  log.debug(HELPERS.pokemon, result)
   return requireFromString(`module.exports = (pokemon) => ${result};`)
 }
 
