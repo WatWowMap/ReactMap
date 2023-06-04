@@ -5,7 +5,7 @@ const log = logger.getLogger('logger')
 
 module.exports.log = log
 
-const HELPERS = {
+const HELPERS = /** @type {const} */ ({
   trace: chalk.gray('☰'),
   debug: chalk.green('☯'),
   info: chalk.blue('ℹ'),
@@ -50,7 +50,7 @@ const HELPERS = {
 
   custom: (text = '', color = '#64b5f6') =>
     chalk.hex(color)(`[${text.toUpperCase()}]`),
-}
+})
 
 module.exports.HELPERS = HELPERS
 

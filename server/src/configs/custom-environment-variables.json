@@ -221,6 +221,10 @@
         "__format": "boolean"
       },
       "minCp": {
+        "little": {
+          "__name": "API_PVP_MIN_CP_LITTLE",
+          "__format": "number"
+        },
         "great": {
           "__name": "API_PVP_MIN_CP_GREAT",
           "__format": "number"
@@ -687,6 +691,10 @@
       },
       "pvpMega": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_PVP_MEGA",
+        "__format": "boolean"
+      },
+      "showAllPvpRanks": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_SHOW_ALL_PVP_RANKS",
         "__format": "boolean"
       },
       "linkGlobalAndAdvanced": {
