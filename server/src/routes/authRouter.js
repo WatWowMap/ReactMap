@@ -43,6 +43,7 @@ strategies.forEach((strategy, i) => {
           } catch (error) {
             log.error(HELPERS.auth, error)
             res.redirect('/')
+            next(error)
           }
         }
       })(req, res, next),

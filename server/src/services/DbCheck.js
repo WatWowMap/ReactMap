@@ -65,9 +65,9 @@ module.exports = class DbCheck {
               conn.query('SET time_zone="+00:00";', (err) => done(err, conn)),
           },
           log: {
-            warn: (message) => log.warn(HELPERS.db, message),
-            error: (message) => log.error(HELPERS.db, message),
-            debug: (message) => log.debug(HELPERS.db, message),
+            warn: (message) => log.warn(HELPERS.knex, message),
+            error: (message) => log.error(HELPERS.knex, message),
+            debug: (message) => log.debug(HELPERS.knex, message),
             enableColors: true,
           },
         })
