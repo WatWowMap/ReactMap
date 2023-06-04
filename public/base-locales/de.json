@@ -594,5 +594,6 @@
   "only_confirmed": "nur bestätigte",
   "rocket_pokemon": "Crypto-Pokemon",
   "decoy": "Täusch-Rüpel",
-  "s2_cell_limit_0": "Sie haben versucht, mehr als 20.000 Zellen zu generieren ({{variable_0}})"
+  "s2_cell_limit_0": "Sie haben versucht, mehr als 20.000 Zellen zu generieren ({{variable_0}})",
+  "show_all_pvp_ranks": "alle PVP Ränge anzeigen"
 }
