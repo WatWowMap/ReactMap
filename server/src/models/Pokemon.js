@@ -177,8 +177,8 @@ module.exports = class Pokemon extends Model {
         .andWhere((ivOr) => {
           if (ivs || pvp) {
             if (globalFilter.filterKeys.size) {
-              const keys = globalFilter.filterKeys
               ivOr.andWhere((pkmn) => {
+                const keys = globalFilter.keyArray
                 for (let i = 0; i < keys.length; i += 1) {
                   const key = keys[i]
                   switch (key) {
