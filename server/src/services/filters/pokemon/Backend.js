@@ -126,8 +126,8 @@ module.exports = class PkmnBackend {
     }
     let merged = andStr ? `${andStr}${orStr ? `|${orStr}` : ''}` : orStr
     if (keys.has('gender')) {
-      if (merged) merged = `(${merged})`
-      merged += `&G${filter.gender}`
+      if (merged) merged = `(${merged})&`
+      merged += `G${filter.gender}`
     }
     log.debug(HELPERS.pokemon, this.id, {
       andStr,
