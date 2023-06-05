@@ -403,7 +403,7 @@ module.exports = class PkmnBackend {
         'weather',
       ])
     }
-    if (this.perms.pvp) {
+    if (this.perms.pvp && result.cp) {
       const { cleanPvp, bestPvp } = this.buildPvp(pokemon)
       result.bestPvp = bestPvp
       result.cleanPvp = cleanPvp
