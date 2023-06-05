@@ -435,10 +435,9 @@ module.exports = class DbCheck {
       log.info(HELPERS.db, `Querying available for ${model}`)
       try {
         const results = await Promise.all(
-          this.models[model].map(async (source) => {
-            log.info(source.SubModel)
-            return source.SubModel.getAvailable(source)
-          }),
+          this.models[model].map(async (source) =>
+            source.SubModel.getAvailable(source),
+          ),
         )
         log.info(HELPERS.db, `Setting available for ${model}`)
         if (model === 'Pokestop') {
