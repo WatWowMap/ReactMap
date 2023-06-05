@@ -75,7 +75,7 @@ module.exports = class Pokemon extends Model {
    * @param {import("../types").Perms} perms
    * @param {object} args
    * @param {import("../types").DbContext} ctx
-   * @returns {{ filterMap: Map<string, PkmnFilter>, globalFilter: PkmnFilter }}
+   * @returns {{ filterMap: Record<string, PkmnFilter>, globalFilter: PkmnFilter }}
    */
   static getFilters(perms, args, { SubModel: _, connection: __, ...ctx }) {
     const mods = {
@@ -84,13 +84,16 @@ module.exports = class Pokemon extends Model {
         LEVELS.map((x) => [`onlyPvp${x}`, args.filters[`onlyPvp${x}`]]),
       ),
     }
-    const filterMap = new Map()
+    const filterMap = {}
 
     Object.entries(args.filters).forEach(([key, filter]) => {
       if (key.includes('-')) {
-        filterMap.set(
+        filterMap[key] = new PkmnFilter(
           key,
-          new PkmnFilter(key, filter, args.filters.onlyIvOr, perms, mods),
+          filter,
+          args.filters.onlyIvOr,
+          perms,
+          mods,
         )
       } else if (typeof filter === 'boolean') {
         mods[key] = filter
@@ -143,7 +146,7 @@ module.exports = class Pokemon extends Model {
 
     const pokemonIds = []
     const pokemonForms = []
-    filterMap.forEach((filter) => {
+    Object.values(filterMap).forEach((filter) => {
       pokemonIds.push(filter.pokemon)
       pokemonForms.push(filter.form)
       if (
@@ -272,7 +275,7 @@ module.exports = class Pokemon extends Model {
             },
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
             filters: Object.fromEntries(
-              [...filterMap.values()].map((x) => [x.id, x.buildApiFilter()]),
+              Object.values(filterMap).map((x) => [x.id, x.buildApiFilter()]),
             ),
           })
         : query.limit(queryLimits.pokemon),
@@ -288,7 +291,7 @@ module.exports = class Pokemon extends Model {
     for (let i = 0; i < results.length; i += 1) {
       const pkmn = results[i]
       const id = `${pkmn.pokemon_id}-${pkmn.form}`
-      const filter = filterMap.get(id) || globalFilter
+      const filter = filterMap[id] || globalFilter
       let noPvp = true
 
       if (
@@ -361,7 +364,7 @@ module.exports = class Pokemon extends Model {
     for (let i = 0; i < pvpResults.length; i += 1) {
       const pkmn = pvpResults[i]
       const filter =
-        filterMap.get(`${pkmn.pokemon_id}-${pkmn.form}`) || globalFilter
+        filterMap[`${pkmn.pokemon_id}-${pkmn.form}`] || globalFilter
       const result = filter.build(pkmn)
       if (filter.valid(result)) {
         finalResults.push(result)
@@ -493,12 +496,12 @@ module.exports = class Pokemon extends Model {
       )
       .map((item) => {
         const filter =
-          filterMap.get(`${item.pokemon_id}-${item.form}`) || globalFilter
+          filterMap[`${item.pokemon_id}-${item.form}`] || globalFilter
         return filter.build(item)
       })
       .filter((pkmn) => {
         const filter =
-          filterMap.get(`${pkmn.pokemon_id}-${pkmn.form}`) || globalFilter
+          filterMap[`${pkmn.pokemon_id}-${pkmn.form}`] || globalFilter
         return filter.valid(pkmn)
       })
   }
