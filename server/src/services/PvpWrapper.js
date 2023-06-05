@@ -44,9 +44,10 @@ module.exports = class PvpWrapper extends Ohbem {
         HELPERS.pokemon,
         'Unable to process PVP Stats for Pokemon with ID#: ',
         pokemon.id,
-        `#${pokemon.pokemon_id} - ${pokemon.form}`,
+        `${pokemon.pokemon_id}-${pokemon.form}`,
         '\n',
         e,
+        pokemon,
       )
       return {}
     }
