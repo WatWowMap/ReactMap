@@ -435,7 +435,7 @@ export default class UIcons {
     )
   }
 
-  getMisc(fileName) {
+  getMisc(fileName = '') {
     const baseUrl = `${this[this.selected.misc]?.path || this.fallback}/misc`
     const extension = this[this.selected.misc]?.extension || 'png'
 
