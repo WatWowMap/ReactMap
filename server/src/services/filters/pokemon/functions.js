@@ -4,7 +4,8 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-cond-assign */
 /* eslint-disable default-case */
-const requireFromString = require('require-from-string')
+const vm = require('vm')
+
 const { log, HELPERS } = require('../../logger')
 
 /**
@@ -184,7 +185,7 @@ function jsifyIvFilter(filter) {
     return null
   }
   log.debug(HELPERS.pokemon, result)
-  return requireFromString(`module.exports = (pokemon) => ${result};`)
+  return vm.runInNewContext(`(pokemon) => ${result};`)
 }
 
 module.exports = {
