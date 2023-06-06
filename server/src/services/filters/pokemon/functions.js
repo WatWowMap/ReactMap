@@ -5,6 +5,7 @@
 /* eslint-disable no-cond-assign */
 /* eslint-disable default-case */
 const vm = require('vm')
+const NodeCache = require('node-cache')
 
 const { log, HELPERS } = require('../../logger')
 
@@ -73,11 +74,19 @@ function assign(newObject, reference, props) {
 }
 
 /**
+ * @param {string} filter
+ * @returns {(pokemon: import('../../../types').Pokemon) => boolean}
+ */
+const jsFnCache = new NodeCache({ stdTTL: 60 * 5 })
+/**
  *
  * @param {string} filter
- * @returns {(pokemon: object) => boolean}
+ * @returns {(pokemon: import('../../../types').Pokemon) => boolean}
  */
 function jsifyIvFilter(filter) {
+  if (jsFnCache.has(filter)) {
+    return jsFnCache.get(filter)
+  }
   const input = filter.toUpperCase()
   const tokenizer =
     /\s*([()|&!,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
@@ -185,7 +194,9 @@ function jsifyIvFilter(filter) {
     return null
   }
   log.debug(HELPERS.pokemon, result)
-  return vm.runInNewContext(`(pokemon) => ${result};`)
+  const fn = vm.runInNewContext(`(pokemon) => ${result};`)
+  jsFnCache.set(filter, fn)
+  return fn
 }
 
 module.exports = {
