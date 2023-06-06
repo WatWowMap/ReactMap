@@ -66,14 +66,6 @@ module.exports = class PkmnBackend {
       if (andStr) andStr += '&'
       andStr += filter.iv.join('-')
     }
-    if (this.mods.onlyZeroIv) {
-      if (andStr) andStr += '|'
-      andStr += `0`
-    }
-    if (this.mods.onlyHundoIv) {
-      if (andStr) andStr += '|'
-      andStr += `100`
-    }
     if (andStr) {
       andStr = `(${andStr})`
     }
@@ -118,6 +110,14 @@ module.exports = class PkmnBackend {
       if (orStr) orStr += '|'
       orStr += `LC${filter.little.join('-')}`
     }
+    if (this.mods.onlyZeroIv) {
+      if (orStr) orStr += '|'
+      orStr += `0`
+    }
+    if (this.mods.onlyHundoIv) {
+      if (orStr) orStr += '|'
+      orStr += `100`
+    }
     if (andStr && !(andStr.startsWith('(') && andStr.endsWith(')')) && orStr) {
       andStr = `(${andStr})`
     }
@@ -126,8 +126,8 @@ module.exports = class PkmnBackend {
     }
     let merged = andStr ? `${andStr}${orStr ? `|${orStr}` : ''}` : orStr
     if (keys.has('gender')) {
-      if (merged) merged = `(${merged})`
-      merged += `&G${filter.gender}`
+      if (merged) merged = `(${merged})&`
+      merged += `G${filter.gender}`
     }
     log.debug(HELPERS.pokemon, this.id, {
       andStr,
@@ -212,23 +212,6 @@ module.exports = class PkmnBackend {
 
     return true
   }
-
-  // /**
-  //  * @param {(typeof import("./constants").KEYS)[number]} key
-  //  * @param {import("./constants").PkmnFilter} global
-  //  * @returns {number[]}
-  //  */
-  // getMinMax(key, global) {
-  //   const localOn = this.isActive(key)
-  //   const globalOn = this.isActive(key, global)
-  //   let [min, max] = localOn ? this.filter[key] : [Infinity, -Infinity]
-  //   if (globalOn) {
-  //     const [globalMin, globalMax] = global[key]
-  //     min = Math.min(min, globalMin)
-  //     max = Math.max(max, globalMax)
-  //   }
-  //   return [min, max]
-  // }
 
   /**
    * @param {typeof import("./constants").LEAGUES[number]} league

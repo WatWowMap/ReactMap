@@ -634,7 +634,7 @@ const PvpInfo = ({ pokemon, league, data, t, Icons }) => {
         <tr>
           <td style={rowClass}>
             <img
-              src={Icons.getMisc(leagueLookup[league] || 500)}
+              src={Icons.getMisc(leagueLookup[league] || '500')}
               height={20}
               alt={league}
             />
