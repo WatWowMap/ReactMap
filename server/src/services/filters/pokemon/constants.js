@@ -75,4 +75,5 @@ module.exports = {
   LEVEL_CALC,
   MAD_KEY_MAP,
   STANDARD,
+  BASE_KEYS,
 }
