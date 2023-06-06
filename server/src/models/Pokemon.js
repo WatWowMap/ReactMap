@@ -26,6 +26,7 @@ const {
   LEVEL_CALC,
   LEAGUES,
   MAD_KEY_MAP,
+  BASE_KEYS,
 } = require('../services/filters/pokemon/constants')
 const PkmnFilter = require('../services/filters/pokemon/Backend')
 const { log, HELPERS } = require('../services/logger')
@@ -208,20 +209,12 @@ module.exports = class Pokemon extends Model {
                       }
                       break
                     default:
-                      if (perms.pvp) {
-                        if (
-                          !globalFilter.filterKeys.has('iv') &&
-                          !globalFilter.filterKeys.has('level') &&
-                          !globalFilter.filterKeys.has('atk_iv') &&
-                          !globalFilter.filterKeys.has('def_iv') &&
-                          !globalFilter.filterKeys.has('sta_iv') &&
-                          !globalFilter.filterKeys.has('cp') &&
-                          !globalFilter.filterKeys.has('xxs') &&
-                          !globalFilter.filterKeys.has('xxl')
-                        ) {
-                          // doesn't return everything if only pvp stats for individual pokemon
-                          pkmn.whereNull('pokemon_id')
-                        }
+                      if (
+                        perms.pvp &&
+                        BASE_KEYS.every((x) => !globalFilter.filterKeys.has(x))
+                      ) {
+                        // doesn't return everything if only pvp stats for individual pokemon
+                        pkmn.whereNull('pokemon_id')
                       }
                       break
                   }
