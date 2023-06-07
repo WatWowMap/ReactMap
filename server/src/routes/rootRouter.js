@@ -11,7 +11,7 @@ const { Event, Db } = require('../services/initialization')
 const { version } = require('../../../package.json')
 const { log, HELPERS } = require('../services/logger')
 
-const rootRouter = new express.Router()
+const rootRouter = express.Router()
 
 rootRouter.use('/', clientRouter)
 
@@ -77,7 +77,7 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
   }
 })
 
-rootRouter.get('/api/settings', async (req, res) => {
+rootRouter.get('/api/settings', async (req, res, next) => {
   try {
     if (
       config.authentication.alwaysEnabledPerms.length ||
@@ -378,8 +378,8 @@ rootRouter.get('/api/settings', async (req, res) => {
     }
     res.status(200).json({ serverSettings })
   } catch (error) {
-    log.error(HELPERS.express, error)
     res.status(500).json({ error: error.message, status: 500 })
+    next(error)
   }
 })
 

@@ -65,9 +65,9 @@ module.exports = class DbCheck {
               conn.query('SET time_zone="+00:00";', (err) => done(err, conn)),
           },
           log: {
-            warn: (message) => log.warn(HELPERS.db, message),
-            error: (message) => log.error(HELPERS.db, message),
-            debug: (message) => log.debug(HELPERS.db, message),
+            warn: (message) => log.warn(HELPERS.knex, message),
+            error: (message) => log.error(HELPERS.knex, message),
+            debug: (message) => log.debug(HELPERS.knex, message),
             enableColors: true,
           },
         })
@@ -435,10 +435,9 @@ module.exports = class DbCheck {
       log.info(HELPERS.db, `Querying available for ${model}`)
       try {
         const results = await Promise.all(
-          this.models[model].map(async (source) => {
-            log.info(source.SubModel)
-            return source.SubModel.getAvailable(source)
-          }),
+          this.models[model].map(async (source) =>
+            source.SubModel.getAvailable(source),
+          ),
         )
         log.info(HELPERS.db, `Setting available for ${model}`)
         if (model === 'Pokestop') {

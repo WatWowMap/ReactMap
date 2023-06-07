@@ -28,6 +28,7 @@ const HELPERS = /** @type {const} */ ({
   areas: chalk.hex('#9ccc65')('[AREAS]'),
   update: chalk.hex('#795548')('[UPDATE]'),
   db: chalk.hex('#aa00ff')('[DB]'),
+  knex: chalk.hex('#ff00ff')('[KNEX]'),
   event: chalk.hex('#283593')('[EVENT]'),
   webhooks: chalk.hex('#1de9b6')('[WEBHOOKS]'),
   geocoder: chalk.hex('#ff5722')('[GEOCODER]'),

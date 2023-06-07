@@ -11,10 +11,19 @@ const passport = require('passport')
 const rateLimit = require('express-rate-limit')
 const i18next = require('i18next')
 const Backend = require('i18next-fs-backend')
-const { ValidationError } = require('apollo-server-core')
-const { ApolloServer } = require('apollo-server-express')
 const { rainbow } = require('chalkercli')
 const Sentry = require('@sentry/node')
+const { ApolloServer } = require('@apollo/server')
+const { expressMiddleware } = require('@apollo/server/express4')
+const {
+  ApolloServerPluginDrainHttpServer,
+} = require('@apollo/server/plugin/drainHttpServer')
+const cors = require('cors')
+const { json } = require('body-parser')
+const http = require('http')
+const { GraphQLError } = require('graphql')
+const { ApolloServerErrorCode } = require('@apollo/server/errors')
+const { parse } = require('graphql')
 
 const config = require('./services/config')
 const { log, HELPERS } = require('./services/logger')
@@ -35,6 +44,84 @@ if (!config.devOptions.skipUpdateCheck) {
 }
 
 const app = express()
+const httpServer = http.createServer(app)
+const apolloServer = new ApolloServer({
+  typeDefs,
+  resolvers,
+  introspection: config.devOptions.enabled,
+  formatError: (e) => {
+    if (e?.message.includes('skipUndefined()') || e?.message === 'old_client') {
+      log.info(
+        HELPERS.gql,
+        'Old client detected, forcing user to refresh, no need to report this error unless it continues to happen\nClient:',
+        e.extensions.clientV,
+        'Server:',
+        e.extensions.serverV,
+        'User:',
+        e.extensions.username || 'Not Logged In',
+      )
+      return { message: 'old_client' }
+    }
+    if (e.message === 'session_expired') {
+      log.debug(
+        HELPERS.gql,
+        'user session expired, forcing logout, no need to report this error unless it continues to happen',
+      )
+      return { message: 'session_expired' }
+    }
+    log.error(HELPERS.gql, e)
+    if (config.devOptions.enabled) {
+      return e
+    }
+    return { message: e.message }
+  },
+  logger: {
+    debug: (...e) => log.debug(HELPERS.gql, ...e),
+    info: (...e) => log.info(HELPERS.gql, ...e),
+    warn: (...e) => log.warn(HELPERS.gql, ...e),
+    error: (...e) => log.error(HELPERS.gql, ...e),
+  },
+  plugins: [
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+    {
+      async requestDidStart(requestContext) {
+        requestContext.contextValue.startTime = Date.now()
+        return {
+          async willSendResponse(context) {
+            const { response, contextValue } = context
+            if (
+              response.body.kind === 'single' &&
+              'data' in response.body.singleResult
+            ) {
+              const endpoint =
+                context?.operation?.selectionSet?.selections?.[0]?.name?.value
+              const returned =
+                response.body.singleResult?.data?.[endpoint]?.length || 0
+
+              context.logger.info(
+                HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
+                '|',
+                context.operationName,
+                '|',
+                returned || 0,
+                '|',
+                `${Date.now() - contextValue.startTime}ms`,
+                '|',
+                contextValue.user || 'Not Logged In',
+              )
+
+              const { transaction } = contextValue
+
+              if (returned) {
+                transaction.setMeasurement(`${endpoint}.returned`, returned)
+              }
+            }
+          },
+        }
+      },
+    },
+  ],
+})
 
 Sentry.init({
   dsn:
@@ -63,104 +150,11 @@ app.use(Sentry.Handlers.requestHandler())
 // TracingHandler creates a trace for every incoming request
 app.use(Sentry.Handlers.tracingHandler())
 
-const server = new ApolloServer({
-  logger: {
-    debug: (e) => log.debug(HELPERS.gql, e),
-    info: (e) => log.info(HELPERS.gql, e),
-    warn: (e) => log.warn(HELPERS.gql, e),
-    error: (e) => log.error(HELPERS.gql, e),
-  },
-  cors: true,
-  cache: 'bounded',
-  typeDefs,
-  resolvers,
-  introspection: config.devOptions.enabled,
-  debug: config.devOptions.queryDebug,
-  context: ({ req, res }) => {
-    const perms = req.user ? req.user.perms : req.session.perms
-    let transaction = res.__sentry_transaction
-    if (!transaction) {
-      transaction = Sentry.startTransaction({ name: 'POST /graphql' })
-    }
-    Sentry.configureScope((scope) => {
-      scope.setSpan(transaction)
-    })
-
-    return {
-      req,
-      res,
-      Db,
-      Event,
-      perms,
-      serverV: pkg.version || 1,
-      clientV:
-        req.headers['apollographql-client-version']?.trim() || pkg.version || 1,
-      transaction,
-    }
-  },
-  formatError: (e) => {
-    if (
-      e instanceof ValidationError ||
-      e?.message.includes('skipUndefined()') ||
-      e?.message === 'old_client'
-    ) {
-      log.info(
-        HELPERS.gql,
-        'Old client detected, forcing user to refresh, no need to report this error unless it continues to happen\nClient:',
-        e.extensions.clientV,
-        'Server:',
-        e.extensions.serverV,
-        'User:',
-        e.extensions.req.user?.username || 'Not Logged In',
-      )
-      return { message: 'old_client' }
-    }
-    if (e.message === 'session_expired') {
-      log.debug(
-        HELPERS.gql,
-        'user session expired, forcing logout, no need to report this error unless it continues to happen',
-      )
-      return { message: 'session_expired' }
-    }
-    log.error(HELPERS.gql, e)
-    if (config.devOptions.enabled) {
-      return e
-    }
-    return { message: e.message }
-  },
-  formatResponse: (data, context) => {
-    const endpoint =
-      context?.operation?.selectionSet?.selections?.[0]?.name?.value
-    const returned = data?.data?.[endpoint]?.length || 0
-
-    const elapsed = process.hrtime(context.context.req._startAt)
-
-    log.info(
-      HELPERS.gql,
-      HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
-      '|',
-      context.operationName,
-      '|',
-      returned || 0,
-      '|',
-      `${(elapsed[0] * 1e3 + elapsed[1] * 1e-6).toFixed(2)}ms`,
-      '|',
-      context.context.req?.user?.username || 'Not Logged In',
-    )
-
-    const { transaction } = context.context
-
-    if (returned) {
-      transaction.setMeasurement(`${endpoint}.returned`, returned)
-    }
-
-    return data
-  },
-})
-
-server.start().then(() => server.applyMiddleware({ app, path: '/graphql' }))
-
-if (process.env.LOG_LEVEL === 'debug' || process.env.LOG_LEVEL === 'trace') {
+if (
+  process.env.LOG_LEVEL === 'debug' ||
+  process.env.LOG_LEVEL === 'trace' ||
+  config.devOptions.enabled
+) {
   app.use(
     logger((tokens, req, res) =>
       [
@@ -262,7 +256,8 @@ app.use(Sentry.Handlers.errorHandler())
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  log.error(HELPERS.express, err)
+  log.error(HELPERS.express, HELPERS.custom(req.originalUrl, '#00d7ac'), err)
+
   switch (err.message) {
     case 'NoCodeProvided':
       return res.redirect('/404')
@@ -271,6 +266,70 @@ app.use((err, req, res, next) => {
     default:
       return res.redirect('/')
   }
+})
+
+apolloServer.start().then(() => {
+  app.use(
+    '/graphql',
+    cors(),
+    json(),
+    expressMiddleware(apolloServer, {
+      context: ({ req, res }) => {
+        const perms = req.user ? req.user.perms : req.session.perms
+        const user = req?.user?.username || ''
+        const id = req?.user?.id || 0
+        const clientV =
+          req.headers['apollographql-client-version']?.trim() ||
+          pkg.version ||
+          1
+        const serverV = pkg.version || 1
+
+        let transaction = res.__sentry_transaction
+        if (!transaction) {
+          transaction = Sentry.startTransaction({ name: 'POST /graphql' })
+        }
+        Sentry.configureScope((scope) => {
+          scope.setSpan(transaction)
+        })
+
+        const operation = parse(req.body.query).definitions.find(
+          (d) => d.kind === 'OperationDefinition',
+        )?.operation
+
+        if (clientV && serverV && clientV !== serverV)
+          throw new GraphQLError('old_client', {
+            extensions: {
+              clientV,
+              serverV,
+              user,
+              http: { status: 464 },
+              code: ApolloServerErrorCode.BAD_USER_INPUT,
+            },
+          })
+        if (!perms || (operation === 'mutation' && !id))
+          throw new GraphQLError('session_expired', {
+            extensions: {
+              clientV,
+              serverV,
+              user,
+              http: { status: 401 },
+              code: 'UNAUTHENTICATED',
+            },
+          })
+
+        return {
+          req,
+          res,
+          Db,
+          Event,
+          perms,
+          user,
+          transaction,
+          token: req.headers.token,
+        }
+      },
+    }),
+  )
 })
 
 connection.migrate.latest().then(async () => {
@@ -289,12 +348,14 @@ connection.migrate.latest().then(async () => {
       Event.getWebhooks(config),
       (config.areas = await getAreas()),
     ]).then(() => {
-      app.listen(config.port, config.interface, () => {
-        const text = rainbow(
-          `Server is now listening at http://${config.interface}:${config.port}`,
-        )
-        setTimeout(() => text.stop(), 10_000)
-      })
+      httpServer.listen(config.port, config.interface)
+      const text = rainbow(
+        `Server is now listening at http://${config.interface}:${config.port}`,
+      )
+      setTimeout(() => text.stop(), 10_000)
+
+      // app.listen(config.port, config.interface, () => {
+      // })
     })
   })
 })
