@@ -53,7 +53,8 @@ module.exports = function clientOptions(perms) {
       interactionRanges: { type: 'bool', perm: ['pokemon'] },
       showDexNumInPopup: { type: 'bool', perm: ['pokemon'] },
       weatherIndicator: { type: 'bool', perm: ['pokemon'] },
-      pvpMega: { type: 'bool', perm: ['pokemon'] },
+      pvpMega: { type: 'bool', perm: ['pvp'] },
+      showAllPvpRanks: { type: 'bool', perm: ['pvp'] },
       showSizeIndicator: { type: 'bool', perm: ['pokemon'] },
     },
     wayfarer: {

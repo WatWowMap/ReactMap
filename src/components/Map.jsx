@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useMap, ZoomControl, TileLayer } from 'react-leaflet'
 import { useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@material-ui/styles'
@@ -79,11 +79,10 @@ export default function Map({
     [map],
   )
 
-  const onFocus = () => setWindowState(true)
-
-  const onBlur = () => setWindowState(false)
-
   useEffect(() => {
+    const onFocus = () => setWindowState(true)
+    const onBlur = () => setWindowState(false)
+
     window.addEventListener('focus', onFocus)
     window.addEventListener('blur', onBlur)
     return () => {
@@ -93,18 +92,18 @@ export default function Map({
   }, [])
 
   useEffect(() => {
-    const timer = setTimeout(
-      () => useStatic.setState({ active: windowState }),
-      1000 * 60 * config.clientTimeoutMinutes,
-    )
     if (windowState) {
-      clearTimeout(timer)
       useStatic.setState({ active: windowState })
+    } else {
+      const timer = setTimeout(
+        () => useStatic.setState({ active: windowState }),
+        1000 * 60 * config.clientTimeoutMinutes,
+      )
+      return () => clearTimeout(timer)
     }
-    return () => clearTimeout(timer)
   }, [windowState])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const lc = L.control.locate({
       position: 'bottomright',
       icon: 'fas fa-crosshairs',

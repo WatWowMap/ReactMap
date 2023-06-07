@@ -20,9 +20,9 @@ if (strategyConfig.doNothing) {
 const authHandler = async (_req, username, password, done) => {
   const date = new Date()
   const trialActive =
-      strategyConfig.trialPeriod &&
-      date >= strategyConfig.trialPeriod.start.js &&
-      date <= strategyConfig.trialPeriod.end.js
+    strategyConfig.trialPeriod &&
+    date >= strategyConfig.trialPeriod.start.js &&
+    date <= strategyConfig.trialPeriod.end.js
   const localPerms = Object.keys(perms).filter((key) =>
     perms[key].roles.includes('local'),
   )
@@ -53,11 +53,11 @@ const authHandler = async (_req, username, password, done) => {
             Object.entries(perms).forEach(([perm, info]) => {
               if (info.enabled) {
                 if (
-                    alwaysEnabledPerms.includes(perm) ||
-                    info.roles.includes('local') ||
-                    (trialActive &&
-                        info.trialPeriodEligible &&
-                        strategyConfig.trialPeriod.roles.includes('local'))
+                  alwaysEnabledPerms.includes(perm) ||
+                  info.roles.includes('local') ||
+                  (trialActive &&
+                    info.trialPeriodEligible &&
+                    strategyConfig.trialPeriod.roles.includes('local'))
                 ) {
                   user.perms[perm] = true
                 }
@@ -77,8 +77,12 @@ const authHandler = async (_req, username, password, done) => {
         if (bcrypt.compareSync(password, userExists.password)) {
           ;['discordPerms', 'telegramPerms'].forEach((permSet) => {
             if (userExists[permSet]) {
-              user.perms = Utility.mergePerms(user.perms,
-                typeof userExists[permSet] === 'string' ? JSON.parse(userExists[permSet]) : userExists[permSet])
+              user.perms = Utility.mergePerms(
+                user.perms,
+                typeof userExists[permSet] === 'string'
+                  ? JSON.parse(userExists[permSet])
+                  : userExists[permSet],
+              )
             }
           })
           if (userExists.strategy !== 'local') {
@@ -89,28 +93,28 @@ const authHandler = async (_req, username, password, done) => {
           }
           user.id = userExists.id
           user.username = userExists.username
-          user.status = userExists.data ?
-            (typeof userExists.data === 'string' ? JSON.parse(userExists.data).status : userExists.data.status) || 'local'
+          user.status = userExists.data
+            ? (typeof userExists.data === 'string'
+                ? JSON.parse(userExists.data).status
+                : userExists.data.status) || 'local'
             : 'local'
           Object.entries(perms).forEach(([perm, info]) => {
             if (info.enabled) {
               if (
-                  alwaysEnabledPerms.includes(perm) ||
-                  info.roles.includes(user.status) ||
-                  (trialActive &&
-                      info.trialPeriodEligible &&
-                      strategyConfig.trialPeriod.roles.includes(
-                          user.status,
-                      ))
+                alwaysEnabledPerms.includes(perm) ||
+                info.roles.includes(user.status) ||
+                (trialActive &&
+                  info.trialPeriodEligible &&
+                  strategyConfig.trialPeriod.roles.includes(user.status))
               ) {
                 user.perms[perm] = true
               }
             }
           })
           Utility.webhookPerms(
-              [user.status],
-              'localStatus',
-              trialActive,
+            [user.status],
+            'localStatus',
+            trialActive,
           ).forEach((x) => user.perms.webhooks.push(x))
           log.info(
             HELPERS.custom(name),

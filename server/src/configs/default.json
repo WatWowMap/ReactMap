@@ -69,6 +69,10 @@
     "pvp": {
       "leagues": [
         {
+          "name": "little",
+          "cp": 500
+        },
+        {
           "name": "great",
           "cp": 1500
         },
@@ -83,6 +87,7 @@
       ],
       "reactMapHandlesPvp": false,
       "minCp": {
+        "little": 400,
         "great": 1400,
         "ultra": 2400
       }
@@ -352,6 +357,7 @@
       "interactionRanges": false,
       "showDexNumInPopup": false,
       "pvpMega": false,
+      "showAllPvpRanks": false,
       "linkGlobalAndAdvanced": false,
       "showSizeIndicator": false,
       "glow": [

@@ -13,7 +13,6 @@ const Session = require('./Session')
 const Spawnpoint = require('./Spawnpoint')
 const User = require('./User')
 const Weather = require('./Weather')
-const { PokemonFilter, GenericFilter } = require('./Filters')
 
 const models = {
   Backup,
@@ -31,11 +30,13 @@ const models = {
   Weather,
 }
 
+/**
+ * @typedef {typeof models} DbModels
+ */
+
 Db.bindConnections(models)
 
 module.exports = {
   ...models,
   Ring,
-  PokemonFilter,
-  GenericFilter,
 }

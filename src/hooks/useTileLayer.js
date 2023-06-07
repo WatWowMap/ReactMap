@@ -30,7 +30,7 @@ export default function useTileLayer() {
 
   return {
     ...tileServer,
-    key: tileServer?.name,
+    key: `${tileServer?.name}_${timeOfDay}}`,
     url:
       tileServer?.[timeOfDay] ||
       tileServer?.url ||

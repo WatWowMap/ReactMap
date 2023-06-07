@@ -4,6 +4,14 @@ const extend = require('extend')
 const { log, HELPERS } = require('./logger')
 
 module.exports = class DbCheck {
+  /**
+   * @param {string[]} validModels
+   * @param {object} dbSettings
+   * @param {boolean} queryDebug
+   * @param {object} apiSettings
+   * @param {'km' | 'mi'} distanceUnit
+   * @param {{ common: number[], uncommon: number[], rare: number[], ultraRare: number[], regional: number[], never: number[], event: number[]}} rarityPercents
+   */
   constructor(
     validModels,
     dbSettings,
@@ -67,6 +75,12 @@ module.exports = class DbCheck {
     this.distanceUnit = distanceUnit
   }
 
+  /**
+   * @param {{ lat: number, lon: number }} args
+   * @param {boolean} isMad
+   * @param {'mi' | 'km'} distanceUnit
+   * @returns {ReturnType<typeof raw>}
+   */
   static getDistance(args, isMad, distanceUnit) {
     return raw(
       `ROUND(( ${
@@ -81,6 +95,10 @@ module.exports = class DbCheck {
     ).as('distance')
   }
 
+  /**
+   * @param {import('knex').Knex} schema
+   * @returns {Promise<import('../types').DbContext>}
+   */
   static async schemaCheck(schema) {
     const [isMad, pvpV2, hasSize, hasHeight] = await schema('pokemon')
       .columnInfo()
@@ -124,7 +142,8 @@ module.exports = class DbCheck {
     return {
       isMad,
       pvpV2,
-      mem: false,
+      mem: '',
+      secret: '',
       hasSize,
       hasHeight,
       hasRewardAmount,
@@ -174,6 +193,11 @@ module.exports = class DbCheck {
     )
   }
 
+  /**
+   * @param {{ [key: string]: number }[]} results
+   * @param {boolean} historical
+   * @returns {void}
+   */
   setRarity(results, historical = false) {
     const base = {}
     const mapKey = historical ? 'historical' : 'rarity'
@@ -232,6 +256,9 @@ module.exports = class DbCheck {
     }
   }
 
+  /**
+   * @param {import("../models").DbModels} models
+   */
   bindConnections(models) {
     try {
       Object.entries(this.models).forEach(([model, sources]) => {
@@ -282,6 +309,11 @@ module.exports = class DbCheck {
     }
   }
 
+  /**
+   * @template {{ id: string | number }} T
+   * @param {T[][]} results
+   * @returns {T[]}
+   */
   static deDupeResults(results) {
     if (results.length === 1) return results[0]
     if (results.length > 1) {
@@ -299,20 +331,40 @@ module.exports = class DbCheck {
           }
         }
       }
-      return returnObj.values()
+      return [...returnObj.values()]
     }
     return []
   }
 
+  /**
+   * @template T
+   * @param {keyof import("../models").DbModels} model
+   * @param {import("../types").Perms} perms
+   * @param {object} args
+   * @param {number} userId
+   * @param {'getAll' | string} method
+   * @returns {Promise<T[]>}
+   */
   async getAll(model, perms, args, userId, method = 'getAll') {
-    const data = await Promise.all(
-      this.models[model].map(async (source) =>
-        source.SubModel[method](perms, args, source, userId),
-      ),
-    )
-    return DbCheck.deDupeResults(data)
+    try {
+      const data = await Promise.all(
+        this.models[model].map(async (source) =>
+          source.SubModel[method](perms, args, source, userId),
+        ),
+      )
+      return DbCheck.deDupeResults(data)
+    } catch (e) {
+      log.error(HELPERS.db, HELPERS[model.toLowerCase()], e)
+      throw e
+    }
   }
 
+  /**
+   * @param {keyof import("../models").DbModels} model
+   * @param {string} id
+   * @param {'getOne' | string} method
+   * @returns {Promise<{id: number | string, lat: number, lon: number}>}
+   */
   async getOne(model, id, method = 'getOne') {
     const data = await Promise.all(
       this.models[model].map(async (source) =>
@@ -323,6 +375,14 @@ module.exports = class DbCheck {
     return (Array.isArray(cleaned) ? cleaned[0] : cleaned) || {}
   }
 
+  /**
+   * @template T
+   * @param {keyof import("../models").DbModels} model
+   * @param {import("../types").Perms} perms
+   * @param {object} args
+   * @param {'search' | string} method
+   * @returns {Promise<T[]>}
+   */
   async search(model, perms, args, method = 'search') {
     const data = await Promise.all(
       this.models[model].map(async (source) =>
@@ -343,6 +403,11 @@ module.exports = class DbCheck {
     return deDuped
   }
 
+  /**
+   * @param {import("../types").Perms} perms
+   * @param {object} args
+   * @returns {Promise<{ id: string, lat: number, lon: number}[]>}
+   */
   async submissionCells(perms, args) {
     const stopData = await Promise.all(
       this.models.Pokestop.map(async (source) =>
@@ -360,6 +425,11 @@ module.exports = class DbCheck {
     ]
   }
 
+  /**
+   * @template T
+   * @param {keyof import("../models").DbModels} model
+   * @returns {T[]}
+   */
   async getAvailable(model) {
     if (this.models[model]) {
       log.info(HELPERS.db, `Querying available for ${model}`)

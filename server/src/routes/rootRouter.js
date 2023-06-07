@@ -32,6 +32,10 @@ fs.readdir(resolve(__dirname, './api/v1/'), (e, files) => {
   })
 })
 
+rootRouter.get('/api/health', async (req, res) =>
+  res.status(200).json({ status: 'ok' }),
+)
+
 rootRouter.post('/api/error/client', (req) => {
   if (req.headers.version === version && req.isAuthenticated()) {
     const {

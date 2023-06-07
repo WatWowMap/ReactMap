@@ -21,10 +21,10 @@ export default function Container({ serverSettings, params, location, zoom }) {
           : zoom
       }
       zoomControl={false}
-      style={{
-        width: '100vw',
-        height: '100vh',
-      }}
+      // style={{
+      //   width: '100vw',
+      //   height: '100vh',
+      // }}
       preferCanvas
     >
       {serverSettings.user && serverSettings.user.perms.map && (
