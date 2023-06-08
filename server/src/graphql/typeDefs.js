@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server-express')
+const gql = require('graphql-tag')
 const ScannerTypes = require('./scannerTypes')
 const PoracleTypes = require('./poracleTypes')
 const MapTypes = require('./mapTypes')

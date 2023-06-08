@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server-express')
+const gql = require('graphql-tag')
 
 module.exports = gql`
   type Available {
