@@ -86,6 +86,10 @@ const apolloServer = new ApolloServer({
     {
       async requestDidStart(requestContext) {
         requestContext.contextValue.startTime = Date.now()
+        const filterCount = Object.keys(
+          requestContext.request?.variables?.filters || {},
+        ).length
+
         return {
           async willSendResponse(context) {
             const { response, contextValue } = context
@@ -103,11 +107,15 @@ const apolloServer = new ApolloServer({
                 '|',
                 context.operationName,
                 '|',
+                'Returning:',
                 returned || 0,
                 '|',
                 `${Date.now() - contextValue.startTime}ms`,
                 '|',
                 contextValue.user || 'Not Logged In',
+                '|',
+                'Filters:',
+                filterCount || 0,
               )
 
               const { transaction } = contextValue

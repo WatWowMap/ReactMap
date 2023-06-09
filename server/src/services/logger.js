@@ -58,7 +58,11 @@ module.exports.HELPERS = HELPERS
 log.methodFactory = (methodName, logLevel, loggerName) => {
   const rawMethod = logger.methodFactory(methodName, logLevel, loggerName)
   return (...args) => {
-    rawMethod(HELPERS[methodName] ?? '', ...args)
+    rawMethod(
+      HELPERS[methodName] ?? '',
+      new Date().toISOString().split('.')[0].split('T').join(' '),
+      ...args,
+    )
   }
 }
 
