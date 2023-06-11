@@ -134,6 +134,7 @@ module.exports = class PkmnBackend {
       orStr,
       merged,
     })
+
     return merged
   }
 
@@ -232,9 +233,6 @@ module.exports = class PkmnBackend {
     return { filtered, best }
   }
 
-  /**
-   * @returns {object}
-   */
   buildApiFilter() {
     const {
       enabled: _enabled,
