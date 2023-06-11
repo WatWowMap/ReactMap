@@ -8,7 +8,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
-export default function PortalPopup({ portal, ts, Icons }) {
+export default function PortalPopup({ portal, config, ts, Icons }) {
   const { navigation } = useStore((state) => state.settings)
   const {
     navigation: {
@@ -97,6 +97,13 @@ export default function PortalPopup({ portal, ts, Icons }) {
             <Map style={{ color: 'white' }} />
           </IconButton>
         </Grid>
+        {config.enablePortalPopupCoords && (
+          <Grid item xs={12} style={{ textAlign: 'center' }}>
+            <Typography variant="caption" style={{ textAlign: 'center' }}>
+              🎯 {portal.lat}, {portal.lon}
+            </Typography>
+          </Grid>
+        )}
       </Grid>
     </ErrorBoundary>
   )
