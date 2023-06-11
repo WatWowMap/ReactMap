@@ -1,5 +1,6 @@
 const { Model, raw } = require('objection')
 const getAreaSql = require('../services/functions/getAreaSql')
+const fetchJson = require('../services/api/fetchJson')
 
 module.exports = class Device extends Model {
   static get tableName() {
@@ -42,9 +43,18 @@ module.exports = class Device extends Model {
     ) {
       return []
     }
-    const results = await query.from(
-      settings.isMad ? 'settings_device' : 'device',
-    )
+    const results = settings.mem
+      ? await fetchJson(`${settings.mem}/api/devices/all`).then((res) =>
+          Object.entries(res.devices).map(([id, device]) => ({
+            id,
+            last_lat: device.latitude,
+            last_lon: device.longitude,
+            updated: device.last_update,
+            type: device.scan_context,
+          })),
+        )
+      : await query.from(settings.isMad ? 'settings_device' : 'device')
+
     return results.filter(
       (device) => device.id && device.last_lat && device.last_lon,
     )
