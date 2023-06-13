@@ -166,6 +166,7 @@
     },
     "links": {
       "discordInvite": "",
+      "discordLink": "",
       "feedbackLink": "",
       "statsLink": "",
       "rolesLinkName": "Role Upgrading Info",
@@ -375,9 +376,9 @@
           "op": "="
         },
         {
-          "name": "Top 3 Ranks",
+          "name": "Top PVP Rank",
           "perm": "pvp",
-          "num": 3,
+          "num": 1,
           "value": "#0000ff",
           "op": "<="
         },

@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react'
 import {
+  Icon,
   List,
   ListItem,
   ListItemIcon,
@@ -70,6 +71,24 @@ export default function DrawerActions() {
             <AccountBoxIcon color="secondary" />
           </ListItemIcon>
           <ListItemText primary={t('profile')} />
+        </ListItem>
+      )}
+      {config.map.discordLink && (
+        <ListItem
+          button
+          component="button"
+          href={config.map.discordLink}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <ListItemIcon>
+            <Icon
+              className="fab fa-discord"
+              color="secondary"
+              style={{ fontSize: 25 }}
+            />
+          </ListItemIcon>
+          <ListItemText primary="Discord" />
         </ListItem>
       )}
       {config.map.enableTutorial && (
