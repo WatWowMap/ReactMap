@@ -27,8 +27,8 @@ module.exports = class DbCheck {
     this.models = {}
     this.questConditions = {}
     this.endpoints = {}
-    this.rarity = new Map()
-    this.historical = new Map()
+    this.rarity = {}
+    this.historical = {}
     this.connections = dbSettings.schemas
       .filter((s) => s.useFor.length)
       .map((schema, i) => {
@@ -214,18 +214,19 @@ module.exports = class DbCheck {
         },
       )
     })
+    this[mapKey] = {}
     Object.entries(base).forEach(([id, count]) => {
       const percent = (count / total) * 100
       if (percent === 0) {
-        this[mapKey].set(id, 'never')
+        this[mapKey][id] = 'never'
       } else if (percent < this.rarityPercents.ultraRare) {
-        this[mapKey].set(id, 'ultraRare')
+        this[mapKey][id] = 'ultraRare'
       } else if (percent < this.rarityPercents.rare) {
-        this[mapKey].set(id, 'rare')
+        this[mapKey][id] = 'rare'
       } else if (percent < this.rarityPercents.uncommon) {
-        this[mapKey].set(id, 'uncommon')
+        this[mapKey][id] = 'uncommon'
       } else {
-        this[mapKey].set(id, 'common')
+        this[mapKey][id] = 'common'
       }
     })
   }
@@ -317,21 +318,21 @@ module.exports = class DbCheck {
   static deDupeResults(results) {
     if (results.length === 1) return results[0]
     if (results.length > 1) {
-      const returnObj = new Map()
+      const returnObj = {}
       const { length } = results
       for (let i = 0; i < length; i += 1) {
         const { length: subLength } = results[i]
         for (let j = 0; j < subLength; j += 1) {
           const item = results[i][j]
           if (
-            !returnObj.has(item.id) ||
-            item.updated > returnObj.get(item.id).updated
+            !returnObj[item.id] ||
+            item.updated > returnObj[item.id].updated
           ) {
-            returnObj.set(item.id, item)
+            returnObj[item.id] = item
           }
         }
       }
-      return [...returnObj.values()]
+      return Object.values(returnObj)
     }
     return []
   }

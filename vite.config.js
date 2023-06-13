@@ -8,9 +8,14 @@ const { viteStaticCopy } = require('vite-plugin-static-copy')
 const removeFiles = require('rollup-plugin-delete')
 const { resolve, extname } = require('path')
 const fs = require('fs')
+const { sentryVitePlugin } = require('@sentry/vite-plugin')
 
 const { log, HELPERS } = require('./server/src/services/logger')
 
+/**
+ * @param {boolean} isDevelopment
+ * @returns {import('vite').Plugin}
+ */
 const customFilePlugin = (isDevelopment) => {
   const fileRegex = /\.(jsx?|css)$/
   const customPaths = []
@@ -48,6 +53,7 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
 
 module.exports = defineConfig(({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
+  const isRelease = process.argv.includes('-r')
 
   const pkg = JSON.parse(
     fs.readFileSync(resolve(__dirname, 'package.json'), 'utf8'),
@@ -98,6 +104,17 @@ module.exports = defineConfig(({ mode }) => {
           },
         ],
       }),
+      ...(process.env.SENTRY_AUTH_TOKEN &&
+      process.env.SENTRY_ORG &&
+      process.env.SENTRY_PROJECT
+        ? [
+            sentryVitePlugin({
+              org: process.env.SENTRY_ORG,
+              project: process.env.SENTRY_PROJECT,
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+            }),
+          ]
+        : []),
     ],
     publicDir: 'public',
     resolve: {
@@ -128,7 +145,7 @@ module.exports = defineConfig(({ mode }) => {
     build: {
       target: ['safari11.1', 'chrome64', 'firefox66', 'edge88'],
       outDir: resolve(__dirname, './dist'),
-      sourcemap: mode === 'development',
+      sourcemap: mode === 'development' || isRelease,
       minify: mode === 'development' ? false : 'esbuild',
       input: { main: resolve(__dirname, 'index.html') },
       assetsDir: '',

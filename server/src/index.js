@@ -53,7 +53,11 @@ const apolloServer = new ApolloServer({
     if (e?.message.includes('skipUndefined()') || e?.message === 'old_client') {
       log.info(
         HELPERS.gql,
-        'Old client detected, forcing user to refresh, no need to report this error unless it continues to happen\nClient:',
+        'Old client detected, forcing user to refresh, no need to report this error unless it continues to happen',
+      )
+      log.info(
+        HELPERS.gql,
+        'Client:',
         e.extensions.clientV,
         'Server:',
         e.extensions.serverV,

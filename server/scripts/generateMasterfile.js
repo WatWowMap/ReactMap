@@ -14,11 +14,7 @@ Object.entries(defaultRarity).forEach(([tier, pokemon]) => {
   }
 })
 
-const generate = async (
-  save = false,
-  historicRarity = new Map(),
-  dbRarity = new Map(),
-) => {
+const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
   try {
     if (!api.pogoApiEndpoints.masterfile)
       throw new Error('No masterfile endpoint')
@@ -31,11 +27,11 @@ const generate = async (
         Object.values(masterfile.pokemon).map((pokemon) => {
           const { legendary, mythical, ultraBeast } = pokemon
           const historic =
-            historicRarity.get(pokemon.pokedexId.toString()) || 'never'
+            historicRarity[pokemon.pokedexId.toString()] || 'never'
 
           let rarity =
             (dbRarity.size
-              ? dbRarity.get(`${pokemon.pokedexId}-${pokemon.defaultFormId}`)
+              ? dbRarity[`${pokemon.pokedexId}-${pokemon.defaultFormId}`]
               : rarityObj[pokemon.pokedexId]) || 'never'
           if (legendary) rarity = 'legendary'
           if (mythical) rarity = 'mythical'
@@ -50,7 +46,7 @@ const generate = async (
                 rarity:
                   +formId === pokemon.defaultFormId
                     ? rarity
-                    : dbRarity.get(`${pokemon.pokedexId}-${formId}`) || 'never',
+                    : dbRarity[`${pokemon.pokedexId}-${formId}`] || 'never',
               },
             ]),
           )
