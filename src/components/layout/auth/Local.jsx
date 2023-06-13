@@ -43,6 +43,7 @@ export default function LocalLogin({ href }) {
 
     if (!resp.ok) {
       setError(t(await resp.json()))
+      setSubmitted(false)
     } else {
       window.location.replace('/')
     }
