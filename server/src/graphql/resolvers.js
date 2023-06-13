@@ -42,6 +42,13 @@ module.exports = {
       }
       return []
     },
+    checkUsername: async (_, args, { Db }) => {
+      const results = await Db.models.User.query().where(
+        'username',
+        args.username,
+      )
+      return !!results.length
+    },
     devices: (_, args, { perms, Db }) => {
       if (perms?.devices) {
         return Db.getAll('Device', perms, args)
@@ -372,13 +379,6 @@ module.exports = {
         return true
       }
       return false
-    },
-    checkUsername: async (_, args, { Db }) => {
-      const results = await Db.models.User.query().where(
-        'username',
-        args.username,
-      )
-      return Boolean(results.length)
     },
     setExtraFields: async (_, { key, value }, { req, Db }) => {
       if (req.user?.id) {
