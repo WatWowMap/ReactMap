@@ -26,6 +26,7 @@ import GenericTimer from './common/Timer'
 import NameTT from './common/NameTT'
 import GenderIcon from './common/GenderIcon'
 import Navigation from './common/Navigation'
+import Coords from './common/Coords'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -578,9 +579,7 @@ const ExtraInfo = ({ pokemon, perms, config, t, Icons }) => {
       )}
       {config.enablePokemonPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="caption" style={{ textAlign: 'center' }}>
-            🎯 {pokemon.lat.toFixed(6)}, {pokemon.lon.toFixed(6)}
-          </Typography>
+          <Coords lat={pokemon.lat.toFixed(6)} lon={pokemon.lon.toFixed(6)} />
         </Grid>
       )}
     </Grid>
