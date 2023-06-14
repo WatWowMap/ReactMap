@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core'
 
 import { useTranslation } from 'react-i18next'
-import { useMutation } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 
 import Fetch from '@services/Fetch'
 import Query from '@services/Query'
@@ -27,7 +27,7 @@ export default function LocalLogin({ href }) {
   })
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [checkUsername, { data }] = useMutation(Query.user('checkUsername'))
+  const [checkUsername, { data }] = useLazyQuery(Query.user('checkUsername'))
 
   const handleChange = (e) => {
     if (e.target.name === 'username') {
@@ -43,6 +43,7 @@ export default function LocalLogin({ href }) {
 
     if (!resp.ok) {
       setError(t(await resp.json()))
+      setSubmitted(false)
     } else {
       window.location.replace('/')
     }

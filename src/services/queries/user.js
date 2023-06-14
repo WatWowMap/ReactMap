@@ -13,7 +13,7 @@ export const setWebhookStrategy = gql`
 `
 
 export const checkUsername = gql`
-  mutation SetUsername($username: String!) {
+  query CheckUsername($username: String!) {
     checkUsername(username: $username)
   }
 `

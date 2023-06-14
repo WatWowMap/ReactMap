@@ -60,7 +60,9 @@ export default function TimeTile({
             <IconButton
               style={{ color: 'white' }}
               onClick={() =>
-                useStore.setState({ popups: { [expandKey]: !expanded } })
+                useStore.setState((prev) => ({
+                  popups: { ...prev.popups, [expandKey]: !expanded },
+                }))
               }
             >
               {expanded ? <ExpandLess /> : <ExpandMore />}

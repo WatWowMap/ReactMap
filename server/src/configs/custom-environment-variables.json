@@ -348,6 +348,7 @@
     },
     "links": {
       "discordInvite": "MAP_LINKS_DISCORD_INVITE",
+      "discordLink": "MAP_LINKS_DISCORD_LINK",
       "feedbackLink": "MAP_LINKS_FEEDBACK_LINK",
       "statsLink": "MAP_LINKS_STATS_LINK",
       "rolesLinkName": "MAP_LINKS_ROLES_LINK_NAME",

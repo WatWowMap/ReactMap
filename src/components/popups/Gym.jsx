@@ -1,6 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react'
 import ExpandMore from '@material-ui/icons/ExpandMore'
-import Map from '@material-ui/icons/Map'
 import MoreVert from '@material-ui/icons/MoreVert'
 import {
   Grid,
@@ -25,6 +24,7 @@ import GenericTimer from './common/Timer'
 import BadgeSelection from '../layout/dialogs/BadgeSelection'
 import PowerUp from './common/PowerUp'
 import GenderIcon from './common/GenderIcon'
+import Navigation from './common/Navigation'
 
 export default function GymPopup({
   gym,
@@ -568,12 +568,6 @@ const Timer = ({ gym, start, t, hasHatched }) => {
 
 const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
   const classes = useStyles()
-  const { navigation } = useStore((state) => state.settings)
-  const {
-    navigation: {
-      [navigation]: { url },
-    },
-  } = useStatic((state) => state.config)
   const { lat, lon } = gym
 
   const handleExpandClick = (category) => {
@@ -602,13 +596,7 @@ const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
         </Grid>
       )}
       <Grid item xs={4} style={{ textAlign: 'center' }}>
-        <IconButton
-          href={url.replace('{x}', lat).replace('{y}', lon)}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <Map style={{ color: 'white' }} />
-        </IconButton>
+        <Navigation lat={lat} lon={lon} />
       </Grid>
       {perms.gyms && (
         <Grid item xs={4}>
