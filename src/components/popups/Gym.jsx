@@ -35,6 +35,7 @@ export default function GymPopup({
   hasHatched,
   badge,
   setBadge,
+  userSettings,
   config,
 }) {
   const { t } = useTranslation()
@@ -677,7 +678,7 @@ const ExtraInfo = ({ gym, config, t, ts }) => {
           </Grid>
         </Fragment>
       ))}
-      {config.enableGymPopupCoords && (
+      {userSettings.enableGymPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Coords lat={gym.lat} lon={gym.lon} />
         </Grid>
