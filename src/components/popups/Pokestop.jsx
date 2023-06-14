@@ -605,7 +605,7 @@ const ExtraInfo = ({ pokestop, config, t, ts }) => {
           </Grid>
         </Fragment>
       ))}
-      {config.enablePokestopPopupCoords && (
+      {userSettings.enablePokestopPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Coords lat={pokestop.lat} lon={pokestop.lon} />
         </Grid>
