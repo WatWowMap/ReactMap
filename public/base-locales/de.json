@@ -281,6 +281,7 @@
   "backups_subtitle": "Ermöglicht das Sichern und Laden von Einstellungen über verschiedene Geräte hinweg",
   "backups": "Sicherungen",
   "user_profile": "Benutzer-Profil",
+  "user_username": "Benutzername",
   "candy": "Bonbon",
   "show_ex_badge": "EX Abzeichen anzeigen",
   "search": "Suche",
@@ -564,6 +565,7 @@
   "poi": "Wayspots",
   "300m_range": "300m Radius",
   "lure_range": "Lockmodulradius",
+  "custom_range": "individueller Radius",
   "tap_to_toggle": "Tippen zum Umschalten",
   "power_up": "Aufladung",
   "never_alt": "Nie",
@@ -589,5 +591,10 @@
   "load": "laden",
   "update": "aktualisieren",
   "delete": "löschen",
-  "name": "Name"
+  "name": "Name",
+  "only_confirmed": "nur bestätigte",
+  "rocket_pokemon": "Crypto-Pokemon",
+  "decoy": "Täusch-Rüpel",
+  "s2_cell_limit_0": "Sie haben versucht, mehr als 20.000 Zellen zu generieren ({{variable_0}})",
+  "show_all_pvp_ranks": "alle PVP Ränge anzeigen"
 }
