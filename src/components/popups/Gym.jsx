@@ -25,6 +25,7 @@ import BadgeSelection from '../layout/dialogs/BadgeSelection'
 import PowerUp from './common/PowerUp'
 import GenderIcon from './common/GenderIcon'
 import Navigation from './common/Navigation'
+import Coords from './common/Coords'
 
 export default function GymPopup({
   gym,
@@ -678,9 +679,7 @@ const ExtraInfo = ({ gym, config, t, ts }) => {
       ))}
       {config.enableGymPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="caption" style={{ textAlign: 'center' }}>
-            🎯 {gym.lat}, {gym.lon}
-          </Typography>
+          <Coords lat={gym.lat} lon={gym.lon} />
         </Grid>
       )}
     </Grid>
