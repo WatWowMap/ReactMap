@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 import Navigation from './common/Navigation'
+import Coords from './common/Coords'
 
 export default function PortalPopup({ portal, config, ts, Icons }) {
   const { t } = useTranslation()
@@ -86,9 +87,7 @@ export default function PortalPopup({ portal, config, ts, Icons }) {
         </Grid>
         {config.enablePortalPopupCoords && (
           <Grid item xs={12} style={{ textAlign: 'center' }}>
-            <Typography variant="caption" style={{ textAlign: 'center' }}>
-              🎯 {portal.lat}, {portal.lon}
-            </Typography>
+            <Coords lat={portal.lat} lon={portal.lon} />
           </Grid>
         )}
       </Grid>
