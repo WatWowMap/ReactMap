@@ -20,6 +20,7 @@ import Utility from '@services/Utility'
 import Dropdown from './common/Dropdown'
 import TimeTile from './common/TimeTile'
 import Navigation from './common/Navigation'
+import Coords from './common/Coords'
 import Title from './common/Title'
 import HeaderImage from './common/HeaderImage'
 import Timer from './common/Timer'
@@ -215,7 +216,7 @@ export default function PokestopPopup({
         />
         {perms.allPokestops && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-            <ExtraInfo pokestop={pokestop} t={t} ts={ts} />
+            <ExtraInfo pokestop={pokestop} config={config} t={t} ts={ts} />
           </Collapse>
         )}
       </Grid>
@@ -561,7 +562,7 @@ const Footer = ({ pokestop, popups, setPopups, perms }) => {
   )
 }
 
-const ExtraInfo = ({ pokestop, t, ts }) => {
+const ExtraInfo = ({ pokestop, config, t, ts }) => {
   const { last_modified_timestamp, updated } = pokestop
 
   const extraMetaData = [
@@ -604,6 +605,11 @@ const ExtraInfo = ({ pokestop, t, ts }) => {
           </Grid>
         </Fragment>
       ))}
+      {config.enablePokestopPopupCoords && (
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Coords lat={pokestop.lat} lon={pokestop.lon} />
+        </Grid>
+      )}
     </Grid>
   )
 }

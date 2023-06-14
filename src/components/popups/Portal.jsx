@@ -6,8 +6,9 @@ import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 import Navigation from './common/Navigation'
+import Coords from './common/Coords'
 
-export default function PortalPopup({ portal, ts, Icons }) {
+export default function PortalPopup({ portal, config, ts, Icons }) {
   const { t } = useTranslation()
   const [portalName, setPortalName] = useState(true)
   const { url: imageUrl, name, lat, lon, updated, imported } = portal
@@ -84,6 +85,11 @@ export default function PortalPopup({ portal, ts, Icons }) {
         <Grid item xs={4} style={{ textAlign: 'center' }}>
           <Navigation lat={lat} lon={lon} />
         </Grid>
+        {config.enablePortalPopupCoords && (
+          <Grid item xs={12} style={{ textAlign: 'center' }}>
+            <Coords lat={portal.lat} lon={portal.lon} />
+          </Grid>
+        )}
       </Grid>
     </ErrorBoundary>
   )
