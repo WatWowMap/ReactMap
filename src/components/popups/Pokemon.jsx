@@ -577,7 +577,7 @@ const ExtraInfo = ({ pokemon, perms, config, t, Icons }) => {
           </Typography>
         </Grid>
       )}
-      {config.enablePokemonPopupCoords && (
+      {userSettings.enablePokemonPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Coords lat={pokemon.lat.toFixed(6)} lon={pokemon.lon.toFixed(6)} />
         </Grid>
