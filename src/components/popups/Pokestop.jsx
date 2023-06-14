@@ -20,6 +20,7 @@ import Utility from '@services/Utility'
 import Dropdown from './common/Dropdown'
 import TimeTile from './common/TimeTile'
 import Navigation from './common/Navigation'
+import Coords from './common/Coords'
 import Title from './common/Title'
 import HeaderImage from './common/HeaderImage'
 import Timer from './common/Timer'
@@ -606,9 +607,7 @@ const ExtraInfo = ({ pokestop, config, t, ts }) => {
       ))}
       {config.enablePokestopPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="caption" style={{ textAlign: 'center' }}>
-            🎯 {pokestop.lat}, {pokestop.lon}
-          </Typography>
+          <Coords lat={pokestop.lat} lon={pokestop.lon} />
         </Grid>
       )}
     </Grid>
