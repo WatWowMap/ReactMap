@@ -71,7 +71,7 @@ module.exports = function clientOptions(perms) {
       darkMapBorder: { type: 'color', perm: ['submissionCells'] },
       cellBlocked: { type: 'color', perm: ['submissionCells'] },
       poiColor: { type: 'color', perm: ['submissionCells'] },
-      enablePortalPopupCoords: { type: 'color', perm: ['portals'] },
+      enablePortalPopupCoords: { type: 'bool', perm: ['portals'] },
     },
     s2cells: {
       lightMapBorder: { type: 'color', perm: ['s2cells'] },
