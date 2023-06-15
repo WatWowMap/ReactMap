@@ -615,7 +615,7 @@
         "__format": "boolean"
       },
       "enableGymPopupCoords": {
-        "__name": "CLIENT_SIDE_OPTIONS_ENABLE_GYM_POPUP_COORDS",
+        "__name": "CLIENT_SIDE_OPTIONS_GYM_POPUP_COORDS",
         "__format": "boolean"
       }
     },
