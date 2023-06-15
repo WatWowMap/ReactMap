@@ -35,8 +35,7 @@ export default function GymPopup({
   hasHatched,
   badge,
   setBadge,
-  userSettings,
-  config,
+  userSettings
 }) {
   const { t } = useTranslation()
   const { perms } = useStatic((state) => state.auth)
@@ -124,7 +123,7 @@ export default function GymPopup({
         />
         {perms.gyms && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-            <ExtraInfo gym={gym} config={config} t={t} ts={ts} />
+            <ExtraInfo gym={gym} userSettings={userSettings} t={t} ts={ts} />
           </Collapse>
         )}
       </Grid>
@@ -615,7 +614,7 @@ const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
   )
 }
 
-const ExtraInfo = ({ gym, config, t, ts, userSettings }) => {
+const ExtraInfo = ({ gym, userSettings, t, ts }) => {
   const { last_modified_timestamp, updated, total_cp, guarding_pokemon_id } =
     gym
   const { gymValidDataLimit } = useStatic((state) => state.config)
