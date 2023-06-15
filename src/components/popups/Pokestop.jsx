@@ -562,7 +562,7 @@ const Footer = ({ pokestop, popups, setPopups, perms }) => {
   )
 }
 
-const ExtraInfo = ({ pokestop, config, t, ts }) => {
+const ExtraInfo = ({ pokestop, config, t, ts, userSettings }) => {
   const { last_modified_timestamp, updated } = pokestop
 
   const extraMetaData = [
