@@ -8,7 +8,7 @@ import ErrorBoundary from '@components/ErrorBoundary'
 import Navigation from './common/Navigation'
 import Coords from './common/Coords'
 
-export default function PortalPopup({ portal, config, ts, Icons, userSettings }) {
+export default function PortalPopup({ portal, userSettings, ts, Icons }) {
   const { t } = useTranslation()
   const [portalName, setPortalName] = useState(true)
   const { url: imageUrl, name, lat, lon, updated, imported } = portal
