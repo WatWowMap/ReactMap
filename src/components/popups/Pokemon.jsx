@@ -42,8 +42,7 @@ export default function PokemonPopup({
   userSettings,
   isTutorial,
   Icons,
-  timeOfDay,
-  config,
+  timeOfDay
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
@@ -141,7 +140,7 @@ export default function PokemonPopup({
           <ExtraInfo
             pokemon={pokemon}
             perms={pokePerms}
-            config={config}
+            userSettings={userSettings}
             t={t}
             Icons={Icons}
           />
@@ -500,7 +499,7 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
   )
 }
 
-const ExtraInfo = ({ pokemon, perms, config, t, Icons, userSettings }) => {
+const ExtraInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
   const { moves } = useStatic((state) => state.masterfile)
 
   const { move_1, move_2, weight, height, first_seen_timestamp, updated, iv } =
