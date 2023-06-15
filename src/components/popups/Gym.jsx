@@ -615,7 +615,7 @@ const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
   )
 }
 
-const ExtraInfo = ({ gym, config, t, ts }) => {
+const ExtraInfo = ({ gym, config, t, ts, userSettings }) => {
   const { last_modified_timestamp, updated, total_cp, guarding_pokemon_id } =
     gym
   const { gymValidDataLimit } = useStatic((state) => state.config)
