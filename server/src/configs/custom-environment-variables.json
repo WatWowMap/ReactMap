@@ -423,22 +423,6 @@
         "__format": "number"
       },
       "distanceUnit": "MAP_MISC_DISTANCE_UNIT",
-      "enablePokemonPopupCoords": {
-        "__name": "MAP_MISC_ENABLE_POKEMON_POPUP_COORDS",
-        "__format": "boolean"
-      },
-      "enableGymPopupCoords": {
-        "__name": "MAP_MISC_ENABLE_GYM_POPUP_COORDS",
-        "__format": "boolean"
-      },
-      "enablePokestopPopupCoords": {
-        "__name": "MAP_MISC_ENABLE_POKESTOP_POPUP_COORDS",
-        "__format": "boolean"
-      },
-      "enablePortalPopupCoords": {
-        "__name": "MAP_MISC_ENABLE_PORTAL_POPUP_COORDS",
-        "__format": "boolean"
-      },
       "customFloatingIcons": {
         "__name": "MAP_MISC_CUSTOM_FLOATING_ICONS",
         "__format": "json"
@@ -629,6 +613,10 @@
       "gymBadgeDiamonds": {
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_GYM_BADGE_DIAMONDS",
         "__format": "boolean"
+      },
+      "enableGymPopupCoords": {
+        "__name": "CLIENT_SIDE_OPTIONS_ENABLE_GYM_POPUP_COORDS",
+        "__format": "boolean"
       }
     },
     "pokestops": {
@@ -670,6 +658,10 @@
       },
       "showArBadge": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_SHOW_AR_BADGE",
+        "__format": "boolean"
+      },
+      "enablePokestopPopupCoords": {
+        "__name": "CLIENT_SIDE_OPTIONS_ENABLE_POKESTOP_POPUP_COORDS",
         "__format": "boolean"
       }
     },
@@ -725,11 +717,19 @@
       "glow": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_GLOW",
         "__format": "json"
+      },
+      "enablePokemonPopupCoords": {
+        "__name": "CLIENT_SIDE_OPTIONS_ENABLE_POKEMON_POPUP_COORDS",
+        "__format": "boolean"
       }
     },
     "wayfarer": {
       "clustering": {
         "__name": "CLIENT_SIDE_OPTIONS_WAYFARER_CLUSTERING",
+        "__format": "boolean"
+      },
+      "enablePortalPopupCoords": {
+        "__name": "CLIENT_SIDE_OPTIONS_ENABLE_PORTAL_POPUP_COORDS",
         "__format": "boolean"
       },
       "oldPortals": "CLIENT_SIDE_OPTIONS_WAYFARER_OLD_PORTALS",
