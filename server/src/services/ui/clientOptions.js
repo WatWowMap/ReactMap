@@ -27,7 +27,7 @@ module.exports = function clientOptions(perms) {
       showArBadge: { type: 'bool', perm: ['gyms'] },
       raidLevelBadges: { type: 'bool', perm: ['raids'] },
       gymBadgeDiamonds: { type: 'bool', perm: ['gymBadges'] },
-      enableGymPopupCoords: { type: 'bool', perm: ['gyms', 'raids'] },
+      enableGymPopupCoords: { type: 'bool', perm: ['gyms'] },
     },
     pokestops: {
       clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },
