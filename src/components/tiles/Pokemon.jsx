@@ -80,6 +80,7 @@ const PokemonTile = ({
   params,
   showCircles,
   setParams,
+  config,
 }) => {
   const markerRef = useRef({ [item.id]: null })
   const [done, setDone] = useState(false)
@@ -153,6 +154,7 @@ const PokemonTile = ({
             userSettings={userSettings}
             Icons={Icons}
             timeOfDay={timeOfDay}
+            config={config}
           />
         </Popup>
         {(showTimer || userSettings.pokemonTimers) && (

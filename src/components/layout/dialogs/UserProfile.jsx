@@ -43,6 +43,7 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
   const {
     map: { excludeList, rolesLinkName, rolesLink },
   } = useStatic((state) => state.config)
+  const locale = localStorage.getItem('i18nextLng') || 'en'
 
   const [tab, setTab] = useState(0)
 
@@ -52,7 +53,10 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
 
   return (
     <>
-      <Header titles={['user_profile']} action={() => setUserProfile(false)} />
+      <Header
+        titles={['user_profile', `- ${auth.username}`]}
+        action={() => setUserProfile(false)}
+      />
       <DialogContent style={{ padding: 0 }}>
         <AppBar position="static">
           <Tabs
@@ -101,7 +105,16 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
       </DialogContent>
       <Footer
         options={[
-          { name: rolesLinkName, link: rolesLink, color: 'primary' },
+          rolesLink
+            ? {
+                name:
+                  typeof rolesLinkName === 'string'
+                    ? rolesLinkName
+                    : rolesLinkName[locale] || Object.values(rolesLinkName)[0],
+                link: rolesLink,
+                color: 'primary',
+              }
+            : {},
           {
             name: 'close',
             color: 'secondary',
@@ -142,10 +155,11 @@ const LinkProfiles = ({ auth, t }) => {
             />
           )
           return (
-            <Grid item xs={6} key={method}>
+            <Grid item xs={12} key={method} align="center">
               {auth[`${method}Id`] ? (
-                <Typography color="secondary" align="center">
-                  {t(`${method}_linked`)}! ({auth.username})
+                <Typography color="secondary">
+                  {t('user_username')}: {auth.username} ({t(`${method}_linked`)}
+                  )
                 </Typography>
               ) : (
                 Component
@@ -221,8 +235,15 @@ const ExtraFields = ({ auth }) => {
         const key = typeof field === 'string' ? field : field.database
         if (!key || !label) return null
         return (
-          <Grid key={label} item xs={5} style={{ margin: '10px 0' }}>
+          <Grid
+            key={label}
+            item
+            xs={5}
+            align="center"
+            style={{ margin: '10px 0' }}
+          >
             <TextField
+              disabled={field.disabled}
               variant="outlined"
               label={label}
               value={auth.data?.[key] || ''}

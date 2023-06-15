@@ -1,19 +1,25 @@
-/* eslint-disable max-classes-per-file */
 const {
   api: {
     pvp: { leagues },
   },
-} = require('../services/config')
+} = require('../../config')
+const BaseFilter = require('../Base')
 
-class GenericFilter {
-  constructor(enabled, size) {
-    this.enabled = enabled || false
-    this.size = size || 'md'
-    this.adv = ''
-  }
-}
-
-class PokemonFilter extends GenericFilter {
+module.exports = class PokemonFilter extends BaseFilter {
+  /**
+   * @param {boolean} enabled
+   * @param {'sm' | 'md' | 'lg' | 'xl'} size
+   * @param {number[]} iv
+   * @param {number[]} level
+   * @param {number[]} atk
+   * @param {number[]} def
+   * @param {number[]} sta
+   * @param {number[]} pvp
+   * @param {number} gender
+   * @param {number[]} cp
+   * @param {boolean} xxs
+   * @param {boolean} xxl
+   */
   constructor(
     enabled,
     size,
@@ -47,5 +53,3 @@ class PokemonFilter extends GenericFilter {
     )
   }
 }
-
-module.exports = { GenericFilter, PokemonFilter }

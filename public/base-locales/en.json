@@ -294,6 +294,7 @@
   "backups_subtitle": "Enables backing up and loading of settings across devices",
   "backups": "Backups",
   "user_profile": "User Profile",
+  "user_username": "Username",
   "candy": "Candy",
   "show_ex_badge": "Show EX Badge",
   "search": "Search",
@@ -590,5 +591,7 @@
   "name": "Name",
   "only_confirmed": "Only Confirmed",
   "rocket_pokemon": "Rocket Pokemon",
-  "decoy": "Decoy"
+  "decoy": "Decoy",
+  "s2_cell_limit_0": "You attempted to generate more than 20,000 cells ({{variable_0}})",
+  "show_all_pvp_ranks": "Show All PVP Ranks"
 }

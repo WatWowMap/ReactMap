@@ -18,7 +18,9 @@ export default function DevicePopup({ device, isOnline, ts }) {
         {device.id}
       </Typography>
       <Typography variant="subtitle2">
-        {t('instance')} {device.instance_name}
+        {device.instance_name
+          ? `${t('instance')}: ${device.instance_name}`
+          : device.type}
       </Typography>
       <Timer device={device} t={t} ts={ts} />
       <Typography

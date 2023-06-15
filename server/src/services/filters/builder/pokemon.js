@@ -1,15 +1,15 @@
 /* eslint-disable no-restricted-syntax */
-const { Event } = require('../initialization')
-const { GenericFilter } = require('../../models/index')
-const { map } = require('../config')
+const { Event } = require('../../initialization')
+const BaseFilter = require('../Base')
+const { map } = require('../../config')
 
 module.exports = function buildPokemon(defaults, base, custom, available) {
   const pokemon = {
     full: { global: custom },
-    raids: { global: new GenericFilter() },
-    quests: { global: new GenericFilter() },
-    nests: { global: new GenericFilter() },
-    rocket: { global: new GenericFilter() },
+    raids: { global: new BaseFilter() },
+    quests: { global: new BaseFilter() },
+    nests: { global: new BaseFilter() },
+    rocket: { global: new BaseFilter() },
   }
   const energyAmounts = new Set([
     ...defaults.pokestops.baseMegaEnergyAmounts,
@@ -21,28 +21,26 @@ module.exports = function buildPokemon(defaults, base, custom, available) {
   for (const [i, pkmn] of Object.entries(Event.masterfile.pokemon)) {
     for (const j of Object.keys(pkmn.forms)) {
       pokemon.full[`${i}-${j}`] = base
-      pokemon.raids[`${i}-${j}`] = new GenericFilter(defaults.gyms.pokemon)
-      pokemon.quests[`${i}-${j}`] = new GenericFilter(
-        defaults.pokestops.pokemon,
-      )
+      pokemon.raids[`${i}-${j}`] = new BaseFilter(defaults.gyms.pokemon)
+      pokemon.quests[`${i}-${j}`] = new BaseFilter(defaults.pokestops.pokemon)
       if (map.enableConfirmedInvasions) {
-        pokemon.rocket[`a${i}-${j}`] = new GenericFilter(
+        pokemon.rocket[`a${i}-${j}`] = new BaseFilter(
           defaults.pokestops.invasionPokemon,
         )
       }
-      pokemon.nests[`${i}-${j}`] = new GenericFilter(defaults.nests.allPokemon)
+      pokemon.nests[`${i}-${j}`] = new BaseFilter(defaults.nests.allPokemon)
     }
     if (pkmn.family == i) {
-      pokemon.quests[`c${pkmn.family}`] = new GenericFilter(
+      pokemon.quests[`c${pkmn.family}`] = new BaseFilter(
         defaults.pokestops.candy,
       )
-      pokemon.quests[`x${pkmn.family}`] = new GenericFilter(
+      pokemon.quests[`x${pkmn.family}`] = new BaseFilter(
         defaults.pokestops.candy,
       )
     }
     if (pkmn.tempEvolutions) {
       energyAmounts.forEach((a) => {
-        pokemon.quests[`m${i}-${a}`] = new GenericFilter(
+        pokemon.quests[`m${i}-${a}`] = new BaseFilter(
           defaults.pokestops.megaEnergy,
         )
       })

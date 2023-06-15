@@ -3,12 +3,8 @@ const { point } = require('@turf/helpers')
 
 const config = require('../config')
 
-module.exports = function getAreaRestrictionSql(
-  item,
-  areaRestrictions,
-  onlyAreas,
-) {
-  if (!areaRestrictions?.length && !onlyAreas?.length) return true
+function filterRTree(item, areaRestrictions = [], onlyAreas = []) {
+  if (!areaRestrictions.length && !onlyAreas.length) return true
 
   const cleanUserAreas = onlyAreas.filter((area) =>
     config.areas.names.has(area),
@@ -39,3 +35,5 @@ module.exports = function getAreaRestrictionSql(
     )
   return foundInRtree
 }
+
+module.exports = { filterRTree }

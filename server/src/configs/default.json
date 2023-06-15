@@ -69,6 +69,10 @@
     "pvp": {
       "leagues": [
         {
+          "name": "little",
+          "cp": 500
+        },
+        {
           "name": "great",
           "cp": 1500
         },
@@ -83,6 +87,7 @@
       ],
       "reactMapHandlesPvp": false,
       "minCp": {
+        "little": 400,
         "great": 1400,
         "ultra": 2400
       }
@@ -161,6 +166,7 @@
     },
     "links": {
       "discordInvite": "",
+      "discordLink": "",
       "feedbackLink": "",
       "statsLink": "",
       "rolesLinkName": "Role Upgrading Info",
@@ -245,6 +251,10 @@
       "permArrayImages": false,
       "clientTimeoutMinutes": 30,
       "distanceUnit": "km",
+      "enablePokemonPopupCoords": false,
+      "enableGymPopupCoords": false,
+      "enablePokestopPopupCoords": false,
+      "enablePortalPopupCoords": false,
       "customFloatingIcons": []
     },
     "theme": {
@@ -275,6 +285,7 @@
       }
     },
     "messageOfTheDay": {
+      "dialogMaxWidth": "sm",
       "index": 0,
       "settings": {
         "parentSpacing": 0,
@@ -350,6 +361,7 @@
       "interactionRanges": false,
       "showDexNumInPopup": false,
       "pvpMega": false,
+      "showAllPvpRanks": false,
       "linkGlobalAndAdvanced": false,
       "showSizeIndicator": false,
       "glow": [
@@ -368,9 +380,9 @@
           "op": "="
         },
         {
-          "name": "Top 3 Ranks",
+          "name": "Top PVP Rank",
           "perm": "pvp",
-          "num": 3,
+          "num": 1,
           "value": "#0000ff",
           "op": "<="
         },

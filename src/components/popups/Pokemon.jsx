@@ -2,7 +2,6 @@ import React, { Fragment, useCallback, useState, useEffect } from 'react'
 import Check from '@material-ui/icons/Check'
 import Clear from '@material-ui/icons/Clear'
 import ExpandMore from '@material-ui/icons/ExpandMore'
-import Map from '@material-ui/icons/Map'
 import MoreVert from '@material-ui/icons/MoreVert'
 import {
   Grid,
@@ -26,6 +25,8 @@ import ErrorBoundary from '@components/ErrorBoundary'
 import GenericTimer from './common/Timer'
 import NameTT from './common/NameTT'
 import GenderIcon from './common/GenderIcon'
+import Navigation from './common/Navigation'
+import Coords from './common/Coords'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -42,6 +43,7 @@ export default function PokemonPopup({
   isTutorial,
   Icons,
   timeOfDay,
+  config,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
@@ -136,7 +138,13 @@ export default function PokemonPopup({
           ))}
         </Collapse>
         <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-          <ExtraInfo pokemon={pokemon} perms={pokePerms} t={t} Icons={Icons} />
+          <ExtraInfo
+            pokemon={pokemon}
+            perms={pokePerms}
+            config={config}
+            t={t}
+            Icons={Icons}
+          />
         </Collapse>
       </Grid>
     </ErrorBoundary>
@@ -446,13 +454,6 @@ const Timer = ({ pokemon, hasStats, t }) => {
 }
 
 const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
-  const { navigation } = useStore((state) => state.settings)
-  const {
-    navigation: {
-      [navigation]: { url },
-    },
-  } = useStatic((state) => state.config)
-
   const { lat, lon } = pokemon
 
   const handleExpandClick = (category) => {
@@ -484,16 +485,7 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
         </Grid>
       )}
       <Grid item xs={4} style={{ textAlign: 'center' }}>
-        <IconButton>
-          <a
-            href={url.replace('{x}', lat).replace('{y}', lon)}
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: 'white' }}
-          >
-            <Map />
-          </a>
-        </IconButton>
+        <Navigation lat={lat} lon={lon} />
       </Grid>
       <Grid item xs={4}>
         <IconButton
@@ -508,7 +500,7 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
   )
 }
 
-const ExtraInfo = ({ pokemon, perms, t, Icons }) => {
+const ExtraInfo = ({ pokemon, perms, config, t, Icons }) => {
   const { moves } = useStatic((state) => state.masterfile)
 
   const { move_1, move_2, weight, height, first_seen_timestamp, updated, iv } =
@@ -585,6 +577,11 @@ const ExtraInfo = ({ pokemon, perms, t, Icons }) => {
           </Typography>
         </Grid>
       )}
+      {config.enablePokemonPopupCoords && (
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Coords lat={pokemon.lat.toFixed(6)} lon={pokemon.lon.toFixed(6)} />
+        </Grid>
+      )}
     </Grid>
   )
 }
@@ -634,7 +631,7 @@ const PvpInfo = ({ pokemon, league, data, t, Icons }) => {
         <tr>
           <td style={rowClass}>
             <img
-              src={Icons.getMisc(leagueLookup[league] || 500)}
+              src={Icons.getMisc(leagueLookup[league] || '500')}
               height={20}
               alt={league}
             />

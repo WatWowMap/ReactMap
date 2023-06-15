@@ -1,11 +1,12 @@
 const {
   defaultFilters,
   map: { enableMapJsFilter },
-} = require('../config')
-const buildPokemon = require('./buildPokemon')
-const buildPokestops = require('./buildPokestops')
-const buildGyms = require('./buildGyms')
-const { GenericFilter, PokemonFilter } = require('../../models/index')
+} = require('../../config')
+const buildPokemon = require('./pokemon')
+const buildPokestops = require('./pokestop')
+const buildGyms = require('./gym')
+const BaseFilter = require('../Base')
+const PokemonFilter = require('../pokemon/Frontend')
 
 const base = new PokemonFilter(defaultFilters.pokemon.allPokemon)
 const custom = new PokemonFilter(
@@ -108,9 +109,9 @@ module.exports = function buildDefault(perms, available, dbModels) {
         ? {
             enabled: defaultFilters.portals.enabled,
             filter: {
-              global: new GenericFilter(),
-              old: new GenericFilter(),
-              new: new GenericFilter(),
+              global: new BaseFilter(),
+              old: new BaseFilter(),
+              new: new BaseFilter(),
             },
           }
         : undefined,
@@ -127,21 +128,21 @@ module.exports = function buildDefault(perms, available, dbModels) {
             rings: defaultFilters.submissionCells.rings,
             s17Cells: defaultFilters.submissionCells.s17Cells,
             s14Cells: defaultFilters.submissionCells.s14Cells,
-            filter: { global: new GenericFilter() },
+            filter: { global: new BaseFilter() },
           }
         : undefined,
     s2cells: perms.s2cells
       ? {
           enabled: defaultFilters.s2cells.enabled,
           cells: defaultFilters.s2cells.cells,
-          filter: { global: new GenericFilter() },
+          filter: { global: new BaseFilter() },
         }
       : undefined,
     weather:
       perms.weather && dbModels.Weather
         ? {
             enabled: defaultFilters.weather.enabled,
-            filter: { global: new GenericFilter() },
+            filter: { global: new BaseFilter() },
           }
         : undefined,
     spawnpoints:
@@ -149,9 +150,9 @@ module.exports = function buildDefault(perms, available, dbModels) {
         ? {
             enabled: defaultFilters.spawnpoints.enabled,
             filter: {
-              global: new GenericFilter(),
-              confirmed: new GenericFilter(),
-              unconfirmed: new GenericFilter(),
+              global: new BaseFilter(),
+              confirmed: new BaseFilter(),
+              unconfirmed: new BaseFilter(),
             },
           }
         : undefined,
@@ -159,7 +160,7 @@ module.exports = function buildDefault(perms, available, dbModels) {
       perms.scanCells && dbModels.ScanCell
         ? {
             enabled: defaultFilters.scanCells.enabled,
-            filter: { global: new GenericFilter() },
+            filter: { global: new BaseFilter() },
           }
         : undefined,
     devices:
@@ -167,9 +168,9 @@ module.exports = function buildDefault(perms, available, dbModels) {
         ? {
             enabled: defaultFilters.devices.enabled,
             filter: {
-              online: new GenericFilter(),
-              offline: new GenericFilter(),
-              global: new GenericFilter(),
+              online: new BaseFilter(),
+              offline: new BaseFilter(),
+              global: new BaseFilter(),
             },
           }
         : undefined,

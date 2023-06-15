@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server-express')
+const gql = require('graphql-tag')
 const ScannerTypes = require('./scannerTypes')
 const PoracleTypes = require('./poracleTypes')
 const MapTypes = require('./mapTypes')
@@ -15,6 +15,7 @@ module.exports = gql`
     badges: [Badge]
     backup(id: ID): Backup
     backups: [Backup]
+    checkUsername(username: String): Boolean
     devices(filters: JSON): [Device]
     geocoder(search: String, name: String): [Geocoder]
     gyms(
@@ -147,7 +148,6 @@ module.exports = gql`
     webhook(category: String, data: JSON, status: String, name: String): Poracle
     tutorial(tutorial: Boolean): Boolean
     strategy(strategy: String): Boolean
-    checkUsername(username: String): Boolean
     setGymBadge(gymId: String, badge: Int): Boolean
     setExtraFields(key: String, value: String): Boolean
   }

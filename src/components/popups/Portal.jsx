@@ -1,20 +1,14 @@
 import React, { Fragment, useState, useEffect } from 'react'
-import Map from '@material-ui/icons/Map'
-import { Grid, Typography, IconButton } from '@material-ui/core'
+import { Grid, Typography } from '@material-ui/core'
 
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
+import Navigation from './common/Navigation'
+import Coords from './common/Coords'
 
-export default function PortalPopup({ portal, ts, Icons }) {
-  const { navigation } = useStore((state) => state.settings)
-  const {
-    navigation: {
-      [navigation]: { url },
-    },
-  } = useStatic((state) => state.config)
+export default function PortalPopup({ portal, config, ts, Icons }) {
   const { t } = useTranslation()
   const [portalName, setPortalName] = useState(true)
   const { url: imageUrl, name, lat, lon, updated, imported } = portal
@@ -89,14 +83,13 @@ export default function PortalPopup({ portal, ts, Icons }) {
           ))}
         </Grid>
         <Grid item xs={4} style={{ textAlign: 'center' }}>
-          <IconButton
-            href={url.replace('{x}', lat).replace('{y}', lon)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Map style={{ color: 'white' }} />
-          </IconButton>
+          <Navigation lat={lat} lon={lon} />
         </Grid>
+        {config.enablePortalPopupCoords && (
+          <Grid item xs={12} style={{ textAlign: 'center' }}>
+            <Coords lat={portal.lat} lon={portal.lon} />
+          </Grid>
+        )}
       </Grid>
     </ErrorBoundary>
   )

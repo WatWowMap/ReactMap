@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core'
 
 import { useTranslation } from 'react-i18next'
-import { useMutation } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 
 import Fetch from '@services/Fetch'
 import Query from '@services/Query'
@@ -27,7 +27,7 @@ export default function LocalLogin({ href }) {
   })
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [checkUsername, { data }] = useMutation(Query.user('checkUsername'))
+  const [checkUsername, { data }] = useLazyQuery(Query.user('checkUsername'))
 
   const handleChange = (e) => {
     if (e.target.name === 'username') {
@@ -43,6 +43,7 @@ export default function LocalLogin({ href }) {
 
     if (!resp.ok) {
       setError(t(await resp.json()))
+      setSubmitted(false)
     } else {
       window.location.replace('/')
     }
@@ -52,7 +53,7 @@ export default function LocalLogin({ href }) {
     <>
       <form onSubmit={handleSubmit}>
         <Grid container justifyContent="center" alignItems="center" spacing={2}>
-          <Grid item xs={12} sm={5} style={{ textAlign: 'center' }}>
+          <Grid item style={{ textAlign: 'center' }}>
             <FormControl variant="outlined" color="secondary">
               <InputLabel htmlFor="username">{t('local_username')}</InputLabel>
               <OutlinedInput
@@ -71,7 +72,7 @@ export default function LocalLogin({ href }) {
               />
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={5} style={{ textAlign: 'center' }}>
+          <Grid item style={{ textAlign: 'center' }}>
             <FormControl variant="outlined" color="secondary">
               <InputLabel htmlFor="password">{t('local_password')}</InputLabel>
               <OutlinedInput
@@ -104,7 +105,7 @@ export default function LocalLogin({ href }) {
               />
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={2} style={{ textAlign: 'center' }}>
+          <Grid item style={{ textAlign: 'center' }}>
             <Button
               variant="contained"
               style={{

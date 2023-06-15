@@ -10,8 +10,6 @@ export default function useConfig(serverSettings, params) {
   const [state, setState] = useState({ set: false, zoom: 10, location: [0, 0] })
 
   if (!state.set) {
-    document.title = serverSettings.config?.map?.headerTitle
-
     Utility.analytics(
       'User',
       serverSettings.user
@@ -106,7 +104,11 @@ export default function useConfig(serverSettings, params) {
         perms: serverSettings.user ? serverSettings.user.perms : {},
         methods: serverSettings.authMethods || [],
         username: serverSettings.user?.username || '',
-        data: serverSettings.user?.data || {},
+        data: serverSettings.user?.data
+          ? typeof serverSettings.user?.data === 'string'
+            ? JSON.parse(serverSettings.user?.data)
+            : serverSettings.user?.data
+          : {},
         counts: serverSettings.config.map.authCounts || {},
         userBackupLimits: serverSettings.userBackupLimits || 0,
       },

@@ -10,7 +10,8 @@ export default function Navigation({ lat, lon }) {
     navigation: {
       [navigation]: { url },
     },
-  } = useStatic((state) => state.config)
+  } = useStatic.getState().config
+
   return (
     <IconButton
       href={url.replace('{x}', lat).replace('{y}', lon)}

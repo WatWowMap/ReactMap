@@ -16,6 +16,11 @@ module.exports = class PvpWrapper extends Ohbem {
     })()
   }
 
+  /**
+   * @param {import("../types").Pokemon} pokemon
+   * @param {number} currentTs
+   * @returns {import("../types").CleanPvp}
+   */
   resultWithCache(pokemon, currentTs) {
     if (pokemon.pokemon_id === 132) return {}
 
@@ -39,9 +44,10 @@ module.exports = class PvpWrapper extends Ohbem {
         HELPERS.pokemon,
         'Unable to process PVP Stats for Pokemon with ID#: ',
         pokemon.id,
-        `#${pokemon.pokemon_id} - ${pokemon.form}`,
+        `${pokemon.pokemon_id}-${pokemon.form}`,
         '\n',
         e,
+        pokemon,
       )
       return {}
     }

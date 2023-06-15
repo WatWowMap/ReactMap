@@ -56,7 +56,7 @@ export default function Footer({ options, role }) {
               <IconButton
                 href={button.link || undefined}
                 rel={button.link ? 'noreferrer' : undefined}
-                target={button.link ? '_blank' : undefined}
+                target={button.link ? button.target || '_blank' : undefined}
                 onClick={button.action || undefined}
                 disabled={button.disabled}
               >
@@ -69,7 +69,7 @@ export default function Footer({ options, role }) {
               <Button
                 href={button.link}
                 rel={button.link ? 'noreferrer' : undefined}
-                target={button.link ? '_blank' : undefined}
+                target={button.link ? button.target || '_blank' : undefined}
                 onClick={button.action}
                 color={muiColor ? color : 'inherit'}
                 style={{ color: muiColor ? null : color }}

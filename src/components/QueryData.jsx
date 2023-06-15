@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import RobustTimeout from '@services/apollo/RobustTimeout'
 
+import { useStatic } from '@hooks/useStore'
 import Query from '@services/Query'
 import Utility from '@services/Utility'
 
@@ -31,7 +32,6 @@ export default function QueryData({
   userIcons,
   setParams,
   timeOfDay,
-  setExcludeList,
   setError,
   active,
   onlyAreas,
@@ -43,9 +43,9 @@ export default function QueryData({
   const trimFilters = useCallback(
     (requestedFilters) => {
       const trimmed = {
-        onlyLegacyExclude: [],
         onlyLegacy: userSettings.legacyFilter,
         onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
+        onlyAllPvp: userSettings.showAllPvpRanks,
         onlyAreas,
       }
       Object.entries(requestedFilters).forEach((topLevelFilter) => {
@@ -66,8 +66,6 @@ export default function QueryData({
 
         if (specifics && specifics.enabled && staticFilters[id]) {
           trimmed[id] = specifics
-        } else if (userSettings.legacyFilter) {
-          trimmed.onlyLegacyExclude.push(id)
         }
       })
       return trimmed
@@ -75,17 +73,17 @@ export default function QueryData({
     [userSettings, filters, onlyAreas],
   )
 
-  const refetchData = () => {
-    onMove()
-    if (category !== 'device' && category !== 'scanAreas') {
-      timeout.doRefetch({
-        ...Utility.getQueryArgs(map),
-        filters: trimFilters(filters),
-      })
-    }
-  }
-
   useEffect(() => {
+    const refetchData = () => {
+      onMove()
+      if (category !== 'device' && category !== 'scanAreas') {
+        timeout.doRefetch({
+          ...Utility.getQueryArgs(map),
+          filters: trimFilters(filters),
+        })
+      }
+    }
+
     map.on('moveend', refetchData)
     return () => {
       map.off('moveend', refetchData)
@@ -109,7 +107,7 @@ export default function QueryData({
   )
   timeout.setupTimeout(refetch)
 
-  useEffect(() => () => setExcludeList([]))
+  useEffect(() => () => useStatic.setState({ excludeList: [] }))
 
   if (error) {
     const message =
