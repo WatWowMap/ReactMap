@@ -42,7 +42,7 @@ export default function PokemonPopup({
   userSettings,
   isTutorial,
   Icons,
-  timeOfDay
+  timeOfDay,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()

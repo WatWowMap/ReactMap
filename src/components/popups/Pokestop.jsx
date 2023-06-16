@@ -216,7 +216,12 @@ export default function PokestopPopup({
         />
         {perms.allPokestops && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-            <ExtraInfo pokestop={pokestop} userSettings={userSettings} t={t} ts={ts} />
+            <ExtraInfo
+              pokestop={pokestop}
+              userSettings={userSettings}
+              t={t}
+              ts={ts}
+            />
           </Collapse>
         )}
       </Grid>
