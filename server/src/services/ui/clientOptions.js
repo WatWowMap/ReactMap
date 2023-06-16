@@ -104,16 +104,24 @@ module.exports = function clientOptions(perms) {
     clientMenus.pokemon.glow = { type: 'bool', sub: {}, perm: ['pokemon'] }
   }
   if (enableGymPopupCoordsSelector) {
-    clientMenus.gyms.enableGymPopupCoords = { type: 'bool', perm: ['gyms'] }
+    clientMenus.gyms.enableGymPopupCoords = {
+      type: 'bool',
+      perm: ['gyms'] }
   }
   if (enablePokestopPopupCoordsSelector) {
-    clientMenus.pokestops.enablePokestopPopupCoords = { type: 'bool', perm: ['pokestops'] }
+    clientMenus.pokestops.enablePokestopPopupCoords = {
+      type: 'bool',
+      perm: ['pokestops'] }
   }
   if (enablePokemonPopupCoordsSelector) {
-    clientMenus.pokemon.enablePokemonPopupCoords = { type: 'bool', perm: ['pokemon'] }
+    clientMenus.pokemon.enablePokemonPopupCoords = {
+      type: 'bool',
+      perm: ['pokemon'] }
   }
   if (enablePortalPopupCoordsSelector) {
-    clientMenus.wayfarer.enablePortalPopupCoords = { type: 'bool', perm: ['portals'] }
+    clientMenus.wayfarer.enablePortalPopupCoords = {
+      type: 'bool',
+      perm: ['portals'] }
   }
 
   // only the keys & values are stored locally
