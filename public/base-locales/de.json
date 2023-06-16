@@ -597,8 +597,8 @@
   "decoy": "Täusch-Rüpel",
   "s2_cell_limit_0": "Sie haben versucht, mehr als 20.000 Zellen zu generieren ({{variable_0}})",
   "show_all_pvp_ranks": "alle PVP Ränge anzeigen",
-  "enable_pokemon_popup_coords": "Koordinaten bei Pokémon anzeigen",
-  "enable_gym_popup_coords": "Koordinaten bei Arenen anzeigen",
-  "enable_pokestop_popup_coords": "Koordinaten bei Pokéstops anzeigen",
-  "enable_portal_popup_coords": "Koordinaten bei Portalen anzeigen"
+  "enable_pokemon_popup_coords": "Pokémon Koordinaten anzeigen",
+  "enable_gym_popup_coords": "Arena Koordinaten anzeigen",
+  "enable_pokestop_popup_coords": "Pokéstop Koordinaten anzeigen",
+  "enable_portal_popup_coords": "Portal Koordinaten anzeigen"
 }
