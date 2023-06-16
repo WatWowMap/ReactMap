@@ -6,14 +6,7 @@ import useForcePopup from '@hooks/useForcePopup'
 import PopupContent from '../popups/Portal'
 import marker from '../markers/portal'
 
-const PortalTile = ({
-  item,
-  userSettings,
-  ts,
-  params,
-  Icons,
-  setParams,
-}) => {
+const PortalTile = ({ item, userSettings, ts, params, Icons, setParams }) => {
   const [done, setDone] = useState(false)
   const markerRef = useRef({})
 
