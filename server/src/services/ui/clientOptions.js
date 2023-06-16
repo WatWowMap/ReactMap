@@ -1,10 +1,12 @@
 const {
   clientSideOptions,
-  map: { enableMapJsFilter },
-  map: { enablePokemonPopupCoordsSelector },
-  map: { enableGymPopupCoordsSelector },
-  map: { enablePokestopPopupCoordsSelector },
-  map: { enablePortalPopupCoordsSelector },
+  map: { 
+    enableMapJsFilter,
+    enablePokemonPopupCoordsSelector,
+    enableGymPopupCoordsSelector,
+    enablePokestopPopupCoordsSelector,
+    enablePortalPopupCoordsSelector
+  },
   api: {
     pvp: { levels },
   },
