@@ -13,7 +13,6 @@ const PortalTile = ({
   params,
   Icons,
   setParams,
-  config,
 }) => {
   const [done, setDone] = useState(false)
   const markerRef = useRef({})
