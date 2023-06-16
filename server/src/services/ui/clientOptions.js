@@ -106,25 +106,25 @@ module.exports = function clientOptions(perms) {
   if (enableGymPopupCoordsSelector) {
     clientMenus.gyms.enableGymPopupCoords = {
       type: 'bool',
-      perm: ['gyms']
+      perm: ['gyms'],
     }
   }
   if (enablePokestopPopupCoordsSelector) {
     clientMenus.pokestops.enablePokestopPopupCoords = {
       type: 'bool',
-      perm: ['pokestops']
+      perm: ['pokestops'],
     }
   }
   if (enablePokemonPopupCoordsSelector) {
     clientMenus.pokemon.enablePokemonPopupCoords = {
       type: 'bool',
-      perm: ['pokemon']
+      perm: ['pokemon'],
     }
   }
   if (enablePortalPopupCoordsSelector) {
     clientMenus.wayfarer.enablePortalPopupCoords = {
       type: 'bool',
-      perm: ['portals']
+      perm: ['portals'],
     }
   }
 
