@@ -33,7 +33,12 @@ const PortalTile = ({
       pathOptions={marker(item, ts, userSettings)}
     >
       <Popup position={[item.lat, item.lon]}>
-        <PopupContent portal={item} userSettings={userSettings} ts={ts} Icons={Icons} />
+        <PopupContent
+          portal={item}
+          userSettings={userSettings}
+          ts={ts}
+          Icons={Icons}
+        />
       </Popup>
     </Circle>
   )
