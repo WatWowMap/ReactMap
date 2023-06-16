@@ -216,7 +216,7 @@ export default function PokestopPopup({
         />
         {perms.allPokestops && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-            <ExtraInfo pokestop={pokestop} config={config} t={t} ts={ts} />
+            <ExtraInfo pokestop={pokestop} userSettings={userSettings} t={t} ts={ts} />
           </Collapse>
         )}
       </Grid>
@@ -562,7 +562,7 @@ const Footer = ({ pokestop, popups, setPopups, perms }) => {
   )
 }
 
-const ExtraInfo = ({ pokestop, config, t, ts }) => {
+const ExtraInfo = ({ pokestop, userSettings, t, ts }) => {
   const { last_modified_timestamp, updated } = pokestop
 
   const extraMetaData = [
@@ -605,7 +605,7 @@ const ExtraInfo = ({ pokestop, config, t, ts }) => {
           </Grid>
         </Fragment>
       ))}
-      {config.enablePokestopPopupCoords && (
+      {userSettings.enablePokestopPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Coords lat={pokestop.lat} lon={pokestop.lon} />
         </Grid>

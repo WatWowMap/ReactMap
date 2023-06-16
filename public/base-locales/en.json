@@ -590,8 +590,12 @@
   "delete": "Delete",
   "name": "Name",
   "only_confirmed": "Only Confirmed",
-  "rocket_pokemon": "Rocket Pokemon",
+  "rocket_pokemon": "Rocket Pokémon",
   "decoy": "Decoy",
   "s2_cell_limit_0": "You attempted to generate more than 20,000 cells ({{variable_0}})",
-  "show_all_pvp_ranks": "Show All PVP Ranks"
+  "show_all_pvp_ranks": "Show All PVP Ranks",
+  "enable_pokemon_popup_coords": "Show Pokémon Coords",
+  "enable_gym_popup_coords": "Show Gym Coords",
+  "enable_pokestop_popup_coords": "Show Pokéstop Coords",
+  "enable_portal_popup_coords": "Show Portal Coords"
 }

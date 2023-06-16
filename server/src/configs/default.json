@@ -251,10 +251,6 @@
       "permArrayImages": false,
       "clientTimeoutMinutes": 30,
       "distanceUnit": "km",
-      "enablePokemonPopupCoords": false,
-      "enableGymPopupCoords": false,
-      "enablePokestopPopupCoords": false,
-      "enablePortalPopupCoords": false,
       "customFloatingIcons": []
     },
     "theme": {
@@ -337,7 +333,8 @@
       "showExBadge": false,
       "showArBadge": false,
       "raidLevelBadges": false,
-      "gymBadgeDiamonds": true
+      "gymBadgeDiamonds": true,
+      "enableGymPopupCoords": false
     },
     "pokestops": {
       "clustering": true,
@@ -349,7 +346,8 @@
       "customRange": 0,
       "madQuestText": false,
       "hasQuestIndicator": true,
-      "showArBadge": false
+      "showArBadge": false,
+      "enablePokestopPopupCoords": false
     },
     "pokemon": {
       "clustering": true,
@@ -364,6 +362,7 @@
       "showAllPvpRanks": false,
       "linkGlobalAndAdvanced": false,
       "showSizeIndicator": false,
+      "enablePokemonPopupCoords": false,
       "glow": [
         {
           "name": "Hundo",
@@ -403,7 +402,8 @@
       "lightMapBorder": "#000000",
       "darkMapBorder": "#ff0000",
       "cellBlocked": "#000000",
-      "poiColor": "#03ffff"
+      "poiColor": "#03ffff",
+      "enablePortalPopupCoords": false
     },
     "s2cells": {
       "darkMapBorder": "#ff0000",
