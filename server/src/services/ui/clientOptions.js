@@ -5,7 +5,7 @@ const {
     enablePokemonPopupCoordsSelector,
     enableGymPopupCoordsSelector,
     enablePokestopPopupCoordsSelector,
-    enablePortalPopupCoordsSelector
+    enablePortalPopupCoordsSelector,
   },
   api: {
     pvp: { levels },
