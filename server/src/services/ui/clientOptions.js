@@ -1,6 +1,6 @@
 const {
   clientSideOptions,
-  map: { 
+  map: {
     enableMapJsFilter,
     enablePokemonPopupCoordsSelector,
     enableGymPopupCoordsSelector,
