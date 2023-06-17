@@ -6,15 +6,7 @@ import useForcePopup from '@hooks/useForcePopup'
 import PopupContent from '../popups/Portal'
 import marker from '../markers/portal'
 
-const PortalTile = ({
-  item,
-  userSettings,
-  ts,
-  params,
-  Icons,
-  setParams,
-  config,
-}) => {
+const PortalTile = ({ item, userSettings, ts, params, Icons, setParams }) => {
   const [done, setDone] = useState(false)
   const markerRef = useRef({})
 
@@ -34,7 +26,12 @@ const PortalTile = ({
       pathOptions={marker(item, ts, userSettings)}
     >
       <Popup position={[item.lat, item.lon]}>
-        <PopupContent portal={item} config={config} ts={ts} Icons={Icons} />
+        <PopupContent
+          portal={item}
+          userSettings={userSettings}
+          ts={ts}
+          Icons={Icons}
+        />
       </Popup>
     </Circle>
   )
