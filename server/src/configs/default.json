@@ -251,6 +251,10 @@
       "permArrayImages": false,
       "clientTimeoutMinutes": 30,
       "distanceUnit": "km",
+      "enablePokemonPopupCoordsSelector": false,
+      "enableGymPopupCoordsSelector": false,
+      "enablePokestopPopupCoordsSelector": false,
+      "enablePortalPopupCoordsSelector": false,
       "customFloatingIcons": []
     },
     "theme": {

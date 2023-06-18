@@ -423,6 +423,22 @@
         "__format": "number"
       },
       "distanceUnit": "MAP_MISC_DISTANCE_UNIT",
+      "enablePokemonPopupCoordsSelector": {
+        "__name": "MAP_MISC_ENABLE_POKEMON_POPUP_COORDS_SELECTOR",
+        "__format": "boolean"
+      },
+      "enableGymPopupCoordsSelector": {
+        "__name": "MAP_MISC_ENABLE_GYM_POPUP_COORDS_SELECTOR",
+        "__format": "boolean"
+      },
+      "enablePokestopPopupCoordsSelector": {
+        "__name": "MAP_MISC_ENABLE_POKESTOP_POPUP_COORDS_SELECTOR",
+        "__format": "boolean"
+      },
+      "enablePortalPopupCoordsSelector": {
+        "__name": "MAP_MISC_ENABLE_PORTAL_POPUP_COORDS_SELECTOR",
+        "__format": "boolean"
+      },
       "customFloatingIcons": {
         "__name": "MAP_MISC_CUSTOM_FLOATING_ICONS",
         "__format": "json"
