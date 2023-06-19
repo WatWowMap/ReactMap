@@ -364,10 +364,7 @@ connection.migrate.latest().then(async () => {
       const text = rainbow(
         `Server is now listening at http://${config.interface}:${config.port}`,
       )
-      setTimeout(() => text.stop(), 10_000)
-
-      // app.listen(config.port, config.interface, () => {
-      // })
+      setTimeout(() => text.stop(), 3_000)
     })
   })
 })

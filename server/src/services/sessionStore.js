@@ -8,6 +8,7 @@ const {
     settings: { sessionTableName },
   },
 } = require('./config')
+const { log, HELPERS } = require('./logger')
 
 const dbSelection = schemas.find(({ useFor }) => useFor?.includes('session'))
 
@@ -28,6 +29,7 @@ const sessionStore = dbSelection
         password: dbSelection.password,
         database: dbSelection.database,
       }),
+      (err) => log.error(HELPERS.custom('sessions'), err),
     )
   : null
 
