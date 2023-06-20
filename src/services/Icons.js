@@ -15,6 +15,7 @@ const freezeProps = (target, property) => {
   })
 }
 
+// TODO: This is dumb, should be a state machine with Zustand
 export default class UIcons {
   constructor({ customizable, sizes, cacheHrs }, questRewardTypes) {
     this.customizable = customizable
@@ -85,6 +86,7 @@ export default class UIcons {
               if (Array.isArray(data[category])) {
                 this[name][category] = new Set(data[category])
                 isValid = true
+                this[name].extension = data[category][0]?.split('.')[1]
               } else {
                 Object.keys(data[category]).forEach((subCategory) => {
                   if (Array.isArray(data[category][subCategory])) {
