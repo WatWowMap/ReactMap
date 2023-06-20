@@ -86,7 +86,8 @@ export default class UIcons {
               if (Array.isArray(data[category])) {
                 this[name][category] = new Set(data[category])
                 isValid = true
-                this[name].extension = data[category][0]?.split('.')[1]
+                this[name].extension =
+                  data[category][0]?.split('.')[1] || this[name].extension
               } else {
                 Object.keys(data[category]).forEach((subCategory) => {
                   if (Array.isArray(data[category][subCategory])) {
