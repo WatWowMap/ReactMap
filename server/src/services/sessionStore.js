@@ -29,7 +29,7 @@ const sessionStore = dbSelection
         password: dbSelection.password,
         database: dbSelection.database,
       }),
-      (err) => log.error(HELPERS.custom('sessions'), err),
+      (err) => err && log.error(HELPERS.custom('sessions'), err),
     )
   : null
 

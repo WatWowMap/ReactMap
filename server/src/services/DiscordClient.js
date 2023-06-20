@@ -124,7 +124,7 @@ module.exports = class DiscordClient {
         )
         log.info(
           HELPERS.custom(this.rmStrategy, '#7289da'),
-          `User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`,
+          `User ${user.username} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
       } else {
         for (let i = 0; i < this.strategy.blockedGuilds.length; i += 1) {
@@ -236,7 +236,6 @@ module.exports = class DiscordClient {
     try {
       const user = {
         ...profile,
-        username: `${profile.username}#${profile.discriminator}`,
         perms: await this.getPerms(profile),
         rmStrategy: this.rmStrategy,
       }
