@@ -304,9 +304,9 @@ apolloServer.start().then(() => {
           scope.setSpan(transaction)
         })
 
-        const operation = parse(req.body.query).definitions.find(
+        const definition = parse(req.body.query).definitions.find(
           (d) => d.kind === 'OperationDefinition',
-        )?.operation
+        )
 
         if (clientV && serverV && clientV !== serverV)
           throw new GraphQLError('old_client', {
@@ -318,7 +318,12 @@ apolloServer.start().then(() => {
               code: ApolloServerErrorCode.BAD_USER_INPUT,
             },
           })
-        if (!perms || (operation === 'mutation' && !id))
+        if (
+          !perms ||
+          (definition?.operation === 'mutation' &&
+            !id &&
+            definition?.name?.value !== 'SetTutorial')
+        )
           throw new GraphQLError('session_expired', {
             extensions: {
               clientV,
