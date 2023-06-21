@@ -44,7 +44,12 @@ module.exports = class Device extends Model {
       return []
     }
     const results = settings.mem
-      ? await fetchJson(`${settings.mem}/api/devices/all`).then((res) =>
+      ? await fetchJson(`${settings.mem}/api/devices/all`, {
+          method: 'GET',
+          headers: {
+            'X-Golbat-Secret': settings.secret || undefined,
+          },
+        }).then((res) =>
           Object.entries(res.devices).map(([id, device]) => ({
             id,
             last_lat: device.latitude,
