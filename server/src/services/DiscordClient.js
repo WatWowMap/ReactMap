@@ -257,7 +257,7 @@ module.exports = class DiscordClient {
         const lastGuild = guildArray.pop()
         const guildString =
           guildArray.length === 1
-            ? guildArray.join(', ') + ' & ' + lastGuild
+            ? `${guildArray.join(', ')} & ${lastGuild} `
             : lastGuild
         return done(null, false, {
           message: guildString,

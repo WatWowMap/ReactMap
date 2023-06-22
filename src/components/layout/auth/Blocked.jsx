@@ -26,17 +26,13 @@ export default function Blocked({ serverSettings }) {
       </Grid>
       <Grid item>
         <Typography variant="h6" style={{ color: 'white' }} align="center">
-          {/* {`You have been blocked for being a member of `} */}
-          {t('on_block_msg') + ' '}
-          {decodeQueryParam(params)}
-          {'.'}
+          {t('on_block_msg')} {decodeQueryParam(params)}.
         </Typography>
       </Grid>
 
       {serverSettings.config.map.discordInvite && (
         <Grid item>
           <Typography variant="h6" style={{ color: 'white' }} align="center">
-            {/* {`Please join our discord for more information.`} */}
             {t('on_block_join_discord')}
           </Typography>
         </Grid>
