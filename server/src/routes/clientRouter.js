@@ -7,6 +7,7 @@ const router = new express.Router()
 const clientRoutes = [
   '/',
   '/login',
+  '/blocked/:blockedGuilds',
   '/@/:lat/:lon/:zoom?',
   '/id/:category/:id/:zoom?',
   '/304',

@@ -26,7 +26,7 @@ strategies.forEach((strategy, i) => {
           return next(err)
         }
         if (!user) {
-          res.status(401).json(info.message)
+          res.redirect(`/blocked/${encodeURIComponent(info.message)}`)
         } else {
           try {
             return req.login(user, async () => {

@@ -260,7 +260,7 @@ module.exports = class DiscordClient {
             ? guildArray.join(', ') + ' & ' + lastGuild
             : lastGuild
         return done(null, false, {
-          message: `You have been blocked for being a member of ${guildString}.`,
+          message: guildString,
         })
       }
       if (user) {
