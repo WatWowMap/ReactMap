@@ -701,26 +701,52 @@ module.exports = class Pokestop extends Model {
         perms.invasions &&
         (filters.onlyAllPokestops || filters.onlyInvasions)
       ) {
-        filtered.invasions = pokestop.invasions.filter(
-          (invasion) =>
-            ((hasConfirmed
+        filtered.invasions = pokestop.invasions.filter((invasion) => {
+          const info = Event.invasions[invasion.grunt_type]
+          if (!info) return false
+          if (
+            info.firstReward &&
+            (hasConfirmed && invasion.confirmed
               ? filters[
                   `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
-                ] ||
-                filters[
+                ]
+              : info.first.some(
+                  (poke) => !!filters[`a${poke.id}-${poke.form}`],
+                ))
+          )
+            return true
+
+          if (
+            info.secondReward &&
+            (hasConfirmed && invasion.confirmed
+              ? filters[
                   `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
-                ] ||
-                filters[
+                ]
+              : info.second.some(
+                  (poke) => !!filters[`a${poke.id}-${poke.form}`],
+                ))
+          )
+            return true
+          if (
+            info.thirdReward &&
+            (hasConfirmed && invasion.confirmed
+              ? filters[
                   `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
-                ] ||
-                filters[`i${invasion.grunt_type}`]
-              : filters[`i${invasion.grunt_type}`]) ||
-              (filters.onlyAllPokestops &&
-                (filters.onlyConfirmed ? invasion.confirmed : true))) &&
-            (isMad && !hasMultiInvasions
-              ? !MADE_UP_MAD_INVASIONS.includes(invasion.grunt_type)
-              : invasion.grunt_type),
-        )
+                ]
+              : info.third.some(
+                  (poke) => !!filters[`a${poke.id}-${poke.form}`],
+                ))
+          )
+            return true
+          return (
+            filters[`i${invasion.grunt_type}`] ||
+            (filters.onlyAllPokestops &&
+              (filters.onlyConfirmed ? invasion.confirmed : true) &&
+              (isMad && !hasMultiInvasions
+                ? !MADE_UP_MAD_INVASIONS.includes(invasion.grunt_type)
+                : invasion.grunt_type))
+          )
+        })
       }
       if (
         perms.lures &&
