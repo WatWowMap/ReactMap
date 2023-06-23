@@ -80,6 +80,7 @@ module.exports = class Pokemon extends Model {
    */
   static getFilters(perms, args, { SubModel: _, connection: __, ...ctx }) {
     const mods = {
+      onlyAreas: args.filters.onlyAreas || [],
       ...ctx,
       ...Object.fromEntries(
         LEVELS.map((x) => [`onlyPvp${x}`, args.filters[`onlyPvp${x}`]]),

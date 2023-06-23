@@ -1,4 +1,5 @@
 const config = require('../config')
+const { consolidateAreas } = require('./consolidateAreas')
 
 module.exports = function getAreaRestrictionSql(
   query,
@@ -16,18 +17,9 @@ module.exports = function getAreaRestrictionSql(
 
   if (!areaRestrictions?.length && !onlyAreas?.length) return true
 
-  const cleanUserAreas = onlyAreas.filter((area) =>
-    config.areas.names.has(area),
-  )
-  const consolidatedAreas = areaRestrictions.length
-    ? areaRestrictions
-        .filter(
-          (area) => !cleanUserAreas.length || cleanUserAreas.includes(area),
-        )
-        .flatMap((area) => config.areas.withoutParents[area] || area)
-    : cleanUserAreas
+  const consolidatedAreas = consolidateAreas(areaRestrictions, onlyAreas)
 
-  if (!consolidatedAreas.length) return false
+  if (!consolidatedAreas.size) return false
 
   let columns = ['lat', 'lon']
   if (isMad) {

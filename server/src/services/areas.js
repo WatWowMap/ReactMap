@@ -289,7 +289,7 @@ module.exports = async () => {
     features: Object.values(scanAreasObj).filter(
       (f) =>
         !f.properties.manual &&
-        !f.properties.hidden &&
+        f.properties.key &&
         f.geometry.type.includes('Polygon'),
     ),
   })
