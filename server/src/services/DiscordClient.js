@@ -139,9 +139,6 @@ module.exports = class DiscordClient {
               : new Set([currentGuildName])
           }
         }
-        if (perms.blocked === true) {
-          return perms
-        }
         await Promise.all(
           this.strategy.allowedGuilds.map(async (guildId) => {
             if (guilds.includes(guildId)) {
@@ -253,7 +250,7 @@ module.exports = class DiscordClient {
       this.sendMessage(embed)
 
       if (user.perms.blocked) {
-        const guildArray = [...user.perms.blockedGuildNames]
+        const guildArray = user.perms.blockedGuildNames
         const lastGuild = guildArray.pop()
         const guildString =
           guildArray.length === 1
