@@ -5,8 +5,8 @@ module.exports = gql`
     id: ID
     instance_name: String
     updated: Int
-    last_lat: Float
-    last_lon: Float
+    lat: Float
+    lon: Float
     type: String
     isMad: Boolean
     route: JSON
