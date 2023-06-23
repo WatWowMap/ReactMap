@@ -165,7 +165,7 @@ module.exports = async function getAuthInfo(req, user, strategy = 'custom') {
     )
     embed.color = 0x00ff00
   } else if (user.perms?.blocked) {
-    const blockedGuilds = Array.from(user.perms.blockedGuildNames).join(', ')
+    const blockedGuilds = [...user.perms.blockedGuildNames].join(', ')
     log.warn(
       HELPERS.custom(strategy, '#7289da'),
       user.id,

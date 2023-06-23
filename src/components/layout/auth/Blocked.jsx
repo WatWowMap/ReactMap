@@ -1,15 +1,12 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Grid, Typography, Button } from '@material-ui/core'
 
-function decodeQueryParam(p) {
-  return decodeURIComponent(p.replace(/\+/g, ' '))
-}
-
 export default function Blocked({ serverSettings }) {
   const { t } = useTranslation()
-  const params = window.location.href.split('/').pop()
+  const { guilds } = useParams()
 
   return (
     <Grid
@@ -24,14 +21,18 @@ export default function Blocked({ serverSettings }) {
           {t('access')} {t('denied')}!
         </Typography>
       </Grid>
+      <br />
+      <br />
+
       <Grid item>
         <Typography variant="h6" style={{ color: 'white' }} align="center">
-          {t('on_block_msg')} {decodeQueryParam(params)}.
+          {t('on_block_msg')} {guilds}.
         </Typography>
       </Grid>
 
       {serverSettings.config.map.discordInvite && (
         <Grid item>
+          <br />
           <Typography variant="h6" style={{ color: 'white' }} align="center">
             {t('on_block_join_discord')}
           </Typography>
@@ -73,7 +74,7 @@ export default function Blocked({ serverSettings }) {
               variant="outlined"
               color="secondary"
               onClick={() =>
-                (window.location = serverSettings.config.map.discordInvite)
+                window.open(serverSettings.config.map.discordInvite, '_blank')
               }
             >
               {t('join')}

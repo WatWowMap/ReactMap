@@ -253,11 +253,11 @@ module.exports = class DiscordClient {
       this.sendMessage(embed)
 
       if (user.perms.blocked) {
-        const guildArray = Array.from(user.perms.blockedGuildNames)
+        const guildArray = [...user.perms.blockedGuildNames]
         const lastGuild = guildArray.pop()
         const guildString =
           guildArray.length === 1
-            ? `${guildArray.join(', ')} & ${lastGuild} `
+            ? `${guildArray.join(', ')} & ${lastGuild}`
             : lastGuild
         return done(null, false, {
           message: guildString,
