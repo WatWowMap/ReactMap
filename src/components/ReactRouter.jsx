@@ -33,7 +33,7 @@ export default function ReactRouter({ serverSettings, getServerSettings }) {
         }
       />
       <Route
-        path="blocked/:guilds"
+        path="blocked/:info"
         element={<Blocked serverSettings={serverSettings} />}
       />
       <Route path="@/:lat/:lon" element={authRoute} />

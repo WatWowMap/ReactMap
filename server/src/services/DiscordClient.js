@@ -259,9 +259,10 @@ module.exports = class DiscordClient {
           guildArray.length === 1
             ? `${guildArray.join(', ')} & ${lastGuild}`
             : lastGuild
-        return done(null, false, {
-          message: guildString,
-        })
+        return done(null, false, { blockedGuilds: guildString })
+      }
+      if (user.perms.map === false) {
+        return done(null, false, { message: 'access_denied' })
       }
       if (user) {
         delete user.guilds

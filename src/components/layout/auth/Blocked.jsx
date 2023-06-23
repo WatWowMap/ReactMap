@@ -6,7 +6,8 @@ import { Grid, Typography, Button } from '@material-ui/core'
 
 export default function Blocked({ serverSettings }) {
   const { t } = useTranslation()
-  const { guilds } = useParams()
+  const { info } = useParams()
+  const queryParams = new URLSearchParams(info)
 
   return (
     <Grid
@@ -24,11 +25,13 @@ export default function Blocked({ serverSettings }) {
       <br />
       <br />
 
-      <Grid item>
-        <Typography variant="h6" style={{ color: 'white' }} align="center">
-          {t('on_block_msg')} {guilds}.
-        </Typography>
-      </Grid>
+      {queryParams.get('blockedGuilds') && (
+        <Grid item>
+          <Typography variant="h6" style={{ color: 'white' }} align="center">
+            {t('on_block_msg')} {queryParams.get('blockedGuilds')}.
+          </Typography>
+        </Grid>
+      )}
 
       {serverSettings.config.map.discordInvite && (
         <Grid item>
