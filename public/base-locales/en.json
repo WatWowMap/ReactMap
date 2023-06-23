@@ -597,5 +597,8 @@
   "enable_pokemon_popup_coords": "Show Pokémon Coords",
   "enable_gym_popup_coords": "Show Gym Coords",
   "enable_pokestop_popup_coords": "Show Pokéstop Coords",
-  "enable_portal_popup_coords": "Show Portal Coords"
+  "enable_portal_popup_coords": "Show Portal Coords",
+  "on_block_join_discord": "Please join our discord for more information.",
+  "on_block_msg": "You have been blocked for being a member of",
+  "denied": "Denied"
 }
