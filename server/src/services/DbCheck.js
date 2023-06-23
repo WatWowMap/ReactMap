@@ -60,6 +60,7 @@ module.exports = class DbCheck {
           },
           debug: queryDebug,
           pool: {
+            min: 0,
             max: dbSettings.settings.maxConnections,
             afterCreate: (conn, done) =>
               conn.query('SET time_zone="+00:00";', (err) => done(err, conn)),
