@@ -51,7 +51,7 @@ export default function Blocked({ serverSettings }) {
       >
         <Grid
           item
-          xs={serverSettings.config.map.discordInvite ? t('go_back') : 10}
+          xs={serverSettings.config.map.discordInvite ? 3 : 10}
           sm={serverSettings.config.map.discordInvite ? 3 : 10}
           style={{
             textAlign: 'center',
@@ -69,7 +69,7 @@ export default function Blocked({ serverSettings }) {
         {serverSettings.config.map.discordInvite && (
           <Grid
             item
-            xs={t('join')}
+            xs={3}
             sm={3}
             style={{ textAlign: 'center', marginTop: 20 }}
           >
