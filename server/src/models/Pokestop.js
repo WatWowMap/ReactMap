@@ -533,13 +533,13 @@ module.exports = class Pokestop extends Model {
                 '>=',
                 safeTs * (multiInvasionMs ? 1000 : 1),
               )
-              if (hasConfirmed) {
-                if (onlyConfirmed) {
-                  invasion.andWhere('confirmed', onlyConfirmed)
-                }
-                if (rocketPokemon.length) {
-                  invasion.andWhere((rocket) => {
-                    rocket
+              invasion.andWhere((subQuery) => {
+                if (hasConfirmed) {
+                  if (onlyConfirmed) {
+                    subQuery.andWhere('confirmed', onlyConfirmed)
+                  }
+                  if (rocketPokemon.length) {
+                    subQuery
                       .whereIn('slot_1_pokemon_id', rocketPokemon)
                       .orWhereIn('slot_2_pokemon_id', rocketPokemon)
                       .orWhereIn('slot_3_pokemon_id', rocketPokemon)
@@ -547,19 +547,19 @@ module.exports = class Pokestop extends Model {
                         isMad ? 'character_display' : 'character',
                         invasions,
                       )
-                  })
+                  } else {
+                    subQuery.whereIn(
+                      isMad ? 'character_display' : 'character',
+                      invasions,
+                    )
+                  }
                 } else {
-                  invasion.whereIn(
+                  subQuery.whereIn(
                     isMad ? 'character_display' : 'character',
                     invasions,
                   )
                 }
-              } else {
-                invasion.whereIn(
-                  isMad ? 'character_display' : 'character',
-                  invasions,
-                )
-              }
+              })
             })
           } else {
             stops.orWhere((invasion) => {
@@ -710,7 +710,7 @@ module.exports = class Pokestop extends Model {
               ? filters[
                   `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
                 ]
-              : info.first.some(
+              : info.encounters.first.some(
                   (poke) => !!filters[`a${poke.id}-${poke.form}`],
                 ))
           )
@@ -722,7 +722,7 @@ module.exports = class Pokestop extends Model {
               ? filters[
                   `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
                 ]
-              : info.second.some(
+              : info.encounters.second.some(
                   (poke) => !!filters[`a${poke.id}-${poke.form}`],
                 ))
           )
@@ -733,7 +733,7 @@ module.exports = class Pokestop extends Model {
               ? filters[
                   `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
                 ]
-              : info.third.some(
+              : info.encounters.third.some(
                   (poke) => !!filters[`a${poke.id}-${poke.form}`],
                 ))
           )
