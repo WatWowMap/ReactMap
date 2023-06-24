@@ -368,9 +368,9 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @template T
+   * @template [T=import('../types').Pokemon[]]
    * @param {string} mem
-   * @param {string | import("objection").QueryBuilder} query
+   * @param {string | import("objection").QueryBuilder<Pokemon>} query
    * @param {'GET' | 'POST' | 'PATCH' | 'DELETE'} method
    * @param {string} secret
    * @returns {Promise<T>}
