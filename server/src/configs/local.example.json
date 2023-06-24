@@ -253,10 +253,6 @@
         }
       },
       {
-        "name": "PMSF",
-        "path": "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons-outline/"
-      },
-      {
         "name": "Home",
         "path": "https://raw.githubusercontent.com/nileplumb/PkmnHomeIcons/master/UICONS/"
       },
@@ -265,8 +261,8 @@
         "path": "https://raw.githubusercontent.com/nileplumb/PkmnShuffleMap/master/UICONS/"
       },
       {
-        "name": "Half Shiny",
-        "path": "https://raw.githubusercontent.com/jms412/PkmnShuffleMap/master/UICONS_Half_Shiny_Sparkles_256/"
+        "name": "Cage",
+        "path": "https://raw.githubusercontent.com/RagingRectangle/CageMons/main"
       }
     ]
   },
