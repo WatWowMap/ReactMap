@@ -63,7 +63,7 @@ router.get('/logout', (req, res) => {
   req.logout((err) => {
     if (err) log.error(HELPERS.auth, 'Unable to logout', err)
   })
-  req.session.destroy()
+  // req.session.destroy()
   res.redirect('/')
 })
 

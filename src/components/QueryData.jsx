@@ -110,12 +110,12 @@ export default function QueryData({
   useEffect(() => () => useStatic.setState({ excludeList: [] }))
 
   if (error) {
-    const message =
-      error?.networkError?.result?.errors?.find(
-        (x) => x?.message === 'old_client',
-      )?.message || error?.message
-    if (message === 'session_expired' || message === 'old_client') {
-      setError(message)
+    if (error.networkError.statusCode === 464) {
+      setError('old_client')
+      return null
+    }
+    if (error.networkError.statusCode === 401) {
+      setError('session_expired')
       return null
     }
   }
