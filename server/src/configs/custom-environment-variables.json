@@ -423,20 +423,20 @@
         "__format": "number"
       },
       "distanceUnit": "MAP_MISC_DISTANCE_UNIT",
-      "enablePokemonPopupCoords": {
-        "__name": "MAP_MISC_ENABLE_POKEMON_POPUP_COORDS",
+      "enablePokemonPopupCoordsSelector": {
+        "__name": "MAP_MISC_ENABLE_POKEMON_POPUP_COORDS_SELECTOR",
         "__format": "boolean"
       },
-      "enableGymPopupCoords": {
-        "__name": "MAP_MISC_ENABLE_GYM_POPUP_COORDS",
+      "enableGymPopupCoordsSelector": {
+        "__name": "MAP_MISC_ENABLE_GYM_POPUP_COORDS_SELECTOR",
         "__format": "boolean"
       },
-      "enablePokestopPopupCoords": {
-        "__name": "MAP_MISC_ENABLE_POKESTOP_POPUP_COORDS",
+      "enablePokestopPopupCoordsSelector": {
+        "__name": "MAP_MISC_ENABLE_POKESTOP_POPUP_COORDS_SELECTOR",
         "__format": "boolean"
       },
-      "enablePortalPopupCoords": {
-        "__name": "MAP_MISC_ENABLE_PORTAL_POPUP_COORDS",
+      "enablePortalPopupCoordsSelector": {
+        "__name": "MAP_MISC_ENABLE_PORTAL_POPUP_COORDS_SELECTOR",
         "__format": "boolean"
       },
       "customFloatingIcons": {
@@ -629,6 +629,10 @@
       "gymBadgeDiamonds": {
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_GYM_BADGE_DIAMONDS",
         "__format": "boolean"
+      },
+      "enableGymPopupCoords": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_ENABLE_GYM_POPUP_COORDS",
+        "__format": "boolean"
       }
     },
     "pokestops": {
@@ -670,6 +674,10 @@
       },
       "showArBadge": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_SHOW_AR_BADGE",
+        "__format": "boolean"
+      },
+      "enablePokestopPopupCoords": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_ENABLE_POKESTOP_POPUP_COORDS",
         "__format": "boolean"
       }
     },
@@ -722,6 +730,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_SHOW_SIZE_INDICATOR",
         "__format": "boolean"
       },
+      "enablePokemonPopupCoords": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_ENABLE_POKEMON_POPUP_COORDS",
+        "__format": "boolean"
+      },
       "glow": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_GLOW",
         "__format": "json"
@@ -740,7 +752,11 @@
       "lightMapBorder": "CLIENT_SIDE_OPTIONS_WAYFARER_LIGHT_MAP_BORDER",
       "darkMapBorder": "CLIENT_SIDE_OPTIONS_WAYFARER_DARK_MAP_BORDER",
       "cellBlocked": "CLIENT_SIDE_OPTIONS_WAYFARER_CELL_BLOCKED",
-      "poiColor": "CLIENT_SIDE_OPTIONS_WAYFARER_POI_COLOR"
+      "poiColor": "CLIENT_SIDE_OPTIONS_WAYFARER_POI_COLOR",
+      "enablePortalPopupCoords": {
+        "__name": "CLIENT_SIDE_OPTIONS_WAYFARER_ENABLE_PORTAL_POPUP_COORDS",
+        "__format": "boolean"
+      }
     },
     "s2cells": {
       "darkMapBorder": "CLIENT_SIDE_OPTIONS_S2CELLS_DARK_MAP_BORDER",

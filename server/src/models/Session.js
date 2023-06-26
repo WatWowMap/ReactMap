@@ -54,7 +54,12 @@ module.exports = class Session extends Model {
         )
         .orWhereRaw(`json_extract(data, '$.passport.user.id') = '${discordId}'`)
         .delete()
-      log.info(`[Session${botName && ` - ${botName}`}] Clear Result:`, results)
+      log.info(
+        HELPERS.session,
+        botName ? HELPERS.custom(botName) : '',
+        'Clear Result:',
+        results,
+      )
       return results
     } catch (e) {
       log.error(HELPERS.session, 'Unable to clear Discord sessions', e)

@@ -43,7 +43,6 @@ export default function PokemonPopup({
   isTutorial,
   Icons,
   timeOfDay,
-  config,
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
@@ -141,7 +140,7 @@ export default function PokemonPopup({
           <ExtraInfo
             pokemon={pokemon}
             perms={pokePerms}
-            config={config}
+            userSettings={userSettings}
             t={t}
             Icons={Icons}
           />
@@ -500,7 +499,7 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
   )
 }
 
-const ExtraInfo = ({ pokemon, perms, config, t, Icons }) => {
+const ExtraInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
   const { moves } = useStatic((state) => state.masterfile)
 
   const { move_1, move_2, weight, height, first_seen_timestamp, updated, iv } =
@@ -577,7 +576,7 @@ const ExtraInfo = ({ pokemon, perms, config, t, Icons }) => {
           </Typography>
         </Grid>
       )}
-      {config.enablePokemonPopupCoords && (
+      {userSettings.enablePokemonPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Coords lat={pokemon.lat.toFixed(6)} lon={pokemon.lon.toFixed(6)} />
         </Grid>

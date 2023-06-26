@@ -106,7 +106,7 @@ const GymTile = ({
             Icons={Icons}
             badge={badge}
             setBadge={setBadge}
-            config={config}
+            userSettings={userSettings}
           />
         </Popup>
         {(showTimer || userSettings.raidTimers) && hasRaid && (

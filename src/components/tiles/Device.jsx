@@ -19,12 +19,12 @@ const DeviceTile = ({ item, ts, Icons, userSettings }) => {
 
   return (
     <Marker
-      position={[item.last_lat, item.last_lon]}
+      position={[item.lat, item.lon]}
       icon={deviceMarker(isOnline, Icons)}
       ref={markerRef}
     >
       <Popup
-        position={[item.last_lat, item.last_lon]}
+        position={[item.lat, item.lon]}
         onOpen={() => setPoly(true)}
         onClose={() => setPoly(false)}
       >
@@ -41,8 +41,8 @@ const DeviceTile = ({ item, ts, Icons, userSettings }) => {
 
 const areEqual = (prev, next) =>
   prev.item.type === next.item.type &&
-  prev.item.last_lat === next.item.last_lat &&
-  prev.item.last_lon === next.item.last_lon &&
+  prev.item.lat === next.item.lat &&
+  prev.item.lon === next.item.lon &&
   prev.item.updated === next.item.updated
 
 export default memo(DeviceTile, areEqual)

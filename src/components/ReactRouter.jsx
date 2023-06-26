@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 
 import Auth from './layout/auth/Auth'
 import Login from './layout/auth/Login'
+import Blocked from './layout/auth/Blocked'
 import Errors from './Errors'
 import ClearStorage from './ClearStorage'
 
@@ -30,6 +31,10 @@ export default function ReactRouter({ serverSettings, getServerSettings }) {
             getServerSettings={getServerSettings}
           />
         }
+      />
+      <Route
+        path="blocked/:info"
+        element={<Blocked serverSettings={serverSettings} />}
       />
       <Route path="@/:lat/:lon" element={authRoute} />
       <Route path="@/:lat/:lon/:zoom" element={authRoute} />

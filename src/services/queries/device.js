@@ -6,8 +6,8 @@ const getAllDevices = gql`
       id
       instance_name
       updated
-      last_lat
-      last_lon
+      lat
+      lon
       route
       type
       isMad

@@ -25,6 +25,10 @@ export default function Container({ serverSettings, params, location, zoom }) {
       //   width: '100vw',
       //   height: '100vh',
       // }}
+      maxBounds={[
+        [-90, -210],
+        [90, 210],
+      ]}
       preferCanvas
     >
       {serverSettings.user && serverSettings.user.perms.map && (

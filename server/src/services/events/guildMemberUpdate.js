@@ -26,7 +26,7 @@ module.exports = async (client, oldPresence, newPresence) => {
   } catch (e) {
     log.error(
       HELPERS.session,
-      `Could not clear sessions for ${oldPresence.user.username}#${oldPresence.user.discriminator}`,
+      `Could not clear sessions for ${oldPresence.user.username}`,
     )
   }
 }

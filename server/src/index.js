@@ -268,7 +268,15 @@ app.use(Sentry.Handlers.errorHandler())
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  log.error(HELPERS.express, HELPERS.custom(req.originalUrl, '#00d7ac'), err)
+  log.error(
+    HELPERS.express,
+    HELPERS.custom(req.originalUrl, '#00d7ac'),
+    req.user ? `- ${req.user.username}` : 'Not Logged In',
+    '|',
+    req.headers['x-forwarded-for'],
+    '|',
+    err,
+  )
 
   switch (err.message) {
     case 'NoCodeProvided':
@@ -304,9 +312,9 @@ apolloServer.start().then(() => {
           scope.setSpan(transaction)
         })
 
-        const operation = parse(req.body.query).definitions.find(
+        const definition = parse(req.body.query).definitions.find(
           (d) => d.kind === 'OperationDefinition',
-        )?.operation
+        )
 
         if (clientV && serverV && clientV !== serverV)
           throw new GraphQLError('old_client', {
@@ -318,7 +326,12 @@ apolloServer.start().then(() => {
               code: ApolloServerErrorCode.BAD_USER_INPUT,
             },
           })
-        if (!perms || (operation === 'mutation' && !id))
+        if (
+          !perms ||
+          (definition?.operation === 'mutation' &&
+            !id &&
+            definition?.name?.value !== 'SetTutorial')
+        )
           throw new GraphQLError('session_expired', {
             extensions: {
               clientV,
@@ -364,10 +377,7 @@ connection.migrate.latest().then(async () => {
       const text = rainbow(
         `Server is now listening at http://${config.interface}:${config.port}`,
       )
-      setTimeout(() => text.stop(), 10_000)
-
-      // app.listen(config.port, config.interface, () => {
-      // })
+      setTimeout(() => text.stop(), 3_000)
     })
   })
 })

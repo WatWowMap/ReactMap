@@ -114,7 +114,6 @@ module.exports = class DiscordClient {
     }
 
     try {
-      const { guildsFull } = user
       const guilds = user.guilds.map((guild) => guild.id)
       if (this.strategy.allowedUsers.includes(user.id)) {
         Object.keys(this.perms).forEach((key) => (perms[key] = true))
@@ -124,14 +123,20 @@ module.exports = class DiscordClient {
         )
         log.info(
           HELPERS.custom(this.rmStrategy, '#7289da'),
-          `User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`,
+          `User ${user.username} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
       } else {
+        const guildsFull = user.guilds
         for (let i = 0; i < this.strategy.blockedGuilds.length; i += 1) {
           const guildId = this.strategy.blockedGuilds[i]
           if (guilds.includes(guildId)) {
-            perms.blocked = !!guildsFull.find((x) => x.id === guildId)
-            return perms
+            perms.blocked = true
+            const currentGuildName = guildsFull.find(
+              (x) => x.id === guildId,
+            ).name
+            perms.blockedGuildNames = perms.blockedGuildNames
+              ? perms.blockedGuildNames.add(currentGuildName)
+              : new Set([currentGuildName])
           }
         }
         await Promise.all(
@@ -236,7 +241,6 @@ module.exports = class DiscordClient {
     try {
       const user = {
         ...profile,
-        username: `${profile.username}#${profile.discriminator}`,
         perms: await this.getPerms(profile),
         rmStrategy: this.rmStrategy,
       }
@@ -246,7 +250,16 @@ module.exports = class DiscordClient {
       this.sendMessage(embed)
 
       if (user.perms.blocked) {
-        return done(null, false)
+        const guildArray = user.perms.blockedGuildNames
+        const lastGuild = guildArray.pop()
+        const guildString =
+          guildArray.length === 1
+            ? `${guildArray.join(', ')} & ${lastGuild}`
+            : lastGuild
+        return done(null, false, { blockedGuilds: guildString })
+      }
+      if (user.perms.map === false) {
+        return done(null, false, { message: 'access_denied' })
       }
       if (user) {
         delete user.guilds
