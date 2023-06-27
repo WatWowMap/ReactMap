@@ -32,7 +32,6 @@
         "username": "scanner_user",
         "password": "scanner_paw",
         "database": "scanner_db",
-        "pokemon": "http://in-memory.pokemon/endpoint (remove if unused)",
         "useFor": [
           "device",
           "gym",
@@ -41,6 +40,16 @@
           "scanCell",
           "spawnpoint",
           "weather"
+        ]
+      },
+      {
+        "note": "This is only if you are using golbat and in memory, if you do not know what that is, remove this whole section. If you are using it, you should remove 'device' and 'pokemon' from the scanner database useFor array",
+        "type": "golbat",
+        "endpoint": "http://127.0.0.1:9001",
+        "secret": "",
+        "useFor": [
+          "pokemon",
+          "device"
         ]
       },
       {
@@ -253,10 +262,6 @@
         }
       },
       {
-        "name": "PMSF",
-        "path": "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons-outline/"
-      },
-      {
         "name": "Home",
         "path": "https://raw.githubusercontent.com/nileplumb/PkmnHomeIcons/master/UICONS/"
       },
@@ -265,8 +270,8 @@
         "path": "https://raw.githubusercontent.com/nileplumb/PkmnShuffleMap/master/UICONS/"
       },
       {
-        "name": "Half Shiny",
-        "path": "https://raw.githubusercontent.com/jms412/PkmnShuffleMap/master/UICONS_Half_Shiny_Sparkles_256/"
+        "name": "Cage",
+        "path": "https://raw.githubusercontent.com/RagingRectangle/CageMons/main"
       }
     ]
   },

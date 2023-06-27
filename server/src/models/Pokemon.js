@@ -80,6 +80,7 @@ module.exports = class Pokemon extends Model {
    */
   static getFilters(perms, args, { SubModel: _, connection: __, ...ctx }) {
     const mods = {
+      onlyAreas: args.filters.onlyAreas || [],
       ...ctx,
       ...Object.fromEntries(
         LEVELS.map((x) => [`onlyPvp${x}`, args.filters[`onlyPvp${x}`]]),
@@ -367,9 +368,9 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @template T
+   * @template [T=import('../types').Pokemon[]]
    * @param {string} mem
-   * @param {string | import("objection").QueryBuilder} query
+   * @param {string | import("objection").QueryBuilder<Pokemon>} query
    * @param {'GET' | 'POST' | 'PATCH' | 'DELETE'} method
    * @param {string} secret
    * @returns {Promise<T>}

@@ -268,7 +268,15 @@ app.use(Sentry.Handlers.errorHandler())
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  log.error(HELPERS.express, HELPERS.custom(req.originalUrl, '#00d7ac'), err)
+  log.error(
+    HELPERS.express,
+    HELPERS.custom(req.originalUrl, '#00d7ac'),
+    req.user ? `- ${req.user.username}` : 'Not Logged In',
+    '|',
+    req.headers['x-forwarded-for'],
+    '|',
+    err,
+  )
 
   switch (err.message) {
     case 'NoCodeProvided':

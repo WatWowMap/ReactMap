@@ -26,7 +26,11 @@ strategies.forEach((strategy, i) => {
           return next(err)
         }
         if (!user) {
-          res.status(401).json(info.message)
+          res.redirect(
+            `/blocked/${encodeURIComponent(
+              new URLSearchParams(info).toString(),
+            )}`,
+          )
         } else {
           try {
             return req.login(user, async () => {
@@ -59,7 +63,7 @@ router.get('/logout', (req, res) => {
   req.logout((err) => {
     if (err) log.error(HELPERS.auth, 'Unable to logout', err)
   })
-  req.session.destroy()
+  // req.session.destroy()
   res.redirect('/')
 })
 
