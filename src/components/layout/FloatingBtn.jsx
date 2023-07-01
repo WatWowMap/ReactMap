@@ -12,7 +12,8 @@ import EuroSymbol from '@material-ui/icons/EuroSymbol'
 import Person from '@material-ui/icons/Person'
 import TrackChanges from '@material-ui/icons/TrackChanges'
 import BlurOn from '@material-ui/icons/BlurOn'
-import { Grid, Fab, Icon } from '@material-ui/core'
+import Grid from '@material-ui/core/Grid'
+import Fab from '@material-ui/core/Fab'
 
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
@@ -21,6 +22,7 @@ import L from 'leaflet'
 import useStyles from '@hooks/useStyles'
 import useLocation from '@hooks/useLocation'
 import { useStore, useStatic } from '@hooks/useStore'
+import FAIcon from './general/FAIcon'
 
 const DonationIcons = {
   dollar: AttachMoney,
@@ -263,11 +265,7 @@ export default function FloatingButtons({
             referrerPolicy="no-referrer"
             target={icon.target || '_blank'}
           >
-            <Icon
-              className={icon.icon}
-              fontSize={iconSize}
-              style={{ color: 'white' }}
-            />
+            <FAIcon className={icon.icon} fontSize={iconSize} color="white" />
           </Fab>
         </Grid>
       ))}
