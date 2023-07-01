@@ -27,7 +27,7 @@ module.exports = class TelegramClient {
         try {
           const response = await fetch(
             `https://api.telegram.org/bot${this.strategy.botToken}/getChatMember?chat_id=${group}&user_id=${user.id}`,
-          ).then(async (res) => res.json())
+          )
           if (!response) {
             throw new Error(
               'Unable to query TG API or User is not in the group',
@@ -38,9 +38,10 @@ module.exports = class TelegramClient {
               `Telegram API error: ${response.status} ${response.statusText}`,
             )
           }
+          const json = await response.json()
           if (
-            response.result.status !== 'left' &&
-            response.result.status !== 'kicked'
+            json.result.status !== 'left' &&
+            json.result.status !== 'kicked'
           ) {
             groups.push(group)
           }

@@ -1,6 +1,7 @@
 import React from 'react'
-import { Button, Icon, Typography } from '@material-ui/core'
+import { Button, Typography } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
+import FAIcon from '../general/FAIcon'
 
 export default function DiscordLogin({ href, text, size }) {
   const { t } = useTranslation()
@@ -16,7 +17,7 @@ export default function DiscordLogin({ href, text, size }) {
       }}
       size={size || 'large'}
       href={href || '/auth/discord/callback'}
-      startIcon={<Icon className="fab fa-discord" style={{ fontSize: 30 }} />}
+      startIcon={<FAIcon className="fab fa-discord" style={{ fontSize: 25 }} />}
     >
       <Typography variant="h6" align="center">
         {text ? t(text) : t('login')}

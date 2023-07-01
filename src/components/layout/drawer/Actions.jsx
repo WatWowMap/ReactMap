@@ -1,6 +1,5 @@
 import React, { forwardRef } from 'react'
 import {
-  Icon,
   List,
   ListItem,
   ListItemIcon,
@@ -18,6 +17,7 @@ import TrendingUpIcon from '@material-ui/icons/TrendingUp'
 import FeedbackIcon from '@material-ui/icons/Feedback'
 
 import { useStore, useStatic } from '@hooks/useStore'
+import FAIcon from '../general/FAIcon'
 
 const importSettings = (e) => {
   const file = e.target.files[0]
@@ -82,11 +82,7 @@ export default function DrawerActions() {
           rel="noreferrer"
         >
           <ListItemIcon>
-            <Icon
-              className="fab fa-discord"
-              color="secondary"
-              style={{ fontSize: 25 }}
-            />
+            <FAIcon className="fab fa-discord" color="secondary" size="small" />
           </ListItemIcon>
           <ListItemText primary="Discord" />
         </ListItem>
