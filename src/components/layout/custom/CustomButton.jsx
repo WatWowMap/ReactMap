@@ -1,9 +1,10 @@
 import React from 'react'
-import { Button, Icon, Typography } from '@material-ui/core'
+import { Button, Typography } from '@material-ui/core'
 
 import Utility from '@services/Utility'
 
 import LinkWrapper from './LinkWrapper'
+import FAIcon from '../general/FAIcon'
 
 export default function CustomButton({ block, isMuiColor = false }) {
   const button = (
@@ -15,7 +16,7 @@ export default function CustomButton({ block, isMuiColor = false }) {
       style={block.style || { color: isMuiColor ? 'inherit' : block.color }}
     >
       {Boolean(block.icon) && (
-        <Icon className={block.icon} style={{ fontSize: 30 }} />
+        <FAIcon className={block.icon} style={{ fontSize: 30 }} />
       )}
       &nbsp;
       <Typography variant="button" align="right">
