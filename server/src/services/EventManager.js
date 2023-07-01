@@ -12,6 +12,7 @@ module.exports = class EventManager {
     this.invasions = masterfile.invasions
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
     this.uicons = []
+    this.uiconsBackup = {}
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
     this.webhookObj = {}
@@ -143,7 +144,7 @@ module.exports = class EventManager {
         'Base uicons not found in config (either remotely or locally). This may be fine, but some things might be broken, such as items from the `misc` folder.',
       )
     }
-    this.uicons = await Promise.all(
+    const uicons = await Promise.allSettled(
       styles.map(async (style) => {
         try {
           const response = style.path.startsWith('http')
@@ -172,7 +173,13 @@ module.exports = class EventManager {
         }
       }),
     )
-    this.uicons = this.uicons.filter(Boolean)
+    for (let i = 0; i < uicons.length; i += 1) {
+      const uicon = uicons[i]
+      if (uicon.status === 'fulfilled') {
+        this.uiconsBackup[uicon.value.name] = uicon.value
+      }
+    }
+    this.uicons = Object.values(this.uiconsBackup)
   }
 
   async getInvasions(endpoint) {
