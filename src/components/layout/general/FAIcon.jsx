@@ -7,7 +7,8 @@ export default function FAIcon({ className, size, style, color }) {
     <i
       className={className}
       style={{
-        fontSize: size === 'small' ? 18 : 25,
+        paddingLeft: 1.5,
+        fontSize: size === 'small' ? 18 : 24,
         color: theme.palette[color]?.main || color || 'white',
         ...style,
       }}
