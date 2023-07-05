@@ -61,12 +61,12 @@ export default function Generator({
           {block.components.map((subBlock, i) => {
             const nextGenerator = (
               <Generator
+                key={i}
                 block={subBlock}
                 defaultReturn={defaultReturn}
                 serverSettings={serverSettings}
               />
             )
-
             return subBlock.type === 'parent' ? (
               nextGenerator
             ) : (
