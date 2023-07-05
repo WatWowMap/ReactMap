@@ -48,7 +48,7 @@ rootRouter.post('/api/error/client', (req) => {
       user?.telegramId ||
       user?.id ||
       'Unknown'
-    if (error && config.devOptions.clientErrors) {
+    if (error) {
       log.warn(HELPERS.client, `User: ${userName}`, error)
     }
   }
