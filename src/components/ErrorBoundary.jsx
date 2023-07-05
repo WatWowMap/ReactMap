@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react'
 import { Grid, Typography, Button } from '@material-ui/core'
@@ -17,6 +18,7 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error) {
+    console.error(error)
     this.setState({
       hasError: true,
       message: error?.message || '',
