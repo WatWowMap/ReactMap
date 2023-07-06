@@ -213,7 +213,7 @@ module.exports = class Gym extends Model {
       }
     }
 
-    if (onlyAllGyms && onlyLevels !== 'all' && !isMad) {
+    if (onlyAllGyms && onlyLevels !== 'all' && !isMad && onlyLevels) {
       query.andWhere('power_up_level', onlyLevels)
     }
     query.andWhere((gym) => {
