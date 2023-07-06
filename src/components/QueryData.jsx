@@ -110,11 +110,11 @@ export default function QueryData({
   useEffect(() => () => useStatic.setState({ excludeList: [] }))
 
   if (error) {
-    if (error.networkError.statusCode === 464) {
+    if (error.networkError?.statusCode === 464) {
       setError('old_client')
       return null
     }
-    if (error.networkError.statusCode === 401) {
+    if (error.networkError?.statusCode === 401) {
       setError('session_expired')
       return null
     }

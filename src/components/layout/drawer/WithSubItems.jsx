@@ -27,6 +27,7 @@ export default function WithSubItems({
 }) {
   const { t } = useTranslation()
   const available = useStatic((s) => s.available)
+  const Icons = useStatic((s) => s.Icons)
 
   if (category === 'scanAreas' && noScanAreaOverlay) {
     return null
@@ -197,6 +198,61 @@ export default function WithSubItems({
             </Grid>
           </>
         )}
+      {category === 'pokestops' && subItem === 'eventStops' && (
+        <Grid item xs={12} style={{ textAlign: 'center', padding: '0 12px' }}>
+          <Collapse in={filters[category][subItem]}>
+            {available?.pokestops
+              .filter((event) => event.startsWith('b'))
+              .map((event) => (
+                <Grid
+                  key={event}
+                  container
+                  style={{ width: '100%' }}
+                  alignItems="center"
+                  justifyContent="flex-end"
+                >
+                  <Grid item xs={2}>
+                    <img
+                      src={Icons.getIconById(event)}
+                      alt={t(`display_type_${event.slice(1)}`)}
+                      style={{ maxWidth: 30, maxHeight: 30 }}
+                    />
+                  </Grid>
+                  <Grid
+                    item
+                    xs={5}
+                    style={{ textAlign: 'left', paddingLeft: 20 }}
+                  >
+                    <Typography>
+                      {t(`display_type_${event.slice(1)}`, t('unknown_event'))}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={5} style={{ textAlign: 'right' }}>
+                    <Switch
+                      checked={filters[category].filter[event].enabled}
+                      onChange={() => {
+                        setFilters({
+                          ...filters,
+                          [category]: {
+                            ...filters[category],
+                            filter: {
+                              ...filters[category].filter,
+                              [event]: {
+                                ...filters[category].filter[event],
+                                enabled:
+                                  !filters[category].filter[event].enabled,
+                              },
+                            },
+                          },
+                        })
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              ))}
+          </Collapse>
+        </Grid>
+      )}
       {category === 'gyms' &&
         subItem === 'gymBadges' &&
         filters[category].gymBadges === true && (

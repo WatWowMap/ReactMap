@@ -431,6 +431,10 @@ export default function WebhookAdvanced({
       )
         .map(checkDefaults)
         .join(' ')}`
+    if (id === 'showcase')
+      return `${prefix}${t('showcase')} ${Object.keys(poracleValues)
+        .map(checkDefaults)
+        .join(' ')}`
     switch (id.charAt(0)) {
       case 't':
         return `${prefix}${t('gym')}

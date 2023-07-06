@@ -51,6 +51,11 @@ export default class Poracle {
             grunt_type: 'kecleon',
             profile_no: human.current_profile_no,
           },
+          showcase: {
+            ...invasion.defaults,
+            grunt_type: 'showcase',
+            profile_no: human.current_profile_no,
+          },
         },
         lure: {
           global: { ...lure.defaults, profile_no: human.current_profile_no },
@@ -266,6 +271,8 @@ export default class Poracle {
           ? 'gold-stop'
           : item.grunt_type === 'kecleon'
           ? 'kecleon'
+          : item.grunt_type === 'showcase'
+          ? 'showcase'
           : `i${Object.keys(invasions).find(
               (x) =>
                 invasions[x].type?.toLowerCase() ===
@@ -306,7 +313,7 @@ export default class Poracle {
     if (!id) return {}
     if (id === 'gold-stop') return { id: 'gold-stop', type: 'invasion' }
     if (id === 'kecleon') return { id: 'kecleon', type: 'invasion' }
-
+    if (id === 'showcase') return { id: 'showcase', type: 'invasion' }
     switch (id.charAt(0)) {
       case 'e':
         return { id: id.replace('e', ''), type: 'egg' }
@@ -340,6 +347,7 @@ export default class Poracle {
       case 'invasion':
         if (idObj.id === 'gold-stop') return ['gold_stop']
         if (idObj.id === 'kecleon') return ['poke_352']
+        if (idObj.id === 'showcase') return ['showcase']
         return idObj.id === '0' ? ['poke_global'] : [`grunt_a_${idObj.id}`]
       case 'lure':
         return [`lure_${idObj.id}`]
