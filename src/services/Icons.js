@@ -182,43 +182,85 @@ export default class UIcons {
 
   getIconById(id) {
     if (id === 'kecleon') {
-      id = '352'
+      id = 'b8'
     } else if (id === 'gold-stop') {
-      id = 'l506'
+      id = 'b7'
+    } else if (id === 'showcase') {
+      id = 'b9'
     }
     switch (id.charAt(0)) {
       case 'a':
+        // rocket pokemon
         return this.getPokemon(...id.slice(1).split('-'))
+      case 'b':
+        // event stops
+        return this.getEventStops(id.slice(1))
       case 'c':
+        // candy
         return this.getRewards(4, ...id.slice(1).split('-'))
       case 'd':
+        // stardust
         return this.getRewards(3, id.slice(1))
       case 'e':
+        // raid eggs
         return this.getEggs(id.slice(1), false)
       case 'g':
+        // gyms
         return this.getGyms(...id.slice(1).split('-'))
       case 'i':
+        // invasions
         return this.getInvasions(id.slice(1), true)
       case 'l':
+        // lures
         return this.getPokestops(id.slice(1))
       case 'm':
+        // mega energy
         return this.getPokemon(id.slice(1).split('-')[0], 0, 1)
       case 'p':
+        // experience
         return this.getRewards(1, id.slice(1))
       case 'q':
+        // items
         return this.getRewards(2, ...id.slice(1).split('-'))
       case 'r':
+        // unconfirmed but hatched raids
         return this.getEggs(id.slice(1), true)
       case 's':
+        // ...base pokestop maybe?
         return this.getPokestops(0)
       case 't':
+        // teams
         return this.getGyms(...id.slice(1).split('-'))
       case 'u':
+        // quest types
         return this.getRewards(id.slice(1))
       case 'x':
+        // xl candy
         return this.getRewards(9, ...id.slice(1).split('-'))
       default:
+        // pokemon
         return this.getPokemon(...id.split('-'))
+    }
+  }
+
+  getEventStops(displayType = 0) {
+    try {
+      switch (+displayType) {
+        case 7:
+          // Gimmighoul coin
+          return this.getMisc('event_coin')
+        case 8:
+          // Kecleon
+          return this.getPokemon(352)
+        case 9:
+          // Showcase
+          return this.getMisc('showcase')
+        default:
+      }
+      return this.getMisc('0')
+    } catch (e) {
+      console.error('[UICONS]', e)
+      return `${this.fallback}/misc/0.webp`
     }
   }
 

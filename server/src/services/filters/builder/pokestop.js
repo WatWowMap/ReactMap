@@ -66,6 +66,9 @@ module.exports = function buildPokestops(perms, defaults, available) {
         quests[avail] = new BaseFilter(defaults.invasionPokemon)
       }
     }
+    if (perms.eventStops && avail.startsWith('b')) {
+      quests[avail] = new BaseFilter(defaults.eventStops)
+    }
   })
   return quests
 }

@@ -187,19 +187,12 @@ export default function PokestopPopup({
                       ) : null}
                       <TimeTile
                         expireTime={event.event_expire_timestamp}
-                        icon={
-                          {
-                            7: Icons.getMisc('event_coin'),
-                            8: Icons.getPokemon(352),
-                          }[event.display_type] || Icons.getMisc(0)
-                        }
+                        icon={Icons.getEventStops(event.display_type)}
                         until
-                        tt={
-                          {
-                            7: t('event_coin'),
-                            8: t('poke_352'),
-                          }[event.display_type] || '???'
-                        }
+                        tt={t(
+                          `display_type_${event.display_type}`,
+                          t('unknown_event'),
+                        )}
                       />
                     </Fragment>
                   ))}
