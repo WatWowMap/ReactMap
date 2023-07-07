@@ -571,8 +571,8 @@
   "seen_lure_encounter": "Lure Encounter",
   "seen_lure_wild": "Lure Spawn",
   "seen_wild": "Wild Spawn",
-  "event_stops": "Kecleon",
-  "event_stop_timers": "Kecleon Timers",
+  "event_stops": "Event Stops",
+  "event_stop_timers": "Event Stop Timers",
   "size_0": "Any",
   "size_1": "XXS",
   "size_2": "XS",
@@ -600,5 +600,7 @@
   "enable_portal_popup_coords": "Show Portal Coords",
   "on_block_join_discord": "Please join our discord for more information.",
   "on_block_msg": "You have been blocked for being a member of",
-  "denied": "Denied"
+  "denied": "Denied",
+  "showcase": "Showcase",
+  "unknown_event": "Unknown Event"
 }

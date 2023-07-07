@@ -18,6 +18,11 @@ export default function genPokestops(t, pokemon, pokestops, categories) {
       perms: ['invasions'],
       webhookOnly: true,
     }
+    tempObj.invasions.showcase = {
+      name: t('showcase'),
+      perms: ['invasions'],
+      webhookOnly: true,
+    }
   }
 
   Object.keys(pokestops.filter).forEach((id) => {
