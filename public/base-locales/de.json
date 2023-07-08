@@ -598,5 +598,8 @@
   "enable_pokemon_popup_coords": "Pokémon Koordinaten anzeigen",
   "enable_gym_popup_coords": "Arena Koordinaten anzeigen",
   "enable_pokestop_popup_coords": "Pokéstop Koordinaten anzeigen",
-  "enable_portal_popup_coords": "Portal Koordinaten anzeigen"
+  "enable_portal_popup_coords": "Portal Koordinaten anzeigen",
+  "denied": "verweigert",
+  "showcase": "Showcase",
+  "unknown_event": "Unbekanntes Event"
 }
