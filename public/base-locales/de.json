@@ -599,6 +599,8 @@
   "enable_gym_popup_coords": "Arena Koordinaten anzeigen",
   "enable_pokestop_popup_coords": "Pokéstop Koordinaten anzeigen",
   "enable_portal_popup_coords": "Portal Koordinaten anzeigen",
+  "on_block_join_discord": "Bitte trete unserem Discord bei, um weitere Informationen zu erhalten.",
+  "on_block_msg": "Du wurdest aufgrund deiner Mitgliedschaft blockiert",
   "denied": "verweigert",
   "showcase": "Showcase",
   "unknown_event": "unbekanntes Event"
