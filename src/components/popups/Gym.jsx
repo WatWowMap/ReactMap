@@ -439,9 +439,9 @@ const RaidInfo = ({ gym, t, Icons }) => {
     raid_level,
     raid_pokemon_id,
     raid_pokemon_form,
+    raid_pokemon_costume,
     raid_pokemon_move_1,
     raid_pokemon_move_2,
-    raid_pokemon_evolution,
   } = gym
 
   if (!raid_pokemon_id) {
@@ -455,9 +455,9 @@ const RaidInfo = ({ gym, t, Icons }) => {
     return `${t('tier')} ${raidLevel}`
   }
 
-  const getRaidForm = (id, form, evo) => {
-    if (evo) {
-      return t('mega')
+  const getRaidForm = (id, form, costume) => {
+    if (costume) {
+      return t(`costume_${costume}`, 'Unknown Costume')
     }
     if (form) {
       const raidForm = pokemon[id].forms[form].name
@@ -481,13 +481,15 @@ const RaidInfo = ({ gym, t, Icons }) => {
           {getRaidName(raid_level, raid_pokemon_id)}
         </Typography>
       </Grid>
-      <Grid item xs={12}>
-        <Typography variant="subtitle2" align="center">
+      <Grid item xs={12} style={{ paddingBottom: 4, textAlign: 'center' }}>
+        <Typography variant="caption" align="center">
+          (
           {getRaidForm(
             raid_pokemon_id,
             raid_pokemon_form,
-            raid_pokemon_evolution,
+            raid_pokemon_costume,
           )}
+          )
         </Typography>
       </Grid>
       {raid_pokemon_move_1 && raid_pokemon_move_1 !== 1 && (
