@@ -26,7 +26,13 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
         container
         alignItems="center"
         style={{ flexWrap: 'nowrap' }}
-        ref={(ref) => setWidth(Math.max(300, ref?.clientWidth || 0))}
+        ref={(ref) => {
+          const refWidth = Math.min(
+            Math.max(300, ref?.clientWidth || 0),
+            window.innerWidth,
+          )
+          return setWidth(refWidth)
+        }}
       >
         <Grid
           item
