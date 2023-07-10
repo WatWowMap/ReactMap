@@ -173,30 +173,6 @@ export default function GymMarker(
               }}
             />
           )}
-          {Boolean(filters.gymBadges && badge) && (
-            <img
-              src={Icons.getMisc(
-                (() => {
-                  switch (badge) {
-                    case 1:
-                      return 'third'
-                    case 2:
-                      return 'second'
-                    default:
-                      return 'first'
-                  }
-                })(),
-              )}
-              alt="badge"
-              style={{
-                width: gymSize / 2,
-                height: 'auto',
-                bottom: 18 + gymMod.offsetY,
-                left: `${gymMod.offsetX * 55}%`,
-                transform: 'translateX(50%)',
-              }}
-            />
-          )}
         </>
       )}
       {raidIcon && (
