@@ -108,6 +108,7 @@ export default function Extras({ category, subItem, data }) {
             setFilters={setFilters}
             category={category}
             filterKey="badge"
+            allowNone
             items={['all', 'badge_1', 'badge_2', 'badge_3']}
           />
         </MemoCollapsibleItem>
