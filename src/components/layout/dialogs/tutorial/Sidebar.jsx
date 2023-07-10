@@ -13,7 +13,7 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
-import WithSubItems from '@components/layout/drawer/WithSubItems'
+import ItemToggle from '@components/layout/drawer/ItemToggle'
 import data from './data.json'
 
 export default function TutSidebar({ toggleDialog, isMobile }) {
@@ -70,7 +70,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
               return null
             }
             return (
-              <WithSubItems
+              <ItemToggle
                 key={subItem}
                 category="pokestops"
                 filters={tempFilters}

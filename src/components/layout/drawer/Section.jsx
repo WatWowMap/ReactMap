@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React from 'react'
+import React, { Fragment } from 'react'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import Settings from '@material-ui/icons/Settings'
 import {
@@ -17,27 +17,26 @@ import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
 import SettingsMenu from './Settings'
-import WithSubItems from './WithSubItems'
+import ItemToggle from './ItemToggle'
 import PokemonSection from './Pokemon'
 import Areas from './Areas'
+import Extras from './Extras'
 
 export default function DrawerSection({ category, value, toggleDialog }) {
   const { t } = useTranslation()
-  const { setSidebar, setFilters } = useStore.getState()
-  const { config } = useStatic.getState()
 
   const sidebar = useStore((s) => s.sidebar)
-  const filters = useStore((s) => s.filters)
-
   const staticUserSettings = useStatic((s) => s.userSettings)
+  const { config } = useStatic.getState()
 
   const handleChange = (panel) => (_, isExpanded) =>
-    setSidebar(isExpanded ? panel : false)
+    useStore.setState({ sidebar: isExpanded ? panel : false })
 
   return (
     <Accordion
       expanded={sidebar === category}
       onChange={handleChange(category)}
+      TransitionProps={{ unmountOnExit: true }}
     >
       <AccordionSummary expandIcon={<ExpandMore style={{ color: 'white' }} />}>
         <Typography>{t(Utility.camelToSnake(category))}</Typography>
@@ -45,36 +44,29 @@ export default function DrawerSection({ category, value, toggleDialog }) {
       <AccordionDetails>
         <Grid
           container
-          style={{ width: 300 }}
           spacing={3}
           direction="row"
           justifyContent="center"
           alignItems="center"
         >
           {category === 'pokemon' ? (
-            <PokemonSection
-              category={category}
-              context={value}
-              specificFilter="ivOr"
-              filters={filters}
-              setFilters={setFilters}
-            />
+            <PokemonSection category={category} context={value} />
           ) : category === 'settings' ? (
             <SettingsMenu toggleDialog={toggleDialog} />
           ) : (
-            Object.keys(value).map((subItem) => (
-              <WithSubItems
-                key={`${category}-${subItem}`}
-                category={category}
-                data={value[subItem]}
-                filters={filters}
-                setFilters={setFilters}
-                subItem={subItem}
-                noScanAreaOverlay={config.map.noScanAreaOverlay}
-                enableQuestSetSelector={config.map.enableQuestSetSelector}
-                enableConfirmedInvasions={config.map.enableConfirmedInvasions}
-              />
-            ))
+            Object.entries(value).map(([subItem, subValue]) =>
+              category === 'scanAreas' &&
+              config.map.noScanAreasOverlay ? null : (
+                <Fragment key={`${category}-${subItem}`}>
+                  <ItemToggle category={category} subItem={subItem} />
+                  <Extras
+                    category={category}
+                    subItem={subItem}
+                    data={subValue}
+                  />
+                </Fragment>
+              ),
+            )
           )}
           {staticUserSettings[category] && (
             <Grid
@@ -110,12 +102,7 @@ export default function DrawerSection({ category, value, toggleDialog }) {
               </Button>
             </Grid>
           )}
-          {category === 'scanAreas' && (
-            <Areas
-              scanAreasZoom={config.map.scanAreasZoom}
-              scanAreaMenuHeight={config.map.scanAreaMenuHeight}
-            />
-          )}
+          {category === 'scanAreas' && <Areas />}
         </Grid>
       </AccordionDetails>
     </Accordion>
