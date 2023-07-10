@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { Fragment, useCallback, useState, useEffect } from 'react'
 import Check from '@material-ui/icons/Check'
 import Clear from '@material-ui/icons/Clear'
@@ -596,7 +597,11 @@ const PvpInfo = ({ pokemon, league, data, t, Icons }) => {
             img: (
               <NameTT
                 id={[
-                  each.form ? `form_${each.form}` : '',
+                  each.evolution
+                    ? `evo_${each.evolution}`
+                    : each.form
+                    ? `form_${each.form}`
+                    : '',
                   `poke_${each.pokemon}`,
                 ]}
               >
