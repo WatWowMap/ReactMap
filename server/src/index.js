@@ -375,7 +375,13 @@ connection.migrate.latest().then(async () => {
     ]).then(() => {
       httpServer.listen(config.port, config.interface)
       const text = rainbow(
-        `Server is now listening at http://${config.interface}:${config.port}`,
+        `ℹ ${new Date()
+          .toISOString()
+          .split('.')[0]
+          .split('T')
+          .join(' ')} [ReactMap] Server is now listening at http://${
+          config.interface
+        }:${config.port}`,
       )
       setTimeout(() => text.stop(), 3_000)
     })
