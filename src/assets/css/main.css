@@ -123,6 +123,48 @@ body {
   border: 4px solid gray;
 }
 
+.badge {
+  width: 96px;
+  height: 96px;
+  box-sizing: border-box;
+  padding: 4px;
+  border-radius: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+  -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+}
+
+.badge-1 {
+  background: linear-gradient(
+    to right,
+    #cd7f32,
+    #ffffff,
+    #cd7f32,
+    #ffffff,
+    #cd7f32
+  );
+}
+.badge-2 {
+  background: linear-gradient(
+    to right,
+    #c0c0c0,
+    #ffffff,
+    #c0c0c0,
+    #ffffff,
+    #c0c0c0
+  );
+}
+.badge-3 {
+  background: linear-gradient(
+    to right,
+    #bf953f,
+    #fcf6ba,
+    #b38728,
+    #fbf5b7,
+    #aa771c
+  );
+}
+
 .marker {
   object-fit: contain;
 }
