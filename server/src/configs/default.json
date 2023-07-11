@@ -293,7 +293,8 @@
         "parentStyle": {},
         "permanent": false,
         "freeloaderOnly": false,
-        "donorOnly": false
+        "donorOnly": false,
+        "timeoutSeconds": 0
       },
       "titles": [],
       "components": [],
