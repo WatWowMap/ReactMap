@@ -293,7 +293,8 @@
         "parentStyle": {},
         "permanent": false,
         "freeloaderOnly": false,
-        "donorOnly": false
+        "donorOnly": false,
+        "timeoutSeconds": 0
       },
       "titles": [],
       "components": [],
@@ -601,6 +602,7 @@
       "scanNextInstance": "scanNext",
       "scanNextDevice": "Device01",
       "scanNextSleeptime": 5,
+      "userCooldownSeconds": 0,
       "scanNextAreaRestriction": [],
       "discordRoles": [],
       "telegramGroups": []
@@ -611,6 +613,7 @@
       "showScanCount": false,
       "showScanQueue": false,
       "scanZoneMaxSize": 10,
+      "userCooldownSeconds": 0,
       "advancedScanZoneOptions": false,
       "scanZoneRadius": {
         "pokemon": 70,

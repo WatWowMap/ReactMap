@@ -5,14 +5,15 @@ import { Grid, Button, Paper, TextField } from '@material-ui/core'
 import { useTranslation } from 'react-i18next'
 
 import Query from '@services/Query'
-import { useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import AreaTile from './AreaTile'
 
-export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
+export default function AreaDropDown() {
   const { data, loading, error } = useQuery(Query.scanAreasMenu())
   const { t } = useTranslation()
   const filters = useStore((s) => s.filters)
   const { setAreas, setFilters } = useStore.getState()
+  const { config } = useStatic.getState()
   const map = useMap()
 
   const allAreas = useMemo(() => {
@@ -67,7 +68,7 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
       <Paper
         style={{
           minHeight: 50,
-          maxHeight: scanAreaMenuHeight || 400,
+          maxHeight: config.map.scanAreaMenuHeight || 400,
           width: '100%',
           overflow: 'auto',
           backgroundColor: '#212121',
@@ -100,7 +101,7 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
                     feature={details}
                     allAreas={allAreas}
                     childAreas={children}
-                    scanAreasZoom={scanAreasZoom}
+                    scanAreasZoom={config.map.scanAreasZoom}
                     map={map}
                     scanAreas={filters.scanAreas}
                     setAreas={setAreas}
@@ -112,7 +113,7 @@ export default function AreaDropDown({ scanAreaMenuHeight, scanAreasZoom }) {
                     feature={feature}
                     allAreas={allAreas}
                     childAreas={children}
-                    scanAreasZoom={scanAreasZoom}
+                    scanAreasZoom={config.map.scanAreasZoom}
                     i={i}
                     map={map}
                     scanAreas={filters.scanAreas}

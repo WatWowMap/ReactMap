@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react'
 import { renderToString } from 'react-dom/server'
 import L from 'leaflet'
+import getOpacity from '@services/functions/getOpacity'
 
 export default function stopMarker(
   pokestop,
@@ -47,9 +48,10 @@ export default function stopMarker(
     invasions.forEach((invasion) => {
       if (invasion.grunt_type) {
         filterId = `i${invasion.grunt_type}`
-        invasionIcons.unshift(
-          Icons.getInvasions(invasion.grunt_type, invasion.confirmed),
-        )
+        invasionIcons.unshift({
+          icon: Icons.getInvasions(invasion.grunt_type, invasion.confirmed),
+          opacity: getOpacity(invasion.incident_expire_timestamp),
+        })
         invasionSizes.unshift(
           Icons.getSize('invasion', filters.filter[filterId]),
         )
@@ -231,12 +233,13 @@ export default function stopMarker(
           )}
         </Fragment>
       ))}
-      {invasionIcons.map((icon, i) => (
+      {invasionIcons.map((invasion, i) => (
         <img
-          key={icon}
-          src={icon}
-          alt={icon}
+          key={invasion.icon}
+          src={invasion.icon}
+          alt={invasion.icon}
           style={{
+            opacity: invasion.opacity,
             width: invasionSizes[i],
             height: invasionSizes[i],
             bottom: baseSize * 0.5 * invasionMod.offsetY + invasionSizes[i] * i,

@@ -14,11 +14,12 @@ export default function DonorPage({ donorPage, handleDonorClose }) {
       configObj={donorPage}
       defaultTitle="donor_page"
       handleClose={handleDonorClose}
-      contentBody={donorPage.components.map((block, i) => {
+    >
+      {donorPage.components.map((block, i) => {
         if (block.donorOnly && !perms.donor) return null
         if (block.freeloaderOnly && perms.donor) return null
         return <CustomTile key={i} block={block} />
       })}
-    />
+    </DialogWrapper>
   )
 }

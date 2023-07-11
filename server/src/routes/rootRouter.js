@@ -187,6 +187,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           scanNextShowScanQueue: config.scanner.scanNext.showScanQueue,
           scanNextAreaRestriction:
             config.scanner.scanNext.scanNextAreaRestriction,
+          scanNextCooldown: config.scanner.scanNext.userCooldownSeconds,
           enableScanZone: config.scanner.scanZone.enabled,
           scanZoneShowScanCount: config.scanner.scanZone.showScanCount,
           scanZoneShowScanQueue: config.scanner.scanZone.showScanQueue,
@@ -197,6 +198,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           scanZoneMaxSize: config.scanner.scanZone.scanZoneMaxSize,
           scanZoneAreaRestriction:
             config.scanner.scanZone.scanZoneAreaRestriction,
+          scanZoneCooldown: config.scanner.scanZone.userCooldownSeconds,
         },
         gymValidDataLimit:
           Date.now() / 1000 - config.api.gymValidDataLimit * 86400,

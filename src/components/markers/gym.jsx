@@ -1,6 +1,7 @@
 import React from 'react'
 import { renderToString } from 'react-dom/server'
 import L from 'leaflet'
+import getOpacity from '@services/functions/getOpacity'
 
 const getBadgeColor = (raidLevel) => {
   switch (raidLevel) {
@@ -83,6 +84,8 @@ export default function GymMarker(
       raidSize = Icons.getSize('raid', filters.filter[filterId])
     }
   }
+
+  const opacity = getOpacity(gym.raid_end_timestamp)
 
   const ReactIcon = (
     <div className="marker-image-holder top-overlay">
@@ -173,30 +176,6 @@ export default function GymMarker(
               }}
             />
           )}
-          {Boolean(filters.gymBadges && badge) && (
-            <img
-              src={Icons.getMisc(
-                (() => {
-                  switch (badge) {
-                    case 1:
-                      return 'third'
-                    case 2:
-                      return 'second'
-                    default:
-                      return 'first'
-                  }
-                })(),
-              )}
-              alt="badge"
-              style={{
-                width: gymSize / 2,
-                height: 'auto',
-                bottom: 18 + gymMod.offsetY,
-                left: `${gymMod.offsetX * 55}%`,
-                transform: 'translateX(50%)',
-              }}
-            />
-          )}
         </>
       )}
       {raidIcon && (
@@ -204,6 +183,7 @@ export default function GymMarker(
           src={raidIcon}
           alt={raidIcon}
           style={{
+            opacity,
             width: raidSize,
             height: raidSize,
             bottom: gymSize * 0.4 + slotModifier * raidMod.offsetY,
@@ -216,6 +196,7 @@ export default function GymMarker(
         <div
           className="iv-badge"
           style={{
+            opacity,
             backgroundColor: getBadgeColor(raid_level),
             bottom: gymSize * 0.4 * raidMod.offsetY,
             left: `${raidMod.offsetX * 200}%`,
@@ -227,6 +208,7 @@ export default function GymMarker(
               src={Icons.getMisc('mega')}
               alt="mega"
               style={{
+                opacity,
                 width: 17.5,
                 height: 'auto',
                 position: 'absolute',
