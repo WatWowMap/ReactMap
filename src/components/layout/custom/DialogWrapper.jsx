@@ -44,7 +44,7 @@ export default function DialogWrapper({
 
   React.useEffect(() => {
     if (countdown > 0) {
-      const timeout = setInterval(() => {
+      const timeout = setTimeout(() => {
         const newTime = countdown - 1
         setCountdown(newTime)
         setFooterOptions((prev) => {
@@ -59,7 +59,7 @@ export default function DialogWrapper({
           ]
         })
       }, 1000)
-      return () => clearInterval(timeout)
+      return () => clearTimeout(timeout)
     }
   }, [countdown])
 

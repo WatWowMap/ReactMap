@@ -1139,6 +1139,10 @@
         "__name": "SCANNER_SCAN_NEXT_SCAN_NEXT_SLEEPTIME",
         "__format": "number"
       },
+      "userCooldownSeconds": {
+        "__name": "SCANNER_SCAN_NEXT_USER_COOLDOWN_SECONDS",
+        "__format": "number"
+      },
       "scanNextAreaRestriction": {
         "__name": "SCANNER_SCAN_NEXT_SCAN_NEXT_AREA_RESTRICTION",
         "__format": "json"
@@ -1171,6 +1175,10 @@
       },
       "scanZoneMaxSize": {
         "__name": "SCANNER_SCAN_ZONE_SCAN_ZONE_MAX_SIZE",
+        "__format": "number"
+      },
+      "userCooldownSeconds": {
+        "__name": "SCANNER_SCAN_ZONE_USER_COOLDOWN_SECONDS",
         "__format": "number"
       },
       "advancedScanZoneOptions": {

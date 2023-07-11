@@ -602,5 +602,6 @@
   "on_block_msg": "You have been blocked for being a member of",
   "denied": "Denied",
   "showcase": "Showcase",
-  "unknown_event": "Unknown Event"
+  "unknown_event": "Unknown Event",
+  "scanner_countdown": "Available in {{time}}s"
 }
