@@ -230,14 +230,14 @@ const MenuActions = ({
   hasLure,
   t,
 }) => {
+  const { setHideList, setExcludeList, setTimerList } = useStatic.getState()
+  const { setFilters } = useStore.getState()
+
   const hideList = useStatic((state) => state.hideList)
-  const setHideList = useStatic((state) => state.setHideList)
   const excludeList = useStatic((state) => state.excludeList)
-  const setExcludeList = useStatic((state) => state.setExcludeList)
+  const masterfile = useStatic((state) => state.masterfile)
   const timerList = useStatic((state) => state.timerList)
-  const setTimerList = useStatic((state) => state.setTimerList)
   const filters = useStore((state) => state.filters)
-  const setFilters = useStore((state) => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
 
@@ -336,15 +336,69 @@ const MenuActions = ({
   if ((perms.invasions && hasInvasion) || (perms.lures && hasLure)) {
     if (hasInvasion) {
       invasions.forEach((invasion, i) => {
-        options.push({
-          key: `${invasion.grunt_type}-${invasion.incident_expire_timestamp}`,
-          name: (
-            <Trans i18nKey="exclude_invasion_multi">
-              {{ invasion: t(`grunt_a_${invasion.grunt_type}`) }}
-            </Trans>
-          ),
-          action: () => excludeInvasion(i),
-        })
+        if (filters.pokestops.filter[`i${invasion.grunt_type}`]?.enabled) {
+          options.push({
+            key: `${invasion.grunt_type}-${invasion.incident_expire_timestamp}`,
+            name: (
+              <Trans i18nKey="exclude_invasion_multi">
+                {{ invasion: t(`grunt_a_${invasion.grunt_type}`) }}
+              </Trans>
+            ),
+            action: () => excludeInvasion(i),
+          })
+        }
+        const reference = masterfile.invasions[invasion.grunt_type]
+        if (reference) {
+          const encounters = new Set()
+          if (
+            invasion.slot_1_pokemon_id &&
+            reference.firstReward &&
+            filters.pokestops.filter[
+              `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
+            ]?.enabled
+          ) {
+            encounters.add(
+              `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`,
+            )
+          }
+          if (
+            invasion.slot_2_pokemon_id &&
+            reference.secondReward &&
+            filters.pokestops.filter[
+              `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
+            ]?.enabled
+          ) {
+            encounters.add(
+              `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`,
+            )
+          }
+          if (
+            invasion.slot_3_pokemon_id &&
+            reference.thirdReward &&
+            filters.pokestops.filter[
+              `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
+            ]?.enabled
+          ) {
+            encounters.add(
+              `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`,
+            )
+          }
+          if (encounters.size)
+            options.push(
+              ...[...encounters].map((x) => ({
+                key: x,
+                name: (
+                  <Trans i18nKey="exclude_quest_multi">
+                    {{ reward: t(`poke_${x.slice(1).split('-')[0]}`) }}
+                  </Trans>
+                ),
+                action: () => {
+                  setAnchorEl(null)
+                  setState(x)
+                },
+              })),
+            )
+        }
       })
     }
     if (hasLure) {
