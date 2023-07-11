@@ -67,7 +67,7 @@ export default class Poracle {
           global: { ...quest.defaults, profile_no: human.current_profile_no },
         },
       }
-      Object.keys(reactMapFilters.pokemon.filter).forEach((key) => {
+      Object.keys(reactMapFilters.pokemon?.filter || {}).forEach((key) => {
         filters.pokemon[key] = {
           ...pokemon.defaults,
           pokemon_id: +key.split('-')[0],
@@ -108,7 +108,7 @@ export default class Poracle {
           delete filters.quest[key].form
         }
       })
-      Object.keys(reactMapFilters.pokestops.filter).forEach((key) => {
+      Object.keys(reactMapFilters.pokestops?.filter || {}).forEach((key) => {
         if (key.startsWith('i')) {
           filters.invasion[key] = {
             ...invasion.defaults,
@@ -181,7 +181,7 @@ export default class Poracle {
           delete filters.quest[key].amount
         }
       })
-      Object.keys(reactMapFilters.gyms.filter).forEach((key) => {
+      Object.keys(reactMapFilters.gyms?.filter || {}).forEach((key) => {
         if (key.startsWith('r')) {
           filters.raid[key] = {
             ...raid.defaults,

@@ -2,7 +2,7 @@ import React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { Grid, Typography } from '@material-ui/core'
 
-export default function WebhookError({ selectedWebhook }) {
+export default function WebhookError({ selectedWebhook, children }) {
   const { t } = useTranslation()
 
   return (
@@ -23,9 +23,11 @@ export default function WebhookError({ selectedWebhook }) {
           align="center"
           style={{ whiteSpace: 'pre-line' }}
         >
-          <Trans i18nKey="non_registered_human_desc">
-            {{ webhook: selectedWebhook }}
-          </Trans>
+          {children ?? (
+            <Trans i18nKey="non_registered_human_desc">
+              {{ webhook: selectedWebhook }}
+            </Trans>
+          )}
         </Typography>
         <br />
         <Typography variant="h6" align="center">
