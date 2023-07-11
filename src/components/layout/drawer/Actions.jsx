@@ -15,6 +15,7 @@ import RotateLeftIcon from '@material-ui/icons/RotateLeft'
 import ImportExportIcon from '@material-ui/icons/ImportExport'
 import TrendingUpIcon from '@material-ui/icons/TrendingUp'
 import FeedbackIcon from '@material-ui/icons/Feedback'
+import HeartIcon from '@material-ui/icons/Favorite'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import FAIcon from '../general/FAIcon'
@@ -156,6 +157,20 @@ export default function DrawerActions() {
           <ListItemText primary={t(loggedIn ? 'logout' : 'login')} />
         </ListItem>
       )}
+      <a
+        href="https://github.com/WatWowMap/ReactMap"
+        referrerPolicy="no-referrer"
+        target="_blank"
+        rel="noreferrer"
+        style={{ textDecoration: 'none', color: 'white' }}
+      >
+        <ListItem button>
+          <ListItemIcon>
+            <HeartIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={t('contribute')} />
+        </ListItem>
+      </a>
     </List>
   )
 }

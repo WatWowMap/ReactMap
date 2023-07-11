@@ -605,5 +605,6 @@
   "showcase": "Showcase",
   "unknown_event": "Unknown Event",
   "scanner_countdown": "Available in {{time}}s",
-  "success": "Success"
+  "success": "Success",
+  "contribute": "Contribute"
 }
