@@ -17,9 +17,11 @@ export default function DialogWrapper({
   const { perms } = useStatic((s) => s.auth)
   const { t } = useTranslation()
   const [countdown, setCountdown] = React.useState(
-    typeof configObj.settings?.timeoutSeconds === 'number'
-      ? configObj.settings?.timeoutSeconds
-      : 0,
+    Math.floor(
+      typeof configObj.settings?.timeoutSeconds === 'number'
+        ? configObj.settings?.timeoutSeconds
+        : 0,
+    ),
   )
   const [footerOptions, setFooterOptions] = React.useState([
     ...(configObj.footerButtons
