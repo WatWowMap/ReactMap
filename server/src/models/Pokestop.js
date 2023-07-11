@@ -3,7 +3,6 @@ const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const { Event } = require('../services/initialization')
 
-const fetchQuests = require('../services/api/fetchQuests')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: {
@@ -1447,10 +1446,7 @@ module.exports = class Pokestop extends Model {
     })
 
     return {
-      available:
-        finalList.size || questTypes.length
-          ? [...finalList, ...questTypes.map((type) => `u${type}`)]
-          : await fetchQuests(),
+      available: [...finalList, ...questTypes.map((type) => `u${type}`)],
       conditions,
     }
   }

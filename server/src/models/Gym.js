@@ -2,7 +2,6 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const fetchRaids = require('../services/api/fetchRaids')
 const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
@@ -430,9 +429,6 @@ module.exports = class Gym extends Model {
         })
         return [...unique]
       })
-    if (!results.length) {
-      return { available: [...teamResults, ...(await fetchRaids())] }
-    }
     return {
       available: [
         ...teamResults,
