@@ -75,7 +75,7 @@ export default function ScanOnDemand({
       const timer = mode === 'scanNext' ? scanNextCooldown : scanZoneCooldown
       useStatic.setState({
         scannerCooldown:
-          (typeof timer === 'number' ? timer : 0) *
+          (typeof timer === 'number' ? Math.floor(timer) : 0) *
           (mode === 'scanNext' ? scanCoords.length : scanZoneSize),
       })
     }

@@ -508,13 +508,11 @@ const RaidInfo = ({ gym, t, Icons }) => {
       </Grid>
       <Grid item xs={12} style={{ paddingBottom: 4, textAlign: 'center' }}>
         <Typography variant="caption" align="center">
-          (
           {getRaidForm(
             raid_pokemon_id,
             raid_pokemon_form,
             raid_pokemon_costume,
           )}
-          )
         </Typography>
       </Grid>
       {raid_pokemon_move_1 && raid_pokemon_move_1 !== 1 && (
