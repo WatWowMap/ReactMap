@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core'
 import PermScanWifiIcon from '@material-ui/icons/PermScanWifi'
 import ClearIcon from '@material-ui/icons/Clear'
-import { useStatic } from '@hooks/useStore'
+import { useStore } from '@hooks/useStore'
 
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -42,7 +42,7 @@ export function ScanQueue({ queue = 0 }) {
 
 export function ScanConfirm({ isInAllowedArea, setMode, areaRestrictions }) {
   const { t } = useTranslation()
-  const scannerCooldown = useStatic((s) => s.scannerCooldown)
+  const scannerCooldown = useStore((s) => s.scannerCooldown)
 
   return (
     <StyledListItem
