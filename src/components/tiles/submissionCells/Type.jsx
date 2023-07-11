@@ -9,10 +9,10 @@ const TypeTile = ({ cell, tileStyle, userSettings }) => (
     positions={cell.polygon}
     pathOptions={typeStyle(cell, tileStyle, userSettings)}
   >
-    <Popup position={[cell.lat, cell.lon]}>
+    <Popup>
       <PopupContent cell={cell} />
     </Popup>
-    <Tooltip position={[cell.lat, cell.lon]} direction="center" permanent>
+    <Tooltip direction="center" permanent>
       {cell.count}
     </Tooltip>
   </Polygon>
