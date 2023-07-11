@@ -156,4 +156,5 @@ export const useStatic = create((set) => ({
   setResetFilters: (resetFilters) => set({ resetFilters }),
   extraUserFields: [],
   setExtraUserFields: (extraUserFields) => set({ extraUserFields }),
+  scannerCooldown: 0,
 }))

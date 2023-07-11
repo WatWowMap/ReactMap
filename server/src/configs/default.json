@@ -602,6 +602,7 @@
       "scanNextInstance": "scanNext",
       "scanNextDevice": "Device01",
       "scanNextSleeptime": 5,
+      "userCooldownSeconds": 0,
       "scanNextAreaRestriction": [],
       "discordRoles": [],
       "telegramGroups": []
@@ -612,6 +613,7 @@
       "showScanCount": false,
       "showScanQueue": false,
       "scanZoneMaxSize": 10,
+      "userCooldownSeconds": 0,
       "advancedScanZoneOptions": false,
       "scanZoneRadius": {
         "pokemon": 70,
