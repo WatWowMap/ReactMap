@@ -397,7 +397,7 @@
   "popup": "팝업",
   "pvp_level": "레벨 {{level}} PVP 통계",
   "pvp_mega": "메가 PVP 통계",
-  "webhook_entry": "{{name}}에 {{category}} 추가",
+  "webhook_entry": "{{name}}에 추가",
   "distance": "거리",
   "gym": "헬스장",
   "egg": "계란",

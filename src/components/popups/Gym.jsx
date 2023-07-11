@@ -131,7 +131,7 @@ export default function GymPopup({
   )
 }
 
-const MenuActions = ({ gym, perms, hasRaid, t, badge, setBadge }) => {
+const MenuActions = ({ gym, perms, hasRaid, badge, setBadge }) => {
   const hideList = useStatic((state) => state.hideList)
   const setHideList = useStatic((state) => state.setHideList)
   const excludeList = useStatic((state) => state.excludeList)
@@ -141,6 +141,7 @@ const MenuActions = ({ gym, perms, hasRaid, t, badge, setBadge }) => {
   const { gymValidDataLimit } = useStatic((state) => state.config)
 
   const selectedWebhook = useStore((state) => state.selectedWebhook)
+  const webhookData = useStatic((state) => state.webhookData)
 
   const filters = useStore((state) => state.filters)
   const setFilters = useStore((state) => state.setFilters)
@@ -149,6 +150,16 @@ const MenuActions = ({ gym, perms, hasRaid, t, badge, setBadge }) => {
   const [badgeMenu, setBadgeMenu] = useState(false)
 
   const addWebhook = useWebhook({ category: 'quickGym', selectedWebhook })
+  const hasGymHook = webhookData?.[selectedWebhook]?.gym?.find(
+    (x) => x.gym_id === gym.id,
+  )
+  const hasRaidHook = webhookData?.[selectedWebhook]?.raid?.find(
+    (x) => x.gym_id === gym.id,
+  )
+  const hasEggHook = webhookData?.[selectedWebhook]?.egg?.find(
+    (x) => x.gym_id === gym.id,
+  )
+  const hasWebhook = !!hasGymHook || !!hasRaidHook || !!hasEggHook
   const {
     id,
     team_id,
@@ -248,12 +259,19 @@ const MenuActions = ({ gym, perms, hasRaid, t, badge, setBadge }) => {
   perms.webhooks.forEach((hook) => {
     options.push({
       name: (
-        <Trans i18nKey="webhook_entry">
-          {{ category: t('gym') }}
+        <Trans i18nKey={hasWebhook ? 'remove_webhook_entry' : 'webhook_entry'}>
           {{ name: hook }}
         </Trans>
       ),
-      action: () => addWebhook(gym),
+      action: () => {
+        if (hasWebhook) {
+          if (hasGymHook) addWebhook(hasGymHook.uid, 'gym-delete')
+          if (hasRaidHook) addWebhook(hasRaidHook.uid, 'raid-delete')
+          if (hasEggHook) addWebhook(hasEggHook.uid, 'egg-delete')
+        } else {
+          addWebhook(gym, 'quickGym')
+        }
+      },
       key: hook,
     })
   })
