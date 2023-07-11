@@ -603,5 +603,6 @@
   "on_block_msg": "Du wurdest aufgrund deiner Mitgliedschaft blockiert",
   "denied": "verweigert",
   "showcase": "Showcase",
-  "unknown_event": "unbekanntes Event"
+  "unknown_event": "unbekanntes Event",
+  "scanner_countdown": "verfügbar in {{time}}s"
 }
