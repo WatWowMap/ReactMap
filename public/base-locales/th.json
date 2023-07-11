@@ -302,7 +302,7 @@
   "popup": "ป๊อปอัพ",
   "pvp_level": "ระดับ {{level}} สถิติ PVP",
   "pvp_mega": "สถิติเมก้า PVP",
-  "webhook_entry": "เพิ่ม {{category}} ใน {{name}}",
+  "webhook_entry": "เพิ่ม ใน {{name}}",
   "distance": "ระยะทาง",
   "gym": "โรงยิม",
   "egg": "ไข่",

@@ -372,7 +372,7 @@
   "has_quest_indicator": "Couleur alternative pour afficher les Quêtes",
   "show_ar_badge": "Afficher les Badges RA",
   "pvp_mega": "Stats PvP Méga",
-  "webhook_entry": "Ajouter {{category}} à {{name}}",
+  "webhook_entry": "Ajouter à {{name}}",
   "distance": "Distance",
   "gym": "Arène",
   "egg": "Œuf",

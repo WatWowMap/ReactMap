@@ -7,11 +7,11 @@ module.exports = class Fetch {
     return fetchJson(url, options)
   }
 
-  static async webhookApi(category, discordId, method, name, data) {
-    return webhookApi(category, discordId, method, name, data)
+  static async webhookApi(...args) {
+    return webhookApi(...args)
   }
 
-  static async scannerApi(category, method, data, user) {
-    return scannerApi(category, method, data, user)
+  static async scannerApi(...args) {
+    return scannerApi(...args)
   }
 }
