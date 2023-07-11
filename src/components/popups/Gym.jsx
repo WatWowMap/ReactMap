@@ -401,7 +401,7 @@ const GymInfo = ({ gym, t, Icons }) => {
     >
       {!!badge && (
         <Grid item xs={12}>
-          <Typography variant="h6" align="center">
+          <Typography variant="h6" align="center" className={`badge_${badge}`}>
             {t(`badge_${badge}`)}
           </Typography>
         </Grid>
