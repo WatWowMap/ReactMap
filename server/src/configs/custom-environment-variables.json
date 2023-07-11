@@ -522,6 +522,10 @@
         "donorOnly": {
           "__name": "MAP_MESSAGE_OF_THE_DAY_SETTINGS_DONOR_ONLY",
           "__format": "boolean"
+        },
+        "timeoutSeconds": {
+          "__name": "MAP_MESSAGE_OF_THE_DAY_SETTINGS_TIMEOUT_SECONDS",
+          "__format": "number"
         }
       },
       "titles": {
