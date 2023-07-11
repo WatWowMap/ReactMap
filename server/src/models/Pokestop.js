@@ -537,11 +537,11 @@ module.exports = class Pokestop extends Model {
                 '>=',
                 safeTs * (multiInvasionMs ? 1000 : 1),
               )
+              if (hasConfirmed && onlyConfirmed) {
+                invasion.andWhere('confirmed', onlyConfirmed)
+              }
               invasion.andWhere((subQuery) => {
                 if (hasConfirmed) {
-                  if (onlyConfirmed) {
-                    subQuery.andWhere('confirmed', onlyConfirmed)
-                  }
                   if (rocketPokemon.length) {
                     subQuery
                       .whereIn('slot_1_pokemon_id', rocketPokemon)
