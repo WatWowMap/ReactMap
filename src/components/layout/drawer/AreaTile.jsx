@@ -13,6 +13,7 @@ export default function AreaTile({
   map,
   scanAreas,
   setAreas,
+  backgroundColor,
 }) {
   if (!scanAreas) return null
 
@@ -39,7 +40,7 @@ export default function AreaTile({
       }
       style={{
         border: `1px solid ${feature?.properties?.color || 'grey'}`,
-        backgroundColor: feature?.properties?.fillColor || 'none',
+        backgroundColor,
       }}
     >
       <MenuItem
@@ -94,9 +95,7 @@ export default function AreaTile({
                 color:
                   hasManual ||
                   (name ? !childAreas.length : !feature.properties.name)
-                    ? feature?.properties?.fillColor ||
-                      feature?.properties?.fill ||
-                      '#212121'
+                    ? backgroundColor
                     : 'none',
               }}
               disabled={

@@ -9,7 +9,13 @@ import { useTranslation } from 'react-i18next'
 import { fromSnakeCase } from '@services/functions/fromSnakeCase'
 
 /**
- * @param {{ field: string, label?: string, disabled?: boolean, children?: React.ReactNode}} props
+ * @param {{
+ *  field: string,
+ *  label?: string,
+ *  disabled?: boolean,
+ *  children?: React.ReactNode,
+ * }} props
+ * @returns {JSX.Element}
  */
 export default function BoolToggle({
   field,

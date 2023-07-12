@@ -18,7 +18,7 @@ export default function MultiSelector({
       : filters
 
   return (
-    <ButtonGroup size="small">
+    <ButtonGroup size="small" sx={{ mx: 'auto' }}>
       {items.map((item) => (
         <Button
           key={item}

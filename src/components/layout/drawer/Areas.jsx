@@ -1,8 +1,18 @@
 import React, { useMemo } from 'react'
 import { useMap } from 'react-leaflet'
 import { useQuery } from '@apollo/client'
-import { Grid, Button, Paper, TextField } from '@mui/material'
+import {
+  Grid,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListItem,
+  Paper,
+  TextField,
+  useTheme,
+} from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
 import Query from '@services/Query'
 import { useStatic, useStore } from '@hooks/useStore'
@@ -15,6 +25,7 @@ export default function AreaDropDown() {
   const { setAreas, setFilters } = useStore.getState()
   const { config } = useStatic.getState()
   const map = useMap()
+  const theme = useTheme()
 
   const allAreas = useMemo(() => {
     if (data?.scanAreasMenu) {
@@ -31,21 +42,13 @@ export default function AreaDropDown() {
 
   return (
     <>
-      <Grid
-        item
-        xs={t('drawer_grid_advanced_width')}
-        style={{ textAlign: 'center' }}
-      >
-        <Button
-          onClick={() => setAreas()}
-          variant="contained"
-          color="primary"
-          style={{ minWidth: '80%' }}
-        >
-          {t('reset')}
-        </Button>
-      </Grid>
-      <Grid item xs={12} style={{ textAlign: 'center' }}>
+      <ListItemButton onClick={() => setAreas()}>
+        <ListItemIcon>
+          <RestartAltIcon color="primary" />
+        </ListItemIcon>
+        <ListItemText primary={t('reset')} />
+      </ListItemButton>
+      <ListItem>
         <TextField
           label={t('search')}
           variant="outlined"
@@ -64,12 +67,13 @@ export default function AreaDropDown() {
             })
           }
         />
-      </Grid>
+      </ListItem>
       <Paper
-        style={{
+        elevation={0}
+        sx={{
+          px: 1,
           minHeight: 50,
           maxHeight: config.map.scanAreaMenuHeight || 400,
-          width: '100%',
           overflow: 'auto',
           backgroundColor: '#212121',
         }}
@@ -105,6 +109,7 @@ export default function AreaDropDown() {
                     map={map}
                     scanAreas={filters.scanAreas}
                     setAreas={setAreas}
+                    backgroundColor={theme.palette.background.paper}
                   />
                 )}
                 {children.map((feature, i) => (
@@ -118,6 +123,7 @@ export default function AreaDropDown() {
                     map={map}
                     scanAreas={filters.scanAreas}
                     setAreas={setAreas}
+                    backgroundColor={theme.palette.background.paper}
                   />
                 ))}
               </Grid>

@@ -3,7 +3,6 @@ import {
   Divider,
   FormControl,
   InputLabel,
-  List,
   ListItem,
   ListItemIcon,
   MenuItem,
@@ -64,7 +63,7 @@ export default function Settings() {
   const darkMode = useStore((s) => s.darkMode)
 
   return (
-    <List dense style={{ width: '100%' }}>
+    <>
       {Object.keys(staticSettings).map((setting) => {
         const Icon = ICON_MAP[setting] || DevicesOtherIcon
         return (
@@ -139,6 +138,6 @@ export default function Settings() {
           <DrawerActions />
         </>
       )}
-    </List>
+    </>
   )
 }
