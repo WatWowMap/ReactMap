@@ -1,45 +1,50 @@
+// @ts-check
 import { responsiveFontSizes } from '@mui/material'
 import { createTheme } from '@mui/material/styles'
 
-export default function setTheme(theme) {
+/**
+ * @param {{ primary: string, secondary: string }} theme
+ * @param {boolean} darkMode
+ * @returns
+ */
+export default function setTheme(theme, darkMode) {
   return responsiveFontSizes(
     createTheme({
       palette: {
-        mode: 'dark',
+        mode: darkMode ? 'dark' : 'light',
         primary: {
-          light: '#ff784e',
           main: theme?.primary || '#ff5722',
-          dark: '#b23c17',
-          contrastText: '#fff',
         },
         secondary: {
-          light: '#33bfff',
           main: theme?.secondary || '#00b0ff',
-          dark: '#007bb2',
-          contrastText: '#fff',
         },
-        action: {
-          main: '#00e676',
-          contrastText: '#fff',
-          active: '#00e676',
-        },
-        grey: {
-          light: '#bdbdbd',
-          main: '#333333',
-          dark: '#424242',
-          contrastText: '#fff',
-        },
-        background: {
-          paper: '#333333',
-          default: '#333333',
-        },
-        text: {
-          primary: '#f5f5f5',
-          secondary: 'white',
-          hint: '#a0a0a0',
-        },
+        // action: {
+        //   main: '#00e676',
+        //   contrastText: '#fff',
+        //   active: '#00e676',
+        // },
+        // grey: {
+        //   light: '#bdbdbd',
+        //   main: '#333333',
+        //   dark: '#424242',
+        //   contrastText: '#fff',
+        // },
+        // background: {
+        //   paper: '#111111',
+        //   default: '#333333',
+        // },
+        // text: {
+        //   primary: '#f5f5f5',
+        //   secondary: 'white',
+        //   // hint: '#a0a0a0',
+        // },
       },
       components: {
+        MuiAccordion: {
+          defaultProps: {
+            disableGutters: true,
+          },
+        },
         MuiButtonBase: {
           defaultProps: {
             disableRipple: true,
@@ -48,29 +53,6 @@ export default function setTheme(theme) {
         MuiButton: {
           defaultProps: {
             disableRipple: true,
-          },
-        },
-        MuiAccordion: {
-          styleOverrides: {
-            root: {
-              '.&expanded': {
-                margin: '1px 0',
-              },
-            },
-          },
-        },
-        MuiAccordionSummary: {
-          styleOverrides: {
-            root: {
-              '.&expanded': {
-                minHeight: 10,
-              },
-            },
-            content: {
-              '.&expanded': {
-                margin: '10px 0',
-              },
-            },
           },
         },
         MuiSelect: {
@@ -97,25 +79,6 @@ export default function setTheme(theme) {
       //       padding: '12px 24px',
       //     },
       //   },
-      // MuiAccordion: {
-      //   root: {
-      //     '&$expanded': {
-      //       margin: '1px 0',
-      //     },
-      //   },
-      // },
-      // MuiAccordionSummary: {
-      //   root: {
-      //     '&$expanded': {
-      //       minHeight: 10,
-      //     },
-      //   },
-      //   content: {
-      //     '&$expanded': {
-      //       margin: '10px 0',
-      //     },
-      //   },
-      // },
       //   MuiSelect: {
       //     icon: {
       //       color: 'white',

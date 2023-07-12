@@ -2,9 +2,9 @@ import '@assets/css/main.css'
 import 'leaflet.locatecontrol/dist/L.Control.Locate.css'
 import 'leaflet/dist/leaflet.css'
 
-import React, { Suspense } from 'react'
+import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
-
+import { ThemeProvider, createTheme } from '@mui/material'
 import { ApolloProvider } from '@apollo/client'
 import client from '@services/apollo'
 
@@ -37,16 +37,19 @@ const SetText = () => {
 }
 
 export default function App() {
-  document.body.classList.add('dark')
+  const [theme, setTheme] = React.useState(createTheme())
+
   return (
-    <Suspense fallback={<SetText />}>
-      <ApolloProvider client={client}>
-        <ErrorBoundary>
-          <BrowserRouter>
-            <Config />
-          </BrowserRouter>
-        </ErrorBoundary>
-      </ApolloProvider>
-    </Suspense>
+    <React.Suspense fallback={<SetText />}>
+      <ThemeProvider theme={theme}>
+        <ApolloProvider client={client}>
+          <ErrorBoundary>
+            <BrowserRouter>
+              <Config setTheme={setTheme} />
+            </BrowserRouter>
+          </ErrorBoundary>
+        </ApolloProvider>
+      </ThemeProvider>
+    </React.Suspense>
   )
 }

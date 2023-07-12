@@ -51,7 +51,6 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
             style={{
               fontWeight: 'bold',
               margin: 10,
-              textShadow: '2px 2px #323232',
             }}
           >
             {title}
@@ -75,5 +74,5 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
         {separateDrawerActions && <Actions />}
       </Box>
     </Drawer>
-  );
+  )
 }

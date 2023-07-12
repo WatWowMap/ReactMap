@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware'
 export const useStore = create(
   persist(
     (set, get) => ({
+      darkMode: true,
       location: undefined,
       setLocation: (location) => set({ location }),
       zoom: undefined,

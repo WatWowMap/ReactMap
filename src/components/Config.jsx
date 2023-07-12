@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import { ThemeProvider } from '@mui/styles'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import setTheme from '@assets/mui/theme'
+import makeTheme from '@assets/mui/theme'
 import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
+import { useStore } from '@hooks/useStore'
 
 import ReactRouter from './ReactRouter'
 import HolidayEffects from './HolidayEffects'
@@ -12,16 +12,18 @@ import HolidayEffects from './HolidayEffects'
 const rootLoading = document.getElementById('loader')
 const loadingText = document.getElementById('loading-text')
 
-export default function Config() {
+export default function Config({ setTheme }) {
   const { t } = useTranslation()
-  const [serverSettings, setServerSettings] = useState(null)
+  const darkMode = useStore((s) => s.darkMode)
+
+  const [serverSettings, setServerSettings] = React.useState(null)
 
   if (rootLoading) {
     if (serverSettings) {
       rootLoading.style.display = 'none'
     }
   }
-  const getServerSettings = useCallback(async () => {
+  const getServerSettings = React.useCallback(async () => {
     const data = await Fetch.getSettings()
     if (data?.config && data?.masterfile) {
       if (data.masterfile?.questRewardTypes) {
@@ -47,7 +49,7 @@ export default function Config() {
     }
   }, [])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!serverSettings) {
       if (loadingText) {
         loadingText.innerText = t('loading_settings')
@@ -56,18 +58,22 @@ export default function Config() {
     }
   }, [])
 
-  const theme = React.useMemo(
-    () => setTheme(serverSettings?.config?.map?.theme),
-    [serverSettings?.config?.map?.theme],
-  )
+  React.useEffect(() => {
+    // this is separate from the above useEffect for better hot reloading during dev
+    setTheme(makeTheme(serverSettings?.config?.map?.theme, darkMode))
+    if (darkMode) {
+      document.body.classList.add('dark')
+    } else {
+      document.body.classList.remove('dark')
+    }
+  }, [serverSettings?.config?.map?.theme, darkMode])
 
   if (!serverSettings) {
     return <div />
   }
 
-  console.log(theme)
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <ReactRouter
         serverSettings={serverSettings}
         getServerSettings={getServerSettings}
@@ -75,6 +81,6 @@ export default function Config() {
       <HolidayEffects
         holidayEffects={serverSettings?.config?.map?.holidayEffects || []}
       />
-    </ThemeProvider>
+    </>
   )
 }
