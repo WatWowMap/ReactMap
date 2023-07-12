@@ -79,6 +79,8 @@ export default function FloatingButtons({
     ? DonationIcons[donationPage.fabIcon || 'card']
     : null
 
+  const disabled =
+    Boolean(webhookMode) || Boolean(scanNextMode) || Boolean(scanZoneMode)
   return (
     <Grid
       container
@@ -95,11 +97,7 @@ export default function FloatingButtons({
           size={fabSize}
           onClick={toggleDrawer(true)}
           title={t('open_menu')}
-          disabled={
-            Boolean(webhookMode) ||
-            Boolean(scanNextMode) ||
-            Boolean(scanZoneMode)
-          }
+          disabled={disabled}
         >
           <Menu fontSize={iconSize} />
         </Fab>
@@ -111,11 +109,7 @@ export default function FloatingButtons({
             size={fabSize}
             onClick={() => setUserProfile(true)}
             title={t('user_profile')}
-            disabled={
-              Boolean(webhookMode) ||
-              Boolean(scanNextMode) ||
-              Boolean(scanZoneMode)
-            }
+            disabled={disabled}
           >
             <Person fontSize={iconSize} />
           </Fab>
@@ -130,13 +124,9 @@ export default function FloatingButtons({
             size={fabSize}
             onClick={toggleDialog(true, '', 'search')}
             title={t('search')}
-            disabled={
-              Boolean(webhookMode) ||
-              Boolean(scanNextMode) ||
-              Boolean(scanZoneMode)
-            }
+            disabled={disabled}
           >
-            <Search fontSize={iconSize} />
+            <Search fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </Grid>
       ) : null}
@@ -147,13 +137,9 @@ export default function FloatingButtons({
             size={fabSize}
             onClick={() => setWebhookMode('open')}
             title={selectedWebhook}
-            disabled={
-              Boolean(webhookMode) ||
-              Boolean(scanNextMode) ||
-              Boolean(scanZoneMode)
-            }
+            disabled={disabled}
           >
-            <NotificationsActive fontSize={iconSize} />
+            <NotificationsActive fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </Grid>
       ) : null}
@@ -170,7 +156,7 @@ export default function FloatingButtons({
             title={t('scan_next')}
             disabled={Boolean(webhookMode) || Boolean(scanZoneMode)}
           >
-            <TrackChanges fontSize={iconSize} />
+            <TrackChanges fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </Grid>
       ) : null}
@@ -189,7 +175,7 @@ export default function FloatingButtons({
             title={t('scan_zone')}
             disabled={Boolean(webhookMode) || Boolean(scanNextMode)}
           >
-            <BlurOn fontSize={iconSize} />
+            <BlurOn fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </Grid>
       ) : null}
@@ -200,13 +186,9 @@ export default function FloatingButtons({
             size={fabSize}
             onClick={() => setDonorPage(true)}
             title={t('donor_menu')}
-            disabled={
-              Boolean(webhookMode) ||
-              Boolean(scanNextMode) ||
-              Boolean(scanZoneMode)
-            }
+            disabled={disabled}
           >
-            <DonorIcon fontSize={iconSize} />
+            <DonorIcon fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </Grid>
       ) : null}
@@ -219,7 +201,11 @@ export default function FloatingButtons({
               onClick={() => lc._onClick()}
               title={t('use_my_location')}
             >
-              <MyLocation color={color} fontSize={iconSize} />
+              <MyLocation
+                color={color}
+                fontSize={iconSize}
+                sx={{ color: 'white' }}
+              />
             </Fab>
           </Grid>
           <Grid item>
@@ -229,7 +215,7 @@ export default function FloatingButtons({
               onClick={() => map.zoomIn()}
               title={t('zoom_in')}
             >
-              <ZoomIn fontSize={iconSize} />
+              <ZoomIn fontSize={iconSize} sx={{ color: 'white' }} />
             </Fab>
           </Grid>
           <Grid item>
@@ -239,7 +225,7 @@ export default function FloatingButtons({
               onClick={() => map.zoomOut()}
               title={t('zoom_out')}
             >
-              <ZoomOut fontSize={iconSize} />
+              <ZoomOut fontSize={iconSize} sx={{ color: 'white' }} />
             </Fab>
           </Grid>
         </>
@@ -252,7 +238,7 @@ export default function FloatingButtons({
             onClick={() => setWebhookMode('open')}
             title={t('save')}
           >
-            <Save fontSize={iconSize} />
+            <Save fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </Grid>
       )}
@@ -265,7 +251,7 @@ export default function FloatingButtons({
             referrerPolicy="no-referrer"
             target={icon.target || '_blank'}
           >
-            <FAIcon className={icon.icon} fontSize={iconSize} color="white" />
+            <FAIcon className={icon.icon} fontSize={iconSize} />
           </Fab>
         </Grid>
       ))}
