@@ -103,9 +103,9 @@ export default function WithSliders({ category, context }) {
             <Tabs
               value={openTab}
               onChange={handleTabChange}
+              textColor="inherit"
               indicatorColor="secondary"
               variant="fullWidth"
-              style={{ backgroundColor: '#424242' }}
             >
               {Object.keys(context.sliders).map((slider) => (
                 <Tab
@@ -120,7 +120,7 @@ export default function WithSliders({ category, context }) {
             <TabPanel value={openTab} index={index} key={slider}>
               <List>
                 {Object.values(context.sliders[slider]).map((subItem) => (
-                  <ListItem key={subItem} disablePadding>
+                  <ListItem key={subItem.name} disablePadding>
                     <SliderTile
                       filterSlide={subItem}
                       handleChange={handleChange}
@@ -194,12 +194,11 @@ export default function WithSliders({ category, context }) {
                     <ListItem
                       secondaryAction={
                         <MultiSelector
-                          category={category}
                           filterKey="gender"
                           items={[0, 1, 2, 3]}
                           tKey="gender_icon_"
                           filters={filters[category].ivOr.gender}
-                          setFilter={(newValue) =>
+                          setFilters={(newValue) =>
                             setFilters({
                               ...filters,
                               [category]: {
