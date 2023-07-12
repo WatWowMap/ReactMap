@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import React, { useEffect, useState } from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useStore } from '@hooks/useStore'
 import Query from '@services/Query'
 import ScanNextTarget from './ScanNextTarget'
 import ScanZoneTarget from './ScanZoneTarget'
@@ -36,7 +36,6 @@ export default function ScanOnDemand({
   const [scanCoords, setScanCoords] = useState([location])
   const [scanNextType, setScanNextType] = useState('S')
   const [scanZoneSize, setScanZoneSize] = useState(1)
-  const scannerCooldown = useStatic((s) => s.scannerCooldown)
 
   const { data: scanAreas } = useQuery(Query.scanAreas())
   const [demandScan, { error: scannerError, data: scannerResponse }] =
@@ -73,10 +72,10 @@ export default function ScanOnDemand({
       demandScan()
       setScanMode('loading')
       const timer = mode === 'scanNext' ? scanNextCooldown : scanZoneCooldown
-      useStatic.setState({
+      useStore.setState({
         scannerCooldown:
-          (typeof timer === 'number' ? timer : 0) *
-          (mode === 'scanNext' ? scanCoords.length : scanZoneSize),
+          (typeof timer === 'number' ? Math.floor(timer) : 0) *
+          scanCoords.length,
       })
     }
   }, [scanMode])
@@ -116,16 +115,6 @@ export default function ScanOnDemand({
       scannerQueueResponse.scanner = {}
     }
   }, [!!scannerQueueResponse?.scanner])
-
-  useEffect(() => {
-    if (scannerCooldown > 0) {
-      const timeout = setInterval(() => {
-        const newTime = scannerCooldown - 1
-        useStatic.setState({ scannerCooldown: newTime })
-      }, 1000)
-      return () => clearInterval(timeout)
-    }
-  }, [scannerCooldown])
 
   return (
     <>

@@ -1,6 +1,5 @@
 import '@assets/css/main.css'
 import 'leaflet.locatecontrol/dist/L.Control.Locate.css'
-import 'react-leaflet-markercluster/dist/styles.min.css'
 import 'leaflet/dist/leaflet.css'
 
 import React, { Suspense } from 'react'

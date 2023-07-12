@@ -329,7 +329,7 @@
   "popup": "現れる",
   "pvp_level": "レベル{{level}} PVP統計",
   "pvp_mega": "メガPVP統計",
-  "webhook_entry": "{{category}}を{{name}}に追加します",
+  "webhook_entry": "を{{name}}に追加します",
   "distance": "距離",
   "gym": "ジム",
   "egg": "卵",

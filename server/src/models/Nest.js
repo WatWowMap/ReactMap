@@ -9,7 +9,6 @@ const {
     nests: { avgFilter },
   },
 } = require('../services/config')
-const fetchNests = require('../services/api/fetchNests')
 
 module.exports = class Nest extends Model {
   static get tableName() {
@@ -82,16 +81,14 @@ module.exports = class Nest extends Model {
       .orderBy('pokemon_id', 'asc')
 
     return {
-      available: results.length
-        ? results.map((pokemon) => {
-            if (pokemon.pokemon_form == 0 || pokemon.pokemon_form === null) {
-              return `${pokemon.pokemon_id}-${
-                Event.masterfile.pokemon[pokemon.pokemon_id].defaultFormId || 0
-              }`
-            }
-            return `${pokemon.pokemon_id}-${pokemon.pokemon_form || 0}`
-          })
-        : fetchNests(),
+      available: results.map((pokemon) => {
+        if (pokemon.pokemon_form == 0 || pokemon.pokemon_form === null) {
+          return `${pokemon.pokemon_id}-${
+            Event.masterfile.pokemon[pokemon.pokemon_id].defaultFormId || 0
+          }`
+        }
+        return `${pokemon.pokemon_id}-${pokemon.pokemon_form || 0}`
+      }),
     }
   }
 

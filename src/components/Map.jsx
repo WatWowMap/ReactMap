@@ -7,6 +7,7 @@ import L from 'leaflet'
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
 import useTileLayer from '@hooks/useTileLayer'
+import useCooldown from '@hooks/useCooldown'
 
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
@@ -40,6 +41,7 @@ export default function Map({
   Utility.analytics(window.location.pathname)
 
   const map = useMap()
+  useCooldown()
   map.attributionControl.setPrefix(config.attributionPrefix || '')
 
   const theme = useTheme()
