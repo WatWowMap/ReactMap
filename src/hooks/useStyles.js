@@ -1,5 +1,5 @@
-import { makeStyles } from '@material-ui/styles'
-import { purple } from '@material-ui/core/colors'
+import { makeStyles } from '@mui/styles'
+import { purple } from '@mui/material/colors'
 
 export default makeStyles((theme) => ({
   gridItem: {
@@ -51,7 +51,7 @@ export default makeStyles((theme) => ({
   },
   floatingBtn: {
     '& > *': {
-      margin: `${theme.spacing(1)}px !important`,
+      margin: `${theme.spacing(1)} !important`,
       position: 'sticky',
       top: 0,
       left: 5,

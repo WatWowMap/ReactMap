@@ -1,6 +1,6 @@
 import React from 'react'
-import Map from '@material-ui/icons/Map'
-import { IconButton } from '@material-ui/core'
+import Map from '@mui/icons-material/Map'
+import { IconButton } from '@mui/material'
 
 import { useStore, useStatic } from '@hooks/useStore'
 
@@ -17,8 +17,8 @@ export default function Navigation({ lat, lon }) {
       href={url.replace('{x}', lat).replace('{y}', lon)}
       target="_blank"
       rel="noreferrer"
-    >
+      size="large">
       <Map style={{ color: 'white' }} />
     </IconButton>
-  )
+  );
 }

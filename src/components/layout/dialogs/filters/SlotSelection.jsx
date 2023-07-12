@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import Clear from '@material-ui/icons/Clear'
-import Check from '@material-ui/icons/Check'
-import { Grid, DialogContent, IconButton } from '@material-ui/core'
+import Clear from '@mui/icons-material/Clear'
+import Check from '@mui/icons-material/Check'
+import { Grid, DialogContent, IconButton } from '@mui/material'
 
 import { useStatic } from '@hooks/useStore'
 
@@ -35,128 +35,126 @@ export default function SlotSelection({
     setFilterValues({ ...slotsObj })
   }
 
-  return (
-    <>
-      <Header
-        titles={[`team_${teamId}`, 'slot_selection']}
-        action={toggleSlotsMenu(false)}
-      />
-      <DialogContent style={{ color: 'white' }}>
-        <Grid
-          container
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-        >
-          {relevantSlots.map((each) => (
-            <Grid
-              container
-              item
-              key={each}
-              xs={12}
-              sm={6}
-              direction="row"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Grid item xs={2} style={{ textAlign: 'center' }}>
-                <img
-                  src={Icons.getGyms(...each.slice(1).split('-'))}
-                  style={{ maxWidth: 50, maxHeight: 50 }}
-                  alt={each}
-                />
-              </Grid>
-              <Grid item xs={8} style={{ textAlign: 'center' }}>
-                <Size
-                  filterValues={filterValues[each]}
-                  handleChange={(name, value) => {
-                    setFilterValues({
-                      ...filterValues,
-                      [each]: {
-                        ...filterValues[each],
-                        [name]: value,
-                      },
-                    })
-                  }}
-                  btnSize="small"
-                />
-              </Grid>
-              <Grid item xs={2}>
-                <IconButton
-                  onClick={() => {
-                    setFilterValues({
-                      ...filterValues,
-                      [each]: {
-                        ...filterValues[each],
-                        enabled: !filterValues[each].enabled,
-                      },
-                    })
-                  }}
-                >
-                  {filterValues[each].enabled ? (
-                    <Check style={{ color: '#00e676' }} />
-                  ) : (
-                    <Clear color="primary" />
-                  )}
-                </IconButton>
-              </Grid>
-            </Grid>
-          ))}
-          {isMobile && (
-            <Grid
-              item
-              xs={12}
-              style={{ textAlign: 'center', margin: '15px 0' }}
-            >
-              <Size
-                filterValues={filterValues[team]}
-                handleChange={handleSizeChange}
-                btnSize="medium"
+  return <>
+    <Header
+      titles={[`team_${teamId}`, 'slot_selection']}
+      action={toggleSlotsMenu(false)}
+    />
+    <DialogContent style={{ color: 'white' }}>
+      <Grid
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        {relevantSlots.map((each) => (
+          <Grid
+            container
+            item
+            key={each}
+            xs={12}
+            sm={6}
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Grid item xs={2} style={{ textAlign: 'center' }}>
+              <img
+                src={Icons.getGyms(...each.slice(1).split('-'))}
+                style={{ maxWidth: 50, maxHeight: 50 }}
+                alt={each}
               />
             </Grid>
-          )}
-        </Grid>
-      </DialogContent>
-      <Footer
-        options={[
-          ...(isMobile
-            ? []
-            : [
-                {
-                  key: 'size',
-                  component: (
-                    <Size
-                      filterValues={filterValues[team]}
-                      handleChange={handleSizeChange}
-                      btnSize="medium"
-                    />
-                  ),
-                  size: 6,
-                },
-              ]),
-          {
-            name: 'disable_all',
-            action: () => handleSizeChange('all', false),
-            color: 'primary',
-            icon: 'Clear',
-            size: 2,
-          },
-          {
-            name: 'enable_all',
-            action: () => handleSizeChange('all', true),
-            color: '#00e676',
-            icon: 'Check',
-            size: 2,
-          },
-          {
-            name: 'save',
-            action: toggleSlotsMenu(false, teamId, filterValues),
-            color: 'secondary',
-            icon: 'Save',
-            size: 2,
-          },
-        ]}
-      />
-    </>
-  )
+            <Grid item xs={8} style={{ textAlign: 'center' }}>
+              <Size
+                filterValues={filterValues[each]}
+                handleChange={(name, value) => {
+                  setFilterValues({
+                    ...filterValues,
+                    [each]: {
+                      ...filterValues[each],
+                      [name]: value,
+                    },
+                  })
+                }}
+                btnSize="small"
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <IconButton
+                onClick={() => {
+                  setFilterValues({
+                    ...filterValues,
+                    [each]: {
+                      ...filterValues[each],
+                      enabled: !filterValues[each].enabled,
+                    },
+                  })
+                }}
+                size="large">
+                {filterValues[each].enabled ? (
+                  <Check style={{ color: '#00e676' }} />
+                ) : (
+                  <Clear color="primary" />
+                )}
+              </IconButton>
+            </Grid>
+          </Grid>
+        ))}
+        {isMobile && (
+          <Grid
+            item
+            xs={12}
+            style={{ textAlign: 'center', margin: '15px 0' }}
+          >
+            <Size
+              filterValues={filterValues[team]}
+              handleChange={handleSizeChange}
+              btnSize="medium"
+            />
+          </Grid>
+        )}
+      </Grid>
+    </DialogContent>
+    <Footer
+      options={[
+        ...(isMobile
+          ? []
+          : [
+              {
+                key: 'size',
+                component: (
+                  <Size
+                    filterValues={filterValues[team]}
+                    handleChange={handleSizeChange}
+                    btnSize="medium"
+                  />
+                ),
+                size: 6,
+              },
+            ]),
+        {
+          name: 'disable_all',
+          action: () => handleSizeChange('all', false),
+          color: 'primary',
+          icon: 'Clear',
+          size: 2,
+        },
+        {
+          name: 'enable_all',
+          action: () => handleSizeChange('all', true),
+          color: '#00e676',
+          icon: 'Check',
+          size: 2,
+        },
+        {
+          name: 'save',
+          action: toggleSlotsMenu(false, teamId, filterValues),
+          color: 'secondary',
+          icon: 'Save',
+          size: 2,
+        },
+      ]}
+    />
+  </>;
 }

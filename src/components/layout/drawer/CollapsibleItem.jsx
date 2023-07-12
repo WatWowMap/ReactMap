@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import * as React from 'react'
-import Grid from '@material-ui/core/Grid'
-import Collapse from '@material-ui/core/Collapse'
+import Grid from '@mui/material/Grid'
+import Collapse from '@mui/material/Collapse'
 
 export default function CollapsibleItem({ open, children, ...props }) {
   return (

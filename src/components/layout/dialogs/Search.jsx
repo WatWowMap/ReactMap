@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
   Grid,
-} from '@material-ui/core'
+} from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
 
@@ -296,5 +296,5 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
         ))}
       </Grid>
     </div>
-  )
+  );
 }

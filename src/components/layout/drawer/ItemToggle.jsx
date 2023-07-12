@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Typography, Switch } from '@material-ui/core'
+import { Grid, Typography, Switch } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'

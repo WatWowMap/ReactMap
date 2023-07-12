@@ -1,14 +1,14 @@
 import React, { useEffect, useCallback, memo } from 'react'
-import LocationOn from '@material-ui/icons/LocationOn'
-import MyLocation from '@material-ui/icons/MyLocation'
+import LocationOn from '@mui/icons-material/LocationOn'
+import MyLocation from '@mui/icons-material/MyLocation'
 import {
   Grid,
   Button,
   TextField,
   Typography,
   CircularProgress,
-} from '@material-ui/core'
-import { Autocomplete } from '@material-ui/lab'
+  Autocomplete,
+} from '@mui/material'
 
 import { useLazyQuery } from '@apollo/client'
 import { useMapEvents } from 'react-leaflet'

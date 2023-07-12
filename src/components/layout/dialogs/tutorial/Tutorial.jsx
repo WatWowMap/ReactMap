@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft'
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import {
   DialogActions,
   Button,
   MobileStepper,
   useMediaQuery,
-} from '@material-ui/core'
+} from '@mui/material'
 
-import { useTheme } from '@material-ui/core/styles'
+import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 

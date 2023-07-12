@@ -2,7 +2,7 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Grid, Typography, Button } from '@material-ui/core'
+import { Grid, Typography, Button } from '@mui/material'
 
 export default function Blocked({ serverSettings }) {
   const { t } = useTranslation()

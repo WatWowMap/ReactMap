@@ -6,7 +6,7 @@ import {
   OutlinedInput,
   InputAdornment,
   FormControl,
-} from '@material-ui/core'
+} from '@mui/material'
 import { Circle, Marker, Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import fallbackIcon from '@components/markers/fallback'
@@ -47,59 +47,57 @@ export default function DraggableMarker({
     }
   }, [])
 
-  return (
-    <>
-      <Marker
-        draggable
-        eventHandlers={eventHandlers}
-        position={position}
-        ref={markerRef}
-        icon={fallbackIcon()}
-      >
-        <Popup minWidth={90} maxWidth={150} ref={popupRef}>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="center"
-            direction="column"
-            spacing={2}
-          >
-            <Grid item>
-              <Typography variant="subtitle2" align="center">
-                {t('drag_and_drop')}
-              </Typography>
-            </Grid>
-            <Grid item style={{ textAlign: 'center' }}>
-              <FormControl variant="outlined">
-                <OutlinedInput
-                  value={radius}
-                  onChange={(e) =>
-                    setRadius(e.target.value.replace(/[^0-9.]/g, ''))
-                  }
-                  endAdornment={
-                    <InputAdornment position="end">{t('m')}</InputAdornment>
-                  }
-                  labelWidth={0}
-                />
-              </FormControl>
-              <Typography variant="caption">{t('distance_radius')}</Typography>
-            </Grid>
-            <Grid item>
-              <Button
-                color="secondary"
-                variant="contained"
-                onClick={() => {
-                  setWebhookMode('open')
-                  setWebhookLocation(position)
-                }}
-              >
-                {t('click_to_select')}
-              </Button>
-            </Grid>
+  return <>
+    <Marker
+      draggable
+      eventHandlers={eventHandlers}
+      position={position}
+      ref={markerRef}
+      icon={fallbackIcon()}
+    >
+      <Popup minWidth={90} maxWidth={150} ref={popupRef}>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="center"
+          direction="column"
+          spacing={2}
+        >
+          <Grid item>
+            <Typography variant="subtitle2" align="center">
+              {t('drag_and_drop')}
+            </Typography>
           </Grid>
-        </Popup>
-      </Marker>
-      <Circle radius={radius} center={position} />
-    </>
-  )
+          <Grid item style={{ textAlign: 'center' }}>
+            <FormControl variant="outlined">
+              <OutlinedInput
+                value={radius}
+                onChange={(e) =>
+                  setRadius(e.target.value.replace(/[^0-9.]/g, ''))
+                }
+                endAdornment={
+                  <InputAdornment position="end">{t('m')}</InputAdornment>
+                }
+                labelWidth={0}
+              />
+            </FormControl>
+            <Typography variant="caption">{t('distance_radius')}</Typography>
+          </Grid>
+          <Grid item>
+            <Button
+              color="secondary"
+              variant="contained"
+              onClick={() => {
+                setWebhookMode('open')
+                setWebhookLocation(position)
+              }}
+            >
+              {t('click_to_select')}
+            </Button>
+          </Grid>
+        </Grid>
+      </Popup>
+    </Marker>
+    <Circle radius={radius} center={position} />
+  </>;
 }

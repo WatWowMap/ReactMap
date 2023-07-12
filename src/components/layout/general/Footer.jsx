@@ -5,8 +5,8 @@ import {
   Typography,
   useMediaQuery,
   Grid,
-} from '@material-ui/core'
-import { useTheme } from '@material-ui/styles'
+} from '@mui/material'
+import { useTheme } from '@mui/styles'
 import { useTranslation } from 'react-i18next'
 
 import useStyles from '@hooks/useStyles'
@@ -59,7 +59,7 @@ export default function Footer({ options, role }) {
                 target={button.link ? button.target || '_blank' : undefined}
                 onClick={button.action || undefined}
                 disabled={button.disabled}
-              >
+                size="large">
                 <MuiIcon
                   color={muiColor ? color : 'inherit'}
                   style={{ color: muiColor ? null : color }}
@@ -85,8 +85,8 @@ export default function Footer({ options, role }) {
               </Button>
             )}
           </Grid>
-        )
+        );
       })}
     </Grid>
-  )
+  );
 }

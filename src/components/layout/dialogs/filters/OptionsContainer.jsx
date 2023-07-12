@@ -1,6 +1,6 @@
 import React from 'react'
-import Clear from '@material-ui/icons/Clear'
-import { Grid, Typography, Button, Chip, IconButton } from '@material-ui/core'
+import Clear from '@mui/icons-material/Clear'
+import { Grid, Typography, Button, Chip, IconButton } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
@@ -127,7 +127,7 @@ export default function OptionsContainer({
     allFilterMenus.unshift(
       <Grid container key="close" justifyContent="center" alignItems="center">
         <Grid item xs={12} style={{ textAlign: 'right' }}>
-          <IconButton onClick={toggleDrawer(false)}>
+          <IconButton onClick={toggleDrawer(false)} size="large">
             <Clear style={{ color: 'white' }} />
           </IconButton>
         </Grid>

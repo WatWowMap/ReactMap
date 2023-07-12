@@ -17,8 +17,8 @@ import {
   Button,
   ButtonGroup,
   Divider,
-} from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
+} from '@mui/material'
+import Edit from '@mui/icons-material/Edit'
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'

@@ -1,5 +1,5 @@
 import React from 'react'
-import { DialogContent, Typography, Divider, Grid } from '@material-ui/core'
+import { DialogContent, Typography, Divider, Grid } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 const closing = [0, 1, 2, 3, 4]

@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { Dialog, Snackbar } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
+import { Dialog, Snackbar, Alert } from '@mui/material'
 
 import Utility from '@services/Utility'
 import useStyles from '@hooks/useStyles'

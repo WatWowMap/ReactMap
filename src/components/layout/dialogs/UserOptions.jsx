@@ -8,7 +8,7 @@ import {
   Tab,
   Tabs,
   DialogContent,
-} from '@material-ui/core'
+} from '@mui/material'
 import { useTranslation, Trans } from 'react-i18next'
 
 import Utility from '@services/Utility'

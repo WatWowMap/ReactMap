@@ -2,8 +2,8 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Grid, Typography, useMediaQuery } from '@material-ui/core'
-import { useTheme } from '@material-ui/styles'
+import { Grid, Typography, useMediaQuery } from '@mui/material'
+import { useTheme } from '@mui/styles'
 
 import LocalLogin from './Local'
 import LocaleSelection from '../general/LocaleSelection'

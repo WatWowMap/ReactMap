@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useMap } from 'react-leaflet'
 import { useQuery } from '@apollo/client'
-import { Grid, Button, Paper, TextField } from '@material-ui/core'
+import { Grid, Button, Paper, TextField } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Query from '@services/Query'

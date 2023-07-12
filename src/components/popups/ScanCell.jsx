@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 import { Trans, useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'

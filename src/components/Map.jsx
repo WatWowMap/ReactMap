@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useMap, ZoomControl, TileLayer } from 'react-leaflet'
-import { useMediaQuery } from '@material-ui/core'
-import { useTheme } from '@material-ui/styles'
+import { useMediaQuery } from '@mui/material'
+import { useTheme } from '@mui/styles'
 import L from 'leaflet'
 
 import Utility from '@services/Utility'

@@ -5,7 +5,7 @@ import {
   Drawer,
   Grid,
   Typography,
-} from '@material-ui/core'
+} from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Grid, MenuItem, Typography, Checkbox } from '@material-ui/core'
+import { Grid, MenuItem, Typography, Checkbox } from '@mui/material'
 
 import Utility from '@services/Utility'
 

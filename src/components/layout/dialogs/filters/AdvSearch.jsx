@@ -1,6 +1,6 @@
 import React from 'react'
-import HighlightOff from '@material-ui/icons/HighlightOff'
-import { Paper, InputBase, IconButton } from '@material-ui/core'
+import HighlightOff from '@mui/icons-material/HighlightOff'
+import { Paper, InputBase, IconButton } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
@@ -35,9 +35,9 @@ export default function AdvSearch({ search, setSearch, category }) {
         autoComplete="off"
         variant="outlined"
       />
-      <IconButton className={classes.iconButton} onClick={resetSearch}>
+      <IconButton className={classes.iconButton} onClick={resetSearch} size="large">
         <HighlightOff style={{ color: '#848484' }} />
       </IconButton>
     </Paper>
-  )
+  );
 }

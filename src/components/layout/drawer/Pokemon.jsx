@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Fragment } from 'react'
-import { Grid, Typography, Switch, AppBar, Tab, Tabs } from '@material-ui/core'
+import { Grid, Typography, Switch, AppBar, Tab, Tabs } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import { useStore } from '@hooks/useStore'

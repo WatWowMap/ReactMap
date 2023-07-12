@@ -1,13 +1,13 @@
 import React, { Fragment, useState, useEffect } from 'react'
-import ExpandMore from '@material-ui/icons/ExpandMore'
-import MoreVert from '@material-ui/icons/MoreVert'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import MoreVert from '@mui/icons-material/MoreVert'
 import {
   Grid,
   Typography,
   Collapse,
   IconButton,
   Divider,
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { useTranslation, Trans } from 'react-i18next'
 
@@ -399,7 +399,7 @@ const MenuActions = ({
   }
   return (
     <Grid item xs={2} style={{ textAlign: 'right' }}>
-      <IconButton aria-haspopup="true" onClick={handleClick}>
+      <IconButton aria-haspopup="true" onClick={handleClick} size="large">
         <MoreVert style={{ color: 'white' }} />
       </IconButton>
       <Dropdown
@@ -408,7 +408,7 @@ const MenuActions = ({
         options={options}
       />
     </Grid>
-  )
+  );
 }
 
 const RewardInfo = ({ quest, Icons, config, t }) => {
@@ -594,13 +594,13 @@ const Footer = ({ pokestop, perms }) => {
               }))
             }
             aria-expanded={open}
-          >
+            size="large">
             <ExpandMore style={{ color: 'white' }} />
           </IconButton>
         </Grid>
       )}
     </Grid>
-  )
+  );
 }
 
 const ExtraInfo = ({ pokestop, userSettings, t, ts }) => {

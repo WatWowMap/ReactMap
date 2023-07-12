@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import MoreVert from '@material-ui/icons/MoreVert'
+import MoreVert from '@mui/icons-material/MoreVert'
 import {
   Grid,
   Typography,
@@ -7,7 +7,7 @@ import {
   Divider,
   Menu,
   MenuItem,
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
@@ -100,7 +100,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
           </Typography>
         </Grid>
         <Grid item xs={3}>
-          <IconButton aria-haspopup="true" onClick={handleClick}>
+          <IconButton aria-haspopup="true" onClick={handleClick} size="large">
             <MoreVert style={{ color: 'white' }} />
           </IconButton>
         </Grid>
@@ -170,5 +170,5 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
         </Grid>
       </Grid>
     </ErrorBoundary>
-  )
+  );
 }

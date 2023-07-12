@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Fab, Typography } from '@material-ui/core'
+import { Grid, Fab, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 export default function Selecting({ setSelected, handleAll, deleteAll }) {

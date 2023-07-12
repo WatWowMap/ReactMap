@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import Tune from '@material-ui/icons/Tune'
-import Ballot from '@material-ui/icons/Ballot'
-import Check from '@material-ui/icons/Check'
-import Clear from '@material-ui/icons/Clear'
-import Save from '@material-ui/icons/Save'
-import HelpOutline from '@material-ui/icons/HelpOutline'
-import FormatSize from '@material-ui/icons/FormatSize'
+import Tune from '@mui/icons-material/Tune'
+import Ballot from '@mui/icons-material/Ballot'
+import Check from '@mui/icons-material/Check'
+import Clear from '@mui/icons-material/Clear'
+import Save from '@mui/icons-material/Save'
+import HelpOutline from '@mui/icons-material/HelpOutline'
+import FormatSize from '@mui/icons-material/FormatSize'
 
 import {
   Grid,
@@ -14,7 +14,7 @@ import {
   Divider,
   Button,
   Dialog,
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Typography, Button } from '@material-ui/core'
+import { Grid, Typography, Button } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 export default function Errors() {

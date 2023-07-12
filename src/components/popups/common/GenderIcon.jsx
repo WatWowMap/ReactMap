@@ -1,5 +1,5 @@
 import * as React from 'react'
-import SvgIcon from '@material-ui/core/SvgIcon'
+import SvgIcon from '@mui/material/SvgIcon'
 
 const PATH = {
   0: '',

@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-duplicate-props */
 import React, { useState, useEffect } from 'react'
-import { Grid, Typography, Slider, TextField } from '@material-ui/core'
+import { Grid, Typography, Slider, TextField } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 export default function SliderTile({

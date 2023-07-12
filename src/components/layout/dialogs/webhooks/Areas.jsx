@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useMemo } from 'react'
-import Done from '@material-ui/icons/Done'
-import Clear from '@material-ui/icons/Clear'
-import { Grid, Typography, Chip, Button, Divider } from '@material-ui/core'
+import Done from '@mui/icons-material/Done'
+import Clear from '@mui/icons-material/Clear'
+import { Grid, Typography, Chip, Button, Divider } from '@mui/material'
 
 import { Trans } from 'react-i18next'
 

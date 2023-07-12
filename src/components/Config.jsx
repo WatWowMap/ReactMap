@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { ThemeProvider } from '@material-ui/styles'
+import { ThemeProvider } from '@mui/styles'
 import { useTranslation } from 'react-i18next'
 
 import setTheme from '@assets/mui/theme'
@@ -56,12 +56,18 @@ export default function Config() {
     }
   }, [])
 
+  const theme = React.useMemo(
+    () => setTheme(serverSettings?.config?.map?.theme),
+    [serverSettings?.config?.map?.theme],
+  )
+
   if (!serverSettings) {
     return <div />
   }
 
+  console.log(theme)
   return (
-    <ThemeProvider theme={setTheme(serverSettings?.config?.map?.theme)}>
+    <ThemeProvider theme={theme}>
       <ReactRouter
         serverSettings={serverSettings}
         getServerSettings={getServerSettings}

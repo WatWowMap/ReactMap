@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { Grid, Typography, Switch, Select, MenuItem } from '@material-ui/core'
+import { Grid, Typography, Switch, Select, MenuItem } from '@mui/material'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { useStatic, useStore } from '@hooks/useStore'

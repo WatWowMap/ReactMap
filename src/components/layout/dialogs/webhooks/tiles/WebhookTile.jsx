@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import Check from '@material-ui/icons/Check'
-import Clear from '@material-ui/icons/Clear'
-import Tune from '@material-ui/icons/Tune'
-import { Grid, IconButton, Typography } from '@material-ui/core'
+import Check from '@mui/icons-material/Check'
+import Clear from '@mui/icons-material/Clear'
+import Tune from '@mui/icons-material/Tune'
+import { Grid, IconButton, Typography } from '@mui/material'
 
 const getOtherData = (id) => {
   switch (id.charAt(0)) {
@@ -62,7 +62,7 @@ export default function NewPokemon({ data, rowIndex, columnIndex, style }) {
     />
   )
   const selection = (
-    <IconButton onClick={handleFilterChange}>
+    <IconButton onClick={handleFilterChange} size="large">
       {tempFilters[item.id] && tempFilters[item.id]?.enabled ? (
         <Check style={{ color: '#00e676' }} />
       ) : (
@@ -72,7 +72,7 @@ export default function NewPokemon({ data, rowIndex, columnIndex, style }) {
   )
 
   const advMenu = (
-    <IconButton onClick={toggleWebhook(true, item.id)}>
+    <IconButton onClick={toggleWebhook(true, item.id)} size="large">
       <Tune style={{ color: 'white' }} />
     </IconButton>
   )

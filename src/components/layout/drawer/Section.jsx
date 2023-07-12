@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React, { Fragment } from 'react'
-import ExpandMore from '@material-ui/icons/ExpandMore'
-import Settings from '@material-ui/icons/Settings'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import Settings from '@mui/icons-material/Settings'
 import {
   Button,
   Typography,
@@ -9,7 +9,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   Grid,
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 

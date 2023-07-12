@@ -1,6 +1,5 @@
 import React, { Fragment, useState } from 'react'
-import { Snackbar } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
+import { Alert, Snackbar } from '@mui/material'
 import { useTranslation, Trans } from 'react-i18next'
 
 import SlideTransition from '@assets/mui/SlideTransition'

@@ -1,6 +1,6 @@
 import * as React from 'react'
-import Clear from '@material-ui/icons/Clear'
-import { Drawer, Typography, Grid, IconButton, Box } from '@material-ui/core'
+import Clear from '@mui/icons-material/Clear'
+import { Drawer, Typography, Grid, IconButton, Box } from '@mui/material'
 
 import { useStatic } from '@hooks/useStore'
 import Actions from './Actions'
@@ -58,7 +58,7 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
           </Typography>
         </Grid>
         <Grid item style={{ flexGrow: 0 }}>
-          <IconButton onClick={toggleDrawer(false)}>
+          <IconButton onClick={toggleDrawer(false)} size="large">
             <Clear style={{ color: 'white' }} />
           </IconButton>
         </Grid>
@@ -75,5 +75,5 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
         {separateDrawerActions && <Actions />}
       </Box>
     </Drawer>
-  )
+  );
 }

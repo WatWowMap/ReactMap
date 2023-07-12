@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Typography } from '@material-ui/core'
+import { Button, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import FAIcon from '../general/FAIcon'
 

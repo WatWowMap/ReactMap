@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useMediaQuery, Dialog } from '@material-ui/core'
-import { useTheme } from '@material-ui/core/styles'
+import { useMediaQuery, Dialog } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 
 import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'

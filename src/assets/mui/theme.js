@@ -1,11 +1,11 @@
-import { responsiveFontSizes } from '@material-ui/core'
-import { createTheme } from '@material-ui/core/styles'
+import { responsiveFontSizes } from '@mui/material'
+import { createTheme } from '@mui/material/styles'
 
 export default function setTheme(theme) {
   return responsiveFontSizes(
     createTheme({
       palette: {
-        type: 'dark',
+        mode: 'dark',
         primary: {
           light: '#ff784e',
           main: theme?.primary || '#ff5722',
@@ -39,45 +39,92 @@ export default function setTheme(theme) {
           hint: '#a0a0a0',
         },
       },
-      props: {
+      components: {
         MuiButtonBase: {
-          disableRipple: true,
+          defaultProps: {
+            disableRipple: true,
+          },
         },
-      },
-      overrides: {
-        MuiDialogTitle: {
-          root: {
-            padding: '12px 24px',
+        MuiButton: {
+          defaultProps: {
+            disableRipple: true,
           },
         },
         MuiAccordion: {
-          root: {
-            '&$expanded': {
-              margin: '1px 0',
+          styleOverrides: {
+            root: {
+              '.&expanded': {
+                margin: '1px 0',
+              },
             },
           },
         },
         MuiAccordionSummary: {
-          root: {
-            '&$expanded': {
-              minHeight: 10,
+          styleOverrides: {
+            root: {
+              '.&expanded': {
+                minHeight: 10,
+              },
             },
-          },
-          content: {
-            '&$expanded': {
-              margin: '10px 0',
+            content: {
+              '.&expanded': {
+                margin: '10px 0',
+              },
             },
           },
         },
         MuiSelect: {
-          icon: {
-            color: 'white',
+          styleOverrides: {
+            icon: {
+              color: 'white',
+            },
+            iconOpen: {
+              color: 'white',
+            },
           },
-          iconOpen: {
-            color: 'white',
+        },
+        MuiDialogTitle: {
+          styleOverrides: {
+            root: {
+              padding: '12px 24px',
+            },
           },
         },
       },
+      // overrides: {
+      //   MuiDialogTitle: {
+      //     root: {
+      //       padding: '12px 24px',
+      //     },
+      //   },
+      // MuiAccordion: {
+      //   root: {
+      //     '&$expanded': {
+      //       margin: '1px 0',
+      //     },
+      //   },
+      // },
+      // MuiAccordionSummary: {
+      //   root: {
+      //     '&$expanded': {
+      //       minHeight: 10,
+      //     },
+      //   },
+      //   content: {
+      //     '&$expanded': {
+      //       margin: '10px 0',
+      //     },
+      //   },
+      // },
+      //   MuiSelect: {
+      //     icon: {
+      //       color: 'white',
+      //     },
+      //     iconOpen: {
+      //       color: 'white',
+      //     },
+      //   },
+      // },
     }),
   )
 }

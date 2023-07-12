@@ -8,12 +8,12 @@ import {
   ListItemIcon,
   MenuItem,
   Select,
-} from '@material-ui/core'
-import TranslateIcon from '@material-ui/icons/Translate'
-import MapIcon from '@material-ui/icons/Map'
-import NavIcon from '@material-ui/icons/Navigation'
-import StyleIcon from '@material-ui/icons/Style'
-import DevicesOtherIcon from '@material-ui/icons/DevicesOther'
+} from '@mui/material'
+import TranslateIcon from '@mui/icons-material/Translate'
+import MapIcon from '@mui/icons-material/Map'
+import NavIcon from '@mui/icons-material/Navigation'
+import StyleIcon from '@mui/icons-material/Style'
+import DevicesOtherIcon from '@mui/icons-material/DevicesOther'
 
 import { useTranslation } from 'react-i18next'
 

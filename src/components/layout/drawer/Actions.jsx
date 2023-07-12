@@ -5,17 +5,17 @@ import {
   ListItemIcon,
   ListItemText,
   Link as MuiLink,
-} from '@material-ui/core'
+} from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import AccountBoxIcon from '@material-ui/icons/AccountBox'
-import ExitToAppIcon from '@material-ui/icons/ExitToApp'
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline'
-import RotateLeftIcon from '@material-ui/icons/RotateLeft'
-import ImportExportIcon from '@material-ui/icons/ImportExport'
-import TrendingUpIcon from '@material-ui/icons/TrendingUp'
-import FeedbackIcon from '@material-ui/icons/Feedback'
-import HeartIcon from '@material-ui/icons/Favorite'
+import AccountBoxIcon from '@mui/icons-material/AccountBox'
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import RotateLeftIcon from '@mui/icons-material/RotateLeft'
+import ImportExportIcon from '@mui/icons-material/ImportExport'
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'
+import FeedbackIcon from '@mui/icons-material/Feedback'
+import HeartIcon from '@mui/icons-material/Favorite'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import FAIcon from '../general/FAIcon'

@@ -1,5 +1,5 @@
 import React from 'react'
-import { DialogContent, ButtonGroup, Button } from '@material-ui/core'
+import { DialogContent, ButtonGroup, Button } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 

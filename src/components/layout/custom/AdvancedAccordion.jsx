@@ -1,13 +1,8 @@
 import React from 'react'
-import ExpandMore from '@material-ui/icons/ExpandMore'
-import {
-  withStyles,
-  Grid,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from '@material-ui/core'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import { Grid, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+
+import withStyles from '@mui/styles/withStyles';
 
 import { useTranslation } from 'react-i18next'
 

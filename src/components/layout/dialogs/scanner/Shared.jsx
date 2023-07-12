@@ -1,12 +1,8 @@
 import * as React from 'react'
-import {
-  ListItemText,
-  ListItem,
-  ListItemIcon,
-  withStyles,
-} from '@material-ui/core'
-import PermScanWifiIcon from '@material-ui/icons/PermScanWifi'
-import ClearIcon from '@material-ui/icons/Clear'
+import { ListItemText, ListItem, ListItemIcon } from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'
+import ClearIcon from '@mui/icons-material/Clear'
 import { useStore } from '@hooks/useStore'
 
 import { Trans, useTranslation } from 'react-i18next'
