@@ -59,7 +59,8 @@ export default function Footer({ options, role }) {
                 target={button.link ? button.target || '_blank' : undefined}
                 onClick={button.action || undefined}
                 disabled={button.disabled}
-                size="large">
+                size="large"
+              >
                 <MuiIcon
                   color={muiColor ? color : 'inherit'}
                   style={{ color: muiColor ? null : color }}
@@ -85,8 +86,8 @@ export default function Footer({ options, role }) {
               </Button>
             )}
           </Grid>
-        );
+        )
       })}
     </Grid>
-  );
+  )
 }

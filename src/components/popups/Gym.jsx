@@ -295,7 +295,7 @@ const MenuActions = ({ gym, perms, hasRaid, badge, setBadge }) => {
         />
       </Dialog>
     </Grid>
-  );
+  )
 }
 
 const PoiImage = ({ gym, Icons }) => {
@@ -621,38 +621,42 @@ const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
     })
   }
 
-  return <>
-    {hasRaid && perms.raids && perms.gyms && (
-      <Grid item xs={4}>
-        <IconButton
-          className={classes.expand}
-          onClick={() => handleExpandClick('raids')}
-          aria-expanded={popups.raids}
-          size="large">
-          <img
-            src={Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
-            alt={popups.raids ? 'gyms' : 'raids'}
-            height={20}
-            width="auto"
-          />
-        </IconButton>
+  return (
+    <>
+      {hasRaid && perms.raids && perms.gyms && (
+        <Grid item xs={4}>
+          <IconButton
+            className={classes.expand}
+            onClick={() => handleExpandClick('raids')}
+            aria-expanded={popups.raids}
+            size="large"
+          >
+            <img
+              src={Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
+              alt={popups.raids ? 'gyms' : 'raids'}
+              height={20}
+              width="auto"
+            />
+          </IconButton>
+        </Grid>
+      )}
+      <Grid item xs={4} style={{ textAlign: 'center' }}>
+        <Navigation lat={lat} lon={lon} />
       </Grid>
-    )}
-    <Grid item xs={4} style={{ textAlign: 'center' }}>
-      <Navigation lat={lat} lon={lon} />
-    </Grid>
-    {perms.gyms && (
-      <Grid item xs={4}>
-        <IconButton
-          className={popups.extras ? classes.expandOpen : classes.expand}
-          onClick={() => handleExpandClick('extras')}
-          aria-expanded={popups.extras}
-          size="large">
-          <ExpandMore style={{ color: 'white' }} />
-        </IconButton>
-      </Grid>
-    )}
-  </>;
+      {perms.gyms && (
+        <Grid item xs={4}>
+          <IconButton
+            className={popups.extras ? classes.expandOpen : classes.expand}
+            onClick={() => handleExpandClick('extras')}
+            aria-expanded={popups.extras}
+            size="large"
+          >
+            <ExpandMore style={{ color: 'white' }} />
+          </IconButton>
+        </Grid>
+      )}
+    </>
+  )
 }
 
 const ExtraInfo = ({ gym, userSettings, t, ts }) => {

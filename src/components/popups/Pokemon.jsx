@@ -231,60 +231,62 @@ const Header = ({
       ? ''
       : t(`form_${pokemon.form}`)
 
-  return <>
-    <Grid item xs={3}>
-      {userSettings.showDexNumInPopup ? (
-        <Avatar
-          classes={{
-            colorDefault: classes.avatar,
-          }}
-        >
-          {metaData.pokedexId}
-        </Avatar>
-      ) : (
-        <img
-          src={iconUrl}
-          style={{ maxWidth: 40, maxHeight: 40 }}
-          alt={pokemon.pokemon_id}
-        />
-      )}
-    </Grid>
-    <Grid item xs={6} style={{ textAlign: 'center' }}>
-      <Typography variant={pokeName.length > 8 ? 'h6' : 'h5'}>
-        {pokeName}
-      </Typography>
-      {ditto_form !== null && display_pokemon_id ? (
-        <Typography variant="caption">
-          ({t(`poke_${display_pokemon_id}`)})
+  return (
+    <>
+      <Grid item xs={3}>
+        {userSettings.showDexNumInPopup ? (
+          <Avatar
+            classes={{
+              colorDefault: classes.avatar,
+            }}
+          >
+            {metaData.pokedexId}
+          </Avatar>
+        ) : (
+          <img
+            src={iconUrl}
+            style={{ maxWidth: 40, maxHeight: 40 }}
+            alt={pokemon.pokemon_id}
+          />
+        )}
+      </Grid>
+      <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Typography variant={pokeName.length > 8 ? 'h6' : 'h5'}>
+          {pokeName}
         </Typography>
-      ) : (
-        <Typography variant="caption">{formName}</Typography>
-      )}
-    </Grid>
-    <Grid item xs={3}>
-      <IconButton aria-haspopup="true" onClick={handleClick} size="large">
-        <MoreVert style={{ color: 'white' }} />
-      </IconButton>
-    </Grid>
-    <Menu
-      anchorEl={anchorEl}
-      keepMounted
-      open={!!anchorEl}
-      onClose={handleClose}
-      PaperProps={{
-        style: {
-          maxHeight: 216,
-          minWidth: '20ch',
-        },
-      }}
-    >
-      {options.map((option) => (
-        <MenuItem key={option.key || option.name} onClick={option.action}>
-          {typeof option.name === 'string' ? t(option.name) : option.name}
-        </MenuItem>
-      ))}
-    </Menu>
-  </>;
+        {ditto_form !== null && display_pokemon_id ? (
+          <Typography variant="caption">
+            ({t(`poke_${display_pokemon_id}`)})
+          </Typography>
+        ) : (
+          <Typography variant="caption">{formName}</Typography>
+        )}
+      </Grid>
+      <Grid item xs={3}>
+        <IconButton aria-haspopup="true" onClick={handleClick} size="large">
+          <MoreVert style={{ color: 'white' }} />
+        </IconButton>
+      </Grid>
+      <Menu
+        anchorEl={anchorEl}
+        keepMounted
+        open={!!anchorEl}
+        onClose={handleClose}
+        PaperProps={{
+          style: {
+            maxHeight: 216,
+            minWidth: '20ch',
+          },
+        }}
+      >
+        {options.map((option) => (
+          <MenuItem key={option.key || option.name} onClick={option.action}>
+            {typeof option.name === 'string' ? t(option.name) : option.name}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
+  )
 }
 
 const Stats = ({ pokemon, t }) => {
@@ -463,37 +465,41 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
     })
   }
 
-  return <>
-    {hasPvp && (
+  return (
+    <>
+      {hasPvp && (
+        <Grid item xs={4}>
+          <IconButton
+            className={popups.pvp ? classes.expandOpen : classes.expand}
+            name="pvp"
+            onClick={() => handleExpandClick('pvp')}
+            aria-expanded={popups.pvp}
+            size="large"
+          >
+            <img
+              alt="pvp"
+              src={Icons.getMisc('pvp')}
+              height={20}
+              width="auto"
+            />
+          </IconButton>
+        </Grid>
+      )}
+      <Grid item xs={4} style={{ textAlign: 'center' }}>
+        <Navigation lat={lat} lon={lon} />
+      </Grid>
       <Grid item xs={4}>
         <IconButton
-          className={popups.pvp ? classes.expandOpen : classes.expand}
-          name="pvp"
-          onClick={() => handleExpandClick('pvp')}
-          aria-expanded={popups.pvp}
-          size="large">
-          <img
-            alt="pvp"
-            src={Icons.getMisc('pvp')}
-            height={20}
-            width="auto"
-          />
+          className={popups.extras ? classes.expandOpen : classes.expand}
+          onClick={() => handleExpandClick('extras')}
+          aria-expanded={popups.extras}
+          size="large"
+        >
+          <ExpandMore style={{ color: 'white' }} />
         </IconButton>
       </Grid>
-    )}
-    <Grid item xs={4} style={{ textAlign: 'center' }}>
-      <Navigation lat={lat} lon={lon} />
-    </Grid>
-    <Grid item xs={4}>
-      <IconButton
-        className={popups.extras ? classes.expandOpen : classes.expand}
-        onClick={() => handleExpandClick('extras')}
-        aria-expanded={popups.extras}
-        size="large">
-        <ExpandMore style={{ color: 'white' }} />
-      </IconButton>
-    </Grid>
-  </>;
+    </>
+  )
 }
 
 const ExtraInfo = ({ pokemon, perms, userSettings, t, Icons }) => {

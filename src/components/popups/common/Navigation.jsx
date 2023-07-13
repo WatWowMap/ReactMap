@@ -17,8 +17,9 @@ export default function Navigation({ lat, lon }) {
       href={url.replace('{x}', lat).replace('{y}', lon)}
       target="_blank"
       rel="noreferrer"
-      size="large">
+      size="large"
+    >
       <Map style={{ color: 'white' }} />
     </IconButton>
-  );
+  )
 }

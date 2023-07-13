@@ -1,13 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
-import {
-  Grid,
-  Typography,
-  Collapse,
-  IconButton,
-  Divider,
-} from '@mui/material'
+import { Grid, Typography, Collapse, IconButton, Divider } from '@mui/material'
 
 import { useTranslation, Trans } from 'react-i18next'
 
@@ -408,7 +402,7 @@ const MenuActions = ({
         options={options}
       />
     </Grid>
-  );
+  )
 }
 
 const RewardInfo = ({ quest, Icons, config, t }) => {
@@ -594,13 +588,14 @@ const Footer = ({ pokestop, perms }) => {
               }))
             }
             aria-expanded={open}
-            size="large">
+            size="large"
+          >
             <ExpandMore style={{ color: 'white' }} />
           </IconButton>
         </Grid>
       )}
     </Grid>
-  );
+  )
 }
 
 const ExtraInfo = ({ pokestop, userSettings, t, ts }) => {

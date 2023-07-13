@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { ListItemText, ListItem, ListItemIcon } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
+import { ListItemText, ListItem, ListItemIcon } from '@mui/material'
+import withStyles from '@mui/styles/withStyles'
 import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'
 import ClearIcon from '@mui/icons-material/Clear'
 import { useStore } from '@hooks/useStore'

@@ -1,11 +1,5 @@
 import React, { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  Drawer,
-  Grid,
-  Typography,
-} from '@mui/material'
+import { Dialog, DialogContent, Drawer, Grid, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'

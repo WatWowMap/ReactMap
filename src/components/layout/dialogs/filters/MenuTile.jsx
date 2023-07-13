@@ -108,7 +108,8 @@ export default function MenuTile({ data, rowIndex, columnIndex, style }) {
           ? toggleSlotsMenu(true, item.id.charAt(1))
           : toggleAdvMenu(true, item.id)
       }
-      size="large">
+      size="large"
+    >
       {getAdvMenuIcon()}
     </IconButton>
   )

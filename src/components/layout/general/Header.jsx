@@ -24,10 +24,11 @@ export default function Header({ names = [], titles, action }) {
         <IconButton
           onClick={action}
           style={{ position: 'absolute', right: 5, top: 2, color: 'white' }}
-          size="large">
+          size="large"
+        >
           <Clear />
         </IconButton>
       )}
     </DialogTitle>
-  );
+  )
 }

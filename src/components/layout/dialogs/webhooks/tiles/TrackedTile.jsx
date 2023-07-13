@@ -1,13 +1,7 @@
 import React, { useState } from 'react'
 import DeleteForever from '@mui/icons-material/DeleteForever'
 import Edit from '@mui/icons-material/Edit'
-import {
-  Grid,
-  Typography,
-  IconButton,
-  Dialog,
-  Checkbox,
-} from '@mui/material'
+import { Grid, Typography, IconButton, Dialog, Checkbox } from '@mui/material'
 
 import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 

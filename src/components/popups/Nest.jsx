@@ -170,5 +170,5 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
         </Grid>
       </Grid>
     </ErrorBoundary>
-  );
+  )
 }

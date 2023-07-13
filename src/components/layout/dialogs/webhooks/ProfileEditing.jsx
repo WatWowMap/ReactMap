@@ -192,20 +192,27 @@ export default function ProfileEditing({
       profiles[profile].profile_no
     return (
       <Grid item sm={isMobile ? 6 : 3} style={{ textAlign: 'right' }}>
-        <IconButton onClick={() => setViews({ ...views, [profile]: 'edit' })} size="large">
+        <IconButton
+          onClick={() => setViews({ ...views, [profile]: 'edit' })}
+          size="large"
+        >
           <Edit style={{ color: 'white' }} />
         </IconButton>
         <IconButton
           onClick={() => setViews({ ...views, [profile]: 'delete' })}
           disabled={disabled}
-          size="large">
+          size="large"
+        >
           <DeleteForever style={{ color: disabled ? 'inherit' : 'white' }} />
         </IconButton>
-        <IconButton onClick={() => setViews({ ...views, [profile]: 'copy' })} size="large">
+        <IconButton
+          onClick={() => setViews({ ...views, [profile]: 'copy' })}
+          size="large"
+        >
           <FileCopy style={{ color: 'white' }} />
         </IconButton>
       </Grid>
-    );
+    )
   }
 
   useEffect(() => {
@@ -221,230 +228,243 @@ export default function ProfileEditing({
     }
   }, [data])
 
-  return <>
-    <Header titles={['manage_profiles']} action={() => handleClose(false)} />
-    <DialogContent style={{ marginBottom: 20 }}>
-      <Grid container spacing={2} alignItems="center" justifyContent="center">
-        <Grid item xs={12} sm={4}>
-          <Typography variant="h6" align="center">
-            {t('add_new_profile')}
-          </Typography>
-        </Grid>
-        <Grid item xs={7} sm={5}>
-          <TextField
-            autoComplete="off"
-            label={
-              profiles[newProfile] || newProfile === 'all'
-                ? t('profile_error')
-                : t('profile_name')
-            }
-            value={newProfile}
-            onChange={(event) =>
-              setNewProfile(event.target.value?.toLowerCase())
-            }
-            variant="outlined"
-            error={Boolean(profiles[newProfile]) || newProfile === 'all'}
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddProfile}
-            disabled={
-              Boolean(profiles[newProfile]) ||
-              !newProfile ||
-              newProfile === 'all'
-            }
-          >
-            {t('save')}
-          </Button>
-        </Grid>
-        <Divider
-          flexItem
-          light
-          style={{ margin: '10px 0', width: '90%', height: 3 }}
-        />
-        <Grid item xs={12}>
-          {Object.keys(profiles).map((profile, i) => (
-            <Grid
-              key={profile}
-              container
-              spacing={2}
-              justifyContent="center"
-              alignItems="center"
+  return (
+    <>
+      <Header titles={['manage_profiles']} action={() => handleClose(false)} />
+      <DialogContent style={{ marginBottom: 20 }}>
+        <Grid container spacing={2} alignItems="center" justifyContent="center">
+          <Grid item xs={12} sm={4}>
+            <Typography variant="h6" align="center">
+              {t('add_new_profile')}
+            </Typography>
+          </Grid>
+          <Grid item xs={7} sm={5}>
+            <TextField
+              autoComplete="off"
+              label={
+                profiles[newProfile] || newProfile === 'all'
+                  ? t('profile_error')
+                  : t('profile_name')
+              }
+              value={newProfile}
+              onChange={(event) =>
+                setNewProfile(event.target.value?.toLowerCase())
+              }
+              variant="outlined"
+              error={Boolean(profiles[newProfile]) || newProfile === 'all'}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddProfile}
+              disabled={
+                Boolean(profiles[newProfile]) ||
+                !newProfile ||
+                newProfile === 'all'
+              }
             >
-              {Boolean(i) && (
-                <Divider
-                  flexItem
-                  light
-                  style={{ margin: '20px 0', width: '90%', height: 3 }}
-                />
-              )}
-              {
+              {t('save')}
+            </Button>
+          </Grid>
+          <Divider
+            flexItem
+            light
+            style={{ margin: '10px 0', width: '90%', height: 3 }}
+          />
+          <Grid item xs={12}>
+            {Object.keys(profiles).map((profile, i) => (
+              <Grid
+                key={profile}
+                container
+                spacing={2}
+                justifyContent="center"
+                alignItems="center"
+              >
+                {Boolean(i) && (
+                  <Divider
+                    flexItem
+                    light
+                    style={{ margin: '20px 0', width: '90%', height: 3 }}
+                  />
+                )}
                 {
-                  profile: (
-                    <>
-                      <Grid item xs={6} sm={2}>
-                        <Typography variant="h6">{profile}</Typography>
-                      </Grid>
-                      {isMobile && getInputs(profile)}
-                      <Grid item xs={12} sm={6}>
-                        {profiles[profile].active_hours.map((schedule) => (
-                          <Chip
-                            key={schedule.id}
-                            label={`${t(`day_${schedule.day}`)} ${
-                              schedule.hours
-                            }:${String(schedule.mins).padStart(2, '0')}`}
-                            clickable
-                            deleteIcon={<Clear />}
-                            size={isMobile ? 'small' : 'medium'}
-                            color="secondary"
-                            onDelete={() =>
-                              handleRemoveSchedule(profile, schedule.id)
-                            }
-                            style={{ margin: 3 }} />
-                        ))}
-                      </Grid>
-                      {!isMobile && getInputs(profile)}
-                    </>
-                  ),
-                  edit: (
-                    <>
-                      <Grid item xs={4}>
-                        <Select
-                          name="day"
-                          value={newSchedule.day}
-                          onChange={handleScheduleAdjustments}
-                          fullWidth
-                        >
-                          {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                            <MenuItem key={day} value={day} dense>
-                              {t(`day_${day}`)}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <Input
-                          name="time"
-                          color="secondary"
-                          label="new time"
-                          value={`${newSchedule.hours}:${newSchedule.mins}`}
-                          onChange={handleScheduleAdjustments}
-                          variant="outlined"
-                          size="small"
-                          type="time"
-                        />
-                      </Grid>
-                      <Grid item xs={4} sm={2} style={{ textAlign: 'right' }}>
-                        <IconButton
-                          onClick={() =>
-                            setViews({ ...views, [profile]: 'profile' })
-                          }
-                          size="large">
-                          <Clear style={{ color: 'white' }} />
-                        </IconButton>
-                        <IconButton onClick={() => handleAddSchedule(profile)} size="large">
-                          <Save style={{ color: 'white' }} />
-                        </IconButton>
-                      </Grid>
-                    </>
-                  ),
-                  delete: (
-                    <>
-                      <Grid item xs={6} sm={8}>
-                        <Typography variant="subtitle2" align="center">
-                          {t('confirm_delete')}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={4} sm={2}>
-                        <IconButton
-                          onClick={() =>
-                            setViews({ ...views, [profile]: 'profile' })
-                          }
-                          size="large">
-                          <Clear style={{ color: 'white' }} />
-                        </IconButton>
-                        <IconButton onClick={() => handleRemoveProfile(profile)} size="large">
-                          <Save style={{ color: 'white' }} />
-                        </IconButton>
-                      </Grid>
-                    </>
-                  ),
-                  copy: (
-                    <>
-                      <Grid item xs={8} sm={7}>
-                        <Typography variant="subtitle2" align="center">
-                          <Trans i18nKey="confirm_copy">{{ profile }}</Trans>
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        container
-                        xs={4}
-                        alignItems="center"
-                        justifyContent="center"
-                      >
+                  {
+                    profile: (
+                      <>
+                        <Grid item xs={6} sm={2}>
+                          <Typography variant="h6">{profile}</Typography>
+                        </Grid>
+                        {isMobile && getInputs(profile)}
                         <Grid item xs={12} sm={6}>
+                          {profiles[profile].active_hours.map((schedule) => (
+                            <Chip
+                              key={schedule.id}
+                              label={`${t(`day_${schedule.day}`)} ${
+                                schedule.hours
+                              }:${String(schedule.mins).padStart(2, '0')}`}
+                              clickable
+                              deleteIcon={<Clear />}
+                              size={isMobile ? 'small' : 'medium'}
+                              color="secondary"
+                              onDelete={() =>
+                                handleRemoveSchedule(profile, schedule.id)
+                              }
+                              style={{ margin: 3 }}
+                            />
+                          ))}
+                        </Grid>
+                        {!isMobile && getInputs(profile)}
+                      </>
+                    ),
+                    edit: (
+                      <>
+                        <Grid item xs={4}>
                           <Select
-                            value={copyTo[profile]}
-                            onChange={(e) =>
-                              setCopyTo({
-                                ...copyTo,
-                                [profile]: e.target.value,
-                              })
-                            }
+                            name="day"
+                            value={newSchedule.day}
+                            onChange={handleScheduleAdjustments}
                             fullWidth
                           >
-                            {Object.keys(profiles).map((prof) => (
-                              <MenuItem key={prof} value={prof}>
-                                {prof}
+                            {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                              <MenuItem key={day} value={day} dense>
+                                {t(`day_${day}`)}
                               </MenuItem>
                             ))}
                           </Select>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={4}>
+                          <Input
+                            name="time"
+                            color="secondary"
+                            label="new time"
+                            value={`${newSchedule.hours}:${newSchedule.mins}`}
+                            onChange={handleScheduleAdjustments}
+                            variant="outlined"
+                            size="small"
+                            type="time"
+                          />
+                        </Grid>
+                        <Grid item xs={4} sm={2} style={{ textAlign: 'right' }}>
                           <IconButton
                             onClick={() =>
                               setViews({ ...views, [profile]: 'profile' })
                             }
-                            size="large">
+                            size="large"
+                          >
                             <Clear style={{ color: 'white' }} />
                           </IconButton>
                           <IconButton
-                            onClick={() => handleCopyProfile(profile)}
-                            disabled={profile === copyTo[profile]}
-                            size="large">
-                            <Save
-                              style={{
-                                color:
-                                  profile === copyTo[profile]
-                                    ? 'inherit'
-                                    : 'white',
-                              }}
-                            />
+                            onClick={() => handleAddSchedule(profile)}
+                            size="large"
+                          >
+                            <Save style={{ color: 'white' }} />
                           </IconButton>
                         </Grid>
-                      </Grid>
-                    </>
-                  ),
-                }[views[profile]]
-              }
-            </Grid>
-          ))}
+                      </>
+                    ),
+                    delete: (
+                      <>
+                        <Grid item xs={6} sm={8}>
+                          <Typography variant="subtitle2" align="center">
+                            {t('confirm_delete')}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={4} sm={2}>
+                          <IconButton
+                            onClick={() =>
+                              setViews({ ...views, [profile]: 'profile' })
+                            }
+                            size="large"
+                          >
+                            <Clear style={{ color: 'white' }} />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => handleRemoveProfile(profile)}
+                            size="large"
+                          >
+                            <Save style={{ color: 'white' }} />
+                          </IconButton>
+                        </Grid>
+                      </>
+                    ),
+                    copy: (
+                      <>
+                        <Grid item xs={8} sm={7}>
+                          <Typography variant="subtitle2" align="center">
+                            <Trans i18nKey="confirm_copy">{{ profile }}</Trans>
+                          </Typography>
+                        </Grid>
+                        <Grid
+                          item
+                          container
+                          xs={4}
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <Grid item xs={12} sm={6}>
+                            <Select
+                              value={copyTo[profile]}
+                              onChange={(e) =>
+                                setCopyTo({
+                                  ...copyTo,
+                                  [profile]: e.target.value,
+                                })
+                              }
+                              fullWidth
+                            >
+                              {Object.keys(profiles).map((prof) => (
+                                <MenuItem key={prof} value={prof}>
+                                  {prof}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <IconButton
+                              onClick={() =>
+                                setViews({ ...views, [profile]: 'profile' })
+                              }
+                              size="large"
+                            >
+                              <Clear style={{ color: 'white' }} />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => handleCopyProfile(profile)}
+                              disabled={profile === copyTo[profile]}
+                              size="large"
+                            >
+                              <Save
+                                style={{
+                                  color:
+                                    profile === copyTo[profile]
+                                      ? 'inherit'
+                                      : 'white',
+                                }}
+                              />
+                            </IconButton>
+                          </Grid>
+                        </Grid>
+                      </>
+                    ),
+                  }[views[profile]]
+                }
+              </Grid>
+            ))}
+          </Grid>
         </Grid>
-      </Grid>
-    </DialogContent>
-    <Footer
-      options={[
-        {
-          name: 'save',
-          action: handleCloseMenu,
-          icon: 'Save',
-        },
-      ]}
-      role="webhook_advanced"
-    />
-  </>;
+      </DialogContent>
+      <Footer
+        options={[
+          {
+            name: 'save',
+            action: handleCloseMenu,
+            icon: 'Save',
+          },
+        ]}
+        role="webhook_advanced"
+      />
+    </>
+  )
 }

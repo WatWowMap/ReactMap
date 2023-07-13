@@ -35,9 +35,13 @@ export default function AdvSearch({ search, setSearch, category }) {
         autoComplete="off"
         variant="outlined"
       />
-      <IconButton className={classes.iconButton} onClick={resetSearch} size="large">
+      <IconButton
+        className={classes.iconButton}
+        onClick={resetSearch}
+        size="large"
+      >
         <HighlightOff style={{ color: '#848484' }} />
       </IconButton>
     </Paper>
-  );
+  )
 }
