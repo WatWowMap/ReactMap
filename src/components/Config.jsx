@@ -78,7 +78,6 @@ export default function Config({ setTheme }) {
   }, [])
 
   React.useEffect(() => {
-    // this is separate from the above useEffect for better hot reloading during dev
     setTheme(
       makeTheme(
         serverSettings?.config?.map?.theme,

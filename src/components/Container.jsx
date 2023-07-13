@@ -3,12 +3,14 @@ import { MapContainer, Pane } from 'react-leaflet'
 
 import useGenerate from '@hooks/useGenerate'
 import useRefresh from '@hooks/useRefresh'
+import useStyles from '@hooks/useStyles'
 
 import Map from './Map'
 
 export default function Container({ serverSettings, params, location, zoom }) {
   useGenerate()
   useRefresh()
+  useStyles()
 
   return (
     <MapContainer

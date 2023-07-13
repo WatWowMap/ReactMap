@@ -3,6 +3,7 @@ import Clear from '@mui/icons-material/Clear'
 import { Drawer, Typography, Grid, IconButton, Box } from '@mui/material'
 
 import { useStatic } from '@hooks/useStore'
+
 import Actions from './Actions'
 import DrawerSection from './Section'
 
@@ -58,7 +59,7 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
         </Grid>
         <Grid item style={{ flexGrow: 0 }}>
           <IconButton onClick={toggleDrawer(false)} size="large">
-            <Clear style={{ color: 'white' }} />
+            <Clear />
           </IconButton>
         </Grid>
       </Grid>

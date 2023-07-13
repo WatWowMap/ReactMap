@@ -308,7 +308,6 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
         autoComplete={false}
         clearOnBlur={false}
         fullWidth
-        open
         clearIcon={null}
         popupIcon={null}
         sx={{ p: 2 }}
