@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.19.2",
+  "version": "1.19.3",
   "description": "React based frontend map.",
   "main": "ReactMap.js",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -90,7 +90,7 @@
     "i18next-http-backend": "^1.4.0",
     "knex": "^2.4.2",
     "leaflet": "1.9.4",
-    "leaflet.locatecontrol": "0.79.0",
+    "leaflet.locatecontrol": "^0.73.0",
     "leaflet.markercluster": "1.5.3",
     "loglevel": "^1.8.1",
     "morgan": "^1.10.0",

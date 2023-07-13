@@ -40,8 +40,6 @@ export default function PokestopPopup({
 }) {
   const { t } = useTranslation()
   const { pokestops: perms } = useStatic((state) => state.ui)
-  const popups = useStore((state) => state.popups)
-  const setPopups = useStore((state) => state.setPopups)
   const { lure_expire_timestamp, lure_id, invasions, events } = pokestop
 
   useEffect(() => {
@@ -76,7 +74,7 @@ export default function PokestopPopup({
           </Grid>
         )}
         <Grid item xs={plainPokestop ? 10 : 7}>
-          <Title mainName={pokestop.name} backup={t('unknown_pokestop')} />
+          <Title backup={t('unknown_pokestop')}>{pokestop.name}</Title>
         </Grid>
         <MenuActions
           pokestop={pokestop}
@@ -201,21 +199,14 @@ export default function PokestopPopup({
             </Grid>
           )}
         </Grid>
-        <Footer
-          pokestop={pokestop}
-          popups={popups}
-          setPopups={setPopups}
-          perms={perms}
-        />
+        <Footer pokestop={pokestop} perms={perms} />
         {perms.allPokestops && (
-          <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-            <ExtraInfo
-              pokestop={pokestop}
-              userSettings={userSettings}
-              t={t}
-              ts={ts}
-            />
-          </Collapse>
+          <ExtraInfo
+            pokestop={pokestop}
+            userSettings={userSettings}
+            t={t}
+            ts={ts}
+          />
         )}
       </Grid>
     </ErrorBoundary>
@@ -578,15 +569,9 @@ const QuestConditions = ({ quest, t, userSettings }) => {
   )
 }
 
-const Footer = ({ pokestop, popups, setPopups, perms }) => {
+const Footer = ({ pokestop, perms }) => {
   const classes = useStyles()
-
-  const handleExpandClick = (category) => {
-    setPopups({
-      ...popups,
-      [category]: !popups[category],
-    })
-  }
+  const open = useStore((state) => !!state.popups.extras)
 
   return (
     <Grid
@@ -602,9 +587,13 @@ const Footer = ({ pokestop, popups, setPopups, perms }) => {
       {perms.allPokestops && (
         <Grid item xs={3} style={{ textAlign: 'center' }}>
           <IconButton
-            className={popups.extras ? classes.expandOpen : classes.expand}
-            onClick={() => handleExpandClick('extras')}
-            aria-expanded={popups.extras}
+            className={open ? classes.expandOpen : classes.expand}
+            onClick={() =>
+              useStore.setState((prev) => ({
+                popups: { ...prev.popups, extras: !open },
+              }))
+            }
+            aria-expanded={open}
           >
             <ExpandMore style={{ color: 'white' }} />
           </IconButton>
@@ -615,6 +604,7 @@ const Footer = ({ pokestop, popups, setPopups, perms }) => {
 }
 
 const ExtraInfo = ({ pokestop, userSettings, t, ts }) => {
+  const open = useStore((state) => state.popups.extras)
   const { last_modified_timestamp, updated } = pokestop
 
   const extraMetaData = [
@@ -631,38 +621,40 @@ const ExtraInfo = ({ pokestop, userSettings, t, ts }) => {
   ]
 
   return (
-    <Grid container alignItems="center" justifyContent="center">
-      {extraMetaData.map((meta) => (
-        <Fragment key={meta.description}>
-          <Grid
-            item
-            xs={t('popup_pokestop_description_width')}
-            style={{ textAlign: 'left' }}
-          >
-            <Typography variant="caption">{t(meta.description)}:</Typography>
+    <Collapse in={open} timeout="auto" unmountOnExit>
+      <Grid container alignItems="center" justifyContent="center">
+        {extraMetaData.map((meta) => (
+          <Fragment key={meta.description}>
+            <Grid
+              item
+              xs={t('popup_pokestop_description_width')}
+              style={{ textAlign: 'left' }}
+            >
+              <Typography variant="caption">{t(meta.description)}:</Typography>
+            </Grid>
+            <Grid
+              item
+              xs={t('popup_pokestop_seen_timer_width')}
+              style={{ textAlign: 'right' }}
+            >
+              {meta.timer}
+            </Grid>
+            <Grid
+              item
+              xs={t('popup_pokestop_data_width')}
+              style={{ textAlign: 'right' }}
+            >
+              <Typography variant="caption">{meta.data}</Typography>
+            </Grid>
+          </Fragment>
+        ))}
+        {userSettings.enablePokestopPopupCoords && (
+          <Grid item xs={12} style={{ textAlign: 'center' }}>
+            <Coords lat={pokestop.lat} lon={pokestop.lon} />
           </Grid>
-          <Grid
-            item
-            xs={t('popup_pokestop_seen_timer_width')}
-            style={{ textAlign: 'right' }}
-          >
-            {meta.timer}
-          </Grid>
-          <Grid
-            item
-            xs={t('popup_pokestop_data_width')}
-            style={{ textAlign: 'right' }}
-          >
-            <Typography variant="caption">{meta.data}</Typography>
-          </Grid>
-        </Fragment>
-      ))}
-      {userSettings.enablePokestopPopupCoords && (
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Coords lat={pokestop.lat} lon={pokestop.lon} />
-        </Grid>
-      )}
-    </Grid>
+        )}
+      </Grid>
+    </Collapse>
   )
 }
 

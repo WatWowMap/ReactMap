@@ -22,12 +22,12 @@ const DeviceTile = ({ item, ts, Icons, userSettings }) => {
       position={[item.lat, item.lon]}
       icon={deviceMarker(isOnline, Icons)}
       ref={markerRef}
+      eventHandlers={{
+        popupopen: () => setPoly(true),
+        popupclose: () => setPoly(false),
+      }}
     >
-      <Popup
-        position={[item.lat, item.lon]}
-        onOpen={() => setPoly(true)}
-        onClose={() => setPoly(false)}
-      >
+      <Popup position={[item.lat, item.lon]}>
         <PopupContent device={item} isOnline={isOnline} ts={ts} />
       </Popup>
       {poly && !item.isMad && (

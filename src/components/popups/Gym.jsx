@@ -61,7 +61,7 @@ export default function GymPopup({
         spacing={1}
       >
         <Grid item xs={10}>
-          <Title mainName={gym.name} backup={t('unknown_gym')} />
+          <Title backup={t('unknown_gym')}>{gym.name}</Title>
         </Grid>
         <MenuActions
           gym={gym}
