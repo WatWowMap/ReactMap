@@ -22,11 +22,6 @@ export default makeStyles((theme) => {
       color: '#fff',
       backgroundColor: theme.palette.secondary.main,
     },
-    filterFooter: {
-      backgroundColor: '#424242',
-      textAlign: 'center',
-      height: 50,
-    },
     successButton: {
       color: theme.palette.success.main,
     },

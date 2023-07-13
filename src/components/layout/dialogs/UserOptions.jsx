@@ -1,13 +1,14 @@
 import React, { Fragment, useState } from 'react'
 import {
-  Grid,
-  Typography,
   Switch,
   Input,
   AppBar,
   Tab,
   Tabs,
   DialogContent,
+  List,
+  ListItem,
+  ListItemText,
 } from '@mui/material'
 import { useTranslation, Trans } from 'react-i18next'
 
@@ -17,7 +18,7 @@ import TabPanel from '../general/TabPanel'
 import Header from '../general/Header'
 import Footer from '../general/Footer'
 
-export default function UserOptions({ category, toggleDialog, isMobile }) {
+export default function UserOptions({ category, toggleDialog }) {
   const { t } = useTranslation()
   const { [category]: staticUserSettings } = useStatic(
     (state) => state.userSettings,
@@ -49,9 +50,7 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
     )
   }
 
-  const handleTabChange = (event, newValue) => {
-    setTab(newValue)
-  }
+  const handleTabChange = (_, newValue) => setTab(newValue)
 
   const getLabel = (label) => {
     if (label.startsWith('pvp') && !label.includes('Mega')) {
@@ -68,38 +67,34 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
     switch (fullOption.type) {
       case 'bool':
         return (
-          <Grid item xs={3} style={{ textAlign: 'right' }}>
-            <Switch
-              color="secondary"
-              checked={localState[subOption || option]}
-              name={subOption || option}
-              onChange={handleChange}
-              disabled={fullOption.disabled}
-            />
-          </Grid>
+          <Switch
+            color="secondary"
+            checked={localState[subOption || option]}
+            name={subOption || option}
+            onChange={handleChange}
+            disabled={fullOption.disabled}
+          />
         )
       default:
         return (
-          <Grid item xs={3} style={{ textAlign: 'right' }}>
-            <Input
-              color="secondary"
-              id={subOption || option}
-              label={subOption || option}
-              name={subOption || option}
-              style={{ width: 50 }}
-              value={localState[subOption || option]}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              type={fullOption.type}
-              disabled={fullOption.disabled}
-              endAdornment={fullOption.label || ''}
-              inputProps={{
-                min: fullOption.min || 0,
-                max: fullOption.max || 100,
-              }}
-            />
-          </Grid>
+          <Input
+            color="secondary"
+            id={subOption || option}
+            label={subOption || option}
+            name={subOption || option}
+            style={{ width: 50 }}
+            value={localState[subOption || option]}
+            onChange={handleChange}
+            variant="outlined"
+            size="small"
+            type={fullOption.type}
+            disabled={fullOption.disabled}
+            endAdornment={fullOption.label || ''}
+            inputProps={{
+              min: fullOption.min || 0,
+              max: fullOption.max || 100,
+            }}
+          />
         )
     }
   }
@@ -110,7 +105,7 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
         titles={[`${Utility.camelToSnake(category)}_options`]}
         action={toggleDialog(false, category, 'options')}
       />
-      <DialogContent style={{ padding: 0 }}>
+      <DialogContent sx={{ p: 0, minWidth: 'min(100vw, 300px)' }}>
         {tabPages.length > 1 && (
           <AppBar position="static">
             <Tabs
@@ -118,7 +113,7 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
               onChange={handleTabChange}
               indicatorColor="secondary"
               variant="fullWidth"
-              style={{ backgroundColor: '#424242', width: '100%' }}
+              textColor="inherit"
             >
               {tabPages.map((each) => (
                 <Tab
@@ -132,39 +127,29 @@ export default function UserOptions({ category, toggleDialog, isMobile }) {
         )}
         {tabPages.map((each) => (
           <TabPanel value={tab} index={each} key={each}>
-            {Object.entries(staticUserSettings).map(([key, values], j) => {
-              const start = each * 10
-              const end = each * 10 + 10
-              if (j < start) return null
-              if (j >= end) return null
-              return (
-                <Grid
-                  container
-                  key={key}
-                  direction="row"
-                  justifyContent="center"
-                  alignItems="center"
-                  style={isMobile ? {} : { width: 250 }}
-                  spacing={2}
-                >
-                  <Grid item xs={9}>
-                    <Typography variant="body1">{getLabel(key)}</Typography>
-                  </Grid>
-                  {getInputType(key)}
-                  {values.sub &&
-                    Object.keys(values.sub).map((subOption) => (
-                      <Fragment key={subOption}>
-                        <Grid item xs={9}>
-                          <Typography variant="body1">
-                            {getLabel(subOption)}
-                          </Typography>
-                        </Grid>
-                        {getInputType(key, subOption)}
-                      </Fragment>
-                    ))}
-                </Grid>
-              )
-            })}
+            <List>
+              {Object.entries(staticUserSettings).map(([key, values], j) => {
+                const start = each * 10
+                const end = each * 10 + 10
+                if (j < start) return null
+                if (j >= end) return null
+                return (
+                  <Fragment key={key}>
+                    <ListItem key={key} disableGutters disablePadding>
+                      <ListItemText primary={getLabel(key)} />
+                      {getInputType(key)}
+                    </ListItem>
+                    {values.sub &&
+                      Object.keys(values.sub).map((subOption) => (
+                        <ListItem key={subOption} disableGutters disablePadding>
+                          <ListItemText primary={getLabel(subOption)} />
+                          {getInputType(key, subOption)}
+                        </ListItem>
+                      ))}
+                  </Fragment>
+                )
+              })}
+            </List>
           </TabPanel>
         ))}
       </DialogContent>
