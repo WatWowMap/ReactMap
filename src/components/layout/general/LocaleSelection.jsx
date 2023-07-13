@@ -14,7 +14,7 @@ export default function LocaleSelection({ localeSelection }) {
       fullWidth
     >
       {Object.keys(localeSelection).map((option) => (
-        <MenuItem key={option} value={option}>
+        <MenuItem key={option} value={option} dense>
           {t(`locale_selection_${option}`)}
         </MenuItem>
       ))}

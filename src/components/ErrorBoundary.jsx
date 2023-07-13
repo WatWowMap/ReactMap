@@ -40,18 +40,10 @@ class ErrorBoundary extends Component {
         }
       >
         <Grid item xs={12}>
-          <Typography
-            variant={this.props.variant || 'h3'}
-            align="center"
-            style={{ color: 'white' }}
-          >
+          <Typography variant={this.props.variant || 'h3'} align="center">
             {this.props.t('react_error')}
           </Typography>
-          <Typography
-            variant="subtitle2"
-            align="center"
-            style={{ color: 'white' }}
-          >
+          <Typography variant="subtitle2" align="center">
             {this.state.message}
           </Typography>
           {!this.props.noRefresh && (

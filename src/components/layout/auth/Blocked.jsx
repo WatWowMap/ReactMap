@@ -18,7 +18,7 @@ export default function Blocked({ serverSettings }) {
       style={{ minHeight: '95vh' }}
     >
       <Grid item>
-        <Typography variant="h3" style={{ color: 'white' }} align="center">
+        <Typography variant="h3" align="center">
           {t('access')} {t('denied')}!
         </Typography>
       </Grid>
@@ -27,7 +27,7 @@ export default function Blocked({ serverSettings }) {
 
       {queryParams.get('blockedGuilds') && (
         <Grid item>
-          <Typography variant="h6" style={{ color: 'white' }} align="center">
+          <Typography variant="h6" align="center">
             {t('on_block_msg')} {queryParams.get('blockedGuilds')}.
           </Typography>
         </Grid>
@@ -36,7 +36,7 @@ export default function Blocked({ serverSettings }) {
       {serverSettings.config.map.discordInvite && (
         <Grid item>
           <br />
-          <Typography variant="h6" style={{ color: 'white' }} align="center">
+          <Typography variant="h6" align="center">
             {t('on_block_join_discord')}
           </Typography>
         </Grid>
