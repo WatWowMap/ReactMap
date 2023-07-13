@@ -453,7 +453,7 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
         style={{ position: 'absolute', top: 2, right: 2 }}
         onClick={() => setBadgeMenu(true)}
       >
-        <Edit style={{ color: 'white' }} />
+        <Edit />
       </IconButton>
       <Grid
         item

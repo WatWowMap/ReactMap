@@ -118,7 +118,7 @@ export default function AdvancedFilter({
         ]}
         action={toggleAdvMenu(false, type, filters.filter)}
       />
-      <DialogContent style={{ color: 'white' }}>
+      <DialogContent>
         {type === 'pokemon' ? (
           <Grid
             container

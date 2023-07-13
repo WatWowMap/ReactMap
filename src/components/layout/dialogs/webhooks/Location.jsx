@@ -152,7 +152,7 @@ const Location = ({
           renderOption={(option) => (
             <Grid container alignItems="center" spacing={1}>
               <Grid item>
-                <LocationOn style={{ color: 'white' }} />
+                <LocationOn />
               </Grid>
               <Grid item xs>
                 <Typography variant="caption">

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import * as MuiIcons from './Icons'
 
-export default function Footer({ options }) {
+export default function Footer({ options, role }) {
   const { t } = useTranslation()
 
   return (
@@ -36,7 +36,12 @@ export default function Footer({ options }) {
         const color = button.disabled ? 'default' : button.color || 'white'
         const muiColor = color === 'primary' || color === 'secondary'
         return (
-          <Grid item key={key} style={{ textAlign: button.align || 'center' }}>
+          <Grid
+            item
+            xs={+t(`${role}_key_width`) || actualSize}
+            key={key}
+            style={{ textAlign: button.align || 'center' }}
+          >
             {MuiIcon && (
               <IconButton
                 href={button.link || undefined}

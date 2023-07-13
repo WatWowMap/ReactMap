@@ -180,11 +180,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
             <Divider light />
           </Grid>
           <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-            {isMobile ? (
-              <HelpOutline style={{ color: 'white' }} />
-            ) : (
-              <Typography>{t('help')}</Typography>
-            )}
+            {isMobile ? <HelpOutline /> : <Typography>{t('help')}</Typography>}
           </Grid>
           <Grid item xs={9} sm={8}>
             <Typography variant="subtitle2" align="center">
@@ -192,7 +188,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
             </Typography>
           </Grid>
           <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-            <Ballot style={{ color: 'white' }} />
+            <Ballot />
           </Grid>
           <Grid item xs={9} sm={8}>
             <Typography variant="subtitle2" align="center">
@@ -203,7 +199,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
             <>
               <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
                 {isMobile ? (
-                  <Tune style={{ color: 'white' }} />
+                  <Tune />
                 ) : (
                   <Typography>{t('apply_to_all')}</Typography>
                 )}
@@ -218,7 +214,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
             <>
               <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
                 {isMobile ? (
-                  <FormatSize style={{ color: 'white' }} />
+                  <FormatSize />
                 ) : (
                   <Typography>{t('apply_to_all')}</Typography>
                 )}

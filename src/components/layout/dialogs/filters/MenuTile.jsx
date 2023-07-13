@@ -89,7 +89,7 @@ export default function MenuTile({ data, rowIndex, columnIndex, style }) {
 
   const getAdvMenuIcon = () => {
     if (type === 'pokemon') {
-      return <Tune style={{ color: 'white' }} />
+      return <Tune />
     }
     if (
       (type === 'pokestops' &&
@@ -97,9 +97,9 @@ export default function MenuTile({ data, rowIndex, columnIndex, style }) {
         !item.id.startsWith('i')) ||
       (item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0)
     ) {
-      return <Settings style={{ color: 'white' }} />
+      return <Settings />
     }
-    return <FormatSize style={{ color: 'white' }} />
+    return <FormatSize />
   }
   const advMenu = (
     <IconButton

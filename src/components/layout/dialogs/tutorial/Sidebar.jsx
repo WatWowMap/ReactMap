@@ -88,7 +88,7 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
               onClick={toggleDialog(true, 'pokestops', 'options')}
               variant="contained"
               color="secondary"
-              startIcon={<Settings style={{ color: 'white' }} />}
+              startIcon={<Settings />}
             >
               {t('options')}
             </Button>

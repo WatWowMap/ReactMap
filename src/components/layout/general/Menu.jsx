@@ -233,13 +233,11 @@ export default function Menu({
       name: 'help',
       action: () => setHelpDialog(!helpDialog),
       icon: 'HelpOutline',
-      color: 'white',
     },
     {
       name: 'openFilter',
       action: toggleDrawer(true),
       icon: 'Ballot',
-      color: 'white',
       mobileOnly: true,
     },
     {
@@ -248,7 +246,6 @@ export default function Menu({
         ? toggleWebhook(true, 'global')
         : toggleAdvMenu(true, 'global'),
       icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
-      color: 'white',
     },
     {
       name: 'disable_all',

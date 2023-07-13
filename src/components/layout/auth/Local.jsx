@@ -91,7 +91,6 @@ export default function LocalLogin({ href }) {
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
-                      style={{ color: 'white' }}
                       name="showPassword"
                       onClick={() =>
                         setUser({ ...user, showPassword: !user.showPassword })
@@ -110,7 +109,6 @@ export default function LocalLogin({ href }) {
             <Button
               variant="contained"
               style={{
-                color: 'white',
                 textAlign: 'center',
               }}
               color="primary"

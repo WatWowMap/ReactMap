@@ -11,10 +11,6 @@ export default makeStyles((theme) => {
       backgroundRepeat: 'no-repeat',
       backgroundSize: 'contain',
     },
-    formControl: {
-      width: 125,
-      color: 'white',
-    },
     formLabel: {
       color: 'white',
     },

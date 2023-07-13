@@ -1,5 +1,5 @@
 import React from 'react'
-import HighlightOff from '@mui/icons-material/HighlightOff'
+import ClearIcon from '@mui/icons-material/Clear'
 import { Paper, InputBase, IconButton } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
@@ -40,7 +40,7 @@ export default function AdvSearch({ search, setSearch, category }) {
         onClick={resetSearch}
         size="large"
       >
-        <HighlightOff style={{ color: '#848484' }} />
+        <ClearIcon style={{ color: '#848484' }} />
       </IconButton>
     </Paper>
   )

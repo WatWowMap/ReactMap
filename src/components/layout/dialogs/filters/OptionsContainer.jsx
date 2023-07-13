@@ -128,7 +128,7 @@ export default function OptionsContainer({
       <Grid container key="close" justifyContent="center" alignItems="center">
         <Grid item xs={12} style={{ textAlign: 'right' }}>
           <IconButton onClick={toggleDrawer(false)} size="large">
-            <Clear style={{ color: 'white' }} />
+            <Clear />
           </IconButton>
         </Grid>
       </Grid>,

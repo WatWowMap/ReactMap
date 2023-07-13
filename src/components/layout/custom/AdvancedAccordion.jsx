@@ -61,9 +61,7 @@ export default function AdvancedAccordion({ block = null, children }) {
   const { t } = useTranslation()
   return (
     <StyledAccordion>
-      <StyledAccordionSummary
-        expandIcon={<ExpandMore style={{ color: 'white' }} />}
-      >
+      <StyledAccordionSummary expandIcon={<ExpandMore />}>
         <Typography variant="caption">{t('advanced')}</Typography>
       </StyledAccordionSummary>
       <AccordionDetails style={{ width: '100%' }}>

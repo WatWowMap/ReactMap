@@ -41,7 +41,7 @@ export default function SlotSelection({
         titles={[`team_${teamId}`, 'slot_selection']}
         action={toggleSlotsMenu(false)}
       />
-      <DialogContent style={{ color: 'white' }}>
+      <DialogContent>
         <Grid
           container
           direction="row"
