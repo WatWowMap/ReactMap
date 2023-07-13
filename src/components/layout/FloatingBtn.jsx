@@ -19,7 +19,6 @@ import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
 import L from 'leaflet'
 
-import useStyles from '@hooks/useStyles'
 import useLocation from '@hooks/useLocation'
 import { useStore, useStatic } from '@hooks/useStore'
 import FAIcon from './general/FAIcon'
@@ -59,7 +58,6 @@ export default function FloatingButtons({
 
   const map = useMap()
   const ref = useRef(null)
-  const classes = useStyles()
   const { lc, color } = useLocation(map)
   const selectedWebhook = useStore((s) => s.selectedWebhook)
 
@@ -87,9 +85,19 @@ export default function FloatingButtons({
       direction="column"
       justifyContent="flex-start"
       alignItems="flex-start"
-      className={classes.floatingBtn}
       ref={ref}
-      style={{ width: isMobile ? 50 : 65, zIndex: 5000 }}
+      sx={(theme) => ({
+        width: isMobile ? 50 : 65,
+        zIndex: 5000,
+        '& > *': {
+          margin: `${theme.spacing(1)} !important`,
+          position: 'sticky',
+          top: 0,
+          left: 5,
+          zIndex: 1000,
+          width: 10,
+        },
+      })}
     >
       <Grid item>
         <Fab

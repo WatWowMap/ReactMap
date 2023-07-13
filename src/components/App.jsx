@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css'
 
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
-import { ThemeProvider, createTheme } from '@mui/material'
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 import { ApolloProvider } from '@apollo/client'
 import client from '@services/apollo'
 
@@ -42,6 +42,7 @@ export default function App() {
   return (
     <React.Suspense fallback={<SetText />}>
       <ThemeProvider theme={theme}>
+        <CssBaseline />
         <ApolloProvider client={client}>
           <ErrorBoundary>
             <BrowserRouter>

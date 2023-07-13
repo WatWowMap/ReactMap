@@ -606,5 +606,6 @@
   "unknown_event": "Unknown Event",
   "scanner_countdown": "Available in {{time}}s",
   "success": "Success",
-  "contribute": "Contribute"
+  "contribute": "Contribute",
+  "mi": "mi"
 }

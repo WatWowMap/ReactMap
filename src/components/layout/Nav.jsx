@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Dialog, Snackbar, Alert } from '@mui/material'
 
 import Utility from '@services/Utility'
-import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
 import SlideTransition from '@assets/mui/SlideTransition'
 
@@ -33,7 +32,6 @@ export default function Nav({
   isMobile,
   isTablet,
 }) {
-  const classes = useStyles()
   const {
     auth: { perms },
     setWebhookAlert,
@@ -90,30 +88,31 @@ export default function Nav({
     setMotd(false)
   }
 
-  const toggleDialog = (open, category, type, filter) => (event) => {
-    Utility.analytics(
-      'Menu Toggle',
-      `Open: ${open}`,
-      `Category: ${category} Menu: ${type}`,
-    )
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
+  const toggleDialog =
+    (open, category, type, filter) => (event, searchValue) => {
+      Utility.analytics(
+        'Menu Toggle',
+        `Open: ${open}`,
+        `Category: ${category} Menu: ${type}`,
+      )
+      if (
+        event.type === 'keydown' &&
+        (event.key === 'Tab' || event.key === 'Shift')
+      ) {
+        return
+      }
+      setDialog({ open, category, type })
+      if (typeof searchValue === 'object' && type === 'search') {
+        setManualParams({ id: searchValue.id })
+        map.flyTo([searchValue.lat, searchValue.lon], 16)
+      }
+      if (filter && type === 'filters') {
+        setFilters({ ...filters, [category]: { ...filters[category], filter } })
+      }
+      if (filter && type === 'options') {
+        setUserSettings({ ...userSettings, [category]: filter })
+      }
     }
-    setDialog({ open, category, type })
-    if (filter && type === 'search') {
-      setManualParams({ id: filter.id })
-      map.flyTo([filter.lat, filter.lon], 16)
-    }
-    if (filter && type === 'filters') {
-      setFilters({ ...filters, [category]: { ...filters[category], filter } })
-    }
-    if (filter && type === 'options') {
-      setUserSettings({ ...userSettings, [category]: filter })
-    }
-  }
 
   return (
     <>
@@ -194,12 +193,13 @@ export default function Nav({
       </Dialog>
       <Dialog
         fullScreen={isMobile}
-        classes={{
-          scrollPaper: classes.scrollPaper,
-          container: classes.container,
-        }}
         open={dialog.open && dialog.type === 'search'}
         onClose={toggleDialog(false, dialog.category, dialog.type)}
+        sx={{
+          '& .MuiDialog-container': {
+            alignItems: 'flex-start',
+          },
+        }}
       >
         <Search
           toggleDialog={toggleDialog}

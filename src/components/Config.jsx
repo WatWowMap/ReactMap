@@ -12,9 +12,28 @@ import HolidayEffects from './HolidayEffects'
 const rootLoading = document.getElementById('loader')
 const loadingText = document.getElementById('loading-text')
 
+const LOCALE_MAP = /** @type {const} */ ({
+  en: 'enUS',
+  de: 'deDE',
+  es: 'esES',
+  fr: 'frFR',
+  it: 'itIT',
+  ja: 'jaJP',
+  ko: 'koKR',
+  nl: 'nlNL',
+  pl: 'plPL',
+  'pt-br': 'ptBR',
+  ru: 'ruRU',
+  sv: 'svSE',
+  th: 'thTH',
+  tr: 'trTR',
+  'zh-tw': 'zhTW',
+})
+
 export default function Config({ setTheme }) {
   const { t } = useTranslation()
   const darkMode = useStore((s) => s.darkMode)
+  const locale = useStore((s) => s.settings.localeSelection)
 
   const [serverSettings, setServerSettings] = React.useState(null)
 
@@ -60,13 +79,21 @@ export default function Config({ setTheme }) {
 
   React.useEffect(() => {
     // this is separate from the above useEffect for better hot reloading during dev
-    setTheme(makeTheme(serverSettings?.config?.map?.theme, darkMode))
+    setTheme(
+      makeTheme(
+        serverSettings?.config?.map?.theme,
+        darkMode,
+        LOCALE_MAP[locale],
+      ),
+    )
     if (darkMode) {
-      document.body.classList.add('dark')
-    } else {
+      if (!document.body.classList.contains('dark')) {
+        document.body.classList.add('dark')
+      }
+    } else if (document.body.classList.contains('dark')) {
       document.body.classList.remove('dark')
     }
-  }, [serverSettings?.config?.map?.theme, darkMode])
+  }, [serverSettings?.config?.map?.theme, darkMode, locale])
 
   if (!serverSettings) {
     return <div />
