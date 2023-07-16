@@ -241,6 +241,7 @@
       "enableFloatingProfileButton": false,
       "forceTutorial": true,
       "enableTutorial": true,
+      "enableContribute": true,
       "enableUserProfile": true,
       "enableQuestSetSelector": true,
       "enableConfirmedInvasions": false,
@@ -605,6 +606,7 @@
       "userCooldownSeconds": 0,
       "scanNextAreaRestriction": [],
       "discordRoles": [],
+      "localStatus": [],
       "telegramGroups": []
     },
     "scanZone": {
@@ -623,6 +625,7 @@
       "scanZoneInstance": "scanZone",
       "scanZoneAreaRestriction": [],
       "discordRoles": [],
+      "localStatus": [],
       "telegramGroups": []
     }
   },

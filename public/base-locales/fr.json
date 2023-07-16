@@ -274,6 +274,10 @@
   "stats_subtitle": "Affiche les Stats et Niveaux des Pokémon",
   "submissionCells_subtitle": "Affiche les informations utiles à la création de nouveaux Points d'Intérêts",
   "weather_subtitle": "Affiche les informations météo du jeu pour chaque cellule",
+  "scanner_subtitle": "Formuler des demandes de scan sur mesure",
+  "s2cells_subtitle": "Afficher les cellules S2 de différents niveaux sur la carte",
+  "backups_subtitle": "Activer des sauvegardes et chargements de paramètres d'un appareil à l'autre",
+  "backups": "Sauvegardes",
   "user_profile": "Profil Utilisateur",
   "user_username": "Nom d'utilisateur ",
   "candy": "Bonbon",
@@ -438,6 +442,7 @@
   "auto": "Auto",
   "webhooks_subtitle": "Gérer vos alertes directement depuis la carte pour ces bots",
   "webhooks": "Alertes",
+  "scanner": "Actions du Scanner",
   "tile_servers": "Type de cartes",
   "tile_servers_default": "Défaut",
   "alola": "Alola",
@@ -595,5 +600,8 @@
   "on_block_msg": "Vous avez été bloqué car membre de",
   "denied": "Refusé",
   "showcase": "Épreuves",
-  "unknown_event": "Inconnu"
+  "unknown_event": "Inconnu",
+  "scanner_countdown": "Disponible dans {{time}}s",
+  "success": "Succès",
+  "contribute": "Contribuer"
 }

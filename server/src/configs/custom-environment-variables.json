@@ -389,6 +389,10 @@
         "__name": "MAP_MISC_ENABLE_TUTORIAL",
         "__format": "boolean"
       },
+      "enableContribute": {
+        "__name": "MAP_MISC_ENABLE_CONTRIBUTE",
+        "__format": "boolean"
+      },
       "enableUserProfile": {
         "__name": "MAP_MISC_ENABLE_USER_PROFILE",
         "__format": "boolean"
@@ -1151,6 +1155,10 @@
         "__name": "SCANNER_SCAN_NEXT_DISCORD_ROLES",
         "__format": "json"
       },
+      "localStatus": {
+        "__name": "SCANNER_SCAN_NEXT_LOCAL_STATUS",
+        "__format": "json"
+      },
       "telegramGroups": {
         "__name": "SCANNER_SCAN_NEXT_TELEGRAM_GROUPS",
         "__format": "json"
@@ -1206,6 +1214,10 @@
       },
       "discordRoles": {
         "__name": "SCANNER_SCAN_ZONE_DISCORD_ROLES",
+        "__format": "json"
+      },
+      "localStatus": {
+        "__name": "SCANNER_SCAN_ZONE_LOCAL_STATUS",
         "__format": "json"
       },
       "telegramGroups": {
