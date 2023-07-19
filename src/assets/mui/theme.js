@@ -25,26 +25,6 @@ export default function customTheme(
           secondary: {
             main: theme?.secondary || '#00b0ff',
           },
-          // action: {
-          //   main: '#00e676',
-          //   contrastText: '#fff',
-          //   active: '#00e676',
-          // },
-          // grey: {
-          //   light: '#bdbdbd',
-          //   main: '#333333',
-          //   dark: '#424242',
-          //   contrastText: '#fff',
-          // },
-          // background: {
-          //   paper: '#111111',
-          //   default: '#333333',
-          // },
-          // text: {
-          //   primary: '#f5f5f5',
-          //   secondary: 'white',
-          //   // hint: '#a0a0a0',
-          // },
         },
         components: {
           MuiPaper: {

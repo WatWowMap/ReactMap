@@ -118,6 +118,10 @@ export default function Map({
     return () => lc.remove()
   }, [settings.navigationControls])
 
+  useEffect(() => {
+    useStatic.setState({ isMobile, isTablet })
+  }, [isMobile, isTablet])
+
   return (
     <>
       <TileLayer {...tileLayer} />

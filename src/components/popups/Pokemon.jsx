@@ -295,10 +295,10 @@ const Stats = ({ pokemon, t }) => {
   const getColor = useCallback(
     (ivPercent) => {
       const ivColors = {
-        0: 'red',
+        0: 'error.main',
         66: 'orange',
         82: 'yellow',
-        100: '#00e676',
+        100: 'success.main',
       }
       let color
       Object.keys(ivColors).forEach((range) =>
@@ -320,11 +320,7 @@ const Stats = ({ pokemon, t }) => {
     >
       {iv !== null && (
         <Grid item>
-          <Typography
-            variant="h5"
-            align="center"
-            style={{ color: getColor(iv) }}
-          >
+          <Typography variant="h5" align="center" sx={{ color: getColor(iv) }}>
             {iv.toFixed(2)}
             {t('%')}
           </Typography>
@@ -443,9 +439,9 @@ const Timer = ({ pokemon, hasStats, t }) => {
           enterTouchDelay={0}
         >
           {expire_timestamp_verified ? (
-            <Check fontSize="large" style={{ color: '#00e676' }} />
+            <Check fontSize="large" color="success" />
           ) : (
-            <Clear fontSize="large" color="primary" />
+            <Clear fontSize="large" color="error" />
           )}
         </Tooltip>
       </Grid>

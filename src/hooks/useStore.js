@@ -94,6 +94,8 @@ export const useStore = create(
 )
 
 export const useStatic = create((set) => ({
+  isMobile: false,
+  isTablet: false,
   active: true,
   setActive: (active) => set({ active }),
   auth: {

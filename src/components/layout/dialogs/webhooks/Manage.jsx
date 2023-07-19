@@ -115,7 +115,7 @@ export default function Manage({
       action: () => setFeedback(true),
       icon: 'BugReport',
       disabled: !webhookData[selectedWebhook].human,
-      color: '#00e676',
+      color: 'success',
     })
   }
 

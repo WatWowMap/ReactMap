@@ -251,13 +251,13 @@ export default function Menu({
       name: 'disable_all',
       action: () => selectAllOrNone(false),
       icon: 'Clear',
-      color: 'primary',
+      color: 'error',
     },
     {
       name: 'enable_all',
       action: () => selectAllOrNone(true),
       icon: 'Check',
-      color: '#00e676',
+      color: 'success',
     },
     ...extraButtons,
   ]

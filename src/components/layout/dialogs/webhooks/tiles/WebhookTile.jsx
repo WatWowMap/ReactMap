@@ -64,9 +64,9 @@ export default function NewPokemon({ data, rowIndex, columnIndex, style }) {
   const selection = (
     <IconButton onClick={handleFilterChange} size="large">
       {tempFilters[item.id] && tempFilters[item.id]?.enabled ? (
-        <Check style={{ color: '#00e676' }} />
+        <Check color="success" />
       ) : (
-        <Clear color="primary" />
+        <Clear color="error" />
       )}
     </IconButton>
   )

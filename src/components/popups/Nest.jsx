@@ -30,12 +30,12 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
   const lastUpdated = Utility.getTimeUntil(new Date(updated * 1000))
 
   const getColor = (timeSince) => {
-    let color = '#00e676'
+    let color = 'success'
     if (timeSince > 604800) {
       color = '#ffeb3b'
     }
     if (timeSince > 1209600) {
-      color = '#ff5722'
+      color = 'error'
     }
     return color
   }
@@ -140,7 +140,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
           <Typography variant="subtitle2">{t('last_updated')}</Typography>
           <Typography
             variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'}
-            style={{ color: getColor(lastUpdated.diff) }}
+            color={getColor(lastUpdated.diff)}
           >
             {lastUpdated.str
               .replace('days', t('days'))

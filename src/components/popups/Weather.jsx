@@ -72,9 +72,9 @@ const Timer = ({ updated, ts, t }) => {
   const currentDay = date.getDate()
   const updatedDay = lastUpdated.getDate()
 
-  let color = '#ff5722'
+  let color = 'error.main'
   if (updatedHour === currentHour && updatedDay === currentDay) {
-    color = '#00e676'
+    color = 'success.main'
   }
 
   useEffect(() => {
@@ -91,7 +91,7 @@ const Timer = ({ updated, ts, t }) => {
           variant="subtitle2"
           align="center"
           gutterBottom
-          style={{ color }}
+          sx={{ color }}
         >
           {Utility.dayCheck(ts, updated)}
         </Typography>
@@ -101,7 +101,7 @@ const Timer = ({ updated, ts, t }) => {
           variant="subtitle2"
           align="center"
           gutterBottom
-          style={{ color }}
+          sx={{ color }}
         >
           ({timer.str.replace('days', t('days')).replace('day', t('day'))})
         </Typography>

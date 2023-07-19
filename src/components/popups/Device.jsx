@@ -25,7 +25,7 @@ export default function DevicePopup({ device, isOnline, ts }) {
       <Timer device={device} t={t} ts={ts} />
       <Typography
         variant="subtitle1"
-        style={{ color: isOnline ? '#00e676' : '#ff5722' }}
+        color={isOnline ? 'success' : 'error'}
         align="center"
       >
         {t(isOnline ? 'online' : 'offline')}

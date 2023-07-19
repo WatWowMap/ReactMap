@@ -95,9 +95,9 @@ export default function SlotSelection({
                   size="large"
                 >
                   {filterValues[each].enabled ? (
-                    <Check style={{ color: '#00e676' }} />
+                    <Check color="success" />
                   ) : (
-                    <Clear color="primary" />
+                    <Clear color="error" />
                   )}
                 </IconButton>
               </Grid>
@@ -138,14 +138,14 @@ export default function SlotSelection({
           {
             name: 'disable_all',
             action: () => handleSizeChange('all', false),
-            color: 'primary',
+            color: 'error',
             icon: 'Clear',
             size: 2,
           },
           {
             name: 'enable_all',
             action: () => handleSizeChange('all', true),
-            color: '#00e676',
+            color: 'success',
             icon: 'Check',
             size: 2,
           },
