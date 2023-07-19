@@ -47,19 +47,6 @@ export default makeStyles((theme) => {
       margin: '45% auto auto auto',
       backgroundColor: 'rgb(52, 52, 52)',
     },
-    search: {
-      padding: '2px 4px',
-      display: 'flex',
-      alignItems: 'center',
-      margin: 3,
-    },
-    input: {
-      marginLeft: theme.spacing(1),
-      flex: 1,
-    },
-    iconButton: {
-      padding: 10,
-    },
     expand: {
       transform: 'rotate(0deg)',
     },
