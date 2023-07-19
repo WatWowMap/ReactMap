@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useMediaQuery, Dialog } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 
-import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
 
 import DraggableMarker from './Draggable'
@@ -11,7 +10,6 @@ import AreaSelection from './AreaSelection'
 
 export default function Main({ webhookMode, setWebhookMode, Icons, map }) {
   const theme = useTheme()
-  const classes = useStyles()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
 
@@ -27,10 +25,6 @@ export default function Main({ webhookMode, setWebhookMode, Icons, map }) {
   return (
     <>
       <Dialog
-        classes={{
-          scrollPaper: classes.scrollPaper,
-          container: classes.container,
-        }}
         fullWidth={!isMobile}
         fullScreen={isMobile}
         style={{ display: webhookMode === 'open' ? 'block' : 'none' }}

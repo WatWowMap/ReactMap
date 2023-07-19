@@ -14,10 +14,6 @@ export default makeStyles((theme) => {
     formLabel: {
       color: 'white',
     },
-    filterHeader: {
-      color: '#fff',
-      backgroundColor: theme.palette.secondary.main,
-    },
     successButton: {
       color: theme.palette.success.main,
     },
@@ -29,9 +25,6 @@ export default makeStyles((theme) => {
     },
     formControlLabel: {
       marginTop: theme.spacing(1),
-    },
-    accordionSummary: {
-      backgroundColor: '#2e2e2e',
     },
     list: {
       width: 'auto',
@@ -52,12 +45,6 @@ export default makeStyles((theme) => {
     },
     expandOpen: {
       transform: 'rotate(180deg)',
-    },
-    scrollPaper: {
-      alignItems: 'baseline',
-    },
-    container: {
-      height: false,
     },
     avatar: {
       backgroundColor: `${theme.palette.secondary.main} !important`,

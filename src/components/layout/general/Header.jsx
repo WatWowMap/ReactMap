@@ -3,14 +3,12 @@ import Clear from '@mui/icons-material/Clear'
 import { IconButton, DialogTitle } from '@mui/material'
 
 import { Trans, useTranslation } from 'react-i18next'
-import useStyles from '@hooks/useStyles'
 
 export default function Header({ names = [], titles, action }) {
-  const classes = useStyles()
   const { t } = useTranslation()
 
   return (
-    <DialogTitle className={classes.filterHeader}>
+    <DialogTitle sx={{ bgcolor: 'secondary.main' }}>
       {titles.map((title, index) =>
         names[index] ? (
           <Trans i18nKey={title} key={title}>
