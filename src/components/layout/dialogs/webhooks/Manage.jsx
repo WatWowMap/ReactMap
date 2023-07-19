@@ -8,7 +8,6 @@ import { useLazyQuery } from '@apollo/client'
 
 import Query from '@services/Query'
 import { useStatic } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
 import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 
@@ -40,7 +39,6 @@ export default function Manage({
   handleWebhookClose,
 }) {
   const { t } = useTranslation()
-  const classes = useStyles()
   const [syncWebhook, { data }] = useLazyQuery(Query.webhook('allProfiles'), {
     fetchPolicy: 'no-cache',
   })
@@ -247,10 +245,6 @@ export default function Manage({
       </DialogContent>
       <Footer options={footerButtons} role="webhook_footer" />
       <Dialog
-        classes={{
-          scrollPaper: classes.scrollPaper,
-          container: classes.container,
-        }}
         fullWidth={!isMobile}
         fullScreen={isMobile}
         maxWidth="md"
@@ -289,15 +283,7 @@ export default function Manage({
           />
         )}
       </Dialog>
-      <Dialog
-        classes={{
-          scrollPaper: classes.scrollPaper,
-          container: classes.container,
-        }}
-        maxWidth="xs"
-        open={feedback}
-        onClose={() => setFeedback(false)}
-      >
+      <Dialog maxWidth="xs" open={feedback} onClose={() => setFeedback(false)}>
         <Feedback link={map.feedbackLink} setFeedback={setFeedback} />
       </Dialog>
     </>
