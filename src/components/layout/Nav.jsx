@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
 
 import Utility from '@services/Utility'
@@ -53,14 +53,14 @@ export default function Nav({
   const tutorial = useStore((s) => s.tutorial)
   const motdIndex = useStore((s) => s.motdIndex)
 
-  const [drawer, setDrawer] = useState(false)
-  const [donorPage, setDonorPage] = useState(false)
-  const [dialog, setDialog] = useState({
+  const [drawer, setDrawer] = React.useState(false)
+  const [donorPage, setDonorPage] = React.useState(false)
+  const [dialog, setDialog] = React.useState({
     open: false,
     category: '',
     type: '',
   })
-  const [motd, setMotd] = useState(
+  const [motd, setMotd] = React.useState(
     config.map.messageOfTheDay.components?.length &&
       (config.map.messageOfTheDay.index > motdIndex ||
         config.map.messageOfTheDay.settings.permanent) &&
@@ -113,6 +113,21 @@ export default function Nav({
         setUserSettings({ ...userSettings, [category]: filter })
       }
     }
+
+  React.useEffect(() => {
+    /**
+     * @param {KeyboardEvent} event
+     */
+    const toggleDarkMode = (event) => {
+      // This is mostly meant for development purposes
+      if (event.ctrlKey && event.key === 'd') {
+        useStore.setState((prev) => ({ darkMode: !prev.darkMode }))
+      }
+    }
+
+    window.addEventListener('keydown', toggleDarkMode)
+    return () => window.removeEventListener('keydown', toggleDarkMode)
+  }, [])
 
   return (
     <>
