@@ -25,16 +25,12 @@
 }
 
 body {
-  background-color: rgb(53, 53, 53);
   margin: 0;
-}
-
-.MuiDrawer-paper {
-  background-color: rgb(51, 51, 51);
-}
-
-.MuiToggleButton-root {
   background-color: white;
+}
+
+.dark {
+  background-color: rgb(18, 18, 18);
 }
 
 .grid-item {

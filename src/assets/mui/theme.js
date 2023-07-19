@@ -11,7 +11,7 @@ import * as locales from '@mui/material/locale'
  */
 export default function customTheme(
   theme = {},
-  darkMode = true,
+  darkMode = document.body.classList.contains('dark'),
   locale = 'enUS',
 ) {
   return responsiveFontSizes(
