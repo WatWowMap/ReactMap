@@ -278,7 +278,7 @@ const MenuActions = ({ gym, perms, hasRaid, badge, setBadge }) => {
   return (
     <Grid item xs={2} style={{ textAlign: 'right' }}>
       <IconButton aria-haspopup="true" onClick={handleClick} size="large">
-        <MoreVert style={{ color: 'white' }} />
+        <MoreVert />
       </IconButton>
       <Dropdown
         anchorEl={anchorEl}
@@ -643,7 +643,7 @@ const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
             onClick={() => handleExpandClick('extras')}
             size="large"
           >
-            <ExpandMore style={{ color: 'white' }} />
+            <ExpandMore />
           </IconButton>
         </Grid>
       )}

@@ -101,7 +101,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
         </Grid>
         <Grid item xs={3}>
           <IconButton aria-haspopup="true" onClick={handleClick} size="large">
-            <MoreVert style={{ color: 'white' }} />
+            <MoreVert />
           </IconButton>
         </Grid>
         <Menu
@@ -151,7 +151,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Divider style={{ color: 'white', margin: 4 }} />
+          <Divider style={{ margin: 4 }} />
         </Grid>
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           {recent ? (

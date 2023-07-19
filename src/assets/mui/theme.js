@@ -56,16 +56,6 @@ export default function customTheme(
               disableRipple: true,
             },
           },
-          MuiSelect: {
-            styleOverrides: {
-              icon: {
-                color: 'white',
-              },
-              iconOpen: {
-                color: 'white',
-              },
-            },
-          },
           MuiDialogTitle: {
             styleOverrides: {
               root: {
@@ -81,21 +71,6 @@ export default function customTheme(
             },
           },
         },
-        // overrides: {
-        //   MuiDialogTitle: {
-        //     root: {
-        //       padding: '12px 24px',
-        //     },
-        //   },
-        //   MuiSelect: {
-        //     icon: {
-        //       color: 'white',
-        //     },
-        //     iconOpen: {
-        //       color: 'white',
-        //     },
-        //   },
-        // },
       },
       locales[locale],
     ),

@@ -8,7 +8,7 @@ export default function Header({ names = [], titles, action }) {
   const { t } = useTranslation()
 
   return (
-    <DialogTitle sx={{ bgcolor: 'secondary.main' }}>
+    <DialogTitle sx={{ bgcolor: 'secondary.main', color: 'white' }}>
       {titles.map((title, index) =>
         names[index] ? (
           <Trans i18nKey={title} key={title}>

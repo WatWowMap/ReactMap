@@ -73,7 +73,7 @@ export default function NewPokemon({ data, rowIndex, columnIndex, style }) {
 
   const advMenu = (
     <IconButton onClick={toggleWebhook(true, item.id)} size="large">
-      <Tune style={{ color: 'white' }} />
+      <Tune />
     </IconButton>
   )
 

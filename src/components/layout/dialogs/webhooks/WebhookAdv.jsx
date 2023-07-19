@@ -744,7 +744,7 @@ export default function WebhookAdvanced({
         titles={Poracle.getTitles(idObj)}
         action={toggleWebhook(false, id)}
       />
-      <DialogContent style={{ color: 'white', padding: '8px 5px' }}>
+      <DialogContent style={{ padding: '8px 5px' }}>
         {Object.keys(info.ui).map((type) => {
           if (
             human.blocked_alerts &&

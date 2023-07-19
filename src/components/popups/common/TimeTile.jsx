@@ -58,7 +58,6 @@ export default function TimeTile({
           <Grid item xs={2}>
             <IconButton
               className={expanded ? 'expanded' : 'closed'}
-              style={{ color: 'white' }}
               onClick={() =>
                 useStore.setState((prev) => ({
                   popups: { ...prev.popups, [expandKey]: !expanded },

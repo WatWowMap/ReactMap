@@ -19,7 +19,7 @@ export default function Navigation({ lat, lon }) {
       rel="noreferrer"
       size="large"
     >
-      <Map style={{ color: 'white' }} />
+      <Map />
     </IconButton>
   )
 }

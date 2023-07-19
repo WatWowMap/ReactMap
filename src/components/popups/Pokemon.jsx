@@ -253,7 +253,7 @@ const Header = ({
       </Grid>
       <Grid item xs={3}>
         <IconButton aria-haspopup="true" onClick={handleClick} size="large">
-          <MoreVert style={{ color: 'white' }} />
+          <MoreVert />
         </IconButton>
       </Grid>
       <Menu
@@ -478,7 +478,7 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, Icons }) => {
           onClick={() => handleExpandClick('extras')}
           size="large"
         >
-          <ExpandMore style={{ color: 'white' }} />
+          <ExpandMore />
         </IconButton>
       </Grid>
     </>

@@ -393,7 +393,7 @@ const MenuActions = ({
   return (
     <Grid item xs={2} style={{ textAlign: 'right' }}>
       <IconButton aria-haspopup="true" onClick={handleClick} size="large">
-        <MoreVert style={{ color: 'white' }} />
+        <MoreVert />
       </IconButton>
       <Dropdown
         anchorEl={anchorEl}
@@ -587,7 +587,7 @@ const Footer = ({ pokestop, perms }) => {
             }
             size="large"
           >
-            <ExpandMore style={{ color: 'white' }} />
+            <ExpandMore />
           </IconButton>
         </Grid>
       )}
@@ -713,7 +713,7 @@ const Invasion = ({ invasion, Icons, t }) => {
         {invasion.confirmed ? (
           <Check fontSize="medium" color="action" />
         ) : (
-          <Help fontSize="medium" style={{ color: 'white' }} />
+          <Help fontSize="medium" />
         )}
       </Grid>
       <Grid item xs={12}>
