@@ -83,6 +83,7 @@ export const useStore = create(
       setPopups: (popups) => set({ popups }),
       motdIndex: 0,
       setMotdIndex: (motdIndex) => set({ motdIndex }),
+      scannerCooldown: 0,
     }),
     {
       name: 'local-state',

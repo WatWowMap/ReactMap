@@ -1,6 +1,7 @@
 import React from 'react'
 import { renderToString } from 'react-dom/server'
-import L, { Icon } from 'leaflet'
+import { Icon, divIcon } from 'leaflet'
+import getOpacity from '@services/functions/getOpacity'
 
 export const basicMarker = (iconUrl, size) =>
   new Icon({
@@ -10,6 +11,19 @@ export const basicMarker = (iconUrl, size) =>
     popupAnchor: [0, size * -0.6],
     className: 'marker',
   })
+
+const getBadge = (bestPvp) => {
+  switch (bestPvp) {
+    case 1:
+      return 'first'
+    case 2:
+      return 'second'
+    case 3:
+      return 'third'
+    default:
+      return ''
+  }
+}
 
 export const fancyMarker = (
   iconUrl,
@@ -23,23 +37,13 @@ export const fancyMarker = (
   userSettings,
 ) => {
   const { pokemon: pokemonMod, weather: weatherMod } = Icons.modifiers
-  let badge
-  switch (pkmn.bestPvp) {
-    case 1:
-      badge = 'first'
-      break
-    case 2:
-      badge = 'second'
-      break
-    case 3:
-      badge = 'third'
-      break
-    default:
-      break
-  }
+  const badge = getBadge(pkmn.bestPvp)
 
   const ReactIcon = (
-    <div className="marker-image-holder top-overlay">
+    <div
+      className="marker-image-holder top-overlay"
+      style={{ opacity: getOpacity(pkmn.expire_timestamp) }}
+    >
       <img
         src={iconUrl}
         alt={pkmn.pokemon_id}
@@ -127,7 +131,7 @@ export const fancyMarker = (
     </div>
   )
 
-  return L.divIcon({
+  return divIcon({
     popupAnchor: [
       0 + pokemonMod.popupX,
       size * -0.7 * pokemonMod.offsetY + pokemonMod.popupY,

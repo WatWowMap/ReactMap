@@ -7,8 +7,9 @@ import {
 } from '@material-ui/core'
 import PermScanWifiIcon from '@material-ui/icons/PermScanWifi'
 import ClearIcon from '@material-ui/icons/Clear'
+import { useStore } from '@hooks/useStore'
 
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 const StyledListItem = withStyles({
   root: {
@@ -41,17 +42,32 @@ export function ScanQueue({ queue = 0 }) {
 
 export function ScanConfirm({ isInAllowedArea, setMode, areaRestrictions }) {
   const { t } = useTranslation()
+  const scannerCooldown = useStore((s) => s.scannerCooldown)
+
   return (
     <StyledListItem
       button
       color="secondary"
-      disabled={!!(areaRestrictions?.length && !isInAllowedArea)}
+      disabled={
+        !!(areaRestrictions?.length && !isInAllowedArea) || !!scannerCooldown
+      }
       onClick={() => setMode('sendCoords')}
     >
       <ListItemIcon>
         <PermScanWifiIcon color="secondary" />
       </ListItemIcon>
-      <ListItemText primary={t('click_to_scan')} />
+      <ListItemText
+        primary={
+          scannerCooldown ? (
+            <Trans
+              i18nKey="scanner_countdown"
+              values={{ time: scannerCooldown }}
+            />
+          ) : (
+            t('click_to_scan')
+          )
+        }
+      />
     </StyledListItem>
   )
 }

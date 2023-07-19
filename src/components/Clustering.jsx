@@ -1,5 +1,5 @@
 import React from 'react'
-import MarkerClusterGroup from 'react-leaflet-markercluster'
+import MarkerClusterGroup from 'react-leaflet-cluster'
 import { useStatic } from '@hooks/useStore'
 import * as index from './tiles/index'
 import Notification from './layout/general/Notification'

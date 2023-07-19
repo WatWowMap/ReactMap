@@ -3,7 +3,6 @@ const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const { Event } = require('../services/initialization')
 
-const fetchQuests = require('../services/api/fetchQuests')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: {
@@ -79,7 +78,7 @@ module.exports = class Pokestop extends Model {
   ) {
     const {
       filters: {
-        onlyLevels,
+        onlyLevels = 'all',
         onlyLures,
         onlyQuests,
         onlyInvasions,
@@ -537,11 +536,11 @@ module.exports = class Pokestop extends Model {
                 '>=',
                 safeTs * (multiInvasionMs ? 1000 : 1),
               )
+              if (hasConfirmed && onlyConfirmed) {
+                invasion.andWhere('confirmed', onlyConfirmed)
+              }
               invasion.andWhere((subQuery) => {
                 if (hasConfirmed) {
-                  if (onlyConfirmed) {
-                    subQuery.andWhere('confirmed', onlyConfirmed)
-                  }
                   if (rocketPokemon.length) {
                     subQuery
                       .whereIn('slot_1_pokemon_id', rocketPokemon)
@@ -1447,10 +1446,7 @@ module.exports = class Pokestop extends Model {
     })
 
     return {
-      available:
-        finalList.size || questTypes.length
-          ? [...finalList, ...questTypes.map((type) => `u${type}`)]
-          : await fetchQuests(),
+      available: [...finalList, ...questTypes.map((type) => `u${type}`)],
       conditions,
     }
   }

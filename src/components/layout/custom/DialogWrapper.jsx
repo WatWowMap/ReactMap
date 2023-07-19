@@ -1,5 +1,6 @@
-import React from 'react'
+import * as React from 'react'
 import { DialogContent, Grid } from '@material-ui/core'
+import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
@@ -7,36 +8,67 @@ import Utility from '@services/Utility'
 import Header from '../general/Header'
 import Footer from '../general/Footer'
 
-export default function CustomWrapper({
+export default function DialogWrapper({
   configObj,
   defaultTitle,
-  contentBody,
   handleClose,
+  children,
 }) {
   const { perms } = useStatic((s) => s.auth)
-  const footerOptions = [
-    { name: 'close', action: handleClose, color: 'primary' },
-  ]
+  const { t } = useTranslation()
+  const [countdown, setCountdown] = React.useState(
+    Math.floor(
+      typeof configObj.settings?.timeoutSeconds === 'number'
+        ? configObj.settings?.timeoutSeconds
+        : 0,
+    ),
+  )
+  const [footerOptions, setFooterOptions] = React.useState([
+    ...(configObj.footerButtons
+      ? configObj.footerButtons
+          .filter(
+            (button) =>
+              (!button.donorOnly && !button.freeloaderOnly) ||
+              (button.donorOnly && perms.donor) ||
+              (button.freeloaderOnly && !perms.donor),
+          )
+          .map((b) => ({ ...b, name: Utility.getBlockContent(b.name) }))
+      : []),
+    {
+      name: `${t('close')}${countdown ? ` (${countdown})` : ''}`,
+      action: handleClose,
+      color: 'primary',
+      disabled: !!countdown,
+    },
+  ])
 
-  if (configObj.footerButtons.length) {
-    footerOptions.unshift(
-      ...configObj.footerButtons
-        .filter(
-          (button) =>
-            (!button.donorOnly && !button.freeloaderOnly) ||
-            (button.donorOnly && perms.donor) ||
-            (button.freeloaderOnly && !perms.donor),
-        )
-        .map((b) => ({ ...b, name: Utility.getBlockContent(b.name) })),
-    )
-  }
+  React.useEffect(() => {
+    if (countdown > 0) {
+      const timeout = setTimeout(() => {
+        const newTime = countdown - 1
+        setCountdown(newTime)
+        setFooterOptions((prev) => {
+          const last = prev.at(-1)
+          return [
+            ...prev.slice(0, prev.length - 1),
+            {
+              ...last,
+              name: `${t('close')}${newTime ? ` (${newTime})` : ''}`,
+              disabled: !!newTime,
+            },
+          ]
+        })
+      }, 1000)
+      return () => clearTimeout(timeout)
+    }
+  }, [countdown])
 
   return (
     <>
       <Header
         titles={
           configObj.titles?.length
-            ? configObj.titles.map((t) => Utility.getBlockContent(t))
+            ? configObj.titles.map((title) => Utility.getBlockContent(title))
             : [defaultTitle]
         }
       />
@@ -48,7 +80,7 @@ export default function CustomWrapper({
           justifyContent={configObj.settings.parentJustifyContent || 'center'}
           style={configObj.settings.parentStyle || {}}
         >
-          {contentBody}
+          {children}
         </Grid>
       </DialogContent>
       <Footer options={footerOptions} />

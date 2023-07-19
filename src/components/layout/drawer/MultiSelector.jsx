@@ -9,6 +9,7 @@ export default function MultiSelector({
   filterKey,
   items,
   tKey,
+  allowNone,
 }) {
   const { t } = useTranslation()
   const filterValue =
@@ -27,7 +28,8 @@ export default function MultiSelector({
                 ...filters,
                 [category]: {
                   ...filters[category],
-                  [filterKey]: item,
+                  [filterKey]:
+                    item === filterValue && allowNone ? 'none' : item,
                 },
               })
             } else {

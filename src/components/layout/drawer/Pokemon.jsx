@@ -9,18 +9,13 @@ import SliderTile from '../dialogs/filters/SliderTile'
 import TabPanel from '../general/TabPanel'
 import GenderFilter from '../dialogs/filters/Gender'
 
-export default function WithSliders({
-  category,
-  filters,
-  setFilters,
-  context,
-  specificFilter,
-}) {
+export default function WithSliders({ category, context }) {
   const userSettings = useStore((state) => state.userSettings)
+  const filters = useStore((s) => s.filters)
+  const { setFilters } = useStore.getState()
+
   const { t } = useTranslation()
-  const [tempLegacy, setTempLegacy] = useState(
-    filters[category][specificFilter],
-  )
+  const [tempLegacy, setTempLegacy] = useState(filters[category].ivOr)
   const [openTab, setOpenTab] = useState(0)
 
   useEffect(() => {
@@ -28,7 +23,7 @@ export default function WithSliders({
       ...filters,
       [category]: {
         ...filters[category],
-        [specificFilter]: tempLegacy,
+        ivOr: tempLegacy,
       },
     })
   }, [tempLegacy])
@@ -58,9 +53,7 @@ export default function WithSliders({
     }
   }
 
-  const handleTabChange = (event, newValue) => {
-    setOpenTab(newValue)
-  }
+  const handleTabChange = (_e, newValue) => setOpenTab(newValue)
 
   return (
     <>
@@ -114,15 +107,6 @@ export default function WithSliders({
           </AppBar>
           {Object.keys(context.sliders).map((slider, index) => (
             <TabPanel value={openTab} index={index} key={slider}>
-              {Object.values(context.sliders[slider]).map((subItem) => (
-                <Grid item xs={12} key={subItem.name}>
-                  <SliderTile
-                    filterSlide={subItem}
-                    handleChange={handleChange}
-                    filterValues={filters[category][specificFilter]}
-                  />
-                </Grid>
-              ))}
               <Grid
                 container
                 item
@@ -130,8 +114,17 @@ export default function WithSliders({
                 direction="row"
                 alignItems="center"
                 justifyContent="center"
-                style={{ width: 250 }}
+                style={{ paddingTop: 4 }}
               >
+                {Object.values(context.sliders[slider]).map((subItem) => (
+                  <Grid item xs={12} key={subItem.name}>
+                    <SliderTile
+                      filterSlide={subItem}
+                      handleChange={handleChange}
+                      filterValues={filters[category].ivOr}
+                    />
+                  </Grid>
+                ))}
                 {index ? (
                   <>
                     {['xxs', 'xxl'].map((each, i) => (
@@ -161,22 +154,14 @@ export default function WithSliders({
                         </Grid>
                       </Fragment>
                     ))}
-                    {/* <Divider
-                      flexItem
-                      style={{ width: '100%', height: 2, margin: '8px 0' }}
-                    /> */}
-                    {/* {['xsRat', 'xlKarp'].map((each, i) => (
+                  </>
+                ) : (
+                  <>
+                    {['zeroIv', 'hundoIv'].map((each) => (
                       <Fragment key={each}>
-                        <Grid item xs={2}>
-                          <img
-                            style={{ maxHeight: 30, maxWidth: 30 }}
-                            src={Icons.getPokemon(i ? 129 : 19)}
-                            alt={i ? 'Karp' : 'Rat'}
-                          />
-                        </Grid>
-                        <Grid item xs={1}>
-                          <Typography variant="subtitle2">
-                            {i ? t('xl').toUpperCase() : t('xs').toUpperCase()}
+                        <Grid item xs={3}>
+                          <Typography>
+                            {t(Utility.camelToSnake(each))}
                           </Typography>
                         </Grid>
                         <Grid item xs={3}>
@@ -196,59 +181,33 @@ export default function WithSliders({
                           />
                         </Grid>
                       </Fragment>
-                    ))} */}
-                  </>
-                ) : (
-                  ['zeroIv', 'hundoIv'].map((each) => (
-                    <Fragment key={each}>
-                      <Grid item xs={3}>
-                        <Typography>{t(Utility.camelToSnake(each))}</Typography>
-                      </Grid>
-                      <Grid item xs={3}>
-                        <Switch
-                          color="primary"
-                          disabled={!context[each]}
-                          checked={filters[category][each]}
-                          onChange={() => {
-                            setFilters({
-                              ...filters,
-                              [category]: {
-                                ...filters[category],
-                                [each]: !filters[category][each],
+                    ))}
+                    <Grid
+                      container
+                      alignItems="center"
+                      justifyContent="flex-start"
+                      item
+                      xs={category ? 12 : 6}
+                      style={{ margin: '10px 0' }}
+                    >
+                      <GenderFilter
+                        filter={filters[category].ivOr}
+                        setFilter={(newValue) =>
+                          setFilters({
+                            ...filters,
+                            [category]: {
+                              ...filters[category],
+                              ivOr: {
+                                ...filters[category].ivOr,
+                                gender: newValue,
                               },
-                            })
-                          }}
-                        />
-                      </Grid>
-                    </Fragment>
-                  ))
-                )}
-                {!index && (
-                  <Grid
-                    container
-                    alignItems="center"
-                    justifyContent="flex-start"
-                    item
-                    xs={category ? 12 : 6}
-                    style={{ margin: '10px 0' }}
-                  >
-                    <GenderFilter
-                      filter={filters[category].ivOr}
-                      setFilter={(newValue) =>
-                        setFilters({
-                          ...filters,
-                          [category]: {
-                            ...filters[category],
-                            ivOr: {
-                              ...filters[category].ivOr,
-                              gender: newValue,
                             },
-                          },
-                        })
-                      }
-                      category="pokemon"
-                    />
-                  </Grid>
+                          })
+                        }
+                        category="pokemon"
+                      />
+                    </Grid>
+                  </>
                 )}
               </Grid>
             </TabPanel>

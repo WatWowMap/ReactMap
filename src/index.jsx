@@ -1,5 +1,5 @@
-import React from 'react'
-import { render } from 'react-dom'
+import * as React from 'react'
+import { createRoot } from 'react-dom/client'
 import ReactGA from 'react-ga4'
 
 // Sentry must be imported before app
@@ -19,6 +19,4 @@ if (inject) {
   console.log('ReactMap Version:', VERSION)
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  render(<App />, document.getElementById('root'))
-})
+createRoot(document.getElementById('root')).render(<App />)

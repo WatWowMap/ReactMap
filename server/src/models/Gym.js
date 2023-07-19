@@ -1,7 +1,7 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const fetchRaids = require('../services/api/fetchRaids')
 const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
@@ -128,9 +128,9 @@ module.exports = class Gym extends Model {
     const eggs = []
     const slots = []
     const actualBadge =
-      onlyBadge === 'all'
-        ? 'all'
-        : onlyBadge && +onlyBadge.replace('badge_', '')
+      onlyBadge && onlyBadge.startsWith('badge_')
+        ? +onlyBadge.replace('badge_', '')
+        : `${onlyBadge}`
 
     const userBadges =
       onlyGymBadges && gymBadges && userId
@@ -138,7 +138,7 @@ module.exports = class Gym extends Model {
             .where('userId', userId)
             .andWhere(
               'badge',
-              ...(actualBadge === 'all' ? ['>', 0] : [actualBadge]),
+              ...(typeof actualBadge === 'string' ? ['>', 0] : [actualBadge]),
             )
         : []
 
@@ -257,7 +257,12 @@ module.exports = class Gym extends Model {
           })
         }
       }
-      if (userBadges.length) {
+      if (actualBadge === 'none' && onlyGymBadges) {
+        gym.orWhereNotIn(
+          isMad ? 'gym.gym_id' : 'id',
+          userBadges.map((badge) => badge.gymId) || [],
+        )
+      } else if (userBadges.length) {
         gym.orWhereIn(
           isMad ? 'gym.gym_id' : 'id',
           userBadges.map((badge) => badge.gymId) || [],
@@ -364,13 +369,21 @@ module.exports = class Gym extends Model {
           newGym.hasRaid = true
         }
         if (
-          (onlyAllGyms || onlyExEligible || onlyArEligible || onlyInBattle) &&
+          (onlyAllGyms ||
+            (onlyExEligible && newGym.ex_raid_eligible) ||
+            (onlyArEligible && newGym.ar_scan_eligible) ||
+            (onlyInBattle && newGym.in_battle)) &&
           (finalTeams.includes(gym.team_id) ||
             finalSlots[gym.team_id]?.includes(gym.available_slots))
         ) {
           newGym.hasGym = true
         }
-        if (newGym.hasRaid || newGym.badge || newGym.hasGym) {
+        if (
+          newGym.hasRaid ||
+          newGym.badge ||
+          (actualBadge === 'none' && onlyGymBadges) ||
+          newGym.hasGym
+        ) {
           filteredResults.push(newGym)
         }
       })
@@ -419,9 +432,6 @@ module.exports = class Gym extends Model {
         })
         return [...unique]
       })
-    if (!results.length) {
-      return { available: [...teamResults, ...(await fetchRaids())] }
-    }
     return {
       available: [
         ...teamResults,

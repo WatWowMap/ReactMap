@@ -24,6 +24,8 @@ export default function ScanOnDemand({
     scanZoneSpacing,
     scanZoneMaxSize,
     scanZoneAreaRestriction,
+    scanNextCooldown = 0,
+    scanZoneCooldown = 0,
   },
   mode,
 }) {
@@ -69,6 +71,12 @@ export default function ScanOnDemand({
     if (scanMode === 'sendCoords') {
       demandScan()
       setScanMode('loading')
+      const timer = mode === 'scanNext' ? scanNextCooldown : scanZoneCooldown
+      useStore.setState({
+        scannerCooldown:
+          (typeof timer === 'number' ? Math.floor(timer) : 0) *
+          scanCoords.length,
+      })
     }
   }, [scanMode])
 

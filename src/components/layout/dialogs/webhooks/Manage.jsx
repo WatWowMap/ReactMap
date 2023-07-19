@@ -240,7 +240,9 @@ export default function Manage({
             </TabPanel>
           ))
         ) : (
-          <WebhookError selectedWebhook={selectedWebhook} />
+          <WebhookError selectedWebhook={selectedWebhook}>
+            {poracleFilters.error}
+          </WebhookError>
         )}
       </DialogContent>
       <Footer options={footerButtons} role="webhook_footer" />

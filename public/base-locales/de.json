@@ -339,7 +339,7 @@
   "popup": "Popup",
   "pvp_level": "Level {{level}} PVP Stats",
   "pvp_mega": "Mega PVP Stats",
-  "webhook_entry": "Füge {{category}} zu {{name}} hinzu",
+  "webhook_entry": "Füge zu {{name}} hinzu",
   "distance": "Distanz",
   "gym": "Arena",
   "egg": "Ei",
@@ -598,5 +598,10 @@
   "enable_pokemon_popup_coords": "Pokémon Koordinaten anzeigen",
   "enable_gym_popup_coords": "Arena Koordinaten anzeigen",
   "enable_pokestop_popup_coords": "Pokéstop Koordinaten anzeigen",
-  "enable_portal_popup_coords": "Portal Koordinaten anzeigen"
+  "enable_portal_popup_coords": "Portal Koordinaten anzeigen",
+  "on_block_join_discord": "Bitte trete unserem Discord bei, um weitere Informationen zu erhalten.",
+  "on_block_msg": "Du wurdest aufgrund deiner Mitgliedschaft blockiert",
+  "denied": "verweigert",
+  "showcase": "Showcase",
+  "unknown_event": "unbekanntes Event"
 }

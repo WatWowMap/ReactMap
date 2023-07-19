@@ -328,7 +328,8 @@
   "popup": "Popup",
   "pvp_level": "Level {{level}} PVP Stats",
   "pvp_mega": "Mega PVP Stats",
-  "webhook_entry": "Add {{category}} to {{name}}",
+  "webhook_entry": "Add to {{name}}",
+  "remove_webhook_entry": "Remove from {{name}}",
   "distance": "Distance",
   "gym": "Gym",
   "egg": "Egg",
@@ -602,5 +603,8 @@
   "on_block_msg": "You have been blocked for being a member of",
   "denied": "Denied",
   "showcase": "Showcase",
-  "unknown_event": "Unknown Event"
+  "unknown_event": "Unknown Event",
+  "scanner_countdown": "Available in {{time}}s",
+  "success": "Success",
+  "contribute": "Contribute"
 }

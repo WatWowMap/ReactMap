@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import React, { memo, useRef, useState } from 'react'
+import React, { memo, useRef, useState, useMemo } from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
@@ -107,10 +107,13 @@ const PokemonTile = ({
   const pvpCheck = item.bestPvp !== null && item.bestPvp < 4
   const weatherCheck = item.weather && userSettings.weatherIndicator
 
-  const finalLocation =
-    item.seen_type?.startsWith('nearby') || item.seen_type?.includes('lure')
-      ? getOffset([item.lat, item.lon], item.seen_type, item.id)
-      : [item.lat, item.lon]
+  const finalLocation = useMemo(
+    () =>
+      item.seen_type?.startsWith('nearby') || item.seen_type?.includes('lure')
+        ? getOffset([item.lat, item.lon], item.seen_type, item.id)
+        : [item.lat, item.lon],
+    [item.seen_type],
+  )
 
   useForcePopup(item.id, markerRef, params, setParams, done)
 
