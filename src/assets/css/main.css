@@ -315,6 +315,7 @@ img {
   height: 16px;
   min-width: 14px;
   padding: 4px 3px 0 3px;
+  box-sizing: content-box;
 }
 
 .weather-icon {
