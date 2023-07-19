@@ -33,6 +33,10 @@ module.exports = function clientOptions(perms) {
       showArBadge: { type: 'bool', perm: ['gyms'] },
       raidLevelBadges: { type: 'bool', perm: ['raids'] },
       gymBadgeDiamonds: { type: 'bool', perm: ['gymBadges'] },
+      raidOpacity: { type: 'bool', perm: ['raids'] },
+      opacityTenMinutes: { type: 'number', perm: ['raids'] },
+      opacityFiveMinutes: { type: 'number', perm: ['raids'] },
+      opacityOneMinute: { type: 'number', perm: ['raids'] },
     },
     pokestops: {
       clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },
@@ -49,6 +53,10 @@ module.exports = function clientOptions(perms) {
       },
       hasQuestIndicator: { type: 'bool', perm: ['quests'] },
       showArBadge: { type: 'bool', perm: ['pokestops'] },
+      invasionOpacity: { type: 'bool', perm: ['invasions'] },
+      opacityTenMinutes: { type: 'number', perm: ['invasions'] },
+      opacityFiveMinutes: { type: 'number', perm: ['invasions'] },
+      opacityOneMinute: { type: 'number', perm: ['invasions'] },
     },
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'] },
@@ -62,6 +70,10 @@ module.exports = function clientOptions(perms) {
       pvpMega: { type: 'bool', perm: ['pvp'] },
       showAllPvpRanks: { type: 'bool', perm: ['pvp'] },
       showSizeIndicator: { type: 'bool', perm: ['pokemon'] },
+      pokemonOpacity: { type: 'bool', perm: ['pokemon'] },
+      opacityTenMinutes: { type: 'number', perm: ['pokemon'] },
+      opacityFiveMinutes: { type: 'number', perm: ['pokemon'] },
+      opacityOneMinute: { type: 'number', perm: ['pokemon'] },
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'] },

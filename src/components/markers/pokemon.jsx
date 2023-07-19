@@ -42,7 +42,11 @@ export const fancyMarker = (
   const ReactIcon = (
     <div
       className="marker-image-holder top-overlay"
-      style={{ opacity: getOpacity(pkmn.expire_timestamp) }}
+      style={{
+        opacity: userSettings.pokemonOpacity
+          ? getOpacity(pkmn.expire_timestamp, userSettings)
+          : 1,
+      }}
     >
       <img
         src={iconUrl}

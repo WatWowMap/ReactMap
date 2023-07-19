@@ -85,7 +85,9 @@ export default function GymMarker(
     }
   }
 
-  const opacity = getOpacity(gym.raid_end_timestamp)
+  const opacity = userSettings.raidOpacity
+    ? getOpacity(gym.raid_end_timestamp, userSettings)
+    : 1
 
   const ReactIcon = (
     <div className="marker-image-holder top-overlay">
