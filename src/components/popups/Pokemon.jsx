@@ -598,7 +598,7 @@ const PvpInfo = ({ pokemon, league, data, t, Icons }) => {
                     each.gender,
                     pokemon.costume,
                   )}
-                  height={20}
+                  style={{ maxWidth: 40, maxHeight: 20 }}
                   alt={t(`poke_${each.pokemon}`)}
                 />
               </NameTT>
