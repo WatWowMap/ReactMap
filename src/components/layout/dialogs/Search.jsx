@@ -140,6 +140,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
   Utility.analytics('Global Search', `Search Value: ${search}`, searchTab)
 
   const { data, previousData, loading } = useQuery(Query.search(searchTab), {
+    skip: typeof searchTab === 'number',
     variables: {
       search,
       category: searchTab,
@@ -289,6 +290,13 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
       ] || [],
     )
   }, [data])
+
+  React.useEffect(() => {
+    if (typeof searchTab === 'number') {
+      // searchTab value migration
+      useStore.setState({ searchTab: safeSearch[0] })
+    }
+  }, [searchTab])
 
   return (
     <Box sx={{ width: { xs: 'inherit', sm: 500 } }}>
