@@ -69,24 +69,21 @@ export default function UserOptions({ category, toggleDialog }) {
 
   const [localState, setLocalState] = React.useState(userSettings[category])
 
-  const handleChange = React.useCallback(
-    (event) => {
-      const { name, value, checked, type } = event.target
-      if (type === 'checkbox') {
-        setLocalState({ ...localState, [name]: checked })
-      } else if (value) {
-        setLocalState({ ...localState, [name]: value })
-      } else {
-        setLocalState({ ...localState, [name]: !localState[name] })
-      }
-      Utility.analytics(
-        'User Options',
-        `Name: ${name} New Value: ${value || !localState[name]}`,
-        category,
-      )
-    },
-    [category, localState],
-  )
+  const handleChange = (event) => {
+    const { name, value, checked, type } = event.target
+    if (type === 'checkbox') {
+      setLocalState((prev) => ({ ...prev, [name]: checked }))
+    } else if (value) {
+      setLocalState((prev) => ({ ...prev, [name]: value }))
+    } else {
+      setLocalState((prev) => ({ ...prev, [name]: !localState[name] }))
+    }
+    Utility.analytics(
+      'User Options',
+      `Name: ${name} New Value: ${value || !localState[name]}`,
+      category,
+    )
+  }
 
   const getLabel = (label) => {
     if (label.startsWith('pvp') && !label.includes('Mega')) {
