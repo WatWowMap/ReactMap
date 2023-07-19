@@ -41,7 +41,7 @@ export const useStore = create(
           })
         }
       },
-      settings: undefined,
+      settings: {},
       setSettings: (settings) => set({ settings }),
       userSettings: undefined,
       setUserSettings: (userSettings) => set({ userSettings }),

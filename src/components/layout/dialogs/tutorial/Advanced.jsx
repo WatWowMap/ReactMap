@@ -25,7 +25,7 @@ import ReactWindow from '@components/layout/general/ReactWindow'
 import Advanced from '../filters/Advanced'
 import Tile from '../filters/MenuTile'
 import SlotSelection from '../filters/SlotSelection'
-import data from './data.json'
+import data from './data'
 
 export default function TutAdvanced({ isMobile, toggleHelp, category }) {
   const { t } = useTranslation()
@@ -226,12 +226,16 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
               </Grid>
             </>
           )}
-          <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-            {isMobile ? (
-              <Clear color="primary" />
-            ) : (
-              <Typography color="primary">{t('disable_all')}</Typography>
-            )}
+          <Grid
+            item
+            xs={3}
+            sm={4}
+            sx={(theme) => ({
+              color: theme.palette.error.main,
+              textAlign: 'center',
+            })}
+          >
+            {isMobile ? <Clear /> : <Typography>{t('disable_all')}</Typography>}
           </Grid>
           <Grid item xs={9} sm={8}>
             <Typography variant="subtitle2" align="center">
@@ -242,7 +246,10 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
             item
             xs={3}
             sm={4}
-            style={{ color: '#00e676', textAlign: 'center' }}
+            sx={(theme) => ({
+              color: theme.palette.success.light,
+              textAlign: 'center',
+            })}
           >
             {isMobile ? <Check /> : <Typography>{t('enable_all')}</Typography>}
           </Grid>

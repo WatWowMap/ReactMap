@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
-import {
-  DialogActions,
-  Button,
-  MobileStepper,
-  useMediaQuery,
-} from '@mui/material'
+import { Box, useMediaQuery } from '@mui/material'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import MobileStepper from '@mui/material/MobileStepper'
+import Slide from '@mui/material/Slide'
 
 import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
@@ -32,13 +31,16 @@ export default function Tutorial({
   const { t } = useTranslation()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const [activeStep, setActiveStep] = useState(0)
+  const [prevStep, setPrevStep] = useState(0)
   const [setTutorialInDb] = useMutation(Query.user('setTutorial'))
 
   const handleNext = () => {
+    setPrevStep(activeStep)
     setActiveStep((prevActiveStep) => prevActiveStep + 1)
   }
 
   const handleBack = () => {
+    setPrevStep(activeStep)
     setActiveStep((prevActiveStep) => prevActiveStep - 1)
   }
 
@@ -47,34 +49,50 @@ export default function Tutorial({
     setTutorialInDb({ variables: { tutorial: true } })
   }
 
-  const getStepContent = (stepIndex) => {
-    switch (stepIndex) {
-      case 0:
-        return <Welcome setUserProfile={setUserProfile} />
-      case 1:
-        return <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />
-      case 2:
-        return <Sliders isMobile={isMobile} />
-      case 3:
-        return <Advanced isMobile={isMobile} />
-      case 4:
-        return <Popups isMobile={isMobile} />
-      default:
-        return <Closing />
-    }
-  }
-
   return (
     <>
       <Header titles={['tutorial', steps[activeStep] || 'closing']} />
-      {getStepContent(activeStep)}
+      {/* {getStepContent(activeStep)} */}
+      {[0, 1, 2, 3, 4, 5].map((step) => (
+        <Slide
+          key={step}
+          in={activeStep === step}
+          direction={step > prevStep ? 'left' : 'right'}
+          mountOnEnter
+          unmountOnExit
+          style={{ flexGrow: 1 }}
+        >
+          <Box display={activeStep === step ? 'block' : 'none'}>
+            {
+              {
+                0: <Welcome setUserProfile={setUserProfile} />,
+                1: <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />,
+                2: <Sliders isMobile={isMobile} />,
+                3: <Advanced isMobile={isMobile} />,
+                4: <Popups />,
+                5: <Closing />,
+              }[step]
+            }
+          </Box>
+        </Slide>
+      ))}
+      {/* <Slide in={activeStep === 1} direction="left" mountOnEnter unmountOnExit>
+        <Box>
+          <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />
+        </Box>
+      </Slide>
+      <Slide in={activeStep === 2} direction="left" mountOnEnter unmountOnExit>
+        <Box>
+          <Sliders isMobile={isMobile} />
+        </Box>
+      </Slide> */}
       <DialogActions>
         <MobileStepper
-          variant="progress"
+          variant="text"
           steps={steps.length}
           position="static"
           activeStep={activeStep}
-          style={{ maxWidth: 400, flexGrow: 1 }}
+          style={{ flexGrow: 1 }}
           nextButton={
             <Button
               size="small"

@@ -33,7 +33,10 @@ const LOCALE_MAP = /** @type {const} */ ({
 export default function Config({ setTheme }) {
   const { t } = useTranslation()
   const darkMode = useStore((s) => s.darkMode)
-  const locale = useStore((s) => s.settings.localeSelection)
+  const locale =
+    useStore((s) => s.settings?.localeSelection) ||
+    localStorage.getItem('i18nextLng') ||
+    'en'
 
   const [serverSettings, setServerSettings] = React.useState(null)
 

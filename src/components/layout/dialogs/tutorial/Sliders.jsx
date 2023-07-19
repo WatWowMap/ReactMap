@@ -3,7 +3,7 @@ import { Grid, DialogContent, Typography, Divider } from '@mui/material'
 import { useTranslation, Trans } from 'react-i18next'
 
 import SliderTile from '../filters/SliderTile'
-import data from './data.json'
+import data from './data'
 
 const relevant = ['iv', 'level', 'great', 'ultra']
 export default function TutSliders() {

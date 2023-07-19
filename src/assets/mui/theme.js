@@ -4,12 +4,16 @@ import { createTheme } from '@mui/material/styles'
 import * as locales from '@mui/material/locale'
 
 /**
- * @param {{ primary: string, secondary: string }} theme
+ * @param {{ primary?: string, secondary?: string }} theme
  * @param {boolean} darkMode
  * @param {keyof typeof locales} locale
  * @returns
  */
-export default function setTheme(theme, darkMode, locale = 'enUS') {
+export default function customTheme(
+  theme = {},
+  darkMode = true,
+  locale = 'enUS',
+) {
   return responsiveFontSizes(
     createTheme(
       {
@@ -43,6 +47,13 @@ export default function setTheme(theme, darkMode, locale = 'enUS') {
           // },
         },
         components: {
+          MuiPaper: {
+            styleOverrides: {
+              root: {
+                backgroundImage: 'none',
+              },
+            },
+          },
           MuiAccordion: {
             defaultProps: {
               disableGutters: true,
@@ -79,6 +90,13 @@ export default function setTheme(theme, darkMode, locale = 'enUS') {
             styleOverrides: {
               root: {
                 padding: '12px 24px',
+              },
+            },
+          },
+          MuiDialogContent: {
+            styleOverrides: {
+              root: {
+                height: '100%',
               },
             },
           },

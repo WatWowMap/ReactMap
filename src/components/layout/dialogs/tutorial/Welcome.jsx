@@ -44,7 +44,7 @@ export default function TutWelcome({ setUserProfile }) {
         container
         direction="row"
         alignItems="center"
-        justifyContent="center"
+        justifyContent="space-evenly"
         spacing={2}
         style={{ height: '100%' }}
       >
