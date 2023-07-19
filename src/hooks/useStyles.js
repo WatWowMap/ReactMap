@@ -90,13 +90,5 @@ export default makeStyles((theme) => {
         backgroundColor: theme.palette.action.selected,
       },
     },
-    areaChips: {
-      display: 'flex',
-      justifyContent: 'center',
-      flexWrap: 'wrap',
-      '& > *': {
-        margin: theme.spacing(1),
-      },
-    },
   }
 })
