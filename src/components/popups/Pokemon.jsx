@@ -503,8 +503,7 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
 const ExtraInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
   const { moves } = useStatic((state) => state.masterfile)
 
-  const { move_1, move_2, weight, height, first_seen_timestamp, updated, iv } =
-    pokemon
+  const { move_1, move_2, first_seen_timestamp, updated, iv } = pokemon
 
   return (
     <Grid container alignItems="center" justifyContent="center">
@@ -524,50 +523,49 @@ const ExtraInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
                   backgroundImage: `url(${Icons.getTypes(moves[move].type)})`,
                 }}
               />
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <Typography variant="caption">{t(`move_${move}`)}</Typography>
               </Grid>
-              <Grid item xs={3} style={{ textAlign: 'right' }}>
+              {/* <Grid item xs={3} style={{ textAlign: 'right' }}>
                 <Typography variant="caption">
                   {i
                     ? `${weight ? weight.toFixed(2) : '? '}${t('kilogram')}`
                     : `${height ? height.toFixed(2) : '? '}${t('meter')}`}
                 </Typography>
-              </Grid>
+              </Grid> */}
             </Fragment>
           )
         })}
+      <Divider
+        flexItem
+        style={{ width: '100%', height: 2, margin: '10px 0' }}
+      />
       {[first_seen_timestamp, updated].map((time, i) =>
         time ? (
-          <Fragment key={`${time}-${i ? 'updated' : 'first'}`}>
-            <Grid
-              item
-              xs={t('popup_pokemon_description_width')}
-              style={{ textAlign: 'center' }}
-            >
-              <Typography variant="caption">
+          <Grid
+            container
+            item
+            xs={6}
+            key={`${time}-${i ? 'updated' : 'first'}`}
+            style={{ flexGrow: i ? 0 : 1, textAlign: 'center' }}
+            direction="column"
+          >
+            <Grid item>
+              <Typography variant="subtitle2">
                 {i ? t('last_seen') : t('first_seen')}:
               </Typography>
             </Grid>
-            <Grid
-              item
-              xs={t('popup_pokemon_seen_timer_width')}
-              style={{ textAlign: 'right' }}
-            >
-              <GenericTimer expireTime={time} />
-            </Grid>
-            <Grid
-              item
-              xs={t('popup_pokemon_data_width')}
-              style={{ textAlign: 'right' }}
-            >
+            <Grid item>
               <Typography variant="caption">
                 {new Date(time * 1000).toLocaleTimeString(
                   localStorage.getItem('i18nextLng') || 'en',
                 )}
               </Typography>
             </Grid>
-          </Fragment>
+            <Grid item>
+              <GenericTimer expireTime={time} />
+            </Grid>
+          </Grid>
         ) : null,
       )}
       {process.env.NODE_ENV === 'development' && (
