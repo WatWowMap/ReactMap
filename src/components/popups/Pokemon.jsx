@@ -440,6 +440,7 @@ const Timer = ({ pokemon, hasStats, t }) => {
 
 const Footer = ({ pokemon, popups, setPopups, hasPvp, Icons }) => {
   const { lat, lon } = pokemon
+  const darkMode = useStore((s) => s.darkMode)
 
   const handleExpandClick = (category) => {
     const opposite = category === 'extras' ? 'pvp' : 'extras'
@@ -462,6 +463,7 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, Icons }) => {
           >
             <img
               alt="pvp"
+              className={darkMode ? '' : 'darken-image'}
               src={Icons.getMisc('pvp')}
               height={20}
               width="auto"

@@ -345,6 +345,7 @@ img {
   border-radius: 12px;
   padding: 3px;
   font-size: 0.5rem !important;
+  color: white;
 }
 
 .amount-popup {

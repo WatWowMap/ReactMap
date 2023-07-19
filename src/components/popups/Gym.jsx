@@ -611,7 +611,7 @@ const Timer = ({ gym, start, t, hasHatched }) => {
 
 const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
   const { lat, lon } = gym
-
+  const darkMode = useStore((s) => s.darkMode)
   const handleExpandClick = (category) => {
     setPopups({
       ...popups,
@@ -627,6 +627,7 @@ const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
             <img
               src={Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
               alt={popups.raids ? 'gyms' : 'raids'}
+              className={darkMode ? '' : 'darken-image'}
               height={20}
               width="auto"
             />
