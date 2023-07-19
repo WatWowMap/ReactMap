@@ -96,7 +96,7 @@ export default function GymMarker(
               width: 46,
               height: 46,
               backgroundImage: `url(${
-                gym.url ? gym.url.replace('http', 'https') : ''
+                gym.url ? gym.url.replace('http://', 'https://') : ''
               })`,
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat',

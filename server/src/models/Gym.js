@@ -257,7 +257,7 @@ module.exports = class Gym extends Model {
           })
         }
       }
-      if (actualBadge === 'none') {
+      if (actualBadge === 'none' && onlyGymBadges) {
         gym.orWhereNotIn(
           isMad ? 'gym.gym_id' : 'id',
           userBadges.map((badge) => badge.gymId) || [],
@@ -369,7 +369,10 @@ module.exports = class Gym extends Model {
           newGym.hasRaid = true
         }
         if (
-          (onlyAllGyms || onlyExEligible || onlyArEligible || onlyInBattle) &&
+          (onlyAllGyms ||
+            (onlyExEligible && newGym.ex_raid_eligible) ||
+            (onlyArEligible && newGym.ar_scan_eligible) ||
+            (onlyInBattle && newGym.in_battle)) &&
           (finalTeams.includes(gym.team_id) ||
             finalSlots[gym.team_id]?.includes(gym.available_slots))
         ) {
@@ -378,7 +381,7 @@ module.exports = class Gym extends Model {
         if (
           newGym.hasRaid ||
           newGym.badge ||
-          actualBadge === 'none' ||
+          (actualBadge === 'none' && onlyGymBadges) ||
           newGym.hasGym
         ) {
           filteredResults.push(newGym)

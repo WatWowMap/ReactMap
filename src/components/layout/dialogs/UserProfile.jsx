@@ -462,7 +462,7 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
         onClick={() => map.flyTo([item.lat, item.lon], 16)}
       >
         <img
-          src={item.url ? item.url.replace('http', 'https') : ''}
+          src={item.url ? item.url.replace('http://', 'https://') : ''}
           alt={item.url}
           style={{
             width: 48,
