@@ -75,7 +75,6 @@ export default function AreaDropDown() {
           minHeight: 50,
           maxHeight: config.map.scanAreaMenuHeight || 400,
           overflow: 'auto',
-          backgroundColor: '#212121',
         }}
       >
         {data?.scanAreasMenu

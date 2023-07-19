@@ -14,7 +14,7 @@ export default function Footer({ options, role }) {
       justifyContent="flex-end"
       alignItems="center"
       sx={(theme) => ({
-        minHeight: 50,
+        // minHeight: 50,
         borderTop: `1px solid ${theme.palette.divider}`,
       })}
     >
@@ -84,7 +84,7 @@ export default function Footer({ options, role }) {
               disabled={button.disabled}
               sx={(theme) => ({
                 display: {
-                  xs: 'none',
+                  xs: MuiIcon ? 'none' : 'block',
                   sm: button.mobileOnly ? 'none' : 'block',
                 },
                 color: muiColor

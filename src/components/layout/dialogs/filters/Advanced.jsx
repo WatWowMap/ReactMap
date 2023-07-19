@@ -202,7 +202,7 @@ export default function AdvancedFilter({
             )}
           </Grid>
         ) : (
-          <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Grid item xs={12} sx={{ textAlign: 'center', mt: 2 }}>
             <Size
               filterValues={filterValues}
               handleChange={handleChange}

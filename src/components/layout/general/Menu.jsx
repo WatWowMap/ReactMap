@@ -334,7 +334,12 @@ export default function Menu({
         </Grid>
       </DialogContent>
       <Footer options={footerButtons} role="dialog_filter_footer" />
-      <Drawer anchor="bottom" open={filterDrawer} onClose={toggleDrawer(false)}>
+      <Drawer
+        anchor="bottom"
+        sx={{ zIndex: 10000 }}
+        open={filterDrawer}
+        onClose={toggleDrawer(false)}
+      >
         {Options}
       </Drawer>
       <Dialog
