@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import { Dialog, Snackbar, Alert } from '@mui/material'
+import Dialog from '@mui/material/Dialog'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
-import SlideTransition from '@assets/mui/SlideTransition'
 
 import FloatingBtn from './FloatingBtn'
 import Sidebar from './drawer/Drawer'
@@ -16,6 +15,7 @@ import Motd from './dialogs/Motd'
 import DonorPage from './dialogs/DonorPage'
 import Feedback from './dialogs/Feedback'
 import ResetFilters from './dialogs/ResetFilters'
+import Notification from './general/Notification'
 
 export default function Nav({
   map,
@@ -239,24 +239,18 @@ export default function Nav({
       >
         <ResetFilters />
       </Dialog>
-      <Snackbar
-        open={Boolean(webhookAlert.open)}
-        onClose={() =>
-          setWebhookAlert({ open: false, severity: 'info', message: '' })
+      <Notification
+        open={!!webhookAlert.open}
+        cb={() =>
+          setWebhookAlert({
+            open: false,
+            severity: webhookAlert.severity,
+            message: '',
+          })
         }
-        TransitionComponent={SlideTransition}
-      >
-        <Alert
-          onClose={() =>
-            setWebhookAlert({ open: false, severity: 'info', message: '' })
-          }
-          severity={webhookAlert.severity}
-          variant="filled"
-          style={{ whiteSpace: 'pre-line', textAlign: 'center' }}
-        >
-          {webhookAlert.message}
-        </Alert>
-      </Snackbar>
+        severity={webhookAlert.severity}
+        messages={[webhookAlert.message]}
+      />
     </>
   )
 }
