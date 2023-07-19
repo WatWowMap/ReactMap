@@ -196,7 +196,8 @@ export default function Nav({
         />
       </Dialog>
       <Dialog
-        maxWidth="sm"
+        fullScreen={isMobile}
+        maxWidth="md"
         open={dialog.open && dialog.type === 'options'}
         onClose={toggleDialog(false, dialog.category, dialog.type)}
       >

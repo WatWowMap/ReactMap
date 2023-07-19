@@ -2,9 +2,6 @@ import * as React from 'react'
 import {
   Switch,
   Input,
-  AppBar,
-  Tab,
-  Tabs,
   DialogContent,
   List,
   ListItem,
@@ -14,7 +11,6 @@ import { useTranslation, Trans } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
-import TabPanel from '../general/TabPanel'
 import Header from '../general/Header'
 import Footer from '../general/Footer'
 
@@ -72,15 +68,6 @@ export default function UserOptions({ category, toggleDialog }) {
   const userSettings = useStore((state) => state.userSettings)
 
   const [localState, setLocalState] = React.useState(userSettings[category])
-  const [tab, setTab] = React.useState(0)
-  const [tabPages] = React.useState(
-    Array.from(
-      {
-        length: Math.ceil(Object.keys(staticUserSettings).length / 10),
-      },
-      (_, i) => i,
-    ),
-  )
 
   const handleChange = React.useCallback(
     (event) => {
@@ -101,8 +88,6 @@ export default function UserOptions({ category, toggleDialog }) {
     [category, localState],
   )
 
-  const handleTabChange = (_, newValue) => setTab(newValue)
-
   const getLabel = (label) => {
     if (label.startsWith('pvp') && !label.includes('Mega')) {
       return <Trans i18nKey="pvp_level">{{ level: label.substring(3) }}</Trans>
@@ -116,72 +101,50 @@ export default function UserOptions({ category, toggleDialog }) {
         titles={[`${Utility.camelToSnake(category)}_options`]}
         action={toggleDialog(false, category, 'options')}
       />
-      <DialogContent sx={{ p: 0, minWidth: 'min(100vw, 300px)' }}>
-        {tabPages.length > 1 && (
-          <AppBar position="static">
-            <Tabs value={tab} onChange={handleTabChange}>
-              {tabPages.map((each) => (
-                <Tab
-                  key={each}
-                  label={<Trans i18nKey="page">{{ page: each + 1 }}</Trans>}
+      <DialogContent sx={{ minWidth: 'min(100vw, 350px)' }}>
+        <List>
+          {Object.entries(staticUserSettings).map(([option, values]) => (
+            <React.Fragment key={option}>
+              <ListItem
+                key={option}
+                disableGutters
+                disablePadding
+                style={{ minHeight: 38 }}
+              >
+                <ListItemText
+                  primary={getLabel(option)}
+                  primaryTypographyProps={{
+                    style: { maxWidth: '80%' },
+                  }}
                 />
-              ))}
-            </Tabs>
-          </AppBar>
-        )}
-        {tabPages.map((each) => (
-          <TabPanel value={tab} index={each} key={each}>
-            <List>
-              {Object.entries(staticUserSettings).map(([option, values], j) => {
-                const start = each * 10
-                const end = each * 10 + 10
-                if (j < start) return null
-                if (j >= end) return null
-                return (
-                  <React.Fragment key={option}>
-                    <ListItem
-                      key={option}
-                      disableGutters
-                      disablePadding
-                      style={{ minHeight: 38 }}
-                    >
-                      <ListItemText
-                        primary={getLabel(option)}
-                        primaryTypographyProps={{
-                          style: { maxWidth: '80%' },
-                        }}
-                      />
-                      <MemoInputType
-                        option={option}
-                        localState={localState}
-                        handleChange={handleChange}
-                        category={category}
-                      />
-                    </ListItem>
-                    {values.sub &&
-                      Object.keys(values.sub).map((subOption) => (
-                        <ListItem
-                          key={subOption}
-                          disableGutters
-                          disablePadding
-                          style={{ minHeight: 38 }}
-                        >
-                          <ListItemText primary={getLabel(subOption)} />
-                          <MemoInputType
-                            option={option}
-                            subOption={subOption}
-                            localState={localState}
-                            handleChange={handleChange}
-                            category={category}
-                          />
-                        </ListItem>
-                      ))}
-                  </React.Fragment>
-                )
-              })}
-            </List>
-          </TabPanel>
-        ))}
+                <MemoInputType
+                  option={option}
+                  localState={localState}
+                  handleChange={handleChange}
+                  category={category}
+                />
+              </ListItem>
+              {values.sub &&
+                Object.keys(values.sub).map((subOption) => (
+                  <ListItem
+                    key={subOption}
+                    disableGutters
+                    disablePadding
+                    style={{ minHeight: 38 }}
+                  >
+                    <ListItemText primary={getLabel(subOption)} />
+                    <MemoInputType
+                      option={option}
+                      subOption={subOption}
+                      localState={localState}
+                      handleChange={handleChange}
+                      category={category}
+                    />
+                  </ListItem>
+                ))}
+            </React.Fragment>
+          ))}
+        </List>
       </DialogContent>
       <Footer
         options={[
