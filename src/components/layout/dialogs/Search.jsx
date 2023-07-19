@@ -124,7 +124,7 @@ export function FancySearch({ searchOptions, loading, InputProps, ...props }) {
   )
 }
 
-export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
+export default function Search({ safeSearch, toggleDialog, Icons }) {
   Utility.analytics('/search')
 
   const { t } = useTranslation()
@@ -171,8 +171,8 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
           style={{
             maxHeight: 45,
             maxWidth: 45,
-            marginLeft: isMobile ? 0 : 17,
-            position: 'relative',
+            // marginLeft: isMobile ? 0 : 17,
+            // position: 'relative',
           }}
         >
           <NameTT id={tt}>
@@ -315,14 +315,19 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
         loading={loading}
         autoComplete={false}
         clearOnBlur={false}
+        ListboxProps={{
+          sx: { maxHeight: '80vh' },
+        }}
         fullWidth
         clearIcon={null}
+        open
         popupIcon={null}
         sx={{ p: 2 }}
         PopperComponent={({ children, ...props }) => (
           <Popper
             {...props}
             placement="bottom"
+            keepMounted
             sx={{ height: 0, width: { xs: 'inherit', sm: 500 } }}
           >
             {children}
@@ -337,7 +342,9 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
             loading={loading}
           />
         )}
-        getOptionLabel={(option) => option.id}
+        getOptionLabel={(option) =>
+          `${option.id}-${searchTab}-${option.with_ar}`
+        }
         renderOption={(props, option) => (
           <Grid
             key={`${option.id}-${searchTab}-${option.with_ar}`}
@@ -357,14 +364,12 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
           >
             <Grid
               item
-              xs={2}
+              xs={3}
+              sm={2}
               style={{
-                textAlign: 'center',
                 alignItems: 'center',
                 display: 'flex',
                 justifyContent: 'center',
-                height: 45,
-                width: 45,
               }}
             >
               {option.url ? (
@@ -374,14 +379,15 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
                       ? option.url.replace(/^http:\/\//, 'https://')
                       : Icons.getMisc(searchTab)
                   }
-                  style={{ maxHeight: '100%', maxWidth: '100%' }}
                   alt={option.url}
+                  height={45}
+                  width={45}
                 />
               ) : (
                 getUrl(option)
               )}
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs={7} sm={8}>
               <Typography variant="caption" style={{ fontWeight: 'bold' }}>
                 {searchTab === 'pokemon'
                   ? `${t(`poke_${option.pokemon_id}`)} ${
