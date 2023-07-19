@@ -181,7 +181,6 @@ export default function ScanZoneTarget({
                     step={1}
                     value={scanZoneSize}
                     onChange={handleSizeChange}
-                    valueLabelDisplay="auto"
                   />
                 </ListItem>
                 <ListSubheader disableSticky style={{ lineHeight: 2 }}>
@@ -224,7 +223,6 @@ export default function ScanZoneTarget({
                           step={0.01}
                           value={spacing}
                           onChange={handleSpacingChange}
-                          valueLabelDisplay="auto"
                           style={{ margin: 0, padding: 0 }}
                         />
                         <ListSubheader disableSticky style={{ lineHeight: 2 }}>

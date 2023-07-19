@@ -89,6 +89,12 @@ export default function customTheme(
               },
             },
           },
+          MuiSlider: {
+            defaultProps: {
+              size: 'small',
+              valueLabelDisplay: 'auto',
+            },
+          },
         },
       },
       locales[locale],

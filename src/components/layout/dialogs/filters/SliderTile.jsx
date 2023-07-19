@@ -109,7 +109,7 @@ export default function SliderTile({
           />
         </Grid>
       ))}
-      <Grid item xs={10} style={{ textAlign: 'center' }}>
+      <Grid item xs={11} style={{ textAlign: 'center' }}>
         <Slider
           name={name}
           min={min}
@@ -122,7 +122,6 @@ export default function SliderTile({
             handleChange(name, newValues, low, high)
           }}
           disabled={disabled}
-          valueLabelDisplay="auto"
           valueLabelFormat={marks ? (e) => t(`${markI18n}${e}`) : undefined}
           step={step}
           marks={
