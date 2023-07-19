@@ -59,7 +59,17 @@ body {
   border-radius: 0.5rem !important;
 }
 
-.leaflet-popup-tip-container .leaflet-popup-tip {
+.dark .leaflet-tooltip {
+  background-color: rgb(33, 37, 31);
+  border: rgb(26, 26, 26) solid 1px;
+  color: white;
+}
+
+.dark .leaflet-tooltip-bottom:before {
+  border-bottom-color: rgb(26, 26, 26);
+}
+
+.dark .leaflet-popup-tip-container .leaflet-popup-tip {
   background-color: rgb(33, 37, 31);
 }
 
@@ -68,6 +78,13 @@ body {
   color: white;
   border: rgb(26, 26, 26) solid 4px;
 }
+/* 
+TODO: Come back to this
+.dark .leaflet-bar a {
+  background-color: rgb(33, 37, 31);
+  color: white;
+  border: rgb(26, 26, 26) solid 1px;
+} */
 
 .table-pvp {
   margin-left: auto;

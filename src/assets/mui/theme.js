@@ -53,6 +53,11 @@ export default function customTheme(
               disableGutters: true,
             },
           },
+          MuiSelect: {
+            defaultProps: {
+              size: 'small',
+            },
+          },
           MuiAutocomplete: {
             styleOverrides: {
               inputRoot: {

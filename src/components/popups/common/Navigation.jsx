@@ -18,6 +18,7 @@ export default function Navigation({ lat, lon }) {
       target="_blank"
       rel="noreferrer"
       size="large"
+      style={{ color: 'inherit' }}
     >
       <Map />
     </IconButton>

@@ -6,6 +6,8 @@ import {
   DialogContent,
   MenuItem,
   Switch,
+  FormControl,
+  InputLabel,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
@@ -218,25 +220,34 @@ export default function AdvancedFilter({
               xs={12}
               style={{ textAlign: 'center', marginTop: 10, marginBottom: 10 }}
             >
-              <Typography variant="h6">{t('quest_condition')}</Typography>
-              <Select
-                name="adv"
-                value={filterValues.adv || ''}
+              <FormControl
+                variant="outlined"
+                size="small"
                 fullWidth
-                onChange={(e) => handleChange(e)}
+                sx={{ my: 1 }}
               >
-                <MenuItem value="">
-                  <Typography variant="caption">{t('all')}</Typography>
-                </MenuItem>
-                {questConditions[advancedFilter.id]
-                  .slice()
-                  .sort((a, b) => a.title.localeCompare(b.title))
-                  .map(({ title, target }) => (
-                    <MenuItem key={`${title}-${target}`} value={title}>
-                      <QuestTitle questTitle={title} questTarget={target} />
-                    </MenuItem>
-                  ))}
-              </Select>
+                <InputLabel>{t('quest_condition')}</InputLabel>
+                <Select
+                  name="adv"
+                  value={filterValues.adv || ''}
+                  fullWidth
+                  size="small"
+                  label={t('quest_condition')}
+                  onChange={(e) => handleChange(e)}
+                >
+                  <MenuItem value="">
+                    <Typography variant="caption">{t('all')}</Typography>
+                  </MenuItem>
+                  {questConditions[advancedFilter.id]
+                    .slice()
+                    .sort((a, b) => a.title.localeCompare(b.title))
+                    .map(({ title, target }) => (
+                      <MenuItem key={`${title}-${target}`} value={title}>
+                        <QuestTitle questTitle={title} questTarget={target} />
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
             </Grid>
           )}
       </DialogContent>

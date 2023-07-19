@@ -18,7 +18,7 @@ export default function BadgeSelection({ gym, setBadgeMenu, badge, setBadge }) {
     <>
       <Header titles={['gym_badge_menu']} action={() => setBadgeMenu(false)} />
       <DialogContent>
-        <ButtonGroup>
+        <ButtonGroup sx={{ pt: 2 }}>
           {[0, 1, 2, 3].map((i) => (
             <Button
               key={i}
