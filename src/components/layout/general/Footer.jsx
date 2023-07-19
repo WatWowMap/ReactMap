@@ -40,7 +40,6 @@ export default function Footer({ options, role }) {
         )
         const [first, second] = color ? color.split('.') : ['inherit']
 
-        console.log({ first, second })
         return (
           <Grid
             item
