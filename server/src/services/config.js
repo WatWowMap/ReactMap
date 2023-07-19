@@ -415,8 +415,9 @@ Object.keys(config.scanner || {}).forEach((key) => {
 })
 
 if (
-  !config.authentication.strategies.length ||
-  !config.authentication.strategies.find((strategy) => strategy.enabled)
+  !config.authentication.alwaysEnabledPerms.length &&
+  (!config.authentication.strategies.length ||
+    !config.authentication.strategies.find((strategy) => strategy.enabled))
 ) {
   const enabled = Object.keys(config.authentication.perms).filter(
     (perm) => config.authentication.perms[perm].enabled,

@@ -78,7 +78,7 @@ module.exports = class Pokestop extends Model {
   ) {
     const {
       filters: {
-        onlyLevels,
+        onlyLevels = 'all',
         onlyLures,
         onlyQuests,
         onlyInvasions,

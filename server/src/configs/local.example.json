@@ -236,7 +236,7 @@
     }
   },
   "icons": {
-    "Read_More_Here": "https://github.com/WatWowMap/ReactMap/wiki/Icons-Configuration",
+    "Read_More_Here": "https://github.com/WatWowMap/ReactMap/wiki/06.-Icons-Configuration",
     "customizable": [
       "pokemon",
       "pokestop",
