@@ -4,7 +4,6 @@ import { Collapse, Grid, IconButton, Typography } from '@mui/material'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 
 import { useStore } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
 
 import Timer from './Timer'
 import NameTT from './NameTT'
@@ -21,7 +20,6 @@ export default function TimeTile({
 }) {
   const endTime = new Date(expireTime * 1000)
   const expanded = useStore((state) => !!state.popups[expandKey])
-  const classes = useStyles()
 
   return (
     <>
@@ -59,7 +57,7 @@ export default function TimeTile({
         <>
           <Grid item xs={2}>
             <IconButton
-              className={expanded ? classes.expandOpen : classes.expand}
+              className={expanded ? 'expanded' : 'closed'}
               style={{ color: 'white' }}
               onClick={() =>
                 useStore.setState((prev) => ({

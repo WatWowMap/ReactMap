@@ -13,7 +13,6 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
@@ -611,7 +610,6 @@ const Timer = ({ gym, start, t, hasHatched }) => {
 }
 
 const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
-  const classes = useStyles()
   const { lat, lon } = gym
 
   const handleExpandClick = (category) => {
@@ -625,12 +623,7 @@ const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
     <>
       {hasRaid && perms.raids && perms.gyms && (
         <Grid item xs={4}>
-          <IconButton
-            className={classes.expand}
-            onClick={() => handleExpandClick('raids')}
-            aria-expanded={popups.raids}
-            size="large"
-          >
+          <IconButton onClick={() => handleExpandClick('raids')} size="large">
             <img
               src={Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
               alt={popups.raids ? 'gyms' : 'raids'}
@@ -646,9 +639,8 @@ const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
       {perms.gyms && (
         <Grid item xs={4}>
           <IconButton
-            className={popups.extras ? classes.expandOpen : classes.expand}
+            className={popups.extras ? 'expanded' : 'closed'}
             onClick={() => handleExpandClick('extras')}
-            aria-expanded={popups.extras}
             size="large"
           >
             <ExpandMore style={{ color: 'white' }} />

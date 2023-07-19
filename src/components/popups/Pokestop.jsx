@@ -8,7 +8,6 @@ import { useTranslation, Trans } from 'react-i18next'
 import ErrorBoundary from '@components/ErrorBoundary'
 import { Check, Help } from '@components/layout/general/Icons'
 import { useStore, useStatic } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
 import Dropdown from './common/Dropdown'
@@ -564,7 +563,6 @@ const QuestConditions = ({ quest, t, userSettings }) => {
 }
 
 const Footer = ({ pokestop, perms }) => {
-  const classes = useStyles()
   const open = useStore((state) => !!state.popups.extras)
 
   return (
@@ -581,13 +579,12 @@ const Footer = ({ pokestop, perms }) => {
       {perms.allPokestops && (
         <Grid item xs={3} style={{ textAlign: 'center' }}>
           <IconButton
-            className={open ? classes.expandOpen : classes.expand}
+            className={open ? 'expanded' : 'closed'}
             onClick={() =>
               useStore.setState((prev) => ({
                 popups: { ...prev.popups, extras: !open },
               }))
             }
-            aria-expanded={open}
             size="large"
           >
             <ExpandMore style={{ color: 'white' }} />

@@ -434,3 +434,11 @@ input[type='time']::-webkit-calendar-picker-indicator {
 .darken-image {
   filter: invert(100%) sepia(100%) hue-rotate(151deg) grayscale(1);
 }
+
+.expanded {
+  transform: rotate(180deg);
+}
+
+.closed {
+  transform: rotate(0deg);
+}

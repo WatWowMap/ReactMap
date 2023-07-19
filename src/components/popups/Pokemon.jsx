@@ -19,7 +19,6 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
@@ -46,7 +45,6 @@ export default function PokemonPopup({
   timeOfDay,
 }) {
   const { t } = useTranslation()
-  const classes = useStyles()
   const { pokemon_id, cleanPvp, iv, cp } = pokemon
   const { perms } = useStatic((state) => state.auth)
   const pokePerms = isTutorial
@@ -87,7 +85,6 @@ export default function PokemonPopup({
           t={t}
           perms={perms}
           userSettings={userSettings}
-          classes={classes}
           isTutorial={isTutorial}
         />
         {pokemon.seen_type !== 'encounter' && (
@@ -122,7 +119,6 @@ export default function PokemonPopup({
           popups={popups}
           setPopups={setPopups}
           hasPvp={!!hasLeagues.length}
-          classes={classes}
           Icons={Icons}
         />
         <Collapse in={popups.pvp && perms.pvp} timeout="auto" unmountOnExit>
@@ -157,7 +153,6 @@ const Header = ({
   t,
   iconUrl,
   userSettings,
-  classes,
   isTutorial,
 }) => {
   const hideList = useStatic((state) => state.hideList)
@@ -235,13 +230,7 @@ const Header = ({
     <>
       <Grid item xs={3}>
         {userSettings.showDexNumInPopup ? (
-          <Avatar
-            classes={{
-              colorDefault: classes.avatar,
-            }}
-          >
-            {metaData.pokedexId}
-          </Avatar>
+          <Avatar>{metaData.pokedexId}</Avatar>
         ) : (
           <img
             src={iconUrl}
@@ -449,7 +438,7 @@ const Timer = ({ pokemon, hasStats, t }) => {
   )
 }
 
-const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
+const Footer = ({ pokemon, popups, setPopups, hasPvp, Icons }) => {
   const { lat, lon } = pokemon
 
   const handleExpandClick = (category) => {
@@ -466,10 +455,9 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
       {hasPvp && (
         <Grid item xs={4}>
           <IconButton
-            className={popups.pvp ? classes.expandOpen : classes.expand}
+            className={popups.pvp ? 'expanded' : 'closed'}
             name="pvp"
             onClick={() => handleExpandClick('pvp')}
-            aria-expanded={popups.pvp}
             size="large"
           >
             <img
@@ -486,9 +474,8 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
       </Grid>
       <Grid item xs={4}>
         <IconButton
-          className={popups.extras ? classes.expandOpen : classes.expand}
+          className={popups.extras ? 'expanded' : 'closed'}
           onClick={() => handleExpandClick('extras')}
-          aria-expanded={popups.extras}
           size="large"
         >
           <ExpandMore style={{ color: 'white' }} />
