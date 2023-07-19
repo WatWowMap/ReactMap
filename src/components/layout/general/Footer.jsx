@@ -14,7 +14,7 @@ export default function Footer({ options, role }) {
       justifyContent="flex-end"
       alignItems="center"
       sx={(theme) => ({
-        // minHeight: 50,
+        minHeight: { xs: 'inherit', sm: 50 },
         borderTop: `1px solid ${theme.palette.divider}`,
       })}
     >
