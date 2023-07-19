@@ -65,6 +65,10 @@ body {
   border-bottom-color: rgb(26, 26, 26);
 }
 
+.dark .leaflet-tooltip-top:before {
+  border-top-color: rgb(26, 26, 26);
+}
+
 .dark .leaflet-popup-tip-container .leaflet-popup-tip {
   background-color: rgb(33, 37, 31);
 }
