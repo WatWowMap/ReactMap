@@ -58,7 +58,6 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.0",
     "@mui/material": "^5.14.0",
-    "@mui/styles": "^5.14.0",
     "@sentry/node": "^7.48.0",
     "@sentry/react": "^7.48.0",
     "@turf/boolean-contains": "^6.5.0",

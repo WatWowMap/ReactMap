@@ -1,17 +1,14 @@
 import * as React from 'react'
-import { ListItemText, ListItem, ListItemIcon } from '@mui/material'
-import withStyles from '@mui/styles/withStyles'
+import { ListItemText, ListItem, ListItemIcon, styled } from '@mui/material'
 import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'
 import ClearIcon from '@mui/icons-material/Clear'
 import { useStore } from '@hooks/useStore'
 
 import { Trans, useTranslation } from 'react-i18next'
 
-const StyledListItem = withStyles({
-  root: {
-    padding: '2px 16px',
-  },
-})(ListItem)
+const StyledListItem = styled(ListItem)(() => ({
+  padding: '2px 16px',
+}))
 
 export function ScanRequests({ amount = 0 }) {
   const { t } = useTranslation()

@@ -1,8 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Box, Grid, Typography, useMediaQuery } from '@mui/material'
-import { useTheme } from '@mui/styles'
+import { Box, Grid, Typography, useMediaQuery, useTheme } from '@mui/material'
 
 import LocalLogin from './Local'
 import LocaleSelection from '../general/LocaleSelection'

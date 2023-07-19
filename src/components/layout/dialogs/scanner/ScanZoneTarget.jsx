@@ -211,7 +211,6 @@ export default function ScanZoneTarget({
                       <List
                         style={{
                           textAlign: 'center',
-                          width: '80%',
                           padding: 0,
                         }}
                       >
