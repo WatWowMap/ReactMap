@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react'
 import { IconButton, Button, Typography, Grid } from '@mui/material'
 import { useTranslation } from 'react-i18next'
@@ -33,14 +34,25 @@ export default function Footer({ options, role }) {
           )
         }
         const MuiIcon = button.icon ? MuiIcons[button.icon] : null
-        const color = button.disabled ? 'default' : button.color || 'white'
-        const muiColor = color === 'primary' || color === 'secondary'
+        const color = button.disabled ? 'default' : button.color
+        const muiColor = ['primary', 'secondary', 'success', 'error'].includes(
+          color,
+        )
+        const [first, second] = color ? color.split('.') : ['inherit']
+
+        console.log({ first, second })
         return (
           <Grid
             item
-            xs={+t(`${role}_key_width`) || actualSize}
+            xs={actualSize}
+            sm={+t(`${role}_key_width`) || actualSize}
             key={key}
-            style={{ textAlign: button.align || 'center' }}
+            style={{
+              textAlign: button.align || 'center',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
           >
             {MuiIcon && (
               <IconButton
@@ -54,7 +66,13 @@ export default function Footer({ options, role }) {
               >
                 <MuiIcon
                   color={muiColor ? color : 'inherit'}
-                  style={{ color: muiColor ? null : color }}
+                  sx={(theme) => ({
+                    color: muiColor
+                      ? null
+                      : second
+                      ? theme.palette[first][second]
+                      : first,
+                  })}
                 />
               </IconButton>
             )}
@@ -64,17 +82,22 @@ export default function Footer({ options, role }) {
               target={button.link ? button.target || '_blank' : undefined}
               onClick={button.action}
               color={muiColor ? color : 'inherit'}
-              style={{ color: muiColor ? null : color }}
               disabled={button.disabled}
-              sx={{ display: { xs: 'none', sm: 'block' } }}
+              sx={(theme) => ({
+                display: {
+                  xs: 'none',
+                  sm: button.mobileOnly ? 'none' : 'block',
+                },
+                color: muiColor
+                  ? null
+                  : second
+                  ? theme.palette[first][second]
+                  : first,
+              })}
             >
-              {!button.mobileOnly && (
-                <Typography variant="caption">
-                  {typeof button.name === 'string'
-                    ? t(button.name)
-                    : button.name}
-                </Typography>
-              )}
+              <Typography variant="caption">
+                {typeof button.name === 'string' ? t(button.name) : button.name}
+              </Typography>
             </Button>
           </Grid>
         )
