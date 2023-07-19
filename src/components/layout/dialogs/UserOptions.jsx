@@ -108,18 +108,11 @@ export default function UserOptions({ category, toggleDialog }) {
       <DialogContent sx={{ p: 0, minWidth: 'min(100vw, 300px)' }}>
         {tabPages.length > 1 && (
           <AppBar position="static">
-            <Tabs
-              value={tab}
-              onChange={handleTabChange}
-              indicatorColor="secondary"
-              variant="fullWidth"
-              textColor="inherit"
-            >
+            <Tabs value={tab} onChange={handleTabChange}>
               {tabPages.map((each) => (
                 <Tab
                   key={each}
                   label={<Trans i18nKey="page">{{ page: each + 1 }}</Trans>}
-                  style={{ width: 40, minWidth: 40 }}
                 />
               ))}
             </Tabs>

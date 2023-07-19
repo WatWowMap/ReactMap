@@ -173,16 +173,13 @@ export default function Manage({
         <Tabs
           value={tabValue}
           onChange={(e, newValue) => setTabValue(newValue)}
-          indicatorColor="secondary"
-          variant="fullWidth"
-          style={{ backgroundColor: '#424242', width: '100%' }}
         >
           {filteredData.map((each) => (
             <Tab
               key={each}
               icon={
                 each === 'human' ? (
-                  <Person style={{ color: 'white ' }} />
+                  <Person />
                 ) : (
                   <img
                     src={Icons.getMisc(each)}
@@ -191,7 +188,6 @@ export default function Manage({
                   />
                 )
               }
-              style={{ width: 40, minWidth: 40 }}
             />
           ))}
         </Tabs>

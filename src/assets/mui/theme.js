@@ -34,6 +34,20 @@ export default function customTheme(
               },
             },
           },
+          MuiTabs: {
+            defaultProps: {
+              textColor: 'inherit',
+              indicatorColor: 'secondary',
+              variant: 'fullWidth',
+            },
+            styleOverrides: {
+              root: ({ theme: t }) => ({
+                backgroundColor:
+                  t.palette.grey[t.palette.mode === 'dark' ? 800 : 500],
+                width: '100%',
+              }),
+            },
+          },
           MuiAccordion: {
             defaultProps: {
               disableGutters: true,

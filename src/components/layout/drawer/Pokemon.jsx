@@ -100,19 +100,9 @@ export default function WithSliders({ category, context }) {
       ) : (
         <>
           <AppBar position="static">
-            <Tabs
-              value={openTab}
-              onChange={handleTabChange}
-              textColor="inherit"
-              indicatorColor="secondary"
-              variant="fullWidth"
-            >
+            <Tabs value={openTab} onChange={handleTabChange}>
               {Object.keys(context.sliders).map((slider) => (
-                <Tab
-                  label={t(slider)}
-                  key={slider}
-                  style={{ width: 5, minWidth: 5 }}
-                />
+                <Tab label={t(slider)} key={slider} />
               ))}
             </Tabs>
           </AppBar>

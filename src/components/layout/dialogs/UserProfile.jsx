@@ -59,19 +59,9 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
       />
       <DialogContent style={{ padding: 0 }}>
         <AppBar position="static">
-          <Tabs
-            value={tab}
-            onChange={handleTabChange}
-            indicatorColor="secondary"
-            variant="fullWidth"
-            style={{ backgroundColor: '#424242', width: '100%' }}
-          >
+          <Tabs value={tab} onChange={handleTabChange}>
             {['profile', 'badges', 'access'].map((each) => (
-              <Tab
-                key={each}
-                label={t(each)}
-                style={{ width: 40, minWidth: 40 }}
-              />
+              <Tab key={each} label={t(each)} />
             ))}
           </Tabs>
         </AppBar>
@@ -341,7 +331,7 @@ const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
           borderBottomLeftRadius: 0,
           borderBottomRightRadius: 0,
           textAlign: 'center',
-          backgroundColor: '#222222',
+          // backgroundColor: '#222222',
         }}
         alignItems="center"
         justifyContent="center"
