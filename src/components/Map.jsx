@@ -139,7 +139,7 @@ export default function Map({
         Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(
           ([category, value]) => {
             let enabled = false
-            if (scanZoneMode === 'setLocation') return null
+
             switch (category) {
               case 'scanAreas':
                 if (
