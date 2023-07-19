@@ -649,6 +649,7 @@ const Backups = ({ t, auth }) => {
               <Button
                 disabled={loading}
                 color="secondary"
+                sx={{ color: 'white' }}
                 onClick={() => {
                   load({ variables: { id: backup.id } })
                 }}
@@ -658,6 +659,7 @@ const Backups = ({ t, auth }) => {
               <Button
                 disabled={loading}
                 color="secondary"
+                sx={{ color: 'white' }}
                 onClick={() => {
                   update({
                     variables: {
@@ -675,6 +677,7 @@ const Backups = ({ t, auth }) => {
               <Button
                 disabled={loading}
                 color="primary"
+                sx={{ color: 'white' }}
                 onClick={() => {
                   remove({ variables: { id: backup.id } })
                 }}
