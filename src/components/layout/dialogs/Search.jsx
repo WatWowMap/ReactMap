@@ -54,9 +54,10 @@ export function FancySearch({ searchOptions, loading, InputProps, ...props }) {
         {...props}
         InputProps={{
           ...InputProps,
+          sx: { pl: 2 },
           endAdornment: (
             <>
-              <IconButton sx={{ p: '10px' }}>
+              <IconButton sx={{ p: 1.25 }}>
                 {loading ? (
                   <CircularProgress
                     size={24}
@@ -73,7 +74,7 @@ export function FancySearch({ searchOptions, loading, InputProps, ...props }) {
               <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
               <IconButton
                 color="primary"
-                sx={{ p: '10px', width: 40 }}
+                sx={{ p: 1.25, width: 40 }}
                 onClick={(e) => setAnchorEl(e.currentTarget)}
               >
                 <img
@@ -320,14 +321,12 @@ export default function Search({ safeSearch, toggleDialog, Icons }) {
         }}
         fullWidth
         clearIcon={null}
-        open
         popupIcon={null}
         sx={{ p: 2 }}
         PopperComponent={({ children, ...props }) => (
           <Popper
             {...props}
             placement="bottom"
-            keepMounted
             sx={{ height: 0, width: { xs: 'inherit', sm: 500 } }}
           >
             {children}

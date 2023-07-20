@@ -154,7 +154,7 @@
   "verify_nests": "Verify by Checking Current Spawns",
   "nest_out_of_date": "Nest is Potentially Out of Date!",
   "nest_check_current": "Check Current Spawns Instead",
-  "spawns_per_hour": "spawns/hr",
+  "spawns_per_hour": "Per Hour",
   "teams": "Teams",
   "eggs": "Eggs",
   "reverse": "Reverse",
@@ -615,5 +615,11 @@
   "submit_nest_name": "Submit Nest Name",
   "nest_submission_menu": "Name Update",
   "nest_submissions": "Nest Submissions",
-  "nest_submissions_subtitle": "Allows you to submit new names for nests"
+  "nest_submissions_subtitle": "Allows you to submit new names for nests",
+  "pokemon_opacity": "Dynamic Pokemon Opacity",
+  "invasion_opacity": "Dynamic Invasion Opacity",
+  "raid_opacity": "Dynamic Raid Opacity",
+  "opacity_ten_minutes": "Opacity at 10 minutes",
+  "opacity_five_minutes": "Opacity at 5 minutes",
+  "opacity_one_minute": "Opacity at 1 minute"
 }

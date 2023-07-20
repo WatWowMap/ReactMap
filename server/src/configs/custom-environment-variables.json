@@ -633,6 +633,22 @@
       "enableGymPopupCoords": {
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_ENABLE_GYM_POPUP_COORDS",
         "__format": "boolean"
+      },
+      "raidOpacity": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_RAID_OPACITY",
+        "__format": "boolean"
+      },
+      "opacityTenMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_OPACITY_TEN_MINUTES",
+        "__format": "number"
+      },
+      "opacityFiveMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_OPACITY_FIVE_MINUTES",
+        "__format": "number"
+      },
+      "opacityOneMinute": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_OPACITY_ONE_MINUTE",
+        "__format": "number"
       }
     },
     "pokestops": {
@@ -679,6 +695,22 @@
       "enablePokestopPopupCoords": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_ENABLE_POKESTOP_POPUP_COORDS",
         "__format": "boolean"
+      },
+      "invasionOpacity": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_INVASION_OPACITY",
+        "__format": "boolean"
+      },
+      "opacityTenMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_OPACITY_TEN_MINUTES",
+        "__format": "number"
+      },
+      "opacityFiveMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_OPACITY_FIVE_MINUTES",
+        "__format": "number"
+      },
+      "opacityOneMinute": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_OPACITY_ONE_MINUTE",
+        "__format": "number"
       }
     },
     "pokemon": {
@@ -737,6 +769,22 @@
       "glow": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_GLOW",
         "__format": "json"
+      },
+      "pokemonOpacity": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_POKEMON_OPACITY",
+        "__format": "boolean"
+      },
+      "opacityTenMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_OPACITY_TEN_MINUTES",
+        "__format": "number"
+      },
+      "opacityFiveMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_OPACITY_FIVE_MINUTES",
+        "__format": "number"
+      },
+      "opacityOneMinute": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_OPACITY_ONE_MINUTE",
+        "__format": "number"
       }
     },
     "wayfarer": {

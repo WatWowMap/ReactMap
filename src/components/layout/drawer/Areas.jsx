@@ -71,10 +71,11 @@ export default function AreaDropDown() {
       <Paper
         elevation={0}
         sx={{
-          px: 1,
+          px: 2,
           minHeight: 50,
           maxHeight: config.map.scanAreaMenuHeight || 400,
           overflow: 'auto',
+          maxWidth: 350,
         }}
       >
         {data?.scanAreasMenu

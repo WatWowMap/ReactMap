@@ -338,7 +338,11 @@
       "showArBadge": false,
       "raidLevelBadges": false,
       "gymBadgeDiamonds": true,
-      "enableGymPopupCoords": false
+      "enableGymPopupCoords": false,
+      "raidOpacity": true,
+      "opacityTenMinutes": 0.75,
+      "opacityFiveMinutes": 0.5,
+      "opacityOneMinute": 0.25
     },
     "pokestops": {
       "clustering": true,
@@ -351,7 +355,11 @@
       "madQuestText": false,
       "hasQuestIndicator": true,
       "showArBadge": false,
-      "enablePokestopPopupCoords": false
+      "enablePokestopPopupCoords": false,
+      "invasionOpacity": true,
+      "opacityTenMinutes": 0.75,
+      "opacityFiveMinutes": 0.5,
+      "opacityOneMinute": 0.25
     },
     "pokemon": {
       "clustering": true,
@@ -394,7 +402,11 @@
           "perm": "pvp",
           "value": "#800080"
         }
-      ]
+      ],
+      "pokemonOpacity": true,
+      "opacityTenMinutes": 0.75,
+      "opacityFiveMinutes": 0.5,
+      "opacityOneMinute": 0.25
     },
     "wayfarer": {
       "clustering": true,

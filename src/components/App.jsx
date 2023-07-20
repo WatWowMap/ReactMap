@@ -49,6 +49,9 @@ export default function App() {
         <CssBaseline />
         <GlobalStyles
           styles={{
+            '*': {
+              scrollbarWidth: 'thin',
+            },
             '*::-webkit-scrollbar': {
               width: '5px',
             },

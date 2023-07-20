@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Clear from '@mui/icons-material/Clear'
-import { Drawer, Typography, Grid, IconButton, Box } from '@mui/material'
+import { Drawer, Typography, Grid, IconButton } from '@mui/material'
 
 import { useStatic } from '@hooks/useStore'
 
@@ -14,7 +14,6 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
     },
     ui,
   } = useStatic.getState()
-  const [width, setWidth] = React.useState(300)
 
   return (
     <Drawer
@@ -23,18 +22,7 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
       open={drawer}
       onClose={toggleDrawer(false)}
     >
-      <Grid
-        container
-        alignItems="center"
-        style={{ flexWrap: 'nowrap' }}
-        ref={(ref) => {
-          const refWidth = Math.min(
-            Math.max(300, ref?.clientWidth || 0),
-            window.innerWidth,
-          )
-          return setWidth(refWidth)
-        }}
-      >
+      <Grid container alignItems="center" style={{ flexWrap: 'nowrap' }}>
         <Grid
           item
           className="grid-item"
@@ -63,17 +51,15 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
           </IconButton>
         </Grid>
       </Grid>
-      <Box width={width}>
-        {Object.entries(ui).map(([category, value]) => (
-          <DrawerSection
-            key={category}
-            category={category}
-            value={value}
-            toggleDialog={toggleDialog}
-          />
-        ))}
-        {separateDrawerActions && <Actions />}
-      </Box>
+      {Object.entries(ui).map(([category, value]) => (
+        <DrawerSection
+          key={category}
+          category={category}
+          value={value}
+          toggleDialog={toggleDialog}
+        />
+      ))}
+      {separateDrawerActions && <Actions />}
     </Drawer>
   )
 }

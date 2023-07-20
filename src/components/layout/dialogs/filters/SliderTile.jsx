@@ -63,18 +63,28 @@ export default function SliderTile({
 
   const textColor =
     (tempValues && tempValues[0] === min && tempValues[1] === max) || disabled
-      ? '#616161'
+      ? 'text.disabled'
       : 'inherit'
 
+  const translated = t(i18nKey || `slider_${name}`)
   return (
-    <Grid container direction="row" justifyContent="center" alignItems="center">
+    <Grid
+      container
+      direction="row"
+      justifyContent="center"
+      alignItems="center"
+      minWidth={Math.min(
+        window.innerWidth,
+        Math.max(260, translated.length * 25),
+      )}
+    >
       <Grid item xs={noTextInput ? 12 : 4}>
         <Typography
           noWrap={fullName}
           onClick={() => setFullName(!fullName)}
-          style={{ color: textColor }}
+          color={textColor}
         >
-          {t(i18nKey || `slider_${name}`)}
+          {translated}
         </Typography>
       </Grid>
       {(noTextInput ? [] : ['min', 'max']).map((each, index) => (
@@ -85,7 +95,7 @@ export default function SliderTile({
           style={{ textAlign: index ? 'center' : 'right' }}
         >
           <TextField
-            style={{ width: 80, color: textColor }}
+            sx={{ width: 80, color: textColor }}
             id={each}
             label={`${t(each)} ${t(label)}`}
             name={name}
@@ -96,10 +106,10 @@ export default function SliderTile({
             type="number"
             disabled={disabled}
             InputLabelProps={{
-              style: { color: textColor },
+              sx: { color: textColor },
             }}
             InputProps={{
-              style: { color: textColor },
+              sx: { color: textColor },
             }}
             inputProps={{
               min,
