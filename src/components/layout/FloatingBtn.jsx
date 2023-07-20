@@ -209,11 +209,7 @@ export default function FloatingButtons({
               onClick={() => lc._onClick()}
               title={t('use_my_location')}
             >
-              <MyLocation
-                color={color}
-                fontSize={iconSize}
-                sx={{ color: 'white' }}
-              />
+              <MyLocation color={color} fontSize={iconSize} />
             </Fab>
           </Grid>
           <Grid item>
@@ -258,6 +254,7 @@ export default function FloatingButtons({
             href={icon.href}
             referrerPolicy="no-referrer"
             target={icon.target || '_blank'}
+            disabled={disabled}
           >
             <FAIcon className={icon.icon} fontSize={iconSize} />
           </Fab>
