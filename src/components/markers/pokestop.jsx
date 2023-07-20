@@ -51,7 +51,7 @@ export default function stopMarker(
         invasionIcons.unshift({
           icon: Icons.getInvasions(invasion.grunt_type, invasion.confirmed),
           opacity: userSettings.invasionOpacity
-            ? getOpacity(invasion.incident_expire_timestamp)
+            ? getOpacity(invasion.incident_expire_timestamp, userSettings)
             : 1,
         })
         invasionSizes.unshift(
