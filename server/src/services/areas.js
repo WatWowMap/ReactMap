@@ -262,15 +262,6 @@ module.exports = async () => {
         }
       })
 
-      // Create blanks for better formatting when there's an odd number of children
-      Object.values(parents).forEach(({ children }) => {
-        if (children.length % 2 === 1) {
-          children.push({
-            type: 'Feature',
-            properties: { name: '', manual: !!config.manualAreas.length },
-          })
-        }
-      })
       return [
         domain,
         Object.values(parents).sort((a, b) => a.name.localeCompare(b.name)),

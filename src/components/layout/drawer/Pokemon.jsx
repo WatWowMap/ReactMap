@@ -115,7 +115,7 @@ export default function WithSliders({ category, context }) {
                   </ListItem>
                 ))}
                 {index ? (
-                  <ListItem>
+                  <ListItem disablePadding>
                     <Grid container alignItems="center">
                       {['xxs', 'xxl'].map((each, i) => (
                         <Fragment key={each}>
@@ -148,12 +148,12 @@ export default function WithSliders({ category, context }) {
                   </ListItem>
                 ) : (
                   <>
-                    <ListItem>
+                    <ListItem disablePadding>
                       <Grid container alignItems="center">
                         {['zeroIv', 'hundoIv'].map((each) => (
                           <Fragment key={each}>
                             <Grid item xs={3}>
-                              <Typography>
+                              <Typography noWrap>
                                 {t(Utility.camelToSnake(each))}
                               </Typography>
                             </Grid>
@@ -177,29 +177,26 @@ export default function WithSliders({ category, context }) {
                         ))}
                       </Grid>
                     </ListItem>
-                    <ListItem
-                      secondaryAction={
-                        <MultiSelector
-                          filterKey="gender"
-                          items={[0, 1, 2, 3]}
-                          tKey="gender_icon_"
-                          filters={filters[category].ivOr.gender}
-                          setFilters={(newValue) =>
-                            setFilters({
-                              ...filters,
-                              [category]: {
-                                ...filters[category],
-                                ivOr: {
-                                  ...filters[category].ivOr,
-                                  gender: newValue,
-                                },
-                              },
-                            })
-                          }
-                        />
-                      }
-                    >
+                    <ListItem disablePadding sx={{ pt: 2, pr: 1 }}>
                       <ListItemText primary={t('gender')} />
+                      <MultiSelector
+                        filterKey="gender"
+                        items={[0, 1, 2, 3]}
+                        tKey="gender_icon_"
+                        filters={filters[category].ivOr.gender}
+                        setFilters={(newValue) =>
+                          setFilters({
+                            ...filters,
+                            [category]: {
+                              ...filters[category],
+                              ivOr: {
+                                ...filters[category].ivOr,
+                                gender: newValue,
+                              },
+                            },
+                          })
+                        }
+                      />
                     </ListItem>
                   </>
                 )}
