@@ -438,6 +438,10 @@
       "customFloatingIcons": {
         "__name": "MAP_MISC_CUSTOM_FLOATING_ICONS",
         "__format": "json"
+      },
+      "expandAllScanAreas": {
+        "__name": "MAP_MISC_EXPAND_ALL_SCAN_AREAS",
+        "__format": "boolean"
       }
     },
     "theme": {
