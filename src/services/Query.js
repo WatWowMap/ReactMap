@@ -7,7 +7,7 @@ import * as portalIndex from './queries/portal'
 import getAllWeather from './queries/weather'
 import getAllScanCells from './queries/scanCell'
 import getAllSubmissionCells from './queries/submissionCells'
-import { getOne, getAllNests } from './queries/nest'
+import { getOne, getAllNests, nestSubmission } from './queries/nest'
 import { getAllScanAreas, getScanAreasMenu } from './queries/scanAreas'
 import * as searchIndex from './queries/search'
 import * as webhookIndex from './queries/webhook'
@@ -54,6 +54,9 @@ export default class Query {
   static nests(filters) {
     if (filters === 'id') {
       return getOne
+    }
+    if (filters === 'nestSubmission') {
+      return nestSubmission
     }
     return getAllNests
   }

@@ -611,5 +611,9 @@
   "scanner_countdown": "Available in {{time}}s",
   "success": "Success",
   "contribute": "Contribute",
-  "mi": "mi"
+  "mi": "mi",
+  "submit_nest_name": "Submit Nest Name",
+  "nest_submission_menu": "Name Update",
+  "nest_submissions": "Nest Submissions",
+  "nest_submissions_subtitle": "Allows you to submit new names for nests"
 }

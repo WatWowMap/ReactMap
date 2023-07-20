@@ -161,3 +161,7 @@ export const useStatic = create((set) => ({
   extraUserFields: [],
   setExtraUserFields: (extraUserFields) => set({ extraUserFields }),
 }))
+
+export const useDialogStore = create((/* set, get */) => ({
+  nestSubmissions: false,
+}))
