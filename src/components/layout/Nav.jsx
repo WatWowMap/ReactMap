@@ -131,31 +131,29 @@ export default function Nav({
 
   return (
     <>
-      {drawer ? (
-        <Sidebar
-          drawer={drawer}
-          toggleDrawer={toggleDrawer}
-          toggleDialog={toggleDialog}
-        />
-      ) : (
-        <FloatingBtn
-          toggleDrawer={toggleDrawer}
-          toggleDialog={toggleDialog}
-          safeSearch={config.map.searchable}
-          isMobile={isMobile}
-          webhooks={webhooks}
-          webhookMode={webhookMode}
-          setWebhookMode={setWebhookMode}
-          scanNextMode={scanNextMode}
-          setScanNextMode={setScanNextMode}
-          scanZoneMode={scanZoneMode}
-          setScanZoneMode={setScanZoneMode}
-          settings={settings}
-          donationPage={config.map.donationPage}
-          setDonorPage={setDonorPage}
-          setUserProfile={setUserProfile}
-        />
-      )}
+      <Sidebar
+        drawer={drawer}
+        toggleDrawer={toggleDrawer}
+        toggleDialog={toggleDialog}
+      />
+
+      <FloatingBtn
+        toggleDrawer={toggleDrawer}
+        toggleDialog={toggleDialog}
+        safeSearch={config.map.searchable}
+        isMobile={isMobile}
+        webhooks={webhooks}
+        webhookMode={webhookMode}
+        setWebhookMode={setWebhookMode}
+        scanNextMode={scanNextMode}
+        setScanNextMode={setScanNextMode}
+        scanZoneMode={scanZoneMode}
+        setScanZoneMode={setScanZoneMode}
+        settings={settings}
+        donationPage={config.map.donationPage}
+        setDonorPage={setDonorPage}
+        setUserProfile={setUserProfile}
+      />
       <Dialog
         open={userProfile}
         fullScreen={isMobile}
