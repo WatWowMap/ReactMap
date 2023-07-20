@@ -271,7 +271,7 @@ export default function Search({ safeSearch, toggleDialog, Icons }) {
   }
 
   const getBackupName = () => {
-    switch (safeSearch[searchTab]) {
+    switch (searchTab) {
       case 'quests':
       case 'pokestops':
         return t('unknown_pokestop')
@@ -317,7 +317,7 @@ export default function Search({ safeSearch, toggleDialog, Icons }) {
         autoComplete={false}
         clearOnBlur={false}
         ListboxProps={{
-          sx: { maxHeight: '80vh' },
+          sx: { maxHeight: { xs: '75vh', sm: '80vh' } },
         }}
         fullWidth
         clearIcon={null}
@@ -378,6 +378,16 @@ export default function Search({ safeSearch, toggleDialog, Icons }) {
                       ? option.url.replace(/^http:\/\//, 'https://')
                       : Icons.getMisc(searchTab)
                   }
+                  onError={(e) => {
+                    e.target.onerror = null
+                    if (searchTab === 'pokestops') {
+                      e.target.src =
+                        'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/pokestop/0.webp'
+                    } else {
+                      e.target.src =
+                        'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/gym/0.webp'
+                    }
+                  }}
                   alt={option.url}
                   height={45}
                   width={45}
