@@ -104,6 +104,10 @@ const PokemonTile = ({
     userSettings.ivCircles &&
     item.iv !== null &&
     item.iv >= userSettings.minIvCircle
+  const levelCircle =
+    userSettings.levelCircles &&
+    item.level !== null &&
+    item.level >= userSettings.minLevelCircle
   const pvpCheck = item.bestPvp !== null && item.bestPvp < 4
   const weatherCheck = item.weather && userSettings.weatherIndicator
 
@@ -133,6 +137,7 @@ const PokemonTile = ({
           pvpCheck ||
           glowStatus ||
           ivCircle ||
+          levelCircle ||
           weatherCheck ||
           item.seen_type === 'nearby_cell' ||
           (Number.isInteger(item.size) && (item.size !== 3 || item.size !== 0))
@@ -142,6 +147,7 @@ const PokemonTile = ({
                 item,
                 glowStatus,
                 ivCircle,
+                levelCircle,
                 Icons,
                 weatherCheck,
                 timeOfDay,

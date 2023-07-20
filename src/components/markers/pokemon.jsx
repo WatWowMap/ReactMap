@@ -31,6 +31,7 @@ export const fancyMarker = (
   pkmn,
   glow,
   ivCircle,
+  levelCircle,
   Icons,
   weatherCheck,
   timeOfDay,
@@ -92,6 +93,17 @@ export const fancyMarker = (
           }}
         >
           {Math.round(pkmn.iv)}
+        </div>
+      )}
+      {levelCircle && !badge && (
+        <div
+          className="iv-badge"
+          style={{
+            bottom: (-size / 2) * pokemonMod.offsetY,
+            left: `${pokemonMod.offsetX * size * 5}%`,
+          }}
+        >
+          L{Math.round(pkmn.level)}
         </div>
       )}
       {userSettings?.showSizeIndicator &&

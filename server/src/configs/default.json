@@ -368,6 +368,8 @@
       "legacyFilter": false,
       "ivCircles": false,
       "minIvCircle": 90,
+      "levelCircles": false,
+      "minLevelCircle": 30,
       "weatherIndicator": false,
       "interactionRanges": false,
       "showDexNumInPopup": false,
