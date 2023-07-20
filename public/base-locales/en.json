@@ -611,5 +611,11 @@
   "scanner_countdown": "Available in {{time}}s",
   "success": "Success",
   "contribute": "Contribute",
-  "mi": "mi"
+  "mi": "mi",
+  "pokemon_opacity": "Dynamic Pokemon Opacity",
+  "invasion_opacity": "Dynamic Invasion Opacity",
+  "raid_opacity": "Dynamic Raid Opacity",
+  "opacity_ten_minutes": "Opacity at 10 minutes",
+  "opacity_five_minutes": "Opacity at 5 minutes",
+  "opacity_one_minute": "Opacity at 1 minute"
 }
