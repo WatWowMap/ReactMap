@@ -782,6 +782,11 @@
         "trialPeriodEligible": false,
         "roles": []
       },
+      "nestSubmissions": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
       "scanAreas": {
         "enabled": true,
         "trialPeriodEligible": false,

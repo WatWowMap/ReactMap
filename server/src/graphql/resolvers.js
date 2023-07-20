@@ -347,6 +347,15 @@ module.exports = {
         await Db.models.Backup.update(args.backup, req.user.id)
       }
     },
+    nestSubmission: async (_, args, { req, perms, Db }) => {
+      if (perms?.nestSubmissions && req.user?.id) {
+        return Db.submitName({
+          ...args,
+          nest_submitted_by: req.user.username,
+        })
+      }
+      return false
+    },
     webhook: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : false
       const { category, data, status, name } = args
