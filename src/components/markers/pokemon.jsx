@@ -99,7 +99,7 @@ export const fancyMarker = (
         <div
           className="iv-badge"
           style={{
-            bottom: (-size / 2) * pokemonMod.offsetY,
+            bottom: (size / 1.5) * pokemonMod.offsetY,
             left: `${pokemonMod.offsetX * size * 5}%`,
           }}
         >
