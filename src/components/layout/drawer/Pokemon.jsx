@@ -87,15 +87,11 @@ export default function WithSliders({ category, context }) {
       </ListItem>
 
       {userSettings[category].legacyFilter && context.legacy ? (
-        <ListItem
-          secondaryAction={
-            <StringFilter
-              filterValues={tempLegacy}
-              setFilterValues={setTempLegacy}
-            />
-          }
-        >
-          <ListItemText primary={t('iv_or_filter')} />
+        <ListItem>
+          <StringFilter
+            filterValues={tempLegacy}
+            setFilterValues={setTempLegacy}
+          />
         </ListItem>
       ) : (
         <>
