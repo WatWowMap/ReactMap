@@ -9,38 +9,45 @@ export function ScanAreaTile({
   webhookMode,
   selectedAreas,
   setSelectedAreas,
-  onlyAreas,
   userSettings,
-  filters,
 }) {
-  const setAreas = useStore((s) => s.setAreas)
-
-  const names = item.features
-    .filter((f) => !f.properties.manual)
-    .map((f) => f.properties.key)
-
-  const handleClick = (name) => {
-    if (selectedAreas.includes(name)) {
-      setSelectedAreas(selectedAreas.filter((h) => h !== name))
-    } else {
-      setSelectedAreas([...selectedAreas, name])
-    }
-  }
+  const search = useStore((s) => s.filters.scanAreas?.filter?.search)
+  const initialRenderAreas =
+    useStore.getState().filters?.scanAreas?.filter?.areas || []
 
   return (
     <GeoJSON
-      key={`${selectedAreas}-${onlyAreas ? onlyAreas.join('') : ''}-${
-        filters?.filter?.search
-      }`}
+      key={search}
       data={item}
       filter={(f) =>
         webhookMode ||
-        filters?.filter?.search === '' ||
-        f.properties.key
-          .toLowerCase()
-          .includes(filters.filter.search.toLowerCase())
+        search === '' ||
+        f.properties.key.toLowerCase().includes(search.toLowerCase())
       }
       pane="geojson"
+      eventHandlers={{
+        click: ({ propagatedFrom: layer }) => {
+          if (!layer.feature) return
+          const { name, key, manual = false } = layer.feature.properties
+          if (webhookMode && name) {
+            setSelectedAreas((prev) => {
+              const includes = prev.includes(name)
+              layer.setStyle({ fillOpacity: includes ? 0.2 : 0.8 })
+              return includes ? prev.filter((h) => h !== name) : [...prev, name]
+            })
+          } else if (!manual && userSettings?.tapToToggle) {
+            const { filters, setAreas } = useStore.getState()
+            const includes = filters?.scanAreas?.filter?.areas?.includes(key)
+            layer.setStyle({ fillOpacity: includes ? 0.2 : 0.8 })
+            setAreas(
+              key,
+              item.features
+                .filter((f) => !f.properties.manual)
+                .map((f) => f.properties.key),
+            )
+          }
+        },
+      }}
       onEachFeature={(feature, layer) => {
         if (feature.properties && feature.properties.name) {
           const { name, key } = feature.properties
@@ -57,12 +64,13 @@ export function ScanAreaTile({
                 feature.properties.fillColor ||
                 feature.properties.fill ||
                 '#3388ff',
-              fillOpacity:
-                (selectedAreas?.includes(name?.toLowerCase()) &&
-                  webhookMode === 'areas') ||
-                onlyAreas?.includes(webhookMode ? name : key)
-                  ? 0.8
-                  : 0.2,
+              fillOpacity: (
+                webhookMode === 'areas'
+                  ? selectedAreas.includes(name?.toLowerCase())
+                  : initialRenderAreas.includes(webhookMode ? name : key)
+              )
+                ? 0.8
+                : 0.2,
             })
             .bindTooltip(popupContent, {
               permanent: userSettings ? userSettings.alwaysShowLabels : true,
@@ -72,28 +80,10 @@ export function ScanAreaTile({
           if (!userSettings || userSettings.alwaysShowLabels) {
             layer.openTooltip()
           }
-          if (webhookMode && name) {
-            layer.on('click', () => handleClick(name.toLowerCase()))
-          } else if (!feature.properties.manual && userSettings?.tapToToggle) {
-            layer.on('click', () => setAreas(key, names))
-          }
         }
       }}
     />
   )
 }
 
-const areEqual = (prev, next) =>
-  prev.filters?.filter?.search === next.filters?.filter?.search &&
-  (prev.onlyAreas && next.onlyAreas
-    ? prev.onlyAreas.length === next.onlyAreas.length &&
-      prev.onlyAreas.every((_, i) => prev.onlyAreas[i] === next.onlyAreas[i])
-    : true) &&
-  (prev.selectedAreas && next.selectedAreas
-    ? prev.selectedAreas.length === next.selectedAreas.length &&
-      prev.selectedAreas.every(
-        (_, i) => prev.selectedAreas[i] === next.selectedAreas[i],
-      )
-    : true)
-
-export default React.memo(ScanAreaTile, areEqual)
+export default React.memo(ScanAreaTile, () => true)

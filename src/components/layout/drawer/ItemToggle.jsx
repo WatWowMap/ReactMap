@@ -21,7 +21,7 @@ export default function ItemToggle({ category, subItem }) {
     <ListItem>
       <ListItemText
         primary={
-          category === 'scanAreas'
+          category === 'scanAreas' && subItem === 'enabled'
             ? t('show_polygons')
             : t(Utility.camelToSnake(subItem))
         }

@@ -39,7 +39,11 @@ export default function DrawerSection({ category, value, toggleDialog }) {
     <Accordion
       expanded={sidebar === category}
       onChange={handleChange(category)}
-      TransitionProps={{ unmountOnExit: category === 'scanAreas' }}
+      TransitionProps={{
+        unmountOnExit:
+          category !== 'pokemon' &&
+          (sidebar === 'scanAreas' ? true : category === 'scanAreas'),
+      }}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography>{t(Utility.camelToSnake(category))}</Typography>
