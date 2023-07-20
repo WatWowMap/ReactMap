@@ -63,6 +63,10 @@ export default function customTheme(
               inputRoot: {
                 paddingRight: `0px !important`,
               },
+              paper: {
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+              },
             },
           },
           MuiButtonBase: {
