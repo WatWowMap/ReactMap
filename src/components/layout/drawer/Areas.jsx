@@ -1,15 +1,20 @@
-import React, { useMemo } from 'react'
+/* eslint-disable react/no-array-index-key */
+import * as React from 'react'
 import { useMap } from 'react-leaflet'
 import { useQuery } from '@apollo/client'
 import {
-  Grid,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   ListItem,
-  Paper,
   TextField,
-  useTheme,
+  TableContainer,
+  Table,
+  TableBody,
+  TableRow,
+  Collapse,
+  TableCell,
+  Paper,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
@@ -25,18 +30,17 @@ export default function AreaDropDown() {
   const { setAreas, setFilters } = useStore.getState()
   const { config } = useStatic.getState()
   const map = useMap()
-  const theme = useTheme()
+  const [open, setOpen] = React.useState('')
 
-  const allAreas = useMemo(() => {
-    if (data?.scanAreasMenu) {
-      return data.scanAreasMenu.flatMap((parent) =>
+  const allAreas = React.useMemo(
+    () =>
+      data?.scanAreasMenu.flatMap((parent) =>
         parent.children
           .filter((child) => !child.properties.manual)
           .map((child) => child.properties.key),
-      )
-    }
-    return []
-  }, [data])
+      ) || [],
+    [data],
+  )
 
   if (loading || error) return null
 
@@ -68,68 +72,115 @@ export default function AreaDropDown() {
           }
         />
       </ListItem>
-      <Paper
-        elevation={0}
-        sx={{
-          px: 2,
-          minHeight: 50,
-          maxHeight: config.map.scanAreaMenuHeight || 400,
-          overflow: 'auto',
-          maxWidth: 350,
-        }}
-      >
-        {data?.scanAreasMenu
-          ?.map((area) => ({
-            ...area,
-            children: area.children.filter(
-              (feature) =>
-                filters.scanAreas?.filter?.search === '' ||
-                feature.properties?.key
-                  ?.toLowerCase()
-                  ?.includes(filters?.scanAreas?.filter?.search?.toLowerCase()),
-            ),
-          }))
-          .map(({ name, details, children }) => {
-            if (!children.length) return null
-            return (
-              <Grid
-                key={name || ''}
-                container
-                alignItems="stretch"
-                justifyContent="center"
-              >
-                {name && (
-                  <AreaTile
-                    key={name}
-                    name={name}
-                    feature={details}
-                    allAreas={allAreas}
-                    childAreas={children}
-                    scanAreasZoom={config.map.scanAreasZoom}
-                    map={map}
-                    scanAreas={filters.scanAreas}
-                    setAreas={setAreas}
-                    backgroundColor={theme.palette.background.paper}
-                  />
-                )}
-                {children.map((feature, i) => (
-                  <AreaTile
-                    key={feature?.properties?.name || i}
-                    feature={feature}
-                    allAreas={allAreas}
-                    childAreas={children}
-                    scanAreasZoom={config.map.scanAreasZoom}
-                    i={i}
-                    map={map}
-                    scanAreas={filters.scanAreas}
-                    setAreas={setAreas}
-                    backgroundColor={theme.palette.background.paper}
-                  />
-                ))}
-              </Grid>
-            )
-          })}
-      </Paper>
+      <ListItem>
+        <TableContainer
+          component={Paper}
+          sx={{
+            minHeight: 50,
+            maxHeight: config.map.scanAreaMenuHeight || 400,
+            overflow: 'auto',
+          }}
+        >
+          <Table
+            size="small"
+            sx={(theme) => ({
+              borderTop: 1,
+              borderColor:
+                theme.palette.grey[theme.palette.mode === 'dark' ? 800 : 200],
+            })}
+          >
+            <TableBody>
+              {data?.scanAreasMenu
+                ?.map((area) => ({
+                  ...area,
+                  children: area.children.filter(
+                    (feature) =>
+                      filters.scanAreas?.filter?.search === '' ||
+                      feature.properties?.key
+                        ?.toLowerCase()
+                        ?.includes(
+                          filters?.scanAreas?.filter?.search?.toLowerCase(),
+                        ),
+                  ),
+                }))
+                .map(({ name, details, children }) => {
+                  if (!children.length) return null
+                  const rows = []
+                  for (let i = 0; i < children.length; i += 2) {
+                    const newRow = []
+                    if (children[i]) newRow.push(children[i])
+                    if (children[i + 1]) newRow.push(children[i + 1])
+                    rows.push(newRow)
+                  }
+                  return (
+                    <React.Fragment key={`${name}-${children.length}`}>
+                      {name && (
+                        <TableRow>
+                          <AreaTile
+                            name={name}
+                            feature={details}
+                            allAreas={allAreas}
+                            childAreas={children}
+                            scanAreasZoom={config.map.scanAreasZoom}
+                            map={map}
+                            scanAreas={filters.scanAreas}
+                            setAreas={setAreas}
+                            open={open}
+                            setOpen={
+                              config.map.expandAllScanAreas
+                                ? undefined
+                                : setOpen
+                            }
+                            colSpan={2}
+                          />
+                        </TableRow>
+                      )}
+                      <TableRow>
+                        <TableCell padding="none" sx={{ border: 'none' }}>
+                          <Collapse
+                            in={
+                              config.map.expandAllScanAreas ||
+                              open === name ||
+                              !!filters?.scanAreas?.filter?.search
+                            }
+                            timeout="auto"
+                            unmountOnExit
+                            sx={{ width: '100%' }}
+                          >
+                            <Table sx={{ width: '100%' }}>
+                              <TableBody sx={{ width: '100%' }}>
+                                {rows.map((row, i) => (
+                                  <TableRow key={i}>
+                                    {row.map((feature, j) => (
+                                      <AreaTile
+                                        key={feature?.properties?.name || i}
+                                        feature={feature}
+                                        allAreas={allAreas}
+                                        childAreas={children}
+                                        scanAreasZoom={config.map.scanAreasZoom}
+                                        map={map}
+                                        borderRight={
+                                          row.length === 2 && j === 0
+                                        }
+                                        scanAreas={filters.scanAreas}
+                                        setAreas={setAreas}
+                                        colSpan={row.length === 1 ? 2 : 1}
+                                      />
+                                    ))}
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  )
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </ListItem>
     </>
   )
 }

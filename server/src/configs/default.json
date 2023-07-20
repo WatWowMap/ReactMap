@@ -254,7 +254,8 @@
       "enableGymPopupCoordsSelector": false,
       "enablePokestopPopupCoordsSelector": false,
       "enablePortalPopupCoordsSelector": false,
-      "customFloatingIcons": []
+      "customFloatingIcons": [],
+      "expandAllScanAreas": false
     },
     "theme": {
       "style": "dark",
