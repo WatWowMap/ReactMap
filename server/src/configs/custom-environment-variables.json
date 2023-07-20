@@ -1440,6 +1440,20 @@
           "__format": "json"
         }
       },
+      "nestSubmissions": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_NEST_SUBMISSIONS_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_NEST_SUBMISSIONS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_NEST_SUBMISSIONS_ROLES",
+          "__format": "json"
+        }
+      },
       "scanAreas": {
         "enabled": {
           "__name": "AUTHENTICATION_PERMS_SCAN_AREAS_ENABLED",
