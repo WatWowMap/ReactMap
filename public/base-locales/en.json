@@ -611,5 +611,6 @@
   "scanner_countdown": "Available in {{time}}s",
   "success": "Success",
   "contribute": "Contribute",
-  "mi": "mi"
+  "mi": "mi",
+  "filter_by_areas": "Filter by Areas"
 }

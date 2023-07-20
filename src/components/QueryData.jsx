@@ -76,7 +76,7 @@ export default function QueryData({
   useEffect(() => {
     const refetchData = () => {
       onMove()
-      if (category !== 'device' && category !== 'scanAreas') {
+      if (category !== 'scanAreas') {
         timeout.doRefetch({
           ...Utility.getQueryArgs(map),
           filters: trimFilters(filters),

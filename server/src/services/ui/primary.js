@@ -139,6 +139,8 @@ module.exports = function generateUi(filters, perms) {
               ui.admin[key] = true
               break
             case 'scanAreas':
+              ui[key].filterByAreas = true
+            // eslint-disable-next-line no-fallthrough
             case 'weather':
               ui[key].enabled = true
               break

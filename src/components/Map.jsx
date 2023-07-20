@@ -246,7 +246,11 @@ export default function Map({
                     userSettings[userSettingsCategory(category)] || {}
                   }
                   filters={filters[category]}
-                  onlyAreas={filters?.scanAreas?.filter?.areas || []}
+                  onlyAreas={
+                    (filters?.scanAreas?.filterByAreas &&
+                      filters?.scanAreas?.filter?.areas) ||
+                    []
+                  }
                   tileStyle={tileLayer?.style || 'light'}
                   clusteringRules={
                     config?.clustering?.[category] || {

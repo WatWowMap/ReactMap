@@ -57,6 +57,7 @@ export default function AreaDropDown() {
           label={t('search')}
           variant="outlined"
           fullWidth
+          size="small"
           value={filters?.scanAreas?.filter?.search || ''}
           onChange={(e) =>
             setFilters({
