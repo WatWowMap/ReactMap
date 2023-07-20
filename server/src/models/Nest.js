@@ -3,6 +3,7 @@ const { Model } = require('objection')
 const i18next = require('i18next')
 const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
+const { log, HELPERS } = require('../services/logger')
 const {
   api: { searchResultsLimit, queryLimits },
   defaultFilters: {
@@ -136,6 +137,10 @@ module.exports = class Nest extends Model {
       const nest = await this.query().findById(id)
       if (nest) {
         await nest.$query().patch({ name, nest_submitted_by })
+        log.info(
+          HELPERS.nests,
+          `Nest name updated for ${id} from ${nest.name} to ${name} by ${nest_submitted_by}`,
+        )
         return true
       }
     }

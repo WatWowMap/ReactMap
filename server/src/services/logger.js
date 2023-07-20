@@ -48,6 +48,8 @@ const HELPERS = /** @type {const} */ ({
   scanCells: chalk.hex('#ffeb3b')('[SCAN CELLS]'),
   s2cells: chalk.hex('#ffc107')('[S2 CELLS]'),
   devices: chalk.hex('#ff9800')('[DEVICE]'),
+  nests: chalk.hex('#ff5724')('[NESTS]'),
+  portals: chalk.hex('#795548')('[PORTALS]'),
 
   custom: (text = '', color = '#64b5f6') =>
     chalk.hex(color)(`[${text.toUpperCase()}]`),
