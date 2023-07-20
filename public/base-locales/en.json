@@ -612,5 +612,15 @@
   "success": "Success",
   "contribute": "Contribute",
   "mi": "mi",
-  "filter_by_areas": "Filter by Areas"
+  "filter_by_areas": "Filter by Areas",
+  "submit_nest_name": "Submit Nest Name",
+  "nest_submission_menu": "Name Update",
+  "nest_submissions": "Nest Submissions",
+  "nest_submissions_subtitle": "Allows you to submit new names for nests",
+  "pokemon_opacity": "Dynamic Pokemon Opacity",
+  "invasion_opacity": "Dynamic Invasion Opacity",
+  "raid_opacity": "Dynamic Raid Opacity",
+  "opacity_ten_minutes": "Opacity at 10 minutes",
+  "opacity_five_minutes": "Opacity at 5 minutes",
+  "opacity_one_minute": "Opacity at 1 minute"
 }

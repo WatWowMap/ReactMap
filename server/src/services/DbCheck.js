@@ -136,9 +136,9 @@ module.exports = class DbCheck {
         'availble_slots' in columns ? 'availble_slots' : 'available_slots',
         'raid_pokemon_alignment' in columns,
       ])
-    const [polygon] = await schema('nests')
+    const [polygon, hasSubmissionColumn] = await schema('nests')
       .columnInfo()
-      .then((columns) => ['polygon' in columns])
+      .then((columns) => ['polygon' in columns, 'nest_submitted_by' in columns])
 
     return {
       isMad,
@@ -157,6 +157,7 @@ module.exports = class DbCheck {
       availableSlotsCol,
       polygon,
       hasAlignment,
+      hasSubmissionColumn,
     }
   }
 
@@ -425,6 +426,19 @@ module.exports = class DbCheck {
       [...DbCheck.deDupeResults(stopData)],
       [...DbCheck.deDupeResults(gymData)],
     ]
+  }
+
+  /**
+   * @param {{ id: number, name: string, nest_submitted_by: string }} args
+   * @returns {Promise<boolean[]>}
+   */
+  async submitName(args) {
+    const nameSubmissions = await Promise.all(
+      this.models.Nest.map(async (source) =>
+        source.SubModel.submitName(args, source),
+      ),
+    )
+    return nameSubmissions
   }
 
   /**

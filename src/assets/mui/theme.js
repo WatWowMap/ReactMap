@@ -24,6 +24,7 @@ export default function customTheme(
           },
           secondary: {
             main: theme?.secondary || '#00b0ff',
+            contrastText: '#fff',
           },
         },
         components: {

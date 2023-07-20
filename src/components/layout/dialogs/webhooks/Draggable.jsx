@@ -79,7 +79,6 @@ export default function DraggableMarker({
                   endAdornment={
                     <InputAdornment position="end">{t('m')}</InputAdornment>
                   }
-                  labelWidth={0}
                 />
               </FormControl>
               <Typography variant="caption">{t('distance_radius')}</Typography>

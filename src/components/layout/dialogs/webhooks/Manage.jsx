@@ -95,7 +95,6 @@ export default function Manage({
         t('manage_profiles')
       ),
       action: () => setAddNew(true),
-      icon: tabValue ? 'Add' : 'People',
       key: 'addNew',
       disabled: !webhookData[selectedWebhook]?.human,
     },
@@ -188,6 +187,7 @@ export default function Manage({
                   />
                 )
               }
+              style={{ minWidth: 5 }}
             />
           ))}
         </Tabs>

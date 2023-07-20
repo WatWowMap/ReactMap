@@ -637,6 +637,22 @@
       "enableGymPopupCoords": {
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_ENABLE_GYM_POPUP_COORDS",
         "__format": "boolean"
+      },
+      "raidOpacity": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_RAID_OPACITY",
+        "__format": "boolean"
+      },
+      "opacityTenMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_OPACITY_TEN_MINUTES",
+        "__format": "number"
+      },
+      "opacityFiveMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_OPACITY_FIVE_MINUTES",
+        "__format": "number"
+      },
+      "opacityOneMinute": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_OPACITY_ONE_MINUTE",
+        "__format": "number"
       }
     },
     "pokestops": {
@@ -683,6 +699,22 @@
       "enablePokestopPopupCoords": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_ENABLE_POKESTOP_POPUP_COORDS",
         "__format": "boolean"
+      },
+      "invasionOpacity": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_INVASION_OPACITY",
+        "__format": "boolean"
+      },
+      "opacityTenMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_OPACITY_TEN_MINUTES",
+        "__format": "number"
+      },
+      "opacityFiveMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_OPACITY_FIVE_MINUTES",
+        "__format": "number"
+      },
+      "opacityOneMinute": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_OPACITY_ONE_MINUTE",
+        "__format": "number"
       }
     },
     "pokemon": {
@@ -741,6 +773,22 @@
       "glow": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_GLOW",
         "__format": "json"
+      },
+      "pokemonOpacity": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_POKEMON_OPACITY",
+        "__format": "boolean"
+      },
+      "opacityTenMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_OPACITY_TEN_MINUTES",
+        "__format": "number"
+      },
+      "opacityFiveMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_OPACITY_FIVE_MINUTES",
+        "__format": "number"
+      },
+      "opacityOneMinute": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_OPACITY_ONE_MINUTE",
+        "__format": "number"
       }
     },
     "wayfarer": {
@@ -1441,6 +1489,20 @@
         },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_NESTS_ROLES",
+          "__format": "json"
+        }
+      },
+      "nestSubmissions": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_NEST_SUBMISSIONS_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_NEST_SUBMISSIONS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_NEST_SUBMISSIONS_ROLES",
           "__format": "json"
         }
       },
