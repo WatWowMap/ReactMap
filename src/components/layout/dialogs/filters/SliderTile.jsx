@@ -68,7 +68,13 @@ export default function SliderTile({
 
   const translated = t(i18nKey || `slider_${name}`)
   return (
-    <Grid container direction="row" justifyContent="center" alignItems="center">
+    <Grid
+      container
+      direction="row"
+      justifyContent="center"
+      alignItems="center"
+      minWidth={Math.min(window.innerWidth, 260)}
+    >
       <Grid item xs={noTextInput ? 12 : 4}>
         <Typography
           noWrap={fullName}
