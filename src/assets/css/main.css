@@ -31,12 +31,12 @@ body {
 
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: rgb(12, 12, 12);
+    background-color: #121212;
   }
 }
 
 .dark {
-  background-color: rgb(12, 12, 12);
+  background-color: #121212;
 }
 
 .grid-item {
