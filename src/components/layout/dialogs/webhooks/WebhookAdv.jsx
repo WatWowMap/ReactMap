@@ -545,7 +545,7 @@ export default function WebhookAdvanced({
             sm={option.sm || size}
             style={{ margin: '10px 0', textAlign: 'center' }}
           >
-            <FormControl variant="outlined" size="small">
+            <FormControl variant="outlined" size="small" sx={{ width: '80%' }}>
               <InputLabel>{t(option.name)}</InputLabel>
               <Select
                 autoFocus
