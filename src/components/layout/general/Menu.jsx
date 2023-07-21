@@ -1,11 +1,5 @@
 import React, { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  Drawer,
-  Grid,
-  Typography,
-} from '@material-ui/core'
+import { Dialog, DialogContent, Drawer, Grid, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
@@ -239,13 +233,11 @@ export default function Menu({
       name: 'help',
       action: () => setHelpDialog(!helpDialog),
       icon: 'HelpOutline',
-      color: 'white',
     },
     {
       name: 'openFilter',
       action: toggleDrawer(true),
       icon: 'Ballot',
-      color: 'white',
       mobileOnly: true,
     },
     {
@@ -254,19 +246,18 @@ export default function Menu({
         ? toggleWebhook(true, 'global')
         : toggleAdvMenu(true, 'global'),
       icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
-      color: 'white',
     },
     {
       name: 'disable_all',
       action: () => selectAllOrNone(false),
       icon: 'Clear',
-      color: 'primary',
+      color: 'error',
     },
     {
       name: 'enable_all',
       action: () => selectAllOrNone(true),
       icon: 'Check',
-      color: '#00e676',
+      color: 'success',
     },
     ...extraButtons,
   ]
@@ -343,7 +334,12 @@ export default function Menu({
         </Grid>
       </DialogContent>
       <Footer options={footerButtons} role="dialog_filter_footer" />
-      <Drawer anchor="bottom" open={filterDrawer} onClose={toggleDrawer(false)}>
+      <Drawer
+        anchor="bottom"
+        sx={{ zIndex: 10000 }}
+        open={filterDrawer}
+        onClose={toggleDrawer(false)}
+      >
         {Options}
       </Drawer>
       <Dialog

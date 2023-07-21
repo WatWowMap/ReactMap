@@ -150,5 +150,6 @@ module.exports = gql`
     strategy(strategy: String): Boolean
     setGymBadge(gymId: String, badge: Int): Boolean
     setExtraFields(key: String, value: String): Boolean
+    nestSubmission(id: ID, name: String): [Boolean]
   }
 `

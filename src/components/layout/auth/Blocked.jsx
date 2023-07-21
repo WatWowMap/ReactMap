@@ -2,7 +2,8 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Grid, Typography, Button } from '@material-ui/core'
+import { Grid, Typography, Button } from '@mui/material'
+import DiscordLogin from './Discord'
 
 export default function Blocked({ serverSettings }) {
   const { t } = useTranslation()
@@ -18,7 +19,7 @@ export default function Blocked({ serverSettings }) {
       style={{ minHeight: '95vh' }}
     >
       <Grid item>
-        <Typography variant="h3" style={{ color: 'white' }} align="center">
+        <Typography variant="h3" align="center">
           {t('access')} {t('denied')}!
         </Typography>
       </Grid>
@@ -27,7 +28,7 @@ export default function Blocked({ serverSettings }) {
 
       {queryParams.get('blockedGuilds') && (
         <Grid item>
-          <Typography variant="h6" style={{ color: 'white' }} align="center">
+          <Typography variant="h6" align="center">
             {t('on_block_msg')} {queryParams.get('blockedGuilds')}.
           </Typography>
         </Grid>
@@ -36,7 +37,7 @@ export default function Blocked({ serverSettings }) {
       {serverSettings.config.map.discordInvite && (
         <Grid item>
           <br />
-          <Typography variant="h6" style={{ color: 'white' }} align="center">
+          <Typography variant="h6" align="center">
             {t('on_block_join_discord')}
           </Typography>
         </Grid>
@@ -59,9 +60,10 @@ export default function Blocked({ serverSettings }) {
           }}
         >
           <Button
-            variant="outlined"
-            color="secondary"
+            variant="contained"
+            color="primary"
             onClick={() => (window.location = window.location.origin)}
+            size="large"
           >
             {t('go_back')}
           </Button>
@@ -73,15 +75,11 @@ export default function Blocked({ serverSettings }) {
             sm={3}
             style={{ textAlign: 'center', marginTop: 20 }}
           >
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() =>
-                window.open(serverSettings.config.map.discordInvite, '_blank')
-              }
-            >
-              {t('join')}
-            </Button>
+            <DiscordLogin
+              href={serverSettings.config.map.discordInvite}
+              text="join"
+              // size="small"
+            />
           </Grid>
         )}
       </Grid>

@@ -1,13 +1,23 @@
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
-import React from 'react'
+import * as React from 'react'
 import {
-  Tabs,
-  AppBar,
-  Tab,
-  TextField,
   Typography,
   Grid,
-} from '@material-ui/core'
+  Autocomplete,
+  Popper,
+  Box,
+  ListItemIcon,
+  ListItemText,
+  TextField,
+  CircularProgress,
+} from '@mui/material'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
+import SearchIcon from '@mui/icons-material/Search'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
 
@@ -19,31 +29,122 @@ import Query from '@services/Query'
 import Header from '../general/Header'
 import QuestTitle from '../general/QuestTitle'
 
-export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
+export function FancySearch({ searchOptions, loading, InputProps, ...props }) {
+  const { t } = useTranslation()
+  const searchTab = useStore((state) => state.searchTab)
+  const Icons = useStatic((s) => s.Icons)
+
+  const { setSearchTab, darkMode } = useStore.getState()
+
+  const [anchorEl, setAnchorEl] = React.useState(null)
+
+  /**
+   * @param {string} selection
+   */
+  const handleClose = (selection) => {
+    if (typeof selection === 'string') setSearchTab(selection)
+    setAnchorEl(null)
+  }
+
+  return (
+    <>
+      <TextField
+        placeholder={t(`global_search_${searchTab}`)}
+        variant="standard"
+        {...props}
+        InputProps={{
+          ...InputProps,
+          sx: { pl: 2 },
+          endAdornment: (
+            <>
+              <IconButton sx={{ p: 1.25 }}>
+                {loading ? (
+                  <CircularProgress
+                    size={24}
+                    sx={(theme) => ({
+                      color: theme.palette.getContrastText(
+                        theme.palette.background.default,
+                      ),
+                    })}
+                  />
+                ) : (
+                  <SearchIcon />
+                )}
+              </IconButton>
+              <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+              <IconButton
+                color="primary"
+                sx={{ p: 1.25, width: 40 }}
+                onClick={(e) => setAnchorEl(e.currentTarget)}
+              >
+                <img
+                  className={darkMode ? '' : 'darken-image'}
+                  src={Icons.getMisc(searchTab)}
+                  alt={t(searchTab)}
+                  style={{ maxWidth: 20, maxHeight: 20 }}
+                />
+              </IconButton>
+            </>
+          ),
+        }}
+        sx={{ boxShadow: 1 }}
+      />
+      <Menu
+        anchorEl={anchorEl}
+        open={!!anchorEl}
+        onClose={handleClose}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        elevation={0}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+      >
+        {searchOptions.map((option) => (
+          <MenuItem
+            key={option}
+            selected={option === searchTab}
+            onClick={() => handleClose(option)}
+          >
+            <ListItemIcon>
+              <img
+                className={darkMode ? '' : 'darken-image'}
+                src={Icons.getMisc(option)}
+                alt={t(option)}
+                style={{ maxWidth: 20, maxHeight: 20 }}
+              />
+            </ListItemIcon>
+            <ListItemText primary={t(option)} />
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
+  )
+}
+
+export default function Search({ safeSearch, toggleDialog, Icons }) {
   Utility.analytics('/search')
 
   const { t } = useTranslation()
+  const { setSearch } = useStore.getState()
   const location = useStore((state) => state.location)
   const search = useStore((state) => state.search)
-  const setSearch = useStore((state) => state.setSearch)
   const searchTab = useStore((state) => state.searchTab)
-  const setSearchTab = useStore((state) => state.setSearchTab)
   const { scanAreas } = useStore((state) => state.filters)
   const { map } = useStatic((state) => state.config)
 
-  const handleTabChange = (event, newValue) => {
-    setSearchTab(newValue)
-  }
-  Utility.analytics(
-    'Global Search',
-    `Search Value: ${search}`,
-    safeSearch[searchTab],
-  )
+  const [options, setOptions] = React.useState([])
 
-  const { data, previousData } = useQuery(Query.search(safeSearch[searchTab]), {
+  Utility.analytics('Global Search', `Search Value: ${search}`, searchTab)
+
+  const { data, previousData, loading } = useQuery(Query.search(searchTab), {
+    skip: typeof searchTab === 'number',
     variables: {
       search,
-      category: safeSearch[searchTab],
+      category: searchTab,
       lat: location[0],
       lon: location[1],
       locale: localStorage.getItem('i18nextLng'),
@@ -71,8 +172,8 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
           style={{
             maxHeight: 45,
             maxWidth: 45,
-            marginLeft: isMobile ? 0 : 17,
-            position: 'relative',
+            // marginLeft: isMobile ? 0 : 17,
+            // position: 'relative',
           }}
         >
           <NameTT id={tt}>
@@ -170,7 +271,7 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
   }
 
   const getBackupName = () => {
-    switch (safeSearch[searchTab]) {
+    switch (searchTab) {
       case 'quests':
       case 'pokestops':
         return t('unknown_pokestop')
@@ -179,84 +280,125 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
     }
   }
 
-  const fetchedData = data || previousData
+  React.useEffect(() => {
+    setOptions(
+      (data || previousData)?.[
+        searchTab === 'quests'
+          ? 'searchQuest'
+          : searchTab === 'lures'
+          ? 'searchLure'
+          : 'search'
+      ] || [],
+    )
+  }, [data])
+
+  React.useEffect(() => {
+    if (typeof searchTab === 'number') {
+      // searchTab value migration
+      useStore.setState({ searchTab: safeSearch[0] })
+    }
+  }, [searchTab])
+
   return (
-    <div style={{ width: isMobile ? 'inherit' : 500, minHeight: 190 }}>
+    <Box sx={{ width: { xs: 'inherit', sm: 500 } }}>
       <Header titles={['search']} action={toggleDialog(false, '', 'search')} />
-      <AppBar position="static">
-        <Tabs
-          value={searchTab}
-          onChange={handleTabChange}
-          indicatorColor="secondary"
-          variant="fullWidth"
-          style={{ backgroundColor: '#424242', width: '100%' }}
-        >
-          {safeSearch.map((each) => (
-            <Tab
-              key={each}
-              icon={
-                <img
-                  src={Icons.getMisc(each)}
-                  alt={each}
-                  style={{ maxWidth: 20, height: 'auto' }}
-                />
-              }
-              style={{ width: 40, minWidth: 40 }}
-            />
-          ))}
-        </Tabs>
-      </AppBar>
-      <TextField
-        style={{ margin: '15px 10px', width: isMobile ? '93%' : '96%' }}
-        autoComplete="off"
-        label={t(`global_search_${safeSearch[searchTab]}`)}
-        value={search}
-        onChange={({ target: { value } }) => {
-          if (/^[0-9\s\p{L}]+$/u.test(value) || value === '')
-            setSearch(value.toLowerCase())
+      <Autocomplete
+        inputValue={search}
+        onInputChange={(e, newValue) => {
+          if (
+            e?.type === 'change' &&
+            (/^[0-9\s\p{L}]+$/u.test(newValue) || newValue === '')
+          ) {
+            setSearch(newValue.toLowerCase())
+          }
         }}
-        variant="outlined"
-      />
-      <Grid container>
-        {fetchedData?.[
-          safeSearch[searchTab] === 'quests'
-            ? 'searchQuest'
-            : safeSearch[searchTab] === 'lures'
-            ? 'searchLure'
-            : 'search'
-        ]?.map((option, index) => (
-          <Grid
-            container
-            item
-            xs={12}
-            key={`${option.id}-${safeSearch[searchTab]}-${option.with_ar}`}
-            onClick={toggleDialog(false, '', 'search', option)}
-            justifyContent="space-between"
-            alignItems="center"
-            style={{
-              backgroundColor:
-                index % 2 ? 'rgba(1, 1, 1, 0.05)' : 'rgba(240, 240, 240, 0.05)',
-              padding: '10px 5px',
-            }}
+        options={options.map((option, i) => ({ ...option, i }))}
+        loading={loading}
+        autoComplete={false}
+        clearOnBlur={false}
+        ListboxProps={{
+          sx: { maxHeight: { xs: '75vh', sm: '80vh' } },
+        }}
+        fullWidth
+        clearIcon={null}
+        popupIcon={null}
+        sx={{ p: 2 }}
+        PopperComponent={({ children, ...props }) => (
+          <Popper
+            {...props}
+            placement="bottom"
+            sx={{ height: 0, width: { xs: 'inherit', sm: 500 } }}
           >
-            <Grid item xs={2} style={{ textAlign: 'center' }}>
+            {children}
+          </Popper>
+        )}
+        filterOptions={(o) => o}
+        onChange={toggleDialog(false, '', 'search')}
+        renderInput={(params) => (
+          <FancySearch
+            {...params}
+            searchOptions={safeSearch}
+            loading={loading}
+          />
+        )}
+        getOptionLabel={(option) =>
+          `${option.id}-${searchTab}-${option.with_ar}`
+        }
+        renderOption={(props, option) => (
+          <Grid
+            key={`${option.id}-${searchTab}-${option.with_ar}`}
+            container
+            component="li"
+            alignItems="center"
+            justifyContent="space-between"
+            sx={(theme) => ({
+              backgroundColor:
+                option.i % 2
+                  ? theme.palette.background.default
+                  : theme.palette.grey[
+                      theme.palette.mode === 'light' ? 100 : 900
+                    ],
+            })}
+            {...props}
+          >
+            <Grid
+              item
+              xs={3}
+              sm={2}
+              style={{
+                alignItems: 'center',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
               {option.url ? (
                 <img
                   src={
                     option.url.includes('http')
                       ? option.url.replace(/^http:\/\//, 'https://')
-                      : Icons.getMisc(safeSearch[searchTab])
+                      : Icons.getMisc(searchTab)
                   }
-                  style={{ height: 40, width: 45, objectFit: 'fill' }}
+                  onError={(e) => {
+                    e.target.onerror = null
+                    if (searchTab === 'pokestops') {
+                      e.target.src =
+                        'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/pokestop/0.webp'
+                    } else {
+                      e.target.src =
+                        'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/gym/0.webp'
+                    }
+                  }}
                   alt={option.url}
+                  height={45}
+                  width={45}
                 />
               ) : (
                 getUrl(option)
               )}
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs={7} sm={8}>
               <Typography variant="caption" style={{ fontWeight: 'bold' }}>
-                {safeSearch[searchTab] === 'pokemon'
+                {searchTab === 'pokemon'
                   ? `${t(`poke_${option.pokemon_id}`)} ${
                       option.form &&
                       t(`form_${option.form}`) !== t('poke_type_1')
@@ -286,15 +428,15 @@ export default function Search({ safeSearch, toggleDialog, isMobile, Icons }) {
                 {map.distanceUnit === 'mi' ? t('mi') : t('km')}
               </Typography>
               <br />
-              {safeSearch[searchTab] === 'quests' && (
+              {searchTab === 'quests' && (
                 <Typography variant="caption" className="ar-task" noWrap>
                   {map.questMessage || t(`ar_quest_${Boolean(option.with_ar)}`)}
                 </Typography>
               )}
             </Grid>
           </Grid>
-        ))}
-      </Grid>
-    </div>
+        )}
+      />
+    </Box>
   )
 }

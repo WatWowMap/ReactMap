@@ -25,16 +25,18 @@
 }
 
 body {
-  background-color: rgb(53, 53, 53);
   margin: 0;
-}
-
-.MuiDrawer-paper {
-  background-color: rgb(51, 51, 51);
-}
-
-.MuiToggleButton-root {
   background-color: white;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #121212;
+  }
+}
+
+.dark {
+  background-color: #121212;
 }
 
 .grid-item {
@@ -44,12 +46,6 @@ body {
   background-size: contain;
 }
 
-.filter-footer {
-  background-color: #424242;
-  text-align: center;
-  height: 50px;
-}
-
 .leaflet-tooltip {
   font-weight: bold;
   border: none;
@@ -57,16 +53,6 @@ body {
   max-height: 60px !important;
   padding: 0px 2px !important;
   border-radius: 0.5rem !important;
-}
-
-.leaflet-popup-tip-container .leaflet-popup-tip {
-  background-color: rgb(33, 37, 31);
-}
-
-.dark .leaflet-popup-content-wrapper {
-  background-color: rgb(33, 37, 31);
-  color: white;
-  border: rgb(26, 26, 26) solid 4px;
 }
 
 .table-pvp {
@@ -294,14 +280,12 @@ img {
   text-align: center;
   align-items: center;
   justify-content: center;
-  background-color: rgb(110, 110, 110);
-  border: 2px solid white;
   border-radius: 12px;
-  color: white;
-  font: bold 15px/13px Helvetica, Verdana, Tahoma;
+  font: bold 15px/13px Roboto, sans-serif;
   height: 16px;
   min-width: 14px;
   padding: 4px 3px 0 3px;
+  box-sizing: content-box;
 }
 
 .weather-icon {
@@ -320,14 +304,6 @@ img {
 .quest-popup-img {
   max-width: 30px;
   max-height: 30px;
-}
-
-.ar-task {
-  background-color: rgb(63, 63, 63);
-  border: 1px solid white;
-  border-radius: 12px;
-  padding: 3px;
-  font-size: 0.5rem !important;
 }
 
 .amount-popup {
@@ -408,7 +384,6 @@ img {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(128, 128, 128, 0.5);
 }
 
 .perm-wrapper img {
@@ -429,4 +404,16 @@ input[type='time']::-webkit-calendar-picker-indicator {
 
 .badge_1 {
   color: #cd7f32;
+}
+
+.darken-image {
+  filter: invert(100%) sepia(100%) hue-rotate(151deg) grayscale(1);
+}
+
+.expanded {
+  transform: rotate(180deg);
+}
+
+.closed {
+  transform: rotate(0deg);
 }

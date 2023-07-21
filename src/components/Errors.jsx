@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Typography, Button } from '@material-ui/core'
+import { Grid, Typography, Button } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 export default function Errors() {
@@ -15,12 +15,12 @@ export default function Errors() {
       style={{ minHeight: '95vh' }}
     >
       <Grid item>
-        <Typography variant="h1" style={{ color: 'white' }} align="center">
+        <Typography variant="h1" align="center">
           {error}
         </Typography>
       </Grid>
       <Grid item>
-        <Typography variant="h6" style={{ color: 'white' }} align="center">
+        <Typography variant="h6" align="center">
           {t(`errors_${error}`)}
         </Typography>
       </Grid>

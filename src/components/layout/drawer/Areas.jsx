@@ -1,8 +1,23 @@
-import React, { useMemo } from 'react'
+/* eslint-disable react/no-array-index-key */
+import * as React from 'react'
 import { useMap } from 'react-leaflet'
 import { useQuery } from '@apollo/client'
-import { Grid, Button, Paper, TextField } from '@material-ui/core'
+import {
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListItem,
+  TextField,
+  TableContainer,
+  Table,
+  TableBody,
+  TableRow,
+  Collapse,
+  TableCell,
+  Paper,
+} from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
 import Query from '@services/Query'
 import { useStatic, useStore } from '@hooks/useStore'
@@ -15,41 +30,34 @@ export default function AreaDropDown() {
   const { setAreas, setFilters } = useStore.getState()
   const { config } = useStatic.getState()
   const map = useMap()
+  const [open, setOpen] = React.useState('')
 
-  const allAreas = useMemo(() => {
-    if (data?.scanAreasMenu) {
-      return data.scanAreasMenu.flatMap((parent) =>
+  const allAreas = React.useMemo(
+    () =>
+      data?.scanAreasMenu.flatMap((parent) =>
         parent.children
           .filter((child) => !child.properties.manual)
           .map((child) => child.properties.key),
-      )
-    }
-    return []
-  }, [data])
+      ) || [],
+    [data],
+  )
 
   if (loading || error) return null
 
   return (
     <>
-      <Grid
-        item
-        xs={t('drawer_grid_advanced_width')}
-        style={{ textAlign: 'center' }}
-      >
-        <Button
-          onClick={() => setAreas()}
-          variant="contained"
-          color="primary"
-          style={{ minWidth: '80%' }}
-        >
-          {t('reset')}
-        </Button>
-      </Grid>
-      <Grid item xs={12} style={{ textAlign: 'center' }}>
+      <ListItemButton onClick={() => setAreas()}>
+        <ListItemIcon>
+          <RestartAltIcon color="primary" />
+        </ListItemIcon>
+        <ListItemText primary={t('reset')} />
+      </ListItemButton>
+      <ListItem>
         <TextField
           label={t('search')}
           variant="outlined"
           fullWidth
+          size="small"
           value={filters?.scanAreas?.filter?.search || ''}
           onChange={(e) =>
             setFilters({
@@ -64,66 +72,116 @@ export default function AreaDropDown() {
             })
           }
         />
-      </Grid>
-      <Paper
-        style={{
-          minHeight: 50,
-          maxHeight: config.map.scanAreaMenuHeight || 400,
-          width: '100%',
-          overflow: 'auto',
-          backgroundColor: '#212121',
-        }}
-      >
-        {data?.scanAreasMenu
-          ?.map((area) => ({
-            ...area,
-            children: area.children.filter(
-              (feature) =>
-                filters.scanAreas?.filter?.search === '' ||
-                feature.properties?.key
-                  ?.toLowerCase()
-                  ?.includes(filters?.scanAreas?.filter?.search?.toLowerCase()),
-            ),
-          }))
-          .map(({ name, details, children }) => {
-            if (!children.length) return null
-            return (
-              <Grid
-                key={name || ''}
-                container
-                alignItems="stretch"
-                justifyContent="center"
-              >
-                {name && (
-                  <AreaTile
-                    key={name}
-                    name={name}
-                    feature={details}
-                    allAreas={allAreas}
-                    childAreas={children}
-                    scanAreasZoom={config.map.scanAreasZoom}
-                    map={map}
-                    scanAreas={filters.scanAreas}
-                    setAreas={setAreas}
-                  />
-                )}
-                {children.map((feature, i) => (
-                  <AreaTile
-                    key={feature?.properties?.name || i}
-                    feature={feature}
-                    allAreas={allAreas}
-                    childAreas={children}
-                    scanAreasZoom={config.map.scanAreasZoom}
-                    i={i}
-                    map={map}
-                    scanAreas={filters.scanAreas}
-                    setAreas={setAreas}
-                  />
-                ))}
-              </Grid>
-            )
-          })}
-      </Paper>
+      </ListItem>
+      <ListItem>
+        <TableContainer
+          component={Paper}
+          sx={{
+            minHeight: 50,
+            maxHeight: config.map.scanAreaMenuHeight || 400,
+            overflow: 'auto',
+          }}
+        >
+          <Table
+            size="small"
+            sx={(theme) => ({
+              borderTop: 1,
+              borderColor:
+                theme.palette.grey[theme.palette.mode === 'dark' ? 800 : 200],
+            })}
+          >
+            <TableBody>
+              {data?.scanAreasMenu
+                ?.map((area) => ({
+                  ...area,
+                  children: area.children.filter(
+                    (feature) =>
+                      filters.scanAreas?.filter?.search === '' ||
+                      feature.properties?.key
+                        ?.toLowerCase()
+                        ?.includes(
+                          filters?.scanAreas?.filter?.search?.toLowerCase(),
+                        ),
+                  ),
+                }))
+                .map(({ name, details, children }) => {
+                  if (!children.length) return null
+                  const rows = []
+                  for (let i = 0; i < children.length; i += 2) {
+                    const newRow = []
+                    if (children[i]) newRow.push(children[i])
+                    if (children[i + 1]) newRow.push(children[i + 1])
+                    rows.push(newRow)
+                  }
+                  return (
+                    <React.Fragment key={`${name}-${children.length}`}>
+                      {name && (
+                        <TableRow>
+                          <AreaTile
+                            name={name}
+                            feature={details}
+                            allAreas={allAreas}
+                            childAreas={children}
+                            scanAreasZoom={config.map.scanAreasZoom}
+                            map={map}
+                            scanAreas={filters.scanAreas}
+                            setAreas={setAreas}
+                            open={open}
+                            setOpen={
+                              config.map.expandAllScanAreas
+                                ? undefined
+                                : setOpen
+                            }
+                            colSpan={2}
+                          />
+                        </TableRow>
+                      )}
+                      <TableRow>
+                        <TableCell padding="none" sx={{ border: 'none' }}>
+                          <Collapse
+                            in={
+                              config.map.expandAllScanAreas ||
+                              open === name ||
+                              !!filters?.scanAreas?.filter?.search
+                            }
+                            timeout="auto"
+                            unmountOnExit
+                            sx={{ width: '100%' }}
+                          >
+                            <Table sx={{ width: '100%' }}>
+                              <TableBody sx={{ width: '100%' }}>
+                                {rows.map((row, i) => (
+                                  <TableRow key={i}>
+                                    {row.map((feature, j) => (
+                                      <AreaTile
+                                        key={feature?.properties?.name || i}
+                                        feature={feature}
+                                        allAreas={allAreas}
+                                        childAreas={children}
+                                        scanAreasZoom={config.map.scanAreasZoom}
+                                        map={map}
+                                        borderRight={
+                                          row.length === 2 && j === 0
+                                        }
+                                        scanAreas={filters.scanAreas}
+                                        setAreas={setAreas}
+                                        colSpan={row.length === 1 ? 2 : 1}
+                                      />
+                                    ))}
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  )
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </ListItem>
     </>
   )
 }

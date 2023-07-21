@@ -1,5 +1,5 @@
 import React from 'react'
-import { DialogContent, ButtonGroup, Button } from '@material-ui/core'
+import { DialogContent, ButtonGroup, Button } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 
@@ -18,7 +18,7 @@ export default function BadgeSelection({ gym, setBadgeMenu, badge, setBadge }) {
     <>
       <Header titles={['gym_badge_menu']} action={() => setBadgeMenu(false)} />
       <DialogContent>
-        <ButtonGroup>
+        <ButtonGroup sx={{ pt: 2 }}>
           {[0, 1, 2, 3].map((i) => (
             <Button
               key={i}

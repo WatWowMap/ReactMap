@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-duplicate-props */
 import React, { useState } from 'react'
-import ExpandMore from '@material-ui/icons/ExpandMore'
+import ExpandMore from '@mui/icons-material/ExpandMore'
 import {
   Grid,
   DialogContent,
@@ -18,13 +18,11 @@ import {
   AccordionDetails,
   Divider,
   CircularProgress,
-} from '@material-ui/core'
-
-import { Autocomplete } from '@material-ui/lab'
+  Autocomplete,
+} from '@mui/material'
 import { Trans, useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
-import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
 
 import Query from '@services/Query'
@@ -80,7 +78,6 @@ export default function WebhookAdvanced({
 }) {
   const idObj = Poracle.getIdObj(id)
   const { t } = useTranslation()
-  const classes = useStyles()
   const location = useStore((state) => state.location)
   const selectedWebhook = useStore((s) => s.selectedWebhook)
   const webhookAdv = useStore((s) => s.webhookAdv)
@@ -548,7 +545,7 @@ export default function WebhookAdvanced({
             sm={option.sm || size}
             style={{ margin: '10px 0', textAlign: 'center' }}
           >
-            <FormControl variant="outlined" size="small">
+            <FormControl variant="outlined" size="small" sx={{ width: '80%' }}>
               <InputLabel>{t(option.name)}</InputLabel>
               <Select
                 autoFocus
@@ -747,7 +744,7 @@ export default function WebhookAdvanced({
         titles={Poracle.getTitles(idObj)}
         action={toggleWebhook(false, id)}
       />
-      <DialogContent style={{ color: 'white', padding: '8px 5px' }}>
+      <DialogContent style={{ padding: '8px 5px' }}>
         {Object.keys(info.ui).map((type) => {
           if (
             human.blocked_alerts &&
@@ -778,13 +775,8 @@ export default function WebhookAdvanced({
                   expanded={webhookAdv[type]}
                   onChange={handleChange(type)}
                 >
-                  <AccordionSummary
-                    expandIcon={<ExpandMore style={{ color: 'white' }} />}
-                    className={classes.accordionSummary}
-                  >
-                    <Typography className={classes.heading}>
-                      {t(type)}
-                    </Typography>
+                  <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Typography>{t(type)}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>{Items}</AccordionDetails>
                 </Accordion>

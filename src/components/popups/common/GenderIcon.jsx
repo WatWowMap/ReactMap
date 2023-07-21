@@ -1,5 +1,7 @@
 import * as React from 'react'
-import SvgIcon from '@material-ui/core/SvgIcon'
+import SvgIcon from '@mui/material/SvgIcon'
+
+import { useTheme } from '@mui/material'
 
 const PATH = {
   0: '',
@@ -9,9 +11,11 @@ const PATH = {
 }
 
 export default function GenderIcon({ gender }) {
+  const theme = useTheme()
+
   return (
     <SvgIcon fontSize={gender === 3 ? 'small' : 'medium'}>
-      <path d={PATH[gender]} fill="white" />
+      <path d={PATH[gender]} fill={theme.palette.text.primary} />
     </SvgIcon>
   )
 }

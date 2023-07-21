@@ -3,6 +3,7 @@ const { Model } = require('objection')
 const i18next = require('i18next')
 const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
+const { log, HELPERS } = require('../services/logger')
 const {
   api: { searchResultsLimit, queryLimits },
   defaultFilters: {
@@ -119,5 +120,30 @@ module.exports = class Nest extends Model {
 
   static getOne(id) {
     return this.query().findById(id).select(['lat', 'lon'])
+  }
+
+  /**
+   * Update the nest name in the database
+   * @param {string} name
+   * @param {number} id
+   * @param {string?} nest_submitted_by
+   * @returns {boolean}
+   */
+  static async submitName(
+    { name, id, nest_submitted_by = 'Unknown User' },
+    { hasSubmissionColumn },
+  ) {
+    if (name && id && hasSubmissionColumn) {
+      const nest = await this.query().findById(id)
+      if (nest) {
+        await nest.$query().patch({ name, nest_submitted_by })
+        log.info(
+          HELPERS.nests,
+          `Nest name updated for ${id} from ${nest.name} to ${name} by ${nest_submitted_by}`,
+        )
+        return true
+      }
+    }
+    return false
   }
 }

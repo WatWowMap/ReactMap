@@ -43,3 +43,9 @@ export const getOne = gql`
     }
   }
 `
+
+export const nestSubmission = gql`
+  mutation NestSubmission($id: ID!, $name: String!) {
+    nestSubmission(id: $id, name: $name)
+  }
+`

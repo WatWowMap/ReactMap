@@ -1,8 +1,6 @@
 import React from 'react'
-import { DialogContent, Typography, Divider, Grid } from '@material-ui/core'
+import { DialogContent, Typography, Divider, Grid } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-
-const closing = [0, 1, 2, 3, 4]
 
 export default function TutClosing() {
   const { t } = useTranslation()
@@ -16,13 +14,15 @@ export default function TutClosing() {
         spacing={2}
         style={{ height: '100%' }}
       >
-        {closing.map((i) => (
-          <Grid item xs={12} key={i}>
-            <Typography variant={i ? 'subtitle1' : 'h5'} align="center">
-              {t(`tutorial_closing_${i}`)}
-            </Typography>
-            <Divider light style={{ margin: 10 }} />
-          </Grid>
+        {[0, 1, 2, 3, 4].map((i) => (
+          <React.Fragment key={i}>
+            <Grid item xs={12}>
+              <Typography variant={i ? 'subtitle1' : 'h4'} align="center">
+                {t(`tutorial_closing_${i}`)}
+              </Typography>
+            </Grid>
+            <Divider flexItem style={{ margin: 10, width: '100%' }} />
+          </React.Fragment>
         ))}
         <Grid item xs={12}>
           <Typography variant="subtitle1" align="center">

@@ -80,22 +80,21 @@ export default function Clustering({
       >
         {finalData}
       </MarkerClusterGroup>
-      {limitHit && (
-        <Notification
-          severity="warning"
-          i18nKey="cluster_limit"
-          messages={[
-            {
-              key: 'limitHit',
-              variables: [category, clusteringRules.forcedLimit],
-            },
-            {
-              key: 'zoomIn',
-              variables: [],
-            },
-          ]}
-        />
-      )}
+      <Notification
+        open={limitHit}
+        severity="warning"
+        i18nKey="cluster_limit"
+        messages={[
+          {
+            key: 'limitHit',
+            variables: [category, clusteringRules.forcedLimit],
+          },
+          {
+            key: 'zoomIn',
+            variables: [],
+          },
+        ]}
+      />
     </>
   ) : (
     finalData

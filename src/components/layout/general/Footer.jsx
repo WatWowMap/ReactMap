@@ -1,31 +1,22 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react'
-import {
-  IconButton,
-  Button,
-  Typography,
-  useMediaQuery,
-  Grid,
-} from '@material-ui/core'
-import { useTheme } from '@material-ui/styles'
+import { IconButton, Button, Typography, Grid } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-
-import useStyles from '@hooks/useStyles'
 
 import * as MuiIcons from './Icons'
 
 export default function Footer({ options, role }) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
-  const classes = useStyles()
 
   return (
     <Grid
-      className={classes.filterFooter}
       container
       justifyContent="flex-end"
       alignItems="center"
-      style={{ minHeight: 50 }}
+      sx={(theme) => ({
+        minHeight: { xs: 'inherit', sm: 50 },
+        borderTop: `1px solid ${theme.palette.divider}`,
+      })}
     >
       {options.map((button) => {
         const key = button.key || button.name
@@ -43,47 +34,70 @@ export default function Footer({ options, role }) {
           )
         }
         const MuiIcon = button.icon ? MuiIcons[button.icon] : null
-        const color = button.disabled ? 'default' : button.color || 'white'
-        const muiColor = color === 'primary' || color === 'secondary'
+        const color = button.disabled ? 'default' : button.color
+        const muiColor = ['primary', 'secondary', 'success', 'error'].includes(
+          color,
+        )
+        const [first, second] = color ? color.split('.') : ['inherit']
+
         return (
           <Grid
             item
-            xs={isMobile ? actualSize : +t(`${role}_key_width`) || actualSize}
+            xs={actualSize}
+            sm={+t(`${role}_key_width`) || actualSize}
             key={key}
-            style={{ textAlign: button.align || 'center' }}
+            style={{
+              textAlign: button.align || 'center',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
           >
-            {isMobile && MuiIcon ? (
+            {MuiIcon && (
               <IconButton
                 href={button.link || undefined}
                 rel={button.link ? 'noreferrer' : undefined}
                 target={button.link ? button.target || '_blank' : undefined}
                 onClick={button.action || undefined}
                 disabled={button.disabled}
+                sx={{ display: { xs: 'block', sm: 'none' } }}
+                size="large"
               >
                 <MuiIcon
                   color={muiColor ? color : 'inherit'}
-                  style={{ color: muiColor ? null : color }}
+                  sx={(theme) => ({
+                    color: muiColor
+                      ? null
+                      : second
+                      ? theme.palette[first][second]
+                      : first,
+                  })}
                 />
               </IconButton>
-            ) : (
-              <Button
-                href={button.link}
-                rel={button.link ? 'noreferrer' : undefined}
-                target={button.link ? button.target || '_blank' : undefined}
-                onClick={button.action}
-                color={muiColor ? color : 'inherit'}
-                style={{ color: muiColor ? null : color }}
-                disabled={button.disabled}
-              >
-                {!button.mobileOnly && (
-                  <Typography variant="caption">
-                    {typeof button.name === 'string'
-                      ? t(button.name)
-                      : button.name}
-                  </Typography>
-                )}
-              </Button>
             )}
+            <Button
+              href={button.link}
+              rel={button.link ? 'noreferrer' : undefined}
+              target={button.link ? button.target || '_blank' : undefined}
+              onClick={button.action}
+              color={muiColor ? color : 'inherit'}
+              disabled={button.disabled}
+              sx={(theme) => ({
+                display: {
+                  xs: MuiIcon ? 'none' : 'block',
+                  sm: button.mobileOnly ? 'none' : 'block',
+                },
+                color: muiColor
+                  ? null
+                  : second
+                  ? theme.palette[first][second]
+                  : first,
+              })}
+            >
+              <Typography variant="caption">
+                {typeof button.name === 'string' ? t(button.name) : button.name}
+              </Typography>
+            </Button>
           </Grid>
         )
       })}

@@ -1,12 +1,19 @@
-import React, { Fragment } from 'react'
-import { Grid, Typography, Switch, Select, MenuItem } from '@material-ui/core'
+import * as React from 'react'
+import {
+  Switch,
+  Select,
+  MenuItem,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+} from '@mui/material'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { useStatic, useStore } from '@hooks/useStore'
 
 import MultiSelector from './MultiSelector'
 import SliderTile from '../dialogs/filters/SliderTile'
-import { MemoCollapsibleItem } from './CollapsibleItem'
+import CollapsibleItem from './CollapsibleItem'
 
 export default function Extras({ category, subItem, data }) {
   const { t } = useTranslation()
@@ -22,7 +29,7 @@ export default function Extras({ category, subItem, data }) {
 
   if (category === 'nests' && subItem === 'sliders') {
     return (
-      <Grid item xs={12} style={{ textAlign: 'center' }}>
+      <ListItem>
         <SliderTile
           filterSlide={data.secondary[0]}
           handleChange={(_, values) =>
@@ -36,41 +43,39 @@ export default function Extras({ category, subItem, data }) {
           }
           filterValues={filters[category]}
         />
-      </Grid>
+      </ListItem>
     )
   }
 
   if (category === 's2cells' && subItem === 'cells') {
     return (
-      <MemoCollapsibleItem open={!!filters[category].enabled}>
-        <Grid item xs={10}>
-          <Select
-            fullWidth
-            value={
-              Array.isArray(filters[category][subItem])
-                ? filters[category][subItem]
-                : []
-            }
-            renderValue={(selected) => selected.join(', ')}
-            multiple
-            onChange={({ target }) =>
-              setFilters({
-                ...filters,
-                [category]: {
-                  ...filters[category],
-                  [subItem]: target.value,
-                },
-              })
-            }
-          >
-            {[10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((level) => (
-              <MenuItem key={level} value={level}>
-                Level {level}
-              </MenuItem>
-            ))}
-          </Select>
-        </Grid>
-      </MemoCollapsibleItem>
+      <CollapsibleItem open={!!filters[category].enabled}>
+        <Select
+          fullWidth
+          value={
+            Array.isArray(filters[category][subItem])
+              ? filters[category][subItem]
+              : []
+          }
+          renderValue={(selected) => selected.join(', ')}
+          multiple
+          onChange={({ target }) =>
+            setFilters({
+              ...filters,
+              [category]: {
+                ...filters[category],
+                [subItem]: target.value,
+              },
+            })
+          }
+        >
+          {[10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((level) => (
+            <MenuItem key={level} value={level}>
+              Level {level}
+            </MenuItem>
+          ))}
+        </Select>
+      </CollapsibleItem>
     )
   }
 
@@ -79,78 +84,83 @@ export default function Extras({ category, subItem, data }) {
     (category === 'gyms' && subItem === 'allGyms')
   ) {
     return (
-      <MemoCollapsibleItem open={filters[category][subItem] === true}>
-        <Grid item xs={4} style={{ textAlign: 'center' }}>
-          <Typography>{t('power_up')}</Typography>
-        </Grid>
-        <Grid item xs={8} style={{ textAlign: 'center' }}>
-          <MultiSelector
-            filters={filters}
-            setFilters={setFilters}
-            category={category}
-            filterKey="levels"
-            items={['all', '1', '2', '3']}
-          />
-        </Grid>
-      </MemoCollapsibleItem>
+      <CollapsibleItem open={filters[category][subItem] === true}>
+        <ListItem
+          secondaryAction={
+            <MultiSelector
+              filters={filters}
+              setFilters={setFilters}
+              category={category}
+              filterKey="levels"
+              items={['all', '1', '2', '3']}
+            />
+          }
+        >
+          <ListItemText primary={t('power_up')} />
+        </ListItem>
+      </CollapsibleItem>
     )
   }
 
   if (category === 'gyms') {
     if (subItem === 'gymBadges') {
       return (
-        <MemoCollapsibleItem
+        <CollapsibleItem
           open={filters[category].gymBadges === true}
           style={{ textAlign: 'center', padding: '12px 0' }}
         >
-          <MultiSelector
-            filters={filters}
-            setFilters={setFilters}
-            category={category}
-            filterKey="badge"
-            allowNone
-            items={['all', 'badge_1', 'badge_2', 'badge_3']}
-          />
-        </MemoCollapsibleItem>
+          <ListItem>
+            <MultiSelector
+              filters={filters}
+              setFilters={setFilters}
+              category={category}
+              filterKey="badge"
+              allowNone
+              items={['all', 'badge_1', 'badge_2', 'badge_3']}
+            />
+          </ListItem>
+        </CollapsibleItem>
       )
     }
     if (subItem === 'raids') {
       return (
-        <MemoCollapsibleItem
+        <CollapsibleItem
           open={filters[category].raids === true}
           style={{ width: '100%' }}
         >
-          <Grid item xs={5}>
-            <Typography>{t('raid_quick_select')}</Typography>
-          </Grid>
-          <Grid item xs={7} style={{ textAlign: 'right' }}>
-            <Select
-              value={filters[category].raidTier}
-              fullWidth
-              onChange={(e) => {
-                setFilters({
-                  ...filters,
-                  [category]: {
-                    ...filters[category],
-                    raidTier:
-                      e.target.value === 'all' ? 'all' : +e.target.value,
-                  },
-                })
-              }}
-            >
-              {[
-                'all',
-                ...available.gyms
-                  .filter((x) => x.startsWith('r'))
-                  .map((y) => +y.slice(1)),
-              ].map((tier, i) => (
-                <MenuItem key={tier} dense value={tier}>
-                  {t(i ? `raid_${tier}_plural` : 'disabled')}
-                </MenuItem>
-              ))}
-            </Select>
-          </Grid>
-        </MemoCollapsibleItem>
+          <ListItem
+            secondaryAction={
+              <Select
+                value={filters[category].raidTier}
+                fullWidth
+                size="small"
+                onChange={(e) => {
+                  setFilters({
+                    ...filters,
+                    [category]: {
+                      ...filters[category],
+                      raidTier:
+                        e.target.value === 'all' ? 'all' : +e.target.value,
+                    },
+                  })
+                }}
+              >
+                {[
+                  'all',
+                  ...available.gyms
+                    .filter((x) => x.startsWith('r'))
+                    .map((y) => +y.slice(1)),
+                ].map((tier, i) => (
+                  <MenuItem key={tier} dense value={tier}>
+                    {t(i ? `raid_${tier}_plural` : 'disabled')}
+                  </MenuItem>
+                ))}
+              </Select>
+            }
+          >
+            <ListItemText primary={t('raid_quick_select')} />
+          </ListItem>
+        </CollapsibleItem>
       )
     }
   }
@@ -158,121 +168,103 @@ export default function Extras({ category, subItem, data }) {
   if (category === 'pokestops') {
     if (enableQuestSetSelector === true && subItem === 'quests') {
       return (
-        <MemoCollapsibleItem
+        <CollapsibleItem
           open={filters[category].quests === true}
           style={{ textAlign: 'center' }}
         >
-          <MultiSelector
-            filters={filters}
-            setFilters={setFilters}
-            category={category}
-            filterKey="showQuestSet"
-            items={['with_ar', 'both', 'without_ar']}
-          />
-        </MemoCollapsibleItem>
+          <ListItem>
+            <MultiSelector
+              filters={filters}
+              setFilters={setFilters}
+              category={category}
+              filterKey="showQuestSet"
+              items={['with_ar', 'both', 'without_ar']}
+            />
+          </ListItem>
+        </CollapsibleItem>
       )
     }
     if (enableConfirmedInvasions === true && subItem === 'invasions') {
       return (
-        <MemoCollapsibleItem
+        <CollapsibleItem
           open={filters[category][subItem]}
           style={{ width: '100%' }}
           alignItems="center"
           justifyContent="flex-end"
         >
-          <Grid item xs={6} style={{ textAlign: 'left' }}>
-            <Typography>{t('only_confirmed')}</Typography>
-          </Grid>
-          <Grid item xs={4} style={{ textAlign: 'right' }}>
-            <Switch
-              checked={filters[category].confirmed}
-              onChange={() => {
-                setFilters({
-                  ...filters,
-                  [category]: {
-                    ...filters[category],
-                    confirmed: !filters[category].confirmed,
-                  },
-                })
-              }}
-            />
-          </Grid>
-        </MemoCollapsibleItem>
+          <ListItem
+            secondaryAction={
+              <Switch
+                checked={filters[category].confirmed}
+                onChange={() => {
+                  setFilters({
+                    ...filters,
+                    [category]: {
+                      ...filters[category],
+                      confirmed: !filters[category].confirmed,
+                    },
+                  })
+                }}
+              />
+            }
+          >
+            <ListItemText sx={{ pl: 4 }} primary={t('only_confirmed')} />
+          </ListItem>
+        </CollapsibleItem>
       )
     }
     if (subItem === 'eventStops') {
       return (
-        <MemoCollapsibleItem open={filters[category][subItem]}>
+        <CollapsibleItem open={filters[category][subItem]}>
           {available?.pokestops
             .filter((event) => event.startsWith('b'))
             .map((event) => (
-              <Grid
-                key={event}
-                container
-                style={{ width: '100%' }}
-                alignItems="center"
-                justifyContent="flex-end"
-              >
-                <Grid item xs={2}>
+              <ListItem key={event}>
+                <ListItemIcon sx={{ pl: 4 }}>
                   <img
                     src={Icons.getIconById(event)}
                     alt={t(`display_type_${event.slice(1)}`)}
                     style={{ maxWidth: 30, maxHeight: 30 }}
                   />
-                </Grid>
-                <Grid
-                  item
-                  xs={5}
-                  style={{ textAlign: 'left', paddingLeft: 20 }}
-                >
-                  <Typography>
-                    {t(`display_type_${event.slice(1)}`, t('unknown_event'))}
-                  </Typography>
-                </Grid>
-                <Grid item xs={5} style={{ textAlign: 'right' }}>
-                  <Switch
-                    checked={filters[category].filter[event].enabled}
-                    onChange={() => {
-                      setFilters({
-                        ...filters,
-                        [category]: {
-                          ...filters[category],
-                          filter: {
-                            ...filters[category].filter,
-                            [event]: {
-                              ...filters[category].filter[event],
-                              enabled: !filters[category].filter[event].enabled,
-                            },
+                </ListItemIcon>
+                <ListItemText
+                  primary={t(
+                    `display_type_${event.slice(1)}`,
+                    t('unknown_event'),
+                  )}
+                />
+                <Switch
+                  checked={filters[category].filter[event].enabled}
+                  onChange={() => {
+                    setFilters({
+                      ...filters,
+                      [category]: {
+                        ...filters[category],
+                        filter: {
+                          ...filters[category].filter,
+                          [event]: {
+                            ...filters[category].filter[event],
+                            enabled: !filters[category].filter[event].enabled,
                           },
                         },
-                      })
-                    }}
-                  />
-                </Grid>
-              </Grid>
+                      },
+                    })
+                  }}
+                />
+              </ListItem>
             ))}
-        </MemoCollapsibleItem>
+        </CollapsibleItem>
       )
     }
   }
 
   if (category === 'wayfarer' && subItem === 'submissionCells') {
     return (
-      <MemoCollapsibleItem open={filters[subItem].enabled}>
+      <CollapsibleItem open={filters[subItem].enabled}>
         {['rings', 's14Cells', 's17Cells'].map((item, i) => (
-          <Fragment key={item}>
-            <Grid item xs={8}>
-              <Typography>
-                {i ? (
-                  <Trans i18nKey="s2_cell_level">
-                    {{ level: item.substring(1, 3) }}
-                  </Trans>
-                ) : (
-                  t('poi')
-                )}
-              </Typography>
-            </Grid>
-            <Grid item xs={4} style={{ textAlign: 'right' }}>
+          <ListItem
+            key={item}
+            secondaryAction={
               <Switch
                 checked={filters[subItem][item]}
                 onChange={() => {
@@ -286,10 +278,22 @@ export default function Extras({ category, subItem, data }) {
                 }}
                 disabled={!filters[subItem].enabled}
               />
-            </Grid>
-          </Fragment>
+            }
+          >
+            <ListItemText
+              primary={
+                i ? (
+                  <Trans i18nKey="s2_cell_level">
+                    {{ level: item.substring(1, 3) }}
+                  </Trans>
+                ) : (
+                  t('poi')
+                )
+              }
+            />
+          </ListItem>
         ))}
-      </MemoCollapsibleItem>
+      </CollapsibleItem>
     )
   }
 

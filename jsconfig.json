@@ -4,12 +4,25 @@
     "module": "commonjs",
     "allowSyntheticDefaultImports": false,
     "baseUrl": "./src",
+    "jsx": "react",
     "paths": {
-      "@assets/*": ["./assets/*"],
-      "@components/*": ["./components/*"],
-      "@services/*": ["./services/*"],
-      "@hooks/*": ["./hooks/*"]
+      "@assets/*": [
+        "./assets/*"
+      ],
+      "@components/*": [
+        "./components/*"
+      ],
+      "@services/*": [
+        "./services/*"
+      ],
+      "@hooks/*": [
+        "./hooks/*"
+      ]
     }
   },
-  "exclude": ["node_modules", "**/node_modules/*", "dist"]
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*",
+    "dist"
+  ]
 }

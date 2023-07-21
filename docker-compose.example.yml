@@ -44,7 +44,7 @@ services:
       # All of these are optional - comment out whichever ones you aren't using
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
       - ./server/src/configs/local.json:/home/node/server/src/configs/local.json
-      - ./server/src/configs/geofence.json/:/home/node/server/src/configs/geofence.json
+      - ./public/favicon/favicon.ico:/home/node/public/favicon/favicon.ico
       - ./example.env:/home/node/.env
 
     security_opt:

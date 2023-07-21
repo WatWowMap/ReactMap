@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
@@ -25,7 +25,7 @@ export default function DevicePopup({ device, isOnline, ts }) {
       <Timer device={device} t={t} ts={ts} />
       <Typography
         variant="subtitle1"
-        style={{ color: isOnline ? '#00e676' : '#ff5722' }}
+        color={isOnline ? 'success' : 'error'}
         align="center"
       >
         {t(isOnline ? 'online' : 'offline')}

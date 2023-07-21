@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import Clear from '@material-ui/icons/Clear'
-import Check from '@material-ui/icons/Check'
-import { Grid, DialogContent, IconButton } from '@material-ui/core'
+import Clear from '@mui/icons-material/Clear'
+import Check from '@mui/icons-material/Check'
+import { Grid, DialogContent, IconButton } from '@mui/material'
 
 import { useStatic } from '@hooks/useStore'
 
@@ -41,7 +41,7 @@ export default function SlotSelection({
         titles={[`team_${teamId}`, 'slot_selection']}
         action={toggleSlotsMenu(false)}
       />
-      <DialogContent style={{ color: 'white' }}>
+      <DialogContent>
         <Grid
           container
           direction="row"
@@ -92,11 +92,12 @@ export default function SlotSelection({
                       },
                     })
                   }}
+                  size="large"
                 >
                   {filterValues[each].enabled ? (
-                    <Check style={{ color: '#00e676' }} />
+                    <Check color="success" />
                   ) : (
-                    <Clear color="primary" />
+                    <Clear color="error" />
                   )}
                 </IconButton>
               </Grid>
@@ -137,14 +138,14 @@ export default function SlotSelection({
           {
             name: 'disable_all',
             action: () => handleSizeChange('all', false),
-            color: 'primary',
+            color: 'error',
             icon: 'Clear',
             size: 2,
           },
           {
             name: 'enable_all',
             action: () => handleSizeChange('all', true),
-            color: '#00e676',
+            color: 'success',
             icon: 'Check',
             size: 2,
           },

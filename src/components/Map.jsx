@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useMap, ZoomControl, TileLayer } from 'react-leaflet'
-import { useMediaQuery } from '@material-ui/core'
-import { useTheme } from '@material-ui/styles'
+import { useMediaQuery, useTheme } from '@mui/material'
 import L from 'leaflet'
 
 import Utility from '@services/Utility'
@@ -117,6 +116,10 @@ export default function Map({
     }
     return () => lc.remove()
   }, [settings.navigationControls])
+
+  useEffect(() => {
+    useStatic.setState({ isMobile, isTablet })
+  }, [isMobile, isTablet])
 
   return (
     <>
@@ -243,7 +246,11 @@ export default function Map({
                     userSettings[userSettingsCategory(category)] || {}
                   }
                   filters={filters[category]}
-                  onlyAreas={filters?.scanAreas?.filter?.areas || []}
+                  onlyAreas={
+                    (filters?.scanAreas?.filterByAreas &&
+                      filters?.scanAreas?.filter?.areas) ||
+                    []
+                  }
                   tileStyle={tileLayer?.style || 'light'}
                   clusteringRules={
                     config?.clustering?.[category] || {

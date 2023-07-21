@@ -17,8 +17,9 @@ import {
   Button,
   ButtonGroup,
   Divider,
-} from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
+  Box,
+} from '@mui/material'
+import Edit from '@mui/icons-material/Edit'
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
@@ -46,8 +47,9 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
   const locale = localStorage.getItem('i18nextLng') || 'en'
 
   const [tab, setTab] = useState(0)
-
-  const handleTabChange = (event, newValue) => {
+  const [tabsHeight, setTabsHeight] = useState(0)
+  const [contentHeight, setContentHeight] = useState(0)
+  const handleTabChange = (_event, newValue) => {
     setTab(newValue)
   }
 
@@ -57,26 +59,28 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
         titles={['user_profile', `- ${auth.username}`]}
         action={() => setUserProfile(false)}
       />
-      <DialogContent style={{ padding: 0 }}>
-        <AppBar position="static">
-          <Tabs
-            value={tab}
-            onChange={handleTabChange}
-            indicatorColor="secondary"
-            variant="fullWidth"
-            style={{ backgroundColor: '#424242', width: '100%' }}
-          >
+      <DialogContent
+        style={{ padding: 0 }}
+        ref={(ref) => ref && setContentHeight(ref.clientHeight)}
+      >
+        <AppBar
+          position="static"
+          ref={(ref) => ref && setTabsHeight(ref.clientHeight)}
+        >
+          <Tabs value={tab} onChange={handleTabChange}>
             {['profile', 'badges', 'access'].map((each) => (
-              <Tab
-                key={each}
-                label={t(each)}
-                style={{ width: 40, minWidth: 40 }}
-              />
+              <Tab key={each} label={t(each)} />
             ))}
           </Tabs>
         </AppBar>
-        <TabPanel value={tab} index={0}>
-          <div style={{ minHeight: '70vh' }}>
+        <Box
+          overflow="auto"
+          sx={{
+            maxHeight: `${contentHeight - tabsHeight}px`,
+            minHeight: '70vh',
+          }}
+        >
+          <TabPanel value={tab} index={0}>
             <LinkProfiles auth={auth} t={t} />
             <ExtraFields auth={auth} />
             {auth.perms.backups && (
@@ -87,21 +91,19 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
                 t={t}
               />
             )}
-          </div>
-        </TabPanel>
-        <TabPanel value={tab} index={1}>
-          <div style={{ minHeight: '70vh' }}>
+          </TabPanel>
+          <TabPanel value={tab} index={1}>
             <GymBadges
               badges={auth.badges}
               isMobile={isMobile}
               isTablet={isTablet}
               t={t}
             />
-          </div>
-        </TabPanel>
-        <TabPanel value={tab} index={2}>
-          <ProfilePermissions auth={auth} excludeList={excludeList} t={t} />
-        </TabPanel>
+          </TabPanel>
+          <TabPanel value={tab} index={2}>
+            <ProfilePermissions auth={auth} excludeList={excludeList} t={t} />
+          </TabPanel>
+        </Box>
       </DialogContent>
       <Footer
         options={[
@@ -341,7 +343,6 @@ const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
           borderBottomLeftRadius: 0,
           borderBottomRightRadius: 0,
           textAlign: 'center',
-          backgroundColor: '#222222',
         }}
         alignItems="center"
         justifyContent="center"
@@ -393,30 +394,33 @@ const GymBadges = ({ isMobile, t }) => {
   }
 
   return data ? (
-    <Grid container alignItems="center" justifyContent="center">
-      <Grid item xs={12}>
-        <Typography
-          variant="h5"
-          align="center"
-          gutterBottom
-          style={{ margin: '20px 0' }}
-        >
+    <Grid
+      container
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      height="100cqh"
+    >
+      <Grid item>
+        <Typography variant="h5" align="center" gutterBottom>
           {t('gym_badges')}
         </Typography>
       </Grid>
-      {[bronze, silver, gold].map((count, i) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <Grid key={i} item xs={4}>
-          <Typography
-            variant="subtitle2"
-            align="center"
-            className={`badge_${i + 1}`}
-          >
-            {t(`badge_${i + 1}`)}: {count}
-          </Typography>
-        </Grid>
-      ))}
-      <Grid item xs={12} style={{ height: '55vh', marginTop: 10 }}>
+      <Grid item container direction="row">
+        {[bronze, silver, gold].map((count, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Grid key={i} item xs={4}>
+            <Typography
+              variant="subtitle2"
+              align="center"
+              className={`badge_${i + 1}`}
+            >
+              {t(`badge_${i + 1}`)}: {count}
+            </Typography>
+          </Grid>
+        ))}
+      </Grid>
+      <Grid item style={{ flexGrow: 1, marginTop: 10, width: '100%' }}>
         <ReactWindow
           columnCount={isMobile ? 2 : 3}
           length={data.badges.length}
@@ -453,7 +457,7 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
         style={{ position: 'absolute', top: 2, right: 2 }}
         onClick={() => setBadgeMenu(true)}
       >
-        <Edit style={{ color: 'white' }} />
+        <Edit />
       </IconButton>
       <Grid
         item
@@ -645,6 +649,7 @@ const Backups = ({ t, auth }) => {
               <Button
                 disabled={loading}
                 color="secondary"
+                sx={{ color: 'white' }}
                 onClick={() => {
                   load({ variables: { id: backup.id } })
                 }}
@@ -654,6 +659,7 @@ const Backups = ({ t, auth }) => {
               <Button
                 disabled={loading}
                 color="secondary"
+                sx={{ color: 'white' }}
                 onClick={() => {
                   update({
                     variables: {
@@ -671,6 +677,7 @@ const Backups = ({ t, auth }) => {
               <Button
                 disabled={loading}
                 color="primary"
+                sx={{ color: 'white' }}
                 onClick={() => {
                   remove({ variables: { id: backup.id } })
                 }}

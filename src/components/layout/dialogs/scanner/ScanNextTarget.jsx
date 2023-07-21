@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   Button,
   ButtonGroup,
@@ -6,7 +6,7 @@ import {
   ListItemText,
   ListItem,
   Divider,
-} from '@material-ui/core'
+} from '@mui/material'
 import { point } from '@turf/helpers'
 import destination from '@turf/destination'
 import { Circle, Marker, Popup } from 'react-leaflet'
@@ -65,34 +65,6 @@ export default function ScanNextTarget({
   const [position, setPosition] = useState(scanNextLocation)
 
   const { t } = useTranslation()
-  const scanMarkerRef = useRef(null)
-  const scanPopupRef = useRef(null)
-  const eventHandlers = useMemo(
-    () => ({
-      dragend() {
-        const marker = scanMarkerRef.current
-        if (marker) {
-          const { lat, lng } = marker.getLatLng()
-          map.panTo([lat, lng])
-          setPosition([lat, lng])
-          setScanNextLocation([lat, lng])
-          setScanNextCoords(calcScanNextCoords([lat, lng], scanNextType))
-          const popup = scanPopupRef.current
-          if (popup) {
-            popup.openOn(map)
-          }
-        }
-      },
-    }),
-    [position, scanNextLocation, scanNextType],
-  )
-
-  useEffect(() => {
-    const marker = scanMarkerRef.current
-    if (marker) {
-      marker.openPopup()
-    }
-  }, [])
 
   const isInAllowedArea = scanNextAreaRestriction.length
     ? Utility.checkAreaValidity(position, scanNextAreaRestriction, scanAreas)
@@ -102,12 +74,27 @@ export default function ScanNextTarget({
     <>
       <Marker
         draggable
-        eventHandlers={eventHandlers}
+        eventHandlers={{
+          dragend({ target, popup }) {
+            if (target) {
+              const { lat, lng } = target.getLatLng()
+              map.panTo([lat, lng])
+              setPosition([lat, lng])
+              setScanNextLocation([lat, lng])
+              setScanNextCoords(calcScanNextCoords([lat, lng], scanNextType))
+            }
+            if (popup) {
+              popup.openPopup()
+            }
+          },
+        }}
         position={position}
-        ref={scanMarkerRef}
+        ref={(ref) => {
+          if (ref && !ref.isPopupOpen()) ref.openPopup()
+        }}
         icon={fallbackIcon()}
       >
-        <Popup minWidth={90} maxWidth={200} ref={scanPopupRef} autoPan={false}>
+        <Popup minWidth={90} maxWidth={200} autoPan={false}>
           <List>
             <ListItemText
               className="no-leaflet-margin"

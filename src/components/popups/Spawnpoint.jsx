@@ -1,5 +1,5 @@
 import React from 'react'
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Typography, Switch } from '@material-ui/core'
+import { Switch, ListItem, ListItemText } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
@@ -18,43 +18,41 @@ export default function ItemToggle({ category, subItem }) {
   }
 
   return (
-    <Grid container item xs={12} alignItems="center">
-      <Grid item xs={8}>
-        <Typography>
-          {category === 'scanAreas'
+    <ListItem>
+      <ListItemText
+        primary={
+          category === 'scanAreas' && subItem === 'enabled'
             ? t('show_polygons')
-            : t(Utility.camelToSnake(subItem))}
-        </Typography>
-      </Grid>
-      <Grid item xs={4} style={{ textAlign: 'right' }}>
-        {category === 'wayfarer' || category === 'admin' ? (
-          <Switch
-            checked={filters[subItem].enabled}
-            onChange={() => {
-              setFilters({
-                ...filters,
-                [subItem]: {
-                  ...filters[subItem],
-                  enabled: !filters[subItem].enabled,
-                },
-              })
-            }}
-          />
-        ) : (
-          <Switch
-            checked={filters[category][subItem]}
-            onChange={() => {
-              setFilters({
-                ...filters,
-                [category]: {
-                  ...filters[category],
-                  [subItem]: !filters[category][subItem],
-                },
-              })
-            }}
-          />
-        )}
-      </Grid>
-    </Grid>
+            : t(Utility.camelToSnake(subItem))
+        }
+      />
+      {category === 'wayfarer' || category === 'admin' ? (
+        <Switch
+          checked={filters[subItem].enabled}
+          onChange={() => {
+            setFilters({
+              ...filters,
+              [subItem]: {
+                ...filters[subItem],
+                enabled: !filters[subItem].enabled,
+              },
+            })
+          }}
+        />
+      ) : (
+        <Switch
+          checked={filters[category][subItem]}
+          onChange={() => {
+            setFilters({
+              ...filters,
+              [category]: {
+                ...filters[category],
+                [subItem]: !filters[category][subItem],
+              },
+            })
+          }}
+        />
+      )}
+    </ListItem>
   )
 }
