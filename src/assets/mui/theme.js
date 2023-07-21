@@ -88,7 +88,7 @@ export default function customTheme(
               '.leaflet-bar a:active, .leaflet-bar a:focus, .leaflet-bar a:hover':
                 {
                   backgroundColor: darken(
-                    t.palette.grey[darkMode ? 900 : 50],
+                    t.palette.grey[darkMode ? 800 : 50],
                     darkMode ? 0.2 : 0.1,
                   ),
                 },
@@ -96,6 +96,18 @@ export default function customTheme(
                 {
                   lineHeight: '25px !important',
                 },
+              [t.breakpoints.down('sm')]: {
+                '.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out':
+                  {
+                    lineHeight: '30px !important',
+                  },
+              },
+              '.leaflet-bar a.leaflet-disabled': {
+                backgroundColor: darken(
+                  t.palette.grey[darkMode ? 900 : 50],
+                  0.3,
+                ),
+              },
 
               // Other
 
