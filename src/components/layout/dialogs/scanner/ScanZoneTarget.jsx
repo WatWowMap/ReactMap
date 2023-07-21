@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Button,
   ButtonGroup,
@@ -89,29 +89,6 @@ export default function ScanZoneTarget({
   const [radius, setRadius] = useState(scanZoneRadius.pokemon)
 
   const { t } = useTranslation()
-  const scanMarkerRef = useRef(null)
-  const scanPopupRef = useRef(null)
-  const eventHandlers = useMemo(
-    () => ({
-      dragend() {
-        const marker = scanMarkerRef.current
-        if (marker) {
-          const { lat, lng } = marker.getLatLng()
-          map.panTo([lat, lng])
-          setPosition([lat, lng])
-          setScanZoneLocation([lat, lng])
-          setScanZoneCoords(
-            calcScanZoneCoords([lat, lng], radius, spacing, scanZoneSize),
-          )
-          const popup = scanPopupRef.current
-          if (popup) {
-            popup.openOn(map)
-          }
-        }
-      },
-    }),
-    [position, scanZoneLocation, scanZoneSize, spacing, radius],
-  )
 
   const handleSizeChange = (_event, newSize) => {
     setScanZoneSize(newSize)
@@ -144,23 +121,33 @@ export default function ScanZoneTarget({
     }
   }, [scanZoneCoords.length])
 
-  useEffect(() => {
-    const marker = scanMarkerRef.current
-    if (marker) {
-      marker.openPopup()
-    }
-  }, [])
-
   return (
     <>
       <Marker
         draggable
-        eventHandlers={eventHandlers}
+        eventHandlers={{
+          dragend({ target, popup }) {
+            if (target) {
+              const { lat, lng } = target.getLatLng()
+              map.panTo([lat, lng])
+              setPosition([lat, lng])
+              setScanZoneLocation([lat, lng])
+              setScanZoneCoords(
+                calcScanZoneCoords([lat, lng], radius, spacing, scanZoneSize),
+              )
+              if (popup) {
+                popup.openOn(map)
+              }
+            }
+          },
+        }}
         position={position}
-        ref={scanMarkerRef}
+        ref={(ref) => {
+          if (ref && !ref.isPopupOpen()) ref.openPopup()
+        }}
         icon={fallbackIcon()}
       >
-        <Popup minWidth={90} maxWidth={200} ref={scanPopupRef} autoPan={false}>
+        <Popup minWidth={90} maxWidth={200} autoPan={false}>
           <List>
             <ListItemText
               className="no-leaflet-margin"
