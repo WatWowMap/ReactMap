@@ -66,7 +66,7 @@ export default function customTheme(
                 borderBottomColor: t.palette.background.paper,
               },
               '.leaflet-tooltip-top:before': {
-                borderBottomColor: t.palette.background.paper,
+                borderTopColor: t.palette.background.paper,
               },
               '.leaflet-popup-tip-container .leaflet-popup-tip': {
                 backgroundColor: t.palette.background.paper,
