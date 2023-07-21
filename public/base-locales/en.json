@@ -622,5 +622,7 @@
   "raid_opacity": "Dynamic Raid Opacity",
   "opacity_ten_minutes": "Opacity at 10 minutes",
   "opacity_five_minutes": "Opacity at 5 minutes",
-  "opacity_one_minute": "Opacity at 1 minute"
+  "opacity_one_minute": "Opacity at 1 minute",
+  "level_circles": "Level Indicators",
+  "min_level_circle": "Minimum Circle Level"
 }

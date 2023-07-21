@@ -35,6 +35,7 @@ export const fancyMarker = (
   weatherCheck,
   timeOfDay,
   userSettings,
+  levelCircle,
 ) => {
   const { pokemon: pokemonMod, weather: weatherMod } = Icons.modifiers
   const badge = getBadge(pkmn.bestPvp)
@@ -92,6 +93,17 @@ export const fancyMarker = (
           }}
         >
           {Math.round(pkmn.iv)}
+        </div>
+      )}
+      {levelCircle && !badge && (
+        <div
+          className="iv-badge"
+          style={{
+            bottom: (size / 1.5) * pokemonMod.offsetY,
+            left: `${pokemonMod.offsetX * size * 5}%`,
+          }}
+        >
+          L{Math.round(pkmn.level)}
         </div>
       )}
       {userSettings?.showSizeIndicator &&

@@ -738,6 +738,14 @@
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_MIN_IV_CIRCLE",
         "__format": "number"
       },
+      "levelCircles": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_LEVEL_CIRCLES",
+        "__format": "boolean"
+      },
+      "minLevelCircle": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_MIN_LEVEL_CIRCLE",
+        "__format": "number"
+      },
       "weatherIndicator": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_WEATHER_INDICATOR",
         "__format": "boolean"
