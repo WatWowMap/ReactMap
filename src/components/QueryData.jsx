@@ -87,7 +87,6 @@ export default function QueryData({
     map.on('moveend', refetchData)
     return () => {
       map.off('moveend', refetchData)
-      timeout.off()
     }
   }, [filters, userSettings, onlyAreas])
 
@@ -108,7 +107,13 @@ export default function QueryData({
   )
   timeout.setupTimeout(refetch)
 
-  useEffect(() => () => useStatic.setState({ excludeList: [] }))
+  useEffect(
+    () => () => {
+      useStatic.setState({ excludeList: [] })
+      timeout.off()
+    },
+    [],
+  )
 
   if (error) {
     if (error.networkError?.statusCode === 464) {
