@@ -147,11 +147,11 @@ const PokemonTile = ({
                 item,
                 glowStatus,
                 ivCircle,
-                levelCircle,
                 Icons,
                 weatherCheck,
                 timeOfDay,
                 userSettings,
+                levelCircle,
               )
             : basicMarker(url, size)
         }

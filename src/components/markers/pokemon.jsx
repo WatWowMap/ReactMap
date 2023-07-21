@@ -31,11 +31,11 @@ export const fancyMarker = (
   pkmn,
   glow,
   ivCircle,
-  levelCircle,
   Icons,
   weatherCheck,
   timeOfDay,
   userSettings,
+  levelCircle,
 ) => {
   const { pokemon: pokemonMod, weather: weatherMod } = Icons.modifiers
   const badge = getBadge(pkmn.bestPvp)
