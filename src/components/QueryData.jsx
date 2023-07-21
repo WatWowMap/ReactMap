@@ -87,6 +87,7 @@ export default function QueryData({
     map.on('moveend', refetchData)
     return () => {
       map.off('moveend', refetchData)
+      timeout.off()
     }
   }, [filters, userSettings, onlyAreas])
 
