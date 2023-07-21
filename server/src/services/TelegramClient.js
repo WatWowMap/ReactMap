@@ -1,5 +1,5 @@
 const fetch = require('node-fetch')
-const { TelegramStrategy } = require('passport-telegram-official')
+const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
 const passport = require('passport')
 
 const Utility = require('./Utility')
@@ -95,6 +95,14 @@ module.exports = class TelegramClient {
     const groups = await this.getUserGroups(baseUser)
     const user = this.getUserPerms(baseUser, groups)
 
+    if (!user.perms.map) {
+      log.warn(
+        HELPERS.custom(this.rmStrategy, '#26A8EA'),
+        user.username,
+        'was not given map perms',
+      )
+      return done(null, false, { message: 'access_denied' })
+    }
     try {
       await Db.models.User.query()
         .findOne({ telegramId: user.id })
