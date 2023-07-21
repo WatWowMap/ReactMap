@@ -32,6 +32,7 @@ export default function Tutorial({
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const [activeStep, setActiveStep] = useState(0)
   const [prevStep, setPrevStep] = useState(0)
+
   const [setTutorialInDb] = useMutation(Query.user('setTutorial'))
 
   const handleNext = () => {
@@ -51,8 +52,10 @@ export default function Tutorial({
 
   return (
     <>
-      <Header titles={['tutorial', steps[activeStep] || 'closing']} />
-      {/* {getStepContent(activeStep)} */}
+      <Header
+        titles={['tutorial', steps[activeStep] || 'closing']}
+        action={handleTutClose}
+      />
       {[0, 1, 2, 3, 4, 5].map((step) => (
         <Slide
           key={step}
@@ -60,9 +63,16 @@ export default function Tutorial({
           direction={step > prevStep ? 'left' : 'right'}
           mountOnEnter
           unmountOnExit
-          style={{ flexGrow: 1 }}
         >
-          <Box display={activeStep === step ? 'block' : 'none'}>
+          <Box
+            display={activeStep === step ? 'block' : 'none'}
+            sx={{
+              flexGrow: 1,
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              height: { xs: '100%', sm: '90vh' },
+            }}
+          >
             {
               {
                 0: <Welcome setUserProfile={setUserProfile} />,
@@ -76,16 +86,6 @@ export default function Tutorial({
           </Box>
         </Slide>
       ))}
-      {/* <Slide in={activeStep === 1} direction="left" mountOnEnter unmountOnExit>
-        <Box>
-          <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />
-        </Box>
-      </Slide>
-      <Slide in={activeStep === 2} direction="left" mountOnEnter unmountOnExit>
-        <Box>
-          <Sliders isMobile={isMobile} />
-        </Box>
-      </Slide> */}
       <DialogActions>
         <MobileStepper
           variant="text"

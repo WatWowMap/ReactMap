@@ -128,8 +128,9 @@ export default function useConfig(serverSettings, params) {
 
     useStore.setState({
       tutorial:
+        !localState?.state?.tutorial ||
         serverSettings.user.tutorial === undefined
-          ? Boolean(localState?.state?.tutorial)
+          ? !!localState?.state?.tutorial
           : !serverSettings.user.tutorial,
       menus: updateObjState(serverSettings.menus, 'menus'),
       filters: updateObjState(serverSettings.defaultFilters, 'filters'),
