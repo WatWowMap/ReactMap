@@ -28,6 +28,67 @@ export default function customTheme(
           },
         },
         components: {
+          MuiCssBaseline: {
+            styleOverrides: (t) => ({
+              body: {
+                backgroundColor: t.palette.background.paper,
+              },
+              '*': {
+                scrollbarWidth: 'thin',
+              },
+              '*::-webkit-scrollbar': {
+                width: '5px',
+              },
+              '*::-webkit-scrollbar-track': {
+                backgroundColor: t.palette.grey[darkMode ? 900 : 50],
+              },
+              '*::-webkit-scrollbar-thumb': {
+                backgroundColor: t.palette.action.selected,
+                borderRadius: '3px',
+              },
+              '*::-webkit-scrollbar-thumb:hover': {
+                backgroundColor: t.palette.action.selected,
+              },
+              '*::-webkit-scrollbar-thumb:active': {
+                backgroundColor: t.palette.action.selected,
+              },
+              '.leaflet-tooltip': {
+                backgroundColor: t.palette.background.paper,
+                border: `${t.palette.divider} solid 1px`,
+                color: t.palette.text.primary,
+              },
+              '.leaflet-tooltip-bottom:before': {
+                borderBottomColor: t.palette.background.paper,
+              },
+              '.leaflet-tooltip-top:before': {
+                borderBottomColor: t.palette.background.paper,
+              },
+              '.leaflet-popup-tip-container .leaflet-popup-tip': {
+                backgroundColor: t.palette.background.paper,
+              },
+              '.leaflet-popup-content-wrapper': {
+                backgroundColor: t.palette.background.paper,
+                border: `${t.palette.divider} solid 4px`,
+                color: t.palette.text.primary,
+              },
+              '.ar-task': {
+                border: `2px solid ${t.palette.divider}`,
+                borderRadius: '12px',
+                padding: '3px',
+                fontSize: '0.5rem !important',
+                backgroundColor: t.palette.grey[darkMode ? 900 : 50],
+                color: t.palette.text.primary,
+              },
+              '.iv-badge': {
+                backgroundColor: t.palette.grey[darkMode ? 900 : 50],
+                color: t.palette.text.primary,
+                border: `2px solid ${t.palette.divider}`,
+              },
+              '.disabled-overlay': {
+                backgroundColor: t.palette.grey[darkMode ? 900 : 50],
+              },
+            }),
+          },
           MuiPaper: {
             styleOverrides: {
               root: {
@@ -43,8 +104,7 @@ export default function customTheme(
             },
             styleOverrides: {
               root: ({ theme: t }) => ({
-                backgroundColor:
-                  t.palette.grey[t.palette.mode === 'dark' ? 800 : 500],
+                backgroundColor: t.palette.grey[darkMode ? 800 : 500],
                 width: '100%',
               }),
             },
@@ -52,6 +112,13 @@ export default function customTheme(
           MuiAccordion: {
             defaultProps: {
               disableGutters: true,
+            },
+            styleOverrides: {
+              root: {
+                '&.Mui-expanded:before': {
+                  opacity: 1,
+                },
+              },
             },
           },
           MuiSelect: {

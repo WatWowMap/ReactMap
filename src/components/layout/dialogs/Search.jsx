@@ -429,12 +429,7 @@ export default function Search({ safeSearch, toggleDialog, Icons }) {
               </Typography>
               <br />
               {searchTab === 'quests' && (
-                <Typography
-                  variant="caption"
-                  className="ar-task"
-                  noWrap
-                  color="white"
-                >
+                <Typography variant="caption" className="ar-task" noWrap>
                   {map.questMessage || t(`ar_quest_${Boolean(option.with_ar)}`)}
                 </Typography>
               )}

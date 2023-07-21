@@ -29,8 +29,14 @@ body {
   background-color: white;
 }
 
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: rgb(12, 12, 12);
+  }
+}
+
 .dark {
-  background-color: rgb(18, 18, 18);
+  background-color: rgb(12, 12, 12);
 }
 
 .grid-item {
@@ -38,12 +44,6 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
-}
-
-.filter-footer {
-  background-color: #424242;
-  text-align: center;
-  height: 50px;
 }
 
 .leaflet-tooltip {
@@ -54,37 +54,6 @@ body {
   padding: 0px 2px !important;
   border-radius: 0.5rem !important;
 }
-
-.dark .leaflet-tooltip {
-  background-color: rgb(33, 37, 31);
-  border: rgb(26, 26, 26) solid 1px;
-  color: white;
-}
-
-.dark .leaflet-tooltip-bottom:before {
-  border-bottom-color: rgb(26, 26, 26);
-}
-
-.dark .leaflet-tooltip-top:before {
-  border-top-color: rgb(26, 26, 26);
-}
-
-.dark .leaflet-popup-tip-container .leaflet-popup-tip {
-  background-color: rgb(33, 37, 31);
-}
-
-.dark .leaflet-popup-content-wrapper {
-  background-color: rgb(33, 37, 31);
-  color: white;
-  border: rgb(26, 26, 26) solid 4px;
-}
-/* 
-TODO: Come back to this
-.dark .leaflet-bar a {
-  background-color: rgb(33, 37, 31);
-  color: white;
-  border: rgb(26, 26, 26) solid 1px;
-} */
 
 .table-pvp {
   margin-left: auto;
@@ -311,11 +280,8 @@ img {
   text-align: center;
   align-items: center;
   justify-content: center;
-  background-color: rgb(110, 110, 110);
-  border: 2px solid white;
   border-radius: 12px;
-  color: white;
-  font: bold 15px/13px Helvetica, Verdana, Tahoma;
+  font: bold 15px/13px Roboto, sans-serif;
   height: 16px;
   min-width: 14px;
   padding: 4px 3px 0 3px;
@@ -338,15 +304,6 @@ img {
 .quest-popup-img {
   max-width: 30px;
   max-height: 30px;
-}
-
-.ar-task {
-  background-color: rgb(63, 63, 63);
-  border: 1px solid white;
-  border-radius: 12px;
-  padding: 3px;
-  font-size: 0.5rem !important;
-  color: white;
 }
 
 .amount-popup {
@@ -427,7 +384,6 @@ img {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(128, 128, 128, 0.5);
 }
 
 .perm-wrapper img {
