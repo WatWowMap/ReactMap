@@ -65,6 +65,7 @@ export default function AreaTile({
         variant="text"
         color="inherit"
         size="small"
+        wrap="nowrap"
         onClick={() => {
           if (feature?.properties?.center) {
             map.flyTo(
