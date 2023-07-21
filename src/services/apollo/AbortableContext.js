@@ -1,3 +1,4 @@
+// @ts-check
 import { Observable } from '@apollo/client/utilities/observables/Observable'
 
 /**
@@ -37,11 +38,17 @@ export default class AbortableContext {
     subscription.unsubscribe()
   }
 
+  /**
+   * @param {import("@apollo/client").Operation} operation
+   * @param {import("@apollo/client").NextLink} [forward]
+   * @returns {import("@apollo/client").Observable<import("@apollo/client").FetchResult> | null}
+   */
   handle(operation, forward) {
     // add abort controller and signal object to fetchOptions if they don't already exist
     const context = operation.getContext()
     let fetchOptions = context.fetchOptions || {}
 
+    /** @type {AbortController} */
     const controller = fetchOptions.controller || new AbortController()
 
     fetchOptions = { ...fetchOptions, controller, signal: controller.signal }
@@ -57,6 +64,14 @@ export default class AbortableContext {
     // create local observable with timeout functionality (unsubscibe from chain observable and
     // return an error if the timeout expires before chain observable resolves)
     return new Observable((observer) => {
+      /**
+       * @type {{
+       *  controller: AbortController,
+       *  operation: import("@apollo/client").Operation,
+       *  observer: import("@apollo/client/utilities/observables/Observable").Observer<import("@apollo/client").FetchResult>,
+       *  subscription?: import("zen-observable-ts").Subscription
+       * }}
+       */
       const op = {
         controller,
         operation,
