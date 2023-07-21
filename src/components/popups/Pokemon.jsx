@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { Fragment, useCallback, useState, useEffect } from 'react'
+import React, { Fragment, useState, useEffect } from 'react'
 import Check from '@mui/icons-material/Check'
 import Clear from '@mui/icons-material/Clear'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -34,6 +34,21 @@ const leagueLookup = {
   great: '1500',
   ultra: '2500',
   master: '9000',
+}
+
+const getColor = (ivPercent) => {
+  switch (true) {
+    case ivPercent < 50:
+      return 'error.main'
+    case ivPercent < 80:
+      return 'warning.main'
+    case ivPercent < 100:
+      return 'info.main'
+    case ivPercent === 100:
+      return 'success.main'
+    default:
+      return 'text.primary'
+  }
 }
 
 export default function PokemonPopup({
@@ -281,23 +296,6 @@ const Header = ({
 const Stats = ({ pokemon, t }) => {
   const { cp, iv, atk_iv, def_iv, sta_iv, level, inactive_stats } = pokemon
 
-  const getColor = useCallback(
-    (ivPercent) => {
-      const ivColors = {
-        0: 'error.main',
-        66: 'orange',
-        82: 'yellow',
-        100: 'success.main',
-      }
-      let color
-      Object.keys(ivColors).forEach((range) =>
-        ivPercent >= parseInt(range) ? (color = ivColors[range]) : '',
-      )
-      return color
-    },
-    [iv],
-  )
-
   return (
     <Grid
       item
@@ -309,7 +307,7 @@ const Stats = ({ pokemon, t }) => {
     >
       {iv !== null && (
         <Grid item>
-          <Typography variant="h5" align="center" sx={{ color: getColor(iv) }}>
+          <Typography variant="h5" align="center" color={getColor(iv)}>
             {iv.toFixed(2)}
             {t('%')}
           </Typography>
