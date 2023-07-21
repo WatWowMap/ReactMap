@@ -1,6 +1,6 @@
 // @ts-check
 import { responsiveFontSizes } from '@mui/material'
-import { createTheme } from '@mui/material/styles'
+import { createTheme, darken } from '@mui/material/styles'
 import * as locales from '@mui/material/locale'
 
 /**
@@ -30,6 +30,8 @@ export default function customTheme(
         components: {
           MuiCssBaseline: {
             styleOverrides: (t) => ({
+              // Global
+
               body: {
                 backgroundColor: t.palette.background.paper,
               },
@@ -52,6 +54,9 @@ export default function customTheme(
               '*::-webkit-scrollbar-thumb:active': {
                 backgroundColor: t.palette.action.selected,
               },
+
+              // Leaflet
+
               '.leaflet-tooltip': {
                 backgroundColor: t.palette.background.paper,
                 border: `${t.palette.divider} solid 1px`,
@@ -71,6 +76,29 @@ export default function customTheme(
                 border: `${t.palette.divider} solid 4px`,
                 color: t.palette.text.primary,
               },
+              '.leaflet-bar a': {
+                backgroundColor: t.palette.grey[darkMode ? 900 : 50],
+                borderBottom: `1px solid ${t.palette.divider}`,
+                color: t.palette.text.primary,
+                transition: t.transitions.create(['background-color'], {
+                  duration: t.transitions.duration.standard,
+                  easing: t.transitions.easing.easeInOut,
+                }),
+              },
+              '.leaflet-bar a:active, .leaflet-bar a:focus, .leaflet-bar a:hover':
+                {
+                  backgroundColor: darken(
+                    t.palette.grey[darkMode ? 900 : 50],
+                    darkMode ? 0.2 : 0.1,
+                  ),
+                },
+              '.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out':
+                {
+                  lineHeight: '25px !important',
+                },
+
+              // Other
+
               '.ar-task': {
                 border: `2px solid ${t.palette.divider}`,
                 borderRadius: '12px',
