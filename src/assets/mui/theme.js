@@ -1,6 +1,6 @@
 // @ts-check
 import { responsiveFontSizes } from '@mui/material'
-import { createTheme, darken } from '@mui/material/styles'
+import { createTheme, darken, lighten } from '@mui/material/styles'
 import * as locales from '@mui/material/locale'
 
 /**
@@ -103,9 +103,9 @@ export default function customTheme(
                   },
               },
               '.leaflet-bar a.leaflet-disabled': {
-                backgroundColor: darken(
+                backgroundColor: lighten(
                   t.palette.grey[darkMode ? 900 : 50],
-                  0.3,
+                  0.2,
                 ),
               },
 
