@@ -127,7 +127,7 @@ export const fancyMarker = (
             width: size / 2,
             height: size / 2,
             top: -size * pokemonMod.offsetY,
-            left: `${pokemonMod.offsetX * size * 5}%`,
+            right: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
