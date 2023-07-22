@@ -256,7 +256,7 @@ export default function FloatingButtons({
             target={icon.target || '_blank'}
             disabled={disabled}
           >
-            <FAIcon className={icon.icon} fontSize={iconSize} />
+            <FAIcon className={icon.icon} size={iconSize} />
           </Fab>
         </Grid>
       ))}
