@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 const { Model } = require('objection')
 const i18next = require('i18next')
+
 const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { log, HELPERS } = require('../services/logger')
@@ -18,6 +19,10 @@ module.exports = class Nest extends Model {
 
   static get idColumn() {
     return 'nest_id'
+  }
+
+  $beforeUpdate() {
+    this.updated = Math.floor(Date.now() / 1000)
   }
 
   static async getAll(perms, args, { polygon }) {
@@ -133,10 +138,14 @@ module.exports = class Nest extends Model {
     { name, id, nest_submitted_by = 'Unknown User' },
     { hasSubmissionColumn },
   ) {
-    if (name && id && hasSubmissionColumn) {
+    if (name && id) {
       const nest = await this.query().findById(id)
       if (nest) {
-        await nest.$query().patch({ name, nest_submitted_by })
+        if (hasSubmissionColumn) {
+          await nest.$query().patch({ name, nest_submitted_by })
+        } else {
+          await nest.$query().patch({ name })
+        }
         log.info(
           HELPERS.nests,
           `Nest name updated for ${id} from ${nest.name} to ${name} by ${nest_submitted_by}`,

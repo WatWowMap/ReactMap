@@ -120,7 +120,7 @@ export default function QueryData({
       setError('old_client')
       return null
     }
-    if (error.networkError?.statusCode === 401) {
+    if (error.networkError?.statusCode === 511) {
       setError('session_expired')
       return null
     }

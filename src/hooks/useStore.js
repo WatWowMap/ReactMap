@@ -163,5 +163,5 @@ export const useStatic = create((set) => ({
 }))
 
 export const useDialogStore = create((/* set, get */) => ({
-  nestSubmissions: false,
+  nestSubmissions: '0',
 }))
