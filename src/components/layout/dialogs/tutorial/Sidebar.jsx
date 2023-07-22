@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Menu from '@mui/icons-material/Menu'
 import Settings from '@mui/icons-material/Settings'
 import TuneIcon from '@mui/icons-material/Tune'
@@ -23,7 +23,6 @@ import data from './data'
 
 export default function TutSidebar({ toggleDialog, isMobile }) {
   const { t } = useTranslation()
-  const [tempFilters, setTempFilters] = useState(data.filters)
   const { perms } = useStatic((state) => state.auth)
 
   const permCheck =
@@ -58,8 +57,8 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <List>
-            {Object.keys(tempFilters.pokestops).map((subItem) => {
+          <List disablePadding>
+            {Object.keys(data.filters).map((subItem) => {
               if (subItem === 'filter') {
                 return null
               }
@@ -67,8 +66,6 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
                 <ItemToggle
                   key={subItem}
                   category="pokestops"
-                  filters={tempFilters}
-                  setFilters={setTempFilters}
                   subItem={subItem}
                 />
               )

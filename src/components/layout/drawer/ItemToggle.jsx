@@ -5,7 +5,15 @@ import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 import { useStore } from '@hooks/useStore'
 
-export default function ItemToggle({ category, subItem }) {
+/**
+ * Generic list item toggle with a switch and managed filter state
+ * @param {{
+ *  category: string,
+ *  subItem: string,
+ * } & import("@mui/material").ListItemProps} props
+ * @returns {JSX.Element}
+ */
+export default function ItemToggle({ category, subItem, ...props }) {
   const { t } = useTranslation()
   const filters = useStore((s) => s.filters)
   const { setFilters } = useStore.getState()
@@ -18,7 +26,7 @@ export default function ItemToggle({ category, subItem }) {
   }
 
   return (
-    <ListItem>
+    <ListItem {...props}>
       <ListItemText
         primary={
           category === 'scanAreas' && subItem === 'enabled'
