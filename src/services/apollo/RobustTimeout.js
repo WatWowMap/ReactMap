@@ -37,7 +37,6 @@ export default class RobustTimeout extends AbortableContext {
    * @returns {void}
    */
   setupTimeout(refetch) {
-    if (this.refetch === refetch) return
     this.refetch = refetch
     if (this._ms) {
       clearTimeout(this.timeout)
@@ -46,7 +45,6 @@ export default class RobustTimeout extends AbortableContext {
   }
 
   off() {
-    this._ms = null
     clearTimeout(this.timeout)
   }
 }
