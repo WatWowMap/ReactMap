@@ -35,14 +35,14 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
 
   const hideList = useStatic((state) => state.hideList)
   const excludeList = useStatic((state) => state.excludeList)
-  const { perms } = useStatic((s) => s.auth)
+  const { perms, loggedIn } = useStatic((s) => s.auth)
 
   const filters = useStore((state) => state.filters)
 
   const [parkName, setParkName] = useState(true)
   const [anchorEl, setAnchorEl] = useState(false)
 
-  const { id = 0, name = '', updated = 0, pokemon_avg = 0 } = nest
+  const { id = '0', name = '', updated = 0, pokemon_avg = 0 } = nest
 
   const lastUpdated = Utility.getTimeUntil(new Date(updated * 1000))
 
@@ -178,8 +178,8 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
           <Button
             color="secondary"
             variant="contained"
-            disabled={!perms.nestSubmissions}
-            onClick={() => useDialogStore.setState({ nestSubmissions: true })}
+            disabled={!perms.nestSubmissions || !loggedIn}
+            onClick={() => useDialogStore.setState({ nestSubmissions: id })}
           >
             {t('submit_nest_name')}
           </Button>

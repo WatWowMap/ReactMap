@@ -624,5 +624,6 @@
   "opacity_five_minutes": "Opacity at 5 minutes",
   "opacity_one_minute": "Opacity at 1 minute",
   "level_circles": "Level Indicators",
-  "min_level_circle": "Minimum Circle Level"
+  "min_level_circle": "Minimum Circle Level",
+  "mutation_auth_error": "Your request was unsuccessful due to not being logged in"
 }

@@ -10,7 +10,7 @@
     "start": "node .",
     "build": "yarn create-locales && vite build",
     "server": "yarn create-area && yarn generate && yarn migrate:latest && node server/src/index.js",
-    "watch": "vite",
+    "watch": "yarn create-locales && vite",
     "dev": "nodemon server/src/index.js --watch server",
     "generate": "node server/scripts/generateMasterfile.js",
     "gen-env-config": "node server/scripts/genEnvConfig.js",
