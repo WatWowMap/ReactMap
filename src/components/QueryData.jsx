@@ -101,18 +101,19 @@ export default function QueryData({
         filters: trimFilters(filters),
       },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
-      // pollInterval: (config.polling[category] || 10) * 1000,
       skip: !active,
     },
   )
 
   useEffect(() => {
-    timeout.current.setupTimeout(refetch)
-    return () => {
-      useStatic.setState({ excludeList: [] })
-      timeout.current.off()
+    if (active) {
+      timeout.current.setupTimeout(refetch)
+      return () => {
+        useStatic.setState({ excludeList: [] })
+        timeout.current.off()
+      }
     }
-  }, [])
+  }, [active])
 
   if (error) {
     if (error.networkError?.statusCode === 464) {
