@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { useQuery } from '@apollo/client'
 import RobustTimeout from '@services/apollo/RobustTimeout'
 
@@ -36,8 +36,8 @@ export default function QueryData({
   active,
   onlyAreas,
 }) {
-  const [timeout] = useState(
-    () => new RobustTimeout((config.polling[category] || 10) * 1000),
+  const timeout = useRef(
+    new RobustTimeout((config.polling[category] || 10) * 1000),
   )
 
   const trimFilters = useCallback(
@@ -77,7 +77,7 @@ export default function QueryData({
     const refetchData = () => {
       onMove()
       if (category !== 'scanAreas') {
-        timeout.doRefetch({
+        timeout.current.doRefetch({
           ...Utility.getQueryArgs(map),
           filters: trimFilters(filters),
         })
@@ -94,7 +94,7 @@ export default function QueryData({
     Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),
     {
       context: {
-        abortableContext: timeout,
+        abortableContext: timeout.current,
       },
       variables: {
         ...bounds,
@@ -105,9 +105,14 @@ export default function QueryData({
       skip: !active,
     },
   )
-  timeout.setupTimeout(refetch)
 
-  useEffect(() => () => useStatic.setState({ excludeList: [] }))
+  useEffect(() => {
+    timeout.current.setupTimeout(refetch)
+    return () => {
+      useStatic.setState({ excludeList: [] })
+      timeout.current.off()
+    }
+  }, [])
 
   if (error) {
     if (error.networkError?.statusCode === 464) {
