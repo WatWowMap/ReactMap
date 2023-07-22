@@ -40,12 +40,15 @@ export default function NestSubmission({ id, name }) {
   }, [id, name])
 
   React.useEffect(() => {
-    if (error?.networkError?.statusCode === 401) {
+    if (error) {
       useStatic.setState({
         webhookAlert: {
           open: true,
           severity: 'error',
-          message: t('mutation_auth_error'),
+          message:
+            error.networkError?.statusCode === 401
+              ? t('mutation_auth_error')
+              : error.message,
         },
       })
     }

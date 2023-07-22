@@ -1,6 +1,8 @@
 /* eslint-disable no-nested-ternary */
 const { Model } = require('objection')
 const i18next = require('i18next')
+const { GraphQLError } = require('graphql')
+
 const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { log, HELPERS } = require('../services/logger')
@@ -143,6 +145,11 @@ module.exports = class Nest extends Model {
         )
         return true
       }
+    }
+    if (!hasSubmissionColumn) {
+      throw new GraphQLError(
+        'Nest submissions are not available for your nest table since it does not have a `nest_submitted_by` column.',
+      )
     }
     return false
   }

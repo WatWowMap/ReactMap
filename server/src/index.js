@@ -106,7 +106,6 @@ const apolloServer = new ApolloServer({
                 '|',
                 context.operationName,
                 '|',
-                context.operation === 'Returning:',
                 returned || 0,
                 '|',
                 `${Date.now() - contextValue.startTime}ms`,
