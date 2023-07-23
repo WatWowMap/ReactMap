@@ -60,7 +60,6 @@
         "password": "reactmap_paw",
         "database": "reactmap_db",
         "useFor": [
-          "session",
           "user"
         ]
       },

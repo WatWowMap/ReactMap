@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const { Event } = require('../services/initialization')
+const { Event, Db } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },
@@ -10,7 +10,6 @@ const {
     gyms: { baseTeamIds, baseGymSlotAmounts },
   },
 } = require('../services/config')
-const Badge = require('./Badge')
 
 const coreFields = [
   'id',
@@ -134,12 +133,14 @@ module.exports = class Gym extends Model {
 
     const userBadges =
       onlyGymBadges && gymBadges && userId
-        ? await Badge.query()
-            .where('userId', userId)
-            .andWhere(
-              'badge',
-              ...(typeof actualBadge === 'string' ? ['>', 0] : [actualBadge]),
-            )
+        ? await Db.query(
+            'Badge',
+            'getAll',
+            userId,
+            ...(typeof actualBadge === 'string'
+              ? ['>', 0]
+              : ['=', actualBadge]),
+          )
         : []
 
     Object.keys(args.filters).forEach((gym) => {
@@ -519,7 +520,7 @@ module.exports = class Gym extends Model {
     return query
   }
 
-  static async getBadges(userGyms, _, { isMad }) {
+  static async getBadges(userGyms, { isMad }) {
     const query = this.query().select([
       '*',
       isMad ? 'gym.gym_id AS id' : 'gym.id',
