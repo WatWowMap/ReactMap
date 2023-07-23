@@ -42,7 +42,13 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
   const [parkName, setParkName] = useState(true)
   const [anchorEl, setAnchorEl] = useState(false)
 
-  const { id = '0', name = '', updated = 0, pokemon_avg = 0 } = nest
+  const {
+    id = '0',
+    name = '',
+    updated = 0,
+    pokemon_avg = 0,
+    submitted_by = '',
+  } = nest
 
   const lastUpdated = Utility.getTimeUntil(new Date(updated * 1000))
 
@@ -95,7 +101,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
         style={{ width: 200 }}
         spacing={1}
       >
-        <Grid item xs={9}>
+        <Grid item xs={9} style={{ textAlign: 'center' }}>
           <Typography
             variant={name.length > 20 ? 'subtitle2' : 'h6'}
             align="center"
@@ -104,6 +110,16 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
           >
             {name}
           </Typography>
+          {submitted_by && (
+            <Typography
+              variant="caption"
+              fontSize={10}
+              noWrap={parkName}
+              onClick={() => setParkName(!parkName)}
+            >
+              {t('submitted_by')}: {submitted_by}
+            </Typography>
+          )}
         </Grid>
         <Grid item xs={3}>
           <IconButton aria-haspopup="true" onClick={handleClick} size="large">

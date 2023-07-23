@@ -7,7 +7,8 @@ const {
 } = require('../services/config')
 const { log, HELPERS } = require('../services/logger')
 
-module.exports = class User extends Model {
+class User extends Model {
+  /** @returns {string} */
   static get tableName() {
     return userTableName
   }
@@ -26,16 +27,26 @@ module.exports = class User extends Model {
 
   static get relationMappings() {
     // eslint-disable-next-line global-require
-    const Badge = require('./Badge')
+    const { Db } = require('../services/initialization')
     return {
       badges: {
         relation: Model.HasManyRelation,
-        modelClass: Badge,
+        modelClass: Db.models.Badge,
         join: {
           from: `${userTableName}.id`,
           to: `${gymBadgeTableName}.userId`,
         },
       },
+      nestSubmissions: {
+        relation: Model.HasManyRelation,
+        modelClass: Db.models.NestSubmission,
+        join: {
+          from: `${userTableName}.id`,
+          to: `nest_submissions.userId`,
+        },
+      },
     }
   }
 }
+
+module.exports = User

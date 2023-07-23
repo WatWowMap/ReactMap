@@ -1,4 +1,22 @@
 import { LEAGUES } from './services/filters/pokemon/constants'
+import type {
+  ScannerModels,
+  ScannerModelKeys,
+  RmModels,
+  RmModelKeys,
+  ModelKeys,
+} from './models'
+import { Knex } from 'knex'
+import { Model } from 'objection'
+import { Request, Response } from 'express'
+import { Transaction } from '@sentry/node'
+import DbCheck = require('./services/DbCheck')
+import EventManager = require('./services/EventManager')
+import Pokemon = require('./models/Pokemon')
+import Badge = require('./models/Badge')
+import Backup = require('./models/Backup')
+import Nest = require('./models/Nest')
+import NestSubmission = require('./models/NestSubmission')
 
 export interface DbContext {
   isMad: boolean
@@ -104,4 +122,119 @@ export interface PvpEntry {
   evolution: number
 }
 
-export type CleanPvp = { [league in typeof LEAGUES[number]]?: PvpEntry }
+export interface ApiEndpoint {
+  type: string
+  endpoint: string
+  secret: string
+  useFor: Lowercase<ModelKeys>[]
+}
+
+export interface DbConnection {
+  host: string
+  port: number
+  username: string
+  password: string
+  database: string
+  useFor: Lowercase<ModelKeys>[]
+}
+
+export type Schema = ApiEndpoint | DbConnection
+
+export type CleanPvp = { [league in (typeof LEAGUES)[number]]?: PvpEntry }
+
+export interface DbCheckClass {
+  models: {
+    [key in ScannerModelKeys]?: (DbContext & {
+      connection: number
+      SubModel: ScannerModels[key]
+    })[]
+  } & Partial<RmModels>
+  validModels: ScannerModelKeys[]
+  singleModels: readonly RmModelKeys[]
+  searchLimit: number
+  endpoints: { [key: number]: ApiEndpoint }
+  connections: (Knex | null)[]
+  rarity: Rarity
+  historical: Rarity
+  questionConditions: { [key: string]: string[] }
+  rarityPercents: RarityPercents
+  distanceUnit: 'km' | 'mi'
+  reactMapDb: null | number
+}
+
+export interface RarityPercents {
+  common: number
+  uncommon: number
+  rare: number
+  ultraRare: number
+  regional: number
+  never: number
+  event: number
+}
+
+export type Rarity = { [key: string]: keyof RarityPercents }
+
+export interface BaseRecord {
+  id: number | string
+  lat: number
+  lon: number
+  updated: number
+  distance?: number
+}
+
+export interface GqlContext {
+  req: Request
+  res: Response
+  Db: DbCheck
+  Event: EventManager
+  perms: Permissions
+  user: string
+  transaction: Transaction
+  operation: 'query' | 'mutation'
+}
+
+export interface Permissions {
+  map: boolean
+  pokemon: boolean
+  iv: boolean
+  pvp: boolean
+  gyms: boolean
+  raids: boolean
+  pokestops: boolean
+  eventStops: boolean
+  quests: boolean
+  lures: boolean
+  portals: boolean
+  submissionCells: boolean
+  invasions: boolean
+  nests: boolean
+  nestSubmissions: boolean
+  scanAreas: boolean
+  weather: boolean
+  spawnpoints: boolean
+  s2cells: boolean
+  scanCells: boolean
+  devices: boolean
+  donor: boolean
+  gymBadges: boolean
+  backups: boolean
+  scanner: string[]
+  areaRestrictions: string[]
+  webhooks: string[]
+}
+
+export type PickMatching<T, V> = {
+  [K in keyof T as T[K] extends V ? K : never]: T[K]
+}
+
+export type ExtractMethods<T> = PickMatching<T, Function>
+
+type Test = ExtractMethods<typeof Badge>
+
+type Test2 = ReturnType<Test['getAll']>
+
+type Test3 = Parameters<Test['getAll']>
+
+export type Head<T extends any[]> = T extends [...infer Head, any]
+  ? Head
+  : any[]

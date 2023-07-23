@@ -31,6 +31,7 @@ export const getAllNests = gql`
       updated
       pokemon_avg
       polygon_path
+      submitted_by
     }
   }
 `

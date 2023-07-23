@@ -2,9 +2,8 @@
 const { Model } = require('objection')
 const i18next = require('i18next')
 
-const { Event } = require('../services/initialization')
+const { Event, Db } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { log, HELPERS } = require('../services/logger')
 const {
   api: { searchResultsLimit, queryLimits },
   defaultFilters: {
@@ -21,10 +20,13 @@ module.exports = class Nest extends Model {
     return 'nest_id'
   }
 
-  $beforeUpdate() {
-    this.updated = Math.floor(Date.now() / 1000)
-  }
-
+  /**
+   *
+   * @param {import('../types').Permissions} perms
+   * @param {object} args
+   * @param {import('../types').DbContext} ctx
+   * @returns
+   */
   static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
     const { minLat, minLon, maxLat, maxLon, filters } = args
@@ -51,34 +53,59 @@ module.exports = class Nest extends Model {
     }
     const results = await query.limit(queryLimits.nests)
 
-    const fixedForms = (queryResults) => {
-      const returnedResults = []
-      queryResults.forEach((pkmn) => {
-        if (pkmn.pokemon_form == 0 || pkmn.pokemon_form === null) {
-          const formId = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
-          if (formId) pkmn.pokemon_form = formId
-        }
-        pkmn.polygon_path = polygon
-          ? typeof pkmn.polygon === 'string' && pkmn.polygon
-            ? pkmn.polygon
-            : JSON.stringify(
-                pkmn.polygon || { type: 'Polygon', coordinates: [] },
-              )
-          : JSON.stringify({
-              type: 'Polygon',
-              coordinates: JSON.parse(pkmn.polygon_path || '[]').map((line) =>
-                line.map((point) => [point[1], point[0]]),
-              ),
-            })
-        if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
-          returnedResults.push(pkmn)
-        }
-      })
-      return returnedResults
-    }
-    return fixedForms(results)
+    const submittedNameMap = await Db.query(
+      'NestSubmission',
+      'getAllByIds',
+      results.map((x) => x.nest_id),
+    ).then((submissions) =>
+      Object.fromEntries(submissions.map((x) => [x.nest_id, x])),
+    )
+
+    /** @type {Nest[]} */
+    const withNames = results.map((x) => ({
+      ...x,
+      name: submittedNameMap[x.id]?.name || x.name,
+      submitted_by: submittedNameMap[x.id]?.submitted_by,
+    }))
+
+    return Nest.secondaryFilter(withNames, filters, polygon)
   }
 
+  /**
+   *
+   * @param {Nest[]} queryResults
+   * @param {object} filters
+   * @param {boolean} polygon
+   * @returns {Nest[]}
+   */
+  static secondaryFilter(queryResults, filters, polygon) {
+    const returnedResults = []
+    queryResults.forEach((pkmn) => {
+      if (pkmn.pokemon_form == 0 || pkmn.pokemon_form === null) {
+        const formId = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
+        if (formId) pkmn.pokemon_form = formId
+      }
+      pkmn.polygon_path = polygon
+        ? typeof pkmn.polygon === 'string' && pkmn.polygon
+          ? pkmn.polygon
+          : JSON.stringify(pkmn.polygon || { type: 'Polygon', coordinates: [] })
+        : JSON.stringify({
+            type: 'Polygon',
+            coordinates: JSON.parse(pkmn.polygon_path || '[]').map((line) =>
+              line.map((point) => [point[1], point[0]]),
+            ),
+          })
+      if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
+        returnedResults.push(pkmn)
+      }
+    })
+    return returnedResults
+  }
+
+  /**
+   * Returns available nesting species from the db
+   * @returns
+   */
   static async getAvailable() {
     const results = await this.query()
       .select(['pokemon_id', 'pokemon_form'])
@@ -98,11 +125,22 @@ module.exports = class Nest extends Model {
     }
   }
 
+  /**
+   *
+   * @param {import('../types').Permissions} perms
+   * @param {object} args
+   * @param {import('../types').DbContext} ctx
+   * @param {import('objection').Raw} distance
+   * @returns
+   */
   static async search(perms, args, { isMad }, distance) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
+
+    const submittedNests = await Db.query('NestSubmission', 'search', search)
+
     const query = this.query()
       .select([
         'nest_id AS id',
@@ -113,8 +151,16 @@ module.exports = class Nest extends Model {
         'pokemon_form AS nest_pokemon_form',
         distance,
       ])
-      .whereIn('pokemon_id', pokemonIds)
       .whereNotNull('pokemon_id')
+      .where((builder) => {
+        builder
+          .whereIn('pokemon_id', pokemonIds)
+          .orWhereIn(
+            'nest_id',
+            submittedNests.map((x) => x.id),
+          )
+          .orWhere('name', 'like', `%${search}%`)
+      })
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
@@ -123,36 +169,12 @@ module.exports = class Nest extends Model {
     return query
   }
 
-  static getOne(id) {
-    return this.query().findById(id).select(['lat', 'lon'])
-  }
-
   /**
-   * Update the nest name in the database
-   * @param {string} name
+   *
    * @param {number} id
-   * @param {string?} nest_submitted_by
-   * @returns {boolean}
+   * @returns
    */
-  static async submitName(
-    { name, id, nest_submitted_by = 'Unknown User' },
-    { hasSubmissionColumn },
-  ) {
-    if (name && id) {
-      const nest = await this.query().findById(id)
-      if (nest) {
-        if (hasSubmissionColumn) {
-          await nest.$query().patch({ name, nest_submitted_by })
-        } else {
-          await nest.$query().patch({ name })
-        }
-        log.info(
-          HELPERS.nests,
-          `Nest name updated for ${id} from ${nest.name} to ${name} by ${nest_submitted_by}`,
-        )
-        return true
-      }
-    }
-    return false
+  static async getOne(id) {
+    return this.query().findById(id).select(['lat', 'lon'])
   }
 }

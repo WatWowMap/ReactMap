@@ -8,6 +8,7 @@ const {
 const { log, HELPERS } = require('../services/logger')
 
 module.exports = class Session extends Model {
+  /** @returns {string} */
   static get tableName() {
     return sessionTableName
   }

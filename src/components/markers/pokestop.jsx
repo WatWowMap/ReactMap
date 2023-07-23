@@ -26,7 +26,7 @@ export default function stopMarker(
     hasLure ? lure_id : 0,
     hasInvasion,
     hasQuest && userSettings.hasQuestIndicator,
-    ar_scan_eligible && userSettings.showArBadge,
+    ar_scan_eligible && (userSettings.showArBadge || power_up_level),
     power_up_level,
     hasEvent ? events[0].display_type : '',
   )
