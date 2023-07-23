@@ -459,16 +459,22 @@ module.exports = class DbCheck {
   }
 
   /**
+   * This function performs a query on a model using a specified method and arguments.
+   * It supports both single and multiple models, and deduplicates results if necessary.
+   *
+   * @example
+   * const results = await dbCheck.query('Pokemon', 'getAll', perms, args)
+   *
    * @template {import('../models').ModelKeys} T
    * @template {keyof import('../types').ExtractMethods<import('../models').Models[T]>} U
    * @template {ReturnType<import('../types').ExtractMethods<import('../models').Models[T]>[U]>} V
-   * @param {T} model
-   * @param {U} method
+   * @param {T} model The model to query
+   * @param {U} method The method to call on the model
    * @param {T extends import('../models').ScannerModelKeys
    *  ? import('../types').Head<Parameters<import('../types').ExtractMethods<import('../models').Models[T]>[U]>>
    *  : Parameters<import('../types').ExtractMethods<import('../models').Models[T]>[U]>
-   * } args
-   * @returns {Promise<V>}
+   * } args The arguments to pass to the method
+   * @returns {Promise<V>} The result of the query
    */
   async query(model, method, ...args) {
     if (Array.isArray(this.models[model])) {
