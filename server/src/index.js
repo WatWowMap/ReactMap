@@ -71,7 +71,7 @@ const apolloServer = new ApolloServer({
     }
     errorCache.set(key, true)
 
-    log.error(
+    log[customMessage ? 'info' : 'error'](
       HELPERS.gql,
       HELPERS[e.extensions.endpoint] ||
         `[${e.extensions.endpoint?.toUpperCase()}]`,
