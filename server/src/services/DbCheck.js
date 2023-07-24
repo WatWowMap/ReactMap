@@ -87,7 +87,7 @@ module.exports = class DbCheck {
           },
         })
       })
-    if (!this.reactMapDb) {
+    if (this.reactMapDb === null) {
       log.error(
         HELPERS.db,
         'No database connection was found for the User model',
