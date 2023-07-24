@@ -57,13 +57,13 @@ module.exports = gql`
     pokemon_id: Int
     updated: Int
     type: Int
-    nest_submitted_by: String
     name: String
     pokemon_count: Int
     pokemon_avg: Float
     pokemon_form: Int
     polygon_type: Int
     polygon_path: String
+    submitted_by: String
   }
 
   type Quest {

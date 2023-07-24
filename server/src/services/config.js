@@ -114,7 +114,7 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
       database: REACT_MAP_DB_NAME,
       username: REACT_MAP_DB_USERNAME,
       password: REACT_MAP_DB_PASSWORD,
-      useFor: ['session', 'user'],
+      useFor: ['user'],
     })
   } else {
     log.info(
@@ -129,9 +129,7 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
       database: MANUAL_DB_NAME,
       username: MANUAL_DB_USERNAME,
       password: MANUAL_DB_PASSWORD,
-      useFor: hasReactMapDb
-        ? ['nest', 'portal']
-        : ['session', 'user', 'nest', 'portal'],
+      useFor: hasReactMapDb ? ['nest', 'portal'] : ['user', 'nest', 'portal'],
     })
   } else if (!hasReactMapDb) {
     log.error(

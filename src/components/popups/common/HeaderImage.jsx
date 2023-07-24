@@ -1,5 +1,5 @@
 import React from 'react'
-import { Avatar, Link } from '@material-ui/core'
+import { Avatar, Link } from '@mui/material'
 
 export default function HeaderImage({
   url,

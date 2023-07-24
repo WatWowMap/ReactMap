@@ -233,44 +233,42 @@ module.exports = async () => {
   }
 
   const scanAreasMenu = Object.fromEntries(
-    Object.entries(scanAreas).map(([domain, areas]) => {
+    Object.entries(scanAreas).map(([domain, featureCollection]) => {
       const parents = { '': { children: [], name: '' } }
 
-      const noHidden = {
-        ...areas,
-        features: areas.features.filter((f) => !f.properties.hidden),
+      const noHiddenFeatures = {
+        ...featureCollection,
+        features: featureCollection.features.filter(
+          (f) => !f.properties.hidden,
+        ),
       }
       // Finds unique parents and determines if the parents have their own properties
-      noHidden.features.forEach((feature) => {
+      noHiddenFeatures.features.forEach((feature) => {
         if (feature.properties.parent) {
+          const found = featureCollection.features.find(
+            (area) => area.properties.name === feature.properties.parent,
+          )
           parents[feature.properties.parent] = {
             name: feature.properties.parent,
-            details: areas.features.find(
-              (area) => area.properties.name === feature.properties.parent,
-            ),
+            details: found && {
+              properties: found.properties,
+            },
             children: [],
           }
         }
       })
 
       // Finds the children of each parent
-      noHidden.features.forEach((feature) => {
+      noHiddenFeatures.features.forEach((feature) => {
         if (feature.properties.parent) {
-          parents[feature.properties.parent].children.push(feature)
+          parents[feature.properties.parent].children.push({
+            properties: feature.properties,
+          })
         } else if (!parents[feature.properties.name]) {
-          parents[''].children.push(feature)
+          parents[''].children.push({ properties: feature.properties })
         }
       })
 
-      // Create blanks for better formatting when there's an odd number of children
-      Object.values(parents).forEach(({ children }) => {
-        if (children.length % 2 === 1) {
-          children.push({
-            type: 'Feature',
-            properties: { name: '', manual: !!config.manualAreas.length },
-          })
-        }
-      })
       return [
         domain,
         Object.values(parents).sort((a, b) => a.name.localeCompare(b.name)),

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Typography, DialogContent } from '@material-ui/core'
+import { Button, Typography, DialogContent } from '@mui/material'
 import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 

@@ -1,14 +1,11 @@
 import React from 'react'
-import HighlightOff from '@material-ui/icons/HighlightOff'
-import { Paper, InputBase, IconButton } from '@material-ui/core'
+import ClearIcon from '@mui/icons-material/Clear'
+import { Paper, InputBase, IconButton } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
-import useStyles from '@hooks/useStyles'
-
 export default function AdvSearch({ search, setSearch, category }) {
   const { t } = useTranslation()
-  const classes = useStyles()
 
   const handleSearchChange = (event) => {
     setSearch(event.target.value?.toString()?.toLowerCase() || '')
@@ -22,11 +19,15 @@ export default function AdvSearch({ search, setSearch, category }) {
     <Paper
       elevation={0}
       variant="outlined"
-      className={classes.search}
+      style={{
+        padding: '2px 4px',
+        display: 'flex',
+        alignItems: 'center',
+      }}
       key="search"
     >
       <InputBase
-        className={classes.input}
+        sx={(theme) => ({ ml: theme.spacing(1), flex: 1 })}
         placeholder={t(`search_${category}`, t(`search_${category}s`))}
         name="search"
         value={search}
@@ -35,8 +36,8 @@ export default function AdvSearch({ search, setSearch, category }) {
         autoComplete="off"
         variant="outlined"
       />
-      <IconButton className={classes.iconButton} onClick={resetSearch}>
-        <HighlightOff style={{ color: '#848484' }} />
+      <IconButton sx={{ p: 1 }} onClick={resetSearch} size="large">
+        <ClearIcon style={{ color: '#848484' }} />
       </IconButton>
     </Paper>
   )

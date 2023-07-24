@@ -1,10 +1,10 @@
 import React from 'react'
-import { Grid, DialogContent, Typography, Divider } from '@material-ui/core'
+import { Grid, DialogContent, Typography, Divider } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
 import PokemonPopup from '@components/popups/Pokemon'
-import data from './data.json'
+import data from './data'
 
 export default function TutPopup({ isMobile }) {
   const { t } = useTranslation()
@@ -33,8 +33,18 @@ export default function TutPopup({ isMobile }) {
             {t('tutorial_popup_1')}
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={10} style={{ textAlign: 'center' }}>
-          <div className="leaflet-popup-content-wrapper">
+        <Grid
+          item
+          xs={12}
+          sm={10}
+          style={{
+            textAlign: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div className="leaflet-popup-content-wrapper" style={{ width: 230 }}>
             <div className="leaflet-popup-content">
               <PokemonPopup
                 pokemon={{

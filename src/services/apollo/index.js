@@ -1,10 +1,16 @@
+// @ts-check
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client'
+
 import AbortableLink from './AbortableLink'
+
+const abortableLink = new AbortableLink()
 
 export default new ApolloClient({
   uri: '/graphql',
-  link: new AbortableLink().concat(createHttpLink()),
+  link: abortableLink.concat(createHttpLink()),
+  // @ts-ignore
   name: inject.TITLE,
+  // @ts-ignore
   version: inject.VERSION,
   cache: new InMemoryCache({
     typePolicies: {
@@ -26,10 +32,8 @@ export default new ApolloClient({
             },
           },
           nests: {
-            badges: {
-              merge(existing, incoming) {
-                return incoming
-              },
+            merge(existing, incoming) {
+              return incoming
             },
           },
           pokemon: {

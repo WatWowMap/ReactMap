@@ -1,15 +1,18 @@
 /* eslint-disable no-nested-ternary */
 import React, { Fragment } from 'react'
-import ExpandMore from '@material-ui/icons/ExpandMore'
-import Settings from '@material-ui/icons/Settings'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import SettingsIcon from '@mui/icons-material/Settings'
+import TuneIcon from '@mui/icons-material/Tune'
 import {
-  Button,
   Typography,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Grid,
-} from '@material-ui/core'
+  ListItemButton,
+  List,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
@@ -36,19 +39,17 @@ export default function DrawerSection({ category, value, toggleDialog }) {
     <Accordion
       expanded={sidebar === category}
       onChange={handleChange(category)}
-      TransitionProps={{ unmountOnExit: true }}
+      TransitionProps={{
+        unmountOnExit:
+          category !== 'pokemon' &&
+          (sidebar === 'scanAreas' ? true : category === 'scanAreas'),
+      }}
     >
-      <AccordionSummary expandIcon={<ExpandMore style={{ color: 'white' }} />}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography>{t(Utility.camelToSnake(category))}</Typography>
       </AccordionSummary>
-      <AccordionDetails>
-        <Grid
-          container
-          spacing={3}
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-        >
+      <AccordionDetails sx={{ p: 0 }}>
+        <List>
           {category === 'pokemon' ? (
             <PokemonSection category={category} context={value} />
           ) : category === 'settings' ? (
@@ -69,41 +70,26 @@ export default function DrawerSection({ category, value, toggleDialog }) {
             )
           )}
           {staticUserSettings[category] && (
-            <Grid
-              item
-              xs={t('drawer_grid_options_width')}
-              style={{ textAlign: 'center' }}
-            >
-              <Button
-                onClick={toggleDialog(true, category, 'options')}
-                variant="contained"
-                color="secondary"
-                startIcon={<Settings style={{ color: 'white' }} />}
-              >
-                {t('options')}
-              </Button>
-            </Grid>
+            <ListItemButton onClick={toggleDialog(true, category, 'options')}>
+              <ListItemIcon>
+                <SettingsIcon color="secondary" />
+              </ListItemIcon>
+              <ListItemText primary={t('options')} />
+            </ListItemButton>
           )}
           {(category === 'pokemon' ||
             category === 'gyms' ||
             category === 'pokestops' ||
             category === 'nests') && (
-            <Grid
-              item
-              xs={t('drawer_grid_advanced_width')}
-              style={{ textAlign: 'center' }}
-            >
-              <Button
-                onClick={toggleDialog(true, category, 'filters')}
-                variant="contained"
-                color="primary"
-              >
-                {t('advanced')}
-              </Button>
-            </Grid>
+            <ListItemButton onClick={toggleDialog(true, category, 'filters')}>
+              <ListItemIcon>
+                <TuneIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText primary={t('advanced')} />
+            </ListItemButton>
           )}
           {category === 'scanAreas' && <Areas />}
-        </Grid>
+        </List>
       </AccordionDetails>
     </Accordion>
   )

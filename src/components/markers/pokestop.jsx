@@ -26,7 +26,7 @@ export default function stopMarker(
     hasLure ? lure_id : 0,
     hasInvasion,
     hasQuest && userSettings.hasQuestIndicator,
-    ar_scan_eligible && userSettings.showArBadge,
+    ar_scan_eligible && (userSettings.showArBadge || power_up_level),
     power_up_level,
     hasEvent ? events[0].display_type : '',
   )
@@ -50,7 +50,9 @@ export default function stopMarker(
         filterId = `i${invasion.grunt_type}`
         invasionIcons.unshift({
           icon: Icons.getInvasions(invasion.grunt_type, invasion.confirmed),
-          opacity: getOpacity(invasion.incident_expire_timestamp),
+          opacity: userSettings.invasionOpacity
+            ? getOpacity(invasion.incident_expire_timestamp, userSettings)
+            : 1,
         })
         invasionSizes.unshift(
           Icons.getSize('invasion', filters.filter[filterId]),

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Select, MenuItem } from '@material-ui/core'
+import { Select, MenuItem } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 export default function LocaleSelection({ localeSelection }) {
@@ -14,7 +14,7 @@ export default function LocaleSelection({ localeSelection }) {
       fullWidth
     >
       {Object.keys(localeSelection).map((option) => (
-        <MenuItem key={option} value={option}>
+        <MenuItem key={option} value={option} dense>
           {t(`locale_selection_${option}`)}
         </MenuItem>
       ))}

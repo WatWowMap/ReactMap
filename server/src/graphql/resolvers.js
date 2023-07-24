@@ -6,7 +6,15 @@ const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 
-module.exports = {
+/**
+ * @typedef {(parent: unknown, args: object, context: import('../types').GqlContext) => unknown} Resolver
+ * @type {{
+ *  JSON: typeof GraphQLJSON
+ *  Query: Record<string, Resolver>
+ *  Mutation: Record<string, Resolver>
+ * }}
+ */
+const resolvers = {
   JSON: GraphQLJSON,
   Query: {
     available: (_, _args, { Event, Db, perms }) => {
@@ -37,8 +45,9 @@ module.exports = {
     },
     badges: async (_, _args, { req, perms, Db }) => {
       if (perms?.gymBadges) {
-        const badges = await Db.models.Badge.getAll(req.user?.id)
-        return Db.getAll('Gym', badges, {}, req.user?.id, 'getBadges')
+        const badges = await Db.query('Badge', 'getAll', req.user?.id)
+        const gyms = await Db.query('Gym', 'getBadges', badges)
+        return gyms
       }
       return []
     },
@@ -108,9 +117,9 @@ module.exports = {
     pokemon: (_, args, { perms, Db }) => {
       if (perms?.pokemon) {
         if (args.filters.onlyLegacy) {
-          return Db.getAll('Pokemon', perms, args, 0, 'getLegacy')
+          return Db.query('Pokemon', 'getLegacy', perms, args)
         }
-        return Db.getAll('Pokemon', perms, args)
+        return Db.query('Pokemon', 'getAll', perms, args)
       }
       return []
     },
@@ -347,6 +356,23 @@ module.exports = {
         await Db.models.Backup.update(args.backup, req.user.id)
       }
     },
+    nestSubmission: async (_, args, { req, perms, Db, user }) => {
+      if (perms?.nestSubmissions && req.user?.id) {
+        return Db.query(
+          'NestSubmission',
+          'create',
+          {
+            name: args.name,
+            nest_id: args.id,
+          },
+          {
+            submitted_by: user,
+            user_id: req.user.id,
+          },
+        )
+      }
+      return false
+    },
     webhook: (_, args, { req }) => {
       const perms = req.user ? req.user.perms : false
       const { category, data, status, name } = args
@@ -424,3 +450,5 @@ module.exports = {
     },
   },
 }
+
+module.exports = resolvers

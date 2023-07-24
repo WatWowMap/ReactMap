@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /**
- * @typedef {import("knex")} Knex
+ * @typedef {import("knex").Knex} Knex
  */
 
 /**
@@ -9,6 +9,6 @@
 exports.up = async (knex) => {}
 
 /**
-  * @param {Knex} knex
-  */
+ * @param {Knex} knex
+ */
 exports.down = (knex) => {}

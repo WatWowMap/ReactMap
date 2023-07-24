@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react'
-import { Grid, Divider } from '@material-ui/core'
+import { Grid, Divider } from '@mui/material'
 
 import Utility from '@services/Utility'
 

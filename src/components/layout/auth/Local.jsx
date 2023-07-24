@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import Visibility from '@material-ui/icons/Visibility'
-import VisibilityOff from '@material-ui/icons/VisibilityOff'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import {
   Grid,
   Typography,
@@ -10,7 +10,7 @@ import {
   FormControl,
   InputAdornment,
   IconButton,
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
@@ -63,8 +63,8 @@ export default function LocalLogin({ href }) {
                 value={user.username}
                 onChange={handleChange}
                 autoComplete="username"
+                label={t('local_username')}
                 color="secondary"
-                labelWidth={t('local_username').length * 9}
                 style={{ width: 250 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSubmit(e)
@@ -83,7 +83,7 @@ export default function LocalLogin({ href }) {
                 onChange={handleChange}
                 autoComplete="current-password"
                 color="secondary"
-                labelWidth={t('local_password').length * 9}
+                label={t('local_password')}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSubmit(e)
                 }}
@@ -91,12 +91,12 @@ export default function LocalLogin({ href }) {
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
-                      style={{ color: 'white' }}
                       name="showPassword"
                       onClick={() =>
                         setUser({ ...user, showPassword: !user.showPassword })
                       }
                       onMouseDown={(e) => e.preventDefault()}
+                      size="large"
                     >
                       {user.showPassword ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
@@ -109,7 +109,6 @@ export default function LocalLogin({ href }) {
             <Button
               variant="contained"
               style={{
-                color: 'white',
                 textAlign: 'center',
               }}
               color="primary"

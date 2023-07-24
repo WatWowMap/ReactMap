@@ -1,21 +1,21 @@
 import React, { forwardRef } from 'react'
-import {
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Link as MuiLink,
-} from '@material-ui/core'
+import List from '@mui/material/List'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import Divider from '@mui/material/Divider'
+import MuiLink from '@mui/material/Link'
+
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import AccountBoxIcon from '@material-ui/icons/AccountBox'
-import ExitToAppIcon from '@material-ui/icons/ExitToApp'
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline'
-import RotateLeftIcon from '@material-ui/icons/RotateLeft'
-import ImportExportIcon from '@material-ui/icons/ImportExport'
-import TrendingUpIcon from '@material-ui/icons/TrendingUp'
-import FeedbackIcon from '@material-ui/icons/Feedback'
-import HeartIcon from '@material-ui/icons/Favorite'
+import AccountBoxIcon from '@mui/icons-material/AccountBox'
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import RotateLeftIcon from '@mui/icons-material/RotateLeft'
+import ImportExportIcon from '@mui/icons-material/ImportExport'
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'
+import FeedbackIcon from '@mui/icons-material/Feedback'
+import HeartIcon from '@mui/icons-material/Favorite'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import FAIcon from '../general/FAIcon'
@@ -67,38 +67,72 @@ export default function DrawerActions() {
   return (
     <List>
       {config.map.enableUserProfile && (
-        <ListItem button onClick={() => setUserProfile(true)}>
+        <ListItemButton onClick={() => setUserProfile(true)}>
           <ListItemIcon>
             <AccountBoxIcon color="secondary" />
           </ListItemIcon>
           <ListItemText primary={t('profile')} />
-        </ListItem>
-      )}
-      {config.map.discordLink && (
-        <ListItem
-          button
-          component="button"
-          href={config.map.discordLink}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <ListItemIcon>
-            <FAIcon className="fab fa-discord" color="secondary" size="small" />
-          </ListItemIcon>
-          <ListItemText primary="Discord" />
-        </ListItem>
+        </ListItemButton>
       )}
       {config.map.enableTutorial && (
-        <ListItem button onClick={() => setTutorial(true)}>
+        <ListItemButton onClick={() => setTutorial(true)}>
           <ListItemIcon>
             <HelpOutlineIcon color="secondary" />
           </ListItemIcon>
           <ListItemText primary={t('tutorial')} />
-        </ListItem>
+        </ListItemButton>
       )}
+      <input
+        accept="application/json"
+        id="contained-button-file"
+        type="file"
+        style={{ display: 'none' }}
+        onChange={importSettings}
+      />
+      <ListItemButton onClick={exportSettings}>
+        <ListItemIcon>
+          <ImportExportIcon color="secondary" />
+        </ListItemIcon>
+        <ListItemText primary={t('export')} />
+      </ListItemButton>
+      <ListItemButton component="label" htmlFor="contained-button-file">
+        <ListItemIcon>
+          <ImportExportIcon color="primary" />
+        </ListItemIcon>
+        <ListItemText primary={t('import')} />
+      </ListItemButton>
+      <ListItemButton onClick={() => setResetFilters(true)}>
+        <ListItemIcon>
+          <RotateLeftIcon color="primary" />
+        </ListItemIcon>
+        <ListItemText primary={t('reset_filters')} />
+      </ListItemButton>
+      {!!methods.length && (
+        <ListItemButton
+          component={loggedIn ? MuiLink : renderLink}
+          to={loggedIn ? undefined : '/login'}
+          href={loggedIn ? '/auth/logout' : undefined}
+        >
+          <ListItemIcon>
+            <ExitToAppIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={t(loggedIn ? 'logout' : 'login')} />
+        </ListItemButton>
+      )}
+      <Divider />
+      <ListItemButton
+        href="https://github.com/WatWowMap/ReactMap"
+        referrerPolicy="no-referrer"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <ListItemIcon>
+          <HeartIcon color="primary" />
+        </ListItemIcon>
+        <ListItemText primary={t('contribute')} />
+      </ListItemButton>
       {config.map.statsLink && (
-        <ListItem
-          button
+        <ListItemButton
           component="button"
           href={config.map.statsLink}
           target="_blank"
@@ -108,69 +142,29 @@ export default function DrawerActions() {
             <TrendingUpIcon color="action" />
           </ListItemIcon>
           <ListItemText primary={t('stats')} />
-        </ListItem>
+        </ListItemButton>
       )}
       {config.map.feedbackLink && (
-        <ListItem button component="button" onClick={() => setFeedback(true)}>
+        <ListItemButton component="button" onClick={() => setFeedback(true)}>
           <ListItemIcon>
             <FeedbackIcon color="action" />
           </ListItemIcon>
           <ListItemText primary={t('feedback')} />
-        </ListItem>
+        </ListItemButton>
       )}
-      <input
-        accept="application/json"
-        id="contained-button-file"
-        type="file"
-        style={{ display: 'none' }}
-        onChange={importSettings}
-      />
-      <ListItem button component="label" htmlFor="contained-button-file">
-        <ListItemIcon>
-          <ImportExportIcon color="primary" />
-        </ListItemIcon>
-        <ListItemText primary={t('import')} />
-      </ListItem>
-      <ListItem button onClick={exportSettings}>
-        <ListItemIcon>
-          <ImportExportIcon color="secondary" />
-        </ListItemIcon>
-        <ListItemText primary={t('export')} />
-      </ListItem>
-      <ListItem button onClick={() => setResetFilters(true)}>
-        <ListItemIcon>
-          <RotateLeftIcon color="primary" />
-        </ListItemIcon>
-        <ListItemText primary={t('reset_filters')} />
-      </ListItem>
-      {!!methods.length && (
-        <ListItem
-          button
-          component={loggedIn ? MuiLink : renderLink}
-          to={loggedIn ? undefined : '/login'}
-          style={{ textDecoration: 'none', color: 'white' }}
-          href={loggedIn ? '/auth/logout' : undefined}
+      {config.map.discordLink && (
+        <ListItemButton
+          component="button"
+          href={config.map.discordLink}
+          target="_blank"
+          rel="noreferrer"
         >
           <ListItemIcon>
-            <ExitToAppIcon color="primary" />
+            <FAIcon className="fab fa-discord" color="secondary" size="small" />
           </ListItemIcon>
-          <ListItemText primary={t(loggedIn ? 'logout' : 'login')} />
-        </ListItem>
+          <ListItemText primary="Discord" />
+        </ListItemButton>
       )}
-      <a
-        href="https://github.com/WatWowMap/ReactMap"
-        referrerPolicy="no-referrer"
-        target="_blank"
-        rel="noreferrer"
-        style={{ textDecoration: 'none', color: 'white' }}
-      >
-        <ListItem button>
-          <ListItemIcon>
-            <HeartIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary={t('contribute')} />
-        </ListItem>
-      </a>
     </List>
   )
 }

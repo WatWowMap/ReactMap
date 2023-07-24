@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { useQuery } from '@apollo/client'
 import RobustTimeout from '@services/apollo/RobustTimeout'
 
@@ -36,8 +36,8 @@ export default function QueryData({
   active,
   onlyAreas,
 }) {
-  const [timeout] = useState(
-    () => new RobustTimeout((config.polling[category] || 10) * 1000),
+  const timeout = useRef(
+    new RobustTimeout((config.polling[category] || 10) * 1000),
   )
 
   const trimFilters = useCallback(
@@ -76,8 +76,8 @@ export default function QueryData({
   useEffect(() => {
     const refetchData = () => {
       onMove()
-      if (category !== 'device' && category !== 'scanAreas') {
-        timeout.doRefetch({
+      if (category !== 'scanAreas') {
+        timeout.current.doRefetch({
           ...Utility.getQueryArgs(map),
           filters: trimFilters(filters),
         })
@@ -94,27 +94,33 @@ export default function QueryData({
     Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),
     {
       context: {
-        abortableContext: timeout,
+        abortableContext: timeout.current,
       },
       variables: {
         ...bounds,
         filters: trimFilters(filters),
       },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
-      // pollInterval: (config.polling[category] || 10) * 1000,
       skip: !active,
     },
   )
-  timeout.setupTimeout(refetch)
 
-  useEffect(() => () => useStatic.setState({ excludeList: [] }))
+  useEffect(() => {
+    if (active) {
+      timeout.current.setupTimeout(refetch)
+      return () => {
+        useStatic.setState({ excludeList: [] })
+        timeout.current.off()
+      }
+    }
+  }, [active])
 
   if (error) {
     if (error.networkError?.statusCode === 464) {
       setError('old_client')
       return null
     }
-    if (error.networkError?.statusCode === 401) {
+    if (error.networkError?.statusCode === 511) {
       setError('session_expired')
       return null
     }

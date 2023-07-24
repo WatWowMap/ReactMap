@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware'
 export const useStore = create(
   persist(
     (set, get) => ({
+      darkMode: true,
       location: undefined,
       setLocation: (location) => set({ location }),
       zoom: undefined,
@@ -40,7 +41,7 @@ export const useStore = create(
           })
         }
       },
-      settings: undefined,
+      settings: {},
       setSettings: (settings) => set({ settings }),
       userSettings: undefined,
       setUserSettings: (userSettings) => set({ userSettings }),
@@ -93,6 +94,8 @@ export const useStore = create(
 )
 
 export const useStatic = create((set) => ({
+  isMobile: false,
+  isTablet: false,
   active: true,
   setActive: (active) => set({ active }),
   auth: {
@@ -157,4 +160,8 @@ export const useStatic = create((set) => ({
   setResetFilters: (resetFilters) => set({ resetFilters }),
   extraUserFields: [],
   setExtraUserFields: (extraUserFields) => set({ extraUserFields }),
+}))
+
+export const useDialogStore = create((/* set, get */) => ({
+  nestSubmissions: '0',
 }))

@@ -3,25 +3,34 @@ const { raw } = require('objection')
 const extend = require('extend')
 const { log, HELPERS } = require('./logger')
 
+/**
+ * @type {import("../types").DbCheckClass}
+ */
 module.exports = class DbCheck {
   /**
-   * @param {string[]} validModels
-   * @param {object} dbSettings
+   * @param {import("../models").ScannerModelKeys[]} validModels
+   * @param {{ schemas: import("../types").Schema[], settings: { maxConnections: number } }} dbConfig
    * @param {boolean} queryDebug
    * @param {object} apiSettings
    * @param {'km' | 'mi'} distanceUnit
-   * @param {{ common: number[], uncommon: number[], rare: number[], ultraRare: number[], regional: number[], never: number[], event: number[]}} rarityPercents
+   * @param {import("../types").RarityPercents} rarityPercents
    */
   constructor(
     validModels,
-    dbSettings,
+    dbConfig,
     queryDebug,
     apiSettings,
     distanceUnit,
     rarityPercents,
   ) {
     this.validModels = validModels
-    this.singleModels = ['User', 'Badge', 'Session', 'Backup']
+    this.singleModels = /** @type {const} */ ([
+      'Backup',
+      'Badge',
+      'NestSubmission',
+      'Session',
+      'User',
+    ])
     this.searchLimit = apiSettings.searchLimit
     this.rarityPercents = rarityPercents
     this.models = {}
@@ -29,15 +38,20 @@ module.exports = class DbCheck {
     this.endpoints = {}
     this.rarity = {}
     this.historical = {}
-    this.connections = dbSettings.schemas
+    this.reactMapDb = null
+    this.connections = dbConfig.schemas
       .filter((s) => s.useFor.length)
       .map((schema, i) => {
         schema.useFor.forEach((category) => {
+          /** @type {import('../models').ModelKeys} */
           const capital = `${category.charAt(0).toUpperCase()}${category.slice(
             1,
           )}`
           if (this.singleModels.includes(capital)) {
-            this.models[capital] = { connection: i }
+            this.models[capital] = {}
+            if (capital === 'User') {
+              this.reactMapDb = i
+            }
           } else {
             if (!this.models[capital]) {
               this.models[capital] = []
@@ -61,7 +75,7 @@ module.exports = class DbCheck {
           debug: queryDebug,
           pool: {
             min: 0,
-            max: dbSettings.settings.maxConnections,
+            max: dbConfig.settings.maxConnections,
             afterCreate: (conn, done) =>
               conn.query('SET time_zone="+00:00";', (err) => done(err, conn)),
           },
@@ -73,19 +87,25 @@ module.exports = class DbCheck {
           },
         })
       })
+    if (!this.reactMapDb) {
+      log.error(
+        HELPERS.db,
+        'No database connection was found for the User model',
+      )
+      process.exit(0)
+    }
     this.distanceUnit = distanceUnit
   }
 
   /**
    * @param {{ lat: number, lon: number }} args
    * @param {boolean} isMad
-   * @param {'mi' | 'km'} distanceUnit
    * @returns {ReturnType<typeof raw>}
    */
-  static getDistance(args, isMad, distanceUnit) {
+  getDistance(args, isMad) {
     return raw(
       `ROUND(( ${
-        distanceUnit === 'mi' ? '3959' : '6371'
+        this.distanceUnit === 'mi' ? '3959' : '6371'
       } * acos( cos( radians(${args.lat}) ) * cos( radians( ${
         isMad ? 'latitude' : 'lat'
       } ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${
@@ -130,6 +150,7 @@ module.exports = class DbCheck {
         'expiration_ms' in columns,
         'confirmed' in columns,
       ])
+    /** @type {[string, boolean]} */
     const [availableSlotsCol, hasAlignment] = await schema('gym')
       .columnInfo()
       .then((columns) => [
@@ -155,8 +176,8 @@ module.exports = class DbCheck {
       multiInvasionMs,
       hasConfirmed,
       availableSlotsCol,
-      polygon,
       hasAlignment,
+      polygon,
     }
   }
 
@@ -259,12 +280,14 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @param {import("../models").DbModels} models
+   * @param {import("../models").Models} models
    */
   bindConnections(models) {
     try {
-      Object.entries(this.models).forEach(([model, sources]) => {
-        if (this.singleModels.includes(model)) {
+      Object.entries(this.models).forEach(([modelName, sources]) => {
+        if (this.singleModels.includes(modelName)) {
+          /** @type {import('../models').RmModelKeys} */
+          const model = modelName
           if (sources.length > 1) {
             log.error(
               HELPERS.db,
@@ -275,13 +298,19 @@ module.exports = class DbCheck {
           }
           if (model === 'User') {
             this.models.Badge = models.Badge
-            this.models.Badge.knex(this.connections[sources.connection])
+            this.models.Badge.knex(this.connections[this.reactMapDb])
             this.models.Backup = models.Backup
-            this.models.Backup.knex(this.connections[sources.connection])
+            this.models.Backup.knex(this.connections[this.reactMapDb])
+            this.models.NestSubmission = models.NestSubmission
+            this.models.NestSubmission.knex(this.connections[this.reactMapDb])
+            this.models.Session = models.Session
+            this.models.Session.knex(this.connections[this.reactMapDb])
           }
           this.models[model] = models[model]
-          this.models[model].knex(this.connections[sources.connection])
-        } else {
+          this.models[model].knex(this.connections[this.reactMapDb])
+        } else if (Array.isArray(sources)) {
+          /** @type {import('../models').ScannerModelKeys} */
+          const model = modelName
           sources.forEach((source, i) => {
             if (this.connections[source.connection]) {
               this.models[model][i].SubModel = models[model].bindKnex(
@@ -291,10 +320,12 @@ module.exports = class DbCheck {
               this.models[model][i].SubModel = models[model]
             }
           })
+        } else {
+          log.warn(HELPERS.db, modelName, 'something unexpected happened')
         }
         log.info(
           HELPERS.db,
-          `Bound ${model} to ${sources.length ?? 1} connection${
+          `Bound ${modelName} to ${sources.length ?? 1} connection${
             sources.length > 1 ? 's' : ''
           }`,
         )
@@ -312,7 +343,7 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @template {{ id: string | number }} T
+   * @template {import('../types').BaseRecord} T
    * @param {T[][]} results
    * @returns {T[]}
    */
@@ -339,8 +370,8 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @template T
-   * @param {keyof import("../models").DbModels} model
+   * @template {import('../types').BaseRecord} T
+   * @param {import("../models").ScannerModelKeys} model
    * @param {import("../types").Perms} perms
    * @param {object} args
    * @param {number} userId
@@ -362,24 +393,24 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @param {keyof import("../models").DbModels} model
+   * @template {import('../types').BaseRecord} T
+   * @param {import("../models").ScannerModelKeys} model
    * @param {string} id
-   * @param {'getOne' | string} method
-   * @returns {Promise<{id: number | string, lat: number, lon: number}>}
+   * @returns {Promise<T | {}>}
    */
-  async getOne(model, id, method = 'getOne') {
+  async getOne(model, id) {
     const data = await Promise.all(
       this.models[model].map(async (source) =>
-        source.SubModel[method](id, source),
+        source.SubModel.getOne(id, source),
       ),
     )
     const cleaned = DbCheck.deDupeResults(data.filter(Boolean))
-    return (Array.isArray(cleaned) ? cleaned[0] : cleaned) || {}
+    return cleaned || {}
   }
 
   /**
-   * @template T
-   * @param {keyof import("../models").DbModels} model
+   * @template {import('../types').BaseRecord} T
+   * @param {import("../models").ScannerModelKeys} model
    * @param {import("../types").Perms} perms
    * @param {object} args
    * @param {'search' | string} method
@@ -392,11 +423,11 @@ module.exports = class DbCheck {
           perms,
           args,
           source,
-          DbCheck.getDistance(args, source.isMad, this.distanceUnit),
+          this.getDistance(args, source.isMad),
         ),
       ),
     )
-    const deDuped = [...DbCheck.deDupeResults(data)].sort(
+    const deDuped = DbCheck.deDupeResults(data).sort(
       (a, b) => a.distance - b.distance,
     )
     if (deDuped.length > this.searchLimit) {
@@ -408,7 +439,10 @@ module.exports = class DbCheck {
   /**
    * @param {import("../types").Perms} perms
    * @param {object} args
-   * @returns {Promise<{ id: string, lat: number, lon: number}[]>}
+   * @returns {Promise<[
+   *  import('../types').BaseRecord[],
+   *  import('../types').BaseRecord[]
+   * ]>}
    */
   async submissionCells(perms, args) {
     const stopData = await Promise.all(
@@ -421,16 +455,43 @@ module.exports = class DbCheck {
         source.SubModel.getSubmissions(perms, args, source),
       ),
     )
-    return [
-      [...DbCheck.deDupeResults(stopData)],
-      [...DbCheck.deDupeResults(gymData)],
-    ]
+    return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]
+  }
+
+  /**
+   * This function performs a query on a model using a specified method and arguments.
+   * It supports both single and multiple models, and deduplicates results if necessary.
+   *
+   * @example
+   * const results = await dbCheck.query('Pokemon', 'getAll', perms, args)
+   *
+   * @template {import('../models').ModelKeys} T
+   * @template {keyof import('../types').ExtractMethods<import('../models').Models[T]>} U
+   * @template {ReturnType<import('../types').ExtractMethods<import('../models').Models[T]>[U]>} V
+   * @param {T} model The model to query
+   * @param {U} method The method to call on the model
+   * @param {T extends import('../models').ScannerModelKeys
+   *  ? import('../types').Head<Parameters<import('../types').ExtractMethods<import('../models').Models[T]>[U]>>
+   *  : Parameters<import('../types').ExtractMethods<import('../models').Models[T]>[U]>
+   * } args The arguments to pass to the method
+   * @returns {Promise<V>} The result of the query
+   */
+  async query(model, method, ...args) {
+    if (Array.isArray(this.models[model])) {
+      const data = await Promise.all(
+        this.models[model].map(async (source) =>
+          source.SubModel[method](...args, source),
+        ),
+      )
+      return DbCheck.deDupeResults(data)
+    }
+    return this.models[model][method](...args)
   }
 
   /**
    * @template T
-   * @param {keyof import("../models").DbModels} model
-   * @returns {T[]}
+   * @param {import("../models").ScannerModelKeys} model
+   * @returns {Promise<T[]>}
    */
   async getAvailable(model) {
     if (this.models[model]) {

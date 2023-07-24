@@ -5,7 +5,8 @@ const {
   },
 } = require('../services/config')
 
-module.exports = class Badge extends Model {
+class Badge extends Model {
+  /** @returns {string} */
   static get tableName() {
     return gymBadgeTableName
   }
@@ -20,12 +21,11 @@ module.exports = class Badge extends Model {
   }
 
   static get relationMappings() {
-    // eslint-disable-next-line global-require
-    const User = require('./User')
+    const { Db } = require('../services/initialization')
     return {
       user: {
         relation: Model.BelongsToOneRelation,
-        modelClass: User,
+        modelClass: Db.models.User,
         join: {
           from: `${gymBadgeTableName}.userId`,
           to: `${userTableName}.id`,
@@ -34,7 +34,18 @@ module.exports = class Badge extends Model {
     }
   }
 
-  static async getAll(userId) {
-    return this.query().where('userId', userId).andWhere('badge', '>', 0)
+  /**
+   * Returns all badges for a user
+   * @param {number} userId
+   * @param {'>' | '>=' | '<' | '<=' | '='} operator
+   * @param {number} badge
+   * @returns
+   */
+  static async getAll(userId, operator = '>', badge = 0) {
+    return this.query()
+      .where('userId', userId)
+      .andWhere('badge', operator, badge)
   }
 }
+
+module.exports = Badge

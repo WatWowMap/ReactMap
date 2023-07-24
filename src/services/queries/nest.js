@@ -31,6 +31,7 @@ export const getAllNests = gql`
       updated
       pokemon_avg
       polygon_path
+      submitted_by
     }
   }
 `
@@ -41,5 +42,11 @@ export const getOne = gql`
     nestsSingle(id: $id, perm: $perm) {
       ...CoreNest
     }
+  }
+`
+
+export const nestSubmission = gql`
+  mutation NestSubmission($id: ID!, $name: String!) {
+    nestSubmission(id: $id, name: $name)
   }
 `

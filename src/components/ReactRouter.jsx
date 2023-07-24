@@ -15,7 +15,7 @@ export default function ReactRouter({ serverSettings, getServerSettings }) {
         getServerSettings={getServerSettings}
       />
     ),
-    [],
+    [serverSettings],
   )
 
   return (

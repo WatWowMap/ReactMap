@@ -1,14 +1,13 @@
 /* eslint-disable max-len */
 import React, { useState, useEffect, useMemo } from 'react'
-import Person from '@material-ui/icons/Person'
-import { DialogContent, Dialog, AppBar, Tabs, Tab } from '@material-ui/core'
+import Person from '@mui/icons-material/Person'
+import { DialogContent, Dialog, AppBar, Tabs, Tab } from '@mui/material'
 
 import { useTranslation, Trans } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
 import Query from '@services/Query'
 import { useStatic } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
 import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 
@@ -40,7 +39,6 @@ export default function Manage({
   handleWebhookClose,
 }) {
   const { t } = useTranslation()
-  const classes = useStyles()
   const [syncWebhook, { data }] = useLazyQuery(Query.webhook('allProfiles'), {
     fetchPolicy: 'no-cache',
   })
@@ -97,7 +95,6 @@ export default function Manage({
         t('manage_profiles')
       ),
       action: () => setAddNew(true),
-      icon: tabValue ? 'Add' : 'People',
       key: 'addNew',
       disabled: !webhookData[selectedWebhook]?.human,
     },
@@ -115,7 +112,7 @@ export default function Manage({
       action: () => setFeedback(true),
       icon: 'BugReport',
       disabled: !webhookData[selectedWebhook].human,
-      color: '#00e676',
+      color: 'success',
     })
   }
 
@@ -175,16 +172,13 @@ export default function Manage({
         <Tabs
           value={tabValue}
           onChange={(e, newValue) => setTabValue(newValue)}
-          indicatorColor="secondary"
-          variant="fullWidth"
-          style={{ backgroundColor: '#424242', width: '100%' }}
         >
           {filteredData.map((each) => (
             <Tab
               key={each}
               icon={
                 each === 'human' ? (
-                  <Person style={{ color: 'white ' }} />
+                  <Person />
                 ) : (
                   <img
                     src={Icons.getMisc(each)}
@@ -193,7 +187,7 @@ export default function Manage({
                   />
                 )
               }
-              style={{ width: 40, minWidth: 40 }}
+              style={{ minWidth: 5 }}
             />
           ))}
         </Tabs>
@@ -247,10 +241,6 @@ export default function Manage({
       </DialogContent>
       <Footer options={footerButtons} role="webhook_footer" />
       <Dialog
-        classes={{
-          scrollPaper: classes.scrollPaper,
-          container: classes.container,
-        }}
         fullWidth={!isMobile}
         fullScreen={isMobile}
         maxWidth="md"
@@ -289,15 +279,7 @@ export default function Manage({
           />
         )}
       </Dialog>
-      <Dialog
-        classes={{
-          scrollPaper: classes.scrollPaper,
-          container: classes.container,
-        }}
-        maxWidth="xs"
-        open={feedback}
-        onClose={() => setFeedback(false)}
-      >
+      <Dialog maxWidth="xs" open={feedback} onClose={() => setFeedback(false)}>
         <Feedback link={map.feedbackLink} setFeedback={setFeedback} />
       </Dialog>
     </>
