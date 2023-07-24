@@ -24,6 +24,7 @@ const http = require('http')
 const { GraphQLError } = require('graphql')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
+const NodeCache = require('node-cache')
 
 const config = require('./services/config')
 const { log, HELPERS } = require('./services/logger')
@@ -43,6 +44,8 @@ if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')
 }
 
+const errorCache = new NodeCache({ stdTTL: 60 * 60 })
+
 const app = express()
 const httpServer = http.createServer(app)
 const apolloServer = new ApolloServer({
@@ -61,8 +64,17 @@ const apolloServer = new ApolloServer({
       customMessage =
         'user is not authenticated, forcing logout, no need to report this error unless it continues to happen'
     }
+
+    const key = `${e.extensions.id || e.extensions.user}-${e.message}`
+    if (errorCache.has(key)) {
+      return e
+    }
+    errorCache.set(key, true)
+
     log.error(
       HELPERS.gql,
+      HELPERS[e.extensions.endpoint] ||
+        `[${e.extensions.endpoint?.toUpperCase()}]`,
       'Client:',
       e.extensions.clientV,
       'Server:',
@@ -306,7 +318,17 @@ apolloServer.start().then(() => {
           scope.setSpan(transaction)
         })
 
-        const errorCtx = { id, user, clientV, serverV }
+        const definition = parse(req.body.query).definitions.find(
+          (d) => d.kind === 'OperationDefinition',
+        )
+        const errorCtx = {
+          id,
+          user,
+          clientV,
+          serverV,
+          endpoint: definition.name?.value || '',
+        }
+
         if (clientV && serverV && clientV !== serverV) {
           throw new GraphQLError('old_client', {
             extensions: {
@@ -327,9 +349,6 @@ apolloServer.start().then(() => {
           })
         }
 
-        const definition = parse(req.body.query).definitions.find(
-          (d) => d.kind === 'OperationDefinition',
-        )
         if (
           definition?.operation === 'mutation' &&
           !id &&
