@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react'
-import ExpandMore from '@material-ui/icons/ExpandMore'
-import MoreVert from '@material-ui/icons/MoreVert'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import MoreVert from '@mui/icons-material/MoreVert'
 import {
   Grid,
   Typography,
@@ -8,12 +8,11 @@ import {
   IconButton,
   Divider,
   Dialog,
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { useTranslation, Trans } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
@@ -278,8 +277,8 @@ const MenuActions = ({ gym, perms, hasRaid, badge, setBadge }) => {
 
   return (
     <Grid item xs={2} style={{ textAlign: 'right' }}>
-      <IconButton aria-haspopup="true" onClick={handleClick}>
-        <MoreVert style={{ color: 'white' }} />
+      <IconButton aria-haspopup="true" onClick={handleClick} size="large">
+        <MoreVert />
       </IconButton>
       <Dropdown
         anchorEl={anchorEl}
@@ -611,9 +610,8 @@ const Timer = ({ gym, start, t, hasHatched }) => {
 }
 
 const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
-  const classes = useStyles()
   const { lat, lon } = gym
-
+  const darkMode = useStore((s) => s.darkMode)
   const handleExpandClick = (category) => {
     setPopups({
       ...popups,
@@ -625,14 +623,11 @@ const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
     <>
       {hasRaid && perms.raids && perms.gyms && (
         <Grid item xs={4}>
-          <IconButton
-            className={classes.expand}
-            onClick={() => handleExpandClick('raids')}
-            aria-expanded={popups.raids}
-          >
+          <IconButton onClick={() => handleExpandClick('raids')} size="large">
             <img
               src={Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
               alt={popups.raids ? 'gyms' : 'raids'}
+              className={darkMode ? '' : 'darken-image'}
               height={20}
               width="auto"
             />
@@ -645,11 +640,11 @@ const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
       {perms.gyms && (
         <Grid item xs={4}>
           <IconButton
-            className={popups.extras ? classes.expandOpen : classes.expand}
+            className={popups.extras ? 'expanded' : 'closed'}
             onClick={() => handleExpandClick('extras')}
-            aria-expanded={popups.extras}
+            size="large"
           >
-            <ExpandMore style={{ color: 'white' }} />
+            <ExpandMore />
           </IconButton>
         </Grid>
       )}

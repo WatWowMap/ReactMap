@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import MoreVert from '@material-ui/icons/MoreVert'
+import MoreVert from '@mui/icons-material/MoreVert'
 import {
   Grid,
   Typography,
@@ -7,38 +7,50 @@ import {
   Divider,
   Menu,
   MenuItem,
-} from '@material-ui/core'
+  Button,
+} from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic } from '@hooks/useStore'
+import { useStore, useStatic, useDialogStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
+import NestSubmission from '@components/layout/dialogs/NestSubmission'
+
+const getColor = (timeSince) => {
+  let color = 'success'
+  if (timeSince > 604800) {
+    color = '#ffeb3b'
+  }
+  if (timeSince > 1209600) {
+    color = 'error'
+  }
+  return color
+}
 
 export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
   const { t } = useTranslation()
+  const { setHideList, setExcludeList } = useStatic.getState()
+  const { setFilters } = useStore.getState()
+
   const hideList = useStatic((state) => state.hideList)
-  const setHideList = useStatic((state) => state.setHideList)
   const excludeList = useStatic((state) => state.excludeList)
-  const setExcludeList = useStatic((state) => state.setExcludeList)
+  const { perms, loggedIn } = useStatic((s) => s.auth)
+
   const filters = useStore((state) => state.filters)
-  const setFilters = useStore((state) => state.setFilters)
+
   const [parkName, setParkName] = useState(true)
   const [anchorEl, setAnchorEl] = useState(false)
-  const { id = 0, name = '', updated = 0, pokemon_avg = 0 } = nest
+
+  const {
+    id = '0',
+    name = '',
+    updated = 0,
+    pokemon_avg = 0,
+    submitted_by = '',
+  } = nest
 
   const lastUpdated = Utility.getTimeUntil(new Date(updated * 1000))
-
-  const getColor = (timeSince) => {
-    let color = '#00e676'
-    if (timeSince > 604800) {
-      color = '#ffeb3b'
-    }
-    if (timeSince > 1209600) {
-      color = '#ff5722'
-    }
-    return color
-  }
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -89,7 +101,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
         style={{ width: 200 }}
         spacing={1}
       >
-        <Grid item xs={9}>
+        <Grid item xs={9} style={{ textAlign: 'center' }}>
           <Typography
             variant={name.length > 20 ? 'subtitle2' : 'h6'}
             align="center"
@@ -98,10 +110,20 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
           >
             {name}
           </Typography>
+          {submitted_by && (
+            <Typography
+              variant="caption"
+              fontSize={10}
+              noWrap={parkName}
+              onClick={() => setParkName(!parkName)}
+            >
+              {t('submitted_by')}: {submitted_by}
+            </Typography>
+          )}
         </Grid>
         <Grid item xs={3}>
-          <IconButton aria-haspopup="true" onClick={handleClick}>
-            <MoreVert style={{ color: 'white' }} />
+          <IconButton aria-haspopup="true" onClick={handleClick} size="large">
+            <MoreVert />
           </IconButton>
         </Grid>
         <Menu
@@ -140,7 +162,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
           <Typography variant="subtitle2">{t('last_updated')}</Typography>
           <Typography
             variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'}
-            style={{ color: getColor(lastUpdated.diff) }}
+            color={getColor(lastUpdated.diff)}
           >
             {lastUpdated.str
               .replace('days', t('days'))
@@ -151,7 +173,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Divider style={{ color: 'white', margin: 4 }} />
+          <Divider style={{ margin: 4 }} />
         </Grid>
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           {recent ? (
@@ -168,7 +190,18 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
             </Typography>
           )}
         </Grid>
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Button
+            color="secondary"
+            variant="contained"
+            disabled={!perms.nestSubmissions || !loggedIn}
+            onClick={() => useDialogStore.setState({ nestSubmissions: id })}
+          >
+            {t('submit_nest_name')}
+          </Button>
+        </Grid>
       </Grid>
+      <NestSubmission {...nest} />
     </ErrorBoundary>
   )
 }

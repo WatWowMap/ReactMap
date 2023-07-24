@@ -1,20 +1,13 @@
 import React, { Fragment, useState, useEffect } from 'react'
-import ExpandMore from '@material-ui/icons/ExpandMore'
-import MoreVert from '@material-ui/icons/MoreVert'
-import {
-  Grid,
-  Typography,
-  Collapse,
-  IconButton,
-  Divider,
-} from '@material-ui/core'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import MoreVert from '@mui/icons-material/MoreVert'
+import { Grid, Typography, Collapse, IconButton, Divider } from '@mui/material'
 
 import { useTranslation, Trans } from 'react-i18next'
 
 import ErrorBoundary from '@components/ErrorBoundary'
 import { Check, Help } from '@components/layout/general/Icons'
 import { useStore, useStatic } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
 import Utility from '@services/Utility'
 
 import Dropdown from './common/Dropdown'
@@ -399,8 +392,8 @@ const MenuActions = ({
   }
   return (
     <Grid item xs={2} style={{ textAlign: 'right' }}>
-      <IconButton aria-haspopup="true" onClick={handleClick}>
-        <MoreVert style={{ color: 'white' }} />
+      <IconButton aria-haspopup="true" onClick={handleClick} size="large">
+        <MoreVert />
       </IconButton>
       <Dropdown
         anchorEl={anchorEl}
@@ -570,7 +563,6 @@ const QuestConditions = ({ quest, t, userSettings }) => {
 }
 
 const Footer = ({ pokestop, perms }) => {
-  const classes = useStyles()
   const open = useStore((state) => !!state.popups.extras)
 
   return (
@@ -587,15 +579,15 @@ const Footer = ({ pokestop, perms }) => {
       {perms.allPokestops && (
         <Grid item xs={3} style={{ textAlign: 'center' }}>
           <IconButton
-            className={open ? classes.expandOpen : classes.expand}
+            className={open ? 'expanded' : 'closed'}
             onClick={() =>
               useStore.setState((prev) => ({
                 popups: { ...prev.popups, extras: !open },
               }))
             }
-            aria-expanded={open}
+            size="large"
           >
-            <ExpandMore style={{ color: 'white' }} />
+            <ExpandMore />
           </IconButton>
         </Grid>
       )}
@@ -721,7 +713,7 @@ const Invasion = ({ invasion, Icons, t }) => {
         {invasion.confirmed ? (
           <Check fontSize="medium" color="action" />
         ) : (
-          <Help fontSize="medium" style={{ color: 'white' }} />
+          <Help fontSize="medium" />
         )}
       </Grid>
       <Grid item xs={12}>

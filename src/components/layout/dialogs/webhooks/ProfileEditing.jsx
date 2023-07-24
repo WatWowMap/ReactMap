@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import Clear from '@material-ui/icons/Clear'
-import Edit from '@material-ui/icons/Edit'
-import DeleteForever from '@material-ui/icons/DeleteForever'
-import Save from '@material-ui/icons/Save'
-import FileCopy from '@material-ui/icons/FileCopy'
+import Clear from '@mui/icons-material/Clear'
+import Edit from '@mui/icons-material/Edit'
+import DeleteForever from '@mui/icons-material/DeleteForever'
+import Save from '@mui/icons-material/Save'
+import FileCopy from '@mui/icons-material/FileCopy'
 import {
   DialogContent,
   Grid,
@@ -16,7 +16,7 @@ import {
   Divider,
   TextField,
   IconButton,
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { Trans, useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
@@ -192,17 +192,24 @@ export default function ProfileEditing({
       profiles[profile].profile_no
     return (
       <Grid item sm={isMobile ? 6 : 3} style={{ textAlign: 'right' }}>
-        <IconButton onClick={() => setViews({ ...views, [profile]: 'edit' })}>
-          <Edit style={{ color: 'white' }} />
+        <IconButton
+          onClick={() => setViews({ ...views, [profile]: 'edit' })}
+          size="large"
+        >
+          <Edit />
         </IconButton>
         <IconButton
           onClick={() => setViews({ ...views, [profile]: 'delete' })}
           disabled={disabled}
+          size="large"
         >
-          <DeleteForever style={{ color: disabled ? 'inherit' : 'white' }} />
+          <DeleteForever />
         </IconButton>
-        <IconButton onClick={() => setViews({ ...views, [profile]: 'copy' })}>
-          <FileCopy style={{ color: 'white' }} />
+        <IconButton
+          onClick={() => setViews({ ...views, [profile]: 'copy' })}
+          size="large"
+        >
+          <FileCopy />
         </IconButton>
       </Grid>
     )
@@ -224,8 +231,14 @@ export default function ProfileEditing({
   return (
     <>
       <Header titles={['manage_profiles']} action={() => handleClose(false)} />
-      <DialogContent style={{ marginBottom: 20 }}>
-        <Grid container spacing={2} alignItems="center" justifyContent="center">
+      <DialogContent sx={{ my: 2 }}>
+        <Grid
+          container
+          spacing={2}
+          alignItems="center"
+          justifyContent="center"
+          py={2}
+        >
           <Grid item xs={12} sm={4}>
             <Typography variant="h6" align="center">
               {t('add_new_profile')}
@@ -233,6 +246,7 @@ export default function ProfileEditing({
           </Grid>
           <Grid item xs={7} sm={5}>
             <TextField
+              size="small"
               autoComplete="off"
               label={
                 profiles[newProfile] || newProfile === 'all'
@@ -298,7 +312,6 @@ export default function ProfileEditing({
                                 schedule.hours
                               }:${String(schedule.mins).padStart(2, '0')}`}
                               clickable
-                              variant="default"
                               deleteIcon={<Clear />}
                               size={isMobile ? 'small' : 'medium'}
                               color="secondary"
@@ -345,13 +358,15 @@ export default function ProfileEditing({
                             onClick={() =>
                               setViews({ ...views, [profile]: 'profile' })
                             }
+                            size="large"
                           >
-                            <Clear style={{ color: 'white' }} />
+                            <Clear />
                           </IconButton>
                           <IconButton
                             onClick={() => handleAddSchedule(profile)}
+                            size="large"
                           >
-                            <Save style={{ color: 'white' }} />
+                            <Save />
                           </IconButton>
                         </Grid>
                       </>
@@ -368,13 +383,15 @@ export default function ProfileEditing({
                             onClick={() =>
                               setViews({ ...views, [profile]: 'profile' })
                             }
+                            size="large"
                           >
-                            <Clear style={{ color: 'white' }} />
+                            <Clear />
                           </IconButton>
                           <IconButton
                             onClick={() => handleRemoveProfile(profile)}
+                            size="large"
                           >
-                            <Save style={{ color: 'white' }} />
+                            <Save />
                           </IconButton>
                         </Grid>
                       </>
@@ -395,7 +412,7 @@ export default function ProfileEditing({
                         >
                           <Grid item xs={12} sm={6}>
                             <Select
-                              value={copyTo[profile]}
+                              value={copyTo[profile] || ''}
                               onChange={(e) =>
                                 setCopyTo({
                                   ...copyTo,
@@ -416,21 +433,16 @@ export default function ProfileEditing({
                               onClick={() =>
                                 setViews({ ...views, [profile]: 'profile' })
                               }
+                              size="large"
                             >
-                              <Clear style={{ color: 'white' }} />
+                              <Clear />
                             </IconButton>
                             <IconButton
                               onClick={() => handleCopyProfile(profile)}
                               disabled={profile === copyTo[profile]}
+                              size="large"
                             >
-                              <Save
-                                style={{
-                                  color:
-                                    profile === copyTo[profile]
-                                      ? 'inherit'
-                                      : 'white',
-                                }}
-                              />
+                              <Save />
                             </IconButton>
                           </Grid>
                         </Grid>

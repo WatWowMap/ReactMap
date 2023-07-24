@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Dialog, DialogContent, Grid, Typography } from '@material-ui/core'
+import { Dialog, DialogContent, Grid, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'

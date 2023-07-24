@@ -1,11 +1,8 @@
-import React, { useState } from 'react'
-import { Dialog, Snackbar } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
+import * as React from 'react'
+import Dialog from '@mui/material/Dialog'
 
 import Utility from '@services/Utility'
-import useStyles from '@hooks/useStyles'
 import { useStore, useStatic } from '@hooks/useStore'
-import SlideTransition from '@assets/mui/SlideTransition'
 
 import FloatingBtn from './FloatingBtn'
 import Sidebar from './drawer/Drawer'
@@ -18,6 +15,7 @@ import Motd from './dialogs/Motd'
 import DonorPage from './dialogs/DonorPage'
 import Feedback from './dialogs/Feedback'
 import ResetFilters from './dialogs/ResetFilters'
+import Notification from './general/Notification'
 
 export default function Nav({
   map,
@@ -34,7 +32,6 @@ export default function Nav({
   isMobile,
   isTablet,
 }) {
-  const classes = useStyles()
   const {
     auth: { perms },
     setWebhookAlert,
@@ -56,14 +53,14 @@ export default function Nav({
   const tutorial = useStore((s) => s.tutorial)
   const motdIndex = useStore((s) => s.motdIndex)
 
-  const [drawer, setDrawer] = useState(false)
-  const [donorPage, setDonorPage] = useState(false)
-  const [dialog, setDialog] = useState({
+  const [drawer, setDrawer] = React.useState(false)
+  const [donorPage, setDonorPage] = React.useState(false)
+  const [dialog, setDialog] = React.useState({
     open: false,
     category: '',
     type: '',
   })
-  const [motd, setMotd] = useState(
+  const [motd, setMotd] = React.useState(
     config.map.messageOfTheDay.components?.length &&
       (config.map.messageOfTheDay.index > motdIndex ||
         config.map.messageOfTheDay.settings.permanent) &&
@@ -91,58 +88,72 @@ export default function Nav({
     setMotd(false)
   }
 
-  const toggleDialog = (open, category, type, filter) => (event) => {
-    Utility.analytics(
-      'Menu Toggle',
-      `Open: ${open}`,
-      `Category: ${category} Menu: ${type}`,
-    )
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
+  const toggleDialog =
+    (open, category, type, filter) => (event, searchValue) => {
+      Utility.analytics(
+        'Menu Toggle',
+        `Open: ${open}`,
+        `Category: ${category} Menu: ${type}`,
+      )
+      if (
+        event.type === 'keydown' &&
+        (event.key === 'Tab' || event.key === 'Shift')
+      ) {
+        return
+      }
+      setDialog({ open, category, type })
+      if (typeof searchValue === 'object' && type === 'search') {
+        setManualParams({ id: searchValue.id })
+        map.flyTo([searchValue.lat, searchValue.lon], 16)
+      }
+      if (filter && type === 'filters') {
+        setFilters({ ...filters, [category]: { ...filters[category], filter } })
+      }
+      if (filter && type === 'options') {
+        setUserSettings({ ...userSettings, [category]: filter })
+      }
     }
-    setDialog({ open, category, type })
-    if (filter && type === 'search') {
-      setManualParams({ id: filter.id })
-      map.flyTo([filter.lat, filter.lon], 16)
+
+  React.useEffect(() => {
+    /**
+     * @param {KeyboardEvent} event
+     */
+    const toggleDarkMode = (event) => {
+      // This is mostly meant for development purposes
+      if (event.ctrlKey && event.key === 'd') {
+        useStore.setState((prev) => ({ darkMode: !prev.darkMode }))
+      }
     }
-    if (filter && type === 'filters') {
-      setFilters({ ...filters, [category]: { ...filters[category], filter } })
-    }
-    if (filter && type === 'options') {
-      setUserSettings({ ...userSettings, [category]: filter })
-    }
-  }
+
+    window.addEventListener('keydown', toggleDarkMode)
+    return () => window.removeEventListener('keydown', toggleDarkMode)
+  }, [])
 
   return (
     <>
-      {drawer ? (
-        <Sidebar
-          drawer={drawer}
-          toggleDrawer={toggleDrawer}
-          toggleDialog={toggleDialog}
-        />
-      ) : (
-        <FloatingBtn
-          toggleDrawer={toggleDrawer}
-          toggleDialog={toggleDialog}
-          safeSearch={config.map.searchable}
-          isMobile={isMobile}
-          webhooks={webhooks}
-          webhookMode={webhookMode}
-          setWebhookMode={setWebhookMode}
-          scanNextMode={scanNextMode}
-          setScanNextMode={setScanNextMode}
-          scanZoneMode={scanZoneMode}
-          setScanZoneMode={setScanZoneMode}
-          settings={settings}
-          donationPage={config.map.donationPage}
-          setDonorPage={setDonorPage}
-          setUserProfile={setUserProfile}
-        />
-      )}
+      <Sidebar
+        drawer={drawer}
+        toggleDrawer={toggleDrawer}
+        toggleDialog={toggleDialog}
+      />
+
+      <FloatingBtn
+        toggleDrawer={toggleDrawer}
+        toggleDialog={toggleDialog}
+        safeSearch={config.map.searchable}
+        isMobile={isMobile}
+        webhooks={webhooks}
+        webhookMode={webhookMode}
+        setWebhookMode={setWebhookMode}
+        scanNextMode={scanNextMode}
+        setScanNextMode={setScanNextMode}
+        scanZoneMode={scanZoneMode}
+        setScanZoneMode={setScanZoneMode}
+        settings={settings}
+        donationPage={config.map.donationPage}
+        setDonorPage={setDonorPage}
+        setUserProfile={setUserProfile}
+      />
       <Dialog
         open={userProfile}
         fullScreen={isMobile}
@@ -183,7 +194,8 @@ export default function Nav({
         />
       </Dialog>
       <Dialog
-        maxWidth="sm"
+        fullScreen={isMobile}
+        maxWidth="md"
         open={dialog.open && dialog.type === 'options'}
         onClose={toggleDialog(false, dialog.category, dialog.type)}
       >
@@ -195,12 +207,13 @@ export default function Nav({
       </Dialog>
       <Dialog
         fullScreen={isMobile}
-        classes={{
-          scrollPaper: classes.scrollPaper,
-          container: classes.container,
-        }}
         open={dialog.open && dialog.type === 'search'}
         onClose={toggleDialog(false, dialog.category, dialog.type)}
+        sx={{
+          '& .MuiDialog-container': {
+            alignItems: 'flex-start',
+          },
+        }}
       >
         <Search
           toggleDialog={toggleDialog}
@@ -240,24 +253,18 @@ export default function Nav({
       >
         <ResetFilters />
       </Dialog>
-      <Snackbar
-        open={Boolean(webhookAlert.open)}
-        onClose={() =>
-          setWebhookAlert({ open: false, severity: 'info', message: '' })
+      <Notification
+        open={!!webhookAlert.open}
+        cb={() =>
+          setWebhookAlert({
+            open: false,
+            severity: webhookAlert.severity,
+            message: '',
+          })
         }
-        TransitionComponent={SlideTransition}
-      >
-        <Alert
-          onClose={() =>
-            setWebhookAlert({ open: false, severity: 'info', message: '' })
-          }
-          severity={webhookAlert.severity}
-          variant="filled"
-          style={{ whiteSpace: 'pre-line', textAlign: 'center' }}
-        >
-          {webhookAlert.message}
-        </Alert>
-      </Snackbar>
+        severity={webhookAlert.severity}
+        messages={[webhookAlert.message]}
+      />
     </>
   )
 }

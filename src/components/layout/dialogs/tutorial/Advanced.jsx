@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import Tune from '@material-ui/icons/Tune'
-import Ballot from '@material-ui/icons/Ballot'
-import Check from '@material-ui/icons/Check'
-import Clear from '@material-ui/icons/Clear'
-import Save from '@material-ui/icons/Save'
-import HelpOutline from '@material-ui/icons/HelpOutline'
-import FormatSize from '@material-ui/icons/FormatSize'
+import Tune from '@mui/icons-material/Tune'
+import Ballot from '@mui/icons-material/Ballot'
+import Check from '@mui/icons-material/Check'
+import Clear from '@mui/icons-material/Clear'
+import Save from '@mui/icons-material/Save'
+import HelpOutline from '@mui/icons-material/HelpOutline'
+import FormatSize from '@mui/icons-material/FormatSize'
 
 import {
   Grid,
@@ -14,7 +14,7 @@ import {
   Divider,
   Button,
   Dialog,
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
@@ -25,7 +25,7 @@ import ReactWindow from '@components/layout/general/ReactWindow'
 import Advanced from '../filters/Advanced'
 import Tile from '../filters/MenuTile'
 import SlotSelection from '../filters/SlotSelection'
-import data from './data.json'
+import data from './data'
 
 export default function TutAdvanced({ isMobile, toggleHelp, category }) {
   const { t } = useTranslation()
@@ -180,11 +180,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
             <Divider light />
           </Grid>
           <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-            {isMobile ? (
-              <HelpOutline style={{ color: 'white' }} />
-            ) : (
-              <Typography>{t('help')}</Typography>
-            )}
+            {isMobile ? <HelpOutline /> : <Typography>{t('help')}</Typography>}
           </Grid>
           <Grid item xs={9} sm={8}>
             <Typography variant="subtitle2" align="center">
@@ -192,7 +188,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
             </Typography>
           </Grid>
           <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-            <Ballot style={{ color: 'white' }} />
+            <Ballot />
           </Grid>
           <Grid item xs={9} sm={8}>
             <Typography variant="subtitle2" align="center">
@@ -203,7 +199,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
             <>
               <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
                 {isMobile ? (
-                  <Tune style={{ color: 'white' }} />
+                  <Tune />
                 ) : (
                   <Typography>{t('apply_to_all')}</Typography>
                 )}
@@ -218,7 +214,7 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
             <>
               <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
                 {isMobile ? (
-                  <FormatSize style={{ color: 'white' }} />
+                  <FormatSize />
                 ) : (
                   <Typography>{t('apply_to_all')}</Typography>
                 )}
@@ -230,12 +226,16 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
               </Grid>
             </>
           )}
-          <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
-            {isMobile ? (
-              <Clear color="primary" />
-            ) : (
-              <Typography color="primary">{t('disable_all')}</Typography>
-            )}
+          <Grid
+            item
+            xs={3}
+            sm={4}
+            sx={(theme) => ({
+              color: theme.palette.error.main,
+              textAlign: 'center',
+            })}
+          >
+            {isMobile ? <Clear /> : <Typography>{t('disable_all')}</Typography>}
           </Grid>
           <Grid item xs={9} sm={8}>
             <Typography variant="subtitle2" align="center">
@@ -246,7 +246,10 @@ export default function TutAdvanced({ isMobile, toggleHelp, category }) {
             item
             xs={3}
             sm={4}
-            style={{ color: '#00e676', textAlign: 'center' }}
+            sx={(theme) => ({
+              color: theme.palette.success.light,
+              textAlign: 'center',
+            })}
           >
             {isMobile ? <Check /> : <Typography>{t('enable_all')}</Typography>}
           </Grid>

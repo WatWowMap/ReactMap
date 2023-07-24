@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-duplicate-props */
 import React, { useState, useEffect } from 'react'
-import { Grid, Typography, Slider, TextField } from '@material-ui/core'
+import { Grid, Typography, Slider, TextField } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 export default function SliderTile({
@@ -63,18 +63,25 @@ export default function SliderTile({
 
   const textColor =
     (tempValues && tempValues[0] === min && tempValues[1] === max) || disabled
-      ? '#616161'
-      : 'white'
+      ? 'text.disabled'
+      : 'inherit'
 
+  const translated = t(i18nKey || `slider_${name}`)
   return (
-    <Grid container direction="row" justifyContent="center" alignItems="center">
+    <Grid
+      container
+      direction="row"
+      justifyContent="center"
+      alignItems="center"
+      minWidth={Math.min(window.innerWidth, 260)}
+    >
       <Grid item xs={noTextInput ? 12 : 4}>
         <Typography
           noWrap={fullName}
           onClick={() => setFullName(!fullName)}
-          style={{ color: textColor }}
+          color={textColor}
         >
-          {t(i18nKey || `slider_${name}`)}
+          {translated}
         </Typography>
       </Grid>
       {(noTextInput ? [] : ['min', 'max']).map((each, index) => (
@@ -85,7 +92,7 @@ export default function SliderTile({
           style={{ textAlign: index ? 'center' : 'right' }}
         >
           <TextField
-            style={{ width: 80, color: textColor }}
+            sx={{ width: 80, color: textColor }}
             id={each}
             label={`${t(each)} ${t(label)}`}
             name={name}
@@ -96,10 +103,10 @@ export default function SliderTile({
             type="number"
             disabled={disabled}
             InputLabelProps={{
-              style: { color: textColor },
+              sx: { color: textColor },
             }}
             InputProps={{
-              style: { color: textColor },
+              sx: { color: textColor },
             }}
             inputProps={{
               min,
@@ -109,7 +116,7 @@ export default function SliderTile({
           />
         </Grid>
       ))}
-      <Grid item xs={10} style={{ textAlign: 'center' }}>
+      <Grid item xs={11} style={{ textAlign: 'center' }}>
         <Slider
           name={name}
           min={min}
@@ -122,7 +129,6 @@ export default function SliderTile({
             handleChange(name, newValues, low, high)
           }}
           disabled={disabled}
-          valueLabelDisplay="auto"
           valueLabelFormat={marks ? (e) => t(`${markI18n}${e}`) : undefined}
           step={step}
           marks={

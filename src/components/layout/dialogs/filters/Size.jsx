@@ -1,5 +1,5 @@
 import React from 'react'
-import { ButtonGroup, Button } from '@material-ui/core'
+import { ButtonGroup, Button } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 export default function Size({ filterValues, handleChange, btnSize }) {

@@ -6,7 +6,7 @@ const {
 } = require('../../services/config')
 const { log, HELPERS } = require('../../services/logger')
 /**
- * @typedef {import("knex")} Knex
+ * @typedef {import("knex").Knex} Knex
  */
 
 /**

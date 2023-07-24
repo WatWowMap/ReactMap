@@ -1,10 +1,9 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react'
-import { Collapse, Grid, IconButton, Typography } from '@material-ui/core'
-import ExpandMore from '@material-ui/icons/ExpandMore'
+import { Collapse, Grid, IconButton, Typography } from '@mui/material'
+import ExpandMore from '@mui/icons-material/ExpandMore'
 
 import { useStore } from '@hooks/useStore'
-import useStyles from '@hooks/useStyles'
 
 import Timer from './Timer'
 import NameTT from './NameTT'
@@ -21,7 +20,6 @@ export default function TimeTile({
 }) {
   const endTime = new Date(expireTime * 1000)
   const expanded = useStore((state) => !!state.popups[expandKey])
-  const classes = useStyles()
 
   return (
     <>
@@ -59,13 +57,13 @@ export default function TimeTile({
         <>
           <Grid item xs={2}>
             <IconButton
-              className={expanded ? classes.expandOpen : classes.expand}
-              style={{ color: 'white' }}
+              className={expanded ? 'expanded' : 'closed'}
               onClick={() =>
                 useStore.setState((prev) => ({
                   popups: { ...prev.popups, [expandKey]: !expanded },
                 }))
               }
+              size="large"
             >
               <ExpandMore />
             </IconButton>

@@ -3,34 +3,30 @@ import {
   Divider,
   FormControl,
   InputLabel,
-  List,
   ListItem,
   ListItemIcon,
   MenuItem,
   Select,
-} from '@material-ui/core'
-import TranslateIcon from '@material-ui/icons/Translate'
-import MapIcon from '@material-ui/icons/Map'
-import NavIcon from '@material-ui/icons/Navigation'
-import StyleIcon from '@material-ui/icons/Style'
-import DevicesOtherIcon from '@material-ui/icons/DevicesOther'
+} from '@mui/material'
+import TranslateIcon from '@mui/icons-material/Translate'
+import MapIcon from '@mui/icons-material/Map'
+import NavIcon from '@mui/icons-material/Navigation'
+import StyleIcon from '@mui/icons-material/Style'
+import DevicesOtherIcon from '@mui/icons-material/DevicesOther'
+import Brightness7Icon from '@mui/icons-material/Brightness7'
 
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import DrawerActions from './Actions'
+import BoolToggle from './BoolToggle'
 
-function FCSelect({ name, label, value, onChange, children, icon, color }) {
+function FCSelect({ name, label, value, onChange, children, icon }) {
   return (
     <ListItem dense>
       {icon && <ListItemIcon>{icon}</ListItemIcon>}
-      <FormControl
-        size="small"
-        color={color || 'primary'}
-        fullWidth
-        style={{ margin: '3px 0' }}
-      >
+      <FormControl size="small" fullWidth style={{ margin: '3px 0' }}>
         <InputLabel>{label}</InputLabel>
         <Select
           autoFocus
@@ -38,6 +34,7 @@ function FCSelect({ name, label, value, onChange, children, icon, color }) {
           value={value}
           onChange={onChange}
           fullWidth
+          label={label}
         >
           {children}
         </Select>
@@ -63,9 +60,10 @@ export default function Settings() {
 
   const settings = useStore((s) => s.settings)
   const icons = useStore((s) => s.icons)
+  const darkMode = useStore((s) => s.darkMode)
 
   return (
-    <List dense style={{ width: '100%' }}>
+    <>
       {Object.keys(staticSettings).map((setting) => {
         const Icon = ICON_MAP[setting] || DevicesOtherIcon
         return (
@@ -83,7 +81,7 @@ export default function Settings() {
                 i18n.changeLanguage(target.value)
               }
             }}
-            icon={<Icon style={{ color: 'white' }} />}
+            icon={<Icon />}
           >
             {Object.keys(config[setting]).map((option) => (
               <MenuItem key={option} value={option}>
@@ -109,7 +107,14 @@ export default function Settings() {
             setStaticIcons(Icons)
             setIcons({ ...icons, [target.name]: target.value })
           }}
-          icon={<img src={Icons.getMisc(category)} alt={category} width={24} />}
+          icon={
+            <img
+              src={Icons.getMisc(category)}
+              alt={category}
+              width={24}
+              className={darkMode ? '' : 'darken-image'}
+            />
+          }
         >
           {Icons[category].map((option) => (
             <MenuItem key={option} value={option}>
@@ -121,12 +126,18 @@ export default function Settings() {
           ))}
         </FCSelect>
       ))}
+      <Divider style={{ margin: '10px 0' }} />
+      <BoolToggle field="darkMode" label="dark_mode">
+        <ListItemIcon>
+          <Brightness7Icon />
+        </ListItemIcon>
+      </BoolToggle>
       {!config.map?.separateDrawerActions && (
         <>
           <Divider style={{ margin: '10px 0' }} />
           <DrawerActions />
         </>
       )}
-    </List>
+    </>
   )
 }

@@ -1,7 +1,15 @@
 import * as React from 'react'
-import { Grid, MenuItem, Typography, Checkbox } from '@material-ui/core'
+import {
+  Typography,
+  Checkbox,
+  TableCell,
+  Button,
+  IconButton,
+} from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import Utility from '@services/Utility'
+import Grid2 from '@mui/material/Unstable_Grid2'
 
 export default function AreaTile({
   name,
@@ -9,10 +17,13 @@ export default function AreaTile({
   childAreas,
   scanAreasZoom,
   allAreas,
-  i,
   map,
+  borderRight,
   scanAreas,
   setAreas,
+  colSpan = 1,
+  open,
+  setOpen,
 }) {
   if (!scanAreas) return null
 
@@ -28,22 +39,33 @@ export default function AreaTile({
     childAreas.some((c) => scanAreas.filter.areas.includes(c.properties.key))
   const hasManual =
     feature?.properties?.manual || childAreas.every((c) => c.properties.manual)
+  const color =
+    hasManual || (name ? !childAreas.length : !feature.properties.name)
+      ? 'transparent'
+      : 'none'
 
   return (
-    <Grid
-      item
-      xs={
-        name || (childAreas.length % 2 === 1 && i === childAreas.length - 1)
-          ? 12
-          : 6
-      }
-      style={{
-        border: `1px solid ${feature?.properties?.color || 'grey'}`,
-        backgroundColor: feature?.properties?.fillColor || 'none',
-      }}
+    <TableCell
+      colSpan={colSpan}
+      sx={(theme) => ({
+        bgcolor: theme.palette.background.paper,
+        p: 0,
+        borderRight: borderRight ? 1 : 'inherit',
+        borderColor:
+          theme.palette.grey[theme.palette.mode === 'dark' ? 800 : 200],
+      })}
     >
-      <MenuItem
-        style={{ height: '100%' }}
+      <Grid2
+        container
+        alignItems="center"
+        justifyContent="space-between"
+        component={Button}
+        fullWidth
+        borderRadius={0}
+        variant="text"
+        color="inherit"
+        size="small"
+        wrap="nowrap"
         onClick={() => {
           if (feature?.properties?.center) {
             map.flyTo(
@@ -52,61 +74,79 @@ export default function AreaTile({
             )
           }
         }}
+        sx={(theme) => ({
+          py: name ? 'inherit' : 0,
+          minHeight: 36,
+          textTransform: 'none',
+          '&:hover': {
+            backgroundColor: theme.palette.action.hover,
+          },
+        })}
       >
-        <Grid container alignItems="center" justifyContent="center">
-          <Grid item xs={name ? 11 : 10} style={{ textAlign: 'center' }}>
-            <Typography
-              variant={name ? 'h6' : 'caption'}
-              align="center"
-              style={{ whiteSpace: 'pre-wrap', width: '100%' }}
-            >
-              {name || feature.properties.name ? (
-                Utility.getProperName(
-                  name ||
-                    feature.properties.formattedName ||
-                    feature.properties.name,
-                )
-              ) : (
-                <>&nbsp;</>
-              )}
-            </Typography>
-          </Grid>
-          <Grid item xs={name ? 1 : 2} style={{ textAlign: 'right' }}>
-            <Checkbox
-              size="small"
-              indeterminate={name ? hasSome && !hasAll : false}
-              checked={
+        {!name && hasManual ? null : (
+          <Checkbox
+            size="small"
+            color="secondary"
+            indeterminate={name ? hasSome && !hasAll : false}
+            checked={
+              name
+                ? hasAll
+                : scanAreas.filter.areas.includes(feature.properties.key)
+            }
+            onClick={(e) => e.stopPropagation()}
+            onChange={() =>
+              setAreas(
                 name
-                  ? hasAll
-                  : scanAreas.filter.areas.includes(feature.properties.key)
-              }
-              onClick={(e) => e.stopPropagation()}
-              onChange={() =>
-                setAreas(
-                  name
-                    ? childAreas.map((c) => c.properties.key)
-                    : feature.properties.key,
-                  allAreas,
-                  name ? hasSome : false,
-                )
-              }
-              style={{
-                color:
-                  hasManual ||
-                  (name ? !childAreas.length : !feature.properties.name)
-                    ? feature?.properties?.fillColor ||
-                      feature?.properties?.fill ||
-                      '#212121'
-                    : 'none',
-              }}
-              disabled={
-                (name ? !childAreas.length : !feature.properties.name) ||
-                hasManual
-              }
-            />
-          </Grid>
-        </Grid>
-      </MenuItem>
-    </Grid>
+                  ? childAreas.map((c) => c.properties.key)
+                  : feature.properties.key,
+                allAreas,
+                name ? hasSome : false,
+              )
+            }
+            sx={{
+              p: 1,
+              color,
+              '&.Mui-checked': {
+                color,
+              },
+              '&.Mui-disabled': {
+                color,
+              },
+            }}
+            disabled={
+              (name ? !childAreas.length : !feature.properties.name) ||
+              hasManual
+            }
+          />
+        )}
+        <Typography
+          variant={name ? 'h6' : 'caption'}
+          align="center"
+          style={{ whiteSpace: 'pre-wrap', flexGrow: 1 }}
+        >
+          {name || feature.properties.name ? (
+            Utility.getProperName(
+              name ||
+                feature.properties.formattedName ||
+                feature.properties.name,
+            )
+          ) : (
+            <>&nbsp;</>
+          )}
+        </Typography>
+        {name && setOpen && (
+          <IconButton
+            component="span"
+            className={open === name ? 'expanded' : 'collapsed'}
+            onClick={(e) => {
+              e.stopPropagation()
+              return setOpen((prev) => (prev === name ? '' : name))
+            }}
+          >
+            <ExpandMoreIcon />
+          </IconButton>
+        )}
+      </Grid2>
+    </TableCell>
   )
 }

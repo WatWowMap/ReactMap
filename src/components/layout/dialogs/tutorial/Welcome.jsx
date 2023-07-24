@@ -1,7 +1,7 @@
 import React from 'react'
-import Person from '@material-ui/icons/Person'
-import LockOpen from '@material-ui/icons/LockOpen'
-import { DialogContent, Grid, Typography, Fab } from '@material-ui/core'
+import Person from '@mui/icons-material/Person'
+import LockOpen from '@mui/icons-material/LockOpen'
+import { DialogContent, Grid, Typography, Fab } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
@@ -44,7 +44,7 @@ export default function TutWelcome({ setUserProfile }) {
         container
         direction="row"
         alignItems="center"
-        justifyContent="center"
+        justifyContent="space-evenly"
         spacing={2}
         style={{ height: '100%' }}
       >

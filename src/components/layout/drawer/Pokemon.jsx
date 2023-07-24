@@ -1,5 +1,15 @@
 import React, { useEffect, useState, Fragment } from 'react'
-import { Grid, Typography, Switch, AppBar, Tab, Tabs } from '@material-ui/core'
+import {
+  Grid,
+  Typography,
+  Switch,
+  AppBar,
+  Tab,
+  Tabs,
+  List,
+  ListItem,
+  ListItemText,
+} from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import { useStore } from '@hooks/useStore'
@@ -7,7 +17,7 @@ import Utility from '@services/Utility'
 import StringFilter from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 import TabPanel from '../general/TabPanel'
-import GenderFilter from '../dialogs/filters/Gender'
+import MultiSelector from './MultiSelector'
 
 export default function WithSliders({ category, context }) {
   const userSettings = useStore((state) => state.userSettings)
@@ -57,142 +67,124 @@ export default function WithSliders({ category, context }) {
 
   return (
     <>
-      <Grid item xs={6}>
-        <Typography>{t('enabled')}</Typography>
-      </Grid>
-      <Grid item xs={6} style={{ textAlign: 'right' }}>
-        <Switch
-          checked={filters[category].enabled}
-          onChange={() => {
-            setFilters({
-              ...filters,
-              [category]: {
-                ...filters[category],
-                enabled: !filters[category].enabled,
-              },
-            })
-          }}
-        />
-      </Grid>
+      <ListItem
+        secondaryAction={
+          <Switch
+            checked={filters[category].enabled}
+            onChange={() => {
+              setFilters({
+                ...filters,
+                [category]: {
+                  ...filters[category],
+                  enabled: !filters[category].enabled,
+                },
+              })
+            }}
+          />
+        }
+      >
+        <ListItemText primary={t('enabled')} />
+      </ListItem>
+
       {userSettings[category].legacyFilter && context.legacy ? (
-        <>
-          <Grid item xs={12}>
-            <Typography>{t('iv_or_filter')}</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <StringFilter
-              filterValues={tempLegacy}
-              setFilterValues={setTempLegacy}
-            />
-          </Grid>
-        </>
+        <ListItem>
+          <StringFilter
+            filterValues={tempLegacy}
+            setFilterValues={setTempLegacy}
+          />
+        </ListItem>
       ) : (
         <>
           <AppBar position="static">
-            <Tabs
-              value={openTab}
-              onChange={handleTabChange}
-              indicatorColor="secondary"
-              variant="fullWidth"
-              style={{ backgroundColor: '#424242' }}
-            >
+            <Tabs value={openTab} onChange={handleTabChange}>
               {Object.keys(context.sliders).map((slider) => (
-                <Tab
-                  label={t(slider)}
-                  key={slider}
-                  style={{ width: 5, minWidth: 5 }}
-                />
+                <Tab label={t(slider)} key={slider} />
               ))}
             </Tabs>
           </AppBar>
           {Object.keys(context.sliders).map((slider, index) => (
             <TabPanel value={openTab} index={index} key={slider}>
-              <Grid
-                container
-                item
-                xs={12}
-                direction="row"
-                alignItems="center"
-                justifyContent="center"
-                style={{ paddingTop: 4 }}
-              >
+              <List>
                 {Object.values(context.sliders[slider]).map((subItem) => (
-                  <Grid item xs={12} key={subItem.name}>
+                  <ListItem key={subItem.name} disablePadding>
                     <SliderTile
                       filterSlide={subItem}
                       handleChange={handleChange}
                       filterValues={filters[category].ivOr}
                     />
-                  </Grid>
+                  </ListItem>
                 ))}
                 {index ? (
-                  <>
-                    {['xxs', 'xxl'].map((each, i) => (
-                      <Fragment key={each}>
-                        <Grid item xs={3}>
-                          <Typography variant="subtitle2" align="center">
-                            {t(i ? 'size_5' : 'size_1')}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Switch
-                            color="primary"
-                            checked={filters[category].ivOr[each]}
-                            onChange={() => {
-                              setFilters({
-                                ...filters,
-                                [category]: {
-                                  ...filters[category],
-                                  ivOr: {
-                                    ...filters[category].ivOr,
-                                    [each]: !filters[category].ivOr[each],
+                  <ListItem disablePadding>
+                    <Grid container alignItems="center">
+                      {['xxs', 'xxl'].map((each, i) => (
+                        <Fragment key={each}>
+                          <Grid item xs={3}>
+                            <Typography variant="subtitle2" align="center">
+                              {t(i ? 'size_5' : 'size_1')}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={3}>
+                            <Switch
+                              color="primary"
+                              checked={filters[category].ivOr[each]}
+                              onChange={() => {
+                                setFilters({
+                                  ...filters,
+                                  [category]: {
+                                    ...filters[category],
+                                    ivOr: {
+                                      ...filters[category].ivOr,
+                                      [each]: !filters[category].ivOr[each],
+                                    },
                                   },
-                                },
-                              })
-                            }}
-                          />
-                        </Grid>
-                      </Fragment>
-                    ))}
-                  </>
+                                })
+                              }}
+                            />
+                          </Grid>
+                        </Fragment>
+                      ))}
+                    </Grid>
+                  </ListItem>
                 ) : (
                   <>
-                    {['zeroIv', 'hundoIv'].map((each) => (
-                      <Fragment key={each}>
-                        <Grid item xs={3}>
-                          <Typography>
-                            {t(Utility.camelToSnake(each))}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Switch
-                            color="primary"
-                            disabled={!context[each]}
-                            checked={filters[category][each]}
-                            onChange={() => {
-                              setFilters({
-                                ...filters,
-                                [category]: {
-                                  ...filters[category],
-                                  [each]: !filters[category][each],
-                                },
-                              })
-                            }}
-                          />
-                        </Grid>
-                      </Fragment>
-                    ))}
-                    <Grid
-                      container
-                      alignItems="center"
-                      justifyContent="flex-start"
-                      item
-                      xs={category ? 12 : 6}
-                      style={{ margin: '10px 0' }}
-                    >
-                      <GenderFilter
-                        filter={filters[category].ivOr}
-                        setFilter={(newValue) =>
+                    <ListItem disablePadding>
+                      <Grid container alignItems="center">
+                        {['zeroIv', 'hundoIv'].map((each) => (
+                          <Fragment key={each}>
+                            <Grid item xs={3}>
+                              <Typography noWrap>
+                                {t(Utility.camelToSnake(each))}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={3}>
+                              <Switch
+                                color="primary"
+                                disabled={!context[each]}
+                                checked={filters[category][each]}
+                                onChange={() => {
+                                  setFilters({
+                                    ...filters,
+                                    [category]: {
+                                      ...filters[category],
+                                      [each]: !filters[category][each],
+                                    },
+                                  })
+                                }}
+                              />
+                            </Grid>
+                          </Fragment>
+                        ))}
+                      </Grid>
+                    </ListItem>
+                    <ListItem disablePadding sx={{ pt: 2, pr: 1 }}>
+                      <ListItemText primary={t('gender')} />
+                      <MultiSelector
+                        filterKey="gender"
+                        items={[0, 1, 2, 3]}
+                        tKey="gender_icon_"
+                        filters={filters[category].ivOr.gender}
+                        setFilters={(newValue) =>
                           setFilters({
                             ...filters,
                             [category]: {
@@ -204,12 +196,11 @@ export default function WithSliders({ category, context }) {
                             },
                           })
                         }
-                        category="pokemon"
                       />
-                    </Grid>
+                    </ListItem>
                   </>
                 )}
-              </Grid>
+              </List>
             </TabPanel>
           ))}
         </>

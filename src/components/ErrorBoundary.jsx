@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react'
-import { Grid, Typography, Button } from '@material-ui/core'
-import Refresh from '@material-ui/icons/Refresh'
+import { Grid, Typography, Button } from '@mui/material'
+import Refresh from '@mui/icons-material/Refresh'
 import { withTranslation } from 'react-i18next'
 
 // This component uses React Classes due to componentDidCatch() not being available in React Hooks
@@ -40,18 +40,10 @@ class ErrorBoundary extends Component {
         }
       >
         <Grid item xs={12}>
-          <Typography
-            variant={this.props.variant || 'h3'}
-            align="center"
-            style={{ color: 'white' }}
-          >
+          <Typography variant={this.props.variant || 'h3'} align="center">
             {this.props.t('react_error')}
           </Typography>
-          <Typography
-            variant="subtitle2"
-            align="center"
-            style={{ color: 'white' }}
-          >
+          <Typography variant="subtitle2" align="center">
             {this.state.message}
           </Typography>
           {!this.props.noRefresh && (

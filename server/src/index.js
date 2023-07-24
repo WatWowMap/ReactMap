@@ -24,6 +24,7 @@ const http = require('http')
 const { GraphQLError } = require('graphql')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
+const NodeCache = require('node-cache')
 
 const config = require('./services/config')
 const { log, HELPERS } = require('./services/logger')
@@ -43,6 +44,8 @@ if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')
 }
 
+const errorCache = new NodeCache({ stdTTL: 60 * 60 })
+
 const app = express()
 const httpServer = http.createServer(app)
 const apolloServer = new ApolloServer({
@@ -50,34 +53,38 @@ const apolloServer = new ApolloServer({
   resolvers,
   introspection: config.devOptions.enabled,
   formatError: (e) => {
+    let customMessage = ''
     if (e?.message.includes('skipUndefined()') || e?.message === 'old_client') {
-      log.info(
-        HELPERS.gql,
-        'Old client detected, forcing user to refresh, no need to report this error unless it continues to happen',
-      )
-      log.info(
-        HELPERS.gql,
-        'Client:',
-        e.extensions.clientV,
-        'Server:',
-        e.extensions.serverV,
-        'User:',
-        e.extensions.username || 'Not Logged In',
-      )
-      return { message: 'old_client' }
+      customMessage =
+        'old client detected, forcing user to refresh, no need to report this error unless it continues to happen'
+    } else if (e.message === 'session_expired') {
+      customMessage =
+        'user session expired, forcing logout, no need to report this error unless it continues to happen'
+    } else if (e.message === 'unauthenticated') {
+      customMessage =
+        'user is not authenticated, forcing logout, no need to report this error unless it continues to happen'
     }
-    if (e.message === 'session_expired') {
-      log.debug(
-        HELPERS.gql,
-        'user session expired, forcing logout, no need to report this error unless it continues to happen',
-      )
-      return { message: 'session_expired' }
-    }
-    log.error(HELPERS.gql, e)
-    if (config.devOptions.enabled) {
+
+    const key = `${e.extensions.id || e.extensions.user}-${e.message}`
+    if (errorCache.has(key)) {
       return e
     }
-    return { message: e.message }
+    errorCache.set(key, true)
+
+    log[customMessage ? 'info' : 'error'](
+      HELPERS.gql,
+      HELPERS[e.extensions.endpoint] ||
+        `[${e.extensions.endpoint?.toUpperCase()}]`,
+      'Client:',
+      e.extensions.clientV,
+      'Server:',
+      e.extensions.serverV,
+      'User:',
+      e.extensions.user || 'Not Logged In',
+      e.extensions.id || '',
+      customMessage || e,
+    )
+    return e
   },
   logger: {
     debug: (...e) => log.debug(HELPERS.gql, ...e),
@@ -111,7 +118,6 @@ const apolloServer = new ApolloServer({
                 '|',
                 context.operationName,
                 '|',
-                'Returning:',
                 returned || 0,
                 '|',
                 `${Date.now() - contextValue.startTime}ms`,
@@ -315,32 +321,47 @@ apolloServer.start().then(() => {
         const definition = parse(req.body.query).definitions.find(
           (d) => d.kind === 'OperationDefinition',
         )
+        const errorCtx = {
+          id,
+          user,
+          clientV,
+          serverV,
+          endpoint: definition.name?.value || '',
+        }
 
-        if (clientV && serverV && clientV !== serverV)
+        if (clientV && serverV && clientV !== serverV) {
           throw new GraphQLError('old_client', {
             extensions: {
-              clientV,
-              serverV,
-              user,
+              ...errorCtx,
               http: { status: 464 },
               code: ApolloServerErrorCode.BAD_USER_INPUT,
             },
           })
-        if (
-          !perms ||
-          (definition?.operation === 'mutation' &&
-            !id &&
-            definition?.name?.value !== 'SetTutorial')
-        )
+        }
+
+        if (!perms) {
           throw new GraphQLError('session_expired', {
             extensions: {
-              clientV,
-              serverV,
-              user,
+              ...errorCtx,
+              http: { status: 511 },
+              code: 'EXPIRED',
+            },
+          })
+        }
+
+        if (
+          definition?.operation === 'mutation' &&
+          !id &&
+          definition?.name?.value !== 'SetTutorial'
+        ) {
+          throw new GraphQLError('unauthenticated', {
+            extensions: {
+              ...errorCtx,
               http: { status: 401 },
               code: 'UNAUTHENTICATED',
             },
           })
+        }
 
         return {
           req,
@@ -351,6 +372,7 @@ apolloServer.start().then(() => {
           user,
           transaction,
           token: req.headers.token,
+          operation: definition?.operation,
         }
       },
     }),

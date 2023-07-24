@@ -35,6 +35,7 @@ export const fancyMarker = (
   weatherCheck,
   timeOfDay,
   userSettings,
+  levelCircle,
 ) => {
   const { pokemon: pokemonMod, weather: weatherMod } = Icons.modifiers
   const badge = getBadge(pkmn.bestPvp)
@@ -42,7 +43,11 @@ export const fancyMarker = (
   const ReactIcon = (
     <div
       className="marker-image-holder top-overlay"
-      style={{ opacity: getOpacity(pkmn.expire_timestamp) }}
+      style={{
+        opacity: userSettings.pokemonOpacity
+          ? getOpacity(pkmn.expire_timestamp, userSettings)
+          : 1,
+      }}
     >
       <img
         src={iconUrl}
@@ -90,6 +95,17 @@ export const fancyMarker = (
           {Math.round(pkmn.iv)}
         </div>
       )}
+      {levelCircle && !badge && (
+        <div
+          className="iv-badge"
+          style={{
+            bottom: (size / 1.5) * pokemonMod.offsetY,
+            left: `${pokemonMod.offsetX * size * 5}%`,
+          }}
+        >
+          L{Math.round(pkmn.level)}
+        </div>
+      )}
       {userSettings?.showSizeIndicator &&
         Number.isInteger(pkmn.size) &&
         pkmn.size !== 3 && (
@@ -111,7 +127,7 @@ export const fancyMarker = (
             width: size / 2,
             height: size / 2,
             top: -size * pokemonMod.offsetY,
-            left: `${pokemonMod.offsetX * size * 5}%`,
+            right: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

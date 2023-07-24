@@ -15,7 +15,8 @@ const bytes = (s) => ~-encodeURI(s).split(/%..|./).length
 
 const jsonSize = (s) => bytes(JSON.stringify(s))
 
-module.exports = class Backup extends Model {
+class Backup extends Model {
+  /** @returns {string} */
   static get tableName() {
     return backupTableName
   }
@@ -30,12 +31,11 @@ module.exports = class Backup extends Model {
   }
 
   static get relationMappings() {
-    // eslint-disable-next-line global-require
-    const User = require('./User')
+    const { Db } = require('../services/initialization')
     return {
       user: {
         relation: Model.BelongsToOneRelation,
-        modelClass: User,
+        modelClass: Db.models.User,
         join: {
           from: `${backupTableName}.userId`,
           to: `${userTableName}.id`,
@@ -44,10 +44,21 @@ module.exports = class Backup extends Model {
     }
   }
 
+  /**
+   *
+   * @param {number} id
+   * @param {number} userId
+   * @returns
+   */
   static async getOne(id, userId) {
     return this.query().findById(id).where('userId', userId)
   }
 
+  /**
+   *
+   * @param {number} userId
+   * @returns
+   */
   static async getAll(userId) {
     return this.query()
       .select(['id', 'name', 'createdAt', 'updatedAt'])
@@ -55,23 +66,49 @@ module.exports = class Backup extends Model {
       .whereNotNull('data')
   }
 
-  static async create({ name, data }, userId) {
-    if (jsonSize(data) > userBackupSizeLimit) throw new Error('Data too large')
+  /**
+   *
+   * @param {{ name: string, data: object }} backup
+   * @param {number} userId
+   * @returns
+   */
+  static async create(backup, userId) {
+    if (jsonSize(backup.data) > userBackupSizeLimit)
+      throw new Error('Data too large')
     const count = await this.query().count().where('userId', userId).first()
     if (count['count(*)'] < userBackupLimits) {
-      return this.query().insert({ userId, name, data: JSON.stringify(data) })
+      return this.query().insert({
+        userId,
+        name: backup.name,
+        data: JSON.stringify(backup.data),
+      })
     }
   }
 
-  static async update({ id, name, data }, userId) {
-    if (jsonSize(data) > userBackupSizeLimit) throw new Error('Data too large')
+  /**
+   *
+   * @param {{ name: string, data: object, id: number | string}} backup
+   * @param {number} userId
+   * @returns
+   */
+  static async update(backup, userId) {
+    if (jsonSize(backup.data) > userBackupSizeLimit)
+      throw new Error('Data too large')
     return this.query()
-      .update({ name, data: JSON.stringify(data) })
-      .where('id', +id)
+      .update({ name: backup.name, data: JSON.stringify(backup.data) })
+      .where('id', +backup.id)
       .where('userId', userId)
   }
 
+  /**
+   *
+   * @param {number} id
+   * @param {number} userId
+   * @returns
+   */
   static async delete(id, userId) {
     return this.query().deleteById(id).where('userId', userId)
   }
 }
+
+module.exports = Backup

@@ -6,7 +6,7 @@ import {
   Select,
   MenuItem,
   Switch,
-} from '@material-ui/core'
+} from '@mui/material'
 import { useMutation } from '@apollo/client'
 import { Trans } from 'react-i18next'
 

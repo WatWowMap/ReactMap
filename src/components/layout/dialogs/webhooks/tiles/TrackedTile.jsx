@@ -1,13 +1,7 @@
 import React, { useState } from 'react'
-import DeleteForever from '@material-ui/icons/DeleteForever'
-import Edit from '@material-ui/icons/Edit'
-import {
-  Grid,
-  Typography,
-  IconButton,
-  Dialog,
-  Checkbox,
-} from '@material-ui/core'
+import DeleteForever from '@mui/icons-material/DeleteForever'
+import Edit from '@mui/icons-material/Edit'
+import { Grid, Typography, IconButton, Dialog, Checkbox } from '@mui/material'
 
 import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 
@@ -99,7 +93,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
       </Grid>
       <Grid item xs={4} sm={3} md={2} style={{ textAlign: 'right' }}>
         <IconButton size="small" onClick={() => setEditDialog(true)}>
-          <Edit style={{ color: 'white' }} />
+          <Edit />
         </IconButton>
         <IconButton
           size="small"
@@ -115,7 +109,7 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
             })
           }}
         >
-          <DeleteForever style={{ color: 'white' }} />
+          <DeleteForever />
         </IconButton>
         <Checkbox
           size="small"

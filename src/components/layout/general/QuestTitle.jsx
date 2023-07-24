@@ -1,5 +1,5 @@
 import React from 'react'
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 import { useTranslation, Trans } from 'react-i18next'
 
 export default function QuestTitle({ questTitle, questTarget }) {

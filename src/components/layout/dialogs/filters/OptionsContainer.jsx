@@ -1,10 +1,9 @@
 import React from 'react'
-import Clear from '@material-ui/icons/Clear'
-import { Grid, Typography, Button, Chip, IconButton } from '@material-ui/core'
+import Clear from '@mui/icons-material/Clear'
+import { Grid, Typography, Button, Chip, IconButton } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
-import useStyles from '@hooks/useStyles'
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
@@ -23,7 +22,6 @@ export default function OptionsContainer({
   toggleDrawer,
 }) {
   const { t } = useTranslation()
-  const classes = useStyles()
   const { [category]: staticMenus } = useStatic((state) => state.menus)
 
   const handleChange = (name, event) => {
@@ -107,7 +105,18 @@ export default function OptionsContainer({
           {t('showing')}: {count.show}/{count.total}
         </Typography>
       </Grid>
-      <Grid item xs={12} className={classes.areaChips}>
+      <Grid
+        item
+        xs={12}
+        sx={(theme) => ({
+          display: 'flex',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          '& > *': {
+            margin: theme.spacing(1),
+          },
+        })}
+      >
         {applied.map((x) => (
           <Chip
             key={x}
@@ -127,8 +136,8 @@ export default function OptionsContainer({
     allFilterMenus.unshift(
       <Grid container key="close" justifyContent="center" alignItems="center">
         <Grid item xs={12} style={{ textAlign: 'right' }}>
-          <IconButton onClick={toggleDrawer(false)}>
-            <Clear style={{ color: 'white' }} />
+          <IconButton onClick={toggleDrawer(false)} size="large">
+            <Clear />
           </IconButton>
         </Grid>
       </Grid>,

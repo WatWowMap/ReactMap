@@ -1,6 +1,6 @@
 import React from 'react'
-import Create from '@material-ui/icons/Create'
-import { Button, Typography, Divider, DialogContent } from '@material-ui/core'
+import Create from '@mui/icons-material/Create'
+import { Button, Typography, Divider, DialogContent } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 import Header from '../general/Header'

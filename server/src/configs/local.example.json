@@ -60,7 +60,6 @@
         "password": "reactmap_paw",
         "database": "reactmap_db",
         "useFor": [
-          "session",
           "user"
         ]
       },
@@ -189,6 +188,11 @@
         "roles": []
       },
       "nests": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "nestSubmissions": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []

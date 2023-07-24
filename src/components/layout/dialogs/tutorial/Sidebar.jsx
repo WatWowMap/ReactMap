@@ -1,24 +1,28 @@
-import React, { useState } from 'react'
-import Menu from '@material-ui/icons/Menu'
-import Settings from '@material-ui/icons/Settings'
+import React from 'react'
+import Menu from '@mui/icons-material/Menu'
+import Settings from '@mui/icons-material/Settings'
+import TuneIcon from '@mui/icons-material/Tune'
+
 import {
   Grid,
   DialogContent,
   Typography,
   Fab,
   Divider,
-  Button,
-} from '@material-ui/core'
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
 import ItemToggle from '@components/layout/drawer/ItemToggle'
-import data from './data.json'
+import data from './data'
 
 export default function TutSidebar({ toggleDialog, isMobile }) {
   const { t } = useTranslation()
-  const [tempFilters, setTempFilters] = useState(data.filters)
   const { perms } = useStatic((state) => state.auth)
 
   const permCheck =
@@ -52,61 +56,39 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
             {t('tutorial_sidebar_1')}
           </Typography>
         </Grid>
-        <Grid
-          container
-          spacing={2}
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          style={{
-            width: 300,
-            border: 'black 4px solid',
-            borderRadius: 20,
-            margin: 10,
-          }}
-        >
-          {Object.keys(tempFilters.pokestops).map((subItem) => {
-            if (subItem === 'filter') {
-              return null
-            }
-            return (
-              <ItemToggle
-                key={subItem}
-                category="pokestops"
-                filters={tempFilters}
-                setFilters={setTempFilters}
-                subItem={subItem}
-              />
-            )
-          })}
-          <Grid
-            item
-            xs={t('drawer_grid_options_width')}
-            style={{ textAlign: 'center' }}
-          >
-            <Button
+        <Grid item xs={12}>
+          <List disablePadding>
+            {Object.keys(data.filters).map((subItem) => {
+              if (subItem === 'filter') {
+                return null
+              }
+              return (
+                <ItemToggle
+                  key={subItem}
+                  category="pokestops"
+                  subItem={subItem}
+                />
+              )
+            })}
+            <ListItemButton
               onClick={toggleDialog(true, 'pokestops', 'options')}
-              variant="contained"
-              color="secondary"
-              startIcon={<Settings style={{ color: 'white' }} />}
-            >
-              {t('options')}
-            </Button>
-          </Grid>
-          <Grid
-            item
-            xs={t('drawer_grid_advanced_width')}
-            style={{ textAlign: 'center' }}
-          >
-            <Button
-              onClick={toggleDialog(true, 'pokestops', 'filters')}
-              variant="contained"
-              color="primary"
               disabled={!permCheck}
             >
-              {t('advanced')}
-            </Button>
-          </Grid>
+              <ListItemIcon>
+                <Settings color="secondary" />
+              </ListItemIcon>
+              <ListItemText primary={t('options')} />
+            </ListItemButton>
+            <ListItemButton
+              onClick={toggleDialog(true, 'pokestops', 'filters')}
+              disabled={!permCheck}
+            >
+              <ListItemIcon>
+                <TuneIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText primary={t('advanced')} />
+            </ListItemButton>
+          </List>
         </Grid>
         <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
           <Typography variant="subtitle1" align="center" gutterBottom>

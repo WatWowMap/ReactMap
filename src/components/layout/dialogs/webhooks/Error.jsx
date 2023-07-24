@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
-import { Grid, Typography } from '@material-ui/core'
+import { Grid, Typography } from '@mui/material'
 
 export default function WebhookError({ selectedWebhook, children }) {
   const { t } = useTranslation()
