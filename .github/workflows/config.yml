@@ -4,6 +4,8 @@ on:
     branches:
       - main
       - develop
+      - developmod
+      - developmod2
 
 env:
   REGISTRY: ghcr.io
