@@ -10,8 +10,8 @@ export default function useLocation(map) {
   const [lc] = useState(() => {
     const LocateFab = Locate.extend({
       _setClasses(state) {
-        if (state === 'requesting') setColor('action')
-        else if (state === 'active') setColor('action')
+        if (state === 'requesting') setColor('secondary')
+        else if (state === 'active') setColor('success')
         else if (state === 'following') setColor('primary')
       },
       _cleanClasses() {
