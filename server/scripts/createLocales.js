@@ -1,10 +1,11 @@
 const fs = require('fs')
 const path = require('path')
+const fetch = require('node-fetch')
+
 const { api } = require('../src/services/config')
 const { log, HELPERS } = require('../src/services/logger')
-const fetchJson = require('../src/services/api/fetchJson')
 
-const appLocalesFolder = path.resolve(__dirname, '../../public/base-locales')
+const appLocalesFolder = path.resolve(__dirname, '../../locales')
 const finalLocalesFolder = path.resolve(__dirname, '../../public/locales')
 const missingFolder = path.resolve(__dirname, '../../public/missing-locales')
 
@@ -20,12 +21,12 @@ const locales = async () => {
   fs.mkdir(finalLocalesFolder, (error) =>
     error
       ? log.info(HELPERS.locales, 'Locales folder already exists, skipping')
-      : log.info(HELPERS.locales, '[LOCALES] locales folder created'),
+      : log.info(HELPERS.locales, 'Locales folder created'),
   )
 
-  const availableRemote = await fetchJson(
+  const availableRemote = await fetch(
     `${api.pogoApiEndpoints.translations}/index.json`,
-  )
+  ).then((res) => res.json())
 
   await Promise.all(
     localTranslations.map(async (locale) => {
@@ -42,11 +43,11 @@ const locales = async () => {
 
       try {
         const hasRemote = availableRemote.includes(locale)
-        const remoteFiles = await fetchJson(
+        const remoteFiles = await fetch(
           `${api.pogoApiEndpoints.translations}/static/locales/${
             hasRemote ? baseName : 'en'
           }.json`,
-        )
+        ).then((res) => res.json())
 
         if (!hasRemote) {
           log.warn(

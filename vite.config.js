@@ -11,6 +11,7 @@ const fs = require('fs')
 const { sentryVitePlugin } = require('@sentry/vite-plugin')
 
 const { log, HELPERS } = require('./server/src/services/logger')
+const { locales } = require('./server/scripts/createLocales')
 
 /**
  * @param {boolean} isDevelopment
@@ -51,7 +52,7 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
   }
 }
 
-module.exports = defineConfig(({ mode }) => {
+module.exports = defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
   const isRelease = process.argv.includes('-r')
 
@@ -75,6 +76,7 @@ module.exports = defineConfig(({ mode }) => {
     log.info(HELPERS.build, `Building production version: ${version}`)
   }
 
+  await locales()
   return {
     plugins: [
       react({
@@ -136,7 +138,7 @@ module.exports = defineConfig(({ mode }) => {
         VERSION: version,
         DEVELOPMENT: mode === 'development',
         CUSTOM: hasCustom,
-        LOCALES: fs.readdirSync(resolve(__dirname, 'public/locales')),
+        LOCALES: fs.readdirSync(resolve(__dirname, './locales')),
       }),
     },
     esbuild: {
