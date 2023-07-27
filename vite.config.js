@@ -52,6 +52,16 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
   }
 }
 
+/**
+ * @returns {import('vite').Plugin}
+ */
+const localePlugin = () => ({
+  name: 'vite-plugin-locales',
+  async buildStart() {
+    await locales()
+  },
+})
+
 module.exports = defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
   const isRelease = process.argv.includes('-r')
@@ -76,7 +86,6 @@ module.exports = defineConfig(async ({ mode }) => {
     log.info(HELPERS.build, `Building production version: ${version}`)
   }
 
-  await locales()
   return {
     plugins: [
       react({
@@ -117,6 +126,7 @@ module.exports = defineConfig(async ({ mode }) => {
             }),
           ]
         : []),
+      localePlugin(),
     ],
     publicDir: 'public',
     resolve: {

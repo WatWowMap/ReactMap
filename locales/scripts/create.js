@@ -7,9 +7,9 @@ const { log, HELPERS } = require('../../server/src/services/logger')
 
 const appLocalesFolder = path.resolve(__dirname, '../')
 const finalLocalesFolder = path.resolve(__dirname, '../../public/locales')
-const missingFolder = path.resolve(__dirname, '../../public/missing-locales')
+const missingFolder = path.resolve(__dirname, '../missing-locales')
 
-const locales = async () => {
+const locales = async (directory = finalLocalesFolder) => {
   if (!api.pogoApiEndpoints.translations)
     log.error(HELPERS.locales, 'No translations endpoint')
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
@@ -18,7 +18,7 @@ const locales = async () => {
     { encoding: 'utf8', flag: 'r' },
   )
 
-  fs.mkdir(finalLocalesFolder, (error) =>
+  fs.mkdir(directory, (error) =>
     error
       ? log.info(HELPERS.locales, 'Locales folder already exists, skipping')
       : log.info(HELPERS.locales, 'Locales folder created'),
@@ -39,7 +39,7 @@ const locales = async () => {
         const baseName = locale.replace('.json', '')
         const trimmedRemoteFiles = {}
 
-        fs.mkdir(`${finalLocalesFolder}/${baseName}`, (error) =>
+        fs.mkdir(`${directory}/${baseName}`, (error) =>
           error ? {} : log.info(HELPERS.locales, locale, `folder created`),
         )
 
@@ -84,7 +84,7 @@ const locales = async () => {
           ...JSON.parse(reactMapTranslations),
         }
         fs.writeFile(
-          path.resolve(finalLocalesFolder, baseName, 'translation.json'),
+          path.resolve(directory, baseName, 'translation.json'),
           JSON.stringify(finalTranslations, null, 2),
           'utf8',
           () => {},
