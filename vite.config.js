@@ -138,7 +138,9 @@ module.exports = defineConfig(async ({ mode }) => {
         VERSION: version,
         DEVELOPMENT: mode === 'development',
         CUSTOM: hasCustom,
-        LOCALES: fs.readdirSync(resolve(__dirname, './locales')),
+        LOCALES: fs
+          .readdirSync(resolve(__dirname, './locales'))
+          .map((x) => x.replace('.json', '')),
       }),
     },
     esbuild: {
