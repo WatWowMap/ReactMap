@@ -14,7 +14,7 @@ const core = gql`
 
 export const getRoute = gql`
   ${core}
-  query Route(id: ID) {
+  query Route($id: ID) {
     route(id: $id) {
       ...CoreRoute
     }
