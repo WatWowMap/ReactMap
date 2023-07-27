@@ -45,37 +45,31 @@ function estimateTokenCount(content) {
 }
 
 /**
- * Recursively gets the sub json of a {@link I18nObject}
- * @param {I18nObject} node
- * @param {(n: Node) => Promise<string>} action
- * @returns {Promise<Node>}
+ * Splits the json into 2048 token chunks
+ * @param {I18nObject} json
+ * @returns {I18nObject[]}
  */
-async function getSubJson(node, action) {
-  if (estimateTokenCount(node) < 4096) {
-    return action(node)
-  }
-  /** @type {I18nObject} */
-  let nextObject = {}
+function splitJson(json) {
+  /** @type {I18nObject[]} */
+  const chunks = []
   /** @type {I18nObject} */
   let pool = {}
   let poolSize = 0
-  for (const key in node) {
-    const nodeSize = estimateTokenCount(node[key])
-    if (nodeSize + poolSize < 4096 * 0.8) {
+  for (const key in json) {
+    const nodeSize = estimateTokenCount(json[key]) + estimateTokenCount(key)
+    if (nodeSize + poolSize < 2048) {
       poolSize += nodeSize
-      pool[key] = node[key]
-      continue
+      pool[key] = json[key]
     } else {
-      const nextItem = await getSubJson(pool, action)
-      nextObject = {
-        ...nextObject,
-        ...(typeof nextItem === 'string' ? JSON.parse(nextItem) : nextItem),
-      }
-      pool = { [key]: node[key] }
+      chunks.push(pool)
+      pool = { [key]: json[key] }
       poolSize = nodeSize
     }
   }
-  return nextObject
+  if (Object.keys(pool).length > 0) {
+    chunks.push(pool)
+  }
+  return chunks
 }
 
 /**
@@ -109,32 +103,20 @@ function matchJSON(str) {
  * Saves the result to the locale file
  * @param {string} locale
  * @param {string} localeFileName
- * @param {I18nObject} existing
  * @param {Node} newTranslations
  */
-function saveResult(locale, localeFileName, existing, newTranslations) {
+function saveResult(locale, localeFileName, newTranslations) {
   try {
-    const reactMapTranslations = { ...existing }
     const chatGptTranslations =
       typeof newTranslations === 'string'
         ? JSON.parse(newTranslations)
         : newTranslations
 
-    log.info(
-      HELPERS.locales,
-      locale,
-      'translated',
-      Object.keys(chatGptTranslations).length,
-      'keys',
-    )
-
-    Object.keys(chatGptTranslations).forEach((key) => {
-      reactMapTranslations[key] = chatGptTranslations[key]
-    })
+    log.info(HELPERS.locales, locale, 'translated successfully, saving to file')
 
     fs.writeFileSync(
       path.resolve(__dirname, '../', localeFileName),
-      JSON.stringify(reactMapTranslations, null, 2),
+      JSON.stringify(chatGptTranslations, null, 2),
       'utf8',
     )
   } catch (e) {
@@ -184,7 +166,7 @@ async function getMissingLocales() {
     const locale = localeFileName.replace('.json', '')
     if (locale === 'en') continue
 
-    const reactMapTranslations = JSON.parse(
+    const localeTranslations = JSON.parse(
       fs.readFileSync(path.resolve(__dirname, '../', localeFileName), {
         encoding: 'utf8',
         flag: 'r',
@@ -194,7 +176,7 @@ async function getMissingLocales() {
     const missingKeys = {}
 
     Object.keys(englishRef).forEach((key) => {
-      if (!reactMapTranslations[key] && typeof englishRef[key] === 'string') {
+      if (!localeTranslations[key] && typeof englishRef[key] === 'string') {
         missingKeys[key] = englishRef[key]
       }
     })
@@ -202,11 +184,37 @@ async function getMissingLocales() {
     if (Object.keys(missingKeys).length === 0) continue
 
     try {
-      const result = await getSubJson(missingKeys, async (node) => {
-        const completion = await sendToGPT(locale, node)
-        return matchJSON(`${completion.data.choices[0].message?.content}`)
-      })
-      saveResult(locale, localeFileName, reactMapTranslations, result)
+      const chunks = splitJson(missingKeys)
+      log.info(
+        HELPERS.locales,
+        locale,
+        'making',
+        chunks.length,
+        'requests to OpenAI',
+      )
+      /** @type {I18nObject[]} */
+      const result = await Promise.all(
+        chunks.map(async (x) => {
+          const raw = await sendToGPT(locale, x)
+          const { content } = raw.data.choices[0].message
+          const clean = matchJSON(`${content}`)
+          try {
+            return JSON.parse(clean)
+          } catch (e) {
+            log.error(e, '\nUnable to parse returned translations\n', {
+              locale,
+              content,
+              clean,
+            })
+            return {}
+          }
+        }),
+      )
+      const mergedJson = result.reduce(
+        (acc, x) => ({ ...acc, ...x }),
+        localeTranslations,
+      )
+      saveResult(locale, localeFileName, mergedJson)
     } catch (error) {
       log.error(HELPERS.locales, error)
     }
