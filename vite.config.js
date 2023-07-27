@@ -11,7 +11,7 @@ const fs = require('fs')
 const { sentryVitePlugin } = require('@sentry/vite-plugin')
 
 const { log, HELPERS } = require('./server/src/services/logger')
-const { locales } = require('./server/scripts/createLocales')
+const { locales } = require('./locales/scripts/create')
 
 /**
  * @param {boolean} isDevelopment
@@ -140,6 +140,7 @@ module.exports = defineConfig(async ({ mode }) => {
         CUSTOM: hasCustom,
         LOCALES: fs
           .readdirSync(resolve(__dirname, './locales'))
+          .filter((x) => x.endsWith('.json'))
           .map((x) => x.replace('.json', '')),
       }),
     },
@@ -159,7 +160,7 @@ module.exports = defineConfig(async ({ mode }) => {
         plugins: [
           // @ts-ignore
           removeFiles({
-            targets: ['dist/base-locales', 'dist/favicon'],
+            targets: ['dist/favicon'],
             hook: 'generateBundle',
           }),
         ],
