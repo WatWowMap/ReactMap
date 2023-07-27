@@ -17,6 +17,22 @@ export const getRoute = gql`
   query Route($id: ID) {
     route(id: $id) {
       ...CoreRoute
+      name
+      description
+      distance_meters
+      duration_seconds
+      start_fort_id
+      end_fort_id
+      reversible
+      tags
+      type
+      updated
+      version
+      waypoints {
+        lat_degrees
+        lng_degrees
+        elevation_in_meters
+      }
     }
   }
 `
@@ -38,22 +54,6 @@ export const getRoutes = gql`
       filters: $filters
     ) {
       ...CoreRoute
-      name
-      description
-      distance_meters
-      duration_seconds
-      start_fort_id
-      end_fort_id
-      reversible
-      tags
-      type
-      updated
-      version
-      waypoints {
-        lat_degrees
-        lon_degrees
-        elevation_in_meters
-      }
     }
   }
 `

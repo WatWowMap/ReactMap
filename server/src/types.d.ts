@@ -241,7 +241,7 @@ export type Head<T extends any[]> = T extends [...infer Head, any]
 
 export interface Waypoint {
   lat_degrees: number
-  lon_degrees: number
+  lng_degrees: number
   elevation_in_meters: number
 }
 

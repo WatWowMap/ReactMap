@@ -225,7 +225,7 @@ module.exports = gql`
 
   type Waypoint {
     lat_degrees: Float
-    lon_degrees: Float
+    lng_degrees: Float
     elevation_in_meters: Float
   }
 

@@ -16,6 +16,10 @@ import routeMarker from '../markers/route'
  */
 const RouteTile = ({ item }) => {
   const [route, setRoute] = React.useState(item)
+  const [open, setOpen] = React.useState(0)
+  const refOne = React.useRef(null)
+  const refTwo = React.useRef(null)
+
   const [getFullRoute, { data }] = useLazyQuery(Query.routes('getOne'), {
     variables: { id: item.id },
   })
@@ -26,14 +30,26 @@ const RouteTile = ({ item }) => {
     }
   }, [data])
 
+  React.useEffect(() => {
+    if (open === 1 && refOne.current) {
+      refOne.current.openPopup()
+    }
+    if (open === 2 && refTwo.current) {
+      refTwo.current.openPopup()
+    }
+  })
+
   const { waypoints = [], ...rest } = route || {}
   return (
     <>
       <Marker
         position={[route.start_lat, route.start_lon]}
         icon={routeMarker(route.image)}
+        ref={refOne}
         eventHandlers={{
-          popupopen: () => getFullRoute({ variables: { id: item.id } }),
+          click: () => getFullRoute({ variables: { id: item.id } }),
+          popupclose: () => setOpen(0),
+          popupopen: () => setOpen(1),
         }}
       >
         <Popup position={[route.start_lat, route.start_lon]}>
@@ -43,8 +59,11 @@ const RouteTile = ({ item }) => {
       <Marker
         position={[route.end_lat, route.end_lon]}
         icon={routeMarker(route.image)}
+        ref={refTwo}
         eventHandlers={{
-          popupopen: () => getFullRoute({ variables: { id: item.id } }),
+          click: () => getFullRoute({ variables: { id: item.id } }),
+          popupclose: () => setOpen(0),
+          popupopen: () => setOpen(2),
         }}
       >
         <Popup position={[route.end_lat, route.end_lon]}>
@@ -52,17 +71,17 @@ const RouteTile = ({ item }) => {
         </Popup>
       </Marker>
       <ErrorBoundary>
-        {waypoints.map((waypoint) => (
+        {(waypoints || []).map((waypoint) => (
           <Circle
-            key={`${waypoint.lat_degrees}-${waypoint.lon_degrees}`}
-            center={[waypoint.lat_degrees, waypoint.lon_degrees]}
-            radius={70}
+            key={`${waypoint.lat_degrees}-${waypoint.lng_degrees}`}
+            center={[waypoint.lat_degrees, waypoint.lng_degrees]}
+            radius={10}
           />
         ))}
         <Polyline
-          positions={waypoints.map((waypoint) => [
+          positions={(waypoints || []).map((waypoint) => [
             waypoint.lat_degrees,
-            waypoint.lon_degrees,
+            waypoint.lng_degrees,
           ])}
           pathOptions={{ color: 'red', fillColor: 'red' }}
         />
