@@ -126,6 +126,7 @@ module.exports = function generateUi(filters, perms) {
           (!ignoredKeys.includes(subKey) && subValue !== undefined) ||
           key === 'weather' ||
           key === 'scanAreas' ||
+          key === 'routes' ||
           (key === 's2cells' && subKey !== 'filter')
         ) {
           switch (key) {
