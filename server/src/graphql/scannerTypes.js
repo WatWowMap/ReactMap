@@ -235,10 +235,10 @@ module.exports = gql`
     description: String
     distance_meters: Int
     duration_seconds: Int
-    start_poi: String
-    end_poi: String
+    start_fort_id: String
     start_lat: Float
     start_lon: Float
+    end_fort_id: String
     end_lat: Float
     end_lon: Float
     image: String

@@ -251,9 +251,9 @@ export interface Route {
   description: string
   distance_meters: number
   duration_seconds: number
-  start_poi: string
-  end_poi: string
+  start_ford_id: string
   start_lat: number
+  end_fort_id: string
   end_lat: number
   start_lon: number
   end_lon: number

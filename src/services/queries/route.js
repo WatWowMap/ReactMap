@@ -42,8 +42,8 @@ export const getRoutes = gql`
       description
       distance_meters
       duration_seconds
-      start_poi
-      end_poi
+      start_fort_id
+      end_fort_id
       reversible
       tags
       type
