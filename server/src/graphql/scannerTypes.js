@@ -222,4 +222,32 @@ module.exports = gql`
     status: String
     message: String
   }
+
+  type Waypoint {
+    lat_degrees: Float
+    lon_degrees: Float
+    elevation_in_meters: Float
+  }
+
+  type Route {
+    id: ID
+    name: String
+    description: String
+    distance_meters: Int
+    duration_seconds: Int
+    start_poi: String
+    end_poi: String
+    start_lat: Float
+    start_lon: Float
+    end_lat: Float
+    end_lon: Float
+    image: String
+    image_border_color: String
+    reversible: Boolean
+    tags: [String]
+    type: Int
+    updated: Int
+    version: Int
+    waypoints: [Waypoint]
+  }
 `

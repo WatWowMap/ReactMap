@@ -104,6 +104,10 @@ module.exports = function buildDefault(perms, available, dbModels) {
             filter: pokemon.full,
           }
         : undefined,
+    routes:
+      perms.routes && dbModels.Route
+        ? { enabled: true, filter: {} }
+        : undefined,
     portals:
       perms.portals && dbModels.Portal
         ? {

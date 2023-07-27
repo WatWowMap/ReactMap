@@ -238,3 +238,31 @@ type Test3 = Parameters<Test['getAll']>
 export type Head<T extends any[]> = T extends [...infer Head, any]
   ? Head
   : any[]
+
+export interface Waypoint {
+  lat_degrees: number
+  lon_degrees: number
+  elevation_in_meters: number
+}
+
+export interface Route {
+  id: string
+  name: string
+  description: string
+  distance_meters: number
+  duration_seconds: number
+  start_poi: string
+  end_poi: string
+  start_lat: number
+  end_lat: number
+  start_lon: number
+  end_lon: number
+  image: string
+  image_border_color: string
+  reversible: boolean
+  tags: string[]
+  type: number
+  updated: number
+  version: number
+  waypoints: Waypoint[]
+}

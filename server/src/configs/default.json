@@ -132,6 +132,7 @@
         "nests",
         "pokestops",
         "pokemon",
+        "routes",
         "wayfarer",
         "s2cells",
         "scanAreas",
@@ -831,6 +832,11 @@
         "roles": []
       },
       "backups": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "routes": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []

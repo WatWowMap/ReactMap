@@ -141,6 +141,18 @@ const resolvers = {
       }
       return {}
     },
+    route: (_, args, { perms, Db }) => {
+      if (perms?.routes) {
+        return Db.query('Route', 'getOne', args.id)
+      }
+      return {}
+    },
+    routes: (_, args, { perms, Db }) => {
+      if (perms?.routes) {
+        return Db.query('Route', 'getAll', perms, args)
+      }
+      return []
+    },
     s2cells: (_, args, { perms }) => {
       if (perms?.s2cells) {
         const { onlyCells } = args.filters
