@@ -245,7 +245,7 @@ export interface Route {
   description: string
   distance_meters: number
   duration_seconds: number
-  start_ford_id: string
+  start_fort_id: string
   start_lat: number
   start_image: string
   end_fort_id: string

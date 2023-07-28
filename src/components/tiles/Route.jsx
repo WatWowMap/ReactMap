@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import { Marker, Polyline, useMapEvent } from 'react-leaflet'
+import { Marker, Polyline, useMapEvents } from 'react-leaflet'
 import { darken } from '@mui/material'
 
 import ErrorBoundary from '@components/ErrorBoundary'
@@ -15,6 +15,7 @@ const POSITIONS = /** @type {const} */ (['start', 'end'])
  * @param {{
  *  item: import('../../../server/src/types').Route
  *  Icons: InstanceType<typeof import("@services/Icons").default>
+ *  map: import("leaflet").Map
  * }} props
  * @returns
  */
@@ -49,8 +50,17 @@ const RouteTile = ({ item, Icons }) => {
     [item.image_border_color],
   )
 
-  useMapEvent('click', ({ originalEvent }) => {
-    if (!originalEvent.defaultPrevented) setClicked(false)
+  useMapEvents({
+    click: ({ originalEvent }) => {
+      if (!originalEvent.defaultPrevented) setClicked(false)
+    },
+    /** @param {{ target: import('leaflet').Map }} args */
+    zoom: ({ target }) => {
+      const pane = target.getPane('routes')
+      if (pane) {
+        pane.hidden = target.getZoom() < 13
+      }
+    },
   })
 
   return (
@@ -85,6 +95,7 @@ const RouteTile = ({ item, Icons }) => {
       <ErrorBoundary>
         <Polyline
           ref={lineRef}
+          pane="routes"
           eventHandlers={{
             click: ({ originalEvent }) => {
               originalEvent.preventDefault()

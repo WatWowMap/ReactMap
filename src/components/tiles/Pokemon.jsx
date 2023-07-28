@@ -4,44 +4,18 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
 import useForcePopup from '@hooks/useForcePopup'
+import { getOffset } from '@services/functions/offset'
 
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
 import ToolTipWrapper from './Timer'
 
-const operator = {
+const OPERATOR = {
   '=': (a, b) => a === b,
   '<': (a, b) => a < b,
   '<=': (a, b) => a <= b,
   '>': (a, b) => a > b,
   '>=': (a, b) => a >= b,
-}
-
-const cyrb53 = (str, seed = 0) => {
-  let h1 = 0xdeadbeef ^ seed
-  let h2 = 0x41c6ce57 ^ seed
-  for (let i = 0, ch; i < str.length; i += 1) {
-    ch = str.charCodeAt(i)
-    h1 = Math.imul(h1 ^ ch, 2654435761)
-    h2 = Math.imul(h2 ^ ch, 1597334677)
-  }
-  h1 =
-    Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
-    Math.imul(h2 ^ (h2 >>> 13), 3266489909)
-  h2 =
-    Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
-    Math.imul(h1 ^ (h1 >>> 13), 3266489909)
-  return [h1, h2]
-}
-
-const getOffset = (coords, type, seed) => {
-  const offOffset = type === 'nearby_cell' ? 0.0002 : 0.00015
-  const rand = cyrb53(seed)
-  return [0, 1].map((i) => {
-    let offset = rand[i] * (0.0002 / 4294967296) - 0.0001
-    offset += offset >= 0 ? -offOffset : offOffset
-    return coords[i] + offset
-  })
 }
 
 const getGlowStatus = (item, userSettings, staticUserSettings) => {
@@ -52,7 +26,7 @@ const getGlowStatus = (item, userSettings, staticUserSettings) => {
     const statKey = ruleValue.perm === 'iv' ? 'iv' : 'bestPvp'
     if (ruleValue.op) {
       if (
-        operator[ruleValue.op](item[statKey], ruleValue.num) &&
+        OPERATOR[ruleValue.op](item[statKey], ruleValue.num) &&
         item[statKey] !== null
       ) {
         glowCount += 1
@@ -114,7 +88,11 @@ const PokemonTile = ({
   const finalLocation = useMemo(
     () =>
       item.seen_type?.startsWith('nearby') || item.seen_type?.includes('lure')
-        ? getOffset([item.lat, item.lon], item.seen_type, item.id)
+        ? getOffset(
+            [item.lat, item.lon],
+            item.seen_type === 'nearby_cell' ? 0.0002 : 0.00015,
+            item.id,
+          )
         : [item.lat, item.lon],
     [item.seen_type],
   )
