@@ -198,6 +198,7 @@ export default function RoutePopup({ end, ...props }) {
             flexWrap: 'wrap',
             justifyContent: 'center',
             alignItems: 'center',
+            textAlign: 'center',
           }}
         >
           {route.tags.map((tag) => (
