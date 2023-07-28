@@ -166,18 +166,18 @@ export default class UIcons {
     }
   }
 
-  getSize(category, filterId) {
+  getSize(category, filter) {
     const refSizes = this.sizes[category]
-    const baseSize = filterId ? refSizes[filterId.size] : refSizes.md
+    const baseSize = filter ? refSizes[filter.size] : refSizes.md
     return this.modifiers[category]
       ? baseSize * this.modifiers[category].sizeMultiplier
       : baseSize
   }
 
-  getModifiers(category) {
-    return this.modifiers[category]
-      ? this.modifiers[category]
-      : this.modifiers.base
+  getModifiers(...categories) {
+    return categories.map((category) =>
+      this.modifiers[category] ? this.modifiers[category] : this.modifiers.base,
+    )
   }
 
   getIconById(id) {

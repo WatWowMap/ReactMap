@@ -13,15 +13,9 @@ export default function nestMarker(
   const { types } = pokemon
   const filterId = `${nest.pokemon_id}-${nest.pokemon_form}`
   const size = Icons.getSize('nest', filters.filter[filterId])
-  const {
-    offsetX,
-    offsetY,
-    popupX,
-    popupY,
-    sizeMultiplier,
-    nestMonSizeMulti = 1,
-  } = Icons.getModifiers('nest')
-  const { nest: nestMod } = Icons.modifiers
+  const [
+    { offsetX, offsetY, popupX, popupY, sizeMultiplier, nestMonSizeMulti = 1 },
+  ] = Icons.getModifiers('nest')
   const opacity = recent ? 1 : 0.5
 
   const ReactIcon = (
@@ -56,8 +50,8 @@ export default function nestMarker(
         style={{
           width: size * nestMonSizeMulti,
           height: size * nestMonSizeMulti,
-          bottom: nestMod.offsetY - 1,
-          left: nestMod.offsetX - 1,
+          bottom: offsetY - 1,
+          left: offsetX - 1,
           opacity,
         }}
       />
@@ -68,8 +62,8 @@ export default function nestMarker(
     iconSize: [size * sizeMultiplier, size * sizeMultiplier],
     iconAnchor: [(size / 2) * offsetX, (size / 0.75) * offsetY],
     popupAnchor: [
-      0 + popupX - nestMod.offsetX * 0.6 + nestMod.popupX,
-      -8 - size + popupY - nestMod.offsetY * 0.6 + nestMod.popupY,
+      0 + popupX - offsetX * 0.6 + popupX,
+      -8 - size + popupY - offsetY * 0.6 + popupY,
     ],
     className: 'nest-marker',
     html: renderToString(ReactIcon),
