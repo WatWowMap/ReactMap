@@ -631,5 +631,6 @@
   "version": "Verison",
   "route_tags": "Route Tags",
   "routes": "Routes",
-  "route_type": "Route Type"
+  "route_type": "Route Type",
+  "routes_subtitle": "View in game routes and relevant information about them on the map"
 }

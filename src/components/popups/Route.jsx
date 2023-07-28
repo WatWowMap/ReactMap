@@ -171,26 +171,28 @@ export default function RoutePopup({ end, ...props }) {
             <TimeSince expireTime={route.updated} />
           </Grid2>
         </Grid2>
-        <Grid2 container xs={12} alignItems="center">
-          <Grid2 flexGrow={1}>
-            <Typography variant="h6" align="center" width="100%" py={0}>
-              {t('route_tags')}
-            </Typography>
+        {!!route.tags.length && (
+          <Grid2 container xs={12} alignItems="center">
+            <Grid2 flexGrow={1}>
+              <Typography variant="h6" align="center" width="100%" py={0}>
+                {t('route_tags')}
+              </Typography>
+            </Grid2>
+            <Grid2>
+              <IconButton
+                className={expanded ? 'expanded' : 'closed'}
+                onClick={() =>
+                  useStore.setState((prev) => ({
+                    // @ts-ignore
+                    popups: { ...prev.popups, tags: !prev.popups.tags },
+                  }))
+                }
+              >
+                <ExpandMore />
+              </IconButton>
+            </Grid2>
           </Grid2>
-          <Grid2>
-            <IconButton
-              className={expanded ? 'expanded' : 'closed'}
-              onClick={() =>
-                useStore.setState((prev) => ({
-                  // @ts-ignore
-                  popups: { ...prev.popups, tags: !prev.popups.tags },
-                }))
-              }
-            >
-              <ExpandMore />
-            </IconButton>
-          </Grid2>
-        </Grid2>
+        )}
         <Collapse
           in={expanded}
           sx={{
