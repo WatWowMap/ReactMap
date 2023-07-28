@@ -16,9 +16,15 @@ export default function TimeSince({ expireTime, until = false }) {
     return () => clearTimeout(timer)
   })
 
+  useEffect(() => {
+    setTimerEnd(Utility.getTimeUntil(endTime, until))
+  }, [expireTime])
+
   return (
     <Typography variant="subtitle2">
-      {timerEnd.str.replace('days', t('days')).replace('day', t('day'))}
+      {expireTime
+        ? timerEnd.str.replace('days', t('days')).replace('day', t('day'))
+        : t('never')}
     </Typography>
   )
 }
