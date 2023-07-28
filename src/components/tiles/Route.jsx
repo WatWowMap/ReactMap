@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import { Marker, Polyline } from 'react-leaflet'
+import { Marker, Polyline, useMapEvent } from 'react-leaflet'
 import { darken } from '@mui/material'
 
 import ErrorBoundary from '@components/ErrorBoundary'
@@ -19,6 +19,12 @@ const POSITIONS = /** @type {const} */ (['start', 'end'])
  * @returns
  */
 const RouteTile = ({ item, Icons }) => {
+  const [clicked, setClicked] = React.useState(false)
+
+  useMapEvent('click', ({ originalEvent }) => {
+    if (!originalEvent.defaultPrevented) setClicked(false)
+  })
+
   const waypoints = React.useMemo(
     () => [
       {
@@ -43,6 +49,10 @@ const RouteTile = ({ item, Icons }) => {
           key={position}
           position={[item[`${position}_lat`], item[`${position}_lon`]]}
           icon={routeMarker(Icons.getMisc(`route-${position}`), position)}
+          eventHandlers={{
+            popupclose: () => setClicked(false),
+            popupopen: () => setClicked(true),
+          }}
         >
           <RoutePopup
             {...item}
@@ -54,25 +64,19 @@ const RouteTile = ({ item, Icons }) => {
       <ErrorBoundary>
         <Polyline
           eventHandlers={{
-            click: ({ target }) => {
-              if (target) {
-                target.setStyle({
-                  color: target.options.clicked
-                    ? `#${item.image_border_color}`
-                    : darken(`#${item.image_border_color}`, 0.2),
-                })
-                target.options.clicked = !target.options.clicked
-              }
+            click: ({ originalEvent }) => {
+              originalEvent.preventDefault()
+              setClicked((prev) => !prev)
             },
             mouseover: ({ target }) => {
-              if (target?.options.clicked !== true) {
+              if (target && !clicked) {
                 target.setStyle({
-                  color: darken(`#${item.image_border_color}`, 0.2),
+                  color: darken(`#${item.image_border_color}`, 0.3),
                 })
               }
             },
             mouseout: ({ target }) => {
-              if (target?.options.clicked !== true) {
+              if (target && !clicked) {
                 target.setStyle({
                   color: `#${item.image_border_color}`,
                 })
@@ -85,8 +89,9 @@ const RouteTile = ({ item, Icons }) => {
             waypoint.lng_degrees,
           ])}
           pathOptions={{
-            color: `#${item.image_border_color}`,
-            fillColor: `#${item.image_border_color}`,
+            color: clicked
+              ? darken(`#${item.image_border_color}`, 0.3)
+              : `#${item.image_border_color}`,
           }}
         />
       </ErrorBoundary>
