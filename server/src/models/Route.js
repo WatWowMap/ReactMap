@@ -46,6 +46,8 @@ class Route extends Model {
     return results.map((result) => {
       if (typeof result.waypoints === 'string') {
         result.waypoints = JSON.parse(result.waypoints)
+      } else if (result.waypoints === null) {
+        result.waypoints = []
       }
       return result
     })
@@ -59,9 +61,13 @@ class Route extends Model {
     const result = await this.query().findById(id)
     if (typeof result.waypoints === 'string') {
       result.waypoints = JSON.parse(result.waypoints)
+    } else if (result.waypoints === null) {
+      result.waypoints = []
     }
     if (typeof result.tags === 'string') {
       result.tags = JSON.parse(result.tags)
+    } else if (result.tags === null) {
+      result.tags = []
     }
     return result
   }

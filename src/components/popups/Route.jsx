@@ -28,7 +28,12 @@ export default function RoutePopup(props) {
 
   React.useEffect(() => {
     if (data?.route) {
-      setRoute({ ...route, ...data.route })
+      setRoute({
+        ...route,
+        ...data.route,
+        waypoints: route.waypoints || [],
+        tags: data.route.tags || [],
+      })
     }
   }, [data])
 
