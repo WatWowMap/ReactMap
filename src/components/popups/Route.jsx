@@ -115,7 +115,7 @@ export default function RoutePopup(props) {
         </Grid2>
         <Grid2 xs={12}>
           <Typography variant="subtitle2" pt={2} pb={1}>
-            {route.description.length > 75
+            {route.description?.length > 75
               ? `${route.description.slice(0, 75).trim()}...`
               : route.description}
           </Typography>
