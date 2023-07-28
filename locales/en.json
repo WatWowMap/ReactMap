@@ -628,7 +628,7 @@
   "mutation_auth_error": "Your request was unsuccessful due to not being logged in",
   "submitted_by": "Submitted By",
   "reversible": "Reversible",
-  "version": "Verison",
+  "version": "Version",
   "route_tags": "Route Tags",
   "routes": "Routes",
   "route_type": "Route Type",
