@@ -11,6 +11,7 @@ const fs = require('fs')
 const { sentryVitePlugin } = require('@sentry/vite-plugin')
 
 const { log, HELPERS } = require('./server/src/services/logger')
+const { locales } = require('./locales/scripts/create')
 
 /**
  * @param {boolean} isDevelopment
@@ -51,7 +52,17 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
   }
 }
 
-module.exports = defineConfig(({ mode }) => {
+/**
+ * @returns {import('vite').Plugin}
+ */
+const localePlugin = () => ({
+  name: 'vite-plugin-locales',
+  async buildStart() {
+    await locales()
+  },
+})
+
+module.exports = defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
   const isRelease = process.argv.includes('-r')
 
@@ -115,6 +126,7 @@ module.exports = defineConfig(({ mode }) => {
             }),
           ]
         : []),
+      localePlugin(),
     ],
     publicDir: 'public',
     resolve: {
@@ -136,7 +148,10 @@ module.exports = defineConfig(({ mode }) => {
         VERSION: version,
         DEVELOPMENT: mode === 'development',
         CUSTOM: hasCustom,
-        LOCALES: fs.readdirSync(resolve(__dirname, 'public/locales')),
+        LOCALES: fs
+          .readdirSync(resolve(__dirname, './locales'))
+          .filter((x) => x.endsWith('.json'))
+          .map((x) => x.replace('.json', '')),
       }),
     },
     esbuild: {
@@ -155,7 +170,7 @@ module.exports = defineConfig(({ mode }) => {
         plugins: [
           // @ts-ignore
           removeFiles({
-            targets: ['dist/base-locales', 'dist/favicon'],
+            targets: ['dist/favicon'],
             hook: 'generateBundle',
           }),
         ],
