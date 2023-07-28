@@ -27,6 +27,7 @@
       "pokemon": 20,
       "pokestops": 300,
       "portals": 300,
+      "routes": 10000,
       "scanAreas": 10000,
       "scanCells": 10,
       "submissionCells": 500,

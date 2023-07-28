@@ -16,6 +16,7 @@ class Route extends Model {
   static async getAll(perms, args, ctx) {
     const { areaRestrictions } = perms
     const { onlyAreas } = args.filters
+
     const query = this.query()
       .select([
         'id',
@@ -23,18 +24,36 @@ class Route extends Model {
         'start_lon',
         'end_lat',
         'end_lon',
-        'image',
-        'image_border_color',
+        'waypoints',
       ])
       .whereBetween('start_lat', [args.minLat, args.maxLat])
       .andWhereBetween('start_lon', [args.minLon, args.maxLon])
+      .union((qb) =>
+        qb
+          .select([
+            'id',
+            'start_lat',
+            'start_lon',
+            'end_lat',
+            'end_lon',
+            'waypoints',
+          ])
+          .whereBetween('end_lat', [args.minLat, args.maxLat])
+          .andWhereBetween('end_lon', [args.minLon, args.maxLon])
+          .from('route'),
+      )
 
     if (!getAreaSql(query, areaRestrictions, onlyAreas, ctx.isMad, 'route')) {
       return []
     }
     const results = await query
 
-    return results
+    return results.map((result) => {
+      if (typeof result.waypoints === 'string') {
+        result.waypoints = JSON.parse(result.waypoints)
+      }
+      return result
+    })
   }
 
   /**
