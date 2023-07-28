@@ -229,12 +229,6 @@ export type PickMatching<T, V> = {
 
 export type ExtractMethods<T> = PickMatching<T, Function>
 
-type Test = ExtractMethods<typeof Badge>
-
-type Test2 = ReturnType<Test['getAll']>
-
-type Test3 = Parameters<Test['getAll']>
-
 export type Head<T extends any[]> = T extends [...infer Head, any]
   ? Head
   : any[]

@@ -1,11 +1,13 @@
 // @ts-check
-import ErrorBoundary from '@components/ErrorBoundary'
 import * as React from 'react'
-import { CircleMarker, Marker, Polyline, Popup } from 'react-leaflet'
-import { useLazyQuery } from '@apollo/client'
-import Query from '@services/Query'
+import { CircleMarker, Marker, Polyline } from 'react-leaflet'
+
+import ErrorBoundary from '@components/ErrorBoundary'
+import RoutePopup from '@components/popups/Route'
 
 import routeMarker from '../markers/route'
+
+const POSITIONS = /** @type {const} */ (['start', 'end'])
 
 /**
  *
@@ -16,75 +18,39 @@ import routeMarker from '../markers/route'
  * @returns
  */
 const RouteTile = ({ item, Icons }) => {
-  const [route, setRoute] = React.useState({
-    ...item,
-    waypoints: [
+  const waypoints = React.useMemo(
+    () => [
       {
         lat_degrees: item.start_lat,
         lng_degrees: item.start_lon,
         elevation_in_meters: 0,
       },
       ...item.waypoints,
-      { lat_degrees: item.end_lat, lng_degrees: item.end_lon },
+      {
+        lat_degrees: item.end_lat,
+        lng_degrees: item.end_lon,
+        elevation_in_meters: 1,
+      },
     ],
-  })
-  const [open, setOpen] = React.useState(0)
-  const refOne = React.useRef(null)
-  const refTwo = React.useRef(null)
-
-  const [getFullRoute, { data }] = useLazyQuery(Query.routes('getOne'), {
-    variables: { id: item.id },
-  })
-
-  React.useEffect(() => {
-    if (data?.route) {
-      setRoute({ ...route, ...data.route })
-    }
-  }, [data])
-
-  React.useEffect(() => {
-    if (open === 1 && refOne.current) {
-      refOne.current.openPopup()
-    }
-    if (open === 2 && refTwo.current) {
-      refTwo.current.openPopup()
-    }
-  })
-
-  const { waypoints = [], ...rest } = route || {}
+    [item],
+  )
 
   return (
     <>
-      <Marker
-        position={[route.start_lat, route.start_lon]}
-        icon={routeMarker(Icons.getMisc('route-start'))}
-        ref={refOne}
-        eventHandlers={{
-          click: () => getFullRoute({ variables: { id: item.id } }),
-          popupclose: () => setOpen(0),
-          popupopen: () => setOpen(1),
-        }}
-      >
-        <Popup position={[route.start_lat, route.start_lon]}>
-          {JSON.stringify(rest, null, 2)}
-        </Popup>
-      </Marker>
-      <Marker
-        position={[route.end_lat, route.end_lon]}
-        icon={routeMarker(Icons.getMisc('route-end'), true)}
-        ref={refTwo}
-        eventHandlers={{
-          click: () => getFullRoute({ variables: { id: item.id } }),
-          popupclose: () => setOpen(0),
-          popupopen: () => setOpen(2),
-        }}
-      >
-        <Popup position={[route.end_lat, route.end_lon]}>
-          {JSON.stringify(rest, null, 2)}
-        </Popup>
-      </Marker>
+      {POSITIONS.map((position) => (
+        <Marker
+          key={position}
+          position={[item[`${position}_lat`], item[`${position}_lon`]]}
+          icon={routeMarker(
+            Icons.getMisc(`route-${position}`),
+            position === 'end',
+          )}
+        >
+          <RoutePopup {...item} waypoints={waypoints} />
+        </Marker>
+      ))}
       <ErrorBoundary>
-        {(waypoints || []).map((waypoint) => (
+        {waypoints.map((waypoint) => (
           <CircleMarker
             key={`${waypoint.lat_degrees}-${waypoint.lng_degrees}-${waypoint.elevation_in_meters}`}
             center={[waypoint.lat_degrees, waypoint.lng_degrees]}
@@ -92,7 +58,7 @@ const RouteTile = ({ item, Icons }) => {
           />
         ))}
         <Polyline
-          positions={(waypoints || []).map((waypoint) => [
+          positions={waypoints.map((waypoint) => [
             waypoint.lat_degrees,
             waypoint.lng_degrees,
           ])}

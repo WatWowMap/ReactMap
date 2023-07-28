@@ -1,9 +1,18 @@
-import React from 'react'
+import * as React from 'react'
 import { Typography } from '@mui/material'
 
 import { useStore } from '@hooks/useStore'
 
-export default function Title({ children, backup }) {
+/**
+ *
+ * @param {{
+ *  children: React.ReactNode,
+ *  backup?: string,
+ *  sx?: import('@mui/material').SxProps
+ * }} props
+ * @returns
+ */
+export default function Title({ children, backup, sx }) {
   const popups = useStore((state) => state.popups)
 
   return (
@@ -19,6 +28,7 @@ export default function Title({ children, backup }) {
           },
         }))
       }
+      sx={sx}
     >
       {children || backup}
     </Typography>

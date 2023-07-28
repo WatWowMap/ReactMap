@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
-export default function TimeSince({ expireTime, until }) {
+export default function TimeSince({ expireTime, until = false }) {
   const { t } = useTranslation()
   const endTime = new Date(expireTime * 1000)
   const [timerEnd, setTimerEnd] = useState(Utility.getTimeUntil(endTime, until))

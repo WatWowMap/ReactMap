@@ -1,6 +1,15 @@
 const { Model } = require('objection')
 const getAreaSql = require('../services/functions/getAreaSql')
 
+const GET_ALL_SELECT = /** @type {const} */ ([
+  'id',
+  'start_lat',
+  'start_lon',
+  'end_lat',
+  'end_lon',
+  'waypoints',
+])
+
 class Route extends Model {
   static get tableName() {
     return 'route'
@@ -18,26 +27,12 @@ class Route extends Model {
     const { onlyAreas } = args.filters
 
     const query = this.query()
-      .select([
-        'id',
-        'start_lat',
-        'start_lon',
-        'end_lat',
-        'end_lon',
-        'waypoints',
-      ])
+      .select(GET_ALL_SELECT)
       .whereBetween('start_lat', [args.minLat, args.maxLat])
       .andWhereBetween('start_lon', [args.minLon, args.maxLon])
       .union((qb) =>
         qb
-          .select([
-            'id',
-            'start_lat',
-            'start_lon',
-            'end_lat',
-            'end_lon',
-            'waypoints',
-          ])
+          .select(GET_ALL_SELECT)
           .whereBetween('end_lat', [args.minLat, args.maxLat])
           .andWhereBetween('end_lon', [args.minLon, args.maxLon])
           .from('route'),
