@@ -82,7 +82,8 @@ module.exports = class DbCheck {
           log: {
             warn: (message) => log.warn(HELPERS.knex, message),
             error: (message) => log.error(HELPERS.knex, message),
-            debug: (message) => log.debug(HELPERS.knex, message),
+            debug: (message) =>
+              log[queryDebug ? 'info' : 'debug'](HELPERS.knex, message),
             enableColors: true,
           },
         })
