@@ -57,7 +57,7 @@ export default function RoutePopup(props) {
         />
         <Typography variant="subtitle2">{route.description}</Typography>
         <Typography variant="subtitle2">
-          {t('distance', 'Distance')}: {route.distance_meters}m
+          {t('distance', 'Distance')}: {route.distance_meters || 0}m
         </Typography>
         <Typography variant="subtitle2">
           {t('poi', 'Points of Interest')}: {route.waypoints.length}
