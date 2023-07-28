@@ -1,6 +1,7 @@
 // @ts-check
 import * as React from 'react'
 import { Marker, Polyline } from 'react-leaflet'
+import { darken } from '@mui/material'
 
 import ErrorBoundary from '@components/ErrorBoundary'
 import RoutePopup from '@components/popups/Route'
@@ -52,6 +53,33 @@ const RouteTile = ({ item, Icons }) => {
       ))}
       <ErrorBoundary>
         <Polyline
+          eventHandlers={{
+            click: ({ target }) => {
+              if (target) {
+                target.setStyle({
+                  color: target.options.clicked
+                    ? `#${item.image_border_color}`
+                    : darken(`#${item.image_border_color}`, 0.2),
+                })
+                target.options.clicked = !target.options.clicked
+              }
+            },
+            mouseover: ({ target }) => {
+              if (target?.options.clicked !== true) {
+                target.setStyle({
+                  color: darken(`#${item.image_border_color}`, 0.2),
+                })
+              }
+            },
+            mouseout: ({ target }) => {
+              if (target?.options.clicked !== true) {
+                target.setStyle({
+                  color: `#${item.image_border_color}`,
+                })
+              }
+            },
+          }}
+          dashArray={item.reversible ? undefined : '5, 5'}
           positions={waypoints.map((waypoint) => [
             waypoint.lat_degrees,
             waypoint.lng_degrees,
