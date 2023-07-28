@@ -56,7 +56,10 @@ const RouteTile = ({ item, Icons }) => {
             waypoint.lat_degrees,
             waypoint.lng_degrees,
           ])}
-          pathOptions={{ color: 'red', fillColor: 'red' }}
+          pathOptions={{
+            color: `#${item.image_border_color}`,
+            fillColor: `#${item.image_border_color}`,
+          }}
         />
       </ErrorBoundary>
     </>

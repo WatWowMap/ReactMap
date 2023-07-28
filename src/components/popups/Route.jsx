@@ -24,6 +24,8 @@ import Title from './common/Title'
 import TimeSince from './common/Timer'
 import Navigation from './common/Navigation'
 
+const IMAGE_SIZE = 80
+
 /**
  *
  * @param {{
@@ -115,27 +117,27 @@ export default function RoutePopup({ end, ...props }) {
             alt={route.name}
             src={route.image}
             style={{
-              width: 120,
-              height: 120,
+              width: IMAGE_SIZE,
+              height: IMAGE_SIZE,
               border: `4px solid #${route.image_border_color}`,
             }}
           />
         </Grid2>
-        {!imagesAreEqual && (
+        {!imagesAreEqual && (end ? route.end_image : route.start_image) && (
           <Grid2 xs={6} container alignItems="center" justifyContent="center">
             <Avatar
               alt={route.name}
               src={end ? route.end_image : route.start_image}
               style={{
-                width: 120,
-                height: 120,
+                width: IMAGE_SIZE,
+                height: IMAGE_SIZE,
                 border: `4px solid #${route.image_border_color}`,
               }}
             />
           </Grid2>
         )}
         <Grid2 xs={12}>
-          <Typography variant="subtitle2" pt={2} pb={1}>
+          <Typography variant="subtitle2" align="center" pt={2} pb={1}>
             {route.description?.length > 75
               ? `${route.description.slice(0, 75).trim()}...`
               : route.description}

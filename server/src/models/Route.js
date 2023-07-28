@@ -8,6 +8,7 @@ const GET_ALL_SELECT = /** @type {const} */ ([
   'end_lat',
   'end_lon',
   'waypoints',
+  'image_border_color',
 ])
 
 class Route extends Model {

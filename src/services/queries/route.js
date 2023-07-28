@@ -17,7 +17,6 @@ export const getRoute = gql`
       ...CoreRoute
       name
       image
-      image_border_color
       description
       distance_meters
       # duration_seconds
@@ -51,6 +50,7 @@ export const getRoutes = gql`
       filters: $filters
     ) {
       ...CoreRoute
+      image_border_color
       waypoints {
         lat_degrees
         lng_degrees
