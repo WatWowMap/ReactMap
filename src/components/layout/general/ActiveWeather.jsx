@@ -21,7 +21,7 @@ export default function ActiveWeather({
   const location = useStore((state) => state.location)
   const [open, setOpen] = useState(false)
 
-  const { disableColorShift = false } = Icons.getModifiers('weather')
+  const [{ disableColorShift = false }] = Icons.getModifiers('weather')
   const active = weather.find(
     (cell) =>
       cell && booleanPointInPolygon(point(location), polygon([cell.polygon])),

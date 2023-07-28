@@ -3,14 +3,16 @@ import { renderToString } from 'react-dom/server'
 import L from 'leaflet'
 
 export default function weatherMarker(weather, Icons, timeOfDay) {
-  const {
-    offsetX,
-    offsetY,
-    popupX,
-    popupY,
-    sizeMultiplier,
-    disableColorShift = false,
-  } = Icons.getModifiers('weather')
+  const [
+    {
+      offsetX,
+      offsetY,
+      popupX,
+      popupY,
+      sizeMultiplier,
+      disableColorShift = false,
+    },
+  ] = Icons.getModifiers('weather')
 
   return L.divIcon({
     iconAnchor: [17 * offsetX, 17 * offsetY],

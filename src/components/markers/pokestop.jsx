@@ -14,11 +14,11 @@ export default function stopMarker(
   hasEvent,
 ) {
   const { lure_id, ar_scan_eligible, power_up_level, events } = pokestop
-  const {
-    invasion: invasionMod,
-    pokestop: pokestopMod,
-    reward: rewardMod,
-  } = Icons.modifiers
+  const [invasionMod, pokestopMod, rewardMod] = Icons.getModifiers(
+    'invasion',
+    'pokestop',
+    'reward',
+  )
 
   let filterId = 's0'
   let popupYOffset = 1.3
