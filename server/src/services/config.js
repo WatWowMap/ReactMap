@@ -11,13 +11,13 @@ const allowedMenuItems = [
   'nests',
   'pokestops',
   'pokemon',
+  'routes',
   'wayfarer',
   's2cells',
   'scanAreas',
   'weather',
   'admin',
   'settings',
-  'routes',
 ]
 
 try {
