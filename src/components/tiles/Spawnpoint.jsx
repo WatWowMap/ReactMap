@@ -5,7 +5,7 @@ import { Marker, Circle, Popup } from 'react-leaflet'
 import PopupContent from '../popups/Spawnpoint'
 
 const SpawnpointTile = ({ item, Icons, ts }) => {
-  const modifiers = Icons.getModifiers('spawnpoint')
+  const [modifiers] = Icons.getModifiers('spawnpoint')
   const popup = (
     <Popup position={[item.lat, item.lon]}>
       <PopupContent spawnpoint={item} ts={ts} />
