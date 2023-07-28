@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import { CircleMarker, Marker, Polyline } from 'react-leaflet'
+import { Marker, Polyline } from 'react-leaflet'
 
 import ErrorBoundary from '@components/ErrorBoundary'
 import RoutePopup from '@components/popups/Route'
@@ -50,13 +50,6 @@ const RouteTile = ({ item, Icons }) => {
         </Marker>
       ))}
       <ErrorBoundary>
-        {waypoints.map((waypoint) => (
-          <CircleMarker
-            key={`${waypoint.lat_degrees}-${waypoint.lng_degrees}-${waypoint.elevation_in_meters}`}
-            center={[waypoint.lat_degrees, waypoint.lng_degrees]}
-            radius={10}
-          />
-        ))}
         <Polyline
           positions={waypoints.map((waypoint) => [
             waypoint.lat_degrees,
