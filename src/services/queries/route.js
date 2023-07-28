@@ -7,8 +7,6 @@ const core = gql`
     start_lon
     end_lat
     end_lon
-    image
-    image_border_color
   }
 `
 
@@ -18,6 +16,8 @@ export const getRoute = gql`
     route(id: $id) {
       ...CoreRoute
       name
+      image
+      image_border_color
       description
       distance_meters
       duration_seconds
@@ -28,11 +28,6 @@ export const getRoute = gql`
       type
       updated
       version
-      waypoints {
-        lat_degrees
-        lng_degrees
-        elevation_in_meters
-      }
     }
   }
 `
@@ -54,6 +49,11 @@ export const getRoutes = gql`
       filters: $filters
     ) {
       ...CoreRoute
+      waypoints {
+        lat_degrees
+        lng_degrees
+        elevation_in_meters
+      }
     }
   }
 `

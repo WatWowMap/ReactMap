@@ -2,15 +2,14 @@
 import { Icon } from 'leaflet'
 
 /**
- *
  * @param {string} iconUrl
+ * @param {boolean} end
  * @returns
  */
-export default function getRouteMarker(iconUrl) {
+export default function getRouteMarker(iconUrl, end = false) {
   return new Icon({
     iconUrl,
-    iconAnchor: [20, 33.96],
-    popupAnchor: [-5, -37],
-    className: 'circle-image',
+    iconSize: [32, 32],
+    className: `circle-route-${end ? 'end' : 'start'}`,
   })
 }
