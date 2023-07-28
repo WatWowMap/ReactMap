@@ -37,7 +37,7 @@ export default function GymMarker(
     ex_raid_eligible,
     ar_scan_eligible,
   } = gym
-  const { gym: gymMod, raid: raidMod } = Icons.modifiers
+  const [gymMod, raidMod] = Icons.getModifiers('gym', 'raid')
 
   const filledSlots = available_slots !== null ? 6 - available_slots : 0
   let filterId =

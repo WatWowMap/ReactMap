@@ -37,7 +37,7 @@ export const fancyMarker = (
   userSettings,
   levelCircle,
 ) => {
-  const { pokemon: pokemonMod, weather: weatherMod } = Icons.modifiers
+  const [pokemonMod, weatherMod] = Icons.getModifiers('pokemon', 'weather')
   const badge = getBadge(pkmn.bestPvp)
 
   const ReactIcon = (
