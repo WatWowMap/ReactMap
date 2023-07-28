@@ -629,5 +629,6 @@
   "submitted_by": "Submitted By",
   "reversible": "Reversible",
   "version": "Verison",
-  "route_tags": "Route Tags"
+  "route_tags": "Route Tags",
+  "routes": "Routes"
 }
