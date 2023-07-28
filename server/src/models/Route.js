@@ -9,6 +9,7 @@ const GET_ALL_SELECT = /** @type {const} */ ([
   'end_lon',
   'waypoints',
   'image_border_color',
+  'reversible',
 ])
 
 class Route extends Model {
@@ -69,6 +70,15 @@ class Route extends Model {
       result.tags = JSON.parse(result.tags)
     } else if (result.tags === null) {
       result.tags = []
+    }
+    if (typeof result.image === 'string') {
+      result.image = result.image.replace('http://', 'https://')
+    }
+    if (typeof result.start_image === 'string') {
+      result.start_image = result.start_image.replace('http://', 'https://')
+    }
+    if (typeof result.end_image === 'string') {
+      result.end_image = result.end_image.replace('http://', 'https://')
     }
     return result
   }

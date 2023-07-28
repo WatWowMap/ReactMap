@@ -15,8 +15,10 @@ import IconButton from '@mui/material/IconButton'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
+import Box from '@mui/material/Box'
 
 import Query from '@services/Query'
+import formatInterval from '@services/functions/formatInterval'
 import { useStore } from '@hooks/useStore'
 
 import Title from './common/Title'
@@ -27,19 +29,14 @@ const IMAGE_SIZE = 80
 
 /**
  *
- * @param {{
- *  primary: string
- *  primaryTypographyProps?: import('@mui/material/Typography').TypographyProps
- *  sx?: import('@mui/material').SxProps
- *  children?: React.ReactNode
- * }} props
+ * @param {Exclude<import('@mui/material').ListItemTextProps, 'primary'> & { primary: string }} props
  * @returns
  */
 function ListItemWrapper({
   primary,
   primaryTypographyProps,
-  sx,
   children = null,
+  ...props
 }) {
   const { t } = useTranslation()
 
@@ -52,7 +49,7 @@ function ListItemWrapper({
           ...primaryTypographyProps,
         }}
         style={{ margin: 0 }}
-        sx={sx}
+        {...props}
       />
       {typeof children === 'object' ? (
         children
@@ -73,16 +70,16 @@ function ListItemWrapper({
 
 /**
  * @param {{
- * disabled?: boolean
- * children: React.ReactNode
- * expandKey: string
- * primary: string
+ *  disabled?: boolean
+ *  children: React.ReactNode
+ *  expandKey: string
+ *  primary: string
  * }} props
  * @returns
  */
 function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
   // @ts-ignore
-  const expanded = useStore((s) => s.popups[expandKey])
+  const expanded = useStore((s) => !!s.popups[expandKey])
   return (
     <>
       <ListItemWrapper primary={primary}>
@@ -114,9 +111,11 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
             justifyContent: 'center',
             alignItems: 'center',
             textAlign: 'center',
+            width: '90%',
+            mx: 'auto',
           }}
         >
-          {children}
+          <Box py={1}>{children}</Box>
         </Collapse>
       </ListItem>
     </>
@@ -130,6 +129,8 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
  */
 export default function RoutePopup({ end, ...props }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
+  // @ts-ignore
+  const locale = useStore((s) => s.settings.localeSelection)
 
   const [getRoute, { data, called }] = useLazyQuery(Query.routes('getOne'), {
     variables: { id: props.id },
@@ -146,6 +147,12 @@ export default function RoutePopup({ end, ...props }) {
       })
     }
   }, [data])
+
+  const numFormatter = new Intl.NumberFormat(locale, {
+    unitDisplay: 'short',
+    unit: 'meter',
+    style: 'unit',
+  })
 
   const imagesAreEqual =
     route.image === (end ? route.end_image : route.start_image)
@@ -199,26 +206,13 @@ export default function RoutePopup({ end, ...props }) {
         )}
         <Grid2 xs={12} component={List}>
           <ListItemWrapper primary="distance">
-            {`${route.distance_meters || 0}m`}
+            {`${numFormatter.format(route.distance_meters || 0)}`}
+          </ListItemWrapper>
+          <ListItemWrapper primary="duration">
+            {`${formatInterval((route.duration_seconds || 0) * 1000).str}`}
           </ListItemWrapper>
           <ListItemWrapper primary="points">
             {route.waypoints.length}
-          </ListItemWrapper>
-          <ListItemWrapper primary="reversible">
-            {route.reversible ? (
-              <CheckIcon fontSize="small" color="success" />
-            ) : (
-              <CloseIcon fontSize="small" color="error" />
-            )}
-          </ListItemWrapper>
-          <ListItemWrapper primary="route_type">
-            {t(`route_type_${route.type || 0}`)}
-          </ListItemWrapper>
-          <ListItemWrapper primary="version">
-            {route.version || 0}
-          </ListItemWrapper>
-          <ListItemWrapper primary={t('last_updated')}>
-            <TimeSince expireTime={route.updated} fontWeight={400} />
           </ListItemWrapper>
           <ExpandableWrapper
             primary="route_tags"
@@ -241,6 +235,26 @@ export default function RoutePopup({ end, ...props }) {
             disabled={!route.description}
           >
             {route.description}
+          </ExpandableWrapper>
+          <ExpandableWrapper primary="additional_info" expandKey="extraInfo">
+            <List disablePadding>
+              <ListItemWrapper primary="reversible">
+                {route.reversible ? (
+                  <CheckIcon fontSize="small" color="success" />
+                ) : (
+                  <CloseIcon fontSize="small" color="error" />
+                )}
+              </ListItemWrapper>
+              <ListItemWrapper primary="route_type">
+                {t(`route_type_${route.type || 0}`)}
+              </ListItemWrapper>
+              <ListItemWrapper primary="version">
+                {route.version || 0}
+              </ListItemWrapper>
+              <ListItemWrapper primary={t('last_updated')}>
+                <TimeSince expireTime={route.updated} fontWeight={400} />
+              </ListItemWrapper>
+            </List>
           </ExpandableWrapper>
         </Grid2>
         <Grid2 xs={12} container justifyContent="center">

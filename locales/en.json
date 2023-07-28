@@ -633,5 +633,7 @@
   "routes": "Routes",
   "route_type": "Route Type",
   "routes_subtitle": "View in game routes and relevant information about them on the map",
-  "description": "Description"
+  "description": "Description",
+  "additional_info": "Additional Info",
+  "duration": "Duration"
 }

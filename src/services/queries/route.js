@@ -19,12 +19,11 @@ export const getRoute = gql`
       image
       description
       distance_meters
-      # duration_seconds
+      duration_seconds
       # start_fort_id
       start_image
       end_image
       # end_fort_id
-      reversible
       tags
       type
       updated
@@ -51,6 +50,7 @@ export const getRoutes = gql`
     ) {
       ...CoreRoute
       image_border_color
+      reversible
       waypoints {
         lat_degrees
         lng_degrees
