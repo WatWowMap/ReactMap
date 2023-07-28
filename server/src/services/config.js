@@ -17,6 +17,7 @@ const allowedMenuItems = [
   'weather',
   'admin',
   'settings',
+  'routes',
 ]
 
 try {
