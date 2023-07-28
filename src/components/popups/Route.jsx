@@ -2,11 +2,10 @@
 /* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
 import { Popup } from 'react-leaflet'
-import { useQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import Avatar from '@mui/material/Avatar'
-import Typography from '@mui/material/Typography'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -60,10 +59,67 @@ function ListItemWrapper({
       ) : (
         <ListItemText
           primary={children}
-          primaryTypographyProps={{ variant: 'subtitle2', align: 'right' }}
+          primaryTypographyProps={{
+            variant: 'subtitle2',
+            fontWeight: 400,
+            align: 'right',
+          }}
+          style={{ margin: 0 }}
         />
       )}
     </ListItem>
+  )
+}
+
+/**
+ * @param {{
+ * disabled?: boolean
+ * children: React.ReactNode
+ * expandKey: string
+ * primary: string
+ * }} props
+ * @returns
+ */
+function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
+  // @ts-ignore
+  const expanded = useStore((s) => s.popups[expandKey])
+  return (
+    <>
+      <ListItemWrapper primary={primary}>
+        <IconButton
+          disabled={disabled}
+          size="small"
+          sx={{ p: 0 }}
+          className={expanded ? 'expanded' : 'closed'}
+          onClick={() =>
+            useStore.setState((prev) => ({
+              popups: {
+                // @ts-ignore
+                ...prev.popups,
+                // @ts-ignore
+                [expandKey]: !prev.popups[expandKey],
+              },
+            }))
+          }
+        >
+          <ExpandMore />
+        </IconButton>
+      </ListItemWrapper>
+      <ListItem disablePadding disableGutters>
+        <Collapse
+          in={expanded}
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+          }}
+        >
+          {children}
+        </Collapse>
+      </ListItem>
+    </>
   )
 }
 
@@ -74,10 +130,8 @@ function ListItemWrapper({
  */
 export default function RoutePopup({ end, ...props }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
-  // @ts-ignore
-  const expanded = useStore((s) => !!s.popups.tags)
 
-  const { data } = useQuery(Query.routes('getOne'), {
+  const [getRoute, { data, called }] = useLazyQuery(Query.routes('getOne'), {
     variables: { id: props.id },
   })
   const { t } = useTranslation()
@@ -97,21 +151,28 @@ export default function RoutePopup({ end, ...props }) {
     route.image === (end ? route.end_image : route.start_image)
 
   return (
-    <Popup>
+    <Popup
+      ref={(ref) => {
+        if (ref && ref.isOpen() && !called) {
+          getRoute()
+        }
+      }}
+    >
       <Grid2
         alignItems="center"
         justifyContent="center"
         container
-        sx={{ width: 250 }}
+        sx={{ width: 200 }}
       >
         <Grid2 xs={12}>
-          <Title sx={{ pb: 2 }}>{route.name}</Title>
+          <Title>{route.name}</Title>
         </Grid2>
         <Grid2
           xs={imagesAreEqual ? 12 : 6}
           container
           alignItems="center"
           justifyContent="center"
+          sx={{ py: 2 }}
         >
           <Avatar
             alt={route.name}
@@ -136,15 +197,7 @@ export default function RoutePopup({ end, ...props }) {
             />
           </Grid2>
         )}
-        <Grid2 xs={12}>
-          <Typography variant="subtitle2" align="center" pt={2} pb={1}>
-            {route.description?.length > 75
-              ? `${route.description.slice(0, 75).trim()}...`
-              : route.description}
-          </Typography>
-        </Grid2>
-
-        <Grid2 container xs={12} component={List}>
+        <Grid2 xs={12} component={List}>
           <ListItemWrapper primary="distance">
             {`${route.distance_meters || 0}m`}
           </ListItemWrapper>
@@ -153,70 +206,48 @@ export default function RoutePopup({ end, ...props }) {
           </ListItemWrapper>
           <ListItemWrapper primary="reversible">
             {route.reversible ? (
-              <CheckIcon color="success" />
+              <CheckIcon fontSize="small" color="success" />
             ) : (
-              <CloseIcon color="error" />
+              <CloseIcon fontSize="small" color="error" />
             )}
           </ListItemWrapper>
           <ListItemWrapper primary="route_type">
-            {t(`route_type_${route.type}`)}
+            {t(`route_type_${route.type || 0}`)}
           </ListItemWrapper>
-          <ListItemWrapper primary="version">{route.version}</ListItemWrapper>
+          <ListItemWrapper primary="version">
+            {route.version || 0}
+          </ListItemWrapper>
+          <ListItemWrapper primary={t('last_updated')}>
+            <TimeSince expireTime={route.updated} fontWeight={400} />
+          </ListItemWrapper>
+          <ExpandableWrapper
+            primary="route_tags"
+            expandKey="tags"
+            disabled={!route.tags.length}
+          >
+            {route.tags.map((tag) => (
+              <Chip
+                key={tag}
+                label={t(tag)}
+                size="small"
+                color="secondary"
+                sx={{ m: 0.25 }}
+              />
+            ))}
+          </ExpandableWrapper>
+          <ExpandableWrapper
+            primary="description"
+            expandKey="routeDescription"
+            disabled={!route.description}
+          >
+            {route.description}
+          </ExpandableWrapper>
         </Grid2>
-        <Grid2 container xs={12} justifyContent="center" alignItems="center">
-          <Grid2 xs={6}>
-            <Typography variant="subtitle2">{t('last_updated')}:</Typography>
-          </Grid2>
-          <Grid2 xs={6} textAlign="right">
-            <TimeSince expireTime={route.updated} />
-          </Grid2>
-        </Grid2>
-        {!!route.tags.length && (
-          <Grid2 container xs={12} alignItems="center">
-            <Grid2 flexGrow={1}>
-              <Typography variant="h6" align="center" width="100%" py={0}>
-                {t('route_tags')}
-              </Typography>
-            </Grid2>
-            <Grid2>
-              <IconButton
-                className={expanded ? 'expanded' : 'closed'}
-                onClick={() =>
-                  useStore.setState((prev) => ({
-                    // @ts-ignore
-                    popups: { ...prev.popups, tags: !prev.popups.tags },
-                  }))
-                }
-              >
-                <ExpandMore />
-              </IconButton>
-            </Grid2>
-          </Grid2>
-        )}
-        <Collapse
-          in={expanded}
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-          }}
-        >
-          {route.tags.map((tag) => (
-            <Chip
-              key={tag}
-              label={t(tag)}
-              size="small"
-              color="secondary"
-              sx={{ m: 0.25 }}
-            />
-          ))}
-        </Collapse>
         <Grid2 xs={12} container justifyContent="center">
           <Navigation
             lat={end ? route.end_lat : route.start_lat}
             lon={end ? route.end_lon : route.start_lon}
+            size="small"
           />
         </Grid2>
       </Grid2>
