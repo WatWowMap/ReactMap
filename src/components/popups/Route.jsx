@@ -47,7 +47,7 @@ function ListItemWrapper({
       <ListItemText
         primary={`${t(primary)}:`}
         primaryTypographyProps={{
-          variant: 'subtitle1',
+          variant: 'subtitle2',
           ...primaryTypographyProps,
         }}
         style={{ margin: 0 }}
@@ -115,7 +115,9 @@ export default function RoutePopup(props) {
         </Grid2>
         <Grid2 xs={12}>
           <Typography variant="subtitle2" pt={2} pb={1}>
-            {route.description}
+            {route.description.length > 75
+              ? `${route.description.slice(0, 75).trim()}...`
+              : route.description}
           </Typography>
         </Grid2>
 
@@ -138,9 +140,9 @@ export default function RoutePopup(props) {
           </ListItemWrapper>
           <ListItemWrapper primary="version">{route.version}</ListItemWrapper>
         </Grid2>
-        <Grid2 container xs={12}>
+        <Grid2 container xs={12} alignItems="center">
           <Grid2 flexGrow={1}>
-            <Typography variant="h6" align="center" width="100%" py={1}>
+            <Typography variant="h6" align="center" width="100%" py={0}>
               {t('route_tags')}
             </Typography>
           </Grid2>
@@ -160,7 +162,12 @@ export default function RoutePopup(props) {
         </Grid2>
         <Collapse
           in={expanded}
-          sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
           {route.tags.map((tag) => (
             <Chip
@@ -174,7 +181,7 @@ export default function RoutePopup(props) {
         </Collapse>
 
         <Grid2 container xs={12} justifyContent="center" alignItems="center">
-          <Divider flexItem sx={{ width: '100%', height: 1, my: 2 }} />
+          <Divider flexItem sx={{ width: '100%', height: 1, mt: 1, mb: 2 }} />
           <Grid2 xs={6}>
             <Typography variant="subtitle2">{t('last_updated')}:</Typography>
           </Grid2>
