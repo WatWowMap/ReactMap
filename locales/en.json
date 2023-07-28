@@ -630,5 +630,6 @@
   "reversible": "Reversible",
   "version": "Verison",
   "route_tags": "Route Tags",
-  "routes": "Routes"
+  "routes": "Routes",
+  "route_type": "Route Type"
 }
