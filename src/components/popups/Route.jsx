@@ -12,7 +12,6 @@ import CloseIcon from '@mui/icons-material/Close'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import Chip from '@mui/material/Chip'
 import Collapse from '@mui/material/Collapse'
-import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -23,6 +22,7 @@ import { useStore } from '@hooks/useStore'
 
 import Title from './common/Title'
 import TimeSince from './common/Timer'
+import Navigation from './common/Navigation'
 
 /**
  *
@@ -67,10 +67,10 @@ function ListItemWrapper({
 
 /**
  *
- * @param {import('../../../server/src/types').Route} props
+ * @param {import('../../../server/src/types').Route & { end?: boolean }} props
  * @returns
  */
-export default function RoutePopup(props) {
+export default function RoutePopup({ end, ...props }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
   // @ts-ignore
   const expanded = useStore((s) => !!s.popups.tags)
@@ -91,6 +91,9 @@ export default function RoutePopup(props) {
     }
   }, [data])
 
+  const imagesAreEqual =
+    route.image === (end ? route.end_image : route.start_image)
+
   return (
     <Popup>
       <Grid2
@@ -102,7 +105,12 @@ export default function RoutePopup(props) {
         <Grid2 xs={12}>
           <Title sx={{ pb: 2 }}>{route.name}</Title>
         </Grid2>
-        <Grid2 xs={12} container alignItems="center" justifyContent="center">
+        <Grid2
+          xs={imagesAreEqual ? 12 : 6}
+          container
+          alignItems="center"
+          justifyContent="center"
+        >
           <Avatar
             alt={route.name}
             src={route.image}
@@ -113,6 +121,19 @@ export default function RoutePopup(props) {
             }}
           />
         </Grid2>
+        {!imagesAreEqual && (
+          <Grid2 xs={6} container alignItems="center" justifyContent="center">
+            <Avatar
+              alt={route.name}
+              src={end ? route.end_image : route.start_image}
+              style={{
+                width: 120,
+                height: 120,
+                border: `4px solid #${route.image_border_color}`,
+              }}
+            />
+          </Grid2>
+        )}
         <Grid2 xs={12}>
           <Typography variant="subtitle2" pt={2} pb={1}>
             {route.description?.length > 75
@@ -139,6 +160,14 @@ export default function RoutePopup(props) {
             {t(`route_type_${route.type}`)}
           </ListItemWrapper>
           <ListItemWrapper primary="version">{route.version}</ListItemWrapper>
+        </Grid2>
+        <Grid2 container xs={12} justifyContent="center" alignItems="center">
+          <Grid2 xs={6}>
+            <Typography variant="subtitle2">{t('last_updated')}:</Typography>
+          </Grid2>
+          <Grid2 xs={6} textAlign="right">
+            <TimeSince expireTime={route.updated} />
+          </Grid2>
         </Grid2>
         <Grid2 container xs={12} alignItems="center">
           <Grid2 flexGrow={1}>
@@ -179,15 +208,11 @@ export default function RoutePopup(props) {
             />
           ))}
         </Collapse>
-
-        <Grid2 container xs={12} justifyContent="center" alignItems="center">
-          <Divider flexItem sx={{ width: '100%', height: 1, mt: 1, mb: 2 }} />
-          <Grid2 xs={6}>
-            <Typography variant="subtitle2">{t('last_updated')}:</Typography>
-          </Grid2>
-          <Grid2 xs={6} textAlign="right">
-            <TimeSince expireTime={route.updated} />
-          </Grid2>
+        <Grid2 xs={12} container justifyContent="center">
+          <Navigation
+            lat={end ? route.end_lat : route.start_lat}
+            lon={end ? route.end_lon : route.start_lon}
+          />
         </Grid2>
       </Grid2>
     </Popup>

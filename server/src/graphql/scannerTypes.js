@@ -238,9 +238,11 @@ module.exports = gql`
     start_fort_id: String
     start_lat: Float
     start_lon: Float
+    start_image: String
     end_fort_id: String
     end_lat: Float
     end_lon: Float
+    end_image: String
     image: String
     image_border_color: String
     reversible: Boolean

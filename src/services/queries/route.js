@@ -20,9 +20,11 @@ export const getRoute = gql`
       image_border_color
       description
       distance_meters
-      duration_seconds
-      start_fort_id
-      end_fort_id
+      # duration_seconds
+      # start_fort_id
+      start_image
+      end_image
+      # end_fort_id
       reversible
       tags
       type

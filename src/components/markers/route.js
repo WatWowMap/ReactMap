@@ -3,13 +3,13 @@ import { Icon } from 'leaflet'
 
 /**
  * @param {string} iconUrl
- * @param {boolean} end
+ * @param {'start' | 'end'} position
  * @returns
  */
-export default function getRouteMarker(iconUrl, end = false) {
+export default function getRouteMarker(iconUrl, position) {
   return new Icon({
     iconUrl,
     iconSize: [32, 32],
-    className: `circle-route-${end ? 'end' : 'start'}`,
+    className: `circle-route-${position}`,
   })
 }

@@ -41,12 +41,13 @@ const RouteTile = ({ item, Icons }) => {
         <Marker
           key={position}
           position={[item[`${position}_lat`], item[`${position}_lon`]]}
-          icon={routeMarker(
-            Icons.getMisc(`route-${position}`),
-            position === 'end',
-          )}
+          icon={routeMarker(Icons.getMisc(`route-${position}`), position)}
         >
-          <RoutePopup {...item} waypoints={waypoints} />
+          <RoutePopup
+            {...item}
+            waypoints={waypoints}
+            end={position === 'end'}
+          />
         </Marker>
       ))}
       <ErrorBoundary>
