@@ -16,7 +16,7 @@ const LEAGUES = config.api.pvp.leagues.map((league) => league.name)
 /**
  * @type {number[]}
  */
-const LEVELS = config.api.pvp.levels.sort((a, b) => a - b)
+const LEVELS = config.api.pvp.levels.slice().sort((a, b) => a - b)
 
 const BASE_KEYS = /** @type {const} */ ([
   'iv',
