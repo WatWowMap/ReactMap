@@ -70,7 +70,6 @@ const RouteTile = ({ item, Icons }) => {
     },
   })
 
-  console.log({ hover, clicked })
   return (
     <>
       {POSITIONS.map((position) => (
