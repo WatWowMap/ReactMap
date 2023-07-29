@@ -305,8 +305,8 @@ export default function Extras({ category, subItem, data }) {
             filterSlide={{
               color: 'secondary',
               disabled: false,
+              min: staticFilters.routes.distance[0] || 0,
               max: staticFilters.routes.distance[1] || 25,
-              min: 0.5,
               i18nKey: 'distance',
               step: 0.5,
               name: 'distance',
