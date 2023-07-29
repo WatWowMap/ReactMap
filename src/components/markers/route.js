@@ -9,8 +9,9 @@ import { Icon } from 'leaflet'
 export default function getRouteMarker(iconUrl, position) {
   return new Icon({
     iconUrl,
+    iconAnchor: [position === 'start' ? 12 : 20, 16],
     iconSize: [32, 32],
     popupAnchor: [0, -12],
-    className: `circle-route-${position}`,
+    className: `circle-route ${position}`,
   })
 }

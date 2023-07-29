@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 // @ts-check
 import * as React from 'react'
 import { Marker, Polyline, useMapEvents } from 'react-leaflet'
@@ -10,6 +11,8 @@ import routeMarker from '../markers/route'
 
 const POSITIONS = /** @type {const} */ (['start', 'end'])
 
+const OPACITY = 0.66
+
 /**
  *
  * @param {{
@@ -21,6 +24,7 @@ const POSITIONS = /** @type {const} */ (['start', 'end'])
  */
 const RouteTile = ({ item, Icons }) => {
   const [clicked, setClicked] = React.useState(false)
+  const [hover, setHover] = React.useState('')
 
   /** @type {React.MutableRefObject<import("leaflet").Polyline>} */
   const lineRef = React.useRef()
@@ -52,7 +56,10 @@ const RouteTile = ({ item, Icons }) => {
 
   useMapEvents({
     click: ({ originalEvent }) => {
-      if (!originalEvent.defaultPrevented) setClicked(false)
+      if (!originalEvent.defaultPrevented) {
+        setClicked(false)
+        setHover('')
+      }
     },
     /** @param {{ target: import('leaflet').Map }} args */
     zoom: ({ target }) => {
@@ -63,11 +70,14 @@ const RouteTile = ({ item, Icons }) => {
     },
   })
 
+  console.log({ hover, clicked })
   return (
     <>
       {POSITIONS.map((position) => (
         <Marker
           key={position}
+          opacity={hover || clicked ? 1 : OPACITY}
+          zIndexOffset={hover === position ? 2000 : hover || clicked ? 1000 : 0}
           position={[item[`${position}_lat`], item[`${position}_lon`]]}
           icon={routeMarker(Icons.getMisc(`route-${position}`), position)}
           eventHandlers={{
@@ -77,11 +87,13 @@ const RouteTile = ({ item, Icons }) => {
               if (lineRef.current) {
                 lineRef.current.setStyle({ color: darkened, opacity: 1 })
               }
+              setHover(position)
             },
             mouseout: () => {
               if (lineRef.current && !clicked) {
-                lineRef.current.setStyle({ color, opacity: 0.5 })
+                lineRef.current.setStyle({ color, opacity: OPACITY })
               }
+              setHover('')
             },
           }}
         >
@@ -108,7 +120,7 @@ const RouteTile = ({ item, Icons }) => {
             },
             mouseout: ({ target }) => {
               if (target && !clicked) {
-                target.setStyle({ color, opacity: 0.5 })
+                target.setStyle({ color, opacity: OPACITY })
               }
             },
           }}
@@ -119,7 +131,7 @@ const RouteTile = ({ item, Icons }) => {
           ])}
           pathOptions={{
             color: clicked ? darkened : color,
-            opacity: clicked ? 1 : 0.5,
+            opacity: clicked || hover ? 1 : OPACITY,
           }}
         />
       </ErrorBoundary>
