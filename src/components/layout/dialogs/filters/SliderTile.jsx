@@ -67,6 +67,7 @@ export default function SliderTile({
       : 'inherit'
 
   const translated = t(i18nKey || `slider_${name}`)
+
   return (
     <Grid
       container
@@ -94,7 +95,7 @@ export default function SliderTile({
           <TextField
             sx={{ width: 80, color: textColor }}
             id={each}
-            label={`${t(each)} ${t(label)}`}
+            label={`${t(each)} ${label ? t(label) : ''}`}
             name={name}
             value={tempTextValues[index]}
             onChange={handleTempChange}

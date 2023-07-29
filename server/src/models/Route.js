@@ -26,16 +26,20 @@ class Route extends Model {
    */
   static async getAll(perms, args, ctx) {
     const { areaRestrictions } = perms
-    const { onlyAreas } = args.filters
+    const { onlyAreas, onlyDistance } = args.filters
+
+    const distanceInMeters = (onlyDistance || [0.5, 100]).map((x) => x * 1000)
 
     const query = this.query()
       .select(GET_ALL_SELECT)
       .whereBetween('start_lat', [args.minLat, args.maxLat])
       .andWhereBetween('start_lon', [args.minLon, args.maxLon])
+      .andWhereBetween('distance_meters', distanceInMeters)
       .union((qb) => {
         qb.select(GET_ALL_SELECT)
           .whereBetween('end_lat', [args.minLat, args.maxLat])
           .andWhereBetween('end_lon', [args.minLon, args.maxLon])
+          .andWhereBetween('distance_meters', distanceInMeters)
           .from('route')
 
         getAreaSql(qb, areaRestrictions, onlyAreas, ctx.isMad, 'route')

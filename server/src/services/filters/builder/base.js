@@ -115,8 +115,12 @@ function buildDefaultFilters(perms, available, database) {
       perms.routes && database.models.Route
         ? {
             enabled: defaultFilters.routes.enabled,
+            distance: [
+              0,
+              Math.ceil(database.filterContext.Route.maxDistance / 1000) + 1,
+            ],
             filter: {
-              distance: [0, database.filterContext.Route.maxDistance],
+              global: new BaseFilter(),
             },
           }
         : undefined,
