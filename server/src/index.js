@@ -383,6 +383,7 @@ connection.migrate.latest().then(async () => {
   await Db.getDbContext()
   await Promise.all([
     Db.historicalRarity(),
+    Db.getFilterContext(),
     Event.setAvailable('gyms', 'Gym', Db),
     Event.setAvailable('pokestops', 'Pokestop', Db),
     Event.setAvailable('pokemon', 'Pokemon', Db),

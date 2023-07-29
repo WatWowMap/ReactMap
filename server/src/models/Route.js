@@ -83,6 +83,19 @@ class Route extends Model {
     }
     return result
   }
+
+  /**
+   * returns route context
+   * @returns {{ max_distance: number, max_duration: number }}
+   */
+  static async getFilterContext() {
+    const result = await this.query()
+      .max('distance_meters AS max_distance')
+      .max('duration_seconds AS max_duration')
+      .first()
+
+    return result
+  }
 }
 
 module.exports = Route

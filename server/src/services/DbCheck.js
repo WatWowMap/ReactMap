@@ -38,6 +38,9 @@ module.exports = class DbCheck {
     this.endpoints = {}
     this.rarity = {}
     this.historical = {}
+    this.filterContext = {
+      Route: { maxDistance: 0, maxDuration: 0 },
+    }
     this.reactMapDb = null
     this.connections = dbConfig.schemas
       .filter((s) => s.useFor.length)
@@ -546,5 +549,23 @@ module.exports = class DbCheck {
       }
     }
     return []
+  }
+
+  /**
+   * Builds filter context for all models
+   */
+  async getFilterContext() {
+    if (this.models.Route) {
+      const results = await Promise.all(
+        this.models.Route.map((source) => source.SubModel.getFilterContext()),
+      )
+      this.filterContext.Route.maxDistance = Math.max(
+        ...results.map((result) => result.max_distance),
+      )
+      this.filterContext.Route.maxDuration = Math.max(
+        ...results.map((result) => result.max_duration),
+      )
+      log.info(HELPERS.db, 'Updating filter context for routes')
+    }
   }
 }

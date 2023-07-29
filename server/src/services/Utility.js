@@ -1,7 +1,6 @@
 const getPolyVector = require('./functions/getPolyVector')
 const getPlacementCells = require('./functions/getPlacementCells')
 const getTypeCells = require('./functions/getTypeCells')
-const buildDefaultFilters = require('./filters/builder/base')
 const primaryUi = require('./ui/primary')
 const advMenus = require('./ui/advMenus')
 const clientOptions = require('./ui/clientOptions')
@@ -24,10 +23,6 @@ module.exports = class Utility {
 
   static getTypeCells(...args) {
     return getTypeCells(...args)
-  }
-
-  static buildDefaultFilters(...args) {
-    return buildDefaultFilters(...args)
   }
 
   static buildPrimaryUi(...args) {

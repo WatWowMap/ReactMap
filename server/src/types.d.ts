@@ -10,13 +10,16 @@ import { Knex } from 'knex'
 import { Model } from 'objection'
 import { Request, Response } from 'express'
 import { Transaction } from '@sentry/node'
+
 import DbCheck = require('./services/DbCheck')
 import EventManager = require('./services/EventManager')
 import Pokemon = require('./models/Pokemon')
+import Gym = require('./models/Gym')
 import Badge = require('./models/Badge')
 import Backup = require('./models/Backup')
 import Nest = require('./models/Nest')
 import NestSubmission = require('./models/NestSubmission')
+import Pokestop = require('./models/Pokestop')
 
 export interface DbContext {
   isMad: boolean
@@ -109,6 +112,13 @@ export interface AvailablePokemon {
   count: number
 }
 
+export interface Available {
+  pokemon: Awaited<ReturnType<(typeof Pokemon)['getAvailable']>>
+  gyms: Awaited<ReturnType<(typeof Gym)['getAvailable']>>
+  pokestops: Awaited<ReturnType<(typeof Pokestop)['getAvailable']>>
+  nests: Awaited<ReturnType<(typeof Nest)['getAvailable']>>
+}
+
 export interface PvpEntry {
   pokemon: number
   form: number
@@ -160,6 +170,9 @@ export interface DbCheckClass {
   rarityPercents: RarityPercents
   distanceUnit: 'km' | 'mi'
   reactMapDb: null | number
+  filterContext: {
+    Route: { maxDistance: number; maxDuration: number }
+  }
 }
 
 export interface RarityPercents {
@@ -218,6 +231,7 @@ export interface Permissions {
   donor: boolean
   gymBadges: boolean
   backups: boolean
+  routes: boolean
   scanner: string[]
   areaRestrictions: string[]
   webhooks: string[]

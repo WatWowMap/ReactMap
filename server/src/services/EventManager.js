@@ -99,6 +99,11 @@ module.exports = class EventManager {
       this.chatLog({ description: 'Refreshed webhook settings' })
     }, 1000 * 60 * 60 * (config.map.webhookCacheHrs || 1))
 
+    setInterval(async () => {
+      await Db.getFilterContext()
+      this.chatLog({ description: 'Updated filter contexts' })
+    }, 1000 * 60 * 30)
+
     const newDate = new Date()
     config.authentication.strategies.forEach((strategy) => {
       if (strategy.enabled) {
