@@ -75,12 +75,12 @@ const RouteTile = ({ item, Icons }) => {
             popupclose: () => setClicked(false),
             mouseover: () => {
               if (lineRef.current) {
-                lineRef.current.setStyle({ color: darkened })
+                lineRef.current.setStyle({ color: darkened, opacity: 1 })
               }
             },
             mouseout: () => {
               if (lineRef.current && !clicked) {
-                lineRef.current.setStyle({ color })
+                lineRef.current.setStyle({ color, opacity: 0.5 })
               }
             },
           }}
@@ -103,12 +103,12 @@ const RouteTile = ({ item, Icons }) => {
             },
             mouseover: ({ target }) => {
               if (target && !clicked) {
-                target.setStyle({ color: darkened })
+                target.setStyle({ color: darkened, opacity: 1 })
               }
             },
             mouseout: ({ target }) => {
               if (target && !clicked) {
-                target.setStyle({ color })
+                target.setStyle({ color, opacity: 0.5 })
               }
             },
           }}
@@ -119,6 +119,7 @@ const RouteTile = ({ item, Icons }) => {
           ])}
           pathOptions={{
             color: clicked ? darkened : color,
+            opacity: clicked ? 1 : 0.5,
           }}
         />
       </ErrorBoundary>
