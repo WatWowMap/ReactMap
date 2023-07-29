@@ -47,13 +47,6 @@ module.exports = function getAreaRestrictionSql(
             config.areas.polygons[area],
           )}', 2, 0), POINT(${columns[1]}, ${columns[0]}))`,
         )
-        if (category === 'route') {
-          restrictions.orWhereRaw(
-            `ST_CONTAINS(ST_GeomFromGeoJSON('${JSON.stringify(
-              config.areas.polygons[area],
-            )}', 2, 0), POINT(end_lon, end_lat))`,
-          )
-        }
       }
     })
   })

@@ -32,13 +32,14 @@ class Route extends Model {
       .select(GET_ALL_SELECT)
       .whereBetween('start_lat', [args.minLat, args.maxLat])
       .andWhereBetween('start_lon', [args.minLon, args.maxLon])
-      .union((qb) =>
-        qb
-          .select(GET_ALL_SELECT)
+      .union((qb) => {
+        qb.select(GET_ALL_SELECT)
           .whereBetween('end_lat', [args.minLat, args.maxLat])
           .andWhereBetween('end_lon', [args.minLon, args.maxLon])
-          .from('route'),
-      )
+          .from('route')
+
+        getAreaSql(qb, areaRestrictions, onlyAreas, ctx.isMad, 'route')
+      })
 
     if (!getAreaSql(query, areaRestrictions, onlyAreas, ctx.isMad, 'route')) {
       return []

@@ -106,7 +106,7 @@ module.exports = function buildDefault(perms, available, dbModels) {
         : undefined,
     routes:
       perms.routes && dbModels.Route
-        ? { enabled: true, filter: {} }
+        ? { enabled: defaultFilters.routes.enabled, filter: {} }
         : undefined,
     portals:
       perms.portals && dbModels.Portal

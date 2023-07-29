@@ -565,6 +565,9 @@
     "portals": {
       "enabled": false
     },
+    "routes": {
+      "enabled": true
+    },
     "scanAreas": {
       "enabled": false
     },
