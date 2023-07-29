@@ -338,7 +338,7 @@ module.exports = class DbCheck {
       log.error(
         HELPERS.db,
         e,
-        `| Only ${[this.validModels].join(
+        `\n\nOnly ${[this.validModels].join(
           ', ',
         )} are valid options in the useFor arrays`,
       )

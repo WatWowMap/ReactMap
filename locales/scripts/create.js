@@ -1,17 +1,23 @@
+if (!process.env.NODE_CONFIG_DIR) {
+  process.env.NODE_CONFIG_DIR = `${__dirname}/../../server/src/configs`
+  process.env.ALLOW_CONFIG_MUTATIONS = 'true'
+}
+
 const fs = require('fs')
 const path = require('path')
 const fetch = require('node-fetch')
 
-const { api } = require('../../server/src/services/config')
+const config = require('config')
 const { log, HELPERS } = require('../../server/src/services/logger')
 
 const appLocalesFolder = path.resolve(__dirname, '../')
 const finalLocalesFolder = path.resolve(__dirname, '../../public/locales')
 const missingFolder = path.resolve(__dirname, '../missing-locales')
 
+const endpoint = config.get('api.pogoApiEndpoints.translations')
+
 const locales = async (directory = finalLocalesFolder) => {
-  if (!api.pogoApiEndpoints.translations)
-    log.error(HELPERS.locales, 'No translations endpoint')
+  if (!endpoint) log.error(HELPERS.locales, 'No translations endpoint')
   const localTranslations = await fs.promises.readdir(appLocalesFolder)
   const englishRef = fs.readFileSync(
     path.resolve(appLocalesFolder, 'en.json'),
@@ -24,9 +30,9 @@ const locales = async (directory = finalLocalesFolder) => {
       : log.info(HELPERS.locales, 'Locales folder created'),
   )
 
-  const availableRemote = await fetch(
-    `${api.pogoApiEndpoints.translations}/index.json`,
-  ).then((res) => res.json())
+  const availableRemote = await fetch(`${endpoint}/index.json`).then((res) =>
+    res.json(),
+  )
 
   await Promise.all(
     localTranslations
@@ -46,9 +52,7 @@ const locales = async (directory = finalLocalesFolder) => {
         try {
           const hasRemote = availableRemote.includes(locale)
           const remoteFiles = await fetch(
-            `${api.pogoApiEndpoints.translations}/static/locales/${
-              hasRemote ? baseName : 'en'
-            }.json`,
+            `${endpoint}/static/locales/${hasRemote ? baseName : 'en'}.json`,
           ).then((res) => res.json())
 
           if (!hasRemote) {
