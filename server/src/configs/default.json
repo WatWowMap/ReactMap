@@ -6,7 +6,8 @@
     "enabled": false,
     "graphiql": false,
     "queryDebug": false,
-    "clientPath": "../../dist"
+    "clientPath": "../../dist",
+    "logLevel": "info"
   },
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",

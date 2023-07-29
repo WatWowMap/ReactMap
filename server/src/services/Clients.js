@@ -1,11 +1,12 @@
 const { resolve } = require('path')
 const fs = require('fs')
 
-const config = require('./config')
+const config = require('config')
 const { log, HELPERS } = require('./logger')
 
-module.exports = Object.fromEntries(
-  config.authentication.strategies
+const Clients = Object.fromEntries(
+  config
+    .get('authentication.strategies')
     .filter(({ name, enabled }) => {
       log.info(
         HELPERS.auth,
@@ -36,3 +37,5 @@ module.exports = Object.fromEntries(
       }
     }),
 )
+
+module.exports = Clients

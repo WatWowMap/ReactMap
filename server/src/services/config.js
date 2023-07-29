@@ -1,5 +1,3 @@
-process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
-
 const fs = require('fs')
 const { resolve } = require('path')
 
