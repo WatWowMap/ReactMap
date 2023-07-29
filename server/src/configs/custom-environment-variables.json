@@ -18,7 +18,8 @@
       "__name": "DEV_OPTIONS_QUERY_DEBUG",
       "__format": "boolean"
     },
-    "clientPath": "DEV_OPTIONS_CLIENT_PATH"
+    "clientPath": "DEV_OPTIONS_CLIENT_PATH",
+    "logLevel": "DEV_OPTIONS_LOG_LEVEL"
   },
   "api": {
     "sessionSecret": "API_SESSION_SECRET",
