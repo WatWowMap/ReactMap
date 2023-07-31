@@ -635,5 +635,6 @@
   "routes_subtitle": "View in game routes and relevant information about them on the map",
   "description": "Description",
   "additional_info": "Additional Info",
-  "duration": "Duration"
+  "duration": "Duration",
+  "elevation": "Elevation"
 }

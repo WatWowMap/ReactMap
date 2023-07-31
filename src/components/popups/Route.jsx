@@ -16,6 +16,9 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import Box from '@mui/material/Box'
+import ArrowDropDown from '@mui/icons-material/ArrowDropDown'
+import ArrowDropUp from '@mui/icons-material/ArrowDropUp'
+import Typography from '@mui/material/Typography'
 
 import Query from '@services/Query'
 import formatInterval from '@services/functions/formatInterval'
@@ -148,6 +151,23 @@ export default function RoutePopup({ end, ...props }) {
     }
   }, [data])
 
+  const elevation = React.useMemo(() => {
+    const sum = { down: 0, up: 0 }
+    for (let i = 0; i < route.waypoints.length - 1; i += 1) {
+      const diff =
+        route.waypoints[i + 1].elevation_in_meters -
+        route.waypoints[i].elevation_in_meters
+      if (diff > 0) {
+        sum.up += diff
+      } else {
+        sum.down += Math.abs(diff)
+      }
+    }
+    sum.down = Math.round(sum.down)
+    sum.up = Math.round(sum.up)
+    return sum
+  }, [!!route.waypoints])
+
   const numFormatter = new Intl.NumberFormat(locale, {
     unitDisplay: 'short',
     unit: 'meter',
@@ -211,9 +231,24 @@ export default function RoutePopup({ end, ...props }) {
           <ListItemWrapper primary="duration">
             {`${formatInterval((route.duration_seconds || 0) * 1000).str}`}
           </ListItemWrapper>
-          <ListItemWrapper primary="points">
-            {route.waypoints.length}
-          </ListItemWrapper>
+          <ListItem disablePadding sx={{ justifyContent: 'space-around' }}>
+            <ListItemText
+              primary={`${t('elevation')}:`}
+              primaryTypographyProps={{ variant: 'subtitle2' }}
+            />
+            <Box display="flex" alignItems="center">
+              <ArrowDropUp fontSize="small" />
+              <Typography variant="caption">
+                {numFormatter.format(elevation.up)}
+              </Typography>
+            </Box>
+            <Box display="flex" alignItems="center">
+              <ArrowDropDown fontSize="small" />
+              <Typography variant="caption">
+                {numFormatter.format(elevation.down)}
+              </Typography>
+            </Box>
+          </ListItem>
           <ExpandableWrapper
             primary="route_tags"
             expandKey="tags"
