@@ -621,6 +621,7 @@
       "userCooldownSeconds": 0,
       "scanNextAreaRestriction": [],
       "discordRoles": [],
+      "local": [],
       "telegramGroups": []
     },
     "scanZone": {
@@ -639,6 +640,7 @@
       "scanZoneInstance": "scanZone",
       "scanZoneAreaRestriction": [],
       "discordRoles": [],
+      "local": [],
       "telegramGroups": []
     }
   },
