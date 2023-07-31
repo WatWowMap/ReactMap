@@ -153,7 +153,7 @@ export default function RoutePopup({ end, ...props }) {
 
   const elevation = React.useMemo(() => {
     const sum = { down: 0, up: 0 }
-    for (let i = 0; i < route.waypoints.length - 1; i += 1) {
+    for (let i = 1; i < route.waypoints.length - 2; i += 1) {
       const diff =
         route.waypoints[i + 1].elevation_in_meters -
         route.waypoints[i].elevation_in_meters
@@ -163,8 +163,6 @@ export default function RoutePopup({ end, ...props }) {
         sum.down += Math.abs(diff)
       }
     }
-    sum.down = Math.round(sum.down)
-    sum.up = Math.round(sum.up)
     return sum
   }, [!!route.waypoints])
 
@@ -172,6 +170,7 @@ export default function RoutePopup({ end, ...props }) {
     unitDisplay: 'short',
     unit: 'meter',
     style: 'unit',
+    maximumFractionDigits: 1,
   })
 
   const imagesAreEqual =
