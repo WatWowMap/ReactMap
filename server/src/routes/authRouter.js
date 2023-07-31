@@ -13,15 +13,15 @@ strategies.forEach((strategy, i) => {
     strategy.type === 'discord' || strategy.type === 'telegram' ? 'get' : 'post'
   if (strategy.enabled) {
     const name = strategy.name ?? `${strategy.type}-${i}`
-    const callbackOptions = {};
+    const callbackOptions = {}
     const authenticateOptions = {
       failureRedirect: '/',
       successRedirect: '/',
-    };
-    if (strategy.type === 'discord') {
-      callbackOptions.prompt = strategy.clientPrompt;
     }
-    router[method](`/${name}`, passport.authenticate(name, authenticateOptions));
+    if (strategy.type === 'discord') {
+      callbackOptions.prompt = strategy.clientPrompt
+    }
+    router[method](`/${name}`, passport.authenticate(name, authenticateOptions))
     router[method](`/${name}/callback`, async (req, res, next) =>
       passport.authenticate(name, callbackOptions, async (err, user, info) => {
         if (err) {
