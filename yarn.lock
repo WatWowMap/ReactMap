@@ -1197,7 +1197,7 @@
     "@sentry/types" "7.53.1"
     tslib "^1.9.3"
 
-"@sentry/vite-plugin@^2.2.1":
+"@sentry/vite-plugin@2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@sentry/vite-plugin/-/vite-plugin-2.2.1.tgz#6a5cc370514a60aafa7e4fd545df616389cab618"
   integrity sha512-7UeDnMRMis8o68penA8cIb2ph0je4MaJUsglFtk5zocyKr5HGCA7lh50cGAZW6/MIFEKiOZ+1mR6kYdjgACTZA==
@@ -1553,7 +1553,7 @@
   dependencies:
     "@types/node" "*"
 
-"@vitejs/plugin-react@^4.0.0":
+"@vitejs/plugin-react@4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@vitejs/plugin-react/-/plugin-react-4.0.0.tgz#46d1c37c507447d10467be1c111595174555ef28"
   integrity sha512-HX0XzMjL3hhOYm+0s95pb0Z7F8O81G7joUHgfDd/9J/ZZf5k4xX6QAMFkKsHFxaHlf6X7GD7+XuaZ66ULiJuhQ==
@@ -5691,7 +5691,7 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
-vite-plugin-checker@^0.6.0:
+vite-plugin-checker@0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/vite-plugin-checker/-/vite-plugin-checker-0.6.0.tgz#f8d09c5f6af427787c657249f7ac775d63cff7e8"
   integrity sha512-DWZ9Hv2TkpjviPxAelNUt4Q3IhSGrx7xrwdM64NI+Q4dt8PaMWJJh4qGNtSrfEuiuIzWWo00Ksvh5It4Y3L9xQ==
@@ -5714,7 +5714,7 @@ vite-plugin-checker@^0.6.0:
     vscode-languageserver-textdocument "^1.0.1"
     vscode-uri "^3.0.2"
 
-vite-plugin-static-copy@^0.16.0:
+vite-plugin-static-copy@0.16.0:
   version "0.16.0"
   resolved "https://registry.yarnpkg.com/vite-plugin-static-copy/-/vite-plugin-static-copy-0.16.0.tgz#2f65227037f17fc99c0782fd0b344e962935e69e"
   integrity sha512-dMVEg5Z2SwYRgQnHZaeokvSKB4p/TOTf65JU4sP3U6ccSBsukqdtDOjpmT+xzTFHAA8WJjcS31RMLjUdWQCBzw==
@@ -5724,7 +5724,7 @@ vite-plugin-static-copy@^0.16.0:
     fs-extra "^11.1.0"
     picocolors "^1.0.0"
 
-vite@^4.3.9:
+vite@4.3.9:
   version "4.3.9"
   resolved "https://registry.yarnpkg.com/vite/-/vite-4.3.9.tgz#db896200c0b1aa13b37cdc35c9e99ee2fdd5f96d"
   integrity sha512-qsTNZjO9NoJNW7KnOrgYwczm0WctJ8m/yqYAMAK9Lxt4SoySUfS5S8ia9K7JHpa3KEeMfyF8LoJ3c5NeBJy6pg==

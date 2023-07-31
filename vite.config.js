@@ -62,7 +62,7 @@ const localePlugin = () => ({
   },
 })
 
-module.exports = defineConfig(async ({ mode }) => {
+const config = defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
   const isRelease = process.argv.includes('-r')
 
@@ -210,3 +210,5 @@ module.exports = defineConfig(async ({ mode }) => {
     },
   }
 })
+
+module.exports = config
