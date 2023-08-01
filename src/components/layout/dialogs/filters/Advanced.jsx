@@ -58,7 +58,10 @@ export default function AdvancedFilter({
       const { name, value } = event.target
       setFilterValues({
         ...filterValues,
-        [name]: Array.isArray(value) ? value.filter(Boolean).join(',') : value,
+        [name]:
+          Array.isArray(value) && type === 'pokestops'
+            ? value.filter(Boolean).join(',')
+            : value,
       })
     }
   }
