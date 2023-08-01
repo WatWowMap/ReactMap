@@ -1,8 +1,8 @@
 const { promises: fs } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
+const { default: fetch } = require('node-fetch')
 const { generate } = require('../../scripts/generateMasterfile')
-const fetchJson = require('./api/fetchJson')
 const initWebhooks = require('./initWebhooks')
 const { log, HELPERS } = require('./logger')
 
@@ -153,7 +153,7 @@ module.exports = class EventManager {
       styles.map(async (style) => {
         try {
           const response = style.path.startsWith('http')
-            ? await fetchJson(`${style.path}/index.json`)
+            ? await fetch(`${style.path}/index.json`).then((res) => res.json())
             : JSON.parse(
                 await fs.readFile(
                   path.resolve(
@@ -162,6 +162,7 @@ module.exports = class EventManager {
                   ),
                 ),
               )
+
           return { ...style, data: response }
         } catch (e) {
           log.warn(
@@ -180,7 +181,7 @@ module.exports = class EventManager {
     )
     for (let i = 0; i < uicons.length; i += 1) {
       const uicon = uicons[i]
-      if (uicon.status === 'fulfilled') {
+      if (uicon.status === 'fulfilled' && uicon.value) {
         this.uiconsBackup[uicon.value.name] = uicon.value
       }
     }
@@ -191,7 +192,7 @@ module.exports = class EventManager {
     if (endpoint) {
       log.info(HELPERS.event, 'Fetching Latest Invasions')
       try {
-        const newInvasions = await fetchJson(endpoint)
+        const newInvasions = await fetch(endpoint).then((res) => res.json())
         if (newInvasions) {
           this.invasions = newInvasions
         }
