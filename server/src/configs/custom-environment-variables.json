@@ -79,6 +79,10 @@
         "__name": "API_POLLING_PORTALS",
         "__format": "number"
       },
+      "routes": {
+        "__name": "API_POLLING_ROUTES",
+        "__format": "number"
+      },
       "scanAreas": {
         "__name": "API_POLLING_SCAN_AREAS",
         "__format": "number"
@@ -1080,6 +1084,12 @@
         "__format": "boolean"
       }
     },
+    "routes": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_ROUTES_ENABLED",
+        "__format": "boolean"
+      }
+    },
     "scanAreas": {
       "enabled": {
         "__name": "DEFAULT_FILTERS_SCAN_AREAS_ENABLED",
@@ -1638,6 +1648,20 @@
         },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_BACKUPS_ROLES",
+          "__format": "json"
+        }
+      },
+      "routes": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_ROUTES_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_ROUTES_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_ROUTES_ROLES",
           "__format": "json"
         }
       }
