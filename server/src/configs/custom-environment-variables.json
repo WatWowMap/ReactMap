@@ -1222,6 +1222,10 @@
         "__name": "SCANNER_SCAN_NEXT_DISCORD_ROLES",
         "__format": "json"
       },
+      "local": {
+        "__name": "SCANNER_SCAN_NEXT_LOCAL",
+        "__format": "json"
+      },
       "telegramGroups": {
         "__name": "SCANNER_SCAN_NEXT_TELEGRAM_GROUPS",
         "__format": "json"
@@ -1277,6 +1281,10 @@
       },
       "discordRoles": {
         "__name": "SCANNER_SCAN_ZONE_DISCORD_ROLES",
+        "__format": "json"
+      },
+      "local": {
+        "__name": "SCANNER_SCAN_ZONE_LOCAL",
         "__format": "json"
       },
       "telegramGroups": {
