@@ -105,13 +105,15 @@ export default function AdvancedFilter({
       if (!questConditions[advancedFilter.id] && filterValues.adv) {
         setFilterValues({ ...filterValues, adv: '' })
       } else {
-        const filtered = filterValues.adv
-          .split(',')
-          .filter((each) =>
-            questConditions[advancedFilter.id].find(
-              ({ title }) => title === each,
-            ),
-          )
+        const filtered = questConditions[advancedFilter.id]
+          ? filterValues.adv
+              .split(',')
+              .filter((each) =>
+                questConditions[advancedFilter.id].find(
+                  ({ title }) => title === each,
+                ),
+              )
+          : []
         setFilterValues({
           ...filterValues,
           adv: filtered.length ? filtered.join(',') : '',
