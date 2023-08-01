@@ -114,16 +114,12 @@ const authHandler = async (_req, username, password, done) => {
               }
             }
           })
-          Utility.webhookPerms(
-            [user.status],
-            'local',
-            trialActive,
-          ).forEach((x) => user.perms.webhooks.push(x))
-          Utility.scannerPerms(
-            [user.status],
-            'local',
-            trialActive,
-          ).forEach((x) => user.perms.scanner.push(x))
+          Utility.webhookPerms([user.status], 'local', trialActive).forEach(
+            (x) => user.perms.webhooks.push(x),
+          )
+          Utility.scannerPerms([user.status], 'local', trialActive).forEach(
+            (x) => user.perms.scanner.push(x),
+          )
           log.info(
             HELPERS.custom(name),
             user.username,
