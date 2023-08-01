@@ -25,6 +25,7 @@ export default function Extras({ category, subItem, data }) {
     config: {
       map: { enableConfirmedInvasions, enableQuestSetSelector },
     },
+    filters: staticFilters,
   } = useStatic.getState()
 
   if (category === 'nests' && subItem === 'sliders') {
@@ -293,6 +294,36 @@ export default function Extras({ category, subItem, data }) {
             />
           </ListItem>
         ))}
+      </CollapsibleItem>
+    )
+  }
+  if (category === 'routes' && subItem === 'enabled') {
+    return (
+      <CollapsibleItem open={filters[category][subItem]}>
+        <ListItem>
+          <SliderTile
+            filterSlide={{
+              color: 'secondary',
+              disabled: false,
+              min: staticFilters.routes.distance[0] || 0,
+              max: staticFilters.routes.distance[1] || 25,
+              i18nKey: 'distance',
+              step: 0.5,
+              name: 'distance',
+              label: 'km',
+            }}
+            handleChange={(_, values) =>
+              setFilters({
+                ...filters,
+                [category]: {
+                  ...filters[category],
+                  distance: values,
+                },
+              })
+            }
+            filterValues={filters[category]}
+          />
+        </ListItem>
       </CollapsibleItem>
     )
   }

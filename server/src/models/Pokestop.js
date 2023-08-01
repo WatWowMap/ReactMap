@@ -829,12 +829,13 @@ module.exports = class Pokestop extends Model {
               default:
                 newQuest.key = `u${quest.quest_reward_type}`
             }
+
             if (
               quest.quest_timestamp >= midnight &&
               (filters.onlyAllPokestops ||
                 (filters[newQuest.key] &&
                   (filters[newQuest.key].adv
-                    ? quest.quest_title === filters[newQuest.key].adv
+                    ? filters[newQuest.key].adv.includes(quest.quest_title)
                     : true)) ||
                 filters[`u${quest.quest_reward_type}`])
             ) {

@@ -153,6 +153,7 @@ const mergeAuth = async () => {
     allowedGuilds: obj?.allowedGuilds,
     blockedGuilds: obj?.blockedGuilds,
     allowedUsers: obj?.allowedUsers,
+    clientPrompt: obj?.clientPrompt,
   })
 
   const telegramObj = (obj, name) => ({

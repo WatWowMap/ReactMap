@@ -76,6 +76,18 @@ body {
   -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 1);
 }
 
+.circle-route {
+  border-radius: 50%;
+}
+
+.start {
+  background-color: #00a3ee;
+}
+
+.end {
+  background-color: #ff4b4d;
+}
+
 .invasion-exists {
   border: 4px solid rgb(141, 13, 13);
 }

@@ -137,6 +137,14 @@ module.exports = gql`
       maxLon: Float
       filters: JSON
     ): [Weather]
+    route(id: ID): Route
+    routes(
+      minLat: Float
+      maxLat: Float
+      minLon: Float
+      maxLon: Float
+      filters: JSON
+    ): [Route]
     webhook(category: String, status: String, name: String): Poracle
     scanner(category: String, method: String, data: JSON): ScannerApi
   }

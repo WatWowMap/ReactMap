@@ -40,9 +40,11 @@ export default function LocalLogin({ href }) {
     e.preventDefault()
     setSubmitted(true)
     const resp = await Fetch.login(user, href)
-
     if (!resp.ok) {
-      setError(t(await resp.json()))
+      setError(t('localauth_failed'))
+      setSubmitted(false)
+    } else if (resp.url.includes('invalid_credentials')) {
+      setError(t('invalid_credentials'))
       setSubmitted(false)
     } else {
       window.location.replace('/')

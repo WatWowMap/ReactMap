@@ -39,7 +39,8 @@
           "pokestop",
           "scanCell",
           "spawnpoint",
-          "weather"
+          "weather",
+          "route"
         ]
       },
       {
@@ -233,6 +234,11 @@
         "roles": []
       },
       "backups": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "routes": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []

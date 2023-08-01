@@ -56,7 +56,13 @@ export default function AdvancedFilter({
       }
     } else {
       const { name, value } = event.target
-      setFilterValues({ ...filterValues, [name]: value })
+      setFilterValues({
+        ...filterValues,
+        [name]:
+          Array.isArray(value) && type === 'pokestops'
+            ? value.filter(Boolean).join(',')
+            : value,
+      })
     }
   }
 
@@ -98,12 +104,20 @@ export default function AdvancedFilter({
     if (type === 'pokestops' && ui.pokestops?.quests) {
       if (!questConditions[advancedFilter.id] && filterValues.adv) {
         setFilterValues({ ...filterValues, adv: '' })
-      } else if (
-        questConditions[advancedFilter.id]?.every(
-          (cond) => cond.title !== filterValues.adv,
-        )
-      ) {
-        setFilterValues({ ...filterValues, adv: '' })
+      } else {
+        const filtered = questConditions[advancedFilter.id]
+          ? filterValues.adv
+              .split(',')
+              .filter((each) =>
+                questConditions[advancedFilter.id].find(
+                  ({ title }) => title === each,
+                ),
+              )
+          : []
+        setFilterValues({
+          ...filterValues,
+          adv: filtered.length ? filtered.join(',') : '',
+        })
       }
     }
   }, [])
@@ -218,7 +232,12 @@ export default function AdvancedFilter({
             <Grid
               item
               xs={12}
-              style={{ textAlign: 'center', marginTop: 10, marginBottom: 10 }}
+              style={{
+                textAlign: 'center',
+                marginTop: 10,
+                marginBottom: 10,
+                maxWidth: 200,
+              }}
             >
               <FormControl
                 variant="outlined"
@@ -229,11 +248,22 @@ export default function AdvancedFilter({
                 <InputLabel>{t('quest_condition')}</InputLabel>
                 <Select
                   name="adv"
-                  value={filterValues.adv || ''}
+                  value={(filterValues.adv || '').split(',')}
                   fullWidth
+                  multiple
+                  renderValue={(selected) =>
+                    Array.isArray(selected)
+                      ? `${selected.length} ${t('selected')}`
+                      : selected
+                  }
                   size="small"
                   label={t('quest_condition')}
-                  onChange={(e) => handleChange(e)}
+                  onChange={(e, child) => {
+                    if (child.props.value === '') {
+                      return setFilterValues((prev) => ({ ...prev, adv: '' }))
+                    }
+                    return handleChange(e)
+                  }}
                 >
                   <MenuItem value="">
                     <Typography variant="caption">{t('all')}</Typography>

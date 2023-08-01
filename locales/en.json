@@ -455,6 +455,7 @@
   "webhook_strategy_success_0": "Success! Refreshing to fetch alert settings...",
   "register": "Register",
   "invalid_credentials": "Invalid Credentials",
+  "localauth_failed": "Authentication failed",
   "error_creating_user": "Unable to register new user at this time",
   "discord_linked": "Discord Linked",
   "telegram_linked": "Telegram Linked",
@@ -626,5 +627,15 @@
   "level_circles": "Level Indicators",
   "min_level_circle": "Minimum Circle Level",
   "mutation_auth_error": "Your request was unsuccessful due to not being logged in",
-  "submitted_by": "Submitted By"
+  "submitted_by": "Submitted By",
+  "reversible": "Reversible",
+  "version": "Version",
+  "route_tags": "Route Tags",
+  "routes": "Routes",
+  "route_type": "Route Type",
+  "routes_subtitle": "View in game routes and relevant information about them on the map",
+  "description": "Description",
+  "additional_info": "Additional Info",
+  "duration": "Duration",
+  "elevation": "Elevation"
 }

@@ -7,18 +7,18 @@ const BaseFilter = require('../Base')
 
 module.exports = class PokemonFilter extends BaseFilter {
   /**
-   * @param {boolean} enabled
-   * @param {'sm' | 'md' | 'lg' | 'xl'} size
-   * @param {number[]} iv
-   * @param {number[]} level
-   * @param {number[]} atk
-   * @param {number[]} def
-   * @param {number[]} sta
-   * @param {number[]} pvp
-   * @param {number} gender
-   * @param {number[]} cp
-   * @param {boolean} xxs
-   * @param {boolean} xxl
+   * @param {boolean} [enabled]
+   * @param {'sm' | 'md' | 'lg' | 'xl'} [size]
+   * @param {number[]} [iv]
+   * @param {number[]} [level]
+   * @param {number[]} [atk]
+   * @param {number[]} [def]
+   * @param {number[]} [sta]
+   * @param {number[]} [pvp]
+   * @param {number} [gender]
+   * @param {number[]} [cp]
+   * @param {boolean} [xxs]
+   * @param {boolean} [xxl]
    */
   constructor(
     enabled,
