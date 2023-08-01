@@ -270,7 +270,7 @@ export interface Route {
   image: string
   image_border_color: string
   reversible: boolean
-  tags: string[]
+  tags?: string[]
   type: number
   updated: number
   version: number
