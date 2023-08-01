@@ -462,6 +462,7 @@
   "register": "S'inscrire",
   "invalid_credentials": "Les informations d'identification sont invalides",
   "error_creating_user": "Impossible d'enregistrer un nouvel utilisateur pour le moment",
+  "localauth_failed": "Authentification impossible",
   "discord_linked": "Discord lié",
   "telegram_linked": "Télégram lié",
   "level": "niveau",

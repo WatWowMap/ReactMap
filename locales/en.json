@@ -455,6 +455,7 @@
   "webhook_strategy_success_0": "Success! Refreshing to fetch alert settings...",
   "register": "Register",
   "invalid_credentials": "Invalid Credentials",
+  "localauth_failed": "Authentication failed",
   "error_creating_user": "Unable to register new user at this time",
   "discord_linked": "Discord Linked",
   "telegram_linked": "Telegram Linked",
