@@ -5,6 +5,7 @@ const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
+const buildDefaultFilters = require('../services/filters/builder/base')
 
 /**
  * @typedef {(parent: unknown, args: object, context: import('../types').GqlContext) => unknown} Resolver
@@ -28,7 +29,7 @@ const resolvers = {
       return {
         ...available,
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
-        filters: Utility.buildDefaultFilters(perms, available, Db.models),
+        filters: buildDefaultFilters(perms, available, Db),
       }
     },
     backup: (_, args, { req, perms, Db }) => {
@@ -140,6 +141,18 @@ const resolvers = {
         return Db.getOne('Portal', args.id)
       }
       return {}
+    },
+    route: (_, args, { perms, Db }) => {
+      if (perms?.routes) {
+        return Db.query('Route', 'getOne', args.id)
+      }
+      return {}
+    },
+    routes: (_, args, { perms, Db }) => {
+      if (perms?.routes) {
+        return Db.query('Route', 'getAll', perms, args)
+      }
+      return []
     },
     s2cells: (_, args, { perms }) => {
       if (perms?.s2cells) {

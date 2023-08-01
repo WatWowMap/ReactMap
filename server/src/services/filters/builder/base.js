@@ -15,7 +15,14 @@ const custom = new PokemonFilter(
   ...Object.values(defaultFilters.pokemon.globalValues),
 )
 
-module.exports = function buildDefault(perms, available, dbModels) {
+/**
+ *
+ * @param {import('../../../types').Permissions} perms
+ * @param {import('../../../types').Available} available
+ * @param {import('../../../types').DbCheckClass} database
+ * @returns
+ */
+function buildDefaultFilters(perms, available, database) {
   const stopReducer =
     perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
@@ -24,7 +31,7 @@ module.exports = function buildDefault(perms, available, dbModels) {
 
   return {
     gyms:
-      gymReducer && dbModels.Gym
+      gymReducer && database.models.Gym
         ? {
             enabled: defaultFilters.gyms.enabled,
             allGyms: perms.gyms ? defaultFilters.gyms.enabled : undefined,
@@ -45,7 +52,7 @@ module.exports = function buildDefault(perms, available, dbModels) {
           }
         : undefined,
     nests:
-      perms.nests && dbModels.Nest
+      perms.nests && database.models.Nest
         ? {
             enabled: defaultFilters.nests.enabled,
             pokemon: defaultFilters.nests.pokemon,
@@ -55,7 +62,7 @@ module.exports = function buildDefault(perms, available, dbModels) {
           }
         : undefined,
     pokestops:
-      stopReducer && dbModels.Pokestop
+      stopReducer && database.models.Pokestop
         ? {
             enabled: defaultFilters.pokestops.enabled,
             allPokestops: perms.pokestops
@@ -85,7 +92,7 @@ module.exports = function buildDefault(perms, available, dbModels) {
           }
         : undefined,
     pokemon:
-      perms.pokemon && dbModels.Pokemon
+      perms.pokemon && database.models.Pokemon
         ? {
             enabled: defaultFilters.pokemon.enabled,
             legacy:
@@ -104,8 +111,21 @@ module.exports = function buildDefault(perms, available, dbModels) {
             filter: pokemon.full,
           }
         : undefined,
+    routes:
+      perms.routes && database.models.Route
+        ? {
+            enabled: defaultFilters.routes.enabled,
+            distance: [
+              0,
+              Math.ceil(database.filterContext.Route.maxDistance / 1000) + 1,
+            ],
+            filter: {
+              global: new BaseFilter(),
+            },
+          }
+        : undefined,
     portals:
-      perms.portals && dbModels.Portal
+      perms.portals && database.models.Portal
         ? {
             enabled: defaultFilters.portals.enabled,
             filter: {
@@ -123,7 +143,7 @@ module.exports = function buildDefault(perms, available, dbModels) {
         }
       : undefined,
     submissionCells:
-      perms.submissionCells && dbModels.Pokestop && dbModels.Gym
+      perms.submissionCells && database.models.Pokestop && database.models.Gym
         ? {
             enabled: defaultFilters.submissionCells.enabled,
             rings: defaultFilters.submissionCells.rings,
@@ -140,14 +160,14 @@ module.exports = function buildDefault(perms, available, dbModels) {
         }
       : undefined,
     weather:
-      perms.weather && dbModels.Weather
+      perms.weather && database.models.Weather
         ? {
             enabled: defaultFilters.weather.enabled,
             filter: { global: new BaseFilter() },
           }
         : undefined,
     spawnpoints:
-      perms.spawnpoints && dbModels.Spawnpoint
+      perms.spawnpoints && database.models.Spawnpoint
         ? {
             enabled: defaultFilters.spawnpoints.enabled,
             filter: {
@@ -158,14 +178,14 @@ module.exports = function buildDefault(perms, available, dbModels) {
           }
         : undefined,
     scanCells:
-      perms.scanCells && dbModels.ScanCell
+      perms.scanCells && database.models.ScanCell
         ? {
             enabled: defaultFilters.scanCells.enabled,
             filter: { global: new BaseFilter() },
           }
         : undefined,
     devices:
-      perms.devices && dbModels.Device
+      perms.devices && database.models.Device
         ? {
             enabled: defaultFilters.devices.enabled,
             filter: {
@@ -177,3 +197,5 @@ module.exports = function buildDefault(perms, available, dbModels) {
         : undefined,
   }
 }
+
+module.exports = buildDefaultFilters

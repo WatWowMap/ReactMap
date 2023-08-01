@@ -70,6 +70,7 @@ export default function customTheme(
               },
               '.leaflet-popup-tip-container .leaflet-popup-tip': {
                 backgroundColor: t.palette.background.paper,
+                border: `${t.palette.divider} solid 7px`,
               },
               '.leaflet-popup-content-wrapper': {
                 backgroundColor: t.palette.background.paper,

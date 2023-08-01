@@ -4,7 +4,7 @@ import { IconButton } from '@mui/material'
 
 import { useStore, useStatic } from '@hooks/useStore'
 
-export default function Navigation({ lat, lon }) {
+export default function Navigation({ lat, lon, size = 'large' }) {
   const { navigation } = useStore((state) => state.settings)
   const {
     navigation: {
@@ -17,7 +17,7 @@ export default function Navigation({ lat, lon }) {
       href={url.replace('{x}', lat).replace('{y}', lon)}
       target="_blank"
       rel="noreferrer"
-      size="large"
+      size={size}
       style={{ color: 'inherit' }}
     >
       <Map />

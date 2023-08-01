@@ -28,6 +28,7 @@
       "pokemon": 20,
       "pokestops": 300,
       "portals": 300,
+      "routes": 10000,
       "scanAreas": 10000,
       "scanCells": 10,
       "submissionCells": 500,
@@ -133,6 +134,7 @@
         "nests",
         "pokestops",
         "pokemon",
+        "routes",
         "wayfarer",
         "s2cells",
         "scanAreas",
@@ -564,6 +566,9 @@
     "portals": {
       "enabled": false
     },
+    "routes": {
+      "enabled": true
+    },
     "scanAreas": {
       "enabled": false
     },
@@ -661,6 +666,7 @@
         "allowedGuilds": [],
         "blockedGuilds": [],
         "allowedUsers": [],
+        "clientPrompt": "consent",
         "thumbnailUrl": "https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png",
         "trialPeriod": {
           "start": {
@@ -832,6 +838,11 @@
         "roles": []
       },
       "backups": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "routes": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []

@@ -53,6 +53,8 @@ const HELPERS = /** @type {const} */ ({
   devices: chalk.hex('#ff9800')('[DEVICE]'),
   nests: chalk.hex('#ff5724')('[NESTS]'),
   portals: chalk.hex('#795548')('[PORTALS]'),
+  route: chalk.hex('#607d8b')('[ROUTE]'),
+  routes: chalk.hex('#9e9e9e')('[ROUTES]'),
 
   custom: (text = '', color = '#64b5f6') =>
     chalk.hex(color)(`[${text.toUpperCase()}]`),

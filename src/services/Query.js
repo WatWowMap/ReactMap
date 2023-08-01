@@ -15,6 +15,7 @@ import scanner from './queries/scanner'
 import getGeocoder from './queries/geocoder'
 import * as user from './queries/user'
 import s2cell from './queries/s2cell'
+import { getRoute, getRoutes } from './queries/route'
 
 export default class Query {
   static devices() {
@@ -164,5 +165,10 @@ export default class Query {
 
   static s2cells() {
     return s2cell
+  }
+
+  static routes(method) {
+    if (method === 'getOne') return getRoute
+    return getRoutes
   }
 }

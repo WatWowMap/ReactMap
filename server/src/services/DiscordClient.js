@@ -343,6 +343,7 @@ module.exports = class DiscordClient {
           callbackURL: this.strategy.redirectUri,
           scope: ['identify', 'guilds'],
           passReqToCallback: true,
+          prompt: this.strategy.clientPrompt,
         },
         (...args) => this.authHandler(...args),
       ),

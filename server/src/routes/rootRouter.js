@@ -10,6 +10,7 @@ const Fetch = require('../services/Fetch')
 const { Event, Db } = require('../services/initialization')
 const { version } = require('../../../package.json')
 const { log, HELPERS } = require('../services/logger')
+const buildDefaultFilters = require('../services/filters/builder/base')
 
 const rootRouter = express.Router()
 
@@ -287,10 +288,10 @@ rootRouter.get('/api/settings', async (req, res, next) => {
         }
       }
 
-      serverSettings.defaultFilters = Utility.buildDefaultFilters(
+      serverSettings.defaultFilters = buildDefaultFilters(
         serverSettings.user.perms,
         serverSettings.available,
-        Db.models,
+        Db,
       )
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile
