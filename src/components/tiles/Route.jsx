@@ -49,7 +49,7 @@ const RouteTile = ({ item, Icons }) => {
   const [color, darkened] = React.useMemo(
     () => [
       `#${item.image_border_color}`,
-      darken(`#${item.image_border_color}`, 0.3),
+      darken(`#${item.image_border_color}`, 0.2),
     ],
     [item.image_border_color],
   )
@@ -129,7 +129,7 @@ const RouteTile = ({ item, Icons }) => {
             waypoint.lng_degrees,
           ])}
           pathOptions={{
-            color: clicked ? darkened : color,
+            color: clicked || hover ? darkened : color,
             opacity: clicked || hover ? 1 : OPACITY,
           }}
         />
