@@ -458,6 +458,7 @@
   "webhook_strategy_success_0": "Erfolg! Aktualisieren, um Benachrichtigungseinstellungen abzurufen...",
   "register": "Registrieren",
   "invalid_credentials": "Ungültige Anmeldeinformationen",
+  "localauth_failed": "Authentifizierung fehlgeschlagen",
   "error_creating_user": "Neuer Benutzer kann derzeit nicht registriert werden",
   "discord_linked": "Discord Verknüpft",
   "telegram_linked": "Telegram Verknüpft",
