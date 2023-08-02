@@ -9,7 +9,11 @@ import { CssBaseline, ThemeProvider } from '@mui/material'
 import { ApolloProvider } from '@apollo/client'
 
 import customTheme from '@assets/mui/theme'
+import { globalStyles } from '@assets/mui/global'
+import { useStore } from '@hooks/useStore'
 import client from '@services/apollo'
+import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled'
+import { setLoadingText } from '@services/functions/setLoadingText'
 
 import Config from './Config'
 import ErrorBoundary from './ErrorBoundary'
@@ -37,20 +41,39 @@ const LOADING_LOCALES = {
 
 function SetText() {
   const locale = localStorage?.getItem('i18nextLng') || 'en'
-  const loadingText = document.getElementById('loading-text')
-  if (loadingText)
-    loadingText.innerText =
-      LOADING_LOCALES[locale.toLowerCase()] || LOADING_LOCALES.en
+  setLoadingText(LOADING_LOCALES[locale.toLowerCase()] || LOADING_LOCALES.en)
   return <div />
+}
+
+/**
+ * @param {KeyboardEvent} event
+ */
+function toggleDarkMode(event) {
+  // This is mostly meant for development purposes
+  if (event.ctrlKey && event.key === 'd') {
+    useStore.setState((prev) => ({ darkMode: !prev.darkMode }))
+  }
 }
 
 export default function App() {
   const [theme, setTheme] = React.useState(customTheme())
 
-  return (
-    <React.Suspense fallback={<SetText />}>
-      <ThemeProvider theme={theme}>
+  React.useEffect(() => {
+    window.addEventListener('keydown', toggleDarkMode)
+    return () => window.removeEventListener('keydown', toggleDarkMode)
+  }, [])
+
+  const isValid = isLocalStorageEnabled()
+
+  if (!isValid) {
+    setLoadingText('Local storage is required to use this app!')
+  }
+
+  return isLocalStorageEnabled() ? (
+    <ThemeProvider theme={theme}>
+      <React.Suspense fallback={<SetText />}>
         <CssBaseline />
+        {globalStyles}
         <ApolloProvider client={client}>
           <ErrorBoundary>
             <BrowserRouter>
@@ -58,7 +81,7 @@ export default function App() {
             </BrowserRouter>
           </ErrorBoundary>
         </ApolloProvider>
-      </ThemeProvider>
-    </React.Suspense>
-  )
+      </React.Suspense>
+    </ThemeProvider>
+  ) : null
 }

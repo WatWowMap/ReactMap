@@ -45,7 +45,7 @@ export default function Login({ serverSettings, getServerSettings }) {
           direction="column"
           justifyContent="center"
           alignItems="center"
-          style={{ minHeight: '95vh', width: '100%' }}
+          sx={{ height: '100vh', width: '100%' }}
         >
           <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
             <Typography variant="h3" align="center">
