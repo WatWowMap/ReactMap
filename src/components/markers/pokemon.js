@@ -65,7 +65,12 @@ export const fancyMarker = (
           src="${iconUrl}"
           alt="${pkmn.pokemon_id}"
           style="
-            WebkitFilter: ${
+            -webkit-filter: ${
+              glow
+                ? `drop-shadow(0 0 10px ${glow})drop-shadow(0 0 10px ${glow})`
+                : 'none'
+            };
+            filter: ${
               glow
                 ? `drop-shadow(0 0 10px ${glow})drop-shadow(0 0 10px ${glow})`
                 : 'none'
