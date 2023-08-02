@@ -896,6 +896,10 @@
     {
       "name": "Intel",
       "url": "https://intel.ingress.com/intel?pll={x},{y}"
+    },
+    {
+      "name": "System",
+      "url": "geo:{x},{y}"
     }
   ],
   "icons": {

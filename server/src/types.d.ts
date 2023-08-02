@@ -20,6 +20,7 @@ import Backup = require('./models/Backup')
 import Nest = require('./models/Nest')
 import NestSubmission = require('./models/NestSubmission')
 import Pokestop = require('./models/Pokestop')
+import config = require('./configs/default.json')
 
 export interface DbContext {
   isMad: boolean
@@ -276,3 +277,5 @@ export interface Route {
   version: number
   waypoints: Waypoint[]
 }
+
+export type Config = typeof config

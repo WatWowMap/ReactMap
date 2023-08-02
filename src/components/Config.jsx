@@ -2,15 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import makeTheme from '@assets/mui/theme'
+import { useStore } from '@hooks/useStore'
 import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
-import { useStore } from '@hooks/useStore'
+import { setLoadingText } from '@services/functions/setLoadingText'
 
 import ReactRouter from './ReactRouter'
 import HolidayEffects from './HolidayEffects'
 
 const rootLoading = document.getElementById('loader')
-const loadingText = document.getElementById('loading-text')
 
 const LOCALE_MAP = /** @type {const} */ ({
   en: 'enUS',
@@ -73,9 +73,7 @@ export default function Config({ setTheme }) {
 
   React.useEffect(() => {
     if (!serverSettings) {
-      if (loadingText) {
-        loadingText.innerText = t('loading_settings')
-      }
+      setLoadingText(t('loading_settings'))
       getServerSettings()
     }
   }, [])
