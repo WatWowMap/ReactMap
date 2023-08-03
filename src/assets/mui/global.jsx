@@ -92,9 +92,21 @@ export const globalStyles = (
           color: theme.palette.text.primary,
         },
         '.iv-badge': {
-          backgroundColor: theme.palette.grey[grey],
           color: theme.palette.text.primary,
+          textAlign: 'center',
+          alignItems: 'center',
+          justifyContent: 'center',
+          display: 'flex',
+          font: 'bold 12px/8px Roboto, sans-serif',
+          padding: 4,
+          boxSizing: 'content-box',
+          flexWrap: 'nowrap',
+        },
+        '.raid-badge': {
           border: `2px solid ${theme.palette.divider}`,
+          position: 'absolute',
+          borderRadius: 12,
+          height: 14,
         },
         '.disabled-overlay': {
           backgroundColor: theme.palette.grey[grey],

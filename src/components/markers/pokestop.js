@@ -228,9 +228,12 @@ export default function stopMarker(
                 "
               />
               ${
-                icon.url.includes('stardust') || icon.url.includes('experience')
-                  ? icon.url.includes('/0.')
-                  : !icon.url.includes('_a') && icon.amount
+                (
+                  icon.url.includes('stardust') ||
+                  icon.url.includes('experience')
+                    ? icon.url.includes('/0.')
+                    : !icon.url.includes('_a') && icon.amount
+                )
                   ? /* html */ `
                   <div
                     class="amount-holder"

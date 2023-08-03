@@ -261,6 +261,12 @@ img {
   height: 100%;
 }
 
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .amount-holder {
   position: absolute;
   left: 50%;
@@ -285,19 +291,6 @@ img {
   text-shadow: #000 0 0 2px, #000 0 0 2px, #000 0 0 2px, #000 0 0 2px,
     #000 0 0 2px, #000 0 0 2px;
   font-weight: 700;
-}
-
-.iv-badge {
-  position: absolute;
-  text-align: center;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  font: bold 15px/13px Roboto, sans-serif;
-  height: 16px;
-  min-width: 14px;
-  padding: 4px 3px 0 3px;
-  box-sizing: content-box;
 }
 
 .weather-icon {

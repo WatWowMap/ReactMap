@@ -10,38 +10,18 @@ export const basicMarker = (iconUrl, size) =>
     className: 'marker',
   })
 
-const getBadge = (bestPvp) => {
-  switch (bestPvp) {
-    case 1:
-      return 'first'
-    case 2:
-      return 'second'
-    case 3:
-      return 'third'
-    default:
-      return ''
-  }
-}
-
 export const fancyMarker = (
   iconUrl,
   size,
   pkmn,
   glow,
-  ivCircle,
   Icons,
   weatherCheck,
   timeOfDay,
   userSettings,
-  levelCircle,
+  badge,
 ) => {
   const [pokemonMod, weatherMod] = Icons.getModifiers('pokemon', 'weather')
-  const badge = getBadge(pkmn.bestPvp)
-
-  const showSize =
-    userSettings?.showSizeIndicator &&
-    Number.isInteger(pkmn.size) &&
-    pkmn.size !== 3
 
   return divIcon({
     popupAnchor: [
@@ -52,6 +32,7 @@ export const fancyMarker = (
     className: 'pokemon-marker',
     html: /* html */ `
       <div
+        id="pokemon-${pkmn.id}"
         class="marker-image-holder top-overlay"
         style="
           opacity: ${
@@ -94,77 +75,35 @@ export const fancyMarker = (
             />`
             : ''
         }
-       ${
-         badge
-           ? /* html */ `
-           <img
-            src="${Icons.getMisc(badge)}"
-            alt="${badge}"
-            style="
-              width: ${size / 2}px;
-              height: auto;
-              bottom: ${(-size / 5) * pokemonMod.offsetY}px;
-              left: ${pokemonMod.offsetX * size * 4}%;
-            "
-            />`
-           : ''
-       }
-       ${
-         ivCircle && !badge
-           ? /* html */ `
-           <div
-            class="iv-badge"
-            style="
-              bottom: ${(-size / 5) * pokemonMod.offsetY}px;
-              left: ${pokemonMod.offsetX * size * 5}%;
-            "
-          >
-            ${Math.round(pkmn.iv)}
-          </div> `
-           : ''
-       }
         ${
-          levelCircle && !badge
+          badge
             ? /* html */ `
-            <div
-              class="iv-badge"
-              style="
-                bottom: ${(size / 1.5) * pokemonMod.offsetY}px;
-                left: ${pokemonMod.offsetX * size * 5}%;
-              "
-            >
-              L${Math.round(pkmn.level)}
-            </div>`
+            <img
+             src="${Icons.getMisc(badge)}"
+             alt="${badge}"
+             style="
+               width: ${size / 2}px;
+               height: auto;
+               bottom: ${(-size / 5) * pokemonMod.offsetY}px;
+               left: ${pokemonMod.offsetX * size * 4}%;
+             "
+             />`
             : ''
         }
-       ${
-         showSize
-           ? /* html */ `
-           <div
-            class="iv-badge"
-            style="
-              bottom: ${(-size / 5) * pokemonMod.offsetY}px;
-              right: ${pokemonMod.offsetX * size}%;
-              fontSize: 10px;
-            "
-          >
-            ${{ 1: 'XXS', 2: 'XS', 3: 'MD', 4: 'XL', 5: 'XXL' }[pkmn.size]}
-          </div>`
-           : ''
-       }
         ${
           weatherCheck
             ? /* html */ `
             <div
               class="weather-icon"
               style="
-                width: ${size / 2}px;
-                height: ${size / 2}px;
+                width: ${Math.max(17, size / 2)}px;
+                height: ${Math.max(17, size / 2)}px;
                 top: ${-size * pokemonMod.offsetY}px;
-                right: 0;
+                left: ${pokemonMod.offsetX * size * 5}%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                border-width: ${Math.max(1, size / 24)}px;
               "
             >
               <img
@@ -172,8 +111,8 @@ export const fancyMarker = (
                 alt="${pkmn.weather}"
                 class="${weatherMod.disableColorShift ? '' : 'fancy'}"
                 style="
-                  width: ${size / 3}px;
-                  height: ${size / 3}px;
+                  width: ${Math.max(10, size / 3)}px;
+                  height: ${Math.max(10, size / 3)}px;
                 "
               />
             </div>`

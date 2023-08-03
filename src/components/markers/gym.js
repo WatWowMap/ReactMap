@@ -120,7 +120,7 @@ export default function GymMarker(
                     });
                     background-size: cover;
                     background-repeat: no-repeat;
-                    clipPath: polygon(50% 0%, 80% 50%, 50% 100%, 20% 50%);
+                    clip-path: polygon(50% 0%, 80% 50%, 50% 100%, 20% 50%);
                     transform: translateX(-38%) translateY(-82%);
                   "
                 ></div>
@@ -218,13 +218,14 @@ export default function GymMarker(
             raidIcon && userSettings.raidLevelBadges /* html */
               ? `
                 <div
-                  class="iv-badge"
+                  class="iv-badge flex-center raid-badge"
                   style="
                     opacity: ${opacity};
                     background-color: ${getBadgeColor(raid_level)};
                     bottom: ${gymSize * 0.4 * raidMod.offsetY}px;
                     left: ${raidMod.offsetX * 200}%;
                     transform: translateX(-50%);
+                    min-width: ${raid_level === 6 ? 10 : 12}px;
                   "
                 >
               ${
@@ -235,11 +236,8 @@ export default function GymMarker(
                       alt="mega"
                       style="
                         opacity: ${opacity};
-                        width: 17.5px;
+                        width: 10px;
                         height: auto;
-                        position: absolute;
-                        bottom: 1.5px;
-                        transform: translateX(-50%);
                       "
                     />`
                   : raid_level
