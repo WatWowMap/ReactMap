@@ -53,8 +53,7 @@ export const fancyMarker = (
       src="${Icons.getMisc(badge)}"
       alt="${badge}"
       style="
-        width: ${size / 3}px;
-        height: auto;
+        height: 100%;
         bottom: ${(-size / 5) * pokemonMod.offsetY}px;
         left: ${pokemonMod.offsetX * size * 4}%;
       "
