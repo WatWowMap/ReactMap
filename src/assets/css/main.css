@@ -287,19 +287,6 @@ img {
   font-weight: 700;
 }
 
-.iv-badge {
-  position: absolute;
-  text-align: center;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  font: bold 14px/11px Roboto, sans-serif;
-  height: 14px;
-  min-width: 14px;
-  padding: 4px 3px 0 3px;
-  box-sizing: content-box;
-}
-
 .weather-icon {
   background-color: rgba(255, 255, 255, 0.5);
   border: 2px solid rgb(41, 102, 122);

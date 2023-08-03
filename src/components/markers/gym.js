@@ -225,6 +225,7 @@ export default function GymMarker(
                     bottom: ${gymSize * 0.4 * raidMod.offsetY}px;
                     left: ${raidMod.offsetX * 200}%;
                     transform: translateX(-50%);
+                    min-width: ${raid_level === 6 ? 10 : 12}px;
                   "
                 >
               ${
@@ -235,11 +236,8 @@ export default function GymMarker(
                       alt="mega"
                       style="
                         opacity: ${opacity};
-                        width: 17.5px;
+                        width: 10px;
                         height: auto;
-                        position: absolute;
-                        bottom: 1.5px;
-                        transform: translateX(-50%);
                       "
                     />`
                   : raid_level
