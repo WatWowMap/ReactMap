@@ -20,7 +20,7 @@ const components = {
     },
     styleOverrides: {
       root: ({ theme: t }) => ({
-        backgroundColor: t.palette.grey[t.palette.mode === 'dark' ? 900 : 50],
+        backgroundColor: t.palette.grey[t.palette.mode === 'dark' ? 800 : 500],
         width: '100%',
       }),
     },
