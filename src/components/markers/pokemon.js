@@ -144,7 +144,7 @@ export const fancyMarker = (
             class="iv-badge"
             style="
               bottom: ${(-size / 5) * pokemonMod.offsetY}px;
-              right: ${pokemonMod.offsetX * size}%;
+              right: ${pokemonMod.offsetX * (size / 4)}%;
               fontSize: 10px;
             "
           >
