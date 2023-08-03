@@ -43,6 +43,24 @@ export const fancyMarker = (
     Number.isInteger(pkmn.size) &&
     pkmn.size !== 3
 
+  const extras = []
+  if (ivCircle) extras.push(`${Math.round(pkmn.iv)}%`)
+  if (levelCircle) extras.push(`L${Math.round(pkmn.level)}`)
+  if (showSize) extras.push({ 1: 'XXS', 2: 'XS', 4: 'XL', 5: 'XXL' }[pkmn.size])
+  if (badge && extras.length > 0)
+    extras.push(/* html */ `
+    <img
+      src="${Icons.getMisc(badge)}"
+      alt="${badge}"
+      style="
+        width: ${size / 3}px;
+        height: auto;
+        bottom: ${(-size / 5) * pokemonMod.offsetY}px;
+        left: ${pokemonMod.offsetX * size * 4}%;
+      "
+  />
+  `)
+
   return divIcon({
     popupAnchor: [
       0 + pokemonMod.popupX,
@@ -94,62 +112,36 @@ export const fancyMarker = (
             />`
             : ''
         }
-       ${
-         badge
-           ? /* html */ `
-           <img
-            src="${Icons.getMisc(badge)}"
-            alt="${badge}"
-            style="
-              width: ${size / 2}px;
-              height: auto;
-              bottom: ${(-size / 5) * pokemonMod.offsetY}px;
-              left: ${pokemonMod.offsetX * size * 4}%;
-            "
-            />`
-           : ''
-       }
-       ${
-         ivCircle && !badge
-           ? /* html */ `
-           <div
-            class="iv-badge"
-            style="
-              bottom: ${(-size / 5) * pokemonMod.offsetY}px;
-              left: ${pokemonMod.offsetX * size * 5}%;
-            "
-          >
-            ${Math.round(pkmn.iv)}
-          </div> `
-           : ''
-       }
         ${
-          levelCircle && !badge
+          badge && !extras.length
             ? /* html */ `
-            <div
-              class="iv-badge"
-              style="
-                bottom: ${(size / 1.5) * pokemonMod.offsetY}px;
-                left: ${pokemonMod.offsetX * size * 5}%;
-              "
-            >
-              L${Math.round(pkmn.level)}
-            </div>`
+            <img
+             src="${Icons.getMisc(badge)}"
+             alt="${badge}"
+             style="
+               width: ${size / 2}px;
+               height: auto;
+               bottom: ${(-size / 5) * pokemonMod.offsetY}px;
+               left: ${pokemonMod.offsetX * size * 4}%;
+             "
+             />`
             : ''
         }
        ${
-         showSize
+         extras.length
            ? /* html */ `
-           <div
-            class="iv-badge"
-            style="
-              bottom: ${(-size / 5) * pokemonMod.offsetY}px;
-              right: ${pokemonMod.offsetX * (size / 4)}%;
-              fontSize: 10px;
-            "
-          >
-            ${{ 1: 'XXS', 2: 'XS', 3: 'MD', 4: 'XL', 5: 'XXL' }[pkmn.size]}
-          </div>`
+            <div
+              class="iv-badge"
+              style="
+                left: ${pokemonMod.offsetX * size * 4.3}%;
+                transform: translateX(-50%);
+                font-size: ${Math.max(size / 6, 8)}px;
+                bottom: ${pokemonMod.offsetY - 20}px;
+                padding: ${size / 20 > 3 ? 2 : 1}px 4px;
+              "
+            >
+              ${extras.join('<span>&nbsp;|&nbsp;</span>')}
+            </div>`
            : ''
        }
         ${
@@ -158,13 +150,14 @@ export const fancyMarker = (
             <div
               class="weather-icon"
               style="
-                width: ${size / 2}px;
-                height: ${size / 2}px;
+                width: ${Math.max(17, size / 2)}px;
+                height: ${Math.max(17, size / 2)}px;
                 top: ${-size * pokemonMod.offsetY}px;
-                right: 0;
+                left: ${pokemonMod.offsetX * size * 5}%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                border-width: ${Math.max(1, size / 24)}px;
               "
             >
               <img
@@ -172,8 +165,8 @@ export const fancyMarker = (
                 alt="${pkmn.weather}"
                 class="${weatherMod.disableColorShift ? '' : 'fancy'}"
                 style="
-                  width: ${size / 3}px;
-                  height: ${size / 3}px;
+                  width: ${Math.max(10, size / 3)}px;
+                  height: ${Math.max(10, size / 3)}px;
                 "
               />
             </div>`
