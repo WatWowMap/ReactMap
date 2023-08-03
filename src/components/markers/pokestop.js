@@ -1,5 +1,4 @@
-import React, { Fragment } from 'react'
-import { renderToString } from 'react-dom/server'
+/* eslint-disable no-nested-ternary */
 import L from 'leaflet'
 import getOpacity from '@services/functions/getOpacity'
 
@@ -165,93 +164,8 @@ export default function stopMarker(
   const totalQuestSize = questSizes.reduce((a, b) => a + b, 0)
   const totalInvasionSize = invasionSizes.reduce((a, b) => a + b, 0)
 
-  const ReactIcon = (
-    <div className="marker-image-holder top-overlay">
-      <img
-        src={baseIcon}
-        alt={baseIcon}
-        style={{
-          width: baseSize,
-          height: baseSize,
-          bottom: 2 + pokestopMod.offsetY,
-          left: `${pokestopMod.offsetX * 50}%`,
-          transform: 'translateX(-50%)',
-        }}
-      />
-      {Boolean(
-        userSettings.showArBadge &&
-          ar_scan_eligible &&
-          !baseIcon.includes('_ar'),
-      ) && (
-        <img
-          src={Icons.getMisc('ar')}
-          alt="ar"
-          style={{
-            width: baseSize / 2,
-            height: 'auto',
-            bottom: 23 + pokestopMod.offsetY,
-            left: `${pokestopMod.offsetX * 10}%`,
-            transform: 'translateX(-50%)',
-          }}
-        />
-      )}
-      {questIcons.map((icon, i) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <Fragment key={`${icon.url}-${i}`}>
-          <img
-            src={icon.url}
-            alt={icon.url}
-            style={{
-              width: questSizes[i],
-              height: questSizes[i],
-              bottom:
-                (baseSize * 0.6 +
-                  (invasionMod?.removeQuest ? 10 : totalInvasionSize)) *
-                  rewardMod.offsetY +
-                questSizes[i] * i,
-              left: `${rewardMod.offsetX * 50}%`,
-              transform: 'translateX(-50%)',
-            }}
-          />
-          {Boolean(
-            icon.url.includes('stardust') || icon.url.includes('experience')
-              ? icon.url.includes('/0.')
-              : !icon.url.includes('_a') && icon.amount,
-          ) && (
-            <div
-              className="amount-holder"
-              style={{
-                bottom:
-                  (baseSize * 0.6 +
-                    (invasionMod?.removeQuest ? 10 : totalInvasionSize)) *
-                    rewardMod.offsetY +
-                  questSizes[i] * i,
-                left: `${rewardMod.offsetX * 50}%`,
-                transform: 'translateX(-50%)',
-              }}
-            >
-              x{icon.amount}
-            </div>
-          )}
-        </Fragment>
-      ))}
-      {invasionIcons.map((invasion, i) => (
-        <img
-          key={invasion.icon}
-          src={invasion.icon}
-          alt={invasion.icon}
-          style={{
-            opacity: invasion.opacity,
-            width: invasionSizes[i],
-            height: invasionSizes[i],
-            bottom: baseSize * 0.5 * invasionMod.offsetY + invasionSizes[i] * i,
-            left: `${invasionMod.offsetX * 50}%`,
-            transform: 'translateX(-50%)',
-          }}
-        />
-      ))}
-    </div>
-  )
+  const showAr =
+    userSettings.showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')
 
   return L.divIcon({
     popupAnchor: [
@@ -264,6 +178,102 @@ export default function stopMarker(
         popupY,
     ],
     className: 'pokestop-marker',
-    html: renderToString(ReactIcon),
+    html: /* html */ `
+      <div class="marker-image-holder top-overlay">
+        <img
+          src="${baseIcon}"
+          alt="${baseIcon}"
+          style="
+            width: ${baseSize}px;
+            height: ${baseSize}px;
+            bottom: ${2 + pokestopMod.offsetY}px;
+            left: ${pokestopMod.offsetX * 50}%;
+            transform: translateX(-50%);
+          "
+        />
+        ${
+          showAr
+            ? `
+              <img
+                src="${Icons.getMisc('ar')}"
+                alt="ar"
+                style="
+                  width: ${baseSize / 2}px;
+                  height: auto;
+                  bottom: ${23 + pokestopMod.offsetY}px;
+                  left: ${pokestopMod.offsetX * 10}%;
+                  transform: translateX(-50%);
+                "
+              />
+            `
+            : ''
+        }
+        ${questIcons
+          .map(
+            (icon, i) => `
+              <img
+                src="${icon.url}"
+                alt="${icon.url}"
+                style="
+                  width: ${questSizes[i]}px;
+                  height: ${questSizes[i]}px;
+                  bottom: ${
+                    (baseSize * 0.6 +
+                      (invasionMod?.removeQuest ? 10 : totalInvasionSize)) *
+                      rewardMod.offsetY +
+                    questSizes[i] * i
+                  }px;
+                  left: ${rewardMod.offsetX * 50}%;
+                  transform: translateX(-50%);
+                "
+              />
+              ${
+                icon.url.includes('stardust') || icon.url.includes('experience')
+                  ? icon.url.includes('/0.')
+                  : !icon.url.includes('_a') && icon.amount
+                  ? /* html */ `
+                  <div
+                    class="amount-holder"
+                    style="
+                      bottom: ${
+                        (baseSize * 0.6 +
+                          (invasionMod?.removeQuest ? 10 : totalInvasionSize)) *
+                          rewardMod.offsetY +
+                        questSizes[i] * i
+                      }px;
+                      left: ${rewardMod.offsetX * 50}%;
+                      transform: translateX(-50%);
+                    "
+                  >
+                    x${icon.amount}
+                  </div>
+                `
+                  : ''
+              }
+          `,
+          )
+          .join('')}
+        ${invasionIcons
+          .map(
+            (invasion, i) => /* html */ `
+              <img
+                key="${invasion.icon}"
+                src="${invasion.icon}"
+                alt="${invasion.icon}"
+                style="
+                  opacity: ${invasion.opacity};
+                  width: ${invasionSizes[i]}px;
+                  height: ${invasionSizes[i]}px;
+                  bottom: ${
+                    baseSize * 0.5 * invasionMod.offsetY + invasionSizes[i] * i
+                  }px;
+                  left: ${invasionMod.offsetX * 50}%;
+                  transform: translateX(-50%);
+                "
+              />
+          `,
+          )
+          .join('')}
+      </div>`,
   })
 }
