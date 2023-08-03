@@ -18,6 +18,19 @@ const OPERATOR = {
   '>=': (a, b) => a >= b,
 }
 
+const getBadge = (bestPvp) => {
+  switch (bestPvp) {
+    case 1:
+      return 'first'
+    case 2:
+      return 'second'
+    case 3:
+      return 'third'
+    default:
+      return ''
+  }
+}
+
 const getGlowStatus = (item, userSettings, staticUserSettings) => {
   let glowCount = 0
   let glowValue
@@ -82,8 +95,13 @@ const PokemonTile = ({
     userSettings.levelCircles &&
     item.level !== null &&
     item.level >= userSettings.minLevelCircle
-  const pvpCheck = item.bestPvp !== null && item.bestPvp < 4
   const weatherCheck = item.weather && userSettings.weatherIndicator
+  const showSize =
+    userSettings?.showSizeIndicator &&
+    Number.isInteger(item.size) &&
+    item.size !== 3
+  const timerCheck = showTimer || userSettings.pokemonTimers
+  const badge = getBadge(item.bestPvp)
 
   const finalLocation = useMemo(
     () =>
@@ -98,6 +116,22 @@ const PokemonTile = ({
   )
 
   useForcePopup(item.id, markerRef, params, setParams, done)
+
+  const extras = []
+  if (ivCircle) extras.push(`${Math.round(item.iv)}%`)
+  if (levelCircle) extras.push(`L${Math.round(item.level)}`)
+  if (showSize) extras.push({ 1: 'XXS', 2: 'XS', 4: 'XL', 5: 'XXL' }[item.size])
+  if (badge && extras.length > 0)
+    extras.push(
+      <img
+        key={badge}
+        src={Icons.getMisc(badge)}
+        alt={badge}
+        style={{ height: 12 }}
+      />,
+    )
+  const pvpCheck =
+    item.bestPvp !== null && item.bestPvp < 4 && extras.length === 0
 
   return (
     !excludeList.includes(`${item.pokemon_id}-${item.form}`) &&
@@ -114,8 +148,6 @@ const PokemonTile = ({
         icon={
           pvpCheck ||
           glowStatus ||
-          ivCircle ||
-          levelCircle ||
           weatherCheck ||
           item.seen_type === 'nearby_cell' ||
           (Number.isInteger(item.size) && (item.size !== 3 || item.size !== 0))
@@ -124,12 +156,11 @@ const PokemonTile = ({
                 size,
                 item,
                 glowStatus,
-                ivCircle,
                 Icons,
                 weatherCheck,
                 timeOfDay,
                 userSettings,
-                levelCircle,
+                extras.length ? null : badge,
               )
             : basicMarker(url, size)
         }
@@ -144,8 +175,26 @@ const PokemonTile = ({
             config={config}
           />
         </Popup>
-        {(showTimer || userSettings.pokemonTimers) && (
-          <ToolTipWrapper timers={[item.expire_timestamp]} offset={[0, 18]} />
+        {(timerCheck || extras.length > 0) && (
+          <ToolTipWrapper
+            timers={timerCheck ? [item.expire_timestamp] : []}
+            offset={[0, 14]}
+            id={item.id}
+          >
+            {extras.length > 0 && (
+              <div className="iv-badge flex-center">
+                {extras.map((val, i) => (
+                  <span
+                    key={typeof val === 'string' ? val : val.key}
+                    className="flex-center"
+                  >
+                    {i ? <>&nbsp;|&nbsp;</> : null}
+                    {val}
+                  </span>
+                ))}
+              </div>
+            )}
+          </ToolTipWrapper>
         )}
         {showCircles && (
           <Circle

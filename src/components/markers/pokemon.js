@@ -10,55 +10,18 @@ export const basicMarker = (iconUrl, size) =>
     className: 'marker',
   })
 
-const getBadge = (bestPvp) => {
-  switch (bestPvp) {
-    case 1:
-      return 'first'
-    case 2:
-      return 'second'
-    case 3:
-      return 'third'
-    default:
-      return ''
-  }
-}
-
 export const fancyMarker = (
   iconUrl,
   size,
   pkmn,
   glow,
-  ivCircle,
   Icons,
   weatherCheck,
   timeOfDay,
   userSettings,
-  levelCircle,
+  badge,
 ) => {
   const [pokemonMod, weatherMod] = Icons.getModifiers('pokemon', 'weather')
-  const badge = getBadge(pkmn.bestPvp)
-
-  const showSize =
-    userSettings?.showSizeIndicator &&
-    Number.isInteger(pkmn.size) &&
-    pkmn.size !== 3
-
-  const extras = []
-  if (ivCircle) extras.push(`${Math.round(pkmn.iv)}%`)
-  if (levelCircle) extras.push(`L${Math.round(pkmn.level)}`)
-  if (showSize) extras.push({ 1: 'XXS', 2: 'XS', 4: 'XL', 5: 'XXL' }[pkmn.size])
-  if (badge && extras.length > 0)
-    extras.push(/* html */ `
-    <img
-      src="${Icons.getMisc(badge)}"
-      alt="${badge}"
-      style="
-        height: 100%;
-        bottom: ${(-size / 5) * pokemonMod.offsetY}px;
-        left: ${pokemonMod.offsetX * size * 4}%;
-      "
-  />
-  `)
 
   return divIcon({
     popupAnchor: [
@@ -69,6 +32,7 @@ export const fancyMarker = (
     className: 'pokemon-marker',
     html: /* html */ `
       <div
+        id="pokemon-${pkmn.id}"
         class="marker-image-holder top-overlay"
         style="
           opacity: ${
@@ -112,7 +76,7 @@ export const fancyMarker = (
             : ''
         }
         ${
-          badge && !extras.length
+          badge
             ? /* html */ `
             <img
              src="${Icons.getMisc(badge)}"
@@ -126,23 +90,6 @@ export const fancyMarker = (
              />`
             : ''
         }
-       ${
-         extras.length
-           ? /* html */ `
-            <div
-              class="iv-badge"
-              style="
-                left: ${pokemonMod.offsetX * size * 4.3}%;
-                transform: translateX(-50%);
-                font-size: ${Math.max(size / 6, 8)}px;
-                bottom: ${pokemonMod.offsetY - 20}px;
-                padding: ${size / 20 > 3 ? 2 : 1}px 4px;
-              "
-            >
-              ${extras.join('<span>&nbsp;|&nbsp;</span>')}
-            </div>`
-           : ''
-       }
         ${
           weatherCheck
             ? /* html */ `
