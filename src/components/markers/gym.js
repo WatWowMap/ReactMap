@@ -120,7 +120,7 @@ export default function GymMarker(
                     });
                     background-size: cover;
                     background-repeat: no-repeat;
-                    clipPath: polygon(50% 0%, 80% 50%, 50% 100%, 20% 50%);
+                    clip-path: polygon(50% 0%, 80% 50%, 50% 100%, 20% 50%);
                     transform: translateX(-38%) translateY(-82%);
                   "
                 ></div>
@@ -218,7 +218,7 @@ export default function GymMarker(
             raidIcon && userSettings.raidLevelBadges /* html */
               ? `
                 <div
-                  class="iv-badge"
+                  class="iv-badge flex-center raid-badge"
                   style="
                     opacity: ${opacity};
                     background-color: ${getBadgeColor(raid_level)};
