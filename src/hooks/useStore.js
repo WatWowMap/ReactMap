@@ -6,6 +6,7 @@ import { persist } from 'zustand/middleware'
  * @typedef {{
  *   darkMode: boolean,
  *   location: [number, number],
+ *   popups: Record<string, boolean>,
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
