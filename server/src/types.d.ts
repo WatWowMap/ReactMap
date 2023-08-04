@@ -262,10 +262,10 @@ export interface Route {
   duration_seconds: number
   start_fort_id: string
   start_lat: number
+  start_lon: number
   start_image: string
   end_fort_id: string
   end_lat: number
-  start_lon: number
   end_lon: number
   end_image: string
   image: string
