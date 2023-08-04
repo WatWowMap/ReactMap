@@ -42,10 +42,12 @@ class Route extends Model {
           .andWhereBetween('distance_meters', distanceInMeters)
           .from('route')
 
-        getAreaSql(qb, areaRestrictions, onlyAreas, ctx.isMad, 'route')
+        getAreaSql(qb, areaRestrictions, onlyAreas, ctx.isMad, 'route_end')
       })
 
-    if (!getAreaSql(query, areaRestrictions, onlyAreas, ctx.isMad, 'route')) {
+    if (
+      !getAreaSql(query, areaRestrictions, onlyAreas, ctx.isMad, 'route_start')
+    ) {
       return []
     }
     const results = await query

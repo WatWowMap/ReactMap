@@ -81,7 +81,6 @@ function ListItemWrapper({
  * @returns
  */
 function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
-  // @ts-ignore
   const expanded = useStore((s) => !!s.popups[expandKey])
   return (
     <>
@@ -94,9 +93,7 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
           onClick={() =>
             useStore.setState((prev) => ({
               popups: {
-                // @ts-ignore
                 ...prev.popups,
-                // @ts-ignore
                 [expandKey]: !prev.popups[expandKey],
               },
             }))
