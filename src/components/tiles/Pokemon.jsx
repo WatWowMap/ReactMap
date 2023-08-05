@@ -199,7 +199,7 @@ const PokemonTile = ({
         {showCircles && (
           <Circle
             center={finalLocation}
-            radius={70}
+            radius={40}
             pathOptions={{ color: '#BA42F6', weight: 1 }}
           />
         )}
