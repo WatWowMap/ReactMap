@@ -70,7 +70,7 @@ const Location = ({
 
   useEffect(() => () => lc.stop(), [])
 
-  const fetchedData = data || previousData
+  const fetchedData = data || previousData || { geocoder: [] }
 
   return (
     <Grid
@@ -115,7 +115,7 @@ const Location = ({
           style={{ width: '100%' }}
           getOptionLabel={(option) => Utility.formatter(addressFormat, option)}
           filterOptions={(x) => x}
-          options={fetchedData ? fetchedData.geocoder : []}
+          options={fetchedData.geocoder}
           autoComplete
           includeInputInList
           freeSolo
@@ -149,8 +149,8 @@ const Location = ({
               }}
             />
           )}
-          renderOption={(option) => (
-            <Grid container alignItems="center" spacing={1}>
+          renderOption={(props, option) => (
+            <Grid container alignItems="center" spacing={1} {...props}>
               <Grid item>
                 <LocationOn />
               </Grid>

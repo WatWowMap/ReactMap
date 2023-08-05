@@ -693,8 +693,8 @@ export default function WebhookAdvanced({
                     }}
                   />
                 )}
-                renderOption={(x) => (
-                  <Grid container alignItems="center" spacing={1}>
+                renderOption={(props, x) => (
+                  <Grid container alignItems="center" spacing={1} {...props}>
                     <Grid item xs={12}>
                       <Typography variant="subtitle2">{x.name}</Typography>
                     </Grid>
