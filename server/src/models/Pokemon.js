@@ -78,7 +78,7 @@ module.exports = class Pokemon extends Model {
    * @param {import("../types").DbContext} ctx
    * @returns {{ filterMap: Record<string, PkmnFilter>, globalFilter: PkmnFilter }}
    */
-  static getFilters(perms, args, { SubModel: _, connection: __, ...ctx }) {
+  static getFilters(perms, args, ctx) {
     const mods = {
       onlyAreas: args.filters.onlyAreas || [],
       ...ctx,
@@ -86,6 +86,7 @@ module.exports = class Pokemon extends Model {
         LEVELS.map((x) => [`onlyPvp${x}`, args.filters[`onlyPvp${x}`]]),
       ),
     }
+    /** @type {Record<string, PkmnFilter>} */
     const filterMap = {}
 
     Object.entries(args.filters).forEach(([key, filter]) => {
@@ -120,7 +121,7 @@ module.exports = class Pokemon extends Model {
    * @param {import("../types").Perms} perms
    * @param {object} args
    * @param {import("../types").DbContext} ctx
-   * @returns {Promise<import('../types').Pokemon[]>}
+   * @returns {Promise<Partial<import('../types').Pokemon>[]>}
    */
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
@@ -411,7 +412,7 @@ module.exports = class Pokemon extends Model {
    * @param {import("../types").Perms} perms
    * @param {object} args
    * @param {import("../types").DbContext} ctx
-   * @returns {Promise<import('../types').Pokemon[]>}
+   * @returns {Promise<Partial<import('../types').Pokemon>[]>}
    */
   static async getLegacy(perms, args, ctx) {
     const { isMad, hasSize, hasHeight, mem, secret } = ctx
@@ -520,7 +521,7 @@ module.exports = class Pokemon extends Model {
               isMad ? this.knex().fn.now() : ts,
             )
             .groupBy('pokemon_id', 'form')
-            .orderBy('pokemon_id', 'form'),
+            .orderBy(['pokemon_id', 'form']),
       'GET',
       secret,
     )
@@ -559,7 +560,7 @@ module.exports = class Pokemon extends Model {
    * @param {object} args
    * @param {import("../types").DbContext} ctx
    * @param {number} distance
-   * @returns {Promise<import('../types').Pokemon[]>}
+   * @returns {Promise<Partial<import('../types').Pokemon>[]>}
    */
   static async search(perms, args, { isMad, mem, secret }, distance) {
     const { search, locale, onlyAreas = [] } = args
@@ -627,10 +628,10 @@ module.exports = class Pokemon extends Model {
       )
       .map((poke) => ({
         ...poke,
-        iv: perms.iv && poke.iv ? poke.iv.toFixed(2) : null,
+        iv: perms.iv && poke.iv ? +poke.iv.toFixed(2) : null,
         distance:
           poke.distance ||
-          getDistance(
+          +getDistance(
             point([poke.lon, poke.lat]),
             point([args.lon, args.lat]),
             {
