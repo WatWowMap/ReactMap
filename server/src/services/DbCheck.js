@@ -385,8 +385,8 @@ module.exports = class DbCheck {
   async getAll(model, perms, args, userId, method = 'getAll') {
     try {
       const data = await Promise.all(
-        this.models[model].map(async (source) =>
-          source.SubModel[method](perms, args, source, userId),
+        this.models[model].map(async ({ SubModel, ...source }) =>
+          SubModel[method](perms, args, source, userId),
         ),
       )
       return DbCheck.deDupeResults(data)
@@ -404,8 +404,8 @@ module.exports = class DbCheck {
    */
   async getOne(model, id) {
     const data = await Promise.all(
-      this.models[model].map(async (source) =>
-        source.SubModel.getOne(id, source),
+      this.models[model].map(async ({ SubModel, ...source }) =>
+        SubModel.getOne(id, source),
       ),
     )
     const cleaned = DbCheck.deDupeResults(data.filter(Boolean))
@@ -422,8 +422,8 @@ module.exports = class DbCheck {
    */
   async search(model, perms, args, method = 'search') {
     const data = await Promise.all(
-      this.models[model].map(async (source) =>
-        source.SubModel[method](
+      this.models[model].map(async ({ SubModel, ...source }) =>
+        SubModel[method](
           perms,
           args,
           source,
@@ -450,13 +450,13 @@ module.exports = class DbCheck {
    */
   async submissionCells(perms, args) {
     const stopData = await Promise.all(
-      this.models.Pokestop.map(async (source) =>
-        source.SubModel.getSubmissions(perms, args, source),
+      this.models.Pokestop.map(async ({ SubModel, ...source }) =>
+        SubModel.getSubmissions(perms, args, source),
       ),
     )
     const gymData = await Promise.all(
-      this.models.Gym.map(async (source) =>
-        source.SubModel.getSubmissions(perms, args, source),
+      this.models.Gym.map(async ({ SubModel, ...source }) =>
+        SubModel.getSubmissions(perms, args, source),
       ),
     )
     return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]
@@ -483,8 +483,8 @@ module.exports = class DbCheck {
   async query(model, method, ...args) {
     if (Array.isArray(this.models[model])) {
       const data = await Promise.all(
-        this.models[model].map(async (source) =>
-          source.SubModel[method](...args, source),
+        this.models[model].map(async ({ SubModel, ...source }) =>
+          SubModel[method](...args, source),
         ),
       )
       return DbCheck.deDupeResults(data)
@@ -502,8 +502,8 @@ module.exports = class DbCheck {
       log.info(HELPERS.db, `Querying available for ${model}`)
       try {
         const results = await Promise.all(
-          this.models[model].map(async (source) =>
-            source.SubModel.getAvailable(source),
+          this.models[model].map(async ({ SubModel, ...source }) =>
+            SubModel.getAvailable(source),
           ),
         )
         log.info(HELPERS.db, `Setting available for ${model}`)
@@ -557,7 +557,9 @@ module.exports = class DbCheck {
   async getFilterContext() {
     if (this.models.Route) {
       const results = await Promise.all(
-        this.models.Route.map((source) => source.SubModel.getFilterContext()),
+        this.models.Route.map(({ SubModel, ...source }) =>
+          SubModel.getFilterContext(source),
+        ),
       )
       this.filterContext.Route.maxDistance = Math.max(
         ...results.map((result) => result.max_distance),

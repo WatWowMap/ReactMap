@@ -105,6 +105,10 @@ export interface Pokemon {
   first_seen_timestamp: number
   expire_timestamp_verified: boolean
   updated: number
+  pvp: { [league in (typeof LEAGUES)[number]]?: PvpEntry[] }
+  pvp_rankings_great_league?: PvpEntry[]
+  pvp_rankings_ultra_league?: PvpEntry[]
+  distance?: number
 }
 
 export interface AvailablePokemon {
