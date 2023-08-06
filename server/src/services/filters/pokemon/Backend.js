@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
-const config = require('../../config')
-const { KEYS, MAD_KEY_MAP, STANDARD, LEAGUES } = require('./constants')
+const config = require('config')
+const { KEYS, STANDARD, LEAGUES } = require('./constants')
 const {
   deepCompare,
   between,
@@ -12,11 +12,14 @@ const { filterRTree } = require('../../functions/filterRTree')
 const { Event, Pvp } = require('../../initialization')
 const { log, HELPERS } = require('../../logger')
 
+/** @type {import('../../../types').Config['api']['pvp']} */
+const pvpConfig = config.get('api.pvp')
+
 module.exports = class PkmnBackend {
   /**
    * @param {`${number}-${number}` | 'global'} id
-   * @param {import('./constants').PkmnFilter} filter
-   * @param {import('./constants').PkmnFilter} global
+   * @param {import("./Frontend")} filter
+   * @param {import("./Frontend")} global
    * @param {object} perms
    * @param {boolean} perms.pokemon
    * @param {boolean} perms.iv
@@ -139,8 +142,8 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {string} filter
-   * @returns {(pokemon?: import("../../../types").Pokemon) => boolean}
+   * @param {boolean} global
+   * @returns {(pokemon?: Partial<import("../../../types").Pokemon>) => boolean}
    */
   getCallback(global = false) {
     const filter = global ? this.global : this.filter
@@ -155,14 +158,14 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {import("./constants").PkmnFilter} filter
+   * @param {import("./Frontend")} filter
    * @returns {Set<(typeof import("./constants").KEYS)[number]>}
    */
   getRelevantKeys(filter = this.filter) {
     return new Set(
       KEYS.filter(
         (key) =>
-          (config.api.pvp.leagueObj[key] ? this.perms.pvp : this.perms.iv) &&
+          (pvpConfig.leagueObj[key] ? this.perms.pvp : this.perms.iv) &&
           this.isActive(key, filter),
       ),
     )
@@ -198,15 +201,15 @@ module.exports = class PkmnBackend {
 
     const cpCheck =
       this.mods.pvpV2 ||
-      config.api.pvp.reactMapHandlesPvp ||
-      entry.cp >= config.api.pvp.minCp[league]
+      pvpConfig.reactMapHandlesPvp ||
+      entry.cp >= pvpConfig.minCp[league]
     if (!cpCheck) return false
 
     const megaCheck = !entry.evolution || this.mods.onlyPvpMega
     if (!megaCheck) return false
 
     const capCheck =
-      this.mods.pvpV2 || config.api.pvp.reactMapHandlesPvp
+      this.mods.pvpV2 || pvpConfig.reactMapHandlesPvp
         ? entry.capped || this.mods[`onlyPvp${entry.cap}`]
         : true
     if (!capCheck) return false
@@ -216,8 +219,8 @@ module.exports = class PkmnBackend {
 
   /**
    * @param {typeof import("./constants").LEAGUES[number]} league
-   * @param {import("../../PvpWrapper").PokemonEntry[]} data
-   * @returns {{ best: number; filtered: import("../../PvpWrapper").PokemonEntry[]}}
+   * @param {import('../../../types').PvpEntry[]} data
+   * @returns {{ best: number; filtered: import('../../../types').PvpEntry[]}}
    */
   getRanks(league, data) {
     const filtered =
@@ -283,7 +286,7 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {import('../../../types').Pokemon} pokemon
+   * @param {Partial<import('../../../types').Pokemon>} pokemon
    * @return {boolean}
    */
   valid(pokemon) {
@@ -312,13 +315,13 @@ module.exports = class PkmnBackend {
    * @returns {{ cleanPvp: { [key in typeof LEAGUES[number]]?: number[] }, bestPvp: number }}
    */
   buildPvp(pokemon, safeTs = Math.floor(Date.now() / 1000)) {
-    const parsed = config.api.pvp.reactMapHandlesPvp
+    const parsed = pvpConfig.reactMapHandlesPvp
       ? Pvp.resultWithCache(pokemon, safeTs)
       : getParsedPvp(pokemon)
     const cleanPvp = {}
     let bestPvp = 4096
     Object.keys(parsed).forEach((league) => {
-      if (config.api.pvp.leagueObj[league]) {
+      if (pvpConfig.leagueObj[league]) {
         const { filtered, best } = this.getRanks(league, parsed[league])
         if (filtered.length) {
           cleanPvp[league] = filtered

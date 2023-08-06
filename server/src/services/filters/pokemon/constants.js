@@ -42,29 +42,6 @@ const MAD_KEY_MAP = /** @type {const} */ ({
   cp: 'cp',
 })
 
-/**
- * @typedef {object} PkmnFilter
- * @property {number[]} standard.iv
- * @property {number[]} standard.level
- * @property {number[]} standard.atk_iv
- * @property {number[]} standard.def_iv
- * @property {number[]} standard.sta_iv
- * @property {number[]} standard.cp
- * @property {number[]} standard.great
- * @property {number[]} standard.ultra
- * @property {number[]} standard.little
- * @property {number} standard.gender
- * @property {boolean} standard.xxs
- * @property {boolean} standard.xxl
- * @property {string} standard.size
- * @property {string} standard.adv
- * @property {boolean} standard.enabled
- */
-
-/**
- * @type {PkmnFilter}
- */
-
 const STANDARD = new PokemonFilter()
 
 module.exports = {

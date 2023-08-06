@@ -6,7 +6,7 @@ const { consolidateAreas } = require('./consolidateAreas')
 
 /**
  * Filters via RTree in place of MySQL query when using in memory data
- * @template {{ lat: number, lon: number }} T
+ * @template {{ lat?: number, lon?: number }} T
  * @param {T} item
  * @param {string[]} areaRestrictions
  * @param {string[]} onlyAreas
@@ -21,8 +21,8 @@ function filterRTree(item, areaRestrictions = [], onlyAreas = []) {
 
   const foundFeatures = config.areas.myRTree
     .search({
-      x: item.lon,
-      y: item.lat,
+      x: item.lon || 0,
+      y: item.lat || 0,
       w: 0,
       h: 0,
     })
@@ -31,7 +31,7 @@ function filterRTree(item, areaRestrictions = [], onlyAreas = []) {
   const foundInRtree =
     foundFeatures.length &&
     foundFeatures.some((feature) =>
-      pointInPolygon(point([item.lon, item.lat]), feature),
+      pointInPolygon(point([item.lon || 0, item.lat || 0]), feature),
     )
 
   return foundInRtree
