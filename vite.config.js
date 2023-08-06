@@ -128,6 +128,7 @@ const config = defineConfig(async ({ mode }) => {
         : []),
       localePlugin(),
     ],
+    optimizeDeps: mode === 'development' ? { exclude: ['@mui/*'] } : undefined,
     publicDir: 'public',
     resolve: {
       alias: {
