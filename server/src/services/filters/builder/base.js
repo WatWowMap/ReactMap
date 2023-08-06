@@ -170,6 +170,7 @@ function buildDefaultFilters(perms, available, database) {
       perms.spawnpoints && database.models.Spawnpoint
         ? {
             enabled: defaultFilters.spawnpoints.enabled,
+            tth: defaultFilters.spawnpoints.tth,
             filter: {
               global: new BaseFilter(),
               confirmed: new BaseFilter(),
