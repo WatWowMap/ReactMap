@@ -101,6 +101,7 @@
     "hideOldGyms": false,
     "stopValidDataLimit": 30,
     "hideOldPokestops": false,
+    "hideShowcaseRanks": false,
     "fetchTimeoutMs": 5000,
     "pogoApiEndpoints": {
       "invasions": "https://raw.githubusercontent.com/WatWowMap/event-info/main/grunts/formatted.json",

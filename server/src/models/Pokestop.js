@@ -10,6 +10,7 @@ const {
     queryLimits,
     stopValidDataLimit,
     hideOldPokestops,
+    hideShowcaseRanks,
   },
   map,
 } = require('../services/config')
@@ -685,6 +686,13 @@ module.exports = class Pokestop extends Model {
         perms.eventStops &&
         (filters.onlyAllPokestops || filters.onlyEventStops)
       ) {
+        const showcaseData =
+          typeof pokestop.showcase_rankings === 'string'
+            ? JSON.parse(pokestop.showcase_rankings)
+            : pokestop.showcase_rankings ?? {}
+        if (hideShowcaseRanks) {
+          showcaseData.contest_entries = []
+        }
         filtered.events = pokestop.invasions
           .filter((event) =>
             isMad && !hasMultiInvasions
@@ -694,10 +702,7 @@ module.exports = class Pokestop extends Model {
           .map((event) => ({
             event_expire_timestamp: event.incident_expire_timestamp,
             showcase_pokemon_id: pokestop.showcase_pokemon_id,
-            showcase_rankings:
-              typeof pokestop.showcase_rankings === 'string'
-                ? JSON.parse(pokestop.showcase_rankings)
-                : pokestop.showcase_rankings,
+            showcase_rankings: showcaseData,
             display_type:
               isMad && !hasMultiInvasions
                 ? MAD_GRUNT_MAP[event.grunt_type] || 8
