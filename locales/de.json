@@ -632,5 +632,19 @@
   "global_search_pokemon": "Gib den Pokemon-Namen ein...",
   "remove_webhook_entry": "Entferne von {{name}}",
   "event_stops": "Event Stops",
-  "event_stop_timers": "Event Stop Timer"
+  "event_stop_timers": "Event Stop Timer",
+  "reversible": "umkehrbar",
+  "version": "Version",
+  "route_tags": "Routen Tags",
+  "routes": "Routen",
+  "route_type": "Routen Typ",
+  "routes_subtitle": "Zeige Routen und relevante Infos dazu, auf der Map.",
+  "description": "Beschreibung",
+  "additional_info": "zusätzliche Infos",
+  "duration": "Dauer",
+  "elevation": "Höhenunterschied",
+  "tth": "TTH",
+  "tth_0": "alle",
+  "tth_1": "bekannt",
+  "tth_2": "unbekannt"
 }
