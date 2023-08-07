@@ -235,7 +235,7 @@ export default function PokestopPopup({
                               className="table-invasion three-quarters-width"
                             >
                               <TableBody>
-                                {contest_entries.map((position) => (
+                                {(contest_entries || []).map((position) => (
                                   <ShowcaseEntry
                                     key={position.rank}
                                     {...position}
