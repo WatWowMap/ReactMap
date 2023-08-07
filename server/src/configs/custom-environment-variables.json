@@ -1106,6 +1106,10 @@
       "enabled": {
         "__name": "DEFAULT_FILTERS_SPAWNPOINTS_ENABLED",
         "__format": "boolean"
+      },
+      "tth": {
+        "__name": "DEFAULT_FILTERS_SPAWNPOINTS_TTH",
+        "__format": "number"
       }
     },
     "submissionCells": {
