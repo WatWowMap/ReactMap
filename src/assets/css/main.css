@@ -175,7 +175,7 @@ body {
 }
 
 .three-quarters-width {
-  width: 75%;
+  width: 75% !important;
 }
 
 .table-invasion td:first-child {

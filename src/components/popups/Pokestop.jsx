@@ -65,7 +65,6 @@ export default function PokestopPopup({
         justifyContent="space-evenly"
         alignItems="center"
         style={{ width: 200 }}
-        spacing={1}
       >
         {!plainPokestop && (
           <Grid item xs={3} style={{ textAlign: 'center' }}>
