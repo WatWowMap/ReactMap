@@ -693,6 +693,11 @@ module.exports = class Pokestop extends Model {
           )
           .map((event) => ({
             event_expire_timestamp: event.incident_expire_timestamp,
+            showcase_pokemon_id: pokestop.showcase_pokemon_id,
+            showcase_rankings:
+              typeof pokestop.showcase_rankings === 'string'
+                ? JSON.parse(pokestop.showcase_rankings)
+                : pokestop.showcase_rankings,
             display_type:
               isMad && !hasMultiInvasions
                 ? MAD_GRUNT_MAP[event.grunt_type] || 8
@@ -948,6 +953,11 @@ module.exports = class Pokestop extends Model {
     return Object.values(filtered)
   }
 
+  /**
+   *
+   * @param {import('../types').DbContext} param0
+   * @returns
+   */
   static async getAvailable({
     isMad,
     hasAltQuests,
@@ -955,6 +965,7 @@ module.exports = class Pokestop extends Model {
     multiInvasionMs,
     hasRewardAmount,
     hasConfirmed,
+    hasShowcaseData,
   }) {
     const ts = Math.floor(new Date().getTime() / 1000)
     const finalList = new Set()
@@ -1324,6 +1335,14 @@ module.exports = class Pokestop extends Model {
       .orderBy(isMad ? 'active_fort_modifier' : 'lure_id')
     // lures
 
+    if (hasShowcaseData) {
+      queries.showcase = this.query()
+        .select('showcase_pokemon_id')
+        .distinct('showcase_pokemon_id')
+        .where('showcase_expiry', '>=', ts)
+        .orderBy('showcase_pokemon_id')
+    }
+
     const resolved = Object.fromEntries(
       await Promise.all(
         Object.entries(queries).map(async ([key, query]) => [key, await query]),
@@ -1430,6 +1449,13 @@ module.exports = class Pokestop extends Model {
               finalList.add(
                 `a${reward.slot_3_pokemon_id}-${reward.slot_3_form}`,
               )
+            })
+          }
+          break
+        case 'showcase':
+          if (hasShowcaseData) {
+            rewards.forEach((reward) => {
+              finalList.add(`f${reward.showcase_pokemon_id}`)
             })
           }
           break

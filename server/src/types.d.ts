@@ -39,6 +39,7 @@ export interface DbContext {
   availableSlotsCol: string
   polygon: boolean
   hasAlignment: boolean
+  hasShowcaseData: boolean
 }
 
 export interface Perms {

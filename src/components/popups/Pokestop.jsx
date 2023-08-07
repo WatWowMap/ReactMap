@@ -1,7 +1,18 @@
 import React, { Fragment, useState, useEffect } from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
-import { Grid, Typography, Collapse, IconButton, Divider } from '@mui/material'
+import {
+  Grid,
+  Typography,
+  Collapse,
+  IconButton,
+  Divider,
+  TableRow,
+  TableCell,
+  Table,
+  TableBody,
+  styled,
+} from '@mui/material'
 
 import { useTranslation, Trans } from 'react-i18next'
 
@@ -169,24 +180,70 @@ export default function PokestopPopup({
                   {(hasQuest || hasLure || hasInvasion) && (
                     <Divider light flexItem className="popup-divider" />
                   )}
-                  {events.map((event, index) => (
-                    <Fragment
-                      key={`${event.display_Type}-${event.event_expire_timestamp}`}
-                    >
-                      {index ? (
-                        <Divider light flexItem className="popup-divider" />
-                      ) : null}
-                      <TimeTile
-                        expireTime={event.event_expire_timestamp}
-                        icon={Icons.getEventStops(event.display_type)}
-                        until
-                        tt={t(
-                          `display_type_${event.display_type}`,
-                          t('unknown_event'),
-                        )}
-                      />
-                    </Fragment>
-                  ))}
+                  {events.map(({ showcase_rankings = {}, ...event }, index) => {
+                    const { contest_entries, ...showcase } = showcase_rankings
+                    return (
+                      <Fragment
+                        key={`${event.display_Type}-${event.event_expire_timestamp}`}
+                      >
+                        {index ? (
+                          <Divider light flexItem className="popup-divider" />
+                        ) : null}
+                        <TimeTile
+                          expireTime={event.event_expire_timestamp}
+                          expandKey={`event_${event.display_type}`}
+                          icon={
+                            event.showcase_pokemon_id ? (
+                              <NameTT
+                                key={event.showcase_pokemon_id}
+                                id={[`poke_${event.showcase_pokemon_id}`]}
+                              >
+                                <div className="invasion-reward">
+                                  <img
+                                    className="invasion-reward"
+                                    alt="invasion reward"
+                                    src={Icons.getPokemon(
+                                      event.showcase_pokemon_id,
+                                    )}
+                                  />
+                                  <img
+                                    className="invasion-reward-shadow"
+                                    alt="shadow"
+                                    src={Icons.getEventStops(
+                                      event.display_type,
+                                    )}
+                                  />
+                                </div>
+                              </NameTT>
+                            ) : (
+                              Icons.getEventStops(event.display_type)
+                            )
+                          }
+                          until
+                          tt={t(
+                            `display_type_${event.display_type}`,
+                            t('unknown_event'),
+                          )}
+                        >
+                          <Showcase {...showcase}>
+                            <Table
+                              size="small"
+                              className="table-invasion three-quarters-width"
+                            >
+                              <TableBody>
+                                {contest_entries.map((position) => (
+                                  <ShowcaseEntry
+                                    key={position.rank}
+                                    {...position}
+                                  />
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </Showcase>
+                        </TimeTile>
+                      </Fragment>
+                    )
+                  })}
                 </>
               )}
             </Grid>
@@ -650,60 +707,57 @@ const ExtraInfo = ({ pokestop, userSettings, t, ts }) => {
   )
 }
 
+const getRewardPercent = (grunt) => {
+  if (grunt.type.startsWith('NPC')) {
+    return {}
+  }
+  if (grunt.secondReward) {
+    return { first: '85%', second: '15%' }
+  }
+  if (grunt.thirdReward) {
+    return { third: '100%' }
+  }
+  if (grunt.firstReward) {
+    return { first: '100%' }
+  }
+  return {}
+}
+
+const ShadowPokemon = ({ Icons, ...pkmn }) => {
+  const src = Icons.getPokemon(
+    pkmn.id,
+    pkmn.form,
+    0,
+    pkmn.gender,
+    pkmn.costumeId,
+    1,
+    pkmn.shiny,
+  )
+  return (
+    <NameTT
+      key={`${pkmn.id}_${pkmn.form}`}
+      id={[pkmn.form ? `form_${pkmn.form}` : '', `poke_${pkmn.id}`]}
+    >
+      <div className="invasion-reward">
+        <img className="invasion-reward" alt="invasion reward" src={src} />
+        {!src.includes('_a1') && (
+          <img
+            className="invasion-reward-shadow"
+            alt="shadow"
+            src={Icons.getMisc('shadow')}
+          />
+        )}
+      </div>
+    </NameTT>
+  )
+}
+
 const Invasion = ({ invasion, Icons, t }) => {
   const { invasions: invasionInfo } = useStatic((state) => state.masterfile)
   const encounterNum = { first: '#1', second: '#2', third: '#3' }
 
-  const makeShadowPokemon = (pkmn) => {
-    const src = Icons.getPokemon(
-      pkmn.id,
-      pkmn.form,
-      0,
-      pkmn.gender,
-      pkmn.costumeId,
-      1,
-      pkmn.shiny,
-    )
-    return (
-      <NameTT
-        key={`${pkmn.id}_${pkmn.form}`}
-        id={[pkmn.form ? `form_${pkmn.form}` : '', `poke_${pkmn.id}`]}
-      >
-        <div className="invasion-reward">
-          <img className="invasion-reward" alt="invasion reward" src={src} />
-          {!src.includes('_a1') && (
-            <img
-              className="invasion-reward-shadow"
-              alt="shadow"
-              src={Icons.getMisc('shadow')}
-            />
-          )}
-        </div>
-      </NameTT>
-    )
-  }
-
-  const getRewardPercent = (grunt) => {
-    if (grunt.type.startsWith('NPC')) {
-      return {}
-    }
-    if (grunt.secondReward) {
-      return { first: '85%', second: '15%' }
-    }
-    if (grunt.thirdReward) {
-      return { third: '100%' }
-    }
-    if (grunt.firstReward) {
-      return { first: '100%' }
-    }
-    return {}
-  }
-
   return (
-    <Grid
-      container
-      key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
-    >
+    <Grid container>
       <Grid item xs={9}>
         <Typography variant="h6" align="center">
           {t(`grunt_a_${invasion.grunt_type}`)}
@@ -728,11 +782,19 @@ const Invasion = ({ invasion, Icons, t }) => {
                 <tr key={position}>
                   <td>{encounterNum[position]}</td>
                   <td>
-                    {id
-                      ? makeShadowPokemon({ id, form })
-                      : invasionInfo[invasion.grunt_type].encounters[
-                          position
-                        ].map((data) => makeShadowPokemon(data))}
+                    {id ? (
+                      <ShadowPokemon Icons={Icons} id={id} form={form} />
+                    ) : (
+                      invasionInfo[invasion.grunt_type].encounters[
+                        position
+                      ].map((data) => (
+                        <ShadowPokemon
+                          key={`${data.id}-${data.form}`}
+                          Icons={Icons}
+                          {...data}
+                        />
+                      ))
+                    )}
                   </td>
                   <td>
                     {getRewardPercent(invasionInfo[invasion.grunt_type])[
@@ -748,3 +810,46 @@ const Invasion = ({ invasion, Icons, t }) => {
     </Grid>
   )
 }
+
+const Showcase = ({ total_entries, last_update, children }) => {
+  const { t } = useTranslation()
+  return (
+    <Grid container>
+      <Grid item xs={12}>
+        {children}
+      </Grid>
+      <Grid item xs={6}>
+        <Typography variant="subtitle2" align="center">
+          {t(`total_entries`, 'Total Entries')}:
+        </Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <Typography variant="subtitle2" align="center">
+          {total_entries}
+        </Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <Typography variant="subtitle2" align="center">
+          {t(`last_update`, 'Last Update')}:
+        </Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <Timer expireTime={last_update} />
+      </Grid>
+    </Grid>
+  )
+}
+
+const NoBorderCell = styled(TableCell, {
+  shouldForwardProp: (prop) => prop !== 'textAlign',
+})(({ textAlign = 'right' }) => ({
+  borderBottom: 'none',
+  textAlign,
+}))
+
+const ShowcaseEntry = ({ rank, score }) => (
+  <TableRow>
+    <NoBorderCell>{rank}.</NoBorderCell>
+    <NoBorderCell textAlign="center">{score.toFixed(2)}</NoBorderCell>
+  </TableRow>
+)

@@ -221,7 +221,7 @@ export default function Extras({ category, subItem, data }) {
             .filter((event) => event.startsWith('b'))
             .map((event) => (
               <ListItem key={event}>
-                <ListItemIcon sx={{ pl: 4 }}>
+                <ListItemIcon sx={{ justifyContent: 'center' }}>
                   <img
                     src={Icons.getIconById(event)}
                     alt={t(`display_type_${event.slice(1)}`)}

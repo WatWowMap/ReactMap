@@ -204,6 +204,9 @@ export default class UIcons {
       case 'e':
         // raid eggs
         return this.getEggs(id.slice(1), false)
+      case 'f':
+        // showcase mons
+        return this.getPokemon(...id.slice(1).split('-'))
       case 'g':
         // gyms
         return this.getGyms(...id.slice(1).split('-'))
