@@ -181,7 +181,8 @@ export default function PokestopPopup({
                     <Divider light flexItem className="popup-divider" />
                   )}
                   {events.map(({ showcase_rankings = {}, ...event }, index) => {
-                    const { contest_entries, ...showcase } = showcase_rankings
+                    const { contest_entries = [], ...showcase } =
+                      showcase_rankings
                     return (
                       <Fragment
                         key={`${event.display_Type}-${event.event_expire_timestamp}`}
@@ -191,7 +192,11 @@ export default function PokestopPopup({
                         ) : null}
                         <TimeTile
                           expireTime={event.event_expire_timestamp}
-                          expandKey={`event_${event.display_type}`}
+                          expandKey={
+                            event.showcase_pokemon_id
+                              ? `event_${event.display_type}`
+                              : undefined
+                          }
                           icon={
                             event.showcase_pokemon_id ? (
                               <NameTT
