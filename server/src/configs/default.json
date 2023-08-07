@@ -576,7 +576,8 @@
       "enabled": false
     },
     "spawnpoints": {
-      "enabled": false
+      "enabled": false,
+      "tth": 0
     },
     "submissionCells": {
       "enabled": false,

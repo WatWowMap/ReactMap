@@ -376,7 +376,7 @@ module.exports = class DbCheck {
   /**
    * @template {import('../types').BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
-   * @param {import("../types").Perms} perms
+   * @param {import("../types").Permissions} perms
    * @param {object} args
    * @param {number} userId
    * @param {'getAll' | string} method
@@ -415,7 +415,7 @@ module.exports = class DbCheck {
   /**
    * @template {import('../types').BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
-   * @param {import("../types").Perms} perms
+   * @param {import("../types").Permissions} perms
    * @param {object} args
    * @param {'search' | string} method
    * @returns {Promise<T[]>}
@@ -441,7 +441,7 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @param {import("../types").Perms} perms
+   * @param {import("../types").Permissions} perms
    * @param {object} args
    * @returns {Promise<[
    *  import('../types').BaseRecord[],

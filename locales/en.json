@@ -637,5 +637,9 @@
   "description": "Description",
   "additional_info": "Additional Info",
   "duration": "Duration",
-  "elevation": "Elevation"
+  "elevation": "Elevation",
+  "tth": "TTH",
+  "tth_0": "All",
+  "tth_1": "Known",
+  "tth_2": "Unknown"
 }
