@@ -217,7 +217,7 @@ const parseAreas = (areasObj) => {
 }
 
 // Check if an areas.json exists
-module.exports = async () => {
+const getAreas = async () => {
   const scanAreas = {
     main: await loadScanPolygons(config.map.geoJsonFileName),
     ...Object.fromEntries(
@@ -293,6 +293,7 @@ module.exports = async () => {
   })
 
   const raw = loadAreas(scanAreas)
+  log.info(HELPERS.areas, 'Loaded areas')
   return {
     scanAreas,
     scanAreasMenu,
@@ -302,3 +303,5 @@ module.exports = async () => {
     ...parseAreas(raw),
   }
 }
+
+module.exports = getAreas

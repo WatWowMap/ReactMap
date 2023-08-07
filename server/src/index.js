@@ -393,27 +393,25 @@ connection.migrate.latest().then(async () => {
     Event.setAvailable('pokestops', 'Pokestop', Db),
     Event.setAvailable('pokemon', 'Pokemon', Db),
     Event.setAvailable('nests', 'Nest', Db),
-  ]).then(async () => {
-    await Promise.all([
-      Event.getUicons(config.icons.styles),
-      Event.getMasterfile(Db.historical, Db.rarity),
-      Event.getInvasions(config.api.pogoApiEndpoints.invasions),
-      Event.getWebhooks(config),
-      (config.areas = await getAreas()),
-    ]).then(() => {
-      httpServer.listen(config.port, config.interface)
-      const text = rainbow(
-        `ℹ ${new Date()
-          .toISOString()
-          .split('.')[0]
-          .split('T')
-          .join(' ')} [ReactMap] Server is now listening at http://${
-          config.interface
-        }:${config.port}`,
-      )
-      setTimeout(() => text.stop(), 3_000)
-    })
-  })
+  ])
+  await Promise.all([
+    Event.getUicons(config.icons.styles),
+    Event.getMasterfile(Db.historical, Db.rarity),
+    Event.getInvasions(config.api.pogoApiEndpoints.invasions),
+    Event.getWebhooks(config),
+    getAreas().then((res) => (config.areas = res)),
+  ])
+  httpServer.listen(config.port, config.interface)
+  const text = rainbow(
+    `ℹ ${new Date()
+      .toISOString()
+      .split('.')[0]
+      .split('T')
+      .join(' ')} [ReactMap] Server is now listening at http://${
+      config.interface
+    }:${config.port}`,
+  )
+  setTimeout(() => text.stop(), 3_000)
 })
 
 module.exports = app
