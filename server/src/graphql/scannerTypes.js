@@ -127,6 +127,7 @@ module.exports = gql`
     event_expire_timestamp: Int
     showcase_pokemon_id: Int
     showcase_rankings: ShowcaseDetails
+    showcase_ranking_standard: Int
   }
 
   type Pokestop {
