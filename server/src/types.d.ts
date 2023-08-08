@@ -42,33 +42,14 @@ export interface DbContext {
   hasShowcaseData: boolean
 }
 
-export interface Perms {
-  map: boolean
-  pokemon: boolean
-  iv: boolean
-  pvp: boolean
-  gyms: boolean
-  raids: boolean
-  pokestops: boolean
-  eventStops: boolean
-  quests: boolean
-  lures: boolean
-  portals: boolean
-  submissionCells: boolean
-  invasions: boolean
-  nests: boolean
-  scanAreas: boolean
-  weather: boolean
-  spawnpoints: boolean
-  s2cells: boolean
-  scanCells: boolean
-  devices: boolean
-  donor: boolean
-  gymBadges: boolean
-  backups: boolean
-  areaRestrictions: string[]
-  webhooks: string[]
-  scanner: string[]
+export interface User {
+  perms: Permissions
+  valid: boolean
+  id: number
+  discordId: string
+  username: string
+  telegramId: string
+  avatar: string
 }
 
 export interface Pokemon {
@@ -238,6 +219,8 @@ export interface Permissions {
   gymBadges: boolean
   backups: boolean
   routes: boolean
+  blocked: boolean
+  blockedGuildNames: string[]
   scanner: string[]
   areaRestrictions: string[]
   webhooks: string[]

@@ -73,7 +73,7 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../types").Perms} perms
+   * @param {import("../types").Permissions} perms
    * @param {object} args
    * @param {import("../types").DbContext} ctx
    * @returns {{ filterMap: Record<string, PkmnFilter>, globalFilter: PkmnFilter }}
@@ -118,7 +118,7 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../types").Perms} perms
+   * @param {import("../types").Permissions} perms
    * @param {object} args
    * @param {import("../types").DbContext} ctx
    * @returns {Promise<Partial<import('../types').Pokemon>[]>}
@@ -409,7 +409,7 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../types").Perms} perms
+   * @param {import("../types").Permissions} perms
    * @param {object} args
    * @param {import("../types").DbContext} ctx
    * @returns {Promise<Partial<import('../types').Pokemon>[]>}
@@ -556,7 +556,7 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../types").Perms} perms
+   * @param {import("../types").Permissions} perms
    * @param {object} args
    * @param {import("../types").DbContext} ctx
    * @param {number} distance
