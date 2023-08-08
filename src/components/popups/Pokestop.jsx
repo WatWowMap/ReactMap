@@ -843,7 +843,7 @@ const Showcase = ({
       </Grid>
       <Grid item xs={6}>
         <Typography variant="subtitle2" align="center">
-          {total_entries}
+          {total_entries} / 150 {/* TODO: Read from GM */}
         </Typography>
       </Grid>
       <Grid item xs={6}>
@@ -870,11 +870,10 @@ const ShowcaseEntry = ({ rank, score }) => {
   const Icons = useStatic((s) => s.Icons)
   return (
     <TableRow>
-      <NoBorderCell>{rank}.</NoBorderCell>
-      <NoBorderCell textAlign="center">{score.toFixed(2)}</NoBorderCell>
       <NoBorderCell>
         <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
       </NoBorderCell>
+      <NoBorderCell textAlign="center">{score.toFixed(2)}</NoBorderCell>
     </TableRow>
   )
 }
