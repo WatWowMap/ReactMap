@@ -48,6 +48,9 @@ export const globalStyles = (
           backgroundColor: theme.palette.background.paper,
           border: `${theme.palette.divider} solid 7px`,
         },
+        '.leaflet-popup-content': {
+          margin: '13px 20px',
+        },
         '.leaflet-popup-content-wrapper': {
           backgroundColor: theme.palette.background.paper,
           border: `${theme.palette.divider} solid 4px`,

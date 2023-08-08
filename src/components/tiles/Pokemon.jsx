@@ -5,6 +5,7 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 import useMarkerTimer from '@hooks/useMarkerTimer'
 import useForcePopup from '@hooks/useForcePopup'
 import { getOffset } from '@services/functions/offset'
+import { getBadge } from '@services/functions/getBadge'
 
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
@@ -16,19 +17,6 @@ const OPERATOR = {
   '<=': (a, b) => a <= b,
   '>': (a, b) => a > b,
   '>=': (a, b) => a >= b,
-}
-
-const getBadge = (bestPvp) => {
-  switch (bestPvp) {
-    case 1:
-      return 'first'
-    case 2:
-      return 'second'
-    case 3:
-      return 'third'
-    default:
-      return ''
-  }
 }
 
 const getGlowStatus = (item, userSettings, staticUserSettings) => {

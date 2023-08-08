@@ -20,6 +20,7 @@ import ErrorBoundary from '@components/ErrorBoundary'
 import { Check, Help } from '@components/layout/general/Icons'
 import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
+import { getBadge } from '@services/functions/getBadge'
 
 import Dropdown from './common/Dropdown'
 import TimeTile from './common/TimeTile'
@@ -101,12 +102,7 @@ export default function PokestopPopup({
               <PowerUp {...pokestop} />
             </>
           ) : (
-            <Grid
-              container
-              justifyContent="center"
-              alignItems="center"
-              spacing={1}
-            >
+            <Grid container justifyContent="center" alignItems="center">
               <PowerUp
                 {...pokestop}
                 divider={hasInvasion || hasQuest || hasLure}
@@ -229,7 +225,12 @@ export default function PokestopPopup({
                             t('unknown_event'),
                           )}
                         >
-                          <Showcase {...showcase}>
+                          <Showcase
+                            {...showcase}
+                            showcase_ranking_standard={
+                              event.showcase_ranking_standard
+                            }
+                          >
                             <Table
                               size="small"
                               className="table-invasion three-quarters-width"
@@ -815,10 +816,23 @@ const Invasion = ({ invasion, Icons, t }) => {
   )
 }
 
-const Showcase = ({ total_entries, last_update, children }) => {
+const Showcase = ({
+  showcase_ranking_standard,
+  total_entries,
+  last_update,
+  children,
+}) => {
   const { t } = useTranslation()
   return (
     <Grid container>
+      <Grid item xs={12}>
+        <Typography variant="h6" align="center">
+          {t(
+            `context_category_${showcase_ranking_standard}`,
+            t('unknown_event'),
+          )}
+        </Typography>
+      </Grid>
       <Grid item xs={12}>
         {children}
       </Grid>
@@ -834,7 +848,7 @@ const Showcase = ({ total_entries, last_update, children }) => {
       </Grid>
       <Grid item xs={6}>
         <Typography variant="subtitle2" align="center">
-          {t(`last_update`, 'Last Update')}:
+          {t(`last_updated`, 'Last Updated')}:
         </Typography>
       </Grid>
       <Grid item xs={6}>
@@ -848,12 +862,19 @@ const NoBorderCell = styled(TableCell, {
   shouldForwardProp: (prop) => prop !== 'textAlign',
 })(({ textAlign = 'right' }) => ({
   borderBottom: 'none',
+  padding: 2,
   textAlign,
 }))
 
-const ShowcaseEntry = ({ rank, score }) => (
-  <TableRow>
-    <NoBorderCell>{rank}.</NoBorderCell>
-    <NoBorderCell textAlign="center">{score.toFixed(2)}</NoBorderCell>
-  </TableRow>
-)
+const ShowcaseEntry = ({ rank, score }) => {
+  const Icons = useStatic((s) => s.Icons)
+  return (
+    <TableRow>
+      <NoBorderCell>{rank}.</NoBorderCell>
+      <NoBorderCell textAlign="center">{score.toFixed(2)}</NoBorderCell>
+      <NoBorderCell>
+        <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
+      </NoBorderCell>
+    </TableRow>
+  )
+}
