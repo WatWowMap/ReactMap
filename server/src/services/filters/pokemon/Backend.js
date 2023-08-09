@@ -240,7 +240,7 @@ module.exports = class PkmnBackend {
    *
    * @param {[number, number]} filter
    * @param {number} [limit]
-   * @returns
+   * @returns {[number, number]}
    */
   static ensureSafe(filter, limit = 100) {
     // eslint-disable-next-line no-nested-ternary
