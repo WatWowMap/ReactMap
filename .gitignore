@@ -76,3 +76,5 @@ src/**/*.custom.css
 
 # Logs
 server/src/models/queries/*
+/logs/*
+!./logs/.gitkeep
