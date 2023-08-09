@@ -1678,8 +1678,8 @@
         }
       },
       "showcaseRankings": {
-        "enabeld": {
-          "__name": "AUTHENTICATION_PERMS_SHOWCASE_RANKINGS_ENABELD",
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_SHOWCASE_RANKINGS_ENABLED",
           "__format": "boolean"
         },
         "trialPeriodEligible": {
