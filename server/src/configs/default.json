@@ -851,7 +851,7 @@
         "roles": []
       },
       "showcaseRankings": {
-        "enabeld": true,
+        "enabled": true,
         "trialPeriodEligible": false,
         "roles": []
       }
