@@ -3,6 +3,7 @@ import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
 import Slide from '@mui/material/Slide'
 import { useTranslation, Trans } from 'react-i18next'
+import { AlertTitle } from '@mui/material'
 
 function SlideTransition(props) {
   // eslint-disable-next-line react/jsx-props-no-spreading
@@ -15,6 +16,7 @@ export default function Notification({
   i18nKey,
   messages,
   cb,
+  title,
 }) {
   const { t } = useTranslation()
   const [alert, setAlert] = React.useState(true)
@@ -26,6 +28,13 @@ export default function Notification({
 
   React.useEffect(() => {
     setAlert(open)
+
+    if (open) {
+      const timer = setTimeout(() => {
+        handleClose()
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
   }, [open])
 
   return (
@@ -40,6 +49,7 @@ export default function Notification({
         variant="filled"
         style={{ textAlign: 'center', color: 'white' }}
       >
+        {title && <AlertTitle>{t(title)}</AlertTitle>}
         {i18nKey
           ? messages.map((message, i) => (
               <React.Fragment key={message.key}>
