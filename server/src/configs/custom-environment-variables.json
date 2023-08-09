@@ -1676,6 +1676,20 @@
           "__name": "AUTHENTICATION_PERMS_ROUTES_ROLES",
           "__format": "json"
         }
+      },
+      "showcaseRankings": {
+        "enabeld": {
+          "__name": "AUTHENTICATION_PERMS_SHOWCASE_RANKINGS_ENABELD",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_SHOWCASE_RANKINGS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_SHOWCASE_RANKINGS_ROLES",
+          "__format": "json"
+        }
       }
     }
   },
