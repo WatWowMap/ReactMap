@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 import { Grid, Typography, Button } from '@mui/material'
 import Refresh from '@mui/icons-material/Refresh'
 import { withTranslation } from 'react-i18next'
+import Notification from './layout/general/Notification'
 
 // This component uses React Classes due to componentDidCatch() not being available in React Hooks
 // Do not use this as a base for other components
@@ -12,21 +13,21 @@ class ErrorBoundary extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      hasError: false,
       message: '',
+      errorCount: 0,
     }
   }
 
   componentDidCatch(error) {
     console.error(error)
-    this.setState({
-      hasError: true,
+    this.setState((prev) => ({
       message: error?.message || '',
-    })
+      errorCount: prev.errorCount + 1,
+    }))
   }
 
   render() {
-    return this.state.hasError ? (
+    return this.state.errorCount > 5 ? (
       <Grid
         container
         justifyContent="center"
@@ -63,7 +64,18 @@ class ErrorBoundary extends Component {
         </Grid>
       </Grid>
     ) : (
-      this.props.children
+      <>
+        <Notification
+          open={this.state.errorCount > 0}
+          messages={this.state.message}
+          cb={() => this.setState({ errorCount: 0 })}
+          severity="error"
+          title="react_error"
+        >
+          <Typography>{this.state.message}</Typography>
+        </Notification>
+        {this.props.children || null}
+      </>
     )
   }
 }
