@@ -24,7 +24,6 @@ export function ScanAreaTile({
         search === '' ||
         f.properties.key.toLowerCase().includes(search.toLowerCase())
       }
-      pane="geojson"
       eventHandlers={{
         click: ({ propagatedFrom: layer }) => {
           if (!layer.feature) return

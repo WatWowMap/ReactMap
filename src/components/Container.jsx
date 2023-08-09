@@ -1,5 +1,5 @@
 import React from 'react'
-import { MapContainer, Pane } from 'react-leaflet'
+import { MapContainer } from 'react-leaflet'
 
 import useGenerate from '@hooks/useGenerate'
 import useRefresh from '@hooks/useRefresh'
@@ -21,10 +21,6 @@ export default function Container({ serverSettings, params, location, zoom }) {
           : zoom
       }
       zoomControl={false}
-      // style={{
-      //   width: '100vw',
-      //   height: '100vh',
-      // }}
       maxBounds={[
         [-90, -210],
         [90, 210],
@@ -34,9 +30,6 @@ export default function Container({ serverSettings, params, location, zoom }) {
       {serverSettings.user && serverSettings.user.perms.map && (
         <Map serverSettings={serverSettings} params={params} />
       )}
-      <Pane name="geojson" style={{ zIndex: 501 }} />
-      <Pane name="circlePane" style={{ zIndex: 450, pointerEvents: 'none' }} />
-      <Pane name="scanCells" style={{ zIndex: 400 }} />
     </MapContainer>
   )
 }
