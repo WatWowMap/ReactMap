@@ -236,6 +236,17 @@ module.exports = class PkmnBackend {
     return { filtered, best }
   }
 
+  /**
+   *
+   * @param {[number, number]} filter
+   * @param {number} [limit]
+   * @returns {[number, number]}
+   */
+  static ensureSafe(filter, limit = 100) {
+    // eslint-disable-next-line no-nested-ternary
+    return filter.map((x, i) => (x > limit ? (i ? limit : 0) : x))
+  }
+
   buildApiFilter() {
     const {
       enabled: _enabled,
@@ -256,7 +267,10 @@ module.exports = class PkmnBackend {
       ? Object.fromEntries(
           Object.entries(rest).map(([league, values]) => {
             if (Array.isArray(values) && this.filterKeys.has(league)) {
-              return [league, values]
+              return [
+                league,
+                PkmnBackend.ensureSafe(values, STANDARD[league]?.[1]),
+              ]
             }
             return [league, undefined]
           }),
@@ -269,12 +283,22 @@ module.exports = class PkmnBackend {
       return { additional: { include_everything: true } }
     }
     return {
-      iv: this.filterKeys.has('iv') ? iv : undefined,
-      atk_iv: this.filterKeys.has('atk_iv') ? atk_iv : undefined,
-      def_iv: this.filterKeys.has('def_iv') ? def_iv : undefined,
-      sta_iv: this.filterKeys.has('sta_iv') ? sta_iv : undefined,
-      cp: this.filterKeys.has('cp') ? cp : undefined,
-      level: this.filterKeys.has('level') ? level : undefined,
+      iv: this.filterKeys.has('iv') ? PkmnBackend.ensureSafe(iv) : undefined,
+      atk_iv: this.filterKeys.has('atk_iv')
+        ? PkmnBackend.ensureSafe(atk_iv, 15)
+        : undefined,
+      def_iv: this.filterKeys.has('def_iv')
+        ? PkmnBackend.ensureSafe(def_iv, 15)
+        : undefined,
+      sta_iv: this.filterKeys.has('sta_iv')
+        ? PkmnBackend.ensureSafe(sta_iv, 15)
+        : undefined,
+      cp: this.filterKeys.has('cp')
+        ? PkmnBackend.ensureSafe(cp, STANDARD.cp[1])
+        : undefined,
+      level: this.filterKeys.has('level')
+        ? PkmnBackend.ensureSafe(level, 35)
+        : undefined,
       gender: this.filterKeys.has('gender') ? gender : undefined,
       pvp: Object.keys(pvp || {}).length ? pvp : undefined,
       additional: {
