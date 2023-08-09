@@ -37,7 +37,6 @@ export default function Container({ serverSettings, params, location, zoom }) {
       <Pane name="geojson" style={{ zIndex: 501 }} />
       <Pane name="circlePane" style={{ zIndex: 450, pointerEvents: 'none' }} />
       <Pane name="scanCells" style={{ zIndex: 400 }} />
-      <Pane name="routes" style={{ zIndex: 399 }} />
     </MapContainer>
   )
 }

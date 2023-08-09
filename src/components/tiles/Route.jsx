@@ -4,7 +4,6 @@ import * as React from 'react'
 import { Marker, Polyline, useMapEvents } from 'react-leaflet'
 import { darken } from '@mui/material'
 
-import ErrorBoundary from '@components/ErrorBoundary'
 import RoutePopup from '@components/popups/Route'
 
 import routeMarker from '../markers/route'
@@ -62,13 +61,6 @@ const RouteTile = ({ item, Icons }) => {
         setHover('')
       }
     },
-    /** @param {{ target: import('leaflet').Map }} args */
-    zoom: ({ target }) => {
-      const pane = target.getPane('routes')
-      if (pane) {
-        pane.hidden = target.getZoom() < 13
-      }
-    },
   })
 
   return (
@@ -104,38 +96,35 @@ const RouteTile = ({ item, Icons }) => {
           />
         </Marker>
       ))}
-      <ErrorBoundary>
-        <Polyline
-          ref={lineRef}
-          pane="routes"
-          eventHandlers={{
-            click: ({ originalEvent }) => {
-              originalEvent.preventDefault()
-              setClicked((prev) => !prev)
-            },
-            mouseover: ({ target }) => {
-              if (target && !clicked) {
-                target.setStyle({ color: darkened, opacity: 1 })
-              }
-            },
-            mouseout: ({ target }) => {
-              if (target && !clicked) {
-                target.setStyle({ color, opacity: LINE_OPACITY })
-              }
-            },
-          }}
-          dashArray={item.reversible ? undefined : '5, 5'}
-          positions={waypoints.map((waypoint) => [
-            waypoint.lat_degrees,
-            waypoint.lng_degrees,
-          ])}
-          pathOptions={{
-            color: clicked || hover ? darkened : color,
-            opacity: clicked || hover ? 1 : LINE_OPACITY,
-            weight: 4,
-          }}
-        />
-      </ErrorBoundary>
+      <Polyline
+        ref={lineRef}
+        eventHandlers={{
+          click: ({ originalEvent }) => {
+            originalEvent.preventDefault()
+            setClicked((prev) => !prev)
+          },
+          mouseover: ({ target }) => {
+            if (target && !clicked) {
+              target.setStyle({ color: darkened, opacity: 1 })
+            }
+          },
+          mouseout: ({ target }) => {
+            if (target && !clicked) {
+              target.setStyle({ color, opacity: LINE_OPACITY })
+            }
+          },
+        }}
+        dashArray={item.reversible ? undefined : '5, 5'}
+        positions={waypoints.map((waypoint) => [
+          waypoint.lat_degrees,
+          waypoint.lng_degrees,
+        ])}
+        pathOptions={{
+          color: clicked || hover ? darkened : color,
+          opacity: clicked || hover ? 1 : LINE_OPACITY,
+          weight: 4,
+        }}
+      />
     </>
   )
 }
