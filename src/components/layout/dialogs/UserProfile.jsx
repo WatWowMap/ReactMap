@@ -280,7 +280,7 @@ const ProfilePermissions = ({ auth, excludeList, t }) => {
     <Grid
       container
       direction="row"
-      alignItems="center"
+      alignItems="stretch"
       justifyContent="center"
       spacing={2}
       style={{ padding: 5 }}
@@ -316,8 +316,12 @@ const ProfilePermissions = ({ auth, excludeList, t }) => {
 
 const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
   <Card className="perm-wrapper">
-    {(Array.isArray(perms[perm]) ? !perms[perm].length : !perms[perm]) && (
-      <div className="disabled-overlay" />
+    {(Array.isArray(perms[perm]) ? false : !perms[perm]) && (
+      <div className="disabled-overlay flex-center">
+        <Typography variant="h6" align="center" pb={4}>
+          {t('no_access')}
+        </Typography>
+      </div>
     )}
     {(perm !== 'areaRestrictions' &&
       perm !== 'webhooks' &&
@@ -336,8 +340,8 @@ const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
       <Grid
         container
         direction="column"
-        style={{
-          height: 260,
+        sx={{
+          minHeight: 260,
           border: 'black 4px solid',
           borderRadius: 4,
           borderBottomLeftRadius: 0,
@@ -354,7 +358,7 @@ const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
         ))}
       </Grid>
     )}
-    <CardContent style={{ height: 100 }}>
+    <CardContent style={{ minHeight: 100 }}>
       <Typography gutterBottom variant="h6" noWrap>
         {t(Utility.camelToSnake(perm))}
       </Typography>
