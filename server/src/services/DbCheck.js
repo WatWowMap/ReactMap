@@ -133,13 +133,15 @@ module.exports = class DbCheck {
         'size' in columns,
         'height' in columns,
       ])
-    const [hasRewardAmount, hasPowerUp, hasAltQuests] = await schema('pokestop')
-      .columnInfo()
-      .then((columns) => [
-        'quest_reward_amount' in columns || isMad,
-        'power_up_level' in columns,
-        'alternative_quest_type' in columns,
-      ])
+    const [hasRewardAmount, hasPowerUp, hasAltQuests, hasShowcaseData] =
+      await schema('pokestop')
+        .columnInfo()
+        .then((columns) => [
+          'quest_reward_amount' in columns || isMad,
+          'power_up_level' in columns,
+          'alternative_quest_type' in columns,
+          'showcase_pokemon_id' in columns,
+        ])
     const [hasLayerColumn] = isMad
       ? await schema('trs_quest')
           .columnInfo()
@@ -182,6 +184,7 @@ module.exports = class DbCheck {
       availableSlotsCol,
       hasAlignment,
       polygon,
+      hasShowcaseData,
     }
   }
 

@@ -638,8 +638,14 @@
   "additional_info": "Additional Info",
   "duration": "Duration",
   "elevation": "Elevation",
+  "contest_category_1": "Smallest Size",
+  "context_category_2": "Largest Size",
+  "total_entries": "Total Entries",
+  "showcase_rankings": "Showcase Rankings",
+  "showcase_rankings_subtitle": "Displays a list of the top rankings for a showcase at a Pokestop",
   "tth": "TTH",
   "tth_0": "All",
   "tth_1": "Known",
-  "tth_2": "Unknown"
+  "tth_2": "Unknown",
+  "no_access": "No Access"
 }

@@ -849,6 +849,11 @@
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []
+      },
+      "showcaseRankings": {
+        "enabeld": true,
+        "trialPeriodEligible": false,
+        "roles": []
       }
     }
   },
