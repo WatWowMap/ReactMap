@@ -331,19 +331,15 @@ export default function Extras({ category, subItem, data }) {
   if (category === 'admin' && subItem === 'spawnpoints') {
     return (
       <CollapsibleItem open={filters[subItem]?.enabled === true}>
-        <ListItem
-          secondaryAction={
-            <MultiSelector
-              filters={filters}
-              setFilters={setFilters}
-              category={subItem}
-              filterKey="tth"
-              items={[0, 1, 2]}
-              tKey="tth_"
-            />
-          }
-        >
-          <ListItemText primary={t('tth')} />
+        <ListItem>
+          <MultiSelector
+            filters={filters}
+            setFilters={setFilters}
+            category={subItem}
+            filterKey="tth"
+            items={[0, 1, 2]}
+            tKey="tth_"
+          />
         </ListItem>
       </CollapsibleItem>
     )
