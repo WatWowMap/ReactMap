@@ -29,10 +29,12 @@ export default function Notification({
   React.useEffect(() => {
     setAlert(open)
 
-    const timer = setTimeout(() => {
-      handleClose()
-    }, 5000)
-    return () => clearTimeout(timer)
+    if (open) {
+      const timer = setTimeout(() => {
+        handleClose()
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
   }, [open])
 
   return (
