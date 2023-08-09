@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react'
+import Fetch from './Fetch'
 
 if (inject) {
   const {
@@ -35,14 +36,8 @@ if (inject) {
         const error = errors[0]
           ? `${errors[0].type}: ${errors[0].value}`
           : 'Unknown error'
-        await fetch('/api/error/client', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            version: VERSION,
-          },
-          body: JSON.stringify({ error }),
-        })
+
+        await Fetch.sendError(error)
       }
       return CUSTOM || isLibrary || fetchError ? null : event
     },
