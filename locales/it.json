@@ -613,5 +613,20 @@
   "tth_0": "Tutti",
   "tth_1": "Noti",
   "tth_2": "Sconosciuti",
-  "nessun_accesso": "Nessun accesso"
+  "nessun_accesso": "Nessun accesso",
+  "version": "Versione",
+  "route_tags": "Tag Percorsi",
+  "routes": "Percorsi",
+  "route_type": "Tipo Percorso",
+  "routes_subtitle": "Visualizza nel gioco i percorsi e le informazioni rilevanti su di essi sulla mappa",
+  "description": "Descrizione",
+  "additional_info": "Informazioni Aggiuntive",
+  "duration": "Durata",
+  "elevation": "Elevazione",
+  "contest_category_1": "Dimensione più Piccola",
+  "context_category_2": "Dimensione più Grande",
+  "total_entries": "Totale Voci",
+  "showcase_rankings": "Classifica Vetrina",
+  "showcase_rankings_subtitle": "Mostra una lista delle migliori classifiche per una vetrina in un Pokestop",
+  "no_access": "Nessun Accesso"
 }

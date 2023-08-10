@@ -651,5 +651,6 @@
   "tth_0": "Tous",
   "tth_1": "Connus",
   "tth_2": "Inconnus",
-  "no_access": "Pas d'accès"
+  "no_access": "Pas d'accès",
+  "context_category_2": "Plus grande taille"
 }
