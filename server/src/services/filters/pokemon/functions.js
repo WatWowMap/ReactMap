@@ -278,6 +278,9 @@ function dnfifyIvFilter(filter, pokemon, dest) {
     }
     lastIndex = tokenizer.lastIndex
   }
+  if (!expectClause) {
+    dest.push(clause)
+  }
 }
 
 module.exports = {
