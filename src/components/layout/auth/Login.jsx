@@ -4,6 +4,9 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Box, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/'
+import { useQuery } from '@apollo/client'
+
+import { GET_LOGIN_PAGE } from '@services/queries/customPages'
 
 import LocalLogin from './Local'
 import LocaleSelection from '../general/LocaleSelection'
@@ -14,8 +17,16 @@ import ThemeToggle from '../general/ThemeToggle'
 
 export default function Login({ serverSettings }) {
   const { t } = useTranslation()
-  const { settings, components } = serverSettings.config.map.loginPage
+  const { data, loading } = useQuery(GET_LOGIN_PAGE, {
+    fetchPolicy: 'cache-first',
+  })
 
+  if (loading) return <p>Loading...</p>
+
+  const { settings, components } = data?.loginPage || {
+    settings: {},
+    components: [],
+  }
   return (
     <>
       <Box position="absolute" top={10} right={10}>

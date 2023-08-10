@@ -27,6 +27,7 @@ module.exports = gql`
       filters: JSON
     ): [Gym]
     gymsSingle(id: ID, perm: String): Gym
+    loginPage: JSON
     nests(
       minLat: Float
       maxLat: Float

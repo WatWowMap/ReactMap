@@ -160,6 +160,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
         map: {
           ...config.map,
           ...config.multiDomainsObj[req.headers.host],
+          loginPage: undefined,
           excludeList: config.authentication.excludeFromTutorial,
           polling: config.api.polling,
           authCounts: {

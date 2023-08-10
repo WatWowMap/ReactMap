@@ -1,8 +1,8 @@
 /* global BigInt */
 const GraphQLJSON = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
+const config = require('config')
 
-const config = require('../services/config')
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 const buildDefaultFilters = require('../services/filters/builder/base')
@@ -177,16 +177,16 @@ const resolvers = {
       return []
     },
     scanCells: (_, args, { perms, Db }) => {
-      if (perms?.scanCells && args.zoom >= config.map.scanCellsZoom) {
+      if (perms?.scanCells && args.zoom >= config.get('map.scanCellsZoom')) {
         return Db.getAll('ScanCell', perms, args)
       }
       return []
     },
     scanAreas: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.areas.scanAreas[req.headers.host]
-          ? config.areas.scanAreas[req.headers.host]
-          : config.areas.scanAreas.main
+        const scanAreas = config.has(`areas.scanAreas.${req.headers.host}`)
+          ? config.get(`areas.scanAreas.${req.headers.host}`)
+          : config.get('areas.scanAreas.main')
         return [
           {
             ...scanAreas,
@@ -204,9 +204,9 @@ const resolvers = {
     },
     scanAreasMenu: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.areas.scanAreasMenu[req.headers.host]
-          ? config.areas.scanAreasMenu[req.headers.host]
-          : config.areas.scanAreasMenu.main
+        const scanAreas = config.has(`areas.scanAreasMenu.${req.headers.host}`)
+          ? config.get(`areas.scanAreasMenu.${req.headers.host}`)
+          : config.get('areas.scanAreasMenu.main')
 
         if (perms.areaRestrictions.length) {
           const filtered = scanAreas
@@ -227,7 +227,7 @@ const resolvers = {
                 type: 'Feature',
                 properties: {
                   name: '',
-                  manual: Boolean(config.manualAreas.length),
+                  manual: !!config.get('manualAreas.length'),
                 },
               })
             }
@@ -308,13 +308,13 @@ const resolvers = {
     submissionCells: async (_, args, { perms, Db }) => {
       if (
         perms?.submissionCells &&
-        args.zoom >= config.map.submissionZoom - 1
+        args.zoom >= config.get('map.submissionZoom') - 1
       ) {
         const [pokestops, gyms] = await Db.submissionCells(perms, args)
         return [
           {
             placementCells:
-              args.zoom >= config.map.submissionZoom
+              args.zoom >= config.get('map.submissionZoom')
                 ? Utility.getPlacementCells(args, pokestops, gyms)
                 : [],
             typeCells: args.filters.onlyS14Cells
@@ -352,6 +352,8 @@ const resolvers = {
       }
       return {}
     },
+    loginPage: () =>
+      config.has('map.loginPage') ? config.get('map.loginPage') : null,
   },
   Mutation: {
     createBackup: async (_, args, { req, perms, Db }) => {

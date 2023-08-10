@@ -6,7 +6,7 @@ const { generate } = require('../../scripts/generateMasterfile')
 const initWebhooks = require('./initWebhooks')
 const { log, HELPERS } = require('./logger')
 
-module.exports = class EventManager {
+class EventManager {
   constructor(masterfile) {
     this.masterfile = masterfile
     this.invasions = masterfile.invasions
@@ -253,3 +253,5 @@ module.exports = class EventManager {
     )
   }
 }
+
+module.exports = EventManager
