@@ -1,10 +1,19 @@
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 
+/**
+ * TODO: Finish this
+ * @typedef {{
+ *   darkMode: boolean,
+ *   location: [number, number],
+ *   popups: Record<string, boolean>,
+ * }} UseStore
+ * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
+ */
 export const useStore = create(
   persist(
     (set, get) => ({
-      darkMode: true,
+      darkMode: !!window?.matchMedia('(prefers-color-scheme: dark)').matches,
       location: undefined,
       setLocation: (location) => set({ location }),
       zoom: undefined,

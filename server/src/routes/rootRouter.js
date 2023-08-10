@@ -10,6 +10,7 @@ const Fetch = require('../services/Fetch')
 const { Event, Db } = require('../services/initialization')
 const { version } = require('../../../package.json')
 const { log, HELPERS } = require('../services/logger')
+const buildDefaultFilters = require('../services/filters/builder/base')
 
 const rootRouter = express.Router()
 
@@ -36,8 +37,8 @@ rootRouter.get('/api/health', async (req, res) =>
   res.status(200).json({ status: 'ok' }),
 )
 
-rootRouter.post('/api/error/client', (req) => {
-  if (req.headers.version === version && req.isAuthenticated()) {
+rootRouter.post('/api/error/client', (req, res) => {
+  if (req.headers.version === version) {
     const {
       body: { error },
       user,
@@ -47,11 +48,13 @@ rootRouter.post('/api/error/client', (req) => {
       user?.discordId ||
       user?.telegramId ||
       user?.id ||
-      'Unknown'
+      'Not Logged In'
     if (error) {
       log.warn(HELPERS.client, `User: ${userName}`, error)
     }
+    return res.status(200).json({ status: 'ok' })
   }
+  return res.status(464).json({ status: 'invalid client version' })
 })
 
 rootRouter.get('/area/:area/:zoom?', (req, res) => {
@@ -287,10 +290,10 @@ rootRouter.get('/api/settings', async (req, res, next) => {
         }
       }
 
-      serverSettings.defaultFilters = Utility.buildDefaultFilters(
+      serverSettings.defaultFilters = buildDefaultFilters(
         serverSettings.user.perms,
         serverSettings.available,
-        Db.models,
+        Db,
       )
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile

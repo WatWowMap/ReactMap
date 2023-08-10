@@ -10,13 +10,17 @@ import { Knex } from 'knex'
 import { Model } from 'objection'
 import { Request, Response } from 'express'
 import { Transaction } from '@sentry/node'
+
 import DbCheck = require('./services/DbCheck')
 import EventManager = require('./services/EventManager')
 import Pokemon = require('./models/Pokemon')
+import Gym = require('./models/Gym')
 import Badge = require('./models/Badge')
 import Backup = require('./models/Backup')
 import Nest = require('./models/Nest')
 import NestSubmission = require('./models/NestSubmission')
+import Pokestop = require('./models/Pokestop')
+import config = require('./configs/default.json')
 
 export interface DbContext {
   isMad: boolean
@@ -35,35 +39,17 @@ export interface DbContext {
   availableSlotsCol: string
   polygon: boolean
   hasAlignment: boolean
+  hasShowcaseData: boolean
 }
 
-export interface Perms {
-  map: boolean
-  pokemon: boolean
-  iv: boolean
-  pvp: boolean
-  gyms: boolean
-  raids: boolean
-  pokestops: boolean
-  eventStops: boolean
-  quests: boolean
-  lures: boolean
-  portals: boolean
-  submissionCells: boolean
-  invasions: boolean
-  nests: boolean
-  scanAreas: boolean
-  weather: boolean
-  spawnpoints: boolean
-  s2cells: boolean
-  scanCells: boolean
-  devices: boolean
-  donor: boolean
-  gymBadges: boolean
-  backups: boolean
-  areaRestrictions: string[]
-  webhooks: string[]
-  scanner: string[]
+export interface User {
+  perms: Permissions
+  valid: boolean
+  id: number
+  discordId: string
+  username: string
+  telegramId: string
+  avatar: string
 }
 
 export interface Pokemon {
@@ -101,12 +87,23 @@ export interface Pokemon {
   first_seen_timestamp: number
   expire_timestamp_verified: boolean
   updated: number
+  pvp: { [league in (typeof LEAGUES)[number]]?: PvpEntry[] }
+  pvp_rankings_great_league?: PvpEntry[]
+  pvp_rankings_ultra_league?: PvpEntry[]
+  distance?: number
 }
 
 export interface AvailablePokemon {
   id: number
   form: number
   count: number
+}
+
+export interface Available {
+  pokemon: Awaited<ReturnType<(typeof Pokemon)['getAvailable']>>
+  gyms: Awaited<ReturnType<(typeof Gym)['getAvailable']>>
+  pokestops: Awaited<ReturnType<(typeof Pokestop)['getAvailable']>>
+  nests: Awaited<ReturnType<(typeof Nest)['getAvailable']>>
 }
 
 export interface PvpEntry {
@@ -160,6 +157,9 @@ export interface DbCheckClass {
   rarityPercents: RarityPercents
   distanceUnit: 'km' | 'mi'
   reactMapDb: null | number
+  filterContext: {
+    Route: { maxDistance: number; maxDuration: number }
+  }
 }
 
 export interface RarityPercents {
@@ -218,6 +218,9 @@ export interface Permissions {
   donor: boolean
   gymBadges: boolean
   backups: boolean
+  routes: boolean
+  blocked: boolean
+  blockedGuildNames: string[]
   scanner: string[]
   areaRestrictions: string[]
   webhooks: string[]
@@ -229,12 +232,38 @@ export type PickMatching<T, V> = {
 
 export type ExtractMethods<T> = PickMatching<T, Function>
 
-type Test = ExtractMethods<typeof Badge>
-
-type Test2 = ReturnType<Test['getAll']>
-
-type Test3 = Parameters<Test['getAll']>
-
 export type Head<T extends any[]> = T extends [...infer Head, any]
   ? Head
   : any[]
+
+export interface Waypoint {
+  lat_degrees: number
+  lng_degrees: number
+  elevation_in_meters: number
+}
+
+export interface Route {
+  id: string
+  name: string
+  description: string
+  distance_meters: number
+  duration_seconds: number
+  start_fort_id: string
+  start_lat: number
+  start_lon: number
+  start_image: string
+  end_fort_id: string
+  end_lat: number
+  end_lon: number
+  end_image: string
+  image: string
+  image_border_color: string
+  reversible: boolean
+  tags?: string[]
+  type: number
+  updated: number
+  version: number
+  waypoints: Waypoint[]
+}
+
+export type Config = typeof config

@@ -33,9 +33,12 @@ module.exports = function getAreaRestrictionSql(
     }
   } else if (category === 'device') {
     columns = columns.map((each) => `last_${each}`)
-  }
-  if (category === 's2cell') {
+  } else if (category === 's2cell') {
     columns = columns.map((each) => `center_${each}`)
+  } else if (category === 'route_start') {
+    columns = columns.map((each) => `start_${each}`)
+  } else if (category === 'route_end') {
+    columns = columns.map((each) => `end_${each}`)
   }
 
   query.andWhere((restrictions) => {

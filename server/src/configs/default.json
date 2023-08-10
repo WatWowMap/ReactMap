@@ -6,7 +6,8 @@
     "enabled": false,
     "graphiql": false,
     "queryDebug": false,
-    "clientPath": "../../dist"
+    "clientPath": "../../dist",
+    "logLevel": "info"
   },
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
@@ -27,6 +28,7 @@
       "pokemon": 20,
       "pokestops": 300,
       "portals": 300,
+      "routes": 10000,
       "scanAreas": 10000,
       "scanCells": 10,
       "submissionCells": 500,
@@ -132,6 +134,7 @@
         "nests",
         "pokestops",
         "pokemon",
+        "routes",
         "wayfarer",
         "s2cells",
         "scanAreas",
@@ -563,6 +566,9 @@
     "portals": {
       "enabled": false
     },
+    "routes": {
+      "enabled": true
+    },
     "scanAreas": {
       "enabled": false
     },
@@ -570,7 +576,8 @@
       "enabled": false
     },
     "spawnpoints": {
-      "enabled": false
+      "enabled": false,
+      "tth": 0
     },
     "submissionCells": {
       "enabled": false,
@@ -620,6 +627,7 @@
       "userCooldownSeconds": 0,
       "scanNextAreaRestriction": [],
       "discordRoles": [],
+      "local": [],
       "telegramGroups": []
     },
     "scanZone": {
@@ -638,6 +646,7 @@
       "scanZoneInstance": "scanZone",
       "scanZoneAreaRestriction": [],
       "discordRoles": [],
+      "local": [],
       "telegramGroups": []
     }
   },
@@ -660,6 +669,7 @@
         "allowedGuilds": [],
         "blockedGuilds": [],
         "allowedUsers": [],
+        "clientPrompt": "consent",
         "thumbnailUrl": "https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png",
         "trialPeriod": {
           "start": {
@@ -831,6 +841,16 @@
         "roles": []
       },
       "backups": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "routes": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "showcaseRankings": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []

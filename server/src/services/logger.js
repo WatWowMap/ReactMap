@@ -1,9 +1,12 @@
+if (!process.env.NODE_CONFIG_DIR) {
+  process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
+  process.env.ALLOW_CONFIG_MUTATIONS = 'true'
+}
 const logger = require('loglevel')
 const chalk = require('chalk')
+const config = require('config')
 
 const log = logger.getLogger('logger')
-
-module.exports.log = log
 
 const HELPERS = /** @type {const} */ ({
   trace: chalk.gray('☰'),
@@ -50,12 +53,12 @@ const HELPERS = /** @type {const} */ ({
   devices: chalk.hex('#ff9800')('[DEVICE]'),
   nests: chalk.hex('#ff5724')('[NESTS]'),
   portals: chalk.hex('#795548')('[PORTALS]'),
+  route: chalk.hex('#607d8b')('[ROUTE]'),
+  routes: chalk.hex('#9e9e9e')('[ROUTES]'),
 
   custom: (text = '', color = '#64b5f6') =>
     chalk.hex(color)(`[${text.toUpperCase()}]`),
 })
-
-module.exports.HELPERS = HELPERS
 
 log.methodFactory = (methodName, logLevel, loggerName) => {
   const rawMethod = logger.methodFactory(methodName, logLevel, loggerName)
@@ -68,4 +71,21 @@ log.methodFactory = (methodName, logLevel, loggerName) => {
   }
 }
 
-log.setLevel(process.env.LOG_LEVEL || 'info')
+let logLevel = 'info'
+if (
+  process.env.LOG_LEVEL &&
+  process.env.LOG_LEVEL.toUpperCase() in logger.levels
+) {
+  logLevel = process.env.LOG_LEVEL
+} else if (
+  config.has('devOptions.logLevel') &&
+  config.get('devOptions.logLevel').toUpperCase() in logger.levels
+) {
+  logLevel = config.get('devOptions.logLevel')
+}
+
+log.setLevel(logLevel)
+
+module.exports.log = log
+
+module.exports.HELPERS = HELPERS

@@ -35,4 +35,23 @@ export default class Fetch {
       return { error: true, status: 500 }
     }
   }
+
+  static async sendError(error) {
+    try {
+      return fetch('/api/error/client', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          version: inject.VERSION,
+        },
+        body: JSON.stringify({ error }),
+      })
+    } catch (e) {
+      console.error(
+        e.message,
+        '\nWell, this is awkward, we were unable to report the error to the server.',
+      )
+      return { error: true, status: 500 }
+    }
+  }
 }

@@ -74,6 +74,20 @@ const event = gql`
     events {
       display_type
       event_expire_timestamp
+      showcase_pokemon_id
+      showcase_ranking_standard
+      showcase_rankings {
+        total_entries
+        last_update
+        contest_entries {
+          rank
+          pokemon_id
+          form
+          costume
+          gender
+          score
+        }
+      }
     }
   }
 `

@@ -139,7 +139,7 @@ export default function DrawerActions() {
           rel="noreferrer"
         >
           <ListItemIcon>
-            <TrendingUpIcon color="action" />
+            <TrendingUpIcon color="success" />
           </ListItemIcon>
           <ListItemText primary={t('stats')} />
         </ListItemButton>
@@ -147,7 +147,7 @@ export default function DrawerActions() {
       {config.map.feedbackLink && (
         <ListItemButton component="button" onClick={() => setFeedback(true)}>
           <ListItemIcon>
-            <FeedbackIcon color="action" />
+            <FeedbackIcon color="success" />
           </ListItemIcon>
           <ListItemText primary={t('feedback')} />
         </ListItemButton>

@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "CommonJS",
     "allowSyntheticDefaultImports": false,
+    "resolveJsonModule": true,
     "baseUrl": "./src",
     "jsx": "react",
     "paths": {

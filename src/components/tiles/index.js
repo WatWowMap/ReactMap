@@ -10,6 +10,7 @@ import spawnpoints from './Spawnpoint'
 import submissionCells from './submissionCells/SubmissionCell'
 import weather from './Weather'
 import s2cells from './S2Cell'
+import routes from './Route'
 
 export {
   devices,
@@ -24,4 +25,5 @@ export {
   spawnpoints,
   weather,
   s2cells,
+  routes,
 }

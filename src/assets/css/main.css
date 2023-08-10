@@ -30,7 +30,7 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  body {
+  .dark body {
     background-color: #121212;
   }
 }
@@ -74,6 +74,18 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+}
+
+.circle-route {
+  border-radius: 50%;
+}
+
+.start {
+  background-color: #00a3ee;
+}
+
+.end {
+  background-color: #ff4b4d;
 }
 
 .invasion-exists {
@@ -160,6 +172,10 @@ body {
   margin-right: auto;
   font-weight: bold;
   text-align: center;
+}
+
+.three-quarters-width {
+  width: 75% !important;
 }
 
 .table-invasion td:first-child {
@@ -249,6 +265,12 @@ img {
   height: 100%;
 }
 
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .amount-holder {
   position: absolute;
   left: 50%;
@@ -273,19 +295,6 @@ img {
   text-shadow: #000 0 0 2px, #000 0 0 2px, #000 0 0 2px, #000 0 0 2px,
     #000 0 0 2px, #000 0 0 2px;
   font-weight: 700;
-}
-
-.iv-badge {
-  position: absolute;
-  text-align: center;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  font: bold 15px/13px Roboto, sans-serif;
-  height: 16px;
-  min-width: 14px;
-  padding: 4px 3px 0 3px;
-  box-sizing: content-box;
 }
 
 .weather-icon {
@@ -384,6 +393,7 @@ img {
   left: 0;
   width: 100%;
   height: 100%;
+  opacity: 80%;
 }
 
 .perm-wrapper img {

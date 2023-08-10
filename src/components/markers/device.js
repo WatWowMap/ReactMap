@@ -2,7 +2,7 @@ import { Icon } from 'leaflet'
 
 export default function getDeviceMarkers(isOnline, Icons) {
   const size = Icons.getSize('device')
-  const { offsetX, offsetY, popupX, popupY, sizeMultiplier } =
+  const [{ offsetX, offsetY, popupX, popupY, sizeMultiplier }] =
     Icons.getModifiers('device')
   return new Icon({
     iconUrl: Icons.getDevices(isOnline),

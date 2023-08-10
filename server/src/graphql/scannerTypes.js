@@ -107,9 +107,27 @@ module.exports = gql`
     slot_3_form: Int
   }
 
+  type ShowcaseEntry {
+    rank: Int
+    pokemon_id: Int
+    form: Int
+    costume: Int
+    gender: Int
+    score: Float
+  }
+
+  type ShowcaseDetails {
+    total_entries: Int
+    last_update: Int
+    contest_entries: [ShowcaseEntry]
+  }
+
   type Event {
     display_type: Int
     event_expire_timestamp: Int
+    showcase_pokemon_id: Int
+    showcase_rankings: ShowcaseDetails
+    showcase_ranking_standard: Int
   }
 
   type Pokestop {
@@ -221,5 +239,35 @@ module.exports = gql`
   type ScannerApi {
     status: String
     message: String
+  }
+
+  type Waypoint {
+    lat_degrees: Float
+    lng_degrees: Float
+    elevation_in_meters: Float
+  }
+
+  type Route {
+    id: ID
+    name: String
+    description: String
+    distance_meters: Int
+    duration_seconds: Int
+    start_fort_id: String
+    start_lat: Float
+    start_lon: Float
+    start_image: String
+    end_fort_id: String
+    end_lat: Float
+    end_lon: Float
+    end_image: String
+    image: String
+    image_border_color: String
+    reversible: Boolean
+    tags: [String]
+    type: Int
+    updated: Int
+    version: Int
+    waypoints: [Waypoint]
   }
 `

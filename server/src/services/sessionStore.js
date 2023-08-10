@@ -8,7 +8,7 @@ const {
   },
 } = require('./config')
 
-const dbSelection = schemas.find(({ useFor }) => useFor?.includes('session'))
+const dbSelection = schemas.find(({ useFor }) => useFor?.includes('user'))
 
 const sessionStore = dbSelection
   ? new MySQLStore({

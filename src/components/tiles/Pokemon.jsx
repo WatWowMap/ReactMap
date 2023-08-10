@@ -4,44 +4,19 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
 import useForcePopup from '@hooks/useForcePopup'
+import { getOffset } from '@services/functions/offset'
+import { getBadge } from '@services/functions/getBadge'
 
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
 import ToolTipWrapper from './Timer'
 
-const operator = {
+const OPERATOR = {
   '=': (a, b) => a === b,
   '<': (a, b) => a < b,
   '<=': (a, b) => a <= b,
   '>': (a, b) => a > b,
   '>=': (a, b) => a >= b,
-}
-
-const cyrb53 = (str, seed = 0) => {
-  let h1 = 0xdeadbeef ^ seed
-  let h2 = 0x41c6ce57 ^ seed
-  for (let i = 0, ch; i < str.length; i += 1) {
-    ch = str.charCodeAt(i)
-    h1 = Math.imul(h1 ^ ch, 2654435761)
-    h2 = Math.imul(h2 ^ ch, 1597334677)
-  }
-  h1 =
-    Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
-    Math.imul(h2 ^ (h2 >>> 13), 3266489909)
-  h2 =
-    Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
-    Math.imul(h1 ^ (h1 >>> 13), 3266489909)
-  return [h1, h2]
-}
-
-const getOffset = (coords, type, seed) => {
-  const offOffset = type === 'nearby_cell' ? 0.0002 : 0.00015
-  const rand = cyrb53(seed)
-  return [0, 1].map((i) => {
-    let offset = rand[i] * (0.0002 / 4294967296) - 0.0001
-    offset += offset >= 0 ? -offOffset : offOffset
-    return coords[i] + offset
-  })
 }
 
 const getGlowStatus = (item, userSettings, staticUserSettings) => {
@@ -52,7 +27,7 @@ const getGlowStatus = (item, userSettings, staticUserSettings) => {
     const statKey = ruleValue.perm === 'iv' ? 'iv' : 'bestPvp'
     if (ruleValue.op) {
       if (
-        operator[ruleValue.op](item[statKey], ruleValue.num) &&
+        OPERATOR[ruleValue.op](item[statKey], ruleValue.num) &&
         item[statKey] !== null
       ) {
         glowCount += 1
@@ -108,18 +83,43 @@ const PokemonTile = ({
     userSettings.levelCircles &&
     item.level !== null &&
     item.level >= userSettings.minLevelCircle
-  const pvpCheck = item.bestPvp !== null && item.bestPvp < 4
   const weatherCheck = item.weather && userSettings.weatherIndicator
+  const showSize =
+    userSettings?.showSizeIndicator &&
+    Number.isInteger(item.size) &&
+    item.size !== 3
+  const timerCheck = showTimer || userSettings.pokemonTimers
+  const badge = getBadge(item.bestPvp)
 
   const finalLocation = useMemo(
     () =>
       item.seen_type?.startsWith('nearby') || item.seen_type?.includes('lure')
-        ? getOffset([item.lat, item.lon], item.seen_type, item.id)
+        ? getOffset(
+            [item.lat, item.lon],
+            item.seen_type === 'nearby_cell' ? 0.0002 : 0.00015,
+            item.id,
+          )
         : [item.lat, item.lon],
     [item.seen_type],
   )
 
   useForcePopup(item.id, markerRef, params, setParams, done)
+
+  const extras = []
+  if (ivCircle) extras.push(`${Math.round(item.iv)}%`)
+  if (levelCircle) extras.push(`L${Math.round(item.level)}`)
+  if (showSize) extras.push({ 1: 'XXS', 2: 'XS', 4: 'XL', 5: 'XXL' }[item.size])
+  if (badge && extras.length > 0)
+    extras.push(
+      <img
+        key={badge}
+        src={Icons.getMisc(badge)}
+        alt={badge}
+        style={{ height: 12 }}
+      />,
+    )
+  const pvpCheck =
+    item.bestPvp !== null && item.bestPvp < 4 && extras.length === 0
 
   return (
     !excludeList.includes(`${item.pokemon_id}-${item.form}`) &&
@@ -136,8 +136,6 @@ const PokemonTile = ({
         icon={
           pvpCheck ||
           glowStatus ||
-          ivCircle ||
-          levelCircle ||
           weatherCheck ||
           item.seen_type === 'nearby_cell' ||
           (Number.isInteger(item.size) && (item.size !== 3 || item.size !== 0))
@@ -146,12 +144,11 @@ const PokemonTile = ({
                 size,
                 item,
                 glowStatus,
-                ivCircle,
                 Icons,
                 weatherCheck,
                 timeOfDay,
                 userSettings,
-                levelCircle,
+                extras.length ? null : badge,
               )
             : basicMarker(url, size)
         }
@@ -166,13 +163,31 @@ const PokemonTile = ({
             config={config}
           />
         </Popup>
-        {(showTimer || userSettings.pokemonTimers) && (
-          <ToolTipWrapper timers={[item.expire_timestamp]} offset={[0, 18]} />
+        {(timerCheck || extras.length > 0) && (
+          <ToolTipWrapper
+            timers={timerCheck ? [item.expire_timestamp] : []}
+            offset={[0, 14]}
+            id={item.id}
+          >
+            {extras.length > 0 && (
+              <div className="iv-badge flex-center">
+                {extras.map((val, i) => (
+                  <span
+                    key={typeof val === 'string' ? val : val.key}
+                    className="flex-center"
+                  >
+                    {i ? <>&nbsp;|&nbsp;</> : null}
+                    {val}
+                  </span>
+                ))}
+              </div>
+            )}
+          </ToolTipWrapper>
         )}
         {showCircles && (
           <Circle
             center={finalLocation}
-            radius={70}
+            radius={40}
             pathOptions={{ color: '#BA42F6', weight: 1 }}
           />
         )}

@@ -25,6 +25,7 @@ export default function Extras({ category, subItem, data }) {
     config: {
       map: { enableConfirmedInvasions, enableQuestSetSelector },
     },
+    filters: staticFilters,
   } = useStatic.getState()
 
   if (category === 'nests' && subItem === 'sliders') {
@@ -220,7 +221,7 @@ export default function Extras({ category, subItem, data }) {
             .filter((event) => event.startsWith('b'))
             .map((event) => (
               <ListItem key={event}>
-                <ListItemIcon sx={{ pl: 4 }}>
+                <ListItemIcon sx={{ justifyContent: 'center' }}>
                   <img
                     src={Icons.getIconById(event)}
                     alt={t(`display_type_${event.slice(1)}`)}
@@ -296,6 +297,52 @@ export default function Extras({ category, subItem, data }) {
       </CollapsibleItem>
     )
   }
+  if (category === 'routes' && subItem === 'enabled') {
+    return (
+      <CollapsibleItem open={filters[category][subItem]}>
+        <ListItem>
+          <SliderTile
+            filterSlide={{
+              color: 'secondary',
+              disabled: false,
+              min: staticFilters.routes.distance[0] || 0,
+              max: staticFilters.routes.distance[1] || 25,
+              i18nKey: 'distance',
+              step: 0.5,
+              name: 'distance',
+              label: 'km',
+            }}
+            handleChange={(_, values) =>
+              setFilters({
+                ...filters,
+                [category]: {
+                  ...filters[category],
+                  distance: values,
+                },
+              })
+            }
+            filterValues={filters[category]}
+          />
+        </ListItem>
+      </CollapsibleItem>
+    )
+  }
 
+  if (category === 'admin' && subItem === 'spawnpoints') {
+    return (
+      <CollapsibleItem open={filters[subItem]?.enabled === true}>
+        <ListItem>
+          <MultiSelector
+            filters={filters}
+            setFilters={setFilters}
+            category={subItem}
+            filterKey="tth"
+            items={[0, 1, 2]}
+            tKey="tth_"
+          />
+        </ListItem>
+      </CollapsibleItem>
+    )
+  }
   return null
 }

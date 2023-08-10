@@ -1,6 +1,11 @@
 process.title = 'ReactMap'
 process.env.FORCE_COLOR = 3
 
+if (!process.env.NODE_CONFIG_DIR) {
+  process.env.NODE_CONFIG_DIR = `${__dirname}/configs`
+  process.env.ALLOW_CONFIG_MUTATIONS = 'true'
+}
+
 require('dotenv').config()
 const path = require('path')
 const express = require('express')
@@ -383,31 +388,30 @@ connection.migrate.latest().then(async () => {
   await Db.getDbContext()
   await Promise.all([
     Db.historicalRarity(),
+    Db.getFilterContext(),
     Event.setAvailable('gyms', 'Gym', Db),
     Event.setAvailable('pokestops', 'Pokestop', Db),
     Event.setAvailable('pokemon', 'Pokemon', Db),
     Event.setAvailable('nests', 'Nest', Db),
-  ]).then(async () => {
-    await Promise.all([
-      Event.getUicons(config.icons.styles),
-      Event.getMasterfile(Db.historical, Db.rarity),
-      Event.getInvasions(config.api.pogoApiEndpoints.invasions),
-      Event.getWebhooks(config),
-      (config.areas = await getAreas()),
-    ]).then(() => {
-      httpServer.listen(config.port, config.interface)
-      const text = rainbow(
-        `ℹ ${new Date()
-          .toISOString()
-          .split('.')[0]
-          .split('T')
-          .join(' ')} [ReactMap] Server is now listening at http://${
-          config.interface
-        }:${config.port}`,
-      )
-      setTimeout(() => text.stop(), 3_000)
-    })
-  })
+  ])
+  await Promise.all([
+    Event.getUicons(config.icons.styles),
+    Event.getMasterfile(Db.historical, Db.rarity),
+    Event.getInvasions(config.api.pogoApiEndpoints.invasions),
+    Event.getWebhooks(config),
+    getAreas().then((res) => (config.areas = res)),
+  ])
+  httpServer.listen(config.port, config.interface)
+  const text = rainbow(
+    `ℹ ${new Date()
+      .toISOString()
+      .split('.')[0]
+      .split('T')
+      .join(' ')} [ReactMap] Server is now listening at http://${
+      config.interface
+    }:${config.port}`,
+  )
+  setTimeout(() => text.stop(), 3_000)
 })
 
 module.exports = app

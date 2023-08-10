@@ -36,6 +36,7 @@ server/src/routes/api/v1/*
 !server/src/routes/api/v1/sessions.js
 !server/src/routes/api/v1/available.js
 !server/src/routes/api/v1/config.js
+!server/src/routes/api/v1/area.js
 
 # custom model
 server/src/models/Custom.js
@@ -51,6 +52,7 @@ public/images/custom/*
 # Ignore generated locales
 public/locales/*
 public/missing-locales/*
+locales/missing-locales/*
 
 # OS X
 .DS_Store*
@@ -74,3 +76,5 @@ src/**/*.custom.css
 
 # Logs
 server/src/models/queries/*
+/logs/*
+!/logs/.gitkeep

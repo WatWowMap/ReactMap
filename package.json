@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.21.1",
+  "version": "1.23.1",
   "description": "React based frontend map.",
   "main": "ReactMap.js",
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
@@ -8,14 +8,15 @@
   "private": true,
   "scripts": {
     "start": "node .",
-    "build": "yarn create-locales && vite build",
+    "build": "vite build",
     "server": "yarn create-area && yarn generate && yarn migrate:latest && node server/src/index.js",
-    "watch": "yarn create-locales && vite",
+    "watch": "vite",
     "dev": "nodemon server/src/index.js --watch server",
     "generate": "node server/scripts/generateMasterfile.js",
     "gen-env-config": "node server/scripts/genEnvConfig.js",
-    "create-locales": "node server/scripts/createLocales.js",
-    "missing-locales": "node server/scripts/createLocales.js --missing",
+    "create-locales": "node locales/scripts/create.js",
+    "missing-locales": "node locales/scripts/create.js --missing",
+    "generate-locales": "node locales/scripts/generate.js",
     "create-area": "node server/scripts/poracleToGeoJSON.js",
     "config-migrate": "node server/scripts/configMigration.js",
     "config-check": "node server/scripts/configCheck.js",
@@ -34,10 +35,10 @@
     "yarn": "^1.22.x"
   },
   "devDependencies": {
-    "@sentry/vite-plugin": "^2.2.1",
+    "@sentry/vite-plugin": "2.2.1",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
-    "@vitejs/plugin-react": "^4.0.0",
+    "@vitejs/plugin-react": "4.0.0",
     "eslint": "^8.44.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.8.0",
@@ -49,9 +50,9 @@
     "nodemon": "^2.0.22",
     "prettier": "^2.8.8",
     "rollup-plugin-delete": "^2.0.0",
-    "vite": "^4.3.9",
-    "vite-plugin-checker": "^0.6.0",
-    "vite-plugin-static-copy": "^0.16.0"
+    "vite": "4.3.9",
+    "vite-plugin-checker": "0.6.0",
+    "vite-plugin-static-copy": "0.16.0"
   },
   "dependencies": {
     "@apollo/client": "^3.7.15",
@@ -104,6 +105,7 @@
     "nodes2ts": "^2.0.0",
     "objection": "^3.0.1",
     "ohbem": "^1.4.1",
+    "openai": "^3.3.0",
     "passport": "^0.6.0",
     "passport-discord": "https://github.com/tonestrike/passport-discord.git",
     "passport-local": "^1.0.0",

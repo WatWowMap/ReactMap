@@ -18,7 +18,8 @@
       "__name": "DEV_OPTIONS_QUERY_DEBUG",
       "__format": "boolean"
     },
-    "clientPath": "DEV_OPTIONS_CLIENT_PATH"
+    "clientPath": "DEV_OPTIONS_CLIENT_PATH",
+    "logLevel": "DEV_OPTIONS_LOG_LEVEL"
   },
   "api": {
     "sessionSecret": "API_SESSION_SECRET",
@@ -76,6 +77,10 @@
       },
       "portals": {
         "__name": "API_POLLING_PORTALS",
+        "__format": "number"
+      },
+      "routes": {
+        "__name": "API_POLLING_ROUTES",
         "__format": "number"
       },
       "scanAreas": {
@@ -1079,6 +1084,12 @@
         "__format": "boolean"
       }
     },
+    "routes": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_ROUTES_ENABLED",
+        "__format": "boolean"
+      }
+    },
     "scanAreas": {
       "enabled": {
         "__name": "DEFAULT_FILTERS_SCAN_AREAS_ENABLED",
@@ -1095,6 +1106,10 @@
       "enabled": {
         "__name": "DEFAULT_FILTERS_SPAWNPOINTS_ENABLED",
         "__format": "boolean"
+      },
+      "tth": {
+        "__name": "DEFAULT_FILTERS_SPAWNPOINTS_TTH",
+        "__format": "number"
       }
     },
     "submissionCells": {
@@ -1211,6 +1226,10 @@
         "__name": "SCANNER_SCAN_NEXT_DISCORD_ROLES",
         "__format": "json"
       },
+      "local": {
+        "__name": "SCANNER_SCAN_NEXT_LOCAL",
+        "__format": "json"
+      },
       "telegramGroups": {
         "__name": "SCANNER_SCAN_NEXT_TELEGRAM_GROUPS",
         "__format": "json"
@@ -1266,6 +1285,10 @@
       },
       "discordRoles": {
         "__name": "SCANNER_SCAN_ZONE_DISCORD_ROLES",
+        "__format": "json"
+      },
+      "local": {
+        "__name": "SCANNER_SCAN_ZONE_LOCAL",
         "__format": "json"
       },
       "telegramGroups": {
@@ -1637,6 +1660,34 @@
         },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_BACKUPS_ROLES",
+          "__format": "json"
+        }
+      },
+      "routes": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_ROUTES_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_ROUTES_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_ROUTES_ROLES",
+          "__format": "json"
+        }
+      },
+      "showcaseRankings": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_SHOWCASE_RANKINGS_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_SHOWCASE_RANKINGS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_SHOWCASE_RANKINGS_ROLES",
           "__format": "json"
         }
       }

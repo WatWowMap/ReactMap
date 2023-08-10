@@ -38,6 +38,9 @@ module.exports = class DbCheck {
     this.endpoints = {}
     this.rarity = {}
     this.historical = {}
+    this.filterContext = {
+      Route: { maxDistance: 0, maxDuration: 0 },
+    }
     this.reactMapDb = null
     this.connections = dbConfig.schemas
       .filter((s) => s.useFor.length)
@@ -82,7 +85,8 @@ module.exports = class DbCheck {
           log: {
             warn: (message) => log.warn(HELPERS.knex, message),
             error: (message) => log.error(HELPERS.knex, message),
-            debug: (message) => log.debug(HELPERS.knex, message),
+            debug: (message) =>
+              log[queryDebug ? 'info' : 'debug'](HELPERS.knex, message),
             enableColors: true,
           },
         })
@@ -129,13 +133,15 @@ module.exports = class DbCheck {
         'size' in columns,
         'height' in columns,
       ])
-    const [hasRewardAmount, hasPowerUp, hasAltQuests] = await schema('pokestop')
-      .columnInfo()
-      .then((columns) => [
-        'quest_reward_amount' in columns || isMad,
-        'power_up_level' in columns,
-        'alternative_quest_type' in columns,
-      ])
+    const [hasRewardAmount, hasPowerUp, hasAltQuests, hasShowcaseData] =
+      await schema('pokestop')
+        .columnInfo()
+        .then((columns) => [
+          'quest_reward_amount' in columns || isMad,
+          'power_up_level' in columns,
+          'alternative_quest_type' in columns,
+          'showcase_pokemon_id' in columns,
+        ])
     const [hasLayerColumn] = isMad
       ? await schema('trs_quest')
           .columnInfo()
@@ -178,6 +184,7 @@ module.exports = class DbCheck {
       availableSlotsCol,
       hasAlignment,
       polygon,
+      hasShowcaseData,
     }
   }
 
@@ -334,7 +341,7 @@ module.exports = class DbCheck {
       log.error(
         HELPERS.db,
         e,
-        `| Only ${[this.validModels].join(
+        `\n\nOnly ${[this.validModels].join(
           ', ',
         )} are valid options in the useFor arrays`,
       )
@@ -372,7 +379,7 @@ module.exports = class DbCheck {
   /**
    * @template {import('../types').BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
-   * @param {import("../types").Perms} perms
+   * @param {import("../types").Permissions} perms
    * @param {object} args
    * @param {number} userId
    * @param {'getAll' | string} method
@@ -381,8 +388,8 @@ module.exports = class DbCheck {
   async getAll(model, perms, args, userId, method = 'getAll') {
     try {
       const data = await Promise.all(
-        this.models[model].map(async (source) =>
-          source.SubModel[method](perms, args, source, userId),
+        this.models[model].map(async ({ SubModel, ...source }) =>
+          SubModel[method](perms, args, source, userId),
         ),
       )
       return DbCheck.deDupeResults(data)
@@ -400,8 +407,8 @@ module.exports = class DbCheck {
    */
   async getOne(model, id) {
     const data = await Promise.all(
-      this.models[model].map(async (source) =>
-        source.SubModel.getOne(id, source),
+      this.models[model].map(async ({ SubModel, ...source }) =>
+        SubModel.getOne(id, source),
       ),
     )
     const cleaned = DbCheck.deDupeResults(data.filter(Boolean))
@@ -411,15 +418,15 @@ module.exports = class DbCheck {
   /**
    * @template {import('../types').BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
-   * @param {import("../types").Perms} perms
+   * @param {import("../types").Permissions} perms
    * @param {object} args
    * @param {'search' | string} method
    * @returns {Promise<T[]>}
    */
   async search(model, perms, args, method = 'search') {
     const data = await Promise.all(
-      this.models[model].map(async (source) =>
-        source.SubModel[method](
+      this.models[model].map(async ({ SubModel, ...source }) =>
+        SubModel[method](
           perms,
           args,
           source,
@@ -437,7 +444,7 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @param {import("../types").Perms} perms
+   * @param {import("../types").Permissions} perms
    * @param {object} args
    * @returns {Promise<[
    *  import('../types').BaseRecord[],
@@ -446,13 +453,13 @@ module.exports = class DbCheck {
    */
   async submissionCells(perms, args) {
     const stopData = await Promise.all(
-      this.models.Pokestop.map(async (source) =>
-        source.SubModel.getSubmissions(perms, args, source),
+      this.models.Pokestop.map(async ({ SubModel, ...source }) =>
+        SubModel.getSubmissions(perms, args, source),
       ),
     )
     const gymData = await Promise.all(
-      this.models.Gym.map(async (source) =>
-        source.SubModel.getSubmissions(perms, args, source),
+      this.models.Gym.map(async ({ SubModel, ...source }) =>
+        SubModel.getSubmissions(perms, args, source),
       ),
     )
     return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]
@@ -479,8 +486,8 @@ module.exports = class DbCheck {
   async query(model, method, ...args) {
     if (Array.isArray(this.models[model])) {
       const data = await Promise.all(
-        this.models[model].map(async (source) =>
-          source.SubModel[method](...args, source),
+        this.models[model].map(async ({ SubModel, ...source }) =>
+          SubModel[method](...args, source),
         ),
       )
       return DbCheck.deDupeResults(data)
@@ -498,8 +505,8 @@ module.exports = class DbCheck {
       log.info(HELPERS.db, `Querying available for ${model}`)
       try {
         const results = await Promise.all(
-          this.models[model].map(async (source) =>
-            source.SubModel.getAvailable(source),
+          this.models[model].map(async ({ SubModel, ...source }) =>
+            SubModel.getAvailable(source),
           ),
         )
         log.info(HELPERS.db, `Setting available for ${model}`)
@@ -545,5 +552,25 @@ module.exports = class DbCheck {
       }
     }
     return []
+  }
+
+  /**
+   * Builds filter context for all models
+   */
+  async getFilterContext() {
+    if (this.models.Route) {
+      const results = await Promise.all(
+        this.models.Route.map(({ SubModel, ...source }) =>
+          SubModel.getFilterContext(source),
+        ),
+      )
+      this.filterContext.Route.maxDistance = Math.max(
+        ...results.map((result) => result.max_distance),
+      )
+      this.filterContext.Route.maxDuration = Math.max(
+        ...results.map((result) => result.max_duration),
+      )
+      log.info(HELPERS.db, 'Updating filter context for routes')
+    }
   }
 }

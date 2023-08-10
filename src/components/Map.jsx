@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
 import { useMap, ZoomControl, TileLayer } from 'react-leaflet'
 import { useMediaQuery, useTheme } from '@mui/material'
-import L from 'leaflet'
+import { control } from 'leaflet'
 
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
@@ -104,18 +104,21 @@ export default function Map({
     }
   }, [windowState])
 
-  useEffect(() => {
-    const lc = L.control.locate({
-      position: 'bottomright',
-      icon: 'fas fa-crosshairs',
-      keepCurrentZoomLevel: true,
-      setView: 'untilPan',
-    })
-    if (settings.navigationControls === 'leaflet') {
-      lc.addTo(map)
+  useLayoutEffect(() => {
+    if (settings.navigationControls === 'leaflet' && map) {
+      const lc = control
+        .locate({
+          position: 'bottomright',
+          icon: 'fas fa-crosshairs',
+          keepCurrentZoomLevel: true,
+          setView: 'untilPan',
+        })
+        .addTo(map)
+      return () => {
+        lc.remove()
+      }
     }
-    return () => lc.remove()
-  }, [settings.navigationControls])
+  }, [settings.navigationControls, map])
 
   useEffect(() => {
     useStatic.setState({ isMobile, isTablet })

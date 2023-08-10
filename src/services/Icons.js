@@ -166,18 +166,18 @@ export default class UIcons {
     }
   }
 
-  getSize(category, filterId) {
+  getSize(category, filter) {
     const refSizes = this.sizes[category]
-    const baseSize = filterId ? refSizes[filterId.size] : refSizes.md
+    const baseSize = filter ? refSizes[filter.size] : refSizes.md
     return this.modifiers[category]
       ? baseSize * this.modifiers[category].sizeMultiplier
       : baseSize
   }
 
-  getModifiers(category) {
-    return this.modifiers[category]
-      ? this.modifiers[category]
-      : this.modifiers.base
+  getModifiers(...categories) {
+    return categories.map((category) =>
+      this.modifiers[category] ? this.modifiers[category] : this.modifiers.base,
+    )
   }
 
   getIconById(id) {
@@ -204,6 +204,9 @@ export default class UIcons {
       case 'e':
         // raid eggs
         return this.getEggs(id.slice(1), false)
+      case 'f':
+        // showcase mons
+        return this.getPokemon(...id.slice(1).split('-'))
       case 'g':
         // gyms
         return this.getGyms(...id.slice(1).split('-'))
@@ -321,7 +324,7 @@ export default class UIcons {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/type/0.png`
+      return `${this.fallback}/type/0.webp`
     }
   }
 
@@ -360,7 +363,7 @@ export default class UIcons {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/pokestop/0.png`
+      return `${this.fallback}/pokestop/0.webp`
     }
   }
 
@@ -384,7 +387,7 @@ export default class UIcons {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/reward/unset/0.png`
+      return `${this.fallback}/reward/unset/0.webp`
     }
   }
 
@@ -405,7 +408,7 @@ export default class UIcons {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/invasion/0.png`
+      return `${this.fallback}/invasion/0.webp`
     }
   }
 
@@ -439,7 +442,7 @@ export default class UIcons {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/gym/0.png`
+      return `${this.fallback}/gym/0.webp`
     }
   }
 
@@ -466,7 +469,7 @@ export default class UIcons {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/raid/egg/0.png`
+      return `${this.fallback}/raid/egg/0.webp`
     }
   }
 
@@ -482,7 +485,7 @@ export default class UIcons {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/team/0.png`
+      return `${this.fallback}/team/0.webp`
     }
   }
 
@@ -503,7 +506,7 @@ export default class UIcons {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/weather/0.png`
+      return `${this.fallback}/weather/0.webp`
     }
   }
 
@@ -519,7 +522,7 @@ export default class UIcons {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/nest/0.png`
+      return `${this.fallback}/nest/0.webp`
     }
   }
 
@@ -557,7 +560,7 @@ export default class UIcons {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/misc/0.png`
+      return `${this.fallback}/misc/0.webp`
     }
   }
 
@@ -571,7 +574,7 @@ export default class UIcons {
       return online ? `${baseUrl}/1.${extension}` : `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/device/0.png`
+      return `${this.fallback}/device/0.webp`
     }
   }
 
@@ -585,7 +588,7 @@ export default class UIcons {
       return hasTth ? `${baseUrl}/1.${extension}` : `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
-      return `${this.fallback}/spawnpoint/0.png`
+      return `${this.fallback}/spawnpoint/0.webp`
     }
   }
 }

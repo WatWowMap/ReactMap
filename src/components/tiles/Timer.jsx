@@ -21,9 +21,10 @@ const Timer = ({ timestamp }) => {
   )
 }
 
-export default function TooltipWrapper({ timers, offset }) {
+export default function TooltipWrapper({ timers, offset, children }) {
   return (
     <Tooltip direction="bottom" permanent offset={offset}>
+      {children}
       {[...new Set(timers)].map((timer, i) => (
         <Timer
           // eslint-disable-next-line react/no-array-index-key

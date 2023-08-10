@@ -114,21 +114,6 @@ export default function Nav({
       }
     }
 
-  React.useEffect(() => {
-    /**
-     * @param {KeyboardEvent} event
-     */
-    const toggleDarkMode = (event) => {
-      // This is mostly meant for development purposes
-      if (event.ctrlKey && event.key === 'd') {
-        useStore.setState((prev) => ({ darkMode: !prev.darkMode }))
-      }
-    }
-
-    window.addEventListener('keydown', toggleDarkMode)
-    return () => window.removeEventListener('keydown', toggleDarkMode)
-  }, [])
-
   return (
     <>
       <Sidebar

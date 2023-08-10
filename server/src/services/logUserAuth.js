@@ -1,6 +1,12 @@
-const fetch = require('node-fetch')
+// @ts-check
+const { default: fetch } = require('node-fetch')
 const { log, HELPERS } = require('./logger')
 
+/**
+ * Convert camelCase to Capitalized Words
+ * @param {string} str
+ * @returns
+ */
 const capCamel = (str) =>
   str
     .replace(/([a-z](?=[A-Z]))/g, '$1 ')
@@ -8,6 +14,11 @@ const capCamel = (str) =>
     .map((str2) => str2.charAt(0).toUpperCase() + str2.slice(1))
     .join(' ')
 
+/**
+ * Map permissions to a string
+ * @param {string[]} perms
+ * @param {import('../types').Permissions} userPerms
+ */
 const mapPerms = (perms, userPerms) =>
   perms
     .map(
@@ -15,12 +26,19 @@ const mapPerms = (perms, userPerms) =>
     )
     .join('\n')
 
-module.exports = async function getAuthInfo(req, user, strategy = 'custom') {
+/**
+ * Log user authentication to Discord
+ * @param {import('express').Request} req
+ * @param {import('../types').User} user
+ * @param {string} strategy
+ * @returns
+ */
+async function getAuthInfo(req, user, strategy = 'custom') {
   const ip =
     req.headers['cf-connecting-ip'] ||
-    (req.headers['x-forwarded-for'] || '').split(', ')[0] ||
+    `${req.headers['x-forwarded-for'] || ''}`.split(', ')[0] ||
     (req.connection.remoteAddress || req.connection.localAddress).match(
-      '[0-9]+.[0-9].+[0-9]+.[0-9]+$',
+      /[0-9]+.[0-9].+[0-9]+.[0-9]+$/,
     )[0]
 
   const geo = await fetch(
@@ -76,17 +94,17 @@ module.exports = async function getAuthInfo(req, user, strategy = 'custom') {
       },
       {
         name: 'Mobile',
-        value: `${Boolean(geo.mobile)}`,
+        value: `${!!geo.mobile}`,
         inline: true,
       },
       {
         name: 'Proxy',
-        value: `${Boolean(geo.proxy)}`,
+        value: `${!!geo.proxy}`,
         inline: true,
       },
       {
         name: 'Hosting',
-        value: `${Boolean(geo.hosting)}`,
+        value: `${!!geo.hosting}`,
         inline: true,
       },
       {
@@ -120,7 +138,7 @@ module.exports = async function getAuthInfo(req, user, strategy = 'custom') {
       {
         name: 'Other',
         value: mapPerms(
-          ['nests', 'weather', 'scanAreas', 'donor', 'backups'],
+          ['nests', 'weather', 'scanAreas', 'donor', 'backups', 'routes'],
           user.perms,
         ),
         inline: true,
@@ -183,3 +201,5 @@ module.exports = async function getAuthInfo(req, user, strategy = 'custom') {
   }
   return embed
 }
+
+module.exports = getAuthInfo

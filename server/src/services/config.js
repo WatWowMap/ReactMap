@@ -1,5 +1,3 @@
-process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
-
 const fs = require('fs')
 const { resolve } = require('path')
 
@@ -11,6 +9,7 @@ const allowedMenuItems = [
   'nests',
   'pokestops',
   'pokemon',
+  'routes',
   'wayfarer',
   's2cells',
   'scanAreas',
