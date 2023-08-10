@@ -41,5 +41,5 @@ jobs:
         if: ${{ env.changes_exist == 'true' }}
         run: |
           git add --all
-          git commit --message "Sync CI/CD Config Items"
+          git commit --message "sync locales"
           git push
