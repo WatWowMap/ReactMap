@@ -646,5 +646,11 @@
   "tth": "TTH",
   "tth_0": "alle",
   "tth_1": "bekannt",
-  "tth_2": "unbekannt"
+  "tth_2": "unbekannt",
+  "contest_category_1": "Kleinste Größe",
+  "context_category_2": "Größte Größe",
+  "total_entries": "Gesamteinträge",
+  "showcase_rankings": "Schaukasten-Rankings",
+  "showcase_rankings_subtitle": "Zeigt eine Liste der Top-Rankings für einen Schaukasten an einem Pokestop",
+  "no_access": "Kein Zugriff"
 }
