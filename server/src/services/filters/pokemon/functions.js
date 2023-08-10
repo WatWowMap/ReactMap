@@ -78,6 +78,7 @@ function assign(newObject, reference, props) {
  * @returns {(pokemon: import('../../../types').Pokemon) => boolean}
  */
 const jsFnCache = new NodeCache({ stdTTL: 60 * 5 })
+
 /**
  *
  * @param {string} filter
@@ -199,21 +200,28 @@ function jsifyIvFilter(filter) {
   return fn
 }
 
-function dnfifyIvFilter(filter, pokemon, dest) {
+/**
+ *
+ * @param {string} filter
+ * @param {import('../../../types').FilterId} pokemon
+ * @returns
+ */
+function dnfifyIvFilter(filter, pokemon) {
+  const results = /** @type {import('../../../types').DnfFilter[]} */ ([])
   const input = filter.toUpperCase()
   const tokenizer =
-      /\s*([|&,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
+    /\s*([|&,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
   let expectClause = true // expect a clause or '('
   let lastIndex = 0
   let match
   let clause = { pokemon }
   while ((match = tokenizer.exec(input)) !== null) {
     if (match.index > lastIndex) {
-      return
+      return []
     }
     if (expectClause) {
       if (match[3] === undefined) {
-        return
+        return []
       }
       const lower = parseFloat(match[3])
       let column = 'iv'
@@ -262,7 +270,7 @@ function dnfifyIvFilter(filter, pokemon, dest) {
       }
       expectClause = false
     } else if (match[3] !== undefined) {
-      return
+      return []
     } else {
       switch (match[1]) {
         case '&':
@@ -270,8 +278,8 @@ function dnfifyIvFilter(filter, pokemon, dest) {
           break
         case '|':
         case ',':
-          dest.push(clause)
-          clause = {pokemon}
+          results.push(clause)
+          clause = { pokemon }
           expectClause = true
           break
       }
@@ -279,8 +287,9 @@ function dnfifyIvFilter(filter, pokemon, dest) {
     lastIndex = tokenizer.lastIndex
   }
   if (!expectClause) {
-    dest.push(clause)
+    results.push(clause)
   }
+  return results
 }
 
 module.exports = {

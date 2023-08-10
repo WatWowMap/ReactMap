@@ -267,3 +267,18 @@ export interface Route {
 }
 
 export type Config = typeof config
+
+export type FilterId = `${number}-${number}` | 'global'
+
+export interface DnfFilter {
+  pokemon?: FilterId
+  iv?: [number, number]
+  level?: [number, number]
+  cp?: [number, number]
+  atk_iv?: [number, number]
+  def_iv?: [number, number]
+  sta_iv?: [number, number]
+  gender?: 0 | 1 | 2 | 3
+  size?: 0 | 1 | 2 | 3 | 4 | 5
+  pvp?: { [league in (typeof LEAGUES)[number]]?: [number, number] }
+}

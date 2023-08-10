@@ -240,12 +240,15 @@ module.exports = class Pokemon extends Model {
       }
     }
 
-    const dnf = globalFilter.buildApiFilter()
-    if (onlyIvOr.xxs) dnf.push({ size: 1 })
-    if (onlyIvOr.xxl) dnf.push({ size: 5 })
+    const dnf = Object.values(filterMap).flatMap((filter) =>
+      filter.buildApiFilter(),
+    )
+    // if (onlyIvOr.xxs) dnf.push({ size: 1 })
+    // if (onlyIvOr.xxl) dnf.push({ size: 5 })
+    dnf.push(...globalFilter.buildApiFilter())
     if (onlyZeroIv) dnf.push({ iv: [0, 0] })
     if (onlyHundoIv) dnf.push({ iv: [100, 100] })
-    Object.values(filterMap).forEach((filter) => filter.buildApiFilter(dnf))
+
     /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/scan` : null,
