@@ -24,6 +24,8 @@ jobs:
       - name: Run generating script
         run: |
           yarn generate-locales
+        env:
+          OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
       - name: Configure git
         run: |
           git config --global user.name "turtlesocks-bot"
