@@ -245,9 +245,7 @@ module.exports = class Pokemon extends Model {
     if (onlyIvOr.xxl) dnf.push({ size: 5 })
     if (onlyZeroIv) dnf.push({ iv: [0, 0] })
     if (onlyHundoIv) dnf.push({ iv: [100, 100] })
-    for (const filter of Object.values(filterMap)) {
-      filter.buildApiFilter(dnf)
-    }
+    Object.values(filterMap).forEach((filter) => filter.buildApiFilter(dnf))
     /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/scan` : null,

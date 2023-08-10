@@ -298,7 +298,7 @@ module.exports = class PkmnBackend {
       })
     }
     if (this.perms.pvp) {
-      for (const [league, values] of Object.entries(rest)) {
+      Object.entries(rest).forEach(([league, values]) => {
         if (Array.isArray(values) && this.filterKeys.has(league)) {
           result.push({
             pokemon,
@@ -307,7 +307,7 @@ module.exports = class PkmnBackend {
             }
           })
         }
-      }
+      })
     }
     if (this.filterKeys.has('xxs')) result.push({ pokemon, size: 1 })
     if (this.filterKeys.has('xxl')) result.push({ pokemon, size: 5 })
