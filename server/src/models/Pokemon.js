@@ -240,6 +240,14 @@ module.exports = class Pokemon extends Model {
       }
     }
 
+    const dnf = globalFilter.buildApiFilter()
+    if (onlyIvOr.xxs) dnf.push({ size: 1 })
+    if (onlyIvOr.xxl) dnf.push({ size: 5 })
+    if (onlyZeroIv) dnf.push({ iv: [0, 0] })
+    if (onlyHundoIv) dnf.push({ iv: [100, 100] })
+    for (const filter of Object.values(filterMap)) {
+      filter.buildApiFilter(dnf)
+    }
     /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/scan` : null,
@@ -258,20 +266,8 @@ module.exports = class Pokemon extends Model {
               longitude: 0,
             },
             searchIds: [],
-            global: {
-              ...globalFilter.buildApiFilter(),
-              additional: {
-                include_xxs: onlyIvOr.xxs || false,
-                include_xxl: onlyIvOr.xxl || false,
-                include_zeroiv: onlyZeroIv,
-                include_hundoiv: onlyHundoIv,
-                include_everything: false,
-              },
-            },
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-            filters: Object.fromEntries(
-              Object.values(filterMap).map((x) => [x.id, x.buildApiFilter()]),
-            ),
+            dnf,
           })
         : query.limit(queryLimits.pokemon),
       'POST',

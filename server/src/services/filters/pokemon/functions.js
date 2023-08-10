@@ -199,10 +199,92 @@ function jsifyIvFilter(filter) {
   return fn
 }
 
+function dnfifyIvFilter(filter, pokemon, dest) {
+  const input = filter.toUpperCase()
+  const tokenizer =
+      /\s*([|&,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
+  let expectClause = true // expect a clause or '('
+  let lastIndex = 0
+  let match
+  let clause = { pokemon }
+  while ((match = tokenizer.exec(input)) !== null) {
+    if (match.index > lastIndex) {
+      return
+    }
+    if (expectClause) {
+      if (match[3] === undefined) {
+        return
+      }
+      const lower = parseFloat(match[3])
+      let column = 'iv'
+      let pvpColumn
+      switch (match[2]) {
+        case 'A':
+          column = 'atk_iv'
+          break
+        case 'D':
+          column = 'def_iv'
+          break
+        case 'G':
+          column = 'gender'
+          break
+        case 'S':
+          column = 'sta_iv'
+          break
+        case 'L':
+          column = 'level'
+          break
+        case 'X':
+          column = 'size'
+          break
+        case 'CP':
+          column = 'cp'
+          break
+        case 'GL':
+          pvpColumn = 'great'
+          break
+        case 'UL':
+          pvpColumn = 'ultra'
+          break
+        case 'LC':
+          pvpColumn = 'little'
+          break
+      }
+      let upper = lower
+      if (match[4] !== undefined) {
+        upper = parseInt(match[4])
+      }
+      if (pvpColumn) {
+        if (!clause.pvp) clause.pvp = {}
+        clause.pvp[pvpColumn] = [lower, upper]
+      } else {
+        clause[column] = [lower, upper]
+      }
+      expectClause = false
+    } else if (match[3] !== undefined) {
+      return
+    } else {
+      switch (match[1]) {
+        case '&':
+          expectClause = true
+          break
+        case '|':
+        case ',':
+          dest.push(clause)
+          clause = {pokemon}
+          expectClause = true
+          break
+      }
+    }
+    lastIndex = tokenizer.lastIndex
+  }
+}
+
 module.exports = {
   getParsedPvp,
   deepCompare,
   between,
   assign,
   jsifyIvFilter,
+  dnfifyIvFilter,
 }
