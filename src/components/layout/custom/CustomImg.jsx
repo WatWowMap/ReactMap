@@ -1,7 +1,12 @@
-import React from 'react'
-import LinkWrapper from './LinkWrapper'
+import * as React from 'react'
+import { styled } from '@mui/material'
 
-export default function CustomImg({ block }) {
-  const img = <img src={block.src} style={block.style} alt={block.src} />
-  return block.link ? <LinkWrapper block={block} element={img} /> : img
+const Img = styled('img')``
+
+export default function CustomImg({ style, sx, children, ...props }) {
+  return (
+    <Img {...props} style={style} sx={sx}>
+      {children}
+    </Img>
+  )
 }

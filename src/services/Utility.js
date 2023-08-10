@@ -151,6 +151,11 @@ export default class Utility {
     }
   }
 
+  /**
+   * Provides the raw content or translated content if available
+   * @param {string | Record<string, string>} content
+   * @returns
+   */
   static getBlockContent(content) {
     if (!content) return ''
     if (typeof content === 'string') return content

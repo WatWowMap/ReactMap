@@ -1,33 +1,27 @@
+// @ts-check
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react'
-import { Grid } from '@mui/material'
+import * as React from 'react'
+import Grid from '@mui/material/Unstable_Grid2'
 
 import Utility from '@services/Utility'
 
 import Generator from './Generator'
 
-export default function CustomTile({
-  block,
-  defaultReturn,
-  serverSettings = {},
-}) {
+/**
+ *
+ * @param {{ block: object, defaultReturn?: React.ReactNode | null }} props
+ * @returns
+ */
+export default function CustomTile({ block, defaultReturn }) {
   return block.type === 'parent' ? (
-    <Generator
-      block={block}
-      defaultReturn={defaultReturn}
-      serverSettings={serverSettings}
-    />
+    <Generator block={block} defaultReturn={defaultReturn} />
   ) : (
     <Grid
-      item
       {...Utility.getSizes(block.gridSizes)}
-      style={block.gridStyle || { textAlign: 'center' }}
+      style={block.gridStyle}
+      sx={block.sx}
     >
-      <Generator
-        block={block}
-        defaultReturn={defaultReturn}
-        serverSettings={serverSettings}
-      />
+      <Generator block={block} defaultReturn={defaultReturn} />
     </Grid>
   )
 }

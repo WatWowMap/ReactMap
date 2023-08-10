@@ -1,21 +1,42 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { Link } from '@mui/material'
 
-export default function LinkWrapper({ block, element }) {
-  return block.link.startsWith('http') ? (
+/**
+ * Wraps div in a link if the block has one, otherwise returns children
+ * @param {{
+ *  link?: string,
+ *  target?: string,
+ *  linkColor?: string,
+ *  underline?: import("@mui/material/Link").LinkProps['underline'],
+ *  style?: import("@mui/system").SxProps,
+ *  children: React.ReactNode
+ * }} props
+ * @returns {React.ReactNode}
+ */
+export default function LinkWrapper({
+  link,
+  target,
+  linkColor,
+  underline,
+  style,
+  children,
+}) {
+  if (!link) return children
+  const external = link.startsWith('http')
+  return (
     <Link
-      href={block.link}
-      rel="noreferrer"
-      target="blank"
-      color={block.linkColor}
-      underline={block.underline}
+      href={external ? link : null}
+      to={external ? null : link}
+      rel={external ? 'noopener noreferrer' : null}
+      target={target ?? (external ? '_blank' : null)}
+      color={linkColor}
+      underline={underline}
+      sx={style}
+      component={external ? 'a' : RouterLink}
     >
-      {element}
+      {children}
     </Link>
-  ) : (
-    <RouterLink to={block.link} style={block.style}>
-      {element}
-    </RouterLink>
   )
 }
