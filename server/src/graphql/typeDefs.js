@@ -96,6 +96,7 @@ module.exports = gql`
       midnight: Int
       onlyAreas: [String]
     ): [Search]
+    searchable: [String]
     searchLure(
       search: String
       category: String

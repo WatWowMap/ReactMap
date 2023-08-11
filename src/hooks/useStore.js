@@ -12,6 +12,9 @@ import { persist } from 'zustand/middleware'
  *   settings: Record<string, unknown>,
  *   motdIndex: number
  *   tutorial: boolean,
+ *   searchTab: string,
+ *   search: string,
+ *   filters: object,
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
@@ -75,9 +78,7 @@ export const useStore = create(
       },
       setAdvMenu: (advMenu) => set({ advMenu }),
       search: '',
-      setSearch: (search) => set({ search }),
-      searchTab: 0,
-      setSearchTab: (searchTab) => set({ searchTab }),
+      searchTab: '',
       selectedWebhook: undefined,
       setSelectedWebhook: (selectedWebhook) => set({ selectedWebhook }),
       webhookAdv: {
@@ -113,6 +114,9 @@ export const useStore = create(
  *   isMobile: boolean,
  *   isTablet: boolean,
  *   active: boolean,
+ *   searchLoading: boolean,
+ *   Icons: InstanceType<typeof import("../services/Icons").default>,
+ *   config: object,
  * }} UseStatic
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
  */
@@ -120,6 +124,7 @@ export const useStatic = create((set) => ({
   isMobile: false,
   isTablet: false,
   active: true,
+  searchLoading: false,
   setActive: (active) => set({ active }),
   auth: {
     strategy: '',
@@ -183,10 +188,12 @@ export const useStatic = create((set) => ({
   setResetFilters: (resetFilters) => set({ resetFilters }),
   extraUserFields: [],
   setExtraUserFields: (extraUserFields) => set({ extraUserFields }),
+  manualParams: { id: '' },
 }))
 
 export const useDialogStore = create((/* set, get */) => ({
   nestSubmissions: '0',
   motd: false,
   donorPage: false,
+  search: false,
 }))

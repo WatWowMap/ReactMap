@@ -18,17 +18,12 @@ import ResetFilters from './dialogs/ResetFilters'
 import Notification from './general/Notification'
 
 export default function Nav({
-  map,
-  setManualParams,
-  Icons,
-  setWebhookMode,
   webhookMode,
-  setScanNextMode,
+  setWebhookMode,
   scanNextMode,
-  setScanZoneMode,
+  setScanNextMode,
   scanZoneMode,
-  isMobile,
-  isTablet,
+  setScanZoneMode,
 }) {
   const {
     setWebhookAlert,
@@ -37,15 +32,15 @@ export default function Nav({
     setFeedback,
     setResetFilters,
   } = useStatic.getState()
-  const { setFilters, setUserSettings, setTutorial } = useStore.getState()
 
   const webhookAlert = useStatic((s) => s.webhookAlert)
   const userProfile = useStatic((s) => s.userProfile)
   const feedback = useStatic((s) => s.feedback)
   const resetFilters = useStatic((s) => s.resetFilters)
+  const isMobile = useStatic((s) => s.isMobile)
+  const isTablet = useStatic((s) => s.isTablet)
 
   const filters = useStore((s) => s.filters)
-  const userSettings = useStore((s) => s.userSettings)
   const tutorial = useStore((s) => s.tutorial)
 
   const [drawer, setDrawer] = React.useState(false)
@@ -65,31 +60,36 @@ export default function Nav({
     setDrawer(open)
   }
 
-  const toggleDialog =
-    (open, category, type, filter) => (event, searchValue) => {
-      Utility.analytics(
-        'Menu Toggle',
-        `Open: ${open}`,
-        `Category: ${category} Menu: ${type}`,
-      )
-      if (
-        event.type === 'keydown' &&
-        (event.key === 'Tab' || event.key === 'Shift')
-      ) {
-        return
-      }
-      setDialog({ open, category, type })
-      if (typeof searchValue === 'object' && type === 'search') {
-        setManualParams({ id: searchValue.id })
-        map.flyTo([searchValue.lat, searchValue.lon], 16)
-      }
-      if (filter && type === 'filters') {
-        setFilters({ ...filters, [category]: { ...filters[category], filter } })
-      }
-      if (filter && type === 'options') {
-        setUserSettings({ ...userSettings, [category]: filter })
-      }
+  const toggleDialog = (open, category, type, filter) => (event) => {
+    Utility.analytics(
+      'Menu Toggle',
+      `Open: ${open}`,
+      `Category: ${category} Menu: ${type}`,
+    )
+    if (
+      event.type === 'keydown' &&
+      (event.key === 'Tab' || event.key === 'Shift')
+    ) {
+      return
     }
+    setDialog({ open, category, type })
+    if (filter && type === 'filters') {
+      useStore.setState((prev) => ({
+        filters: {
+          ...prev.filters,
+          [category]: { ...prev.filters[category], filter },
+        },
+      }))
+    }
+    if (filter && type === 'options') {
+      useStore.setState((prev) => ({
+        userSettings: {
+          ...prev.userSettings,
+          [category]: filter,
+        },
+      }))
+    }
+  }
 
   return (
     <>
@@ -98,7 +98,6 @@ export default function Nav({
         toggleDrawer={toggleDrawer}
         toggleDialog={toggleDialog}
       />
-
       <FloatingBtn
         toggleDrawer={toggleDrawer}
         toggleDialog={toggleDialog}
@@ -126,11 +125,11 @@ export default function Nav({
         open={tutorial && config.map.enableTutorial}
         fullScreen={isMobile}
         maxWidth="xs"
-        onClose={() => setTutorial(false)}
+        onClose={() => useStore.setState({ tutorial: false })}
       >
         <Tutorial
           setUserProfile={setUserProfile}
-          setTutorial={setTutorial}
+          setTutorial={(tut) => useStore.setState({ tutorial: tut })}
           toggleDialog={toggleDialog}
         />
       </Dialog>
@@ -161,23 +160,7 @@ export default function Nav({
           isMobile={isMobile}
         />
       </Dialog>
-      <Dialog
-        fullScreen={isMobile}
-        open={dialog.open && dialog.type === 'search'}
-        onClose={toggleDialog(false, dialog.category, dialog.type)}
-        sx={{
-          '& .MuiDialog-container': {
-            alignItems: 'flex-start',
-          },
-        }}
-      >
-        <Search
-          toggleDialog={toggleDialog}
-          safeSearch={config.map.searchable}
-          isMobile={isMobile}
-          Icons={Icons}
-        />
-      </Dialog>
+      <Search />
       <MessageOfTheDay />
       <DonorPage />
       <Dialog

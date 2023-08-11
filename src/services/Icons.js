@@ -564,7 +564,7 @@ export default class UIcons {
     }
   }
 
-  getDevices(online) {
+  getDevices(online = false) {
     try {
       const baseUrl = `${
         this[this.selected.device]?.path || this.fallback
@@ -578,7 +578,7 @@ export default class UIcons {
     }
   }
 
-  getSpawnpoints(hasTth) {
+  getSpawnpoints(hasTth = false) {
     try {
       const baseUrl = `${
         this[this.selected.spawnpoint]?.path || this.fallback

@@ -294,19 +294,12 @@ export default function Map({
         />
       )}
       <Nav
-        map={map}
-        setManualParams={setManualParams}
-        Icons={Icons}
-        config={config}
         webhookMode={webhookMode}
         setWebhookMode={setWebhookMode}
         scanNextMode={scanNextMode}
         setScanNextMode={setScanNextMode}
         scanZoneMode={scanZoneMode}
         setScanZoneMode={setScanZoneMode}
-        settings={settings}
-        isMobile={isMobile}
-        isTablet={isTablet}
       />
       <ClientError error={error} />
     </>

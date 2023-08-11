@@ -49,7 +49,6 @@ const DEFAULT = {
 
 export default function FloatingButtons({
   toggleDrawer,
-  toggleDialog,
   webhookMode,
   setWebhookMode,
   setUserProfile,
@@ -115,7 +114,7 @@ export default function FloatingButtons({
         <Fab
           color={reactControls ? 'primary' : 'secondary'}
           size={fabSize}
-          onClick={toggleDialog(true, '', 'search')}
+          onClick={() => useDialogStore.setState({ search: true })}
           title={t('search')}
           disabled={disabled}
         >

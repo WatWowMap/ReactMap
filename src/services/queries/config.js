@@ -30,3 +30,9 @@ export const FAB_BUTTONS = gql`
     }
   }
 `
+
+export const SEARCHABLE = gql`
+  query Searchable {
+    searchable
+  }
+`

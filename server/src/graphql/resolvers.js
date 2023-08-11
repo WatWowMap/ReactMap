@@ -366,6 +366,10 @@ const resolvers = {
       }
       return []
     },
+    searchable: (_, __, { perms }) => {
+      const options = config.get('api.searchable')
+      return Object.keys(options).filter((k) => options[k] && perms[k])
+    },
     spawnpoints: (_, args, { perms, Db }) => {
       if (perms?.spawnpoints) {
         return Db.getAll('Spawnpoint', perms, args)
