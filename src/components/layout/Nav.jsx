@@ -25,16 +25,10 @@ export default function Nav({
   scanZoneMode,
   setScanZoneMode,
 }) {
-  const {
-    setWebhookAlert,
-    config,
-    setUserProfile,
-    setFeedback,
-    setResetFilters,
-  } = useStatic.getState()
+  const { setWebhookAlert, config, setFeedback, setResetFilters } =
+    useStatic.getState()
 
   const webhookAlert = useStatic((s) => s.webhookAlert)
-  const userProfile = useStatic((s) => s.userProfile)
   const feedback = useStatic((s) => s.feedback)
   const resetFilters = useStatic((s) => s.resetFilters)
   const isMobile = useStatic((s) => s.isMobile)
@@ -100,27 +94,14 @@ export default function Nav({
       />
       <FloatingBtn
         toggleDrawer={toggleDrawer}
-        toggleDialog={toggleDialog}
         webhookMode={webhookMode}
         setWebhookMode={setWebhookMode}
         scanNextMode={scanNextMode}
         setScanNextMode={setScanNextMode}
         scanZoneMode={scanZoneMode}
         setScanZoneMode={setScanZoneMode}
-        setUserProfile={setUserProfile}
       />
-      <Dialog
-        open={userProfile}
-        fullScreen={isMobile}
-        fullWidth={!isMobile}
-        onClose={() => setUserProfile(false)}
-      >
-        <UserProfile
-          setUserProfile={setUserProfile}
-          isMobile={isMobile}
-          isTablet={isTablet}
-        />
-      </Dialog>
+      <UserProfile />
       <Dialog
         open={tutorial && config.map.enableTutorial}
         fullScreen={isMobile}
@@ -128,7 +109,6 @@ export default function Nav({
         onClose={() => useStore.setState({ tutorial: false })}
       >
         <Tutorial
-          setUserProfile={setUserProfile}
           setTutorial={(tut) => useStore.setState({ tutorial: tut })}
           toggleDialog={toggleDialog}
         />

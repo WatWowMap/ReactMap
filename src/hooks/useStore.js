@@ -180,8 +180,6 @@ export const useStatic = create((set) => ({
   setWebhookData: (webhookData) => set({ webhookData }),
   timeOfDay: 'day',
   setTimeOfDay: (timeOfDay) => set({ timeOfDay }),
-  userProfile: false,
-  setUserProfile: (userProfile) => set({ userProfile }),
   feedback: false,
   setFeedback: (feedback) => set({ feedback }),
   resetFilters: false,
@@ -191,9 +189,21 @@ export const useStatic = create((set) => ({
   manualParams: { id: '' },
 }))
 
-export const useDialogStore = create((/* set, get */) => ({
+// /**
+//  * @typedef {{
+//  *  nestSubmissions: string,
+//  *  motd: boolean,
+//  *  donorPage: boolean,
+//  *  search: boolean,
+//  *  userProfile: boolean,
+//  * }} UseDialog
+//  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseDialog>>}
+//  */
+
+export const useDialogStore = create(() => ({
   nestSubmissions: '0',
   motd: false,
   donorPage: false,
   search: false,
+  userProfile: false,
 }))

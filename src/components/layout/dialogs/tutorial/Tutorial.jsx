@@ -6,13 +6,14 @@ import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import MobileStepper from '@mui/material/MobileStepper'
 import Slide from '@mui/material/Slide'
-
 import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 
+import { useStore } from '@hooks/useStore'
 import Query from '@services/Query'
 import Header from '@components/layout/general/Header'
+
 import Welcome from './Welcome'
 import Advanced from './Advanced'
 import Closing from './Closing'
@@ -22,11 +23,7 @@ import Popups from './Popups'
 
 const steps = ['intro', 'sidebar', 'sliders', 'advanced', 'popups', 'closing']
 
-export default function Tutorial({
-  toggleDialog,
-  setTutorial,
-  setUserProfile,
-}) {
+export default function Tutorial({ toggleDialog }) {
   const theme = useTheme()
   const { t } = useTranslation()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
@@ -46,7 +43,7 @@ export default function Tutorial({
   }
 
   const handleTutClose = () => {
-    setTutorial(false)
+    useStore.setState({ tutorial: false })
     setTutorialInDb({ variables: { tutorial: true } })
   }
 
@@ -75,7 +72,7 @@ export default function Tutorial({
           >
             {
               {
-                0: <Welcome setUserProfile={setUserProfile} />,
+                0: <Welcome />,
                 1: <Sidebar isMobile={isMobile} toggleDialog={toggleDialog} />,
                 2: <Sliders isMobile={isMobile} />,
                 3: <Advanced isMobile={isMobile} />,

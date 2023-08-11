@@ -51,7 +51,6 @@ export default function FloatingButtons({
   toggleDrawer,
   webhookMode,
   setWebhookMode,
-  setUserProfile,
   scanNextMode,
   setScanNextMode,
   scanZoneMode,
@@ -103,7 +102,7 @@ export default function FloatingButtons({
         <Fab
           color="primary"
           size={fabSize}
-          onClick={() => setUserProfile(true)}
+          onClick={() => useDialogStore.setState({ userProfile: true })}
           title={t('user_profile')}
           disabled={disabled}
         >

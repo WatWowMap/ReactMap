@@ -17,7 +17,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import FeedbackIcon from '@mui/icons-material/Feedback'
 import HeartIcon from '@mui/icons-material/Favorite'
 
-import { useStore, useStatic } from '@hooks/useStore'
+import { useStore, useStatic, useDialogStore } from '@hooks/useStore'
 import FAIcon from '../general/FAIcon'
 
 const importSettings = (e) => {
@@ -57,7 +57,6 @@ export default function DrawerActions() {
   const { t } = useTranslation()
   const {
     auth: { loggedIn, methods },
-    setUserProfile,
     setFeedback,
     setResetFilters,
     config,
@@ -67,7 +66,9 @@ export default function DrawerActions() {
   return (
     <List>
       {config.map.enableUserProfile && (
-        <ListItemButton onClick={() => setUserProfile(true)}>
+        <ListItemButton
+          onClick={() => useDialogStore.setState({ userProfile: true })}
+        >
           <ListItemIcon>
             <AccountBoxIcon color="secondary" />
           </ListItemIcon>

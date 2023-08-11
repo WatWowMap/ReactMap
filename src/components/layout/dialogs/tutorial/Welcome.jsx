@@ -5,10 +5,10 @@ import { DialogContent, Grid, Typography, Fab } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
+import { useDialogStore, useStatic } from '@hooks/useStore'
 import LocaleSelection from '@components/layout/general/LocaleSelection'
 
-export default function TutWelcome({ setUserProfile }) {
+export default function TutWelcome() {
   const { t } = useTranslation()
   const { methods, loggedIn, perms, counts } = useStatic((state) => state.auth)
   const {
@@ -82,7 +82,10 @@ export default function TutWelcome({ setUserProfile }) {
               )
             }
             return enableUserProfile ? (
-              <Fab color="primary" onClick={() => setUserProfile(true)}>
+              <Fab
+                color="primary"
+                onClick={() => useDialogStore.setState({ userProfile: true })}
+              >
                 <Person />
               </Fab>
             ) : null
