@@ -22,9 +22,9 @@ export default function ScanDialog() {
   )
 
   const handleClose = React.useCallback(() => {
-    if (scanMode) return setScanMode('scanNextMode')
+    if (scanNext) return setScanMode('scanNextMode')
     if (scanZone) return setScanMode('scanZoneMode')
-  }, [scanMode])
+  }, [])
 
   return (
     <Dialog

@@ -7,8 +7,9 @@ import { useScanStore } from '@hooks/useStore'
 
 import { COLORS, ScanCircle, ScanCircles } from '../Shared'
 import { useCheckValid } from '../useCheckValid'
-import { ScanNextMarker } from './Marker'
-import { ScanNextPopup } from './Popup'
+import { ScanNextPopup } from './PopupContent'
+import { ScanOnDemandMarker } from '../Marker'
+import { ScanOnDemandPopup } from '../Popup'
 
 const POKEMON_RADIUS = 70
 const GYM_RADIUS = 750
@@ -24,9 +25,11 @@ export default function ScanNext(props) {
   const scanNextSize = useScanStore((s) => s.scanNextSize)
   return (
     <>
-      <ScanNextMarker>
-        <ScanNextPopup {...props} />
-      </ScanNextMarker>
+      <ScanOnDemandMarker>
+        <ScanOnDemandPopup {...props} mode="scanNext">
+          <ScanNextPopup />
+        </ScanOnDemandPopup>
+      </ScanOnDemandMarker>
       {scanNextSize === 'M' ? (
         <ScanCircle
           lat={scanLocation[0]}
