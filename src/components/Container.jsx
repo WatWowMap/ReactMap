@@ -7,6 +7,7 @@ import useRefresh from '@hooks/useRefresh'
 import { useStatic } from '@hooks/useStore'
 
 import Map from './Map'
+import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
 
 export default function Container({ serverSettings, params, location, zoom }) {
   useGenerate()
@@ -38,6 +39,8 @@ export default function Container({ serverSettings, params, location, zoom }) {
       {serverSettings.user && serverSettings.user.perms.map && (
         <Map serverSettings={serverSettings} params={params} />
       )}
+      <ScanOnDemand mode="scanNext" />
+      <ScanOnDemand mode="scanZone" />
     </MapContainer>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useMap, ZoomControl, TileLayer } from 'react-leaflet'
 import { control } from 'leaflet'
 
@@ -10,10 +10,10 @@ import useCooldown from '@hooks/useCooldown'
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
 import Webhook from './layout/dialogs/webhooks/Webhook'
-import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
 import ClientError from './layout/dialogs/ClientError'
 import { GenerateCells } from './tiles/S2Cell'
 
+/** @param {string} category */
 const userSettingsCategory = (category) => {
   switch (category) {
     case 'devices':
@@ -30,7 +30,7 @@ const userSettingsCategory = (category) => {
 
 export default function Map({
   serverSettings: {
-    config: { map: config, scanner },
+    config: { map: config },
     Icons,
     webhooks,
   },
@@ -57,8 +57,6 @@ export default function Map({
   const userSettings = useStore((state) => state.userSettings)
 
   const [webhookMode, setWebhookMode] = useState(false)
-  const [scanNextMode, setScanNextMode] = useState(false)
-  const [scanZoneMode, setScanZoneMode] = useState(false)
   const [manualParams, setManualParams] = useState(params)
   const [error, setError] = useState('')
   const [windowState, setWindowState] = useState(true)
@@ -101,7 +99,7 @@ export default function Map({
     }
   }, [windowState])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (settings.navigationControls === 'leaflet' && map) {
       const lc = control
         .locate({
@@ -268,32 +266,7 @@ export default function Map({
           },
         )
       )}
-      {scanNextMode && (
-        <ScanOnDemand
-          map={map}
-          scanMode={scanNextMode}
-          setScanMode={setScanNextMode}
-          scanner={scanner}
-          mode="scanNext"
-        />
-      )}
-      {scanZoneMode && (
-        <ScanOnDemand
-          map={map}
-          scanMode={scanZoneMode}
-          setScanMode={setScanZoneMode}
-          scanner={scanner}
-          mode="scanZone"
-        />
-      )}
-      <Nav
-        webhookMode={webhookMode}
-        setWebhookMode={setWebhookMode}
-        scanNextMode={scanNextMode}
-        setScanNextMode={setScanNextMode}
-        scanZoneMode={scanZoneMode}
-        setScanZoneMode={setScanZoneMode}
-      />
+      <Nav webhookMode={webhookMode} setWebhookMode={setWebhookMode} />
       <ClientError error={error} />
     </>
   )

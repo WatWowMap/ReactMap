@@ -1,75 +1,74 @@
-import React, { useState } from 'react'
-import {
-  Button,
-  ButtonGroup,
-  List,
-  ListItemText,
-  ListItem,
-  Divider,
-} from '@mui/material'
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable react/destructuring-assignment */
+// @ts-check
+import * as React from 'react'
+import { Button, ButtonGroup, List, ListItem } from '@mui/material'
 import { point } from '@turf/helpers'
 import destination from '@turf/destination'
-import { Circle, Marker, Popup } from 'react-leaflet'
+import { Marker, Popup, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
-import Utility from '@services/Utility'
+
+import { useScanStore } from '@hooks/useStore'
 import fallbackIcon from '@components/markers/fallback'
+
 import {
+  COLORS,
   InAllowedArea,
   ScanCancel,
+  ScanCircle,
+  ScanCircles,
   ScanConfirm,
   ScanQueue,
   ScanRequests,
+  StyledDivider,
+  StyledListItemText,
 } from './Shared'
+import { useCheckValid } from './useCheckValid'
 
-const RADIUS_POKEMON = 70
-const RADIUS_GYM = 750
+const OPTIONS = /** @type {const} */ ({ units: 'kilometers' })
+const SIZES = /** @type {const} */ (['S', 'M', 'XL'])
+const POKEMON_RADIUS = 70
+const GYM_RADIUS = 750
+
 const DISTANCE = {
-  M: RADIUS_POKEMON * 1.732,
-  XL: RADIUS_GYM * 1.732,
+  M: POKEMON_RADIUS * 1.732,
+  XL: GYM_RADIUS * 1.732,
 }
 
-const calcScanNextCoords = (center, type) => {
+/**
+ *
+ * @todo Move this to the server
+ * @param {[number, number]} center
+ * @param {import('@hooks/useStore').UseScanStore['scanNextSize']} size
+ * @returns {import('@hooks/useStore').UseScanStore['scanCoords']}
+ */
+const calcScanNextCoords = (center, size) => {
   const coords = [center]
-  if (type === 'S') return coords
+  if (size === 'S') return coords
   const start = point([center[1], center[0]])
-  const options = { units: 'kilometers' }
   return coords.concat(
     [0, 60, 120, 180, 240, 300].map((bearing) => {
       const [lon, lat] = destination(
         start,
-        DISTANCE[type] / 1000,
+        DISTANCE[size] / 1000,
         bearing,
-        options,
+        OPTIONS,
       ).geometry.coordinates
       return [lat, lon]
     }),
   )
 }
 
-export default function ScanNextTarget({
-  map,
-  scannerType,
-  queue,
-  setScanNextMode,
-  scanNextLocation,
-  setScanNextLocation,
-  scanNextCoords,
-  setScanNextCoords,
-  scanNextType,
-  setScanNextType,
-  scanNextShowScanCount,
-  scanNextShowScanQueue,
-  scanNextAreaRestriction,
-  scanAreas,
-}) {
-  const [position, setPosition] = useState(scanNextLocation)
+/**
+ * @param {{ children: React.ReactNode }} props
+ * @returns
+ */
+export function ScanNextTarget({ children }) {
+  const map = useMap()
+  const color = useCheckValid('scanNext')
 
-  const { t } = useTranslation()
-
-  const isInAllowedArea = scanNextAreaRestriction.length
-    ? Utility.checkAreaValidity(position, scanNextAreaRestriction, scanAreas)
-    : true
-
+  const scanLocation = useScanStore((s) => s.scanLocation)
+  const scanNextSize = useScanStore((s) => s.scanNextSize)
   return (
     <>
       <Marker
@@ -79,105 +78,89 @@ export default function ScanNextTarget({
             if (target) {
               const { lat, lng } = target.getLatLng()
               map.panTo([lat, lng])
-              setPosition([lat, lng])
-              setScanNextLocation([lat, lng])
-              setScanNextCoords(calcScanNextCoords([lat, lng], scanNextType))
+              useScanStore.setState((prev) => ({
+                scanLocation: [lat, lng],
+                scanCoords: calcScanNextCoords([lat, lng], prev.scanNextSize),
+              }))
             }
             if (popup) {
               popup.openPopup()
             }
           },
         }}
-        position={position}
+        icon={fallbackIcon()}
+        position={scanLocation}
         ref={(ref) => {
           if (ref && !ref.isPopupOpen()) ref.openPopup()
         }}
-        icon={fallbackIcon()}
       >
-        <Popup minWidth={90} maxWidth={200} autoPan={false}>
-          <List>
-            <ListItemText
-              className="no-leaflet-margin"
-              secondary={t('scan_next_choose')}
-              style={{ textAlign: 'center' }}
-            />
-            <Divider style={{ margin: '10px 0' }} />
-            {scannerType !== 'mad' && (
-              <ListItem>
-                <ButtonGroup size="small" fullWidth>
-                  {['S', 'M', 'XL'].map((item) => (
-                    <Button
-                      key={item}
-                      onClick={() => {
-                        setScanNextType(item)
-                        setScanNextCoords(calcScanNextCoords(position, item))
-                      }}
-                      color={item === scanNextType ? 'primary' : 'secondary'}
-                      variant={item === scanNextType ? 'contained' : 'outlined'}
-                    >
-                      {t(item)}
-                    </Button>
-                  ))}
-                </ButtonGroup>
-              </ListItem>
-            )}
-            {scanNextShowScanCount && (
-              <ScanRequests amount={scanNextCoords?.length} />
-            )}
-            {scanNextShowScanQueue && <ScanQueue queue={queue} />}
-            <Divider style={{ margin: '10px 0' }} />
-            <ScanConfirm
-              areaRestrictions={scanNextAreaRestriction}
-              setMode={setScanNextMode}
-              isInAllowedArea={isInAllowedArea}
-            />
-            <InAllowedArea isInAllowedArea={isInAllowedArea} />
-            <ScanCancel setMode={setScanNextMode} />
-          </List>
-        </Popup>
+        {children}
       </Marker>
-      {scanNextCoords.map((coords) => (
-        <Circle
-          key={[coords[0], coords[1]]}
-          radius={RADIUS_POKEMON}
-          center={[coords[0], coords[1]]}
-          fillOpacity={0.5}
-          pathOptions={{
-            color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)',
-          }}
-        />
-      ))}
-      {scanNextType === 'M' ? (
-        <Circle
-          key={[scanNextCoords[0][0], scanNextCoords[0][1]]}
-          radius={RADIUS_GYM + RADIUS_POKEMON}
-          center={[scanNextCoords[0][0], scanNextCoords[0][1]]}
-          fillOpacity={0.1}
-          pathOptions={{
-            color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(255, 165, 0)',
-            fillColor: !isInAllowedArea
-              ? 'rgb(255, 100, 90)'
-              : 'rgb(255, 165, 0)',
-          }}
+      {scanNextSize === 'M' ? (
+        <ScanCircle
+          lat={scanLocation[0]}
+          lon={scanLocation[1]}
+          radius={GYM_RADIUS}
+          color={COLORS.orange}
         />
       ) : (
-        scanNextCoords.map((coords) => (
-          <Circle
-            key={[coords[0], coords[1]]}
-            radius={RADIUS_GYM}
-            center={[coords[0], coords[1]]}
-            fillOpacity={0.1}
-            pathOptions={{
-              color: !isInAllowedArea
-                ? 'rgb(255, 100, 90)'
-                : 'rgb(255, 165, 0)',
-              fillColor: !isInAllowedArea
-                ? 'rgb(255, 100, 90)'
-                : 'rgb(255, 165, 0)',
-            }}
-          />
-        ))
+        <ScanCircles radius={GYM_RADIUS} color={color} />
       )}
+      <ScanCircles radius={POKEMON_RADIUS} />
     </>
+  )
+}
+
+/**
+ *
+ * @param {import('@hooks/useStore').ScanConfig} props
+ * @returns
+ */
+export function ScanNextPopup({ scannerType, showScanCount, showScanQueue }) {
+  const { t } = useTranslation()
+  const scanNextSize = useScanStore((s) => s.scanNextSize)
+
+  const setSize = React.useCallback(
+    (/** @type {typeof SIZES[number]} */ size) => () => {
+      useScanStore.setState((prev) => ({
+        scanNextSize: size,
+        scanCoords: calcScanNextCoords(prev.scanLocation, size),
+      }))
+    },
+    [],
+  )
+
+  return (
+    <Popup minWidth={90} maxWidth={200} autoPan={false}>
+      <List>
+        <StyledListItemText
+          className="no-leaflet-margin"
+          secondary={t('scan_next_choose')}
+        />
+        <StyledDivider />
+        {scannerType !== 'mad' && (
+          <ListItem>
+            <ButtonGroup size="small" fullWidth>
+              {SIZES.map((size) => (
+                <Button
+                  key={size}
+                  onClick={setSize(size)}
+                  color={size === scanNextSize ? 'primary' : 'secondary'}
+                  variant={size === scanNextSize ? 'contained' : 'outlined'}
+                >
+                  {t(size)}
+                </Button>
+              ))}
+            </ButtonGroup>
+          </ListItem>
+        )}
+        {showScanCount && <ScanRequests />}
+        {showScanQueue && <ScanQueue />}
+        <StyledDivider />
+        <ScanConfirm mode="scanNext" />
+        <InAllowedArea />
+        <ScanCancel mode="scanNext" />
+      </List>
+    </Popup>
   )
 }

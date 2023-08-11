@@ -15,6 +15,7 @@ import { persist } from 'zustand/middleware'
  *   searchTab: string,
  *   search: string,
  *   filters: object,
+ *   scannerCooldown: number
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
@@ -205,4 +206,51 @@ export const useLayoutStore = create(() => ({
   resetFilters: false,
   feedback: false,
   drawer: false,
+}))
+
+/**
+ * @typedef {'scanNext' | 'scanZone'} ScanMode
+ * @typedef {'' | 'mad' | 'rdm' | 'custom'} ScannerType
+ * @typedef {{
+ *   scannerType: ScannerType,
+ *   showScanCount: boolean,
+ *   showScanQueue: boolean,
+ *   advancedOptions: boolean,
+ *   pokemonRadius: number,
+ *   gymRadius: number,
+ *   spacing: number,
+ *   maxSize: number,
+ *   cooldown: number,
+ *   refreshQueue: number
+ *   enabled: boolean,
+ * }} ScanConfig
+ * @typedef {{
+ *  scanNextMode: '' | 'setLocation' | 'sendCoords' | 'loading' | 'confirmed' | 'error',
+ *  scanZoneMode: UseScanStore['scanNextMode']
+ *  queue: 'init' | '...' | number,
+ *  scanLocation: [number, number],
+ *  scanCoords: [number, number][],
+ *  scanNextSize: 'S' | 'M' | 'L' | 'XL',
+ *  scanZoneSize: number,
+ *  userRadius: number,
+ *  userSpacing: number,
+ *  valid: boolean,
+ *  setScanMode: <T extends `${ScanMode}Mode`>(mode: T, nextMode?: UseScanStore[T]) => void,
+ *  setScanSize: <T extends `${ScanMode}Size`>(mode: T, size: UseScanStore[T]) => void,
+ * }} UseScanStore
+ * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseScanStore>>}
+ */
+export const useScanStore = create((set) => ({
+  scanNextMode: '',
+  scanZoneMode: '',
+  queue: 'init',
+  scanLocation: [0, 0],
+  scanCoords: [],
+  scanNextSize: 'S',
+  scanZoneSize: 1,
+  userRadius: 70,
+  userSpacing: 1,
+  valid: false,
+  setScanMode: (mode, nextMode = '') => set({ [mode]: nextMode }),
+  setScanSize: (mode, size) => set({ [mode]: size }),
 }))

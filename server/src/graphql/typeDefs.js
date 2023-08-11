@@ -17,6 +17,7 @@ module.exports = gql`
     backups: [Backup]
     checkUsername(username: String): Boolean
     fabButtons: FabButtons
+    checkValidScan(center: [Float], mode: String): Boolean
     customComponent(component: String): JSON
     devices(filters: JSON): [Device]
     geocoder(search: String, name: String): [Geocoder]
@@ -85,6 +86,7 @@ module.exports = gql`
     ): [ScanCell]
     scanAreas: [ScanArea]
     scanAreasMenu: [ScanAreasMenu]
+    scannerConfig(mode: String): ScannerConfig
     search(
       search: String
       category: String

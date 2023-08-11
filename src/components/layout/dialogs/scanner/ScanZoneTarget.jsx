@@ -1,29 +1,46 @@
-import React, { useState, useEffect } from 'react'
+/* eslint-disable react/no-array-index-key */
+// @ts-check
+import * as React from 'react'
 import {
   Button,
   ButtonGroup,
   Slider,
   List,
-  ListItemText,
   ListItem,
   ListSubheader,
-  Divider,
 } from '@mui/material'
 import { point } from '@turf/helpers'
 import destination from '@turf/destination'
-import { Circle, Marker, Popup } from 'react-leaflet'
+import { Marker, Popup, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
+
 import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
-import Utility from '@services/Utility'
-import fallbackIcon from '@components/markers/fallback'
+import { useScanStore } from '@hooks/useStore'
+
 import {
   InAllowedArea,
   ScanCancel,
+  ScanCircles,
   ScanConfirm,
   ScanQueue,
   ScanRequests,
+  StyledDivider,
+  StyledListItemText,
 } from './Shared'
+import { useCheckValid } from './useCheckValid'
 
+const OPTIONS = /** @type {const} */ ({ units: 'kilometers' })
+
+const RADIUS_CHOICES = /** @type {const} */ (['pokemon', 'gym'])
+
+/**
+ *
+ * @param {[number, number]} center
+ * @param {number} radius
+ * @param {number} spacing
+ * @param {import('@hooks/useStore').UseScanStore['scanZoneSize']} scanZoneSize
+ * @returns
+ */
 const calcScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
   let coords = [center]
   let currentPoint = point([center[1], center[0]])
@@ -44,7 +61,7 @@ const calcScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
         currentPoint,
         (distance * spacing) / 1000,
         step === 1 ? 330 : bearings[quadrant],
-        { units: 'kilometers' },
+        OPTIONS,
       )
       coords = coords.concat([
         [
@@ -59,67 +76,29 @@ const calcScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
   return coords
 }
 
-const RADIUS = {
-  pokemon: 70,
-  gym: 750,
-}
+/**
+ *
+ * @param {{ children: React.ReactNode }} props
+ * @returns
+ */
+export function ScanZoneTarget({ children }) {
+  const map = useMap()
+  useCheckValid('scanZone')
 
-export default function ScanZoneTarget({
-  map,
-  scannerType,
-  queue,
-  setScanZoneMode,
-  scanZoneLocation,
-  setScanZoneLocation,
-  scanZoneCoords,
-  setScanZoneCoords,
-  scanZoneSize,
-  setScanZoneSize,
-  scanZoneShowScanCount,
-  scanZoneShowScanQueue,
-  advancedScanZoneOptions,
-  scanZoneRadius,
-  scanZoneSpacing,
-  scanZoneMaxSize,
-  scanZoneAreaRestriction,
-  scanAreas,
-}) {
-  const [position, setPosition] = useState(scanZoneLocation)
-  const [spacing, setSpacing] = useState(scanZoneSpacing)
-  const [radius, setRadius] = useState(scanZoneRadius.pokemon)
+  const scanLocation = useScanStore((s) => s.scanLocation)
 
-  const { t } = useTranslation()
-
-  const handleSizeChange = (_event, newSize) => {
-    setScanZoneSize(newSize)
-    setScanZoneCoords(calcScanZoneCoords(position, radius, spacing, newSize))
-  }
-
-  const handleSpacingChange = (_event, newSpacing) => {
-    setSpacing(newSpacing)
-    setScanZoneCoords(
-      calcScanZoneCoords(position, radius, newSpacing, scanZoneSize),
-    )
-  }
-
-  const handleRadiusChange = (_event, newRadius) => {
-    setRadius(newRadius)
-    setScanZoneCoords(
-      calcScanZoneCoords(position, newRadius, spacing, scanZoneSize),
-    )
-  }
-
-  const isInAllowedArea = scanZoneAreaRestriction.length
-    ? Utility.checkAreaValidity(position, scanZoneAreaRestriction, scanAreas)
-    : true
-
-  useEffect(() => {
-    if (scanZoneCoords.length === 1) {
-      setScanZoneCoords(
-        calcScanZoneCoords(scanZoneLocation, radius, spacing, scanZoneSize),
-      )
-    }
-  }, [scanZoneCoords.length])
+  // React.useEffect(() => {
+  //   if (scanCoords.length === 1) {
+  //     useScanStore.setState((prev) => ({
+  //       scanCoords: calcScanZoneCoords(
+  //         prev.scanLocation,
+  //         prev.userRadius,
+  //         prev.userSpacing,
+  //         prev.scanZoneSize,
+  //       ),
+  //     }))
+  //   }
+  // }, [scanCoords.length])
 
   return (
     <>
@@ -130,131 +109,183 @@ export default function ScanZoneTarget({
             if (target) {
               const { lat, lng } = target.getLatLng()
               map.panTo([lat, lng])
-              setPosition([lat, lng])
-              setScanZoneLocation([lat, lng])
-              setScanZoneCoords(
-                calcScanZoneCoords([lat, lng], radius, spacing, scanZoneSize),
-              )
+              useScanStore.setState((prev) => ({
+                scanLocation: [lat, lng],
+                scanCoords: calcScanZoneCoords(
+                  [lat, lng],
+                  prev.userRadius,
+                  prev.userSpacing,
+                  prev.scanZoneSize,
+                ),
+              }))
               if (popup) {
-                popup.openOn(map)
+                popup.openPopup()
               }
             }
           },
         }}
-        position={position}
+        position={scanLocation}
         ref={(ref) => {
           if (ref && !ref.isPopupOpen()) ref.openPopup()
         }}
-        icon={fallbackIcon()}
       >
-        <Popup minWidth={90} maxWidth={200} autoPan={false}>
-          <List>
-            <ListItemText
-              className="no-leaflet-margin"
-              secondary={t('scan_zone_choose')}
-              style={{ textAlign: 'center' }}
-            />
-            <Divider style={{ margin: '10px 0' }} />
-            {scannerType !== 'mad' && (
-              <>
-                <ListSubheader disableSticky style={{ lineHeight: 2 }}>
-                  {t('scan_zone_size')}
-                </ListSubheader>
-                <ListItem style={{ padding: 0 }}>
-                  <Slider
-                    name="Size"
-                    min={1}
-                    max={scanZoneMaxSize}
-                    step={1}
-                    value={scanZoneSize}
-                    onChange={handleSizeChange}
-                  />
-                </ListItem>
-                <ListSubheader disableSticky style={{ lineHeight: 2 }}>
-                  {t('scan_zone_range')}
-                </ListSubheader>
-                <ListItem style={{ padding: 2 }}>
-                  <ButtonGroup size="small" fullWidth>
-                    {['pokemon', 'gym'].map((item) => (
-                      <Button
-                        key={item}
-                        onClick={() => handleRadiusChange(null, RADIUS[item])}
-                        color={
-                          RADIUS[item] === radius ? 'primary' : 'secondary'
-                        }
-                        variant={
-                          RADIUS[item] === radius ? 'contained' : 'outlined'
-                        }
-                      >
-                        {t(item)}
-                      </Button>
-                    ))}
-                  </ButtonGroup>
-                </ListItem>
-                {advancedScanZoneOptions && (
-                  <ListItem style={{ padding: '10px 0' }}>
-                    <AdvancedAccordion>
-                      <List
-                        style={{
-                          textAlign: 'center',
-                          padding: 0,
-                        }}
-                      >
-                        <ListSubheader disableSticky style={{ lineHeight: 2 }}>
-                          {t('scan_zone_spacing')}
-                        </ListSubheader>
-                        <Slider
-                          name="Spacing"
-                          min={1}
-                          max={2}
-                          step={0.01}
-                          value={spacing}
-                          onChange={handleSpacingChange}
-                          style={{ margin: 0, padding: 0 }}
-                        />
-                        <ListSubheader disableSticky style={{ lineHeight: 2 }}>
-                          {t('scan_zone_radius')}
-                        </ListSubheader>
-                        <Slider
-                          name="Radius"
-                          min={50}
-                          max={900}
-                          value={radius}
-                          onChange={handleRadiusChange}
-                          valueLabelDisplay="auto"
-                        />
-                      </List>
-                    </AdvancedAccordion>
-                  </ListItem>
-                )}
-              </>
-            )}
-            {scanZoneShowScanCount && (
-              <ScanRequests amount={scanZoneCoords?.length} />
-            )}
-            {scanZoneShowScanQueue && <ScanQueue queue={queue} />}
-            <Divider style={{ margin: '10px 0' }} />
-            <ScanConfirm
-              isInAllowedArea={isInAllowedArea}
-              setMode={setScanZoneMode}
-              areaRestrictions={scanZoneAreaRestriction}
-            />
-            <InAllowedArea isInAllowedArea={isInAllowedArea} />
-            <ScanCancel setMode={setScanZoneMode} />
-          </List>
-        </Popup>
+        {children}
       </Marker>
-      {scanZoneCoords.map((coords) => (
-        <Circle
-          key={[coords[0], coords[1]]}
-          radius={radius}
-          center={[coords[0], coords[1]]}
-          fillOpacity={0.5}
-          pathOptions={{
-            color: !isInAllowedArea ? 'rgb(255, 100, 90)' : 'rgb(90, 145, 255)',
-          }}
-        />
-      ))}
+      <ScanCircles />
     </>
+  )
+}
+
+/**
+ *
+ * @param {import('@hooks/useStore').ScanConfig} props
+ * @returns
+ */
+export function ScanZonePopup({
+  scannerType,
+  maxSize,
+  pokemonRadius,
+  gymRadius,
+  advancedOptions,
+  showScanCount,
+  showScanQueue,
+}) {
+  const { t } = useTranslation()
+
+  const userSpacing = useScanStore((s) => s.userSpacing)
+  const scanZoneSize = useScanStore((s) => s.scanZoneSize)
+  const userRadius = useScanStore((s) => s.userRadius)
+
+  const handleSizeChange = React.useCallback(
+    (_, newSize) =>
+      useScanStore.setState((prev) => ({
+        scanZoneSize: newSize,
+        scanCoords: calcScanZoneCoords(
+          prev.scanLocation,
+          prev.userRadius,
+          prev.userSpacing,
+          newSize,
+        ),
+      })),
+    [],
+  )
+
+  const handleSpacingChange = React.useCallback(
+    (_, newSpacing) =>
+      useScanStore.setState((prev) => ({
+        userSpacing: newSpacing,
+        scanCoords: calcScanZoneCoords(
+          prev.scanLocation,
+          prev.userRadius,
+          newSpacing,
+          prev.scanZoneSize,
+        ),
+      })),
+    [],
+  )
+
+  const handleRadiusChange = React.useCallback(
+    (_, newRadius) =>
+      useScanStore.setState((prev) => ({
+        userRadius: newRadius,
+        scanCoords: calcScanZoneCoords(
+          prev.scanLocation,
+          newRadius,
+          prev.userSpacing,
+          prev.scanZoneSize,
+        ),
+      })),
+    [],
+  )
+
+  return (
+    <Popup minWidth={90} maxWidth={200} autoPan={false}>
+      <List>
+        <StyledListItemText
+          className="no-leaflet-margin"
+          secondary={t('scan_zone_choose')}
+        />
+        <StyledDivider />
+        {scannerType !== 'mad' && (
+          <>
+            <ListSubheader disableSticky style={{ lineHeight: 2 }}>
+              {t('scan_zone_size')}
+            </ListSubheader>
+            <ListItem style={{ padding: 0 }}>
+              <Slider
+                name="Size"
+                min={1}
+                max={maxSize}
+                step={1}
+                value={scanZoneSize}
+                onChange={handleSizeChange}
+              />
+            </ListItem>
+            <ListSubheader disableSticky style={{ lineHeight: 2 }}>
+              {t('scan_zone_range')}
+            </ListSubheader>
+            <ListItem style={{ padding: 2 }}>
+              <ButtonGroup size="small" fullWidth>
+                {RADIUS_CHOICES.map((item) => {
+                  const radius = item === 'pokemon' ? pokemonRadius : gymRadius
+                  return (
+                    <Button
+                      key={item}
+                      onClick={() => handleRadiusChange(null, radius)}
+                      color={radius === userRadius ? 'primary' : 'secondary'}
+                      variant={radius === userRadius ? 'contained' : 'outlined'}
+                    >
+                      {t(item)}
+                    </Button>
+                  )
+                })}
+              </ButtonGroup>
+            </ListItem>
+            {advancedOptions && (
+              <ListItem style={{ padding: '10px 0' }}>
+                <AdvancedAccordion>
+                  <List
+                    style={{
+                      textAlign: 'center',
+                      padding: 0,
+                    }}
+                  >
+                    <ListSubheader disableSticky style={{ lineHeight: 2 }}>
+                      {t('scan_zone_spacing')}
+                    </ListSubheader>
+                    <Slider
+                      name="Spacing"
+                      min={1}
+                      max={2}
+                      step={0.01}
+                      value={userSpacing}
+                      onChange={handleSpacingChange}
+                      style={{ margin: 0, padding: 0 }}
+                    />
+                    <ListSubheader disableSticky style={{ lineHeight: 2 }}>
+                      {t('scan_zone_radius')}
+                    </ListSubheader>
+                    <Slider
+                      name="Radius"
+                      min={50}
+                      max={900}
+                      value={userRadius}
+                      onChange={handleRadiusChange}
+                      valueLabelDisplay="auto"
+                    />
+                  </List>
+                </AdvancedAccordion>
+              </ListItem>
+            )}
+          </>
+        )}
+        {showScanCount && <ScanRequests />}
+        {showScanQueue && <ScanQueue />}
+        <StyledDivider />
+        <ScanConfirm mode="scanZone" />
+        <InAllowedArea />
+        <ScanCancel mode="scanZone" />
+      </List>
+    </Popup>
   )
 }

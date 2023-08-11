@@ -7,6 +7,7 @@ const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 const buildDefaultFilters = require('../services/filters/builder/base')
 const filterComponents = require('../services/functions/filterComponents')
+const checkAreaValidity = require('../services/functions/checkAreaValidity')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import('../types').GqlContext>['resolvers']} */
 const resolvers = {
@@ -52,6 +53,15 @@ const resolvers = {
         args.username,
       )
       return !!results.length
+    },
+    checkValidScan: (_, { mode, center }, { perms }) => {
+      if (perms?.scanner.includes(mode)) {
+        const areaRestrictions =
+          config.get(`scanner.${mode}.${mode}AreaRestriction`) || []
+        const valid = checkAreaValidity(center, areaRestrictions)
+        return valid
+      }
+      return false
     },
     fabButtons: (_, _args, { perms, user, req, Event }) => {
       const domain = `multiDomainsObj[${req.headers.host}]`
@@ -304,6 +314,35 @@ const resolvers = {
         return scanAreas.filter((parent) => parent.children.length)
       }
       return []
+    },
+    scannerConfig: (_, { mode }, { perms }) => {
+      /** @type {import('../types').Config['scanner']} */
+      const scanner = config.get('scanner')
+
+      if (perms.scanner?.includes(mode) && scanner[mode].enabled) {
+        return mode === 'scanZone'
+          ? {
+              scannerType: scanner.backendConfig.platform,
+              showScanCount: scanner.scanZone.showScanCount,
+              showScanQueue: scanner.scanZone.showScanQueue,
+              advancedOptions: scanner.scanZone.advancedScanZoneOptions,
+              pokemonRadius: scanner.scanZone.scanZoneRadius.pokemon,
+              gymRadius: scanner.scanZone.scanZoneRadius.gym,
+              spacing: scanner.scanZone.scanZoneSpacing,
+              maxSize: scanner.scanZone.scanZoneMaxSize,
+              cooldown: scanner.scanZone.userCooldownSeconds,
+              refreshQueue: scanner.backendConfig.queueRefreshInterval,
+              enabled: scanner[mode].enabled,
+            }
+          : {
+              showScanCount: scanner.scanNext.showScanCount,
+              showScanQueue: scanner.scanNext.showScanQueue,
+              cooldown: scanner.scanNext.userCooldownSeconds,
+              refreshQueue: scanner.backendConfig.queueRefreshInterval,
+              enabled: scanner[mode].enabled,
+            }
+      }
+      return null
     },
     search: async (_, args, { Event, perms, Db }) => {
       const { category, webhookName, search } = args

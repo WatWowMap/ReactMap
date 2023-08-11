@@ -1,167 +1,154 @@
+// @ts-check
 /* eslint-disable react/jsx-no-useless-fragment */
-import React, { useEffect, useState } from 'react'
+import * as React from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
-import { useStore } from '@hooks/useStore'
-import Query from '@services/Query'
-import ScanNextTarget from './ScanNextTarget'
-import ScanZoneTarget from './ScanZoneTarget'
 
-import ScanDialog from './ScanDialog'
+import { useScanStore, useStore } from '@hooks/useStore'
 
-export default function ScanOnDemand({
-  map,
-  scanMode,
-  setScanMode,
-  scanner: {
-    scannerType,
-    scanNextShowScanCount,
-    scanNextShowScanQueue,
-    scanNextAreaRestriction,
-    scanZoneShowScanCount,
-    scanZoneShowScanQueue,
-    advancedScanZoneOptions,
-    scanZoneRadius,
-    scanZoneSpacing,
-    scanZoneMaxSize,
-    scanZoneAreaRestriction,
-    scanNextCooldown = 0,
-    scanZoneCooldown = 0,
-  },
-  mode,
-}) {
+import { SCANNER_CONFIG, SCANNER_STATUS } from '@services/queries/scanner'
+
+import { ScanNextTarget, ScanNextPopup } from './ScanNextTarget'
+import { ScanZoneTarget, ScanZonePopup } from './ScanZoneTarget'
+
+export const DEFAULT = /** @type {import('@hooks/useStore').ScanConfig} */ ({
+  scannerType: '',
+  showScanCount: false,
+  showScanQueue: false,
+  advancedOptions: false,
+  enabled: false,
+  pokemonRadius: 70,
+  gymRadius: 750,
+  spacing: 1,
+  maxSize: 10,
+  cooldown: 0,
+  refreshQueue: 5,
+})
+
+const { setScanMode } = useScanStore.getState()
+
+const renderCount = {
+  scanNext: 1,
+  scanZone: 1,
+}
+/**
+ *
+ * @param {{ mode: 'scanNext' | 'scanZone' }} props
+ * @returns {JSX.Element}
+ */
+function ScanOnDemand({ mode }) {
+  const scanMode = useScanStore((s) => s[`${mode}Mode`])
   const location = useStore((s) => s.location)
 
-  const [queue, setQueue] = useState('init')
-  const [scanLocation, setScanLocation] = useState(location)
-  const [scanCoords, setScanCoords] = useState([location])
-  const [scanNextType, setScanNextType] = useState('S')
-  const [scanZoneSize, setScanZoneSize] = useState(1)
+  const { data } = useQuery(SCANNER_CONFIG, {
+    variables: { mode },
+    initialFetchPolicy: 'network-only',
+    nextFetchPolicy: 'standby',
+    skip: !scanMode,
+  })
 
-  const { data: scanAreas } = useQuery(Query.scanAreas())
-  const [demandScan, { error: scannerError, data: scannerResponse }] =
-    useLazyQuery(Query.scanner(), {
+  /** @type {typeof DEFAULT} */
+  const config = React.useMemo(() => data?.scannerConfig || DEFAULT, [data])
+
+  const [scan, { error: scannerError, data: scannerResponse }] = useLazyQuery(
+    SCANNER_STATUS,
+    {
+      fetchPolicy: 'cache-first',
+    },
+  )
+
+  const { data: scannerQueueResponse } = useQuery(SCANNER_STATUS, {
+    variables: {
+      category: 'getQueue',
+      method: 'GET',
+      data: {
+        type: 'scan_next',
+        typeName: mode,
+      },
+    },
+    fetchPolicy: 'no-cache',
+    skip: !scanMode,
+    pollInterval: config.refreshQueue * 1000,
+  })
+
+  const demandScan = () => {
+    const { scanCoords, scanLocation, ...rest } = useScanStore.getState()
+    scan({
       variables: {
         category: mode,
         method: 'GET',
         data: {
           scanLocation,
           scanCoords,
-          scanNextType,
-          scanZoneSize,
+          scanSize: rest[`${mode}Size`],
         },
       },
-      fetchPolicy: 'no-cache',
     })
-  const [getQueue, { data: scannerQueueResponse }] = useLazyQuery(
-    Query.scanner(),
-    {
-      variables: {
-        category: 'getQueue',
-        method: 'GET',
-        data: {
-          type: 'scan_next',
-          typeName: mode,
-        },
-      },
-      fetchPolicy: 'no-cache',
-    },
-  )
+  }
 
-  useEffect(() => {
-    if (scanMode === 'sendCoords') {
+  React.useEffect(() => {
+    if (scanMode === 'sendCoords' && config.enabled) {
       demandScan()
-      setScanMode('loading')
-      const timer = mode === 'scanNext' ? scanNextCooldown : scanZoneCooldown
+      setScanMode(`${mode}Mode`, 'loading')
+      const { scanCoords } = useScanStore.getState()
       useStore.setState({
         scannerCooldown:
-          (typeof timer === 'number' ? Math.floor(timer) : 0) *
-          scanCoords.length,
+          (typeof config.cooldown === 'number'
+            ? Math.floor(config.cooldown)
+            : 0) * scanCoords.length,
       })
     }
   }, [scanMode])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (scannerError) {
-      setScanMode('error')
+      setScanMode(`${mode}Mode`, 'error')
     }
     if (scannerResponse) {
       if (scannerResponse?.scanner?.status === 'ok') {
-        setScanMode('confirmed')
+        setScanMode(`${mode}Mode`, 'confirmed')
       } else {
-        setScanMode('error')
+        setScanMode(`${mode}Mode`, 'error')
       }
     }
-  }, [!!scannerError, scannerResponse?.scanner?.status])
+  }, [scannerError, scannerResponse])
 
-  useEffect(() => {
-    let timer
-    if (scanNextShowScanQueue || scanZoneShowScanQueue) {
-      if (queue === 'init') {
-        getQueue()
-        setQueue('...')
-      }
-      timer = setInterval(() => {
-        if (scanMode === 'setLocation') {
-          getQueue()
-        }
-      }, 2000)
-    }
-    return () => (timer ? clearInterval(timer) : null)
-  })
-
-  useEffect(() => {
+  React.useEffect(() => {
     if (scannerQueueResponse?.scanner?.status === 'ok') {
-      setQueue(scannerQueueResponse.scanner.message)
-      scannerQueueResponse.scanner = {}
+      useScanStore.setState({ queue: scannerQueueResponse.scanner.message })
     }
-  }, [!!scannerQueueResponse?.scanner])
+  }, [scannerQueueResponse])
 
-  return (
-    <>
-      {scanMode === 'setLocation' && (
-        <>
-          {mode === 'scanNext' ? (
-            <ScanNextTarget
-              map={map}
-              scannerType={scannerType}
-              queue={queue}
-              setScanNextMode={setScanMode}
-              scanNextLocation={scanLocation}
-              setScanNextLocation={setScanLocation}
-              scanNextCoords={scanCoords}
-              setScanNextCoords={setScanCoords}
-              scanNextType={scanNextType}
-              setScanNextType={setScanNextType}
-              scanNextShowScanCount={scanNextShowScanCount}
-              scanNextShowScanQueue={scanNextShowScanQueue}
-              scanNextAreaRestriction={scanNextAreaRestriction}
-              scanAreas={scanAreas ? scanAreas.scanAreas[0]?.features : null}
-            />
-          ) : (
-            <ScanZoneTarget
-              map={map}
-              scannerType={scannerType}
-              queue={queue}
-              setScanZoneMode={setScanMode}
-              scanZoneLocation={scanLocation}
-              setScanZoneLocation={setScanLocation}
-              scanZoneCoords={scanCoords}
-              setScanZoneCoords={setScanCoords}
-              scanZoneSize={scanZoneSize}
-              setScanZoneSize={setScanZoneSize}
-              scanZoneShowScanCount={scanZoneShowScanCount}
-              scanZoneShowScanQueue={scanZoneShowScanQueue}
-              advancedScanZoneOptions={advancedScanZoneOptions}
-              scanZoneRadius={scanZoneRadius}
-              scanZoneSpacing={scanZoneSpacing}
-              scanZoneMaxSize={scanZoneMaxSize}
-              scanZoneAreaRestriction={scanZoneAreaRestriction}
-              scanAreas={scanAreas ? scanAreas.scanAreas[0]?.features : null}
-            />
-          )}
-        </>
-      )}
-      <ScanDialog scanMode={scanMode} setScanMode={setScanMode} />
-    </>
+  React.useEffect(() => {
+    if (scanMode === '') {
+      useScanStore.setState((prev) => ({
+        scanLocation: prev.scanLocation.every((x) => x === 0)
+          ? location
+          : prev.scanLocation,
+        scanCoords: prev.scanCoords.length === 0 ? [location] : prev.scanCoords,
+        userSpacing: config.spacing || 1,
+        userRadius: config.pokemonRadius || 70,
+      }))
+    }
+  }, [location])
+
+  console.log(renderCount[mode]++, { mode })
+
+  if (scanMode !== 'setLocation') return null
+
+  return mode === 'scanNext' ? (
+    <ScanNextTarget>
+      <ScanNextPopup {...config} />
+    </ScanNextTarget>
+  ) : (
+    <ScanZoneTarget>
+      <ScanZonePopup {...config} />
+    </ScanZoneTarget>
   )
 }
+
+const MemoizedScanOnDemand = React.memo(
+  ScanOnDemand,
+  (prev, next) => prev.mode === next.mode,
+)
+
+export default MemoizedScanOnDemand

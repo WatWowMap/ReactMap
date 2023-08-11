@@ -165,6 +165,20 @@ module.exports = gql`
     search: Boolean
   }
 
+  type ScannerConfig {
+    scannerType: String
+    showScanCount: Boolean
+    showScanQueue: Boolean
+    cooldown: Int
+    advancedOptions: Boolean
+    pokemonRadius: Int
+    gymRadius: Int
+    spacing: Int
+    maxSize: Int
+    refreshQueue: Int
+    enabled: Boolean
+  }
+
   input BackupCreate {
     name: String
     data: JSON

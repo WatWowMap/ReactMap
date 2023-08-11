@@ -21,13 +21,20 @@ import { useQuery } from '@apollo/client'
 
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
-import * as L from 'leaflet'
+import { DomEvent } from 'leaflet'
 
 import { FAB_BUTTONS } from '@services/queries/config'
 import useLocation from '@hooks/useLocation'
-import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
+import {
+  useLayoutStore,
+  useScanStore,
+  useStatic,
+  useStore,
+} from '@hooks/useStore'
 
 import FAIcon from './general/FAIcon'
+
+/** @typedef {keyof ReturnType<typeof useLayoutStore['getState']> | keyof ReturnType<typeof useScanStore['getState']>} Keys */
 
 const DonationIcons = {
   dollar: AttachMoney,
@@ -47,30 +54,25 @@ const DEFAULT = {
   search: false,
 }
 
-export default function FloatingButtons({
-  webhookMode,
-  setWebhookMode,
-  scanNextMode,
-  setScanNextMode,
-  scanZoneMode,
-  setScanZoneMode,
-}) {
+export default function FloatingButtons({ webhookMode, setWebhookMode }) {
   const { t } = useTranslation()
   const { data } = useQuery(FAB_BUTTONS, {
     fetchPolicy: 'cache-first',
   })
   const map = useMap()
-  const ref = React.useRef(null)
   const { lc, color } = useLocation()
+
   const selectedWebhook = useStore((s) => s.selectedWebhook)
   const reactControls = useStore(
     (s) => s.settings.navigationControls === 'react',
   )
+
   const isMobile = useStatic((s) => s.isMobile)
 
-  React.useEffect(() => {
-    L.DomEvent.disableClickPropagation(ref.current)
-  }, [])
+  const scanNextMode = useScanStore((s) => s.scanNextMode)
+  const scanZoneMode = useScanStore((s) => s.scanZoneMode)
+
+  const ref = React.useRef(null)
 
   const fabButtons = /** @type {typeof DEFAULT} */ (data?.fabButtons || DEFAULT)
 
@@ -82,16 +84,35 @@ export default function FloatingButtons({
     [fabButtons.donationButton],
   )
 
+  const handleClick = React.useCallback(
+    (/** @type {Keys} */ name) => () => {
+      switch (name) {
+        case 'scanZoneMode':
+        case 'scanNextMode':
+          return useScanStore.setState((prev) => ({
+            [name]: prev[name] === 'setLocation' ? '' : 'setLocation',
+          }))
+        default:
+          return useLayoutStore.setState({ [name]: true })
+      }
+    },
+    [],
+  )
+
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'medium'
   const disabled = !!webhookMode || !!scanNextMode || !!scanZoneMode
+
+  React.useEffect(() => {
+    DomEvent.disableClickPropagation(ref.current)
+  }, [])
 
   return (
     <Stack ref={ref}>
       <Fab
         color="primary"
         size={fabSize}
-        onClick={() => useLayoutStore.setState({ drawer: true })}
+        onClick={handleClick('drawer')}
         title={t('open_menu')}
         disabled={disabled}
       >
@@ -101,7 +122,7 @@ export default function FloatingButtons({
         <Fab
           color="primary"
           size={fabSize}
-          onClick={() => useLayoutStore.setState({ userProfile: true })}
+          onClick={handleClick('userProfile')}
           title={t('user_profile')}
           disabled={disabled}
         >
@@ -112,7 +133,7 @@ export default function FloatingButtons({
         <Fab
           color={reactControls ? 'primary' : 'secondary'}
           size={fabSize}
-          onClick={() => useLayoutStore.setState({ search: true })}
+          onClick={handleClick('search')}
           title={t('search')}
           disabled={disabled}
         >
@@ -132,13 +153,9 @@ export default function FloatingButtons({
       )}
       {fabButtons.scanNext && (
         <Fab
-          color={scanNextMode === 'setLocation' ? null : 'secondary'}
+          color={scanNextMode === 'setLocation' ? 'error' : 'secondary'}
           size={fabSize}
-          onClick={() =>
-            scanNextMode === 'setLocation'
-              ? setScanNextMode(false)
-              : setScanNextMode('setLocation')
-          }
+          onClick={handleClick('scanNextMode')}
           title={t('scan_next')}
           disabled={Boolean(webhookMode) || Boolean(scanZoneMode)}
         >
@@ -147,13 +164,9 @@ export default function FloatingButtons({
       )}
       {fabButtons.scanZone && (
         <Fab
-          color={scanZoneMode === 'setLocation' ? null : 'secondary'}
+          color={scanZoneMode === 'setLocation' ? 'error' : 'secondary'}
           size={fabSize}
-          onClick={() =>
-            scanZoneMode === 'setLocation'
-              ? setScanZoneMode(false)
-              : setScanZoneMode('setLocation')
-          }
+          onClick={handleClick('scanZoneMode')}
           title={t('scan_zone')}
           disabled={Boolean(webhookMode) || Boolean(scanNextMode)}
         >
@@ -164,7 +177,7 @@ export default function FloatingButtons({
         <Fab
           color="secondary"
           size={fabSize}
-          onClick={() => useLayoutStore.setState({ donorPage: true })}
+          onClick={handleClick('donorPage')}
           title={t('donor_menu')}
           disabled={disabled}
         >
@@ -199,16 +212,17 @@ export default function FloatingButtons({
           </Fab>
         </>
       )}
-      {(webhookMode === 'areas' || webhookMode === 'location') && (
-        <Fab
-          color="primary"
-          size={fabSize}
-          onClick={() => setWebhookMode('open')}
-          title={t('save')}
-        >
-          <Save fontSize={iconSize} sx={{ color: 'white' }} />
-        </Fab>
-      )}
+      {fabButtons.webhooks &&
+        (webhookMode === 'areas' || webhookMode === 'location') && (
+          <Fab
+            color="primary"
+            size={fabSize}
+            onClick={() => setWebhookMode('open')}
+            title={t('save')}
+          >
+            <Save fontSize={iconSize} sx={{ color: 'white' }} />
+          </Fab>
+        )}
       {fabButtons.custom.map((icon) => (
         <Fab
           key={`${icon.color}${icon.href}${icon.icon}`}

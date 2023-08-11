@@ -1,8 +1,18 @@
+/* eslint-disable react/no-array-index-key */
+// @ts-check
 import * as React from 'react'
-import { ListItemText, ListItem, ListItemIcon, styled } from '@mui/material'
+import {
+  ListItemText,
+  ListItem,
+  ListItemIcon,
+  styled,
+  ListItemButton,
+  Divider,
+} from '@mui/material'
+import { Circle } from 'react-leaflet'
 import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'
 import ClearIcon from '@mui/icons-material/Clear'
-import { useStore } from '@hooks/useStore'
+import { useScanStore, useStore } from '@hooks/useStore'
 
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -10,41 +20,63 @@ const StyledListItem = styled(ListItem)(() => ({
   padding: '2px 16px',
 }))
 
-export function ScanRequests({ amount = 0 }) {
+export const StyledListItemText = styled(ListItemText)(() => ({
+  textAlign: 'center',
+}))
+
+const StyledListButton = styled(ListItemButton)(() => ({
+  padding: '2px 16px',
+}))
+
+export const StyledDivider = styled(Divider)(() => ({
+  margin: '10px 0',
+}))
+
+const { setScanMode } = useScanStore.getState()
+
+export const COLORS = /** @type {const} */ ({
+  blue: 'rgb(90, 145, 255)',
+  orange: 'rgb(255, 165, 0)',
+  red: 'rgb(255, 100, 90)',
+})
+
+export function ScanRequests() {
   const { t } = useTranslation()
+  const amount = useScanStore((s) => s.scanCoords.length)
   return (
     <StyledListItem style={{ margin: 0 }} className="no-leaflet-margin">
       <ListItemText secondary={`${t('scan_requests')}:`} />
-      <ListItemText style={{ textAlign: 'center' }} secondary={amount} />
+      <StyledListItemText secondary={amount} />
     </StyledListItem>
   )
 }
 
-export function ScanQueue({ queue = 0 }) {
+export function ScanQueue() {
   const { t } = useTranslation()
+  const queue = useScanStore((s) => s.queue)
   return (
     <StyledListItem className="no-leaflet-margin">
       <ListItemText secondary={`${t('scan_queue')}:`} />
-      <ListItemText
-        style={{ textAlign: 'center' }}
-        secondary={`${queue || '...'}`}
-      />
+      <StyledListItemText secondary={queue} />
     </StyledListItem>
   )
 }
 
-export function ScanConfirm({ isInAllowedArea, setMode, areaRestrictions }) {
+/**
+ *
+ * @param {{ mode: import('@hooks/useStore').ScanMode }} props
+ * @returns
+ */
+export function ScanConfirm({ mode }) {
   const { t } = useTranslation()
   const scannerCooldown = useStore((s) => s.scannerCooldown)
+  const valid = useScanStore((s) => s.valid)
 
   return (
-    <StyledListItem
-      button
+    <StyledListButton
       color="secondary"
-      disabled={
-        !!(areaRestrictions?.length && !isInAllowedArea) || !!scannerCooldown
-      }
-      onClick={() => setMode('sendCoords')}
+      disabled={!valid || !!scannerCooldown}
+      onClick={() => setScanMode(`${mode}Mode`, 'sendCoords')}
     >
       <ListItemIcon>
         <PermScanWifiIcon color="secondary" />
@@ -61,28 +93,66 @@ export function ScanConfirm({ isInAllowedArea, setMode, areaRestrictions }) {
           )
         }
       />
-    </StyledListItem>
+    </StyledListButton>
   )
 }
 
-export function InAllowedArea({ isInAllowedArea }) {
+export function InAllowedArea() {
   const { t } = useTranslation()
-  return (
-    <ListItemText
-      secondary={t('scan_outside_area')}
-      style={{ display: isInAllowedArea ? 'none' : 'block' }}
-    />
-  )
+  const valid = useScanStore((s) => s.valid)
+  return valid ? null : <ListItemText secondary={t('scan_outside_area')} />
 }
 
-export function ScanCancel({ setMode }) {
+/**
+ *
+ * @param {{ mode: import('@hooks/useStore').ScanMode}} props
+ * @returns
+ */
+export function ScanCancel({ mode }) {
   const { t } = useTranslation()
   return (
-    <StyledListItem button onClick={() => setMode(false)}>
+    <StyledListButton onClick={() => setScanMode(`${mode}Mode`, '')}>
       <ListItemIcon>
         <ClearIcon color="primary" />
       </ListItemIcon>
       <ListItemText primary={t('cancel')} />
-    </StyledListItem>
+    </StyledListButton>
   )
+}
+
+/**
+ *
+ * @param {{ radius: number, lat: number, lon: number, color?: string }} props
+ * @returns
+ */
+export function ScanCircle({ radius, lat, lon, color = COLORS.blue }) {
+  return (
+    <Circle
+      radius={radius}
+      center={[lat, lon]}
+      fillOpacity={0.1}
+      color={color}
+      fillColor={color}
+    />
+  )
+}
+
+/**
+ *
+ * @param {{ radius?: number, color?: string }} props
+ * @returns
+ */
+export function ScanCircles({ radius, color }) {
+  const scanCoords = useScanStore((s) => s.scanCoords)
+  const userRadius = useScanStore((s) => s.userRadius)
+
+  return scanCoords.map((coords) => (
+    <ScanCircle
+      key={`${coords.join('')}${radius}`}
+      radius={radius || userRadius}
+      lat={coords[0]}
+      lon={coords[1]}
+      color={color}
+    />
+  ))
 }

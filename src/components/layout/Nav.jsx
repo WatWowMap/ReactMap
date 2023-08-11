@@ -16,15 +16,9 @@ import DonorPage from './dialogs/DonorPage'
 import Feedback from './dialogs/Feedback'
 import ResetFilters from './dialogs/ResetFilters'
 import Notification from './general/Notification'
+import ScanDialog from './dialogs/scanner/ScanDialog'
 
-export default function Nav({
-  webhookMode,
-  setWebhookMode,
-  scanNextMode,
-  setScanNextMode,
-  scanZoneMode,
-  setScanZoneMode,
-}) {
+export default function Nav({ webhookMode, setWebhookMode }) {
   const { setWebhookAlert, config } = useStatic.getState()
 
   const webhookAlert = useStatic((s) => s.webhookAlert)
@@ -74,14 +68,7 @@ export default function Nav({
   return (
     <>
       <Sidebar toggleDialog={toggleDialog} />
-      <FloatingBtn
-        webhookMode={webhookMode}
-        setWebhookMode={setWebhookMode}
-        scanNextMode={scanNextMode}
-        setScanNextMode={setScanNextMode}
-        scanZoneMode={scanZoneMode}
-        setScanZoneMode={setScanZoneMode}
-      />
+      <FloatingBtn webhookMode={webhookMode} setWebhookMode={setWebhookMode} />
       <UserProfile />
       <Dialog
         open={tutorial && config.map.enableTutorial}
@@ -126,6 +113,7 @@ export default function Nav({
       <DonorPage />
       <Feedback />
       <ResetFilters />
+      <ScanDialog />
       <Notification
         open={!!webhookAlert.open}
         cb={() =>

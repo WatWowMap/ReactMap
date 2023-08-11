@@ -9,6 +9,10 @@ const { log, HELPERS } = require('./logger')
 
 const DEFAULT_RETURN = { type: 'FeatureCollection', features: [] }
 
+/**
+ * @typedef {Record<string, import('@turf/helpers').Feature<import('@turf/helpers').Polygon | import('@turf/helpers').MultiPolygon>>} ScanAreasObj
+ */
+
 const manualGeojson = {
   type: 'FeatureCollection',
   features: config.manualAreas
