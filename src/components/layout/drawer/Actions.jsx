@@ -58,7 +58,6 @@ export default function DrawerActions() {
   const {
     auth: { loggedIn, methods },
     setFeedback,
-    setResetFilters,
     config,
   } = useStatic.getState()
   const { setTutorial } = useStore.getState()
@@ -102,7 +101,9 @@ export default function DrawerActions() {
         </ListItemIcon>
         <ListItemText primary={t('import')} />
       </ListItemButton>
-      <ListItemButton onClick={() => setResetFilters(true)}>
+      <ListItemButton
+        onClick={() => useDialogStore.setState({ resetFilters: true })}
+      >
         <ListItemIcon>
           <RotateLeftIcon color="primary" />
         </ListItemIcon>

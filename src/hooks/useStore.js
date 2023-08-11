@@ -182,8 +182,6 @@ export const useStatic = create((set) => ({
   setTimeOfDay: (timeOfDay) => set({ timeOfDay }),
   feedback: false,
   setFeedback: (feedback) => set({ feedback }),
-  resetFilters: false,
-  setResetFilters: (resetFilters) => set({ resetFilters }),
   extraUserFields: [],
   setExtraUserFields: (extraUserFields) => set({ extraUserFields }),
   manualParams: { id: '' },
@@ -206,4 +204,5 @@ export const useDialogStore = create(() => ({
   donorPage: false,
   search: false,
   userProfile: false,
+  resetFilters: false,
 }))
