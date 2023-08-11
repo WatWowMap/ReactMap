@@ -9,13 +9,13 @@ import NotificationsActive from '@mui/icons-material/NotificationsActive'
 import Save from '@mui/icons-material/Save'
 import CardMembership from '@mui/icons-material/CardMembership'
 import AttachMoney from '@mui/icons-material/AttachMoney'
+import Stack from '@mui/material/Stack'
 // import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin'
 // import CurrencyPoundIcon from '@mui/icons-material/CurrencyPound'
 import EuroSymbol from '@mui/icons-material/EuroSymbol'
 import Person from '@mui/icons-material/Person'
 import TrackChanges from '@mui/icons-material/TrackChanges'
 import BlurOn from '@mui/icons-material/BlurOn'
-import Grid from '@mui/material/Grid'
 import Fab from '@mui/material/Fab'
 import { useQuery } from '@apollo/client'
 
@@ -90,182 +90,141 @@ export default function FloatingButtons({
   const disabled = !!webhookMode || !!scanNextMode || !!scanZoneMode
 
   return (
-    <Grid
-      container
-      direction="column"
-      justifyContent="flex-start"
-      alignItems="flex-start"
-      ref={ref}
-      sx={(theme) => ({
-        width: { xs: 50, sm: 65 },
-        zIndex: 5000,
-        '& > *': {
-          margin: `${theme.spacing(1)} !important`,
-          position: 'sticky',
-          top: 0,
-          left: 5,
-          zIndex: 1000,
-          width: 10,
-        },
-      })}
-    >
-      <Grid item>
+    <Stack ref={ref}>
+      <Fab
+        color="primary"
+        size={fabSize}
+        onClick={toggleDrawer(true)}
+        title={t('open_menu')}
+        disabled={disabled}
+      >
+        <Menu fontSize={iconSize} />
+      </Fab>
+      {fabButtons.profileButton && (
         <Fab
           color="primary"
           size={fabSize}
-          onClick={toggleDrawer(true)}
-          title={t('open_menu')}
+          onClick={() => setUserProfile(true)}
+          title={t('user_profile')}
           disabled={disabled}
         >
-          <Menu fontSize={iconSize} />
+          <Person fontSize={iconSize} />
         </Fab>
-      </Grid>
-      {fabButtons.profileButton && (
-        <Grid item>
-          <Fab
-            color="primary"
-            size={fabSize}
-            onClick={() => setUserProfile(true)}
-            title={t('user_profile')}
-            disabled={disabled}
-          >
-            <Person fontSize={iconSize} />
-          </Fab>
-        </Grid>
       )}
       {fabButtons.search && (
-        <Grid item>
-          <Fab
-            color={reactControls ? 'primary' : 'secondary'}
-            size={fabSize}
-            onClick={toggleDialog(true, '', 'search')}
-            title={t('search')}
-            disabled={disabled}
-          >
-            <Search fontSize={iconSize} sx={{ color: 'white' }} />
-          </Fab>
-        </Grid>
+        <Fab
+          color={reactControls ? 'primary' : 'secondary'}
+          size={fabSize}
+          onClick={toggleDialog(true, '', 'search')}
+          title={t('search')}
+          disabled={disabled}
+        >
+          <Search fontSize={iconSize} sx={{ color: 'white' }} />
+        </Fab>
       )}
       {fabButtons.webhooks && selectedWebhook && (
-        <Grid item>
-          <Fab
-            color="secondary"
-            size={fabSize}
-            onClick={() => setWebhookMode('open')}
-            title={selectedWebhook}
-            disabled={disabled}
-          >
-            <NotificationsActive fontSize={iconSize} sx={{ color: 'white' }} />
-          </Fab>
-        </Grid>
+        <Fab
+          color="secondary"
+          size={fabSize}
+          onClick={() => setWebhookMode('open')}
+          title={selectedWebhook}
+          disabled={disabled}
+        >
+          <NotificationsActive fontSize={iconSize} sx={{ color: 'white' }} />
+        </Fab>
       )}
       {fabButtons.scanNext && (
-        <Grid item>
-          <Fab
-            color={scanNextMode === 'setLocation' ? null : 'secondary'}
-            size={fabSize}
-            onClick={() =>
-              scanNextMode === 'setLocation'
-                ? setScanNextMode(false)
-                : setScanNextMode('setLocation')
-            }
-            title={t('scan_next')}
-            disabled={Boolean(webhookMode) || Boolean(scanZoneMode)}
-          >
-            <TrackChanges fontSize={iconSize} sx={{ color: 'white' }} />
-          </Fab>
-        </Grid>
+        <Fab
+          color={scanNextMode === 'setLocation' ? null : 'secondary'}
+          size={fabSize}
+          onClick={() =>
+            scanNextMode === 'setLocation'
+              ? setScanNextMode(false)
+              : setScanNextMode('setLocation')
+          }
+          title={t('scan_next')}
+          disabled={Boolean(webhookMode) || Boolean(scanZoneMode)}
+        >
+          <TrackChanges fontSize={iconSize} sx={{ color: 'white' }} />
+        </Fab>
       )}
       {fabButtons.scanZone && (
-        <Grid item>
-          <Fab
-            color={scanZoneMode === 'setLocation' ? null : 'secondary'}
-            size={fabSize}
-            onClick={() =>
-              scanZoneMode === 'setLocation'
-                ? setScanZoneMode(false)
-                : setScanZoneMode('setLocation')
-            }
-            title={t('scan_zone')}
-            disabled={Boolean(webhookMode) || Boolean(scanNextMode)}
-          >
-            <BlurOn fontSize={iconSize} sx={{ color: 'white' }} />
-          </Fab>
-        </Grid>
+        <Fab
+          color={scanZoneMode === 'setLocation' ? null : 'secondary'}
+          size={fabSize}
+          onClick={() =>
+            scanZoneMode === 'setLocation'
+              ? setScanZoneMode(false)
+              : setScanZoneMode('setLocation')
+          }
+          title={t('scan_zone')}
+          disabled={Boolean(webhookMode) || Boolean(scanNextMode)}
+        >
+          <BlurOn fontSize={iconSize} sx={{ color: 'white' }} />
+        </Fab>
       )}
       {!!DonorIcon && (
-        <Grid item>
-          <Fab
-            color="secondary"
-            size={fabSize}
-            onClick={() => useDialogStore.setState({ donorPage: true })}
-            title={t('donor_menu')}
-            disabled={disabled}
-          >
-            <DonorIcon fontSize={iconSize} sx={{ color: 'white' }} />
-          </Fab>
-        </Grid>
+        <Fab
+          color="secondary"
+          size={fabSize}
+          onClick={() => useDialogStore.setState({ donorPage: true })}
+          title={t('donor_menu')}
+          disabled={disabled}
+        >
+          <DonorIcon fontSize={iconSize} sx={{ color: 'white' }} />
+        </Fab>
       )}
       {reactControls && (
         <>
-          <Grid item>
-            <Fab
-              color="secondary"
-              size={fabSize}
-              onClick={() => lc._onClick()}
-              title={t('use_my_location')}
-            >
-              <MyLocation color={color} fontSize={iconSize} />
-            </Fab>
-          </Grid>
-          <Grid item>
-            <Fab
-              color="secondary"
-              size={fabSize}
-              onClick={() => map.zoomIn()}
-              title={t('zoom_in')}
-            >
-              <ZoomIn fontSize={iconSize} sx={{ color: 'white' }} />
-            </Fab>
-          </Grid>
-          <Grid item>
-            <Fab
-              color="secondary"
-              size={fabSize}
-              onClick={() => map.zoomOut()}
-              title={t('zoom_out')}
-            >
-              <ZoomOut fontSize={iconSize} sx={{ color: 'white' }} />
-            </Fab>
-          </Grid>
+          <Fab
+            color="secondary"
+            size={fabSize}
+            onClick={() => lc._onClick()}
+            title={t('use_my_location')}
+          >
+            <MyLocation color={color} fontSize={iconSize} />
+          </Fab>
+          <Fab
+            color="secondary"
+            size={fabSize}
+            onClick={() => map.zoomIn()}
+            title={t('zoom_in')}
+          >
+            <ZoomIn fontSize={iconSize} sx={{ color: 'white' }} />
+          </Fab>
+          <Fab
+            color="secondary"
+            size={fabSize}
+            onClick={() => map.zoomOut()}
+            title={t('zoom_out')}
+          >
+            <ZoomOut fontSize={iconSize} sx={{ color: 'white' }} />
+          </Fab>
         </>
       )}
       {(webhookMode === 'areas' || webhookMode === 'location') && (
-        <Grid item>
-          <Fab
-            color="primary"
-            size={fabSize}
-            onClick={() => setWebhookMode('open')}
-            title={t('save')}
-          >
-            <Save fontSize={iconSize} sx={{ color: 'white' }} />
-          </Fab>
-        </Grid>
+        <Fab
+          color="primary"
+          size={fabSize}
+          onClick={() => setWebhookMode('open')}
+          title={t('save')}
+        >
+          <Save fontSize={iconSize} sx={{ color: 'white' }} />
+        </Fab>
       )}
       {fabButtons.custom.map((icon) => (
-        <Grid item key={`${icon.color}${icon.href}${icon.icon}`}>
-          <Fab
-            color={icon.color || 'secondary'}
-            size={fabSize}
-            href={icon.href}
-            referrerPolicy="no-referrer"
-            target={icon.target || '_blank'}
-            disabled={disabled}
-          >
-            <FAIcon className={icon.icon} size={iconSize} />
-          </Fab>
-        </Grid>
+        <Fab
+          key={`${icon.color}${icon.href}${icon.icon}`}
+          color={icon.color || 'secondary'}
+          size={fabSize}
+          href={icon.href}
+          referrerPolicy="no-referrer"
+          target={icon.target || '_blank'}
+          disabled={disabled}
+        >
+          <FAIcon className={icon.icon} size={iconSize} />
+        </Fab>
       ))}
-    </Grid>
+    </Stack>
   )
 }
