@@ -2,12 +2,12 @@
 // @ts-check
 import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
-import { useDialogStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useStatic } from '@hooks/useStore'
 
 /**
  *
  * @param {{
- *  dialog: keyof ReturnType<typeof useDialogStore['getState']>,
+ *  dialog: keyof ReturnType<typeof useLayoutStore['getState']>,
  *  variant?: 'small' | 'large'
  *  children: React.ReactNode
  * } & Omit<import('@mui/material').DialogProps, 'open'>} props
@@ -19,11 +19,11 @@ export function DialogWrapper({
   variant = 'large',
   ...props
 }) {
-  const open = useDialogStore((s) => s[dialog])
+  const open = useLayoutStore((s) => s[dialog])
   const isMobile = useStatic((s) => s.isMobile)
 
   const handleClose = React.useCallback(
-    () => useDialogStore.setState({ [dialog]: false }),
+    () => useLayoutStore.setState({ [dialog]: false }),
     [dialog],
   )
 

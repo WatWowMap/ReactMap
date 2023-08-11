@@ -196,7 +196,7 @@ export const useStatic = create((set) => ({
 //  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseDialog>>}
 //  */
 
-export const useDialogStore = create(() => ({
+export const useLayoutStore = create(() => ({
   nestSubmissions: '0',
   motd: false,
   donorPage: false,
@@ -204,4 +204,5 @@ export const useDialogStore = create(() => ({
   userProfile: false,
   resetFilters: false,
   feedback: false,
+  drawer: false,
 }))

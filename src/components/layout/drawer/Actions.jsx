@@ -17,7 +17,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import FeedbackIcon from '@mui/icons-material/Feedback'
 import HeartIcon from '@mui/icons-material/Favorite'
 
-import { useStore, useStatic, useDialogStore } from '@hooks/useStore'
+import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import FAIcon from '../general/FAIcon'
 
 const importSettings = (e) => {
@@ -64,7 +64,7 @@ export default function DrawerActions() {
     <List>
       {config.map.enableUserProfile && (
         <ListItemButton
-          onClick={() => useDialogStore.setState({ userProfile: true })}
+          onClick={() => useLayoutStore.setState({ userProfile: true })}
         >
           <ListItemIcon>
             <AccountBoxIcon color="secondary" />
@@ -100,7 +100,7 @@ export default function DrawerActions() {
         <ListItemText primary={t('import')} />
       </ListItemButton>
       <ListItemButton
-        onClick={() => useDialogStore.setState({ resetFilters: true })}
+        onClick={() => useLayoutStore.setState({ resetFilters: true })}
       >
         <ListItemIcon>
           <RotateLeftIcon color="primary" />
@@ -147,7 +147,7 @@ export default function DrawerActions() {
       {config.map.feedbackLink && (
         <ListItemButton
           component="button"
-          onClick={() => useDialogStore.setState({ feedback: true })}
+          onClick={() => useLayoutStore.setState({ feedback: true })}
         >
           <ListItemIcon>
             <FeedbackIcon color="success" />

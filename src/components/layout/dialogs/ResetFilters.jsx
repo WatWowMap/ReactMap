@@ -3,7 +3,7 @@ import { Button, Typography, DialogContent } from '@mui/material'
 import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useDialogStore } from '@hooks/useStore'
+import { useLayoutStore } from '@hooks/useStore'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'
@@ -14,7 +14,7 @@ export default function ResetFilters() {
   const [redirect, setRedirect] = React.useState(false)
 
   const handleClose = React.useCallback(
-    () => useDialogStore.setState({ resetFilters: false }),
+    () => useLayoutStore.setState({ resetFilters: false }),
     [],
   )
 

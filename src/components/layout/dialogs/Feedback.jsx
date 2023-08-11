@@ -4,7 +4,7 @@ import Create from '@mui/icons-material/Create'
 import { Button, Typography, Divider, DialogContent } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import { useDialogStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useStatic } from '@hooks/useStore'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'
@@ -15,7 +15,7 @@ export default function Feedback() {
 
   const link = useStatic((s) => s.config.map.feedbackLink)
   const handleClose = React.useCallback(
-    () => useDialogStore.setState({ feedback: false }),
+    () => useLayoutStore.setState({ feedback: false }),
     [],
   )
 

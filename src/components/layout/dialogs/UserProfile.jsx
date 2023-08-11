@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { useDialogStore, useStatic, useStore } from '@hooks/useStore'
+import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 
@@ -56,7 +56,7 @@ export default function UserProfile() {
   }
 
   const handleClose = React.useCallback(
-    () => useDialogStore.setState({ userProfile: false }),
+    () => useLayoutStore.setState({ userProfile: false }),
     [],
   )
 

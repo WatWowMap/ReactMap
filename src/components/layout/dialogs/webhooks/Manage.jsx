@@ -7,7 +7,7 @@ import { useTranslation, Trans } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
 import Query from '@services/Query'
-import { useDialogStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useStatic } from '@hooks/useStore'
 import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 
@@ -107,7 +107,7 @@ export default function Manage({
   if (map.feedbackLink) {
     footerButtons.unshift({
       name: 'feedback',
-      action: () => useDialogStore.setState({ feedback: true }),
+      action: () => useLayoutStore.setState({ feedback: true }),
       icon: 'BugReport',
       disabled: !webhookData[selectedWebhook].human,
       color: 'success',

@@ -12,7 +12,7 @@ import {
 
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic, useDialogStore } from '@hooks/useStore'
+import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 import NestSubmission from '@components/layout/dialogs/NestSubmission'
@@ -195,7 +195,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
             color="secondary"
             variant="contained"
             disabled={!perms.nestSubmissions || !loggedIn}
-            onClick={() => useDialogStore.setState({ nestSubmissions: id })}
+            onClick={() => useLayoutStore.setState({ nestSubmissions: id })}
           >
             {t('submit_nest_name')}
           </Button>

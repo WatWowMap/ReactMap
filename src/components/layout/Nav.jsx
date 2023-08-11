@@ -34,22 +34,11 @@ export default function Nav({
   const filters = useStore((s) => s.filters)
   const tutorial = useStore((s) => s.tutorial)
 
-  const [drawer, setDrawer] = React.useState(false)
   const [dialog, setDialog] = React.useState({
     open: false,
     category: '',
     type: '',
   })
-
-  const toggleDrawer = (open) => (event) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
-    }
-    setDrawer(open)
-  }
 
   const toggleDialog = (open, category, type, filter) => (event) => {
     Utility.analytics(
@@ -84,13 +73,8 @@ export default function Nav({
 
   return (
     <>
-      <Sidebar
-        drawer={drawer}
-        toggleDrawer={toggleDrawer}
-        toggleDialog={toggleDialog}
-      />
+      <Sidebar toggleDialog={toggleDialog} />
       <FloatingBtn
-        toggleDrawer={toggleDrawer}
         webhookMode={webhookMode}
         setWebhookMode={setWebhookMode}
         scanNextMode={scanNextMode}

@@ -6,7 +6,7 @@ import Dialog from '@mui/material/Dialog'
 import Box from '@mui/material/Box'
 import { useQuery } from '@apollo/client'
 
-import { useDialogStore, useStore } from '@hooks/useStore'
+import { useLayoutStore, useStore } from '@hooks/useStore'
 import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
 import Utility from '@services/Utility'
 
@@ -25,7 +25,7 @@ export default function MessageOfTheDay() {
   const clientIndex = useStore((s) => s.motdIndex)
   const tutorial = useStore((s) => s.tutorial)
 
-  const open = useDialogStore((s) => s.motd)
+  const open = useLayoutStore((s) => s.motd)
 
   const { data: check, loading: loadingCheck } = useQuery(MOTD_CHECK, {
     fetchPolicy: 'cache-first',
@@ -44,12 +44,12 @@ export default function MessageOfTheDay() {
     if (motd.settings.permanent === false) {
       useStore.setState({ motdIndex: motd.settings.index })
     }
-    useDialogStore.setState({ motd: false })
+    useLayoutStore.setState({ motd: false })
   }, [motd])
 
   React.useEffect(() => {
     if (check?.motdCheck && !open) {
-      useDialogStore.setState({ motd: true })
+      useLayoutStore.setState({ motd: true })
     }
   }, [check])
 

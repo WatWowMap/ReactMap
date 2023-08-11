@@ -2,12 +2,14 @@ import * as React from 'react'
 import Clear from '@mui/icons-material/Clear'
 import { Drawer, Typography, Grid, IconButton } from '@mui/material'
 
-import { useStatic } from '@hooks/useStore'
+import { useLayoutStore, useStatic } from '@hooks/useStore'
 
 import Actions from './Actions'
 import DrawerSection from './Section'
 
-export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
+export default function Sidebar({ toggleDialog }) {
+  const drawer = useLayoutStore((s) => s.drawer)
+
   const {
     config: {
       map: { title, separateDrawerActions },
@@ -15,12 +17,17 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
     ui,
   } = useStatic.getState()
 
+  const handleClose = React.useCallback(
+    () => useLayoutStore.setState({ drawer: false }),
+    [],
+  )
+
   return (
     <Drawer
       anchor="left"
       variant="temporary"
       open={drawer}
-      onClose={toggleDrawer(false)}
+      onClose={handleClose}
     >
       <Grid container alignItems="center" style={{ flexWrap: 'nowrap' }}>
         <Grid
@@ -46,7 +53,7 @@ export default function Sidebar({ drawer, toggleDrawer, toggleDialog }) {
           </Typography>
         </Grid>
         <Grid item style={{ flexGrow: 0 }}>
-          <IconButton onClick={toggleDrawer(false)} size="large">
+          <IconButton onClick={handleClose} size="large">
             <Clear />
           </IconButton>
         </Grid>

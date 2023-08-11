@@ -25,7 +25,7 @@ import * as L from 'leaflet'
 
 import { FAB_BUTTONS } from '@services/queries/config'
 import useLocation from '@hooks/useLocation'
-import { useDialogStore, useStatic, useStore } from '@hooks/useStore'
+import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
 
 import FAIcon from './general/FAIcon'
 
@@ -48,7 +48,6 @@ const DEFAULT = {
 }
 
 export default function FloatingButtons({
-  toggleDrawer,
   webhookMode,
   setWebhookMode,
   scanNextMode,
@@ -92,7 +91,7 @@ export default function FloatingButtons({
       <Fab
         color="primary"
         size={fabSize}
-        onClick={toggleDrawer(true)}
+        onClick={() => useLayoutStore.setState({ drawer: true })}
         title={t('open_menu')}
         disabled={disabled}
       >
@@ -102,7 +101,7 @@ export default function FloatingButtons({
         <Fab
           color="primary"
           size={fabSize}
-          onClick={() => useDialogStore.setState({ userProfile: true })}
+          onClick={() => useLayoutStore.setState({ userProfile: true })}
           title={t('user_profile')}
           disabled={disabled}
         >
@@ -113,7 +112,7 @@ export default function FloatingButtons({
         <Fab
           color={reactControls ? 'primary' : 'secondary'}
           size={fabSize}
-          onClick={() => useDialogStore.setState({ search: true })}
+          onClick={() => useLayoutStore.setState({ search: true })}
           title={t('search')}
           disabled={disabled}
         >
@@ -165,7 +164,7 @@ export default function FloatingButtons({
         <Fab
           color="secondary"
           size={fabSize}
-          onClick={() => useDialogStore.setState({ donorPage: true })}
+          onClick={() => useLayoutStore.setState({ donorPage: true })}
           title={t('donor_menu')}
           disabled={disabled}
         >

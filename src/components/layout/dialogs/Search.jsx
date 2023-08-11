@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next'
 import { useLazyQuery, useQuery } from '@apollo/client'
 
 import NameTT from '@components/popups/common/NameTT'
-import { useStore, useStatic, useDialogStore } from '@hooks/useStore'
+import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { SEARCHABLE } from '@services/queries/config'
@@ -186,7 +186,7 @@ export default function Search() {
   const mapConfig = useStatic((state) => state.config.map)
   const isMobile = useStatic((s) => s.isMobile)
 
-  const open = useDialogStore((s) => s.search)
+  const open = useLayoutStore((s) => s.search)
 
   const [options, setOptions] = React.useState([])
 
@@ -207,7 +207,7 @@ export default function Search() {
   )
 
   const handleClose = React.useCallback((_, result) => {
-    useDialogStore.setState({ search: false })
+    useLayoutStore.setState({ search: false })
     if (typeof result === 'object' && 'lat' in result && 'lon' in result) {
       map.flyTo([result.lat, result.lon], 16)
     }
