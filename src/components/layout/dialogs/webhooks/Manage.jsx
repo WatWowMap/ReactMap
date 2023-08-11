@@ -7,7 +7,7 @@ import { useTranslation, Trans } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
 import Query from '@services/Query'
-import { useStatic } from '@hooks/useStore'
+import { useDialogStore, useStatic } from '@hooks/useStore'
 import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 
@@ -20,7 +20,6 @@ import Tracked from './Tracked'
 import Menu from '../../general/Menu'
 import WebhookError from './Error'
 import ProfileEditing from './ProfileEditing'
-import Feedback from '../Feedback'
 
 export default function Manage({
   Icons,
@@ -57,7 +56,6 @@ export default function Manage({
     [],
   )
   const [tabValue, setTabValue] = useState(0)
-  const [feedback, setFeedback] = useState(false)
   const [addNew, setAddNew] = useState(false)
   const filteredData = Object.keys(
     webhookData[selectedWebhook]?.info || {},
@@ -109,7 +107,7 @@ export default function Manage({
   if (map.feedbackLink) {
     footerButtons.unshift({
       name: 'feedback',
-      action: () => setFeedback(true),
+      action: () => useDialogStore.setState({ feedback: true }),
       icon: 'BugReport',
       disabled: !webhookData[selectedWebhook].human,
       color: 'success',
@@ -278,9 +276,6 @@ export default function Manage({
             ]}
           />
         )}
-      </Dialog>
-      <Dialog maxWidth="xs" open={feedback} onClose={() => setFeedback(false)}>
-        <Feedback link={map.feedbackLink} setFeedback={setFeedback} />
       </Dialog>
     </>
   )

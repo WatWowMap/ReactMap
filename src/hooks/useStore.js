@@ -180,8 +180,6 @@ export const useStatic = create((set) => ({
   setWebhookData: (webhookData) => set({ webhookData }),
   timeOfDay: 'day',
   setTimeOfDay: (timeOfDay) => set({ timeOfDay }),
-  feedback: false,
-  setFeedback: (feedback) => set({ feedback }),
   extraUserFields: [],
   setExtraUserFields: (extraUserFields) => set({ extraUserFields }),
   manualParams: { id: '' },
@@ -205,4 +203,5 @@ export const useDialogStore = create(() => ({
   search: false,
   userProfile: false,
   resetFilters: false,
+  feedback: false,
 }))

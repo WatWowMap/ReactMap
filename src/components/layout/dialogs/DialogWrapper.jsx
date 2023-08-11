@@ -8,9 +8,9 @@ import { useDialogStore, useStatic } from '@hooks/useStore'
  *
  * @param {{
  *  dialog: keyof ReturnType<typeof useDialogStore['getState']>,
- *  variant: 'small' | 'large'
+ *  variant?: 'small' | 'large'
  *  children: React.ReactNode
- * } & import('@mui/material').DialogProps} props
+ * } & Omit<import('@mui/material').DialogProps, 'open'>} props
  * @returns {JSX.Element}
  */
 export function DialogWrapper({
@@ -29,7 +29,7 @@ export function DialogWrapper({
 
   return (
     <Dialog
-      open={open}
+      open={!!open}
       fullScreen={isMobile && variant === 'large'}
       fullWidth={!isMobile && variant === 'large'}
       maxWidth={variant === 'small' ? (isMobile ? 'sm' : 'xs') : undefined}

@@ -57,10 +57,8 @@ export default function DrawerActions() {
   const { t } = useTranslation()
   const {
     auth: { loggedIn, methods },
-    setFeedback,
     config,
   } = useStatic.getState()
-  const { setTutorial } = useStore.getState()
 
   return (
     <List>
@@ -75,7 +73,7 @@ export default function DrawerActions() {
         </ListItemButton>
       )}
       {config.map.enableTutorial && (
-        <ListItemButton onClick={() => setTutorial(true)}>
+        <ListItemButton onClick={() => useStore.setState({ tutorial: true })}>
           <ListItemIcon>
             <HelpOutlineIcon color="secondary" />
           </ListItemIcon>
@@ -147,7 +145,10 @@ export default function DrawerActions() {
         </ListItemButton>
       )}
       {config.map.feedbackLink && (
-        <ListItemButton component="button" onClick={() => setFeedback(true)}>
+        <ListItemButton
+          component="button"
+          onClick={() => useDialogStore.setState({ feedback: true })}
+        >
           <ListItemIcon>
             <FeedbackIcon color="success" />
           </ListItemIcon>

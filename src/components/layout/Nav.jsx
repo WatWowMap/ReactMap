@@ -25,10 +25,9 @@ export default function Nav({
   scanZoneMode,
   setScanZoneMode,
 }) {
-  const { setWebhookAlert, config, setFeedback } = useStatic.getState()
+  const { setWebhookAlert, config } = useStatic.getState()
 
   const webhookAlert = useStatic((s) => s.webhookAlert)
-  const feedback = useStatic((s) => s.feedback)
   const isMobile = useStatic((s) => s.isMobile)
   const isTablet = useStatic((s) => s.isTablet)
 
@@ -141,13 +140,7 @@ export default function Nav({
       <Search />
       <MessageOfTheDay />
       <DonorPage />
-      <Dialog
-        open={feedback}
-        maxWidth={isMobile ? 'sm' : 'xs'}
-        onClose={() => setFeedback(false)}
-      >
-        <Feedback link={config.map.feedbackLink} setFeedback={setFeedback} />
-      </Dialog>
+      <Feedback />
       <ResetFilters />
       <Notification
         open={!!webhookAlert.open}
