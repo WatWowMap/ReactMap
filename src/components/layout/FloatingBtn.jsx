@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react'
+// @ts-check
+import * as React from 'react'
 import Menu from '@mui/icons-material/Menu'
 import MyLocation from '@mui/icons-material/MyLocation'
 import ZoomIn from '@mui/icons-material/ZoomIn'
@@ -8,38 +9,49 @@ import NotificationsActive from '@mui/icons-material/NotificationsActive'
 import Save from '@mui/icons-material/Save'
 import CardMembership from '@mui/icons-material/CardMembership'
 import AttachMoney from '@mui/icons-material/AttachMoney'
+// import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin'
+// import CurrencyPoundIcon from '@mui/icons-material/CurrencyPound'
 import EuroSymbol from '@mui/icons-material/EuroSymbol'
 import Person from '@mui/icons-material/Person'
 import TrackChanges from '@mui/icons-material/TrackChanges'
 import BlurOn from '@mui/icons-material/BlurOn'
 import Grid from '@mui/material/Grid'
 import Fab from '@mui/material/Fab'
+import { useQuery } from '@apollo/client'
 
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
-import L from 'leaflet'
+import * as L from 'leaflet'
 
+import { FAB_BUTTONS } from '@services/queries/config'
 import useLocation from '@hooks/useLocation'
-import { useStore, useStatic } from '@hooks/useStore'
+import { useDialogStore, useStatic, useStore } from '@hooks/useStore'
+
 import FAIcon from './general/FAIcon'
 
 const DonationIcons = {
   dollar: AttachMoney,
   euro: EuroSymbol,
   card: CardMembership,
+  // bitcoin: CurrencyBitcoinIcon,
+  // pound: CurrencyPoundIcon,
+}
+
+const DEFAULT = {
+  custom: [],
+  donationButton: '',
+  profileButton: false,
+  scanNext: false,
+  scanZone: false,
+  webhooks: false,
+  search: false,
 }
 
 export default function FloatingButtons({
   toggleDrawer,
   toggleDialog,
-  safeSearch,
-  isMobile,
   webhookMode,
   setWebhookMode,
-  settings,
-  webhooks,
-  donationPage,
-  setDonorPage,
   setUserProfile,
   scanNextMode,
   setScanNextMode,
@@ -47,38 +59,36 @@ export default function FloatingButtons({
   setScanZoneMode,
 }) {
   const { t } = useTranslation()
-
-  const {
-    config: {
-      map: { enableFloatingProfileButton, customFloatingIcons = [] },
-      scanner: { scannerType, enableScanNext, enableScanZone },
-    },
-    auth: { loggedIn, perms },
-  } = useStatic.getState()
-
+  const { data } = useQuery(FAB_BUTTONS, {
+    fetchPolicy: 'cache-first',
+  })
   const map = useMap()
-  const ref = useRef(null)
-  const { lc, color } = useLocation(map)
+  const ref = React.useRef(null)
+  const { lc, color } = useLocation()
   const selectedWebhook = useStore((s) => s.selectedWebhook)
+  const reactControls = useStore(
+    (s) => s.settings.navigationControls === 'react',
+  )
+  const isMobile = useStatic((s) => s.isMobile)
 
-  const fabSize = isMobile ? 'small' : 'large'
-  const iconSize = isMobile ? 'small' : 'medium'
-
-  useEffect(() => {
+  React.useEffect(() => {
     L.DomEvent.disableClickPropagation(ref.current)
   }, [])
 
-  const showDonorPage =
-    (perms.donor ? donationPage.showToDonors : true) &&
-    donationPage.showOnMap &&
-    donationPage?.components?.length
+  const fabButtons = /** @type {typeof DEFAULT} */ (data?.fabButtons || DEFAULT)
 
-  const DonorIcon = showDonorPage
-    ? DonationIcons[donationPage.fabIcon || 'card']
-    : null
+  const DonorIcon = React.useMemo(
+    () =>
+      fabButtons.donationButton in DonationIcons
+        ? DonationIcons[fabButtons.donationButton]
+        : null,
+    [fabButtons.donationButton],
+  )
 
-  const disabled =
-    Boolean(webhookMode) || Boolean(scanNextMode) || Boolean(scanZoneMode)
+  const fabSize = isMobile ? 'small' : 'large'
+  const iconSize = isMobile ? 'small' : 'medium'
+  const disabled = !!webhookMode || !!scanNextMode || !!scanZoneMode
+
   return (
     <Grid
       container
@@ -87,7 +97,7 @@ export default function FloatingButtons({
       alignItems="flex-start"
       ref={ref}
       sx={(theme) => ({
-        width: isMobile ? 50 : 65,
+        width: { xs: 50, sm: 65 },
         zIndex: 5000,
         '& > *': {
           margin: `${theme.spacing(1)} !important`,
@@ -110,7 +120,7 @@ export default function FloatingButtons({
           <Menu fontSize={iconSize} />
         </Fab>
       </Grid>
-      {enableFloatingProfileButton && loggedIn && (
+      {fabButtons.profileButton && (
         <Grid item>
           <Fab
             color="primary"
@@ -123,12 +133,10 @@ export default function FloatingButtons({
           </Fab>
         </Grid>
       )}
-      {safeSearch.length ? (
+      {fabButtons.search && (
         <Grid item>
           <Fab
-            color={
-              settings.navigationControls === 'react' ? 'primary' : 'secondary'
-            }
+            color={reactControls ? 'primary' : 'secondary'}
             size={fabSize}
             onClick={toggleDialog(true, '', 'search')}
             title={t('search')}
@@ -137,8 +145,8 @@ export default function FloatingButtons({
             <Search fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </Grid>
-      ) : null}
-      {perms?.webhooks?.length && webhooks && selectedWebhook ? (
+      )}
+      {fabButtons.webhooks && selectedWebhook && (
         <Grid item>
           <Fab
             color="secondary"
@@ -150,8 +158,8 @@ export default function FloatingButtons({
             <NotificationsActive fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </Grid>
-      ) : null}
-      {perms?.scanner?.includes('scanNext') && enableScanNext ? (
+      )}
+      {fabButtons.scanNext && (
         <Grid item>
           <Fab
             color={scanNextMode === 'setLocation' ? null : 'secondary'}
@@ -167,10 +175,8 @@ export default function FloatingButtons({
             <TrackChanges fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </Grid>
-      ) : null}
-      {perms?.scanner?.includes('scanZone') &&
-      enableScanZone &&
-      scannerType !== 'mad' ? (
+      )}
+      {fabButtons.scanZone && (
         <Grid item>
           <Fab
             color={scanZoneMode === 'setLocation' ? null : 'secondary'}
@@ -186,21 +192,21 @@ export default function FloatingButtons({
             <BlurOn fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </Grid>
-      ) : null}
-      {showDonorPage ? (
+      )}
+      {!!DonorIcon && (
         <Grid item>
           <Fab
             color="secondary"
             size={fabSize}
-            onClick={() => setDonorPage(true)}
+            onClick={() => useDialogStore.setState({ donorPage: true })}
             title={t('donor_menu')}
             disabled={disabled}
           >
             <DonorIcon fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </Grid>
-      ) : null}
-      {settings.navigationControls === 'react' ? (
+      )}
+      {reactControls && (
         <>
           <Grid item>
             <Fab
@@ -233,7 +239,7 @@ export default function FloatingButtons({
             </Fab>
           </Grid>
         </>
-      ) : null}
+      )}
       {(webhookMode === 'areas' || webhookMode === 'location') && (
         <Grid item>
           <Fab
@@ -246,7 +252,7 @@ export default function FloatingButtons({
           </Fab>
         </Grid>
       )}
-      {customFloatingIcons.map((icon) => (
+      {fabButtons.custom.map((icon) => (
         <Grid item key={`${icon.color}${icon.href}${icon.icon}`}>
           <Fab
             color={icon.color || 'secondary'}

@@ -16,6 +16,8 @@ module.exports = gql`
     backup(id: ID): Backup
     backups: [Backup]
     checkUsername(username: String): Boolean
+    fabButtons: FabButtons
+    customComponent(component: String): JSON
     devices(filters: JSON): [Device]
     geocoder(search: String, name: String): [Geocoder]
     gyms(
@@ -27,7 +29,7 @@ module.exports = gql`
       filters: JSON
     ): [Gym]
     gymsSingle(id: ID, perm: String): Gym
-    loginPage: JSON
+    motdCheck(clientIndex: Int): Boolean
     nests(
       minLat: Float
       maxLat: Float

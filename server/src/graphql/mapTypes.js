@@ -148,6 +148,23 @@ module.exports = gql`
     updatedAt: Int
   }
 
+  type CustomButton {
+    color: String
+    href: String
+    icon: String
+    target: String
+  }
+
+  type FabButtons {
+    custom: [CustomButton]
+    donationButton: String
+    profileButton: Boolean
+    scanZone: Boolean
+    scanNext: Boolean
+    webhooks: Boolean
+    search: Boolean
+  }
+
   input BackupCreate {
     name: String
     data: JSON

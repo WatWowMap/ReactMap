@@ -7,6 +7,11 @@ import { persist } from 'zustand/middleware'
  *   darkMode: boolean,
  *   location: [number, number],
  *   popups: Record<string, boolean>,
+ *   zoom: number,
+ *   selectedWebhook: string,
+ *   settings: Record<string, unknown>,
+ *   motdIndex: number
+ *   tutorial: boolean,
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
@@ -102,6 +107,15 @@ export const useStore = create(
   ),
 )
 
+/**
+ * TODO: Finish this
+ * @typedef {{
+ *   isMobile: boolean,
+ *   isTablet: boolean,
+ *   active: boolean,
+ * }} UseStatic
+ * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
+ */
 export const useStatic = create((set) => ({
   isMobile: false,
   isTablet: false,
@@ -173,4 +187,6 @@ export const useStatic = create((set) => ({
 
 export const useDialogStore = create((/* set, get */) => ({
   nestSubmissions: '0',
+  motd: false,
+  donorPage: false,
 }))

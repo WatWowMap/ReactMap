@@ -11,7 +11,7 @@ import UserOptions from './dialogs/UserOptions'
 import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/UserProfile'
 import Search from './dialogs/Search'
-import Motd from './dialogs/Motd'
+import MessageOfTheDay from './dialogs/Motd'
 import DonorPage from './dialogs/DonorPage'
 import Feedback from './dialogs/Feedback'
 import ResetFilters from './dialogs/ResetFilters'
@@ -23,8 +23,6 @@ export default function Nav({
   Icons,
   setWebhookMode,
   webhookMode,
-  settings,
-  webhooks,
   setScanNextMode,
   scanNextMode,
   setScanZoneMode,
@@ -33,15 +31,13 @@ export default function Nav({
   isTablet,
 }) {
   const {
-    auth: { perms },
     setWebhookAlert,
     config,
     setUserProfile,
     setFeedback,
     setResetFilters,
   } = useStatic.getState()
-  const { setFilters, setUserSettings, setTutorial, setMotdIndex } =
-    useStore.getState()
+  const { setFilters, setUserSettings, setTutorial } = useStore.getState()
 
   const webhookAlert = useStatic((s) => s.webhookAlert)
   const userProfile = useStatic((s) => s.userProfile)
@@ -51,25 +47,13 @@ export default function Nav({
   const filters = useStore((s) => s.filters)
   const userSettings = useStore((s) => s.userSettings)
   const tutorial = useStore((s) => s.tutorial)
-  const motdIndex = useStore((s) => s.motdIndex)
 
   const [drawer, setDrawer] = React.useState(false)
-  const [donorPage, setDonorPage] = React.useState(false)
   const [dialog, setDialog] = React.useState({
     open: false,
     category: '',
     type: '',
   })
-  const [motd, setMotd] = React.useState(
-    config.map.messageOfTheDay.components?.length &&
-      (config.map.messageOfTheDay.index > motdIndex ||
-        config.map.messageOfTheDay.settings.permanent) &&
-      ((perms.donor
-        ? config.map.messageOfTheDay.settings.donorOnly
-        : config.map.messageOfTheDay.settings.freeloaderOnly) ||
-        (!config.map.messageOfTheDay.settings.donorOnly &&
-          !config.map.messageOfTheDay.settings.freeloaderOnly)),
-  )
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -79,13 +63,6 @@ export default function Nav({
       return
     }
     setDrawer(open)
-  }
-
-  const handleMotdClose = () => {
-    if (!config.map.messageOfTheDay.settings.permanent) {
-      setMotdIndex(config.map.messageOfTheDay.index)
-    }
-    setMotd(false)
   }
 
   const toggleDialog =
@@ -125,18 +102,12 @@ export default function Nav({
       <FloatingBtn
         toggleDrawer={toggleDrawer}
         toggleDialog={toggleDialog}
-        safeSearch={config.map.searchable}
-        isMobile={isMobile}
-        webhooks={webhooks}
         webhookMode={webhookMode}
         setWebhookMode={setWebhookMode}
         scanNextMode={scanNextMode}
         setScanNextMode={setScanNextMode}
         scanZoneMode={scanZoneMode}
         setScanZoneMode={setScanZoneMode}
-        settings={settings}
-        donationPage={config.map.donationPage}
-        setDonorPage={setDonorPage}
         setUserProfile={setUserProfile}
       />
       <Dialog
@@ -207,23 +178,8 @@ export default function Nav({
           Icons={Icons}
         />
       </Dialog>
-      <Dialog
-        maxWidth={config.map.messageOfTheDay.dialogMaxWidth || 'sm'}
-        open={Boolean(motd && !tutorial)}
-        onClose={handleMotdClose}
-      >
-        <Motd
-          motd={config.map.messageOfTheDay}
-          perms={perms}
-          handleMotdClose={handleMotdClose}
-        />
-      </Dialog>
-      <Dialog open={donorPage} onClose={() => setDonorPage(false)}>
-        <DonorPage
-          donorPage={config.map.donationPage}
-          handleDonorClose={() => setDonorPage(false)}
-        />
-      </Dialog>
+      <MessageOfTheDay />
+      <DonorPage />
       <Dialog
         open={feedback}
         maxWidth={isMobile ? 'sm' : 'xs'}

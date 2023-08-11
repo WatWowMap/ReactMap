@@ -1,20 +1,14 @@
 /* global BigInt */
-const GraphQLJSON = require('graphql-type-json')
+const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 const config = require('config')
 
 const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 const buildDefaultFilters = require('../services/filters/builder/base')
+const filterComponents = require('../services/functions/filterComponents')
 
-/**
- * @typedef {(parent: unknown, args: object, context: import('../types').GqlContext) => unknown} Resolver
- * @type {{
- *  JSON: typeof GraphQLJSON
- *  Query: Record<string, Resolver>
- *  Mutation: Record<string, Resolver>
- * }}
- */
+/** @type {import("@apollo/server").ApolloServerOptions<import('../types').GqlContext>['resolvers']} */
 const resolvers = {
   JSON: GraphQLJSON,
   Query: {
@@ -59,6 +53,69 @@ const resolvers = {
       )
       return !!results.length
     },
+    fabButtons: (_, _args, { perms, user, req, Event }) => {
+      const domain = `multiDomainsObj[${req.headers.host}]`
+
+      /** @type {import('../types').Config['map']['donationPage']} */
+      const donorPage = config.has(domain)
+        ? config.get(`${domain}.donationPage`)
+        : config.get('map.donationPage')
+
+      /** @type {import('../types').Config['scanner']} */
+      const scanner = config.get('scanner')
+
+      return {
+        custom: config.has(domain)
+          ? config.get(`${domain}.customFloatingIcons`)
+          : config.get('map.customFloatingIcons'),
+        donationButton:
+          donorPage.showOnMap && (perms.donor ? donorPage.showToDonors : true)
+            ? donorPage.fabIcon
+            : '',
+        profileButton:
+          user && config.has(domain)
+            ? config.get(`${domain}.enableFloatingProfileButton`)
+            : config.get('map.enableFloatingProfileButton'),
+        scanZone:
+          scanner.backendConfig.platform !== 'mad' &&
+          scanner.scanZone.enabled &&
+          perms.scanner.includes('scanZone'),
+        scanNext:
+          scanner.scanNext.enabled && perms.scanner.includes('scanNext'),
+        search: Object.entries(config.api.searchable).some(
+          ([k, v]) => v && perms[k],
+        ),
+        webhooks:
+          !!perms.webhooks.length &&
+          perms.webhooks.every((name) => name in Event.webhookObj),
+      }
+    },
+    customComponent: (_, { component }, { perms, user }) => {
+      switch (component) {
+        case 'messageOfTheDay':
+        case 'donationPage':
+        case 'loginPage':
+          if (config.has(`map.${component}`)) {
+            const {
+              footerButtons = [],
+              components = [],
+              ...rest
+            } = config.get(`map.${component}`)
+            return {
+              ...rest,
+              footerButtons: filterComponents(
+                footerButtons,
+                !!user,
+                perms.donor,
+              ),
+              components: filterComponents(components, !!user, perms.donor),
+            }
+          }
+          return null
+        default:
+          return null
+      }
+    },
     devices: (_, args, { perms, Db }) => {
       if (perms?.devices) {
         return Db.getAll('Device', perms, args)
@@ -85,6 +142,16 @@ const resolvers = {
         return Db.getOne('Gym', args.id)
       }
       return {}
+    },
+    motdCheck: (_, { clientIndex }, { perms }) => {
+      const motd = config.get('map.messageOfTheDay')
+      return (
+        (motd.index > clientIndex || motd.settings.permanent) &&
+        ((perms.donor
+          ? motd.settings.donorOnly
+          : motd.settings.freeloaderOnly) ||
+          (!motd.settings.donorOnly && !motd.settings.freeloaderOnly))
+      )
     },
     nests: (_, args, { perms, Db }) => {
       if (perms?.nests) {
@@ -352,8 +419,6 @@ const resolvers = {
       }
       return {}
     },
-    loginPage: () =>
-      config.has('map.loginPage') ? config.get('map.loginPage') : null,
   },
   Mutation: {
     createBackup: async (_, args, { req, perms, Db }) => {

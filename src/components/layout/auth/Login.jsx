@@ -6,7 +6,7 @@ import { Box, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/'
 import { useQuery } from '@apollo/client'
 
-import { GET_LOGIN_PAGE } from '@services/queries/customPages'
+import { CUSTOM_COMPONENT } from '@services/queries/config'
 
 import LocalLogin from './Local'
 import LocaleSelection from '../general/LocaleSelection'
@@ -14,16 +14,21 @@ import DiscordLogin from './Discord'
 import TelegramLogin from './Telegram'
 import CustomTile from '../custom/CustomTile'
 import ThemeToggle from '../general/ThemeToggle'
+import { Loading } from '../general/Loading'
 
 export default function Login({ serverSettings }) {
   const { t } = useTranslation()
-  const { data, loading } = useQuery(GET_LOGIN_PAGE, {
+  const { data, loading } = useQuery(CUSTOM_COMPONENT, {
     fetchPolicy: 'cache-first',
+    variables: { component: 'loginPage' },
+    skip: !serverSettings.config.map.loginPage,
   })
 
-  if (loading) return <p>Loading...</p>
+  if (loading) {
+    return <Loading height="100vh">{t('loading', { category: '' })}</Loading>
+  }
 
-  const { settings, components } = data?.loginPage || {
+  const { settings, components } = data?.customComponent || {
     settings: {},
     components: [],
   }

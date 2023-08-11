@@ -300,7 +300,6 @@ export default function Map({
         config={config}
         webhookMode={webhookMode}
         setWebhookMode={setWebhookMode}
-        webhooks={webhooks}
         scanNextMode={scanNextMode}
         setScanNextMode={setScanNextMode}
         scanZoneMode={scanZoneMode}
