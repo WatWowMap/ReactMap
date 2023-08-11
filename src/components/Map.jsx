@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
 import { useMap, ZoomControl, TileLayer } from 'react-leaflet'
-import { useMediaQuery, useTheme } from '@mui/material'
 import { control } from 'leaflet'
 
 import Utility from '@services/Utility'
@@ -43,20 +42,18 @@ export default function Map({
   useCooldown()
   map.attributionControl.setPrefix(config.attributionPrefix || '')
 
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
-  const isTablet = useMediaQuery(theme.breakpoints.only('sm'))
   const tileLayer = useTileLayer()
 
   const staticUserSettings = useStatic((state) => state.userSettings)
   const ui = useStatic((state) => state.ui)
   const staticFilters = useStatic((state) => state.filters)
   const active = useStatic((state) => state.active)
+  const timeOfDay = useStatic((state) => state.timeOfDay)
+  const isMobile = useStatic((state) => state.isMobile)
 
   const filters = useStore((state) => state.filters)
   const settings = useStore((state) => state.settings)
   const icons = useStore((state) => state.icons)
-  const timeOfDay = useStatic((state) => state.timeOfDay)
   const userSettings = useStore((state) => state.userSettings)
 
   const [webhookMode, setWebhookMode] = useState(false)
@@ -119,10 +116,6 @@ export default function Map({
       }
     }
   }, [settings.navigationControls, map])
-
-  useEffect(() => {
-    useStatic.setState({ isMobile, isTablet })
-  }, [isMobile, isTablet])
 
   return (
     <>
