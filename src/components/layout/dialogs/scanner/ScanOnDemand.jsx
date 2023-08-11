@@ -7,16 +7,13 @@ import { useScanStore, useStore } from '@hooks/useStore'
 
 import { SCANNER_CONFIG, SCANNER_STATUS } from '@services/queries/scanner'
 
-import {
-  ScanNextTarget,
-  ScanNextPopup,
-  calcScanNextCoords,
-} from './ScanNextTarget'
+import ScanNext from './scanNext'
 import {
   ScanZoneTarget,
   ScanZonePopup,
   calcScanZoneCoords,
 } from './ScanZoneTarget'
+import { calcScanNextCoords } from './scanNext/calcCoords'
 
 export const DEFAULT = /** @type {import('@hooks/useStore').ScanConfig} */ ({
   scannerType: '',
@@ -160,9 +157,7 @@ function ScanOnDemand({ mode }) {
   if (scanMode !== 'setLocation') return null
 
   return mode === 'scanNext' ? (
-    <ScanNextTarget>
-      <ScanNextPopup {...config} />
-    </ScanNextTarget>
+    <ScanNext {...config} />
   ) : (
     <ScanZoneTarget>
       <ScanZonePopup {...config} />
