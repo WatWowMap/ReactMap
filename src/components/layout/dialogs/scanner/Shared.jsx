@@ -8,6 +8,7 @@ import {
   styled,
   ListItemButton,
   Divider,
+  ListSubheader,
 } from '@mui/material'
 import { Circle } from 'react-leaflet'
 import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'
@@ -30,6 +31,10 @@ const StyledListButton = styled(ListItemButton)(() => ({
 
 export const StyledDivider = styled(Divider)(() => ({
   margin: '10px 0',
+}))
+
+export const StyledSubHeader = styled(ListSubheader)(() => ({
+  lineHeight: 2,
 }))
 
 const { setScanMode } = useScanStore.getState()
@@ -125,7 +130,7 @@ export function ScanCancel({ mode }) {
  * @param {{ radius: number, lat: number, lon: number, color?: string }} props
  * @returns
  */
-export function ScanCircle({ radius, lat, lon, color = COLORS.blue }) {
+export function ScanCircle({ lat, lon, radius, color = COLORS.blue }) {
   return (
     <Circle
       radius={radius}
@@ -148,7 +153,7 @@ export function ScanCircles({ radius, color }) {
 
   return scanCoords.map((coords) => (
     <ScanCircle
-      key={`${coords.join('')}${radius}`}
+      key={coords.join('')}
       radius={radius || userRadius}
       lat={coords[0]}
       lon={coords[1]}

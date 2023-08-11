@@ -1,18 +1,12 @@
 /* eslint-disable react/no-array-index-key */
 // @ts-check
 import * as React from 'react'
-import {
-  Button,
-  ButtonGroup,
-  Slider,
-  List,
-  ListItem,
-  ListSubheader,
-} from '@mui/material'
+import { Button, ButtonGroup, Slider, List, ListItem } from '@mui/material'
 import { point } from '@turf/helpers'
 import destination from '@turf/destination'
 import { Marker, Popup, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
+import { debounce } from 'lodash'
 
 import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
 import { useScanStore } from '@hooks/useStore'
@@ -26,12 +20,22 @@ import {
   ScanRequests,
   StyledDivider,
   StyledListItemText,
+  StyledSubHeader,
 } from './Shared'
 import { useCheckValid } from './useCheckValid'
 
 const OPTIONS = /** @type {const} */ ({ units: 'kilometers' })
 
 const RADIUS_CHOICES = /** @type {const} */ (['pokemon', 'gym'])
+
+const BEARINGS = {
+  1: 30,
+  2: 90,
+  3: 150,
+  4: 210,
+  5: 270,
+  6: 330,
+}
 
 /**
  *
@@ -41,18 +45,10 @@ const RADIUS_CHOICES = /** @type {const} */ (['pokemon', 'gym'])
  * @param {import('@hooks/useStore').UseScanStore['scanZoneSize']} scanZoneSize
  * @returns
  */
-const calcScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
-  let coords = [center]
+export const calcScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
+  const coords = [center]
   let currentPoint = point([center[1], center[0]])
   const distance = radius * 2 * Math.cos(30 * (Math.PI / 180))
-  const bearings = {
-    1: 30,
-    2: 90,
-    3: 150,
-    4: 210,
-    5: 270,
-    6: 330,
-  }
   for (let i = 1; i < scanZoneSize + 1; i += 1) {
     let quadrant = 1
     let step = 1
@@ -60,14 +56,12 @@ const calcScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
       currentPoint = destination(
         currentPoint,
         (distance * spacing) / 1000,
-        step === 1 ? 330 : bearings[quadrant],
+        step === 1 ? 330 : BEARINGS[quadrant],
         OPTIONS,
       )
-      coords = coords.concat([
-        [
-          currentPoint.geometry.coordinates[1],
-          currentPoint.geometry.coordinates[0],
-        ],
+      coords.push([
+        currentPoint.geometry.coordinates[1],
+        currentPoint.geometry.coordinates[0],
       ])
       quadrant = Math.floor(step / i) + 1
       step += 1
@@ -109,15 +103,7 @@ export function ScanZoneTarget({ children }) {
             if (target) {
               const { lat, lng } = target.getLatLng()
               map.panTo([lat, lng])
-              useScanStore.setState((prev) => ({
-                scanLocation: [lat, lng],
-                scanCoords: calcScanZoneCoords(
-                  [lat, lng],
-                  prev.userRadius,
-                  prev.userSpacing,
-                  prev.scanZoneSize,
-                ),
-              }))
+              useScanStore.setState({ scanLocation: [lat, lng] })
               if (popup) {
                 popup.openPopup()
               }
@@ -126,13 +112,80 @@ export function ScanZoneTarget({ children }) {
         }}
         position={scanLocation}
         ref={(ref) => {
-          if (ref && !ref.isPopupOpen()) ref.openPopup()
+          if (ref) {
+            if (!ref.isPopupOpen()) ref.openPopup()
+          }
         }}
       >
         {children}
       </Marker>
       <ScanCircles />
     </>
+  )
+}
+
+/**
+ *
+ * @param {{
+ *  name: keyof import('../../../../../server/src/types').OnlyType<import('@hooks/useStore').UseScanStore, number>,
+ * } & import('@mui/material').SliderProps} props
+ * @returns
+ */
+function ScanZoneSlider({ name, ...props }) {
+  const value = useScanStore((s) => s[name])
+
+  const handleChange = React.useCallback(
+    (_, newValue) => useScanStore.setState({ [name]: newValue }),
+    [],
+  )
+
+  const debouncedHandleChange = debounce(handleChange, 10)
+
+  return (
+    <Slider
+      value={value}
+      onChange={debouncedHandleChange}
+      onChangeCommitted={handleChange}
+      valueLabelDisplay="auto"
+      {...props}
+    />
+  )
+}
+
+function SizeSelection({ pokemonRadius, gymRadius }) {
+  const { t } = useTranslation()
+  const userRadius = useScanStore((s) => s.userRadius)
+
+  const handleRadiusChange = React.useCallback(
+    (newRadius) => () =>
+      useScanStore.setState((prev) => ({
+        userRadius: newRadius,
+        scanCoords: calcScanZoneCoords(
+          prev.scanLocation,
+          newRadius,
+          prev.userSpacing,
+          prev.scanZoneSize,
+        ),
+      })),
+    [],
+  )
+
+  return (
+    <ButtonGroup size="small" fullWidth>
+      {RADIUS_CHOICES.map((item) => {
+        const radius = item === 'pokemon' ? pokemonRadius : gymRadius
+        return (
+          <Button
+            key={item}
+            onClick={handleRadiusChange(radius)}
+            color={radius === userRadius ? 'primary' : 'secondary'}
+            variant={radius === userRadius ? 'contained' : 'outlined'}
+          >
+            {t(item)}
+          </Button>
+        )
+      })}
+    </ButtonGroup>
   )
 }
 
@@ -152,52 +205,6 @@ export function ScanZonePopup({
 }) {
   const { t } = useTranslation()
 
-  const userSpacing = useScanStore((s) => s.userSpacing)
-  const scanZoneSize = useScanStore((s) => s.scanZoneSize)
-  const userRadius = useScanStore((s) => s.userRadius)
-
-  const handleSizeChange = React.useCallback(
-    (_, newSize) =>
-      useScanStore.setState((prev) => ({
-        scanZoneSize: newSize,
-        scanCoords: calcScanZoneCoords(
-          prev.scanLocation,
-          prev.userRadius,
-          prev.userSpacing,
-          newSize,
-        ),
-      })),
-    [],
-  )
-
-  const handleSpacingChange = React.useCallback(
-    (_, newSpacing) =>
-      useScanStore.setState((prev) => ({
-        userSpacing: newSpacing,
-        scanCoords: calcScanZoneCoords(
-          prev.scanLocation,
-          prev.userRadius,
-          newSpacing,
-          prev.scanZoneSize,
-        ),
-      })),
-    [],
-  )
-
-  const handleRadiusChange = React.useCallback(
-    (_, newRadius) =>
-      useScanStore.setState((prev) => ({
-        userRadius: newRadius,
-        scanCoords: calcScanZoneCoords(
-          prev.scanLocation,
-          newRadius,
-          prev.userSpacing,
-          prev.scanZoneSize,
-        ),
-      })),
-    [],
-  )
-
   return (
     <Popup minWidth={90} maxWidth={200} autoPan={false}>
       <List>
@@ -208,38 +215,21 @@ export function ScanZonePopup({
         <StyledDivider />
         {scannerType !== 'mad' && (
           <>
-            <ListSubheader disableSticky style={{ lineHeight: 2 }}>
-              {t('scan_zone_size')}
-            </ListSubheader>
+            <StyledSubHeader>{t('scan_zone_size')}</StyledSubHeader>
             <ListItem style={{ padding: 0 }}>
-              <Slider
-                name="Size"
+              <ScanZoneSlider
+                name="scanZoneSize"
                 min={1}
                 max={maxSize}
                 step={1}
-                value={scanZoneSize}
-                onChange={handleSizeChange}
               />
             </ListItem>
-            <ListSubheader disableSticky style={{ lineHeight: 2 }}>
-              {t('scan_zone_range')}
-            </ListSubheader>
+            <StyledSubHeader>{t('scan_zone_range')}</StyledSubHeader>
             <ListItem style={{ padding: 2 }}>
-              <ButtonGroup size="small" fullWidth>
-                {RADIUS_CHOICES.map((item) => {
-                  const radius = item === 'pokemon' ? pokemonRadius : gymRadius
-                  return (
-                    <Button
-                      key={item}
-                      onClick={() => handleRadiusChange(null, radius)}
-                      color={radius === userRadius ? 'primary' : 'secondary'}
-                      variant={radius === userRadius ? 'contained' : 'outlined'}
-                    >
-                      {t(item)}
-                    </Button>
-                  )
-                })}
-              </ButtonGroup>
+              <SizeSelection
+                pokemonRadius={pokemonRadius}
+                gymRadius={gymRadius}
+              />
             </ListItem>
             {advancedOptions && (
               <ListItem style={{ padding: '10px 0' }}>
@@ -250,29 +240,15 @@ export function ScanZonePopup({
                       padding: 0,
                     }}
                   >
-                    <ListSubheader disableSticky style={{ lineHeight: 2 }}>
-                      {t('scan_zone_spacing')}
-                    </ListSubheader>
-                    <Slider
-                      name="Spacing"
+                    <StyledSubHeader>{t('scan_zone_spacing')}</StyledSubHeader>
+                    <ScanZoneSlider
+                      name="userSpacing"
                       min={1}
                       max={2}
                       step={0.01}
-                      value={userSpacing}
-                      onChange={handleSpacingChange}
-                      style={{ margin: 0, padding: 0 }}
                     />
-                    <ListSubheader disableSticky style={{ lineHeight: 2 }}>
-                      {t('scan_zone_radius')}
-                    </ListSubheader>
-                    <Slider
-                      name="Radius"
-                      min={50}
-                      max={900}
-                      value={userRadius}
-                      onChange={handleRadiusChange}
-                      valueLabelDisplay="auto"
-                    />
+                    <StyledSubHeader>{t('scan_zone_radius')}</StyledSubHeader>
+                    <ScanZoneSlider name="userRadius" min={50} max={900} />
                   </List>
                 </AdvancedAccordion>
               </ListItem>

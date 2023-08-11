@@ -31,7 +31,11 @@ const components = {
       }),
     },
   },
-
+  MuiListSubheader: {
+    defaultProps: {
+      disableSticky: true,
+    },
+  },
   MuiTabs: {
     defaultProps: {
       textColor: 'inherit',

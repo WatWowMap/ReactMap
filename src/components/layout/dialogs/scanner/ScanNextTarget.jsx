@@ -42,7 +42,7 @@ const DISTANCE = {
  * @param {import('@hooks/useStore').UseScanStore['scanNextSize']} size
  * @returns {import('@hooks/useStore').UseScanStore['scanCoords']}
  */
-const calcScanNextCoords = (center, size) => {
+export const calcScanNextCoords = (center, size) => {
   const coords = [center]
   if (size === 'S') return coords
   const start = point([center[1], center[0]])

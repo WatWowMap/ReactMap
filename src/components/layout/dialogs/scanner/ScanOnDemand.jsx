@@ -7,8 +7,16 @@ import { useScanStore, useStore } from '@hooks/useStore'
 
 import { SCANNER_CONFIG, SCANNER_STATUS } from '@services/queries/scanner'
 
-import { ScanNextTarget, ScanNextPopup } from './ScanNextTarget'
-import { ScanZoneTarget, ScanZonePopup } from './ScanZoneTarget'
+import {
+  ScanNextTarget,
+  ScanNextPopup,
+  calcScanNextCoords,
+} from './ScanNextTarget'
+import {
+  ScanZoneTarget,
+  ScanZonePopup,
+  calcScanZoneCoords,
+} from './ScanZoneTarget'
 
 export const DEFAULT = /** @type {import('@hooks/useStore').ScanConfig} */ ({
   scannerType: '',
@@ -26,10 +34,6 @@ export const DEFAULT = /** @type {import('@hooks/useStore').ScanConfig} */ ({
 
 const { setScanMode } = useScanStore.getState()
 
-const renderCount = {
-  scanNext: 1,
-  scanZone: 1,
-}
 /**
  *
  * @param {{ mode: 'scanNext' | 'scanZone' }} props
@@ -131,7 +135,27 @@ function ScanOnDemand({ mode }) {
     }
   }, [location])
 
-  console.log(renderCount[mode]++, { mode })
+  useScanStore.subscribe((next, prev) => {
+    if (
+      next.userRadius !== prev.userRadius ||
+      next.userSpacing !== prev.userSpacing ||
+      next.scanNextSize !== prev.scanNextSize ||
+      next.scanZoneSize !== prev.scanZoneSize ||
+      next.scanLocation.some((x, i) => x !== prev.scanLocation[i])
+    ) {
+      useScanStore.setState({
+        scanCoords:
+          mode === 'scanZone'
+            ? calcScanZoneCoords(
+                next.scanLocation,
+                next.userRadius,
+                next.userSpacing,
+                next.scanZoneSize,
+              )
+            : calcScanNextCoords(next.scanLocation, next.scanNextSize),
+      })
+    }
+  })
 
   if (scanMode !== 'setLocation') return null
 

@@ -267,3 +267,20 @@ export interface Route {
 }
 
 export type Config = typeof config
+
+export type SpecificValueType<T, U, V> = {
+  [k in keyof T]: T[k] extends U
+    ? V extends true
+      ? k
+      : never
+    : V extends true
+    ? never
+    : k
+}[keyof T]
+
+/*
+ * OnlyType<T, U, V> - returns a type with only the keys of T that have a value of U
+ */
+export type OnlyType<T, U, V = true> = { [k in SpecificValueType<T, U, V>]: U }
+
+export type StoreNoFn<T> = keyof OnlyType<T, Function, false>
