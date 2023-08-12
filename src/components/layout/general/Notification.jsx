@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
@@ -10,11 +11,26 @@ function SlideTransition(props) {
   return <Slide {...props} direction="up" />
 }
 
+/**
+ *
+ * @template T
+ * @param {{
+ *  open: boolean
+ *  severity: import('@mui/material').AlertProps['severity']
+ *  i18nKey?: T
+ *  messages?: T extends string ? { key: string, variables: string[] }[] : React.ReactNode
+ *  children?: T extends string ? never : React.ReactNode
+ *  cb?: () => void
+ *  title?: string
+ * }} props
+ * @returns
+ */
 export default function Notification({
   open,
   severity,
   i18nKey,
   messages,
+  children,
   cb,
   title,
 }) {
@@ -50,18 +66,20 @@ export default function Notification({
         style={{ textAlign: 'center', color: 'white' }}
       >
         {title && <AlertTitle>{t(title)}</AlertTitle>}
-        {i18nKey
+        {typeof i18nKey === 'string' && Array.isArray(messages)
           ? messages.map((message, i) => (
               <React.Fragment key={message.key}>
                 <Trans i18nKey={`${i18nKey}_${i}`}>
-                  {message.variables.map((variable, j) => ({
-                    [`variable_${j}`]: t(variable),
-                  }))}
+                  <>
+                    {message.variables.map((variable, j) => ({
+                      [`variable_${j}`]: t(variable),
+                    }))}
+                  </>
                 </Trans>
                 <br />
               </React.Fragment>
             ))
-          : messages}
+          : children}
       </Alert>
     </Snackbar>
   )

@@ -1,4 +1,5 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import { Grid, Typography, Button } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
@@ -28,7 +29,7 @@ export default function Errors() {
         <Button
           variant="outlined"
           color="secondary"
-          onClick={() => (window.location = window.location.origin)}
+          onClick={() => window.history.back()}
         >
           {t('go_back')}
         </Button>

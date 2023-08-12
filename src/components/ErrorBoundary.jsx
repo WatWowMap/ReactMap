@@ -1,6 +1,7 @@
+// @ts-check
 /* eslint-disable no-console */
 /* eslint-disable react/destructuring-assignment */
-import React, { Component } from 'react'
+import * as React from 'react'
 import { Grid, Typography, Button } from '@mui/material'
 import Refresh from '@mui/icons-material/Refresh'
 import { withTranslation } from 'react-i18next'
@@ -9,7 +10,7 @@ import Notification from './layout/general/Notification'
 // This component uses React Classes due to componentDidCatch() not being available in React Hooks
 // Do not use this as a base for other components
 
-class ErrorBoundary extends Component {
+class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -52,7 +53,7 @@ class ErrorBoundary extends Component {
               <br />
               <br />
               <Button
-                onClick={() => (window.location = window.location.href)}
+                onClick={() => window.location.reload()}
                 variant="contained"
                 color="primary"
                 startIcon={<Refresh />}
@@ -67,7 +68,6 @@ class ErrorBoundary extends Component {
       <>
         <Notification
           open={this.state.errorCount > 0}
-          messages={this.state.message}
           cb={() => this.setState({ errorCount: 0 })}
           severity="error"
           title="react_error"

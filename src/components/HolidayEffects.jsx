@@ -1,57 +1,72 @@
-/* eslint-disable no-nested-ternary */
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import HolidayAnimations from '@services/HolidayAnimations'
 
-export default function HolidayEffects({ holidayEffects }) {
-  const date = new Date()
-  return holidayEffects.map((holiday) => {
+/**
+ *
+ * @param {import('../../server/src/types').Config['map']['holidayEffects'][number]} props
+ * @returns
+ */
+export default function HolidayEffect({
+  enabled,
+  endDay,
+  endMonth,
+  images,
+  name,
+  startDay,
+  startMonth,
+  css,
+  imageScale,
+}) {
+  const [element, setElement] = React.useState(
+    /** @type {React.ReactNode} */ (null),
+  )
+
+  React.useLayoutEffect(() => {
+    const date = new Date()
     const start = new Date(
-      date.getFullYear() - (holiday.startMonth > holiday.endMonth ? 1 : 0),
-      holiday.startMonth - 1,
-      holiday.startDay,
+      date.getFullYear() - (startMonth > endMonth ? 1 : 0),
+      startMonth - 1,
+      startDay,
       0,
       0,
       0,
     )
-    const end = new Date(
-      date.getFullYear(),
-      holiday.endMonth - 1,
-      holiday.endDay,
-      23,
-      59,
-      59,
-    )
-    if (holiday.enabled && date >= start && date <= end) {
-      switch (holiday.css) {
+    const end = new Date(date.getFullYear(), endMonth - 1, endDay, 23, 59, 59)
+    if (enabled && date >= start && date <= end) {
+      switch (css) {
         case 'snow':
-          return (
-            <div className="winter-is-coming" key={holiday.name}>
+          setElement(
+            <div className="winter-is-coming" key={name}>
               <div className="snow snow--near" />
               <div className="snow snow--near snow--alt" />
               <div className="snow snow--mid" />
               <div className="snow snow--mid snow--alt" />
               <div className="snow snow--far" />
               <div className="snow snow--far snow--alt" />
-            </div>
+            </div>,
           )
+          return () => setElement(null)
         case 'fireworks':
-          return (
-            <div className="pyro" key={holiday.name}>
+          setElement(
+            <div className="pyro" key={name}>
               <div className="before" />
               <div className="after" />
-            </div>
+            </div>,
           )
+          return () => setElement(null)
         default: {
-          if (holiday.images?.length) {
-            const animation = new HolidayAnimations(
-              holiday.images,
-              holiday.imageScale,
-            )
+          if (images?.length) {
+            const animation = new HolidayAnimations(images, imageScale)
             animation.initialize()
+            return () => {
+              animation.stop()
+            }
           }
         }
       }
     }
-    return null
-  })
+  }, [])
+
+  return element
 }

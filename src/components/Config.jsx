@@ -8,7 +8,7 @@ import Fetch from '@services/Fetch'
 import { setLoadingText } from '@services/functions/setLoadingText'
 
 import ReactRouter from './ReactRouter'
-import HolidayEffects from './HolidayEffects'
+import HolidayEffect from './HolidayEffects'
 
 const rootLoading = document.getElementById('loader')
 
@@ -81,9 +81,9 @@ export default function Config({ setTheme }) {
         serverSettings={serverSettings}
         getServerSettings={getServerSettings}
       />
-      <HolidayEffects
-        holidayEffects={serverSettings?.config?.map?.holidayEffects || []}
-      />
+      {(serverSettings?.config?.map?.holidayEffects || []).map((holiday) => (
+        <HolidayEffect key={holiday.name} {...holiday} />
+      ))}
     </>
   )
 }
