@@ -1,3 +1,4 @@
+// @ts-check
 import { point } from '@turf/helpers'
 import destination from '@turf/destination'
 

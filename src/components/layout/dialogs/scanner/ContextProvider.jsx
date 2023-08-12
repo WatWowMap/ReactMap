@@ -1,3 +1,4 @@
+// @ts-check
 import { createContext } from 'react'
 
 export const DEFAULT = /** @type {import('@hooks/useStore').ScanConfig} */ ({

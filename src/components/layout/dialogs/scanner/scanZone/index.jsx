@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 // @ts-check
 import * as React from 'react'
 
@@ -14,19 +13,6 @@ import { ScanOnDemandPopup } from '../Popup'
  */
 export default function ScanZone() {
   useCheckValid('scanZone')
-
-  // React.useEffect(() => {
-  //   if (scanCoords.length === 1) {
-  //     useScanStore.setState((prev) => ({
-  //       scanCoords: calcScanZoneCoords(
-  //         prev.scanLocation,
-  //         prev.userRadius,
-  //         prev.userSpacing,
-  //         prev.scanZoneSize,
-  //       ),
-  //     }))
-  //   }
-  // }, [scanCoords.length])
 
   return (
     <>

@@ -1,5 +1,3 @@
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
 

@@ -1,3 +1,4 @@
+// @ts-check
 import { point } from '@turf/helpers'
 import destination from '@turf/destination'
 
@@ -11,7 +12,7 @@ const DISTANCE = {
 }
 
 /**
- *
+ * Get scan next coords
  * @param {[number, number]} center
  * @param {import('@hooks/useStore').UseScanStore['scanNextSize']} size
  * @returns {import('@hooks/useStore').UseScanStore['scanCoords']}

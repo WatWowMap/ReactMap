@@ -1,5 +1,4 @@
 // @ts-check
-/* eslint-disable react/jsx-no-useless-fragment */
 import * as React from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
 
@@ -108,9 +107,6 @@ function ScanOnDemand({ mode }) {
         scanLocation: prev.scanLocation.every((x) => x === 0)
           ? location
           : prev.scanLocation,
-        // scanCoords: prev.scanCoords.length === 0 ? [location] : prev.scanCoords,
-        // userSpacing: config.spacing || 1,
-        // userRadius: config.pokemonRadius || 70,
       }))
     }
   }, [location])

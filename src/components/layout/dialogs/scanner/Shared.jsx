@@ -1,5 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable react/no-array-index-key */
 // @ts-check
 import * as React from 'react'
 import {
