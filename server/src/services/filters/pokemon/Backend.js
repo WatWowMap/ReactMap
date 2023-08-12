@@ -253,7 +253,6 @@ module.exports = class PkmnBackend {
    * @returns {import('../../../types').DnfFilter[]}
    */
   buildApiFilter() {
-    const results = /** @type {import('../../../types').DnfFilter[]} */ ([])
     const {
       enabled: _enabled,
       size: _size,
@@ -271,13 +270,12 @@ module.exports = class PkmnBackend {
     } = this.filter
     const pokemon = this.id === 'global' ? undefined : [this.id]
     if (this.mods.onlyLegacy) {
-      results.push(...dnfifyIvFilter(adv, pokemon))
-      return results
+      return dnfifyIvFilter(adv, pokemon)
     }
     if (!this.filterKeys.size) {
-      results.push({ pokemon, iv: [-1, 100] })
-      return results
+      return [{ pokemon, iv: [-1, 100] }]
     }
+    const results = /** @type {import('../../../types').DnfFilter[]} */ ([])
     if (
       ['iv', 'atk_iv', 'def_iv', 'sta_iv', 'cp', 'level', 'gender'].some((k) =>
         this.filterKeys.has(k),
