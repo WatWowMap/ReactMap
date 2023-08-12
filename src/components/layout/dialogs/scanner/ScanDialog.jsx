@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import { Dialog, DialogContent, Grid, Typography } from '@mui/material'
+import { Dialog, DialogContent, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Header from '@components/layout/general/Header'
@@ -24,7 +24,7 @@ export default function ScanDialog() {
   const handleClose = React.useCallback(() => {
     if (scanNext) return setScanMode('scanNextMode')
     if (scanZone) return setScanMode('scanZoneMode')
-  }, [])
+  }, [scanNext, scanZone])
 
   return (
     <Dialog
@@ -33,12 +33,10 @@ export default function ScanDialog() {
       maxWidth="xs"
     >
       <Header titles={[`scan_${scanMode}_title`]} action={handleClose} />
-      <DialogContent>
-        <Grid item style={{ textAlign: 'center' }}>
-          <Typography variant="subtitle1" align="center">
-            {t(`scan_${scanMode}`)}
-          </Typography>
-        </Grid>
+      <DialogContent className="flex-center" sx={{ mt: 2 }}>
+        <Typography variant="subtitle1" align="center">
+          {t(`scan_${scanMode}`)}
+        </Typography>
       </DialogContent>
       <Footer
         role="alertdialog"
