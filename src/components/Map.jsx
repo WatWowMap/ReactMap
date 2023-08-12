@@ -9,7 +9,6 @@ import useCooldown from '@hooks/useCooldown'
 
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
-import Webhook from './layout/dialogs/webhooks/Webhook'
 import ClientError from './layout/dialogs/ClientError'
 import { GenerateCells } from './tiles/S2Cell'
 
@@ -32,7 +31,6 @@ export default function Map({
   serverSettings: {
     config: { map: config },
     Icons,
-    webhooks,
   },
   params,
 }) {
@@ -56,7 +54,6 @@ export default function Map({
   const icons = useStore((state) => state.icons)
   const userSettings = useStore((state) => state.userSettings)
 
-  const [webhookMode, setWebhookMode] = useState(false)
   const [manualParams, setManualParams] = useState(params)
   const [error, setError] = useState('')
   const [windowState, setWindowState] = useState(true)
@@ -121,152 +118,131 @@ export default function Map({
       {settings.navigationControls === 'leaflet' && (
         <ZoomControl position="bottomright" />
       )}
-      {webhooks && webhookMode ? (
-        <Webhook
-          map={map}
-          webhookMode={webhookMode}
-          setWebhookMode={setWebhookMode}
-          Icons={Icons}
-        />
-      ) : (
-        Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(
-          ([category, value]) => {
-            let enabled = false
+      {Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(
+        ([category, value]) => {
+          let enabled = false
 
-            switch (category) {
-              case 'scanAreas':
-                if (
-                  (filters[category] && filters[category].enabled) ||
-                  webhookMode === 'areas'
-                ) {
-                  enabled = true
-                }
-                break
-              case 'gyms':
-                if (
-                  ((filters[category].allGyms && value.allGyms) ||
-                    (filters[category].raids && value.raids) ||
-                    (filters[category].exEligible && value.exEligible) ||
-                    (filters[category].inBattle && value.inBattle) ||
-                    (filters[category].arEligible && value.arEligible) ||
-                    (filters[category].gymBadges && value.gymBadges)) &&
-                  !webhookMode
-                ) {
-                  enabled = true
-                }
-                break
-              case 'nests':
-                if (
-                  ((filters[category].pokemon && value.pokemon) ||
-                    (filters[category].polygons && value.polygons)) &&
-                  !webhookMode
-                ) {
-                  enabled = true
-                }
-                break
-              case 'pokestops':
-                if (
-                  ((filters[category].allPokestops && value.allPokestops) ||
-                    (filters[category].lures && value.lures) ||
-                    (filters[category].invasions && value.invasions) ||
-                    (filters[category].quests && value.quests) ||
-                    (filters[category].eventStops && value.eventStops) ||
-                    (filters[category].arEligible && value.arEligible)) &&
-                  !webhookMode
-                ) {
-                  enabled = true
-                }
-                break
-              case 's2cells':
-                if (
-                  filters[category] &&
-                  filters[category]?.enabled &&
-                  filters[category]?.cells?.length &&
-                  value &&
-                  !webhookMode
-                ) {
-                  enabled = true
-                }
-                break
-              default:
-                if (
-                  filters[category] &&
-                  filters[category].enabled &&
-                  value &&
-                  !webhookMode
-                ) {
-                  enabled = true
-                }
-                break
-            }
-            if (enabled && !error) {
-              Utility.analytics(
-                'Data',
-                `${category} being fetched`,
-                category,
-                true,
-              )
-              if (category === 's2cells') {
-                return (
-                  <GenerateCells
-                    key={category}
-                    tileStyle={tileLayer?.style || 'light'}
-                    onMove={onMove}
-                  />
-                )
+          switch (category) {
+            case 'scanAreas':
+              if (filters[category] && filters[category].enabled) {
+                enabled = true
               }
+              break
+            case 'gyms':
+              if (
+                (filters[category].allGyms && value.allGyms) ||
+                (filters[category].raids && value.raids) ||
+                (filters[category].exEligible && value.exEligible) ||
+                (filters[category].inBattle && value.inBattle) ||
+                (filters[category].arEligible && value.arEligible) ||
+                (filters[category].gymBadges && value.gymBadges)
+              ) {
+                enabled = true
+              }
+              break
+            case 'nests':
+              if (
+                (filters[category].pokemon && value.pokemon) ||
+                (filters[category].polygons && value.polygons)
+              ) {
+                enabled = true
+              }
+              break
+            case 'pokestops':
+              if (
+                (filters[category].allPokestops && value.allPokestops) ||
+                (filters[category].lures && value.lures) ||
+                (filters[category].invasions && value.invasions) ||
+                (filters[category].quests && value.quests) ||
+                (filters[category].eventStops && value.eventStops) ||
+                (filters[category].arEligible && value.arEligible)
+              ) {
+                enabled = true
+              }
+              break
+            case 's2cells':
+              if (
+                filters[category] &&
+                filters[category]?.enabled &&
+                filters[category]?.cells?.length &&
+                value
+              ) {
+                enabled = true
+              }
+              break
+            default:
+              if (filters[category] && filters[category].enabled && value) {
+                enabled = true
+              }
+              break
+          }
+          if (enabled && !error) {
+            Utility.analytics(
+              'Data',
+              `${category} being fetched`,
+              category,
+              true,
+            )
+            if (category === 's2cells') {
               return (
-                <QueryData
-                  key={`${category}-${Object.values(
-                    userSettings[userSettingsCategory(category)] || {},
-                  ).join('')}-${Object.values(icons).join('')}`}
-                  sizeKey={
-                    filters[category].filter
-                      ? Object.values(filters[category].filter)
-                          .map((x) => (x ? x.size : 'md'))
-                          .join(',')
-                      : 'md'
-                  }
-                  bounds={Utility.getQueryArgs(map)}
-                  onMove={onMove}
-                  perms={value}
-                  map={map}
-                  category={category}
-                  config={config}
-                  Icons={Icons}
-                  staticFilters={staticFilters[category].filter}
-                  userIcons={icons}
-                  userSettings={
-                    userSettings[userSettingsCategory(category)] || {}
-                  }
-                  filters={filters[category]}
-                  onlyAreas={
-                    (filters?.scanAreas?.filterByAreas &&
-                      filters?.scanAreas?.filter?.areas) ||
-                    []
-                  }
+                <GenerateCells
+                  key={category}
                   tileStyle={tileLayer?.style || 'light'}
-                  clusteringRules={
-                    config?.clustering?.[category] || {
-                      zoomLimit: config.minZoom,
-                      forcedLimit: 10000,
-                    }
-                  }
-                  staticUserSettings={staticUserSettings[category]}
-                  params={manualParams}
-                  setParams={setManualParams}
-                  timeOfDay={timeOfDay}
-                  isMobile={isMobile}
-                  setError={setError}
-                  active={active}
+                  onMove={onMove}
                 />
               )
             }
-            return null
-          },
-        )
+            return (
+              <QueryData
+                key={`${category}-${Object.values(
+                  userSettings[userSettingsCategory(category)] || {},
+                ).join('')}-${Object.values(icons).join('')}`}
+                sizeKey={
+                  filters[category].filter
+                    ? Object.values(filters[category].filter)
+                        .map((x) => (x ? x.size : 'md'))
+                        .join(',')
+                    : 'md'
+                }
+                bounds={Utility.getQueryArgs(map)}
+                onMove={onMove}
+                perms={value}
+                map={map}
+                category={category}
+                config={config}
+                Icons={Icons}
+                staticFilters={staticFilters[category].filter}
+                userIcons={icons}
+                userSettings={
+                  userSettings[userSettingsCategory(category)] || {}
+                }
+                filters={filters[category]}
+                onlyAreas={
+                  (filters?.scanAreas?.filterByAreas &&
+                    filters?.scanAreas?.filter?.areas) ||
+                  []
+                }
+                tileStyle={tileLayer?.style || 'light'}
+                clusteringRules={
+                  config?.clustering?.[category] || {
+                    zoomLimit: config.minZoom,
+                    forcedLimit: 10000,
+                  }
+                }
+                staticUserSettings={staticUserSettings[category]}
+                params={manualParams}
+                setParams={setManualParams}
+                timeOfDay={timeOfDay}
+                isMobile={isMobile}
+                setError={setError}
+                active={active}
+              />
+            )
+          }
+          return null
+        },
       )}
-      <Nav webhookMode={webhookMode} setWebhookMode={setWebhookMode} />
+      <Nav />
       <ClientError error={error} />
     </>
   )

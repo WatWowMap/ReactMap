@@ -33,6 +33,7 @@ import {
 } from '@hooks/useStore'
 
 import FAIcon from './general/FAIcon'
+import { setModeBtn, useWebhookStore } from './dialogs/webhooks/store'
 
 /** @typedef {keyof ReturnType<typeof useLayoutStore['getState']> | keyof ReturnType<typeof useScanStore['getState']>} Keys */
 
@@ -54,7 +55,20 @@ const DEFAULT = {
   search: false,
 }
 
-export default function FloatingButtons({ webhookMode, setWebhookMode }) {
+/** @param {Keys} name */
+const handleClick = (name) => () => {
+  switch (name) {
+    case 'scanZoneMode':
+    case 'scanNextMode':
+      return useScanStore.setState((prev) => ({
+        [name]: prev[name] === 'setLocation' ? '' : 'setLocation',
+      }))
+    default:
+      return useLayoutStore.setState({ [name]: true })
+  }
+}
+
+export default function FloatingButtons() {
   const { t } = useTranslation()
   const { data } = useQuery(FAB_BUTTONS, {
     fetchPolicy: 'cache-first',
@@ -68,6 +82,7 @@ export default function FloatingButtons({ webhookMode, setWebhookMode }) {
   )
 
   const isMobile = useStatic((s) => s.isMobile)
+  const webhookMode = useWebhookStore((s) => s.mode)
 
   const scanNextMode = useScanStore((s) => s.scanNextMode)
   const scanZoneMode = useScanStore((s) => s.scanZoneMode)
@@ -84,24 +99,25 @@ export default function FloatingButtons({ webhookMode, setWebhookMode }) {
     [fabButtons.donationButton],
   )
 
-  const handleClick = React.useCallback(
-    (/** @type {Keys} */ name) => () => {
-      switch (name) {
-        case 'scanZoneMode':
-        case 'scanNextMode':
-          return useScanStore.setState((prev) => ({
-            [name]: prev[name] === 'setLocation' ? '' : 'setLocation',
-          }))
-        default:
-          return useLayoutStore.setState({ [name]: true })
-      }
-    },
-    [],
-  )
-
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'medium'
   const disabled = !!webhookMode || !!scanNextMode || !!scanZoneMode
+
+  const handleNavBtn = React.useCallback(
+    (/** @type {'zoomIn' | 'zoomOut' | 'locate'} */ name) => () => {
+      switch (name) {
+        case 'zoomIn':
+          return map.zoomIn()
+        case 'zoomOut':
+          return map.zoomOut()
+        case 'locate':
+          return lc._onClick()
+        default:
+          break
+      }
+    },
+    [map],
+  )
 
   React.useEffect(() => {
     DomEvent.disableClickPropagation(ref.current)
@@ -144,7 +160,7 @@ export default function FloatingButtons({ webhookMode, setWebhookMode }) {
         <Fab
           color="secondary"
           size={fabSize}
-          onClick={() => setWebhookMode('open')}
+          onClick={setModeBtn('open')}
           title={selectedWebhook}
           disabled={disabled}
         >
@@ -189,7 +205,7 @@ export default function FloatingButtons({ webhookMode, setWebhookMode }) {
           <Fab
             color="secondary"
             size={fabSize}
-            onClick={() => lc._onClick()}
+            onClick={handleNavBtn('locate')}
             title={t('use_my_location')}
           >
             <MyLocation color={color} fontSize={iconSize} />
@@ -197,7 +213,7 @@ export default function FloatingButtons({ webhookMode, setWebhookMode }) {
           <Fab
             color="secondary"
             size={fabSize}
-            onClick={() => map.zoomIn()}
+            onClick={handleNavBtn('zoomIn')}
             title={t('zoom_in')}
           >
             <ZoomIn fontSize={iconSize} sx={{ color: 'white' }} />
@@ -205,7 +221,7 @@ export default function FloatingButtons({ webhookMode, setWebhookMode }) {
           <Fab
             color="secondary"
             size={fabSize}
-            onClick={() => map.zoomOut()}
+            onClick={handleNavBtn('zoomOut')}
             title={t('zoom_out')}
           >
             <ZoomOut fontSize={iconSize} sx={{ color: 'white' }} />
@@ -217,7 +233,7 @@ export default function FloatingButtons({ webhookMode, setWebhookMode }) {
           <Fab
             color="primary"
             size={fabSize}
-            onClick={() => setWebhookMode('open')}
+            onClick={setModeBtn('open')}
             title={t('save')}
           >
             <Save fontSize={iconSize} sx={{ color: 'white' }} />

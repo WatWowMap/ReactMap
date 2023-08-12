@@ -1,10 +1,11 @@
 /* eslint-disable no-nested-ternary */
 import { useState } from 'react'
 import extend from 'extend'
-import * as Sentry from '@sentry/react'
+import { setUser } from '@sentry/react'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
+import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
 
 export default function useConfig(serverSettings, params) {
   const [state, setState] = useState({ set: false, zoom: 10, location: [0, 0] })
@@ -18,7 +19,7 @@ export default function useConfig(serverSettings, params) {
       'Permissions',
       true,
     )
-    Sentry.setUser({
+    setUser({
       username: serverSettings.user.username,
       id:
         serverSettings.user.discordId ||
@@ -123,7 +124,10 @@ export default function useConfig(serverSettings, params) {
       timeOfDay: Utility.timeCheck(...location),
       Icons: serverSettings.Icons,
       config: serverSettings.config,
-      webhookData: serverSettings.webhooks,
+    })
+
+    useWebhookStore.setState({
+      data: serverSettings.webhooks,
     })
 
     useStore.setState({

@@ -17,8 +17,6 @@ import WebhookAdvanced from '../dialogs/webhooks/WebhookAdv'
 import AdvSearch from '../dialogs/filters/AdvSearch'
 
 export default function Menu({
-  isTablet,
-  isMobile,
   category,
   Tile,
   webhookCategory,
@@ -31,6 +29,9 @@ export default function Menu({
   extraButtons = [],
 }) {
   Utility.analytics(`/advanced/${category}`)
+
+  const isMobile = useStatic((s) => s.isMobile)
+  const isTablet = useStatic((s) => s.isTablet)
 
   const { setMenus, setAdvMenu } = useStore.getState()
   const menus = useStore((state) => state.menus)

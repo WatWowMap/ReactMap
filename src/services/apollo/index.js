@@ -5,7 +5,7 @@ import AbortableLink from './AbortableLink'
 
 const abortableLink = new AbortableLink()
 
-export default new ApolloClient({
+const apolloClient = new ApolloClient({
   uri: '/graphql',
   link: abortableLink.concat(createHttpLink()),
   // @ts-ignore
@@ -78,3 +78,5 @@ export default new ApolloClient({
     },
   }),
 })
+
+export default apolloClient

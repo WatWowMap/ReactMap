@@ -1,13 +1,13 @@
-/* eslint-disable max-len */
-import React, { useState, useEffect, useMemo } from 'react'
+// @ts-check
+import * as React from 'react'
 import Person from '@mui/icons-material/Person'
-import { DialogContent, Dialog, AppBar, Tabs, Tab } from '@mui/material'
+import { DialogContent, AppBar, Tabs, Tab, Collapse } from '@mui/material'
 
 import { useTranslation, Trans } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
 import Query from '@services/Query'
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
 import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 
@@ -15,48 +15,43 @@ import Footer from '@components/layout/general/Footer'
 import TabPanel from '@components/layout/general/TabPanel'
 import Header from '@components/layout/general/Header'
 import NewPokemon from './tiles/WebhookTile'
-import Human from './Human'
+import Human from './human'
 import Tracked from './Tracked'
 import Menu from '../../general/Menu'
 import WebhookError from './Error'
 import ProfileEditing from './ProfileEditing'
+import { setMode, setSend, useWebhookStore } from './store'
 
-export default function Manage({
-  Icons,
-  isMobile,
-  isTablet,
-  selectedWebhook,
-  setSelectedWebhook,
-  setWebhookMode,
-  webhookMode,
-  selectedAreas,
-  setSelectedAreas,
-  webhookLocation,
-  setWebhookLocation,
-  webhookData,
-  setWebhookData,
-  handleWebhookClose,
-}) {
+export default function Manage() {
+  const Icons = useStatic((s) => s.Icons)
+
+  const webhookData = useWebhookStore((s) => s.data)
+  const selectedWebhook = useStore((s) => s.selectedWebhook)
+
   const { t } = useTranslation()
   const [syncWebhook, { data }] = useLazyQuery(Query.webhook('allProfiles'), {
     fetchPolicy: 'no-cache',
   })
 
   const staticFilters = useStatic((s) => s.filters)
-  const { invasions } = useStatic((s) => s.masterfile)
-  const { map } = useStatic((s) => s.config)
-  const setWebhookAlert = useStatic((state) => state.setWebhookAlert)
-  const poracleFilters = useMemo(
+  const invasions = useStatic((s) => s.masterfile.invasions)
+  const feedbackLink = useStatic((s) => s.config.map.feedbackLink)
+
+  const send = useWebhookStore((s) => s.send)
+
+  const poracleFilters = React.useMemo(
     () =>
       Poracle.filterGenerator(
         webhookData[selectedWebhook],
         staticFilters,
         invasions,
       ),
-    [],
+    [selectedWebhook],
   )
-  const [tabValue, setTabValue] = useState(0)
-  const [addNew, setAddNew] = useState(false)
+
+  const [tabValue, setTabValue] = React.useState(0)
+  const [addNew, setAddNew] = React.useState(false)
+
   const filteredData = Object.keys(
     webhookData[selectedWebhook]?.info || {},
   ).filter(
@@ -73,69 +68,80 @@ export default function Manage({
 
   Utility.analytics(
     'Webhook',
-    `${webhookCategory} Webhook Page`,
-    webhookCategory,
+    // `${webhookCategory} Webhook Page`,
+    // webhookCategory,
     true,
   )
 
-  const [tempFilters, setTempFilters] = useState(
+  const [tempFilters, setTempFilters] = React.useState(
     poracleFilters[webhookCategory],
   )
-  const [send, setSend] = useState(false)
 
-  const footerButtons = [
-    {
-      name: tabValue ? (
-        <Trans i18nKey="add_new">
-          {{ category: t(filteredData[tabValue]) }}
-        </Trans>
-      ) : (
-        t('manage_profiles')
-      ),
-      action: () => setAddNew(true),
-      key: 'addNew',
-      disabled: !webhookData[selectedWebhook]?.human,
+  const footerButtons = React.useMemo(
+    () => [
+      {
+        name: tabValue ? (
+          <Trans i18nKey="add_new">
+            {{ category: t(filteredData[tabValue]) }}
+          </Trans>
+        ) : (
+          t('manage_profiles')
+        ),
+        action: () => setAddNew(true),
+        key: 'addNew',
+        disabled: !webhookData[selectedWebhook]?.human,
+      },
+      {
+        name: 'close',
+        action: setMode,
+        icon: 'Close',
+        color: 'primary',
+      },
+      ...(feedbackLink
+        ? [
+            {
+              name: 'feedback',
+              action: () => useLayoutStore.setState({ feedback: true }),
+              icon: 'BugReport',
+              disabled: !webhookData[selectedWebhook].human,
+              color: 'success',
+            },
+          ]
+        : []),
+    ],
+    [],
+  )
+
+  const handleClose = React.useCallback(
+    (save) => {
+      if (addNew) {
+        setAddNew(false)
+        if (save === 'profiles') {
+          syncWebhook({
+            variables: {
+              category: 'allProfiles',
+              data: null,
+              status: 'GET',
+              name: selectedWebhook,
+            },
+          })
+        } else if (save) {
+          setSend(true)
+        } else {
+          setTempFilters(poracleFilters[webhookCategory])
+        }
+      } else {
+        setMode()
+      }
     },
-    {
-      name: 'close',
-      action: handleWebhookClose,
-      icon: 'Close',
-      color: 'primary',
-    },
-  ]
+    [selectedWebhook, webhookCategory, poracleFilters, addNew],
+  )
 
-  if (map.feedbackLink) {
-    footerButtons.unshift({
-      name: 'feedback',
-      action: () => useLayoutStore.setState({ feedback: true }),
-      icon: 'BugReport',
-      disabled: !webhookData[selectedWebhook].human,
-      color: 'success',
-    })
-  }
-
-  const handleClose = (save) => {
-    setAddNew(false)
-    if (save === 'profiles') {
-      syncWebhook({
-        variables: {
-          category: 'allProfiles',
-          data: null,
-          status: 'GET',
-          name: selectedWebhook,
-        },
-      })
-    } else if (save) {
-      setSend(true)
-    } else {
-      setTempFilters(poracleFilters[webhookCategory])
-    }
-  }
-
-  useEffect(() => {
+  React.useEffect(() => {
     if (tabValue) {
       setTempFilters(poracleFilters[webhookCategory])
     } else {
+      // Syncs when back on the human tab
       syncWebhook({
         variables: {
           category: 'allProfiles',
@@ -147,15 +153,19 @@ export default function Manage({
     }
   }, [tabValue])
 
-  useEffect(() => {
+  React.useEffect(() => {
+    console.log(webhookData, selectedWebhook, data)
+
     if (data?.webhook) {
-      setWebhookData({
-        ...webhookData,
-        [selectedWebhook]: {
-          ...webhookData[selectedWebhook],
-          ...data.webhook,
+      useWebhookStore.setState((prev) => ({
+        data: {
+          ...prev.data,
+          [selectedWebhook]: {
+            ...prev.data[selectedWebhook],
+            ...data.webhook,
+          },
         },
-      })
+      }))
     }
   }, [data])
 
@@ -163,96 +173,62 @@ export default function Manage({
     <>
       <Header
         names={[selectedWebhook]}
-        action={handleWebhookClose}
+        action={handleClose}
         titles={['manage_webhook']}
       />
-      <AppBar position="static">
-        <Tabs
-          value={tabValue}
-          onChange={(e, newValue) => setTabValue(newValue)}
-        >
-          {filteredData.map((each) => (
-            <Tab
-              key={each}
-              icon={
-                each === 'human' ? (
-                  <Person />
+      <Collapse in={!addNew}>
+        <AppBar position="static">
+          <Tabs
+            value={tabValue}
+            onChange={(e, newValue) => setTabValue(newValue)}
+          >
+            {filteredData.map((each) => (
+              <Tab
+                key={each}
+                icon={
+                  each === 'human' ? (
+                    <Person />
+                  ) : (
+                    <img
+                      src={Icons.getMisc(each)}
+                      style={{ maxWidth: 20, height: 'auto' }}
+                      alt={each}
+                    />
+                  )
+                }
+                style={{ minWidth: 5 }}
+              />
+            ))}
+          </Tabs>
+        </AppBar>
+        <DialogContent sx={{ padding: 0, height: { xs: '100%', sm: '70vh' } }}>
+          {webhookData[selectedWebhook].human && !poracleFilters.error ? (
+            filteredData.map((key, i) => (
+              <TabPanel value={tabValue} index={i} key={key} virtual>
+                {key === 'human' ? (
+                  <Human />
                 ) : (
-                  <img
-                    src={Icons.getMisc(each)}
-                    style={{ maxWidth: 20, height: 'auto' }}
-                    alt={each}
+                  <Tracked
+                    category={key}
+                    selectedWebhook={selectedWebhook}
+                    tempFilters={tempFilters}
+                    setTempFilters={setTempFilters}
+                    send={send}
                   />
-                )
-              }
-              style={{ minWidth: 5 }}
-            />
-          ))}
-        </Tabs>
-      </AppBar>
-      <DialogContent style={{ padding: 0, height: isMobile ? '100%' : '70vh' }}>
-        {webhookData[selectedWebhook].human && !poracleFilters.error ? (
-          filteredData.map((key, i) => (
-            <TabPanel value={tabValue} index={i} key={key} virtual>
-              {key === 'human' ? (
-                <Human
-                  t={t}
-                  isMobile={isMobile}
-                  webhookData={webhookData}
-                  setWebhookData={setWebhookData}
-                  webhookMode={webhookMode}
-                  setWebhookMode={setWebhookMode}
-                  webhookLocation={webhookLocation}
-                  setWebhookLocation={setWebhookLocation}
-                  selectedAreas={selectedAreas}
-                  setSelectedAreas={setSelectedAreas}
-                  selectedWebhook={selectedWebhook}
-                  setSelectedWebhook={setSelectedWebhook}
-                  setWebhookAlert={setWebhookAlert}
-                  addNew={addNew}
-                />
-              ) : (
-                <Tracked
-                  t={t}
-                  Icons={Icons}
-                  category={key}
-                  isMobile={isMobile}
-                  webhookData={webhookData}
-                  setWebhookData={setWebhookData}
-                  selectedWebhook={selectedWebhook}
-                  tempFilters={tempFilters}
-                  setTempFilters={setTempFilters}
-                  send={send}
-                  setSend={setSend}
-                  Poracle={Poracle}
-                  setWebhookAlert={setWebhookAlert}
-                  addNew={addNew}
-                />
-              )}
-            </TabPanel>
-          ))
-        ) : (
-          <WebhookError selectedWebhook={selectedWebhook}>
-            {poracleFilters.error}
-          </WebhookError>
-        )}
-      </DialogContent>
-      <Footer options={footerButtons} role="webhook_footer" />
-      <Dialog
-        fullWidth={!isMobile}
-        fullScreen={isMobile}
-        maxWidth="md"
-        open={addNew}
-        onClose={handleClose}
-      >
+                )}
+              </TabPanel>
+            ))
+          ) : (
+            <WebhookError selectedWebhook={selectedWebhook}>
+              {poracleFilters.error}
+            </WebhookError>
+          )}
+        </DialogContent>
+      </Collapse>
+      {/* 
+      <Collapse in={addNew}>
         {webhookCategory === 'human' ? (
-          <ProfileEditing
-            webhookData={webhookData}
-            setWebhookData={setWebhookData}
-            selectedWebhook={selectedWebhook}
-            handleClose={handleClose}
-            isMobile={isMobile}
-          />
+          <ProfileEditing handleClose={handleClose} />
         ) : (
           <Menu
             category={Poracle.getMapCategory(webhookCategory)}
@@ -263,8 +239,6 @@ export default function Manage({
             setTempFilters={setTempFilters}
             title="webhook_selection"
             titleAction={() => handleClose(false)}
-            isMobile={isMobile}
-            isTablet={isTablet}
             Tile={NewPokemon}
             extraButtons={[
               {
@@ -276,7 +250,9 @@ export default function Manage({
             ]}
           />
         )}
-      </Dialog>
+      </Collapse> */}
+
+      <Footer options={footerButtons} role="webhook_footer" />
     </>
   )
 }

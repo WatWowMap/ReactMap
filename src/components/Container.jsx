@@ -8,6 +8,8 @@ import { useStatic } from '@hooks/useStore'
 
 import Map from './Map'
 import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
+import DraggableMarker from './layout/dialogs/webhooks/Draggable'
+import WebhookAreaSelection from './layout/dialogs/webhooks/AreaSelection'
 
 export default function Container({ serverSettings, params, location, zoom }) {
   useGenerate()
@@ -41,6 +43,8 @@ export default function Container({ serverSettings, params, location, zoom }) {
       )}
       <ScanOnDemand mode="scanNext" />
       <ScanOnDemand mode="scanZone" />
+      <DraggableMarker />
+      <WebhookAreaSelection />
     </MapContainer>
   )
 }

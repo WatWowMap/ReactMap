@@ -17,6 +17,7 @@ export function DialogWrapper({
   dialog,
   children,
   variant = 'large',
+  maxWidth,
   ...props
 }) {
   const open = useLayoutStore((s) => s[dialog])
@@ -32,7 +33,9 @@ export function DialogWrapper({
       open={!!open}
       fullScreen={isMobile && variant === 'large'}
       fullWidth={!isMobile && variant === 'large'}
-      maxWidth={variant === 'small' ? (isMobile ? 'sm' : 'xs') : undefined}
+      maxWidth={
+        variant === 'small' && !maxWidth ? (isMobile ? 'sm' : 'xs') : maxWidth
+      }
       onClose={handleClose}
       {...props}
     >

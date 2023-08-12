@@ -1,4 +1,5 @@
-import React, { useState, useRef, useMemo, useEffect } from 'react'
+// @ts-check
+import * as React from 'react'
 import {
   Grid,
   Button,
@@ -7,56 +8,48 @@ import {
   InputAdornment,
   FormControl,
 } from '@mui/material'
-import { Circle, Marker, Popup } from 'react-leaflet'
+import { Circle, Marker, Popup, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import fallbackIcon from '@components/markers/fallback'
+import { useWebhookStore } from './store'
 
-export default function DraggableMarker({
-  map,
-  setWebhookMode,
-  webhookLocation,
-  setWebhookLocation,
-}) {
-  const [position, setPosition] = useState(webhookLocation)
-  const [radius, setRadius] = useState(0)
+export default function DraggableMarker() {
+  const map = useMap()
   const { t } = useTranslation()
-  const markerRef = useRef(null)
-  const popupRef = useRef(null)
-  const eventHandlers = useMemo(
-    () => ({
-      dragend() {
-        const marker = markerRef.current
-        if (marker) {
-          const { lat, lng } = marker.getLatLng()
-          map.flyTo([lat, lng])
-          setPosition([lat, lng])
-          const popup = popupRef.current
-          if (popup) {
-            popup.openOn(map)
-          }
-        }
-      },
-    }),
-    [],
-  )
 
-  useEffect(() => {
-    const marker = markerRef.current
-    if (marker) {
-      marker.openPopup()
+  const webhookLocation = useWebhookStore((s) => s.location)
+  const webhookMode = useWebhookStore((s) => s.mode)
+
+  const [radius, setRadius] = React.useState(/** @type {number | ''} */ (1000))
+  const [position, setPosition] = React.useState(webhookLocation)
+
+  React.useEffect(() => {
+    if (webhookLocation) {
+      setPosition(webhookLocation)
     }
-  }, [])
+  }, [webhookLocation])
 
+  if (webhookMode !== 'location') return null
   return (
     <>
       <Marker
         draggable
-        eventHandlers={eventHandlers}
-        position={position}
-        ref={markerRef}
+        eventHandlers={{
+          dragend({ target, popup }) {
+            if (target) {
+              const { lat, lng } = target.getLatLng()
+              map.flyTo([lat, lng])
+              useWebhookStore.setState({ location: [lat, lng] })
+            }
+            if (popup) {
+              popup.openOn(map)
+            }
+          },
+        }}
+        position={webhookLocation}
         icon={fallbackIcon()}
       >
-        <Popup minWidth={90} maxWidth={150} ref={popupRef}>
+        <Popup minWidth={90} maxWidth={150}>
           <Grid
             container
             alignItems="center"
@@ -73,8 +66,9 @@ export default function DraggableMarker({
               <FormControl variant="outlined">
                 <OutlinedInput
                   value={radius}
+                  type="number"
                   onChange={(e) =>
-                    setRadius(e.target.value.replace(/[^0-9.]/g, ''))
+                    setRadius(+e.target.value.replace(/[^0-9.]/g, '') || '')
                   }
                   endAdornment={
                     <InputAdornment position="end">{t('m')}</InputAdornment>
@@ -88,8 +82,10 @@ export default function DraggableMarker({
                 color="secondary"
                 variant="contained"
                 onClick={() => {
-                  setWebhookMode('open')
-                  setWebhookLocation(position)
+                  useWebhookStore.setState({
+                    mode: 'open',
+                    location: position,
+                  })
                 }}
               >
                 {t('click_to_select')}
@@ -98,7 +94,7 @@ export default function DraggableMarker({
           </Grid>
         </Popup>
       </Marker>
-      <Circle radius={radius} center={position} />
+      <Circle radius={radius || 0} center={position} />
     </>
   )
 }

@@ -1,4 +1,5 @@
-import React, { useEffect, useCallback, memo } from 'react'
+// @ts-check
+import * as React from 'react'
 import LocationOn from '@mui/icons-material/LocationOn'
 import MyLocation from '@mui/icons-material/MyLocation'
 import {
@@ -9,44 +10,41 @@ import {
   CircularProgress,
   Autocomplete,
 } from '@mui/material'
-
 import { useLazyQuery } from '@apollo/client'
 import { useMapEvents } from 'react-leaflet'
+import { useTranslation } from 'react-i18next'
 
 import Query from '@services/Query'
 import Utility from '@services/Utility'
 import useLocation from '@hooks/useLocation'
+import { useStore } from '@hooks/useStore'
 
-const Location = ({
-  setWebhookMode,
-  t,
-  syncWebhook,
-  addressFormat,
-  currentHuman,
-  webhookLocation,
-  selectedWebhook,
-  hasNominatim,
-}) => {
-  const map = useMapEvents({
-    locationfound: (location) => {
-      if (
-        location.latitude !== webhookLocation[0] &&
-        location.longitude !== webhookLocation[1]
-      ) {
-        handleLocationChange([location.latitude, location.longitude])
-      }
-    },
-  })
+import { setModeBtn, useWebhookStore } from './store'
 
-  const { lc, color } = useLocation(map)
-  const [setSearch, { data, previousData, loading }] = useLazyQuery(
+const Location = ({ syncWebhook }) => {
+  const { lc, color } = useLocation()
+  const { t } = useTranslation()
+
+  const selectedWebhook = useStore((s) => s.selectedWebhook)
+
+  const webhookLocation = useWebhookStore((s) => s.location)
+  const human = useWebhookStore((s) => s.data[selectedWebhook].human)
+  const addressFormat = useWebhookStore(
+    (s) => s.data[selectedWebhook].addressFormat,
+  )
+  const hasNominatim = useWebhookStore(
+    (s) => s.data[selectedWebhook].hasNominatim,
+  )
+
+  const [execSearch, { data, previousData, loading }] = useLazyQuery(
     Query.geocoder(),
     {
       variables: { search: '', name: selectedWebhook },
     },
   )
 
-  const handleLocationChange = useCallback((location) => {
+  /** @param {number[]} location */
+  const handleLocationChange = (location) => {
     if (location.length) {
       syncWebhook({
         variables: {
@@ -57,20 +55,31 @@ const Location = ({
         },
       })
     }
-  }, [])
+  }
 
-  useEffect(() => {
+  const map = useMapEvents({
+    locationfound: (newLoc) => {
+      const { location } = useWebhookStore.getState()
+      const { lat, lng } = newLoc.latlng
+      if (lat !== location[0] && lng !== location[1]) {
+        handleLocationChange([lat, lng])
+      }
+    },
+  })
+
+  React.useEffect(() => {
     if (
-      webhookLocation[0] !== currentHuman.latitude &&
-      webhookLocation[1] !== currentHuman.longitude
+      webhookLocation[0] !== human.latitude &&
+      webhookLocation[1] !== human.longitude
     ) {
       handleLocationChange(webhookLocation)
     }
   }, [webhookLocation])
 
-  useEffect(() => () => lc.stop(), [])
+  // React.useEffect(() => () => lc.stop(), [])
 
   const fetchedData = data || previousData || { geocoder: [] }
+  console.log(webhookLocation)
 
   return (
     <Grid
@@ -86,7 +95,7 @@ const Location = ({
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Typography variant="body2">
-          {webhookLocation.map((x) => x.toFixed(8)).join(', ')}
+          {webhookLocation.map((x) => x.toFixed(6)).join(', ')}
         </Typography>
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
@@ -105,7 +114,7 @@ const Location = ({
           size="small"
           variant="contained"
           color="primary"
-          onClick={() => setWebhookMode('location')}
+          onClick={setModeBtn('location')}
         >
           {t('choose_on_map')}
         </Button>
@@ -134,7 +143,9 @@ const Location = ({
               label={t('search_location')}
               variant="outlined"
               onChange={(e) =>
-                setSearch({ variables: { search: e.target.value } })
+                execSearch({
+                  variables: { search: e.target.value, name: selectedWebhook },
+                })
               }
               InputProps={{
                 ...params.InputProps,
@@ -167,7 +178,9 @@ const Location = ({
   )
 }
 
-const getEqual = (prev, next) =>
-  prev.webhookLocation.join('') === next.webhookLocation.join('')
+export default Location
 
-export default memo(Location, getEqual)
+// const getEqual = (prev, next) =>
+//   prev.webhookLocation.join('') === next.webhookLocation.join('')
+
+// export default memo(Location, getEqual)

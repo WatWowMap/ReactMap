@@ -3,6 +3,8 @@ import DeleteForever from '@mui/icons-material/DeleteForever'
 import Edit from '@mui/icons-material/Edit'
 import { Grid, Typography, IconButton, Dialog, Checkbox } from '@mui/material'
 
+import Utility from '@services/Utility'
+import Poracle from '@services/Poracle'
 import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 
 export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
@@ -14,14 +16,12 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
     selectedWebhook,
     selected,
     setSelected,
-    Utility,
     tracked,
     setTracked,
     isMobile,
     setSend,
     setTempFilters,
     category,
-    Poracle,
     invasions,
   } = data
   const [editDialog, setEditDialog] = useState(false)

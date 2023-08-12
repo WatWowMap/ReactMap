@@ -1,4 +1,4 @@
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 /**
@@ -118,6 +118,9 @@ export const useStore = create(
  *   searchLoading: boolean,
  *   Icons: InstanceType<typeof import("../services/Icons").default>,
  *   config: object,
+ *   auth: object,
+ *   filters: object,
+ *   masterfile: { invasions: object }
  * }} UseStatic
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
  */
@@ -177,8 +180,6 @@ export const useStatic = create((set) => ({
     message: '',
   },
   setWebhookAlert: (webhookAlert) => set({ webhookAlert }),
-  webhookData: undefined,
-  setWebhookData: (webhookData) => set({ webhookData }),
   timeOfDay: 'day',
   setTimeOfDay: (timeOfDay) => set({ timeOfDay }),
   extraUserFields: [],

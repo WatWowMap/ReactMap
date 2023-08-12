@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState, memo } from 'react'
+import * as React from 'react'
 import { useMutation } from '@apollo/client'
-import { Trans } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
-import Utility from '@services/Utility'
+import Poracle from '@services/Poracle'
 import Query from '@services/Query'
 import { useStatic } from '@hooks/useStore'
 import { Grid, Typography } from '@mui/material'
@@ -10,52 +10,55 @@ import ReactWindow from '@components/layout/general/ReactWindow'
 import AdvSearch from '@components/layout/dialogs/filters/AdvSearch'
 import PokemonTile from './tiles/TrackedTile'
 import Selecting from './Selecting'
+import { useWebhookStore } from './store'
 
 const Tracked = ({
   isMobile,
-  webhookData,
   selectedWebhook,
-  Icons,
   send,
   setSend,
   tempFilters,
   setTempFilters,
-  setWebhookData,
   category,
-  Poracle,
-  setWebhookAlert,
-  t,
 }) => {
+  const { t } = useTranslation()
+  const Icons = useStatic((s) => s.Icons)
+  const webhookData = useWebhookStore((s) => s.data)
+
   const [syncWebhook, { data: newWebhookData }] = useMutation(
     Query.webhook(category),
     {
       fetchPolicy: 'no-cache',
     },
   )
-  const [search, setSearch] = useState('')
-  const [tracked, setTracked] = useState(webhookData[selectedWebhook][category])
-  const [selected, setSelected] = useState({})
-  const [staticInfo] = useState(webhookData[selectedWebhook].info)
-  const { invasions } = useStatic((s) => s.masterfile)
+  const [search, setSearch] = React.useState('')
+  const [tracked, setTracked] = React.useState(
+    webhookData[selectedWebhook][category],
+  )
+  const [selected, setSelected] = React.useState({})
+  const [staticInfo] = React.useState(webhookData[selectedWebhook].info)
+  const { invasions } = React.useStatic((s) => s.masterfile)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (newWebhookData?.webhook?.[category]) {
       setTracked(newWebhookData.webhook[category])
     }
     if (newWebhookData?.webhook?.status === 'error') {
-      setWebhookAlert({
-        open: true,
-        severity: newWebhookData.webhook.status,
-        message: (
-          <Trans i18nKey={newWebhookData.webhook.message}>
-            {{ name: selectedWebhook }}
-          </Trans>
-        ),
+      useStatic.setState({
+        webhookAlert: {
+          open: true,
+          severity: newWebhookData.webhook.status,
+          message: (
+            <Trans i18nKey={newWebhookData.webhook.message}>
+              {{ name: selectedWebhook }}
+            </Trans>
+          ),
+        },
       })
     }
   }, [newWebhookData])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (send) {
       setSend(false)
       setTempFilters(
@@ -81,18 +84,20 @@ const Tracked = ({
     }
   }, [send])
 
-  useEffect(
+  React.useEffect(
     () => () =>
-      setWebhookData({
-        ...webhookData,
-        [selectedWebhook]: {
-          ...webhookData[selectedWebhook],
-          [category]: tracked,
+      useWebhookStore.setState((prev) => ({
+        data: {
+          ...prev.data,
+          [selectedWebhook]: {
+            ...prev.data[selectedWebhook],
+            [category]: tracked,
+          },
         },
-      }),
+      })),
   )
 
-  const profileFiltered = useMemo(
+  const profileFiltered = React.useMemo(
     () =>
       tracked
         .filter(
@@ -165,9 +170,7 @@ const Tracked = ({
             setSend,
             setTempFilters,
             category,
-            Poracle,
             invasions,
-            Utility,
           }}
           Tile={PokemonTile}
         />
@@ -199,18 +202,20 @@ const Tracked = ({
   )
 }
 
-const areEqual = (prev, next) => {
-  const prevSelected = prev.webhookData[prev.selectedWebhook]
-  const nextSelected = next.webhookData[next.selectedWebhook]
-  return (
-    prevSelected[prev.category].length === nextSelected[next.category].length &&
-    prev.addNew === next.addNew &&
-    prevSelected.human.current_profile_no ===
-      nextSelected.human.current_profile_no &&
-    prevSelected.fetched === nextSelected.fetched &&
-    prev.send === next.send &&
-    prev.isMobile === next.isMobile
-  )
-}
+export default Tracked
 
-export default memo(Tracked, areEqual)
+// const areEqual = (prev, next) => {
+//   const prevSelected = prev.webhookData[prev.selectedWebhook]
+//   const nextSelected = next.webhookData[next.selectedWebhook]
+//   return (
+//     prevSelected[prev.category].length === nextSelected[next.category].length &&
+//     prev.addNew === next.addNew &&
+//     prevSelected.human.current_profile_no ===
+//       nextSelected.human.current_profile_no &&
+//     prevSelected.fetched === nextSelected.fetched &&
+//     prev.send === next.send &&
+//     prev.isMobile === next.isMobile
+//   )
+// }
+
+// export default React.memo(Tracked, areEqual)

@@ -11,7 +11,7 @@ import { ApolloProvider } from '@apollo/client'
 import customTheme from '@assets/mui/theme'
 import { globalStyles } from '@assets/mui/global'
 import { useStore } from '@hooks/useStore'
-import client from '@services/apollo'
+import apolloClient from '@services/apollo'
 import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled'
 import { setLoadingText } from '@services/functions/setLoadingText'
 
@@ -72,7 +72,7 @@ export default function App() {
       <React.Suspense fallback={<SetText />}>
         <CssBaseline />
         {globalStyles}
-        <ApolloProvider client={client}>
+        <ApolloProvider client={apolloClient}>
           <ErrorBoundary>
             <BrowserRouter>
               <Config setTheme={setTheme} />

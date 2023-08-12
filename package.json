@@ -121,7 +121,7 @@
     "react-window": "^1.8.9",
     "rtree": "^1.4.2",
     "suncalc": "^1.9.0",
-    "zustand": "^4.0.0-rc.1"
+    "zustand": "^4.4.1"
   },
   "nodemonConfig": {
     "ignore": [

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import * as React from 'react'
 import Clear from '@mui/icons-material/Clear'
 import Edit from '@mui/icons-material/Edit'
 import DeleteForever from '@mui/icons-material/DeleteForever'
@@ -25,6 +25,8 @@ import Query from '@services/Query'
 
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
+import { useStatic, useStore } from '@hooks/useStore'
+import { setData, useWebhookStore } from './store'
 
 const profilesObject = (data) =>
   data
@@ -47,36 +49,32 @@ const profilesObject = (data) =>
       )
     : {}
 
-export default function ProfileEditing({
-  webhookData,
-  setWebhookData,
-  selectedWebhook,
-  handleClose,
-  isMobile,
-}) {
+export default function ProfileEditing({ handleClose }) {
   const { t } = useTranslation()
+
+  const selectedWebhook = useStore((s) => s.selectedWebhook)
+  const isMobile = useStatic((s) => s.isMobile)
+  const webhookData = useWebhookStore((s) => s.data[selectedWebhook])
+
   const [syncWebhook, { data }] = useMutation(Query.webhook('setProfile'), {
     fetchPolicy: 'no-cache',
   })
-  const [profiles, setProfiles] = useState(
-    profilesObject(webhookData[selectedWebhook].profile),
+
+  const [profiles, setProfiles] = React.useState(
+    profilesObject(webhookData.profile),
   )
-  const [copyTo, setCopyTo] = useState(
-    Object.fromEntries(
-      webhookData[selectedWebhook].profile.map((x) => [x.name, x.name]),
-    ),
+  const [copyTo, setCopyTo] = React.useState(
+    Object.fromEntries(webhookData.profile.map((x) => [x.name, x.name])),
   )
-  const [views, setViews] = useState(
-    Object.fromEntries(
-      webhookData[selectedWebhook].profile.map((x) => [x.name, 'profile']),
-    ),
+  const [views, setViews] = React.useState(
+    Object.fromEntries(webhookData.profile.map((x) => [x.name, 'profile'])),
   )
-  const [newSchedule, setNewSchedule] = useState({
+  const [newSchedule, setNewSchedule] = React.useState({
     day: 1,
     hours: '00',
     mins: '00',
   })
-  const [newProfile, setNewProfile] = useState('')
+  const [newProfile, setNewProfile] = React.useState('')
 
   const handleAddProfile = () => {
     setProfiles({
@@ -104,8 +102,9 @@ export default function ProfileEditing({
         name: selectedWebhook,
       },
     })
-    delete profiles[profile]
-    setProfiles({ ...profiles })
+    // eslint-disable-next-line no-unused-vars
+    const { [profile]: _, ...rest } = profiles
+    setProfiles({ ...rest })
   }
 
   const handleCopyProfile = (profile) => {
@@ -120,7 +119,7 @@ export default function ProfileEditing({
         name: selectedWebhook,
       },
     })
-    setViews({ ...views, [profile]: 'profile' })
+    setViews((prev) => ({ ...prev, [profile]: 'profile' }))
   }
 
   const handleAddSchedule = (profile) => {
@@ -132,8 +131,8 @@ export default function ProfileEditing({
         { ...newSchedule, id: active.active_hours.length },
       ],
     }
-    setProfiles({ ...profiles, [profile]: editedProfile })
-    setViews({ ...views, [profile]: 'profile' })
+    setProfiles((prev) => ({ ...prev, [profile]: editedProfile }))
+    setViews((prev) => ({ ...prev, [profile]: 'profile' }))
     syncWebhook({
       variables: {
         category: 'profiles-update',
@@ -176,54 +175,17 @@ export default function ProfileEditing({
   }
 
   const handleCloseMenu = () => {
-    setWebhookData({
-      ...webhookData,
-      [selectedWebhook]: {
-        ...webhookData[selectedWebhook],
-        profile: Object.values(profiles),
-      },
-    })
+    setData(Object.values(profiles), 'profile')
     handleClose('profiles')
   }
 
-  const getInputs = (profile) => {
-    const disabled =
-      webhookData[selectedWebhook].human.current_profile_no ===
-      profiles[profile].profile_no
-    return (
-      <Grid item sm={isMobile ? 6 : 3} style={{ textAlign: 'right' }}>
-        <IconButton
-          onClick={() => setViews({ ...views, [profile]: 'edit' })}
-          size="large"
-        >
-          <Edit />
-        </IconButton>
-        <IconButton
-          onClick={() => setViews({ ...views, [profile]: 'delete' })}
-          disabled={disabled}
-          size="large"
-        >
-          <DeleteForever />
-        </IconButton>
-        <IconButton
-          onClick={() => setViews({ ...views, [profile]: 'copy' })}
-          size="large"
-        >
-          <FileCopy />
-        </IconButton>
-      </Grid>
-    )
-  }
+  const handleViewChange = React.useCallback((profile, view) => {
+    setViews((prev) => ({ ...prev, [profile]: view }))
+  }, [])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (data?.webhook?.profile) {
-      setWebhookData({
-        ...webhookData,
-        [selectedWebhook]: {
-          ...webhookData[selectedWebhook],
-          profile: data.webhook.profile,
-        },
-      })
+      setData(data.webhook.profile, 'profile')
       setProfiles(profilesObject(data.webhook.profile))
     }
   }, [data])
@@ -281,177 +243,208 @@ export default function ProfileEditing({
             style={{ margin: '10px 0', width: '90%', height: 3 }}
           />
           <Grid item xs={12}>
-            {Object.keys(profiles).map((profile, i) => (
-              <Grid
-                key={profile}
-                container
-                spacing={2}
-                justifyContent="center"
-                alignItems="center"
-              >
-                {Boolean(i) && (
-                  <Divider
-                    flexItem
-                    light
-                    style={{ margin: '20px 0', width: '90%', height: 3 }}
-                  />
-                )}
-                {
+            {Object.entries(profiles).map(([profileName, fullProfile], i) => {
+              const disabled =
+                fullProfile.profile_no === webhookData.human.current_profile_no
+              return (
+                <Grid
+                  key={profileName}
+                  container
+                  spacing={2}
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  {Boolean(i) && (
+                    <Divider
+                      flexItem
+                      light
+                      style={{ margin: '20px 0', width: '90%', height: 3 }}
+                    />
+                  )}
                   {
-                    profile: (
-                      <>
-                        <Grid item xs={6} sm={2}>
-                          <Typography variant="h6">{profile}</Typography>
-                        </Grid>
-                        {isMobile && getInputs(profile)}
-                        <Grid item xs={12} sm={6}>
-                          {profiles[profile].active_hours.map((schedule) => (
-                            <Chip
-                              key={schedule.id}
-                              label={`${t(`day_${schedule.day}`)} ${
-                                schedule.hours
-                              }:${String(schedule.mins).padStart(2, '0')}`}
-                              clickable
-                              deleteIcon={<Clear />}
-                              size={isMobile ? 'small' : 'medium'}
-                              color="secondary"
-                              onDelete={() =>
-                                handleRemoveSchedule(profile, schedule.id)
-                              }
-                              style={{ margin: 3 }}
+                    {
+                      profile: (
+                        <>
+                          <Grid item xs={6} sm={2}>
+                            <Typography variant="h6">{profileName}</Typography>
+                          </Grid>
+                          {isMobile && (
+                            <Inputs
+                              disabled={disabled}
+                              handleViewChange={handleViewChange}
+                              profileName={profileName}
                             />
-                          ))}
-                        </Grid>
-                        {!isMobile && getInputs(profile)}
-                      </>
-                    ),
-                    edit: (
-                      <>
-                        <Grid item xs={4}>
-                          <Select
-                            name="day"
-                            value={newSchedule.day}
-                            onChange={handleScheduleAdjustments}
-                            fullWidth
-                          >
-                            {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                              <MenuItem key={day} value={day} dense>
-                                {t(`day_${day}`)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Input
-                            name="time"
-                            color="secondary"
-                            label="new time"
-                            value={`${newSchedule.hours}:${newSchedule.mins}`}
-                            onChange={handleScheduleAdjustments}
-                            variant="outlined"
-                            size="small"
-                            type="time"
-                          />
-                        </Grid>
-                        <Grid item xs={4} sm={2} style={{ textAlign: 'right' }}>
-                          <IconButton
-                            onClick={() =>
-                              setViews({ ...views, [profile]: 'profile' })
-                            }
-                            size="large"
-                          >
-                            <Clear />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleAddSchedule(profile)}
-                            size="large"
-                          >
-                            <Save />
-                          </IconButton>
-                        </Grid>
-                      </>
-                    ),
-                    delete: (
-                      <>
-                        <Grid item xs={6} sm={8}>
-                          <Typography variant="subtitle2" align="center">
-                            {t('confirm_delete')}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={4} sm={2}>
-                          <IconButton
-                            onClick={() =>
-                              setViews({ ...views, [profile]: 'profile' })
-                            }
-                            size="large"
-                          >
-                            <Clear />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleRemoveProfile(profile)}
-                            size="large"
-                          >
-                            <Save />
-                          </IconButton>
-                        </Grid>
-                      </>
-                    ),
-                    copy: (
-                      <>
-                        <Grid item xs={8} sm={7}>
-                          <Typography variant="subtitle2" align="center">
-                            <Trans i18nKey="confirm_copy">{{ profile }}</Trans>
-                          </Typography>
-                        </Grid>
-                        <Grid
-                          item
-                          container
-                          xs={4}
-                          alignItems="center"
-                          justifyContent="center"
-                        >
+                          )}
                           <Grid item xs={12} sm={6}>
+                            {profiles[profileName].active_hours.map(
+                              (schedule) => (
+                                <Chip
+                                  key={schedule.id}
+                                  label={`${t(`day_${schedule.day}`)} ${
+                                    schedule.hours
+                                  }:${String(schedule.mins).padStart(2, '0')}`}
+                                  clickable
+                                  deleteIcon={<Clear />}
+                                  size={isMobile ? 'small' : 'medium'}
+                                  color="secondary"
+                                  onDelete={() =>
+                                    handleRemoveSchedule(
+                                      profileName,
+                                      schedule.id,
+                                    )
+                                  }
+                                  style={{ margin: 3 }}
+                                />
+                              ),
+                            )}
+                          </Grid>
+                          {!isMobile && (
+                            <Inputs
+                              disabled={disabled}
+                              handleViewChange={handleViewChange}
+                              profileName={profileName}
+                            />
+                          )}
+                        </>
+                      ),
+                      edit: (
+                        <>
+                          <Grid item xs={4}>
                             <Select
-                              value={copyTo[profile] || ''}
-                              onChange={(e) =>
-                                setCopyTo({
-                                  ...copyTo,
-                                  [profile]: e.target.value,
-                                })
-                              }
+                              name="day"
+                              value={newSchedule.day}
+                              onChange={handleScheduleAdjustments}
                               fullWidth
                             >
-                              {Object.keys(profiles).map((prof) => (
-                                <MenuItem key={prof} value={prof}>
-                                  {prof}
+                              {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                                <MenuItem key={day} value={day} dense>
+                                  {t(`day_${day}`)}
                                 </MenuItem>
                               ))}
                             </Select>
                           </Grid>
-                          <Grid item xs={12} sm={6}>
+                          <Grid item xs={4}>
+                            <Input
+                              name="time"
+                              color="secondary"
+                              label="new time"
+                              value={`${newSchedule.hours}:${newSchedule.mins}`}
+                              onChange={handleScheduleAdjustments}
+                              variant="outlined"
+                              size="small"
+                              type="time"
+                            />
+                          </Grid>
+                          <Grid
+                            item
+                            xs={4}
+                            sm={2}
+                            style={{ textAlign: 'right' }}
+                          >
                             <IconButton
                               onClick={() =>
-                                setViews({ ...views, [profile]: 'profile' })
+                                setViews({ ...views, [profileName]: 'profile' })
                               }
                               size="large"
                             >
                               <Clear />
                             </IconButton>
                             <IconButton
-                              onClick={() => handleCopyProfile(profile)}
-                              disabled={profile === copyTo[profile]}
+                              onClick={() => handleAddSchedule(profileName)}
                               size="large"
                             >
                               <Save />
                             </IconButton>
                           </Grid>
-                        </Grid>
-                      </>
-                    ),
-                  }[views[profile]]
-                }
-              </Grid>
-            ))}
+                        </>
+                      ),
+                      delete: (
+                        <>
+                          <Grid item xs={6} sm={8}>
+                            <Typography variant="subtitle2" align="center">
+                              {t('confirm_delete')}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={4} sm={2}>
+                            <IconButton
+                              onClick={() =>
+                                setViews({ ...views, [profileName]: 'profile' })
+                              }
+                              size="large"
+                            >
+                              <Clear />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => handleRemoveProfile(profileName)}
+                              size="large"
+                            >
+                              <Save />
+                            </IconButton>
+                          </Grid>
+                        </>
+                      ),
+                      copy: (
+                        <>
+                          <Grid item xs={8} sm={7}>
+                            <Typography variant="subtitle2" align="center">
+                              <Trans i18nKey="confirm_copy">
+                                {{ profile: profileName }}
+                              </Trans>
+                            </Typography>
+                          </Grid>
+                          <Grid
+                            item
+                            container
+                            xs={4}
+                            alignItems="center"
+                            justifyContent="center"
+                          >
+                            <Grid item xs={12} sm={6}>
+                              <Select
+                                value={copyTo[profileName] || ''}
+                                onChange={(e) =>
+                                  setCopyTo({
+                                    ...copyTo,
+                                    [profileName]: e.target.value,
+                                  })
+                                }
+                                fullWidth
+                              >
+                                {Object.keys(profiles).map((prof) => (
+                                  <MenuItem key={prof} value={prof}>
+                                    {prof}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <IconButton
+                                onClick={() =>
+                                  setViews({
+                                    ...views,
+                                    [profileName]: 'profile',
+                                  })
+                                }
+                                size="large"
+                              >
+                                <Clear />
+                              </IconButton>
+                              <IconButton
+                                onClick={() => handleCopyProfile(profileName)}
+                                disabled={profileName === copyTo[profileName]}
+                                size="large"
+                              >
+                                <Save />
+                              </IconButton>
+                            </Grid>
+                          </Grid>
+                        </>
+                      ),
+                    }[views[profileName]]
+                  }
+                </Grid>
+              )
+            })}
           </Grid>
         </Grid>
       </DialogContent>
@@ -468,3 +461,32 @@ export default function ProfileEditing({
     </>
   )
 }
+
+const Inputs = ({ profileName, disabled, handleViewChange }) => (
+  <Grid item sm={6} style={{ textAlign: 'right' }}>
+    <IconButton
+      onClick={() => handleViewChange(profileName, 'edit')}
+      size="large"
+    >
+      <Edit />
+    </IconButton>
+    <IconButton
+      onClick={() => handleViewChange(profileName, 'delete')}
+      disabled={disabled}
+      size="large"
+    >
+      <DeleteForever />
+    </IconButton>
+    <IconButton
+      onClick={() => handleViewChange(profileName, 'copy')}
+      size="large"
+    >
+      <FileCopy />
+    </IconButton>
+  </Grid>
+)
+
+// const currentProfile = useWebhookStore(
+//   (s) => s.data[selectedWebhook].human.current_profile_no,
+// )
+// const disabled = currentProfile === profiles[profile].profile_no

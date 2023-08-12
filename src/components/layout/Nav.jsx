@@ -15,13 +15,13 @@ import MessageOfTheDay from './dialogs/Motd'
 import DonorPage from './dialogs/DonorPage'
 import Feedback from './dialogs/Feedback'
 import ResetFilters from './dialogs/ResetFilters'
-import Notification from './general/Notification'
 import ScanDialog from './dialogs/scanner/ScanDialog'
+import Webhook from './dialogs/webhooks/Webhook'
+import { WebhookNotification } from './dialogs/webhooks/Notification'
 
-export default function Nav({ webhookMode, setWebhookMode }) {
-  const { setWebhookAlert, config } = useStatic.getState()
+export default function Nav() {
+  const { config } = useStatic.getState()
 
-  const webhookAlert = useStatic((s) => s.webhookAlert)
   const isMobile = useStatic((s) => s.isMobile)
   const isTablet = useStatic((s) => s.isTablet)
 
@@ -68,7 +68,7 @@ export default function Nav({ webhookMode, setWebhookMode }) {
   return (
     <>
       <Sidebar toggleDialog={toggleDialog} />
-      <FloatingBtn webhookMode={webhookMode} setWebhookMode={setWebhookMode} />
+      <FloatingBtn />
       <UserProfile />
       <Dialog
         open={tutorial && config.map.enableTutorial}
@@ -108,24 +108,14 @@ export default function Nav({ webhookMode, setWebhookMode }) {
           isMobile={isMobile}
         />
       </Dialog>
+      <Webhook />
       <Search />
       <MessageOfTheDay />
       <DonorPage />
       <Feedback />
       <ResetFilters />
       <ScanDialog />
-      <Notification
-        open={!!webhookAlert.open}
-        cb={() =>
-          setWebhookAlert({
-            open: false,
-            severity: webhookAlert.severity,
-            message: '',
-          })
-        }
-        severity={webhookAlert.severity}
-        messages={[webhookAlert.message]}
-      />
+      <WebhookNotification />
     </>
   )
 }
