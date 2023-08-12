@@ -262,11 +262,6 @@ module.exports = class Pokemon extends Model {
               latitude: args.maxLat,
               longitude: args.maxLon,
             },
-            center: {
-              latitude: 0,
-              longitude: 0,
-            },
-            searchIds: [],
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
             dnf,
           })
@@ -454,6 +449,11 @@ module.exports = class Pokemon extends Model {
       return []
     }
 
+    const dnf = Object.values(filterMap).flatMap((filter) =>
+      filter.buildApiFilter(),
+    )
+    dnf.push(...globalFilter.buildApiFilter())
+
     const results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/scan` : null,
       mem
@@ -466,15 +466,8 @@ module.exports = class Pokemon extends Model {
               latitude: args.maxLat,
               longitude: args.maxLon,
             },
-            global: {
-              expert: args.filters.onlyIvOr.adv,
-            },
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-            filters: Object.fromEntries(
-              Object.entries(args.filters)
-                .filter(([k, v]) => k.includes('-') && v.enabled)
-                .map(([k, v]) => [k, { expert: v.adv }]),
-            ),
+            dnf,
           })
         : query,
       'POST',
