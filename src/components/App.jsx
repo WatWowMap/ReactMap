@@ -45,9 +45,7 @@ function SetText() {
   return <div />
 }
 
-/**
- * @param {KeyboardEvent} event
- */
+/** @param {KeyboardEvent} event */
 function toggleDarkMode(event) {
   // This is mostly meant for development purposes
   if (event.ctrlKey && event.key === 'd') {
