@@ -3,6 +3,24 @@ import { responsiveFontSizes } from '@mui/material'
 import { createTheme } from '@mui/material/styles'
 import * as locales from '@mui/material/locale'
 
+const LOCALE_MAP = /** @type {const} */ ({
+  en: 'enUS',
+  de: 'deDE',
+  es: 'esES',
+  fr: 'frFR',
+  it: 'itIT',
+  ja: 'jaJP',
+  ko: 'koKR',
+  nl: 'nlNL',
+  pl: 'plPL',
+  'pt-br': 'ptBR',
+  ru: 'ruRU',
+  sv: 'svSE',
+  th: 'thTH',
+  tr: 'trTR',
+  'zh-tw': 'zhTW',
+})
+
 /** @type {import('@mui/material').Components<Omit<import('@mui/material').Theme, 'components'>>} */
 const components = {
   MuiPaper: {
@@ -117,13 +135,13 @@ const DEFAULT_PALETTE = {
 /**
  * @param {{ primary?: string, secondary?: string }} themeOptions
  * @param {boolean} darkMode
- * @param {keyof typeof locales} locale
+ * @param {keyof typeof LOCALE_MAP} locale
  * @returns
  */
 export default function customTheme(
   themeOptions = DEFAULT_PALETTE,
   darkMode = document.body.classList.contains('dark'),
-  locale = 'enUS',
+  locale = 'en',
 ) {
   const newTheme = createTheme(
     {
@@ -139,7 +157,7 @@ export default function customTheme(
       },
       components,
     },
-    locales[locale],
+    locales[LOCALE_MAP[locale]],
   )
   return responsiveFontSizes(newTheme)
 }

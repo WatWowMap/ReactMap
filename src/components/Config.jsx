@@ -12,24 +12,6 @@ import HolidayEffects from './HolidayEffects'
 
 const rootLoading = document.getElementById('loader')
 
-const LOCALE_MAP = /** @type {const} */ ({
-  en: 'enUS',
-  de: 'deDE',
-  es: 'esES',
-  fr: 'frFR',
-  it: 'itIT',
-  ja: 'jaJP',
-  ko: 'koKR',
-  nl: 'nlNL',
-  pl: 'plPL',
-  'pt-br': 'ptBR',
-  ru: 'ruRU',
-  sv: 'svSE',
-  th: 'thTH',
-  tr: 'trTR',
-  'zh-tw': 'zhTW',
-})
-
 export default function Config({ setTheme }) {
   const { t } = useTranslation()
   const darkMode = useStore((s) => s.darkMode)
@@ -79,13 +61,7 @@ export default function Config({ setTheme }) {
   }, [])
 
   React.useEffect(() => {
-    setTheme(
-      makeTheme(
-        serverSettings?.config?.map?.theme,
-        darkMode,
-        LOCALE_MAP[locale],
-      ),
-    )
+    setTheme(makeTheme(serverSettings?.config?.map?.theme, darkMode, locale))
     if (darkMode) {
       if (!document.body.classList.contains('dark')) {
         document.body.classList.add('dark')
