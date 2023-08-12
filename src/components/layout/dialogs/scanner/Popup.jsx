@@ -13,20 +13,16 @@ import {
   StyledDivider,
   StyledListItemText,
 } from './Shared'
+import { ConfigContext } from './ContextProvider'
 
 /**
  *
- * @param {import('@hooks/useStore').ScanConfig & { children: React.ReactNode, mode: import('@hooks/useStore').ScanMode }} props
+ * @param {{ children: React.ReactNode, mode: import('@hooks/useStore').ScanMode }} props
  * @returns
  */
-export function ScanOnDemandPopup({
-  scannerType,
-  showScanCount,
-  showScanQueue,
-  children,
-  mode,
-}) {
+export function ScanOnDemandPopup({ children, mode }) {
   const { t } = useTranslation()
+  const context = React.useContext(ConfigContext)
 
   return (
     <Popup minWidth={90} maxWidth={200} autoPan={false}>
@@ -36,9 +32,9 @@ export function ScanOnDemandPopup({
           secondary={t('scan_next_choose')}
         />
         <StyledDivider />
-        {scannerType !== 'mad' && children}
-        {showScanCount && <ScanRequests />}
-        {showScanQueue && <ScanQueue />}
+        {context.scannerType !== 'mad' && children}
+        {context.showScanCount && <ScanRequests />}
+        {context.showScanQueue && <ScanQueue />}
         <StyledDivider />
         <ScanConfirm mode={mode} />
         <InAllowedArea />

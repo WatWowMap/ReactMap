@@ -10,10 +10,9 @@ import { ScanOnDemandPopup } from '../Popup'
 
 /**
  *
- * @param {import('@hooks/useStore').ScanConfig} props
  * @returns
  */
-export default function ScanZone(props) {
+export default function ScanZone() {
   useCheckValid('scanZone')
 
   // React.useEffect(() => {
@@ -32,8 +31,8 @@ export default function ScanZone(props) {
   return (
     <>
       <ScanOnDemandMarker>
-        <ScanOnDemandPopup {...props} mode="scanZone">
-          <ScanZonePopup {...props} />
+        <ScanOnDemandPopup mode="scanZone">
+          <ScanZonePopup />
         </ScanOnDemandPopup>
       </ScanOnDemandMarker>
       <ScanCircles />

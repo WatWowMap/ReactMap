@@ -11,20 +11,7 @@ import ScanNext from './scanNext'
 import ScanZone from './scanZone'
 import { getScanNextCoords } from './scanNext/getCoords'
 import { getScanZoneCoords } from './scanZone/getCoords'
-
-export const DEFAULT = /** @type {import('@hooks/useStore').ScanConfig} */ ({
-  scannerType: '',
-  showScanCount: false,
-  showScanQueue: false,
-  advancedOptions: false,
-  enabled: false,
-  pokemonRadius: 70,
-  gymRadius: 750,
-  spacing: 1,
-  maxSize: 10,
-  cooldown: 0,
-  refreshQueue: 5,
-})
+import { ConfigContext, DEFAULT } from './ContextProvider'
 
 const { setScanMode } = useScanStore.getState()
 
@@ -153,10 +140,10 @@ function ScanOnDemand({ mode }) {
 
   if (scanMode !== 'setLocation') return null
 
-  return mode === 'scanNext' ? (
-    <ScanNext {...config} />
-  ) : (
-    <ScanZone {...config} />
+  return (
+    <ConfigContext.Provider value={config}>
+      {mode === 'scanNext' ? <ScanNext /> : <ScanZone />}
+    </ConfigContext.Provider>
   )
 }
 

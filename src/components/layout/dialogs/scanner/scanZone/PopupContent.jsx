@@ -9,21 +9,17 @@ import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
 import { useScanStore } from '@hooks/useStore'
 
 import { StyledSubHeader } from '../Shared'
+import { ConfigContext } from '../ContextProvider'
 
 const RADIUS_CHOICES = /** @type {const} */ (['pokemon', 'gym'])
 
 /**
  *
- * @param {import('@hooks/useStore').ScanConfig} props
  * @returns
  */
-export function ScanZonePopup({
-  maxSize,
-  pokemonRadius,
-  gymRadius,
-  advancedOptions,
-}) {
+export function ScanZonePopup() {
   const { t } = useTranslation()
+  const { advancedOptions, maxSize } = React.useContext(ConfigContext)
 
   return (
     <>
@@ -33,7 +29,7 @@ export function ScanZonePopup({
       </ListItem>
       <StyledSubHeader>{t('scan_zone_range')}</StyledSubHeader>
       <ListItem style={{ padding: 2 }}>
-        <SizeSelection pokemonRadius={pokemonRadius} gymRadius={gymRadius} />
+        <SizeSelection />
       </ListItem>
       {advancedOptions && (
         <ListItem style={{ padding: '10px 0' }}>
@@ -84,14 +80,10 @@ function ScanZoneSlider({ name, ...props }) {
   )
 }
 
-/**
- *
- * @param {Pick<import('@hooks/useStore').ScanConfig, 'pokemonRadius' | 'gymRadius'>} props
- * @returns
- */
-function SizeSelection({ pokemonRadius, gymRadius }) {
+function SizeSelection() {
   const { t } = useTranslation()
   const userRadius = useScanStore((s) => s.userRadius)
+  const { pokemonRadius, gymRadius } = React.useContext(ConfigContext)
 
   const handleRadiusChange = React.useCallback(
     (newRadius) => () => useScanStore.setState({ userRadius: newRadius }),

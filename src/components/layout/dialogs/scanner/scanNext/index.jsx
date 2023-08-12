@@ -15,10 +15,9 @@ const POKEMON_RADIUS = 70
 const GYM_RADIUS = 750
 
 /**
- * @param {import('@hooks/useStore').ScanConfig} props
  * @returns {JSX.Element}
  */
-export default function ScanNext(props) {
+export default function ScanNext() {
   const color = useCheckValid('scanNext')
 
   const scanLocation = useScanStore((s) => s.scanLocation)
@@ -26,7 +25,7 @@ export default function ScanNext(props) {
   return (
     <>
       <ScanOnDemandMarker>
-        <ScanOnDemandPopup {...props} mode="scanNext">
+        <ScanOnDemandPopup mode="scanNext">
           <ScanNextPopup />
         </ScanOnDemandPopup>
       </ScanOnDemandMarker>
