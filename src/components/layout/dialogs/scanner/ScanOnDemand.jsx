@@ -116,27 +116,32 @@ function ScanOnDemand({ mode }) {
     }
   }, [location])
 
-  useScanStore.subscribe((next, prev) => {
-    if (
-      next.userRadius !== prev.userRadius ||
-      next.userSpacing !== prev.userSpacing ||
-      next.scanNextSize !== prev.scanNextSize ||
-      next.scanZoneSize !== prev.scanZoneSize ||
-      next.scanLocation.some((x, i) => x !== prev.scanLocation[i])
-    ) {
-      useScanStore.setState({
-        scanCoords:
-          mode === 'scanZone'
-            ? getScanZoneCoords(
-                next.scanLocation,
-                next.userRadius,
-                next.userSpacing,
-                next.scanZoneSize,
-              )
-            : getScanNextCoords(next.scanLocation, next.scanNextSize),
-      })
+  React.useEffect(() => {
+    const subscription = useScanStore.subscribe((next, prev) => {
+      if (
+        next.userRadius !== prev.userRadius ||
+        next.userSpacing !== prev.userSpacing ||
+        next.scanNextSize !== prev.scanNextSize ||
+        next.scanZoneSize !== prev.scanZoneSize ||
+        next.scanLocation.some((x, i) => x !== prev.scanLocation[i])
+      ) {
+        useScanStore.setState({
+          scanCoords:
+            mode === 'scanZone'
+              ? getScanZoneCoords(
+                  next.scanLocation,
+                  next.userRadius,
+                  next.userSpacing,
+                  next.scanZoneSize,
+                )
+              : getScanNextCoords(next.scanLocation, next.scanNextSize),
+        })
+      }
+    })
+    return () => {
+      subscription()
     }
-  })
+  }, [mode])
 
   if (scanMode !== 'setLocation') return null
 

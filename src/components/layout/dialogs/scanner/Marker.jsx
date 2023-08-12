@@ -13,19 +13,6 @@ export function ScanOnDemandMarker({ children }) {
   const map = useMap()
   const scanLocation = useScanStore((s) => s.scanLocation)
 
-  // React.useEffect(() => {
-  //   if (scanCoords.length === 1) {
-  //     useScanStore.setState((prev) => ({
-  //       scanCoords: calcScanZoneCoords(
-  //         prev.scanLocation,
-  //         prev.userRadius,
-  //         prev.userSpacing,
-  //         prev.scanZoneSize,
-  //       ),
-  //     }))
-  //   }
-  // }, [scanCoords.length])
-
   return (
     <Marker
       draggable
@@ -39,6 +26,9 @@ export function ScanOnDemandMarker({ children }) {
           if (popup) {
             popup.openPopup()
           }
+        },
+        popupclose() {
+          useScanStore.setState({ scanNextMode: '', scanZoneMode: '' })
         },
       }}
       icon={fallbackIcon()}

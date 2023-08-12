@@ -153,7 +153,7 @@ export function ScanCircles({ radius, color }) {
 
   return scanCoords.map((coords) => (
     <ScanCircle
-      key={coords.join('')}
+      key={`${coords.join('')}${color}`}
       radius={radius || userRadius}
       lat={coords[0]}
       lon={coords[1]}
