@@ -119,11 +119,12 @@ function ScanOnDemand({ mode }) {
   React.useEffect(() => {
     const subscription = useScanStore.subscribe((next, prev) => {
       if (
-        next.userRadius !== prev.userRadius ||
-        next.userSpacing !== prev.userSpacing ||
-        next.scanNextSize !== prev.scanNextSize ||
-        next.scanZoneSize !== prev.scanZoneSize ||
-        next.scanLocation.some((x, i) => x !== prev.scanLocation[i])
+        next[`${mode}Mode`] &&
+        (next.userRadius !== prev.userRadius ||
+          next.userSpacing !== prev.userSpacing ||
+          next.scanNextSize !== prev.scanNextSize ||
+          next.scanZoneSize !== prev.scanZoneSize ||
+          next.scanLocation.some((x, i) => x !== prev.scanLocation[i]))
       ) {
         useScanStore.setState({
           scanCoords:
