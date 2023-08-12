@@ -18,7 +18,7 @@ const GYM_RADIUS = 750
  * @returns {JSX.Element}
  */
 export default function ScanNext() {
-  const color = useCheckValid('scanNext')
+  useCheckValid('scanNext')
 
   const scanLocation = useScanStore((s) => s.scanLocation)
   const scanNextSize = useScanStore((s) => s.scanNextSize)
@@ -34,12 +34,11 @@ export default function ScanNext() {
           lat={scanLocation[0]}
           lon={scanLocation[1]}
           radius={GYM_RADIUS}
-          color={color}
         />
       ) : (
         <ScanCircles radius={GYM_RADIUS} />
       )}
-      <ScanCircles radius={POKEMON_RADIUS} color={color} />
+      <ScanCircles radius={POKEMON_RADIUS} />
     </>
   )
 }

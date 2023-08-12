@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable react/no-array-index-key */
 // @ts-check
 import * as React from 'react'
@@ -43,6 +44,7 @@ export const COLORS = /** @type {const} */ ({
   blue: 'rgb(90, 145, 255)',
   orange: 'rgb(255, 165, 0)',
   red: 'rgb(255, 100, 90)',
+  purple: 'rgb(200, 100, 255)',
 })
 
 export function ScanRequests() {
@@ -151,20 +153,28 @@ export function ScanCircle({ lat, lon, radius, color = COLORS.blue }) {
 
 /**
  *
- * @param {{ radius?: number, color?: string }} props
+ * @param {{ radius?: number }} props
  * @returns
  */
-export function ScanCircles({ radius, color }) {
+export function ScanCircles({ radius }) {
   const scanCoords = useScanStore((s) => s.scanCoords)
   const userRadius = useScanStore((s) => s.userRadius)
   const validCoords = useScanStore((s) => s.validCoords)
 
+  const finalRadius = radius || userRadius
   return scanCoords.map((coords, i) => {
-    const finalColor = color || (validCoords[i] ? COLORS.blue : COLORS.red)
+    const finalColor =
+      finalRadius <= 70
+        ? validCoords[i]
+          ? COLORS.orange
+          : COLORS.purple
+        : validCoords[i]
+        ? COLORS.blue
+        : COLORS.red
     return (
       <ScanCircle
         key={`${coords.join('')}${finalColor}`}
-        radius={radius || userRadius}
+        radius={finalRadius}
         lat={coords[0]}
         lon={coords[1]}
         color={finalColor}

@@ -2,8 +2,7 @@
 import { useQuery } from '@apollo/client'
 import { useScanStore } from '@hooks/useStore'
 import { CHECK_VALID_SCAN } from '@services/queries/scanner'
-import { useContext, useEffect, useState } from 'react'
-import { COLORS } from './Shared'
+import { useContext, useEffect } from 'react'
 import { ConfigContext } from './ContextProvider'
 
 /**
@@ -15,9 +14,6 @@ export function useCheckValid(mode) {
   const { cooldown } = useContext(ConfigContext)
   const skip = useScanStore((s) => !s[`${mode}Mode`])
   const points = useScanStore((s) => s.scanCoords)
-  const [color, setColor] = useState(
-    /** @type {typeof COLORS[keyof typeof COLORS]} */ (COLORS.blue),
-  )
 
   const { data } = useQuery(CHECK_VALID_SCAN, {
     variables: {
@@ -41,13 +37,6 @@ export function useCheckValid(mode) {
         validCoords: data.checkValidScan,
         estimatedDelay: data.checkValidScan.filter(Boolean).length * cooldown,
       })
-      if (valid) {
-        setColor(COLORS.orange)
-      } else {
-        setColor(COLORS.red)
-      }
     }
   }, [data])
-
-  return color
 }

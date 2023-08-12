@@ -108,9 +108,9 @@ function ScanOnDemand({ mode }) {
         scanLocation: prev.scanLocation.every((x) => x === 0)
           ? location
           : prev.scanLocation,
-        scanCoords: prev.scanCoords.length === 0 ? [location] : prev.scanCoords,
-        userSpacing: config.spacing || 1,
-        userRadius: config.pokemonRadius || 70,
+        // scanCoords: prev.scanCoords.length === 0 ? [location] : prev.scanCoords,
+        // userSpacing: config.spacing || 1,
+        // userRadius: config.pokemonRadius || 70,
       }))
     }
   }, [location])
@@ -119,7 +119,9 @@ function ScanOnDemand({ mode }) {
     const subscription = useScanStore.subscribe((next, prev) => {
       if (
         next[`${mode}Mode`] &&
-        (next.userRadius !== prev.userRadius ||
+        ((!prev.scanNextMode && next.scanNextMode) ||
+          (!prev.scanZoneMode && next.scanZoneMode) ||
+          next.userRadius !== prev.userRadius ||
           next.userSpacing !== prev.userSpacing ||
           next.scanNextSize !== prev.scanNextSize ||
           next.scanZoneSize !== prev.scanZoneSize ||
