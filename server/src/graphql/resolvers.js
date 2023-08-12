@@ -7,7 +7,7 @@ const Utility = require('../services/Utility')
 const Fetch = require('../services/Fetch')
 const buildDefaultFilters = require('../services/filters/builder/base')
 const filterComponents = require('../services/functions/filterComponents')
-const checkAreaValidity = require('../services/functions/checkAreaValidity')
+const { filterRTree } = require('../services/functions/filterRTree')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import('../types').GqlContext>['resolvers']} */
 const resolvers = {
@@ -54,14 +54,21 @@ const resolvers = {
       )
       return !!results.length
     },
-    checkValidScan: (_, { mode, center }, { perms }) => {
+    checkValidScan: (_, { mode, points }, { perms }) => {
       if (perms?.scanner.includes(mode)) {
         const areaRestrictions =
           config.get(`scanner.${mode}.${mode}AreaRestriction`) || []
-        const valid = checkAreaValidity(center, areaRestrictions)
-        return valid
+
+        const validPoints = points.map((point) =>
+          filterRTree(
+            { lat: point[0], lon: point[1] },
+            perms.areaRestrictions,
+            areaRestrictions,
+          ),
+        )
+        return validPoints
       }
-      return false
+      return []
     },
     fabButtons: (_, _args, { perms, user, req, Event }) => {
       const domain = `multiDomainsObj[${req.headers.host}]`

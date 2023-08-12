@@ -27,9 +27,6 @@ export function ScanOnDemandMarker({ children }) {
             popup.openPopup()
           }
         },
-        popupclose() {
-          useScanStore.setState({ scanNextMode: '', scanZoneMode: '' })
-        },
       }}
       icon={fallbackIcon()}
       position={scanLocation}

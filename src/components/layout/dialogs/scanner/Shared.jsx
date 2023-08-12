@@ -81,7 +81,7 @@ export function ScanConfirm({ mode }) {
   return (
     <StyledListButton
       color="secondary"
-      disabled={!valid || !!scannerCooldown}
+      disabled={valid === 'none' || !!scannerCooldown}
       onClick={() => setScanMode(`${mode}Mode`, 'sendCoords')}
     >
       <ListItemIcon>
@@ -108,7 +108,11 @@ export function ScanConfirm({ mode }) {
 export function InAllowedArea() {
   const { t } = useTranslation()
   const valid = useScanStore((s) => s.valid)
-  return valid ? null : <ListItemText secondary={t('scan_outside_area')} />
+  return {
+    none: <StyledListItemText secondary={t('scan_outside_area')} />,
+    some: <StyledListItemText secondary={t('scan_some_outside_area')} />,
+    all: null,
+  }[valid]
 }
 
 /**
@@ -153,14 +157,18 @@ export function ScanCircle({ lat, lon, radius, color = COLORS.blue }) {
 export function ScanCircles({ radius, color }) {
   const scanCoords = useScanStore((s) => s.scanCoords)
   const userRadius = useScanStore((s) => s.userRadius)
+  const validCoords = useScanStore((s) => s.validCoords)
 
-  return scanCoords.map((coords) => (
-    <ScanCircle
-      key={`${coords.join('')}${color}`}
-      radius={radius || userRadius}
-      lat={coords[0]}
-      lon={coords[1]}
-      color={color}
-    />
-  ))
+  return scanCoords.map((coords, i) => {
+    const finalColor = color || (validCoords[i] ? COLORS.blue : COLORS.red)
+    return (
+      <ScanCircle
+        key={`${coords.join('')}${finalColor}`}
+        radius={radius || userRadius}
+        lat={coords[0]}
+        lon={coords[1]}
+        color={finalColor}
+      />
+    )
+  })
 }

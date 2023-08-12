@@ -44,11 +44,10 @@ export default function AdvancedAccordion({ block = null, children }) {
       <StyledAccordionSummary expandIcon={<ExpandMore />}>
         <Typography variant="caption">{t('advanced')}</Typography>
       </StyledAccordionSummary>
-      <AccordionDetails style={{ width: '100%' }}>
+      <AccordionDetails sx={{ py: 0 }}>
         {block ? (
           <Grid
             container
-            style={{ width: 200 }}
             direction="row"
             justifyContent="center"
             alignItems="center"

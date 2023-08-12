@@ -32,7 +32,7 @@ export function ScanZonePopup() {
         <SizeSelection />
       </ListItem>
       {advancedOptions && (
-        <ListItem style={{ padding: '10px 0' }}>
+        <ListItem style={{ padding: '10px 0' }} disableGutters disablePadding>
           <AdvancedAccordion>
             <List
               style={{

@@ -5,7 +5,7 @@ import * as React from 'react'
 
 import { useScanStore } from '@hooks/useStore'
 
-import { COLORS, ScanCircle, ScanCircles } from '../Shared'
+import { ScanCircle, ScanCircles } from '../Shared'
 import { useCheckValid } from '../useCheckValid'
 import { ScanNextPopup } from './PopupContent'
 import { ScanOnDemandMarker } from '../Marker'
@@ -34,12 +34,12 @@ export default function ScanNext() {
           lat={scanLocation[0]}
           lon={scanLocation[1]}
           radius={GYM_RADIUS}
-          color={COLORS.orange}
+          color={color}
         />
       ) : (
-        <ScanCircles radius={GYM_RADIUS} color={color} />
+        <ScanCircles radius={GYM_RADIUS} />
       )}
-      <ScanCircles radius={POKEMON_RADIUS} />
+      <ScanCircles radius={POKEMON_RADIUS} color={color} />
     </>
   )
 }

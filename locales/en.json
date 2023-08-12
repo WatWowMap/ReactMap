@@ -648,5 +648,6 @@
   "tth_1": "Known",
   "tth_2": "Unknown",
   "no_access": "No Access",
-  "cooldown": "Cool Down"
+  "cooldown": "Cool Down",
+  "scan_some_outside_area": "Some locations are outside the authorized boundaries"
 }

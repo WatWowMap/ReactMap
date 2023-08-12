@@ -28,7 +28,7 @@ export const SCANNER_CONFIG = gql`
 `
 
 export const CHECK_VALID_SCAN = gql`
-  query CheckValidScan($center: [Float!]!, $mode: String) {
-    checkValidScan(center: $center, mode: $mode)
+  query CheckValidScan($mode: String, $points: [[Float]]) {
+    checkValidScan(mode: $mode, points: $points)
   }
 `

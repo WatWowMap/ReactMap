@@ -33,7 +33,6 @@ function ScanOnDemand({ mode }) {
 
   /** @type {typeof DEFAULT} */
   const config = React.useMemo(() => data?.scannerConfig || DEFAULT, [data])
-  const safeCooldown = typeof config.cooldown === 'number' ? config.cooldown : 0
 
   const [scan, { error: scannerError, data: scannerResponse }] = useLazyQuery(
     SCANNER_STATUS,
@@ -57,9 +56,12 @@ function ScanOnDemand({ mode }) {
   })
 
   const demandScan = () => {
-    const { scanCoords, scanLocation, ...rest } = useScanStore.getState()
+    const { scanCoords, validCoords, scanLocation, ...rest } =
+      useScanStore.getState()
     useStore.setState({
-      scannerCooldown: safeCooldown * scanCoords.length,
+      scannerCooldown:
+        (typeof config.cooldown === 'number' ? config.cooldown : 0) *
+        validCoords.filter(Boolean).length,
     })
     setScanMode(`${mode}Mode`, 'loading')
     scan({
@@ -68,7 +70,7 @@ function ScanOnDemand({ mode }) {
         method: 'GET',
         data: {
           scanLocation,
-          scanCoords,
+          scanCoords: scanCoords.filter((_, i) => validCoords[i]),
           scanSize: rest[`${mode}Size`],
         },
       },
@@ -132,16 +134,13 @@ function ScanOnDemand({ mode }) {
                 next.scanZoneSize,
               )
             : getScanNextCoords(next.scanLocation, next.scanNextSize)
-        useScanStore.setState({
-          scanCoords,
-          estimatedDelay: safeCooldown * scanCoords.length,
-        })
+        useScanStore.setState({ scanCoords })
       }
     })
     return () => {
       subscription()
     }
-  }, [mode, safeCooldown])
+  }, [mode])
 
   if (scanMode !== 'setLocation') return null
 
