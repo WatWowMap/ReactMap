@@ -647,5 +647,6 @@
   "tth_0": "All",
   "tth_1": "Known",
   "tth_2": "Unknown",
-  "no_access": "No Access"
+  "no_access": "No Access",
+  "cooldown": "Cool Down"
 }

@@ -76,6 +76,7 @@ export function ScanConfirm({ mode }) {
   const { t } = useTranslation()
   const scannerCooldown = useStore((s) => s.scannerCooldown)
   const valid = useScanStore((s) => s.valid)
+  const estimatedDelay = useScanStore((s) => s.estimatedDelay)
 
   return (
     <StyledListButton
@@ -97,6 +98,8 @@ export function ScanConfirm({ mode }) {
             t('click_to_scan')
           )
         }
+        secondary={estimatedDelay ? `${estimatedDelay}s ${t('cooldown')}` : ''}
+        secondaryTypographyProps={{ component: 'span' }}
       />
     </StyledListButton>
   )

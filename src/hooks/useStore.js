@@ -235,6 +235,7 @@ export const useLayoutStore = create(() => ({
  *  userRadius: number,
  *  userSpacing: number,
  *  valid: boolean,
+ *  estimatedDelay: number,
  *  setScanMode: <T extends `${ScanMode}Mode`>(mode: T, nextMode?: UseScanStore[T]) => void,
  *  setScanSize: <T extends `${ScanMode}Size`>(mode: T, size: UseScanStore[T]) => void,
  * }} UseScanStore
@@ -251,6 +252,7 @@ export const useScanStore = create((set) => ({
   userRadius: 70,
   userSpacing: 1,
   valid: false,
+  estimatedDelay: 0,
   setScanMode: (mode, nextMode = '') => set({ [mode]: nextMode }),
   setScanSize: (mode, size) => set({ [mode]: size }),
 }))

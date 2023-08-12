@@ -33,6 +33,7 @@ function ScanOnDemand({ mode }) {
 
   /** @type {typeof DEFAULT} */
   const config = React.useMemo(() => data?.scannerConfig || DEFAULT, [data])
+  const safeCooldown = typeof config.cooldown === 'number' ? config.cooldown : 0
 
   const [scan, { error: scannerError, data: scannerResponse }] = useLazyQuery(
     SCANNER_STATUS,
@@ -57,6 +58,10 @@ function ScanOnDemand({ mode }) {
 
   const demandScan = () => {
     const { scanCoords, scanLocation, ...rest } = useScanStore.getState()
+    useStore.setState({
+      scannerCooldown: safeCooldown * scanCoords.length,
+    })
+    setScanMode(`${mode}Mode`, 'loading')
     scan({
       variables: {
         category: mode,
@@ -73,14 +78,6 @@ function ScanOnDemand({ mode }) {
   React.useEffect(() => {
     if (scanMode === 'sendCoords' && config.enabled) {
       demandScan()
-      setScanMode(`${mode}Mode`, 'loading')
-      const { scanCoords } = useScanStore.getState()
-      useStore.setState({
-        scannerCooldown:
-          (typeof config.cooldown === 'number'
-            ? Math.floor(config.cooldown)
-            : 0) * scanCoords.length,
-      })
     }
   }, [scanMode])
 
@@ -126,23 +123,25 @@ function ScanOnDemand({ mode }) {
           next.scanZoneSize !== prev.scanZoneSize ||
           next.scanLocation.some((x, i) => x !== prev.scanLocation[i]))
       ) {
+        const scanCoords =
+          mode === 'scanZone'
+            ? getScanZoneCoords(
+                next.scanLocation,
+                next.userRadius,
+                next.userSpacing,
+                next.scanZoneSize,
+              )
+            : getScanNextCoords(next.scanLocation, next.scanNextSize)
         useScanStore.setState({
-          scanCoords:
-            mode === 'scanZone'
-              ? getScanZoneCoords(
-                  next.scanLocation,
-                  next.userRadius,
-                  next.userSpacing,
-                  next.scanZoneSize,
-                )
-              : getScanNextCoords(next.scanLocation, next.scanNextSize),
+          scanCoords,
+          estimatedDelay: safeCooldown * scanCoords.length,
         })
       }
     })
     return () => {
       subscription()
     }
-  }, [mode])
+  }, [mode, safeCooldown])
 
   if (scanMode !== 'setLocation') return null
 
