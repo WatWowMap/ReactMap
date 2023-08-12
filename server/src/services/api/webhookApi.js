@@ -3,7 +3,7 @@ const fetchJson = require('./fetchJson')
 const { Event } = require('../initialization')
 const { log, HELPERS } = require('../logger')
 
-module.exports = async function webhookApi(
+async function webhookApi(
   category,
   discordId,
   method,
@@ -193,3 +193,5 @@ module.exports = async function webhookApi(
     return { status: 'error', message: 'webhook_error' }
   }
 }
+
+module.exports = webhookApi

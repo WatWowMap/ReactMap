@@ -152,6 +152,7 @@ module.exports = gql`
       filters: JSON
     ): [Route]
     webhook(category: String, status: String, name: String): Poracle
+    webhookAreas(name: String): [WebhookAreaGroups]
     scanner(category: String, method: String, data: JSON): ScannerApi
   }
 

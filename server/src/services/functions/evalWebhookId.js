@@ -1,4 +1,5 @@
-module.exports = function evalWebhookId(user) {
+/** @param {InstanceType<typeof import('../../models/User')>} user */
+function evalWebhookId(user) {
   if (!user) {
     return ''
   }
@@ -12,3 +13,5 @@ module.exports = function evalWebhookId(user) {
       return webhookStrategy === 'discord' ? discordId : telegramId
   }
 }
+
+module.exports = evalWebhookId

@@ -15,7 +15,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 import Query from '@services/Query'
 
 import Location from '../Location'
-import Areas from '../Areas'
+import Areas from './area'
 import {
   setData,
   setLocation,
@@ -68,11 +68,6 @@ const Human = () => {
       }
     }
   }, [newData])
-
-  React.useEffect(() => {
-    console.log('hi')
-    useWebhookStore.setState({ syncWebhook })
-  }, [syncWebhook])
 
   const handleProfileChange = React.useCallback(
     (/** @type {import('@mui/material').SelectChangeEvent<number>} */ e) => {

@@ -13,18 +13,6 @@ class User extends Model {
     return userTableName
   }
 
-  static async clearPerms(userId, strategy, botName) {
-    await this.query()
-      .update({ [`${strategy}Perms`]: null })
-      .where({ [`${strategy}Id`]: userId })
-      .then(() =>
-        log.info(
-          HELPERS.custom(botName, '#fff2cc'),
-          `Cleared ${strategy} perms for user ${userId}`,
-        ),
-      )
-  }
-
   static get relationMappings() {
     // eslint-disable-next-line global-require
     const { Db } = require('../services/initialization')
@@ -46,6 +34,23 @@ class User extends Model {
         },
       },
     }
+  }
+
+  static async clearPerms(userId, strategy, botName) {
+    await this.query()
+      .update({ [`${strategy}Perms`]: null })
+      .where({ [`${strategy}Id`]: userId })
+      .then(() =>
+        log.info(
+          HELPERS.custom(botName, '#fff2cc'),
+          `Cleared ${strategy} perms for user ${userId}`,
+        ),
+      )
+  }
+
+  /** @param {number} id */
+  static async getOne(id) {
+    return this.query().findOne({ id })
   }
 }
 

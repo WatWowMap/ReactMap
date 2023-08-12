@@ -15,7 +15,6 @@ import { create } from 'zustand'
  *  }
  *  send: boolean
  *  groupedAreas: Record<string, import('@turf/helpers').Feature[]>
- *  syncWebhook: <T>(options?: import('@apollo/client').MutationFunctionOptions<T, MutationVars>) => Promise<FetchResult<any>>
  * }} WebhookStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<WebhookStore>>}
  */
@@ -31,7 +30,6 @@ export const useWebhookStore = create(() => ({
   },
   send: false,
   groupedAreas: {},
-  syncWebhook: () => {},
 }))
 
 /** @param {WebhookStore['location']} location */

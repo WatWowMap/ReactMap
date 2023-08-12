@@ -474,7 +474,7 @@ module.exports = class DbCheck {
    *
    * @template {import('../models').ModelKeys} T
    * @template {keyof import('../types').ExtractMethods<import('../models').Models[T]>} U
-   * @template {ReturnType<import('../types').ExtractMethods<import('../models').Models[T]>[U]>} V
+   * @template {Awaited<ReturnType<import('../types').ExtractMethods<import('../models').Models[T]>[U]>>} V
    * @param {T} model The model to query
    * @param {U} method The method to call on the model
    * @param {T extends import('../models').ScannerModelKeys

@@ -8,6 +8,7 @@ const Fetch = require('../services/Fetch')
 const buildDefaultFilters = require('../services/filters/builder/base')
 const filterComponents = require('../services/functions/filterComponents')
 const { filterRTree } = require('../services/functions/filterRTree')
+const evalWebhookId = require('../services/functions/evalWebhookId')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import('../types').GqlContext>['resolvers']} */
 const resolvers = {
@@ -458,6 +459,30 @@ const resolvers = {
         )
       }
       return {}
+    },
+    webhookAreas: async (_, { name }, { req, perms, Db }) => {
+      if (perms.webhooks.includes(name) && req.user?.id) {
+        const user = await Db.query('User', 'getOne', req.user.id)
+        const { areas } = await Fetch.webhookApi(
+          'humans',
+          evalWebhookId(user),
+          'GET',
+          name,
+        )
+        const areaGroups = areas.reduce((groupMap, area) => {
+          if (area.userSelectable) {
+            if (!groupMap[area.group]) groupMap[area.group] = []
+            groupMap[area.group].push(area.name)
+          }
+          return groupMap
+        }, {})
+
+        return Object.entries(areaGroups).map(([group, children]) => ({
+          group,
+          children,
+        }))
+      }
+      return []
     },
     scanner: (_, args, { req, perms }) => {
       const { category, method, data } = args

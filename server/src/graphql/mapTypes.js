@@ -179,6 +179,11 @@ module.exports = gql`
     enabled: Boolean
   }
 
+  type WebhookAreaGroups {
+    group: String
+    children: [String]
+  }
+
   input BackupCreate {
     name: String
     data: JSON

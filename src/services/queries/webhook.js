@@ -264,6 +264,15 @@ export const allProfiles = gql`
   }
 `
 
+export const WEBHOOK_AREAS = gql`
+  query WebhookAreas($name: String!) {
+    webhookAreas(name: $name) {
+      group
+      children
+    }
+  }
+`
+
 export const quickAdd = gql`
   ${Human}
   ${Egg}
