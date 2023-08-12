@@ -240,15 +240,14 @@ module.exports = class Pokemon extends Model {
       }
     }
 
-    const dnf = Object.values(filterMap).flatMap((filter) =>
-      filter.buildApiFilter(),
-    )
-    // if (onlyIvOr.xxs) dnf.push({ size: 1 })
-    // if (onlyIvOr.xxl) dnf.push({ size: 5 })
-    dnf.push(...globalFilter.buildApiFilter())
-    if (onlyZeroIv) dnf.push({ iv: [0, 0] })
-    if (onlyHundoIv) dnf.push({ iv: [100, 100] })
-
+    const dnf = mem
+      ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
+      : []
+    if ((perms.iv || perms.pvp) && mem) {
+      dnf.push(...globalFilter.buildApiFilter())
+      if (onlyZeroIv) dnf.push({ iv: [0, 0] })
+      if (onlyHundoIv) dnf.push({ iv: [100, 100] })
+    }
     /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/scan` : null,
@@ -449,10 +448,11 @@ module.exports = class Pokemon extends Model {
       return []
     }
 
-    const dnf = Object.values(filterMap).flatMap((filter) =>
-      filter.buildApiFilter(),
-    )
-    dnf.push(...globalFilter.buildApiFilter())
+    const dnf = mem
+      ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
+      : []
+    if ((perms.iv || perms.pvp) && mem)
+      dnf.push(...globalFilter.buildApiFilter())
 
     const results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/scan` : null,

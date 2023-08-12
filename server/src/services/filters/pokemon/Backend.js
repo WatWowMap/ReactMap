@@ -66,62 +66,70 @@ module.exports = class PkmnBackend {
 
   createExpertFilter(filter = this.filter, keys = this.filterKeys) {
     let andStr = ''
-    if (keys.has('iv')) {
-      if (andStr) andStr += '&'
-      andStr += filter.iv.join('-')
-    }
-    if (andStr) {
-      andStr = `(${andStr})`
-    }
-    if (keys.has('atk_iv')) {
-      if (andStr) andStr += '&'
-      andStr += `A${filter.atk_iv.join('-')}`
-    }
-    if (keys.has('def_iv')) {
-      if (andStr) andStr += '&'
-      andStr += `D${filter.def_iv.join('-')}`
-    }
-    if (keys.has('sta_iv')) {
-      if (andStr) andStr += '&'
-      andStr += `S${filter.sta_iv.join('-')}`
-    }
-    if (keys.has('level')) {
-      if (andStr) andStr += '&'
-      andStr += `L${filter.level.join('-')}`
-    }
-    if (keys.has('cp')) {
-      if (andStr) andStr += '&'
-      andStr += `CP${filter.cp.join('-')}`
-    }
     let orStr = ''
-    if (keys.has('xxs')) {
-      if (orStr) orStr += '|'
-      orStr += `X1`
+
+    if (this.perms.iv) {
+      if (keys.has('iv')) {
+        if (andStr) andStr += '&'
+        andStr += filter.iv.join('-')
+      }
+      if (andStr) {
+        andStr = `(${andStr})`
+      }
+      if (keys.has('atk_iv')) {
+        if (andStr) andStr += '&'
+        andStr += `A${filter.atk_iv.join('-')}`
+      }
+      if (keys.has('def_iv')) {
+        if (andStr) andStr += '&'
+        andStr += `D${filter.def_iv.join('-')}`
+      }
+      if (keys.has('sta_iv')) {
+        if (andStr) andStr += '&'
+        andStr += `S${filter.sta_iv.join('-')}`
+      }
+      if (keys.has('level')) {
+        if (andStr) andStr += '&'
+        andStr += `L${filter.level.join('-')}`
+      }
+      if (keys.has('cp')) {
+        if (andStr) andStr += '&'
+        andStr += `CP${filter.cp.join('-')}`
+      }
+      if (keys.has('xxs')) {
+        if (orStr) orStr += '|'
+        orStr += `X1`
+      }
+      if (keys.has('xxl')) {
+        if (orStr) orStr += '|'
+        orStr += `X5`
+      }
     }
-    if (keys.has('xxl')) {
-      if (orStr) orStr += '|'
-      orStr += `X5`
+    if (this.perms.pvp) {
+      if (keys.has('great')) {
+        if (orStr) orStr += '|'
+        orStr += `GL${filter.great.join('-')}`
+      }
+      if (keys.has('ultra')) {
+        if (orStr) orStr += '|'
+        orStr += `UL${filter.ultra.join('-')}`
+      }
+      if (keys.has('little')) {
+        if (orStr) orStr += '|'
+        orStr += `LC${filter.little.join('-')}`
+      }
     }
-    if (keys.has('great')) {
-      if (orStr) orStr += '|'
-      orStr += `GL${filter.great.join('-')}`
+    if (this.perms.iv) {
+      if (this.mods.onlyZeroIv) {
+        if (orStr) orStr += '|'
+        orStr += `0`
+      }
+      if (this.mods.onlyHundoIv) {
+        if (orStr) orStr += '|'
+        orStr += `100`
+      }
     }
-    if (keys.has('ultra')) {
-      if (orStr) orStr += '|'
-      orStr += `UL${filter.ultra.join('-')}`
-    }
-    if (keys.has('little')) {
-      if (orStr) orStr += '|'
-      orStr += `LC${filter.little.join('-')}`
-    }
-    if (this.mods.onlyZeroIv) {
-      if (orStr) orStr += '|'
-      orStr += `0`
-    }
-    if (this.mods.onlyHundoIv) {
-      if (orStr) orStr += '|'
-      orStr += `100`
-    }
+
     if (andStr && !(andStr.startsWith('(') && andStr.endsWith(')')) && orStr) {
       andStr = `(${andStr})`
     }
@@ -129,7 +137,7 @@ module.exports = class PkmnBackend {
       orStr = `(${orStr})`
     }
     let merged = andStr ? `${andStr}${orStr ? `|${orStr}` : ''}` : orStr
-    if (keys.has('gender')) {
+    if (keys.has('gender') && this.perms.iv) {
       if (merged) merged = `(${merged})&`
       merged += `G${filter.gender}`
     }
@@ -272,14 +280,15 @@ module.exports = class PkmnBackend {
     if (this.mods.onlyLegacy) {
       return dnfifyIvFilter(adv, pokemon)
     }
-    if (!this.filterKeys.size) {
+    if (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp)) {
       return [{ pokemon, iv: [-1, 100] }]
     }
     const results = /** @type {import('../../../types').DnfFilter[]} */ ([])
     if (
       ['iv', 'atk_iv', 'def_iv', 'sta_iv', 'cp', 'level', 'gender'].some((k) =>
         this.filterKeys.has(k),
-      )
+      ) &&
+      this.perms.iv
     ) {
       results.push({
         pokemon,
@@ -332,6 +341,7 @@ module.exports = class PkmnBackend {
         !this.mods.onlyLinkGlobal ||
         (this.pokemon === pokemon.pokemon_id && this.form === pokemon.form)
       ) {
+        if (!this.expertFilter || !this.expertGlobal) return true
         if (this.expertFilter(pokemon)) {
           return true
         }
