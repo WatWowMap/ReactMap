@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useMap, ZoomControl, TileLayer } from 'react-leaflet'
 import { useMediaQuery, useTheme } from '@mui/material'
 import { control } from 'leaflet'
@@ -104,7 +104,7 @@ export default function Map({
     }
   }, [windowState])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (settings.navigationControls === 'leaflet' && map) {
       const lc = control
         .locate({
