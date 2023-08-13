@@ -1,6 +1,6 @@
-const gql = require('graphql-tag')
+const { gql } = require('graphql-tag')
 
-module.exports = gql`
+const poracleTypes = gql`
   type PoracleHuman {
     id: ID
     type: String
@@ -200,3 +200,5 @@ module.exports = gql`
     weather: [PoracleWeather]
   }
 `
+
+module.exports = poracleTypes
