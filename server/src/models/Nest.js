@@ -1,17 +1,17 @@
 /* eslint-disable no-nested-ternary */
 const { Model } = require('objection')
 const i18next = require('i18next')
+const config = require('config')
 
 const { Event, Db } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
-const {
-  api: { searchResultsLimit, queryLimits },
-  defaultFilters: {
-    nests: { avgFilter },
-  },
-} = require('../services/config')
 
-module.exports = class Nest extends Model {
+const { searchResultsLimit, queryLimits } = config.getSafe('api')
+const { avgFilter } = config.getSafe('defaultFilters.nests')
+
+/** @typedef {Nest & import('types').Nest} FullNest */
+
+class Nest extends Model {
   static get tableName() {
     return 'nests'
   }
@@ -25,7 +25,7 @@ module.exports = class Nest extends Model {
    * @param {import('types').Permissions} perms
    * @param {object} args
    * @param {import('types').DbContext} ctx
-   * @returns
+   * @returns {Promise<import('types').Nest[]>}
    */
   static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
@@ -51,17 +51,19 @@ module.exports = class Nest extends Model {
     if (!getAreaSql(query, areaRestrictions, filters.onlyAreas || [])) {
       return []
     }
-    const results = await query.limit(queryLimits.nests)
+
+    const results = /** @type {FullNest[]} */ (
+      await query.limit(queryLimits.nests)
+    )
 
     const submittedNameMap = await Db.query(
       'NestSubmission',
       'getAllByIds',
-      results.map((x) => x.nest_id),
+      results.map((x) => x.id),
     ).then((submissions) =>
       Object.fromEntries(submissions.map((x) => [x.nest_id, x])),
     )
 
-    /** @type {Nest[]} */
     const withNames = results.map((x) => ({
       ...x,
       name: submittedNameMap[x.id]?.name || x.name,
@@ -73,10 +75,10 @@ module.exports = class Nest extends Model {
 
   /**
    *
-   * @param {Nest[]} queryResults
+   * @param {FullNest[]} queryResults
    * @param {object} filters
    * @param {boolean} polygon
-   * @returns {Nest[]}
+   * @returns {FullNest[]}
    */
   static secondaryFilter(queryResults, filters, polygon) {
     const returnedResults = []
@@ -107,11 +109,13 @@ module.exports = class Nest extends Model {
    * @returns
    */
   static async getAvailable() {
-    const results = await this.query()
-      .select(['pokemon_id', 'pokemon_form'])
-      .whereNotNull('pokemon_id')
-      .groupBy('pokemon_id', 'pokemon_form')
-      .orderBy('pokemon_id', 'asc')
+    const results = /** @type {FullNest[]} */ (
+      await this.query()
+        .select(['pokemon_id', 'pokemon_form'])
+        .whereNotNull('pokemon_id')
+        .groupBy('pokemon_id', 'pokemon_form')
+        .orderBy('pokemon_id', 'asc')
+    )
 
     return {
       available: results.map((pokemon) => {
@@ -131,7 +135,7 @@ module.exports = class Nest extends Model {
    * @param {object} args
    * @param {import('types').DbContext} ctx
    * @param {import('objection').Raw} distance
-   * @returns
+   * @returns {Promise<FullNest[]>}
    */
   static async search(perms, args, { isMad }, distance) {
     const { search, locale, onlyAreas = [] } = args
@@ -166,15 +170,18 @@ module.exports = class Nest extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
-    return query
+    const results = /** @type {FullNest[]} */ (await query)
+    return results
   }
 
   /**
    *
    * @param {number} id
-   * @returns
+   * @returns {Promise<FullNest>}
    */
   static async getOne(id) {
     return this.query().findById(id).select(['lat', 'lon'])
   }
 }
+
+module.exports = Nest

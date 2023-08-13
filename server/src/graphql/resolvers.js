@@ -10,7 +10,7 @@ const filterComponents = require('../services/functions/filterComponents')
 const { filterRTree } = require('../services/functions/filterRTree')
 const evalWebhookId = require('../services/functions/evalWebhookId')
 
-/** @type {import("@apollo/server").ApolloServerOptions<import('@types/types').GqlContext>['resolvers']} */
+/** @type {import("@apollo/server").ApolloServerOptions<import('types').GqlContext>['resolvers']} */
 const resolvers = {
   JSON: GraphQLJSON,
   Query: {
@@ -288,8 +288,6 @@ const resolvers = {
       return [{ features: [] }]
     },
     scanAreasMenu: (_, _args, { req, perms }) => {
-      console.log(req?.user)
-
       if (perms?.scanAreas) {
         const scanAreas = config.has(`areas.scanAreasMenu.${req.headers.host}`)
           ? config.get(`areas.scanAreasMenu.${req.headers.host}`)
@@ -451,13 +449,12 @@ const resolvers = {
       }
       return []
     },
-    webhook: (_, args, { req, perms }) => {
-      if (perms?.webhooks) {
-        return Fetch.webhookApi(
+    webhook: (_, args, { req, perms, Event }) => {
+      if (perms?.webhooks && req.user?.selectedWebhook) {
+        return Event.webhookObj[req.user.selectedWebhook].api(
+          req.user?.id,
           args.category,
-          Utility.evalWebhookId(req.user),
           args.status,
-          args.name,
         )
       }
       return {}
@@ -486,9 +483,9 @@ const resolvers = {
       }
       return []
     },
-    webhookGeojson: async (parent, { name }, { perms }) => {
-      console.log({ parent })
-    },
+    // webhookGeojson: async (parent, { name }, { perms }) => {
+    //   console.log({ parent })
+    // },
     scanner: (_, args, { req, perms }) => {
       const { category, method, data } = args
       if (category === 'getQueue') {

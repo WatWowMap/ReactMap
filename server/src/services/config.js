@@ -2,6 +2,9 @@ const fs = require('fs')
 const { resolve } = require('path')
 
 const config = require('config')
+
+config.getSafe = (key) => config.get(key)
+
 const { log, HELPERS } = require('./logger')
 
 const allowedMenuItems = [

@@ -1,7 +1,7 @@
 const config = require('../config')
 const { consolidateAreas } = require('./consolidateAreas')
 
-module.exports = function getAreaRestrictionSql(
+function getAreaRestrictionSql(
   query,
   areaRestrictions,
   onlyAreas,
@@ -54,3 +54,5 @@ module.exports = function getAreaRestrictionSql(
   })
   return true
 }
+
+module.exports = getAreaRestrictionSql

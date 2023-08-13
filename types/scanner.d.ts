@@ -50,7 +50,7 @@ export interface Gym {
 }
 
 export interface Nest {
-  id: string
+  id: number
   lat: number
   lon: number
   pokemon_id: number
@@ -62,6 +62,7 @@ export interface Nest {
   pokemon_form: number
   polygon_type: number
   polygon_path: string
+  polygon?: string | object
   submitted_by: string
 }
 
