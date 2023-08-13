@@ -11,6 +11,16 @@ const GET_ALL_SELECT = /** @type {const} */ ([
   'image_border_color',
   'reversible',
 ])
+const GET_MAD_ALL_SELECT = /** @type {const} */ ({
+  id: 'route_id',
+  start_lat: 'start_poi_latitude',
+  start_lon: 'start_poi_longitude',
+  end_lat: 'end_poi_latitude',
+  end_lon: 'end_poi_longitude',
+  waypoints: 'waypoints',
+  image_border_color: 'image_border_color_hex',
+  reversible: 'reversible',
+})
 
 class Route extends Model {
   static get tableName() {
@@ -24,29 +34,37 @@ class Route extends Model {
    * @param {import('../types').DbContext} ctx
    * @returns
    */
-  static async getAll(perms, args, ctx) {
+  static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const { onlyAreas, onlyDistance } = args.filters
+    
 
     const distanceInMeters = (onlyDistance || [0.5, 100]).map((x) => x * 1000)
 
+    const startLatitude = isMad ? 'start_poi_latitude' : 'start_lat'
+    const startLongitude = isMad ? 'start_poi_longitude' : 'start_lon'
+    const distanceMeters = isMad ? 'route_distance_meters' : 'distance_meters'
+    const endLatitude = isMad ? 'end_poi_latitude' : 'end_lat'
+    const endLongitude = isMad ? 'end_poi_longitude' : 'end_lon'
+    //route_distance_meters
     const query = this.query()
-      .select(GET_ALL_SELECT)
-      .whereBetween('start_lat', [args.minLat, args.maxLat])
-      .andWhereBetween('start_lon', [args.minLon, args.maxLon])
-      .andWhereBetween('distance_meters', distanceInMeters)
+      .select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
+      .whereBetween(startLatitude, [args.minLat, args.maxLat])
+      .andWhereBetween(startLongitude, [args.minLon, args.maxLon])
+      .andWhereBetween(distanceMeters, distanceInMeters)
       .union((qb) => {
-        qb.select(GET_ALL_SELECT)
-          .whereBetween('end_lat', [args.minLat, args.maxLat])
-          .andWhereBetween('end_lon', [args.minLon, args.maxLon])
-          .andWhereBetween('distance_meters', distanceInMeters)
+        
+        qb.select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
+          .whereBetween(endLatitude, [args.minLat, args.maxLat])
+          .andWhereBetween(endLongitude, [args.minLon, args.maxLon])
+          .andWhereBetween(distanceMeters, distanceInMeters)
           .from('route')
 
-        getAreaSql(qb, areaRestrictions, onlyAreas, ctx.isMad, 'route_end')
+        getAreaSql(qb, areaRestrictions, onlyAreas, isMad, 'route_end')
       })
 
     if (
-      !getAreaSql(query, areaRestrictions, onlyAreas, ctx.isMad, 'route_start')
+      !getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'route_start')
     ) {
       return []
     }
@@ -94,13 +112,24 @@ class Route extends Model {
    * returns route context
    * @returns {{ max_distance: number, max_duration: number }}
    */
-  static async getFilterContext() {
+  static async getFilterContext(source) {
+    const { isMad } = source
+    if(isMad) {
+      const result = await this.query()
+      .max('route_distance_meters AS max_distance')
+      .max('route_duration_seconds AS max_duration')
+      .first()
+
+     return result 
+    }
+
     const result = await this.query()
       .max('distance_meters AS max_distance')
       .max('duration_seconds AS max_duration')
       .first()
 
     return result
+
   }
 }
 
