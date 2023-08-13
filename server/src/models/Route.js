@@ -1,4 +1,4 @@
-const { Model } = require('objection')
+const { Model, raw } = require('objection')
 const getAreaSql = require('../services/functions/getAreaSql')
 
 const GET_ALL_SELECT = /** @type {const} */ ([
@@ -84,8 +84,35 @@ class Route extends Model {
    * Returns the full route after querying it, generally from the Popup
    * @param {number} id
    */
-  static async getOne(id) {
-    const result = await this.query().findById(id)
+  static async getOne(id, { isMad }) {
+    let result = null;
+
+    if(isMad) {
+      result = await this.query().select({
+        id: 'route_id',
+        name: 'name',
+        description: 'description',
+        distance_meters: 'route_distance_meters',
+        duration_seconds: 'route_duration_seconds',
+        start_fort_id: 'start_poi_fort_id',
+        start_lat: 'start_poi_latitude',
+        start_lon: 'start_poi_longitude',
+        start_image: 'start_poi_image_url',
+        end_fort_id: 'end_poi_fort_id',
+        end_lat: 'end_poi_latitude',
+        end_lon: 'end_poi_longitude',
+        end_image: 'end_poi_image_url',
+        image: 'image',
+        image_border_color: 'image_border_color_hex',
+        reversible: 'reversible',
+        tags: 'tags',
+        type: 'type',
+        version: 'version',
+        waypoints: 'waypoints',
+      }).select(raw('UNIX_TIMESTAMP(last_updated)').as('updated')).findOne( {route_id: id})
+    } else {
+      result = await this.query().findById(id)
+    }
     if (typeof result.waypoints === 'string') {
       result.waypoints = JSON.parse(result.waypoints)
     } else if (result.waypoints === null) {
