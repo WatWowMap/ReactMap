@@ -20,6 +20,7 @@ import Backup = require('../server/src/models/Backup')
 import Nest = require('../server/src/models/Nest')
 import NestSubmission = require('../server/src/models/NestSubmission')
 import Pokestop = require('../server/src/models/Pokestop')
+import { ModelReturn } from './utility'
 
 export interface DbContext {
   isMad: boolean
@@ -58,10 +59,10 @@ export interface AvailablePokemon {
 }
 
 export interface Available {
-  pokemon: Awaited<ReturnType<(typeof Pokemon)['getAvailable']>>
-  gyms: Awaited<ReturnType<(typeof Gym)['getAvailable']>>
-  pokestops: Awaited<ReturnType<(typeof Pokestop)['getAvailable']>>
-  nests: Awaited<ReturnType<(typeof Nest)['getAvailable']>>
+  pokemon: ModelReturn<typeof Pokemon, 'getAvailable'>
+  gyms: ModelReturn<typeof Gym, 'getAvailable'>
+  pokestops: ModelReturn<typeof Pokestop, 'getAvailable'>
+  nests: ModelReturn<typeof Nest, 'getAvailable'>
 }
 
 export interface ApiEndpoint {

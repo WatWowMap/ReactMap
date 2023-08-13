@@ -1,3 +1,5 @@
+import type { Model } from 'objection'
+
 export type SpecificValueType<T, U, V> = {
   [k in keyof T]: T[k] extends U
     ? V extends true
@@ -32,3 +34,7 @@ export type ExtractMethods<T> = PickMatching<T, Function>
 export type Head<T extends any[]> = T extends [...infer Head, any]
   ? Head
   : any[]
+
+export type ModelReturn<T extends Model, U extends keyof T> = Awaited<
+  ReturnType<T[U]>
+>

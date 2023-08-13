@@ -196,3 +196,76 @@ export interface Poracle {
   nest: PoracleNest[]
   weather: PoracleWeather[]
 }
+
+export interface PoracleHumanArea {
+  name: string
+  group: string
+  userSelectable: boolean
+}
+
+export type PoracleCategory =
+  | 'start'
+  | 'stop'
+  | 'switchProfile'
+  | 'setLocation'
+  | 'setAreas'
+  | 'geojson'
+  | 'areaSecurity'
+  | 'humans'
+  | 'profiles'
+  | 'egg'
+  | 'invasion'
+  | 'lure'
+  | 'nest'
+  | 'pokemon'
+  | 'quest'
+  | 'raid'
+  | 'gym'
+  | 'quickGym'
+
+export type PoracleAction =
+  | 'add'
+  | 'byProfileNo'
+  | 'update'
+  | 'update'
+  | 'copy'
+  | 'delete'
+
+export type PoracleAPIInput =
+  | PoracleCategory
+  | `${PoracleCategory}-${PoracleAction}`
+
+export interface PoracleAPIRef {
+  config: '/api/config/poracleWeb'
+  geofence: '/api/geofence/all/geojson'
+  templates: '/api/config/templates?names=true'
+  humans: (userId: number) => `/api/humans/${number}`
+  oneHuman: (userId: number) => `/api/humans/one/${number}`
+  location: (
+    userId: number,
+    location: [number, number],
+  ) => `/api/humans/${number}/setLocation/${number}/${number}`
+  areas: (userId: number) => `/api/humans/${number}/setAreas`
+  areaSecurity: (userId: number) => `/api/geofence/${number}`
+  start: (userId: number) => `/api/humans/${number}/start`
+  stop: (userId: number) => `/api/humans/${number}/stop`
+  switchProfile: (
+    userId: number,
+    profile: number,
+  ) => `/api/humans/${number}/switchProfile/${number}`
+  tracking: <Suffix extends string = ''>(
+    userId: number,
+    category: PoracleCategory,
+    suffix?: Suffix = '' as const,
+  ) => `/api/tracking/${typeof category}/${number}${Suffix extends ''
+    ? ''
+    : `/${Suffix}`}}`
+  profiles: (userId: number) => `/api/profiles/${number}`
+  profileAction: <Suffix extends string = ''>(
+    userId: number,
+    action: PoracleAction,
+    suffix?: Suffix = '' as const,
+  ) => `/api/profiles/${number}/${PoracleAction}${Suffix extends ''
+    ? ''
+    : `/${Suffix}`}`
+}

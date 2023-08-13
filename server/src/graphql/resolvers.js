@@ -71,6 +71,7 @@ const resolvers = {
       }
       return []
     },
+    /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} */
     customComponent: (_, { component }, { perms, user }) => {
       switch (component) {
         case 'messageOfTheDay':
@@ -81,7 +82,7 @@ const resolvers = {
               footerButtons = [],
               components = [],
               ...rest
-            } = config.get(`map.${component}`)
+            } = config.getSafe(`map.${component}`)
             return {
               ...rest,
               footerButtons: filterComponents(

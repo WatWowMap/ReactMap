@@ -6,34 +6,33 @@ const resolveQuickHook = require('./resolveQuickHook')
 
 const PLATFORMS = /** @type {const} */ (['discord', 'telegram'])
 
-const APIS = /** @type {const} */ ({
+/**
+ * @typedef {import('types').PoracleAPIRef} APIReference
+ * @typedef {import('types').PoracleAPIInput} APIInput
+ * @typedef {import('types').PoracleCategory} Category
+ * @typedef {import('types').PoracleAction} Action
+ * @typedef {import('types').HttpMethod} Method
+ */
+
+const APIS = /** @type {APIReference} */ ({
   config: '/api/config/poracleWeb',
   geofence: '/api/geofence/all/geojson',
   templates: '/api/config/templates?names=true',
-  /** @param {number} userId */
   humans: (userId) => `/api/humans/${userId}`,
-  /** @param {number} userId */
   oneHuman: (userId) => `/api/humans/one/${userId}`,
-  /** @param {number} userId @param {[number, number]} location */
   location: (userId, location) =>
     `/api/humans/${userId}/setLocation/${location.join('/')}`,
-  /** @param {number} userId */
   areas: (userId) => `/api/humans/${userId}/setAreas`,
-  /** @param {number} userId */
   areaSecurity: (userId) => `/api/geofence/${userId}`,
-  /** @param {number} userId */
   start: (userId) => `/api/humans/${userId}/start`,
-  /** @param {number} userId */
   stop: (userId) => `/api/humans/${userId}/stop`,
-  /** @param {number} userId @param {number} profile */
   switchProfile: (userId, profile) =>
     `/api/humans/${userId}/switchProfile/${profile}`,
-  /** @param {number} userId @param {Category} category @param {string} suffix */
+  // @ts-ignore
   tracking: (userId, category, suffix = '') =>
     `/api/tracking/${category}/${userId}${suffix}`,
-  /** @param {number} userId */
   profiles: (userId) => `/api/profiles/${userId}`,
-  /** @param {number} userId @param {Action} action @param {string} [suffix] */
+  // @ts-ignore
   profileAction: (userId, action, suffix = '') =>
     `/api/profiles/${userId}/${action}${suffix}`,
 })
@@ -41,19 +40,6 @@ const APIS = /** @type {const} */ ({
 const SUBCATEGORIES = /** @type {const} */ ({
   gym: ['raid', 'egg', 'gym'],
 })
-
-/**
- * @typedef { |
- *  'start' | 'stop' | 'switchProfile' | 'setLocation' | 'setAreas' | 'geojson' | 'areaSecurity' | 'humans' |
- *  'profiles-add' | 'profiles-byProfileNo' | 'profiles-update' | 'profiles-copy' | 'profiles-delete' | 'profiles' |
- *  'egg' | 'invasion' | 'lure' | 'nest' | 'pokemon' | 'quest' | 'raid' | 'gym' |
- *  'egg-delete' | 'invasion-delete' | 'lure-delete' | 'nest-delete' | 'pokemon-delete' | 'quest-delete' |
- *  'raid-delete' | 'gym-delete' | 'quickGym'
- * } Category
- * @typedef {'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'} Method
- * @typedef {'add' | 'byProfileNo' | 'update' | 'update' | 'copy' | 'delete'} Action
- * @typedef {{ name: string, group: string, userSelectable: boolean }} PoracleHumanArea
- */
 
 class PoracleAPI {
   constructor(webhook) {
@@ -98,7 +84,6 @@ class PoracleAPI {
 
   async init() {
     if (!this.enabled) return this
-
     try {
       await Promise.all([
         this.remoteConfig(),
@@ -110,7 +95,6 @@ class PoracleAPI {
     } catch (e) {
       log.error(HELPERS.webhooks, `Error initializing ${this.name} webhook`, e)
     }
-
     return this
   }
 
@@ -159,7 +143,7 @@ class PoracleAPI {
   }
 
   async getGeojson() {
-    /** @type {{ geoJSON: { features: import('@turf/helpers').Feature<import('@turf/helpers').Polygon | import('@turf/helpers').MultiPolygon>[] } }} */
+    /** @type {{ geoJSON: import('types').RMGeoJSON }} */
     const { geoJSON } = await this.sendRequest(APIS.geofence)
     if (geoJSON?.features) {
       this.geojson.features = geoJSON.features.filter(
@@ -189,8 +173,8 @@ class PoracleAPI {
    * @param {{
    *  strategy: 'discord' | 'telegram'
    *  webhookStrategy: 'discord' | 'telegram'
-   *  discordId: string
-   *  telegramId: string
+   *  discordId: `${number}`
+   *  telegramId: `${number}`
    * }} user
    * @returns
    */
@@ -215,7 +199,7 @@ class PoracleAPI {
    * @returns
    */
   async getUserAreas(userId) {
-    /** @type {{ areas: PoracleHumanArea[] }} */
+    /** @type {{ areas: import('types').PoracleHumanArea[] }} */
     const { areas } = await this.sendRequest(APIS.humans(userId))
     const areaGroups = areas.reduce((groupMap, area) => {
       if (area.userSelectable) {
@@ -235,7 +219,7 @@ class PoracleAPI {
    *
    * @param {string} path
    * @param {Method} method
-   * @param {object} body
+   * @param {any} body
    * @returns
    */
   async sendRequest(path, method = 'GET', body = null) {
@@ -283,6 +267,7 @@ class PoracleAPI {
    */
   async profileManagement(userId, category, method, data) {
     const [, action] = PoracleAPI.split(category)
+
     const first = await this.sendRequest(
       action
         ? APIS.profileAction(
@@ -290,7 +275,7 @@ class PoracleAPI {
             action,
             `/${action === 'copy' ? `/${data.from}/${data.to}` : ''}${
               method === 'DELETE' ? `/${data}` : ''
-            }}`,
+            }`,
           )
         : APIS.profiles(userId),
       method,
@@ -327,7 +312,7 @@ class PoracleAPI {
   /**
    *
    * @param {number} userId
-   * @param {Category} category
+   * @param {APIInput} category
    * @param {Method} method
    * @param {any} data
    * @returns
@@ -343,7 +328,7 @@ class PoracleAPI {
       : await this.sendRequest(
           APIS.tracking(
             userId,
-            category,
+            main,
             method === 'DELETE' ? `/byUid/${data.uid}` : '',
           ),
           method,
@@ -357,7 +342,7 @@ class PoracleAPI {
   /**
    *
    * @param {number} userId
-   * @param {Category} category
+   * @param {APIInput} category
    * @param {Method} method
    * @param {any} data
    * @returns
@@ -434,7 +419,7 @@ class PoracleAPI {
   }
 
   /**
-   * @param {Category} category
+   * @param {APIInput} category
    * @returns {[Category, Action | undefined]}
    */
   static split(category) {
