@@ -157,7 +157,7 @@ module.exports = class Pokestop extends Model {
             'pokestop_incident.character_display AS grunt_type',
             'pokestop_incident.incident_display_type AS display_type',
           ])
-          .whereRaw('incident_expiration > UTC_TIMESTAMP()')
+          .whereRaw('(pokestop_incident.pokestop_id is null OR incident_expiration > UTC_TIMESTAMP())')
       } else {
         query
           .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
