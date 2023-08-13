@@ -1,3 +1,5 @@
+import { LEAGUES } from 'server/src/services/filters/pokemon/constants'
+
 export interface Device {
   id: string
   instance_name: string
@@ -149,6 +151,21 @@ export interface Pokestop {
   power_up_end_timestamp: number
 }
 
+export interface PvpEntry {
+  pokemon: number
+  form: number
+  cap: number
+  value: number
+  level: number
+  cp: number
+  percentage: number
+  rank: number
+  capped: boolean
+  evolution: number
+}
+
+export type CleanPvp = { [league in (typeof LEAGUES)[number]]?: PvpEntry }
+
 export interface Pokemon {
   id: string
   encounter_id: number
@@ -176,7 +193,7 @@ export interface Pokemon {
   capture_1: number
   capture_2: number
   capture_3: number
-  cleanPvp: any // JSON
+  cleanPvp: CleanPvp
   bestPvp: number
   seen_type: string
   changed: boolean
@@ -184,6 +201,10 @@ export interface Pokemon {
   first_seen_timestamp: number
   expire_timestamp_verified: boolean
   updated: number
+  pvp: { [league in (typeof LEAGUES)[number]]?: PvpEntry[] }
+  pvp_rankings_great_league?: PvpEntry[]
+  pvp_rankings_ultra_league?: PvpEntry[]
+  distance?: number
 }
 
 export interface Portal {

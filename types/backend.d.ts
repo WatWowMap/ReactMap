@@ -52,47 +52,6 @@ export interface User {
   avatar: string
 }
 
-export interface Pokemon {
-  id: string
-  encounter_id: number
-  spawnpoint_id: string
-  lat: number
-  lon: number
-  pokemon_id: number
-  form: number
-  costume: number
-  gender: number
-  display_pokemon_id: number
-  ditto_form: number
-  weight: number
-  height: number
-  size: number
-  move_1: number
-  move_2: number
-  cp: number
-  level: number
-  iv: number
-  atk_iv: number
-  def_iv: number
-  sta_iv: number
-  weather: number
-  capture_1: number
-  capture_2: number
-  capture_3: number
-  cleanPvp: CleanPvp
-  bestPvp: number
-  seen_type: string
-  changed: boolean
-  expire_timestamp: number
-  first_seen_timestamp: number
-  expire_timestamp_verified: boolean
-  updated: number
-  pvp: { [league in (typeof LEAGUES)[number]]?: PvpEntry[] }
-  pvp_rankings_great_league?: PvpEntry[]
-  pvp_rankings_ultra_league?: PvpEntry[]
-  distance?: number
-}
-
 export interface AvailablePokemon {
   id: number
   form: number
@@ -104,19 +63,6 @@ export interface Available {
   gyms: Awaited<ReturnType<(typeof Gym)['getAvailable']>>
   pokestops: Awaited<ReturnType<(typeof Pokestop)['getAvailable']>>
   nests: Awaited<ReturnType<(typeof Nest)['getAvailable']>>
-}
-
-export interface PvpEntry {
-  pokemon: number
-  form: number
-  cap: number
-  value: number
-  level: number
-  cp: number
-  percentage: number
-  rank: number
-  capped: boolean
-  evolution: number
 }
 
 export interface ApiEndpoint {
@@ -136,8 +82,6 @@ export interface DbConnection {
 }
 
 export type Schema = ApiEndpoint | DbConnection
-
-export type CleanPvp = { [league in (typeof LEAGUES)[number]]?: PvpEntry }
 
 export interface DbCheckClass {
   models: {
