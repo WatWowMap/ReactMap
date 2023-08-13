@@ -17,7 +17,7 @@ const capCamel = (str) =>
 /**
  * Map permissions to a string
  * @param {string[]} perms
- * @param {import('../../../types/types').Permissions} userPerms
+ * @param {import('types').Permissions} userPerms
  */
 const mapPerms = (perms, userPerms) =>
   perms
@@ -29,7 +29,7 @@ const mapPerms = (perms, userPerms) =>
 /**
  * Log user authentication to Discord
  * @param {import('express').Request} req
- * @param {import('../../../types/types').User} user
+ * @param {import('types').User} user
  * @param {string} strategy
  * @returns
  */

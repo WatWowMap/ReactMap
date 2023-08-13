@@ -4,16 +4,16 @@ const extend = require('extend')
 const { log, HELPERS } = require('./logger')
 
 /**
- * @type {import("../../../types/types").DbCheckClass}
+ * @type {import("types").DbCheckClass}
  */
 module.exports = class DbCheck {
   /**
    * @param {import("../models").ScannerModelKeys[]} validModels
-   * @param {{ schemas: import("../../../types/types").Schema[], settings: { maxConnections: number } }} dbConfig
+   * @param {{ schemas: import("types").Schema[], settings: { maxConnections: number } }} dbConfig
    * @param {boolean} queryDebug
    * @param {object} apiSettings
    * @param {'km' | 'mi'} distanceUnit
-   * @param {import("../../../types/types").RarityPercents} rarityPercents
+   * @param {import("types").RarityPercents} rarityPercents
    */
   constructor(
     validModels,
@@ -122,7 +122,7 @@ module.exports = class DbCheck {
 
   /**
    * @param {import('knex').Knex} schema
-   * @returns {Promise<import('../../../types/types').DbContext>}
+   * @returns {Promise<import('types').DbContext>}
    */
   static async schemaCheck(schema) {
     const [isMad, pvpV2, hasSize, hasHeight] = await schema('pokemon')
@@ -350,7 +350,7 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @template {import('../../../types/types').BaseRecord} T
+   * @template {import('types').BaseRecord} T
    * @param {T[][]} results
    * @returns {T[]}
    */
@@ -377,9 +377,9 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @template {import('../../../types/types').BaseRecord} T
+   * @template {import('types').BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
-   * @param {import("../../../types/types").Permissions} perms
+   * @param {import("types").Permissions} perms
    * @param {object} args
    * @param {number} userId
    * @param {'getAll' | string} method
@@ -400,7 +400,7 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @template {import('../../../types/types').BaseRecord} T
+   * @template {import('types').BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
    * @param {string} id
    * @returns {Promise<T | {}>}
@@ -416,9 +416,9 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @template {import('../../../types/types').BaseRecord} T
+   * @template {import('types').BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
-   * @param {import("../../../types/types").Permissions} perms
+   * @param {import("types").Permissions} perms
    * @param {object} args
    * @param {'search' | string} method
    * @returns {Promise<T[]>}
@@ -444,11 +444,11 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @param {import("../../../types/types").Permissions} perms
+   * @param {import("types").Permissions} perms
    * @param {object} args
    * @returns {Promise<[
-   *  import('../../../types/types').BaseRecord[],
-   *  import('../../../types/types').BaseRecord[]
+   *  import('types').BaseRecord[],
+   *  import('types').BaseRecord[]
    * ]>}
    */
   async submissionCells(perms, args) {
@@ -473,13 +473,13 @@ module.exports = class DbCheck {
    * const results = await dbCheck.query('Pokemon', 'getAll', perms, args)
    *
    * @template {import('../models').ModelKeys} T
-   * @template {keyof import('../../../types/types').ExtractMethods<import('../models').Models[T]>} U
-   * @template {Awaited<ReturnType<import('../../../types/types').ExtractMethods<import('../models').Models[T]>[U]>>} V
+   * @template {keyof import('types').ExtractMethods<import('../models').Models[T]>} U
+   * @template {Awaited<ReturnType<import('types').ExtractMethods<import('../models').Models[T]>[U]>>} V
    * @param {T} model The model to query
    * @param {U} method The method to call on the model
    * @param {T extends import('../models').ScannerModelKeys
-   *  ? import('../../../types/types').Head<Parameters<import('../../../types/types').ExtractMethods<import('../models').Models[T]>[U]>>
-   *  : Parameters<import('../../../types/types').ExtractMethods<import('../models').Models[T]>[U]>
+   *  ? import('types').Head<Parameters<import('types').ExtractMethods<import('../models').Models[T]>[U]>>
+   *  : Parameters<import('types').ExtractMethods<import('../models').Models[T]>[U]>
    * } args The arguments to pass to the method
    * @returns {Promise<V>} The result of the query
    */

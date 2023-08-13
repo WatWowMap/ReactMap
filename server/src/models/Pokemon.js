@@ -73,9 +73,9 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../../../types/types").Permissions} perms
+   * @param {import("types").Permissions} perms
    * @param {object} args
-   * @param {import("../../../types/types").DbContext} ctx
+   * @param {import("types").DbContext} ctx
    * @returns {{ filterMap: Record<string, PkmnFilter>, globalFilter: PkmnFilter }}
    */
   static getFilters(perms, args, ctx) {
@@ -118,10 +118,10 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../../../types/types").Permissions} perms
+   * @param {import("types").Permissions} perms
    * @param {object} args
-   * @param {import("../../../types/types").DbContext} ctx
-   * @returns {Promise<Partial<import('../../../types/types').Pokemon>[]>}
+   * @param {import("types").DbContext} ctx
+   * @returns {Promise<Partial<import('types').Pokemon>[]>}
    */
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
@@ -240,7 +240,7 @@ module.exports = class Pokemon extends Model {
       }
     }
 
-    /** @type {import("../../../types/types").Pokemon[]} */
+    /** @type {import("types").Pokemon[]} */
     const results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/scan` : null,
       mem
@@ -369,7 +369,7 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @template [T=import('../../../types/types').Pokemon[]]
+   * @template [T=import('types').Pokemon[]]
    * @param {string} mem
    * @param {string | import("objection").QueryBuilder<Pokemon>} query
    * @param {'GET' | 'POST' | 'PATCH' | 'DELETE'} method
@@ -409,10 +409,10 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../../../types/types").Permissions} perms
+   * @param {import("types").Permissions} perms
    * @param {object} args
-   * @param {import("../../../types/types").DbContext} ctx
-   * @returns {Promise<Partial<import('../../../types/types').Pokemon>[]>}
+   * @param {import("types").DbContext} ctx
+   * @returns {Promise<Partial<import('types').Pokemon>[]>}
    */
   static async getLegacy(perms, args, ctx) {
     const { isMad, hasSize, hasHeight, mem, secret } = ctx
@@ -502,12 +502,12 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../../../types/types").DbContext} ctx
+   * @param {import("types").DbContext} ctx
    */
   static async getAvailable({ isMad, mem, secret }) {
     const ts = Math.floor(Date.now() / 1000)
 
-    /** @type {import('../../../types/types').AvailablePokemon[]} */
+    /** @type {import('types').AvailablePokemon[]} */
     const available = await this.evalQuery(
       mem ? `${mem}/api/pokemon/available` : null,
       mem
@@ -535,8 +535,8 @@ module.exports = class Pokemon extends Model {
 
   /**
    * @param {string} id
-   * @param {import("../../../types/types").DbContext} ctx
-   * @returns {Promise<import('../../../types/types').Pokemon>}
+   * @param {import("types").DbContext} ctx
+   * @returns {Promise<import('types').Pokemon>}
    */
   static getOne(id, { isMad, mem, secret }) {
     return this.evalQuery(
@@ -556,11 +556,11 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../../../types/types").Permissions} perms
+   * @param {import("types").Permissions} perms
    * @param {object} args
-   * @param {import("../../../types/types").DbContext} ctx
+   * @param {import("types").DbContext} ctx
    * @param {number} distance
-   * @returns {Promise<Partial<import('../../../types/types').Pokemon>[]>}
+   * @returns {Promise<Partial<import('types').Pokemon>[]>}
    */
   static async search(perms, args, { isMad, mem, secret }, distance) {
     const { search, locale, onlyAreas = [] } = args

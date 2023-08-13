@@ -439,7 +439,7 @@ class PoracleAPI {
    */
   static split(category) {
     const [main, action] =
-      /** @type {import('../../../../types/types').Split<typeof category, '-'>} */ (
+      /** @type {import('types').Split<typeof category, '-'>} */ (
         category.split('-', 2)
       )
     return [main, action]

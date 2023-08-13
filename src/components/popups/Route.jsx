@@ -124,7 +124,7 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
 
 /**
  *
- * @param {import('../../../types/types').Route & { end?: boolean }} props
+ * @param {import('types').Route & { end?: boolean }} props
  * @returns
  */
 export default function RoutePopup({ end, ...props }) {

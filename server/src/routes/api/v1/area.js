@@ -5,7 +5,7 @@ const config = require('config')
 const { log, HELPERS } = require('../../../services/logger')
 const getAreas = require('../../../services/areas')
 
-/** @type {import('../../../../../types/types').Config['api']['reactMapSecret']} */
+/** @type {import('types').Config['api']['reactMapSecret']} */
 const reactMapSecret = config.get('api.reactMapSecret')
 
 router.get('/reload', async (req, res) => {

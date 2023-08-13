@@ -106,12 +106,12 @@ const resolvers = {
     fabButtons: (_, _args, { perms, user, req, Event }) => {
       const domain = `multiDomainsObj[${req.headers.host}]`
 
-      /** @type {import('../../../types/types').Config['map']['donationPage']} */
+      /** @type {import('types').Config['map']['donationPage']} */
       const donorPage = config.has(domain)
         ? config.get(`${domain}.donationPage`)
         : config.get('map.donationPage')
 
-      /** @type {import('../../../types/types').Config['scanner']} */
+      /** @type {import('types').Config['scanner']} */
       const scanner = config.get('scanner')
 
       return {
@@ -326,7 +326,7 @@ const resolvers = {
       return []
     },
     scannerConfig: (_, { mode }, { perms }) => {
-      /** @type {import('../../../types/types').Config['scanner']} */
+      /** @type {import('types').Config['scanner']} */
       const scanner = config.get('scanner')
 
       if (perms.scanner?.includes(mode) && scanner[mode].enabled) {

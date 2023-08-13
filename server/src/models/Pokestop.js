@@ -960,7 +960,7 @@ module.exports = class Pokestop extends Model {
 
   /**
    *
-   * @param {import('../../../types/types').DbContext} param0
+   * @param {import('types').DbContext} param0
    * @returns
    */
   static async getAvailable({

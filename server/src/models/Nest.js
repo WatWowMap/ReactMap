@@ -22,9 +22,9 @@ module.exports = class Nest extends Model {
 
   /**
    *
-   * @param {import('../../../types/types').Permissions} perms
+   * @param {import('types').Permissions} perms
    * @param {object} args
-   * @param {import('../../../types/types').DbContext} ctx
+   * @param {import('types').DbContext} ctx
    * @returns
    */
   static async getAll(perms, args, { polygon }) {
@@ -127,9 +127,9 @@ module.exports = class Nest extends Model {
 
   /**
    *
-   * @param {import('../../../types/types').Permissions} perms
+   * @param {import('types').Permissions} perms
    * @param {object} args
-   * @param {import('../../../types/types').DbContext} ctx
+   * @param {import('types').DbContext} ctx
    * @param {import('objection').Raw} distance
    * @returns
    */

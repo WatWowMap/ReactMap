@@ -19,9 +19,9 @@ class Route extends Model {
 
   /**
    * Returns the bare essentials for displaying on the map
-   * @param {import('../../../types/types').Permissions} perms
+   * @param {import('types').Permissions} perms
    * @param {object} args
-   * @param {import('../../../types/types').DbContext} ctx
+   * @param {import('types').DbContext} ctx
    * @returns
    */
   static async getAll(perms, args, ctx) {
