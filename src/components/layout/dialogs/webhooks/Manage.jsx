@@ -12,7 +12,7 @@ import Utility from '@services/Utility'
 import Footer from '@components/layout/general/Footer'
 import TabPanel from '@components/layout/general/TabPanel'
 import Header from '@components/layout/general/Header'
-import { FULL_WEBHOOK } from '@services/queries/webhook'
+import { allProfiles } from '@services/queries/webhook'
 
 import NewPokemon from './tiles/WebhookTile'
 import Human from './human'
@@ -29,7 +29,7 @@ export default function Manage() {
 
   const { t } = useTranslation()
 
-  const { data } = useQuery(FULL_WEBHOOK, {
+  const { data } = useQuery(allProfiles, {
     fetchPolicy: 'no-cache',
   })
 

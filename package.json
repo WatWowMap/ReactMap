@@ -59,6 +59,8 @@
     "@apollo/server": "^4.7.4",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@graphql-tools/graphql-file-loader": "^8.0.0",
+    "@graphql-tools/load": "^8.0.0",
     "@mui/icons-material": "^5.14.0",
     "@mui/material": "^5.14.0",
     "@rainb0w-clwn/passport-telegram-official": "^2.0.2",

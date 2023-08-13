@@ -18,18 +18,13 @@ const i18next = require('i18next')
 const Backend = require('i18next-fs-backend')
 const { rainbow } = require('chalkercli')
 const Sentry = require('@sentry/node')
-const { ApolloServer } = require('@apollo/server')
 const { expressMiddleware } = require('@apollo/server/express4')
-const {
-  ApolloServerPluginDrainHttpServer,
-} = require('@apollo/server/plugin/drainHttpServer')
 const cors = require('cors')
 const { json } = require('body-parser')
 const http = require('http')
 const { GraphQLError } = require('graphql')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
-const NodeCache = require('node-cache')
 
 const config = require('./services/config')
 const { log, HELPERS } = require('./services/logger')
@@ -37,11 +32,10 @@ const { Db, Event } = require('./services/initialization')
 const Clients = require('./services/Clients')
 const sessionStore = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
-const typeDefs = require('./graphql/typeDefs')
-const resolvers = require('./graphql/resolvers')
 const pkg = require('../../package.json')
 const getAreas = require('./services/areas')
 const { connection } = require('./db/knexfile.cjs')
+const startApollo = require('./graphql/server')
 
 Event.clients = Clients
 
@@ -49,102 +43,17 @@ if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')
 }
 
-const errorCache = new NodeCache({ stdTTL: 60 * 60 })
+// const typeDefs = loadTypedefs(
+//   path.join(__dirname, 'graphql/typeDefs', '*.graphql'),
+//   {
+//     loaders: [new GraphQLFileLoader()],
+//   },
+// )
+
+// typeDefs.then((data) => console.log(data))
 
 const app = express()
 const httpServer = http.createServer(app)
-const apolloServer = new ApolloServer({
-  typeDefs,
-  resolvers,
-  introspection: config.devOptions.enabled,
-  formatError: (e) => {
-    let customMessage = ''
-    if (e?.message.includes('skipUndefined()') || e?.message === 'old_client') {
-      customMessage =
-        'old client detected, forcing user to refresh, no need to report this error unless it continues to happen'
-    } else if (e.message === 'session_expired') {
-      customMessage =
-        'user session expired, forcing logout, no need to report this error unless it continues to happen'
-    } else if (e.message === 'unauthenticated') {
-      customMessage =
-        'user is not authenticated, forcing logout, no need to report this error unless it continues to happen'
-    }
-
-    const key = `${e.extensions.id || e.extensions.user}-${e.message}`
-    if (errorCache.has(key)) {
-      return e
-    }
-    errorCache.set(key, true)
-
-    log[customMessage ? 'info' : 'error'](
-      HELPERS.gql,
-      HELPERS[e.extensions.endpoint] ||
-        `[${e.extensions.endpoint?.toUpperCase()}]`,
-      'Client:',
-      e.extensions.clientV,
-      'Server:',
-      e.extensions.serverV,
-      'User:',
-      e.extensions.user || 'Not Logged In',
-      e.extensions.id || '',
-      customMessage || e,
-    )
-    return e
-  },
-  logger: {
-    debug: (...e) => log.debug(HELPERS.gql, ...e),
-    info: (...e) => log.info(HELPERS.gql, ...e),
-    warn: (...e) => log.warn(HELPERS.gql, ...e),
-    error: (...e) => log.error(HELPERS.gql, ...e),
-  },
-  plugins: [
-    ApolloServerPluginDrainHttpServer({ httpServer }),
-    {
-      async requestDidStart(requestContext) {
-        requestContext.contextValue.startTime = Date.now()
-        const filterCount = Object.keys(
-          requestContext.request?.variables?.filters || {},
-        ).length
-
-        return {
-          async willSendResponse(context) {
-            const { response, contextValue } = context
-            if (
-              response.body.kind === 'single' &&
-              'data' in response.body.singleResult
-            ) {
-              const endpoint =
-                context?.operation?.selectionSet?.selections?.[0]?.name?.value
-              const returned =
-                response.body.singleResult?.data?.[endpoint]?.length || 0
-
-              context.logger.info(
-                HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
-                '|',
-                context.operationName,
-                '|',
-                returned || 0,
-                '|',
-                `${Date.now() - contextValue.startTime}ms`,
-                '|',
-                contextValue.user || 'Not Logged In',
-                '|',
-                'Filters:',
-                filterCount || 0,
-              )
-
-              const { transaction } = contextValue
-
-              if (returned) {
-                transaction.setMeasurement(`${endpoint}.returned`, returned)
-              }
-            }
-          },
-        }
-      },
-    },
-  ],
-})
 
 Sentry.init({
   dsn:
@@ -299,12 +208,12 @@ app.use((err, req, res, next) => {
   }
 })
 
-apolloServer.start().then(() => {
+startApollo(httpServer).then((server) => {
   app.use(
     '/graphql',
     cors(),
     json(),
-    expressMiddleware(apolloServer, {
+    expressMiddleware(server, {
       context: ({ req, res }) => {
         const perms = req.user ? req.user.perms : req.session.perms
         const user = req?.user?.username || ''

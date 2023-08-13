@@ -1,7 +1,6 @@
 // @ts-check
 const fetchJson = require('./fetchJson')
 const { log, HELPERS } = require('../logger')
-const resolveQuickHook = require('./resolveQuickHook')
 
 const PLATFORMS = /** @type {const} */ (['discord', 'telegram'])
 
@@ -392,7 +391,7 @@ class PoracleAPI {
       case 'gym':
         return this.tracking(userId, category, data)
       case 'quickGym':
-        return resolveQuickHook(category, userId, this.name, data)
+        return this.quickGym(userId, data)
       default:
         return this.tracking(userId, category, data)
     }

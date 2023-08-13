@@ -135,6 +135,7 @@ export interface GqlContext {
   user: string
   transaction: Transaction
   operation: 'query' | 'mutation'
+  startTime: number
 }
 
 export interface Permissions {

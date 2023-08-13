@@ -235,7 +235,7 @@ const Weather = gql`
   }
 `
 
-export const FULL_WEBHOOK = gql`
+export const allProfiles = gql`
   ${Human}
   ${Egg}
   ${Gym}
@@ -469,9 +469,9 @@ export const quest = gql`
   }
 `
 
-export const WEBHOOK_CONTEXT = gql`
-  query WebhookContext {
-    webhookContext {
-    }
-  }
-`
+// export const WEBHOOK_CONTEXT = gql`
+//   query WebhookContext {
+//     webhookContext {
+//     }
+//   }
+// `
