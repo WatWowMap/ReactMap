@@ -6,7 +6,6 @@ const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
 const config = require('../services/config')
 const Utility = require('../services/Utility')
-const Fetch = require('../services/Fetch')
 const { Event, Db } = require('../services/initialization')
 const { version } = require('../../../package.json')
 const { log, HELPERS } = require('../services/logger')
@@ -293,73 +292,73 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       serverSettings.userSettings = clientValues
       serverSettings.clientMenus = clientMenus
 
-      if (
-        config.webhooks.length &&
-        serverSettings.user?.perms?.webhooks?.length
-      ) {
-        serverSettings.webhooks = {}
-        const filtered = config.webhooks.filter((webhook) =>
-          serverSettings.user.perms.webhooks.includes(webhook.name),
-        )
-        try {
-          await Promise.all(
-            filtered.map(async (webhook) => {
-              if (
-                webhook.enabled &&
-                Event.webhookObj?.[webhook.name]?.client?.valid
-              ) {
-                const webhookId = Utility.evalWebhookId(serverSettings.user)
-                const { strategy, webhookStrategy } = serverSettings.user
+      // if (
+      //   config.webhooks.length &&
+      //   serverSettings.user?.perms?.webhooks?.length
+      // ) {
+      //   serverSettings.webhooks = {}
+      //   const filtered = config.webhooks.filter((webhook) =>
+      //     serverSettings.user.perms.webhooks.includes(webhook.name),
+      //   )
+      //   try {
+      //     await Promise.all(
+      //       filtered.map(async (webhook) => {
+      //         if (
+      //           webhook.enabled &&
+      //           Event.webhookObj?.[webhook.name]?.client?.valid
+      //         ) {
+      //           const webhookId = Utility.evalWebhookId(serverSettings.user)
+      //           const { strategy, webhookStrategy } = serverSettings.user
 
-                const remoteData = await Fetch.webhookApi(
-                  'allProfiles',
-                  webhookId,
-                  'GET',
-                  webhook.name,
-                )
-                const { areas } = await Fetch.webhookApi(
-                  'humans',
-                  webhookId,
-                  'GET',
-                  webhook.name,
-                )
+      //           const remoteData = await Fetch.webhookApi(
+      //             'allProfiles',
+      //             webhookId,
+      //             'GET',
+      //             webhook.name,
+      //           )
+      //           const { areas } = await Fetch.webhookApi(
+      //             'humans',
+      //             webhookId,
+      //             'GET',
+      //             webhook.name,
+      //           )
 
-                if (remoteData && areas) {
-                  serverSettings.webhooks[webhook.name] = remoteData.human
-                    .admin_disable
-                    ? Event.webhookObj[webhook.name].client
-                    : {
-                        ...Event.webhookObj[webhook.name].client,
-                        ...remoteData,
-                        hasNominatim: Boolean(
-                          Event.webhookObj[webhook.name].server.nominatimUrl,
-                        ),
-                        locale:
-                          remoteData.human.language ||
-                          Event.webhookObj[webhook.name].client.locale,
-                        available: areas
-                          .sort((a, b) => a.name.localeCompare(b.name))
-                          .filter((area) => area.userSelectable !== false)
-                          .map((area) => area.name),
-                        templates:
-                          Event.webhookObj[webhook.name].client.templates[
-                            webhookStrategy || strategy
-                          ],
-                      }
-                }
-              }
-            }),
-          )
-        } catch (e) {
-          serverSettings.webhooks = null
-          log.warn(
-            HELPERS.auth,
-            e,
-            'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database. User ID:',
-            serverSettings.user.id,
-          )
-        }
-      }
+      //           if (remoteData && areas) {
+      //             serverSettings.webhooks[webhook.name] = remoteData.human
+      //               .admin_disable
+      //               ? Event.webhookObj[webhook.name].client
+      //               : {
+      //                   ...Event.webhookObj[webhook.name].client,
+      //                   ...remoteData,
+      //                   hasNominatim: Boolean(
+      //                     Event.webhookObj[webhook.name].server.nominatimUrl,
+      //                   ),
+      //                   locale:
+      //                     remoteData.human.language ||
+      //                     Event.webhookObj[webhook.name].client.locale,
+      //                   available: areas
+      //                     .sort((a, b) => a.name.localeCompare(b.name))
+      //                     .filter((area) => area.userSelectable !== false)
+      //                     .map((area) => area.name),
+      //                   templates:
+      //                     Event.webhookObj[webhook.name].client.templates[
+      //                       webhookStrategy || strategy
+      //                     ],
+      //                 }
+      //           }
+      //         }
+      //       }),
+      //     )
+      //   } catch (e) {
+      //     serverSettings.webhooks = null
+      //     log.warn(
+      //       HELPERS.auth,
+      //       e,
+      //       'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database. User ID:',
+      //       serverSettings.user.id,
+      //     )
+      //   }
+      // }
     }
     res.status(200).json({ serverSettings })
   } catch (error) {

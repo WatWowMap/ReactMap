@@ -3,8 +3,8 @@ const path = require('path')
 const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
 const { generate } = require('../../scripts/generateMasterfile')
-const initWebhooks = require('./initWebhooks')
 const { log, HELPERS } = require('./logger')
+const PoracleAPI = require('./api/Poracle')
 
 class EventManager {
   constructor(masterfile) {
@@ -15,6 +15,8 @@ class EventManager {
     this.uiconsBackup = {}
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
+
+    /** @type {Record<string, InstanceType<typeof PoracleAPI>>} */
     this.webhookObj = {}
     this.Clients = {}
   }
@@ -245,10 +247,9 @@ class EventManager {
   async getWebhooks(config) {
     await Promise.all(
       config.webhooks.map(async (webhook) => {
-        this.webhookObj = {
-          ...this.webhookObj,
-          [webhook.name]: await initWebhooks(webhook),
-        }
+        Object.assign(this.webhookObj, {
+          [webhook.name]: await new PoracleAPI(webhook).init(),
+        })
       }),
     )
   }

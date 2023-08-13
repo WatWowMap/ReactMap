@@ -284,3 +284,11 @@ export type SpecificValueType<T, U, V> = {
 export type OnlyType<T, U, V = true> = { [k in SpecificValueType<T, U, V>]: U }
 
 export type StoreNoFn<T> = keyof OnlyType<T, Function, false>
+
+export type Split<S extends string, D extends string> = string extends S
+  ? string[]
+  : S extends ''
+  ? []
+  : S extends `${infer T}${D}${infer U}`
+  ? [T, ...Split<U, D>]
+  : [S]

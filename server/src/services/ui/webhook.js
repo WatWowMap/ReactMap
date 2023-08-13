@@ -1,4 +1,4 @@
-module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
+function webhookUi(provider, hookConfig, pvp, leagues) {
   switch (provider) {
     case 'poracle': {
       const isOhbem = pvp === 'ohbem'
@@ -667,3 +667,5 @@ module.exports = function webhookUi(provider, hookConfig, pvp, leagues) {
       return {}
   }
 }
+
+module.exports = webhookUi

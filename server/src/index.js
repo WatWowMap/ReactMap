@@ -411,7 +411,7 @@ connection.migrate.latest().then(async () => {
       config.interface
     }:${config.port}`,
   )
-  setTimeout(() => text.stop(), 3_000)
+  setTimeout(() => text.stop(), 1_000)
 })
 
 module.exports = app

@@ -12,7 +12,7 @@ export default function WebhookAreaSelection() {
   const selectedAreas = useWebhookStore((s) => s.selectedAreas)
   const webhookData = useWebhookStore((s) => s.data)
 
-  if (webhookData[selectedWebhook] && webhookMode === 'areas') {
+  if (webhookMode === 'areas' && webhookData[selectedWebhook]) {
     const lower = webhookData[selectedWebhook].available.map((a) =>
       a.toLowerCase(),
     )

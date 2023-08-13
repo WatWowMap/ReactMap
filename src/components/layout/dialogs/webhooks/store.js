@@ -1,5 +1,6 @@
 import { useStore } from '@hooks/useStore'
 import { create } from 'zustand'
+
 /**
  * TODO: Finish this
  * @typedef {{}} MutationVars

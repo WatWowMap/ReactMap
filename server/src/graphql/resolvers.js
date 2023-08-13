@@ -484,6 +484,9 @@ const resolvers = {
       }
       return []
     },
+    webhookGeojson: async (parent, { name }, { perms }) => {
+      console.log({ parent })
+    },
     scanner: (_, args, { req, perms }) => {
       const { category, method, data } = args
       if (category === 'getQueue') {
