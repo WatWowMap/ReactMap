@@ -52,6 +52,10 @@ class User extends Model {
   static async getOne(id) {
     return this.query().findOne({ id })
   }
+
+  static async updateWebhook(id, selectedWebhook) {
+    return this.query().update({ selectedWebhook }).where({ id })
+  }
 }
 
 module.exports = User

@@ -10,7 +10,7 @@ const filterComponents = require('../services/functions/filterComponents')
 const { filterRTree } = require('../services/functions/filterRTree')
 const evalWebhookId = require('../services/functions/evalWebhookId')
 
-/** @type {import("@apollo/server").ApolloServerOptions<import('../types').GqlContext>['resolvers']} */
+/** @type {import("@apollo/server").ApolloServerOptions<import('@types/types').GqlContext>['resolvers']} */
 const resolvers = {
   JSON: GraphQLJSON,
   Query: {
@@ -71,43 +71,6 @@ const resolvers = {
       }
       return []
     },
-    fabButtons: (_, _args, { perms, user, req, Event }) => {
-      const domain = `multiDomainsObj[${req.headers.host}]`
-
-      /** @type {import('../types').Config['map']['donationPage']} */
-      const donorPage = config.has(domain)
-        ? config.get(`${domain}.donationPage`)
-        : config.get('map.donationPage')
-
-      /** @type {import('../types').Config['scanner']} */
-      const scanner = config.get('scanner')
-
-      return {
-        custom: config.has(domain)
-          ? config.get(`${domain}.customFloatingIcons`)
-          : config.get('map.customFloatingIcons'),
-        donationButton:
-          donorPage.showOnMap && (perms.donor ? donorPage.showToDonors : true)
-            ? donorPage.fabIcon
-            : '',
-        profileButton:
-          user && config.has(domain)
-            ? config.get(`${domain}.enableFloatingProfileButton`)
-            : config.get('map.enableFloatingProfileButton'),
-        scanZone:
-          scanner.backendConfig.platform !== 'mad' &&
-          scanner.scanZone.enabled &&
-          perms.scanner.includes('scanZone'),
-        scanNext:
-          scanner.scanNext.enabled && perms.scanner.includes('scanNext'),
-        search: Object.entries(config.api.searchable).some(
-          ([k, v]) => v && perms[k],
-        ),
-        webhooks:
-          !!perms.webhooks.length &&
-          perms.webhooks.every((name) => name in Event.webhookObj),
-      }
-    },
     customComponent: (_, { component }, { perms, user }) => {
       switch (component) {
         case 'messageOfTheDay':
@@ -139,6 +102,43 @@ const resolvers = {
         return Db.getAll('Device', perms, args)
       }
       return []
+    },
+    fabButtons: (_, _args, { perms, user, req, Event }) => {
+      const domain = `multiDomainsObj[${req.headers.host}]`
+
+      /** @type {import('../../../types/types').Config['map']['donationPage']} */
+      const donorPage = config.has(domain)
+        ? config.get(`${domain}.donationPage`)
+        : config.get('map.donationPage')
+
+      /** @type {import('../../../types/types').Config['scanner']} */
+      const scanner = config.get('scanner')
+
+      return {
+        custom: config.has(domain)
+          ? config.get(`${domain}.customFloatingIcons`)
+          : config.get('map.customFloatingIcons'),
+        donationButton:
+          donorPage.showOnMap && (perms.donor ? donorPage.showToDonors : true)
+            ? donorPage.fabIcon
+            : '',
+        profileButton:
+          user && config.has(domain)
+            ? config.get(`${domain}.enableFloatingProfileButton`)
+            : config.get('map.enableFloatingProfileButton'),
+        scanZone:
+          scanner.backendConfig.platform !== 'mad' &&
+          scanner.scanZone.enabled &&
+          perms.scanner.includes('scanZone'),
+        scanNext:
+          scanner.scanNext.enabled && perms.scanner.includes('scanNext'),
+        search: Object.entries(config.api.searchable).some(
+          ([k, v]) => v && perms[k],
+        ),
+        webhooks:
+          !!perms.webhooks.length &&
+          perms.webhooks.every((name) => name in Event.webhookObj),
+      }
     },
     geocoder: (_, args, { perms, Event }) => {
       if (perms?.webhooks) {
@@ -288,6 +288,8 @@ const resolvers = {
       return [{ features: [] }]
     },
     scanAreasMenu: (_, _args, { req, perms }) => {
+      console.log(req?.user)
+
       if (perms?.scanAreas) {
         const scanAreas = config.has(`areas.scanAreasMenu.${req.headers.host}`)
           ? config.get(`areas.scanAreasMenu.${req.headers.host}`)
@@ -324,7 +326,7 @@ const resolvers = {
       return []
     },
     scannerConfig: (_, { mode }, { perms }) => {
-      /** @type {import('../types').Config['scanner']} */
+      /** @type {import('../../../types/types').Config['scanner']} */
       const scanner = config.get('scanner')
 
       if (perms.scanner?.includes(mode) && scanner[mode].enabled) {

@@ -4,7 +4,7 @@ import HolidayAnimations from '@services/HolidayAnimations'
 
 /**
  *
- * @param {import('../../server/src/types').Config['map']['holidayEffects'][number]} props
+ * @param {import('../../types/types').Config['map']['holidayEffects'][number]} props
  * @returns
  */
 export default function HolidayEffect({

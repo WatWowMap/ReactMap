@@ -76,7 +76,6 @@ export default function FloatingButtons() {
   const map = useMap()
   const { lc, color } = useLocation()
 
-  const selectedWebhook = useStore((s) => s.selectedWebhook)
   const reactControls = useStore(
     (s) => s.settings.navigationControls === 'react',
   )
@@ -156,12 +155,11 @@ export default function FloatingButtons() {
           <Search fontSize={iconSize} sx={{ color: 'white' }} />
         </Fab>
       )}
-      {fabButtons.webhooks && selectedWebhook && (
+      {fabButtons.webhooks && (
         <Fab
           color="secondary"
           size={fabSize}
           onClick={setModeBtn('open')}
-          title={selectedWebhook}
           disabled={disabled}
         >
           <NotificationsActive fontSize={iconSize} sx={{ color: 'white' }} />

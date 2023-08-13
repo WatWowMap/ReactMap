@@ -17,9 +17,9 @@ const custom = new PokemonFilter(
 
 /**
  *
- * @param {import('../../../types').Permissions} perms
- * @param {import('../../../types').Available} available
- * @param {import('../../../types').DbCheckClass} database
+ * @param {import('../../../../../types/types').Permissions} perms
+ * @param {import('../../../../../types/types').Available} available
+ * @param {import('../../../../../types/types').DbCheckClass} database
  * @returns
  */
 function buildDefaultFilters(perms, available, database) {

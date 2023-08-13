@@ -26,7 +26,6 @@ export default function Manage() {
   const Icons = useStatic((s) => s.Icons)
 
   const webhookData = useWebhookStore((s) => s.data)
-  const selectedWebhook = useStore((s) => s.selectedWebhook)
 
   const { t } = useTranslation()
   const [syncWebhook, { data }] = useLazyQuery(Query.webhook('allProfiles'), {
@@ -40,13 +39,8 @@ export default function Manage() {
   const send = useWebhookStore((s) => s.send)
 
   const poracleFilters = React.useMemo(
-    () =>
-      Poracle.filterGenerator(
-        webhookData[selectedWebhook],
-        staticFilters,
-        invasions,
-      ),
-    [selectedWebhook],
+    () => Poracle.filterGenerator(webhookData, staticFilters, invasions),
+    [],
   )
 
   const [tabValue, setTabValue] = React.useState(0)

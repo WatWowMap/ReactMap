@@ -12,7 +12,7 @@ const { filterRTree } = require('../../functions/filterRTree')
 const { Event, Pvp } = require('../../initialization')
 const { log, HELPERS } = require('../../logger')
 
-/** @type {import('../../../types').Config['api']['pvp']} */
+/** @type {import('../../../../../types/types').Config['api']['pvp']} */
 const pvpConfig = config.get('api.pvp')
 
 module.exports = class PkmnBackend {
@@ -143,7 +143,7 @@ module.exports = class PkmnBackend {
 
   /**
    * @param {boolean} global
-   * @returns {(pokemon?: Partial<import("../../../types").Pokemon>) => boolean}
+   * @returns {(pokemon?: Partial<import("../../../../../types/types").Pokemon>) => boolean}
    */
   getCallback(global = false) {
     const filter = global ? this.global : this.filter
@@ -189,7 +189,7 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {import("../../../types").PvpEntry} entry
+   * @param {import("../../../../../types/types").PvpEntry} entry
    * @param {typeof import("./constants").LEAGUES[number]} league
    * @returns {boolean}
    */
@@ -219,8 +219,8 @@ module.exports = class PkmnBackend {
 
   /**
    * @param {typeof import("./constants").LEAGUES[number]} league
-   * @param {import('../../../types').PvpEntry[]} data
-   * @returns {{ best: number; filtered: import('../../../types').PvpEntry[]}}
+   * @param {import('../../../../../types/types').PvpEntry[]} data
+   * @returns {{ best: number; filtered: import('../../../../../types/types').PvpEntry[]}}
    */
   getRanks(league, data) {
     const filtered =
@@ -310,7 +310,7 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {Partial<import('../../../types').Pokemon>} pokemon
+   * @param {Partial<import('../../../../../types/types').Pokemon>} pokemon
    * @return {boolean}
    */
   valid(pokemon) {
@@ -334,7 +334,7 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {import('../../../types').Pokemon} pokemon
+   * @param {import('../../../../../types/types').Pokemon} pokemon
    * @param {number} safeTs
    * @returns {{ cleanPvp: { [key in typeof LEAGUES[number]]?: number[] }, bestPvp: number }}
    */
@@ -357,8 +357,8 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {import('../../../types').Pokemon} pokemon
-   * @returns {Partial<import('../../../types').Pokemon>}
+   * @param {import('../../../../../types/types').Pokemon} pokemon
+   * @returns {Partial<import('../../../../../types/types').Pokemon>}
    */
   build(pokemon) {
     const result = {

@@ -17,9 +17,9 @@ module.exports = class PvpWrapper extends Ohbem {
   }
 
   /**
-   * @param {import("../types").Pokemon} pokemon
+   * @param {import("../../../types/types").Pokemon} pokemon
    * @param {number} currentTs
-   * @returns {import("../types").CleanPvp}
+   * @returns {import("../../../types/types").CleanPvp}
    */
   resultWithCache(pokemon, currentTs) {
     if (pokemon.pokemon_id === 132) return {}

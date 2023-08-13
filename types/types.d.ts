@@ -1,26 +1,26 @@
-import { LEAGUES } from './services/filters/pokemon/constants'
+import { LEAGUES } from '../server/src/services/filters/pokemon/constants'
 import type {
   ScannerModels,
   ScannerModelKeys,
   RmModels,
   RmModelKeys,
   ModelKeys,
-} from './models'
+} from '../server/src/models'
 import { Knex } from 'knex'
 import { Model } from 'objection'
 import { Request, Response } from 'express'
 import { Transaction } from '@sentry/node'
 
-import DbCheck = require('./services/DbCheck')
-import EventManager = require('./services/EventManager')
-import Pokemon = require('./models/Pokemon')
-import Gym = require('./models/Gym')
-import Badge = require('./models/Badge')
-import Backup = require('./models/Backup')
-import Nest = require('./models/Nest')
-import NestSubmission = require('./models/NestSubmission')
-import Pokestop = require('./models/Pokestop')
-import config = require('./configs/default.json')
+import DbCheck = require('../server/src/services/DbCheck')
+import EventManager = require('../server/src/services/EventManager')
+import Pokemon = require('../server/src/models/Pokemon')
+import Gym = require('../server/src/models/Gym')
+import Badge = require('../server/src/models/Badge')
+import Backup = require('../server/src/models/Backup')
+import Nest = require('../server/src/models/Nest')
+import NestSubmission = require('../server/src/models/NestSubmission')
+import Pokestop = require('../server/src/models/Pokestop')
+import config = require('../server/src/configs/default.json')
 
 export interface DbContext {
   isMad: boolean

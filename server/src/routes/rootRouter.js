@@ -119,9 +119,18 @@ rootRouter.get('/api/settings', async (req, res, next) => {
     const getUser = async () => {
       if (config.authMethods.length && req.user) {
         try {
-          const user = await Db.models.User.query().findById(req.user.id)
+          const user = await Db.query('User', 'getOne', req.user.id)
           if (user) {
+            if (!user.selectedWebhook) {
+              const newWebhook = req.user.perms.webhooks.find(
+                (n) => n in Event.webhookObj,
+              )
+              await Db.query('User', 'updateWebhook', user.id, newWebhook)
+              req.session.user.selectedWebhook = newWebhook
+              req.session.save()
+            }
             delete user.password
+
             return {
               ...req.user,
               ...user,
@@ -137,10 +146,11 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           req.logout(() => {})
           return { valid: false, tutorial: !config.map.forceTutorial }
         } catch (e) {
-          log.info(
+          log.warn(
             HELPERS.session,
             'Issue finding user, User ID:',
             req?.user?.id,
+            e,
           )
           return { valid: false, tutorial: !config.map.forceTutorial }
         }

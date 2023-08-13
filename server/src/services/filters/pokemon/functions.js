@@ -75,13 +75,13 @@ function assign(newObject, reference, props) {
 
 /**
  * @param {string} filter
- * @returns {(pokemon: import('../../../types').Pokemon) => boolean}
+ * @returns {(pokemon: import('../../../../../types/types').Pokemon) => boolean}
  */
 const jsFnCache = new NodeCache({ stdTTL: 60 * 5 })
 /**
  *
  * @param {string} filter
- * @returns {(pokemon: import('../../../types').Pokemon) => boolean}
+ * @returns {(pokemon: import('../../../../../types/types').Pokemon) => boolean}
  */
 function jsifyIvFilter(filter) {
   if (jsFnCache.has(filter)) {
