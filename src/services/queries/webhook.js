@@ -235,7 +235,7 @@ const Weather = gql`
   }
 `
 
-export const allProfiles = gql`
+export const FULL_WEBHOOK = gql`
   ${Human}
   ${Egg}
   ${Gym}
@@ -247,8 +247,8 @@ export const allProfiles = gql`
   ${Quest}
   ${Raid}
   ${Weather}
-  query Webhook($category: String!, $status: String!, $name: String!) {
-    webhook(category: $category, status: $status, name: $name) {
+  query Webhook($category: String!, $status: String!) {
+    webhook(category: $category, status: $status) {
       ...PoracleHuman
       ...PoracleEgg
       ...PoracleGym
@@ -465,6 +465,13 @@ export const quest = gql`
     webhook(data: $data, category: $category, status: $status, name: $name) {
       ...Base
       ...PoracleQuest
+    }
+  }
+`
+
+export const WEBHOOK_CONTEXT = gql`
+  query WebhookContext {
+    webhookContext {
     }
   }
 `

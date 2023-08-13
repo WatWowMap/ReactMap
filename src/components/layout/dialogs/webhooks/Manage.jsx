@@ -4,16 +4,16 @@ import Person from '@mui/icons-material/Person'
 import { DialogContent, AppBar, Tabs, Tab, Collapse } from '@mui/material'
 
 import { useTranslation, Trans } from 'react-i18next'
-import { useLazyQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 
-import Query from '@services/Query'
 import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
 import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
-
 import Footer from '@components/layout/general/Footer'
 import TabPanel from '@components/layout/general/TabPanel'
 import Header from '@components/layout/general/Header'
+import { FULL_WEBHOOK } from '@services/queries/webhook'
+
 import NewPokemon from './tiles/WebhookTile'
 import Human from './human'
 import Tracked from './Tracked'
@@ -28,7 +28,8 @@ export default function Manage() {
   const webhookData = useWebhookStore((s) => s.data)
 
   const { t } = useTranslation()
-  const [syncWebhook, { data }] = useLazyQuery(Query.webhook('allProfiles'), {
+
+  const { data } = useQuery(FULL_WEBHOOK, {
     fetchPolicy: 'no-cache',
   })
 
