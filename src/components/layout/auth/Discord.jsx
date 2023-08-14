@@ -3,16 +3,16 @@ import { Button, darken } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import FAIcon from '../general/FAIcon'
 
-export default function DiscordLogin({ href, text, size }) {
+export default function DiscordLogin({ href, text, size, color }) {
   const { t } = useTranslation()
 
   return (
     <Button
       variant="contained"
       sx={{
-        bgcolor: 'rgb(117,218,114)',
+        bgcolor: color || 'rgb(114,136,218)',
         '&:hover': {
-          bgcolor: darken('rgb(117,218,114)', 0.2),
+          bgcolor: darken(color || 'rgb(114,136,218)', 0.2),
         },
       }}
       size={size || 'large'}
