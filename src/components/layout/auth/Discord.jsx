@@ -10,9 +10,9 @@ export default function DiscordLogin({ href, text, size }) {
     <Button
       variant="contained"
       sx={{
-        bgcolor: 'rgb(114,136,218)',
+        bgcolor: 'rgb(117,218,114)',
         '&:hover': {
-          bgcolor: darken('rgb(114,136,218)', 0.2),
+          bgcolor: darken('rgb(117,218,114)', 0.2),
         },
       }}
       size={size || 'large'}
