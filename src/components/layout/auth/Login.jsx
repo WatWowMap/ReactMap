@@ -75,7 +75,7 @@ export default function Login({ serverSettings, getServerSettings }) {
               >
                 <DiscordLogin
                     href={serverSettings.config.map.discordAuthUrl}
-                    color={'rgb(117,218,114'}
+                    color={rgb(117,218,114)}
                 />
               </Grid>
               {serverSettings.config.map.discordInvite && (
