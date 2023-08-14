@@ -104,7 +104,7 @@
     "mysql2": "^3.4.0",
     "node-cache": "^5.1.2",
     "node-fetch": "2",
-    "node-geocoder": "^4.0.0",
+    "node-geocoder": "^4.2.0",
     "nodes2ts": "^2.0.0",
     "objection": "^3.0.1",
     "ohbem": "^1.4.1",

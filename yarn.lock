@@ -4301,10 +4301,10 @@ node-fetch@2, node-fetch@2.6.7, node-fetch@^2.6.0, node-fetch@^2.6.5, node-fetch
   dependencies:
     whatwg-url "^5.0.0"
 
-node-geocoder@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/node-geocoder/-/node-geocoder-4.0.0.tgz#2b9677ebec35ff5db84e9e40bd602b4578d91e0a"
-  integrity sha512-/lD7tkVzP2B4rbcyKiNUr/tRgzAw3zowDy8LXOzUxeLnRIMxjQ5a04RhkbJq3RgeKVD0MDpe+FCDX/rJoAColQ==
+node-geocoder@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/node-geocoder/-/node-geocoder-4.2.0.tgz#340a62636877dc3f8bce3554e9e13bbe85409624"
+  integrity sha512-ZvUiOHWHLVGlrYPvazXj+VQ9oK+EOMinh/5vWoBwOQiV0eCU7GPtEWrMRNnKvmBVOzZHb1eFe9uoKMFeyygMVA==
   dependencies:
     bluebird "^3.5.2"
     node-fetch "^2.6.0"

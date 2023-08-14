@@ -4,6 +4,7 @@ export const Nominatim = gql`
   fragment Nominatim on Geocoder {
     latitude
     longitude
+    formatted
     streetNumber
     streetName
     neighborhood
@@ -16,11 +17,12 @@ export const Nominatim = gql`
   }
 `
 
-export default gql`
-  ${Nominatim}
-  query Geocoder($search: String!, $name: String!) {
-    geocoder(search: $search, name: $name) {
-      ...Nominatim
+export const WEBHOOK_NOMINATIM = gql`
+  query Geocoder($search: String!) {
+    geocoder(search: $search) {
+      latitude
+      longitude
+      formatted
     }
   }
 `

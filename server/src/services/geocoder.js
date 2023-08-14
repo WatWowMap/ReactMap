@@ -1,7 +1,19 @@
+/* eslint-disable no-nested-ternary */
 const NodeGeocoder = require('node-geocoder')
 const { log, HELPERS } = require('./logger')
 
-module.exports = async function geocoder(nominatimUrl, search, reverse) {
+function formatter(addressFormat, result) {
+  return addressFormat
+    .replace(
+      /{{(streetNumber|streetName|city|state|country|zipcode|latitude|longitude|countryCode|neighborhoods|suburb|town|village)}}/g,
+      (_, p1) => result[p1] || '',
+    )
+    .trim()
+    .replace(/^,|,$/g, '')
+    .trim()
+}
+
+async function geocoder(nominatimUrl, search, reverse, format) {
   try {
     if (!nominatimUrl) {
       throw new Error('Nominatim url not provided')
@@ -20,9 +32,19 @@ module.exports = async function geocoder(nominatimUrl, search, reverse) {
     const results = reverse
       ? await stockGeocoder.reverse(search)
       : await stockGeocoder.geocode(search)
-    return reverse ? results[0] : results
+    return reverse
+      ? results[0]
+      : format
+      ? results.map((result) => ({
+          formatted: formatter(format, result),
+          latitude: result.latitude,
+          longitude: result.longitude,
+        }))
+      : results
   } catch (e) {
     log.warn(HELPERS.geocoder, 'Unable to geocode for', search, e)
     return {}
   }
 }
+
+module.exports = { geocoder, formatter }

@@ -18,9 +18,7 @@ import { getContext, useWebhookStore } from './store'
  * @returns {{ group: string, children: string[] }[]}
  */
 export function useGetAreas() {
-  const selectedWebhook = useStore((s) => s.selectedWebhook)
   const { data } = useQuery(WEBHOOK_AREAS, {
-    variables: { name: selectedWebhook },
     fetchPolicy: 'cache-first',
   })
 

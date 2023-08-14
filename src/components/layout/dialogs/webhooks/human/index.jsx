@@ -123,13 +123,13 @@ const Human = () => {
           style={{ height: 5, width: '100%', margin: '15px 0px' }}
         />
       </Grid>
-      {/* <Location /> */}
+      <Location />
       <Divider
         light
         flexItem
         style={{ height: 5, width: '100%', margin: '15px 0px' }}
       />
-      {/* <Areas /> */}
+      <Areas />
     </Grid>
   )
 }

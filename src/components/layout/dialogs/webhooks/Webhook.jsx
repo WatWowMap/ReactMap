@@ -8,7 +8,7 @@ import Manage from './Manage'
 import { setMode, useWebhookStore } from './store'
 
 export default function Main() {
-  const webhookMode = useWebhookStore((s) => !!s.mode)
+  const webhookMode = useWebhookStore((s) => s.mode === 'open')
   const isMobile = useStatic((s) => s.isMobile)
 
   return (

@@ -10,68 +10,51 @@ import {
   CircularProgress,
   Autocomplete,
 } from '@mui/material'
-import { useLazyQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { useMapEvents } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
-import Query from '@services/Query'
-import Utility from '@services/Utility'
+import { setHuman } from '@services/queries/webhook'
+import { WEBHOOK_NOMINATIM } from '@services/queries/geocoder'
 import useLocation from '@hooks/useLocation'
-import { useStore } from '@hooks/useStore'
 
 import { setModeBtn, useWebhookStore } from './store'
 
-const Location = ({ syncWebhook }) => {
+const Location = () => {
   const { lc, color } = useLocation()
   const { t } = useTranslation()
 
-  const selectedWebhook = useStore((s) => s.selectedWebhook)
-
+  // const location = useWebhookStore((s) => s.location)
   const webhookLocation = useWebhookStore((s) => s.location)
-  const human = useWebhookStore((s) => s.data[selectedWebhook].human)
-  const addressFormat = useWebhookStore(
-    (s) => s.data[selectedWebhook].addressFormat,
-  )
-  const hasNominatim = useWebhookStore(
-    (s) => s.data[selectedWebhook].hasNominatim,
-  )
+  const latitude = useWebhookStore((s) => s.human.latitude || 0)
+  const longitude = useWebhookStore((s) => s.human.longitude || 0)
+  const addressFormat = useWebhookStore((s) => s.context.addressFormat || '')
+  const hasNominatim = useWebhookStore((s) => !!s.context.hasNominatim)
 
   const [execSearch, { data, previousData, loading }] = useLazyQuery(
-    Query.geocoder(),
+    WEBHOOK_NOMINATIM,
     {
-      variables: { search: '', name: selectedWebhook },
+      variables: { search: '' },
     },
   )
+
+  const [save] = useMutation(setHuman, { fetchPolicy: 'no-cache' })
 
   /** @param {number[]} location */
   const handleLocationChange = (location) => {
     if (location.length) {
-      syncWebhook({
+      save({
         variables: {
           category: 'setLocation',
           data: location,
-          name: selectedWebhook,
           status: 'POST',
         },
       })
     }
   }
 
-  const map = useMapEvents({
-    locationfound: (newLoc) => {
-      const { location } = useWebhookStore.getState()
-      const { lat, lng } = newLoc.latlng
-      if (lat !== location[0] && lng !== location[1]) {
-        handleLocationChange([lat, lng])
-      }
-    },
-  })
-
   React.useEffect(() => {
-    if (
-      webhookLocation[0] !== human.latitude &&
-      webhookLocation[1] !== human.longitude
-    ) {
+    if (webhookLocation[0] !== latitude && webhookLocation[1] !== longitude) {
       handleLocationChange(webhookLocation)
     }
   }, [webhookLocation])
@@ -79,7 +62,7 @@ const Location = ({ syncWebhook }) => {
   // React.useEffect(() => () => lc.stop(), [])
 
   const fetchedData = data || previousData || { geocoder: [] }
-  console.log(webhookLocation)
+  console.log(fetchedData, addressFormat)
 
   return (
     <Grid
@@ -95,7 +78,7 @@ const Location = ({ syncWebhook }) => {
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Typography variant="body2">
-          {webhookLocation.map((x) => x.toFixed(6)).join(', ')}
+          {[latitude, longitude].map((x) => x.toFixed(6)).join(', ')}
         </Typography>
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
@@ -122,7 +105,9 @@ const Location = ({ syncWebhook }) => {
       <Grid item xs={12}>
         <Autocomplete
           style={{ width: '100%' }}
-          getOptionLabel={(option) => Utility.formatter(addressFormat, option)}
+          getOptionLabel={(option) =>
+            `${option.formatted} (${option.latitude}, ${option.longitude})`
+          }
           filterOptions={(x) => x}
           options={fetchedData.geocoder}
           autoComplete
@@ -131,9 +116,10 @@ const Location = ({ syncWebhook }) => {
           disabled={!hasNominatim}
           onChange={(event, newValue) => {
             if (newValue) {
-              const { latitude, longitude } = newValue
-              map.panTo([latitude, longitude])
-              handleLocationChange([latitude, longitude])
+              console.log({ newValue })
+              const { latitude: lat, longitude: lng } = newValue
+              map.panTo([lat, lng])
+              useWebhookStore.setState({ location: [lat, lng] })
             }
           }}
           renderInput={(params) => (
@@ -143,9 +129,7 @@ const Location = ({ syncWebhook }) => {
               label={t('search_location')}
               variant="outlined"
               onChange={(e) =>
-                execSearch({
-                  variables: { search: e.target.value, name: selectedWebhook },
-                })
+                execSearch({ variables: { search: e.target.value } })
               }
               InputProps={{
                 ...params.InputProps,
@@ -161,14 +145,12 @@ const Location = ({ syncWebhook }) => {
             />
           )}
           renderOption={(props, option) => (
-            <Grid container alignItems="center" spacing={1} {...props}>
+            <Grid container alignItems="center" {...props}>
               <Grid item>
                 <LocationOn />
               </Grid>
               <Grid item xs>
-                <Typography variant="caption">
-                  {Utility.formatter(addressFormat, option)}
-                </Typography>
+                <Typography variant="caption">{option.formatted}</Typography>
               </Grid>
             </Grid>
           )}

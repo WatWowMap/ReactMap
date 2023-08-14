@@ -11,6 +11,7 @@ const { filterRTree } = require('../services/functions/filterRTree')
 const evalWebhookId = require('../services/functions/evalWebhookId')
 const validateSelectedWebhook = require('../services/functions/validateSelectedWebhook')
 const PoracleAPI = require('../services/api/Poracle')
+const geocoder = require('../services/geocoder')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import('types').GqlContext>['resolvers']} */
 const resolvers = {
@@ -143,11 +144,16 @@ const resolvers = {
           perms.webhooks.every((name) => name in Event.webhookObj),
       }
     },
-    geocoder: (_, args, { perms, Event }) => {
+    geocoder: (_, { search }, { perms, Event, req }) => {
       if (perms?.webhooks) {
-        const webhook = Event.webhookObj[args.name]
+        const webhook = Event.webhookObj[req.user?.selectedWebhook]
         if (webhook) {
-          return Utility.geocoder(webhook.server.nominatimUrl, args.search)
+          return geocoder(
+            webhook.nominatimUrl,
+            search,
+            false,
+            webhook.addressFormat,
+          )
         }
       }
       return []
@@ -463,27 +469,11 @@ const resolvers = {
       }
       return {}
     },
-    webhookAreas: async (_, { name }, { req, perms, Db }) => {
-      if (perms.webhooks.includes(name) && req.user?.id) {
-        const user = await Db.query('User', 'getOne', req.user.id)
-        const { areas } = await Fetch.webhookApi(
-          'humans',
-          evalWebhookId(user),
-          'GET',
-          name,
+    webhookAreas: async (_, __, { req, perms, Event }) => {
+      if (perms.webhooks.includes(req.user?.selectedWebhook) && req.user?.id) {
+        return Event.webhookObj[req.user.selectedWebhook].getUserAreas(
+          PoracleAPI.getWebhookId(req.user),
         )
-        const areaGroups = areas.reduce((groupMap, area) => {
-          if (area.userSelectable) {
-            if (!groupMap[area.group]) groupMap[area.group] = []
-            groupMap[area.group].push(area.name)
-          }
-          return groupMap
-        }, {})
-
-        return Object.entries(areaGroups).map(([group, children]) => ({
-          group,
-          children,
-        }))
       }
       return []
     },

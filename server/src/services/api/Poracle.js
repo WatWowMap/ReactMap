@@ -151,12 +151,13 @@ class PoracleAPI {
         `Poracle must be at least version 4.6.0, current version is ${this.version}`,
       )
     }
-    Object.assign(this, remoteConfig)
-    if (remoteConfig.addressFormat && !this.addressFormat) {
-      this.addressFormat = remoteConfig.addressFormat
+    const { providerURL, addressFormat, ...rest } = remoteConfig
+    Object.assign(this, rest)
+    if (addressFormat && !this.addressFormat) {
+      this.addressFormat = addressFormat
     }
-    if (remoteConfig.providerUrl && !this.nominatimUrl) {
-      this.nominatimUrl = remoteConfig.providerUrl
+    if (providerURL && !this.nominatimUrl) {
+      this.nominatimUrl = providerURL
     }
     this.leagues = [
       { name: 'great', cp: 1500, min: remoteConfig.pvpFilterGreatMinCP },
@@ -356,7 +357,11 @@ class PoracleAPI {
    * @returns
    */
   async #setLocation(userId, location) {
-    const first = await this.#sendRequest(APIS.location(userId, location))
+    const first = await this.#sendRequest(
+      APIS.location(userId, location),
+      'POST',
+    )
+    console.log({ first })
     const second = await this.#oneHuman(userId)
     return { ...first, ...second }
   }
