@@ -11,7 +11,7 @@ const { filterRTree } = require('../services/functions/filterRTree')
 const evalWebhookId = require('../services/functions/evalWebhookId')
 const validateSelectedWebhook = require('../services/functions/validateSelectedWebhook')
 const PoracleAPI = require('../services/api/Poracle')
-const geocoder = require('../services/geocoder')
+const { geocoder } = require('../services/geocoder')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import('types').GqlContext>['resolvers']} */
 const resolvers = {
@@ -381,7 +381,7 @@ const resolvers = {
               const withFormatted = await Promise.all(
                 results.map(async (result) => ({
                   ...result,
-                  formatted: await Utility.geocoder(
+                  formatted: await geocoder(
                     webhook.server.nominatimUrl,
                     { lat: result.lat, lon: result.lon },
                     true,

@@ -4,7 +4,6 @@ const getTypeCells = require('./functions/getTypeCells')
 const primaryUi = require('./ui/primary')
 const advMenus = require('./ui/advMenus')
 const clientOptions = require('./ui/clientOptions')
-const geocoder = require('./geocoder')
 const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')
 const scannerPerms = require('./functions/scannerPerms')
@@ -34,10 +33,6 @@ module.exports = class Utility {
 
   static buildClientOptions(...args) {
     return clientOptions(...args)
-  }
-
-  static async geocoder(...args) {
-    return geocoder(...args)
   }
 
   static areaPerms(...args) {

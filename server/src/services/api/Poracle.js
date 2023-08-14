@@ -92,7 +92,6 @@ class PoracleAPI {
       name: this.name,
       templates: this.templates[platform],
       hasNominatim: !!this.nominatimUrl,
-      addressFormat: this.addressFormat,
       locale: this.locale,
       everything: this.everythingFlagPermissions,
       prefix: this.prefix,
@@ -357,13 +356,9 @@ class PoracleAPI {
    * @returns
    */
   async #setLocation(userId, location) {
-    const first = await this.#sendRequest(
-      APIS.location(userId, location),
-      'POST',
-    )
-    console.log({ first })
+    await this.#sendRequest(APIS.location(userId, location), 'POST')
     const second = await this.#oneHuman(userId)
-    return { ...first, ...second }
+    return second
   }
 
   /**
