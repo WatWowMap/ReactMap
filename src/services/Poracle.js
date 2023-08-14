@@ -1,11 +1,13 @@
-/* eslint-disable no-nested-ternary */
+// @ts-check
+import { useStatic } from '@hooks/useStore'
+
 export default class Poracle {
-  static filterGenerator = (poracleInfo, reactMapFilters, invasions) => {
+  /** @param {import('types').PoracleUI} poracleInfo */
+  static filterGenerator = (poracleInfo) => {
+    const { masterfile, filters: rmFilters } = useStatic.getState()
     try {
-      const {
-        info: { pokemon, raid, egg, invasion, lure, nest, quest, gym },
-        human,
-      } = poracleInfo
+      const { pokemon, raid, egg, invasion, lure, nest, quest, gym, human } =
+        poracleInfo
       const filters = {
         pokemon: {
           global: { ...pokemon.defaults, profile_no: human.current_profile_no },

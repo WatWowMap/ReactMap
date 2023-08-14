@@ -1,6 +1,25 @@
 import config = require('../server/src/configs/default.json')
 
-export type Config = typeof config
+type BaseConfig = typeof config
+
+export interface Config extends BaseConfig {
+  webhooks: Webhook[]
+}
+
+export interface Webhook {
+  enabled: boolean
+  provider: 'poracle'
+  name: string
+  host: string
+  port: number
+  poracleSecret: string
+  addressFormat?: string
+  nominatimUrl?: string
+  areasToSkip: string[]
+  discordRoles: []
+  telegramGroups: []
+  local: []
+}
 
 export type DeepKeys<T, P extends string = ''> = {
   [K in keyof T]-?: K extends string

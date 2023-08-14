@@ -23,66 +23,53 @@ import {
   useWebhookStore,
 } from '../store'
 import { ProfileSelect } from './ProfileSelect'
+import { useGetWebhookData } from '../hooks'
+import { EnableSwitch, MemoEnableSwitch } from './EnableSwitch'
 
 const Human = () => {
   const { t } = useTranslation()
 
-  const selectedWebhook = useStore((s) => s.selectedWebhook)
   const location = useStore((s) => s.location)
 
   const perms = useStatic((s) => s.auth.perms)
+  const { data } = useGetWebhookData('human')
 
-  const human = useWebhookStore((s) => s.data[selectedWebhook].human)
+  // console.log(data)
+  // const [syncWebhook, { data: newData }] = useMutation(
+  //   Query.webhook('setHuman'),
+  //   {
+  //     fetchPolicy: 'no-cache',
+  //   },
+  // )
 
-  const [syncWebhook, { data: newData }] = useMutation(
-    Query.webhook('setHuman'),
-    {
-      fetchPolicy: 'no-cache',
-    },
-  )
+  // React.useEffect(() => {
+  //   if (newData?.webhook) {
+  //     const { latitude, longitude, area } = newData.webhook.human
+  //     if (parseFloat(latitude) || parseFloat(longitude)) {
+  //       setLocation([latitude, longitude])
+  //     } else {
+  //       setLocation(location)
+  //     }
+  //     setSelectedAreas(JSON.parse(area))
 
-  React.useEffect(() => {
-    if (newData?.webhook) {
-      const { latitude, longitude, area } = newData.webhook.human
-      if (parseFloat(latitude) || parseFloat(longitude)) {
-        setLocation([latitude, longitude])
-      } else {
-        setLocation(location)
-      }
-      setSelectedAreas(JSON.parse(area))
+  // }
+  // }, [newData])
 
-      if (newData.webhook.status === 'error') {
-        useWebhookStore.setState({
-          alert: {
-            open: true,
-            severity: newData.webhook.status,
-            message: (
-              <Trans i18nKey={newData.webhook.message}>
-                {{ name: selectedWebhook }}
-              </Trans>
-            ),
-          },
-        })
-      } else if (newData.webhook.human) {
-        setData(newData.webhook.human, 'human')
-      }
-    }
-  }, [newData])
+  // const handleProfileChange = React.useCallback(
+  //   (/** @type {import('@mui/material').SelectChangeEvent<number>} */ e) => {
+  //     syncWebhook({
+  //       variables: {
+  //         category: 'switchProfile',
+  //         data: e.target.value,
+  //         status: 'POST',
+  //         name: selectedWebhook,
+  //       },
+  //     })
+  //   },
+  //   [selectedWebhook],
+  // )
 
-  const handleProfileChange = React.useCallback(
-    (/** @type {import('@mui/material').SelectChangeEvent<number>} */ e) => {
-      syncWebhook({
-        variables: {
-          category: 'switchProfile',
-          data: e.target.value,
-          status: 'POST',
-          name: selectedWebhook,
-        },
-      })
-    },
-    [selectedWebhook],
-  )
-
+  // console.log({ data })
   const multipleHooks = perms.webhooks.length > 1
   const gridSize = multipleHooks ? 2 : 3
 
@@ -100,9 +87,9 @@ const Human = () => {
           <Typography variant="h6">{t('select_profile')}</Typography>
         </Grid>
         <Grid item xs={6} sm={gridSize} style={{ textAlign: 'center' }}>
-          <ProfileSelect onChange={handleProfileChange} />
+          <ProfileSelect />
         </Grid>
-        {multipleHooks && (
+        {/* {multipleHooks && (
           <>
             <Grid item xs={6} sm={gridSize}>
               <Typography variant="h6">{t('select_webhook')}</Typography>
@@ -123,25 +110,12 @@ const Human = () => {
               </Select>
             </Grid>
           </>
-        )}
+        )} */}
         <Grid item xs={6} sm={gridSize}>
           <Typography variant="h6">{t('enabled')}</Typography>
         </Grid>
         <Grid item xs={6} sm={gridSize} style={{ textAlign: 'center' }}>
-          <Switch
-            color="secondary"
-            checked={!!human.enabled}
-            onChange={() => {
-              syncWebhook({
-                variables: {
-                  category: human.enabled ? 'stop' : 'start',
-                  data: false,
-                  status: 'POST',
-                  name: selectedWebhook,
-                },
-              })
-            }}
-          />
+          <MemoEnableSwitch />
         </Grid>
         <Divider
           light
@@ -149,13 +123,13 @@ const Human = () => {
           style={{ height: 5, width: '100%', margin: '15px 0px' }}
         />
       </Grid>
-      <Location syncWebhook={syncWebhook} />
+      {/* <Location /> */}
       <Divider
         light
         flexItem
         style={{ height: 5, width: '100%', margin: '15px 0px' }}
       />
-      <Areas syncWebhook={syncWebhook} />
+      {/* <Areas /> */}
     </Grid>
   )
 }

@@ -30,7 +30,9 @@ const APIS = /** @type {APIReference} */ ({
     `/api/tracking/${category}/${userId}${suffix ? `/${suffix}` : ''}`,
   profiles: (userId) => `/api/profiles/${userId}`,
   profileAction: (userId, action, suffix) =>
-    `/api/profiles/${userId}/${action}${suffix ? `/${suffix}` : ''}`,
+    `/api/profiles/${userId}${action ? `/${action}` : ''}${
+      suffix ? `/${suffix}` : ''
+    }`,
 })
 
 const SUBCATEGORIES = /** @type {const} */ ({
@@ -77,10 +79,14 @@ class PoracleAPI {
     this.pvpCaps = []
     this.leagues = []
 
-    this.context = {}
+    // /** @type {ReturnType<PoracleAPI['buildPoracleUI']>} */
+    this.ui = {}
   }
 
-  /** @param {'discord' | 'telegram'} platform */
+  /**
+   * @param {'discord' | 'telegram'} platform
+   * @returns
+   */
   getClientContext(platform) {
     return {
       name: this.name,
@@ -92,17 +98,28 @@ class PoracleAPI {
       prefix: this.prefix,
       leagues: this.leagues,
       pvp: this.pvp,
-      context: this.context,
+      ui: this.ui,
     }
+  }
+
+  /**
+   * @param {string[] | string | null} blockedAlerts
+   * @returns
+   */
+  getAllowedCategories(blockedAlerts) {
+    return Object.keys(this.ui).filter(
+      (key) =>
+        !(this.disabledHooks.includes(key) || blockedAlerts?.includes(key)),
+    )
   }
 
   async init() {
     if (!this.enabled) return this
     try {
       await Promise.all([
-        this.remoteConfig(),
-        this.getGeojson(),
-        this.getTemplates(),
+        this.#fetchConfig(),
+        this.#fetchGeojson(),
+        this.#fetchTemplates(),
       ])
       this.lastFetched = Date.now()
       log.info(HELPERS.webhooks, `${this.name} webhook initialized`)
@@ -112,8 +129,8 @@ class PoracleAPI {
     return this
   }
 
-  async remoteConfig() {
-    const remoteConfig = await this.sendRequest(APIS.config)
+  async #fetchConfig() {
+    const remoteConfig = await this.#sendRequest(APIS.config)
     if (!remoteConfig) {
       throw new Error(`Webhook [${this.name}] is not configured correctly`)
     }
@@ -153,12 +170,12 @@ class PoracleAPI {
       })
       this.pvp = 'ohbem'
     }
-    this.context = this.buildPoracleUI()
+    this.ui = this.buildPoracleUi()
   }
 
-  async getGeojson() {
+  async #fetchGeojson() {
     /** @type {{ geoJSON: import('types').RMGeoJSON }} */
-    const { geoJSON } = await this.sendRequest(APIS.geofence)
+    const { geoJSON } = await this.#sendRequest(APIS.geofence)
     if (geoJSON?.features) {
       this.geojson.features = geoJSON.features.filter(
         (x) => !this.areasToSkip.includes(x.properties.name.toLowerCase()),
@@ -168,8 +185,8 @@ class PoracleAPI {
     }
   }
 
-  async getTemplates() {
-    const templates = await this.sendRequest(APIS.templates)
+  async #fetchTemplates() {
+    const templates = await this.#sendRequest(APIS.templates)
     if (templates) {
       PLATFORMS.forEach((platform) => {
         this.templates[platform] = Object.fromEntries(
@@ -214,7 +231,7 @@ class PoracleAPI {
    */
   async getUserAreas(userId) {
     /** @type {{ areas: import('types').PoracleHumanArea[] }} */
-    const { areas } = await this.sendRequest(APIS.humans(userId))
+    const { areas } = await this.#sendRequest(APIS.humans(userId))
     const areaGroups = areas.reduce((groupMap, area) => {
       if (area.userSelectable) {
         if (!groupMap[area.group]) groupMap[area.group] = []
@@ -236,16 +253,17 @@ class PoracleAPI {
    * @param {any} body
    * @returns
    */
-  async sendRequest(path, method = 'GET', body = null) {
-    return fetchJson(`${this.endpoint}${path}`, {
+  async #sendRequest(path, method = 'GET', body = {}) {
+    const response = await fetchJson(`${this.endpoint}${path}`, {
       method,
       headers: {
         'X-Poracle-Secret': this.secret,
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: body ? JSON.stringify(body) : undefined,
+      body: method === 'GET' ? undefined : JSON.stringify(body),
     })
+    return response
   }
 
   /**
@@ -253,22 +271,38 @@ class PoracleAPI {
    * @param {number} userId
    * @returns
    */
-  async oneHuman(userId) {
-    return this.sendRequest(APIS.oneHuman(userId))
+  async #oneHuman(userId) {
+    const { human } = await this.#sendRequest(APIS.oneHuman(userId))
+    return {
+      human: {
+        ...human,
+        area: human.area ? JSON.parse(human.area) : [],
+        area_restrictions: human.area_restrictions
+          ? JSON.parse(human.area_restrictions)
+          : [],
+        blocked_alerts: human.blocked_alerts
+          ? JSON.parse(human.blocked_alerts)
+          : [],
+        community_membership: human.community_membership
+          ? JSON.parse(human.community_membership)
+          : [],
+      },
+    }
   }
 
   /**
    *
    * @param {number} userId
-   * @param {boolean} active
+   * @param {APIInput} category
+   * @param {Method} method
    * @returns
    */
-  async setActive(userId, active) {
-    const first = await this.sendRequest(
-      active ? APIS.start(userId) : APIS.stop(userId),
+  async #setActive(userId, category, method) {
+    await this.#sendRequest(
+      category === 'start' ? APIS.start(userId) : APIS.stop(userId),
+      method,
     )
-    const second = await this.oneHuman(userId)
-    return { ...first, ...second }
+    return this.#oneHuman(userId)
   }
 
   /**
@@ -279,24 +313,40 @@ class PoracleAPI {
    * @param {any} data
    * @returns
    */
-  async profileManagement(userId, category, method, data) {
-    const [, action] = PoracleAPI.split(category)
+  async #profileManagement(userId, category, method, data) {
+    const [, action] = PoracleAPI.#split(category)
 
-    const first = await this.sendRequest(
+    const first = await this.#sendRequest(
       action
         ? APIS.profileAction(
             userId,
             action,
-            `/${action === 'copy' ? `/${data.from}/${data.to}` : ''}${
-              method === 'DELETE' ? `/${data}` : ''
+            `${action === 'copy' ? `${data.from}/${data.to}` : ''}${
+              method === 'DELETE' ? `${data}` : ''
             }`,
           )
         : APIS.profiles(userId),
       method,
-      method === 'POST' && category !== 'profiles-copy' ? data : undefined,
+      method === 'POST' && action !== 'copy' ? data : undefined,
     )
-    const second = await this.sendRequest(APIS.profiles(userId))
-    return { ...first, ...second }
+    if (method === 'GET')
+      return { profile: PoracleAPI.#processProfile(first.profile) }
+    const second = await this.#sendRequest(APIS.profiles(userId))
+    return { profile: PoracleAPI.#processProfile(second.profile) }
+  }
+
+  /**
+   * @param {import('types').PoracleProfile[]} profiles
+   * @returns {import('types').PoracleProfile[]}
+   */
+  static #processProfile(profiles) {
+    return profiles.map((profile) => ({
+      ...profile,
+      area: profile.area ? JSON.parse(profile.area) : [],
+      active_hours: profile.active_hours
+        ? JSON.parse(profile.active_hours)
+        : {},
+    }))
   }
 
   /**
@@ -305,9 +355,9 @@ class PoracleAPI {
    * @param {[number, number]} location
    * @returns
    */
-  async setLocation(userId, location) {
-    const first = await this.sendRequest(APIS.location(userId, location))
-    const second = await this.oneHuman(userId)
+  async #setLocation(userId, location) {
+    const first = await this.#sendRequest(APIS.location(userId, location))
+    const second = await this.#oneHuman(userId)
     return { ...first, ...second }
   }
 
@@ -317,29 +367,22 @@ class PoracleAPI {
    * @param {string[]} areas
    * @returns
    */
-  async setAreas(userId, areas) {
-    const first = await this.sendRequest(APIS.areas(userId), 'POST', areas)
-    const second = await this.oneHuman(userId)
+  async #setAreas(userId, areas) {
+    const first = await this.#sendRequest(APIS.areas(userId), 'POST', areas)
+    const second = await this.#oneHuman(userId)
     return { ...first, ...second }
   }
 
-  /**
-   *
-   * @param {number} userId
-   * @param {APIInput} category
-   * @param {Method} method
-   * @param {any} data
-   * @returns
-   */
-  async tracking(userId, category, method, data) {
-    const [main, action] = PoracleAPI.split(category)
+  /** @type {PoracleAPI['api']} */
+  async #tracking(userId, category, method, data) {
+    const [main, action] = PoracleAPI.#split(category)
     const first = action
-      ? await this.sendRequest(
+      ? await this.#sendRequest(
           APIS.tracking(userId, main, action),
           method,
           method === 'POST' ? data : undefined,
         )
-      : await this.sendRequest(
+      : await this.#sendRequest(
           APIS.tracking(
             userId,
             main,
@@ -348,39 +391,54 @@ class PoracleAPI {
           method,
           data,
         )
-    const second = await this.sendRequest(APIS.tracking(userId, main))
+    const second = await this.#sendRequest(APIS.tracking(userId, main))
 
     return { ...first, ...second }
   }
 
   /**
-   *
+   * @template {APIInput} T
    * @param {number} userId
-   * @param {APIInput} category
+   * @param {T} category
    * @param {Method} method
    * @param {any} data
-   * @returns
+   * @returns {Promise<import('types').APIReturnType[import('types').Split<T, '-'>[0]]>}
    */
   async api(userId, category, method = 'GET', data = null) {
-    const [main, action] = PoracleAPI.split(category)
+    const [main, action] = PoracleAPI.#split(category)
+    log.warn(HELPERS.webhooks, HELPERS.api, {
+      main,
+      action,
+      userId,
+      category,
+      method,
+      data,
+    })
     switch (main) {
       case 'start':
       case 'stop':
-        return this.setActive(userId, category === 'start')
+        return this.#setActive(userId, category, method)
       case 'switchProfile':
-        return this.sendRequest(APIS.switchProfile(userId, data))
+        return this.#sendRequest(APIS.switchProfile(userId, data), method).then(
+          () => this.#oneHuman(userId),
+        )
       case 'setLocation':
-        return this.setLocation(userId, data)
+        return this.#setLocation(userId, data)
       case 'setAreas':
-        return this.setAreas(userId, data)
+        return this.#setAreas(userId, data)
       case 'geojson':
-        return this.sendRequest(APIS.geofence)
+        return this.#sendRequest(APIS.geofence)
       case 'areaSecurity':
-        return this.sendRequest(APIS.areaSecurity(userId))
+        return this.#sendRequest(APIS.areaSecurity(userId))
       case 'humans':
-        return this.sendRequest(APIS.humans(userId))
+        return this.#sendRequest(APIS.humans(userId))
       case 'profiles':
-        return this.profileManagement(userId, `${main}-${action}`, method, data)
+        return this.#profileManagement(
+          userId,
+          action ? `${main}-${action}` : main,
+          method,
+          data,
+        )
       case 'egg':
       case 'invasion':
       case 'lure':
@@ -389,11 +447,13 @@ class PoracleAPI {
       case 'quest':
       case 'raid':
       case 'gym':
-        return this.tracking(userId, category, data)
+        return this.#tracking(userId, category, data)
       case 'quickGym':
-        return this.quickGym(userId, data)
+        return this.#quickGym(userId, data)
+      case 'human':
+        return this.#oneHuman(userId)
       default:
-        return this.tracking(userId, category, data)
+        return this.#tracking(userId, category, data)
     }
   }
 
@@ -402,17 +462,17 @@ class PoracleAPI {
    * @param {number} userId
    * @param {any} data
    */
-  async quickGym(userId, data) {
+  async #quickGym(userId, data) {
     await Promise.all(
       SUBCATEGORIES.gym.map((subCategory) =>
-        this.sendRequest(APIS.tracking(userId, subCategory), 'POST', {
-          ...this.context[subCategory].defaults,
-          ...this.wildCards(subCategory),
+        this.#sendRequest(APIS.tracking(userId, subCategory), 'POST', {
+          ...this.ui[subCategory].defaults,
+          ...this.#wildCards(subCategory),
           gym_id: data.id,
         }),
       ),
     )
-    return this.sendRequest(APIS.tracking(userId, 'gym'))
+    return this.#sendRequest(APIS.tracking(userId, 'gym'))
   }
 
   /**
@@ -420,7 +480,7 @@ class PoracleAPI {
    * @param {typeof SUBCATEGORIES.gym[number]} category
    * @returns
    */
-  wildCards(category) {
+  #wildCards(category) {
     switch (category) {
       case 'gym':
         return { team: 4, slot_changes: true, battle_changes: this.gymBattles }
@@ -436,7 +496,7 @@ class PoracleAPI {
    * @param {APIInput} category
    * @returns {[Category, Action | undefined]}
    */
-  static split(category) {
+  static #split(category) {
     const [main, action] =
       /** @type {import('types').Split<typeof category, '-'>} */ (
         category.split('-', 2)
@@ -444,7 +504,7 @@ class PoracleAPI {
     return [main, action]
   }
 
-  buildPoracleUI() {
+  buildPoracleUi() {
     const isOhbem = this.pvp === 'ohbem'
     const poracleUiObj = /** @type {const} */ ({
       human: true,
@@ -1105,6 +1165,7 @@ class PoracleAPI {
         })
       }
     })
+    this.disabledHooks.forEach((hook) => delete poracleUiObj[hook])
     return poracleUiObj
   }
 }

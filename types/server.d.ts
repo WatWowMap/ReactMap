@@ -50,6 +50,7 @@ export interface User {
   username: string
   telegramId: string
   avatar: string
+  selectedWebhook?: string
 }
 
 export interface AvailablePokemon {

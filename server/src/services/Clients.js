@@ -1,12 +1,18 @@
+// @ts-check
 const { resolve } = require('path')
 const fs = require('fs')
 
 const config = require('config')
 const { log, HELPERS } = require('./logger')
 
+/**
+ * @typedef {import('../services/DiscordClient') | import('../services/TelegramClient') | null} Client
+ * @typedef {Record<string, Client>} ClientObject
+ * @type {ClientObject}
+ */
 const Clients = Object.fromEntries(
   config
-    .get('authentication.strategies')
+    .getSafe('authentication.strategies')
     .filter(({ name, enabled }) => {
       log.info(
         HELPERS.auth,

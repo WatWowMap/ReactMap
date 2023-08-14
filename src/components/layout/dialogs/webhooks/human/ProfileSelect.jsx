@@ -3,7 +3,8 @@ import * as React from 'react'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 
-import { useStore } from '@hooks/useStore'
+import { useMutation, useQuery } from '@apollo/client'
+import { allProfiles, setHuman } from '@services/queries/webhook'
 
 import { useWebhookStore } from '../store'
 
@@ -12,20 +13,42 @@ const STYLE = { minWidth: 100 }
 
 /**
  * Convenient module for selecting a profile
- * @param {{  onChange: import('@mui/material').SelectProps<number>['onChange'] }} props
  * @returns
  */
-export function ProfileSelect({ onChange }) {
-  const selectedWebhook = useStore((s) => s.selectedWebhook)
-  const profiles = useWebhookStore((s) => s.data[selectedWebhook].profile)
+export function ProfileSelect() {
+  const currentProfile = useWebhookStore((s) => s.human.current_profile_no || 0)
 
-  /** @type {number} */
-  const currentProfileNo = useWebhookStore(
-    (s) => s.data[selectedWebhook].human.current_profile_no,
+  /** @type {import('@apollo/client').ApolloQueryResult<{ webhook: { profile: import('types').PoracleProfile[] } }>} */
+  const { data: profiles } = useQuery(allProfiles, {
+    fetchPolicy: 'no-cache',
+    variables: {
+      category: 'profiles',
+      status: 'GET',
+    },
+  })
+
+  const [save] = useMutation(setHuman)
+
+  const onChange = React.useCallback(
+    (event) => {
+      save({
+        variables: {
+          category: 'switchProfile',
+          status: 'POST',
+          data: +event.target.value || currentProfile,
+        },
+      }).then(({ data }) => {
+        if (data.webhook.human) {
+          useWebhookStore.setState({ human: data.webhook.human })
+        }
+      })
+    },
+    [currentProfile],
   )
+
   return (
-    <Select value={currentProfileNo || ''} onChange={onChange} style={STYLE}>
-      {profiles.map((profile) => (
+    <Select value={currentProfile || ''} onChange={onChange} style={STYLE}>
+      {(profiles?.webhook?.profile || []).map((profile) => (
         <MenuItem key={profile.profile_no} value={profile.profile_no}>
           {profile.name}
         </MenuItem>

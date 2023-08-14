@@ -43,15 +43,6 @@ if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')
 }
 
-// const typeDefs = loadTypedefs(
-//   path.join(__dirname, 'graphql/typeDefs', '*.graphql'),
-//   {
-//     loaders: [new GraphQLFileLoader()],
-//   },
-// )
-
-// typeDefs.then((data) => console.log(data))
-
 const app = express()
 const httpServer = http.createServer(app)
 

@@ -3,7 +3,7 @@ type PoracleHuman {
   type: String
   name: String
   enabled: Boolean
-  area: String
+  area: [String]
   latitude: Float
   longitude: Float
   fails: Int
@@ -12,18 +12,18 @@ type PoracleHuman {
   admin_disable: Boolean
   disabled_date: String
   current_profile_no: Int
-  community_membership: String
-  area_restrictions: String
+  community_membership: [String]
+  area_restrictions: [String]
   notes: String
-  blocked_alerts: String
+  blocked_alerts: [String]
 }
 
 type PoracleProfile {
   uid: Int
   id: ID
   profile_no: Int
-  active_hours: String
-  area: String
+  active_hours: JSON
+  area: [String]
   latitude: Float
   longitude: Float
   name: String

@@ -1,9 +1,8 @@
+// @ts-check
 import { useStore } from '@hooks/useStore'
 import { create } from 'zustand'
 
 /**
- * TODO: Finish this
- * @typedef {{}} MutationVars
  * @typedef {{
  *  mode: '' | 'areas' | 'location' | 'open'
  *  location: [number, number]
@@ -15,6 +14,18 @@ import { create } from 'zustand'
  *   message: string | import('react').ReactNode
  *  }
  *  send: boolean
+ *  human: Partial<import('types').PoracleHuman>
+ *  profile: import('types').PoracleProfile[]
+ *  pokemon: import('types').PoraclePokemon[]
+ *  raid: import('types').PoracleRaid[]
+ *  egg: import('types').PoracleEgg[]
+ *  invasion: import('types').PoracleInvasion[]
+ *  lure: import('types').PoracleLure[]
+ *  nest: import('types').PoracleNest[]
+ *  quest: import('types').PoracleQuest[]
+ *  gym: import('types').PoracleGym[]
+ *  category: keyof import('types').PoracleUI
+ *  context: Partial<import('types').PoracleClientContext>
  *  groupedAreas: Record<string, import('@turf/helpers').Feature[]>
  * }} WebhookStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<WebhookStore>>}
@@ -24,6 +35,18 @@ export const useWebhookStore = create(() => ({
   mode: '',
   location: [0, 0],
   selectedAreas: [],
+  category: 'human',
+  human: {},
+  profile: [],
+  pokemon: [],
+  raid: [],
+  egg: [],
+  invasion: [],
+  lure: [],
+  nest: [],
+  quest: [],
+  gym: [],
+  context: {},
   alert: {
     open: false,
     severity: 'info',
@@ -56,7 +79,7 @@ export const setSend = (send) => useWebhookStore.setState({ send })
 /**
  * Updates the data for the selected webhook
  * Either with a category or the entire data object
- * @param {WebhookStore['data']} data
+ * @param {WebhookStore['data']} incoming
  * @param {WebhookStore['category']} [category]
  */
 export const setData = (incoming, category) => {
@@ -81,3 +104,12 @@ export const resetAlert = () =>
       message: '',
     },
   })
+
+/**
+ * @template {WebhookStore['category']} T
+ * @param {T} category
+ * @returns {WebhookStore['context']['ui'][T]}
+ */
+export function getContext(category) {
+  return useWebhookStore.getState().context.ui[category]
+}

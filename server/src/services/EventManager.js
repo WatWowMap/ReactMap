@@ -18,6 +18,7 @@ class EventManager {
 
     /** @type {Record<string, InstanceType<typeof PoracleAPI>>} */
     this.webhookObj = {}
+    /** @type {import('./Clients').ClientObject} */
     this.Clients = {}
   }
 
@@ -29,6 +30,9 @@ class EventManager {
     this.available[category] = await Db.getAvailable(model)
   }
 
+  /**
+   * @param {import('./Clients').ClientObject} clients
+   */
   set clients(clients) {
     this.Clients = clients
   }

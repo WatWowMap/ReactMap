@@ -10,7 +10,7 @@ type Query {
   checkValidScan(mode: String, points: [[Float]]): [Boolean]
   customComponent(component: String): JSON
   devices(filters: JSON): [Device]
-  geocoder(search: String, name: String): [Geocoder]
+  geocoder(search: String): [Geocoder]
   gyms(
     minLat: Float
     maxLat: Float
@@ -83,7 +83,6 @@ type Query {
     lat: Float
     lon: Float
     locale: String
-    webhookName: String
     ts: Int
     midnight: Int
     onlyAreas: [String]
@@ -95,7 +94,6 @@ type Query {
     lat: Float
     lon: Float
     locale: String
-    webhookName: String
     midnight: Int
     onlyAreas: [String]
   ): [SearchLure]
@@ -105,7 +103,6 @@ type Query {
     lat: Float
     lon: Float
     locale: String
-    webhookName: String
     midnight: Int
     onlyAreas: [String]
   ): [SearchQuest]
@@ -141,10 +138,11 @@ type Query {
     maxLon: Float
     filters: JSON
   ): [Route]
-  webhook(category: String, status: String, name: String): Poracle
-  webhookAreas(name: String): [WebhookAreaGroups]
-  webhookGeojson(name: String): JSON
+  webhook(category: String, status: String): Poracle
+  webhookAreas: [WebhookAreaGroups]
+  webhookGeojson: JSON
   webhookContext: PoracleConfig
+  webhookValid: [String]
   scanner(category: String, method: String, data: JSON): ScannerApi
 }
 
@@ -152,7 +150,7 @@ type Mutation {
   createBackup(backup: BackupCreate): Boolean
   updateBackup(backup: BackupUpdate): Boolean
   deleteBackup(id: ID): Boolean
-  webhook(category: String, data: JSON, status: String, name: String): Poracle
+  webhook(category: String, data: JSON, status: String): Poracle
   tutorial(tutorial: Boolean): Boolean
   strategy(strategy: String): Boolean
   setGymBadge(gymId: String, badge: Int): Boolean

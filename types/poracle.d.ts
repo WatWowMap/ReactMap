@@ -1,9 +1,13 @@
+import { useQuery } from '@apollo/client'
+import { HttpMethod } from './general'
+import { Split } from './utility'
+
 export interface PoracleHuman {
   id: string
   type: string
   name: string
   enabled: boolean
-  area: string
+  area: string[]
   latitude: number
   longitude: number
   fails: number
@@ -12,10 +16,10 @@ export interface PoracleHuman {
   admin_disable: boolean
   disabled_date: string
   current_profile_no: number
-  community_membership: string
-  area_restrictions: string
+  community_membership: string[]
+  area_restrictions: string[]
   notes: string
-  blocked_alerts: string
+  blocked_alerts: string[]
 }
 
 export interface PoracleProfile {
@@ -212,6 +216,7 @@ export type PoracleCategory =
   | 'geojson'
   | 'areaSecurity'
   | 'humans'
+  | 'oneHuman'
   | 'profiles'
   | 'egg'
   | 'invasion'
@@ -261,11 +266,57 @@ export interface PoracleAPIRef {
     ? ''
     : `/${Suffix}`}}`
   profiles: (userId: number) => `/api/profiles/${number}`
-  profileAction: <Suffix extends string = ''>(
+  profileAction: <
+    Action extends PoracleAction = '',
+    Suffix extends string = '',
+  >(
     userId: number,
-    action: PoracleAction,
+    action?: Action = '' as const,
     suffix?: Suffix = '' as const,
-  ) => `/api/profiles/${number}/${PoracleAction}${Suffix extends ''
+  ) => `/api/profiles/${number}/${Action extends ''
     ? ''
-    : `/${Suffix}`}`
+    : `/${Action}`}${Suffix extends '' ? '' : `/${Suffix}`}`
 }
+
+export type PoracleUI = ReturnType<
+  import('../server/src/services/api/Poracle')['buildPoracleUi']
+>
+
+export type PoracleDefault<T extends keyof Omit<PoracleUI, 'human'>> =
+  PoracleUI[T]['defaults']
+
+export type PoracleClientContext = Omit<
+  ReturnType<import('../server/src/services/api/Poracle')['getClientContext']>,
+  'ui'
+> & {
+  ui: PoracleUI
+}
+
+interface APIReturnType {
+  humans: PoracleHuman
+  oneHuman: PoracleHuman
+  switchProfile: PoracleHuman
+  start: PoracleHuman
+  stop: PoracleHuman
+  pokemon: PoraclePokemon[]
+  invasion: PoracleInvasion[]
+  lure: PoracleLure[]
+  quest: PoracleQuest[]
+  nest: PoracleNest[]
+  weather: PoracleWeather[]
+  profile: PoracleProfile[]
+  gym: PoracleGym[]
+  quickGym: PoracleGym[]
+  egg: PoracleEgg[]
+  raid: PoracleRaid[]
+}
+
+export type APIMethod<T extends PoracleAPIInput = PoracleAPIInput> = (
+  userId: number,
+  category: T,
+  method: HttpMethod,
+  data: any,
+) => Promise<APIReturnType[Split<T, '-'>[0]]>
+
+export type ApolloQueryReturn<T extends APIReturnType[keyof APIReturnType]> =
+  ReturnType<typeof useQuery<{ webhook: T }>>

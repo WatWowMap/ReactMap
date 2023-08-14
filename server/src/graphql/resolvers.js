@@ -9,6 +9,8 @@ const buildDefaultFilters = require('../services/filters/builder/base')
 const filterComponents = require('../services/functions/filterComponents')
 const { filterRTree } = require('../services/functions/filterRTree')
 const evalWebhookId = require('../services/functions/evalWebhookId')
+const validateSelectedWebhook = require('../services/functions/validateSelectedWebhook')
+const PoracleAPI = require('../services/api/Poracle')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import('types').GqlContext>['resolvers']} */
 const resolvers = {
@@ -450,13 +452,14 @@ const resolvers = {
       }
       return []
     },
-    webhook: (_, args, { req, perms, Event }) => {
+    webhook: async (_, args, { req, perms, Event }) => {
       if (perms?.webhooks && req.user?.selectedWebhook) {
-        return Event.webhookObj[req.user.selectedWebhook].api(
-          req.user?.id,
+        const result = await Event.webhookObj[req.user.selectedWebhook].api(
+          PoracleAPI.getWebhookId(req.user),
           args.category,
           args.status,
         )
+        return result
       }
       return {}
     },
@@ -483,6 +486,31 @@ const resolvers = {
         }))
       }
       return []
+    },
+    webhookValid: async (_, args, { req, perms, Event }) => {
+      if (req.user?.id && perms.webhooks.includes(req.user?.selectedWebhook)) {
+        const human = await Event.webhookObj[req.user?.selectedWebhook].api(
+          PoracleAPI.getWebhookId(req.user),
+          'oneHuman',
+          'GET',
+        )
+        return Event.webhookObj[req.user?.selectedWebhook].getAllowedCategories(
+          human.blocked_alerts,
+        )
+      }
+    },
+    webhookContext: async (_, __, { req, perms, Db, Event }) => {
+      if (perms?.webhooks.length && req.user) {
+        const selectedWebhook = await validateSelectedWebhook(
+          req.user,
+          Db,
+          Event,
+        )
+        const webhookStrategy = evalWebhookId(req.user)
+        return Event.webhookObj[selectedWebhook].getClientContext(
+          webhookStrategy,
+        )
+      }
     },
     // webhookGeojson: async (parent, { name }, { perms }) => {
     //   console.log({ parent })
@@ -531,17 +559,19 @@ const resolvers = {
       }
       return false
     },
-    webhook: (_, args, { req }) => {
-      const perms = req.user ? req.user.perms : false
-      const { category, data, status, name } = args
-      if (perms?.webhooks?.includes(name)) {
-        return Fetch.webhookApi(
+    webhook: async (_, args, { req, Event, perms }) => {
+      if (
+        req.user?.selectedWebhook &&
+        perms?.webhooks?.includes(req.user?.selectedWebhook)
+      ) {
+        const { category, data, status } = args
+        const result = await Event.webhookObj[req.user.selectedWebhook].api(
+          PoracleAPI.getWebhookId(req.user),
           category,
-          Utility.evalWebhookId(req.user),
           status,
-          name,
           data,
         )
+        return result
       }
       return {}
     },

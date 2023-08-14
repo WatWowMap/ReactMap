@@ -13,14 +13,15 @@ import Selecting from './Selecting'
 import { useWebhookStore } from './store'
 
 const Tracked = ({
-  isMobile,
-  selectedWebhook,
-  send,
-  setSend,
-  tempFilters,
-  setTempFilters,
+  // isMobile,
+  // selectedWebhook,
+  // send,
+  // setSend,
+  // tempFilters,
+  // setTempFilters,
   category,
 }) => {
+  return null
   const { t } = useTranslation()
   const Icons = useStatic((s) => s.Icons)
   const webhookData = useWebhookStore((s) => s.data)
