@@ -18,11 +18,18 @@ type PoracleHuman {
   blocked_alerts: [String]
 }
 
+type ActiveHour {
+  day: Int
+  hours: String
+  mins: String
+  id: Int
+}
+
 type PoracleProfile {
   uid: Int
   id: ID
   profile_no: Int
-  active_hours: JSON
+  active_hours: [ActiveHour]
   area: [String]
   latitude: Float
   longitude: Float

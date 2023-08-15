@@ -162,10 +162,15 @@ const Pokemon = gql`
   }
 `
 
-const Profile = gql`
+export const Profile = gql`
   fragment PoracleProfile on Poracle {
     profile {
-      active_hours
+      active_hours {
+        day
+        hours
+        mins
+        id
+      }
       area
       id
       latitude

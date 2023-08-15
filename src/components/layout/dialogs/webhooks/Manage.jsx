@@ -50,33 +50,31 @@ export default function Manage() {
   const footerButtons = React.useMemo(
     () => [
       {
-        name:
-          category === 'human'
-            ? t('manage_profiles')
-            : t('add_new', { category: t(category) }),
-        action: () => setAddNew(true),
+        name: 'feedback',
+        action: () => useLayoutStore.setState({ feedback: true }),
+        icon: 'BugReport',
+        disabled: !categories.length || !feedbackLink,
+        color: 'success',
+      },
+      {
+        name: addNew
+          ? 'save'
+          : category === 'human'
+          ? t('manage_profiles')
+          : t('add_new', { category: t(category) }),
+        action: () => setAddNew(!addNew),
         key: 'addNew',
+        icon: addNew ? 'Save' : 'Add',
         disabled: !categories.length,
       },
       {
         name: 'close',
         action: setMode,
-        icon: 'Close',
+        icon: 'Clear',
         color: 'primary',
       },
-      ...(feedbackLink
-        ? [
-            {
-              name: 'feedback',
-              action: () => useLayoutStore.setState({ feedback: true }),
-              icon: 'BugReport',
-              disabled: !categories.length,
-              color: 'success',
-            },
-          ]
-        : []),
     ],
-    [],
+    [addNew, categories, feedbackLink],
   )
 
   const changeTab = React.useCallback(
@@ -89,11 +87,14 @@ export default function Manage() {
 
   const tabValue = categories.findIndex((x) => x === category)
 
-  console.log(tabValue, category, categories)
   return (
     <>
-      <Header names={[name]} action={setMode} titles={['manage_webhook']} />
-      <AppBar position="static">
+      <Header
+        names={[name]}
+        action={setMode}
+        titles={[addNew ? 'manage_profiles' : 'manage_webhook']}
+      />
+      <AppBar position="static" sx={{ display: addNew ? 'none' : 'block' }}>
         <Tabs value={tabValue} onChange={changeTab}>
           {categories.map((each) => (
             <Tab
@@ -114,32 +115,31 @@ export default function Manage() {
             ))}
           </Box>
         </Collapse>
-        {/* 
-      <Collapse in={addNew}>
-        {webhookCategory === 'human' ? (
-          <ProfileEditing handleClose={handleClose} />
-        ) : (
-          <Menu
-            category={Poracle.getMapCategory(webhookCategory)}
-            categories={Poracle.getFilterCategories(webhookCategory)}
-            webhookCategory={webhookCategory}
-            filters={poracleFilters[webhookCategory]}
-            tempFilters={tempFilters}
-            setTempFilters={setTempFilters}
-            title="webhook_selection"
-            titleAction={() => handleClose(false)}
-            Tile={NewPokemon}
-            extraButtons={[
-              {
-                name: 'save',
-                action: () => handleClose(true),
-                icon: 'Save',
-                color: 'secondary',
-              },
-            ]}
-          />
-        )}
-      </Collapse> */}
+        <Collapse in={addNew}>
+          {category === 'human' ? (
+            <ProfileEditing />
+          ) : (
+            <Menu
+              category={Poracle.getMapCategory(webhookCategory)}
+              categories={Poracle.getFilterCategories(webhookCategory)}
+              webhookCategory={webhookCategory}
+              filters={poracleFilters[webhookCategory]}
+              tempFilters={tempFilters}
+              setTempFilters={setTempFilters}
+              title="webhook_selection"
+              titleAction={() => handleClose(false)}
+              Tile={NewPokemon}
+              extraButtons={[
+                {
+                  name: 'save',
+                  action: () => handleClose(true),
+                  icon: 'Save',
+                  color: 'secondary',
+                },
+              ]}
+            />
+          )}
+        </Collapse>
       </DialogContent>
 
       <Footer options={footerButtons} role="webhook_footer" />

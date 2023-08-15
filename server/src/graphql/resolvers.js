@@ -490,15 +490,6 @@ const resolvers = {
       }
       return []
     },
-    webhookUser: async (_, __, { req, perms }) => {
-      if (req.user?.id && perms.webhooks) {
-        return {
-          webhooks: perms.webhooks || [],
-          selected: req.user?.selectedWebhook,
-        }
-      }
-      return {}
-    },
     webhookContext: async (_, __, { req, perms, Db, Event }) => {
       if (perms?.webhooks.length && req.user) {
         const selectedWebhook = await validateSelectedWebhook(
@@ -521,6 +512,25 @@ const resolvers = {
         )
       }
       return null
+    },
+    // webhookProfiles: async (_, __, { req, perms, Event }) => {
+    //   if (perms?.webhooks && req.user?.selectedWebhook) {
+    //     const result = await Event.webhookObj[req.user.selectedWebhook].api(
+    //       PoracleAPI.getWebhookId(req.user),
+    //       'profiles',
+    //       'GET',
+    //     )
+    //     return result.profile
+    //   }
+    // },
+    webhookUser: async (_, __, { req, perms }) => {
+      if (req.user?.id && perms.webhooks) {
+        return {
+          webhooks: perms.webhooks || [],
+          selected: req.user?.selectedWebhook,
+        }
+      }
+      return {}
     },
     scanner: (_, args, { req, perms }) => {
       const { category, method, data } = args

@@ -350,23 +350,35 @@ class PoracleAPI {
       method,
       method === 'POST' && action !== 'copy' ? data : undefined,
     )
-    if (method === 'GET')
+    if (method === 'GET') {
       return { profile: PoracleAPI.#processProfile(first.profile) }
+    }
     const second = await this.#sendRequest(APIS.profiles(userId))
     return { profile: PoracleAPI.#processProfile(second.profile) }
   }
 
   /**
-   * @param {import('types').PoracleProfile[]} profiles
+   * @param {import('types').PoracleProfile<false>[]} profiles
    * @returns {import('types').PoracleProfile[]}
    */
   static #processProfile(profiles) {
     return profiles.map((profile) => ({
       ...profile,
       area: profile.area ? JSON.parse(profile.area) : [],
-      active_hours: profile.active_hours
-        ? JSON.parse(profile.active_hours)
-        : {},
+      active_hours:
+        profile.active_hours && profile.active_hours !== '{}'
+          ? /** @type {import('types').PoracleActiveHours[]} */ (
+              JSON.parse(profile.active_hours)
+            )
+              .sort((a, b) =>
+                a.day === b.day
+                  ? a.hours === b.hours
+                    ? a.mins.localeCompare(b.mins)
+                    : a.hours.localeCompare(b.hours)
+                  : a.day - b.day,
+              )
+              .map((x, id) => ({ ...x, id }))
+          : [],
     }))
   }
 
@@ -453,6 +465,7 @@ class PoracleAPI {
         return this.#sendRequest(APIS.areaSecurity(userId))
       case 'humans':
         return this.#sendRequest(APIS.humans(userId))
+      case 'profile':
       case 'profiles':
         return this.#profileManagement(
           userId,

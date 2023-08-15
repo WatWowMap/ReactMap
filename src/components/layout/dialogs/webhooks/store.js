@@ -26,6 +26,7 @@ import { create } from 'zustand'
  *  category: keyof import('types').PoracleUI
  *  context: Partial<import('types').PoracleClientContext>
  *  groupedAreas: Record<string, import('@turf/helpers').Feature[]>
+ *  newActiveHours: import('types').PoracleActiveHours
  * }} WebhookStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<WebhookStore>>}
  */
@@ -55,6 +56,11 @@ export const useWebhookStore = create(() => ({
     open: false,
     severity: 'info',
     message: '',
+  },
+  newActiveHours: {
+    day: 1,
+    hours: '00',
+    mins: '00',
   },
   send: false,
   groupedAreas: {},
@@ -97,4 +103,15 @@ export const resetAlert = () =>
  */
 export function getContext(category) {
   return useWebhookStore.getState().context.ui[category]
+}
+
+export function handleActiveHourChange(event) {
+  const { name, value } = event.target
+  useWebhookStore.setState({
+    alert: {
+      open: false,
+      severity: 'info',
+      message: '',
+    },
+  })
 }

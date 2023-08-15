@@ -2,12 +2,12 @@ import { useQuery } from '@apollo/client'
 import { HttpMethod } from './general'
 import { Split } from './utility'
 
-export interface PoracleHuman {
+export interface PoracleHuman<Parsed extends boolean = true> {
   id: string
   type: string
   name: string
   enabled: boolean
-  area: string[]
+  area: Parsed extends true ? string[] : string
   latitude: number
   longitude: number
   fails: number
@@ -16,18 +16,25 @@ export interface PoracleHuman {
   admin_disable: boolean
   disabled_date: string
   current_profile_no: number
-  community_membership: string[]
-  area_restrictions: string[]
+  community_membership: Parsed extends true ? string[] : string
+  area_restrictions: Parsed extends true ? string[] : string
   notes: string
-  blocked_alerts: string[]
+  blocked_alerts: Parsed extends true ? string[] : string
 }
 
-export interface PoracleProfile {
+export interface PoracleActiveHours {
+  id: number
+  day: number
+  hours: string
+  mins: string
+}
+
+export interface PoracleProfile<Parsed extends boolean = true> {
   uid: number
   id: string
   profile_no: number
-  active_hours: string
-  area: string
+  active_hours: Parsed extends true ? PoracleActiveHours[] : string
+  area: Parsed extends true ? string[] : string
   latitude: number
   longitude: number
   name: string
@@ -215,8 +222,10 @@ export type PoracleCategory =
   | 'setAreas'
   | 'geojson'
   | 'areaSecurity'
+  | 'human'
   | 'humans'
   | 'oneHuman'
+  | 'profile'
   | 'profiles'
   | 'egg'
   | 'invasion'
@@ -305,6 +314,7 @@ interface APIReturnType {
   nest: PoracleNest[]
   weather: PoracleWeather[]
   profile: PoracleProfile[]
+  profiles: PoracleProfile[]
   gym: PoracleGym[]
   quickGym: PoracleGym[]
   egg: PoracleEgg[]

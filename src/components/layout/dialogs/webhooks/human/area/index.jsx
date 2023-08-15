@@ -13,13 +13,7 @@ const Areas = () => {
   const { t } = useTranslation()
 
   return (
-    <Grid
-      container
-      xs={12}
-      justifyContent="center"
-      alignItems="center"
-      // height="100%"
-    >
+    <Grid container xs={12} justifyContent="center" alignItems="center">
       <Grid xs={6} sm={3}>
         <Typography variant="h6">{t('areas')}</Typography>
       </Grid>
