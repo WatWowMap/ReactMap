@@ -11,7 +11,7 @@ import {
 import { Circle, Marker, Popup, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import fallbackIcon from '@components/markers/fallback'
-import { useWebhookStore } from './store'
+import { useWebhookStore } from '../store'
 
 export default function DraggableMarker() {
   const map = useMap()
@@ -24,10 +24,16 @@ export default function DraggableMarker() {
   const [position, setPosition] = React.useState(webhookLocation)
 
   React.useEffect(() => {
-    if (webhookLocation) {
+    if (webhookLocation.every((x) => x !== 0)) {
       setPosition(webhookLocation)
     }
   }, [webhookLocation])
+
+  React.useEffect(() => {
+    if (webhookMode === 'location') {
+      map.panTo(webhookLocation)
+    }
+  }, [webhookMode])
 
   if (webhookMode !== 'location') return null
   return (
@@ -39,15 +45,15 @@ export default function DraggableMarker() {
             if (target) {
               const { lat, lng } = target.getLatLng()
               map.flyTo([lat, lng])
-              useWebhookStore.setState({ location: [lat, lng] })
+              setPosition([lat, lng])
             }
             if (popup) {
               popup.openOn(map)
             }
           },
         }}
-        position={webhookLocation}
-        icon={fallbackIcon()}
+        position={position}
+        icon={fallbackIcon}
       >
         <Popup minWidth={90} maxWidth={150}>
           <Grid

@@ -1,5 +1,4 @@
 // @ts-check
-import { useStore } from '@hooks/useStore'
 import { create } from 'zustand'
 
 /**
@@ -36,7 +35,12 @@ export const useWebhookStore = create(() => ({
   location: [0, 0],
   selectedAreas: [],
   category: 'human',
-  human: {},
+  human: {
+    area: [],
+    latitude: 0,
+    longitude: 0,
+    enabled: false,
+  },
   profile: [],
   pokemon: [],
   raid: [],
@@ -60,7 +64,8 @@ export const useWebhookStore = create(() => ({
 export const setLocation = (location) => useWebhookStore.setState({ location })
 
 /** @param {WebhookStore['mode']} [mode] */
-export const setMode = (mode = '') => useWebhookStore.setState({ mode })
+export const setMode = (mode = '') =>
+  useWebhookStore.setState({ mode: typeof mode === 'string' ? mode : '' })
 /** @param {WebhookStore['mode']} [mode] */
 export const setModeBtn = (mode) => () => setMode(mode)
 
@@ -75,26 +80,6 @@ export const setSelectedAreas = (selectedAreas) =>
 
 /** @param {WebhookStore['send']} send */
 export const setSend = (send) => useWebhookStore.setState({ send })
-
-/**
- * Updates the data for the selected webhook
- * Either with a category or the entire data object
- * @param {WebhookStore['data']} incoming
- * @param {WebhookStore['category']} [category]
- */
-export const setData = (incoming, category) => {
-  const { selectedWebhook } = useStore.getState()
-  if (!selectedWebhook) return
-  useWebhookStore.setState(({ data }) => ({
-    data: {
-      ...data,
-      [selectedWebhook]: {
-        ...data[selectedWebhook],
-        ...(category ? { [category]: incoming } : incoming),
-      },
-    },
-  }))
-}
 
 export const resetAlert = () =>
   useWebhookStore.setState({

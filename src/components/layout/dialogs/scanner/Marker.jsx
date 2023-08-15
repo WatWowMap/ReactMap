@@ -28,7 +28,7 @@ export function ScanOnDemandMarker({ children }) {
           }
         },
       }}
-      icon={fallbackIcon()}
+      icon={fallbackIcon}
       position={scanLocation}
       ref={(ref) => {
         if (ref && !ref.isPopupOpen()) ref.openPopup()

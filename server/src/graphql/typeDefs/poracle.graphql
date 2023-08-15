@@ -215,3 +215,8 @@ type PoracleConfig {
   pvp: String
   ui: JSON
 }
+
+type UserPoracleConfig {
+  webhooks: [String]
+  selected: String
+}

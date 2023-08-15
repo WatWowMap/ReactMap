@@ -15,7 +15,7 @@ async function validateSelectedWebhook(user, Db, Event) {
   }
   const validWebhook = Object.keys(Event.webhookObj)[0]
   const updatedUser = await Db.models.User.updateWebhook(user.id, validWebhook)
-  return updatedUser.selectedWebhook
+  return updatedUser
 }
 
 module.exports = validateSelectedWebhook

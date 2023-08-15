@@ -1,11 +1,12 @@
 // @ts-check
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Grid, Typography, Button } from '@mui/material'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Grid from '@mui/material/Unstable_Grid2'
 
 import { setModeBtn } from '../../store'
-import { AreaGroup } from './AreaGroup'
-import { handleClick } from './AreaChip'
+import { AreaAction, AreaGroup } from './AreaGroup'
 import { Selected } from './Selected'
 
 const Areas = () => {
@@ -14,18 +15,15 @@ const Areas = () => {
   return (
     <Grid
       container
-      item
       xs={12}
       justifyContent="center"
       alignItems="center"
-      spacing={2}
-      style={{ height: '100%' }}
+      // height="100%"
     >
-      <Grid item xs={6} sm={3}>
+      <Grid xs={6} sm={3}>
         <Typography variant="h6">{t('areas')}</Typography>
       </Grid>
       <Grid
-        item
         xs={6}
         sm={3}
         textAlign="center"
@@ -40,29 +38,17 @@ const Areas = () => {
           {t('choose_on_map')}
         </Button>
       </Grid>
-
-      <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
-        <Button
-          size="small"
-          variant="contained"
-          color="primary"
-          onClick={handleClick('none')}
-        >
+      <Grid xs={6} sm={3} textAlign="center">
+        <AreaAction color="primary" action="none">
           {t('disable_all')}
-        </Button>
+        </AreaAction>
       </Grid>
-      <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
-        <Button
-          size="small"
-          variant="contained"
-          color="secondary"
-          onClick={handleClick('all')}
-        >
+      <Grid xs={6} sm={3} textAlign="center">
+        <AreaAction color="secondary" action="all">
           {t('enable_all')}
-        </Button>
+        </AreaAction>
       </Grid>
       <Grid
-        item
         xs={6}
         sm={3}
         textAlign="center"
@@ -78,14 +64,8 @@ const Areas = () => {
         </Button>
       </Grid>
       <AreaGroup />
-      <Grid
-        item
-        container
-        xs={12}
-        alignItems="center"
-        justifyContent="center"
-      />
-      <Grid item xs={12}>
+      <Grid container xs={12} alignItems="center" justifyContent="center" />
+      <Grid xs={12}>
         <Selected />
       </Grid>
     </Grid>

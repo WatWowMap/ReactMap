@@ -26,7 +26,7 @@ import Query from '@services/Query'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 import { useStatic, useStore } from '@hooks/useStore'
-import { setData, useWebhookStore } from './store'
+import { useWebhookStore } from './store'
 
 const profilesObject = (data) =>
   data
@@ -175,7 +175,7 @@ export default function ProfileEditing({ handleClose }) {
   }
 
   const handleCloseMenu = () => {
-    setData(Object.values(profiles), 'profile')
+    // setData(Object.values(profiles), 'profile')
     handleClose('profiles')
   }
 
@@ -185,7 +185,7 @@ export default function ProfileEditing({ handleClose }) {
 
   React.useEffect(() => {
     if (data?.webhook?.profile) {
-      setData(data.webhook.profile, 'profile')
+      // setData(data.webhook.profile, 'profile')
       setProfiles(profilesObject(data.webhook.profile))
     }
   }, [data])

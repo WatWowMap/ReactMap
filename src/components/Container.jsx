@@ -8,8 +8,8 @@ import { useStatic } from '@hooks/useStore'
 
 import Map from './Map'
 import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
-import DraggableMarker from './layout/dialogs/webhooks/Draggable'
-import WebhookAreaSelection from './layout/dialogs/webhooks/AreaSelection'
+import DraggableMarker from './layout/dialogs/webhooks/human/Draggable'
+import WebhookAreaSelection from './layout/dialogs/webhooks/human/area/AreaSelection'
 
 export default function Container({ serverSettings, params, location, zoom }) {
   useGenerate()

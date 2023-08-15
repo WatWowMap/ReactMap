@@ -477,7 +477,7 @@ const resolvers = {
       }
       return []
     },
-    webhookValid: async (_, args, { req, perms, Event }) => {
+    webhookCategories: async (_, __, { req, perms, Event }) => {
       if (req.user?.id && perms.webhooks.includes(req.user?.selectedWebhook)) {
         const human = await Event.webhookObj[req.user?.selectedWebhook].api(
           PoracleAPI.getWebhookId(req.user),
@@ -488,6 +488,16 @@ const resolvers = {
           human.blocked_alerts,
         )
       }
+      return []
+    },
+    webhookUser: async (_, __, { req, perms }) => {
+      if (req.user?.id && perms.webhooks) {
+        return {
+          webhooks: perms.webhooks || [],
+          selected: req.user?.selectedWebhook,
+        }
+      }
+      return {}
     },
     webhookContext: async (_, __, { req, perms, Db, Event }) => {
       if (perms?.webhooks.length && req.user) {
@@ -496,15 +506,22 @@ const resolvers = {
           Db,
           Event,
         )
+        req.user.selectedWebhook = selectedWebhook
+        req.session.save()
         const webhookStrategy = evalWebhookId(req.user)
         return Event.webhookObj[selectedWebhook].getClientContext(
           webhookStrategy,
         )
       }
     },
-    // webhookGeojson: async (parent, { name }, { perms }) => {
-    //   console.log({ parent })
-    // },
+    webhookGeojson: async (_, __, { perms, req, Event }) => {
+      if (perms?.webhooks) {
+        return Event.webhookObj[req.user.selectedWebhook].getClientGeojson(
+          PoracleAPI.getWebhookId(req.user),
+        )
+      }
+      return null
+    },
     scanner: (_, args, { req, perms }) => {
       const { category, method, data } = args
       if (category === 'getQueue') {
@@ -564,6 +581,24 @@ const resolvers = {
         return result
       }
       return {}
+    },
+    webhookChange: async (_, args, { req, Db, perms, Event }) => {
+      if (req.user?.id && perms.webhooks.includes(args.webhook)) {
+        const selectedWebhook = await Db.query(
+          'User',
+          'updateWebhook',
+          req.user.id,
+          args.webhook,
+        )
+        req.user.selectedWebhook = selectedWebhook
+        req.session.save()
+        return Event.webhookObj[selectedWebhook].api(
+          PoracleAPI.getWebhookId(req.user),
+          'oneHuman',
+          'GET',
+        )
+      }
+      return ''
     },
     tutorial: async (_, args, { req, Db }) => {
       if (req.user) {

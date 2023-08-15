@@ -1,16 +1,12 @@
-import React from 'react'
+import * as React from 'react'
 import { GeoJSON } from 'react-leaflet'
 
 import { useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
+import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
+import { handleClick } from '@components/layout/dialogs/webhooks/human/area/AreaChip'
 
-export function ScanAreaTile({
-  item,
-  webhookMode,
-  selectedAreas,
-  setSelectedAreas,
-  userSettings,
-}) {
+export function ScanAreaTile({ item, webhookMode, userSettings }) {
   const search = useStore((s) => s.filters.scanAreas?.filter?.search)
   const initialRenderAreas =
     useStore.getState().filters?.scanAreas?.filter?.areas || []
@@ -29,10 +25,10 @@ export function ScanAreaTile({
           if (!layer.feature) return
           const { name, key, manual = false } = layer.feature.properties
           if (webhookMode && name) {
-            setSelectedAreas((prev) => {
-              const includes = prev.includes(name)
-              layer.setStyle({ fillOpacity: includes ? 0.2 : 0.8 })
-              return includes ? prev.filter((h) => h !== name) : [...prev, name]
+            handleClick(name)().then((newAreas) => {
+              layer.setStyle({
+                fillOpacity: newAreas.includes(name) ? 0.8 : 0.2,
+              })
             })
           } else if (!manual && userSettings?.tapToToggle) {
             const { filters, setAreas } = useStore.getState()
@@ -48,7 +44,7 @@ export function ScanAreaTile({
         },
       }}
       onEachFeature={(feature, layer) => {
-        if (feature.properties && feature.properties.name) {
+        if (feature.properties?.name) {
           const { name, key } = feature.properties
           const popupContent = Utility.getProperName(name)
           layer
@@ -65,7 +61,9 @@ export function ScanAreaTile({
                 '#3388ff',
               fillOpacity: (
                 webhookMode === 'areas'
-                  ? selectedAreas.includes(name?.toLowerCase())
+                  ? useWebhookStore
+                      .getState()
+                      .human?.area?.includes(name?.toLowerCase())
                   : initialRenderAreas.includes(webhookMode ? name : key)
               )
                 ? 0.8

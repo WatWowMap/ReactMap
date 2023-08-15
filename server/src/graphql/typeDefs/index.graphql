@@ -142,7 +142,8 @@ type Query {
   webhookAreas: [WebhookAreaGroups]
   webhookGeojson: JSON
   webhookContext: PoracleConfig
-  webhookValid: [String]
+  webhookCategories: [String]
+  webhookUser: UserPoracleConfig
   scanner(category: String, method: String, data: JSON): ScannerApi
 }
 
@@ -151,6 +152,7 @@ type Mutation {
   updateBackup(backup: BackupUpdate): Boolean
   deleteBackup(id: ID): Boolean
   webhook(category: String, data: JSON, status: String): Poracle
+  webhookChange(webhook: String): Poracle
   tutorial(tutorial: Boolean): Boolean
   strategy(strategy: String): Boolean
   setGymBadge(gymId: String, badge: Int): Boolean

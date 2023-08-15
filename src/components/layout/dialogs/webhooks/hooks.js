@@ -1,14 +1,14 @@
 // @ts-check
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useStatic } from '@hooks/useStore'
 import {
-  VALID_HOOKS,
+  WEBHOOK_CATEGORIES,
   WEBHOOK_AREAS,
   WEBHOOK_CONTEXT,
   allProfiles,
+  WEBHOOK_USER,
 } from '@services/queries/webhook'
-import Query from '@services/Query'
 import { useTranslation } from 'react-i18next'
 
 import { getContext, useWebhookStore } from './store'
@@ -34,7 +34,7 @@ export function useGetHookContext() {
     nextFetchPolicy: 'standby',
     skip: !mode,
   })
-  const { data: categories } = useQuery(VALID_HOOKS, {
+  const { data: categories } = useQuery(WEBHOOK_CATEGORIES, {
     fetchPolicy: 'no-cache',
     nextFetchPolicy: 'standby',
     skip: !mode,
@@ -48,23 +48,29 @@ export function useGetHookContext() {
     }
   }, [context])
 
-  return categories?.webhookValid || []
+  return categories?.webhookCategories || []
 }
 
 /**
  *
  * @template {import('./store').WebhookStore['category']} T
  * @param {T} category
- * @returns {{ data: import('types').APIMethod[T], loading: boolean }}
+ * @returns {{ data: T extends 'human' ? { webhooks: string[], selected: string } : import('types').APIMethod[T], loading: boolean }}
  */
 export function useGetWebhookData(category) {
   const { t } = useTranslation()
+  // const cached = useWebhookStore((s) => s[category])
+
   const { data, loading } = useQuery(allProfiles, {
     fetchPolicy: 'no-cache',
     variables: {
       category,
       status: 'GET',
     },
+  })
+  const { data: userConfig } = useQuery(WEBHOOK_USER, {
+    fetchPolicy: 'no-cache',
+    skip: category !== 'human',
   })
 
   useEffect(() => {
@@ -78,22 +84,46 @@ export function useGetWebhookData(category) {
             message: t(data.webhook.message, { name: context.name || '' }),
           },
         })
-      } else if (category === 'human') {
-        console.log('human', data?.webhook)
-        useWebhookStore.setState({ human: data?.webhook?.human || {} })
       }
     }
   }, [loading])
 
   return {
-    data: data?.webhook?.[category] || (category === 'human' ? {} : []),
+    data:
+      category === 'human'
+        ? userConfig?.webhookUser || { webhooks: [], selected: '' }
+        : data?.webhook?.[category] || [],
     loading,
   }
 }
 
+/**
+ * @template {import('./store').WebhookStore['category']} T
+ * @param {T} category */
+export function useSyncData(category) {
+  const cached = useWebhookStore((s) => s[category])
+
+  const { data } = useQuery(allProfiles, {
+    fetchPolicy: 'no-cache',
+    variables: {
+      category,
+      status: 'GET',
+    },
+  })
+
+  useEffect(() => {
+    if (data?.webhook?.[category]) {
+      useWebhookStore.setState({
+        [category]: data.webhook[category],
+      })
+    }
+  }, [data])
+  return cached
+}
+
 export function useGenFilters() {
   const {
-    masterfile: { invasions },
+    // masterfile: { invasions },
     filters: rmFilters,
   } = useStatic.getState()
   const category = useWebhookStore((s) => s.category)

@@ -57,14 +57,11 @@ class User extends Model {
    * TODO: Fix user types
    * @param {number} id
    * @param {string} selectedWebhook
-   * @returns {Promise<import('types').User & { selectedWebhook: string }>}
+   * @returns {Promise<string>}
    */
   static async updateWebhook(id, selectedWebhook) {
-    return this.query()
-      .update({ selectedWebhook })
-      .where({ id })
-      .returning('*')
-      .first()
+    await this.query().update({ selectedWebhook }).where({ id })
+    return selectedWebhook
   }
 }
 

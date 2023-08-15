@@ -9,26 +9,25 @@ import {
   Typography,
   CircularProgress,
   Autocomplete,
+  Box,
 } from '@mui/material'
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { useMapEvents } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
+import { useMapEvents } from 'react-leaflet'
 
 import { setHuman } from '@services/queries/webhook'
 import { WEBHOOK_NOMINATIM } from '@services/queries/geocoder'
 import useLocation from '@hooks/useLocation'
 
-import { setModeBtn, useWebhookStore } from './store'
+import { setModeBtn, useWebhookStore } from '../store'
+import { useSyncData } from '../hooks'
 
 const Location = () => {
   const { lc, color } = useLocation()
   const { t } = useTranslation()
 
-  // const location = useWebhookStore((s) => s.location)
   const webhookLocation = useWebhookStore((s) => s.location)
-  const latitude = useWebhookStore((s) => s.human.latitude || 0)
-  const longitude = useWebhookStore((s) => s.human.longitude || 0)
-  const addressFormat = useWebhookStore((s) => s.context.addressFormat || '')
+  const { latitude, longitude } = useSyncData('human')
   const hasNominatim = useWebhookStore((s) => !!s.context.hasNominatim)
 
   const [execSearch, { data, previousData, loading }] = useLazyQuery(
@@ -40,18 +39,33 @@ const Location = () => {
 
   const [save] = useMutation(setHuman, { fetchPolicy: 'no-cache' })
 
-  /** @param {number[]} location */
+  /** @param {[number, number]} location */
   const handleLocationChange = (location) => {
-    if (location.length) {
+    if (location.every((x) => x !== 0)) {
+      useWebhookStore.setState({ location })
       save({
         variables: {
           category: 'setLocation',
           data: location,
           status: 'POST',
         },
+      }).then(({ data: newData }) => {
+        if (newData?.webhook) {
+          useWebhookStore.setState({ human: newData.webhook.human })
+        }
       })
     }
   }
+
+  const map = useMapEvents({
+    locationfound: (newLoc) => {
+      const { location } = useWebhookStore.getState()
+      const { lat, lng } = newLoc.latlng
+      if (lat !== location[0] && lng !== location[1]) {
+        handleLocationChange([lat, lng])
+      }
+    },
+  })
 
   React.useEffect(() => {
     if (webhookLocation[0] !== latitude && webhookLocation[1] !== longitude) {
@@ -59,10 +73,15 @@ const Location = () => {
     }
   }, [webhookLocation])
 
-  // React.useEffect(() => () => lc.stop(), [])
+  React.useEffect(() => {
+    if (webhookLocation.every((x) => x === 0)) {
+      useWebhookStore.setState({ location: [latitude, longitude] })
+    }
+  }, [latitude, longitude])
+
+  React.useEffect(() => () => lc.stop(), [])
 
   const fetchedData = data || previousData || { geocoder: [] }
-  console.log(fetchedData, addressFormat)
 
   return (
     <Grid
@@ -78,7 +97,7 @@ const Location = () => {
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Typography variant="body2">
-          {[latitude, longitude].map((x) => x.toFixed(6)).join(', ')}
+          {[latitude, longitude].map((x) => x.toFixed(5)).join(', ')}
         </Typography>
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
@@ -114,23 +133,21 @@ const Location = () => {
           includeInputInList
           freeSolo
           disabled={!hasNominatim}
-          onChange={(event, newValue) => {
+          onInputChange={(_, newValue) =>
+            execSearch({ variables: { search: newValue } })
+          }
+          onChange={(_, newValue) => {
             if (newValue) {
-              console.log({ newValue })
               const { latitude: lat, longitude: lng } = newValue
               map.panTo([lat, lng])
-              useWebhookStore.setState({ location: [lat, lng] })
+              handleLocationChange([lat, lng])
             }
           }}
           renderInput={(params) => (
             <TextField
-              // eslint-disable-next-line react/jsx-props-no-spreading
               {...params}
               label={t('search_location')}
               variant="outlined"
-              onChange={(e) =>
-                execSearch({ variables: { search: e.target.value } })
-              }
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
@@ -145,14 +162,15 @@ const Location = () => {
             />
           )}
           renderOption={(props, option) => (
-            <Grid container alignItems="center" {...props}>
-              <Grid item>
-                <LocationOn />
-              </Grid>
-              <Grid item xs>
-                <Typography variant="caption">{option.formatted}</Typography>
-              </Grid>
-            </Grid>
+            <Typography
+              {...props}
+              className="flex-center"
+              variant="caption"
+              py={1}
+            >
+              <LocationOn sx={{ mx: 2 }} />
+              <Box flexGrow={1}>{option.formatted}</Box>
+            </Typography>
           )}
         />
       </Grid>
@@ -161,8 +179,3 @@ const Location = () => {
 }
 
 export default Location
-
-// const getEqual = (prev, next) =>
-//   prev.webhookLocation.join('') === next.webhookLocation.join('')
-
-// export default memo(Location, getEqual)

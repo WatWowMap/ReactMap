@@ -435,8 +435,34 @@ export const WEBHOOK_CONTEXT = gql`
   }
 `
 
-export const VALID_HOOKS = gql`
-  query ValidWebhooks {
-    webhookValid
+export const WEBHOOK_USER = gql`
+  query WebhookUser {
+    webhookUser {
+      webhooks
+      selected
+    }
+  }
+`
+
+export const WEBHOOK_CATEGORIES = gql`
+  query WebhookCategory {
+    webhookCategories
+  }
+`
+
+export const WEBHOOK_CHANGE = gql`
+  ${base}
+  ${Human}
+  mutation WebhookChange($webhook: String!) {
+    webhookChange(webhook: $webhook) {
+      ...Base
+      ...PoracleHuman
+    }
+  }
+`
+
+export const WEBHOOK_GEOJSON = gql`
+  query WebhookGeojson {
+    webhookGeojson
   }
 `

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import Person from '@mui/icons-material/Person'
 import { DialogContent, AppBar, Tabs, Tab, Collapse } from '@mui/material'
-
+import Box from '@mui/material/Box'
 import { useTranslation, Trans } from 'react-i18next'
 
 import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
@@ -18,7 +18,7 @@ import Tracked from './Tracked'
 import Menu from '../../general/Menu'
 import WebhookError from './Error'
 import ProfileEditing from './ProfileEditing'
-import { setMode, setSend, useWebhookStore } from './store'
+import { setMode, useWebhookStore } from './store'
 import { useGetHookContext } from './hooks'
 
 export default function Manage() {
@@ -89,39 +89,32 @@ export default function Manage() {
 
   const tabValue = categories.findIndex((x) => x === category)
 
+  console.log(tabValue, category, categories)
   return (
     <>
       <Header names={[name]} action={setMode} titles={['manage_webhook']} />
-      <Collapse in={!addNew}>
-        <AppBar position="static">
-          <Tabs value={tabValue} onChange={changeTab}>
-            {categories.map((each) => (
-              <Tab
-                key={each}
-                icon={<TabIcon key={each} category={each} />}
-                style={{ minWidth: 5 }}
-              />
-            ))}
-          </Tabs>
-        </AppBar>
-        <DialogContent sx={{ padding: 0, height: { xs: '100%', sm: '70vh' } }}>
-          {categories.map((key, i) => (
-            <TabPanel value={tabValue} index={i} key={key} virtual>
-              {key === 'human' ? (
-                <Human />
-              ) : (
-                <Tracked
-                  category={key}
-                  // tempFilters={tempFilters}
-                  // setTempFilters={setTempFilters}
-                  // send={send}
-                />
-              )}
-            </TabPanel>
+      <AppBar position="static">
+        <Tabs value={tabValue} onChange={changeTab}>
+          {categories.map((each) => (
+            <Tab
+              key={each}
+              icon={<TabIcon key={each} category={each} />}
+              style={{ minWidth: 5 }}
+            />
           ))}
-        </DialogContent>
-      </Collapse>
-      {/* 
+        </Tabs>
+      </AppBar>
+      <DialogContent sx={{ p: 0 }}>
+        <Collapse in={!addNew} sx={{ maxHeight: '70vh', overflow: 'auto' }}>
+          <Box>
+            {categories.map((key, i) => (
+              <TabPanel value={tabValue} index={i} key={key} virtual>
+                {key === 'human' ? <Human /> : <Tracked category={key} />}
+              </TabPanel>
+            ))}
+          </Box>
+        </Collapse>
+        {/* 
       <Collapse in={addNew}>
         {webhookCategory === 'human' ? (
           <ProfileEditing handleClose={handleClose} />
@@ -147,6 +140,7 @@ export default function Manage() {
           />
         )}
       </Collapse> */}
+      </DialogContent>
 
       <Footer options={footerButtons} role="webhook_footer" />
     </>

@@ -70,6 +70,7 @@ class PoracleAPI {
     this.prefix = '!'
     this.locale = 'en'
     this.gymBattles = false
+    /** @type {import('types').RMGeoJSON} */
     this.geojson = { features: [], type: 'FeatureCollection' }
     this.templates = { discord: {}, telegram: {} }
 
@@ -110,6 +111,71 @@ class PoracleAPI {
       (key) =>
         !(this.disabledHooks.includes(key) || blockedAlerts?.includes(key)),
     )
+  }
+
+  /**
+   *
+   * @param {{
+   *  strategy: 'discord' | 'telegram'
+   *  webhookStrategy: 'discord' | 'telegram'
+   *  discordId: `${number}`
+   *  telegramId: `${number}`
+   * }} user
+   * @returns
+   */
+  static getWebhookId(user) {
+    if (!user) {
+      return ''
+    }
+    const { strategy, webhookStrategy, discordId, telegramId } = user
+    switch (strategy) {
+      case 'discord':
+        return discordId
+      case 'telegram':
+        return telegramId
+      default:
+        return webhookStrategy === 'discord' ? discordId : telegramId
+    }
+  }
+
+  /**
+   *
+   * @param {number} userId
+   * @returns
+   */
+  async getUserAreas(userId) {
+    /** @type {{ areas: import('types').PoracleHumanArea[] }} */
+    const { areas } = await this.#sendRequest(APIS.humans(userId))
+    const areaGroups = areas.reduce((groupMap, area) => {
+      if (area.userSelectable) {
+        if (!groupMap[area.group]) groupMap[area.group] = []
+        groupMap[area.group].push(area.name)
+      }
+      return groupMap
+    }, /** @type {Record<string, string[]>} */ ({}))
+
+    return Object.entries(areaGroups)
+      .map(([group, children]) => ({
+        group,
+        children,
+      }))
+      .sort((a, b) => a.group.localeCompare(b.group))
+  }
+
+  /**
+   * @param {number} userId
+   * @returns
+   */
+  async getClientGeojson(userId) {
+    const allowedAreas = await this.getUserAreas(userId)
+    const areaSet = new Set(allowedAreas.flatMap((x) => x.children))
+    const features = this.geojson.features.filter((feature) =>
+      areaSet.has(feature.properties.name.toLowerCase()),
+    )
+    return {
+      type: 'FeatureCollection',
+      features,
+    }
   }
 
   async init() {
@@ -201,53 +267,6 @@ class PoracleAPI {
 
   /**
    *
-   * @param {{
-   *  strategy: 'discord' | 'telegram'
-   *  webhookStrategy: 'discord' | 'telegram'
-   *  discordId: `${number}`
-   *  telegramId: `${number}`
-   * }} user
-   * @returns
-   */
-  static getWebhookId(user) {
-    if (!user) {
-      return ''
-    }
-    const { strategy, webhookStrategy, discordId, telegramId } = user
-    switch (strategy) {
-      case 'discord':
-        return discordId
-      case 'telegram':
-        return telegramId
-      default:
-        return webhookStrategy === 'discord' ? discordId : telegramId
-    }
-  }
-
-  /**
-   *
-   * @param {number} userId
-   * @returns
-   */
-  async getUserAreas(userId) {
-    /** @type {{ areas: import('types').PoracleHumanArea[] }} */
-    const { areas } = await this.#sendRequest(APIS.humans(userId))
-    const areaGroups = areas.reduce((groupMap, area) => {
-      if (area.userSelectable) {
-        if (!groupMap[area.group]) groupMap[area.group] = []
-        groupMap[area.group].push(area.name)
-      }
-      return groupMap
-    }, /** @type {Record<string, string[]>} */ ({}))
-
-    return Object.entries(areaGroups).map(([group, children]) => ({
-      group,
-      children,
-    }))
-  }
-
-  /**
-   *
    * @param {string} path
    * @param {Method} method
    * @param {any} body
@@ -255,13 +274,13 @@ class PoracleAPI {
    */
   async #sendRequest(path, method = 'GET', body = {}) {
     const response = await fetchJson(`${this.endpoint}${path}`, {
-      method,
+      method: method || 'GET',
       headers: {
         'X-Poracle-Secret': this.secret,
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: method === 'GET' ? undefined : JSON.stringify(body),
+      body: method === 'GET' || !method ? undefined : JSON.stringify(body),
     })
     return response
   }
@@ -276,6 +295,8 @@ class PoracleAPI {
     return {
       human: {
         ...human,
+        enabled: !!human.enabled,
+        admin_disable: !!human.admin_disable,
         area: human.area ? JSON.parse(human.area) : [],
         area_restrictions: human.area_restrictions
           ? JSON.parse(human.area_restrictions)
@@ -451,6 +472,7 @@ class PoracleAPI {
       case 'quickGym':
         return this.#quickGym(userId, data)
       case 'human':
+      case 'oneHuman':
         return this.#oneHuman(userId)
       default:
         return this.#tracking(userId, category, data)
