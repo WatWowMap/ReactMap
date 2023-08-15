@@ -3,9 +3,9 @@ import * as React from 'react'
 import Person from '@mui/icons-material/Person'
 import { DialogContent, AppBar, Tabs, Tab, Collapse } from '@mui/material'
 import Box from '@mui/material/Box'
-import { useTranslation, Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 
-import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
+import { useLayoutStore, useStatic } from '@hooks/useStore'
 import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 import Footer from '@components/layout/general/Footer'
@@ -17,9 +17,9 @@ import Human from './human'
 import Tracked from './Tracked'
 import Menu from '../../general/Menu'
 import WebhookError from './Error'
-import ProfileEditing from './ProfileEditing'
 import { setMode, useWebhookStore } from './store'
 import { useGetHookContext } from './hooks'
+import ProfileEditing from './human/profile'
 
 export default function Manage() {
   const { t } = useTranslation()
