@@ -6,17 +6,16 @@ import Box from '@mui/material/Box'
 import { useTranslation } from 'react-i18next'
 
 import { useLayoutStore, useStatic } from '@hooks/useStore'
-import Poracle from '@services/Poracle'
+// import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 import Footer from '@components/layout/general/Footer'
-import TabPanel from '@components/layout/general/TabPanel'
 import Header from '@components/layout/general/Header'
 
-import NewPokemon from './tiles/WebhookTile'
+// import NewPokemon from './tiles/WebhookTile'
 import Human from './human'
 import Tracked from './Tracked'
-import Menu from '../../general/Menu'
-import WebhookError from './Error'
+// import Menu from '../../general/Menu'
+// import WebhookError from './Error'
 import { setMode, useWebhookStore } from './store'
 import { useGetHookContext } from './hooks'
 import ProfileEditing from './human/profile'
@@ -33,7 +32,6 @@ export default function Manage() {
   const category = useWebhookStore((s) => s.category)
   const name = useWebhookStore((s) => s.context.name) || ''
 
-  // const [tabValue, setTabValue] = React.useState(0)
   const [addNew, setAddNew] = React.useState(false)
 
   Utility.analytics(
@@ -106,39 +104,50 @@ export default function Manage() {
         </Tabs>
       </AppBar>
       <DialogContent sx={{ p: 0 }}>
-        <Collapse in={!addNew} sx={{ maxHeight: '70vh', overflow: 'auto' }}>
-          <Box>
-            {categories.map((key, i) => (
-              <TabPanel value={tabValue} index={i} key={key} virtual>
-                {key === 'human' ? <Human /> : <Tracked category={key} />}
-              </TabPanel>
-            ))}
-          </Box>
+        <Collapse
+          in={!addNew}
+          sx={{
+            height: '70vh',
+            // overflow: 'auto',
+            p: 2,
+            // display: 'flex',
+            // flexDirection: 'column',
+          }}
+        >
+          {/* {category === 'human' ? <Human /> : <Tracked category={category} />} */}
+          {categories.map((key) =>
+            key === 'human' ? (
+              <Box key={key} hidden={category !== 'human'}>
+                <Human />
+              </Box>
+            ) : (
+              <Tracked key={key} visible={category} category={key} />
+            ),
+          )}
         </Collapse>
         <Collapse in={addNew}>
-          {category === 'human' ? (
-            <ProfileEditing />
-          ) : (
-            <Menu
-              category={Poracle.getMapCategory(webhookCategory)}
-              categories={Poracle.getFilterCategories(webhookCategory)}
-              webhookCategory={webhookCategory}
-              filters={poracleFilters[webhookCategory]}
-              tempFilters={tempFilters}
-              setTempFilters={setTempFilters}
-              title="webhook_selection"
-              titleAction={() => handleClose(false)}
-              Tile={NewPokemon}
-              extraButtons={[
-                {
-                  name: 'save',
-                  action: () => handleClose(true),
-                  icon: 'Save',
-                  color: 'secondary',
-                },
-              ]}
-            />
-          )}
+          {
+            category === 'human' ? <ProfileEditing /> : null
+            // <Menu
+            //   category={Poracle.getMapCategory(category)}
+            //   categories={Poracle.getFilterCategories(category)}
+            //   webhookCategory={category}
+            //   filters={poracleFilters[webhookCategory]}
+            //   tempFilters={tempFilters}
+            //   setTempFilters={setTempFilters}
+            //   title="webhook_selection"
+            //   titleAction={() => handleClose(false)}
+            //   Tile={NewPokemon}
+            //   extraButtons={[
+            //     {
+            //       name: 'save',
+            //       action: () => handleClose(true),
+            //       icon: 'Save',
+            //       color: 'secondary',
+            //     },
+            //   ]}
+            // />
+          }
         </Collapse>
       </DialogContent>
 

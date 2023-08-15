@@ -120,6 +120,7 @@
     "react-leaflet-cluster": "2.1.0",
     "react-router-dom": "^6.2.0",
     "react-virtualized-auto-sizer": "^1.0.20",
+    "react-virtuoso": "^4.5.0",
     "react-window": "^1.8.9",
     "rtree": "^1.4.2",
     "suncalc": "^1.9.0",

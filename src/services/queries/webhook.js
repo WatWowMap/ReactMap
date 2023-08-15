@@ -82,6 +82,7 @@ const Invasion = gql`
       template
       uid
       description
+      real_grunt_id
     }
   }
 `
@@ -158,6 +159,10 @@ const Pokemon = gql`
       template
       uid
       description
+      allForms
+      pvpEntry
+      xs
+      xl
     }
   }
 `
@@ -220,6 +225,7 @@ const Raid = gql`
       template
       uid
       description
+      allMoves
     }
   }
 `

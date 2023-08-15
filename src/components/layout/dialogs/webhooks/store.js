@@ -26,7 +26,8 @@ import { create } from 'zustand'
  *  category: keyof import('types').PoracleUI
  *  context: Partial<import('types').PoracleClientContext>
  *  groupedAreas: Record<string, import('@turf/helpers').Feature[]>
- *  newActiveHours: import('types').PoracleActiveHours
+ *  trackedSearch: string
+ *  selected: Record<string, boolean>
  * }} WebhookStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<WebhookStore>>}
  */
@@ -57,13 +58,10 @@ export const useWebhookStore = create(() => ({
     severity: 'info',
     message: '',
   },
-  newActiveHours: {
-    day: 1,
-    hours: '00',
-    mins: '00',
-  },
   send: false,
   groupedAreas: {},
+  trackedSearch: '',
+  selected: {},
 }))
 
 /** @param {WebhookStore['location']} location */
@@ -105,13 +103,14 @@ export function getContext(category) {
   return useWebhookStore.getState().context.ui[category]
 }
 
-export function handleActiveHourChange(event) {
-  const { name, value } = event.target
-  useWebhookStore.setState({
-    alert: {
-      open: false,
-      severity: 'info',
-      message: '',
-    },
-  })
+/** @param {string} trackedSearch */
+export function setTrackedSearch(trackedSearch) {
+  useWebhookStore.setState({ trackedSearch })
+}
+
+/** @param {string} id */
+export const setSelected = (id) => () => {
+  useWebhookStore.setState((prev) => ({
+    selected: id ? { ...prev.selected, [id]: !prev.selected[id] } : {},
+  }))
 }

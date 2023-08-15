@@ -80,7 +80,6 @@ class PoracleAPI {
     this.pvpCaps = []
     this.leagues = []
 
-    // /** @type {ReturnType<PoracleAPI['buildPoracleUI']>} */
     this.ui = {}
   }
 
@@ -419,7 +418,7 @@ class PoracleAPI {
           APIS.tracking(
             userId,
             main,
-            method === 'DELETE' ? `/byUid/${data.uid}` : '',
+            method === 'DELETE' ? `byUid/${data.uid}` : '',
           ),
           method,
           data,
@@ -481,14 +480,14 @@ class PoracleAPI {
       case 'quest':
       case 'raid':
       case 'gym':
-        return this.#tracking(userId, category, data)
+        return this.#tracking(userId, category, method, data)
       case 'quickGym':
         return this.#quickGym(userId, data)
       case 'human':
       case 'oneHuman':
         return this.#oneHuman(userId)
       default:
-        return this.#tracking(userId, category, data)
+        return this.#tracking(userId, category, method, data)
     }
   }
 

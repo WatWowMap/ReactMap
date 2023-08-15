@@ -1,6 +1,8 @@
 // @ts-check
-import { useEffect } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useQuery } from '@apollo/client'
+import { useTranslation } from 'react-i18next'
+
 import { useStatic } from '@hooks/useStore'
 import {
   WEBHOOK_CATEGORIES,
@@ -9,7 +11,7 @@ import {
   allProfiles,
   WEBHOOK_USER,
 } from '@services/queries/webhook'
-import { useTranslation } from 'react-i18next'
+import RobustTimeout from '@services/apollo/RobustTimeout'
 
 import { getContext, useWebhookStore } from './store'
 
@@ -59,19 +61,47 @@ export function useGetHookContext() {
  */
 export function useGetWebhookData(category) {
   const { t } = useTranslation()
-  // const cached = useWebhookStore((s) => s[category])
+  const search = useWebhookStore((s) => s.trackedSearch)
+  const realCategory = useWebhookStore((s) => s.category)
+  const timeout = useRef(new RobustTimeout(10_000))
 
-  const { data, loading } = useQuery(allProfiles, {
-    fetchPolicy: 'no-cache',
+  const { data, previousData, loading, refetch } = useQuery(allProfiles, {
+    fetchPolicy: 'cache-first',
     variables: {
       category,
       status: 'GET',
     },
+    context: {
+      abortableContext: timeout.current,
+    },
+    skip: category !== realCategory,
   })
   const { data: userConfig } = useQuery(WEBHOOK_USER, {
     fetchPolicy: 'no-cache',
     skip: category !== 'human',
   })
+
+  useEffect(() => {
+    if (category === realCategory) {
+      timeout.current.setupTimeout(refetch)
+      return () => {
+        timeout.current.off()
+      }
+    }
+  }, [category, realCategory])
+
+  const filtererData = useMemo(() => {
+    const source = data ?? previousData
+    return category === 'human' || category === 'profile'
+      ? source?.webhook?.[category]
+      : (source?.webhook?.[category] || []).filter(
+          (x) =>
+            !search ||
+            (x.description
+              ? x.description.toLowerCase().includes(search.toLowerCase())
+              : true),
+        ) || []
+  }, [data, previousData, search])
 
   useEffect(() => {
     if (!loading && data?.webhook) {
@@ -85,18 +115,20 @@ export function useGetWebhookData(category) {
           },
         })
       } else {
-        useWebhookStore.setState({
-          [category]: data.webhook[category],
-        })
+        useWebhookStore.setState({ [category]: filtererData })
       }
     }
-  }, [loading, data])
+  }, [loading, data, search])
+
+  useEffect(() => {
+    refetch()
+  }, [category])
 
   return {
     data:
       category === 'human'
         ? userConfig?.webhookUser || { webhooks: [], selected: '' }
-        : data?.webhook?.[category] || [],
+        : filtererData || [],
     loading,
   }
 }

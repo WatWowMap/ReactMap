@@ -1,4 +1,5 @@
 // @ts-check
+import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
 import { useStatic } from '@hooks/useStore'
 
 export default class Poracle {
@@ -264,7 +265,10 @@ export default class Poracle {
     }
   }
 
-  static getId(item, category, invasions) {
+  static getId(item) {
+    const { invasions } = useStatic.getState().masterfile
+    const { category } = useWebhookStore.getState()
+
     switch (category) {
       case 'egg':
         return `e${item.level}`

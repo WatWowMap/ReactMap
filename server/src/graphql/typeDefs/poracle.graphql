@@ -66,6 +66,7 @@ type PoracleRaid {
   move: Int
   pokemon_id: Int
   description: String
+  allMoves: Boolean
 }
 
 type PoracleEgg {
@@ -94,6 +95,7 @@ type PoracleInvasion {
   template: String
   distance: Int
   description: String
+  real_grunt_id: Int
 }
 
 type PoraclePokemon {
@@ -132,6 +134,10 @@ type PoraclePokemon {
   pvp_ranking_league: Int
   pvp_ranking_cap: Int
   description: String
+  allForms: Boolean
+  pvpEntry: Boolean
+  xs: Boolean
+  xl: Boolean
 }
 
 type PoracleLure {

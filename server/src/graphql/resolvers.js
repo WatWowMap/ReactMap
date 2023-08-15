@@ -458,13 +458,42 @@ const resolvers = {
       }
       return []
     },
-    webhook: async (_, args, { req, perms, Event }) => {
+    webhook: async (_, { status, category }, { req, perms, Event }) => {
       if (perms?.webhooks && req.user?.selectedWebhook) {
         const result = await Event.webhookObj[req.user.selectedWebhook].api(
           PoracleAPI.getWebhookId(req.user),
-          args.category,
-          args.status,
+          category,
+          status,
         )
+        if (category === 'pokemon') {
+          result.pokemon = result.pokemon.map((x) => ({
+            ...x,
+            allForms: !x.form,
+            pvpEntry: !!x.pvp_ranking_league,
+            xs: x.max_weight !== 9000000,
+            xl: x.min_weight !== 0,
+          }))
+        }
+        if (category === 'invasion') {
+          const { invasions } = Event.masterfile
+          result.invasion = result.invasion.map((x) => ({
+            ...x,
+            real_grunt_id:
+              +Object.keys(invasions).find(
+                (key) =>
+                  invasions[key]?.type?.toLowerCase() ===
+                    x.grunt_type.toLowerCase() &&
+                  invasions[key].gender === (x.gender || 1),
+              ) || 0,
+          }))
+        }
+        if (category === 'raid') {
+          result.raid = result.raid.map((x) => ({
+            ...x,
+            allMoves: x.move === 9000,
+          }))
+        }
+
         return result
       }
       return {}
@@ -499,9 +528,8 @@ const resolvers = {
         )
         req.user.selectedWebhook = selectedWebhook
         req.session.save()
-        const webhookStrategy = evalWebhookId(req.user)
         return Event.webhookObj[selectedWebhook].getClientContext(
-          webhookStrategy,
+          req.user.strategy || req.user.webhookStrategy,
         )
       }
     },

@@ -1,32 +1,34 @@
 import React, { useState } from 'react'
 import DeleteForever from '@mui/icons-material/DeleteForever'
 import Edit from '@mui/icons-material/Edit'
-import { Grid, Typography, IconButton, Dialog, Checkbox } from '@mui/material'
+import {
+  Grid,
+  Typography,
+  IconButton,
+  Dialog,
+  Checkbox,
+  Box,
+} from '@mui/material'
 
 import Utility from '@services/Utility'
 import Poracle from '@services/Poracle'
 import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
+import { useStatic } from '@hooks/useStore'
+import apolloClient, { apolloCache } from '@services/apollo'
+import * as webhookNodes from '@services/queries/webhook'
 
-export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
-  const {
-    tileItem,
-    columnCount,
-    Icons,
-    syncWebhook,
-    selectedWebhook,
-    selected,
-    setSelected,
-    tracked,
-    setTracked,
-    isMobile,
-    setSend,
-    setTempFilters,
-    category,
-    invasions,
-  } = data
+import { useWebhookStore, setSelected } from '../store'
+
+export default function TrackedTile({ index }) {
   const [editDialog, setEditDialog] = useState(false)
-  const item = tileItem[rowIndex * columnCount + columnIndex]
-  if (!item) return null
+
+  const isMobile = useStatic((s) => s.isMobile)
+
+  const category = useWebhookStore((s) => s.category)
+  const item = useWebhookStore((s) => s[category][index])
+  const selected = useWebhookStore((s) => (item ? s.selected[item.uid] : false))
+
+  if (!item) return <Box>&nbsp;</Box>
 
   const toggleWebhook = (open, id, newFilters) => (event) => {
     if (
@@ -41,49 +43,36 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
       newFilters &&
       !Object.keys(newFilters).every((key) => newFilters[key] === item[key])
     ) {
-      setTempFilters({ [id]: { ...newFilters, enabled: true } })
-      setSend(true)
+      apolloClient.mutate({
+        mutation: webhookNodes[category],
+        variables: {
+          data: Poracle.processor(
+            category,
+            [newFilters],
+            useWebhookStore.getState().context.ui[category].defaults,
+          ),
+          status: 'POST',
+          category,
+        },
+      })
     }
   }
 
-  const handleChange = (event) => {
-    setSelected({ ...selected, [item.uid]: event.target.checked })
-  }
+  const id = Poracle.getId(item, category)
 
-  const id = Poracle.getId(item, category, invasions)
-  if (item.form !== undefined) {
-    item.allForms = !item.form
-  }
-  if (category === 'invasion') {
-    item.grunt_id = Object.keys(invasions).find(
-      (key) =>
-        invasions[key]?.type?.toLowerCase() === item.grunt_type.toLowerCase() &&
-        invasions[key].gender === (item.gender || 1),
-    )
-  }
-  if (category === 'pokemon') {
-    item.pvpEntry = Boolean(item.pvp_ranking_league)
-    item.xs = item.max_weight !== 9000000
-    item.xl = item.min_weight !== 0
-  }
-  if (category === 'raid') {
-    item.allMoves = item.move === 9000
-  }
   return (
     <Grid
       container
       item
       xs={12}
-      style={{
-        ...style,
-        backgroundColor: Utility.getTileBackground(columnIndex, rowIndex),
-      }}
+      bgcolor={Utility.getTileBackground(1, index)}
       justifyContent="center"
       alignItems="center"
+      py={1}
     >
       <Grid item xs={2} sm={1}>
         <img
-          src={Icons.getIconById(id)}
+          src={useStatic.getState().Icons.getIconById(id)}
           alt={id}
           style={{ maxWidth: 40, maxHeight: 40 }}
         />
@@ -98,13 +87,23 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
         <IconButton
           size="small"
           onClick={() => {
-            setTracked(tracked.filter((p) => p.uid !== item.uid))
-            syncWebhook({
+            useWebhookStore.setState((prev) => ({
+              [category]: prev[category].filter((x) => x.uid !== item.uid),
+            }))
+            apolloClient.mutate({
+              mutation: webhookNodes.setProfile,
               variables: {
                 category,
                 data: { uid: item.uid },
-                name: selectedWebhook,
                 status: 'DELETE',
+              },
+            })
+            apolloClient.cache.modify({
+              id: apolloCache.identify(item),
+              fields: {
+                uid() {
+                  // deletes...?
+                },
               },
             })
           }}
@@ -113,8 +112,8 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
         </IconButton>
         <Checkbox
           size="small"
-          checked={Boolean(selected[item.uid])}
-          onChange={handleChange}
+          checked={!!selected}
+          onChange={setSelected(item.uid)}
           color="secondary"
         />
       </Grid>
@@ -127,9 +126,9 @@ export default function PokemonTile({ data, rowIndex, columnIndex, style }) {
         <WebhookAdvanced
           id={id}
           category={category}
-          isMobile={isMobile}
+          // isMobile={isMobile}
           toggleWebhook={toggleWebhook}
-          tempFilters={{ ...item, byDistance: Boolean(item.distance) }}
+          tempFilters={{ ...item, byDistance: !!item.distance }}
         />
       </Dialog>
     </Grid>
