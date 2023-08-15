@@ -693,9 +693,7 @@ export default function WebhookAdvanced({
                       <Typography variant="subtitle2">{x.name}</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="caption">
-                        {Utility.formatter(addressFormat, x.formatted)}
-                      </Typography>
+                      <Typography variant="caption">{x.formatted}</Typography>
                     </Grid>
                     <Divider
                       light

@@ -9,6 +9,7 @@ import {
   Checkbox,
   Box,
 } from '@mui/material'
+import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import Poracle from '@services/Poracle'
@@ -23,7 +24,7 @@ export default function TrackedTile({ index }) {
   const [editDialog, setEditDialog] = useState(false)
 
   const isMobile = useStatic((s) => s.isMobile)
-
+  const { t } = useTranslation()
   const category = useWebhookStore((s) => s.category)
   const item = useWebhookStore((s) => s[category][index])
   const selected = useWebhookStore((s) => (item ? s.selected[item.uid] : false))
@@ -78,7 +79,9 @@ export default function TrackedTile({ index }) {
         />
       </Grid>
       <Grid item xs={6} sm={8} md={9}>
-        <Typography variant="caption">{item.description}</Typography>
+        <Typography variant="caption">
+          {item.description || Poracle.generateDescription(item, category, t)}
+        </Typography>
       </Grid>
       <Grid item xs={4} sm={3} md={2} style={{ textAlign: 'right' }}>
         <IconButton size="small" onClick={() => setEditDialog(true)}>

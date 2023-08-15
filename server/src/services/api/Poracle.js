@@ -1,4 +1,3 @@
-// @ts-check
 const fetchJson = require('./fetchJson')
 const { log, HELPERS } = require('../logger')
 

@@ -33,7 +33,7 @@ export default function Selecting() {
         status: 'POST',
       },
     })
-    setSelected()
+    setSelected()()
   }
 
   if (!Object.keys(selected).length) return null
@@ -45,7 +45,7 @@ export default function Selecting() {
           size="small"
           color="secondary"
           variant="extended"
-          onClick={() => setSelected()}
+          onClick={setSelected()}
         >
           <Typography variant="caption">{t('cancel')}</Typography>
         </Fab>

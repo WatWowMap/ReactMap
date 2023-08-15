@@ -1,49 +1,46 @@
 // @ts-check
 import * as React from 'react'
 import Person from '@mui/icons-material/Person'
-import { DialogContent, AppBar, Tabs, Tab, Collapse } from '@mui/material'
+import DialogContent from '@mui/material/DialogContent'
+import AppBar from '@mui/material/AppBar'
+import Tabs from '@mui/material/Tabs'
+import Tab from '@mui/material/Tab'
+import Collapse from '@mui/material/Collapse'
+
 import Box from '@mui/material/Box'
 import { useTranslation } from 'react-i18next'
 
 import { useLayoutStore, useStatic } from '@hooks/useStore'
-// import Poracle from '@services/Poracle'
+import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 import Footer from '@components/layout/general/Footer'
 import Header from '@components/layout/general/Header'
+import apolloClient from '@services/apollo'
+import Query from '@services/Query'
+import { allProfiles } from '@services/queries/webhook'
 
-// import NewPokemon from './tiles/WebhookTile'
+import NewPokemon from './tiles/WebhookTile'
 import Human from './human'
 import Tracked from './Tracked'
-// import Menu from '../../general/Menu'
+import Menu from '../../general/Menu'
 // import WebhookError from './Error'
 import { setMode, useWebhookStore } from './store'
-import { useGetHookContext } from './hooks'
+import { useGenFullFilters, useGetHookContext } from './hooks'
 import ProfileEditing from './human/profile'
 
 export default function Manage() {
   const { t } = useTranslation()
 
   const categories = useGetHookContext()
-
-  // const staticFilters = useStatic((s) => s.filters)
-  // const invasions = useStatic((s) => s.masterfile.invasions)
-  const feedbackLink = useStatic((s) => s.config.map.feedbackLink)
-  // const send = useWebhookStore((s) => s.send)
   const category = useWebhookStore((s) => s.category)
   const name = useWebhookStore((s) => s.context.name) || ''
 
+  const feedbackLink = useStatic((s) => s.config.map.feedbackLink)
+
+  const filters = useGenFullFilters()
+
   const [addNew, setAddNew] = React.useState(false)
-
-  Utility.analytics(
-    'Webhook',
-    // `${webhookCategory} Webhook Page`,
-    // webhookCategory,
-    true,
-  )
-
-  // const [tempFilters, setTempFilters] = React.useState(
-  //   poracleFilters[webhookCategory],
-  // )
+  const [tempFilters, setTempFilters] = React.useState(filters[category])
 
   const footerButtons = React.useMemo(
     () => [
@@ -72,8 +69,31 @@ export default function Manage() {
         color: 'primary',
       },
     ],
-    [addNew, categories, feedbackLink],
+    [addNew, categories, category, feedbackLink],
   )
+
+  React.useEffect(() => {
+    Utility.analytics('Webhook', `${category} Webhook Page`, category, true)
+    setTempFilters(filters[category])
+  }, [category])
+
+  React.useEffect(() => {
+    if (!addNew && category !== 'human') {
+      apolloClient.mutate({
+        mutation: Query.webhook(category),
+        variables: {
+          category,
+          data: Poracle.processor(
+            category,
+            Object.values(tempFilters || {}).filter((x) => x && x.enabled),
+            useWebhookStore.getState().context.ui[category].defaults,
+          ),
+          status: 'POST',
+        },
+        refetchQueries: [allProfiles],
+      })
+    }
+  }, [addNew])
 
   const changeTab = React.useCallback(
     /** @param {React.SyntheticEvent<Element, Event>} _ @param {typeof category} newCategory */
@@ -85,7 +105,27 @@ export default function Manage() {
 
   const tabValue = categories.findIndex((x) => x === category)
 
-  return (
+  return category !== 'human' && addNew ? (
+    <Menu
+      category={Poracle.getMapCategory(category)}
+      categories={Poracle.getFilterCategories(category)}
+      webhookCategory={category}
+      filters={filters[category]}
+      tempFilters={tempFilters}
+      setTempFilters={setTempFilters}
+      title="webhook_selection"
+      titleAction={() => setAddNew(false)}
+      Tile={NewPokemon}
+      extraButtons={[
+        {
+          name: 'save',
+          action: () => setAddNew(false),
+          icon: 'Save',
+          color: 'secondary',
+        },
+      ]}
+    />
+  ) : (
     <>
       <Header
         names={[name]}
@@ -108,13 +148,9 @@ export default function Manage() {
           in={!addNew}
           sx={{
             height: '70vh',
-            // overflow: 'auto',
             p: 2,
-            // display: 'flex',
-            // flexDirection: 'column',
           }}
         >
-          {/* {category === 'human' ? <Human /> : <Tracked category={category} />} */}
           {categories.map((key) =>
             key === 'human' ? (
               <Box key={key} hidden={category !== 'human'}>
@@ -126,28 +162,7 @@ export default function Manage() {
           )}
         </Collapse>
         <Collapse in={addNew}>
-          {
-            category === 'human' ? <ProfileEditing /> : null
-            // <Menu
-            //   category={Poracle.getMapCategory(category)}
-            //   categories={Poracle.getFilterCategories(category)}
-            //   webhookCategory={category}
-            //   filters={poracleFilters[webhookCategory]}
-            //   tempFilters={tempFilters}
-            //   setTempFilters={setTempFilters}
-            //   title="webhook_selection"
-            //   titleAction={() => handleClose(false)}
-            //   Tile={NewPokemon}
-            //   extraButtons={[
-            //     {
-            //       name: 'save',
-            //       action: () => handleClose(true),
-            //       icon: 'Save',
-            //       color: 'secondary',
-            //     },
-            //   ]}
-            // />
-          }
+          {category === 'human' && <ProfileEditing />}
         </Collapse>
       </DialogContent>
 
