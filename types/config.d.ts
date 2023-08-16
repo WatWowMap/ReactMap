@@ -15,6 +15,40 @@ export interface Config extends BaseConfig {
     alwaysEnabledPerms: (keyof BaseConfig['authentication']['perms'])[]
     aliases: { role: string; name: string }[]
   } & BaseConfig['authentication']
+  api: {
+    pvp: {
+      leagues: {
+        name: string
+        cp: number
+        minRank?: number
+        maxRank?: number
+      }[]
+    } & BaseConfig['api']['pvp']
+  } & BaseConfig['api']
+  map: {
+    messageOfTheDay: {
+      settings: {
+        parentStyle: Record<string, string> // should be CSS properties but performance seems to die
+      } & BaseConfig['map']['messageOfTheDay']['settings']
+      titles: string[]
+      components: CustomComponent[]
+      footerButtons: CustomComponent[]
+    } & BaseConfig['map']['messageOfTheDay']
+    donationPage: {
+      settings: {
+        parentStyle: Record<string, string> // should be CSS properties but performance seems to die
+      } & BaseConfig['map']['donationPage']['settings']
+      titles: string[]
+      components: CustomComponent[]
+      footerButtons: CustomComponent[]
+    } & BaseConfig['map']['donationPage']
+    loginPage: {
+      settings: {
+        parentStyle: Record<string, string> // should be CSS properties but performance seems to die
+      } & BaseConfig['map']['loginPage']['settings']
+      components: CustomComponent[]
+    } & BaseConfig['map']['loginPage']
+  } & BaseConfig['map']
   multiDomains: (BaseConfig['map'] & { domain: string })[]
   database: {
     schemas: Schema[]
@@ -56,6 +90,14 @@ export interface Webhook {
   discordRoles: []
   telegramGroups: []
   local: []
+}
+
+export interface CustomComponent {
+  components?: CustomComponent[]
+  donorOnly?: boolean
+  freeloaderOnly?: boolean
+  loggedInOnly?: boolean
+  loggedOutOnly?: boolean
 }
 
 export type DeepKeys<T, P extends string = ''> = {

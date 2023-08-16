@@ -1,18 +1,12 @@
-const {
-  clientSideOptions,
-  map: {
-    enableMapJsFilter,
-    enablePokemonPopupCoordsSelector,
-    enableGymPopupCoordsSelector,
-    enablePokestopPopupCoordsSelector,
-    enablePortalPopupCoordsSelector,
-  },
-  api: {
-    pvp: { levels },
-  },
-} = require('../config')
+// @ts-check
+const config = require('config')
 
-module.exports = function clientOptions(perms) {
+const clientSideOptions = config.getSafe('clientSideOptions')
+const map = config.getSafe('map')
+const levels = config.getSafe('api.pvp.levels')
+
+/** @param {import('types').Permissions} perms */
+function clientOptions(perms) {
   // the values here are the relevant perms to use them, they are looped through and the values are set based on your config, then the type is set based off of those values in the above function
   const clientMenus = {
     admin: {
@@ -113,31 +107,31 @@ module.exports = function clientOptions(perms) {
   })
 
   // special case options that require additional checks
-  if (enableMapJsFilter) {
+  if (map.misc.enableMapJsFilter) {
     clientMenus.pokemon.legacyFilter = { type: 'bool', perm: ['iv', 'pvp'] }
   }
   if (clientSideOptions.pokemon.glow.length) {
     clientMenus.pokemon.glow = { type: 'bool', sub: {}, perm: ['pokemon'] }
   }
-  if (enableGymPopupCoordsSelector) {
+  if (map.misc.enableGymPopupCoordsSelector) {
     clientMenus.gyms.enableGymPopupCoords = {
       type: 'bool',
       perm: ['gyms'],
     }
   }
-  if (enablePokestopPopupCoordsSelector) {
+  if (map.misc.enablePokestopPopupCoordsSelector) {
     clientMenus.pokestops.enablePokestopPopupCoords = {
       type: 'bool',
       perm: ['pokestops'],
     }
   }
-  if (enablePokemonPopupCoordsSelector) {
+  if (map.misc.enablePokemonPopupCoordsSelector) {
     clientMenus.pokemon.enablePokemonPopupCoords = {
       type: 'bool',
       perm: ['pokemon'],
     }
   }
-  if (enablePortalPopupCoordsSelector) {
+  if (map.misc.enablePortalPopupCoordsSelector) {
     clientMenus.wayfarer.enablePortalPopupCoords = {
       type: 'bool',
       perm: ['portals'],
@@ -172,3 +166,5 @@ module.exports = function clientOptions(perms) {
 
   return { clientValues, clientMenus }
 }
+
+module.exports = clientOptions

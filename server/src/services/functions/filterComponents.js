@@ -1,17 +1,10 @@
 // @ts-check
 /**
  * Recursively filter out components based on donor or freeloader status
- * @typedef {{
- *  components?: Components[],
- *  donorOnly?: boolean,
- *  freeloaderOnly?: boolean,
- *  loggedInOnly?: boolean,
- *  loggedOutOnly?: boolean
- * }} Components
- * @param {Components[]} components
+ * @param {import("types").CustomComponent[]} components
  * @param {boolean} loggedIn
  * @param {boolean} donor
- * @returns {Components[]}
+ * @returns {import("types").CustomComponent[]}
  */
 function filterComponents(components, loggedIn, donor) {
   return (Array.isArray(components) ? components : []).filter((component) => {

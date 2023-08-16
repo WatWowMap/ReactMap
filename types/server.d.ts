@@ -51,6 +51,8 @@ export interface User {
   telegramId: string
   avatar: string
   selectedWebhook?: string
+  strategy: string
+  webhookStrategy: string
 }
 
 export interface AvailablePokemon {

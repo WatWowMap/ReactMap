@@ -1,4 +1,6 @@
-/** @param {InstanceType<typeof import('../../models/User')>} user */
+// @ts-check
+
+/** @param {import("types").User} user */
 function evalWebhookId(user) {
   if (!user) {
     return ''

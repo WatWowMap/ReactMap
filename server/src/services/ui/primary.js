@@ -1,14 +1,11 @@
-const {
-  api: {
-    pvp: { leagues },
-  },
-  defaultFilters: {
-    nests: { avgSliderStep, avgFilter },
-  },
-  map: { menuOrder },
-} = require('../config')
+// @ts-check
+const config = require('config')
 
-const refSliders = {
+const nestFilters = config.getSafe('defaultFilters.nests')
+const map = config.getSafe('map')
+const leagues = config.getSafe('api.pvp.leagues')
+
+const SLIDERS = {
   pokemon: {
     primary: [
       {
@@ -64,17 +61,17 @@ const refSliders = {
         name: 'avgFilter',
         i18nKey: 'spawns_per_hour',
         label: '',
-        min: avgFilter[0],
-        max: avgFilter[1],
+        min: nestFilters.avgFilter[0],
+        max: nestFilters.avgFilter[1],
         perm: 'nests',
-        step: avgSliderStep,
+        step: nestFilters.avgSliderStep,
       },
     ],
   },
 }
 
 leagues.forEach((league) =>
-  refSliders.pokemon.primary.push({
+  SLIDERS.pokemon.primary.push({
     name: league.name,
     label: 'rank',
     min: league.minRank || 1,
@@ -96,7 +93,7 @@ const ignoredKeys = [
   'confirmed',
 ]
 
-module.exports = function generateUi(filters, perms) {
+function generateUi(filters, perms) {
   const ui = {}
 
   // builds the initial categories
@@ -117,7 +114,7 @@ module.exports = function generateUi(filters, perms) {
           break
         default:
           ui[key] = {}
-          sliders = refSliders[key]
+          sliders = SLIDERS[key]
           break
       }
       // builds each subcategory
@@ -178,10 +175,12 @@ module.exports = function generateUi(filters, perms) {
 
   // sorts the menus
   const sortedUi = {}
-  menuOrder.forEach((category) => {
+  map.general.menuOrder.forEach((category) => {
     if (ui[category]) {
       sortedUi[category] = ui[category]
     }
   })
   return { ...sortedUi, ...ui }
 }
+
+module.exports = generateUi

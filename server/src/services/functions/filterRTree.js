@@ -1,7 +1,8 @@
+// @ts-check
 const { default: pointInPolygon } = require('@turf/boolean-point-in-polygon')
 const { point } = require('@turf/helpers')
 
-const config = require('../config')
+const config = require('config')
 const { consolidateAreas } = require('./consolidateAreas')
 
 /**
@@ -19,7 +20,9 @@ function filterRTree(item, areaRestrictions = [], onlyAreas = []) {
 
   if (!consolidatedAreas.size) return true
 
-  const foundFeatures = config.areas.myRTree
+  /** @type {import('types').RMGeoJSON['features']} */
+  const foundFeatures = config
+    .getSafe('areas.myRTree')
     .search({
       x: item.lon || 0,
       y: item.lat || 0,

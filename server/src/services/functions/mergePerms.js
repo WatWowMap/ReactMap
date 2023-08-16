@@ -1,4 +1,12 @@
-module.exports = function mergePerms(existingPerms, incomingPerms) {
+// @ts-check
+
+/**
+ *
+ * @param {string[]} existingPerms
+ * @param {string[]} incomingPerms
+ * @returns
+ */
+function mergePerms(existingPerms, incomingPerms) {
   return Object.fromEntries(
     Object.keys(existingPerms).map((key) => [
       key,
@@ -8,3 +16,5 @@ module.exports = function mergePerms(existingPerms, incomingPerms) {
     ]),
   )
 }
+
+module.exports = mergePerms

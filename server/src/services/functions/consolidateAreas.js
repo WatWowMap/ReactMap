@@ -1,4 +1,5 @@
-const config = require('../config')
+// @ts-check
+const config = require('config')
 
 /**
  * Consolidate area restrictions and user set areas, accounts for parents
@@ -7,17 +8,16 @@ const config = require('../config')
  * @returns {Set<string>}
  */
 function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
+  const areas = config.getSafe('areas')
   const validAreaRestrictions = areaRestrictions.filter((a) =>
-    config.areas.names.has(a),
+    areas.names.has(a),
   )
-  const validUserAreas = onlyAreas.filter((a) => config.areas.names.has(a))
+  const validUserAreas = onlyAreas.filter((a) => areas.names.has(a))
 
   const cleanedValidUserAreas = validUserAreas.filter((area) =>
     areaRestrictions.length
       ? areaRestrictions.includes(area) ||
-        areaRestrictions.includes(
-          config.areas.scanAreasObj[area].properties.parent,
-        )
+        areaRestrictions.includes(areas.scanAreasObj[area].properties.parent)
       : true,
   )
   return new Set(
