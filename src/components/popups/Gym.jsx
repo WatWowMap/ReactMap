@@ -39,7 +39,6 @@ export default function GymPopup({
   const { t } = useTranslation()
   const { perms } = useStatic((state) => state.auth)
   const popups = useStore((state) => state.popups)
-  const setPopups = useStore((state) => state.setPopups)
 
   useEffect(() => {
     Utility.analytics(
@@ -114,7 +113,6 @@ export default function GymPopup({
         <GymFooter
           gym={gym}
           popups={popups}
-          setPopups={setPopups}
           hasRaid={hasRaid}
           perms={perms}
           t={t}
@@ -131,19 +129,12 @@ export default function GymPopup({
 }
 
 const MenuActions = ({ gym, perms, hasRaid, badge, setBadge }) => {
-  const hideList = useStatic((state) => state.hideList)
-  const setHideList = useStatic((state) => state.setHideList)
-  const excludeList = useStatic((state) => state.excludeList)
-  const setExcludeList = useStatic((state) => state.setExcludeList)
-  const timerList = useStatic((state) => state.timerList)
-  const setTimerList = useStatic((state) => state.setTimerList)
   const { gymValidDataLimit } = useStatic((state) => state.config)
 
   const selectedWebhook = useStore((state) => state.selectedWebhook)
   const webhookData = useStatic((state) => state.webhookData)
 
   const filters = useStore((state) => state.filters)
-  const setFilters = useStore((state) => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [badgeMenu, setBadgeMenu] = useState(false)
@@ -178,7 +169,7 @@ const MenuActions = ({ gym, perms, hasRaid, badge, setBadge }) => {
 
   const handleHide = () => {
     setAnchorEl(null)
-    setHideList([...hideList, id])
+    useStatic.setState((prev) => ({ hideList: [...prev.hideList, id] }))
   }
 
   const handleCloseBadge = (open) => {
@@ -189,20 +180,22 @@ const MenuActions = ({ gym, perms, hasRaid, badge, setBadge }) => {
   const excludeTeam = () => {
     setAnchorEl(null)
     const key = `t${team_id}-0`
-    setFilters({
-      ...filters,
-      gyms: {
-        ...filters.gyms,
-        filter: {
-          ...filters.gyms.filter,
-          [key]: {
-            ...filters.gyms.filter[key],
-            enabled: false,
+    useStore.setState((prev) => ({
+      filters: {
+        ...prev.filters,
+        gyms: {
+          ...prev.filters.gyms,
+          filter: {
+            ...prev.filters.gyms.filter,
+            [key]: {
+              ...prev.filters.gyms.filter[key],
+              enabled: false,
+            },
           },
         },
       },
-    })
-    setExcludeList([...excludeList, key])
+    }))
+    useStatic.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
   }
 
   const excludeBoss = () => {
@@ -211,29 +204,32 @@ const MenuActions = ({ gym, perms, hasRaid, badge, setBadge }) => {
     if (raid_pokemon_id > 0) {
       key = `${raid_pokemon_id}-${raid_pokemon_form}`
     }
-    setFilters({
-      ...filters,
-      gyms: {
-        ...filters.gyms,
-        filter: {
-          ...filters.gyms.filter,
-          [key]: {
-            ...filters.gyms.filter[key],
-            enabled: false,
+    useStore.setState((prev) => ({
+      filters: {
+        ...prev.filters,
+        gyms: {
+          ...prev.filters.gyms,
+          filter: {
+            ...prev.filters.gyms.filter,
+            [key]: {
+              ...prev.filters.gyms.filter[key],
+              enabled: false,
+            },
           },
         },
       },
-    })
-    setExcludeList([...excludeList, key])
+    }))
+    useStatic.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
   }
 
   const handleTimer = () => {
     setAnchorEl(null)
-    if (timerList.includes(id)) {
-      setTimerList(timerList.filter((x) => x !== id))
-    } else {
-      setTimerList([...timerList, id])
-    }
+    useStatic.setState((prev) => {
+      if (prev.includes(id)) {
+        return { timerList: prev.timerList.filter((x) => x !== id) }
+      }
+      return { timerList: [...prev.timerList, id] }
+    })
   }
 
   const options = [{ name: 'hide', action: handleHide }]
@@ -609,14 +605,16 @@ const Timer = ({ gym, start, t, hasHatched }) => {
   ) : null
 }
 
-const GymFooter = ({ gym, popups, setPopups, hasRaid, perms, Icons }) => {
+const GymFooter = ({ gym, popups, hasRaid, perms, Icons }) => {
   const { lat, lon } = gym
   const darkMode = useStore((s) => s.darkMode)
   const handleExpandClick = (category) => {
-    setPopups({
-      ...popups,
-      [category]: !popups[category],
-    })
+    useStore.setState((prev) => ({
+      popups: {
+        ...prev.popups,
+        [category]: !popups[category],
+      },
+    }))
   }
 
   return (

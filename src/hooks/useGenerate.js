@@ -11,7 +11,6 @@ export default function useGenerate() {
   const gyms = useStatic((s) => s.filters.gyms)
   const pokestops = useStatic((s) => s.filters.pokestops)
   const staticMenus = useStatic((s) => s.menus)
-  const setMenuFilters = useStatic((s) => s.setMenuFilters)
 
   useEffect(() => {
     const pokeFilters = genPokemon(pokemon, staticMenus.pokemon.categories)
@@ -22,6 +21,8 @@ export default function useGenerate() {
       staticMenus.pokestops.categories,
     )
 
-    setMenuFilters({ ...gymFilters, ...stopFilters, ...pokeFilters })
+    useStatic.setState({
+      menuFilters: { ...gymFilters, ...stopFilters, ...pokeFilters },
+    })
   }, [pokemon, gyms, pokestops, staticMenus])
 }

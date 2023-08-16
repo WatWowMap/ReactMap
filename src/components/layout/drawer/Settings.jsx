@@ -52,8 +52,7 @@ const ICON_MAP = {
 
 export default function Settings() {
   const { t, i18n } = useTranslation()
-  const { config, setIcons: setStaticIcons } = useStatic.getState()
-  const { setIcons, setSettings } = useStore.getState()
+  const { config } = useStatic.getState()
 
   const Icons = useStatic((s) => s.Icons)
   const staticSettings = useStatic((s) => s.settings)
@@ -73,10 +72,12 @@ export default function Settings() {
             value={config[setting][settings[setting]]?.name || ''}
             label={t(Utility.camelToSnake(setting))}
             onChange={({ target }) => {
-              setSettings({
-                ...settings,
-                [target.name]: config[target.name][target.value].name,
-              })
+              useStore.setState((prev) => ({
+                settings: {
+                  ...prev.settings,
+                  [target.name]: config[target.name][target.value].name,
+                },
+              }))
               if (target.name === 'localeSelection') {
                 i18n.changeLanguage(target.value)
               }
@@ -104,8 +105,10 @@ export default function Settings() {
           label={t(`${category}_icons`, `${category} Icons`)}
           onChange={({ target }) => {
             Icons.setSelection(target.name, target.value)
-            setStaticIcons(Icons)
-            setIcons({ ...icons, [target.name]: target.value })
+            useStatic.setState({ Icons })
+            useStore.setState({
+              icons: { ...icons, [target.name]: target.value },
+            })
           }}
           icon={
             <img

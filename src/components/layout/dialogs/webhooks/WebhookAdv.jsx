@@ -80,7 +80,6 @@ export default function WebhookAdvanced({
   const { t } = useTranslation()
   const location = useStore((state) => state.location)
   const webhookAdv = useStore((s) => s.webhookAdv)
-  const setWebhookAdv = useStore((s) => s.setWebhookAdv)
   const {
     ui: { [category]: info },
     templates,
@@ -211,8 +210,10 @@ export default function WebhookAdvanced({
     setPoracleValues({ ...poracleValues, ...newObj })
   }
 
-  const handleChange = (panel) => (event, isExpanded) => {
-    setWebhookAdv({ ...webhookAdv, [panel]: isExpanded })
+  const handleChange = (panel) => (_, isExpanded) => {
+    useStore.setState((prev) => ({
+      webhookAdv: { ...prev.webhookAdv, [panel]: isExpanded },
+    }))
   }
 
   const footerOptions = [

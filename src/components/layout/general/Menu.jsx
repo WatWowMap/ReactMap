@@ -33,7 +33,6 @@ export default function Menu({
   const isMobile = useStatic((s) => s.isMobile)
   const isTablet = useStatic((s) => s.isTablet)
 
-  const { setMenus, setAdvMenu } = useStore.getState()
   const menus = useStore((state) => state.menus)
   const advMenu = useStore((state) => state.advMenu)
   const { t } = useTranslation()
@@ -205,10 +204,12 @@ export default function Menu({
         resetPayload[cat][filter] = false
       })
     })
-    setMenus({
-      ...menus,
-      [category]: { ...menus[category], filters: resetPayload },
-    })
+    useStore.setState((prev) => ({
+      menus: {
+        ...prev.menus,
+        [category]: { ...prev.menus[category], filters: resetPayload },
+      },
+    }))
   }
 
   const Options = (
@@ -218,11 +219,11 @@ export default function Menu({
       Utility={Utility}
       handleReset={handleReset}
       advMenu={advMenu}
-      setAdvMenu={setAdvMenu}
+      setAdvMenu={(value) => useStore.setState({ advMenu: value })}
       search={search}
       setSearch={setSearch}
       menus={menus}
-      setMenus={setMenus}
+      setMenus={(value) => useStore.setState({ menus: value })}
       toggleDrawer={toggleDrawer}
       isMobile={isMobile}
       categories={categories}

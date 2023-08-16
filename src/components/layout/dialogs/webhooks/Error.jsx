@@ -1,10 +1,11 @@
 import React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { Grid, Typography } from '@mui/material'
+import { useWebhookStore } from './store'
 
-export default function WebhookError({ selectedWebhook, children }) {
+export default function WebhookError({ children }) {
   const { t } = useTranslation()
-
+  const name = useWebhookStore((s) => s.context.name)
   return (
     <Grid
       container
@@ -25,7 +26,7 @@ export default function WebhookError({ selectedWebhook, children }) {
         >
           {children ?? (
             <Trans i18nKey="non_registered_human_desc">
-              {{ webhook: selectedWebhook }}
+              {{ webhook: name }}
             </Trans>
           )}
         </Typography>

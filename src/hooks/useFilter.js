@@ -24,7 +24,6 @@ export default function useFilter(
     Icons,
     auth: { perms },
     masterfile: { pokemon },
-    setExcludeList,
     menuFilters,
   } = useStatic.getState()
 
@@ -253,7 +252,7 @@ export default function useFilter(
     })
   })
 
-  useEffect(() => () => setExcludeList([]))
+  useEffect(() => () => useStatic.setState({ excludeList: [] }))
 
   return { filteredObj, filteredArr, count }
 }
