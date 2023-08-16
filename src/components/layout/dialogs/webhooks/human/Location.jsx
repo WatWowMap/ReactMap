@@ -18,6 +18,7 @@ import { useMapEvents } from 'react-leaflet'
 import { setHuman } from '@services/queries/webhook'
 import { WEBHOOK_NOMINATIM } from '@services/queries/geocoder'
 import useLocation from '@hooks/useLocation'
+import { Loading } from '@components/layout/general/Loading'
 
 import { setModeBtn, useWebhookStore } from '../store'
 import { useSyncData } from '../hooks'
@@ -27,7 +28,10 @@ const Location = () => {
   const { t } = useTranslation()
 
   const webhookLocation = useWebhookStore((s) => s.location)
-  const { latitude, longitude } = useSyncData('human')
+  const {
+    data: { latitude, longitude },
+    loading: loadingHuman,
+  } = useSyncData('human')
   const hasNominatim = useWebhookStore((s) => !!s.context.hasNominatim)
 
   const [execSearch, { data, previousData, loading }] = useLazyQuery(
@@ -83,7 +87,9 @@ const Location = () => {
 
   const fetchedData = data || previousData || { geocoder: [] }
 
-  return (
+  return loadingHuman ? (
+    <Loading>{t('loading', { category: t('location') })}</Loading>
+  ) : (
     <Grid
       container
       item

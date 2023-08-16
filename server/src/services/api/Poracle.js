@@ -83,6 +83,7 @@ class PoracleAPI {
   }
 
   /**
+   *
    * @param {'discord' | 'telegram'} platform
    * @returns
    */
@@ -101,6 +102,7 @@ class PoracleAPI {
   }
 
   /**
+   *
    * @param {string[] | string | null} blockedAlerts
    * @returns
    */
@@ -161,6 +163,7 @@ class PoracleAPI {
   }
 
   /**
+   *
    * @param {number} userId
    * @returns
    */
@@ -349,17 +352,18 @@ class PoracleAPI {
       method === 'POST' && action !== 'copy' ? data : undefined,
     )
     if (method === 'GET') {
-      return { profile: PoracleAPI.#processProfile(first.profile) }
+      return { profile: PoracleAPI.#processProfiles(first.profile) }
     }
     const second = await this.#sendRequest(APIS.profiles(userId))
-    return { profile: PoracleAPI.#processProfile(second.profile) }
+    return { profile: PoracleAPI.#processProfiles(second.profile) }
   }
 
   /**
+   *
    * @param {import('types').PoracleProfile<false>[]} profiles
    * @returns {import('types').PoracleProfile[]}
    */
-  static #processProfile(profiles) {
+  static #processProfiles(profiles) {
     return profiles.map((profile) => ({
       ...profile,
       area: profile.area ? JSON.parse(profile.area) : [],
@@ -428,6 +432,7 @@ class PoracleAPI {
   }
 
   /**
+   *
    * @template {APIInput} T
    * @param {number} userId
    * @param {T} category
@@ -526,6 +531,7 @@ class PoracleAPI {
   }
 
   /**
+   *
    * @param {APIInput} category
    * @returns {[Category, Action | undefined]}
    */

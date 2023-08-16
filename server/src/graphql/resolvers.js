@@ -540,16 +540,6 @@ const resolvers = {
       }
       return null
     },
-    // webhookProfiles: async (_, __, { req, perms, Event }) => {
-    //   if (perms?.webhooks && req.user?.selectedWebhook) {
-    //     const result = await Event.webhookObj[req.user.selectedWebhook].api(
-    //       PoracleAPI.getWebhookId(req.user),
-    //       'profiles',
-    //       'GET',
-    //     )
-    //     return result.profile
-    //   }
-    // },
     webhookUser: async (_, __, { req, perms }) => {
       if (req.user?.id && perms.webhooks) {
         return {

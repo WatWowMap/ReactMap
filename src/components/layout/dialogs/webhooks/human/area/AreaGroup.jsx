@@ -6,18 +6,26 @@ import Divider from '@mui/material/Divider'
 import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
 
+import { Loading } from '@components/layout/general/Loading'
+
 import { useGetAreas } from '../../hooks'
 import { MemoAreaChip, handleClick } from './AreaChip'
 
 export const AreaGroup = () => {
-  const groups = useGetAreas()
-  return groups.map(({ group, children }) => (
-    <GroupTile key={group} group={group}>
-      {children.map((child) => (
-        <MemoAreaChip key={`${group}_${child}`} name={child} />
-      ))}
-    </GroupTile>
-  ))
+  const { data, loading } = useGetAreas()
+  const { t } = useTranslation()
+
+  return loading ? (
+    <Loading>{t('loading', { category: t('areas') })}</Loading>
+  ) : (
+    data.map(({ group, children }) => (
+      <GroupTile key={group} group={group}>
+        {children.map((child) => (
+          <MemoAreaChip key={`${group}_${child}`} name={child} />
+        ))}
+      </GroupTile>
+    ))
+  )
 }
 
 /**

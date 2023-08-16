@@ -52,6 +52,7 @@ export interface PoracleGym {
   slot_changes: number
   gym_id: string
   description: string
+  description?: string
 }
 
 export interface PoracleRaid {
@@ -98,6 +99,7 @@ export interface PoracleInvasion {
   template: string
   distance: number
   description: string
+  real_grunt_id?: number
 }
 
 export interface PoraclePokemon {
@@ -177,6 +179,7 @@ export interface PoracleNest {
   min_spawn_avg: number
   pokemon_id: number
   form: number
+  description?: string
 }
 
 export interface PoracleWeather {

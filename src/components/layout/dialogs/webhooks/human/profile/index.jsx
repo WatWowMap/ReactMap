@@ -1,6 +1,9 @@
 // @ts-check
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
+import { useTranslation } from 'react-i18next'
+
+import { Loading } from '@components/layout/general/Loading'
 
 import { useGetWebhookData } from '../../hooks'
 import { NewProfile } from './NewProfile'
@@ -12,9 +15,12 @@ import { ProfileTile } from './ProfileTile'
  */
 
 export default function ProfileEditing() {
-  const { data } = useGetWebhookData('profile')
+  const { data, loading } = useGetWebhookData('profile')
+  const { t } = useTranslation()
 
-  return (
+  return loading ? (
+    <Loading>{t('loading', { category: t('profile') })}</Loading>
+  ) : (
     <Grid container alignItems="center" justifyContent="center" py={2} px={4}>
       <NewProfile />
       {data.map(({ uid }) => (

@@ -303,6 +303,13 @@ export default class Poracle {
     }
   }
 
+  /**
+   *
+   * @param {object} item
+   * @param {Exclude<import('@components/layout/dialogs/webhooks/store').WebhookStore['category'], 'human'>} category
+   * @param {import('i18next').TFunction} t
+   * @returns {string}
+   */
   static generateDescription(item, category, t) {
     const { leagues } = useWebhookStore.getState().context
     switch (category) {
@@ -396,7 +403,7 @@ export default class Poracle {
             : ''
         }`
       default:
-        return item.description
+        return item.description || ''
     }
   }
 }

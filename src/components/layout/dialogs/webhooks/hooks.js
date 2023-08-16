@@ -17,14 +17,14 @@ import { getContext, useWebhookStore } from './store'
 
 /**
  *
- * @returns {{ group: string, children: string[] }[]}
+ * @returns {{ data: { group: string, children: string[] }[], loading: boolean }}
  */
 export function useGetAreas() {
-  const { data } = useQuery(WEBHOOK_AREAS, {
+  const { data, loading } = useQuery(WEBHOOK_AREAS, {
     fetchPolicy: 'cache-first',
   })
 
-  return data?.webhookAreas || []
+  return { data: data?.webhookAreas || [], loading }
 }
 
 /** @returns {import('./store').WebhookStore['category'][]} */
@@ -140,7 +140,7 @@ export function useGetWebhookData(category) {
 export function useSyncData(category) {
   const cached = useWebhookStore((s) => s[category])
 
-  const { data } = useQuery(allProfiles, {
+  const { data, loading } = useQuery(allProfiles, {
     fetchPolicy: 'no-cache',
     variables: {
       category,
@@ -155,7 +155,7 @@ export function useSyncData(category) {
       })
     }
   }, [data])
-  return cached
+  return { data: cached, loading }
 }
 
 export function useGenFilters() {

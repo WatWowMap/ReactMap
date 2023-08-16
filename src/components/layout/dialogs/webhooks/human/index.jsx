@@ -8,6 +8,7 @@ import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 import { WEBHOOK_CHANGE } from '@services/queries/webhook'
+import { Loading } from '@components/layout/general/Loading'
 
 import Location from './Location'
 import Areas from './area'
@@ -56,6 +57,7 @@ function HookSelection() {
 
   const {
     data: { selected, webhooks },
+    loading,
   } = useGetWebhookData('human')
 
   const [save] = useMutation(WEBHOOK_CHANGE, {
@@ -69,7 +71,9 @@ function HookSelection() {
     fetchPolicy: 'no-cache',
   })
 
-  return (
+  return loading ? (
+    <Loading>{t('loading', { category: t('webhooks') })}</Loading>
+  ) : (
     <>
       <Grid xs={6} sm={2}>
         <Typography variant="h6">{t('select_webhook')}</Typography>

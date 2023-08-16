@@ -7,6 +7,8 @@ import Typography from '@mui/material/Typography'
 
 import Box from '@mui/material/Box'
 import AdvSearch from '@components/layout/dialogs/filters/AdvSearch'
+import { Loading } from '@components/layout/general/Loading'
+
 import TrackedTile from './tiles/TrackedTile'
 import Selecting from './Selecting'
 import { useWebhookStore, setTrackedSearch } from './store'
@@ -20,10 +22,12 @@ import { useGetWebhookData } from './hooks'
 const Tracked = ({ category, visible }) => {
   const { t } = useTranslation()
 
-  const { data: tracked } = useGetWebhookData(category)
+  const { data: tracked, loading } = useGetWebhookData(category)
   const trackedSearch = useWebhookStore((s) => s.trackedSearch)
 
-  return (
+  return loading ? (
+    <Loading>{t('loading', { category: t(category) })}</Loading>
+  ) : (
     <Box role="tabpanel" hidden={category !== visible}>
       <Box pb={1}>
         <AdvSearch
@@ -34,11 +38,11 @@ const Tracked = ({ category, visible }) => {
       </Box>
       {tracked.length ? (
         <Virtuoso
-          style={{ height: '55vh' }}
+          // style={{ height: '55vh' }}
           // @ts-ignore
           data={tracked}
           itemContent={(i) => <TrackedTile key={i} index={i} />}
-          // useWindowScroll
+          useWindowScroll
         />
       ) : (
         <div className="flex-center" style={{ flex: '1 1 auto' }}>
