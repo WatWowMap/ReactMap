@@ -9,7 +9,7 @@ const { log, HELPERS } = require('./logger')
 module.exports = class DbCheck {
   /**
    * @param {import("../models").ScannerModelKeys[]} validModels
-   * @param {{ schemas: import("types").Schema[], settings: { maxConnections: number } }} dbConfig
+   * @param {import('types').Config['database']} dbConfig
    * @param {boolean} queryDebug
    * @param {object} apiSettings
    * @param {'km' | 'mi'} distanceUnit

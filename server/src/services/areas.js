@@ -1,21 +1,21 @@
+// @ts-check
 const { default: center } = require('@turf/center')
 const fs = require('fs')
 const { resolve } = require('path')
-const fetch = require('node-fetch')
+const { default: fetch } = require('node-fetch')
 const RTree = require('rtree')
 
-const config = require('./config')
+const config = require('config')
 const { log, HELPERS } = require('./logger')
 
+/** @type {import('types').RMGeoJSON} */
 const DEFAULT_RETURN = { type: 'FeatureCollection', features: [] }
 
-/**
- * @typedef {Record<string, import('@turf/helpers').Feature<import('@turf/helpers').Polygon | import('@turf/helpers').MultiPolygon>>} ScanAreasObj
- */
-
+/** @type {import('types').RMGeoJSON} */
 const manualGeojson = {
   type: 'FeatureCollection',
-  features: config.manualAreas
+  features: config
+    .getSafe('manualAreas')
     .filter((area) =>
       ['lat', 'lon', 'name'].every((k) => k in area && !area.hidden),
     )
@@ -37,19 +37,18 @@ const manualGeojson = {
     }),
 }
 
+/** @param {string} location */
 const getGeojson = async (location) => {
   try {
     if (location.startsWith('http')) {
       log.info(HELPERS.areas, 'Loading Kōji URL', location)
-      return fetch(
-        location,
-        {
-          headers: {
-            Authorization: `Bearer ${config.api.kojiOptions.bearerToken}`,
-          },
+      return fetch(location, {
+        headers: {
+          Authorization: `Bearer ${config.getSafe(
+            'api.kojiOptions.bearerToken',
+          )}`,
         },
-        true,
-      )
+      })
         .then((res) => res.json())
         .then((res) => {
           if (res?.data) {
@@ -89,6 +88,7 @@ const getGeojson = async (location) => {
                     '__',
                   )}.json`,
                 ),
+                'utf-8',
               ),
             )
           }
@@ -98,7 +98,7 @@ const getGeojson = async (location) => {
     }
     if (fs.existsSync(resolve(__dirname, `../configs/${location}`))) {
       return JSON.parse(
-        fs.readFileSync(resolve(__dirname, `../configs/${location}`)),
+        fs.readFileSync(resolve(__dirname, `../configs/${location}`), 'utf-8'),
       )
     }
   } catch (e) {
@@ -144,18 +144,28 @@ const loadScanPolygons = async (fileName, domain) => {
   }
 }
 
+/**
+ *
+ * @param {Record<string, import('types').RMGeoJSON>} scanAreas
+ * @returns {import('types').RMGeoJSON}
+ */
 const loadAreas = (scanAreas) => {
   try {
+    /** @type {ReturnType<typeof loadAreas>} */
     const normalized = { type: 'FeatureCollection', features: [] }
     Object.values(scanAreas).forEach((area) => {
       if (area?.features.length) {
-        normalized.features.push(...area.features.filter((f) => !f.manual))
+        normalized.features.push(
+          ...area.features.filter((f) => !f.properties.manual),
+        )
       }
     })
     return normalized
   } catch (err) {
     if (
-      config.authentication.areaRestrictions.some((rule) => rule.roles.length)
+      config
+        .getSafe('authentication.areaRestrictions')
+        .some((rule) => rule.roles.length)
     ) {
       log.warn(
         HELPERS.areas,
@@ -166,15 +176,19 @@ const loadAreas = (scanAreas) => {
   }
 }
 
-const parseAreas = (areasObj) => {
+/** @param {import('types').RMGeoJSON} featureCollection */
+const parseAreas = (featureCollection) => {
+  /** @type {Record<string, import('types').RMGeoJSON['features'][number]['geometry']>} */
   const polygons = {}
+  /** @type {Set<string>} */
   const names = new Set()
+  /** @type {Record<string, string[]>} */
   const withoutParents = {}
 
-  if (!areasObj) {
-    return { names, polygons }
+  if (!featureCollection) {
+    return { names, polygons, withoutParents }
   }
-  areasObj.features.forEach((feature) => {
+  featureCollection.features.forEach((feature) => {
     const { name, key, manual } = feature.properties
     if (name && !manual && feature.geometry.type.includes('Polygon')) {
       const { coordinates } = feature.geometry
@@ -222,16 +236,19 @@ const parseAreas = (areasObj) => {
 
 // Check if an areas.json exists
 const getAreas = async () => {
+  const main = config.getSafe('map.general.geoJsonFileName')
+
+  /** @type {Record<string, import('types').RMGeoJSON>} */
   const scanAreas = {
-    main: await loadScanPolygons(config.map.geoJsonFileName),
+    main: await loadScanPolygons(main),
     ...Object.fromEntries(
       await Promise.all(
-        config.multiDomains.map(async (d) => [
-          d.general?.geoJsonFileName ? d.domain : 'main',
-          await loadScanPolygons(
-            d.general?.geoJsonFileName || config.map.geoJsonFileName,
-          ),
-        ]),
+        config
+          .getSafe('multiDomains')
+          .map(async (d) => [
+            d.general?.geoJsonFileName ? d.domain : 'main',
+            await loadScanPolygons(d.general?.geoJsonFileName || main),
+          ]),
       ),
     ),
   }

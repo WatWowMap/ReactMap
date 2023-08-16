@@ -1,9 +1,45 @@
 import config = require('../server/src/configs/default.json')
+import example = require('../server/src/configs/local.example.json')
+
+import { Schema } from './server'
 
 type BaseConfig = typeof config
+type ExampleConfig = typeof example
 
 export interface Config extends BaseConfig {
   webhooks: Webhook[]
+  areas: Awaited<ReturnType<typeof import('server/src/services/areas')>>
+  authentication: {
+    areaRestrictions: { roles: string[]; areas: string[] }[]
+    excludeFromTutorial: (keyof BaseConfig['authentication']['perms'])[]
+    alwaysEnabledPerms: (keyof BaseConfig['authentication']['perms'])[]
+    aliases: { role: string; name: string }[]
+  } & BaseConfig['authentication']
+  multiDomains: (BaseConfig['map'] & { domain: string })[]
+  database: {
+    schemas: Schema[]
+    settings: {
+      extraUserFields: string[]
+    } & BaseConfig['database']['settings']
+  } & BaseConfig['database']
+  scanner: {
+    scanNext: {
+      discordRoles: string[]
+      telegramGroups: string[]
+      local: string[]
+    } & BaseConfig['scanner']['scanNext']
+    scanZone: {
+      discordRoles: string[]
+      telegramGroups: string[]
+      local: string[]
+    } & BaseConfig['scanner']['scanZone']
+  } & BaseConfig['scanner']
+  icons: {
+    customizable: string[]
+    styles: ExampleConfig['icons']['styles'][number][]
+    defaultIcons: Record<string, string>
+  } & BaseConfig['icons']
+  manualAreas: ExampleConfig['manualAreas'][number][]
 }
 
 export interface Webhook {

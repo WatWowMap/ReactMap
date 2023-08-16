@@ -11,6 +11,11 @@ export type RMFeature = Feature<
     displayInMatches?: boolean
     color?: string
     group?: string
+    domain?: string
+    hidden?: boolean
+    parent?: string
+    manual?: boolean
+    key: string
   }
 >
 
