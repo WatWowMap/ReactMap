@@ -17,7 +17,7 @@ const freezeProps = (target, property) => {
 }
 
 // TODO: This is dumb, should be a state machine with Zustand
-export default class UIcons {
+class UIcons {
   constructor({ customizable, sizes, cacheHrs }, questRewardTypes) {
     this.customizable = customizable
     this.sizes = sizes
@@ -138,6 +138,7 @@ export default class UIcons {
         configurable: false,
       })
     }
+    return this
   }
 
   get selection() {
@@ -592,3 +593,5 @@ export default class UIcons {
     }
   }
 }
+
+export default UIcons

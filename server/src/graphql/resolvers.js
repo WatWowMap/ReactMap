@@ -17,18 +17,20 @@ const resolvers = {
   JSON: GraphQLJSON,
   Query: {
     available: (_, _args, { Event, Db, perms }) => {
-      const available = {
+      const data = {
         pokemon: perms.pokemon ? Event.available.pokemon : [],
         gyms: perms.gyms ? Event.available.gyms : [],
         nests: perms.nests ? Event.available.nests : [],
         pokestops: perms.pokestops ? Event.available.pokestops : [],
         questConditions: perms.quests ? Db.questConditions : {},
-      }
-      return {
-        ...available,
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
-        filters: buildDefaultFilters(perms, available, Db),
+        filters: buildDefaultFilters(perms, Db),
+        icons: {
+          ...config.getSafe('icons'),
+          styles: Event.uicons,
+        },
       }
+      return data
     },
     backup: (_, args, { req, perms, Db }) => {
       if (perms?.backups && req?.user?.id) {

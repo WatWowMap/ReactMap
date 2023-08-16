@@ -2,7 +2,7 @@ const BaseFilter = require('../Base')
 const { Event } = require('../../initialization')
 const { map } = require('../../config')
 
-module.exports = function buildPokestops(perms, defaults, available) {
+module.exports = function buildPokestops(perms, defaults) {
   const quests = { s0: new BaseFilter() }
   if (perms.quests) {
     Object.keys(Event.masterfile.items).forEach((item) => {
@@ -43,7 +43,7 @@ module.exports = function buildPokestops(perms, defaults, available) {
       }
     })
   }
-  available.pokestops.forEach((avail) => {
+  Event.getAvailable('pokestops').forEach((avail) => {
     if (perms.lures && avail.startsWith('l')) {
       quests[avail] = new BaseFilter(defaults.lures)
     }

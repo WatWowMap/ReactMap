@@ -1,4 +1,6 @@
-export default function genPokestops(t, pokemon, pokestops, categories) {
+import { t } from 'i18next'
+
+export default function genPokestops(pokemon, pokestops, categories) {
   const tempObj = Object.fromEntries(categories.map((x) => [x, {}]))
   if (!pokestops?.filter) return {}
 

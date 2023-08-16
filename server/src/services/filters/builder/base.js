@@ -18,16 +18,15 @@ const custom = new PokemonFilter(
 /**
  *
  * @param {import('types').Permissions} perms
- * @param {import('types').Available} available
  * @param {import('types').DbCheckClass} database
  * @returns
  */
-function buildDefaultFilters(perms, available, database) {
+function buildDefaultFilters(perms, database) {
   const stopReducer =
     perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
   const pokemonReducer = perms.iv || perms.pvp
-  const pokemon = buildPokemon(defaultFilters, base, custom, available)
+  const pokemon = buildPokemon(defaultFilters, base, custom)
 
   return {
     gyms:
@@ -46,7 +45,7 @@ function buildDefaultFilters(perms, available, database) {
             badge: perms.gymBadges ? 'all' : undefined,
             raidTier: perms.raids ? 'all' : undefined,
             filter: {
-              ...buildGyms(perms, defaultFilters.gyms, available),
+              ...buildGyms(perms, defaultFilters.gyms),
               ...pokemon.raids,
             },
           }
@@ -86,7 +85,7 @@ function buildDefaultFilters(perms, available, database) {
             arEligible: perms.pokestops ? false : undefined,
             filter: {
               ...pokemon.rocket,
-              ...buildPokestops(perms, defaultFilters.pokestops, available),
+              ...buildPokestops(perms, defaultFilters.pokestops),
               ...pokemon.quests,
             },
           }

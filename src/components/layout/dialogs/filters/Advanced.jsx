@@ -32,7 +32,7 @@ export default function AdvancedFilter({
   Utility.analytics(`/${type}/${advancedFilter.id}`)
 
   const ui = useStatic((state) => state.ui)
-  const { questConditions = {} } = useStatic((state) => state.available)
+  const { questConditions } = useStatic((state) => state.available)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore((state) => state.filters)
   const userSettings = useStore((state) => state.userSettings)

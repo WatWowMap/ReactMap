@@ -6,6 +6,7 @@ type Available {
   nests: [String]
   filters: JSON
   questConditions: JSON
+  icons: JSON
 }
 
 type Badge {

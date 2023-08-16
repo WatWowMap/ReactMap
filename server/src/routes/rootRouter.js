@@ -10,6 +10,7 @@ const { Event, Db } = require('../services/initialization')
 const { version } = require('../../../package.json')
 const { log, HELPERS } = require('../services/logger')
 const buildDefaultFilters = require('../services/filters/builder/base')
+const advMenus = require('../services/ui/advMenus')
 
 const rootRouter = express.Router()
 
@@ -164,7 +165,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       settings: {},
       authMethods: config.authMethods,
       userBackupLimits: config.database.settings.userBackupLimits,
-      masterfile: { ...Event.masterfile, invasions: Event.invasions },
+      // masterfile: { ...Event.masterfile, invasions: Event.invasions },
       config: {
         map: {
           ...config.map,
@@ -195,12 +196,12 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           react: {},
           leaflet: {},
         },
-        icons: { ...config.icons, styles: Event.uicons },
+        // icons: { ...config.icons, styles: Event.uicons },
         gymValidDataLimit:
           Date.now() / 1000 - config.api.gymValidDataLimit * 86400,
       },
       extraUserFields: config.database.settings.extraUserFields,
-      available: { pokemon: [], pokestops: [], gyms: [], nests: [] },
+      // available: { pokemon: [], pokestops: [], gyms: [], nests: [] },
     }
 
     // add user options here from the config that are structured as objects
@@ -242,46 +243,39 @@ rootRouter.get('/api/settings', async (req, res, next) => {
         }
       })
 
-      if (serverSettings.user.perms.pokemon) {
-        if (config.api.queryOnSessionInit.pokemon) {
-          Event.setAvailable('pokemon', 'Pokemon', Db, false)
-        }
-        serverSettings.available.pokemon = Event.getAvailable('pokemon')
-      }
-      if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
-        if (config.api.queryOnSessionInit.raids) {
-          Event.setAvailable('gyms', 'Gym', Db, false)
-        }
-        serverSettings.available.gyms = Event.getAvailable('gyms')
+      if (
+        serverSettings.user.perms.pokemon &&
+        config.api.queryOnSessionInit.pokemon
+      ) {
+        Event.setAvailable('pokemon', 'Pokemon', Db, false)
       }
       if (
-        serverSettings.user.perms.quests ||
-        serverSettings.user.perms.pokestops ||
-        serverSettings.user.perms.invasions ||
-        serverSettings.user.perms.lures
+        config.api.queryOnSessionInit.raids &&
+        (serverSettings.user.perms.raids || serverSettings.user.perms.gyms)
       ) {
-        if (config.api.queryOnSessionInit.quests) {
-          Event.setAvailable('pokestops', 'Pokestop', Db, false)
-        }
-        serverSettings.available.pokestops = Event.getAvailable('pokestops')
+        Event.setAvailable('gyms', 'Gym', Db, false)
       }
-      if (serverSettings.user.perms.nests) {
-        if (config.api.queryOnSessionInit.nests) {
-          Event.setAvailable('nests', 'Nest', Db, false)
-        }
-        serverSettings.available.nests = Event.getAvailable('nests')
+      if (
+        config.api.queryOnSessionInit.quests &&
+        (serverSettings.user.perms.quests ||
+          serverSettings.user.perms.pokestops ||
+          serverSettings.user.perms.invasions ||
+          serverSettings.user.perms.lures)
+      ) {
+        Event.setAvailable('pokestops', 'Pokestop', Db, false)
+      }
+      if (
+        serverSettings.user.perms.nests &&
+        config.api.queryOnSessionInit.nests
+      ) {
+        Event.setAvailable('nests', 'Nest', Db, false)
       }
       if (Object.values(config.api.queryOnSessionInit).some((v) => v)) {
         Event.addAvailable()
-        serverSettings.masterfile = {
-          ...Event.masterfile,
-          invasions: Event.invasions,
-        }
       }
 
       serverSettings.defaultFilters = buildDefaultFilters(
         serverSettings.user.perms,
-        serverSettings.available,
         Db,
       )
 
@@ -293,7 +287,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
         serverSettings.user.perms,
       )
 
-      serverSettings.menus = Utility.buildAdvMenus(serverSettings.available)
+      serverSettings.menus = advMenus()
 
       const { clientValues, clientMenus } = Utility.buildClientOptions(
         serverSettings.user.perms,

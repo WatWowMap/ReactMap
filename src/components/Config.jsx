@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 
 import makeTheme from '@assets/mui/theme'
 import { useStore } from '@hooks/useStore'
-import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
 import { setLoadingText } from '@services/functions/setLoadingText'
 
@@ -29,27 +28,9 @@ export default function Config({ setTheme }) {
   }
   const getServerSettings = React.useCallback(async () => {
     const data = await Fetch.getSettings()
-    if (data?.config && data?.masterfile) {
-      if (data.masterfile?.questRewardTypes) {
-        localStorage.setItem(
-          'questRewardTypes',
-          JSON.stringify(data.masterfile.questRewardTypes),
-        )
-      }
-      const Icons = new UIcons(
-        data.config.icons,
-        data.masterfile
-          ? data.masterfile.questRewardTypes
-          : JSON.parse(localStorage.getItem('questRewardTypes') || '{}'),
-      )
-      if (Icons) {
-        Icons.build(data.config.icons.styles)
-        if (data.config.icons.defaultIcons) {
-          Icons.setSelection(data.config.icons.defaultIcons)
-        }
-      }
-      setServerSettings({ ...data, Icons })
-      document.title = data.config?.map?.headerTitle
+    if (data?.config) {
+      document.title = data.config?.map?.headerTitle || 'Map'
+      setServerSettings(data)
     }
   }, [])
 

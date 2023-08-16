@@ -12,8 +12,8 @@ import DraggableMarker from './layout/dialogs/webhooks/human/Draggable'
 import WebhookAreaSelection from './layout/dialogs/webhooks/human/area/AreaSelection'
 
 export default function Container({ serverSettings, params, location, zoom }) {
-  useGenerate()
   useRefresh()
+  useGenerate()
   const isMobile = useMediaQuery((t) => t.breakpoints.only('xs'))
   const isTablet = useMediaQuery((t) => t.breakpoints.only('sm'))
 

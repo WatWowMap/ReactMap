@@ -3,7 +3,7 @@ const { Event } = require('../../initialization')
 const BaseFilter = require('../Base')
 const { map } = require('../../config')
 
-module.exports = function buildPokemon(defaults, base, custom, available) {
+module.exports = function buildPokemon(defaults, base, custom) {
   const pokemon = {
     full: { global: custom },
     raids: { global: new BaseFilter() },
@@ -13,7 +13,7 @@ module.exports = function buildPokemon(defaults, base, custom, available) {
   }
   const energyAmounts = new Set([
     ...defaults.pokestops.baseMegaEnergyAmounts,
-    ...available.pokestops
+    ...Event.getAvailable('pokestops')
       .filter((e) => e.startsWith('m'))
       .map((e) => e.split('-')[1]),
   ])

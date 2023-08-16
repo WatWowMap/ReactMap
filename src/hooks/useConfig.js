@@ -5,7 +5,6 @@ import { setUser } from '@sentry/react'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
-import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
 
 export default function useConfig(serverSettings, params) {
   const [state, setState] = useState({ set: false, zoom: 10, location: [0, 0] })
@@ -74,13 +73,6 @@ export default function useConfig(serverSettings, params) {
         serverSettings.settings.localeSelection
     }
 
-    const newIcons = updateObjState(serverSettings.Icons.selected, 'icons')
-    const isValidIcon = serverSettings.Icons.checkValid(newIcons)
-
-    if (localState?.state?.icons && isValidIcon) {
-      serverSettings.Icons.setSelection(newIcons)
-    }
-
     const zoom =
       params.zoom ||
       updatePositionState(serverSettings.config.map.startZoom, 'zoom')
@@ -114,20 +106,13 @@ export default function useConfig(serverSettings, params) {
         userBackupLimits: serverSettings.userBackupLimits || 0,
       },
       ui: serverSettings.ui,
-      masterfile: serverSettings.masterfile,
-      available: serverSettings.available,
       menus: serverSettings.menus,
       filters: serverSettings.defaultFilters,
       extraUserFields: serverSettings.extraUserFields,
       userSettings: serverSettings.clientMenus,
       settings: serverSettings.settings,
       timeOfDay: Utility.timeCheck(...location),
-      Icons: serverSettings.Icons,
       config: serverSettings.config,
-    })
-
-    useWebhookStore.setState({
-      data: serverSettings.webhooks,
     })
 
     useStore.setState({
@@ -140,14 +125,6 @@ export default function useConfig(serverSettings, params) {
       filters: updateObjState(serverSettings.defaultFilters, 'filters'),
       userSettings: updateObjState(serverSettings.userSettings, 'userSettings'),
       settings: updateObjState(serverSettings.settings, 'settings'),
-      icons: serverSettings.Icons.selection,
-      selectedWebhook:
-        localState?.state &&
-        serverSettings?.webhooks?.[localState.state?.selectedWebhook]
-          ? localState.state.selectedWebhook
-          : serverSettings?.webhooks
-          ? Object.keys(serverSettings.webhooks)[0]
-          : null,
       zoom,
       location,
     })

@@ -1,6 +1,7 @@
+const { Event } = require('../../initialization')
 const BaseFilter = require('../Base')
 
-module.exports = function buildGyms(perms, defaults, available) {
+module.exports = function buildGyms(perms, defaults) {
   const gymFilters = {}
 
   if (perms.gyms) {
@@ -19,7 +20,7 @@ module.exports = function buildGyms(perms, defaults, available) {
       gymFilters[`r${tier}`] = new BaseFilter(defaults.raids)
     })
   }
-  available.gyms.forEach((avail) => {
+  Event.getAvailable('gyms').forEach((avail) => {
     if (perms.gyms && (avail.startsWith('t') || avail.startsWith('g'))) {
       gymFilters[avail] = new BaseFilter(defaults.allGyms)
     }

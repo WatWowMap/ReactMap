@@ -31,7 +31,7 @@ const baseRarity = [
   'never',
 ]
 
-module.exports = function buildMenus() {
+function buildMenus() {
   const menuFilters = {}
   const returnedItems = {}
 
@@ -78,3 +78,5 @@ module.exports = function buildMenus() {
   })
   return returnedItems
 }
+
+module.exports = buildMenus
