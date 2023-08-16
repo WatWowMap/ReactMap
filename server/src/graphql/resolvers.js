@@ -4,13 +4,13 @@ const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 const config = require('config')
 
 const Utility = require('../services/Utility')
-const Fetch = require('../services/Fetch')
 const buildDefaultFilters = require('../services/filters/builder/base')
 const filterComponents = require('../services/functions/filterComponents')
 const { filterRTree } = require('../services/functions/filterRTree')
 const validateSelectedWebhook = require('../services/functions/validateSelectedWebhook')
 const PoracleAPI = require('../services/api/Poracle')
 const { geocoder } = require('../services/geocoder')
+const scannerApi = require('../services/api/scannerApi')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import('types').GqlContext>['resolvers']} */
 const resolvers = {
@@ -562,10 +562,10 @@ const resolvers = {
     scanner: (_, args, { req, perms }) => {
       const { category, method, data } = args
       if (category === 'getQueue') {
-        return Fetch.scannerApi(category, method, data, req?.user)
+        return scannerApi(category, method, data, req?.user)
       }
       if (perms?.scanner?.includes(category)) {
-        return Fetch.scannerApi(category, method, data, req?.user)
+        return scannerApi(category, method, data, req?.user)
       }
       return {}
     },
