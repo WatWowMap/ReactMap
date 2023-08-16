@@ -23,6 +23,7 @@ export interface Config extends BaseConfig {
         minRank?: number
         maxRank?: number
       }[]
+      leagueObj: Record<string, number>
     } & BaseConfig['api']['pvp']
   } & BaseConfig['api']
   map: {

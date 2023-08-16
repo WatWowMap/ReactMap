@@ -1,30 +1,15 @@
-const fs = require('fs')
-const { resolve } = require('path')
-const {
-  database: { schemas: exampleSchemas },
-} = require('../configs/local.example.json')
-const config = require('./config')
-
-const staticMf = JSON.parse(
-  fs.readFileSync(resolve(__dirname, '../data/masterfile.json')),
-)
+// @ts-check
+const config = require('config')
 
 const DbCheck = require('./DbCheck')
 const EventManager = require('./EventManager')
 const PvpWrapper = require('./PvpWrapper')
 
-const Db = new DbCheck(
-  exampleSchemas.flatMap((s) => s.useFor),
-  config.database,
-  config.devOptions.queryDebug,
-  config.api,
-  config.map.distanceUnit,
-  config.rarity.percents,
-)
-const Pvp = config.api.pvp.reactMapHandlesPvp
-  ? new PvpWrapper(config.api.pvp)
+const Db = new DbCheck()
+const Pvp = config.getSafe('api.pvp.reactMapHandlesPvp')
+  ? new PvpWrapper()
   : null
-const Event = new EventManager(staticMf)
+const Event = new EventManager()
 
 Event.setTimers(config, Db, Pvp)
 

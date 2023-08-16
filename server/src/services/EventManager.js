@@ -1,4 +1,4 @@
-const { promises: fs } = require('fs')
+const { promises: fs, readFileSync } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
@@ -7,9 +7,11 @@ const { log, HELPERS } = require('./logger')
 const PoracleAPI = require('./api/Poracle')
 
 class EventManager {
-  constructor(masterfile) {
-    this.masterfile = masterfile
-    this.invasions = masterfile.invasions
+  constructor() {
+    this.masterfile = JSON.parse(
+      readFileSync(path.resolve(__dirname, '../data/masterfile.json'), 'utf-8'),
+    )
+    this.invasions = this.masterfile.invasions
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
     this.uicons = []
     this.uiconsBackup = {}

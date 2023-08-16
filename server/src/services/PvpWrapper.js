@@ -1,13 +1,14 @@
 const Ohbem = require('ohbem')
 const NodeCache = require('node-cache')
+const config = require('config')
 const { log, HELPERS } = require('./logger')
 
 module.exports = class PvpWrapper extends Ohbem {
-  constructor(config) {
+  constructor() {
     super({
-      leagues: config.leagueObj,
+      leagues: config.getSafe('api.pvp.leagueObj'),
       pokemonData: {},
-      levelCaps: config.levels,
+      levelCaps: config.getSafe('api.pvp.levels'),
       cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
     })
     this.rmCache = new NodeCache({ stdTTL: 60 * 60 * 1.5 })

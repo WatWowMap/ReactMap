@@ -290,10 +290,10 @@ const mergeMapConfig = (obj) => {
       ...obj.loginPage,
       ...checkExtraJsons('loginPage', obj.domain),
     },
-    general: undefined,
-    customRoutes: undefined,
-    links: undefined,
-    misc: undefined,
+    // general: undefined,
+    // customRoutes: undefined,
+    // links: undefined,
+    // misc: undefined,
   }
 }
 
