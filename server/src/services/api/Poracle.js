@@ -169,10 +169,15 @@ class PoracleAPI {
    */
   async getClientGeojson(userId) {
     const allowedAreas = await this.getUserAreas(userId)
-    const areaSet = new Set(allowedAreas.flatMap((x) => x.children))
+    const areaSet = new Set(
+      allowedAreas.flatMap((x) =>
+        x.children.map((child) => child.toLowerCase()),
+      ),
+    )
     const features = this.geojson.features.filter((feature) =>
       areaSet.has(feature.properties.name.toLowerCase()),
     )
+
     return {
       type: 'FeatureCollection',
       features,

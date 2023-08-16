@@ -7,7 +7,14 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-import { WEBHOOK_CHANGE } from '@services/queries/webhook'
+import {
+  WEBHOOK_AREAS,
+  WEBHOOK_CATEGORIES,
+  WEBHOOK_CHANGE,
+  WEBHOOK_CONTEXT,
+  WEBHOOK_USER,
+  allProfiles,
+} from '@services/queries/webhook'
 import { Loading } from '@components/layout/general/Loading'
 
 import Location from './Location'
@@ -62,11 +69,11 @@ function HookSelection() {
 
   const [save] = useMutation(WEBHOOK_CHANGE, {
     refetchQueries: [
-      'Webhook',
-      'WebhookUser',
-      'WebhookCategories',
-      'WebhookAreas',
-      'WebhookContext',
+      WEBHOOK_CONTEXT,
+      WEBHOOK_USER,
+      WEBHOOK_CATEGORIES,
+      WEBHOOK_AREAS,
+      allProfiles,
     ],
     fetchPolicy: 'no-cache',
   })

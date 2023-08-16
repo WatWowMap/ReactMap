@@ -33,12 +33,10 @@ export function useGetHookContext() {
 
   const { data: context } = useQuery(WEBHOOK_CONTEXT, {
     fetchPolicy: 'no-cache',
-    nextFetchPolicy: 'standby',
     skip: !mode,
   })
   const { data: categories } = useQuery(WEBHOOK_CATEGORIES, {
     fetchPolicy: 'no-cache',
-    nextFetchPolicy: 'standby',
     skip: !mode,
   })
 
