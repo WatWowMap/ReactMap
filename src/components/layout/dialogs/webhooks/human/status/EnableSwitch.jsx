@@ -2,7 +2,7 @@ import * as React from 'react'
 import Switch from '@mui/material/Switch'
 import { useMutation } from '@apollo/client'
 import { setHuman } from '@services/queries/webhook'
-import { useWebhookStore } from '../store'
+import { useWebhookStore } from '../../store'
 
 export function EnableSwitch() {
   const human = useWebhookStore((s) => s.human)

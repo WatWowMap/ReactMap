@@ -120,6 +120,14 @@ export function useGetWebhookData(category) {
   }, [data, search])
 
   useEffect(() => {
+    if (category === 'human') {
+      useWebhookStore.setState({
+        multipleHooks: userConfig?.webhookUser?.webhooks?.length > 1,
+      })
+    }
+  }, [userConfig])
+
+  useEffect(() => {
     refetch()
   }, [category, profileNo])
 

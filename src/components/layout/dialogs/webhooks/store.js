@@ -12,7 +12,7 @@ import { create } from 'zustand'
  *   severity: import('@mui/material/Alert').AlertProps['severity']
  *   message: string | import('react').ReactNode
  *  }
- *  send: boolean
+ *  multipleHooks: boolean
  *  human: Partial<import('types').PoracleHuman>
  *  profile: import('types').PoracleProfile[]
  *  pokemon: import('types').PoraclePokemon[]
@@ -58,7 +58,7 @@ export const useWebhookStore = create(() => ({
     severity: 'info',
     message: '',
   },
-  send: false,
+  multipleHooks: false,
   groupedAreas: {},
   trackedSearch: '',
   selected: {},
@@ -81,9 +81,6 @@ export const setSelectedAreas = (selectedAreas) =>
         ? JSON.parse(selectedAreas)
         : selectedAreas,
   })
-
-/** @param {WebhookStore['send']} send */
-export const setSend = (send) => useWebhookStore.setState({ send })
 
 export const resetAlert = () =>
   useWebhookStore.setState({

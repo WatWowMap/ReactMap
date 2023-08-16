@@ -250,11 +250,15 @@ class EventManager {
 
   async getWebhooks(config) {
     await Promise.all(
-      config.webhooks.map(async (webhook) => {
-        Object.assign(this.webhookObj, {
-          [webhook.name]: await new PoracleAPI(webhook).init(),
-        })
-      }),
+      config.webhooks
+        .filter((x) => x.enabled)
+        .map(async (webhook) => {
+          const api = new PoracleAPI(webhook)
+          await api.init()
+          Object.assign(this.webhookObj, {
+            [webhook.name]: api,
+          })
+        }),
     )
   }
 }

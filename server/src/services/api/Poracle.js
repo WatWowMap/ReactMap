@@ -79,7 +79,7 @@ class PoracleAPI {
     this.pvpCaps = []
     this.leagues = []
 
-    this.ui = {}
+    this.ui = this.generateUi()
   }
 
   /**
@@ -106,11 +106,12 @@ class PoracleAPI {
    * @param {string[] | string | null} blockedAlerts
    * @returns
    */
-  getAllowedCategories(blockedAlerts) {
-    return Object.keys(this.ui).filter(
+  getAllowedCategories(blockedAlerts = []) {
+    const categories = Object.keys(this.ui).filter(
       (key) =>
         !(this.disabledHooks.includes(key) || blockedAlerts?.includes(key)),
     )
+    return categories
   }
 
   /**
@@ -185,19 +186,18 @@ class PoracleAPI {
   }
 
   async init() {
-    if (!this.enabled) return this
     try {
       await Promise.all([
         this.#fetchConfig(),
         this.#fetchGeojson(),
         this.#fetchTemplates(),
       ])
+      this.ui = this.generateUi()
       this.lastFetched = Date.now()
       log.info(HELPERS.webhooks, `${this.name} webhook initialized`)
     } catch (e) {
       log.error(HELPERS.webhooks, `Error initializing ${this.name} webhook`, e)
     }
-    return this
   }
 
   async #fetchConfig() {
@@ -242,7 +242,6 @@ class PoracleAPI {
       })
       this.pvp = 'ohbem'
     }
-    this.ui = this.buildPoracleUi()
   }
 
   async #fetchGeojson() {
@@ -548,7 +547,7 @@ class PoracleAPI {
     return [main, action]
   }
 
-  buildPoracleUi() {
+  generateUi() {
     const isOhbem = this.pvp === 'ohbem'
     const poracleUiObj = /** @type {const} */ ({
       human: true,
@@ -1209,7 +1208,7 @@ class PoracleAPI {
         })
       }
     })
-    this.disabledHooks.forEach((hook) => delete poracleUiObj[hook])
+    // this.disabledHooks.forEach((hook) => delete poracleUiObj[hook])
     return poracleUiObj
   }
 }

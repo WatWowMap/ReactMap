@@ -7,7 +7,7 @@ import { useMutation, useQuery } from '@apollo/client'
 
 import { allProfiles, setHuman } from '@services/queries/webhook'
 
-import { useWebhookStore } from '../store'
+import { useWebhookStore } from '../../store'
 
 /** @type {React.CSSProperties} */
 const STYLE = { minWidth: 100 }

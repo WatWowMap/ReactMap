@@ -108,7 +108,7 @@ const resolvers = {
       }
       return []
     },
-    fabButtons: (_, _args, { perms, user, req, Event }) => {
+    fabButtons: async (_, _args, { perms, user, req, Db, Event }) => {
       const domain = `multiDomainsObj[${req.headers.host}]`
 
       /** @type {import('types').Config['map']['donationPage']} */
@@ -118,6 +118,12 @@ const resolvers = {
 
       /** @type {import('types').Config['scanner']} */
       const scanner = config.get('scanner')
+
+      const selectedWebhook = await validateSelectedWebhook(req.user, Db, Event)
+      if (selectedWebhook) {
+        req.user.selectedWebhook = selectedWebhook
+        req.session.save()
+      }
 
       return {
         custom: config.has(domain)
@@ -140,9 +146,7 @@ const resolvers = {
         search: Object.entries(config.api.searchable).some(
           ([k, v]) => v && perms[k],
         ),
-        webhooks:
-          !!perms.webhooks.length &&
-          perms.webhooks.every((name) => name in Event.webhookObj),
+        webhooks: !!selectedWebhook,
       }
     },
     geocoder: (_, { search }, { perms, Event, req }) => {
@@ -520,16 +524,12 @@ const resolvers = {
       }
       return []
     },
-    webhookContext: async (_, __, { req, perms, Db, Event }) => {
-      if (perms?.webhooks.length && req.user) {
-        const selectedWebhook = await validateSelectedWebhook(
-          req.user,
-          Db,
-          Event,
-        )
-        req.user.selectedWebhook = selectedWebhook
-        req.session.save()
-        return Event.webhookObj[selectedWebhook].getClientContext(
+    webhookContext: async (_, __, { req, perms, Event }) => {
+      if (
+        req.user?.selectedWebhook &&
+        perms?.webhooks.includes(req.user?.selectedWebhook)
+      ) {
+        return Event.webhookObj[req.user.selectedWebhook].getClientContext(
           req.user.strategy || req.user.webhookStrategy,
         )
       }
@@ -544,8 +544,14 @@ const resolvers = {
     },
     webhookUser: async (_, __, { req, perms }) => {
       if (req.user?.id && perms.webhooks) {
+        const enabledHooks = config
+          .getSafe('webhooks')
+          .filter((hook) => hook.enabled)
+          .map((x) => x.name)
         return {
-          webhooks: perms.webhooks || [],
+          webhooks: (perms.webhooks || []).filter((x) =>
+            enabledHooks.includes(x),
+          ),
           selected: req.user?.selectedWebhook,
         }
       }

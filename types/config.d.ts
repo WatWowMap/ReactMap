@@ -15,6 +15,7 @@ export interface Webhook {
   poracleSecret: string
   addressFormat?: string
   nominatimUrl?: string
+  trialPeriodEligible?: boolean
   areasToSkip: string[]
   discordRoles: []
   telegramGroups: []
