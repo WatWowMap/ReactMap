@@ -127,8 +127,10 @@ rootRouter.get('/api/settings', async (req, res, next) => {
                 (n) => n in Event.webhookObj,
               )
               await Db.query('User', 'updateWebhook', user.id, newWebhook)
-              req.session.user.selectedWebhook = newWebhook
-              req.session.save()
+              if (req.session?.user) {
+                req.session.user.selectedWebhook = newWebhook
+                req.session.save()
+              }
             }
             delete user.password
 
