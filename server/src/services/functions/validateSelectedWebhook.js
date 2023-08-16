@@ -6,7 +6,8 @@
  * @param {import("types").GqlContext['Event']} Event
  */
 async function validateSelectedWebhook(user, Db, Event) {
-  if (user.perms.webhooks.length === 0) return null
+  if (user?.perms?.webhooks === undefined || user.perms.webhooks.length === 0)
+    return null
   if (
     user.selectedWebhook &&
     user.perms.webhooks.includes(user.selectedWebhook) &&

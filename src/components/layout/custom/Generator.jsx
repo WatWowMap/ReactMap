@@ -21,7 +21,7 @@ export default function Generator({ block = {}, defaultReturn = null }) {
     case 'img':
       return (
         <LinkWrapper {...props}>
-          <CustomImg {...props}>{children}</CustomImg>
+          <CustomImg {...props} />
         </LinkWrapper>
       )
     case 'button':
