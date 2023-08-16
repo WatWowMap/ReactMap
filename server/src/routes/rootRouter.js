@@ -206,7 +206,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
 
     // add user options here from the config that are structured as objects
     if (serverSettings.user.valid) {
-      serverSettings.loggedIn = req.user
+      serverSettings.loggedIn = !!req.user
 
       // keys that are being sent to the frontend but are not options
       const ignoreKeys = [
