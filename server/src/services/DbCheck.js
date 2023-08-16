@@ -1,29 +1,22 @@
 const { knex } = require('knex')
 const { raw } = require('objection')
 const extend = require('extend')
+const config = require('config')
+
 const { log, HELPERS } = require('./logger')
+const {
+  database: { schemas: exampleSchemas },
+} = require('../configs/local.example.json')
 
 /**
  * @type {import("types").DbCheckClass}
  */
 module.exports = class DbCheck {
-  /**
-   * @param {import("../models").ScannerModelKeys[]} validModels
-   * @param {import('types').Config['database']} dbConfig
-   * @param {boolean} queryDebug
-   * @param {object} apiSettings
-   * @param {'km' | 'mi'} distanceUnit
-   * @param {import("types").RarityPercents} rarityPercents
-   */
-  constructor(
-    validModels,
-    dbConfig,
-    queryDebug,
-    apiSettings,
-    distanceUnit,
-    rarityPercents,
-  ) {
-    this.validModels = validModels
+  constructor() {
+    this.validModels =
+      /** @type {import("../models").ScannerModelKeys[]} */ exampleSchemas.flatMap(
+        (s) => s.useFor,
+      )
     this.singleModels = /** @type {const} */ ([
       'Backup',
       'Badge',
@@ -31,8 +24,8 @@ module.exports = class DbCheck {
       'Session',
       'User',
     ])
-    this.searchLimit = apiSettings.searchLimit
-    this.rarityPercents = rarityPercents
+    this.searchLimit = config.getSafe('api.searchResultsLimit')
+    this.rarityPercents = config.getSafe('rarity.percents')
     this.models = {}
     this.questConditions = {}
     this.endpoints = {}
@@ -42,7 +35,8 @@ module.exports = class DbCheck {
       Route: { maxDistance: 0, maxDuration: 0 },
     }
     this.reactMapDb = null
-    this.connections = dbConfig.schemas
+    this.connections = config
+      .getSafe('database.schemas')
       .filter((s) => s.useFor.length)
       .map((schema, i) => {
         schema.useFor.forEach((category) => {
@@ -75,10 +69,10 @@ module.exports = class DbCheck {
             password: schema.password,
             database: schema.database,
           },
-          debug: queryDebug,
+          debug: config.getSafe('devOptions.queryDebug'),
           pool: {
             min: 0,
-            max: dbConfig.settings.maxConnections,
+            max: config.getSafe('database.settings.maxConnections'),
             afterCreate: (conn, done) =>
               conn.query('SET time_zone="+00:00";', (err) => done(err, conn)),
           },
@@ -86,7 +80,10 @@ module.exports = class DbCheck {
             warn: (message) => log.warn(HELPERS.knex, message),
             error: (message) => log.error(HELPERS.knex, message),
             debug: (message) =>
-              log[queryDebug ? 'info' : 'debug'](HELPERS.knex, message),
+              log[config.getSafe('devOptions.queryDebug') ? 'info' : 'debug'](
+                HELPERS.knex,
+                message,
+              ),
             enableColors: true,
           },
         })
@@ -98,7 +95,7 @@ module.exports = class DbCheck {
       )
       process.exit(0)
     }
-    this.distanceUnit = distanceUnit
+    this.distanceUnit = config.getSafe('map.misc.distanceUnit')
   }
 
   /**
