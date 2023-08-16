@@ -38,11 +38,11 @@ const Tracked = ({ category, visible }) => {
       </Box>
       {tracked.length ? (
         <Virtuoso
-          // style={{ height: '55vh' }}
+          style={{ height: '60cqh' }}
           // @ts-ignore
           data={tracked}
           itemContent={(i) => <TrackedTile key={i} index={i} />}
-          useWindowScroll
+          // useWindowScroll
         />
       ) : (
         <div className="flex-center" style={{ flex: '1 1 auto' }}>

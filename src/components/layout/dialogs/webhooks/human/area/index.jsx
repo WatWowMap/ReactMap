@@ -14,14 +14,17 @@ const Areas = () => {
 
   return (
     <Grid container xs={12} justifyContent="center" alignItems="center">
-      <Grid xs={6} sm={3}>
-        <Typography variant="h6">{t('areas')}</Typography>
+      <Grid xs={6} sm={3} pb={{ xs: 2, sm: 0 }}>
+        <Typography variant="h6" pl={1}>
+          {t('areas')}
+        </Typography>
       </Grid>
       <Grid
         xs={6}
         sm={3}
         textAlign="center"
         display={{ xs: 'block', sm: 'none' }}
+        pb={{ xs: 2, sm: 0 }}
       >
         <Button
           size="small"

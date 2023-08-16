@@ -99,7 +99,9 @@ const Location = () => {
       spacing={2}
     >
       <Grid item xs={6} sm={3}>
-        <Typography variant="h6">{t('location')}</Typography>
+        <Typography variant="h6" pl={1}>
+          {t('location')}
+        </Typography>
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
         <Typography variant="body2">

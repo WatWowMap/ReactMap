@@ -2,11 +2,10 @@
 import * as React from 'react'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
-import { useTranslation } from 'react-i18next'
+import CircularProgress from '@mui/material/CircularProgress'
 import { useMutation, useQuery } from '@apollo/client'
-import { allProfiles, setHuman } from '@services/queries/webhook'
 
-import { Loading } from '@components/layout/general/Loading'
+import { allProfiles, setHuman } from '@services/queries/webhook'
 
 import { useWebhookStore } from '../store'
 
@@ -19,7 +18,6 @@ const STYLE = { minWidth: 100 }
  */
 export function ProfileSelect() {
   const currentProfile = useWebhookStore((s) => s.human.current_profile_no || 0)
-  const { t } = useTranslation()
 
   /** @type {import('@apollo/client').ApolloQueryResult<{ webhook: { profile: import('types').PoracleProfile[] } }>} */
   const { data: profiles, loading } = useQuery(allProfiles, {
@@ -54,11 +52,7 @@ export function ProfileSelect() {
       value={currentProfile || ''}
       onChange={onChange}
       style={STYLE}
-      endAdornment={
-        loading ? (
-          <Loading>{t('loading', { category: t('profile') })}</Loading>
-        ) : null
-      }
+      endAdornment={loading ? <CircularProgress /> : null}
     >
       {(profiles?.webhook?.profile || []).map((profile) => (
         <MenuItem key={profile.profile_no} value={profile.profile_no}>
