@@ -39,7 +39,7 @@ export default function Container({ serverSettings, params, location, zoom }) {
       preferCanvas
     >
       {serverSettings.user && serverSettings.user.perms.map && (
-        <Map serverSettings={serverSettings} params={params} />
+        <Map params={params} />
       )}
       <ScanOnDemand mode="scanNext" />
       <ScanOnDemand mode="scanZone" />

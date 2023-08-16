@@ -27,17 +27,13 @@ const userSettingsCategory = (category) => {
   }
 }
 
-export default function Map({
-  serverSettings: {
-    config: { map: config },
-    Icons,
-  },
-  params,
-}) {
+export default function Map({ params }) {
   Utility.analytics(window.location.pathname)
 
   const map = useMap()
   useCooldown()
+  const config = useStatic((state) => state.config.map)
+
   map.attributionControl.setPrefix(config.attributionPrefix || '')
 
   const tileLayer = useTileLayer()
@@ -48,7 +44,7 @@ export default function Map({
   const active = useStatic((state) => state.active)
   const timeOfDay = useStatic((state) => state.timeOfDay)
   const isMobile = useStatic((state) => state.isMobile)
-
+  const Icons = useStatic((state) => state.Icons)
   const filters = useStore((state) => state.filters)
   const settings = useStore((state) => state.settings)
   const icons = useStore((state) => state.icons)
