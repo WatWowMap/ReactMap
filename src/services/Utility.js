@@ -7,7 +7,6 @@ import getProperName from './functions/getProperName'
 import checkAdvFilter from './functions/checkAdvFilter'
 import dayCheck from './functions/dayCheck'
 import parseQuestConditions from './functions/parseConditions'
-import formatter from './functions/formatter'
 import getRewardInfo from './functions/getRewardInfo'
 
 export default class Utility {
@@ -33,10 +32,6 @@ export default class Utility {
 
   static parseConditions(conditions) {
     return parseQuestConditions(conditions)
-  }
-
-  static formatter(addressFormat, data) {
-    return formatter(addressFormat, data)
   }
 
   static camelToSnake(str) {
