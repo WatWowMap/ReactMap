@@ -1,9 +1,18 @@
+// @ts-check
 /* eslint-disable no-restricted-syntax */
+const config = require('config')
+
 const { Event } = require('../../initialization')
 const BaseFilter = require('../Base')
-const { map } = require('../../config')
 
-module.exports = function buildPokemon(defaults, base, custom) {
+/**
+ *
+ * @param {import('types').Config['defaultFilters']} defaults
+ * @param {import('../pokemon/Frontend')} base
+ * @param {*} custom
+ * @returns
+ */
+function buildPokemon(defaults, base, custom) {
   const pokemon = {
     full: { global: custom },
     raids: { global: new BaseFilter() },
@@ -23,7 +32,7 @@ module.exports = function buildPokemon(defaults, base, custom) {
       pokemon.full[`${i}-${j}`] = base
       pokemon.raids[`${i}-${j}`] = new BaseFilter(defaults.gyms.pokemon)
       pokemon.quests[`${i}-${j}`] = new BaseFilter(defaults.pokestops.pokemon)
-      if (map.enableConfirmedInvasions) {
+      if (config.getSafe('map.misc.enableConfirmedInvasions')) {
         pokemon.rocket[`a${i}-${j}`] = new BaseFilter(
           defaults.pokestops.invasionPokemon,
         )
@@ -48,3 +57,5 @@ module.exports = function buildPokemon(defaults, base, custom) {
   }
   return pokemon
 }
+
+module.exports = buildPokemon

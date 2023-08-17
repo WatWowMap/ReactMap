@@ -1,8 +1,16 @@
+// @ts-check
+const config = require('config')
+
 const BaseFilter = require('../Base')
 const { Event } = require('../../initialization')
-const { map } = require('../../config')
 
-module.exports = function buildPokestops(perms, defaults) {
+/**
+ *
+ * @param {import('types').Permissions} perms
+ * @param {import('types').Config['defaultFilters']['pokestops']} defaults
+ * @returns
+ */
+function buildPokestops(perms, defaults) {
   const quests = { s0: new BaseFilter() }
   if (perms.quests) {
     Object.keys(Event.masterfile.items).forEach((item) => {
@@ -62,7 +70,10 @@ module.exports = function buildPokestops(perms, defaults) {
       if (avail.startsWith('i')) {
         quests[avail] = new BaseFilter(defaults.allInvasions)
       }
-      if (avail.startsWith('a') && map.enableConfirmedInvasions) {
+      if (
+        avail.startsWith('a') &&
+        config.getSafe('map.misc.enableConfirmedInvasions')
+      ) {
         quests[avail] = new BaseFilter(defaults.invasionPokemon)
       }
     }
@@ -72,3 +83,5 @@ module.exports = function buildPokestops(perms, defaults) {
   })
   return quests
 }
+
+module.exports = buildPokestops

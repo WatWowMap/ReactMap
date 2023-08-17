@@ -1,18 +1,28 @@
-const {
-  defaultFilters,
-  map: { enableMapJsFilter },
-} = require('../../config')
+// @ts-check
+const config = require('config')
+
 const buildPokemon = require('./pokemon')
 const buildPokestops = require('./pokestop')
 const buildGyms = require('./gym')
 const BaseFilter = require('../Base')
 const PokemonFilter = require('../pokemon/Frontend')
 
+const defaultFilters = config.getSafe('defaultFilters')
+
 const base = new PokemonFilter(defaultFilters.pokemon.allPokemon)
 const custom = new PokemonFilter(
   defaultFilters.pokemon.allPokemon,
   'md',
-  ...Object.values(defaultFilters.pokemon.globalValues),
+  defaultFilters.pokemon.globalValues.iv,
+  defaultFilters.pokemon.globalValues.level,
+  defaultFilters.pokemon.globalValues.atk_iv,
+  defaultFilters.pokemon.globalValues.def_iv,
+  defaultFilters.pokemon.globalValues.sta_iv,
+  defaultFilters.pokemon.globalValues.pvp,
+  defaultFilters.pokemon.globalValues.gender,
+  defaultFilters.pokemon.globalValues.cp,
+  defaultFilters.pokemon.globalValues.xxs,
+  defaultFilters.pokemon.globalValues.xxl,
 )
 
 /**
@@ -95,7 +105,7 @@ function buildDefaultFilters(perms, database) {
         ? {
             enabled: defaultFilters.pokemon.enabled,
             legacy:
-              pokemonReducer && enableMapJsFilter
+              pokemonReducer && config.getSafe('map.misc.enableMapJsFilter')
                 ? defaultFilters.pokemon.legacyFilter
                 : undefined,
             iv: perms.iv ? true : undefined,

@@ -1,7 +1,14 @@
+// @ts-check
 const { Event } = require('../../initialization')
 const BaseFilter = require('../Base')
 
-module.exports = function buildGyms(perms, defaults) {
+/**
+ *
+ * @param {import('types').Permissions} perms
+ * @param {import('types').Config['defaultFilters']['gyms']} defaults
+ * @returns
+ */
+function buildGyms(perms, defaults) {
   const gymFilters = {}
 
   if (perms.gyms) {
@@ -35,3 +42,5 @@ module.exports = function buildGyms(perms, defaults) {
   })
   return gymFilters
 }
+
+module.exports = buildGyms
