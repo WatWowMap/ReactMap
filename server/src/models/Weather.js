@@ -8,7 +8,7 @@ const config = require('config')
 
 const getPolyVector = require('../services/functions/getPolyVector')
 
-module.exports = class Weather extends Model {
+class Weather extends Model {
   static get tableName() {
     return 'weather'
   }
@@ -88,3 +88,5 @@ module.exports = class Weather extends Model {
       .filter(Boolean)
   }
 }
+
+module.exports = Weather

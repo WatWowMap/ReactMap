@@ -56,7 +56,7 @@ const MAD_GRUNT_MAP = {
   352: 8,
 }
 
-module.exports = class Pokestop extends Model {
+class Pokestop extends Model {
   static get tableName() {
     return 'pokestop'
   }
@@ -1753,3 +1753,5 @@ module.exports = class Pokestop extends Model {
     return query
   }
 }
+
+module.exports = Pokestop

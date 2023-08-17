@@ -48,7 +48,7 @@ const raidFields = [
   'raid_pokemon_alignment',
 ]
 
-module.exports = class Gym extends Model {
+class Gym extends Model {
   static get tableName() {
     return 'gym'
   }
@@ -597,3 +597,5 @@ module.exports = class Gym extends Model {
     return query
   }
 }
+
+module.exports = Gym

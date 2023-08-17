@@ -3,16 +3,23 @@ const getAreaSql = require('../services/functions/getAreaSql')
 const fetchJson = require('../services/api/fetchJson')
 const { filterRTree } = require('../services/functions/filterRTree')
 
-module.exports = class Device extends Model {
+class Device extends Model {
   static get tableName() {
     return 'device'
   }
 
-  static async getAll(perms, args, settings) {
+  /**
+   *
+   * @param {import('types').Permissions} perms
+   * @param {object} args
+   * @param {import('types').DbContext} context
+   * @returns {Promise<import('types').FullDevice[]>}
+   */
+  static async getAll(perms, args, context) {
     const { areaRestrictions } = perms
     const { onlyAreas } = args.filters
     const query = this.query()
-    if (settings.isMad) {
+    if (context.isMad) {
       query
         .join('trs_status', 'settings_device.device_id', 'trs_status.device_id')
         .join('settings_area', 'trs_status.area_id', 'settings_area.area_id')
@@ -23,7 +30,7 @@ module.exports = class Device extends Model {
           raw('UNIX_TIMESTAMP(lastProtoDateTime)').as('updated'),
           raw('X(currentPos)').as('lat'),
           raw('Y(currentPos)').as('lon'),
-          raw(true).as('isMad'),
+          raw('true').as('isMad'),
         ])
     } else {
       query
@@ -40,15 +47,15 @@ module.exports = class Device extends Model {
         )
     }
     if (
-      !getAreaSql(query, areaRestrictions, onlyAreas, settings.isMad, 'device')
+      !getAreaSql(query, areaRestrictions, onlyAreas, context.isMad, 'device')
     ) {
       return []
     }
-    const results = settings.mem
-      ? await fetchJson(`${settings.mem}/api/devices/all`, {
+    const results = context.mem
+      ? await fetchJson(`${context.mem}/api/devices/all`, {
           method: 'GET',
           headers: {
-            'X-Golbat-Secret': settings.secret || undefined,
+            'X-Golbat-Secret': context.secret || undefined,
           },
         }).then((res) =>
           Object.entries(res.devices)
@@ -63,8 +70,9 @@ module.exports = class Device extends Model {
               filterRTree(device, areaRestrictions, onlyAreas),
             ),
         )
-      : await query.from(settings.isMad ? 'settings_device' : 'device')
-
+      : await query.from(context.isMad ? 'settings_device' : 'device')
     return results.filter((device) => device.id && device.lat && device.lon)
   }
 }
+
+module.exports = Device

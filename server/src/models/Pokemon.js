@@ -31,7 +31,7 @@ const {
 const PkmnFilter = require('../services/filters/pokemon/Backend')
 const { log, HELPERS } = require('../services/logger')
 
-module.exports = class Pokemon extends Model {
+class Pokemon extends Model {
   static get tableName() {
     return 'pokemon'
   }
@@ -645,3 +645,5 @@ module.exports = class Pokemon extends Model {
       }))
   }
 }
+
+module.exports = Pokemon
