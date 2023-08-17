@@ -1,4 +1,15 @@
 import { LEAGUES } from 'server/src/services/filters/pokemon/constants'
+import { FullModel } from './utility'
+import DeviceModel = require('../server/src/models/Device')
+import GymModel = require('../server/src/models/Gym')
+import NestModel = require('../server/src/models/Nest')
+import PokestopModel = require('../server/src/models/Pokestop')
+import PokemonModel = require('../server/src/models/Pokemon')
+import PortalModel = require('../server/src/models/Portal')
+import ScanCellModel = require('../server/src/models/ScanCell')
+import SpawnpointModel = require('../server/src/models/Spawnpoint')
+import WeatherModel = require('../server/src/models/Weather')
+import RouteModel = require('../server/src/models/Route')
 
 export interface Device {
   id: string
@@ -11,6 +22,8 @@ export interface Device {
   route: any // JSON
   radius: number
 }
+
+export type FullDevice = FullModel<Device, DeviceModel>
 
 export interface Gym {
   id: string
@@ -49,6 +62,8 @@ export interface Gym {
   power_up_end_timestamp: number
 }
 
+export type FullGym = FullModel<Gym, GymModel>
+
 export interface Nest {
   id: number
   lat: number
@@ -65,6 +80,8 @@ export interface Nest {
   polygon?: string | object
   submitted_by: string
 }
+
+export type FullNest = FullModel<Nest, NestModel>
 
 export interface Quest {
   quest_type: number
@@ -152,6 +169,8 @@ export interface Pokestop {
   power_up_end_timestamp: number
 }
 
+export type FullPokestop = FullModel<Pokestop, PokestopModel>
+
 export interface PvpEntry {
   pokemon: number
   form: number
@@ -208,6 +227,8 @@ export interface Pokemon {
   distance?: number
 }
 
+export type FullPokemon = FullModel<Pokemon, PokemonModel>
+
 export interface Portal {
   id: string
   external_id: string
@@ -219,6 +240,8 @@ export interface Portal {
   updated: number
 }
 
+export type FullPortal = FullModel<Portal, PortalModel>
+
 export interface ScanCell {
   id: string
   level: number
@@ -228,6 +251,8 @@ export interface ScanCell {
   polygon: number[][]
 }
 
+export type FullScanCell = FullModel<ScanCell, ScanCellModel>
+
 export interface Spawnpoint {
   id: string
   lat: number
@@ -235,6 +260,8 @@ export interface Spawnpoint {
   updated: number
   despawn_sec: number
 }
+
+export type FullSpawnpoint = FullModel<Spawnpoint, SpawnpointModel>
 
 export interface Weather {
   id: string
@@ -254,6 +281,8 @@ export interface Weather {
   updated: number
   polygon: number[][]
 }
+
+export type FullWeather = FullModel<Weather, WeatherModel>
 
 export interface ScannerApi {
   status: string
@@ -289,3 +318,5 @@ export interface Route {
   version: number
   waypoints: Waypoint[]
 }
+
+export type FullRoute = FullModel<Route, RouteModel>

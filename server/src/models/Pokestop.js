@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const { Event } = require('../services/initialization')

@@ -4,6 +4,7 @@ import BackupModel = require('../server/src/models/Backup')
 import SessionModel = require('../server/src/models/Session')
 import NestSubmissionModel = require('../server/src/models/NestSubmission')
 import GymBadgeModel = require('../server/src/models/GymBadge')
+import { FullModel } from './utility'
 
 export interface Backup {
   id: number
@@ -13,7 +14,7 @@ export interface Backup {
   createdAt: number
   updatedAt: number
 }
-export type FullBackup = Partial<Backup> & BackupModel
+export type FullBackup = FullModel<Backup, BackupModel>
 
 export interface User {
   id: number
@@ -29,7 +30,7 @@ export interface User {
   selectedWebhook?: string
 }
 
-export type FullUser = Partial<User> & UserModel
+export type FullUser = FullModel<User, UserModel>
 
 export interface Session {
   session_id: string
@@ -37,7 +38,7 @@ export interface Session {
   data: string | object
 }
 
-export type FullSession = Partial<Session> & SessionModel
+export type FullSession = FullModel<Session, SessionModel>
 
 export interface NestSubmission {
   nest_id: number
@@ -46,7 +47,7 @@ export interface NestSubmission {
   submitted_by: string
 }
 
-export type FullNestSubmission = Partial<NestSubmission> & NestSubmissionModel
+export type FullNestSubmission = FullModel<NestSubmission, NestSubmissionModel>
 
 export interface GymBadge {
   id: number
@@ -57,4 +58,4 @@ export interface GymBadge {
   updatedAt: number
 }
 
-export type FullGymBadge = Partial<GymBadge> & GymBadgeModel
+export type FullGymBadge = FullModel<GymBadge, GymBadgeModel>

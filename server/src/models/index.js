@@ -1,3 +1,4 @@
+// @ts-check
 const { Db } = require('../services/initialization')
 const Backup = require('./Backup')
 const Badge = require('./Badge')

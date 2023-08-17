@@ -38,3 +38,5 @@ export type Head<T extends any[]> = T extends [...infer Head, any]
 export type ModelReturn<T extends Model, U extends keyof T> = Awaited<
   ReturnType<T[U]>
 >
+
+export type FullModel<T, U extends Model> = Partial<T> & U
