@@ -3,7 +3,7 @@ import { responsiveFontSizes } from '@mui/material'
 import { createTheme } from '@mui/material/styles'
 import * as locales from '@mui/material/locale'
 
-const LOCALE_MAP = /** @type {const} */ ({
+export const LOCALE_MAP = /** @type {const} */ ({
   en: 'enUS',
   de: 'deDE',
   es: 'esES',

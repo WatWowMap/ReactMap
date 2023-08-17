@@ -58,10 +58,7 @@ export default function Config({ setTheme }) {
 
   return (
     <>
-      <ReactRouter
-        serverSettings={serverSettings}
-        getServerSettings={getServerSettings}
-      />
+      <ReactRouter serverSettings={serverSettings} />
       {(serverSettings?.config?.map?.holidayEffects || []).map((holiday) => (
         <HolidayEffect key={holiday.name} {...holiday} />
       ))}

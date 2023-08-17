@@ -9,7 +9,7 @@ import { persist } from 'zustand/middleware'
  *   popups: Record<string, boolean>,
  *   zoom: number,
  *   selectedWebhook: string,
- *   settings: { localeSelection: string, navigationControls: 'react' | 'leaflet' }
+ *   settings: { localeSelection: keyof typeof import('@assets/mui/theme').LOCALE_MAP, navigationControls: 'react' | 'leaflet' }
  *   motdIndex: number
  *   tutorial: boolean,
  *   searchTab: string,

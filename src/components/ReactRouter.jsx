@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
@@ -7,14 +8,9 @@ import Blocked from './layout/auth/Blocked'
 import Errors from './Errors'
 import ClearStorage from './ClearStorage'
 
-export default function ReactRouter({ serverSettings, getServerSettings }) {
+export default function ReactRouter({ serverSettings }) {
   const authRoute = React.useMemo(
-    () => (
-      <Auth
-        serverSettings={serverSettings}
-        getServerSettings={getServerSettings}
-      />
-    ),
+    () => <Auth serverSettings={serverSettings} />,
     [serverSettings],
   )
 
@@ -22,16 +18,7 @@ export default function ReactRouter({ serverSettings, getServerSettings }) {
     <Routes>
       <Route path="/" element={authRoute} />
       <Route path="reset" element={<ClearStorage />} />
-      <Route
-        path="login"
-        element={
-          <Login
-            clickedTwice
-            serverSettings={serverSettings}
-            getServerSettings={getServerSettings}
-          />
-        }
-      />
+      <Route path="login" element={<Login serverSettings={serverSettings} />} />
       <Route
         path="blocked/:info"
         element={<Blocked serverSettings={serverSettings} />}

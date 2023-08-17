@@ -1,4 +1,5 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import { useQuery } from '@apollo/client'
 
 import Query from '@services/Query'
