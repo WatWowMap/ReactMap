@@ -8,7 +8,6 @@ const config = require('config')
 const { generate } = require('../../scripts/generateMasterfile')
 const { log, HELPERS } = require('./logger')
 const PoracleAPI = require('./api/Poracle')
-// const DiscordClient = require('./DiscordClient')
 
 class EventManager {
   constructor() {
