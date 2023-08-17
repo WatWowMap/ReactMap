@@ -1,9 +1,12 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
+// @ts-check
 const router = require('express').Router()
-const { api } = require('../../../services/config')
+const config = require('config')
 const { Db } = require('../../../services/initialization')
 const { log, HELPERS } = require('../../../services/logger')
+
+const api = config.getSafe('api')
 
 router.get('/', async (req, res) => {
   try {
@@ -28,27 +31,33 @@ router.get('/export', async (req, res) => {
       api.reactMapSecret &&
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
+      /** @type {import('types/models').FullUser[]} */
       const users = await Db.models.User.query()
+
       const badges = {}
-      await Db.models.Badge.query().then((badgeRes) =>
-        // eslint-disable-next-line no-unused-vars
-        badgeRes.forEach(({ userId, id, ...rest }) => {
-          if (!badges[userId]) {
-            badges[userId] = []
-          }
-          badges[userId].push(rest)
-        }),
-      )
+
+      /** @type {import('types/models').FullGymBadge[]} */
+      const rawBadges = await Db.models.Badge.query()
+      // eslint-disable-next-line no-unused-vars
+      rawBadges.forEach(({ userId, id, ...rest }) => {
+        if (!badges[userId]) {
+          badges[userId] = []
+        }
+        badges[userId].push(rest)
+      })
+
       const backups = {}
-      await Db.models.Backup.query().then((backupRes) =>
-        // eslint-disable-next-line no-unused-vars
-        backupRes.forEach(({ userId, id, ...rest }) => {
-          if (!backups[userId]) {
-            backups[userId] = []
-          }
-          backups[userId].push(rest)
-        }),
-      )
+      /** @type {import('types/models').FullBackup[]} */
+      const rawBackups = await Db.models.Backup.query()
+
+      // eslint-disable-next-line no-unused-vars
+      rawBackups.forEach(({ userId, id, ...rest }) => {
+        if (!backups[userId]) {
+          backups[userId] = []
+        }
+        backups[userId].push(rest)
+      })
+
       const data = users.map(({ id, ...rest }) => ({
         ...rest,
         badges: badges[id] || [],
@@ -74,6 +83,10 @@ router.post('/import', async (req, res) => {
       const { body } = req
       const bodyArray = Array.isArray(body) ? body : [body]
 
+      /**
+       * @param {import('types/models').User} user
+       * @returns {Promise<import('types/models').FullUser>}
+       */
       const getUser = async (user) => {
         if (user.username) {
           const found = await Db.models.User.query().select().findOne({

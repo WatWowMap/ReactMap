@@ -1,16 +1,21 @@
+// @ts-check
 const path = require('path')
 const router = require('express').Router()
-const { api } = require('../../../services/config')
+const config = require('config')
+
 const { Db, Event } = require('../../../services/initialization')
 const { log, HELPERS } = require('../../../services/logger')
 
-const queryObj = {
+const queryObj = /** @type {const} */ ({
   pokemon: { model: 'Pokemon', category: 'pokemon' },
   quests: { model: 'Pokestop', category: 'pokestops' },
   raids: { model: 'Gym', category: 'gyms' },
   nests: { model: 'Nest', category: 'nests' },
-}
+})
 
+const api = config.getSafe('api')
+
+/** @param {string} category */
 const resolveCategory = (category) => {
   switch (category) {
     case 'gym':
@@ -31,6 +36,7 @@ const resolveCategory = (category) => {
   }
 }
 
+/** @param {boolean} compare */
 const getAll = async (compare) => {
   const available = compare
     ? await Promise.all([
@@ -79,7 +85,7 @@ router.get(['/', '/:category'], async (req, res) => {
           res.status(200).json(available)
         }
       } else {
-        const available = await getAll(current)
+        const available = await getAll(!!current)
         Object.values(available).forEach((c) =>
           c.sort((a, b) => a.localeCompare(b)),
         )
@@ -131,7 +137,7 @@ router.put('/:category', async (req, res) => {
       }
       res
         .status(200)
-        .json({ status: `updated availabled for ${category || 'all'}` })
+        .json({ status: `updated available for ${category || 'all'}` })
     } else {
       throw new Error('Incorrect or missing API secret')
     }

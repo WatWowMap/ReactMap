@@ -34,7 +34,7 @@ class User extends Model {
 
   /**
    *
-   * @param {number} userId
+   * @param {string | number} userId
    * @param {string} strategy
    * @param {string} botName
    */

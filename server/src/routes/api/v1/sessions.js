@@ -1,7 +1,11 @@
+// @ts-check
 const router = require('express').Router()
-const { api } = require('../../../services/config')
+const config = require('config')
+
 const { Db } = require('../../../services/initialization')
 const { log, HELPERS } = require('../../../services/logger')
+
+const api = config.getSafe('api')
 
 router.get('/', async (req, res) => {
   try {
