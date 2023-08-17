@@ -1,14 +1,11 @@
 import React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import {
-  Grid,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  styled,
-} from '@mui/material'
-
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
+import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 
 const StyledAccordion = styled(Accordion)((/* { theme } */) => ({

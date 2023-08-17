@@ -178,7 +178,9 @@ const config = defineConfig(async ({ mode }) => {
         output: {
           manualChunks: (id) => {
             if (id.endsWith('.css')) return 'index'
+            if (id.includes('leaflet')) return 'leaflet'
             if (id.includes('node_modules')) return 'vendor'
+            // return id.replace(/.*node_modules\//, '').split('/')[0]
             if (id.includes('src')) return version.replaceAll('.', '-')
           },
         },

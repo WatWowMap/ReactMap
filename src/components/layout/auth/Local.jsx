@@ -1,18 +1,16 @@
 import * as React from 'react'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import {
-  Typography,
-  Button,
-  OutlinedInput,
-  InputLabel,
-  FormControl,
-  InputAdornment,
-  IconButton,
-  Box,
-  Collapse,
-} from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Collapse from '@mui/material/Collapse'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import OutlinedInput from '@mui/material/OutlinedInput'
+import InputAdornment from '@mui/material/InputAdornment'
+import IconButton from '@mui/material/IconButton'
 
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'

@@ -1,4 +1,4 @@
-import L from 'leaflet'
+import { divIcon } from 'leaflet'
 
 export default function weatherMarker(weather, Icons, timeOfDay) {
   const [
@@ -12,7 +12,7 @@ export default function weatherMarker(weather, Icons, timeOfDay) {
     },
   ] = Icons.getModifiers('weather')
 
-  return L.divIcon({
+  return divIcon({
     iconAnchor: [17 * offsetX, 17 * offsetY],
     popupAnchor: [popupX + 1, -20 + popupY],
     iconSize: [30 * sizeMultiplier, 30 * sizeMultiplier],

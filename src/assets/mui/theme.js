@@ -1,25 +1,5 @@
 // @ts-check
-import { responsiveFontSizes } from '@mui/material'
-import { createTheme } from '@mui/material/styles'
-import * as locales from '@mui/material/locale'
-
-export const LOCALE_MAP = /** @type {const} */ ({
-  en: 'enUS',
-  de: 'deDE',
-  es: 'esES',
-  fr: 'frFR',
-  it: 'itIT',
-  ja: 'jaJP',
-  ko: 'koKR',
-  nl: 'nlNL',
-  pl: 'plPL',
-  'pt-br': 'ptBR',
-  ru: 'ruRU',
-  sv: 'svSE',
-  th: 'thTH',
-  tr: 'trTR',
-  'zh-tw': 'zhTW',
-})
+import { createTheme, responsiveFontSizes } from '@mui/material/styles'
 
 /** @type {import('@mui/material').Components<Omit<import('@mui/material').Theme, 'components'>>} */
 const components = {
@@ -135,29 +115,24 @@ const DEFAULT_PALETTE = {
 /**
  * @param {{ primary?: string, secondary?: string }} themeOptions
  * @param {boolean} darkMode
- * @param {keyof typeof LOCALE_MAP} locale
  * @returns
  */
 export default function customTheme(
   themeOptions = DEFAULT_PALETTE,
   darkMode = document.body.classList.contains('dark'),
-  locale = 'en',
 ) {
-  const newTheme = createTheme(
-    {
-      palette: {
-        mode: darkMode ? 'dark' : 'light',
-        primary: {
-          main: themeOptions.primary,
-        },
-        secondary: {
-          main: themeOptions.secondary,
-          contrastText: '#fff',
-        },
+  const newTheme = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+      primary: {
+        main: themeOptions.primary,
       },
-      components,
+      secondary: {
+        main: themeOptions.secondary,
+        contrastText: '#fff',
+      },
     },
-    locales[LOCALE_MAP[locale]],
-  )
+    components,
+  })
   return responsiveFontSizes(newTheme)
 }

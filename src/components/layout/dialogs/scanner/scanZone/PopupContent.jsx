@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Button, ButtonGroup, Slider, List, ListItem } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { debounce } from 'lodash'
+import debounce from 'lodash.debounce'
 
 import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
 import { useScanStore } from '@hooks/useStore'

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MapContainer } from 'react-leaflet'
-import { useMediaQuery } from '@mui/material'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 import useGenerate from '@hooks/useGenerate'
 import useRefresh from '@hooks/useRefresh'

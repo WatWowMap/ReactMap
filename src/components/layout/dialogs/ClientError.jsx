@@ -1,6 +1,9 @@
-import React from 'react'
+import * as React from 'react'
 import Refresh from '@mui/icons-material/Refresh'
-import { Dialog, Typography, DialogContent, Button } from '@mui/material'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 
 import { useTranslation } from 'react-i18next'
 

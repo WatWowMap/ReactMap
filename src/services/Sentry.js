@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/react'
+import { init, BrowserTracing } from '@sentry/react'
 import Fetch from './Fetch'
 
 if (inject) {
@@ -11,12 +11,12 @@ if (inject) {
     SENTRY_DEBUG,
   } = inject
 
-  Sentry.init({
+  init({
     dsn:
       SENTRY_DSN ||
       'https://c40dad799323428f83aee04391639345@o1096501.ingest.sentry.io/6117162',
     integrations: [
-      new Sentry.BrowserTracing({
+      new BrowserTracing({
         tracePropagationTargets: ['localhost', /^\//, 'graphql'],
         idleTimeout: 10000,
       }),

@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { Button, darken } from '@mui/material'
+import { darken } from '@mui/material/styles'
+import Button from '@mui/material/Button'
 
 import FAIcon from '../general/FAIcon'
 

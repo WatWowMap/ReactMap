@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { Button, Typography, DialogContent } from '@mui/material'
+import DialogContent from '@mui/material/DialogContent'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 

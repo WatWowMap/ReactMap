@@ -1,4 +1,4 @@
-import L from 'leaflet'
+import { divIcon } from 'leaflet'
 
 export default function nestMarker(
   iconUrl,
@@ -16,7 +16,7 @@ export default function nestMarker(
   ] = Icons.getModifiers('nest')
   const opacity = recent ? 1 : 0.5
 
-  return L.divIcon({
+  return divIcon({
     iconSize: [size * sizeMultiplier, size * sizeMultiplier],
     iconAnchor: [(size / 2) * offsetX, (size / 0.75) * offsetY],
     popupAnchor: [

@@ -1,7 +1,10 @@
 // @ts-check
 import * as React from 'react'
 import Create from '@mui/icons-material/Create'
-import { Button, Typography, Divider, DialogContent } from '@mui/material'
+import DialogContent from '@mui/material/DialogContent'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
 import { useTranslation } from 'react-i18next'
 
 import { useLayoutStore, useStatic } from '@hooks/useStore'

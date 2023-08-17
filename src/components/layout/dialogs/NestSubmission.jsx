@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { Dialog, DialogContent, TextField } from '@mui/material'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import TextField from '@mui/material/TextField'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 

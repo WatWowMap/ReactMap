@@ -2,9 +2,12 @@
 /* eslint-disable no-console */
 /* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
-import { Grid, Typography, Button } from '@mui/material'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 import Refresh from '@mui/icons-material/Refresh'
 import { withTranslation } from 'react-i18next'
+
 import Notification from './layout/general/Notification'
 
 // This component uses React Classes due to componentDidCatch() not being available in React Hooks
