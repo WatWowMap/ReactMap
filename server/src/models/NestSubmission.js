@@ -1,9 +1,6 @@
+// @ts-check
 const { Model } = require('objection')
-const {
-  database: {
-    settings: { userTableName },
-  },
-} = require('../services/config')
+const config = require('config')
 const { log, HELPERS } = require('../services/logger')
 
 class NestSubmission extends Model {
@@ -24,7 +21,7 @@ class NestSubmission extends Model {
         modelClass: Db.models.User,
         join: {
           from: `nest_submissions.user_id`,
-          to: `${userTableName}.id`,
+          to: `${config.getSafe('database.settings.userTableName')}.id`,
         },
       },
     }
@@ -33,7 +30,7 @@ class NestSubmission extends Model {
   /**
    *
    * @param {number} [userId]
-   * @returns
+   * @returns {Promise<import('types/models').FullNestSubmission[]>}
    */
   static async getAllByUser(userId) {
     return this.query().where('user_id', userId)
@@ -42,7 +39,7 @@ class NestSubmission extends Model {
   /**
    *
    * @param {number[]} nestIds
-   * @returns
+   * @returns {Promise<import('types/models').FullNestSubmission[]>}
    */
   static async getAllByIds(nestIds) {
     return this.query().whereIn('nest_id', nestIds)
@@ -51,7 +48,7 @@ class NestSubmission extends Model {
   /**
    *
    * @param {string} name
-   * @returns
+   * @returns {Promise<import('types/models').FullNestSubmission[]>}
    */
   static async search(name) {
     return this.query().where('name', 'like', `%${name}%`)
@@ -70,6 +67,7 @@ class NestSubmission extends Model {
       userInfo.submitted_by &&
       userInfo.user_id
     ) {
+      /** @type {import('types/models').FullNestSubmission} */
       const nest = await this.query().findById(nestInfo.nest_id)
       if (nest) {
         await nest.$query().patch({ ...nestInfo, ...userInfo })

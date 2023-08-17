@@ -1,3 +1,4 @@
+// @ts-check
 const { Model } = require('objection')
 const config = require('config')
 

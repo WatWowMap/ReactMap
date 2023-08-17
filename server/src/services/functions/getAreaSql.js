@@ -1,22 +1,22 @@
 // @ts-check
-const config = require('../config')
+const config = require('config')
 const { consolidateAreas } = require('./consolidateAreas')
 
 /**
  *
- * @param {import('knex').Knex} query
+ * @param {import('objection').QueryBuilder} query
  * @param {string[]} areaRestrictions
  * @param {string[]} onlyAreas
- * @param {boolean} isMad
- * @param {string} category
+ * @param {boolean} [isMad]
+ * @param {string} [category]
  * @returns
  */
 function getAreaRestrictionSql(
   query,
   areaRestrictions,
   onlyAreas,
-  isMad,
-  category,
+  isMad = false,
+  category = '',
 ) {
   const authentication = config.getSafe('authentication')
   const areas = config.getSafe('areas')

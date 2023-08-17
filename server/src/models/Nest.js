@@ -1,3 +1,4 @@
+// @ts-check
 /* eslint-disable no-nested-ternary */
 const { Model } = require('objection')
 const i18next = require('i18next')
@@ -9,7 +10,7 @@ const getAreaSql = require('../services/functions/getAreaSql')
 const { searchResultsLimit, queryLimits } = config.getSafe('api')
 const { avgFilter } = config.getSafe('defaultFilters.nests')
 
-/** @typedef {Nest & import('types').Nest} FullNest */
+/** @typedef {Nest & Partial<import('types').Nest>} FullNest */
 
 class Nest extends Model {
   static get tableName() {
@@ -25,7 +26,7 @@ class Nest extends Model {
    * @param {import('types').Permissions} perms
    * @param {object} args
    * @param {import('types').DbContext} ctx
-   * @returns {Promise<import('types').Nest[]>}
+   * @returns {Promise<FullNest[]>}
    */
   static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
@@ -64,18 +65,19 @@ class Nest extends Model {
       Object.fromEntries(submissions.map((x) => [x.nest_id, x])),
     )
 
-    const withNames = results.map((x) => ({
-      ...x,
-      name: submittedNameMap[x.id]?.name || x.name,
-      submitted_by: submittedNameMap[x.id]?.submitted_by,
-    }))
+    /** @type {(FullNest & { submitted_by?: string })[]} */
+    const withNames = results.map((x) => {
+      x.name = submittedNameMap[x.id]?.name || x.name
+      x.submitted_by = submittedNameMap[x.id]?.submitted_by
+      return x
+    })
 
     return Nest.secondaryFilter(withNames, filters, polygon)
   }
 
   /**
    *
-   * @param {FullNest[]} queryResults
+   * @param {(FullNest & { submitted_by?: string })[]} queryResults
    * @param {object} filters
    * @param {boolean} polygon
    * @returns {FullNest[]}
@@ -161,7 +163,7 @@ class Nest extends Model {
           .whereIn('pokemon_id', pokemonIds)
           .orWhereIn(
             'nest_id',
-            submittedNests.map((x) => x.id),
+            submittedNests.map((x) => x.nest_id),
           )
           .orWhere('name', 'like', `%${search}%`)
       })

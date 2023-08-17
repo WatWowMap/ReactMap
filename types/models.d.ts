@@ -13,10 +13,10 @@ export interface Backup {
   createdAt: number
   updatedAt: number
 }
-export interface FullBackup extends Backup, BackupModel {}
+export type FullBackup = Partial<Backup> & BackupModel
 
 export interface User {
-  id?: number
+  id: number
   discordId?: string
   username?: string
   telegramId?: string
@@ -29,7 +29,7 @@ export interface User {
   selectedWebhook?: string
 }
 
-export type FullUser = User & UserModel
+export type FullUser = Partial<User> & UserModel
 
 export interface Session {
   session_id: string
@@ -37,7 +37,7 @@ export interface Session {
   data: string | object
 }
 
-export interface FullSession extends Session, SessionModel {}
+export type FullSession = Partial<Session> & SessionModel
 
 export interface NestSubmission {
   nest_id: number
@@ -46,9 +46,7 @@ export interface NestSubmission {
   submitted_by: string
 }
 
-export interface FullNestSubmission
-  extends NestSubmission,
-    NestSubmissionModel {}
+export type FullNestSubmission = Partial<NestSubmission> & NestSubmissionModel
 
 export interface GymBadge {
   id: number
@@ -59,4 +57,4 @@ export interface GymBadge {
   updatedAt: number
 }
 
-export interface FullGymBadge extends GymBadge, GymBadgeModel {}
+export type FullGymBadge = Partial<GymBadge> & GymBadgeModel
