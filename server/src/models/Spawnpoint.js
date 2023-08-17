@@ -1,8 +1,7 @@
 const { Model, raw } = require('objection')
+const config = require('config')
+
 const getAreaSql = require('../services/functions/getAreaSql')
-const {
-  api: { queryLimits },
-} = require('../services/config')
 const { log, HELPERS } = require('../services/logger')
 
 module.exports = class Spawnpoint extends Model {
@@ -10,6 +9,13 @@ module.exports = class Spawnpoint extends Model {
     return 'spawnpoint'
   }
 
+  /**
+   *
+   * @param {import('types').Permissions} perms
+   * @param {object} args
+   * @param {import('types').DbContext} context
+   * @returns {Promise<import('types').FullSpawnpoint[]>}
+   */
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const {
@@ -48,7 +54,7 @@ module.exports = class Spawnpoint extends Model {
       return []
     }
     return query
-      .limit(queryLimits.spawnpoints)
+      .limit(config.getSafe('api.queryLimits.spawnpoints'))
       .from(isMad ? 'trs_spawn' : 'spawnpoint')
   }
 }
