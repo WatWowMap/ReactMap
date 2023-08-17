@@ -29,9 +29,9 @@ const mapPerms = (perms, userPerms) =>
 /**
  * Log user authentication to Discord
  * @param {import('express').Request} req
- * @param {import('types').User} user
+ * @param {{ id: string, username: string, perms: import('types').Permissions, valid: boolean, avatar: string }} user
  * @param {string} strategy
- * @returns
+ * @returns {Promise<import('discord.js').APIEmbed>}
  */
 async function getAuthInfo(req, user, strategy = 'custom') {
   const ip =
@@ -144,7 +144,7 @@ async function getAuthInfo(req, user, strategy = 'custom') {
         inline: true,
       },
     ],
-    timestamp: new Date(),
+    timestamp: new Date().toISOString(),
   }
   if (user.perms.areaRestrictions.length) {
     const trimmed = user.perms.areaRestrictions

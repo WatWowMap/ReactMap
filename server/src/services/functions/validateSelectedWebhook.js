@@ -19,11 +19,11 @@ async function validateSelectedWebhook(user, Db, Event) {
     user.perms.webhooks.includes(x),
   )
   if (validWebhook) {
-    const confirmedHook = await Db.models.User.updateWebhook(
+    const { selectedWebhook } = await Db.models.User.updateWebhook(
       user.id,
       validWebhook,
     )
-    return confirmedHook
+    return selectedWebhook
   }
   return null
 }

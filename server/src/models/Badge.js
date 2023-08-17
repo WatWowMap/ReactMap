@@ -1,14 +1,10 @@
 const { Model } = require('objection')
-const {
-  database: {
-    settings: { userTableName, gymBadgeTableName },
-  },
-} = require('../services/config')
+const config = require('config')
 
 class Badge extends Model {
   /** @returns {string} */
   static get tableName() {
-    return gymBadgeTableName
+    return config.getSafe('database.settings.gymBadgeTableName')
   }
 
   $beforeInsert() {
@@ -27,8 +23,10 @@ class Badge extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Db.models.User,
         join: {
-          from: `${gymBadgeTableName}.userId`,
-          to: `${userTableName}.id`,
+          from: `${config.getSafe(
+            'database.settings.gymBadgeTableName',
+          )}.userId`,
+          to: `${config.getSafe('database.settings.userTableName')}.id`,
         },
       },
     }
@@ -39,7 +37,7 @@ class Badge extends Model {
    * @param {number} userId
    * @param {'>' | '>=' | '<' | '<=' | '='} operator
    * @param {number} badge
-   * @returns
+   * @returns {Promise<import('types/models').FullGymBadge[]>}
    */
   static async getAll(userId, operator = '>', badge = 0) {
     return this.query()

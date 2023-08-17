@@ -619,15 +619,15 @@ const resolvers = {
     },
     webhookChange: async (_, args, { req, Db, perms, Event }) => {
       if (req.user?.id && perms.webhooks.includes(args.webhook)) {
-        const selectedWebhook = await Db.query(
+        const user = await Db.query(
           'User',
           'updateWebhook',
           req.user.id,
           args.webhook,
         )
-        req.user.selectedWebhook = selectedWebhook
+        req.user.selectedWebhook = user.selectedWebhook
         req.session.save()
-        return Event.webhookObj[selectedWebhook].api(
+        return Event.webhookObj[user.selectedWebhook].api(
           PoracleAPI.getWebhookId(req.user),
           'oneHuman',
           'GET',

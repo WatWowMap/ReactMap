@@ -6,7 +6,7 @@ const scanner = config.getSafe('scanner')
 /**
  *
  * @param {string[]} roles
- * @param {'discord' | 'telegram'} provider
+ * @param {'discordRoles' | 'telegramGroups'} provider
  * @param {boolean} [trialActive]
  * @returns
  */

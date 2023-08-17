@@ -170,9 +170,3 @@ export type NestedObjectPaths = Paths<Config>
 export type GetSafeConfig = <P extends NestedObjectPaths>(
   path: P,
 ) => ConfigPathValue<P>
-
-declare module 'config' {
-  interface IConfig {
-    getSafe: GetSafeConfig
-  }
-}

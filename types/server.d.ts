@@ -10,6 +10,7 @@ import { Knex } from 'knex'
 import { Model } from 'objection'
 import { Request, Response } from 'express'
 import { Transaction } from '@sentry/node'
+import { VerifyCallback } from 'passport-oauth2'
 
 import DbCheck = require('../server/src/services/DbCheck')
 import EventManager = require('../server/src/services/EventManager')
@@ -21,7 +22,7 @@ import Nest = require('../server/src/models/Nest')
 import NestSubmission = require('../server/src/models/NestSubmission')
 import Pokestop = require('../server/src/models/Pokestop')
 import { ModelReturn } from './utility'
-
+import { Profile } from 'passport-discord'
 export interface DbContext {
   isMad: boolean
   pvpV2: boolean
@@ -46,13 +47,14 @@ export interface User {
   perms: Permissions
   valid: boolean
   id: number
-  discordId: string
+  discordId?: string
   username: string
-  telegramId: string
+  telegramId?: string
   avatar: string
   selectedWebhook?: string
-  strategy: string
-  webhookStrategy: string
+  strategy?: string
+  webhookStrategy?: string
+  rmStrategy: string
 }
 
 export interface AvailablePokemon {
@@ -203,3 +205,11 @@ export interface Route {
   version: number
   waypoints: Waypoint[]
 }
+
+export type DiscordVerifyFunction = (
+  req: Request,
+  accessToken: string,
+  refreshToken: string,
+  profile: Profile,
+  done: VerifyCallback,
+) => void

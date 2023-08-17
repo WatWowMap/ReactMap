@@ -1,16 +1,12 @@
+// @ts-check
 const { Model } = require('objection')
+const config = require('config')
 
-const {
-  database: {
-    settings: { userTableName, gymBadgeTableName },
-  },
-} = require('../services/config')
 const { log, HELPERS } = require('../services/logger')
 
 class User extends Model {
-  /** @returns {string} */
   static get tableName() {
-    return userTableName
+    return config.getSafe('database.settings.userTableName')
   }
 
   static get relationMappings() {
@@ -21,21 +17,27 @@ class User extends Model {
         relation: Model.HasManyRelation,
         modelClass: Db.models.Badge,
         join: {
-          from: `${userTableName}.id`,
-          to: `${gymBadgeTableName}.userId`,
+          from: `${config.getSafe('database.settings.userTableName')}.id`,
+          to: `${config.getSafe('database.settings.gymBadgeTableName')}.userId`,
         },
       },
       nestSubmissions: {
         relation: Model.HasManyRelation,
         modelClass: Db.models.NestSubmission,
         join: {
-          from: `${userTableName}.id`,
+          from: `${config.getSafe('database.settings.userTableName')}.id`,
           to: `nest_submissions.userId`,
         },
       },
     }
   }
 
+  /**
+   *
+   * @param {number} userId
+   * @param {string} strategy
+   * @param {string} botName
+   */
   static async clearPerms(userId, strategy, botName) {
     await this.query()
       .update({ [`${strategy}Perms`]: null })
@@ -48,20 +50,24 @@ class User extends Model {
       )
   }
 
-  /** @param {number} id */
+  /**
+   *
+   * @param {number} id
+   * @returns {Promise<import('types/models').FullUser | null>}
+   */
   static async getOne(id) {
     return this.query().findOne({ id })
   }
 
   /**
-   * TODO: Fix user types
+   *
    * @param {number} id
    * @param {string} selectedWebhook
-   * @returns {Promise<string>}
+   * @returns {Promise<import('types/models').FullUser | null>}
    */
   static async updateWebhook(id, selectedWebhook) {
     await this.query().update({ selectedWebhook }).where({ id })
-    return selectedWebhook
+    return this.getOne(id)
   }
 }
 
