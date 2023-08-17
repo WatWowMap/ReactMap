@@ -1,12 +1,24 @@
+// @ts-check
+const config = require('config')
+
 const { Db } = require('../initialization')
-const { authentication } = require('../config')
 const { log, HELPERS } = require('../logger')
 
+/**
+ *
+ * @param {import('discord.js').Client} client
+ * @param {import('discord.js').GuildMember} oldPresence
+ * @param {import('discord.js').GuildMember} newPresence
+ */
 module.exports = async (client, oldPresence, newPresence) => {
-  const rolesBefore = oldPresence._roles
-  const rolesAfter = newPresence._roles
+  const rolesBefore = oldPresence.roles.cache.map((x) => x.id)
+  const rolesAfter = newPresence.roles.cache.map((x) => x.id)
   const perms = [
-    ...new Set(Object.values(authentication.perms).flatMap((x) => x.roles)),
+    ...new Set(
+      Object.values(config.getSafe('authentication.perms')).flatMap(
+        (x) => x.roles,
+      ),
+    ),
   ]
   const roleDiff = rolesBefore
     .filter((x) => !rolesAfter.includes(x))

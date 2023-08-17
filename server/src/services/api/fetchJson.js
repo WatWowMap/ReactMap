@@ -1,14 +1,15 @@
+// @ts-check
 const fs = require('fs')
 const { resolve } = require('path')
 
-const fetch = require('node-fetch')
+const { default: fetch } = require('node-fetch')
 const config = require('config')
 const { log, HELPERS } = require('../logger')
 
 /**
  * fetch wrapper with timeout and error handling
  * @param {string} url
- * @param {RequestInit} [options]
+ * @param {import('node-fetch').RequestInit} [options]
  * @returns
  */
 async function fetchJson(url, options = undefined) {
