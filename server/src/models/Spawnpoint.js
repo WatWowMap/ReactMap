@@ -1,10 +1,11 @@
+// @ts-check
 const { Model, raw } = require('objection')
 const config = require('config')
 
 const getAreaSql = require('../services/functions/getAreaSql')
 const { log, HELPERS } = require('../services/logger')
 
-module.exports = class Spawnpoint extends Model {
+class Spawnpoint extends Model {
   static get tableName() {
     return 'spawnpoint'
   }
@@ -58,3 +59,5 @@ module.exports = class Spawnpoint extends Model {
       .from(isMad ? 'trs_spawn' : 'spawnpoint')
   }
 }
+
+module.exports = Spawnpoint

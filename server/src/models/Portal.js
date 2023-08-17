@@ -7,7 +7,7 @@ const getAreaSql = require('../services/functions/getAreaSql')
 const { searchResultsLimit, portalUpdateLimit, queryLimits } =
   config.getSafe('api')
 
-module.exports = class Portal extends Model {
+class Portal extends Model {
   static get tableName() {
     return 'ingress_portals'
   }
@@ -77,3 +77,5 @@ module.exports = class Portal extends Model {
     return this.query().findById(id).select(['lat', 'lon'])
   }
 }
+
+module.exports = Portal

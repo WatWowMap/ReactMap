@@ -3,11 +3,11 @@ const { S2LatLng, S2Cell, S2CellId, S2Point } = require('nodes2ts')
 
 /**
  *
- * @param {S2CellId['id']} s2cellId
- * @param {number[][]} [polyline]
+ * @param {S2CellId['id'] | string} s2cellId
+ * @param {boolean} [polyline]
  * @returns
  */
-function getPolyVector(s2cellId, polyline) {
+function getPolyVector(s2cellId, polyline = false) {
   const s2cell = new S2Cell(new S2CellId(s2cellId.toString()))
   const poly = []
   const revPoly = []

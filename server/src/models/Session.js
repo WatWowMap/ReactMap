@@ -3,7 +3,7 @@ const { Model } = require('objection')
 const config = require('config')
 const { log, HELPERS } = require('../services/logger')
 
-module.exports = class Session extends Model {
+class Session extends Model {
   static get tableName() {
     return config.getSafe('database.settings.sessionTableName')
   }
@@ -80,3 +80,5 @@ module.exports = class Session extends Model {
     return 0
   }
 }
+
+module.exports = Session

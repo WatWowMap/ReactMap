@@ -4,7 +4,7 @@ const config = require('config')
 const getPolyVector = require('../services/functions/getPolyVector')
 const getAreaSql = require('../services/functions/getAreaSql')
 
-module.exports = class ScanCell extends Model {
+class ScanCell extends Model {
   static get tableName() {
     return 's2cell'
   }
@@ -47,3 +47,5 @@ module.exports = class ScanCell extends Model {
     }))
   }
 }
+
+module.exports = ScanCell
