@@ -1,19 +1,10 @@
 import { init, BrowserTracing } from '@sentry/react'
 import Fetch from './Fetch'
 
-if (inject) {
-  const {
-    VERSION,
-    CUSTOM,
-    SENTRY_DSN,
-    SENTRY_TRACES_SAMPLE_RATE,
-    DEVELOPMENT,
-    SENTRY_DEBUG,
-  } = inject
-
+if (CONFIG.SENTRY_DSN) {
   init({
     dsn:
-      SENTRY_DSN ||
+      CONFIG.SENTRY_DSN ||
       'https://c40dad799323428f83aee04391639345@o1096501.ingest.sentry.io/6117162',
     integrations: [
       new BrowserTracing({
@@ -21,12 +12,13 @@ if (inject) {
         idleTimeout: 10000,
       }),
     ],
-    tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE
-      ? +SENTRY_TRACES_SAMPLE_RATE
+    tracesSampleRate: CONFIG.SENTRY_TRACES_SAMPLE_RATE
+      ? +CONFIG.SENTRY_TRACES_SAMPLE_RATE
       : 0.1,
-    release: VERSION,
-    environment: DEVELOPMENT ? 'development' : 'production',
-    debug: SENTRY_DEBUG,
+    release: CONFIG.VERSION,
+    environment:
+      process.env.NODE_ENV === 'development' ? 'development' : 'production',
+    debug: CONFIG.SENTRY_DEBUG,
     beforeSend: async (event) => {
       const errors = event.exception.values
       const isLibrary = errors.find((e) => e?.value?.includes('vendor'))
@@ -39,7 +31,7 @@ if (inject) {
 
         await Fetch.sendError(error)
       }
-      return CUSTOM || isLibrary || fetchError ? null : event
+      return CONFIG.CUSTOM || isLibrary || fetchError ? null : event
     },
   })
 }

@@ -16,7 +16,7 @@
   "globals": {
     "document": true,
     "window": true,
-    "inject": true
+    "CONFIG": true
   },
   "rules": {
     "global-require": 0,

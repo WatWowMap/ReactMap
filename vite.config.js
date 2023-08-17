@@ -1,6 +1,12 @@
 // @ts-check
 /* eslint-disable no-continue */
 /* eslint-disable import/no-extraneous-dependencies */
+
+if (!process.env.NODE_CONFIG_DIR) {
+  process.env.NODE_CONFIG_DIR = `${__dirname}/server/src/configs`
+  process.env.ALLOW_CONFIG_MUTATIONS = 'true'
+}
+
 const { defineConfig, loadEnv } = require('vite')
 const { default: react } = require('@vitejs/plugin-react')
 const { default: checker } = require('vite-plugin-checker')
@@ -9,9 +15,12 @@ const removeFiles = require('rollup-plugin-delete')
 const { resolve, extname } = require('path')
 const fs = require('fs')
 const { sentryVitePlugin } = require('@sentry/vite-plugin')
+const config = require('config')
 
 const { log, HELPERS } = require('./server/src/services/logger')
 const { locales } = require('./locales/scripts/create')
+
+config.getSafe = config.get
 
 /**
  * @param {boolean} isDevelopment
@@ -62,9 +71,10 @@ const localePlugin = () => ({
   },
 })
 
-const config = defineConfig(async ({ mode }) => {
+const viteConfig = defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
   const isRelease = process.argv.includes('-r')
+  const serverPort = +(env.PORT || config.getSafe('port') || '8080')
 
   const pkg = JSON.parse(
     fs.readFileSync(resolve(__dirname, 'package.json'), 'utf8'),
@@ -139,10 +149,16 @@ const config = defineConfig(async ({ mode }) => {
       },
     },
     define: {
-      inject: JSON.stringify({
-        GOOGLE_ANALYTICS_ID: env.GOOGLE_ANALYTICS_ID || '',
-        ANALYTICS_DEBUG_MODE: env.ANALYTICS_DEBUG_MODE || false,
-        TITLE: env.TITLE || env.MAP_GENERAL_TITLE || '',
+      CONFIG: {
+        GOOGLE_ANALYTICS_ID:
+          env.GOOGLE_ANALYTICS_ID ||
+          config.getSafe('analytics.googleAnalyticsId') ||
+          '',
+        ANALYTICS_DEBUG_MODE:
+          env.ANALYTICS_DEBUG_MODE ||
+          config.getSafe('analytics.debugMode') ||
+          false,
+        TITLE: env.TITLE || config.getSafe('map.general.title') || '',
         SENTRY_DSN: env.SENTRY_DSN || '',
         SENTRY_TRACES_SAMPLE_RATE: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
         SENTRY_DEBUG: env.SENTRY_DEBUG || false,
@@ -153,7 +169,7 @@ const config = defineConfig(async ({ mode }) => {
           .readdirSync(resolve(__dirname, './locales'))
           .filter((x) => x.endsWith('.json'))
           .map((x) => x.replace('.json', '')),
-      }),
+      },
     },
     esbuild: {
       legalComments: 'none',
@@ -162,7 +178,10 @@ const config = defineConfig(async ({ mode }) => {
       target: ['safari11.1', 'chrome64', 'firefox66', 'edge88'],
       outDir: resolve(__dirname, './dist'),
       sourcemap: mode === 'development' || isRelease,
-      minify: mode === 'development' ? false : 'esbuild',
+      minify:
+        mode === 'development' || config.getSafe('devOptions.skipMinified')
+          ? false
+          : 'esbuild',
       input: { main: resolve(__dirname, 'index.html') },
       assetsDir: '',
       emptyOutDir: true,
@@ -188,23 +207,23 @@ const config = defineConfig(async ({ mode }) => {
     server: {
       host: '0.0.0.0',
       open: true,
-      port: +(env.PORT || '8080') + 1,
+      port: serverPort + 1,
       fs: {
         strict: false,
       },
       proxy: {
         '/api': {
-          target: `http://0.0.0.0:${env.PORT || 8080}`,
+          target: `http://0.0.0.0:${serverPort}`,
           changeOrigin: true,
           secure: false,
         },
         '/auth': {
-          target: `http://0.0.0.0:${env.PORT || 8080}`,
+          target: `http://0.0.0.0:${serverPort}`,
           changeOrigin: true,
           secure: false,
         },
         '/graphql': {
-          target: `http://0.0.0.0:${env.PORT || 8080}`,
+          target: `http://0.0.0.0:${serverPort}`,
           changeOrigin: true,
           secure: false,
         },
@@ -213,4 +232,4 @@ const config = defineConfig(async ({ mode }) => {
   }
 })
 
-module.exports = config
+module.exports = viteConfig

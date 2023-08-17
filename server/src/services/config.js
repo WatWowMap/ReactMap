@@ -3,7 +3,7 @@ const { resolve } = require('path')
 
 const config = require('config')
 
-config.getSafe = (key) => config.get(key)
+config.getSafe = config.get
 
 const { log, HELPERS } = require('./logger')
 

@@ -42,7 +42,7 @@ export default class Fetch {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          version: inject.VERSION,
+          version: CONFIG.VERSION,
         },
         body: JSON.stringify({ error }),
       })

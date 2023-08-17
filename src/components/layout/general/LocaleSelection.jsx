@@ -22,7 +22,7 @@ export default function LocaleSelection() {
       }}
       fullWidth
     >
-      {(inject.LOCALES || []).map((option) => (
+      {(CONFIG.LOCALES || []).map((option) => (
         <MenuItem key={option} value={option} dense>
           {t(`locale_selection_${option}`)}
         </MenuItem>
