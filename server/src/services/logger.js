@@ -80,9 +80,9 @@ if (
   logLevel = process.env.LOG_LEVEL
 } else if (
   config.has('devOptions.logLevel') &&
-  config.getSafe('devOptions.logLevel').toUpperCase() in logger.levels
+  config.get('devOptions.logLevel').toUpperCase() in logger.levels
 ) {
-  logLevel = config.getSafe('devOptions.logLevel')
+  logLevel = config.get('devOptions.logLevel')
 }
 
 // @ts-ignore
