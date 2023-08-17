@@ -1,15 +1,21 @@
 const { Model, ref } = require('objection')
+const config = require('config')
+
 const getPolyVector = require('../services/functions/getPolyVector')
 const getAreaSql = require('../services/functions/getAreaSql')
-const {
-  api: { queryLimits },
-} = require('../services/config')
 
 module.exports = class ScanCell extends Model {
   static get tableName() {
     return 's2cell'
   }
 
+  /**
+   *
+   * @param {import('types').Permissions} perms
+   * @param {object} args
+   * @param {import('types').DbContext} context
+   * @returns {Promise<import('types').FullScanCell[]>}
+   */
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const {
@@ -33,7 +39,7 @@ module.exports = class ScanCell extends Model {
       return []
     }
     const results = await query
-      .limit(queryLimits.scanCells)
+      .limit(config.getSafe('api.queryLimits.scanCells'))
       .from(isMad ? 'trs_s2cells' : 's2cell')
     return results.map((cell) => ({
       ...cell,
