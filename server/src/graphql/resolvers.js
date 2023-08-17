@@ -1,4 +1,3 @@
-/* global BigInt */
 const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 const config = require('config')
@@ -75,7 +74,7 @@ const resolvers = {
       }
       return []
     },
-    /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} */
+    /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} args */
     customComponent: (_, { component }, { perms, user }) => {
       switch (component) {
         case 'messageOfTheDay':
@@ -104,7 +103,7 @@ const resolvers = {
     },
     devices: (_, args, { perms, Db }) => {
       if (perms?.devices) {
-        return Db.getAll('Device', perms, args)
+        return Db.query('Device', 'getAll', perms, args)
       }
       return []
     },
@@ -143,7 +142,7 @@ const resolvers = {
           perms.scanner.includes('scanZone'),
         scanNext:
           scanner.scanNext.enabled && perms.scanner.includes('scanNext'),
-        search: Object.entries(config.api.searchable).some(
+        search: Object.entries(config.getSafe('api.searchable')).some(
           ([k, v]) => v && perms[k],
         ),
         webhooks: !!selectedWebhook,
@@ -187,7 +186,7 @@ const resolvers = {
     },
     nests: (_, args, { perms, Db }) => {
       if (perms?.nests) {
-        return Db.getAll('Nest', perms, args)
+        return Db.query('Nest', 'getAll', perms, args)
       }
       return []
     },
@@ -204,7 +203,7 @@ const resolvers = {
         perms?.quests ||
         perms?.invasions
       ) {
-        return Db.getAll('Pokestop', perms, args)
+        return Db.query('Pokestop', 'getAll', perms, args)
       }
       return []
     },
@@ -231,7 +230,7 @@ const resolvers = {
     },
     portals: (_, args, { perms, Db }) => {
       if (perms?.portals) {
-        return Db.getAll('Portal', perms, args)
+        return Db.query('Portal', 'getAll', perms, args)
       }
       return []
     },
@@ -265,7 +264,7 @@ const resolvers = {
           regionCoverer.setMinLevel(level)
           regionCoverer.setMaxLevel(level)
           return regionCoverer.getCoveringCells(region).map((cell) => {
-            const id = BigInt(cell.id).toString()
+            const id = cell.id.toString()
             return {
               id,
               coords: Utility.getPolyVector(id).poly,
@@ -277,7 +276,7 @@ const resolvers = {
     },
     scanCells: (_, args, { perms, Db }) => {
       if (perms?.scanCells && args.zoom >= config.get('map.scanCellsZoom')) {
-        return Db.getAll('ScanCell', perms, args)
+        return Db.query('ScanCell', 'getAll', perms, args)
       }
       return []
     },
@@ -387,7 +386,7 @@ const resolvers = {
                 results.map(async (result) => ({
                   ...result,
                   formatted: await geocoder(
-                    webhook.server.nominatimUrl,
+                    webhook.nominatimUrl,
                     { lat: result.lat, lon: result.lon },
                     true,
                   ),
@@ -433,7 +432,7 @@ const resolvers = {
     },
     spawnpoints: (_, args, { perms, Db }) => {
       if (perms?.spawnpoints) {
-        return Db.getAll('Spawnpoint', perms, args)
+        return Db.query('Spawnpoint', 'getAll', perms, args)
       }
       return []
     },
@@ -459,7 +458,7 @@ const resolvers = {
     },
     weather: (_, args, { perms, Db }) => {
       if (perms?.weather) {
-        return Db.getAll('Weather', perms, args)
+        return Db.query('Weather', 'getAll', perms, args)
       }
       return []
     },
@@ -659,7 +658,7 @@ const resolvers = {
     },
     setExtraFields: async (_, { key, value }, { req, Db }) => {
       if (req.user?.id) {
-        const user = await Db.models.User.query().findById(req.user.id)
+        const user = await Db.query('User', 'getOne', req.user.id)
         if (user) {
           const data =
             typeof user.data === 'string'
@@ -672,8 +671,7 @@ const resolvers = {
       }
       return false
     },
-    setGymBadge: async (_, args, { req, Db }) => {
-      const perms = req.user ? req.user.perms : false
+    setGymBadge: async (_, args, { req, Db, perms }) => {
       if (perms?.gymBadges && req?.user?.id) {
         if (
           await Db.models.Badge.query()

@@ -116,12 +116,7 @@ class PoracleAPI {
 
   /**
    *
-   * @param {{
-   *  strategy: 'discord' | 'telegram'
-   *  webhookStrategy: 'discord' | 'telegram'
-   *  discordId: `${number}`
-   *  telegramId: `${number}`
-   * }} user
+   * @param {import('types').User} user
    * @returns
    */
   static getWebhookId(user) {
@@ -141,7 +136,7 @@ class PoracleAPI {
 
   /**
    *
-   * @param {number} userId
+   * @param {string | number} userId
    * @returns
    */
   async getUserAreas(userId) {
@@ -165,7 +160,7 @@ class PoracleAPI {
 
   /**
    *
-   * @param {number} userId
+   * @param {string | number} userId
    * @returns
    */
   async getClientGeojson(userId) {
@@ -292,7 +287,7 @@ class PoracleAPI {
 
   /**
    *
-   * @param {number} userId
+   * @param {string | number} userId
    * @returns
    */
   async #oneHuman(userId) {
@@ -318,7 +313,7 @@ class PoracleAPI {
 
   /**
    *
-   * @param {number} userId
+   * @param {string | number} userId
    * @param {APIInput} category
    * @param {Method} method
    * @returns
@@ -333,7 +328,7 @@ class PoracleAPI {
 
   /**
    *
-   * @param {number} userId
+   * @param {string | number} userId
    * @param {`profiles-${Action}` | 'profiles'} category
    * @param {Method} method
    * @param {any} data
@@ -390,7 +385,7 @@ class PoracleAPI {
 
   /**
    *
-   * @param {number} userId
+   * @param {string | number} userId
    * @param {[number, number]} location
    * @returns
    */
@@ -402,7 +397,7 @@ class PoracleAPI {
 
   /**
    *
-   * @param {number} userId
+   * @param {string | number} userId
    * @param {string[]} areas
    * @returns
    */
@@ -438,7 +433,7 @@ class PoracleAPI {
   /**
    *
    * @template {APIInput} T
-   * @param {number} userId
+   * @param {string | number} userId
    * @param {T} category
    * @param {Method} method
    * @param {any} data
@@ -501,7 +496,7 @@ class PoracleAPI {
 
   /**
    *
-   * @param {number} userId
+   * @param {string | number} userId
    * @param {any} data
    */
   async #quickGym(userId, data) {

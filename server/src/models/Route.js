@@ -67,9 +67,11 @@ class Route extends Model {
   /**
    * Returns the full route after querying it, generally from the Popup
    * @param {number} id
+   * @param {import('types').DbContext} _ctx
    * @returns {Promise<import('types').FullRoute>}
    */
-  static async getOne(id) {
+  // eslint-disable-next-line no-unused-vars
+  static async getOne(id, _ctx) {
     /** @type {import('types').FullRoute} */
     const result = await this.query().findById(id)
     if (typeof result.waypoints === 'string') {

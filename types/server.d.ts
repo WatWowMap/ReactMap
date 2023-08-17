@@ -52,8 +52,8 @@ export interface User {
   telegramId?: string
   avatar: string
   selectedWebhook?: string
-  strategy?: string
-  webhookStrategy?: string
+  strategy?: 'discord' | 'telegram'
+  webhookStrategy?: 'discord' | 'telegram'
   rmStrategy: string
 }
 
@@ -102,7 +102,7 @@ export interface DbCheckClass {
   connections: (Knex | null)[]
   rarity: Rarity
   historical: Rarity
-  questionConditions: { [key: string]: string[] }
+  questConditions: { [key: string]: string[] }
   rarityPercents: RarityPercents
   distanceUnit: 'km' | 'mi'
   reactMapDb: null | number

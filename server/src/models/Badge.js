@@ -3,7 +3,6 @@ const { Model } = require('objection')
 const config = require('config')
 
 class Badge extends Model {
-  /** @returns {string} */
   static get tableName() {
     return config.getSafe('database.settings.gymBadgeTableName')
   }

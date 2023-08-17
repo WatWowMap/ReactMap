@@ -16,9 +16,11 @@ class Portal extends Model {
    *
    * @param {import('types').Permissions} perms
    * @param {object} args
+   * @param {import('types').DbContext} _ctx
    * @returns {Promise<import('types').FullPortal[]>}
    */
-  static async getAll(perms, args) {
+  // eslint-disable-next-line no-unused-vars
+  static async getAll(perms, args, _ctx) {
     const { areaRestrictions } = perms
     const {
       filters: { onlyAreas = [] },

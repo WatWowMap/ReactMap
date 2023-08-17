@@ -1,17 +1,13 @@
 const path = require('path')
-const knex = require('knex')
+const { knex } = require('knex')
+const config = require('config')
 const { log, HELPERS } = require('../services/logger')
 
-const {
-  database: {
-    schemas,
-    settings: { migrationTableName },
-  },
-} = require('../services/config')
+const database = config.getSafe('database')
 
 const migrationUrl = path.resolve(__dirname, 'migrations')
 
-const selectedDb = schemas.find((db) => db.useFor.includes('user'))
+const selectedDb = database.schemas.find((db) => db.useFor.includes('user'))
 
 if (!selectedDb) {
   log.error(
@@ -32,7 +28,7 @@ const getConnection = (basePath = '') => {
       database: selectedDb.database,
     },
     migrations: {
-      tableName: migrationTableName,
+      tableName: database.settings.migrationTableName,
       directory: migrationUrl,
       extensions: 'cjs',
       stub: path.join(migrationUrl, 'migration.stub.cjs'),
