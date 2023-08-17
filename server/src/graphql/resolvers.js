@@ -2,7 +2,6 @@ const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 const config = require('config')
 
-const Utility = require('../services/Utility')
 const buildDefaultFilters = require('../services/filters/builder/base')
 const filterComponents = require('../services/functions/filterComponents')
 const { filterRTree } = require('../services/functions/filterRTree')
@@ -10,6 +9,9 @@ const validateSelectedWebhook = require('../services/functions/validateSelectedW
 const PoracleAPI = require('../services/api/Poracle')
 const { geocoder } = require('../services/geocoder')
 const scannerApi = require('../services/api/scannerApi')
+const getPolyVector = require('../services/functions/getPolyVector')
+const getPlacementCells = require('../services/functions/getPlacementCells')
+const getTypeCells = require('../services/functions/getTypeCells')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import('types').GqlContext>['resolvers']} */
 const resolvers = {
@@ -267,7 +269,7 @@ const resolvers = {
             const id = cell.id.toString()
             return {
               id,
-              coords: Utility.getPolyVector(id).poly,
+              coords: getPolyVector(id).poly,
             }
           })
         })
@@ -446,10 +448,10 @@ const resolvers = {
           {
             placementCells:
               args.zoom >= config.get('map.submissionZoom')
-                ? Utility.getPlacementCells(args, pokestops, gyms)
+                ? getPlacementCells(args, pokestops, gyms)
                 : [],
             typeCells: args.filters.onlyS14Cells
-              ? Utility.getTypeCells(args, pokestops, gyms)
+              ? getTypeCells(args, pokestops, gyms)
               : [],
           },
         ]

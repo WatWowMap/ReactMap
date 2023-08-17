@@ -1,3 +1,4 @@
+// @ts-check
 if (!process.env.NODE_CONFIG_DIR) {
   process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
   process.env.ALLOW_CONFIG_MUTATIONS = 'true'
@@ -79,11 +80,12 @@ if (
   logLevel = process.env.LOG_LEVEL
 } else if (
   config.has('devOptions.logLevel') &&
-  config.get('devOptions.logLevel').toUpperCase() in logger.levels
+  config.getSafe('devOptions.logLevel').toUpperCase() in logger.levels
 ) {
-  logLevel = config.get('devOptions.logLevel')
+  logLevel = config.getSafe('devOptions.logLevel')
 }
 
+// @ts-ignore
 log.setLevel(logLevel)
 
 module.exports.log = log

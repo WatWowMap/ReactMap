@@ -93,6 +93,12 @@ const ignoredKeys = [
   'confirmed',
 ]
 
+/**
+ *
+ * @param {object} filters
+ * @param {import('types').Permissions} perms
+ * @returns
+ */
 function generateUi(filters, perms) {
   const ui = {}
 

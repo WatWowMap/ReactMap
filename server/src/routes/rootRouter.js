@@ -5,12 +5,14 @@ const { resolve } = require('path')
 const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
 const config = require('../services/config')
-const Utility = require('../services/Utility')
 const { Event, Db } = require('../services/initialization')
 const { version } = require('../../../package.json')
 const { log, HELPERS } = require('../services/logger')
 const buildDefaultFilters = require('../services/filters/builder/base')
 const advMenus = require('../services/ui/advMenus')
+const areaPerms = require('../services/functions/areaPerms')
+const generateUi = require('../services/ui/primary')
+const clientOptions = require('../services/ui/clientOptions')
 
 const rootRouter = express.Router()
 
@@ -93,7 +95,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
         ...Object.fromEntries(
           Object.keys(config.authentication.perms).map((p) => [p, false]),
         ),
-        areaRestrictions: Utility.areaPerms(['none']),
+        areaRestrictions: areaPerms(['none']),
         webhooks: [],
         scanner: Object.keys(config.scanner).filter(
           (key) =>
@@ -284,14 +286,14 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile
       // Primary for quest rewards that are form unset, despite normally have a set form
 
-      serverSettings.ui = Utility.buildPrimaryUi(
+      serverSettings.ui = generateUi(
         serverSettings.defaultFilters,
         serverSettings.user.perms,
       )
 
       serverSettings.menus = advMenus()
 
-      const { clientValues, clientMenus } = Utility.buildClientOptions(
+      const { clientValues, clientMenus } = clientOptions(
         serverSettings.user.perms,
       )
 
