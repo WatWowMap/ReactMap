@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 import Menu from '@mui/icons-material/Menu'
 import Settings from '@mui/icons-material/Settings'
 import TuneIcon from '@mui/icons-material/Tune'
@@ -13,17 +13,25 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  ListItem,
+  Switch,
 } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'
-import ItemToggle from '@components/layout/drawer/ItemToggle'
+import Utility from '@services/Utility'
+
 import data from './data'
 
 export default function TutSidebar({ toggleDialog, isMobile }) {
   const { t } = useTranslation()
   const { perms } = useStatic((state) => state.auth)
+  const [tempFilters, setTempFilters] = React.useState(
+    Object.fromEntries(
+      Object.keys(data.filters).map((x) => [x, !!Math.round(Math.random())]),
+    ),
+  )
 
   const permCheck =
     perms.pokestops || perms.invasions || perms.quests || perms.lures
@@ -63,11 +71,18 @@ export default function TutSidebar({ toggleDialog, isMobile }) {
                 return null
               }
               return (
-                <ItemToggle
-                  key={subItem}
-                  category="pokestops"
-                  subItem={subItem}
-                />
+                <ListItem key={subItem}>
+                  <ListItemText primary={t(Utility.camelToSnake(subItem))} />
+                  <Switch
+                    checked={tempFilters[subItem]}
+                    onChange={() => {
+                      setTempFilters((prev) => ({
+                        ...prev,
+                        [subItem]: !prev[subItem],
+                      }))
+                    }}
+                  />
+                </ListItem>
               )
             })}
             <ListItemButton
