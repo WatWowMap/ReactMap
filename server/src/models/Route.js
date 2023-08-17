@@ -1,3 +1,4 @@
+// @ts-check
 const { Model } = require('objection')
 const getAreaSql = require('../services/functions/getAreaSql')
 
@@ -22,7 +23,7 @@ class Route extends Model {
    * @param {import('types').Permissions} perms
    * @param {object} args
    * @param {import('types').DbContext} ctx
-   * @returns
+   * @returns {Promise<import('types').FullRoute[]>}
    */
   static async getAll(perms, args, ctx) {
     const { areaRestrictions } = perms
@@ -50,6 +51,7 @@ class Route extends Model {
     ) {
       return []
     }
+    /** @type {import('types').FullRoute[]} */
     const results = await query
 
     return results.map((result) => {
@@ -65,8 +67,10 @@ class Route extends Model {
   /**
    * Returns the full route after querying it, generally from the Popup
    * @param {number} id
+   * @returns {Promise<import('types').FullRoute>}
    */
   static async getOne(id) {
+    /** @type {import('types').FullRoute} */
     const result = await this.query().findById(id)
     if (typeof result.waypoints === 'string') {
       result.waypoints = JSON.parse(result.waypoints)
@@ -92,7 +96,7 @@ class Route extends Model {
 
   /**
    * returns route context
-   * @returns {{ max_distance: number, max_duration: number }}
+   * @returns {Promise<{ max_distance: number, max_duration: number }>}
    */
   static async getFilterContext() {
     const result = await this.query()
@@ -100,6 +104,7 @@ class Route extends Model {
       .max('duration_seconds AS max_duration')
       .first()
 
+    // @ts-ignore // shrug, I think we would TS to make this actually work
     return result
   }
 }
