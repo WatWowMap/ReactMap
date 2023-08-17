@@ -15,6 +15,6 @@ declare global {
 
 declare module 'passport-discord' {
   interface StrategyOptionsWithRequest {
-    prompt?: 'none' | 'consent' | undefined
+    prompt?: string | undefined
   }
 }

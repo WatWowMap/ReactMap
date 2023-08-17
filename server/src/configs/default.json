@@ -660,6 +660,7 @@
         "logChannelId": "",
         "scanNextLogChannelId": "",
         "scanZoneLogChannelId": "",
+        "eventLogChannelId": "",
         "presence": "Map Status: Online",
         "presenceType": 3,
         "botToken": "",

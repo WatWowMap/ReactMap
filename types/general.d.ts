@@ -23,3 +23,9 @@ export type RMGeoJSON = {
   type: 'FeatureCollection'
   features: RMFeature[]
 }
+
+import masterfile = require('../server/src/data/masterfile.json')
+
+export type Masterfile = typeof masterfile
+
+export type Strategy = 'discord' | 'telegram' | 'local'

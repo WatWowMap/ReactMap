@@ -14,7 +14,12 @@ const webhookPerms = require('./functions/webhookPerms')
 const scannerPerms = require('./functions/scannerPerms')
 const mergePerms = require('./functions/mergePerms')
 
-module.exports = class DiscordClient {
+class DiscordClient {
+  /**
+   *
+   * @param {import('types').Config['authentication']['strategies'][number]} strategy
+   * @param {string} rmStrategy
+   */
   constructor(strategy, rmStrategy) {
     if (strategy instanceof Client || typeof rmStrategy !== 'string') {
       log.error(
@@ -366,3 +371,5 @@ module.exports = class DiscordClient {
     )
   }
 }
+
+module.exports = DiscordClient

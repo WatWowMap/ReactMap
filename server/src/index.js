@@ -40,7 +40,7 @@ const startApollo = require('./graphql/server')
 
 Event.clients = Clients
 
-if (!config.devOptions.skipUpdateCheck) {
+if (!config.has('devOptions.skipUpdateCheck')) {
   require('./services/checkForUpdates')
 }
 
@@ -77,7 +77,7 @@ app.use(Sentry.Handlers.tracingHandler())
 if (
   process.env.LOG_LEVEL === 'debug' ||
   process.env.LOG_LEVEL === 'trace' ||
-  config.devOptions.enabled
+  config.getSafe('devOptions.enabled')
 ) {
   app.use(
     logger((tokens, req, res) =>
@@ -97,9 +97,9 @@ if (
   )
 }
 
-const RateLimitTime = config.api.rateLimit.time * 60 * 1000
+const RateLimitTime = config.getSafe('api.rateLimit.time') * 60 * 1000
 const MaxRequestsPerHour =
-  config.api.rateLimit.requests * (RateLimitTime / 1000)
+  config.getSafe('api.rateLimit.requests') * (RateLimitTime / 1000)
 
 const rateLimitOptions = {
   windowMs: RateLimitTime, // Time window in milliseconds
@@ -109,7 +109,9 @@ const rateLimitOptions = {
     status: 429, // optional, of course
     limiter: true,
     type: 'error',
-    message: `Too many requests from this IP, please try again in ${config.api.rateLimit.time} minutes.`,
+    message: `Too many requests from this IP, please try again in ${config.getSafe(
+      'api.rateLimit.time',
+    )} minutes.`,
   },
   onLimitReached: (req, res) => {
     log.info(
@@ -126,17 +128,19 @@ app.use(compression())
 
 app.use(express.json({ limit: '50mb' }))
 
-app.use(express.static(path.join(__dirname, config.devOptions.clientPath)))
+app.use(
+  express.static(path.join(__dirname, config.getSafe('devOptions.clientPath'))),
+)
 
 app.use(
   session({
     name: 'reactmap0',
     key: 'session',
-    secret: config.api.sessionSecret,
+    secret: config.getSafe('api.sessionSecret'),
     store: sessionStore,
     resave: true,
     saveUninitialized: false,
-    cookie: { maxAge: 86400000 * config.api.cookieAgeDays },
+    cookie: { maxAge: 86400000 * config.getSafe('api.cookieAgeDays') },
   }),
 )
 
@@ -160,7 +164,7 @@ i18next.use(Backend).init(
   {
     lng: 'en',
     fallbackLng: 'en',
-    preload: config.map.localeSelection,
+    preload: config.getSafe('map.localeSelection'),
     ns: ['translation'],
     defaultNS: 'translation',
     backend: {
@@ -296,21 +300,21 @@ connection.migrate.latest().then(async () => {
     Event.setAvailable('nests', 'Nest', Db),
   ])
   await Promise.all([
-    Event.getUicons(config.icons.styles),
+    Event.getUicons(config.getSafe('icons.styles')),
     Event.getMasterfile(Db.historical, Db.rarity),
-    Event.getInvasions(config.api.pogoApiEndpoints.invasions),
+    Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
     Event.getWebhooks(config),
     getAreas().then((res) => (config.areas = res)),
   ])
-  httpServer.listen(config.port, config.interface)
+  httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
   const text = rainbow(
     `ℹ ${new Date()
       .toISOString()
       .split('.')[0]
       .split('T')
-      .join(' ')} [ReactMap] Server is now listening at http://${
-      config.interface
-    }:${config.port}`,
+      .join(' ')} [ReactMap] Server is now listening at http://${config.getSafe(
+      'interface',
+    )}:${config.getSafe('port')}`,
   )
   setTimeout(() => text.stop(), 1_000)
 })

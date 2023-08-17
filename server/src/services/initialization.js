@@ -11,7 +11,7 @@ const Pvp = config.getSafe('api.pvp.reactMapHandlesPvp')
   : null
 const Event = new EventManager()
 
-Event.setTimers(config, Db, Pvp)
+Event.setTimers(Db, Pvp)
 
 module.exports = {
   Db,

@@ -14,6 +14,18 @@ export interface Config extends BaseConfig {
     excludeFromTutorial: (keyof BaseConfig['authentication']['perms'])[]
     alwaysEnabledPerms: (keyof BaseConfig['authentication']['perms'])[]
     aliases: { role: string; name: string }[]
+    strategies: [
+      {
+        trialPeriod: {
+          start: {
+            js: Date
+          } & BaseConfig['authentication']['strategies'][number]['trialPeriod']['start']
+          end: {
+            js: Date
+          } & BaseConfig['authentication']['strategies'][number]['trialPeriod']['end']
+        } & BaseConfig['authentication']['strategies'][number]['trialPeriod']
+      } & BaseConfig['authentication']['strategies'][number],
+    ]
   } & BaseConfig['authentication']
   api: {
     pvp: {
@@ -75,6 +87,9 @@ export interface Config extends BaseConfig {
     defaultIcons: Record<string, string>
   } & BaseConfig['icons']
   manualAreas: ExampleConfig['manualAreas'][number][]
+  devOptions: {
+    skipUpdateCheck?: boolean
+  } & BaseConfig['devOptions']
 }
 
 export interface Webhook {

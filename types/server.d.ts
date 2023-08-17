@@ -52,8 +52,8 @@ export interface User {
   telegramId?: string
   avatar: string
   selectedWebhook?: string
-  strategy?: 'discord' | 'telegram'
-  webhookStrategy?: 'discord' | 'telegram'
+  strategy?: Strategy
+  webhookStrategy?: Strategy
   rmStrategy: string
 }
 

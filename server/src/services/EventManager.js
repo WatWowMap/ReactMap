@@ -1,13 +1,18 @@
+// @ts-check
 const { promises: fs, readFileSync } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
+const config = require('config')
+
 const { generate } = require('../../scripts/generateMasterfile')
 const { log, HELPERS } = require('./logger')
 const PoracleAPI = require('./api/Poracle')
+// const DiscordClient = require('./DiscordClient')
 
 class EventManager {
   constructor() {
+    /** @type {import('types').Masterfile} */
     this.masterfile = JSON.parse(
       readFileSync(path.resolve(__dirname, '../data/masterfile.json'), 'utf-8'),
     )
@@ -28,6 +33,12 @@ class EventManager {
     return this.available[category]
   }
 
+  /**
+   *
+   * @param {keyof EventManager['available']} category
+   * @param {import('../models').ScannerModelKeys} model
+   * @param {import('./DbCheck')} Db
+   */
   async setAvailable(category, model, Db) {
     this.available[category] = await Db.getAvailable(model)
   }
@@ -39,14 +50,21 @@ class EventManager {
     this.Clients = clients
   }
 
+  /**
+   *
+   * @param {import('discord.js').APIEmbed} embed
+   * @param {string} [clientName]
+   */
   async chatLog(embed, clientName) {
     if (clientName) {
-      if (this.Clients[clientName]?.sendMessage)
-        await this.Clients[clientName].sendMessage(embed, 'event')
+      const client = this.Clients[clientName]
+      if ('sendMessage' in client) {
+        await client.sendMessage(embed, 'event')
+      }
     } else {
       await Promise.allSettled(
         Object.values(this.Clients).map(async (client) => {
-          if (client?.sendMessage) {
+          if ('sendMessage' in client) {
             await client.sendMessage(embed, 'event')
           }
         }),
@@ -54,66 +72,73 @@ class EventManager {
     }
   }
 
-  setTimers(config, Db, Pvp) {
-    if (!config.api.queryOnSessionInit.raids) {
+  /**
+   *
+   * @param {import('./DbCheck')} Db
+   * @param {import('./PvpWrapper')} Pvp
+   */
+  setTimers(Db, Pvp) {
+    if (!config.getSafe('api.queryOnSessionInit.raids')) {
       setInterval(async () => {
-        await this.setAvailable('gyms', 'Gym', Db, true)
+        await this.setAvailable('gyms', 'Gym', Db)
         await this.chatLog({ description: 'Refreshed available raids' })
-      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.raids || 1))
+      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.raids') || 1))
     }
-    if (!config.api.queryOnSessionInit.nests) {
+    if (!config.getSafe('api.queryOnSessionInit.nests')) {
       setInterval(async () => {
-        await this.setAvailable('nests', 'Nest', Db, true)
+        await this.setAvailable('nests', 'Nest', Db)
         await this.chatLog({ description: 'Refreshed available nests' })
-      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.nests || 6))
+      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.nests') || 6))
     }
-    if (!config.api.queryOnSessionInit.pokemon) {
+    if (!config.getSafe('api.queryOnSessionInit.pokemon')) {
       setInterval(async () => {
-        await this.setAvailable('pokemon', 'Pokemon', Db, true)
+        await this.setAvailable('pokemon', 'Pokemon', Db)
         await this.chatLog({ description: 'Refreshed available pokemon' })
-      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.pokemon || 1))
+      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.pokemon') || 1))
     }
-    if (!config.api.queryOnSessionInit.quests) {
+    if (!config.getSafe('api.queryOnSessionInit.quests')) {
       setInterval(async () => {
-        await this.setAvailable('pokestops', 'Pokestop', Db, true)
+        await this.setAvailable('pokestops', 'Pokestop', Db)
         await this.chatLog({
           description: 'Refreshed available quests & invasions',
         })
-      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.quests || 3))
+      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.quests') || 3))
     }
     setInterval(async () => {
-      await this.getUicons(config.icons.styles)
+      await this.getUicons(config.getSafe('icons.styles'))
       await this.chatLog({ description: 'Refreshed UICONS indexes' })
-    }, 1000 * 60 * 60 * (config.icons.cacheHrs || 3))
-    if (config.api.pogoApiEndpoints.invasions) {
+    }, 1000 * 60 * 60 * (config.getSafe('icons.cacheHrs') || 3))
+    if (config.getSafe('api.pogoApiEndpoints.invasions')) {
       setInterval(async () => {
-        await this.getInvasions(config.api.pogoApiEndpoints.invasions)
+        await this.getInvasions(
+          config.getSafe('api.pogoApiEndpoints.invasions'),
+        )
         await this.chatLog({ description: 'Refreshed invasions masterfile' })
-      }, 1000 * 60 * 60 * (config.map.invasionCacheHrs || 1))
+      }, 1000 * 60 * 60 * (config.getSafe('map.misc.invasionCacheHrs') || 1))
     }
     setInterval(async () => {
       await Db.historicalRarity()
       await this.chatLog({
         description: 'Refreshed db historical rarity tiers',
       })
-    }, 1000 * 60 * 60 * (config.api.queryUpdateHours.historicalRarity || 6))
-    if (config.api.pogoApiEndpoints.masterfile) {
+    }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.historicalRarity') || 6))
+    if (config.getSafe('api.pogoApiEndpoints.masterfile')) {
       setInterval(async () => {
         await this.getMasterfile(Db.historical, Db.rarity)
         await this.chatLog({ description: 'Refreshed masterfile' })
-      }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
+      }, 1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6))
     }
     if (Pvp) {
       setInterval(async () => {
         log.info(HELPERS.event, 'Fetching Latest PVP Masterfile')
         Pvp.updatePokemonData(await Ohbem.fetchPokemonData())
         await this.chatLog({ description: 'Refreshed PVP masterfile' })
-      }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
+      }, 1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6))
     }
     setInterval(async () => {
-      await this.getWebhooks(config)
+      await this.getWebhooks()
       await this.chatLog({ description: 'Refreshed webhook settings' })
-    }, 1000 * 60 * 60 * (config.map.webhookCacheHrs || 1))
+    }, 1000 * 60 * 60 * (config.getSafe('map.misc.webhookCacheHrs') || 1))
 
     setInterval(async () => {
       await Db.getFilterContext()
@@ -121,13 +146,17 @@ class EventManager {
     }, 1000 * 60 * 30)
 
     const newDate = new Date()
-    config.authentication.strategies.forEach((strategy) => {
+    config.getSafe('authentication.strategies').forEach((strategy) => {
       if (strategy.enabled) {
         if (strategy.trialPeriod.start.js >= newDate) {
           log.info(
             HELPERS.event,
             'Trial period starting in',
-            +((strategy.trialPeriod.start.js - newDate) / 1000 / 60).toFixed(2),
+            +(
+              (strategy.trialPeriod.start.js.getTime() - newDate.getTime()) /
+              1000 /
+              60
+            ).toFixed(2),
             `minutes for ${strategy.name}`,
           )
           setTimeout(async () => {
@@ -136,13 +165,17 @@ class EventManager {
               { description: `Trial period has started.` },
               strategy.name,
             )
-          }, strategy.trialPeriod.start.js - newDate)
+          }, strategy.trialPeriod.start.js.getTime() - newDate.getTime())
         }
         if (strategy.trialPeriod.end.js >= newDate) {
           log.info(
             HELPERS.event,
             'Trial period ending in',
-            +((strategy.trialPeriod.end.js - newDate) / 1000 / 60).toFixed(2),
+            +(
+              (strategy.trialPeriod.end.js.getTime() - newDate.getTime()) /
+              1000 /
+              60
+            ).toFixed(2),
             `minutes for ${strategy.name}`,
           )
           setTimeout(async () => {
@@ -151,12 +184,16 @@ class EventManager {
               { description: `Trial period has ended.` },
               strategy.name,
             )
-          }, strategy.trialPeriod.end.js - newDate)
+          }, strategy.trialPeriod.end.js.getTime() - newDate.getTime())
         }
       }
     })
   }
 
+  /**
+   *
+   * @param {import('types').Config['icons']['styles']} styles
+   */
   async getUicons(styles) {
     log.info(HELPERS.event, 'Fetching Latest UICONS')
     if (!styles.some((icon) => icon.path.includes('wwm'))) {
@@ -176,6 +213,7 @@ class EventManager {
                     __dirname,
                     `../../../public/images/uicons/${style.path}/index.json`,
                   ),
+                  'utf-8',
                 ),
               )
 
@@ -204,6 +242,10 @@ class EventManager {
     this.uicons = Object.values(this.uiconsBackup)
   }
 
+  /**
+   *
+   * @param {import('types').Config['api']['pogoApiEndpoints']['invasions']} endpoint
+   */
   async getInvasions(endpoint) {
     if (endpoint) {
       log.info(HELPERS.event, 'Fetching Latest Invasions')
@@ -218,6 +260,11 @@ class EventManager {
     }
   }
 
+  /**
+   *
+   * @param {import('types').Rarity} historical
+   * @param {import('types').Rarity} dbRarity
+   */
   async getMasterfile(historical, dbRarity) {
     log.info(HELPERS.event, 'Fetching Latest Masterfile')
     try {
@@ -258,9 +305,10 @@ class EventManager {
     })
   }
 
-  async getWebhooks(config) {
+  async getWebhooks() {
     await Promise.all(
-      config.webhooks
+      config
+        .getSafe('webhooks')
         .filter((x) => x.enabled)
         .map(async (webhook) => {
           const api = new PoracleAPI(webhook)

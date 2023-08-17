@@ -24,8 +24,8 @@ export interface User {
   password?: string
   discordPerms?: Permissions
   telegramPerms?: Permissions
-  webhookStrategy?: string
-  strategy?: string
+  webhookStrategy?: Strategy
+  strategy?: Strategy
   data?: string | object
   selectedWebhook?: string
 }
