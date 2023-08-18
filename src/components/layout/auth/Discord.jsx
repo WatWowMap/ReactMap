@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, darken } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import FAIcon from '../general/FAIcon'
+import { I } from '../general/I'
 
 export default function DiscordLogin({ href, text, size }) {
   const { t } = useTranslation()
@@ -17,7 +17,7 @@ export default function DiscordLogin({ href, text, size }) {
       }}
       size={size || 'large'}
       href={href || '/auth/discord/callback'}
-      startIcon={<FAIcon className="fab fa-discord" size={size || 'large'} />}
+      startIcon={<I className="fab fa-discord" size={size || 'large'} />}
     >
       {text ? t(text) : t('login')}
     </Button>

@@ -4,7 +4,7 @@ import { Button, Typography } from '@mui/material'
 import Utility from '@services/Utility'
 
 import LinkWrapper from './LinkWrapper'
-import FAIcon from '../general/FAIcon'
+import { I } from '../general/I'
 
 export default function CustomButton({ block, isMuiColor = false }) {
   const button = (
@@ -16,7 +16,7 @@ export default function CustomButton({ block, isMuiColor = false }) {
       style={block.style || { color: isMuiColor ? 'inherit' : block.color }}
     >
       {Boolean(block.icon) && (
-        <FAIcon className={block.icon} style={{ fontSize: 30 }} />
+        <I className={block.icon} style={{ fontSize: 30 }} />
       )}
       &nbsp;
       <Typography variant="button" align="right">
