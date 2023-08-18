@@ -18,7 +18,7 @@ import FeedbackIcon from '@mui/icons-material/Feedback'
 import HeartIcon from '@mui/icons-material/Favorite'
 
 import { useStore, useStatic } from '@hooks/useStore'
-import FAIcon from '../general/FAIcon'
+import { I } from '../general/I'
 
 const importSettings = (e) => {
   const file = e.target.files[0]
@@ -160,7 +160,7 @@ export default function DrawerActions() {
           rel="noreferrer"
         >
           <ListItemIcon>
-            <FAIcon className="fab fa-discord" color="secondary" size="small" />
+            <I className="fab fa-discord" color="secondary" size="small" />
           </ListItemIcon>
           <ListItemText primary="Discord" />
         </ListItemButton>
