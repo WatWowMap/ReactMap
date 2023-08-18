@@ -32,7 +32,7 @@ import {
   useStore,
 } from '@hooks/useStore'
 
-import FAIcon from './general/FAIcon'
+import { I } from './general/I'
 import { setModeBtn, useWebhookStore } from './dialogs/webhooks/store'
 
 /** @typedef {keyof ReturnType<typeof useLayoutStore['getState']> | keyof ReturnType<typeof useScanStore['getState']>} Keys */
@@ -247,7 +247,7 @@ export default function FloatingButtons() {
           target={icon.target || '_blank'}
           disabled={disabled}
         >
-          <FAIcon className={icon.icon} size={iconSize} />
+          <I className={icon.icon} size={iconSize} />
         </Fab>
       ))}
     </Stack>

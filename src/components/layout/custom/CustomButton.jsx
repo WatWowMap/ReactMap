@@ -2,7 +2,7 @@ import * as React from 'react'
 import { darken } from '@mui/material/styles'
 import Button from '@mui/material/Button'
 
-import FAIcon from '../general/FAIcon'
+import { I } from '../general/I'
 
 const THEME_COLORS = new Set([
   'success',
@@ -39,9 +39,7 @@ export default function CustomButton({
               : 'inherit',
         },
       }}
-      startIcon={
-        icon ? <FAIcon className={icon} style={{ fontSize: 30 }} /> : null
-      }
+      startIcon={icon ? <I className={icon} style={{ fontSize: 30 }} /> : null}
     >
       {children}
     </Button>
