@@ -108,6 +108,7 @@ export default function Map({ params }) {
     }
   }, [settings.navigationControls, map])
 
+  if (!Icons) return null
   return (
     <>
       <TileLayer {...tileLayer} />

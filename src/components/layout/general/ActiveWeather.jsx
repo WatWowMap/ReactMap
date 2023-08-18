@@ -4,13 +4,12 @@ import { Dialog, DialogContent } from '@mui/material'
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { point, polygon } from '@turf/helpers'
 
-import { useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import WeatherPopup from '@components/popups/Weather'
 import Header from './Header'
 import Footer from './Footer'
 
 export default function ActiveWeather({
-  Icons,
   timeOfDay,
   map,
   zoom,
@@ -19,6 +18,8 @@ export default function ActiveWeather({
   clickable,
 }) {
   const location = useStore((state) => state.location)
+  const Icons = useStatic((state) => state.Icons)
+
   const [open, setOpen] = useState(false)
 
   const [{ disableColorShift = false }] = Icons.getModifiers('weather')
