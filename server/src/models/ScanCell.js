@@ -11,10 +11,10 @@ class ScanCell extends Model {
 
   /**
    *
-   * @param {import('types').Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import('types').DbContext} context
-   * @returns {Promise<import('types').FullScanCell[]>}
+   * @param {import("@rm/types").DbContext} context
+   * @returns {Promise<import("@rm/types").FullScanCell[]>}
    */
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms

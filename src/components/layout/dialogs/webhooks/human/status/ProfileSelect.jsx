@@ -19,7 +19,7 @@ const STYLE = { minWidth: 100 }
 export function ProfileSelect() {
   const currentProfile = useWebhookStore((s) => s.human.current_profile_no || 0)
 
-  /** @type {import('@apollo/client').ApolloQueryResult<{ webhook: { profile: import('types').PoracleProfile[] } }>} */
+  /** @type {import('@apollo/client').ApolloQueryResult<{ webhook: { profile: import("@rm/types").PoracleProfile[] } }>} */
   const { data: profiles, loading } = useQuery(allProfiles, {
     fetchPolicy: 'no-cache',
     variables: {

@@ -10,7 +10,7 @@ const getAreaSql = require('../services/functions/getAreaSql')
 const { searchResultsLimit, queryLimits } = config.getSafe('api')
 const { avgFilter } = config.getSafe('defaultFilters.nests')
 
-/** @typedef {Nest & Partial<import('types').Nest>} FullNest */
+/** @typedef {Nest & Partial<import("@rm/types").Nest>} FullNest */
 
 class Nest extends Model {
   static get tableName() {
@@ -23,9 +23,9 @@ class Nest extends Model {
 
   /**
    *
-   * @param {import('types').Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import('types').DbContext} ctx
+   * @param {import("@rm/types").DbContext} ctx
    * @returns {Promise<FullNest[]>}
    */
   static async getAll(perms, args, { polygon }) {
@@ -133,9 +133,9 @@ class Nest extends Model {
 
   /**
    *
-   * @param {import('types').Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import('types').DbContext} ctx
+   * @param {import("@rm/types").DbContext} ctx
    * @param {import('objection').Raw} distance
    * @returns {Promise<FullNest[]>}
    */

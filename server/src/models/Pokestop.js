@@ -961,7 +961,7 @@ class Pokestop extends Model {
 
   /**
    *
-   * @param {import('types').DbContext} param0
+   * @param {import("@rm/types").DbContext} param0
    * @returns
    */
   static async getAvailable({

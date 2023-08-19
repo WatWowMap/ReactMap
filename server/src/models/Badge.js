@@ -37,7 +37,7 @@ class Badge extends Model {
    * @param {number} userId
    * @param {'>' | '>=' | '<' | '<=' | '='} operator
    * @param {number} badge
-   * @returns {Promise<import('types/models').FullGymBadge[]>}
+   * @returns {Promise<import('@packages/types/models').FullGymBadge[]>}
    */
   static async getAll(userId, operator = '>', badge = 0) {
     return this.query()

@@ -7,7 +7,7 @@ const BaseFilter = require('../Base')
 
 /**
  *
- * @param {import('types').Config['defaultFilters']} defaults
+ * @param {import("@rm/types").Config['defaultFilters']} defaults
  * @param {import('../pokemon/Frontend')} base
  * @param {*} custom
  * @returns

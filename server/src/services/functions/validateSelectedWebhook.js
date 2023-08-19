@@ -1,9 +1,9 @@
 // @ts-check
 /**
  *
- * @param {import("types").User} user
- * @param {import("types").GqlContext['Db']} Db
- * @param {import("types").GqlContext['Event']} Event
+ * @param {import("@rm/types").User} user
+ * @param {import("@rm/types").GqlContext['Db']} Db
+ * @param {import("@rm/types").GqlContext['Event']} Event
  */
 async function validateSelectedWebhook(user, Db, Event) {
   if (user?.perms?.webhooks === undefined || user.perms.webhooks.length === 0)

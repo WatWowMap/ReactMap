@@ -20,7 +20,7 @@ function filterRTree(item, areaRestrictions = [], onlyAreas = []) {
 
   if (!consolidatedAreas.size) return true
 
-  /** @type {import('types').RMGeoJSON['features']} */
+  /** @type {import("@rm/types").RMGeoJSON['features']} */
   const foundFeatures = config
     .getSafe('areas.myRTree')
     .search({

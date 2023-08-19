@@ -53,7 +53,7 @@ class User extends Model {
   /**
    *
    * @param {number} id
-   * @returns {Promise<import('types/models').FullUser | null>}
+   * @returns {Promise<import('@packages/types/models').FullUser | null>}
    */
   static async getOne(id) {
     return this.query().findOne({ id })
@@ -63,7 +63,7 @@ class User extends Model {
    *
    * @param {number} id
    * @param {string} selectedWebhook
-   * @returns {Promise<import('types/models').FullUser | null>}
+   * @returns {Promise<import('@packages/types/models').FullUser | null>}
    */
   static async updateWebhook(id, selectedWebhook) {
     await this.query().update({ selectedWebhook }).where({ id })

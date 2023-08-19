@@ -4,11 +4,11 @@ const fetchJson = require('./fetchJson')
 const PLATFORMS = /** @type {const} */ (['discord', 'telegram'])
 
 /**
- * @typedef {import('types').PoracleAPIRef} APIReference
- * @typedef {import('types').PoracleAPIInput} APIInput
- * @typedef {import('types').PoracleCategory} Category
- * @typedef {import('types').PoracleAction} Action
- * @typedef {import('types').HttpMethod} Method
+ * @typedef {import("@rm/types").PoracleAPIRef} APIReference
+ * @typedef {import("@rm/types").PoracleAPIInput} APIInput
+ * @typedef {import("@rm/types").PoracleCategory} Category
+ * @typedef {import("@rm/types").PoracleAction} Action
+ * @typedef {import("@rm/types").HttpMethod} Method
  */
 
 const APIS = /** @type {APIReference} */ ({
@@ -39,7 +39,7 @@ const SUBCATEGORIES = /** @type {const} */ ({
 })
 
 class PoracleAPI {
-  /** @param {import('types').Config['webhooks'][number]} webhook */
+  /** @param {import("@rm/types").Config['webhooks'][number]} webhook */
   constructor(webhook) {
     if (!webhook.name)
       throw new Error('PoracleAPI: name is required', { cause: webhook })
@@ -69,7 +69,7 @@ class PoracleAPI {
     this.prefix = '!'
     this.locale = 'en'
     this.gymBattles = false
-    /** @type {import('types').RMGeoJSON} */
+    /** @type {import("@rm/types").RMGeoJSON} */
     this.geojson = { features: [], type: 'FeatureCollection' }
     this.templates = { discord: {}, telegram: {} }
 
@@ -116,7 +116,7 @@ class PoracleAPI {
 
   /**
    *
-   * @param {import('types').User} user
+   * @param {import("@rm/types").User} user
    * @returns
    */
   static getWebhookId(user) {
@@ -140,7 +140,7 @@ class PoracleAPI {
    * @returns
    */
   async getUserAreas(userId) {
-    /** @type {{ areas: import('types').PoracleHumanArea[] }} */
+    /** @type {{ areas: import("@rm/types").PoracleHumanArea[] }} */
     const { areas } = await this.#sendRequest(APIS.humans(userId))
     const areaGroups = areas.reduce((groupMap, area) => {
       if (area.userSelectable) {
@@ -240,7 +240,7 @@ class PoracleAPI {
   }
 
   async #fetchGeojson() {
-    /** @type {{ geoJSON: import('types').RMGeoJSON }} */
+    /** @type {{ geoJSON: import("@rm/types").RMGeoJSON }} */
     const { geoJSON } = await this.#sendRequest(APIS.geofence)
     if (geoJSON?.features) {
       this.geojson.features = geoJSON.features.filter(
@@ -359,8 +359,8 @@ class PoracleAPI {
 
   /**
    *
-   * @param {import('types').PoracleProfile<false>[]} profiles
-   * @returns {import('types').PoracleProfile[]}
+   * @param {import("@rm/types").PoracleProfile<false>[]} profiles
+   * @returns {import("@rm/types").PoracleProfile[]}
    */
   static #processProfiles(profiles) {
     return profiles.map((profile) => ({
@@ -368,7 +368,7 @@ class PoracleAPI {
       area: profile.area ? JSON.parse(profile.area) : [],
       active_hours:
         profile.active_hours && profile.active_hours !== '{}'
-          ? /** @type {import('types').PoracleActiveHours[]} */ (
+          ? /** @type {import("@rm/types").PoracleActiveHours[]} */ (
               JSON.parse(profile.active_hours)
             )
               .sort((a, b) =>
@@ -437,7 +437,7 @@ class PoracleAPI {
    * @param {T} category
    * @param {Method} method
    * @param {any} data
-   * @returns {Promise<import('types').APIReturnType[import('types').Split<T, '-'>[0]]>}
+   * @returns {Promise<import("@rm/types").APIReturnType[import("@rm/types").Split<T, '-'>[0]]>}
    */
   async api(userId, category, method = 'GET', data = null) {
     const [main, action] = PoracleAPI.#split(category)
@@ -536,7 +536,7 @@ class PoracleAPI {
    */
   static #split(category) {
     const [main, action] =
-      /** @type {import('types').Split<typeof category, '-'>} */ (
+      /** @type {import("@rm/types").Split<typeof category, '-'>} */ (
         category.split('-', 2)
       )
     return [main, action]

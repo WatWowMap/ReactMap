@@ -209,7 +209,7 @@ const checkExtraJsons = (fileName, domain = '') => {
   return generalJson
 }
 
-/** @param {Partial<import('types').Config['map']>} */
+/** @param {Partial<import("@rm/types").Config['map']>} */
 const mergeMapConfig = (obj) => {
   if (process.env.TELEGRAM_BOT_NAME && !obj?.customRoutes?.telegramBotName) {
     if (obj.customRoutes)

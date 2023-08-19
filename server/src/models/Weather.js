@@ -30,7 +30,7 @@ class Weather extends Model {
       const ms = ts - config.getSafe('api.weatherCellLimit') * 60 * 60 * 24
       query.where('updated', '>=', ms)
     }
-    /** @type {import('types').FullWeather[]} */
+    /** @type {import("@rm/types").FullWeather[]} */
     const results = await query
 
     const areas = config.getSafe('areas')

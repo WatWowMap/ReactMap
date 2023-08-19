@@ -42,7 +42,7 @@ class Backup extends Model {
    *
    * @param {number} id
    * @param {number} userId
-   * @returns {Promise<import('types/models').FullBackup>}
+   * @returns {Promise<import('@packages/types/models').FullBackup>}
    */
   static async getOne(id, userId) {
     return this.query().findById(id).where('userId', userId)
@@ -51,7 +51,7 @@ class Backup extends Model {
   /**
    *
    * @param {number} userId
-   * @returns {Promise<import('types/models').FullBackup[]>}
+   * @returns {Promise<import('@packages/types/models').FullBackup[]>}
    */
   static async getAll(userId) {
     return this.query()

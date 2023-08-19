@@ -1,26 +1,26 @@
-import { LEAGUES } from '../server/src/services/filters/pokemon/constants'
+import { LEAGUES } from 'server/src/services/filters/pokemon/constants'
 import type {
   ScannerModels,
   ScannerModelKeys,
   RmModels,
   RmModelKeys,
   ModelKeys,
-} from '../server/src/models'
+} from 'server/src/models'
 import { Knex } from 'knex'
 import { Model } from 'objection'
 import { Request, Response } from 'express'
 import { Transaction } from '@sentry/node'
 import { VerifyCallback } from 'passport-oauth2'
 
-import DbCheck = require('../server/src/services/DbCheck')
-import EventManager = require('../server/src/services/EventManager')
-import Pokemon = require('../server/src/models/Pokemon')
-import Gym = require('../server/src/models/Gym')
-import Badge = require('../server/src/models/Badge')
-import Backup = require('../server/src/models/Backup')
-import Nest = require('../server/src/models/Nest')
-import NestSubmission = require('../server/src/models/NestSubmission')
-import Pokestop = require('../server/src/models/Pokestop')
+import DbCheck = require('../../server/src/services/DbCheck')
+import EventManager = require('../../server/src/services/EventManager')
+import Pokemon = require('../../server/src/models/Pokemon')
+import Gym = require('../../server/src/models/Gym')
+import Badge = require('../../server/src/models/Badge')
+import Backup = require('../../server/src/models/Backup')
+import Nest = require('../../server/src/models/Nest')
+import NestSubmission = require('../../server/src/models/NestSubmission')
+import Pokestop = require('../../server/src/models/Pokestop')
 import { ModelReturn } from './utility'
 import { Profile } from 'passport-discord'
 export interface DbContext {

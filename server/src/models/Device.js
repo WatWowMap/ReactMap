@@ -10,10 +10,10 @@ class Device extends Model {
 
   /**
    *
-   * @param {import('types').Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import('types').DbContext} context
-   * @returns {Promise<import('types').FullDevice[]>}
+   * @param {import("@rm/types").DbContext} context
+   * @returns {Promise<import("@rm/types").FullDevice[]>}
    */
   static async getAll(perms, args, context) {
     const { areaRestrictions } = perms

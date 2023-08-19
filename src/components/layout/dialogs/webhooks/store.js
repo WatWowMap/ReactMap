@@ -13,18 +13,18 @@ import { create } from 'zustand'
  *   message: string | import('react').ReactNode
  *  }
  *  multipleHooks: boolean
- *  human: Partial<import('types').PoracleHuman>
- *  profile: import('types').PoracleProfile[]
- *  pokemon: import('types').PoraclePokemon[]
- *  raid: import('types').PoracleRaid[]
- *  egg: import('types').PoracleEgg[]
- *  invasion: import('types').PoracleInvasion[]
- *  lure: import('types').PoracleLure[]
- *  nest: import('types').PoracleNest[]
- *  quest: import('types').PoracleQuest[]
- *  gym: import('types').PoracleGym[]
- *  category: keyof import('types').PoracleUI
- *  context: Partial<import('types').PoracleClientContext>
+ *  human: Partial<import("@rm/types").PoracleHuman>
+ *  profile: import("@rm/types").PoracleProfile[]
+ *  pokemon: import("@rm/types").PoraclePokemon[]
+ *  raid: import("@rm/types").PoracleRaid[]
+ *  egg: import("@rm/types").PoracleEgg[]
+ *  invasion: import("@rm/types").PoracleInvasion[]
+ *  lure: import("@rm/types").PoracleLure[]
+ *  nest: import("@rm/types").PoracleNest[]
+ *  quest: import("@rm/types").PoracleQuest[]
+ *  gym: import("@rm/types").PoracleGym[]
+ *  category: keyof import("@rm/types").PoracleUI
+ *  context: Partial<import("@rm/types").PoracleClientContext>
  *  groupedAreas: Record<string, import('@turf/helpers').Feature[]>
  *  trackedSearch: string
  *  selected: Record<string, boolean>

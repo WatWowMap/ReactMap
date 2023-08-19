@@ -30,7 +30,7 @@ class NestSubmission extends Model {
   /**
    *
    * @param {number} [userId]
-   * @returns {Promise<import('types/models').FullNestSubmission[]>}
+   * @returns {Promise<import('@packages/types/models').FullNestSubmission[]>}
    */
   static async getAllByUser(userId) {
     return this.query().where('user_id', userId)
@@ -39,7 +39,7 @@ class NestSubmission extends Model {
   /**
    *
    * @param {number[]} nestIds
-   * @returns {Promise<import('types/models').FullNestSubmission[]>}
+   * @returns {Promise<import('@packages/types/models').FullNestSubmission[]>}
    */
   static async getAllByIds(nestIds) {
     return this.query().whereIn('nest_id', nestIds)
@@ -48,7 +48,7 @@ class NestSubmission extends Model {
   /**
    *
    * @param {string} name
-   * @returns {Promise<import('types/models').FullNestSubmission[]>}
+   * @returns {Promise<import('@packages/types/models').FullNestSubmission[]>}
    */
   static async search(name) {
     return this.query().where('name', 'like', `%${name}%`)
@@ -67,7 +67,7 @@ class NestSubmission extends Model {
       userInfo.submitted_by &&
       userInfo.user_id
     ) {
-      /** @type {import('types/models').FullNestSubmission} */
+      /** @type {import('@packages/types/models').FullNestSubmission} */
       const nest = await this.query().findById(nestInfo.nest_id)
       if (nest) {
         await nest.$query().patch({ ...nestInfo, ...userInfo })

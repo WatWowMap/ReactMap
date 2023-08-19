@@ -20,7 +20,7 @@ StyledChip.defaultProps = /** @type {const} */ ({
   color: 'secondary',
 })
 
-/** @param {import('types').PoracleActiveHours & { uid: number }} props */
+/** @param {import("@rm/types").PoracleActiveHours & { uid: number }} props */
 export const ActiveHourChip = ({ day, hours, mins, uid, id }) => {
   const { t } = useTranslation()
   const [save] = useMutation(setProfile, {

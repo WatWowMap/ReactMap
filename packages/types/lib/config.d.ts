@@ -1,6 +1,6 @@
 import { LogLevelNames } from 'loglevel'
-import config = require('../server/src/configs/default.json')
-import example = require('../server/src/configs/local.example.json')
+import config = require('server/src/configs/default.json')
+import example = require('server/src/configs/local.example.json')
 
 import { Schema } from './server'
 

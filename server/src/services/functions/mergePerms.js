@@ -2,11 +2,11 @@
 
 /**
  *
- * @param {import("types").Permissions} existingPerms
- * @param {import("types").Permissions} incomingPerms
+ * @param {import("@rm/types").Permissions} existingPerms
+ * @param {import("@rm/types").Permissions} incomingPerms
  */
 function mergePerms(existingPerms, incomingPerms) {
-  return /** @type {import("types").Permissions} */ (
+  return /** @type {import("@rm/types").Permissions} */ (
     Object.fromEntries(
       Object.keys(existingPerms).map((key) => [
         key,

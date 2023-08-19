@@ -40,11 +40,6 @@
   },
   "devDependencies": {
     "@sentry/vite-plugin": "2.2.1",
-    "@types/config": "^3.3.0",
-    "@types/express": "^4.17.17",
-    "@types/passport-discord": "^0.1.6",
-    "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "4.0.0",
     "eslint": "^8.44.0",
     "eslint-config-airbnb": "^19.0.4",

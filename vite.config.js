@@ -82,6 +82,7 @@ const localePlugin = (isDevelopment) => ({
 const viteConfig = defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
   const isRelease = process.argv.includes('-r')
+  const isDevelopment = mode === 'development'
   const serverPort = +(env.PORT || config.getSafe('port') || '8080')
 
   const pkg = JSON.parse(
@@ -109,7 +110,7 @@ const viteConfig = defineConfig(async ({ mode }) => {
       react({
         jsxRuntime: 'classic',
       }),
-      ...(mode === 'development'
+      ...(isDevelopment
         ? [
             checker({
               overlay: {
@@ -121,7 +122,7 @@ const viteConfig = defineConfig(async ({ mode }) => {
             }),
           ]
         : []),
-      ...(hasCustom ? [customFilePlugin(mode === 'development')] : []),
+      ...(hasCustom ? [customFilePlugin(isDevelopment)] : []),
       viteStaticCopy({
         targets: [
           {
@@ -144,9 +145,9 @@ const viteConfig = defineConfig(async ({ mode }) => {
             }),
           ]
         : []),
-      localePlugin(mode === 'development'),
+      localePlugin(isDevelopment),
     ],
-    optimizeDeps: mode === 'development' ? { exclude: ['@mui/*'] } : undefined,
+    optimizeDeps: isDevelopment ? { exclude: ['@mui/*'] } : undefined,
     publicDir: 'public',
     resolve: {
       alias: {
@@ -178,9 +179,9 @@ const viteConfig = defineConfig(async ({ mode }) => {
     build: {
       target: ['safari11.1', 'chrome64', 'firefox66', 'edge88'],
       outDir: resolve(__dirname, './dist'),
-      sourcemap: mode === 'development' || isRelease,
+      sourcemap: isDevelopment || isRelease,
       minify:
-        mode === 'development' || config.getSafe('devOptions.skipMinified')
+        isDevelopment || config.getSafe('devOptions.skipMinified')
           ? false
           : 'esbuild',
       input: { main: resolve(__dirname, 'index.html') },

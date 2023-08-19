@@ -17,7 +17,7 @@ const capCamel = (str) =>
 /**
  * Map permissions to a string
  * @param {string[]} perms
- * @param {import('types').Permissions} userPerms
+ * @param {import("@rm/types").Permissions} userPerms
  */
 const mapPerms = (perms, userPerms) =>
   perms
@@ -29,7 +29,7 @@ const mapPerms = (perms, userPerms) =>
 /**
  * Log user authentication to Discord
  * @param {import('express').Request} req
- * @param {{ id: string, username: string, perms: import('types').Permissions, valid: boolean, avatar: string }} user
+ * @param {{ id: string, username: string, perms: import("@rm/types").Permissions, valid: boolean, avatar: string }} user
  * @param {string} strategy
  * @returns {Promise<import('discord.js').APIEmbed>}
  */

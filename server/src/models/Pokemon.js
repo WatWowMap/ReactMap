@@ -74,9 +74,9 @@ class Pokemon extends Model {
   }
 
   /**
-   * @param {import("types").Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import("types").DbContext} ctx
+   * @param {import("@rm/types").DbContext} ctx
    * @returns {{ filterMap: Record<string, PkmnFilter>, globalFilter: PkmnFilter }}
    */
   static getFilters(perms, args, ctx) {
@@ -119,10 +119,10 @@ class Pokemon extends Model {
   }
 
   /**
-   * @param {import("types").Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import("types").DbContext} ctx
-   * @returns {Promise<Partial<import('types').Pokemon>[]>}
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
@@ -241,7 +241,7 @@ class Pokemon extends Model {
       }
     }
 
-    /** @type {import("types").Pokemon[]} */
+    /** @type {import("@rm/types").Pokemon[]} */
     const results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/scan` : null,
       mem
@@ -370,7 +370,7 @@ class Pokemon extends Model {
   }
 
   /**
-   * @template [T=import('types').Pokemon[]]
+   * @template [T=import("@rm/types").Pokemon[]]
    * @param {string} mem
    * @param {string | import("objection").QueryBuilder<Pokemon>} query
    * @param {'GET' | 'POST' | 'PATCH' | 'DELETE'} method
@@ -410,10 +410,10 @@ class Pokemon extends Model {
   }
 
   /**
-   * @param {import("types").Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import("types").DbContext} ctx
-   * @returns {Promise<Partial<import('types').Pokemon>[]>}
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async getLegacy(perms, args, ctx) {
     const { isMad, hasSize, hasHeight, mem, secret } = ctx
@@ -503,12 +503,12 @@ class Pokemon extends Model {
   }
 
   /**
-   * @param {import("types").DbContext} ctx
+   * @param {import("@rm/types").DbContext} ctx
    */
   static async getAvailable({ isMad, mem, secret }) {
     const ts = Math.floor(Date.now() / 1000)
 
-    /** @type {import('types').AvailablePokemon[]} */
+    /** @type {import("@rm/types").AvailablePokemon[]} */
     const available = await this.evalQuery(
       mem ? `${mem}/api/pokemon/available` : null,
       mem
@@ -536,8 +536,8 @@ class Pokemon extends Model {
 
   /**
    * @param {string} id
-   * @param {import("types").DbContext} ctx
-   * @returns {Promise<import('types').Pokemon>}
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<import("@rm/types").Pokemon>}
    */
   static getOne(id, { isMad, mem, secret }) {
     return this.evalQuery(
@@ -557,11 +557,11 @@ class Pokemon extends Model {
   }
 
   /**
-   * @param {import("types").Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import("types").DbContext} ctx
+   * @param {import("@rm/types").DbContext} ctx
    * @param {number} distance
-   * @returns {Promise<Partial<import('types').Pokemon>[]>}
+   * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async search(perms, args, { isMad, mem, secret }, distance) {
     const { search, locale, onlyAreas = [] } = args

@@ -54,7 +54,7 @@ export function ScanZonePopup() {
 /**
  *
  * @param {{
- *  name: keyof import('types').OnlyType<import('@hooks/useStore').UseScanStore, number>,
+ *  name: keyof import("@rm/types").OnlyType<import('@hooks/useStore').UseScanStore, number>,
  * } & import('@mui/material').SliderProps} props
  * @returns
  */

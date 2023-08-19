@@ -14,10 +14,10 @@ class Portal extends Model {
 
   /**
    *
-   * @param {import('types').Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import('types').DbContext} _ctx
-   * @returns {Promise<import('types').FullPortal[]>}
+   * @param {import("@rm/types").DbContext} _ctx
+   * @returns {Promise<import("@rm/types").FullPortal[]>}
    */
   // eslint-disable-next-line no-unused-vars
   static async getAll(perms, args, _ctx) {
@@ -45,11 +45,11 @@ class Portal extends Model {
 
   /**
    *
-   * @param {import('types').Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import('types').DbContext} context
+   * @param {import("@rm/types").DbContext} context
    * @param {ReturnType<typeof import('objection').raw>} distance
-   * @returns {Promise<import('types').FullPortal[]>}
+   * @returns {Promise<import("@rm/types").FullPortal[]>}
    */
   static async search(perms, args, { isMad }, distance) {
     const { areaRestrictions } = perms
@@ -73,7 +73,7 @@ class Portal extends Model {
   /**
    *
    * @param {number} id
-   * @returns {Promise<import('types').FullPortal>}
+   * @returns {Promise<import("@rm/types").FullPortal>}
    */
   static async getOne(id) {
     return this.query().findById(id).select(['lat', 'lon'])

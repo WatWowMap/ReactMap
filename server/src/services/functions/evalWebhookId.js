@@ -1,6 +1,6 @@
 // @ts-check
 
-/** @param {import("types").User} user */
+/** @param {import("@rm/types").User} user */
 function evalWebhookId(user) {
   if (!user) {
     return ''

@@ -31,12 +31,12 @@ router.get('/export', async (req, res) => {
       api.reactMapSecret &&
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
-      /** @type {import('types/models').FullUser[]} */
+      /** @type {import('@packages/types/models').FullUser[]} */
       const users = await Db.models.User.query()
 
       const badges = {}
 
-      /** @type {import('types/models').FullGymBadge[]} */
+      /** @type {import('@packages/types/models').FullGymBadge[]} */
       const rawBadges = await Db.models.Badge.query()
       // eslint-disable-next-line no-unused-vars
       rawBadges.forEach(({ userId, id, ...rest }) => {
@@ -47,7 +47,7 @@ router.get('/export', async (req, res) => {
       })
 
       const backups = {}
-      /** @type {import('types/models').FullBackup[]} */
+      /** @type {import('@packages/types/models').FullBackup[]} */
       const rawBackups = await Db.models.Backup.query()
 
       // eslint-disable-next-line no-unused-vars
@@ -84,8 +84,8 @@ router.post('/import', async (req, res) => {
       const bodyArray = Array.isArray(body) ? body : [body]
 
       /**
-       * @param {import('types/models').User} user
-       * @returns {Promise<import('types/models').FullUser>}
+       * @param {import('@packages/types/models').User} user
+       * @returns {Promise<import('@packages/types/models').FullUser>}
        */
       const getUser = async (user) => {
         if (user.username) {

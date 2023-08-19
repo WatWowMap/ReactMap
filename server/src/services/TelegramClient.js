@@ -16,7 +16,7 @@ const mergePerms = require('./functions/mergePerms')
 class TelegramClient {
   /**
    *
-   * @param {import('types').Config['authentication']['strategies'][number]} strategy
+   * @param {import("@rm/types").Config['authentication']['strategies'][number]} strategy
    * @param {string} rmStrategy
    */
   constructor(strategy, rmStrategy) {
@@ -74,7 +74,7 @@ class TelegramClient {
    *
    * @param {TGUser} user
    * @param {string[]} groups
-   * @returns {TGUser & { perms: import('types').Permissions }}
+   * @returns {TGUser & { perms: import("@rm/types").Permissions }}
    */
   getUserPerms(user, groups) {
     const date = new Date()
@@ -122,7 +122,7 @@ class TelegramClient {
       return done(null, false, { message: 'access_denied' })
     }
     try {
-      /** @type {import('types/models').FullUser} */
+      /** @type {import('@packages/types/models').FullUser} */
       const userExists = await Db.models.User.query().findOne({
         telegramId: user.id,
       })
@@ -153,7 +153,7 @@ class TelegramClient {
           perms: mergePerms(req.user.perms, user.perms),
         })
       }
-      /** @type {import('types/models').FullUser} */
+      /** @type {import('@packages/types/models').FullUser} */
       const newUser = await Db.models.User.query().insertAndFetch({
         telegramId: user.id,
         strategy: user.provider,

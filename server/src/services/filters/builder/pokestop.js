@@ -6,8 +6,8 @@ const { Event } = require('../../initialization')
 
 /**
  *
- * @param {import('types').Permissions} perms
- * @param {import('types').Config['defaultFilters']['pokestops']} defaults
+ * @param {import("@rm/types").Permissions} perms
+ * @param {import("@rm/types").Config['defaultFilters']['pokestops']} defaults
  * @returns
  */
 function buildPokestops(perms, defaults) {

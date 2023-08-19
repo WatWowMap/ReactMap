@@ -55,7 +55,7 @@ export function useGetHookContext() {
  *
  * @template {import('./store').WebhookStore['category'] | 'profile'} T
  * @param {T} category
- * @returns {{ data: T extends 'human' ? { webhooks: string[], selected: string } : import('types').APIReturnType[T], loading: boolean }}
+ * @returns {{ data: T extends 'human' ? { webhooks: string[], selected: string } : import("@rm/types").APIReturnType[T], loading: boolean }}
  */
 export function useGetWebhookData(category) {
   const { t } = useTranslation()

@@ -17,7 +17,7 @@ const mergePerms = require('./functions/mergePerms')
 class DiscordClient {
   /**
    *
-   * @param {import('types').Config['authentication']['strategies'][number]} strategy
+   * @param {import("@rm/types").Config['authentication']['strategies'][number]} strategy
    * @param {string} rmStrategy
    */
   constructor(strategy, rmStrategy) {
@@ -107,7 +107,7 @@ class DiscordClient {
   /**
    *
    * @param {import('passport-discord').Profile} user
-   * @returns {Promise<import('types').Permissions>}
+   * @returns {Promise<import("@rm/types").Permissions>}
    */
   async getPerms(user) {
     const date = new Date()
@@ -116,7 +116,7 @@ class DiscordClient {
       date >= this.strategy.trialPeriod.start.js &&
       date <= this.strategy.trialPeriod.end.js
 
-    /** @type {import('types').Permissions} */
+    /** @type {import("@rm/types").Permissions} */
     // @ts-ignore
     const perms = Object.fromEntries(
       Object.entries(this.perms).map(([k, v]) => [
@@ -255,9 +255,9 @@ class DiscordClient {
    * @param {string} _accessToken
    * @param {string} _refreshToken
    * @param {import('passport-discord').Profile} profile
-   * @param {(err: Error | null, user?: import('types').User, info?: { message: string }) => void} done
+   * @param {(err: Error | null, user?: import("@rm/types").User, info?: { message: string }) => void} done
    */
-  /** @type {import('types').DiscordVerifyFunction} */
+  /** @type {import("@rm/types").DiscordVerifyFunction} */
   async authHandler(req, _accessToken, _refreshToken, profile, done) {
     if (!req.query.code) {
       throw new Error('NoCodeProvided')
@@ -293,7 +293,7 @@ class DiscordClient {
         delete discordUser.guilds
       }
 
-      /** @type {import('types/models').FullUser} */
+      /** @type {import('@packages/types/models').FullUser} */
       const userExists = await Db.models.User.query().findOne(
         req.user ? { id: req.user.id } : { discordId: discordUser.id },
       )
@@ -305,7 +305,7 @@ class DiscordClient {
             webhookStrategy: 'discord',
           })
           .where('id', req.user.id)
-        /** @type {import('types/models').FullUser} */
+        /** @type {import('@packages/types/models').FullUser} */
         const oldUser = await Db.models.User.query()
           .where('discordId', discordUser.id)
           .whereNot('id', req.user.id)
@@ -333,7 +333,7 @@ class DiscordClient {
           perms: mergePerms(req.user.perms, discordUser.perms),
         })
       }
-      /** @type {import('types/models').FullUser} */
+      /** @type {import('@packages/types/models').FullUser} */
       const newUser = await Db.models.User.query().insertAndFetch({
         discordId: discordUser.id,
         strategy: 'discord',

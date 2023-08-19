@@ -8,10 +8,10 @@ const RTree = require('rtree')
 const config = require('config')
 const { log, HELPERS } = require('@rm/logger')
 
-/** @type {import('types').RMGeoJSON} */
+/** @type {import("@rm/types").RMGeoJSON} */
 const DEFAULT_RETURN = { type: 'FeatureCollection', features: [] }
 
-/** @type {import('types').RMGeoJSON} */
+/** @type {import("@rm/types").RMGeoJSON} */
 const manualGeojson = {
   type: 'FeatureCollection',
   features: config
@@ -146,8 +146,8 @@ const loadScanPolygons = async (fileName, domain) => {
 
 /**
  *
- * @param {Record<string, import('types').RMGeoJSON>} scanAreas
- * @returns {import('types').RMGeoJSON}
+ * @param {Record<string, import("@rm/types").RMGeoJSON>} scanAreas
+ * @returns {import("@rm/types").RMGeoJSON}
  */
 const loadAreas = (scanAreas) => {
   try {
@@ -176,9 +176,9 @@ const loadAreas = (scanAreas) => {
   }
 }
 
-/** @param {import('types').RMGeoJSON} featureCollection */
+/** @param {import("@rm/types").RMGeoJSON} featureCollection */
 const parseAreas = (featureCollection) => {
-  /** @type {Record<string, import('types').RMGeoJSON['features'][number]['geometry']>} */
+  /** @type {Record<string, import("@rm/types").RMGeoJSON['features'][number]['geometry']>} */
   const polygons = {}
   /** @type {Set<string>} */
   const names = new Set()
@@ -238,7 +238,7 @@ const parseAreas = (featureCollection) => {
 const getAreas = async () => {
   const main = config.getSafe('map.general.geoJsonFileName')
 
-  /** @type {Record<string, import('types').RMGeoJSON>} */
+  /** @type {Record<string, import("@rm/types").RMGeoJSON>} */
   const scanAreas = {
     main: await loadScanPolygons(main),
     ...Object.fromEntries(

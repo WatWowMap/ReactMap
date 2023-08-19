@@ -11,7 +11,7 @@ const PoracleAPI = require('./api/Poracle')
 
 class EventManager {
   constructor() {
-    /** @type {import('types').Masterfile} */
+    /** @type {import("@rm/types").Masterfile} */
     this.masterfile = JSON.parse(
       readFileSync(path.resolve(__dirname, '../data/masterfile.json'), 'utf-8'),
     )
@@ -191,7 +191,7 @@ class EventManager {
 
   /**
    *
-   * @param {import('types').Config['icons']['styles']} styles
+   * @param {import("@rm/types").Config['icons']['styles']} styles
    */
   async getUicons(styles) {
     log.info(HELPERS.event, 'Fetching Latest UICONS')
@@ -243,7 +243,7 @@ class EventManager {
 
   /**
    *
-   * @param {import('types').Config['api']['pogoApiEndpoints']['invasions']} endpoint
+   * @param {import("@rm/types").Config['api']['pogoApiEndpoints']['invasions']} endpoint
    */
   async getInvasions(endpoint) {
     if (endpoint) {
@@ -261,8 +261,8 @@ class EventManager {
 
   /**
    *
-   * @param {import('types').Rarity} historical
-   * @param {import('types').Rarity} dbRarity
+   * @param {import("@rm/types").Rarity} historical
+   * @param {import("@rm/types").Rarity} dbRarity
    */
   async getMasterfile(historical, dbRarity) {
     log.info(HELPERS.event, 'Fetching Latest Masterfile')

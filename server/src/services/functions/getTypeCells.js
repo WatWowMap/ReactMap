@@ -10,8 +10,8 @@ const getPolyVector = require('./getPolyVector')
 /**
  * @typedef {{ id: string, level: number, count: number, count_pokestops: number, count_gyms: number, polygon: number[][] }} ReturnObj
  * @param {{ minLat: number, maxLat: number, minLon: number, maxLon: number }} bounds
- * @param {import('types').Pokestop[]} pokestops
- * @param {import('types').Gym[]} gyms
+ * @param {import("@rm/types").Pokestop[]} pokestops
+ * @param {import("@rm/types").Gym[]} gyms
  * @returns {ReturnObj[]}
  */
 function getTypeCells(bounds, pokestops, gyms) {

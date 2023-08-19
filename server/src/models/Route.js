@@ -30,10 +30,10 @@ class Route extends Model {
 
   /**
    * Returns the bare essentials for displaying on the map
-   * @param {import('types').Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import('types').DbContext} ctx
-   * @returns {Promise<import('types').FullRoute[]>}
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<import("@rm/types").FullRoute[]>}
    */
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
@@ -65,7 +65,7 @@ class Route extends Model {
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'route_start')) {
       return []
     }
-    /** @type {import('types').FullRoute[]} */
+    /** @type {import("@rm/types").FullRoute[]} */
     const results = await query
 
     return results.map((result) => {
@@ -81,10 +81,10 @@ class Route extends Model {
   /**
    * Returns the full route after querying it, generally from the Popup
    * @param {number} id
-   * @param {import('types').DbContext} ctx
+   * @param {import('@rm/types').DbContext} ctx
    */
   static async getOne(id, { isMad }) {
-    /** @type {import('types').FullRoute} */
+    /** @type {import('@rm/types').FullRoute} */
     const result = isMad
       ? await this.query()
           .select({
@@ -137,7 +137,7 @@ class Route extends Model {
 
   /**
    * returns route context
-   * @param {import('types').DbContext} ctx
+   * @param {import('@rm/types').DbContext} ctx
    * @returns {Promise<{ max_distance: number, max_duration: number }>}
    */
   static async getFilterContext({ isMad }) {

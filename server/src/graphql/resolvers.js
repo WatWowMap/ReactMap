@@ -13,7 +13,7 @@ const getPolyVector = require('../services/functions/getPolyVector')
 const getPlacementCells = require('../services/functions/getPlacementCells')
 const getTypeCells = require('../services/functions/getTypeCells')
 
-/** @type {import("@apollo/server").ApolloServerOptions<import('types').GqlContext>['resolvers']} */
+/** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
   JSON: GraphQLJSON,
   Query: {
@@ -112,12 +112,12 @@ const resolvers = {
     fabButtons: async (_, _args, { perms, user, req, Db, Event }) => {
       const domain = `multiDomainsObj[${req.headers.host}]`
 
-      /** @type {import('types').Config['map']['donationPage']} */
+      /** @type {import("@rm/types").Config['map']['donationPage']} */
       const donorPage = config.has(domain)
         ? config.get(`${domain}.donationPage`)
         : config.get('map.donationPage')
 
-      /** @type {import('types').Config['scanner']} */
+      /** @type {import("@rm/types").Config['scanner']} */
       const scanner = config.get('scanner')
 
       const selectedWebhook = await validateSelectedWebhook(req.user, Db, Event)
@@ -339,7 +339,7 @@ const resolvers = {
       return []
     },
     scannerConfig: (_, { mode }, { perms }) => {
-      /** @type {import('types').Config['scanner']} */
+      /** @type {import("@rm/types").Config['scanner']} */
       const scanner = config.get('scanner')
 
       if (perms.scanner?.includes(mode) && scanner[mode].enabled) {
