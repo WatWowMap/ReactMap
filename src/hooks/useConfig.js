@@ -76,6 +76,7 @@ export default function useConfig(serverSettings, params) {
     const zoom =
       +params.zoom ||
       updatePositionState(serverSettings.config.map.startZoom, 'zoom')
+
     const location =
       +params.lat && +params.lon
         ? [+params.lat, +params.lon]
@@ -85,6 +86,12 @@ export default function useConfig(serverSettings, params) {
               serverSettings.config.map.startLon,
             ],
             'location',
+          ).map(
+            (x, i) =>
+              x ||
+              (i === 0
+                ? serverSettings.config.map.startLat
+                : serverSettings.config.map.startLon),
           )
 
     useStatic.setState({

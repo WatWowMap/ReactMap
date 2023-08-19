@@ -285,34 +285,39 @@ startApollo(httpServer).then((server) => {
   )
 })
 
-connection.migrate.latest().then(async () => {
-  await Db.getDbContext()
-  await Promise.all([
-    Db.historicalRarity(),
-    Db.getFilterContext(),
-    Event.setAvailable('gyms', 'Gym', Db),
-    Event.setAvailable('pokestops', 'Pokestop', Db),
-    Event.setAvailable('pokemon', 'Pokemon', Db),
-    Event.setAvailable('nests', 'Nest', Db),
-  ])
-  await Promise.all([
-    Event.getUicons(config.getSafe('icons.styles')),
-    Event.getMasterfile(Db.historical, Db.rarity),
-    Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
-    Event.getWebhooks(config),
-    getAreas().then((res) => (config.areas = res)),
-  ])
-  httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
-  const text = rainbow(
-    `ℹ ${new Date()
-      .toISOString()
-      .split('.')[0]
-      .split('T')
-      .join(' ')} [ReactMap] Server is now listening at http://${config.getSafe(
-      'interface',
-    )}:${config.getSafe('port')}`,
-  )
-  setTimeout(() => text.stop(), 1_000)
-})
+connection.migrate
+  .latest()
+  .then(async () => {
+    await Db.getDbContext()
+    await Promise.all([
+      Db.historicalRarity(),
+      Db.getFilterContext(),
+      Event.setAvailable('gyms', 'Gym', Db),
+      Event.setAvailable('pokestops', 'Pokestop', Db),
+      Event.setAvailable('pokemon', 'Pokemon', Db),
+      Event.setAvailable('nests', 'Nest', Db),
+    ])
+    await Promise.all([
+      Event.getUicons(config.getSafe('icons.styles')),
+      Event.getMasterfile(Db.historical, Db.rarity),
+      Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
+      Event.getWebhooks(config),
+      getAreas().then((res) => (config.areas = res)),
+    ])
+    httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
+    const text = rainbow(
+      `ℹ ${new Date()
+        .toISOString()
+        .split('.')[0]
+        .split('T')
+        .join(
+          ' ',
+        )} [ReactMap] Server is now listening at http://${config.getSafe(
+        'interface',
+      )}:${config.getSafe('port')}`,
+    )
+    setTimeout(() => text.stop(), 1_000)
+  })
+  .then(() => connection.destroy())
 
 module.exports = app

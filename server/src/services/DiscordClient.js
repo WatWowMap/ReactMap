@@ -131,7 +131,7 @@ class DiscordClient {
       scanner: new Set(),
       blockedGuildNames: new Set(),
     }
-    const scanner = config.get('scanner')
+    const scanner = config.getSafe('scanner')
     try {
       const guilds = user.guilds.map((guild) => guild.id)
       if (this.strategy.allowedUsers.includes(user.id)) {

@@ -60,10 +60,11 @@ const resolvers = {
       )
       return !!results.length
     },
+    /** @param {unknown} _ @param {{ mode: 'scanNext' | 'scanZone' }} args */
     checkValidScan: (_, { mode, points }, { perms }) => {
       if (perms?.scanner.includes(mode)) {
         const areaRestrictions =
-          config.get(`scanner.${mode}.${mode}AreaRestriction`) || []
+          config.getSafe(`scanner.${mode}.${mode}AreaRestriction`) || []
 
         const validPoints = points.map((point) =>
           filterRTree(
@@ -114,11 +115,11 @@ const resolvers = {
 
       /** @type {import("@rm/types").Config['map']['donationPage']} */
       const donorPage = config.has(domain)
-        ? config.get(`${domain}.donationPage`)
-        : config.get('map.donationPage')
+        ? config.getSafe(`${domain}.donationPage`)
+        : config.getSafe('map.donationPage')
 
       /** @type {import("@rm/types").Config['scanner']} */
-      const scanner = config.get('scanner')
+      const scanner = config.getSafe('scanner')
 
       const selectedWebhook = await validateSelectedWebhook(req.user, Db, Event)
       if (selectedWebhook) {
@@ -128,16 +129,16 @@ const resolvers = {
 
       return {
         custom: config.has(domain)
-          ? config.get(`${domain}.customFloatingIcons`)
-          : config.get('map.customFloatingIcons'),
+          ? config.getSafe(`${domain}.customFloatingIcons`)
+          : config.getSafe('map.customFloatingIcons'),
         donationButton:
           donorPage.showOnMap && (perms.donor ? donorPage.showToDonors : true)
             ? donorPage.fabIcon
             : '',
         profileButton:
           user && config.has(domain)
-            ? config.get(`${domain}.enableFloatingProfileButton`)
-            : config.get('map.enableFloatingProfileButton'),
+            ? config.getSafe(`${domain}.enableFloatingProfileButton`)
+            : config.getSafe('map.enableFloatingProfileButton'),
         scanZone:
           scanner.backendConfig.platform !== 'mad' &&
           scanner.scanZone.enabled &&
@@ -177,8 +178,9 @@ const resolvers = {
       return {}
     },
     motdCheck: (_, { clientIndex }, { perms }) => {
-      const motd = config.get('map.messageOfTheDay')
+      const motd = config.getSafe('map.messageOfTheDay')
       return (
+        motd.components.length &&
         (motd.index > clientIndex || motd.settings.permanent) &&
         ((perms.donor
           ? motd.settings.donorOnly
@@ -277,7 +279,10 @@ const resolvers = {
       return []
     },
     scanCells: (_, args, { perms, Db }) => {
-      if (perms?.scanCells && args.zoom >= config.get('map.scanCellsZoom')) {
+      if (
+        perms?.scanCells &&
+        args.zoom >= config.getSafe('map.scanCellsZoom')
+      ) {
         return Db.query('ScanCell', 'getAll', perms, args)
       }
       return []
@@ -285,8 +290,8 @@ const resolvers = {
     scanAreas: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.has(`areas.scanAreas.${req.headers.host}`)
-          ? config.get(`areas.scanAreas.${req.headers.host}`)
-          : config.get('areas.scanAreas.main')
+          ? config.getSafe(`areas.scanAreas.${req.headers.host}`)
+          : config.getSafe('areas.scanAreas.main')
         return [
           {
             ...scanAreas,
@@ -305,8 +310,8 @@ const resolvers = {
     scanAreasMenu: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.has(`areas.scanAreasMenu.${req.headers.host}`)
-          ? config.get(`areas.scanAreasMenu.${req.headers.host}`)
-          : config.get('areas.scanAreasMenu.main')
+          ? config.getSafe(`areas.scanAreasMenu.${req.headers.host}`)
+          : config.getSafe('areas.scanAreasMenu.main')
 
         if (perms.areaRestrictions.length) {
           const filtered = scanAreas
@@ -327,7 +332,7 @@ const resolvers = {
                 type: 'Feature',
                 properties: {
                   name: '',
-                  manual: !!config.get('manualAreas.length'),
+                  manual: !!config.getSafe('manualAreas.length'),
                 },
               })
             }
@@ -340,7 +345,7 @@ const resolvers = {
     },
     scannerConfig: (_, { mode }, { perms }) => {
       /** @type {import("@rm/types").Config['scanner']} */
-      const scanner = config.get('scanner')
+      const scanner = config.getSafe('scanner')
 
       if (perms.scanner?.includes(mode) && scanner[mode].enabled) {
         return mode === 'scanZone'
@@ -429,7 +434,7 @@ const resolvers = {
       return []
     },
     searchable: (_, __, { perms }) => {
-      const options = config.get('api.searchable')
+      const options = config.getSafe('api.searchable')
       return Object.keys(options).filter((k) => options[k] && perms[k])
     },
     spawnpoints: (_, args, { perms, Db }) => {
@@ -441,13 +446,13 @@ const resolvers = {
     submissionCells: async (_, args, { perms, Db }) => {
       if (
         perms?.submissionCells &&
-        args.zoom >= config.get('map.submissionZoom') - 1
+        args.zoom >= config.getSafe('map.submissionZoom') - 1
       ) {
         const [pokestops, gyms] = await Db.submissionCells(perms, args)
         return [
           {
             placementCells:
-              args.zoom >= config.get('map.submissionZoom')
+              args.zoom >= config.getSafe('map.submissionZoom')
                 ? getPlacementCells(args, pokestops, gyms)
                 : [],
             typeCells: args.filters.onlyS14Cells

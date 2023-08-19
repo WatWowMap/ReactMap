@@ -13,7 +13,7 @@ const { filterRTree } = require('../../functions/filterRTree')
 const { Event, Pvp } = require('../../initialization')
 
 /** @type {import("@rm/types").Config['api']['pvp']} */
-const pvpConfig = config.get('api.pvp')
+const pvpConfig = config.getSafe('api.pvp')
 
 module.exports = class PkmnBackend {
   /**

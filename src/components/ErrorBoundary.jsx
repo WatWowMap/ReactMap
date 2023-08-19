@@ -31,7 +31,8 @@ class ErrorBoundary extends React.Component {
   }
 
   render() {
-    return this.state.errorCount > 5 ? (
+    return this.state.errorCount >
+      (process.env.NODE_ENV === 'development' ? 1 : 3) ? (
       <Grid
         container
         justifyContent="center"
