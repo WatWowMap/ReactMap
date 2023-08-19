@@ -1,15 +1,15 @@
 import { LEAGUES } from 'server/src/services/filters/pokemon/constants'
 import { FullModel } from './utility'
-import DeviceModel = require('../../server/src/models/Device')
-import GymModel = require('../../server/src/models/Gym')
-import NestModel = require('../../server/src/models/Nest')
-import PokestopModel = require('../../server/src/models/Pokestop')
-import PokemonModel = require('../../server/src/models/Pokemon')
-import PortalModel = require('../../server/src/models/Portal')
-import ScanCellModel = require('../../server/src/models/ScanCell')
-import SpawnpointModel = require('../../server/src/models/Spawnpoint')
-import WeatherModel = require('../../server/src/models/Weather')
-import RouteModel = require('../../server/src/models/Route')
+import DeviceModel = require('server/src/models/Device')
+import GymModel = require('server/src/models/Gym')
+import NestModel = require('server/src/models/Nest')
+import PokestopModel = require('server/src/models/Pokestop')
+import PokemonModel = require('server/src/models/Pokemon')
+import PortalModel = require('server/src/models/Portal')
+import ScanCellModel = require('server/src/models/ScanCell')
+import SpawnpointModel = require('server/src/models/Spawnpoint')
+import WeatherModel = require('server/src/models/Weather')
+import RouteModel = require('server/src/models/Route')
 
 export interface Device {
   id: string

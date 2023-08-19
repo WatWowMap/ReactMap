@@ -1,9 +1,9 @@
 import { Permissions } from './server'
-import UserModel = require('../../server/src/models/NestSubmission')
-import BackupModel = require('../../server/src/models/Backup')
-import SessionModel = require('../../server/src/models/Session')
-import NestSubmissionModel = require('../../server/src/models/NestSubmission')
-import GymBadgeModel = require('../server/src/models/GymBadge')
+import UserModel = require('server/src/models/NestSubmission')
+import BackupModel = require('server/src/models/Backup')
+import SessionModel = require('server/src/models/Session')
+import NestSubmissionModel = require('server/src/models/NestSubmission')
+import GymBadgeModel = require('server/src/models/Badge')
 import { FullModel } from './utility'
 
 export interface Backup {
