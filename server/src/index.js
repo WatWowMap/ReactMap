@@ -22,6 +22,7 @@ const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
 
 const { log, HELPERS } = require('@rm/logger')
+const { locales } = require('@rm/locales')
 
 const config = require('./services/config')
 const { Db, Event } = require('./services/initialization')
@@ -61,7 +62,7 @@ Sentry.init({
     ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
   ],
   tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE) || 0.1,
-  version: pkg.version,
+  release: pkg.version,
 })
 
 // RequestHandler creates a separate execution context, so that all
@@ -109,6 +110,11 @@ const rateLimitOptions = {
       'api.rateLimit.time',
     )} minutes.`,
   },
+  /**
+   *
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
+   */
   onLimitReached: (req, res) => {
     log.info(
       HELPERS.express,
@@ -131,7 +137,6 @@ app.use(
 app.use(
   session({
     name: 'reactmap0',
-    key: 'session',
     secret: config.getSafe('api.sessionSecret'),
     store: sessionStore,
     resave: true,
@@ -160,7 +165,7 @@ i18next.use(Backend).init(
   {
     lng: 'en',
     fallbackLng: 'en',
-    preload: config.getSafe('map.localeSelection'),
+    preload: locales,
     ns: ['translation'],
     defaultNS: 'translation',
     backend: {
@@ -301,7 +306,7 @@ connection.migrate
       Event.getUicons(config.getSafe('icons.styles')),
       Event.getMasterfile(Db.historical, Db.rarity),
       Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
-      Event.getWebhooks(config),
+      Event.getWebhooks(),
       getAreas().then((res) => (config.areas = res)),
     ])
     httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
