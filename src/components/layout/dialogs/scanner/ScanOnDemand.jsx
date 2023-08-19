@@ -60,7 +60,9 @@ function ScanOnDemand({ mode }) {
     useStore.setState({
       scannerCooldown:
         (typeof config.cooldown === 'number' ? config.cooldown : 0) *
-        validCoords.filter(Boolean).length,
+          validCoords.filter(Boolean).length *
+          1000 +
+        Date.now(),
     })
     setScanMode(`${mode}Mode`, 'loading')
     scan({

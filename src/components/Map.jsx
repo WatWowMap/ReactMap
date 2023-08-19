@@ -5,7 +5,6 @@ import { control } from 'leaflet'
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
 import useTileLayer from '@hooks/useTileLayer'
-import useCooldown from '@hooks/useCooldown'
 
 import Nav from './layout/Nav'
 import QueryData from './QueryData'
@@ -31,7 +30,6 @@ export default function Map({ params }) {
   Utility.analytics(window.location.pathname)
 
   const map = useMap()
-  useCooldown()
   const config = useStatic((state) => state.config.map)
 
   map.attributionControl.setPrefix(config.attributionPrefix || '')

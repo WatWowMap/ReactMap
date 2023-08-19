@@ -11,8 +11,8 @@ import './services/i18n'
 if (CONFIG.analytics.googleAnalyticsId) {
   ReactGA.initialize(CONFIG.analytics.googleAnalyticsId)
 }
-if (CONFIG.map.general.title) {
-  document.title = CONFIG.map.general.title
+if (CONFIG.client.title) {
+  document.title = CONFIG.client.title
 }
 
 // eslint-disable-next-line no-console

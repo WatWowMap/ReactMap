@@ -79,10 +79,22 @@ export function ScanConfirm({ mode }) {
   const valid = useScanStore((s) => s.valid)
   const estimatedDelay = useScanStore((s) => s.estimatedDelay)
 
+  const [remainder, setRemainder] = React.useState(scannerCooldown - Date.now())
+
+  React.useEffect(() => {
+    if (scannerCooldown - Date.now() > 0) {
+      const interval = setTimeout(() => {
+        setRemainder(scannerCooldown - Date.now())
+      }, 1000)
+      return () => clearTimeout(interval)
+    }
+    setRemainder(0)
+  }, [remainder, scannerCooldown])
+
   return (
     <StyledListButton
       color="secondary"
-      disabled={valid === 'none' || !!scannerCooldown}
+      disabled={valid === 'none' || remainder > 0}
       onClick={() => setScanMode(`${mode}Mode`, 'sendCoords')}
     >
       <ListItemIcon>
@@ -90,10 +102,10 @@ export function ScanConfirm({ mode }) {
       </ListItemIcon>
       <ListItemText
         primary={
-          scannerCooldown ? (
+          remainder > 0 ? (
             <Trans
               i18nKey="scanner_countdown"
-              values={{ time: scannerCooldown }}
+              values={{ time: Math.round(remainder / 1000) }}
             />
           ) : (
             t('click_to_scan')

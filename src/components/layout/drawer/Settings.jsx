@@ -51,7 +51,7 @@ const ICON_MAP = {
 }
 
 export default function Settings() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { config } = useStatic.getState()
 
   const Icons = useStatic((s) => s.Icons)
@@ -78,9 +78,6 @@ export default function Settings() {
                   [target.name]: config[target.name][target.value].name,
                 },
               }))
-              if (target.name === 'localeSelection') {
-                i18n.changeLanguage(target.value)
-              }
             }}
             icon={<Icon />}
           >

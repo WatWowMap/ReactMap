@@ -18,6 +18,7 @@ export interface Config<Client extends boolean = false> extends BaseConfig {
           tracesSampleRate: number
           debug: boolean
         }
+        title: string
       }
     : never
   webhooks: Webhook[]

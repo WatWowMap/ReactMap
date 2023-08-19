@@ -169,9 +169,10 @@ const viteConfig = defineConfig(async ({ mode }) => {
             tracesSampleRate: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
             debug: env.SENTRY_DEBUG || false,
           },
+          title: config.getSafe('map.general.headerTitle'),
         },
         analytics: config.getSafe('analytics'),
-        map: config.getSafe('map'),
+        // map: config.getSafe('map'),
       },
     },
     esbuild: {
