@@ -172,7 +172,11 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       config: {
         map: {
           ...config.map,
-          ...config.multiDomainsObj[req.headers.host],
+          ...config.multiDomainsObj[req.headers.host.replaceAll('.', '_')],
+          general: undefined,
+          customRoutes: undefined,
+          links: undefined,
+          misc: undefined,
           loginPage: !!config.map.loginPage.components.length,
           donationPage: undefined,
           messageOfTheDay: undefined,
@@ -186,9 +190,6 @@ rootRouter.get('/api/settings', async (req, res, next) => {
               .length,
           },
         },
-        localeSelection: Object.fromEntries(
-          config.map.localeSelection.map((l) => [l, { name: l }]),
-        ),
         tileServers: Object.fromEntries(
           config.tileServers.map((s) => [s.name, s]),
         ),

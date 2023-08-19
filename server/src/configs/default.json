@@ -148,23 +148,6 @@
         "settings"
       ]
     },
-    "localeSelection": [
-      "en",
-      "de",
-      "es",
-      "fr",
-      "hi",
-      "id",
-      "it",
-      "ja",
-      "ko",
-      "nl",
-      "pl",
-      "ru",
-      "sv",
-      "th",
-      "tr"
-    ],
     "customRoutes": {
       "discordAuthUrl": "/auth/discord/callback",
       "telegramAuthUrl": "/auth/telegram/callback",

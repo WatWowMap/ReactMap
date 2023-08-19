@@ -218,7 +218,6 @@ const mergeMapConfig = (input) => {
     : []
 
   return {
-    localeSelection: obj.localeSelection,
     ...obj,
     ...obj.general,
     menuOrder,
@@ -248,7 +247,10 @@ config.map = mergeMapConfig(config.map)
 
 // Create multiDomain Objects
 config.multiDomainsObj = Object.fromEntries(
-  config.multiDomains.map((d) => [d.domain, mergeMapConfig(d)]),
+  config.multiDomains.map((d) => [
+    d.domain.replaceAll('.', '_'),
+    mergeMapConfig(d),
+  ]),
 )
 
 // Check if empty

@@ -111,7 +111,7 @@ const resolvers = {
       return []
     },
     fabButtons: async (_, _args, { perms, user, req, Db, Event }) => {
-      const domain = `multiDomainsObj[${req.headers.host}]`
+      const domain = `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
 
       /** @type {import("@rm/types").Config['map']['donationPage']} */
       const donorPage = config.has(domain)

@@ -21,6 +21,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import DrawerActions from './Actions'
 import BoolToggle from './BoolToggle'
+import LocaleSelection from '../general/LocaleSelection'
 
 function FCSelect({ name, label, value, onChange, children, icon }) {
   return (
@@ -44,7 +45,6 @@ function FCSelect({ name, label, value, onChange, children, icon }) {
 }
 
 const ICON_MAP = {
-  localeSelection: TranslateIcon,
   navigation: NavIcon,
   navigationControls: StyleIcon,
   tileServers: MapIcon,
@@ -95,6 +95,12 @@ export default function Settings() {
           </FCSelect>
         )
       })}
+      <ListItem dense>
+        <ListItemIcon>
+          <TranslateIcon />
+        </ListItemIcon>
+        <LocaleSelection />
+      </ListItem>
       <Divider style={{ margin: '10px 0' }} />
       {Icons.customizable.map((category) => (
         <FCSelect
