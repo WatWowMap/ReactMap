@@ -21,7 +21,7 @@ const allowedMenuItems = [
 
 try {
   const refLength = +fs.readFileSync(
-    resolve(__dirname, '../../../.configref'),
+    resolve(__dirname, '../../../packages/config/.configref'),
     'utf8',
   )
   const defaultLength = fs.readFileSync(

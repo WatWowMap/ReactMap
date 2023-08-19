@@ -4,6 +4,10 @@
   "private": true,
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
+  "scripts": {
+    "generate": "node ./lib/scripts/genEnvConfig.js",
+    "check": "node ./lib/scripts/configCheck.js"
+  },
   "dependencies": {
     "config": "^3.3.9"
   }

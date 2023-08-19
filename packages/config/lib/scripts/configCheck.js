@@ -5,7 +5,7 @@ fs.writeFileSync(
   path.resolve(__dirname, '../../.configref'),
   fs
     .readFileSync(
-      path.resolve(__dirname, '../src/configs/default.json'),
+      path.resolve(__dirname, '../../../../server/src/configs/default.json'),
       'utf8',
     )
     .length.toString(),

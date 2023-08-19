@@ -1,5 +1,6 @@
 const fs = require('fs')
-const sourceConfig = require('../src/configs/default.json')
+const { resolve } = require('path')
+const sourceConfig = require('../../../../server/src/configs/default.json')
 
 const camelToSnake = (str) =>
   str.replace(/([a-z](?=[A-Z]))/g, '$1_').toUpperCase()
@@ -24,7 +25,9 @@ const recursiveObjCheck = (obj, key = '', parentKey = '') => {
 
 const generateEnvConfig = async () => {
   fs.writeFileSync(
-    `${__dirname}/../src/configs/custom-environment-variables.json`,
+    resolve(
+      `${__dirname}/../../../../server/src/configs/custom-environment-variables.json`,
+    ),
     JSON.stringify(recursiveObjCheck(sourceConfig), null, 2),
   )
 }
