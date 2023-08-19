@@ -1289,8 +1289,7 @@ module.exports = class Pokestop extends Model {
           .groupBy('incident.character', 'incident.display_type')
           .orderBy('incident.character', 'incident.display_type')
       }
-    } else {
-      if (isMad) {
+    } else if (isMad) {
         queries.invasions = this.query()
           .distinct('incident_grunt_type AS grunt_type')
           .where('incident_grunt_type', '>', 0)
@@ -1303,7 +1302,6 @@ module.exports = class Pokestop extends Model {
           .andWhere('incident_expire_timestamp', '>=', ts)
           .orderBy('grunt_type')
       }
-    }
     if (isMad && !hasMultiInvasions) {
       queries.invasions.whereNotIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
     }
