@@ -38,7 +38,6 @@ class Route extends Model {
     const { areaRestrictions } = perms
     const { onlyAreas, onlyDistance } = args.filters
 
-
     const distanceInMeters = (onlyDistance || [0.5, 100]).map((x) => x * 1000)
 
     const startLatitude = isMad ? 'start_poi_latitude' : 'start_lat'
@@ -46,14 +45,13 @@ class Route extends Model {
     const distanceMeters = isMad ? 'route_distance_meters' : 'distance_meters'
     const endLatitude = isMad ? 'end_poi_latitude' : 'end_lat'
     const endLongitude = isMad ? 'end_poi_longitude' : 'end_lon'
-    
+
     const query = this.query()
       .select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
       .whereBetween(startLatitude, [args.minLat, args.maxLat])
       .andWhereBetween(startLongitude, [args.minLon, args.maxLon])
       .andWhereBetween(distanceMeters, distanceInMeters)
       .union((qb) => {
-
         qb.select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
           .whereBetween(endLatitude, [args.minLat, args.maxLat])
           .andWhereBetween(endLongitude, [args.minLon, args.maxLon])
@@ -63,9 +61,7 @@ class Route extends Model {
         getAreaSql(qb, areaRestrictions, onlyAreas, isMad, 'route_end')
       })
 
-    if (
-      !getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'route_start')
-    ) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'route_start')) {
       return []
     }
     const results = await query
@@ -86,30 +82,33 @@ class Route extends Model {
    * @param {boolean} isMad true if DB schema is MAD
    */
   static async getOne(id, { isMad }) {
-    const result = isMad ? 
-    await this.query() .select({
-        id: 'route_id',
-        name: 'name',
-        description: 'description',
-        distance_meters: 'route_distance_meters',
-        duration_seconds: 'route_duration_seconds',
-        start_fort_id: 'start_poi_fort_id',
-        start_lat: 'start_poi_latitude',
-        start_lon: 'start_poi_longitude',
-        start_image: 'start_poi_image_url',
-        end_fort_id: 'end_poi_fort_id',
-        end_lat: 'end_poi_latitude',
-        end_lon: 'end_poi_longitude',
-        end_image: 'end_poi_image_url',
-        image: 'image',
-        image_border_color: 'image_border_color_hex',
-        reversible: 'reversible',
-        tags: 'tags',
-        type: 'type',
-        version: 'version',
-        waypoints: 'waypoints',
-      }).select(raw('UNIX_TIMESTAMP(last_updated)').as('updated')).findOne({ route_id: id }) : 
-      await this.query().findById(id)
+    const result = isMad
+      ? await this.query()
+          .select({
+            id: 'route_id',
+            name: 'name',
+            description: 'description',
+            distance_meters: 'route_distance_meters',
+            duration_seconds: 'route_duration_seconds',
+            start_fort_id: 'start_poi_fort_id',
+            start_lat: 'start_poi_latitude',
+            start_lon: 'start_poi_longitude',
+            start_image: 'start_poi_image_url',
+            end_fort_id: 'end_poi_fort_id',
+            end_lat: 'end_poi_latitude',
+            end_lon: 'end_poi_longitude',
+            end_image: 'end_poi_image_url',
+            image: 'image',
+            image_border_color: 'image_border_color_hex',
+            reversible: 'reversible',
+            tags: 'tags',
+            type: 'type',
+            version: 'version',
+            waypoints: 'waypoints',
+          })
+          .select(raw('UNIX_TIMESTAMP(last_updated)').as('updated'))
+          .findOne({ route_id: id })
+      : await this.query().findById(id)
 
     if (typeof result.waypoints === 'string') {
       result.waypoints = JSON.parse(result.waypoints)
@@ -154,7 +153,6 @@ class Route extends Model {
       .first()
 
     return result
-
   }
 }
 
