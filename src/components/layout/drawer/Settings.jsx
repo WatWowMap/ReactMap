@@ -32,7 +32,7 @@ function FCSelect({ name, label, value, onChange, children, icon }) {
         <Select
           autoFocus
           name={name}
-          value={value}
+          value={value || ''}
           onChange={onChange}
           fullWidth
           label={label}
