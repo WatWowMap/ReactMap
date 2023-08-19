@@ -1,7 +1,4 @@
-if (!process.env.NODE_CONFIG_DIR) {
-  process.env.NODE_CONFIG_DIR = `${__dirname}/../src/configs`
-  process.env.ALLOW_CONFIG_MUTATIONS = 'true'
-}
+require('../../packages/config')
 
 const fs = require('fs')
 const { resolve } = require('path')

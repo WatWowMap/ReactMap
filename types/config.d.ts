@@ -1,3 +1,4 @@
+import { LogLevelNames } from 'loglevel'
 import config = require('../server/src/configs/default.json')
 import example = require('../server/src/configs/local.example.json')
 
@@ -8,6 +9,9 @@ type ExampleConfig = typeof example
 
 export interface Config extends BaseConfig {
   webhooks: Webhook[]
+  devOptions: {
+    logLevel: LogLevelNames
+  } & BaseConfig['devOptions']
   areas: Awaited<ReturnType<typeof import('server/src/services/areas')>>
   authentication: {
     areaRestrictions: { roles: string[]; areas: string[] }[]

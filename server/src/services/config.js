@@ -1,11 +1,9 @@
 const fs = require('fs')
 const { resolve } = require('path')
 
-const config = require('config')
+const config = require('@rm/config')
 
-config.getSafe = config.get
-
-const { log, HELPERS } = require('./logger')
+const { log, HELPERS } = require('@rm/logger')
 
 const allowedMenuItems = [
   'gyms',
@@ -32,7 +30,7 @@ try {
   ).length
 
   if (refLength !== defaultLength) {
-    log.error(
+    log.warn(
       HELPERS.config,
       'It looks like you have modified the `default.json` file, you should not do this! Make all of your config changes in your `local.json` file.',
     )
@@ -211,6 +209,7 @@ const checkExtraJsons = (fileName, domain = '') => {
   return generalJson
 }
 
+/** @param {Partial<import('types').Config['map']>} */
 const mergeMapConfig = (obj) => {
   if (process.env.TELEGRAM_BOT_NAME && !obj?.customRoutes?.telegramBotName) {
     if (obj.customRoutes)
@@ -270,10 +269,10 @@ const mergeMapConfig = (obj) => {
   return {
     localeSelection: obj.localeSelection,
     ...obj,
-    ...obj.general,
-    menuOrder,
+    // ...obj.general,
+    // menuOrder,
     ...obj.customRoutes,
-    ...obj.links,
+    // ...obj.links,
     ...obj.misc,
     messageOfTheDay: {
       ...config.map.messageOfTheDay,
@@ -290,10 +289,6 @@ const mergeMapConfig = (obj) => {
       ...obj.loginPage,
       ...checkExtraJsons('loginPage', obj.domain),
     },
-    // general: undefined,
-    // customRoutes: undefined,
-    // links: undefined,
-    // misc: undefined,
   }
 }
 

@@ -2,11 +2,6 @@
 /* eslint-disable no-continue */
 /* eslint-disable import/no-extraneous-dependencies */
 
-if (!process.env.NODE_CONFIG_DIR) {
-  process.env.NODE_CONFIG_DIR = `${__dirname}/server/src/configs`
-  process.env.ALLOW_CONFIG_MUTATIONS = 'true'
-}
-
 const { defineConfig, loadEnv } = require('vite')
 const { default: react } = require('@vitejs/plugin-react')
 const { default: checker } = require('vite-plugin-checker')
@@ -15,9 +10,9 @@ const removeFiles = require('rollup-plugin-delete')
 const { resolve, extname } = require('path')
 const fs = require('fs')
 const { sentryVitePlugin } = require('@sentry/vite-plugin')
-const config = require('config')
+const config = require('@rm/config')
 
-const { log, HELPERS } = require('./server/src/services/logger')
+const { log, HELPERS } = require('@rm/logger')
 const { locales } = require('./locales/scripts/create')
 
 config.getSafe = config.get
@@ -138,7 +133,10 @@ const viteConfig = defineConfig(async ({ mode }) => {
         : []),
       localePlugin(),
     ],
-    optimizeDeps: mode === 'development' ? { exclude: ['@mui/*'] } : undefined,
+    optimizeDeps:
+      mode === 'development'
+        ? { exclude: ['@mui/*'], include: ['@rm/logger'] }
+        : undefined,
     publicDir: 'public',
     resolve: {
       alias: {
@@ -149,26 +147,23 @@ const viteConfig = defineConfig(async ({ mode }) => {
       },
     },
     define: {
+      process: {
+        env: {
+          NODE_ENV: mode,
+          VERSION: version,
+          SENTRY_DSN: env.SENTRY_DSN || '',
+          SENTRY_TRACES_SAMPLE_RATE: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
+          SENTRY_DEBUG: env.SENTRY_DEBUG || false,
+          CUSTOM: hasCustom,
+          LOCALES: fs
+            .readdirSync(resolve(__dirname, './locales'))
+            .filter((x) => x.endsWith('.json'))
+            .map((x) => x.replace('.json', '')),
+        },
+      },
       CONFIG: {
-        GOOGLE_ANALYTICS_ID:
-          env.GOOGLE_ANALYTICS_ID ||
-          config.getSafe('analytics.googleAnalyticsId') ||
-          '',
-        ANALYTICS_DEBUG_MODE:
-          env.ANALYTICS_DEBUG_MODE ||
-          config.getSafe('analytics.debugMode') ||
-          false,
-        TITLE: env.TITLE || config.getSafe('map.general.title') || '',
-        SENTRY_DSN: env.SENTRY_DSN || '',
-        SENTRY_TRACES_SAMPLE_RATE: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
-        SENTRY_DEBUG: env.SENTRY_DEBUG || false,
-        VERSION: version,
-        DEVELOPMENT: mode === 'development',
-        CUSTOM: hasCustom,
-        LOCALES: fs
-          .readdirSync(resolve(__dirname, './locales'))
-          .filter((x) => x.endsWith('.json'))
-          .map((x) => x.replace('.json', '')),
+        analytics: config.getSafe('analytics'),
+        map: config.getSafe('map'),
       },
     },
     esbuild: {
@@ -185,6 +180,9 @@ const viteConfig = defineConfig(async ({ mode }) => {
       input: { main: resolve(__dirname, 'index.html') },
       assetsDir: '',
       emptyOutDir: true,
+      commonjsOptions: {
+        include: [/@rm/],
+      },
       chunkSizeWarningLimit: 2000,
       rollupOptions: {
         plugins: [

@@ -6,6 +6,10 @@
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
   "license": "MIT",
   "private": true,
+  "workspaces": [
+    "apps/**/*",
+    "packages/*"
+  ],
   "scripts": {
     "start": "node .",
     "build": "vite build",
@@ -55,6 +59,7 @@
     "rollup-plugin-delete": "^2.0.0",
     "vite": "4.3.9",
     "vite-plugin-checker": "0.6.0",
+    "vite-plugin-commonjs": "^0.8.2",
     "vite-plugin-static-copy": "0.16.0"
   },
   "dependencies": {
@@ -67,6 +72,8 @@
     "@mui/icons-material": "^5.14.0",
     "@mui/material": "^5.14.0",
     "@rainb0w-clwn/passport-telegram-official": "^2.0.2",
+    "@rm/config": "*",
+    "@rm/logger": "*",
     "@sentry/node": "^7.48.0",
     "@sentry/react": "^7.48.0",
     "@turf/boolean-contains": "^6.5.0",
