@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Config } from './config'
 
 declare global {
-  declare const CONFIG: Config
+  declare const CONFIG: Config<true>
 }
 
 export interface CustomI extends React.HTMLProps<HTMLLIElement> {

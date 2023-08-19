@@ -9,7 +9,7 @@ export default i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    supportedLngs: CONFIG.LOCALES || ['en'],
+    supportedLngs: CONFIG.client.locales || ['en'],
     fallbackLng: 'en',
     debug: false,
     joinArrays: '\n',

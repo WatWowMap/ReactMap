@@ -22,7 +22,7 @@ export default function LocaleSelection() {
       }}
       fullWidth
     >
-      {(CONFIG.LOCALES || []).map((option) => (
+      {CONFIG.client.locales.map((option) => (
         <MenuItem key={option} value={option} dense>
           {t(`locale_selection_${option}`)}
         </MenuItem>

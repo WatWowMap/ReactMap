@@ -1,11 +1,9 @@
-const fs = require('fs')
-const path = require('path')
-
 const { create } = require('./create')
 const { missing } = require('./missing')
 const { generate } = require('./generate')
+const { readLocaleDirectory } = require('./utils')
 
-const locales = fs.readdirSync(path.resolve(__dirname, './translations'))
+const locales = readLocaleDirectory(true)
 
 module.exports.locales = locales
 module.exports.create = create

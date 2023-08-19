@@ -2,6 +2,8 @@
 const logger = require('loglevel')
 const chalk = require('chalk')
 
+const config = require('@rm/config')
+
 const HELPERS = /** @type {const} */ ({
   trace: chalk.gray('☰'),
   debug: chalk.green('☯'),
@@ -68,19 +70,14 @@ log.methodFactory = (methodName, logLevel, loggerName) => {
   }
 }
 
-if (typeof window === 'undefined') {
-  if (!process.env.FORCE_COLOR) {
-    process.env.FORCE_COLOR = '3'
-  }
-  const config = require('@rm/config')
-  if (
-    config.has('devOptions.logLevel') &&
-    config.getSafe('devOptions.logLevel').toUpperCase() in logger.levels
-  ) {
-    log.setLevel(config.getSafe('devOptions.logLevel'))
-  }
-} else {
-  log.setLevel(process.env.NODE_ENV === 'development' ? 'debug' : 'info')
+if (!process.env.FORCE_COLOR) {
+  process.env.FORCE_COLOR = '3'
+}
+if (
+  config.has('devOptions.logLevel') &&
+  config.getSafe('devOptions.logLevel').toUpperCase() in logger.levels
+) {
+  log.setLevel(config.getSafe('devOptions.logLevel'))
 }
 
 module.exports.log = log

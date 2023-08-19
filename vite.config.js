@@ -7,15 +7,13 @@ const { default: react } = require('@vitejs/plugin-react')
 const { default: checker } = require('vite-plugin-checker')
 const { viteStaticCopy } = require('vite-plugin-static-copy')
 const removeFiles = require('rollup-plugin-delete')
-const { resolve, extname } = require('path')
+const { join, resolve, extname } = require('path')
 const fs = require('fs')
 const { sentryVitePlugin } = require('@sentry/vite-plugin')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
-const { locales } = require('./locales/scripts/create')
-
-config.getSafe = config.get
+const { create, locales } = require('@rm/locales')
 
 /**
  * @param {boolean} isDevelopment
@@ -61,8 +59,17 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
  */
 const localePlugin = () => ({
   name: 'vite-plugin-locales',
-  async buildStart() {
-    await locales()
+  async generateBundle() {
+    const localeObj = await create()
+
+    Object.entries(localeObj).forEach(([locale, translations]) => {
+      const fileName = join('locales', locale, 'translation.json')
+      this.emitFile({
+        type: 'asset',
+        fileName,
+        source: JSON.stringify(translations),
+      })
+    })
   },
 })
 
@@ -133,10 +140,7 @@ const viteConfig = defineConfig(async ({ mode }) => {
         : []),
       localePlugin(),
     ],
-    optimizeDeps:
-      mode === 'development'
-        ? { exclude: ['@mui/*'], include: ['@rm/logger'] }
-        : undefined,
+    optimizeDeps: mode === 'development' ? { exclude: ['@mui/*'] } : undefined,
     publicDir: 'public',
     resolve: {
       alias: {
@@ -147,21 +151,15 @@ const viteConfig = defineConfig(async ({ mode }) => {
       },
     },
     define: {
-      process: {
-        env: {
-          NODE_ENV: mode,
-          VERSION: version,
-          SENTRY_DSN: env.SENTRY_DSN || '',
-          SENTRY_TRACES_SAMPLE_RATE: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
-          SENTRY_DEBUG: env.SENTRY_DEBUG || false,
-          CUSTOM: hasCustom,
-          LOCALES: fs
-            .readdirSync(resolve(__dirname, './locales'))
-            .filter((x) => x.endsWith('.json'))
-            .map((x) => x.replace('.json', '')),
-        },
-      },
       CONFIG: {
+        version,
+        locales,
+        hasCustom,
+        sentry: {
+          dsn: env.SENTRY_DSN || '',
+          tracesSampleRate: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
+          debug: env.SENTRY_DEBUG || false,
+        },
         analytics: config.getSafe('analytics'),
         map: config.getSafe('map'),
       },
@@ -180,9 +178,6 @@ const viteConfig = defineConfig(async ({ mode }) => {
       input: { main: resolve(__dirname, 'index.html') },
       assetsDir: '',
       emptyOutDir: true,
-      commonjsOptions: {
-        include: [/@rm/],
-      },
       chunkSizeWarningLimit: 2000,
       rollupOptions: {
         plugins: [

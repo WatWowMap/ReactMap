@@ -1,10 +1,11 @@
+// @ts-check
 import { init, BrowserTracing } from '@sentry/react'
 import Fetch from './Fetch'
 
-if (CONFIG.SENTRY_DSN) {
+if (CONFIG.client.sentry.dsn) {
   init({
     dsn:
-      CONFIG.SENTRY_DSN ||
+      CONFIG.client.sentry.dsn ||
       'https://c40dad799323428f83aee04391639345@o1096501.ingest.sentry.io/6117162',
     integrations: [
       new BrowserTracing({
@@ -12,13 +13,13 @@ if (CONFIG.SENTRY_DSN) {
         idleTimeout: 10000,
       }),
     ],
-    tracesSampleRate: CONFIG.SENTRY_TRACES_SAMPLE_RATE
-      ? +CONFIG.SENTRY_TRACES_SAMPLE_RATE
+    tracesSampleRate: CONFIG.client.sentry.tracesSampleRate
+      ? +CONFIG.client.sentry.tracesSampleRate
       : 0.1,
-    release: CONFIG.VERSION,
+    release: CONFIG.client.version,
     environment:
       process.env.NODE_ENV === 'development' ? 'development' : 'production',
-    debug: CONFIG.SENTRY_DEBUG,
+    debug: CONFIG.client.sentry.debug || false,
     beforeSend: async (event) => {
       const errors = event.exception.values
       const isLibrary = errors.find((e) => e?.value?.includes('vendor'))
@@ -31,7 +32,7 @@ if (CONFIG.SENTRY_DSN) {
 
         await Fetch.sendError(error)
       }
-      return CONFIG.CUSTOM || isLibrary || fetchError ? null : event
+      return CONFIG.client.hasCustom || isLibrary || fetchError ? null : event
     },
   })
 }

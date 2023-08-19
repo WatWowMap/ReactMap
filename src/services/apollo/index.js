@@ -105,9 +105,9 @@ const apolloClient = new ApolloClient({
   uri: '/graphql',
   link: abortableLink.concat(createHttpLink()),
   // @ts-ignore
-  name: CONFIG.TITLE,
+  name: CONFIG.map.general.title,
   // @ts-ignore
-  version: CONFIG.VERSION,
+  version: CONFIG.client.version,
   cache: apolloCache,
 })
 

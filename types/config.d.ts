@@ -7,7 +7,19 @@ import { Schema } from './server'
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
 
-export interface Config extends BaseConfig {
+export interface Config<Client extends boolean = false> extends BaseConfig {
+  client: Client extends true
+    ? {
+        version: string
+        locales: string[]
+        hasCustom: boolean
+        sentry: {
+          dsn: string
+          tracesSampleRate: number
+          debug: boolean
+        }
+      }
+    : never
   webhooks: Webhook[]
   devOptions: {
     logLevel: LogLevelNames

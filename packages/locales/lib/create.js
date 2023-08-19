@@ -70,6 +70,8 @@ module.exports.create = create
 
 if (require.main === module) {
   create()
-    .then((locales) => writeAll(locales, true, __dirname, '../../dist/locales'))
+    .then((locales) =>
+      writeAll(locales, true, __dirname, '../../../dist/locales'),
+    )
     .then(() => log.info(HELPERS.locales, 'locales have finished'))
 }

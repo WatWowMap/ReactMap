@@ -5,10 +5,8 @@ const { resolve } = require('path')
 const { log, HELPERS } = require('@rm/logger')
 
 const HUMAN_LOCALES = resolve(__dirname, './human')
-const AI_LOCALES = resolve(__dirname, './human')
 
-module.exports.HUMAN_LOCALES = HUMAN_LOCALES
-module.exports.AI_LOCALES = AI_LOCALES
+const AI_LOCALES = resolve(__dirname, './generated')
 
 /**
  * Fetch remote translations from the locales repository
@@ -40,8 +38,6 @@ async function fetchRemote(locale, endpoint) {
   }
 }
 
-module.exports.fetchRemote = fetchRemote
-
 /**
  * Read and parse a JSON file, optionally from the human or AI locales
  * @param {string} fileName
@@ -56,13 +52,9 @@ async function readAndParseJson(fileName, human = false) {
   return JSON.parse(file)
 }
 
-module.exports.readAndParseJson = readAndParseJson
-
 function readLocaleDirectory(human = false) {
-  return readdirSync(resolve(__dirname, human ? HUMAN_LOCALES : AI_LOCALES))
+  return readdirSync(human ? HUMAN_LOCALES : AI_LOCALES)
 }
-
-module.exports.readLocaleDirectory = readLocaleDirectory
 
 /**
  * @param {Record<string, string> | string} translations
@@ -77,13 +69,11 @@ async function writeJson(translations, ...directories) {
         : JSON.stringify(translations, null, 2)
 
     await fs.writeFile(resolved, file, 'utf8')
-    log.info(HELPERS.locales, 'wrote file', resolved)
+    log.info(HELPERS.locales, 'wrote file', `${resolved.split('/').pop()}`)
   } catch (e) {
     log.error(HELPERS.locales, '[writeJson]', e)
   }
 }
-
-module.exports.writeJson = writeJson
 
 /**
  * @param {Record<string, Record<string, string>>} locales
@@ -106,4 +96,9 @@ async function writeAll(locales, i18nFormat, ...directories) {
   )
 }
 
-module.exports.writeAll = writeAll
+module.exports = {
+  fetchRemote,
+  readAndParseJson,
+  readLocaleDirectory,
+  writeAll,
+}
