@@ -79,7 +79,8 @@ class Route extends Model {
   /**
    * Returns the full route after querying it, generally from the Popup
    * @param {number} id
-   * @param {boolean} isMad true if DB schema is MAD
+   * @param {import('..types').DbContext} ctx
+   * @param {boolean} ctx.isMad true if DB schema is MAD
    */
   static async getOne(id, { isMad }) {
     const result = isMad
@@ -134,7 +135,8 @@ class Route extends Model {
 
   /**
    * returns route context
-   * @param {boolean} isMad true if DB schema is MAD
+   * @param {import('..types').DbContext} ctx
+   * @param {boolean} ctx.isMad true if DB schema is MAD
    * @returns {{ max_distance: number, max_duration: number }}
    */
   static async getFilterContext({ isMad }) {
