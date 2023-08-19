@@ -6,11 +6,7 @@ const {
 } = require('@rm/config')
 
 /**
- * @typedef {import("knex").Knex} Knex
- */
-
-/**
- * @param {Knex} knex
+ * @param {import("knex").Knex} knex
  */
 exports.up = async (knex) =>
   knex.schema.table(tableName, (table) => {
@@ -18,7 +14,7 @@ exports.up = async (knex) =>
   })
 
 /**
- * @param {Knex} knex
+ * @param {import("knex").Knex} knex
  */
 exports.down = async (knex) =>
   knex.schema.table(tableName, (table) => {
