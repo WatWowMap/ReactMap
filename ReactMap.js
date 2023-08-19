@@ -2,9 +2,10 @@
 /* eslint-disable import/extensions */
 
 const { build } = require('vite')
-const { log, HELPERS } = require('@rm/logger')
 
-const { generate } = require('./server/scripts/generateMasterfile')
+const { log, HELPERS } = require('@rm/logger')
+const { generate } = require('@rm/masterfile')
+
 const viteConfig = require('./vite.config')
 
 generate(true).then(() =>
