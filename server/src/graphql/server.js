@@ -90,14 +90,15 @@ async function startApollo(httpServer) {
                 response.body.kind === 'single' &&
                 'data' in response.body.singleResult
               ) {
-                const endpoint = contextValue.req.body.operationName
+                const endpoint =
+                  // @ts-ignore
+                  context?.operation?.selectionSet?.selections?.[0]?.name?.value
 
                 const data = response.body.singleResult.data?.[endpoint]
                 const returned = Array.isArray(data) ? data.length : 0
 
                 log.info(
-                  HELPERS[endpoint.toLowerCase()] ||
-                    `[${endpoint?.toUpperCase()}]`,
+                  HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
                   '|',
                   context.operationName,
                   '|',

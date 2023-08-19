@@ -18,7 +18,9 @@ export const NewProfile = () => {
     refetchQueries: [allProfiles],
   })
 
-  const existing = useWebhookStore((s) => new Set(s.profile.map((p) => p.name)))
+  const existing = useWebhookStore(
+    (s) => new Set((s.profile || []).map((p) => p.name)),
+  )
 
   const [newProfile, setNewProfile] = React.useState('')
   const [interacted, setInteracted] = React.useState(false)
