@@ -42,6 +42,10 @@ function getAreaRestrictionSql(
     }
     if (category === 'pokemon') {
       columns = columns.map((each) => `pokemon.${each}`)
+    } else if (category === 'route_start') {
+      columns = columns.map((each) => `start_poi_${each}`)
+    } else if (category === 'route_end') {
+      columns = columns.map((each) => `end_poi_${each}`)
     }
   } else if (category === 'device') {
     columns = columns.map((each) => `last_${each}`)
