@@ -59,7 +59,7 @@ export const useStore = create(
       },
       settings: {},
       userSettings: undefined,
-      icons: undefined,
+      icons: {},
       menus: undefined,
       tutorial: true,
       sidebar: undefined,
