@@ -1,7 +1,9 @@
 // @ts-check
 const session = require('express-session')
+// @ts-ignore
 const MySQLStore = require('express-mysql-session')(session)
-const config = require('config')
+
+const config = require('@rm/config')
 
 const dbSelection = config
   .getSafe('database.schemas')

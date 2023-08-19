@@ -1,6 +1,6 @@
 const path = require('path')
 const router = require('express').Router()
-const config = require('config')
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
 router.get('/', (req, res) => {

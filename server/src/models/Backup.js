@@ -1,6 +1,7 @@
+// @ts-check
 /* eslint-disable no-bitwise */
 const { Model } = require('objection')
-const config = require('config')
+const config = require('@rm/config')
 
 const bytes = (s) => ~-encodeURI(s).split(/%..|./).length
 
@@ -42,7 +43,7 @@ class Backup extends Model {
    *
    * @param {number} id
    * @param {number} userId
-   * @returns {Promise<import('@packages/types/models').FullBackup>}
+   * @returns {Promise<import('@rm/types').FullBackup>}
    */
   static async getOne(id, userId) {
     return this.query().findById(id).where('userId', userId)
@@ -51,7 +52,7 @@ class Backup extends Model {
   /**
    *
    * @param {number} userId
-   * @returns {Promise<import('@packages/types/models').FullBackup[]>}
+   * @returns {Promise<import('@rm/types').FullBackup[]>}
    */
   static async getAll(userId) {
     return this.query()
@@ -76,7 +77,9 @@ class Backup extends Model {
     if (
       count['count(*)'] < config.getSafe('database.settings.userBackupLimits')
     ) {
+      // @ts-ignore
       return this.query().insert({
+        // @ts-ignore
         userId,
         name: backup.name,
         data: JSON.stringify(backup.data),
@@ -96,10 +99,13 @@ class Backup extends Model {
       config.getSafe('database.settings.userBackupLimits')
     )
       throw new Error('Data too large')
-    return this.query()
-      .update({ name: backup.name, data: JSON.stringify(backup.data) })
-      .where('id', +backup.id)
-      .where('userId', userId)
+    return (
+      this.query()
+        // @ts-ignore
+        .update({ name: backup.name, data: JSON.stringify(backup.data) })
+        .where('id', +backup.id)
+        .where('userId', userId)
+    )
   }
 
   /**

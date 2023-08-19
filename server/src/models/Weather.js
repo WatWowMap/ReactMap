@@ -4,7 +4,7 @@ const { polygon, point } = require('@turf/helpers')
 const { default: booleanOverlap } = require('@turf/boolean-overlap')
 const { default: pointInPolygon } = require('@turf/boolean-point-in-polygon')
 const { default: booleanContains } = require('@turf/boolean-contains')
-const config = require('config')
+const config = require('@rm/config')
 
 const getPolyVector = require('../services/functions/getPolyVector')
 

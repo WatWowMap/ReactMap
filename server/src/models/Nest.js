@@ -2,7 +2,7 @@
 /* eslint-disable no-nested-ternary */
 const { Model } = require('objection')
 const i18next = require('i18next')
-const config = require('config')
+const config = require('@rm/config')
 
 const { Event, Db } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')

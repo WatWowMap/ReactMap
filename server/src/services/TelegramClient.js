@@ -1,7 +1,8 @@
+// @ts-check
 const { default: fetch } = require('node-fetch')
 const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
 const passport = require('passport')
-const config = require('config')
+const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
 const { Db } = require('./initialization')
@@ -83,8 +84,10 @@ class TelegramClient {
       date >= this.strategy.trialPeriod.start.js &&
       date <= this.strategy.trialPeriod.end.js
 
+    /** @type { TGUser & { perms: import("@rm/types").Permissions }} */
     const newUserObj = {
       ...user,
+      // @ts-ignore
       perms: {
         ...Object.fromEntries(
           Object.entries(this.perms).map(([perm, info]) => [
@@ -122,7 +125,7 @@ class TelegramClient {
       return done(null, false, { message: 'access_denied' })
     }
     try {
-      /** @type {import('@packages/types/models').FullUser} */
+      /** @type {import('@rm/types').FullUser} */
       const userExists = await Db.models.User.query().findOne({
         telegramId: user.id,
       })
@@ -153,7 +156,7 @@ class TelegramClient {
           perms: mergePerms(req.user.perms, user.perms),
         })
       }
-      /** @type {import('@packages/types/models').FullUser} */
+      /** @type {import('@rm/types').FullUser} */
       const newUser = await Db.models.User.query().insertAndFetch({
         telegramId: user.id,
         strategy: user.provider,

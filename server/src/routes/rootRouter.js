@@ -169,7 +169,6 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       settings: {},
       authMethods: config.authMethods,
       userBackupLimits: config.database.settings.userBackupLimits,
-      // masterfile: { ...Event.masterfile, invasions: Event.invasions },
       config: {
         map: {
           ...config.map,
@@ -200,12 +199,10 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           react: {},
           leaflet: {},
         },
-        // icons: { ...config.icons, styles: Event.uicons },
         gymValidDataLimit:
           Date.now() / 1000 - config.api.gymValidDataLimit * 86400,
       },
       extraUserFields: config.database.settings.extraUserFields,
-      // available: { pokemon: [], pokestops: [], gyms: [], nests: [] },
     }
 
     // add user options here from the config that are structured as objects

@@ -2,7 +2,7 @@
 const { resolve } = require('path')
 const fs = require('fs')
 
-const config = require('config')
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
 /**

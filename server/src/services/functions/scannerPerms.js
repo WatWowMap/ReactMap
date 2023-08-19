@@ -1,5 +1,5 @@
 // @ts-check
-const config = require('config')
+const config = require('@rm/config')
 
 const scanner = config.getSafe('scanner')
 
@@ -8,7 +8,7 @@ const scanner = config.getSafe('scanner')
  * @param {string[]} roles
  * @param {'discordRoles' | 'telegramGroups'} provider
  * @param {boolean} [trialActive]
- * @returns
+ * @returns {string[]}
  */
 function scannerPerms(roles, provider, trialActive = false) {
   const perms = []

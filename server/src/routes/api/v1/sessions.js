@@ -1,6 +1,6 @@
 // @ts-check
 const router = require('express').Router()
-const config = require('config')
+const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
 const { Db } = require('../../../services/initialization')

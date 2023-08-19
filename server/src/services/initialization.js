@@ -1,5 +1,5 @@
 // @ts-check
-const config = require('config')
+const config = require('@rm/config')
 
 const DbCheck = require('./DbCheck')
 const EventManager = require('./EventManager')

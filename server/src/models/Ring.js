@@ -1,3 +1,4 @@
+// @ts-check
 class Ring {
   constructor(id, lat, lon) {
     this.id = id

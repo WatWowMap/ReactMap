@@ -1,6 +1,6 @@
 // @ts-check
 /* eslint-disable no-restricted-syntax */
-const config = require('config')
+const config = require('@rm/config')
 
 const { Event } = require('../../initialization')
 const BaseFilter = require('../Base')

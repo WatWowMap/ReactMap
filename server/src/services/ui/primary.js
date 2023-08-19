@@ -1,5 +1,5 @@
 // @ts-check
-const config = require('config')
+const config = require('@rm/config')
 
 const nestFilters = config.getSafe('defaultFilters.nests')
 const map = config.getSafe('map')

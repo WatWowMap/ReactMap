@@ -1,5 +1,5 @@
 // @ts-check
-const config = require('config')
+const config = require('@rm/config')
 const TelegramClient = require('../services/TelegramClient')
 
 /**

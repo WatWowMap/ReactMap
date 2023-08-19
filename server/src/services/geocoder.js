@@ -13,6 +13,14 @@ function formatter(addressFormat, result) {
     .trim()
 }
 
+/**
+ *
+ * @param {string} nominatimUrl
+ * @param {string} search
+ * @param {boolean} reverse
+ * @param {string} format
+ * @returns
+ */
 async function geocoder(nominatimUrl, search, reverse, format) {
   try {
     if (!nominatimUrl) {

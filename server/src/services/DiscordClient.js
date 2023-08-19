@@ -4,7 +4,7 @@ const { resolve } = require('path')
 const { Client } = require('discord.js')
 const { Strategy: DiscordStrategy } = require('passport-discord')
 const passport = require('passport')
-const config = require('config')
+const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
 const { Db } = require('./initialization')
@@ -293,7 +293,7 @@ class DiscordClient {
         delete discordUser.guilds
       }
 
-      /** @type {import('@packages/types/models').FullUser} */
+      /** @type {import('@rm/types').FullUser} */
       const userExists = await Db.models.User.query().findOne(
         req.user ? { id: req.user.id } : { discordId: discordUser.id },
       )
@@ -305,7 +305,7 @@ class DiscordClient {
             webhookStrategy: 'discord',
           })
           .where('id', req.user.id)
-        /** @type {import('@packages/types/models').FullUser} */
+        /** @type {import('@rm/types').FullUser} */
         const oldUser = await Db.models.User.query()
           .where('discordId', discordUser.id)
           .whereNot('id', req.user.id)
@@ -333,7 +333,7 @@ class DiscordClient {
           perms: mergePerms(req.user.perms, discordUser.perms),
         })
       }
-      /** @type {import('@packages/types/models').FullUser} */
+      /** @type {import('@rm/types').FullUser} */
       const newUser = await Db.models.User.query().insertAndFetch({
         discordId: discordUser.id,
         strategy: 'discord',

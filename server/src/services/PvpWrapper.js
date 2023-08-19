@@ -1,6 +1,6 @@
 const Ohbem = require('ohbem')
 const NodeCache = require('node-cache')
-const config = require('config')
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
 module.exports = class PvpWrapper extends Ohbem {

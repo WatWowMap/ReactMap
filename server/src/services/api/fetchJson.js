@@ -3,7 +3,8 @@ const fs = require('fs')
 const { resolve } = require('path')
 
 const { default: fetch } = require('node-fetch')
-const config = require('config')
+
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
 /**
@@ -17,7 +18,7 @@ async function fetchJson(url, options = undefined) {
 
   const timeout = setTimeout(() => {
     controller.abort()
-  }, config.get('api.fetchTimeoutMs'))
+  }, config.getSafe('api.fetchTimeoutMs'))
 
   try {
     log.debug(HELPERS.fetch, url, options || '')

@@ -3,7 +3,7 @@ const { promises: fs } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
-const config = require('config')
+const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
 const { generate } = require('@rm/masterfile')

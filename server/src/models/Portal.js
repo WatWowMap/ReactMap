@@ -1,6 +1,6 @@
 // @ts-check
 const { Model } = require('objection')
-const config = require('config')
+const config = require('@rm/config')
 
 const getAreaSql = require('../services/functions/getAreaSql')
 

@@ -1,14 +1,14 @@
+// @ts-check
 const router = require('express').Router()
 const passport = require('passport')
-const {
-  authentication: { strategies },
-} = require('@rm/config')
+
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 const { Db } = require('../services/initialization')
 
 // Loads up the base auth routes and any custom ones
 
-strategies.forEach((strategy, i) => {
+config.getSafe('authentication.strategies').forEach((strategy, i) => {
   const method =
     strategy.type === 'discord' || strategy.type === 'telegram' ? 'get' : 'post'
   if (strategy.enabled) {

@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-const fetch = require('node-fetch')
+const { default: fetch } = require('node-fetch')
 const NodeCache = require('node-cache')
 
 const config = require('@rm/config')

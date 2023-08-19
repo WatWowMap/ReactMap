@@ -1,3 +1,4 @@
+// @ts-check
 const { Model, raw } = require('objection')
 const getAreaSql = require('../services/functions/getAreaSql')
 const fetchJson = require('../services/api/fetchJson')
@@ -71,6 +72,7 @@ class Device extends Model {
             ),
         )
       : await query.from(context.isMad ? 'settings_device' : 'device')
+    // @ts-ignore
     return results.filter((device) => device.id && device.lat && device.lon)
   }
 }

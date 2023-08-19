@@ -1,6 +1,6 @@
 // @ts-check
 const { Model } = require('objection')
-const config = require('config')
+const config = require('@rm/config')
 
 class Badge extends Model {
   static get tableName() {
@@ -37,7 +37,7 @@ class Badge extends Model {
    * @param {number} userId
    * @param {'>' | '>=' | '<' | '<=' | '='} operator
    * @param {number} badge
-   * @returns {Promise<import('@packages/types/models').FullGymBadge[]>}
+   * @returns {Promise<import('@rm/types').FullGymBadge[]>}
    */
   static async getAll(userId, operator = '>', badge = 0) {
     return this.query()

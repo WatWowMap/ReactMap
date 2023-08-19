@@ -1,12 +1,12 @@
 // @ts-check
-const config = require('config')
+const config = require('@rm/config')
 
 /**
  *
  * @param {string[]} roles
  * @param {string} provider
  * @param {boolean} [trialActive]
- * @returns
+ * @returns {string[]}
  */
 function webhookPerms(roles, provider, trialActive = false) {
   const perms = []

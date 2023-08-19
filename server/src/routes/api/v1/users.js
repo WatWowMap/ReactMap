@@ -2,7 +2,7 @@
 /* eslint-disable no-await-in-loop */
 // @ts-check
 const router = require('express').Router()
-const config = require('config')
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 const { Db } = require('../../../services/initialization')
 
@@ -31,12 +31,12 @@ router.get('/export', async (req, res) => {
       api.reactMapSecret &&
       req.headers['react-map-secret'] === api.reactMapSecret
     ) {
-      /** @type {import('@packages/types/models').FullUser[]} */
+      /** @type {import('@rm/types').FullUser[]} */
       const users = await Db.models.User.query()
 
       const badges = {}
 
-      /** @type {import('@packages/types/models').FullGymBadge[]} */
+      /** @type {import('@rm/types').FullGymBadge[]} */
       const rawBadges = await Db.models.Badge.query()
       // eslint-disable-next-line no-unused-vars
       rawBadges.forEach(({ userId, id, ...rest }) => {
@@ -47,7 +47,7 @@ router.get('/export', async (req, res) => {
       })
 
       const backups = {}
-      /** @type {import('@packages/types/models').FullBackup[]} */
+      /** @type {import('@rm/types').FullBackup[]} */
       const rawBackups = await Db.models.Backup.query()
 
       // eslint-disable-next-line no-unused-vars
@@ -84,8 +84,8 @@ router.post('/import', async (req, res) => {
       const bodyArray = Array.isArray(body) ? body : [body]
 
       /**
-       * @param {import('@packages/types/models').User} user
-       * @returns {Promise<import('@packages/types/models').FullUser>}
+       * @param {import('@rm/types').User} user
+       * @returns {Promise<import('@rm/types').FullUser>}
        */
       const getUser = async (user) => {
         if (user.username) {

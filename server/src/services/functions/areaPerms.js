@@ -1,7 +1,10 @@
 // @ts-check
-const config = require('config')
+const config = require('@rm/config')
 
-/** @param {string[]} roles @returns */
+/**
+ * @param {string[]} roles
+ * @returns {string[]}
+ */
 function areaPerms(roles) {
   const areaRestrictions = config.getSafe('authentication.areaRestrictions')
   const areas = config.getSafe('areas')

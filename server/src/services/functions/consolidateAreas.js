@@ -1,5 +1,5 @@
 // @ts-check
-const config = require('config')
+const config = require('@rm/config')
 
 /**
  * Consolidate area restrictions and user set areas, accounts for parents

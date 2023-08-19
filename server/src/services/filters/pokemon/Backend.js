@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-const config = require('config')
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 const { KEYS, STANDARD, LEAGUES } = require('./constants')
 const {

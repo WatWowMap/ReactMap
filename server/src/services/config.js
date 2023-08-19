@@ -209,70 +209,21 @@ const checkExtraJsons = (fileName, domain = '') => {
   return generalJson
 }
 
-/** @param {Partial<import("@rm/types").Config['map']>} */
-const mergeMapConfig = (obj) => {
-  if (process.env.TELEGRAM_BOT_NAME && !obj?.customRoutes?.telegramBotName) {
-    if (obj.customRoutes)
-      obj.customRoutes.telegramBotName = process.env.TELEGRAM_BOT_NAME
-    log.warn(
-      HELPERS.config,
-      'TELEGRAM_BOT_NAME has been moved from the .env file to your config, telegramBotEnvRef is now deprecated.\nplease use customRoutes.telegramBotName instead\n(Move them from your .env file to your config file)',
-    )
-  }
-  if (obj?.customRoutes?.telegramBotEnvRef) {
-    log.warn(
-      HELPERS.config,
-      'TELEGRAM_BOT_NAME has been moved from the .env file to your config, telegramBotEnvRef is now deprecated.\nplease use customRoutes.telegramBotName instead\n(Move them from your .env file to your config file)',
-    )
-    obj.customRoutes.telegramBotName =
-      process.env[obj.customRoutes.telegramBotEnvRef]
-  }
-  ;['messageOfTheDay', 'donationPage', 'loginPage'].forEach((category) => {
-    if (obj?.[category]?.components) {
-      obj[category].components.forEach((component) => {
-        if (component.type === 'telegram' && component.telegramBotEnvRef) {
-          log.warn(
-            HELPERS.config,
-            'telegramBotEnvRef is deprecated, please use telegramBotName instead\n',
-            category,
-          )
-          log.warn('OLD:\n', component)
-          component.telegramBotName = process.env[component.telegramBotEnvRef]
-          delete component.telegramBotEnvRef
-          log.warn('NEW:\n', component)
-        }
-      })
-    }
-  })
-
-  if (
-    obj?.holidayEffects &&
-    !Array.isArray(obj?.holidayEffects) &&
-    typeof obj?.holidayEffects === 'object'
-  ) {
-    log.warn(
-      HELPERS.config,
-      'holidayEffects has been changed to an array, please update your config. Check out `server/src/configs/default.json` for an example.',
-    )
-    obj.holidayEffects = []
-  }
+/** @param {Partial<import("@rm/types").Config['map']>} [input] */
+const mergeMapConfig = (input) => {
+  const obj = input ?? config.getSafe('map')
 
   const menuOrder = obj?.general?.menuOrder
     ? obj.general.menuOrder.filter((x) => allowedMenuItems.includes(x))
     : []
-  allowedMenuItems.forEach((item) => {
-    if (!menuOrder.includes(item)) {
-      menuOrder.push(item)
-    }
-  })
 
   return {
     localeSelection: obj.localeSelection,
     ...obj,
-    // ...obj.general,
-    // menuOrder,
+    ...obj.general,
+    menuOrder,
     ...obj.customRoutes,
-    // ...obj.links,
+    ...obj.links,
     ...obj.misc,
     messageOfTheDay: {
       ...config.map.messageOfTheDay,
