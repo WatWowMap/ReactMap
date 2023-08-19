@@ -4,19 +4,24 @@ const extend = require('extend')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
-const {
-  database: { schemas: exampleSchemas },
-} = require('../configs/local.example.json')
 
 /**
  * @type {import("@rm/types").DbCheckClass}
  */
 module.exports = class DbCheck {
   constructor() {
-    this.validModels =
-      /** @type {import("../models").ScannerModelKeys[]} */ exampleSchemas.flatMap(
-        (s) => s.useFor,
-      )
+    this.validModels = /** @type {const} */ ([
+      'Device',
+      'Gym',
+      'Nest',
+      'Pokestop',
+      'Pokemon',
+      'Portal',
+      'Route',
+      'ScanCell',
+      'Spawnpoint',
+      'Weather',
+    ])
     this.singleModels = /** @type {const} */ ([
       'Backup',
       'Badge',
@@ -56,7 +61,7 @@ module.exports = class DbCheck {
             this.models[capital].push({ connection: i })
           }
         })
-        if (schema.endpoint) {
+        if ('endpoint' in schema) {
           this.endpoints[i] = schema
           return null
         }
@@ -338,7 +343,7 @@ module.exports = class DbCheck {
       log.error(
         HELPERS.db,
         e,
-        `\n\nOnly ${[this.validModels].join(
+        `\n\nOnly ${[...this.validModels, ...this.singleModels].join(
           ', ',
         )} are valid options in the useFor arrays`,
       )

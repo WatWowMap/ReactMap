@@ -344,7 +344,6 @@ const resolvers = {
       return []
     },
     scannerConfig: (_, { mode }, { perms }) => {
-      /** @type {import("@rm/types").Config['scanner']} */
       const scanner = config.getSafe('scanner')
 
       if (perms.scanner?.includes(mode) && scanner[mode].enabled) {
