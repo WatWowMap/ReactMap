@@ -46,7 +46,7 @@ class Route extends Model {
     const distanceMeters = isMad ? 'route_distance_meters' : 'distance_meters'
     const endLatitude = isMad ? 'end_poi_latitude' : 'end_lat'
     const endLongitude = isMad ? 'end_poi_longitude' : 'end_lon'
-    //route_distance_meters
+    
     const query = this.query()
       .select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
       .whereBetween(startLatitude, [args.minLat, args.maxLat])
@@ -86,7 +86,7 @@ class Route extends Model {
    * @param {boolean} isMad true if DB schema is MAD
    */
   static async getOne(id, { isMad }) {
-    let result = isMad ? 
+    const result = isMad ? 
     await this.query() .select({
         id: 'route_id',
         name: 'name',
