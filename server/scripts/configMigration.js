@@ -1,6 +1,6 @@
 const fs = require('fs')
 const { resolve } = require('path')
-const { log } = require('../src/services/logger')
+const { log } = require('@rm/logger')
 
 const oldConfig = JSON.parse(
   fs.readFileSync(resolve(__dirname, '../src/configs/config.json')),

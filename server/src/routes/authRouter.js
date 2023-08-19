@@ -2,9 +2,9 @@ const router = require('express').Router()
 const passport = require('passport')
 const {
   authentication: { strategies },
-} = require('../services/config')
+} = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
 const { Db } = require('../services/initialization')
-const { log, HELPERS } = require('../services/logger')
 
 // Loads up the base auth routes and any custom ones
 

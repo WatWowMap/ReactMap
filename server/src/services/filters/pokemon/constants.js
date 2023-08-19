@@ -1,5 +1,5 @@
 const { raw } = require('objection')
-const config = require('../../config')
+const config = require('@rm/config')
 const PokemonFilter = require('./Frontend')
 
 const LEVEL_CALC =

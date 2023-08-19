@@ -7,7 +7,7 @@
 const vm = require('vm')
 const NodeCache = require('node-cache')
 
-const { log, HELPERS } = require('../../logger')
+const { log, HELPERS } = require('@rm/logger')
 
 /**
  * @param {object} pokemon

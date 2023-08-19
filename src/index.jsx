@@ -16,7 +16,7 @@ if (CONFIG.map.general.title) {
 }
 
 // eslint-disable-next-line no-console
-console.log('ReactMap Version:', process.env.VERSION)
+console.log('ReactMap Version:', CONFIG.client.version)
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

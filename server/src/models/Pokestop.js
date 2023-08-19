@@ -1,8 +1,5 @@
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const { Event } = require('../services/initialization')
-
-const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: {
     searchResultsLimit,
@@ -11,7 +8,10 @@ const {
     hideOldPokestops,
   },
   map,
-} = require('../services/config')
+} = require('@rm/config')
+const { Event } = require('../services/initialization')
+
+const getAreaSql = require('../services/functions/getAreaSql')
 
 const questProps = {
   quest_type: true,

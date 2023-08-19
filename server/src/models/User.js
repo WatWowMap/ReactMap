@@ -2,7 +2,7 @@
 const { Model } = require('objection')
 const config = require('config')
 
-const { log, HELPERS } = require('../services/logger')
+const { log, HELPERS } = require('@rm/logger')
 
 class User extends Model {
   static get tableName() {

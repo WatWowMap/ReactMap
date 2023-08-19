@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 const NodeGeocoder = require('node-geocoder')
-const { log, HELPERS } = require('./logger')
+const { log, HELPERS } = require('@rm/logger')
 
 function formatter(addressFormat, result) {
   return addressFormat

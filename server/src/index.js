@@ -1,12 +1,7 @@
 process.title = 'ReactMap'
-process.env.FORCE_COLOR = 3
-
-if (!process.env.NODE_CONFIG_DIR) {
-  process.env.NODE_CONFIG_DIR = `${__dirname}/configs`
-  process.env.ALLOW_CONFIG_MUTATIONS = 'true'
-}
 
 require('dotenv').config()
+
 const path = require('path')
 const express = require('express')
 const logger = require('morgan')
@@ -26,8 +21,9 @@ const { GraphQLError } = require('graphql')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
 
+const { log, HELPERS } = require('@rm/logger')
+
 const config = require('./services/config')
-const { log, HELPERS } = require('./services/logger')
 const { Db, Event } = require('./services/initialization')
 require('./models')
 const Clients = require('./services/Clients')
@@ -169,7 +165,7 @@ i18next.use(Backend).init(
     defaultNS: 'translation',
     backend: {
       loadPath: path.resolve(
-        `${__dirname}/../../public/locales/{{lng}}/{{ns}}.json`,
+        `${__dirname}/../../dist/locales/{{lng}}/{{ns}}.json`,
       ),
     },
   },

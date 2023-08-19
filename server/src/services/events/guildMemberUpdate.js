@@ -1,8 +1,8 @@
 // @ts-check
 const config = require('config')
 
+const { log, HELPERS } = require('@rm/logger')
 const { Db } = require('../initialization')
-const { log, HELPERS } = require('../logger')
 
 /**
  *

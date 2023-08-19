@@ -3,7 +3,7 @@ const { resolve } = require('path')
 const fs = require('fs')
 
 const config = require('config')
-const { log, HELPERS } = require('./logger')
+const { log, HELPERS } = require('@rm/logger')
 
 /**
  * @typedef {import('../services/DiscordClient') | import('../services/TelegramClient') | null} Client

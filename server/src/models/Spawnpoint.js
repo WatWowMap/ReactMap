@@ -1,9 +1,9 @@
 // @ts-check
 const { Model, raw } = require('objection')
-const config = require('config')
+const config = require('@rm/config')
 
+const { log, HELPERS } = require('@rm/logger')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { log, HELPERS } = require('../services/logger')
 
 class Spawnpoint extends Model {
   static get tableName() {

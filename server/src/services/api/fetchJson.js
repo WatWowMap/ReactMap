@@ -4,7 +4,7 @@ const { resolve } = require('path')
 
 const { default: fetch } = require('node-fetch')
 const config = require('config')
-const { log, HELPERS } = require('../logger')
+const { log, HELPERS } = require('@rm/logger')
 
 /**
  * fetch wrapper with timeout and error handling

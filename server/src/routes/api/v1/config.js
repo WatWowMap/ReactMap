@@ -1,7 +1,7 @@
 const path = require('path')
 const router = require('express').Router()
 const config = require('config')
-const { log, HELPERS } = require('../../../services/logger')
+const { log, HELPERS } = require('@rm/logger')
 
 router.get('/', (req, res) => {
   try {

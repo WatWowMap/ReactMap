@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 const config = require('config')
+const { log, HELPERS } = require('@rm/logger')
 const { KEYS, STANDARD, LEAGUES } = require('./constants')
 const {
   deepCompare,
@@ -10,7 +11,6 @@ const {
 } = require('./functions')
 const { filterRTree } = require('../../functions/filterRTree')
 const { Event, Pvp } = require('../../initialization')
-const { log, HELPERS } = require('../../logger')
 
 /** @type {import('types').Config['api']['pvp']} */
 const pvpConfig = config.get('api.pvp')

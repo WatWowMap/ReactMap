@@ -8,9 +8,9 @@ const { GraphQLFileLoader } = require('@graphql-tools/graphql-file-loader')
 const {
   ApolloServerPluginDrainHttpServer,
 } = require('@apollo/server/plugin/drainHttpServer')
-const config = require('config')
+const config = require('@rm/config')
 
-const { log, HELPERS } = require('../services/logger')
+const { log, HELPERS } = require('@rm/logger')
 const resolvers = require('./resolvers')
 
 /** @param {import('http').Server} httpServer */
@@ -90,14 +90,14 @@ async function startApollo(httpServer) {
                 response.body.kind === 'single' &&
                 'data' in response.body.singleResult
               ) {
-                log.error(contextValue.req.body.operationName)
                 const endpoint = contextValue.req.body.operationName
 
                 const data = response.body.singleResult.data?.[endpoint]
                 const returned = Array.isArray(data) ? data.length : 0
 
                 log.info(
-                  HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
+                  HELPERS[endpoint.toLowerCase()] ||
+                    `[${endpoint?.toUpperCase()}]`,
                   '|',
                   context.operationName,
                   '|',

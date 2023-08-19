@@ -3,7 +3,7 @@ const { raw } = require('objection')
 const extend = require('extend')
 const config = require('config')
 
-const { log, HELPERS } = require('./logger')
+const { log, HELPERS } = require('@rm/logger')
 const {
   database: { schemas: exampleSchemas },
 } = require('../configs/local.example.json')

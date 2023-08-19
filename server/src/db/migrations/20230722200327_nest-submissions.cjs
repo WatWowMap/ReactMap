@@ -2,7 +2,7 @@ const {
   database: {
     settings: { userTableName },
   },
-} = require('../../services/config')
+} = require('@rm/config')
 /**
  * @typedef {import("knex").Knex} Knex
  */

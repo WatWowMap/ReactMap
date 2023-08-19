@@ -2,7 +2,7 @@ const {
   api: {
     pvp: { leagues },
   },
-} = require('../../config')
+} = require('@rm/config')
 const BaseFilter = require('../Base')
 
 module.exports = class PokemonFilter extends BaseFilter {

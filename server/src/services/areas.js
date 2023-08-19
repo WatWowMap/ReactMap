@@ -6,7 +6,7 @@ const { default: fetch } = require('node-fetch')
 const RTree = require('rtree')
 
 const config = require('config')
-const { log, HELPERS } = require('./logger')
+const { log, HELPERS } = require('@rm/logger')
 
 /** @type {import('types').RMGeoJSON} */
 const DEFAULT_RETURN = { type: 'FeatureCollection', features: [] }

@@ -13,7 +13,7 @@ const { sentryVitePlugin } = require('@sentry/vite-plugin')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
-const { create, locales } = require('@rm/locales')
+const { create, writeAll, locales } = require('@rm/locales')
 
 /**
  * @param {boolean} isDevelopment
@@ -55,10 +55,16 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
 }
 
 /**
+ * @param {boolean} isDevelopment
  * @returns {import('vite').Plugin}
  */
-const localePlugin = () => ({
+const localePlugin = (isDevelopment) => ({
   name: 'vite-plugin-locales',
+  async buildStart() {
+    if (!isDevelopment) return
+    const localeObj = await create()
+    await writeAll(localeObj, true, __dirname, './public/locales')
+  },
   async generateBundle() {
     const localeObj = await create()
 
@@ -138,7 +144,7 @@ const viteConfig = defineConfig(async ({ mode }) => {
             }),
           ]
         : []),
-      localePlugin(),
+      localePlugin(mode === 'development'),
     ],
     optimizeDeps: mode === 'development' ? { exclude: ['@mui/*'] } : undefined,
     publicDir: 'public',
@@ -152,13 +158,15 @@ const viteConfig = defineConfig(async ({ mode }) => {
     },
     define: {
       CONFIG: {
-        version,
-        locales,
-        hasCustom,
-        sentry: {
-          dsn: env.SENTRY_DSN || '',
-          tracesSampleRate: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
-          debug: env.SENTRY_DEBUG || false,
+        client: {
+          version,
+          locales,
+          hasCustom,
+          sentry: {
+            dsn: env.SENTRY_DSN || '',
+            tracesSampleRate: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
+            debug: env.SENTRY_DEBUG || false,
+          },
         },
         analytics: config.getSafe('analytics'),
         map: config.getSafe('map'),

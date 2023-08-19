@@ -2,9 +2,9 @@
 const fetch = require('node-fetch')
 const NodeCache = require('node-cache')
 
+const config = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
 const Clients = require('../Clients')
-const config = require('../config')
-const { log, HELPERS } = require('../logger')
 
 const scannerQueue = {
   scanNext: {},

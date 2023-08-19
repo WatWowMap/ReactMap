@@ -1,5 +1,5 @@
+const { log, HELPERS } = require('@rm/logger')
 const fetchJson = require('./fetchJson')
-const { log, HELPERS } = require('../logger')
 
 const PLATFORMS = /** @type {const} */ (['discord', 'telegram'])
 

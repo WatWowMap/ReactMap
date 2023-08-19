@@ -1,16 +1,15 @@
-require('../../packages/config')
-
 const fs = require('fs')
 const { resolve } = require('path')
-const config = require('config')
-const fetch = require('node-fetch')
-const { log, HELPERS } = require('../src/services/logger')
+
+const config = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
+
 const defaultRarity = require('../src/data/defaultRarity.json')
 
 const rarityObj = {}
 
-const rarityConfig = config.get('rarity')
-const endpoint = config.get('api.pogoApiEndpoints.masterfile')
+const rarityConfig = config.getSafe('rarity')
+const endpoint = config.getSafe('api.pogoApiEndpoints.masterfile')
 
 Object.entries(defaultRarity).forEach(([tier, pokemon]) => {
   if (rarityConfig?.[tier]?.length) {

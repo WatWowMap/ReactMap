@@ -1,11 +1,7 @@
-if (!process.env.NODE_CONFIG_DIR) {
-  process.env.NODE_CONFIG_DIR = `${__dirname}/../configs`
-  process.env.ALLOW_CONFIG_MUTATIONS = 'true'
-}
 const path = require('path')
 const { knex } = require('knex')
-const config = require('config')
-const { log, HELPERS } = require('../services/logger')
+const config = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
 
 const database = config.get('database')
 

@@ -1,6 +1,6 @@
 // @ts-check
 const { default: fetch } = require('node-fetch')
-const { log, HELPERS } = require('./logger')
+const { log, HELPERS } = require('@rm/logger')
 
 /**
  * Convert camelCase to Capitalized Words

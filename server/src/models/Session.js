@@ -1,7 +1,7 @@
 // @ts-check
 const { Model } = require('objection')
-const config = require('config')
-const { log, HELPERS } = require('../services/logger')
+const config = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
 
 class Session extends Model {
   static get tableName() {

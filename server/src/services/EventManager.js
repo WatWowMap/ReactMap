@@ -5,8 +5,8 @@ const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
 const config = require('config')
 
+const { log, HELPERS } = require('@rm/logger')
 const { generate } = require('../../scripts/generateMasterfile')
-const { log, HELPERS } = require('./logger')
 const PoracleAPI = require('./api/Poracle')
 
 class EventManager {

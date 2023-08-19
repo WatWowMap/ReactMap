@@ -3,8 +3,8 @@
 // @ts-check
 const router = require('express').Router()
 const config = require('config')
+const { log, HELPERS } = require('@rm/logger')
 const { Db } = require('../../../services/initialization')
-const { log, HELPERS } = require('../../../services/logger')
 
 const api = config.getSafe('api')
 

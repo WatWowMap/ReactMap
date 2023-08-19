@@ -3,8 +3,8 @@ const path = require('path')
 const router = require('express').Router()
 const config = require('config')
 
+const { log, HELPERS } = require('@rm/logger')
 const { Db, Event } = require('../../../services/initialization')
-const { log, HELPERS } = require('../../../services/logger')
 
 const queryObj = /** @type {const} */ ({
   pokemon: { model: 'Pokemon', category: 'pokemon' },

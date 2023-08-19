@@ -7,7 +7,8 @@ const { resolve } = require('path')
 const { default: getDistance } = require('@turf/distance')
 const { point } = require('@turf/helpers')
 
-const { Event } = require('../services/initialization')
+const { log, HELPERS } = require('@rm/logger')
+
 const {
   devOptions: { queryDebug },
   api: {
@@ -16,7 +17,8 @@ const {
     queryLimits,
   },
   map: { distanceUnit },
-} = require('../services/config')
+} = require('@rm/config')
+const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { filterRTree } = require('../services/functions/filterRTree')
 const fetchJson = require('../services/api/fetchJson')
@@ -29,7 +31,6 @@ const {
   BASE_KEYS,
 } = require('../services/filters/pokemon/constants')
 const PkmnFilter = require('../services/filters/pokemon/Backend')
-const { log, HELPERS } = require('../services/logger')
 
 class Pokemon extends Model {
   static get tableName() {

@@ -7,7 +7,7 @@
 
 const fs = require('fs')
 const { resolve, dirname } = require('path')
-const { log } = require('../src/services/logger')
+const { log } = require('@rm/logger')
 
 // Set Path where for area.json
 const configFolderArea = resolve(

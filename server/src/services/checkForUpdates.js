@@ -4,7 +4,7 @@ const { promisify } = require('util')
 const path = require('path')
 const fs = require('fs')
 
-const { log, HELPERS } = require('./logger')
+const { log, HELPERS } = require('@rm/logger')
 
 const execPromise = promisify(exec)
 

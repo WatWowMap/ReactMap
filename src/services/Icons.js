@@ -146,7 +146,7 @@ class UIcons {
   }
 
   checkValid(localIconObj) {
-    return Object.values(localIconObj).every((icon) => this[icon])
+    return Object.values(localIconObj || {}).every((icon) => this[icon])
   }
 
   setSelection(categories, value) {
