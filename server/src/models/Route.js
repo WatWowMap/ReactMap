@@ -37,7 +37,7 @@ class Route extends Model {
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const { onlyAreas, onlyDistance } = args.filters
-    
+
 
     const distanceInMeters = (onlyDistance || [0.5, 100]).map((x) => x * 1000)
 
@@ -53,7 +53,7 @@ class Route extends Model {
       .andWhereBetween(startLongitude, [args.minLon, args.maxLon])
       .andWhereBetween(distanceMeters, distanceInMeters)
       .union((qb) => {
-        
+
         qb.select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
           .whereBetween(endLatitude, [args.minLat, args.maxLat])
           .andWhereBetween(endLongitude, [args.minLon, args.maxLon])
@@ -83,12 +83,11 @@ class Route extends Model {
   /**
    * Returns the full route after querying it, generally from the Popup
    * @param {number} id
+   * @param {boolean} isMad true if DB schema is MAD
    */
   static async getOne(id, { isMad }) {
-    let result = null;
-
-    if(isMad) {
-      result = await this.query().select({
+    let result = isMad ? 
+    await this.query() .select({
         id: 'route_id',
         name: 'name',
         description: 'description',
@@ -109,10 +108,9 @@ class Route extends Model {
         type: 'type',
         version: 'version',
         waypoints: 'waypoints',
-      }).select(raw('UNIX_TIMESTAMP(last_updated)').as('updated')).findOne( {route_id: id})
-    } else {
-      result = await this.query().findById(id)
-    }
+      }).select(raw('UNIX_TIMESTAMP(last_updated)').as('updated')).findOne({ route_id: id }) : 
+      await this.query().findById(id)
+
     if (typeof result.waypoints === 'string') {
       result.waypoints = JSON.parse(result.waypoints)
     } else if (result.waypoints === null) {
@@ -137,17 +135,17 @@ class Route extends Model {
 
   /**
    * returns route context
+   * @param {boolean} isMad true if DB schema is MAD
    * @returns {{ max_distance: number, max_duration: number }}
    */
-  static async getFilterContext(source) {
-    const { isMad } = source
-    if(isMad) {
+  static async getFilterContext({ isMad }) {
+    if (isMad) {
       const result = await this.query()
-      .max('route_distance_meters AS max_distance')
-      .max('route_duration_seconds AS max_duration')
-      .first()
+        .max('route_distance_meters AS max_distance')
+        .max('route_duration_seconds AS max_duration')
+        .first()
 
-     return result 
+      return result
     }
 
     const result = await this.query()
