@@ -10,8 +10,8 @@ const removeFiles = require('rollup-plugin-delete')
 const { join, resolve, extname } = require('path')
 const fs = require('fs')
 const { sentryVitePlugin } = require('@sentry/vite-plugin')
-const config = require('@rm/config')
 
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 const { create, writeAll, locales } = require('@rm/locales')
 

@@ -4655,7 +4655,7 @@ parseurl@~1.3.3:
   resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.3.tgz#9da19e7bee8d12dff0513ed5b76957793bc2e8d4"
   integrity sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==
 
-passport-discord@^0.1.4, "passport-discord@https://github.com/tonestrike/passport-discord.git":
+"passport-discord@https://github.com/tonestrike/passport-discord.git":
   version "0.1.4"
   resolved "https://github.com/tonestrike/passport-discord.git#7d7a726f6dc1e3d7be51cf11c554f1fd8a74563a"
   dependencies:
