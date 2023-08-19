@@ -1,3 +1,4 @@
+// @ts-check
 /* eslint-disable no-console */
 const freezeProps = (target, property) => {
   const {
@@ -490,7 +491,7 @@ class UIcons {
     }
   }
 
-  getWeather(weatherId, timeOfDay = false) {
+  getWeather(weatherId, timeOfDay = 'day') {
     try {
       const baseUrl = `${
         this[this.selected.weather]?.path || this.fallback

@@ -1,3 +1,4 @@
+// @ts-check
 import getAllDevices from './queries/device'
 import * as gymIndex from './queries/gym'
 import * as pokestopIndex from './queries/pokestop'
