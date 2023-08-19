@@ -66,6 +66,7 @@ const localePlugin = (isDevelopment) => ({
     await writeAll(localeObj, true, __dirname, './public/locales')
   },
   async generateBundle() {
+    if (isDevelopment) return
     const localeObj = await create()
 
     Object.entries(localeObj).forEach(([locale, translations]) => {
