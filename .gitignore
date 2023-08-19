@@ -14,6 +14,7 @@ server/src/configs/koji_backups/*
 
 # Masterfile
 server/src/data/masterfile.json
+packages/masterfile/lib/data/masterfile.json
 
 # Docker file
 /docker-compose.yml

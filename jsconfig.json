@@ -19,9 +19,6 @@
       "@hooks/*": [
         "./src/hooks/*"
       ],
-      "@packages/*": [
-        "./packages/*"
-      ],
     }
   },
   "exclude": [

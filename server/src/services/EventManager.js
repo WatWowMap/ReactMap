@@ -1,20 +1,20 @@
 // @ts-check
-const { promises: fs, readFileSync } = require('fs')
+const { promises: fs } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
 const config = require('config')
 
 const { log, HELPERS } = require('@rm/logger')
-const { generate } = require('../../scripts/generateMasterfile')
+const { generate } = require('@rm/masterfile')
+const masterfile = require('@rm/masterfile/lib/data/masterfile.json')
+
 const PoracleAPI = require('./api/Poracle')
 
 class EventManager {
   constructor() {
     /** @type {import("@rm/types").Masterfile} */
-    this.masterfile = JSON.parse(
-      readFileSync(path.resolve(__dirname, '../data/masterfile.json'), 'utf-8'),
-    )
+    this.masterfile = masterfile
     this.invasions = this.masterfile.invasions
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
     this.uicons = []

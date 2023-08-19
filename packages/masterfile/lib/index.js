@@ -1,10 +1,11 @@
+// @ts-check
 const fs = require('fs')
 const { resolve } = require('path')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
-const defaultRarity = require('../src/data/defaultRarity.json')
+const defaultRarity = require('./data/defaultRarity.json')
 
 const rarityObj = {}
 
@@ -19,6 +20,13 @@ Object.entries(defaultRarity).forEach(([tier, pokemon]) => {
   }
 })
 
+/**
+ *
+ * @param {boolean} save
+ * @param {import('@rm/types').Rarity} historicRarity
+ * @param {import('@rm/types').Rarity} dbRarity
+ * @returns
+ */
 const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
   try {
     if (!endpoint) throw new Error('No masterfile endpoint')
@@ -61,10 +69,9 @@ const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
 
     if (save) {
       fs.writeFileSync(
-        resolve(`${__dirname}/../src/data/masterfile.json`),
+        resolve(`${__dirname}/data/masterfile.json`),
         JSON.stringify(newMf, null, 2),
         'utf8',
-        () => {},
       )
     }
     return newMf

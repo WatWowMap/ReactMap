@@ -1289,18 +1289,18 @@ class Pokestop extends Model {
           .orderBy('incident.character', 'incident.display_type')
       }
     } else if (isMad) {
-        queries.invasions = this.query()
-          .distinct('incident_grunt_type AS grunt_type')
-          .where('incident_grunt_type', '>', 0)
-          .whereRaw('incident_expiration > UTC_TIMESTAMP()')
-          .orderBy('grunt_type')
-      } else {
-        queries.invasions = this.query()
-          .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
-          .where(isMad ? 'incident_grunt_type' : 'grunt_type', '>', 0)
-          .andWhere('incident_expire_timestamp', '>=', ts)
-          .orderBy('grunt_type')
-      }
+      queries.invasions = this.query()
+        .distinct('incident_grunt_type AS grunt_type')
+        .where('incident_grunt_type', '>', 0)
+        .whereRaw('incident_expiration > UTC_TIMESTAMP()')
+        .orderBy('grunt_type')
+    } else {
+      queries.invasions = this.query()
+        .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
+        .where(isMad ? 'incident_grunt_type' : 'grunt_type', '>', 0)
+        .andWhere('incident_expire_timestamp', '>=', ts)
+        .orderBy('grunt_type')
+    }
     if (isMad && !hasMultiInvasions) {
       queries.invasions.whereNotIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
     }
