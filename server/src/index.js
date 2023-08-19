@@ -165,9 +165,10 @@ i18next.use(Backend).init(
   {
     lng: 'en',
     fallbackLng: 'en',
-    preload: locales,
     ns: ['translation'],
     defaultNS: 'translation',
+    supportedLngs: locales,
+    preload: locales,
     backend: {
       loadPath: path.resolve(
         `${__dirname}/../../dist/locales/{{lng}}/{{ns}}.json`,
