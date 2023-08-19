@@ -80,8 +80,7 @@ if (typeof window === 'undefined') {
     log.setLevel(config.getSafe('devOptions.logLevel'))
   }
 } else {
-  const level = process.env.NODE_ENV === 'production' ? 'info' : 'debug'
-  log.setLevel(level)
+  log.setLevel(process.env.NODE_ENV === 'development' ? 'debug' : 'info')
 }
 
 module.exports.log = log

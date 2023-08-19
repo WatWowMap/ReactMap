@@ -1,0 +1,17 @@
+{
+  "name": "@rm/locales",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./lib/index.js",
+  "scripts": {
+    "generate": "node ./lib/generate.js",
+    "create": "node ./lib/create.js",
+    "missing": "node ./lib/missing.js"
+  },
+  "dependencies": {
+    "@rm/config": "*",
+    "@rm/logger": "*",
+    "dotenv": "^16.3.1",
+    "openai": "^3.3.0"
+  }
+}
