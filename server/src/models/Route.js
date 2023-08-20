@@ -113,6 +113,8 @@ class Route extends Model {
           .findOne({ route_id: id })
       : await this.query().findById(id)
 
+    if (!result) return null
+
     if (typeof result.waypoints === 'string') {
       result.waypoints = JSON.parse(result.waypoints)
     } else if (result.waypoints === null) {

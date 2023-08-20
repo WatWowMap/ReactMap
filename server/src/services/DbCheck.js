@@ -492,7 +492,7 @@ module.exports = class DbCheck {
           SubModel[method](...args, source),
         ),
       )
-      return DbCheck.deDupeResults(data)
+      return DbCheck.deDupeResults(data.filter(Boolean))
     }
     return this.models[model][method](...args)
   }
