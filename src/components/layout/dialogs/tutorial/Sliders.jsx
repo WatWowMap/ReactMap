@@ -6,9 +6,11 @@ import SliderTile from '../filters/SliderTile'
 import data from './data'
 
 const relevant = ['iv', 'level', 'great', 'ultra']
+const { ivOr } = data.filters.pokemon
+
 export default function TutSliders() {
-  const { ivOr } = data.filters.pokemon
   const { t } = useTranslation()
+
   const [temp, setTemp] = useState({ ...ivOr, iv: [80, 100], great: [1, 10] })
 
   const handleChange = (event, values) => {

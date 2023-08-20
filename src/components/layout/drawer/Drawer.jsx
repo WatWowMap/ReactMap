@@ -7,7 +7,9 @@ import { useLayoutStore, useStatic } from '@hooks/useStore'
 import Actions from './Actions'
 import DrawerSection from './Section'
 
-export default function Sidebar({ toggleDialog }) {
+const handleClose = () => useLayoutStore.setState({ drawer: false })
+
+export default function Sidebar() {
   const drawer = useLayoutStore((s) => s.drawer)
 
   const {
@@ -16,11 +18,6 @@ export default function Sidebar({ toggleDialog }) {
     },
     ui,
   } = useStatic.getState()
-
-  const handleClose = React.useCallback(
-    () => useLayoutStore.setState({ drawer: false }),
-    [],
-  )
 
   return (
     <Drawer
@@ -59,12 +56,7 @@ export default function Sidebar({ toggleDialog }) {
         </Grid>
       </Grid>
       {Object.entries(ui).map(([category, value]) => (
-        <DrawerSection
-          key={category}
-          category={category}
-          value={value}
-          toggleDialog={toggleDialog}
-        />
+        <DrawerSection key={category} category={category} value={value} />
       ))}
       {separateDrawerActions && <Actions />}
     </Drawer>

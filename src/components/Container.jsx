@@ -10,6 +10,7 @@ import Map from './Map'
 import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
 import DraggableMarker from './layout/dialogs/webhooks/human/Draggable'
 import WebhookAreaSelection from './layout/dialogs/webhooks/human/area/AreaSelection'
+import Nav from './layout/Nav'
 
 export default function Container({ serverSettings, params, location, zoom }) {
   useRefresh()
@@ -45,6 +46,7 @@ export default function Container({ serverSettings, params, location, zoom }) {
       <ScanOnDemand mode="scanZone" />
       <DraggableMarker />
       <WebhookAreaSelection />
+      <Nav />
     </MapContainer>
   )
 }

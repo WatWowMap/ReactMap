@@ -6,9 +6,7 @@ import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
 import useTileLayer from '@hooks/useTileLayer'
 
-import Nav from './layout/Nav'
 import QueryData from './QueryData'
-import ClientError from './layout/dialogs/ClientError'
 import { GenerateCells } from './tiles/S2Cell'
 
 /** @param {string} category */
@@ -43,13 +41,14 @@ export default function Map({ params }) {
   const timeOfDay = useStatic((state) => state.timeOfDay)
   const isMobile = useStatic((state) => state.isMobile)
   const Icons = useStatic((state) => state.Icons)
+  const error = useStatic((state) => state.clientError)
+
   const filters = useStore((state) => state.filters)
   const settings = useStore((state) => state.settings)
   const icons = useStore((state) => state.icons)
   const userSettings = useStore((state) => state.userSettings)
 
   const [manualParams, setManualParams] = useState(params)
-  const [error, setError] = useState('')
   const [windowState, setWindowState] = useState(true)
 
   const onMove = useCallback(
@@ -229,7 +228,6 @@ export default function Map({ params }) {
                 setParams={setManualParams}
                 timeOfDay={timeOfDay}
                 isMobile={isMobile}
-                setError={setError}
                 active={active}
               />
             )
@@ -237,8 +235,6 @@ export default function Map({ params }) {
           return null
         },
       )}
-      <Nav />
-      <ClientError error={error} />
     </>
   )
 }

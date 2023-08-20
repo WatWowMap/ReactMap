@@ -1,4 +1,5 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import {
   Divider,
   FormControl,
@@ -103,7 +104,6 @@ export default function Settings() {
         <FCSelect
           key={category}
           name={category}
-          color="secondary"
           value={icons[category]}
           label={t(`${category}_icons`, `${category} Icons`)}
           onChange={({ target }) => {

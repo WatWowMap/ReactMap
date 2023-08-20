@@ -1,3 +1,4 @@
+import Utility from '@services/Utility'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -8,6 +9,7 @@ import { persist } from 'zustand/middleware'
  *   location: [number, number],
  *   popups: Record<string, boolean>,
  *   zoom: number,
+ *   sidebar: string,
  *   selectedWebhook: string,
  *   settings: { localeSelection: keyof typeof import('@assets/mui/theme').LOCALE_MAP, navigationControls: 'react' | 'leaflet' }
  *   motdIndex: number
@@ -16,6 +18,7 @@ import { persist } from 'zustand/middleware'
  *   search: string,
  *   filters: object,
  *   scannerCooldown: number
+ *   icons: Record<string, string>
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
@@ -107,6 +110,9 @@ export const useStore = create(
  *   auth: object,
  *   filters: object,
  *   masterfile: { invasions: object }
+ *   settings: Record<string, any>
+ *   userSettings: Record<string, any>
+ *   clientError: string,
  * }} UseStatic
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
  */
@@ -115,6 +121,7 @@ export const useStatic = create((set) => ({
   isTablet: false,
   active: true,
   searchLoading: false,
+  clientError: '',
   auth: {
     strategy: '',
     discordId: '',
@@ -177,7 +184,6 @@ export const useStatic = create((set) => ({
 //  * }} UseDialog
 //  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseDialog>>}
 //  */
-
 export const useLayoutStore = create(() => ({
   nestSubmissions: '0',
   motd: false,
@@ -187,7 +193,43 @@ export const useLayoutStore = create(() => ({
   resetFilters: false,
   feedback: false,
   drawer: false,
+  dialog: {
+    open: false,
+    category: '',
+    type: '',
+  },
 }))
+
+export const toggleDialog = (open, category, type, filter) => (event) => {
+  Utility.analytics(
+    'Menu Toggle',
+    `Open: ${open}`,
+    `Category: ${category} Menu: ${type}`,
+  )
+  if (
+    event.type === 'keydown' &&
+    (event.key === 'Tab' || event.key === 'Shift')
+  ) {
+    return
+  }
+  useLayoutStore.setState({ dialog: { open, category, type } })
+  if (filter && type === 'filters') {
+    useStore.setState((prev) => ({
+      filters: {
+        ...prev.filters,
+        [category]: { ...prev.filters[category], filter },
+      },
+    }))
+  }
+  if (filter && type === 'options') {
+    useStore.setState((prev) => ({
+      userSettings: {
+        ...prev.userSettings,
+        [category]: filter,
+      },
+    }))
+  }
+}
 
 /**
  * @typedef {'scanNext' | 'scanZone'} ScanMode

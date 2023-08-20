@@ -10,9 +10,15 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import { useStatic, useStore } from '@hooks/useStore'
+import {
+  useLayoutStore,
+  useStatic,
+  useStore,
+  toggleDialog,
+} from '@hooks/useStore'
 import Header from '../general/Header'
 import Footer from '../general/Footer'
+import { DialogWrapper } from './DialogWrapper'
 
 function InputType({ option, subOption, localState, handleChange, category }) {
   const staticUserSettings = useStatic.getState().userSettings[category] || {}
@@ -25,7 +31,7 @@ function InputType({ option, subOption, localState, handleChange, category }) {
       return (
         <Switch
           color="secondary"
-          checked={!!localState[subOption || option]}
+          checked={!!localState?.[subOption || option] || false}
           name={subOption || option}
           onChange={handleChange}
           disabled={fullOption.disabled}
@@ -39,7 +45,7 @@ function InputType({ option, subOption, localState, handleChange, category }) {
           label={subOption || option}
           name={subOption || option}
           style={{ width: 50 }}
-          value={localState[subOption || option]}
+          value={localState?.[subOption || option] || ''}
           onChange={handleChange}
           variant="outlined"
           size="small"
@@ -58,20 +64,22 @@ function InputType({ option, subOption, localState, handleChange, category }) {
 const MemoInputType = React.memo(
   InputType,
   (prev, next) =>
-    prev.localState[prev.subOption || prev.option] ===
-    next.localState[next.subOption || next.option],
+    prev.localState?.[prev.subOption || prev.option] ===
+    next.localState?.[next.subOption || next.option],
 )
 
-export default function UserOptions({ category, toggleDialog }) {
+export default function UserOptions() {
   const { t } = useTranslation()
-  const staticUserSettings = useStatic.getState().userSettings[category] || {}
+  const { open, category, type } = useLayoutStore((s) => s.dialog)
+
+  const staticUserSettings = useStatic((s) => s.userSettings[category] || {})
   const userSettings = useStore((state) => state.userSettings)
 
   const [localState, setLocalState] = React.useState(userSettings[category])
 
   const handleChange = (event) => {
-    const { name, value, checked, type } = event.target
-    if (type === 'checkbox') {
+    const { name, value, checked, type: eType } = event.target
+    if (eType === 'checkbox') {
       setLocalState((prev) => ({ ...prev, [name]: checked }))
     } else if (value) {
       setLocalState((prev) => ({ ...prev, [name]: value }))
@@ -92,8 +100,17 @@ export default function UserOptions({ category, toggleDialog }) {
     return t(Utility.camelToSnake(label), Utility.getProperName(label))
   }
 
+  React.useEffect(() => {
+    setLocalState(userSettings[category])
+  }, [category])
+
   return (
-    <>
+    <DialogWrapper
+      open={open && type === 'options'}
+      maxWidth="md"
+      onClose={toggleDialog(false, category, type)}
+      fullWidth={false}
+    >
       <Header
         titles={[`${Utility.camelToSnake(category)}_options`]}
         action={toggleDialog(false, category, 'options')}
@@ -171,6 +188,6 @@ export default function UserOptions({ category, toggleDialog }) {
           },
         ]}
       />
-    </>
+    </DialogWrapper>
   )
 }
