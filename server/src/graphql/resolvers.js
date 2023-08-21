@@ -39,9 +39,10 @@ const resolvers = {
       }
       return {}
     },
-    backups: (_, _args, { req, perms, Db }) => {
+    backups: async (_, _args, { req, perms, Db }) => {
       if (perms?.backups) {
-        return Db.models.Backup.getAll(req.user?.id)
+        const records = await Db.query('Backup', 'getAll', req.user?.id)
+        return records
       }
       return []
     },
