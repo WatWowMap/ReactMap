@@ -46,7 +46,7 @@ export default function Generator({ block = {}, defaultReturn = null }) {
         />
       )
     case 'discord':
-      return <DiscordLogin href={block.link} text={block.text} />
+      return <DiscordLogin href={block.link}>{block.text}</DiscordLogin>
     case 'localLogin':
       return <LocalLogin href={block.localAuthUrl} style={props.style} />
     case 'localeSelection':

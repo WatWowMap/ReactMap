@@ -10,7 +10,8 @@ import Link from '@mui/material/Link'
  *  target?: string,
  *  linkColor?: string,
  *  underline?: import("@mui/material/Link").LinkProps['underline'],
- *  style?: import("@mui/system").SxProps,
+ *  style?: import('react').CSSProperties,
+ *  sx?: import("@mui/system").SxProps,
  *  children: React.ReactNode
  * }} props
  * @returns {React.ReactNode}
@@ -21,10 +22,12 @@ export default function LinkWrapper({
   linkColor,
   underline,
   style,
+  sx,
   children,
 }) {
   if (!link) return children
   const external = link.startsWith('http')
+
   return (
     <Link
       href={external ? link : null}
@@ -33,7 +36,7 @@ export default function LinkWrapper({
       target={target ?? (external ? '_blank' : null)}
       color={linkColor}
       underline={underline}
-      sx={style}
+      sx={[style, ...(Array.isArray(sx) ? sx : [sx])]}
       component={external ? 'a' : RouterLink}
     >
       {children}

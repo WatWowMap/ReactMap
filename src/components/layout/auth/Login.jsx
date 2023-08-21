@@ -30,7 +30,7 @@ export default function Login({ serverSettings }) {
     return <Loading height="100vh">{t('loading', { category: '' })}</Loading>
   }
 
-  if (serverSettings?.user?.valid) {
+  if (serverSettings?.user?.valid && process.env.NODE_ENV !== 'development') {
     return <Navigate to="/" />
   }
 
@@ -87,14 +87,16 @@ export default function Login({ serverSettings }) {
                 sm={serverSettings.config.map.discordInvite ? 3 : 10}
                 textAlign="center"
               >
-                <DiscordLogin href={serverSettings.config.map.discordAuthUrl} />
+                <DiscordLogin
+                  href={serverSettings.config.map.discordAuthUrl}
+                  bgcolor="success.dark"
+                />
               </Grid>
               {serverSettings.config.map.discordInvite && (
                 <Grid xs={t('join_button')} sm={3} textAlign="center">
-                  <DiscordLogin
-                    href={serverSettings.config.map.discordInvite}
-                    text="join"
-                  />
+                  <DiscordLogin href={serverSettings.config.map.discordInvite}>
+                    join
+                  </DiscordLogin>
                 </Grid>
               )}
             </Grid>
