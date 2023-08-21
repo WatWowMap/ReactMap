@@ -284,7 +284,11 @@ const ProfilePermissions = () => {
       style={{ padding: 5 }}
     >
       {Object.keys(auth.perms).map((perm) => {
-        if (excludeList.includes(perm) || perm === 'donor') {
+        if (
+          excludeList.includes(perm) ||
+          perm === 'donor' ||
+          perm === 'blockedGuildNames'
+        ) {
           return null
         }
         if (Array.isArray(auth.perms[perm]) && auth.counts[perm] === 0) {

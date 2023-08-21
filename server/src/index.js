@@ -134,7 +134,7 @@ app.use(
 
 app.use(
   session({
-    name: 'reactmap0',
+    name: 'reactmap1',
     secret: config.getSafe('api.sessionSecret'),
     store: sessionStore,
     resave: true,

@@ -119,10 +119,7 @@ class DiscordClient {
     /** @type {import("@rm/types").Permissions} */
     // @ts-ignore
     const perms = Object.fromEntries(
-      Object.entries(this.perms).map(([k, v]) => [
-        k,
-        typeof v === 'boolean' ? false : [],
-      ]),
+      Object.keys(this.perms).map((key) => [key, false]),
     )
 
     const permSets = {
