@@ -5,6 +5,7 @@
     "__format": "number"
   },
   "packageSource": "PACKAGE_SOURCE",
+  "googleAnalyticsId": "GOOGLE_ANALYTICS_ID",
   "devOptions": {
     "enabled": {
       "__name": "DEV_OPTIONS_ENABLED",
@@ -19,7 +20,11 @@
       "__format": "boolean"
     },
     "clientPath": "DEV_OPTIONS_CLIENT_PATH",
-    "logLevel": "DEV_OPTIONS_LOG_LEVEL"
+    "logLevel": "DEV_OPTIONS_LOG_LEVEL",
+    "skipMinified": {
+      "__name": "DEV_OPTIONS_SKIP_MINIFIED",
+      "__format": "boolean"
+    }
   },
   "api": {
     "sessionSecret": "API_SESSION_SECRET",
@@ -336,10 +341,6 @@
         "__name": "MAP_GENERAL_MENU_ORDER",
         "__format": "json"
       }
-    },
-    "localeSelection": {
-      "__name": "MAP_LOCALE_SELECTION",
-      "__format": "json"
     },
     "customRoutes": {
       "discordAuthUrl": "MAP_CUSTOM_ROUTES_DISCORD_AUTH_URL",
