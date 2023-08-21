@@ -104,14 +104,11 @@ function ScanOnDemand({ mode }) {
   }, [scannerQueueResponse])
 
   React.useEffect(() => {
-    if (scanMode === '') {
-      useScanStore.setState((prev) => ({
-        scanLocation: prev.scanLocation.every((x) => x === 0)
-          ? location
-          : prev.scanLocation,
-      }))
+    const { scanNextMode, scanZoneMode } = useScanStore.getState()
+    if (scanNextMode === '' && scanZoneMode === '') {
+      useScanStore.setState({ scanLocation: location })
     }
-  }, [location])
+  }, [location, scanMode])
 
   React.useEffect(() => {
     const subscription = useScanStore.subscribe((next, prev) => {
