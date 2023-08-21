@@ -5,6 +5,7 @@ import Tune from '@mui/icons-material/Tune'
 import FormatSize from '@mui/icons-material/FormatSize'
 import Settings from '@mui/icons-material/Settings'
 import { Grid, IconButton, Typography } from '@mui/material'
+import Utility from '@services/Utility'
 
 export default function MenuTile({ data, rowIndex, columnIndex, style }) {
   const [name, setName] = useState(true)
@@ -17,7 +18,6 @@ export default function MenuTile({ data, rowIndex, columnIndex, style }) {
     isMobile,
     type,
     toggleSlotsMenu,
-    Utility,
     standard,
     Icons,
   } = data

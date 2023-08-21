@@ -441,14 +441,6 @@ class PoracleAPI {
    */
   async api(userId, category, method = 'GET', data = null) {
     const [main, action] = PoracleAPI.#split(category)
-    log.warn(HELPERS.webhooks, HELPERS.api, {
-      main,
-      action,
-      userId,
-      category,
-      method,
-      data,
-    })
     switch (main) {
       case 'start':
       case 'stop':

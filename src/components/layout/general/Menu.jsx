@@ -111,7 +111,10 @@ export default function Menu({
         newObj[key] = { ...newFilters, enabled }
 
         // ugly patch for also changing gym slots with the apply to all
-        if (key.startsWith('t') && key.charAt(1) != 0) {
+        if (
+          (key.startsWith('t') && key.charAt(1) != 0 && category === 'gym') ||
+          webhookCategory
+        ) {
           Object.assign(
             newObj,
             Utility.generateSlots(key, newFilters, tempFilters),
@@ -216,7 +219,6 @@ export default function Menu({
     <OptionsContainer
       count={count}
       category={category}
-      Utility={Utility}
       handleReset={handleReset}
       advMenu={advMenu}
       setAdvMenu={(value) => useStore.setState({ advMenu: value })}
@@ -306,7 +308,6 @@ export default function Menu({
                     toggleAdvMenu,
                     toggleSlotsMenu,
                     type: category,
-                    Utility,
                     toggleWebhook,
                     webhookCategory,
                     standard: filters.standard,

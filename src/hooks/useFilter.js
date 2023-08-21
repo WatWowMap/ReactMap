@@ -123,7 +123,9 @@ export default function useFilter(
     Object.entries(menuFilters[subCategory] || {}).forEach(([id, item]) => {
       if (
         item.perms.some((perm) => perms[perm]) &&
-        (item.webhookOnly ? webhookCategory && tempFilters[id] : true)
+        (item.webhookOnly
+          ? webhookCategory && tempFilters[id]
+          : tempFilters[id])
       ) {
         if (
           !item.name.endsWith('*') ||
