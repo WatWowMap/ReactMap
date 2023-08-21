@@ -1,0 +1,29 @@
+{
+  "name": "@rm/types",
+  "version": "1.0.0",
+  "private": true,
+  "types": "./lib/index.d.ts",
+  "scripts": {
+    "sort": "npx sort-package-json",
+    "depCheck": "npx depcheck",
+    "eslint:check": "eslint \"**/*.{js,jsx}\"",
+    "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix",
+    "prettier:check": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
+    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\""
+  },
+  "devDependencies": {
+    "@apollo/client": "^3.7.15",
+    "@sentry/node": "^7.48.0",
+    "@types/config": "^3.3.0",
+    "@types/node": "^20.5.1",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.0.9",
+    "@turf/helpers": "^6.5.0",
+    "express": "^4.17.3",
+    "knex": "^2.4.2",
+    "loglevel": "^1.8.1",
+    "objection": "^3.0.1",
+    "passport-discord": "https://github.com/tonestrike/passport-discord.git",
+    "passport-oauth2": "^1.7.0"
+  }
+}

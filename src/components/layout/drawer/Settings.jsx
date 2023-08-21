@@ -1,4 +1,5 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import {
   Divider,
   FormControl,
@@ -21,6 +22,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import DrawerActions from './Actions'
 import BoolToggle from './BoolToggle'
+import LocaleSelection from '../general/LocaleSelection'
 
 function FCSelect({ name, label, value, onChange, children, icon }) {
   return (
@@ -31,7 +33,7 @@ function FCSelect({ name, label, value, onChange, children, icon }) {
         <Select
           autoFocus
           name={name}
-          value={value}
+          value={value || ''}
           onChange={onChange}
           fullWidth
           label={label}
@@ -44,16 +46,14 @@ function FCSelect({ name, label, value, onChange, children, icon }) {
 }
 
 const ICON_MAP = {
-  localeSelection: TranslateIcon,
   navigation: NavIcon,
   navigationControls: StyleIcon,
   tileServers: MapIcon,
 }
 
 export default function Settings() {
-  const { t, i18n } = useTranslation()
-  const { config, setIcons: setStaticIcons } = useStatic.getState()
-  const { setIcons, setSettings } = useStore.getState()
+  const { t } = useTranslation()
+  const { config } = useStatic.getState()
 
   const Icons = useStatic((s) => s.Icons)
   const staticSettings = useStatic((s) => s.settings)
@@ -73,13 +73,12 @@ export default function Settings() {
             value={config[setting][settings[setting]]?.name || ''}
             label={t(Utility.camelToSnake(setting))}
             onChange={({ target }) => {
-              setSettings({
-                ...settings,
-                [target.name]: config[target.name][target.value].name,
-              })
-              if (target.name === 'localeSelection') {
-                i18n.changeLanguage(target.value)
-              }
+              useStore.setState((prev) => ({
+                settings: {
+                  ...prev.settings,
+                  [target.name]: config[target.name][target.value].name,
+                },
+              }))
             }}
             icon={<Icon />}
           >
@@ -94,18 +93,25 @@ export default function Settings() {
           </FCSelect>
         )
       })}
+      <ListItem dense>
+        <ListItemIcon>
+          <TranslateIcon />
+        </ListItemIcon>
+        <LocaleSelection />
+      </ListItem>
       <Divider style={{ margin: '10px 0' }} />
       {Icons.customizable.map((category) => (
         <FCSelect
           key={category}
           name={category}
-          color="secondary"
           value={icons[category]}
           label={t(`${category}_icons`, `${category} Icons`)}
           onChange={({ target }) => {
             Icons.setSelection(target.name, target.value)
-            setStaticIcons(Icons)
-            setIcons({ ...icons, [target.name]: target.value })
+            useStatic.setState({ Icons })
+            useStore.setState({
+              icons: { ...icons, [target.name]: target.value },
+            })
           }}
           icon={
             <img

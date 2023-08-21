@@ -1,11 +1,12 @@
+import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import getAvailable from '@services/queries/available'
-import { useEffect } from 'react'
 
-import { useStatic } from './useStore'
+import UIcons from '@services/Icons'
+
+import { useStatic, useStore } from './useStore'
 
 export default function useRefresh() {
-  const { setAvailable, setMasterfile, setFilters } = useStatic.getState()
   const active = useStatic((s) => s.active)
 
   const { data, stopPolling, startPolling } = useQuery(getAvailable, {
@@ -15,18 +16,38 @@ export default function useRefresh() {
 
   useEffect(() => {
     if (active) {
-      startPolling()
-    } else {
-      stopPolling()
+      startPolling(1000 * 60 * 60)
+      return () => stopPolling()
     }
+    stopPolling()
   }, [active])
 
   useEffect(() => {
     if (data?.available) {
-      const { masterfile, filters, ...rest } = data.available
-      setAvailable(rest)
-      setMasterfile(masterfile)
-      setFilters(filters)
+      const { masterfile, filters, icons, ...rest } = data.available
+      const { icons: userIcons } = useStore.getState()
+      const Icons = new UIcons(icons, masterfile.questRewardTypes)
+      if (Icons) {
+        Icons.build(icons.styles)
+        if (icons.defaultIcons) {
+          Icons.setSelection(icons.defaultIcons)
+        }
+        if (Icons.checkValid(userIcons)) {
+          Icons.setSelection(userIcons)
+        }
+      }
+      if (masterfile) {
+        localStorage.setItem(
+          'questRewardTypes',
+          JSON.stringify(masterfile.questRewardTypes),
+        )
+      }
+      useStatic.setState({
+        available: rest,
+        masterfile,
+        filters,
+        Icons,
+      })
     }
   }, [data])
 }

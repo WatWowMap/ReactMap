@@ -27,9 +27,11 @@ import Tile from '../filters/MenuTile'
 import SlotSelection from '../filters/SlotSelection'
 import data from './data'
 
-export default function TutAdvanced({ isMobile, toggleHelp, category }) {
+export default function TutAdvanced({ toggleHelp, category }) {
   const { t } = useTranslation()
   const Icons = useStatic((s) => s.Icons)
+  const isMobile = useStatic((s) => s.isMobile)
+
   const [isPokemon, setIsPokemon] = useState(category === 'pokemon')
 
   if (!category) {

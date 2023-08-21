@@ -32,7 +32,6 @@ export default function QueryData({
   userIcons,
   setParams,
   timeOfDay,
-  setError,
   active,
   onlyAreas,
 }) {
@@ -117,11 +116,11 @@ export default function QueryData({
 
   if (error) {
     if (error.networkError?.statusCode === 464) {
-      setError('old_client')
+      useStatic.setState({ clientError: 'old_client' })
       return null
     }
     if (error.networkError?.statusCode === 511) {
-      setError('session_expired')
+      useStatic.setState({ clientError: 'session_expired' })
       return null
     }
   }

@@ -1,0 +1,20 @@
+{
+  "name": "@rm/masterfile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./lib/index.js",
+  "scripts": {
+    "generate": "node ./lib",
+    "sort": "npx sort-package-json",
+    "depCheck": "npx depcheck",
+    "eslint:check": "eslint \"**/*.{js,jsx}\"",
+    "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix",
+    "prettier:check": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
+    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\""
+  },
+  "dependencies": {
+    "@rm/config": "*",
+    "@rm/logger": "*",
+    "@rm/types": "*"
+  }
+}

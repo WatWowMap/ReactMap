@@ -1,6 +1,7 @@
+// @ts-check
 const { Event } = require('../initialization')
 
-const categories = {
+const CATEGORIES = /** @type {const} */ ({
   gyms: ['teams', 'eggs', 'raids', 'pokemon'],
   pokestops: [
     'lures',
@@ -17,9 +18,9 @@ const categories = {
   ],
   pokemon: ['pokemon'],
   nests: ['pokemon'],
-}
+})
 
-const baseRarity = [
+const BASE_RARITY = /** @type {const} */ ([
   'common',
   'uncommon',
   'rare',
@@ -29,9 +30,9 @@ const baseRarity = [
   'legendary',
   'mythical',
   'never',
-]
+])
 
-module.exports = function buildMenus() {
+function buildMenus() {
   const menuFilters = {}
   const returnedItems = {}
 
@@ -53,8 +54,8 @@ module.exports = function buildMenus() {
     types: Object.keys(Event.masterfile.types)
       .map((key) => `poke_type_${key}`)
       .filter((val) => val !== 'poke_type_0'),
-    rarity: baseRarity.filter((tier) => rarityTiers.has(tier)),
-    historicRarity: baseRarity.filter((tier) => historicalTiers.has(tier)),
+    rarity: BASE_RARITY.filter((tier) => rarityTiers.has(tier)),
+    historicRarity: BASE_RARITY.filter((tier) => historicalTiers.has(tier)),
     forms: ['normalForms', 'altForms', 'Alola', 'Galarian'],
     others: ['reverse', 'selected', 'unselected', 'onlyAvailable'],
   }
@@ -63,7 +64,7 @@ module.exports = function buildMenus() {
     menuFilters[key] = Object.fromEntries(items.map((item) => [item, false]))
   })
 
-  Object.entries(categories).forEach(([key, items]) => {
+  Object.entries(CATEGORIES).forEach(([key, items]) => {
     returnedItems[key] = {
       categories: items,
       filters: {
@@ -78,3 +79,5 @@ module.exports = function buildMenus() {
   })
   return returnedItems
 }
+
+module.exports = buildMenus

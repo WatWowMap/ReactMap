@@ -1,8 +1,14 @@
-/* global BigInt */
+// @ts-check
 const { S2LatLng, S2Cell, S2CellId, S2Point } = require('nodes2ts')
 
-module.exports = function getPolyVector(s2cellId, polyline) {
-  const s2cell = new S2Cell(new S2CellId(BigInt(s2cellId).toString()))
+/**
+ *
+ * @param {S2CellId['id'] | string} s2cellId
+ * @param {boolean} [polyline]
+ * @returns
+ */
+function getPolyVector(s2cellId, polyline = false) {
+  const s2cell = new S2Cell(new S2CellId(s2cellId.toString()))
   const poly = []
   const revPoly = []
   for (let i = 0; i <= 3; i += 1) {
@@ -19,3 +25,5 @@ module.exports = function getPolyVector(s2cellId, polyline) {
 
   return { poly, revPoly }
 }
+
+module.exports = getPolyVector

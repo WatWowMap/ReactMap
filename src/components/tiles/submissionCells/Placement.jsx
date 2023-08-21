@@ -1,4 +1,5 @@
-import React, { memo } from 'react'
+// @ts-check
+import * as React from 'react'
 import { Polygon } from 'react-leaflet'
 
 import placementStyle from '../../markers/placementCell'
@@ -16,4 +17,6 @@ const areEqual = (prev, next) =>
   prev.zoom === next.zoom &&
   prev.tileStyle === next.tileStyle
 
-export default memo(PlacementTile, areEqual)
+const MemoPlacementTile = React.memo(PlacementTile, areEqual)
+
+export default MemoPlacementTile

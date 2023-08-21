@@ -1,10 +1,11 @@
+// @ts-check
 const express = require('express')
 const path = require('path')
-const { devOptions } = require('../services/config')
+const config = require('@rm/config')
 
-const router = new express.Router()
+const router = express.Router()
 
-const clientRoutes = [
+const CLIENT_ROUTES = [
   '/',
   '/login',
   '/blocked/:info',
@@ -16,8 +17,13 @@ const clientRoutes = [
   '/reset',
 ]
 
-router.get(clientRoutes, (req, res) => {
-  res.sendFile(path.join(__dirname, `../${devOptions.clientPath}/index.html`))
+router.get(CLIENT_ROUTES, (req, res) => {
+  res.sendFile(
+    path.join(
+      __dirname,
+      `../${config.getSafe('devOptions.clientPath')}/index.html`,
+    ),
+  )
 })
 
 module.exports = router

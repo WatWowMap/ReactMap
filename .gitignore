@@ -1,5 +1,5 @@
-/node_modules/
-/dist/
+node_modules
+dist
 
 # Config files
 server/src/configs/*
@@ -14,6 +14,7 @@ server/src/configs/koji_backups/*
 
 # Masterfile
 server/src/data/masterfile.json
+packages/masterfile/lib/data/masterfile.json
 
 # Docker file
 /docker-compose.yml
@@ -53,6 +54,8 @@ public/images/custom/*
 public/locales/*
 public/missing-locales/*
 locales/missing-locales/*
+packages/locales/lib/data/**/*.json
+packages/locales/lib/missing/**/*.json
 
 # OS X
 .DS_Store*

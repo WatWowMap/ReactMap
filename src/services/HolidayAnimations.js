@@ -1,11 +1,19 @@
-export default class HolidayAnimations {
+// @ts-check
+class HolidayAnimations {
+  /**
+   * @param {string[]} images
+   * @param {number} scale
+   */
   constructor(images, scale = 1) {
     this.imageHeight = 15 * scale
     this.imageWidth = 15 * scale
     this.baseImages = images
     this.images = []
     this.minScale = 0.3
-    this.canvas = document.getElementById('holiday-canvas')
+    this.interval = null
+    this.canvas = /** @type {HTMLCanvasElement} */ (
+      document.getElementById('holiday-canvas')
+    )
     this.ctx = this.canvas ? this.canvas.getContext('2d') : null
   }
 
@@ -33,6 +41,7 @@ export default class HolidayAnimations {
     this.images.forEach((item) => {
       item.image = new Image()
       item.image.style.height = item.height
+      item.image.style.width = item.width
       item.image.src = item.src
       this.ctx.globalAlpha = item.opacity
       this.ctx.drawImage(item.image, item.x, item.y, item.width, item.height)
@@ -60,6 +69,14 @@ export default class HolidayAnimations {
         ],
       })
     }
-    setInterval(this.draw.bind(this), 30)
+    this.interval = setInterval(this.draw.bind(this), 30)
+  }
+
+  stop() {
+    this.images = []
+    if (this.interval) clearInterval(this.interval)
+    this.ctx.clearRect(0, 0, this.w, this.h)
   }
 }
+
+export default HolidayAnimations

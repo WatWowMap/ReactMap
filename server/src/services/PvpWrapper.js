@@ -1,13 +1,14 @@
 const Ohbem = require('ohbem')
 const NodeCache = require('node-cache')
-const { log, HELPERS } = require('./logger')
+const config = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
 
 module.exports = class PvpWrapper extends Ohbem {
-  constructor(config) {
+  constructor() {
     super({
-      leagues: config.leagueObj,
+      leagues: config.getSafe('api.pvp.leagueObj'),
       pokemonData: {},
-      levelCaps: config.levels,
+      levelCaps: config.getSafe('api.pvp.levels'),
       cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
     })
     this.rmCache = new NodeCache({ stdTTL: 60 * 60 * 1.5 })
@@ -17,9 +18,9 @@ module.exports = class PvpWrapper extends Ohbem {
   }
 
   /**
-   * @param {import("../types").Pokemon} pokemon
+   * @param {import("@rm/types").Pokemon} pokemon
    * @param {number} currentTs
-   * @returns {import("../types").CleanPvp}
+   * @returns {import("@rm/types").CleanPvp}
    */
   resultWithCache(pokemon, currentTs) {
     if (pokemon.pokemon_id === 132) return {}

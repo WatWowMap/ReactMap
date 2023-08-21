@@ -1,17 +1,19 @@
 // @ts-check
 /* eslint-disable no-continue */
 /* eslint-disable import/no-extraneous-dependencies */
+
 const { defineConfig, loadEnv } = require('vite')
 const { default: react } = require('@vitejs/plugin-react')
 const { default: checker } = require('vite-plugin-checker')
 const { viteStaticCopy } = require('vite-plugin-static-copy')
 const removeFiles = require('rollup-plugin-delete')
-const { resolve, extname } = require('path')
+const { join, resolve, extname } = require('path')
 const fs = require('fs')
 const { sentryVitePlugin } = require('@sentry/vite-plugin')
 
-const { log, HELPERS } = require('./server/src/services/logger')
-const { locales } = require('./locales/scripts/create')
+const config = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
+const { create, writeAll, locales } = require('@rm/locales')
 
 /**
  * @param {boolean} isDevelopment
@@ -53,18 +55,36 @@ ${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
 }
 
 /**
+ * @param {boolean} isDevelopment
  * @returns {import('vite').Plugin}
  */
-const localePlugin = () => ({
+const localePlugin = (isDevelopment) => ({
   name: 'vite-plugin-locales',
   async buildStart() {
-    await locales()
+    if (!isDevelopment) return
+    const localeObj = await create()
+    await writeAll(localeObj, true, __dirname, './public/locales')
+  },
+  async generateBundle() {
+    if (isDevelopment) return
+    const localeObj = await create()
+
+    Object.entries(localeObj).forEach(([locale, translations]) => {
+      const fileName = join('locales', locale, 'translation.json')
+      this.emitFile({
+        type: 'asset',
+        fileName,
+        source: JSON.stringify(translations),
+      })
+    })
   },
 })
 
-const config = defineConfig(async ({ mode }) => {
+const viteConfig = defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
   const isRelease = process.argv.includes('-r')
+  const isDevelopment = mode === 'development'
+  const serverPort = +(env.PORT || config.getSafe('port') || '8080')
 
   const pkg = JSON.parse(
     fs.readFileSync(resolve(__dirname, 'package.json'), 'utf8'),
@@ -86,12 +106,19 @@ const config = defineConfig(async ({ mode }) => {
     log.info(HELPERS.build, `Building production version: ${version}`)
   }
 
+  if (env.GOOGLE_ANALYTICS_ID) {
+    log.warn(
+      HELPERS.build,
+      'The .env file has been deprecated, please move your Google Analytics ID to your config file as this functionality will be removed in the future.',
+    )
+  }
+
   return {
     plugins: [
       react({
         jsxRuntime: 'classic',
       }),
-      ...(mode === 'development'
+      ...(isDevelopment
         ? [
             checker({
               overlay: {
@@ -103,7 +130,7 @@ const config = defineConfig(async ({ mode }) => {
             }),
           ]
         : []),
-      ...(hasCustom ? [customFilePlugin(mode === 'development')] : []),
+      ...(hasCustom ? [customFilePlugin(isDevelopment)] : []),
       viteStaticCopy({
         targets: [
           {
@@ -126,9 +153,9 @@ const config = defineConfig(async ({ mode }) => {
             }),
           ]
         : []),
-      localePlugin(),
+      localePlugin(isDevelopment),
     ],
-    optimizeDeps: mode === 'development' ? { exclude: ['@mui/*'] } : undefined,
+    optimizeDeps: isDevelopment ? { exclude: ['@mui/*'] } : undefined,
     publicDir: 'public',
     resolve: {
       alias: {
@@ -139,21 +166,22 @@ const config = defineConfig(async ({ mode }) => {
       },
     },
     define: {
-      inject: JSON.stringify({
-        GOOGLE_ANALYTICS_ID: env.GOOGLE_ANALYTICS_ID || '',
-        ANALYTICS_DEBUG_MODE: env.ANALYTICS_DEBUG_MODE || false,
-        TITLE: env.TITLE || env.MAP_GENERAL_TITLE || '',
-        SENTRY_DSN: env.SENTRY_DSN || '',
-        SENTRY_TRACES_SAMPLE_RATE: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
-        SENTRY_DEBUG: env.SENTRY_DEBUG || false,
-        VERSION: version,
-        DEVELOPMENT: mode === 'development',
-        CUSTOM: hasCustom,
-        LOCALES: fs
-          .readdirSync(resolve(__dirname, './locales'))
-          .filter((x) => x.endsWith('.json'))
-          .map((x) => x.replace('.json', '')),
-      }),
+      CONFIG: {
+        client: {
+          version,
+          locales,
+          hasCustom,
+          sentry: {
+            dsn: env.SENTRY_DSN || '',
+            tracesSampleRate: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
+            debug: env.SENTRY_DEBUG || false,
+          },
+          title: config.getSafe('map.general.headerTitle'),
+        },
+        analytics:
+          env.GOOGLE_ANALYTICS_ID || config.getSafe('googleAnalyticsId'),
+        // map: config.getSafe('map'),
+      },
     },
     esbuild: {
       legalComments: 'none',
@@ -161,8 +189,11 @@ const config = defineConfig(async ({ mode }) => {
     build: {
       target: ['safari11.1', 'chrome64', 'firefox66', 'edge88'],
       outDir: resolve(__dirname, './dist'),
-      sourcemap: mode === 'development' || isRelease,
-      minify: mode === 'development' ? false : 'esbuild',
+      sourcemap: isDevelopment || isRelease,
+      minify:
+        isDevelopment || config.getSafe('devOptions.skipMinified')
+          ? false
+          : 'esbuild',
       input: { main: resolve(__dirname, 'index.html') },
       assetsDir: '',
       emptyOutDir: true,
@@ -179,6 +210,7 @@ const config = defineConfig(async ({ mode }) => {
           manualChunks: (id) => {
             if (id.endsWith('.css')) return 'index'
             if (id.includes('node_modules')) return 'vendor'
+            // return id.replace(/.*node_modules\//, '').split('/')[0]
             if (id.includes('src')) return version.replaceAll('.', '-')
           },
         },
@@ -187,23 +219,23 @@ const config = defineConfig(async ({ mode }) => {
     server: {
       host: '0.0.0.0',
       open: true,
-      port: +(env.PORT || '8080') + 1,
+      port: serverPort + 1,
       fs: {
         strict: false,
       },
       proxy: {
         '/api': {
-          target: `http://0.0.0.0:${env.PORT || 8080}`,
+          target: `http://0.0.0.0:${serverPort}`,
           changeOrigin: true,
           secure: false,
         },
         '/auth': {
-          target: `http://0.0.0.0:${env.PORT || 8080}`,
+          target: `http://0.0.0.0:${serverPort}`,
           changeOrigin: true,
           secure: false,
         },
         '/graphql': {
-          target: `http://0.0.0.0:${env.PORT || 8080}`,
+          target: `http://0.0.0.0:${serverPort}`,
           changeOrigin: true,
           secure: false,
         },
@@ -212,4 +244,4 @@ const config = defineConfig(async ({ mode }) => {
   }
 })
 
-module.exports = config
+module.exports = viteConfig

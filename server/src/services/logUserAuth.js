@@ -1,6 +1,6 @@
 // @ts-check
 const { default: fetch } = require('node-fetch')
-const { log, HELPERS } = require('./logger')
+const { log, HELPERS } = require('@rm/logger')
 
 /**
  * Convert camelCase to Capitalized Words
@@ -17,7 +17,7 @@ const capCamel = (str) =>
 /**
  * Map permissions to a string
  * @param {string[]} perms
- * @param {import('../types').Permissions} userPerms
+ * @param {import("@rm/types").Permissions} userPerms
  */
 const mapPerms = (perms, userPerms) =>
   perms
@@ -29,9 +29,9 @@ const mapPerms = (perms, userPerms) =>
 /**
  * Log user authentication to Discord
  * @param {import('express').Request} req
- * @param {import('../types').User} user
+ * @param {{ id: string, username: string, perms: import("@rm/types").Permissions, valid: boolean, avatar: string }} user
  * @param {string} strategy
- * @returns
+ * @returns {Promise<import('discord.js').APIEmbed>}
  */
 async function getAuthInfo(req, user, strategy = 'custom') {
   const ip =
@@ -144,7 +144,7 @@ async function getAuthInfo(req, user, strategy = 'custom') {
         inline: true,
       },
     ],
-    timestamp: new Date(),
+    timestamp: new Date().toISOString(),
   }
   if (user.perms.areaRestrictions.length) {
     const trimmed = user.perms.areaRestrictions

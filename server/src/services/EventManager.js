@@ -1,21 +1,30 @@
+// @ts-check
 const { promises: fs } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
-const { generate } = require('../../scripts/generateMasterfile')
-const initWebhooks = require('./initWebhooks')
-const { log, HELPERS } = require('./logger')
+const config = require('@rm/config')
 
-module.exports = class EventManager {
-  constructor(masterfile) {
-    this.masterfile = masterfile
-    this.invasions = masterfile.invasions
+const { log, HELPERS } = require('@rm/logger')
+const { generate, read } = require('@rm/masterfile')
+
+const PoracleAPI = require('./api/Poracle')
+
+class EventManager {
+  constructor() {
+    /** @type {import("@rm/types").Masterfile} */
+    this.masterfile = read()
+    this.invasions =
+      'invasions' in this.masterfile ? this.masterfile.invasions : {}
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
     this.uicons = []
     this.uiconsBackup = {}
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
+
+    /** @type {Record<string, InstanceType<typeof PoracleAPI>>} */
     this.webhookObj = {}
+    /** @type {import('./Clients').ClientObject} */
     this.Clients = {}
   }
 
@@ -23,95 +32,130 @@ module.exports = class EventManager {
     return this.available[category]
   }
 
+  /**
+   *
+   * @param {keyof EventManager['available']} category
+   * @param {import('../models').ScannerModelKeys} model
+   * @param {import('./DbCheck')} Db
+   */
   async setAvailable(category, model, Db) {
     this.available[category] = await Db.getAvailable(model)
   }
 
+  /**
+   * @param {import('./Clients').ClientObject} clients
+   */
   set clients(clients) {
     this.Clients = clients
   }
 
-  chatLog(embed, clientName) {
+  /**
+   *
+   * @param {import('discord.js').APIEmbed} embed
+   * @param {string} [clientName]
+   */
+  async chatLog(embed, clientName) {
     if (clientName) {
-      if (this.Clients[clientName]?.sendMessage)
-        this.Clients[clientName].sendMessage(embed, 'event')
+      const client = this.Clients[clientName]
+      if ('sendMessage' in client) {
+        await client.sendMessage(embed, 'event')
+      }
     } else {
-      Object.values(this.Clients).forEach((client) => {
-        if (client?.sendMessage) client.sendMessage(embed, 'event')
-      })
+      await Promise.allSettled(
+        Object.values(this.Clients).map(async (client) => {
+          if ('sendMessage' in client) {
+            await client.sendMessage(embed, 'event')
+          }
+        }),
+      )
     }
   }
 
-  setTimers(config, Db, Pvp) {
-    if (!config.api.queryOnSessionInit.raids) {
+  /**
+   *
+   * @param {import('./DbCheck')} Db
+   * @param {import('./PvpWrapper')} Pvp
+   */
+  setTimers(Db, Pvp) {
+    if (!config.getSafe('api.queryOnSessionInit.raids')) {
       setInterval(async () => {
-        await this.setAvailable('gyms', 'Gym', Db, true)
-        this.chatLog({ description: 'Refreshed available raids' })
-      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.raids || 1))
+        await this.setAvailable('gyms', 'Gym', Db)
+        await this.chatLog({ description: 'Refreshed available raids' })
+      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.raids') || 1))
     }
-    if (!config.api.queryOnSessionInit.nests) {
+    if (!config.getSafe('api.queryOnSessionInit.nests')) {
       setInterval(async () => {
-        await this.setAvailable('nests', 'Nest', Db, true)
-        this.chatLog({ description: 'Refreshed available nests' })
-      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.nests || 6))
+        await this.setAvailable('nests', 'Nest', Db)
+        await this.chatLog({ description: 'Refreshed available nests' })
+      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.nests') || 6))
     }
-    if (!config.api.queryOnSessionInit.pokemon) {
+    if (!config.getSafe('api.queryOnSessionInit.pokemon')) {
       setInterval(async () => {
-        await this.setAvailable('pokemon', 'Pokemon', Db, true)
-        this.chatLog({ description: 'Refreshed available pokemon' })
-      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.pokemon || 1))
+        await this.setAvailable('pokemon', 'Pokemon', Db)
+        await this.chatLog({ description: 'Refreshed available pokemon' })
+      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.pokemon') || 1))
     }
-    if (!config.api.queryOnSessionInit.quests) {
+    if (!config.getSafe('api.queryOnSessionInit.quests')) {
       setInterval(async () => {
-        await this.setAvailable('pokestops', 'Pokestop', Db, true)
-        this.chatLog({ description: 'Refreshed available quests & invasions' })
-      }, 1000 * 60 * 60 * (config.api.queryUpdateHours.quests || 3))
+        await this.setAvailable('pokestops', 'Pokestop', Db)
+        await this.chatLog({
+          description: 'Refreshed available quests & invasions',
+        })
+      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.quests') || 3))
     }
     setInterval(async () => {
-      await this.getUicons(config.icons.styles)
-      this.chatLog({ description: 'Refreshed UICONS indexes' })
-    }, 1000 * 60 * 60 * (config.icons.cacheHrs || 3))
-    if (config.api.pogoApiEndpoints.invasions) {
+      await this.getUicons(config.getSafe('icons.styles'))
+      await this.chatLog({ description: 'Refreshed UICONS indexes' })
+    }, 1000 * 60 * 60 * (config.getSafe('icons.cacheHrs') || 3))
+    if (config.getSafe('api.pogoApiEndpoints.invasions')) {
       setInterval(async () => {
-        await this.getInvasions(config.api.pogoApiEndpoints.invasions)
-        this.chatLog({ description: 'Refreshed invasions masterfile' })
-      }, 1000 * 60 * 60 * (config.map.invasionCacheHrs || 1))
+        await this.getInvasions(
+          config.getSafe('api.pogoApiEndpoints.invasions'),
+        )
+        await this.chatLog({ description: 'Refreshed invasions masterfile' })
+      }, 1000 * 60 * 60 * (config.getSafe('map.misc.invasionCacheHrs') || 1))
     }
     setInterval(async () => {
       await Db.historicalRarity()
-      this.chatLog({ description: 'Refreshed db historical rarity tiers' })
-    }, 1000 * 60 * 60 * (config.api.queryUpdateHours.historicalRarity || 6))
-    if (config.api.pogoApiEndpoints.masterfile) {
+      await this.chatLog({
+        description: 'Refreshed db historical rarity tiers',
+      })
+    }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.historicalRarity') || 6))
+    if (config.getSafe('api.pogoApiEndpoints.masterfile')) {
       setInterval(async () => {
         await this.getMasterfile(Db.historical, Db.rarity)
-        this.chatLog({ description: 'Refreshed masterfile' })
-      }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
+        await this.chatLog({ description: 'Refreshed masterfile' })
+      }, 1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6))
     }
     if (Pvp) {
       setInterval(async () => {
         log.info(HELPERS.event, 'Fetching Latest PVP Masterfile')
         Pvp.updatePokemonData(await Ohbem.fetchPokemonData())
-        this.chatLog({ description: 'Refreshed PVP masterfile' })
-      }, 1000 * 60 * 60 * (config.map.masterfileCacheHrs || 6))
+        await this.chatLog({ description: 'Refreshed PVP masterfile' })
+      }, 1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6))
     }
     setInterval(async () => {
-      await this.getWebhooks(config)
-      this.chatLog({ description: 'Refreshed webhook settings' })
-    }, 1000 * 60 * 60 * (config.map.webhookCacheHrs || 1))
+      await this.getWebhooks()
+      await this.chatLog({ description: 'Refreshed webhook settings' })
+    }, 1000 * 60 * 60 * (config.getSafe('map.misc.webhookCacheHrs') || 1))
 
     setInterval(async () => {
       await Db.getFilterContext()
-      this.chatLog({ description: 'Updated filter contexts' })
+      await this.chatLog({ description: 'Updated filter contexts' })
     }, 1000 * 60 * 30)
 
     const newDate = new Date()
-    config.authentication.strategies.forEach((strategy) => {
+    config.getSafe('authentication.strategies').forEach((strategy) => {
       if (strategy.enabled) {
         if (strategy.trialPeriod.start.js >= newDate) {
           log.info(
             HELPERS.event,
             'Trial period starting in',
-            +((strategy.trialPeriod.start.js - newDate) / 1000 / 60).toFixed(2),
+            +(
+              (strategy.trialPeriod.start.js.getTime() - newDate.getTime()) /
+              1000 /
+              60
+            ).toFixed(2),
             `minutes for ${strategy.name}`,
           )
           setTimeout(async () => {
@@ -120,13 +164,17 @@ module.exports = class EventManager {
               { description: `Trial period has started.` },
               strategy.name,
             )
-          }, strategy.trialPeriod.start.js - newDate)
+          }, strategy.trialPeriod.start.js.getTime() - newDate.getTime())
         }
         if (strategy.trialPeriod.end.js >= newDate) {
           log.info(
             HELPERS.event,
             'Trial period ending in',
-            +((strategy.trialPeriod.end.js - newDate) / 1000 / 60).toFixed(2),
+            +(
+              (strategy.trialPeriod.end.js.getTime() - newDate.getTime()) /
+              1000 /
+              60
+            ).toFixed(2),
             `minutes for ${strategy.name}`,
           )
           setTimeout(async () => {
@@ -135,12 +183,16 @@ module.exports = class EventManager {
               { description: `Trial period has ended.` },
               strategy.name,
             )
-          }, strategy.trialPeriod.end.js - newDate)
+          }, strategy.trialPeriod.end.js.getTime() - newDate.getTime())
         }
       }
     })
   }
 
+  /**
+   *
+   * @param {import("@rm/types").Config['icons']['styles']} styles
+   */
   async getUicons(styles) {
     log.info(HELPERS.event, 'Fetching Latest UICONS')
     if (!styles.some((icon) => icon.path.includes('wwm'))) {
@@ -160,6 +212,7 @@ module.exports = class EventManager {
                     __dirname,
                     `../../../public/images/uicons/${style.path}/index.json`,
                   ),
+                  'utf-8',
                 ),
               )
 
@@ -188,6 +241,10 @@ module.exports = class EventManager {
     this.uicons = Object.values(this.uiconsBackup)
   }
 
+  /**
+   *
+   * @param {import("@rm/types").Config['api']['pogoApiEndpoints']['invasions']} endpoint
+   */
   async getInvasions(endpoint) {
     if (endpoint) {
       log.info(HELPERS.event, 'Fetching Latest Invasions')
@@ -202,6 +259,11 @@ module.exports = class EventManager {
     }
   }
 
+  /**
+   *
+   * @param {import("@rm/types").Rarity} historical
+   * @param {import("@rm/types").Rarity} dbRarity
+   */
   async getMasterfile(historical, dbRarity) {
     log.info(HELPERS.event, 'Fetching Latest Masterfile')
     try {
@@ -242,14 +304,20 @@ module.exports = class EventManager {
     })
   }
 
-  async getWebhooks(config) {
+  async getWebhooks() {
     await Promise.all(
-      config.webhooks.map(async (webhook) => {
-        this.webhookObj = {
-          ...this.webhookObj,
-          [webhook.name]: await initWebhooks(webhook),
-        }
-      }),
+      config
+        .getSafe('webhooks')
+        .filter((x) => x.enabled)
+        .map(async (webhook) => {
+          const api = new PoracleAPI(webhook)
+          await api.init()
+          Object.assign(this.webhookObj, {
+            [webhook.name]: api,
+          })
+        }),
     )
   }
 }
+
+module.exports = EventManager

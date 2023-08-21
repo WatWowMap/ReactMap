@@ -3,32 +3,13 @@ import { useTranslation } from 'react-i18next'
 
 import makeTheme from '@assets/mui/theme'
 import { useStore } from '@hooks/useStore'
-import UIcons from '@services/Icons'
 import Fetch from '@services/Fetch'
 import { setLoadingText } from '@services/functions/setLoadingText'
 
 import ReactRouter from './ReactRouter'
-import HolidayEffects from './HolidayEffects'
+import HolidayEffect from './HolidayEffects'
 
 const rootLoading = document.getElementById('loader')
-
-const LOCALE_MAP = /** @type {const} */ ({
-  en: 'enUS',
-  de: 'deDE',
-  es: 'esES',
-  fr: 'frFR',
-  it: 'itIT',
-  ja: 'jaJP',
-  ko: 'koKR',
-  nl: 'nlNL',
-  pl: 'plPL',
-  'pt-br': 'ptBR',
-  ru: 'ruRU',
-  sv: 'svSE',
-  th: 'thTH',
-  tr: 'trTR',
-  'zh-tw': 'zhTW',
-})
 
 export default function Config({ setTheme }) {
   const { t } = useTranslation()
@@ -47,27 +28,9 @@ export default function Config({ setTheme }) {
   }
   const getServerSettings = React.useCallback(async () => {
     const data = await Fetch.getSettings()
-    if (data?.config && data?.masterfile) {
-      if (data.masterfile?.questRewardTypes) {
-        localStorage.setItem(
-          'questRewardTypes',
-          JSON.stringify(data.masterfile.questRewardTypes),
-        )
-      }
-      const Icons = new UIcons(
-        data.config.icons,
-        data.masterfile
-          ? data.masterfile.questRewardTypes
-          : JSON.parse(localStorage.getItem('questRewardTypes') || '{}'),
-      )
-      if (Icons) {
-        Icons.build(data.config.icons.styles)
-        if (data.config.icons.defaultIcons) {
-          Icons.setSelection(data.config.icons.defaultIcons)
-        }
-      }
-      setServerSettings({ ...data, Icons })
-      document.title = data.config?.map?.headerTitle
+    if (data?.config) {
+      document.title = data.config?.map?.headerTitle || 'Map'
+      setServerSettings(data)
     }
   }, [])
 
@@ -79,13 +42,7 @@ export default function Config({ setTheme }) {
   }, [])
 
   React.useEffect(() => {
-    setTheme(
-      makeTheme(
-        serverSettings?.config?.map?.theme,
-        darkMode,
-        LOCALE_MAP[locale],
-      ),
-    )
+    setTheme(makeTheme(serverSettings?.config?.map?.theme, darkMode, locale))
     if (darkMode) {
       if (!document.body.classList.contains('dark')) {
         document.body.classList.add('dark')
@@ -101,13 +58,10 @@ export default function Config({ setTheme }) {
 
   return (
     <>
-      <ReactRouter
-        serverSettings={serverSettings}
-        getServerSettings={getServerSettings}
-      />
-      <HolidayEffects
-        holidayEffects={serverSettings?.config?.map?.holidayEffects || []}
-      />
+      <ReactRouter serverSettings={serverSettings} />
+      {(serverSettings?.config?.map?.holidayEffects || []).map((holiday) => (
+        <HolidayEffect key={holiday.name} {...holiday} />
+      ))}
     </>
   )
 }

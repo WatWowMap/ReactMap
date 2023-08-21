@@ -1,8 +1,8 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react'
-import { Grid, Divider } from '@mui/material'
-
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Unstable_Grid2'
 import Utility from '@services/Utility'
 
 import DiscordLogin from '../auth/Discord'
@@ -12,22 +12,32 @@ import CustomText from './CustomText'
 import CustomButton from './CustomButton'
 import CustomImg from './CustomImg'
 import LocaleSelection from '../general/LocaleSelection'
+import LinkWrapper from './LinkWrapper'
 
-export default function Generator({
-  block = {},
-  defaultReturn = null,
-  serverSettings,
-}) {
-  const isMuiColor = block.color === 'primary' || block.color === 'secondary'
+export default function Generator({ block = {}, defaultReturn = null }) {
+  const { content = null, ...props } = block
+  const children = Utility.getBlockContent(content)
   switch (block.type) {
     case 'img':
-      return <CustomImg block={block} />
+      return (
+        <LinkWrapper {...props}>
+          <CustomImg {...props} />
+        </LinkWrapper>
+      )
     case 'button':
-      return <CustomButton block={block} isMuiColor={isMuiColor} />
+      return (
+        <LinkWrapper {...props}>
+          <CustomButton {...props}>{children}</CustomButton>
+        </LinkWrapper>
+      )
     case 'text':
-      return <CustomText block={block} isMuiColor={isMuiColor} />
+      return (
+        <LinkWrapper {...props}>
+          <CustomText {...props}>{children}</CustomText>
+        </LinkWrapper>
+      )
     case 'divider':
-      return <Divider {...block} />
+      return <Divider {...props} />
     case 'telegram':
       return (
         <Telegram
@@ -38,48 +48,43 @@ export default function Generator({
     case 'discord':
       return <DiscordLogin href={block.link} text={block.text} />
     case 'localLogin':
-      return (
-        <LocalLogin href={block.localAuthUrl} serverSettings={serverSettings} />
-      )
+      return <LocalLogin href={block.localAuthUrl} style={props.style} />
     case 'localeSelection':
-      return (
-        <LocaleSelection
-          localeSelection={serverSettings.config.localeSelection}
-        />
-      )
+      return <LocaleSelection />
     case 'parent':
       return (
         <Grid
           container
-          item
           {...Utility.getSizes(block.gridSizes)}
           spacing={block.spacing}
           style={block.style}
+          sx={block.sx}
           alignItems={block.alignItems}
           justifyContent={block.justifyContent}
         >
-          {block.components.map((subBlock, i) => {
-            const nextGenerator = (
+          {block.components.map((subBlock, i) =>
+            subBlock.type === 'parent' ? (
               <Generator
                 key={i}
                 block={subBlock}
                 defaultReturn={defaultReturn}
-                serverSettings={serverSettings}
               />
-            )
-            return subBlock.type === 'parent' ? (
-              nextGenerator
             ) : (
               <Grid
                 key={i}
-                item
                 {...Utility.getSizes(subBlock.gridSizes)}
-                style={subBlock.gridStyle || { textAlign: 'center' }}
+                {...subBlock.gridStyle}
+                style={subBlock.gridStyle}
+                sx={subBlock.gridSx}
               >
-                {nextGenerator}
+                <Generator
+                  key={i}
+                  block={subBlock}
+                  defaultReturn={defaultReturn}
+                />
               </Grid>
-            )
-          })}
+            ),
+          )}
         </Grid>
       )
     default:

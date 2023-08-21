@@ -5,13 +5,16 @@ const path = require('path')
 
 const { name } = path.parse(__filename)
 
+const { log, HELPERS } = require('@rm/logger')
 const {
   map: { forceTutorial },
   authentication: { [name]: strategyConfig, alwaysEnabledPerms, perms },
-} = require('../services/config')
+} = require('@rm/config')
 const { Db } = require('../services/initialization')
-const Utility = require('../services/Utility')
-const { log, HELPERS } = require('../services/logger')
+const areaPerms = require('../services/functions/areaPerms')
+const mergePerms = require('../services/functions/mergePerms')
+const webhookPerms = require('../services/functions/webhookPerms')
+const scannerPerms = require('../services/functions/scannerPerms')
 
 if (strategyConfig.doNothing) {
   // This is for nothing other than demonstrating a custom property you can add if you need it
@@ -29,7 +32,7 @@ const authHandler = async (_req, username, password, done) => {
   const user = {
     perms: {
       ...Object.fromEntries(Object.keys(perms).map((x) => [x, false])),
-      areaRestrictions: Utility.areaPerms(localPerms, 'local'),
+      areaRestrictions: areaPerms(localPerms, 'local'),
       webhooks: [],
       scanner: [],
     },
@@ -77,7 +80,7 @@ const authHandler = async (_req, username, password, done) => {
         if (bcrypt.compareSync(password, userExists.password)) {
           ;['discordPerms', 'telegramPerms'].forEach((permSet) => {
             if (userExists[permSet]) {
-              user.perms = Utility.mergePerms(
+              user.perms = mergePerms(
                 user.perms,
                 typeof userExists[permSet] === 'string'
                   ? JSON.parse(userExists[permSet])
@@ -114,11 +117,11 @@ const authHandler = async (_req, username, password, done) => {
               }
             }
           })
-          Utility.webhookPerms([user.status], 'local', trialActive).forEach(
-            (x) => user.perms.webhooks.push(x),
+          webhookPerms([user.status], 'local', trialActive).forEach((x) =>
+            user.perms.webhooks.push(x),
           )
-          Utility.scannerPerms([user.status], 'local', trialActive).forEach(
-            (x) => user.perms.scanner.push(x),
+          scannerPerms([user.status], 'local', trialActive).forEach((x) =>
+            user.perms.scanner.push(x),
           )
           log.info(
             HELPERS.custom(name),

@@ -82,6 +82,7 @@ const Invasion = gql`
       template
       uid
       description
+      real_grunt_id
     }
   }
 `
@@ -158,14 +159,23 @@ const Pokemon = gql`
       template
       uid
       description
+      allForms
+      pvpEntry
+      xs
+      xl
     }
   }
 `
 
-const Profile = gql`
+export const Profile = gql`
   fragment PoracleProfile on Poracle {
     profile {
-      active_hours
+      active_hours {
+        day
+        hours
+        mins
+        id
+      }
       area
       id
       latitude
@@ -215,6 +225,7 @@ const Raid = gql`
       template
       uid
       description
+      allMoves
     }
   }
 `
@@ -247,8 +258,8 @@ export const allProfiles = gql`
   ${Quest}
   ${Raid}
   ${Weather}
-  query Webhook($category: String!, $status: String!, $name: String!) {
-    webhook(category: $category, status: $status, name: $name) {
+  query Webhook($category: String!, $status: String!) {
+    webhook(category: $category, status: $status) {
       ...PoracleHuman
       ...PoracleEgg
       ...PoracleGym
@@ -260,6 +271,15 @@ export const allProfiles = gql`
       ...PoracleQuest
       ...PoracleRaid
       ...PoracleWeather
+    }
+  }
+`
+
+export const WEBHOOK_AREAS = gql`
+  query WebhookAreas {
+    webhookAreas {
+      group
+      children
     }
   }
 `
@@ -276,13 +296,8 @@ export const quickAdd = gql`
   ${Quest}
   ${Raid}
   ${Weather}
-  mutation Webhook(
-    $data: JSON!
-    $category: String!
-    $status: String!
-    $name: String!
-  ) {
-    webhook(data: $data, category: $category, status: $status, name: $name) {
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       ...PoracleHuman
       ...PoracleEgg
       ...PoracleGym
@@ -303,13 +318,8 @@ export const quickAdd = gql`
 export const setHuman = gql`
   ${base}
   ${Human}
-  mutation Webhook(
-    $data: JSON!
-    $category: String!
-    $status: String!
-    $name: String!
-  ) {
-    webhook(data: $data, category: $category, status: $status, name: $name) {
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       ...Base
       ...PoracleHuman
     }
@@ -319,13 +329,8 @@ export const setHuman = gql`
 export const setProfile = gql`
   ${base}
   ${Profile}
-  mutation Webhook(
-    $data: JSON!
-    $category: String!
-    $status: String!
-    $name: String!
-  ) {
-    webhook(data: $data, category: $category, status: $status, name: $name) {
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       ...Base
       ...PoracleProfile
     }
@@ -335,13 +340,8 @@ export const setProfile = gql`
 export const pokemon = gql`
   ${base}
   ${Pokemon}
-  mutation Webhook(
-    $data: JSON!
-    $category: String!
-    $status: String!
-    $name: String!
-  ) {
-    webhook(data: $data, category: $category, status: $status, name: $name) {
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       ...Base
       ...PoraclePokemon
     }
@@ -351,13 +351,8 @@ export const pokemon = gql`
 export const raid = gql`
   ${base}
   ${Raid}
-  mutation Webhook(
-    $data: JSON!
-    $category: String!
-    $status: String!
-    $name: String!
-  ) {
-    webhook(data: $data, category: $category, status: $status, name: $name) {
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       ...Base
       ...PoracleRaid
     }
@@ -367,13 +362,8 @@ export const raid = gql`
 export const egg = gql`
   ${base}
   ${Egg}
-  mutation Webhook(
-    $data: JSON!
-    $category: String!
-    $status: String!
-    $name: String!
-  ) {
-    webhook(data: $data, category: $category, status: $status, name: $name) {
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       ...Base
       ...PoracleEgg
     }
@@ -383,13 +373,8 @@ export const egg = gql`
 export const gym = gql`
   ${base}
   ${Gym}
-  mutation Webhook(
-    $data: JSON!
-    $category: String!
-    $status: String!
-    $name: String!
-  ) {
-    webhook(data: $data, category: $category, status: $status, name: $name) {
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       ...Base
       ...PoracleGym
     }
@@ -399,13 +384,8 @@ export const gym = gql`
 export const invasion = gql`
   ${base}
   ${Invasion}
-  mutation Webhook(
-    $data: JSON!
-    $category: String!
-    $status: String!
-    $name: String!
-  ) {
-    webhook(data: $data, category: $category, status: $status, name: $name) {
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       ...Base
       ...PoracleInvasion
     }
@@ -415,13 +395,8 @@ export const invasion = gql`
 export const lure = gql`
   ${base}
   ${Lure}
-  mutation Webhook(
-    $data: JSON!
-    $category: String!
-    $status: String!
-    $name: String!
-  ) {
-    webhook(data: $data, category: $category, status: $status, name: $name) {
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       ...Base
       ...PoracleLure
     }
@@ -431,13 +406,8 @@ export const lure = gql`
 export const nest = gql`
   ${base}
   ${Nest}
-  mutation Webhook(
-    $data: JSON!
-    $category: String!
-    $status: String!
-    $name: String!
-  ) {
-    webhook(data: $data, category: $category, status: $status, name: $name) {
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       ...Base
       ...PoracleNest
     }
@@ -447,15 +417,63 @@ export const nest = gql`
 export const quest = gql`
   ${base}
   ${Quest}
-  mutation Webhook(
-    $data: JSON!
-    $category: String!
-    $status: String!
-    $name: String!
-  ) {
-    webhook(data: $data, category: $category, status: $status, name: $name) {
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
       ...Base
       ...PoracleQuest
     }
+  }
+`
+
+export const WEBHOOK_CONTEXT = gql`
+  query WebhookContext {
+    webhookContext {
+      name
+      templates
+      hasNominatim
+      addressFormat
+      locale
+      everything
+      prefix
+      leagues {
+        name
+        cp
+        min
+      }
+      pvp
+      ui
+    }
+  }
+`
+
+export const WEBHOOK_USER = gql`
+  query WebhookUser {
+    webhookUser {
+      webhooks
+      selected
+    }
+  }
+`
+
+export const WEBHOOK_CATEGORIES = gql`
+  query WebhookCategory {
+    webhookCategories
+  }
+`
+
+export const WEBHOOK_CHANGE = gql`
+  ${base}
+  ${Human}
+  mutation WebhookChange($webhook: String!) {
+    webhookChange(webhook: $webhook) {
+      ...Base
+      ...PoracleHuman
+    }
+  }
+`
+
+export const WEBHOOK_GEOJSON = gql`
+  query WebhookGeojson {
+    webhookGeojson
   }
 `

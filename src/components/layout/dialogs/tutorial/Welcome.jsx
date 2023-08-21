@@ -5,15 +5,14 @@ import { DialogContent, Grid, Typography, Fab } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
+import { useLayoutStore, useStatic } from '@hooks/useStore'
 import LocaleSelection from '@components/layout/general/LocaleSelection'
 
-export default function TutWelcome({ setUserProfile }) {
+export default function TutWelcome() {
   const { t } = useTranslation()
   const { methods, loggedIn, perms, counts } = useStatic((state) => state.auth)
   const {
     map: { enableUserProfile, excludeList },
-    localeSelection,
   } = useStatic((state) => state.config)
 
   const getPerms = () => {
@@ -83,7 +82,10 @@ export default function TutWelcome({ setUserProfile }) {
               )
             }
             return enableUserProfile ? (
-              <Fab color="primary" onClick={() => setUserProfile(true)}>
+              <Fab
+                color="primary"
+                onClick={() => useLayoutStore.setState({ userProfile: true })}
+              >
                 <Person />
               </Fab>
             ) : null
@@ -104,7 +106,7 @@ export default function TutWelcome({ setUserProfile }) {
           </Typography>
         </Grid>
         <Grid item xs={12} sm={10} style={{ textAlign: 'center' }}>
-          <LocaleSelection localeSelection={localeSelection} />
+          <LocaleSelection />
         </Grid>
         <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
           <Typography variant="subtitle1" align="center">

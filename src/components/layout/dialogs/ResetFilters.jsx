@@ -1,23 +1,31 @@
-import React, { useState } from 'react'
-import { Button, Typography, DialogContent } from '@mui/material'
+import * as React from 'react'
+import DialogContent from '@mui/material/DialogContent'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
+import { useLayoutStore } from '@hooks/useStore'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'
+import { DialogWrapper } from './DialogWrapper'
 
 export default function ResetFilters() {
   const { t } = useTranslation()
-  const [redirect, setRedirect] = useState(false)
-  const setResetFilters = useStatic((state) => state.setResetFilters)
+  const [redirect, setRedirect] = React.useState(false)
+
+  const handleClose = React.useCallback(
+    () => useLayoutStore.setState({ resetFilters: false }),
+    [],
+  )
 
   if (redirect) {
     return <Navigate push to="/reset" />
   }
+
   return (
-    <>
+    <DialogWrapper dialog="resetFilters" variant="small">
       <Header titles={[t('filters_reset_title')]} />
       <DialogContent>
         <Typography variant="subtitle1" align="center">
@@ -32,7 +40,7 @@ export default function ResetFilters() {
             size="small"
             onClick={() => {
               setRedirect(true)
-              setResetFilters(false)
+              handleClose()
             }}
           >
             {t('confirm_filters_reset')}
@@ -44,13 +52,13 @@ export default function ResetFilters() {
         options={[
           {
             name: 'close',
-            action: () => setResetFilters(false),
+            action: handleClose,
             color: 'primary',
             align: 'right',
           },
         ]}
         role="webhook_footer"
       />
-    </>
+    </DialogWrapper>
   )
 }

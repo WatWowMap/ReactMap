@@ -1,9 +1,5 @@
-/* eslint-disable no-nested-ternary */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const { Event } = require('../services/initialization')
-
-const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: {
     searchResultsLimit,
@@ -12,7 +8,10 @@ const {
     hideOldPokestops,
   },
   map,
-} = require('../services/config')
+} = require('@rm/config')
+const { Event } = require('../services/initialization')
+
+const getAreaSql = require('../services/functions/getAreaSql')
 
 const questProps = {
   quest_type: true,
@@ -57,7 +56,7 @@ const MAD_GRUNT_MAP = {
   352: 8,
 }
 
-module.exports = class Pokestop extends Model {
+class Pokestop extends Model {
   static get tableName() {
     return 'pokestop'
   }
@@ -147,11 +146,11 @@ module.exports = class Pokestop extends Model {
     if (hasMultiInvasions) {
       if (isMad) {
         query
-          .leftJoin(
-            'pokestop_incident',
-            'pokestop.pokestop_id',
-            'pokestop_incident.pokestop_id',
-          )
+          .leftJoin('pokestop_incident', (join) => {
+            join
+              .on('pokestop.pokestop_id', '=', 'pokestop_incident.pokestop_id')
+              .andOn('incident_expiration', '>=', raw('UTC_TIMESTAMP()'))
+          })
           .select([
             'incident_id AS incidentId',
             'pokestop_incident.character_display AS grunt_type',
@@ -527,15 +526,15 @@ module.exports = class Pokestop extends Model {
         if (onlyInvasions && invasionPerms) {
           if (hasMultiInvasions) {
             stops.orWhere((invasion) => {
-              invasion.andWhere(
-                multiInvasionMs
-                  ? 'expiration_ms'
-                  : isMad
-                  ? 'incident_expiration'
-                  : 'expiration',
-                '>=',
-                safeTs * (multiInvasionMs ? 1000 : 1),
-              )
+              if (isMad) {
+                invasion.whereRaw('incident_expiration > UTC_TIMESTAMP()')
+              } else {
+                invasion.andWhere(
+                  multiInvasionMs ? 'expiration_ms' : 'expiration',
+                  '>=',
+                  safeTs * (multiInvasionMs ? 1000 : 1),
+                )
+              }
               if (hasConfirmed && onlyConfirmed) {
                 invasion.andWhere('confirmed', onlyConfirmed)
               }
@@ -566,21 +565,18 @@ module.exports = class Pokestop extends Model {
             })
           } else {
             stops.orWhere((invasion) => {
-              invasion
-                .whereIn(
-                  isMad ? 'incident_grunt_type' : 'grunt_type',
-                  invasions,
-                )
-                .andWhere(
-                  isMad ? 'incident_expiration' : 'expiration',
-                  '>=',
-                  isMad ? this.knex().fn.now() : safeTs,
-                )
+              invasion.whereIn(
+                isMad ? 'incident_grunt_type' : 'grunt_type',
+                invasions,
+              )
               if (isMad) {
+                invasion.whereRaw('incident_expiration > UTC_TIMESTAMP()')
                 invasion.whereNotIn(
                   'incident_grunt_type',
                   MADE_UP_MAD_INVASIONS,
                 )
+              } else {
+                invasion.andWhere('expiration', '>=', safeTs)
               }
               if (hasConfirmed) {
                 invasion.andWhere('confirmed', onlyConfirmed)
@@ -597,8 +593,12 @@ module.exports = class Pokestop extends Model {
           stops.orWhere((event) => {
             if (isMad && !hasMultiInvasions) {
               event
-                .whereIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
-                .andWhere('incident_expiration', '>=', this.knex().fn.now())
+                .where((gruntType) => {
+                  gruntType
+                    .whereIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
+                    .orWhere('character_display', 0)
+                })
+                .whereRaw('incident_expiration > UTC_TIMESTAMP()')
             } else {
               event
                 .whereIn(
@@ -606,15 +606,15 @@ module.exports = class Pokestop extends Model {
                   displayTypes,
                 )
                 .andWhere(isMad ? 'character_display' : 'character', 0)
-                .andWhere(
-                  multiInvasionMs
-                    ? 'expiration_ms'
-                    : isMad
-                    ? 'incident_expiration'
-                    : 'expiration',
-                  '>=',
-                  safeTs * (multiInvasionMs ? 1000 : 1),
-                )
+            }
+            if (isMad && hasMultiInvasions) {
+              event.whereRaw('incident_expiration > UTC_TIMESTAMP()')
+            } else {
+              event.where(
+                multiInvasionMs ? 'expiration_ms' : 'expiration',
+                '>=',
+                safeTs * (multiInvasionMs ? 1000 : 1),
+              )
             }
           })
         }
@@ -695,7 +695,8 @@ module.exports = class Pokestop extends Model {
         filtered.events = pokestop.invasions
           .filter((event) =>
             isMad && !hasMultiInvasions
-              ? MADE_UP_MAD_INVASIONS.includes(event.grunt_type)
+              ? MADE_UP_MAD_INVASIONS.includes(event.grunt_type) ||
+                (!event.grunt_type && filters[`b${event.display_type}`])
               : !event.grunt_type && filters[`b${event.display_type}`],
           )
           .map((event) => ({
@@ -960,7 +961,7 @@ module.exports = class Pokestop extends Model {
 
   /**
    *
-   * @param {import('../types').DbContext} param0
+   * @param {import("@rm/types").DbContext} param0
    * @returns
    */
   static async getAvailable({
@@ -1268,9 +1269,12 @@ module.exports = class Pokestop extends Model {
             'pokestop.pokestop_id',
             'pokestop_incident.pokestop_id',
           )
-          .select('pokestop_incident.character_display AS grunt_type')
-          .where('pokestop_incident.character_display', '>', 0)
-          .andWhere('incident_expiration', this.knex().fn.now())
+          .select(
+            'pokestop_incident.character_display AS grunt_type',
+            'pokestop_incident.incident_display_type as display_type',
+          )
+          .where('pokestop_incident.incident_display_type', '>', 0)
+          .whereRaw('incident_expiration > UTC_TIMESTAMP()')
           .orderBy('pokestop_incident.character_display')
       } else {
         queries.invasions = this.query()
@@ -1284,15 +1288,17 @@ module.exports = class Pokestop extends Model {
           .groupBy('incident.character', 'incident.display_type')
           .orderBy('incident.character', 'incident.display_type')
       }
+    } else if (isMad) {
+      queries.invasions = this.query()
+        .distinct('incident_grunt_type AS grunt_type')
+        .where('incident_grunt_type', '>', 0)
+        .whereRaw('incident_expiration > UTC_TIMESTAMP()')
+        .orderBy('grunt_type')
     } else {
       queries.invasions = this.query()
         .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
         .where(isMad ? 'incident_grunt_type' : 'grunt_type', '>', 0)
-        .andWhere(
-          isMad ? 'incident_expiration' : 'incident_expire_timestamp',
-          '>=',
-          isMad ? this.knex().fn.now() : ts,
-        )
+        .andWhere('incident_expire_timestamp', '>=', ts)
         .orderBy('grunt_type')
     }
     if (isMad && !hasMultiInvasions) {
@@ -1754,3 +1760,5 @@ module.exports = class Pokestop extends Model {
     return query
   }
 }
+
+module.exports = Pokestop

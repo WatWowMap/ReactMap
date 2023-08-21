@@ -16,7 +16,7 @@
   "globals": {
     "document": true,
     "window": true,
-    "inject": true
+    "CONFIG": true
   },
   "rules": {
     "global-require": 0,
@@ -42,6 +42,7 @@
     "react/function-component-definition": 0,
     "no-underscore-dangle": 0,
     "no-return-assign": 0,
+    "no-nested-ternary": "off",
     "import/prefer-default-export": 0,
     "max-len": [
       "error",

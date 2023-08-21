@@ -2,44 +2,32 @@ import { useEffect } from 'react'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import Query from '@services/Query'
-import { useStatic } from '@hooks/useStore'
+import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
+import { allProfiles } from '@services/queries/webhook'
 
-export default function useWebhook({ category, selectedWebhook }) {
-  const [syncWebhook, { data }] = useMutation(Query.webhook('quickAdd'))
+export default function useWebhook({ category }) {
+  const [syncWebhook, { data, error }] = useMutation(
+    Query.webhook('quickAdd'),
+    {
+      refetchQueries: [allProfiles],
+    },
+  )
   const { t } = useTranslation()
-  const webhookData = useStatic((state) => state.webhookData)
-  const setWebhookData = useStatic((state) => state.setWebhookData)
-  const setWebhookAlert = useStatic((state) => state.setWebhookAlert)
 
   useEffect(() => {
-    if (data?.webhook) {
-      if (data.webhook.status === 'success') {
-        data.webhook.message = t(
-          `webhook_success_${category.replace('quick', '').toLowerCase()}`,
-        )
-      }
-      if (data.webhook.status === 'ok') {
-        setWebhookAlert({
+    if (data?.webhook || error) {
+      const message = error
+        ? error.message
+        : data?.webhook
+        ? t(`webhook_success_${category.replace('quick', '').toLowerCase()}`)
+        : t('success')
+      useWebhookStore.setState({
+        alert: {
           open: true,
-          severity: 'success',
-          message: t('success'),
-        })
-      } else {
-        setWebhookAlert({
-          open: true,
-          severity: data.webhook.status,
-          message: data.webhook.message,
-        })
-      }
-      if (webhookData?.[selectedWebhook]) {
-        return setWebhookData({
-          ...webhookData,
-          [selectedWebhook]: {
-            ...webhookData[selectedWebhook],
-            ...data.webhook,
-          },
-        })
-      }
+          severity: error ? 'error' : 'success',
+          message,
+        },
+      })
     }
   }, [data])
 
@@ -48,7 +36,6 @@ export default function useWebhook({ category, selectedWebhook }) {
       variables: {
         category: cat,
         data: incomingData,
-        name: selectedWebhook,
         status: 'POST',
       },
     })

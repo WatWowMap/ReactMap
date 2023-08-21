@@ -1,8 +1,5 @@
-const {
-  api: {
-    pvp: { leagues },
-  },
-} = require('../../config')
+// @ts-check
+const config = require('@rm/config')
 const BaseFilter = require('../Base')
 
 module.exports = class PokemonFilter extends BaseFilter {
@@ -44,12 +41,14 @@ module.exports = class PokemonFilter extends BaseFilter {
     this.gender = gender || 0
     this.xxs = xxs || false
     this.xxl = xxl || false
-    leagues.forEach(
-      (league) =>
-        (this[league.name] = pvp || [
-          league.minRank || 1,
-          league.maxRank || 100,
-        ]),
-    )
+    config
+      .getSafe('api.pvp.leagues')
+      .forEach(
+        (league) =>
+          (this[league.name] = pvp || [
+            league.minRank || 1,
+            league.maxRank || 100,
+          ]),
+      )
   }
 }

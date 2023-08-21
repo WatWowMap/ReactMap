@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import L from 'leaflet'
+import { divIcon } from 'leaflet'
 import getOpacity from '@services/functions/getOpacity'
 
 export default function stopMarker(
@@ -167,7 +167,7 @@ export default function stopMarker(
   const showAr =
     userSettings.showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')
 
-  return L.divIcon({
+  return divIcon({
     popupAnchor: [
       popupX - 5,
       (pokestopMod.manualPopup

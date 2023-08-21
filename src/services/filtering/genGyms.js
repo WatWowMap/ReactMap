@@ -1,4 +1,6 @@
-export default function genGyms(t, gyms, categories) {
+import { t } from 'i18next'
+
+export default function genGyms(gyms, categories) {
   const tempObj = Object.fromEntries(categories.map((x) => [x, {}]))
   if (!gyms?.filter) return {}
 

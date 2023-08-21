@@ -2,13 +2,10 @@ const {
   database: {
     settings: { userTableName },
   },
-} = require('../../services/config')
-/**
- * @typedef {import("knex").Knex} Knex
- */
+} = require('@rm/config')
 
 /**
- * @param {Knex} knex
+ * @param {import("knex").Knex} knex
  */
 exports.up = async (knex) =>
   knex.schema.createTable('nest_submissions', (table) => {
@@ -24,6 +21,6 @@ exports.up = async (knex) =>
   })
 
 /**
- * @param {Knex} knex
+ * @param {import("knex").Knex} knex
  */
 exports.down = (knex) => knex.schema.dropTableIfExists('nest_submissions')

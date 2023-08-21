@@ -23,7 +23,7 @@ jobs:
           yarn
       - name: Run generating script
         run: |
-          yarn generate-locales
+          yarn locales:generate
         env:
           OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
       - name: Configure git

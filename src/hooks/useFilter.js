@@ -24,7 +24,6 @@ export default function useFilter(
     Icons,
     auth: { perms },
     masterfile: { pokemon },
-    setExcludeList,
     menuFilters,
   } = useStatic.getState()
 
@@ -118,11 +117,9 @@ export default function useFilter(
     }
   }
 
-  if (!reqCategories) {
-    reqCategories = Object.keys(categories)
-  }
+  const c = reqCategories ?? Object.keys(menuFilters)
 
-  reqCategories.forEach((subCategory) => {
+  c.forEach((subCategory) => {
     Object.entries(menuFilters[subCategory] || {}).forEach(([id, item]) => {
       if (
         item.perms.some((perm) => perms[perm]) &&
@@ -253,7 +250,7 @@ export default function useFilter(
     })
   })
 
-  useEffect(() => () => setExcludeList([]))
+  useEffect(() => () => useStatic.setState({ excludeList: [] }))
 
   return { filteredObj, filteredArr, count }
 }

@@ -1,9 +1,14 @@
-import React from 'react'
-import { Button, darken } from '@mui/material'
+import * as React from 'react'
+import { darken } from '@mui/material/styles'
+import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
-import FAIcon from '../general/FAIcon'
+import { I } from '../general/I'
 
-export default function DiscordLogin({ href, text, size }) {
+export default function DiscordLogin({
+  href = '/auth/discord/callback',
+  text = 'login',
+  size = 'large',
+}) {
   const { t } = useTranslation()
 
   return (
@@ -15,11 +20,11 @@ export default function DiscordLogin({ href, text, size }) {
           bgcolor: darken('rgb(114,136,218)', 0.2),
         },
       }}
-      size={size || 'large'}
-      href={href || '/auth/discord/callback'}
-      startIcon={<FAIcon className="fab fa-discord" size={size || 'large'} />}
+      size={size}
+      href={href}
+      startIcon={<I className="fab fa-discord" size={size} />}
     >
-      {text ? t(text) : t('login')}
+      {t(text)}
     </Button>
   )
 }

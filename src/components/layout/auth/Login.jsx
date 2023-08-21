@@ -1,7 +1,13 @@
+// @ts-check
 /* eslint-disable react/no-array-index-key */
-import React from 'react'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Box, Grid, Typography, useMediaQuery, useTheme } from '@mui/material'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
+import { useQuery } from '@apollo/client'
+
+import { CUSTOM_COMPONENT } from '@services/queries/config'
 
 import LocalLogin from './Local'
 import LocaleSelection from '../general/LocaleSelection'
@@ -9,16 +15,27 @@ import DiscordLogin from './Discord'
 import TelegramLogin from './Telegram'
 import CustomTile from '../custom/CustomTile'
 import ThemeToggle from '../general/ThemeToggle'
+import { Loading } from '../general/Loading'
 
-export default function Login({ serverSettings, getServerSettings }) {
+export default function Login({ serverSettings }) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
-  const { settings, components } = serverSettings.config.map.loginPage
+  const { data, loading } = useQuery(CUSTOM_COMPONENT, {
+    fetchPolicy: 'cache-first',
+    variables: { component: 'loginPage' },
+    skip: !serverSettings.config.map.loginPage,
+  })
 
+  if (loading) {
+    return <Loading height="100vh">{t('loading', { category: '' })}</Loading>
+  }
+
+  const { settings, components } = data?.customComponent || {
+    settings: {},
+    components: [],
+  }
   return (
     <>
-      <Box sx={{ position: 'absolute', top: 10, right: 10 }}>
+      <Box position="absolute" top={10} right={10}>
         <ThemeToggle />
       </Box>
       {components?.length ? (
@@ -28,15 +45,10 @@ export default function Login({ serverSettings, getServerSettings }) {
           alignItems={settings.parentAlignItems || 'center'}
           justifyContent={settings.parentJustifyContent || 'center'}
           style={settings.parentStyle || {}}
+          sx={settings.parentSx || {}}
         >
           {components.map((block, i) => (
-            <CustomTile
-              key={i}
-              block={block}
-              defaultReturn={null}
-              serverSettings={serverSettings}
-              getServerSettings={getServerSettings}
-            />
+            <CustomTile key={i} block={block} />
           ))}
         </Grid>
       ) : (
@@ -45,9 +57,10 @@ export default function Login({ serverSettings, getServerSettings }) {
           direction="column"
           justifyContent="center"
           alignItems="center"
-          sx={{ height: { xs: '90vh', sm: '100vh' }, width: '100%' }}
+          height={{ xs: '90vh', sm: '100vh' }}
+          width="100%"
         >
-          <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
+          <Grid pb={8} xs={12}>
             <Typography variant="h3" align="center">
               {t('welcome')} {serverSettings.config.map.headerTitle}
             </Typography>
@@ -55,33 +68,24 @@ export default function Login({ serverSettings, getServerSettings }) {
           {serverSettings?.authMethods?.includes('discord') && (
             <Grid
               container
-              item
               justifyContent="center"
               alignItems="center"
-              style={{ marginTop: 20, marginBottom: 20 }}
+              direction="row"
+              xs={12}
             >
               <Grid
-                item
                 xs={
                   serverSettings.config.map.discordInvite
                     ? t('login_button')
                     : 10
                 }
                 sm={serverSettings.config.map.discordInvite ? 3 : 10}
-                style={{
-                  textAlign: 'center',
-                  marginTop: serverSettings.config.map.discordAuthUrl ? 20 : 0,
-                }}
+                textAlign="center"
               >
                 <DiscordLogin href={serverSettings.config.map.discordAuthUrl} />
               </Grid>
               {serverSettings.config.map.discordInvite && (
-                <Grid
-                  item
-                  xs={t('join_button')}
-                  sm={3}
-                  style={{ textAlign: 'center', marginTop: 20 }}
-                >
+                <Grid xs={t('join_button')} sm={3} textAlign="center">
                   <DiscordLogin
                     href={serverSettings.config.map.discordInvite}
                     text="join"
@@ -91,7 +95,7 @@ export default function Login({ serverSettings, getServerSettings }) {
             </Grid>
           )}
           {serverSettings?.authMethods?.includes('telegram') && (
-            <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
+            <Grid>
               <TelegramLogin
                 botName={serverSettings.config.map.telegramBotName}
                 authUrl={serverSettings.config.map.telegramAuthUrl}
@@ -99,29 +103,23 @@ export default function Login({ serverSettings, getServerSettings }) {
             </Grid>
           )}
           {serverSettings?.authMethods?.includes('local') && (
-            <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
-              <LocalLogin
-                href={serverSettings.config.map.localAuthUrl}
-                serverSettings={serverSettings}
-                getServerSettings={getServerSettings}
-              />
+            <Grid>
+              <LocalLogin href={serverSettings.config.map.localAuthUrl} />
             </Grid>
           )}
-          <Grid
-            item
-            style={{
-              marginTop: 20,
-              marginBottom: 20,
-              bottom: 0,
-              position: 'absolute',
-              width: isMobile ? '50%' : '20%',
-            }}
-          >
-            <LocaleSelection
-              localeSelection={serverSettings.config.localeSelection}
-            />
-          </Grid>
         </Grid>
+      )}
+      {!components?.length && (
+        <Box
+          position="absolute"
+          bottom={20}
+          left={0}
+          right={0}
+          mx="auto"
+          width={{ xs: '50%', sm: '33%', md: '25%', lg: '20%' }}
+        >
+          <LocaleSelection />
+        </Box>
       )}
     </>
   )

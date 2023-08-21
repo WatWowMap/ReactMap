@@ -1,6 +1,14 @@
+// @ts-check
+const { Event } = require('../../initialization')
 const BaseFilter = require('../Base')
 
-module.exports = function buildGyms(perms, defaults, available) {
+/**
+ *
+ * @param {import("@rm/types").Permissions} perms
+ * @param {import("@rm/types").Config['defaultFilters']['gyms']} defaults
+ * @returns
+ */
+function buildGyms(perms, defaults) {
   const gymFilters = {}
 
   if (perms.gyms) {
@@ -19,7 +27,7 @@ module.exports = function buildGyms(perms, defaults, available) {
       gymFilters[`r${tier}`] = new BaseFilter(defaults.raids)
     })
   }
-  available.gyms.forEach((avail) => {
+  Event.getAvailable('gyms').forEach((avail) => {
     if (perms.gyms && (avail.startsWith('t') || avail.startsWith('g'))) {
       gymFilters[avail] = new BaseFilter(defaults.allGyms)
     }
@@ -34,3 +42,5 @@ module.exports = function buildGyms(perms, defaults, available) {
   })
   return gymFilters
 }
+
+module.exports = buildGyms
