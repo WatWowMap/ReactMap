@@ -30,7 +30,7 @@ export default function Login({ serverSettings }) {
     return <Loading height="100vh">{t('loading', { category: '' })}</Loading>
   }
 
-  if (serverSettings?.user?.valid && process.env.NODE_ENV !== 'development') {
+  if (serverSettings?.loggedIn && process.env.NODE_ENV !== 'development') {
     return <Navigate to="/" />
   }
 
