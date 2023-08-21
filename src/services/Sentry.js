@@ -1,32 +1,25 @@
-import * as Sentry from '@sentry/react'
+// @ts-check
+import { init, BrowserTracing } from '@sentry/react'
 import Fetch from './Fetch'
 
-if (inject) {
-  const {
-    VERSION,
-    CUSTOM,
-    SENTRY_DSN,
-    SENTRY_TRACES_SAMPLE_RATE,
-    DEVELOPMENT,
-    SENTRY_DEBUG,
-  } = inject
-
-  Sentry.init({
+if (CONFIG.client.sentry.dsn) {
+  init({
     dsn:
-      SENTRY_DSN ||
+      CONFIG.client.sentry.dsn ||
       'https://c40dad799323428f83aee04391639345@o1096501.ingest.sentry.io/6117162',
     integrations: [
-      new Sentry.BrowserTracing({
+      new BrowserTracing({
         tracePropagationTargets: ['localhost', /^\//, 'graphql'],
         idleTimeout: 10000,
       }),
     ],
-    tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE
-      ? +SENTRY_TRACES_SAMPLE_RATE
+    tracesSampleRate: CONFIG.client.sentry.tracesSampleRate
+      ? +CONFIG.client.sentry.tracesSampleRate
       : 0.1,
-    release: VERSION,
-    environment: DEVELOPMENT ? 'development' : 'production',
-    debug: SENTRY_DEBUG,
+    release: CONFIG.client.version,
+    environment:
+      process.env.NODE_ENV === 'development' ? 'development' : 'production',
+    debug: CONFIG.client.sentry.debug || false,
     beforeSend: async (event) => {
       const errors = event.exception.values
       const isLibrary = errors.find((e) => e?.value?.includes('vendor'))
@@ -39,7 +32,7 @@ if (inject) {
 
         await Fetch.sendError(error)
       }
-      return CUSTOM || isLibrary || fetchError ? null : event
+      return CONFIG.client.hasCustom || isLibrary || fetchError ? null : event
     },
   })
 }

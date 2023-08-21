@@ -7,9 +7,7 @@ import getProperName from './functions/getProperName'
 import checkAdvFilter from './functions/checkAdvFilter'
 import dayCheck from './functions/dayCheck'
 import parseQuestConditions from './functions/parseConditions'
-import formatter from './functions/formatter'
 import getRewardInfo from './functions/getRewardInfo'
-import checkAreaValidity from './functions/checkAreaValidity'
 
 export default class Utility {
   static getProperName(word) {
@@ -34,10 +32,6 @@ export default class Utility {
 
   static parseConditions(conditions) {
     return parseQuestConditions(conditions)
-  }
-
-  static formatter(addressFormat, data) {
-    return formatter(addressFormat, data)
   }
 
   static camelToSnake(str) {
@@ -104,13 +98,8 @@ export default class Utility {
     )
   }
 
-  static analytics(
-    category,
-    action = false,
-    label = false,
-    nonInteraction = false,
-  ) {
-    if (inject?.GOOGLE_ANALYTICS_ID) {
+  static analytics(category, action = '', label = '', nonInteraction = false) {
+    if (CONFIG.googleAnalyticsId) {
       if (action) {
         ReactGA.event({
           category,
@@ -151,15 +140,16 @@ export default class Utility {
     }
   }
 
+  /**
+   * Provides the raw content or translated content if available
+   * @param {string | Record<string, string>} content
+   * @returns
+   */
   static getBlockContent(content) {
     if (!content) return ''
     if (typeof content === 'string') return content
     return typeof content === 'object'
       ? content[localStorage.getItem('i18nextLng')] || Object.values(content)[0]
       : ''
-  }
-
-  static checkAreaValidity(...args) {
-    return checkAreaValidity(...args)
   }
 }

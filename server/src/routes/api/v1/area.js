@@ -1,12 +1,11 @@
 const path = require('path')
 const router = require('express').Router()
 
-const config = require('config')
-const { log, HELPERS } = require('../../../services/logger')
+const config = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
 const getAreas = require('../../../services/areas')
 
-/** @type {import('../../../types').Config['api']['reactMapSecret']} */
-const reactMapSecret = config.get('api.reactMapSecret')
+const reactMapSecret = config.getSafe('api.reactMapSecret')
 
 router.get('/reload', async (req, res) => {
   try {

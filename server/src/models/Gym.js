@@ -2,14 +2,14 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const { Event, Db } = require('../services/initialization')
-const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },
   defaultFilters: {
     gyms: { baseTeamIds, baseGymSlotAmounts },
   },
-} = require('../services/config')
+} = require('@rm/config')
+const { Event, Db } = require('../services/initialization')
+const getAreaSql = require('../services/functions/getAreaSql')
 
 const coreFields = [
   'id',
@@ -48,7 +48,7 @@ const raidFields = [
   'raid_pokemon_alignment',
 ]
 
-module.exports = class Gym extends Model {
+class Gym extends Model {
   static get tableName() {
     return 'gym'
   }
@@ -597,3 +597,5 @@ module.exports = class Gym extends Model {
     return query
   }
 }
+
+module.exports = Gym

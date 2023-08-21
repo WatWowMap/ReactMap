@@ -1,15 +1,22 @@
+// @ts-check
 const { Model, ref } = require('objection')
+const config = require('@rm/config')
+
 const getPolyVector = require('../services/functions/getPolyVector')
 const getAreaSql = require('../services/functions/getAreaSql')
-const {
-  api: { queryLimits },
-} = require('../services/config')
 
-module.exports = class ScanCell extends Model {
+class ScanCell extends Model {
   static get tableName() {
     return 's2cell'
   }
 
+  /**
+   *
+   * @param {import("@rm/types").Permissions} perms
+   * @param {object} args
+   * @param {import("@rm/types").DbContext} context
+   * @returns {Promise<import("@rm/types").FullScanCell[]>}
+   */
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const {
@@ -32,12 +39,16 @@ module.exports = class ScanCell extends Model {
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 's2cell')) {
       return []
     }
+    /** @type {import('@rm/types').FullScanCell[]} */
     const results = await query
-      .limit(queryLimits.scanCells)
+      .limit(config.getSafe('api.queryLimits.scanCells'))
       .from(isMad ? 'trs_s2cells' : 's2cell')
+
     return results.map((cell) => ({
       ...cell,
-      polygon: getPolyVector(cell.id, 'polygon').poly,
+      polygon: getPolyVector(cell.id, true).poly,
     }))
   }
 }
+
+module.exports = ScanCell

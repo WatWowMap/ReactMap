@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import ReactGA from 'react-ga4'
@@ -7,17 +8,15 @@ import './services/Sentry'
 import App from './components/App'
 import './services/i18n'
 
-if (inject) {
-  const { GOOGLE_ANALYTICS_ID, ANALYTICS_DEBUG_MODE, TITLE, VERSION } = inject
-  if (GOOGLE_ANALYTICS_ID) {
-    ReactGA.initialize(GOOGLE_ANALYTICS_ID, { debug: !!ANALYTICS_DEBUG_MODE })
-  }
-  if (TITLE) {
-    document.title = TITLE
-  }
-  // eslint-disable-next-line no-console
-  console.log('ReactMap Version:', VERSION)
+if (CONFIG.googleAnalyticsId) {
+  ReactGA.initialize(CONFIG.googleAnalyticsId)
 }
+if (CONFIG.client.title) {
+  document.title = CONFIG.client.title
+}
+
+// eslint-disable-next-line no-console
+console.log('ReactMap Version:', CONFIG.client.version)
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -1,6 +1,12 @@
+// @ts-check
+const { log, HELPERS } = require('@rm/logger')
 const { Db } = require('../initialization')
-const { log, HELPERS } = require('../logger')
 
+/**
+ *
+ * @param {import('discord.js').Client} client
+ * @param {import('discord.js').User} member
+ */
 module.exports = async (client, member) => {
   try {
     await Db.models.Session.clearDiscordSessions(

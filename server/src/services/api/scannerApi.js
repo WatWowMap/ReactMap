@@ -1,10 +1,10 @@
 /* eslint-disable no-nested-ternary */
-const fetch = require('node-fetch')
+const { default: fetch } = require('node-fetch')
 const NodeCache = require('node-cache')
 
+const config = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
 const Clients = require('../Clients')
-const config = require('../config')
-const { log, HELPERS } = require('../logger')
 
 const scannerQueue = {
   scanNext: {},
@@ -13,7 +13,7 @@ const scannerQueue = {
 
 const userCache = new NodeCache({ stdTTL: 60 * 60 * 24 })
 
-module.exports = async function scannerApi(
+async function scannerApi(
   category,
   method,
   data = null,
@@ -82,7 +82,7 @@ module.exports = async function scannerApi(
           HELPERS.scanner,
           `Request to scan new location by ${user.username}${
             user.id ? ` (${user.id})` : ''
-          } - type ${data.scanNextType}: ${data.scanLocation[0].toFixed(
+          } - type ${data.scanSize}: ${data.scanLocation[0].toFixed(
             5,
           )},${data.scanLocation[1].toFixed(5)}`,
         )
@@ -132,7 +132,7 @@ module.exports = async function scannerApi(
           HELPERS.scanner,
           `Request to scan new zone by ${user.username}${
             user.id ? ` (${user.id})` : ''
-          } - size ${data.scanZoneSize}: ${data.scanLocation[0].toFixed(
+          } - size ${data.scanSize}: ${data.scanLocation[0].toFixed(
             5,
           )},${data.scanLocation[1].toFixed(5)}`,
         )
@@ -274,9 +274,7 @@ module.exports = async function scannerApi(
                   `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
               },
               timestamp: new Date(),
-              description: `<@${user.discordId}>\n${capitalized} Size: ${
-                category === 'scanNext' ? data.scanNextType : data.scanZoneSize
-              }\nCoordinates: ${coords.length}\n`,
+              description: `<@${user.discordId}>\n${capitalized} Size: ${data.scanSize}\nCoordinates: ${coords.length}\n`,
               fields: [
                 {
                   name: `User History`,
@@ -366,3 +364,5 @@ module.exports = async function scannerApi(
     clearTimeout(timeout)
   }
 }
+
+module.exports = scannerApi

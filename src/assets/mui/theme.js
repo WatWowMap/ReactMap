@@ -1,7 +1,5 @@
 // @ts-check
-import { responsiveFontSizes } from '@mui/material'
-import { createTheme } from '@mui/material/styles'
-import * as locales from '@mui/material/locale'
+import { createTheme, responsiveFontSizes } from '@mui/material/styles'
 
 /** @type {import('@mui/material').Components<Omit<import('@mui/material').Theme, 'components'>>} */
 const components = {
@@ -10,6 +8,30 @@ const components = {
       root: {
         backgroundImage: 'none',
       },
+    },
+  },
+  MuiStack: {
+    defaultProps: {
+      direction: 'column',
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+      sx: (t) => ({
+        width: { xs: 50, sm: 65 },
+        zIndex: 5000,
+        '& > *': {
+          margin: `${t.spacing(1)} !important`,
+          position: 'sticky',
+          top: 0,
+          left: 5,
+          zIndex: 1000,
+          width: 10,
+        },
+      }),
+    },
+  },
+  MuiListSubheader: {
+    defaultProps: {
+      disableSticky: true,
     },
   },
   MuiTabs: {
@@ -93,29 +115,24 @@ const DEFAULT_PALETTE = {
 /**
  * @param {{ primary?: string, secondary?: string }} themeOptions
  * @param {boolean} darkMode
- * @param {keyof typeof locales} locale
  * @returns
  */
 export default function customTheme(
   themeOptions = DEFAULT_PALETTE,
   darkMode = document.body.classList.contains('dark'),
-  locale = 'enUS',
 ) {
-  const newTheme = createTheme(
-    {
-      palette: {
-        mode: darkMode ? 'dark' : 'light',
-        primary: {
-          main: themeOptions.primary,
-        },
-        secondary: {
-          main: themeOptions.secondary,
-          contrastText: '#fff',
-        },
+  const newTheme = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+      primary: {
+        main: themeOptions.primary,
       },
-      components,
+      secondary: {
+        main: themeOptions.secondary,
+        contrastText: '#fff',
+      },
     },
-    locales[locale],
-  )
+    components,
+  })
   return responsiveFontSizes(newTheme)
 }

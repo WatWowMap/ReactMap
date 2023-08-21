@@ -1,18 +1,43 @@
+// @ts-check
 const { Model } = require('objection')
+const config = require('@rm/config')
 
-const {
-  database: {
-    settings: { userTableName, gymBadgeTableName },
-  },
-} = require('../services/config')
-const { log, HELPERS } = require('../services/logger')
+const { log, HELPERS } = require('@rm/logger')
 
 class User extends Model {
-  /** @returns {string} */
   static get tableName() {
-    return userTableName
+    return config.getSafe('database.settings.userTableName')
   }
 
+  static get relationMappings() {
+    // eslint-disable-next-line global-require
+    const { Db } = require('../services/initialization')
+    return {
+      badges: {
+        relation: Model.HasManyRelation,
+        modelClass: Db.models.Badge,
+        join: {
+          from: `${config.getSafe('database.settings.userTableName')}.id`,
+          to: `${config.getSafe('database.settings.gymBadgeTableName')}.userId`,
+        },
+      },
+      nestSubmissions: {
+        relation: Model.HasManyRelation,
+        modelClass: Db.models.NestSubmission,
+        join: {
+          from: `${config.getSafe('database.settings.userTableName')}.id`,
+          to: `nest_submissions.userId`,
+        },
+      },
+    }
+  }
+
+  /**
+   *
+   * @param {string | number} userId
+   * @param {string} strategy
+   * @param {string} botName
+   */
   static async clearPerms(userId, strategy, botName) {
     await this.query()
       .update({ [`${strategy}Perms`]: null })
@@ -25,27 +50,24 @@ class User extends Model {
       )
   }
 
-  static get relationMappings() {
-    // eslint-disable-next-line global-require
-    const { Db } = require('../services/initialization')
-    return {
-      badges: {
-        relation: Model.HasManyRelation,
-        modelClass: Db.models.Badge,
-        join: {
-          from: `${userTableName}.id`,
-          to: `${gymBadgeTableName}.userId`,
-        },
-      },
-      nestSubmissions: {
-        relation: Model.HasManyRelation,
-        modelClass: Db.models.NestSubmission,
-        join: {
-          from: `${userTableName}.id`,
-          to: `nest_submissions.userId`,
-        },
-      },
-    }
+  /**
+   *
+   * @param {number} id
+   * @returns {Promise<import('@rm/types').FullUser | null>}
+   */
+  static async getOne(id) {
+    return this.query().findOne({ id })
+  }
+
+  /**
+   *
+   * @param {number} id
+   * @param {string} selectedWebhook
+   * @returns {Promise<import('@rm/types').FullUser | null>}
+   */
+  static async updateWebhook(id, selectedWebhook) {
+    await this.query().update({ selectedWebhook }).where({ id })
+    return this.getOne(id)
   }
 }
 

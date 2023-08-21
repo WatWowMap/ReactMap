@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import * as React from 'react'
 import {
   Grid,
   Typography,
@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 
@@ -36,28 +36,35 @@ import DiscordLogin from '../auth/Discord'
 import Telegram from '../auth/Telegram'
 import Notification from '../general/Notification'
 import ReactWindow from '../general/ReactWindow'
+import { DialogWrapper } from './DialogWrapper'
 
-export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
+export default function UserProfile() {
   Utility.analytics('/user-profile')
   const { t } = useTranslation()
   const auth = useStatic((state) => state.auth)
   const {
-    map: { excludeList, rolesLinkName, rolesLink },
+    map: { rolesLinkName, rolesLink },
   } = useStatic((state) => state.config)
+
   const locale = localStorage.getItem('i18nextLng') || 'en'
 
-  const [tab, setTab] = useState(0)
-  const [tabsHeight, setTabsHeight] = useState(0)
-  const [contentHeight, setContentHeight] = useState(0)
+  const [tab, setTab] = React.useState(0)
+  const [tabsHeight, setTabsHeight] = React.useState(0)
+  const [contentHeight, setContentHeight] = React.useState(0)
   const handleTabChange = (_event, newValue) => {
     setTab(newValue)
   }
 
+  const handleClose = React.useCallback(
+    () => useLayoutStore.setState({ userProfile: false }),
+    [],
+  )
+
   return (
-    <>
+    <DialogWrapper dialog="userProfile">
       <Header
         titles={['user_profile', `- ${auth.username}`]}
-        action={() => setUserProfile(false)}
+        action={handleClose}
       />
       <DialogContent
         style={{ padding: 0 }}
@@ -75,33 +82,19 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
         </AppBar>
         <Box
           overflow="auto"
-          sx={{
-            maxHeight: `${contentHeight - tabsHeight}px`,
-            minHeight: '70vh',
-          }}
+          maxHeight={`${contentHeight - tabsHeight}px`}
+          minHeight="70vh"
         >
           <TabPanel value={tab} index={0}>
-            <LinkProfiles auth={auth} t={t} />
-            <ExtraFields auth={auth} />
-            {auth.perms.backups && (
-              <Backups
-                isMobile={isMobile}
-                auth={auth}
-                isTablet={isTablet}
-                t={t}
-              />
-            )}
+            <LinkProfiles />
+            <ExtraFields />
+            {auth.perms.backups && <Backups />}
           </TabPanel>
           <TabPanel value={tab} index={1}>
-            <GymBadges
-              badges={auth.badges}
-              isMobile={isMobile}
-              isTablet={isTablet}
-              t={t}
-            />
+            <GymBadges />
           </TabPanel>
           <TabPanel value={tab} index={2}>
-            <ProfilePermissions auth={auth} excludeList={excludeList} t={t} />
+            <ProfilePermissions />
           </TabPanel>
         </Box>
       </DialogContent>
@@ -120,21 +113,22 @@ export default function UserProfile({ setUserProfile, isMobile, isTablet }) {
           {
             name: 'close',
             color: 'secondary',
-            action: () => setUserProfile(false),
+            action: handleClose,
           },
         ]}
       />
-    </>
+    </DialogWrapper>
   )
 }
 
-const LinkProfiles = ({ auth, t }) => {
-  const setAuth = useStatic((state) => state.setAuth)
+const LinkProfiles = () => {
+  const { t } = useTranslation()
+  const auth = useStatic((s) => s.auth)
   const {
     map: { discordAuthUrl, telegramAuthUrl, telegramBotName },
   } = useStatic((state) => state.config)
 
-  const [refreshing, setRefreshing] = useState(false)
+  const [refreshing, setRefreshing] = React.useState(false)
 
   const [setWebhookStrategy] = useMutation(Query.user('setWebhookStrategy'))
 
@@ -189,7 +183,9 @@ const LinkProfiles = ({ auth, t }) => {
                       strategy: e.target.value,
                     },
                   })
-                  setAuth({ ...auth, webhookStrategy: e.target.value })
+                  useStatic.setState({
+                    auth: { ...auth, webhookStrategy: e.target.value },
+                  })
                   setRefreshing(true)
                 }}
                 style={{ minWidth: 100 }}
@@ -217,9 +213,9 @@ const LinkProfiles = ({ auth, t }) => {
   )
 }
 
-const ExtraFields = ({ auth }) => {
+const ExtraFields = () => {
+  const auth = useStatic((s) => s.auth)
   const extraUserFields = useStatic((state) => state.extraUserFields)
-  const setAuth = useStatic((state) => state.setAuth)
 
   const [setField] = useMutation(Query.user('setExtraFields'))
 
@@ -250,13 +246,15 @@ const ExtraFields = ({ auth }) => {
               label={label}
               value={auth.data?.[key] || ''}
               onChange={({ target: { value } }) => {
-                setAuth({
-                  ...auth,
-                  data: {
-                    ...auth.data,
-                    [key]: value,
+                useStatic.setState((prev) => ({
+                  auth: {
+                    ...prev.auth,
+                    data: {
+                      ...prev.auth.data,
+                      [key]: value,
+                    },
                   },
-                })
+                }))
                 setField({
                   variables: {
                     key,
@@ -272,10 +270,10 @@ const ExtraFields = ({ auth }) => {
   )
 }
 
-const ProfilePermissions = ({ auth, excludeList, t }) => {
-  const {
-    map: { permImageDir, permArrayImages },
-  } = useStatic((state) => state.config)
+const ProfilePermissions = () => {
+  const auth = useStatic((s) => s.auth)
+  const excludeList = useStatic((state) => state.config?.map?.excludeList || [])
+
   return (
     <Grid
       container
@@ -300,13 +298,7 @@ const ProfilePermissions = ({ auth, excludeList, t }) => {
           return null
         return (
           <Grid item xs={12} sm={6} key={perm}>
-            <PermCard
-              perms={auth.perms}
-              perm={perm}
-              t={t}
-              permImageDir={permImageDir}
-              permArrayImages={permArrayImages}
-            />
+            <PermCard perm={perm} />
           </Grid>
         )
       })}
@@ -314,62 +306,72 @@ const ProfilePermissions = ({ auth, excludeList, t }) => {
   )
 }
 
-const PermCard = ({ perms, perm, t, permImageDir, permArrayImages }) => (
-  <Card className="perm-wrapper">
-    {(Array.isArray(perms[perm]) ? false : !perms[perm]) && (
-      <div className="disabled-overlay flex-center">
-        <Typography variant="h6" align="center" pb={4}>
-          {t('no_access')}
-        </Typography>
-      </div>
-    )}
-    {(perm !== 'areaRestrictions' &&
-      perm !== 'webhooks' &&
-      perm !== 'scanner') ||
-    permArrayImages ? (
-      <CardMedia
-        style={{
-          height: 250,
-          border: 'black 4px solid',
-          borderRadius: 4,
-        }}
-        image={`/${permImageDir}/${perm}.png`}
-        title={perm}
-      />
-    ) : (
-      <Grid
-        container
-        direction="column"
-        sx={{
-          minHeight: 260,
-          border: 'black 4px solid',
-          borderRadius: 4,
-          borderBottomLeftRadius: 0,
-          borderBottomRightRadius: 0,
-          textAlign: 'center',
-        }}
-        alignItems="center"
-        justifyContent="center"
-      >
-        {perms[perm].map((area) => (
-          <Grid key={area} item>
-            <Typography>{Utility.getProperName(area)}</Typography>
-          </Grid>
-        ))}
-      </Grid>
-    )}
-    <CardContent style={{ minHeight: 100 }}>
-      <Typography gutterBottom variant="h6" noWrap>
-        {t(Utility.camelToSnake(perm))}
-      </Typography>
-      <Typography variant="body2" color="textSecondary" component="p">
-        {t(`${Utility.camelToSnake(perm)}_subtitle`)}
-      </Typography>
-    </CardContent>
-  </Card>
-)
+const PermCard = ({ perm }) => {
+  const { t } = useTranslation()
+  const { permImageDir, permArrayImages } = useStatic(
+    (state) => state.config.map,
+  )
+  const value = useStatic((s) => s.auth.perms[perm])
 
-const GymBadges = ({ isMobile, t }) => {
+  return (
+    <Card className="perm-wrapper">
+      {(Array.isArray(value) ? false : !value) && (
+        <div className="disabled-overlay flex-center">
+          <Typography variant="h6" align="center" pb={4}>
+            {t('no_access')}
+          </Typography>
+        </div>
+      )}
+      {(perm !== 'areaRestrictions' &&
+        perm !== 'webhooks' &&
+        perm !== 'scanner') ||
+      permArrayImages ? (
+        <CardMedia
+          style={{
+            height: 250,
+            border: 'black 4px solid',
+            borderRadius: 4,
+          }}
+          image={`/${permImageDir}/${perm}.png`}
+          title={perm}
+        />
+      ) : (
+        <Grid
+          container
+          direction="column"
+          sx={{
+            minHeight: 260,
+            border: 'black 4px solid',
+            borderRadius: 4,
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+            textAlign: 'center',
+          }}
+          alignItems="center"
+          justifyContent="center"
+        >
+          {value.map((area) => (
+            <Grid key={area} item>
+              <Typography>{Utility.getProperName(area)}</Typography>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+      <CardContent style={{ minHeight: 100 }}>
+        <Typography gutterBottom variant="h6" noWrap>
+          {t(Utility.camelToSnake(perm))}
+        </Typography>
+        <Typography variant="body2" color="textSecondary" component="p">
+          {t(`${Utility.camelToSnake(perm)}_subtitle`)}
+        </Typography>
+      </CardContent>
+    </Card>
+  )
+}
+
+const GymBadges = () => {
+  const { t } = useTranslation()
+  const isMobile = useStatic((s) => s.isMobile)
   const { data } = useQuery(Query.gyms('badges'), {
     fetchPolicy: 'network-only',
   })
@@ -440,8 +442,8 @@ const GymBadges = ({ isMobile, t }) => {
 const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
   const { badges, columnCount, Icons, t, map } = data
   const item = badges[rowIndex * columnCount + columnIndex]
-  const [badge, setBadge] = useState(item?.badge)
-  const [badgeMenu, setBadgeMenu] = useState(false)
+  const [badge, setBadge] = React.useState(item?.badge)
+  const [badgeMenu, setBadgeMenu] = React.useState(false)
 
   return item && badge ? (
     <Grid
@@ -510,7 +512,9 @@ const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
   ) : null
 }
 
-const Backups = ({ t, auth }) => {
+const Backups = () => {
+  const { t } = useTranslation()
+  const auth = useStatic((s) => s.auth)
   const { data, loading: allLoading } = useQuery(Query.user('getBackups'), {
     fetchPolicy: 'no-cache',
   })
@@ -535,9 +539,9 @@ const Backups = ({ t, auth }) => {
   const [load, { data: fullBackup, loading: fullLoading }] = useLazyQuery(
     Query.user('getFullBackup'),
   )
-  const [disabled, setDisabled] = useState(false)
-  const [name, setName] = useState('')
-  const [existing, setExisting] = useState({})
+  const [disabled, setDisabled] = React.useState(false)
+  const [name, setName] = React.useState('')
+  const [existing, setExisting] = React.useState({})
 
   React.useEffect(() => {
     if (fullBackup?.backup?.data) {

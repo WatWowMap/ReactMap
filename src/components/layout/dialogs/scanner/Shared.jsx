@@ -1,8 +1,19 @@
+/* eslint-disable no-nested-ternary */
+// @ts-check
 import * as React from 'react'
-import { ListItemText, ListItem, ListItemIcon, styled } from '@mui/material'
+import {
+  ListItemText,
+  ListItem,
+  ListItemIcon,
+  styled,
+  ListItemButton,
+  Divider,
+  ListSubheader,
+} from '@mui/material'
+import { Circle } from 'react-leaflet'
 import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'
 import ClearIcon from '@mui/icons-material/Clear'
-import { useStore } from '@hooks/useStore'
+import { useScanStore, useStore } from '@hooks/useStore'
 
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -10,79 +21,175 @@ const StyledListItem = styled(ListItem)(() => ({
   padding: '2px 16px',
 }))
 
-export function ScanRequests({ amount = 0 }) {
+export const StyledListItemText = styled(ListItemText)(() => ({
+  textAlign: 'center',
+}))
+
+const StyledListButton = styled(ListItemButton)(() => ({
+  padding: '2px 16px',
+}))
+
+export const StyledDivider = styled(Divider)(() => ({
+  margin: '10px 0',
+}))
+
+export const StyledSubHeader = styled(ListSubheader)(() => ({
+  lineHeight: 2,
+}))
+
+const { setScanMode } = useScanStore.getState()
+
+export const COLORS = /** @type {const} */ ({
+  blue: 'rgb(90, 145, 255)',
+  orange: 'rgb(255, 165, 0)',
+  red: 'rgb(255, 100, 90)',
+  purple: 'rgb(200, 100, 255)',
+})
+
+export function ScanRequests() {
   const { t } = useTranslation()
+  const amount = useScanStore((s) => s.scanCoords.length)
   return (
     <StyledListItem style={{ margin: 0 }} className="no-leaflet-margin">
       <ListItemText secondary={`${t('scan_requests')}:`} />
-      <ListItemText style={{ textAlign: 'center' }} secondary={amount} />
+      <StyledListItemText secondary={amount} />
     </StyledListItem>
   )
 }
 
-export function ScanQueue({ queue = 0 }) {
+export function ScanQueue() {
   const { t } = useTranslation()
+  const queue = useScanStore((s) => s.queue)
   return (
     <StyledListItem className="no-leaflet-margin">
       <ListItemText secondary={`${t('scan_queue')}:`} />
-      <ListItemText
-        style={{ textAlign: 'center' }}
-        secondary={`${queue || '...'}`}
-      />
+      <StyledListItemText secondary={queue} />
     </StyledListItem>
   )
 }
 
-export function ScanConfirm({ isInAllowedArea, setMode, areaRestrictions }) {
+/**
+ *
+ * @param {{ mode: import('@hooks/useStore').ScanMode }} props
+ * @returns
+ */
+export function ScanConfirm({ mode }) {
   const { t } = useTranslation()
   const scannerCooldown = useStore((s) => s.scannerCooldown)
+  const valid = useScanStore((s) => s.valid)
+  const estimatedDelay = useScanStore((s) => s.estimatedDelay)
+
+  const [remainder, setRemainder] = React.useState(scannerCooldown - Date.now())
+
+  React.useEffect(() => {
+    if (scannerCooldown - Date.now() > 0) {
+      const interval = setTimeout(() => {
+        setRemainder(scannerCooldown - Date.now())
+      }, 1000)
+      return () => clearTimeout(interval)
+    }
+    setRemainder(0)
+  }, [remainder, scannerCooldown])
 
   return (
-    <StyledListItem
-      button
+    <StyledListButton
       color="secondary"
-      disabled={
-        !!(areaRestrictions?.length && !isInAllowedArea) || !!scannerCooldown
-      }
-      onClick={() => setMode('sendCoords')}
+      disabled={valid === 'none' || remainder > 0}
+      onClick={() => setScanMode(`${mode}Mode`, 'sendCoords')}
     >
       <ListItemIcon>
         <PermScanWifiIcon color="secondary" />
       </ListItemIcon>
       <ListItemText
         primary={
-          scannerCooldown ? (
+          remainder > 0 ? (
             <Trans
               i18nKey="scanner_countdown"
-              values={{ time: scannerCooldown }}
+              values={{ time: Math.round(remainder / 1000) }}
             />
           ) : (
             t('click_to_scan')
           )
         }
+        secondary={estimatedDelay ? `${estimatedDelay}s ${t('cooldown')}` : ''}
+        secondaryTypographyProps={{ component: 'span' }}
       />
-    </StyledListItem>
+    </StyledListButton>
   )
 }
 
-export function InAllowedArea({ isInAllowedArea }) {
+export function InAllowedArea() {
   const { t } = useTranslation()
-  return (
-    <ListItemText
-      secondary={t('scan_outside_area')}
-      style={{ display: isInAllowedArea ? 'none' : 'block' }}
-    />
-  )
+  const valid = useScanStore((s) => s.valid)
+  return {
+    none: <StyledListItemText secondary={t('scan_outside_area')} />,
+    some: <StyledListItemText secondary={t('scan_some_outside_area')} />,
+    all: null,
+  }[valid]
 }
 
-export function ScanCancel({ setMode }) {
+/**
+ *
+ * @param {{ mode: import('@hooks/useStore').ScanMode}} props
+ * @returns
+ */
+export function ScanCancel({ mode }) {
   const { t } = useTranslation()
   return (
-    <StyledListItem button onClick={() => setMode(false)}>
+    <StyledListButton onClick={() => setScanMode(`${mode}Mode`, '')}>
       <ListItemIcon>
         <ClearIcon color="primary" />
       </ListItemIcon>
       <ListItemText primary={t('cancel')} />
-    </StyledListItem>
+    </StyledListButton>
   )
+}
+
+/**
+ *
+ * @param {{ radius: number, lat: number, lon: number, color?: string }} props
+ * @returns
+ */
+export function ScanCircle({ lat, lon, radius, color = COLORS.blue }) {
+  return (
+    <Circle
+      radius={radius}
+      center={[lat, lon]}
+      fillOpacity={0.1}
+      color={color}
+      fillColor={color}
+    />
+  )
+}
+
+/**
+ *
+ * @param {{ radius?: number }} props
+ * @returns
+ */
+export function ScanCircles({ radius }) {
+  const scanCoords = useScanStore((s) => s.scanCoords)
+  const userRadius = useScanStore((s) => s.userRadius)
+  const validCoords = useScanStore((s) => s.validCoords)
+
+  const finalRadius = radius || userRadius
+  return scanCoords.map((coords, i) => {
+    const finalColor =
+      finalRadius <= 70
+        ? validCoords[i]
+          ? COLORS.orange
+          : COLORS.purple
+        : validCoords[i]
+        ? COLORS.blue
+        : COLORS.red
+    return (
+      <ScanCircle
+        key={`${coords.join('')}${finalColor}`}
+        radius={finalRadius}
+        lat={coords[0]}
+        lon={coords[1]}
+        color={finalColor}
+      />
+    )
+  })
 }

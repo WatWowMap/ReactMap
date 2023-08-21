@@ -10,6 +10,7 @@ const getAvailable = gql`
       nests
       filters
       questConditions
+      icons
     }
   }
 `

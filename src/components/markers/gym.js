@@ -1,4 +1,4 @@
-import L from 'leaflet'
+import { divIcon } from 'leaflet'
 import getOpacity from '@services/functions/getOpacity'
 
 const getBadgeColor = (raidLevel) => {
@@ -97,7 +97,7 @@ export default function GymMarker(
 
   const hasBattle = Boolean(in_battle && !gymIcon.includes('_b'))
 
-  return L.divIcon({
+  return divIcon({
     popupAnchor: [
       0 + gymMod.popupX + gymMod.offsetX,
       (-gymSize - (showDiamond ? 20 : slotModifier) - raidSize) * 0.67 +

@@ -1,5 +1,7 @@
+import { t } from 'i18next'
+
 /* eslint-disable no-nested-ternary */
-export default function genPokemon(t, pokemon, categories) {
+export default function genPokemon(pokemon, categories) {
   const tempObj = Object.fromEntries(
     categories.map((x) => [
       x,

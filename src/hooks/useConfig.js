@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import { useState } from 'react'
 import extend from 'extend'
-import * as Sentry from '@sentry/react'
+import { setUser } from '@sentry/react'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic } from '@hooks/useStore'
@@ -18,7 +18,7 @@ export default function useConfig(serverSettings, params) {
       'Permissions',
       true,
     )
-    Sentry.setUser({
+    setUser({
       username: serverSettings.user.username,
       id:
         serverSettings.user.discordId ||
@@ -73,16 +73,10 @@ export default function useConfig(serverSettings, params) {
         serverSettings.settings.localeSelection
     }
 
-    const newIcons = updateObjState(serverSettings.Icons.selected, 'icons')
-    const isValidIcon = serverSettings.Icons.checkValid(newIcons)
-
-    if (localState?.state?.icons && isValidIcon) {
-      serverSettings.Icons.setSelection(newIcons)
-    }
-
     const zoom =
       +params.zoom ||
       updatePositionState(serverSettings.config.map.startZoom, 'zoom')
+
     const location =
       +params.lat && +params.lon
         ? [+params.lat, +params.lon]
@@ -92,6 +86,12 @@ export default function useConfig(serverSettings, params) {
               serverSettings.config.map.startLon,
             ],
             'location',
+          ).map(
+            (x, i) =>
+              x ||
+              (i === 0
+                ? serverSettings.config.map.startLat
+                : serverSettings.config.map.startLon),
           )
 
     useStatic.setState({
@@ -113,17 +113,13 @@ export default function useConfig(serverSettings, params) {
         userBackupLimits: serverSettings.userBackupLimits || 0,
       },
       ui: serverSettings.ui,
-      masterfile: serverSettings.masterfile,
-      available: serverSettings.available,
       menus: serverSettings.menus,
       filters: serverSettings.defaultFilters,
       extraUserFields: serverSettings.extraUserFields,
       userSettings: serverSettings.clientMenus,
       settings: serverSettings.settings,
       timeOfDay: Utility.timeCheck(...location),
-      Icons: serverSettings.Icons,
       config: serverSettings.config,
-      webhookData: serverSettings.webhooks,
     })
 
     useStore.setState({
@@ -136,14 +132,6 @@ export default function useConfig(serverSettings, params) {
       filters: updateObjState(serverSettings.defaultFilters, 'filters'),
       userSettings: updateObjState(serverSettings.userSettings, 'userSettings'),
       settings: updateObjState(serverSettings.settings, 'settings'),
-      icons: serverSettings.Icons.selection,
-      selectedWebhook:
-        localState?.state &&
-        serverSettings?.webhooks?.[localState.state?.selectedWebhook]
-          ? localState.state.selectedWebhook
-          : serverSettings?.webhooks
-          ? Object.keys(serverSettings.webhooks)[0]
-          : null,
       zoom,
       location,
     })

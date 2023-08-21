@@ -1,12 +1,21 @@
-const { webhooks } = require('../config')
+// @ts-check
+const config = require('@rm/config')
 
-module.exports = function webhookPerms(roles, provider, trialActive = false) {
+/**
+ *
+ * @param {string[]} roles
+ * @param {string} provider
+ * @param {boolean} [trialActive]
+ * @returns {string[]}
+ */
+function webhookPerms(roles, provider, trialActive = false) {
   const perms = []
   roles.forEach((role) => {
-    webhooks.forEach((webhook) => {
+    config.getSafe('webhooks').forEach((webhook) => {
       if (
-        webhook?.[provider]?.includes(role) ||
-        (trialActive && webhook?.trialPeriodEligible)
+        webhook.enabled &&
+        (webhook?.[provider]?.includes(role) ||
+          (trialActive && webhook?.trialPeriodEligible))
       ) {
         perms.push(webhook.name)
       }
@@ -14,3 +23,5 @@ module.exports = function webhookPerms(roles, provider, trialActive = false) {
   })
   return [...new Set(perms)]
 }
+
+module.exports = webhookPerms

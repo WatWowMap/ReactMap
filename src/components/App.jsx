@@ -5,13 +5,14 @@ import 'leaflet/dist/leaflet.css'
 
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
-import { CssBaseline, ThemeProvider } from '@mui/material'
+import CssBaseline from '@mui/material/CssBaseline'
+import { ThemeProvider } from '@mui/material/styles'
 import { ApolloProvider } from '@apollo/client'
 
 import customTheme from '@assets/mui/theme'
 import { globalStyles } from '@assets/mui/global'
 import { useStore } from '@hooks/useStore'
-import client from '@services/apollo'
+import apolloClient from '@services/apollo'
 import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled'
 import { setLoadingText } from '@services/functions/setLoadingText'
 
@@ -45,9 +46,7 @@ function SetText() {
   return <div />
 }
 
-/**
- * @param {KeyboardEvent} event
- */
+/** @param {KeyboardEvent} event */
 function toggleDarkMode(event) {
   // This is mostly meant for development purposes
   if (event.ctrlKey && event.key === 'd') {
@@ -74,7 +73,7 @@ export default function App() {
       <React.Suspense fallback={<SetText />}>
         <CssBaseline />
         {globalStyles}
-        <ApolloProvider client={client}>
+        <ApolloProvider client={apolloClient}>
           <ErrorBoundary>
             <BrowserRouter>
               <Config setTheme={setTheme} />

@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { DialogContent, Grid } from '@mui/material'
+import Grid from '@mui/material/Grid'
+import DialogContent from '@mui/material/DialogContent'
 import { useTranslation } from 'react-i18next'
 
 import { useStatic } from '@hooks/useStore'

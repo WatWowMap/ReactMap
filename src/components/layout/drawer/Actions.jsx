@@ -17,7 +17,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import FeedbackIcon from '@mui/icons-material/Feedback'
 import HeartIcon from '@mui/icons-material/Favorite'
 
-import { useStore, useStatic } from '@hooks/useStore'
+import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import { I } from '../general/I'
 
 const importSettings = (e) => {
@@ -57,17 +57,15 @@ export default function DrawerActions() {
   const { t } = useTranslation()
   const {
     auth: { loggedIn, methods },
-    setUserProfile,
-    setFeedback,
-    setResetFilters,
     config,
   } = useStatic.getState()
-  const { setTutorial } = useStore.getState()
 
   return (
     <List>
       {config.map.enableUserProfile && (
-        <ListItemButton onClick={() => setUserProfile(true)}>
+        <ListItemButton
+          onClick={() => useLayoutStore.setState({ userProfile: true })}
+        >
           <ListItemIcon>
             <AccountBoxIcon color="secondary" />
           </ListItemIcon>
@@ -75,7 +73,7 @@ export default function DrawerActions() {
         </ListItemButton>
       )}
       {config.map.enableTutorial && (
-        <ListItemButton onClick={() => setTutorial(true)}>
+        <ListItemButton onClick={() => useStore.setState({ tutorial: true })}>
           <ListItemIcon>
             <HelpOutlineIcon color="secondary" />
           </ListItemIcon>
@@ -101,7 +99,9 @@ export default function DrawerActions() {
         </ListItemIcon>
         <ListItemText primary={t('import')} />
       </ListItemButton>
-      <ListItemButton onClick={() => setResetFilters(true)}>
+      <ListItemButton
+        onClick={() => useLayoutStore.setState({ resetFilters: true })}
+      >
         <ListItemIcon>
           <RotateLeftIcon color="primary" />
         </ListItemIcon>
@@ -145,7 +145,10 @@ export default function DrawerActions() {
         </ListItemButton>
       )}
       {config.map.feedbackLink && (
-        <ListItemButton component="button" onClick={() => setFeedback(true)}>
+        <ListItemButton
+          component="button"
+          onClick={() => useLayoutStore.setState({ feedback: true })}
+        >
           <ListItemIcon>
             <FeedbackIcon color="success" />
           </ListItemIcon>

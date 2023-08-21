@@ -32,6 +32,7 @@ import Poracle from '@services/Poracle'
 import SliderTile from '@components/layout/dialogs/filters/SliderTile'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
+import { useWebhookStore } from './store'
 
 const skipFields = [
   'profile_no',
@@ -74,30 +75,25 @@ export default function WebhookAdvanced({
   id,
   toggleWebhook,
   tempFilters,
-  isMobile,
 }) {
   const idObj = Poracle.getIdObj(id)
   const { t } = useTranslation()
   const location = useStore((state) => state.location)
-  const selectedWebhook = useStore((s) => s.selectedWebhook)
   const webhookAdv = useStore((s) => s.webhookAdv)
-  const setWebhookAdv = useStore((s) => s.setWebhookAdv)
   const {
-    [selectedWebhook]: {
-      info: { [category]: info },
-      profile,
-      human,
-      templates,
-      prefix,
-      leagues,
-      pvp,
-      addressFormat,
-      hasNominatim,
-      locale,
-      everything,
-    },
-  } = useStatic((s) => s.webhookData)
+    ui: { [category]: info },
+    templates,
+    prefix,
+    leagues,
+    pvp,
+    hasNominatim,
+    locale,
+    everything,
+  } = useWebhookStore((s) => s.context)
+  const human = useWebhookStore((s) => s.human)
+  const profile = useWebhookStore((s) => s.profile)
   const { pokemon, moves, types } = useStatic((s) => s.masterfile)
+  const isMobile = useStatic((s) => s.isMobile)
 
   Utility.analytics(`/poracle/${category}`)
 
@@ -110,7 +106,6 @@ export default function WebhookAdvanced({
         lat: location[0],
         lon: location[1],
         locale: localStorage.getItem('i18nextLng'),
-        webhookName: selectedWebhook,
       },
     },
   )
@@ -215,8 +210,10 @@ export default function WebhookAdvanced({
     setPoracleValues({ ...poracleValues, ...newObj })
   }
 
-  const handleChange = (panel) => (event, isExpanded) => {
-    setWebhookAdv({ ...webhookAdv, [panel]: isExpanded })
+  const handleChange = (panel) => (_, isExpanded) => {
+    useStore.setState((prev) => ({
+      webhookAdv: { ...prev.webhookAdv, [panel]: isExpanded },
+    }))
   }
 
   const footerOptions = [
@@ -232,7 +229,7 @@ export default function WebhookAdvanced({
     switch (option.name) {
       case 'template':
         templates[poracleValues.noIv ? `${category}NoIv` : category]?.[
-          locale
+          human.language || locale
         ]?.forEach((item) =>
           menuItems.push(
             <MenuItem key={item} value={item} dense>
@@ -647,9 +644,7 @@ export default function WebhookAdvanced({
             <Grid item xs={11}>
               <Autocomplete
                 style={{ width: '100%' }}
-                getOptionLabel={(x) =>
-                  `${x.name} - ${Utility.formatter(addressFormat, x.formatted)}`
-                }
+                getOptionLabel={(x) => x.formatted}
                 filterOptions={(x) => x}
                 options={fetchedData ? fetchedData.search : []}
                 autoComplete
@@ -699,9 +694,7 @@ export default function WebhookAdvanced({
                       <Typography variant="subtitle2">{x.name}</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="caption">
-                        {Utility.formatter(addressFormat, x.formatted)}
-                      </Typography>
+                      <Typography variant="caption">{x.formatted}</Typography>
                     </Grid>
                     <Divider
                       light
@@ -746,11 +739,7 @@ export default function WebhookAdvanced({
       />
       <DialogContent style={{ padding: '8px 5px' }}>
         {Object.keys(info.ui).map((type) => {
-          if (
-            human.blocked_alerts &&
-            JSON.parse(human.blocked_alerts).includes(type)
-          )
-            return null
+          if (human.blocked_alerts.includes(type)) return null
           if (type === 'global' && (idObj.id !== 'global' || !everything))
             return null
           const Items = (

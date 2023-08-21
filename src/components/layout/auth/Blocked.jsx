@@ -2,7 +2,10 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Grid, Typography, Button } from '@mui/material'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+
 import DiscordLogin from './Discord'
 
 export default function Blocked({ serverSettings }) {

@@ -1,4 +1,7 @@
-module.exports = function evalWebhookId(user) {
+// @ts-check
+
+/** @param {import("@rm/types").User} user */
+function evalWebhookId(user) {
   if (!user) {
     return ''
   }
@@ -12,3 +15,5 @@ module.exports = function evalWebhookId(user) {
       return webhookStrategy === 'discord' ? discordId : telegramId
   }
 }
+
+module.exports = evalWebhookId

@@ -72,7 +72,6 @@ export default function PokemonPopup({
     pokemon: { [pokemon_id]: metaData },
   } = useStatic((state) => state.masterfile)
   const popups = useStore((state) => state.popups)
-  const setPopups = useStore((state) => state.setPopups)
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
 
@@ -132,7 +131,6 @@ export default function PokemonPopup({
         <Footer
           pokemon={pokemon}
           popups={popups}
-          setPopups={setPopups}
           hasPvp={!!hasLeagues.length}
           Icons={Icons}
         />
@@ -170,14 +168,7 @@ const Header = ({
   userSettings,
   isTutorial,
 }) => {
-  const hideList = useStatic((state) => state.hideList)
-  const setHideList = useStatic((state) => state.setHideList)
-  const excludeList = useStatic((state) => state.excludeList)
-  const setExcludeList = useStatic((state) => state.setExcludeList)
-  const timerList = useStatic((state) => state.timerList)
-  const setTimerList = useStatic((state) => state.setTimerList)
   const filters = useStore((state) => state.filters)
-  const setFilters = useStore((state) => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const { id, pokemon_id, form, ditto_form, display_pokemon_id } = pokemon
@@ -192,37 +183,42 @@ const Header = ({
 
   const handleHide = () => {
     setAnchorEl(null)
-    setHideList([...hideList, id])
+    useStatic.setState((prev) => ({ hideList: [...prev.hideList, id] }))
   }
 
   const handleExclude = () => {
     setAnchorEl(null)
     const key = `${pokemon_id}-${form}`
     if (filters?.pokemon?.filter) {
-      setFilters({
-        ...filters,
-        pokemon: {
-          ...filters.pokemon,
-          filter: {
-            ...filters.pokemon.filter,
-            [key]: {
-              ...filters.pokemon.filter[key],
-              enabled: false,
+      useStore.setState((prev) => ({
+        filters: {
+          ...prev.filters,
+          pokemon: {
+            ...prev.filters.pokemon,
+            filter: {
+              ...prev.filters.pokemon.filter,
+              [key]: {
+                ...prev.filters.pokemon.filter[key],
+                enabled: false,
+              },
             },
           },
         },
-      })
-      setExcludeList([...excludeList, key])
+      }))
+      useStatic.setState((prev) => ({
+        excludeList: [...prev.excludeList, key],
+      }))
     }
   }
 
   const handleTimer = () => {
     setAnchorEl(null)
-    if (timerList.includes(id)) {
-      setTimerList(timerList.filter((x) => x !== id))
-    } else {
-      setTimerList([...timerList, id])
-    }
+    useStatic.setState((prev) => {
+      if (prev.includes(id)) {
+        return { timerList: prev.timerList.filter((x) => x !== id) }
+      }
+      return { timerList: [...prev.timerList, id] }
+    })
   }
 
   const options = [
@@ -436,17 +432,19 @@ const Timer = ({ pokemon, hasStats, t }) => {
   )
 }
 
-const Footer = ({ pokemon, popups, setPopups, hasPvp, Icons }) => {
+const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
   const { lat, lon } = pokemon
   const darkMode = useStore((s) => s.darkMode)
 
   const handleExpandClick = (category) => {
     const opposite = category === 'extras' ? 'pvp' : 'extras'
-    setPopups({
-      ...popups,
-      [category]: !popups[category],
-      [opposite]: false,
-    })
+    useStore.setState((prev) => ({
+      popups: {
+        ...prev.popups,
+        [category]: !popups[category],
+        [opposite]: false,
+      },
+    }))
   }
 
   return (

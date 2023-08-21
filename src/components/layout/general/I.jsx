@@ -1,5 +1,6 @@
 import { styled } from '@mui/material/styles'
 
+/** @type {import('react').FC<import("@rm/types").CustomI>} */
 export const I = styled('i', {
   shouldForwardProp: (prop) => prop !== 'color' && prop !== 'size',
 })(({ theme, style, size, color }) => ({

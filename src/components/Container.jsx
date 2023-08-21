@@ -1,14 +1,26 @@
-import React from 'react'
+import * as React from 'react'
 import { MapContainer } from 'react-leaflet'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 import useGenerate from '@hooks/useGenerate'
 import useRefresh from '@hooks/useRefresh'
+import { useStatic } from '@hooks/useStore'
 
 import Map from './Map'
+import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
+import DraggableMarker from './layout/dialogs/webhooks/human/Draggable'
+import WebhookAreaSelection from './layout/dialogs/webhooks/human/area/AreaSelection'
+import Nav from './layout/Nav'
 
 export default function Container({ serverSettings, params, location, zoom }) {
-  useGenerate()
   useRefresh()
+  useGenerate()
+  const isMobile = useMediaQuery((t) => t.breakpoints.only('xs'))
+  const isTablet = useMediaQuery((t) => t.breakpoints.only('sm'))
+
+  React.useEffect(() => {
+    useStatic.setState({ isMobile, isTablet })
+  }, [isMobile, isTablet])
 
   return (
     <MapContainer
@@ -28,8 +40,13 @@ export default function Container({ serverSettings, params, location, zoom }) {
       preferCanvas
     >
       {serverSettings.user && serverSettings.user.perms.map && (
-        <Map serverSettings={serverSettings} params={params} />
+        <Map params={params} />
       )}
+      <ScanOnDemand mode="scanNext" />
+      <ScanOnDemand mode="scanZone" />
+      <DraggableMarker />
+      <WebhookAreaSelection />
+      <Nav />
     </MapContainer>
   )
 }

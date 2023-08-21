@@ -12,7 +12,7 @@ import {
 
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic, useDialogStore } from '@hooks/useStore'
+import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 import NestSubmission from '@components/layout/dialogs/NestSubmission'
@@ -30,14 +30,7 @@ const getColor = (timeSince) => {
 
 export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
   const { t } = useTranslation()
-  const { setHideList, setExcludeList } = useStatic.getState()
-  const { setFilters } = useStore.getState()
-
-  const hideList = useStatic((state) => state.hideList)
-  const excludeList = useStatic((state) => state.excludeList)
   const { perms, loggedIn } = useStatic((s) => s.auth)
-
-  const filters = useStore((state) => state.filters)
 
   const [parkName, setParkName] = useState(true)
   const [anchorEl, setAnchorEl] = useState(false)
@@ -62,26 +55,28 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
 
   const handleHide = () => {
     setAnchorEl(null)
-    setHideList([...hideList, id])
+    useStatic.setState((prev) => ({ hideList: [...prev.hideList, id] }))
   }
 
   const handleExclude = () => {
     setAnchorEl(null)
     const key = `${pokemon.pokemon_id}-${pokemon.pokemon_form}`
-    setFilters({
-      ...filters,
-      nests: {
-        ...filters.nests,
-        filter: {
-          ...filters.nests.filter,
-          [key]: {
-            ...filters.nests.filter[key],
-            enabled: false,
+    useStore.setState((prev) => ({
+      filters: {
+        ...prev.filters,
+        nests: {
+          ...prev.filters.nests,
+          filter: {
+            ...prev.filters.nests.filter,
+            [key]: {
+              ...prev.filters.nests.filter[key],
+              enabled: false,
+            },
           },
         },
       },
-    })
-    setExcludeList([...excludeList, key])
+    }))
+    useStatic.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
   }
 
   const options = [
@@ -195,7 +190,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
             color="secondary"
             variant="contained"
             disabled={!perms.nestSubmissions || !loggedIn}
-            onClick={() => useDialogStore.setState({ nestSubmissions: id })}
+            onClick={() => useLayoutStore.setState({ nestSubmissions: id })}
           >
             {t('submit_nest_name')}
           </Button>

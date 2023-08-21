@@ -276,13 +276,7 @@ const MenuActions = ({
   hasLure,
   t,
 }) => {
-  const { setHideList, setExcludeList, setTimerList } = useStatic.getState()
-  const { setFilters } = useStore.getState()
-
-  const hideList = useStatic((state) => state.hideList)
-  const excludeList = useStatic((state) => state.excludeList)
   const masterfile = useStatic((state) => state.masterfile)
-  const timerList = useStatic((state) => state.timerList)
   const filters = useStore((state) => state.filters)
 
   const [anchorEl, setAnchorEl] = useState(false)
@@ -299,24 +293,26 @@ const MenuActions = ({
 
   const handleHide = () => {
     setAnchorEl(null)
-    setHideList([...hideList, id])
+    useStatic.setState((prev) => ({ hideList: [...prev.hideList, id] }))
   }
 
   const setState = (key) => {
-    setFilters({
-      ...filters,
-      pokestops: {
-        ...filters.pokestops,
-        filter: {
-          ...filters.pokestops.filter,
-          [key]: {
-            ...filters.pokestops.filter[key],
-            enabled: false,
+    useStore.setState((prev) => ({
+      filters: {
+        ...prev.filters,
+        pokestops: {
+          ...prev.filters.pokestops,
+          filter: {
+            ...prev.filters.pokestops.filter,
+            [key]: {
+              ...prev.filters.pokestops.filter[key],
+              enabled: false,
+            },
           },
         },
       },
-    })
-    setExcludeList([...excludeList, key])
+    }))
+    useStatic.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
   }
 
   const excludeLure = () => {
@@ -336,11 +332,12 @@ const MenuActions = ({
 
   const handleTimer = () => {
     setAnchorEl(null)
-    if (timerList.includes(id)) {
-      setTimerList(timerList.filter((x) => x !== id))
-    } else {
-      setTimerList([...timerList, id])
-    }
+    useStatic.setState((prev) => {
+      if (prev.includes(id)) {
+        return { timerList: prev.timerList.filter((x) => x !== id) }
+      }
+      return { timerList: [...prev.timerList, id] }
+    })
   }
 
   const options = [{ name: 'hide', action: handleHide }]

@@ -1,25 +1,54 @@
+// @ts-check
 /* eslint-disable react/no-array-index-key */
-import React from 'react'
+import * as React from 'react'
+import { useQuery } from '@apollo/client'
+import Dialog from '@mui/material/Dialog'
 
-import { useStatic } from '@hooks/useStore'
+import { CUSTOM_COMPONENT } from '@services/queries/config'
+import { useLayoutStore, useStatic } from '@hooks/useStore'
 
 import DialogWrapper from '../custom/DialogWrapper'
 import CustomTile from '../custom/CustomTile'
+import { Loading } from '../general/Loading'
 
-export default function DonorPage({ donorPage, handleDonorClose }) {
-  const { perms } = useStatic((s) => s.auth)
+const DEFAULT = {
+  settings: {},
+  components: [],
+  titles: [],
+  footerButtons: [],
+}
+
+const handleClose = () => useLayoutStore.setState({ donorPage: false })
+
+export default function DonorPage() {
+  const open = useLayoutStore((s) => s.donorPage)
+  const isMobile = useStatic((s) => s.isMobile)
+
+  const { data, loading } = useQuery(CUSTOM_COMPONENT, {
+    fetchPolicy: 'cache-first',
+    variables: { component: 'donationPage' },
+    skip: !open,
+  })
+
+  const donorPage = /** @type {typeof DEFAULT} */ (
+    data?.customComponent || DEFAULT
+  )
 
   return (
-    <DialogWrapper
-      configObj={donorPage}
-      defaultTitle="donor_page"
-      handleClose={handleDonorClose}
-    >
-      {donorPage.components.map((block, i) => {
-        if (block.donorOnly && !perms.donor) return null
-        if (block.freeloaderOnly && perms.donor) return null
-        return <CustomTile key={i} block={block} />
-      })}
-    </DialogWrapper>
+    <Dialog open={open} fullScreen={isMobile} onClose={handleClose}>
+      <DialogWrapper
+        configObj={donorPage}
+        defaultTitle="donor_page"
+        handleClose={handleClose}
+      >
+        {loading ? (
+          <Loading />
+        ) : (
+          donorPage.components.map((block, i) => (
+            <CustomTile key={i} block={block} />
+          ))
+        )}
+      </DialogWrapper>
+    </Dialog>
   )
 }

@@ -2,15 +2,17 @@ const express = require('express')
 const fs = require('fs')
 const { resolve } = require('path')
 
+const config = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
 const authRouter = require('./authRouter')
 const clientRouter = require('./clientRouter')
-const config = require('../services/config')
-const Utility = require('../services/Utility')
-const Fetch = require('../services/Fetch')
 const { Event, Db } = require('../services/initialization')
 const { version } = require('../../../package.json')
-const { log, HELPERS } = require('../services/logger')
 const buildDefaultFilters = require('../services/filters/builder/base')
+const advMenus = require('../services/ui/advMenus')
+const areaPerms = require('../services/functions/areaPerms')
+const generateUi = require('../services/ui/primary')
+const clientOptions = require('../services/ui/clientOptions')
 
 const rootRouter = express.Router()
 
@@ -93,7 +95,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
         ...Object.fromEntries(
           Object.keys(config.authentication.perms).map((p) => [p, false]),
         ),
-        areaRestrictions: Utility.areaPerms(['none']),
+        areaRestrictions: areaPerms(['none']),
         webhooks: [],
         scanner: Object.keys(config.scanner).filter(
           (key) =>
@@ -120,9 +122,20 @@ rootRouter.get('/api/settings', async (req, res, next) => {
     const getUser = async () => {
       if (config.authMethods.length && req.user) {
         try {
-          const user = await Db.models.User.query().findById(req.user.id)
+          const user = await Db.query('User', 'getOne', req.user.id)
           if (user) {
+            if (!user.selectedWebhook) {
+              const newWebhook = req.user.perms.webhooks.find(
+                (n) => n in Event.webhookObj,
+              )
+              await Db.query('User', 'updateWebhook', user.id, newWebhook)
+              if (req.session?.user) {
+                req.session.user.selectedWebhook = newWebhook
+                req.session.save()
+              }
+            }
             delete user.password
+
             return {
               ...req.user,
               ...user,
@@ -138,10 +151,11 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           req.logout(() => {})
           return { valid: false, tutorial: !config.map.forceTutorial }
         } catch (e) {
-          log.info(
+          log.warn(
             HELPERS.session,
             'Issue finding user, User ID:',
             req?.user?.id,
+            e,
           )
           return { valid: false, tutorial: !config.map.forceTutorial }
         }
@@ -155,11 +169,18 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       settings: {},
       authMethods: config.authMethods,
       userBackupLimits: config.database.settings.userBackupLimits,
-      masterfile: { ...Event.masterfile, invasions: Event.invasions },
       config: {
         map: {
           ...config.map,
-          ...config.multiDomainsObj[req.headers.host],
+          ...config.multiDomainsObj[req.headers.host.replaceAll('.', '_')],
+          general: undefined,
+          customRoutes: undefined,
+          links: undefined,
+          misc: undefined,
+          loginPage: !!config.map.loginPage.components.length,
+          donationPage: undefined,
+          messageOfTheDay: undefined,
+          customFloatingIcons: undefined,
           excludeList: config.authentication.excludeFromTutorial,
           polling: config.api.polling,
           authCounts: {
@@ -169,9 +190,6 @@ rootRouter.get('/api/settings', async (req, res, next) => {
               .length,
           },
         },
-        localeSelection: Object.fromEntries(
-          config.map.localeSelection.map((l) => [l, { name: l }]),
-        ),
         tileServers: Object.fromEntries(
           config.tileServers.map((s) => [s.name, s]),
         ),
@@ -182,41 +200,15 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           react: {},
           leaflet: {},
         },
-        icons: { ...config.icons, styles: Event.uicons },
-        scanner: {
-          scannerType: config.scanner.backendConfig.platform,
-          enableScanNext: config.scanner.scanNext.enabled,
-          scanNextShowScanCount: config.scanner.scanNext.showScanCount,
-          scanNextShowScanQueue: config.scanner.scanNext.showScanQueue,
-          scanNextAreaRestriction:
-            config.scanner.scanNext.scanNextAreaRestriction,
-          scanNextCooldown: config.scanner.scanNext.userCooldownSeconds,
-          enableScanZone: config.scanner.scanZone.enabled,
-          scanZoneShowScanCount: config.scanner.scanZone.showScanCount,
-          scanZoneShowScanQueue: config.scanner.scanZone.showScanQueue,
-          advancedScanZoneOptions:
-            config.scanner.scanZone.advancedScanZoneOptions,
-          scanZoneRadius: config.scanner.scanZone.scanZoneRadius,
-          scanZoneSpacing: config.scanner.scanZone.scanZoneSpacing,
-          scanZoneMaxSize: config.scanner.scanZone.scanZoneMaxSize,
-          scanZoneAreaRestriction:
-            config.scanner.scanZone.scanZoneAreaRestriction,
-          scanZoneCooldown: config.scanner.scanZone.userCooldownSeconds,
-        },
         gymValidDataLimit:
           Date.now() / 1000 - config.api.gymValidDataLimit * 86400,
       },
       extraUserFields: config.database.settings.extraUserFields,
-      available: { pokemon: [], pokestops: [], gyms: [], nests: [] },
     }
 
     // add user options here from the config that are structured as objects
     if (serverSettings.user.valid) {
-      serverSettings.loggedIn = req.user
-
-      serverSettings.config.map.searchable = Object.keys(
-        config.api.searchable,
-      ).filter((k) => config.api.searchable[k] && serverSettings.user.perms[k])
+      serverSettings.loggedIn = !!req.user
 
       // keys that are being sent to the frontend but are not options
       const ignoreKeys = [
@@ -253,133 +245,58 @@ rootRouter.get('/api/settings', async (req, res, next) => {
         }
       })
 
-      if (serverSettings.user.perms.pokemon) {
-        if (config.api.queryOnSessionInit.pokemon) {
-          Event.setAvailable('pokemon', 'Pokemon', Db, false)
-        }
-        serverSettings.available.pokemon = Event.getAvailable('pokemon')
-      }
-      if (serverSettings.user.perms.raids || serverSettings.user.perms.gyms) {
-        if (config.api.queryOnSessionInit.raids) {
-          Event.setAvailable('gyms', 'Gym', Db, false)
-        }
-        serverSettings.available.gyms = Event.getAvailable('gyms')
+      if (
+        serverSettings.user.perms.pokemon &&
+        config.api.queryOnSessionInit.pokemon
+      ) {
+        Event.setAvailable('pokemon', 'Pokemon', Db, false)
       }
       if (
-        serverSettings.user.perms.quests ||
-        serverSettings.user.perms.pokestops ||
-        serverSettings.user.perms.invasions ||
-        serverSettings.user.perms.lures
+        config.api.queryOnSessionInit.raids &&
+        (serverSettings.user.perms.raids || serverSettings.user.perms.gyms)
       ) {
-        if (config.api.queryOnSessionInit.quests) {
-          Event.setAvailable('pokestops', 'Pokestop', Db, false)
-        }
-        serverSettings.available.pokestops = Event.getAvailable('pokestops')
+        Event.setAvailable('gyms', 'Gym', Db, false)
       }
-      if (serverSettings.user.perms.nests) {
-        if (config.api.queryOnSessionInit.nests) {
-          Event.setAvailable('nests', 'Nest', Db, false)
-        }
-        serverSettings.available.nests = Event.getAvailable('nests')
+      if (
+        config.api.queryOnSessionInit.quests &&
+        (serverSettings.user.perms.quests ||
+          serverSettings.user.perms.pokestops ||
+          serverSettings.user.perms.invasions ||
+          serverSettings.user.perms.lures)
+      ) {
+        Event.setAvailable('pokestops', 'Pokestop', Db, false)
+      }
+      if (
+        serverSettings.user.perms.nests &&
+        config.api.queryOnSessionInit.nests
+      ) {
+        Event.setAvailable('nests', 'Nest', Db, false)
       }
       if (Object.values(config.api.queryOnSessionInit).some((v) => v)) {
         Event.addAvailable()
-        serverSettings.masterfile = {
-          ...Event.masterfile,
-          invasions: Event.invasions,
-        }
       }
 
       serverSettings.defaultFilters = buildDefaultFilters(
         serverSettings.user.perms,
-        serverSettings.available,
         Db,
       )
 
       // Backup in case there are Pokemon/Quests/Raids etc that are not in the masterfile
       // Primary for quest rewards that are form unset, despite normally have a set form
 
-      serverSettings.ui = Utility.buildPrimaryUi(
+      serverSettings.ui = generateUi(
         serverSettings.defaultFilters,
         serverSettings.user.perms,
       )
 
-      serverSettings.menus = Utility.buildAdvMenus(serverSettings.available)
+      serverSettings.menus = advMenus()
 
-      const { clientValues, clientMenus } = Utility.buildClientOptions(
+      const { clientValues, clientMenus } = clientOptions(
         serverSettings.user.perms,
       )
 
       serverSettings.userSettings = clientValues
       serverSettings.clientMenus = clientMenus
-
-      if (
-        config.webhooks.length &&
-        serverSettings.user?.perms?.webhooks?.length
-      ) {
-        serverSettings.webhooks = {}
-        const filtered = config.webhooks.filter((webhook) =>
-          serverSettings.user.perms.webhooks.includes(webhook.name),
-        )
-        try {
-          await Promise.all(
-            filtered.map(async (webhook) => {
-              if (
-                webhook.enabled &&
-                Event.webhookObj?.[webhook.name]?.client?.valid
-              ) {
-                const webhookId = Utility.evalWebhookId(serverSettings.user)
-                const { strategy, webhookStrategy } = serverSettings.user
-
-                const remoteData = await Fetch.webhookApi(
-                  'allProfiles',
-                  webhookId,
-                  'GET',
-                  webhook.name,
-                )
-                const { areas } = await Fetch.webhookApi(
-                  'humans',
-                  webhookId,
-                  'GET',
-                  webhook.name,
-                )
-
-                if (remoteData && areas) {
-                  serverSettings.webhooks[webhook.name] = remoteData.human
-                    .admin_disable
-                    ? Event.webhookObj[webhook.name].client
-                    : {
-                        ...Event.webhookObj[webhook.name].client,
-                        ...remoteData,
-                        hasNominatim: Boolean(
-                          Event.webhookObj[webhook.name].server.nominatimUrl,
-                        ),
-                        locale:
-                          remoteData.human.language ||
-                          Event.webhookObj[webhook.name].client.locale,
-                        available: areas
-                          .sort((a, b) => a.name.localeCompare(b.name))
-                          .filter((area) => area.userSelectable !== false)
-                          .map((area) => area.name),
-                        templates:
-                          Event.webhookObj[webhook.name].client.templates[
-                            webhookStrategy || strategy
-                          ],
-                      }
-                }
-              }
-            }),
-          )
-        } catch (e) {
-          serverSettings.webhooks = null
-          log.warn(
-            HELPERS.auth,
-            e,
-            'Unable to fetch webhook data, this is unlikely an issue with ReactMap, check to make sure the user is registered in the webhook database. User ID:',
-            serverSettings.user.id,
-          )
-        }
-      }
     }
     res.status(200).json({ serverSettings })
   } catch (error) {

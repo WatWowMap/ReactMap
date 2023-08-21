@@ -2,12 +2,14 @@
   "interface": "0.0.0.0",
   "port": 8080,
   "packageSource": "git",
+  "googleAnalyticsId": "",
   "devOptions": {
     "enabled": false,
     "graphiql": false,
     "queryDebug": false,
     "clientPath": "../../dist",
-    "logLevel": "info"
+    "logLevel": "info",
+    "skipMinified": false
   },
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
@@ -143,23 +145,6 @@
         "settings"
       ]
     },
-    "localeSelection": [
-      "en",
-      "de",
-      "es",
-      "fr",
-      "hi",
-      "id",
-      "it",
-      "ja",
-      "ko",
-      "nl",
-      "pl",
-      "ru",
-      "sv",
-      "th",
-      "tr"
-    ],
     "customRoutes": {
       "discordAuthUrl": "/auth/discord/callback",
       "telegramAuthUrl": "/auth/telegram/callback",
@@ -660,6 +645,7 @@
         "logChannelId": "",
         "scanNextLogChannelId": "",
         "scanZoneLogChannelId": "",
+        "eventLogChannelId": "",
         "presence": "Map Status: Online",
         "presenceType": 3,
         "botToken": "",

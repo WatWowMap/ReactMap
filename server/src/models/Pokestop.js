@@ -1,9 +1,5 @@
-/* eslint-disable no-nested-ternary */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const { Event } = require('../services/initialization')
-
-const getAreaSql = require('../services/functions/getAreaSql')
 const {
   api: {
     searchResultsLimit,
@@ -12,7 +8,10 @@ const {
     hideOldPokestops,
   },
   map,
-} = require('../services/config')
+} = require('@rm/config')
+const { Event } = require('../services/initialization')
+
+const getAreaSql = require('../services/functions/getAreaSql')
 
 const questProps = {
   quest_type: true,
@@ -57,7 +56,7 @@ const MAD_GRUNT_MAP = {
   352: 8,
 }
 
-module.exports = class Pokestop extends Model {
+class Pokestop extends Model {
   static get tableName() {
     return 'pokestop'
   }
@@ -962,7 +961,7 @@ module.exports = class Pokestop extends Model {
 
   /**
    *
-   * @param {import('../types').DbContext} param0
+   * @param {import("@rm/types").DbContext} param0
    * @returns
    */
   static async getAvailable({
@@ -1290,18 +1289,18 @@ module.exports = class Pokestop extends Model {
           .orderBy('incident.character', 'incident.display_type')
       }
     } else if (isMad) {
-        queries.invasions = this.query()
-          .distinct('incident_grunt_type AS grunt_type')
-          .where('incident_grunt_type', '>', 0)
-          .whereRaw('incident_expiration > UTC_TIMESTAMP()')
-          .orderBy('grunt_type')
-      } else {
-        queries.invasions = this.query()
-          .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
-          .where(isMad ? 'incident_grunt_type' : 'grunt_type', '>', 0)
-          .andWhere('incident_expire_timestamp', '>=', ts)
-          .orderBy('grunt_type')
-      }
+      queries.invasions = this.query()
+        .distinct('incident_grunt_type AS grunt_type')
+        .where('incident_grunt_type', '>', 0)
+        .whereRaw('incident_expiration > UTC_TIMESTAMP()')
+        .orderBy('grunt_type')
+    } else {
+      queries.invasions = this.query()
+        .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
+        .where(isMad ? 'incident_grunt_type' : 'grunt_type', '>', 0)
+        .andWhere('incident_expire_timestamp', '>=', ts)
+        .orderBy('grunt_type')
+    }
     if (isMad && !hasMultiInvasions) {
       queries.invasions.whereNotIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
     }
@@ -1761,3 +1760,5 @@ module.exports = class Pokestop extends Model {
     return query
   }
 }
+
+module.exports = Pokestop

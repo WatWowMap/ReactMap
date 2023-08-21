@@ -1,4 +1,4 @@
-/* eslint-disable no-nested-ternary */
+// @ts-check
 /* eslint-disable no-continue */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-plusplus */
@@ -7,11 +7,11 @@
 const vm = require('vm')
 const NodeCache = require('node-cache')
 
-const { log, HELPERS } = require('../../logger')
+const { log, HELPERS } = require('@rm/logger')
 
 /**
  * @param {object} pokemon
- * @returns {{ [key in typeof import("./constants").LEAGUES[number]]: PokemonEntry[] }}
+ * @returns {{ [key in typeof import("./constants").LEAGUES[number]]: import('@rm/types').PvpEntry[] }}
  */
 function getParsedPvp(pokemon) {
   if (pokemon.pvp)
@@ -19,7 +19,7 @@ function getParsedPvp(pokemon) {
       ? JSON.parse(pokemon.pvp)
       : pokemon.pvp
 
-  const parsed = {}
+  const parsed = { great: [], ultra: [], little: [] }
   const pvpKeys = ['great', 'ultra']
   pvpKeys.forEach((league) => {
     if (pokemon[`pvp_rankings_${league}_league`]) {
@@ -75,13 +75,13 @@ function assign(newObject, reference, props) {
 
 /**
  * @param {string} filter
- * @returns {(pokemon: import('../../../types').Pokemon) => boolean}
+ * @returns {(pokemon: import("@rm/types").Pokemon) => boolean}
  */
 const jsFnCache = new NodeCache({ stdTTL: 60 * 5 })
 /**
  *
  * @param {string} filter
- * @returns {(pokemon: import('../../../types').Pokemon) => boolean}
+ * @returns {(pokemon: import("@rm/types").Pokemon) => boolean}
  */
 function jsifyIvFilter(filter) {
   if (jsFnCache.has(filter)) {

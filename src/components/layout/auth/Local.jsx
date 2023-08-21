@@ -1,16 +1,16 @@
-import React, { useState } from 'react'
+import * as React from 'react'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import {
-  Grid,
-  Typography,
-  Button,
-  OutlinedInput,
-  InputLabel,
-  FormControl,
-  InputAdornment,
-  IconButton,
-} from '@mui/material'
+import Grid from '@mui/material/Unstable_Grid2'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Collapse from '@mui/material/Collapse'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import OutlinedInput from '@mui/material/OutlinedInput'
+import InputAdornment from '@mui/material/InputAdornment'
+import IconButton from '@mui/material/IconButton'
 
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
@@ -18,15 +18,20 @@ import { useLazyQuery } from '@apollo/client'
 import Fetch from '@services/Fetch'
 import Query from '@services/Query'
 
-export default function LocalLogin({ href }) {
+/**
+ *
+ * @param {{ href?: string, sx?: import("@mui/material").SxProps, style?: React.CSSProperties }} props
+ * @returns
+ */
+export default function LocalLogin({ href, sx, style }) {
   const { t } = useTranslation()
-  const [user, setUser] = useState({
+  const [user, setUser] = React.useState({
     username: '',
     password: '',
     showPassword: false,
   })
-  const [error, setError] = useState('')
-  const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = React.useState('')
+  const [submitted, setSubmitted] = React.useState(false)
   const [checkUsername, { data }] = useLazyQuery(Query.user('checkUsername'))
 
   const handleChange = (e) => {
@@ -52,10 +57,10 @@ export default function LocalLogin({ href }) {
   }
 
   return (
-    <>
+    <Box sx={sx} style={style}>
       <form onSubmit={handleSubmit}>
         <Grid container justifyContent="center" alignItems="center" spacing={2}>
-          <Grid item style={{ textAlign: 'center' }}>
+          <Grid textAlign="center">
             <FormControl variant="outlined" color="secondary">
               <InputLabel htmlFor="username">{t('local_username')}</InputLabel>
               <OutlinedInput
@@ -74,7 +79,7 @@ export default function LocalLogin({ href }) {
               />
             </FormControl>
           </Grid>
-          <Grid item style={{ textAlign: 'center' }}>
+          <Grid textAlign="center">
             <FormControl variant="outlined" color="secondary">
               <InputLabel htmlFor="password">{t('local_password')}</InputLabel>
               <OutlinedInput
@@ -107,37 +112,32 @@ export default function LocalLogin({ href }) {
               />
             </FormControl>
           </Grid>
-          <Grid item style={{ textAlign: 'center' }}>
+          <Grid textAlign="center">
             <Button
               variant="contained"
-              style={{
-                textAlign: 'center',
-              }}
               color="primary"
               size="large"
               onClick={handleSubmit}
               disabled={!user.username || !user.password || submitted}
             >
-              <Typography variant="subtitle2" align="center">
-                {(() => {
-                  if (!user.username && !user.password) {
-                    return `${t('login')}/${t('register')}`
-                  }
-                  if (data?.checkUsername) {
-                    return t('login')
-                  }
-                  return t('register')
-                })()}
-              </Typography>
+              {(() => {
+                if (!user.username && !user.password) {
+                  return `${t('login')}/${t('register')}`
+                }
+                if (data?.checkUsername) {
+                  return t('login')
+                }
+                return t('register')
+              })()}
             </Button>
           </Grid>
         </Grid>
       </form>
-      <div style={{ margin: 20 }}>
-        <Typography variant="subtitle2" align="center" color="error">
+      <Collapse in={!!error}>
+        <Typography variant="subtitle2" align="center" color="error" my={2}>
           {error}
         </Typography>
-      </div>
-    </>
+      </Collapse>
+    </Box>
   )
 }

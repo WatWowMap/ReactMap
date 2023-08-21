@@ -1,3 +1,4 @@
+// @ts-check
 /* eslint-disable no-console */
 const freezeProps = (target, property) => {
   const {
@@ -17,7 +18,7 @@ const freezeProps = (target, property) => {
 }
 
 // TODO: This is dumb, should be a state machine with Zustand
-export default class UIcons {
+class UIcons {
   constructor({ customizable, sizes, cacheHrs }, questRewardTypes) {
     this.customizable = customizable
     this.sizes = sizes
@@ -138,6 +139,7 @@ export default class UIcons {
         configurable: false,
       })
     }
+    return this
   }
 
   get selection() {
@@ -145,7 +147,7 @@ export default class UIcons {
   }
 
   checkValid(localIconObj) {
-    return Object.values(localIconObj).every((icon) => this[icon])
+    return Object.values(localIconObj || {}).every((icon) => this[icon])
   }
 
   setSelection(categories, value) {
@@ -489,7 +491,7 @@ export default class UIcons {
     }
   }
 
-  getWeather(weatherId, timeOfDay = false) {
+  getWeather(weatherId, timeOfDay = 'day') {
     try {
       const baseUrl = `${
         this[this.selected.weather]?.path || this.fallback
@@ -564,7 +566,7 @@ export default class UIcons {
     }
   }
 
-  getDevices(online) {
+  getDevices(online = false) {
     try {
       const baseUrl = `${
         this[this.selected.device]?.path || this.fallback
@@ -578,7 +580,7 @@ export default class UIcons {
     }
   }
 
-  getSpawnpoints(hasTth) {
+  getSpawnpoints(hasTth = false) {
     try {
       const baseUrl = `${
         this[this.selected.spawnpoint]?.path || this.fallback
@@ -592,3 +594,5 @@ export default class UIcons {
     }
   }
 }
+
+export default UIcons

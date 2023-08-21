@@ -16,7 +16,7 @@ const MARKER_OPACITY = LINE_OPACITY * 2
 /**
  *
  * @param {{
- *  item: import('../../../server/src/types').Route
+ *  item: import("@rm/types").Route
  *  Icons: InstanceType<typeof import("@services/Icons").default>
  *  map: import("leaflet").Map
  * }} props
