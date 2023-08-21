@@ -16,10 +16,10 @@ import { useGetWebhookData } from './hooks'
 
 /**
  *
- * @param {{ category: Exclude<import('./store').WebhookStore['category'], 'human'>, visible: import('./store').WebhookStore['category'] }} props
+ * @param {{ category: Exclude<import('./store').WebhookStore['category'], 'human'> }} props
  * @returns
  */
-const Tracked = ({ category, visible }) => {
+const Tracked = ({ category }) => {
   const { t } = useTranslation()
 
   const { data: tracked, loading } = useGetWebhookData(category)
@@ -28,7 +28,7 @@ const Tracked = ({ category, visible }) => {
   return loading ? (
     <Loading>{t('loading', { category: t(category) })}</Loading>
   ) : (
-    <Box role="tabpanel" hidden={category !== visible}>
+    <>
       <Box pb={1}>
         <AdvSearch
           search={trackedSearch}
@@ -38,7 +38,6 @@ const Tracked = ({ category, visible }) => {
       </Box>
       {tracked.length ? (
         <Virtuoso
-          style={{ height: '60cqh' }}
           // @ts-ignore
           data={tracked}
           itemContent={(i) => <TrackedTile key={i} index={i} />}
@@ -52,7 +51,7 @@ const Tracked = ({ category, visible }) => {
         </div>
       )}
       <Selecting />
-    </Box>
+    </>
   )
 }
 

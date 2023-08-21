@@ -24,7 +24,7 @@ import Human from './human'
 import Tracked from './Tracked'
 import Menu from '../../general/Menu'
 // import WebhookError from './Error'
-import { setMode, useWebhookStore } from './store'
+import { setMode, setSelected, useWebhookStore } from './store'
 import { useGenFullFilters, useGetHookContext } from './hooks'
 import ProfileEditing from './human/profile'
 
@@ -41,6 +41,7 @@ export default function Manage() {
 
   const [addNew, setAddNew] = React.useState(false)
   const [tempFilters, setTempFilters] = React.useState(filters[category])
+  const [height, setHeight] = React.useState(0)
 
   const footerButtons = React.useMemo(
     () => [
@@ -75,23 +76,29 @@ export default function Manage() {
   React.useEffect(() => {
     Utility.analytics('Webhook', `${category} Webhook Page`, category, true)
     setTempFilters(filters[category])
+    setSelected()()
   }, [category])
 
   React.useEffect(() => {
     if (!addNew && category !== 'human') {
+      const values = Poracle.processor(
+        category,
+        Object.values(tempFilters || {}).filter((x) => x && x.enabled),
+        useWebhookStore.getState().context.ui[category].defaults,
+      )
+      setTempFilters(filters[category])
       apolloClient.mutate({
         mutation: Query.webhook(category),
         variables: {
           category,
-          data: Poracle.processor(
-            category,
-            Object.values(tempFilters || {}).filter((x) => x && x.enabled),
-            useWebhookStore.getState().context.ui[category].defaults,
-          ),
+          data: values,
           status: 'POST',
         },
         refetchQueries: [allProfiles],
       })
+      useWebhookStore.setState((prev) => ({
+        [category]: [...prev[category], ...values],
+      }))
     }
   }, [addNew])
 
@@ -143,7 +150,14 @@ export default function Manage() {
           ))}
         </Tabs>
       </AppBar>
-      <DialogContent sx={{ p: 0 }}>
+      <DialogContent
+        sx={{ p: 0 }}
+        ref={(ref) => {
+          if (ref instanceof HTMLElement && ref.clientHeight !== 0) {
+            setHeight(ref.clientHeight)
+          }
+        }}
+      >
         <Collapse
           in={!addNew}
           sx={{
@@ -151,15 +165,20 @@ export default function Manage() {
             p: 2,
           }}
         >
-          {categories.map((key) =>
-            key === 'human' ? (
-              <Box key={key} hidden={category !== 'human'}>
+          {categories.map((key) => (
+            <Box
+              key={key}
+              role="tabpanel"
+              hidden={category !== key}
+              height={height - 76}
+            >
+              {key === 'human' ? (
                 <Human />
-              </Box>
-            ) : (
-              <Tracked key={key} visible={category} category={key} />
-            ),
-          )}
+              ) : (
+                <Tracked key={key} category={key} />
+              )}
+            </Box>
+          ))}
         </Collapse>
         <Collapse in={addNew}>
           {category === 'human' && <ProfileEditing />}

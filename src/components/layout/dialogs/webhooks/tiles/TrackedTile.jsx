@@ -84,11 +84,16 @@ export default function TrackedTile({ index }) {
         </Typography>
       </Grid>
       <Grid item xs={4} sm={3} md={2} style={{ textAlign: 'right' }}>
-        <IconButton size="small" onClick={() => setEditDialog(true)}>
+        <IconButton
+          size="small"
+          disabled={!item.uid}
+          onClick={() => setEditDialog(true)}
+        >
           <Edit />
         </IconButton>
         <IconButton
           size="small"
+          disabled={!item.uid}
           onClick={() => {
             useWebhookStore.setState((prev) => ({
               [category]: prev[category].filter((x) => x.uid !== item.uid),
@@ -115,6 +120,7 @@ export default function TrackedTile({ index }) {
         </IconButton>
         <Checkbox
           size="small"
+          disabled={!item.uid}
           checked={!!selected}
           onChange={setSelected(item.uid)}
           color="secondary"

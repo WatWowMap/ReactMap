@@ -105,7 +105,7 @@ export function setTrackedSearch(trackedSearch) {
   useWebhookStore.setState({ trackedSearch })
 }
 
-/** @param {string} id */
+/** @param {string} [id] */
 export const setSelected = (id) => () => {
   useWebhookStore.setState((prev) => ({
     selected: id ? { ...prev.selected, [id]: !prev.selected[id] } : {},
