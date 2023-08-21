@@ -101,7 +101,6 @@ const read = () => {
     log.warn(
       HELPERS.masterfile,
       'Unable to read masterfile, generating a new one for you now',
-      e,
     )
     return generate(true)
   }
