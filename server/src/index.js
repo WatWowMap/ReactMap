@@ -72,8 +72,8 @@ app.use(Sentry.Handlers.requestHandler())
 app.use(Sentry.Handlers.tracingHandler())
 
 if (
-  process.env.LOG_LEVEL === 'debug' ||
-  process.env.LOG_LEVEL === 'trace' ||
+  config.getSafe('devOptions.logLevel') === 'debug' ||
+  config.getSafe('devOptions.logLevel') === 'trace' ||
   config.getSafe('devOptions.enabled')
 ) {
   app.use(

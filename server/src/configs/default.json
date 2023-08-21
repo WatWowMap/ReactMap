@@ -2,10 +2,7 @@
   "interface": "0.0.0.0",
   "port": 8080,
   "packageSource": "git",
-  "analytics": {
-    "googleAnalyticsId": "",
-    "debugMode": false
-  },
+  "googleAnalyticsId": "",
   "devOptions": {
     "enabled": false,
     "graphiql": false,

@@ -8,8 +8,8 @@ import './services/Sentry'
 import App from './components/App'
 import './services/i18n'
 
-if (CONFIG.analytics.googleAnalyticsId) {
-  ReactGA.initialize(CONFIG.analytics.googleAnalyticsId)
+if (CONFIG.googleAnalyticsId) {
+  ReactGA.initialize(CONFIG.googleAnalyticsId)
 }
 if (CONFIG.client.title) {
   document.title = CONFIG.client.title

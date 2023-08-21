@@ -106,6 +106,13 @@ const viteConfig = defineConfig(async ({ mode }) => {
     log.info(HELPERS.build, `Building production version: ${version}`)
   }
 
+  if (env.GOOGLE_ANALYTICS_ID) {
+    log.warn(
+      HELPERS.build,
+      'The .env file has been deprecated, please move your Google Analytics ID to your config file as this functionality will be removed in the future.',
+    )
+  }
+
   return {
     plugins: [
       react({
@@ -171,7 +178,8 @@ const viteConfig = defineConfig(async ({ mode }) => {
           },
           title: config.getSafe('map.general.headerTitle'),
         },
-        analytics: config.getSafe('analytics'),
+        analytics:
+          env.GOOGLE_ANALYTICS_ID || config.getSafe('googleAnalyticsId'),
         // map: config.getSafe('map'),
       },
     },
