@@ -1,5 +1,6 @@
 // @ts-check
-import { createTheme, responsiveFontSizes } from '@mui/material/styles'
+import { createTheme, responsiveFontSizes, darken } from '@mui/material/styles'
+import dlv from 'dlv'
 
 /** @type {import('@mui/material').Components<Omit<import('@mui/material').Theme, 'components'>>} */
 const components = {
@@ -84,6 +85,30 @@ const components = {
     defaultProps: {
       disableRipple: true,
     },
+    styleOverrides: {
+      root: ({ theme, ownerState }) => {
+        const color = ownerState?.bgcolor
+        if (typeof color === 'string') {
+          const backgroundColor = color
+            ? (typeof color === 'string' && color.includes('.')) ||
+              color in theme.palette
+              ? dlv(theme.palette, color)
+              : color
+            : theme.palette.success.dark
+          const finalColor =
+            typeof backgroundColor === 'string'
+              ? backgroundColor
+              : backgroundColor.main
+          return {
+            color: theme.palette.getContrastText(finalColor),
+            backgroundColor,
+            '&:hover': {
+              backgroundColor: darken(finalColor, 0.2),
+            },
+          }
+        }
+      },
+    },
   },
   MuiDialogTitle: {
     styleOverrides: {
@@ -130,6 +155,13 @@ export default function customTheme(
       secondary: {
         main: themeOptions.secondary,
         contrastText: '#fff',
+      },
+      discord: {
+        main: '#5865F2',
+        green: '#57F287',
+        yellow: '#FEE75C',
+        fuchsia: '#EB459E',
+        red: '#ED4245',
       },
     },
     components,

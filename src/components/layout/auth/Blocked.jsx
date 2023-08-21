@@ -78,11 +78,9 @@ export default function Blocked({ serverSettings }) {
             sm={3}
             style={{ textAlign: 'center', marginTop: 20 }}
           >
-            <DiscordLogin
-              href={serverSettings.config.map.discordInvite}
-              text="join"
-              // size="small"
-            />
+            <DiscordLogin href={serverSettings.config.map.discordInvite}>
+              join
+            </DiscordLogin>
           </Grid>
         )}
       </Grid>

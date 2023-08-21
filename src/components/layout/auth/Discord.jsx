@@ -1,30 +1,31 @@
 import * as React from 'react'
-import { darken } from '@mui/material/styles'
 import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
+
 import { I } from '../general/I'
 
+/**
+ *
+ * @param {{ children?: string, href?: string, size?: import('@mui/material').ButtonProps['size'], bgcolor?: string }} props
+ * @returns {JSX.Element}
+ */
 export default function DiscordLogin({
   href = '/auth/discord/callback',
-  text = 'login',
+  children = 'login',
   size = 'large',
+  bgcolor = 'discord.main',
 }) {
   const { t } = useTranslation()
 
   return (
     <Button
       variant="contained"
-      sx={{
-        bgcolor: 'rgb(114,136,218)',
-        '&:hover': {
-          bgcolor: darken('rgb(114,136,218)', 0.2),
-        },
-      }}
+      bgcolor={bgcolor}
       size={size}
       href={href}
       startIcon={<I className="fab fa-discord" size={size} />}
     >
-      {t(text)}
+      {t(children)}
     </Button>
   )
 }

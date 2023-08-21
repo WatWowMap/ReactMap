@@ -21,10 +21,6 @@ class Backup extends Model {
     this.updatedAt = Math.floor(Date.now() / 1000)
   }
 
-  get data() {
-    return typeof this.data === 'string' ? JSON.parse(this.data) : this.data
-  }
-
   static get relationMappings() {
     const { Db } = require('../services/initialization')
     return {
@@ -55,10 +51,11 @@ class Backup extends Model {
    * @returns {Promise<import('@rm/types').FullBackup[]>}
    */
   static async getAll(userId) {
-    return this.query()
+    const records = await this.query()
       .select(['id', 'name', 'createdAt', 'updatedAt'])
-      .where('userId', userId)
+      .where({ userId })
       .whereNotNull('data')
+    return records
   }
 
   /**

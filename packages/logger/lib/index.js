@@ -1,4 +1,8 @@
 // @ts-check
+if (!process.env.FORCE_COLOR) {
+  process.env.FORCE_COLOR = '3'
+}
+
 const logger = require('loglevel')
 const chalk = require('chalk')
 
@@ -70,9 +74,6 @@ log.methodFactory = (methodName, logLevel, loggerName) => {
   }
 }
 
-if (!process.env.FORCE_COLOR) {
-  process.env.FORCE_COLOR = '3'
-}
 if (
   config.has('devOptions.logLevel') &&
   config.getSafe('devOptions.logLevel').toUpperCase() in logger.levels
