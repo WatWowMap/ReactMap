@@ -91,3 +91,20 @@ if (require.main === module) {
     log.info(HELPERS.masterfile, 'Masterfile generated'),
   )
 }
+
+const read = () => {
+  try {
+    return JSON.parse(
+      fs.readFileSync(resolve(`${__dirname}/data/masterfile.json`), 'utf8'),
+    )
+  } catch (e) {
+    log.warn(
+      HELPERS.masterfile,
+      'Unable to read masterfile, generating a new one for you now',
+      e,
+    )
+    return generate(true)
+  }
+}
+
+module.exports.read = read

@@ -6,16 +6,16 @@ const { default: fetch } = require('node-fetch')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
-const { generate } = require('@rm/masterfile')
-const masterfile = require('@rm/masterfile/lib/data/masterfile.json')
+const { generate, read } = require('@rm/masterfile')
 
 const PoracleAPI = require('./api/Poracle')
 
 class EventManager {
   constructor() {
     /** @type {import("@rm/types").Masterfile} */
-    this.masterfile = masterfile
-    this.invasions = this.masterfile.invasions
+    this.masterfile = read()
+    this.invasions =
+      'invasions' in this.masterfile ? this.masterfile.invasions : {}
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
     this.uicons = []
     this.uiconsBackup = {}

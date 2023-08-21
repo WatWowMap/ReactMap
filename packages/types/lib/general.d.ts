@@ -24,7 +24,7 @@ export type RMGeoJSON = {
   features: RMFeature[]
 }
 
-import masterfile = require('../../server/src/data/masterfile.json')
+import masterfile = require('packages/masterfile/lib/data/masterfile.json')
 
 export type Masterfile = typeof masterfile
 
