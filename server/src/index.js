@@ -1,7 +1,7 @@
 process.title = 'ReactMap'
 
 require('dotenv').config()
-
+const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const logger = require('morgan')
@@ -9,8 +9,6 @@ const compression = require('compression')
 const session = require('express-session')
 const passport = require('passport')
 const rateLimit = require('express-rate-limit')
-const i18next = require('i18next')
-const Backend = require('i18next-fs-backend')
 const { rainbow } = require('chalkercli')
 const Sentry = require('@sentry/node')
 const { expressMiddleware } = require('@apollo/server/express4')
@@ -22,7 +20,7 @@ const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
 
 const { log, HELPERS } = require('@rm/logger')
-const { locales } = require('@rm/locales')
+const { create, writeAll } = require('@rm/locales')
 
 const config = require('./services/config')
 const { Db, Event } = require('./services/initialization')
@@ -161,24 +159,16 @@ passport.deserializeUser(async (user, done) => {
   }
 })
 
-i18next.use(Backend).init(
-  {
-    lng: 'en',
-    fallbackLng: 'en',
-    ns: ['translation'],
-    defaultNS: 'translation',
-    supportedLngs: locales,
-    preload: locales,
-    backend: {
-      loadPath: path.resolve(
-        `${__dirname}/../../dist/locales/{{lng}}/{{ns}}.json`,
-      ),
-    },
-  },
-  (err) => {
-    if (err) return log.error(HELPERS.i18n, err)
-  },
-)
+const localePath = path.resolve(__dirname, '../../dist/locales')
+if (fs.existsSync(localePath)) {
+  require('./services/i18n')
+} else {
+  create().then((newLocales) =>
+    writeAll(newLocales, true, localePath).then(() =>
+      require('./services/i18n'),
+    ),
+  )
+}
 
 app.use(rootRouter, requestRateLimiter)
 

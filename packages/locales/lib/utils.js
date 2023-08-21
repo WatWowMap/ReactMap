@@ -81,7 +81,9 @@ async function writeJson(translations, ...directories) {
  * @param {string[]} directories
  */
 async function writeAll(locales, i18nFormat, ...directories) {
-  const resolved = resolve(...directories)
+  const resolved = directories.length
+    ? resolve(...directories)
+    : resolve(__dirname, 'data')
   await fs.mkdir(resolved, { recursive: true })
   await Promise.all(
     Object.entries(locales).map(async ([locale, translations]) => {

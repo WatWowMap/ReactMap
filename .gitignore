@@ -54,6 +54,8 @@ public/images/custom/*
 public/locales/*
 public/missing-locales/*
 locales/missing-locales/*
+packages/locales/lib/data/**/*.json
+packages/locales/lib/missing/**/*.json
 
 # OS X
 .DS_Store*

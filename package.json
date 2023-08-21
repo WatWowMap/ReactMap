@@ -14,7 +14,7 @@
     "build": "vite build",
     "config:check": "yarn workspace @rm/config run check",
     "config:env": "yarn workspace @rm/config run generate",
-    "dev": "yarn locales:create && NODE_ENV=development nodemon server/src/index.js",
+    "dev": "NODE_ENV=development nodemon server/src/index.js",
     "eslint:check": "eslint \"**/*.{js,jsx}\"",
     "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix",
     "locales:create": "yarn workspace @rm/locales run create",
