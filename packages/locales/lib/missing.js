@@ -1,52 +1,48 @@
 // @ts-check
-const fs = require('fs')
+const { promises: fs } = require('fs')
 const { resolve } = require('path')
 
 const { log, HELPERS } = require('@rm/logger')
+const { readAndParseJson, readLocaleDirectory } = require('./utils')
 
-const LOCALES_ORIGIN = resolve(__dirname, './translations')
+async function missing() {
+  const localTranslations = readLocaleDirectory(true)
+  const englishRef = await readAndParseJson('en.json', true)
 
-/** @param {string} destination */
-async function missing(destination) {
-  const localTranslations = fs.readdirSync(LOCALES_ORIGIN)
-  const englishRef = JSON.parse(
-    fs.readFileSync(resolve(LOCALES_ORIGIN, 'en.json'), 'utf-8'),
-  )
-
-  fs.mkdirSync(destination, { recursive: true })
-
-  localTranslations
-    .filter((x) => x.endsWith('json'))
-    .forEach((locale) => {
-      const reactMapTranslations = JSON.parse(
-        fs.readFileSync(resolve(LOCALES_ORIGIN, locale), 'utf-8'),
-      )
+  await Promise.allSettled(
+    localTranslations.map(async (fileName) => {
+      const humanLocales = await readAndParseJson(fileName, true)
+      const aiLocales = await readAndParseJson(fileName, false)
+      const combined = {
+        ...aiLocales,
+        ...humanLocales,
+      }
       const missingKeys = {}
 
       Object.keys(englishRef).forEach((key) => {
-        if (!reactMapTranslations[key]) {
+        if (!combined[key]) {
           missingKeys[key] = process.argv.includes('--ally')
             ? `t('${key}')`
             : englishRef[key]
         }
       })
-      fs.writeFile(
+      await fs.writeFile(
         resolve(
-          destination,
+          __dirname,
+          './missing',
           process.argv.includes('--ally')
-            ? locale.replace('.json', '.js')
-            : locale,
+            ? fileName.replace('.json', '.js')
+            : fileName,
         ),
         JSON.stringify(missingKeys, null, 2),
-        'utf8',
-        () => {},
       )
-      log.info(HELPERS.locales, locale, 'file saved.')
-    })
+      log.info(HELPERS.locales, fileName, 'file saved.')
+    }),
+  )
 }
 
 module.exports.missing = missing
 
 if (require.main === module) {
-  missing(resolve(__dirname, '../missing-locales'))
+  missing().then(() => process.exit(0))
 }
