@@ -6,7 +6,13 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "generate": "node ./lib/scripts/genEnvConfig.js",
-    "check": "node ./lib/scripts/configCheck.js"
+    "check": "node ./lib/scripts/configCheck.js",
+    "sort": "npx sort-package-json",
+    "depCheck": "npx depcheck",
+    "eslint:check": "eslint \"**/*.{js,jsx}\"",
+    "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix",
+    "prettier:check": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
+    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\""
   },
   "dependencies": {
     "config": "^3.3.9"
