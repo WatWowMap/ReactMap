@@ -8,17 +8,19 @@ import {
   IconButton,
   Divider,
   Dialog,
+  MenuItem,
+  Menu,
 } from '@mui/material'
 
-import { useTranslation, Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 
+import { useSyncData } from '@components/layout/dialogs/webhooks/hooks'
 import { useStore, useStatic } from '@hooks/useStore'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
 import Title from './common/Title'
-import Dropdown from './common/Dropdown'
 import GenericTimer from './common/Timer'
 import BadgeSelection from '../layout/dialogs/BadgeSelection'
 import PowerUp from './common/PowerUp'
@@ -128,159 +130,34 @@ export default function GymPopup({
   )
 }
 
-const MenuActions = ({ gym, perms, hasRaid, badge, setBadge }) => {
-  const { gymValidDataLimit } = useStatic((state) => state.config)
-
-  const selectedWebhook = useStore((state) => state.selectedWebhook)
-  const webhookData = useStatic((state) => state.webhookData)
-
-  const filters = useStore((state) => state.filters)
-
+const MenuActions = ({ gym, hasRaid, badge, setBadge }) => {
   const [anchorEl, setAnchorEl] = useState(false)
   const [badgeMenu, setBadgeMenu] = useState(false)
-
-  const addWebhook = useWebhook({ category: 'quickGym', selectedWebhook })
-  const hasGymHook = webhookData?.[selectedWebhook]?.gym?.find(
-    (x) => x.gym_id === gym.id,
-  )
-  const hasRaidHook = webhookData?.[selectedWebhook]?.raid?.find(
-    (x) => x.gym_id === gym.id,
-  )
-  const hasEggHook = webhookData?.[selectedWebhook]?.egg?.find(
-    (x) => x.gym_id === gym.id,
-  )
-  const hasWebhook = !!hasGymHook || !!hasRaidHook || !!hasEggHook
-  const {
-    id,
-    team_id,
-    raid_pokemon_id,
-    raid_pokemon_form,
-    raid_level,
-    updated,
-  } = gym
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
   }
 
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
+  const handleClose = React.useCallback(() => setAnchorEl(null), [])
 
-  const handleHide = () => {
-    setAnchorEl(null)
-    useStatic.setState((prev) => ({ hideList: [...prev.hideList, id] }))
-  }
-
-  const handleCloseBadge = (open) => {
-    setAnchorEl(null)
+  const handleCloseBadge = React.useCallback((open) => {
+    handleClose()
     setBadgeMenu(open)
-  }
-
-  const excludeTeam = () => {
-    setAnchorEl(null)
-    const key = `t${team_id}-0`
-    useStore.setState((prev) => ({
-      filters: {
-        ...prev.filters,
-        gyms: {
-          ...prev.filters.gyms,
-          filter: {
-            ...prev.filters.gyms.filter,
-            [key]: {
-              ...prev.filters.gyms.filter[key],
-              enabled: false,
-            },
-          },
-        },
-      },
-    }))
-    useStatic.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
-  }
-
-  const excludeBoss = () => {
-    setAnchorEl(null)
-    let key = `e${raid_level}`
-    if (raid_pokemon_id > 0) {
-      key = `${raid_pokemon_id}-${raid_pokemon_form}`
-    }
-    useStore.setState((prev) => ({
-      filters: {
-        ...prev.filters,
-        gyms: {
-          ...prev.filters.gyms,
-          filter: {
-            ...prev.filters.gyms.filter,
-            [key]: {
-              ...prev.filters.gyms.filter[key],
-              enabled: false,
-            },
-          },
-        },
-      },
-    }))
-    useStatic.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
-  }
-
-  const handleTimer = () => {
-    setAnchorEl(null)
-    useStatic.setState((prev) => {
-      if (prev.includes(id)) {
-        return { timerList: prev.timerList.filter((x) => x !== id) }
-      }
-      return { timerList: [...prev.timerList, id] }
-    })
-  }
-
-  const options = [{ name: 'hide', action: handleHide }]
-
-  if (perms.gyms) {
-    if (updated > gymValidDataLimit) {
-      options.push({ name: 'exclude_team', action: excludeTeam })
-    }
-    if (perms.gymBadges && filters.gyms?.gymBadges) {
-      options.push({
-        name: 'gym_badge_menu',
-        action: () => handleCloseBadge(true),
-      })
-    }
-  }
-  if (perms.raids && hasRaid) {
-    options.push(
-      { name: 'exclude_raid', action: excludeBoss },
-      { name: 'timer', action: handleTimer },
-    )
-  }
-  perms.webhooks.forEach((hook) => {
-    options.push({
-      name: (
-        <Trans i18nKey={hasWebhook ? 'remove_webhook_entry' : 'webhook_entry'}>
-          {{ name: hook }}
-        </Trans>
-      ),
-      action: () => {
-        if (hasWebhook) {
-          if (hasGymHook) addWebhook(hasGymHook.uid, 'gym-delete')
-          if (hasRaidHook) addWebhook(hasRaidHook.uid, 'raid-delete')
-          if (hasEggHook) addWebhook(hasEggHook.uid, 'egg-delete')
-        } else {
-          addWebhook(gym, 'quickGym')
-        }
-      },
-      key: hook,
-    })
-  })
+  }, [])
 
   return (
-    <Grid item xs={2} style={{ textAlign: 'right' }}>
+    <Grid item xs={2} textAlign="right">
       <IconButton aria-haspopup="true" onClick={handleClick} size="large">
         <MoreVert />
       </IconButton>
-      <Dropdown
-        anchorEl={anchorEl}
-        handleClose={handleClose}
-        options={options}
-      />
+      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
+        <DropdownOptions
+          {...gym}
+          hasRaid={hasRaid}
+          handleClose={handleClose}
+          handleCloseBadge={handleCloseBadge}
+        />
+      </Menu>
       <Dialog open={badgeMenu} onClose={handleCloseBadge}>
         <BadgeSelection
           gym={gym}
@@ -291,6 +168,123 @@ const MenuActions = ({ gym, perms, hasRaid, badge, setBadge }) => {
       </Dialog>
     </Grid>
   )
+}
+
+const DropdownOptions = ({
+  id,
+  handleClose,
+  handleCloseBadge,
+  updated,
+  team_id,
+  hasRaid,
+  raid_pokemon_id,
+  raid_pokemon_form,
+  raid_level,
+}) => {
+  const { t } = useTranslation()
+
+  const { gyms, raids, gymBadges, webhooks } = useStatic((s) => s.auth.perms)
+  const gymBadgeFilter = useStatic((s) => s.filters.gyms?.gymBadges)
+  const gymValidDataLimit = useStatic((state) => state.config.gymValidDataLimit)
+
+  const { data: raidHooks } = useSyncData('raid')
+  const { data: gymHooks } = useSyncData('gym')
+  const { data: eggHooks } = useSyncData('egg')
+
+  const hasRaidHook = raidHooks?.find((x) => x.gym_id === id)
+  const hasGymHook = gymHooks?.find((x) => x.gym_id === id)
+  const hasEggHook = eggHooks?.find((x) => x.gym_id === id)
+  const hasWebhook = !!(hasGymHook || hasRaidHook || hasEggHook)
+
+  const addWebhook = useWebhook({ category: 'quickGym' })
+
+  const handleHide = () => {
+    handleClose()
+    useStatic.setState((prev) => ({ hideList: [...prev.hideList, id] }))
+  }
+
+  const handleExclude = (key) => {
+    handleClose()
+    useStore.setState((prev) => ({
+      filters: {
+        ...prev.filters,
+        gyms: {
+          ...prev.filters.gyms,
+          filter: {
+            ...prev.filters.gyms.filter,
+            [key]: {
+              ...prev.filters.gyms.filter[key],
+              enabled: false,
+            },
+          },
+        },
+      },
+    }))
+    useStatic.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
+  }
+
+  const excludeTeam = () => handleExclude(`t${team_id}-0`)
+
+  const excludeBoss = () =>
+    handleExclude(
+      raid_pokemon_id > 0
+        ? `${raid_pokemon_id}-${raid_pokemon_form}`
+        : `e${raid_level}`,
+    )
+
+  const handleTimer = () => {
+    handleClose()
+    useStatic.setState((prev) => {
+      if (prev.includes(id)) {
+        return { timerList: prev.timerList.filter((x) => x !== id) }
+      }
+      return { timerList: [...prev.timerList, id] }
+    })
+  }
+
+  const options = [{ name: 'hide', action: handleHide }]
+
+  if (gyms) {
+    if (updated > gymValidDataLimit) {
+      options.push({ name: 'exclude_team', action: excludeTeam })
+    }
+    if (gymBadges && gymBadgeFilter) {
+      options.push({
+        name: 'gym_badge_menu',
+        action: () => handleCloseBadge(true),
+      })
+    }
+  }
+  if (raids && hasRaid) {
+    options.push(
+      { name: 'exclude_raid', action: excludeBoss },
+      { name: 'timer', action: handleTimer },
+    )
+  }
+
+  if (webhooks?.length) {
+    options.push({
+      name: t(hasWebhook ? 'remove_webhook_entry' : 'webhook_entry', {
+        name: t('alerts'),
+      }),
+      action: () => {
+        if (hasWebhook) {
+          if (hasGymHook) addWebhook(hasGymHook.uid, 'gym-delete')
+          if (hasRaidHook) addWebhook(hasRaidHook.uid, 'raid-delete')
+          if (hasEggHook) addWebhook(hasEggHook.uid, 'egg-delete')
+        } else {
+          addWebhook(id, 'quickGym')
+        }
+      },
+      key: 'wehbhook',
+    })
+  }
+
+  return options.map((option) => (
+    <MenuItem key={option.key || option.name} onClick={option.action} dense>
+      {typeof option.name === 'string' ? t(option.name) : option.name}
+    </MenuItem>
+  ))
 }
 
 const PoiImage = ({ gym, Icons }) => {

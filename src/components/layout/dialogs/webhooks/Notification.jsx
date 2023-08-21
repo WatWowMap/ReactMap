@@ -11,7 +11,8 @@ export function WebhookNotification() {
       open={!!webhookAlert.open}
       cb={resetAlert}
       severity={webhookAlert.severity}
-      messages={[webhookAlert.message]}
-    />
+    >
+      {webhookAlert.message}
+    </Notification>
   )
 }

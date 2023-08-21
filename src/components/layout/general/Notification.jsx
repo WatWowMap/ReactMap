@@ -11,6 +11,9 @@ function SlideTransition(props) {
   return <Slide {...props} direction="up" />
 }
 
+/** @type {React.CSSProperties} */
+const alertStyle = { textAlign: 'center', color: 'white' }
+
 /**
  *
  * @template T
@@ -37,10 +40,10 @@ export default function Notification({
   const { t } = useTranslation()
   const [alert, setAlert] = React.useState(true)
 
-  const handleClose = () => {
+  const handleClose = React.useCallback(() => {
     setAlert(false)
     if (cb) cb()
-  }
+  }, [cb])
 
   React.useEffect(() => {
     setAlert(open)
@@ -63,7 +66,7 @@ export default function Notification({
         onClose={handleClose}
         severity={severity}
         variant="filled"
-        style={{ textAlign: 'center', color: 'white' }}
+        style={alertStyle}
       >
         {title && <AlertTitle>{t(title)}</AlertTitle>}
         {typeof i18nKey === 'string' && Array.isArray(messages)

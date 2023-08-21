@@ -497,7 +497,7 @@ class PoracleAPI {
   /**
    *
    * @param {string | number} userId
-   * @param {any} data
+   * @param {string} data
    */
   async #quickGym(userId, data) {
     await Promise.all(
@@ -505,7 +505,7 @@ class PoracleAPI {
         this.#sendRequest(APIS.tracking(userId, subCategory), 'POST', {
           ...this.ui[subCategory].defaults,
           ...this.#wildCards(subCategory),
-          gym_id: data.id,
+          gym_id: data,
         }),
       ),
     )

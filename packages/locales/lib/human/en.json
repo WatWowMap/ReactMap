@@ -649,5 +649,6 @@
   "tth_2": "Unknown",
   "no_access": "No Access",
   "cooldown": "Cool Down",
-  "scan_some_outside_area": "Some locations are outside the authorized boundaries"
+  "scan_some_outside_area": "Some locations are outside the authorized boundaries",
+  "alerts": "alerts"
 }
