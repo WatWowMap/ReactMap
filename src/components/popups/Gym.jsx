@@ -184,7 +184,6 @@ const DropdownOptions = ({
   const { t } = useTranslation()
 
   const { gyms, raids, gymBadges, webhooks } = useStatic((s) => s.auth.perms)
-  const gymBadgeFilter = useStatic((s) => s.filters.gyms?.gymBadges)
   const gymValidDataLimit = useStatic((state) => state.config.gymValidDataLimit)
 
   const { data: raidHooks } = useSyncData('raid')
@@ -248,7 +247,7 @@ const DropdownOptions = ({
     if (updated > gymValidDataLimit) {
       options.push({ name: 'exclude_team', action: excludeTeam })
     }
-    if (gymBadges && gymBadgeFilter) {
+    if (gymBadges) {
       options.push({
         name: 'gym_badge_menu',
         action: () => handleCloseBadge(true),
