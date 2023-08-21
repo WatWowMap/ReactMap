@@ -1,6 +1,7 @@
-// @ts-check
 /* eslint-disable react/no-array-index-key */
+// @ts-check
 import * as React from 'react'
+import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
@@ -27,6 +28,10 @@ export default function Login({ serverSettings }) {
 
   if (loading) {
     return <Loading height="100vh">{t('loading', { category: '' })}</Loading>
+  }
+
+  if (serverSettings?.user?.valid) {
+    return <Navigate to="/" />
   }
 
   const { settings, components } = data?.customComponent || {
