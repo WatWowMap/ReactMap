@@ -650,5 +650,6 @@
   "no_access": "No Access",
   "cooldown": "Cool Down",
   "scan_some_outside_area": "Some locations are outside the authorized boundaries",
-  "alerts": "alerts"
+  "alerts": "alerts",
+  "alert_manager": "Alert Manager"
 }

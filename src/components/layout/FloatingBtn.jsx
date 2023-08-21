@@ -161,6 +161,7 @@ export default function FloatingButtons() {
           size={fabSize}
           onClick={setModeBtn('open')}
           disabled={disabled}
+          title={t('alert_manager')}
         >
           <NotificationsActive fontSize={iconSize} sx={{ color: 'white' }} />
         </Fab>
