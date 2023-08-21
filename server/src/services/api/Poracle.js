@@ -427,6 +427,10 @@ class PoracleAPI {
         )
     const second = await this.#sendRequest(APIS.tracking(userId, main))
 
+    const sortBy = this.ui[category]?.sortProp
+    if (sortBy) {
+      second[category].sort((a, b) => a[sortBy] - b[sortBy])
+    }
     return { ...first, ...second }
   }
 
