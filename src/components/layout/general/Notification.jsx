@@ -38,7 +38,7 @@ export default function Notification({
   title,
 }) {
   const { t } = useTranslation()
-  const [alert, setAlert] = React.useState(true)
+  const [alert, setAlert] = React.useState(open || false)
 
   const handleClose = React.useCallback(() => {
     setAlert(false)
