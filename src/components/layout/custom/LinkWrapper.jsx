@@ -7,37 +7,46 @@ import Link from '@mui/material/Link'
  * Wraps div in a link if the block has one, otherwise returns children
  * @param {{
  *  link?: string,
+ *  href?: string,
  *  target?: string,
- *  linkColor?: string,
+ *  color?: string,
  *  underline?: import("@mui/material/Link").LinkProps['underline'],
  *  style?: import('react').CSSProperties,
+ *  referrerPolicy?: import('react-router-dom').LinkProps['referrerPolicy'],
  *  sx?: import("@mui/system").SxProps,
  *  children: React.ReactNode
+ *  className?: string
  * }} props
  * @returns {React.ReactNode}
  */
 export default function LinkWrapper({
   link,
+  href,
   target,
-  linkColor,
+  color,
+  referrerPolicy,
   underline,
   style,
   sx,
   children,
+  className,
 }) {
-  if (!link) return children
-  const external = link.startsWith('http')
+  const url = link || href
+  if (!url) return children
+  const external = url.startsWith('http') || url.startsWith('/auth')
 
   return (
     <Link
-      href={external ? link : null}
-      to={external ? null : link}
-      rel={external ? 'noopener noreferrer' : null}
-      target={target ?? (external ? '_blank' : null)}
-      color={linkColor}
-      underline={underline}
-      sx={[style, ...(Array.isArray(sx) ? sx : [sx])]}
+      className={className}
+      href={external ? url : null}
+      to={external ? null : url}
       component={external ? 'a' : RouterLink}
+      referrerPolicy={referrerPolicy}
+      target={target}
+      color={color}
+      underline={underline}
+      style={style}
+      sx={sx}
     >
       {children}
     </Link>

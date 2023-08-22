@@ -15,8 +15,8 @@ import LocaleSelection from '../general/LocaleSelection'
 import LinkWrapper from './LinkWrapper'
 
 export default function Generator({ block = {}, defaultReturn = null }) {
-  const { content = null, ...props } = block
-  const children = Utility.getBlockContent(content)
+  const { content = null, text = null, ...props } = block
+  const children = Utility.getBlockContent(content || text)
   switch (block.type) {
     case 'img':
       return (
@@ -46,7 +46,7 @@ export default function Generator({ block = {}, defaultReturn = null }) {
         />
       )
     case 'discord':
-      return <DiscordLogin href={block.link}>{block.text}</DiscordLogin>
+      return <DiscordLogin href={block.link}>{children}</DiscordLogin>
     case 'localLogin':
       return <LocalLogin href={block.localAuthUrl} style={props.style} />
     case 'localeSelection':
@@ -56,11 +56,12 @@ export default function Generator({ block = {}, defaultReturn = null }) {
         <Grid
           container
           {...Utility.getSizes(block.gridSizes)}
+          className={block.className}
+          alignItems={block.alignItems}
+          justifyContent={block.justifyContent}
           spacing={block.spacing}
           style={block.style}
           sx={block.sx}
-          alignItems={block.alignItems}
-          justifyContent={block.justifyContent}
         >
           {block.components.map((subBlock, i) =>
             subBlock.type === 'parent' ? (
@@ -73,7 +74,7 @@ export default function Generator({ block = {}, defaultReturn = null }) {
               <Grid
                 key={i}
                 {...Utility.getSizes(subBlock.gridSizes)}
-                {...subBlock.gridStyle}
+                className={block.className}
                 style={subBlock.gridStyle}
                 sx={subBlock.gridSx}
               >
