@@ -212,30 +212,36 @@ const checkExtraJsons = (fileName, domain = '') => {
 /** @param {Partial<import("@rm/types").Config['map']>} [input] */
 const mergeMapConfig = (input) => {
   const obj = input ?? config.getSafe('map')
+  const base = config.getSafe('map')
 
   const menuOrder = obj?.general?.menuOrder
     ? obj.general.menuOrder.filter((x) => allowedMenuItems.includes(x))
     : []
 
   return {
+    ...base,
     ...obj,
+    ...base.general,
     ...obj.general,
     menuOrder,
+    ...base.customRoutes,
     ...obj.customRoutes,
+    ...base.links,
     ...obj.links,
+    ...base.misc,
     ...obj.misc,
     messageOfTheDay: {
-      ...config.map.messageOfTheDay,
+      ...base.messageOfTheDay,
       ...obj.messageOfTheDay,
       ...checkExtraJsons('messageOfTheDay', obj.domain),
     },
     donationPage: {
-      ...config.map.donationPage,
+      ...base.donationPage,
       ...obj.donationPage,
       ...checkExtraJsons('donationPage', obj.domain),
     },
     loginPage: {
-      ...config.map.loginPage,
+      ...base.loginPage,
       ...obj.loginPage,
       ...checkExtraJsons('loginPage', obj.domain),
     },

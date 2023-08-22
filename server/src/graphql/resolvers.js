@@ -290,8 +290,12 @@ const resolvers = {
     },
     scanAreas: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.has(`areas.scanAreas.${req.headers.host}`)
-          ? config.getSafe(`areas.scanAreas.${req.headers.host}`)
+        const scanAreas = config.has(
+          `areas.scanAreas.${req.headers.host.replaceAll('.', '_')}`,
+        )
+          ? config.getSafe(
+              `areas.scanAreas.${req.headers.host.replaceAll('.', '_')}`,
+            )
           : config.getSafe('areas.scanAreas.main')
         return [
           {
@@ -310,8 +314,12 @@ const resolvers = {
     },
     scanAreasMenu: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.has(`areas.scanAreasMenu.${req.headers.host}`)
-          ? config.getSafe(`areas.scanAreasMenu.${req.headers.host}`)
+        const scanAreas = config.has(
+          `areas.scanAreasMenu.${req.headers.host.replaceAll('.', '_')}`,
+        )
+          ? config.getSafe(
+              `areas.scanAreasMenu.${req.headers.host.replaceAll('.', '_')}`,
+            )
           : config.getSafe('areas.scanAreasMenu.main')
 
         if (perms.areaRestrictions.length) {
