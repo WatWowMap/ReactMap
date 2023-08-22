@@ -7,7 +7,6 @@
   "author": "TurtIeSocks <58572875+TurtIeSocks@users.noreply.github.com>",
   "main": "ReactMap.js",
   "workspaces": [
-    "apps/**/*",
     "packages/*"
   ],
   "scripts": {
@@ -66,6 +65,7 @@
     "@turf/destination": "^6.5.0",
     "@turf/distance": "^6.5.0",
     "@turf/helpers": "^6.5.0",
+    "@monaco-editor/react": "^4.5.1",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.2",
     "chalkercli": "^1.6.4",
@@ -130,6 +130,7 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "monaco-editor": "^0.41.0",
     "nodemon": "^2.0.22",
     "prettier": "^2.8.8",
     "rollup-plugin-delete": "^2.0.0",

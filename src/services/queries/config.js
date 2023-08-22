@@ -36,3 +36,12 @@ export const SEARCHABLE = gql`
     searchable
   }
 `
+
+export const VALIDATE_USER = gql`
+  query ValidateUser {
+    validateUser {
+      admin
+      loggedIn
+    }
+  }
+`

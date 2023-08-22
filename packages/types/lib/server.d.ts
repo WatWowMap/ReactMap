@@ -171,6 +171,7 @@ export interface Permissions {
   backups: boolean
   routes: boolean
   blocked: boolean
+  admin: boolean
   blockedGuildNames: string[]
   scanner: string[]
   areaRestrictions: string[]

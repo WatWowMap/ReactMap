@@ -121,6 +121,7 @@ class DiscordClient {
     const perms = Object.fromEntries(
       Object.keys(this.perms).map((key) => [key, false]),
     )
+    perms.admin = false
 
     const permSets = {
       areaRestrictions: new Set(),
@@ -133,6 +134,7 @@ class DiscordClient {
       const guilds = user.guilds.map((guild) => guild.id)
       if (this.strategy.allowedUsers.includes(user.id)) {
         Object.keys(this.perms).forEach((key) => (perms[key] = true))
+        perms.admin = true
         config.getSafe('webhooks').forEach((x) => permSets.webhooks.add(x.name))
         Object.keys(scanner).forEach(
           (x) => scanner[x]?.enabled && permSets.scanner.add(x),
@@ -202,11 +204,7 @@ class DiscordClient {
     Object.entries(permSets).forEach(([key, value]) => {
       perms[key] = [...value]
     })
-    log.debug(
-      HELPERS.custom(this.rmStrategy, '#7289da'),
-      'Perms:',
-      JSON.stringify(perms),
-    )
+    log.debug(HELPERS.custom(this.rmStrategy, '#7289da'), { perms })
     return perms
   }
 
