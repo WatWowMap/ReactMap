@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useMap, ZoomControl, TileLayer } from 'react-leaflet'
+import React, { useState, useEffect } from 'react'
+import { ZoomControl, TileLayer, useMapEvents } from 'react-leaflet'
 import { control } from 'leaflet'
 
 import Utility from '@services/Utility'
 import { useStatic, useStore } from '@hooks/useStore'
 import useTileLayer from '@hooks/useTileLayer'
 
-import QueryData from './QueryData'
+// import QueryData from './QueryData'
 import { GenerateCells } from './tiles/S2Cell'
+import Clustering from './Clustering'
 
 /** @param {string} category */
 const userSettingsCategory = (category) => {
@@ -24,20 +25,24 @@ const userSettingsCategory = (category) => {
   }
 }
 
+function setLocationZoom({ target: map }) {
+  const { lat, lng } = map.getCenter()
+  const zoom = map.getZoom()
+  useStore.setState({ location: [lat, lng], zoom })
+  useStatic.setState({
+    timeOfDay: Utility.timeCheck(lat, lng),
+  })
+}
+
 export default function Map({ params }) {
   Utility.analytics(window.location.pathname)
 
-  const map = useMap()
   const config = useStatic((state) => state.config.map)
-
-  map.attributionControl.setPrefix(config.attributionPrefix || '')
 
   const tileLayer = useTileLayer()
 
   const staticUserSettings = useStatic((state) => state.userSettings)
   const ui = useStatic((state) => state.ui)
-  const staticFilters = useStatic((state) => state.filters)
-  const active = useStatic((state) => state.active)
   const timeOfDay = useStatic((state) => state.timeOfDay)
   const isMobile = useStatic((state) => state.isMobile)
   const Icons = useStatic((state) => state.Icons)
@@ -51,19 +56,11 @@ export default function Map({ params }) {
   const [manualParams, setManualParams] = useState(params)
   const [windowState, setWindowState] = useState(true)
 
-  const onMove = useCallback(
-    (latLon) => {
-      const newCenter = latLon || map.getCenter()
-      useStore.setState({
-        location: [newCenter.lat, newCenter.lng],
-        zoom: Math.floor(map.getZoom()),
-      })
-      useStatic.setState({
-        timeOfDay: Utility.timeCheck(newCenter.lat, newCenter.lng),
-      })
-    },
-    [map],
-  )
+  const map = useMapEvents({
+    moveend: setLocationZoom,
+    zoom: setLocationZoom,
+  })
+  map.attributionControl.setPrefix(config.attributionPrefix || '')
 
   useEffect(() => {
     const onFocus = () => setWindowState(true)
@@ -182,53 +179,36 @@ export default function Map({ params }) {
                 <GenerateCells
                   key={category}
                   tileStyle={tileLayer?.style || 'light'}
-                  onMove={onMove}
                 />
               )
             }
             return (
-              <QueryData
-                key={`${category}-${Object.values(
-                  userSettings[userSettingsCategory(category)] || {},
-                ).join('')}-${Object.values(icons).join('')}`}
-                sizeKey={
-                  filters[category].filter
-                    ? Object.values(filters[category].filter)
-                        .map((x) => (x ? x.size : 'md'))
-                        .join(',')
-                    : 'md'
-                }
-                bounds={Utility.getQueryArgs(map)}
-                onMove={onMove}
-                perms={value}
-                map={map}
+              <Clustering
+                key={category}
                 category={category}
-                config={config}
-                Icons={Icons}
-                staticFilters={staticFilters[category].filter}
-                userIcons={icons}
-                userSettings={
-                  userSettings[userSettingsCategory(category)] || {}
-                }
-                filters={filters[category]}
-                onlyAreas={
-                  (filters?.scanAreas?.filterByAreas &&
-                    filters?.scanAreas?.filter?.areas) ||
-                  []
-                }
-                tileStyle={tileLayer?.style || 'light'}
-                clusteringRules={
-                  config?.clustering?.[category] || {
-                    zoomLimit: config.minZoom,
-                    forcedLimit: 10000,
-                  }
-                }
-                staticUserSettings={staticUserSettings[category]}
-                params={manualParams}
-                setParams={setManualParams}
-                timeOfDay={timeOfDay}
-                isMobile={isMobile}
-                active={active}
+                value={value}
+                // clusteringRules={
+                //   config?.clustering?.[category] || {
+                //     zoomLimit: config.minZoom,
+                //     forcedLimit: 10000,
+                //   }
+                // }
+                // map={map}
+                // config={config}
+                // filters={filters}
+                // Icons={Icons}
+                // userIcons={icons}
+                // tileStyle={tileLayer?.style || 'light'}
+                // userSettings={userSettings}
+                // staticUserSettings={staticUserSettings}
+                // params={params}
+                // setParams={setManualParams}
+                // timeOfDay={timeOfDay}
+                // onlyAreas={
+                //   (filters?.scanAreas?.filterByAreas &&
+                //     filters?.scanAreas?.filter?.areas) ||
+                //   []
+                // }
               />
             )
           }

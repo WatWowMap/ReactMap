@@ -23,6 +23,7 @@ const PokestopTile = ({
   setParams,
   zoom,
 }) => {
+  return null
   const markerRef = useRef({})
   const [done, setDone] = useState(false)
   const [stateChange, setStateChange] = useState(false)

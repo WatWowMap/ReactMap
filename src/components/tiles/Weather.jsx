@@ -12,6 +12,7 @@ const WeatherTile = ({
   tileStyle,
   userSettings,
 }) => {
+  return null
   const [popup, setPopup] = useState(false)
   const markerRef = useRef(null)
 
@@ -51,9 +52,9 @@ const WeatherTile = ({
   )
 }
 
-const areEqual = (prev, next) =>
-  prev.item.gameplay_condition === next.item.gameplay_condition &&
-  prev.item.updated === next.item.updated &&
-  prev.tileStyle === next.tileStyle
+// const areEqual = (prev, next) =>
+//   prev.item.gameplay_condition === next.item.gameplay_condition &&
+//   prev.item.updated === next.item.updated &&
+//   prev.tileStyle === next.tileStyle
 
-export default memo(WeatherTile, areEqual)
+export default memo(WeatherTile, () => true)

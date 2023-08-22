@@ -13,6 +13,7 @@ import Utility from '@services/Utility'
 import { useStore } from '@hooks/useStore'
 
 import Notification from '@components/layout/general/Notification'
+import { getQueryArgs } from '@services/functions/getQueryArgs'
 
 function BaseCell({ id, coords, color }) {
   return (
@@ -48,15 +49,14 @@ function getPolyVector(s2cellId, polyline) {
   return poly
 }
 
-export function GenerateCells({ tileStyle, onMove }) {
-  const map = useMap()
+export function GenerateCells({ tileStyle }) {
   const { s2cells: settings } = useStore((s) => s.userSettings)
   const { s2cells: filters } = useStore((s) => s.filters)
   const location = useStore((s) => s.location)
   const zoom = useStore((s) => s.zoom)
 
   const cells = React.useMemo(() => {
-    const bounds = Utility.getQueryArgs(map)
+    const bounds = getQueryArgs()
     return filters.cells.flatMap((level) => {
       const regionCoverer = new S2RegionCoverer()
       const region = S2LatLngRect.fromLatLng(
@@ -75,13 +75,13 @@ export function GenerateCells({ tileStyle, onMove }) {
     })
   }, [filters.cells, location, zoom])
 
-  React.useEffect(() => {
-    const regenerate = () => onMove()
-    map.on('moveend', regenerate)
-    return () => {
-      map.off('moveend', regenerate)
-    }
-  }, [])
+  // React.useEffect(() => {
+  //   const regenerate = () => onMove()
+  //   map.on('moveend', regenerate)
+  //   return () => {
+  //     map.off('moveend', regenerate)
+  //   }
+  // }, [])
 
   const color =
     tileStyle === 'dark'

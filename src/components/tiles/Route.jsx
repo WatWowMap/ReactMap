@@ -23,6 +23,7 @@ const MARKER_OPACITY = LINE_OPACITY * 2
  * @returns
  */
 const RouteTile = ({ item, Icons }) => {
+  return null
   const [clicked, setClicked] = React.useState(false)
   const [hover, setHover] = React.useState('')
 

@@ -127,19 +127,6 @@ export default class Utility {
       12,
   })
 
-  static getQueryArgs(map) {
-    const mapBounds = map.getBounds()
-    return {
-      minLat: mapBounds._southWest.lat,
-      maxLat: mapBounds._northEast.lat,
-      minLon: mapBounds._southWest.lng,
-      maxLon: mapBounds._northEast.lng,
-      zoom: Math.floor(map.getZoom()),
-      ts: Math.floor(Date.now() / 1000),
-      midnight: this.getMidnight(),
-    }
-  }
-
   /**
    * Provides the raw content or translated content if available
    * @param {string | Record<string, string>} content

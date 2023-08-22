@@ -11,6 +11,7 @@ import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
 import DraggableMarker from './layout/dialogs/webhooks/human/Draggable'
 import WebhookAreaSelection from './layout/dialogs/webhooks/human/area/AreaSelection'
 import Nav from './layout/Nav'
+import ActiveWeather from './layout/general/ActiveWeather'
 
 export default function Container({ serverSettings, params, location, zoom }) {
   useRefresh()
@@ -26,6 +27,7 @@ export default function Container({ serverSettings, params, location, zoom }) {
     <MapContainer
       tap={false}
       center={location}
+      ref={(ref) => useStatic.setState({ map: ref })}
       zoom={
         zoom < serverSettings.config.map.minZoom ||
         zoom > serverSettings.config.map.maxZoom
@@ -47,6 +49,7 @@ export default function Container({ serverSettings, params, location, zoom }) {
       <DraggableMarker />
       <WebhookAreaSelection />
       <Nav />
+      <ActiveWeather />
     </MapContainer>
   )
 }

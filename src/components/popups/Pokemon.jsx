@@ -51,27 +51,23 @@ const getColor = (ivPercent) => {
   }
 }
 
-export default function PokemonPopup({
-  pokemon,
-  iconUrl,
-  userSettings,
-  isTutorial,
-  Icons,
-  timeOfDay,
-}) {
+export default function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const { t } = useTranslation()
   const { pokemon_id, cleanPvp, iv, cp } = pokemon
-  const { perms } = useStatic((state) => state.auth)
+  const perms = useStatic((state) => state.auth.perms)
+  const timeOfDay = useStatic((s) => s.timeOfDay)
+  const metaData = useStatic((state) => state.masterfile.pokemon[pokemon_id])
+  const Icons = useStatic((state) => state.Icons)
+
+  const userSettings = useStore((s) => s.userSettings)
   const pokePerms = isTutorial
     ? {
         pvp: true,
         iv: true,
       }
     : perms
-  const {
-    pokemon: { [pokemon_id]: metaData },
-  } = useStatic((state) => state.masterfile)
   const popups = useStore((state) => state.popups)
+
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
 

@@ -11,7 +11,9 @@ import { persist } from 'zustand/middleware'
  *   zoom: number,
  *   sidebar: string,
  *   selectedWebhook: string,
- *   settings: { localeSelection: keyof typeof import('@assets/mui/theme').LOCALE_MAP, navigationControls: 'react' | 'leaflet' }
+ *   settings: {
+ *    localeSelection: keyof typeof import('@assets/mui/theme').LOCALE_MAP,
+ *    navigationControls: 'react' | 'leaflet' }
  *   motdIndex: number
  *   tutorial: boolean,
  *   searchTab: string,
@@ -19,6 +21,7 @@ import { persist } from 'zustand/middleware'
  *   filters: object,
  *   scannerCooldown: number
  *   icons: Record<string, string>
+ *   userSettings: Record<string, any>
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
@@ -113,6 +116,11 @@ export const useStore = create(
  *   settings: Record<string, any>
  *   userSettings: Record<string, any>
  *   clientError: string,
+ *   map: import('leaflet').Map | null,
+ *   timeOfDay: 'day' | 'night' | 'dusk' | 'dawn',
+ *   hideList: string[],
+ *   excludeList: string[],
+ *   timerList: string[],
  * }} UseStatic
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
  */
@@ -122,6 +130,7 @@ export const useStatic = create((set) => ({
   active: true,
   searchLoading: false,
   clientError: '',
+  map: null,
   auth: {
     strategy: '',
     discordId: '',
@@ -281,3 +290,11 @@ export const useScanStore = create((set) => ({
   setScanMode: (mode, nextMode = '') => set({ [mode]: nextMode }),
   setScanSize: (mode, size) => set({ [mode]: size }),
 }))
+
+/**
+ *
+ * @param {(string | number | boolean)[]} p
+ * @param {(string | number | boolean)[]} n
+ * @returns
+ */
+export const basicEqualFn = (p, n) => p.every((v, i) => v === n[i])
