@@ -18,6 +18,7 @@ export default function CustomTile({ block, defaultReturn }) {
   ) : (
     <Grid
       {...Utility.getSizes(block.gridSizes)}
+      className={block.className}
       style={block.gridStyle}
       sx={block.sx}
     >
