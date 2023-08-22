@@ -48,7 +48,12 @@ export default function Generator({ block = {}, defaultReturn = null }) {
     case 'discord':
       return <DiscordLogin href={block.link}>{children}</DiscordLogin>
     case 'localLogin':
-      return <LocalLogin href={block.localAuthUrl} style={props.style} />
+      return (
+        <LocalLogin
+          href={block.localAuthUrl || block.link}
+          style={props.style}
+        />
+      )
     case 'localeSelection':
       return <LocaleSelection />
     case 'parent':
