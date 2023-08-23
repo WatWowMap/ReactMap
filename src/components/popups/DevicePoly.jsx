@@ -15,14 +15,18 @@ const DevicePoly = ({ route, type, radius }) => {
 
   const safeRoute = React.useMemo(() => {
     try {
-      if (typeof route === 'string') {
-        return JSON.parse(route)
-      }
+      if (!route) return null
+      // check for mariadb or mysql route
+      const parsed = typeof route === 'string' ? JSON.parse(route) : route
+      // Leveling
+      if (!Array.isArray(parsed)) return parsed
+      // Single or multi
+      return parsed[0].lat ? [parsed] : parsed
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn(e)
+      return route
     }
-    return route
   }, [route])
 
   if (!safeRoute) return null
@@ -35,17 +39,16 @@ const DevicePoly = ({ route, type, radius }) => {
       </>
     )
   }
-  const arrayRoute = safeRoute[0].lat ? [safeRoute] : safeRoute
-  if (Array.isArray(arrayRoute)) {
+  if (Array.isArray(safeRoute)) {
     return type?.includes('circle')
-      ? arrayRoute.map((polygon, i) => (
+      ? safeRoute.map((polygon, i) => (
           <Polyline
             key={i}
             positions={polygon.map((poly) => [poly.lat, poly.lon])}
             color={color}
           />
         ))
-      : arrayRoute.map((polygon, i) => (
+      : safeRoute.map((polygon, i) => (
           <Polygon
             key={i}
             positions={polygon.map((poly) => [poly.lat, poly.lon])}
