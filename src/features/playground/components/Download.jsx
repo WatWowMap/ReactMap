@@ -2,7 +2,7 @@
 import * as React from 'react'
 import Button from '@mui/material/Button'
 
-import { handleDownload, usePlayStore } from './store'
+import { handleDownload, usePlayStore } from '../hooks/store'
 
 export function Download() {
   const valid = usePlayStore((s) => s.valid)

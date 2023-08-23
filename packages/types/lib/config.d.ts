@@ -1,8 +1,8 @@
-import { LogLevelNames } from 'loglevel'
+import type { LogLevelNames } from 'loglevel'
 import config = require('server/src/configs/default.json')
 import example = require('server/src/configs/local.example.json')
 
-import { Schema } from './server'
+import type { Schema } from './server'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
@@ -36,10 +36,16 @@ export interface Config<Client extends boolean = false> extends BaseConfig {
         trialPeriod: {
           start: {
             js: Date
-          } & BaseConfig['authentication']['strategies'][number]['trialPeriod']['start']
+          } & Exclude<
+            BaseConfig['authentication']['strategies'][number]['trialPeriod'],
+            undefined
+          >['start']
           end: {
             js: Date
-          } & BaseConfig['authentication']['strategies'][number]['trialPeriod']['end']
+          } & Exclude<
+            BaseConfig['authentication']['strategies'][number]['trialPeriod'],
+            undefined
+          >['end']
         } & BaseConfig['authentication']['strategies'][number]['trialPeriod']
       } & BaseConfig['authentication']['strategies'][number],
     ]

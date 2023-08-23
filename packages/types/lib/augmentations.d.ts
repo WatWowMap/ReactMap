@@ -1,6 +1,6 @@
 import { ButtonProps } from '@mui/material'
 import { GetSafeConfig } from './config'
-import { User as MyUser } from './server'
+import { ExpressUser } from './server'
 
 declare module 'config' {
   interface IConfig {
@@ -10,7 +10,7 @@ declare module 'config' {
 
 declare global {
   namespace Express {
-    interface User extends MyUser {}
+    interface User extends ExpressUser {}
   }
 }
 
