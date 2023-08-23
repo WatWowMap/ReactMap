@@ -1,9 +1,10 @@
+// @ts-check
 import * as React from 'react'
 import { useTheme } from '@mui/material/styles'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import Editor from '@monaco-editor/react'
 
-import { setCode, usePlayStore } from '../hooks/store'
+import { setCode, usePlayStore } from './store'
 
 export function CodeWrapper() {
   const hideEditor = usePlayStore((s) => s.hideEditor)

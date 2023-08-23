@@ -1,10 +1,11 @@
+// @ts-check
 /* eslint-disable react/no-array-index-key */
 import * as React from 'react'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import CustomTile from '@components/layout/custom/CustomTile'
 import DialogWrapper from '@components/layout/custom/DialogWrapper'
-import { useSafeParse } from '../hooks/useSafeParse'
-import { usePlayStore } from '../hooks/store'
+import { useSafeParse } from './useSafeParse'
+import { usePlayStore } from './store'
 
 export function Viewer() {
   const hideEditor = usePlayStore((s) => s.hideEditor)

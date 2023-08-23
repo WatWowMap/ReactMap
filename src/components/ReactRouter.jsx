@@ -8,7 +8,7 @@ import Blocked from './layout/auth/Blocked'
 import Errors from './Errors'
 import ClearStorage from './ClearStorage'
 
-const Playground = React.lazy(() => import('../features/playground/index.tsx'))
+const Playground = React.lazy(() => import('../features/playground'))
 
 export default function ReactRouter({ serverSettings }) {
   const authRoute = React.useMemo(
