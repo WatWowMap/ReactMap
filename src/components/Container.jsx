@@ -11,6 +11,16 @@ import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
 import DraggableMarker from './layout/dialogs/webhooks/human/Draggable'
 import WebhookAreaSelection from './layout/dialogs/webhooks/human/area/AreaSelection'
 import Nav from './layout/Nav'
+import {
+  ControlledLocate,
+  ControlledTileLayer,
+  ControlledZoomLayer,
+} from './Layers'
+
+const MAX_BOUNDS = [
+  [-90, -210],
+  [90, 210],
+]
 
 export default function Container({ serverSettings, params, location, zoom }) {
   useRefresh()
@@ -33,12 +43,12 @@ export default function Container({ serverSettings, params, location, zoom }) {
           : zoom
       }
       zoomControl={false}
-      maxBounds={[
-        [-90, -210],
-        [90, 210],
-      ]}
+      maxBounds={MAX_BOUNDS}
       preferCanvas
     >
+      <ControlledTileLayer />
+      <ControlledZoomLayer />
+      <ControlledLocate />
       {serverSettings.user && serverSettings.user.perms.map && (
         <Map params={params} />
       )}
