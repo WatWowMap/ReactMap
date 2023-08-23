@@ -21,10 +21,12 @@ export default function CustomButton({
   sx,
   icon = null,
   children,
+  className,
 }) {
   const isMuiColor = THEME_COLORS.has(color)
   return (
     <Button
+      className={className}
       size={size}
       color={isMuiColor ? color : undefined}
       bgcolor={isMuiColor ? undefined : color}

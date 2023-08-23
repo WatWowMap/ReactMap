@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { ZoomControl, TileLayer, useMapEvents } from 'react-leaflet'
-import { control } from 'leaflet'
+import { useMapEvents } from 'react-leaflet'
 
-import Utility from '@services/Utility'
-import { useStatic, useStore } from '@hooks/useStore'
 import useTileLayer from '@hooks/useTileLayer'
+import { useStatic, useStore } from '@hooks/useStore'
+import Utility from '@services/Utility'
 
 // import QueryData from './QueryData'
 import { GenerateCells } from './tiles/S2Cell'
@@ -38,18 +37,16 @@ export default function Map({ params }) {
   Utility.analytics(window.location.pathname)
 
   const config = useStatic((state) => state.config.map)
+  const { style } = useTileLayer()
 
-  const tileLayer = useTileLayer()
-
-  const staticUserSettings = useStatic((state) => state.userSettings)
+  // const staticUserSettings = useStatic((state) => state.userSettings)
   const ui = useStatic((state) => state.ui)
-  const timeOfDay = useStatic((state) => state.timeOfDay)
-  const isMobile = useStatic((state) => state.isMobile)
+  // const timeOfDay = useStatic((state) => state.timeOfDay)
+  // const isMobile = useStatic((state) => state.isMobile)
   const Icons = useStatic((state) => state.Icons)
   const error = useStatic((state) => state.clientError)
 
   const filters = useStore((state) => state.filters)
-  const settings = useStore((state) => state.settings)
   const icons = useStore((state) => state.icons)
   const userSettings = useStore((state) => state.userSettings)
 
@@ -86,29 +83,9 @@ export default function Map({ params }) {
     }
   }, [windowState])
 
-  useEffect(() => {
-    if (settings.navigationControls === 'leaflet' && map) {
-      const lc = control
-        .locate({
-          position: 'bottomright',
-          icon: 'fas fa-crosshairs',
-          keepCurrentZoomLevel: true,
-          setView: 'untilPan',
-        })
-        .addTo(map)
-      return () => {
-        lc.remove()
-      }
-    }
-  }, [settings.navigationControls, map])
-
   if (!Icons) return null
   return (
     <>
-      <TileLayer {...tileLayer} />
-      {settings.navigationControls === 'leaflet' && (
-        <ZoomControl position="bottomright" />
-      )}
       {Object.entries({ ...ui, ...ui.wayfarer, ...ui.admin }).map(
         ([category, value]) => {
           let enabled = false
@@ -178,7 +155,7 @@ export default function Map({ params }) {
               return (
                 <GenerateCells
                   key={category}
-                  tileStyle={tileLayer?.style || 'light'}
+                  tileStyle={style}
                 />
               )
             }

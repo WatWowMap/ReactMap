@@ -63,8 +63,8 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
   const { area, zoom } = req.params
   try {
     const { scanAreas } = config.areas
-    const validScanAreas = scanAreas[req.headers.host]
-      ? scanAreas[req.headers.host]
+    const validScanAreas = scanAreas[req.headers.host.replaceAll('.', '_')]
+      ? scanAreas[req.headers.host.replaceAll('.', '_')]
       : scanAreas.main
     if (validScanAreas.features.length) {
       const foundArea = validScanAreas.features.find(
