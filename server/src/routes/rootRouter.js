@@ -116,8 +116,10 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           )
         }
       })
-      req.session.save()
+    } else if (!req.session.perms) {
+      req.session.perms = {}
     }
+    req.session.save()
 
     const getUser = async () => {
       if (config.authMethods.length && req.user) {
