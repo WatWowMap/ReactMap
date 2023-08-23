@@ -15,12 +15,13 @@ const DevicePoly = ({ route, type, radius }) => {
 
   const safeRoute = React.useMemo(() => {
     try {
+      // check for null
       if (!route) return null
       // check for mariadb or mysql route
       const parsed = typeof route === 'string' ? JSON.parse(route) : route
       // Leveling
       if (!Array.isArray(parsed)) return parsed
-      // Single or multi
+      // Normalizing
       return parsed[0].lat ? [parsed] : parsed
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -39,24 +40,23 @@ const DevicePoly = ({ route, type, radius }) => {
       </>
     )
   }
-  if (Array.isArray(safeRoute)) {
-    return type?.includes('circle')
-      ? safeRoute.map((polygon, i) => (
-          <Polyline
-            key={i}
-            positions={polygon.map((poly) => [poly.lat, poly.lon])}
-            color={color}
-          />
-        ))
-      : safeRoute.map((polygon, i) => (
-          <Polygon
-            key={i}
-            positions={polygon.map((poly) => [poly.lat, poly.lon])}
-            color={color}
-          />
-        ))
-  }
-  return null
+  if (!Array.isArray(safeRoute)) return null
+
+  return type?.includes('circle')
+    ? safeRoute.map((polygon, i) => (
+        <Polyline
+          key={i}
+          positions={polygon.map((poly) => [poly.lat, poly.lon])}
+          color={color}
+        />
+      ))
+    : safeRoute.map((polygon, i) => (
+        <Polygon
+          key={i}
+          positions={polygon.map((poly) => [poly.lat, poly.lon])}
+          color={color}
+        />
+      ))
 }
 
 const MemoDevicePoly = React.memo(
