@@ -20,7 +20,7 @@ export function Toolbar() {
       flexWrap="nowrap"
       height={55}
     >
-      <Button LinkComponent={Link} to="/">
+      <Button component={Link} to="/">
         Go Back
       </Button>
       <Typography variant="h6">Playground</Typography>

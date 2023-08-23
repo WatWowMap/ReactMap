@@ -1,5 +1,5 @@
-// @ts-check
 import { create } from 'zustand'
+import { SelectChangeEvent } from '@mui/material'
 import { downloadJson } from '@services/functions/downloadJson'
 
 export const usePlayStore = create(() => ({
@@ -9,8 +9,7 @@ export const usePlayStore = create(() => ({
   valid: true,
 }))
 
-/** @param {string | object} code */
-export const setCode = (code) => {
+export const setCode = (code: string | object) => {
   if (typeof code === 'object') {
     return usePlayStore.setState({ code: JSON.stringify(code, null, 2) })
   }
@@ -19,8 +18,7 @@ export const setCode = (code) => {
   }
 }
 
-/** @param {import('@mui/material').SelectChangeEvent<string>} event */
-export const setComponent = ({ target }) =>
+export const setComponent = ({ target }: SelectChangeEvent<string>) =>
   usePlayStore.setState({ component: target.value })
 
 export const toggleEditor = () =>

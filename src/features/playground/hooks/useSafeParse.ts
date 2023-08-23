@@ -1,4 +1,3 @@
-// @ts-check
 import { usePlayStore } from './store'
 
 export function useSafeParse() {
@@ -8,10 +7,13 @@ export function useSafeParse() {
   try {
     const parsed = JSON.parse(code)
     if (!parsed.settings) {
-      parsed.settings = { parentStyle: {} }
+      parsed.settings = { parentStyle: {}, parentSx: {} }
     }
     if (!parsed.settings.parentStyle) {
       parsed.settings.parentStyle = {}
+    }
+    if (!parsed.settings.parentSx) {
+      parsed.settings.parentSx = {}
     }
     if (!parsed.components) {
       parsed.components = []
@@ -30,7 +32,7 @@ export function useSafeParse() {
       components: [],
       footerButtons: [],
       titles: [],
-      settings: { parentStyle: {} },
+      settings: { parentStyle: {}, parentSx: {} },
     }
   }
 }

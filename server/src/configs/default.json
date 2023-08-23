@@ -280,6 +280,7 @@
         "parentAlignItems": "center",
         "parentJustifyContent": "center",
         "parentStyle": {},
+        "parentSx": {},
         "permanent": false,
         "freeloaderOnly": false,
         "donorOnly": false,
@@ -297,7 +298,8 @@
         "parentSpacing": 0,
         "parentAlignItems": "center",
         "parentJustifyContent": "center",
-        "parentStyle": {}
+        "parentStyle": {},
+        "parentSx": {}
       },
       "titles": [],
       "components": [],
@@ -308,7 +310,8 @@
         "parentSpacing": 0,
         "parentAlignItems": "center",
         "parentJustifyContent": "center",
-        "parentStyle": {}
+        "parentStyle": {},
+        "parentSx": {}
       },
       "components": []
     }

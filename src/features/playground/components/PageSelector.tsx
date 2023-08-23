@@ -1,11 +1,10 @@
-// @ts-check
 import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import { CUSTOM_COMPONENT } from '@services/queries/config'
 
-import { setCode, setComponent, usePlayStore } from './store'
+import { setCode, setComponent, usePlayStore } from '../hooks/store'
 
 const PAGES = ['loginPage', 'messageOfTheDay', 'donorPage']
 
