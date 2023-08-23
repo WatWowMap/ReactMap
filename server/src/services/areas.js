@@ -247,7 +247,8 @@ const getAreas = async () => {
           .getSafe('multiDomains')
           .map(async (d) => [
             d.general?.geoJsonFileName
-            ? d.domain.replaceAll('.','_') : 'main',
+              ? d.domain.replaceAll('.','_')
+              : 'main',
             await loadScanPolygons(d.general?.geoJsonFileName || main),
           ]),
       ),
