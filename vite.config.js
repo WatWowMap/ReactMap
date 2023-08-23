@@ -2,7 +2,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable import/no-extraneous-dependencies */
 
-const { defineConfig, loadEnv, splitVendorChunkPlugin } = require('vite')
+const { defineConfig, loadEnv } = require('vite')
 const { default: react } = require('@vitejs/plugin-react')
 const { default: checker } = require('vite-plugin-checker')
 const { viteStaticCopy } = require('vite-plugin-static-copy')
@@ -118,7 +118,6 @@ const viteConfig = defineConfig(async ({ mode }) => {
       react({
         jsxRuntime: 'classic',
       }),
-      splitVendorChunkPlugin(),
       ...(isDevelopment
         ? [
             checker({
@@ -210,6 +209,7 @@ const viteConfig = defineConfig(async ({ mode }) => {
         output: {
           manualChunks: (id) => {
             if (id.endsWith('.css')) return 'index'
+            if (id.includes('node_modules')) return 'vendor'
             // return id.replace(/.*node_modules\//, '').split('/')[0]
             if (id.includes('src')) return version.replaceAll('.', '-')
           },
