@@ -67,8 +67,9 @@ export function useQueryWithTimeout(category, perms) {
     },
   } = useStatic.getState()
 
-  const timeout = useRef(new RobustTimeout((polling || 10) * 1000) || {})
-  // const location = useStore((s) => s.location)
+  const timeout = useRef(
+    new RobustTimeout((polling[category] || 10) * 1000) || {},
+  )
   const zoom = useStore((s) => s.zoom)
 
   const userSettings = useStore(
@@ -95,7 +96,7 @@ export function useQueryWithTimeout(category, perms) {
         filters: trimFilters(filters, userSettings, category, onlyAreas),
       },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
-      // skip: !active,
+      skip: !active,
     },
   )
 

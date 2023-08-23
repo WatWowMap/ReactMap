@@ -1,47 +1,64 @@
+// @ts-check
 /* eslint-disable react/no-array-index-key */
-import React, { memo } from 'react'
+import * as React from 'react'
 import { Polyline, Polygon, Circle } from 'react-leaflet'
 
-const DevicePoly = ({ device, color }) => {
-  if (!device.route) return null
+import { useStore } from '@hooks/useStore'
 
-  if (typeof device.route === 'string') {
-    device.route = JSON.parse(device.route)
-  }
-  if (device.type === 'leveling') {
+/**
+ *
+ * @param {import('@rm/types').Device} props
+ * @returns
+ */
+const DevicePoly = ({ route, type, radius }) => {
+  const color = useStore((s) => s.userSettings.admin.devicePathColor)
+
+  const safeRoute = React.useMemo(() => {
+    try {
+      if (typeof route === 'string') {
+        return JSON.parse(route)
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn(e)
+    }
+    return route
+  }, [route])
+
+  if (!safeRoute) return null
+
+  if (type === 'leveling') {
     return (
       <>
-        <Circle center={device.route} pathOptions={{ color }} />
-        <Circle
-          center={device.route}
-          radius={device.radius}
-          pathOptions={{ color }}
-        />
+        <Circle center={safeRoute} radius={5} color={color} />
+        <Circle center={safeRoute} radius={radius} color={color} />
       </>
     )
   }
-  const arrayRoute = device.route[0].lat ? [device.route] : device.route
+  const arrayRoute = safeRoute[0].lat ? [safeRoute] : safeRoute
   if (Array.isArray(arrayRoute)) {
-    return device?.type?.includes('circle')
+    return type?.includes('circle')
       ? arrayRoute.map((polygon, i) => (
           <Polyline
             key={i}
-            positions={polygon.map((route) => [route.lat, route.lon])}
-            pathOptions={{ color }}
+            positions={polygon.map((poly) => [poly.lat, poly.lon])}
+            color={color}
           />
         ))
       : arrayRoute.map((polygon, i) => (
           <Polygon
             key={i}
-            positions={polygon.map((route) => [route.lat, route.lon])}
-            pathOptions={{ color }}
+            positions={polygon.map((poly) => [poly.lat, poly.lon])}
+            color={color}
           />
         ))
   }
   return null
 }
 
-const areEqual = (prev, next) =>
-  prev.device.type === next.device.type && prev.color === next.color
+const MemoDevicePoly = React.memo(
+  DevicePoly,
+  (prev, next) => prev.type === next.type,
+)
 
-export default memo(DevicePoly, areEqual)
+export default MemoDevicePoly
