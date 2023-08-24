@@ -49,9 +49,4 @@ watcher.on('add', (path) => {
   handle(rawFile, domain, 'ADD')
 })
 
-module.exports = watcher
-
-process.on('SIGINT', () => {
-  watcher.close()
-  process.exit(0)
-})
+module.exports.watcher = watcher
