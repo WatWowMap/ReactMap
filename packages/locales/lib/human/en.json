@@ -661,5 +661,6 @@
   "component_message_of_the_day": "Message of the Day",
   "download": "Download",
   "playground": "Playground",
-  "locale": "Locale"
+  "locale": "Locale",
+  "saved": "Saved"
 }

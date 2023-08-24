@@ -45,3 +45,9 @@ export const VALIDATE_USER = gql`
     }
   }
 `
+
+export const SAVE_COMPONENT = gql`
+  mutation SaveComponent($component: String, $code: String) {
+    saveComponent(component: $component, code: $code)
+  }
+`

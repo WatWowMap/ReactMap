@@ -10,6 +10,7 @@ import { VALIDATE_USER } from '@services/queries/config'
 import { CodeWrapper } from './components/Editor'
 import { MuiToolbar } from './components/Toolbar'
 import { Viewer } from './components/Viewer'
+import { StatusNotification } from './components/Status'
 
 export default function Playground() {
   const { data } = useQuery(VALIDATE_USER)
@@ -30,6 +31,7 @@ export default function Playground() {
         <CodeWrapper />
         <Viewer />
       </Grid2>
+      <StatusNotification />
     </Box>
   )
 }

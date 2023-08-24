@@ -14,30 +14,24 @@ import { useTranslation } from 'react-i18next'
 import { ToggleEditor } from './ToggleEditor'
 import { Download } from './Download'
 import { ThemeMenuItem } from './Theme'
+import { Save } from './Save'
+import { openMenu, usePlayStore } from '../hooks/store'
 
 export function MainMenu() {
   const { t } = useTranslation()
-
-  const [anchorEl, setAnchorEl] = React.useState(null)
+  const anchorEl = usePlayStore((s) => s.menuAnchorEl)
 
   return (
     <>
-      <Button
-        color="inherit"
-        startIcon={<MenuIcon />}
-        onClick={(e) => setAnchorEl(e.currentTarget)}
-      >
+      <Button color="inherit" startIcon={<MenuIcon />} onClick={openMenu}>
         {t('menu')}
       </Button>
-      <Menu
-        open={!!anchorEl}
-        anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
-      >
-        <Download />
+      <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={openMenu}>
         <ToggleEditor />
         <ThemeMenuItem />
         <Divider />
+        <Download />
+        <Save />
         <MenuItem component={Link} to="/" dense>
           <ListItemIcon>
             <ClearIcon fontSize="small" />

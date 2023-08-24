@@ -1,8 +1,6 @@
 // @ts-check
 import { create } from 'zustand'
 import { downloadJson } from '@services/functions/downloadJson'
-import apolloClient from '@services/apollo'
-import { CUSTOM_COMPONENT } from '@services/queries/config'
 
 export const usePlayStore = create(() => ({
   code: '{}',
@@ -10,6 +8,10 @@ export const usePlayStore = create(() => ({
   hideEditor: false,
   component: 'loginPage',
   valid: true,
+  success: false,
+  loading: false,
+  error: null,
+  menuAnchorEl: null,
 }))
 
 /**
@@ -24,6 +26,20 @@ export const setCode = (code) => {
     return usePlayStore.setState({ code })
   }
 }
+
+/**
+ * Opens the main menu
+ * @param {React.MouseEvent<HTMLButtonElement, MouseEvent>} e
+ * @returns
+ */
+export const openMenu = (e) =>
+  usePlayStore.setState({ menuAnchorEl: e.currentTarget })
+
+/**
+ * Closes the main menu
+ * @returns
+ */
+export const closeMenu = () => usePlayStore.setState({ menuAnchorEl: null })
 
 /**
  * Sets the component to be used in the editor
@@ -44,24 +60,21 @@ export const handleDownload = () => {
   try {
     const { code, component } = usePlayStore.getState()
     downloadJson(code, `${component}.json`)
-    usePlayStore.setState({ original: code })
+    usePlayStore.setState({ original: code, menuAnchorEl: null })
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e)
-    // eslint-disable-next-line no-alert
-    alert('Invalid JSON')
+    usePlayStore.setState({ error: e.message })
   }
 }
 
 /**
- * fetches the code from config to load into the editor
- * @param {ReturnType<typeof usePlayStore['getState']>['component']} component
+ * Handles resetting all of the various states
+ * @returns
  */
-export const fetchCode = async (component) => {
-  const { data } = await apolloClient.query({
-    query: CUSTOM_COMPONENT,
-    variables: { component },
+export const handleReset = () =>
+  usePlayStore.setState({
+    loading: false,
+    success: false,
+    error: null,
   })
-  const stringified = JSON.stringify(data?.customComponent || {}, null, 2)
-  usePlayStore.setState({ original: stringified, code: stringified })
-}

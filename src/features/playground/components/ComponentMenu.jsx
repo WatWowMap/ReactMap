@@ -13,7 +13,9 @@ import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
-import { fetchCode, setComponent, usePlayStore } from '../hooks/store'
+import { useQuery } from '@apollo/client'
+import { CUSTOM_COMPONENT } from '@services/queries/config'
+import { setComponent, usePlayStore } from '../hooks/store'
 
 const PAGES = ['loginPage', 'messageOfTheDay', 'donationPage']
 
@@ -22,6 +24,10 @@ const pagesIcon = <PagesIcon />
 export function ComponentMenu() {
   const { t } = useTranslation()
   const component = usePlayStore((s) => s.component)
+  const { data, loading, error } = useQuery(CUSTOM_COMPONENT, {
+    variables: { component },
+  })
+
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [pendingComponent, setPendingComponent] = React.useState(null)
 
@@ -33,8 +39,11 @@ export function ComponentMenu() {
     const { original, code } = usePlayStore.getState()
     setAnchorEl(null)
     if (newComponent) {
-      if (original === code) setComponent(newComponent)
-      else setPendingComponent(newComponent)
+      if (original === code) {
+        setComponent(newComponent)
+      } else {
+        setPendingComponent(newComponent)
+      }
     }
   }
 
@@ -46,8 +55,13 @@ export function ComponentMenu() {
   }
 
   React.useEffect(() => {
-    fetchCode(component)
-  }, [component])
+    usePlayStore.setState((prev) => {
+      const code = data?.customComponent
+        ? JSON.stringify(data?.customComponent, null, 2)
+        : prev.code
+      return { loading, error, code, original: code }
+    })
+  }, [data, loading, error])
 
   return (
     <>

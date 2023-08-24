@@ -159,4 +159,5 @@ type Mutation {
   setGymBadge(gymId: String, badge: Int): Boolean
   setExtraFields(key: String, value: String): Boolean
   nestSubmission(id: ID, name: String): Boolean
+  saveComponent(component: String, code: String): Boolean
 }

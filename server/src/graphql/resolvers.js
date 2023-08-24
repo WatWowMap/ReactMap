@@ -1,3 +1,5 @@
+const fs = require('fs')
+const { resolve } = require('path')
 const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 const config = require('@rm/config')
@@ -663,6 +665,35 @@ const resolvers = {
       if (req.session) {
         req.session.tutorial = true
         req.session.save()
+      }
+      return false
+    },
+    saveComponent: async (_, { code, component }, { perms, req }) => {
+      if (perms.admin && code && component) {
+        const configFolder = resolve(__dirname, '../configs')
+        const ts = Math.floor(Date.now() / 1000)
+        if (
+          fs.existsSync(`${configFolder}/${component}/${req.headers.host}.json`)
+        ) {
+          fs.copyFileSync(
+            `${configFolder}/${component}/${req.headers.host}.json`,
+            `${configFolder}/${component}/${req.headers.host}_${ts}.json`,
+          )
+          fs.writeFileSync(
+            `${configFolder}/${component}/${req.headers.host}.json`,
+            code,
+            'utf8',
+          )
+        } else {
+          if (fs.existsSync(`${configFolder}/${component}.json`)) {
+            fs.copyFileSync(
+              `${configFolder}/${component}.json`,
+              `${configFolder}/${component}_${ts}.json`,
+            )
+          }
+          fs.writeFileSync(`${configFolder}/${component}.json`, code, 'utf8')
+        }
+        return true
       }
       return false
     },
