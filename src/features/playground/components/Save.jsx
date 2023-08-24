@@ -26,7 +26,7 @@ export function Save() {
   React.useEffect(() => {
     if (loading || error || data) {
       usePlayStore.setState((prev) => ({
-        success: !!data?.saveComponent,
+        success: data?.saveComponent,
         loading,
         error,
         menuAnchorEl: null,

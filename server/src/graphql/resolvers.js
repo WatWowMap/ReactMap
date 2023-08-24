@@ -684,18 +684,18 @@ const resolvers = {
             code,
             'utf8',
           )
-        } else {
-          if (fs.existsSync(`${configFolder}/${component}.json`)) {
-            fs.copyFileSync(
-              `${configFolder}/${component}.json`,
-              `${configFolder}/${component}_${ts}.json`,
-            )
-          }
-          fs.writeFileSync(`${configFolder}/${component}.json`, code, 'utf8')
+          return `Saved to ${configFolder}/${component}/${req.headers.host}.json`
         }
-        return true
+        if (fs.existsSync(`${configFolder}/${component}.json`)) {
+          fs.copyFileSync(
+            `${configFolder}/${component}.json`,
+            `${configFolder}/${component}_${ts}.json`,
+          )
+        }
+        fs.writeFileSync(`${configFolder}/${component}.json`, code, 'utf8')
+        return `Saved to ${configFolder}/${component}.json`
       }
-      return false
+      return null
     },
     strategy: async (_, args, { req, Db }) => {
       if (req.user) {

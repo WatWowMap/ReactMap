@@ -2,14 +2,28 @@
 import { create } from 'zustand'
 import { downloadJson } from '@services/functions/downloadJson'
 
+/**
+ * @typedef {{
+ *  code: string
+ *  original: string
+ *  hideEditor: boolean
+ *  component: string
+ *  valid: boolean
+ *  success: string | null
+ *  loading: boolean
+ *  error: import('@apollo/client').ApolloError
+ *  menuAnchorEl: null | HTMLElement
+ * }} PlayStore
+ * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<PlayStore>>}
+ */
 export const usePlayStore = create(() => ({
   code: '{}',
   original: '{}',
   hideEditor: false,
   component: 'loginPage',
   valid: true,
-  success: false,
   loading: false,
+  success: null,
   error: null,
   menuAnchorEl: null,
 }))
@@ -30,16 +44,9 @@ export const setCode = (code) => {
 /**
  * Opens the main menu
  * @param {React.MouseEvent<HTMLButtonElement, MouseEvent>} e
- * @returns
  */
 export const openMenu = (e) =>
   usePlayStore.setState({ menuAnchorEl: e.currentTarget })
-
-/**
- * Closes the main menu
- * @returns
- */
-export const closeMenu = () => usePlayStore.setState({ menuAnchorEl: null })
 
 /**
  * Sets the component to be used in the editor
@@ -75,6 +82,6 @@ export const handleDownload = () => {
 export const handleReset = () =>
   usePlayStore.setState({
     loading: false,
-    success: false,
+    success: null,
     error: null,
   })
