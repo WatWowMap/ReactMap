@@ -1,13 +1,25 @@
-import { LogLevelNames } from 'loglevel'
+import type { LogLevelNames } from 'loglevel'
 import config = require('server/src/configs/default.json')
 import example = require('server/src/configs/local.example.json')
 
-import { Schema } from './server'
+import type { Schema } from './server'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
 
-export interface Config<Client extends boolean = false> extends BaseConfig {
+export interface Config<Client extends boolean = false>
+  extends Omit<
+    BaseConfig,
+    | 'webhooks'
+    | 'devOptions'
+    | 'authentication'
+    | 'api'
+    | 'map'
+    | 'multiDomains'
+    | 'database'
+    | 'scanner'
+    | 'icons'
+  > {
   client: Client extends true
     ? {
         version: string
@@ -24,6 +36,7 @@ export interface Config<Client extends boolean = false> extends BaseConfig {
   webhooks: Webhook[]
   devOptions: {
     logLevel: LogLevelNames
+    skipUpdateCheck?: boolean
   } & BaseConfig['devOptions']
   areas: Awaited<ReturnType<typeof import('server/src/services/areas')>>
   authentication: {
@@ -36,10 +49,16 @@ export interface Config<Client extends boolean = false> extends BaseConfig {
         trialPeriod: {
           start: {
             js: Date
-          } & BaseConfig['authentication']['strategies'][number]['trialPeriod']['start']
+          } & Exclude<
+            BaseConfig['authentication']['strategies'][number]['trialPeriod'],
+            undefined
+          >['start']
           end: {
             js: Date
-          } & BaseConfig['authentication']['strategies'][number]['trialPeriod']['end']
+          } & Exclude<
+            BaseConfig['authentication']['strategies'][number]['trialPeriod'],
+            undefined
+          >['end']
         } & BaseConfig['authentication']['strategies'][number]['trialPeriod']
       } & BaseConfig['authentication']['strategies'][number],
     ]
@@ -80,6 +99,7 @@ export interface Config<Client extends boolean = false> extends BaseConfig {
     } & BaseConfig['map']['loginPage']
   } & BaseConfig['map']
   multiDomains: (BaseConfig['map'] & { domain: string })[]
+  multiDomainsObj: Record<string, BaseConfig['map'] & { domain: string }>
   database: {
     schemas: Schema[]
     settings: {
@@ -104,9 +124,6 @@ export interface Config<Client extends boolean = false> extends BaseConfig {
     defaultIcons: Record<string, string>
   } & BaseConfig['icons']
   manualAreas: ExampleConfig['manualAreas'][number][]
-  devOptions: {
-    skipUpdateCheck?: boolean
-  } & BaseConfig['devOptions']
 }
 
 export interface Webhook {

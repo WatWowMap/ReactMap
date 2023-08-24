@@ -102,10 +102,14 @@ class TelegramClient {
                   ))),
           ]),
         ),
+        admin: false,
         areaRestrictions: areaPerms(groups),
         webhooks: webhookPerms(groups, 'telegramGroups', trialActive),
         scanner: scannerPerms(groups, 'telegramGroups', trialActive),
       },
+    }
+    if (this.strategy.allowedUsers?.includes(newUserObj.id)) {
+      newUserObj.perms.admin = true
     }
     return newUserObj
   }

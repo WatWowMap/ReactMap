@@ -32,6 +32,7 @@ const pkg = require('../../package.json')
 const getAreas = require('./services/areas')
 const { connection } = require('./db/knexfile.cjs')
 const startApollo = require('./graphql/server')
+require('./services/watcher')
 
 Event.clients = Clients
 
@@ -283,6 +284,7 @@ startApollo(httpServer).then((server) => {
 
 connection.migrate
   .latest()
+  .then(() => connection.destroy())
   .then(async () => {
     await Db.getDbContext()
     await Promise.all([
@@ -314,6 +316,5 @@ connection.migrate
     )
     setTimeout(() => text.stop(), 1_000)
   })
-  .then(() => connection.destroy())
 
 module.exports = app

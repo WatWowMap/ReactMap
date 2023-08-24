@@ -193,3 +193,8 @@ input BackupUpdate {
   name: String
   data: JSON
 }
+
+type ValidUserObj {
+  loggedIn: Boolean
+  admin: Boolean
+}

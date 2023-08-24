@@ -16,6 +16,7 @@ import ImportExportIcon from '@mui/icons-material/ImportExport'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import FeedbackIcon from '@mui/icons-material/Feedback'
 import HeartIcon from '@mui/icons-material/Favorite'
+import { downloadJson } from '@services/functions/downloadJson'
 
 import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import { I } from '../general/I'
@@ -37,6 +38,7 @@ const importSettings = (e) => {
 
 const exportSettings = () => {
   const json = localStorage.getItem('local-state')
+  downloadJson(json, 'settings.json')
   const el = document.createElement('a')
   el.setAttribute(
     'href',
@@ -120,17 +122,19 @@ export default function DrawerActions() {
         </ListItemButton>
       )}
       <Divider />
-      <ListItemButton
-        href="https://github.com/WatWowMap/ReactMap"
-        referrerPolicy="no-referrer"
-        target="_blank"
-        rel="noreferrer"
-      >
-        <ListItemIcon>
-          <HeartIcon color="primary" />
-        </ListItemIcon>
-        <ListItemText primary={t('contribute')} />
-      </ListItemButton>
+      {!config.map.rude && (
+        <ListItemButton
+          href="https://github.com/WatWowMap/ReactMap"
+          referrerPolicy="no-referrer"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <ListItemIcon>
+            <HeartIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={t('contribute')} />
+        </ListItemButton>
+      )}
       {config.map.statsLink && (
         <ListItemButton
           component="button"

@@ -145,6 +145,7 @@ type Query {
   webhookCategories: [String]
   webhookUser: UserPoracleConfig
   scanner(category: String, method: String, data: JSON): ScannerApi
+  validateUser: ValidUserObj
 }
 
 type Mutation {
@@ -158,4 +159,5 @@ type Mutation {
   setGymBadge(gymId: String, badge: Int): Boolean
   setExtraFields(key: String, value: String): Boolean
   nestSubmission(id: ID, name: String): Boolean
+  saveComponent(component: String, code: String): String
 }

@@ -1,5 +1,3 @@
-declare module '@rm/config'
-
-import config = require('config')
+import config from 'config'
 
 export = config
