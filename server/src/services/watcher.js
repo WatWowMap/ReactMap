@@ -20,18 +20,28 @@ const watcher = chokidar.watch(configDir, {
 const clean = (path) =>
   path.replace(`${configDir}/`, '').replace('.json', '').split('/', 2)
 
-const handle = (rawFile, domain, event) => {
+/**
+ *
+ * @param {string} event
+ * @param {string} rawFile
+ * @param {string} [domain]
+ */
+const handle = (event, rawFile, domain) => {
   switch (rawFile) {
     case 'loginPage':
     case 'donationPage':
     case 'messageOfTheDay':
-      log.info(HELPERS.config, `[${event}]`, rawFile, domain || '')
-      if (domain && config.multiDomainsObj[domain]?.[rawFile]) {
-        config.multiDomainsObj[domain][rawFile] = checkConfigJsons(
-          rawFile,
-          domain,
-        )
+      if (domain) {
+        const domainKey = domain.replaceAll('.', '_')
+        if (config.multiDomainsObj[domainKey]?.[rawFile]) {
+          log.info(HELPERS.config, `[${event}]`, rawFile, domain)
+          config.multiDomainsObj[domainKey][rawFile] = checkConfigJsons(
+            rawFile,
+            domain,
+          )
+        }
       } else {
+        log.info(HELPERS.config, `[${event}]`, rawFile)
         config.map[rawFile] = checkConfigJsons(rawFile)
       }
       break
@@ -41,12 +51,13 @@ const handle = (rawFile, domain, event) => {
 }
 watcher.on('change', (path) => {
   const [rawFile, domain] = clean(path)
-  handle(rawFile, domain, 'CHANGE')
+  handle('CHANGE', rawFile, domain)
 })
 
 watcher.on('add', (path) => {
   const [rawFile, domain] = clean(path)
-  handle(rawFile, domain, 'ADD')
+  if (domain && domain.split('_').length > 1) return
+  handle('ADD', rawFile, domain)
 })
 
 module.exports.watcher = watcher

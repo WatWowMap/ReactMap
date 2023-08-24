@@ -24,6 +24,7 @@ function checkConfigJsons(fileName, domain = '') {
   if (Object.keys(generalJson).length) {
     log.info(
       HELPERS.config,
+      domain ? `[${domain}]` : '',
       `config ${fileName}.json found, overwriting your config.map.${fileName} with the found data.`,
     )
   }
