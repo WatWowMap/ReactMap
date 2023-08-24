@@ -49,6 +49,11 @@ export const openMenu = (e) =>
   usePlayStore.setState({ menuAnchorEl: e.currentTarget })
 
 /**
+ * Closes the main menu
+ */
+export const closeMenu = () => usePlayStore.setState({ menuAnchorEl: null })
+
+/**
  * Sets the component to be used in the editor
  * @param {ReturnType<typeof usePlayStore['getState']>['component']} component
  */

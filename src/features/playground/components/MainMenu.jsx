@@ -15,7 +15,7 @@ import { ToggleEditor } from './ToggleEditor'
 import { Download } from './Download'
 import { ThemeMenuItem } from './Theme'
 import { Save } from './Save'
-import { openMenu, usePlayStore } from '../hooks/store'
+import { closeMenu, openMenu, usePlayStore } from '../hooks/store'
 
 const startIcon = <MenuIcon />
 
@@ -28,7 +28,7 @@ export function MainMenu() {
       <Button color="inherit" startIcon={startIcon} onClick={openMenu}>
         {t('menu')}
       </Button>
-      <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={openMenu}>
+      <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
         <ToggleEditor />
         <ThemeMenuItem />
         <Divider />
