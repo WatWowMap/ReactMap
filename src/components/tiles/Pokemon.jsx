@@ -56,7 +56,6 @@ const getGlowStatus = (pkmn, userSettings) => {
  * @returns
  */
 const PokemonTile = ({ force, ...pkmn }) => {
-  const internalId = `${pkmn.pokemon_id}-${pkmn.form}`
   const markerRef = React.useRef(null)
   const [done, setDone] = React.useState(false)
   useMarkerTimer(pkmn.expire_timestamp, markerRef)
@@ -71,6 +70,7 @@ const PokemonTile = ({ force, ...pkmn }) => {
     configZoom,
     timeOfDay,
   ] = useStatic((s) => {
+    const internalId = `${pkmn.pokemon_id}-${pkmn.form}`
     const { Icons, excludeList, timerList, config, map } = s
     const badgeId = getBadge(pkmn.bestPvp)
     const filter = useStore.getState().filters.pokemon.filter[internalId]

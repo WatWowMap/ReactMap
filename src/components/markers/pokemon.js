@@ -1,6 +1,11 @@
 import { Icon, divIcon } from 'leaflet'
 import { useStatic } from '@hooks/useStore'
 
+/**
+ *
+ * @param {{ iconUrl: string, iconSize: number }} props
+ * @returns
+ */
 export const basicMarker = ({ iconUrl, iconSize }) =>
   new Icon({
     iconUrl,

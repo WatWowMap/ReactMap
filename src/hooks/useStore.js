@@ -112,7 +112,7 @@ export const useStore = create(
  *   config: object,
  *   auth: object,
  *   filters: object,
- *   masterfile: { invasions: object }
+ *   masterfile: import('@rm/types').Masterfile
  *   settings: Record<string, any>
  *   userSettings: Record<string, any>
  *   clientError: string,
