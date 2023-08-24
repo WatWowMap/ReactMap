@@ -20,7 +20,7 @@ export function Viewer() {
   if (!configObj) return null
 
   return (
-    <Grid2 xs={hideEditor ? 12 : 6} overflow="auto" height="calc(100vh - 55px)">
+    <Grid2 xs={hideEditor ? 12 : 6} overflow="auto" height="calc(100vh - 48px)">
       {component === 'loginPage' ? (
         <Grid2
           xs={12}

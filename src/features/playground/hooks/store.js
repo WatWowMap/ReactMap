@@ -13,6 +13,7 @@ export const usePlayStore = create(() => ({
 }))
 
 /**
+ * Sets the code in the editor, accepts either an object or a string
  * @param {string | object} code
  */
 export const setCode = (code) => {
@@ -24,12 +25,21 @@ export const setCode = (code) => {
   }
 }
 
-/** @param {ReturnType<typeof usePlayStore['getState']>['component']} component */
+/**
+ * Sets the component to be used in the editor
+ * @param {ReturnType<typeof usePlayStore['getState']>['component']} component
+ */
 export const setComponent = (component) => usePlayStore.setState({ component })
 
+/**
+ * Shows or hides the editor to enable fullscreen viewing of what's being worked on
+ */
 export const toggleEditor = () =>
   usePlayStore.setState((s) => ({ hideEditor: !s.hideEditor }))
 
+/**
+ * Creates an element and clicks it to download the JSON
+ */
 export const handleDownload = () => {
   try {
     const { code, component } = usePlayStore.getState()
@@ -43,7 +53,7 @@ export const handleDownload = () => {
 }
 
 /**
- *
+ * fetches the code from config to load into the editor
  * @param {ReturnType<typeof usePlayStore['getState']>['component']} component
  */
 export const fetchCode = async (component) => {

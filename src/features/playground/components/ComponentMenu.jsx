@@ -3,13 +3,15 @@ import * as React from 'react'
 import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 import Menu from '@mui/material/Menu'
-import PageViewIcon from '@mui/icons-material/Pageview'
+import PagesIcon from '@mui/icons-material/Pages'
 import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 
 import { fetchCode, setComponent, usePlayStore } from '../hooks/store'
 
 const PAGES = ['loginPage', 'messageOfTheDay', 'donationPage']
+
+const pagesIcon = <PagesIcon />
 
 export function ComponentMenu() {
   const { t } = useTranslation()
@@ -34,7 +36,7 @@ export function ComponentMenu() {
       <Button
         color="inherit"
         onClick={(e) => setAnchorEl(e.currentTarget)}
-        startIcon={<PageViewIcon />}
+        startIcon={pagesIcon}
       >
         {t('component')}
       </Button>
