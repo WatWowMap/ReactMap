@@ -16,4 +16,20 @@ const config = require('config')
 
 config.getSafe = config.get
 
+config.getMapConfig = (req) => {
+  const domain = /** @type {const} */ (
+    `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
+  )
+  return config.has(domain) ? config.getSafe(domain) : config.getSafe('map')
+}
+
+config.getAreas = (req, key) => {
+  const location = /** @type {const} */ (
+    `areas.${key}.${req.headers.host.replaceAll('.', '_')}`
+  )
+  return config.has(location)
+    ? config.getSafe(location)
+    : config.getSafe(`areas.${key}.main`)
+}
+
 module.exports = config

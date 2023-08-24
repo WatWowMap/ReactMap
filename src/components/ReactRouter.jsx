@@ -8,6 +8,8 @@ import Blocked from './layout/auth/Blocked'
 import Errors from './Errors'
 import ClearStorage from './ClearStorage'
 
+const Playground = React.lazy(() => import('../features/playground'))
+
 export default function ReactRouter({ serverSettings }) {
   const authRoute = React.useMemo(
     () => <Auth serverSettings={serverSettings} />,
@@ -19,6 +21,7 @@ export default function ReactRouter({ serverSettings }) {
       <Route path="/" element={authRoute} />
       <Route path="reset" element={<ClearStorage />} />
       <Route path="login" element={<Login serverSettings={serverSettings} />} />
+      <Route path="playground" element={<Playground />} />
       <Route
         path="blocked/:info"
         element={<Blocked serverSettings={serverSettings} />}

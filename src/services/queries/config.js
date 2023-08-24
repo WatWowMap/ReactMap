@@ -36,3 +36,18 @@ export const SEARCHABLE = gql`
     searchable
   }
 `
+
+export const VALIDATE_USER = gql`
+  query ValidateUser {
+    validateUser {
+      admin
+      loggedIn
+    }
+  }
+`
+
+export const SAVE_COMPONENT = gql`
+  mutation SaveComponent($component: String, $code: String) {
+    saveComponent(component: $component, code: $code)
+  }
+`
