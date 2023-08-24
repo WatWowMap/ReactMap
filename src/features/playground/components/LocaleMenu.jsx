@@ -7,7 +7,7 @@ import TranslateIcon from '@mui/icons-material/Translate'
 
 import { useTranslation } from 'react-i18next'
 
-const translateIcon = <TranslateIcon />
+const startIcon = <TranslateIcon />
 
 export function LocaleMenu() {
   const { t, i18n } = useTranslation()
@@ -28,7 +28,7 @@ export function LocaleMenu() {
       <Button
         color="inherit"
         onClick={(e) => setAnchorEl(e.currentTarget)}
-        startIcon={translateIcon}
+        startIcon={startIcon}
       >
         {t('locale')}
       </Button>

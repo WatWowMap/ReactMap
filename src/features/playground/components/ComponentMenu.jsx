@@ -19,7 +19,7 @@ import { setComponent, usePlayStore } from '../hooks/store'
 
 const PAGES = ['loginPage', 'messageOfTheDay', 'donationPage']
 
-const pagesIcon = <PagesIcon />
+const startIcon = <PagesIcon />
 
 export function ComponentMenu() {
   const { t } = useTranslation()
@@ -68,7 +68,7 @@ export function ComponentMenu() {
       <Button
         color="inherit"
         onClick={(e) => setAnchorEl(e.currentTarget)}
-        startIcon={pagesIcon}
+        startIcon={startIcon}
       >
         {t('component')}
       </Button>

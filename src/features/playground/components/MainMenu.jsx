@@ -17,13 +17,15 @@ import { ThemeMenuItem } from './Theme'
 import { Save } from './Save'
 import { openMenu, usePlayStore } from '../hooks/store'
 
+const startIcon = <MenuIcon />
+
 export function MainMenu() {
   const { t } = useTranslation()
   const anchorEl = usePlayStore((s) => s.menuAnchorEl)
 
   return (
     <>
-      <Button color="inherit" startIcon={<MenuIcon />} onClick={openMenu}>
+      <Button color="inherit" startIcon={startIcon} onClick={openMenu}>
         {t('menu')}
       </Button>
       <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={openMenu}>
