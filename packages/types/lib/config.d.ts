@@ -86,6 +86,7 @@ export interface Config<Client extends boolean = false> extends BaseConfig {
     } & BaseConfig['map']['loginPage']
   } & BaseConfig['map']
   multiDomains: (BaseConfig['map'] & { domain: string })[]
+  multiDomainsObj: Record<string, BaseConfig['map'] & { domain: string }>
   database: {
     schemas: Schema[]
     settings: {

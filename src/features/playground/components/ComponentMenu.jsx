@@ -25,6 +25,7 @@ export function ComponentMenu() {
   const { t } = useTranslation()
   const component = usePlayStore((s) => s.component)
   const { data, loading, error } = useQuery(CUSTOM_COMPONENT, {
+    fetchPolicy: 'network-only',
     variables: { component },
   })
 
