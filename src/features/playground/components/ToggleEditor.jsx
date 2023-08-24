@@ -1,7 +1,10 @@
 // @ts-check
 import * as React from 'react'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
+import MenuItem from '@mui/material/MenuItem'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
 
 import { toggleEditor, usePlayStore } from '../hooks/store'
 
@@ -9,17 +12,11 @@ export function ToggleEditor() {
   const hideEditor = usePlayStore((s) => s.hideEditor)
 
   return (
-    <FormControlLabel
-      control={
-        <Checkbox
-          size="small"
-          checked={hideEditor}
-          onChange={toggleEditor}
-          name="Hide Editor"
-        />
-      }
-      value="Hide Editor"
-      label="Hide Editor"
-    />
+    <MenuItem onClick={toggleEditor} dense>
+      <ListItemIcon>
+        {hideEditor ? <VisibilityOff /> : <Visibility />}
+      </ListItemIcon>
+      <ListItemText>{hideEditor ? 'Show Editor' : 'Hide Editor'}</ListItemText>
+    </MenuItem>
   )
 }

@@ -1,36 +1,38 @@
 import * as React from 'react'
+
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import { Link } from 'react-router-dom'
+import AppBar from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import { useTranslation } from 'react-i18next'
 
-import ThemeToggle from '@components/layout/general/ThemeToggle'
-import LocaleSelection from '@components/layout/general/LocaleSelection'
+import { ComponentMenu } from './ComponentMenu'
+import { LocaleMenu } from './LocaleMenu'
+import { MainMenu } from './MainMenu'
 
-import { PageSelector } from './PageSelector'
-import { ToggleEditor } from './ToggleEditor'
-import { Download } from './Download'
+export function MuiToolbar() {
+  const { t } = useTranslation()
 
-export function Toolbar() {
   return (
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-      flexWrap="nowrap"
-      height={55}
-    >
-      <Button LinkComponent={Link} to="/">
-        Go Back
-      </Button>
-      <Typography variant="h6">Playground</Typography>
-      <PageSelector />
-      <ToggleEditor />
-      <Download />
-      <Box width={150}>
-        <LocaleSelection />
-      </Box>
-      <ThemeToggle />
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
+        <Toolbar
+          variant="dense"
+          sx={{
+            '> *': {
+              mr: 2,
+            },
+          }}
+        >
+          <MainMenu />
+          <ComponentMenu />
+          <LocaleMenu />
+          <Box sx={{ flexGrow: 1 }} />
+          <Typography variant="h6" color="inherit" component="div" mr={0}>
+            {t('playground')}
+          </Typography>
+        </Toolbar>
+      </AppBar>
     </Box>
   )
 }

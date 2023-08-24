@@ -2,8 +2,8 @@
 import { usePlayStore } from './store'
 
 export function useSafeParse() {
-  const component = usePlayStore((s) => s.component)
   const code = usePlayStore((s) => s.code)
+  const component = usePlayStore((s) => s.component)
 
   try {
     const parsed = JSON.parse(code)
@@ -22,15 +22,8 @@ export function useSafeParse() {
     if (!parsed.titles && component !== 'loginPage') {
       parsed.titles = []
     }
-    usePlayStore.setState({ valid: true })
     return parsed
   } catch (e) {
-    usePlayStore.setState({ valid: false })
-    return {
-      components: [],
-      footerButtons: [],
-      titles: [],
-      settings: { parentStyle: {} },
-    }
+    return null
   }
 }

@@ -8,7 +8,7 @@ import { useQuery } from '@apollo/client'
 import { VALIDATE_USER } from '@services/queries/config'
 
 import { CodeWrapper } from './components/Editor'
-import { Toolbar } from './components/Toolbar'
+import { MuiToolbar } from './components/Toolbar'
 import { Viewer } from './components/Viewer'
 
 export default function Playground() {
@@ -25,7 +25,7 @@ export default function Playground() {
 
   return (
     <Box height="100vh">
-      <Toolbar />
+      <MuiToolbar />
       <Grid2 container>
         <CodeWrapper />
         <Viewer />

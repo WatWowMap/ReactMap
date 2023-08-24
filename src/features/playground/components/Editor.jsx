@@ -30,9 +30,9 @@ export function CodeEditor() {
       theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'vs-light'}
       defaultLanguage="json"
       value={code}
-      height="100%"
-      width="100%"
       onChange={setCode}
     />
   )
 }
+
+export const MemoizedCodeWrapper = React.memo(CodeWrapper)
