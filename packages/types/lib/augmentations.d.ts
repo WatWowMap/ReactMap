@@ -4,7 +4,7 @@ import { ExpressUser } from './server'
 import { Request } from 'express'
 
 declare module 'config' {
-  interface IConfig {
+  interface IConfig extends Config {
     getSafe: GetSafeConfig
     getMapConfig: (request: Request) => Config['map']
     getAreas: <T extends 'scanAreas' | 'scanAreasMenu'>(

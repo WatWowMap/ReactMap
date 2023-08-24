@@ -7,7 +7,19 @@ import type { Schema } from './server'
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
 
-export interface Config<Client extends boolean = false> extends BaseConfig {
+export interface Config<Client extends boolean = false>
+  extends Omit<
+    BaseConfig,
+    | 'webhooks'
+    | 'devOptions'
+    | 'authentication'
+    | 'api'
+    | 'map'
+    | 'multiDomains'
+    | 'database'
+    | 'scanner'
+    | 'icons'
+  > {
   client: Client extends true
     ? {
         version: string
@@ -24,6 +36,7 @@ export interface Config<Client extends boolean = false> extends BaseConfig {
   webhooks: Webhook[]
   devOptions: {
     logLevel: LogLevelNames
+    skipUpdateCheck?: boolean
   } & BaseConfig['devOptions']
   areas: Awaited<ReturnType<typeof import('server/src/services/areas')>>
   authentication: {
@@ -111,9 +124,6 @@ export interface Config<Client extends boolean = false> extends BaseConfig {
     defaultIcons: Record<string, string>
   } & BaseConfig['icons']
   manualAreas: ExampleConfig['manualAreas'][number][]
-  devOptions: {
-    skipUpdateCheck?: boolean
-  } & BaseConfig['devOptions']
 }
 
 export interface Webhook {
