@@ -28,7 +28,12 @@ export function MainMenu() {
       <Button color="inherit" startIcon={startIcon} onClick={openMenu}>
         {t('menu')}
       </Button>
-      <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
+      <Menu
+        transitionDuration={200}
+        open={!!anchorEl}
+        anchorEl={anchorEl}
+        onClose={closeMenu}
+      >
         <ToggleEditor />
         <ThemeMenuItem />
         <Divider />

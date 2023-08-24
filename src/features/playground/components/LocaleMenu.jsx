@@ -32,7 +32,12 @@ export function LocaleMenu() {
       >
         {t('locale')}
       </Button>
-      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose()}>
+      <Menu
+        transitionDuration={200}
+        anchorEl={anchorEl}
+        open={!!anchorEl}
+        onClose={handleClose()}
+      >
         {CONFIG.client.locales.map((c) => (
           <MenuItem
             key={c}

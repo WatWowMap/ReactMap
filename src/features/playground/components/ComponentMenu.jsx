@@ -73,7 +73,12 @@ export function ComponentMenu() {
       >
         {t('component')}
       </Button>
-      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleMenuClose()}>
+      <Menu
+        transitionDuration={200}
+        anchorEl={anchorEl}
+        open={!!anchorEl}
+        onClose={handleMenuClose()}
+      >
         {PAGES.map((c) => (
           <MenuItem
             key={c}
