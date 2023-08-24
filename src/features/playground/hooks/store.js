@@ -44,6 +44,7 @@ export const handleDownload = () => {
   try {
     const { code, component } = usePlayStore.getState()
     downloadJson(code, `${component}.json`)
+    usePlayStore.setState({ original: code })
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e)
