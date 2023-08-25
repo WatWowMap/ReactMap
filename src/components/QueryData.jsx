@@ -19,8 +19,8 @@ export default function QueryData({ category, value }) {
 
   const hideList = useStatic((state) => new Set(state.hideList))
 
-  if (!data) {
-    return process.env.NODE_ENV === 'development' && error ? (
+  if (!data || process.env.NODE_ENV === 'development') {
+    return error ? (
       <Notification
         open
         severity="error"
