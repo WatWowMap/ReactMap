@@ -2,6 +2,9 @@
 import { createTheme, responsiveFontSizes, darken } from '@mui/material/styles'
 import dlv from 'dlv'
 
+const VALID_COLOR =
+  /^#([A-Fa-f0-9]{3,4}){1,2}$|^rgb\((\s*\d{1,3}\s*,){2}\s*\d{1,3}\s*\)$|^rgba\((\s*\d{1,3}\s*,){3}\s*(0?\.\d+|1\.0|1|\d{1,2}%)\s*\)$|^hsl\(\s*\d{1,3}(\s*,\s*\d{1,3}%){2}\s*\)$|^hsla\(\s*\d{1,3}(\s*,\s*\d{1,3}%){2}\s*,\s*(0?\.\d+|1\.0|1|\d{1,2}%)\s*\)$/
+
 /** @type {import('@mui/material').Components<Omit<import('@mui/material').Theme, 'components'>>} */
 const components = {
   MuiPaper: {
@@ -99,6 +102,9 @@ const components = {
             typeof backgroundColor === 'string'
               ? backgroundColor
               : backgroundColor.main
+          if (!VALID_COLOR.test(finalColor)) {
+            return
+          }
           return {
             color: theme.palette.getContrastText(finalColor),
             backgroundColor,
