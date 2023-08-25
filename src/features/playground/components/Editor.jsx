@@ -11,7 +11,8 @@ export function CodeWrapper() {
 
   return (
     <Grid2
-      xs={hideEditor ? 0 : 6}
+      xs={hideEditor ? 0 : 12}
+      sm={hideEditor ? 0 : 6}
       display={hideEditor ? 'none' : 'block'}
       overflow="auto"
       height="calc(100vh - 48px)"

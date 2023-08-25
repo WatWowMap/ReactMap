@@ -42,6 +42,7 @@ export function LocaleMenu() {
           <MenuItem
             key={c}
             value={c}
+            dense
             onClick={handleClose(c)}
             selected={c === i18n.language}
           >

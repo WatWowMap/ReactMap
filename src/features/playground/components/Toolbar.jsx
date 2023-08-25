@@ -21,7 +21,12 @@ export function MuiToolbar() {
         <ComponentMenu />
         <LocaleMenu />
         <Box flexGrow={1} />
-        <Typography variant="h6" color="inherit" component="div">
+        <Typography
+          variant="h6"
+          color="inherit"
+          component="div"
+          display={{ xs: 'none', sm: 'block' }}
+        >
           {t('playground')}
         </Typography>
       </Toolbar>

@@ -1,8 +1,7 @@
 // @ts-check
 /* eslint-disable react/no-array-index-key */
 import * as React from 'react'
-import Grid2 from '@mui/material/Unstable_Grid2'
-import Box from '@mui/material/Box'
+import Grid from '@mui/material/Unstable_Grid2'
 import CustomTile from '@components/layout/custom/CustomTile'
 import DialogWrapper from '@components/layout/custom/DialogWrapper'
 import { useSafeParse } from '../hooks/useSafeParse'
@@ -20,9 +19,14 @@ export function Viewer() {
   if (!configObj) return null
 
   return (
-    <Grid2 xs={hideEditor ? 12 : 6} overflow="auto" height="calc(100vh - 48px)">
+    <Grid
+      xs={12}
+      sm={hideEditor ? 12 : 6}
+      overflow="auto"
+      height="calc(100vh - 48px)"
+    >
       {component === 'loginPage' ? (
-        <Grid2
+        <Grid
           xs={12}
           container
           spacing={configObj.settings.parentSpacing || 0}
@@ -34,9 +38,9 @@ export function Viewer() {
           {configObj.components.map((block, i) => (
             <CustomTile key={i} block={block} />
           ))}
-        </Grid2>
+        </Grid>
       ) : (
-        <Box height="100%" pb={16} pt={4}>
+        <Grid xs={12} height="100%" pb={16} pt={4}>
           <DialogWrapper
             configObj={configObj}
             defaultTitle={
@@ -48,9 +52,9 @@ export function Viewer() {
               <CustomTile key={i} block={block} />
             ))}
           </DialogWrapper>
-        </Box>
+        </Grid>
       )}
-    </Grid2>
+    </Grid>
   )
 }
 
