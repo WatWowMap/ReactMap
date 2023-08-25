@@ -131,7 +131,7 @@ const resolvers = {
           (perms.donor ? donationPage.showToDonors : true)
             ? donationPage.fabIcon
             : '',
-        profileButton: user && misc.enableFloatingProfileButton,
+        profileButton: !!(user && misc.enableFloatingProfileButton),
         scanZone:
           scanner.backendConfig.platform !== 'mad' &&
           scanner.scanZone.enabled &&

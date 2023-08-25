@@ -662,5 +662,7 @@
   "download": "Download",
   "playground": "Playground",
   "locale": "Locale",
-  "saved": "Saved"
+  "saved": "Saved",
+  "show_editor": "Show Editor",
+  "hide_editor": "Hide Editor"
 }
