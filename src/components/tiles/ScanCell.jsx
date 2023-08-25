@@ -1,21 +1,27 @@
-import React, { memo } from 'react'
+// @ts-check
+/* eslint-disable react/destructuring-assignment */
+import * as React from 'react'
 import { Polygon, Popup } from 'react-leaflet'
 
 import PopupContent from '../popups/ScanCell'
 import marker from '../markers/scanCell'
 
-const ScanCellTile = ({ item, config, zoom, ts }) =>
-  zoom >= config.scanCellsZoom && (
-    <Polygon positions={item.polygon} pathOptions={marker(ts - item.updated)}>
-      <Popup position={[item.center_lat, item.center_lon]}>
-        <PopupContent cell={item} ts={ts} />
-      </Popup>
-    </Polygon>
-  )
+/**
+ *
+ * @param {import('@rm/types').ScanCell} scanCell
+ * @returns
+ */
+const ScanCellTile = (scanCell) => (
+  <Polygon
+    positions={scanCell.polygon}
+    pathOptions={marker(Date.now() / 1000 - scanCell.updated)}
+  >
+    <Popup position={[scanCell.center_lat, scanCell.center_lon]}>
+      <PopupContent {...scanCell} />
+    </Popup>
+  </Polygon>
+)
 
-const areEqual = (prev, next) =>
-  prev.item.id === next.item.id &&
-  prev.item.updated === next.item.updated &&
-  prev.zoom === next.zoom
+const ScanCellMemo = React.memo(ScanCellTile)
 
-export default memo(ScanCellTile, areEqual)
+export default ScanCellMemo

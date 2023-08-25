@@ -248,7 +248,7 @@ export interface ScanCell {
   center_lat: number
   center_lon: number
   updated: number
-  polygon: number[][]
+  polygon: [number, number][]
 }
 
 export type FullScanCell = FullModel<ScanCell, ScanCellModel>

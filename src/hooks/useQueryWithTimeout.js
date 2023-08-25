@@ -97,6 +97,7 @@ export function useQueryWithTimeout(category, perms) {
       variables: {
         ...getQueryArgs(),
         filters: trimFilters(filters, userSettings, category, onlyAreas),
+        zoom,
       },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
       skip: !active,

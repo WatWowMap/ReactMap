@@ -155,33 +155,7 @@ export default function Map({ params }) {
               return <GenerateCells key={category} tileStyle={style} />
             }
             return (
-              <QueryData
-                key={category}
-                category={category}
-                value={value}
-                // clusteringRules={
-                //   config?.clustering?.[category] || {
-                //     zoomLimit: config.minZoom,
-                //     forcedLimit: 10000,
-                //   }
-                // }
-                // map={map}
-                // config={config}
-                // filters={filters}
-                // Icons={Icons}
-                // userIcons={icons}
-                // tileStyle={tileLayer?.style || 'light'}
-                // userSettings={userSettings}
-                // staticUserSettings={staticUserSettings}
-                // params={params}
-                // setParams={setManualParams}
-                // timeOfDay={timeOfDay}
-                // onlyAreas={
-                //   (filters?.scanAreas?.filterByAreas &&
-                //     filters?.scanAreas?.filter?.areas) ||
-                //   []
-                // }
-              />
+              <QueryData key={category} category={category} value={value} />
             )
           }
           return null

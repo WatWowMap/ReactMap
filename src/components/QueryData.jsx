@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 
 import { useQueryWithTimeout } from '@hooks/useQueryWithTimeout'
@@ -42,30 +43,7 @@ export default function QueryData({ category, value }) {
     >
       {data.map((each) => {
         if (!hideList.has(each.id)) {
-          return (
-            <Component
-              key={each.id}
-              {...each}
-              // showTimer={timerList.includes(each.id)}
-              // ts={ts}
-              // filters={filters}
-              // map={map}
-              // config={config}
-              // Icons={Icons}
-              // userIcons={userIcons}
-              // perms={perms}
-              // zoom={currentZoom}
-              // tileStyle={tileStyle}
-              // excludeList={excludeList}
-              // userSettings={userSettings}
-              // staticUserSettings={staticUserSettings}
-              // params={params}
-              // setParams={setParams}
-              // showCircles={showCircles}
-              // timeOfDay={timeOfDay}
-              // onlyAreas={onlyAreas}
-            />
-          )
+          return <Component key={each.id} {...each} />
         }
         return null
       })}
