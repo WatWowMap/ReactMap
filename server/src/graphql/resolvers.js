@@ -439,14 +439,14 @@ const resolvers = {
             placementCells:
               args.zoom >= submissionZoom
                 ? getPlacementCells(args, pokestops, gyms)
-                : [],
+                : { rings: [], cells: [] },
             typeCells: args.filters.onlyS14Cells
               ? getTypeCells(args, pokestops, gyms)
               : [],
           },
         ]
       }
-      return [{ placementCells: [], typeCells: [] }]
+      return [{ placementCells: { rings: [], cells: [] }, typeCells: [] }]
     },
     weather: (_, args, { perms, Db }) => {
       if (perms?.weather) {

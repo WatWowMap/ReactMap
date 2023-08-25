@@ -2,21 +2,29 @@
 import * as React from 'react'
 import { Polygon } from 'react-leaflet'
 
-import placementStyle from '../../markers/placementCell'
-
-const PlacementTile = ({ cell, tileStyle, userSettings }) => (
+/**
+ *
+ * @param {{
+ *  cellColor: string,
+ *  blockedColor: string,
+ *  polygon: [number, number][],
+ *  blocked: boolean
+ * }} param0
+ * @returns
+ */
+const PlacementTile = ({ cellColor, blockedColor, polygon, blocked }) => (
   <Polygon
-    positions={cell.polygon}
-    pathOptions={placementStyle(cell.blocked, tileStyle, userSettings)}
+    key={`${cellColor}${blockedColor}${blocked}`}
+    positions={polygon}
     interactive={false}
+    color={cellColor}
+    fillColor={blockedColor}
+    opacity={0.75}
+    fillOpacity={blocked ? 0.25 : 0}
+    weight={0.35}
   />
 )
 
-const areEqual = (prev, next) =>
-  prev.cell.id === next.cell.id &&
-  prev.zoom === next.zoom &&
-  prev.tileStyle === next.tileStyle
-
-const MemoPlacementTile = React.memo(PlacementTile, areEqual)
+const MemoPlacementTile = React.memo(PlacementTile)
 
 export default MemoPlacementTile

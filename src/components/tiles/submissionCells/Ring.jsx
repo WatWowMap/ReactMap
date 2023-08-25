@@ -1,19 +1,17 @@
-import React, { memo } from 'react'
+import * as React from 'react'
 import { Circle } from 'react-leaflet'
 
-const RingTile = ({ ring, userSettings }) => (
+const RingTile = ({ lat, lon, color }) => (
   <Circle
-    center={[ring.lat, ring.lon]}
+    key={color}
+    center={[lat, lon]}
     radius={20}
     interactive={false}
-    pathOptions={{
-      fillColor: userSettings.poiColor,
-      color: userSettings.poiColor,
-    }}
+    color={color}
+    fillColor={color}
   />
 )
 
-const areEqual = (prev, next) =>
-  prev.ring.id === next.ring.id && prev.zoom === next.zoom
+const MemoRing = React.memo(RingTile)
 
-export default memo(RingTile, areEqual)
+export default MemoRing
