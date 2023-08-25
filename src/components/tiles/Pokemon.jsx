@@ -60,36 +60,7 @@ const PokemonTile = ({ force, ...pkmn }) => {
   const [done, setDone] = React.useState(false)
   useMarkerTimer(pkmn.expire_timestamp, markerRef)
   const opacity = useOpacity(pkmn.expire_timestamp, 'pokemon')
-
-  const [
-    excluded,
-    timerOverride,
-    iconUrl,
-    iconSize,
-    badge,
-    configZoom,
-    timeOfDay,
-  ] = useStatic((s) => {
-    const internalId = `${pkmn.pokemon_id}-${pkmn.form}`
-    const { Icons, excludeList, timerList, config, map } = s
-    const badgeId = getBadge(pkmn.bestPvp)
-    const filter = useStore.getState().filters.pokemon.filter[internalId]
-    return [
-      excludeList.includes(internalId),
-      timerList.includes(pkmn.id),
-      Icons.getPokemon(
-        pkmn.pokemon_id,
-        pkmn.form,
-        0,
-        pkmn.gender,
-        pkmn.costume,
-      ),
-      Icons.getSize('pokemon', filter),
-      badgeId ? Icons.getMisc(badgeId) : '',
-      config.map.interactionRangeZoom <= map.getZoom(),
-      s.timeOfDay,
-    ]
-  }, basicEqualFn)
+  const internalId = `${pkmn.pokemon_id}-${pkmn.form}`
 
   const [
     showTimer,
@@ -99,6 +70,7 @@ const PokemonTile = ({ force, ...pkmn }) => {
     showWeather,
     showSize,
     showInteractionRange,
+    filterSize,
   ] = useStore((s) => {
     const {
       pokemonTimers,
@@ -119,6 +91,35 @@ const PokemonTile = ({ force, ...pkmn }) => {
       !!(pkmn.weather && weatherIndicator),
       showSizeIndicator && Number.isInteger(pkmn.size) && pkmn.size !== 3,
       interactionRanges,
+      s.filters.pokemon.filter[internalId]?.size || 'md',
+    ]
+  }, basicEqualFn)
+
+  const [
+    excluded,
+    timerOverride,
+    iconUrl,
+    iconSize,
+    badge,
+    configZoom,
+    timeOfDay,
+  ] = useStatic((s) => {
+    const { Icons, excludeList, timerList, config, map } = s
+    const badgeId = getBadge(pkmn.bestPvp)
+    return [
+      excludeList.includes(internalId),
+      timerList.includes(pkmn.id),
+      Icons.getPokemon(
+        pkmn.pokemon_id,
+        pkmn.form,
+        0,
+        pkmn.gender,
+        pkmn.costume,
+      ),
+      Icons.getSize('pokemon', { size: filterSize }),
+      badgeId ? Icons.getMisc(badgeId) : '',
+      config.map.interactionRangeZoom <= map.getZoom(),
+      s.timeOfDay,
     ]
   }, basicEqualFn)
 
