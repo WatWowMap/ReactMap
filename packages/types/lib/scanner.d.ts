@@ -279,7 +279,7 @@ export interface Weather {
   severity: boolean
   warn_weather: boolean
   updated: number
-  polygon: number[][]
+  polygon: [number, number][]
 }
 
 export type FullWeather = FullModel<Weather, WeatherModel>

@@ -1,60 +1,72 @@
-import React, { memo, useState, useRef, useEffect } from 'react'
+/* eslint-disable react/destructuring-assignment */
+// @ts-check
+import * as React from 'react'
 import { Popup, Polyline, Marker } from 'react-leaflet'
+
+import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
 
 import weatherMarker from '../markers/weather'
 import PopupContent from '../popups/Weather'
 
-const WeatherTile = ({
-  item,
-  ts,
-  Icons,
-  timeOfDay,
-  tileStyle,
-  userSettings,
-}) => {
-  return null
-  const [popup, setPopup] = useState(false)
-  const markerRef = useRef(null)
+/**
+ *
+ * @param {import('@rm/types').Weather} weather
+ * @returns
+ */
+const WeatherTile = (weather) => {
+  // return null
+  const [popup, setPopup] = React.useState(false)
+  const markerRef = React.useRef(null)
 
-  useEffect(() => {
+  const [darkTiles, iconUrl] = useStatic(
+    (s) => [
+      s.tileStyle === 'dark',
+      s.Icons.getWeather(weather.gameplay_condition, s.timeOfDay),
+    ],
+    basicEqualFn,
+  )
+  const color = useStore((s) =>
+    darkTiles
+      ? s.userSettings.weather.darkMapBorder
+      : s.userSettings.weather.lightMapBorder,
+  )
+  React.useEffect(() => {
     if (popup && markerRef) {
       markerRef.current.openPopup()
     }
   })
 
+  /** @type {import('react-leaflet').MarkerProps['eventHandlers']} */
+  const eventHandlers = React.useMemo(
+    () => ({
+      popupclose: () => setPopup(false),
+      popupopen: () => setPopup(true),
+    }),
+    [],
+  )
+
   return (
     <Polyline
-      key={item.id}
-      positions={item.polygon}
-      pathOptions={{
-        color:
-          tileStyle === 'dark'
-            ? userSettings.darkMapBorder
-            : userSettings.lightMapBorder,
-        opacity: 0.25,
-      }}
+      key={color}
+      positions={weather.polygon}
+      color={color}
+      opacity={0.25}
     >
       <Marker
-        icon={weatherMarker(item, Icons, timeOfDay, userSettings)}
-        position={[item.latitude, item.longitude]}
-        zIndexOffset={10000}
         ref={markerRef}
+        icon={weatherMarker(iconUrl)}
+        position={[weather.latitude, weather.longitude]}
+        zIndexOffset={10000}
+        eventHandlers={eventHandlers}
       >
-        <Popup
-          position={[item.latitude, item.longitude]}
-          onOpen={() => setPopup(true)}
-          onClose={() => setPopup(false)}
-        >
-          <PopupContent weather={item} ts={ts} Icons={Icons} />
+        <Popup position={[weather.latitude, weather.longitude]}>
+          <PopupContent {...weather} />
         </Popup>
       </Marker>
     </Polyline>
   )
 }
 
-// const areEqual = (prev, next) =>
-//   prev.item.gameplay_condition === next.item.gameplay_condition &&
-//   prev.item.updated === next.item.updated &&
-//   prev.tileStyle === next.tileStyle
+const MemoWeatherTile = React.memo(WeatherTile, () => true)
 
-export default memo(WeatherTile, () => true)
+export default MemoWeatherTile

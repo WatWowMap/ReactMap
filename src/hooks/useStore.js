@@ -121,6 +121,7 @@ export const useStore = create(
  *   hideList: string[],
  *   excludeList: string[],
  *   timerList: string[],
+ *   tileStyle: 'light' | 'dark',
  * }} UseStatic
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
  */
@@ -129,6 +130,7 @@ export const useStatic = create((set) => ({
   isTablet: false,
   active: true,
   searchLoading: false,
+  tileStyle: 'light',
   clientError: '',
   map: null,
   auth: {

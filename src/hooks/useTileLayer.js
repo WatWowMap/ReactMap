@@ -40,5 +40,9 @@ export default function useTileLayer() {
     }
   }, [timeOfDay, userTileLayer])
 
+  React.useEffect(() => {
+    useStatic.setState({ tileStyle: tileLayer.style })
+  }, [tileLayer.style])
+
   return tileLayer
 }
