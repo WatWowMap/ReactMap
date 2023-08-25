@@ -14,7 +14,6 @@ import PopupContent from '../popups/Weather'
  * @returns
  */
 const WeatherTile = (weather) => {
-  // return null
   const [popup, setPopup] = React.useState(false)
   const markerRef = React.useRef(null)
 

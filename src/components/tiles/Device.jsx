@@ -12,14 +12,14 @@ import DevicePoly from '../popups/DevicePoly'
 
 /**
  *
- * @param {import('@rm/types').Device} props
+ * @param {import('@rm/types').Device} device
  * @returns
  */
-const DeviceTile = (props) => {
+const DeviceTile = (device) => {
   const ts = Math.floor(Date.now() / 1000)
   const [poly, setPoly] = React.useState(false)
   const markerRef = React.useRef(null)
-  const isOnline = ts - props.updated < 900
+  const isOnline = ts - device.updated < 900
   const [iconUrl, iconSize, modifiers] = useStatic(
     (s) => [
       s.Icons.getDevices(isOnline),
@@ -42,7 +42,7 @@ const DeviceTile = (props) => {
 
   return (
     <Marker
-      position={[props.lat, props.lon]}
+      position={[device.lat, device.lon]}
       icon={icon}
       ref={markerRef}
       eventHandlers={{
@@ -50,18 +50,24 @@ const DeviceTile = (props) => {
         popupclose: () => setPoly(false),
       }}
     >
-      <Popup position={[props.lat, props.lon]}>
-        <PopupContent {...props} isOnline={isOnline} ts={ts} />
+      <Popup position={[device.lat, device.lon]}>
+        <PopupContent {...device} isOnline={isOnline} ts={ts} />
       </Popup>
-      {poly && !props.isMad && (
+      {poly && !device.isMad && (
         <ErrorBoundary>
-          <DevicePoly {...props} />
+          <DevicePoly {...device} />
         </ErrorBoundary>
       )}
     </Marker>
   )
 }
 
-const MemoDevice = React.memo(DeviceTile, () => true)
+const MemoDevice = React.memo(
+  DeviceTile,
+  (prev, next) =>
+    prev.lat === next.lat &&
+    prev.lon === next.lon &&
+    prev.updated === next.updated,
+)
 
 export default MemoDevice

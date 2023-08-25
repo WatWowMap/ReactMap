@@ -16,10 +16,10 @@ const MARKER_OPACITY = LINE_OPACITY * 2
 
 /**
  *
- * @param {import("@rm/types").Route} item
+ * @param {import("@rm/types").Route} route
  * @returns
  */
-const RouteTile = (item) => {
+const RouteTile = (route) => {
   const [clicked, setClicked] = React.useState(false)
   const [hover, setHover] = React.useState('')
 
@@ -29,26 +29,26 @@ const RouteTile = (item) => {
   const waypoints = React.useMemo(
     () => [
       {
-        lat_degrees: item.start_lat,
-        lng_degrees: item.start_lon,
+        lat_degrees: route.start_lat,
+        lng_degrees: route.start_lon,
         elevation_in_meters: 0,
       },
-      ...item.waypoints,
+      ...route.waypoints,
       {
-        lat_degrees: item.end_lat,
-        lng_degrees: item.end_lon,
+        lat_degrees: route.end_lat,
+        lng_degrees: route.end_lon,
         elevation_in_meters: 1,
       },
     ],
-    [item],
+    [route],
   )
 
   const [color, darkened] = React.useMemo(
     () => [
-      `#${item.image_border_color}`,
-      darken(`#${item.image_border_color}`, 0.2),
+      `#${route.image_border_color}`,
+      darken(`#${route.image_border_color}`, 0.2),
     ],
-    [item.image_border_color],
+    [route.image_border_color],
   )
 
   useMapEvents({
@@ -67,7 +67,7 @@ const RouteTile = (item) => {
           key={position}
           opacity={hover || clicked ? 1 : MARKER_OPACITY}
           zIndexOffset={hover === position ? 2000 : hover || clicked ? 1000 : 0}
-          position={[item[`${position}_lat`], item[`${position}_lon`]]}
+          position={[route[`${position}_lat`], route[`${position}_lon`]]}
           icon={routeMarker(position)}
           eventHandlers={{
             popupopen: () => setClicked(true),
@@ -87,7 +87,7 @@ const RouteTile = (item) => {
           }}
         >
           <RoutePopup
-            {...item}
+            {...route}
             waypoints={waypoints}
             end={position === 'end'}
           />
@@ -111,7 +111,7 @@ const RouteTile = (item) => {
             }
           },
         }}
-        dashArray={item.reversible ? undefined : '5, 5'}
+        dashArray={route.reversible ? undefined : '5, 5'}
         positions={waypoints.map((waypoint) => [
           waypoint.lat_degrees,
           waypoint.lng_degrees,
@@ -126,4 +126,6 @@ const RouteTile = (item) => {
   )
 }
 
-export default React.memo(RouteTile, () => true)
+const RouteMemo = React.memo(RouteTile, () => true)
+
+export default RouteMemo
