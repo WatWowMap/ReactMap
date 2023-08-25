@@ -22,6 +22,7 @@ import { persist } from 'zustand/middleware'
  *   scannerCooldown: number
  *   icons: Record<string, string>
  *   userSettings: Record<string, any>
+ *   setAreas: (areas: string | string[], validAreas: string[], unselectAll?: boolean) => void,
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
@@ -45,7 +46,6 @@ export const useStore = create(
             existing.add(area)
           }
         })
-
         if (filters?.scanAreas?.filter?.areas) {
           set({
             filters: {

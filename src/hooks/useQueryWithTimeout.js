@@ -82,7 +82,7 @@ export function useQueryWithTimeout(category, perms) {
   const onlyAreas = useStore(
     (s) =>
       (s.filters?.scanAreas?.filterByAreas &&
-        filters?.scanAreas?.filter?.areas) ||
+        s.filters?.scanAreas?.filter?.areas) ||
       [],
   )
 

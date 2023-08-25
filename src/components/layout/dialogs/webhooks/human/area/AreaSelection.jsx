@@ -9,6 +9,10 @@ import MemoScanArea from '@components/tiles/ScanArea'
 
 import { useWebhookStore } from '../../store'
 
+const FALLBACK = {
+  type: 'FeatureCollection',
+  features: [],
+}
 export default function WebhookAreaSelection() {
   const webhookMode = useWebhookStore((s) => s.mode)
   const webhookName = useWebhookStore((s) => s.context.name)
@@ -32,15 +36,7 @@ export default function WebhookAreaSelection() {
     return <Loading>{t('loading', { category: t('areas') })}</Loading>
   }
   if (webhookMode === 'areas' && data?.webhookGeojson) {
-    return (
-      <MemoScanArea
-        item={
-          data?.webhookGeojson || { type: 'FeatureCollection', features: [] }
-        }
-        webhookMode={webhookMode}
-        userSettings={null}
-      />
-    )
+    return <MemoScanArea {...(data?.webhookGeojson || FALLBACK)} />
   }
   return null
 }

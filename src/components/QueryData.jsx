@@ -43,7 +43,7 @@ export default function QueryData({ category, value }) {
     >
       {data.map((each) => {
         if (!hideList.has(each.id)) {
-          return <Component key={each.id} {...each} />
+          return <Component key={each.id || category} {...each} />
         }
         return null
       })}
