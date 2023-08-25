@@ -12,10 +12,6 @@ export function Viewer() {
   const component = usePlayStore((s) => s.component)
   const configObj = useSafeParse()
 
-  React.useEffect(() => {
-    usePlayStore.setState({ valid: !!configObj })
-  }, [configObj])
-
   if (!configObj) return null
 
   return (
