@@ -1,39 +1,47 @@
+// @ts-check
+/* eslint-disable react/destructuring-assignment */
+import * as React from 'react'
 import spawnpointMarker from '@components/markers/spawnpoints'
-import React, { memo } from 'react'
 import { Marker, Circle, Popup } from 'react-leaflet'
 
+import { useStatic } from '@hooks/useStore'
 import PopupContent from '../popups/Spawnpoint'
 
-const SpawnpointTile = ({ item, Icons, ts }) => {
+/**
+ *
+ * @param {import('@rm/types').Spawnpoint} item
+ * @returns
+ */
+const SpawnpointTile = (item) => {
+  const Icons = useStatic((state) => state.Icons)
   const [modifiers] = Icons.getModifiers('spawnpoint')
-  const popup = (
-    <Popup position={[item.lat, item.lon]}>
-      <PopupContent spawnpoint={item} ts={ts} />
-    </Popup>
-  )
   const size = Icons.getSize('spawnpoint') * modifiers.sizeMultiplier
+
   return modifiers.useImage ? (
     <Marker
       position={[item.lat, item.lon]}
       icon={spawnpointMarker(
-        Icons.getSpawnpoints(item.despawn_sec),
+        Icons.getSpawnpoints(!!item.despawn_sec),
         size * 6,
         modifiers,
       )}
     >
-      {popup}
+      <Popup position={[item.lat, item.lon]}>
+        <PopupContent {...item} />
+      </Popup>
     </Marker>
   ) : (
     <Circle
       center={[item.lat, item.lon]}
       radius={size}
-      pathOptions={{ color: item.despawn_sec ? 'green' : 'red' }}
+      color={item.despawn_sec ? 'green' : 'red'}
     >
-      {popup}
+      <Popup position={[item.lat, item.lon]}>
+        <PopupContent {...item} />
+      </Popup>
     </Circle>
   )
 }
-const areEqual = (prev, next) =>
-  prev.item.id === next.item.id && prev.item.updated === next.item.updated
+const MemoSpawnpoint = React.memo(SpawnpointTile, () => true)
 
-export default memo(SpawnpointTile, areEqual)
+export default MemoSpawnpoint

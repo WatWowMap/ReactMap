@@ -1,15 +1,20 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import { Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
-export default function SpawnpointPopup({ spawnpoint, ts }) {
+/**
+ *
+ * @param {import('@rm/types').Spawnpoint} props
+ * @returns
+ */
+export default function SpawnpointPopup({ despawn_sec, lat, lon, updated }) {
   const { t } = useTranslation()
-  const { despawn_sec: despawn, lat, lon, updated } = spawnpoint
 
-  const minute = despawn > 60 ? Math.round(despawn / 60) : despawn
+  const minute = despawn_sec > 60 ? Math.round(despawn_sec / 60) : despawn_sec
   const minuteFixed = minute < 10 ? `0${minute}` : minute
 
   return (
@@ -18,13 +23,13 @@ export default function SpawnpointPopup({ spawnpoint, ts }) {
         {t('spawnpoint')}
       </Typography>
       <Typography variant="h6" align="center">
-        {despawn ? `00:${minuteFixed}` : '?'}
+        {despawn_sec ? `00:${minuteFixed}` : '?'}
       </Typography>
       <Typography variant="subtitle1" align="center">
         {t('last_updated')}
       </Typography>
       <Typography variant="subtitle2" align="center">
-        {Utility.dayCheck(ts, updated)}
+        {Utility.dayCheck(Date.now() / 1000, updated)}
       </Typography>
       <br />
       <Typography variant="subtitle1" align="center">
