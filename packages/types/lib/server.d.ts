@@ -23,6 +23,7 @@ import NestSubmission = require('server/src/models/NestSubmission')
 import Pokestop = require('server/src/models/Pokestop')
 import { ModelReturn } from './utility'
 import { Profile } from 'passport-discord'
+import { User } from './models'
 
 export interface DbContext {
   isMad: boolean
@@ -44,16 +45,10 @@ export interface DbContext {
   hasShowcaseData: boolean
 }
 
-export interface User {
+export interface ExpressUser extends User {
   perms: Permissions
   valid: boolean
-  id: number
-  discordId?: string
-  username: string
-  telegramId?: string
   avatar: string
-  selectedWebhook?: string
-  strategy?: Strategy
   webhookStrategy?: Strategy
   rmStrategy: string
 }
@@ -171,40 +166,11 @@ export interface Permissions {
   backups: boolean
   routes: boolean
   blocked: boolean
+  admin: boolean
   blockedGuildNames: string[]
   scanner: string[]
   areaRestrictions: string[]
   webhooks: string[]
-}
-
-export interface Waypoint {
-  lat_degrees: number
-  lng_degrees: number
-  elevation_in_meters: number
-}
-
-export interface Route {
-  id: string
-  name: string
-  description: string
-  distance_meters: number
-  duration_seconds: number
-  start_fort_id: string
-  start_lat: number
-  start_lon: number
-  start_image: string
-  end_fort_id: string
-  end_lat: number
-  end_lon: number
-  end_image: string
-  image: string
-  image_border_color: string
-  reversible: boolean
-  tags?: string[]
-  type: number
-  updated: number
-  version: number
-  waypoints: Waypoint[]
 }
 
 export type DiscordVerifyFunction = (

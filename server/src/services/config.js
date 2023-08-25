@@ -4,6 +4,7 @@ const { resolve } = require('path')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
+const checkConfigJsons = require('./functions/checkConfigJsons')
 
 const allowedMenuItems = [
   'gyms',
@@ -170,45 +171,6 @@ if (config.icons.styles.length === 0) {
   })
 }
 
-const checkExtraJsons = (fileName, domain = '') => {
-  const generalJson = fs.existsSync(
-    resolve(`${__dirname}/../configs/${fileName}.json`),
-  )
-    ? JSON.parse(
-        fs.readFileSync(resolve(__dirname, `../configs/${fileName}.json`)),
-      )
-    : {}
-  if (Object.keys(generalJson).length) {
-    log.info(
-      HELPERS.config,
-      `config ${fileName}.json found, overwriting your config.map.${fileName} with the found data.`,
-    )
-  }
-  if (
-    domain &&
-    fs.existsSync(resolve(`${__dirname}/../configs/${fileName}/${domain}.json`))
-  ) {
-    const domainJson =
-      JSON.parse(
-        fs.readFileSync(
-          resolve(__dirname, `../configs/${fileName}/${domain}.json`),
-        ),
-      ) || {}
-    if (Object.keys(domainJson).length) {
-      log.info(
-        HELPERS.config,
-        `config ${fileName}/${domain}.json found, overwriting your config.map.${fileName} with the found data.`,
-      )
-    }
-    return {
-      components: [],
-      ...generalJson,
-      ...domainJson,
-    }
-  }
-  return generalJson
-}
-
 /** @param {Partial<import("@rm/types").Config['map']>} [input] */
 const mergeMapConfig = (input) => {
   const obj = input ?? config.getSafe('map')
@@ -233,17 +195,17 @@ const mergeMapConfig = (input) => {
     messageOfTheDay: {
       ...base.messageOfTheDay,
       ...obj.messageOfTheDay,
-      ...checkExtraJsons('messageOfTheDay', obj.domain),
+      ...checkConfigJsons('messageOfTheDay', obj.domain),
     },
     donationPage: {
       ...base.donationPage,
       ...obj.donationPage,
-      ...checkExtraJsons('donationPage', obj.domain),
+      ...checkConfigJsons('donationPage', obj.domain),
     },
     loginPage: {
       ...base.loginPage,
       ...obj.loginPage,
-      ...checkExtraJsons('loginPage', obj.domain),
+      ...checkConfigJsons('loginPage', obj.domain),
     },
   }
 }

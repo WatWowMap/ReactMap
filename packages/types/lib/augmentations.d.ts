@@ -1,16 +1,24 @@
 import { ButtonProps } from '@mui/material'
-import { GetSafeConfig } from './config'
-import { User as MyUser } from './server'
+import { Config, GetSafeConfig } from './config'
+import { ExpressUser } from './server'
+import { Request } from 'express'
 
 declare module 'config' {
-  interface IConfig {
+  interface IConfig extends Config {
     getSafe: GetSafeConfig
+    getMapConfig: (request: Request) => Config['map']
+    getAreas: <T extends 'scanAreas' | 'scanAreasMenu'>(
+      request: Request,
+      key: T,
+    ) => T extends 'scanAreas'
+      ? Config['areas']['scanAreas'][string]
+      : Config['areas']['scanAreasMenu'][string]
   }
 }
 
 declare global {
   namespace Express {
-    interface User extends MyUser {}
+    interface User extends ExpressUser {}
   }
 }
 

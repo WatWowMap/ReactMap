@@ -24,6 +24,7 @@ async function getCurrentBranch() {
       e.message,
       '\nProceeding normally...',
     )
+    return { branch: 'main', isDocker: false }
   }
 }
 
@@ -43,6 +44,7 @@ async function getCurrentSha() {
       e.message,
       '\nProceeding normally...',
     )
+    return ''
   }
 }
 
@@ -62,6 +64,7 @@ async function getRemoteSha(branch) {
       branch,
       '\nProceeding normally...',
     )
+    return ''
   }
 }
 
