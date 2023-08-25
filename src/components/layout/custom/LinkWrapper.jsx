@@ -23,7 +23,6 @@ export default function LinkWrapper({
   link,
   href,
   target,
-  color,
   referrerPolicy,
   underline,
   style,
@@ -43,7 +42,6 @@ export default function LinkWrapper({
       component={external ? 'a' : RouterLink}
       referrerPolicy={referrerPolicy}
       target={target}
-      color={color}
       underline={underline}
       style={style}
       sx={sx}
