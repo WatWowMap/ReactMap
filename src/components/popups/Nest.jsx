@@ -28,7 +28,21 @@ const getColor = (timeSince) => {
   return color
 }
 
-export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
+/**
+ *
+ * @param {import('@rm/types').Nest & {
+ *  recent: boolean,
+ *  iconUrl: string
+ * }} props
+ * @returns
+ */
+export default function NestPopup({
+  recent,
+  iconUrl,
+  pokemon_id,
+  pokemon_form,
+  ...nest
+}) {
   const { t } = useTranslation()
   const { perms, loggedIn } = useStatic((s) => s.auth)
 
@@ -60,7 +74,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
 
   const handleExclude = () => {
     setAnchorEl(null)
-    const key = `${pokemon.pokemon_id}-${pokemon.pokemon_form}`
+    const key = `${pokemon_id}-${pokemon_form}`
     useStore.setState((prev) => ({
       filters: {
         ...prev.filters,
@@ -84,11 +98,11 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
     { name: 'exclude', action: handleExclude },
   ]
   useEffect(() => {
-    Utility.analytics('Popup', `Name: ${name} Pokemon: ${pokemon}`, 'Nest')
+    Utility.analytics('Popup', `Name: ${name} Pokemon: ${pokemon_id}`, 'Nest')
   }, [])
 
   return (
-    <ErrorBoundary noRefresh style={{}} variant="h5">
+    <ErrorBoundary noRefresh variant="h5">
       <Grid
         container
         justifyContent="center"
@@ -149,9 +163,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
             }}
           />
           <br />
-          <Typography variant="caption">
-            {t(`poke_${pokemon.pokemon_id}`)}
-          </Typography>
+          <Typography variant="caption">{t(`poke_${pokemon_id}`)}</Typography>
         </Grid>
         <Grid item xs={6} style={{ textAlign: 'center' }}>
           <Typography variant="subtitle2">{t('last_updated')}</Typography>

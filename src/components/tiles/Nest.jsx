@@ -45,12 +45,7 @@ const NestTile = ({ force, ...nest }) => {
     <>
       <NestMarker force={force} icon={icon} lat={nest.lat} lon={nest.lon}>
         <Popup position={[nest.lat, nest.lon]}>
-          <PopupContent
-            nest={nest}
-            iconUrl={iconUrl}
-            pokemon={nest}
-            recent={recent}
-          />
+          <PopupContent iconUrl={iconUrl} recent={recent} {...nest} />
         </Popup>
       </NestMarker>
       <NestGeoJSON polygon_path={nest.polygon_path} />
