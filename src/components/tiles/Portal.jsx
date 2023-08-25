@@ -44,4 +44,6 @@ const PortalTile = ({ force, ...portal }) => {
   )
 }
 
-export default React.memo(PortalTile)
+const MemoPortalTile = React.memo(PortalTile)
+
+export default MemoPortalTile

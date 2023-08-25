@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable no-nested-ternary */
 // @ts-check
 import * as React from 'react'
@@ -15,15 +16,10 @@ const MARKER_OPACITY = LINE_OPACITY * 2
 
 /**
  *
- * @param {{
- *  item: import("@rm/types").Route
- *  Icons: InstanceType<typeof import("@services/Icons").default>
- *  map: import("leaflet").Map
- * }} props
+ * @param {import("@rm/types").Route} item
  * @returns
  */
-const RouteTile = ({ item, Icons }) => {
-  return null
+const RouteTile = (item) => {
   const [clicked, setClicked] = React.useState(false)
   const [hover, setHover] = React.useState('')
 
@@ -72,7 +68,7 @@ const RouteTile = ({ item, Icons }) => {
           opacity={hover || clicked ? 1 : MARKER_OPACITY}
           zIndexOffset={hover === position ? 2000 : hover || clicked ? 1000 : 0}
           position={[item[`${position}_lat`], item[`${position}_lon`]]}
-          icon={routeMarker(Icons.getMisc(`route-${position}`), position)}
+          icon={routeMarker(position)}
           eventHandlers={{
             popupopen: () => setClicked(true),
             popupclose: () => setClicked(false),

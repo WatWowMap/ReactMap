@@ -109,4 +109,6 @@ const NestGeoJSON = ({ polygon_path }) => {
   return <GeoJSON data={geometry} />
 }
 
-export default React.memo(NestTile)
+const MemoNestTile = React.memo(NestTile)
+
+export default MemoNestTile

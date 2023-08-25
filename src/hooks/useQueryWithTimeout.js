@@ -66,6 +66,9 @@ export function useQueryWithTimeout(category, perms) {
       },
     },
   } = useStatic.getState()
+  const userCluster = useStore(
+    (s) => s.userSettings[category]?.clustering || false,
+  )
 
   const timeout = useRef(
     new RobustTimeout((polling[category] || 10) * 1000) || {},
@@ -121,9 +124,14 @@ export function useQueryWithTimeout(category, perms) {
     }
   }
 
+  const returnData = (data || previousData || { [category]: [] })[category]
   return {
-    data: (data || previousData || { [category]: [] })[category],
+    data: returnData,
     error,
     loading,
+    cluster: clustering
+      ? userCluster || returnData.length >= clustering.forcedLimit
+      : false,
+    zoomLevel: clustering?.zoomLevel || minZoom,
   }
 }

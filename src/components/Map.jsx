@@ -7,7 +7,7 @@ import Utility from '@services/Utility'
 
 // import QueryData from './QueryData'
 import { GenerateCells } from './tiles/S2Cell'
-import Clustering from './Clustering'
+import QueryData from './QueryData'
 
 /** @param {string} category */
 const userSettingsCategory = (category) => {
@@ -152,15 +152,10 @@ export default function Map({ params }) {
               true,
             )
             if (category === 's2cells') {
-              return (
-                <GenerateCells
-                  key={category}
-                  tileStyle={style}
-                />
-              )
+              return <GenerateCells key={category} tileStyle={style} />
             }
             return (
-              <Clustering
+              <QueryData
                 key={category}
                 category={category}
                 value={value}
