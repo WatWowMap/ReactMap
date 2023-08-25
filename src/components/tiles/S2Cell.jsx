@@ -1,5 +1,6 @@
+// @ts-check
 import * as React from 'react'
-import { Polyline, useMap } from 'react-leaflet'
+import { Polyline } from 'react-leaflet'
 import {
   S2LatLng,
   S2RegionCoverer,
@@ -9,16 +10,15 @@ import {
   S2Point,
 } from 'nodes2ts'
 
-import Utility from '@services/Utility'
-import { useStore } from '@hooks/useStore'
+import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
 
 import Notification from '@components/layout/general/Notification'
 import { getQueryArgs } from '@services/functions/getQueryArgs'
 
-function BaseCell({ id, coords, color }) {
+function BaseCell({ coords, color }) {
   return (
     <Polyline
-      key={id}
+      key={color}
       positions={[...coords, coords[0]]}
       color={color}
       weight={0.5}
@@ -28,7 +28,7 @@ function BaseCell({ id, coords, color }) {
 
 const MemoBaseCell = React.memo(
   BaseCell,
-  (prev, next) => prev.id === next.id && prev.color === next.color,
+  (prev, next) => prev.color === next.color,
 )
 
 export default MemoBaseCell
@@ -49,15 +49,20 @@ function getPolyVector(s2cellId, polyline) {
   return poly
 }
 
-export function GenerateCells({ tileStyle }) {
-  const { s2cells: settings } = useStore((s) => s.userSettings)
-  const { s2cells: filters } = useStore((s) => s.filters)
+export function GenerateCells() {
+  const darkTiles = useStatic((s) => s.tileStyle === 'dark')
+  const color = useStore((s) =>
+    darkTiles
+      ? s.userSettings.s2cells.darkMapBorder
+      : s.userSettings.s2cells.lightMapBorder,
+  )
+  const filter = useStore((s) => s.filters.s2cells.cells, basicEqualFn)
   const location = useStore((s) => s.location)
   const zoom = useStore((s) => s.zoom)
 
   const cells = React.useMemo(() => {
     const bounds = getQueryArgs()
-    return filters.cells.flatMap((level) => {
+    return filter.flatMap((level) => {
       const regionCoverer = new S2RegionCoverer()
       const region = S2LatLngRect.fromLatLng(
         S2LatLng.fromDegrees(bounds.minLat, bounds.minLon),
@@ -73,20 +78,7 @@ export function GenerateCells({ tileStyle }) {
         }
       })
     })
-  }, [filters.cells, location, zoom])
-
-  // React.useEffect(() => {
-  //   const regenerate = () => onMove()
-  //   map.on('moveend', regenerate)
-  //   return () => {
-  //     map.off('moveend', regenerate)
-  //   }
-  // }, [])
-
-  const color =
-    tileStyle === 'dark'
-      ? settings.darkMapBorder || 'red'
-      : settings.lightMapBorder || 'black'
+  }, [filter, location, zoom, color])
 
   return (
     <>
@@ -95,19 +87,17 @@ export function GenerateCells({ tileStyle }) {
         .map((cell) => (
           <MemoBaseCell key={cell.id} {...cell} color={color} />
         ))}
-      {cells.length > 20_000 && (
-        <Notification
-          key={cells.length}
-          severity="warning"
-          i18nKey="s2_cell_limit"
-          messages={[
-            {
-              key: 'error',
-              variables: [cells.length.toLocaleString()],
-            },
-          ]}
-        />
-      )}
+      <Notification
+        open={cells.length > 20_000}
+        severity="warning"
+        i18nKey="s2_cell_limit"
+        messages={[
+          {
+            key: 'error',
+            variables: [cells.length.toLocaleString()],
+          },
+        ]}
+      />
     </>
   )
 }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useMapEvents } from 'react-leaflet'
 
-import useTileLayer from '@hooks/useTileLayer'
 import { useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
@@ -9,20 +8,20 @@ import Utility from '@services/Utility'
 import { GenerateCells } from './tiles/S2Cell'
 import QueryData from './QueryData'
 
-/** @param {string} category */
-const userSettingsCategory = (category) => {
-  switch (category) {
-    case 'devices':
-    case 'spawnpoints':
-    case 'scanCells':
-      return 'admin'
-    case 'submissionCells':
-    case 'portals':
-      return 'wayfarer'
-    default:
-      return category
-  }
-}
+// /** @param {string} category */
+// const userSettingsCategory = (category) => {
+//   switch (category) {
+//     case 'devices':
+//     case 'spawnpoints':
+//     case 'scanCells':
+//       return 'admin'
+//     case 'submissionCells':
+//     case 'portals':
+//       return 'wayfarer'
+//     default:
+//       return category
+//   }
+// }
 
 function setLocationZoom({ target: map }) {
   const { lat, lng } = map.getCenter()
@@ -37,7 +36,6 @@ export default function Map({ params }) {
   Utility.analytics(window.location.pathname)
 
   const config = useStatic((state) => state.config.map)
-  const { style } = useTileLayer()
 
   // const staticUserSettings = useStatic((state) => state.userSettings)
   const ui = useStatic((state) => state.ui)
@@ -47,9 +45,6 @@ export default function Map({ params }) {
   const error = useStatic((state) => state.clientError)
 
   const filters = useStore((state) => state.filters)
-  const icons = useStore((state) => state.icons)
-  const userSettings = useStore((state) => state.userSettings)
-
   const [manualParams, setManualParams] = useState(params)
   const [windowState, setWindowState] = useState(true)
 
@@ -151,10 +146,9 @@ export default function Map({ params }) {
               category,
               true,
             )
-            if (category === 's2cells') {
-              return <GenerateCells key={category} tileStyle={style} />
-            }
-            return (
+            return category === 's2cells' ? (
+              <GenerateCells key={category} />
+            ) : (
               <QueryData key={category} category={category} value={value} />
             )
           }
