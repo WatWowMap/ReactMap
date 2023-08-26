@@ -52,7 +52,6 @@ class ErrorBoundary extends React.Component {
   }
 
   render() {
-    console.log(this.state.reported)
     return this.state.errorCount >
       (process.env.NODE_ENV === 'development' ? 1 : 3) ? (
       <Grid
