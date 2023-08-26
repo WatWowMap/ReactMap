@@ -1,20 +1,18 @@
+// @ts-check
 import * as React from 'react'
 
 import { useStatic, useStore } from '@hooks/useStore'
 
-import TypeTile from './Type'
-import PlacementTile from './Placement'
-import RingTile from './Ring'
+import Level14Tile from './S14Cell'
+import Level17Tile from './S17Cell'
+import PoITile from './PoI'
 
 /**
  *
- * @param {{ typeCells: any[], placementCells: { rings: any[], cells: any[] }}} item
+ * @param {import('@rm/types').SubmissionCell} props
  * @returns
  */
-const SubmissionCellTile = ({
-  typeCells,
-  placementCells: { cells, rings },
-}) => {
+const SubmissionCellTile = ({ level14Cells, level17Cells, pois }) => {
   const poiColor = useStore((s) => s.userSettings.wayfarer.poiColor)
   const cellBlocked = useStore((s) => s.userSettings.wayfarer.cellBlocked)
   const oneStopTillNext = useStore(
@@ -32,19 +30,19 @@ const SubmissionCellTile = ({
   )
   return (
     <>
-      {rings?.map((ring) => (
-        <RingTile key={ring.id} {...ring} color={poiColor} />
+      {pois?.map((ring) => (
+        <PoITile key={ring.id} {...ring} color={poiColor} />
       ))}
-      {cells?.map((cell) => (
-        <PlacementTile
+      {level17Cells?.map((cell) => (
+        <Level17Tile
           key={`pc${cell.id}-${cell.polygon.join('-')}`}
           cellColor={cellColor}
           blockedColor={cellBlocked}
           {...cell}
         />
       ))}
-      {typeCells?.map((cell) => (
-        <TypeTile
+      {level14Cells?.map((cell) => (
+        <Level14Tile
           key={`tc${cell.id}-${cell.polygon.join('-')}`}
           cellColor={cellColor}
           oneStopTillNext={oneStopTillNext}

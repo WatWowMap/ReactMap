@@ -7,12 +7,10 @@ import { Polygon } from 'react-leaflet'
  * @param {{
  *  cellColor: string,
  *  blockedColor: string,
- *  polygon: [number, number][],
- *  blocked: boolean
- * }} param0
+ * } & import('@rm/types').Level17Cell} props
  * @returns
  */
-const PlacementTile = ({ cellColor, blockedColor, polygon, blocked }) => (
+const S17Cell = ({ cellColor, blockedColor, polygon, blocked }) => (
   <Polygon
     key={`${cellColor}${blockedColor}${blocked}`}
     positions={polygon}
@@ -25,6 +23,12 @@ const PlacementTile = ({ cellColor, blockedColor, polygon, blocked }) => (
   />
 )
 
-const MemoPlacementTile = React.memo(PlacementTile)
+const MemoS17Cell = React.memo(
+  S17Cell,
+  (prev, next) =>
+    prev.blocked === next.blocked &&
+    prev.blockedColor === next.blockedColor &&
+    prev.cellColor === next.cellColor,
+)
 
-export default MemoPlacementTile
+export default MemoS17Cell

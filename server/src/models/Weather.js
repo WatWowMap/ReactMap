@@ -56,8 +56,8 @@ class Weather extends Model {
     return results
       .map((cell) => {
         const center = point([cell.longitude, cell.latitude])
-        const { poly, revPoly } = getPolyVector(cell.id, true)
-        const geojson = polygon([revPoly])
+        const { polygon: poly, reverse } = getPolyVector(cell.id, true)
+        const geojson = polygon([reverse])
         const hasOverlap =
           (pointInPolygon(center, boundPolygon) ||
             booleanOverlap(geojson, boundPolygon) ||

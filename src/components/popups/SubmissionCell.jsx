@@ -1,42 +1,53 @@
-import React, { useEffect } from 'react'
-import { Typography } from '@mui/material'
-import { Trans, useTranslation } from 'react-i18next'
+// @ts-check
+import * as React from 'react'
+import Typography from '@mui/material/Typography'
+import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
-export default function SubmissionCellPopup({ cell }) {
+const GYM_THRESHOLD = [2, 6, 20]
+
+/**
+ *
+ * @param {import('@rm/types/lib').Level14Cell & { total: number }} props
+ * @returns
+ */
+export default function SubmissionCellPopup({
+  count_gyms,
+  count_pokestops,
+  total,
+}) {
   const { t } = useTranslation()
-  const gymThreshold = [2, 6, 20]
-  let untilNextGym = t('never_alt', t('never'))
-  if (cell.count_gyms < 3) {
-    untilNextGym = gymThreshold[cell.count_gyms] - cell.count
-  }
+  let untilNextGym =
+    count_gyms < 3
+      ? GYM_THRESHOLD[count_gyms] - total
+      : t('never_alt', t('never'))
   if (
-    (cell.count === 1 && cell.count_gyms < 1) ||
-    (cell.count === 5 && cell.count_gyms < 2) ||
-    (cell.count === 19 && cell.count_gyms < 3)
+    (total === 1 && count_gyms < 1) ||
+    (total === 5 && count_gyms < 2) ||
+    (total === 19 && count_gyms < 3)
   ) {
     untilNextGym = t('next_submission')
   }
 
-  useEffect(() => {
-    Utility.analytics('Popup', `Total Count: ${cell.count}`, 'Submission Cell')
+  React.useEffect(() => {
+    Utility.analytics('Popup', `Total Count: ${total}`, 'Submission Cell')
   }, [])
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
       <Typography variant="h6" align="center">
-        <Trans i18nKey="s2_cell_level">{{ level: cell.level }}</Trans>
+        {t('s2_cell_level', { level: 14 })}
       </Typography>
       <Typography variant="subtitle2" align="center">
-        {t('total_count')}: {cell.count}
+        {t('total_count')}: {total}
       </Typography>
       <Typography variant="subtitle2" align="center">
-        {t('pokestops')}: {cell.count_pokestops}
+        {t('pokestops')}: {count_pokestops}
       </Typography>
       <Typography variant="subtitle2" align="center">
-        {t('gyms')}: {cell.count_gyms}
+        {t('gyms')}: {count_gyms}
       </Typography>
       <Typography variant="subtitle2" align="center">
         {t('next_gym')}: {untilNextGym}

@@ -1,13 +1,25 @@
+// @ts-check
+
+/**
+ *
+ * @param {import("@rm/types/lib").Level14Cell} cell
+ * @param {number} total
+ * @param {string} oneStopTillNext
+ * @param {string} twoStopsTillNext
+ * @param {string} noMoreGyms
+ * @returns
+ */
 export default function typeStyle(
   cell,
+  total,
   oneStopTillNext,
   twoStopsTillNext,
   noMoreGyms,
 ) {
   if (
-    (cell.count === 1 && cell.count_gyms < 1) ||
-    (cell.count === 5 && cell.count_gyms < 2) ||
-    (cell.count === 19 && cell.count_gyms < 3)
+    (total === 1 && cell.count_gyms < 1) ||
+    (total === 5 && cell.count_gyms < 2) ||
+    (total === 19 && cell.count_gyms < 3)
   ) {
     return {
       fillColor: oneStopTillNext,
@@ -16,8 +28,8 @@ export default function typeStyle(
     }
   }
   if (
-    (cell.count === 4 && cell.count_gyms < 2) ||
-    (cell.count === 18 && cell.count_gyms < 3)
+    (total === 4 && cell.count_gyms < 2) ||
+    (total === 18 && cell.count_gyms < 3)
   ) {
     return {
       fillColor: twoStopsTillNext,
@@ -25,7 +37,7 @@ export default function typeStyle(
       weight: 0.75,
     }
   }
-  if (cell.count >= 20) {
+  if (total >= 20) {
     return {
       fillColor: noMoreGyms,
       fillOpacity: 0.25,

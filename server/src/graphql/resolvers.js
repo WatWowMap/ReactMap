@@ -264,7 +264,7 @@ const resolvers = {
             const id = cell.id.toString()
             return {
               id,
-              coords: getPolyVector(id).poly,
+              coords: getPolyVector(id).polygon,
             }
           })
         })
@@ -436,17 +436,14 @@ const resolvers = {
         const [pokestops, gyms] = await Db.submissionCells(perms, args)
         return [
           {
-            placementCells:
-              args.zoom >= submissionZoom
-                ? getPlacementCells(args, pokestops, gyms)
-                : { rings: [], cells: [] },
-            typeCells: args.filters.onlyS14Cells
-              ? getTypeCells(args, pokestops, gyms)
-              : [],
+            ...(args.zoom >= submissionZoom
+              ? getPlacementCells(args, pokestops, gyms)
+              : { pois: [], level17Cells: [] }),
+            level14Cells: getTypeCells(args, pokestops, gyms),
           },
         ]
       }
-      return [{ placementCells: { rings: [], cells: [] }, typeCells: [] }]
+      return [{ level17Cells: [], level14Cells: [], pois: [] }]
     },
     weather: (_, args, { perms, Db }) => {
       if (perms?.weather) {
