@@ -1,7 +1,6 @@
 // @ts-check
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
-
 import useMarkerTimer from '@hooks/useMarkerTimer'
 import { getOffset } from '@services/functions/offset'
 import { getBadge } from '@services/functions/getBadge'
@@ -12,13 +11,14 @@ import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
 import ToolTipWrapper from './Timer'
 
-const OPERATOR = /** @type {const} */ ({
-  '=': (a, b) => a === b,
-  '<': (a, b) => a < b,
-  '<=': (a, b) => a <= b,
-  '>': (a, b) => a > b,
-  '>=': (a, b) => a >= b,
-})
+const OPERATOR =
+  /** @type {{ [key in '=' | '<' | '<=' | '>'| '>=']: (a: number, b: number) => boolean }} */ ({
+    '=': (a, b) => a === b,
+    '<': (a, b) => a < b,
+    '<=': (a, b) => a <= b,
+    '>': (a, b) => a > b,
+    '>=': (a, b) => a >= b,
+  })
 
 /**
  *
