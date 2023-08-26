@@ -100,4 +100,6 @@ export function ScanAreaTile(featureCollection) {
   )
 }
 
-export default React.memo(ScanAreaTile)
+const MemoScanAreaTile = React.memo(ScanAreaTile)
+
+export default MemoScanAreaTile

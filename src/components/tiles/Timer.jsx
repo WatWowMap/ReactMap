@@ -21,6 +21,11 @@ const Timer = ({ timestamp }) => {
   )
 }
 
+/**
+ * TODO: Come back and makes timers only accept 1 timer
+ * @param {{ timers: number[], offset?: [number, number], children?: React.ReactNode }} props
+ * @returns
+ */
 export default function TooltipWrapper({ timers, offset, children }) {
   return (
     <Tooltip direction="bottom" permanent offset={offset}>

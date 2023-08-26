@@ -73,7 +73,7 @@ class Gym extends Model {
       ts,
       onlyAreas = [],
     } = args.filters
-    const safeTs = ts || Math.floor(new Date().getTime() / 1000)
+    const safeTs = ts || Math.floor(Date.now() / 1000)
     const query = this.query()
 
     if (isMad) {

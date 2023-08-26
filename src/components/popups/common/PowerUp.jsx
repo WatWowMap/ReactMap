@@ -10,7 +10,7 @@ export default function PowerUp({
   power_up_level,
   power_up_points,
   power_up_end_timestamp,
-  divider,
+  divider = false,
 }) {
   const { t } = useTranslation()
   if (!power_up_level) return null

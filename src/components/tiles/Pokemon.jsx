@@ -56,11 +56,13 @@ const getGlowStatus = (pkmn, userSettings) => {
  * @returns
  */
 const PokemonTile = ({ force, ...pkmn }) => {
+  const internalId = `${pkmn.pokemon_id}-${pkmn.form}`
+
   const markerRef = React.useRef(null)
   const [done, setDone] = React.useState(false)
+
   useMarkerTimer(pkmn.expire_timestamp, markerRef)
   const opacity = useOpacity(pkmn.expire_timestamp, 'pokemon')
-  const internalId = `${pkmn.pokemon_id}-${pkmn.form}`
 
   const [
     showTimer,
@@ -223,6 +225,9 @@ const PokemonTile = ({ force, ...pkmn }) => {
   )
 }
 
-const MemoizedPokemonTile = React.memo(PokemonTile, () => true)
+const MemoizedPokemonTile = React.memo(
+  PokemonTile,
+  (prev, next) => prev.updated === next.updated,
+)
 
 export default MemoizedPokemonTile

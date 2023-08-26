@@ -98,6 +98,7 @@ export function useQueryWithTimeout(category, perms) {
         ...getQueryArgs(),
         filters: trimFilters(filters, userSettings, category, onlyAreas),
         zoom,
+        ts: Math.floor(Date.now() / 1000),
       },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
       skip: !active,
@@ -117,11 +118,11 @@ export function useQueryWithTimeout(category, perms) {
   if (error) {
     if (error.networkError?.statusCode === 464) {
       useStatic.setState({ clientError: 'old_client' })
-      return null
+      return { data: null, error, loading }
     }
     if (error.networkError?.statusCode === 511) {
       useStatic.setState({ clientError: 'session_expired' })
-      return null
+      return { data: null, error, loading }
     }
   }
 

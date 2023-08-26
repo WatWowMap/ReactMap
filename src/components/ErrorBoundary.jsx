@@ -44,7 +44,7 @@ class ErrorBoundary extends React.Component {
   }
 
   async componentDidCatch(error) {
-    if (!this.state.reported) {
+    if (!this.state.reported && process.env.NODE_ENV !== 'development') {
       await Fetch.sendError({
         cause: error.cause,
         message: error.message,
