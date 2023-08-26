@@ -111,7 +111,7 @@ export const apolloCache = new InMemoryCache({
   },
 })
 
-const apolloClient = new ApolloClient({
+export const apolloClient = new ApolloClient({
   uri: '/graphql',
   link: abortableLink.concat(createHttpLink()),
   // @ts-ignore
@@ -120,5 +120,3 @@ const apolloClient = new ApolloClient({
   version: CONFIG.client.version,
   cache: apolloCache,
 })
-
-export default apolloClient

@@ -12,7 +12,7 @@ import { ApolloProvider } from '@apollo/client'
 import customTheme from '@assets/mui/theme'
 import { globalStyles } from '@assets/mui/global'
 import { useStore } from '@hooks/useStore'
-import apolloClient from '@services/apollo'
+import { apolloClient } from '@services/apollo'
 import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled'
 import { setLoadingText } from '@services/functions/setLoadingText'
 

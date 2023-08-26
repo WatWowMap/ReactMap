@@ -15,7 +15,7 @@ import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 import Footer from '@components/layout/general/Footer'
 import Header from '@components/layout/general/Header'
-import apolloClient from '@services/apollo'
+import { apolloClient } from '@services/apollo'
 import Query from '@services/Query'
 import { allProfiles } from '@services/queries/webhook'
 
