@@ -1,7 +1,7 @@
 const express = require('express')
 const fs = require('fs')
 const { resolve } = require('path')
-
+const { SourceMapConsumer } = require('source-map')
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 const authRouter = require('./authRouter')
@@ -39,24 +39,66 @@ rootRouter.get('/api/health', async (req, res) =>
   res.status(200).json({ status: 'ok' }),
 )
 
-rootRouter.post('/api/error/client', (req, res) => {
-  if (req.headers.version === version) {
-    const {
-      body: { error },
-      user,
-    } = req
-    const userName =
-      user?.username ||
-      user?.discordId ||
-      user?.telegramId ||
-      user?.id ||
+rootRouter.post('/api/error/client', async (req, res) => {
+  try {
+    const { stack, cause, message, uuid } = req.body
+
+    const username =
+      req?.user?.username ||
+      req?.user?.discordId ||
+      req?.user?.telegramId ||
+      req?.user?.id ||
       'Not Logged In'
-    if (error) {
-      log.warn(HELPERS.client, `User: ${userName}`, error)
-    }
-    return res.status(200).json({ status: 'ok' })
+
+    const originalStack =
+      typeof stack === 'string'
+        ? await Promise.all(
+            stack.split('\n').map(async (stackLine) => {
+              const match = stackLine.match(
+                /at (.+) \(https?:\/\/([^/]+)\/(.+\.js):(\d+):(\d+)\)/,
+              )
+              if (match) {
+                const [, functionName, , file, line, column] = match
+                const foundStack = await SourceMapConsumer.with(
+                  await fs.promises.readFile(
+                    resolve(__dirname, '../../../dist', `${file}.map`),
+                    'utf8',
+                  ),
+                  null,
+                  (consumer) => {
+                    if (!consumer) return null
+                    const position = consumer.originalPositionFor({
+                      line: Number(line),
+                      column: Number(column),
+                    })
+
+                    if (position.source && position.line && position.column) {
+                      return `${functionName} (${position.source}:${position.line}:${position.column})`
+                    }
+                  },
+                )
+                if (foundStack) {
+                  return foundStack
+                }
+              }
+              return stackLine
+            }),
+          ).then((lines) => lines.join('\n'))
+        : cause || message
+
+    log.error(HELPERS.client, {
+      client_version: req.headers.version,
+      server_version: version,
+      username,
+      client_id: uuid,
+      nginx_id: req.headers['x-request-id'],
+      trace: originalStack,
+    })
+    res.status(200).send('Error reported')
+  } catch (mapErr) {
+    log.error('Error processing source map:', mapErr)
+    res.status(500).send('Failed to process error')
   }
-  return res.status(464).json({ status: 'invalid client version' })
 })
 
 rootRouter.get('/area/:area/:zoom?', (req, res) => {

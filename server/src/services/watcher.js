@@ -1,3 +1,4 @@
+// @ts-check
 const { resolve } = require('path')
 const chokidar = require('chokidar')
 

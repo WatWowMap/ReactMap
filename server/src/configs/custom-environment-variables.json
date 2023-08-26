@@ -888,14 +888,6 @@
         "__name": "DEFAULT_FILTERS_GYMS_GYM_BADGES",
         "__format": "boolean"
       },
-      "baseRaidTiers": {
-        "__name": "DEFAULT_FILTERS_GYMS_BASE_RAID_TIERS",
-        "__format": "json"
-      },
-      "baseTeamIds": {
-        "__name": "DEFAULT_FILTERS_GYMS_BASE_TEAM_IDS",
-        "__format": "json"
-      },
       "baseGymSlotAmounts": {
         "__name": "DEFAULT_FILTERS_GYMS_BASE_GYM_SLOT_AMOUNTS",
         "__format": "json"

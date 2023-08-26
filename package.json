@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.24.1",
+  "version": "1.25.0",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -113,6 +113,7 @@
     "react-virtuoso": "^4.5.0",
     "react-window": "^1.8.9",
     "rtree": "^1.4.2",
+    "source-map": "^0.7.4",
     "suncalc": "^1.9.0",
     "zustand": "^4.4.1"
   },

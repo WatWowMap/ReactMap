@@ -54,13 +54,10 @@ function toggleDarkMode(event) {
   }
 }
 
+window.addEventListener('keydown', toggleDarkMode)
+
 export default function App() {
   const [theme, setTheme] = React.useState(customTheme())
-
-  React.useEffect(() => {
-    window.addEventListener('keydown', toggleDarkMode)
-    return () => window.removeEventListener('keydown', toggleDarkMode)
-  }, [])
 
   const isValid = isLocalStorageEnabled()
 

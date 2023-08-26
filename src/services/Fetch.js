@@ -44,7 +44,7 @@ export default class Fetch {
           'Content-Type': 'application/json',
           version: CONFIG.client.version,
         },
-        body: JSON.stringify({ error }),
+        body: JSON.stringify(error),
       })
     } catch (e) {
       console.error(
