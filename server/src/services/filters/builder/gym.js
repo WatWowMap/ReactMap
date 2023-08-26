@@ -23,8 +23,10 @@ function buildGyms(perms, defaults) {
   }
   if (perms.raids) {
     Object.keys(Event.masterfile.raids).forEach((tier) => {
-      gymFilters[`e${tier}`] = new BaseFilter(defaults.eggs)
-      gymFilters[`r${tier}`] = new BaseFilter(defaults.raids)
+      if (tier !== '0') {
+        gymFilters[`e${tier}`] = new BaseFilter(defaults.eggs)
+        gymFilters[`r${tier}`] = new BaseFilter(defaults.raids)
+      }
     })
   }
   Event.getAvailable('gyms').forEach((avail) => {

@@ -248,7 +248,7 @@ export default function Menu({
       },
       ...extraButtons,
     ],
-    [category, webhookCategory, extraButtons],
+    [category, webhookCategory, extraButtons, filteredObj, tempFilters],
   )
 
   return (
