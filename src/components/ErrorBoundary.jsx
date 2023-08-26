@@ -7,6 +7,8 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Refresh from '@mui/icons-material/Refresh'
+import CopyIcon from '@mui/icons-material/FileCopy'
+import IconButton from '@mui/material/IconButton'
 import { withTranslation } from 'react-i18next'
 
 import Fetch from '@services/Fetch'
@@ -17,7 +19,7 @@ import Notification from './layout/general/Notification'
 
 class ErrorBoundary extends React.Component {
   static uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    return 'xxxxxxxx-r2m4-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0
       const v = c == 'x' ? r : (r & 0x3) | 0x8
       return v.toString(16)
@@ -78,7 +80,13 @@ class ErrorBoundary extends React.Component {
               <br />
               {this.props.t('reported_error')}
               <br />
-              {this.state.uuid}
+              {this.state.uuid}{' '}
+              <IconButton
+                size="small"
+                onClick={() => navigator.clipboard.writeText(this.state.uuid)}
+              >
+                <CopyIcon fontSize="small" />
+              </IconButton>
             </Typography>
           )}
           {!this.props.noRefresh && (
