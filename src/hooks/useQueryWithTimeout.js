@@ -5,6 +5,7 @@ import RobustTimeout from '@services/apollo/RobustTimeout'
 import { useQuery } from '@apollo/client'
 import Query from '@services/Query'
 import { getQueryArgs } from '@services/functions/getQueryArgs'
+import Utility from '@services/Utility'
 
 import { useStatic, useStore } from './useStore'
 
@@ -99,6 +100,7 @@ export function useQueryWithTimeout(category, perms) {
         filters: trimFilters(filters, userSettings, category, onlyAreas),
         zoom,
         ts: Math.floor(Date.now() / 1000),
+        midnight: Utility.getMidnight(),
       },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
       skip: !active,

@@ -32,7 +32,7 @@ function setLocationZoom({ target: map }) {
   })
 }
 
-export default function Map({ params }) {
+export default function Map() {
   Utility.analytics(window.location.pathname)
 
   const config = useStatic((state) => state.config.map)
@@ -45,7 +45,7 @@ export default function Map({ params }) {
   const error = useStatic((state) => state.clientError)
 
   const filters = useStore((state) => state.filters)
-  const [manualParams, setManualParams] = useState(params)
+  // const [manualParams, setManualParams] = useState(params)
   const [windowState, setWindowState] = useState(true)
 
   const map = useMapEvents({

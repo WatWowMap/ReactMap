@@ -62,7 +62,7 @@ const PokemonTile = ({ force, ...pkmn }) => {
   const [done, setDone] = React.useState(false)
 
   useMarkerTimer(pkmn.expire_timestamp, markerRef)
-  const opacity = useOpacity(pkmn.expire_timestamp, 'pokemon')
+  const opacity = useOpacity('pokemon')(pkmn.expire_timestamp)
 
   const [
     showTimer,

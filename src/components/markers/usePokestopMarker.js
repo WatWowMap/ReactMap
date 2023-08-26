@@ -1,35 +1,60 @@
+// @ts-check
 /* eslint-disable no-nested-ternary */
 import { divIcon } from 'leaflet'
-import getOpacity from '@services/functions/getOpacity'
+import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import useOpacity from '@hooks/useOpacity'
 
-export default function stopMarker(
-  pokestop,
+/**
+ *
+ * @param {{
+ *  hasQuest: boolean,
+ *  hasLure: boolean,
+ *  hasInvasion: boolean,
+ *  hasEvent: boolean,
+ * } & import('@rm/types').Pokestop} param0
+ * @returns
+ */
+export default function usePokestopMarker({
   hasQuest,
   hasLure,
   hasInvasion,
-  filters,
-  Icons,
-  userSettings,
   hasEvent,
-) {
-  const { lure_id, ar_scan_eligible, power_up_level, events } = pokestop
+  lure_id,
+  ar_scan_eligible,
+  power_up_level,
+  events,
+  invasions,
+  ...pokestop
+}) {
+  const Icons = useStatic((s) => s.Icons)
+  const getOpacity = useOpacity('pokestops', 'invasions')
+  const [showArBadge, baseIcon, baseSize] = useStore((s) => {
+    const { filters, userSettings } = s
+    return [
+      userSettings.pokestops.showArBadge,
+      Icons.getPokestops(
+        hasLure ? lure_id : 0,
+        hasInvasion,
+        hasQuest && userSettings.pokestops.hasQuestIndicator,
+        ar_scan_eligible &&
+          (userSettings.pokestops.showArBadge || power_up_level),
+        power_up_level,
+        hasEvent ? events[0].display_type?.toString() : '',
+      ),
+      hasLure
+        ? Icons.getSize('pokestop', filters.pokestops.filter[`l${lure_id}`])
+        : Icons.getSize('pokestop', filters.pokestops.filter.s0),
+    ]
+  }, basicEqualFn)
+  const filters = useStore((s) => s.filters.pokestops.filter)
+
   const [invasionMod, pokestopMod, rewardMod] = Icons.getModifiers(
     'invasion',
     'pokestop',
     'reward',
   )
 
-  let filterId = 's0'
   let popupYOffset = 1.3
-  const baseIcon = Icons.getPokestops(
-    hasLure ? lure_id : 0,
-    hasInvasion,
-    hasQuest && userSettings.hasQuestIndicator,
-    ar_scan_eligible && (userSettings.showArBadge || power_up_level),
-    power_up_level,
-    hasEvent ? events[0].display_type : '',
-  )
-  let baseSize = Icons.getSize('pokestop', filters.filter[filterId])
   let popupX = 7 + pokestopMod.popupX
   let { popupY } = pokestopMod
 
@@ -38,23 +63,15 @@ export default function stopMarker(
   const questIcons = []
   const questSizes = []
 
-  if (hasLure) {
-    filterId = `l${lure_id}`
-    baseSize = Icons.getSize('pokestop', filters.filter[filterId])
-  }
   if (hasInvasion) {
-    const { invasions } = pokestop
     invasions.forEach((invasion) => {
       if (invasion.grunt_type) {
-        filterId = `i${invasion.grunt_type}`
         invasionIcons.unshift({
           icon: Icons.getInvasions(invasion.grunt_type, invasion.confirmed),
-          opacity: userSettings.invasionOpacity
-            ? getOpacity(invasion.incident_expire_timestamp, userSettings)
-            : 1,
+          opacity: getOpacity(invasion.incident_expire_timestamp),
         })
         invasionSizes.unshift(
-          Icons.getSize('invasion', filters.filter[filterId]),
+          Icons.getSize('invasion', filters[`i${invasion.grunt_type}`]),
         )
         popupYOffset += rewardMod.offsetY - 1
         popupX += invasionMod.popupX
@@ -127,7 +144,7 @@ export default function stopMarker(
               quest_gender_id,
               quest_costume_id,
               0,
-              quest_shiny,
+              !!quest_shiny,
             ),
           })
           break
@@ -154,7 +171,7 @@ export default function stopMarker(
         default:
           questIcons.unshift({ url: Icons.getRewards(quest_reward_type) })
       }
-      questSizes.unshift(Icons.getSize('reward', filters.filter[key]))
+      questSizes.unshift(Icons.getSize('reward', filters[key]))
       popupYOffset += rewardMod.offsetY - 1
       popupX += rewardMod.popupX
       popupY += rewardMod.popupY
@@ -164,8 +181,7 @@ export default function stopMarker(
   const totalQuestSize = questSizes.reduce((a, b) => a + b, 0)
   const totalInvasionSize = invasionSizes.reduce((a, b) => a + b, 0)
 
-  const showAr =
-    userSettings.showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')
+  const showAr = showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')
 
   return divIcon({
     popupAnchor: [

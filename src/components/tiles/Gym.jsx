@@ -28,26 +28,10 @@ const getColor = (team) => {
  * @param {import('@rm/types').Gym & { force?: boolean }} props
  * @returns
  */
-const GymTile = ({
-  force,
-  ...gym
-  // item,
-  // ts,
-  // showTimer,
-  // filters,
-  // Icons,
-  // excludeList,
-  // userSettings,
-  // params,
-  // showCircles,
-  // setParams,
-  // config,
-  // zoom,
-}) => {
+const GymTile = ({ force, ...gym }) => {
   const markerRef = React.useRef(null)
   const [done, setDone] = React.useState(false)
   const [stateChange, setStateChange] = React.useState(false)
-  // const [badge, setBadge] = React.useState(item.badge || 0)
 
   const [
     hasRaid,
@@ -145,7 +129,7 @@ const GymTile = ({
     ]
   }, basicEqualFn)
 
-  const opacity = useOpacity(gym.raid_end_timestamp, 'gyms', 'raids')
+  const opacity = useOpacity('gyms', 'raids')(gym.raid_end_timestamp)
 
   const timerToDisplay =
     gym.raid_pokemon_id || hasHatched

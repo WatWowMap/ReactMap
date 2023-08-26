@@ -1,140 +1,171 @@
-import React, { useState, memo, useRef } from 'react'
+// @ts-check
+import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
-import useForcePopup from '@hooks/useForcePopup'
+import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
 
 import PopupContent from '../popups/Pokestop'
-import stopMarker from '../markers/pokestop'
 import ToolTipWrapper from './Timer'
+import usePokestopMarker from '../markers/usePokestopMarker'
 
-const PokestopTile = ({
-  item,
-  ts,
-  showTimer,
-  filters,
-  Icons,
-  perms,
-  excludeList,
-  userSettings,
-  params,
-  showCircles,
-  config,
-  setParams,
-  zoom,
-}) => {
-  return null
-  const markerRef = useRef({})
-  const [done, setDone] = useState(false)
-  const [stateChange, setStateChange] = useState(false)
-  const newTs = Date.now() / 1000
+/**
+ *
+ * @param {import('@rm/types').Pokestop & { force: boolean }} props
+ * @returns
+ */
+const PokestopTile = ({ force, ...pokestop }) => {
+  const markerRef = React.useRef(null)
+  const [done, setDone] = React.useState(false)
+  const [stateChange, setStateChange] = React.useState(false)
 
-  const hasLure = item.lure_expire_timestamp > newTs
+  const [
+    hasLure,
+    hasInvasion,
+    hasQuest,
+    hasEvent,
+    hasAllStops,
+    showTimer,
+    interactionRangeZoom,
+  ] = useStatic((s) => {
+    const newTs = Date.now() / 1000
+    const { filters } = useStore.getState()
+    const {
+      config,
+      excludeList,
+      timerList,
+      auth: { perms },
+    } = s
+    return [
+      pokestop.lure_expire_timestamp > newTs &&
+        perms.lures &&
+        !excludeList.includes(`l${pokestop.lure_id}`),
+      !!(
+        perms.invasions &&
+        pokestop.invasions?.some(
+          (invasion) =>
+            invasion.grunt_type &&
+            !excludeList.includes(`i${invasion.grunt_type}`) &&
+            invasion.incident_expire_timestamp > newTs,
+        )
+      ),
+      !!(
+        perms.quests &&
+        pokestop.quests?.some((quest) => !excludeList.includes(quest.key))
+      ),
+      !!(
+        perms.eventStops &&
+        filters.pokestops.eventStops &&
+        pokestop.events?.some((event) => event.event_expire_timestamp > newTs)
+      ),
+      (filters.pokestops.allPokestops || pokestop.ar_scan_eligible) &&
+        perms.pokestops,
+      timerList.includes(pokestop.id),
+      config.map.interactionRangeZoom,
+    ]
+  }, basicEqualFn)
 
-  const hasInvasion =
-    item.invasions &&
-    item.invasions.some(
-      (invasion) =>
-        invasion.grunt_type &&
-        !excludeList.includes(`i${invasion.grunt_type}`) &&
-        invasion.incident_expire_timestamp > newTs,
-    )
+  const [
+    invasionTimers,
+    lureTimers,
+    eventStopTimers,
+    lureRange,
+    interactionRange,
+    customRange,
+  ] = useStore((s) => {
+    const { userSettings, zoom } = s
+    return [
+      userSettings.pokestops.invasionTimers || showTimer,
+      userSettings.pokestops.lureTimers || showTimer,
+      userSettings.pokestops.eventStopTimers || showTimer,
+      !!userSettings.pokestops.lureRange && zoom >= interactionRangeZoom,
+      !!userSettings.pokestops.interactionRange && zoom >= interactionRangeZoom,
+      zoom >= interactionRangeZoom ? userSettings.pokestops.customRange : 0,
+    ]
+  }, basicEqualFn)
 
-  const hasQuest =
-    item.quests && item.quests.some((quest) => !excludeList.includes(quest.key))
+  const timers = React.useMemo(() => {
+    const internalTimers = /** @type {number[]} */ ([])
+    if (invasionTimers && hasInvasion) {
+      pokestop.invasions.forEach((invasion) =>
+        internalTimers.push(invasion.incident_expire_timestamp),
+      )
+    }
+    if (lureTimers && hasLure) {
+      internalTimers.push(pokestop.lure_expire_timestamp)
+    }
+    if (eventStopTimers && hasEvent) {
+      pokestop.events.forEach((event) => {
+        internalTimers.push(event.event_expire_timestamp)
+      })
+    }
+    return internalTimers
+  }, [
+    invasionTimers,
+    hasInvasion,
+    lureTimers,
+    hasLure,
+    eventStopTimers,
+    hasEvent,
+  ])
 
-  const hasEvent =
-    item.events &&
-    item.events.some((event) => event.event_expire_timestamp > newTs)
-
-  const timers = []
-  if ((showTimer || userSettings.invasionTimers) && hasInvasion) {
-    item.invasions.forEach((invasion) =>
-      timers.push(invasion.incident_expire_timestamp),
-    )
-  }
-  if ((showTimer || userSettings.lureTimers) && hasLure) {
-    timers.push(item.lure_expire_timestamp)
-  }
-  if ((showTimer || userSettings.eventStopTimers) && hasEvent) {
-    item.events.forEach((event) => {
-      if (!event.grunt_type) {
-        timers.push(event.event_expire_timestamp)
-      }
-    })
-  }
-
-  useMarkerTimer(
-    timers.length ? Math.min(...timers) : null,
-    item.id,
-    markerRef,
-    '',
-    ts,
-    () => setStateChange(!stateChange),
+  useMarkerTimer(timers.length ? Math.min(...timers) : null, markerRef, () =>
+    setStateChange(!stateChange),
   )
-  useForcePopup(item.id, markerRef, params, setParams, done)
+
+  const icon = usePokestopMarker({
+    hasQuest,
+    hasLure,
+    hasInvasion,
+    hasEvent,
+    ...pokestop,
+  })
+
+  React.useEffect(() => {
+    if (force && !done && markerRef.current) {
+      markerRef.current.openPopup()
+      setDone(true)
+    }
+  }, [force])
 
   return (
-    Boolean(
-      (hasQuest && perms.quests) ||
-        (hasLure && perms.lures) ||
-        (hasInvasion && perms.invasions) ||
-        (hasEvent && perms.eventStops && filters.eventStops) ||
-        ((filters.allPokestops || item.ar_scan_eligible) && perms.allPokestops),
-    ) && (
+    !!(hasQuest || hasLure || hasInvasion || hasEvent || hasAllStops) && (
       <Marker
-        ref={(m) => {
-          markerRef.current[item.id] = m
-          if (!done && item.id === params.id) {
-            setDone(true)
-          }
-        }}
-        position={[item.lat, item.lon]}
-        icon={stopMarker(
-          item,
-          hasQuest,
-          hasLure,
-          hasInvasion,
-          filters,
-          Icons,
-          userSettings,
-          hasEvent,
-        )}
+        ref={markerRef}
+        position={[pokestop.lat, pokestop.lon]}
+        icon={icon}
       >
-        <Popup position={[item.lat, item.lon]}>
+        <Popup position={[pokestop.lat, pokestop.lon]}>
           <PopupContent
-            pokestop={item}
-            ts={ts}
             hasLure={hasLure}
             hasInvasion={hasInvasion}
             hasQuest={hasQuest}
             hasEvent={hasEvent}
-            Icons={Icons}
-            userSettings={userSettings}
-            config={config}
+            hasAllStops={hasAllStops}
+            {...pokestop}
           />
         </Popup>
         {Boolean(timers.length) && (
           <ToolTipWrapper timers={timers} offset={[0, 4]} />
         )}
-        {showCircles && (
+        {interactionRange && (
           <Circle
-            center={[item.lat, item.lon]}
+            center={[pokestop.lat, pokestop.lon]}
             radius={80}
             pathOptions={{ color: '#0DA8E7', weight: 1 }}
           />
         )}
-        {userSettings.lureRange && zoom >= config.interactionRangeZoom && (
+        {lureRange && (
           <Circle
-            center={[item.lat, item.lon]}
+            center={[pokestop.lat, pokestop.lon]}
             radius={40}
             pathOptions={{ color: '#32cd32', weight: 1 }}
           />
         )}
-        {!!userSettings.customRange && zoom >= config.interactionRangeZoom && (
+        {!!customRange && (
           <Circle
-            center={[item.lat, item.lon]}
-            radius={userSettings.customRange}
+            center={[pokestop.lat, pokestop.lon]}
+            radius={customRange}
             pathOptions={{ color: 'purple', weight: 0.5 }}
           />
         )}
@@ -143,29 +174,25 @@ const PokestopTile = ({
   )
 }
 
-const areEqual = (prev, next) =>
-  prev.item.id === next.item.id &&
-  prev.item.lure_expire_timestamp === next.item.lure_expire_timestamp &&
-  prev.item.updated === next.item.updated &&
-  prev.showTimer === next.showTimer &&
-  prev.showCircles === next.showCircles &&
-  prev.item.quests?.length === next.item.quests?.length &&
-  (prev.item.quests && next.item.quests
-    ? prev.item.quests.every(
-        (q, i) =>
-          q.with_ar === next.item.quests[i]?.with_ar &&
-          !next.excludeList.includes(q.key),
-      )
-    : true) &&
-  prev.item.invasions?.length === next.item.invasions?.length &&
-  (prev.item.invasions && next.item.invasions
-    ? prev.item.invasions?.every(
-        (inv, i) =>
-          inv.confirmed === next.item?.invasions?.[i]?.confirmed &&
-          inv.grunt_type === next.item?.invasions?.[i]?.grunt_type &&
-          !next.excludeList.includes(inv.grunt_type),
-      )
-    : true) &&
-  prev.item.events?.length === next.item.events?.length
+const MemoPokestopTile = React.memo(
+  PokestopTile,
+  (prev, next) =>
+    prev.id === next.id &&
+    prev.lure_expire_timestamp === next.lure_expire_timestamp &&
+    prev.updated === next.updated &&
+    prev.quests?.length === next.quests?.length &&
+    (prev.quests && next.quests
+      ? prev.quests.every((q, i) => q.with_ar === next.quests[i]?.with_ar)
+      : true) &&
+    prev.invasions?.length === next.invasions?.length &&
+    (prev.invasions && next.invasions
+      ? prev.invasions?.every(
+          (inv, i) =>
+            inv.confirmed === next?.invasions?.[i]?.confirmed &&
+            inv.grunt_type === next?.invasions?.[i]?.grunt_type,
+        )
+      : true) &&
+    prev.events?.length === next.events?.length,
+)
 
-export default memo(PokestopTile, areEqual)
+export default MemoPokestopTile
