@@ -93,6 +93,14 @@ if (
   )
 }
 
+app.use((req, res, next) => {
+  if (req.url.endsWith('.map')) {
+    res.status(403).send('Naughty!')
+  } else {
+    next()
+  }
+})
+
 const RateLimitTime = config.getSafe('api.rateLimit.time') * 60 * 1000
 const MaxRequestsPerHour =
   config.getSafe('api.rateLimit.requests') * (RateLimitTime / 1000)
