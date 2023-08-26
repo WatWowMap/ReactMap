@@ -13,6 +13,7 @@ const THEME_COLORS = new Set([
   'inherit',
 ])
 
+/** @param {import('@mui/material').ButtonProps & { icon?: string }} */
 export default function CustomButton({
   size,
   color = 'inherit',
@@ -33,7 +34,9 @@ export default function CustomButton({
       variant={variant}
       style={style}
       sx={sx}
-      startIcon={icon ? <I className={icon} style={{ fontSize: 30 }} /> : null}
+      startIcon={
+        icon ? <I className={icon} style={{ fontSize: 30 }} /> : undefined
+      }
     >
       {children}
     </Button>

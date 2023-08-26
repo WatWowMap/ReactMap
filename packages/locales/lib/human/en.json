@@ -664,5 +664,6 @@
   "locale": "Locale",
   "saved": "Saved",
   "show_editor": "Show Editor",
-  "hide_editor": "Hide Editor"
+  "hide_editor": "Hide Editor",
+  "reported_error": "This error has been reported to the server with identifier:"
 }
