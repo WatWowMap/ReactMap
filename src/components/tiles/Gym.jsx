@@ -10,6 +10,7 @@ import gymMarker from '../markers/gym'
 import PopupContent from '../popups/Gym'
 import ToolTipWrapper from './Timer'
 
+/** @param {number} team */
 const getColor = (team) => {
   switch (team) {
     case 1:

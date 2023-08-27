@@ -42,6 +42,10 @@ const SpawnpointTile = (item) => {
     </Circle>
   )
 }
-const MemoSpawnpoint = React.memo(SpawnpointTile, () => true)
+const MemoSpawnpoint = React.memo(
+  SpawnpointTile,
+  (prev, next) =>
+    prev.despawn_sec === next.despawn_sec && prev.updated === next.updated,
+)
 
 export default MemoSpawnpoint

@@ -225,9 +225,9 @@ const PokemonTile = ({ force, ...pkmn }) => {
   )
 }
 
-const MemoizedPokemonTile = React.memo(
+const MemoPokemonTile = React.memo(
   PokemonTile,
   (prev, next) => prev.updated === next.updated,
 )
 
-export default MemoizedPokemonTile
+export default MemoPokemonTile

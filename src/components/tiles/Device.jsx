@@ -64,10 +64,7 @@ const DeviceTile = (device) => {
 
 const MemoDevice = React.memo(
   DeviceTile,
-  (prev, next) =>
-    prev.lat === next.lat &&
-    prev.lon === next.lon &&
-    prev.updated === next.updated,
+  (prev, next) => prev.updated === next.updated,
 )
 
 export default MemoDevice

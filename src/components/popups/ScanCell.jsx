@@ -6,7 +6,12 @@ import { Trans, useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
-export default function ScanCellPopup({ id, updated }) {
+/**
+ *
+ * @param {import('@rm/types').ScanCell} props
+ * @returns
+ */
+function ScanCellPopup({ id, updated }) {
   const { t } = useTranslation()
   const lastUpdated = new Date(updated * 1000)
   const [timer, setTimer] = React.useState(Utility.getTimeUntil(lastUpdated))
@@ -38,3 +43,5 @@ export default function ScanCellPopup({ id, updated }) {
     </ErrorBoundary>
   )
 }
+
+export default ScanCellPopup

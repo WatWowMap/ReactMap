@@ -22,6 +22,9 @@ const ScanCellTile = (scanCell) => (
   </Polygon>
 )
 
-const ScanCellMemo = React.memo(ScanCellTile)
+const ScanCellMemo = React.memo(
+  ScanCellTile,
+  (prev, next) => prev.updated === next.updated,
+)
 
 export default ScanCellMemo

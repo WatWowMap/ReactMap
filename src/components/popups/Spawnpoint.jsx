@@ -11,7 +11,7 @@ import ErrorBoundary from '@components/ErrorBoundary'
  * @param {import('@rm/types').Spawnpoint} props
  * @returns
  */
-export default function SpawnpointPopup({ despawn_sec, lat, lon, updated }) {
+function SpawnpointPopup({ despawn_sec, lat, lon, updated }) {
   const { t } = useTranslation()
 
   const minute = despawn_sec > 60 ? Math.round(despawn_sec / 60) : despawn_sec
@@ -42,3 +42,5 @@ export default function SpawnpointPopup({ despawn_sec, lat, lon, updated }) {
     </ErrorBoundary>
   )
 }
+
+export default SpawnpointPopup

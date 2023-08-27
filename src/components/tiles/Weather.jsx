@@ -66,6 +66,11 @@ const WeatherTile = (weather) => {
   )
 }
 
-const MemoWeatherTile = React.memo(WeatherTile, () => true)
+const MemoWeatherTile = React.memo(
+  WeatherTile,
+  (prev, next) =>
+    prev.gameplay_condition === next.gameplay_condition &&
+    prev.updated === next.updated,
+)
 
 export default MemoWeatherTile

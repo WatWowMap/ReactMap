@@ -100,6 +100,10 @@ export function ScanAreaTile(featureCollection) {
   )
 }
 
-const MemoScanAreaTile = React.memo(ScanAreaTile)
+const MemoScanAreaTile = React.memo(ScanAreaTile, (prev, next) =>
+  prev.features.every(
+    (feat, i) => feat.properties.key === next.features[i].properties.key,
+  ),
+)
 
 export default MemoScanAreaTile

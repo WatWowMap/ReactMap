@@ -44,6 +44,9 @@ const PortalTile = ({ force, ...portal }) => {
   )
 }
 
-const MemoPortalTile = React.memo(PortalTile)
+const MemoPortalTile = React.memo(
+  PortalTile,
+  (prev, next) => prev.updated === next.updated,
+)
 
 export default MemoPortalTile

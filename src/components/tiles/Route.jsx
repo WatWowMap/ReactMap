@@ -126,6 +126,9 @@ const RouteTile = (route) => {
   )
 }
 
-const RouteMemo = React.memo(RouteTile, () => true)
+const MemoRouteTile = React.memo(
+  RouteTile,
+  (prev, next) => prev.updated === next.updated,
+)
 
-export default RouteMemo
+export default MemoRouteTile
