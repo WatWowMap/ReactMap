@@ -12,12 +12,8 @@ import HolidayEffect from './HolidayEffects'
 const rootLoading = document.getElementById('loader')
 
 export default function Config({ setTheme }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const darkMode = useStore((s) => s.darkMode)
-  const locale =
-    useStore((s) => s.settings?.localeSelection) ||
-    localStorage.getItem('i18nextLng') ||
-    'en'
 
   const [serverSettings, setServerSettings] = React.useState(null)
 
@@ -42,7 +38,9 @@ export default function Config({ setTheme }) {
   }, [])
 
   React.useEffect(() => {
-    setTheme(makeTheme(serverSettings?.config?.map?.theme, darkMode, locale))
+    setTheme(
+      makeTheme(serverSettings?.config?.map?.theme, darkMode, i18n.language),
+    )
     if (darkMode) {
       if (!document.body.classList.contains('dark')) {
         document.body.classList.add('dark')
@@ -50,7 +48,7 @@ export default function Config({ setTheme }) {
     } else if (document.body.classList.contains('dark')) {
       document.body.classList.remove('dark')
     }
-  }, [serverSettings?.config?.map?.theme, darkMode, locale])
+  }, [serverSettings?.config?.map?.theme, darkMode, i18n.language])
 
   if (!serverSettings) {
     return <div />

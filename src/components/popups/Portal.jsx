@@ -1,6 +1,7 @@
+// @ts-check
 import * as React from 'react'
-import { Grid, Typography } from '@mui/material'
-
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
@@ -10,6 +11,11 @@ import { useStatic, useStore } from '@hooks/useStore'
 import Navigation from './common/Navigation'
 import Coords from './common/Coords'
 
+/**
+ *
+ * @param {import('@rm/types').Portal} props
+ * @returns
+ */
 export default function PortalPopup({
   url,
   name,
@@ -64,12 +70,7 @@ export default function PortalPopup({
           </Typography>
         </Grid>
         <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <a
-            href={url}
-            alt={name || 'unknown'}
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href={url} target="_blank" rel="noreferrer">
             <img
               src={src}
               alt={name || 'unknown'}

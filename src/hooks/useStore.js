@@ -12,7 +12,6 @@ import { persist } from 'zustand/middleware'
  *   sidebar: string,
  *   selectedWebhook: string,
  *   settings: {
- *    localeSelection: keyof typeof import('@assets/mui/theme').LOCALE_MAP,
  *    navigationControls: 'react' | 'leaflet' }
  *   motdIndex: number
  *   tutorial: boolean,

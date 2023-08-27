@@ -49,11 +49,6 @@ export default function useConfig(serverSettings, params) {
     }
 
     if (localState?.state?.settings) {
-      const cached = localState.state.settings.localeSelection
-      const i18cached = localStorage.getItem('i18nextLng')
-      localState.state.settings.localeSelection =
-        cached !== i18cached ? i18cached : cached
-
       const validNav = Object.keys(serverSettings.config.navigation)
       localState.state.settings.navigation = validNav.includes(
         localState.state.settings.navigation,
@@ -67,10 +62,6 @@ export default function useConfig(serverSettings, params) {
       )
         ? localState.state.settings.tileServers
         : serverSettings.config.tileServers[validTs[0]]?.name
-    } else {
-      serverSettings.settings.localeSelection =
-        localStorage.getItem('i18nextLng') ||
-        serverSettings.settings.localeSelection
     }
 
     const zoom =
