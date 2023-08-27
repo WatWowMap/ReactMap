@@ -15,6 +15,7 @@ import { useStore } from '@hooks/useStore'
 import { apolloClient } from '@services/apollo'
 import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled'
 import { setLoadingText } from '@services/functions/setLoadingText'
+import { useWindowState } from '@hooks/useWindowState'
 
 import Config from './Config'
 import ErrorBoundary from './ErrorBoundary'
@@ -57,6 +58,7 @@ function toggleDarkMode(event) {
 window.addEventListener('keydown', toggleDarkMode)
 
 export default function App() {
+  useWindowState()
   const [theme, setTheme] = React.useState(customTheme())
 
   const isValid = isLocalStorageEnabled()

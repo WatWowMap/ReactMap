@@ -15,8 +15,6 @@ import Clustering from './Clustering'
 import Notification from './layout/general/Notification'
 import { GenerateCells } from './tiles/S2Cell'
 
-const IGNORE_CLUSTERING = ['devices', 'submissionCells', 'scanCells', 'weather']
-
 const FILTER_SKIP_LIST = ['filter', 'enabled', 'legacy']
 
 /** @param {string} category */
@@ -93,18 +91,7 @@ function QueryData({ category, timeout }) {
 
   const hideList = useStatic((state) => new Set(state.hideList))
   const active = useStatic((state) => state.active)
-  const {
-    config: {
-      map: {
-        clustering: { [category]: clustering },
-        minZoom,
-      },
-    },
-  } = useStatic.getState()
 
-  const userCluster = useStore(
-    (s) => s.userSettings[category]?.clustering || false,
-  )
   const userSettings = useStore(
     (s) => s.userSettings[userSettingsCategory(category)] || {},
   )
@@ -122,7 +109,7 @@ function QueryData({ category, timeout }) {
       ...getQueryArgs(),
       filters: trimFilters(filters, userSettings, category, onlyAreas),
     }),
-    [map],
+    [],
   )
 
   const { data, previousData, error, refetch } = useQuery(
@@ -177,18 +164,7 @@ function QueryData({ category, timeout }) {
 
   const returnData = (data || previousData || { [category]: [] })[category]
 
-  const cluster = clustering
-    ? userCluster || returnData.length >= clustering.forcedLimit
-    : false
-  const zoomLevel = clustering?.zoomLevel || minZoom
-
-  // console.log(new Date().toLocaleTimeString(), category, {
-  //   data,
-  //   previousData,
-  //   returnData,
-  // })
-
-  if (!returnData) {
+  if (!data) {
     return error && process.env.NODE_ENV === 'development' ? (
       <Notification
         open
@@ -205,11 +181,7 @@ function QueryData({ category, timeout }) {
   }
 
   return (
-    <Clustering
-      category={category}
-      cluster={cluster && !IGNORE_CLUSTERING.includes('category')}
-      zoomLevel={zoomLevel}
-    >
+    <Clustering category={category}>
       {returnData.map((each) => {
         if (!hideList.has(each.id)) {
           return <Component key={each.id || category} {...each} />
