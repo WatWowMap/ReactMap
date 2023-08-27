@@ -7,7 +7,9 @@ const { name } = path.parse(__filename)
 
 const { log, HELPERS } = require('@rm/logger')
 const {
-  map: { forceTutorial },
+  map: {
+    misc: { forceTutorial },
+  },
   authentication: { [name]: strategyConfig, alwaysEnabledPerms, perms },
 } = require('@rm/config')
 const { Db } = require('../services/initialization')

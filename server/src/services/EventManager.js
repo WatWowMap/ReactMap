@@ -14,6 +14,7 @@ class EventManager {
   constructor() {
     /** @type {import("@rm/types").Masterfile} */
     this.masterfile = read()
+    /** @type {import("@rm/types").Masterfile['invasions'] | {}} */
     this.invasions =
       'invasions' in this.masterfile ? this.masterfile.invasions : {}
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
@@ -28,6 +29,11 @@ class EventManager {
     this.Clients = {}
   }
 
+  /**
+   *
+   * @param {keyof EventManager['available']} category
+   * @returns
+   */
   getAvailable(category) {
     return this.available[category]
   }

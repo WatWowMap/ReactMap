@@ -5,7 +5,7 @@ const i18next = require('i18next')
 const {
   api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },
   defaultFilters: {
-    gyms: { baseTeamIds, baseGymSlotAmounts },
+    gyms: { baseGymSlotAmounts },
   },
 } = require('@rm/config')
 const { Event, Db } = require('../services/initialization')
@@ -171,7 +171,9 @@ class Gym extends Model {
     })
 
     const finalTeams = []
-    const finalSlots = Object.fromEntries(baseTeamIds.map((team) => [team, []]))
+    const finalSlots = Object.fromEntries(
+      Object.keys(Event.masterfile.teams).map((team) => [team, []]),
+    )
 
     teams.forEach((team) => {
       let slotCount = 0

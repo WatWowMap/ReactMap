@@ -189,7 +189,7 @@ const viteConfig = defineConfig(async ({ mode }) => {
     build: {
       target: ['safari11.1', 'chrome64', 'firefox66', 'edge88'],
       outDir: resolve(__dirname, './dist'),
-      sourcemap: isDevelopment || isRelease,
+      sourcemap: isRelease || isDevelopment ? true : 'hidden',
       minify:
         isDevelopment || config.getSafe('devOptions.skipMinified')
           ? false

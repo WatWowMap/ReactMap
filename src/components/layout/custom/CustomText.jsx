@@ -1,6 +1,12 @@
+// @ts-check
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 
+/**
+ *
+ * @param {import('@mui/material').TypographyProps} props
+ * @returns
+ */
 export default function CustomText({
   className,
   variant,

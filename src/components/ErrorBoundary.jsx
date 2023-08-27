@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 // @ts-check
 /* eslint-disable no-console */
 /* eslint-disable react/destructuring-assignment */
@@ -6,27 +7,49 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Refresh from '@mui/icons-material/Refresh'
+import CopyIcon from '@mui/icons-material/FileCopy'
+import IconButton from '@mui/material/IconButton'
 import { withTranslation } from 'react-i18next'
 
+import Fetch from '@services/Fetch'
 import Notification from './layout/general/Notification'
 
 // This component uses React Classes due to componentDidCatch() not being available in React Hooks
 // Do not use this as a base for other components
 
 class ErrorBoundary extends React.Component {
+  static uuidv4() {
+    return 'xxxxxxxx-r2m4-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0
+      const v = c == 'x' ? r : (r & 0x3) | 0x8
+      return v.toString(16)
+    })
+  }
+
   constructor(props) {
     super(props)
     this.state = {
       message: '',
       errorCount: 0,
+      reported: false,
+      uuid: ErrorBoundary.uuidv4(),
     }
   }
 
-  componentDidCatch(error) {
-    console.error(error)
+  async componentDidCatch(error) {
+    if (!this.state.reported) {
+      await Fetch.sendError({
+        cause: error.cause,
+        message: error.message,
+        stack: error?.stack,
+        name: error.name,
+        uuid: this.state.uuid,
+      })
+    }
     this.setState((prev) => ({
       message: error?.message || '',
       errorCount: prev.errorCount + 1,
+      reported: true,
     }))
   }
 
@@ -52,6 +75,20 @@ class ErrorBoundary extends React.Component {
           <Typography variant="subtitle2" align="center">
             {this.state.message}
           </Typography>
+          {this.state.reported && (
+            <Typography variant="subtitle2" align="center">
+              <br />
+              {this.props.t('reported_error')}
+              <br />
+              {this.state.uuid}{' '}
+              <IconButton
+                size="small"
+                onClick={() => navigator.clipboard.writeText(this.state.uuid)}
+              >
+                <CopyIcon fontSize="small" />
+              </IconButton>
+            </Typography>
+          )}
           {!this.props.noRefresh && (
             <>
               <br />
