@@ -109,7 +109,8 @@ export const useStore = create(
  *   searchLoading: boolean,
  *   Icons: InstanceType<typeof import("../services/Icons").default>,
  *   config: object,
- *   auth: object,
+ *   ui: object
+ *   auth: { perms: import('@rm/types').Permissions },
  *   filters: object,
  *   masterfile: import('@rm/types').Masterfile
  *   settings: Record<string, any>

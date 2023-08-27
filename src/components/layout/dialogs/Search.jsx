@@ -27,6 +27,7 @@ import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { SEARCHABLE } from '@services/queries/config'
+import getMidnight from '@services/functions/getMidnight'
 
 import Header from '../general/Header'
 import QuestTitle from '../general/QuestTitle'
@@ -198,7 +199,7 @@ export default function Search() {
         lon: location[1],
         locale: localStorage.getItem('i18nextLng'),
         ts: Math.floor(Date.now() / 1000),
-        midnight: Utility.getMidnight(),
+        midnight: getMidnight(),
         onlyAreas: scanAreas?.filter?.areas || [],
       },
     },

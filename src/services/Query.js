@@ -1,4 +1,6 @@
 // @ts-check
+import { useStatic } from '@hooks/useStore'
+
 import getAllDevices from './queries/device'
 import * as gymIndex from './queries/gym'
 import * as pokestopIndex from './queries/pokestop'
@@ -21,7 +23,8 @@ export default class Query {
     return getAllDevices
   }
 
-  static gyms(filters, perms) {
+  static gyms(filters) {
+    const perms = useStatic.getState().ui.gyms
     if (filters === 'id') {
       return gymIndex.getOne
     }
@@ -61,7 +64,8 @@ export default class Query {
     return getAllNests
   }
 
-  static pokestops(filters, perms) {
+  static pokestops(filters) {
+    const perms = useStatic.getState().ui.gyms
     if (filters === 'id') {
       return pokestopIndex.getOne
     }
@@ -81,7 +85,8 @@ export default class Query {
     return pokestopIndex[query]
   }
 
-  static pokemon(filters, perms) {
+  static pokemon(filters) {
+    const perms = useStatic.getState().ui.gyms
     if (filters === 'id') {
       return pokemonIndex.getOne
     }
