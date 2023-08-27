@@ -41,6 +41,8 @@ export default function Container({ serverSettings, params, location, zoom }) {
   const isMobile = useMediaQuery((t) => t.breakpoints.only('xs'))
   const isTablet = useMediaQuery((t) => t.breakpoints.only('sm'))
 
+  const [ready, setReady] = React.useState(false)
+
   React.useEffect(() => {
     useStatic.setState({ isMobile, isTablet })
   }, [isMobile, isTablet])
@@ -61,6 +63,7 @@ export default function Container({ serverSettings, params, location, zoom }) {
           return { map: ref }
         })
       }
+      whenReady={() => setReady(true)}
       zoom={
         zoom < serverSettings.config.map.minZoom ||
         zoom > serverSettings.config.map.maxZoom
@@ -74,7 +77,7 @@ export default function Container({ serverSettings, params, location, zoom }) {
       <ControlledTileLayer />
       <ControlledZoomLayer />
       <ControlledLocate />
-      {serverSettings.user && serverSettings.user.perms.map && (
+      {serverSettings.user && serverSettings.user.perms.map && ready && (
         <Map params={params} />
       )}
       <ScanOnDemand mode="scanNext" />
