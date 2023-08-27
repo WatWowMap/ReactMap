@@ -14,15 +14,15 @@ import PopupContent from '../popups/Nest'
  */
 const NestTile = ({ force, ...nest }) => {
   const recent = Date.now() / 1000 - nest.updated < 172800000
+  const internalId = `${nest.pokemon_id}-${nest.pokemon_form}`
 
+  const size = useStore((s) => s.filters.nests.filter[internalId]?.size || 'md')
   const [excluded, iconUrl, iconSize] = useStatic((s) => {
-    const internalId = `${nest.pokemon_id}-${nest.pokemon_form}`
     const { Icons, excludeList } = s
-    const filter = useStore.getState().filters.nests.filter[internalId]
     return [
       excludeList.includes(internalId),
       Icons.getPokemon(nest.pokemon_id, nest.pokemon_form),
-      Icons.getSize('nest', filter),
+      Icons.getSize('nest', size),
     ]
   }, basicEqualFn)
 

@@ -118,7 +118,7 @@ const PokemonTile = ({ force, ...pkmn }) => {
         pkmn.gender,
         pkmn.costume,
       ),
-      Icons.getSize('pokemon', { size: filterSize }),
+      Icons.getSize('pokemon', filterSize),
       badgeId ? Icons.getMisc(badgeId) : '',
       config.map.interactionRangeZoom <= map.getZoom(),
       s.timeOfDay,

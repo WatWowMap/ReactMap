@@ -80,7 +80,7 @@ const GymTile = ({ force, ...gym }) => {
         userSettings.gyms.showExBadge && gym.ex_raid_eligible,
         userSettings.gyms.showArBadge && gym.ar_scan_eligible,
       ),
-      Icons.getSize('gym', filters.gyms.filter[gymFilterId]),
+      Icons.getSize('gym', filters.gyms.filter[gymFilterId]?.size),
       hasRaidInternal
         ? gym.raid_pokemon_id
           ? Icons.getPokemon(
@@ -99,8 +99,8 @@ const GymTile = ({ force, ...gym }) => {
         : '',
       hasRaidInternal
         ? gym.raid_pokemon_id
-          ? Icons.getSize('raid', filters.gyms.filter[raidFilterId])
-          : Icons.getSize('raid', filters.gyms.filter[eggFilterId])
+          ? Icons.getSize('raid', filters.gyms.filter[raidFilterId]?.size)
+          : Icons.getSize('raid', filters.gyms.filter[eggFilterId]?.size)
         : '',
     ]
   }, basicEqualFn)

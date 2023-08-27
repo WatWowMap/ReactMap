@@ -168,9 +168,12 @@ class UIcons {
     }
   }
 
-  getSize(category, filter) {
-    const refSizes = this.sizes[category]
-    const baseSize = filter ? refSizes[filter.size] : refSizes.md
+  /**
+   * @param {string} category
+   * @param {'sm' | 'md' | 'lg' | 'xl'} [size]
+   */
+  getSize(category, size = 'md') {
+    const baseSize = this.sizes[category][size]
     return this.modifiers[category]
       ? baseSize * this.modifiers[category].sizeMultiplier
       : baseSize

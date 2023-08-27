@@ -42,8 +42,11 @@ export default function usePokestopMarker({
         hasEvent ? events[0].display_type?.toString() : '',
       ),
       hasLure
-        ? Icons.getSize('pokestop', filters.pokestops.filter[`l${lure_id}`])
-        : Icons.getSize('pokestop', filters.pokestops.filter.s0),
+        ? Icons.getSize(
+            'pokestop',
+            filters.pokestops.filter[`l${lure_id}`]?.size,
+          )
+        : Icons.getSize('pokestop', filters.pokestops.filter.s0?.size),
     ]
   }, basicEqualFn)
   const filters = useStore((s) => s.filters.pokestops.filter)
@@ -71,7 +74,7 @@ export default function usePokestopMarker({
           opacity: getOpacity(invasion.incident_expire_timestamp),
         })
         invasionSizes.unshift(
-          Icons.getSize('invasion', filters[`i${invasion.grunt_type}`]),
+          Icons.getSize('invasion', filters[`i${invasion.grunt_type}`]?.size),
         )
         popupYOffset += rewardMod.offsetY - 1
         popupX += invasionMod.popupX
@@ -171,7 +174,7 @@ export default function usePokestopMarker({
         default:
           questIcons.unshift({ url: Icons.getRewards(quest_reward_type) })
       }
-      questSizes.unshift(Icons.getSize('reward', filters[key]))
+      questSizes.unshift(Icons.getSize('reward', filters[key]?.size))
       popupYOffset += rewardMod.offsetY - 1
       popupX += rewardMod.popupX
       popupY += rewardMod.popupY
