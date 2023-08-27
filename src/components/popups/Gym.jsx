@@ -465,8 +465,8 @@ const GymInfo = ({
         item
         xs={4}
         style={{
-          background: `url(${Icons.getTeams(team_id)})`,
           height: 24,
+          backgroundImage: `url(${Icons.getTeams(team_id)})`,
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
