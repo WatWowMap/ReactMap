@@ -178,8 +178,8 @@ const viteConfig = defineConfig(async ({ mode }) => {
           },
           title: config.getSafe('map.general.headerTitle'),
         },
-        analytics:
-          env.GOOGLE_ANALYTICS_ID || config.getSafe('googleAnalyticsId'),
+        googleAnalyticsId:
+          config.getSafe('googleAnalyticsId') || env.GOOGLE_ANALYTICS_ID || '',
         // map: config.getSafe('map'),
       },
     },
