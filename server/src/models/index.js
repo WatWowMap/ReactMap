@@ -9,7 +9,7 @@ const NestSubmission = require('./NestSubmission')
 const Pokestop = require('./Pokestop')
 const Pokemon = require('./Pokemon')
 const Portal = require('./Portal')
-const Poi = require('./PoI')
+const PoI = require('./PoI')
 const Route = require('./Route')
 const ScanCell = require('./ScanCell')
 const Session = require('./Session')
@@ -52,5 +52,5 @@ Db.bindConnections({ ...rmModels, ...scannerModels })
 module.exports = {
   ...rmModels,
   ...scannerModels,
-  Poi,
+  PoI,
 }

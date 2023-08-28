@@ -62,10 +62,12 @@ export default function Config({ children }) {
         'Permissions',
         true,
       )
-      setUser({
-        username: data.user.username,
-        id: data.user.discordId || data.user.telegramId || data.user.id,
-      })
+      if (CONFIG.sentry.client.enabled) {
+        setUser({
+          username: data.user.username,
+          id: data.user.discordId || data.user.telegramId || data.user.id,
+        })
+      }
 
       const localState = JSON.parse(localStorage.getItem('local-state') || '{}')
 

@@ -25,11 +25,6 @@ export interface Config<Client extends boolean = false>
         version: string
         locales: string[]
         hasCustom: boolean
-        sentry: {
-          dsn: string
-          tracesSampleRate: number
-          debug: boolean
-        }
         title: string
       }
     : never
