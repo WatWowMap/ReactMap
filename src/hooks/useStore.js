@@ -110,7 +110,7 @@ export const useStore = create(
  *   Icons: InstanceType<typeof import("../services/Icons").default>,
  *   config: object,
  *   ui: object
- *   auth: { perms: import('@rm/types').Permissions },
+ *   auth: { perms: import('@rm/types').Permissions, loggedIn: boolean, methods: string[] },
  *   filters: object,
  *   masterfile: import('@rm/types').Masterfile
  *   settings: Record<string, any>
@@ -122,6 +122,10 @@ export const useStore = create(
  *   excludeList: string[],
  *   timerList: string[],
  *   tileStyle: 'light' | 'dark',
+ *   theme: {
+ *     primary: string,
+ *     secondary: string,
+ *   },
  * }} UseStatic
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
  */
@@ -133,6 +137,10 @@ export const useStatic = create((set) => ({
   tileStyle: 'light',
   clientError: '',
   map: null,
+  theme: {
+    primary: '#ff5722',
+    secondary: '#00b0ff',
+  },
   auth: {
     strategy: '',
     discordId: '',
@@ -156,6 +164,7 @@ export const useStatic = create((set) => ({
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,
+  holidayEffects: [],
   available: {
     gyms: [],
     pokemon: [],

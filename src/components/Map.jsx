@@ -8,8 +8,7 @@ import FilterPermCheck from './QueryData'
 export default function Map() {
   Utility.analytics(window.location.pathname)
 
-  // const [manualParams, setManualParams] = useState(params)
-  const stateMap = useStatic((s) => s.map)
+  const stateMap = useStatic((s) => !!s.map)
   const ui = useStatic((state) => state.ui)
 
   if (!stateMap) return null

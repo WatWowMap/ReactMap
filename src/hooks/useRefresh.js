@@ -35,6 +35,7 @@ export default function useRefresh() {
         if (Icons.checkValid(userIcons)) {
           Icons.setSelection(userIcons)
         }
+        useStore.setState({ icons: Icons.selection })
       }
       if (masterfile) {
         localStorage.setItem(

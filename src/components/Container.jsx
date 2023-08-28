@@ -1,9 +1,6 @@
 import * as React from 'react'
 import { MapContainer } from 'react-leaflet'
-import useMediaQuery from '@mui/material/useMediaQuery'
 
-import useGenerate from '@hooks/useGenerate'
-import useRefresh from '@hooks/useRefresh'
 import { useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
@@ -18,6 +15,7 @@ import {
   ControlledTileLayer,
   ControlledZoomLayer,
 } from './Layers'
+import { Effects } from './Effects'
 
 /** @param {{ target: import('leaflet').Map, type: string }} */
 function setLocationZoom({ target: map }) {
@@ -35,17 +33,8 @@ const MAX_BOUNDS = [
   [90, 210],
 ]
 
-export default function Container({ serverSettings, params, location, zoom }) {
-  useRefresh()
-  useGenerate()
-  const isMobile = useMediaQuery((t) => t.breakpoints.only('xs'))
-  const isTablet = useMediaQuery((t) => t.breakpoints.only('sm'))
-
-  const [ready, setReady] = React.useState(false)
-
-  React.useEffect(() => {
-    useStatic.setState({ isMobile, isTablet })
-  }, [isMobile, isTablet])
+export default function Container() {
+  const { location, zoom } = useStore.getState()
 
   return (
     <MapContainer
@@ -63,23 +52,16 @@ export default function Container({ serverSettings, params, location, zoom }) {
           return { map: ref }
         })
       }
-      whenReady={() => setReady(true)}
-      zoom={
-        zoom < serverSettings.config.map.minZoom ||
-        zoom > serverSettings.config.map.maxZoom
-          ? serverSettings.config.map.minZoom
-          : zoom
-      }
+      zoom={zoom}
       zoomControl={false}
       maxBounds={MAX_BOUNDS}
       preferCanvas
     >
+      <Effects />
       <ControlledTileLayer />
       <ControlledZoomLayer />
       <ControlledLocate />
-      {serverSettings.user && serverSettings.user.perms.map && ready && (
-        <Map params={params} />
-      )}
+      <Map />
       <ScanOnDemand mode="scanNext" />
       <ScanOnDemand mode="scanZone" />
       <DraggableMarker />

@@ -4,9 +4,9 @@ import { createRoot } from 'react-dom/client'
 import ReactGA from 'react-ga4'
 
 // Sentry must be imported before app
-import './services/Sentry'
-import App from './components/App'
-import './services/i18n'
+import '@services/Sentry'
+import '@services/i18n'
+import App from '@components/App'
 
 if (CONFIG.googleAnalyticsId) {
   ReactGA.initialize(CONFIG.googleAnalyticsId)
