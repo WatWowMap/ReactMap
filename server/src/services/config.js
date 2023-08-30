@@ -213,13 +213,19 @@ const mergeMapConfig = (input) => {
 // Merge sub-objects for the map object
 config.map = mergeMapConfig(config.map)
 
-// Create multiDomain Objects
-config.multiDomainsObj = Object.fromEntries(
-  config.multiDomains.map((d) => [
-    d.domain.replaceAll('.', '_'),
-    mergeMapConfig(d),
-  ]),
-)
+if (config.has('multiDomains')) {
+  log.warn(
+    HELPERS.config,
+    '`multiDomains` has been deprecated and will be removed in the next major release. Please switch to the new format that makes use of `NODE_CONFIG_ENV`',
+  )
+  // Create multiDomain Objects
+  config.multiDomainsObj = Object.fromEntries(
+    config.multiDomains.map((d) => [
+      d.domain.replaceAll('.', '_'),
+      mergeMapConfig(d),
+    ]),
+  )
+}
 
 // Check if empty
 ;['tileServers', 'navigation'].forEach((opt) => {

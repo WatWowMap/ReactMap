@@ -7,7 +7,6 @@
     "enabled": false,
     "graphiql": false,
     "queryDebug": false,
-    "clientPath": "../../dist",
     "logLevel": "info",
     "skipMinified": false
   },

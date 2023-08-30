@@ -17,7 +17,9 @@ i18next.use(Backend).init(
     backend: {
       loadPath: path.resolve(
         __dirname,
-        `../../../dist/locales/{{lng}}/{{ns}}.json`,
+        `../../../dist${
+          process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''
+        }/locales/{{lng}}/{{ns}}.json`,
       ),
     },
   },
