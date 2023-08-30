@@ -238,19 +238,21 @@ export default function FloatingButtons() {
             <Save fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         )}
-      {fabButtons.custom.map((icon) => (
-        <Fab
-          key={`${icon.color}${icon.href}${icon.icon}`}
-          color={icon.color || 'secondary'}
-          size={fabSize}
-          href={icon.href}
-          referrerPolicy="no-referrer"
-          target={icon.target || '_blank'}
-          disabled={disabled}
-        >
-          <I className={icon.icon} size={iconSize} />
-        </Fab>
-      ))}
+      {(Array.isArray(fabButtons.custom) ? fabButtons.custom : []).map(
+        (icon) => (
+          <Fab
+            key={`${icon.color}${icon.href}${icon.icon}`}
+            color={icon.color || 'secondary'}
+            size={fabSize}
+            href={icon.href}
+            referrerPolicy="no-referrer"
+            target={icon.target || '_blank'}
+            disabled={disabled}
+          >
+            <I className={icon.icon} size={iconSize} />
+          </Fab>
+        ),
+      )}
     </Stack>
   )
 }
