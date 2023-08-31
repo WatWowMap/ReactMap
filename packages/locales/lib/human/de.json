@@ -517,7 +517,7 @@
   "scan_error_title": "Fehler",
   "scan_error": "Es ist ein Fehler bei der Verarbeitung der Scan-Anfrage aufgetreten...",
   "scan_outside_area": "Dieser Standort liegt außerhalb der Grenzen der zugelassenen Gebiete.",
-  "scan_some_outside_area": "Einige Standorte liegt außerhalb der Grenzen der zugelassenen Gebiete.",
+  "scan_some_outside_area": "Einige Standorte liegen außerhalb der Grenzen der zugelassenen Gebiete.",
   "scanner": "Scanner",
   "scanner_subtitle": "Ermöglicht on Demand scannen eines Standorts, innerhalb des Scangebietes",
   "device_icons": "Gerätesymbole",
