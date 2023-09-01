@@ -68,28 +68,29 @@ export default function Generator({ block = {}, defaultReturn = null }) {
           style={block.style}
           sx={block.sx}
         >
-          {block.components.map((subBlock, i) =>
-            subBlock.type === 'parent' ? (
-              <Generator
-                key={i}
-                block={subBlock}
-                defaultReturn={defaultReturn}
-              />
-            ) : (
-              <Grid
-                key={i}
-                {...Utility.getSizes(subBlock.gridSizes)}
-                className={block.className}
-                style={subBlock.gridStyle}
-                sx={subBlock.gridSx}
-              >
+          {(Array.isArray(block.components) ? block.components : []).map(
+            (subBlock, i) =>
+              subBlock.type === 'parent' ? (
                 <Generator
                   key={i}
                   block={subBlock}
                   defaultReturn={defaultReturn}
                 />
-              </Grid>
-            ),
+              ) : (
+                <Grid
+                  key={i}
+                  {...Utility.getSizes(subBlock.gridSizes)}
+                  className={block.className}
+                  style={subBlock.gridStyle}
+                  sx={subBlock.gridSx}
+                >
+                  <Generator
+                    key={i}
+                    block={subBlock}
+                    defaultReturn={defaultReturn}
+                  />
+                </Grid>
+              ),
           )}
         </Grid>
       )
