@@ -42,7 +42,7 @@ export function Viewer() {
             ))}
           </Grid>
         ) : (
-          <Grid container height="100%" pb={16} pt={4}>
+          <Grid height="100%" pb={16} pt={4}>
             <DialogWrapper
               configObj={configObj}
               defaultTitle={
