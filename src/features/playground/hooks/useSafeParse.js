@@ -35,6 +35,7 @@ export function useSafeParse() {
       }
       setCached(parsed)
       usePlayStore.setState({ valid: true })
+      localStorage.setItem('playground', code)
     } catch (e) {
       usePlayStore.setState({ valid: false, error: e })
       // eslint-disable-next-line no-console

@@ -101,8 +101,8 @@ const components = {
           const finalColor =
             typeof backgroundColor === 'string'
               ? backgroundColor
-              : backgroundColor.main
-          if (!VALID_COLOR.test(finalColor)) {
+              : backgroundColor?.main
+          if (!VALID_COLOR.test(finalColor) || !finalColor) {
             return
           }
           return {

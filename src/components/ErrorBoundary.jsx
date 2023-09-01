@@ -103,6 +103,19 @@ class ErrorBoundary extends React.Component {
               </Button>
             </>
           )}
+          {this.props.resettable && (
+            <>
+              <br />
+              <br />
+              <Button
+                onClick={() => this.setState({ errorCount: 0 })}
+                variant="contained"
+                color="primary"
+              >
+                {this.props.t('reset')}
+              </Button>
+            </>
+          )}
         </Grid>
       </Grid>
     ) : (
