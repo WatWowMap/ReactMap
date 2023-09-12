@@ -12,6 +12,7 @@ import {
   WEBHOOK_USER,
 } from '@services/queries/webhook'
 import RobustTimeout from '@services/apollo/RobustTimeout'
+import Poracle from '@services/Poracle'
 
 import { getContext, useWebhookStore } from './store'
 
@@ -98,7 +99,9 @@ export function useGetWebhookData(category) {
             !search ||
             (x.description
               ? x.description.toLowerCase().includes(search.toLowerCase())
-              : true),
+              : Poracle.generateDescription(x, category)
+                  .toLowerCase()
+                  .includes(search)),
         ) || []
   }, [data, previousData, search])
 

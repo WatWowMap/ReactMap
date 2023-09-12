@@ -43,8 +43,8 @@ export default function Manage() {
   const [tempFilters, setTempFilters] = React.useState(filters[category])
   const [height, setHeight] = React.useState(0)
 
-  const footerButtons = React.useMemo(
-    () => [
+  const footerButtons = React.useMemo(() => {
+    const buttons = [
       {
         name: 'feedback',
         action: () => useLayoutStore.setState({ feedback: true }),
@@ -58,20 +58,24 @@ export default function Manage() {
           : category === 'human'
           ? t('manage_profiles')
           : t('add_new', { category: t(category) }),
-        action: () => setAddNew(!addNew),
+        action: () => setAddNew((prev) => !prev),
         key: 'addNew',
         icon: addNew ? 'Save' : 'Add',
         disabled: !categories.length,
+        color: 'secondary',
       },
-      {
+    ]
+    if (!addNew) {
+      buttons.push({
         name: 'close',
         action: setMode,
         icon: 'Clear',
+        disabled: false,
         color: 'primary',
-      },
-    ],
-    [addNew, categories, category, feedbackLink],
-  )
+      })
+    }
+    return buttons
+  }, [addNew, categories, category, feedbackLink])
 
   React.useEffect(() => {
     Utility.analytics('Webhook', `${category} Webhook Page`, category, true)
@@ -165,20 +169,18 @@ export default function Manage() {
             p: 2,
           }}
         >
-          {categories.map((key) => (
-            <Box
-              key={key}
-              role="tabpanel"
-              hidden={category !== key}
-              height={height - 76}
-            >
-              {key === 'human' ? (
-                <Human />
-              ) : (
-                <Tracked key={key} category={key} />
-              )}
+          {category !== 'human' && (
+            <Box role="tabpanel" height={height - 76}>
+              <Tracked category={category} />
             </Box>
-          ))}
+          )}
+          <Box
+            role="tabpanel"
+            height={height - 76}
+            hidden={category !== 'human'}
+          >
+            <Human />
+          </Box>
         </Collapse>
         <Collapse in={addNew}>
           {category === 'human' && <ProfileEditing />}

@@ -17,14 +17,11 @@ export function ScanOnDemandMarker({ children }) {
     <Marker
       draggable
       eventHandlers={{
-        dragend({ target, popup }) {
+        dragend({ target }) {
           if (target) {
             const { lat, lng } = target.getLatLng()
             map.panTo([lat, lng])
             useScanStore.setState({ scanLocation: [lat, lng] })
-          }
-          if (popup) {
-            popup.openPopup()
           }
         },
       }}
