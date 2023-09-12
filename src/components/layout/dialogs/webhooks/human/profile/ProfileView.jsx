@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
-import Edit from '@mui/icons-material/Edit'
 import DeleteForever from '@mui/icons-material/DeleteForever'
+import MoreTimeIcon from '@mui/icons-material/MoreTime'
 import FileCopy from '@mui/icons-material/FileCopy'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
@@ -51,7 +51,7 @@ const Inputs = ({ profileNo, handleViewChange }) => {
   return (
     <Grid sm={4} textAlign="right">
       <IconButton onClick={handleViewChange('edit')} size="large">
-        <Edit />
+        <MoreTimeIcon />
       </IconButton>
       <IconButton
         onClick={handleViewChange('delete')}
