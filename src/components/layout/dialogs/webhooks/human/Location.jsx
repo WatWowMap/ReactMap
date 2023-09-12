@@ -83,7 +83,13 @@ const Location = () => {
     }
   }, [latitude, longitude])
 
-  React.useEffect(() => () => lc.stop(), [])
+  React.useEffect(
+    () => () => {
+      lc.stop()
+      useWebhookStore.setState({ location: [0, 0] })
+    },
+    [],
+  )
 
   const fetchedData = data || previousData || { geocoder: [] }
 
@@ -98,14 +104,14 @@ const Location = () => {
       alignItems="center"
       spacing={2}
     >
-      <Grid item xs={6} sm={3}>
+      <Grid item xs={6} sm={2}>
         <Typography variant="h6" pl={1}>
           {t('location')}
         </Typography>
       </Grid>
-      <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
+      <Grid item xs={6} sm={4} style={{ textAlign: 'center' }}>
         <Typography variant="body2">
-          {[latitude, longitude].map((x) => x.toFixed(5)).join(', ')}
+          {[latitude, longitude].map((x) => x.toFixed(6)).join(', ')}
         </Typography>
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
@@ -186,4 +192,6 @@ const Location = () => {
   )
 }
 
-export default Location
+const MemoizedLocation = React.memo(Location, () => true)
+
+export default MemoizedLocation

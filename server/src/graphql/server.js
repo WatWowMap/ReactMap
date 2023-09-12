@@ -49,7 +49,9 @@ async function startApollo(httpServer) {
       if (errorCache.has(key)) {
         return e
       }
-      errorCache.set(key, true)
+      if (!config.getSafe('devOptions.enabled')) {
+        errorCache.set(key, true)
+      }
 
       const endpoint = /** @type {string} */ (e.extensions.endpoint)
 

@@ -1,11 +1,12 @@
 // @ts-check
 import * as React from 'react'
-import Grid from '@mui/material/Unstable_Grid2'
-import Typography from '@mui/material/Typography'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
+import InputLabel from '@mui/material/InputLabel'
+import FormControl from '@mui/material/FormControl'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
+
 import {
   WEBHOOK_AREAS,
   WEBHOOK_CATEGORIES,
@@ -44,29 +45,27 @@ export function HookSelection() {
   return loading ? (
     <Loading>{t('loading', { category: t('webhooks') })}</Loading>
   ) : (
-    <>
-      <Grid xs={6} sm={2}>
-        <Typography variant="h6">{t('select_webhook')}</Typography>
-      </Grid>
-      <Grid xs={6} sm={2} textAlign="center">
-        <Select
-          value={selected}
-          onChange={(e) => {
-            save({ variables: { webhook: e.target.value } }).then(
-              ({ data }) =>
-                data?.webhook?.human &&
-                useWebhookStore.setState({ human: data.webhook.human }),
-            )
-          }}
-          style={{ minWidth: 100 }}
-        >
-          {webhooks.map((webhook) => (
-            <MenuItem key={webhook} value={webhook}>
-              {webhook}
-            </MenuItem>
-          ))}
-        </Select>
-      </Grid>
-    </>
+    <FormControl sx={{ m: 1 }}>
+      <InputLabel id="hook-select">{t('select_webhook')}</InputLabel>
+      <Select
+        id="hook-select"
+        label={t('select_webhook')}
+        value={selected}
+        onChange={(e) => {
+          save({ variables: { webhook: e.target.value } }).then(
+            ({ data }) =>
+              data?.webhook?.human &&
+              useWebhookStore.setState({ human: data.webhook.human }),
+          )
+        }}
+        style={{ minWidth: 100 }}
+      >
+        {webhooks.map((webhook) => (
+          <MenuItem key={webhook} value={webhook}>
+            {webhook}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   )
 }

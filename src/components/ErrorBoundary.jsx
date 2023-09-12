@@ -79,7 +79,7 @@ class ErrorBoundary extends React.Component {
           {this.state.reported && (
             <Typography variant="subtitle2" align="center">
               <br />
-              {this.props.t('reported_error')}
+              {this.props.t('reported_error')}:
               <br />
               {this.state.uuid}{' '}
               <IconButton
@@ -101,6 +101,19 @@ class ErrorBoundary extends React.Component {
                 startIcon={<Refresh />}
               >
                 {this.props.t('refresh')}
+              </Button>
+            </>
+          )}
+          {this.props.resettable && (
+            <>
+              <br />
+              <br />
+              <Button
+                onClick={() => this.setState({ errorCount: 0 })}
+                variant="contained"
+                color="primary"
+              >
+                {this.props.t('reset')}
               </Button>
             </>
           )}
