@@ -3,6 +3,7 @@ import ClearIcon from '@mui/icons-material/Clear'
 import { Paper, InputBase, IconButton } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
+import { useWebhookStore, setTrackedSearch } from '../webhooks/store'
 
 export default function AdvSearch({ search, setSearch, category }) {
   const { t } = useTranslation()
@@ -42,3 +43,16 @@ export default function AdvSearch({ search, setSearch, category }) {
     </Paper>
   )
 }
+
+export const WebhookSearch = React.memo(() => {
+  const search = useWebhookStore((s) => s.trackedSearch)
+  const category = useWebhookStore((s) => s.category)
+
+  return (
+    <AdvSearch
+      search={search}
+      setSearch={setTrackedSearch}
+      category={category}
+    />
+  )
+})

@@ -3,7 +3,10 @@ import * as React from 'react'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import CircularProgress from '@mui/material/CircularProgress'
+import InputLabel from '@mui/material/InputLabel'
+import FormControl from '@mui/material/FormControl'
 import { useMutation, useQuery } from '@apollo/client'
+import { useTranslation } from 'react-i18next'
 
 import { allProfiles, setHuman } from '@services/queries/webhook'
 
@@ -17,6 +20,8 @@ const STYLE = { minWidth: 100 }
  * @returns
  */
 export function ProfileSelect() {
+  const { t } = useTranslation()
+
   const currentProfile = useWebhookStore((s) => s.human.current_profile_no || 0)
 
   /** @type {import('@apollo/client').ApolloQueryResult<{ webhook: { profile: import("@rm/types").PoracleProfile[] } }>} */
@@ -48,17 +53,22 @@ export function ProfileSelect() {
   )
 
   return (
-    <Select
-      value={currentProfile || ''}
-      onChange={onChange}
-      style={STYLE}
-      endAdornment={loading ? <CircularProgress /> : null}
-    >
-      {(profiles?.webhook?.profile || []).map((profile) => (
-        <MenuItem key={profile.profile_no} value={profile.profile_no}>
-          {profile.name}
-        </MenuItem>
-      ))}
-    </Select>
+    <FormControl sx={{ m: 1 }}>
+      <InputLabel id="profile-select">{t('select_profile')}</InputLabel>
+      <Select
+        id="profile-select"
+        label={t('select_profile')}
+        value={currentProfile || ''}
+        onChange={onChange}
+        style={STYLE}
+        endAdornment={loading ? <CircularProgress /> : null}
+      >
+        {(profiles?.webhook?.profile || []).map((profile) => (
+          <MenuItem key={profile.profile_no} value={profile.profile_no}>
+            {profile.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   )
 }
