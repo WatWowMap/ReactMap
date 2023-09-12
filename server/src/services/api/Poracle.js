@@ -352,7 +352,7 @@ class PoracleAPI {
         ? {
             ...data,
             active_hours:
-              data?.active_hours.map(({ day, mins, hours }) => ({
+              data?.active_hours?.map(({ day, mins, hours }) => ({
                 day,
                 mins: mins.padStart(2, '0'),
                 hours: hours.padStart(2, '0'),
