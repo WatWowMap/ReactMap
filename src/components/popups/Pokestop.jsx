@@ -115,7 +115,8 @@ export default function PokestopPopup({
                 divider={hasInvasion || hasQuest || hasLure}
               />
               {hasQuest &&
-                pokestop.quests.map((quest, index) => (
+                // eslint-disable-next-line no-unused-vars
+                pokestop.quests.map(({ key, ...quest }, index) => (
                   <React.Fragment key={`${quest.with_ar}`}>
                     {index ? (
                       <Divider light flexItem className="popup-divider" />
@@ -465,7 +466,7 @@ const MenuActions = ({
 
 /**
  *
- * @param {import('@rm/types').Quest} props
+ * @param {Omit<import('@rm/types').Quest, 'key'>} props
  * @returns
  */
 const RewardInfo = ({ with_ar, ...quest }) => {
@@ -506,7 +507,7 @@ const RewardInfo = ({ with_ar, ...quest }) => {
 
 /**
  *
- * @param {import('@rm/types').Quest} props
+ * @param {Omit<import('@rm/types').Quest, 'key'>} props
  * @returns
  */
 const QuestConditions = ({

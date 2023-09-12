@@ -21,12 +21,11 @@ export default function Map() {
             key={category}
             id={category}
             onRender={(id, phase, actualDuration, baseDuration) => {
-              if (category === 'gyms')
-                // eslint-disable-next-line no-console
-                console.log(`[Profiler] ${id} (${phase})`, {
-                  actualDuration,
-                  baseDuration,
-                })
+              // eslint-disable-next-line no-console
+              console.log(`[Profiler] ${id} (${phase})`, {
+                actualDuration,
+                baseDuration,
+              })
             }}
           >
             <FilterPermCheck key={category} category={category} />
