@@ -24,18 +24,19 @@ export const handleClick =
       children: [],
       group: '',
     }
+    const withLowerCase = {
+      group: foundGroup.group,
+      children: foundGroup.children.map((a) => a.toLowerCase()),
+    }
+
     let newAreas = []
     if (incomingArea === 'all') {
-      newAreas = groupName
-        ? [
-            ...existing,
-            ...(areas.find((group) => group.group === groupName)?.children ||
-              []),
-          ]
+      newAreas = withLowerCase.group
+        ? [...existing, ...withLowerCase.children]
         : areas.flatMap((group) => group.children)
     } else if (incomingArea === 'none') {
       newAreas = groupName
-        ? existing.filter((a) => !foundGroup.children.includes(a))
+        ? existing.filter((a) => !withLowerCase.children.includes(a))
         : []
     } else {
       newAreas = existing.includes(incomingArea)
@@ -43,6 +44,7 @@ export const handleClick =
         : [...existing, incomingArea]
     }
     newAreas = [...new Set(newAreas)]
+
     await apolloClient
       .mutate({
         mutation: setHuman,
