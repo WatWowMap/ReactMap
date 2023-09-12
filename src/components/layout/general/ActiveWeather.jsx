@@ -7,6 +7,7 @@ import Box from '@mui/material/Box'
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { point, polygon } from '@turf/helpers'
 import { useQuery } from '@apollo/client'
+import { useTranslation } from 'react-i18next'
 
 import WeatherPopup from '@components/popups/Weather'
 import { useStatic, useStore } from '@hooks/useStore'
@@ -43,7 +44,8 @@ export default function ActiveWeather() {
   const clickable = useStore((s) => s.userSettings?.weather?.clickableIcon)
   const timeOfDay = useStatic((s) => s.timeOfDay)
   const zoom = useStore((s) => s.zoom)
-  const allowedZoom = useStatic((s) => s.config.map.activeWeatherZoom)
+  const allowedZoom = useStatic((s) => s.config.general.activeWeatherZoom)
+  const { t } = useTranslation()
 
   const { data, previousData } = useQuery(getAllWeather, {
     fetchPolicy: 'cache-only',
@@ -60,6 +62,7 @@ export default function ActiveWeather() {
 
   if (!weatherEnabled || !Icons) return null
 
+  /** @type {import('@rm/types').Weather | undefined} */
   const active = (data || previousData)?.weather?.find(
     (cell) =>
       cell && booleanPointInPolygon(point(location), polygon([cell.polygon])),
@@ -77,7 +80,7 @@ export default function ActiveWeather() {
         <Img
           className={disableColorShift ? '' : 'fancy'}
           src={Icons.getWeather(active.gameplay_condition, timeOfDay)}
-          alt={active.gameplay_condition}
+          alt={t(`weather_${active.gameplay_condition}`)}
           sx={ImgSx}
         />
       </StyledBox>
@@ -90,7 +93,7 @@ export default function ActiveWeather() {
             justifyContent: 'center',
           }}
         >
-          <WeatherPopup weather={active} Icons={Icons} ts={Date.now() / 1000} />
+          <WeatherPopup {...active} />
         </DialogContent>
         <Footer
           role=""

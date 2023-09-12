@@ -10,7 +10,7 @@ export default function Navigation({ lat, lon, size = 'large' }) {
     navigation: {
       [navigation]: { url },
     },
-  } = useStatic.getState().config
+  } = useStatic.getState().settings
 
   return (
     <IconButton

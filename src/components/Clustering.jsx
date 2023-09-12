@@ -17,10 +17,8 @@ const IGNORE_CLUSTERING = ['devices', 'submissionCells', 'scanCells', 'weather']
 export default function Clustering({ category, children }) {
   const {
     config: {
-      map: {
-        clustering: { [category]: clustering },
-        minZoom,
-      },
+      clustering: { [category]: clustering },
+      general: { minZoom },
     },
   } = useStatic.getState()
 

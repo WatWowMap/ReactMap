@@ -23,7 +23,7 @@ export default function Extras({ category, subItem, data }) {
   const { setFilters } = useStore.getState()
   const {
     config: {
-      map: { enableConfirmedInvasions, enableQuestSetSelector },
+      misc: { enableConfirmedInvasions, enableQuestSetSelector },
     },
     filters: staticFilters,
   } = useStatic.getState()

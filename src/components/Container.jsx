@@ -44,7 +44,7 @@ export default function Container() {
         useStatic.setState((prev) => {
           if (ref) {
             ref.attributionControl.setPrefix(
-              prev.config.map.attributionPrefix || '',
+              prev.config.general.attributionPrefix || '',
             )
             ref.on('moveend', setLocationZoom)
             ref.on('zoomend', setLocationZoom)

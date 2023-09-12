@@ -65,7 +65,7 @@ export default class Query {
   }
 
   static pokestops(filters) {
-    const perms = useStatic.getState().ui.gyms
+    const perms = useStatic.getState().ui.pokestops
     if (filters === 'id') {
       return pokestopIndex.getOne
     }
@@ -86,7 +86,7 @@ export default class Query {
   }
 
   static pokemon(filters) {
-    const perms = useStatic.getState().ui.gyms
+    const perms = useStatic.getState().ui.pokemon
     if (filters === 'id') {
       return pokemonIndex.getOne
     }

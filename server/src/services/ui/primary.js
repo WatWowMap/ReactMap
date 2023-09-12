@@ -2,7 +2,6 @@
 const config = require('@rm/config')
 
 const nestFilters = config.getSafe('defaultFilters.nests')
-const map = config.getSafe('map')
 const leagues = config.getSafe('api.pvp.leagues')
 
 const SLIDERS = {
@@ -81,107 +80,98 @@ leagues.forEach((league) =>
   }),
 )
 
-const ignoredKeys = [
-  'enabled',
-  'filter',
-  'showQuestSet',
-  'badge',
-  'backup',
-  'avgFilter',
-  'raidTier',
-  'levels',
-  'confirmed',
-]
-
 /**
  *
- * @param {object} filters
+ * @param {import('express').Request} req
  * @param {import("@rm/types").Permissions} perms
  * @returns
  */
-function generateUi(filters, perms) {
-  const ui = {}
-
-  // builds the initial categories
-  Object.entries(filters).forEach(([key, value]) => {
-    let sliders
-    if (value) {
-      switch (key) {
-        case 'submissionCells':
-        case 'portals':
-          if (!ui.wayfarer) ui.wayfarer = {}
-          ui.wayfarer[key] = true
-          break
-        case 'spawnpoints':
-        case 'scanCells':
-        case 'devices':
-          if (!ui.admin) ui.admin = {}
-          ui.admin[key] = true
-          break
-        default:
-          ui[key] = {}
-          sliders = SLIDERS[key]
-          break
-      }
-      // builds each subcategory
-      Object.entries(value).forEach(([subKey, subValue]) => {
-        if (
-          (!ignoredKeys.includes(subKey) && subValue !== undefined) ||
-          key === 'weather' ||
-          key === 'scanAreas' ||
-          key === 'routes' ||
-          (key === 's2cells' && subKey !== 'filter')
-        ) {
-          switch (key) {
-            case 'submissionCells':
-            case 'portals':
-              ui.wayfarer[key] = true
-              break
-            case 'spawnpoints':
-            case 'scanCells':
-            case 'devices':
-              ui.admin[key] = true
-              break
-            case 'scanAreas':
-              ui[key].filterByAreas = true
-            // eslint-disable-next-line no-fallthrough
-            case 'routes':
-            case 'weather':
-              ui[key].enabled = true
-              break
-            default:
-              ui[key][subKey] = true
-              break
+function generateUi(req, perms) {
+  const mapConfig = config.getMapConfig(req)
+  const ui = {
+    gyms:
+      perms.gyms || perms.raids
+        ? {
+            allGyms: true,
+            raids: perms.raids,
+            exEligible: true,
+            inBattle: true,
+            arEligible: true,
+            gymBadges: perms.gymBadges,
           }
-        }
-      })
-      // adds any sliders present
-      if (sliders) {
-        ui[key].sliders = sliders
-        Object.keys(sliders).forEach((category) => {
-          sliders[category].forEach((slider) => {
-            slider.disabled = !perms[slider.perm]
-            if (!slider.color) {
-              slider.color = category
-            }
-          })
-        })
-      }
-    }
-  })
+        : undefined,
+    nests: perms.nests
+      ? { pokemon: true, polygons: true, sliders: SLIDERS.nests }
+      : undefined,
+    pokestops:
+      perms.pokestops || perms.lures || perms.quests || perms.invasions
+        ? {
+            allPokestops: perms.pokestops,
+            lures: perms.lures,
+            eventStops: perms.eventStops,
+            quests: perms.quests,
+            invasions: perms.invasions,
+            arEligible: perms.pokestops,
+          }
+        : undefined,
+    pokemon:
+      perms.pokemon || perms.iv || perms.pvp
+        ? {
+            legacy: mapConfig.misc.enableMapJsFilter,
+            iv: perms.iv,
+            pvp: perms.pvp,
+            standard: true,
+            ivOr: true,
+            gender: true,
+            zeroIv: perms.iv,
+            hundoIv: perms.iv,
+            sliders: {
+              primary: SLIDERS.pokemon.primary.map((slider) => ({
+                ...slider,
+                disabled: !perms[slider.perm],
+              })),
+              secondary: SLIDERS.pokemon.secondary.map((slider) => ({
+                ...slider,
+                disabled: !perms[slider.perm],
+              })),
+            },
+          }
+        : undefined,
+    routes: perms.routes ? { enabled: true } : undefined,
+    wayfarer:
+      perms.portals || perms.submissionCells
+        ? {
+            portals: perms.portals,
+            submissionCells: perms.submissionCells,
+          }
+        : undefined,
+    s2cells: perms.s2cells ? { enabled: true, cells: true } : undefined,
+    scanAreas: perms.scanAreas
+      ? { filterByAreas: true, enabled: true }
+      : undefined,
+    weather: perms.weather ? { enabled: true } : undefined,
+    admin:
+      perms.spawnpoints || perms.scanCells || perms.devices
+        ? {
+            spawnpoints: perms.spawnpoints || undefined,
+            scanCells: perms.scanCells || undefined,
+            devices: perms.devices || undefined,
+          }
+        : undefined,
+    settings: true,
+  }
 
   // deletes any menus that do not have any items/perms
   Object.keys(ui).forEach((category) => {
-    if (Object.keys(ui[category]).length === 0) {
+    if (category === 'settings') return
+    if (!ui[category] || Object.keys(ui[category]).length === 0) {
       delete ui[category]
     }
   })
 
-  ui.settings = true
-
   // sorts the menus
   const sortedUi = {}
-  map.general.menuOrder.forEach((category) => {
+  mapConfig.general.menuOrder.forEach((category) => {
     if (ui[category]) {
       sortedUi[category] = ui[category]
     }

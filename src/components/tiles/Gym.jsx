@@ -72,7 +72,7 @@ const GymTile = ({ force, ...gym }) => {
       hasHatchedInternal,
       excludeList.includes(`t${gym.team_id}-0`),
       timerList.includes(gym.id),
-      config.map.interactionRangeZoom,
+      config.general.interactionRangeZoom,
       Icons.getGyms(
         gym.team_id,
         filledSlots,

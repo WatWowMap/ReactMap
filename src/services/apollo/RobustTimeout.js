@@ -4,12 +4,15 @@ import AbortableContext from './AbortableContext'
 
 export default class RobustTimeout extends AbortableContext {
   /**
-   * @param {keyof import('@rm/types').Config['api']['polling']} category
+   * @param {keyof import('@rm/types').Config['api']['polling'] | number} category
    */
   constructor(category) {
     super(null)
     this._category = category
-    this._ms = (useStatic.getState().config.map.polling[category] || 10) * 1000
+    this._ms =
+      (typeof category === 'number'
+        ? category
+        : useStatic.getState().polling[category] || 10) * 1000
     this._lastUpdated = 0
   }
 

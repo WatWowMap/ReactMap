@@ -42,9 +42,7 @@ export default function UserProfile() {
   Utility.analytics('/user-profile')
   const { t } = useTranslation()
   const auth = useStatic((state) => state.auth)
-  const {
-    map: { rolesLinkName, rolesLink },
-  } = useStatic((state) => state.config)
+  const { rolesLinkName, rolesLink } = useStatic((state) => state.config.links)
 
   const locale = localStorage.getItem('i18nextLng') || 'en'
 
@@ -124,9 +122,9 @@ export default function UserProfile() {
 const LinkProfiles = () => {
   const { t } = useTranslation()
   const auth = useStatic((s) => s.auth)
-  const {
-    map: { discordAuthUrl, telegramAuthUrl, telegramBotName },
-  } = useStatic((state) => state.config)
+  const { discordAuthUrl, telegramAuthUrl, telegramBotName } = useStatic(
+    (state) => state.config.customRoutes,
+  )
 
   const [refreshing, setRefreshing] = React.useState(false)
 
@@ -312,9 +310,11 @@ const ProfilePermissions = () => {
 
 const PermCard = ({ perm }) => {
   const { t } = useTranslation()
-  const { permImageDir, permArrayImages } = useStatic(
-    (state) => state.config.map,
+  const permImageDir = useStatic((state) => state.config.misc.permImageDir)
+  const permArrayImages = useStatic(
+    (state) => state.config.misc.permArrayImages,
   )
+
   const value = useStatic((s) => s.auth.perms[perm])
 
   return (

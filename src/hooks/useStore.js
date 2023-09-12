@@ -12,7 +12,10 @@ import { persist } from 'zustand/middleware'
  *   sidebar: string,
  *   selectedWebhook: string,
  *   settings: {
- *    navigationControls: 'react' | 'leaflet' }
+ *    navigationControls: 'react' | 'leaflet'
+ *    navigation: string,
+ *    tileServers: string
+ *   },
  *   motdIndex: number
  *   tutorial: boolean,
  *   searchTab: string,
@@ -29,9 +32,12 @@ export const useStore = create(
   persist(
     (set, get) => ({
       darkMode: !!window?.matchMedia('(prefers-color-scheme: dark)').matches,
-      location: undefined,
-      zoom: undefined,
-      filters: undefined,
+      location: [
+        CONFIG.map.general.startLat || 0,
+        CONFIG.map.general.startLon || 0,
+      ],
+      zoom: CONFIG.map.general.startZoom,
+      filters: {},
       setFilters: (filters) => set({ filters }),
       setAreas: (areas = [], validAreas = [], unselectAll = false) => {
         const { filters } = get()
@@ -63,11 +69,11 @@ export const useStore = create(
         }
       },
       settings: {},
-      userSettings: undefined,
+      userSettings: {},
       icons: {},
-      menus: undefined,
+      menus: {},
       tutorial: true,
-      sidebar: undefined,
+      sidebar: '',
       advMenu: {
         pokemon: 'others',
         gyms: 'categories',
@@ -108,11 +114,13 @@ export const useStore = create(
  *   active: boolean,
  *   searchLoading: boolean,
  *   Icons: InstanceType<typeof import("../services/Icons").default>,
- *   config: object,
+ *   config: import('@rm/types').Config['map'],
  *   ui: object
- *   auth: { perms: import('@rm/types').Permissions, loggedIn: boolean, methods: string[] },
+ *   auth: { perms: Partial<import('@rm/types').Permissions>, loggedIn: boolean, methods: string[], strategy: import('@rm/types').Strategy | '' },
  *   filters: object,
  *   masterfile: import('@rm/types').Masterfile
+ *   polling: Record<string, number>
+ *   gymValidDataLimit: number
  *   settings: Record<string, any>
  *   userSettings: Record<string, any>
  *   clientError: string,
@@ -126,6 +134,12 @@ export const useStore = create(
  *     primary: string,
  *     secondary: string,
  *   },
+ *   available: {
+ *     gyms: string[],
+ *     pokemon: string[],
+ *     pokestops: string[],
+ *     nests: string[],
+ *   }
  * }} UseStatic
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
  */
@@ -141,6 +155,8 @@ export const useStatic = create((set) => ({
     primary: '#ff5722',
     secondary: '#00b0ff',
   },
+  polling: {},
+  gymValidDataLimit: 0,
   auth: {
     strategy: '',
     discordId: '',
@@ -158,7 +174,7 @@ export const useStatic = create((set) => ({
     },
     userBackupLimits: 0,
   },
-  config: undefined,
+  config: {},
   filters: {},
   menus: undefined,
   menuFilters: {},
@@ -191,7 +207,7 @@ export const useStatic = create((set) => ({
   setWebhookAlert: (webhookAlert) => set({ webhookAlert }),
   timeOfDay: 'day',
   extraUserFields: [],
-  manualParams: { id: '' },
+  manualParams: {},
 }))
 
 // /**
@@ -303,9 +319,9 @@ export const useScanStore = create((set) => ({
 }))
 
 /**
- *
- * @param {(string | number | boolean)[]} p
- * @param {(string | number | boolean)[]} n
- * @returns
+ * @template {string | number | boolean} T
+ * @param {T[]} p
+ * @param {T[]} n
+ * @returns {boolean}
  */
 export const basicEqualFn = (p, n) => p.every((v, i) => v === n[i])

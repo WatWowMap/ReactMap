@@ -169,7 +169,7 @@ passport.deserializeUser(async (user, done) => {
   if (user.perms.map) {
     done(null, user)
   } else {
-    done(null, false)
+    done('User does not have map permissions', null)
   }
 })
 

@@ -32,13 +32,13 @@ export default function Login() {
   ] = useStatic(
     (s) => [
       s.auth.loggedIn,
-      s.config.map.loginPage,
-      s.config.map.headerTitle,
-      s.config.map.discordInvite,
-      s.config.map.discordAuthUrl,
-      s.config.map.telegramBotName,
-      s.config.map.telegramAuthUrl,
-      s.config.map.localAuthUrl,
+      !!s.config.loginPage,
+      s.config.general.headerTitle,
+      s.config.links.discordInvite,
+      s.config.customRoutes.discordAuthUrl,
+      s.config.customRoutes.telegramBotName,
+      s.config.customRoutes.telegramAuthUrl,
+      s.config.customRoutes.localAuthUrl,
     ],
     basicEqualFn,
   )

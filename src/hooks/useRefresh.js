@@ -1,8 +1,10 @@
+// @ts-check
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import getAvailable from '@services/queries/available'
 
 import UIcons from '@services/Icons'
+import { deepMerge } from '@services/functions/deepMerge'
 
 import { useStatic, useStore } from './useStore'
 
@@ -49,6 +51,9 @@ export default function useRefresh() {
         filters,
         Icons,
       })
+      useStore.setState((prev) => ({
+        filters: deepMerge({}, filters, prev.filters),
+      }))
     }
   }, [data])
 }

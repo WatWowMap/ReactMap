@@ -471,7 +471,7 @@ const MenuActions = ({
 const RewardInfo = ({ with_ar, ...quest }) => {
   const { t } = useTranslation()
   const { src, amount, tt } = getRewardInfo(quest)
-  const questMessage = useStatic((s) => s.config.map.questMessage)
+  const questMessage = useStatic((s) => s.config.misc.questMessage)
 
   return (
     <Grid item xs={3} style={{ textAlign: 'center', position: 'relative' }}>

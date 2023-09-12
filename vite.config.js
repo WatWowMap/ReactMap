@@ -184,7 +184,13 @@ const viteConfig = defineConfig(async ({ mode }) => {
         sentry: { client: sentry },
         googleAnalyticsId:
           config.getSafe('googleAnalyticsId') || env.GOOGLE_ANALYTICS_ID || '',
-        // map: config.getSafe('map'),
+        map: {
+          general: {
+            startLat: config.getSafe('map.general.startLat'),
+            startLon: config.getSafe('map.general.startLon'),
+            startZoom: config.getSafe('map.general.startZoom'),
+          },
+        },
       },
     },
     esbuild: {

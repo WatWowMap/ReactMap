@@ -114,7 +114,7 @@ async function startApollo(httpServer) {
                   filterCount || 0,
                 )
 
-                if (returned) {
+                if (returned && config.getSafe('sentry.server.enabled')) {
                   contextValue.transaction.setMeasurement(
                     `${endpoint}.returned`,
                     returned,

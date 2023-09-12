@@ -182,7 +182,8 @@ export default function Search() {
   const searchTab = useStore((state) => state.searchTab)
   const scanAreas = useStore((state) => state.filters.scanAreas)
 
-  const mapConfig = useStatic((state) => state.config.map)
+  const distanceUnit = useStatic((state) => state.config.misc.distanceUnit)
+  const questMessage = useStatic((state) => state.config.misc.questMessage)
   const isMobile = useStatic((s) => s.isMobile)
 
   const open = useLayoutStore((s) => s.search)
@@ -338,14 +339,12 @@ export default function Search() {
               </Grid>
               <Grid item xs={2} style={{ textAlign: 'center' }}>
                 <Typography variant="caption">
-                  {option.distance}{' '}
-                  {mapConfig.distanceUnit === 'mi' ? t('mi') : t('km')}
+                  {option.distance} {distanceUnit === 'mi' ? t('mi') : t('km')}
                 </Typography>
                 <br />
                 {searchTab === 'quests' && (
                   <Typography variant="caption" className="ar-task" noWrap>
-                    {mapConfig.questMessage ||
-                      t(`ar_quest_${Boolean(option.with_ar)}`)}
+                    {questMessage || t(`ar_quest_${Boolean(option.with_ar)}`)}
                   </Typography>
                 )}
               </Grid>

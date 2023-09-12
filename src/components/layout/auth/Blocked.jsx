@@ -12,7 +12,7 @@ import DiscordLogin from './Discord'
 export default function Blocked() {
   const { t } = useTranslation()
   const { info } = useParams()
-  const discordInvite = useStatic((s) => s.config.map.discordInvite)
+  const discordInvite = useStatic((s) => s.config.links.discordInvite)
 
   const queryParams = new URLSearchParams(info)
 

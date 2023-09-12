@@ -23,7 +23,7 @@ export function useWindowState() {
     } else {
       const timer = setTimeout(
         () => useStatic.setState({ active: windowState }),
-        1000 * 60 * useStatic.getState().config.map.clientTimeoutMinutes,
+        1000 * 60 * useStatic.getState().config.misc.clientTimeoutMinutes,
       )
       return () => clearTimeout(timer)
     }

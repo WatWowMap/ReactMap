@@ -21,11 +21,11 @@ export default function useTileLayer() {
   const userTileLayer = useStore((state) => state.settings.tileServers)
 
   const tileLayer = React.useMemo(() => {
-    const { tileServers, map } = useStatic.getState().config || {
+    const { config, settings } = useStatic.getState() || {
       minZoom: 10,
       maxZoom: 18,
     }
-    const layer = getTileLayer(tileServers, userTileLayer, timeOfDay)
+    const layer = getTileLayer(settings.tileServers, userTileLayer, timeOfDay)
     return {
       ...layer,
       style: layer.style || 'light',
@@ -34,8 +34,8 @@ export default function useTileLayer() {
         layer?.[timeOfDay] ||
         layer?.url ||
         'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png',
-      minZoom: map?.minZoom || 18,
-      maxZoom: map?.maxZoom || 10,
+      minZoom: config.general.minZoom || 18,
+      maxZoom: config.general.maxZoom || 10,
       zIndex: 250,
     }
   }, [timeOfDay, userTileLayer])

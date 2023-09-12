@@ -6,35 +6,9 @@ import { useStatic, useStore } from '@hooks/useStore'
 import Fetch from '@services/Fetch'
 import { setLoadingText } from '@services/functions/setLoadingText'
 import Utility from '@services/Utility'
-import { Navigate } from 'react-router-dom'
+import { deepMerge } from '@services/functions/deepMerge'
 
 const rootLoading = document.getElementById('loader')
-
-function isObject(item) {
-  return (
-    item && typeof item === 'object' && !Array.isArray(item) && item !== null
-  )
-}
-
-function deepMerge(target, ...sources) {
-  if (!sources.length) return target
-  const source = sources.shift()
-
-  if (isObject(target) && isObject(source)) {
-    Object.keys(source).forEach((key) => {
-      if (isObject(source[key])) {
-        if (!target[key]) {
-          Object.assign(target, { [key]: {} })
-        }
-        deepMerge(target[key], source[key])
-      } else {
-        Object.assign(target, { [key]: source[key] })
-      }
-    })
-  }
-
-  return deepMerge(target, ...sources)
-}
 
 export default function Config({ children }) {
   const { t } = useTranslation()
@@ -52,9 +26,8 @@ export default function Config({ children }) {
   }
   const getServerSettings = async () => {
     const data = await Fetch.getSettings()
-    if (data?.config) {
-      document.title = data.config?.map?.headerTitle || document.title
-      setServerSettings(data)
+    if (data) {
+      document.title = data?.map?.general.headerTitle || document.title
 
       Utility.analytics(
         'User',
@@ -69,7 +42,10 @@ export default function Config({ children }) {
         })
       }
 
-      const localState = JSON.parse(localStorage.getItem('local-state') || '{}')
+      /** @type {{ state: import('@hooks/useStore').UseStore}} */
+      const localState = JSON.parse(
+        localStorage.getItem('local-state') || '{ "state": {} }',
+      )
 
       const updateObjState = (defaults, category) => {
         if (localState?.state?.[category]) {
@@ -78,6 +54,12 @@ export default function Config({ children }) {
         return defaults
       }
 
+      /**
+       * @template T
+       * @param {T} defaults
+       * @param {string} category
+       * @returns {T}
+       */
       const updatePositionState = (defaults, category) => {
         if (localState?.state?.[category]) {
           return localState.state[category]
@@ -85,39 +67,53 @@ export default function Config({ children }) {
         return defaults
       }
 
-      if (localState?.state?.filters?.pokemon?.standard) {
-        delete localState.state.filters.pokemon.standard
-      }
-
       if (localState?.state?.settings) {
-        const validNav = Object.keys(data.config.navigation)
+        const validNav = data.navigation.map((x) => x.name)
         localState.state.settings.navigation = validNav.includes(
           localState.state.settings.navigation,
         )
           ? localState.state.settings.navigation
-          : data.config.navigation[validNav[0]]?.name
+          : validNav[0]
 
-        const validTs = Object.keys(data.config.tileServers)
-        localState.state.settings.tileServers = validTs.includes(
+        const validTileLayer = data.tileServers.map((x) => x.name)
+        localState.state.settings.tileServers = validTileLayer.includes(
           localState.state.settings.tileServers,
         )
           ? localState.state.settings.tileServers
-          : data.config.tileServers[validTs[0]]?.name
+          : validTileLayer[0]
+
+        localState.state.settings.navigationControls =
+          data.map.misc.navigationControls
       }
 
-      const location = updatePositionState(
-        [data.config.map.startLat, data.config.map.startLon],
-        'location',
-      ).map(
+      const defaultLocation = /** @type {const} */ ([
+        data.map.general.startLat,
+        data.map.general.startLon,
+      ])
+      const location = updatePositionState(defaultLocation, 'location').map(
         (x, i) =>
-          x || (i === 0 ? data.config.map.startLat : data.config.map.startLon),
+          x ||
+          (i === 0 ? data.map.general.startLat : data.map.general.startLon),
       )
 
-      const zoom = updatePositionState(data.config.map.startZoom, 'zoom')
+      const zoom = updatePositionState(data.map.general.startZoom, 'zoom')
       const safeZoom =
-        zoom < data.config.map.minZoom || zoom > data.config.map.maxZoom
-          ? data.config.map.minZoom
+        zoom < data.map.general.minZoom || zoom > data.map.general.maxZoom
+          ? data.map.general.minZoom
           : zoom
+
+      const settings = {
+        navigationControls: {
+          react: { name: 'react' },
+          leaflet: { name: 'leaflet' },
+        },
+        navigation: Object.fromEntries(
+          data.navigation.map((item) => [item.name, item]),
+        ),
+        tileServers: Object.fromEntries(
+          data.tileServers.map((item) => [item.name, item]),
+        ),
+      }
 
       useStatic.setState({
         auth: {
@@ -125,28 +121,30 @@ export default function Config({ children }) {
           discordId: data.user?.discordId || '',
           telegramId: data.user?.telegramId || '',
           webhookStrategy: data.user?.webhookStrategy || '',
-          loggedIn: data.loggedIn,
+          loggedIn: !!data.user?.loggedIn,
           perms: data.user ? data.user.perms : {},
-          methods: data.authMethods || [],
+          methods: data.authentication.methods || [],
           username: data.user?.username || '',
           data: data.user?.data
             ? typeof data.user?.data === 'string'
               ? JSON.parse(data.user?.data)
               : data.user?.data
             : {},
-          counts: data.config.map.authCounts || {},
-          userBackupLimits: data.userBackupLimits || 0,
+          counts: data.authReferences || {},
+          userBackupLimits: data.database.settings.userBackupLimits || 0,
         },
-        theme: data.config.map.theme,
-        holidayEffects: data.config.map.holidayEffects || [],
+        theme: data.map.theme,
+        holidayEffects: data.map.holidayEffects || [],
         ui: data.ui,
         menus: data.menus,
-        filters: data.defaultFilters,
-        extraUserFields: data.extraUserFields,
+        extraUserFields: data.database.settings.extraUserFields,
         userSettings: data.clientMenus,
-        settings: data.settings,
         timeOfDay: Utility.timeCheck(...location),
-        config: data.config,
+        config: data.map,
+        polling: data.api.polling,
+        settings,
+        gymValidDataLimit: data.api.gymValidDataLimit,
+        tutorialExcludeList: data.authentication.excludeFromTutorial || [],
       })
 
       useStore.setState({
@@ -155,15 +153,14 @@ export default function Config({ children }) {
             ? !!localState?.state?.tutorial
             : !data.user.tutorial,
         menus: updateObjState(data.menus, 'menus'),
-        filters: updateObjState(data.defaultFilters, 'filters'),
         userSettings: updateObjState(data.userSettings, 'userSettings'),
-        settings: updateObjState(data.settings, 'settings'),
+        settings: updateObjState(settings, 'settings'),
         zoom: safeZoom,
         location,
       })
       setServerSettings({ ...serverSettings, fetched: true })
     } else {
-      setServerSettings({ error: true, status: data.status, fetched: true })
+      setServerSettings({ error: true, status: 500, fetched: true })
     }
   }
 
@@ -174,13 +171,7 @@ export default function Config({ children }) {
     }
   }, [])
 
-  if (!serverSettings.fetched) {
-    return <div />
-  }
-
-  if (serverSettings.error) {
-    return <Navigate to={{ pathname: `${serverSettings.status}` }} />
-  }
-
-  return children
+  return serverSettings.fetched && serverSettings.status !== 500
+    ? children
+    : null
 }

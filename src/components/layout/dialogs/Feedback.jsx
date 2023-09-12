@@ -16,7 +16,7 @@ import { DialogWrapper } from './DialogWrapper'
 export default function Feedback() {
   const { t } = useTranslation()
 
-  const link = useStatic((s) => s.config.map.feedbackLink)
+  const link = useStatic((s) => s.config.links.feedbackLink)
   const handleClose = React.useCallback(
     () => useLayoutStore.setState({ feedback: false }),
     [],

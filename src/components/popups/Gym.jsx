@@ -190,7 +190,7 @@ const DropdownOptions = ({
   const { t } = useTranslation()
 
   const { gyms, raids, gymBadges, webhooks } = useStatic((s) => s.auth.perms)
-  const gymValidDataLimit = useStatic((state) => state.config.gymValidDataLimit)
+  const gymValidDataLimit = useStatic((state) => state.gymValidDataLimit)
 
   const { data: raidHooks } = useSyncData('raid')
   const { data: gymHooks } = useSyncData('gym')
@@ -406,7 +406,7 @@ const GymInfo = ({
 }) => {
   const { t } = useTranslation()
   const Icons = useStatic((state) => state.Icons)
-  const { gymValidDataLimit } = useStatic((state) => state.config)
+  const gymValidDataLimit = useStatic((state) => state.gymValidDataLimit)
 
   return (
     <Grid
@@ -703,7 +703,7 @@ const ExtraInfo = ({
   guarding_pokemon_id,
 }) => {
   const { t } = useTranslation()
-  const { gymValidDataLimit } = useStatic((state) => state.config)
+  const gymValidDataLimit = useStatic((state) => state.gymValidDataLimit)
   const enableGymPopupCoords = useStore(
     (state) => state.userSettings.gyms.enableGymPopupCoords,
   )

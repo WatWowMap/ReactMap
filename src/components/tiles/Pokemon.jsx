@@ -120,7 +120,7 @@ const PokemonTile = ({ force, ...pkmn }) => {
       ),
       Icons.getSize('pokemon', filterSize),
       badgeId ? Icons.getMisc(badgeId) : '',
-      config.map.interactionRangeZoom <= map.getZoom(),
+      config.general.interactionRangeZoom <= map.getZoom(),
       s.timeOfDay,
     ]
   }, basicEqualFn)

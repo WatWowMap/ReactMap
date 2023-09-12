@@ -61,7 +61,7 @@ const PokestopTile = ({ force, ...pokestop }) => {
       (filters.pokestops.allPokestops || pokestop.ar_scan_eligible) &&
         perms.pokestops,
       timerList.includes(pokestop.id),
-      config.map.interactionRangeZoom,
+      config.general.interactionRangeZoom,
     ]
   }, basicEqualFn)
 

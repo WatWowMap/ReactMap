@@ -35,7 +35,7 @@ export default function Manage() {
   const category = useWebhookStore((s) => s.category)
   const name = useWebhookStore((s) => s.context.name || '')
 
-  const feedbackLink = useStatic((s) => s.config.map.feedbackLink)
+  const feedbackLink = useStatic((s) => s.config.links.feedbackLink)
 
   const filters = useGenFullFilters()
 

@@ -39,6 +39,7 @@ export interface Config<Client extends boolean = false>
     excludeFromTutorial: (keyof BaseConfig['authentication']['perms'])[]
     alwaysEnabledPerms: (keyof BaseConfig['authentication']['perms'])[]
     aliases: { role: string; name: string }[]
+    methods: string[]
     strategies: [
       {
         trialPeriod: {
@@ -77,7 +78,10 @@ export interface Config<Client extends boolean = false>
       titles: string[]
       components: CustomComponent[]
       footerButtons: CustomComponent[]
-    } & BaseConfig['map']['messageOfTheDay']
+    } & Omit<
+      BaseConfig['map']['messageOfTheDay'],
+      'settings' | 'titles' | 'components' | 'footerButtons'
+    >
     donationPage: {
       settings: {
         parentStyle: Record<string, string> // should be CSS properties but performance seems to die
@@ -85,13 +89,16 @@ export interface Config<Client extends boolean = false>
       titles: string[]
       components: CustomComponent[]
       footerButtons: CustomComponent[]
-    } & BaseConfig['map']['donationPage']
+    } & Omit<
+      BaseConfig['map']['donationPage'],
+      'settings' | 'titles' | 'components' | 'footerButtons'
+    >
     loginPage: {
       settings: {
         parentStyle: Record<string, string> // should be CSS properties but performance seems to die
       } & BaseConfig['map']['loginPage']['settings']
       components: CustomComponent[]
-    } & BaseConfig['map']['loginPage']
+    } & Omit<BaseConfig['map']['loginPage'], 'settings' | 'components'>
   } & BaseConfig['map']
   multiDomains: (BaseConfig['map'] & { domain: string })[]
   multiDomainsObj: Record<string, BaseConfig['map'] & { domain: string }>
