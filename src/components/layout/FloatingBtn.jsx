@@ -6,7 +6,6 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn'
 import ZoomOutIcon from '@mui/icons-material/ZoomOut'
 import SearchIcon from '@mui/icons-material/Search'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
-import SaveIcon from '@mui/icons-material/Save'
 import CardMembershipIcon from '@mui/icons-material/CardMembership'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
 import CheckIcon from '@mui/icons-material/Check'
@@ -238,13 +237,9 @@ export default function FloatingButtons() {
             color="primary"
             size={fabSize}
             onClick={setModeBtn('open')}
-            title={webhookMode === 'areas' ? t('save') : t('cancel')}
+            title={t('done')}
           >
-            {webhookMode === 'areas' ? (
-              <SaveIcon fontSize={iconSize} sx={{ color: 'white' }} />
-            ) : (
-              <CheckIcon fontSize={iconSize} sx={{ color: 'white' }} />
-            )}
+            <CheckIcon fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         )}
       {(Array.isArray(fabButtons.custom) ? fabButtons.custom : []).map(
