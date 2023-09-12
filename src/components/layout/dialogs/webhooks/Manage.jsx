@@ -33,12 +33,14 @@ export default function Manage() {
 
   const categories = useGetHookContext()
   const category = useWebhookStore((s) => s.category)
-  const name = useWebhookStore((s) => s.context.name) || ''
+  const name = useWebhookStore((s) => s.context.name || '')
 
   const feedbackLink = useStatic((s) => s.config.map.feedbackLink)
 
   const filters = useGenFullFilters()
 
+  /** @type {ReturnType<typeof React.useRef<HTMLElement | null>>} */
+  const dialogRef = React.useRef(null)
   const [addNew, setAddNew] = React.useState(false)
   const [tempFilters, setTempFilters] = React.useState(filters[category])
   const [height, setHeight] = React.useState(0)
@@ -81,6 +83,9 @@ export default function Manage() {
     Utility.analytics('Webhook', `${category} Webhook Page`, category, true)
     setTempFilters(filters[category])
     setSelected()()
+    if (dialogRef.current) {
+      setHeight(dialogRef.current.clientHeight)
+    }
   }, [category])
 
   React.useEffect(() => {
@@ -103,6 +108,9 @@ export default function Manage() {
       useWebhookStore.setState((prev) => ({
         [category]: [...prev[category], ...values],
       }))
+    }
+    if (dialogRef.current) {
+      setHeight(dialogRef.current.clientHeight)
     }
   }, [addNew])
 
@@ -154,19 +162,12 @@ export default function Manage() {
           ))}
         </Tabs>
       </AppBar>
-      <DialogContent
-        sx={{ p: 0 }}
-        ref={(ref) => {
-          if (ref instanceof HTMLElement && ref.clientHeight !== 0) {
-            setHeight(ref.clientHeight)
-          }
-        }}
-      >
+      <DialogContent sx={{ p: 0 }} ref={dialogRef}>
         <Collapse
           in={!addNew}
           sx={{
             height: '70vh',
-            p: 2,
+            p: addNew ? 0 : 2,
           }}
         >
           {category !== 'human' && (
@@ -186,7 +187,6 @@ export default function Manage() {
           {category === 'human' && <ProfileEditing />}
         </Collapse>
       </DialogContent>
-
       <Footer options={footerButtons} role="webhook_footer" />
     </>
   )

@@ -192,4 +192,6 @@ const Location = () => {
   )
 }
 
-export default Location
+const MemoizedLocation = React.memo(Location, () => true)
+
+export default MemoizedLocation
