@@ -18,6 +18,7 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Autocomplete from '@mui/material/Autocomplete'
 import { useMap } from 'react-leaflet'
+import debounce from 'lodash.debounce'
 
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery, useQuery } from '@apollo/client'
@@ -28,6 +29,7 @@ import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { SEARCHABLE } from '@services/queries/config'
 import getMidnight from '@services/functions/getMidnight'
+import getRewardInfo from '@services/functions/getRewardInfo'
 
 import Header from '../general/Header'
 import QuestTitle from '../general/QuestTitle'
@@ -213,6 +215,8 @@ export default function Search() {
     }
   }, [])
 
+  const debouncedFetch = debounce(callSearch, 1000)
+
   React.useEffect(() => {
     setOptions(
       search
@@ -231,6 +235,11 @@ export default function Search() {
   React.useEffect(() => {
     useStatic.setState({ searchLoading: loading })
   }, [loading])
+
+  React.useEffect(() => {
+    // initial search
+    if (search) callSearch()
+  }, [])
 
   return (
     <Dialog
@@ -253,7 +262,7 @@ export default function Search() {
               (/^[0-9\s\p{L}]+$/u.test(newValue) || newValue === '')
             ) {
               useStore.setState({ search: newValue.toLowerCase() })
-              callSearch()
+              debouncedFetch()
             }
           }}
           options={options.map((option, i) => ({ ...option, i }))}
@@ -261,12 +270,13 @@ export default function Search() {
           autoComplete={false}
           clearOnBlur={false}
           ListboxProps={{
-            sx: { maxHeight: { xs: '75vh', sm: '80vh' } },
+            sx: { maxHeight: '80cqh' },
           }}
           fullWidth
           clearIcon={null}
           popupIcon={null}
           sx={{ p: 2 }}
+          open
           PopperComponent={({ children, ...props }) => (
             <Popper
               {...props}
@@ -384,7 +394,7 @@ function ResultImage(props) {
     )
   }
   if (props.quest_reward_type) {
-    const { src, amount, tt } = Utility.getRewardInfo(props, Icons)
+    const { src, amount, tt } = getRewardInfo(props, Icons)
 
     return (
       <div
