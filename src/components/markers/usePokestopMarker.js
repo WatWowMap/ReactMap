@@ -26,7 +26,11 @@ export default function usePokestopMarker({
   invasions,
   ...pokestop
 }) {
-  const Icons = useStatic((s) => s.Icons)
+  const [, Icons] = useStore(
+    (s) => [s.icons, useStatic.getState().Icons],
+    (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
+  )
+
   const getOpacity = useOpacity('pokestops', 'invasions')
   const [showArBadge, baseIcon, baseSize] = useStore((s) => {
     const { filters, userSettings } = s
