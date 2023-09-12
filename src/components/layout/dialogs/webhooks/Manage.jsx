@@ -83,7 +83,7 @@ export default function Manage() {
     Utility.analytics('Webhook', `${category} Webhook Page`, category, true)
     setTempFilters(filters[category])
     setSelected()()
-    if (dialogRef.current) {
+    if (dialogRef.current && !addNew) {
       setHeight(dialogRef.current.clientHeight)
     }
   }, [category])
@@ -108,9 +108,6 @@ export default function Manage() {
       useWebhookStore.setState((prev) => ({
         [category]: [...prev[category], ...values],
       }))
-    }
-    if (dialogRef.current) {
-      setHeight(dialogRef.current.clientHeight)
     }
   }, [addNew])
 
@@ -162,22 +159,17 @@ export default function Manage() {
           ))}
         </Tabs>
       </AppBar>
-      <DialogContent sx={{ p: 0 }} ref={dialogRef}>
-        <Collapse
-          in={!addNew}
-          sx={{
-            height: '70vh',
-            p: addNew ? 0 : 2,
-          }}
-        >
+      <DialogContent sx={{ p: 0, minHeight: '70vh' }} ref={dialogRef}>
+        <Collapse in={!addNew}>
           {category !== 'human' && (
-            <Box role="tabpanel" height={height - 76}>
+            <Box role="tabpanel" height={height - 76} p={2}>
               <Tracked category={category} />
             </Box>
           )}
           <Box
             role="tabpanel"
             height={height - 76}
+            p={4}
             hidden={category !== 'human'}
           >
             <Human />
