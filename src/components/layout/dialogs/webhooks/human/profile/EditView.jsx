@@ -23,8 +23,8 @@ export const EditView = ({ handleViewChange, uid }) => {
 
   const [newActiveHours, setNewActiveHours] = React.useState({
     day: 1,
-    hours: 0,
-    mins: 0,
+    hours: '00',
+    mins: '00',
   })
   const handleEdit = React.useCallback((event) => {
     const { name, value } = event.target
@@ -42,7 +42,7 @@ export const EditView = ({ handleViewChange, uid }) => {
       ...active,
       active_hours: [
         ...active.active_hours,
-        { ...newActiveHours, id: active.active_hours.length },
+        { ...newActiveHours, id: `${uid}_${active.active_hours.length}` },
       ],
     }
     save({
@@ -53,7 +53,7 @@ export const EditView = ({ handleViewChange, uid }) => {
       },
     })
     handleViewChange('profile')()
-  }, [])
+  }, [newActiveHours])
 
   return (
     <>
