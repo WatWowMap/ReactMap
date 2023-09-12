@@ -144,6 +144,7 @@ function QueryData({ category, timeout }) {
       }
     }
     map.on('fetchdata', refetchData)
+    map.fire('fetchdata')
     return () => {
       map.off('fetchdata', refetchData)
     }
