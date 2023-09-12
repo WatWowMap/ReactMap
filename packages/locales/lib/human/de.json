@@ -432,7 +432,7 @@
   "webhook_success_gym": "Raids, Eier, und Team Wechsel Alarme wurden hinzugefügt!",
   "slot_changes": "Platzänderungen",
   "confirm_delete": "Dadurch wird die Tracking-Funktion für dieses Profil entfernt, bist du sicher?",
-  "confirm_copy": "Wähle das Profil, das du zu \"{{profile}}\" kopieren möchtest, dadurch wird dieses Profil vollständig überschrieben.",
+  "confirm_copy": "Wähle das Profil aus, in das du \"{{profile}}\" kopieren möchtest. Dadurch wird dieses Profil vollständig überschrieben.",
   "webhook_error": "{{name}} konnte das nicht verarbeiten.\nBitte versuche es später nochmals.",
   "profile_error": "Muss eindeutig und gültig sein",
   "team_0": "Neutral",
