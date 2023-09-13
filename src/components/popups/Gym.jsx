@@ -22,12 +22,13 @@ import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
 import Title from './common/Title'
-import GenericTimer from './common/Timer'
 import BadgeSelection from '../layout/dialogs/BadgeSelection'
 import PowerUp from './common/PowerUp'
 import GenderIcon from './common/GenderIcon'
 import Navigation from './common/Navigation'
 import Coords from './common/Coords'
+import { TimeStamp } from './common/TimeStamps'
+import { ExtraInfo } from './common/ExtraInfo'
 
 /**
  *
@@ -113,7 +114,7 @@ export default function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         <GymFooter hasRaid={hasRaid} lat={gym.lat} lon={gym.lon} />
         {perms.gyms && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-            <ExtraInfo ts={ts} {...gym} />
+            <ExtraGymInfo {...gym} />
           </Collapse>
         )}
       </Grid>
@@ -690,11 +691,10 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
 
 /**
  *
- * @param {{ ts: number } & import('@rm/types').Gym} props
+ * @param {import('@rm/types').Gym} props
  * @returns
  */
-const ExtraInfo = ({
-  ts,
+const ExtraGymInfo = ({
   last_modified_timestamp,
   lat,
   lon,
@@ -702,70 +702,39 @@ const ExtraInfo = ({
   total_cp,
   guarding_pokemon_id,
 }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const Icons = useStatic((s) => s.Icons)
   const gymValidDataLimit = useStatic((state) => state.gymValidDataLimit)
   const enableGymPopupCoords = useStore(
     (state) => state.userSettings.gyms.enableGymPopupCoords,
   )
 
-  const extraMetaData = [
-    {
-      description: 'defender',
-      data: t(`poke_${guarding_pokemon_id}`),
-      check: guarding_pokemon_id && updated > gymValidDataLimit,
-    },
-    {
-      description: 'total_cp',
-      data: total_cp,
-      check: total_cp && updated > gymValidDataLimit,
-    },
-    {
-      description: 'last_seen',
-      timer: <GenericTimer expireTime={updated} />,
-      data: Utility.dayCheck(ts, updated),
-      check: updated,
-    },
-    {
-      description: 'last_modified',
-      timer: <GenericTimer expireTime={last_modified_timestamp} />,
-      data: Utility.dayCheck(ts, last_modified_timestamp),
-      check: last_modified_timestamp,
-    },
-  ].filter((x) => Boolean(x.check))
+  const numFormatter = new Intl.NumberFormat(i18n.language)
 
   return (
-    <Grid container>
-      {extraMetaData.map((meta) => (
-        <React.Fragment key={meta.description}>
-          <Grid
-            item
-            xs={t('popup_gym_description_width')}
-            style={{ textAlign: 'left' }}
-          >
-            <Typography variant="caption">{t(meta.description)}:</Typography>
-          </Grid>
-          {Boolean(meta.timer) && (
-            <Grid
-              item
-              xs={t('popup_gym_seen_timer_width')}
-              style={{ textAlign: 'right' }}
-            >
-              {meta.timer}
-            </Grid>
-          )}
-          <Grid
-            item
-            xs={
-              meta.timer
-                ? t('popup_gym_data_width')
-                : t('popup_gym_seen_timer_width')
-            }
-            style={{ textAlign: 'right' }}
-          >
-            <Typography variant="caption">{meta.data}</Typography>
-          </Grid>
-        </React.Fragment>
-      ))}
+    <Grid container alignItems="center" justifyContent="center">
+      {guarding_pokemon_id && updated > gymValidDataLimit && (
+        <ExtraInfo title="defender">
+          <Typography variant="caption" className="flex-center">
+            {t(`poke_${guarding_pokemon_id}`)}
+            &nbsp;
+            <img
+              src={Icons.getPokemon(guarding_pokemon_id)}
+              alt={t(`poke_${guarding_pokemon_id}`)}
+              style={{ maxWidth: 15, maxHeight: 15 }}
+            />
+          </Typography>
+        </ExtraInfo>
+      )}
+      {total_cp && updated > gymValidDataLimit && (
+        <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
+      )}
+      <Divider
+        flexItem
+        style={{ width: '100%', height: 2, margin: '10px 0' }}
+      />
+      <TimeStamp time={updated}>last_seen</TimeStamp>
+      <TimeStamp time={last_modified_timestamp}>last_modified</TimeStamp>
       {enableGymPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Coords lat={lat} lon={lon} />

@@ -1,10 +1,10 @@
 // @ts-check
 import * as React from 'react'
 import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
 
 import { useTranslation } from 'react-i18next'
 import TimeSince from './Timer'
+import { ExtraInfo } from './ExtraInfo'
 
 /**
  *
@@ -12,7 +12,7 @@ import TimeSince from './Timer'
  * @returns
  */
 export const TimeStamp = ({ time, children }) => {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
 
   if (!time) return null
 
@@ -23,18 +23,10 @@ export const TimeStamp = ({ time, children }) => {
   })
 
   return (
-    <Grid container item xs={6} direction="column" textAlign="center">
-      <Grid item>
-        <Typography variant="subtitle2">{t(children)}:</Typography>
-      </Grid>
-      <Grid item>
-        <Typography variant="caption">
-          {formatter.format(time * 1000)}
-        </Typography>
-      </Grid>
+    <ExtraInfo title={children} data={formatter.format(time * 1000)}>
       <Grid item>
         <TimeSince expireTime={time} />
       </Grid>
-    </Grid>
+    </ExtraInfo>
   )
 }
