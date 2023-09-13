@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 
 /**
  *
- * @param {{ title: string, data?: React.ReactNode, children?: React.ReactNode }} props
+ * @param {{ title?: string, data?: React.ReactNode, children?: React.ReactNode }} props
  * @returns
  */
 export const ExtraInfo = ({ title, data, children }) => {
@@ -15,9 +15,11 @@ export const ExtraInfo = ({ title, data, children }) => {
 
   return (
     <Grid container item xs={6} direction="column" textAlign="center">
-      <Grid item>
-        <Typography variant="subtitle2">{t(title)}:</Typography>
-      </Grid>
+      {title && (
+        <Grid item>
+          <Typography variant="subtitle2">{t(title)}:</Typography>
+        </Grid>
+      )}
       {data && (
         <Grid item>
           <Typography variant="caption">{data}</Typography>

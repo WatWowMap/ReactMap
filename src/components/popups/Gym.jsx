@@ -20,6 +20,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
+import { TextWithIcon } from '@components/layout/custom/CustomImg'
 
 import Title from './common/Title'
 import BadgeSelection from '../layout/dialogs/BadgeSelection'
@@ -715,15 +716,9 @@ const ExtraGymInfo = ({
     <Grid container alignItems="center" justifyContent="center">
       {guarding_pokemon_id && updated > gymValidDataLimit && (
         <ExtraInfo title="defender">
-          <Typography variant="caption" className="flex-center">
+          <TextWithIcon src={Icons.getPokemon(guarding_pokemon_id)}>
             {t(`poke_${guarding_pokemon_id}`)}
-            &nbsp;
-            <img
-              src={Icons.getPokemon(guarding_pokemon_id)}
-              alt={t(`poke_${guarding_pokemon_id}`)}
-              style={{ maxWidth: 15, maxHeight: 15 }}
-            />
-          </Typography>
+          </TextWithIcon>
         </ExtraInfo>
       )}
       {total_cp && updated > gymValidDataLimit && (

@@ -10,7 +10,7 @@ import LocalLogin from '../auth/Local'
 import Telegram from '../auth/Telegram'
 import CustomText from './CustomText'
 import CustomButton from './CustomButton'
-import CustomImg from './CustomImg'
+import { Img } from './CustomImg'
 import LocaleSelection from '../general/LocaleSelection'
 import LinkWrapper from './LinkWrapper'
 
@@ -21,7 +21,7 @@ export default function Generator({ block = {}, defaultReturn = null }) {
     case 'img':
       return (
         <LinkWrapper {...props}>
-          <CustomImg {...props} />
+          <Img {...props} />
         </LinkWrapper>
       )
     case 'button':
