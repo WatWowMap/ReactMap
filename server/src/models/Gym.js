@@ -2,14 +2,14 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const {
-  api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },
-  defaultFilters: {
-    gyms: { baseGymSlotAmounts },
-  },
-} = require('@rm/config')
+const config = require('@rm/config')
+
 const { Event, Db } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
+
+const { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms } =
+  config.getSafe('api')
+const { baseGymSlotAmounts } = config.getSafe('defaultFilters.gyms')
 
 const coreFields = [
   'id',

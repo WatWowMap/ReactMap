@@ -1,17 +1,17 @@
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const {
-  api: {
-    searchResultsLimit,
-    queryLimits,
-    stopValidDataLimit,
-    hideOldPokestops,
-  },
-  map,
-} = require('@rm/config')
-const { Event } = require('../services/initialization')
+const config = require('@rm/config')
 
+const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
+
+const {
+  searchResultsLimit,
+  queryLimits,
+  stopValidDataLimit,
+  hideOldPokestops,
+} = config.getSafe('api')
+const map = config.getSafe('map')
 
 const questProps = {
   quest_type: true,
@@ -779,7 +779,7 @@ class Pokestop extends Model {
         pokestop.quests.forEach((quest) => {
           if (
             quest.quest_reward_type &&
-            (!map.enableQuestSetSelector ||
+            (!map.misc.enableQuestSetSelector ||
               filters.onlyShowQuestSet === 'both' ||
               (filters.onlyShowQuestSet === 'with_ar' && quest.with_ar) ||
               (filters.onlyShowQuestSet === 'without_ar' && !quest.with_ar))

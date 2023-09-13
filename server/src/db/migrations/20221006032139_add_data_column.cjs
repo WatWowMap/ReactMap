@@ -1,9 +1,6 @@
-/* eslint-disable no-unused-vars */
-const {
-  database: {
-    settings: { userTableName: tableName },
-  },
-} = require('@rm/config')
+const config = require('@rm/config')
+
+const tableName = config.getSafe('database.settings.userTableName')
 
 /**
  * @param {import("knex").Knex} knex
