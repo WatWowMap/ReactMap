@@ -9,7 +9,7 @@ import {
   S2Point,
 } from 'nodes2ts'
 
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 
 import Notification from '@components/layout/general/Notification'
 import { getQueryArgs } from '@services/functions/getQueryArgs'
@@ -45,7 +45,7 @@ export function GenerateCells() {
       : s.userSettings.s2cells.lightMapBorder,
   )
   /** @type {number[]} */
-  const filter = useStore((s) => s.filters.s2cells.cells, basicEqualFn)
+  const filter = useStore((s) => s.filters.s2cells.cells)
   const location = useStore((s) => s.location)
   const zoom = useStore((s) => s.zoom)
 
