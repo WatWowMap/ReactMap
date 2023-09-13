@@ -1,5 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
+const { Db } = require('../initialization')
 
 const nestFilters = config.getSafe('defaultFilters.nests')
 const leagues = config.getSafe('api.pvp.leagues')
@@ -90,7 +91,7 @@ function generateUi(req, perms) {
   const mapConfig = config.getMapConfig(req)
   const ui = {
     gyms:
-      perms.gyms || perms.raids
+      (perms.gyms || perms.raids) && Db.models.Gym
         ? {
             allGyms: true,
             raids: perms.raids,
@@ -100,11 +101,13 @@ function generateUi(req, perms) {
             gymBadges: perms.gymBadges,
           }
         : undefined,
-    nests: perms.nests
-      ? { pokemon: true, polygons: true, sliders: SLIDERS.nests }
-      : undefined,
+    nests:
+      perms.nests && Db.models.Nest
+        ? { pokemon: true, polygons: true, sliders: SLIDERS.nests }
+        : undefined,
     pokestops:
-      perms.pokestops || perms.lures || perms.quests || perms.invasions
+      (perms.pokestops || perms.lures || perms.quests || perms.invasions) &&
+      Db.models.Pokestop
         ? {
             allPokestops: perms.pokestops,
             lures: perms.lures,
@@ -115,7 +118,7 @@ function generateUi(req, perms) {
           }
         : undefined,
     pokemon:
-      perms.pokemon || perms.iv || perms.pvp
+      (perms.pokemon || perms.iv || perms.pvp) && Db.models.Pokemon
         ? {
             legacy: mapConfig.misc.enableMapJsFilter,
             iv: perms.iv,
@@ -137,25 +140,28 @@ function generateUi(req, perms) {
             },
           }
         : undefined,
-    routes: perms.routes ? { enabled: true } : undefined,
+    routes: perms.routes && Db.models.Route ? { enabled: true } : undefined,
     wayfarer:
       perms.portals || perms.submissionCells
         ? {
-            portals: perms.portals,
-            submissionCells: perms.submissionCells,
+            portals: (perms.portals && Db.models.Portal) || undefined,
+            submissionCells:
+              (perms.submissionCells && Db.models.Pokestop && Db.models.Gym) ||
+              undefined,
           }
         : undefined,
     s2cells: perms.s2cells ? { enabled: true, cells: true } : undefined,
     scanAreas: perms.scanAreas
       ? { filterByAreas: true, enabled: true }
       : undefined,
-    weather: perms.weather ? { enabled: true } : undefined,
+    weather: perms.weather && Db.models.Weather ? { enabled: true } : undefined,
     admin:
       perms.spawnpoints || perms.scanCells || perms.devices
         ? {
-            spawnpoints: perms.spawnpoints || undefined,
-            scanCells: perms.scanCells || undefined,
-            devices: perms.devices || undefined,
+            spawnpoints:
+              (perms.spawnpoints && Db.models.Spawnpoint) || undefined,
+            scanCells: (perms.scanCells && Db.models.ScanCell) || undefined,
+            devices: (perms.devices && Db.models.Device) || undefined,
           }
         : undefined,
     settings: true,

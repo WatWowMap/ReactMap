@@ -63,5 +63,5 @@ export default function WebhookQuery({ children }) {
     }
   }, [data])
 
-  return (data ? ready : false) ? children : null
+  return (data?.[`${lowercase}Single`]?.lat ? ready : data) ? children : null
 }
