@@ -174,7 +174,7 @@ function QueryData({ category, timeout }) {
 
   const returnData = (data || previousData || { [category]: [] })[category]
 
-  if (!data) {
+  if (!returnData) {
     return error && process.env.NODE_ENV === 'development' ? (
       <Notification
         open
@@ -193,7 +193,7 @@ function QueryData({ category, timeout }) {
   return (
     <Clustering category={category}>
       {returnData.map((each) => {
-        if (!hideList.includes(each.id)) {
+        if (!hideList.has(each.id)) {
           return <Component key={each.id || category} {...each} />
         }
         return null

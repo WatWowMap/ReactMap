@@ -126,7 +126,7 @@ export const useStore = create(
  *   clientError: string,
  *   map: import('leaflet').Map | null,
  *   timeOfDay: 'day' | 'night' | 'dusk' | 'dawn',
- *   hideList: string[],
+ *   hideList: Set<string | number>,
  *   excludeList: string[],
  *   timerList: string[],
  *   tileStyle: 'light' | 'dark',
@@ -200,7 +200,7 @@ export const useStatic = create((set) => ({
     questRewardTypes: {},
     types: {},
   },
-  hideList: [],
+  hideList: new Set(),
   excludeList: [],
   timerList: [],
   webhookAlert: {
@@ -219,7 +219,7 @@ export const useStatic = create((set) => ({
 
 // /**
 //  * @typedef {{
-//  *  nestSubmissions: string,
+//  *  nestSubmissions: string | number,
 //  *  motd: boolean,
 //  *  donorPage: boolean,
 //  *  search: boolean,

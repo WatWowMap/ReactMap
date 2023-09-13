@@ -181,7 +181,7 @@ const Header = ({
 
   const handleHide = () => {
     setAnchorEl(null)
-    useStatic.setState((prev) => ({ hideList: [...prev.hideList, id] }))
+    useStatic.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
   const handleExclude = () => {

@@ -1,3 +1,4 @@
+// @ts-check
 import React, { useState, useEffect } from 'react'
 import MoreVert from '@mui/icons-material/MoreVert'
 import {
@@ -41,21 +42,17 @@ export default function NestPopup({
   iconUrl,
   pokemon_id,
   pokemon_form,
-  ...nest
+  id,
+  name = '',
+  updated = 0,
+  pokemon_avg = 0,
+  submitted_by = '',
 }) {
   const { t } = useTranslation()
   const { perms, loggedIn } = useStatic((s) => s.auth)
 
   const [parkName, setParkName] = useState(true)
-  const [anchorEl, setAnchorEl] = useState(false)
-
-  const {
-    id = '0',
-    name = '',
-    updated = 0,
-    pokemon_avg = 0,
-    submitted_by = '',
-  } = nest
+  const [anchorEl, setAnchorEl] = useState(null)
 
   const lastUpdated = Utility.getTimeUntil(new Date(updated * 1000))
 
@@ -69,7 +66,7 @@ export default function NestPopup({
 
   const handleHide = () => {
     setAnchorEl(null)
-    useStatic.setState((prev) => ({ hideList: [...prev.hideList, id] }))
+    useStatic.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
   const handleExclude = () => {
@@ -138,7 +135,7 @@ export default function NestPopup({
         <Menu
           anchorEl={anchorEl}
           keepMounted
-          open={Boolean(anchorEl)}
+          open={!!anchorEl}
           onClose={handleClose}
           PaperProps={{
             style: {
@@ -202,13 +199,15 @@ export default function NestPopup({
             color="secondary"
             variant="contained"
             disabled={!perms.nestSubmissions || !loggedIn}
-            onClick={() => useLayoutStore.setState({ nestSubmissions: id })}
+            onClick={() =>
+              useLayoutStore.setState({ nestSubmissions: `${id}` })
+            }
           >
             {t('submit_nest_name')}
           </Button>
         </Grid>
       </Grid>
-      <NestSubmission {...nest} />
+      <NestSubmission id={id} name={name} />
     </ErrorBoundary>
   )
 }
