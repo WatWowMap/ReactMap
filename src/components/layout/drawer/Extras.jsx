@@ -51,31 +51,33 @@ export default function Extras({ category, subItem, data }) {
   if (category === 's2cells' && subItem === 'cells') {
     return (
       <CollapsibleItem open={!!filters[category].enabled}>
-        <Select
-          fullWidth
-          value={
-            Array.isArray(filters[category][subItem])
-              ? filters[category][subItem]
-              : []
-          }
-          renderValue={(selected) => selected.join(', ')}
-          multiple
-          onChange={({ target }) =>
-            setFilters({
-              ...filters,
-              [category]: {
-                ...filters[category],
-                [subItem]: target.value,
-              },
-            })
-          }
-        >
-          {[10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((level) => (
-            <MenuItem key={level} value={level}>
-              Level {level}
-            </MenuItem>
-          ))}
-        </Select>
+        <ListItem>
+          <Select
+            sx={{ mx: 'auto', width: '90%' }}
+            value={
+              Array.isArray(filters[category][subItem])
+                ? filters[category][subItem]
+                : []
+            }
+            renderValue={(selected) => selected.join(', ')}
+            multiple
+            onChange={({ target }) =>
+              setFilters({
+                ...filters,
+                [category]: {
+                  ...filters[category],
+                  [subItem]: target.value,
+                },
+              })
+            }
+          >
+            {[10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((level) => (
+              <MenuItem key={level} value={level}>
+                Level {level}
+              </MenuItem>
+            ))}
+          </Select>
+        </ListItem>
       </CollapsibleItem>
     )
   }
