@@ -237,7 +237,7 @@ export default function Extras({ category, subItem, data }) {
                   )}
                 />
                 <Switch
-                  checked={filters[category].filter[event].enabled}
+                  checked={filters[category].filter[event]?.enabled || false}
                   onChange={() => {
                     setFilters({
                       ...filters,

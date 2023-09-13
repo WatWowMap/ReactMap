@@ -38,6 +38,7 @@ export default function Clustering({ category, children }) {
   return limitHit || (clusteringRules.zoomLevel && userCluster) ? (
     <>
       <MarkerClusterGroup
+        key={`${userCluster}-${limitHit}`}
         disableClusteringAtZoom={limitHit ? 20 : clusteringRules.zoomLevel}
         chunkedLoading
       >
