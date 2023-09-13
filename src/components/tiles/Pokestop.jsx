@@ -80,8 +80,11 @@ const PokestopTile = (pokestop) => {
       userSettings.pokestops.lureTimers || showTimer,
       userSettings.pokestops.eventStopTimers || showTimer,
       !!userSettings.pokestops.lureRange && zoom >= interactionRangeZoom,
-      !!userSettings.pokestops.interactionRange && zoom >= interactionRangeZoom,
-      zoom >= interactionRangeZoom ? userSettings.pokestops.customRange : 0,
+      !!userSettings.pokestops.interactionRanges &&
+        zoom >= interactionRangeZoom,
+      zoom >= interactionRangeZoom
+        ? +userSettings.pokestops.customRange || 0
+        : 0,
     ]
   }, basicEqualFn)
 

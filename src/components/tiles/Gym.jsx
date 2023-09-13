@@ -119,9 +119,9 @@ const GymTile = (gym) => {
     const { userSettings, filters, zoom } = s
     return [
       (userSettings.gyms.raidTimers || inTimerList) && hasRaid,
-      !!userSettings.gyms.interactionRange && zoom >= interactionRangeZoom,
+      !!userSettings.gyms.interactionRanges && zoom >= interactionRangeZoom,
       !!userSettings.gyms['300mRange'] && zoom >= interactionRangeZoom,
-      zoom >= interactionRangeZoom ? userSettings.customRange : 0,
+      zoom >= interactionRangeZoom ? +userSettings.gyms.customRange || 0 : 0,
       !!gym.badge &&
         filters.gyms.gymBadges &&
         userSettings.gyms.gymBadgeDiamonds,
