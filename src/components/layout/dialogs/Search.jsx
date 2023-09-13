@@ -1,3 +1,4 @@
+// @ts-check
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
@@ -28,7 +29,6 @@ import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { SEARCHABLE } from '@services/queries/config'
-import getMidnight from '@services/functions/getMidnight'
 import getRewardInfo from '@services/functions/getRewardInfo'
 import { fromSearchCategory } from '@services/functions/fromSearchCategory'
 
@@ -177,13 +177,11 @@ const getBackupName = (tab) => {
 export default function Search() {
   Utility.analytics('/search')
 
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const map = useMap()
 
-  const location = useStore((state) => state.location)
   const search = useStore((state) => state.search)
   const searchTab = useStore((state) => state.searchTab)
-  const scanAreas = useStore((state) => state.filters.scanAreas)
 
   const distanceUnit = useStatic((state) => state.config.misc.distanceUnit)
   const questMessage = useStatic((state) => state.config.misc.questMessage)
@@ -195,18 +193,6 @@ export default function Search() {
 
   const [callSearch, { data, previousData, loading }] = useLazyQuery(
     Query.search(searchTab),
-    {
-      variables: {
-        search,
-        category: searchTab,
-        lat: location[0],
-        lon: location[1],
-        locale: localStorage.getItem('i18nextLng'),
-        ts: Math.floor(Date.now() / 1000),
-        midnight: getMidnight(),
-        onlyAreas: scanAreas?.filter?.areas || [],
-      },
-    },
   )
 
   const handleClose = React.useCallback((_, result) => {
@@ -222,7 +208,43 @@ export default function Search() {
     }
   }, [])
 
-  const debouncedFetch = debounce(callSearch, 1000)
+  const sendToServer = React.useCallback(
+    (/** @type {string} */ newSearch) => {
+      const { lat, lng } = map.getCenter()
+      const { areas } = useStore.getState().filters.scanAreas?.filter || {
+        areas: [],
+      }
+      callSearch({
+        variables: {
+          search: newSearch,
+          category: searchTab,
+          lat,
+          lon: lng,
+          locale: i18n.language,
+          onlyAreas: areas || [],
+        },
+      })
+    },
+    [i18n.language, searchTab],
+  )
+
+  const debounceChange = React.useMemo(
+    () => debounce(sendToServer, 250),
+    [sendToServer],
+  )
+
+  const handleChange = React.useCallback(
+    (e, newValue) => {
+      if (
+        e?.type === 'change' &&
+        (/^[0-9\s\p{L}]+$/u.test(newValue) || newValue === '')
+      ) {
+        useStore.setState({ search: newValue.toLowerCase() })
+        debounceChange(newValue.toLowerCase())
+      }
+    },
+    [debounceChange],
+  )
 
   React.useEffect(() => {
     setOptions(
@@ -245,8 +267,8 @@ export default function Search() {
 
   React.useEffect(() => {
     // initial search
-    if (search) callSearch()
-  }, [])
+    if (search && open) sendToServer(search)
+  }, [open])
 
   React.useEffect(() => {
     if (open) map.closePopup()
@@ -267,15 +289,7 @@ export default function Search() {
         <Header titles={['search']} action={handleClose} />
         <Autocomplete
           inputValue={search}
-          onInputChange={(e, newValue) => {
-            if (
-              e?.type === 'change' &&
-              (/^[0-9\s\p{L}]+$/u.test(newValue) || newValue === '')
-            ) {
-              useStore.setState({ search: newValue.toLowerCase() })
-              debouncedFetch()
-            }
-          }}
+          onInputChange={handleChange}
           options={options.map((option, i) => ({ ...option, i }))}
           loading={loading}
           autoComplete={false}
@@ -389,11 +403,14 @@ function ResultImage(props) {
             : Icons.getMisc(props.searchTab)
         }
         onError={(e) => {
+          // @ts-ignore
           e.target.onerror = null
           if (props.searchTab === 'pokestops') {
+            // @ts-ignore
             e.target.src =
               'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/pokestop/0.webp'
           } else {
+            // @ts-ignore
             e.target.src =
               'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/gym/0.webp'
           }
@@ -405,7 +422,7 @@ function ResultImage(props) {
     )
   }
   if (props.quest_reward_type) {
-    const { src, amount, tt } = getRewardInfo(props, Icons)
+    const { src, amount, tt } = getRewardInfo(props)
 
     return (
       <div
@@ -418,9 +435,11 @@ function ResultImage(props) {
           <img
             src={src}
             style={{ maxWidth: 45, maxHeight: 45 }}
-            alt={tt}
+            alt={typeof tt === 'string' ? tt : tt.join(' ')}
             onError={(e) => {
+              // @ts-ignore
               e.target.onerror = null
+              // @ts-ignore
               e.target.src =
                 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/misc/0.webp'
             }}
