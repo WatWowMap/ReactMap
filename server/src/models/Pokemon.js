@@ -23,6 +23,7 @@ const {
   BASE_KEYS,
 } = require('../services/filters/pokemon/constants')
 const PkmnFilter = require('../services/filters/pokemon/Backend')
+const { getClientDate } = require('../services/functions/getClientTime')
 
 const distanceUnit = config.getSafe('map.misc.distanceUnit')
 const searchResultsLimit = config.getSafe('api.searchResultsLimit')
@@ -124,18 +125,12 @@ class Pokemon extends Model {
    */
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
-    const {
-      onlyIvOr,
-      onlyHundoIv,
-      onlyZeroIv,
-      ts,
-      onlyAreas = [],
-    } = args.filters
+    const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
     const { hasSize, hasHeight, isMad, mem, secret, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
     let queryPvp = LEAGUES.some((league) => globalFilter.filterKeys.has(league))
 
-    const safeTs = ts || Math.floor(Date.now() / 1000)
+    const ts = Math.floor(getClientDate(args).getTime() / 1000)
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !pvp) {
@@ -170,7 +165,7 @@ class Pokemon extends Model {
         .where(
           isMad ? 'disappear_time' : 'expire_timestamp',
           '>=',
-          isMad ? this.knex().fn.now() : safeTs,
+          isMad ? this.knex().fn.now() : ts,
         )
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
           args.minLat,
@@ -315,7 +310,7 @@ class Pokemon extends Model {
         .where(
           isMad ? 'disappear_time' : 'expire_timestamp',
           '>=',
-          isMad ? this.knex().fn.now() : safeTs,
+          isMad ? this.knex().fn.now() : ts,
         )
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
           args.minLat,
@@ -567,14 +562,14 @@ class Pokemon extends Model {
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
-    const safeTs = args.ts || Math.floor(Date.now() / 1000)
+    const ts = Math.floor(getClientDate(args).getTime() / 1000)
     const query = this.query()
       .select(['pokemon_id', distance])
       .whereIn('pokemon_id', pokemonIds)
       .andWhere(
         isMad ? 'disappear_time' : 'expire_timestamp',
         '>=',
-        isMad ? this.knex().fn.now() : safeTs,
+        isMad ? this.knex().fn.now() : ts,
       )
       .limit(searchResultsLimit)
       .orderBy('distance')

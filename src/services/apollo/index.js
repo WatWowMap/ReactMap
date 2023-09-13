@@ -7,16 +7,6 @@ const abortableLink = new AbortableLink()
 
 export const apolloCache = new InMemoryCache({
   typePolicies: {
-    // Pokestop: {
-    //   fields: {
-    //     quests: {
-    //       merge(existing, incoming) {
-    //         console.log('quests', { existing, incoming })
-    //         return incoming
-    //       },
-    //     },
-    //   },
-    // },
     Query: {
       fields: {
         badges: {
@@ -94,20 +84,20 @@ export const apolloCache = new InMemoryCache({
     PoracleWeather: {
       keyFields: ['uid'],
     },
-    // Pokestop: {
-    //   fields: {
-    //     quests: {
-    //       merge(existing, incoming) {
-    //         return incoming
-    //       },
-    //     },
-    //     invasions: {
-    //       merge(existing, incoming) {
-    //         return incoming
-    //       },
-    //     },
-    //   },
-    // },
+    Pokestop: {
+      fields: {
+        quests: {
+          merge(existing, incoming) {
+            return incoming
+          },
+        },
+        invasions: {
+          merge(existing, incoming) {
+            return incoming
+          },
+        },
+      },
+    },
   },
 })
 

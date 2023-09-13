@@ -6,6 +6,7 @@ const config = require('@rm/config')
 
 const { Event, Db } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
+const { getClientDate } = require('../services/functions/getClientTime')
 
 const { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms } =
   config.getSafe('api')
@@ -70,10 +71,9 @@ class Gym extends Model {
       onlyRaidTier,
       onlyGymBadges,
       onlyBadge,
-      ts,
       onlyAreas = [],
     } = args.filters
-    const safeTs = ts || Math.floor(Date.now() / 1000)
+    const ts = Math.floor(getClientDate(args).getTime() / 1000)
     const query = this.query()
 
     if (isMad) {
@@ -279,7 +279,7 @@ class Gym extends Model {
                 .where(
                   isMad ? 'end' : 'raid_end_timestamp',
                   '>=',
-                  isMad ? this.knex().fn.now() : safeTs,
+                  isMad ? this.knex().fn.now() : ts,
                 )
                 .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [
                   ...(raidBosses || []),
@@ -301,7 +301,7 @@ class Gym extends Model {
                   .where(
                     isMad ? 'start' : 'raid_battle_timestamp',
                     '>=',
-                    isMad ? this.knex().fn.now() : safeTs,
+                    isMad ? this.knex().fn.now() : ts,
                   )
                   .orWhere((unknownEggs) => {
                     unknownEggs
@@ -309,7 +309,7 @@ class Gym extends Model {
                       .andWhere(
                         isMad ? 'end' : 'raid_end_timestamp',
                         '>=',
-                        isMad ? this.knex().fn.now() : safeTs,
+                        isMad ? this.knex().fn.now() : ts,
                       )
                   })
               })
@@ -322,7 +322,7 @@ class Gym extends Model {
               .andWhere(
                 isMad ? 'end' : 'raid_end_timestamp',
                 '>=',
-                isMad ? this.knex().fn.now() : safeTs,
+                isMad ? this.knex().fn.now() : ts,
               )
           })
         }
@@ -342,7 +342,7 @@ class Gym extends Model {
         const newGym = Object.fromEntries(
           coreFields.map((field) => [field, gym[field]]),
         )
-        const isRaid = gym.raid_end_timestamp > safeTs
+        const isRaid = gym.raid_end_timestamp > ts
         const isEgg = isRaid && !gym.raid_pokemon_id
 
         if (userBadgeObj[gym.id]) {
@@ -478,7 +478,7 @@ class Gym extends Model {
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
-    const safeTs = args.ts || Math.floor(new Date().getTime() / 1000)
+    const ts = Math.floor(getClientDate(args).getTime() / 1000)
     const query = this.query()
       .select([
         'name',
@@ -500,12 +500,12 @@ class Gym extends Model {
       .andWhere(
         isMad ? 'start' : 'raid_battle_timestamp',
         '<=',
-        isMad ? this.knex().fn.now() : safeTs,
+        isMad ? this.knex().fn.now() : ts,
       )
       .andWhere(
         isMad ? 'end' : 'raid_end_timestamp',
         '>=',
-        isMad ? this.knex().fn.now() : safeTs,
+        isMad ? this.knex().fn.now() : ts,
       )
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {

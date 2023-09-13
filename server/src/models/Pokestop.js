@@ -4,6 +4,7 @@ const config = require('@rm/config')
 
 const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
+const { getClientTime } = require('../services/functions/getClientTime')
 
 const {
   searchResultsLimit,
@@ -87,11 +88,8 @@ class Pokestop extends Model {
         onlyConfirmed,
         onlyAreas = [],
       },
-      ts,
-      midnight: clientMidnight,
     } = args
-    const midnight = clientMidnight || 0
-    const safeTs = ts || Math.floor(new Date().getTime() / 1000)
+    const { ts, midnight } = getClientTime(args)
 
     const {
       lures: lurePerms,
@@ -255,7 +253,7 @@ class Pokestop extends Model {
               .andWhere(
                 isMad ? 'lure_expiration' : 'lure_expire_timestamp',
                 '>=',
-                isMad ? this.knex().fn.now() : safeTs,
+                isMad ? this.knex().fn.now() : ts,
               )
           })
         }
@@ -532,7 +530,7 @@ class Pokestop extends Model {
                 invasion.andWhere(
                   multiInvasionMs ? 'expiration_ms' : 'expiration',
                   '>=',
-                  safeTs * (multiInvasionMs ? 1000 : 1),
+                  ts * (multiInvasionMs ? 1000 : 1),
                 )
               }
               if (hasConfirmed && onlyConfirmed) {
@@ -576,7 +574,7 @@ class Pokestop extends Model {
                   MADE_UP_MAD_INVASIONS,
                 )
               } else {
-                invasion.andWhere('expiration', '>=', safeTs)
+                invasion.andWhere('expiration', '>=', ts)
               }
               if (hasConfirmed) {
                 invasion.andWhere('confirmed', onlyConfirmed)
@@ -613,7 +611,7 @@ class Pokestop extends Model {
               event.where(
                 multiInvasionMs ? 'expiration_ms' : 'expiration',
                 '>=',
-                safeTs * (multiInvasionMs ? 1000 : 1),
+                ts * (multiInvasionMs ? 1000 : 1),
               )
             }
           })
@@ -625,15 +623,15 @@ class Pokestop extends Model {
     const results = await query
 
     const normalized = isMad
-      ? this.mapMAD(results, safeTs)
-      : this.mapRDM(results, safeTs)
+      ? this.mapMAD(results, ts)
+      : this.mapRDM(results, ts)
     if (normalized.length > queryLimits.pokestops)
       normalized.length = queryLimits.pokestops
     const finalResults = this.secondaryFilter(
       normalized,
       args.filters,
       isMad,
-      safeTs,
+      ts,
       midnight,
       perms,
       hasMultiInvasions,
@@ -651,7 +649,7 @@ class Pokestop extends Model {
     queryResults,
     filters,
     isMad,
-    safeTs,
+    ts,
     midnight,
     perms,
     hasMultiInvasions,
@@ -765,7 +763,7 @@ class Pokestop extends Model {
         perms.lures &&
         (filters.onlyAllPokestops ||
           (filters.onlyLures &&
-            pokestop.lure_expire_timestamp >= safeTs &&
+            pokestop.lure_expire_timestamp >= ts &&
             filters[`l${pokestop.lure_id}`]))
       ) {
         this.fieldAssigner(filtered, pokestop, [
@@ -1575,8 +1573,8 @@ class Pokestop extends Model {
   }
 
   static async searchQuests(perms, args, { isMad, hasAltQuests }, distance) {
-    const { search, onlyAreas = [], locale, midnight: clientMidnight } = args
-    const midnight = clientMidnight || 0
+    const { search, onlyAreas = [], locale, lat, lon } = args
+    const { midnight } = getClientTime({ lat, lon })
 
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next

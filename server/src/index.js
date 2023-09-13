@@ -227,7 +227,6 @@ startApollo(httpServer).then((server) => {
           pkg.version ||
           1
         const serverV = pkg.version || 1
-
         let transaction
         if (sentry.enabled || process.env.SENTRY_DSN) {
           transaction = res.__sentry_transaction

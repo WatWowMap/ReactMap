@@ -91,7 +91,6 @@ function QueryData({ category, timeout }) {
 
   const hideList = useStatic((s) => s.hideList)
   const active = useStatic((s) => s.active)
-  // const manualParams = useStatic((s) => s.manualParams)
 
   const userSettings = useStore(
     (s) => s.userSettings[userSettingsCategory(category)] || {},
@@ -105,25 +104,16 @@ function QueryData({ category, timeout }) {
     basicEqualFn,
   )
 
-  const initialArgs = React.useMemo(
-    () => ({
-      ...getQueryArgs(),
-      // id:
-      //   category === manualParams.category && manualParams.id
-      //     ? manualParams.id
-      //     : null,
-      filters: trimFilters(filters, userSettings, category, onlyAreas),
-    }),
-    [],
-  )
-
   const { data, previousData, error, refetch } = useQuery(
     Query[category](filters),
     {
       context: {
         abortableContext: timeout.current,
       },
-      variables: initialArgs,
+      variables: {
+        ...getQueryArgs(),
+        filters: trimFilters(filters, userSettings, category, onlyAreas),
+      },
       fetchPolicy: active ? 'cache-first' : 'cache-only',
       skip: !active,
     },
@@ -144,16 +134,11 @@ function QueryData({ category, timeout }) {
       if (category !== 'scanAreas') {
         timeout.current.doRefetch({
           ...getQueryArgs(),
-          // id:
-          //   category === manualParams.category && manualParams.id
-          //     ? manualParams.id
-          //     : null,
           filters: trimFilters(filters, userSettings, category, onlyAreas),
         })
       }
     }
     map.on('fetchdata', refetchData)
-    map.fire('fetchdata')
     return () => {
       map.off('fetchdata', refetchData)
     }
