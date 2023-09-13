@@ -126,50 +126,47 @@ const PokestopTile = (pokestop) => {
     ...pokestop,
   })
 
-  return (
-    !!(hasQuest || hasLure || hasInvasion || hasEvent || hasAllStops) && (
-      <Marker
-        ref={setMarkerRef}
-        position={[pokestop.lat, pokestop.lon]}
-        icon={icon}
-      >
-        <Popup position={[pokestop.lat, pokestop.lon]}>
-          <PopupContent
-            hasLure={hasLure}
-            hasInvasion={hasInvasion}
-            hasQuest={hasQuest}
-            hasEvent={hasEvent}
-            hasAllStops={hasAllStops}
-            {...pokestop}
-          />
-        </Popup>
-        {Boolean(timers.length) && (
-          <ToolTipWrapper timers={timers} offset={[0, 4]} />
-        )}
-        {interactionRange && (
-          <Circle
-            center={[pokestop.lat, pokestop.lon]}
-            radius={80}
-            pathOptions={{ color: '#0DA8E7', weight: 1 }}
-          />
-        )}
-        {lureRange && (
-          <Circle
-            center={[pokestop.lat, pokestop.lon]}
-            radius={40}
-            pathOptions={{ color: '#32cd32', weight: 1 }}
-          />
-        )}
-        {!!customRange && (
-          <Circle
-            center={[pokestop.lat, pokestop.lon]}
-            radius={customRange}
-            pathOptions={{ color: 'purple', weight: 0.5 }}
-          />
-        )}
-      </Marker>
-    )
-  )
+  return hasQuest || hasLure || hasInvasion || hasEvent || hasAllStops ? (
+    <Marker
+      ref={setMarkerRef}
+      position={[pokestop.lat, pokestop.lon]}
+      icon={icon}
+    >
+      <Popup position={[pokestop.lat, pokestop.lon]}>
+        <PopupContent
+          hasLure={hasLure}
+          hasInvasion={hasInvasion}
+          hasQuest={hasQuest}
+          hasEvent={hasEvent}
+          {...pokestop}
+        />
+      </Popup>
+      {Boolean(timers.length) && (
+        <ToolTipWrapper timers={timers} offset={[0, 4]} />
+      )}
+      {interactionRange && (
+        <Circle
+          center={[pokestop.lat, pokestop.lon]}
+          radius={80}
+          pathOptions={{ color: '#0DA8E7', weight: 1 }}
+        />
+      )}
+      {lureRange && (
+        <Circle
+          center={[pokestop.lat, pokestop.lon]}
+          radius={40}
+          pathOptions={{ color: '#32cd32', weight: 1 }}
+        />
+      )}
+      {!!customRange && (
+        <Circle
+          center={[pokestop.lat, pokestop.lon]}
+          radius={customRange}
+          pathOptions={{ color: 'purple', weight: 0.5 }}
+        />
+      )}
+    </Marker>
+  ) : null
 }
 
 const MemoPokestopTile = React.memo(

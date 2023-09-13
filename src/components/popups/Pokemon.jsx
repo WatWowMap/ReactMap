@@ -22,11 +22,11 @@ import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
-import GenericTimer from './common/Timer'
 import NameTT from './common/NameTT'
 import GenderIcon from './common/GenderIcon'
 import Navigation from './common/Navigation'
 import Coords from './common/Coords'
+import { TimeStamp } from './common/TimeStamps'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -480,7 +480,7 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
 }
 
 const ExtraInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
-  const { moves } = useStatic((state) => state.masterfile)
+  const moves = useStatic((state) => state.masterfile.moves)
 
   const { move_1, move_2, first_seen_timestamp, updated, iv } = pokemon
 
@@ -519,34 +519,9 @@ const ExtraInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
         flexItem
         style={{ width: '100%', height: 2, margin: '10px 0' }}
       />
-      {[first_seen_timestamp, updated].map((time, i) =>
-        time ? (
-          <Grid
-            container
-            item
-            xs={6}
-            key={`${time}-${i ? 'updated' : 'first'}`}
-            style={{ flexGrow: i ? 0 : 1, textAlign: 'center' }}
-            direction="column"
-          >
-            <Grid item>
-              <Typography variant="subtitle2">
-                {i ? t('last_seen') : t('first_seen')}:
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography variant="caption">
-                {new Date(time * 1000).toLocaleTimeString(
-                  localStorage.getItem('i18nextLng') || 'en',
-                )}
-              </Typography>
-            </Grid>
-            <Grid item>
-              <GenericTimer expireTime={time} />
-            </Grid>
-          </Grid>
-        ) : null,
-      )}
+      <TimeStamp time={first_seen_timestamp}>first_seen</TimeStamp>
+      <TimeStamp time={updated}>last_seen</TimeStamp>
+
       {process.env.NODE_ENV === 'development' && (
         <Grid item xs={12} style={{ paddingTop: 10 }}>
           <Typography variant="subtitle1" align="center">

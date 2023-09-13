@@ -33,6 +33,7 @@ import HeaderImage from './common/HeaderImage'
 import Timer from './common/Timer'
 import PowerUp from './common/PowerUp'
 import NameTT from './common/NameTT'
+import { TimeStamp } from './common/TimeStamps'
 
 /**
  *
@@ -41,7 +42,6 @@ import NameTT from './common/NameTT'
  *   hasInvasion: boolean
  *   hasQuest: boolean
  *   hasEvent: boolean
- *   hasAllStops: boolean
  * }} props
  * @returns
  */
@@ -50,7 +50,6 @@ export default function PokestopPopup({
   hasInvasion,
   hasQuest,
   hasEvent,
-  hasAllStops,
   ...pokestop
 }) {
   const { t } = useTranslation()
@@ -253,12 +252,8 @@ export default function PokestopPopup({
             </Grid>
           )}
         </Grid>
-        <Footer
-          lat={pokestop.lat}
-          lon={pokestop.lon}
-          hasAllStops={hasAllStops}
-        />
-        {hasAllStops && <ExtraInfo {...pokestop} />}
+        <Footer lat={pokestop.lat} lon={pokestop.lon} />
+        <ExtraInfo {...pokestop} />
       </Grid>
     </ErrorBoundary>
   )
@@ -636,10 +631,10 @@ const QuestConditions = ({
 
 /**
  *
- * @param {Pick<import('@rm/types').Pokestop, 'lat' | 'lon'> & { hasAllStops: boolean }} props
+ * @param {Pick<import('@rm/types').Pokestop, 'lat' | 'lon'>} props
  * @returns
  */
-const Footer = ({ lat, lon, hasAllStops }) => {
+const Footer = ({ lat, lon }) => {
   const open = useStore((state) => !!state.popups.extras)
 
   return (
@@ -653,21 +648,19 @@ const Footer = ({ lat, lon, hasAllStops }) => {
       <Grid item xs={3}>
         <Navigation lat={lat} lon={lon} />
       </Grid>
-      {hasAllStops && (
-        <Grid item xs={3} textAlign="center">
-          <IconButton
-            className={open ? 'expanded' : 'closed'}
-            onClick={() =>
-              useStore.setState((prev) => ({
-                popups: { ...prev.popups, extras: !open },
-              }))
-            }
-            size="large"
-          >
-            <ExpandMore />
-          </IconButton>
-        </Grid>
-      )}
+      <Grid item xs={3} textAlign="center">
+        <IconButton
+          className={open ? 'expanded' : 'closed'}
+          onClick={() =>
+            useStore.setState((prev) => ({
+              popups: { ...prev.popups, extras: !open },
+            }))
+          }
+          size="large"
+        >
+          <ExpandMore />
+        </IconButton>
+      </Grid>
     </Grid>
   )
 }
@@ -678,56 +671,18 @@ const Footer = ({ lat, lon, hasAllStops }) => {
  * @returns
  */
 const ExtraInfo = ({ last_modified_timestamp, updated, lat, lon }) => {
-  const { t } = useTranslation()
   const open = useStore((state) => state.popups.extras)
   const enablePokestopPopupCoords = useStore(
     (state) => state.userSettings.pokestops.enablePokestopPopupCoords,
   )
-  const ts = Date.now() / 1000
-
-  const extraMetaData = [
-    {
-      description: 'last_seen',
-      timer: <Timer expireTime={updated} />,
-      data: Utility.dayCheck(ts, updated),
-    },
-    {
-      description: 'last_modified',
-      timer: <Timer expireTime={last_modified_timestamp} />,
-      data: Utility.dayCheck(ts, last_modified_timestamp),
-    },
-  ]
 
   return (
-    <Collapse in={open} timeout="auto" unmountOnExit>
+    <Collapse in={open} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
       <Grid container alignItems="center" justifyContent="center">
-        {extraMetaData.map((meta) => (
-          <React.Fragment key={meta.description}>
-            <Grid
-              item
-              xs={t('popup_pokestop_description_width')}
-              style={{ textAlign: 'left' }}
-            >
-              <Typography variant="caption">{t(meta.description)}:</Typography>
-            </Grid>
-            <Grid
-              item
-              xs={t('popup_pokestop_seen_timer_width')}
-              style={{ textAlign: 'right' }}
-            >
-              {meta.timer}
-            </Grid>
-            <Grid
-              item
-              xs={t('popup_pokestop_data_width')}
-              style={{ textAlign: 'right' }}
-            >
-              <Typography variant="caption">{meta.data}</Typography>
-            </Grid>
-          </React.Fragment>
-        ))}
+        <TimeStamp time={updated}>last_seen</TimeStamp>
+        <TimeStamp time={last_modified_timestamp}>last_modified</TimeStamp>
         {enablePokestopPopupCoords && (
-          <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Grid item xs={12} textAlign="center">
             <Coords lat={lat} lon={lon} />
           </Grid>
         )}
