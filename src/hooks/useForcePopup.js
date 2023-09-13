@@ -1,11 +1,26 @@
+// @ts-check
 import { useEffect } from 'react'
+import { useStatic } from './useStore'
 
-export default function useForcePopup(itemId, ref, params, setParams, done) {
+const cleanup = () =>
+  useStatic.setState({ manualParams: { category: '', id: '' } })
+
+/**
+ *
+ * @param {string | number} id
+ * @param {import('leaflet').Marker<any>} ref
+ */
+export default function useForcePopup(id, ref) {
+  const manualParams = useStatic((s) => s.manualParams)
+
   useEffect(() => {
-    const { id } = params
-    if (id === itemId && ref?.current[itemId] && done) {
-      ref.current[itemId].openPopup()
-      setParams({})
+    if (id === manualParams.id && ref) {
+      ref.openPopup()
+      ref.on('popupclose', cleanup)
+      return () => {
+        ref.off('popupclose', cleanup)
+        ref.closePopup()
+      }
     }
-  }, [done])
+  }, [manualParams, ref])
 }

@@ -1,11 +1,14 @@
+/* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
+
 import useMarkerTimer from '@hooks/useMarkerTimer'
 import { getOffset } from '@services/functions/offset'
 import { getBadge } from '@services/functions/getBadge'
 import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
 import useOpacity from '@hooks/useOpacity'
+import useForcePopup from '@hooks/useForcePopup'
 
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
@@ -55,13 +58,11 @@ const getGlowStatus = (pkmn, userSettings) => {
  * @param {import('@rm/types').Pokemon & { force?: boolean }} pkmn
  * @returns
  */
-const PokemonTile = ({ force, ...pkmn }) => {
+const PokemonTile = (pkmn) => {
   const internalId = `${pkmn.pokemon_id}-${pkmn.form}`
 
-  const markerRef = React.useRef(null)
-  const [done, setDone] = React.useState(false)
+  const [markerRef, setMarkerRef] = React.useState(null)
 
-  useMarkerTimer(pkmn.expire_timestamp, markerRef)
   const opacity = useOpacity('pokemon')(pkmn.expire_timestamp)
 
   const [
@@ -122,6 +123,7 @@ const PokemonTile = ({ force, ...pkmn }) => {
       badgeId ? Icons.getMisc(badgeId) : '',
       config.general.interactionRangeZoom <= map.getZoom(),
       s.timeOfDay,
+      s.manualParams.category === 'pokemon' && s.manualParams.id === pkmn.id,
     ]
   }, basicEqualFn)
 
@@ -152,12 +154,8 @@ const PokemonTile = ({ force, ...pkmn }) => {
     return decorators
   }, [showIv, showLevel, showSize, badge])
 
-  React.useEffect(() => {
-    if (force && !done && markerRef.current) {
-      markerRef.current.openPopup()
-      setDone(true)
-    }
-  }, [force])
+  useForcePopup(pkmn.id, markerRef)
+  useMarkerTimer(pkmn.expire_timestamp, markerRef)
 
   if (pkmn.expire_timestamp < Date.now() / 1000 || excluded) {
     return null
@@ -165,7 +163,7 @@ const PokemonTile = ({ force, ...pkmn }) => {
 
   return (
     <Marker
-      ref={markerRef}
+      ref={setMarkerRef}
       zIndexOffset={
         (typeof pkmn.iv === 'number' ? pkmn.iv || 99 : 0) * 100 +
         40.96 -

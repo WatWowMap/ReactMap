@@ -1,9 +1,11 @@
+/* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
 import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import useForcePopup from '@hooks/useForcePopup'
 
 import PopupContent from '../popups/Pokestop'
 import ToolTipWrapper from './Timer'
@@ -11,13 +13,12 @@ import usePokestopMarker from '../markers/usePokestopMarker'
 
 /**
  *
- * @param {import('@rm/types').Pokestop & { force: boolean }} props
+ * @param {import('@rm/types').Pokestop} pokestop
  * @returns
  */
-const PokestopTile = ({ force, ...pokestop }) => {
-  const markerRef = React.useRef(null)
-  const [done, setDone] = React.useState(false)
+const PokestopTile = (pokestop) => {
   const [stateChange, setStateChange] = React.useState(false)
+  const [markerRef, setMarkerRef] = React.useState(null)
 
   const [
     hasLure,
@@ -109,6 +110,7 @@ const PokestopTile = ({ force, ...pokestop }) => {
     hasEvent,
   ])
 
+  useForcePopup(pokestop.id, markerRef)
   useMarkerTimer(timers.length ? Math.min(...timers) : null, markerRef, () =>
     setStateChange(!stateChange),
   )
@@ -121,17 +123,10 @@ const PokestopTile = ({ force, ...pokestop }) => {
     ...pokestop,
   })
 
-  React.useEffect(() => {
-    if (force && !done && markerRef.current) {
-      markerRef.current.openPopup()
-      setDone(true)
-    }
-  }, [force])
-
   return (
     !!(hasQuest || hasLure || hasInvasion || hasEvent || hasAllStops) && (
       <Marker
-        ref={markerRef}
+        ref={setMarkerRef}
         position={[pokestop.lat, pokestop.lon]}
         icon={icon}
       >

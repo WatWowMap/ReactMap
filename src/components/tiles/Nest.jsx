@@ -1,18 +1,20 @@
+/* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
 import { GeoJSON, Marker, Popup } from 'react-leaflet'
 
 import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import useForcePopup from '@hooks/useForcePopup'
 
 import nestMarker from '../markers/nest'
 import PopupContent from '../popups/Nest'
 
 /**
  *
- * @param {import('@rm/types').Nest & { force?: boolean }} props
+ * @param {import('@rm/types').Nest} nest
  * @returns
  */
-const NestTile = ({ force, ...nest }) => {
+const NestTile = (nest) => {
   const recent = Date.now() / 1000 - nest.updated < 172800000
   const internalId = `${nest.pokemon_id}-${nest.pokemon_form}`
 
@@ -43,7 +45,7 @@ const NestTile = ({ force, ...nest }) => {
 
   return (
     <>
-      <NestMarker force={force} icon={icon} lat={nest.lat} lon={nest.lon}>
+      <NestMarker icon={icon} id={nest.id} lat={nest.lat} lon={nest.lon}>
         <Popup position={[nest.lat, nest.lon]}>
           <PopupContent iconUrl={iconUrl} recent={recent} {...nest} />
         </Popup>
@@ -56,30 +58,24 @@ const NestTile = ({ force, ...nest }) => {
 /**
  *
  * @param {Omit<import('react-leaflet').MarkerProps, 'position'> & {
- *  force?: boolean
  *  children: React.ReactNode
+ *  id: number
  *  lat: number
  *  lon: number
  * }} props
  * @returns
  */
-const NestMarker = ({ force, children, icon, lat, lon }) => {
+const NestMarker = ({ children, icon, id, lat, lon }) => {
   const showPokemon = useStore((s) => s.filters.nests.pokemon)
-  const [done, setDone] = React.useState(false)
-  const markerRef = React.useRef(null)
+  const [markerRef, setMarkerRef] = React.useState(null)
 
-  React.useEffect(() => {
-    if (force && !done && markerRef.current) {
-      markerRef.current.openPopup()
-      setDone(true)
-    }
-  }, [force])
+  useForcePopup(id, markerRef)
 
   if (!showPokemon) {
     return null
   }
   return (
-    <Marker ref={markerRef} position={[lat, lon]} icon={icon}>
+    <Marker ref={setMarkerRef} position={[lat, lon]} icon={icon}>
       {children}
     </Marker>
   )

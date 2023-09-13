@@ -8,16 +8,8 @@ const { default: getDistance } = require('@turf/distance')
 const { point } = require('@turf/helpers')
 
 const { log, HELPERS } = require('@rm/logger')
+const config = require('@rm/config')
 
-const {
-  devOptions: { queryDebug },
-  api: {
-    searchResultsLimit,
-    pvp: { reactMapHandlesPvp },
-    queryLimits,
-  },
-  map: { distanceUnit },
-} = require('@rm/config')
 const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { filterRTree } = require('../services/functions/filterRTree')
@@ -31,6 +23,12 @@ const {
   BASE_KEYS,
 } = require('../services/filters/pokemon/constants')
 const PkmnFilter = require('../services/filters/pokemon/Backend')
+
+const distanceUnit = config.getSafe('map.misc.distanceUnit')
+const searchResultsLimit = config.getSafe('api.searchResultsLimit')
+const queryLimits = config.getSafe('api.queryLimits')
+const queryDebug = config.getSafe('devOptions.queryDebug')
+const reactMapHandlesPvp = config.getSafe('api.pvp.reactMapHandlesPvp')
 
 class Pokemon extends Model {
   static get tableName() {
@@ -146,6 +144,7 @@ class Pokemon extends Model {
       )
       if (!noPokemonSelect) return []
     }
+
     const query = this.query()
 
     const pokemonIds = []

@@ -1,36 +1,32 @@
+/* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
 import { Circle, Popup } from 'react-leaflet'
 
 import { useStore } from '@hooks/useStore'
+import useForcePopup from '@hooks/useForcePopup'
 
 import PopupContent from '../popups/Portal'
 
 /**
  *
- * @param {{ force?: boolean } & import('@rm/types').Portal} props
+ * @param {{ force?: boolean } & import('@rm/types').Portal} portal
  * @returns
  */
-const PortalTile = ({ force, ...portal }) => {
-  const [done, setDone] = React.useState(false)
-  const markerRef = React.useRef(null)
+const PortalTile = (portal) => {
+  const [markerRef, setMarkerRef] = React.useState(null)
   const color = useStore((s) =>
     Date.now() / 1000 - portal.imported > 86400
       ? s.userSettings.wayfarer.oldPortals
       : s.userSettings.wayfarer.newPortals,
   )
 
-  React.useEffect(() => {
-    if (force && !done && markerRef.current) {
-      markerRef.current.openPopup()
-      setDone(true)
-    }
-  }, [force])
+  useForcePopup(portal.id, markerRef)
 
   return (
     <Circle
       key={color}
-      ref={markerRef}
+      ref={setMarkerRef}
       center={[portal.lat, portal.lon]}
       radius={20}
       fillOpacity={0.25}

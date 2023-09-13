@@ -30,6 +30,7 @@ import Query from '@services/Query'
 import { SEARCHABLE } from '@services/queries/config'
 import getMidnight from '@services/functions/getMidnight'
 import getRewardInfo from '@services/functions/getRewardInfo'
+import { fromSearchCategory } from '@services/functions/fromSearchCategory'
 
 import Header from '../general/Header'
 import QuestTitle from '../general/QuestTitle'
@@ -212,6 +213,12 @@ export default function Search() {
     useLayoutStore.setState({ search: false })
     if (typeof result === 'object' && 'lat' in result && 'lon' in result) {
       map.flyTo([result.lat, result.lon], 16)
+      useStatic.setState({
+        manualParams: {
+          category: fromSearchCategory(searchTab),
+          id: result.id,
+        },
+      })
     }
   }, [])
 
@@ -240,6 +247,10 @@ export default function Search() {
     // initial search
     if (search) callSearch()
   }, [])
+
+  React.useEffect(() => {
+    if (open) map.closePopup()
+  }, [open])
 
   return (
     <Dialog

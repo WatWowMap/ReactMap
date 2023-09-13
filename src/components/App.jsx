@@ -69,9 +69,9 @@ export default function App() {
 
   return isValid ? (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <ErrorBoundary>
         <React.Suspense fallback={<SetText />}>
-          <CssBaseline />
           {globalStyles}
           <ApolloProvider client={apolloClient}>
             <Config>

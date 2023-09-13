@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
@@ -5,6 +6,7 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 import useMarkerTimer from '@hooks/useMarkerTimer'
 import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
 import useOpacity from '@hooks/useOpacity'
+import useForcePopup from '@hooks/useForcePopup'
 
 import gymMarker from '../markers/gym'
 import PopupContent from '../popups/Gym'
@@ -26,12 +28,11 @@ const getColor = (team) => {
 
 /**
  *
- * @param {import('@rm/types').Gym & { force?: boolean }} props
+ * @param {import('@rm/types').Gym} gym
  * @returns
  */
-const GymTile = ({ force, ...gym }) => {
-  const markerRef = React.useRef(null)
-  const [done, setDone] = React.useState(false)
+const GymTile = (gym) => {
+  const [markerRef, setMarkerRef] = React.useState(null)
   const [stateChange, setStateChange] = React.useState(false)
 
   const [
@@ -137,19 +138,13 @@ const GymTile = ({ force, ...gym }) => {
       ? gym.raid_end_timestamp
       : gym.raid_battle_timestamp
 
+  useForcePopup(gym.id, markerRef)
   useMarkerTimer(timerToDisplay, markerRef, () => setStateChange(!stateChange))
-
-  React.useEffect(() => {
-    if (force && !done && markerRef.current) {
-      markerRef.current.openPopup()
-      setDone(true)
-    }
-  }, [force])
 
   return (
     !excludeTeam && (
       <Marker
-        ref={markerRef}
+        ref={setMarkerRef}
         position={[gym.lat, gym.lon]}
         icon={gymMarker({
           showDiamond,

@@ -6,6 +6,7 @@ import { Marker, Polyline, useMapEvents } from 'react-leaflet'
 import { darken } from '@mui/material'
 
 import RoutePopup from '@components/popups/Route'
+import useForcePopup from '@hooks/useForcePopup'
 
 import routeMarker from '../markers/route'
 
@@ -25,6 +26,7 @@ const RouteTile = (route) => {
 
   /** @type {React.MutableRefObject<import("leaflet").Polyline>} */
   const lineRef = React.useRef()
+  const [markerRef, setMarkerRef] = React.useState(null)
 
   const waypoints = React.useMemo(
     () => [
@@ -59,12 +61,14 @@ const RouteTile = (route) => {
       }
     },
   })
+  useForcePopup(route.id, markerRef)
 
   return (
     <>
       {POSITIONS.map((position) => (
         <Marker
           key={position}
+          ref={position === 'start' ? setMarkerRef : undefined}
           opacity={hover || clicked ? 1 : MARKER_OPACITY}
           zIndexOffset={hover === position ? 2000 : hover || clicked ? 1000 : 0}
           position={[route[`${position}_lat`], route[`${position}_lon`]]}

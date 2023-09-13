@@ -89,8 +89,9 @@ function QueryData({ category, timeout }) {
 
   const map = useMap()
 
-  const hideList = useStatic((state) => new Set(state.hideList))
-  const active = useStatic((state) => state.active)
+  const hideList = useStatic((s) => s.hideList)
+  const active = useStatic((s) => s.active)
+  // const manualParams = useStatic((s) => s.manualParams)
 
   const userSettings = useStore(
     (s) => s.userSettings[userSettingsCategory(category)] || {},
@@ -107,6 +108,10 @@ function QueryData({ category, timeout }) {
   const initialArgs = React.useMemo(
     () => ({
       ...getQueryArgs(),
+      // id:
+      //   category === manualParams.category && manualParams.id
+      //     ? manualParams.id
+      //     : null,
       filters: trimFilters(filters, userSettings, category, onlyAreas),
     }),
     [],
@@ -139,6 +144,10 @@ function QueryData({ category, timeout }) {
       if (category !== 'scanAreas') {
         timeout.current.doRefetch({
           ...getQueryArgs(),
+          // id:
+          //   category === manualParams.category && manualParams.id
+          //     ? manualParams.id
+          //     : null,
           filters: trimFilters(filters, userSettings, category, onlyAreas),
         })
       }
@@ -184,7 +193,7 @@ function QueryData({ category, timeout }) {
   return (
     <Clustering category={category}>
       {returnData.map((each) => {
-        if (!hideList.has(each.id)) {
+        if (!hideList.includes(each.id)) {
           return <Component key={each.id || category} {...each} />
         }
         return null

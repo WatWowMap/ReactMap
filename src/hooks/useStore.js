@@ -140,6 +140,10 @@ export const useStore = create(
  *     pokestops: string[],
  *     nests: string[],
  *   }
+ *   manualParams: {
+ *     category: string,
+ *     id: number | string,
+ *  },
  * }} UseStatic
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
  */
@@ -207,7 +211,10 @@ export const useStatic = create((set) => ({
   setWebhookAlert: (webhookAlert) => set({ webhookAlert }),
   timeOfDay: 'day',
   extraUserFields: [],
-  manualParams: {},
+  manualParams: {
+    category: '',
+    id: '',
+  },
 }))
 
 // /**

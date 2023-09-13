@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 
 import Query from '@services/Query'
-import { useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 
 /**
  * @param {string} category
@@ -30,6 +30,8 @@ export default function WebhookQuery({ children }) {
   const params = useParams()
   const lowercase = getLowerCase(params.category)
 
+  const [ready, setReady] = React.useState(false)
+
   const { data } = useQuery(Query[lowercase]('id'), {
     variables: {
       id: params.id,
@@ -51,8 +53,15 @@ export default function WebhookQuery({ children }) {
         ],
         zoom: +params.zoom || prev.zoom,
       }))
+      useStatic.setState({
+        manualParams: {
+          category: params.category,
+          id: params.id,
+        },
+      })
+      setReady(true)
     }
   }, [data])
 
-  return data ? children : null
+  return (data ? ready : false) ? children : null
 }
