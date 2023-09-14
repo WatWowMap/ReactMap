@@ -89,7 +89,8 @@ class Pokestop extends Model {
         onlyAreas = [],
       },
     } = args
-    const { ts, midnight } = getClientTime(args)
+    const { midnight } = getClientTime(args)
+    const ts = Math.floor(Date.now() / 1000)
 
     const {
       lures: lurePerms,
@@ -129,17 +130,11 @@ class Pokestop extends Model {
       }
       if (hideOldPokestops) {
         query.whereRaw(
-          `UNIX_TIMESTAMP(last_updated) > ${
-            Date.now() / 1000 - stopValidDataLimit * 86400
-          }`,
+          `UNIX_TIMESTAMP(last_updated) > ${ts - stopValidDataLimit * 86400}`,
         )
       }
     } else if (hideOldPokestops) {
-      query.where(
-        'pokestop.updated',
-        '>',
-        Date.now() / 1000 - stopValidDataLimit * 86400,
-      )
+      query.where('pokestop.updated', '>', ts - stopValidDataLimit * 86400)
     }
     if (hasMultiInvasions) {
       if (isMad) {
@@ -971,7 +966,7 @@ class Pokestop extends Model {
     hasConfirmed,
     hasShowcaseData,
   }) {
-    const ts = Math.floor(new Date().getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const finalList = new Set()
     const conditions = {}
     const queries = {}
@@ -1678,6 +1673,7 @@ class Pokestop extends Model {
 
   static async searchLures(perms, args, { isMad }, distance) {
     const { search, onlyAreas = [], locale } = args
+    const ts = Math.floor(Date.now() / 1000)
 
     const lureIds = Object.keys(Event.masterfile.items)
       .filter((item) => Event.masterfile.items[item].startsWith('Troy Disk'))
@@ -1705,7 +1701,7 @@ class Pokestop extends Model {
       .andWhere(
         isMad ? 'lure_expiration' : 'lure_expire_timestamp',
         '>=',
-        isMad ? this.knex().fn.now() : Math.floor(Date.now() / 1000),
+        isMad ? this.knex().fn.now() : ts,
       )
       .whereIn(isMad ? 'active_fort_modifier' : 'lure_id', lureIds)
       .limit(searchResultsLimit)

@@ -26,7 +26,7 @@ class Weather extends Model {
         raw('UNIX_TIMESTAMP(last_updated)').as('updated'),
       ])
     } else {
-      const ts = Math.floor(new Date().getTime() / 1000)
+      const ts = Math.floor(Date.now() / 1000)
       const ms = ts - config.getSafe('api.weatherCellLimit') * 60 * 60 * 24
       query.where('updated', '>=', ms)
     }

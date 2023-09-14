@@ -6,7 +6,6 @@ const config = require('@rm/config')
 
 const { Event, Db } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { getClientDate } = require('../services/functions/getClientTime')
 
 const { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms } =
   config.getSafe('api')
@@ -73,7 +72,7 @@ class Gym extends Model {
       onlyBadge,
       onlyAreas = [],
     } = args.filters
-    const ts = Math.floor(getClientDate(args).getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
 
     if (isMad) {
@@ -109,12 +108,12 @@ class Gym extends Model {
       if (hideOldGyms) {
         query.whereRaw(
           `UNIX_TIMESTAMP(gym.last_scanned) > ${
-            Date.now() / 1000 - gymValidDataLimit * 86400
+            ts - gymValidDataLimit * 86400
           }`,
         )
       }
     } else if (hideOldGyms) {
-      query.where('updated', '>', Date.now() / 1000 - gymValidDataLimit * 86400)
+      query.where('updated', '>', ts - gymValidDataLimit * 86400)
     }
     query
       .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
@@ -352,7 +351,7 @@ class Gym extends Model {
           if (gym.availble_slots !== undefined) {
             gym.available_slots = gym.availble_slots
           }
-          if (gym.updated > Date.now() / 1000 - gymValidDataLimit * 86400) {
+          if (gym.updated > ts - gymValidDataLimit * 86400) {
             gymFields.forEach((field) => (newGym[field] = gym[field]))
           }
         }
@@ -396,7 +395,7 @@ class Gym extends Model {
   }
 
   static async getAvailable({ isMad, availableSlotsCol }) {
-    const ts = Math.floor(new Date().getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const results = await this.query()
       .select([
         isMad ? 'pokemon_id AS raid_pokemon_id' : 'raid_pokemon_id',
@@ -478,7 +477,8 @@ class Gym extends Model {
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
-    const ts = Math.floor(getClientDate(args).getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
+
     const query = this.query()
       .select([
         'name',

@@ -23,7 +23,6 @@ const {
   BASE_KEYS,
 } = require('../services/filters/pokemon/constants')
 const PkmnFilter = require('../services/filters/pokemon/Backend')
-const { getClientDate } = require('../services/functions/getClientTime')
 
 const distanceUnit = config.getSafe('map.misc.distanceUnit')
 const searchResultsLimit = config.getSafe('api.searchResultsLimit')
@@ -129,8 +128,7 @@ class Pokemon extends Model {
     const { hasSize, hasHeight, isMad, mem, secret, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
     let queryPvp = LEAGUES.some((league) => globalFilter.filterKeys.has(league))
-
-    const ts = Math.floor(getClientDate(args).getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !pvp) {
@@ -411,7 +409,7 @@ class Pokemon extends Model {
    */
   static async getLegacy(perms, args, ctx) {
     const { isMad, hasSize, hasHeight, mem, secret } = ctx
-    const ts = Math.floor(new Date().getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
     if (!perms.iv && !perms.pvp) {
@@ -562,7 +560,7 @@ class Pokemon extends Model {
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
-    const ts = Math.floor(getClientDate(args).getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
       .select(['pokemon_id', distance])
       .whereIn('pokemon_id', pokemonIds)

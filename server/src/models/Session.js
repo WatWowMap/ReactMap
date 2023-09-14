@@ -21,7 +21,7 @@ class Session extends Model {
    */
   static async isValidSession(userId) {
     try {
-      const ts = Math.floor(new Date().getTime() / 1000)
+      const ts = Math.floor(Date.now() / 1000)
       const results = await this.query()
         .select('session_id')
         .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
