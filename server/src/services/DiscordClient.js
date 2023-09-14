@@ -43,7 +43,7 @@ class DiscordClient {
       scanNext: strategy.scanNextLogChannelId,
       scanZone: strategy.scanZoneLogChannelId,
     }
-    this.loggingChannelHidePii = strategy.loggingChannelHidePii
+    this.loggingChannelHidePii = strategy.logChannelHidePii
     this.perms = config.getSafe('authentication.perms')
     this.alwaysEnabledPerms = config.getSafe(
       'authentication.alwaysEnabledPerms',
