@@ -2,6 +2,9 @@
 const { default: fetch } = require('node-fetch')
 const { log, HELPERS } = require('@rm/logger')
 
+// PII fields inside getAuthInfo embed
+const PII_FIELDS = ['Ip Address', 'Geo Lookup', 'Google Map', 'Network Provider']
+
 /**
  * Convert camelCase to Capitalized Words
  * @param {string} str
@@ -202,8 +205,7 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii) {
   }
   if (hidePii) {
     embed.fields = embed.fields.filter(field => {
-      const piiFields = ['Ip Address', 'Geo Lookup', 'Google Map', 'Network Provider'];
-      return !piiFields.includes(field.name);
+      return !PII_FIELDS.includes(field.name)
     });
   }
   return embed
