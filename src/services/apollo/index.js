@@ -8,48 +8,48 @@ const abortableLink = new AbortableLink()
 export const apolloCache = new InMemoryCache({
   typePolicies: {
     Query: {
-      fields: {
-        badges: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-        devices: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-        gyms: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-        nests: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-        pokemon: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-        pokestops: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-        portals: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-        spawnpoints: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-      },
+      // fields: {
+      //   badges: {
+      //     merge(existing, incoming) {
+      //       return incoming
+      //     },
+      //   },
+      //   devices: {
+      //     merge(existing, incoming) {
+      //       return incoming
+      //     },
+      //   },
+      //   gyms: {
+      //     merge(existing, incoming) {
+      //       return incoming
+      //     },
+      //   },
+      //   nests: {
+      //     merge(existing, incoming) {
+      //       return incoming
+      //     },
+      //   },
+      //   pokemon: {
+      //     merge(existing, incoming) {
+      //       return incoming
+      //     },
+      //   },
+      //   pokestops: {
+      //     merge(existing, incoming) {
+      //       return incoming
+      //     },
+      //   },
+      //   portals: {
+      //     merge(existing, incoming) {
+      //       return incoming
+      //     },
+      //   },
+      //   spawnpoints: {
+      //     merge(existing, incoming) {
+      //       return incoming
+      //     },
+      //   },
+      // },
     },
     SearchQuest: {
       keyFields: ['id', 'with_ar'],
@@ -84,29 +84,27 @@ export const apolloCache = new InMemoryCache({
     PoracleWeather: {
       keyFields: ['uid'],
     },
-    Pokestop: {
-      fields: {
-        quests: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-        invasions: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-      },
-    },
+    // Pokestop: {
+    //   fields: {
+    //     quests: {
+    //       merge(existing, incoming) {
+    //         return incoming
+    //       },
+    //     },
+    //     invasions: {
+    //       merge(existing, incoming) {
+    //         return incoming
+    //       },
+    //     },
+    //   },
+    // },
   },
 })
 
 export const apolloClient = new ApolloClient({
   uri: '/graphql',
   link: abortableLink.concat(createHttpLink()),
-  // @ts-ignore
   name: CONFIG.client.title,
-  // @ts-ignore
   version: CONFIG.client.version,
   cache: apolloCache,
 })

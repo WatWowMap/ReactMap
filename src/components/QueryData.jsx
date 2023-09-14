@@ -114,7 +114,7 @@ function QueryData({ category, timeout }) {
         ...getQueryArgs(),
         filters: trimFilters(filters, userSettings, category, onlyAreas),
       },
-      fetchPolicy: active ? 'cache-first' : 'cache-only',
+      fetchPolicy: active ? 'no-cache' : 'cache-only',
       skip: !active,
     },
   )
