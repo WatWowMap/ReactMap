@@ -43,6 +43,7 @@ class DiscordClient {
       scanNext: strategy.scanNextLogChannelId,
       scanZone: strategy.scanZoneLogChannelId,
     }
+    this.loggingChannelHidePii = strategy.loggingChannelHidePii
     this.perms = config.getSafe('authentication.perms')
     this.alwaysEnabledPerms = config.getSafe(
       'authentication.alwaysEnabledPerms',
@@ -269,7 +270,7 @@ class DiscordClient {
       }
       discordUser.valid = discordUser.perms.map !== false
 
-      const embed = await logUserAuth(req, discordUser, 'Discord')
+      const embed = await logUserAuth(req, discordUser, 'Discord', this.loggingChannelHidePii)
       await this.sendMessage(embed)
 
       if (discordUser.perms.blocked) {
