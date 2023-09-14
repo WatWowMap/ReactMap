@@ -114,7 +114,11 @@ function QueryData({ category, timeout }) {
         ...getQueryArgs(),
         filters: trimFilters(filters, userSettings, category, onlyAreas),
       },
-      fetchPolicy: active ? 'no-cache' : 'cache-only',
+      fetchPolicy: active
+        ? category === 'weather'
+          ? 'cache-and-network'
+          : 'no-cache'
+        : 'cache-only',
       skip: !active,
     },
   )
