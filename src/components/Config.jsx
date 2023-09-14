@@ -47,13 +47,6 @@ export default function Config({ children }) {
         localStorage.getItem('local-state') || '{ "state": {} }',
       )
 
-      const updateObjState = (defaults, category) => {
-        if (localState?.state?.[category]) {
-          return deepMerge({}, defaults, localState.state[category])
-        }
-        return defaults
-      }
-
       /**
        * @template T
        * @param {T} defaults
@@ -65,25 +58,6 @@ export default function Config({ children }) {
           return localState.state[category]
         }
         return defaults
-      }
-
-      if (localState?.state?.settings) {
-        const validNav = data.navigation.map((x) => x.name)
-        localState.state.settings.navigation = validNav.includes(
-          localState.state.settings.navigation,
-        )
-          ? localState.state.settings.navigation
-          : validNav[0]
-
-        const validTileLayer = data.tileServers.map((x) => x.name)
-        localState.state.settings.tileServers = validTileLayer.includes(
-          localState.state.settings.tileServers,
-        )
-          ? localState.state.settings.tileServers
-          : validTileLayer[0]
-
-        localState.state.settings.navigationControls =
-          data.map.misc.navigationControls
       }
 
       const defaultLocation = /** @type {const} */ ([
@@ -147,17 +121,22 @@ export default function Config({ children }) {
         tutorialExcludeList: data.authentication.excludeFromTutorial || [],
       })
 
-      useStore.setState({
+      useStore.setState((prev) => ({
         tutorial:
           !localState?.state?.tutorial || data.user.tutorial === undefined
             ? !!localState?.state?.tutorial
             : !data.user.tutorial,
-        menus: updateObjState(data.menus, 'menus'),
-        userSettings: updateObjState(data.userSettings, 'userSettings'),
-        settings: updateObjState(settings, 'settings'),
+        menus: deepMerge({}, data.menus, prev.menus),
+        userSettings: deepMerge({}, data.userSettings, prev.userSettings),
+        settings: {
+          ...Object.fromEntries(
+            Object.entries(settings).map(([k, v]) => [k, Object.keys(v)[0]]),
+          ),
+          ...prev.settings,
+        },
         zoom: safeZoom,
         location,
-      })
+      }))
       setServerSettings({ ...serverSettings, fetched: true })
     } else {
       setServerSettings({ error: true, status: 500, fetched: true })
