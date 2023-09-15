@@ -273,8 +273,8 @@ class DiscordClient {
       const embed = await logUserAuth(
         req,
         discordUser,
-        this.loggingChannelHidePii,
         'Discord',
+        this.loggingChannelHidePii,
       )
       await this.sendMessage(embed)
 
