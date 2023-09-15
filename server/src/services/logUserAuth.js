@@ -7,7 +7,7 @@ const PII_FIELDS = [
   'Ip Address',
   'Geo Lookup',
   'Google Map',
-  'Network Provider'
+  'Network Provider',
 ]
 
 /**
