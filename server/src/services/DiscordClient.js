@@ -274,7 +274,7 @@ class DiscordClient {
         req,
         discordUser,
         this.loggingChannelHidePii,
-        'Discord'
+        'Discord',
       )
       await this.sendMessage(embed)
 
