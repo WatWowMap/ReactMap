@@ -1,5 +1,6 @@
 // @ts-check
 const { find } = require('geo-tz')
+const { tz } = require('moment-timezone')
 const { utcToZonedTime } = require('date-fns-tz')
 const { format } = require('date-fns')
 
@@ -8,13 +9,22 @@ const { log, HELPERS } = require('@rm/logger')
 /** @typedef {import('@rm/types').Bounds | { lat: number, lon: number }} BoundsEnum */
 
 /**
+ *
+ * @param {Date} date
+ * @returns
+ */
+function getEpoch(date) {
+  return Math.floor(date.getTime() / 1000)
+}
+
+/**
  * Get the client timezone
  *
  * Accepts either a keyed bbox or a center point.
  * @param {BoundsEnum} bounds
  * @returns {string}
  */
-function getClientTimeZone(bounds) {
+function getUserTimeZone(bounds) {
   const { lat, lon } =
     'lat' in bounds
       ? bounds
@@ -22,50 +32,31 @@ function getClientTimeZone(bounds) {
           lat: (bounds.minLat + bounds.maxLat) / 2,
           lon: (bounds.minLon + bounds.maxLon) / 2,
         }
-  const timezone = find(lat, lon)[0]
+  const timezone = find(lat, lon)
   log.debug(HELPERS.client, `timezone: ${timezone}`)
-  return timezone
+  return timezone[0]
 }
 
 /**
  * Get the client's local time
  *
  * Accepts either a keyed bbox or a center point.
- * @param {BoundsEnum} bounds
+ * @param {BoundsEnum | string} boundsOrTimezone
  * @returns {Date}
  */
-function getClientDate(bounds) {
-  const timeZone = getClientTimeZone(bounds)
+function getUserDate(boundsOrTimezone) {
+  const timezone =
+    typeof boundsOrTimezone === 'string'
+      ? boundsOrTimezone
+      : getUserTimeZone(boundsOrTimezone)
   const utcDate = new Date()
-  const clientDate = utcToZonedTime(utcDate, timeZone)
+  const clientDate = utcToZonedTime(utcDate, timezone)
   log.debug(
     HELPERS.client,
     `time: ${format(clientDate, 'yyyy-MM-dd HH:mm:ss.SSS')}`,
+    getEpoch(clientDate),
   )
   return clientDate
-}
-
-/**
- * Get the client's midnight, generally for checking quest validity
- * @param {Date} clientDate
- * @returns {number}
- */
-function getClientMidnight(clientDate) {
-  const midnight = new Date(
-    clientDate.getFullYear(),
-    clientDate.getMonth(),
-    clientDate.getDate(),
-    0,
-    0,
-    1,
-    0,
-  )
-
-  log.debug(
-    HELPERS.client,
-    `midnight: ${format(midnight, 'yyyy-MM-dd HH:mm:ss.SSS')}`,
-  )
-  return Math.floor(midnight.getTime() / 1000)
 }
 
 /**
@@ -73,20 +64,24 @@ function getClientMidnight(clientDate) {
  *
  * Accepts either a keyed bbox or center point.
  * @param {BoundsEnum} bounds
- * @returns {{ ts: number, midnight: number }}
+ * @returns {number}
  */
-function getClientTime(bounds) {
-  const clientDate = getClientDate(bounds)
+function getUserMidnight(bounds) {
+  const userTimeZone = getUserTimeZone(bounds)
+  const userDate = getUserDate(bounds)
 
-  return {
-    ts: Math.floor(clientDate.getTime() / 1000),
-    midnight: getClientMidnight(clientDate),
-  }
+  const userMidnight = tz(userDate, userTimeZone).startOf('day')
+  log.debug(
+    HELPERS.client,
+    `midnight: ${userMidnight.format('yyyy-MM-DD HH:mm:ss.SSS')}`,
+    userMidnight.unix(),
+  )
+  return userMidnight.unix()
 }
 
 module.exports = {
-  getClientTimeZone,
-  getClientDate,
-  getClientMidnight,
-  getClientTime,
+  getEpoch,
+  getUserTimeZone,
+  getUserDate,
+  getUserMidnight,
 }

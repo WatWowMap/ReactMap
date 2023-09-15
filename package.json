@@ -94,6 +94,7 @@
     "leaflet.locatecontrol": "^0.73.0",
     "leaflet.markercluster": "1.5.3",
     "lodash.debounce": "^4.0.8",
+    "moment-timezone": "^0.5.43",
     "morgan": "^1.10.0",
     "mysql2": "^3.4.0",
     "node-cache": "^5.1.2",

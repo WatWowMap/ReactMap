@@ -4,7 +4,7 @@ const config = require('@rm/config')
 
 const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
-const { getClientTime } = require('../services/functions/getClientTime')
+const { getUserMidnight } = require('../services/functions/getClientTime')
 
 const {
   searchResultsLimit,
@@ -89,7 +89,7 @@ class Pokestop extends Model {
         onlyAreas = [],
       },
     } = args
-    const { midnight } = getClientTime(args)
+    const midnight = getUserMidnight(args)
     const ts = Math.floor(Date.now() / 1000)
 
     const {
@@ -1569,7 +1569,7 @@ class Pokestop extends Model {
 
   static async searchQuests(perms, args, { isMad, hasAltQuests }, distance) {
     const { search, onlyAreas = [], locale, lat, lon } = args
-    const { midnight } = getClientTime({ lat, lon })
+    const midnight = getUserMidnight({ lat, lon })
 
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next
