@@ -37,7 +37,7 @@ const mapPerms = (perms, userPerms) =>
  * @param {boolean} hidePii
  * @returns {Promise<import('discord.js').APIEmbed>}
  */
-async function getAuthInfo(req, user, strategy = 'custom', hidePii) {
+async function getAuthInfo(req, user, hidePii, strategy = 'custom') {
   const ip =
     req.headers['cf-connecting-ip'] ||
     `${req.headers['x-forwarded-for'] || ''}`.split(', ')[0] ||
@@ -204,9 +204,9 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii) {
     )
   }
   if (hidePii) {
-    embed.fields = embed.fields.filter(field => {
-      return !PII_FIELDS.includes(field.name)
-    });
+    embed.fields = embed.fields.filter(
+      field => { !PII_FIELDS.includes(field.name) }
+    );
   }
   return embed
 }
