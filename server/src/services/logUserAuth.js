@@ -3,7 +3,12 @@ const { default: fetch } = require('node-fetch')
 const { log, HELPERS } = require('@rm/logger')
 
 // PII fields inside getAuthInfo embed
-const PII_FIELDS = ['Ip Address', 'Geo Lookup', 'Google Map', 'Network Provider']
+const PII_FIELDS = [
+  'Ip Address',
+  'Geo Lookup',
+  'Google Map',
+  'Network Provider'
+]
 
 /**
  * Convert camelCase to Capitalized Words
