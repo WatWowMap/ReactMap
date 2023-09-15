@@ -208,11 +208,6 @@ async function getAuthInfo(req, user, hidePii, strategy = 'custom') {
       'Not authorized to access map',
     )
   }
-  if (hidePii) {
-    embed.fields = embed.fields.filter(
-      (field) => !PII_FIELDS.includes(field.name)
-    )
-  }
   return embed
 }
 
