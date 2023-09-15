@@ -627,6 +627,7 @@
         "type": "discord",
         "enabled": false,
         "logChannelId": "",
+        "logChannelHidePii": false,
         "scanNextLogChannelId": "",
         "scanZoneLogChannelId": "",
         "eventLogChannelId": "",
