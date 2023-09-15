@@ -52,25 +52,22 @@ function getClientDate(bounds, timeZone = getClientTimeZone(bounds)) {
  * @returns {number}
  */
 function getClientMidnight(clientDate, timezone) {
-  // const serverMidnight = new Date(
-  //   clientDate.getFullYear(),
-  //   clientDate.getMonth(),
-  //   clientDate.getDate(),
-  //   0,
-  //   0,
-  //   1,
-  //   0,
-  // )
-  // const clientMidnight = utcToZonedTime(serverMidnight, timezone)
-
-  clientDate.setHours(0, 0, 1, 0)
+  const serverMidnight = new Date(
+    clientDate.getFullYear(),
+    clientDate.getMonth(),
+    clientDate.getDate(),
+    0,
+    0,
+    1,
+    0,
+  )
+  const clientMidnight = utcToZonedTime(serverMidnight, timezone)
 
   log.debug(
     HELPERS.client,
-    `midnight: ${format(clientDate, 'yyyy-MM-dd HH:mm:ss.SSS')}`,
-    `timezone: ${timezone}`,
+    `midnight: ${format(clientMidnight, 'yyyy-MM-dd HH:mm:ss.SSS')}`,
   )
-  return Math.floor(clientDate.getTime() / 1000)
+  return Math.floor(clientMidnight.getTime() / 1000)
 }
 
 /**
