@@ -28,7 +28,7 @@ export default function Tutorial() {
   const { t } = useTranslation()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
   const tutorial = useStore((s) => s.tutorial)
-  const enableTutorial = useStatic((s) => s.config.map.enableTutorial)
+  const enableTutorial = useStatic((s) => s.config.misc.enableTutorial)
 
   const [activeStep, setActiveStep] = useState(0)
   const [prevStep, setPrevStep] = useState(0)

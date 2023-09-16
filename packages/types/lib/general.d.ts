@@ -29,3 +29,40 @@ import masterfile = require('packages/masterfile/lib/data/masterfile.json')
 export type Masterfile = typeof masterfile
 
 export type Strategy = 'discord' | 'telegram' | 'local'
+
+export type S2Polygon = [number, number][]
+
+export interface PoI {
+  id: string
+  lat: number
+  lon: number
+}
+
+export interface BaseCell {
+  id: string
+  polygon: S2Polygon
+}
+
+export interface Level17Cell extends BaseCell {
+  // level: 17
+  blocked: boolean
+}
+
+export interface Level14Cell extends BaseCell {
+  // level: 14
+  count_pokestops: number
+  count_gyms: number
+}
+
+export interface SubmissionCell {
+  level17Cells: Level17Cell[]
+  level14Cells: Level14Cell[]
+  pois: PoI[]
+}
+
+export interface Bounds {
+  minLat: number
+  maxLat: number
+  minLon: number
+  maxLon: number
+}

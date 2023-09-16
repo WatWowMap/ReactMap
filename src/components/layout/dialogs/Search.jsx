@@ -1,3 +1,4 @@
+// @ts-check
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
@@ -18,6 +19,7 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Autocomplete from '@mui/material/Autocomplete'
 import { useMap } from 'react-leaflet'
+import debounce from 'lodash.debounce'
 
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery, useQuery } from '@apollo/client'
@@ -27,6 +29,8 @@ import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { SEARCHABLE } from '@services/queries/config'
+import getRewardInfo from '@services/functions/getRewardInfo'
+import { fromSearchCategory } from '@services/functions/fromSearchCategory'
 
 import Header from '../general/Header'
 import QuestTitle from '../general/QuestTitle'
@@ -173,15 +177,14 @@ const getBackupName = (tab) => {
 export default function Search() {
   Utility.analytics('/search')
 
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const map = useMap()
 
-  const location = useStore((state) => state.location)
   const search = useStore((state) => state.search)
   const searchTab = useStore((state) => state.searchTab)
-  const scanAreas = useStore((state) => state.filters.scanAreas)
 
-  const mapConfig = useStatic((state) => state.config.map)
+  const distanceUnit = useStatic((state) => state.config.misc.distanceUnit)
+  const questMessage = useStatic((state) => state.config.misc.questMessage)
   const isMobile = useStatic((s) => s.isMobile)
 
   const open = useLayoutStore((s) => s.search)
@@ -190,26 +193,58 @@ export default function Search() {
 
   const [callSearch, { data, previousData, loading }] = useLazyQuery(
     Query.search(searchTab),
-    {
-      variables: {
-        search,
-        category: searchTab,
-        lat: location[0],
-        lon: location[1],
-        locale: localStorage.getItem('i18nextLng'),
-        ts: Math.floor(Date.now() / 1000),
-        midnight: Utility.getMidnight(),
-        onlyAreas: scanAreas?.filter?.areas || [],
-      },
-    },
   )
 
   const handleClose = React.useCallback((_, result) => {
     useLayoutStore.setState({ search: false })
     if (typeof result === 'object' && 'lat' in result && 'lon' in result) {
       map.flyTo([result.lat, result.lon], 16)
+      useStatic.setState({
+        manualParams: {
+          category: fromSearchCategory(searchTab),
+          id: result.id,
+        },
+      })
     }
   }, [])
+
+  const sendToServer = React.useCallback(
+    (/** @type {string} */ newSearch) => {
+      const { lat, lng } = map.getCenter()
+      const { areas } = useStore.getState().filters.scanAreas?.filter || {
+        areas: [],
+      }
+      callSearch({
+        variables: {
+          search: newSearch,
+          category: searchTab,
+          lat,
+          lon: lng,
+          locale: i18n.language,
+          onlyAreas: areas || [],
+        },
+      })
+    },
+    [i18n.language, searchTab],
+  )
+
+  const debounceChange = React.useMemo(
+    () => debounce(sendToServer, 250),
+    [sendToServer],
+  )
+
+  const handleChange = React.useCallback(
+    (e, newValue) => {
+      if (
+        e?.type === 'change' &&
+        (/^[0-9\s\p{L}]+$/u.test(newValue) || newValue === '')
+      ) {
+        useStore.setState({ search: newValue.toLowerCase() })
+        debounceChange(newValue.toLowerCase())
+      }
+    },
+    [debounceChange],
+  )
 
   React.useEffect(() => {
     setOptions(
@@ -230,6 +265,15 @@ export default function Search() {
     useStatic.setState({ searchLoading: loading })
   }, [loading])
 
+  React.useEffect(() => {
+    // initial search
+    if (search && open) sendToServer(search)
+  }, [open])
+
+  React.useEffect(() => {
+    if (open) map.closePopup()
+  }, [open])
+
   return (
     <Dialog
       fullScreen={isMobile}
@@ -245,26 +289,19 @@ export default function Search() {
         <Header titles={['search']} action={handleClose} />
         <Autocomplete
           inputValue={search}
-          onInputChange={(e, newValue) => {
-            if (
-              e?.type === 'change' &&
-              (/^[0-9\s\p{L}]+$/u.test(newValue) || newValue === '')
-            ) {
-              useStore.setState({ search: newValue.toLowerCase() })
-              callSearch()
-            }
-          }}
+          onInputChange={handleChange}
           options={options.map((option, i) => ({ ...option, i }))}
           loading={loading}
           autoComplete={false}
           clearOnBlur={false}
           ListboxProps={{
-            sx: { maxHeight: { xs: '75vh', sm: '80vh' } },
+            sx: { maxHeight: '80cqh' },
           }}
           fullWidth
           clearIcon={null}
           popupIcon={null}
           sx={{ p: 2 }}
+          open
           PopperComponent={({ children, ...props }) => (
             <Popper
               {...props}
@@ -337,14 +374,12 @@ export default function Search() {
               </Grid>
               <Grid item xs={2} style={{ textAlign: 'center' }}>
                 <Typography variant="caption">
-                  {option.distance}{' '}
-                  {mapConfig.distanceUnit === 'mi' ? t('mi') : t('km')}
+                  {option.distance} {distanceUnit === 'mi' ? t('mi') : t('km')}
                 </Typography>
                 <br />
                 {searchTab === 'quests' && (
                   <Typography variant="caption" className="ar-task" noWrap>
-                    {mapConfig.questMessage ||
-                      t(`ar_quest_${Boolean(option.with_ar)}`)}
+                    {questMessage || t(`ar_quest_${Boolean(option.with_ar)}`)}
                   </Typography>
                 )}
               </Grid>
@@ -368,11 +403,14 @@ function ResultImage(props) {
             : Icons.getMisc(props.searchTab)
         }
         onError={(e) => {
+          // @ts-ignore
           e.target.onerror = null
           if (props.searchTab === 'pokestops') {
+            // @ts-ignore
             e.target.src =
               'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/pokestop/0.webp'
           } else {
+            // @ts-ignore
             e.target.src =
               'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/gym/0.webp'
           }
@@ -384,7 +422,7 @@ function ResultImage(props) {
     )
   }
   if (props.quest_reward_type) {
-    const { src, amount, tt } = Utility.getRewardInfo(props, Icons)
+    const { src, amount, tt } = getRewardInfo(props)
 
     return (
       <div
@@ -397,9 +435,11 @@ function ResultImage(props) {
           <img
             src={src}
             style={{ maxWidth: 45, maxHeight: 45 }}
-            alt={tt}
+            alt={typeof tt === 'string' ? tt : tt.join(' ')}
             onError={(e) => {
+              // @ts-ignore
               e.target.onerror = null
+              // @ts-ignore
               e.target.src =
                 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/misc/0.webp'
             }}

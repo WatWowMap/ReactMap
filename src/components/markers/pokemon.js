@@ -1,45 +1,46 @@
 import { Icon, divIcon } from 'leaflet'
-import getOpacity from '@services/functions/getOpacity'
+import { useStatic } from '@hooks/useStore'
 
-export const basicMarker = (iconUrl, size) =>
+/**
+ *
+ * @param {{ iconUrl: string, iconSize: number }} props
+ * @returns
+ */
+export const basicMarker = ({ iconUrl, iconSize }) =>
   new Icon({
     iconUrl,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
-    popupAnchor: [0, size * -0.6],
+    iconSize: [iconSize, iconSize],
+    iconAnchor: [iconSize / 2, iconSize / 2],
+    popupAnchor: [0, iconSize * -0.6],
     className: 'marker',
   })
 
-export const fancyMarker = (
-  iconUrl,
-  size,
+export const fancyMarker = ({
   pkmn,
-  glow,
-  Icons,
-  weatherCheck,
-  timeOfDay,
-  userSettings,
+  iconUrl,
+  iconSize,
+  showGlow,
+  showWeather,
   badge,
-) => {
+  opacity,
+  timeOfDay,
+}) => {
+  const { Icons } = useStatic.getState()
   const [pokemonMod, weatherMod] = Icons.getModifiers('pokemon', 'weather')
 
   return divIcon({
     popupAnchor: [
       0 + pokemonMod.popupX,
-      size * -0.7 * pokemonMod.offsetY + pokemonMod.popupY,
+      iconSize * -0.7 * pokemonMod.offsetY + pokemonMod.popupY,
     ],
-    iconAnchor: [size / 2, 0],
+    iconAnchor: [iconSize / 2, 0],
     className: 'pokemon-marker',
     html: /* html */ `
       <div
         id="pokemon-${pkmn.id}"
         class="marker-image-holder top-overlay"
         style="
-          opacity: ${
-            userSettings.pokemonOpacity
-              ? getOpacity(pkmn.expire_timestamp, userSettings)
-              : 1
-          };
+          opacity: ${opacity};
         "
       >
         <img
@@ -47,17 +48,17 @@ export const fancyMarker = (
           alt="${pkmn.pokemon_id}"
           style="
             -webkit-filter: ${
-              glow
-                ? `drop-shadow(0 0 10px ${glow})drop-shadow(0 0 10px ${glow})`
+              showGlow
+                ? `drop-shadow(0 0 10px ${showGlow})drop-shadow(0 0 10px ${showGlow})`
                 : 'none'
             };
             filter: ${
-              glow
-                ? `drop-shadow(0 0 10px ${glow})drop-shadow(0 0 10px ${glow})`
+              showGlow
+                ? `drop-shadow(0 0 10px ${showGlow})drop-shadow(0 0 10px ${showGlow})`
                 : 'none'
             };
-            height: ${size}px;
-            width: ${size}px;
+            height: ${iconSize}px;
+            width: ${iconSize}px;
           "
         />
         ${
@@ -67,9 +68,9 @@ export const fancyMarker = (
               src="${Icons.getMisc('grass')}"
               alt="nearby_cell"
               style="
-                width: ${size / 1.5}px;
+                width: ${iconSize / 1.5}px;
                 height: auto;
-                bottom: ${(-size / 5) * pokemonMod.offsetY}px;
+                bottom: ${(-iconSize / 5) * pokemonMod.offsetY}px;
                 left: 10%;
               "
             />`
@@ -79,31 +80,31 @@ export const fancyMarker = (
           badge
             ? /* html */ `
             <img
-             src="${Icons.getMisc(badge)}"
+             src="${badge}"
              alt="${badge}"
              style="
-               width: ${size / 2}px;
+               width: ${iconSize / 2}px;
                height: auto;
-               bottom: ${(-size / 5) * pokemonMod.offsetY}px;
-               left: ${pokemonMod.offsetX * size * 4}%;
+               bottom: ${(-iconSize / 5) * pokemonMod.offsetY}px;
+               left: ${pokemonMod.offsetX * iconSize * 4}%;
              "
              />`
             : ''
         }
         ${
-          weatherCheck
+          showWeather
             ? /* html */ `
             <div
               class="weather-icon"
               style="
-                width: ${Math.max(17, size / 2)}px;
-                height: ${Math.max(17, size / 2)}px;
-                top: ${-size * pokemonMod.offsetY}px;
-                left: ${pokemonMod.offsetX * size * 5}%;
+                width: ${Math.max(17, iconSize / 2)}px;
+                height: ${Math.max(17, iconSize / 2)}px;
+                top: ${-iconSize * pokemonMod.offsetY}px;
+                left: ${pokemonMod.offsetX * iconSize * 5}%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                border-width: ${Math.max(1, size / 24)}px;
+                border-width: ${Math.max(1, iconSize / 24)}px;
               "
             >
               <img
@@ -111,8 +112,8 @@ export const fancyMarker = (
                 alt="${pkmn.weather}"
                 class="${weatherMod.disableColorShift ? '' : 'fancy'}"
                 style="
-                  width: ${Math.max(10, size / 3)}px;
-                  height: ${Math.max(10, size / 3)}px;
+                  width: ${Math.max(10, iconSize / 3)}px;
+                  height: ${Math.max(10, iconSize / 3)}px;
                 "
               />
             </div>`

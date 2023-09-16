@@ -7,9 +7,16 @@ const {
   S2LatLngRect,
 } = require('nodes2ts')
 const getPolyVector = require('./getPolyVector')
-const Ring = require('../../models/Ring')
+const PoI = require('../../models/PoI')
 
-function getPlacementCells(bounds, pokestops, gyms) {
+/**
+ *
+ * @param {import('@rm/types').Bounds & { filters: { onlyRings: boolean, onlyS17Cells: boolean }}} filters
+ * @param {import("@rm/types").Pokestop[]} pokestops
+ * @param {import("@rm/types").Gym[]} gyms
+ * @returns {{ level17Cells: import('@rm/types').Level17Cell[], pois: import('@rm/types').PoI[] }}}
+ */
+function getPlacementCells(filters, pokestops, gyms) {
   // dedupe poi entries
   const allCoords = Object.values(
     Object.fromEntries([...pokestops, ...gyms].map((poi) => [poi.id, poi])),
@@ -20,20 +27,20 @@ function getPlacementCells(bounds, pokestops, gyms) {
   regionCoverer.setMaxLevel(17)
 
   const region = S2LatLngRect.fromLatLng(
-    S2LatLng.fromDegrees(bounds.minLat, bounds.minLon),
-    S2LatLng.fromDegrees(bounds.maxLat, bounds.maxLon),
+    S2LatLng.fromDegrees(filters.minLat, filters.minLon),
+    S2LatLng.fromDegrees(filters.maxLat, filters.maxLon),
   )
   const indexedCells = {}
   const coveringCells = regionCoverer.getCoveringCells(region)
   for (let i = 0; i < coveringCells.length; i += 1) {
     const cell = coveringCells[i]
-    const { poly } = getPolyVector(cell.id)
+    const { polygon } = getPolyVector(cell.id)
     const cellId = cell.id.toString()
     indexedCells[cellId] = {
       id: cellId,
       level: 17,
       blocked: false,
-      polygon: poly,
+      polygon,
     }
   }
   for (let i = 0; i < allCoords.length; i += 1) {
@@ -47,13 +54,14 @@ function getPlacementCells(bounds, pokestops, gyms) {
       cell.blocked = true
     }
   }
-  const rings = bounds.filters.onlyRings
-    ? allCoords.map((poi) => new Ring(poi.id, poi.lat, poi.lon))
-    : []
 
   return {
-    cells: bounds.filters.onlyS17Cells ? Object.values(indexedCells) : [],
-    rings,
+    level17Cells: filters.filters.onlyS17Cells
+      ? Object.values(indexedCells)
+      : [],
+    pois: filters.filters.onlyRings
+      ? allCoords.map((poi) => new PoI(poi.id, poi.lat, poi.lon))
+      : [],
   }
 }
 

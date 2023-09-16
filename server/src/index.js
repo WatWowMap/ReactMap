@@ -43,32 +43,37 @@ if (!config.has('devOptions.skipUpdateCheck')) {
 const app = express()
 const httpServer = http.createServer(app)
 
-Sentry.init({
-  dsn:
-    process.env.SENTRY_DSN ||
-    'https://c40dad799323428f83aee04391639345@o1096501.ingest.sentry.io/6117162',
-  environment: process.env.NODE_ENV || 'production',
-  integrations: [
-    // enable HTTP calls tracing
-    new Sentry.Integrations.Http({ tracing: true }),
-    // enable Express.js middleware tracing
-    new Sentry.Integrations.Express({
-      // to trace all requests to the default router
-      app,
-      // alternatively, you can specify the routes you want to trace:
-      // router: someRouter,
-    }),
-    ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
-  ],
-  tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE) || 0.1,
-  release: pkg.version,
-})
+const sentry = config.getSafe('sentry.server')
+if (sentry.enabled || process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: sentry.dsn || process.env.SENTRY_DSN,
+    debug: sentry.debug || !!process.env.SENTRY_DEBUG,
+    environment: process.env.NODE_ENV || 'production',
+    integrations: [
+      // enable HTTP calls tracing
+      new Sentry.Integrations.Http({ tracing: true }),
+      // enable Express.js middleware tracing
+      new Sentry.Integrations.Express({
+        // to trace all requests to the default router
+        app,
+        // alternatively, you can specify the routes you want to trace:
+        // router: someRouter,
+      }),
+      ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
+    ],
+    tracesSampleRate:
+      parseFloat(
+        process.env.SENTRY_TRACES_SAMPLE_RATE || sentry.tracesSampleRate,
+      ) || 0.1,
+    release: pkg.version,
+  })
 
-// RequestHandler creates a separate execution context, so that all
-// transactions/spans/breadcrumbs are isolated across requests
-app.use(Sentry.Handlers.requestHandler())
-// TracingHandler creates a trace for every incoming request
-app.use(Sentry.Handlers.tracingHandler())
+  // RequestHandler creates a separate execution context, so that all
+  // transactions/spans/breadcrumbs are isolated across requests
+  app.use(Sentry.Handlers.requestHandler())
+  // TracingHandler creates a trace for every incoming request
+  app.use(Sentry.Handlers.tracingHandler())
+}
 
 if (
   config.getSafe('devOptions.logLevel') === 'debug' ||
@@ -164,7 +169,7 @@ passport.deserializeUser(async (user, done) => {
   if (user.perms.map) {
     done(null, user)
   } else {
-    done(null, false)
+    done('User does not have map permissions', null)
   }
 })
 
@@ -181,7 +186,9 @@ if (fs.existsSync(localePath)) {
 
 app.use(rootRouter, requestRateLimiter)
 
-app.use(Sentry.Handlers.errorHandler())
+if (sentry.enabled || process.env.SENTRY_DSN) {
+  app.use(Sentry.Handlers.errorHandler())
+}
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
@@ -220,14 +227,16 @@ startApollo(httpServer).then((server) => {
           pkg.version ||
           1
         const serverV = pkg.version || 1
-
-        let transaction = res.__sentry_transaction
-        if (!transaction) {
-          transaction = Sentry.startTransaction({ name: 'POST /graphql' })
+        let transaction
+        if (sentry.enabled || process.env.SENTRY_DSN) {
+          transaction = res.__sentry_transaction
+          if (!transaction) {
+            transaction = Sentry.startTransaction({ name: 'POST /graphql' })
+          }
+          Sentry.configureScope((scope) => {
+            scope.setSpan(transaction)
+          })
         }
-        Sentry.configureScope((scope) => {
-          scope.setSpan(transaction)
-        })
 
         const definition = parse(req.body.query).definitions.find(
           (d) => d.kind === 'OperationDefinition',

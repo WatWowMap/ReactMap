@@ -5,12 +5,15 @@ import { useTranslation } from 'react-i18next'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import { useStatic } from '@hooks/useStore'
 
 import DiscordLogin from './Discord'
 
-export default function Blocked({ serverSettings }) {
+export default function Blocked() {
   const { t } = useTranslation()
   const { info } = useParams()
+  const discordInvite = useStatic((s) => s.config.links.discordInvite)
+
   const queryParams = new URLSearchParams(info)
 
   return (
@@ -37,7 +40,7 @@ export default function Blocked({ serverSettings }) {
         </Grid>
       )}
 
-      {serverSettings.config.map.discordInvite && (
+      {discordInvite && (
         <Grid item>
           <br />
           <Typography variant="h6" align="center">
@@ -55,11 +58,11 @@ export default function Blocked({ serverSettings }) {
       >
         <Grid
           item
-          xs={serverSettings.config.map.discordInvite ? 3 : 10}
-          sm={serverSettings.config.map.discordInvite ? 3 : 10}
+          xs={discordInvite ? 3 : 10}
+          sm={discordInvite ? 3 : 10}
           style={{
             textAlign: 'center',
-            marginTop: serverSettings.config.map.discordAuthUrl ? 20 : 0,
+            marginTop: discordInvite ? 20 : 0,
           }}
         >
           <Button
@@ -71,16 +74,14 @@ export default function Blocked({ serverSettings }) {
             {t('go_back')}
           </Button>
         </Grid>
-        {serverSettings.config.map.discordInvite && (
+        {discordInvite && (
           <Grid
             item
             xs={3}
             sm={3}
             style={{ textAlign: 'center', marginTop: 20 }}
           >
-            <DiscordLogin href={serverSettings.config.map.discordInvite}>
-              join
-            </DiscordLogin>
+            <DiscordLogin href={discordInvite}>join</DiscordLogin>
           </Grid>
         )}
       </Grid>

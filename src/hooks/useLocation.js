@@ -74,8 +74,7 @@ export default function useLocation() {
           maximumAge: 5000,
         },
       },
-    })
-    result.addTo(map)
+    }).addTo(map)
     return result
   })
   return { lc, color }

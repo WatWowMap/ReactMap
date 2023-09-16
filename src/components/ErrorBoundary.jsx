@@ -14,6 +14,13 @@ import { withTranslation } from 'react-i18next'
 import Fetch from '@services/Fetch'
 import Notification from './layout/general/Notification'
 
+/** @type {React.CSSProperties} */
+const defaultStyle = {
+  height: '100vh',
+  width: '100vw',
+  textAlign: 'center',
+}
+
 // This component uses React Classes due to componentDidCatch() not being available in React Hooks
 // Do not use this as a base for other components
 
@@ -37,7 +44,7 @@ class ErrorBoundary extends React.Component {
   }
 
   async componentDidCatch(error) {
-    if (!this.state.reported) {
+    if (!this.state.reported && process.env.NODE_ENV !== 'development') {
       await Fetch.sendError({
         cause: error.cause,
         message: error.message,
@@ -60,13 +67,7 @@ class ErrorBoundary extends React.Component {
         container
         justifyContent="center"
         alignItems="center"
-        style={
-          this.props.style ?? {
-            height: '100vh',
-            width: '100vw',
-            textAlign: 'center',
-          }
-        }
+        style={this.props.style ?? defaultStyle}
       >
         <Grid item xs={12}>
           <Typography variant={this.props.variant || 'h3'} align="center">

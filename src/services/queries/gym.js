@@ -53,7 +53,6 @@ export const getGyms = gql`
     $maxLat: Float!
     $maxLon: Float!
     $filters: JSON!
-    $ts: Int!
   ) {
     gyms(
       minLat: $minLat
@@ -61,7 +60,6 @@ export const getGyms = gql`
       maxLat: $maxLat
       maxLon: $maxLon
       filters: $filters
-      ts: $ts
     ) {
       ...CoreGym
       ...Gym
@@ -78,7 +76,6 @@ export const getRaids = gql`
     $maxLat: Float!
     $maxLon: Float!
     $filters: JSON!
-    $ts: Int!
   ) {
     gyms(
       minLat: $minLat
@@ -86,7 +83,6 @@ export const getRaids = gql`
       maxLat: $maxLat
       maxLon: $maxLon
       filters: $filters
-      ts: $ts
     ) {
       ...CoreGym
       ...Raid
@@ -104,7 +100,6 @@ export const getGymsRaids = gql`
     $maxLat: Float!
     $maxLon: Float!
     $filters: JSON!
-    $ts: Int!
   ) {
     gyms(
       minLat: $minLat
@@ -112,7 +107,6 @@ export const getGymsRaids = gql`
       maxLat: $maxLat
       maxLon: $maxLon
       filters: $filters
-      ts: $ts
     ) {
       ...CoreGym
       ...Gym

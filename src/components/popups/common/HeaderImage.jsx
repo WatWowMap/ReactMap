@@ -1,14 +1,16 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import { Avatar, Link } from '@mui/material'
+import { useStatic } from '@hooks/useStore'
 
 export default function HeaderImage({
   url,
-  exEligible,
-  arScanEligible,
+  exEligible = false,
+  arScanEligible = false,
   alt,
-  Icons,
-  large,
+  large = false,
 }) {
+  const Icons = useStatic((s) => s.Icons)
   const src = url ? url.replace('http://', 'https://') : Icons.getPokestops(0)
 
   const Image = (
@@ -31,7 +33,7 @@ export default function HeaderImage({
       ) : (
         Image
       )}
-      {Boolean(arScanEligible) && (
+      {!!arScanEligible && (
         <img
           className="ar-logo"
           alt="ar"
@@ -42,7 +44,7 @@ export default function HeaderImage({
           }}
         />
       )}
-      {Boolean(exEligible) && (
+      {!!exEligible && (
         <img
           className="ex-logo"
           alt="ex"

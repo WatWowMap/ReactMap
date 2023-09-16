@@ -26,7 +26,7 @@ class Weather extends Model {
         raw('UNIX_TIMESTAMP(last_updated)').as('updated'),
       ])
     } else {
-      const ts = Math.floor(new Date().getTime() / 1000)
+      const ts = Math.floor(Date.now() / 1000)
       const ms = ts - config.getSafe('api.weatherCellLimit') * 60 * 60 * 24
       query.where('updated', '>=', ms)
     }
@@ -56,8 +56,8 @@ class Weather extends Model {
     return results
       .map((cell) => {
         const center = point([cell.longitude, cell.latitude])
-        const { poly, revPoly } = getPolyVector(cell.id, true)
-        const geojson = polygon([revPoly])
+        const { polygon: poly, reverse } = getPolyVector(cell.id, true)
+        const geojson = polygon([reverse])
         const hasOverlap =
           (pointInPolygon(center, boundPolygon) ||
             booleanOverlap(geojson, boundPolygon) ||

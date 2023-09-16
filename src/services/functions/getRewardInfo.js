@@ -1,25 +1,30 @@
-export default function getRewardInfo(quest, Icons) {
-  const {
-    quest_pokemon_id,
-    quest_form_id,
-    quest_gender_id,
-    quest_costume_id,
-    quest_shiny,
-    quest_item_id,
-    item_amount,
-    stardust_amount,
-    candy_amount,
-    xl_candy_amount,
-    xp_amount,
-    mega_pokemon_id,
-    mega_amount,
-    candy_pokemon_id,
-    xl_candy_pokemon_id,
-    quest_reward_type,
-  } = quest
+// @ts-check
+
+import { useStatic } from '@hooks/useStore'
+
+/** @param {Partial<import("@rm/types").Quest>} quest */
+export default function getRewardInfo({
+  quest_pokemon_id,
+  quest_form_id,
+  quest_gender_id,
+  quest_costume_id,
+  quest_shiny,
+  quest_item_id,
+  item_amount,
+  stardust_amount,
+  candy_amount,
+  xl_candy_amount,
+  xp_amount,
+  mega_pokemon_id,
+  mega_amount,
+  candy_pokemon_id,
+  xl_candy_pokemon_id,
+  quest_reward_type,
+}) {
+  const { Icons } = useStatic.getState()
   let src = ''
   let amount = 0
-  let tt = ''
+  let tt = /** @type {string[] | string} */ ('')
 
   switch (quest_reward_type) {
     case 1:
@@ -54,7 +59,7 @@ export default function getRewardInfo(quest, Icons) {
         quest_gender_id,
         quest_costume_id,
         0,
-        quest_shiny,
+        !!quest_shiny,
       )
       break
     case 9:

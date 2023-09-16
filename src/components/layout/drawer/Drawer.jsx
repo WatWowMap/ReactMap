@@ -14,7 +14,7 @@ export default function Sidebar() {
 
   const {
     config: {
-      map: { title, separateDrawerActions },
+      general: { title, separateDrawerActions },
     },
     ui,
   } = useStatic.getState()

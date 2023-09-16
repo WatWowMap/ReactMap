@@ -10,22 +10,16 @@ import ClearStorage from './ClearStorage'
 
 const Playground = React.lazy(() => import('../features/playground'))
 
-export default function ReactRouter({ serverSettings }) {
-  const authRoute = React.useMemo(
-    () => <Auth serverSettings={serverSettings} />,
-    [serverSettings],
-  )
+const authRoute = <Auth />
 
+export default function ReactRouter() {
   return (
     <Routes>
       <Route path="/" element={authRoute} />
       <Route path="reset" element={<ClearStorage />} />
-      <Route path="login" element={<Login serverSettings={serverSettings} />} />
+      <Route path="login" element={<Login />} />
       <Route path="playground" element={<Playground />} />
-      <Route
-        path="blocked/:info"
-        element={<Blocked serverSettings={serverSettings} />}
-      />
+      <Route path="blocked/:info" element={<Blocked />} />
       <Route path="@/:lat/:lon" element={authRoute} />
       <Route path="@/:lat/:lon/:zoom" element={authRoute} />
       <Route path="id/:category/:id" element={authRoute} />

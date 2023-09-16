@@ -952,5 +952,22 @@
     "event": [],
     "never": []
   },
-  "manualAreas": []
+  "manualAreas": [],
+  "sentry": {
+    "client": {
+      "enabled": false,
+      "debug": false,
+      "dsn": "",
+      "tracesSampleRate": 0.1,
+      "authToken": "",
+      "org": "",
+      "project": ""
+    },
+    "server": {
+      "enabled": false,
+      "debug": false,
+      "dsn": "",
+      "tracesSampleRate": 0.1
+    }
+  }
 }

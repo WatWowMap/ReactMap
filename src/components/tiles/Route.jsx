@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable no-nested-ternary */
 // @ts-check
 import * as React from 'react'
@@ -5,6 +6,7 @@ import { Marker, Polyline, useMapEvents } from 'react-leaflet'
 import { darken } from '@mui/material'
 
 import RoutePopup from '@components/popups/Route'
+import useForcePopup from '@hooks/useForcePopup'
 
 import routeMarker from '../markers/route'
 
@@ -15,43 +17,40 @@ const MARKER_OPACITY = LINE_OPACITY * 2
 
 /**
  *
- * @param {{
- *  item: import("@rm/types").Route
- *  Icons: InstanceType<typeof import("@services/Icons").default>
- *  map: import("leaflet").Map
- * }} props
+ * @param {import("@rm/types").Route} route
  * @returns
  */
-const RouteTile = ({ item, Icons }) => {
+const RouteTile = (route) => {
   const [clicked, setClicked] = React.useState(false)
   const [hover, setHover] = React.useState('')
 
   /** @type {React.MutableRefObject<import("leaflet").Polyline>} */
   const lineRef = React.useRef()
+  const [markerRef, setMarkerRef] = React.useState(null)
 
   const waypoints = React.useMemo(
     () => [
       {
-        lat_degrees: item.start_lat,
-        lng_degrees: item.start_lon,
+        lat_degrees: route.start_lat,
+        lng_degrees: route.start_lon,
         elevation_in_meters: 0,
       },
-      ...item.waypoints,
+      ...route.waypoints,
       {
-        lat_degrees: item.end_lat,
-        lng_degrees: item.end_lon,
+        lat_degrees: route.end_lat,
+        lng_degrees: route.end_lon,
         elevation_in_meters: 1,
       },
     ],
-    [item],
+    [route],
   )
 
   const [color, darkened] = React.useMemo(
     () => [
-      `#${item.image_border_color}`,
-      darken(`#${item.image_border_color}`, 0.2),
+      `#${route.image_border_color}`,
+      darken(`#${route.image_border_color}`, 0.2),
     ],
-    [item.image_border_color],
+    [route.image_border_color],
   )
 
   useMapEvents({
@@ -62,16 +61,18 @@ const RouteTile = ({ item, Icons }) => {
       }
     },
   })
+  useForcePopup(route.id, markerRef)
 
   return (
     <>
       {POSITIONS.map((position) => (
         <Marker
           key={position}
+          ref={position === 'start' ? setMarkerRef : undefined}
           opacity={hover || clicked ? 1 : MARKER_OPACITY}
           zIndexOffset={hover === position ? 2000 : hover || clicked ? 1000 : 0}
-          position={[item[`${position}_lat`], item[`${position}_lon`]]}
-          icon={routeMarker(Icons.getMisc(`route-${position}`), position)}
+          position={[route[`${position}_lat`], route[`${position}_lon`]]}
+          icon={routeMarker(position)}
           eventHandlers={{
             popupopen: () => setClicked(true),
             popupclose: () => setClicked(false),
@@ -90,7 +91,7 @@ const RouteTile = ({ item, Icons }) => {
           }}
         >
           <RoutePopup
-            {...item}
+            {...route}
             waypoints={waypoints}
             end={position === 'end'}
           />
@@ -114,7 +115,7 @@ const RouteTile = ({ item, Icons }) => {
             }
           },
         }}
-        dashArray={item.reversible ? undefined : '5, 5'}
+        dashArray={route.reversible ? undefined : '5, 5'}
         positions={waypoints.map((waypoint) => [
           waypoint.lat_degrees,
           waypoint.lng_degrees,
@@ -129,4 +130,9 @@ const RouteTile = ({ item, Icons }) => {
   )
 }
 
-export default React.memo(RouteTile, () => true)
+const MemoRouteTile = React.memo(
+  RouteTile,
+  (prev, next) => prev.updated === next.updated,
+)
+
+export default MemoRouteTile
