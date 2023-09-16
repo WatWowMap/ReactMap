@@ -1921,5 +1921,40 @@
   "manualAreas": {
     "__name": "MANUAL_AREAS",
     "__format": "json"
+  },
+  "sentry": {
+    "client": {
+      "enabled": {
+        "__name": "SENTRY_CLIENT_ENABLED",
+        "__format": "boolean"
+      },
+      "debug": {
+        "__name": "SENTRY_CLIENT_DEBUG",
+        "__format": "boolean"
+      },
+      "dsn": "SENTRY_CLIENT_DSN",
+      "tracesSampleRate": {
+        "__name": "SENTRY_CLIENT_TRACES_SAMPLE_RATE",
+        "__format": "number"
+      },
+      "authToken": "SENTRY_CLIENT_AUTH_TOKEN",
+      "org": "SENTRY_CLIENT_ORG",
+      "project": "SENTRY_CLIENT_PROJECT"
+    },
+    "server": {
+      "enabled": {
+        "__name": "SENTRY_SERVER_ENABLED",
+        "__format": "boolean"
+      },
+      "debug": {
+        "__name": "SENTRY_SERVER_DEBUG",
+        "__format": "boolean"
+      },
+      "dsn": "SENTRY_SERVER_DSN",
+      "tracesSampleRate": {
+        "__name": "SENTRY_SERVER_TRACES_SAMPLE_RATE",
+        "__format": "number"
+      }
+    }
   }
 }
