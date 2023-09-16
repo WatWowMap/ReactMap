@@ -270,7 +270,12 @@ class DiscordClient {
       }
       discordUser.valid = discordUser.perms.map !== false
 
-      const embed = await logUserAuth(req, discordUser, 'Discord', this.loggingChannelHidePii)
+      const embed = await logUserAuth(
+        req,
+        discordUser,
+        'Discord',
+        this.loggingChannelHidePii,
+      )
       await this.sendMessage(embed)
 
       if (discordUser.perms.blocked) {
