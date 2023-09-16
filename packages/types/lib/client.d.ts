@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Config } from './config'
 import UIcons from '@services/Icons'
+import { ButtonProps } from '@mui/material'
 
 declare global {
   declare const CONFIG: Config<true>
@@ -11,5 +12,5 @@ declare global {
 }
 
 export interface CustomI extends React.HTMLProps<HTMLLIElement> {
-  size?: 'small' | 'medium'
+  size?: ButtonProps['size']
 }

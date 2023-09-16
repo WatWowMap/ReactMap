@@ -11,10 +11,8 @@ const { setScanMode } = useScanStore.getState()
 
 export default function ScanDialog() {
   const { t } = useTranslation()
-  const [scanNext, scanZone] = useScanStore((s) => [
-    s.scanNextMode,
-    s.scanZoneMode,
-  ])
+  const scanNext = useScanStore((s) => s.scanNextMode)
+  const scanZone = useScanStore((s) => s.scanZoneMode)
 
   const scanMode = React.useMemo(
     () => scanNext || scanZone,

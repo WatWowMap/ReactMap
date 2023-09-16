@@ -154,7 +154,6 @@ export const quests = gql`
     $lat: Float!
     $lon: Float!
     $locale: String!
-    $midnight: Int
     $onlyAreas: [String]
   ) {
     searchQuest(
@@ -163,7 +162,6 @@ export const quests = gql`
       lat: $lat
       lon: $lon
       locale: $locale
-      midnight: $midnight
       onlyAreas: $onlyAreas
     ) {
       id
@@ -200,7 +198,6 @@ export const raids = gql`
     $lat: Float!
     $lon: Float!
     $locale: String!
-    $ts: Int
     $onlyAreas: [String]
   ) {
     search(
@@ -209,7 +206,6 @@ export const raids = gql`
       lat: $lat
       lon: $lon
       locale: $locale
-      ts: $ts
       onlyAreas: $onlyAreas
     ) {
       ...CoreSearch

@@ -1,6 +1,7 @@
-// @ts-check
 /* eslint-disable react/no-array-index-key */
+// @ts-check
 import * as React from 'react'
+import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
@@ -9,6 +10,7 @@ import { useQuery } from '@apollo/client'
 
 import { CUSTOM_COMPONENT } from '@services/queries/config'
 
+import { basicEqualFn, useStatic } from '@hooks/useStore'
 import LocalLogin from './Local'
 import LocaleSelection from '../general/LocaleSelection'
 import DiscordLogin from './Discord'
@@ -17,16 +19,44 @@ import CustomTile from '../custom/CustomTile'
 import ThemeToggle from '../general/ThemeToggle'
 import { Loading } from '../general/Loading'
 
-export default function Login({ serverSettings }) {
+export default function Login() {
+  const [
+    loggedIn,
+    loginPage,
+    headerTitle,
+    discordInvite,
+    discordAuthUrl,
+    telegramBotName,
+    telegramAuthUrl,
+    localAuthUrl,
+  ] = useStatic(
+    (s) => [
+      s.auth.loggedIn,
+      !!s.config.loginPage,
+      s.config.general.headerTitle,
+      s.config.links.discordInvite,
+      s.config.customRoutes.discordAuthUrl,
+      s.config.customRoutes.telegramBotName,
+      s.config.customRoutes.telegramAuthUrl,
+      s.config.customRoutes.localAuthUrl,
+    ],
+    basicEqualFn,
+  )
+  const authMethods = useStatic((s) => s.auth.methods)
+
   const { t } = useTranslation()
   const { data, loading } = useQuery(CUSTOM_COMPONENT, {
     fetchPolicy: 'cache-first',
     variables: { component: 'loginPage' },
-    skip: !serverSettings.config.map.loginPage,
+    skip: !loginPage,
   })
 
   if (loading) {
     return <Loading height="100vh">{t('loading', { category: '' })}</Loading>
+  }
+
+  if (loggedIn && process.env.NODE_ENV !== 'development') {
+    return <Navigate to="/" />
   }
 
   const { settings, components } = data?.customComponent || {
@@ -57,15 +87,15 @@ export default function Login({ serverSettings }) {
           direction="column"
           justifyContent="center"
           alignItems="center"
-          height={{ xs: '90vh', sm: '100vh' }}
+          height="100cqh"
           width="100%"
         >
           <Grid pb={8} xs={12}>
             <Typography variant="h3" align="center">
-              {t('welcome')} {serverSettings.config.map.headerTitle}
+              {t('welcome')} {headerTitle}
             </Typography>
           </Grid>
-          {serverSettings?.authMethods?.includes('discord') && (
+          {authMethods.includes('discord') && (
             <Grid
               container
               justifyContent="center"
@@ -74,37 +104,30 @@ export default function Login({ serverSettings }) {
               xs={12}
             >
               <Grid
-                xs={
-                  serverSettings.config.map.discordInvite
-                    ? t('login_button')
-                    : 10
-                }
-                sm={serverSettings.config.map.discordInvite ? 3 : 10}
+                xs={discordInvite ? t('login_button') : 10}
+                sm={discordInvite ? 3 : 10}
                 textAlign="center"
               >
-                <DiscordLogin href={serverSettings.config.map.discordAuthUrl} />
+                <DiscordLogin href={discordAuthUrl} bgcolor="success.dark" />
               </Grid>
-              {serverSettings.config.map.discordInvite && (
+              {discordInvite && (
                 <Grid xs={t('join_button')} sm={3} textAlign="center">
-                  <DiscordLogin
-                    href={serverSettings.config.map.discordInvite}
-                    text="join"
-                  />
+                  <DiscordLogin href={discordInvite}>join</DiscordLogin>
                 </Grid>
               )}
             </Grid>
           )}
-          {serverSettings?.authMethods?.includes('telegram') && (
+          {authMethods?.includes('telegram') && (
             <Grid>
               <TelegramLogin
-                botName={serverSettings.config.map.telegramBotName}
-                authUrl={serverSettings.config.map.telegramAuthUrl}
+                botName={telegramBotName}
+                authUrl={telegramAuthUrl}
               />
             </Grid>
           )}
-          {serverSettings?.authMethods?.includes('local') && (
+          {authMethods?.includes('local') && (
             <Grid>
-              <LocalLogin href={serverSettings.config.map.localAuthUrl} />
+              <LocalLogin href={localAuthUrl} />
             </Grid>
           )}
         </Grid>

@@ -10,6 +10,7 @@ import ScanCellModel = require('server/src/models/ScanCell')
 import SpawnpointModel = require('server/src/models/Spawnpoint')
 import WeatherModel = require('server/src/models/Weather')
 import RouteModel = require('server/src/models/Route')
+import { S2Polygon } from './general'
 
 export interface Device {
   id: string
@@ -243,12 +244,12 @@ export interface Portal {
 export type FullPortal = FullModel<Portal, PortalModel>
 
 export interface ScanCell {
-  id: string
-  level: number
-  center_lat: number
-  center_lon: number
-  updated: number
-  polygon: number[][]
+  id?: string
+  level?: number
+  center_lat?: number
+  center_lon?: number
+  updated?: number
+  polygon?: S2Polygon
 }
 
 export type FullScanCell = FullModel<ScanCell, ScanCellModel>
@@ -279,7 +280,7 @@ export interface Weather {
   severity: boolean
   warn_weather: boolean
   updated: number
-  polygon: number[][]
+  polygon: S2Polygon
 }
 
 export type FullWeather = FullModel<Weather, WeatherModel>

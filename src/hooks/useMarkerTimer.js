@@ -1,21 +1,22 @@
+// @ts-check
 import { useEffect } from 'react'
 
-export default function useMarkerTimer(
-  itemExpire,
-  itemId,
-  ref,
-  map,
-  ts,
-  callback,
-) {
+/**
+ *
+ * @param {number} itemExpire
+ * @param {import('leaflet').Marker<any>} ref
+ * @param {() => void} [callback]
+ */
+export default function useMarkerTimer(itemExpire, ref, callback) {
+  const ts = Math.floor(Date.now() / 1000)
   useEffect(() => {
     if (itemExpire > ts && itemExpire !== Infinity) {
       const timeout = setTimeout(() => {
         if (itemExpire) {
           if (callback) {
             callback()
-          } else if (ref?.current && ref?.current[itemId]) {
-            ref.current[itemId].removeFrom(map)
+          } else if (ref) {
+            ref.remove()
           }
         }
       }, (itemExpire - ts) * 1000)

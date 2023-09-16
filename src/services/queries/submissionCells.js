@@ -17,26 +17,21 @@ const getAllSubmissionCells = gql`
       zoom: $zoom
       filters: $filters
     ) {
-      placementCells {
-        cells {
-          id
-          level
-          polygon
-          blocked
-        }
-        rings {
-          id
-          lat
-          lon
-        }
-      }
-      typeCells {
+      level17Cells {
         id
-        level
-        count
+        polygon
+        blocked
+      }
+      level14Cells {
+        id
         count_pokestops
         count_gyms
         polygon
+      }
+      pois {
+        id
+        lat
+        lon
       }
     }
   }

@@ -1,3 +1,5 @@
+const fs = require('fs')
+const { resolve } = require('path')
 const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 const config = require('@rm/config')
@@ -39,9 +41,10 @@ const resolvers = {
       }
       return {}
     },
-    backups: (_, _args, { req, perms, Db }) => {
+    backups: async (_, _args, { req, perms, Db }) => {
       if (perms?.backups) {
-        return Db.models.Backup.getAll(req.user?.id)
+        const records = await Db.query('Backup', 'getAll', req.user?.id)
+        return records
       }
       return []
     },
@@ -78,7 +81,7 @@ const resolvers = {
       return []
     },
     /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} args */
-    customComponent: (_, { component }, { perms, user }) => {
+    customComponent: (_, { component }, { perms, req, user }) => {
       switch (component) {
         case 'messageOfTheDay':
         case 'donationPage':
@@ -88,7 +91,7 @@ const resolvers = {
               footerButtons = [],
               components = [],
               ...rest
-            } = config.getSafe(`map.${component}`)
+            } = config.getMapConfig(req)[component]
             return {
               ...rest,
               footerButtons: filterComponents(
@@ -111,14 +114,8 @@ const resolvers = {
       return []
     },
     fabButtons: async (_, _args, { perms, user, req, Db, Event }) => {
-      const domain = `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
+      const { donationPage, misc } = config.getMapConfig(req)
 
-      /** @type {import("@rm/types").Config['map']['donationPage']} */
-      const donorPage = config.has(domain)
-        ? config.getSafe(`${domain}.donationPage`)
-        : config.getSafe('map.donationPage')
-
-      /** @type {import("@rm/types").Config['scanner']} */
       const scanner = config.getSafe('scanner')
 
       const selectedWebhook = await validateSelectedWebhook(req.user, Db, Event)
@@ -128,17 +125,13 @@ const resolvers = {
       }
 
       return {
-        custom: config.has(domain)
-          ? config.getSafe(`${domain}.customFloatingIcons`)
-          : config.getSafe('map.customFloatingIcons'),
+        custom: misc.customFloatingIcons,
         donationButton:
-          donorPage.showOnMap && (perms.donor ? donorPage.showToDonors : true)
-            ? donorPage.fabIcon
+          donationPage.showOnMap &&
+          (perms.donor ? donationPage.showToDonors : true)
+            ? donationPage.fabIcon
             : '',
-        profileButton:
-          user && config.has(domain)
-            ? config.getSafe(`${domain}.enableFloatingProfileButton`)
-            : config.getSafe('map.enableFloatingProfileButton'),
+        profileButton: !!(user && misc.enableFloatingProfileButton),
         scanZone:
           scanner.backendConfig.platform !== 'mad' &&
           scanner.scanZone.enabled &&
@@ -177,8 +170,8 @@ const resolvers = {
       }
       return {}
     },
-    motdCheck: (_, { clientIndex }, { perms }) => {
-      const motd = config.getSafe('map.messageOfTheDay')
+    motdCheck: (_, { clientIndex }, { req, perms }) => {
+      const motd = config.getMapConfig(req).messageOfTheDay
       return (
         motd.components.length &&
         (motd.index > clientIndex || motd.settings.permanent) &&
@@ -271,17 +264,17 @@ const resolvers = {
             const id = cell.id.toString()
             return {
               id,
-              coords: getPolyVector(id).poly,
+              coords: getPolyVector(id).polygon,
             }
           })
         })
       }
       return []
     },
-    scanCells: (_, args, { perms, Db }) => {
+    scanCells: (_, args, { perms, Db, req }) => {
       if (
         perms?.scanCells &&
-        args.zoom >= config.getSafe('map.scanCellsZoom')
+        args.zoom >= config.getMapConfig(req).general.scanCellsZoom
       ) {
         return Db.query('ScanCell', 'getAll', perms, args)
       }
@@ -289,9 +282,7 @@ const resolvers = {
     },
     scanAreas: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.has(`areas.scanAreas.${req.headers.host}`)
-          ? config.getSafe(`areas.scanAreas.${req.headers.host}`)
-          : config.getSafe('areas.scanAreas.main')
+        const scanAreas = config.getAreas(req, 'scanAreas')
         return [
           {
             ...scanAreas,
@@ -309,10 +300,7 @@ const resolvers = {
     },
     scanAreasMenu: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.has(`areas.scanAreasMenu.${req.headers.host}`)
-          ? config.getSafe(`areas.scanAreasMenu.${req.headers.host}`)
-          : config.getSafe('areas.scanAreasMenu.main')
-
+        const scanAreas = config.getAreas(req, 'scanAreasMenu')
         if (perms.areaRestrictions.length) {
           const filtered = scanAreas
             .map((parent) => ({
@@ -442,25 +430,20 @@ const resolvers = {
       }
       return []
     },
-    submissionCells: async (_, args, { perms, Db }) => {
-      if (
-        perms?.submissionCells &&
-        args.zoom >= config.getSafe('map.submissionZoom') - 1
-      ) {
+    submissionCells: async (_, args, { req, perms, Db }) => {
+      const { submissionZoom } = config.getMapConfig(req).general
+      if (perms?.submissionCells && args.zoom >= submissionZoom - 1) {
         const [pokestops, gyms] = await Db.submissionCells(perms, args)
         return [
           {
-            placementCells:
-              args.zoom >= config.getSafe('map.submissionZoom')
-                ? getPlacementCells(args, pokestops, gyms)
-                : [],
-            typeCells: args.filters.onlyS14Cells
-              ? getTypeCells(args, pokestops, gyms)
-              : [],
+            ...(args.zoom >= submissionZoom
+              ? getPlacementCells(args, pokestops, gyms)
+              : { pois: [], level17Cells: [] }),
+            level14Cells: getTypeCells(args, pokestops, gyms),
           },
         ]
       }
-      return [{ placementCells: [], typeCells: [] }]
+      return [{ level17Cells: [], level14Cells: [], pois: [] }]
     },
     weather: (_, args, { perms, Db }) => {
       if (perms?.weather) {
@@ -572,6 +555,10 @@ const resolvers = {
       }
       return {}
     },
+    validateUser: (_, __, { user, perms }) => ({
+      loggedIn: !!user,
+      admin: perms?.admin,
+    }),
   },
   Mutation: {
     createBackup: async (_, args, { req, perms, Db }) => {
@@ -652,6 +639,35 @@ const resolvers = {
         req.session.save()
       }
       return false
+    },
+    saveComponent: async (_, { code, component }, { perms, req }) => {
+      if (perms.admin && code && component) {
+        const configFolder = resolve(__dirname, '../configs')
+        const ts = Math.floor(Date.now() / 1000)
+        if (
+          fs.existsSync(`${configFolder}/${component}/${req.headers.host}.json`)
+        ) {
+          fs.copyFileSync(
+            `${configFolder}/${component}/${req.headers.host}.json`,
+            `${configFolder}/${component}/${req.headers.host}_${ts}.json`,
+          )
+          fs.writeFileSync(
+            `${configFolder}/${component}/${req.headers.host}.json`,
+            code,
+            'utf8',
+          )
+          return `Saved to ${configFolder}/${component}/${req.headers.host}.json`
+        }
+        if (fs.existsSync(`${configFolder}/${component}.json`)) {
+          fs.copyFileSync(
+            `${configFolder}/${component}.json`,
+            `${configFolder}/${component}_${ts}.json`,
+          )
+        }
+        fs.writeFileSync(`${configFolder}/${component}.json`, code, 'utf8')
+        return `Saved to ${configFolder}/${component}.json`
+      }
+      return null
     },
     strategy: async (_, args, { req, Db }) => {
       if (req.user) {

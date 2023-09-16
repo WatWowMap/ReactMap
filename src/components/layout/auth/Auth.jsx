@@ -1,27 +1,21 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 
-import useConfig from '@hooks/useConfig'
+import { useStatic } from '@hooks/useStore'
 
 import Container from '../../Container'
 import WebhookQuery from '../../WebhookQuery'
 
-export default function Auth({ serverSettings }) {
+export default function Auth() {
   const params = useParams()
-  const { location, zoom } = useConfig(serverSettings, params)
+  const mapPerm = useStatic((s) => s.auth.perms.map)
 
-  if (serverSettings.error) {
-    return <Navigate push to={{ pathname: `${serverSettings.status}` }} />
-  }
-
-  if (
-    (serverSettings.authMethods.length && !serverSettings.user) ||
-    (serverSettings.user && !serverSettings.user?.perms?.map)
-  ) {
-    if (params.category || params.lat) {
+  if (!mapPerm) {
+    if ((params.category && params.id) || (params.lat && params.lon)) {
       localStorage.setItem('params', JSON.stringify(params))
     }
-    return <Navigate push to="/login" />
+    return <Navigate to="/login" />
   }
   const cachedParams = JSON.parse(localStorage.getItem('params'))
   if (cachedParams) {
@@ -31,24 +25,14 @@ export default function Auth({ serverSettings }) {
           cachedParams.zoom || 18
         }`
       : `/@/${cachedParams.lat}/${cachedParams.lon}/${cachedParams.zoom || 18}`
-    return <Navigate push to={url} />
+    return <Navigate to={url} />
   }
   if (params.category) {
     return (
-      <WebhookQuery
-        params={params}
-        serverSettings={serverSettings}
-        location={location}
-        zoom={zoom}
-      />
+      <WebhookQuery>
+        <Container />
+      </WebhookQuery>
     )
   }
-  return (
-    <Container
-      serverSettings={serverSettings}
-      params={params}
-      location={location}
-      zoom={zoom}
-    />
-  )
+  return <Container />
 }

@@ -16,6 +16,7 @@ import ImportExportIcon from '@mui/icons-material/ImportExport'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import FeedbackIcon from '@mui/icons-material/Feedback'
 import HeartIcon from '@mui/icons-material/Favorite'
+import { downloadJson } from '@services/functions/downloadJson'
 
 import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import { I } from '../general/I'
@@ -37,6 +38,7 @@ const importSettings = (e) => {
 
 const exportSettings = () => {
   const json = localStorage.getItem('local-state')
+  downloadJson(json, 'settings.json')
   const el = document.createElement('a')
   el.setAttribute(
     'href',
@@ -62,7 +64,7 @@ export default function DrawerActions() {
 
   return (
     <List>
-      {config.map.enableUserProfile && (
+      {config.misc.enableUserProfile && (
         <ListItemButton
           onClick={() => useLayoutStore.setState({ userProfile: true })}
         >
@@ -72,7 +74,7 @@ export default function DrawerActions() {
           <ListItemText primary={t('profile')} />
         </ListItemButton>
       )}
-      {config.map.enableTutorial && (
+      {config.misc.enableTutorial && (
         <ListItemButton onClick={() => useStore.setState({ tutorial: true })}>
           <ListItemIcon>
             <HelpOutlineIcon color="secondary" />
@@ -120,21 +122,23 @@ export default function DrawerActions() {
         </ListItemButton>
       )}
       <Divider />
-      <ListItemButton
-        href="https://github.com/WatWowMap/ReactMap"
-        referrerPolicy="no-referrer"
-        target="_blank"
-        rel="noreferrer"
-      >
-        <ListItemIcon>
-          <HeartIcon color="primary" />
-        </ListItemIcon>
-        <ListItemText primary={t('contribute')} />
-      </ListItemButton>
-      {config.map.statsLink && (
+      {!config.misc.rude && (
+        <ListItemButton
+          href="https://github.com/WatWowMap/ReactMap"
+          referrerPolicy="no-referrer"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <ListItemIcon>
+            <HeartIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={t('contribute')} />
+        </ListItemButton>
+      )}
+      {config.links.statsLink && (
         <ListItemButton
           component="button"
-          href={config.map.statsLink}
+          href={config.links.statsLink}
           target="_blank"
           rel="noreferrer"
         >
@@ -144,7 +148,7 @@ export default function DrawerActions() {
           <ListItemText primary={t('stats')} />
         </ListItemButton>
       )}
-      {config.map.feedbackLink && (
+      {config.links.feedbackLink && (
         <ListItemButton
           component="button"
           onClick={() => useLayoutStore.setState({ feedback: true })}
@@ -155,10 +159,10 @@ export default function DrawerActions() {
           <ListItemText primary={t('feedback')} />
         </ListItemButton>
       )}
-      {config.map.discordLink && (
+      {config.links.discordLink && (
         <ListItemButton
           component="button"
-          href={config.map.discordLink}
+          href={config.links.discordLink}
           target="_blank"
           rel="noreferrer"
         >

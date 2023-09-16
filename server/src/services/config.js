@@ -4,6 +4,7 @@ const { resolve } = require('path')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
+const checkConfigJsons = require('./functions/checkConfigJsons')
 
 const allowedMenuItems = [
   'gyms',
@@ -61,8 +62,6 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
     MANUAL_DB_NAME,
     MANUAL_DB_USERNAME,
     MANUAL_DB_PASSWORD,
-    MAP_GENERAL_START_LAT,
-    MAP_GENERAL_START_LON,
   } = process.env
 
   const hasScannerDb =
@@ -137,12 +136,6 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
       'Neither a ReactMap database or Manual database was found, you will need one of these to proceed.',
     )
   }
-  if (!MAP_GENERAL_START_LAT || !MAP_GENERAL_START_LON) {
-    log.warn(
-      HELPERS.config,
-      'Missing, MAP_GENERAL_START_LAT OR MAP_GENERAL_START_LON\nYou will be able to proceed but you should add these values to your docker-compose file',
-    )
-  }
 }
 if (fs.existsSync(resolve(`${__dirname}/../configs/config.json`))) {
   log.info(
@@ -170,80 +163,40 @@ if (config.icons.styles.length === 0) {
   })
 }
 
-const checkExtraJsons = (fileName, domain = '') => {
-  const generalJson = fs.existsSync(
-    resolve(`${__dirname}/../configs/${fileName}.json`),
-  )
-    ? JSON.parse(
-        fs.readFileSync(resolve(__dirname, `../configs/${fileName}.json`)),
-      )
-    : {}
-  if (Object.keys(generalJson).length) {
-    log.info(
-      HELPERS.config,
-      `config ${fileName}.json found, overwriting your config.map.${fileName} with the found data.`,
-    )
-  }
-  if (
-    domain &&
-    fs.existsSync(resolve(`${__dirname}/../configs/${fileName}/${domain}.json`))
-  ) {
-    const domainJson =
-      JSON.parse(
-        fs.readFileSync(
-          resolve(__dirname, `../configs/${fileName}/${domain}.json`),
-        ),
-      ) || {}
-    if (Object.keys(domainJson).length) {
-      log.info(
-        HELPERS.config,
-        `config ${fileName}/${domain}.json found, overwriting your config.map.${fileName} with the found data.`,
-      )
-    }
-    return {
-      components: [],
-      ...generalJson,
-      ...domainJson,
-    }
-  }
-  return generalJson
-}
+/**
+ * @param {Partial<import("@rm/types").Config['map']>} [input]
+ * @returns {import("@rm/types").Config['map']}
+ */
+const mergeMapConfig = (input = {}) => {
+  const base = config.getSafe('map')
 
-/** @param {Partial<import("@rm/types").Config['map']>} [input] */
-const mergeMapConfig = (input) => {
-  const obj = input ?? config.getSafe('map')
+  /** @type {import('@rm/types').Config['map']} */
+  const merged = config.util.extendDeep({}, base, input)
 
-  const menuOrder = obj?.general?.menuOrder
-    ? obj.general.menuOrder.filter((x) => allowedMenuItems.includes(x))
+  merged.general.menuOrder = merged?.general?.menuOrder
+    ? merged.general.menuOrder.filter((x) => allowedMenuItems.includes(x))
     : []
 
-  return {
-    ...obj,
-    ...obj.general,
-    menuOrder,
-    ...obj.customRoutes,
-    ...obj.links,
-    ...obj.misc,
-    messageOfTheDay: {
-      ...config.map.messageOfTheDay,
-      ...obj.messageOfTheDay,
-      ...checkExtraJsons('messageOfTheDay', obj.domain),
-    },
-    donationPage: {
-      ...config.map.donationPage,
-      ...obj.donationPage,
-      ...checkExtraJsons('donationPage', obj.domain),
-    },
-    loginPage: {
-      ...config.map.loginPage,
-      ...obj.loginPage,
-      ...checkExtraJsons('loginPage', obj.domain),
-    },
-  }
+  merged.loginPage = config.util.extendDeep(
+    {},
+    merged.loginPage,
+    checkConfigJsons('loginPage', merged.domain),
+  )
+  merged.donationPage = config.util.extendDeep(
+    {},
+    merged.donationPage,
+    checkConfigJsons('donationPage', merged.domain),
+  )
+  merged.messageOfTheDay = config.util.extendDeep(
+    {},
+    merged.messageOfTheDay,
+    checkConfigJsons('messageOfTheDay', merged.domain),
+  )
+
+  return merged
 }
 
-// Merge sub-objects for the map object
-config.map = mergeMapConfig(config.map)
+config.map = mergeMapConfig()
 
 // Create multiDomain Objects
 config.multiDomainsObj = Object.fromEntries(
@@ -344,7 +297,7 @@ config.authentication.strategies = config.authentication.strategies.map(
 
 // Consolidate Auth Methods
 // Create Authentication Objects
-config.authMethods = [
+config.authentication.methods = [
   ...new Set(
     config.authentication.strategies
       .filter((strategy) => strategy.enabled)

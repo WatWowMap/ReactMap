@@ -1,13 +1,14 @@
 // @ts-check
 import * as React from 'react'
 import HolidayAnimations from '@services/HolidayAnimations'
+import { useStatic } from '@hooks/useStore'
 
 /**
  *
  * @param {import("@rm/types").Config['map']['holidayEffects'][number]} props
  * @returns
  */
-export default function HolidayEffect({
+export function HolidayEffect({
   enabled,
   endDay,
   endMonth,
@@ -69,4 +70,16 @@ export default function HolidayEffect({
   }, [])
 
   return element
+}
+
+export default function HolidayEffects() {
+  const holidayEffects = useStatic((s) => s?.config?.map?.holidayEffects || [])
+
+  return (
+    <>
+      {holidayEffects.map((holiday) => (
+        <HolidayEffect key={holiday.name} {...holiday} />
+      ))}
+    </>
+  )
 }

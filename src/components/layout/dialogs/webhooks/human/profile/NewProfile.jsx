@@ -18,14 +18,12 @@ export const NewProfile = () => {
     refetchQueries: [allProfiles],
   })
 
-  const existing = useWebhookStore(
-    (s) => new Set((s.profile || []).map((p) => p.name)),
-  )
+  const existing = useWebhookStore((s) => s.profile || []).map((x) => x.name)
 
   const [newProfile, setNewProfile] = React.useState('')
   const [interacted, setInteracted] = React.useState(false)
 
-  const handleAddProfile = () => {
+  const handleAddProfile = React.useCallback(() => {
     setNewProfile('')
     save({
       variables: {
@@ -34,24 +32,34 @@ export const NewProfile = () => {
         status: 'POST',
       },
     })
-  }
+  }, [newProfile, save])
+
+  const handleChange = React.useCallback(
+    (
+      /** @type {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} */ event,
+    ) => {
+      setNewProfile(event.target.value?.toLowerCase() || '')
+    },
+    [setNewProfile],
+  )
 
   const invalid =
-    existing.has(newProfile) || newProfile === 'all' || !newProfile
+    existing.includes(newProfile) || newProfile === 'all' || !newProfile
+
   return (
     <Grid container xs={12}>
       <Grid xs={12} sm={4}>
-        <Typography variant="h6" align="center">
+        <Typography variant="h6" align="center" pb={{ xs: 2, sm: 0 }}>
           {t('add_new_profile')}
         </Typography>
       </Grid>
-      <Grid xs={7} sm={5}>
+      <Grid xs={9} sm={5}>
         <TextField
           size="small"
           autoComplete="off"
           label={invalid && interacted ? t('profile_error') : t('profile_name')}
           value={newProfile}
-          onChange={(event) => setNewProfile(event.target.value?.toLowerCase())}
+          onChange={handleChange}
           variant="outlined"
           error={invalid && interacted}
           onFocus={() => !interacted && setInteracted(true)}
@@ -70,3 +78,5 @@ export const NewProfile = () => {
     </Grid>
   )
 }
+
+export const MemoNewProfile = React.memo(NewProfile, () => true)

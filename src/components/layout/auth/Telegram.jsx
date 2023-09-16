@@ -21,7 +21,7 @@ export default function Telegram({ botName, authUrl }) {
       ref.current.appendChild(script)
 
       return () => {
-        ref.current.removeChild(script)
+        if (ref.current) ref.current.removeChild(script)
       }
     }
   }, [botName, authUrl, ref])

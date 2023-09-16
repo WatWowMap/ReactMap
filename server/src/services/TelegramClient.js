@@ -102,10 +102,14 @@ class TelegramClient {
                   ))),
           ]),
         ),
+        admin: false,
         areaRestrictions: areaPerms(groups),
         webhooks: webhookPerms(groups, 'telegramGroups', trialActive),
         scanner: scannerPerms(groups, 'telegramGroups', trialActive),
       },
+    }
+    if (this.strategy.allowedUsers?.includes(newUserObj.id)) {
+      newUserObj.perms.admin = true
     }
     return newUserObj
   }
@@ -125,60 +129,62 @@ class TelegramClient {
       return done(null, false, { message: 'access_denied' })
     }
     try {
-      /** @type {import('@rm/types').FullUser} */
-      const userExists = await Db.models.User.query().findOne({
-        telegramId: user.id,
-      })
-
-      if (req.user && userExists?.strategy === 'local') {
-        await Db.models.User.query()
-          .update({
-            telegramId: user.id,
-            telegramPerms: JSON.stringify(user.perms),
-            webhookStrategy: 'telegram',
-          })
-          .where('id', req.user.id)
-        await Db.models.User.query()
-          .where('telegramId', user.id)
-          .whereNot('id', req.user.id)
-          .delete()
-        log.info(
-          HELPERS.custom(this.rmStrategy, '#26A8EA'),
-          user.username,
-          `(${user.id})`,
-          'Authenticated successfully.',
+      await Db.models.User.query()
+        .findOne({ telegramId: user.id })
+        .then(
+          async (/** @type {import('@rm/types').FullUser} */ userExists) => {
+            if (req.user && userExists?.strategy === 'local') {
+              await Db.models.User.query()
+                .update({
+                  telegramId: user.id,
+                  telegramPerms: JSON.stringify(user.perms),
+                  webhookStrategy: 'telegram',
+                })
+                .where('id', req.user.id)
+              await Db.models.User.query()
+                .where('telegramId', user.id)
+                .whereNot('id', req.user.id)
+                .delete()
+              log.info(
+                HELPERS.custom(this.rmStrategy, '#26A8EA'),
+                user.username,
+                `(${user.id})`,
+                'Authenticated successfully.',
+              )
+              return done(null, {
+                ...user,
+                ...req.user,
+                username: userExists.username || user.username,
+                telegramId: user.id,
+                perms: mergePerms(req.user.perms, user.perms),
+              })
+            }
+            if (!userExists) {
+              userExists = await Db.models.User.query().insertAndFetch({
+                telegramId: user.id,
+                strategy: user.provider,
+                tutorial: !config.getSafe('map.misc.forceTutorial'),
+              })
+            }
+            if (userExists.strategy !== 'telegram') {
+              await Db.models.User.query()
+                .update({ strategy: 'telegram' })
+                .where('id', userExists.id)
+              userExists.strategy = 'telegram'
+            }
+            log.info(
+              HELPERS.custom(this.rmStrategy, '#26A8EA'),
+              user.username,
+              `(${user.id})`,
+              'Authenticated successfully.',
+            )
+            return done(null, {
+              ...user,
+              ...userExists,
+              username: userExists.username || user.username,
+            })
+          },
         )
-        return done(null, {
-          ...user,
-          ...req.user,
-          username: userExists.username || user.username,
-          telegramId: user.id,
-          perms: mergePerms(req.user.perms, user.perms),
-        })
-      }
-      /** @type {import('@rm/types').FullUser} */
-      const newUser = await Db.models.User.query().insertAndFetch({
-        telegramId: user.id,
-        strategy: user.provider,
-        tutorial: !config.getSafe('map.misc.forceTutorial'),
-      })
-      if (newUser.strategy !== 'telegram') {
-        await Db.models.User.query()
-          .update({ strategy: 'telegram' })
-          .where('id', userExists.id)
-        userExists.strategy = 'telegram'
-      }
-      log.info(
-        HELPERS.custom(this.rmStrategy, '#26A8EA'),
-        user.username,
-        `(${user.id})`,
-        'Authenticated successfully.',
-      )
-      return done(null, {
-        ...user,
-        ...userExists,
-        username: userExists.username || user.username,
-      })
     } catch (e) {
       log.error(
         HELPERS.custom(this.rmStrategy, '#26A8EA'),

@@ -12,7 +12,7 @@ function buildGyms(perms, defaults) {
   const gymFilters = {}
 
   if (perms.gyms) {
-    defaults.baseTeamIds.forEach((team, i) => {
+    Object.keys(Event.masterfile.teams).forEach((team, i) => {
       gymFilters[`t${team}-0`] = new BaseFilter(defaults.allGyms)
       if (i) {
         defaults.baseGymSlotAmounts.forEach((slot) => {
@@ -22,9 +22,11 @@ function buildGyms(perms, defaults) {
     })
   }
   if (perms.raids) {
-    defaults.baseRaidTiers.forEach((tier) => {
-      gymFilters[`e${tier}`] = new BaseFilter(defaults.eggs)
-      gymFilters[`r${tier}`] = new BaseFilter(defaults.raids)
+    Object.keys(Event.masterfile.raids).forEach((tier) => {
+      if (tier !== '0') {
+        gymFilters[`e${tier}`] = new BaseFilter(defaults.eggs)
+        gymFilters[`r${tier}`] = new BaseFilter(defaults.raids)
+      }
     })
   }
   Event.getAvailable('gyms').forEach((avail) => {

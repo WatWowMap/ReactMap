@@ -3,7 +3,7 @@ import * as React from 'react'
 import Done from '@mui/icons-material/Done'
 import Clear from '@mui/icons-material/Clear'
 import Chip from '@mui/material/Chip'
-import apolloClient from '@services/apollo'
+import { apolloClient } from '@services/apollo'
 import { WEBHOOK_AREAS, setHuman } from '@services/queries/webhook'
 
 import { useWebhookStore } from '../../store'
@@ -24,18 +24,19 @@ export const handleClick =
       children: [],
       group: '',
     }
+    const withLowerCase = {
+      group: foundGroup.group,
+      children: foundGroup.children.map((a) => a.toLowerCase()),
+    }
+
     let newAreas = []
     if (incomingArea === 'all') {
-      newAreas = groupName
-        ? [
-            ...existing,
-            ...(areas.find((group) => group.group === groupName)?.children ||
-              []),
-          ]
+      newAreas = withLowerCase.group
+        ? [...existing, ...withLowerCase.children]
         : areas.flatMap((group) => group.children)
     } else if (incomingArea === 'none') {
       newAreas = groupName
-        ? existing.filter((a) => !foundGroup.children.includes(a))
+        ? existing.filter((a) => !withLowerCase.children.includes(a))
         : []
     } else {
       newAreas = existing.includes(incomingArea)
@@ -43,6 +44,7 @@ export const handleClick =
         : [...existing, incomingArea]
     }
     newAreas = [...new Set(newAreas)]
+
     await apolloClient
       .mutate({
         mutation: setHuman,

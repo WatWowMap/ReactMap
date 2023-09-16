@@ -1,41 +1,48 @@
-export default function typeStyle(cell, tileStyle, userSettings) {
-  const color =
-    tileStyle === 'dark'
-      ? userSettings.darkMapBorder
-      : userSettings.lightMapBorder
+// @ts-check
+
+/**
+ *
+ * @param {import("@rm/types/lib").Level14Cell} cell
+ * @param {number} total
+ * @param {string} oneStopTillNext
+ * @param {string} twoStopsTillNext
+ * @param {string} noMoreGyms
+ * @returns
+ */
+export default function typeStyle(
+  cell,
+  total,
+  oneStopTillNext,
+  twoStopsTillNext,
+  noMoreGyms,
+) {
   if (
-    (cell.count === 1 && cell.count_gyms < 1) ||
-    (cell.count === 5 && cell.count_gyms < 2) ||
-    (cell.count === 19 && cell.count_gyms < 3)
+    (total === 1 && cell.count_gyms < 1) ||
+    (total === 5 && cell.count_gyms < 2) ||
+    (total === 19 && cell.count_gyms < 3)
   ) {
     return {
-      fillColor: userSettings.oneStopTillNext,
-      color,
-      opacity: 0.75,
+      fillColor: oneStopTillNext,
       fillOpacity: 0.5,
       weight: 0.75,
     }
   }
   if (
-    (cell.count === 4 && cell.count_gyms < 2) ||
-    (cell.count === 18 && cell.count_gyms < 3)
+    (total === 4 && cell.count_gyms < 2) ||
+    (total === 18 && cell.count_gyms < 3)
   ) {
     return {
-      fillColor: userSettings.twoStopsTillNext,
-      color,
-      opacity: 0.75,
+      fillColor: twoStopsTillNext,
       fillOpacity: 0.5,
       weight: 0.75,
     }
   }
-  if (cell.count >= 20) {
+  if (total >= 20) {
     return {
-      fillColor: userSettings.noMoreGyms,
-      color,
-      opacity: 0.75,
+      fillColor: noMoreGyms,
       fillOpacity: 0.25,
       weight: 0.8,
     }
   }
-  return { color, opacity: 0.75, fillOpacity: 0.0, weight: 0.8 }
+  return { fillOpacity: 0.0, weight: 0.8 }
 }

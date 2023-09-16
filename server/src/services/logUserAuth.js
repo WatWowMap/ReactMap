@@ -2,6 +2,9 @@
 const { default: fetch } = require('node-fetch')
 const { log, HELPERS } = require('@rm/logger')
 
+// PII fields inside getAuthInfo embed
+const PII_FIELDS = ['Ip Address', 'Geo Lookup', 'Google Map', 'Network Provider']
+
 /**
  * Convert camelCase to Capitalized Words
  * @param {string} str
@@ -31,9 +34,10 @@ const mapPerms = (perms, userPerms) =>
  * @param {import('express').Request} req
  * @param {{ id: string, username: string, perms: import("@rm/types").Permissions, valid: boolean, avatar: string }} user
  * @param {string} strategy
+ * @param {boolean} hidePii
  * @returns {Promise<import('discord.js').APIEmbed>}
  */
-async function getAuthInfo(req, user, strategy = 'custom') {
+async function getAuthInfo(req, user, strategy = 'custom', hidePii) {
   const ip =
     req.headers['cf-connecting-ip'] ||
     `${req.headers['x-forwarded-for'] || ''}`.split(', ')[0] ||
@@ -198,6 +202,11 @@ async function getAuthInfo(req, user, strategy = 'custom') {
       user.id,
       'Not authorized to access map',
     )
+  }
+  if (hidePii) {
+    embed.fields = embed.fields.filter(field => {
+      return !PII_FIELDS.includes(field.name)
+    });
   }
   return embed
 }

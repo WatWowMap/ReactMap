@@ -1,23 +1,28 @@
+// @ts-check
 import * as React from 'react'
-import { Polyline, useMap } from 'react-leaflet'
+import { Polyline } from 'react-leaflet'
 import {
   S2LatLng,
   S2RegionCoverer,
   S2LatLngRect,
   S2Cell,
-  S2CellId,
   S2Point,
 } from 'nodes2ts'
 
-import Utility from '@services/Utility'
-import { useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 
 import Notification from '@components/layout/general/Notification'
+import { getQueryArgs } from '@services/functions/getQueryArgs'
 
-function BaseCell({ id, coords, color }) {
+/**
+ *
+ * @param {{ coords: import('@rm/types').S2Polygon, color: string }} props
+ * @returns
+ */
+function BaseCell({ coords, color }) {
   return (
     <Polyline
-      key={id}
+      key={color}
       positions={[...coords, coords[0]]}
       color={color}
       weight={0.5}
@@ -27,37 +32,26 @@ function BaseCell({ id, coords, color }) {
 
 const MemoBaseCell = React.memo(
   BaseCell,
-  (prev, next) => prev.id === next.id && prev.color === next.color,
+  (prev, next) => prev.color === next.color,
 )
 
 export default MemoBaseCell
 
-function getPolyVector(s2cellId, polyline) {
-  const s2cell = new S2Cell(new S2CellId(s2cellId.toString()))
-  const poly = []
-  for (let i = 0; i <= 3; i += 1) {
-    const coordinate = s2cell.getVertex(i)
-    const point = new S2Point(coordinate.x, coordinate.y, coordinate.z)
-    const latLng = S2LatLng.fromPoint(point)
-    poly.push([latLng.latDegrees, latLng.lngDegrees])
-  }
-  if (polyline) {
-    poly.push(poly[0])
-  }
-
-  return poly
-}
-
-export function GenerateCells({ tileStyle, onMove }) {
-  const map = useMap()
-  const { s2cells: settings } = useStore((s) => s.userSettings)
-  const { s2cells: filters } = useStore((s) => s.filters)
+export function GenerateCells() {
+  const darkTiles = useStatic((s) => s.tileStyle === 'dark')
+  const color = useStore((s) =>
+    darkTiles
+      ? s.userSettings.s2cells.darkMapBorder
+      : s.userSettings.s2cells.lightMapBorder,
+  )
+  /** @type {number[]} */
+  const filter = useStore((s) => s.filters.s2cells.cells)
   const location = useStore((s) => s.location)
   const zoom = useStore((s) => s.zoom)
 
   const cells = React.useMemo(() => {
-    const bounds = Utility.getQueryArgs(map)
-    return filters.cells.flatMap((level) => {
+    const bounds = getQueryArgs()
+    return filter.flatMap((level) => {
       const regionCoverer = new S2RegionCoverer()
       const region = S2LatLngRect.fromLatLng(
         S2LatLng.fromDegrees(bounds.minLat, bounds.minLon),
@@ -66,27 +60,22 @@ export function GenerateCells({ tileStyle, onMove }) {
       regionCoverer.setMinLevel(level)
       regionCoverer.setMaxLevel(level)
       return regionCoverer.getCoveringCells(region).map((cell) => {
-        const id = cell.id.toString()
+        const s2cell = new S2Cell(cell)
+        /** @type {import('@rm/types').S2Polygon} */
+        const poly = []
+        for (let i = 0; i <= 3; i += 1) {
+          const coordinate = s2cell.getVertex(i)
+          const point = new S2Point(coordinate.x, coordinate.y, coordinate.z)
+          const latLng = S2LatLng.fromPoint(point)
+          poly.push([latLng.latDegrees, latLng.lngDegrees])
+        }
         return {
-          id,
-          coords: getPolyVector(id),
+          id: cell.id.toString(),
+          coords: poly,
         }
       })
     })
-  }, [filters.cells, location, zoom])
-
-  React.useEffect(() => {
-    const regenerate = () => onMove()
-    map.on('moveend', regenerate)
-    return () => {
-      map.off('moveend', regenerate)
-    }
-  }, [])
-
-  const color =
-    tileStyle === 'dark'
-      ? settings.darkMapBorder || 'red'
-      : settings.lightMapBorder || 'black'
+  }, [filter, location, zoom, color])
 
   return (
     <>
@@ -95,19 +84,17 @@ export function GenerateCells({ tileStyle, onMove }) {
         .map((cell) => (
           <MemoBaseCell key={cell.id} {...cell} color={color} />
         ))}
-      {cells.length > 20_000 && (
-        <Notification
-          key={cells.length}
-          severity="warning"
-          i18nKey="s2_cell_limit"
-          messages={[
-            {
-              key: 'error',
-              variables: [cells.length.toLocaleString()],
-            },
-          ]}
-        />
-      )}
+      <Notification
+        open={cells.length > 20_000}
+        severity="warning"
+        i18nKey="s2_cell_limit"
+        messages={[
+          {
+            key: 'error',
+            variables: [cells.length.toLocaleString()],
+          },
+        ]}
+      />
     </>
   )
 }

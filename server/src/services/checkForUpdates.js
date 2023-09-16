@@ -10,20 +10,13 @@ const execPromise = promisify(exec)
 
 async function getCurrentBranch() {
   try {
-    const { stdout } = await execPromise('git branch --show-current')
-    const gitRef = fs.readFileSync(
-      path.resolve(`${__dirname}/../../../.gitref`),
-      'utf8',
-    )
-    const isDocker = typeof gitRef === 'string' && gitRef.trim()
+    const gitRef = fs
+      .readFileSync(path.resolve(`${__dirname}/../../../.gitref`), 'utf8')
+      .trim()
+    if (gitRef) return { branch: gitRef.split('/')[2].trim(), isDocker: true }
 
-    return {
-      branch:
-        typeof gitRef === 'string' && gitRef.trim()
-          ? gitRef.split('/')[2].trim()
-          : stdout.trim(),
-      isDocker,
-    }
+    const { stdout } = await execPromise('git branch --show-current')
+    return { branch: stdout.trim(), isDocker: false }
   } catch (e) {
     log.info(
       HELPERS.update,
@@ -31,19 +24,19 @@ async function getCurrentBranch() {
       e.message,
       '\nProceeding normally...',
     )
+    return { branch: 'main', isDocker: false }
   }
 }
 
 async function getCurrentSha() {
   try {
+    const gitSha = fs
+      .readFileSync(path.resolve(`${__dirname}/../../../.gitsha`), 'utf8')
+      .trim()
+    if (gitSha) return gitSha
+
     const { stdout } = await execPromise('git rev-parse HEAD')
-    const gitSha = fs.readFileSync(
-      path.resolve(`${__dirname}/../../../.gitsha`),
-      'utf8',
-    )
-    return typeof gitSha === 'string' && gitSha.trim()
-      ? gitSha.trim()
-      : stdout.trim()
+    return stdout.trim()
   } catch (e) {
     log.info(
       HELPERS.update,
@@ -51,6 +44,7 @@ async function getCurrentSha() {
       e.message,
       '\nProceeding normally...',
     )
+    return ''
   }
 }
 
@@ -70,6 +64,7 @@ async function getRemoteSha(branch) {
       branch,
       '\nProceeding normally...',
     )
+    return ''
   }
 }
 

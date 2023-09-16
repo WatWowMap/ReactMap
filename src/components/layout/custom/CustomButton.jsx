@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { darken } from '@mui/material/styles'
 import Button from '@mui/material/Button'
 
 import { I } from '../general/I'
@@ -14,32 +13,30 @@ const THEME_COLORS = new Set([
   'inherit',
 ])
 
+/** @param {import('@mui/material').ButtonProps & { icon?: string }} */
 export default function CustomButton({
   size,
   color = 'inherit',
   variant = 'text',
   style = {},
+  sx,
   icon = null,
   children,
+  className,
 }) {
   const isMuiColor = THEME_COLORS.has(color)
   return (
     <Button
+      className={className}
       size={size}
       color={isMuiColor ? color : undefined}
+      bgcolor={isMuiColor ? undefined : color}
       variant={variant}
-      sx={{
-        ...style,
-        color: isMuiColor ? undefined : color,
-        '&:hover': {
-          ...style['&:hover'],
-          bgcolor:
-            style.backgroundColor && !THEME_COLORS.has(style.backgroundColor)
-              ? darken(style.backgroundColor, 0.2)
-              : 'inherit',
-        },
-      }}
-      startIcon={icon ? <I className={icon} style={{ fontSize: 30 }} /> : null}
+      style={style}
+      sx={sx}
+      startIcon={
+        icon ? <I className={icon} style={{ fontSize: 30 }} /> : undefined
+      }
     >
       {children}
     </Button>

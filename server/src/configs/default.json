@@ -440,22 +440,6 @@
       "eggs": true,
       "pokemon": true,
       "gymBadges": false,
-      "baseRaidTiers": [
-        1,
-        3,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ],
-      "baseTeamIds": [
-        0,
-        1,
-        2,
-        3
-      ],
       "baseGymSlotAmounts": [
         1,
         2,
@@ -643,6 +627,7 @@
         "type": "discord",
         "enabled": false,
         "logChannelId": "",
+        "logChannelHidePii": false,
         "scanNextLogChannelId": "",
         "scanZoneLogChannelId": "",
         "eventLogChannelId": "",
@@ -967,5 +952,22 @@
     "event": [],
     "never": []
   },
-  "manualAreas": []
+  "manualAreas": [],
+  "sentry": {
+    "client": {
+      "enabled": false,
+      "debug": false,
+      "dsn": "",
+      "tracesSampleRate": 0.1,
+      "authToken": "",
+      "org": "",
+      "project": ""
+    },
+    "server": {
+      "enabled": false,
+      "debug": false,
+      "dsn": "",
+      "tracesSampleRate": 0.1
+    }
+  }
 }

@@ -43,6 +43,7 @@ class DiscordClient {
       scanNext: strategy.scanNextLogChannelId,
       scanZone: strategy.scanZoneLogChannelId,
     }
+    this.loggingChannelHidePii = strategy.logChannelHidePii
     this.perms = config.getSafe('authentication.perms')
     this.alwaysEnabledPerms = config.getSafe(
       'authentication.alwaysEnabledPerms',
@@ -119,11 +120,9 @@ class DiscordClient {
     /** @type {import("@rm/types").Permissions} */
     // @ts-ignore
     const perms = Object.fromEntries(
-      Object.entries(this.perms).map(([k, v]) => [
-        k,
-        typeof v === 'boolean' ? false : [],
-      ]),
+      Object.keys(this.perms).map((key) => [key, false]),
     )
+    perms.admin = false
 
     const permSets = {
       areaRestrictions: new Set(),
@@ -136,6 +135,7 @@ class DiscordClient {
       const guilds = user.guilds.map((guild) => guild.id)
       if (this.strategy.allowedUsers.includes(user.id)) {
         Object.keys(this.perms).forEach((key) => (perms[key] = true))
+        perms.admin = true
         config.getSafe('webhooks').forEach((x) => permSets.webhooks.add(x.name))
         Object.keys(scanner).forEach(
           (x) => scanner[x]?.enabled && permSets.scanner.add(x),
@@ -205,11 +205,7 @@ class DiscordClient {
     Object.entries(permSets).forEach(([key, value]) => {
       perms[key] = [...value]
     })
-    log.debug(
-      HELPERS.custom(this.rmStrategy, '#7289da'),
-      'Perms:',
-      JSON.stringify(perms),
-    )
+    log.debug(HELPERS.custom(this.rmStrategy, '#7289da'), { perms })
     return perms
   }
 
@@ -274,7 +270,7 @@ class DiscordClient {
       }
       discordUser.valid = discordUser.perms.map !== false
 
-      const embed = await logUserAuth(req, discordUser, 'Discord')
+      const embed = await logUserAuth(req, discordUser, 'Discord', this.loggingChannelHidePii)
       await this.sendMessage(embed)
 
       if (discordUser.perms.blocked) {
@@ -293,58 +289,70 @@ class DiscordClient {
         delete discordUser.guilds
       }
 
-      /** @type {import('@rm/types').FullUser} */
-      const userExists = await Db.models.User.query().findOne(
-        req.user ? { id: req.user.id } : { discordId: discordUser.id },
-      )
-      if (req.user && userExists?.strategy === 'local') {
-        await Db.models.User.query()
-          .update({
-            discordId: discordUser.id,
-            discordPerms: JSON.stringify(discordUser.perms),
-            webhookStrategy: 'discord',
-          })
-          .where('id', req.user.id)
-        /** @type {import('@rm/types').FullUser} */
-        const oldUser = await Db.models.User.query()
-          .where('discordId', discordUser.id)
-          .whereNot('id', req.user.id)
-          .first()
-        if (oldUser) {
-          await Db.models.Badge.query()
-            // @ts-ignore
-            .update({ userId: req.user.id })
-            .where('userId', oldUser.id)
-          await Db.models.User.query()
-            .update({ data: oldUser.data })
-            .where('id', req.user.id)
-            .where('data', null)
-        }
-        await Db.models.User.query()
-          .where('discordId', discordUser.id)
-          .whereNot('id', req.user.id)
-          .delete()
-        return done(null, {
-          ...discordUser,
-          ...req.user,
-          ...userExists,
-          username: userExists.username || discordUser.username,
-          discordId: discordUser.id,
-          perms: mergePerms(req.user.perms, discordUser.perms),
-        })
-      }
-      /** @type {import('@rm/types').FullUser} */
-      const newUser = await Db.models.User.query().insertAndFetch({
-        discordId: discordUser.id,
-        strategy: 'discord',
-        tutorial: !config.getSafe('map.misc.forceTutorial'),
-      })
-      return done(null, {
-        ...discordUser,
-        ...req.user,
-        ...newUser,
-        username: userExists.username || discordUser.username,
-      })
+      await Db.models.User.query()
+        .findOne(req.user ? { id: req.user.id } : { discordId: discordUser.id })
+        .then(
+          async (/** @type {import('@rm/types').FullUser} */ userExists) => {
+            if (req.user && userExists?.strategy === 'local') {
+              await Db.models.User.query()
+                .update({
+                  discordId: discordUser.id,
+                  discordPerms: JSON.stringify(discordUser.perms),
+                  webhookStrategy: 'discord',
+                })
+                .where('id', req.user.id)
+              /** @type {import('@rm/types').FullUser} */
+              const oldUser = await Db.models.User.query()
+                .where('discordId', discordUser.id)
+                .whereNot('id', req.user.id)
+                .first()
+              if (oldUser) {
+                await Db.models.Badge.query()
+                  .update({
+                    // @ts-ignore
+                    userId: req.user.id,
+                  })
+                  .where('userId', oldUser.id)
+                await Db.models.User.query()
+                  .update({
+                    data: oldUser.data,
+                  })
+                  .where('id', req.user.id)
+                  .where('data', null)
+              }
+              await Db.models.User.query()
+                .where('discordId', discordUser.id)
+                .whereNot('id', req.user.id)
+                .delete()
+              return done(null, {
+                ...discordUser,
+                ...req.user,
+                username: userExists.username || discordUser.username,
+                discordId: discordUser.id,
+                perms: mergePerms(req.user.perms, discordUser.perms),
+              })
+            }
+            if (!userExists) {
+              userExists = await Db.models.User.query().insertAndFetch({
+                discordId: discordUser.id,
+                strategy: 'discord',
+                tutorial: !config.getSafe('map.misc.forceTutorial'),
+              })
+            }
+            if (userExists.strategy !== 'discord') {
+              await Db.models.User.query()
+                .update({ strategy: 'discord' })
+                .where('id', userExists.id)
+              userExists.strategy = 'discord'
+            }
+            return done(null, {
+              ...discordUser,
+              ...userExists,
+              id: userExists.id,
+              username: userExists.username || discordUser.username,
+            })
+          },
+        )
     } catch (e) {
       log.error(
         HELPERS.custom(this.rmStrategy, '#7289da'),

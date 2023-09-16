@@ -16,7 +16,6 @@ type Query {
     maxLat: Float
     minLon: Float
     maxLon: Float
-    ts: Int
     filters: JSON
   ): [Gym]
   gymsSingle(id: ID, perm: String): Gym
@@ -26,7 +25,6 @@ type Query {
     maxLat: Float
     minLon: Float
     maxLon: Float
-    ts: Int
     filters: JSON
   ): [Nest]
   nestsSingle(id: ID, perm: String): Nest
@@ -35,8 +33,6 @@ type Query {
     maxLat: Float
     minLon: Float
     maxLon: Float
-    ts: Int
-    midnight: Int
     filters: JSON
   ): [Pokestop]
   pokestopsSingle(id: ID, perm: String): Pokestop
@@ -45,7 +41,6 @@ type Query {
     maxLat: Float
     minLon: Float
     maxLon: Float
-    ts: Int
     filters: JSON
   ): [Pokemon]
   pokemonSingle(id: ID, perm: String): Pokemon
@@ -54,7 +49,6 @@ type Query {
     maxLat: Float
     minLon: Float
     maxLon: Float
-    ts: Int
     filters: JSON
   ): [Portal]
   portalsSingle(id: ID, perm: String): Portal
@@ -70,7 +64,6 @@ type Query {
     maxLat: Float
     minLon: Float
     maxLon: Float
-    ts: Int
     filters: JSON
     zoom: Int
   ): [ScanCell]
@@ -83,8 +76,6 @@ type Query {
     lat: Float
     lon: Float
     locale: String
-    ts: Int
-    midnight: Int
     onlyAreas: [String]
   ): [Search]
   searchable: [String]
@@ -94,7 +85,6 @@ type Query {
     lat: Float
     lon: Float
     locale: String
-    midnight: Int
     onlyAreas: [String]
   ): [SearchLure]
   searchQuest(
@@ -103,7 +93,6 @@ type Query {
     lat: Float
     lon: Float
     locale: String
-    midnight: Int
     onlyAreas: [String]
   ): [SearchQuest]
   spawnpoints(
@@ -111,7 +100,6 @@ type Query {
     maxLat: Float
     minLon: Float
     maxLon: Float
-    ts: Int
     filters: JSON
   ): [Spawnpoint]
   submissionCells(
@@ -119,7 +107,6 @@ type Query {
     maxLat: Float
     minLon: Float
     maxLon: Float
-    ts: Int
     zoom: Int
     filters: JSON
   ): [SubmissionCell]
@@ -145,6 +132,7 @@ type Query {
   webhookCategories: [String]
   webhookUser: UserPoracleConfig
   scanner(category: String, method: String, data: JSON): ScannerApi
+  validateUser: ValidUserObj
 }
 
 type Mutation {
@@ -158,4 +146,5 @@ type Mutation {
   setGymBadge(gymId: String, badge: Int): Boolean
   setExtraFields(key: String, value: String): Boolean
   nestSubmission(id: ID, name: String): Boolean
+  saveComponent(component: String, code: String): String
 }

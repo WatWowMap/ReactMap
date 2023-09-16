@@ -49,7 +49,9 @@ async function startApollo(httpServer) {
       if (errorCache.has(key)) {
         return e
       }
-      errorCache.set(key, true)
+      if (!config.getSafe('devOptions.enabled')) {
+        errorCache.set(key, true)
+      }
 
       const endpoint = /** @type {string} */ (e.extensions.endpoint)
 
@@ -57,9 +59,9 @@ async function startApollo(httpServer) {
         HELPERS.gql,
         HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
         'Client:',
-        e.extensions.clientV,
+        e.extensions.clientV || 'Unknown',
         'Server:',
-        e.extensions.serverV,
+        e.extensions.serverV || 'Unknown',
         'User:',
         e.extensions.user || 'Not Logged In',
         e.extensions.id || '',
@@ -112,7 +114,7 @@ async function startApollo(httpServer) {
                   filterCount || 0,
                 )
 
-                if (returned) {
+                if (returned && config.getSafe('sentry.server.enabled')) {
                   contextValue.transaction.setMeasurement(
                     `${endpoint}.returned`,
                     returned,

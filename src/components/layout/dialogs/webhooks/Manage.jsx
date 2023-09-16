@@ -15,7 +15,7 @@ import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 import Footer from '@components/layout/general/Footer'
 import Header from '@components/layout/general/Header'
-import apolloClient from '@services/apollo'
+import { apolloClient } from '@services/apollo'
 import Query from '@services/Query'
 import { allProfiles } from '@services/queries/webhook'
 
@@ -24,7 +24,7 @@ import Human from './human'
 import Tracked from './Tracked'
 import Menu from '../../general/Menu'
 // import WebhookError from './Error'
-import { setMode, useWebhookStore } from './store'
+import { setMode, setSelected, useWebhookStore } from './store'
 import { useGenFullFilters, useGetHookContext } from './hooks'
 import ProfileEditing from './human/profile'
 
@@ -33,17 +33,20 @@ export default function Manage() {
 
   const categories = useGetHookContext()
   const category = useWebhookStore((s) => s.category)
-  const name = useWebhookStore((s) => s.context.name) || ''
+  const name = useWebhookStore((s) => s.context.name || '')
 
-  const feedbackLink = useStatic((s) => s.config.map.feedbackLink)
+  const feedbackLink = useStatic((s) => s.config.links.feedbackLink)
 
   const filters = useGenFullFilters()
 
+  /** @type {ReturnType<typeof React.useRef<HTMLElement | null>>} */
+  const dialogRef = React.useRef(null)
   const [addNew, setAddNew] = React.useState(false)
   const [tempFilters, setTempFilters] = React.useState(filters[category])
+  const [height, setHeight] = React.useState(0)
 
-  const footerButtons = React.useMemo(
-    () => [
+  const footerButtons = React.useMemo(() => {
+    const buttons = [
       {
         name: 'feedback',
         action: () => useLayoutStore.setState({ feedback: true }),
@@ -57,41 +60,54 @@ export default function Manage() {
           : category === 'human'
           ? t('manage_profiles')
           : t('add_new', { category: t(category) }),
-        action: () => setAddNew(!addNew),
+        action: () => setAddNew((prev) => !prev),
         key: 'addNew',
         icon: addNew ? 'Save' : 'Add',
         disabled: !categories.length,
+        color: 'secondary',
       },
-      {
+    ]
+    if (!addNew) {
+      buttons.push({
         name: 'close',
         action: setMode,
         icon: 'Clear',
+        disabled: false,
         color: 'primary',
-      },
-    ],
-    [addNew, categories, category, feedbackLink],
-  )
+      })
+    }
+    return buttons
+  }, [addNew, categories, category, feedbackLink])
 
   React.useEffect(() => {
     Utility.analytics('Webhook', `${category} Webhook Page`, category, true)
     setTempFilters(filters[category])
+    setSelected()()
+    if (dialogRef.current && !addNew) {
+      setHeight(dialogRef.current.clientHeight)
+    }
   }, [category])
 
   React.useEffect(() => {
     if (!addNew && category !== 'human') {
+      const values = Poracle.processor(
+        category,
+        Object.values(tempFilters || {}).filter((x) => x && x.enabled),
+        useWebhookStore.getState().context.ui[category].defaults,
+      )
+      setTempFilters(filters[category])
       apolloClient.mutate({
         mutation: Query.webhook(category),
         variables: {
           category,
-          data: Poracle.processor(
-            category,
-            Object.values(tempFilters || {}).filter((x) => x && x.enabled),
-            useWebhookStore.getState().context.ui[category].defaults,
-          ),
+          data: values,
           status: 'POST',
         },
         refetchQueries: [allProfiles],
       })
+      useWebhookStore.setState((prev) => ({
+        [category]: [...prev[category], ...values],
+      }))
     }
   }, [addNew])
 
@@ -143,29 +159,26 @@ export default function Manage() {
           ))}
         </Tabs>
       </AppBar>
-      <DialogContent sx={{ p: 0 }}>
-        <Collapse
-          in={!addNew}
-          sx={{
-            height: '70vh',
-            p: 2,
-          }}
-        >
-          {categories.map((key) =>
-            key === 'human' ? (
-              <Box key={key} hidden={category !== 'human'}>
-                <Human />
-              </Box>
-            ) : (
-              <Tracked key={key} visible={category} category={key} />
-            ),
+      <DialogContent sx={{ p: 0, minHeight: '70vh' }} ref={dialogRef}>
+        <Collapse in={!addNew}>
+          {category !== 'human' && (
+            <Box role="tabpanel" height={height - 76} p={2}>
+              <Tracked category={category} />
+            </Box>
           )}
+          <Box
+            role="tabpanel"
+            height={height - 76}
+            p={4}
+            hidden={category !== 'human'}
+          >
+            <Human />
+          </Box>
         </Collapse>
         <Collapse in={addNew}>
           {category === 'human' && <ProfileEditing />}
         </Collapse>
       </DialogContent>
-
       <Footer options={footerButtons} role="webhook_footer" />
     </>
   )

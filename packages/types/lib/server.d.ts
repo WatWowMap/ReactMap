@@ -23,6 +23,7 @@ import NestSubmission = require('server/src/models/NestSubmission')
 import Pokestop = require('server/src/models/Pokestop')
 import { ModelReturn } from './utility'
 import { Profile } from 'passport-discord'
+import { User } from './models'
 
 export interface DbContext {
   isMad: boolean
@@ -44,16 +45,10 @@ export interface DbContext {
   hasShowcaseData: boolean
 }
 
-export interface User {
+export interface ExpressUser extends User {
   perms: Permissions
   valid: boolean
-  id: number
-  discordId?: string
-  username: string
-  telegramId?: string
   avatar: string
-  selectedWebhook?: string
-  strategy?: Strategy
   webhookStrategy?: Strategy
   rmStrategy: string
 }
@@ -171,6 +166,7 @@ export interface Permissions {
   backups: boolean
   routes: boolean
   blocked: boolean
+  admin: boolean
   blockedGuildNames: string[]
   scanner: string[]
   areaRestrictions: string[]

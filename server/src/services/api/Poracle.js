@@ -348,7 +348,17 @@ class PoracleAPI {
           )
         : APIS.profiles(userId),
       method,
-      method === 'POST' && action !== 'copy' ? data : undefined,
+      method === 'POST' && action !== 'copy'
+        ? {
+            ...data,
+            active_hours:
+              data?.active_hours?.map(({ day, mins, hours }) => ({
+                day,
+                mins: mins.padStart(2, '0'),
+                hours: hours.padStart(2, '0'),
+              })) || [],
+          }
+        : undefined,
     )
     if (method === 'GET') {
       return { profile: PoracleAPI.#processProfiles(first.profile) }
@@ -374,11 +384,11 @@ class PoracleAPI {
               .sort((a, b) =>
                 a.day === b.day
                   ? a.hours === b.hours
-                    ? a.mins.localeCompare(b.mins)
-                    : a.hours.localeCompare(b.hours)
+                    ? a.mins.toString().localeCompare(b.mins.toString())
+                    : a.hours.toString().localeCompare(b.hours.toString())
                   : a.day - b.day,
               )
-              .map((x, id) => ({ ...x, id }))
+              .map((x, id) => ({ ...x, id: `${profile.uid}_${id}` }))
           : [],
     }))
   }
@@ -427,6 +437,10 @@ class PoracleAPI {
         )
     const second = await this.#sendRequest(APIS.tracking(userId, main))
 
+    const sortBy = this.ui[category]?.sortProp
+    if (sortBy) {
+      second[category].sort((a, b) => a[sortBy] - b[sortBy])
+    }
     return { ...first, ...second }
   }
 
@@ -441,14 +455,6 @@ class PoracleAPI {
    */
   async api(userId, category, method = 'GET', data = null) {
     const [main, action] = PoracleAPI.#split(category)
-    log.warn(HELPERS.webhooks, HELPERS.api, {
-      main,
-      action,
-      userId,
-      category,
-      method,
-      data,
-    })
     switch (main) {
       case 'start':
       case 'stop':

@@ -1,49 +1,95 @@
 import React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import {
-  FormControl,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
-} from '@mui/material'
-
+import Typography from '@mui/material/Typography'
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import FormControl from '@mui/material/FormControl'
+import FormGroup from '@mui/material/FormGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Checkbox from '@mui/material/Checkbox'
 import { useTranslation } from 'react-i18next'
 
+import { useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
-export default function FilterOptions({
-  name,
-  options,
-  handleChange,
-  expanded,
-  handleAccordion,
-  userSelection,
-}) {
+const handleChange = (category, subCategory) => (event) => {
+  Utility.analytics(
+    'Filtering Options',
+    `New Value: ${event.target.checked}`,
+    `Category: ${category} Name: ${subCategory}.${event.target.name}`,
+  )
+  useStore.setState((prev) => ({
+    menus: {
+      ...prev.menus,
+      [category]: {
+        ...prev.menus[category],
+        filters: {
+          ...prev.menus[category].filters,
+          [subCategory]: {
+            ...prev.menus[category].filters[subCategory],
+            [event.target.name]: event.target.checked,
+          },
+        },
+      },
+    },
+  }))
+}
+
+const handleAccordion = (category, subCategory) => (event, isExpanded) => {
+  useStore.setState((prev) => ({
+    advMenu: { ...prev.advMenu, [category]: isExpanded ? subCategory : false },
+  }))
+}
+
+export function OptionCheckbox({ category, subCategory, option }) {
   const { t } = useTranslation()
+
+  const checked = useStore(
+    (state) => state.menus[category].filters[subCategory][option] || false,
+  )
+
   return (
-    <Accordion expanded={expanded === name} onChange={handleAccordion(name)}>
+    <FormControlLabel
+      control={
+        <Checkbox
+          checked={checked}
+          onChange={handleChange(category, subCategory)}
+          name={option}
+        />
+      }
+      value={option}
+      label={t(Utility.camelToSnake(option))}
+    />
+  )
+}
+
+const OptionsCheckboxMemo = React.memo(OptionCheckbox, () => true)
+
+export default function OptionsGroup({ category, subCategory }) {
+  const { t } = useTranslation()
+  const options = useStatic((s) =>
+    Object.keys(s.menus[category].filters[subCategory] || {}),
+  )
+  const expanded = useStore((s) => s.advMenu[category] === subCategory)
+
+  return (
+    <Accordion
+      expanded={expanded}
+      onChange={handleAccordion(category, subCategory)}
+    >
       <AccordionSummary expandIcon={<ExpandMore />}>
-        <Typography>{t(Utility.camelToSnake(name))}</Typography>
+        <Typography>{t(Utility.camelToSnake(subCategory))}</Typography>
       </AccordionSummary>
       <AccordionDetails>
         <FormControl component="fieldset">
           <FormGroup>
-            {Object.keys(options).map((key) => (
-              <FormControlLabel
-                key={`${name}-${key}`}
-                control={
-                  <Checkbox
-                    checked={userSelection[key]}
-                    onChange={(e) => handleChange(name, e)}
-                    name={key}
-                  />
-                }
-                value={key}
-                label={t(Utility.camelToSnake(key))}
+            {options.map((option) => (
+              <OptionsCheckboxMemo
+                key={`${category}-${subCategory}-${option}`}
+                category={category}
+                subCategory={subCategory}
+                option={option}
               />
             ))}
           </FormGroup>

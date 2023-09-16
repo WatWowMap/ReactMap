@@ -9,13 +9,12 @@ import {
   Checkbox,
   Box,
 } from '@mui/material'
-import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import Poracle from '@services/Poracle'
 import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 import { useStatic } from '@hooks/useStore'
-import apolloClient, { apolloCache } from '@services/apollo'
+import { apolloClient, apolloCache } from '@services/apollo'
 import * as webhookNodes from '@services/queries/webhook'
 
 import { useWebhookStore, setSelected } from '../store'
@@ -24,7 +23,6 @@ export default function TrackedTile({ index }) {
   const [editDialog, setEditDialog] = useState(false)
 
   const isMobile = useStatic((s) => s.isMobile)
-  const { t } = useTranslation()
   const category = useWebhookStore((s) => s.category)
   const item = useWebhookStore((s) => s[category][index])
   const selected = useWebhookStore((s) => (item ? s.selected[item.uid] : false))
@@ -80,15 +78,20 @@ export default function TrackedTile({ index }) {
       </Grid>
       <Grid item xs={6} sm={8} md={9}>
         <Typography variant="caption">
-          {item.description || Poracle.generateDescription(item, category, t)}
+          {item.description || Poracle.generateDescription(item, category)}
         </Typography>
       </Grid>
       <Grid item xs={4} sm={3} md={2} style={{ textAlign: 'right' }}>
-        <IconButton size="small" onClick={() => setEditDialog(true)}>
+        <IconButton
+          size="small"
+          disabled={!item.uid}
+          onClick={() => setEditDialog(true)}
+        >
           <Edit />
         </IconButton>
         <IconButton
           size="small"
+          disabled={!item.uid}
           onClick={() => {
             useWebhookStore.setState((prev) => ({
               [category]: prev[category].filter((x) => x.uid !== item.uid),
@@ -115,6 +118,7 @@ export default function TrackedTile({ index }) {
         </IconButton>
         <Checkbox
           size="small"
+          disabled={!item.uid}
           checked={!!selected}
           onChange={setSelected(item.uid)}
           color="secondary"
