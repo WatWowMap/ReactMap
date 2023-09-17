@@ -13,7 +13,7 @@ const { log, HELPERS } = require('@rm/logger')
  * @param {Date} date
  * @returns
  */
-function getEpoch(date) {
+function getEpoch(date = new Date()) {
   return Math.floor(date.getTime() / 1000)
 }
 
