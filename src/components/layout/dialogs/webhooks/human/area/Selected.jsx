@@ -5,7 +5,7 @@ import { Trans } from 'react-i18next'
 import { useWebhookStore } from '../../store'
 
 export const Selected = () => {
-  const selectedAreas = useWebhookStore((s) => s.selectedAreas)
+  const selectedAreas = useWebhookStore((s) => s.human.area || [])
   return (
     <Typography variant="h6" align="center">
       <Trans i18nKey="selected_areas" count={selectedAreas.length}>
