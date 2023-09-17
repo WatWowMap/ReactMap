@@ -15,7 +15,7 @@ import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 import Footer from '@components/layout/general/Footer'
 import Header from '@components/layout/general/Header'
-import apolloClient from '@services/apollo'
+import { apolloClient } from '@services/apollo'
 import Query from '@services/Query'
 import { allProfiles } from '@services/queries/webhook'
 
@@ -35,7 +35,7 @@ export default function Manage() {
   const category = useWebhookStore((s) => s.category)
   const name = useWebhookStore((s) => s.context.name || '')
 
-  const feedbackLink = useStatic((s) => s.config.map.feedbackLink)
+  const feedbackLink = useStatic((s) => s.config.links.feedbackLink)
 
   const filters = useGenFullFilters()
 

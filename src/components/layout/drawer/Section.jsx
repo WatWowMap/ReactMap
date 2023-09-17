@@ -30,7 +30,6 @@ export default function DrawerSection({ category, value }) {
 
   const sidebar = useStore((s) => s.sidebar)
   const staticUserSettings = useStatic((s) => s.userSettings)
-  const { config } = useStatic.getState()
 
   const handleChange = (panel) => (_, isExpanded) =>
     useStore.setState({ sidebar: isExpanded ? panel : false })
@@ -55,19 +54,12 @@ export default function DrawerSection({ category, value }) {
           ) : category === 'settings' ? (
             <SettingsMenu />
           ) : (
-            Object.entries(value).map(([subItem, subValue]) =>
-              category === 'scanAreas' &&
-              config.map.noScanAreasOverlay ? null : (
-                <React.Fragment key={`${category}-${subItem}`}>
-                  <ItemToggle category={category} subItem={subItem} />
-                  <Extras
-                    category={category}
-                    subItem={subItem}
-                    data={subValue}
-                  />
-                </React.Fragment>
-              ),
-            )
+            Object.entries(value).map(([subItem, subValue]) => (
+              <React.Fragment key={`${category}-${subItem}`}>
+                <ItemToggle category={category} subItem={subItem} />
+                <Extras category={category} subItem={subItem} data={subValue} />
+              </React.Fragment>
+            ))
           )}
           {staticUserSettings[category] && (
             <ListItemButton onClick={toggleDialog(true, category, 'options')}>

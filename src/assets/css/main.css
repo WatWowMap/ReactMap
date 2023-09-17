@@ -427,3 +427,9 @@ input[type='time']::-webkit-calendar-picker-indicator {
 .closed {
   transform: rotate(0deg);
 }
+
+.round-tt {
+  padding: 2px !important;
+  min-width: 25px !important;
+  border-radius: 50% !important;
+}

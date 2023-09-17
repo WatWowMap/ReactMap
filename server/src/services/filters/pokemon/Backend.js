@@ -335,12 +335,12 @@ module.exports = class PkmnBackend {
 
   /**
    * @param {import("@rm/types").Pokemon} pokemon
-   * @param {number} safeTs
+   * @param {number} [ts]
    * @returns {{ cleanPvp: { [key in typeof LEAGUES[number]]?: number[] }, bestPvp: number }}
    */
-  buildPvp(pokemon, safeTs = Math.floor(Date.now() / 1000)) {
+  buildPvp(pokemon, ts = Math.floor(Date.now() / 1000)) {
     const parsed = pvpConfig.reactMapHandlesPvp
-      ? Pvp.resultWithCache(pokemon, safeTs)
+      ? Pvp.resultWithCache(pokemon, ts)
       : getParsedPvp(pokemon)
     const cleanPvp = {}
     let bestPvp = 4096

@@ -42,7 +42,7 @@ async function scannerApi(
         })) || []
 
   try {
-    const headers = {}
+    const headers = Object.fromEntries(config.scanner.backendConfig.headers)
     switch (config.scanner.backendConfig.platform) {
       case 'mad':
       case 'rdm':

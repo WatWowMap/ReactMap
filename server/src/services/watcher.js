@@ -36,14 +36,19 @@ const handle = (event, rawFile, domain) => {
         const domainKey = domain.replaceAll('.', '_')
         if (config.multiDomainsObj[domainKey]?.[rawFile]) {
           log.info(HELPERS.config, `[${event}]`, rawFile, domain)
-          config.multiDomainsObj[domainKey][rawFile] = checkConfigJsons(
-            rawFile,
-            domain,
+          config.multiDomainsObj[domainKey][rawFile] = config.util.extendDeep(
+            {},
+            config.multiDomainsObj[domainKey][rawFile],
+            checkConfigJsons(rawFile, domain),
           )
         }
       } else {
         log.info(HELPERS.config, `[${event}]`, rawFile)
-        config.map[rawFile] = checkConfigJsons(rawFile)
+        config.map[rawFile] = config.util.extendDeep(
+          {},
+          config.map[rawFile],
+          checkConfigJsons(rawFile),
+        )
       }
       break
     default:

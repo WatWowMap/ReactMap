@@ -1,5 +1,5 @@
-/* eslint-disable no-nested-ternary */
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import { Collapse, Grid, IconButton, Typography } from '@mui/material'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 
@@ -8,6 +8,20 @@ import { useStore } from '@hooks/useStore'
 import Timer from './Timer'
 import NameTT from './NameTT'
 
+/**
+ *
+ * @param {{
+ *  expireTime: number
+ *  icon?: string | React.ReactNode
+ *  until?: boolean
+ *  size?: number
+ *  tt?: string[] | string
+ *  expandKey?: string
+ *  caption?: string
+ *  children?: React.ReactNode
+ * }} param0
+ * @returns
+ */
 export default function TimeTile({
   expireTime,
   icon,

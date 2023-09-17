@@ -14,7 +14,7 @@ import Utility from '@services/Utility'
 import Poracle from '@services/Poracle'
 import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
 import { useStatic } from '@hooks/useStore'
-import apolloClient, { apolloCache } from '@services/apollo'
+import { apolloClient, apolloCache } from '@services/apollo'
 import * as webhookNodes from '@services/queries/webhook'
 
 import { useWebhookStore, setSelected } from '../store'

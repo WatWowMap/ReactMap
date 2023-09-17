@@ -1,3 +1,4 @@
+// @ts-check
 import React, { useState, useEffect } from 'react'
 import MoreVert from '@mui/icons-material/MoreVert'
 import {
@@ -28,20 +29,30 @@ const getColor = (timeSince) => {
   return color
 }
 
-export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
+/**
+ *
+ * @param {import('@rm/types').Nest & {
+ *  recent: boolean,
+ *  iconUrl: string
+ * }} props
+ * @returns
+ */
+export default function NestPopup({
+  recent,
+  iconUrl,
+  pokemon_id,
+  pokemon_form,
+  id,
+  name = '',
+  updated = 0,
+  pokemon_avg = 0,
+  submitted_by = '',
+}) {
   const { t } = useTranslation()
   const { perms, loggedIn } = useStatic((s) => s.auth)
 
   const [parkName, setParkName] = useState(true)
-  const [anchorEl, setAnchorEl] = useState(false)
-
-  const {
-    id = '0',
-    name = '',
-    updated = 0,
-    pokemon_avg = 0,
-    submitted_by = '',
-  } = nest
+  const [anchorEl, setAnchorEl] = useState(null)
 
   const lastUpdated = Utility.getTimeUntil(new Date(updated * 1000))
 
@@ -55,12 +66,12 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
 
   const handleHide = () => {
     setAnchorEl(null)
-    useStatic.setState((prev) => ({ hideList: [...prev.hideList, id] }))
+    useStatic.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
   const handleExclude = () => {
     setAnchorEl(null)
-    const key = `${pokemon.pokemon_id}-${pokemon.pokemon_form}`
+    const key = `${pokemon_id}-${pokemon_form}`
     useStore.setState((prev) => ({
       filters: {
         ...prev.filters,
@@ -84,11 +95,11 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
     { name: 'exclude', action: handleExclude },
   ]
   useEffect(() => {
-    Utility.analytics('Popup', `Name: ${name} Pokemon: ${pokemon}`, 'Nest')
+    Utility.analytics('Popup', `Name: ${name} Pokemon: ${pokemon_id}`, 'Nest')
   }, [])
 
   return (
-    <ErrorBoundary noRefresh style={{}} variant="h5">
+    <ErrorBoundary noRefresh variant="h5">
       <Grid
         container
         justifyContent="center"
@@ -124,7 +135,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
         <Menu
           anchorEl={anchorEl}
           keepMounted
-          open={Boolean(anchorEl)}
+          open={!!anchorEl}
           onClose={handleClose}
           PaperProps={{
             style: {
@@ -149,9 +160,7 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
             }}
           />
           <br />
-          <Typography variant="caption">
-            {t(`poke_${pokemon.pokemon_id}`)}
-          </Typography>
+          <Typography variant="caption">{t(`poke_${pokemon_id}`)}</Typography>
         </Grid>
         <Grid item xs={6} style={{ textAlign: 'center' }}>
           <Typography variant="subtitle2">{t('last_updated')}</Typography>
@@ -190,13 +199,15 @@ export default function NestPopup({ nest, iconUrl, pokemon, recent }) {
             color="secondary"
             variant="contained"
             disabled={!perms.nestSubmissions || !loggedIn}
-            onClick={() => useLayoutStore.setState({ nestSubmissions: id })}
+            onClick={() =>
+              useLayoutStore.setState({ nestSubmissions: `${id}` })
+            }
           >
             {t('submit_nest_name')}
           </Button>
         </Grid>
       </Grid>
-      <NestSubmission {...nest} />
+      <NestSubmission id={id} name={name} />
     </ErrorBoundary>
   )
 }

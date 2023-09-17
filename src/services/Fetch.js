@@ -1,6 +1,10 @@
 /* eslint-disable no-console */
 
 export default class Fetch {
+  /**
+   *
+   * @returns {Promise<ReturnType<typeof import('../../server/src/services/functions/getServerSettings')>>}
+   */
   static async getSettings() {
     try {
       const response = await fetch('/api/settings')
@@ -8,7 +12,7 @@ export default class Fetch {
         throw new Error(`${response.status} (${response.statusText})`)
       }
       const body = await response.json()
-      return body.serverSettings
+      return body
     } catch (error) {
       console.error(
         error.message,

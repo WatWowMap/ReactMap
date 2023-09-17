@@ -1,51 +1,60 @@
-import React from 'react'
-import TypeTile from './Type'
-import PlacementTile from './Placement'
-import RingTile from './Ring'
+// @ts-check
+import * as React from 'react'
 
-export default function SubmissionCellTile({
-  item,
-  tileStyle,
-  config,
-  zoom,
-  userSettings,
-}) {
-  const zoomLimit = zoom >= config.submissionZoom
+import { useStatic, useStore } from '@hooks/useStore'
+
+import Level14Tile from './S14Cell'
+import Level17Tile from './S17Cell'
+import PoITile from './PoI'
+
+/**
+ *
+ * @param {import('@rm/types').SubmissionCell} props
+ * @returns
+ */
+const SubmissionCellTile = ({ level14Cells, level17Cells, pois }) => {
+  const poiColor = useStore((s) => s.userSettings.wayfarer.poiColor)
+  const cellBlocked = useStore((s) => s.userSettings.wayfarer.cellBlocked)
+  const oneStopTillNext = useStore(
+    (s) => s.userSettings.wayfarer.oneStopTillNext,
+  )
+  const twoStopsTillNext = useStore(
+    (s) => s.userSettings.wayfarer.twoStopsTillNext,
+  )
+  const noMoreGyms = useStore((s) => s.userSettings.wayfarer.noMoreGyms)
+  const darkStyle = useStatic((s) => s.tileStyle === 'dark')
+  const cellColor = useStore((s) =>
+    darkStyle
+      ? s.userSettings.wayfarer.darkMapBorder
+      : s.userSettings.wayfarer.lightMapBorder,
+  )
   return (
-    zoom >= config.submissionZoom - 1 && (
-      <>
-        {item?.placementCells?.rings &&
-          zoomLimit &&
-          item.placementCells.rings.map((ring) => (
-            <RingTile
-              key={ring.id}
-              ring={ring}
-              zoom={zoomLimit}
-              userSettings={userSettings}
-            />
-          ))}
-        {item?.placementCells?.cells &&
-          zoomLimit &&
-          item.placementCells.cells.map((cell) => (
-            <PlacementTile
-              key={`pc${cell.id}-${cell.polygon[0]}-${cell.polygon[1]}-${cell.polygon[2]}-${cell.polygon[3]}`}
-              cell={cell}
-              tileStyle={tileStyle}
-              zoom={zoomLimit}
-              userSettings={userSettings}
-            />
-          ))}
-        {item?.typeCells &&
-          item.typeCells.map((cell) => (
-            <TypeTile
-              key={`tc${cell.id}-${cell.polygon[0]}-${cell.polygon[1]}-${cell.polygon[2]}-${cell.polygon[3]}`}
-              cell={cell}
-              tileStyle={tileStyle}
-              zoom={zoom >= config.submissionZoom - 1}
-              userSettings={userSettings}
-            />
-          ))}
-      </>
-    )
+    <>
+      {pois?.map((ring) => (
+        <PoITile key={ring.id} {...ring} color={poiColor} />
+      ))}
+      {level17Cells?.map((cell) => (
+        <Level17Tile
+          key={`pc${cell.id}-${cell.polygon.join('-')}`}
+          cellColor={cellColor}
+          blockedColor={cellBlocked}
+          {...cell}
+        />
+      ))}
+      {level14Cells?.map((cell) => (
+        <Level14Tile
+          key={`tc${cell.id}-${cell.polygon.join('-')}`}
+          cellColor={cellColor}
+          oneStopTillNext={oneStopTillNext}
+          twoStopsTillNext={twoStopsTillNext}
+          noMoreGyms={noMoreGyms}
+          {...cell}
+        />
+      ))}
+    </>
   )
 }
+
+const MemoSubmissionCell = React.memo(SubmissionCellTile)
+
+export default MemoSubmissionCell

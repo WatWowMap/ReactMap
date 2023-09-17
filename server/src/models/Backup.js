@@ -93,7 +93,7 @@ class Backup extends Model {
   static async update(backup, userId) {
     if (
       jsonSize(backup.data) >
-      config.getSafe('database.settings.userBackupLimits')
+      config.getSafe('database.settings.userBackupSizeLimit')
     )
       throw new Error('Data too large')
     return (

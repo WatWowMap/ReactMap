@@ -5,6 +5,7 @@ import NestSubmissionModel = require('server/src/models/NestSubmission')
 import GymBadgeModel = require('server/src/models/Badge')
 import type { FullModel } from './utility'
 import type { Permissions } from './server'
+import { Strategy } from './general'
 
 export interface Backup {
   id: number

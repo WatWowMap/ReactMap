@@ -1,27 +1,40 @@
+// @ts-check
 import { divIcon } from 'leaflet'
+import { useStatic } from '@hooks/useStore'
 
-export default function nestMarker(
+/**
+ *
+ * @param {{
+ *  iconUrl: string,
+ *  pokemonId: number,
+ *  formId?: number,
+ *  iconSize: number,
+ *  recent: boolean,
+ * }} props
+ * @returns
+ */
+export default function nestMarker({
   iconUrl,
-  nest,
-  pokemon,
-  filters,
-  Icons,
+  pokemonId,
+  formId,
+  iconSize,
   recent,
-) {
-  const { types } = pokemon
-  const filterId = `${nest.pokemon_id}-${nest.pokemon_form}`
-  const size = Icons.getSize('nest', filters.filter[filterId])
+}) {
+  const { Icons, masterfile } = useStatic.getState()
+  const { types } = masterfile.pokemon[pokemonId]?.forms?.[formId]?.types
+    ? masterfile.pokemon[pokemonId].forms[formId]
+    : masterfile.pokemon[pokemonId]
   const [
     { offsetX, offsetY, popupX, popupY, sizeMultiplier, nestMonSizeMulti = 1 },
   ] = Icons.getModifiers('nest')
   const opacity = recent ? 1 : 0.5
 
   return divIcon({
-    iconSize: [size * sizeMultiplier, size * sizeMultiplier],
-    iconAnchor: [(size / 2) * offsetX, (size / 0.75) * offsetY],
+    iconSize: [iconSize * sizeMultiplier, iconSize * sizeMultiplier],
+    iconAnchor: [(iconSize / 2) * offsetX, (iconSize / 0.75) * offsetY],
     popupAnchor: [
       0 + popupX - offsetX * 0.6 + popupX,
-      -8 - size + popupY - offsetY * 0.6 + popupY,
+      -8 - iconSize + popupY - offsetY * 0.6 + popupY,
     ],
     className: 'nest-marker',
     html: /* html */ `
@@ -32,7 +45,7 @@ export default function nestMarker(
               alt="${types[0]}"
               class="${types.length === 2 ? 'type-img-1' : 'type-img-single'}"
               style="
-                width: ${size}px; 
+                width: ${iconSize}px; 
                 height: auto; 
                 opacity: ${opacity};
               "
@@ -42,7 +55,7 @@ export default function nestMarker(
               alt="${types[1]}"
               class="type-img-2"
               style="
-                width: ${size}px; 
+                width: ${iconSize}px; 
                 height: auto; 
                 opacity: ${types.length === 2 ? opacity : 0};
               "
@@ -50,10 +63,10 @@ export default function nestMarker(
         </span>
         <img
           src="${iconUrl}"
-          alt="${nest.pokemon_id}"
+          alt="${pokemonId}"
           style="
-            width: ${size * nestMonSizeMulti}px; 
-            height: ${size * nestMonSizeMulti}px; 
+            width: ${iconSize * nestMonSizeMulti}px; 
+            height: ${iconSize * nestMonSizeMulti}px; 
             bottom: ${offsetY - 1}px; 
             left: ${offsetX - 1}px; 
             opacity: ${opacity};

@@ -11,7 +11,11 @@ import { persist } from 'zustand/middleware'
  *   zoom: number,
  *   sidebar: string,
  *   selectedWebhook: string,
- *   settings: { localeSelection: keyof typeof import('@assets/mui/theme').LOCALE_MAP, navigationControls: 'react' | 'leaflet' }
+ *   settings: {
+ *    navigationControls: 'react' | 'leaflet'
+ *    navigation: string,
+ *    tileServers: string
+ *   },
  *   motdIndex: number
  *   tutorial: boolean,
  *   searchTab: string,
@@ -19,6 +23,8 @@ import { persist } from 'zustand/middleware'
  *   filters: object,
  *   scannerCooldown: number
  *   icons: Record<string, string>
+ *   userSettings: Record<string, any>
+ *   setAreas: (areas: string | string[], validAreas: string[], unselectAll?: boolean) => void,
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
@@ -26,9 +32,12 @@ export const useStore = create(
   persist(
     (set, get) => ({
       darkMode: !!window?.matchMedia('(prefers-color-scheme: dark)').matches,
-      location: undefined,
-      zoom: undefined,
-      filters: undefined,
+      location: [
+        CONFIG.map.general.startLat || 0,
+        CONFIG.map.general.startLon || 0,
+      ],
+      zoom: CONFIG.map.general.startZoom,
+      filters: {},
       setFilters: (filters) => set({ filters }),
       setAreas: (areas = [], validAreas = [], unselectAll = false) => {
         const { filters } = get()
@@ -42,7 +51,6 @@ export const useStore = create(
             existing.add(area)
           }
         })
-
         if (filters?.scanAreas?.filter?.areas) {
           set({
             filters: {
@@ -61,11 +69,11 @@ export const useStore = create(
         }
       },
       settings: {},
-      userSettings: undefined,
+      userSettings: {},
       icons: {},
-      menus: undefined,
+      menus: {},
       tutorial: true,
-      sidebar: undefined,
+      sidebar: '',
       advMenu: {
         pokemon: 'others',
         gyms: 'categories',
@@ -106,13 +114,36 @@ export const useStore = create(
  *   active: boolean,
  *   searchLoading: boolean,
  *   Icons: InstanceType<typeof import("../services/Icons").default>,
- *   config: object,
- *   auth: object,
+ *   config: import('@rm/types').Config['map'],
+ *   ui: object
+ *   auth: { perms: Partial<import('@rm/types').Permissions>, loggedIn: boolean, methods: string[], strategy: import('@rm/types').Strategy | '' },
  *   filters: object,
- *   masterfile: { invasions: object }
+ *   masterfile: import('@rm/types').Masterfile
+ *   polling: Record<string, number>
+ *   gymValidDataLimit: number
  *   settings: Record<string, any>
  *   userSettings: Record<string, any>
  *   clientError: string,
+ *   map: import('leaflet').Map | null,
+ *   timeOfDay: 'day' | 'night' | 'dusk' | 'dawn',
+ *   hideList: Set<string | number>,
+ *   excludeList: string[],
+ *   timerList: string[],
+ *   tileStyle: 'light' | 'dark',
+ *   theme: {
+ *     primary: string,
+ *     secondary: string,
+ *   },
+ *   available: {
+ *     gyms: string[],
+ *     pokemon: string[],
+ *     pokestops: string[],
+ *     nests: string[],
+ *   }
+ *   manualParams: {
+ *     category: string,
+ *     id: number | string,
+ *  },
  * }} UseStatic
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
  */
@@ -121,7 +152,15 @@ export const useStatic = create((set) => ({
   isTablet: false,
   active: true,
   searchLoading: false,
+  tileStyle: 'light',
   clientError: '',
+  map: null,
+  theme: {
+    primary: '#ff5722',
+    secondary: '#00b0ff',
+  },
+  polling: {},
+  gymValidDataLimit: 0,
   auth: {
     strategy: '',
     discordId: '',
@@ -139,12 +178,13 @@ export const useStatic = create((set) => ({
     },
     userBackupLimits: 0,
   },
-  config: undefined,
+  config: {},
   filters: {},
   menus: undefined,
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,
+  holidayEffects: [],
   available: {
     gyms: [],
     pokemon: [],
@@ -160,7 +200,7 @@ export const useStatic = create((set) => ({
     questRewardTypes: {},
     types: {},
   },
-  hideList: [],
+  hideList: new Set(),
   excludeList: [],
   timerList: [],
   webhookAlert: {
@@ -171,12 +211,15 @@ export const useStatic = create((set) => ({
   setWebhookAlert: (webhookAlert) => set({ webhookAlert }),
   timeOfDay: 'day',
   extraUserFields: [],
-  manualParams: { id: '' },
+  manualParams: {
+    category: '',
+    id: '',
+  },
 }))
 
 // /**
 //  * @typedef {{
-//  *  nestSubmissions: string,
+//  *  nestSubmissions: string | number,
 //  *  motd: boolean,
 //  *  donorPage: boolean,
 //  *  search: boolean,
@@ -281,3 +324,11 @@ export const useScanStore = create((set) => ({
   setScanMode: (mode, nextMode = '') => set({ [mode]: nextMode }),
   setScanSize: (mode, size) => set({ [mode]: size }),
 }))
+
+/**
+ * @template {string | number | boolean} T
+ * @param {T[]} p
+ * @param {T[]} n
+ * @returns {boolean}
+ */
+export const basicEqualFn = (p, n) => p.every((v, i) => v === n[i])

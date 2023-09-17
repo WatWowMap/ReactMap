@@ -8,34 +8,35 @@ const {
 const getPolyVector = require('./getPolyVector')
 
 /**
- * @typedef {{ id: string, level: number, count: number, count_pokestops: number, count_gyms: number, polygon: number[][] }} ReturnObj
- * @param {{ minLat: number, maxLat: number, minLon: number, maxLon: number }} bounds
+ *
+ * @param {import('@rm/types').Bounds & { filters: { onlyS14Cells: boolean }}} filters
  * @param {import("@rm/types").Pokestop[]} pokestops
  * @param {import("@rm/types").Gym[]} gyms
- * @returns {ReturnObj[]}
+ * @returns {import('@rm/types').Level14Cell[]}
  */
-function getTypeCells(bounds, pokestops, gyms) {
+function getTypeCells(filters, pokestops, gyms) {
+  if (!filters.filters.onlyS14Cells) return []
+
   const regionCoverer = new S2RegionCoverer()
   regionCoverer.setMinLevel(14)
   regionCoverer.setMaxLevel(14)
   const region = S2LatLngRect.fromLatLng(
-    S2LatLng.fromDegrees(bounds.minLat, bounds.minLon),
-    S2LatLng.fromDegrees(bounds.maxLat, bounds.maxLon),
+    S2LatLng.fromDegrees(filters.minLat, filters.minLon),
+    S2LatLng.fromDegrees(filters.maxLat, filters.maxLon),
   )
-  /** @type {Record<string, ReturnObj>} */
+  /** @type {Record<string, import('@rm/types').Level14Cell>} */
   const indexedCells = {}
   const coveringCells = regionCoverer.getCoveringCells(region)
   for (let i = 0; i < coveringCells.length; i += 1) {
     const cell = coveringCells[i]
-    const { poly } = getPolyVector(cell.id)
+    const { polygon } = getPolyVector(cell.id)
     const cellId = cell.id.toString()
     indexedCells[cellId] = {
       id: cellId,
-      level: 14,
-      count: 0,
+      // level: 14,
       count_pokestops: 0,
       count_gyms: 0,
-      polygon: poly,
+      polygon,
     }
   }
   for (let i = 0; i < gyms.length; i += 1) {
@@ -47,7 +48,6 @@ function getTypeCells(bounds, pokestops, gyms) {
     const cell = indexedCells[cellId]
     if (cell) {
       cell.count_gyms += 1
-      cell.count += 1
     }
   }
   for (let i = 0; i < pokestops.length; i += 1) {
@@ -59,7 +59,6 @@ function getTypeCells(bounds, pokestops, gyms) {
     const cell = indexedCells[cellId]
     if (cell) {
       cell.count_pokestops += 1
-      cell.count += 1
     }
   }
   return Object.values(indexedCells)

@@ -1,8 +1,7 @@
-const {
-  database: {
-    settings: { userTableName, backupTableName },
-  },
-} = require('@rm/config')
+const config = require('@rm/config')
+
+const userTableName = config.getSafe('database.settings.userTableName')
+const backupTableName = config.getSafe('database.settings.backupTableName')
 
 /**
  * @param {import("knex").Knex} knex

@@ -1,5 +1,7 @@
 import * as React from 'react'
 
+import { useStatic } from '@hooks/useStore'
+
 import FloatingBtn from './FloatingBtn'
 import Sidebar from './drawer/Drawer'
 import FilterMenu from './dialogs/filters/FilterMenu'
@@ -17,6 +19,8 @@ import ClientError from './dialogs/ClientError'
 import { WebhookNotification } from './dialogs/webhooks/Notification'
 
 export default function Nav() {
+  const iconsIsReady = useStatic((s) => !!s.Icons)
+  if (!iconsIsReady) return null
   return (
     <>
       <Sidebar />

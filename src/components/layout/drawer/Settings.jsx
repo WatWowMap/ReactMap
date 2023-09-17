@@ -53,10 +53,12 @@ const ICON_MAP = {
 
 export default function Settings() {
   const { t } = useTranslation()
-  const { config } = useStatic.getState()
 
   const Icons = useStatic((s) => s.Icons)
   const staticSettings = useStatic((s) => s.settings)
+  const separateDrawerActions = useStatic(
+    (s) => s.config.general.separateDrawerActions,
+  )
 
   const settings = useStore((s) => s.settings)
   const icons = useStore((s) => s.icons)
@@ -70,19 +72,19 @@ export default function Settings() {
           <FCSelect
             key={setting}
             name={setting}
-            value={config[setting][settings[setting]]?.name || ''}
+            value={staticSettings[setting][settings[setting]]?.name || ''}
             label={t(Utility.camelToSnake(setting))}
             onChange={({ target }) => {
               useStore.setState((prev) => ({
                 settings: {
                   ...prev.settings,
-                  [target.name]: config[target.name][target.value].name,
+                  [target.name]: staticSettings[target.name][target.value].name,
                 },
               }))
             }}
             icon={<Icon />}
           >
-            {Object.keys(config[setting]).map((option) => (
+            {Object.keys(staticSettings[setting]).map((option) => (
               <MenuItem key={option} value={option}>
                 {t(
                   `${Utility.camelToSnake(setting)}_${option.toLowerCase()}`,
@@ -138,7 +140,7 @@ export default function Settings() {
           <Brightness7Icon />
         </ListItemIcon>
       </BoolToggle>
-      {!config.map?.separateDrawerActions && (
+      {!separateDrawerActions && (
         <>
           <Divider style={{ margin: '10px 0' }} />
           <DrawerActions />

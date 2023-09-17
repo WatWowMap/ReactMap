@@ -9,9 +9,7 @@ import data from './data'
 export default function TutPopup({ isMobile }) {
   const { t } = useTranslation()
   const Icons = useStatic((state) => state.Icons)
-  const {
-    map: { startLat, startLon },
-  } = useStatic((state) => state.config)
+  const { startLat, startLon } = useStatic((state) => state.config.general)
   const ts = Math.floor(new Date().getTime() / 1000)
   const size = isMobile ? 'subtitle2' : 'subtitle1'
 
