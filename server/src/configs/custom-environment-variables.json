@@ -1177,6 +1177,10 @@
     "backendConfig": {
       "platform": "SCANNER_BACKEND_CONFIG_PLATFORM",
       "apiEndpoint": "SCANNER_BACKEND_CONFIG_API_ENDPOINT",
+      "headers": {
+        "__name": "SCANNER_BACKEND_CONFIG_HEADERS",
+        "__format": "json"
+      },
       "apiUsername": "SCANNER_BACKEND_CONFIG_API_USERNAME",
       "apiPassword": "SCANNER_BACKEND_CONFIG_API_PASSWORD",
       "queueRefreshInterval": {
