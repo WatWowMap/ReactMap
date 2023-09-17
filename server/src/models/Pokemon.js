@@ -233,17 +233,17 @@ class Pokemon extends Model {
       }
     }
 
-    const dnf = mem
+    const filters = mem
       ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
       : []
     if ((perms.iv || perms.pvp) && mem) {
-      dnf.push(...globalFilter.buildApiFilter())
-      if (onlyZeroIv) dnf.push({ iv: [0, 0] })
-      if (onlyHundoIv) dnf.push({ iv: [100, 100] })
+      filters.push(...globalFilter.buildApiFilter())
+      if (onlyZeroIv) filters.push({ iv: [0, 0] })
+      if (onlyHundoIv) filters.push({ iv: [100, 100] })
     }
     /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(
-      mem ? `${mem}/api/pokemon/scan` : null,
+      mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
             min: {
@@ -255,7 +255,7 @@ class Pokemon extends Model {
               longitude: args.maxLon,
             },
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-            dnf,
+            filters,
           })
         : query.limit(queryLimits.pokemon),
       'POST',
@@ -441,14 +441,14 @@ class Pokemon extends Model {
       return []
     }
 
-    const dnf = mem
+    const filters = mem
       ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
       : []
     if ((perms.iv || perms.pvp) && mem)
-      dnf.push(...globalFilter.buildApiFilter())
+      filters.push(...globalFilter.buildApiFilter())
 
     const results = await this.evalQuery(
-      mem ? `${mem}/api/pokemon/scan` : null,
+      mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
             min: {
@@ -460,7 +460,7 @@ class Pokemon extends Model {
               longitude: args.maxLon,
             },
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-            dnf,
+            filters,
           })
         : query,
       'POST',

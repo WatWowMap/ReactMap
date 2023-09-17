@@ -203,11 +203,11 @@ function jsifyIvFilter(filter) {
 /**
  *
  * @param {string} filter
- * @param {import('../../../types').FilterId} pokemon
+ * @param {import('@rm/types').FilterId} pokemon
  * @returns
  */
 function dnfifyIvFilter(filter, pokemon) {
-  const results = /** @type {import('../../../types').DnfFilter[]} */ ([])
+  const results = /** @type {import('@rm/types').DnfFilter[]} */ ([])
   const input = filter.toUpperCase()
   const tokenizer =
     /\s*([|&,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g

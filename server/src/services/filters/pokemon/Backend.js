@@ -157,7 +157,7 @@ module.exports = class PkmnBackend {
   getCallback(global = false) {
     const filter = global ? this.global : this.filter
     if (this.mods.onlyLegacy) {
-      return filter.adv ? jsifyIvFilter(this.global.adv) : () => true
+      return filter.adv ? jsifyIvFilter(filter.adv) : () => true
     }
     const keys = global ? this.globalKeys : this.filterKeys
     return keys.size ||
@@ -308,7 +308,7 @@ module.exports = class PkmnBackend {
         level: this.filterKeys.has('level')
           ? PkmnBackend.ensureSafe(level, 35)
           : undefined,
-        gender: this.filterKeys.has('gender') ? gender : undefined,
+        gender: this.filterKeys.has('gender') ? [gender, gender] : undefined,
       })
     }
     if (this.perms.pvp) {
@@ -323,8 +323,8 @@ module.exports = class PkmnBackend {
         }
       })
     }
-    if (this.filterKeys.has('xxs')) results.push({ pokemon, size: 1 })
-    if (this.filterKeys.has('xxl')) results.push({ pokemon, size: 5 })
+    if (this.filterKeys.has('xxs')) results.push({ pokemon, size: [1, 1] })
+    if (this.filterKeys.has('xxl')) results.push({ pokemon, size: [5, 5] })
     return results
   }
 
