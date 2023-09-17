@@ -581,6 +581,7 @@
     "backendConfig": {
       "platform": "rdm/mad",
       "apiEndpoint": "http://ip:port/api/",
+      "headers": [],
       "apiUsername": "username",
       "apiPassword": "password",
       "queueRefreshInterval": 5,
