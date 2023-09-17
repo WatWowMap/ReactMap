@@ -270,6 +270,10 @@
       "__name": "API_HIDE_OLD_POKESTOPS",
       "__format": "boolean"
     },
+    "routeUpdateLimit": {
+      "__name": "API_ROUTE_UPDATE_LIMIT",
+      "__format": "number"
+    },
     "fetchTimeoutMs": {
       "__name": "API_FETCH_TIMEOUT_MS",
       "__format": "number"
