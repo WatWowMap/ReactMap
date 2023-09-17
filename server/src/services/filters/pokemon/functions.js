@@ -287,7 +287,7 @@ function dnfifyIvFilter(filter, pokemon) {
     lastIndex = tokenizer.lastIndex
   }
   if (expectClause) {
-    return []
+    return [{ pokemon, iv: [-1, 100] }]
   }
   results.push(clause)
   return results
