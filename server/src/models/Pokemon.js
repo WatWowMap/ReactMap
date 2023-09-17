@@ -238,7 +238,7 @@ class Pokemon extends Model {
       : []
     if ((perms.iv || perms.pvp) && mem) {
       const pokemon = Object.keys(filterMap).filter(key => key.includes('-'))
-      pokemon.push('')  // add everything else
+      if (!ctx.onlyLinkGlobal) pokemon.push('') // add everything else
       filters.push(...globalFilter.buildApiFilter(pokemon))
       if (onlyZeroIv) filters.push({ iv: [0, 0] })
       if (onlyHundoIv) filters.push({ iv: [100, 100] })
