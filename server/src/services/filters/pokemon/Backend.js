@@ -260,7 +260,7 @@ module.exports = class PkmnBackend {
    * Build the API filter for Golbat
    * @returns {import('../../../types').DnfFilter[]}
    */
-  buildApiFilter() {
+  buildApiFilter(pokemon = undefined) {
     const {
       enabled: _enabled,
       size: _size,
@@ -276,7 +276,7 @@ module.exports = class PkmnBackend {
       xxl,
       ...rest
     } = this.filter
-    const pokemon = this.id === 'global' ? undefined : [this.id]
+    if (pokemon === undefined && this.id !== 'global') pokemon = [this.id]
     if (this.mods.onlyLegacy) {
       return dnfifyIvFilter(adv, pokemon)
     }

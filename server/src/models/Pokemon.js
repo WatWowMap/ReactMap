@@ -237,7 +237,9 @@ class Pokemon extends Model {
       ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
       : []
     if ((perms.iv || perms.pvp) && mem) {
-      filters.push(...globalFilter.buildApiFilter())
+      const pokemon = Object.keys(filterMap).filter(key => key.includes('-'))
+      pokemon.push('')  // add everything else
+      filters.push(...globalFilter.buildApiFilter(pokemon))
       if (onlyZeroIv) filters.push({ iv: [0, 0] })
       if (onlyHundoIv) filters.push({ iv: [100, 100] })
     }
