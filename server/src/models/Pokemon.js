@@ -240,8 +240,8 @@ class Pokemon extends Model {
       const pokemon = Object.keys(filterMap).filter(key => key.includes('-'))
       if (!ctx.onlyLinkGlobal) pokemon.push('') // add everything else
       filters.push(...globalFilter.buildApiFilter(pokemon))
-      if (onlyZeroIv) filters.push({ iv: [0, 0] })
-      if (onlyHundoIv) filters.push({ iv: [100, 100] })
+      if (onlyZeroIv) filters.push({ iv: [0, 0], pokemon })
+      if (onlyHundoIv) filters.push({ iv: [100, 100], pokemon })
     }
     /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(
