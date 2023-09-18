@@ -672,5 +672,7 @@
   "reported_error": "Dieser Fehler wurde dem Server mit Kennung gemeldet",
   "dark_mode": "Dunkelmodus",
   "load_from_autosave": "Aus Autosave laden",
-  "done": "Erledigt"
+  "done": "Erledigt",
+  "fast": "schnell",
+  "charged": "aufgeladen"
 }
