@@ -42,7 +42,12 @@ async function scannerApi(
         })) || []
 
   try {
-    const headers = Object.fromEntries(config.scanner.backendConfig.headers)
+    const headers = Object.fromEntries(
+      config.scanner.backendConfig.headers.map((header) => [
+        typeof header === 'string' ? header : header.key || header.name,
+        typeof header === 'string' ? header : header.value,
+      ]),
+    )
     switch (config.scanner.backendConfig.platform) {
       case 'mad':
       case 'rdm':
