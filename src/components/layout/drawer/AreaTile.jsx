@@ -45,7 +45,7 @@ export default function AreaTile({
       : 'none'
 
   const nameProp =
-    name || feature.properties.formattedName || feature.properties.name
+    name || feature?.properties?.formattedName || feature?.properties?.name
   return (
     <TableCell
       colSpan={colSpan}
@@ -126,7 +126,7 @@ export default function AreaTile({
           align="center"
           style={{ whiteSpace: 'pre-wrap', flexGrow: 1 }}
         >
-          {feature.properties.reactMapFormat && nameProp
+          {feature?.properties?.reactMapFormat && nameProp
             ? Utility.getProperName(nameProp)
             : nameProp || <>&nbsp;</>}
         </Typography>
