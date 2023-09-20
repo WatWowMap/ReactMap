@@ -61,7 +61,7 @@ export default function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const metaData = useStatic((state) => state.masterfile.pokemon[pokemon_id])
   const Icons = useStatic((state) => state.Icons)
 
-  const userSettings = useStore((s) => s.userSettings)
+  const userSettings = useStore((s) => s.userSettings.pokemon)
   const pokePerms = isTutorial
     ? {
         pvp: true,
