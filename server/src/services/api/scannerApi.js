@@ -42,7 +42,12 @@ async function scannerApi(
         })) || []
 
   try {
-    const headers = Object.fromEntries(config.scanner.backendConfig.headers)
+    const headers = Object.fromEntries(
+      config.scanner.backendConfig.headers.map((header) => [
+        typeof header === 'string' ? header : header.key || header.name,
+        typeof header === 'string' ? header : header.value,
+      ]),
+    )
     switch (config.scanner.backendConfig.platform) {
       case 'mad':
       case 'rdm':
@@ -278,7 +283,9 @@ async function scannerApi(
               fields: [
                 {
                   name: `User History`,
-                  value: `Total Requests: ${updatedCache.requests}\nTotal Coordinates: ${updatedCache.coordinates}`,
+                  value: `Total Requests: ${
+                    updatedCache?.requests || 0
+                  }\nTotal Coordinates: ${updatedCache?.coordinates || 0}`,
                   inline: true,
                 },
                 {
@@ -328,7 +335,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: instance ${
-            config.scanner[category][`${category}Instance`]
+            config.scanner[category]?.[`${category}Instance`]
           } does not exist`,
         )
         return { status: 'error', message: 'scanner_no_instance' }
@@ -336,7 +343,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: instance ${
-            config.scanner[category][`${category}Instance`]
+            config.scanner[category]?.[`${category}Instance`]
           } has no device assigned`,
         )
         return { status: 'error', message: 'scanner_no_device_assigned' }
@@ -344,7 +351,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: device ${
-            config.scanner[category][`${category}Device`]
+            config.scanner[category]?.[`${category}Device`]
           } does not exist`,
         )
         return { status: 'error', message: 'scanner_no_device' }
