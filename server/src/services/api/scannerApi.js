@@ -283,7 +283,9 @@ async function scannerApi(
               fields: [
                 {
                   name: `User History`,
-                  value: `Total Requests: ${updatedCache.requests}\nTotal Coordinates: ${updatedCache.coordinates}`,
+                  value: `Total Requests: ${
+                    updatedCache?.requests || 0
+                  }\nTotal Coordinates: ${updatedCache?.coordinates || 0}`,
                   inline: true,
                 },
                 {
@@ -333,7 +335,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: instance ${
-            config.scanner[category][`${category}Instance`]
+            config.scanner[category]?.[`${category}Instance`]
           } does not exist`,
         )
         return { status: 'error', message: 'scanner_no_instance' }
@@ -341,7 +343,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: instance ${
-            config.scanner[category][`${category}Instance`]
+            config.scanner[category]?.[`${category}Instance`]
           } has no device assigned`,
         )
         return { status: 'error', message: 'scanner_no_device_assigned' }
@@ -349,7 +351,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: device ${
-            config.scanner[category][`${category}Device`]
+            config.scanner[category]?.[`${category}Device`]
           } does not exist`,
         )
         return { status: 'error', message: 'scanner_no_device' }
