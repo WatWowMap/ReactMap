@@ -837,7 +837,7 @@ const Showcase = ({
       </Grid>
       <Grid item xs={6}>
         <Typography variant="subtitle2" align="center">
-          {total_entries} / 150 {/* TODO: Read from GM */}
+          {total_entries} / 200 {/* TODO: Read from GM */}
         </Typography>
       </Grid>
       <Grid item xs={6}>
