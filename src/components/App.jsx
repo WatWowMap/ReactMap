@@ -16,7 +16,6 @@ import { apolloClient } from '@services/apollo'
 import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled'
 import { setLoadingText } from '@services/functions/setLoadingText'
 
-import Config from './Config'
 import ErrorBoundary from './ErrorBoundary'
 import ReactRouter from './ReactRouter'
 import HolidayEffects from './HolidayEffects'
@@ -74,12 +73,10 @@ export default function App() {
         <React.Suspense fallback={<SetText />}>
           {globalStyles}
           <ApolloProvider client={apolloClient}>
-            <Config>
-              <BrowserRouter>
-                <ReactRouter />
-              </BrowserRouter>
-              <HolidayEffects />
-            </Config>
+            <BrowserRouter>
+              <ReactRouter />
+            </BrowserRouter>
+            <HolidayEffects />
           </ApolloProvider>
         </React.Suspense>
       </ErrorBoundary>

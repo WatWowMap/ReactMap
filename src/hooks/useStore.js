@@ -16,6 +16,7 @@ import { persist } from 'zustand/middleware'
  *    navigation: string,
  *    tileServers: string
  *   },
+ *   menus: Record<string, boolean>,
  *   motdIndex: number
  *   tutorial: boolean,
  *   searchTab: string,
@@ -130,6 +131,7 @@ export const useStore = create(
  *   excludeList: string[],
  *   timerList: string[],
  *   tileStyle: 'light' | 'dark',
+ *   reset: boolean,
  *   theme: {
  *     primary: string,
  *     secondary: string,
@@ -152,6 +154,7 @@ export const useStatic = create((set) => ({
   isTablet: false,
   active: true,
   searchLoading: false,
+  reset: false,
   tileStyle: 'light',
   clientError: '',
   map: null,

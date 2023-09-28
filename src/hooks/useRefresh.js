@@ -10,8 +10,9 @@ import { useStatic, useStore } from './useStore'
 
 export default function useRefresh() {
   const active = useStatic((s) => s.active)
+  const hasIcons = useStatic((s) => !!s.Icons)
 
-  const { data, stopPolling, startPolling } = useQuery(getAvailable, {
+  const { data, stopPolling, startPolling, refetch } = useQuery(getAvailable, {
     fetchPolicy: active ? 'network-only' : 'cache-only',
     pollInterval: 1000 * 60 * 60,
   })
@@ -23,6 +24,12 @@ export default function useRefresh() {
     }
     stopPolling()
   }, [active])
+
+  useEffect(() => {
+    if (!hasIcons) {
+      refetch()
+    }
+  }, [hasIcons])
 
   useEffect(() => {
     if (data?.available) {
