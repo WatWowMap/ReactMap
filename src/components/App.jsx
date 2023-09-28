@@ -11,7 +11,7 @@ import { ApolloProvider } from '@apollo/client'
 
 import useCustomTheme from '@assets/mui/theme'
 import { globalStyles } from '@assets/mui/global'
-import { useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import { apolloClient } from '@services/apollo'
 import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled'
 import { setLoadingText } from '@services/functions/setLoadingText'
@@ -56,6 +56,10 @@ function toggleDarkMode(event) {
 }
 
 window.addEventListener('keydown', toggleDarkMode)
+
+window.addEventListener('online', () => useStatic.setState({ online: true }))
+
+window.addEventListener('offline', () => useStatic.setState({ online: false }))
 
 export default function App() {
   const theme = useCustomTheme()
