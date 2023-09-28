@@ -249,11 +249,12 @@ module.exports = class PkmnBackend {
    *
    * @param {[number, number]} filter
    * @param {number} [limit]
-   * @returns {[number, number]}
+   * @returns DnfMinMax
    */
   static ensureSafe(filter, limit = 100) {
     // eslint-disable-next-line no-nested-ternary
-    return filter.map((x, i) => (x > limit ? (i ? limit : 0) : x))
+    const [min, max] = filter.map((x, i) => (x > limit ? (i ? limit : 0) : x))
+    return { min, max }
   }
 
   /**
@@ -276,12 +277,12 @@ module.exports = class PkmnBackend {
       xxl,
       ...rest
     } = this.filter
-    if (pokemon === undefined && this.id !== 'global') pokemon = [this.id]
+    if (pokemon === undefined && this.id !== 'global') pokemon = [{ id: this.pokemon, form: this.form }]
     if (this.mods.onlyLegacy) {
       return dnfifyIvFilter(adv, pokemon)
     }
     if (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp)) {
-      return [{ pokemon, iv: [-1, 100] }]
+      return [{ pokemon, iv: { min: -1, max: 100 } }]
     }
     const results = /** @type {import('../../../types').DnfFilter[]} */ ([])
     if (
@@ -308,7 +309,7 @@ module.exports = class PkmnBackend {
         level: this.filterKeys.has('level')
           ? PkmnBackend.ensureSafe(level, 35)
           : undefined,
-        gender: this.filterKeys.has('gender') ? [gender, gender] : undefined,
+        gender: this.filterKeys.has('gender') ? { min: gender, max: gender } : undefined,
       })
     }
     if (this.perms.pvp) {
@@ -316,15 +317,13 @@ module.exports = class PkmnBackend {
         if (Array.isArray(values) && this.filterKeys.has(league)) {
           results.push({
             pokemon,
-            pvp: {
-              [league]: PkmnBackend.ensureSafe(values, STANDARD[league]?.[1]),
-            },
+            [`pvp_${league}`]: PkmnBackend.ensureSafe(values, STANDARD[league]?.[1]),
           })
         }
       })
     }
-    if (this.filterKeys.has('xxs')) results.push({ pokemon, size: [1, 1] })
-    if (this.filterKeys.has('xxl')) results.push({ pokemon, size: [5, 5] })
+    if (this.filterKeys.has('xxs')) results.push({ pokemon, size: { min: 1, max: 1 } })
+    if (this.filterKeys.has('xxl')) results.push({ pokemon, size: { min: 5, max: 5 } })
     return results
   }
 

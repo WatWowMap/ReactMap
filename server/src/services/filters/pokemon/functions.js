@@ -223,9 +223,7 @@ function dnfifyIvFilter(filter, pokemon) {
       if (match[3] === undefined) {
         return []
       }
-      const lower = parseFloat(match[3])
       let column = 'iv'
-      let pvpColumn
       switch (match[2]) {
         case 'A':
           column = 'atk_iv'
@@ -249,25 +247,22 @@ function dnfifyIvFilter(filter, pokemon) {
           column = 'cp'
           break
         case 'GL':
-          pvpColumn = 'great'
+          column = 'pvp_great'
           break
         case 'UL':
-          pvpColumn = 'ultra'
+          column = 'pvp_ultra'
           break
         case 'LC':
-          pvpColumn = 'little'
+          column = 'pvp_little'
           break
       }
-      let upper = lower
+      const minMax = { min: parseFloat(match[3]) }
       if (match[4] !== undefined) {
-        upper = parseInt(match[4])
-      }
-      if (pvpColumn) {
-        if (!clause.pvp) clause.pvp = {}
-        clause.pvp[pvpColumn] = [lower, upper]
+        minMax.max = parseInt(match[4])
       } else {
-        clause[column] = [lower, upper]
+        minMax.max = minMax.min
       }
+      clause[column] = minMax
       expectClause = false
     } else if (match[3] !== undefined) {
       return []
@@ -287,7 +282,7 @@ function dnfifyIvFilter(filter, pokemon) {
     lastIndex = tokenizer.lastIndex
   }
   if (expectClause) {
-    return [{ pokemon, iv: [-1, 100] }]
+    return [{ pokemon, iv: { min: -1, max: 100 } }]
   }
   results.push(clause)
   return results

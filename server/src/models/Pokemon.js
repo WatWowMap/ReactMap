@@ -237,11 +237,14 @@ class Pokemon extends Model {
       ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
       : []
     if ((perms.iv || perms.pvp) && mem) {
-      const pokemon = Object.keys(filterMap).filter((key) => key.includes('-'))
-      if (!globalFilter.mods.onlyLinkGlobal) pokemon.push('') // add everything else
+      const pokemon = Object.keys(filterMap).filter((key) => key.includes('-')).map((key) => {
+        const [id, form] = key.split('-', 2).map(Number)
+        return { id, form }
+      })
+      if (!globalFilter.mods.onlyLinkGlobal) pokemon.push({ id: -1 }) // add everything else
       filters.push(...globalFilter.buildApiFilter(pokemon))
-      if (onlyZeroIv) filters.push({ iv: [0, 0], pokemon })
-      if (onlyHundoIv) filters.push({ iv: [100, 100], pokemon })
+      if (onlyZeroIv) filters.push({ iv: { min: 0, max: 0 }, pokemon })
+      if (onlyHundoIv) filters.push({ iv: { min: 100, max: 100 }, pokemon })
     }
     /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(
