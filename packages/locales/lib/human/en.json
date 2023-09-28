@@ -670,5 +670,6 @@
   "load_from_autosave": "Load from autosave",
   "done": "Done",
   "fast": "Fast",
-  "charged": "Charged"
+  "charged": "Charged",
+  "offline_mode": "Offline Mode"
 }

@@ -10,8 +10,8 @@ export const DEFAULT = /** @type {import('@hooks/useStore').ScanConfig} */ ({
   pokemonRadius: 70,
   gymRadius: 750,
   spacing: 1,
-  maxSize: 10,
-  cooldown: 0,
+  maxSize: 1,
+  cooldown: 1,
   refreshQueue: 5,
 })
 
