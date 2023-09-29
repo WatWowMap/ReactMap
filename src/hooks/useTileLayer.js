@@ -19,6 +19,7 @@ const getTileLayer = (tileServers, tileServer, timeOfDay) => {
 export default function useTileLayer() {
   const timeOfDay = useStatic((state) => state.timeOfDay)
   const userTileLayer = useStore((state) => state.settings.tileServers)
+  const online = useStatic((s) => s.online)
 
   const tileLayer = React.useMemo(() => {
     const { config, settings } = useStatic.getState() || {
@@ -37,8 +38,9 @@ export default function useTileLayer() {
       minZoom: config.general.minZoom || 18,
       maxZoom: config.general.maxZoom || 10,
       zIndex: 250,
+      attribution: online ? layer?.attribution : '',
     }
-  }, [timeOfDay, userTileLayer])
+  }, [timeOfDay, userTileLayer, online])
 
   React.useEffect(() => {
     useStatic.setState({ tileStyle: tileLayer.style })

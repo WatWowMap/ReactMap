@@ -73,7 +73,7 @@ export function HolidayEffect({
 }
 
 export default function HolidayEffects() {
-  const holidayEffects = useStatic((s) => s?.config?.map?.holidayEffects || [])
+  const holidayEffects = useStatic((s) => s?.config?.holidayEffects || [])
 
   return (
     <>

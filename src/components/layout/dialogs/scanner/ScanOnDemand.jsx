@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
 
-import { useScanStore, useStore } from '@hooks/useStore'
+import { useScanStore, useStatic, useStore } from '@hooks/useStore'
 
 import { SCANNER_CONFIG, SCANNER_STATUS } from '@services/queries/scanner'
 
@@ -22,12 +22,12 @@ const { setScanMode } = useScanStore.getState()
 function ScanOnDemand({ mode }) {
   const scanMode = useScanStore((s) => s[`${mode}Mode`])
   const location = useStore((s) => s.location)
+  const online = useStatic((s) => s.online)
 
-  const { data } = useQuery(SCANNER_CONFIG, {
+  const [getConfig, { data }] = useLazyQuery(SCANNER_CONFIG, {
     variables: { mode },
     initialFetchPolicy: 'network-only',
-    nextFetchPolicy: 'standby',
-    skip: !scanMode,
+    nextFetchPolicy: 'cache-first',
   })
 
   /** @type {typeof DEFAULT} */
@@ -111,6 +111,12 @@ function ScanOnDemand({ mode }) {
   }, [location, scanMode])
 
   React.useEffect(() => {
+    if (online && scanMode) {
+      getConfig()
+    }
+  }, [online, scanMode])
+
+  React.useEffect(() => {
     const subscription = useScanStore.subscribe((next, prev) => {
       if (
         next[`${mode}Mode`] &&
@@ -139,7 +145,7 @@ function ScanOnDemand({ mode }) {
     }
   }, [mode])
 
-  if (scanMode !== 'setLocation') return null
+  if (scanMode !== 'setLocation' || !config.scannerType) return null
 
   return (
     <ConfigContext.Provider value={config}>

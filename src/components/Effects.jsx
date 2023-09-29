@@ -7,17 +7,20 @@ import { useWindowState } from '@hooks/useWindowState'
 import { useStatic } from '@hooks/useStore'
 import { useParams } from 'react-router-dom'
 import { useMap } from 'react-leaflet'
+import { useTranslation } from 'react-i18next'
 
 export function Effects() {
   const params = useParams()
   const map = useMap()
+  const { t } = useTranslation()
 
   useRefresh()
   useGenerate()
   useWindowState()
 
-  const isMobile = useMediaQuery((t) => t.breakpoints.only('xs'))
-  const isTablet = useMediaQuery((t) => t.breakpoints.only('sm'))
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.only('xs'))
+  const isTablet = useMediaQuery((theme) => theme.breakpoints.only('sm'))
+  const online = useStatic((s) => s.online)
 
   React.useEffect(() => {
     useStatic.setState({ isMobile, isTablet })
@@ -31,6 +34,14 @@ export function Effects() {
       map.setView([lat, lon], zoom)
     }
   }, [params.lat, params.lon, params.zoom])
+
+  React.useEffect(() => {
+    map.attributionControl.setPrefix(
+      online
+        ? useStatic.getState().config.general.attributionPrefix || ''
+        : t('offline_mode'),
+    )
+  }, [online])
 
   return null
 }

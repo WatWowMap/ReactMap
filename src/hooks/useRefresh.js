@@ -10,19 +10,27 @@ import { useStatic, useStore } from './useStore'
 
 export default function useRefresh() {
   const active = useStatic((s) => s.active)
+  const online = useStatic((s) => s.online)
 
-  const { data, stopPolling, startPolling } = useQuery(getAvailable, {
-    fetchPolicy: active ? 'network-only' : 'cache-only',
+  const hasIcons = useStatic((s) => !!s.Icons)
+
+  const { data, stopPolling, startPolling, refetch } = useQuery(getAvailable, {
+    fetchPolicy: active && online ? 'network-only' : 'cache-only',
     pollInterval: 1000 * 60 * 60,
   })
 
   useEffect(() => {
-    if (active) {
+    if (active && online) {
       startPolling(1000 * 60 * 60)
       return () => stopPolling()
     }
-    stopPolling()
-  }, [active])
+  }, [active, online])
+
+  useEffect(() => {
+    if (!hasIcons && online) {
+      refetch()
+    }
+  }, [hasIcons, online])
 
   useEffect(() => {
     if (data?.available) {

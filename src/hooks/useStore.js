@@ -16,6 +16,7 @@ import { persist } from 'zustand/middleware'
  *    navigation: string,
  *    tileServers: string
  *   },
+ *   menus: Record<string, boolean>,
  *   motdIndex: number
  *   tutorial: boolean,
  *   searchTab: string,
@@ -112,6 +113,7 @@ export const useStore = create(
  *   isMobile: boolean,
  *   isTablet: boolean,
  *   active: boolean,
+ *   online: boolean,
  *   searchLoading: boolean,
  *   Icons: InstanceType<typeof import("../services/Icons").default>,
  *   config: import('@rm/types').Config['map'],
@@ -130,6 +132,7 @@ export const useStore = create(
  *   excludeList: string[],
  *   timerList: string[],
  *   tileStyle: 'light' | 'dark',
+ *   reset: boolean,
  *   theme: {
  *     primary: string,
  *     secondary: string,
@@ -151,7 +154,9 @@ export const useStatic = create((set) => ({
   isMobile: false,
   isTablet: false,
   active: true,
+  online: true,
   searchLoading: false,
+  reset: false,
   tileStyle: 'light',
   clientError: '',
   map: null,

@@ -16,10 +16,11 @@ import { useStore } from '@hooks/useStore'
  */
 export default function ItemToggle({ category, subItem, ...props }) {
   const { t } = useTranslation()
-  const checked = useStore((s) =>
-    category === 'wayfarer' || category === 'admin'
-      ? s.filters[subItem].enabled
-      : s.filters[category][subItem],
+  const checked = useStore(
+    (s) =>
+      (category === 'wayfarer' || category === 'admin'
+        ? s.filters[subItem]?.enabled
+        : s.filters[category]?.[subItem]) || false,
   )
 
   if (
