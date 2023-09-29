@@ -329,7 +329,7 @@ const Stats = ({ pokemon, t }) => {
 const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
   const { gender, size, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
-
+  const darkMode = useStore((s) => s.darkMode)
   return (
     <Grid
       item
@@ -342,7 +342,7 @@ const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
       {weather != 0 && perms.iv && (
         <Grid
           item
-          className="grid-item"
+          className={`grid-item ${darkMode ? '' : 'darken-image'}`}
           style={{
             height: 24,
             width: 24,
