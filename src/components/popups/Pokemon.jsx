@@ -212,7 +212,7 @@ const Header = ({
   const handleTimer = () => {
     setAnchorEl(null)
     useStatic.setState((prev) => {
-      if (prev.includes(id)) {
+      if (prev.timerList.includes(id)) {
         return { timerList: prev.timerList.filter((x) => x !== id) }
       }
       return { timerList: [...prev.timerList, id] }
