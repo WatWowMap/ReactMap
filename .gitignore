@@ -25,6 +25,9 @@ packages/masterfile/lib/data/masterfile.json
 public/favicon/*
 !public/favicon/fallback.ico
 
+# Asset Links JSON
+/public/.well-known/assetlinks.json
+
 # Strategies
 server/src/strategies/*
 !server/src/strategies/discord.js
