@@ -277,7 +277,8 @@ module.exports = class PkmnBackend {
       xxl,
       ...rest
     } = this.filter
-    if (pokemon === undefined && this.id !== 'global') pokemon = [{ id: this.pokemon, form: this.form }]
+    if (pokemon === undefined && this.id !== 'global')
+      pokemon = [{ id: this.pokemon, form: this.form }]
     if (this.mods.onlyLegacy) {
       return dnfifyIvFilter(adv, pokemon)
     }
@@ -309,7 +310,9 @@ module.exports = class PkmnBackend {
         level: this.filterKeys.has('level')
           ? PkmnBackend.ensureSafe(level, 35)
           : undefined,
-        gender: this.filterKeys.has('gender') ? { min: gender, max: gender } : undefined,
+        gender: this.filterKeys.has('gender')
+          ? { min: gender, max: gender }
+          : undefined,
       })
     }
     if (this.perms.pvp) {
@@ -317,13 +320,18 @@ module.exports = class PkmnBackend {
         if (Array.isArray(values) && this.filterKeys.has(league)) {
           results.push({
             pokemon,
-            [`pvp_${league}`]: PkmnBackend.ensureSafe(values, STANDARD[league]?.[1]),
+            [`pvp_${league}`]: PkmnBackend.ensureSafe(
+              values,
+              STANDARD[league]?.[1],
+            ),
           })
         }
       })
     }
-    if (this.filterKeys.has('xxs')) results.push({ pokemon, size: { min: 1, max: 1 } })
-    if (this.filterKeys.has('xxl')) results.push({ pokemon, size: { min: 5, max: 5 } })
+    if (this.filterKeys.has('xxs'))
+      results.push({ pokemon, size: { min: 1, max: 1 } })
+    if (this.filterKeys.has('xxl'))
+      results.push({ pokemon, size: { min: 5, max: 5 } })
     return results
   }
 
