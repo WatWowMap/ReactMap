@@ -13,7 +13,7 @@ const { log, HELPERS } = require('@rm/logger')
  * @param {Date} date
  * @returns
  */
-function getEpoch(date) {
+function getEpoch(date = new Date()) {
   return Math.floor(date.getTime() / 1000)
 }
 
@@ -68,9 +68,8 @@ function getUserDate(boundsOrTimezone) {
  */
 function getUserMidnight(bounds) {
   const userTimeZone = getUserTimeZone(bounds)
-  const userDate = getUserDate(bounds)
 
-  const userMidnight = tz(userDate, userTimeZone).startOf('day')
+  const userMidnight = tz(new Date(), userTimeZone).startOf('day')
   log.debug(
     HELPERS.client,
     `midnight: ${userMidnight.format('yyyy-MM-DD HH:mm:ss.SSS')}`,

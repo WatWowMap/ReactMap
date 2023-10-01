@@ -270,6 +270,10 @@
       "__name": "API_HIDE_OLD_POKESTOPS",
       "__format": "boolean"
     },
+    "routeUpdateLimit": {
+      "__name": "API_ROUTE_UPDATE_LIMIT",
+      "__format": "number"
+    },
     "fetchTimeoutMs": {
       "__name": "API_FETCH_TIMEOUT_MS",
       "__format": "number"
@@ -1173,6 +1177,10 @@
     "backendConfig": {
       "platform": "SCANNER_BACKEND_CONFIG_PLATFORM",
       "apiEndpoint": "SCANNER_BACKEND_CONFIG_API_ENDPOINT",
+      "headers": {
+        "__name": "SCANNER_BACKEND_CONFIG_HEADERS",
+        "__format": "json"
+      },
       "apiUsername": "SCANNER_BACKEND_CONFIG_API_USERNAME",
       "apiPassword": "SCANNER_BACKEND_CONFIG_API_PASSWORD",
       "queueRefreshInterval": {

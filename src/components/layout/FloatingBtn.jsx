@@ -82,6 +82,8 @@ export default function FloatingButtons() {
   )
 
   const isMobile = useStatic((s) => s.isMobile)
+  const online = useStatic((s) => s.online)
+
   const webhookMode = useWebhookStore((s) => s.mode)
 
   const scanNextMode = useScanStore((s) => s.scanNextMode)
@@ -101,7 +103,7 @@ export default function FloatingButtons() {
 
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'medium'
-  const disabled = !!webhookMode || !!scanNextMode || !!scanZoneMode
+  const disabled = !!webhookMode || !!scanNextMode || !!scanZoneMode || !online
 
   const handleNavBtn = React.useCallback(
     (/** @type {'zoomIn' | 'zoomOut' | 'locate'} */ name) => () => {
@@ -176,7 +178,7 @@ export default function FloatingButtons() {
           size={fabSize}
           onClick={handleClick('scanNextMode')}
           title={t('scan_next')}
-          disabled={Boolean(webhookMode) || Boolean(scanZoneMode)}
+          disabled={!!webhookMode || !!scanZoneMode || !online}
         >
           <TrackChanges fontSize={iconSize} sx={{ color: 'white' }} />
         </Fab>
@@ -187,7 +189,7 @@ export default function FloatingButtons() {
           size={fabSize}
           onClick={handleClick('scanZoneMode')}
           title={t('scan_zone')}
-          disabled={Boolean(webhookMode) || Boolean(scanNextMode)}
+          disabled={!!webhookMode || !!scanNextMode || !online}
         >
           <BlurOn fontSize={iconSize} sx={{ color: 'white' }} />
         </Fab>

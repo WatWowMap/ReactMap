@@ -7,24 +7,44 @@ import Login from './layout/auth/Login'
 import Blocked from './layout/auth/Blocked'
 import Errors from './Errors'
 import ClearStorage from './ClearStorage'
+import Config from './Config'
 
 const Playground = React.lazy(() => import('../features/playground'))
 
-const authRoute = <Auth />
+const authRoute = (
+  <Config>
+    <Auth />
+  </Config>
+)
+const loginRoute = (
+  <Config>
+    <Login />
+  </Config>
+)
+const resetRoute = <ClearStorage />
+const blockedRoute = <Blocked />
+const errorRoute = <Errors />
 
 export default function ReactRouter() {
   return (
     <Routes>
       <Route path="/" element={authRoute} />
-      <Route path="reset" element={<ClearStorage />} />
-      <Route path="login" element={<Login />} />
-      <Route path="playground" element={<Playground />} />
-      <Route path="blocked/:info" element={<Blocked />} />
+      <Route path="reset" element={resetRoute} />
+      <Route path="login" element={loginRoute} />
+      <Route
+        path="playground"
+        element={
+          <Config>
+            <Playground />
+          </Config>
+        }
+      />
+      <Route path="blocked/:info" element={blockedRoute} />
       <Route path="@/:lat/:lon" element={authRoute} />
       <Route path="@/:lat/:lon/:zoom" element={authRoute} />
       <Route path="id/:category/:id" element={authRoute} />
       <Route path="id/:category/:id/:zoom" element={authRoute} />
-      <Route path="*" element={<Errors />} />
+      <Route path="*" element={errorRoute} />
     </Routes>
   )
 }

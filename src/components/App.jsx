@@ -11,12 +11,11 @@ import { ApolloProvider } from '@apollo/client'
 
 import useCustomTheme from '@assets/mui/theme'
 import { globalStyles } from '@assets/mui/global'
-import { useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import { apolloClient } from '@services/apollo'
 import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled'
 import { setLoadingText } from '@services/functions/setLoadingText'
 
-import Config from './Config'
 import ErrorBoundary from './ErrorBoundary'
 import ReactRouter from './ReactRouter'
 import HolidayEffects from './HolidayEffects'
@@ -58,6 +57,10 @@ function toggleDarkMode(event) {
 
 window.addEventListener('keydown', toggleDarkMode)
 
+window.addEventListener('online', () => useStatic.setState({ online: true }))
+
+window.addEventListener('offline', () => useStatic.setState({ online: false }))
+
 export default function App() {
   const theme = useCustomTheme()
 
@@ -74,12 +77,10 @@ export default function App() {
         <React.Suspense fallback={<SetText />}>
           {globalStyles}
           <ApolloProvider client={apolloClient}>
-            <Config>
-              <BrowserRouter>
-                <ReactRouter />
-              </BrowserRouter>
-              <HolidayEffects />
-            </Config>
+            <BrowserRouter>
+              <ReactRouter />
+            </BrowserRouter>
+            <HolidayEffects />
           </ApolloProvider>
         </React.Suspense>
       </ErrorBoundary>

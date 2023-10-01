@@ -7,12 +7,12 @@ import Fetch from '@services/Fetch'
 import { setLoadingText } from '@services/functions/setLoadingText'
 import Utility from '@services/Utility'
 import { deepMerge } from '@services/functions/deepMerge'
+import { Navigate } from 'react-router-dom'
 
 const rootLoading = document.getElementById('loader')
 
 export default function Config({ children }) {
   const { t } = useTranslation()
-
   const [serverSettings, setServerSettings] = React.useState({
     error: false,
     status: 200,
@@ -20,12 +20,13 @@ export default function Config({ children }) {
   })
 
   if (rootLoading) {
-    if (serverSettings) {
+    if (serverSettings.fetched) {
       rootLoading.style.display = 'none'
     }
   }
   const getServerSettings = async () => {
     const data = await Fetch.getSettings()
+
     if (data) {
       document.title = data?.map?.general.headerTitle || document.title
 
@@ -149,6 +150,10 @@ export default function Config({ children }) {
       getServerSettings()
     }
   }, [])
+
+  if (serverSettings.error) {
+    return <Navigate to={`/error/${serverSettings.status}`} />
+  }
 
   return serverSettings.fetched && serverSettings.status !== 500
     ? children

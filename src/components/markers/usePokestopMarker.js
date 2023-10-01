@@ -24,7 +24,7 @@ export default function usePokestopMarker({
   power_up_level,
   events,
   invasions,
-  ...pokestop
+  quests,
 }) {
   const [, Icons] = useStore(
     (s) => [s.icons, useStatic.getState().Icons],
@@ -87,8 +87,6 @@ export default function usePokestopMarker({
     })
   }
   if (hasQuest && !(hasInvasion && invasionMod?.removeQuest)) {
-    const { quests } = pokestop
-
     quests.forEach((quest) => {
       const {
         quest_item_id,

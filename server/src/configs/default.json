@@ -103,6 +103,7 @@
     "hideOldGyms": false,
     "stopValidDataLimit": 30,
     "hideOldPokestops": false,
+    "routeUpdateLimit": 7,
     "fetchTimeoutMs": 5000,
     "pogoApiEndpoints": {
       "invasions": "https://raw.githubusercontent.com/WatWowMap/event-info/main/grunts/formatted.json",
@@ -580,6 +581,7 @@
     "backendConfig": {
       "platform": "rdm/mad",
       "apiEndpoint": "http://ip:port/api/",
+      "headers": [],
       "apiUsername": "username",
       "apiPassword": "password",
       "queueRefreshInterval": 5,

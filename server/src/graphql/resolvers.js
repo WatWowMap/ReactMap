@@ -350,6 +350,7 @@ const resolvers = {
               enabled: scanner[mode].enabled,
             }
           : {
+              scannerType: scanner.backendConfig.platform,
               showScanCount: scanner.scanNext.showScanCount,
               showScanQueue: scanner.scanNext.showScanQueue,
               cooldown: scanner.scanNext.userCooldownSeconds,

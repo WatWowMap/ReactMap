@@ -73,11 +73,11 @@ export function HolidayEffect({
 }
 
 export default function HolidayEffects() {
-  const holidayEffects = useStatic((s) => s?.config?.map?.holidayEffects || [])
+  const holidayEffects = useStatic((s) => s?.config?.holidayEffects || [])
 
   return (
     <>
-      {holidayEffects.map((holiday) => (
+      {(Array.isArray(holidayEffects) ? holidayEffects : []).map((holiday) => (
         <HolidayEffect key={holiday.name} {...holiday} />
       ))}
     </>
