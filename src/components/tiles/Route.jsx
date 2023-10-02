@@ -33,13 +33,14 @@ const RouteTile = (route) => {
       {
         lat_degrees: route.start_lat,
         lng_degrees: route.start_lon,
-        elevation_in_meters: 0,
+        elevation_in_meters: route.waypoints[0]?.elevation_in_meters || 0,
       },
       ...route.waypoints,
       {
         lat_degrees: route.end_lat,
         lng_degrees: route.end_lon,
-        elevation_in_meters: 1,
+        elevation_in_meters:
+          route.waypoints[route.waypoints.length - 1]?.elevation_in_meters || 1,
       },
     ],
     [route],
