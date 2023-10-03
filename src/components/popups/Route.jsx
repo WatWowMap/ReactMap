@@ -23,7 +23,7 @@ import DownloadIcon from '@mui/icons-material/Download'
 
 import Query from '@services/Query'
 import formatInterval from '@services/functions/formatInterval'
-import { useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 
 import Title from './common/Title'
 import TimeSince from './common/Timer'
@@ -131,6 +131,7 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
 export default function RoutePopup({ end, ...props }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
   const { i18n } = useTranslation()
+  const { config } = useStatic.getState()
 
   const [getRoute, { data, called }] = useLazyQuery(Query.routes('getOne'), {
     variables: { id: props.id },
@@ -294,7 +295,9 @@ export default function RoutePopup({ end, ...props }) {
             lon={end ? route.end_lon : route.start_lon}
             size="small"
           />
-          <DownloadRouteGPX route={route} />
+          {config.misc.enableRouteDownload && (
+            <DownloadRouteGPX route={route} />
+          )}
         </Grid2>
       </Grid2>
     </Popup>
