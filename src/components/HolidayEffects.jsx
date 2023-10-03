@@ -77,7 +77,7 @@ export default function HolidayEffects() {
 
   return (
     <>
-      {holidayEffects.map((holiday) => (
+      {(Array.isArray(holidayEffects) ? holidayEffects : []).map((holiday) => (
         <HolidayEffect key={holiday.name} {...holiday} />
       ))}
     </>
