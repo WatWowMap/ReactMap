@@ -35,9 +35,9 @@ const userSettingsCategory = (category) => {
 const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
   const { filters: staticFilters } = useStatic.getState()
   const trimmed = {
-    onlyLegacy: userSettings.legacyFilter,
-    onlyLinkGlobal: userSettings.linkGlobalAndAdvanced,
-    onlyAllPvp: userSettings.showAllPvpRanks,
+    onlyLegacy: userSettings?.legacyFilter,
+    onlyLinkGlobal: userSettings?.linkGlobalAndAdvanced,
+    onlyAllPvp: userSettings?.showAllPvpRanks,
     onlyAreas,
   }
   Object.entries(requestedFilters).forEach((topLevelFilter) => {
@@ -47,7 +47,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
       trimmed[`only${id.charAt(0).toUpperCase()}${id.slice(1)}`] = specifics
     }
   })
-  Object.entries(userSettings).forEach(([entryK, entryV]) => {
+  Object.entries(userSettings || {}).forEach(([entryK, entryV]) => {
     if (entryK.startsWith('pvp')) {
       trimmed[`only${entryK.charAt(0).toUpperCase()}${entryK.slice(1)}`] =
         entryV
@@ -93,7 +93,7 @@ function QueryData({ category, timeout }) {
   const active = useStatic((s) => s.active)
 
   const userSettings = useStore(
-    (s) => s.userSettings[userSettingsCategory(category)] || {},
+    (s) => s.userSettings[userSettingsCategory(category)],
   )
   const filters = useStore((s) => s.filters[category])
   const onlyAreas = useStore(
@@ -104,16 +104,20 @@ function QueryData({ category, timeout }) {
     basicEqualFn,
   )
 
+  const initial = React.useMemo(
+    () => ({
+      ...getQueryArgs(),
+      filters: trimFilters(filters, userSettings, category, onlyAreas),
+    }),
+    [],
+  )
   const { data, previousData, error, refetch } = useQuery(
     Query[category](filters),
     {
       context: {
         abortableContext: timeout.current,
       },
-      variables: {
-        ...getQueryArgs(),
-        filters: trimFilters(filters, userSettings, category, onlyAreas),
-      },
+      variables: initial,
       fetchPolicy: active
         ? category === 'weather'
           ? 'cache-and-network'
