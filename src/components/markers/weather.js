@@ -24,9 +24,9 @@ export default function weatherMarker(iconUrl) {
         alt="${iconUrl}"
         src="${iconUrl}"
         style="
-          width: 24px;
-          height: 24px;
-          padding: 2.5px;
+          width: 26px;
+          height: 26px;
+          padding: 4px;
         "
       />
     `,
