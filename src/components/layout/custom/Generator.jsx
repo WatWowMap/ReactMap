@@ -15,7 +15,8 @@ import LocaleSelection from '../general/LocaleSelection'
 import LinkWrapper from './LinkWrapper'
 
 export default function Generator({ block = {}, defaultReturn = null }) {
-  const { content = null, text = null, ...props } = block
+  // eslint-disable-next-line no-unused-vars
+  const { content = null, text = null, gridSizes, ...props } = block
   const children = Utility.getBlockContent(content || text)
   switch (block.type) {
     case 'img':

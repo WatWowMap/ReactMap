@@ -93,6 +93,9 @@ export default class Utility {
     }
   }
 
+  /**
+   * @param {Record<string, number>} sizeObj
+   */
   static getSizes = (sizeObj) => ({
     xs: sizeObj?.xs || 12,
     sm: sizeObj?.sm || sizeObj?.xs || 12,

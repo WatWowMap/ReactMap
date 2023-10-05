@@ -44,7 +44,7 @@ export default function Login() {
   )
   const authMethods = useStatic((s) => s.auth.methods)
 
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { data, loading } = useQuery(CUSTOM_COMPONENT, {
     fetchPolicy: 'cache-first',
     variables: { component: 'loginPage' },
@@ -71,6 +71,7 @@ export default function Login() {
       {components?.length ? (
         <Grid
           container
+          key={i18n.language}
           spacing={settings.parentSpacing || 0}
           alignItems={settings.parentAlignItems || 'center'}
           justifyContent={settings.parentJustifyContent || 'center'}

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import DialogContent from '@mui/material/DialogContent'
 import { useTranslation } from 'react-i18next'
 
