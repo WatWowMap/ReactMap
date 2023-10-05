@@ -14,7 +14,7 @@ export default function DialogWrapper({
   handleClose,
   children,
 }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [countdown, setCountdown] = React.useState(
     Math.floor(
       typeof configObj.settings?.timeoutSeconds === 'number'
@@ -81,7 +81,7 @@ export default function DialogWrapper({
             : [defaultTitle]
         }
       />
-      <DialogContent>
+      <DialogContent key={i18n.language}>
         <Grid
           container
           spacing={configObj.settings.parentSpacing || 0}
