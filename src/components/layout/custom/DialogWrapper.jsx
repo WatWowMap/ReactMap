@@ -3,7 +3,6 @@ import Grid from '@mui/material/Grid'
 import DialogContent from '@mui/material/DialogContent'
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
 import Header from '../general/Header'
@@ -15,7 +14,6 @@ export default function DialogWrapper({
   handleClose,
   children,
 }) {
-  const { perms } = useStatic((s) => s.auth)
   const { t } = useTranslation()
   const [countdown, setCountdown] = React.useState(
     Math.floor(
@@ -24,16 +22,13 @@ export default function DialogWrapper({
         : 0,
     ),
   )
+
   const [footerOptions, setFooterOptions] = React.useState([
     ...(configObj.footerButtons
-      ? configObj.footerButtons
-          .filter(
-            (button) =>
-              (!button.donorOnly && !button.freeloaderOnly) ||
-              (button.donorOnly && perms.donor) ||
-              (button.freeloaderOnly && !perms.donor),
-          )
-          .map((b) => ({ ...b, name: Utility.getBlockContent(b.name) }))
+      ? configObj.footerButtons.map((b) => ({
+          ...b,
+          name: Utility.getBlockContent(b.name),
+        }))
       : []),
     {
       name: `${t('close')}${countdown ? ` (${countdown})` : ''}`,
