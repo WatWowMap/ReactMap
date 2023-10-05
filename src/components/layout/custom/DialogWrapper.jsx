@@ -24,12 +24,10 @@ export default function DialogWrapper({
   )
 
   const [footerOptions, setFooterOptions] = React.useState([
-    ...(configObj.footerButtons
-      ? configObj.footerButtons.map((b) => ({
-          ...b,
-          name: Utility.getBlockContent(b.name),
-        }))
-      : []),
+    ...(configObj.footerButtons || []).map((b) => ({
+      ...b,
+      name: Utility.getBlockContent(b.name),
+    })),
     {
       name: `${t('close')}${countdown ? ` (${countdown})` : ''}`,
       action: handleClose,
@@ -37,6 +35,21 @@ export default function DialogWrapper({
       disabled: !!countdown,
     },
   ])
+
+  React.useEffect(() => {
+    setFooterOptions([
+      ...(configObj.footerButtons || []).map((b) => ({
+        ...b,
+        name: Utility.getBlockContent(b.name),
+      })),
+      {
+        name: `${t('close')}${countdown ? ` (${countdown})` : ''}`,
+        action: handleClose,
+        color: 'primary',
+        disabled: !!countdown,
+      },
+    ])
+  }, [configObj])
 
   React.useEffect(() => {
     if (countdown > 0) {
