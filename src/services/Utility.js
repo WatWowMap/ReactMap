@@ -7,7 +7,6 @@ import getProperName from './functions/getProperName'
 import checkAdvFilter from './functions/checkAdvFilter'
 import dayCheck from './functions/dayCheck'
 import parseQuestConditions from './functions/parseConditions'
-import getRewardInfo from './functions/getRewardInfo'
 
 export default class Utility {
   static getProperName(word) {
@@ -40,10 +39,6 @@ export default class Utility {
 
   static capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1)
-  }
-
-  static getRewardInfo(...args) {
-    return getRewardInfo(...args)
   }
 
   static getTileBackground(columnIndex, rowIndex) {
@@ -83,21 +78,6 @@ export default class Utility {
     }
   }
 
-  static getMidnight() {
-    const date = new Date()
-    return Math.floor(
-      new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate(),
-        0,
-        0,
-        1,
-        0,
-      ).getTime() / 1000,
-    )
-  }
-
   static analytics(category, action = '', label = '', nonInteraction = false) {
     if (CONFIG.googleAnalyticsId) {
       if (action) {
@@ -113,6 +93,9 @@ export default class Utility {
     }
   }
 
+  /**
+   * @param {Record<string, number>} sizeObj
+   */
   static getSizes = (sizeObj) => ({
     xs: sizeObj?.xs || 12,
     sm: sizeObj?.sm || sizeObj?.xs || 12,
@@ -126,19 +109,6 @@ export default class Utility {
       sizeObj?.xs ||
       12,
   })
-
-  static getQueryArgs(map) {
-    const mapBounds = map.getBounds()
-    return {
-      minLat: mapBounds._southWest.lat,
-      maxLat: mapBounds._northEast.lat,
-      minLon: mapBounds._southWest.lng,
-      maxLon: mapBounds._northEast.lng,
-      zoom: Math.floor(map.getZoom()),
-      ts: Math.floor(Date.now() / 1000),
-      midnight: this.getMidnight(),
-    }
-  }
 
   /**
    * Provides the raw content or translated content if available

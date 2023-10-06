@@ -666,5 +666,10 @@
   "show_editor": "Show Editor",
   "hide_editor": "Hide Editor",
   "reported_error": "This error has been reported to the server with identifier",
-  "dark_mode": "Dark Mode"
+  "dark_mode": "Dark Mode",
+  "load_from_autosave": "Load from autosave",
+  "done": "Done",
+  "fast": "Fast",
+  "charged": "Charged",
+  "offline_mode": "Offline Mode"
 }

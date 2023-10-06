@@ -8,6 +8,7 @@ const {
   assign,
   getParsedPvp,
   jsifyIvFilter,
+  dnfifyIvFilter,
 } = require('./functions')
 const { filterRTree } = require('../../functions/filterRTree')
 const { Event, Pvp } = require('../../initialization')
@@ -65,62 +66,70 @@ module.exports = class PkmnBackend {
 
   createExpertFilter(filter = this.filter, keys = this.filterKeys) {
     let andStr = ''
-    if (keys.has('iv')) {
-      if (andStr) andStr += '&'
-      andStr += filter.iv.join('-')
-    }
-    if (andStr) {
-      andStr = `(${andStr})`
-    }
-    if (keys.has('atk_iv')) {
-      if (andStr) andStr += '&'
-      andStr += `A${filter.atk_iv.join('-')}`
-    }
-    if (keys.has('def_iv')) {
-      if (andStr) andStr += '&'
-      andStr += `D${filter.def_iv.join('-')}`
-    }
-    if (keys.has('sta_iv')) {
-      if (andStr) andStr += '&'
-      andStr += `S${filter.sta_iv.join('-')}`
-    }
-    if (keys.has('level')) {
-      if (andStr) andStr += '&'
-      andStr += `L${filter.level.join('-')}`
-    }
-    if (keys.has('cp')) {
-      if (andStr) andStr += '&'
-      andStr += `CP${filter.cp.join('-')}`
-    }
     let orStr = ''
-    if (keys.has('xxs')) {
-      if (orStr) orStr += '|'
-      orStr += `X1`
+
+    if (this.perms.iv) {
+      if (keys.has('iv')) {
+        if (andStr) andStr += '&'
+        andStr += filter.iv.join('-')
+      }
+      if (andStr) {
+        andStr = `(${andStr})`
+      }
+      if (keys.has('atk_iv')) {
+        if (andStr) andStr += '&'
+        andStr += `A${filter.atk_iv.join('-')}`
+      }
+      if (keys.has('def_iv')) {
+        if (andStr) andStr += '&'
+        andStr += `D${filter.def_iv.join('-')}`
+      }
+      if (keys.has('sta_iv')) {
+        if (andStr) andStr += '&'
+        andStr += `S${filter.sta_iv.join('-')}`
+      }
+      if (keys.has('level')) {
+        if (andStr) andStr += '&'
+        andStr += `L${filter.level.join('-')}`
+      }
+      if (keys.has('cp')) {
+        if (andStr) andStr += '&'
+        andStr += `CP${filter.cp.join('-')}`
+      }
+      if (keys.has('xxs')) {
+        if (orStr) orStr += '|'
+        orStr += `X1`
+      }
+      if (keys.has('xxl')) {
+        if (orStr) orStr += '|'
+        orStr += `X5`
+      }
     }
-    if (keys.has('xxl')) {
-      if (orStr) orStr += '|'
-      orStr += `X5`
+    if (this.perms.pvp) {
+      if (keys.has('great')) {
+        if (orStr) orStr += '|'
+        orStr += `GL${filter.great.join('-')}`
+      }
+      if (keys.has('ultra')) {
+        if (orStr) orStr += '|'
+        orStr += `UL${filter.ultra.join('-')}`
+      }
+      if (keys.has('little')) {
+        if (orStr) orStr += '|'
+        orStr += `LC${filter.little.join('-')}`
+      }
     }
-    if (keys.has('great')) {
-      if (orStr) orStr += '|'
-      orStr += `GL${filter.great.join('-')}`
+    if (this.perms.iv) {
+      if (this.mods.onlyZeroIv) {
+        if (orStr) orStr += '|'
+        orStr += `0`
+      }
+      if (this.mods.onlyHundoIv) {
+        if (orStr) orStr += '|'
+        orStr += `100`
+      }
     }
-    if (keys.has('ultra')) {
-      if (orStr) orStr += '|'
-      orStr += `UL${filter.ultra.join('-')}`
-    }
-    if (keys.has('little')) {
-      if (orStr) orStr += '|'
-      orStr += `LC${filter.little.join('-')}`
-    }
-    if (this.mods.onlyZeroIv) {
-      if (orStr) orStr += '|'
-      orStr += `0`
-    }
-    if (this.mods.onlyHundoIv) {
-      if (orStr) orStr += '|'
-      orStr += `100`
-    }
+
     if (andStr && !(andStr.startsWith('(') && andStr.endsWith(')')) && orStr) {
       andStr = `(${andStr})`
     }
@@ -128,7 +137,7 @@ module.exports = class PkmnBackend {
       orStr = `(${orStr})`
     }
     let merged = andStr ? `${andStr}${orStr ? `|${orStr}` : ''}` : orStr
-    if (keys.has('gender')) {
+    if (keys.has('gender') && this.perms.iv) {
       if (merged) merged = `(${merged})&`
       merged += `G${filter.gender}`
     }
@@ -148,7 +157,7 @@ module.exports = class PkmnBackend {
   getCallback(global = false) {
     const filter = global ? this.global : this.filter
     if (this.mods.onlyLegacy) {
-      return filter.adv ? jsifyIvFilter(this.global.adv) : () => true
+      return filter.adv ? jsifyIvFilter(filter.adv) : () => true
     }
     const keys = global ? this.globalKeys : this.filterKeys
     return keys.size ||
@@ -240,14 +249,19 @@ module.exports = class PkmnBackend {
    *
    * @param {[number, number]} filter
    * @param {number} [limit]
-   * @returns {[number, number]}
+   * @returns DnfMinMax
    */
   static ensureSafe(filter, limit = 100) {
     // eslint-disable-next-line no-nested-ternary
-    return filter.map((x, i) => (x > limit ? (i ? limit : 0) : x))
+    const [min, max] = filter.map((x, i) => (x > limit ? (i ? limit : 0) : x))
+    return { min, max }
   }
 
-  buildApiFilter() {
+  /**
+   * Build the API filter for Golbat
+   * @returns {import('../../../types').DnfFilter[]}
+   */
+  buildApiFilter(pokemon = undefined) {
     const {
       enabled: _enabled,
       size: _size,
@@ -263,50 +277,62 @@ module.exports = class PkmnBackend {
       xxl,
       ...rest
     } = this.filter
-    const pvp = this.perms.pvp
-      ? Object.fromEntries(
-          Object.entries(rest).map(([league, values]) => {
-            if (Array.isArray(values) && this.filterKeys.has(league)) {
-              return [
-                league,
-                PkmnBackend.ensureSafe(values, STANDARD[league]?.[1]),
-              ]
-            }
-            return [league, undefined]
-          }),
-        )
-      : undefined
+    if (pokemon === undefined && this.id !== 'global')
+      pokemon = [{ id: this.pokemon, form: this.form }]
     if (this.mods.onlyLegacy) {
-      return { expert: adv }
+      return dnfifyIvFilter(adv, pokemon)
     }
-    if (!this.filterKeys.size) {
-      return { additional: { include_everything: true } }
+    if (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp)) {
+      return [{ pokemon, iv: { min: -1, max: 100 } }]
     }
-    return {
-      iv: this.filterKeys.has('iv') ? PkmnBackend.ensureSafe(iv) : undefined,
-      atk_iv: this.filterKeys.has('atk_iv')
-        ? PkmnBackend.ensureSafe(atk_iv, 15)
-        : undefined,
-      def_iv: this.filterKeys.has('def_iv')
-        ? PkmnBackend.ensureSafe(def_iv, 15)
-        : undefined,
-      sta_iv: this.filterKeys.has('sta_iv')
-        ? PkmnBackend.ensureSafe(sta_iv, 15)
-        : undefined,
-      cp: this.filterKeys.has('cp')
-        ? PkmnBackend.ensureSafe(cp, STANDARD.cp[1])
-        : undefined,
-      level: this.filterKeys.has('level')
-        ? PkmnBackend.ensureSafe(level, 35)
-        : undefined,
-      gender: this.filterKeys.has('gender') ? gender : undefined,
-      pvp: Object.keys(pvp || {}).length ? pvp : undefined,
-      additional: {
-        include_everything: false,
-        include_xxs: this.filterKeys.has('xxs') ? xxs : undefined,
-        include_xxl: this.filterKeys.has('xxl') ? xxl : undefined,
-      },
+    const results = /** @type {import('../../../types').DnfFilter[]} */ ([])
+    if (
+      ['iv', 'atk_iv', 'def_iv', 'sta_iv', 'cp', 'level', 'gender'].some((k) =>
+        this.filterKeys.has(k),
+      ) &&
+      this.perms.iv
+    ) {
+      results.push({
+        pokemon,
+        iv: this.filterKeys.has('iv') ? PkmnBackend.ensureSafe(iv) : undefined,
+        atk_iv: this.filterKeys.has('atk_iv')
+          ? PkmnBackend.ensureSafe(atk_iv, 15)
+          : undefined,
+        def_iv: this.filterKeys.has('def_iv')
+          ? PkmnBackend.ensureSafe(def_iv, 15)
+          : undefined,
+        sta_iv: this.filterKeys.has('sta_iv')
+          ? PkmnBackend.ensureSafe(sta_iv, 15)
+          : undefined,
+        cp: this.filterKeys.has('cp')
+          ? PkmnBackend.ensureSafe(cp, STANDARD.cp[1])
+          : undefined,
+        level: this.filterKeys.has('level')
+          ? PkmnBackend.ensureSafe(level, 35)
+          : undefined,
+        gender: this.filterKeys.has('gender')
+          ? { min: gender, max: gender }
+          : undefined,
+      })
     }
+    if (this.perms.pvp) {
+      Object.entries(rest).forEach(([league, values]) => {
+        if (Array.isArray(values) && this.filterKeys.has(league)) {
+          results.push({
+            pokemon,
+            [`pvp_${league}`]: PkmnBackend.ensureSafe(
+              values,
+              STANDARD[league]?.[1],
+            ),
+          })
+        }
+      })
+    }
+    if (this.filterKeys.has('xxs'))
+      results.push({ pokemon, size: { min: 1, max: 1 } })
+    if (this.filterKeys.has('xxl'))
+      results.push({ pokemon, size: { min: 5, max: 5 } })
+    return results
   }
 
   /**
@@ -322,6 +348,7 @@ module.exports = class PkmnBackend {
         !this.mods.onlyLinkGlobal ||
         (this.pokemon === pokemon.pokemon_id && this.form === pokemon.form)
       ) {
+        if (!this.expertFilter || !this.expertGlobal) return true
         if (this.expertFilter(pokemon)) {
           return true
         }
@@ -335,12 +362,12 @@ module.exports = class PkmnBackend {
 
   /**
    * @param {import("@rm/types").Pokemon} pokemon
-   * @param {number} safeTs
+   * @param {number} [ts]
    * @returns {{ cleanPvp: { [key in typeof LEAGUES[number]]?: number[] }, bestPvp: number }}
    */
-  buildPvp(pokemon, safeTs = Math.floor(Date.now() / 1000)) {
+  buildPvp(pokemon, ts = Math.floor(Date.now() / 1000)) {
     const parsed = pvpConfig.reactMapHandlesPvp
-      ? Pvp.resultWithCache(pokemon, safeTs)
+      ? Pvp.resultWithCache(pokemon, ts)
       : getParsedPvp(pokemon)
     const cleanPvp = {}
     let bestPvp = 4096

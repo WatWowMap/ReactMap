@@ -1,4 +1,5 @@
 // @ts-check
+import { t } from 'i18next'
 import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
 import { useStatic } from '@hooks/useStore'
 
@@ -307,10 +308,9 @@ export default class Poracle {
    *
    * @param {object} item
    * @param {Exclude<import('@components/layout/dialogs/webhooks/store').WebhookStore['category'], 'human'>} category
-   * @param {import('i18next').TFunction} t
    * @returns {string}
    */
-  static generateDescription(item, category, t) {
+  static generateDescription(item, category) {
     const { leagues } = useWebhookStore.getState().context
     switch (category) {
       case 'invasion': {

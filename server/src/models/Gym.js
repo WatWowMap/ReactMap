@@ -2,14 +2,14 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const {
-  api: { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms },
-  defaultFilters: {
-    gyms: { baseGymSlotAmounts },
-  },
-} = require('@rm/config')
+const config = require('@rm/config')
+
 const { Event, Db } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
+
+const { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms } =
+  config.getSafe('api')
+const { baseGymSlotAmounts } = config.getSafe('defaultFilters.gyms')
 
 const coreFields = [
   'id',
@@ -70,10 +70,9 @@ class Gym extends Model {
       onlyRaidTier,
       onlyGymBadges,
       onlyBadge,
-      ts,
       onlyAreas = [],
     } = args.filters
-    const safeTs = ts || Math.floor(new Date().getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
 
     if (isMad) {
@@ -109,12 +108,12 @@ class Gym extends Model {
       if (hideOldGyms) {
         query.whereRaw(
           `UNIX_TIMESTAMP(gym.last_scanned) > ${
-            Date.now() / 1000 - gymValidDataLimit * 86400
+            ts - gymValidDataLimit * 86400
           }`,
         )
       }
     } else if (hideOldGyms) {
-      query.where('updated', '>', Date.now() / 1000 - gymValidDataLimit * 86400)
+      query.where('updated', '>', ts - gymValidDataLimit * 86400)
     }
     query
       .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
@@ -279,7 +278,7 @@ class Gym extends Model {
                 .where(
                   isMad ? 'end' : 'raid_end_timestamp',
                   '>=',
-                  isMad ? this.knex().fn.now() : safeTs,
+                  isMad ? this.knex().fn.now() : ts,
                 )
                 .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [
                   ...(raidBosses || []),
@@ -301,7 +300,7 @@ class Gym extends Model {
                   .where(
                     isMad ? 'start' : 'raid_battle_timestamp',
                     '>=',
-                    isMad ? this.knex().fn.now() : safeTs,
+                    isMad ? this.knex().fn.now() : ts,
                   )
                   .orWhere((unknownEggs) => {
                     unknownEggs
@@ -309,7 +308,7 @@ class Gym extends Model {
                       .andWhere(
                         isMad ? 'end' : 'raid_end_timestamp',
                         '>=',
-                        isMad ? this.knex().fn.now() : safeTs,
+                        isMad ? this.knex().fn.now() : ts,
                       )
                   })
               })
@@ -322,7 +321,7 @@ class Gym extends Model {
               .andWhere(
                 isMad ? 'end' : 'raid_end_timestamp',
                 '>=',
-                isMad ? this.knex().fn.now() : safeTs,
+                isMad ? this.knex().fn.now() : ts,
               )
           })
         }
@@ -342,7 +341,7 @@ class Gym extends Model {
         const newGym = Object.fromEntries(
           coreFields.map((field) => [field, gym[field]]),
         )
-        const isRaid = gym.raid_end_timestamp > safeTs
+        const isRaid = gym.raid_end_timestamp > ts
         const isEgg = isRaid && !gym.raid_pokemon_id
 
         if (userBadgeObj[gym.id]) {
@@ -352,7 +351,7 @@ class Gym extends Model {
           if (gym.availble_slots !== undefined) {
             gym.available_slots = gym.availble_slots
           }
-          if (gym.updated > Date.now() / 1000 - gymValidDataLimit * 86400) {
+          if (gym.updated > ts - gymValidDataLimit * 86400) {
             gymFields.forEach((field) => (newGym[field] = gym[field]))
           }
         }
@@ -396,7 +395,7 @@ class Gym extends Model {
   }
 
   static async getAvailable({ isMad, availableSlotsCol }) {
-    const ts = Math.floor(new Date().getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const results = await this.query()
       .select([
         isMad ? 'pokemon_id AS raid_pokemon_id' : 'raid_pokemon_id',
@@ -478,7 +477,8 @@ class Gym extends Model {
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
-    const safeTs = args.ts || Math.floor(new Date().getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
+
     const query = this.query()
       .select([
         'name',
@@ -500,12 +500,12 @@ class Gym extends Model {
       .andWhere(
         isMad ? 'start' : 'raid_battle_timestamp',
         '<=',
-        isMad ? this.knex().fn.now() : safeTs,
+        isMad ? this.knex().fn.now() : ts,
       )
       .andWhere(
         isMad ? 'end' : 'raid_end_timestamp',
         '>=',
-        isMad ? this.knex().fn.now() : safeTs,
+        isMad ? this.knex().fn.now() : ts,
       )
       .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {

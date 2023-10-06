@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Sets the non-reactive loading element's inner text
  * @param {string} text

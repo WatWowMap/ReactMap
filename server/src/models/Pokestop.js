@@ -1,17 +1,18 @@
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const {
-  api: {
-    searchResultsLimit,
-    queryLimits,
-    stopValidDataLimit,
-    hideOldPokestops,
-  },
-  map,
-} = require('@rm/config')
-const { Event } = require('../services/initialization')
+const config = require('@rm/config')
 
+const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
+const { getUserMidnight } = require('../services/functions/getClientTime')
+
+const {
+  searchResultsLimit,
+  queryLimits,
+  stopValidDataLimit,
+  hideOldPokestops,
+} = config.getSafe('api')
+const map = config.getSafe('map')
 
 const questProps = {
   quest_type: true,
@@ -87,11 +88,9 @@ class Pokestop extends Model {
         onlyConfirmed,
         onlyAreas = [],
       },
-      ts,
-      midnight: clientMidnight,
     } = args
-    const midnight = clientMidnight || 0
-    const safeTs = ts || Math.floor(new Date().getTime() / 1000)
+    const midnight = getUserMidnight(args)
+    const ts = Math.floor(Date.now() / 1000)
 
     const {
       lures: lurePerms,
@@ -131,17 +130,11 @@ class Pokestop extends Model {
       }
       if (hideOldPokestops) {
         query.whereRaw(
-          `UNIX_TIMESTAMP(last_updated) > ${
-            Date.now() / 1000 - stopValidDataLimit * 86400
-          }`,
+          `UNIX_TIMESTAMP(last_updated) > ${ts - stopValidDataLimit * 86400}`,
         )
       }
     } else if (hideOldPokestops) {
-      query.where(
-        'pokestop.updated',
-        '>',
-        Date.now() / 1000 - stopValidDataLimit * 86400,
-      )
+      query.where('pokestop.updated', '>', ts - stopValidDataLimit * 86400)
     }
     if (hasMultiInvasions) {
       if (isMad) {
@@ -255,7 +248,7 @@ class Pokestop extends Model {
               .andWhere(
                 isMad ? 'lure_expiration' : 'lure_expire_timestamp',
                 '>=',
-                isMad ? this.knex().fn.now() : safeTs,
+                isMad ? this.knex().fn.now() : ts,
               )
           })
         }
@@ -532,7 +525,7 @@ class Pokestop extends Model {
                 invasion.andWhere(
                   multiInvasionMs ? 'expiration_ms' : 'expiration',
                   '>=',
-                  safeTs * (multiInvasionMs ? 1000 : 1),
+                  ts * (multiInvasionMs ? 1000 : 1),
                 )
               }
               if (hasConfirmed && onlyConfirmed) {
@@ -576,7 +569,7 @@ class Pokestop extends Model {
                   MADE_UP_MAD_INVASIONS,
                 )
               } else {
-                invasion.andWhere('expiration', '>=', safeTs)
+                invasion.andWhere('expiration', '>=', ts)
               }
               if (hasConfirmed) {
                 invasion.andWhere('confirmed', onlyConfirmed)
@@ -613,7 +606,7 @@ class Pokestop extends Model {
               event.where(
                 multiInvasionMs ? 'expiration_ms' : 'expiration',
                 '>=',
-                safeTs * (multiInvasionMs ? 1000 : 1),
+                ts * (multiInvasionMs ? 1000 : 1),
               )
             }
           })
@@ -625,15 +618,15 @@ class Pokestop extends Model {
     const results = await query
 
     const normalized = isMad
-      ? this.mapMAD(results, safeTs)
-      : this.mapRDM(results, safeTs)
+      ? this.mapMAD(results, ts)
+      : this.mapRDM(results, ts)
     if (normalized.length > queryLimits.pokestops)
       normalized.length = queryLimits.pokestops
     const finalResults = this.secondaryFilter(
       normalized,
       args.filters,
       isMad,
-      safeTs,
+      ts,
       midnight,
       perms,
       hasMultiInvasions,
@@ -651,7 +644,7 @@ class Pokestop extends Model {
     queryResults,
     filters,
     isMad,
-    safeTs,
+    ts,
     midnight,
     perms,
     hasMultiInvasions,
@@ -765,7 +758,7 @@ class Pokestop extends Model {
         perms.lures &&
         (filters.onlyAllPokestops ||
           (filters.onlyLures &&
-            pokestop.lure_expire_timestamp >= safeTs &&
+            pokestop.lure_expire_timestamp >= ts &&
             filters[`l${pokestop.lure_id}`]))
       ) {
         this.fieldAssigner(filtered, pokestop, [
@@ -779,7 +772,7 @@ class Pokestop extends Model {
         pokestop.quests.forEach((quest) => {
           if (
             quest.quest_reward_type &&
-            (!map.enableQuestSetSelector ||
+            (!map.misc.enableQuestSetSelector ||
               filters.onlyShowQuestSet === 'both' ||
               (filters.onlyShowQuestSet === 'with_ar' && quest.with_ar) ||
               (filters.onlyShowQuestSet === 'without_ar' && !quest.with_ar))
@@ -973,7 +966,7 @@ class Pokestop extends Model {
     hasConfirmed,
     hasShowcaseData,
   }) {
-    const ts = Math.floor(new Date().getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const finalList = new Set()
     const conditions = {}
     const queries = {}
@@ -1575,8 +1568,8 @@ class Pokestop extends Model {
   }
 
   static async searchQuests(perms, args, { isMad, hasAltQuests }, distance) {
-    const { search, onlyAreas = [], locale, midnight: clientMidnight } = args
-    const midnight = clientMidnight || 0
+    const { search, onlyAreas = [], locale, lat, lon } = args
+    const midnight = getUserMidnight({ lat, lon })
 
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next
@@ -1680,6 +1673,7 @@ class Pokestop extends Model {
 
   static async searchLures(perms, args, { isMad }, distance) {
     const { search, onlyAreas = [], locale } = args
+    const ts = Math.floor(Date.now() / 1000)
 
     const lureIds = Object.keys(Event.masterfile.items)
       .filter((item) => Event.masterfile.items[item].startsWith('Troy Disk'))
@@ -1707,7 +1701,7 @@ class Pokestop extends Model {
       .andWhere(
         isMad ? 'lure_expiration' : 'lure_expire_timestamp',
         '>=',
-        isMad ? this.knex().fn.now() : Math.floor(Date.now() / 1000),
+        isMad ? this.knex().fn.now() : ts,
       )
       .whereIn(isMad ? 'active_fort_modifier' : 'lure_id', lureIds)
       .limit(searchResultsLimit)

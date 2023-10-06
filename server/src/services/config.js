@@ -62,8 +62,6 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
     MANUAL_DB_NAME,
     MANUAL_DB_USERNAME,
     MANUAL_DB_PASSWORD,
-    MAP_GENERAL_START_LAT,
-    MAP_GENERAL_START_LON,
   } = process.env
 
   const hasScannerDb =
@@ -138,12 +136,6 @@ if (!fs.existsSync(resolve(`${__dirname}/../configs/local.json`))) {
       'Neither a ReactMap database or Manual database was found, you will need one of these to proceed.',
     )
   }
-  if (!MAP_GENERAL_START_LAT || !MAP_GENERAL_START_LON) {
-    log.warn(
-      HELPERS.config,
-      'Missing, MAP_GENERAL_START_LAT OR MAP_GENERAL_START_LON\nYou will be able to proceed but you should add these values to your docker-compose file',
-    )
-  }
 }
 if (fs.existsSync(resolve(`${__dirname}/../configs/config.json`))) {
   log.info(
@@ -171,47 +163,40 @@ if (config.icons.styles.length === 0) {
   })
 }
 
-/** @param {Partial<import("@rm/types").Config['map']>} [input] */
-const mergeMapConfig = (input) => {
-  const obj = input ?? config.getSafe('map')
+/**
+ * @param {Partial<import("@rm/types").Config['map']>} [input]
+ * @returns {import("@rm/types").Config['map']}
+ */
+const mergeMapConfig = (input = {}) => {
   const base = config.getSafe('map')
 
-  const menuOrder = obj?.general?.menuOrder
-    ? obj.general.menuOrder.filter((x) => allowedMenuItems.includes(x))
+  /** @type {import('@rm/types').Config['map']} */
+  const merged = config.util.extendDeep({}, base, input)
+
+  merged.general.menuOrder = merged?.general?.menuOrder
+    ? merged.general.menuOrder.filter((x) => allowedMenuItems.includes(x))
     : []
 
-  return {
-    ...base,
-    ...obj,
-    ...base.general,
-    ...obj.general,
-    menuOrder,
-    ...base.customRoutes,
-    ...obj.customRoutes,
-    ...base.links,
-    ...obj.links,
-    ...base.misc,
-    ...obj.misc,
-    messageOfTheDay: {
-      ...base.messageOfTheDay,
-      ...obj.messageOfTheDay,
-      ...checkConfigJsons('messageOfTheDay', obj.domain),
-    },
-    donationPage: {
-      ...base.donationPage,
-      ...obj.donationPage,
-      ...checkConfigJsons('donationPage', obj.domain),
-    },
-    loginPage: {
-      ...base.loginPage,
-      ...obj.loginPage,
-      ...checkConfigJsons('loginPage', obj.domain),
-    },
-  }
+  merged.loginPage = config.util.extendDeep(
+    {},
+    merged.loginPage,
+    checkConfigJsons('loginPage', merged.domain),
+  )
+  merged.donationPage = config.util.extendDeep(
+    {},
+    merged.donationPage,
+    checkConfigJsons('donationPage', merged.domain),
+  )
+  merged.messageOfTheDay = config.util.extendDeep(
+    {},
+    merged.messageOfTheDay,
+    checkConfigJsons('messageOfTheDay', merged.domain),
+  )
+
+  return merged
 }
 
-// Merge sub-objects for the map object
-config.map = mergeMapConfig(config.map)
+config.map = mergeMapConfig()
 
 if (config.has('multiDomains')) {
   log.warn(
@@ -318,7 +303,7 @@ config.authentication.strategies = config.authentication.strategies.map(
 
 // Consolidate Auth Methods
 // Create Authentication Objects
-config.authMethods = [
+config.authentication.methods = [
   ...new Set(
     config.authentication.strategies
       .filter((strategy) => strategy.enabled)

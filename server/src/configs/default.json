@@ -102,6 +102,7 @@
     "hideOldGyms": false,
     "stopValidDataLimit": 30,
     "hideOldPokestops": false,
+    "routeUpdateLimit": 7,
     "fetchTimeoutMs": 5000,
     "pogoApiEndpoints": {
       "invasions": "https://raw.githubusercontent.com/WatWowMap/event-info/main/grunts/formatted.json",
@@ -242,7 +243,8 @@
       "enablePokestopPopupCoordsSelector": false,
       "enablePortalPopupCoordsSelector": false,
       "customFloatingIcons": [],
-      "expandAllScanAreas": false
+      "expandAllScanAreas": false,
+      "enableRouteDownload": false
     },
     "theme": {
       "style": "dark",
@@ -579,6 +581,7 @@
     "backendConfig": {
       "platform": "rdm/mad",
       "apiEndpoint": "http://ip:port/api/",
+      "headers": [],
       "apiUsername": "username",
       "apiPassword": "password",
       "queueRefreshInterval": 5,
@@ -626,6 +629,7 @@
         "type": "discord",
         "enabled": false,
         "logChannelId": "",
+        "logChannelHidePii": false,
         "scanNextLogChannelId": "",
         "scanZoneLogChannelId": "",
         "eventLogChannelId": "",
@@ -950,5 +954,22 @@
     "event": [],
     "never": []
   },
-  "manualAreas": []
+  "manualAreas": [],
+  "sentry": {
+    "client": {
+      "enabled": false,
+      "debug": false,
+      "dsn": "",
+      "tracesSampleRate": 0.1,
+      "authToken": "",
+      "org": "",
+      "project": ""
+    },
+    "server": {
+      "enabled": false,
+      "debug": false,
+      "dsn": "",
+      "tracesSampleRate": 0.1
+    }
+  }
 }

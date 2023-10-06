@@ -8,16 +8,8 @@ const { default: getDistance } = require('@turf/distance')
 const { point } = require('@turf/helpers')
 
 const { log, HELPERS } = require('@rm/logger')
+const config = require('@rm/config')
 
-const {
-  devOptions: { queryDebug },
-  api: {
-    searchResultsLimit,
-    pvp: { reactMapHandlesPvp },
-    queryLimits,
-  },
-  map: { distanceUnit },
-} = require('@rm/config')
 const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { filterRTree } = require('../services/functions/filterRTree')
@@ -31,6 +23,12 @@ const {
   BASE_KEYS,
 } = require('../services/filters/pokemon/constants')
 const PkmnFilter = require('../services/filters/pokemon/Backend')
+
+const distanceUnit = config.getSafe('map.misc.distanceUnit')
+const searchResultsLimit = config.getSafe('api.searchResultsLimit')
+const queryLimits = config.getSafe('api.queryLimits')
+const queryDebug = config.getSafe('devOptions.queryDebug')
+const reactMapHandlesPvp = config.getSafe('api.pvp.reactMapHandlesPvp')
 
 class Pokemon extends Model {
   static get tableName() {
@@ -126,18 +124,11 @@ class Pokemon extends Model {
    */
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
-    const {
-      onlyIvOr,
-      onlyHundoIv,
-      onlyZeroIv,
-      ts,
-      onlyAreas = [],
-    } = args.filters
+    const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
     const { hasSize, hasHeight, isMad, mem, secret, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
     let queryPvp = LEAGUES.some((league) => globalFilter.filterKeys.has(league))
-
-    const safeTs = ts || Math.floor(Date.now() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !pvp) {
@@ -146,6 +137,7 @@ class Pokemon extends Model {
       )
       if (!noPokemonSelect) return []
     }
+
     const query = this.query()
 
     const pokemonIds = []
@@ -171,7 +163,7 @@ class Pokemon extends Model {
         .where(
           isMad ? 'disappear_time' : 'expire_timestamp',
           '>=',
-          isMad ? this.knex().fn.now() : safeTs,
+          isMad ? this.knex().fn.now() : ts,
         )
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
           args.minLat,
@@ -241,9 +233,24 @@ class Pokemon extends Model {
       }
     }
 
-    /** @type {import("@rm/types").Pokemon[]} */
+    const filters = mem
+      ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
+      : []
+    if ((perms.iv || perms.pvp) && mem) {
+      const pokemon = Object.keys(filterMap)
+        .filter((key) => key.includes('-'))
+        .map((key) => {
+          const [id, form] = key.split('-', 2).map(Number)
+          return { id, form }
+        })
+      if (!globalFilter.mods.onlyLinkGlobal) pokemon.push({ id: -1 }) // add everything else
+      filters.push(...globalFilter.buildApiFilter(pokemon))
+      if (onlyZeroIv) filters.push({ iv: { min: 0, max: 0 }, pokemon })
+      if (onlyHundoIv) filters.push({ iv: { min: 100, max: 100 }, pokemon })
+    }
+    /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(
-      mem ? `${mem}/api/pokemon/scan` : null,
+      mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
             min: {
@@ -254,25 +261,8 @@ class Pokemon extends Model {
               latitude: args.maxLat,
               longitude: args.maxLon,
             },
-            center: {
-              latitude: 0,
-              longitude: 0,
-            },
-            searchIds: [],
-            global: {
-              ...globalFilter.buildApiFilter(),
-              additional: {
-                include_xxs: onlyIvOr.xxs || false,
-                include_xxl: onlyIvOr.xxl || false,
-                include_zeroiv: onlyZeroIv,
-                include_hundoiv: onlyHundoIv,
-                include_everything: false,
-              },
-            },
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-            filters: Object.fromEntries(
-              Object.values(filterMap).map((x) => [x.id, x.buildApiFilter()]),
-            ),
+            filters,
           })
         : query.limit(queryLimits.pokemon),
       'POST',
@@ -316,7 +306,7 @@ class Pokemon extends Model {
         .where(
           isMad ? 'disappear_time' : 'expire_timestamp',
           '>=',
-          isMad ? this.knex().fn.now() : safeTs,
+          isMad ? this.knex().fn.now() : ts,
         )
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
           args.minLat,
@@ -417,7 +407,7 @@ class Pokemon extends Model {
    */
   static async getLegacy(perms, args, ctx) {
     const { isMad, hasSize, hasHeight, mem, secret } = ctx
-    const ts = Math.floor(new Date().getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
     if (!perms.iv && !perms.pvp) {
@@ -458,8 +448,14 @@ class Pokemon extends Model {
       return []
     }
 
+    const filters = mem
+      ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
+      : []
+    if ((perms.iv || perms.pvp) && mem)
+      filters.push(...globalFilter.buildApiFilter())
+
     const results = await this.evalQuery(
-      mem ? `${mem}/api/pokemon/scan` : null,
+      mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
             min: {
@@ -470,15 +466,8 @@ class Pokemon extends Model {
               latitude: args.maxLat,
               longitude: args.maxLon,
             },
-            global: {
-              expert: args.filters.onlyIvOr.adv,
-            },
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-            filters: Object.fromEntries(
-              Object.entries(args.filters)
-                .filter(([k, v]) => k.includes('-') && v.enabled)
-                .map(([k, v]) => [k, { expert: v.adv }]),
-            ),
+            filters,
           })
         : query,
       'POST',
@@ -568,14 +557,14 @@ class Pokemon extends Model {
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
-    const safeTs = args.ts || Math.floor(Date.now() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
       .select(['pokemon_id', distance])
       .whereIn('pokemon_id', pokemonIds)
       .andWhere(
         isMad ? 'disappear_time' : 'expire_timestamp',
         '>=',
-        isMad ? this.knex().fn.now() : safeTs,
+        isMad ? this.knex().fn.now() : ts,
       )
       .limit(searchResultsLimit)
       .orderBy('distance')

@@ -113,6 +113,16 @@ const viteConfig = defineConfig(async ({ mode }) => {
     )
   }
 
+  const sentry = config.getSafe('sentry.client')
+  sentry.enabled = sentry.enabled || !!env.SENTRY_DSN
+  if (env.SENTRY_AUTH_TOKEN) sentry.authToken = env.SENTRY_AUTH_TOKEN
+  if (env.SENTRY_ORG) sentry.org = env.SENTRY_ORG
+  if (env.SENTRY_PROJECT) sentry.project = env.SENTRY_PROJECT
+  if (env.SENTRY_DSN) sentry.dsn = env.SENTRY_DSN
+  if (env.SENTRY_TRACES_SAMPLE_RATE)
+    sentry.tracesSampleRate = +env.SENTRY_TRACES_SAMPLE_RATE || 0.1
+  if (env.SENTRY_DEBUG) sentry.debug = !!env.SENTRY_DEBUG
+
   return {
     plugins: [
       react({
@@ -142,14 +152,12 @@ const viteConfig = defineConfig(async ({ mode }) => {
           },
         ],
       }),
-      ...(process.env.SENTRY_AUTH_TOKEN &&
-      process.env.SENTRY_ORG &&
-      process.env.SENTRY_PROJECT
+      ...(sentry.authToken && sentry.org && sentry.project
         ? [
             sentryVitePlugin({
-              org: process.env.SENTRY_ORG,
-              project: process.env.SENTRY_PROJECT,
-              authToken: process.env.SENTRY_AUTH_TOKEN,
+              org: sentry.org,
+              project: sentry.project,
+              authToken: sentry.authToken,
             }),
           ]
         : []),
@@ -171,16 +179,18 @@ const viteConfig = defineConfig(async ({ mode }) => {
           version,
           locales,
           hasCustom,
-          sentry: {
-            dsn: env.SENTRY_DSN || '',
-            tracesSampleRate: env.SENTRY_TRACES_SAMPLE_RATE || 0.1,
-            debug: env.SENTRY_DEBUG || false,
-          },
           title: config.getSafe('map.general.headerTitle'),
         },
+        sentry: { client: sentry },
         googleAnalyticsId:
           config.getSafe('googleAnalyticsId') || env.GOOGLE_ANALYTICS_ID || '',
-        // map: config.getSafe('map'),
+        map: {
+          general: {
+            startLat: config.getSafe('map.general.startLat'),
+            startLon: config.getSafe('map.general.startLon'),
+            startZoom: config.getSafe('map.general.startZoom'),
+          },
+        },
       },
     },
     esbuild: {

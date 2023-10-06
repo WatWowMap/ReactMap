@@ -23,6 +23,23 @@ export default function DraggableMarker() {
   const [radius, setRadius] = React.useState(/** @type {number | ''} */ (1000))
   const [position, setPosition] = React.useState(webhookLocation)
 
+  /** @type {import('react-leaflet').MarkerProps['eventHandlers']} */
+  const eventHandlers = React.useMemo(
+    () => ({
+      dragend({ target }) {
+        if (target) {
+          const { lat, lng } = target.getLatLng()
+          map.flyTo([lat, lng])
+          setPosition([lat, lng])
+        }
+      },
+      add({ target }) {
+        if (target) target.openPopup()
+      },
+    }),
+    [map],
+  )
+
   React.useEffect(() => {
     if (webhookLocation.every((x) => x !== 0)) {
       setPosition(webhookLocation)
@@ -40,17 +57,9 @@ export default function DraggableMarker() {
     <>
       <Marker
         draggable
-        eventHandlers={{
-          dragend({ target, popup }) {
-            if (target) {
-              const { lat, lng } = target.getLatLng()
-              map.flyTo([lat, lng])
-              setPosition([lat, lng])
-            }
-            if (popup) {
-              popup.openOn(map)
-            }
-          },
+        eventHandlers={eventHandlers}
+        ref={(ref) => {
+          if (ref) ref.openPopup()
         }}
         position={position}
         icon={fallbackIcon}

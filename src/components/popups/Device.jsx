@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from 'react'
+// @ts-check
+import * as React from 'react'
 import { Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
-export default function DevicePopup({ device, isOnline, ts }) {
+export default function DevicePopup({ isOnline, ts, ...device }) {
   const { t } = useTranslation()
 
-  useEffect(() => {
+  React.useEffect(() => {
     Utility.analytics('Popup', 'Popup Clicked', 'Device')
   }, [])
 
   return (
-    <ErrorBoundary noRefresh style={{}} variant="h5">
+    <ErrorBoundary noRefresh variant="h5">
       <Typography variant="h6" align="center">
         {device.id}
       </Typography>
@@ -37,9 +38,9 @@ export default function DevicePopup({ device, isOnline, ts }) {
 const Timer = ({ device, t, ts }) => {
   const { updated } = device
   const lastSeen = new Date(updated * 1000)
-  const [since, setSince] = useState(Utility.getTimeUntil(lastSeen))
+  const [since, setSince] = React.useState(Utility.getTimeUntil(lastSeen))
 
-  useEffect(() => {
+  React.useEffect(() => {
     const timer = setTimeout(() => {
       setSince(Utility.getTimeUntil(lastSeen))
     }, 1000)

@@ -1,26 +1,36 @@
+// @ts-check
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import getAvailable from '@services/queries/available'
 
 import UIcons from '@services/Icons'
+import { deepMerge } from '@services/functions/deepMerge'
 
 import { useStatic, useStore } from './useStore'
 
 export default function useRefresh() {
   const active = useStatic((s) => s.active)
+  const online = useStatic((s) => s.online)
 
-  const { data, stopPolling, startPolling } = useQuery(getAvailable, {
-    fetchPolicy: active ? 'network-only' : 'cache-only',
+  const hasIcons = useStatic((s) => !!s.Icons)
+
+  const { data, stopPolling, startPolling, refetch } = useQuery(getAvailable, {
+    fetchPolicy: active && online ? 'network-only' : 'cache-only',
     pollInterval: 1000 * 60 * 60,
   })
 
   useEffect(() => {
-    if (active) {
+    if (active && online) {
       startPolling(1000 * 60 * 60)
       return () => stopPolling()
     }
-    stopPolling()
-  }, [active])
+  }, [active, online])
+
+  useEffect(() => {
+    if (!hasIcons && online) {
+      refetch()
+    }
+  }, [hasIcons, online])
 
   useEffect(() => {
     if (data?.available) {
@@ -35,6 +45,7 @@ export default function useRefresh() {
         if (Icons.checkValid(userIcons)) {
           Icons.setSelection(userIcons)
         }
+        useStore.setState({ icons: Icons.selection })
       }
       if (masterfile) {
         localStorage.setItem(
@@ -48,6 +59,9 @@ export default function useRefresh() {
         filters,
         Icons,
       })
+      useStore.setState((prev) => ({
+        filters: deepMerge({}, filters, prev.filters),
+      }))
     }
   }, [data])
 }

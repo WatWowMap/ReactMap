@@ -22,7 +22,7 @@ type ActiveHour {
   day: Int
   hours: String
   mins: String
-  id: Int
+  id: ID
 }
 
 type PoracleProfile {

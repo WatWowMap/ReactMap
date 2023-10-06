@@ -9,15 +9,16 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
 import { ApolloProvider } from '@apollo/client'
 
-import customTheme from '@assets/mui/theme'
+import useCustomTheme from '@assets/mui/theme'
 import { globalStyles } from '@assets/mui/global'
-import { useStore } from '@hooks/useStore'
-import apolloClient from '@services/apollo'
+import { useStatic, useStore } from '@hooks/useStore'
+import { apolloClient } from '@services/apollo'
 import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled'
 import { setLoadingText } from '@services/functions/setLoadingText'
 
-import Config from './Config'
 import ErrorBoundary from './ErrorBoundary'
+import ReactRouter from './ReactRouter'
+import HolidayEffects from './HolidayEffects'
 
 /**
  * @type {Record<string, string>}
@@ -56,8 +57,12 @@ function toggleDarkMode(event) {
 
 window.addEventListener('keydown', toggleDarkMode)
 
+window.addEventListener('online', () => useStatic.setState({ online: true }))
+
+window.addEventListener('offline', () => useStatic.setState({ online: false }))
+
 export default function App() {
-  const [theme, setTheme] = React.useState(customTheme())
+  const theme = useCustomTheme()
 
   const isValid = isLocalStorageEnabled()
 
@@ -65,19 +70,20 @@ export default function App() {
     setLoadingText('Local storage is required to use this app!')
   }
 
-  return isLocalStorageEnabled() ? (
+  return isValid ? (
     <ThemeProvider theme={theme}>
-      <React.Suspense fallback={<SetText />}>
-        <CssBaseline />
-        {globalStyles}
-        <ApolloProvider client={apolloClient}>
-          <ErrorBoundary>
+      <CssBaseline />
+      <ErrorBoundary>
+        <React.Suspense fallback={<SetText />}>
+          {globalStyles}
+          <ApolloProvider client={apolloClient}>
             <BrowserRouter>
-              <Config setTheme={setTheme} />
+              <ReactRouter />
             </BrowserRouter>
-          </ErrorBoundary>
-        </ApolloProvider>
-      </React.Suspense>
+            <HolidayEffects />
+          </ApolloProvider>
+        </React.Suspense>
+      </ErrorBoundary>
     </ThemeProvider>
   ) : null
 }

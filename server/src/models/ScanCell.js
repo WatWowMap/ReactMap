@@ -15,7 +15,7 @@ class ScanCell extends Model {
    * @param {import("@rm/types").Permissions} perms
    * @param {object} args
    * @param {import("@rm/types").DbContext} context
-   * @returns {Promise<import("@rm/types").FullScanCell[]>}
+   * @returns {Promise<import("@rm/types").ScanCell[]>}
    */
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
@@ -44,10 +44,10 @@ class ScanCell extends Model {
       .limit(config.getSafe('api.queryLimits.scanCells'))
       .from(isMad ? 'trs_s2cells' : 's2cell')
 
-    return results.map((cell) => ({
-      ...cell,
-      polygon: getPolyVector(cell.id, true).poly,
-    }))
+    results.forEach((cell) => {
+      cell.polygon = getPolyVector(cell.id, true).polygon
+    })
+    return results
   }
 }
 

@@ -1,9 +1,8 @@
 import * as React from 'react'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import DialogContent from '@mui/material/DialogContent'
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
 import Header from '../general/Header'
@@ -15,8 +14,7 @@ export default function DialogWrapper({
   handleClose,
   children,
 }) {
-  const { perms } = useStatic((s) => s.auth)
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [countdown, setCountdown] = React.useState(
     Math.floor(
       typeof configObj.settings?.timeoutSeconds === 'number'
@@ -24,17 +22,12 @@ export default function DialogWrapper({
         : 0,
     ),
   )
+
   const [footerOptions, setFooterOptions] = React.useState([
-    ...(configObj.footerButtons
-      ? configObj.footerButtons
-          .filter(
-            (button) =>
-              (!button.donorOnly && !button.freeloaderOnly) ||
-              (button.donorOnly && perms.donor) ||
-              (button.freeloaderOnly && !perms.donor),
-          )
-          .map((b) => ({ ...b, name: Utility.getBlockContent(b.name) }))
-      : []),
+    ...(configObj.footerButtons || []).map((b) => ({
+      ...b,
+      name: Utility.getBlockContent(b.name),
+    })),
     {
       name: `${t('close')}${countdown ? ` (${countdown})` : ''}`,
       action: handleClose,
@@ -42,6 +35,21 @@ export default function DialogWrapper({
       disabled: !!countdown,
     },
   ])
+
+  React.useEffect(() => {
+    setFooterOptions([
+      ...(configObj.footerButtons || []).map((b) => ({
+        ...b,
+        name: Utility.getBlockContent(b.name),
+      })),
+      {
+        name: `${t('close')}${countdown ? ` (${countdown})` : ''}`,
+        action: handleClose,
+        color: 'primary',
+        disabled: !!countdown,
+      },
+    ])
+  }, [configObj])
 
   React.useEffect(() => {
     if (countdown > 0) {
@@ -73,7 +81,7 @@ export default function DialogWrapper({
             : [defaultTitle]
         }
       />
-      <DialogContent>
+      <DialogContent key={i18n.language}>
         <Grid
           container
           spacing={configObj.settings.parentSpacing || 0}

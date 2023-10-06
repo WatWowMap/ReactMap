@@ -112,30 +112,31 @@ type SearchQuest {
   quest_target: Int
 }
 
-type WayfarerCell {
+type Level17Cell {
   id: String
   level: Int
-  count: Int
-  count_pokestops: Int
-  count_gyms: Int
   polygon: [[Float]]
   blocked: Boolean
 }
 
-type Ring {
+type Level14Cell {
+  id: String
+  level: Int
+  polygon: [[Float]]
+  count_pokestops: Int
+  count_gyms: Int
+}
+
+type PoI {
   id: ID
   lat: Float
   lon: Float
 }
 
-type PlacementCell {
-  cells: [WayfarerCell]
-  rings: [Ring]
-}
-
 type SubmissionCell {
-  placementCells: PlacementCell
-  typeCells: [WayfarerCell]
+  level14Cells: [Level14Cell]
+  level17Cells: [Level17Cell]
+  pois: [PoI]
 }
 
 type Backup {

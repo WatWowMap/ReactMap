@@ -173,6 +173,60 @@ export interface Permissions {
   webhooks: string[]
 }
 
+export interface Waypoint {
+  lat_degrees: number
+  lng_degrees: number
+  elevation_in_meters: number
+}
+
+export interface Route {
+  id: string
+  name: string
+  description: string
+  distance_meters: number
+  duration_seconds: number
+  start_fort_id: string
+  start_lat: number
+  start_lon: number
+  start_image: string
+  end_fort_id: string
+  end_lat: number
+  end_lon: number
+  end_image: string
+  image: string
+  image_border_color: string
+  reversible: boolean
+  tags?: string[]
+  type: number
+  updated: number
+  version: number
+  waypoints: Waypoint[]
+}
+
+export interface FilterId {
+  id: number
+  form?: number
+}
+export interface DnfMinMax {
+  min: number
+  max: number
+}
+
+export interface DnfFilter {
+  pokemon?: FilterId
+  iv?: DnfMinMax
+  level?: DnfMinMax
+  cp?: DnfMinMax
+  atk_iv?: DnfMinMax
+  def_iv?: DnfMinMax
+  sta_iv?: DnfMinMax
+  gender?: DnfMinMax
+  size?: DnfMinMax
+  pvp_little?: DnfMinMax
+  pvp_great?: DnfMinMax
+  pvp_ultra?: DnfMinMax
+}
+
 export type DiscordVerifyFunction = (
   req: Request,
   accessToken: string,

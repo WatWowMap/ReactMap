@@ -1,4 +1,5 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import { Switch, ListItem, ListItemText } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
@@ -15,8 +16,12 @@ import { useStore } from '@hooks/useStore'
  */
 export default function ItemToggle({ category, subItem, ...props }) {
   const { t } = useTranslation()
-  const filters = useStore((s) => s.filters)
-  const { setFilters } = useStore.getState()
+  const checked = useStore(
+    (s) =>
+      (category === 'wayfarer' || category === 'admin'
+        ? s.filters[subItem]?.enabled
+        : s.filters[category]?.[subItem]) || false,
+  )
 
   if (
     (category === 's2cells' && subItem === 'cells') ||
@@ -36,28 +41,32 @@ export default function ItemToggle({ category, subItem, ...props }) {
       />
       {category === 'wayfarer' || category === 'admin' ? (
         <Switch
-          checked={filters[subItem].enabled}
-          onChange={() => {
-            setFilters({
-              ...filters,
-              [subItem]: {
-                ...filters[subItem],
-                enabled: !filters[subItem].enabled,
+          checked={checked}
+          onChange={() =>
+            useStore.setState((prev) => ({
+              filters: {
+                ...prev.filters,
+                [subItem]: {
+                  ...prev.filters[subItem],
+                  enabled: !prev.filters[subItem].enabled,
+                },
               },
-            })
-          }}
+            }))
+          }
         />
       ) : (
         <Switch
-          checked={filters[category][subItem]}
+          checked={checked}
           onChange={() => {
-            setFilters({
-              ...filters,
-              [category]: {
-                ...filters[category],
-                [subItem]: !filters[category][subItem],
+            useStore.setState((prev) => ({
+              filters: {
+                ...prev.filters,
+                [category]: {
+                  ...prev.filters[category],
+                  [subItem]: !prev.filters[category][subItem],
+                },
               },
-            })
+            }))
           }}
         />
       )}

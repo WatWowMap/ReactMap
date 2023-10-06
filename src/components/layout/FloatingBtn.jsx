@@ -1,17 +1,18 @@
 // @ts-check
 import * as React from 'react'
-import Menu from '@mui/icons-material/Menu'
-import MyLocation from '@mui/icons-material/MyLocation'
-import ZoomIn from '@mui/icons-material/ZoomIn'
-import ZoomOut from '@mui/icons-material/ZoomOut'
-import Search from '@mui/icons-material/Search'
-import NotificationsActive from '@mui/icons-material/NotificationsActive'
-import Save from '@mui/icons-material/Save'
-import CardMembership from '@mui/icons-material/CardMembership'
-import AttachMoney from '@mui/icons-material/AttachMoney'
+import MenuIcon from '@mui/icons-material/Menu'
+import MyLocationIcon from '@mui/icons-material/MyLocation'
+import ZoomInIcon from '@mui/icons-material/ZoomIn'
+import ZoomOutIcon from '@mui/icons-material/ZoomOut'
+import SearchIcon from '@mui/icons-material/Search'
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
+import CardMembershipIcon from '@mui/icons-material/CardMembership'
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
+import CheckIcon from '@mui/icons-material/Check'
+import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin'
+import CurrencyPoundIcon from '@mui/icons-material/CurrencyPound'
+
 import Stack from '@mui/material/Stack'
-// import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin'
-// import CurrencyPoundIcon from '@mui/icons-material/CurrencyPound'
 import EuroSymbol from '@mui/icons-material/EuroSymbol'
 import Person from '@mui/icons-material/Person'
 import TrackChanges from '@mui/icons-material/TrackChanges'
@@ -38,11 +39,11 @@ import { setModeBtn, useWebhookStore } from './dialogs/webhooks/store'
 /** @typedef {keyof ReturnType<typeof useLayoutStore['getState']> | keyof ReturnType<typeof useScanStore['getState']>} Keys */
 
 const DonationIcons = {
-  dollar: AttachMoney,
+  dollar: AttachMoneyIcon,
   euro: EuroSymbol,
-  card: CardMembership,
-  // bitcoin: CurrencyBitcoinIcon,
-  // pound: CurrencyPoundIcon,
+  card: CardMembershipIcon,
+  bitcoin: CurrencyBitcoinIcon,
+  pound: CurrencyPoundIcon,
 }
 
 const DEFAULT = {
@@ -81,6 +82,8 @@ export default function FloatingButtons() {
   )
 
   const isMobile = useStatic((s) => s.isMobile)
+  const online = useStatic((s) => s.online)
+
   const webhookMode = useWebhookStore((s) => s.mode)
 
   const scanNextMode = useScanStore((s) => s.scanNextMode)
@@ -100,7 +103,7 @@ export default function FloatingButtons() {
 
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'medium'
-  const disabled = !!webhookMode || !!scanNextMode || !!scanZoneMode
+  const disabled = !!webhookMode || !!scanNextMode || !!scanZoneMode || !online
 
   const handleNavBtn = React.useCallback(
     (/** @type {'zoomIn' | 'zoomOut' | 'locate'} */ name) => () => {
@@ -131,7 +134,7 @@ export default function FloatingButtons() {
         title={t('open_menu')}
         disabled={disabled}
       >
-        <Menu fontSize={iconSize} />
+        <MenuIcon fontSize={iconSize} />
       </Fab>
       {fabButtons.profileButton && (
         <Fab
@@ -152,7 +155,7 @@ export default function FloatingButtons() {
           title={t('search')}
           disabled={disabled}
         >
-          <Search fontSize={iconSize} sx={{ color: 'white' }} />
+          <SearchIcon fontSize={iconSize} sx={{ color: 'white' }} />
         </Fab>
       )}
       {fabButtons.webhooks && (
@@ -163,7 +166,10 @@ export default function FloatingButtons() {
           disabled={disabled}
           title={t('alert_manager')}
         >
-          <NotificationsActive fontSize={iconSize} sx={{ color: 'white' }} />
+          <NotificationsActiveIcon
+            fontSize={iconSize}
+            sx={{ color: 'white' }}
+          />
         </Fab>
       )}
       {fabButtons.scanNext && (
@@ -172,7 +178,7 @@ export default function FloatingButtons() {
           size={fabSize}
           onClick={handleClick('scanNextMode')}
           title={t('scan_next')}
-          disabled={Boolean(webhookMode) || Boolean(scanZoneMode)}
+          disabled={!!webhookMode || !!scanZoneMode || !online}
         >
           <TrackChanges fontSize={iconSize} sx={{ color: 'white' }} />
         </Fab>
@@ -183,7 +189,7 @@ export default function FloatingButtons() {
           size={fabSize}
           onClick={handleClick('scanZoneMode')}
           title={t('scan_zone')}
-          disabled={Boolean(webhookMode) || Boolean(scanNextMode)}
+          disabled={!!webhookMode || !!scanNextMode || !online}
         >
           <BlurOn fontSize={iconSize} sx={{ color: 'white' }} />
         </Fab>
@@ -207,7 +213,7 @@ export default function FloatingButtons() {
             onClick={handleNavBtn('locate')}
             title={t('use_my_location')}
           >
-            <MyLocation color={color} fontSize={iconSize} />
+            <MyLocationIcon color={color} fontSize={iconSize} />
           </Fab>
           <Fab
             color="secondary"
@@ -215,7 +221,7 @@ export default function FloatingButtons() {
             onClick={handleNavBtn('zoomIn')}
             title={t('zoom_in')}
           >
-            <ZoomIn fontSize={iconSize} sx={{ color: 'white' }} />
+            <ZoomInIcon fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
           <Fab
             color="secondary"
@@ -223,7 +229,7 @@ export default function FloatingButtons() {
             onClick={handleNavBtn('zoomOut')}
             title={t('zoom_out')}
           >
-            <ZoomOut fontSize={iconSize} sx={{ color: 'white' }} />
+            <ZoomOutIcon fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         </>
       )}
@@ -233,24 +239,26 @@ export default function FloatingButtons() {
             color="primary"
             size={fabSize}
             onClick={setModeBtn('open')}
-            title={t('save')}
+            title={t('done')}
           >
-            <Save fontSize={iconSize} sx={{ color: 'white' }} />
+            <CheckIcon fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
         )}
-      {fabButtons.custom.map((icon) => (
-        <Fab
-          key={`${icon.color}${icon.href}${icon.icon}`}
-          color={icon.color || 'secondary'}
-          size={fabSize}
-          href={icon.href}
-          referrerPolicy="no-referrer"
-          target={icon.target || '_blank'}
-          disabled={disabled}
-        >
-          <I className={icon.icon} size={iconSize} />
-        </Fab>
-      ))}
+      {(Array.isArray(fabButtons.custom) ? fabButtons.custom : []).map(
+        (icon) => (
+          <Fab
+            key={`${icon.color}${icon.href}${icon.icon}`}
+            color={icon.color || 'secondary'}
+            size={fabSize}
+            href={icon.href}
+            referrerPolicy="no-referrer"
+            target={icon.target || '_blank'}
+            disabled={disabled}
+          >
+            <I className={icon.icon} size={iconSize} />
+          </Fab>
+        ),
+      )}
     </Stack>
   )
 }

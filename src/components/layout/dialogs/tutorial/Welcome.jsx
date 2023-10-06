@@ -11,10 +11,10 @@ import LocaleSelection from '@components/layout/general/LocaleSelection'
 export default function TutWelcome() {
   const { t } = useTranslation()
   const { methods, loggedIn, perms, counts } = useStatic((state) => state.auth)
-  const {
-    map: { enableUserProfile, excludeList },
-  } = useStatic((state) => state.config)
-
+  const enableUserProfile = useStatic(
+    (state) => state.config.misc.enableUserProfile,
+  )
+  const excludeList = useStatic((s) => s.tutorialExcludeList)
   const getPerms = () => {
     let have = 0
     let total = 0

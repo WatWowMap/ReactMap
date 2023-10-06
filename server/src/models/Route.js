@@ -1,6 +1,9 @@
 // @ts-check
 const { Model, raw } = require('objection')
+const config = require('@rm/config')
+
 const getAreaSql = require('../services/functions/getAreaSql')
+const { getEpoch } = require('../services/functions/getClientTime')
 
 const GET_ALL_SELECT = /** @type {const} */ ([
   'id',
@@ -23,6 +26,8 @@ const GET_MAD_ALL_SELECT = /** @type {const} */ ({
   reversible: 'reversible',
 })
 
+const updateSeconds = config.getSafe('api.routeUpdateLimit') * 24 * 60 * 60
+
 class Route extends Model {
   static get tableName() {
     return 'route'
@@ -38,7 +43,7 @@ class Route extends Model {
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const { onlyAreas, onlyDistance } = args.filters
-
+    const ts = getEpoch() - updateSeconds
     const distanceInMeters = (onlyDistance || [0.5, 100]).map((x) => x * 1000)
 
     const startLatitude = isMad ? 'start_poi_latitude' : 'start_lat'
@@ -52,13 +57,22 @@ class Route extends Model {
       .whereBetween(startLatitude, [args.minLat, args.maxLat])
       .andWhereBetween(startLongitude, [args.minLon, args.maxLon])
       .andWhereBetween(distanceMeters, distanceInMeters)
+      .andWhere(
+        isMad ? raw(`UNIX_TIMESTAMP(last_updated) > ${ts}`) : 'updated',
+        '>',
+        ts,
+      )
       .union((qb) => {
         qb.select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
           .whereBetween(endLatitude, [args.minLat, args.maxLat])
           .andWhereBetween(endLongitude, [args.minLon, args.maxLon])
           .andWhereBetween(distanceMeters, distanceInMeters)
+          .andWhere(
+            isMad ? raw(`UNIX_TIMESTAMP(last_updated) > ${ts}`) : 'updated',
+            '>',
+            ts,
+          )
           .from('route')
-
         getAreaSql(qb, areaRestrictions, onlyAreas, isMad, 'route_end')
       })
 

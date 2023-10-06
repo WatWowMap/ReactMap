@@ -1,6 +1,8 @@
 // @ts-check
+import { useStatic, useStore } from '@hooks/useStore'
 import { createTheme, responsiveFontSizes, darken } from '@mui/material/styles'
 import dlv from 'dlv'
+import { useMemo } from 'react'
 
 const VALID_COLOR =
   /^#([A-Fa-f0-9]{3,4}){1,2}$|^rgb\((\s*\d{1,3}\s*,){2}\s*\d{1,3}\s*\)$|^rgba\((\s*\d{1,3}\s*,){3}\s*(0?\.\d+|1\.0|1|\d{1,2}%)\s*\)$|^hsl\(\s*\d{1,3}(\s*,\s*\d{1,3}%){2}\s*\)$|^hsla\(\s*\d{1,3}(\s*,\s*\d{1,3}%){2}\s*,\s*(0?\.\d+|1\.0|1|\d{1,2}%)\s*\)$/
@@ -101,8 +103,8 @@ const components = {
           const finalColor =
             typeof backgroundColor === 'string'
               ? backgroundColor
-              : backgroundColor.main
-          if (!VALID_COLOR.test(finalColor)) {
+              : backgroundColor?.main
+          if (!VALID_COLOR.test(finalColor) || !finalColor) {
             return
           }
           return {
@@ -138,39 +140,47 @@ const components = {
   },
 }
 
-const DEFAULT_PALETTE = {
-  primary: '#ff5722',
-  secondary: '#00b0ff',
-}
-
 /**
- * @param {{ primary?: string, secondary?: string }} themeOptions
- * @param {boolean} darkMode
- * @returns
+ * @returns {import('@mui/material').Theme}
  */
-export default function customTheme(
-  themeOptions = DEFAULT_PALETTE,
-  darkMode = document.body.classList.contains('dark'),
-) {
-  const newTheme = createTheme({
-    palette: {
-      mode: darkMode ? 'dark' : 'light',
-      primary: {
-        main: themeOptions.primary,
-      },
-      secondary: {
-        main: themeOptions.secondary,
-        contrastText: '#fff',
-      },
-      discord: {
-        main: '#5865F2',
-        green: '#57F287',
-        yellow: '#FEE75C',
-        fuchsia: '#EB459E',
-        red: '#ED4245',
-      },
-    },
-    components,
-  })
-  return responsiveFontSizes(newTheme)
+export default function useCustomTheme() {
+  const primary = useStatic((s) => s.theme.primary)
+  const secondary = useStatic((s) => s.theme.secondary)
+  const darkMode = useStore((s) => s.darkMode)
+
+  if (darkMode) {
+    if (!document.body.classList.contains('dark')) {
+      document.body.classList.add('dark')
+    }
+  } else if (document.body.classList.contains('dark')) {
+    document.body.classList.remove('dark')
+  }
+
+  const newTheme = useMemo(
+    () =>
+      responsiveFontSizes(
+        createTheme({
+          palette: {
+            mode: darkMode ? 'dark' : 'light',
+            primary: {
+              main: primary,
+            },
+            secondary: {
+              main: secondary,
+              contrastText: '#fff',
+            },
+            discord: {
+              main: '#5865F2',
+              green: '#57F287',
+              yellow: '#FEE75C',
+              fuchsia: '#EB459E',
+              red: '#ED4245',
+            },
+          },
+          components,
+        }),
+      ),
+    [darkMode, primary, secondary],
+  )
+  return newTheme
 }

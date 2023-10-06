@@ -10,18 +10,19 @@ import LocalLogin from '../auth/Local'
 import Telegram from '../auth/Telegram'
 import CustomText from './CustomText'
 import CustomButton from './CustomButton'
-import CustomImg from './CustomImg'
+import { Img } from './CustomImg'
 import LocaleSelection from '../general/LocaleSelection'
 import LinkWrapper from './LinkWrapper'
 
 export default function Generator({ block = {}, defaultReturn = null }) {
-  const { content = null, text = null, ...props } = block
+  // eslint-disable-next-line no-unused-vars
+  const { content = null, text = null, gridSizes, ...props } = block
   const children = Utility.getBlockContent(content || text)
   switch (block.type) {
     case 'img':
       return (
         <LinkWrapper {...props}>
-          <CustomImg {...props} />
+          <Img {...props} />
         </LinkWrapper>
       )
     case 'button':
@@ -68,28 +69,29 @@ export default function Generator({ block = {}, defaultReturn = null }) {
           style={block.style}
           sx={block.sx}
         >
-          {block.components.map((subBlock, i) =>
-            subBlock.type === 'parent' ? (
-              <Generator
-                key={i}
-                block={subBlock}
-                defaultReturn={defaultReturn}
-              />
-            ) : (
-              <Grid
-                key={i}
-                {...Utility.getSizes(subBlock.gridSizes)}
-                className={block.className}
-                style={subBlock.gridStyle}
-                sx={subBlock.gridSx}
-              >
+          {(Array.isArray(block.components) ? block.components : []).map(
+            (subBlock, i) =>
+              subBlock.type === 'parent' ? (
                 <Generator
                   key={i}
                   block={subBlock}
                   defaultReturn={defaultReturn}
                 />
-              </Grid>
-            ),
+              ) : (
+                <Grid
+                  key={i}
+                  {...Utility.getSizes(subBlock.gridSizes)}
+                  className={block.className}
+                  style={subBlock.gridStyle}
+                  sx={subBlock.gridSx}
+                >
+                  <Generator
+                    key={i}
+                    block={subBlock}
+                    defaultReturn={defaultReturn}
+                  />
+                </Grid>
+              ),
           )}
         </Grid>
       )

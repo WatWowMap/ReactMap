@@ -26,7 +26,6 @@ export default function AdvancedFilter({
   toggleAdvMenu,
   advancedFilter,
   type,
-  isTutorial,
   isMobile,
 }) {
   Utility.analytics(`/${type}/${advancedFilter.id}`)
@@ -43,10 +42,6 @@ export default function AdvancedFilter({
     `ID: ${advancedFilter.id} Size: ${filterValues.size}`,
     type,
   )
-  if (isTutorial) {
-    ui.pokemon = isTutorial
-  }
-
   const handleChange = (event, values) => {
     if (values) {
       if (event === 'default') {

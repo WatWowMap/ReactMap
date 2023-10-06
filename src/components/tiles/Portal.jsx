@@ -1,46 +1,48 @@
-import React, { useState, useRef, memo } from 'react'
+/* eslint-disable react/destructuring-assignment */
+// @ts-check
+import * as React from 'react'
 import { Circle, Popup } from 'react-leaflet'
 
+import { useStore } from '@hooks/useStore'
 import useForcePopup from '@hooks/useForcePopup'
 
 import PopupContent from '../popups/Portal'
-import marker from '../markers/portal'
 
-const PortalTile = ({ item, userSettings, ts, params, Icons, setParams }) => {
-  const [done, setDone] = useState(false)
-  const markerRef = useRef({})
+/**
+ *
+ * @param {{ force?: boolean } & import('@rm/types').Portal} portal
+ * @returns
+ */
+const PortalTile = (portal) => {
+  const [markerRef, setMarkerRef] = React.useState(null)
+  const color = useStore((s) =>
+    Date.now() / 1000 - portal.imported > 86400
+      ? s.userSettings.wayfarer.oldPortals
+      : s.userSettings.wayfarer.newPortals,
+  )
 
-  useForcePopup(item.id, markerRef, params, setParams, done)
+  useForcePopup(portal.id, markerRef)
 
   return (
     <Circle
-      key={item.id}
-      ref={(m) => {
-        markerRef.current[item.id] = m
-        if (!done && item.id === params.id) {
-          setDone(true)
-        }
-      }}
-      center={[item.lat, item.lon]}
+      key={color}
+      ref={setMarkerRef}
+      center={[portal.lat, portal.lon]}
       radius={20}
-      pathOptions={marker(item, ts, userSettings)}
+      fillOpacity={0.25}
+      color={color}
+      fillColor={color}
     >
-      <Popup position={[item.lat, item.lon]}>
-        <PopupContent
-          portal={item}
-          userSettings={userSettings}
-          ts={ts}
-          Icons={Icons}
-        />
+      <Popup position={[portal.lat, portal.lon]}>
+        <PopupContent {...portal} />
       </Popup>
     </Circle>
   )
 }
 
-const areEqual = (prev, next) =>
-  prev.item.id === next.item.id &&
-  prev.userSettings.clustering === next.userSettings.clustering &&
-  prev.userSettings.oldPortals === next.userSettings.oldPortals &&
-  prev.userSettings.newPortals === next.userSettings.newPortals
+const MemoPortalTile = React.memo(
+  PortalTile,
+  (prev, next) => prev.updated === next.updated,
+)
 
-export default memo(PortalTile, areEqual)
+export default MemoPortalTile
