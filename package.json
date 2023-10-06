@@ -83,7 +83,7 @@
     "express-session": "^1.17.3",
     "extend": "^3.0.2",
     "geo-tz": "^7.0.7",
-    "graphql": "^16.6.0",
+    "graphql": "^16.8.1",
     "graphql-type-json": "^0.3.2",
     "i18next": "^21.6.16",
     "i18next-browser-languagedetector": "^6.1.4",
